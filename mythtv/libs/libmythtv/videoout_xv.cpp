@@ -1002,7 +1002,8 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     bool done = false;
     // If use_xvmc try to create XvMC buffers
 #ifdef USING_VDPAU
-    if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END))
+    if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END) ||
+         mcodecid < kCodec_NORMAL_END)
     {
         vbuffers.Init(NUM_VDPAU_BUFFERS, true, 1, 4, 4, 1, false);
         done = InitVDPAU(mcodecid);
@@ -1323,7 +1324,7 @@ bool VideoOutputXv::InitVDPAU(MythCodecID mcodecid)
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
     bool ok = vdpau->Init(XJ_disp, XJ_screen, XJ_curwin,
                           display_visible_rect.size(),
-                          db_use_picture_controls);
+                          db_use_picture_controls, mcodecid);
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, "Unable to init VDPAU");
@@ -1339,6 +1340,12 @@ bool VideoOutputXv::InitVDPAU(MythCodecID mcodecid)
         VERBOSE(VB_IMPORTANT, "Unable to create VDPAU buffers");
         DeleteBuffers(XVideoVDPAU, false);
         return ok;
+    }
+    else
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+            QString("Created VDPAU context (%1 decode)")
+            .arg((mcodecid < kCodec_NORMAL_END) ? "software" : "GPU"));
     }
 
     video_output_subtype = XVideoVDPAU;            
@@ -2304,8 +2311,19 @@ bool VideoOutputXv::CreateVDPAUBuffers(void)
         return false;
     }
 
-    bool ok = vbuffers.CreateBuffers(video_dim.width(), 
-                                     video_dim.height(), vdpau);
+    bool ok = false;
+
+    if (myth_codec_id > kCodec_VDPAU_BEGIN &&
+        myth_codec_id < kCodec_VDPAU_END)
+    {
+        ok = vbuffers.CreateBuffers(video_dim.width(), 
+                               video_dim.height(), vdpau);
+    }
+    else if (myth_codec_id < kCodec_NORMAL_END)
+    {
+        ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+    }
+
     if (!ok)
     {
         DeleteBuffers(XVideoVDPAU, false);
@@ -3089,7 +3107,7 @@ void VideoOutputXv::PrepareFrameVDPAU(VideoFrame *frame, FrameScanType scan)
 
     vdpau->PrepareVideo(
         frame, windows[0].GetVideoRect(), windows[0].GetDisplayVideoRect(),
-	windows[0].GetDisplayVisibleRect().size(), scan);
+    	windows[0].GetDisplayVisibleRect().size(), scan);
 
 #endif
 
@@ -5086,14 +5104,24 @@ static void SetFromHW(Display *d,
     {
         useVDPAU = false;
 #ifdef USING_VDPAU
-        useVDPAU = VDPAUContext::CheckCodecSupported(vdpau_codec_id);
+        if (vdpau_codec_id < kCodec_NORMAL_END)
+        {
+            useVDPAU = true;
+        }
+        else
+        {
+            useVDPAU = VDPAUContext::CheckCodecSupported(vdpau_codec_id);
+        }
         if (useVDPAU)
         {
-            VDPAUContext *c = new VDPAUContext();
-            useVDPAU = c->Init(d, screen, curwin, QSize(1920,1200), false);
-            c->Deinit();
-            delete c;
+            // this hangs playback when using sofware decoding in live tv
+            //VDPAUContext *c = new VDPAUContext();
+            //useVDPAU = c->Init(d, screen, curwin, QSize(1920,1200),
+            //                   false, vdpau_codec_id);
+            //c->Deinit();
+            //delete c;
         }
+
 #endif // USING_VDPAU
     }
 }
@@ -5104,6 +5132,10 @@ static QStringList allowed_video_renderers(
     bool vld, idct, mc, xv, shm, xvmc_opengl, opengl, vdpau;
 
     myth2av_codecid(myth_codec_id, vld, idct, mc, vdpau);
+
+    // allow vdpau rendering for software decode
+    if (myth_codec_id < kCodec_NORMAL_END)
+        vdpau = true;
 
     opengl = xv = shm = !vld && !idct;
     xvmc_opengl = vld || idct || mc;
@@ -5122,6 +5154,8 @@ static QStringList allowed_video_renderers(
             list += "xv-blit";
         if (shm)
             list += "xshm";
+        if (vdpau)
+            list += "vdpau";
         list += "xlib";
     }
     else if ((kCodec_VDPAU_BEGIN < myth_codec_id) && 

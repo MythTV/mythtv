@@ -14,7 +14,8 @@ class VDPAUContext
    ~VDPAUContext();
 
     bool Init(Display *disp, Screen *screen, Window win,
-              QSize screen_size, bool color_control);
+              QSize screen_size, bool color_control,
+              MythCodecID mcodecid);
     void Deinit(void);
     bool IsErrored(void) { return errored; }
 
@@ -64,7 +65,7 @@ class VDPAUContext
     bool InitFlipQueue(Window win);
     void DeinitFlipQueue(void);
 
-    void UpdateReferenceFrames(VideoFrame *frame);
+    bool UpdateReferenceFrames(VideoFrame *frame);
     bool InitColorControl(void);
     bool SetPictureAttributes(void);
 
@@ -125,6 +126,8 @@ class VDPAUContext
 
     VdpPresentationQueueTarget vdp_flip_target;
     VdpPresentationQueue       vdp_flip_queue;
+
+    bool              vdpauDecode;
 
     VdpDevice vdp_device;
     bool      errored;

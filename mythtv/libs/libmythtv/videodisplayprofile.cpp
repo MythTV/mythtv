@@ -1609,6 +1609,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer["xvmc-vld"] += "xvmc-blit";
     safe_renderer["dummy"]    += "xvmc-opengl";
     safe_renderer["xvmc"]     += "xvmc-opengl";
+    safe_renderer["ffmpeg"]   += "vdpau";
 
     safe_renderer["dummy"]    += "quartz-accel";
     safe_renderer["macaccel"] += "quartz-accel";

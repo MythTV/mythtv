@@ -58,7 +58,7 @@ VDPAUContext::VDPAUContext()
     pipVideoSurface(0),     pipOutputSurface(0),
     pipVideoMixer(0),       pipReady(0),       pipAlpha(0),
     vdp_flip_target(NULL),  vdp_flip_queue(NULL),
-    vdp_device(NULL),       errored(false)
+    vdpauDecode(false),     vdp_device(NULL),  errored(false)
 {
     memset(outputSurfaces, 0, sizeof(outputSurfaces));
 }
@@ -69,8 +69,11 @@ VDPAUContext::~VDPAUContext()
 
 bool VDPAUContext::Init(Display *disp, Screen *screen,
                         Window win, QSize screen_size,
-                        bool color_control)
+                        bool color_control, MythCodecID mcodecid)
 {
+    if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END))
+        vdpauDecode = true;
+
     bool ok;
 
     ok = InitProcs(disp, screen);
@@ -493,6 +496,13 @@ void VDPAUContext::DeinitFlipQueue(void)
 
 bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
 {
+    int num_bufs = numbufs;
+
+    // for software decode, create enough surfaces for deinterlacing
+    // TODO only create when actually deinterlacing
+    if (!vdpauDecode)
+        num_bufs = NUM_REFERENCE_FRAMES;
+
     VdpStatus vdp_st;
     bool ok = true;
 
@@ -524,13 +534,16 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
         return false;
     }
 
-    videoSurfaces = (VdpVideoSurface *)malloc(sizeof(VdpVideoSurface) * numbufs);
-    surface_render = (vdpau_render_state_t*)malloc(sizeof(vdpau_render_state_t) * numbufs);
-    memset(surface_render, 0, sizeof(vdpau_render_state_t) * numbufs);
+    videoSurfaces = (VdpVideoSurface *)malloc(sizeof(VdpVideoSurface) * num_bufs);
+    if (vdpauDecode)
+    {
+        surface_render = (vdpau_render_state_t*)malloc(sizeof(vdpau_render_state_t) * num_bufs);
+        memset(surface_render, 0, sizeof(vdpau_render_state_t) * num_bufs);
+    }
 
-    numSurfaces = numbufs;
+    numSurfaces = num_bufs;
 
-    for (i = 0; i < numbufs; i++)
+    for (i = 0; i < num_bufs; i++)
     {
         vdp_st = vdp_video_surface_create(
             vdp_device,
@@ -547,9 +560,13 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
                 QString("Failed to create video surface."));
             return false;
         }
-        surface_render[i].magic = MP_VDPAU_RENDER_MAGIC;
-        surface_render[i].state = 0;
-        surface_render[i].surface = videoSurfaces[i];
+
+        if (vdpauDecode)
+        {
+            surface_render[i].magic = MP_VDPAU_RENDER_MAGIC;
+            surface_render[i].state = 0;
+            surface_render[i].surface = videoSurfaces[i];
+        }
     }
 
     // clear video surfaces to black
@@ -570,7 +587,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
             uint32_t pitches[3] = {width, width, width>>1};
             void* const planes[3] = 
                         {tmp, tmp + (width * height), tmp + (width * height)};
-            for (i = 0; i < numbufs; i++)
+            for (i = 0; i < num_bufs; i++)
             {
                 vdp_video_surface_put_bits_y_cb_cr(
                     videoSurfaces[i],
@@ -765,6 +782,13 @@ void VDPAUContext::FreeOutput(void)
 
 void VDPAUContext::Decode(VideoFrame *frame)
 {
+    if (!vdpauDecode)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("VDPAUContext::Decode called for cpu decode."));
+        return;
+    }
+
     VdpStatus vdp_st;
     bool ok = true;
     vdpau_render_state_t *render;
@@ -852,14 +876,50 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     if (!frame)
         return;
 
-    if (deinterlacing && needDeintRefs)
-        UpdateReferenceFrames(frame);
+    bool new_frame = true;
+    bool deint = (deinterlacing && needDeintRefs);
+    if (deint)
+    {
+        new_frame = UpdateReferenceFrames(frame);
+        if (vdpauDecode && (referenceFrames.size() != NUM_REFERENCE_FRAMES))
+            deint = false;
+    }
 
-    render = (vdpau_render_state_t *)frame->buf;
-    if (!render)
-        return;
+    if (vdpauDecode)
+    {
+        render = (vdpau_render_state_t *)frame->buf;
+        if (!render)
+            return;
 
-    videoSurface = render->surface;
+        videoSurface = render->surface;
+    }
+    else if (new_frame)
+    {
+        int surf = 0;
+        if (deint)
+            surf = (currentFrameNum + 1) % NUM_REFERENCE_FRAMES;
+
+        videoSurface = videoSurfaces[surf];
+
+        uint32_t pitches[3] = {
+            frame->pitches[0],
+            frame->pitches[2],
+            frame->pitches[1]
+        };
+        void* const planes[3] = {
+            frame->buf,
+            frame->buf + frame->offsets[2],
+            frame->buf + frame->offsets[1]
+        };
+        vdp_st = vdp_video_surface_put_bits_y_cb_cr(
+            videoSurface,
+            VDP_YCBCR_FORMAT_YV12,
+            planes,
+            pitches);
+        CHECK_ST;
+        if (!ok)
+            return;
+    }
 
     if (outRect.x1 != (uint)screen_size.width() ||
         outRect.y1 != (uint)screen_size.height())
@@ -921,80 +981,48 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     );
     CHECK_ST
 
-    bool deint = false;
-    if (deinterlacing && needDeintRefs &&
-        referenceFrames.size() == NUM_REFERENCE_FRAMES)
-    {
-        deint = true;
-    }
-
-    VdpVideoSurface past_surfaces[2] = { VDP_INVALID_HANDLE, VDP_INVALID_HANDLE };
+    VdpVideoSurface past_surfaces[2] = { VDP_INVALID_HANDLE,
+                                         VDP_INVALID_HANDLE };
     VdpVideoSurface future_surfaces[1] = { VDP_INVALID_HANDLE };
 
     if (deint)
     {
-        render = (vdpau_render_state_t *)referenceFrames[1]->buf;
-        if (render)
-            videoSurface = render->surface;
- 
-        // consolidate more 
-        if (frame->top_field_first)
+        VdpVideoSurface refs[NUM_REFERENCE_FRAMES];
+        for (int i = 0; i < NUM_REFERENCE_FRAMES; i++)
         {
-            if (scan == kScan_Interlaced) // displaying top top-first
+            if (vdpauDecode)
             {
-                // next field (bottom) is in the current frame)
-                future_surfaces[0] = videoSurface;
-
-                // previous two fields are in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
-                if (render)
-                    past_surfaces[0] = render->surface;
-                past_surfaces[1] = past_surfaces[0];
+                vdpau_render_state_t *render;
+                render = (vdpau_render_state_t *)referenceFrames[i]->buf;
+                refs[i] = render ? render->surface : VDP_INVALID_HANDLE;
             }
-            else // displaying bottom of top-first
+            else
             {
-                // next field (top) is in the next frame
-                render = (vdpau_render_state_t *)referenceFrames[2]->buf;
-                if (render)
-                    future_surfaces[0] = render->surface;
-
-                // previous field is in the current frame
-                past_surfaces[0] = videoSurface;
-
-                // field before that is in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
-                if (render)
-                    past_surfaces[1] = render->surface;
+                int ref = (currentFrameNum + i - 1) % NUM_REFERENCE_FRAMES;
+                if (ref < 0)
+                    ref = 0;
+                refs[i] = videoSurfaces[ref];
             }
+        }
+
+        videoSurface = refs[1];
+ 
+        if (scan == kScan_Interlaced)
+        {
+            // next field is in the current frame
+            future_surfaces[0] = refs[1];
+            // previous two fields are in the previous frame
+            past_surfaces[0] = refs[0];
+            past_surfaces[1] = refs[0];
         }
         else
         {
-            if (scan == kScan_Interlaced) // displaying bottom bottom-first
-            {
-                // next field (top) is in the current frame)
-                future_surfaces[0] = videoSurface;
-
-                // previous two fields are in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
-                if (render)
-                    past_surfaces[0] = render->surface;
-                past_surfaces[1] = past_surfaces[0];
-            }
-            else // displaying top of bottom-first
-            {
-                // next field (bottom) is in the next frame
-                render = (vdpau_render_state_t *)referenceFrames[2]->buf;
-                if (render)
-                    future_surfaces[0] = render->surface;
-
-                // previous field is in the current frame
-                past_surfaces[0] = videoSurface;
-
-                // field before that is in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
-                if (render)
-                    past_surfaces[1] = render->surface;
-            }
+            // next field is in the next frame
+            future_surfaces[0] = refs[2];
+            // previous field is in the current frame
+            past_surfaces[0] = refs[1];
+            // field before that is in the previous frame
+            past_surfaces[1] = refs[0];
         }
     }
 
@@ -1394,22 +1422,26 @@ bool VDPAUContext::SetDeinterlacing(bool interlaced)
     return deinterlacing;
 }
 
-void VDPAUContext::UpdateReferenceFrames(VideoFrame *frame)
+bool VDPAUContext::UpdateReferenceFrames(VideoFrame *frame)
 {
-    if (frame->frameNumber == currentFrameNum ||
-        !needDeintRefs)
-        return;
+    if (frame->frameNumber == currentFrameNum)
+        return false;
 
     currentFrameNum = frame->frameNumber;
-    while (referenceFrames.size() > (NUM_REFERENCE_FRAMES - 1))
-        referenceFrames.pop_front();
 
-    referenceFrames.push_back(frame);
+    if (vdpauDecode)
+    {
+        while (referenceFrames.size() > (NUM_REFERENCE_FRAMES - 1))
+            referenceFrames.pop_front();
+        referenceFrames.push_back(frame);
+    }
+
+    return true;
 }
 
 bool VDPAUContext::IsBeingUsed(VideoFrame *frame)
 {
-    if (!frame)
+    if (!frame || !vdpauDecode)
         return false;
 
     return referenceFrames.contains(frame);
@@ -1557,8 +1589,16 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
         ok = (ok && (support > 0));
         if (ok && support != 3)
         {
-            VERBOSE(VB_IMPORTANT, "VDPAU WARNING: Codec not fully supported"
-                                  " - playback may fail.");
+            VERBOSE(VB_IMPORTANT,
+                QString("VDPAU WARNING: %1 GPU decode not fully supported"
+                        " - playback may fail.")
+                        .arg(toString(myth_codec_id)));
+        }
+        else if (!support)
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("%1 GPU decode not supported")
+                .arg(toString(myth_codec_id)));
         }
     }
 
@@ -1949,6 +1989,9 @@ bool VDPAUContext::ShowPiP(VideoFrame * frame, QRect position)
 
 void VDPAUContext::CopyFrame(VideoFrame *dst, const VideoFrame *src, QSize size)
 {
+    if (!vdpauDecode)
+        return;
+
     if (!src || !dst || size.height() < 1 || size.width() < 1)
         return;
 
