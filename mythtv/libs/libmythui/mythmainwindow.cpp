@@ -56,8 +56,6 @@
 /* from libmyth */
 #include "screensaver.h"
 
-#include "util-x11.h"
-
 #ifdef USING_VDPAU
 #include "mythpainter_vdpau.h"
 #endif
@@ -787,15 +785,12 @@ void MythMainWindow::Init(void)
 
     d->paintwin->move(0, 0);
     d->paintwin->setFixedSize(size());
-    X11L;
     d->paintwin->raise();
     d->paintwin->show();
-    X11U;
 }
 
 void MythMainWindow::Show(void)
 {
-    X11L;
     show();
 #ifdef Q_WS_MACX
     if (d->does_fill_screen)
@@ -809,7 +804,6 @@ void MythMainWindow::Show(void)
 
     //-=>TODO: The following method does not exist in Qt4
     //qApp->wakeUpGuiThread();    // ensures that setActiveWindow() occurs
-    X11U;
 }
 
 /* FIXME compatability only */
@@ -832,10 +826,8 @@ void MythMainWindow::attach(QWidget *child)
 
     d->widgetList.push_back(child);
     child->winId();
-    X11L;
     child->raise();
     child->setFocus();
-    X11U;
 }
 
 void MythMainWindow::detach(QWidget *child)

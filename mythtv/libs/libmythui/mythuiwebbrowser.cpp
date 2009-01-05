@@ -31,7 +31,6 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
-#include "util-x11.h"
 
 #include "mythuiwebbrowser.h"
 
@@ -314,11 +313,9 @@ void MythUIWebBrowser::SetActive(bool active)
         if (m_HasFocus)
         {
             m_browser->setUpdatesEnabled(false);
-            X11L;
             m_browser->setFocus();
             m_browser->show();
             m_browser->raise();
-            X11U;
             m_browser->setUpdatesEnabled(true);
         }
     }
@@ -326,10 +323,8 @@ void MythUIWebBrowser::SetActive(bool active)
     {
         if (m_HasFocus)
         {
-            X11L;
             m_browser->clearFocus();
             m_browser->hide();
-            X11U;
             UpdateBuffer();
         }
     }
@@ -485,11 +480,9 @@ void MythUIWebBrowser::slotTakingFocus(void)
     if (m_active)
     {
         m_browser->setUpdatesEnabled(false);
-        X11L;
         m_browser->setFocus();
         m_browser->show();
         m_browser->raise();
-        X11U;
         m_browser->setUpdatesEnabled(true);
     }
     else
@@ -498,10 +491,8 @@ void MythUIWebBrowser::slotTakingFocus(void)
 
 void MythUIWebBrowser::slotLosingFocus(void)
 {
-    X11L;
     m_browser->clearFocus();
     m_browser->hide();
-    X11U;
 
     UpdateBuffer();
 }

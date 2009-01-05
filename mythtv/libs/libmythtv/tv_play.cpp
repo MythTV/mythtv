@@ -56,11 +56,6 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
 
-extern QMutex x11_lock;
-#define X11L x11_lock.lock()
-#define X11U x11_lock.unlock()
-#define X11S(arg) do { X11L; arg; X11U; } while (0)
-
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
@@ -878,7 +873,7 @@ bool TV::Init(bool createWindow)
         mainWindow->installEventFilter(this);
 
         // finally we put the player window on screen...
-        X11S(myWindow->show());
+        myWindow->show();
         QPalette p = myWindow->palette();
         p.setColor(myWindow->backgroundRole(), Qt::black);
         myWindow->setPalette(p);
@@ -915,7 +910,7 @@ TV::~TV(void)
         MythMainWindow* mwnd = gContext->GetMainWindow();
         mwnd->resize(saved_gui_bounds.size());
         mwnd->setFixedSize(saved_gui_bounds.size());
-        X11S(mwnd->show());
+        mwnd->show();
         if (!db_use_gui_size_for_tv)
             mwnd->move(saved_gui_bounds.topLeft());
     }

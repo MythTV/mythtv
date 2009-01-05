@@ -46,7 +46,6 @@ using namespace std;
 #include "util.h"
 #include "x11colors.h"
 #include "mythuihelper.h"
-#include "util-x11.h"
 
 #define LOC QString("PlaybackBox: ")
 #define LOC_ERR QString("PlaybackBox Error: ")
@@ -3353,7 +3352,7 @@ void PlaybackBox::cancelPopup(void)
     paintSkipUpdate = false;
     paintSkipCount = 2;
 
-    X11S(activateWindow());
+    activateWindow();
 
     EmbedTVWindow();
 }
@@ -4867,7 +4866,7 @@ void PlaybackBox::showIconHelp(void)
     paintSkipUpdate = false;
     paintSkipCount = 2;
 
-    X11S(activateWindow());
+    activateWindow();
 }
 
 void PlaybackBox::initRecGroupPopup(QString title, QString name)
@@ -4907,7 +4906,7 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
     paintSkipUpdate = false;
     paintSkipCount = 2;
 
-    X11S(activateWindow());
+    activateWindow();
 
     EmbedTVWindow();
 

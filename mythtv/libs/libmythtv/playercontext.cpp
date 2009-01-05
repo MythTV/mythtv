@@ -872,11 +872,14 @@ void PlayerContext::SetRingBuffer(RingBuffer *buf)
  */
 void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
 {
+    bool ignoreDB = gContext->IsDatabaseIgnored();
+
     QMutexLocker locker(&playingInfoLock);
 
     if (playingInfo)
     {
-        playingInfo->MarkAsInUse(false);
+        if (!ignoreDB)
+            playingInfo->MarkAsInUse(false);
         delete playingInfo;
         playingInfo = NULL;
     }
@@ -884,6 +887,8 @@ void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
     if (info)
     {
         playingInfo = new ProgramInfo(*info);
+        if (!ignoreDB)
+            playingInfo->MarkAsInUse(true, "player");
         playingLen  = playingInfo->CalculateLength();
     }
 }
