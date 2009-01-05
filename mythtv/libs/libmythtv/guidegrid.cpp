@@ -35,6 +35,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "channelutil.h"
 #include "cardutil.h"
+#include "util-x11.h"
 
 QWaitCondition epgIsVisibleCond;
 
@@ -2132,8 +2133,10 @@ void GuideGrid::showProgFinder()
 {
     RunProgramFind(false, true);
 
+    X11L;
     activateWindow();
     setFocus();
+    X11U;
 
     EmbedTVWindow();
 }
@@ -2196,8 +2199,10 @@ void GuideGrid::editRecording()
 
     setFocusPolicy(storeFocus);
 
+    X11L;
     activateWindow();
     setFocus();
+    X11U;
 
     m_recList.FromScheduler();
     fillProgramInfos();
@@ -2223,8 +2228,10 @@ void GuideGrid::editScheduled()
 
     setFocusPolicy(storeFocus);
 
+    X11L;
     activateWindow();
     setFocus();
+    X11U;
 
     m_recList.FromScheduler();
     fillProgramInfos();

@@ -31,6 +31,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "mythverbose.h"
+#include "util-x11.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -1757,7 +1758,7 @@ MythPasswordDialog::MythPasswordDialog(QString message,
     connect(password_editor, SIGNAL(textChanged(const QString &)),
             this, SLOT(checkPassword(const QString &)));
 
-    activateWindow();
+    X11S(activateWindow());
     password_editor->setFocus();
 }
 

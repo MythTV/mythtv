@@ -35,6 +35,7 @@
 #include "tv.h"
 #include "guidegrid.h"
 #include "mythdb.h"
+#include "util-x11.h"
 
 using namespace std;
 
@@ -502,8 +503,10 @@ void ProgFinder::getInfo(bool toggle)
 
         selectShowData(curPick->title, curShow);
 
+        X11L;
         activateWindow();
         setFocus();
+        X11U;
     }
 }
 
