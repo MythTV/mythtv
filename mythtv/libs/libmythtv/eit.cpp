@@ -354,7 +354,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "    description    = :DESC, "
         "    category       = :CAT,       category_type = :CATTYPE, "
         "    starttime      = :STARTTIME, endtime       = :ENDTIME, "
-        "    closecaptioned = :CC,        subtitled     = :SUBTITLED, "
+        "    closecaptioned = :CC,        subtitled     = :HASSUBTITLES, "
         "    stereo         = :STEREO,    hdtv          = :HDTV, "
         "    subtitletypes  = :SUBTYPE, "
         "    audioprop      = :AUDIOPROP, videoprop     = :VIDEOPROP, "
@@ -377,7 +377,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
     query.bindValue(":CC",          lsubtype & SUB_HARDHEAR ? true : false);
-    query.bindValue(":SUBTITLED",   lsubtype & SUB_NORMAL   ? true : false);
+    query.bindValue(":HASSUBTITLES",lsubtype & SUB_NORMAL   ? true : false);
     query.bindValue(":STEREO",      laudio   & AUD_STEREO   ? true : false);
     query.bindValue(":HDTV",        lvideo   & VID_HDTV     ? true : false);
     query.bindValue(":SUBTYPE",     lsubtype);
@@ -524,7 +524,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
         " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
         " :CATEGORY,      :CATTYPE, "
         " :STARTTIME,     :ENDTIME, "
-        " :CC,            :STEREO,        :HDTV,           :SUBTITLED, "
+        " :CC,            :STEREO,        :HDTV,           :HASSUBTITLES, "
         " :SUBTYPES,      :AUDIOPROP,     :VIDEOPROP, "
         " :PARTNUMBER,    :PARTTOTAL, "
         " :SYNDICATENO, "
@@ -544,7 +544,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":CC",          subtitleType & SUB_HARDHEAR ? true : false);
     query.bindValue(":STEREO",      audioProps   & AUD_STEREO   ? true : false);
     query.bindValue(":HDTV",        videoProps   & VID_HDTV     ? true : false);
-    query.bindValue(":SUBTITLED",   subtitleType & SUB_NORMAL   ? true : false);
+    query.bindValue(":HASSUBTITLES",subtitleType & SUB_NORMAL   ? true : false);
     query.bindValue(":SUBTYPES",    subtitleType);
     query.bindValue(":AUDIOPROP",   audioProps);
     query.bindValue(":VIDEOPROP",   videoProps);
