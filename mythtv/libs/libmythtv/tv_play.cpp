@@ -2081,7 +2081,7 @@ void TV::run(void)
     UpdateLCD();
 
     const PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    ClearInputQueues(mctx, false);
+    ClearInputQueues(ctx, false);
     ReturnPlayerLock(ctx);
 
     switchToRec = NULL;
