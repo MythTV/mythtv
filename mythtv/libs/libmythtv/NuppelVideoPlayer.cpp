@@ -621,6 +621,7 @@ void NuppelVideoPlayer::SetPlayingInfo(const ProgramInfo &pginfo)
     videoFiltersForProgram = QString::null;
     if (!gContext->IsDatabaseIgnored())
     {
+        player_ctx->playingInfo->MarkAsInUse(true, m_recusage);
         videoFiltersForProgram = player_ctx->playingInfo->chanOutputFilters;
         videoFiltersForProgram.detach();
     }
