@@ -8,6 +8,8 @@
 #include <QMutex>
 #include <QList>
 
+#include <sys/types.h>   // for uint
+
 class LIRCPriv;
 
 class LIRC : public QThread
