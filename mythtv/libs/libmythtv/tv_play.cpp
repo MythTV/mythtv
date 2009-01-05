@@ -6199,7 +6199,10 @@ void TV::ClearInputQueues(const PlayerContext *ctx, bool hideosd)
     queuedChanNum = "";
     queuedChanID  = 0;
     if (queueInputTimerId)
+    {
         KillTimer(queueInputTimerId);
+        queueInputTimerId = 0;
+    }
 }
 
 void TV::AddKeyToInputQueue(PlayerContext *ctx, char key)
