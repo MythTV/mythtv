@@ -884,7 +884,7 @@ bool TV::Init(bool createWindow)
     start();
     mainLoopCond.wait(&mainLoopCondLock);
     errorRecoveryTimerId = StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
-    lcdTimerId           = StartTimer(kLCDTimeout, __LINE__);
+    lcdTimerId           = StartTimer(1, __LINE__);
     speedChangeTimerId   = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
     mainLoopCondLock.unlock();
 
@@ -2077,8 +2077,6 @@ void TV::run(void)
     sleep_index = 0;
 
     SetUpdateOSDPosition(false);
-
-    UpdateLCD();
 
     const PlayerContext *ctx = GetPlayerReadLock(0, __FILE__, __LINE__);
     ClearInputQueues(ctx, false);
