@@ -352,7 +352,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
         "UPDATE program "
         "SET title          = :TITLE,     subtitle      = :SUBTITLE, "
         "    description    = :DESC, "
-        "    category       = :CAT,       category_type = :CATTYPE, "
+        "    category       = :CATEGORY,  category_type = :CATTYPE, "
         "    starttime      = :STARTTIME, endtime       = :ENDTIME, "
         "    closecaptioned = :CC,        subtitled     = :HASSUBTITLES, "
         "    stereo         = :STEREO,    hdtv          = :HDTV, "
@@ -372,7 +372,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":TITLE",       ltitle);
     query.bindValue(":SUBTITLE",    lsubtitle);
     query.bindValue(":DESC",        ldesc);
-    query.bindValue(":CAT",         lcategory);
+    query.bindValue(":CATEGORY",    lcategory);
     query.bindValue(":CATTYPE",     lcattype);
     query.bindValue(":STARTTIME",   starttime);
     query.bindValue(":ENDTIME",     endtime);
