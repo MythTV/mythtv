@@ -302,7 +302,7 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
                                          qVariantFromValue(article));
             QString posterImage = LoadPosterImage(article->articleURL());
             item->SetImage(posterImage);
-            item->setText(article->description(), "description");
+            item->SetText(article->description(), "description");
         }
     }
 }

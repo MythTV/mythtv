@@ -296,10 +296,10 @@ void ZMConsole::updateMonitorList()
 
         MythUIButtonListItem *item = new MythUIButtonListItem(m_monitor_list,
                 "", NULL, true, MythUIButtonListItem::NotChecked);
-        item->setText(monitor->name, "name");
-        item->setText(monitor->zmcStatus, "zmcstatus");
-        item->setText(monitor->zmaStatus, "zmastatus");
-        item->setText(QString("%1").arg(monitor->events), "eventcount");
+        item->SetText(monitor->name, "name");
+        item->SetText(monitor->zmcStatus, "zmcstatus");
+        item->SetText(monitor->zmaStatus, "zmastatus");
+        item->SetText(QString("%1").arg(monitor->events), "eventcount");
         item->SetData((void*) monitor);
     }
 

@@ -335,7 +335,7 @@ QString StaticImageScreen::prepareDataItem(const QString &key,
 
 void StaticImageScreen::prepareWidget(MythUIType *widget)
 {
-
+    (void) widget;
 }
 
 AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent, const char *name,

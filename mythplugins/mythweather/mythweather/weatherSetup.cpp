@@ -214,7 +214,7 @@ void ScreenSetup::updateHelpText()
 
         text = tr("Add desired screen to the Active Screens list "
             "by pressing SELECT.") + "\n";
-        text += item->text() + "\n";
+        text += item->GetText() + "\n";
         text += QString("%1: %2").arg(tr("Sources"))
                                  .arg(sources.join(", "));
     }
@@ -228,7 +228,7 @@ void ScreenSetup::updateHelpText()
         if (!si)
             return;
 
-        text += item->text() + "\n";
+        text += item->GetText() + "\n";
         if (si->hasUnits)
         {
             text += tr("Units: ");
@@ -418,7 +418,7 @@ void ScreenSetup::saveData()
         MythUIButtonListItem *item = m_activeList->GetItemAt(i);
         ScreenListInfo *si = qVariantValue<ScreenListInfo *>(item->GetData());
         db.bindValue(":DRAW", draworder);
-        db.bindValue(":CONT", item->text());
+        db.bindValue(":CONT", item->GetText());
         db.bindValue(":UNITS", si->units);
         db.bindValue(":HOST", gContext->GetHostName());
         if (db.exec())
@@ -476,7 +476,7 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
     if (!selected)
         return;
 
-    QString txt = selected->text();
+    QString txt = selected->GetText();
     if (GetFocusWidget() == m_activeList)
     {
         ScreenListInfo *si = qVariantValue<ScreenListInfo *>(selected->GetData());
@@ -528,7 +528,7 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
                 NextPrevWidgetFocus(true);
             }
             if (hasUnits)
-                showUnitsPopup(selected->text(), newsi);
+                showUnitsPopup(selected->GetText(), newsi);
             else
                 doLocationDialog(newsi);
         }
@@ -617,7 +617,7 @@ void ScreenSetup::customEvent(QEvent *event)
             }
             else if (si->hasUnits && buttonnum == 4)
             {
-                showUnitsPopup(item->text(), si);
+                showUnitsPopup(item->GetText(), si);
                 updateHelpText();
             }
         }
@@ -776,8 +776,8 @@ void SourceSetup::saveData()
 {
     SourceListInfo *si = qVariantValue<SourceListInfo *>
                                     (m_sourceList->GetItemCurrent()->GetData());
-    si->update_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
-    si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
+    si->update_timeout = m_updateSpinbox->GetItemCurrent()->GetText().toInt();
+    si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->GetText().toInt();
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "UPDATE weathersourcesettings "
@@ -808,7 +808,7 @@ void SourceSetup::updateSpinboxUpdate()
     {
         SourceListInfo *si = qVariantValue<SourceListInfo *>
                                     (m_sourceList->GetItemCurrent()->GetData());
-        si->update_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
+        si->update_timeout = m_updateSpinbox->GetItemCurrent()->GetText().toInt();
     }
 }
 
@@ -818,7 +818,7 @@ void SourceSetup::retrieveSpinboxUpdate()
     {
         SourceListInfo *si = qVariantValue<SourceListInfo *>
                                     (m_sourceList->GetItemCurrent()->GetData());
-        si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
+        si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->GetText().toInt();
     }
 }
 

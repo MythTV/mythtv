@@ -368,7 +368,7 @@ void MythControls::UpdateRightList(void)
     if (!item)
         return;
 
-    QString rtstr = item->text();
+    QString rtstr = item->GetText();
 
     switch(m_currentView)
     {
@@ -424,12 +424,12 @@ void MythControls::RefreshKeyInformation(void)
 QString MythControls::GetCurrentContext(void)
 {
     if (m_leftListType == kContextList)
-        return m_leftList->GetItemCurrent()->text();
+        return m_leftList->GetItemCurrent()->GetText();
 
     if (GetFocusWidget() == m_leftList)
         return QString::null;
 
-    QString desc = m_rightList->GetItemCurrent()->text();
+    QString desc = m_rightList->GetItemCurrent()->GetText();
     int loc = desc.indexOf(" => ");
     if (loc == -1)
         return QString::null; // Should not happen
@@ -453,7 +453,7 @@ QString MythControls::GetCurrentAction(void)
     {
         if (m_leftList && m_leftList->GetItemCurrent())
         {
-            QString tmp = m_leftList->GetItemCurrent()->text();
+            QString tmp = m_leftList->GetItemCurrent()->GetText();
             tmp.detach();
             return tmp;
         }
@@ -466,7 +466,7 @@ QString MythControls::GetCurrentAction(void)
     if (!m_rightList || !m_rightList->GetItemCurrent())
         return QString::null;
 
-    QString desc = m_rightList->GetItemCurrent()->text();
+    QString desc = m_rightList->GetItemCurrent()->GetText();
     if (kContextList == m_leftListType &&
         kActionList  == m_rightListType)
     {
@@ -515,7 +515,7 @@ uint MythControls::GetCurrentButton(void)
 QString MythControls::GetCurrentKey(void)
 {
     if (m_leftListType == kKeyList)
-        return m_leftList->GetItemCurrent()->text();
+        return m_leftList->GetItemCurrent()->GetText();
 
     if (GetFocusWidget() == m_leftList)
         return QString::null;
@@ -533,7 +533,7 @@ QString MythControls::GetCurrentKey(void)
         return QString::null;
     }
 
-    QString desc = m_rightList->GetItemCurrent()->text();
+    QString desc = m_rightList->GetItemCurrent()->GetText();
     int loc = desc.indexOf(" => ");
     if (loc == -1)
         return QString::null; // Should not happen

@@ -751,7 +751,7 @@ namespace
 
         void handleText(const QString &name, const QString &value)
         {
-            m_item->setText(value, name);
+            m_item->SetText(value, name);
         }
 
         void handleState(const QString &name, const QString &value)
@@ -1368,7 +1368,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     MythUIButtonListItemCopyDest dest(item);
     CopyMetadataToUI(metadata, dest);
 
-    item->setText(metadata ? metadata->Title() : node->getString());
+    item->SetText(metadata ? metadata->Title() : node->getString());
 
     QString imgFilename = GetCoverImage(node);
 
@@ -1378,7 +1378,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
     {
-        item->setText(QString("%1").arg(node->childCount() - 1), "childcount");
+        item->SetText(QString("%1").arg(node->childCount() - 1), "childcount");
         item->DisplayState("subfolder", "nodetype");
     }
     else if (nodeInt == kUpFolder)
@@ -1632,7 +1632,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     CopyMetadataToUI(metadata, dest);
 
     if (!metadata)
-        CheckedSet(m_titleText, item->text());
+        CheckedSet(m_titleText, item->GetText());
     UpdatePosition();
 
     CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));

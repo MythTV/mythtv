@@ -198,10 +198,10 @@ void ZMEvents::updateUIList()
         MythUIButtonListItem *item = new MythUIButtonListItem(m_eventGrid,
                 "", NULL, true, MythUIButtonListItem::NotChecked);
 
-        item->setText(event->eventName);
-        item->setText(event->monitorName, "camera" );
-        item->setText(event->startTime, "time");
-        item->setText(event->length, "length");
+        item->SetText(event->eventName);
+        item->SetText(event->monitorName, "camera" );
+        item->SetText(event->startTime, "time");
+        item->SetText(event->length, "length");
     }
 
     m_eventGrid->SetItemCurrent(m_eventGrid->GetItemFirst());

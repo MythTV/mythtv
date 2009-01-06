@@ -364,6 +364,8 @@ namespace
         void OnPasswordResultReady(bool passwordValid,
                 ParentalLevel::Level newLevel)
         {
+            (void) newLevel;
+
             if (passwordValid)
             {
                 VideoGeneralSettings settings;

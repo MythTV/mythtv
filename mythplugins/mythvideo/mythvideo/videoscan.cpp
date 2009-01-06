@@ -125,6 +125,8 @@ class VideoScannerThread : public QThread
 
     void promptForRemoval(unsigned int id, const QString &filename)
     {
+        (void) filename;
+
         // TODO: use single DB connection for all calls
         if (m_RemoveAll)
             m_dbmetadata->purgeByID(id);
