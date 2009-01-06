@@ -104,7 +104,6 @@ class IconView : public MythScreenType
     void LoadThumbnail(ThumbItem *item);
     void ImportFromDir(const QString &fromDir, const QString &toDir);
     void CopyMarkedFiles(bool move = false);
-    void ShowOKDialog(const QString &message, const char *slot, bool showCancel = false);
     ThumbItem *GetCurrentThumb(void);
 
     QList<ThumbItem*>           m_itemList;

@@ -472,7 +472,7 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
         // device was removed
         QString msg = tr("Error") + '\n' +
                 tr("The selected device is no longer available");
-        ShowOKDialog(msg, SLOT(HandleShowDevices()));
+        ShowOkPopup(msg, this, SLOT(HandleShowDevices()));
     }
 
     return true;
@@ -890,7 +890,7 @@ void IconView::HandleDeleteCurrent(void)
         tr("Deleting 1 folder, including any subfolders and files.") :
         tr("Deleting 1 image.");
 
-    ShowOKDialog(title + '\n' + msg, SLOT(DoDeleteCurrent(bool)), true);
+    ShowOkPopup(title + '\n' + msg, this, SLOT(DoDeleteCurrent(bool)), true);
 }
 
 void IconView::DoDeleteCurrent(bool doDelete)
@@ -1091,7 +1091,7 @@ void IconView::HandleDeleteMarked(void)
     QString msg = /*tr("Delete Marked Files") + "\n\n" +*/
             tr("Deleting %1 images and folders, including "
                "any subfolders and files.").arg(m_itemMarked.count());
-    ShowOKDialog(msg, SLOT(DoDeleteMarked(bool)), true);
+    ShowOkPopup(msg, this, SLOT(DoDeleteMarked(bool)), true);
 }
 
 void IconView::DoDeleteMarked(bool doDelete)
@@ -1197,7 +1197,7 @@ void IconView::DoRename(QString folderName)
         else
             msg = tr("Failed to rename file");
 
-        ShowOKDialog(msg, NULL);
+        ShowOkPopup(msg, NULL, NULL);
 
         return;
     }
@@ -1308,18 +1308,6 @@ void IconView::mediaStatusChanged(MediaStatus oldStatus,
 
         // UpdateText();
     }
-}
-
-void IconView::ShowOKDialog(const QString &message, const char *slot, bool showCancel)
-{
-    MythConfirmationDialog *dialog = new MythConfirmationDialog(
-            m_popupStack, message, showCancel);
-
-    if (dialog->Create())
-        m_popupStack->AddScreen(dialog);
-
-    if (slot)
-        connect(dialog, SIGNAL(haveResult(bool)), slot, Qt::QueuedConnection);
 }
 
 ThumbItem *IconView::GetCurrentThumb(void)
