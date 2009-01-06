@@ -333,18 +333,18 @@ void MythBurn::toggleUseCutlist(void)
     {
         if (a->useCutlist)
         {
-            item->setText(tr("Using Cutlist"), "cutlist");
+            item->SetText(tr("Using Cutlist"), "cutlist");
             item->DisplayState("using", "cutliststatus");
         }
         else
         {
-            item->setText(tr("Not Using Cutlist"), "cutlist");
+            item->SetText(tr("Not Using Cutlist"), "cutlist");
             item->DisplayState("notusing", "cutliststatus");
         }
     }
     else
     {
-        item->setText(tr("No Cut List"), "cutlist");
+        item->SetText(tr("No Cut List"), "cutlist");
         item->DisplayState("none", "cutliststatus");
     }
     recalcItemSize(a);
@@ -445,28 +445,28 @@ void MythBurn::updateArchiveList(void)
 
             MythUIButtonListItem* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
             item->SetData(qVariantFromValue(a));
-            item->setText(a->subtitle, "subtitle");
-            item->setText(a->startDate + " " + a->startTime, "date");
-            item->setText(formatSize(a->newsize / 1024, 2), "size");
+            item->SetText(a->subtitle, "subtitle");
+            item->SetText(a->startDate + " " + a->startTime, "date");
+            item->SetText(formatSize(a->newsize / 1024, 2), "size");
             if (a->hasCutlist)
             {
                 if (a->useCutlist)
                 {
-                    item->setText(tr("Using Cutlist"), "cutlist");
+                    item->SetText(tr("Using Cutlist"), "cutlist");
                     item->DisplayState("using", "cutliststatus");
                 }
                 else
                 {
-                    item->setText(tr("Not Using Cutlist"), "cutlist");
+                    item->SetText(tr("Not Using Cutlist"), "cutlist");
                     item->DisplayState("notusing", "cutliststatus");
                 }
             }
             else
             {
-                item->setText(tr("No Cut List"), "cutlist");
+                item->SetText(tr("No Cut List"), "cutlist");
                 item->DisplayState("none", "cutliststatus");
             }
-            item->setText(a->encoderProfile->name, "profile");
+            item->SetText(a->encoderProfile->name, "profile");
         }
 
         m_nofilesText->Hide();
@@ -862,9 +862,9 @@ void MythBurn::editorClosed(bool ok, ArchiveItem *item)
     if (ok && item && gridItem)
     {
         // update the grid to reflect any changes
-        gridItem->setText(item->title);
-        gridItem->setText(item->subtitle, "subtitle");
-        gridItem->setText(item->startDate + " " + item->startTime, "date");
+        gridItem->SetText(item->title);
+        gridItem->SetText(item->subtitle, "subtitle");
+        gridItem->SetText(item->startDate + " " + item->startTime, "date");
     }
 }
 
@@ -905,8 +905,8 @@ void MythBurn::profileChanged(int profileNo)
 
     archiveItem->encoderProfile = profile;
 
-    item->setText(profile->name, "profile");
-    item->setText(formatSize(archiveItem->newsize / 1024, 2), "size");
+    item->SetText(profile->name, "profile");
+    item->SetText(formatSize(archiveItem->newsize / 1024, 2), "size");
 
     updateSizeBar();
 }

@@ -153,7 +153,7 @@ void LogViewer::toggleAutoUpdate(void)
 void LogViewer::updateLogItem(MythUIButtonListItem *item)
 {
     if (item)
-        m_logText->SetText(item->text());
+        m_logText->SetText(item->GetText());
 }
 
 void LogViewer::cancelClicked(void)
