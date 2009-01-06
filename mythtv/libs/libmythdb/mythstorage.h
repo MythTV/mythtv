@@ -15,6 +15,7 @@ class StorageUser
   public:
     virtual void SetDBValue(const QString&) = 0;
     virtual QString GetDBValue(void) const = 0;
+    virtual ~StorageUser() { }
 };
 
 class MPUBLIC Storage
