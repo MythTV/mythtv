@@ -357,6 +357,7 @@ bool MythUIImage::Load(void)
             image = MythImage::Gradient(gradsize, m_gradientStart,
                                         m_gradientEnd, m_gradientAlpha,
                                         m_gradientDirection);
+            image->UpRef();
         }
         else
             bNeedLoad = true;
@@ -413,6 +414,7 @@ bool MythUIImage::Load(void)
                                          "cache. Loading Directly :%1:")
                                          .arg(filename));
                 image = GetMythPainter()->GetFormatImage();
+                image->UpRef();
                 if (!image->Load(filename))
                 {
                     VERBOSE(VB_FILE, QString("MythUIImage::Load Could not load :%1:").arg(filename));
@@ -468,7 +470,10 @@ bool MythUIImage::Load(void)
         image->SetChanged();
 
         if (image->isNull())
+        {
+            VERBOSE(VB_FILE, QString("MythUIImage::Load Image is NULL :%1:").arg(m_Filename));
             image->DownRef();
+        }
         else
             m_Images.push_back(image);
     }

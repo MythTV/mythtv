@@ -1247,6 +1247,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
                 ret = GetMythPainter()->GetFormatImage();
                 if (!ret->Load(cachefilepath, false))
                 {
+                    VERBOSE(VB_FILE, QString("MythUIHelper::LoadCacheImage Could not load :%1").arg(cachefilepath));
                     ret->DownRef();
                     ret = NULL;
                 }

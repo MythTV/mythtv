@@ -52,7 +52,7 @@ bool MythImage::DownRef(void)
 //     if (m_RefCount == 1)
 //         GetMythUI()->IncludeInCacheSize(this);
 
-    if (m_RefCount < 0)
+    if (m_RefCount <= 0)
     {
         delete this;
         return true;
