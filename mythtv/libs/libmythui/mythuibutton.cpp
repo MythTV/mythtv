@@ -123,13 +123,13 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
 
         if (action == "SELECT")
         {
-            if (!IsEnabled())
-                return false;
-
-            if (m_Pushed)
-                UnPush();
-            else
-                Push();
+            if (IsEnabled())
+            {
+                if (m_Pushed)
+                    UnPush();
+                else
+                    Push();
+            }
         }
         else
             handled = false;
