@@ -6,6 +6,7 @@ using namespace std;
 #include "channelrecpriority.h"
 #include "tv.h"
 
+#include "mythcontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "scheduledrecording.h"
@@ -211,7 +212,7 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
             SortList();
         else
         {
-            item->setText(chanInfo->recpriority, "priority");
+            item->SetText(chanInfo->recpriority, "priority");
             updateInfo(item);
         }
     }
@@ -320,17 +321,17 @@ void ChannelRecPriority::updateList()
         if (!m_visMap[chanInfo->chanid])
             fontState = "disabled";
 
-        QString stringFormat = item->text();
+        QString stringFormat = item->GetText();
         if (stringFormat.isEmpty())
             stringFormat = "<num>  <sign>  \"<name>\"";
-        item->setText(chanInfo->Text(stringFormat), fontState);
+        item->SetText(chanInfo->Text(stringFormat), fontState);
 
-        item->setText(chanInfo->chanstr, "channum", fontState);
-        item->setText(chanInfo->callsign, "callsign", fontState);
-        item->setText(chanInfo->channame, "name", fontState);
-        item->setText(QString().setNum(chanInfo->sourceid), "sourceid",
+        item->SetText(chanInfo->chanstr, "channum", fontState);
+        item->SetText(chanInfo->callsign, "callsign", fontState);
+        item->SetText(chanInfo->channame, "name", fontState);
+        item->SetText(QString().setNum(chanInfo->sourceid), "sourceid",
                         fontState);
-        item->setText(chanInfo->sourcename, "sourcename", fontState);
+        item->SetText(chanInfo->sourcename, "sourcename", fontState);
         if (m_visMap[chanInfo->chanid])
             item->DisplayState("normal", "status");
         else
@@ -339,7 +340,7 @@ void ChannelRecPriority::updateList()
         item->SetImage(chanInfo->iconpath, "icon");
         item->SetImage(chanInfo->iconpath);
 
-        item->setText(chanInfo->recpriority, "priority", fontState);
+        item->SetText(chanInfo->recpriority, "priority", fontState);
 
         if (m_currentItem == chanInfo)
             m_channelList->SetItemCurrent(item);

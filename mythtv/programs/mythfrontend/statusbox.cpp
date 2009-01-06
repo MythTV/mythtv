@@ -194,7 +194,7 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
         QString currentItem;
         QRegExp logNumberKeys( "^[12345678]$" );
 
-        currentItem = m_categoryList->GetItemCurrent()->text();
+        currentItem = m_categoryList->GetItemCurrent()->GetText();
         handled = true;
 
         if (action == "MENU")
@@ -260,7 +260,7 @@ void StatusBox::clicked(MythUIButtonListItem *item)
 
     LogLine logline = qVariantValue<LogLine>(item->GetData());
 
-    QString currentItem = m_categoryList->GetItemCurrent()->text();
+    QString currentItem = m_categoryList->GetItemCurrent()->GetText();
 
     // FIXME: Comparisons against strings here is not great, changing names
     //        breaks everything and it's inefficient

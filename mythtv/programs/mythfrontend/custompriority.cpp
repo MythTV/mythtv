@@ -293,7 +293,7 @@ void CustomPriority::installClicked(void)
                   "(priorityname, recpriority, selectclause) "
                   "VALUES(:NAME,:VALUE,:CLAUSE);");
     query.bindValue(":NAME", m_titleEdit->GetText());
-    query.bindValue(":VALUE", item->text());
+    query.bindValue(":VALUE", item->GetText());
     query.bindValue(":CLAUSE", m_descriptionEdit->GetText());
 
     if (!query.exec())
@@ -441,7 +441,7 @@ void CustomPriority::testSchedule(void)
                        "VALUES(:NAME,:VALUE,:CLAUSE);").arg(ttable);
     query.prepare(thequery);
     query.bindValue(":NAME", m_titleEdit->GetText());
-    query.bindValue(":VALUE", item->text());
+    query.bindValue(":VALUE", item->GetText());
     query.bindValue(":CLAUSE", m_descriptionEdit->GetText());
 
     if (!query.exec())

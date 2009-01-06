@@ -172,8 +172,8 @@ void ManualSchedule::dateChanged(void)
     daysahead = m_startdate->GetCurrentPos();
     m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
 
-    int hr = m_starthour->GetItemCurrent()->text().toInt();
-    int min = m_startminute->GetItemCurrent()->text().toInt();
+    int hr = m_starthour->GetItemCurrent()->GetText().toInt();
+    int min = m_startminute->GetItemCurrent()->GetText().toInt();
     m_startDateTime.setTime(QTime(hr, min));
 
     VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
@@ -217,7 +217,7 @@ void ManualSchedule::recordClicked(void)
         p.channame = query.value(3).toString();
     }
 
-    int addsec = m_duration->GetItemCurrent()->text().toInt() * 60;
+    int addsec = m_duration->GetItemCurrent()->GetText().toInt() * 60;
 
     if (!addsec)
         addsec = 60;

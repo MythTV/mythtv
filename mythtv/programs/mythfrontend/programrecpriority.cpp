@@ -793,8 +793,8 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
                                     pgRecInfo->autoRecPriority +
                                     pgRecInfo->recTypeRecPriority;
 
-            item->setText(QString::number(progRecPriority), "progpriority");
-            item->setText(QString::number(finalRecPriority), "finalpriority");
+            item->SetText(QString::number(progRecPriority), "progpriority");
+            item->SetText(QString::number(finalRecPriority), "finalpriority");
         }
     }
 }
@@ -1109,10 +1109,10 @@ void ProgramRecPriority::UpdateList()
         else if (m_recMatch[progInfo->recordid] > 0)
             state = "normal";
 
-        item->setText(tempSubTitle, "title", state);
-        item->setText(progInfo->RecTypeChar(), "rectype", state);
-        item->setText(QString::number(progRecPriority), "progpriority", state);
-        item->setText(QString::number(finalRecPriority), "finalpriority", state);
+        item->SetText(tempSubTitle, "title", state);
+        item->SetText(progInfo->RecTypeChar(), "rectype", state);
+        item->SetText(QString::number(progRecPriority), "progpriority", state);
+        item->SetText(QString::number(finalRecPriority), "finalpriority", state);
         item->DisplayState(state, "status");
 
         if (m_currentItem == progInfo)
