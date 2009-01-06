@@ -141,7 +141,6 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
 HEADERS += programinfo.h            programlist.h
-HEADERS += proglist.h
 HEADERS += RingBuffer.h             avfringbuffer.h
 HEADERS += ThreadedFileWriter.h     previouslist.h
 HEADERS += dbcheck.h                customedit.h
@@ -161,8 +160,10 @@ HEADERS += channeleditor.h          channelsettings.h
 HEADERS += previewgenerator.h       transporteditor.h
 HEADERS += importicons.h
 
+# Remove when everything is switched to MythUI
+HEADERS += proglist_qt.h
+
 SOURCES += programinfo.cpp          programlist.cpp
-SOURCES += proglist.cpp
 SOURCES += RingBuffer.cpp           avfringbuffer.cpp
 SOURCES += ThreadedFileWriter.cpp   previouslist.cpp
 SOURCES += dbcheck.cpp              customedit.cpp
@@ -183,6 +184,10 @@ SOURCES += progdetails.cpp
 SOURCES += channeleditor.cpp        channelsettings.cpp
 SOURCES += previewgenerator.cpp     transporteditor.cpp
 SOURCES += importicons.cpp
+
+# Remove when everything is switched to MythUI
+SOURCES += proglist_qt.cpp
+
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h

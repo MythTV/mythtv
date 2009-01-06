@@ -27,7 +27,7 @@ using namespace std;
 #include <QPaintEvent>
 
 #include "playbackbox.h"
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "tv.h"
 #include "oldsettings.h"
 
@@ -2381,7 +2381,7 @@ void PlaybackBox::upcoming()
         return;
     }
 
-    ProgLister *pl = new ProgLister(plTitle, curitem->title, "",
+    ProgListerQt *pl = new ProgListerQt(plTitle, curitem->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

@@ -27,7 +27,7 @@
 #include <cassert>
 
 #include "progfind.h"
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "customedit.h"
 #include "infostructs.h"
 #include "programinfo.h"
@@ -637,7 +637,7 @@ void ProgFinder::upcoming()
         if (!curPick)
             return;
 
-        ProgLister *pl = new ProgLister(plTitle, curPick->title, "",
+        ProgListerQt *pl = new ProgListerQt(plTitle, curPick->title, "",
                                         gContext->GetMainWindow(), "proglist");
         pl->exec();
         delete pl;

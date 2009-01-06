@@ -14,7 +14,7 @@
 
 #include "viewschdiff.h"
 #include "scheduledrecording.h"
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "tv.h"
 
 #include "exitcodes.h"
@@ -270,7 +270,7 @@ void ViewScheduleDiff::upcoming()
     if (!pi)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, pi->title, "",
+    ProgListerQt *pl = new ProgListerQt(plTitle, pi->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

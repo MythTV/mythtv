@@ -29,7 +29,7 @@ using namespace std;
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "progfind.h"
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "customedit.h"
 #include "util.h"
 #include "remoteutil.h"
@@ -2281,7 +2281,7 @@ void GuideGrid::upcoming()
     if (pginfo->title == unknownTitle)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, pginfo->title, "",
+    ProgListerQt *pl = new ProgListerQt(plTitle, pginfo->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

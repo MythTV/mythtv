@@ -20,7 +20,7 @@ using namespace std;
 
 #include "exitcodes.h"
 #include "previouslist.h"
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "dialogbox.h"
@@ -413,7 +413,7 @@ void PreviousList::upcoming()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
-    ProgLister *pl = new ProgLister(plTitle, pi->title, "",
+    ProgListerQt *pl = new ProgListerQt(plTitle, pi->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

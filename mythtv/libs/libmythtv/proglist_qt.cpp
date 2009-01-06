@@ -18,7 +18,7 @@ using namespace std;
 #include <QPaintEvent>
 #include <QPainter>
 
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "dialogbox.h"
@@ -28,7 +28,7 @@ using namespace std;
 #include "libmythdb/mythverbose.h"
 #include "channelutil.h"
 
-ProgLister::ProgLister(ProgListType pltype,
+ProgListerQt::ProgListerQt(ProgListTypeQt pltype,
                        const QString &view, const QString &from,
                        MythMainWindow *parent,
                        const char *name)
@@ -132,10 +132,10 @@ ProgLister::ProgLister(ProgListType pltype,
     setNoErase();
 
     gContext->addListener(this);
-    gContext->addCurrentLocation("ProgLister");
+    gContext->addCurrentLocation("ProgListerQt");
 }
 
-ProgLister::~ProgLister()
+ProgListerQt::~ProgListerQt()
 {
     itemList.clear();
     gContext->removeListener(this);
@@ -143,7 +143,7 @@ ProgLister::~ProgLister()
     delete theme;
 }
 
-void ProgLister::keyPressEvent(QKeyEvent *e)
+void ProgListerQt::keyPressEvent(QKeyEvent *e)
 {
     if (!allowEvents)
         return;
@@ -237,7 +237,7 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
     allowEvents = true;
 }
 
-void ProgLister::LoadWindow(QDomElement &element)
+void ProgListerQt::LoadWindow(QDomElement &element)
 {
     QString name;
     int context;
@@ -264,14 +264,14 @@ void ProgLister::LoadWindow(QDomElement &element)
             else
             {
                 VERBOSE(VB_IMPORTANT,
-                        QString("ProgLister::LoadWindow(): Error, unknown "
+                        QString("ProgListerQt::LoadWindow(): Error, unknown "
                                 "element '%1'. Ignoring.").arg(e.tagName()));
             }
         }
     }
 }
 
-void ProgLister::updateBackground(void)
+void ProgListerQt::updateBackground(void)
 {
     QPixmap bground(size());
     bground.fill(this, 0, 0);
@@ -314,7 +314,7 @@ void ProgLister::updateBackground(void)
     setPalette(p);
 }
 
-void ProgLister::paintEvent(QPaintEvent *e)
+void ProgListerQt::paintEvent(QPaintEvent *e)
 {
     if (!allowUpdates)
     {
@@ -336,7 +336,7 @@ void ProgLister::paintEvent(QPaintEvent *e)
     updateAll = false;
 }
 
-void ProgLister::cursorDown(bool page)
+void ProgListerQt::cursorDown(bool page)
 {
     if (curItem < (int)itemList.count() - 1)
     {
@@ -347,7 +347,7 @@ void ProgLister::cursorDown(bool page)
     }
 }
 
-void ProgLister::cursorUp(bool page)
+void ProgListerQt::cursorUp(bool page)
 {
     if (curItem > 0)
     {
@@ -358,7 +358,7 @@ void ProgLister::cursorUp(bool page)
     }
 }
 
-void ProgLister::prevView(void)
+void ProgListerQt::prevView(void)
 {
     if (type == plTime)
     {
@@ -381,7 +381,7 @@ void ProgLister::prevView(void)
     refillAll = true;
 }
 
-void ProgLister::nextView(void)
+void ProgListerQt::nextView(void)
 {
     if (type == plTime)
     {
@@ -403,7 +403,7 @@ void ProgLister::nextView(void)
     refillAll = true;
 }
 
-void ProgLister::setViewFromList(int item)
+void ProgListerQt::setViewFromList(int item)
 {
     int view = item;
 
@@ -443,7 +443,7 @@ void ProgLister::setViewFromList(int item)
     refillAll = true;
 }
 
-void ProgLister::chooseEditChanged(void)
+void ProgListerQt::chooseEditChanged(void)
 {
     if (!chooseOkButton || !chooseRecordButton || !chooseLineEdit)
         return;
@@ -454,7 +454,7 @@ void ProgLister::chooseEditChanged(void)
         chooseLineEdit->text().trimmed().length() > 0);
 }
 
-void ProgLister::chooseListBoxChanged(void)
+void ProgListerQt::chooseListBoxChanged(void)
 {
     if (!chooseListBox)
         return;
@@ -477,7 +477,7 @@ void ProgLister::chooseListBoxChanged(void)
     }
 }
 
-void ProgLister::updateKeywordInDB(const QString &text)
+void ProgListerQt::updateKeywordInDB(const QString &text)
 {
     int oldview = chooseListBox->currentRow() - 1;
     int newview = viewList.indexOf(text);
@@ -511,7 +511,7 @@ void ProgLister::updateKeywordInDB(const QString &text)
     }
 }
 
-void ProgLister::setViewFromEdit(void)
+void ProgListerQt::setViewFromEdit(void)
 {
     if (!choosePopup || !chooseListBox || !chooseLineEdit)
         return;
@@ -531,7 +531,7 @@ void ProgLister::setViewFromEdit(void)
     refillAll = true;
 }
 
-void ProgLister::setViewFromPowerEdit()
+void ProgListerQt::setViewFromPowerEdit()
 {
     if (!powerPopup || !choosePopup || !chooseListBox)
         return;
@@ -565,7 +565,7 @@ void ProgLister::setViewFromPowerEdit()
     refillAll = true;
 }
 
-void ProgLister::addSearchRecord(void)
+void ProgListerQt::addSearchRecord(void)
 {
     if (!choosePopup || !chooseListBox)
         return;
@@ -587,7 +587,7 @@ void ProgLister::addSearchRecord(void)
 
     if (searchtype == kNoSearch)
     {
-        VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
+        VERBOSE(VB_IMPORTANT, "Unknown search in ProgListerQt");
         return;
     }
 
@@ -626,7 +626,7 @@ void ProgLister::addSearchRecord(void)
     setViewFromEdit();
 }
 
-void ProgLister::deleteKeyword(void)
+void ProgListerQt::deleteKeyword(void)
 {
     if (!chooseDeleteButton || !chooseListBox)
         return;
@@ -666,7 +666,7 @@ void ProgLister::deleteKeyword(void)
         chooseListBox->setFocus();
 }
 
-void ProgLister::setViewFromTime(void)
+void ProgListerQt::setViewFromTime(void)
 {
     if (!choosePopup || !chooseDay || !chooseHour)
         return;
@@ -688,7 +688,7 @@ void ProgLister::setViewFromTime(void)
     refillAll = true;
 }
 
-void ProgLister::chooseView(void)
+void ProgListerQt::chooseView(void)
 {
     if (type == plChannel || type == plCategory || type == plMovies ||
         type == plNewListings || type == plStoredSearch)
@@ -931,7 +931,7 @@ void ProgLister::chooseView(void)
     }
 }
 
-void ProgLister::powerEdit()
+void ProgListerQt::powerEdit()
 {
     int view = chooseListBox->currentRow() - 1;
     QString text = ":::::";
@@ -1058,7 +1058,7 @@ void ProgLister::powerEdit()
     powerPopup = NULL;
 }
 
-bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
+bool ProgListerQt::powerStringToSQL(const QString &qphrase, QString &output,
                                   MSqlBindings &bindings)
 {
     int ret = 0;
@@ -1131,7 +1131,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     return ret;
 }
 
-void ProgLister::quickRecord()
+void ProgListerQt::quickRecord()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -1141,7 +1141,7 @@ void ProgLister::quickRecord()
     pi->ToggleRecord();
 }
 
-void ProgLister::select()
+void ProgListerQt::select()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -1151,7 +1151,7 @@ void ProgLister::select()
     pi->EditRecording();
 }
 
-void ProgLister::edit()
+void ProgListerQt::edit()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -1161,7 +1161,7 @@ void ProgLister::edit()
     pi->EditScheduled();
 }
 
-void ProgLister::customEdit()
+void ProgListerQt::customEdit()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -1174,7 +1174,7 @@ void ProgLister::customEdit()
     delete ce;
 }
 
-void ProgLister::remove()
+void ProgListerQt::remove()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -1200,20 +1200,20 @@ void ProgLister::remove()
     record->deleteLater();
 }
 
-void ProgLister::upcoming()
+void ProgListerQt::upcoming()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
     if (!pi || type == plTitle)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, pi->title, "",
+    ProgListerQt *pl = new ProgListerQt(plTitle, pi->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
 }
 
-void ProgLister::details()
+void ProgListerQt::details()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -1221,7 +1221,7 @@ void ProgLister::details()
         pi->showDetails();
 }
 
-void ProgLister::fillViewList(const QString &view)
+void ProgListerQt::fillViewList(const QString &view)
 {
     viewList.clear();
     viewTextList.clear();
@@ -1528,7 +1528,7 @@ class plTimeSort
         }
 };
 
-void ProgLister::fillItemList(void)
+void ProgListerQt::fillItemList(void)
 {
     if (curView < 0)
          return;
@@ -1797,7 +1797,7 @@ void ProgLister::fillItemList(void)
         curItem = itemList.count() - 1;
 }
 
-void ProgLister::updateView(QPainter *p)
+void ProgListerQt::updateView(QPainter *p)
 {
     QRect pr = viewRect;
     QPixmap pix(pr.size());
@@ -1824,7 +1824,7 @@ void ProgLister::updateView(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void ProgLister::updateList(QPainter *p)
+void ProgListerQt::updateList(QPainter *p)
 {
     QRect pr = listRect;
     QPixmap pix(pr.size());
@@ -1925,7 +1925,7 @@ void ProgLister::updateList(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void ProgLister::updateInfo(QPainter *p)
+void ProgListerQt::updateInfo(QPainter *p)
 {
     QRect pr = infoRect;
     QPixmap pix(pr.size());
@@ -1962,7 +1962,7 @@ void ProgLister::updateInfo(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void ProgLister::customEvent(QEvent *e)
+void ProgListerQt::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
         return;

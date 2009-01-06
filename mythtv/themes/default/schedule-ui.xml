@@ -501,4 +501,300 @@
 
     </window>
 
+    <window name="phrasepopup">
+        <area>-1,-1,500,500</area>
+
+        <imagetype name="box">
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="title_text" from="basetextarea">
+            <area>20,20,460,40</area>
+            <font>baselarge</font>
+            <align>hcenter,top</align>
+            <value>Phrase</value>
+        </textarea>
+
+        <buttonlist name="phrase_list" from="basebuttonlist">
+            <area>20,60,450,270</area>
+            <align>left</align>
+            <showarrow>no</showarrow>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext">
+                        <area>5,0,450,30</area>
+                    </textarea>
+                </state>
+                <state name="inactive">
+                    <textarea name="buttontext">
+                        <area>5,0,450,30</area>
+                    </textarea>
+                </state>
+                <state name="selected">
+                    <textarea name="buttontext">
+                        <area>5,0,450,30</area>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textedit name="phrase_edit" from="basetextedit">
+            <position>60,360</position>
+        </textedit>
+
+        <button name="ok_button" from="basebutton">
+            <position>12,440</position>
+        </button>
+
+        <button name="delete_button" from="basebutton">
+            <position>173,440</position>
+        </button>
+
+        <button name="record_button" from="basebutton">
+            <position>333,440</position>
+        </button>
+
+    </window>
+
+    <window name="timepopup">
+        <area>-1,-1,580,165</area>
+
+        <imagetype name="box">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>0,10,580,40</area>
+            <font>baselarge</font>
+            <align>hcenter,top</align>
+            <value>Select Time</value>
+        </textarea>
+
+        <buttonlist name="date_list" from="baseselector">
+            <position>40,60</position>
+        </buttonlist>
+
+        <buttonlist name="time_list" from="baseselector">
+            <position>330,60</position>
+        </buttonlist>
+
+        <button name="ok_button" from="basebutton">
+            <position>220,115</position>
+        </button>
+
+    </window>
+
+    <window name="powersearchpopup">
+        <area>-1,-1,500,500</area>
+
+        <imagetype name="box">
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="title_text" from="basetextarea">
+            <area>20,20,460,40</area>
+            <font>baselarge</font>
+            <align>hcenter,top</align>
+            <value>Select Search</value>
+        </textarea>
+
+        <buttonlist name="phrase_list" from="basebuttonlist">
+            <area>20,60,450,350</area>
+            <align>left</align>
+            <showarrow>no</showarrow>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext">
+                        <area>5,0,450,30</area>
+                    </textarea>
+                </state>
+                <state name="inactive">
+                    <textarea name="buttontext">
+                        <area>5,0,450,30</area>
+                    </textarea>
+                </state>
+                <state name="selected">
+                    <textarea name="buttontext">
+                        <area>5,0,450,30</area>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <button name="edit_button" from="basebutton">
+            <position>12,440</position>
+        </button>
+
+        <button name="delete_button" from="basebutton">
+            <position>173,440</position>
+        </button>
+
+        <button name="record_button" from="basebutton">
+            <position>333,440</position>
+        </button>
+
+    </window>
+
+    <window name="editpowersearchpopup">
+        <area>-1,-1,500,550</area>
+
+        <imagetype name="box">
+            <area>0,0,500,550</area>
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="title_text" from="basetextarea">
+            <area>20,10,460,40</area>
+            <font>baselarge</font>
+            <align>hcenter,top</align>
+            <value>Edit Power Search Fields</value>
+        </textarea>
+
+        <textarea name="titlelabel" from="basetextarea">
+            <area>60,50,460,30</area>
+            <font>basesmall</font>
+            <value>Optional title phrase:</value>
+        </textarea>
+
+        <textedit name="title_edit" from="basetextedit">
+            <position>60,80</position>
+        </textedit>
+
+        <textarea name="subtitlelabel" from="basetextarea">
+            <area>60,140,460,30</area>
+            <font>basesmall</font>
+            <value>Optional subtitle phrase:</value>
+        </textarea>
+
+        <textedit name="subtitle_edit" from="basetextedit">
+            <position>60,170</position>
+        </textedit>
+
+        <textarea name="desclabel" from="basetextarea">
+            <area>60,230,320,30</area>
+            <font>basesmall</font>
+            <value>Optional description phrase:</value>
+        </textarea>
+
+        <textedit name="desc_edit" from="basetextedit">
+            <position>60,260</position>
+        </textedit>
+
+        <buttonlist name="category_list" from="basewideselector">
+            <position>60,330</position>
+        </buttonlist>
+
+        <buttonlist name="genre_list" from="basewideselector">
+            <position>60,380</position>
+        </buttonlist>
+
+        <buttonlist name="channel_list" from="basewideselector">
+            <position>60,430</position>
+        </buttonlist>
+
+        <button name="ok_button" from="basebutton">
+            <position>170,490</position>
+        </button>
+
+    </window>
+
+    <window name="programlist">
+
+        <font name="yellowinfo" face="Arial">
+            <color>#ffff33</color>
+            <size>17</size>
+            <size:small>10</size:small>
+            <shadow>1,1</shadow>
+            <bold>yes</bold>
+        </font>
+
+
+        <textarea name="sched" from="basetextarea">
+            <area>20,5,245,40</area>
+            <font>baselarge</font>
+            <align>left,bottom</align>
+            <value>Program Listings</value>
+        </textarea>
+        <textarea name="keyinstr" from="basetextarea">
+            <area>260,5,180,40</area>
+            <align>hcenter,bottom</align>
+            <value>(1)Time (2)Title</value>
+        </textarea>
+        <imagetype name="filler">
+            <filename>rk-background.png</filename>
+            <position>0,45</position>
+        </imagetype>
+
+        <textarea name="curview" from="basetextarea">
+            <area>410,5,360,40</area>
+            <align>right,bottom</align>
+        </textarea>
+
+        <buttonlist name="proglist" from="basebuttonlist2">
+            <area>15,62,760,370</area>
+            <buttonarea>0,0,760,325</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,760,25</area>
+                <state name="active">
+                    <textarea name="time" from="buttontext">
+                        <area>32,1,148,24</area>
+                    </textarea>
+                    <textarea name="channel" from="time">
+                        <area>190,1,140,24</area>
+                    </textarea>
+                    <textarea name="title" from="time">
+                        <area>340,1,380,24</area>
+                    </textarea>
+                    <textarea name="card" from="time">
+                        <area>730,1,30,24</area>
+                    </textarea>
+                </state>
+                <state name="selected" from="active" />
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>690,350</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>720,350</position>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="showinglines">
+            <position>0,45</position>
+            <filename>rk-lines.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>30,405,760,50</area>
+            <font>baselarge</font>
+        </textarea>
+        <textarea name="channel" from="basetextarea">
+            <area>30,445,160,30</area>
+        </textarea>
+        <textarea name="timedate" from="basetextarea">
+            <area>210,445,420,30</area>
+        </textarea>
+        <textarea name="description" from="basetextarea">
+            <area>30,475,720,90</area>
+            <multiline>yes</multiline>
+            <value>%|"SUBTITLE|"%\n%STARS%%DESCRIPTION%</value>
+        </textarea>
+        <textarea name="type" from="basetextarea">
+            <area>30,560,560,30</area>
+            <font>yellowinfo</font>
+        </textarea>
+        <textarea name="programid" from="basetextarea">
+            <area>560,560,200,30</area>
+            <align>right</align>
+        </textarea>
+        <textarea name="msg" from="basetextarea">
+            <area>0,110,800,70</area>
+            <align>allcenter</align>
+            <value>No listings found for this program. </value>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
 </mythuitheme>

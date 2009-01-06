@@ -500,10 +500,12 @@ void ChannelRecPriority::upcoming()
         return;
 
     QString chanID = QString("%1").arg(chanInfo->chanid);
-    ProgLister *pl = new ProgLister(plChannel, chanID, "",
-                                   gContext->GetMainWindow(), "proglist");
-    pl->exec();
-    delete pl;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plChannel, chanID, "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 

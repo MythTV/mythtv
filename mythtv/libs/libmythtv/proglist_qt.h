@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef PROGLIST_H_
-#define PROGLIST_H_
+#ifndef PROGLIST_QT_H_
+#define PROGLIST_QT_H_
 
 // Qt headers
 #include <QDateTime>
@@ -17,7 +17,7 @@
 #include "programinfo.h"
 #include "programlist.h"
 
-enum ProgListType {
+enum ProgListTypeQt {
     plUnknown = 0,
     plTitle = 1,
     plTitleSearch,
@@ -34,15 +34,14 @@ enum ProgListType {
     plStoredSearch
 };
 
-
-class MPUBLIC ProgLister : public MythDialog
+class MPUBLIC ProgListerQt : public MythDialog
 {
     Q_OBJECT
 
   public:
-    ProgLister(ProgListType pltype, const QString &view, const QString &from,
+    ProgListerQt(ProgListTypeQt pltype, const QString &view, const QString &from,
                MythMainWindow *parent, const char *name = 0);
-    ~ProgLister();
+    ~ProgListerQt();
 
   protected slots:
     void cursorDown(bool page = false);
@@ -74,7 +73,7 @@ class MPUBLIC ProgLister : public MythDialog
     void quickRecord(void);
 
   private:
-    ProgListType type;
+    ProgListTypeQt type;
     QString addTables;
     QDateTime startTime;
     QDateTime searchTime;

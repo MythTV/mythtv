@@ -9,7 +9,7 @@
 #include "programinfo.h"
 #include "recordingprofile.h"
 #include "mythcontext.h"
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "previouslist.h"
 #include "sr_items.h"
 #include "sr_root.h"
@@ -572,26 +572,26 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
 
 void ScheduledRecording::runTitleList(void)
 {
-    ProgLister *pl = NULL;
+    ProgListerQt *pl = NULL;
 
     if (search->intValue())
     {
         if (m_pginfo)
         {
-            pl = new ProgLister(plTitle, m_pginfo->title, "",
+            pl = new ProgListerQt(plTitle, m_pginfo->title, "",
                                 gContext->GetMainWindow(), "proglist");
         }
         else
         {
             QString trimTitle = title->getValue();
             trimTitle.remove(QRegExp(" \\(.*\\)$"));
-            pl = new ProgLister(plTitle, trimTitle, "",
+            pl = new ProgListerQt(plTitle, trimTitle, "",
                                 gContext->GetMainWindow(), "proglist");
         }
     }
     else
     {
-        pl = new ProgLister(plTitle, title->getValue(), "",
+        pl = new ProgListerQt(plTitle, title->getValue(), "",
                             gContext->GetMainWindow(), "proglist");
     }
     pl->exec();
@@ -600,17 +600,17 @@ void ScheduledRecording::runTitleList(void)
 
 void ScheduledRecording::runRuleList(void)
 {
-    ProgLister *pl = NULL;
+    ProgListerQt *pl = NULL;
 
     if (getRecordID())
     {
-        pl = new ProgLister(plRecordid,
+        pl = new ProgListerQt(plRecordid,
                             QString("%1").arg(getRecordID()), "",
                             gContext->GetMainWindow(), "proglist");
     }
     else
     {
-        pl = new ProgLister(plTitle, title->getValue(), "",
+        pl = new ProgListerQt(plTitle, title->getValue(), "",
                             gContext->GetMainWindow(), "proglist");
     }
     pl->exec();

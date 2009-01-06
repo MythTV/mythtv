@@ -18,7 +18,7 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmyth/dialogbox.h"
 #include "programinfo.h"
-#include "proglist.h"
+#include "proglist_qt.h"
 #include "scheduledrecording.h"
 #include "recordingtypes.h"
 #include "libmythdb/mythdb.h"
@@ -541,7 +541,7 @@ void CustomEdit::testClicked(void)
         return;
     }
 
-    ProgLister *pl = new ProgLister(plSQLSearch, m_description->text(), 
+    ProgListerQt *pl = new ProgListerQt(plSQLSearch, m_description->text(), 
                                     m_subtitle->text(),
                                     gContext->GetMainWindow(), "proglist");
     pl->exec();

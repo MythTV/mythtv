@@ -142,72 +142,102 @@ void startFinder(void)
 
 void startSearchTitle(void)
 {
-    ProgLister searchTitle(plTitleSearch, "", "",
-                         gContext->GetMainWindow(), "proglist");
-    searchTitle.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plTitleSearch, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchKeyword(void)
 {
-    ProgLister searchKeyword(plKeywordSearch, "", "",
-                        gContext->GetMainWindow(), "proglist");
-    searchKeyword.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plKeywordSearch, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchPeople(void)
 {
-    ProgLister searchPeople(plPeopleSearch, "", "",
-                         gContext->GetMainWindow(), "proglist");
-    searchPeople.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plPeopleSearch, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchPower(void)
 {
-    ProgLister searchPower(plPowerSearch, "", "",
-                         gContext->GetMainWindow(), "proglist");
-    searchPower.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plPowerSearch, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchStored(void)
 {
-    ProgLister searchStored(plStoredSearch, "", "",
-                         gContext->GetMainWindow(), "proglist");
-    searchStored.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plStoredSearch, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchChannel(void)
 {
-    ProgLister searchChannel(plChannel, "", "",
-                             gContext->GetMainWindow(), "proglist");
-    searchChannel.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plChannel, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchCategory(void)
 {
-    ProgLister searchCategory(plCategory, "", "",
-                            gContext->GetMainWindow(), "proglist");
-    searchCategory.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plCategory, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchMovie(void)
 {
-    ProgLister searchMovie(plMovies, "", "",
-                           gContext->GetMainWindow(), "proglist");
-    searchMovie.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plMovies, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchNew(void)
 {
-    ProgLister searchNew(plNewListings, "", "",
-                         gContext->GetMainWindow(), "proglist");
-    searchNew.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plNewListings, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startSearchTime(void)
 {
-    ProgLister searchTime(plTime, "", "",
-                         gContext->GetMainWindow(), "proglist");
-    searchTime.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plTime, "", "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startManaged(void)

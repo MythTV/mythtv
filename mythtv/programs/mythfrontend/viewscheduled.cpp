@@ -247,17 +247,17 @@ void ViewScheduled::FillList(void)
         QString temp;
         temp = (pginfo->recstartts).toString(m_dateformat);
         temp += " " + (pginfo->recstartts).toString(m_timeformat);
-        item->setText(temp, "time", state); //,font
+        item->SetText(temp, "time", state); //,font
 
-        item->setText(pginfo->ChannelText(m_channelFormat), "channel", state);
+        item->SetText(pginfo->ChannelText(m_channelFormat), "channel", state);
 
         temp = pginfo->title;
         if ((pginfo->subtitle).trimmed().length() > 0)
             temp += " - \"" + pginfo->subtitle + "\"";
-        item->setText(temp, "title", state); //,font
+        item->SetText(temp, "title", state); //,font
 
         temp = pginfo->RecStatusChar();
-        item->setText(temp, "card", state); //,font
+        item->SetText(temp, "card", state); //,font
 
         item->DisplayState(state, "status");
     }
@@ -413,12 +413,17 @@ void ViewScheduled::upcoming()
     if (!pginfo)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, pginfo->title, "",
-                                   gContext->GetMainWindow(), "proglist");
-    pl->exec();
-    delete pl;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
+    if (pl->Create())
+    {
+        mainStack->AddScreen(pl);
+    }
+    else
+        delete pl;
 
-    EmbedTVWindow();
+    //FIXME: 
+    //EmbedTVWindow();
 }
 
 void ViewScheduled::details()

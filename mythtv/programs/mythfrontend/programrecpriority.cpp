@@ -747,10 +747,12 @@ void ProgramRecPriority::upcoming(void)
         ProgLister *pl = NULL;
         QString trimTitle = pgRecInfo->title;
         trimTitle.remove(QRegExp(" \\(.*\\)$"));
-        pl = new ProgLister(plTitle, trimTitle, "",
-                            gContext->GetMainWindow(), "proglist");
-        pl->exec();
-        delete pl;
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        pl = new ProgLister(mainStack, plTitle, trimTitle, "");
+        if (pl->Create())
+            mainStack->AddScreen(pl);
+        else
+            delete pl;
     }
 }
 
