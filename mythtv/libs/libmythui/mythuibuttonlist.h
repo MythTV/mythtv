@@ -127,8 +127,8 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
     void SetValue(QString value) { MoveToNamedPosition(value); }
     void SetValueByData(QVariant data);
-    int  GetIntValue() { return GetItemCurrent()->GetText().toInt(); }
-    QString  GetValue() { return GetItemCurrent()->GetText(); }
+    int  GetIntValue();
+    QString  GetValue();
 
     void SetItemCurrent(MythUIButtonListItem* item);
     void SetItemCurrent(int pos);

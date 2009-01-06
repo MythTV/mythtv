@@ -371,6 +371,22 @@ MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
     return m_selItem;
 }
 
+int  MythUIButtonList::GetIntValue()
+{
+    if (GetItemCurrent())
+        return GetItemCurrent()->GetText().toInt();
+
+    return 0;
+}
+
+QString  MythUIButtonList::GetValue()
+{
+    if (GetItemCurrent())
+        return GetItemCurrent()->GetText();
+
+    return QString();
+}
+
 MythUIButtonListItem* MythUIButtonList::GetItemFirst() const
 {
     if (!m_itemList.empty())
