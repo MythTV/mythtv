@@ -275,7 +275,8 @@ void MythConfirmationDialog::sendResult(bool ok)
 /**
  * Non-blocking version of MythPopupBox::showOkPopup()
  */
-void ShowOkPopup(const QString &message)
+void ShowOkPopup(const QString &message, QObject *parent,
+                 const char *slot, bool showCancel)
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
     MythConfirmationDialog  *pop;
@@ -302,9 +303,13 @@ void ShowOkPopup(const QString &message)
         }
     }
 
-    pop = new MythConfirmationDialog(stk, message, false);  // No cancel button
+    pop = new MythConfirmationDialog(stk, message, showCancel);
     if (pop->Create())
+    {
         stk->AddScreen(pop);
+        if (parent && slot)
+            QObject::connect(pop, SIGNAL(haveResult(bool)), parent, slot, Qt::QueuedConnection);
+    }
     else
     {
         delete pop;
