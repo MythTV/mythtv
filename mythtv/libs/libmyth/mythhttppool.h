@@ -24,6 +24,7 @@ class MPUBLIC MythHttpListener
                         uint              http_status_id,
                         const QString    &http_status_str,
                         const QByteArray &data) = 0;
+    virtual ~MythHttpListener() { }
 };
 
 class HttpRequest
