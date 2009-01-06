@@ -257,7 +257,7 @@ void MythBrowser::slotLoadStarted(void)
     MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
     {
-        item->setText(tr("Loading..."));
+        item->SetText(tr("Loading..."));
         m_pageList->Update();
     }
 }
@@ -283,7 +283,7 @@ void MythBrowser::slotTitleChanged(const QString &title)
     MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
     {
-        item->setText(title);
+        item->SetText(title);
         m_pageList->Update();
     }
 }
@@ -331,7 +331,7 @@ void MythBrowser::slotTabSelected(MythUIButtonListItem *item)
         return;
 
     switchTab(m_pageList->GetCurrentPos());
-    slotStatusBarMessage(item->text());
+    slotStatusBarMessage(item->GetText());
 }
 
 void MythBrowser::slotTabLosingFocus(void)

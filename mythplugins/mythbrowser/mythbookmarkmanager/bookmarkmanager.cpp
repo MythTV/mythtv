@@ -224,7 +224,7 @@ void BookmarkManager::UpdateURLList(void)
     if (!item)
         return;
 
-    QString group = item->text();
+    QString group = item->GetText();
 
     for (int x = 0; x < m_siteList.count(); x++)
     {
@@ -234,8 +234,8 @@ void BookmarkManager::UpdateURLList(void)
         {
             MythUIButtonListItem *item = new MythUIButtonListItem(
                     m_bookmarkList, "", "", true, MythUIButtonListItem::NotChecked);
-            item->setText(site->name, "name");
-            item->setText(site->url, "url");
+            item->SetText(site->name, "name");
+            item->SetText(site->url, "url");
             item->SetData(qVariantFromValue(site));
             item->setChecked(site->selected ?
                     MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);

@@ -126,7 +126,7 @@ void WebPage::slotIconChanged(void)
 
 void WebPage::slotLoadStarted(void)
 {
-    m_listItem->setText(tr("Loading..."));
+    m_listItem->SetText(tr("Loading..."));
     m_parent->m_pageList->Update();
 }
 
@@ -153,6 +153,6 @@ void WebPage::slotStatusBarMessage(const QString &text)
 
 void WebPage::slotTitleChanged(const QString &title)
 {
-    m_listItem->setText(title);
+    m_listItem->SetText(title);
     m_parent->m_pageList->Update();
 }
