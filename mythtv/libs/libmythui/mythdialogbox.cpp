@@ -522,7 +522,7 @@ void MythUISearchDialog::slotUpdateList(void)
         }
 
         // add item to list
-        new MythUIButtonListItem(m_itemList, item, NULL, true, MythUIButtonListItem::NotChecked);
+        new MythUIButtonListItem(m_itemList, item, NULL, false);
     }
 
     m_itemList->SetItemCurrent(0);
