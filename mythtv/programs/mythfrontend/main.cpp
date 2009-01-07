@@ -290,13 +290,18 @@ void startCustomPriority(void)
 
 void startPlaybackWithGroup(QString recGroup = "")
 {
-    PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(),
-                    "tvplayselect");
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    if (recGroup.size())
-        pbb.displayRecGroup(recGroup);
+    PlaybackBox *pbb = new PlaybackBox(mainStack, "playbackbox",
+                                        PlaybackBox::Play);
 
-    pbb.exec();
+    if (!recGroup.isEmpty())
+        pbb->displayRecGroup(recGroup);
+
+    if (pbb->Create())
+        mainStack->AddScreen(pbb);
+    else
+        delete pbb;
 }
 
 void startPlayback(void)
@@ -306,9 +311,15 @@ void startPlayback(void)
 
 void startDelete(void)
 {
-    PlaybackBox delbox(PlaybackBox::Delete, gContext->GetMainWindow(),
-                       "tvplayselect");
-    delbox.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    PlaybackBox *pbb = new PlaybackBox(mainStack, "deletebox",
+                                        PlaybackBox::Delete);
+
+    if (pbb->Create())
+        mainStack->AddScreen(pbb);
+    else
+        delete pbb;
 }
 
 void startPrevious(void)

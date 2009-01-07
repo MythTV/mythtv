@@ -1,37 +1,22 @@
 
-#include <cmath>
-#include <unistd.h>
-#include <stdlib.h>
-
-#include <algorithm>
-#include <iostream>
 using namespace std;
 
-#include <QPushButton>
-#include <QLabel>
-#include <QCursor>
 #include <QDateTime>
-#include <QLayout>
+#include <QDir>
 #include <QApplication>
 #include <QTimer>
-#include <QImage>
-#include <QPainter>
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
 #include <QWaitCondition>
-#include <QPixmap>
-#include <QGridLayout>
-#include <QKeyEvent>
-#include <QEvent>
-#include <QPaintEvent>
 
 #include "playbackbox.h"
-#include "proglist_qt.h"
+#include "proglist.h"
 #include "tv.h"
 #include "oldsettings.h"
+#include "NuppelVideoPlayer.h"
 
-#include "exitcodes.h"
+#include "mythdirs.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
@@ -42,10 +27,17 @@ using namespace std;
 #include "previewgenerator.h"
 #include "playgroup.h"
 #include "customedit.h"
-#include "playercontext.h"
 #include "util.h"
-#include "x11colors.h"
+
 #include "mythuihelper.h"
+#include "mythuibuttonlist.h"
+#include "mythuitext.h"
+#include "mythuistatetype.h"
+#include "mythdialogbox.h"
+#include "mythuitextedit.h"
+#include "mythuiimage.h"
+#include "mythuicheckbox.h"
+#include "mythuiprogressbar.h"
 
 #define LOC QString("PlaybackBox: ")
 #define LOC_ERR QString("PlaybackBox Error: ")
@@ -60,7 +52,7 @@ using namespace std;
 const uint PreviewGenState::maxAttempts     = 5;
 const uint PreviewGenState::minBlockSeconds = 60;
 
-const uint PlaybackBox::previewGeneratorMaxRunning = 2;
+const uint PlaybackBox::PREVIEW_GEN_MAX_RUN = 2;
 
 static int comp_programid(const ProgramInfo *a, const ProgramInfo *b)
 {
@@ -184,7 +176,7 @@ static bool comp_recordDate_rev_less_than(
     return comp_recordDate_rev(a, b) < 0;
 }
 
-static PlaybackBox::ViewMask viewMaskToggle(PlaybackBox::ViewMask mask,
+static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
         PlaybackBox::ViewMask toggle)
 {
     // can only toggle a single bit at a time
@@ -196,7 +188,7 @@ static PlaybackBox::ViewMask viewMaskToggle(PlaybackBox::ViewMask mask,
 static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
         PlaybackBox::ViewTitleSort titleSort, int recpriority)
 {
-    if (title == "")
+    if (title.isEmpty())
         return title;
 
     QRegExp prefixes( QObject::tr("^(The |A |An )") );
@@ -241,1487 +233,858 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
 
 ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 {
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    PlaybackBox *pbb = new PlaybackBox(mainStack,"playbackbox",
+                                        PlaybackBox::Play, (TV *)player,
+                                        showTV);
+
+    if (pbb->Create())
+        mainStack->AddScreen(pbb);
+    else
+        delete pbb;
+
     ProgramInfo *nextProgram = NULL;
-
-    PlaybackBox *pbb = new PlaybackBox(PlaybackBox::Play,
-            gContext->GetMainWindow(), "tvplayselect", (TV *)player, showTV);
-    pbb->Show();
-    pbb->exec();
-
-    if (pbb->getSelected())
-        nextProgram = new ProgramInfo(*pbb->getSelected());
-
-    delete pbb;
+    if (pbb->CurrentItem())
+        nextProgram = new ProgramInfo(*pbb->CurrentItem());
 
     return nextProgram;
 }
 
-PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
-                         const char *name, TV *player, bool showTV)
-    : MythDialog(parent, name),
+PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
+                            TV *player, bool showTV)
+    : MythScreenType(parent, name),
       // Settings
-      type(ltype),
-      formatShortDate("M/d"),           formatLongDate("ddd MMMM d"),
-      formatTime("h:mm AP"),
-      titleView(true),                  useCategories(false),
-      useRecGroups(false),              watchListAutoExpire(false),
-      watchListMaxAge(60),              watchListBlackOut(2),
-      groupnameAsAllProg(false),
-      arrowAccel(true),                 ignoreKeyPressEvents(false),
-      listOrder(1),                     listsize(0),
+      m_type(ltype),
+      m_formatShortDate("M/d"),           m_formatLongDate("ddd MMMM d"),
+      m_formatTime("h:mm AP"),
+      m_watchListAutoExpire(false),
+      m_watchListMaxAge(60),              m_watchListBlackOut(2),
+      m_groupnameAsAllProg(false),
+      m_listOrder(1),
       // Recording Group settings
-      groupDisplayName(ProgramInfo::i18n("All Programs")),
-      recGroup("All Programs"),
-      recGroupPassword(""),             curGroupPassword(""),
-      watchGroupName(" " + tr("Watch List")),
-      watchGroupLabel(watchGroupName.toLower()),
-      viewMask(VIEW_TITLES),
-      // Theme parsing
-      theme(new XMLParse()),
-      // Non-volatile drawing variables
-      drawPopupSolid(true),
-      drawPopupFgColor(Qt::white),      drawPopupBgColor(Qt::black),
-      drawPopupSelColor(Qt::green),
-      drawTotalBounds(0, 0, size().width(), size().height()),
-      drawListBounds(0, 0, 0, 0),       drawInfoBounds(0, 0, 0, 0),
-      drawGroupBounds(0, 0, 0, 0),      drawUsageBounds(0, 0, 0, 0),
-      drawVideoBounds(0, 0, 0, 0),      blackholeBounds(0, 0, 0, 0),
-      drawCurGroupBounds(0, 0, 0, 0),
-      // General popup support
-      popup(NULL),                      expectingPopup(false),
-      // Recording Group popup support
-      recGroupLastItem(0),              recGroupChooserPassword(""),
-      recGroupPopup(NULL),              recGroupListBox(NULL),
-      recGroupLineEdit(NULL),           recGroupLineEdit1(NULL),
-      recGroupOldPassword(NULL),        recGroupNewPassword(NULL),
-      recGroupOkButton(NULL),
+      m_groupDisplayName(ProgramInfo::i18n("All Programs")),
+      m_recGroup("All Programs"),
+      m_watchGroupName(tr("Watch List")),
+      m_watchGroupLabel(m_watchGroupName.toLower()),
+      m_viewMask(VIEW_TITLES),
+
+      // General m_popupMenu support
+      m_popupMenu(NULL),
       // Main Recording List support
-      fillListTimer(new QTimer(this)),  fillListFromCache(false),
-      connected(false),
-      titleIndex(0),                    progIndex(0),
-      progsInDB(0),
+      m_fillListTimer(new QTimer(this)),  m_fillListFromCache(false),
+      m_connected(false),                 m_progsInDB(0),
       // Other state
-      curitem(NULL),                    delitem(NULL),
-      progCache(NULL),                  playingSomething(false),
+      m_delItem(NULL),                    m_currentItem(NULL),
+      m_progCache(NULL),                  m_playingSomething(false),
       // Selection state variables
-      haveGroupInfoSet(false),          inTitle(false),
-      leftRight(false), playbackVideoContainer(false),
+      m_needUpdate(false),
       // Free disk space tracking
-      freeSpaceNeedsUpdate(true),       freeSpaceTimer(new QTimer(this)),
-      freeSpaceTotal(0),                freeSpaceUsed(0),
-      // Volatile drawing variables
-      paintSkipCount(0),                paintSkipUpdate(false),
-      // Preview Video Variables
-      previewPlayer(NULL),
-      previewVideoStartTimer(new QTimer(this)),
-      previewVideoRefreshTimer(new QTimer(this)),
-      previewVideoStopTimer(new QTimer(this)),
-      previewVideoEnabled(false), previewTimeout(2000),
+      m_freeSpaceNeedsUpdate(true),       m_freeSpaceTimer(new QTimer(this)),
+      m_freeSpaceTotal(0),                m_freeSpaceUsed(0),
       // Preview Image Variables
-      previewPixmapEnabled(false),      previewPixmap(NULL),
-      previewSuspend(false),            previewChanid(""),
-      previewGeneratorRunning(0),
+      m_previewGeneratorRunning(0),
       // Network Control Variables
-      underNetworkControl(false),
+      m_underNetworkControl(false),
       m_player(NULL)
 {
-    formatShortDate    = gContext->GetSetting("ShortDateFormat", "M/d");
-    formatLongDate     = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    formatTime         = gContext->GetSetting("TimeFormat", "h:mm AP");
-    recGroup           = gContext->GetSetting("DisplayRecGroup","All Programs");
+    m_formatShortDate    = gContext->GetSetting("ShortDateFormat", "M/d");
+    m_formatLongDate     = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_formatTime         = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_recGroup           = gContext->GetSetting("DisplayRecGroup",
+                                                "All Programs");
     int pbOrder        = gContext->GetNumSetting("PlayBoxOrdering", 1);
     // Split out sort order modes, wacky order for backward compatibility
-    listOrder = (pbOrder >> 1) ^ (allOrder = pbOrder & 1);
-    watchListStart     = gContext->GetNumSetting("PlaybackWLStart", 0);
-    watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
-    watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
-    watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
-    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
-    arrowAccel         = gContext->GetNumSetting("UseArrowAccels", 1);
-    inTitle            = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
-    if (!player)
-    {
-        previewVideoEnabled =gContext->GetNumSetting("PlaybackPreview");
-        previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
-    }
-    previewFromBookmark= gContext->GetNumSetting("PreviewFromBookmark");
-    previewGeneratorMode =
-        gContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
-        PreviewGenerator::kRemote : PreviewGenerator::kLocalAndRemote;
+    m_listOrder = (pbOrder >> 1) ^ (m_allOrder = pbOrder & 1);
+    m_watchListStart     = gContext->GetNumSetting("PlaybackWLStart", 0);
+    m_watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
+    m_watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
+    m_watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
+    m_groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
+    m_previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
+    m_previewGeneratorMode =
+            gContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
+            PreviewGenerator::kRemote : PreviewGenerator::kLocalAndRemote;
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
-    viewMask = (ViewMask)gContext->GetNumSetting(
-            "DisplayGroupDefaultViewMask", VIEW_TITLES);
+    m_viewMask = (ViewMask)gContext->GetNumSetting(
+                                    "DisplayGroupDefaultViewMask", VIEW_TITLES);
 
     if (gContext->GetNumSetting("PlaybackWatchList", 1))
-        viewMask = (ViewMask)(viewMask | VIEW_WATCHLIST);
-
-    progLists[""];
-    titleList << "";
-    playList.clear();
+        m_viewMask = (ViewMask)(m_viewMask | VIEW_WATCHLIST);
 
     if (player)
     {
         m_player = player;
         QString tmp = m_player->GetRecordingGroup(0);
         if (!tmp.isEmpty())
-            recGroup = tmp;
+            m_recGroup = tmp;
     }
+
     // recording group stuff
-    recGroupType.clear();
-    recGroupType[recGroup] = (displayCat) ? "category" : "recgroup";
-    if (groupnameAsAllProg)
-        groupDisplayName = ProgramInfo::i18n(recGroup);
+    m_recGroupType.clear();
+    m_recGroupType[m_recGroup] = (displayCat) ? "category" : "recgroup";
+    if (m_groupnameAsAllProg)
+        m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
+
+    fillRecGroupPasswordCache();
 
     if (!m_player)
-        recGroupPassword = getRecGroupPassword(recGroup);
-
-    // theme stuff
-    theme->SetWMult(wmult);
-    theme->SetHMult(hmult);
-    if (m_player && m_player->IsRunning() && showTV &&
-        theme->LoadTheme(xmldata,"playback-video"))
-    {
-        playbackVideoContainer = true;
-        previewPixmapEnabled = false;
-    }
-    else
-        theme->LoadTheme(xmldata,"playback");
-
-    LoadWindow(xmldata);
-
-    if (previewVideoEnabled)
-    {
-        previewPlayer = new PlayerContext();
-        previewPlayer->SetPIPState(kPIPStandAlone);
-        previewPlayer->CreatePIPWindow(blackholeBounds, -1, this);
-        previewPixmapEnabled = true;
-    }
-
-    EmbedTVWindow();
-
-    LayerSet *container = theme->GetSet("selector");
-    UIListType *listtype = NULL;
-    if (container)
-    {
-        listtype = (UIListType *)container->GetType("showing");
-        if (listtype)
-            listsize = listtype->GetItems();
-    }
-    else
-    {
-        QString btn0 = QObject::tr("Failed to get selector object");
-        QString btn1 = QObject::tr(
-            "Myth could not locate the selector object within your theme.\n"
-            "Please make sure that your ui.xml is valid.\n"
-            "\n"
-            "Myth will now exit.");
-
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), btn0, btn1);
-
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get selector object.");
-        exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
-        return;
-    }
-
-    if (theme->GetSet("group_info") &&
-        gContext->GetNumSetting("ShowGroupInfo", 0) == 1)
-    {
-        haveGroupInfoSet = true;
-        if (listtype)
-            listtype->ShowSelAlways(false);
-    }
-
-    // initially fill the list
-    connected = FillList();
-
-    // connect up timers...
-    connect(previewVideoStartTimer, SIGNAL(timeout()),
-            this,                     SLOT(timeout()));
-    connect(previewVideoRefreshTimer, SIGNAL(timeout()),
-            this,                     SLOT(refreshVideo()));
-    connect(previewVideoStopTimer,    SIGNAL(timeout()),
-            this,                     SLOT(finishedPreview()));
-    connect(freeSpaceTimer,           SIGNAL(timeout()),
-            this,                     SLOT(setUpdateFreeSpace()));
-    connect(fillListTimer,            SIGNAL(timeout()),
-            this,                     SLOT(listChanged()));
-
-    // preview video & preview pixmap init
-    previewStartts = QDateTime::currentDateTime();
-    previewVideoStartTimer->start(previewTimeout);
+        m_recGroupPassword = getRecGroupPassword(m_recGroup);
 
     // misc setup
-    updateBackground();
-    setNoErase();
     gContext->addListener(this);
 
-    if (!m_player && ((!recGroupPassword.isEmpty()) ||
-        ((titleList.count() <= 1) && (progsInDB > 0))))
-    {
-        recGroup = "";
-        showRecGroupChooser();
-    }
-
-    gContext->addCurrentLocation((type == Delete)? "DeleteBox":"PlaybackBox");
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 
 PlaybackBox::~PlaybackBox(void)
 {
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
 
-    killPlayer();
-
-    if (previewVideoStartTimer)
+    if (m_fillListTimer)
     {
-        previewVideoStartTimer->disconnect(this);
-        previewVideoStartTimer->deleteLater();
-        previewVideoStartTimer = NULL;
+        m_fillListTimer->disconnect(this);
+        m_fillListTimer->deleteLater();
+        m_fillListTimer = NULL;
     }
 
-    if (previewVideoRefreshTimer)
+    if (m_freeSpaceTimer)
     {
-        previewVideoRefreshTimer->disconnect(this);
-        previewVideoRefreshTimer->deleteLater();
-        previewVideoRefreshTimer = NULL;
-    }
-
-    if (previewVideoStopTimer)
-    {
-        previewVideoStopTimer->disconnect(this);
-        previewVideoStopTimer->deleteLater();
-        previewVideoStopTimer = NULL;
-    }
-    if (fillListTimer)
-    {
-        fillListTimer->disconnect(this);
-        fillListTimer->deleteLater();
-        fillListTimer = NULL;
-    }
-
-    if (freeSpaceTimer)
-    {
-        freeSpaceTimer->disconnect(this);
-        freeSpaceTimer->deleteLater();
-        freeSpaceTimer = NULL;
-    }
-
-    if (theme)
-    {
-        delete theme;
-        theme = NULL;
-    }
-
-    if (curitem)
-    {
-        delete curitem;
-        curitem = NULL;
-    }
-
-    if (delitem)
-    {
-        delete delitem;
-        delitem = NULL;
+        m_freeSpaceTimer->disconnect(this);
+        m_freeSpaceTimer->deleteLater();
+        m_freeSpaceTimer = NULL;
     }
 
     clearProgramCache();
 
+    if (m_currentItem)
+        delete m_currentItem;
+
     // disconnect preview generators
-    QMutexLocker locker(&previewGeneratorLock);
-    PreviewMap::iterator it = previewGenerator.begin();
-    for (;it != previewGenerator.end(); ++it)
+    QMutexLocker locker(&m_previewGeneratorLock);
+    PreviewMap::iterator it = m_previewGenerator.begin();
+    for (;it != m_previewGenerator.end(); ++it)
     {
         if ((*it).gen)
             (*it).gen->disconnectSafe();
     }
-
-    // free preview pixmap after preview generators are
-    // no longer telling us about any new previews.
-    if (previewPixmap)
-    {
-        delete previewPixmap;
-        previewPixmap = NULL;
-    }
 }
 
-void PlaybackBox::displayRecGroup(QString newRecGroup)
+bool PlaybackBox::Create()
 {
-    setGroupFilter(newRecGroup);
+    if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
+        return false;
 
-    connected = FillList(true);
+    m_groupList     = dynamic_cast<MythUIButtonList *> (GetChild("groups"));
+    m_recordingList = dynamic_cast<MythUIButtonList *> (GetChild("recordings"));
 
-    progIndex = 0;
-    titleIndex = 0;
-}
+    m_noRecordingsText = dynamic_cast<MythUIText *> (GetChild("norecordings"));
 
-DialogCode PlaybackBox::exec(void)
-{
-    if (recGroup != "All Programs")
-        return MythDialog::exec();
-    else if (gContext->GetNumSetting("QueryInitialFilter", 0) == 1)
+    m_previewImage = dynamic_cast<MythUIImage *>(GetChild("preview"));
+
+    if (!m_recordingList || !m_groupList)
     {
-        showRecGroupChooser();
-        return MythDialog::exec();
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
     }
 
-    return MythDialog::exec();
-}
+    connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(updateRecList(MythUIButtonListItem*)));
+    connect(m_groupList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(SwitchList()));
+    connect(m_recordingList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(updateProgramInfo(MythUIButtonListItem*)));
+    connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(playSelected(MythUIButtonListItem*)));
 
-void PlaybackBox::LoadWindow(QDomElement &element)
-{
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
+    if (!m_player && !m_recGroupPassword.isEmpty())
+        displayRecGroup(m_recGroup);
+    else if (m_recGroup == "All Programs" ||
+        gContext->GetNumSetting("QueryInitialFilter", 0) == 1)
+        showGroupFilter();
+    else
     {
-        QDomElement e = child.toElement();
-        if (!e.isNull())
+        FillList(true);
+
+        if ((m_titleList.size() <= 1) && (m_progsInDB > 0))
         {
-            if (e.tagName() == "font")
+            m_recGroup = "";
+            showGroupFilter();
+        }
+    }
+
+    // connect up timers...
+    connect(m_freeSpaceTimer, SIGNAL(timeout()), SLOT(setUpdateFreeSpace()));
+    connect(m_fillListTimer, SIGNAL(timeout()), SLOT(listChanged()));
+
+    BuildFocusList();
+
+    if (gContext->GetNumSetting("PlaybackBoxStartInTitle", 0))
+        SetFocusWidget(m_recordingList);
+
+    return true;
+}
+
+void PlaybackBox::SetTextFromMap(MythUIType *parent,
+                                   QMap<QString, QString> &infoMap)
+{
+    ResetMap(this, m_currentMap);
+
+    if (!parent)
+        return;
+
+    QList<MythUIType *> *children = parent->GetAllChildren();
+
+    MythUIText *textType;
+    QMutableListIterator<MythUIType *> i(*children);
+    while (i.hasNext())
+    {
+        MythUIType *type = i.next();
+        if (!type->IsVisible())
+            continue;
+
+        textType = dynamic_cast<MythUIText *> (type);
+        if (textType && infoMap.contains(textType->objectName()))
+        {
+            QString newText = textType->GetDefaultText();
+            QRegExp regexp("%(\\|(.))?([^\\|]+)(\\|(.))?%");
+            regexp.setMinimal(true);
+            if (newText.contains(regexp))
             {
-                theme->parseFont(e);
-            }
-            else if (e.tagName() == "container")
-            {
-                parseContainer(e);
-            }
-            else if (e.tagName() == "popup")
-            {
-                parsePopup(e);
+                int pos = 0;
+                QString tempString = newText;
+                while ((pos = regexp.indexIn(newText, pos)) != -1)
+                {
+                    QString key = regexp.cap(3).toLower().trimmed();
+                    QString replacement;
+                    if (!infoMap.value(key).isEmpty())
+                    {
+                        replacement = QString("%1%2%3")
+                                                .arg(regexp.cap(2))
+                                                .arg(infoMap.value(key))
+                                                .arg(regexp.cap(5));
+                    }
+                    tempString.replace(regexp.cap(0), replacement);
+                    pos += regexp.matchedLength();
+                }
+                newText = tempString;
             }
             else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        QString("PlaybackBox::LoadWindow(): Ignoring unknown "
-                                "element, %1. ").arg(e.tagName()));
-            }
+                newText = infoMap.value(textType->objectName());
+
+            textType->SetText(newText);
         }
     }
 }
 
-void PlaybackBox::parseContainer(QDomElement &element)
+void PlaybackBox::ResetMap(MythUIType *parent, QMap<QString, QString> &infoMap)
 {
-    QRect area;
-    QString name;
-    int context;
-    theme->parseContainer(element, name, context, area);
+    if (!parent)
+        return;
 
-    if (name.toLower() == "selector")
-        drawListBounds = area;
-    if (name.toLower() == "program_info_play" && context == 0 && type != Delete)
-        drawInfoBounds = area;
-    if (name.toLower() == "program_info_del" && context == 1 && type == Delete)
-        drawInfoBounds = area;
-    if (name.toLower() == "video")
+    if (infoMap.isEmpty())
+        return;
+
+    QList<MythUIType *> *children = parent->GetAllChildren();
+
+    MythUIText *textType;
+    QMutableListIterator<MythUIType *> i(*children);
+    while (i.hasNext())
     {
-        drawVideoBounds = area;
-        blackholeBounds = area;
-    }
-    if (name.toLower() == "group_info")
-        drawGroupBounds = area;
-    if (name.toLower() == "usage")
-        drawUsageBounds = area;
-    if (name.toLower() == "cur_group")
-        drawCurGroupBounds = area;
+        MythUIType *type = i.next();
+        if (!type->IsVisible())
+            continue;
 
+        textType = dynamic_cast<MythUIText *> (type);
+        if (textType && infoMap.contains(textType->objectName()))
+            textType->Reset();
+    }
 }
 
-void PlaybackBox::parsePopup(QDomElement &element)
+void PlaybackBox::SwitchList()
 {
-    QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty() || name != "confirmdelete")
+    if (GetFocusWidget() == m_groupList)
+        SetFocusWidget(m_recordingList);
+    else if (GetFocusWidget() == m_recordingList)
+        SetFocusWidget(m_groupList);
+}
+
+void PlaybackBox::displayRecGroup(const QString &newRecGroup)
+{
+    QString password = m_recGroupPwCache[newRecGroup];
+
+    m_newRecGroup = newRecGroup;
+    if (m_curGroupPassword != password && !password.isEmpty())
     {
-        if (name.isNull())
-            name = "(null)";
-        VERBOSE(VB_IMPORTANT,
-                QString("PlaybackBox::parsePopup(): Popup name must "
-                        "be 'confirmdelete' but was '%1'").arg(name));
+        MythScreenStack *popupStack =
+                                GetMythMainWindow()->GetStack("popup stack");
+
+        QString label = tr("Password for group '%1':").arg(newRecGroup);
+
+        MythTextInputDialog *pwd = new MythTextInputDialog(popupStack,
+                                            label, FilterNone, true);
+
+        connect(pwd, SIGNAL(haveResult(QString)),
+                SLOT(checkPassword(QString)));
+
+        if (pwd->Create())
+            popupStack->AddScreen(pwd, false);
         return;
     }
 
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "solidbgcolor")
-            {
-                QString col = theme->getFirstText(info);
-                drawPopupBgColor = createColor(col);
-                drawPopupSolid = false;
-            }
-            else if (info.tagName() == "foreground")
-            {
-                QString col = theme->getFirstText(info);
-                drawPopupFgColor = createColor(col);
-            }
-            else if (info.tagName() == "highlight")
-            {
-                QString col = theme->getFirstText(info);
-                drawPopupSelColor = createColor(col);
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        QString("PlaybackBox::parsePopup(): Unknown child %1")
-                        .arg(info.tagName()));
-            }
-        }
-    }
+    setGroupFilter(newRecGroup);
 }
 
-void PlaybackBox::exitWin()
+void PlaybackBox::checkPassword(const QString &password)
 {
-    killPlayer();
-    
-    accept();
-
-    if (m_player)
-    {
-        if (curitem)
-            delete curitem;
-        curitem = NULL;
-    }
+    QString grouppass = m_recGroupPwCache[m_newRecGroup];
+    if (password == grouppass)
+        setGroupFilter(m_newRecGroup);
 }
 
-void PlaybackBox::updateBackground(void)
-{
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
-
-    QPainter tmp(&bground);
-
-    LayerSet *container = theme->GetSet("background");
-    if (container)
-        container->Draw(&tmp, 0, (type == Delete) ? 1 : 0);
-
-    tmp.end();
-    paintBackgroundPixmap = bground;
-
-    QPalette p = palette();
-    p.setBrush(backgroundRole(), QBrush(paintBackgroundPixmap));
-    setPalette(p);
-}
-
-void PlaybackBox::paintEvent(QPaintEvent *e)
-{
-//    if (e->erased())
-    paintSkipUpdate = false;
-
-    QRect r = e->rect();
-    QPainter p(this);
-
-    if (r.intersects(drawListBounds) && !paintSkipUpdate)
-    {
-        updateShowTitles(&p);
-    }
-
-    if (r.intersects(drawInfoBounds) && !paintSkipUpdate)
-    {
-        updateInfo(&p);
-    }
-
-    if (r.intersects(drawCurGroupBounds) && !paintSkipUpdate)
-    {
-        updateCurGroup(&p);
-    }
-
-    if (r.intersects(drawUsageBounds) && !paintSkipUpdate)
-    {
-        updateUsage(&p);
-    }
-
-    if (r.intersects(drawVideoBounds) && !paintSkipUpdate)
-    {
-        updateVideo(&p);
-    }
-
-    if (r.intersects(blackholeBounds))
-    {
-        drawVideo(&p);
-    }
-
-    paintSkipCount--;
-    if (paintSkipCount < 0)
-    {
-        paintSkipUpdate = true;
-        paintSkipCount = 0;
-    }
-}
-
-void PlaybackBox::grayOut(QPainter *tmp)
-{
-    (void)tmp;
-/*
-    int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
-    if (transparentFlag == 0)
-        tmp->fillRect(QRect(QPoint(0, 0), size()),
-                      QBrush(QColor(10, 10, 10), Dense4Pattern));
-    else if (transparentFlag == 1)
-    {
-        int ww, hh;
-
-        if (d->IsWideMode())
-        {
-            ww = 1280;
-            hh = 720;
-        }
-        else
-        {
-            ww = 800;
-            hh = 600;
-        }
-        tmp->drawPixmap(0, 0, *drawTransPixmap, 0, 0, (int)(ww*wmult),
-                        (int)(hh*hmult));
-    }
-*/
-}
-void PlaybackBox::updateCurGroup(QPainter *p)
-{
-    QRect pr = drawCurGroupBounds;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    if (recGroup != "Default")
-        updateGroupInfo(p, pr, pix, "cur_group");
-    else
-    {
-        LayerSet *container = theme->GetSet("cur_group");
-        if (container)
-        {
-            QPainter tmp(&pix);
-
-            container->ClearAllText();
-            container->Draw(&tmp, 6, 1);
-
-            tmp.end();
-            p->drawPixmap(pr.topLeft(), pix);
-        }
-    }
-}
-
-
-void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr,
-                                  QPixmap& pix, QString cont_name)
-{
-    LayerSet *container = theme->GetSet(cont_name);
-    if ( container)
-    {
-        container->ClearAllText();
-        QPainter tmp(&pix);
-        QMap<QString, QString> infoMap;
-        int countInGroup; // = progLists[""].count();
-
-        if (titleList[titleIndex] == "")
-        {
-           countInGroup = progLists[""].count();
-           infoMap["title"] = groupDisplayName;
-           infoMap["group"] = groupDisplayName;
-           infoMap["show"] = ProgramInfo::i18n("All Programs");
-        }
-        else
-        {
-            countInGroup = progLists[titleList[titleIndex].toLower()].count();
-            infoMap["group"] = groupDisplayName;
-            infoMap["show"] = titleList[titleIndex];
-            infoMap["title"] = QString("%1 - %2").arg(groupDisplayName)
-                                                 .arg(titleList[titleIndex]);
-        }
-
-        if (countInGroup > 1)
-            infoMap["description"] = QString(tr("There are %1 recordings in "
-                                                "this display group"))
-                                                .arg(countInGroup);
-        else if (countInGroup == 1)
-            infoMap["description"] = QString(tr("There is one recording in "
-                                                 "this display group"));
-        else
-            infoMap["description"] = QString(tr("There are no recordings in "
-                                                "this display group"));
-
-        infoMap["rec_count"] = QString("%1").arg(countInGroup);
-
-        container->SetText(infoMap);
-
-        if (type != Delete)
-            container->Draw(&tmp, 6, 0);
-        else
-            container->Draw(&tmp, 6, 1);
-
-        tmp.end();
-        p->drawPixmap(pr.topLeft(), pix);
-    }
-    else
-    {
-        if (cont_name == "group_info")
-            updateProgramInfo(p, pr, pix);
-    }
-}
-
-
-void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
+void PlaybackBox::updateGroupInfo(const QString &groupname)
 {
     QMap<QString, QString> infoMap;
-    QPainter tmp(&pix);
+    int countInGroup;
 
-    LayerSet *container = NULL;
-    if (type != Delete)
-        container = theme->GetSet("program_info_play");
-    else
-        container = theme->GetSet("program_info_del");
-
-    if (container)
+    if (groupname.isEmpty())
     {
-        if (curitem)
-            curitem->ToMap(infoMap);
+        countInGroup = m_progLists[""].size();
+        infoMap["title"] = m_groupDisplayName;
+        infoMap["group"] = m_groupDisplayName;
+        infoMap["show"] = ProgramInfo::i18n("All Programs");
+    }
+    else
+    {
+        countInGroup = m_progLists[groupname].size();
+        infoMap["group"] = m_groupDisplayName;
+        infoMap["show"] = groupname;
+        infoMap["title"] = QString("%1 - %2").arg(m_groupDisplayName)
+                                                .arg(groupname);
+    }
 
-        if (previewPixmapEnabled)
-            container->UseAlternateArea(true);
+    if (countInGroup > 1)
+        infoMap["description"] = QString(tr("There are %1 recordings in "
+                                            "this display group"))
+                                            .arg(countInGroup);
+    else if (countInGroup == 1)
+        infoMap["description"] = QString(tr("There is one recording in "
+                                                "this display group"));
+    else
+        infoMap["description"] = QString(tr("There are no recordings in "
+                                            "this display group"));
 
-        container->ClearAllText();
-        container->SetText(infoMap);
+    infoMap["rec_count"] = QString("%1").arg(countInGroup);
 
-        int flags = 0;
-        if (curitem)
-            flags = curitem->programflags;
+    SetTextFromMap(this, infoMap);
+    m_currentMap = infoMap;
 
-        QMap <QString, int>::iterator it;
-        QMap <QString, int> iconMap;
+    if (m_previewImage)
+        m_previewImage->SetVisible(false);
 
-        iconMap["commflagged"] = FL_COMMFLAG;
-        iconMap["cutlist"]     = FL_CUTLIST;
-        iconMap["autoexpire"]  = FL_AUTOEXP;
-        iconMap["processing"]  = FL_EDITING;
-        iconMap["bookmark"]    = FL_BOOKMARK;
-        iconMap["inuse"]       = (FL_INUSERECORDING | FL_INUSEPLAYING);
-        iconMap["transcoded"]  = FL_TRANSCODED;
-        iconMap["watched"]     = FL_WATCHED;
-        iconMap["preserved"]   = FL_PRESERVED;
+    updateIcons();
+}
 
-        UIImageType *itype;
+void PlaybackBox::updateProgramInfo(MythUIButtonListItem *item)
+{
+    if (GetFocusWidget() != m_recordingList)
+        return;
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+
+    if (!pginfo)
+        return;
+
+    QMap<QString, QString> infoMap;
+
+    pginfo->ToMap(infoMap);
+    SetTextFromMap(this, infoMap);
+    m_currentMap = infoMap;
+
+    if (m_previewImage)
+    {
+        m_previewImage->SetVisible(true);
+        QString imagefile = getPreviewImage(pginfo);
+        m_previewImage->SetFilename(imagefile);
+        m_previewImage->Load();
+    }
+
+    updateIcons(pginfo);
+}
+
+void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
+{
+    int flags = 0;
+
+    if (pginfo)
+        flags = pginfo->programflags;
+
+    QMap <QString, int>::iterator it;
+    QMap <QString, int> iconMap;
+
+    iconMap["commflagged"] = FL_COMMFLAG;
+    iconMap["cutlist"]     = FL_CUTLIST;
+    iconMap["autoexpire"]  = FL_AUTOEXP;
+    iconMap["processing"]  = FL_EDITING;
+    iconMap["bookmark"]    = FL_BOOKMARK;
+    iconMap["inuse"]       = (FL_INUSERECORDING | FL_INUSEPLAYING);
+    iconMap["transcoded"]  = FL_TRANSCODED;
+    iconMap["watched"]     = FL_WATCHED;
+    iconMap["preserved"]   = FL_PRESERVED;
+
+    MythUIImage *iconImage;
+    for (it = iconMap.begin(); it != iconMap.end(); ++it)
+    {
+        iconImage = dynamic_cast<MythUIImage *>(GetChild(it.key()));
+        if (iconImage)
+            iconImage->SetVisible(flags & (*it));
+    }
+
+    iconMap.clear();
+    iconMap["dolby"]  = AUD_DOLBY;
+    iconMap["surround"]  = AUD_SURROUND;
+    iconMap["stereo"] = AUD_STEREO;
+    iconMap["mono"] = AUD_MONO;
+
+    MythUIStateType *iconState;
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("audioprops"));
+    if (pginfo && iconState)
+    {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            itype = (UIImageType *)container->GetType(it.key());
-            if (itype)
+            if (pginfo && pginfo->audioproperties & (*it))
             {
-                if (flags & (*it))
-                    itype->show();
-                else
-                    itype->hide();
-            }
-        }
-
-        iconMap.clear();
-
-        if (curitem)
-        {
-
-            iconMap["dolby"]  = AUD_DOLBY;
-            iconMap["surround"]  = AUD_SURROUND;
-            iconMap["stereo"] = AUD_STEREO;
-            iconMap["mono"] = AUD_MONO;
-
-            bool haveaudicon = false;
-
-            for (it = iconMap.begin(); it != iconMap.end(); ++it)
-            {
-                itype = (UIImageType *)container->GetType(it.key());
-                if (itype)
-                {
-                    itype->hide();
-
-                    if (!haveaudicon && (curitem->audioproperties & (*it)))
-                    {
-                        itype->show();
-                        // We only want one icon displayed
-                        haveaudicon = true;
-                    }
-                }
-            }
-
-            iconMap.clear();
-
-            iconMap["hdtv"] = VID_HDTV;
-            iconMap["widescreen"] = VID_WIDESCREEN;
-
-            bool havevidicon = false;
-
-            for (it = iconMap.begin(); it != iconMap.end(); ++it)
-            {
-                itype = (UIImageType *)container->GetType(it.key());
-                if (itype)
-                {
-                    itype->hide();
-
-                    if (!havevidicon && (curitem->videoproperties & (*it)))
-                    {
-                        itype->show();
-                        // We only want one icon displayed
-                        havevidicon = true;
-                    }
-                }
-            }
-
-            iconMap.clear();
-
-            iconMap["onscreensub"] = SUB_ONSCREEN;
-            iconMap["subtitles"] = SUB_NORMAL;
-            iconMap["cc"] = SUB_HARDHEAR;
-            iconMap["deafsigned"] = SUB_SIGNED;
-
-            bool havesubicon = false;
-
-            for (it = iconMap.begin(); it != iconMap.end(); ++it)
-            {
-                itype = (UIImageType *)container->GetType(it.key());
-                if (itype)
-                {
-                    itype->hide();
-                    if (!havesubicon && (curitem->subtitleType & (*it)))
-                    {
-                        itype->show();
-                        // We only want one icon displayed
-                        havesubicon = true;
-                    }
-                }
-            }
-
-        }
-
-        container->Draw(&tmp, 6, (type == Delete) ? 1 : 0);
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-
-}
-
-void PlaybackBox::updateInfo(QPainter *p)
-{
-    QRect pr = drawInfoBounds;
-    bool updateGroup = (inTitle && haveGroupInfoSet);
-    if (updateGroup)
-        pr = drawGroupBounds;
-
-    QPixmap pix(pr.size());
-
-    pix.fill(this, pr.topLeft());
-
-    if (titleList.count() > 1 && curitem && !updateGroup)
-        updateProgramInfo(p, pr, pix);
-    else if (updateGroup)
-        updateGroupInfo(p, pr, pix);
-    else
-    {
-        QPainter tmp(&pix);
-        LayerSet *norec = theme->GetSet("norecordings_info");
-        if (type != Delete && norec)
-            norec->Draw(&tmp, 8, 0);
-        else if (norec)
-            norec->Draw(&tmp, 8, 1);
-
-        tmp.end();
-        p->drawPixmap(pr.topLeft(), pix);
-    }
-}
-
-void PlaybackBox::updateVideo(QPainter *p)
-{
-    if ((!previewVideoEnabled && !previewPixmapEnabled) ||
-        (inTitle && haveGroupInfoSet))
-    {
-        return;
-    }
-
-    LayerSet *container = NULL;
-    container = theme->GetSet("video");
-    UIBlackHoleType *blackhole = NULL;
-    blackhole = (UIBlackHoleType *)container->GetType("video_blackhole");
-    if (blackhole)
-    {
-        blackholeBounds = blackhole->getScreenArea();
-        QPixmap pix(drawVideoBounds.size());
-        pix.fill(this, drawVideoBounds.topLeft());
-        QPainter tmp(&pix);
-        if (container)
-            container->Draw(&tmp, 1, 1);
-
-        tmp.end();
-        p->drawPixmap(drawVideoBounds.topLeft(), pix);
-    }
-}
-
-void PlaybackBox::drawVideo(QPainter *p)
-{
-    // If we're displaying group info don't update the video.
-    if (inTitle && haveGroupInfoSet)
-        return;
-
-    /* show a still frame if the user doesn't want a video preview or nvp
-     * hasn't started playing the video preview yet */
-    if ((curitem) && (previewPixmapEnabled))
-    {
-        QPixmap temp = getPixmap(curitem);
-        if (temp.width() > 0)
-        {
-            int pixmap_y = 0;
-            int pixmap_x = 0;
-
-            // Centre preview in the y axis
-            if (temp.height() < blackholeBounds.height())
-                pixmap_y = blackholeBounds.y() + 
-                                (blackholeBounds.height() - temp.height()) / 2;
-            else
-                pixmap_y = blackholeBounds.y();
-
-            // Centre preview in the x axis
-            if (temp.width() < blackholeBounds.width())
-                pixmap_x = blackholeBounds.x() + 
-                                (blackholeBounds.width() - temp.width()) / 2;
-            else
-                pixmap_x = blackholeBounds.x();
-
-            p->drawPixmap(pixmap_x, pixmap_y, temp);
-        }
-    }
-
-    if (previewPlayer && curitem)
-    {
-        if (previewPlayer->nvp && previewPlayer->playingInfo)
-        {
-            if (previewPlayer->playingInfo->IsSameProgram(*curitem))
-            {
-                QMutexLocker locker(&previewVideoLock);
-                previewPlayer->nvp->ExposeEvent();
-                if (previewPlayer->nvp->UsingNullVideo())
-                    previewPlayer->DrawARGBFrame(p);
-            }
-            else
-            {
-                stopPlayer();
-            }
-        }
-    }
-}
-
-void PlaybackBox::updateUsage(QPainter *p)
-{
-    LayerSet *container = NULL;
-    container = theme->GetSet("usage");
-    if (container)
-    {
-        int ccontext = container->GetContext();
-
-        if (ccontext != -1)
-        {
-            if (ccontext == 1 && type != Delete)
+                iconState->DisplayState(it.key());
                 return;
-            if (ccontext == 0 && type == Delete)
-                return;
-        }
-
-        vector<FileSystemInfo> fsInfos;
-        if (freeSpaceNeedsUpdate && connected)
-        {
-            freeSpaceNeedsUpdate = false;
-            freeSpaceTotal = 0;
-            freeSpaceUsed = 0;
-
-            fsInfos = RemoteGetFreeSpace();
-            for (unsigned int i = 0; i < fsInfos.size(); i++)
-            {
-                if (fsInfos[i].directory == "TotalDiskSpace")
-                {
-                    freeSpaceTotal = (int) (fsInfos[i].totalSpaceKB >> 10);
-                    freeSpaceUsed = (int) (fsInfos[i].usedSpaceKB >> 10);
-                }
             }
-            freeSpaceTimer->start(15000);
         }
+    }
+    else if (iconState)
+        iconState->DisplayState("default");
 
-        QString usestr;
+    iconMap.clear();
+    iconMap["hdtv"] = VID_HDTV;
+    iconMap["widescreen"] = VID_WIDESCREEN;
 
-        double perc = 0.0;
-        if (freeSpaceTotal > 0)
-            perc = (100.0 * freeSpaceUsed) / (double) freeSpaceTotal;
-
-        usestr.sprintf("%d", (int)perc);
-        usestr = usestr + tr("% used");
-
-        QString size;
-        size.sprintf("%0.2f", (freeSpaceTotal - freeSpaceUsed) / 1024.0);
-        QString rep = tr(", %1 GB free").arg(size);
-        usestr = usestr + rep;
-
-        QRect pr = drawUsageBounds;
-        QPixmap pix(pr.size());
-        pix.fill(this, pr.topLeft());
-        QPainter tmp(&pix);
-
-        UITextType *ttype = (UITextType *)container->GetType("freereport");
-        if (ttype)
-            ttype->SetText(usestr);
-
-        UIStatusBarType *sbtype =
-                               (UIStatusBarType *)container->GetType("usedbar");
-        if (sbtype)
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
+    if (pginfo && iconState)
+    {
+        for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            sbtype->SetUsed(freeSpaceUsed);
-            sbtype->SetTotal(freeSpaceTotal);
+            if (pginfo && pginfo->videoproperties & (*it))
+            {
+                iconState->DisplayState(it.key());
+                return;
+            }
         }
+    }
+    else if (iconState)
+        iconState->DisplayState("default");
 
-        if (type != Delete)
-        {
-            container->Draw(&tmp, 5, 0);
-            container->Draw(&tmp, 6, 0);
-        }
-        else
-        {
-            container->Draw(&tmp, 5, 1);
-            container->Draw(&tmp, 6, 1);
-        }
+    iconMap.clear();
+    iconMap["onscreensub"] = SUB_ONSCREEN;
+    iconMap["subtitles"] = SUB_NORMAL;
+    iconMap["cc"] = SUB_HARDHEAR;
+    iconMap["deafsigned"] = SUB_SIGNED;
 
-        tmp.end();
-        p->drawPixmap(pr.topLeft(), pix);
+    iconState = dynamic_cast<MythUIStateType *>(GetChild("subtitletypes"));
+    if (pginfo && iconState)
+    {
+        for (it = iconMap.begin(); it != iconMap.end(); ++it)
+        {
+            if (pginfo->subtitleType & (*it))
+            {
+                iconState->DisplayState(it.key());
+                return;
+            }
+        }
+    }
+    else if (iconState)
+        iconState->DisplayState("default");
+}
+
+void PlaybackBox::updateUsage()
+{
+    vector<FileSystemInfo> fsInfos;
+    if (m_freeSpaceNeedsUpdate && m_connected)
+    {
+        m_freeSpaceNeedsUpdate = false;
+        m_freeSpaceTotal = 0;
+        m_freeSpaceUsed = 0;
+
+        fsInfos = RemoteGetFreeSpace();
+        for (unsigned int i = 0; i < fsInfos.size(); i++)
+        {
+            if (fsInfos[i].directory == "TotalDiskSpace")
+            {
+                m_freeSpaceTotal = (int) (fsInfos[i].totalSpaceKB >> 10);
+                m_freeSpaceUsed = (int) (fsInfos[i].usedSpaceKB >> 10);
+            }
+        }
+        m_freeSpaceTimer->start(15000);
+    }
+
+    QString usestr;
+
+    double perc = 0.0;
+    if (m_freeSpaceTotal > 0)
+        perc = (100.0 * m_freeSpaceUsed) / (double) m_freeSpaceTotal;
+
+    usestr.sprintf("%d", (int)perc);
+    usestr = usestr + tr("% used");
+
+    QString size;
+    size.sprintf("%0.2f", (m_freeSpaceTotal - m_freeSpaceUsed) / 1024.0);
+    QString rep = tr(", %1 GB free").arg(size);
+    usestr = usestr + rep;
+
+    MythUIText *m_freeSpaceText = dynamic_cast<MythUIText *>
+                                                    (GetChild("freereport"));
+    if (m_freeSpaceText)
+        m_freeSpaceText->SetText(usestr);
+
+    MythUIProgressBar *m_freeSpaceProgress = dynamic_cast<MythUIProgressBar *>
+                                                        (GetChild("usedbar"));
+    if (m_freeSpaceProgress)
+    {
+        m_freeSpaceProgress->SetUsed(m_freeSpaceUsed);
+        m_freeSpaceProgress->SetTotal(m_freeSpaceTotal);
     }
 }
 
-void PlaybackBox::updateShowTitles(QPainter *p)
+void PlaybackBox::updateGroupList()
 {
-    QString tempTitle;
+    m_groupList->Reset();
+
+    LCD *lcddev = LCD::Get();
+    QString lcdTitle;
+    QList<LCDMenuItem> lcdItems;
+
+    if (lcddev)
+    {
+        if (GetFocusWidget() == m_groupList)
+            lcdTitle = "Recordings";;
+    }
+
+    if (!m_titleList.isEmpty())
+    {
+        MythUIButtonListItem *item;
+
+        QString groupname;
+
+        bool foundGroup = false;
+        QStringList::iterator it;
+        for (it = m_titleList.begin(); it != m_titleList.end(); it++)
+        {
+            groupname = (*it);
+            groupname = groupname.simplified();
+
+            // The first item added to the list will trigger an update of the
+            // associated Recording List, m_needsUpdate should be false unless
+            // this is the currently selected group
+            if (groupname.toLower() == m_currentGroup)
+            {
+                m_needUpdate = true;
+                foundGroup = true;
+            }
+
+            item = new MythUIButtonListItem(m_groupList, "",
+                                        qVariantFromValue(groupname.toLower()));
+
+            if (m_needUpdate)
+                m_groupList->SetItemCurrent(item);
+
+            if (groupname.isEmpty())
+                groupname = m_groupDisplayName;
+
+            item->SetText(groupname, "name");
+
+            int count = m_progLists[groupname.toLower()].size();
+            item->SetText(QString::number(count), "reccount");
+
+            if (lcddev && (GetFocusWidget() == m_groupList))
+                lcdItems.append(LCDMenuItem(0, NOTCHECKABLE, groupname));
+        }
+
+        if (!foundGroup)
+        {
+            m_needUpdate = true;
+            m_groupList->SetItemCurrent(0);
+        }
+    }
+}
+
+void PlaybackBox::updateRecList(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    QString groupname = item->GetData().toString();
+
+    updateGroupInfo(groupname);
+
+    if (m_currentGroup == groupname)
+    {
+        if (!m_needUpdate)
+            return;
+    }
+
+    m_needUpdate = false;
+
+    if (!m_isFilling)
+        m_currentGroup = groupname;
+
+    m_recordingList->Reset();
+
+    if (groupname == "default")
+        groupname = "";
+
+    ProgramList *progList = NULL;
+    progList = &m_progLists[groupname];
+
+    if (!progList)
+        return;
+
     QString tempSubTitle;
-    QString tempDate;
+    QString tempShortDate;
+    QString tempLongDate;
     QString tempTime;
     QString tempSize;
 
-    bool    repeatTitles = titleList.count() > 5;
     QString match;
-    QRect   pr = drawListBounds;
-    QPixmap pix(pr.size());
-
-    LayerSet *container = NULL;
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
 
     LCD *lcddev = LCD::Get();
-    QString tstring, lcdTitle;
+    QString lcdTitle;
     QList<LCDMenuItem> lcdItems;
 
-    container = theme->GetSet("selector");
-
-    ProgramInfo *tempInfo;
-
-    ProgramList *plist;
-    if (titleList.count() > 1)
-        plist = &progLists[titleList[titleIndex].toLower()];
-    else
-        plist = &progLists[""];
-
-    int progCount = plist->count();
-
-    if (curitem)
+    if (lcddev)
     {
-        delete curitem;
-        curitem = NULL;
+        if (GetFocusWidget() == m_groupList)
+            lcdTitle = "Recordings";
+        else
+            lcdTitle = " <<" + groupname;
     }
 
-    if (container && titleList.count() >= 1)
+    if (!progList->isEmpty())
     {
-        UIListType *ltype = (UIListType *)container->GetType("toptitles");
-        if (ltype && titleList.count() > 1)
+        ProgramInfo *progInfo;
+        ProgramList::iterator it;
+        for (it = progList->begin(); it != progList->end(); it++)
         {
-            ltype->ResetList();
-            ltype->SetActive(inTitle);
+            progInfo = *it;
 
-            int h = titleIndex - ltype->GetItems();
-            if (repeatTitles)
-                h += titleList.count();
+            item = new MythUIButtonListItem(m_recordingList, "",
+                                                qVariantFromValue(progInfo));
 
-            for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
+            if (groupname != progInfo->title)
             {
-                if (repeatTitles)
-                    h = h % titleList.count();
-
-                if (h < 0)
-                    tstring = "";
-                else
-                {
-                    tstring = titleList[h];
-                    if (tstring == "")
-                        tstring = groupDisplayName;
-                    tstring.remove(QRegExp("^ "));
-                }
-
-                ltype->SetItemText(cnt, tstring);
-                if (lcddev && inTitle)
-                    lcdItems.append(LCDMenuItem(0, NOTCHECKABLE, tstring));
-
-                h++;
-             }
-        }
-        else if (ltype)
-        {
-            ltype->ResetList();
-        }
-
-        UITextType *typeText = (UITextType *)container->GetType("current");
-        if (typeText && titleList.count() > 1)
-        {
-            if (titleList[titleIndex] == "")
-                tstring = groupDisplayName;
+                tempSubTitle = progInfo->title;
+                if (!progInfo->subtitle.trimmed().isEmpty())
+                    tempSubTitle = QString("%1 - \"%2\"")
+                                    .arg(tempSubTitle).arg(progInfo->subtitle);
+            }
             else
-                tstring = titleList[titleIndex];
-
-            tstring.remove(QRegExp("^ "));
-            typeText->SetText(tstring);
-            if (lcddev)
             {
-                if (inTitle)
-                {
-                    lcdItems.append(LCDMenuItem(1, NOTCHECKABLE, tstring));
-                    lcdTitle = "Recordings";
-                }
-                else
-                    lcdTitle = " <<" + tstring;
+                tempSubTitle = progInfo->subtitle;
+                if (tempSubTitle.trimmed().isEmpty())
+                    tempSubTitle = progInfo->title;
             }
-        }
-        else if (typeText)
-        {
-            typeText->SetText("");
-        }
 
-        ltype = (UIListType *)container->GetType("bottomtitles");
-        if (ltype && titleList.count() > 1)
-        {
-            ltype->ResetList();
-            ltype->SetActive(inTitle);
+            tempShortDate = (progInfo->recstartts).toString(m_formatShortDate);
+            tempLongDate = (progInfo->recstartts).toString(m_formatLongDate);
+            tempTime = (progInfo->recstartts).toString(m_formatTime);
 
-            int h = titleIndex + 1;
+            long long size = progInfo->filesize;
+            tempSize.sprintf("%0.2f GB", size / 1024.0 / 1024.0 / 1024.0);
 
-            for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
+            QString state;
+
+            if (progInfo->recstatus == rsRecording)
+                state = "running";
+
+            if (((progInfo->recstatus != rsRecording) &&
+                    (progInfo->availableStatus != asAvailable) &&
+                    (progInfo->availableStatus != asNotYetAvailable)) ||
+                (m_player && m_player->IsSameProgram(0, progInfo)))
+                state = "disabled";
+
+            if (lcddev && !(GetFocusWidget() == m_groupList))
             {
-                if (repeatTitles)
-                    h = h % titleList.count();
-
-                if (h >= titleList.count())
-                    tstring = "";
-                else
-                {
-                    tstring = titleList[h];
-                    if (tstring == "")
-                        tstring = groupDisplayName;
-                    tstring.remove(QRegExp("^ "));
-                }
-
-                ltype->SetItemText(cnt, tstring);
-                if (lcddev && inTitle)
-                    lcdItems.append(LCDMenuItem(0, NOTCHECKABLE, tstring));
-
-                h++;
+                QString lcdSubTitle = tempSubTitle;
+                lcdItems.append(LCDMenuItem(m_currentItem == progInfo,
+                                NOTCHECKABLE, QString("%1 %2")
+                                            .arg(lcdSubTitle.replace('"', "'"))
+                                            .arg(tempShortDate)));
             }
-        }
-        else if (ltype)
-        {
-            ltype->ResetList();
-        }
 
-        ltype = (UIListType *)container->GetType("showing");
-        if (ltype && titleList.count() > 1)
-        {
-            ltype->ResetList();
-            ltype->SetActive(!inTitle);
+            QString imagefile = getPreviewImage(progInfo);
+            item->SetImage(imagefile, "preview");
 
-            int skip;
-            if (progCount <= listsize || progIndex <= listsize / 2)
-                skip = 0;
-            else if (progIndex >= progCount - listsize + listsize / 2)
-                skip = progCount - listsize;
+            item->SetText(tempSubTitle, "titlesubtitle", state);
+            item->SetText(progInfo->title, "title", state);
+            item->SetText(progInfo->subtitle, "subtitle", state);
+            item->SetText(progInfo->description, "description", state);
+            item->SetText(tempLongDate, "longdate", state);
+            item->SetText(tempShortDate, "shortdate", state);
+            item->SetText(tempTime, "time", state);
+            item->SetText(tempSize, "size", state);
+
+            item->DisplayState(state, "status");
+
+            if (m_playList.filter(progInfo->MakeUniqueKey()).size())
+                item->DisplayState("yes", "playlist");
             else
-                skip = progIndex - listsize / 2;
+                item->DisplayState("no", "playlist");
 
-            ltype->SetUpArrow(skip > 0);
-            ltype->SetDownArrow(skip + listsize < progCount);
+            if (progInfo->programflags & FL_WATCHED)
+                item->DisplayState("yes", "watched");
+            else
+                item->DisplayState("no", "watched");
 
-            int cnt;
-            for (cnt = 0; cnt < listsize; cnt++)
-            {
-                if (cnt + skip >= progCount)
-                    break;
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
+                                       progInfo->chanid, progInfo->recstartts))
+                item->DisplayState("yes", "transcoding");
+            else
+                item->DisplayState("no", "transcoding");
 
-                tempInfo = plist->at(skip+cnt);
+            if (!JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,
+                                       progInfo->chanid, progInfo->recstartts))
+                item->DisplayState("yes", "commflagging");
+            else
+                item->DisplayState("no", "commflagging");
 
-                if (titleList[titleIndex] != tempInfo->title)
-                {
-                    tempSubTitle = tempInfo->title;
-                    if (tempInfo->subtitle.trimmed().length() > 0)
-                        tempSubTitle = tempSubTitle + " - \"" +
-                                       tempInfo->subtitle + "\"";
-                }
-                else
-                {
-                    tempSubTitle = tempInfo->subtitle;
-                    if (tempSubTitle.trimmed().length() == 0)
-                        tempSubTitle = tempInfo->title;
-                }
 
-                tempDate = (tempInfo->recstartts).toString(formatShortDate);
-                tempTime = (tempInfo->recstartts).toString(formatTime);
+             //item->DisplayState("", "expiry");
 
-                long long size = tempInfo->filesize;
-                tempSize.sprintf("%0.2f GB", size / 1024.0 / 1024.0 / 1024.0);
-
-                if (skip + cnt == progIndex)
-                {
-                    curitem = new ProgramInfo(*tempInfo);
-                    ltype->SetItemCurrent(cnt);
-                }
-
-                if (lcddev && !inTitle)
-                {
-                    QString lcdSubTitle = tempSubTitle;
-                    lcdItems.append(LCDMenuItem(skip + cnt == progIndex,
-                                    NOTCHECKABLE,
-                                    lcdSubTitle.replace('"', "'") +
-                                    " " + tempDate));
-                }
-
-                ltype->SetItemText(cnt, 1, tempSubTitle);
-                ltype->SetItemText(cnt, 2, tempDate);
-                ltype->SetItemText(cnt, 3, tempTime);
-                ltype->SetItemText(cnt, 4, tempSize);
-                if (tempInfo->recstatus == rsRecording)
-                    ltype->EnableForcedFont(cnt, "recording");
-
-                if (playList.filter(tempInfo->MakeUniqueKey()).count())
-                    ltype->EnableForcedFont(cnt, "tagged");
-
-                if (((tempInfo->recstatus != rsRecording) &&
-                     (tempInfo->availableStatus != asAvailable) &&
-                     (tempInfo->availableStatus != asNotYetAvailable)) ||
-                    (m_player && m_player->IsSameProgram(0, tempInfo)))
-                    ltype->EnableForcedFont(cnt, "inactive");
-            }
-        }
-        else if (ltype)
-        {
-            ltype->ResetList();
+            if (m_currentItem &&
+                (m_currentItem->chanid == progInfo->chanid) &&
+                (m_currentItem->recstartts == progInfo->recstartts))
+                    m_recordingList->SetItemCurrent(item);
         }
     }
 
     if (lcddev && !lcdItems.isEmpty())
         lcddev->switchToMenu(lcdItems, lcdTitle);
 
-    // DRAW LAYERS
-    if (container)
+    if (m_noRecordingsText && !progList->isEmpty())
     {
-        int typeIsEqToDel = (type == Delete) ? 1 : 0;
-        for (int i = 0; i < 9; i++)
-            container->Draw(&tmp, i, typeIsEqToDel);
+        m_progCacheLock.lock();
+        if (m_progCache && !m_progCache->empty())
+            m_noRecordingsText->SetText(tr(
+                "There are no recordings in your current view"));
+        else
+            m_noRecordingsText->SetText(tr(
+                "There are no recordings available"));
+        m_progCacheLock.unlock();
     }
 
-    leftRight = false;
-
-    if (titleList.count() <= 1)
-    {
-        LayerSet *norec = theme->GetSet("norecordings_list");
-        UITextType *ttype = (UITextType *)norec->GetType("msg");
-        if (ttype)
-        {
-            progCacheLock.lock();
-            if (progCache && !progCache->empty())
-                ttype->SetText(tr(
-                    "There are no recordings in your current view"));
-            else
-                ttype->SetText(tr(
-                    "There are no recordings available"));
-            progCacheLock.unlock();
-        }
-
-        if (type != Delete && norec)
-            norec->Draw(&tmp, 8, 0);
-        else if (norec)
-            norec->Draw(&tmp, 8, 1);
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-
-    if (titleList.count() <= 1)
-        update(drawInfoBounds);
-}
-
-void PlaybackBox::cursorLeft()
-{
-    if (!inTitle)
-    {
-        if (haveGroupInfoSet)
-            killPlayer();
-
-        inTitle = true;
-        paintSkipUpdate = false;
-
-        update(drawTotalBounds);
-        leftRight = true;
-    }
-    else if (arrowAccel)
-        exitWin();
-
-}
-
-void PlaybackBox::cursorRight()
-{
-    if (inTitle)
-    {
-        leftRight = true;
-        inTitle = false;
-        paintSkipUpdate = false;
-        update(drawTotalBounds);
-    }
-    else if (arrowAccel)
-        showActionsSelected();
-    else if (curitem && curitem->availableStatus != asAvailable)
-        showAvailablePopup(curitem);
-}
-
-void PlaybackBox::cursorDown(bool page, bool newview)
-{
-    if (inTitle == true || newview)
-    {
-        titleIndex += (page ? 5 : 1);
-        titleIndex = titleIndex % (int)titleList.count();
-
-        progIndex = 0;
-
-        if (newview)
-            inTitle = false;
-
-        paintSkipUpdate = false;
-        update(drawTotalBounds);
-    }
-    else
-    {
-        int progCount = progLists[titleList[titleIndex].toLower()].count();
-        if (progIndex < progCount - 1)
-        {
-            progIndex += (page ? listsize : 1);
-            if (progIndex > progCount - 1)
-                progIndex = progCount - 1;
-
-            paintSkipUpdate = false;
-            update(drawListBounds);
-            update(drawInfoBounds);
-            update(blackholeBounds);
-        }
-    }
-
-    if (previewPlayer)
-    {
-        previewVideoStartTimer->start(previewTimeout);
-        previewPixmapEnabled = true;
-    }
-}
-
-void PlaybackBox::cursorUp(bool page, bool newview)
-{
-    if (inTitle == true || newview)
-    {
-        titleIndex -= (page ? 5 : 1);
-        titleIndex += 5 * titleList.count();
-        titleIndex = titleIndex % titleList.count();
-
-        progIndex = 0;
-
-        if (newview)
-            inTitle = false;
-
-        paintSkipUpdate = false;
-        update(drawTotalBounds);
-    }
-    else
-    {
-        if (progIndex > 0)
-        {
-            progIndex -= (page ? listsize : 1);
-            if (progIndex < 0)
-                progIndex = 0;
-
-            paintSkipUpdate = false;
-            update(drawListBounds);
-            update(drawInfoBounds);
-            update(blackholeBounds);
-        }
-    }
-
-    if (previewPlayer)
-    {
-        previewVideoStartTimer->start(previewTimeout);
-        previewPixmapEnabled = true;
-    }
-}
-
-void PlaybackBox::pageTop()
-{
-    if (inTitle)
-    {
-        titleIndex = 0;
-
-        progIndex = 0;
-
-        paintSkipUpdate = false;
-        update(drawTotalBounds);
-    }
-    else 
-    {
-        progIndex = 0;
-
-        paintSkipUpdate = false;
-        update(drawListBounds);
-        update(drawInfoBounds);
-        update(blackholeBounds);
-    }
-}
-
-void PlaybackBox::pageMiddle()
-{
-    if (inTitle)
-    {
-        titleIndex = (int)floor(titleList.count() / 2.0);
-
-        progIndex = 0;
-
-        paintSkipUpdate = false;
-        update(drawTotalBounds);
-    }
-    else 
-    {
-        int progCount = progLists[titleList[titleIndex].toLower()].count();
-
-        if (progCount > 0)
-        {
-            progIndex = (int)floor(progCount / 2.0);
-
-            paintSkipUpdate = false;
-            update(drawListBounds);
-            update(drawInfoBounds);
-            update(blackholeBounds);
-        }
-    }
-}
-
-void PlaybackBox::pageBottom()
-{
-    if (inTitle)
-        pageTop();
-    else 
-    {
-        progIndex = progLists[titleList[titleIndex].toLower()].count() - 1;
-
-        paintSkipUpdate = false;
-        update(drawListBounds);
-        update(drawInfoBounds);
-        update(blackholeBounds);
-    }
+    m_noRecordingsText->SetVisible(progList->isEmpty());
 }
 
 void PlaybackBox::listChanged(void)
 {
-    if (playingSomething)
+    if (m_playingSomething)
         return;
 
-    connected = FillList(fillListFromCache);
-    paintSkipUpdate = false;
-    update(drawTotalBounds);
-    if (type == Delete)
-        UpdateProgressBar();
+    // If we are in the middle of filling the list, then wait
+    if (m_isFilling)
+    {
+        m_fillListTimer->setSingleShot(true);
+        m_fillListTimer->start(1000);
+        return;
+    }
+
+    m_connected = FillList(m_fillListFromCache);
 }
 
 bool PlaybackBox::FillList(bool useCachedData)
 {
+    m_isFilling = true;
+
     ProgramInfo *p;
 
-    // Save some information so we can find our place again.
-    QString oldtitle = titleList[titleIndex];
-    QString oldchanid;
-    QString oldprogramid;
-    QDate oldoriginalAirDate;
-    QDateTime oldstartts;
-    int oldrecpriority = 0;
-    int oldrecordid = 0;
-
-    ProgramList &list = progLists[oldtitle.toLower()];
-    p = list[progIndex];
-    if (p)
+    if (m_currentItem)
     {
-        oldchanid = p->chanid;
-        oldstartts = p->recstartts;
-        oldprogramid = p->programid;
-        oldrecordid = p->recordid;
-        oldoriginalAirDate = p->originalAirDate;
-        oldrecpriority = p->recpriority;
+        delete m_currentItem;
+        m_currentItem = NULL;
     }
+
+    ProgramInfo *tmp = CurrentItem();
+    if (tmp)
+        m_currentItem = new ProgramInfo(*tmp);
 
     QMap<QString, AvailableStatusType> asCache;
     QString asKey;
-    ProgramList::iterator it = progLists[""].begin();
-    ProgramList::iterator end = progLists[""].end();
-    for (; it != end; ++it)
+
+    if (!m_progLists.isEmpty())
     {
-        asKey = (*it)->MakeUniqueKey();
-        asCache[asKey] = (*it)->availableStatus;
+        ProgramList::iterator it = m_progLists[""].begin();
+        ProgramList::iterator end = m_progLists[""].end();
+        for (; it != end; ++it)
+        {
+            asKey = (*it)->MakeUniqueKey();
+            asCache[asKey] = (*it)->availableStatus;
+        }
     }
 
-    progsInDB = 0;
-    titleList.clear();
-    progLists.clear();
+    m_progsInDB = 0;
+    m_titleList.clear();
+    m_progLists.clear();
+    m_recordingList->Reset();
+    m_groupList->Reset();
     // Clear autoDelete for the "all" list since it will share the
     // objects with the title lists.
-    progLists[""] = ProgramList(false);
-
-    fillRecGroupPasswordCache();
+    m_progLists[""] = ProgramList(false);
+    m_progLists[""].setAutoDelete(false);
 
     ViewTitleSort titleSort = (ViewTitleSort)gContext->GetNumSetting(
-            "DisplayGroupTitleSort", TitleSortAlphabetical);
+                                "DisplayGroupTitleSort", TitleSortAlphabetical);
 
     QMap<QString, QString> sortedList;
     QMap<int, QString> searchRule;
     QMap<int, int> recidEpisodes;
-    QString sTitle = "";
+    QString sTitle;
 
     bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
-    progCacheLock.lock();
-    if (!useCachedData || !progCache || progCache->empty())
+    m_progCacheLock.lock();
+    if (!useCachedData || !m_progCache || m_progCache->empty())
     {
         clearProgramCache();
 
-        progCache = RemoteGetRecordedList(allOrder == 0 || type == Delete);
+        m_progCache = RemoteGetRecordedList(m_allOrder == 0 || m_type == Delete);
     }
     else
     {
         // Validate the cache
-        vector<ProgramInfo *>::iterator i = progCache->begin();
-        for ( ; i != progCache->end(); )
+        vector<ProgramInfo *>::iterator i = m_progCache->begin();
+        for ( ; i != m_progCache->end(); )
         {
             if ((*i)->availableStatus == asDeleted)
             {
                 delete *i;
-                i = progCache->erase(i);
+                i = m_progCache->erase(i);
             }
             else
                 i++;
         }
     }
 
-    if (progCache)
+    if (m_progCache)
     {
-        if ((viewMask & VIEW_SEARCHES))
+        if ((m_viewMask & VIEW_SEARCHES))
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("SELECT recordid,title FROM record "
                           "WHERE search > 0 AND search != :MANUAL;");
             query.bindValue(":MANUAL", kManualSearch);
 
-            if (query.exec() && query.isActive())
+            if (query.exec())
             {
                 while (query.next())
                 {
@@ -1732,31 +1095,31 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
 
-        if (!(viewMask & VIEW_WATCHLIST))
-            watchListStart = 0;
+        if (!(m_viewMask & VIEW_WATCHLIST))
+            m_watchListStart = 0;
 
         sortedList[""] = "";
-        vector<ProgramInfo *>::iterator i = progCache->begin();
-        for ( ; i != progCache->end(); i++)
+        vector<ProgramInfo *>::iterator i = m_progCache->begin();
+        for ( ; i != m_progCache->end(); i++)
         {
-            progsInDB++;
+            m_progsInDB++;
             p = *i;
 
-            if (p->title == "")
+            if (p->title.isEmpty())
                 p->title = tr("_NO_TITLE_");
 
-            if ((((p->recgroup == recGroup) ||
-                  ((recGroup == "All Programs") &&
+            if ((((p->recgroup == m_recGroup) ||
+                  ((m_recGroup == "All Programs") &&
                    (p->recgroup != "Deleted") &&
                    (p->recgroup != "LiveTV" || LiveTVInAllPrograms))) &&
-                 (recGroupPassword == curGroupPassword)) ||
-                ((recGroupType[recGroup] == "category") &&
-                 ((p->category == recGroup ) ||
-                  ((p->category == "") && (recGroup == tr("Unknown")))) &&
-                 ( !recGroupPwCache.contains(p->recgroup))))
+                 (m_recGroupPassword == m_curGroupPassword)) ||
+                ((m_recGroupType[m_recGroup] == "category") &&
+                 ((p->category == m_recGroup ) ||
+                  ((p->category.isEmpty()) && (m_recGroup == tr("Unknown")))) &&
+                 ( !m_recGroupPwCache.contains(p->recgroup))))
             {
-                if (viewMask != VIEW_NONE)
-                    progLists[""].prepend(p);
+                if (m_viewMask != VIEW_NONE)
+                    m_progLists[""].prepend(p);
 
                 asKey = p->MakeUniqueKey();
                 if (asCache.contains(asKey))
@@ -1764,63 +1127,63 @@ bool PlaybackBox::FillList(bool useCachedData)
                 else
                     p->availableStatus = asAvailable;
 
-                if ((viewMask & VIEW_TITLES) && // Show titles
+                if ((m_viewMask & VIEW_TITLES) && // Show titles
                     ((p->recgroup != "LiveTV") ||
-                     (recGroup == "LiveTV") ||
-                     ((recGroup == "All Programs") &&
-                      ((viewMask & VIEW_LIVETVGRP) == 0))))
+                     (m_recGroup == "LiveTV") ||
+                     ((m_recGroup == "All Programs") &&
+                      ((m_viewMask & VIEW_LIVETVGRP) == 0))))
                 {
-                    sTitle = sortTitle(p->title, viewMask, titleSort,
+                    sTitle = sortTitle(p->title, m_viewMask, titleSort,
                             p->recpriority);
                     sTitle = sTitle.toLower();
 
                     if (!sortedList.contains(sTitle))
                         sortedList[sTitle] = p->title;
-                    progLists[sortedList[sTitle].toLower()].prepend(p);
-                    progLists[sortedList[sTitle].toLower()].setAutoDelete(false);
+                    m_progLists[sortedList[sTitle].toLower()].prepend(p);
+                    m_progLists[sortedList[sTitle].toLower()].setAutoDelete(false);
                 }
 
-                if ((viewMask & VIEW_RECGROUPS) &&
-                    p->recgroup != "") // Show recording groups
+                if ((m_viewMask & VIEW_RECGROUPS) &&
+                    !p->recgroup.isEmpty()) // Show recording groups
                 {
                     sortedList[p->recgroup.toLower()] = p->recgroup;
-                    progLists[p->recgroup.toLower()].prepend(p);
-                    progLists[p->recgroup.toLower()].setAutoDelete(false);
+                    m_progLists[p->recgroup.toLower()].prepend(p);
+                    m_progLists[p->recgroup.toLower()].setAutoDelete(false);
                 }
 
-                if ((viewMask & VIEW_CATEGORIES) &&
-                    p->category != "") // Show categories
+                if ((m_viewMask & VIEW_CATEGORIES) &&
+                    !p->category.isEmpty()) // Show categories
                 {
                     sortedList[p->category.toLower()] = p->category;
-                    progLists[p->category.toLower()].prepend(p);
-                    progLists[p->category.toLower()].setAutoDelete(false);
+                    m_progLists[p->category.toLower()].prepend(p);
+                    m_progLists[p->category.toLower()].setAutoDelete(false);
                 }
 
-                if ((viewMask & VIEW_SEARCHES) &&
-                    searchRule[p->recordid] != "" &&
+                if ((m_viewMask & VIEW_SEARCHES) &&
+                    !searchRule[p->recordid].isEmpty() &&
                     p->title != searchRule[p->recordid]) // Show search rules
                 {
                     QString tmpTitle = QString("(%1)")
                                                .arg(searchRule[p->recordid]);
                     sortedList[tmpTitle.toLower()] = tmpTitle;
-                    progLists[tmpTitle.toLower()].prepend(p);
-                    progLists[tmpTitle.toLower()].setAutoDelete(false);
+                    m_progLists[tmpTitle.toLower()].prepend(p);
+                    m_progLists[tmpTitle.toLower()].setAutoDelete(false);
                 }
 
                 if ((LiveTVInAllPrograms) &&
-                    (recGroup == "All Programs") &&
-                    (viewMask & VIEW_LIVETVGRP) &&
+                    (m_recGroup == "All Programs") &&
+                    (m_viewMask & VIEW_LIVETVGRP) &&
                     (p->recgroup == "LiveTV"))
                 {
                     QString tmpTitle = QString(" %1").arg(tr("LiveTV"));
                     sortedList[tmpTitle.toLower()] = tmpTitle;
-                    progLists[tmpTitle.toLower()].prepend(p);
-                    progLists[tmpTitle.toLower()].setAutoDelete(false);
+                    m_progLists[tmpTitle.toLower()].prepend(p);
+                    m_progLists[tmpTitle.toLower()].setAutoDelete(false);
                 }
 
-                if ((viewMask & VIEW_WATCHLIST) && (p->recgroup != "LiveTV"))
+                if ((m_viewMask & VIEW_WATCHLIST) && (p->recgroup != "LiveTV"))
                 {
-                    if (watchListAutoExpire && !p->GetAutoExpireFromRecorded())
+                    if (m_watchListAutoExpire && !(p->programflags & FL_AUTOEXP))
                     {
                         p->recpriority2 = wlExpireOff;
                         VERBOSE(VB_FILE, QString("Auto-expire off:  %1")
@@ -1839,9 +1202,9 @@ bool PlaybackBox::FillList(bool useCachedData)
                         if (recidEpisodes[p->recordid] == 1 ||
                             p->recordid == 0 )
                         {
-                            sortedList[watchGroupLabel] = watchGroupName;
-                            progLists[watchGroupLabel].prepend(p);
-                            progLists[watchGroupLabel].setAutoDelete(false);
+                            sortedList[m_watchGroupLabel] = m_watchGroupName;
+                            m_progLists[m_watchGroupLabel].prepend(p);
+                            m_progLists[m_watchGroupLabel].setAutoDelete(false);
                         }
                         else
                         {
@@ -1854,17 +1217,17 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
     }
-    progCacheLock.unlock();
+    m_progCacheLock.unlock();
 
-    if (sortedList.count() == 0)
+    if (sortedList.size() == 0)
     {
-        progLists[""];
-        titleList << "";
-        progIndex = 0;
-        titleIndex = 0;
-        playList.clear();
+        VERBOSE(VB_IMPORTANT, "SortedList is Empty");
+        m_progLists[""];
+        m_titleList << "";
+        m_playList.clear();
 
-        return 0;
+        m_isFilling = false;
+        return false;
     }
 
     QString episodeSort = gContext->GetSetting("PlayBoxEpisodeSort", "Date");
@@ -1872,11 +1235,11 @@ bool PlaybackBox::FillList(bool useCachedData)
     if (episodeSort == "OrigAirDate")
     {
         QMap<QString, ProgramList>::Iterator Iprog;
-        for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
+        for (Iprog = m_progLists.begin(); Iprog != m_progLists.end(); ++Iprog)
         {
             if (!Iprog.key().isEmpty())
             {
-                if (listOrder == 0 || type == Delete)
+                if (m_listOrder == 0 || m_type == Delete)
                     (*Iprog).sort(comp_originalAirDate_rev_less_than);
                 else
                     (*Iprog).sort(comp_originalAirDate_less_than);
@@ -1886,11 +1249,11 @@ bool PlaybackBox::FillList(bool useCachedData)
     else if (episodeSort == "Id")
     {
         QMap<QString, ProgramList>::Iterator Iprog;
-        for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
+        for (Iprog = m_progLists.begin(); Iprog != m_progLists.end(); ++Iprog)
         {
             if (!Iprog.key().isEmpty())
             {
-                if (listOrder == 0 || type == Delete)
+                if (m_listOrder == 0 || m_type == Delete)
                     (*Iprog).sort(comp_programid_rev_less_than);
                 else
                     (*Iprog).sort(comp_programid_less_than);
@@ -1900,11 +1263,11 @@ bool PlaybackBox::FillList(bool useCachedData)
     else if (episodeSort == "Date")
     {
         QMap<QString, ProgramList>::iterator it;
-        for (it = progLists.begin(); it != progLists.end(); ++it)
+        for (it = m_progLists.begin(); it != m_progLists.end(); ++it)
         {
             if (!it.key().isEmpty())
             {
-                if (!listOrder || type == Delete)
+                if (!m_listOrder || m_type == Delete)
                     (*it).sort(comp_recordDate_rev_less_than);
                 else
                     (*it).sort(comp_recordDate_less_than);
@@ -1912,10 +1275,10 @@ bool PlaybackBox::FillList(bool useCachedData)
         }
     }
 
-    if (progLists[watchGroupLabel].count() > 1)
+    if (m_progLists[m_watchGroupLabel].size() > 1)
     {
         QDateTime now = QDateTime::currentDateTime();
-        int baseValue = watchListMaxAge * 2 / 3;
+        int baseValue = m_watchListMaxAge * 2 / 3;
 
         QMap<int, int> recType;
         QMap<int, int> maxEpisodes;
@@ -1928,7 +1291,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         query.prepare("SELECT recordid, type, maxepisodes, avg_delay, "
                       "next_record, last_record, last_delete FROM record;");
 
-        if (query.exec() && query.isActive())
+        if (query.exec())
         {
             while (query.next())
             {
@@ -1958,8 +1321,8 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
 
-        ProgramList::iterator pit = progLists[watchGroupLabel].begin();
-        while (pit != progLists[watchGroupLabel].end())
+        ProgramList::iterator pit = m_progLists[m_watchGroupLabel].begin();
+        while (pit != m_progLists[m_watchGroupLabel].end())
         {
             int recid = (*pit)->recordid;
             int avgd =  avgDelay[recid];
@@ -2003,12 +1366,12 @@ bool PlaybackBox::FillList(bool useCachedData)
                 recType[recid] == kTimeslotRecord ||
                 recType[recid] == kFindDailyRecord)
             {
-                if (delHours[recid] < watchListBlackOut * 4)
+                if (delHours[recid] < m_watchListBlackOut * 4)
                 {
                     (*pit)->recpriority2 = wlDeleted;
                     VERBOSE(VB_FILE, QString("Recently deleted daily:  %1")
                                              .arg((*pit)->title));
-                    pit = progLists[watchGroupLabel].erase(pit);
+                    pit = m_progLists[m_watchGroupLabel].erase(pit);
                     continue;
                 }
                 else
@@ -2028,12 +1391,12 @@ bool PlaybackBox::FillList(bool useCachedData)
                      recType[recid] == kFindWeeklyRecord)
 
             {
-                if (delHours[recid] < (watchListBlackOut * 24) - 4)
+                if (delHours[recid] < (m_watchListBlackOut * 24) - 4)
                 {
                     (*pit)->recpriority2 = wlDeleted;
                     VERBOSE(VB_FILE, QString("Recently deleted weekly:  %1")
                                              .arg((*pit)->title));
-                    pit = progLists[watchGroupLabel].erase(pit);
+                    pit = m_progLists[m_watchGroupLabel].erase(pit);
                     continue;
                 }
                 else
@@ -2051,10 +1414,10 @@ bool PlaybackBox::FillList(bool useCachedData)
             // Not recurring
             else
             {
-                if (delHours[recid] < (watchListBlackOut * 48) - 4)
+                if (delHours[recid] < (m_watchListBlackOut * 48) - 4)
                 {
                     (*pit)->recpriority2 = wlDeleted;
-                    pit = progLists[watchGroupLabel].erase(pit);
+                    pit = m_progLists[m_watchGroupLabel].erase(pit);
                     continue;
                 }
                 else
@@ -2071,10 +1434,10 @@ bool PlaybackBox::FillList(bool useCachedData)
                             (*pit)->recpriority2 +=
                                 (baseValue / 3) + (baseValue * hrs / 24 / 4);
                     }
-                    else if ((hrs / 24) < watchListMaxAge)
+                    else if ((hrs / 24) < m_watchListMaxAge)
                         (*pit)->recpriority2 += hrs / 24;
                     else
-                        (*pit)->recpriority2 += watchListMaxAge;
+                        (*pit)->recpriority2 += m_watchListMaxAge;
                 }
             }
 
@@ -2091,313 +1454,167 @@ bool PlaybackBox::FillList(bool useCachedData)
                 (*pit)->recpriority2 = (*pit)->recpriority2 * 100 / delaypct;
 
             VERBOSE(VB_FILE, QString(" %1  %2  %3")
-                    .arg((*pit)->startts.toString(formatShortDate))
+                    .arg((*pit)->startts.toString(m_formatShortDate))
                     .arg((*pit)->recpriority2).arg((*pit)->title));
 
             ++pit;
         }
-        progLists[watchGroupLabel].sort(comp_recpriority2_less_than);
+        m_progLists[m_watchGroupLabel].sort(comp_recpriority2_less_than);
     }
 
-    // Try to find our old place in the title list.  Scan the new
-    // titles backwards until we find where we were or go past.  This
-    // is somewhat inefficient, but it works.
+    m_titleList = sortedList.values();
 
-    QStringList sTitleList = sortedList.keys();
-    titleList = sortedList.values();
+    updateGroupList();
+    updateUsage();
 
-    QString oldsTitle = sortTitle(oldtitle, viewMask, titleSort,
-            oldrecpriority);
-    oldsTitle = oldsTitle.toLower();
-    titleIndex = titleList.count() - 1;
-    for (titleIndex = titleList.count() - 1; titleIndex >= 0; titleIndex--)
-    {
-        if (watchListStart && sTitleList[titleIndex] == watchGroupLabel)
-        {
-            watchListStart = 0;
-            break;
-        }
-        sTitle = sTitleList[titleIndex];
-        sTitle = sTitle.toLower();
+    m_isFilling = false;
 
-        if (oldsTitle > sTitle)
-        {
-            if (titleIndex + 1 < (int)titleList.count())
-                titleIndex++;
-            break;
-        }
-
-        if (oldsTitle == sTitle)
-            break;
-    }
-
-    // Now do pretty much the same thing for the individual shows on
-    // the specific program list if needed.
-    if (oldtitle != titleList[titleIndex] || oldchanid.isNull())
-        progIndex = 0;
-    else
-    {
-        ProgramList *l = &progLists[oldtitle.toLower()];
-        progIndex = l->count() - 1;
-
-        for (int i = progIndex; i >= 0; i--)
-        {
-            p = l->at(i);
-
-            if (oldtitle != watchGroupName)
-            {
-                if (titleIndex == 0)
-                {
-                    if (allOrder == 0 || type == Delete)
-                    {
-                        if (oldstartts > p->recstartts)
-                            break;
-                    }
-                    else
-                    {
-                        if (oldstartts < p->recstartts)
-                            break;
-                    }
-                }
-                else
-                {
-                    if (!listOrder || type == Delete)
-                    {
-                        if (episodeSort == "OrigAirDate")
-                        {
-                            if (oldoriginalAirDate > p->originalAirDate)
-                                break;
-                        }
-                        else if (episodeSort == "Id")
-                        {
-                            if (oldprogramid > p->programid)
-                                break;
-                        }
-                        else
-                        {
-                            if (oldstartts > p->recstartts)
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        if (episodeSort == "OrigAirDate")
-                        {
-                            if (oldoriginalAirDate < p->originalAirDate)
-                                break;
-                        }
-                        else if (episodeSort == "Id")
-                        {
-                            if (oldprogramid < p->programid)
-                                break;
-                        }
-                        else
-                        {
-                            if (oldstartts < p->recstartts)
-                                break;
-                        }
-                    }
-                }
-            }
-            progIndex = i;
-
-            if (oldchanid == p->chanid &&
-                oldstartts == p->recstartts)
-                break;
-        }
-    }
-
-    return (progCache != NULL);
-}
-
-bool PlaybackBox::killPlayer(void)
-{
-    if (previewPlayer)
-    {
-        stopPlayer();
-        delete previewPlayer;
-        previewPlayer = NULL;
-        return true;
-    }
-
-    return false;
-}
-
-void PlaybackBox::startPlayer(ProgramInfo *rec)
-{
-    ignoreKeyPressEvents = true;
-    previewVideoStartTimer->stop();
-    QMutexLocker locker(&previewVideoLock);
-    if (rec && previewPlayer)
-    {
-        bool useHWAccel = gContext->GetNumSetting("HWAccelPlaybackPreview", 0);
-        previewPlayer->SetNullVideo(true);
-        rec->setIgnoreBookmark(true);
-        previewPlayer->SetPlayingInfo(rec);
-        QString playbackURL = previewPlayer->playingInfo->GetPlaybackURL();
-        previewPlayer->SetRingBuffer(
-                new RingBuffer(playbackURL, false, false, 0));
-        bool ok = false;
-        if (previewPlayer->buffer->IsOpen())
-        {
-            ok = previewPlayer->StartPIPPlayer(
-                            NULL, kState_WatchingPreRecorded);
-            if (ok)
-            {
-                previewPlayer->ResizePIPWindow(blackholeBounds);
-                if (useHWAccel)
-                {
-                    previewPlayer->nvp->StopPlaying();
-                    previewPlayer->SetNVP(NULL);
-                    previewPlayer->SetRingBuffer(NULL);
-                    previewPlayer->SetNullVideo(false);
-                    previewPlayer->SetRingBuffer(
-                            new RingBuffer(playbackURL, false, false, 0));
-                    ok = previewPlayer->buffer->IsOpen();
-                    if (ok)
-                    {
-                        previewPlayer->ResizePIPWindow(blackholeBounds);
-                        ok = previewPlayer->StartPIPPlayer(NULL, 
-                                        kState_WatchingPreRecorded);
-                    }
-                }
-            }
-        }
-        if (ok)
-        {
-            previewVideoRefreshTimer->start(66);
-            previewVideoStopTimer->start(60000); // run preview for 1 min
-            previewPixmapEnabled = false;
-        }
-    }
-
-    ignoreKeyPressEvents = false;
-}
-
-void PlaybackBox::stopPlayer(void)
-{
-    ignoreKeyPressEvents = true;
-    QMutexLocker locker(&previewVideoLock);
-    previewVideoRefreshTimer->stop();
-    if (previewPlayer && previewPlayer->nvp)
-    {
-        previewPlayer->nvp->StopPlaying();
-        previewPlayer->SetNVP(NULL);
-        previewPlayer->SetPlayingInfo(NULL);
-        previewPixmapEnabled = true;
-        if (curitem)
-        {
-            curitem->programflags = curitem->getProgramFlags();
-            curitem->setIgnoreBookmark(false);
-        }
-    }
-    ignoreKeyPressEvents = false;
+    return (m_progCache != NULL);
 }
 
 void PlaybackBox::playSelectedPlaylist(bool random)
 {
-    if (!curitem)
-        return;
-
     ProgramInfo *tmpItem;
-    QStringList::Iterator it = playList.begin();
-    QStringList randomList = playList;
+    QStringList::Iterator it = m_playList.begin();
+    QStringList randomList = m_playList;
     bool playNext = true;
     int i = 0;
 
-    while (randomList.count() && playNext)
+    while (randomList.size() && playNext)
     {
         if (random)
-            i = (int)(1.0 * randomList.count() * rand() / (RAND_MAX + 1.0));
+            i = (int)(1.0 * randomList.size() * rand() / (RAND_MAX + 1.0));
 
         it = randomList.begin() + i;
+
         tmpItem = findMatchingProg(*it);
-        if (tmpItem)
-        {
-            ProgramInfo *rec = new ProgramInfo(*tmpItem);
-            if ((rec->availableStatus == asAvailable) ||
-                (rec->availableStatus == asNotYetAvailable))
-                playNext = play(rec, true);
-            delete rec;
-        }
+
+        if ((tmpItem->availableStatus == asAvailable) ||
+            (tmpItem->availableStatus == asNotYetAvailable))
+            playNext = play(tmpItem, true);
+
         randomList.erase(it);
     }
 }
 
-void PlaybackBox::playSelected()
+void PlaybackBox::playSelected(MythUIButtonListItem *item)
 {
-    if (!curitem)
+    if (!item)
         return;
 
-    if (m_player && m_player->IsSameProgram(0, curitem))
+    item = m_recordingList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+
+    if (!pginfo)
+        return;
+
+    if (m_player && m_player->IsSameProgram(0, pginfo))
     {
-        exitWin();
+        Close();
         return;
     }
 
-    if ((curitem->availableStatus == asAvailable) ||
-        (curitem->availableStatus == asNotYetAvailable))
-        play(curitem);
+    if ((pginfo->availableStatus == asAvailable) ||
+        (pginfo->availableStatus == asNotYetAvailable))
+        play(pginfo);
     else
-        showAvailablePopup(curitem);
+        showAvailablePopup(pginfo);
 
     if (m_player)
-        accept();
+    {
+    }
 }
 
 void PlaybackBox::stopSelected()
 {
-    if (!curitem)
+    ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    stop(curitem);
+    stop(pginfo);
 }
 
-void PlaybackBox::deleteSelected()
+void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
 {
-    if (!curitem)
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+
+    if (!pginfo)
         return;
 
     bool undelete_possible =
             gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
 
-    if (curitem->recgroup == "Deleted" && undelete_possible)
-        doRemove(curitem, false, false);
-    else if ((curitem->availableStatus != asPendingDelete) &&
-        (REC_CAN_BE_DELETED(curitem)))
-        remove(curitem);
+    if (pginfo->recgroup == "Deleted" && undelete_possible)
+    {
+        m_delItem = pginfo;
+        doRemove(pginfo, false, false);
+    }
+    else if ((pginfo->availableStatus != asPendingDelete) &&
+        (REC_CAN_BE_DELETED(pginfo)))
+        askDelete(pginfo);
     else
-        showAvailablePopup(curitem);
+        showAvailablePopup(pginfo);
 }
 
 void PlaybackBox::upcoming()
 {
-    if (!curitem)
+   ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    if (curitem->availableStatus != asAvailable)
+    if (pginfo->availableStatus != asAvailable)
     {
-        showAvailablePopup(curitem);
+        showAvailablePopup(pginfo);
         return;
     }
 
-    ProgListerQt *pl = new ProgListerQt(plTitle, curitem->title, "",
-                                   gContext->GetMainWindow(), "proglist");
-    pl->exec();
-    delete pl;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
+}
+
+ProgramInfo *PlaybackBox::CurrentItem(void)
+{
+    ProgramInfo *pginfo = NULL;
+
+    MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
+
+    if (!item)
+        return NULL;
+
+    pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+
+    if (!pginfo)
+        return NULL;
+
+    return pginfo;
 }
 
 void PlaybackBox::customEdit()
 {
-    if (!curitem)
+    ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    if (curitem->availableStatus != asAvailable)
+    if (pginfo->availableStatus != asAvailable)
     {
-        showAvailablePopup(curitem);
+        showAvailablePopup(pginfo);
         return;
     }
-    ProgramInfo *pi = curitem;
+    ProgramInfo *pi = pginfo;
 
     if (!pi)
         return;
@@ -2410,101 +1627,94 @@ void PlaybackBox::customEdit()
 
 void PlaybackBox::details()
 {
-    if (!curitem)
+    ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    if (curitem->availableStatus != asAvailable)
-        showAvailablePopup(curitem);
+    if (pginfo->availableStatus != asAvailable)
+        showAvailablePopup(pginfo);
     else
-        curitem->showDetails();
+        pginfo->showDetails();
 }
 
-void PlaybackBox::selected()
+void PlaybackBox::selected(MythUIButtonListItem *item)
 {
-    if (inTitle && haveGroupInfoSet)
-    {
-        cursorRight();
-        return;
-    }
-
-    if (!curitem)
+    if (!item)
         return;
 
-    switch (type)
+    switch (m_type)
     {
-        case Play: playSelected(); break;
-        case Delete: deleteSelected(); break;
+        case Play: playSelected(item); break;
+        case Delete: deleteSelected(item); break;
     }
 }
 
 void PlaybackBox::showMenu()
 {
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "menu popup");
+    QString label = tr("Recording List Menu");
 
-    QLabel *label = popup->addLabel(tr("Recording List Menu"),
-                                  MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter);
+    ProgramInfo *pginfo = CurrentItem();
 
-    QAbstractButton *topButton = popup->addButton(tr("Change Group Filter"), this,
-                     SLOT(showRecGroupChooser()));
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    popup->addButton(tr("Change Group View"), this,
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
+
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
+
+    m_popupMenu->AddButton(tr("Change Group Filter"),
+                                 SLOT(showGroupFilter()));
+
+    m_popupMenu->AddButton(tr("Change Group View"),
                      SLOT(showViewChanger()));
 
-    if (recGroupType[recGroup] == "recgroup")
-        popup->addButton(tr("Change Group Password"), this,
+    if (m_recGroupType[m_recGroup] == "recgroup")
+        m_popupMenu->AddButton(tr("Change Group Password"),
                          SLOT(showRecGroupPasswordChanger()));
 
-    if (playList.count())
+    if (m_playList.size())
     {
-        popup->addButton(tr("Playlist options"), this,
-                         SLOT(showPlaylistPopup()));
+        m_popupMenu->AddButton(tr("Playlist options"),
+                         SLOT(showPlaylistPopup()), true);
     }
     else if (!m_player)
     {
-        if (inTitle)
+        if (GetFocusWidget() == m_groupList)
         {
-            popup->addButton(tr("Add this Group to Playlist"), this,
+            m_popupMenu->AddButton(tr("Add this Group to Playlist"),
                              SLOT(togglePlayListTitle()));
         }
-        else if (curitem && curitem->availableStatus == asAvailable)
+        else if (pginfo && pginfo->availableStatus == asAvailable)
         {
-            popup->addButton(tr("Add this recording to Playlist"), this,
-                             SLOT(togglePlayListItem()));
+            m_popupMenu->AddButton(tr("Add this recording to Playlist"),
+                                        SLOT(togglePlayListItem()));
         }
     }
 
-    popup->addButton(tr("Help (Status Icons)"), this,
-                         SLOT(showIconHelp()));
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-
-    topButton->setFocus();
-
-    expectingPopup = true;
+    m_popupMenu->AddButton(tr("Help (Status Icons)"), SLOT(showIconHelp()));
 }
 
 void PlaybackBox::showActionsSelected()
 {
-    if (!curitem)
+    if (GetFocusWidget() == m_groupList)
         return;
 
-    if (inTitle && haveGroupInfoSet)
+    ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    if ((curitem->availableStatus != asAvailable) &&
-        (curitem->availableStatus != asFileNotFound))
-        showAvailablePopup(curitem);
+    if ((pginfo->availableStatus != asAvailable) &&
+        (pginfo->availableStatus != asFileNotFound))
+        showAvailablePopup(pginfo);
     else
-        showActions(curitem);
+        showActions(pginfo);
 }
 
 bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 {
     bool playCompleted = false;
-    ProgramInfo *tmpItem = NULL;
 
     if (!rec)
         return false;
@@ -2515,30 +1725,19 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     rec->pathname = rec->GetPlaybackURL(true);
 
     if (rec->availableStatus == asNotYetAvailable)
-    {
-        tmpItem = findMatchingProg(rec);
-        if (tmpItem)
-            tmpItem->availableStatus = asAvailable;
-    }
+        rec->availableStatus = asAvailable;
 
     if (fileExists(rec) == false)
     {
-        QString msg =
-            QString("PlaybackBox::play(): Error, %1 file not found")
-            .arg(rec->pathname);
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, QString("PlaybackBox::play(): Error, %1 file "
+                                      "not found").arg(rec->pathname));
 
-        tmpItem = (tmpItem) ? tmpItem : findMatchingProg(rec);
+        if (rec->recstatus == rsRecording)
+            rec->availableStatus = asNotYetAvailable;
+        else
+            rec->availableStatus = asFileNotFound;
 
-        if (tmpItem)
-        {
-            if (tmpItem->recstatus == rsRecording)
-                tmpItem->availableStatus = asNotYetAvailable;
-            else
-                tmpItem->availableStatus = asFileNotFound;
-
-            showAvailablePopup(tmpItem);
-        }
+        showAvailablePopup(rec);
 
         return false;
     }
@@ -2549,40 +1748,32 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
             QString("PlaybackBox::play(): Error, %1 is zero-bytes in size")
             .arg(rec->pathname));
 
-        tmpItem = (tmpItem) ? tmpItem : findMatchingProg(rec);
+        if (rec->recstatus == rsRecording)
+            rec->availableStatus = asNotYetAvailable;
+        else
+            rec->availableStatus = asZeroByte;
 
-        if (tmpItem)
-        {
-            if (tmpItem->recstatus == rsRecording)
-                tmpItem->availableStatus = asNotYetAvailable;
-            else
-                tmpItem->availableStatus = asZeroByte;
-
-            showAvailablePopup(tmpItem);
-        }
+        showAvailablePopup(rec);
 
         return false;
     }
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
-    setEnabled(false);
-    playingSomething = true;
+    m_playingSomething = true;
 
-    if (previewPlayer && previewPlayer->nvp)
-        stopPlayer();
+    playCompleted = TV::StartTV(tvrec, false, inPlaylist, m_underNetworkControl);
 
-    playCompleted = TV::StartTV(tvrec, false, inPlaylist, underNetworkControl);
-
-    playingSomething = false;
-    setEnabled(true);
+    m_playingSomething = false;
 
     delete tvrec;
 
-    connected = FillList();
-
-    if (previewPlayer && !previewPlayer->nvp)
-        previewVideoStartTimer->start(previewTimeout);
+    // TODO 1) Potentially duplicate refill, watching a recording will normally
+    //      trigger a recording list change event which also triggers a refill
+    //
+    //      2) We really don't need to do a refill here, but just update that
+    //      one programinfo object
+    m_connected = FillList();
 
     return playCompleted;
 }
@@ -2595,73 +1786,84 @@ void PlaybackBox::stop(ProgramInfo *rec)
 bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
                            bool forceMetadataDelete)
 {
-    if (playList.filter(rec->MakeUniqueKey()).count())
+    m_delItem = NULL;
+
+    if (!rec)
+        return false;
+
+    if (!forceMetadataDelete &&
+        ((rec->availableStatus == asPendingDelete) ||
+        (!REC_CAN_BE_DELETED(rec))))
+    {
+        showAvailablePopup(rec);
+        return false;
+    }
+
+    if (m_playList.filter(rec->MakeUniqueKey()).size())
         togglePlayListItem(rec);
 
     if (!forceMetadataDelete)
         rec->UpdateLastDelete(true);
 
-    return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
-}
+    bool result = RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 
-void PlaybackBox::remove(ProgramInfo *toDel)
-{
-    if (delitem)
-        delete delitem;
-
-    delitem = new ProgramInfo(*toDel);
-    showDeletePopup(delitem, DeleteRecording);
-}
-
-void PlaybackBox::showActions(ProgramInfo *toExp)
-{
-    if (delitem)
-        delete delitem;
-
-    delitem = new ProgramInfo(*toExp);
-
-    if (fileExists(delitem) == false)
+    if (result)
     {
-        QString msg =
-            QString("PlaybackBox::showActions(): Error, %1 file not found")
-            .arg(delitem->pathname);
-        VERBOSE(VB_IMPORTANT, msg);
-
-        ProgramInfo *tmpItem = findMatchingProg(delitem);
-        if (tmpItem)
-        {
-            tmpItem->availableStatus = asFileNotFound;
-            showFileNotFoundActionPopup(delitem);
-        }
+        rec->availableStatus = asPendingDelete;
+        m_recordingList->RemoveItem(m_recordingList->GetItemCurrent());
     }
-    else if (delitem->availableStatus != asAvailable)
-        showAvailablePopup(delitem);
+    else if (!forceMetadataDelete)
+        showDeletePopup(rec, ForceDeleteRecording);
+
+    return result;
+}
+
+void PlaybackBox::showActions(ProgramInfo *pginfo)
+{
+    if (!pginfo)
+        return;
+
+    if (fileExists(pginfo) == false)
+    {
+        VERBOSE(VB_IMPORTANT, QString("PlaybackBox::showActions(): Error, %1 "
+                                      "file not found").arg(pginfo->pathname));
+
+        pginfo->availableStatus = asFileNotFound;
+        showFileNotFoundActionPopup(pginfo);
+    }
+    else if (pginfo->availableStatus != asAvailable)
+        showAvailablePopup(pginfo);
     else
-        showActionPopup(delitem);
+        showActionPopup(pginfo);
 }
 
 void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 {
-    freeSpaceNeedsUpdate = true;
-
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "delete popup");
-    QString message1 = "";
-    QString message2 = "";
+    QString label;
     switch (types)
     {
         case DeleteRecording:
-             message1 = tr("Are you sure you want to delete:"); break;
+             label = tr("Are you sure you want to delete:"); break;
         case ForceDeleteRecording:
-             message1 = tr("ERROR: Recorded file does not exist.");
-             message2 = tr("Are you sure you want to delete:");
+             label = tr("ERROR: Recorded file does not exist.\n"
+                        "Are you sure you want to delete:");
              break;
         case StopRecording:
-             message1 = tr("Are you sure you want to stop:"); break;
+             label = tr("Are you sure you want to stop:"); break;
     }
 
-    initPopup(popup, program, message1, message2);
+    m_delItem = CurrentItem();
+
+    popupString(m_delItem, label);
+
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
+
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
+
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
+
+    m_freeSpaceNeedsUpdate = true;
 
     QString tmpmessage;
     const char *tmpslot = NULL;
@@ -2672,7 +1874,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     {
         tmpmessage = tr("Yes, and allow re-record");
         tmpslot = SLOT(doDeleteForgetHistory());
-        popup->addButton(tmpmessage, this, tmpslot);
+        m_popupMenu->AddButton(tmpmessage, tmpslot);
     }
 
     switch (types)
@@ -2691,7 +1893,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              break;
     }
 
-    QAbstractButton *yesButton = popup->addButton(tmpmessage, this, tmpslot);
+    m_popupMenu->AddButton(tmpmessage, tmpslot);
 
     switch (types)
     {
@@ -2702,25 +1904,10 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              break;
         case StopRecording:
              tmpmessage = tr("No, continue recording it");
-             tmpslot = SLOT(doCancel());
+             tmpslot = SLOT(noStop());
              break;
     }
-    QAbstractButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
-
-    if (types == DeleteRecording ||
-        types == ForceDeleteRecording)
-        noButton->setFocus();
-    else
-    {
-        if (program->GetAutoExpireFromRecorded())
-            yesButton->setFocus();
-        else
-            noButton->setFocus();
-    }
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-
-    expectingPopup = true;
+    m_popupMenu->AddButton(tmpmessage, tmpslot);
 }
 
 void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
@@ -2728,9 +1915,9 @@ void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
     if (!rec)
         return;
 
-    QString msg = rec->title + "\n";
-    if (rec->subtitle != "")
-        msg += rec->subtitle + "\n";
+    QString msg = rec->title;
+    if (!rec->subtitle.isEmpty())
+        msg += " \"" + rec->subtitle + "\"";
     msg += "\n";
 
     switch (rec->availableStatus)
@@ -2741,129 +1928,101 @@ void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
                      QString byWho;
                      rec->IsInUse(byWho);
 
-                     MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                   QObject::tr("Recording Available"), msg +
-                                   QObject::tr("This recording is currently in "
+                     ShowOkPopup(tr("Recording Available\n") + msg +
+                                 tr("This recording is currently in "
                                                "use by:") + "\n" + byWho);
                  }
                  else
                  {
-                     MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                   QObject::tr("Recording Available"), msg +
-                                   QObject::tr("This recording is currently "
+                     ShowOkPopup(tr("Recording Available\n") + msg +
+                                 tr("This recording is currently "
                                                "Available"));
                  }
                  break;
         case asPendingDelete:
-                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                               QObject::tr("Recording Unavailable"), msg +
-                               QObject::tr("This recording is currently being "
+                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                             tr("This recording is currently being "
                                            "deleted and is unavailable"));
                  break;
         case asFileNotFound:
-                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                               QObject::tr("Recording Unavailable"), msg +
-                               QObject::tr("The file for this recording can "
+                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                             tr("The file for this recording can "
                                            "not be found"));
                  break;
         case asZeroByte:
-                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                               QObject::tr("Recording Unavailable"), msg +
-                               QObject::tr("The file for this recording is "
+                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                             tr("The file for this recording is "
                                            "empty."));
                  break;
         case asNotYetAvailable:
-                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                               QObject::tr("Recording Unavailable"), msg +
-                               QObject::tr("This recording is not yet "
+                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                             tr("This recording is not yet "
                                            "available."));
     }
 }
 
 void PlaybackBox::showPlaylistPopup()
 {
-    if (expectingPopup)
-       cancelPopup();
+    QString label;
+    if (m_playList.size() > 1)
+        label = tr("There are %1 items in the playlist.").arg(m_playList.size());
+    else
+        label = tr("There is %1 item in the playlist.").arg(m_playList.size());
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "playlist popup");
+    label.append(tr("Actions affect all items in the playlist"));
 
-    QLabel *tlabel = NULL;
-    if (playList.count() > 1)
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
+
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
+
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
+
+    m_popupMenu->AddButton(tr("Play"), SLOT(doPlayList()));
+    m_popupMenu->AddButton(tr("Shuffle Play"), SLOT(doPlayListRandom()));
+    m_popupMenu->AddButton(tr("Clear Playlist"), SLOT(doClearPlaylist()));
+
+    if (GetFocusWidget() == m_groupList)
     {
-        tlabel = popup->addLabel(tr("There are %1 items in the playlist.")
-                                       .arg(playList.count()));
-    } else {
-        tlabel = popup->addLabel(tr("There is %1 item in the playlist.")
-                                       .arg(playList.count()));
-    }
-    tlabel->setAlignment(Qt::AlignCenter);
-
-    QAbstractButton *playButton = popup->addButton(tr("Play"), this, SLOT(doPlayList()));
-
-    popup->addButton(tr("Shuffle Play"), this, SLOT(doPlayListRandom()));
-    popup->addButton(tr("Clear Playlist"), this, SLOT(doClearPlaylist()));
-
-    if (inTitle)
-    {
-        if ((viewMask & VIEW_TITLES))
-            popup->addButton(tr("Toggle playlist for this Category/Title"),
-                             this, SLOT(togglePlayListTitle()));
+        if ((m_viewMask & VIEW_TITLES))
+            m_popupMenu->AddButton(tr("Toggle playlist for this Category/Title"),
+                                SLOT(togglePlayListTitle()));
         else
-            popup->addButton(tr("Toggle playlist for this Recording Group"),
-                             this, SLOT(togglePlayListTitle()));
+            m_popupMenu->AddButton(tr("Toggle playlist for this Recording Group"),
+                                SLOT(togglePlayListTitle()));
     }
     else
-    {
-        popup->addButton(tr("Toggle playlist for this recording"), this,
+        m_popupMenu->AddButton(tr("Toggle playlist for this recording"),
                          SLOT(togglePlayListItem()));
-    }
 
-    QLabel *label = popup->addLabel(
-                        tr("These actions affect all items in the playlist"));
-    label->setAlignment(Qt::AlignCenter);
-
-    popup->addButton(tr("Change Recording Group"), this,
+    m_popupMenu->AddButton(tr("Change Recording Group"),
                      SLOT(doPlaylistChangeRecGroup()));
-    popup->addButton(tr("Change Playback Group"), this,
+    m_popupMenu->AddButton(tr("Change Playback Group"),
                      SLOT(doPlaylistChangePlayGroup()));
-    popup->addButton(tr("Job Options"), this,
-                     SLOT(showPlaylistJobPopup()));
-    popup->addButton(tr("Delete"), this, SLOT(doPlaylistDelete()));
-    popup->addButton(tr("Delete, and allow re-record"), this,
+    m_popupMenu->AddButton(tr("Job Options"),
+                     SLOT(showPlaylistJobPopup()), true);
+    m_popupMenu->AddButton(tr("Delete"), SLOT(doPlaylistDelete()));
+    m_popupMenu->AddButton(tr("Delete, and allow re-record"),
                      SLOT(doPlaylistDeleteForgetHistory()));
-
-    playButton->setFocus();
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-
-    expectingPopup = true;
 }
 
 void PlaybackBox::showPlaylistJobPopup()
 {
-    if (expectingPopup)
-       cancelPopup();
+    QString label;
+    if (m_playList.size() > 1)
+        label = tr("There are %1 items in the playlist.").arg(m_playList.size());
+    else
+        label = tr("There is %1 item in the playlist.").arg(m_playList.size());
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "playlist popup");
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    QLabel *tlabel = NULL;
-    if (playList.count() > 1)
-    {
-        tlabel = popup->addLabel(tr("There are %1 items in the playlist.")
-                                       .arg(playList.count()));
-    } else {
-        tlabel = popup->addLabel(tr("There is %1 item in the playlist.")
-                                       .arg(playList.count()));
-    }
-    tlabel->setAlignment(Qt::AlignCenter);
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
 
-    QAbstractButton *jobButton;
-    QString jobTitle = "";
-    QString command = "";
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
+
+    QString jobTitle;
+    QString command;
     QStringList::Iterator it;
     ProgramInfo *tmpItem;
     bool isTranscoding = true;
@@ -2873,10 +2032,11 @@ void PlaybackBox::showPlaylistJobPopup()
     bool isRunningUserJob3 = true;
     bool isRunningUserJob4 = true;
 
-    for(it = playList.begin(); it != playList.end(); ++it)
+    for(it = m_playList.begin(); it != m_playList.end(); ++it)
     {
         tmpItem = findMatchingProg(*it);
-        if (tmpItem) {
+        if (tmpItem)
+        {
             if (!JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
                                        tmpItem->chanid, tmpItem->recstartts))
                 isTranscoding = false;
@@ -2901,598 +2061,464 @@ void PlaybackBox::showPlaylistJobPopup()
         }
     }
     if (!isTranscoding)
-        jobButton = popup->addButton(tr("Begin Transcoding"), this,
+        m_popupMenu->AddButton(tr("Begin Transcoding"),
                          SLOT(doPlaylistBeginTranscoding()));
     else
-        jobButton = popup->addButton(tr("Stop Transcoding"), this,
+        m_popupMenu->AddButton(tr("Stop Transcoding"),
                          SLOT(stopPlaylistTranscoding()));
     if (!isFlagging)
-        popup->addButton(tr("Begin Commercial Flagging"), this,
+        m_popupMenu->AddButton(tr("Begin Commercial Flagging"),
                          SLOT(doPlaylistBeginFlagging()));
     else
-        popup->addButton(tr("Stop Commercial Flagging"), this,
+        m_popupMenu->AddButton(tr("Stop Commercial Flagging"),
                          SLOT(stopPlaylistFlagging()));
 
     command = gContext->GetSetting("UserJob1", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc1");
 
         if (!isRunningUserJob1)
-            popup->addButton(tr("Begin") + " " + jobTitle, this,
+            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
                              SLOT(doPlaylistBeginUserJob1()));
         else
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
+            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
                              SLOT(stopPlaylistUserJob1()));
     }
 
     command = gContext->GetSetting("UserJob2", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc2");
 
         if (!isRunningUserJob2)
-            popup->addButton(tr("Begin") + " " + jobTitle, this,
+            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
                              SLOT(doPlaylistBeginUserJob2()));
         else
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
+            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
                              SLOT(stopPlaylistUserJob2()));
     }
 
     command = gContext->GetSetting("UserJob3", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc3");
 
         if (!isRunningUserJob3)
-            popup->addButton(tr("Begin") + " " + jobTitle, this,
+            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
                              SLOT(doPlaylistBeginUserJob3()));
         else
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
+            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
                              SLOT(stopPlaylistUserJob3()));
     }
 
     command = gContext->GetSetting("UserJob4", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc4");
 
         if (!isRunningUserJob4)
-            popup->addButton(tr("Begin") + " " + jobTitle, this,
-                             SLOT(doPlaylistBeginUserJob4()));
+            m_popupMenu->AddButton(QString("%1 %2")
+                                    .arg(tr("Begin")).arg(jobTitle),
+                                     SLOT(doPlaylistBeginUserJob4()));
         else
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
-                             SLOT(stopPlaylistUserJob4()));
+            m_popupMenu->AddButton(QString("%1 %2")
+                                    .arg(tr("Stop")).arg(jobTitle),
+                                    SLOT(stopPlaylistUserJob4()));
     }
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-    jobButton->setFocus();
-
-    expectingPopup = true;
 }
 
 void PlaybackBox::showPlayFromPopup()
 {
-    if (expectingPopup)
-        cancelPopup();
+    QString label = tr("Play options");
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "playfrom popup");
+    ProgramInfo *pginfo = CurrentItem();
+    popupString(pginfo, label);
 
-    initPopup(popup, delitem, "", "");
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    QAbstractButton *playButton = popup->addButton(tr("Play from bookmark"), this,
-            SLOT(doPlay()));
-    popup->addButton(tr("Play from beginning"), this, SLOT(doPlayFromBeg()));
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
 
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-    playButton->setFocus();
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    expectingPopup = true;
+    m_popupMenu->AddButton(tr("Play from bookmark"), SLOT(playSelected()));
+    m_popupMenu->AddButton(tr("Play from beginning"), SLOT(doPlayFromBeg()));
 }
 
 void PlaybackBox::showStoragePopup()
 {
-    if (expectingPopup)
-        cancelPopup();
+    QString label = tr("Storage options");
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "storage popup");
+    ProgramInfo *pginfo = CurrentItem();
+    popupString(pginfo, label);
 
-    initPopup(popup, delitem, "", "");
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    QAbstractButton *storageButton;
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
 
-    MythPushButton *toggleButton;
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    storageButton = popup->addButton(tr("Change Recording Group"), this,
-                                     SLOT(showRecGroupChanger()));
+    m_popupMenu->AddButton(tr("Change Recording Group"),
+                            SLOT(showRecGroupChanger()));
 
-    popup->addButton(tr("Change Playback Group"), this,
-                     SLOT(showPlayGroupChanger()));
+    m_popupMenu->AddButton(tr("Change Playback Group"),
+                            SLOT(showPlayGroupChanger()));
 
-    if (delitem)
+    if (pginfo)
     {
-        toggleButton = new MythPushButton(
-            tr("Disable Auto Expire"), tr("Enable Auto Expire"),
-            popup, delitem->GetAutoExpireFromRecorded());
-        connect(toggleButton, SIGNAL(toggled(bool)), this,
-                SLOT(toggleAutoExpire(bool)));
-        popup->addWidget(toggleButton, false);
+        if (pginfo->programflags & FL_AUTOEXP)
+            m_popupMenu->AddButton(tr("Disable Auto Expire"),
+                                            SLOT(toggleAutoExpire()));
+        else
+            m_popupMenu->AddButton(tr("Enable Auto Expire"),
+                                            SLOT(toggleAutoExpire()));
 
-        toggleButton = new MythPushButton(
-            tr("Do not preserve this episode"), tr("Preserve this episode"),
-            popup, delitem->GetPreserveEpisodeFromRecorded());
-        connect(toggleButton, SIGNAL(toggled(bool)), this,
-                SLOT(togglePreserveEpisode(bool)));
-        popup->addWidget(toggleButton, false);
+        if (pginfo->programflags & FL_PRESERVED)
+            m_popupMenu->AddButton(tr("Do not preserve this episode"),
+                                            SLOT(togglePreserveEpisode()));
+        else
+            m_popupMenu->AddButton(tr("Preserve this episode"),
+                                            SLOT(togglePreserveEpisode()));
     }
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-    storageButton->setFocus();
-
-    expectingPopup = true;
 }
 
 void PlaybackBox::showRecordingPopup()
 {
-    if (expectingPopup)
-        cancelPopup();
+    QString label = tr("Scheduling options");
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "recording popup");
+    ProgramInfo *pginfo = CurrentItem();
+    popupString(pginfo, label);
 
-    initPopup(popup, delitem, "", "");
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    QAbstractButton *editButton = popup->addButton(tr("Edit Recording Schedule"), this,
-                     SLOT(doEditScheduled()));
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
 
-    popup->addButton(tr("Allow this program to re-record"), this,
-                     SLOT(doAllowRerecord()));
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    popup->addButton(tr("Show Program Details"), this,
-                     SLOT(showProgramDetails()));
+    m_popupMenu->AddButton(tr("Edit Recording Schedule"),
+                            SLOT(doEditScheduled()));
 
-    popup->addButton(tr("Change Recording Title"), this,
-                     SLOT(showRecTitleChanger()));
+    m_popupMenu->AddButton(tr("Allow this program to re-record"),
+                            SLOT(doAllowRerecord()));
 
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-    editButton->setFocus();
+    m_popupMenu->AddButton(tr("Show Program Details"),
+                            SLOT(showProgramDetails()));
 
-    expectingPopup = true;
+    m_popupMenu->AddButton(tr("Change Recording Title"),
+                            SLOT(showMetadataEditor()));
 }
 
 void PlaybackBox::showJobPopup()
 {
-    if (expectingPopup)
-        cancelPopup();
+    QString label = tr("Job options");
 
-    if (!curitem)
+    ProgramInfo *pginfo = CurrentItem();
+    popupString(pginfo, label);
+
+    if (!pginfo)
         return;
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "job popup");
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    initPopup(popup, delitem, "", "");
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
 
-    QAbstractButton *jobButton;
-    QString jobTitle = "";
-    QString command = "";
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, curitem->chanid,
-                                                  curitem->recstartts))
-        jobButton = popup->addButton(tr("Stop Transcoding"), this,
-                         SLOT(doBeginTranscoding()));
+    QString jobTitle;
+    QString command;
+
+    if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, pginfo->chanid,
+                                                  pginfo->recstartts))
+        m_popupMenu->AddButton(tr("Stop Transcoding"),
+                                    SLOT(doBeginTranscoding()));
     else
-        jobButton = popup->addButton(tr("Begin Transcoding"), this,
-                         SLOT(showTranscodingProfiles()));
+        m_popupMenu->AddButton(tr("Begin Transcoding"),
+                                    SLOT(showTranscodingProfiles()));
 
-    if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG, curitem->chanid,
-                                                  curitem->recstartts))
-        popup->addButton(tr("Stop Commercial Flagging"), this,
-                         SLOT(doBeginFlagging()));
+    if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG, pginfo->chanid,
+                                                  pginfo->recstartts))
+        m_popupMenu->AddButton(tr("Stop Commercial Flagging"),
+                                    SLOT(doBeginFlagging()));
     else
-        popup->addButton(tr("Begin Commercial Flagging"), this,
-                         SLOT(doBeginFlagging()));
+        m_popupMenu->AddButton(tr("Begin Commercial Flagging"),
+                                    SLOT(doBeginFlagging()));
 
     command = gContext->GetSetting("UserJob1", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc1", tr("User Job") + " #1");
 
-        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1, curitem->chanid,
-                                   curitem->recstartts))
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
-                             SLOT(doBeginUserJob1()));
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1, pginfo->chanid,
+                                   pginfo->recstartts))
+            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+                                    SLOT(doBeginUserJob1()));
         else
-            popup->addButton(tr("Begin") + " " + jobTitle, this,
-                             SLOT(doBeginUserJob1()));
+            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+                                    SLOT(doBeginUserJob1()));
     }
 
     command = gContext->GetSetting("UserJob2", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc2", tr("User Job") + " #2");
 
-        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2, curitem->chanid,
-                                   curitem->recstartts))
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
-                             SLOT(doBeginUserJob2()));
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2, pginfo->chanid,
+                                   pginfo->recstartts))
+            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+                                    SLOT(doBeginUserJob2()));
         else
-            popup->addButton(tr("Begin") + " " + jobTitle, this,
-                             SLOT(doBeginUserJob2()));
+            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+                                    SLOT(doBeginUserJob2()));
     }
 
     command = gContext->GetSetting("UserJob3", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc3", tr("User Job") + " #3");
 
-        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3, curitem->chanid,
-                                   curitem->recstartts))
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
-                             SLOT(doBeginUserJob3()));
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3, pginfo->chanid,
+                                   pginfo->recstartts))
+            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+                                    SLOT(doBeginUserJob3()));
         else
-            popup->addButton(tr("Begin") + " " + jobTitle, this,
-                             SLOT(doBeginUserJob3()));
+            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+                                    SLOT(doBeginUserJob3()));
     }
 
     command = gContext->GetSetting("UserJob4", "");
-    if (command != "") {
+    if (!command.isEmpty())
+    {
         jobTitle = gContext->GetSetting("UserJobDesc4", tr("User Job") + " #4");
 
-        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4, curitem->chanid,
-                                   curitem->recstartts))
-            popup->addButton(tr("Stop") + " " + jobTitle, this,
-                             SLOT(doBeginUserJob4()));
+        if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4, pginfo->chanid,
+                                   pginfo->recstartts))
+            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+                                    SLOT(doBeginUserJob4()));
         else
-            popup->addButton(tr("Begin") + " "  + jobTitle, this,
-                             SLOT(doBeginUserJob4()));
+            m_popupMenu->AddButton(tr("Begin") + " "  + jobTitle,
+                                    SLOT(doBeginUserJob4()));
     }
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-    jobButton->setFocus();
-
-    expectingPopup = true;
 }
 
 void PlaybackBox::showTranscodingProfiles()
 {
-    if (expectingPopup)
-        cancelPopup();
+    QString label = tr("Transcoding profiles");
 
-    if (!curitem)
-        return;
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "transcode popup");
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
 
-    initPopup(popup, delitem, "", "");
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    QAbstractButton *defaultButton;
-
-    defaultButton = popup->addButton(tr("Default"), this,
-                                 SLOT(doBeginTranscoding()));
-    popup->addButton(tr("Autodetect"), this,
-                     SLOT(changeProfileAndTranscodeAuto()));
-    popup->addButton(tr("High Quality"), this,
-                     SLOT(changeProfileAndTranscodeHigh()));
-    popup->addButton(tr("Medium Quality"), this,
-                     SLOT(changeProfileAndTranscodeMedium()));
-    popup->addButton(tr("Low Quality"), this,
-                     SLOT(changeProfileAndTranscodeLow()));
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-    defaultButton->setFocus();
-
-    expectingPopup = true;
+    m_popupMenu->AddButton(tr("Default"), SLOT(doBeginTranscoding()));
+    m_popupMenu->AddButton(tr("Autodetect"),
+                                    SLOT(changeProfileAndTranscodeAuto()));
+    m_popupMenu->AddButton(tr("High Quality"),
+                                    SLOT(changeProfileAndTranscodeHigh()));
+    m_popupMenu->AddButton(tr("Medium Quality"),
+                                    SLOT(changeProfileAndTranscodeMedium()));
+    m_popupMenu->AddButton(tr("Low Quality"),
+                                    SLOT(changeProfileAndTranscodeLow()));
 }
 
-void PlaybackBox::changeProfileAndTranscode(QString profile)
+void PlaybackBox::changeProfileAndTranscode(const QString &profile)
 {
-    curitem->ApplyTranscoderProfileChange(profile);
+   ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
+        return;
+
+    pginfo->ApplyTranscoderProfileChange(profile);
     doBeginTranscoding();
 }
 
-void PlaybackBox::showActionPopup(ProgramInfo *program)
+void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
 {
-    if (!curitem || !program)
+    if (!pginfo)
         return;
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "action popup");
+    QString label = tr("Recording Options");
 
-    initPopup(popup, program, "", "");
+    popupString(pginfo, label);
 
-    QAbstractButton *playButton = NULL;
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    if (!(m_player && m_player->IsSameProgram(0, curitem)))
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
+
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
+
+    if (!(m_player && m_player->IsSameProgram(0, pginfo)))
     {
-        if (curitem->programflags & FL_BOOKMARK)
-            playButton = popup->addButton(tr("Play from..."), this,
-                                        SLOT(showPlayFromPopup()));
+        if (pginfo->programflags & FL_BOOKMARK)
+            m_popupMenu->AddButton(tr("Play from..."),
+                                        SLOT(showPlayFromPopup()), true);
         else
-            playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
+            m_popupMenu->AddButton(tr("Play"), SLOT(playSelected()));
+    }
+
+    if (!m_player)
+    {
+        if (m_playList.filter(pginfo->MakeUniqueKey()).size())
+            m_popupMenu->AddButton(tr("Remove from Playlist"),
+                                        SLOT(togglePlayListItem()));
+        else
+            m_popupMenu->AddButton(tr("Add to Playlist"),
+                                        SLOT(togglePlayListItem()));
     }
 
     TVState m_tvstate = kState_None;
     if (m_player)
-    {
-        if (!m_player->IsSameProgram(0, curitem) && m_player->IsPIPSupported())
-        {
-            popup->addButton(tr("Start As PIP"), this,
-                             SLOT(doPIPPlay()));
-            popup->addButton(tr("Start As PBP"), this,
-                             SLOT(doPBPPlay()));
-        }
-
         m_tvstate = m_player->GetState(0);
-    }
-    else
-    {
-        if (playList.filter(curitem->MakeUniqueKey()).count())
-            popup->addButton(tr("Remove from Playlist"), this,
-                            SLOT(togglePlayListItem()));
-        else
-            popup->addButton(tr("Add to Playlist"), this,
-                            SLOT(togglePlayListItem()));
-    }
 
-    if (program->recstatus == rsRecording &&
+    if (pginfo->recstatus == rsRecording &&
         (!(m_player &&
             (m_tvstate == kState_WatchingLiveTV ||
             m_tvstate == kState_WatchingRecording) &&
-            m_player->IsSameProgram(0, curitem))))
+            m_player->IsSameProgram(0, pginfo))))
     {
-        popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
+        m_popupMenu->AddButton(tr("Stop Recording"), SLOT(askStop()));
     }
 
-    if (curitem->programflags & FL_WATCHED)
-        popup->addButton(tr("Mark as Unwatched"), this,
-                                    SLOT(setUnwatched()));
+    if (pginfo->programflags & FL_WATCHED)
+        m_popupMenu->AddButton(tr("Mark as Unwatched"), SLOT(toggleWatched()));
     else
-        popup->addButton(tr("Mark as Watched"), this,
-                                    SLOT(setWatched()));
+        m_popupMenu->AddButton(tr("Mark as Watched"), SLOT(toggleWatched()));
 
-    popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
-    popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
-    popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
+    m_popupMenu->AddButton(tr("Storage Options"), SLOT(showStoragePopup()),
+                           true);
+    m_popupMenu->AddButton(tr("Recording Options"), SLOT(showRecordingPopup()),
+                           true);
+    m_popupMenu->AddButton(tr("Job Options"), SLOT(showJobPopup()), true);
 
-    if (!(m_player && m_player->IsSameProgram(0, curitem)))
+    if (!(m_player && m_player->IsSameProgram(0, pginfo)))
     {
-        if (curitem->recgroup == "Deleted")
+        if (pginfo->recgroup == "Deleted")
         {
-            popup->addButton(tr("Undelete"), this,
-                        SLOT(doUndelete()));
-            popup->addButton(tr("Delete Forever"), this,
-                        SLOT(doDelete()));
+            m_delItem = pginfo;
+            m_popupMenu->AddButton(tr("Undelete"), SLOT(doUndelete()));
+            m_popupMenu->AddButton(tr("Delete Forever"), SLOT(doDelete()));
         }
         else
         {
-            popup->addButton(tr("Delete"), this,
-                        SLOT(askDelete()));
+            m_popupMenu->AddButton(tr("Delete"), SLOT(askDelete()));
         }
     }
-
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-
-    if (!m_player || !m_player->IsSameProgram(0, curitem))
-    {
-        if (playButton)
-            playButton->setFocus();
-    }
-
-    expectingPopup = true;
 }
 
-void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *program)
+void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *pginfo)
 {
-    if (!curitem || !program)
+    if (!pginfo)
         return;
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
-                             drawPopupFgColor, drawPopupBgColor,
-                             drawPopupSelColor, "action popup");
+    QString label = tr("Recording file can not be found");
 
-    QString msg = QObject::tr("Recording Unavailable") + "\n";
-    msg += QObject::tr("The file for this recording can "
-                       "not be found") + "\n";
+    popupString(pginfo, label);
 
-    initPopup(popup, program, "", msg);
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    QAbstractButton *detailsButton;
-    detailsButton = popup->addButton(tr("Show Program Details"), this,
-                                     SLOT(showProgramDetails()));
+    if (m_popupMenu->Create())
+        m_popupStack->AddScreen(m_popupMenu);
 
-    popup->addButton(tr("Delete"), this, SLOT(askDelete()));
+    m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    popup->ShowPopup(this, SLOT(PopupDone(int)));
-
-    detailsButton->setFocus();
-
-    expectingPopup = true;
+    m_popupMenu->AddButton(tr("Show Program Details"),
+                                SLOT(showProgramDetails()));
+    m_popupMenu->AddButton(tr("Delete"), SLOT(askDelete()));
 }
 
-void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
-                            QString message, QString message2)
+void PlaybackBox::popupString(ProgramInfo *program, QString &message)
 {
+    if (!program)
+        return;
+
     QDateTime recstartts = program->recstartts;
     QDateTime recendts = program->recendts;
 
-    QString timedate = recstartts.date().toString(formatLongDate) + QString(", ") +
-                       recstartts.time().toString(formatTime) + QString(" - ") +
-                       recendts.time().toString(formatTime);
+    QString timedate = QString("%1, %2 - %3")
+                        .arg(recstartts.date().toString(m_formatLongDate))
+                        .arg(recstartts.time().toString(m_formatTime))
+                        .arg(recendts.time().toString(m_formatTime));
 
-    QString descrip = program->description;
-    descrip = cutDownString(descrip, &defaultMediumFont, (int)(width() / 2));
-    QString titl = program->title;
-    titl = cutDownString(titl, &defaultBigFont, (int)(width() / 2));
+    QString title = program->title;
 
-    if (message.trimmed().length() > 0)
-        popup->addLabel(message);
-
-    popup->addLabel(program->title, MythPopupBox::Large);
-
-    if ((program->subtitle).trimmed().length() > 0)
-        popup->addLabel("\"" + program->subtitle + "\"\n" + timedate);
-    else
-        popup->addLabel(timedate);
-
-    if (message2.trimmed().length() > 0)
-        popup->addLabel(message2);
-}
-
-void PlaybackBox::cancelPopup(void)
-{
-    popup->hide();
-    expectingPopup = false;
-
-    popup->deleteLater();
-    popup = NULL;
-
-    paintSkipUpdate = false;
-    paintSkipCount = 2;
-
-    activateWindow();
-
-    EmbedTVWindow();
+    message = QString("%1\n%2\n%3").arg(message).arg(title).arg(timedate);
 }
 
 void PlaybackBox::doClearPlaylist(void)
 {
-    if (expectingPopup)
-        cancelPopup();
-
-    playList.clear();
-}
-
-void PlaybackBox::doPlay(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    if (curitem)
-        delete curitem;
-
-    curitem = new ProgramInfo(*delitem);
-
-    playSelected();
+    m_playList.clear();
 }
 
 void PlaybackBox::doPlayFromBeg(void)
 {
-    delitem->setIgnoreBookmark(true);
-    doPlay();
-}
-
-void PlaybackBox::doPIPPlay(void)
-{
-    doPIPPlay(kPIPonTV);
-}
-
-void PlaybackBox::doPBPPlay(void)
-{
-    doPIPPlay(kPBPLeft);
-}
-
-void PlaybackBox::doPIPPlay(PIPState state)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    if (m_player)
-    {
-        accept();
-        m_player->SetNextProgPIPState(state);
-        if (curitem)
-            curitem->setIgnoreBookmark(true);
-    }
+    ProgramInfo *pginfo = CurrentItem();
+    pginfo->setIgnoreBookmark(true);
+    playSelected(m_recordingList->GetItemCurrent());
 }
 
 void PlaybackBox::doPlayList(void)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
     playSelectedPlaylist(false);
 }
 
 
 void PlaybackBox::doPlayListRandom(void)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
     playSelectedPlaylist(true);
 }
 
 void PlaybackBox::askStop(void)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    showDeletePopup(delitem, StopRecording);
+    ProgramInfo *pginfo = CurrentItem();
+    showDeletePopup(pginfo, StopRecording);
 }
 
 void PlaybackBox::doStop(void)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    stop(delitem);
+    ProgramInfo *pginfo = CurrentItem();
+    stop(pginfo);
 }
 
 void PlaybackBox::showProgramDetails()
 {
-    if (!expectingPopup)
+   ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    cancelPopup();
-
-    if (!curitem)
-        return;
-
-    curitem->showDetails();
+    pginfo->showDetails();
 }
 
 void PlaybackBox::doEditScheduled()
 {
-    if (!expectingPopup)
+   ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    cancelPopup();
-
-    if (!curitem)
-        return;
-
-    if (curitem->availableStatus != asAvailable)
+    if (pginfo->availableStatus != asAvailable)
     {
-        showAvailablePopup(curitem);
+        showAvailablePopup(pginfo);
     }
     else
     {
         ScheduledRecording *record = new ScheduledRecording();
-        ProgramInfo *t_pginfo = new ProgramInfo(*curitem);
+        ProgramInfo *t_pginfo = new ProgramInfo(*pginfo);
         record->loadByProgram(t_pginfo);
         record->exec();
         record->deleteLater();
 
-        connected = FillList();
+        // TODO Can this be changed to a cached refill?
+        m_connected = FillList();
         delete t_pginfo;
     }
 
-    EmbedTVWindow();
 }
 
 /** \fn doAllowRerecord
@@ -3503,53 +2529,49 @@ void PlaybackBox::doEditScheduled()
  */
 void PlaybackBox::doAllowRerecord()
 {
-    if (!expectingPopup)
+   ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    cancelPopup();
-
-    if (!curitem)
-        return;
-
-    curitem->ForgetHistory();
-}    
+    pginfo->ForgetHistory();
+}
 
 void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 {
-    if (!expectingPopup)
+   ProgramInfo *pginfo = CurrentItem();
+
+    if (!pginfo)
         return;
 
-    cancelPopup();
+    ProgramInfo *tmpItem = findMatchingProg(pginfo);
 
-    if (!curitem)
-        return;
-
-    ProgramInfo *tmpItem = findMatchingProg(curitem);
-
-    if (JobQueue::IsJobQueuedOrRunning(jobType, curitem->chanid,
-                               curitem->recstartts))
+    if (JobQueue::IsJobQueuedOrRunning(jobType, pginfo->chanid,
+                               pginfo->recstartts))
     {
-        JobQueue::ChangeJobCmds(jobType, curitem->chanid,
-                                curitem->recstartts, JOB_STOP);
+        JobQueue::ChangeJobCmds(jobType, pginfo->chanid,
+                               pginfo->recstartts, JOB_STOP);
         if ((jobType & JOB_COMMFLAG) && (tmpItem))
         {
             tmpItem->programflags &= ~FL_EDITING;
             tmpItem->programflags &= ~FL_COMMFLAG;
         }
-    } else {
-        QString jobHost = "";
+    }
+    else
+    {
+        QString jobHost;
         if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
-            jobHost = curitem->hostname;
+            jobHost = pginfo->hostname;
 
-        JobQueue::QueueJob(jobType, curitem->chanid, curitem->recstartts,
-                           "", "", jobHost, jobFlags);
+        JobQueue::QueueJob(jobType, pginfo->chanid,
+                            pginfo->recstartts, "", "", jobHost,
+                            jobFlags);
     }
 }
 
 void PlaybackBox::doBeginFlagging()
 {
     doJobQueueJob(JOB_COMMFLAG);
-    update(drawListBounds);
 }
 
 void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
@@ -3558,17 +2580,15 @@ void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
     QStringList::Iterator it;
     int jobID;
 
-    if (expectingPopup)
-        cancelPopup();
-
-    for (it = playList.begin(); it != playList.end(); ++it)
+    for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
         jobID = 0;
         tmpItem = findMatchingProg(*it);
         if (tmpItem &&
             (!JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
-                                    tmpItem->recstartts))) {
-            QString jobHost = "";
+                                    tmpItem->recstartts)))
+    {
+            QString jobHost;
             if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
                 jobHost = tmpItem->hostname;
 
@@ -3584,10 +2604,7 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
     QStringList::Iterator it;
     int jobID;
 
-    if (expectingPopup)
-        cancelPopup();
-
-    for (it = playList.begin(); it != playList.end(); ++it)
+    for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
         jobID = 0;
         tmpItem = findMatchingProg(*it);
@@ -3606,23 +2623,11 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
     }
 }
 
-void PlaybackBox::askDelete(void)
+void PlaybackBox::askDelete(ProgramInfo *pginfo)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    showDeletePopup(delitem, DeleteRecording);
-}
-
-void PlaybackBox::noDelete(void)
-{
-    previewSuspend = false;
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
+    if (!pginfo)
+        pginfo = CurrentItem();
+    showDeletePopup(pginfo, DeleteRecording);
 }
 
 void PlaybackBox::doPlaylistDelete(void)
@@ -3637,124 +2642,49 @@ void PlaybackBox::doPlaylistDeleteForgetHistory(void)
 
 void PlaybackBox::playlistDelete(bool forgetHistory)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
     ProgramInfo *tmpItem;
     QStringList::Iterator it;
 
-    for (it = playList.begin(); it != playList.end(); ++it )
+    for (it = m_playList.begin(); it != m_playList.end(); ++it )
     {
         tmpItem = findMatchingProg(*it);
         if (tmpItem && (REC_CAN_BE_DELETED(tmpItem)))
             RemoteDeleteRecording(tmpItem, forgetHistory, false);
     }
 
-    connected = FillList();
-    playList.clear();
+    m_connected = FillList(true);
+    m_playList.clear();
 }
 
 void PlaybackBox::doUndelete(void)
 {
-    if (!expectingPopup)
-    {
-        previewSuspend = false;
-        return;
-    }
+   ProgramInfo *pginfo = CurrentItem();
 
-    cancelPopup();
-    RemoteUndeleteRecording(curitem);
+    if (!pginfo)
+        return;
+
+    RemoteUndeleteRecording(pginfo);
 }
 
-void PlaybackBox::doDelete(void)
+void PlaybackBox::doDelete()
 {
-    if (!expectingPopup)
-    {
-        previewSuspend = false;
-        return;
-    }
-
-    cancelPopup();
-
-    if ((delitem->availableStatus == asPendingDelete) ||
-        (!REC_CAN_BE_DELETED(delitem)))
-    {
-        showAvailablePopup(delitem);
-        previewSuspend = false;
-        return;
-    }
-
-    bool result = doRemove(delitem, false, false);
-
-    if (result)
-    {
-        ProgramInfo *tmpItem = findMatchingProg(delitem);
-        if (tmpItem)
-            tmpItem->availableStatus = asPendingDelete;
-        previewSuspend = false;
-    }
-    else
-        showDeletePopup(delitem, ForceDeleteRecording);
+    doRemove(m_delItem, false, false);
 }
 
-void PlaybackBox::doForceDelete(void)
+void PlaybackBox::doForceDelete()
 {
-    if (!expectingPopup)
-    {
-        previewSuspend = false;
-        return;
-    }
-
-    cancelPopup();
-
-    if ((delitem->availableStatus == asPendingDelete) ||
-        (!REC_CAN_BE_DELETED(delitem)))
-    {
-        showAvailablePopup(delitem);
-        previewSuspend = false;
-        return;
-    }
-
-    doRemove(delitem, true, true);
+    doRemove(m_delItem, true, true);
 }
 
-void PlaybackBox::doDeleteForgetHistory(void)
+void PlaybackBox::doDeleteForgetHistory()
 {
-    if (!expectingPopup)
-    {
-        previewSuspend = false;
-        return;
-    }
-
-    cancelPopup();
-
-    if ((delitem->availableStatus == asPendingDelete) ||
-        (!REC_CAN_BE_DELETED(delitem)))
-    {
-        showAvailablePopup(delitem);
-        previewSuspend = false;
-        return;
-    }
-
-    bool result = doRemove(delitem, true, false);
-
-    if (result)
-    {
-        ProgramInfo *tmpItem = findMatchingProg(delitem);
-        if (tmpItem)
-            tmpItem->availableStatus = asPendingDelete;
-        previewSuspend = false;
-    }
-    else
-        showDeletePopup(delitem, ForceDeleteRecording);
+    doRemove(m_delItem, true, false);
 }
 
-ProgramInfo *PlaybackBox::findMatchingProg(ProgramInfo *pginfo)
+ProgramInfo *PlaybackBox::findMatchingProg(const ProgramInfo *pginfo)
 {
-    ProgramList::iterator it = progLists[""].begin();
-    ProgramList::iterator end = progLists[""].end();
+    ProgramList::iterator it = m_progLists[""].begin();
+    ProgramList::iterator end = m_progLists[""].end();
     for (; it != end; ++it)
     {
         if ((*it)->recstartts == pginfo->recstartts &&
@@ -3767,26 +2697,27 @@ ProgramInfo *PlaybackBox::findMatchingProg(ProgramInfo *pginfo)
     return NULL;
 }
 
-ProgramInfo *PlaybackBox::findMatchingProg(QString key)
+ProgramInfo *PlaybackBox::findMatchingProg(const QString &key)
 {
     QStringList keyParts;
 
-    if ((key == "") || (key.indexOf('_') < 0))
+    if ((key.isEmpty()) || (key.indexOf('_') < 0))
         return NULL;
 
     keyParts = key.split("_");
 
     // ProgramInfo::MakeUniqueKey() has 2 parts separated by '_' characters
-    if (keyParts.count() == 2)
+    if (keyParts.size() == 2)
         return findMatchingProg(keyParts[0], keyParts[1]);
     else
         return NULL;
 }
 
-ProgramInfo *PlaybackBox::findMatchingProg(QString chanid, QString recstartts)
+ProgramInfo *PlaybackBox::findMatchingProg(const QString &chanid,
+                                           const QString &recstartts)
 {
-    ProgramList::iterator it = progLists[""].begin();
-    ProgramList::iterator end = progLists[""].end();
+    ProgramList::iterator it = m_progLists[""].begin();
+    ProgramList::iterator end = m_progLists[""].end();
     for (; it != end; ++it)
     {
         if ((*it)->recstartts.toString(Qt::ISODate) == recstartts &&
@@ -3799,117 +2730,109 @@ ProgramInfo *PlaybackBox::findMatchingProg(QString chanid, QString recstartts)
     return NULL;
 }
 
-void PlaybackBox::setUnwatched(void)
+void PlaybackBox::toggleWatched(void)
 {
-    if (!expectingPopup && delitem)
+    MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
+
+    if (!item)
         return;
 
-    cancelPopup();
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
 
-    delitem->SetWatchedFlag(0);
-
-    ProgramInfo *tmpItem = findMatchingProg(delitem);
-    if (tmpItem)
-        tmpItem->programflags &= ~FL_WATCHED;
-
-    delete delitem;
-    delitem = NULL;
-
-    connected = FillList();
-    update(drawListBounds);
-}
-
-void PlaybackBox::setWatched(void)
-{
-    if (!expectingPopup)
+    if (!pginfo)
         return;
 
-    cancelPopup();
-
-    delitem->SetWatchedFlag(1);
-
-    ProgramInfo *tmpItem = findMatchingProg(delitem);
-    if (tmpItem)
-        tmpItem->programflags |= FL_WATCHED;
-
-    delete delitem;
-    delitem = NULL;
-
-    connected = FillList();
-    update(drawListBounds);
-}
-
-void PlaybackBox::toggleAutoExpire(bool turnOn)
-{
-    if (!expectingPopup)
-        return;
-
-    ProgramInfo *tmpItem = findMatchingProg(delitem);
-
-    if (tmpItem)
+    if (pginfo)
     {
-        tmpItem->SetAutoExpire(turnOn, true);
+        bool on = !(pginfo->programflags & FL_WATCHED);
 
-        if (turnOn)
-            tmpItem->programflags |= FL_AUTOEXP;
+        pginfo->SetWatchedFlag(on);
+
+        if (on)
+            pginfo->programflags |= FL_WATCHED;
         else
-            tmpItem->programflags &= ~FL_AUTOEXP;
+            pginfo->programflags &= ~FL_WATCHED;
 
-        update(drawListBounds);
+        item->DisplayState("on", "watched");
+        updateIcons(pginfo);
+
+        // A refill affects the responsiveness of the UI and we only
+        // need to rebuild the list if the watch list is displayed
+        if (m_viewMask & VIEW_WATCHLIST)
+            m_connected = FillList(true);
     }
 }
 
-void PlaybackBox::togglePreserveEpisode(bool turnOn)
+void PlaybackBox::toggleAutoExpire()
 {
-    if (!expectingPopup)
+    MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
+
+    if (!item)
         return;
 
-    ProgramInfo *tmpItem = findMatchingProg(delitem);
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
 
-    if (tmpItem)
+    if (!pginfo)
+        return;
+
+    if (pginfo)
     {
-        if (tmpItem->availableStatus != asAvailable)
-            showAvailablePopup(tmpItem);
+        bool on = !(pginfo->programflags & FL_AUTOEXP);
+        pginfo->SetAutoExpire(on, true);
+
+        if (on)
+            pginfo->programflags |= FL_AUTOEXP;
         else
-            tmpItem->SetPreserveEpisode(turnOn);
+            pginfo->programflags &= ~FL_AUTOEXP;
+
+        item->DisplayState("off", "expiry");
+        updateIcons(pginfo);
     }
 }
 
-void PlaybackBox::PopupDone(int r)
+void PlaybackBox::togglePreserveEpisode()
 {
-    if ((MythDialog::Rejected == r) && expectingPopup)
-        cancelPopup();
+    MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+
+    if (!pginfo)
+        return;
+
+    if (pginfo)
+    {
+        bool on = !(pginfo->programflags & FL_PRESERVED);
+        pginfo->SetPreserveEpisode(on);
+
+        if (on)
+            pginfo->programflags |= FL_PRESERVED;
+        else
+            pginfo->programflags &= ~FL_PRESERVED;
+
+        item->DisplayState("on", "preserve");
+        updateIcons(pginfo);
+    }
 }
 
 void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
 {
     if (setOn)
-        viewMask = (ViewMask)(viewMask | itemMask);
+        m_viewMask = (ViewMask)(m_viewMask | itemMask);
     else
-        viewMask = (ViewMask)(viewMask & ~itemMask);
+        m_viewMask = (ViewMask)(m_viewMask & ~itemMask);
 
-    connected = FillList(true);
-    paintSkipUpdate = false;
-    update(drawTotalBounds);
-}
-
-void PlaybackBox::UpdateProgressBar(void)
-{
-    update(drawUsageBounds);
+    m_connected = FillList(true);
 }
 
 void PlaybackBox::togglePlayListTitle(void)
 {
-    if (expectingPopup)
-        cancelPopup();
+    QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
 
-    if (!curitem)
-        return;
-
-    QString currentTitle = titleList[titleIndex].toLower();
-
-    ProgramList::iterator it = progLists[currentTitle].begin();
-    ProgramList::iterator end = progLists[currentTitle].end();
+    ProgramList::iterator it = m_progLists[groupname].begin();
+    ProgramList::iterator end = m_progLists[groupname].end();
     for (; it != end; ++it)
     {
         if (*it && ((*it)->availableStatus == asAvailable))
@@ -3919,25 +2842,26 @@ void PlaybackBox::togglePlayListTitle(void)
 
 void PlaybackBox::togglePlayListItem(void)
 {
-    if (expectingPopup)
-        cancelPopup();
+    MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
 
-    if (!curitem)
+    if (!item)
         return;
 
-    if (curitem->availableStatus != asAvailable)
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+
+    if (!pginfo)
+        return;
+
+    if (pginfo->availableStatus != asAvailable)
     {
-        showAvailablePopup(curitem);
+        showAvailablePopup(pginfo);
         return;
     }
 
-    togglePlayListItem(curitem);
+    togglePlayListItem(pginfo);
 
-    if (!inTitle)
-        cursorDown();
-
-    paintSkipUpdate = false;
-    update(drawListBounds);
+    if (GetFocusWidget() == m_recordingList)
+        m_recordingList->MoveDown(MythUIButtonList::MoveItem);
 }
 
 void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
@@ -3953,85 +2877,32 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
 
     QString key = pginfo->MakeUniqueKey();
 
-    if (playList.filter(key).count())
+    MythUIButtonListItem *item =
+                    m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+
+    if (m_playList.filter(key).size())
     {
+        if (item)
+          item->DisplayState("no", "playlist");
+
         QStringList tmpList;
         QStringList::Iterator it;
 
-        tmpList = playList;
-        playList.clear();
+        tmpList = m_playList;
+        m_playList.clear();
 
         for (it = tmpList.begin(); it != tmpList.end(); ++it )
         {
             if (*it != key)
-                playList << *it;
+                m_playList << *it;
         }
     }
     else
     {
-        playList << key;
+        if (item)
+          item->DisplayState("yes", "playlist");
+        m_playList << key;
     }
-
-    paintSkipUpdate = false;
-    update(drawListBounds);
-}
-
-void PlaybackBox::timeout(void)
-{
-    if (titleList.count() <= 1)
-        return;
-
-    if (previewPlayer)
-    {
-        if (expectingPopup ||
-            !(this == gContext->GetMainWindow()->currentWidget()))
-        {
-            // don't do anything while in another widget
-            // like program details window.
-            return;
-        }
-        else if (!previewPlayer->nvp)
-        {
-            if (previewPixmapEnabled)
-            {
-                previewPixmapEnabled = false;
-                previewVideoStartTimer->start(1);
-                paintSkipUpdate = false;
-                update(blackholeBounds);
-            }
-            else
-            {
-                startPlayer(curitem);
-            }
-        }
-        else
-        {
-            stopPlayer();
-        }
-    }
-}
-
-void PlaybackBox::refreshVideo(void)
-{
-    if (previewPlayer && previewPlayer->nvp)
-    {
-        if (!previewPlayer->nvp->IsPlaying())
-            stopPlayer();
-        else if (previewPlayer->nvp->UsingNullVideo())
-            update(blackholeBounds);
-    }
-}
-
-/**
- * \brief stops preview playback. return back to pixmap.
- * do not rerun preview player.
- * spares your logs from filling up if you leave
- * mythtv in preview playback mode
- */
-void PlaybackBox::finishedPreview(void)
-{
-    previewVideoStopTimer->stop();
-    stopPlayer();
 }
 
 void PlaybackBox::processNetworkControlCommands(void)
@@ -4039,26 +2910,26 @@ void PlaybackBox::processNetworkControlCommands(void)
     int commands = 0;
     QString command;
 
-    ncLock.lock();
-    commands = networkControlCommands.size();
-    ncLock.unlock();
+    m_ncLock.lock();
+    commands = m_networkControlCommands.size();
+    m_ncLock.unlock();
 
     while (commands)
     {
-        ncLock.lock();
-        command = networkControlCommands.front();
-        networkControlCommands.pop_front();
-        ncLock.unlock();
+        m_ncLock.lock();
+        command = m_networkControlCommands.front();
+        m_networkControlCommands.pop_front();
+        m_ncLock.unlock();
 
         processNetworkControlCommand(command);
 
-        ncLock.lock();
-        commands = networkControlCommands.size();
-        ncLock.unlock();
+        m_ncLock.lock();
+        commands = m_networkControlCommands.size();
+        m_ncLock.unlock();
     }
 }
 
-void PlaybackBox::processNetworkControlCommand(QString command)
+void PlaybackBox::processNetworkControlCommand(const QString &command)
 {
     QStringList tokens = command.simplified().split(" ");
 
@@ -4070,10 +2941,9 @@ void PlaybackBox::processNetworkControlCommand(QString command)
                     QString("NetworkControl: Trying to %1 program '%2' @ '%3'")
                             .arg(tokens[1]).arg(tokens[3]).arg(tokens[4]));
 
-            if (playingSomething)
+            if (m_playingSomething)
             {
-                VERBOSE(VB_IMPORTANT,
-                        "NetworkControl: ERROR: Already playing");
+                VERBOSE(VB_IMPORTANT, "NetworkControl: ERROR: Already playing");
 
                 MythEvent me("NETWORK_CONTROL RESPONSE ERROR: Unable to play, "
                              "player is already playing another recording.");
@@ -4086,20 +2956,17 @@ void PlaybackBox::processNetworkControlCommand(QString command)
 
             if (tmpItem)
             {
-                if (curitem)
-                    delete curitem;
-
-                curitem = tmpItem;
+                m_recordingList->SetValueByData(tmpItem);
 
                 MythEvent me("NETWORK_CONTROL RESPONSE OK");
                 gContext->dispatch(me);
 
                 if (tokens[1] == "PLAY")
-                    curitem->setIgnoreBookmark(true);
+                    tmpItem->setIgnoreBookmark(true);
 
-                underNetworkControl = true;
-                playSelected();
-                underNetworkControl = false;
+                m_underNetworkControl = true;
+                playSelected(m_recordingList->GetItemCurrent());
+                m_underNetworkControl = false;
             }
             else
             {
@@ -4114,78 +2981,78 @@ void PlaybackBox::processNetworkControlCommand(QString command)
     }
 }
 
-void PlaybackBox::keyPressEvent(QKeyEvent *e)
+bool PlaybackBox::keyPressEvent(QKeyEvent *event)
 {
-    bool handled = false;
-
-    if (ignoreKeyPressEvents)
-        return;
-
     // This should be an impossible keypress we've simulated
-    if ((e->key() == Qt::Key_LaunchMedia) &&
-        (e->modifiers() == 
+    if ((event->key() == Qt::Key_LaunchMedia) &&
+        (event->modifiers() ==
          (Qt::ShiftModifier |
           Qt::ControlModifier |
           Qt::AltModifier |
           Qt::MetaModifier |
           Qt::KeypadModifier)))
     {
-        e->accept();
-        ncLock.lock();
-        int commands = networkControlCommands.size();
-        ncLock.unlock();
+        event->accept();
+        m_ncLock.lock();
+        int commands = m_networkControlCommands.size();
+        m_ncLock.unlock();
         if (commands)
             processNetworkControlCommands();
-        return;
+        return true;
     }
 
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
-    stopPlayer();
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE")
-            exitWin();
-        else if (action == "1" || action == "HELP")
+        if (action == "1" || action == "HELP")
             showIconHelp();
         else if (action == "MENU")
             showMenu();
+        else if (action == "ESCAPE")
+        {
+            if (GetFocusWidget() == m_recordingList)
+            {
+                SwitchList();
+            }
+            else
+                handled = false;
+        }
         else if (action == "NEXTFAV")
         {
-            if (inTitle)
+            if (GetFocusWidget() == m_groupList)
                 togglePlayListTitle();
             else
                 togglePlayListItem();
         }
         else if (action == "TOGGLEFAV")
         {
-            playList.clear();
-            connected = FillList(true);
-            paintSkipUpdate = false;
-            update(drawTotalBounds);
+            m_playList.clear();
+            m_connected = FillList(true);
         }
         else if (action == "TOGGLERECORD")
         {
-            viewMask = viewMaskToggle(viewMask, VIEW_TITLES);
-            connected = FillList(true);
-            paintSkipUpdate = false;
-            update(drawTotalBounds);
+            m_viewMask = m_viewMaskToggle(m_viewMask, VIEW_TITLES);
+            m_connected = FillList(true);
         }
         else if (action == "CHANGERECGROUP")
-            showRecGroupChooser();
+            showGroupFilter();
         else if (action == "CHANGEGROUPVIEW")
             showViewChanger();
-        else if (titleList.count() > 1)
+        else if (m_titleList.size() > 1)
         {
             if (action == "DELETE")
-                deleteSelected();
+                deleteSelected(m_recordingList->GetItemCurrent());
             else if (action == "PLAYBACK")
-                playSelected();
+                playSelected(m_recordingList->GetItemCurrent());
             else if (action == "INFO")
                 showActionsSelected();
             else if (action == "DETAILS")
@@ -4194,51 +3061,24 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 customEdit();
             else if (action == "UPCOMING")
                 upcoming();
-            else if (action == "SELECT")
-                selected();
-            else if (action == "UP")
-                cursorUp();
-            else if (action == "DOWN")
-                cursorDown();
-            else if (action == "LEFT")
-                cursorLeft();
-            else if (action == "RIGHT")
-                cursorRight();
-            else if (action == "PAGEUP")
-                pageUp();
-            else if (action == "PAGEDOWN")
-                pageDown();
-            else if (action == "PAGETOP")
-                pageTop();
-            else if (action == "PAGEMIDDLE")
-                pageMiddle();
-            else if (action == "PAGEBOTTOM")
-                pageBottom();
-            else if (action == "PREVVIEW")
-                cursorUp(false, true);
-            else if (action == "NEXTVIEW")
-                cursorDown(false, true);
             else
                 handled = false;
         }
         else
-        {
-            if (action == "LEFT" && arrowAccel)
-                exitWin();
-            else
-                handled = false;
-        }
+            handled = false;
     }
 
-    if (!handled)
-        MythDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
-void PlaybackBox::customEvent(QEvent *e)
+void PlaybackBox::customEvent(QEvent *event)
 {
-    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)e;
+        MythEvent *me = (MythEvent *)event;
         QString message = me->Message();
 
         if (message.left(21) == "RECORDING_LIST_CHANGE")
@@ -4246,46 +3086,57 @@ void PlaybackBox::customEvent(QEvent *e)
             QStringList tokens = message.simplified().split(" ");
             if (tokens.size() == 1)
             {
-                fillListFromCache = false;
-                if (!fillListTimer->isActive())
+                m_fillListFromCache = false;
+                if (!m_fillListTimer->isActive())
                 {
-                    fillListTimer->stop();
-                    fillListTimer->setSingleShot(true);
-                    fillListTimer->start(1000);
+                    m_fillListTimer->stop();
+                    m_fillListTimer->setSingleShot(true);
+                    m_fillListTimer->start(1000);
                 }
             }
             else if ((tokens[1] == "DELETE") && (tokens.size() == 4))
             {
-                progCacheLock.lock();
-                if (!progCache)
+                m_freeSpaceNeedsUpdate = true;
+                m_progCacheLock.lock();
+                if (!m_progCache)
                 {
-                    progCacheLock.unlock();
-                    freeSpaceNeedsUpdate = true;
-                    fillListFromCache = false;
-                    fillListTimer->stop();
-                    fillListTimer->setSingleShot(true);
-                    fillListTimer->start(1000);
+                    m_progCacheLock.unlock();
+                    m_freeSpaceNeedsUpdate = true;
+                    m_fillListFromCache = false;
+                    m_fillListTimer->stop();
+                    m_fillListTimer->setSingleShot(true);
+                    m_fillListTimer->start(1000);
                     return;
                 }
-                vector<ProgramInfo *>::iterator i = progCache->begin();
-                for ( ; i != progCache->end(); i++)
+                vector<ProgramInfo *>::iterator i = m_progCache->begin();
+                for ( ; i != m_progCache->end(); i++)
                 {
                    if (((*i)->chanid == tokens[2]) &&
                        ((*i)->recstartts.toString(Qt::ISODate) == tokens[3]))
                    {
-                       (*i)->availableStatus = asDeleted;
-                       break;
+                        // We've set this recording to be deleted locally
+                        // it's no longer in the recording list, so don't
+                        // trigger a list reload which would cause a UI lag
+                        if ((*i)->availableStatus == asPendingDelete
+                             && m_currentGroup != m_watchGroupLabel)
+                        {
+                            (*i)->availableStatus = asDeleted;
+                            m_progCacheLock.unlock();
+                            return;
+                        }
+                        else
+                            (*i)->availableStatus = asDeleted;
+                        break;
                    }
                 }
 
-                progCacheLock.unlock();
-                freeSpaceNeedsUpdate = true;
-                if (!fillListTimer->isActive())
+                m_progCacheLock.unlock();
+                if (!m_fillListTimer->isActive())
                 {
-                    fillListFromCache = true;
-                    fillListTimer->stop();
-                    fillListTimer->setSingleShot(true);
-                    fillListTimer->start(1000);
+                    m_fillListFromCache = true;
+                    m_fillListTimer->stop();
+                    m_fillListTimer->setSingleShot(true);
+                    m_fillListTimer->start(1000);
                 }
             }
         }
@@ -4294,9 +3145,9 @@ void PlaybackBox::customEvent(QEvent *e)
             QStringList tokens = message.simplified().split(" ");
             if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
             {
-                ncLock.lock();
-                networkControlCommands.push_back(message);
-                ncLock.unlock();
+                m_ncLock.lock();
+                m_networkControlCommands.push_back(message);
+                m_ncLock.unlock();
 
                 // This should be an impossible keypress we're simulating
                 QKeyEvent *event;
@@ -4348,31 +3199,31 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
 
 void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)
 {
-    QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
+    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
 
-    QMutexLocker locker(&previewGeneratorLock);
-    vector<QString> &q = previewGeneratorQueue;
+    QMutexLocker locker(&m_previewGeneratorLock);
+    vector<QString> &q = m_previewGeneratorQueue;
     vector<QString>::iterator it = std::find(q.begin(), q.end(), fn);
     if (it != q.end())
         q.erase(it);
 
-    PreviewMap::iterator pit = previewGenerator.find(fn);
-    if (pit != previewGenerator.end() && (*pit).gen && !(*pit).genStarted)
+    PreviewMap::iterator pit = m_previewGenerator.find(fn);
+    if (pit != m_previewGenerator.end() && (*pit).gen && !(*pit).genStarted)
         q.push_back(fn);
 }
 
 void PlaybackBox::UpdatePreviewGeneratorThreads(void)
 {
-    QMutexLocker locker(&previewGeneratorLock);
-    vector<QString> &q = previewGeneratorQueue;
-    if ((previewGeneratorRunning < previewGeneratorMaxRunning) && q.size())
+    QMutexLocker locker(&m_previewGeneratorLock);
+    vector<QString> &q = m_previewGeneratorQueue;
+    if ((m_previewGeneratorRunning < PREVIEW_GEN_MAX_RUN) && q.size())
     {
         QString fn = q.back();
         q.pop_back();
-        PreviewMap::iterator it = previewGenerator.find(fn);
-        if (it != previewGenerator.end() && (*it).gen && !(*it).genStarted)
+        PreviewMap::iterator it = m_previewGenerator.find(fn);
+        if (it != m_previewGenerator.end() && (*it).gen && !(*it).genStarted)
         {
-            previewGeneratorRunning++;
+            m_previewGeneratorRunning++;
             (*it).gen->Start();
             (*it).genStarted = true;
         }
@@ -4385,21 +3236,21 @@ void PlaybackBox::UpdatePreviewGeneratorThreads(void)
  */
 bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 {
-    QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
-    QMutexLocker locker(&previewGeneratorLock);
+    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
+    QMutexLocker locker(&m_previewGeneratorLock);
 
     if (!g)
     {
-        previewGeneratorRunning = max(0, (int)previewGeneratorRunning - 1);
-        PreviewMap::iterator it = previewGenerator.find(fn);
-        if (it == previewGenerator.end())
+        m_previewGeneratorRunning = qMax(0, (int)m_previewGeneratorRunning - 1);
+        PreviewMap::iterator it = m_previewGenerator.find(fn);
+        if (it == m_previewGenerator.end())
             return false;
 
         (*it).gen        = NULL;
         (*it).genStarted = false;
         (*it).ready      = false;
         (*it).lastBlockTime =
-            max(PreviewGenState::minBlockSeconds, (*it).lastBlockTime * 2);
+            qMax(PreviewGenState::minBlockSeconds, (*it).lastBlockTime * 2);
         (*it).blockRetryUntil =
             QDateTime::currentDateTime().addSecs((*it).lastBlockTime);
 
@@ -4407,13 +3258,13 @@ bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
     }
 
     g->AttachSignals(this);
-    previewGenerator[fn].gen = g;
-    previewGenerator[fn].genStarted = false;
-    previewGenerator[fn].ready = false;
+    m_previewGenerator[fn].gen = g;
+    m_previewGenerator[fn].genStarted = false;
+    m_previewGenerator[fn].ready = false;
 
-    previewGeneratorLock.unlock();
+    m_previewGeneratorLock.unlock();
     IncPreviewGeneratorPriority(xfn);
-    previewGeneratorLock.lock();
+    m_previewGeneratorLock.lock();
 
     return true;
 }
@@ -4425,10 +3276,10 @@ bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 bool PlaybackBox::IsGeneratingPreview(const QString &xfn, bool really) const
 {
     PreviewMap::const_iterator it;
-    QMutexLocker locker(&previewGeneratorLock);
+    QMutexLocker locker(&m_previewGeneratorLock);
 
-    QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
-    if ((it = previewGenerator.find(fn)) == previewGenerator.end())
+    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
+    if ((it = m_previewGenerator.find(fn)) == m_previewGenerator.end())
         return false;
 
     if (really)
@@ -4446,9 +3297,9 @@ bool PlaybackBox::IsGeneratingPreview(const QString &xfn, bool really) const
  */
 uint PlaybackBox::IncPreviewGeneratorAttempts(const QString &xfn)
 {
-    QMutexLocker locker(&previewGeneratorLock);
-    QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
-    return previewGenerator[fn].attempts++;
+    QMutexLocker locker(&m_previewGeneratorLock);
+    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
+    return m_previewGenerator[fn].attempts++;
 }
 
 void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
@@ -4458,39 +3309,32 @@ void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
 }
 
 /** \fn PlaybackBox::previewReady(const ProgramInfo*)
- *  \brief Callback used by PreviewGenerator to tell us a preview
+ *  \brief Callback used by PreviewGenerator to tell us a m_preview
  *         we requested has been returned from the backend.
- *  \param pginfo ProgramInfo describing the preview.
+ *  \param pginfo ProgramInfo describing the previewed recording.
  */
 void PlaybackBox::previewReady(const ProgramInfo *pginfo)
 {
     QString xfn = pginfo->pathname + ".png";
-    QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
+    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
 
-    previewGeneratorLock.lock();
-    PreviewMap::iterator it = previewGenerator.find(fn);
-    if (it != previewGenerator.end())
+    m_previewGeneratorLock.lock();
+    PreviewMap::iterator it = m_previewGenerator.find(fn);
+    if (it != m_previewGenerator.end())
     {
         (*it).ready         = true;
         (*it).attempts      = 0;
         (*it).lastBlockTime = 0;
     }
-    previewGeneratorLock.unlock();
+    m_previewGeneratorLock.unlock();
 
-    // If we are still displaying this preview update it.
-    if (pginfo->recstartts  == previewStartts &&
-        pginfo->chanid      == previewChanid  &&
-        previewLastModified == previewFilets  &&
-        titleList.count() > 1)
+    if (m_titleList.size() > 1)
     {
-        if (previewPixmap)
-        {
-            delete previewPixmap;
-            previewPixmap = NULL;
-        }
-
-        // ask for repaint
-        update(blackholeBounds);
+        ProgramInfo *tmpInfo = findMatchingProg(pginfo);
+        MythUIButtonListItem *item =
+                    m_recordingList->GetItemByData(qVariantFromValue(tmpInfo));
+        if (item)
+            item->SetImage(getPreviewImage(tmpInfo), "preview");
     }
 }
 
@@ -4498,78 +3342,32 @@ bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)
 {
     LastCheckedMap::iterator it = elapsedtime.find(filename);
 
-    if (it != elapsedtime.end() && ((*it).elapsed() < 250))
+    if (it != elapsedtime.end() && ((*it).elapsed() < 300))
         return false;
 
     elapsedtime[filename].restart();
     return true;
 }
 
-static QSize calc_preview_size(const QSize &bounds, const QSize &imageSize)
+QString PlaybackBox::getPreviewImage(ProgramInfo *pginfo)
 {
-    if ((bounds.width() == imageSize.width()) &&
-        (imageSize.height() <= bounds.height()))
-    {
-        return imageSize;
-    }
+    QString filename;
 
-    float boundsaspect  = 4.0f / 3.0f;
-    float imageaspect   = 4.0f / 3.0f;
-    QSize previewSize   = bounds;
+    if (!pginfo || pginfo->availableStatus == asPendingDelete)
+        return filename;
 
-    if ((bounds.width() > 0) && (bounds.height() > 0))
-        boundsaspect = ((float)bounds.width()) / ((float)bounds.height());
+    filename = pginfo->GetPlaybackURL() + ".png";
 
-    if ((imageSize.width() > 0) && (imageSize.height() > 0))
-        imageaspect = ((float)imageSize.width()) / ((float)imageSize.height());
+    IncPreviewGeneratorPriority(filename);
 
-    // Calculate new height or width according to relative aspect ratio
-    if ((int)((boundsaspect + 0.05f) * 10) >
-        (int)((imageaspect  + 0.05f) * 10))
-    {
-        float scaleratio = imageaspect / boundsaspect;
-        previewSize.setWidth((int)(previewSize.width() * scaleratio));
-    }
-    else if ((int)((boundsaspect + 0.05f) * 10) <
-             (int)((imageaspect + 0.05f) * 10))
-    {
-        float scaleratio = boundsaspect / imageaspect;
-        previewSize.setHeight((int)(previewSize.height() * scaleratio));
-    }
+    bool check_date = check_lastmod(m_previewLastModifyCheck, filename);
 
-    // Ensure preview width/height are multiples of 8 to match
-    // the preview video
-    //previewwidth = ((previewwidth + 7) / 8) * 8;
-    //previewheight = ((previewheight + 7) / 8) * 8;
-
-    return previewSize;
-}
-
-QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
-{
-    QPixmap retpixmap;
-
-    if (!previewPixmapEnabled || !pginfo)
-        return retpixmap;
-
-    if ((asPendingDelete == pginfo->availableStatus) || previewSuspend)
-    {
-        if (previewPixmap)
-            retpixmap = *previewPixmap;
-
-        return retpixmap;
-    }
-
-    QString filename = pginfo->pathname + ".png";
-    bool check_date = check_lastmod(previewLastModifyCheck, filename);
+    QDateTime previewLastModified;
 
     if (check_date)
         previewLastModified = getPreviewLastModified(pginfo);
 
-    IncPreviewGeneratorPriority(filename);
-
-    if (previewFromBookmark &&
-        check_date &&
+    if (m_previewFromBookmark && check_date &&
         (!previewLastModified.isValid() ||
          (previewLastModified <  pginfo->lastmodified &&
           previewLastModified >= pginfo->recendts)) &&
@@ -4577,26 +3375,11 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo) &&
         !IsGeneratingPreview(filename))
     {
-        VERBOSE(VB_PLAYBACK, QString("Starting preview generator ") +
-                QString("%1 && (%2 || ((%3<%4)->%5 && (%6>=%7)->%8)) && ")
-                .arg(previewFromBookmark)
-                .arg(!previewLastModified.isValid())
-                .arg(previewLastModified.toString(Qt::ISODate))
-                .arg(pginfo->lastmodified.toString(Qt::ISODate))
-                .arg(previewLastModified <  pginfo->lastmodified)
-                .arg(previewLastModified.toString(Qt::ISODate))
-                .arg(pginfo->recendts.toString(Qt::ISODate))
-                .arg(previewLastModified >= pginfo->recendts) +
-                QString("%1 && %2 && %3")
-                .arg(!pginfo->IsEditing())
-                .arg(!JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo))
-                .arg(!IsGeneratingPreview(filename)));
-
         uint attempts = IncPreviewGeneratorAttempts(filename);
         if (attempts < PreviewGenState::maxAttempts)
         {
             PreviewGenerator::Mode mode =
-                (PreviewGenerator::Mode) previewGeneratorMode;
+                (PreviewGenerator::Mode) m_previewGeneratorMode;
             SetPreviewGenerator(filename, new PreviewGenerator(pginfo, mode));
         }
         else if (attempts == PreviewGenState::maxAttempts)
@@ -4608,156 +3391,848 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         }
 
         if (attempts >= PreviewGenState::maxAttempts)
-            return retpixmap;
+            return filename;
     }
 
     UpdatePreviewGeneratorThreads();
 
-    // Check and see if we've already tried this one.
-    if (previewPixmap &&
-        pginfo->recstartts == previewStartts &&
-        pginfo->chanid == previewChanid &&
-        previewLastModified == previewFilets)
+    // Image is local
+    if (QFileInfo(filename).exists())
+        return filename;
+
+    // If this is a remote frontend then check the remote file cache
+    QString cachefile = QString("%1/remotecache/%3").arg(GetConfDir())
+                                                .arg(filename.section('/', -1));
+    QFileInfo cachefileinfo(cachefile);
+    if (!cachefileinfo.exists() ||
+        previewLastModified.addSecs(-60) > cachefileinfo.lastModified())
     {
-        return *previewPixmap;
-    }
-
-    paintSkipUpdate = false; // repaint background next time around
-
-    if (previewPixmap)
-    {
-        delete previewPixmap;
-        previewPixmap = NULL;
-    }
-
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    previewPixmap = GetMythUI()->LoadScalePixmap(filename, true /*fromcache*/);
-    if (previewPixmap)
-    {
-        previewStartts = pginfo->recstartts;
-        previewChanid = pginfo->chanid;
-        previewFilets = previewLastModified;
-        QSize previewSize = calc_preview_size(
-            blackholeBounds.size(), previewPixmap->size());
-        if (previewSize != previewPixmap->size())
+        if (!IsGeneratingPreview(filename))
         {
-            QPixmap tmp(previewSize);
+            uint attempts = IncPreviewGeneratorAttempts(filename);
+            if (attempts < PreviewGenState::maxAttempts)
             {
-                QPainter p(&tmp);
-                p.drawPixmap(0,0,*previewPixmap, 0, 0,
-                             min(tmp.width(), previewPixmap->width()),
-                             min(tmp.height(), previewPixmap->height()));
+                SetPreviewGenerator(filename, new PreviewGenerator(pginfo,
+                                (PreviewGenerator::Mode)m_previewGeneratorMode));
             }
-            *previewPixmap = tmp;
-        }
-        retpixmap = *previewPixmap;
-        return retpixmap;
-    }
-
-    //if this is a remote frontend, then we need to refresh the pixmap
-    //if another frontend has already regenerated the stale pixmap on the disk
-    bool refreshPixmap      = (previewLastModified >= previewFilets);
-
-    QImage *image = NULL;
-    if (!IsGeneratingPreview(filename, true))
-        image = (QImage*)gContext->CacheRemotePixmap(filename, refreshPixmap);
-
-    // If the image is not available remotely either, we need to generate it.
-    if (!image && !IsGeneratingPreview(filename))
-    {
-        uint attempts = IncPreviewGeneratorAttempts(filename);
-        if (attempts < PreviewGenState::maxAttempts)
-        {
-            VERBOSE(VB_PLAYBACK, "Starting preview generator");
-            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, (PreviewGenerator::Mode)previewGeneratorMode));
-        }
-        else if (attempts == PreviewGenState::maxAttempts)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Attempted to generate preview for '%1' "
-                            "%2 times, giving up.")
-                    .arg(filename).arg(PreviewGenState::maxAttempts));
-
-            return retpixmap;
+            else if (attempts == PreviewGenState::maxAttempts)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("Attempted to generate m_preview for '%1' "
+                                "%2 times, giving up.")
+                        .arg(filename).arg(PreviewGenState::maxAttempts));
+            }
         }
     }
 
-    if (image)
-    {
-        previewPixmap = new QPixmap();
+    if (cachefileinfo.exists())
+        return cachefile;
 
-        QSize previewSize = calc_preview_size(
-            blackholeBounds.size(), image->size());
-
-        if (previewSize == previewPixmap->size())
-            *previewPixmap = QPixmap::fromImage(*image);
-        else
-        {
-            QImage tmp2 = image->scaled(previewSize, 
-                            Qt::IgnoreAspectRatio,
-                            Qt::SmoothTransformation);
-            *previewPixmap = QPixmap::fromImage(tmp2);
-        }
-    }
-
-    if (!previewPixmap)
-    {
-        previewPixmap = new QPixmap((int)(blackholeBounds.width()),
-                                    (int)(blackholeBounds.height()));
-        previewPixmap->fill(Qt::black);
-    }
-
-    retpixmap = *previewPixmap;
-    previewStartts = pginfo->recstartts;
-    previewChanid = pginfo->chanid;
-    previewFilets = previewLastModified;
-
-    return retpixmap;
+    return "";
 }
 
 void PlaybackBox::showIconHelp(void)
 {
-    if (expectingPopup)
-       cancelPopup();
+    HelpPopup *helpPopup = new HelpPopup(m_popupStack);
 
-    LayerSet *container = NULL;
-    if (type != Delete)
-        container = theme->GetSet("program_info_play");
+    if (helpPopup->Create())
+        m_popupStack->AddScreen(helpPopup);
     else
-        container = theme->GetSet("program_info_del");
+        delete helpPopup;
+}
 
-    if (!container)
+void PlaybackBox::showViewChanger(void)
+{
+    ChangeView *viewPopup = new ChangeView(m_popupStack, this, m_viewMask);
+
+    if (viewPopup->Create())
+    {
+        connect(viewPopup, SIGNAL(result(int)), SLOT(saveViewChanges(int)));
+        m_popupStack->AddScreen(viewPopup);
+    }
+    else
+        delete viewPopup;
+}
+
+void PlaybackBox::saveViewChanges(int viewMask)
+{
+    if (viewMask == VIEW_NONE)
+        viewMask = VIEW_TITLES;
+    gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)viewMask);
+    gContext->SaveSetting("PlaybackWatchList",
+                                            (bool)(viewMask & VIEW_WATCHLIST));
+    m_viewMask = (ViewMask)viewMask;
+}
+
+void PlaybackBox::showGroupFilter(void)
+{
+    QString dispGroup = ProgramInfo::i18n(m_recGroup);
+
+    QStringList groupNames;
+    QStringList displayNames;
+    QStringList groups;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    bool liveTVInAll = gContext->GetNumSetting("LiveTVInAllPrograms",0);
+
+    QMap<QString,QString> recGroupType;
+
+    uint items = 0;
+    uint totalItems = 0;
+    QString itemStr;
+
+    // Add the group entries
+    displayNames.append(QString("------- %1 -------").arg(tr("Groups")));
+    groupNames.append("");
+
+    // Find each recording group, and the number of recordings in each
+    query.prepare("SELECT recgroup, COUNT(title) FROM recorded "
+                  "WHERE deletepending = 0 GROUP BY recgroup");
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            dispGroup = query.value(0).toString();
+            items     = query.value(1).toInt();
+            itemStr   = (items == 1) ? tr("item") : tr("items");
+
+            if ((dispGroup != "LiveTV" || liveTVInAll) &&
+                (dispGroup != "Deleted"))
+                totalItems += items;
+
+            groupNames.append(dispGroup);
+
+            dispGroup = (dispGroup == "Default") ? tr("Default") : dispGroup;
+            dispGroup = (dispGroup == "Deleted") ? tr("Deleted") : dispGroup;
+            dispGroup = (dispGroup == "LiveTV")  ? tr("LiveTV")  : dispGroup;
+
+            displayNames.append(QString("%1 [%2 %3]").arg(dispGroup).arg(items)
+                                .arg(itemStr));
+
+            recGroupType[query.value(0).toString()] = "recgroup";
+        }
+    }
+
+    // Create and add the "All Programs" entry
+    itemStr = (totalItems == 1) ? tr("item") : tr("items");
+    displayNames.prepend(QString("%1 [%2 %3]")
+                        .arg(ProgramInfo::i18n("All Programs"))
+                        .arg(totalItems).arg(itemStr));
+    groupNames.prepend("All Programs");
+    recGroupType["All Programs"] = "recgroup";
+
+    // Find each category, and the number of recordings in each
+    query.prepare("SELECT DISTINCT category, COUNT(title) FROM recorded "
+                  "WHERE deletepending = 0 GROUP BY category");
+    if (query.exec())
+    {
+        int unknownCount = 0;
+        while (query.next())
+        {
+            items     = query.value(1).toInt();
+            itemStr   = (items == 1) ? tr("item") : tr("items");
+
+            dispGroup = query.value(0).toString();
+            if (dispGroup.isEmpty())
+            {
+                unknownCount += items;
+                dispGroup = tr("Unknown");
+            }
+            else if (dispGroup == tr("Unknown"))
+                unknownCount += items;
+
+            if ((!recGroupType.contains(dispGroup)) &&
+                (dispGroup != tr("Unknown")))
+            {
+                groups += QString("%1 [%2 %3]").arg(dispGroup)
+                                  .arg(items).arg(itemStr);
+
+                recGroupType[dispGroup] = "category";
+            }
+        }
+
+        if (unknownCount > 0)
+        {
+            dispGroup = tr("Unknown");
+            items     = unknownCount;
+            itemStr   = (items == 1) ? tr("item") : tr("items");
+            groups += QString("%1 [%2 %3]").arg(dispGroup)
+                              .arg(items).arg(itemStr);
+
+            recGroupType[dispGroup] = "category";
+        }
+    }
+
+    // Add the category entries
+    displayNames.append(QString("------- %1 -------").arg(tr("Categories")));
+    groupNames.append("");
+    groups.sort();
+    QStringList::iterator it;
+    for (it = groups.begin(); it != groups.end(); it++)
+    {
+        displayNames.append(*it);
+        groupNames.append(*it);
+    }
+
+    QString label = tr("Change Filter");
+
+    GroupSelector *recGroupPopup = new GroupSelector(m_popupStack, label,
+                                                     displayNames, groupNames,
+                                                     m_recGroup);
+
+    if (recGroupPopup->Create())
+    {
+        connect(recGroupPopup, SIGNAL(result(QString)),
+                SLOT(displayRecGroup(QString)));
+        m_popupStack->AddScreen(recGroupPopup);
+    }
+    else
+        delete recGroupPopup;
+}
+
+void PlaybackBox::setGroupFilter(const QString &recGroup)
+{
+    QString newRecGroup = recGroup;
+
+    if (newRecGroup.isEmpty())
         return;
 
-    QGridLayout *grid = new QGridLayout();
-    grid->setSpacing((int)(5 * wmult));
+    if (newRecGroup == ProgramInfo::i18n("Default"))
+        newRecGroup = "Default";
+    else if (newRecGroup == ProgramInfo::i18n("All Programs"))
+        newRecGroup = "All Programs";
+    else if (newRecGroup == ProgramInfo::i18n("LiveTV"))
+        newRecGroup = "LiveTV";
+    else if (m_recGroup == ProgramInfo::i18n("Deleted"))
+        newRecGroup = "Deleted";
 
-    QLabel *label = new QLabel(tr("Status Icons"));
-    label->setObjectName("status_icons");
+    m_curGroupPassword = m_recGroupPassword;
 
-    QFont font = label->font();
-    font.setPointSize(int (font.pointSize() * 1.5));
-    font.setBold(true);
-    label->setFont(font);
+    m_recGroup = newRecGroup;
 
-    QPalette p = label->palette();
-    p.setColor(label->foregroundRole(), drawPopupFgColor);
-    label->setPalette(p);
+    if (m_groupnameAsAllProg)
+        m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
-    label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
-    //label->setMinimumWidth((int)(600 * wmult));
-    //label->setMaximumWidth((int)(600 * wmult));
-    label->setMinimumHeight((int)(35 * hmult));
-    label->setMaximumHeight((int)(35 * hmult));
+    m_connected = FillList(true);
 
-    grid->addWidget(label,
-                    /*row beg */ 0, /*col beg */ 0,
-                    /*row span*/ 1, /*col span*/ 4,
-                    Qt::AlignHCenter | Qt::AlignVCenter);
+    // Don't save anything if we forced a new group
+    if (!newRecGroup.isEmpty())
+        return;
+
+    if (gContext->GetNumSetting("RememberRecGroup",1))
+        gContext->SaveSetting("DisplayRecGroup", m_recGroup);
+
+    if (m_recGroupType[m_recGroup] == "recgroup")
+        gContext->SaveSetting("DisplayRecGroupIsCategory", 0);
+    else
+        gContext->SaveSetting("DisplayRecGroupIsCategory", 1);
+}
+
+QString PlaybackBox::getRecGroupPassword(const QString &group)
+{
+    return m_recGroupPwCache[group];
+}
+
+void PlaybackBox::fillRecGroupPasswordCache(void)
+{
+    m_recGroupPwCache.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recgroup, password FROM recgrouppassword "
+                  "WHERE password IS NOT NULL AND password <> '';");
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            QString recgroup = query.value(0).toString();
+
+            if (recgroup == ProgramInfo::i18n("Default"))
+                recgroup = "Default";
+            else if (recgroup == ProgramInfo::i18n("All Programs"))
+                recgroup = "All Programs";
+            else if (recgroup == ProgramInfo::i18n("LiveTV"))
+                recgroup = "LiveTV";
+            else if (m_recGroup == ProgramInfo::i18n("Deleted"))
+                recgroup = "Deleted";
+
+            m_recGroupPwCache[recgroup] = query.value(1).toString();
+        }
+    }
+
+    m_recGroupPwCache["All Programs"] =
+                                gContext->GetSetting("AllRecGroupPassword", "");
+}
+
+void PlaybackBox::doPlaylistChangeRecGroup(void)
+{
+    // If m_delItem is not NULL, then the Recording Group changer will operate
+    // on just that recording, otherwise it operates on the items in theplaylist
+    if (m_delItem)
+    {
+        delete m_delItem;
+        m_delItem = NULL;
+    }
+
+    showRecGroupChanger();
+}
+
+void PlaybackBox::showRecGroupChanger(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT recgroup, COUNT(title) FROM recorded "
+        "WHERE deletepending = 0 GROUP BY recgroup ORDER BY recgroup");
+
+    QStringList groupNames;
+    QStringList displayNames;
+    QString selected = "";
+
+    QString itemStr;
+    QString dispGroup;
+
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            dispGroup = query.value(0).toString();
+
+            groupNames.append(dispGroup);
+
+            if (dispGroup == "Default")
+                dispGroup = tr("Default");
+            else if (dispGroup == "LiveTV")
+                dispGroup = tr("LiveTV");
+            else if (dispGroup == "Deleted")
+                dispGroup = tr("Deleted");
+
+            if (query.value(1).toInt() == 1)
+                itemStr = tr("item");
+            else
+                itemStr = tr("items");
+
+            displayNames.append(QString("%1 [%2 %3]").arg(dispGroup)
+                              .arg(query.value(1).toInt()).arg(itemStr));
+        }
+    }
+
+    ProgramInfo *pginfo = CurrentItem();
+    selected = pginfo->recgroup;
+
+    QString label = tr("Select Recording Group");
+
+    popupString(pginfo, label);
+
+    GroupSelector *rgChanger = new GroupSelector(m_popupStack, label,
+                                                 displayNames, groupNames,
+                                                 selected);
+
+    if (rgChanger->Create())
+    {
+        connect(rgChanger, SIGNAL(result(QString)), SLOT(setRecGroup(QString)));
+        m_popupStack->AddScreen(rgChanger);
+    }
+    else
+        delete rgChanger;
+}
+
+void PlaybackBox::doPlaylistChangePlayGroup(void)
+{
+    // If m_delItem is not NULL, then the Playback Group changer will operate
+    // on just that recording, otherwise it operates on the items in theplaylist
+    if (m_delItem)
+    {
+        delete m_delItem;
+        m_delItem = NULL;
+    }
+
+    showPlayGroupChanger();
+}
+
+void PlaybackBox::showPlayGroupChanger(void)
+{
+    QStringList groupNames;
+    QStringList displayNames;
+    QString selected = "";
+
+    displayNames.append(tr("Default"));
+    groupNames.append("Default");
+
+    QStringListIterator it(PlayGroup::GetNames());
+    while (it.hasNext())
+    {
+        QString group = it.next();
+        displayNames.append(group);
+        groupNames.append(group);
+    }
+
+    ProgramInfo *pginfo = CurrentItem();
+    selected = pginfo->playgroup;
+
+    QString label = tr("Select Playback Group");
+
+    popupString(pginfo, label);
+
+    GroupSelector *pgChanger = new GroupSelector(m_popupStack, label,
+                                                 displayNames, groupNames,
+                                                 selected);
+
+    if (pgChanger->Create())
+    {
+        connect(pgChanger, SIGNAL(result(QString)),
+                SLOT(setPlayGroup(QString)));
+        m_popupStack->AddScreen(pgChanger);
+    }
+    else
+        delete pgChanger;
+}
+
+void PlaybackBox::showMetadataEditor()
+{
+    ProgramInfo *pgInfo = CurrentItem();
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    RecMetadataEdit *editMetadata = new RecMetadataEdit(mainStack, pgInfo);
+
+    if (editMetadata->Create())
+    {
+        connect(editMetadata, SIGNAL(result(const QString &, const QString &)),
+                SLOT(saveRecMetadata(const QString &, const QString &)));
+        mainStack->AddScreen(editMetadata);
+    }
+    else
+        delete editMetadata;
+}
+
+void PlaybackBox::saveRecMetadata(const QString &newTitle,
+                                  const QString &newSubtitle)
+{
+    MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
+
+    if (!pginfo)
+        return;
+
+    QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
+
+    if (groupname != pginfo->title)
+    {
+        QString tempSubTitle = newTitle;
+        if (!newSubtitle.trimmed().isEmpty())
+            tempSubTitle = QString("%1 - \"%2\"")
+                            .arg(tempSubTitle).arg(newSubtitle);
+
+        pginfo->ApplyRecordRecTitleChange(newTitle, newSubtitle);
+        item->SetText(tempSubTitle, "titlesubtitle");
+        item->SetText(newTitle, "title");
+        item->SetText(newSubtitle, "subtitle");
+
+        updateProgramInfo(item);
+    }
+    else
+        m_recordingList->RemoveItem(item);
+}
+
+void PlaybackBox::setRecGroup(QString newRecGroup)
+{
+    ProgramInfo *tmpItem = CurrentItem();
+
+    if (newRecGroup.isEmpty() || !tmpItem)
+        return;
+
+    if (m_playList.size() > 0)
+    {
+        QStringList::Iterator it;
+
+        for (it = m_playList.begin(); it != m_playList.end(); ++it )
+        {
+            tmpItem = findMatchingProg(*it);
+            if (tmpItem)
+            {
+                if ((tmpItem->recgroup == "LiveTV") && (newRecGroup != "LiveTV"))
+                    tmpItem->SetAutoExpire(
+                        gContext->GetNumSetting("AutoExpireDefault", 0));
+                else if ((tmpItem->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
+                    tmpItem->SetAutoExpire(kLiveTVAutoExpire);
+
+                tmpItem->ApplyRecordRecGroupChange(newRecGroup);
+            }
+        }
+        m_playList.clear();
+    }
+    else
+    {
+        if ((tmpItem->recgroup == "LiveTV") && (newRecGroup != "LiveTV"))
+            tmpItem->SetAutoExpire(gContext->GetNumSetting("AutoExpireDefault", 0));
+        else if ((tmpItem->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
+            tmpItem->SetAutoExpire(kLiveTVAutoExpire);
+
+        tmpItem->ApplyRecordRecGroupChange(newRecGroup);
+    }
+
+    // TODO May not rebuild the list here, check current filter and removeitem
+    //      if it shouldn't be visible any more
+    FillList(true);
+}
+
+void PlaybackBox::setPlayGroup(QString newPlayGroup)
+{
+    ProgramInfo *tmpItem = CurrentItem();
+
+    if (newPlayGroup.isEmpty() || !tmpItem)
+        return;
+
+    if (newPlayGroup == tr("Default"))
+        newPlayGroup = "Default";
+
+    if (m_playList.size() > 0)
+    {
+        QStringList::Iterator it;
+
+        for (it = m_playList.begin(); it != m_playList.end(); ++it )
+        {
+            tmpItem = findMatchingProg(*it);
+            if (tmpItem)
+                tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
+        }
+        m_playList.clear();
+    }
+    else if (tmpItem)
+        tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
+}
+
+void PlaybackBox::showRecGroupPasswordChanger(void)
+{
+    MythUIButtonListItem *item = m_groupList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    QString recgroup = item->GetData().toString();
+    QString currentPassword = getRecGroupPassword(m_recGroup);
+
+    PasswordChange *pwChanger = new PasswordChange(m_popupStack,
+                                                   currentPassword);
+
+    if (pwChanger->Create())
+    {
+        connect(pwChanger, SIGNAL(result(const QString &)),
+                SLOT(SetRecGroupPassword(const QString &)));
+        m_popupStack->AddScreen(pwChanger);
+    }
+    else
+        delete pwChanger;
+}
+
+void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
+{
+    if (m_recGroup == "All Programs")
+    {
+        gContext->SaveSetting("AllRecGroupPassword", newPassword);
+    }
+    else
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("DELETE FROM recgrouppassword "
+                           "WHERE recgroup = :RECGROUP ;");
+        query.bindValue(":RECGROUP", m_recGroup);
+
+        query.exec();
+
+        if (!newPassword.isEmpty())
+        {
+            query.prepare("INSERT INTO recgrouppassword "
+                          "(recgroup, password) VALUES "
+                          "( :RECGROUP , :PASSWD )");
+            query.bindValue(":RECGROUP", m_recGroup);
+            query.bindValue(":PASSWD", newPassword);
+
+            query.exec();
+        }
+    }
+
+    m_recGroupPassword = newPassword;
+}
+
+void PlaybackBox::clearProgramCache(void)
+{
+    if (!m_progCache)
+        return;
+
+    vector<ProgramInfo *>::iterator i = m_progCache->begin();
+    for ( ; i != m_progCache->end(); i++)
+        delete *i;
+    delete m_progCache;
+    m_progCache = NULL;
+}
+
+///////////////////////////////////////////////////
+
+GroupSelector::GroupSelector(MythScreenStack *lparent, const QString &label,
+                             const QStringList &list, const QStringList &data,
+                             const QString &selected)
+            : MythScreenType(lparent, "groupselector"), m_label(label),
+              m_List(list), m_Data(data), m_selected(selected)
+{
+}
+
+bool GroupSelector::Create()
+{
+    if (!LoadWindowFromXML("recordings-ui.xml", "groupselector", this))
+        return false;
+
+    MythUIText *labelText = dynamic_cast<MythUIText*> (GetChild("label"));
+    MythUIButtonList *groupList = dynamic_cast<MythUIButtonList*>
+                                        (GetChild("groups"));
+
+    if (!groupList)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing 'groups' button list.");
+        return false;
+    }
+
+    if (labelText)
+        labelText->SetText(m_label);
+
+    for (int i = 0; i < m_List.size(); ++i)
+    {
+        new MythUIButtonListItem(groupList, m_List.at(i),
+                                 qVariantFromValue(m_Data.at(i)));
+    }
+
+    // Set the current position in the list
+    groupList->SetValueByData(qVariantFromValue(m_selected));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    connect(groupList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            SLOT(AcceptItem(MythUIButtonListItem *)));
+
+    return true;
+}
+
+void GroupSelector::AcceptItem(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    QString group = item->GetData().toString();
+    emit result(group);
+    Close();
+}
+
+////////////////////////////////////////////////
+
+ChangeView::ChangeView(MythScreenStack *lparent, MythScreenType *parentscreen,
+                       int viewMask)
+                : MythScreenType(lparent, "changeview"),
+                   m_parentScreen(parentscreen), m_viewMask(viewMask)
+{
+}
+
+bool ChangeView::Create()
+{
+    if (!LoadWindowFromXML("recordings-ui.xml", "changeview", this))
+        return false;
+
+    MythUICheckBox *checkBox;
+
+    checkBox = dynamic_cast<MythUICheckBox*>(GetChild("titles"));
+    if (m_viewMask & PlaybackBox::VIEW_TITLES)
+        checkBox->SetCheckState(MythUIStateType::Full);
+    connect(checkBox, SIGNAL(toggled(bool)),
+            m_parentScreen, SLOT(toggleTitleView(bool)));
+
+    checkBox = dynamic_cast<MythUICheckBox*>(GetChild("categories"));
+    if (m_viewMask & PlaybackBox::VIEW_CATEGORIES)
+        checkBox->SetCheckState(MythUIStateType::Full);
+    connect(checkBox, SIGNAL(toggled(bool)),
+            m_parentScreen, SLOT(toggleCategoryView(bool)));
+
+    checkBox = dynamic_cast<MythUICheckBox*>(GetChild("recgroups"));
+    if (m_viewMask & PlaybackBox::VIEW_RECGROUPS)
+        checkBox->SetCheckState(MythUIStateType::Full);
+    connect(checkBox, SIGNAL(toggled(bool)),
+            m_parentScreen, SLOT(toggleRecGroupView(bool)));
+
+    // TODO Do we need two separate settings to determine whether the watchlist
+    //      is shown? The filter setting be enough?
+    checkBox = dynamic_cast<MythUICheckBox*>(GetChild("watchlist"));
+    if (m_viewMask & PlaybackBox::VIEW_WATCHLIST)
+        checkBox->SetCheckState(MythUIStateType::Full);
+    connect(checkBox, SIGNAL(toggled(bool)),
+            m_parentScreen, SLOT(toggleWatchListView(bool)));
+
+    checkBox = dynamic_cast<MythUICheckBox*>(GetChild("searches"));
+    if (m_viewMask & PlaybackBox::VIEW_SEARCHES)
+        checkBox->SetCheckState(MythUIStateType::Full);
+    connect(checkBox, SIGNAL(toggled(bool)),
+            m_parentScreen, SLOT(toggleSearchView(bool)));
+
+    // TODO Do we need two separate settings to determine whether livetv
+    //      recordings are shown? Same issue as the watchlist above
+
+    //if ((m_recGroup == "All Programs") &&
+    //    (gContext->GetNumSetting("LiveTVInAllPrograms",0)))
+    //{
+        checkBox = dynamic_cast<MythUICheckBox*>(GetChild("livetv"));
+        if (checkBox)
+        {
+            if (m_viewMask & PlaybackBox::VIEW_LIVETVGRP)
+                checkBox->SetCheckState(MythUIStateType::Full);
+            connect(checkBox, SIGNAL(toggled(bool)),
+                    m_parentScreen, SLOT(toggleLiveTVView(bool)));
+        }
+    //}
+
+    MythUIButton *savebutton = dynamic_cast<MythUIButton*>(GetChild("save"));
+    connect(savebutton, SIGNAL(Clicked()), SLOT(SaveChanges()));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    return true;
+}
+
+void ChangeView::SaveChanges()
+{
+    emit result(m_viewMask);
+}
+
+////////////////////////////////////////////////
+
+PasswordChange::PasswordChange(MythScreenStack *lparent, QString oldpassword)
+                : MythScreenType(lparent, "passwordchanger"),
+                    m_oldPassword(oldpassword)
+{
+    m_oldPasswordEdit = m_newPasswordEdit = NULL;
+    m_okButton = NULL;
+}
+
+bool PasswordChange::Create()
+{
+    if (!LoadWindowFromXML("recordings-ui.xml", "passwordchanger", this))
+        return false;
+
+    m_oldPasswordEdit = dynamic_cast<MythUITextEdit *>(GetChild("oldpassword"));
+    m_newPasswordEdit = dynamic_cast<MythUITextEdit *>(GetChild("newpassword"));
+    m_okButton = dynamic_cast<MythUIButton *>(GetChild("ok"));
+
+    if (!m_oldPasswordEdit || !m_newPasswordEdit || !m_okButton)
+    {
+        VERBOSE(VB_IMPORTANT, "Window 'passwordchanger' is missing required "
+                              "elements.");
+        return false;
+    }
+
+    m_oldPasswordEdit->SetPassword(true);
+    m_newPasswordEdit->SetPassword(true);
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    connect(m_oldPasswordEdit, SIGNAL(valueChanged()),
+                               SLOT(OldPasswordChanged()));
+    connect(m_okButton, SIGNAL(Clicked()), SLOT(SendResult()));
+
+    return true;
+}
+
+void PasswordChange::OldPasswordChanged()
+{
+    QString newText = m_oldPasswordEdit->GetText();
+    bool ok = (newText == m_oldPassword);
+    m_okButton->SetEnabled(ok);
+}
+
+
+void PasswordChange::SendResult()
+{
+    emit result(m_newPasswordEdit->GetText());
+    Close();
+}
+
+////////////////////////////////////////////////////////
+
+RecMetadataEdit::RecMetadataEdit(MythScreenStack *lparent, ProgramInfo *pginfo)
+                : MythScreenType(lparent, "recmetadataedit"),
+                    m_progInfo(pginfo)
+{
+    m_titleEdit = m_subtitleEdit = NULL;
+}
+
+bool RecMetadataEdit::Create()
+{
+    if (!LoadWindowFromXML("recordings-ui.xml", "editmetadata", this))
+        return false;
+
+    m_titleEdit = dynamic_cast<MythUITextEdit*>(GetChild("title"));
+    m_subtitleEdit = dynamic_cast<MythUITextEdit*>(GetChild("subtitle"));
+    MythUIButton *okButton = dynamic_cast<MythUIButton*>(GetChild("ok"));
+
+    if (!m_titleEdit || !m_subtitleEdit || !okButton)
+    {
+        VERBOSE(VB_IMPORTANT, "Window 'editmetadata' is missing required "
+                              "elements.");
+        return false;
+    }
+
+    m_titleEdit->SetText(m_progInfo->title);
+    m_subtitleEdit->SetText(m_progInfo->subtitle);
+
+    connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    return true;
+}
+
+void RecMetadataEdit::SaveChanges()
+{
+    QString newRecTitle = m_titleEdit->GetText();
+    QString newRecSubtitle = m_subtitleEdit->GetText();
+
+    if (newRecTitle.isEmpty())
+        return;
+
+    emit result(newRecTitle, newRecSubtitle);
+    Close();
+}
+
+//////////////////////////////////////////
+
+HelpPopup::HelpPopup(MythScreenStack *lparent)
+                : MythScreenType(lparent, "helppopup")
+{
+
+}
+
+bool HelpPopup::Create()
+{
+    if (!LoadWindowFromXML("recordings-ui.xml", "iconhelp", this))
+        return false;
+
+    MythUIButtonList *iconList = dynamic_cast<MythUIButtonList*>
+                                                        (GetChild("icons"));
+
+    if (!iconList)
+    {
+        VERBOSE(VB_IMPORTANT, "Window 'iconhelp' is missing required "
+                              "elements.");
+        return false;
+    }
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 
     QMap <QString, QString>::iterator it;
     QMap <QString, QString> iconMap;
@@ -4784,963 +4259,18 @@ void PlaybackBox::showIconHelp(void)
     iconMap["watched"]     = tr("Recording has been watched");
     iconMap["preserved"]   = tr("Recording is preserved");
 
-    bool displayme = false;
-
-    int curRow = 1;
-    int curCol = 0;
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
     {
-        UIImageType *itype = (UIImageType*)container->GetType(it.key());
-        if (!itype)
-            continue;
-
-        displayme = true;
-
-        if (curCol == 0)
+        MythUIImage *iconImage = dynamic_cast<MythUIImage*>(GetChild(it.key()));
+        if (iconImage)
         {
-            label = new QLabel(*it);
-            label->setObjectName("nopopsize0");
-        }
-        else
-        {
-            label = new QLabel(*it);
-            label->setObjectName("nopopsize1");
-        }
-
-        label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-
-        QPalette p = label->palette();
-        p.setColor(label->foregroundRole(), drawPopupFgColor);
-        label->setPalette(p);
-
-        label->setMinimumHeight((int)(40 * hmult));
-        label->setMaximumHeight((int)(45 * hmult));
-
-        grid->addWidget(label, curRow, curCol + 1, Qt::AlignLeft);
-
-        label = new QLabel();
-        label->setObjectName("nopopsize2");
-
-        itype->ResetFilename();
-        itype->LoadImage();
-
-        label->setPixmap(itype->GetImage());
-
-        p = label->palette();
-        p.setColor(label->foregroundRole(), drawPopupFgColor);
-        label->setPalette(p);
-        grid->addWidget(label, curRow, curCol, Qt::AlignCenter);
-
-        curCol += 2;
-        curCol %= 4;
-        if (curCol == 0)
-            curRow++;
-    }
-
-    if (!displayme)
-    {
-        grid->deleteLater();
-        return;
-    }
-
-    QFrame *widget = new QFrame();
-    QBoxLayout *blah = new QBoxLayout(QBoxLayout::TopToBottom);
-    blah->addLayout(grid);
-    widget->setLayout(blah);
-
-    MythPopupBox *iconhelp = new MythPopupBox(
-        gContext->GetMainWindow(), true, drawPopupFgColor,
-        drawPopupBgColor, drawPopupSelColor, "icon help");
-
-    iconhelp->addWidget(widget);
-
-    QAbstractButton *button = iconhelp->addButton(
-        tr("Ok"), iconhelp, SLOT(accept()));
-    button->setFocus();
-
-    iconhelp->ExecPopup();
-
-    iconhelp->hide();
-    iconhelp->deleteLater();
-
-    paintSkipUpdate = false;
-    paintSkipCount = 2;
-
-    activateWindow();
-}
-
-void PlaybackBox::initRecGroupPopup(QString title, QString name)
-{
-    if (recGroupPopup)
-        closeRecGroupPopup();
-
-    recGroupPopup = new MythPopupBox(gContext->GetMainWindow(), true,
-                                     drawPopupFgColor, drawPopupBgColor,
-                                     drawPopupSelColor,
-                                     name.toLocal8Bit().constData());
-
-    QLabel *label = recGroupPopup->addLabel(title, MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter);
-
-    stopPlayer();
-}
-
-void PlaybackBox::closeRecGroupPopup(bool refreshList)
-{
-    if (!recGroupPopup)
-        return;
-
-    recGroupPopup->hide();
-    recGroupPopup->deleteLater();
-
-    recGroupPopup = NULL;
-    recGroupLineEdit = NULL;
-    recGroupListBox = NULL;
-    recGroupOldPassword = NULL;
-    recGroupNewPassword = NULL;
-    recGroupOkButton = NULL;
-
-    if (refreshList)
-        connected = FillList(true);
-
-    paintSkipUpdate = false;
-    paintSkipCount = 2;
-
-    activateWindow();
-
-    EmbedTVWindow();
-
-    if (delitem)
-    {
-        delete delitem;
-        delitem = NULL;
-    }
-}
-
-void PlaybackBox::showViewChanger(void)
-{
-    ViewMask savedMask = viewMask;
-
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    initRecGroupPopup(tr("Group View"), "showViewChanger");
-
-    MythCheckBox *checkBox;
-
-    checkBox = new MythCheckBox(tr("Show Titles"), recGroupPopup);
-    checkBox->setChecked(viewMask & VIEW_TITLES);
-    connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(toggleTitleView(bool)));
-    recGroupPopup->addWidget(checkBox, false);
-    checkBox->setFocus();
-
-    checkBox = new MythCheckBox(tr("Show Categories"), recGroupPopup);
-    checkBox->setChecked(viewMask & VIEW_CATEGORIES);
-    connect(checkBox, SIGNAL(toggled(bool)), this,
-            SLOT(toggleCategoryView(bool)));
-    recGroupPopup->addWidget(checkBox, false);
-
-    checkBox = new MythCheckBox(tr("Show Recording Groups"), recGroupPopup);
-    checkBox->setChecked(viewMask & VIEW_RECGROUPS);
-    connect(checkBox, SIGNAL(toggled(bool)), this,
-            SLOT(toggleRecGroupView(bool)));
-    recGroupPopup->addWidget(checkBox, false);
-
-    checkBox = new MythCheckBox(tr("Show Watch List"), recGroupPopup);
-    checkBox->setChecked(viewMask & VIEW_WATCHLIST);
-    connect(checkBox, SIGNAL(toggled(bool)), this,
-            SLOT(toggleWatchListView(bool)));
-    recGroupPopup->addWidget(checkBox, false);
-
-    checkBox = new MythCheckBox(tr("Show Searches"), recGroupPopup);
-    checkBox->setChecked(viewMask & VIEW_SEARCHES);
-    connect(checkBox, SIGNAL(toggled(bool)), this,
-            SLOT(toggleSearchView(bool)));
-    recGroupPopup->addWidget(checkBox, false);
-
-    if ((recGroup == "All Programs") &&
-        (gContext->GetNumSetting("LiveTVInAllPrograms",0)))
-    {
-        checkBox = new MythCheckBox(tr("Show LiveTV as a Group"),
-                                    recGroupPopup);
-        checkBox->setChecked(viewMask & VIEW_LIVETVGRP);
-        connect(checkBox, SIGNAL(toggled(bool)), this,
-                SLOT(toggleLiveTVView(bool)));
-        recGroupPopup->addWidget(checkBox, false);
-    }
-
-    MythPushButton *okbutton = new MythPushButton(recGroupPopup);
-    okbutton->setText(tr("Save Current View"));
-    recGroupPopup->addWidget(okbutton);
-    connect(okbutton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
-
-    MythPushButton *exitbutton = new MythPushButton(recGroupPopup);
-    exitbutton->setText(tr("Cancel"));
-    recGroupPopup->addWidget(exitbutton);
-    connect(exitbutton, SIGNAL(clicked()), recGroupPopup, SLOT(reject()));
-
-    DialogCode result = recGroupPopup->ExecPopup();
-
-    if (result != MythDialog::Rejected)
-    {
-        if (viewMask == VIEW_NONE)
-            viewMask = VIEW_TITLES;
-        connected = FillList(true);
-        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)viewMask);
-        gContext->SaveSetting("PlaybackWatchList",
-            (bool)(viewMask & VIEW_WATCHLIST));
-    }
-    else
-    {
-        viewMask = savedMask;
-        connected = FillList(true);
-        paintSkipUpdate = false;
-        update(drawTotalBounds);
-    }
-
-    closeRecGroupPopup(result != MythDialog::Rejected);
-}
-
-void PlaybackBox::showRecGroupChooser(void)
-{
-    // This is contrary to other code because the option to display this
-    // box when starting the Playbackbox means expectingPopup will not be
-    // set, nor is there a popup to be canceled as is normally the case
-    if (expectingPopup)
-       cancelPopup();
-
-    initRecGroupPopup(tr("Select Group Filter"), "showRecGroupChooser");
-
-    QStringList groups;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString itemStr;
-    QString dispGroup;
-    QString saveRecGroup = recGroup;
-    int items;
-    int totalItems = 0;
-    bool liveTVInAll = gContext->GetNumSetting("LiveTVInAllPrograms",0);
-
-    recGroupType.clear();
-
-    recGroupListBox = new MythListBox(recGroupPopup);
-
-    // Find each recording group, and the number of recordings in each
-    query.prepare(
-        "SELECT recgroup, COUNT(title) "
-        "FROM recorded "
-        "WHERE deletepending = 0 "
-        "GROUP BY recgroup");
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            dispGroup = query.value(0).toString();
-            items     = query.value(1).toInt();
-            itemStr   = (items == 1) ? tr("item") : tr("items");
-
-            if ((dispGroup != "LiveTV" || liveTVInAll) &&
-                (dispGroup != "Deleted"))
-                totalItems += items;
-
-            dispGroup = (dispGroup == "Default") ? tr("Default") : dispGroup;
-            dispGroup = (dispGroup == "Deleted") ? tr("Deleted") : dispGroup;
-            dispGroup = (dispGroup == "LiveTV")  ? tr("LiveTV")  : dispGroup;
-
-            groups += QString("%1 [%2 %3]").arg(dispGroup)
-                              .arg(items).arg(itemStr);
-
-            recGroupType[query.value(0).toString()] = "recgroup";
+            //MythUIButtonListItem *item = new MythUIButtonListItem(iconList,
+            //                                                      it.value());
+            //item->SetImage();
         }
     }
 
-    // Create and add the "All Programs" entry
-    itemStr = (totalItems == 1) ? tr("item") : tr("items");
-    recGroupListBox->insertItem(QString("%1 [%2 %3]")
-                                .arg(ProgramInfo::i18n("All Programs"))
-                                .arg(totalItems).arg(itemStr));
-    recGroupType["All Programs"] = "recgroup";
-
-    // Add the group entries
-    recGroupListBox->insertItem(QString("------- %1 -------")
-                                        .arg(tr("Groups")));
-    groups.sort();
-    recGroupListBox->insertStringList(groups);
-    groups.clear();
-
-    // Find each category, and the number of recordings in each
-    query.prepare(
-        "SELECT DISTINCT category, COUNT(title) "
-        "FROM recorded "
-        "WHERE deletepending = 0 "
-        "GROUP BY category");
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        int unknownCount = 0;
-        while (query.next())
-        {
-            items     = query.value(1).toInt();
-            itemStr   = (items == 1) ? tr("item") : tr("items");
-
-            dispGroup = query.value(0).toString();
-            if (dispGroup == "")
-            {
-                unknownCount += items;
-                dispGroup = tr("Unknown");
-            }
-            else if (dispGroup == tr("Unknown"))
-                unknownCount += items;
-
-            if ((!recGroupType.contains(dispGroup)) &&
-                (dispGroup != tr("Unknown")))
-            {
-                groups += QString("%1 [%2 %3]").arg(dispGroup)
-                                  .arg(items).arg(itemStr);
-
-                recGroupType[dispGroup] = "category";
-            }
-        }
-
-        if (unknownCount)
-        {
-            dispGroup = tr("Unknown");
-            items     = unknownCount;
-            itemStr   = (items == 1) ? tr("item") : tr("items");
-            groups += QString("%1 [%2 %3]").arg(dispGroup)
-                              .arg(items).arg(itemStr);
-
-            recGroupType[dispGroup] = "category";
-        }
-    }
-
-    // Add the category entries
-    recGroupListBox->insertItem(QString("------- %1 -------")
-                                .arg(tr("Categories")));
-    groups.sort();
-    recGroupListBox->insertStringList(groups);
-
-    // Now set up the widget
-    recGroupPopup->addWidget(recGroupListBox);
-    recGroupListBox->setFocus();
-
-    // figure out what our recGroup is called in the recGroupPopup
-    dispGroup = ProgramInfo::i18n(recGroup);
-
-    // select the recGroup in the dialog
-    int index = recGroupListBox->index(recGroupListBox->findItems(dispGroup));
-    if (index < 0)
-        index = 0;
-
-    recGroupListBox->setCurrentRow(index, QItemSelectionModel::Select);
-
-    recGroupLastItem = recGroupListBox->currentRow();
-
-    connect(recGroupListBox, SIGNAL(accepted(int)),
-            recGroupPopup,   SLOT(AcceptItem(int)));
-    connect(recGroupListBox, SIGNAL(currentRowChanged(int)),
-            this, SLOT(recGroupChooserListBoxChanged()));
-
-    DialogCode result = recGroupPopup->ExecPopup();
-
-    if (result != MythDialog::Rejected)
-        setGroupFilter();
-
-    closeRecGroupPopup(result != MythDialog::Rejected);
-
-    if (result != MythDialog::Rejected)
-    {
-        progIndex = 0;
-        titleIndex = 0;
-    }
-}
-
-void PlaybackBox::recGroupChooserListBoxChanged(void)
-{
-    if (!recGroupListBox)
-        return;
-
-    QString item = recGroupListBox->currentText().section(" [", 0, 0);
-
-    if (item.left(5) == "-----")
-    {
-        int thisItem = recGroupListBox->currentRow();
-        if ((recGroupLastItem > thisItem) && (thisItem > 0))
-        {
-            recGroupListBox->setCurrentRow(
-                thisItem - 1, QItemSelectionModel::Select);
-        }
-        else if ((thisItem > recGroupLastItem) &&
-                 (thisItem < (recGroupListBox->count() - 1)))
-        {
-            recGroupListBox->setCurrentRow(
-                thisItem + 1, QItemSelectionModel::Select);
-        }
-    }
-    recGroupLastItem = recGroupListBox->currentRow();
-}
-
-void PlaybackBox::setGroupFilter(QString newRecGroup)
-{
-    QString savedPW = recGroupPassword;
-    QString savedRecGroup = recGroup;
-
-    if (newRecGroup != "")
-        recGroup = newRecGroup;
-    else if (recGroupListBox)
-        recGroup = recGroupListBox->currentText().section(" [", 0, 0);
-    else
-        return;
-
-    if (recGroup == ProgramInfo::i18n("Default"))
-        recGroup = "Default";
-    else if (recGroup == ProgramInfo::i18n("All Programs"))
-        recGroup = "All Programs";
-    else if (recGroup == ProgramInfo::i18n("LiveTV"))
-        recGroup = "LiveTV";
-    else if (recGroup == ProgramInfo::i18n("Deleted"))
-        recGroup = "Deleted";
-
-    recGroupPassword = getRecGroupPassword(recGroup);
-
-    if (recGroupPassword != "" )
-    {
-
-        bool ok = false;
-        QString text = tr("Password:");
-
-        MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok,
-                                                     recGroupPassword,
-                                                     gContext->GetMainWindow());
-        pwd->exec();
-        pwd->deleteLater();
-        if (!ok)
-        {
-            recGroupPassword = savedPW;
-            recGroup = savedRecGroup;
-            return;
-        }
-
-        curGroupPassword = recGroupPassword;
-    } else
-        curGroupPassword = "";
-
-    if (groupnameAsAllProg)
-        groupDisplayName = ProgramInfo::i18n(recGroup);
-
-    // Don't save anything if we forced a new group
-    if (newRecGroup != "")
-        return;
-
-    if (gContext->GetNumSetting("RememberRecGroup",1))
-        gContext->SaveSetting("DisplayRecGroup", recGroup);
-
-    if (recGroupType[recGroup] == "recgroup")
-        gContext->SaveSetting("DisplayRecGroupIsCategory", 0);
-    else
-        gContext->SaveSetting("DisplayRecGroupIsCategory", 1);
-}
-
-QString PlaybackBox::getRecGroupPassword(QString group)
-{
-    return ProgramInfo::GetRecGroupPassword(group);
-}
-
-void PlaybackBox::fillRecGroupPasswordCache(void)
-{
-    recGroupPwCache.clear();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT recgroup, password "
-                  "FROM recgrouppassword "
-                  "WHERE password is not null "
-                  "AND password <> '' ;");
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-        while (query.next())
-        {
-            QString recgroup = query.value(0).toString();
-            recGroupPwCache[recgroup] =
-                query.value(1).toString();
-        }
-}
-
-void PlaybackBox::doPlaylistChangeRecGroup(void)
-{
-    // If delitem is not NULL, then the Recording Group changer will operate
-    // on just that recording, otherwise it operates on the items in theplaylist
-    if (delitem)
-    {
-        delete delitem;
-        delitem = NULL;
-    }
-
-    showRecGroupChanger();
-}
-
-void PlaybackBox::showRecGroupChanger(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    initRecGroupPopup(tr("Recording Group"), "showRecGroupChanger");
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT recgroup, COUNT(title) FROM recorded "
-        "WHERE deletepending = 0 GROUP BY recgroup");
-
-    QStringList groups;
-    QString itemStr;
-    QString dispGroup;
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            if (query.value(1).toInt() == 1)
-                itemStr = tr("item");
-            else
-                itemStr = tr("items");
-
-            dispGroup = query.value(0).toString();
-
-            if (dispGroup == "Default")
-                dispGroup = tr("Default");
-            else if (dispGroup == "LiveTV")
-                dispGroup = tr("LiveTV");
-            else if (dispGroup == "Deleted")
-                dispGroup = tr("Deleted");
-
-            groups += QString("%1 [%2 %3]").arg(dispGroup)
-                              .arg(query.value(1).toInt()).arg(itemStr);
-        }
-    }
-    groups.sort();
-
-    recGroupListBox = new MythListBox(recGroupPopup);
-    recGroupListBox->insertStringList(groups);
-    recGroupPopup->addWidget(recGroupListBox);
-
-    recGroupLineEdit = new MythLineEdit(recGroupPopup);
-    recGroupLineEdit->setText("");
-    recGroupLineEdit->selectAll();
-    recGroupPopup->addWidget(recGroupLineEdit);
-
-    if (delitem && (delitem->recgroup != "Default"))
-    {
-        recGroupLineEdit->setText(delitem->recgroup);
-        recGroupListBox->setCurrentRow(
-            recGroupListBox->index(
-                recGroupListBox->findItems(delitem->recgroup)),
-            QItemSelectionModel::Select);
-    }
-    else
-    {
-        QString dispGroup = recGroup;
-
-        if (recGroup == "Default")
-            dispGroup = tr("Default");
-        else if (recGroup == "LiveTV")
-            dispGroup = tr("LiveTV");
-        else if (recGroup == "Deleted")
-            dispGroup = tr("Deleted");
-
-        recGroupLineEdit->setText(dispGroup);
-        recGroupListBox->setCurrentRow(
-            recGroupListBox->index(
-                recGroupListBox->findItems(dispGroup)),
-            QItemSelectionModel::Select);
-    }
-
-    recGroupOkButton = new MythPushButton(recGroupPopup);
-    recGroupOkButton->setText(tr("OK"));
-    recGroupPopup->addWidget(recGroupOkButton);
-
-    recGroupListBox->setFocus();
-
-    connect(recGroupListBox, SIGNAL(accepted(int)),
-            recGroupPopup,   SLOT(AcceptItem(int)));
-    connect(recGroupListBox, SIGNAL(currentRowChanged(int)),
-            this,            SLOT(recGroupChangerListBoxChanged()));
-    connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
-
-    DialogCode result = recGroupPopup->ExecPopup();
-
-    if (result != MythDialog::Rejected)
-        setRecGroup();
-
-    closeRecGroupPopup(result != MythDialog::Rejected);
-}
-
-void PlaybackBox::doPlaylistChangePlayGroup(void)
-{
-    // If delitem is not NULL, then the Playback Group changer will operate
-    // on just that recording, otherwise it operates on the items in theplaylist
-    if (delitem)
-    {
-        delete delitem;
-        delitem = NULL;
-    }
-
-    showPlayGroupChanger();
-}
-
-void PlaybackBox::showPlayGroupChanger(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    initRecGroupPopup(tr("Playback Group"), "showPlayGroupChanger");
-
-    recGroupListBox = new MythListBox(recGroupPopup);
-    recGroupListBox->insertItem(tr("Default"));
-    recGroupListBox->insertStringList(PlayGroup::GetNames());
-    recGroupPopup->addWidget(recGroupListBox);
-
-    if (delitem && (delitem->playgroup != "Default"))
-    {
-        recGroupListBox->setCurrentRow(
-            recGroupListBox->index(
-                recGroupListBox->findItems(delitem->playgroup)),
-            QItemSelectionModel::Select);
-    }
-    else
-    {
-        QString dispGroup = tr("Default");
-        recGroupListBox->setCurrentRow(
-            recGroupListBox->index(
-                recGroupListBox->findItems(dispGroup)),
-            QItemSelectionModel::Select);
-    }
-
-    recGroupListBox->setFocus();
-    connect(recGroupListBox, SIGNAL(accepted(int)),
-            recGroupPopup,   SLOT(AcceptItem(int)));
-
-    DialogCode result = recGroupPopup->ExecPopup();
-
-    if (result != MythDialog::Rejected)
-        setPlayGroup();
-
-    closeRecGroupPopup(result != MythDialog::Rejected);
-}
-
-void PlaybackBox::showRecTitleChanger()
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    initRecGroupPopup(tr("Recording Title"), "showRecTitleChanger");
-
-    recGroupPopup->addLabel(tr("Title"));
-    recGroupLineEdit = new MythLineEdit(recGroupPopup);
-    recGroupLineEdit->setText(delitem->title);
-    recGroupLineEdit->selectAll();
-    recGroupPopup->addWidget(recGroupLineEdit);
-
-    recGroupPopup->addLabel(tr("Subtitle"));
-    recGroupLineEdit1 = new MythLineEdit(recGroupPopup);
-    recGroupLineEdit1->setText(delitem->subtitle);
-    recGroupLineEdit1->selectAll();
-    recGroupPopup->addWidget(recGroupLineEdit1);
-
-    recGroupLineEdit->setFocus();
-
-    recGroupOkButton = new MythPushButton(recGroupPopup);
-    recGroupOkButton->setText(tr("OK"));
-    recGroupPopup->addWidget(recGroupOkButton);
-
-    connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
-
-    DialogCode result = recGroupPopup->ExecPopup();
-
-    if (result == MythDialog::Accepted)
-        setRecTitle();
-
-    closeRecGroupPopup(result == MythDialog::Accepted);
-
-    delete delitem;
-    delitem = NULL;
-}
-
-void PlaybackBox::setRecGroup(void)
-{
-    QString newRecGroup = recGroupLineEdit->text();
-    ProgramInfo *tmpItem;
-
-    if (newRecGroup != "" )
-    {
-        if (newRecGroup == tr("Default"))
-            newRecGroup = "Default";
-        else if (newRecGroup == tr("LiveTV"))
-            newRecGroup = "LiveTV";
-        else if (newRecGroup == tr("Deleted"))
-            newRecGroup = "Deleted";
-
-        if (delitem)
-        {
-            if ((delitem->recgroup == "LiveTV") &&
-                (newRecGroup != "LiveTV"))
-                delitem->SetAutoExpire(
-                    gContext->GetNumSetting("AutoExpireDefault", 0));
-            else if ((delitem->recgroup != "LiveTV") &&
-                     (newRecGroup == "LiveTV"))
-                delitem->SetAutoExpire(kLiveTVAutoExpire);
-
-
-            tmpItem = findMatchingProg(delitem);
-            if (tmpItem)
-                tmpItem->ApplyRecordRecGroupChange(newRecGroup);
-        } else if (playList.count() > 0) {
-            QStringList::Iterator it;
-
-            for (it = playList.begin(); it != playList.end(); ++it )
-            {
-                tmpItem = findMatchingProg(*it);
-                if (tmpItem)
-                {
-                    if ((tmpItem->recgroup == "LiveTV") &&
-                        (newRecGroup != "LiveTV"))
-                        tmpItem->SetAutoExpire(
-                            gContext->GetNumSetting("AutoExpireDefault", 0));
-                    else if ((tmpItem->recgroup != "LiveTV") &&
-                             (newRecGroup == "LiveTV"))
-                        tmpItem->SetAutoExpire(kLiveTVAutoExpire);
-
-                    tmpItem->ApplyRecordRecGroupChange(newRecGroup);
-                }
-            }
-            playList.clear();
-        }
-    }
-}
-
-void PlaybackBox::setPlayGroup(void)
-{
-    QString newPlayGroup = recGroupListBox->currentText();
-    ProgramInfo *tmpItem;
-
-    if (newPlayGroup == tr("Default"))
-        newPlayGroup = "Default";
-
-    if (delitem)
-    {
-        tmpItem = findMatchingProg(delitem);
-        if (tmpItem)
-            tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
-    }
-    else if (playList.count() > 0)
-    {
-        QStringList::Iterator it;
-
-        for (it = playList.begin(); it != playList.end(); ++it )
-        {
-            tmpItem = findMatchingProg(*it);
-            if (tmpItem)
-                tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
-        }
-        playList.clear();
-    }
-}
-
-void PlaybackBox::setRecTitle()
-{
-    QString newRecTitle = recGroupLineEdit->text();
-    QString newRecSubtitle = recGroupLineEdit1->text();
-    ProgramInfo *tmpItem;
-
-    if (newRecTitle == "")
-        return;
-
-    tmpItem = findMatchingProg(delitem);
-    if (tmpItem)
-        tmpItem->ApplyRecordRecTitleChange(newRecTitle, newRecSubtitle);
-
-    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
-    titleIndex = 0;
-    progIndex = 0;
-
-    connected = FillList(true);
-    paintSkipUpdate = false;
-    update(drawTotalBounds);
-}
-
-void PlaybackBox::recGroupChangerListBoxChanged(void)
-{
-    if (!recGroupPopup || !recGroupListBox || !recGroupLineEdit)
-        return;
-
-    recGroupLineEdit->setText(
-        recGroupListBox->currentText().section('[', 0, 0).simplified());
-}
-
-void PlaybackBox::showRecGroupPasswordChanger(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    initRecGroupPopup(tr("Group Password"),
-                      "showRecGroupPasswordChanger");
-
-    QGridLayout *grid = new QGridLayout();
-    grid->setSpacing((int)(10 * wmult));
-
-    QLabel *label = new QLabel(tr("Recording Group:"), recGroupPopup);
-    label->setAlignment(Qt::AlignLeft);
-    QPalette p = label->palette();
-    p.setColor(label->foregroundRole(), drawPopupFgColor);
-    label->setPalette(p);
-    grid->addWidget(label, 0, 0, Qt::AlignLeft);
-
-    QString gdn = ProgramInfo::i18n(recGroup);
-    label = new QLabel(gdn, recGroupPopup);
-
-    label->setAlignment(Qt::AlignLeft);
-    p = label->palette();
-    p.setColor(label->foregroundRole(), drawPopupFgColor);
-    label->setPalette(p);
-    grid->addWidget(label, 0, 1, Qt::AlignLeft);
-
-    label = new QLabel(tr("Old Password:"), recGroupPopup);
-    label->setAlignment(Qt::AlignLeft);
-    p = label->palette();
-    p.setColor(label->foregroundRole(), drawPopupFgColor);
-    label->setPalette(p);
-    grid->addWidget(label, 1, 0, Qt::AlignLeft);
-
-    recGroupOldPassword = new MythLineEdit(recGroupPopup);
-    recGroupOldPassword->setText("");
-    recGroupOldPassword->selectAll();
-    grid->addWidget(recGroupOldPassword, 1, 1, Qt::AlignLeft);
-
-    label = new QLabel(tr("New Password:"), recGroupPopup);
-    label->setAlignment(Qt::AlignLeft);
-    p = label->palette();
-    p.setColor(label->foregroundRole(), drawPopupFgColor);
-    label->setPalette(p);
-    grid->addWidget(label, 2, 0, Qt::AlignLeft);
-
-    recGroupNewPassword = new MythLineEdit(recGroupPopup);
-    recGroupNewPassword->setText("");
-    recGroupNewPassword->selectAll();
-    grid->addWidget(recGroupNewPassword, 2, 1, Qt::AlignLeft);
-
-    recGroupPopup->addLayout(grid);
-
-    recGroupOkButton = new MythPushButton(recGroupPopup);
-    recGroupOkButton->setText(tr("OK"));
-    recGroupPopup->addWidget(recGroupOkButton);
-
-    recGroupChooserPassword = getRecGroupPassword(recGroup);
-
-    recGroupOldPassword->setEchoMode(QLineEdit::Password);
-    recGroupNewPassword->setEchoMode(QLineEdit::Password);
-
-    // set inital ok enabled status and initial focus
-    recGroupOldPasswordChanged(QString::null);
-    if (IsRecGroupPasswordCorrect(QString::null))
-        recGroupNewPassword->setFocus();
-    else
-        recGroupOldPassword->setFocus();
-
-    connect(recGroupOldPassword, SIGNAL(textChanged(const QString &)), this,
-            SLOT(recGroupOldPasswordChanged(const QString &)));
-    connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
-
-    if (recGroupPopup->ExecPopup() == MythDialog::Accepted)
-    {
-        SetRecGroupPassword(recGroupOldPassword->text(),
-                            recGroupNewPassword->text());
-    }
-
-    closeRecGroupPopup(false);
-}
-
-void PlaybackBox::SetRecGroupPassword(const QString &oldPassword,
-                                      const QString &newPassword)
-{
-    if (oldPassword != recGroupPassword)
-    {
-        VERBOSE(VB_IMPORTANT, "Not setting password: "
-                "oldPassword != recGroupPassword");
-        return;
-    }
-
-    if (recGroup == "All Programs")
-    {
-        gContext->SaveSetting("AllRecGroupPassword", newPassword);
-    }
-    else
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        query.prepare("DELETE FROM recgrouppassword "
-                           "WHERE recgroup = :RECGROUP ;");
-        query.bindValue(":RECGROUP", recGroup);
-
-        query.exec();
-
-        if (newPassword != "")
-        {
-            query.prepare("INSERT INTO recgrouppassword "
-                          "(recgroup, password) VALUES "
-                          "( :RECGROUP , :PASSWD )");
-            query.bindValue(":RECGROUP", recGroup);
-            query.bindValue(":PASSWD", newPassword);
-
-            query.exec();
-        }
-    }
-
-    recGroupPassword = newPassword;
-}
-
-bool PlaybackBox::IsRecGroupPasswordCorrect(const QString &newText) const
-{
-    return ((newText == recGroupChooserPassword) ||
-            (newText.isEmpty() && recGroupChooserPassword.isEmpty()));
-}
-
-void PlaybackBox::recGroupOldPasswordChanged(const QString &newText)
-{
-    if (recGroupOkButton)
-        recGroupOkButton->setEnabled(IsRecGroupPasswordCorrect(newText));
-}
-
-void PlaybackBox::clearProgramCache(void)
-{
-    if (!progCache)
-        return;
-
-    vector<ProgramInfo *>::iterator i = progCache->begin();
-    for ( ; i != progCache->end(); i++)
-        delete *i;
-    delete progCache;
-    progCache = NULL;
-}
-
-void PlaybackBox::EmbedTVWindow(void)
-{
-    if (playbackVideoContainer && m_player)
-    {
-        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-        m_player->StartEmbedding(ctx, this->winId(), drawVideoBounds);
-        QRegion r1 = QRegion(drawTotalBounds);
-        QRegion r2 = QRegion(drawVideoBounds);
-        this->setMask(r1.xored(r2));
-        m_player->DrawUnusedRects(false, ctx);
-        m_player->ReturnPlayerLock(ctx);
-    }
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
