@@ -112,7 +112,6 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
     inputname.detach();
 
     // Initialize statics
-    init_freq_tables();
     current = transport_scan_items_it_t( scanTransports.end());
 
     signalMonitor->AddListener(this);
@@ -148,6 +147,7 @@ void SIScan::deleteLater(void)
     disconnect();
     StopScanner();
     VERBOSE(VB_SIPARSER, LOC + "SIScanner Stopped");
+    teardown_frequency_tables();
     QObject::deleteLater();
 }
 
@@ -821,7 +821,9 @@ bool SIScan::ScanTransports(int SourceID,
             name_num++;
             freq += ft.frequencyStep;
         }
+        delete *it;
     }
+    tables.clear();
 
     timer.start();
     waitingForTables = false;

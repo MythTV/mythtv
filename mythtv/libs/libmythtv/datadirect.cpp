@@ -745,6 +745,8 @@ int DataDirectProcessor::UpdateChannelsSafe(
         new_channels++;
     }
 
+    teardown_frequency_tables();
+
     return new_channels;
 }
 

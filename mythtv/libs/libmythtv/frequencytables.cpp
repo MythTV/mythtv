@@ -3,9 +3,13 @@
 #include "channelutil.h"
 #include "compat.h"
 
-freq_table_map_t frequencies;
+static bool             frequencies_initialized = false;
+static QMutex           frequencies_lock;
+static freq_table_map_t frequencies;
 
 static void init_freq_tables(freq_table_map_t&);
+static freq_table_list_t get_matching_freq_tables_internal(
+    const QString &format, const QString &modulation, const QString &country);
 
 TransportScanItem::TransportScanItem()
     : mplexid((uint)-1),  FriendlyName(""),
@@ -166,24 +170,29 @@ QString TransportScanItem::toString() const
     return str;
 }
 
-bool init_freq_tables()
+static bool init_freq_tables(void)
 {
-    static bool statics_initialized = false;
-    static QMutex statics_lock;
-    statics_lock.lock();
-    if (!statics_initialized)
+    if (!frequencies_initialized)
     {
         init_freq_tables(frequencies);
-        statics_initialized = true;
+        frequencies_initialized = true;
     }
-    statics_lock.unlock();
-
     return true;
 }
-bool just_here_to_force_init = init_freq_tables();
 
-freq_table_list_t get_matching_freq_tables(
-    QString format, QString modulation, QString country)
+bool teardown_frequency_tables(void)
+{
+    QMutexLocker locker(&frequencies_lock);
+    if (frequencies_initialized)
+    {
+        frequencies.clear();
+        frequencies_initialized = false;
+    }
+    return true;
+}
+
+static freq_table_list_t get_matching_freq_tables_internal(
+    const QString &format, const QString &modulation, const QString &country)
 {
     const freq_table_map_t &fmap = frequencies;
 
@@ -203,11 +212,30 @@ freq_table_list_t get_matching_freq_tables(
     return list;
 }
 
+freq_table_list_t get_matching_freq_tables(
+    const QString &format, const QString &modulation, const QString &country)
+{
+    QMutexLocker locker(&frequencies_lock);
+    init_freq_tables();
+
+    freq_table_list_t list =
+        get_matching_freq_tables_internal(format, modulation, country);
+
+    freq_table_list_t new_list;
+    for (uint i = 0; i < list.size(); i++)
+        new_list.push_back(new FrequencyTable(*list[i]));
+
+    return new_list;
+}
+
 long long get_center_frequency(
     QString format, QString modulation, QString country, int freqid)
 {
+    QMutexLocker locker(&frequencies_lock);
+    init_freq_tables();
+
     freq_table_list_t list =
-        get_matching_freq_tables(format, modulation, country);
+        get_matching_freq_tables_internal(format, modulation, country);
 
     for (uint i = 0; i < list.size(); ++i)
     {
@@ -229,7 +257,7 @@ int get_closest_freqid(
     modulation = (modulation == "8vsb") ? "vsb8" : modulation;
 
     freq_table_list_t list =
-        get_matching_freq_tables(format, modulation, country);
+        get_matching_freq_tables_internal(format, modulation, country);
     
     for (uint i = 0; i < list.size(); ++i)
     {
