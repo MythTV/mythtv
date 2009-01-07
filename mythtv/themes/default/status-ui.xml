@@ -68,7 +68,7 @@
                         <filename>lb-ltarrow-sel.png</filename>
                     </imagetype>
                 </state>
-        </statetype>
+            </statetype>
         </buttonlist>
 
         <buttonlist name="log" from="basebuttonlist2">
