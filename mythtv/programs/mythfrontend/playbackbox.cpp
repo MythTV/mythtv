@@ -401,8 +401,7 @@ bool PlaybackBox::Create()
 
     if (!m_player && !m_recGroupPassword.isEmpty())
         displayRecGroup(m_recGroup);
-    else if (m_recGroup == "All Programs" ||
-        gContext->GetNumSetting("QueryInitialFilter", 0) == 1)
+    else if (gContext->GetNumSetting("QueryInitialFilter", 0) == 1)
         showGroupFilter();
     else
     {
