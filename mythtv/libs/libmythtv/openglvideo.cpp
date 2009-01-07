@@ -936,6 +936,22 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                 continue;
         }
 
+        if (draw_border &&
+            (filter->frameBuffers.empty() ||
+            filter->outputBuffer == kDefaultBuffer))
+        {
+            gl_context->EnableFragmentProgram(0);
+            gl_context->DisableTextures();
+            glColor3f(0.5f, 0.0f, 0.0f); // deep red colour
+            glBegin(GL_QUADS);
+            glVertex2f(vleft  - 10, vtop + 10);
+            glVertex2f(vright + 10, vtop + 10);
+            glVertex2f(vright + 10, vbot - 10);
+            glVertex2f(vleft  - 10, vbot - 10);
+            glEnd();
+            glColor3f(1.0f, 1.0f, 1.0f); // prevents tinting of texture
+        }
+
         // bind correct textures
         uint active_tex = 0;
         for (; active_tex < inputs.size(); active_tex++)
@@ -1013,24 +1029,6 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
         // disable blending
         if (type == kGLFilterResize && filters.count(kGLFilterYUV2RGBA))
             glDisable(GL_BLEND);
-
-        if (draw_border &&
-            (filter->frameBuffers.empty() ||
-            filter->outputBuffer == kDefaultBuffer))
-        {
-            gl_context->DisableTextures();
-            glEnable(GL_LINE_SMOOTH);
-            glLineWidth(10);
-            glColor3f(0.5f, 0.0f, 0.0f); // deep red colour
-            glBegin(GL_LINE_LOOP);
-            glVertex2f(vleft, vtop);
-            glVertex2f(vright, vtop);
-            glVertex2f(vright, vbot);
-            glVertex2f(vleft, vbot);
-            glEnd();
-            glColor3f(1.0f, 1.0f, 1.0f); // prevents tinting of texture
-            glDisable(GL_LINE_SMOOTH);
-        }
 
         // switch back to default framebuffer
         if (filter->outputBuffer != kDefaultBuffer)
