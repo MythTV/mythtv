@@ -72,7 +72,7 @@
                 <state name="selected" from="active">
                     <imagetype name="selectbar">
                         <!-- Full area to workaround inheritence bug -->
-                        <area>25,0,527,25</area>
+                        <area>25,0,857,30</area>
                         <filename>watchrec_selectbar.png</filename>
                     </imagetype>
                 </state>
