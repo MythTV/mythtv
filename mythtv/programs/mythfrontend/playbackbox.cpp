@@ -2749,11 +2749,16 @@ void PlaybackBox::toggleWatched(void)
         pginfo->SetWatchedFlag(on);
 
         if (on)
+        {
+            item->DisplayState("yes", "watched");
             pginfo->programflags |= FL_WATCHED;
+        }
         else
+        {
+            item->DisplayState("no", "watched");
             pginfo->programflags &= ~FL_WATCHED;
+        }
 
-        item->DisplayState("on", "watched");
         updateIcons(pginfo);
 
         // A refill affects the responsiveness of the UI and we only
