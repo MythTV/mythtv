@@ -39,10 +39,10 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,1,640,28</area>
+                        <area>32,1,605,28</area>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>660,1,120,28</area>
+                        <area>645,1,120,28</area>
                         <align>right</align>
                     </textarea>
                     <textarea name="time" from="shortdate">
