@@ -3746,6 +3746,23 @@ void VideoOutputXv::ShowPIP(VideoFrame        *frame,
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
+void VideoOutputXv::RemovePIP(NuppelVideoPlayer *pipplayer)
+{
+    if (VideoOutputSubType() != OpenGL)
+        return;
+
+    if (!gl_pipchains.contains(pipplayer))
+        return;
+
+    OpenGLContextLocker ctx_lock(gl_context);
+
+    OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
+    if (gl_pipchain)
+        delete gl_pipchain;
+    gl_pip_ready.remove(pipplayer);
+    gl_pipchains.remove(pipplayer);
+}
+
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
     if (VideoOutputSubType() == OpenGL ||

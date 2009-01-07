@@ -3881,6 +3881,9 @@ bool NuppelVideoPlayer::RemovePIPPlayer(NuppelVideoPlayer *pip, uint timeout)
 
     pip_players_rm[pip] = kPIP_END;
 
+    if (videoOutput)
+        videoOutput->RemovePIP(pip);
+
     pip_players_wait.wait(&pip_players_lock, timeout);
 
     if (pip_players.find(pip) == pip_players.end())

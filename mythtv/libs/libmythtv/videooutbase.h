@@ -234,6 +234,7 @@ class VideoOutput
     virtual QRect GetPIPRect(PIPLocation location,
                              NuppelVideoPlayer *pipplayer = NULL,
                              bool do_pixel_adj = true) const;
+    virtual void RemovePIP(NuppelVideoPlayer *pipplayer) { }
 
     virtual void SetPIPState(PIPState setting);
 
