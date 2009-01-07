@@ -2522,7 +2522,7 @@ void TV::timerEvent(QTimerEvent *te)
         ReturnPlayerLock(actx);
 
         QMutexLocker locker(&timerIdLock);
-        if (!queuedChanID && queuedChanNum.isEmpty())
+        if (!queuedChanID && queuedChanNum.isEmpty() && queueInputTimerId)
         {
             KillTimer(queueInputTimerId);
             queueInputTimerId = 0;
