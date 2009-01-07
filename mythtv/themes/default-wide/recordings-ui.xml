@@ -14,7 +14,7 @@
         </imagetype>
         
         <buttonlist name="groups">
-            <area>45,98,250,300</area>
+            <area>45,98,300,300</area>
             <buttonarea>0,0,250,250</buttonarea>
             <spacing>5</spacing>
             <scrollstyle>center</scrollstyle>
@@ -22,7 +22,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
-                        <area>5,0,180,30</area>
+                        <area>5,0,300,30</area>
                         <font>basesmall</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -90,7 +90,7 @@
             <position>988,670</position>
         </imagetype>
         
-        <imagetype name="cflagged">
+        <imagetype name="commflagged">
             <filename>commflagged.png</filename>
             <position>1024,670</position>
         </imagetype>
