@@ -12,6 +12,7 @@ class MediaMonitorUnix : public MediaMonitor
     void CheckDeviceNotifications(void);
     bool CheckFileSystemTable(void);
     bool CheckMountable(void);
+    bool CheckRemovable(const QString &dev);
     bool FindPartitions(const QString &dev, bool checkPartitions);
 
     virtual bool AddDevice(MythMediaDevice* pDevice);

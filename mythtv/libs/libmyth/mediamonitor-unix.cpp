@@ -160,13 +160,29 @@ bool MediaMonitorUnix::CheckMountable(void)
             continue;
 
         sysfs.cd(*it);
+        QString path = sysfs.absolutePath();
+        if (CheckRemovable(path))
+            FindPartitions(path, true);
+        sysfs.cdUp();
+    }
+    return true;
+#else // if !linux
+    return false;
+#endif // !linux
+}
 
-        QString removablePath = sysfs.absoluteFilePath("removable");
+/**
+ * \brief  Is /sys/block/dev a removable device?
+ */
+bool MediaMonitorUnix::CheckRemovable(const QString &dev)
+{
+#ifdef linux
+        QString removablePath = dev + "/removable";
         QFile   removable(removablePath);
         if (removable.exists() && removable.open(QIODevice::ReadOnly))
         {
             char    c   = 0;
-            QString msg = LOC + ":CheckMountable() '" + removablePath + "' ";
+            QString msg = LOC + ":CheckRemovable(" + dev + ")/removable ";
             bool    ok  = removable.getChar(&c);
             removable.close();
 
@@ -174,16 +190,14 @@ bool MediaMonitorUnix::CheckMountable(void)
             {
                 VERBOSE(VB_MEDIA+VB_EXTRA, msg + c);
                 if (c == '1')
-                    FindPartitions(sysfs.absolutePath(), true);
+                    return true;
             }
             else
             {
                 VERBOSE(VB_IMPORTANT, msg + "failed");
             }
         }
-        sysfs.cdUp();
-    }
-    return true;
+        return false;
 #else // if !linux
     return false;
 #endif // !linux
@@ -604,28 +618,8 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         {
             QString dev = (*it).section(' ', 1, 1);
 
-            // check if removeable
-            QFile removable(dev + "/removable");
-            if (removable.exists() &&
-                removable.open(QIODevice::ReadOnly))
-            {
-                char    c   = 0;
-                QString msg = LOC + ":CheckDeviceNotifications() '"
-                              + dev + "/removable' ";
-                bool    ok  = removable.getChar(&c);
-                removable.close();
-
-                if (ok)
-                {
-                    VERBOSE(VB_MEDIA+VB_EXTRA, msg + c);
-                    if (c == '1')
-                        FindPartitions(dev, true);
-                }
-                else
-                {
-                    VERBOSE(VB_IMPORTANT, msg + "failed");
-                }
-            }
+            if (CheckRemovable(dev))
+                FindPartitions(dev, true);
         }
         else if ((*it).startsWith("remove"))
         {
