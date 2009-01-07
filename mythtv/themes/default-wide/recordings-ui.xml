@@ -39,14 +39,14 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,1,605,28</area>
+                        <area>32,1,600,28</area>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>645,1,120,28</area>
+                        <area>640,1,120,28</area>
                         <align>right</align>
                     </textarea>
                     <textarea name="time" from="shortdate">
-                        <area>770,1,100,28</area>
+                        <area>770,1,105,28</area>
                         <align>right</align>
                     </textarea>
                     <statetype name="watched">
