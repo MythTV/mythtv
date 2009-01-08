@@ -57,6 +57,8 @@ typedef QMap<QString,MythTimer>         LastCheckedMap;
 class PlaybackBox : public MythScreenType
 {
     Q_OBJECT
+    friend class PlaybackBoxListItem;
+
   public:
     typedef enum
     {
@@ -122,7 +124,8 @@ class PlaybackBox : public MythScreenType
 
   protected slots:
     void updateRecList(MythUIButtonListItem *);
-    void updateProgramInfo(MythUIButtonListItem *);
+    void ItemSelected(MythUIButtonListItem *item)
+        { UpdateProgramInfo(item, true); }
     void selected(MythUIButtonListItem *item);
     void playSelected(MythUIButtonListItem *item = NULL);
     void deleteSelected(MythUIButtonListItem *item);
@@ -288,6 +291,7 @@ class PlaybackBox : public MythScreenType
     void updateIcons(const ProgramInfo *pginfo = NULL);
     void updateUsage();
     void updateGroupInfo(const QString &groupname);
+    void UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel);
 
     void SetTextFromMap(MythUIType *parent, QMap<QString, QString> &infoMap);
     void ResetMap(MythUIType *parent, QMap<QString, QString> &infoMap);

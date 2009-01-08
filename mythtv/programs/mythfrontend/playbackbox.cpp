@@ -11,6 +11,7 @@ using namespace std;
 #include <QWaitCondition>
 
 #include "playbackbox.h"
+#include "playbackboxlistitem.h"
 #include "proglist.h"
 #include "tv.h"
 #include "oldsettings.h"
@@ -30,7 +31,6 @@ using namespace std;
 #include "util.h"
 
 #include "mythuihelper.h"
-#include "mythuibuttonlist.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
@@ -395,7 +395,7 @@ bool PlaybackBox::Create()
     connect(m_groupList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(SwitchList()));
     connect(m_recordingList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(updateProgramInfo(MythUIButtonListItem*)));
+            SLOT(ItemSelected(MythUIButtonListItem*)));
     connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(playSelected(MythUIButtonListItem*)));
 
@@ -586,11 +586,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname)
     updateIcons();
 }
 
-void PlaybackBox::updateProgramInfo(MythUIButtonListItem *item)
+void PlaybackBox::UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel)
 {
-    if (GetFocusWidget() != m_recordingList)
-        return;
-
     if (!item)
         return;
 
@@ -599,21 +596,39 @@ void PlaybackBox::updateProgramInfo(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    QMap<QString, QString> infoMap;
-
-    pginfo->ToMap(infoMap);
-    SetTextFromMap(this, infoMap);
-    m_currentMap = infoMap;
-
-    if (m_previewImage)
+    static const char *disp_flags[] = { "transcoding", "commflagging", };
+    const bool disp_flag_stat[] =
     {
-        m_previewImage->SetVisible(true);
-        QString imagefile = getPreviewImage(pginfo);
-        m_previewImage->SetFilename(imagefile);
-        m_previewImage->Load();
-    }
+        !JobQueue::IsJobQueuedOrRunning(
+            JOB_TRANSCODE, pginfo->chanid, pginfo->recstartts),
+        !JobQueue::IsJobQueuedOrRunning(
+            JOB_COMMFLAG, pginfo->chanid, pginfo->recstartts),
+    };
 
-    updateIcons(pginfo);
+    for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); i++)
+        item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
+
+    QString imagefile = getPreviewImage(pginfo);
+    if (!imagefile.isEmpty())
+        item->SetImage(imagefile, "preview");
+
+    if ((GetFocusWidget() == m_recordingList) && is_sel)
+    {
+        QMap<QString, QString> infoMap;
+
+        pginfo->ToMap(infoMap);
+        SetTextFromMap(this, infoMap);
+        m_currentMap = infoMap;
+
+        if (m_previewImage)
+        {
+            m_previewImage->SetVisible(!imagefile.isEmpty());
+            m_previewImage->SetFilename(imagefile);
+            m_previewImage->Load();
+        }
+
+        updateIcons(pginfo);
+    }
 }
 
 void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
@@ -818,20 +833,17 @@ void PlaybackBox::updateGroupList()
     }
 }
 
-void PlaybackBox::updateRecList(MythUIButtonListItem *item)
+void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 {
-    if (!item)
+    if (!sel_item)
         return;
 
-    QString groupname = item->GetData().toString();
+    QString groupname = sel_item->GetData().toString();
 
     updateGroupInfo(groupname);
 
-    if (m_currentGroup == groupname)
-    {
-        if (!m_needUpdate)
-            return;
-    }
+    if ((m_currentGroup == groupname) && !m_needUpdate)
+        return;
 
     m_needUpdate = false;
 
@@ -843,146 +855,113 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *item)
     if (groupname == "default")
         groupname = "";
 
-    ProgramList *progList = NULL;
-    progList = &m_progLists[groupname];
-
-    if (!progList)
+    ProgramMap::iterator pmit = m_progLists.find(groupname);
+    if (pmit == m_progLists.end())
         return;
 
-    QString tempSubTitle;
-    QString tempShortDate;
-    QString tempLongDate;
-    QString tempTime;
-    QString tempSize;
+    ProgramList &progList = *pmit;
 
-    QString match;
+    LCD    *lcddev   = LCD::Get();
+    QString lcdTitle = "Recordings";
+    if (lcddev && GetFocusWidget() != m_groupList)
+        lcdTitle = " <<" + groupname;
 
-    LCD *lcddev = LCD::Get();
-    QString lcdTitle;
     QList<LCDMenuItem> lcdItems;
 
-    if (lcddev)
-    {
-        if (GetFocusWidget() == m_groupList)
-            lcdTitle = "Recordings";
-        else
-            lcdTitle = " <<" + groupname;
-    }
+    static const char *disp_flags[] = { "playlist", "watched", };
+    bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
 
-    if (!progList->isEmpty())
+    ProgramList::iterator it = progList.begin();
+    for (; it != progList.end(); it++)
     {
-        ProgramInfo *progInfo;
-        ProgramList::iterator it;
-        for (it = progList->begin(); it != progList->end(); it++)
+        MythUIButtonListItem *item =
+            new PlaybackBoxListItem(this, m_recordingList, *it);
+
+        QString tempSubTitle;
+        if (groupname != (*it)->title)
         {
-            progInfo = *it;
-
-            item = new MythUIButtonListItem(m_recordingList, "",
-                                                qVariantFromValue(progInfo));
-
-            if (groupname != progInfo->title)
+            tempSubTitle = (*it)->title;
+            if (!(*it)->subtitle.trimmed().isEmpty())
             {
-                tempSubTitle = progInfo->title;
-                if (!progInfo->subtitle.trimmed().isEmpty())
-                    tempSubTitle = QString("%1 - \"%2\"")
-                                    .arg(tempSubTitle).arg(progInfo->subtitle);
+                tempSubTitle = QString("%1 - \"%2\"")
+                    .arg(tempSubTitle).arg((*it)->subtitle);
             }
-            else
-            {
-                tempSubTitle = progInfo->subtitle;
-                if (tempSubTitle.trimmed().isEmpty())
-                    tempSubTitle = progInfo->title;
-            }
+        }
+        else
+        {
+            tempSubTitle = (*it)->subtitle;
+            if (tempSubTitle.trimmed().isEmpty())
+                tempSubTitle = (*it)->title;
+        }
 
-            tempShortDate = (progInfo->recstartts).toString(m_formatShortDate);
-            tempLongDate = (progInfo->recstartts).toString(m_formatLongDate);
-            tempTime = (progInfo->recstartts).toString(m_formatTime);
+        QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
+        QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
+        QString tempTime      = ((*it)->recstartts).toString(m_formatTime);
+        QString tempSize      = tr("%1 GB")
+            .arg((*it)->filesize * (1.0/(1024.0*1024.0*1024.0)), 0, 'f', 2);
 
-            long long size = progInfo->filesize;
-            tempSize.sprintf("%0.2f GB", size / 1024.0 / 1024.0 / 1024.0);
+        QString state = ((*it)->recstatus == rsRecording) ?
+            QString("running") : QString::null;
 
-            QString state;
+        if ((((*it)->recstatus != rsRecording) &&
+             ((*it)->availableStatus != asAvailable) &&
+             ((*it)->availableStatus != asNotYetAvailable)) ||
+            (m_player && m_player->IsSameProgram(0, *it)))
+        {
+            state = "disabled";
+        }
 
-            if (progInfo->recstatus == rsRecording)
-                state = "running";
+        if (lcddev && !(GetFocusWidget() == m_groupList))
+        {
+            QString lcdSubTitle = tempSubTitle;
+            QString lcdStr = QString("%1 %2")
+                .arg(lcdSubTitle.replace('"', "'")).arg(tempShortDate);
+            LCDMenuItem lcdItem(m_currentItem == *it, NOTCHECKABLE, lcdStr);
+            lcdItems.push_back(lcdItem);
+        }
 
-            if (((progInfo->recstatus != rsRecording) &&
-                    (progInfo->availableStatus != asAvailable) &&
-                    (progInfo->availableStatus != asNotYetAvailable)) ||
-                (m_player && m_player->IsSameProgram(0, progInfo)))
-                state = "disabled";
+        item->SetText(tempSubTitle,       "titlesubtitle", state);
+        item->SetText((*it)->title,       "title",         state);
+        item->SetText((*it)->subtitle,    "subtitle",      state);
+        item->SetText((*it)->description, "description",   state);
+        item->SetText(tempLongDate,       "longdate",      state);
+        item->SetText(tempShortDate,      "shortdate",     state);
+        item->SetText(tempTime,           "time",          state);
+        item->SetText(tempSize,           "size",          state);
 
-            if (lcddev && !(GetFocusWidget() == m_groupList))
-            {
-                QString lcdSubTitle = tempSubTitle;
-                lcdItems.append(LCDMenuItem(m_currentItem == progInfo,
-                                NOTCHECKABLE, QString("%1 %2")
-                                            .arg(lcdSubTitle.replace('"', "'"))
-                                            .arg(tempShortDate)));
-            }
+        item->DisplayState(state, "status");
 
-            QString imagefile = getPreviewImage(progInfo);
-            item->SetImage(imagefile, "preview");
+        disp_flag_stat[0] = !m_playList.filter((*it)->MakeUniqueKey()).empty();
+        disp_flag_stat[1] = (*it)->programflags & FL_WATCHED;
 
-            item->SetText(tempSubTitle, "titlesubtitle", state);
-            item->SetText(progInfo->title, "title", state);
-            item->SetText(progInfo->subtitle, "subtitle", state);
-            item->SetText(progInfo->description, "description", state);
-            item->SetText(tempLongDate, "longdate", state);
-            item->SetText(tempShortDate, "shortdate", state);
-            item->SetText(tempTime, "time", state);
-            item->SetText(tempSize, "size", state);
+        for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); i++)
+            item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
 
-            item->DisplayState(state, "status");
-
-            if (m_playList.filter(progInfo->MakeUniqueKey()).size())
-                item->DisplayState("yes", "playlist");
-            else
-                item->DisplayState("no", "playlist");
-
-            if (progInfo->programflags & FL_WATCHED)
-                item->DisplayState("yes", "watched");
-            else
-                item->DisplayState("no", "watched");
-
-            if (!JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
-                                       progInfo->chanid, progInfo->recstartts))
-                item->DisplayState("yes", "transcoding");
-            else
-                item->DisplayState("no", "transcoding");
-
-            if (!JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,
-                                       progInfo->chanid, progInfo->recstartts))
-                item->DisplayState("yes", "commflagging");
-            else
-                item->DisplayState("no", "commflagging");
-
-
-             //item->DisplayState("", "expiry");
-
-            if (m_currentItem &&
-                (m_currentItem->chanid == progInfo->chanid) &&
-                (m_currentItem->recstartts == progInfo->recstartts))
-                    m_recordingList->SetItemCurrent(item);
+        if (m_currentItem &&
+            (m_currentItem->chanid     == (*it)->chanid) &&
+            (m_currentItem->recstartts == (*it)->recstartts))
+        {
+            m_recordingList->SetItemCurrent(item);
         }
     }
 
     if (lcddev && !lcdItems.isEmpty())
         lcddev->switchToMenu(lcdItems, lcdTitle);
 
-    if (m_noRecordingsText && !progList->isEmpty())
+    if (m_noRecordingsText)
     {
-        m_progCacheLock.lock();
-        if (m_progCache && !m_progCache->empty())
-            m_noRecordingsText->SetText(tr(
-                "There are no recordings in your current view"));
+        if (!progList.isEmpty())
+            m_noRecordingsText->SetVisible(false);
         else
-            m_noRecordingsText->SetText(tr(
-                "There are no recordings available"));
-        m_progCacheLock.unlock();
+        {
+            QMutexLocker locker(&m_progCacheLock);
+            QString txt = (m_progCache && !m_progCache->empty()) ?
+                tr("There are no recordings in your current view") :
+                tr("There are no recordings available");
+            m_noRecordingsText->SetText(txt);
+            m_noRecordingsText->SetVisible(true);
+        }
     }
-
-    m_noRecordingsText->SetVisible(progList->isEmpty());
 }
 
 void PlaybackBox::listChanged(void)
@@ -3338,36 +3317,31 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
     }
     m_previewGeneratorLock.unlock();
 
-    if (sizeof(qulonglong) < sizeof(ProgramInfo*))
-    {
-        VERBOSE(VB_IMPORTANT, "Pointer size assumption incorrect");
-        return;
-    }
-
     if (pginfo)
     {
         QStringList extra;
         pginfo->ToStringList(extra);
         extra.detach();
         MythEvent me("PREVIEW_READY", extra);
-        VERBOSE(VB_IMPORTANT, "Sending Preview Event...");
         gContext->dispatch(me);
     }
 }
 
 void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
 {
-    VERBOSE(VB_IMPORTANT, "Handling Preview Event...");
-
     ProgramInfo *info = findMatchingProg(&evinfo);
-    if (info)
-    {
-        QString imgname = getPreviewImage(info);
-        MythUIButtonListItem *item =
-            m_recordingList->GetItemByData(qVariantFromValue(info));
-        if (item && !imgname.isEmpty())
-            item->SetImage(imgname, "preview");
-    }
+
+    if (!info)
+        return;
+
+    MythUIButtonListItem *item =
+        m_recordingList->GetItemByData(qVariantFromValue(info));
+
+    if (!item)
+        return;
+
+    MythUIButtonListItem *sel_item = m_recordingList->GetItemCurrent();
+    UpdateProgramInfo(item, item == sel_item);
 }
 
 bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)
@@ -3865,7 +3839,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
 
-        updateProgramInfo(item);
+        UpdateProgramInfo(item, true);
     }
     else
         m_recordingList->RemoveItem(item);

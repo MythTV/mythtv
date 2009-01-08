@@ -28,13 +28,13 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += playbackbox.h viewscheduled.h globalsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
 HEADERS += statusbox.h networkcontrol.h custompriority.h
-HEADERS += mediarenderer.h mythfexml.h
+HEADERS += mediarenderer.h mythfexml.h playbackboxlistitem.h
 HEADERS += mythappearance.h exitprompt.h proglist.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp 
 SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
-SOURCES += mediarenderer.cpp mythfexml.cpp
+SOURCES += mediarenderer.cpp mythfexml.cpp playbackboxlistitem.cpp
 SOURCES += custompriority.cpp
 SOURCES += mythappearance.cpp exitprompt.cpp proglist.cpp
 

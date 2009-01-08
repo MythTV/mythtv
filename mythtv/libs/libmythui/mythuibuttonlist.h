@@ -34,7 +34,7 @@ class MPUBLIC MythUIButtonListItem
                          CheckState state = CantCheck, bool showArrow = false);
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
                          QVariant data);
-    ~MythUIButtonListItem();
+    virtual ~MythUIButtonListItem();
 
     MythUIButtonList *parent() const;
 
@@ -83,7 +83,7 @@ class MPUBLIC MythUIButtonListItem
 
     bool MoveUpDown(bool flag);
 
-    void SetToRealButton(MythUIStateType *button, bool selected);
+    virtual void SetToRealButton(MythUIStateType *button, bool selected);
 
   protected:
     MythUIButtonList *m_parent;
