@@ -34,7 +34,8 @@ class VDPAUContext
 
     void PrepareVideo(VideoFrame *frame, QRect video_rect,
                       QRect display_video_rect,
-                      QSize screen_size, FrameScanType scan);
+                      QSize screen_size, FrameScanType scan,
+                      bool pause_frame);
     void DisplayNextFrame(void);
     void SetNextFrameDisplayTimeOffset(int delayus);
     bool InitOSD(QSize osd_size);
@@ -55,7 +56,6 @@ class VDPAUContext
     int SetPictureAttribute(PictureAttribute attributeType, int newValue);
 
     bool ShowPiP(VideoFrame * frame, QRect position);
-    void CopyFrame(VideoFrame *dst, const VideoFrame *src, QSize size);
 
   private:
     bool InitProcs(Display *disp, Screen *screen);

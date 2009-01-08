@@ -3102,10 +3102,13 @@ void VideoOutputXv::PrepareFrameVDPAU(VideoFrame *frame, FrameScanType scan)
     (void)frame;
     (void)scan;
 
-    if (!frame)
-        frame = vbuffers.GetScratchFrame();
+    bool pause = (frame == NULL);
+    // select the correct still frame on certain dvds
+    if (pause && vbuffers.size(kVideoBuffer_used))
+        frame = vbuffers.head(kVideoBuffer_used);
 
-    framesPlayed = frame->frameNumber + 1;
+    if (frame)
+        framesPlayed = frame->frameNumber + 1;
 
 #ifdef USING_VDPAU
     if (!vdpau)
@@ -3113,11 +3116,11 @@ void VideoOutputXv::PrepareFrameVDPAU(VideoFrame *frame, FrameScanType scan)
 
     vdpau->PrepareVideo(
         frame, windows[0].GetVideoRect(), windows[0].GetDisplayVideoRect(),
-    	windows[0].GetDisplayVisibleRect().size(), scan);
+    	windows[0].GetDisplayVisibleRect().size(), scan, pause);
 
 #endif
 
-    if (vbuffers.GetScratchFrame() == frame)
+    if (pause)
         vbuffers.SetLastShownFrameToScratch();
 }
 
@@ -3983,16 +3986,6 @@ void VideoOutputXv::CopyFrame(VideoFrame *to, const VideoFrame *from)
 {
     if (VideoOutputSubType() <= XVideo)
         VideoOutput::CopyFrame(to, from);
-#ifdef USING_VDPAU
-    else if (VideoOutputSubType() == XVideoVDPAU)
-    {
-        if (!vdpau)
-            return;
-
-        to->frameNumber = from->frameNumber;
-        vdpau->CopyFrame(to, from, windows[0].GetVideoDim());
-    }
-#endif
     else if (xvmc_tex)
     {
         global_lock.lock();
@@ -4048,55 +4041,7 @@ void VideoOutputXv::UpdatePauseFrame(void)
 #ifdef USING_VDPAU
     else if (VideoOutputSubType() == XVideoVDPAU)
     {
-        vbuffers.begin_lock(kVideoBuffer_used);
-
-        bool new_pause = false;
-        if (vbuffers.size(kVideoBuffer_pause))
-        {
-            if (vbuffers.size(kVideoBuffer_pause) > 1)
-            {
-                VERBOSE(VB_PLAYBACK, LOC_ERR + "UpdatePauseFrame(): "
-                        "Pause buffer size>1 check, " + QString("size = %1")
-                        .arg(vbuffers.size(kVideoBuffer_pause)));
-                while (vbuffers.size(kVideoBuffer_pause) > 1)
-                    DiscardFrame(vbuffers.dequeue(kVideoBuffer_pause));
-            }
-
-            if (vbuffers.size(kVideoBuffer_used))
-            {
-                CopyFrame(vbuffers.head(kVideoBuffer_pause),
-                          vbuffers.head(kVideoBuffer_used));
-                new_pause = true;
-            }   
-        }
-        else if (vbuffers.size(kVideoBuffer_used) > 1) 
-        {
-            VideoFrame *frame = vbuffers.dequeue(kVideoBuffer_used);
-            vbuffers.safeEnqueue(kVideoBuffer_pause, frame);
-            new_pause = true;
-        }
-        else if (vbuffers.size(kVideoBuffer_avail) > 0)
-        {
-            VideoFrame *frame = vbuffers.dequeue(kVideoBuffer_avail);
-            vbuffers.safeEnqueue(kVideoBuffer_pause, frame);
-        }
-
-        if (new_pause)
-        {
-            VERBOSE(VB_PLAYBACK, LOC + "VDPAU using new pause frame.");
-        }
-        else if (vbuffers.size(kVideoBuffer_pause) == 1)
-        {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    "VDPAU using old pause frame.");
-        }
-        else
-        {
-            VERBOSE(VB_PLAYBACK, LOC_ERR +
-                    "VDPAU did not find a pause frame.");
-        }
-
-        vbuffers.end_lock();
+        return;
     }
 #endif
 #ifdef USING_XVMC
@@ -4155,13 +4100,6 @@ void VideoOutputXv::UpdatePauseFrame(void)
 void VideoOutputXv::ProcessFrameVDPAU(VideoFrame *frame, OSD *osd,
                                       const PIPMap &pipPlayers)
 {
-    if (!frame)
-    {
-        frame = vbuffers.GetScratchFrame();
-        if (frame && vbuffers.head(kVideoBuffer_pause))
-            CopyFrame(frame, vbuffers.head(kVideoBuffer_pause));
-    }
-
     if (vdpau_use_osd && osd)
         DisplayOSD(frame, osd);
     ShowPIPs(frame, pipPlayers);
