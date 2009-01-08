@@ -365,6 +365,17 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
         delete curProgram;
     }
 
+    if (!nvpError.isEmpty())
+    {
+        MythScreenStack *ss = GetMythMainWindow()->GetStack("popup stack");
+        MythConfirmationDialog *dlg = new MythConfirmationDialog(
+            ss, nvpError, false);
+        if (!dlg->Create())
+            delete dlg;
+        else
+            ss->AddScreen(dlg);
+    }
+
     gContext->sendPlaybackEnd();
 
     VERBOSE(VB_PLAYBACK, LOC + "StartTV -- end");
