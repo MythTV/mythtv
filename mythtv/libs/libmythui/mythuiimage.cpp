@@ -401,11 +401,11 @@ bool MythUIImage::Load(void)
             image = GetMythUI()->LoadCacheImage(filename, imagelabel);
             if (image)
             {
+                image->UpRef();
                 VERBOSE(VB_FILE, QString("MythUIImage::Load found in cache :%1:").arg(imagelabel));
                 if (m_isReflected)
                     image->setIsReflected(true);
 
-                image->UpRef();
                 bFoundInCache = true;
             }
             else
@@ -467,21 +467,21 @@ bool MythUIImage::Load(void)
             SetSize(aSize);
         }
 
-        image->SetChanged();
-
         if (image->isNull())
         {
             VERBOSE(VB_FILE, QString("MythUIImage::Load Image is NULL :%1:").arg(m_Filename));
             image->DownRef();
         }
         else
+        {
+            image->SetChanged();
             m_Images.push_back(image);
+        }
     }
 
     m_LastDisplay = QTime::currentTime();
     SetRedraw();
 
-    //VERBOSE(VB_FILE, QString("MythUIImage::Load  done :%1:").arg(t1.elapsed()));
     return true;
 }
 
@@ -622,6 +622,7 @@ bool MythUIImage::ParseElement(QDomElement &element)
         }
 
         m_maskImage = GetMythPainter()->GetFormatImage();
+        m_maskImage->UpRef();
         if (m_maskImage->Load(maskfile))
             m_isMasked = true;
         else
