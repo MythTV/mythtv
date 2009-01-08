@@ -1172,24 +1172,33 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     switch (XML.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
-            break;
+            m_database->SetDatabaseParams(m_DBparams);
+            VERBOSE(VB_UPNP,
+                    LOC + "Got database hostname: " + m_DBparams.dbHostName);
+            return true;
 
         case UPnPResult_ActionNotAuthorized:
             // The stored PIN is probably not correct.
             // We could prompt for the PIN and try again, but that needs a UI.
             // Easier to fail for now, and put up the full UI selector later
             VERBOSE(VB_UPNP, LOC + error + ". Wrong PIN?");
-            return false;
+            break;
 
         default:
             VERBOSE(VB_UPNP, LOC + error);
-            return false;
+            break;
     }
 
-    m_database->SetDatabaseParams(m_DBparams);
+    // This backend may have a local DB with the default user/pass/DBname.
+    // For whatever reason, we have failed to get anything back via UPnP,
+    // so we might as well try the database directly as a last resort.
+    URL.remove("http://");
+    URL.remove(QRegExp("[:/].*"));
+    if (URL.isEmpty())
+        return false;
 
-    QString DBhost = m_DBparams.dbHostName;
-    VERBOSE(VB_UPNP, LOC + QString("Got database hostname: %1").arg(DBhost));
+    VERBOSE(VB_UPNP, "Trying default DB credentials at " + URL);
+    m_DBparams.dbHostName = URL;
 
     return true;
 }
