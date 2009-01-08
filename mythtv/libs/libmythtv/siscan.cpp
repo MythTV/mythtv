@@ -147,6 +147,7 @@ void SIScan::deleteLater(void)
     disconnect();
     StopScanner();
     VERBOSE(VB_SIPARSER, LOC + "SIScanner Stopped");
+    channel = 0; // Deleted by caller
     teardown_frequency_tables();
     QObject::deleteLater();
 }
