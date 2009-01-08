@@ -1869,7 +1869,7 @@ bool MythContext::CheckProtoVersion(MythSocket* socket)
                                     "backend=%2)\n")
                                     .arg(MYTH_PROTO_VERSION).arg(strlist[1]));
 
-        if (d->m_ui && d->m_ui->IsScreenSetup())
+        if (d->mainWindow && d->m_ui && d->m_ui->IsScreenSetup())
         {
             MythPopupBox::showOkPopup(
                 d->mainWindow,
