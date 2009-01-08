@@ -294,6 +294,8 @@ class PlaybackBox : public MythScreenType
 
     void clearProgramCache(void);
 
+    void HandlePreviewEvent(const ProgramInfo &evinfo);
+
     MythUIButtonList *m_groupList;
     MythUIButtonList *m_recordingList;
 

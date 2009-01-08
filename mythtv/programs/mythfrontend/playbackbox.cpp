@@ -3172,6 +3172,12 @@ void PlaybackBox::customEvent(QEvent *event)
                                         event);
             }
         }
+        else if (message == "PREVIEW_READY")
+        {
+            ProgramInfo evinfo;
+            if (evinfo.FromStringList(me->ExtraDataList(), 0))
+                HandlePreviewEvent(evinfo);
+        }
     }
 }
 
@@ -3332,13 +3338,35 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
     }
     m_previewGeneratorLock.unlock();
 
-    if (m_titleList.size() > 1)
+    if (sizeof(qulonglong) < sizeof(ProgramInfo*))
     {
-        ProgramInfo *tmpInfo = findMatchingProg(pginfo);
+        VERBOSE(VB_IMPORTANT, "Pointer size assumption incorrect");
+        return;
+    }
+
+    if (pginfo)
+    {
+        QStringList extra;
+        pginfo->ToStringList(extra);
+        extra.detach();
+        MythEvent me("PREVIEW_READY", extra);
+        VERBOSE(VB_IMPORTANT, "Sending Preview Event...");
+        gContext->dispatch(me);
+    }
+}
+
+void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
+{
+    VERBOSE(VB_IMPORTANT, "Handling Preview Event...");
+
+    ProgramInfo *info = findMatchingProg(&evinfo);
+    if (info)
+    {
+        QString imgname = getPreviewImage(info);
         MythUIButtonListItem *item =
-                    m_recordingList->GetItemByData(qVariantFromValue(tmpInfo));
-        if (item)
-            item->SetImage(getPreviewImage(tmpInfo), "preview");
+            m_recordingList->GetItemByData(qVariantFromValue(info));
+        if (item && !imgname.isEmpty())
+            item->SetImage(imgname, "preview");
     }
 }
 
