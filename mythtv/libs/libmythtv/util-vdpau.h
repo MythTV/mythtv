@@ -7,6 +7,14 @@ extern "C" {
 
 #include "videobuffers.h"
 
+struct vdpauPIP
+{
+    QSize           videoSize;
+    VdpVideoSurface videoSurface;
+    VdpVideoMixer   videoMixer;
+};
+class NuppelVideoPlayer;
+
 class VDPAUContext
 {
   public:
@@ -55,7 +63,11 @@ class VDPAUContext
     PictureAttributeSupported  GetSupportedPictureAttributes(void) const;
     int SetPictureAttribute(PictureAttribute attributeType, int newValue);
 
-    bool ShowPiP(VideoFrame * frame, QRect position);
+    bool InitPIPLayer(QSize screen_size);
+    bool ShowPIP(NuppelVideoPlayer *pipplayer,
+                 VideoFrame * frame, QRect position,
+                 bool pip_is_active);
+    void DeinitPIP(NuppelVideoPlayer *pipplayer);
 
   private:
     bool InitProcs(Display *disp, Screen *screen);
@@ -69,8 +81,9 @@ class VDPAUContext
     bool InitColorControl(void);
     bool SetPictureAttributes(void);
 
-    bool InitPiP(QSize vid_size);
-    void DeinitPip(void);
+    
+    void DeinitPIPLayer(void);
+    bool InitPIP(NuppelVideoPlayer *pipplayer, QSize vid_size);
 
     int nextframedelay;
     VdpTime lastframetime;
@@ -115,14 +128,15 @@ class VDPAUContext
     VdpCSCMatrix      cscMatrix;
     VdpProcamp        proCamp;
 
-    QSize             pipFrameSize;
     VdpLayer          pipLayer;
-    VdpVideoSurface   pipVideoSurface;
     VdpOutputSurface  pipOutputSurface;
-    VdpVideoMixer     pipVideoMixer;
-    int               pipReady;
-    VdpRect           pipPosition;
     VdpBitmapSurface  pipAlpha;
+    VdpBitmapSurface  pipBorder;
+    VdpBitmapSurface  pipClear;
+    QMap<NuppelVideoPlayer*,vdpauPIP> pips;
+    int  pipReady;
+    QSize             pipLayerSize;
+    bool              pipNeedsClear;
 
     VdpPresentationQueueTarget vdp_flip_target;
     VdpPresentationQueue       vdp_flip_queue;

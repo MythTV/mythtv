@@ -3690,7 +3690,9 @@ void VideoOutputXv::ShowPIP(VideoFrame        *frame,
 #ifdef USING_VDPAU
     if (vdpau && vdpau_use_pip && VideoOutputSubType() == XVideoVDPAU)
     {
-        vdpau_use_pip = vdpau->ShowPiP(pipimage, position);
+        if (vdpau->InitPIPLayer(dvr.size()))
+            vdpau_use_pip = vdpau->ShowPIP(pipplayer, pipimage,
+                                           position, pipActive);
         pipplayer->ReleaseCurrentFrame(pipimage);
         return;
     }
@@ -3751,19 +3753,25 @@ void VideoOutputXv::ShowPIP(VideoFrame        *frame,
 
 void VideoOutputXv::RemovePIP(NuppelVideoPlayer *pipplayer)
 {
-    if (VideoOutputSubType() != OpenGL)
-        return;
+    if (VideoOutputSubType() == OpenGL)
+    {
+        if (!gl_pipchains.contains(pipplayer))
+            return;
 
-    if (!gl_pipchains.contains(pipplayer))
-        return;
+        OpenGLContextLocker ctx_lock(gl_context);
 
-    OpenGLContextLocker ctx_lock(gl_context);
-
-    OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
-    if (gl_pipchain)
-        delete gl_pipchain;
-    gl_pip_ready.remove(pipplayer);
-    gl_pipchains.remove(pipplayer);
+        OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
+        if (gl_pipchain)
+            delete gl_pipchain;
+        gl_pip_ready.remove(pipplayer);
+        gl_pipchains.remove(pipplayer);
+    }
+#ifdef USING_VDPAU
+    else if (vdpau && VideoOutputSubType() == XVideoVDPAU)
+    {
+        vdpau->DeinitPIP(pipplayer);
+    }
+#endif // USING_VDPAU
 }
 
 void VideoOutputXv::DrawUnusedRects(bool sync)
@@ -4788,6 +4796,7 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
     (void)do_pixel_adj;
 
     if (!pipplayer || OpenGL == VideoOutputSubType() ||
+        XVideoVDPAU == VideoOutputSubType() ||
         !pipplayer->UsingNullVideo())
     {
         return VideoOutput::GetPIPRect(location, pipplayer);

@@ -145,7 +145,8 @@ class VideoOutput
     virtual bool hasOpenGLAcceleration(void) const { return false; }
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
-
+    /// \brief Return true if VDPAU Acceleration is running
+    virtual bool hasVDPAUAcceleration(void) const { return false; }
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
     /// \brief Returns the number of frames played

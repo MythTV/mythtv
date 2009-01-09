@@ -125,7 +125,8 @@ bool PlayerContext::IsPIPSupported(void) const
         const VideoOutput *vid = nvp->getVideoOutput();
         if (vid && 
             (vid->hasXVAcceleration() ||
-             vid->hasOpenGLAcceleration()))
+             vid->hasOpenGLAcceleration()) ||
+             vid->hasVDPAUAcceleration())
         {
             supported = true;
         }

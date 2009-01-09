@@ -43,7 +43,18 @@ static const VdpOutputSurfaceRenderBlendState osd_blend =
         VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
         VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
         VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD
-    };        
+    };
+
+static const VdpOutputSurfaceRenderBlendState pip_blend =
+    {
+        VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
+        VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE,
+        VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
+        VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ONE,
+        VDP_OUTPUT_SURFACE_RENDER_BLEND_FACTOR_ZERO,
+        VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD,
+        VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD
+    };
 
 VDPAUContext::VDPAUContext()
   : nextframedelay(0),      lastframetime(0),
@@ -54,10 +65,10 @@ VDPAUContext::VDPAUContext()
     osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
     osdSize(QSize(0,0)),    osdReady(false),   deintAvail(false),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
-    needDeintRefs(false),   useColorControl(false), pipFrameSize(QSize(0,0)),
-    pipVideoSurface(0),     pipOutputSurface(0),
-    pipVideoMixer(0),       pipReady(0),       pipAlpha(0),
-    vdp_flip_target(NULL),  vdp_flip_queue(NULL),
+    needDeintRefs(false),   useColorControl(false),
+    pipOutputSurface(0),    pipAlpha(0),       pipBorder(0),
+    pipClear(0),            pipReady(0),       pipLayerSize(QSize(0,0)),
+    pipNeedsClear(false),   vdp_flip_target(NULL), vdp_flip_queue(NULL),
     vdpauDecode(false),     vdp_device(NULL),  errored(false)
 {
     memset(outputSurfaces, 0, sizeof(outputSurfaces));
@@ -106,7 +117,7 @@ void VDPAUContext::Deinit(void)
     DeinitOSD();
     FreeOutput();
     DeinitFlipQueue();
-    DeinitPip();
+    DeinitPIPLayer();
     DeinitProcs();
 }
 
@@ -1071,6 +1082,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
 
     if (pipReady)
         pipReady--;
+    pipNeedsClear = true;
 }
 
 void VDPAUContext::DisplayNextFrame(void)
@@ -1771,15 +1783,12 @@ void VDPAUContext::ClearScreen(void)
     DisplayNextFrame();
 }
 
-void VDPAUContext::DeinitPip(void)
+void VDPAUContext::DeinitPIPLayer(void)
 {
-    pipFrameSize = QSize(0,0);
-    pipReady     = 0;
-
-    if (pipVideoSurface)
+    while (!pips.empty())
     {
-        vdp_video_surface_destroy(pipVideoSurface);
-        pipVideoSurface = 0;
+        DeinitPIP(pips.begin().key());
+        pips.erase(pips.begin());
     }
 
     if (pipOutputSurface)
@@ -1788,70 +1797,69 @@ void VDPAUContext::DeinitPip(void)
         pipOutputSurface = 0;
     }
 
-    if (pipVideoMixer)
-    {
-        vdp_video_mixer_destroy(pipVideoMixer);
-        pipVideoMixer = 0;
-    }
-
     if (pipAlpha)
     {
         vdp_bitmap_surface_destroy(pipAlpha);
         pipAlpha = 0;
     }
+
+    if (pipBorder)
+    {
+        vdp_bitmap_surface_destroy(pipBorder);
+        pipBorder = 0;
+    }
+
+    if (pipClear)
+    {
+        vdp_bitmap_surface_destroy(pipClear);
+        pipClear = 0;
+    }
+
+    pipLayerSize = QSize(0, 0);
+    pipReady     = 0;
 }
 
-bool VDPAUContext::InitPiP(QSize vid_size)
+bool VDPAUContext::InitPIPLayer(QSize screen_size)
 {
-    // TODO capability check 
-    // but should just fail gracefully anyway
+    if (pipLayerSize != screen_size)
+        DeinitPIPLayer();
+
     bool ok = true;
     VdpStatus vdp_st;
 
-    pipFrameSize = vid_size;
-
-    vdp_st = vdp_video_surface_create(
-        vdp_device,
-        vdp_chroma_type,
-        vid_size.width(),
-        vid_size.height(),
-        &pipVideoSurface
-    );
-    CHECK_ST
-
-    if (ok)
+    if (!pipOutputSurface)
     {
         vdp_st = vdp_output_surface_create(
             vdp_device,
             VDP_RGBA_FORMAT_B8G8R8A8,
-            vid_size.width(),
-            vid_size.height(),
+            screen_size.width(),
+            screen_size.height(),
             &pipOutputSurface
         );
         CHECK_ST
+
+        pipLayer.struct_version = VDP_LAYER_VERSION;
+        pipLayer.source_surface = pipOutputSurface;
+        pipLayer.source_rect    = NULL;
+        pipLayer.destination_rect = NULL;
     }
 
-    if (ok)
+    if (!pipAlpha && ok)
     {
         vdp_st = vdp_bitmap_surface_create(
             vdp_device,
             VDP_RGBA_FORMAT_A8,
-            vid_size.width(),
-            vid_size.height(),
+            1, 1,
             false,
             &pipAlpha
         );
         CHECK_ST
-    }
 
-    if (ok)
-    {
-        unsigned char *alpha = new unsigned char[vid_size.width() * vid_size.height()];
-        void const * alpha_ptr[] = {alpha};
-        if (alpha)
+        if (ok)
         {
-            memset(alpha, 255, vid_size.width() * vid_size.height());
-            uint32_t pitch[1] = {vid_size.width()};
+            unsigned char alpha = 255;
+            void const * alpha_ptr[] = {&alpha};
+            uint32_t pitch[1] = {1};
             vdp_st = vdp_bitmap_surface_put_bits_native(
                 pipAlpha,
                 alpha_ptr,
@@ -1859,11 +1867,117 @@ bool VDPAUContext::InitPiP(QSize vid_size)
                 NULL
             );
             CHECK_ST
-            delete [] alpha;
         }
-        else
-            ok = false;
     }
+
+    if (!pipBorder && ok)
+    {
+        vdp_st = vdp_bitmap_surface_create(
+            vdp_device,
+            VDP_RGBA_FORMAT_R8G8B8A8,
+            1, 1,
+            false,
+            &pipBorder
+        );
+        CHECK_ST
+
+        if (ok)
+        {
+            unsigned char red[] = {127, 0, 0, 255};
+            void const * red_ptr[] = {&red};
+            uint32_t pitch[1] = {1};
+            vdp_st = vdp_bitmap_surface_put_bits_native(
+                pipBorder,
+                red_ptr,
+                pitch,
+                NULL
+            );
+            CHECK_ST
+        }
+    }
+
+    if (!pipClear && ok)
+    {
+        vdp_st = vdp_bitmap_surface_create(
+            vdp_device,
+            VDP_RGBA_FORMAT_R8G8B8A8,
+            1, 1,
+            false,
+            &pipClear
+        );
+        CHECK_ST
+
+        if (ok)
+        {
+            unsigned char blank[] = {0, 0, 0, 0};
+            void const * blank_ptr[] = {&blank};
+            uint32_t pitch[1] = {1};
+            vdp_st = vdp_bitmap_surface_put_bits_native(
+                pipClear,
+                blank_ptr,
+                pitch,
+                NULL
+            );
+            CHECK_ST
+        }
+    }
+
+    ok &= (pipBorder && pipAlpha && pipOutputSurface && pipClear);
+
+    if (ok && pipNeedsClear)
+    {
+        pipLayerSize = screen_size;
+        vdp_st = vdp_output_surface_render_bitmap_surface(
+            pipOutputSurface,
+            NULL,
+            pipClear,
+            NULL,
+            NULL,
+            &pip_blend,
+            0
+        );
+        CHECK_ST
+        pipNeedsClear = false;
+    }
+
+    return ok;
+}
+
+void VDPAUContext::DeinitPIP(NuppelVideoPlayer *pipplayer)
+{
+    if (!pips.contains(pipplayer))
+        return;
+
+    if (pips[pipplayer].videoSurface)
+        vdp_video_surface_destroy(pips[pipplayer].videoSurface);
+
+    if (pips[pipplayer].videoMixer)
+        vdp_video_mixer_destroy(pips[pipplayer].videoMixer);
+
+    pips.remove(pipplayer);
+    VERBOSE(VB_PLAYBACK, LOC + "Removed 1 PIP");
+}
+
+bool VDPAUContext::InitPIP(NuppelVideoPlayer *pipplayer,
+                           QSize vid_size)
+{
+    if (pips.contains(pipplayer))
+        return false;
+
+    bool ok = true;
+    VdpStatus vdp_st;
+
+    VdpVideoSurface tmp_surface;
+    VdpVideoMixer   tmp_mixer;
+
+    vdp_st = vdp_video_surface_create(
+        vdp_device,
+        vdp_chroma_type,
+        vid_size.width(),
+        vid_size.height(),
+        &tmp_surface
+    );
+    CHECK_ST
 
     if (ok)
     {
@@ -1888,34 +2002,48 @@ bool VDPAUContext::InitPiP(QSize vid_size)
             ARSIZE(parameters),
             parameters,
             parameter_values,
-            &pipVideoMixer
+            &tmp_mixer
         );
         CHECK_ST
-        VERBOSE(VB_PLAYBACK, LOC + QString("Created VDPAU PiP (%1x%2)")
-                .arg(width).arg(height));
     }
 
-    pipLayer.struct_version = VDP_LAYER_VERSION;
-    pipLayer.source_surface = pipOutputSurface;
-    pipLayer.source_rect    = NULL;
-    pipLayer.destination_rect = &pipPosition;
+    if (ok && tmp_mixer && tmp_surface)
+    {
+        vdpauPIP tmp = {vid_size, tmp_surface, tmp_mixer};
+        pips[pipplayer] = tmp;
+        VERBOSE(VB_PLAYBACK, LOC + QString("Created VDPAU PIP (%1x%2)")
+                .arg(vid_size.width()).arg(vid_size.height()));
+    }
+    else
+    {
+        DeinitPIP(pipplayer);
+        ok = false;
+    }
 
     return ok;
 }
 
-bool VDPAUContext::ShowPiP(VideoFrame * frame, QRect position)
+bool VDPAUContext::ShowPIP(NuppelVideoPlayer *pipplayer,
+                           VideoFrame * frame, QRect position,
+                           bool pip_is_active)
 {
-    if (!frame)
+    if (!frame || !pipplayer)
         return false;
 
     bool ok = true;
     VdpStatus vdp_st;
 
-    if (frame->width  != pipFrameSize.width() ||
-        frame->height != pipFrameSize.height())
+    QSize vid_size = QSize(frame->width, frame->height);
+
+    if (pips.contains(pipplayer) &&
+        pips[pipplayer].videoSize != vid_size)
     {
-        DeinitPip();
-        ok = InitPiP(QSize(frame->width, frame->height));
+        DeinitPIP(pipplayer);
+    }
+
+    if (!pips.contains(pipplayer))
+    {
+        ok = InitPIP(pipplayer, vid_size);
     }
 
     if (!ok)
@@ -1932,33 +2060,54 @@ bool VDPAUContext::ShowPiP(VideoFrame * frame, QRect position)
         frame->buf + frame->offsets[1]
     };
     vdp_st = vdp_video_surface_put_bits_y_cb_cr(
-        pipVideoSurface,
+        pips[pipplayer].videoSurface,
         VDP_YCBCR_FORMAT_YV12,
         planes,
         pitches);
     CHECK_ST;
 
     VdpRect pip_rect;
-    pip_rect.x0 = 0;
-    pip_rect.y0 = 0;
-    pip_rect.x1 = pipFrameSize.width();
-    pip_rect.y1 = pipFrameSize.height();
+    pip_rect.x0 = position.left();
+    pip_rect.y0 = position.top();
+    pip_rect.x1 = position.left() + position.width();
+    pip_rect.y1 = position.top() + position.height();
+
+    if (pip_is_active && ok)
+    {
+        VdpRect pip_active_rect;
+        pip_active_rect.x0 = pip_rect.x0 - 10;
+        pip_active_rect.y0 = pip_rect.y0 - 10;
+        pip_active_rect.x1 = pip_rect.x1 + 10;
+        pip_active_rect.y1 = pip_rect.y1 + 10;
+
+        vdp_st = vdp_output_surface_render_bitmap_surface(
+            pipOutputSurface,
+            &pip_active_rect,
+            pipBorder,
+            NULL,
+            NULL,
+            &pip_blend,
+            0
+        );
+        CHECK_ST
+    }
+
     if (ok)
     {
         vdp_st = vdp_video_mixer_render(
-            pipVideoMixer,
+            pips[pipplayer].videoMixer,
             VDP_INVALID_HANDLE,
             NULL,
             VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
             0,
             NULL,
-            pipVideoSurface,
+            pips[pipplayer].videoSurface,
             0,
             NULL,
             NULL,
             pipOutputSurface,
-            NULL,
-            NULL,
+            &pip_rect,
+            &pip_rect,
             0,
             NULL
         );
@@ -1969,7 +2118,7 @@ bool VDPAUContext::ShowPiP(VideoFrame * frame, QRect position)
     {
         vdp_st = vdp_output_surface_render_bitmap_surface(
             pipOutputSurface,
-            NULL,
+            &pip_rect,
             pipAlpha,
             NULL,
             NULL,
@@ -1980,13 +2129,7 @@ bool VDPAUContext::ShowPiP(VideoFrame * frame, QRect position)
     }
 
     if (ok)
-    {
         pipReady = 2; // for double rate deint
-        pipPosition.x0 = position.left();
-        pipPosition.y0 = position.top();
-        pipPosition.x1 = position.left() + position.width();
-        pipPosition.y1 = position.top() + position.height();
-    }
 
     return ok;
 }

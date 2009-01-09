@@ -113,6 +113,8 @@ class VideoOutputXv : public VideoOutput
         { return OpenGL == VideoOutputSubType(); }
     virtual bool hasHWAcceleration(void) const
         { return OpenGL <= VideoOutputSubType(); }
+    virtual bool hasVDPAUAcceleration(void) const
+        { return XVideoVDPAU == VideoOutputSubType(); }
 
     void CheckFrameStates(void);
 
