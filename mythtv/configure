@@ -2002,7 +2002,7 @@ if ! enabled cpu_override && enabled proc_opt; then
 # EM64T era Intel Xeon
    if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*51[1-6][08]" > /dev/null ; then
        cpu="core2"
-   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*546[0-9][025]" > /dev/null ; then
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*54[0-9][025]" > /dev/null ; then
        cpu="core2"
    elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*33[2567]0" > /dev/null ; then
        cpu="core2"
@@ -2020,6 +2020,10 @@ if ! enabled cpu_override && enabled proc_opt; then
 # Intel Core2 Duo
    elif expr "$processor" : ".*Genuine.*Intel.*CPU.*2160" > /dev/null ; then
        cpu="core2"
+# Intel Atom
+   elif expr "$processor" : ".*Intel(R) Atom(TM)" > /dev/null ; then
+       cpu="nocona"
+       enable small
 # Reportedly Intel Duo, but we assume 32 bit P3 due to generic name
    elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
        cpu="pentium3"
@@ -2083,6 +2087,8 @@ if ! enabled cpu_override && enabled proc_opt; then
        enable small
 # Athlon 64
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
+       cpu="k8"
+   elif expr "$processor" : ".*Athlon LE-16" > /dev/null ; then
        cpu="k8"
 # AMD Phenom
    elif expr "$processor" : ".*AMD Phenom(tm)" > /dev/null ; then
