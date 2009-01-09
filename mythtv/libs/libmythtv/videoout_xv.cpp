@@ -1002,13 +1002,16 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     bool done = false;
 
 #ifdef USING_VDPAU
-    if (((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END) ||
-         mcodecid < kCodec_NORMAL_END) && use_vdpau)
+    if (((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END)) ||
+         mcodecid < kCodec_NORMAL_END)
     {
-        vbuffers.Init(NUM_VDPAU_BUFFERS, true, 1, 4, 4, 1, false);
-        done = InitVDPAU(mcodecid);
-        if (!done)
-            vbuffers.Reset();
+        if (use_vdpau)
+        {
+            vbuffers.Init(NUM_VDPAU_BUFFERS, true, 1, 4, 4, 1, false);
+            done = InitVDPAU(mcodecid);
+            if (!done)
+                vbuffers.Reset();
+        }
     }
 #endif
 
