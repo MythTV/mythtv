@@ -480,6 +480,21 @@ bool VDPAUContext::InitFlipQueue(Window win)
     );
     CHECK_ST
 
+    VdpColor background;
+    background.red = 0.0;
+    background.green = 0.0;
+    background.blue = 0.0;
+    background.alpha = 1.0f;
+
+    if (ok)
+    {
+        vdp_st = vdp_presentation_queue_set_background_color(
+            vdp_flip_queue,
+            &background
+        );
+        CHECK_ST
+    }
+
     return ok;
 }
 
