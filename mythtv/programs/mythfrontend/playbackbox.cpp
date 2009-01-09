@@ -1081,7 +1081,6 @@ bool PlaybackBox::FillList(bool useCachedData)
         if (!(m_viewMask & VIEW_WATCHLIST))
             m_watchListStart = 0;
 
-        sortedList[""] = "";
         vector<ProgramInfo *>::iterator i = m_progCache->begin();
         for ( ; i != m_progCache->end(); i++)
         {
@@ -1185,7 +1184,6 @@ bool PlaybackBox::FillList(bool useCachedData)
                         if (recidEpisodes[p->recordid] == 1 ||
                             p->recordid == 0 )
                         {
-                            sortedList[m_watchGroupLabel] = m_watchGroupName;
                             m_progLists[m_watchGroupLabel].prepend(p);
                             m_progLists[m_watchGroupLabel].setAutoDelete(false);
                         }
@@ -1445,7 +1443,10 @@ bool PlaybackBox::FillList(bool useCachedData)
         m_progLists[m_watchGroupLabel].sort(comp_recpriority2_less_than);
     }
 
-    m_titleList = sortedList.values();
+    m_titleList = QStringList("");
+    if (m_progLists[m_watchGroupLabel].size() > 1)
+        m_titleList << m_watchGroupName;
+    m_titleList << sortedList.values();
 
     updateGroupList();
     updateUsage();
