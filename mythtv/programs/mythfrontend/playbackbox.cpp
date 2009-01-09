@@ -543,7 +543,8 @@ void PlaybackBox::checkPassword(const QString &password)
         setGroupFilter(m_newRecGroup);
 }
 
-void PlaybackBox::updateGroupInfo(const QString &groupname)
+void PlaybackBox::updateGroupInfo(const QString &groupname,
+                                  const QString &grouplabel)
 {
     QMap<QString, QString> infoMap;
     int countInGroup;
@@ -553,15 +554,15 @@ void PlaybackBox::updateGroupInfo(const QString &groupname)
         countInGroup = m_progLists[""].size();
         infoMap["title"] = m_groupDisplayName;
         infoMap["group"] = m_groupDisplayName;
-        infoMap["show"] = ProgramInfo::i18n("All Programs");
+        infoMap["show"]  = ProgramInfo::i18n("All Programs");
     }
     else
     {
         countInGroup = m_progLists[groupname].size();
-        infoMap["group"] = m_groupDisplayName;
-        infoMap["show"] = groupname;
         infoMap["title"] = QString("%1 - %2").arg(m_groupDisplayName)
-                                                .arg(groupname);
+                                             .arg(grouplabel);
+        infoMap["group"] = m_groupDisplayName;
+        infoMap["show"]  = grouplabel;
     }
 
     if (countInGroup > 1)
@@ -822,6 +823,7 @@ void PlaybackBox::updateGroupList()
                 groupname = m_groupDisplayName;
 
             item->SetText(groupname, "name");
+            item->SetText(groupname);
 
             int count = m_progLists[groupname.toLower()].size();
             item->SetText(QString::number(count), "reccount");
@@ -844,8 +846,9 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         return;
 
     QString groupname = sel_item->GetData().toString();
+    QString grouplabel = sel_item->GetText();
 
-    updateGroupInfo(groupname);
+    updateGroupInfo(groupname, grouplabel);
 
     if ((m_currentGroup == groupname) && !m_needUpdate)
         return;

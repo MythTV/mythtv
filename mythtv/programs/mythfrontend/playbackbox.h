@@ -290,7 +290,7 @@ class PlaybackBox : public MythScreenType
     void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);
     void updateUsage();
-    void updateGroupInfo(const QString &groupname);
+    void updateGroupInfo(const QString &groupname, const QString &grouplabel);
     void UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel,
                            bool force_preview_reload = false);
 
