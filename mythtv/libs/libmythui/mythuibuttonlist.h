@@ -65,7 +65,9 @@ class MPUBLIC MythUIButtonListItem
      */
     MythImage *getImage(const QString &name="");
 
-    void SetImage(const QString &filename, const QString &name="");
+    void SetImage(const QString &filename, const QString &name="",
+                  bool force_reload = false);
+    QString GetImage(const QString &name="") const;
     const QString Image() const;
 
     void DisplayState(const QString &state, const QString &name);

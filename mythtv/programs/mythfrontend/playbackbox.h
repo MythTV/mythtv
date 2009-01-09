@@ -291,7 +291,8 @@ class PlaybackBox : public MythScreenType
     void updateIcons(const ProgramInfo *pginfo = NULL);
     void updateUsage();
     void updateGroupInfo(const QString &groupname);
-    void UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel);
+    void UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel,
+                           bool force_preview_reload = false);
 
     void SetTextFromMap(MythUIType *parent, QMap<QString, QString> &infoMap);
     void ResetMap(MythUIType *parent, QMap<QString, QString> &infoMap);

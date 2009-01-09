@@ -586,7 +586,8 @@ void PlaybackBox::updateGroupInfo(const QString &groupname)
     updateIcons();
 }
 
-void PlaybackBox::UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel)
+void PlaybackBox::UpdateProgramInfo(
+    MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
 {
     if (!item)
         return;
@@ -602,15 +603,22 @@ void PlaybackBox::UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel)
         !JobQueue::IsJobQueuedOrRunning(
             JOB_TRANSCODE, pginfo->chanid, pginfo->recstartts),
         !JobQueue::IsJobQueuedOrRunning(
-            JOB_COMMFLAG, pginfo->chanid, pginfo->recstartts),
+            JOB_COMMFLAG,  pginfo->chanid, pginfo->recstartts),
     };
 
     for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); i++)
         item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
 
-    QString imagefile = getPreviewImage(pginfo);
+    QString oldimgfile = item->GetImage("preview");
+    QString imagefile = QString::null;
+    if (oldimgfile.isEmpty() || force_preview_reload ||
+        ((is_sel && GetFocusWidget() == m_recordingList)))
+    {
+        imagefile = getPreviewImage(pginfo);
+    }
+
     if (!imagefile.isEmpty())
-        item->SetImage(imagefile, "preview");
+        item->SetImage(imagefile, "preview", force_preview_reload);
 
     if ((GetFocusWidget() == m_recordingList) && is_sel)
     {
@@ -622,6 +630,7 @@ void PlaybackBox::UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel)
 
         if (m_previewImage)
         {
+            QString imagefile = getPreviewImage(pginfo);
             m_previewImage->SetVisible(!imagefile.isEmpty());
             m_previewImage->SetFilename(imagefile);
             m_previewImage->Load();
@@ -3341,7 +3350,7 @@ void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
         return;
 
     MythUIButtonListItem *sel_item = m_recordingList->GetItemCurrent();
-    UpdateProgramInfo(item, item == sel_item);
+    UpdateProgramInfo(item, item == sel_item, true);
 }
 
 bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)

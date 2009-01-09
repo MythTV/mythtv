@@ -1247,15 +1247,44 @@ MythImage* MythUIButtonListItem::getImage(const QString &name)
     return NULL;
 }
 
-void MythUIButtonListItem::SetImage(const QString &filename, const QString &name)
+void MythUIButtonListItem::SetImage(
+    const QString &filename, const QString &name, bool force_reload)
 {
+    bool do_update = force_reload;
     if (!name.isEmpty())
-        m_imageFilenames.insert(name, filename);
-    else
+    {
+        QMap<QString, QString>::iterator it = m_imageFilenames.find(name);
+        if (it == m_imageFilenames.end())
+        {
+            m_imageFilenames.insert(name, filename);
+            do_update = true;
+        }
+        else if (*it != filename)
+        {
+            *it = filename;
+            do_update = true;
+        }
+    }
+    else if (m_imageFilename != filename)
+    {
         m_imageFilename = filename;
+        do_update = true;
+    }
 
-    if (m_parent)
+    if (m_parent && do_update)
         m_parent->Update();
+}
+
+QString MythUIButtonListItem::GetImage(const QString &name) const
+{
+    if (name.isEmpty())
+        return m_imageFilename;
+
+    QMap<QString, QString>::const_iterator it = m_imageFilenames.find(name);
+    if (it != m_imageFilenames.end())
+        return *it;
+
+    return QString::null;
 }
 
 void MythUIButtonListItem::DisplayState(const QString &state,
@@ -1264,9 +1293,20 @@ void MythUIButtonListItem::DisplayState(const QString &state,
     if (name.isEmpty())
         return;
 
-    m_states.insert(name, state);
+    bool do_update = false;
+    QMap<QString, QString>::iterator it = m_states.find(name);
+    if (it == m_states.end())
+    {
+        m_states.insert(name, state);
+        do_update = true;
+    }
+    else if (*it != state)
+    {
+        *it = state;
+        do_update = true;
+    }
 
-    if (m_parent)
+    if (m_parent && do_update)
         m_parent->Update();
 }
 
