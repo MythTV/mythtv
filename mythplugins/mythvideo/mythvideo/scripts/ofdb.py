@@ -192,17 +192,6 @@ def get_ofdb_doc(uid, context):
 class NoIMDBURL(Exception):
 	pass
 
-def extract_imdb_url(doc):
-	nodes = xpath.Evaluate("//A[contains(@href, 'imdb.com/Title')]",
-			doc.documentElement)
-	if len(nodes):
-		uid_find = re.compile('imdb.com/Title\?(\d+)', re.I)
-		url = nodes[0].getAttributeNS(EMPTY_NAMESPACE, 'href')
-		m = uid_find.search(url)
-		if m:
-			return (url, m.group(1))
-	raise NoIMDBURL()
-
 def search_data(uid, rating_country):
 	def possible_error(path):
 		comment_out("Warning: expected to find content at '%s', site format " \
@@ -254,16 +243,8 @@ def search_data(uid, rating_country):
 
 	try:
 		doc = get_ofdb_doc(uid, "data")
-		alturl = None
-		try:
-			(url, id) = extract_imdb_url(doc)
-			alturl = url
-		except NoIMDBURL:
-			if VERBOSE:
-				print_exception(traceback.format_exc())
-		except:
-			print_exception(traceback.format_exc())
 
+#TODO: Add details from tmdb
 		data = {'title' : '',
 				'countries' : '',
 				'year' : '',
@@ -271,11 +252,11 @@ def search_data(uid, rating_country):
 				'cast' : '',
 				'genre' : '',
 				'user_rating' : '',
-				'movie_rating' : '',
+#				'movie_rating' : '',
 				'plot' : '',
-				'release_date' : '',
-				'runtime' : '',
-				'writers' : '',
+#				'release_date' : '',
+#				'runtime' : '',
+#				'writers' : '',
 				}
 
 		data['title'] = single_value(doc.documentElement,
@@ -293,7 +274,7 @@ def search_data(uid, rating_country):
 		data['genre'] = ",".join(multi_value(doc.documentElement,
 				"//A[starts-with(@href, 'view.php?page=genre&Genre=')]"))
 		data['user_rating'] = attr_value(doc.documentElement,
-				"//IMG[@src='images/notenspalte.gif']", "alt")
+				"//IMG[@src='images/design3/notenspalte.png']", "alt")
 
 		tmp_sid = attr_value(doc.documentElement,
 				"//A[starts-with(@href, 'plot/')]", "href")
@@ -313,52 +294,16 @@ def search_data(uid, rating_country):
 			data['plot'] = unicode(all_text_children(doc.documentElement,
 					"//FONT[@class='Blocksatz']"))
 
-		if alturl:
-			# They now give a "bad" query string, just use the id
-			(scheme, netloc, path, query, frag) = urlparse.urlsplit(alturl)
-			path = "title/tt%s/" % (id)
-			alturl = urlparse.urlunsplit((scheme, netloc, path, None, None))
-			debug_out("Looking for other info %s..." % (alturl))
-			(rc, content) = ofdb_url_get(alturl)
-			reader = HtmlLib.Reader()
-			doc = reader.fromString(content, charset='utf8')
-
-			data['release_date'] = direct_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Premierendatum')]/../child::text()[2]")
-			data['runtime'] = direct_value(doc.documentElement, u"//DIV[@class='info']/H5[starts-with(., 'L\u00E4nge')]/../child::text()[2]").split()[0]
-
-			movie_ratings = multi_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Altersfreigabe')]/../A")
-
-			if len(movie_ratings):
-				found = False
-				if rating_country:
-					for rc in rating_country.split(','):
-						for m in movie_ratings:
-							(country, rating) = m.split(':')
-							if country.lower().find(rc.lower()) != -1:
-								data['movie_rating'] = rating
-								found = True
-								break
-
-						if found:
-							break
-
-				if not found:
-					data['movie_rating'] = ",".join(movie_ratings)
-
-			writers = multi_value(doc.documentElement, "//DIV[@class='info']/H5[starts-with(., 'Drehbuchautoren')]/../A")
-			if len(writers):
-				data['writers'] = writers[0]
-
+#ReleaseDate:%(release_date)s
+#MovieRating:%(movie_rating)s
+#Runtime:%(runtime)s
+#Writers:%(writers)s
 		print("""\
 Title:%(title)s
 Year:%(year)s
-ReleaseDate:%(release_date)s
 Director:%(directors)s
 Plot:%(plot)s
 UserRating:%(user_rating)s
-MovieRating:%(movie_rating)s
-Runtime:%(runtime)s
-Writers:%(writers)s
 Cast:%(cast)s
 Genres:%(genre)s
 Countries:%(countries)s
@@ -373,48 +318,7 @@ def search_poster(uid):
 		poster_urls = []
 		ofdoc = get_ofdb_doc(uid, "poster")
 
-		try:
-			(url, id) = extract_imdb_url(ofdoc)
-
-			(rc, content) = ofdb_url_get(urlparse.urljoin("http://www.imdb.com",
-				"title/tt%s/posters" % (id)))
-
-			reader = HtmlLib.Reader()
-			doc = reader.fromString(content, charset='utf8')
-
-			nodes = xpath.Evaluate("//TABLE[starts-with(@background, 'http://posters.imdb.com/posters/')]", doc.documentElement)
-			for i in nodes:
-				poster_urls.append(i.getAttributeNS(EMPTY_NAMESPACE,
-					'background'))
-
-			nodes = xpath.Evaluate("//A[contains(@href, 'impawards.com')]",
-					doc.documentElement)
-			if len(nodes):
-				try:
-					base = nodes[0].getAttributeNS(EMPTY_NAMESPACE, 'href')
-					(rc, content) = ofdb_url_get(base)
-					reader = HtmlLib.Reader()
-					doc = reader.fromString(content, charset='utf8')
-					nodes = xpath.Evaluate(
-							"//IMG[starts-with(@SRC, 'posters/')]",
-							doc.documentElement)
-					for i in nodes:
-						(scheme, netloc, path, query, frag) = \
-								urlparse.urlsplit(base)
-						np = path.split('/')[:-1]
-						np = "/".join(np)
-						poster_urls.insert(0, urlparse.urljoin(base,
-							"%s/%s" % (np, i.getAttributeNS(EMPTY_NAMESPACE,
-								'SRC'))))
-				except:
-					print_exception(traceback.format_exc())
-		except NoIMDBURL:
-			if VERBOSE:
-				print_exception(traceback.format_exc())
-		except:
-			print_exception(traceback.format_exc())
-
-		nodes = xpath.Evaluate("//IMG[starts-with(@src, 'http://www.ofdb.de:81/film/')]",
+		nodes = xpath.Evaluate("//IMG[starts-with(@src, 'http://img.ofdb.de/film/')]",
 				ofdoc.documentElement)
 		for node in nodes:
 			poster_urls.append(node.getAttributeNS(EMPTY_NAMESPACE, 'src'))
