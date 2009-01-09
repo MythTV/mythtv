@@ -3779,8 +3779,7 @@ void VideoOutputXv::RemovePIP(NuppelVideoPlayer *pipplayer)
 
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
-    if (VideoOutputSubType() == OpenGL ||
-        VideoOutputSubType() == XVideoVDPAU)
+    if (VideoOutputSubType() == OpenGL)
         return;
 
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
@@ -3790,6 +3789,19 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
     int boboff_raw = (int)round(((double)display_video_rect.height()) /
                                 456 - 0.00001);
     int boboff     = use_bob ? boboff_raw : 0;
+
+    if (XVideoVDPAU == VideoOutputSubType())
+    {
+        X11L;
+        XSetForeground(XJ_disp, XJ_gc, 0x020202);
+        XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
+                       display_visible_rect.left(),
+                       display_visible_rect.top(),
+                       display_visible_rect.width(),
+                       display_visible_rect.height());
+        X11U;
+        return;
+    }
 
     xv_need_bobdeint_repaint |= windows[0].IsRepaintNeeded();
 

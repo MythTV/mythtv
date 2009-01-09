@@ -480,10 +480,11 @@ bool VDPAUContext::InitFlipQueue(Window win)
     );
     CHECK_ST
 
+    float tmp = 2.0 / 255.0;
     VdpColor background;
-    background.red = 0.0;
-    background.green = 0.0;
-    background.blue = 0.0;
+    background.red = tmp;
+    background.green = tmp;
+    background.blue = tmp;
     background.alpha = 1.0f;
 
     if (ok)
