@@ -18,6 +18,7 @@ class PlaybackBoxListItem : public MythUIButtonListItem
 
   private:
     PlaybackBox *pbbox;
+    bool         needs_update;
 };
 
 #endif // _PLAYBACKBOXLISTITEM_H_

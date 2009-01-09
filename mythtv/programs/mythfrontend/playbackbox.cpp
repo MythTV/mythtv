@@ -611,11 +611,8 @@ void PlaybackBox::UpdateProgramInfo(
 
     QString oldimgfile = item->GetImage("preview");
     QString imagefile = QString::null;
-    if (oldimgfile.isEmpty() || force_preview_reload ||
-        ((is_sel && GetFocusWidget() == m_recordingList)))
-    {
+    if (oldimgfile.isEmpty() || force_preview_reload)
         imagefile = getPreviewImage(pginfo);
-    }
 
     if (!imagefile.isEmpty())
         item->SetImage(imagefile, "preview", force_preview_reload);
@@ -630,7 +627,7 @@ void PlaybackBox::UpdateProgramInfo(
 
         if (m_previewImage)
         {
-            QString imagefile = getPreviewImage(pginfo);
+            imagefile = (imagefile.isEmpty()) ? oldimgfile : imagefile;
             m_previewImage->SetVisible(!imagefile.isEmpty());
             m_previewImage->SetFilename(imagefile);
             m_previewImage->Load();
@@ -804,8 +801,7 @@ void PlaybackBox::updateGroupList()
         QStringList::iterator it;
         for (it = m_titleList.begin(); it != m_titleList.end(); it++)
         {
-            groupname = (*it);
-            groupname = groupname.simplified();
+            groupname = (*it).simplified();
 
             // The first item added to the list will trigger an update of the
             // associated Recording List, m_needsUpdate should be false unless

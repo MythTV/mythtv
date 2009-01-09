@@ -5,13 +5,18 @@
 
 PlaybackBoxListItem::PlaybackBoxListItem(
     PlaybackBox *parent, MythUIButtonList *lbtype, ProgramInfo *pi) :
-    MythUIButtonListItem(lbtype, "", qVariantFromValue(pi)), pbbox(parent)
+    MythUIButtonListItem(lbtype, "", qVariantFromValue(pi)),
+    pbbox(parent), needs_update(true)
 {
 }
 
 void PlaybackBoxListItem::SetToRealButton(
     MythUIStateType *button, bool selected)
 {
-    pbbox->UpdateProgramInfo(this, selected);
+    if (needs_update)
+    {
+        pbbox->UpdateProgramInfo(this, selected);
+        needs_update = false;
+    }
     MythUIButtonListItem::SetToRealButton(button, selected);
 }
