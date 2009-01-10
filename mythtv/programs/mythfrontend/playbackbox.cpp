@@ -681,7 +681,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo && pginfo->audioproperties & (*it))
             {
                 iconState->DisplayState(it.key());
-                return;
+                break;
             }
         }
     }
@@ -700,7 +700,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo && pginfo->videoproperties & (*it))
             {
                 iconState->DisplayState(it.key());
-                return;
+                break;
             }
         }
     }
@@ -721,7 +721,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo->subtitleType & (*it))
             {
                 iconState->DisplayState(it.key());
-                return;
+                break;
             }
         }
     }
@@ -794,7 +794,7 @@ void PlaybackBox::updateGroupList()
 
     if (!m_titleList.isEmpty())
     {
-        MythUIButtonListItem *item;
+        MythUIButtonListItem *item = NULL;
 
         QString groupname;
 
