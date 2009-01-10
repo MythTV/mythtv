@@ -629,7 +629,11 @@ QString PlayerContext::PopPreviousChannel(void)
     if ((curChan == prevChan.back()) && !prevChan.empty())
         prevChan.pop_back();
 
+    if (prevChan.empty())
+        return QString::null;
+
     QString chan = prevChan.back();
+    chan.detach();
     return chan;
 }
 
@@ -639,9 +643,13 @@ QString PlayerContext::GetPreviousChannel(void) const
         return QString::null;
 
     QString curChan = tvchain->GetChannelName(-1);
-    if (curChan != prevChan.back() && prevChan.size() < 2)
-        return prevChan.back();
-    return prevChan[prevChan.size()-2];
+    QString preChan = QString::null;
+    if (curChan != prevChan.back() || prevChan.size() < 2)
+        preChan = prevChan.back();
+    else
+        preChan = prevChan[prevChan.size()-2];
+    preChan.detach();
+    return preChan;
 }
 
 void PlayerContext::LockPlayingInfo(const char *file, int line) const
