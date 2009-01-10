@@ -16,8 +16,8 @@ using namespace std;
 #include <QDir>
 #include <QTextCodec>
 #include <QWidget>
+#include <QApplication>
 
-#include "mythapplication.h"
 #include "mythconfig.h"
 #include "tv.h"
 #include "proglist.h"
@@ -1022,7 +1022,7 @@ int main(int argc, char **argv)
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
-    MythApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     QString pluginname;
 

@@ -5,8 +5,8 @@ using namespace std;
 #include <QString>
 #include <QRegExp>
 #include <QDir>
+#include <QApplication>
 
-#include "mythapplication.h"
 #include "tv_play.h"
 #include "programinfo.h"
 #include "mythcommandlineparser.h"
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    MythApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
 
