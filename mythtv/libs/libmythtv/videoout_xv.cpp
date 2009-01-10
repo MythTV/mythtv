@@ -1967,6 +1967,9 @@ bool VideoOutputXv::Init(
 #if defined(USING_OPENGL_VIDEO) || defined(USING_OPENGL_VSYNC)
     gl_context_creator = new GLContextCreator(
         this, windows[0].GetDisplayVisibleRect(), false);
+    // HACK -- begin, see #6036
+    GLContextCreatedWait();
+    // HACK -- end 
 #endif  
 
     // Set resolution/measurements (check XRandR, Xinerama, config settings)
