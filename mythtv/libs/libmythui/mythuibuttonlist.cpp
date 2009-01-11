@@ -70,6 +70,7 @@ void MythUIButtonList::Const(void)
 
 MythUIButtonList::~MythUIButtonList()
 {
+    m_ButtonToItem.clear();
     m_clearing = true;
     while (!m_itemList.isEmpty())
         delete m_itemList.takeFirst();
@@ -105,6 +106,8 @@ void MythUIButtonList::SetActive(bool active)
 
 void MythUIButtonList::Reset()
 {
+    m_ButtonToItem.clear();
+
     if (m_itemList.isEmpty())
         return;
 
@@ -137,6 +140,8 @@ void MythUIButtonList::SetPositionArrowStates(void)
         Init();
 
     m_needsUpdate = false;
+
+    m_ButtonToItem.clear();
 
     if (m_ButtonList.size() > 0)
     {
@@ -180,6 +185,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
                 selected = true;
             }
 
+            m_ButtonToItem[button] = buttonItem;
             buttonItem->SetToRealButton(realButton, selected);
             realButton->SetVisible(true);
 
@@ -324,6 +330,8 @@ void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
     if (m_itemsVisible == 0)
         return;
 
+    m_topPosition = 0;
+
     switch (m_scrollStyle)
     {
         case ScrollCenter :
@@ -332,8 +340,7 @@ void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
                 ++m_topPosition;
             break;
         case ScrollFree :
-            if (m_topPosition + (int)m_itemsVisible <= m_selPosition ||
-                m_topPosition > m_selPosition)
+            if (m_topPosition + (int)m_itemsVisible <= m_selPosition)
             {
                 if (m_layout == LayoutHorizontal)
                     m_topPosition = m_selPosition - m_itemsVisible + 1;
@@ -658,7 +665,7 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
                     m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
                                         / m_columns * m_columns;
 
-                m_topPosition = std::max(0, m_topPosition);
+                m_topPosition = qMax(0, m_topPosition);
             }
             break;
     }
@@ -891,7 +898,7 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
     {
         QPoint position = event->GetPosition();
 
-        MythUIType *type = GetChildAt(position,false);
+        MythUIType *type = uitype->GetChildAt(position,false,false);
 
         if (!type)
             return;
@@ -912,18 +919,13 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
             else if (name.startsWith("buttonlist button"))
             {
                 int pos = name.section(' ',2,2).toInt();
-                pos += m_topPosition;
-                if (pos < m_itemList.size())
+                MythUIButtonListItem *item = m_ButtonToItem[pos];
+                if (item)
                 {
-                    if (pos == GetCurrentPos())
-                    {
-                        emit itemClicked(GetItemCurrent());
-                    }
-                    else if (pos != m_selPosition)
-                    {
-                        SetItemCurrent(pos);
-                        emit itemSelected(GetItemCurrent());
-                    }
+                    if (item == GetItemCurrent())
+                        emit itemClicked(item);
+                    else
+                        SetItemCurrent(item);
                 }
             }
 

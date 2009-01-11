@@ -172,14 +172,14 @@ void MythUIType::DeleteAllChildren(void)
  *
  *  \return The widget at these coordinates
  */
-MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive)
+MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
+                                   bool focusable)
 {
+
     if (GetArea().contains(p))
     {
-        /* assumes no selectible ui type will contain another
-         * selectible ui type. */
-        if (!recursive && CanTakeFocus() && IsVisible())
-            return this;
+        if (!IsVisible())
+            return NULL;
 
         if (m_ChildrenList.isEmpty())
             return NULL;
@@ -188,18 +188,28 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive)
         QList<MythUIType *>::iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
+            if (!(*it))
+                continue;
+
             MythUIType *child = NULL;
 
-            if (recursive)
-            {
-                if ((*it)->GetArea().contains(p - GetArea().topLeft()))
-                    child = *it;
-            }
-            else
-                child = (*it)->GetChildAt(p - GetArea().topLeft());
 
-            if (child != NULL)
+            if ((*it)->GetArea().contains(p - GetArea().topLeft()))
+                child = *it;
+
+            if (!child && recursive)
+                child = (*it)->GetChildAt(p - GetArea().topLeft(), recursive,
+                                          focusable);
+
+            if (child)
+            {
+                // NOTE: Assumes no selectible ui type will contain another
+                // selectible ui type.
+                if (focusable && !child->CanTakeFocus())
+                    continue;
+
                 return child;
+            }
         }
     }
     return NULL;

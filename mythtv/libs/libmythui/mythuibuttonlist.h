@@ -215,6 +215,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     MythUIStateType *m_downArrow;
 
     QVector<MythUIStateType *> m_ButtonList;
+    QMap<int, MythUIButtonListItem *> m_ButtonToItem;
 
     bool m_initialized;
     bool m_needsUpdate;
