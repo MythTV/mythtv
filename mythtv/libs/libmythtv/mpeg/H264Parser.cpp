@@ -136,6 +136,8 @@ void H264Parser::Reset(void)
 
     AU_offset = frame_start_offset = keyframe_start_offset = 0;
     on_frame = on_key_frame = false;
+
+    wait_for_IDR = false;
 }
 
 
@@ -347,7 +349,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                 on_frame = true;
                 frame_start_offset = AU_offset;
 
-                if (seen_IDR && isKeySlice(slice_type))
+                if (isKeySlice(slice_type) && (!wait_for_IDR || seen_IDR))
                 {
                     on_key_frame = true;
                     keyframe_start_offset = AU_offset;

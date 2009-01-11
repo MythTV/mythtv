@@ -130,6 +130,8 @@ class H264Parser {
                     nal_type == SLICE_IDR);
         }
 
+    void waitForIDR(bool wait) { wait_for_IDR = wait; }
+
   private:
     enum constants {EXTENDED_SAR = 255};
 
@@ -186,6 +188,8 @@ class H264Parser {
 
     uint64_t   AU_offset, frame_start_offset, keyframe_start_offset;
     bool       on_frame, on_key_frame;
+
+    bool       wait_for_IDR;
 };
 
 #endif /* H264PARSER_H */
