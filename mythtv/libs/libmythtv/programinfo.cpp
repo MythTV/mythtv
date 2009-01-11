@@ -1250,6 +1250,29 @@ void ProgramInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
     playgroup = newplaygroup;
 }
 
+/** \fn ProgramInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
+ *  \brief Sets the storage group, both in this ProgramInfo
+ *         and in the database.
+ *  \param newstoragegroup New storage group.
+ */
+void ProgramInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                  " SET storagegroup = :STORAGEGROUP"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :START ;");
+    query.bindValue(":STORAGEGROUP", newstoragegroup);
+    query.bindValue(":START", recstartts);
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+        MythDB::DBError("StorageGroup update", query);
+
+    storagegroup = newstoragegroup;
+}
+
 /** \fn ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
  *  \brief Sets the recording title and subtitle, both in this ProgramInfo
  *         and in the database.
@@ -3655,519 +3678,52 @@ void ProgramInfo::EditScheduled(void)
     record->exec();
 }
 
-static QString get_ratings(bool recorded, uint chanid, QDateTime startts)
-{
-    QString table = (recorded) ? "recordedrating" : "programrating";
-    QString sel = QString(
-        "SELECT system, rating FROM %1 "
-        "WHERE chanid  = :CHANID "
-        "AND starttime = :STARTTIME").arg(table);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(sel);
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", startts);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("programinfo.cpp: get_ratings", query);
-        return "";
-    }
-
-    QMap<QString,QString> main_ratings;
-    QString advisory = "";
-    while (query.next())
-    {
-        if (query.value(0).toString().toLower() == "advisory")
-        {
-            advisory += query.value(1).toString() + ", ";
-            continue;
-        }
-        main_ratings[query.value(0).toString()] = query.value(1).toString();
-    }
-
-    if (!advisory.length() > 2)
-        advisory.left(advisory.length() - 2);
-
-    if (main_ratings.empty())
-        return advisory;
-
-    if (!advisory.isEmpty())
-        advisory = ": " + advisory;
-
-    if (main_ratings.size() == 1)
-    {
-        return *main_ratings.begin() + advisory;
-    }
-
-    QString ratings = "";
-    QMap<QString,QString>::const_iterator it;
-    for (it = main_ratings.begin(); it != main_ratings.end(); ++it)
-    {
-        ratings += it.key() + ": " + *it + ", ";
-    }
-
-    return ratings + "Advisory" + advisory;
-}
-
-#define ADD_PAR(title,text,result)                                        \
-    do { result += details_dialog->themeText("heading", title + ":  ", 3) \
-            +  details_dialog->themeText("body", text, 3) + "<br>"; }     \
-    while (false)
-
 /** \fn ProgramInfo::showDetails(void) const
- *  \brief Pops up a DialogBox with program info, blocking until user exits
- *         the dialog.
+ *  \brief Pops up a DialogBox with program info.
  */
 void ProgramInfo::showDetails(void) const
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString fullDateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
-    if (!fullDateFormat.contains("yyyy"))
-        fullDateFormat += " yyyy";
-    QString category_type, showtype, year, epinum, rating, colorcode,
-            title_pronounce;
-    float stars = 0.0;
-    int partnumber = 0, parttotal = 0;
-    int audioprop = 0, videoprop = 0, subtype = 0, generic = 0;
-    bool recorded = false;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgDetails *details_dialog  = new ProgDetails(mainStack, this);
 
-    if (record == NULL && recordid)
+    if (!details_dialog->Create())
     {
-        record = new ScheduledRecording();
-        record->loadByProgram(this);
+        delete details_dialog;
+        return;
     }
 
-    if (filesize > 0)
-        recorded = true;
+    mainStack->AddScreen(details_dialog);
 
-    if (endts != startts)
+    // HACK begin - remove when everything is using mythui 
+    if (GetMythMainWindow()->currentWidget())
     {
-        QString ptable = "program";
-        if (recorded)
-            ptable = "recordedprogram";
+        QWidget *widget = GetMythMainWindow()->currentWidget();
+        vector<QWidget *> widgetList;
 
-        query.prepare(QString("SELECT category_type, airdate, stars,"
-                      " partnumber, parttotal, audioprop+0, videoprop+0,"
-                      " subtitletypes+0, syndicatedepisodenumber, generic,"
-                      " showtype, colorcode, title_pronounce"
-                      " FROM %1 WHERE chanid = :CHANID AND"
-                      " starttime = :STARTTIME ;").arg(ptable));
-
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts);
-
-        if (query.exec() && query.isActive() && query.size() > 0)
+        while (widget)
         {
-            query.next();
-            category_type = query.value(0).toString();
-            year = query.value(1).toString();
-            stars = query.value(2).toDouble();
-            partnumber = query.value(3).toInt();
-            parttotal = query.value(4).toInt();
-            audioprop = query.value(5).toInt();
-            videoprop = query.value(6).toInt();
-            subtype = query.value(7).toInt();
-            epinum = query.value(8).toString();
-            generic = query.value(9).toInt();
-            showtype = query.value(10).toString();
-            colorcode = query.value(11).toString();
-            title_pronounce = query.value(12).toString();
+            widgetList.push_back(widget);
+            GetMythMainWindow()->detach(widget);
+            widget = GetMythMainWindow()->currentWidget();
         }
-        else if (!query.isActive())
-            MythDB::DBError(LOC + "showDetails", query);
 
-        rating = get_ratings(recorded, chanid.toUInt(), startts);
-    }
+        GetMythMainWindow()->GetPaintWindow()->raise();
+        GetMythMainWindow()->GetPaintWindow()->setFocus();
 
-    if (category_type == "" && programid != "")
-    {
-        QString prefix = programid.left(2);
-
-        if (prefix == "MV")
-           category_type = "movie";
-        else if (prefix == "EP")
-           category_type = "series";
-        else if (prefix == "SP")
-           category_type = "sports";
-        else if (prefix == "SH")
-           category_type = "tvshow";
-    }
-
-    ProgDetails *details_dialog = new ProgDetails(gContext->GetMainWindow(),
-            "progdetails");
-
-    QString msg = "";
-    QString s   = "";
-
-    s = title;
-    if (subtitle != "")
-        s += " - \"" + subtitle + "\"";
-    ADD_PAR(QObject::tr("Title"), s, msg);
-
-    if (title_pronounce != "")
-        ADD_PAR(QObject::tr("Title Pronounce"), title_pronounce, msg);
-
-    s = description;
-
-    QString attr = "";
-
-    if (partnumber > 0)
-        attr += QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
-
-    if (rating != "" && rating != "NR")
-        attr += rating + ", ";
-    if (category_type == "movie")
-    {
-        if (year != "")
-            attr += year + ", ";
-
-        if (stars > 0.0)
+        int screenCount = mainStack->TotalScreens();
+        do
         {
-            QString str = QObject::tr("stars");
-            if (stars > 0 && stars <= 0.25)
-                str = QObject::tr("star");
+            qApp->processEvents();
+            usleep(5000);
+        } while (mainStack->TotalScreens() >= screenCount);
 
-            attr += QString("%1 %2, ").arg(4.0 * stars).arg(str);
+        vector<QWidget*>::reverse_iterator it;
+        for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
+        {
+            GetMythMainWindow()->attach(*it);
         }
     }
-    if (colorcode != "")
-        attr += colorcode + ", ";
-
-    if (audioprop & AUD_MONO)
-        attr += QObject::tr("Mono") + ", ";
-    if (audioprop & AUD_STEREO)
-        attr += QObject::tr("Stereo") + ", ";
-    if (audioprop & AUD_SURROUND)
-        attr += QObject::tr("Surround Sound") + ", ";
-    if (audioprop & AUD_DOLBY)
-        attr += QObject::tr("Dolby Sound") + ", ";
-    if (audioprop & AUD_HARDHEAR)
-        attr += QObject::tr("Audio for Hearing Impaired") + ", ";
-    if (audioprop & AUD_VISUALIMPAIR)
-        attr += QObject::tr("Audio for Visually Impaired") + ", ";
-
-    if (videoprop & VID_HDTV)
-        attr += QObject::tr("HDTV") + ", ";
-    if  (videoprop & VID_WIDESCREEN)
-        attr += QObject::tr("Widescreen") + ", ";
-    if  (videoprop & VID_AVC)
-        attr += QObject::tr("AVC/H.264") + ", ";
-
-    if (subtype & SUB_HARDHEAR)
-        attr += QObject::tr("CC","Closed Captioned") + ", ";
-    if (subtype & SUB_NORMAL)
-        attr += QObject::tr("Subtitles Available") + ", ";
-    if (subtype & SUB_ONSCREEN)
-        attr += QObject::tr("Subtitled") + ", ";
-    if (subtype & SUB_SIGNED)
-        attr += QObject::tr("Deaf Signing") + ", ";
-
-    if (generic && category_type == "series")
-        attr += QObject::tr("Unidentified Episode") + ", ";
-    else if (repeat)
-        attr += QObject::tr("Repeat") + ", ";
-
-    if (attr != "")
-    {
-        attr.truncate(attr.lastIndexOf(','));
-        s += " (" + attr + ")";
-    }
-
-    if (s != "")
-        ADD_PAR(QObject::tr("Description"), s, msg);
-
-    if (category != "")
-    {
-        s = category;
-
-        query.prepare("SELECT genre FROM programgenres "
-                      "WHERE chanid = :CHANID AND starttime = :STARTTIME "
-                      "AND relevance > 0 ORDER BY relevance;");
-
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts);
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            while (query.next())
-                s += ", " + query.value(0).toString();
-        }
-        ADD_PAR(QObject::tr("Category"), s, msg);
-    }
-
-    if (category_type  != "")
-    {
-        s = category_type;
-        if (seriesid != "")
-            s += "  (" + seriesid + ")";
-        if (showtype != "")
-            s += "  " + showtype;
-        ADD_PAR(QObject::tr("Type","category_type"), s, msg);
-    }
-
-    if (epinum != "")
-        ADD_PAR(QObject::tr("Episode Number"), epinum, msg);
-
-    if (hasAirDate && category_type != "movie")
-    {
-        ADD_PAR(QObject::tr("Original Airdate"),
-                originalAirDate.toString(fullDateFormat), msg);
-    }
-    if (programid  != "")
-        ADD_PAR(QObject::tr("Program ID"), programid, msg);
-
-    QString role = "", pname = "";
-
-    if (endts != startts)
-    {
-        if (recorded)
-            query.prepare("SELECT role,people.name FROM recordedcredits"
-                          " AS credits"
-                          " LEFT JOIN people ON credits.person = people.person"
-                          " WHERE credits.chanid = :CHANID"
-                          " AND credits.starttime = :STARTTIME"
-                          " ORDER BY role;");
-        else
-            query.prepare("SELECT role,people.name FROM credits"
-                          " LEFT JOIN people ON credits.person = people.person"
-                          " WHERE credits.chanid = :CHANID"
-                          " AND credits.starttime = :STARTTIME"
-                          " ORDER BY role;");
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts);
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            QString rstr = "", plist = "";
-
-            while(query.next())
-            {
-                role = query.value(0).toString();
-                pname = query.value(1).toString();
-
-                if (rstr == role)
-                    plist += ", " + pname;
-                else
-                {
-                    if (rstr == "actor")
-                        ADD_PAR(QObject::tr("Actors"), plist, msg);
-                    else if (rstr == "director")
-                        ADD_PAR(QObject::tr("Director"), plist, msg);
-                    else if (rstr == "producer")
-                        ADD_PAR(QObject::tr("Producer"), plist, msg);
-                    else if (rstr == "executive_producer")
-                        ADD_PAR(QObject::tr("Executive Producer"), plist, msg);
-                    else if (rstr == "writer")
-                        ADD_PAR(QObject::tr("Writer"), plist, msg);
-                    else if (rstr == "guest_star")
-                        ADD_PAR(QObject::tr("Guest Star"), plist, msg);
-                    else if (rstr == "host")
-                        ADD_PAR(QObject::tr("Host"), plist, msg);
-                    else if (rstr == "adapter")
-                        ADD_PAR(QObject::tr("Adapter"), plist, msg);
-                    else if (rstr == "presenter")
-                        ADD_PAR(QObject::tr("Presenter"), plist, msg);
-                    else if (rstr == "commentator")
-                        ADD_PAR(QObject::tr("Commentator"), plist, msg);
-                    else if (rstr == "guest")
-                        ADD_PAR(QObject::tr("Guest"), plist, msg);
-
-                    rstr = role;
-                    plist = pname;
-                }
-            }
-            if (rstr == "actor")
-                ADD_PAR(QObject::tr("Actors"), plist, msg);
-            else if (rstr == "director")
-                ADD_PAR(QObject::tr("Director"), plist, msg);
-            else if (rstr == "producer")
-                ADD_PAR(QObject::tr("Producer"), plist, msg);
-            else if (rstr == "executive_producer")
-                ADD_PAR(QObject::tr("Executive Producer"), plist, msg);
-            else if (rstr == "writer")
-                ADD_PAR(QObject::tr("Writer"), plist, msg);
-            else if (rstr == "guest_star")
-                ADD_PAR(QObject::tr("Guest Star"), plist, msg);
-            else if (rstr == "host")
-                ADD_PAR(QObject::tr("Host"), plist, msg);
-            else if (rstr == "adapter")
-                ADD_PAR(QObject::tr("Adapter"), plist, msg);
-            else if (rstr == "presenter")
-                ADD_PAR(QObject::tr("Presenter"), plist, msg);
-            else if (rstr == "commentator")
-                ADD_PAR(QObject::tr("Commentator"), plist, msg);
-            else if (rstr == "guest")
-                ADD_PAR(QObject::tr("Guest"), plist, msg);
-        }
-    }
-
-    // Begin MythTV information not found in the listings info
-    msg += "<p>";
-    QDateTime statusDate;
-    if (recstatus == rsWillRecord)
-        statusDate = startts;
-
-    ProgramInfo *p = new ProgramInfo;
-    p->rectype = kSingleRecord; // must be != kNotRecording
-    p->recstatus = recstatus;
-
-    if (p->recstatus == rsPreviousRecording ||
-        p->recstatus == rsNeverRecord || p->recstatus == rsUnknown)
-    {
-        query.prepare("SELECT recstatus, starttime "
-                      "FROM oldrecorded WHERE duplicate > 0 AND "
-                      "((programid <> '' AND programid = :PROGRAMID) OR "
-                      " (title <> '' AND title = :TITLE AND "
-                      "  subtitle <> '' AND subtitle = :SUBTITLE AND "
-                      "  description <> '' AND description = :DECRIPTION));");
-
-        query.bindValue(":PROGRAMID", programid);
-        query.bindValue(":TITLE", title);
-        query.bindValue(":SUBTITLE", subtitle);
-        query.bindValue(":DECRIPTION", description);
-
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("showDetails", query);
-
-        if (query.isActive() && query.size() > 0)
-        {
-            query.next();
-            if (p->recstatus == rsUnknown)
-                p->recstatus = RecStatusType(query.value(0).toInt());
-            if (p->recstatus == rsPreviousRecording ||
-                p->recstatus == rsNeverRecord || p->recstatus == rsRecorded)
-                statusDate = QDateTime::fromString(query.value(1).toString(),
-                                                  Qt::ISODate);
-        }
-    }
-    if (p->recstatus == rsUnknown)
-    {
-        if (recorded)
-        {
-            p->recstatus = rsRecorded;
-            statusDate = startts;
-        }
-        else
-        {
-            p->rectype = rectype; // re-enable "Not Recording" status text.
-        }
-    }
-    s = p->RecStatusText();
-    if (statusDate.isValid())
-        s += " " + statusDate.toString(fullDateFormat);
-    ADD_PAR(QString("MythTV " + QObject::tr("Status")), s, msg);
-    delete p;
-
-    if (recordid)
-    {
-        s = QString("%1, ").arg(recordid);
-        if (rectype != kNotRecording)
-            s += RecTypeText();
-        if (!(record->getRecordTitle().isEmpty()))
-            s += QString(" \"%2\"").arg(record->getRecordTitle());
-        ADD_PAR(QObject::tr("Recording Rule"), s, msg);
-
-        query.prepare("SELECT last_record, next_record, avg_delay "
-                      "FROM record WHERE recordid = :RECORDID");
-        query.bindValue(":RECORDID", recordid);
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            query.next();
-            if (query.value(0).toDateTime().isValid())
-                ADD_PAR(QObject::tr("Last Recorded"),
-                        query.value(0).toDateTime()
-                        .toString(fullDateFormat), msg);
-            if (query.value(1).toDateTime().isValid())
-                ADD_PAR(QObject::tr("Next Recording"),
-                        query.value(1).toDateTime()
-                        .toString(fullDateFormat), msg);
-            if (query.value(2).toInt() > 0)
-                ADD_PAR(QObject::tr("Average Time Shift"),
-                        QString("%1 %2").arg(query.value(2).toInt())
-                                        .arg(QObject::tr("hours")), msg);
-        }
-        if (recorded)
-        {
-            if (recpriority2 > 0)
-                ADD_PAR(QObject::tr("Watch List Score"),
-                        QString("%1").arg(recpriority2), msg);
-
-            if (recpriority2 < 0)
-            {
-                QString st = "";
-
-                switch(recpriority2)
-                {
-                case wlExpireOff:
-                    st = QObject::tr("Auto-expire off");
-                    break;
-                case wlWatched:
-                    st = QObject::tr("Marked as 'watched'");
-                    break;
-                case wlEarlier:
-                    st = QObject::tr("Not the earliest episode");
-                    break;
-                case wlDeleted:
-                    st = QObject::tr("Recently deleted episode");
-                    break;
-                }
-                ADD_PAR(QObject::tr("Watch List Status"), st, msg);
-            }
-        }
-        if (record->getSearchType() &&
-            record->getSearchType() != kManualSearch &&
-            record->getRecordDescription() != description)
-            ADD_PAR(QObject::tr("Search Phrase"),
-                    record->getRecordDescription().replace("<", "&lt;")
-                            .replace(">", "&gt;").replace("\n", " "), msg);
-    }
-    if (findid > 0)
-    {
-        QDate fdate(1970, 1, 1);
-        fdate = fdate.addDays(findid - 719528);
-        ADD_PAR(QObject::tr("Find ID"), QString("%1 (%2)").arg(findid)
-                .arg(fdate.toString(fullDateFormat)), msg);
-    }
-    if (recorded)
-    {
-        ADD_PAR(QObject::tr("Recording Host"), hostname, msg);
-        ADD_PAR(QObject::tr("Recorded File Name"), GetRecordBasename(), msg);
-
-        QString tmpSize;
-        tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
-        tmpSize += QObject::tr("GB", "GigaBytes");
-        ADD_PAR(QObject::tr("Recorded File Size"), tmpSize, msg);
-
-        query.prepare("SELECT profile FROM recorded"
-                      " WHERE chanid = :CHANID"
-                      " AND starttime = :STARTTIME;");
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts);
-
-        if (query.exec() && query.next())
-        {
-            QString rec_prof = query.value(0).toString();
-            if (!rec_prof.isEmpty())
-            {
-                ADD_PAR(QObject::tr("Recording Profile"),
-                        i18n(rec_prof), msg);
-            }
-        }
-        ADD_PAR(QObject::tr("Recording Group"), i18n(recgroup),     msg);
-        ADD_PAR(QObject::tr("Storage Group"),   i18n(storagegroup), msg);
-        ADD_PAR(QObject::tr("Playback Group"),  i18n(playgroup),    msg);
-    }
-    else if (recordid)
-    {
-        ADD_PAR(QObject::tr("Recording Profile"), record->getProfileName(),msg);
-    }
-    msg.remove(QRegExp("<br>$"));
-    details_dialog->setDetails(msg);
-    details_dialog->exec();
-
-    delete details_dialog;
+    // HACK end
 }
 
 /** \fn ProgramInfo::getProgramFlags(void) const

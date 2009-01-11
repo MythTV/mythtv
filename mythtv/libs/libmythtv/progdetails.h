@@ -1,35 +1,41 @@
 #ifndef PROGDETAILS_H_
 #define PROGDETAILS_H_
 
-#include <qstring.h>
-#include <qimage.h>
+// qt
+#include <QString>
 #include <QKeyEvent>
 
-#include "mythdialogs.h"
-#include "uitypes.h"
+// myth
+#include "mythscreentype.h"
+#include "mythuiwebbrowser.h"
+#include "programinfo.h"
 
-class ProgDetails : public MythThemedDialog
+class ProgDetails : public MythScreenType
 {
     Q_OBJECT
   public:
-      ProgDetails(MythMainWindow *parent, 
-                  QString windowName,
-                  QString details = "");
-      ~ProgDetails();
+      ProgDetails(MythScreenStack *parent, const ProgramInfo *progInfo);
+    ~ProgDetails();
 
-      QString themeText(const QString &fontName, const QString &text, int size);
-      void setDetails(const QString &details);
-
-  protected slots:
-    virtual void keyPressEvent(QKeyEvent *e);
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *event);
+    void Init(void);
 
   private:
-    void wireUpTheme(void);
+    QString getRatings(bool recorded, uint chanid, QDateTime startts);
+    void loadPage(void);
+    void updatePage(void);
+    bool loadHTML(void);
+    void addItem(const QString &key, const QString &title, const QString &data);
+    void removeItem(const QString &key);
 
-    UIRichTextType   *m_richText;
-    UITextButtonType *m_okButton;
+    ProgramInfo        m_progInfo;
+    MythUIWebBrowser  *m_browser;
 
-    QString           m_details;
+    int                m_currentPage;
+    QString            m_page[2];
+
+    QStringList        m_html;
 };
 
 #endif
