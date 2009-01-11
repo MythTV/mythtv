@@ -1863,10 +1863,10 @@ bool VideoOutputXv::InitSetupBuffers(void)
                                use_opengl, use_vdpau);
     if (!ok && windows[0].GetPIPState() == kPIPOff)
     {
-        use_xv     |= renderers.contains("xv-blit");
-        use_shm    |= renderers.contains("xshm");
-        use_opengl |= renderers.contains("opengl");
-        use_vdpau  |= renderers.contains("vdpau");
+        use_xv     |= (bool) renderers.contains("xv-blit");
+        use_shm    |= (bool) renderers.contains("xshm");
+        use_opengl |= (bool) renderers.contains("opengl");
+        use_vdpau  |= (bool) renderers.contains("vdpau");
         ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm,
                               use_opengl, use_vdpau);
     }
