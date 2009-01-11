@@ -10941,13 +10941,19 @@ void TV::DoDisplayJumpMenu(void)
                 }
             }
         }
+    
+        while (!infoList->empty())
+        {
+            delete infoList->back();
+            infoList->pop_back();
+        }
+        delete infoList;
     }
-    while (!infoList->empty())
+    else
     {
-        delete infoList->back();
-        infoList->pop_back();
+        ReturnPlayerLock(actx);
+        return;
     }
-    delete infoList;
 
     OSD *osd = GetOSDLock(actx);
     if (osd)
