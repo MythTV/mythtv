@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2009-01-02, v0.21.05
+  2009-01-11, v0.21.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -110,8 +110,9 @@
      8.1 Gentoo
      8.2 Obtaining and compiling lirc
      8.3 Completing the lirc install
-     8.4 Additional information for lirc
-     8.5 Configuring lirc for use with an IR blaster
+     8.4 Additional information for lirc - native mode
+     8.5 Additional information for lirc - irxevent mode
+     8.6 Configuring lirc for use with an IR blaster
 
   9. Configuring MythTV.
      9.1 Configuring the Master backend system
@@ -341,7 +342,6 @@
         24.2.5 XFS
      24.3 Migrating from DataDirect Labs to Schedules Direct
      24.4 Caching support for Schedules Direct
-
 
 
   ______________________________________________________________________
@@ -2666,7 +2666,29 @@
   control unless you're using native lirc support.
 
 
-  [1m8.4.  Additional information for lirc[0m
+
+  [1m8.4.  Additional information for lirc - native mode[0m
+
+  If you will be using native mode, your lircrc file will need to look
+  something like this:
+
+
+
+  begin
+       remote = mceusb
+       prog = mythtv
+       button = Guide
+       config = S
+       repeat = 0
+       delay = 0
+  end
+
+
+
+  Note that the name of the "prog" is [1mmythtv[22m, not [1mmythtvfrontend[0m
+
+
+  [1m8.5.  Additional information for lirc - irxevent mode[0m
 
   Take a look at the lircrc.example files in the contrib/configfiles/
   directory.  In my case, (Pinnacle Studio card) the channel up and down
@@ -2676,18 +2698,17 @@
   The lircrc.example file has this:
 
 
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2704,19 +2725,20 @@
   my /home/[yourusername]/.lircrc file:
 
 
-       begin
-           prog = irxevent
-           button = channel+
-           repeat = 3
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = channel-
-           repeat = 3
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      repeat = 3
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = channel-
+      repeat = 3
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2739,8 +2761,7 @@
   experiment and see which value works best for you.
 
 
-
-  [1m8.5.  Configuring lirc for use with an IR blaster[0m
+  [1m8.6.  Configuring lirc for use with an IR blaster[0m
 
   Lirc has support for various IR transmitters. A popular model is the
   Actisys IR-200L http://store.snapstreamstore.com/accessories.html
@@ -2768,19 +2789,20 @@
   kernel module you might see the following message during make:
 
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
 
 
@@ -2802,15 +2824,15 @@
 
 
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  setserial /dev/ttySx uart none        # (if required)
-  modprobe lirc_sir
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
 
 
@@ -2830,8 +2852,6 @@
        0000000000007ff0 00 1 gi-motorola-dct2000
        000000000000bff8 00 2 gi-motorola-dct2000
        000000000000f7f0 00 ENTER gi-motorola-dct2000
-
-
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -2863,7 +2883,6 @@
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
-
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/DSS box. Make
@@ -2927,6 +2946,7 @@
   to fill the partition.  This will cause a number of side-effects, most
   of them bad.  Instead, create subdirectories as the destination for
   the storage group.
+
   Your directory structure could then look something like this:
 
 
@@ -2956,6 +2976,7 @@
   running multiple backend systems, the Master backend will make all
   decisions about which programs will be recorded on which tuners.  If
   you have only one backend, then it will be its own master.
+
 
   The Master backend will always choose the first available tuner in the
   same order as you add cards through "mythtv-setup". In other words,
@@ -3014,6 +3035,7 @@
   The next question will ask you if you wish to clear out your video
   source information.  You should answer "YES" to this as well.
 
+
   Once the graphical setup starts, you'll see that there are six choices
 
 
@@ -3046,6 +3068,7 @@
   default values are fine and you can move to the next page by pressing
   the space bar.  If you need to move around the screen, use the arrow
   keys to move focus between settings, not the mouse.
+
   If you will be deploying multiple backends, or if your backend is on
   one system and you're running the frontend on another machine then [4mdo[0m
   [4mnot[24m use the "127.0.0.1" IP address.
@@ -3137,6 +3160,7 @@
   screen may blank for a few seconds to several minutes, depending on
   the load of the listings provider and the speed of your connection to
   the Internet.  Be patient!
+
 
   You will then be returned to the Video Sources screen.  If you have
   multiple video sources available, such as Antenna, Cable, etc, go
@@ -3257,6 +3281,7 @@
   See the ``Tip'' in the "Configuring the Master backend" section for
   additional information.
 
+
   You would then add the four subdirectories you created under the mount
   points (/mnt/store/d1/video, etc) into the "Default" Storage Group.
 
@@ -3320,6 +3345,7 @@
   Unix command line to arrange files however you'd like.
 
 
+
   [1m9.1.6.4.  Advanced: Algorithm used by the Storage Group[0m
 
   This section details the logic of the Storage Group allocation engine.
@@ -3360,34 +3386,31 @@
   Schedules Direct is being established.
 
 
+       From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
+       --02:58:01--
+       http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
+                  => -'
+       Resolving datadirect.webservices.zap2it.com... 206.18.98.160
+       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+       connected.
+       HTTP request sent, awaiting response... 401 Unauthorized
+       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+       connected.
+       HTTP request sent, awaiting response... 200 OK
+       Length: unspecified [text/xml]
 
-  From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
-  --02:58:01--
-  http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
-             => -'
-  Resolving datadirect.webservices.zap2it.com... 206.18.98.160
-  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-  connected.
-  HTTP request sent, awaiting response... 401 Unauthorized
-  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-  connected.
-  HTTP request sent, awaiting response... 200 OK
-  Length: unspecified [text/xml]
+           [    <=>                              ] 114,125       63.57K/s
 
-      [    <=>                              ] 114,125       63.57K/s
+       02:58:03 (63.53 KB/s) - -' saved [114125]
 
-  02:58:03 (63.53 KB/s) - -' saved [114125]
-
-  Your subscription expires on 08/20/2004 12:00:00 AM
-  Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
-  00:00:00 2004 (UTC)
+       Your subscription expires on 08/20/2004 12:00:00 AM
+       Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
+       00:00:00 2004 (UTC)
 
 
 
   Once mythfilldatabase has finished, start the master server before
   continuing.
-
-
        $ mythbackend
 
 
@@ -3506,6 +3529,7 @@
   fit.  The [1mmythbackend [22mprogram will now run [1mmythfilldatabase [22mfor you.
 
 
+
   [1m9.5.  Grabbing channel icons for Schedules Direct users[0m
 
   While the Schedules Direct TV listings service has several advantages,
@@ -3567,7 +3591,6 @@
         [1mNOTE[22m:  You should go through the various setup screens in
   mythfrontend before using any other modules to ensure that the the
   database is correctly initialized.
-
   [1m10.1.  General[0m
 
   The General screen has configuration items that don't really fit
@@ -3603,7 +3626,6 @@
   not use the same font settings as defined in Appearance, so if the EPG
   is unreadable this is where you make the adjustments to fonts, number
   of elements displayed, etc.
-
 
 
   [1m10.4.  Playback[0m
@@ -3699,6 +3721,7 @@
   by blending adjacent lines.  It replaces combing in interlaced video
   with a less distracting "ghost" image.
 
+
   o The "bobdeint" filter
 
   This filter splits the interlaced image into two separate fields that
@@ -3733,7 +3756,6 @@
 
   o The "onefield" filter
 
-
   This is a simple one-field deinterlacing filter that uses only one
   field of the interlaced video.  By default it keeps the top field,
   though passing the parameter "bottom" will cause it to keep the bottom
@@ -3763,7 +3785,6 @@
 
   [1mNOTE[22m: If it is not already specified in the filter chain, this filter
   will be automatically applied when recording with the "bttv" driver.
-
   o The "quickdnr" filter
 
   A fast temporal denoiser. This can take 1, 2 or 4 parameters, each
@@ -3827,6 +3848,7 @@
   recommended for use.
 
 
+
   [1m10.4.4.  Usage Considerations[0m
 
   There are trade-offs to consider when deciding if it would be wise to
@@ -3866,6 +3888,7 @@
 
   +o  DVB - cards supporting DVB; see http://linuxtv.org
      <http://linuxtv.org>
+
      For cards without hardware encoding capabilities (all cards
      supported by V4L not listed above), Myth includes two methods for
      software encoding: RTjpeg and MPEG-4.  RTjpeg has significantly
@@ -3953,6 +3976,7 @@
   <http://xbox-linux.sf.net/>. The program you need is part of the
   eds_i2c_staff module in CVS.  Note the spelling.
 
+
   Once you have installed [1mblink [22myou will need to set permissions.  [1mblink[0m
   needs write permission to the i2c device to function properly.  There
   are three methods to accomplish this.  First, you could run
@@ -4018,43 +4042,6 @@
   [1m11.1.2.  Watching TV or a recording[0m
 
 
-  [1m11.1.3.  Watching TV only[0m
-
-
-  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-  H           Channel history. Each repeat steps back through the previous channels.
-  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  Y           switch between multiple capture cards.  [1mNOTE[22m: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
-
-
-  [1m11.1.4.  LiveTV Browse Mode[0m
-
-
-             Left     browse program prior to current listed program
-            Right     browse program following current listed program
-               Up     browse program on channel above current listed channel/program
-             Down     browse program on channel below current listed channel/program
-                /     browse program on next favorite channel
-              0-9     enter a channel number to browse
-  Space/Enter         change channel to channel of current listed program
-              R/r     Toggle recording of current program (cycles through types)
-            ESC/O     Exit Browse mode
-
-
-  [1m11.1.5.  Playback Recording Zoom Mode[0m
-
-
-             Left     Move video to Left
-            Right     Move video to Right
-               Up     Move video Up
-             Down     Move video Down
-           PageUp     Zoom In
-  PageDown            Zoom Out
-  Space/Enter         Exit Zoom mode leaving picture at current size and position
-              ESC     Exit Zoom mode and return to original size
-
-
-
   Up or down          keys change the channel
           num pad     Type a number to enter a channel number or jump amount (HHMM format)
                 P     pause / play. You may also add an explicit keybinding for 'Play' through MythWeb, returning you to normal speed if you are in slow motion, rewind fast forward or pause mode.
@@ -4111,13 +4098,49 @@
             Right     advance 1 frame
                 >     advance 1 second
 
+
+  [1m11.1.3.  Watching TV only[0m
+
+
+
+  G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
+  H           Channel history. Each repeat steps back through the previous channels.
+  O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
+  Y           switch between multiple capture cards.  [1mNOTE[22m: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+
+  [1m11.1.4.  LiveTV Browse Mode[0m
+
+
+             Left     browse program prior to current listed program
+            Right     browse program following current listed program
+               Up     browse program on channel above current listed channel/program
+             Down     browse program on channel below current listed channel/program
+                /     browse program on next favorite channel
+              0-9     enter a channel number to browse
+  Space/Enter         change channel to channel of current listed program
+              R/r     Toggle recording of current program (cycles through types)
+            ESC/O     Exit Browse mode
+
+
+  [1m11.1.5.  Playback Recording Zoom Mode[0m
+
+
+             Left     Move video to Left
+            Right     Move video to Right
+               Up     Move video Up
+             Down     Move video Down
+           PageUp     Zoom In
+  PageDown            Zoom Out
+  Space/Enter         Exit Zoom mode leaving picture at current size and position
+              ESC     Exit Zoom mode and return to original size
+
+
   [1m11.1.6.  If you have two or more tuner cards[0m
 
 
   V           toggle Picture-in-picture on or off
   B           toggles the window focus (lets you change channels on the PiP window)
   N           swaps the two channels by changing channels on both cards
-
 
 
   [1m11.1.7.  Watching a recording only[0m
@@ -4144,6 +4167,7 @@
   [1m11.1.8.  EPG[0m
 
 
+
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -4159,7 +4183,6 @@
                 X     change the channel to the currently selected channel without leaving the EPG (Most useful in the alternate EPG)
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
-
 
   [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
 
@@ -4181,7 +4204,6 @@
         Home/End            toggle show showing all/important
                       I     edit recording options
         Space/Enter         resolve conflict or override
-
 
 
   [1m11.1.11.  Viewing Search Listings[0m
@@ -4207,6 +4229,7 @@
 
     M           change the view or to set a group password
     I           move a program from one Recording Group to another
+
 
 
   [1m11.1.14.  Watch Recordings Screen[0m
@@ -4269,6 +4292,7 @@
 
   The theme will now be available in the mythfrontend Appearance
   section.
+
 
 
   [1m11.3.  Adding DishTV information to the database[0m
@@ -4335,6 +4359,7 @@
   determine whether or not the MythTV system is idle, the following
   conditions must be met for a period of time defined in the "Idle
   timeout (secs)" parameter.
+
 
   +o  no client is connected to the server
 
@@ -4528,6 +4553,7 @@
   the same as discussed in "The WakeOnLan settings" above.
 
 
+
   [1m11.5.4.  Tips/Tricks:[0m
 
   If, for example, one of the Slave backends is also your desktop
@@ -4550,38 +4576,38 @@
 
 
 
-  $ telnet basement 6546
-  Connected to basement.
-  Escape character is '^]'.
-  MythFrontend Network Control
-  Type 'help' for usage information
-  ---------------------------------
-  # help
-  Valid Commands:
-  ---------------
-  jump               - Jump to a specified location in Myth
-  key                - Send a keypress to the program
-  play               - Playback related commands
-  query              - Queries
-  exit               - Exit Network Control
+       $ telnet basement 6546
+       Connected to basement.
+       Escape character is '^]'.
+       MythFrontend Network Control
+       Type 'help' for usage information
+       ---------------------------------
+       # help
+       Valid Commands:
+       ---------------
+       jump               - Jump to a specified location in Myth
+       key                - Send a keypress to the program
+       play               - Playback related commands
+       query              - Queries
+       exit               - Exit Network Control
 
-  Type 'help COMMANDNAME' for help on any specific command.
+       Type 'help COMMANDNAME' for help on any specific command.
 
-  # help jump
-  Usage: jump JUMPPOINT
+       # help jump
+       Usage: jump JUMPPOINT
 
-  Where JUMPPOINT is one of the following:
-  channelpriorities    - Channel Recording Priorities
-  channelrecpriority   - Channel Recording Priorities
-  deletebox            - TV Recording Deletion
-  deleterecordings     - TV Recording Deletion
-  guidegrid            - Program Guide
-  livetv               - Live TV
-  livetvinguide        - Live TV In Guide
-  mainmenu             - Main Menu
-  ...snip...
-  # exit
-  $
+       Where JUMPPOINT is one of the following:
+       channelpriorities    - Channel Recording Priorities
+       channelrecpriority   - Channel Recording Priorities
+       deletebox            - TV Recording Deletion
+       deleterecordings     - TV Recording Deletion
+       guidegrid            - Program Guide
+       livetv               - Live TV
+       livetvinguide        - Live TV In Guide
+       mainmenu             - Main Menu
+       ...snip...
+       # exit
+       $
 
 
 
@@ -4659,7 +4685,6 @@
   +o  Channel Record -- records one showing of each unique episode from
      any of the times the title is listed on this station.  This is
      perhaps the most common rule to use for most shows.
-
   +o  Record All -- records one showing of each unique episode from any
      of the times this title is listed on any channel. This can be
      useful if a station has sister stations where shows are rebroadcast
@@ -4746,7 +4771,6 @@
   Expire'', below).
 
 
-
   [1m12.2.2.  Duplicates[0m
 
   Singles will record without regard to duplicate matching.
@@ -4793,7 +4817,6 @@
   scheduler exactly which shows you do want to record and/or don't want
   to record in any situation.
 
-
   [1m12.2.4.  Scheduling decisions[0m
 
   Here are the actual decisions made by the scheduler as it fills in the
@@ -4813,6 +4836,7 @@
      If two rules match the same showing of a program, a rule marked as
      inactive or a showing marked as a repeat, for example, yield to the
      other rule.
+
   +o  More specific record type is used in place of less specific -- If
      two rules match the same showing of a program, preference is given
      to Don't Record then Override, Single, Find One, Record Weekly,
@@ -4859,8 +4883,6 @@
      see if a scheduled show can be moved to another input or later
      matching showing without creating a new conflict so that the
      conflicting show can be scheduled to record.
-
-
   [1m12.2.5.  Reschedule Higher Priorities[0m
 
   Setup->TV Settings->Recording Priorities->General has a checkbox for
@@ -4944,7 +4966,6 @@
   this is an episode that you've seen or don't need to see if it is ever
   in the TV listings again.
 
-
   For items that are not scheduled to record, the message will describe
   the reason and in the case of "C" or "L" it will include a list of the
   shows that are scheduled to record instead. For any item that could
@@ -4994,8 +5015,6 @@
   This allows you to select any special "Storage Groups" you may have
   created to determine where recordings from this rule should be stored
   on your disks. The "Default" storage group is always available.
-
-
   [1m12.3.4.  Playback Group[0m
 
   This selects a set of pre-configured playback parameters which can be
@@ -5011,6 +5030,8 @@
   recordings when disk space gets filled up. This option can be set to
   "Don't allow auto expire" to prevent these recordings from being
   automatically deleted when disk space fills up.
+
+
   The default setting is for all scheduled recordings to be eligible for
   auto-expiration; this can be changed in the Settings->TV
   Settings->General page by manipulating the "Auto Expire Default"
@@ -5058,6 +5079,7 @@
   +o  %DIR% - the directory component of the recording's filename
 
   +o  %FILE% - the filename component of the recording's filename
+
 
   +o  %TITLE% - the title of the recording (e.g., name of the series)
 
@@ -5125,8 +5147,6 @@
   examples but leave it on the default for now. Arrow down to "Add this
   example clause" and press SELECT (Enter or Space on a keyboard). The
   large text box should now show:
-
-
             program.title = 'Nova'
 
 
@@ -5189,6 +5209,7 @@
   settings".
 
 
+
   [1m12.5.3.  How it Works[0m
 
   MythTV stores TV program information in a database and uses the
@@ -5205,7 +5226,6 @@
   replacements for the normal title check. There is also a type called
   "Power Search" which takes the raw SQL in the description as the
   replacement for title matching.
-
 
   Custom Record is a tool to help you build valid SQL for Power Search
   rules.  You do not need to be a SQL expert to use Custom Record
@@ -5255,8 +5275,6 @@
   their highest rated shows a dozen on more times per week. However, the
   scheduler only needs two or three choices to do a good job of making a
   flexible choice.
-
-
               program.title LIKE "Celebrity Fit Club%"
               AND DAYNAME(program.starttime) = "Sunday"
 
@@ -5271,6 +5289,8 @@
   "III" or ":Revenge of the Snapple Lady". This can be useful where the
   title may change from one season to the next like "Survivor: %", "Big
   Brother%" or "The Amazing Race%".
+
+
   [1m12.5.5.  Working with SQL[0m
 
   As you experiment, it is possible that you may misplace a quote or
@@ -5319,7 +5339,6 @@
      date or if the show was marked as a repeat and did not have a date
      for the first airing. If this is "0" it usually means that this is
      a brand new show or a rebroadcast within the first two weeks.
-
   +o  "program.generic" is a column created by MythTV to try mark
      showings for a series where the specific episode information is not
      included. When these generic showings appear, it is impossible for
@@ -5384,7 +5403,6 @@
   more service providers, or video source, on one or more video input
   from each provider. Some inputs may not be allowed to record at the
   same time as each other while others may record simultaneously.
-
   A television station may be broadcast on more than one channel from
   one provider or may be available on channels from two or more
   providers. If a TV station is available from more than one source, the
@@ -5442,6 +5460,7 @@
   appears as a separate device. DVB cards may be allowed to capture
   content from more than one channel at a time if the channels are in
   the same MUX.
+
 
 
   [1m12.6.2.  Stations, Channels and Video Sources[0m
@@ -5509,6 +5528,7 @@
   they carry the same station.
 
 
+
   [1m12.6.3.  Order of Inputs[0m
 
   By default the scheduler chooses the first (lowest numbered) input
@@ -5527,6 +5547,7 @@
   cards and then add a HDTV card. If NBC is on a cable channel and "The
   Apprentice" is shown in HDTV on an NBC HD channel, the scheduler would
   still prefer analog inputs 1 and 2 over the new HD input 3.
+
   So, if you'd like the scheduler to prefer a new source, the simplest
   thing is to run [1mmythtv-setup [22mand "Delete all capture cards" then enter
   your cards and inputs in your preferred order. This will not remove
@@ -5593,6 +5614,7 @@
   be added to the "total priority" for showings on that input. This can
   be used to influence using favored cards or not using less favored
   cards unless necessary.
+
   Let's say the "The Apprentice" is on at 8:00pm with a priority of 3.
   "Who Cares" is -2 and an episode is shown at 8:00pm then repeated at
   11:00pm. The scheduler would assign "The Apprentice" to card 1 and
@@ -5760,10 +5782,10 @@
 
 
 
-  Priority Rule Name: Input 1 signal quality
-  Priority Value: -1
-  cardinput.cardinputid = 1 AND
-  channel.channum IN (3, 5, 39, 66)
+       Priority Rule Name: Input 1 signal quality
+       Priority Value: -1
+       cardinput.cardinputid = 1 AND
+       channel.channum IN (3, 5, 39, 66)
 
 
 

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-01-02, v0.21.05
+<date>2009-01-11, v0.21.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2041,7 +2041,23 @@ $ irxevent &
 If <bf>irxevent</bf> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.
 
-<sect1>Additional information for lirc
+
+<sect1>Additional information for lirc - native mode
+<p>If you will be using native mode, your lircrc file will need to look something like this:
+<tscreen><verb>
+begin
+     remote = mceusb
+     prog = mythtv
+     button = Guide
+     config = S
+     repeat = 0
+     delay = 0
+end
+</verb></tscreen>
+
+Note that the name of the "prog" is <bf>mythtv</bf>, not <bf>mythtvfrontend</bf>
+
+<sect1>Additional information for lirc - irxevent mode
 <p>Take a look at the lircrc.example files in the <tt>contrib/configfiles/</tt>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
@@ -7967,7 +7983,7 @@ v0.21.03, 2008-10-27.  Update Hauppauge link.
 v0.21.04, 2009-01-01.  "Crypt" description on LAMC table.
 v0.21.05, 2009-01-02.  Expand instructions on how to use -fixes rather than
 the source tarball, put pointer to wiki for Release Notes.
-
+v0.21.06, 2009-01-11.  Add information for native lirc mode
 -->
 
 <!--

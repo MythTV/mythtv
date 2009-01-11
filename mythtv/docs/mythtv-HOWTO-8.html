@@ -332,7 +332,27 @@ $ irxevent &amp;
 If <B>irxevent</B> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.</P>
 
-<H2><A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Additional information for lirc</A>
+
+<H2><A NAME="ss8.4">8.4</A> <A HREF="mythtv-HOWTO.html#toc8.4">Additional information for lirc - native mode</A>
+</H2>
+
+<P>If you will be using native mode, your lircrc file will need to look something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+begin
+     remote = mceusb
+     prog = mythtv
+     button = Guide
+     config = S
+     repeat = 0
+     delay = 0
+end
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Note that the name of the "prog" is <B>mythtv</B>, not <B>mythtvfrontend</B></P>
+
+<H2><A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Additional information for lirc - irxevent mode</A>
 </H2>
 
 <P>Take a look at the lircrc.example files in the <CODE>contrib/configfiles/</CODE>
@@ -401,7 +421,7 @@ will only send one keypress to the application, even if you're holding down
 the key.  The actual <B>repeat =</B> number will vary from system to
 system, so experiment and see which value works best for you.</P>
 
-<H2><A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Configuring lirc for use with an IR blaster</A>
+<H2><A NAME="ss8.6">8.6</A> <A HREF="mythtv-HOWTO.html#toc8.6">Configuring lirc for use with an IR blaster</A>
 </H2>
 
 <P>Lirc has support for various IR transmitters. A popular model is the Actisys
