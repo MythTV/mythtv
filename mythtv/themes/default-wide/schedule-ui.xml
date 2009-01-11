@@ -787,4 +787,25 @@
 
     </window>
 
+    <window name="progdetails">
+
+        <textarea name="title" from="basetextarea">
+            <area>80,20,720,40</area>
+            <font>baselarge</font>
+            <value>Program Details:</value>
+        </textarea>
+
+        <imagetype name="background">
+            <filename>pd-background.png</filename>
+            <position>60,60</position>
+        </imagetype>
+
+        <webbrowser name="browser">
+            <area>80,70,1094,555</area>
+            <zoom>1.0</zoom>
+            <background color="#000000" alpha="1"/>
+        </webbrowser>
+
+    </window>
+
 </mythuitheme>
