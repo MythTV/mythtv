@@ -1007,7 +1007,7 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     {
         if (use_vdpau)
         {
-            vbuffers.Init(NUM_VDPAU_BUFFERS, true, 1, 4, 4, 1, false);
+            vbuffers.Init(NUM_VDPAU_BUFFERS, false, 1, 4, 4, 1, false);
             done = InitVDPAU(mcodecid);
             if (!done)
                 vbuffers.Reset();
@@ -2325,7 +2325,7 @@ bool VideoOutputXv::CreateVDPAUBuffers(void)
     const QSize video_dim = windows[0].GetVideoDim();
     if (!vdpau->InitBuffers(video_dim.width(),
                             video_dim.height(),
-                            NUM_VDPAU_BUFFERS + 1))
+                            NUM_VDPAU_BUFFERS))
     {
         vdpau->FreeBuffers();
         return false;
