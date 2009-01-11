@@ -294,10 +294,11 @@ class VideoOutputXv : public VideoOutput
     XvMCTextures        *xvmc_tex;
 
 #ifdef USING_VDPAU
-    VDPAUContext         *vdpau;
+    VDPAUContext        *vdpau;
 #endif
-    bool                  vdpau_use_osd;
-    bool                  vdpau_use_pip;
+    bool                 vdpau_use_osd;
+    bool                 vdpau_use_pip;
+    bool                 vdpau_use_colorkey;
 
     // Basic Xv drawing info
     int                  xv_port;
