@@ -690,15 +690,6 @@
 
     <window name="programlist">
 
-        <font name="yellowinfo" face="Arial">
-            <color>#ffff33</color>
-            <size>17</size>
-            <size:small>10</size:small>
-            <shadow>1,1</shadow>
-            <bold>yes</bold>
-        </font>
-
-
         <textarea name="sched" from="basetextarea">
             <area>20,5,400,40</area>
             <font>baselarge</font>
@@ -721,8 +712,8 @@
         </textarea>
 
         <buttonlist name="proglist" from="basebuttonlist2">
-            <area>25,57,1200,400</area>
-            <buttonarea>0,0,1200,400</buttonarea>
+            <area>25,57,1200,380</area>
+            <buttonarea>0,0,1200,380</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,1200,25</area>
                 <state name="active">
@@ -772,7 +763,7 @@
         </textarea>
         <textarea name="type" from="basetextarea">
             <area>30,670,560,30</area>
-            <font>yellowinfo</font>
+            <font>basemediumyellow</font>
         </textarea>
         <textarea name="programid" from="basetextarea">
             <area>800,670,440,30</area>
@@ -781,7 +772,7 @@
         <textarea name="msg" from="basetextarea">
             <area>0,210,1280,70</area>
             <align>allcenter</align>
-            <value>No listings found for this program. </value>
+            <value>No listings found for this program.</value>
             <multiline>yes</multiline>
         </textarea>
 

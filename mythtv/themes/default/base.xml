@@ -68,6 +68,10 @@
         <color>#800900</color>
     </font>
 
+    <font name="basemediumyellow" from="basemedium">
+        <color>#FFFF33</color>
+    </font>
+
     <buttonlist name="basebuttonlist">
         <area>0,0,300,250</area>
         <layout>vertical</layout>

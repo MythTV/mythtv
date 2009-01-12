@@ -7,12 +7,12 @@
             <font>baselarge</font>
             <value>Watch Recordings</value>
         </textarea>
-        
+
         <imagetype name="listbackground">
             <filename>reclist_background.png</filename>
             <position>0,40</position>
         </imagetype>
-        
+
         <buttonlist name="groups">
             <area>30,70,188,300</area>
             <buttonarea>0,0,188,250</buttonarea>
