@@ -139,6 +139,9 @@ void MythUIButtonList::SetPositionArrowStates(void)
     if (!m_initialized)
         Init();
 
+    if (m_clearing)
+        return;
+
     m_needsUpdate = false;
 
     m_ButtonToItem.clear();
@@ -173,10 +176,19 @@ void MythUIButtonList::SetPositionArrowStates(void)
 
         bool seenSelected = false;
 
+        MythUIStateType *realButton = NULL;
+        MythUIButtonListItem *buttonItem = NULL;
+
+        if (it < m_itemList.begin())
+            it = m_itemList.begin();
+
         while (it < m_itemList.end() && button < (int)m_itemsVisible)
         {
-            MythUIStateType *realButton = m_ButtonList[button];
-            MythUIButtonListItem *buttonItem = *it;
+            realButton = m_ButtonList[button];
+            buttonItem = *it;
+
+            if (!realButton || ! buttonItem)
+                break;
 
             bool selected = false;
             if (!seenSelected && (buttonItem == m_selItem))
