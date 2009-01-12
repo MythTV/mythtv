@@ -100,7 +100,7 @@ bool VDPAUContext::Init(Display *disp, Screen *screen,
         return ok;
 
     if (color_control)
-        useColorControl = false; //InitColorControl();
+        useColorControl = InitColorControl();
 
     return ok;
 }
@@ -1712,22 +1712,6 @@ bool VDPAUContext::InitColorControl(void)
     return ok;
 }
 
-// incorrect chroma range
-static VdpCSCMatrix itur_601 =
-   {{1.164382813f, 0.000000000f, 1.596027344f,-0.870785156f},
-    {1.164382813f,-0.391761718f,-0.812968750f, 0.529593650f},
-    {1.164382813f, 2.017234375f, 0.000000000f,-1.081390625f}};
-
-VdpStatus dummy_generate_csc(VdpProcamp *pro_camp,
-                        VdpColorStandard standard,
-                        VdpCSCMatrix *cscMatrix)
-{
-    (void) pro_camp;
-    (void) standard;
-    memcpy(cscMatrix, &itur_601, sizeof(*cscMatrix));
-    return VDP_STATUS_OK;
-}
-
 bool VDPAUContext::SetPictureAttributes(void)
 {
     bool ok = true;
@@ -1735,10 +1719,6 @@ bool VDPAUContext::SetPictureAttributes(void)
 
     if (!videoMixer || !useColorControl)
         return false;
-
-    // replacement csc??
-    if (0)
-        vdp_generate_csc_matrix = &dummy_generate_csc;
 
     vdp_st = vdp_generate_csc_matrix(
         &proCamp,
