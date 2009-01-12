@@ -565,26 +565,36 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
     QFile file(testdir);
     if (file.exists())
         return testdir;
+    else
+        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetMenuThemeDir() + "/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
+    else
+        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
     testdir = GetMythUI()->GetThemeDir() + "/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
+    else
+        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
     testdir = GetShareDir() + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
+    else
+        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
     testdir = "../mythfrontend/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
+    else
+        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
     return "";
 }

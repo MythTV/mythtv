@@ -405,9 +405,11 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
         QString themefile = *i + xmlfile;
         if (doLoad(windowname, parent, themefile))
         {
-            VERBOSE(VB_GENERAL, QString("Loading from: %1").arg(themefile));
+            VERBOSE(VB_GENERAL, "Loading window theme from " + themefile);
             return true;
         }
+        else
+            VERBOSE(VB_FILE+VB_EXTRA, "No theme file " + themefile);
     }
 
     VERBOSE(VB_IMPORTANT, QString("Unable to load window '%1' from "
@@ -522,8 +524,10 @@ bool XMLParseBase::LoadBaseTheme(void)
         QString themefile = *i + "base.xml";
         if (doLoad(QString::null, GetGlobalObjectStore(), themefile, false))
         {
-            VERBOSE(VB_GENERAL, QString("Loading from: %1").arg(themefile));
+            VERBOSE(VB_GENERAL, "Loading base theme from " + themefile);
         }
+        else
+            VERBOSE(VB_FILE+VB_EXTRA, "No theme file " + themefile);
     }
 
     return false;
