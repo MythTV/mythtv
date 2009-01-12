@@ -293,6 +293,12 @@ if ($xml->{"opensearch:totalResults"} > 0) {
 
     foreach my $key (keys(%{$xml->{moviematches}->{movie}}))
     {
+        my $type = $xml->{moviematches}->{movie}->{$key}->{type};
+        if ($type ne "movie")
+        {
+            next;
+        }
+
         my $movienum  = $xml->{moviematches}->{movie}->{$key}->{imdb};
         my $moviename = $xml->{moviematches}->{movie}->{$key}->{title};
         my $release   = $xml->{moviematches}->{movie}->{$key}->{release};
