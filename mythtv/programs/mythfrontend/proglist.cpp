@@ -907,7 +907,11 @@ void ProgLister::fillItemList(bool restorePosition)
     if (m_curView < 0)
          return;
 
-    QString selectedItem = m_progList->GetValue();
+    MythUIButtonListItem *currentItem = m_progList->GetItemCurrent();
+    ProgramInfo *selected = NULL;
+    if (currentItem)
+        selected = new ProgramInfo(*(qVariantValue<ProgramInfo*>
+                                        (currentItem->GetData())));
 
     if (m_curviewText && m_curView >= 0)
         m_curviewText->SetText(m_viewTextList[m_curView]);
@@ -1180,8 +1184,27 @@ void ProgLister::fillItemList(bool restorePosition)
 
     updateButtonList();
 
-    if (restorePosition)
-        m_progList->MoveToNamedPosition(selectedItem);
+    // Restore position after a list update
+    if (restorePosition && selected)
+    {
+        int listPos = m_itemList.count() - 1;
+        int i;
+        for (i = listPos; i >= 0; i--)
+        {
+            if (selected->chansign == m_itemList[i]->chansign &&
+                selected->startts == m_itemList[i]->startts)
+            {
+                listPos = i;
+                break;
+            }
+            else if (selected->recstartts <= m_itemList[i]->recstartts)
+                listPos = i;
+        }
+        m_progList->SetItemCurrent(listPos);
+    }
+
+    if (selected)
+        delete selected;
 }
 
 void ProgLister::updateButtonList(void)
