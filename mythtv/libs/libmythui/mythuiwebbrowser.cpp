@@ -120,9 +120,10 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
  *
  * 
  *      <webbrowser name="webbrowser">
+ *           <url>http://www.google.com/</url>
  *           <area>20,55,760,490</area>
  *           <zoom>1.4</zoom>
- *           <background> color="white" alpha=255" />
+ *           <background color="white" alpha="255" />
  *      </webbrowser>
  *
  * area is the screen area the widget should use.
@@ -154,9 +155,9 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
 #endif
       m_image(NULL),         m_active(false),
       m_initialized(false),  m_zoom(1.0),
-      m_bgColor("White"),    m_inputToggled(false),
-      m_lastMouseAction(""), m_mouseKeyCount(0),
-      m_lastMouseActionTime()
+      m_bgColor("White"),    m_widgetUrl(QUrl()),
+      m_inputToggled(false), m_lastMouseAction(""),
+      m_mouseKeyCount(0),    m_lastMouseActionTime()
 {
     SetCanTakeFocus(true);
 }
@@ -224,6 +225,9 @@ void MythUIWebBrowser::Init(void)
     m_image->Assign(image);
 
     SetBackgroundColor(m_bgColor);
+
+    if (!m_widgetUrl.isEmpty() && m_widgetUrl.isValid())
+        LoadPage(m_widgetUrl);
 
     m_initialized = true;
 }
@@ -739,6 +743,10 @@ bool MythUIWebBrowser::ParseElement(QDomElement &element)
         QString zoom = getFirstText(element);
         m_zoom = zoom.toFloat();
     }
+    else if (element.tagName() == "url")
+    {
+        m_widgetUrl.setUrl(getFirstText(element));
+    }
     else if (element.tagName() == "background")
     {
         m_bgColor = QColor(element.attribute("color", "#ffffff"));
@@ -764,6 +772,7 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
 
     m_zoom = browser->m_zoom;
     m_bgColor = browser->m_bgColor;
+    m_widgetUrl = browser->m_widgetUrl;
 
     MythUIType::CopyFrom(base);
 }

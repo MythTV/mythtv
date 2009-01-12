@@ -109,6 +109,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     bool         m_initialized;
     float        m_zoom;
     QColor       m_bgColor;
+    QUrl         m_widgetUrl;
 
     bool         m_inputToggled;
     QString      m_lastMouseAction;
