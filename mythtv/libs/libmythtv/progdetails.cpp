@@ -7,7 +7,7 @@ using namespace std;
 
 // myth
 #include "mythcontext.h"
-#include "mythdialogs.h"
+#include "mythdialogbox.h"
 #include "uitypes.h"
 #include "scheduledrecording.h"
 #include "libmythdb/mythdb.h"
@@ -48,7 +48,15 @@ bool ProgDetails::Create(void)
     }
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    {
+#ifdef USING_QTWEBKIT
+        VERBOSE(VB_IMPORTANT,
+                "Failed to build a focuslist. Something is wrong");
+#else
+        ShowOkPopup(tr("Sorry, this screen requires Qt 4.4 or greater"));
+        return false;
+#endif
+    }
 
     SetFocusWidget(m_browser);
 
