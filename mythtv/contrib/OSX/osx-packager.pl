@@ -111,7 +111,7 @@ our %depend = (
     'url'
     => 'http://subversion.tigris.org/downloads/subversion-1.4.3.tar.bz2',
     'pre-conf'
-    => 'tar -xjf ../subversion-deps-1.4.3.tar.bz2',
+    => 'tar -xjf ../subversion-deps-1.4.3.tar.bz2 -C ..',
     'conf'
     =>  [
            '--disable-keychain',  # Workaround a 10.3 build problem
