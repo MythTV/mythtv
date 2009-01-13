@@ -278,9 +278,9 @@ void MythConfirmationDialog::sendResult(bool ok)
 void ShowOkPopup(const QString &message, QObject *parent,
                  const char *slot, bool showCancel)
 {
-    QString                         LOC = "ShowOkPopup('" + message + "') - ";
-    static MythConfirmationDialog  *pop = NULL;
-    static MythScreenStack         *stk = NULL;
+    QString                  LOC = "ShowOkPopup('" + message + "') - ";
+    MythConfirmationDialog  *pop;
+    static MythScreenStack  *stk = NULL;
 
 
     if (!stk)
@@ -303,17 +303,12 @@ void ShowOkPopup(const QString &message, QObject *parent,
         }
     }
 
-    // Prevent multiple popups from being all stacked
-    if (pop)
-        stk->PopScreen(pop);
-
     pop = new MythConfirmationDialog(stk, message, showCancel);
     if (pop->Create())
     {
         stk->AddScreen(pop);
         if (parent && slot)
-            QObject::connect(pop, SIGNAL(haveResult(bool)),
-                             parent, slot, Qt::QueuedConnection);
+            QObject::connect(pop, SIGNAL(haveResult(bool)), parent, slot, Qt::QueuedConnection);
     }
     else
     {
