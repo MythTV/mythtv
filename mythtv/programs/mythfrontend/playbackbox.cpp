@@ -598,17 +598,18 @@ void PlaybackBox::UpdateProgramInfo(
     if (!pginfo)
         return;
 
-    static const char *disp_flags[] = { "transcoding", "commflagging", };
-    const bool disp_flag_stat[] =
-    {
-        JobQueue::IsJobQueuedOrRunning(
-            JOB_TRANSCODE, pginfo->chanid, pginfo->recstartts),
-        JobQueue::IsJobQueuedOrRunning(
-            JOB_COMMFLAG,  pginfo->chanid, pginfo->recstartts),
-    };
+    QString state = "default";
 
-    for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); i++)
-        item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
+    if (pginfo->recstatus == rsRecording)
+        state = "recording";
+    else if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, pginfo->chanid,
+                                            pginfo->recstartts))
+        state = "transcoding";
+    else if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,  pginfo->chanid,
+                                            pginfo->recstartts))
+        state = "commflagging";
+
+    item->DisplayState(state, "jobstate");
 
     QString oldimgfile = item->GetImage("preview");
     QString imagefile = QString::null;
