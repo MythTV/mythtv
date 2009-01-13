@@ -12,7 +12,7 @@ MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
                 : MythUIType(parent, name)
 {
     m_CurrentState = NULL;
-    m_ShowEmpty = false;
+    m_ShowEmpty = true;
 }
 
 MythUIStateType::~MythUIStateType()
