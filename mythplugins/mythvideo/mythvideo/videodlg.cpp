@@ -800,7 +800,7 @@ namespace
             tmp["userrating"] = GetDisplayUserRating(metadata->UserRating());
 
             tmp["userratingstate"] =
-                    QString::number((int)(metadata->UserRating() / 2));
+                    QString::number((int)(metadata->UserRating()));
             tmp["videolevel"] = ParentalLevelToState(metadata->ShowLevel());
 
             tmp["inetref"] = metadata->InetRef();
