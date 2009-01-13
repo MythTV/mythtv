@@ -598,18 +598,22 @@ void PlaybackBox::UpdateProgramInfo(
     if (!pginfo)
         return;
 
-    QString state = "default";
+    QString job = "default";
 
     if (pginfo->recstatus == rsRecording)
-        state = "recording";
+        job = "recording";
     else if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, pginfo->chanid,
                                             pginfo->recstartts))
-        state = "transcoding";
+        job = "transcoding";
     else if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,  pginfo->chanid,
                                             pginfo->recstartts))
-        state = "commflagging";
+        job = "commflagging";
 
-    item->DisplayState(state, "jobstate");
+    item->DisplayState(job, "jobstate");
+
+    QString rating = QString::number((int)(pginfo->stars * 10.0));
+
+    item->DisplayState(rating, "ratingstate");
 
     QString oldimgfile = item->GetImage("preview");
     QString imagefile = QString::null;
@@ -626,6 +630,16 @@ void PlaybackBox::UpdateProgramInfo(
         pginfo->ToMap(infoMap);
         SetTextFromMap(this, infoMap);
         m_currentMap = infoMap;
+
+        MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>
+                                                    (GetChild("ratingstate"));
+        if (ratingState)
+            ratingState->DisplayState(rating);
+
+        MythUIStateType *jobState = dynamic_cast<MythUIStateType*>
+                                                    (GetChild("jobstate"));
+        if (jobState)
+            jobState->DisplayState(job);
 
         if (m_previewImage)
         {
@@ -939,6 +953,9 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         item->SetText(tempSize,           "size",          state);
 
         item->DisplayState(state, "status");
+
+        item->DisplayState(QString::number((int)((*it)->stars + 0.5)),
+                            "ratingstate");
 
         disp_flag_stat[0] = !m_playList.filter((*it)->MakeUniqueKey()).empty();
         disp_flag_stat[1] = (*it)->programflags & FL_WATCHED;
@@ -4121,6 +4138,7 @@ bool ChangeView::Create()
 void ChangeView::SaveChanges()
 {
     emit result(m_viewMask);
+    Close();
 }
 
 ////////////////////////////////////////////////
