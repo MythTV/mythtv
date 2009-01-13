@@ -638,6 +638,8 @@ void ProgramRecPriority::remove(void)
 
     if (dialog->Create())
         popupStack->AddScreen(dialog);
+    else
+        delete dialog;
 
     connect(dialog, SIGNAL(haveResult(bool)),
             this, SLOT(doRemove(bool)));
@@ -1072,7 +1074,7 @@ void ProgramRecPriority::SortList()
 
 void ProgramRecPriority::UpdateList()
 {
-    if (!m_currentItem && m_programList->GetItemCurrent())
+    if (!m_currentItem && !m_programList->IsEmpty())
         m_currentItem = qVariantValue<ProgramRecPriorityInfo*>
                                 (m_programList->GetItemCurrent()->GetData());
 
