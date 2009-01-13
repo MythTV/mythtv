@@ -1679,7 +1679,7 @@ int VDPAUContext::SetPictureAttribute(
             break;
         case kPictureAttribute_Hue:
             ret = newValue;
-            proCamp.hue = (newValue * 0.062831853f) - 3.14159265f;
+            proCamp.hue = (newValue * 0.062831853f);
             break;
         default:
             break;
