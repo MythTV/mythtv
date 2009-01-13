@@ -601,9 +601,9 @@ void PlaybackBox::UpdateProgramInfo(
     static const char *disp_flags[] = { "transcoding", "commflagging", };
     const bool disp_flag_stat[] =
     {
-        !JobQueue::IsJobQueuedOrRunning(
+        JobQueue::IsJobQueuedOrRunning(
             JOB_TRANSCODE, pginfo->chanid, pginfo->recstartts),
-        !JobQueue::IsJobQueuedOrRunning(
+        JobQueue::IsJobQueuedOrRunning(
             JOB_COMMFLAG,  pginfo->chanid, pginfo->recstartts),
     };
 
