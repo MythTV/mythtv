@@ -581,6 +581,16 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     SetTextFromMap(this, infoMap);
     m_currentMap = infoMap;
 
+    MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>
+                                                (GetChild("ratingstate"));
+    if (ratingState)
+        ratingState->Reset();
+
+    MythUIStateType *jobState = dynamic_cast<MythUIStateType*>
+                                                (GetChild("jobstate"));
+    if (jobState)
+        jobState->Reset();
+
     if (m_previewImage)
         m_previewImage->SetVisible(false);
 
@@ -611,7 +621,7 @@ void PlaybackBox::UpdateProgramInfo(
 
     item->DisplayState(job, "jobstate");
 
-    QString rating = QString::number((int)(pginfo->stars * 10.0));
+    QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
 
     item->DisplayState(rating, "ratingstate");
 
