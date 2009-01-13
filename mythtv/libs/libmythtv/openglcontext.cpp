@@ -1214,7 +1214,7 @@ bool OpenGLContextGLX::Create(
     X11S(xt = glXQueryExtensionsString(m_display, m_screen_num));
     const QString glx_ext = xt;
     m_ext_supported = ((minor >= 3) ? kGLXPBuffer : 0) |
-        has_glx_swapinterval_support(glx_ext) ? kGLGLXSwap : 0;
+        (has_glx_swapinterval_support(glx_ext) ? kGLGLXSwap : 0);
 
     m_window_rect = display_visible;
 
