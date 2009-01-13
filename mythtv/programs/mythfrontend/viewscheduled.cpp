@@ -254,10 +254,10 @@ void ViewScheduled::FillList(void)
         temp = pginfo->title;
         if ((pginfo->subtitle).trimmed().length() > 0)
             temp += " - \"" + pginfo->subtitle + "\"";
-        item->SetText(temp, "title", state); //,font
+        item->SetText(temp, "title", state);
 
         temp = pginfo->RecStatusChar();
-        item->SetText(temp, "card", state); //,font
+        item->SetText(temp, "card", state);
 
         item->DisplayState(state, "status");
     }
@@ -401,6 +401,8 @@ void ViewScheduled::deleteRule()
 
     if (okPopup->Create())
         popupStack->AddScreen(okPopup);
+    else
+        delete okPopup;
 }
 
 void ViewScheduled::upcoming()
