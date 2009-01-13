@@ -401,11 +401,11 @@ static HostCheckBox *LiveTVInAllPrograms()
 static HostCheckBox *PBBStartInTitle()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackBoxStartInTitle");
-    gc->setLabel(QObject::tr("Start in Title section"));
+    gc->setLabel(QObject::tr("Start in group list"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, the selector highlight will "
-                    "start on the Program titles window, otherwise the "
-                    "selector will default to the recordings."));
+    gc->setHelpText(QObject::tr("If enabled, the focus will "
+                    "start on the group list, otherwise the "
+                    "focus will default to the recordings."));
     return gc;
 }
 

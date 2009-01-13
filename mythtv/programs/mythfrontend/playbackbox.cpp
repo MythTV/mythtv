@@ -420,7 +420,7 @@ bool PlaybackBox::Create()
 
     BuildFocusList();
 
-    if (gContext->GetNumSetting("PlaybackBoxStartInTitle", 0))
+    if (!gContext->GetNumSetting("PlaybackBoxStartInTitle", 0))
         SetFocusWidget(m_recordingList);
 
     return true;
