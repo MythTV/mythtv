@@ -390,7 +390,7 @@ MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
     return m_selItem;
 }
 
-int  MythUIButtonList::GetIntValue()
+int MythUIButtonList::GetIntValue()
 {
     if (GetItemCurrent())
         return GetItemCurrent()->GetText().toInt();
@@ -398,7 +398,7 @@ int  MythUIButtonList::GetIntValue()
     return 0;
 }
 
-QString  MythUIButtonList::GetValue()
+QString MythUIButtonList::GetValue()
 {
     if (GetItemCurrent())
         return GetItemCurrent()->GetText();
@@ -1383,10 +1383,11 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     if (selected)
     {
+        button->MoveToTop();
+
         if (m_parent->m_active)
         {
             button->DisplayState("selected");
-            button->MoveToTop();
         }
         else
             button->DisplayState("inactive");
