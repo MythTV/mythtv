@@ -25,7 +25,7 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_origina
 use Getopt::Long;
 
 $title = "Allocine Query"; 
-$version = "v2.01";
+$version = "v2.03";
 $author = "Xavier Hervy";
 push(@MythTV::MythVideoCommon::URL_get_extras, ($title, $version));
 
@@ -107,36 +107,22 @@ sub getMovieData {
    my $director = parseBetween($response,"<h4>Réalisé par ","</h4>");
    $director = removeTag($director);
 
-   # parse writer 
-   # (Note: this takes the 'first' writer, may want to include others)
-   my $writer = parseBetween($response, ">Writing credits</b>", "</table>");
-   $writer = parseBetween($writer, "/\">", "</");
-
    # parse plot
    my $plot = parseBetween($response,"<td valign=\"top\" style=\"padding:10 0 0 0\"><div align=\"justify\"><h4>","</h4></div></td>");
    $plot =~ s/\n//g;
    $plot = removeTag($plot);
   
    # parse user rating
-   my $userrating;
-   my $rating = parseBetween($response,"Presse</a> <img ", " border=\"0\" /></h4></td>");
-   my $nbvote = 0;
-   my $sommevote = 0;
-   $rating = parseBetween($rating,"etoile_",".gif");
-   if (!($rating eq "")){
-	    $sommevote += $rating - 1;
-	    $nbvote ++;
-   }
-   $rating = parseBetween($response,"Spectateurs</a> <img ", " border=\"0\" /></h4></td>");
-   $rating = parseBetween($rating,"etoile_",".gif");
-   if (!($rating eq "")){
-	$sommevote += $rating - 1;
-	$nbvote ++;
-  }
-   if ($nbvote==0){$userrating=0};
-   if ($nbvote==1){$userrating=$sommevote*2;};
-   if ($nbvote==2){$userrating=$sommevote;};
+   my $userrating=0;
+   my $tmpratings = parseBetween($response,"Critiques&nbsp;:</b></h5>", "</table>");
+   my $rating_pat = qr'class="etoile_(\d+)"';
+
+   # ratings are from one to four stars
+   my @ratings = ($tmpratings =~ m/$rating_pat/g);
+   $userrating += $_ foreach @ratings;
+   if (@ratings) { $userrating /= @ratings; }
 	
+   if ($userrating) { $userrating = int($userrating * 2.5); }
 
    # parse rating
    my $movierating = parseBetween($response,"Interdit aux moins de ","ans");
@@ -166,25 +152,22 @@ sub getMovieData {
 
    # parse cast 
 
-   my $cast = parseBetween($response, "<h4>Avec ","</h4>");
-   $cast = removeTag($cast);
+   my $castchunk;
+
+   my $name_link_pat = qr'<a .*?href="/personne/.*?".*?>(.*?)</a>';
    if (defined $opt_casting){
-      my ($rc, $responsecasting) = myth_url_get("http://www.allocine.fr/film/casting_gen_cfilm=" . $movieid . ".html");
-      my $fullcast = parseBetween($responsecasting, "Acteur(s)", "<table");
-      my $oneactor;
-      $fullcast = parseBetween($fullcast,"style=\"background-color", "</table>");
-      my @listactor = split("style=\"background-color", $fullcast);
-      my @cleanlistactor ;
-      for $oneactor (@listactor ) { 
-        $oneactor = parseBetween($oneactor,"<h4>","</h4>");
-        $oneactor =  removeTag($oneactor );        
-        push(@cleanlistactor,$oneactor); 
-	    }
-	    my $finalcast = join (", ",@cleanlistactor);
-	    if ($finalcast  ne "") {$cast = $finalcast;};
+	  my ($tmprc, $responsecasting) = myth_url_get("http://www.allocine.fr/film/casting_gen_cfilm=" . $movieid . ".html");
+      $castchunk = parseBetween($responsecasting, "Acteurs", "</table");
    }
    
+   if (!$castchunk) {
+      $castchunk = parseBetween($response, "<h4>Avec ","</h4>");
+   }
    
+   my $cast = "";
+   if (defined $castchunk) {
+      $cast = trim(join(',', ($castchunk =~ m/$name_link_pat/g)));
+   }
 
    #genres
    my $genres = parseBetween($response,"<h4>Genre : ","</h4>");
@@ -205,8 +188,7 @@ sub getMovieData {
    print "UserRating:$userrating\n";
    print "MovieRating:$movierating\n";
    print "Runtime:$runtime\n";
-   print "Writers: $writer\n";
-   print "Cast: $cast\n";
+   print "Cast:$cast\n";
    print "Genres:$genres\n";
    print "Countries:$countries\n";
 }
