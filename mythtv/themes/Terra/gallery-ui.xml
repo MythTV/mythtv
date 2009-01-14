@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mythuitheme>
+    
+    <window name="gallery">
+
+        <imagetype name="topbar" from="basetopbar" />
+        
+        <textarea name="heading" from="baseheading">
+            <value>Photo Gallery</value>
+        </textarea>
+        
+        <buttonlist name="images">
+            <area>0,55,1280,5850</area>
+            <buttonarea>0,0,1280,585</buttonarea>
+            <wrapstyle>selection</wrapstyle>
+            <scrollstyle>center</scrollstyle>
+            <layout>grid</layout>
+            <spacing>0</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <imagetype name="buttonimage">
+                        <area>0,0,256,192</area>
+                        <preserveaspect>yes</preserveaspect>
+                    </imagetype>
+                    <statetype name="buttoncheck">
+                        <position>130,100</position>
+                        <showempty>yes</showempty>
+                        <state type="full">
+                            <imagetype name="marked">
+                                <filename>gallery/mark.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                </state>
+                <state name="selected" from="active">
+                    <area>0,0,302,228</area>
+                    <imagetype name="buttonimage">
+                        <area>-23,-18,302,228</area>
+                        <preserveaspect>yes</preserveaspect>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="galleryframe">
+            <position>0,53</position>
+            <filename>gallery/galleryframe.png</filename>
+        </imagetype>
+
+        <textarea name="text">
+            <area>20,640,1240,40</area>
+            <align>hcenter</align>
+            <font>baselarge</font>
+        </textarea>
+        
+    </window>
+    
+</mythuitheme>
