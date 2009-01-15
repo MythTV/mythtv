@@ -9,11 +9,15 @@
             <value>Photo Gallery</value>
         </textarea>
 
+        <imagetype name="galleryframe">
+            <position>0,52</position>
+            <filename>gallery/galleryframe.png</filename>
+        </imagetype>
+
         <buttonlist name="images">
             <area>0,55,1280,5850</area>
             <buttonarea>0,0,1280,585</buttonarea>
             <wrapstyle>selection</wrapstyle>
-            <scrollstyle>center</scrollstyle>
             <layout>grid</layout>
             <spacing>0</spacing>
             <statetype name="buttonitem">
@@ -38,14 +42,13 @@
                         <area>-23,-18,302,228</area>
                         <preserveaspect>yes</preserveaspect>
                     </imagetype>
+                    <imagetype name="selectedframe">
+                        <position>-25,-20</position>
+                        <filename>gallery/selected_frame.png</filename>
+                    </imagetype>
                 </state>
             </statetype>
         </buttonlist>
-
-        <imagetype name="galleryframe">
-            <position>0,53</position>
-            <filename>gallery/galleryframe.png</filename>
-        </imagetype>
 
         <textarea name="text">
             <area>20,640,1240,40</area>

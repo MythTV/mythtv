@@ -58,7 +58,7 @@
             <position>0,120</position>
             <filename>recordings/recordingsbackground.png</filename>
         </imagetype>
-        
+
         <buttonlist name="recordings">
             <area>0,120,1280,300</area>
             <buttonarea>0,0,1280,300</buttonarea>
@@ -180,7 +180,7 @@
             <position>0,118</position>
             <filename>recordings/recordingsframe.png</filename>
         </imagetype>
-        
+
 <!--
         <imagetype name="autoexpire">
             <filename>autoexpire.png</filename>
@@ -271,11 +271,11 @@
             <filename>processing.png</filename>
             <position>1150,493</position>
         </imagetype>
-        
+
         <textarea name="timedate" from="basetextarea">
             <area>25,529,580,30</area>
         </textarea>
-        
+
         <textarea name="channel" from="basetextarea">
             <area>820,529,160,30</area>
             <align>right</align>
@@ -285,7 +285,7 @@
             <position>30,433</position>
             <filename>recordings/descriptionbackground.png</filename>
         </imagetype>
-        
+
         <textarea name="title" from="basetextarea">
             <area>48,438,980,35</area>
             <font>baselarge</font>
@@ -294,7 +294,7 @@
         <statetype name="ratingstate" from="baserating">
             <position>1193,433</position>
         </statetype>
-        
+
         <textarea name="description" from="basetextarea">
             <area>48,489,1190,180</area>
             <multiline>yes</multiline>
@@ -315,7 +315,7 @@
         <imagetype name="fade">
             <filename>popups/fade_background.png</filename>
         </imagetype>
-        
+
         <imagetype name="backimg">
             <position>877,78</position>
             <filename>popups/alt_menu_background.png</filename>
@@ -325,32 +325,32 @@
             <position>896,238</position>
             <filename>recordings/filterlist_background.png</filename>
         </imagetype>
-        
+
         <textarea name="label" from="basetextarea">
             <area>889,93,378,125</area>
             <align>allcenter</align>
             <font>basemedium</font>
             <multiline>yes</multiline>
         </textarea>
-        
+
         <buttonlist name="groups" from="basebuttonlist">
             <area>900,248,364,307</area>
             <buttonarea>0,0,378,300</buttonarea>
             <spacing>2</spacing>
         </buttonlist>
     </window>
-    
+
     <window name="changeview">
         <area>0,42,1280,515</area>
         <imagetype name="fade">
             <filename>popups/fade_background.png</filename>
         </imagetype>
-        
+
         <imagetype name="backimg">
             <position>877,78</position>
             <filename>popups/alt_menu_background.png</filename>
         </imagetype>
-        
+
         <textarea name="title" from="basetextarea">
             <area>889,93,378,125</area>
             <align>allcenter</align>
@@ -358,61 +358,61 @@
             <value>Change Displayed Groups</value>
             <multiline>yes</multiline>
         </textarea>
-        
+
         <checkbox name="titles" from="basecheckbox">
             <position>940,238</position>
         </checkbox>
-        
+
         <textarea name="titlelabel" from="basetextarea">
             <area>990,242,300,30</area>
             <value>Show Titles</value>
         </textarea>
-        
+
         <checkbox name="categories" from="basecheckbox">
             <position>940,283</position>
         </checkbox>
-        
+
         <textarea name="catlabel" from="titlelabel">
             <position>990,288</position>
             <value>Show Categories</value>
         </textarea>
-        
+
         <checkbox name="recgroups" from="basecheckbox">
             <position>940,328</position>
         </checkbox>
-        
+
         <textarea name="grouplabel" from="titlelabel">
             <position>990,335</position>
             <value>Show Recording Groups</value>
         </textarea>
-        
+
         <checkbox name="watchlist" from="basecheckbox">
             <position>940,373</position>
         </checkbox>
-        
+
         <textarea name="watchlabel" from="titlelabel">
             <position>990,378</position>
             <value>Show Watch List</value>
         </textarea>
-        
+
         <checkbox name="searches" from="basecheckbox">
             <position>940,418</position>
         </checkbox>
-        
+
         <textarea name="searchlabel" from="titlelabel">
             <position>990,423</position>
             <value>Show Searches</value>
         </textarea>
-        
+
         <checkbox name="livetv" from="basecheckbox">
             <position>940,463</position>
         </checkbox>
-        
+
         <textarea name="livelabel" from="titlelabel">
             <position>990,468</position>
             <value>Show LiveTV</value>
         </textarea>
-        
+
         <button name="save" from="basebutton">
             <position>968,515</position>
             <value>Save</value>
@@ -424,12 +424,12 @@
         <imagetype name="fade">
             <filename>popups/fade_background.png</filename>
         </imagetype>
-        
+
         <imagetype name="backimg">
             <position>877,78</position>
             <filename>popups/alt_menu_background.png</filename>
         </imagetype>
-        
+
         <textarea name="title" from="basetextarea">
             <area>889,93,378,125</area>
             <font>basemedium</font>
@@ -437,67 +437,74 @@
             <value>Change Recording Group Password</value>
             <multiline>yes</multiline>
         </textarea>
-        
+
         <textarea name="oldpasslabel" from="basetextarea">
             <area>889,250,378,30</area>
             <value>Old Password</value>
             <align>hcenter</align>
             <font>basemedium</font>
         </textarea>
-        
+
         <textedit name="oldpassword" from="baseshorttextedit">
             <position>919,285</position>
         </textedit>
-        
+
         <textarea name="newpasslabel" from="oldpasslabel">
             <position>889,380</position>
             <value>New Password:</value>
         </textarea>
-        
+
         <textedit name="newpassword" from="baseshorttextedit">
             <position>919,415</position>
         </textedit>
-        
+
         <button name="ok" from="basebutton">
             <position>968,515</position>
             <value>OK</value>
         </button>
     </window>
-    
+
     <window name="editmetadata">
-        <area>-1,-1,500,500</area>
-        
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
+        <area>0,42,1280,515</area>
+        <imagetype name="fade">
+            <filename>popups/fade_background.png</filename>
         </imagetype>
-        
+
+        <imagetype name="backimg">
+            <position>877,78</position>
+            <filename>popups/alt_menu_background.png</filename>
+        </imagetype>
+
         <textarea name="label" from="basetextarea">
-            <area>12,15,470,160</area>
-            <multiline>yes</multiline>
+            <area>889,93,378,125</area>
+            <font>basemedium</font>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
+            <multiline>yes</multiline>
         </textarea>
-        
+
         <textarea name="titlelabel" from="basetextarea">
-            <area>58,180,300,30</area>
-            <value>Title:</value>
+            <area>889,250,378,30</area>
+            <value>Title</value>
+            <align>hcenter</align>
+            <font>basemedium</font>
         </textarea>
-        
-        <textedit name="title" from="basetextedit">
-            <position>58,210</position>
+
+        <textedit name="title" from="baseshorttextedit">
+            <position>919,285</position>
         </textedit>
-        
-        <textarea name="subtitlelabel" from="basetextarea">
-            <area>58,310,300,30</area>
-            <value>Subtitle:</value>
+
+        <textarea name="subtitlelabel" from="titlelabel">
+            <position>889,380</position>
+            <value>Subtitle</value>
         </textarea>
-        
-        <textedit name="subtitle" from="basetextedit">
-            <position>58,340</position>
+
+        <textedit name="subtitle" from="baseshorttextedit">
+            <position>919,415</position>
         </textedit>
-        
+
         <button name="ok" from="basebutton">
-            <position>175,435</position>
+            <position>968,515</position>
             <value>OK</value>
         </button>
     </window>
