@@ -440,9 +440,6 @@ bool VideoFilterDialog::Create()
         return false;
     }
 
-    m_saveButton->SetText(tr("Save as default"));
-    m_doneButton->SetText(tr("Done"));
-
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 

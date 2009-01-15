@@ -1113,10 +1113,12 @@
 
         <button name="done_button" from="basebutton">
             <position>400,505</position>
+            <value>Done</value>
         </button>
 
         <button name="save_button" from="basebutton">
             <position>200,505</position>
+            <value>Save as default</value>
         </button>
 
     </window>
