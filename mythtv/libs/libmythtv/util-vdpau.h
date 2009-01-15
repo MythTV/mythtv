@@ -21,7 +21,7 @@ class VDPAUContext
     VDPAUContext();
    ~VDPAUContext();
 
-    bool Init(Display *disp, Screen *screen, Window win,
+    bool Init(Display *disp, int screen, Window win,
               QSize screen_size, bool color_control,
               MythCodecID mcodecid);
     void Deinit(void);
@@ -70,7 +70,7 @@ class VDPAUContext
     void DeinitPIP(NuppelVideoPlayer *pipplayer);
 
   private:
-    bool InitProcs(Display *disp, Screen *screen);
+    bool InitProcs(Display *disp, int screen);
     void DeinitProcs(void);
     void ClearScreen(void);
 

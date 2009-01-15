@@ -78,7 +78,7 @@ VDPAUContext::~VDPAUContext()
 {
 }
 
-bool VDPAUContext::Init(Display *disp, Screen *screen,
+bool VDPAUContext::Init(Display *disp, int screen,
                         Window win, QSize screen_size,
                         bool color_control, MythCodecID mcodecid)
 {
@@ -127,7 +127,7 @@ static const char* dummy_get_error_string(VdpStatus status)
     return &dummy[0];
 }
 
-bool VDPAUContext::InitProcs(Display *disp, Screen *screen)
+bool VDPAUContext::InitProcs(Display *disp, int screen)
 {
     VdpStatus vdp_st;
     bool ok = true;
@@ -135,7 +135,7 @@ bool VDPAUContext::InitProcs(Display *disp, Screen *screen)
 
     vdp_st = vdp_device_create_x11(
         disp,
-        *(int*)screen,
+        screen,
         &vdp_device,
         &vdp_get_proc_address
     );
@@ -1487,10 +1487,8 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
     if (!disp)
         return false;
 
-    Screen *screen;
-    X11S(screen = DefaultScreenOfDisplay(disp));
-    if (!screen)
-        ok = false;
+    int screen;
+    X11S(screen = DefaultScreen(disp));
 
     VdpDevice device;
     VdpGetProcAddress * vdp_proc_address;
@@ -1502,7 +1500,7 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
     {
         vdp_st = vdp_device_create_x11(
             disp,
-            *(int*)screen,
+            screen,
             &device,
             &vdp_proc_address
         );
