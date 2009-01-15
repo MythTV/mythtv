@@ -25,7 +25,6 @@ bool CastDialog::Create()
 
     bool err = false;
     UIUtilE::Assign(this, castList, "cast", &err);
-    UIUtilE::Assign(this, okButton, "ok", &err);
 
     if (err)
     {
@@ -33,9 +32,10 @@ bool CastDialog::Create()
         return false;
     }
 
-    connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
+    UIUtilE::Assign(this, okButton, "ok", &err);
 
-    okButton->SetText(tr("OK"));
+    if (okButton)
+        connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
 
     QStringList cast = GetDisplayCast(*m_metadata);
     QStringListIterator castIterator(cast);
@@ -67,7 +67,6 @@ bool PlotDialog::Create()
 
     bool err = false;
     UIUtilE::Assign(this, plotText, "plot", &err);
-    UIUtilE::Assign(this, okButton, "ok", &err);
 
     if (err)
     {
@@ -75,10 +74,12 @@ bool PlotDialog::Create()
         return false;
     }
 
-    plotText->SetText(m_metadata->Plot());
-    okButton->SetText(tr("OK"));
+    UIUtilE::Assign(this, okButton, "ok", &err);
 
-    connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
+    plotText->SetText(m_metadata->Plot());
+
+    if (okButton)
+        connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
