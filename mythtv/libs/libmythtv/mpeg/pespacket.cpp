@@ -333,21 +333,25 @@ static QMutex pes_alloc_mutex;
 
 unsigned char *pes_alloc(uint size)
 {
+#ifndef USING_VALGRIND
     QMutexLocker locker(&pes_alloc_mutex);
     if (size <= 188)
         return get_188_block();
     else if (size <= 4096)
         return get_4096_block();
+#endif
     return (unsigned char*) malloc(size);
 }
 
 void pes_free(unsigned char *ptr)
 {
+#ifndef USING_VALGRIND
     QMutexLocker locker(&pes_alloc_mutex);
     if (is_188_block(ptr))
         return_188_block(ptr);
     else if (is_4096_block(ptr))
         return_4096_block(ptr);
     else
+#endif
         free(ptr);
 }
