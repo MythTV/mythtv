@@ -32,7 +32,7 @@ bool CastDialog::Create()
         return false;
     }
 
-    UIUtilE::Assign(this, okButton, "ok");
+    UIUtilW::Assign(this, okButton, "ok");
 
     if (okButton)
         connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
@@ -74,7 +74,7 @@ bool PlotDialog::Create()
         return false;
     }
 
-    UIUtilE::Assign(this, okButton, "ok");
+    UIUtilW::Assign(this, okButton, "ok");
 
     plotText->SetText(m_metadata->Plot());
 
