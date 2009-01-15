@@ -61,6 +61,7 @@ typedef enum
 
 class OpenGLContext;
 
+#ifdef USING_OPENGL
 class OpenGLContextLocker
 {
     public:
@@ -70,8 +71,6 @@ class OpenGLContextLocker
     private:
         OpenGLContext *m_ctx;
 };
-
-#ifdef USING_OPENGL
 
 class OpenGLContext
 {
@@ -273,19 +272,22 @@ class OpenGLContextAGL : public OpenGLContext
 #endif //Q_WS_MACX
 
 #else // if !USING_OPENGL
+class OpenGLContextLocker
+{
+    public:
+        OpenGLContextLocker(OpenGLContext*) { }
+        ~OpenGLContextLocker() { }
+};
 
 class OpenGLContext
 {
   public:
+    static OpenGLContext *Create(QMutex*);
+
     OpenGLContext(QMutex*) { }
     ~OpenGLContext() { }
 
-#ifdef USING_X11
-    bool Create(Display*, Window, uint, const Rect&, bool = false) 
-        { return false; }
-    static bool IsGLXSupported(Display*, uint, uint) { return false; }
-#endif
-    bool Create(int, const QRect&, bool = false);
+    bool Create(int, const QRect&, bool = false) { return false; }
     void SetViewPort(const QSize&) { }
     void Show(void) { }
     void MapWindow(void) { }
@@ -334,9 +336,41 @@ class OpenGLContext
     PictureAttributeSupported GetSupportedPictureAttributes(void) const
         { return kPictureAttributeSupported_None; }
     void SetColourParams(void);
-    uint CreateHelperTexture(void);
+    uint CreateHelperTexture(void) { return 0; }
     void ActiveTexture(uint) { }
 };
+
+#ifdef USING_X11
+class OpenGLContextGLX : public OpenGLContext
+{
+  public:
+    OpenGLContextGLX(QMutex* lock) : OpenGLContext(lock) { }
+    ~OpenGLContextGLX() { }
+
+    bool Create(Display*, Window, uint,
+                const QRect&, bool = false,
+                bool = false) { return false; }
+    static bool IsGLXSupported(Display*, uint, uint) { return false; }
+};
+#endif // USING_X11
+
+#ifdef USING_MINGW
+class OpenGLContextWGL : public OpenGLContext
+{
+  public:
+    OpenGLContextWGL(QMutex*) : OpenGLContext(lock) { }
+    ~OpenGLContextWGL() { }
+};
+#endif //USING_MINGW
+
+#ifdef Q_WS_MACX
+class OpenGLContextAGL : public OpenGLContext
+{
+  public:
+    OpenGLContextAGL(QMutex*) : OpenGLContext(lock) { }
+    ~OpenGLContextAGL() { }
+};
+#endif //Q_WS_MACX
 
 #endif //!USING_OPENGL
 
