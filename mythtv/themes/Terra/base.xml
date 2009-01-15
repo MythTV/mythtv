@@ -102,7 +102,7 @@
 
     <!-- Base definition of a textedit -->
     <textedit name="basetextedit">
-        <area>0,0,375,50</area>
+        <area>0,0,437,45</area>
         <statetype name="background">
             <state name="active">
                 <imagetype name="background">
@@ -120,11 +120,35 @@
             <filename>cursor.png</filename>
         </imagetype>
         <textarea name="text">
-            <area>12,13,351,35</area>
+            <area>10,10,417,35</area>
             <font>basesmallbrown</font>
         </textarea>
     </textedit>
-    
+
+    <!-- Base definition of a textedit -->
+    <textedit name="baseshorttextedit">
+        <area>0,0,318,45</area>
+        <statetype name="background">
+            <state name="active">
+                <imagetype name="background">
+                    <filename>controls/short_textedit_background.png</filename>
+                </imagetype>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="background">
+                    <filename>controls/short_textedit_background_selected.png</filename>
+                </imagetype>
+            </state>
+            <state name="inactive" from="active"/>
+        </statetype>
+        <imagetype name="cursor">
+            <filename>cursor.png</filename>
+        </imagetype>
+        <textarea name="text">
+            <area>10,10,298,35</area>
+        </textarea>
+    </textedit>
+
     <!-- Base definition of a button -->
     <button name="basebutton">
         <position>0,0</position>
@@ -540,13 +564,12 @@
         </textarea>
 
         <textedit name="input" from="basetextedit">
-            <position>423d,285</position>
+            <position>423,285</position>
         </textedit>
         
         <button name="ok" from="basebutton">
             <position>528,360</position>
         </button>
-        
     </window>
 
     <!-- Busy Dialog -->

@@ -311,20 +311,32 @@
     </window>
 
     <window name="groupselector">
-        <area>-1,-1,500,500</area>
+        <area>0,42,1280,515</area>
+        <imagetype name="fade">
+            <filename>popups/fade_background.png</filename>
+        </imagetype>
+        
         <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
+            <position>877,78</position>
+            <filename>popups/alt_menu_background.png</filename>
+        </imagetype>
+
+        <imagetype name="listback">
+            <position>896,238</position>
+            <filename>recordings/filterlist_background.png</filename>
         </imagetype>
         
         <textarea name="label" from="basetextarea">
-            <area>12,35,470,30</area>
+            <area>889,93,378,125</area>
             <align>allcenter</align>
             <font>basemedium</font>
+            <multiline>yes</multiline>
         </textarea>
         
         <buttonlist name="groups" from="basebuttonlist">
-            <area>12,80,470,400</area>
-            <showarrow>no</showarrow>
+            <area>900,248,364,307</area>
+            <buttonarea>0,0,378,300</buttonarea>
+            <spacing>2</spacing>
         </buttonlist>
     </window>
     
@@ -344,6 +356,7 @@
             <align>allcenter</align>
             <font>basemedium</font>
             <value>Change Displayed Groups</value>
+            <multiline>yes</multiline>
         </textarea>
         
         <checkbox name="titles" from="basecheckbox">
@@ -407,39 +420,46 @@
     </window>
 
     <window name="passwordchanger">
-        <area>-1,-1,500,500</area>
-        
-        <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
+        <area>0,42,1280,515</area>
+        <imagetype name="fade">
+            <filename>popups/fade_background.png</filename>
         </imagetype>
         
-        <textarea name="label" from="basetextarea">
-            <area>12,15,470,160</area>
-            <multiline>yes</multiline>
+        <imagetype name="backimg">
+            <position>877,78</position>
+            <filename>popups/alt_menu_background.png</filename>
+        </imagetype>
+        
+        <textarea name="title" from="basetextarea">
+            <area>889,93,378,125</area>
+            <font>basemedium</font>
             <align>allcenter</align>
             <value>Change Recording Group Password</value>
+            <multiline>yes</multiline>
         </textarea>
         
         <textarea name="oldpasslabel" from="basetextarea">
-            <area>58,180,300,30</area>
-            <value>Old Password:</value>
+            <area>889,250,378,30</area>
+            <value>Old Password</value>
+            <align>hcenter</align>
+            <font>basemedium</font>
         </textarea>
         
-        <textedit name="oldpassword" from="basetextedit">
-            <position>58,210</position>
+        <textedit name="oldpassword" from="baseshorttextedit">
+            <position>919,285</position>
         </textedit>
         
-        <textarea name="newpasslabel" from="basetextarea">
-            <area>58,310,300,30</area>
+        <textarea name="newpasslabel" from="oldpasslabel">
+            <position>889,380</position>
             <value>New Password:</value>
         </textarea>
         
-        <textedit name="newpassword" from="basetextedit">
-            <position>58,340</position>
+        <textedit name="newpassword" from="baseshorttextedit">
+            <position>919,415</position>
         </textedit>
         
         <button name="ok" from="basebutton">
-            <position>175,435</position>
+            <position>968,515</position>
             <value>OK</value>
         </button>
     </window>

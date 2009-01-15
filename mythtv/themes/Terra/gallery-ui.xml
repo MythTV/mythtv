@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
-    
+
     <window name="gallery">
 
         <imagetype name="topbar" from="basetopbar" />
-        
+
         <textarea name="heading" from="baseheading">
             <value>Photo Gallery</value>
         </textarea>
-        
+
         <buttonlist name="images">
             <area>0,55,1280,5850</area>
             <buttonarea>0,0,1280,585</buttonarea>
@@ -52,7 +52,7 @@
             <align>hcenter</align>
             <font>baselarge</font>
         </textarea>
-        
+
     </window>
-    
+
 </mythuitheme>
