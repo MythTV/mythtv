@@ -4876,8 +4876,10 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
 
     if (commBreakIter != commBreakMap.end())
     {
-        VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2")
-                .arg(*commBreakIter).arg(commBreakIter.key()));
+        VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2, "
+                "framesPlayed = %3")
+                .arg(*commBreakIter).arg(commBreakIter.key())
+                .arg(framesPlayed));
     }
 }
 
