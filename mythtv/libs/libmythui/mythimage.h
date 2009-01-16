@@ -19,6 +19,8 @@ class MPUBLIC MythImage : public QImage
     void UpRef(void);
     bool DownRef(void);
 
+    int RefCount(void) const { return m_RefCount; }
+
     virtual void SetChanged(bool change = true) { m_Changed = change; }
     bool IsChanged() const { return m_Changed; }
 

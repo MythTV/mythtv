@@ -497,21 +497,32 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         uint oldestTime = d->CacheTrack[it.key()];
         QString oldestKey = it.key();
 
+        int count;
         for ( ; it != d->imageCache.end(); ++it)
         {
-                if (d->CacheTrack[it.key()] < oldestTime)
-                {
-                    oldestTime = d->CacheTrack[it.key()];
-                    oldestKey = it.key();
-                }
+            if (d->CacheTrack[it.key()] < oldestTime &&
+                (it.value()->RefCount() == 1))
+            {
+                oldestTime = d->CacheTrack[it.key()];
+                oldestKey = it.key();
+                count++;
+            }
         }
 
-        VERBOSE(VB_FILE, QString("Cache too big, removing :%1:").arg(oldestKey));
+        VERBOSE(VB_FILE, QString("%1 images are eligible for expiry").arg(count));
 
-        m_cacheSize -= d->imageCache[oldestKey]->numBytes();
-        d->imageCache[oldestKey]->DownRef();
-        d->imageCache.remove(oldestKey);
-        d->CacheTrack.remove(oldestKey);
+        if (count > 0)
+        {
+            VERBOSE(VB_FILE, QString("Cache too big (%1), removing :%2:")
+                            .arg(m_cacheSize + im->numBytes()).arg(oldestKey));
+
+            m_cacheSize -= d->imageCache[oldestKey]->numBytes();
+            d->imageCache[oldestKey]->DownRef();
+            d->imageCache.remove(oldestKey);
+            d->CacheTrack.remove(oldestKey);
+        }
+        else
+            break;
     }
 
     QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
