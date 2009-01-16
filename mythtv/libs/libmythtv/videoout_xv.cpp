@@ -4835,8 +4835,8 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
     const QRect video_rect           = windows[0].GetVideoRect();
     const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    const float video_aspect         = windows[0].GetVideoAspect();
-    if (video_aspect < 0.01)
+    float video_aspect               = windows[0].GetVideoAspect();
+    if (video_aspect < 0.01f)
         video_aspect = 1.3333f;
 
     const float pip_size             = (float)windows[0].GetPIPSize();
