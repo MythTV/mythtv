@@ -75,8 +75,10 @@ void BackendQueryDiskSpace(QStringList &strlist,
     query.prepare("SELECT MIN(id),dirname "
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME "
+                    "AND groupname <> :BACKUPGRP "
                   "GROUP BY dirname;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":BACKUPGRP", "DB Backups");
 
     if (query.exec() && query.isActive())
     {
