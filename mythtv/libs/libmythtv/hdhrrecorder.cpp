@@ -250,9 +250,13 @@ void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
     if (!pmt)
         return;
 
-    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
-    pmt->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<TSPacket*>(pmt->tsheader())));
+    unsigned char buf[8 * 1024];
+    uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
+    pmt->tsheader()->SetContinuityCounter(next_cc);
+    uint size = pmt->WriteAsTSPackets(buf, next_cc);
+
+    for (uint i = 0; i < size ; i += TSPacket::SIZE)
+        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
 }
 
 /** \fn HDHRRecorder::HandleMGT(const MasterGuideTable*)
