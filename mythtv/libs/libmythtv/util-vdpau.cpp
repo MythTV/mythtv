@@ -1661,6 +1661,7 @@ int VDPAUContext::SetPictureAttribute(
         return -1;
 
     int ret = -1;
+    float new_val;
     switch (attribute)
     {
         case kPictureAttribute_Brightness:
@@ -1677,7 +1678,10 @@ int VDPAUContext::SetPictureAttribute(
             break;
         case kPictureAttribute_Hue:
             ret = newValue;
-            proCamp.hue = (newValue * 0.062831853f);
+            new_val = (newValue * 0.062831853f);
+            if (new_val > 3.14159265f)
+                new_val -= 6.2831853f;
+            proCamp.hue = new_val;
             break;
         default:
             break;
