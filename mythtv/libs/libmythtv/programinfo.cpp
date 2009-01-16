@@ -3930,9 +3930,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         recDir = "";
     }
-    else if (RemoteCheckFile(this))
+    else if (RemoteCheckFile(this) && pathname.left(1) == "/")
     {
-        // if we hit here we're not recording this file
         recDir = pathname.section("/", 0, -2);
     }
 
