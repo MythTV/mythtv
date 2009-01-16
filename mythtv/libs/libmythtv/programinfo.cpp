@@ -700,16 +700,17 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     else
         progMap["stars"] = "";
 
-    if (hasAirDate)
+    if (!hasAirDate ||
+        (!programid.isEmpty() && (programid.left(2) == "MV")))
+    {
+        progMap["originalairdate"] = "";
+        progMap["shortoriginalairdate"] = "";
+    }
+    else
     {
         progMap["originalairdate"] = originalAirDate.toString(dateFormat);
         progMap["shortoriginalairdate"] =
                                 originalAirDate.toString(shortDateFormat);
-    }
-    else
-    {
-        progMap["originalairdate"] = "";
-        progMap["shortoriginalairdate"] = "";
     }
 }
 
