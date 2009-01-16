@@ -880,10 +880,7 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
     const QRect display_video_rect     = windows[0].GetDisplayVideoRect();
     const QRect video_rect             = windows[0].GetVideoRect();
     const QRect display_visible_rect   = windows[0].GetDisplayVisibleRect();
-    const float overriden_video_aspect = windows[0].GetOverridenVideoAspect();
     const QSize video_disp_dim         = windows[0].GetVideoDispDim();
-    const int   pip_size               = windows[0].GetPIPSize();
-    const AspectOverrideMode aspectoverride = windows[0].GetAspectOverride();
 
     int pipw, piph;
     VideoFrame *pipimage       = pipplayer->GetCurrentFrame(pipw, piph);
@@ -891,8 +888,6 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
     const bool  pipVisible     = pipplayer->IsPIPVisible();
     const float pipVideoAspect = pipplayer->GetVideoAspect();
     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
-    const uint  pipVideoWidth  = pipVideoDim.width();
-    const uint  pipVideoHeight = pipVideoDim.height();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
     if ((video_aspect <= 0) || (pipVideoAspect <= 0) || 
@@ -909,38 +904,8 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
         return;
     }
 
-    // set height
-    int tmph = (int) ((frame->height * pip_size) * 0.01f);
-    pip_desired_display_size.setHeight((tmph >> 1) << 1);
-
-    // adjust for letterbox modes...
-    int letterXadj = 0;
-    int letterYadj = 0;
-    float letterAdj = 1.0f;
-    if (aspectoverride != kAspect_Off)
-    {
-        letterXadj = max(-display_video_rect.left(), 0);
-        float xadj = (float) video_rect.width() / display_visible_rect.width();
-        letterXadj = (int) (letterXadj * xadj);
-
-        float yadj = (float)video_rect.height() /display_visible_rect.height();
-        letterYadj = max(-display_video_rect.top(), 0);
-        letterYadj = (int) (letterYadj * yadj);
-
-        letterAdj  = video_aspect / overriden_video_aspect;
-    }
-
-    // adjust for non-square pixels on screen
-    float dispPixelAdj =
-        (GetDisplayAspect() * video_disp_dim.height())/video_disp_dim.width();
-
-    // adjust for non-square pixels in video
-    float vidPixelAdj  = pipVideoWidth / (pipVideoAspect * pipVideoHeight);
-
-    // set width
-    int tmpw = (int) (pip_desired_display_size.height() * pipVideoAspect *
-                      vidPixelAdj * dispPixelAdj * letterAdj);
-    pip_desired_display_size.setWidth((tmpw >> 1) << 1);
+    QRect position = GetPIPRect(loc, pipplayer);
+    pip_desired_display_size = position.size();
 
     // Scale the image if we have to...
     unsigned char *pipbuf = pipimage->buf;
@@ -995,32 +960,11 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
         }
     }
 
-    // Figure out where to put the Picture-in-Picture window
-    int xoff = 0;
-    int yoff = 0;
-    switch (loc)
-    {
-        case kPIP_END:
-        case kPIPTopLeft:
-            xoff = 30 + letterXadj;
-            yoff = 40 + letterYadj;
-            break;
-        case kPIPBottomLeft:
-            xoff = 30 + letterXadj;
-            yoff = frame->height - piph - 40 - letterYadj;
-            break;
-        case kPIPTopRight:
-            xoff = frame->width  - pipw - 30 - letterXadj;
-            yoff = 40 + letterYadj;
-            break;
-        case kPIPBottomRight:
-            xoff = frame->width  - pipw - 30 - letterXadj;
-            yoff = frame->height - piph - 40 - letterYadj;
-            break;
-    }
-
+    int xoff = position.left();
+    int yoff = position.top();
     uint xoff2[3]  = { xoff, xoff>>1, xoff>>1 };
     uint yoff2[3]  = { yoff, yoff>>1, yoff>>1 };
+
     uint pip_height = pip_tmp_image.height;
     uint height[3] = { pip_height, pip_height>>1, pip_height>>1 };
     

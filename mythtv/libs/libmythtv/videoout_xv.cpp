@@ -4829,15 +4829,19 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
     {
         return VideoOutput::GetPIPRect(location, pipplayer);
     }
-   
+
+    QRect position;
     const QSize video_disp_dim       = windows[0].GetVideoDispDim();
     const QRect video_rect           = windows[0].GetVideoRect();
     const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    QRect position;
-    float pipVideoAspect = 1.3333f;
-    // set height
-    int tmph = (int)(video_disp_dim.height() * windows[0].GetPIPSize() * 0.01f);
+    const float video_aspect         = windows[0].GetVideoAspect();
+    if (video_aspect < 0.01)
+        video_aspect = 1.3333f;
+
+    const float pip_size             = (float)windows[0].GetPIPSize();
+    const float pipVideoAspect       = pipplayer->GetVideoAspect();
+
     // adjust for aspect override modes...
     int letterXadj = 0;
     int letterYadj = 0;
@@ -4853,15 +4857,17 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
         letterAdj  = windows[0].GetVideoAspect() /
             windows[0].GetOverridenVideoAspect();
     }
-    int tmpw = (int)
-        (tmph * (pipVideoAspect / windows[0].GetVideoAspect()) * letterAdj);
+    // adjust for the relative aspect ratios of pip and main video
+    float aspectAdj  = pipVideoAspect / video_aspect;
+
+    int tmph = (int) ((float)video_disp_dim.height() * pip_size * 0.01f);
+    int tmpw = (int) ((float)video_disp_dim.width() * pip_size * 0.01f *
+                             aspectAdj * letterAdj);
     position.setWidth((tmpw >> 1) << 1);
     position.setHeight((tmph >> 1) << 1);
 
-    int xoff = (int)(display_visible_rect.width()  * 0.06);
-    int yoff = (int)(display_visible_rect.height() * 0.06);
-    xoff = (xoff >> 1) << 1;
-    yoff = (yoff >> 1) << 1;
+    int xoff = 30;
+    int yoff = 40;
 
     switch (location)
     {
