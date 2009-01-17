@@ -2,6 +2,8 @@
 <mythuitheme>
     <window name="mainmenu">
 
+        <imagetype name="topbar" from="basetopbar" />
+
         <statetype name="titles">
             <state name="TV">
                 <textarea name="heading" from="baseheading">
@@ -105,6 +107,13 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,17,256,218</area>
+
+                    <textarea name="buttontext">
+                        <area>5,231,246,40</area>
+                        <align>allcenter</align>
+                        <font>basemedium</font>
+                        <multiline>yes</multiline>
+                    </textarea>
 
                     <statetype name="icon">
 
@@ -443,14 +452,15 @@
                         </state>
                         <state name="SETTINGS_ZONEMINDER" from="ZONEMINDER" />
                     </statetype>
-                    <textarea name="buttontext">
-                        <area>5,231,246,40</area>
-                        <align>allcenter</align>
-                        <font>basemedium</font>
-                    </textarea>
                 </state>
                 <state name="selected" from="active">
                     <area>-11,0,277,278</area>
+
+                    <textarea name="buttontext">
+                        <area>5,256,267,40</area>
+                        <font>baselargebrown</font>
+                    </textarea>
+
                     <statetype name="icon">
                         <state name="DEFAULT">
                             <imagetype name="icon">
@@ -787,11 +797,6 @@
                         </state>
                         <state name="SETTINGS_ZONEMINDER" from="ZONEMINDER" />
                     </statetype>
-                    <textarea name="buttontext">
-                        <area>0,256,277,40</area>
-                        <align>allcenter</align>
-                        <font>baselarge</font>
-                    </textarea>
                 </state>
                 <state name="inactive" from="selected" />
             </statetype>
@@ -812,6 +817,7 @@
             <area>100,500,1080,100</area>
             <align>allcenter</align>
             <font>basemedium</font>
+            <alpha>150</alpha>
         </textarea>
 
     </window>

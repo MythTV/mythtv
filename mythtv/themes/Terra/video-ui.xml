@@ -238,6 +238,100 @@
     <!-- Main Windows -->
     <window name="manager">
 
+<!--        <imagetype name="backdrop">
+            <area>0,0,1280,720</area>
+            <crop>0,0,1280,685</crop>
+            <filename>backdrop.jpg</filename>
+        </imagetype>-->
+
+        <imagetype name="framebackground">
+            <position>66,41</position>
+            <filename>video/managerlistbackground.png</filename>
+        </imagetype>
+
+        <buttonlist name="videos">
+            <area>66,41,600,644</area>
+            <layout>vertical</layout>
+            <scrollstyle>center</scrollstyle>
+            <spacing>0</spacing>
+            <buttonarea>0,0,600,646</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,590,88</area>
+                <state name="active">
+                    <imagetype name="buttonimage">
+                        <area>17,0,58,92</area>
+                        <filename>mv_browse_nocover.png</filename>
+                    </imagetype>
+                    <statetype name="nodetype">
+                        <position>0,9</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <area>0,0,25,25</area>
+                                <filename>mv_gallery_dir.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <imagetype name="icon">
+                                <area>0,0,25,25</area>
+                                <filename>mv_gallery_dir_up.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>93,8,470,50</area>
+                        <font>baselarge</font>
+                        <align>vcenter</align>
+                    </textarea>
+                    <textarea name="director" from="basetextarea">
+                        <area>93,61,390,25</area>
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="year" from="director">
+                        <area>497,61,75,25</area>
+                        <align>right</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonimage">
+                        <area>0,-24,92,137</area>
+                        <filename>mv_browse_nocover.png</filename>
+                        <mask>video/managerpostermask.png</mask>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <position>100,8</position>
+                    </textarea>
+                    <textarea name="director">
+                        <position>100,61</position>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>240,270</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>456,270</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="frame">
+            <position>60,41</position>
+            <filename>video/managerlistframe.png</filename>
+        </imagetype>
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Video Manager</value>
+        </textarea>
+        <!--
         <statetype name="parentallevel">
             <position>740,10</position>
             <state name="None">
@@ -265,7 +359,12 @@
                     <filename>mv_level_high.png</filename>
                 </imagetype>
             </state>
-        </statetype>
+        </statetype>-->
+
+        <imagetype name="descriptionbackground">
+            <position>680,57</position>
+            <filename>video/manager_description_background.png</filename>
+        </imagetype>
 
         <textarea name="novideos" from="basetextarea">
             <area>0,110,800,70</area>
@@ -274,47 +373,42 @@
         </textarea>
 
         <textarea name="title" from="basetextarea">
-            <area>20,10,710,80</area>
+            <area>700,65,490,40</area>
             <font>baselarge</font>
         </textarea>
 
+        <statetype name="userratingstate" from="baserating">
+            <position>1195,62</position>
+        </statetype>
+
         <textarea name="dirlbl" from="basetextarea">
-            <area>20,65,130,35</area>
-            <font>basesmall</font>
-            <align>right,top</align>
+            <area>670,120,130,30</area>
+            <font>basemedium</font>
+            <align>right,vcenter</align>
             <value>Director:</value>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>160,65,350,35</area>
-            <font>basesmallyellow</font>
+            <area>810,120,350,30</area>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="yrlbl" from="dirlbl">
-            <position>500,65</position>
+            <position>670,160</position>
             <value>Year:</value>
         </textarea>
 
         <textarea name="year" from="director">
-            <area>650,65,100,35</area>
-        </textarea>
-
-        <textarea name="ratlbl" from="dirlbl">
-            <position>20,95</position>
-            <value>Rated:</value>
-        </textarea>
-
-        <textarea name="rating" from="director">
-            <area>160,95,350,35</area>
+            <area>810,160,100,30</area>
         </textarea>
 
         <textarea name="lvllbl" from="dirlbl">
-            <position>500,95</position>
-            <value>Parental Level:</value>
+            <position>670,200</position>
+            <value>Parental:</value>
         </textarea>
 
         <statetype name="videolevel">
-            <position>645,90</position>
+            <position>810,200</position>
             <state name="Lowest">
                 <imagetype name="icon">
                     <area>0,2,30,30</area>
@@ -352,138 +446,66 @@
             </state>
         </statetype>
 
+
+        <textarea name="ratlbl" from="dirlbl">
+            <position>670,240</position>
+            <value>Rated:</value>
+        </textarea>
+
+        <textarea name="rating" from="director">
+            <area>810,240,350,30</area>
+        </textarea>
+
         <textarea name="browselbl" from="dirlbl">
-            <position>500,125</position>
+            <position>670,280</position>
             <value>Browsable:</value>
             <align>right,top</align>
         </textarea>
 
         <textarea name="browseable" from="director">
-            <area>650,125,100,35</area>
+            <area>810,280,100,35</area>
         </textarea>
 
         <textarea name="lenlbl" from="dirlbl">
-            <position>20,125</position>
+            <position>670,320</position>
             <value>Runtime:</value>
         </textarea>
 
         <textarea name="length" from="director">
-            <area>160,125,350,35</area>
-        </textarea>
-
-        <textarea name="pltlbl" from="dirlbl">
-            <position>20,155</position>
-            <value>Plot:</value>
+            <area>810,320,350,35</area>
         </textarea>
 
         <textarea name="plot" from="director">
-            <area>160,155,600,35</area>
+            <area>695,500,540,160</area>
+            <multiline>yes</multiline>
         </textarea>
 
         <textarea name="fillbl" from="dirlbl">
-            <position>20,185</position>
+            <position>670,360</position>
             <value>Filename:</value>
         </textarea>
 
         <textarea name="filename" from="director">
-            <area>160,185,600,35</area>
+            <area>810,360,400,35</area>
         </textarea>
 
         <textarea name="cvflbl" from="dirlbl">
-            <position>20,215</position>
+            <position>670,400</position>
             <value>Cover File:</value>
         </textarea>
 
         <textarea name="coverfile" from="director">
-            <area>160,215,600,35</area>
+            <area>810,400,400,35</area>
         </textarea>
 
         <textarea name="imdblbl" from="dirlbl">
-            <position>20,245</position>
-            <value>Video Num.:</value>
+            <position>670,440</position>
+            <value>IMDB ID:</value>
         </textarea>
 
         <textarea name="inetref" from="director">
-            <area>160,245,100,35</area>
+            <area>810,440,100,35</area>
         </textarea>
-
-        <imagetype name="menu_background">
-            <position>0,270</position>
-            <filename>cr-background.png</filename>
-        </imagetype>
-
-        <buttonlist name="videos">
-            <area>20,282,760,242</area>
-            <layout>vertical</layout>
-            <spacing>5</spacing>
-            <buttonarea>0,0,760,250</buttonarea>
-            <statetype name="buttonitem">
-                <area>0,0,760,25</area>
-                <state name="active">
-                    <imagetype name="buttonimage">
-                        <area>0,2,25,25</area>
-                        <preserveaspect>yes</preserveaspect>
-                        <filename>mv_browse_nocover.png</filename>
-                    </imagetype>
-                    <statetype name="nodetype">
-                        <position>0,9</position>
-                        <state name="subfolder">
-                            <imagetype name="icon">
-                                <area>0,0,25,25</area>
-                                <filename>mv_gallery_dir.png</filename>
-                                <preserveaspect>yes</preserveaspect>
-                            </imagetype>
-                        </state>
-                        <state name="upfolder">
-                            <imagetype name="icon">
-                                <area>0,0,25,25</area>
-                                <filename>mv_gallery_dir_up.png</filename>
-                                <preserveaspect>yes</preserveaspect>
-                            </imagetype>
-                        </state>
-                    </statetype>
-                    <textarea name="buttontext" from="basetextarea">
-                        <area>30,4,250,30</area>
-                        <font>basesmallgrey</font>
-                    </textarea>
-                    <textarea name="director" from="buttontext">
-                        <area>380,4,150,25</area>
-                    </textarea>
-                    <textarea name="year" from="buttontext">
-                        <area>670,4,50,25</area>
-                    </textarea>
-                </state>
-                <state name="selected" from="active">
-                    <textarea name="buttontext">
-                        <font>basesmall</font>
-                    </textarea>
-                    <textarea name="director">
-                        <font>basesmall</font>
-                    </textarea>
-                    <textarea name="year">
-                        <font>basesmall</font>
-                    </textarea>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>240,270</position>
-                <showempty>yes</showempty>
-                <state type="full">
-                    <imagetype name="upon">
-                        <filename>up_arrow.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>456,270</position>
-                <showempty>yes</showempty>
-                <state type="full">
-                    <imagetype name="dnon">
-                        <filename>down_arrow.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-        </buttonlist>
 
     </window>
 
@@ -496,8 +518,10 @@
             <alpha>180</alpha>
         </imagetype>-->
 
+        <imagetype name="topbar" from="basetopbar" />
+
         <textarea name="heading" from="baseheading">
-            <value>Videos</value>
+            <value>Video Browser</value>
         </textarea>
 
         <buttonlist name="videos">
@@ -571,6 +595,13 @@
     </window>
 
     <window name="gallery">
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Videos - Gallery</value>
+        </textarea>
+
         <textarea name="title" from="basetextarea">
             <area>70,15,800,50</area>
             <cutdown>yes</cutdown>
@@ -697,6 +728,12 @@
 
     <window name="tree">
 
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Videos - Tree</value>
+        </textarea>
+
         <textarea name="breadcrumbs" from="basetextarea">
             <area>50,20,700,40</area>
             <font>basemedium</font>
@@ -785,10 +822,10 @@
     </window>
 
     <window name="file_associations">
-        <textarea name="title" from="basetextarea">
-            <area>10,10,760,50</area>
-            <value>MythVideo File Associations</value>
-            <align>hcenter,vcenter</align>
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Videos - File Associations</value>
         </textarea>
 
         <textarea name="extension_text" from="basetextarea">
@@ -843,11 +880,10 @@
 
     <window name="edit_metadata">
 
-        <textarea name="title" from="basetextarea">
-            <area>10,50,760,50</area>
-            <value>Edit Video Information</value>
-            <align>hcenter,vcenter</align>
-            <font>baselarge</font>
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Videos - Edit Metadata</value>
         </textarea>
 
         <!-- Labels  -->

@@ -305,11 +305,7 @@
                     <filename>controls/selector_background_selected.png</filename>
                 </imagetype>
             </state>
-            <state name="inactive" from="active">
-<!--                <imagetype name="buttonbackground">
-                    <filename>selector_background_inactive.png</filename>
-                </imagetype>-->
-            </state>
+            <state name="inactive" from="active" />
         </statetype>
         <statetype name="upscrollarrow">
             <position>0,0</position>
@@ -433,15 +429,15 @@
         <state name="10" from="9" />
     </statetype>
 
+    <imagetype name="basetopbar">
+        <position>0,0</position>
+        <filename>backgrounds/topbar.png</filename>
+    </imagetype>
+
     <window name="backgroundwindow">
         <imagetype name="backimg">
             <filename>backgrounds/background.png</filename>
         </imagetype>
-
-        <imagetype name="topbar">
-            <position>0,0</position>
-            <filename>backgrounds/topbar.png</filename>
-         </imagetype>
 
         <imagetype name="bottombar">
             <position>0,685</position>
@@ -458,17 +454,17 @@
         </font>
 
         <clock name="date">
-            <area>910,689,250,30</area>
+            <area>910,689,255,30</area>
             <font>datefont</font>
             <format>%DATE%</format>
             <align>right</align>
         </clock>
 
         <clock name="time">
-            <area>1167,685,100,30</area>
+            <area>1167,685,110,30</area>
             <font>timefont</font>
             <format>%TIME%</format>
-            <align>hcenter</align>
+            <align>left</align>
         </clock>
 
     </window>

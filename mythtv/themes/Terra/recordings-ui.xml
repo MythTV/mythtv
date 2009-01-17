@@ -2,6 +2,8 @@
 
     <window name="watchrecordings">
 
+        <imagetype name="topbar" from="basetopbar" />
+
         <textarea name="heading" from="baseheading">
             <value>Watch Recordings</value>
         </textarea>
