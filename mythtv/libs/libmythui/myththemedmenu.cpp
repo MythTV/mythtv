@@ -27,6 +27,7 @@ MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
 
     m_titleState = m_watermarkState = NULL;
     m_buttonList = NULL;
+    m_descriptionText = NULL;
 
     m_callback = NULL;
     m_callbackdata = NULL;
@@ -46,6 +47,7 @@ bool MythThemedMenuState::Create(void)
     m_titleState     = dynamic_cast<MythUIStateType *> (GetChild("titles"));
     m_watermarkState = dynamic_cast<MythUIStateType *> (GetChild("watermarks"));
     m_buttonList     = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
+    m_descriptionText = dynamic_cast<MythUIText *> (GetChild("description"));
 
     if (!m_buttonList)
     {
@@ -74,6 +76,7 @@ void MythThemedMenuState::CopyFrom(MythUIType *base)
     m_titleState     = dynamic_cast<MythUIStateType *> (GetChild("titles"));
     m_watermarkState = dynamic_cast<MythUIStateType *> (GetChild("watermarks"));
     m_buttonList     = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
+    m_descriptionText = dynamic_cast<MythUIText *> (GetChild("description"));
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -176,6 +179,9 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
         if (!(m_watermarkState->DisplayState(button.type)))
             m_watermarkState->DisplayState("DEFAULT");
     }
+
+    if (m_descriptionText)
+        m_descriptionText->SetText(button.description);
 
     updateLCD();
 }
@@ -302,10 +308,11 @@ void MythThemedMenu::aboutToShow()
  */
 void MythThemedMenu::parseThemeButton(QDomElement &element)
 {
-    QString type = "";
-    QString text = "";
+    QString type;
+    QString text;
     QStringList action;
-    QString alttext = "";
+    QString alttext;
+    QString description;
 
     bool addit = true;
 
@@ -374,6 +381,10 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                 addit = GetMythMainWindow()->DestinationExists(
                             getFirstText(info));
             }
+            else if (info.tagName() == "description")
+            {
+                description = getFirstText(info);
+            }
             else
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenu: Unknown tag %1 "
@@ -395,7 +406,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
     }
 
     if (addit)
-        addButton(type, text, alttext, action);
+        addButton(type, text, alttext, action, description);
 }
 
 /** \brief Parse the themebuttons to be added based on the name of
@@ -528,12 +539,14 @@ void MythThemedMenu::updateLCD(void)
  */
 void MythThemedMenu::addButton(const QString &type, const QString &text,
                                       const QString &alttext,
-                                      const QStringList &action)
+                                      const QStringList &action,
+                                      const QString &description)
 {
     ThemedButton newbutton;
     newbutton.type = type;
     newbutton.action = action;
     newbutton.text = text;
+    newbutton.description = description;
 
     MythUIButtonListItem *listbuttonitem =
                                 new MythUIButtonListItem(m_buttonList, text,

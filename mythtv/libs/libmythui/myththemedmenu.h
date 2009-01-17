@@ -16,6 +16,7 @@ struct ThemedButton
     QString type;
     QStringList action;
     QString text;
+    QString description;
     MythImage *icon;
     bool active;
 };
@@ -52,6 +53,7 @@ class MPUBLIC MythThemedMenuState : public MythScreenType
     MythUIStateType *m_titleState;
     MythUIStateType *m_watermarkState;
     MythUIButtonList *m_buttonList;
+    MythUIText *m_descriptionText;
 
   protected:
     void CopyFrom(MythUIType*);
@@ -91,7 +93,8 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
     void parseThemeButton(QDomElement &element);
 
     void addButton(const QString &type, const QString &text,
-                   const QString &alttext, const QStringList &action);
+                   const QString &alttext, const QStringList &action,
+                   const QString &description);
 
     bool handleAction(const QString &action);
     bool findDepends(const QString &fileList);
