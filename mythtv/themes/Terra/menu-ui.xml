@@ -808,6 +808,12 @@
             <filename>menu/menuframe.png</filename>
         </imagetype>
 
+        <textarea name="description">
+            <area>100,500,1080,100</area>
+            <align>allcenter</align>
+            <font>basemedium</font>
+        </textarea>
+
     </window>
 
 </mythuitheme>

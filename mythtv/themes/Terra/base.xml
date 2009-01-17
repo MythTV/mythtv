@@ -50,7 +50,7 @@
         <color>#80d400</color>
     </font>
 
-    <font name="basesmallblue" base="basesmall">
+    <font name="basesmallblue" from="basesmall">
         <color>#0492A7</color>
     </font>
 

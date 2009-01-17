@@ -137,16 +137,12 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
     if (addToGlobal && GetGlobalFontMap()->Contains(name))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error, already have a "
-                                      "global font called: %1").arg(name));
+        VERBOSE(VB_FILE, QString("Warning, already have a global font "
+                                 "called: %1").arg(name));
         return NULL;
     }
 
     QString base = element.attribute("from", "");
-
-    // Temporary fallback to old behaviour to ease transition
-    if (base.isEmpty())
-        base = element.attribute("base", "");
 
     if (!base.isEmpty())
     {
