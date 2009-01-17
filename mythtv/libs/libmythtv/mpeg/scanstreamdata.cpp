@@ -79,3 +79,14 @@ QString ScanStreamData::GetSIStandard(QString guess) const
 
     return "mpeg";
 }
+
+
+void ScanStreamData::DeleteCachedTable(PSIPTable *psip) const
+{
+    if (!psip)
+        return;
+
+    ATSCStreamData::DeleteCachedTable(psip);
+    if (psip->pesdata())
+        DVBStreamData::DeleteCachedTable(psip);
+}

@@ -853,6 +853,42 @@ void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
     sdts.clear();
 }
 
+void DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
+{
+    if (!psip)
+        return;
+
+    uint tid = psip->TableIDExtension();
+
+    QMutexLocker locker(&_cache_lock);
+    if (_cached_ref_cnt[psip] > 0)
+    {
+        _cached_slated_for_deletion[psip] = 1;
+        return;
+    }
+    else if ((TableID::NIT == psip->TableID()) &&
+             _cached_nit[psip->Section()])
+    {
+        _cached_nit[psip->Section()] = NULL;
+        delete psip;
+    }
+    else if ((TableID::SDT == psip->TableID()) &&
+             _cached_sdts[tid << 8 | psip->Section()])
+    {
+        _cached_sdts[tid << 8 | psip->Section()] = NULL;
+        delete psip;
+    }
+    else
+    {
+        MPEGStreamData::DeleteCachedTable(psip);
+        return;
+    }
+    psip_refcnt_map_t::iterator it;
+    it = _cached_slated_for_deletion.find(psip);
+    if (it != _cached_slated_for_deletion.end())
+        _cached_slated_for_deletion.erase(it);
+}
+
 void DVBStreamData::CacheNIT(NetworkInformationTable *nit)
 {
     QMutexLocker locker(&_cache_lock);

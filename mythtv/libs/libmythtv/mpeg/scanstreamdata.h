@@ -27,6 +27,9 @@ class ScanStreamData :
                           uint_vec_t& /*del_pids*/) const { return false; }
 
     QString GetSIStandard(QString guess = "mpeg") const;
+
+  private:
+    virtual void DeleteCachedTable(PSIPTable *psip) const;  
 };
 
 #endif // SCANSTREAMDATA_H_

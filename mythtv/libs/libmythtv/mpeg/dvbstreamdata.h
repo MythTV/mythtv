@@ -185,6 +185,8 @@ class DVBStreamData : virtual public MPEGStreamData
     // Caching
     void CacheNIT(NetworkInformationTable*);
     void CacheSDT(ServiceDescriptionTable*);
+  protected:
+    virtual void DeleteCachedTable(PSIPTable *psip) const;
 
   private:
     /// DVB table monitoring
@@ -218,8 +220,8 @@ class DVBStreamData : virtual public MPEGStreamData
     sections_map_t            _sdto_section_seen;
 
     // Caching
-    nit_cache_t               _cached_nit;  // section -> sdt
-    sdt_cache_t               _cached_sdts; // tsid+section -> sdt
+    mutable nit_cache_t       _cached_nit;  // section -> sdt
+    mutable sdt_cache_t       _cached_sdts; // tsid+section -> sdt
 };
 
 inline void DVBStreamData::SetDishNetEIT(bool use_dishnet_eit)

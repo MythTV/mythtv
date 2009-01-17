@@ -119,6 +119,7 @@ class ATSCStreamData : virtual public MPEGStreamData
     void CacheMGT(MasterGuideTable*);
     void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
     void CacheCVCT(uint pid, CableVirtualChannelTable*);
+  protected:
     virtual void DeleteCachedTable(PSIPTable *psip) const;
 
   private:
