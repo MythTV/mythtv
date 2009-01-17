@@ -131,9 +131,9 @@ void HttpServer::RegisterExtension( HttpServerExtension *pExtension )
     if (pExtension != NULL )
     {
         pExtension->m_sSharePath = m_sSharePath;
-        m_mutex.lock();
+        m_rwlock.lockForWrite();
         m_extensions.append( pExtension );
-        m_mutex.unlock();
+        m_rwlock.unlock();
     }
 }
 
@@ -145,10 +145,10 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
 {
     if (pExtension != NULL )
     {
-        m_mutex.lock();
+        m_rwlock.lockForWrite();
         delete pExtension;
         m_extensions.removeAll(pExtension);
-        m_mutex.unlock();
+        m_rwlock.unlock();
     }
 }
 
@@ -160,7 +160,7 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
 {
     bool bProcessed = false;
 
-    m_mutex.lock();
+    m_rwlock.lockForRead();
 
     HttpServerExtensionList::iterator it = m_extensions.begin();
 
@@ -179,7 +179,7 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
         }
     }
 
-    m_mutex.unlock();
+    m_rwlock.unlock();
 
     if (!bProcessed)
     {

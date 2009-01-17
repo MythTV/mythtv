@@ -233,7 +233,7 @@ bool PreviewGenerator::Run(void)
         if (!outFileName.isEmpty())
             command += QString("--outfile \"%1\" ").arg(outFileName);
 
-        int ret = myth_system(command);
+        int ret = myth_system(command, MYTH_SYSTEM_DONT_BLOCK_PARENT);
         if (ret)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Encountered problems running " +

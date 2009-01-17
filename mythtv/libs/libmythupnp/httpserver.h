@@ -35,6 +35,7 @@
 // Qt headers
 #include <QThread>
 #include <QTcpServer>
+#include <QReadWriteLock>
 
 // MythTV headers
 #include "upnputil.h"
@@ -91,7 +92,7 @@ class HttpServer : public QTcpServer,
 
     protected:
 
-        QMutex                  m_mutex;
+        QReadWriteLock          m_rwlock;
         HttpServerExtensionList m_extensions;
 
         virtual WorkerThread *CreateWorkerThread( ThreadPool *,
