@@ -120,7 +120,7 @@
                         <multiline>yes</multiline>
                     </textarea>
                     <textarea name="subtitle" from="basetextarea">
-                        <area>8,212,240,25</area>
+                        <area>8,211,240,25</area>
                         <align>hcenter</align>
                         <font>basesmallbrown</font>
                     </textarea>
@@ -151,7 +151,7 @@
                         <font>baselarge</font>
                     </textarea>
                     <textarea name="subtitle">
-                        <area>8,240,272,25</area>
+                        <area>8,239,272,25</area>
                     </textarea>
                     <textarea name="time">
                         <area>20,270,100,25</area>

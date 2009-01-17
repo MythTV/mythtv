@@ -458,14 +458,14 @@
         </font>
 
         <clock name="date">
-            <area>920,689,250,30</area>
+            <area>910,689,250,30</area>
             <font>datefont</font>
             <format>%DATE%</format>
             <align>right</align>
         </clock>
 
         <clock name="time">
-            <area>1178,685,90,30</area>
+            <area>1167,685,100,30</area>
             <font>timefont</font>
             <format>%TIME%</format>
             <align>hcenter</align>
