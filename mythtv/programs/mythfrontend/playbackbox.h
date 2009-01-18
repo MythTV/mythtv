@@ -1,3 +1,4 @@
+
 // -*- Mode: c++ -*-
 // vim:set sw=4 ts=4 expandtab:
 #ifndef PLAYBACKBOX_H_
@@ -161,6 +162,8 @@ class PlaybackBox : public MythScreenType
     void showPlaylistJobPopup();
     void showProgramDetails();
     void showIconHelp();
+
+    void popupClosed();
 
     void doPlayFromBeg();
     void doPlayListRandom();
