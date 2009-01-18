@@ -11,6 +11,8 @@
 enum ReflectAxis {ReflectHorizontal, ReflectVertical};
 enum FillDirection {FillLeftToRight, FillTopToBottom};
 
+class MythUIHelper;
+
 class MPUBLIC MythImage : public QImage
 {
   public:
@@ -58,6 +60,8 @@ class MPUBLIC MythImage : public QImage
 
     void setIsReflected(bool reflected) { m_isReflected = reflected; }
 
+    void SetIsInCache(bool bCached);
+
   protected:
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
@@ -82,6 +86,9 @@ class MPUBLIC MythImage : public QImage
     unsigned int m_imageId;
 
     QString m_FileName;
+
+    static MythUIHelper *m_ui;
+    bool m_cached;
 };
 
 #endif

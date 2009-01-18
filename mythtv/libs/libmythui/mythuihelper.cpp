@@ -155,6 +155,7 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
     while (i.hasNext())
     {
         i.next();
+        i.value()->SetIsInCache(false);
         i.value()->DownRef();
         i.remove();
     }
@@ -442,6 +443,7 @@ void MythUIHelper::UpdateImageCache(void)
     while (i.hasNext())
     {
         i.next();
+        i.value()->SetIsInCache(false);
         i.value()->DownRef();
         i.remove();
     }
@@ -458,14 +460,32 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
     if (d->imageCache.contains(url))
         return d->imageCache[url];
 
+/*
     if (QFileInfo(url).exists())
     {
         MythImage *im = GetMythPainter()->GetFormatImage();
         im->Load(url,false);
         return im;
     }
+*/
 
     return NULL;
+}
+
+void MythUIHelper::IncludeInCacheSize(MythImage *im)
+{
+    if (!im)
+        return;
+
+    m_cacheSize += im->numBytes();
+}
+
+void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
+{
+    if (!im)
+        return;
+
+    m_cacheSize -= im->numBytes();
 }
 
 MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
@@ -516,7 +536,6 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
             VERBOSE(VB_FILE, QString("Cache too big (%1), removing :%2:")
                             .arg(m_cacheSize + im->numBytes()).arg(oldestKey));
 
-            m_cacheSize -= d->imageCache[oldestKey]->numBytes();
             d->imageCache[oldestKey]->DownRef();
             d->imageCache.remove(oldestKey);
             d->CacheTrack.remove(oldestKey);
@@ -532,7 +551,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         d->imageCache[url] = im;
         d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
 
-        m_cacheSize += im->numBytes();
+        im->SetIsInCache(true);
         VERBOSE(VB_FILE, QString("NOT IN RAM CACHE, Adding, and adding to size "
                                  ":%1: :%2:").arg(url).arg(m_cacheSize));
     }
@@ -550,7 +569,7 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 
     if (it != d->imageCache.end())
     {
-        m_cacheSize -= (*it)->numBytes();
+        d->imageCache[url]->SetIsInCache(false);
         d->imageCache[url]->DownRef();
         d->imageCache.remove(url);
         d->CacheTrack.remove(url);

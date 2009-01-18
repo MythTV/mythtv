@@ -42,6 +42,9 @@ class MPUBLIC MythUIHelper
     bool IsImageInCache(const QString &url);
     QString GetThemeCacheDir(void);
 
+    void IncludeInCacheSize(MythImage *im);
+    void ExcludeFromCacheSize(MythImage *im);
+
     Settings *qtconfig(void);
 
     bool IsScreenSetup(void);

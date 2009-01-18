@@ -9,6 +9,8 @@
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 
+MythUIHelper *MythImage::m_ui = NULL;
+
 MythImage::MythImage(MythPainter *parent)
 {
     assert(parent);
@@ -29,6 +31,10 @@ MythImage::MythImage(MythPainter *parent)
     m_imageId = 0;
 
     m_FileName = "";
+
+    m_cached = false;
+    if (!m_ui)
+        m_ui = GetMythUI();
 }
 
 MythImage::~MythImage()
@@ -39,18 +45,21 @@ MythImage::~MythImage()
 // these technically should be locked, but all deletion should be happening in the UI thread, and nowhere else.
 void MythImage::UpRef(void)
 {
+    if (m_ui && m_cached && m_RefCount == 1)
+        m_ui->ExcludeFromCacheSize(this);
     m_RefCount++;
-
-//     if (m_RefCount > 0)
-//         GetMythUI()->ExcludeFromCacheSize(this);
 }
 
 bool MythImage::DownRef(void)
 {
     m_RefCount--;
-
-//     if (m_RefCount == 1)
-//         GetMythUI()->IncludeInCacheSize(this);
+    if (m_ui && m_cached)
+    {
+        if (m_RefCount == 1)
+            m_ui->IncludeInCacheSize(this);
+        else if (m_RefCount == 0)
+            m_ui->ExcludeFromCacheSize(this);
+    }
 
     if (m_RefCount <= 0)
     {
@@ -60,9 +69,25 @@ bool MythImage::DownRef(void)
     return false;
 }
 
+void MythImage::SetIsInCache(bool bCached)
+{
+    if (m_ui && m_RefCount == 1)
+    {
+        if (!m_cached && bCached)
+            m_ui->IncludeInCacheSize(this);
+        else if (m_cached && !bCached)
+            m_ui->ExcludeFromCacheSize(this);
+    }
+    m_cached = bCached;
+}
+
 void MythImage::Assign(const QImage &img)
 {
+    if (m_ui && m_RefCount == 1 && m_cached)
+        m_ui->ExcludeFromCacheSize(this);
     *(QImage *)this = img;
+    if (m_ui && m_RefCount == 1 && m_cached)
+        m_ui->IncludeInCacheSize(this);
     SetChanged();
 }
 
