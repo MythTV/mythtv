@@ -7,7 +7,7 @@
 struct colormap
 {
     const char *name;
-    char r, g, b;
+    unsigned char r, g, b;
 };
 
 QColor createColor(const QString &color)
