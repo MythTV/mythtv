@@ -301,8 +301,6 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         return m_StringToImageMap[incoming];
     }
 
-printf("generating image for: %s\n", incoming.toLocal8Bit().constData());
-
     MythImage *im = GetFormatImage();
 
     int w, h;
