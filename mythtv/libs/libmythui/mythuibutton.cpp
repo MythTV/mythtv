@@ -59,7 +59,7 @@ void MythUIButton::Reset()
 
 void MythUIButton::Select()
 {
-    if (!IsEnabled())
+    if (!IsEnabled() || m_Pushed)
         return;
 
     SetState("selected");
@@ -67,6 +67,9 @@ void MythUIButton::Select()
 
 void MythUIButton::Deselect()
 {
+    if (m_Pushed)
+        return;
+
     if (IsEnabled())
         SetState("active");
     else
