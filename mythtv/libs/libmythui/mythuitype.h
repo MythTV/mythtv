@@ -88,7 +88,7 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
 
     virtual QRegion GetDirtyArea(void) const;
 
-    bool IsVisible(void) const;
+    bool IsVisible(bool recurse = false) const;
     void SetVisible(bool visible);
 
     void MoveTo(QPoint destXY, QPoint speedXY);

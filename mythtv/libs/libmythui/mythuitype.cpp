@@ -464,8 +464,14 @@ QRegion MythUIType::GetDirtyArea(void) const
     return m_DirtyRegion;
 }
 
-bool MythUIType::IsVisible(void) const
+bool MythUIType::IsVisible(bool recurse) const
 {
+    if (recurse)
+    {
+        if (m_Parent && !m_Parent->IsVisible(recurse))
+            return false;
+    }
+
     return m_Visible;
 }
 
@@ -586,16 +592,12 @@ void MythUIType::SetEnabled(bool enable)
 
 void MythUIType::Hide(void)
 {
-    m_Visible = false;
-    SetRedraw();
-    emit Hiding();
+    SetVisible(false);
 }
 
 void MythUIType::Show(void)
 {
-    m_Visible = true;
-    SetRedraw();
-    emit Showing();
+    SetVisible(true);
 }
 
 void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
