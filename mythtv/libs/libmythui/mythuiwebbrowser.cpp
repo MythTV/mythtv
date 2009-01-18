@@ -574,26 +574,46 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         if (action == "UP")
         {
             int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Vertical);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos - m_Area.height() / 10);
-            UpdateBuffer();
+            if (pos > 0)
+            {
+                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos - m_Area.height() / 10);
+                UpdateBuffer();
+            }
+            else
+                handled = false;
         }
         else if (action == "DOWN")
         {
             int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Vertical);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos + m_Area.height() / 10);
-            UpdateBuffer();
+            if (pos != m_browser->page()->mainFrame()->scrollBarMaximum(Qt::Vertical))
+            {
+                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos + m_Area.height() / 10);
+                UpdateBuffer();
+            }
+            else
+                handled = false;
         }
         else if (action == "LEFT")
         {
             int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Horizontal);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos - m_Area.width() / 10);
-            UpdateBuffer();
+            if (pos > 0)
+            {
+                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos - m_Area.width() / 10);
+                UpdateBuffer();
+            }
+            else
+                handled = false;
         }
         else if (action == "RIGHT")
         {
             int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Horizontal);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos + m_Area.width() / 10);
-            UpdateBuffer();
+            if (pos != m_browser->page()->mainFrame()->scrollBarMaximum(Qt::Horizontal))
+            {
+                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos + m_Area.width() / 10);
+                UpdateBuffer();
+            }
+            else
+                handled = false;
         }
         else if (action == "PAGEUP")
         {
