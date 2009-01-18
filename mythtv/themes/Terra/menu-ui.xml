@@ -2,6 +2,8 @@
 <mythuitheme>
     <window name="mainmenu">
 
+        <imagetype name="backdrop" from="basebackdrop" />
+
         <imagetype name="topbar" from="basetopbar" />
 
         <statetype name="titles">
@@ -93,7 +95,7 @@
         </statetype>
 
         <imagetype name="background">
-            <position>0,389</position>
+            <position>0,155</position>
             <filename>menu/menubackground.png</filename>
         </imagetype>
 
@@ -109,14 +111,13 @@
                     <area>0,17,256,218</area>
 
                     <textarea name="buttontext">
-                        <area>5,231,246,40</area>
+                        <area>5,225,246,73</area>
                         <align>allcenter</align>
-                        <font>basemedium</font>
+                        <font>baselarge</font>
                         <multiline>yes</multiline>
                     </textarea>
 
                     <statetype name="icon">
-
                         <state name="DEFAULT">
                             <imagetype name="icon">
                                 <area>0,0,256,220</area>
@@ -457,7 +458,7 @@
                     <area>-11,0,277,278</area>
 
                     <textarea name="buttontext">
-                        <area>5,256,267,40</area>
+                        <area>5,250,267,73</area>
                         <font>baselargebrown</font>
                     </textarea>
 

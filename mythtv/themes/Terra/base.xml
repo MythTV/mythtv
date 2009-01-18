@@ -429,6 +429,12 @@
         <state name="10" from="9" />
     </statetype>
 
+    <imagetype name="basebackdrop">
+        <area>0,0,1280,720</area>
+        <crop>0,0,1280,685</crop>
+<!--        <filename>nature.jpg</filename>-->
+    </imagetype>
+
     <imagetype name="basetopbar">
         <position>0,0</position>
         <filename>backgrounds/topbar.png</filename>

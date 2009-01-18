@@ -238,11 +238,7 @@
     <!-- Main Windows -->
     <window name="manager">
 
-        <imagetype name="backdrop">
-            <area>0,0,1280,720</area>
-            <crop>0,0,1280,685</crop>
-            <filename>backdrop.jpg</filename>
-        </imagetype>
+        <imagetype name="backdrop" from="basebackdrop" />
 
         <imagetype name="framebackground">
             <position>66,41</position>
@@ -501,18 +497,18 @@
 
     <window name="browser">
 
-<!--        <imagetype name="backdrop">
-            <area>0,0,1280,720</area>
-            <crop>0,0,1280,685</crop>
-            <filename>tt0363771.jpg</filename>
-            <alpha>180</alpha>
-        </imagetype>-->
+        <imagetype name="backdrop" from="basebackdrop" />
 
         <imagetype name="topbar" from="basetopbar" />
 
         <textarea name="heading" from="baseheading">
             <value>Video Browser</value>
         </textarea>
+
+        <imagetype name="browserbackground">
+            <position>0,65</position>
+            <filename>video/browserlistbackground.png</filename>
+        </imagetype>
 
         <buttonlist name="videos">
             <area>0,65,1280,299</area>
@@ -559,7 +555,7 @@
 
         <imagetype name="posterframe">
             <position>0,60</position>
-            <filename>video/posterframe.png</filename>
+            <filename>video/browserlistframe.png</filename>
         </imagetype>
 
         <imagetype name="textbackground">

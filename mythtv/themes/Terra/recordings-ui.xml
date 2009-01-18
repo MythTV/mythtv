@@ -2,6 +2,7 @@
 
     <window name="watchrecordings">
 
+        <imagetype name="backdrop" from="basebackdrop" />
         <imagetype name="topbar" from="basetopbar" />
 
         <textarea name="heading" from="baseheading">
@@ -71,12 +72,8 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,14,256,262</area>
-                    <imagetype name="previewbackground">
-                        <position>0,0</position>
-                        <filename>recordings/previewbackground.png</filename>
-                    </imagetype>
                     <imagetype name="preview">
-                        <area>0,0,256,144</area>
+                        <area>0,2,256,144</area>
                         <filename></filename>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
@@ -137,12 +134,8 @@
                 </state>
                 <state name="selected" from="active">
                     <area>-16,0,288,280</area>
-                    <imagetype name="previewbackground">
-                        <position>2,2</position>
-                        <filename>recordings/selectedbackground.png</filename>
-                    </imagetype>
                     <imagetype name="preview">
-                        <area>0,2,288,162</area>
+                        <area>0,3,288,162</area>
                         <mask>recordings/previewmask.png</mask>
                     </imagetype>
                     <statetype name="status">
@@ -294,7 +287,7 @@
         </textarea>
 
         <statetype name="ratingstate" from="baserating">
-            <position>1193,433</position>
+            <position>1193,435</position>
         </statetype>
 
         <textarea name="description" from="basetextarea">
