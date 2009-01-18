@@ -219,8 +219,8 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
-MPUBLIC void ShowOkPopup(const QString &message, QObject *parent = NULL,
-                         const char *slot = NULL, bool showCancel = false);
+MPUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
+                                             const char *slot = NULL, bool showCancel = false);
 
 Q_DECLARE_METATYPE(const char*)
 

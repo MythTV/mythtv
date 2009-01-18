@@ -275,8 +275,8 @@ void MythConfirmationDialog::sendResult(bool ok)
 /**
  * Non-blocking version of MythPopupBox::showOkPopup()
  */
-void ShowOkPopup(const QString &message, QObject *parent,
-                 const char *slot, bool showCancel)
+MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
+                                     const char *slot, bool showCancel)
 {
     QString                  LOC = "ShowOkPopup('" + message + "') - ";
     MythConfirmationDialog  *pop;
@@ -292,14 +292,14 @@ void ShowOkPopup(const QString &message, QObject *parent,
         else
         {
             VERBOSE(VB_IMPORTANT, LOC + "no main window?");
-            return;
+            return NULL;
         }
 
         if (!stk)
         {
             VERBOSE(VB_IMPORTANT, LOC + "no popup stack?\n"
                                         "Is there a MythThemeBase?");
-            return;
+            return NULL;
         }
     }
 
@@ -313,8 +313,11 @@ void ShowOkPopup(const QString &message, QObject *parent,
     else
     {
         delete pop;
+        pop = NULL;
         VERBOSE(VB_IMPORTANT, LOC + "Couldn't Create() Dialog");
     }
+
+    return pop;
 }
 
 /////////////////////////////////////////////////////////////////
