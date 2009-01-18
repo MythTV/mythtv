@@ -192,6 +192,9 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void sendPlaybackStart(void);
     void sendPlaybackEnd(void);
 
+  private slots:
+    void popupClosed(void);
+
   private:
     void connected(MythSocket *sock);
     void connectionClosed(MythSocket *sock);
@@ -203,6 +206,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     QMutex locationLock;
     QStringList currentLocation;
+
 };
 
 /// This global variable contains the MythContext instance for the application

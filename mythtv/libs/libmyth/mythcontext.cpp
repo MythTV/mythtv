@@ -116,6 +116,7 @@ class MythContextPrivate
 
     bool disablelibrarypopup;
 
+    MythConfirmationDialog  *MBEconnectPopup;
     MythPluginManager *pluginmanager;
 
     int m_logenable, m_logmaxcount, m_logprintlevel;
@@ -213,6 +214,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       mainWindow(NULL),
       serverSock(NULL), eventSock(NULL),
       disablelibrarypopup(false),
+      MBEconnectPopup(NULL),
       pluginmanager(NULL),
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       m_database(GetMythDB()), m_ui(NULL)
@@ -1356,20 +1358,25 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
                             manageLock = true;
                         d->serverSockLock.unlock();
                     }
-                  // HACK. TODO: Remove when all old-style widgets are gone
-                  if (d->mainWindow->currentWidget())
-                    MythPopupBox::showOkPopup(d->mainWindow,
-                                              "connection failure",
-                                              tr("Could not connect to the "
-                                                 "master backend server -- is "
-                                                 "it running?  Is the IP "
-                                                 "address set for it in the "
-                                                 "setup program correct?"));
-                  else
-                    ShowOkPopup(tr("Could not connect to the master"
-                                   " backend server -- is it running?"
-                                   "  Is the IP address set for it in the "
-                                   "setup program correct?"));
+                    // HACK. TODO: Remove when all old-style widgets are gone
+                    if (d->mainWindow->currentWidget())
+                        MythPopupBox::showOkPopup(d->mainWindow,
+                                                  "connection failure",
+                                                 tr("Could not connect to the "
+                                                    "master backend server -- is "
+                                                    "it running?  Is the IP "
+                                                    "address set for it in the "
+                                                    "setup program correct?"));
+                    else
+                    {
+                        if (!d->MBEconnectPopup)
+                            d->MBEconnectPopup = ShowOkPopup(
+                                        tr("Could not connect to the master"
+                                           " backend server -- is it running? "
+                                           "Is the IP address set for it in the "
+                                           "setup program correct?"),
+                                            this, SLOT(popupClosed()));
+                    }
                     if (manageLock)
                         d->serverSockLock.lock();
                 }
@@ -1435,7 +1442,14 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
 
             eventSock->Unlock();
         }
+
+        if (d->MBEconnectPopup)
+        {
+            d->MBEconnectPopup->Close();
+            d->MBEconnectPopup = NULL;
+        }
     }
+
     return serverSock;
 }
 
@@ -1731,8 +1745,6 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
     {
         bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
         ConnectToMasterServer(blockingClient);
-        // should clear popup if it is currently active here.
-        // Not sure of the correct way. TBD
     }
 
     bool ok = false;
@@ -1788,15 +1800,17 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
             if (d->m_ui && d->m_ui->IsScreenSetup())
             {
                 // HACK. TODO: Remove when all old-style widgets are gone
-              if (d->mainWindow->currentWidget())
-                MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
+                if (d->mainWindow->currentWidget())
+                    MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
                                 "server has gone away for some reason.. "
                                 "Is it running?"));
-              else
-                ShowOkPopup(tr("The connection to the master backend "
-                                "server has gone away for some reason.. "
-                                "Is it running?"));
+                else
+                    if (!d->MBEconnectPopup)
+                        d->MBEconnectPopup = ShowOkPopup(
+                            tr("The connection to the master backend "
+                               "server has gone away for some reason.. "
+                               "Is it running?"));
             }
 
             if (!block)
@@ -2200,6 +2214,12 @@ void MythContext::sendPlaybackEnd(void)
 {
     MythEvent me(QString("PLAYBACK_END %1").arg(GetHostName()));
     dispatchNow(me);
+}
+
+void MythContext::popupClosed(void)
+{
+    if (d)
+        d->MBEconnectPopup = NULL;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
