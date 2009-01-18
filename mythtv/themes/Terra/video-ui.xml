@@ -238,11 +238,11 @@
     <!-- Main Windows -->
     <window name="manager">
 
-<!--        <imagetype name="backdrop">
+        <imagetype name="backdrop">
             <area>0,0,1280,720</area>
             <crop>0,0,1280,685</crop>
             <filename>backdrop.jpg</filename>
-        </imagetype>-->
+        </imagetype>
 
         <imagetype name="framebackground">
             <position>66,41</position>
@@ -263,19 +263,17 @@
                         <filename>mv_browse_nocover.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
-                        <position>0,9</position>
+                        <position>550,62</position>
                         <state name="subfolder">
                             <imagetype name="icon">
-                                <area>0,0,25,25</area>
+                                <area>0,0,30,30</area>
                                 <filename>mv_gallery_dir.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
-                        <state name="upfolder">
+                        <state name="upfolder" from="subfolder">
                             <imagetype name="icon">
-                                <area>0,0,25,25</area>
                                 <filename>mv_gallery_dir_up.png</filename>
-                                <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                     </statetype>
@@ -331,35 +329,30 @@
         <textarea name="heading" from="baseheading">
             <value>Video Manager</value>
         </textarea>
-        <!--
+
         <statetype name="parentallevel">
-            <position>740,10</position>
-            <state name="None">
-                <imagetype name="icon">
-                    <filename>mv_level_none.png</filename>
-                </imagetype>
-            </state>
+            <position>10,636</position>
             <state name="Lowest">
                 <imagetype name="icon">
-                    <filename>mv_level_lowest.png</filename>
+                    <filename>video/parental_level_lowest.png</filename>
                 </imagetype>
             </state>
-            <state name="Low">
+            <state name="Low" from="Lowest">
                 <imagetype name="icon">
-                    <filename>mv_level_low.png</filename>
+                    <filename>video/parental_level_low.png</filename>
                 </imagetype>
             </state>
-            <state name="Medium">
+            <state name="Medium" from="Lowest">
                 <imagetype name="icon">
-                    <filename>mv_level_medium.png</filename>
+                    <filename>video/parental_level_medium.png</filename>
                 </imagetype>
             </state>
-            <state name="High">
+            <state name="High" from="Lowest">
                 <imagetype name="icon">
-                    <filename>mv_level_high.png</filename>
+                    <filename>video/parental_level_high.png</filename>
                 </imagetype>
             </state>
-        </statetype>-->
+        </statetype>
 
         <imagetype name="descriptionbackground">
             <position>680,57</position>
@@ -382,47 +375,46 @@
         </statetype>
 
         <textarea name="dirlbl" from="basetextarea">
-            <area>670,120,130,30</area>
+            <area>700,120,130,30</area>
             <font>basemedium</font>
-            <align>right,vcenter</align>
+            <align>left,vcenter</align>
             <value>Director:</value>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>810,120,350,30</area>
+            <area>838,120,392,30</area>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="yrlbl" from="dirlbl">
-            <position>670,160</position>
+            <position>700,160</position>
             <value>Year:</value>
         </textarea>
 
         <textarea name="year" from="director">
-            <area>810,160,100,30</area>
+            <area>838,160,100,30</area>
         </textarea>
 
         <textarea name="lvllbl" from="dirlbl">
-            <position>670,200</position>
+            <position>700,200</position>
             <value>Parental:</value>
         </textarea>
 
-        <statetype name="videolevel">
-            <position>810,200</position>
+        <statetype name="videolevel" from="parentallevel">
+            <position>838,200</position>
             <state name="Lowest">
                 <imagetype name="icon">
                     <area>0,2,30,30</area>
-                    <filename>mv_level_lowest.png</filename>
+                    <filename>video/parental_level_lowest.png</filename>
                 </imagetype>
-                <textarea name="label">
+                <textarea name="label" from="director">
                     <area>35,6,100,35</area>
                     <value>Lowest</value>
-                    <font>basesmallyellow</font>
                 </textarea>
             </state>
             <state name="Low" from="Lowest">
                 <imagetype name="icon">
-                    <filename>mv_level_low.png</filename>
+                    <filename>video/parental_level_low.png</filename>
                 </imagetype>
                 <textarea name="label">
                     <value>Low</value>
@@ -430,7 +422,7 @@
             </state>
             <state name="Medium" from="Lowest">
                 <imagetype name="icon">
-                    <filename>mv_level_medium.png</filename>
+                    <filename>video/parental_level_medium.png</filename>
                 </imagetype>
                 <textarea name="label">
                     <value>Medium</value>
@@ -438,7 +430,7 @@
             </state>
             <state name="High" from="Lowest">
                 <imagetype name="icon">
-                    <filename>mv_level_high.png</filename>
+                    <filename>video/parental_level_high.png</filename>
                 </imagetype>
                 <textarea name="label">
                     <value>High</value>
@@ -446,65 +438,63 @@
             </state>
         </statetype>
 
-
         <textarea name="ratlbl" from="dirlbl">
-            <position>670,240</position>
+            <position>700,240</position>
             <value>Rated:</value>
         </textarea>
 
         <textarea name="rating" from="director">
-            <area>810,240,350,30</area>
+            <area>838,240,350,30</area>
         </textarea>
 
         <textarea name="browselbl" from="dirlbl">
-            <position>670,280</position>
+            <position>700,280</position>
             <value>Browsable:</value>
-            <align>right,top</align>
         </textarea>
 
         <textarea name="browseable" from="director">
-            <area>810,280,100,35</area>
+            <area>838,280,100,35</area>
         </textarea>
 
         <textarea name="lenlbl" from="dirlbl">
-            <position>670,320</position>
+            <position>700,320</position>
             <value>Runtime:</value>
         </textarea>
 
         <textarea name="length" from="director">
-            <area>810,320,350,35</area>
+            <area>838,320,350,35</area>
+        </textarea>
+
+        <textarea name="fillbl" from="dirlbl">
+            <position>700,360</position>
+            <value>Filename:</value>
+        </textarea>
+
+        <textarea name="filename" from="director">
+            <position>838,360</position>
+        </textarea>
+
+        <textarea name="cvflbl" from="dirlbl">
+            <position>700,400</position>
+            <value>Cover File:</value>
+        </textarea>
+
+        <textarea name="coverfile" from="director">
+            <position>838,400</position>
+        </textarea>
+
+        <textarea name="imdblbl" from="dirlbl">
+            <position>700,440</position>
+            <value>IMDB ID:</value>
+        </textarea>
+
+        <textarea name="inetref" from="director">
+            <position>838,440</position>
         </textarea>
 
         <textarea name="plot" from="director">
             <area>695,500,540,160</area>
             <multiline>yes</multiline>
-        </textarea>
-
-        <textarea name="fillbl" from="dirlbl">
-            <position>670,360</position>
-            <value>Filename:</value>
-        </textarea>
-
-        <textarea name="filename" from="director">
-            <area>810,360,400,35</area>
-        </textarea>
-
-        <textarea name="cvflbl" from="dirlbl">
-            <position>670,400</position>
-            <value>Cover File:</value>
-        </textarea>
-
-        <textarea name="coverfile" from="director">
-            <area>810,400,400,35</area>
-        </textarea>
-
-        <textarea name="imdblbl" from="dirlbl">
-            <position>670,440</position>
-            <value>IMDB ID:</value>
-        </textarea>
-
-        <textarea name="inetref" from="director">
-            <area>810,440,100,35</area>
         </textarea>
 
     </window>

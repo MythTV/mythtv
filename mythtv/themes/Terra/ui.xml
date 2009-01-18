@@ -1,25 +1,13 @@
 <mythuitheme>
 
     <window name="programguide">
-        <font name="chaninfo" base="basesmall">
-            <size>15</size>
-            <size:small>12</size:small>
-            <size:big>17</size:big>
-        </font>
-
-        <font name="small" base="basesmall">
-            <size>15</size>
-            <size:small>12</size:small>
-            <size:big>17</size:big>
-        </font>
-
-        <container name="background">
+<!--        <container name="background">
             <image name="backup" draworder="0" fleximage="no">
                 <context>0</context>
                 <position>0,0</position>
                 <filename>gg-background.png</filename>
             </image>
-        </container>
+        </container>-->
 
         <container name="date_info">
             <area>20,185,115,25</area>
@@ -31,34 +19,33 @@
         </container>
 
         <container name="chanbar">
-            <area>38,208,123,374</area>
+            <area>35,208,170,450</area>
             <bar name="chans" draworder="4">
-                <area>0,0,123,386</area>
+                <area>0,0,170,450</area>
                 <textoffset>38,0</textoffset>
                 <iconoffset>3,10</iconoffset>
                 <iconsize>30,30</iconsize>
                 <orientation>vertical</orientation>
                 <align>allcenter</align>
-                <font>chaninfo</font>
+                <font>basesmall</font>
                 <imagefile>gg-chans.png</imagefile>
             </bar>
         </container>
 
         <container name="timebar">
-            <area>160,182,630,31</area>
+            <area>207,182,1053,31</area>
             <bar name="times" draworder="4">
-                <area>0,0,640,31</area>
+                <area>0,0,1053,31</area>
                 <align>allcenter</align>
                 <imagefile>gg-times.png</imagefile>
                 <font>basesmall</font>
             </bar>
         </container>
 
-
         <container name="guide">
-            <area>160,210,645,374</area>
+            <area>207,208,1053,450</area>
             <guidegrid name="guidegrid" draworder="4">
-                <area>0,0,645,374</area>
+                <area>0,0,1053,450</area>
                 <solidcolor>#003256</solidcolor>
                 <selector type="box" color="#ffff33"></selector>
                 <recordingcolor>#00aa00</recordingcolor>
@@ -78,12 +65,12 @@
                 <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
                 <arrow direction="left" image="gg-arrow-left.png"></arrow>
                 <arrow direction="right" image="gg-arrow-right.png"></arrow>
-                <font>small-info</font>
+                <font>basesmall</font>
             </guidegrid>
         </container>
 
         <container name="current_info">
-            <area>660,20,120,30</area>
+            <area>1100,20,120,30</area>
             <textarea name="time" draworder="4" align="allcenter">
                 <area>0,0,120,32</area>
                 <cutdown>no</cutdown>
@@ -92,18 +79,18 @@
         </container>
 
         <container name="program_info">
-            <area>20,12,760,151</area>
+            <area>20,12,1260,151</area>
             <textarea name="misicon" draworder="5" align="allcenter">
                 <cutdown>no</cutdown>
                 <area>10,2,60,60</area>
-                <font>small</font>
+                <font>basesmall</font>
             </textarea>
             <image name="icon" draworder="6">
                 <position>3,2</position>
                 <staticsize>60,60</staticsize>
             </image>
             <textarea name="title" draworder="4" align="vcenter">
-                <area>75,0,590,60</area>
+                <area>75,0,800,60</area>
                 <font>basemedium</font>
             </textarea>
             <textarea name="subtitle" draworder="6">
@@ -112,128 +99,14 @@
                 <!--<value>%SUBTITLE|"|"%</value> -->
             </textarea>
             <textarea name="description" draworder="6">
-                <area>4,86,760,60</area>
+                <area>4,86,1200,60</area>
                 <font>basesmall</font>
                 <multiline>yes</multiline>
                 <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
             </textarea>
             <textarea name="recordingstatus" draworder="6" align="right">
-                <area>380,40,380,30</area>
-                <font>recstatus</font>
-            </textarea>
-        </container>
-
-    </window>
-
-    <window name="programguide-video">
-
-        <font name="chaninfo" base="basesmall">
-            <size>15</size>
-            <size:small>12</size:small>
-            <size:big>17</size:big>
-        </font>
-
-
-        <container name="background">
-            <image name="backup" draworder="0" fleximage="no">
-                <context>0</context>
-                <position>0,0</position>
-                <filename>gg-vid-background.png</filename>
-            </image>
-        </container>
-
-        <container name="current_video">
-            <area>540,20,240,180</area>
-        </container>
-
-        <container name="date_info">
-            <area>20,296,115,25</area>
-            <textarea name="date" draworder="4" align="center">
+                <area>800,40,380,30</area>
                 <font>basesmall</font>
-                <area>0,0,115,25</area>
-                <cutdown>no</cutdown>
-            </textarea>
-        </container>
-
-        <container name="chanbar">
-            <area>20,325,123,256</area>
-            <bar name="chans" draworder="4">
-                <area>0,0,123,266</area>
-                <textoffset>38,0</textoffset>
-                <iconoffset>3,10</iconoffset>
-                <iconsize>30,30</iconsize>
-                <orientation>vertical</orientation>
-                <align>allcenter</align>
-                <font>chaninfo</font>
-                <imagefile>gg-chans.png</imagefile>
-            </bar>
-        </container>
-
-        <container name="timebar">
-            <area>142,295,638,31</area>
-            <bar name="times" draworder="4">
-                <area>0,0,640,31</area>
-                <align>allcenter</align>
-                <imagefile>gg-times.png</imagefile>
-                <font>basesmall</font>
-            </bar>
-        </container>
-
-        <container name="guide">
-            <area>143,326,645,256</area>
-            <guidegrid name="guidegrid" draworder="4">
-                <area>0,0,647,256</area>
-                <solidcolor>#003256</solidcolor>
-                <selector type="box" color="#ffff33"></selector>
-                <recordingcolor>#00aa00</recordingcolor>
-                <conflictingcolor>#ff6600</conflictingcolor>
-                <textoffset>9,6</textoffset>
-
-                <!-- customized category colors -->
-
-                <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
-                <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
-                <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
-                <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
-                <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
-                <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
-                <arrow direction="left" image="gg-arrow-left.png"></arrow>
-                <arrow direction="right" image="gg-arrow-right.png"></arrow>
-                <font>small-info</font>
-            </guidegrid>
-        </container>
-
-        <container name="current_info">
-            <area>605,201,130,82</area>
-            <textarea name="time" draworder="4" align="left">
-                <area>10,0,130,32</area>
-                <font>basesmall</font>
-            </textarea>
-            <textarea name="channel" draworder="4" align="center">
-                <area>0,0,120,32</area>
-                <font>basesmall</font>
-            </textarea>
-        </container>
-
-        <container name="program_info">
-            <area>20,3,504,275</area>
-            <textarea name="title" draworder="4" align="left">
-                <area>4,10,504,79</area>
-                <font>basemedium</font>
-            </textarea>
-            <textarea name="subtitle" draworder="6">
-                <area>4,46,504,30</area>
-                <font>basesmall</font>
-            </textarea>
-            <textarea name="description" draworder="6">
-                <area>4,100,500,159</area>
-                <font>basesmall</font>
-                <multiline>yes</multiline>
-                <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
-            </textarea>
-            <textarea name="recordingstatus" draworder="6">
-                <area>4,234,489,30</area>
-                <font>recstatus</font>
             </textarea>
         </container>
 
@@ -313,7 +186,7 @@
             <area>300,345,480,30</area>
             <textarea name="recordingstatus" align="right" draworder="6">
                 <area>0,0,480,30</area>
-                <font>recstatus</font>
+                <font>basesmall</font>
             </textarea>
         </container>
 
@@ -330,14 +203,6 @@
 
     <window name="programfind">
 
-
-        <font name="channel" face="Arial">
-            <color>#ffffff</color>
-            <size>22</size>
-            <size:small>14</size:small>
-            <bold>yes</bold>
-        </font>
-
         <container name="background">
             <image name="filler" draworder="0" fleximage="no">
                 <filename>progfind_top.png</filename>
@@ -350,7 +215,7 @@
             </image>
             <textarea name="prgrambar" align="center">
                 <area>0,570,800,30</area>
-                <font>help</font>
+                <font>basesmall</font>
                 <value>(4) Program Guide   **(6) Program Finder **</value>
                 <context>1</context>
             </textarea>
@@ -419,7 +284,7 @@
             </textarea>
             <textarea name="recordingstatus" draworder="6">
                 <area>25,180,500,35</area>
-                <font>recstatus</font>
+                <font>basesmall</font>
             </textarea>
         </container>
 
@@ -427,12 +292,12 @@
             <area>40,40,750,220</area>
             <textarea name="selectinfo" draworder="6">
                 <area>20,20,500,30</area>
-                <font>help</font>
+                <font>basesmall</font>
                 <value>Select a letter...</value>
             </textarea>
             <textarea name="pickinfo" draworder="6">
                 <area>20,75,720,120</area>
-                <font>help</font>
+                <font>basesmall</font>
                 <value>Pick the letter in which the show starts with, then press SELECT or the right arrow</value>
                 <multiline>yes</multiline>
             </textarea>
@@ -442,12 +307,12 @@
             <area>25,25,750,220</area>
             <textarea name="selectprog" draworder="6">
                 <area>20,20,500,30</area>
-                <font>help</font>
+                <font>basesmall</font>
                 <value>Select a program...</value>
             </textarea>
             <textarea name="pickprog" draworder="6">
                 <area>20,75,720,120</area>
-                <font>help</font>
+                <font>basesmall</font>
                 <value>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</value>
                 <multiline>yes</multiline>
             </textarea>
