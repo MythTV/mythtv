@@ -11,771 +11,786 @@ struct mcolor
     int r, g, b;
 };
 
+struct colormap
+{
+    const char *name;
+    mcolor col;
+};
+
 QColor createColor(const QString &color)
 {
     static QMutex x11colormapLock;
-    static QMap<const char *, mcolor> x11colormap;
+    static QMap<QString, QColor> x11colormap;
 
     QMutexLocker locker(&x11colormapLock);
     if (x11colormap.empty())
     {
-        x11colormap["snow"] = mcolor(255, 250, 250);
-        x11colormap["ghost"] = mcolor(248, 248, 255);
-        x11colormap["ghostwhite"] = mcolor(248, 248, 255);
-        x11colormap["white"] = mcolor(245, 245, 245);
-        x11colormap["whitesmoke"] = mcolor(245, 245, 245);
-        x11colormap["gainsboro"] = mcolor(220, 220, 220);
-        x11colormap["floral"] = mcolor(255, 250, 240);
-        x11colormap["floralwhite"] = mcolor(255, 250, 240);
-        x11colormap["old"] = mcolor(253, 245, 230);
-        x11colormap["oldlace"] = mcolor(253, 245, 230);
-        x11colormap["linen"] = mcolor(250, 240, 230);
-        x11colormap["antique"] = mcolor(250, 235, 215);
-        x11colormap["antiquewhite"] = mcolor(250, 235, 215);
-        x11colormap["papaya"] = mcolor(255, 239, 213);
-        x11colormap["papayawhip"] = mcolor(255, 239, 213);
-        x11colormap["blanched"] = mcolor(255, 235, 205);
-        x11colormap["blanchedalmond"] = mcolor(255, 235, 205);
-        x11colormap["bisque"] = mcolor(255, 228, 196);
-        x11colormap["peach"] = mcolor(255, 218, 185);
-        x11colormap["peachpuff"] = mcolor(255, 218, 185);
-        x11colormap["navajo"] = mcolor(255, 222, 173);
-        x11colormap["navajowhite"] = mcolor(255, 222, 173);
-        x11colormap["moccasin"] = mcolor(255, 228, 181);
-        x11colormap["cornsilk"] = mcolor(255, 248, 220);
-        x11colormap["ivory"] = mcolor(255, 255, 240);
-        x11colormap["lemon"] = mcolor(255, 250, 205);
-        x11colormap["lemonchiffon"] = mcolor(255, 250, 205);
-        x11colormap["seashell"] = mcolor(255, 245, 238);
-        x11colormap["honeydew"] = mcolor(240, 255, 240);
-        x11colormap["mint"] = mcolor(245, 255, 250);
-        x11colormap["mintcream"] = mcolor(245, 255, 250);
-        x11colormap["azure"] = mcolor(240, 255, 255);
-        x11colormap["alice"] = mcolor(240, 248, 255);
-        x11colormap["aliceblue"] = mcolor(240, 248, 255);
-        x11colormap["lavender"] = mcolor(230, 230, 250);
-        x11colormap["lavender"] = mcolor(255, 240, 245);
-        x11colormap["lavenderblush"] = mcolor(255, 240, 245);
-        x11colormap["misty"] = mcolor(255, 228, 225);
-        x11colormap["mistyrose"] = mcolor(255, 228, 225);
-        x11colormap["white"] = mcolor(255, 255, 255);
-        x11colormap["black"] = mcolor(0, 0, 0);
-        x11colormap["dark"] = mcolor(47, 79, 79);
-        x11colormap["darkslategray"] = mcolor(47, 79, 79);
-        x11colormap["dark"] = mcolor(47, 79, 79);
-        x11colormap["darkslategrey"] = mcolor(47, 79, 79);
-        x11colormap["dim"] = mcolor(105, 105, 105);
-        x11colormap["dimgray"] = mcolor(105, 105, 105);
-        x11colormap["dim"] = mcolor(105, 105, 105);
-        x11colormap["dimgrey"] = mcolor(105, 105, 105);
-        x11colormap["slate"] = mcolor(112, 128, 144);
-        x11colormap["slategray"] = mcolor(112, 128, 144);
-        x11colormap["slate"] = mcolor(112, 128, 144);
-        x11colormap["slategrey"] = mcolor(112, 128, 144);
-        x11colormap["light"] = mcolor(119, 136, 153);
-        x11colormap["lightslategray"] = mcolor(119, 136, 153);
-        x11colormap["light"] = mcolor(119, 136, 153);
-        x11colormap["lightslategrey"] = mcolor(119, 136, 153);
-        x11colormap["gray"] = mcolor(190, 190, 190);
-        x11colormap["grey"] = mcolor(190, 190, 190);
-        x11colormap["light"] = mcolor(211, 211, 211);
-        x11colormap["lightgrey"] = mcolor(211, 211, 211);
-        x11colormap["light"] = mcolor(211, 211, 211);
-        x11colormap["lightgray"] = mcolor(211, 211, 211);
-        x11colormap["midnight"] = mcolor(25, 25, 112);
-        x11colormap["midnightblue"] = mcolor(25, 25, 112);
-        x11colormap["navy"] = mcolor(0, 0, 128);
-        x11colormap["navy"] = mcolor(0, 0, 128);
-        x11colormap["navyblue"] = mcolor(0, 0, 128);
-        x11colormap["cornflower"] = mcolor(100, 149, 237);
-        x11colormap["cornflowerblue"] = mcolor(100, 149, 237);
-        x11colormap["dark"] = mcolor(72, 61, 139);
-        x11colormap["darkslateblue"] = mcolor(72, 61, 139);
-        x11colormap["slate"] = mcolor(106, 90, 205);
-        x11colormap["slateblue"] = mcolor(106, 90, 205);
-        x11colormap["medium"] = mcolor(123, 104, 238);
-        x11colormap["mediumslateblue"] = mcolor(123, 104, 238);
-        x11colormap["light"] = mcolor(132, 112, 255);
-        x11colormap["lightslateblue"] = mcolor(132, 112, 255);
-        x11colormap["medium"] = mcolor(0, 0, 205);
-        x11colormap["mediumblue"] = mcolor(0, 0, 205);
-        x11colormap["royal"] = mcolor(65, 105, 225);
-        x11colormap["royalblue"] = mcolor(65, 105, 225);
-        x11colormap["blue"] = mcolor(0, 0, 255);
-        x11colormap["dodger"] = mcolor(30, 144, 255);
-        x11colormap["dodgerblue"] = mcolor(30, 144, 255);
-        x11colormap["deep"] = mcolor(0, 191, 255);
-        x11colormap["deepskyblue"] = mcolor(0, 191, 255);
-        x11colormap["sky"] = mcolor(135, 206, 235);
-        x11colormap["skyblue"] = mcolor(135, 206, 235);
-        x11colormap["light"] = mcolor(135, 206, 250);
-        x11colormap["lightskyblue"] = mcolor(135, 206, 250);
-        x11colormap["steel"] = mcolor(70, 130, 180);
-        x11colormap["steelblue"] = mcolor(70, 130, 180);
-        x11colormap["light"] = mcolor(176, 196, 222);
-        x11colormap["lightsteelblue"] = mcolor(176, 196, 222);
-        x11colormap["light"] = mcolor(173, 216, 230);
-        x11colormap["lightblue"] = mcolor(173, 216, 230);
-        x11colormap["powder"] = mcolor(176, 224, 230);
-        x11colormap["powderblue"] = mcolor(176, 224, 230);
-        x11colormap["pale"] = mcolor(175, 238, 238);
-        x11colormap["paleturquoise"] = mcolor(175, 238, 238);
-        x11colormap["dark"] = mcolor(0, 206, 209);
-        x11colormap["darkturquoise"] = mcolor(0, 206, 209);
-        x11colormap["medium"] = mcolor(72, 209, 204);
-        x11colormap["mediumturquoise"] = mcolor(72, 209, 204);
-        x11colormap["turquoise"] = mcolor(64, 224, 208);
-        x11colormap["cyan"] = mcolor(0, 255, 255);
-        x11colormap["light"] = mcolor(224, 255, 255);
-        x11colormap["lightcyan"] = mcolor(224, 255, 255);
-        x11colormap["cadet"] = mcolor(95, 158, 160);
-        x11colormap["cadetblue"] = mcolor(95, 158, 160);
-        x11colormap["medium"] = mcolor(102, 205, 170);
-        x11colormap["mediumaquamarine"] = mcolor(102, 205, 170);
-        x11colormap["aquamarine"] = mcolor(127, 255, 212);
-        x11colormap["dark"] = mcolor(0, 100, 0);
-        x11colormap["darkgreen"] = mcolor(0, 100, 0);
-        x11colormap["dark"] = mcolor(85, 107, 47);
-        x11colormap["darkolivegreen"] = mcolor(85, 107, 47);
-        x11colormap["dark"] = mcolor(143, 188, 143);
-        x11colormap["darkseagreen"] = mcolor(143, 188, 143);
-        x11colormap["sea"] = mcolor(46, 139, 87);
-        x11colormap["seagreen"] = mcolor(46, 139, 87);
-        x11colormap["medium"] = mcolor(60, 179, 113);
-        x11colormap["mediumseagreen"] = mcolor(60, 179, 113);
-        x11colormap["light"] = mcolor(32, 178, 170);
-        x11colormap["lightseagreen"] = mcolor(32, 178, 170);
-        x11colormap["pale"] = mcolor(152, 251, 152);
-        x11colormap["palegreen"] = mcolor(152, 251, 152);
-        x11colormap["spring"] = mcolor(0, 255, 127);
-        x11colormap["springgreen"] = mcolor(0, 255, 127);
-        x11colormap["lawn"] = mcolor(124, 252, 0);
-        x11colormap["lawngreen"] = mcolor(124, 252, 0);
-        x11colormap["green"] = mcolor(0, 255, 0);
-        x11colormap["chartreuse"] = mcolor(127, 255, 0);
-        x11colormap["medium"] = mcolor(0, 250, 154);
-        x11colormap["mediumspringgreen"] = mcolor(0, 250, 154);
-        x11colormap["green"] = mcolor(173, 255, 47);
-        x11colormap["greenyellow"] = mcolor(173, 255, 47);
-        x11colormap["lime"] = mcolor(50, 205, 50);
-        x11colormap["limegreen"] = mcolor(50, 205, 50);
-        x11colormap["yellow"] = mcolor(154, 205, 50);
-        x11colormap["yellowgreen"] = mcolor(154, 205, 50);
-        x11colormap["forest"] = mcolor(34, 139, 34);
-        x11colormap["forestgreen"] = mcolor(34, 139, 34);
-        x11colormap["olive"] = mcolor(107, 142, 35);
-        x11colormap["olivedrab"] = mcolor(107, 142, 35);
-        x11colormap["dark"] = mcolor(189, 183, 107);
-        x11colormap["darkkhaki"] = mcolor(189, 183, 107);
-        x11colormap["khaki"] = mcolor(240, 230, 140);
-        x11colormap["pale"] = mcolor(238, 232, 170);
-        x11colormap["palegoldenrod"] = mcolor(238, 232, 170);
-        x11colormap["light"] = mcolor(250, 250, 210);
-        x11colormap["lightgoldenrodyellow"] = mcolor(250, 250, 210);
-        x11colormap["light"] = mcolor(255, 255, 224);
-        x11colormap["lightyellow"] = mcolor(255, 255, 224);
-        x11colormap["yellow"] = mcolor(255, 255, 0);
-        x11colormap["gold"] = mcolor(255, 215, 0);
-        x11colormap["light"] = mcolor(238, 221, 130);
-        x11colormap["lightgoldenrod"] = mcolor(238, 221, 130);
-        x11colormap["goldenrod"] = mcolor(218, 165, 32);
-        x11colormap["dark"] = mcolor(184, 134, 11);
-        x11colormap["darkgoldenrod"] = mcolor(184, 134, 11);
-        x11colormap["rosy"] = mcolor(188, 143, 143);
-        x11colormap["rosybrown"] = mcolor(188, 143, 143);
-        x11colormap["indian"] = mcolor(205, 92, 92);
-        x11colormap["indianred"] = mcolor(205, 92, 92);
-        x11colormap["saddle"] = mcolor(139, 69, 19);
-        x11colormap["saddlebrown"] = mcolor(139, 69, 19);
-        x11colormap["sienna"] = mcolor(160, 82, 45);
-        x11colormap["peru"] = mcolor(205, 133, 63);
-        x11colormap["burlywood"] = mcolor(222, 184, 135);
-        x11colormap["beige"] = mcolor(245, 245, 220);
-        x11colormap["wheat"] = mcolor(245, 222, 179);
-        x11colormap["sandy"] = mcolor(244, 164, 96);
-        x11colormap["sandybrown"] = mcolor(244, 164, 96);
-        x11colormap["tan"] = mcolor(210, 180, 140);
-        x11colormap["chocolate"] = mcolor(210, 105, 30);
-        x11colormap["firebrick"] = mcolor(178, 34, 34);
-        x11colormap["brown"] = mcolor(165, 42, 42);
-        x11colormap["dark"] = mcolor(233, 150, 122);
-        x11colormap["darksalmon"] = mcolor(233, 150, 122);
-        x11colormap["salmon"] = mcolor(250, 128, 114);
-        x11colormap["light"] = mcolor(255, 160, 122);
-        x11colormap["lightsalmon"] = mcolor(255, 160, 122);
-        x11colormap["orange"] = mcolor(255, 165, 0);
-        x11colormap["dark"] = mcolor(255, 140, 0);
-        x11colormap["darkorange"] = mcolor(255, 140, 0);
-        x11colormap["coral"] = mcolor(255, 127, 80);
-        x11colormap["light"] = mcolor(240, 128, 128);
-        x11colormap["lightcoral"] = mcolor(240, 128, 128);
-        x11colormap["tomato"] = mcolor(255, 99, 71);
-        x11colormap["orange"] = mcolor(255, 69, 0);
-        x11colormap["orangered"] = mcolor(255, 69, 0);
-        x11colormap["red"] = mcolor(255, 0, 0);
-        x11colormap["hot"] = mcolor(255, 105, 180);
-        x11colormap["hotpink"] = mcolor(255, 105, 180);
-        x11colormap["deep"] = mcolor(255, 20, 147);
-        x11colormap["deeppink"] = mcolor(255, 20, 147);
-        x11colormap["pink"] = mcolor(255, 192, 203);
-        x11colormap["light"] = mcolor(255, 182, 193);
-        x11colormap["lightpink"] = mcolor(255, 182, 193);
-        x11colormap["pale"] = mcolor(219, 112, 147);
-        x11colormap["palevioletred"] = mcolor(219, 112, 147);
-        x11colormap["maroon"] = mcolor(176, 48, 96);
-        x11colormap["medium"] = mcolor(199, 21, 133);
-        x11colormap["mediumvioletred"] = mcolor(199, 21, 133);
-        x11colormap["violet"] = mcolor(208, 32, 144);
-        x11colormap["violetred"] = mcolor(208, 32, 144);
-        x11colormap["magenta"] = mcolor(255, 0, 255);
-        x11colormap["violet"] = mcolor(238, 130, 238);
-        x11colormap["plum"] = mcolor(221, 160, 221);
-        x11colormap["orchid"] = mcolor(218, 112, 214);
-        x11colormap["medium"] = mcolor(186, 85, 211);
-        x11colormap["mediumorchid"] = mcolor(186, 85, 211);
-        x11colormap["dark"] = mcolor(153, 50, 204);
-        x11colormap["darkorchid"] = mcolor(153, 50, 204);
-        x11colormap["dark"] = mcolor(148, 0, 211);
-        x11colormap["darkviolet"] = mcolor(148, 0, 211);
-        x11colormap["blue"] = mcolor(138, 43, 226);
-        x11colormap["blueviolet"] = mcolor(138, 43, 226);
-        x11colormap["purple"] = mcolor(160, 32, 240);
-        x11colormap["medium"] = mcolor(147, 112, 219);
-        x11colormap["mediumpurple"] = mcolor(147, 112, 219);
-        x11colormap["thistle"] = mcolor(216, 191, 216);
-        x11colormap["snow1"] = mcolor(255, 250, 250);
-        x11colormap["snow2"] = mcolor(238, 233, 233);
-        x11colormap["snow3"] = mcolor(205, 201, 201);
-        x11colormap["snow4"] = mcolor(139, 137, 137);
-        x11colormap["seashell1"] = mcolor(255, 245, 238);
-        x11colormap["seashell2"] = mcolor(238, 229, 222);
-        x11colormap["seashell3"] = mcolor(205, 197, 191);
-        x11colormap["seashell4"] = mcolor(139, 134, 130);
-        x11colormap["antiquewhite1"] = mcolor(255, 239, 219);
-        x11colormap["antiquewhite2"] = mcolor(238, 223, 204);
-        x11colormap["antiquewhite3"] = mcolor(205, 192, 176);
-        x11colormap["antiquewhite4"] = mcolor(139, 131, 120);
-        x11colormap["bisque1"] = mcolor(255, 228, 196);
-        x11colormap["bisque2"] = mcolor(238, 213, 183);
-        x11colormap["bisque3"] = mcolor(205, 183, 158);
-        x11colormap["bisque4"] = mcolor(139, 125, 107);
-        x11colormap["peachpuff1"] = mcolor(255, 218, 185);
-        x11colormap["peachpuff2"] = mcolor(238, 203, 173);
-        x11colormap["peachpuff3"] = mcolor(205, 175, 149);
-        x11colormap["peachpuff4"] = mcolor(139, 119, 101);
-        x11colormap["navajowhite1"] = mcolor(255, 222, 173);
-        x11colormap["navajowhite2"] = mcolor(238, 207, 161);
-        x11colormap["navajowhite3"] = mcolor(205, 179, 139);
-        x11colormap["navajowhite4"] = mcolor(139, 121, 94);
-        x11colormap["lemonchiffon1"] = mcolor(255, 250, 205);
-        x11colormap["lemonchiffon2"] = mcolor(238, 233, 191);
-        x11colormap["lemonchiffon3"] = mcolor(205, 201, 165);
-        x11colormap["lemonchiffon4"] = mcolor(139, 137, 112);
-        x11colormap["cornsilk1"] = mcolor(255, 248, 220);
-        x11colormap["cornsilk2"] = mcolor(238, 232, 205);
-        x11colormap["cornsilk3"] = mcolor(205, 200, 177);
-        x11colormap["cornsilk4"] = mcolor(139, 136, 120);
-        x11colormap["ivory1"] = mcolor(255, 255, 240);
-        x11colormap["ivory2"] = mcolor(238, 238, 224);
-        x11colormap["ivory3"] = mcolor(205, 205, 193);
-        x11colormap["ivory4"] = mcolor(139, 139, 131);
-        x11colormap["honeydew1"] = mcolor(240, 255, 240);
-        x11colormap["honeydew2"] = mcolor(224, 238, 224);
-        x11colormap["honeydew3"] = mcolor(193, 205, 193);
-        x11colormap["honeydew4"] = mcolor(131, 139, 131);
-        x11colormap["lavenderblush1"] = mcolor(255, 240, 245);
-        x11colormap["lavenderblush2"] = mcolor(238, 224, 229);
-        x11colormap["lavenderblush3"] = mcolor(205, 193, 197);
-        x11colormap["lavenderblush4"] = mcolor(139, 131, 134);
-        x11colormap["mistyrose1"] = mcolor(255, 228, 225);
-        x11colormap["mistyrose2"] = mcolor(238, 213, 210);
-        x11colormap["mistyrose3"] = mcolor(205, 183, 181);
-        x11colormap["mistyrose4"] = mcolor(139, 125, 123);
-        x11colormap["azure1"] = mcolor(240, 255, 255);
-        x11colormap["azure2"] = mcolor(224, 238, 238);
-        x11colormap["azure3"] = mcolor(193, 205, 205);
-        x11colormap["azure4"] = mcolor(131, 139, 139);
-        x11colormap["slateblue1"] = mcolor(131, 111, 255);
-        x11colormap["slateblue2"] = mcolor(122, 103, 238);
-        x11colormap["slateblue3"] = mcolor(105, 89, 205);
-        x11colormap["slateblue4"] = mcolor(71, 60, 139);
-        x11colormap["royalblue1"] = mcolor(72, 118, 255);
-        x11colormap["royalblue2"] = mcolor(67, 110, 238);
-        x11colormap["royalblue3"] = mcolor(58, 95, 205);
-        x11colormap["royalblue4"] = mcolor(39, 64, 139);
-        x11colormap["blue1"] = mcolor(0, 0, 255);
-        x11colormap["blue2"] = mcolor(0, 0, 238);
-        x11colormap["blue3"] = mcolor(0, 0, 205);
-        x11colormap["blue4"] = mcolor(0, 0, 139);
-        x11colormap["dodgerblue1"] = mcolor(30, 144, 255);
-        x11colormap["dodgerblue2"] = mcolor(28, 134, 238);
-        x11colormap["dodgerblue3"] = mcolor(24, 116, 205);
-        x11colormap["dodgerblue4"] = mcolor(16, 78, 139);
-        x11colormap["steelblue1"] = mcolor(99, 184, 255);
-        x11colormap["steelblue2"] = mcolor(92, 172, 238);
-        x11colormap["steelblue3"] = mcolor(79, 148, 205);
-        x11colormap["steelblue4"] = mcolor(54, 100, 139);
-        x11colormap["deepskyblue1"] = mcolor(0, 191, 255);
-        x11colormap["deepskyblue2"] = mcolor(0, 178, 238);
-        x11colormap["deepskyblue3"] = mcolor(0, 154, 205);
-        x11colormap["deepskyblue4"] = mcolor(0, 104, 139);
-        x11colormap["skyblue1"] = mcolor(135, 206, 255);
-        x11colormap["skyblue2"] = mcolor(126, 192, 238);
-        x11colormap["skyblue3"] = mcolor(108, 166, 205);
-        x11colormap["skyblue4"] = mcolor(74, 112, 139);
-        x11colormap["lightskyblue1"] = mcolor(176, 226, 255);
-        x11colormap["lightskyblue2"] = mcolor(164, 211, 238);
-        x11colormap["lightskyblue3"] = mcolor(141, 182, 205);
-        x11colormap["lightskyblue4"] = mcolor(96, 123, 139);
-        x11colormap["slategray1"] = mcolor(198, 226, 255);
-        x11colormap["slategray2"] = mcolor(185, 211, 238);
-        x11colormap["slategray3"] = mcolor(159, 182, 205);
-        x11colormap["slategray4"] = mcolor(108, 123, 139);
-        x11colormap["lightsteelblue1"] = mcolor(202, 225, 255);
-        x11colormap["lightsteelblue2"] = mcolor(188, 210, 238);
-        x11colormap["lightsteelblue3"] = mcolor(162, 181, 205);
-        x11colormap["lightsteelblue4"] = mcolor(110, 123, 139);
-        x11colormap["lightblue1"] = mcolor(191, 239, 255);
-        x11colormap["lightblue2"] = mcolor(178, 223, 238);
-        x11colormap["lightblue3"] = mcolor(154, 192, 205);
-        x11colormap["lightblue4"] = mcolor(104, 131, 139);
-        x11colormap["lightcyan1"] = mcolor(224, 255, 255);
-        x11colormap["lightcyan2"] = mcolor(209, 238, 238);
-        x11colormap["lightcyan3"] = mcolor(180, 205, 205);
-        x11colormap["lightcyan4"] = mcolor(122, 139, 139);
-        x11colormap["paleturquoise1"] = mcolor(187, 255, 255);
-        x11colormap["paleturquoise2"] = mcolor(174, 238, 238);
-        x11colormap["paleturquoise3"] = mcolor(150, 205, 205);
-        x11colormap["paleturquoise4"] = mcolor(102, 139, 139);
-        x11colormap["cadetblue1"] = mcolor(152, 245, 255);
-        x11colormap["cadetblue2"] = mcolor(142, 229, 238);
-        x11colormap["cadetblue3"] = mcolor(122, 197, 205);
-        x11colormap["cadetblue4"] = mcolor(83, 134, 139);
-        x11colormap["turquoise1"] = mcolor(0, 245, 255);
-        x11colormap["turquoise2"] = mcolor(0, 229, 238);
-        x11colormap["turquoise3"] = mcolor(0, 197, 205);
-        x11colormap["turquoise4"] = mcolor(0, 134, 139);
-        x11colormap["cyan1"] = mcolor(0, 255, 255);
-        x11colormap["cyan2"] = mcolor(0, 238, 238);
-        x11colormap["cyan3"] = mcolor(0, 205, 205);
-        x11colormap["cyan4"] = mcolor(0, 139, 139);
-        x11colormap["darkslategray1"] = mcolor(151, 255, 255);
-        x11colormap["darkslategray2"] = mcolor(141, 238, 238);
-        x11colormap["darkslategray3"] = mcolor(121, 205, 205);
-        x11colormap["darkslategray4"] = mcolor(82, 139, 139);
-        x11colormap["aquamarine1"] = mcolor(127, 255, 212);
-        x11colormap["aquamarine2"] = mcolor(118, 238, 198);
-        x11colormap["aquamarine3"] = mcolor(102, 205, 170);
-        x11colormap["aquamarine4"] = mcolor(69, 139, 116);
-        x11colormap["darkseagreen1"] = mcolor(193, 255, 193);
-        x11colormap["darkseagreen2"] = mcolor(180, 238, 180);
-        x11colormap["darkseagreen3"] = mcolor(155, 205, 155);
-        x11colormap["darkseagreen4"] = mcolor(105, 139, 105);
-        x11colormap["seagreen1"] = mcolor(84, 255, 159);
-        x11colormap["seagreen2"] = mcolor(78, 238, 148);
-        x11colormap["seagreen3"] = mcolor(67, 205, 128);
-        x11colormap["seagreen4"] = mcolor(46, 139, 87);
-        x11colormap["palegreen1"] = mcolor(154, 255, 154);
-        x11colormap["palegreen2"] = mcolor(144, 238, 144);
-        x11colormap["palegreen3"] = mcolor(124, 205, 124);
-        x11colormap["palegreen4"] = mcolor(84, 139, 84);
-        x11colormap["springgreen1"] = mcolor(0, 255, 127);
-        x11colormap["springgreen2"] = mcolor(0, 238, 118);
-        x11colormap["springgreen3"] = mcolor(0, 205, 102);
-        x11colormap["springgreen4"] = mcolor(0, 139, 69);
-        x11colormap["green1"] = mcolor(0, 255, 0);
-        x11colormap["green2"] = mcolor(0, 238, 0);
-        x11colormap["green3"] = mcolor(0, 205, 0);
-        x11colormap["green4"] = mcolor(0, 139, 0);
-        x11colormap["chartreuse1"] = mcolor(127, 255, 0);
-        x11colormap["chartreuse2"] = mcolor(118, 238, 0);
-        x11colormap["chartreuse3"] = mcolor(102, 205, 0);
-        x11colormap["chartreuse4"] = mcolor(69, 139, 0);
-        x11colormap["olivedrab1"] = mcolor(192, 255, 62);
-        x11colormap["olivedrab2"] = mcolor(179, 238, 58);
-        x11colormap["olivedrab3"] = mcolor(154, 205, 50);
-        x11colormap["olivedrab4"] = mcolor(105, 139, 34);
-        x11colormap["darkolivegreen1"] = mcolor(202, 255, 112);
-        x11colormap["darkolivegreen2"] = mcolor(188, 238, 104);
-        x11colormap["darkolivegreen3"] = mcolor(162, 205, 90);
-        x11colormap["darkolivegreen4"] = mcolor(110, 139, 61);
-        x11colormap["khaki1"] = mcolor(255, 246, 143);
-        x11colormap["khaki2"] = mcolor(238, 230, 133);
-        x11colormap["khaki3"] = mcolor(205, 198, 115);
-        x11colormap["khaki4"] = mcolor(139, 134, 78);
-        x11colormap["lightgoldenrod1"] = mcolor(255, 236, 139);
-        x11colormap["lightgoldenrod2"] = mcolor(238, 220, 130);
-        x11colormap["lightgoldenrod3"] = mcolor(205, 190, 112);
-        x11colormap["lightgoldenrod4"] = mcolor(139, 129, 76);
-        x11colormap["lightyellow1"] = mcolor(255, 255, 224);
-        x11colormap["lightyellow2"] = mcolor(238, 238, 209);
-        x11colormap["lightyellow3"] = mcolor(205, 205, 180);
-        x11colormap["lightyellow4"] = mcolor(139, 139, 122);
-        x11colormap["yellow1"] = mcolor(255, 255, 0);
-        x11colormap["yellow2"] = mcolor(238, 238, 0);
-        x11colormap["yellow3"] = mcolor(205, 205, 0);
-        x11colormap["yellow4"] = mcolor(139, 139, 0);
-        x11colormap["gold1"] = mcolor(255, 215, 0);
-        x11colormap["gold2"] = mcolor(238, 201, 0);
-        x11colormap["gold3"] = mcolor(205, 173, 0);
-        x11colormap["gold4"] = mcolor(139, 117, 0);
-        x11colormap["goldenrod1"] = mcolor(255, 193, 37);
-        x11colormap["goldenrod2"] = mcolor(238, 180, 34);
-        x11colormap["goldenrod3"] = mcolor(205, 155, 29);
-        x11colormap["goldenrod4"] = mcolor(139, 105, 20);
-        x11colormap["darkgoldenrod1"] = mcolor(255, 185, 15);
-        x11colormap["darkgoldenrod2"] = mcolor(238, 173, 14);
-        x11colormap["darkgoldenrod3"] = mcolor(205, 149, 12);
-        x11colormap["darkgoldenrod4"] = mcolor(139, 101, 8);
-        x11colormap["rosybrown1"] = mcolor(255, 193, 193);
-        x11colormap["rosybrown2"] = mcolor(238, 180, 180);
-        x11colormap["rosybrown3"] = mcolor(205, 155, 155);
-        x11colormap["rosybrown4"] = mcolor(139, 105, 105);
-        x11colormap["indianred1"] = mcolor(255, 106, 106);
-        x11colormap["indianred2"] = mcolor(238, 99, 99);
-        x11colormap["indianred3"] = mcolor(205, 85, 85);
-        x11colormap["indianred4"] = mcolor(139, 58, 58);
-        x11colormap["sienna1"] = mcolor(255, 130, 71);
-        x11colormap["sienna2"] = mcolor(238, 121, 66);
-        x11colormap["sienna3"] = mcolor(205, 104, 57);
-        x11colormap["sienna4"] = mcolor(139, 71, 38);
-        x11colormap["burlywood1"] = mcolor(255, 211, 155);
-        x11colormap["burlywood2"] = mcolor(238, 197, 145);
-        x11colormap["burlywood3"] = mcolor(205, 170, 125);
-        x11colormap["burlywood4"] = mcolor(139, 115, 85);
-        x11colormap["wheat1"] = mcolor(255, 231, 186);
-        x11colormap["wheat2"] = mcolor(238, 216, 174);
-        x11colormap["wheat3"] = mcolor(205, 186, 150);
-        x11colormap["wheat4"] = mcolor(139, 126, 102);
-        x11colormap["tan1"] = mcolor(255, 165, 79);
-        x11colormap["tan2"] = mcolor(238, 154, 73);
-        x11colormap["tan3"] = mcolor(205, 133, 63);
-        x11colormap["tan4"] = mcolor(139, 90, 43);
-        x11colormap["chocolate1"] = mcolor(255, 127, 36);
-        x11colormap["chocolate2"] = mcolor(238, 118, 33);
-        x11colormap["chocolate3"] = mcolor(205, 102, 29);
-        x11colormap["chocolate4"] = mcolor(139, 69, 19);
-        x11colormap["firebrick1"] = mcolor(255, 48, 48);
-        x11colormap["firebrick2"] = mcolor(238, 44, 44);
-        x11colormap["firebrick3"] = mcolor(205, 38, 38);
-        x11colormap["firebrick4"] = mcolor(139, 26, 26);
-        x11colormap["brown1"] = mcolor(255, 64, 64);
-        x11colormap["brown2"] = mcolor(238, 59, 59);
-        x11colormap["brown3"] = mcolor(205, 51, 51);
-        x11colormap["brown4"] = mcolor(139, 35, 35);
-        x11colormap["salmon1"] = mcolor(255, 140, 105);
-        x11colormap["salmon2"] = mcolor(238, 130, 98);
-        x11colormap["salmon3"] = mcolor(205, 112, 84);
-        x11colormap["salmon4"] = mcolor(139, 76, 57);
-        x11colormap["lightsalmon1"] = mcolor(255, 160, 122);
-        x11colormap["lightsalmon2"] = mcolor(238, 149, 114);
-        x11colormap["lightsalmon3"] = mcolor(205, 129, 98);
-        x11colormap["lightsalmon4"] = mcolor(139, 87, 66);
-        x11colormap["orange1"] = mcolor(255, 165, 0);
-        x11colormap["orange2"] = mcolor(238, 154, 0);
-        x11colormap["orange3"] = mcolor(205, 133, 0);
-        x11colormap["orange4"] = mcolor(139, 90, 0);
-        x11colormap["darkorange1"] = mcolor(255, 127, 0);
-        x11colormap["darkorange2"] = mcolor(238, 118, 0);
-        x11colormap["darkorange3"] = mcolor(205, 102, 0);
-        x11colormap["darkorange4"] = mcolor(139, 69, 0);
-        x11colormap["coral1"] = mcolor(255, 114, 86);
-        x11colormap["coral2"] = mcolor(238, 106, 80);
-        x11colormap["coral3"] = mcolor(205, 91, 69);
-        x11colormap["coral4"] = mcolor(139, 62, 47);
-        x11colormap["tomato1"] = mcolor(255, 99, 71);
-        x11colormap["tomato2"] = mcolor(238, 92, 66);
-        x11colormap["tomato3"] = mcolor(205, 79, 57);
-        x11colormap["tomato4"] = mcolor(139, 54, 38);
-        x11colormap["orangered1"] = mcolor(255, 69, 0);
-        x11colormap["orangered2"] = mcolor(238, 64, 0);
-        x11colormap["orangered3"] = mcolor(205, 55, 0);
-        x11colormap["orangered4"] = mcolor(139, 37, 0);
-        x11colormap["red1"] = mcolor(255, 0, 0);
-        x11colormap["red2"] = mcolor(238, 0, 0);
-        x11colormap["red3"] = mcolor(205, 0, 0);
-        x11colormap["red4"] = mcolor(139, 0, 0);
-        x11colormap["deeppink1"] = mcolor(255, 20, 147);
-        x11colormap["deeppink2"] = mcolor(238, 18, 137);
-        x11colormap["deeppink3"] = mcolor(205, 16, 118);
-        x11colormap["deeppink4"] = mcolor(139, 10, 80);
-        x11colormap["hotpink1"] = mcolor(255, 110, 180);
-        x11colormap["hotpink2"] = mcolor(238, 106, 167);
-        x11colormap["hotpink3"] = mcolor(205, 96, 144);
-        x11colormap["hotpink4"] = mcolor(139, 58, 98);
-        x11colormap["pink1"] = mcolor(255, 181, 197);
-        x11colormap["pink2"] = mcolor(238, 169, 184);
-        x11colormap["pink3"] = mcolor(205, 145, 158);
-        x11colormap["pink4"] = mcolor(139, 99, 108);
-        x11colormap["lightpink1"] = mcolor(255, 174, 185);
-        x11colormap["lightpink2"] = mcolor(238, 162, 173);
-        x11colormap["lightpink3"] = mcolor(205, 140, 149);
-        x11colormap["lightpink4"] = mcolor(139, 95, 101);
-        x11colormap["palevioletred1"] = mcolor(255, 130, 171);
-        x11colormap["palevioletred2"] = mcolor(238, 121, 159);
-        x11colormap["palevioletred3"] = mcolor(205, 104, 137);
-        x11colormap["palevioletred4"] = mcolor(139, 71, 93);
-        x11colormap["maroon1"] = mcolor(255, 52, 179);
-        x11colormap["maroon2"] = mcolor(238, 48, 167);
-        x11colormap["maroon3"] = mcolor(205, 41, 144);
-        x11colormap["maroon4"] = mcolor(139, 28, 98);
-        x11colormap["violetred1"] = mcolor(255, 62, 150);
-        x11colormap["violetred2"] = mcolor(238, 58, 140);
-        x11colormap["violetred3"] = mcolor(205, 50, 120);
-        x11colormap["violetred4"] = mcolor(139, 34, 82);
-        x11colormap["magenta1"] = mcolor(255, 0, 255);
-        x11colormap["magenta2"] = mcolor(238, 0, 238);
-        x11colormap["magenta3"] = mcolor(205, 0, 205);
-        x11colormap["magenta4"] = mcolor(139, 0, 139);
-        x11colormap["orchid1"] = mcolor(255, 131, 250);
-        x11colormap["orchid2"] = mcolor(238, 122, 233);
-        x11colormap["orchid3"] = mcolor(205, 105, 201);
-        x11colormap["orchid4"] = mcolor(139, 71, 137);
-        x11colormap["plum1"] = mcolor(255, 187, 255);
-        x11colormap["plum2"] = mcolor(238, 174, 238);
-        x11colormap["plum3"] = mcolor(205, 150, 205);
-        x11colormap["plum4"] = mcolor(139, 102, 139);
-        x11colormap["mediumorchid1"] = mcolor(224, 102, 255);
-        x11colormap["mediumorchid2"] = mcolor(209, 95, 238);
-        x11colormap["mediumorchid3"] = mcolor(180, 82, 205);
-        x11colormap["mediumorchid4"] = mcolor(122, 55, 139);
-        x11colormap["darkorchid1"] = mcolor(191, 62, 255);
-        x11colormap["darkorchid2"] = mcolor(178, 58, 238);
-        x11colormap["darkorchid3"] = mcolor(154, 50, 205);
-        x11colormap["darkorchid4"] = mcolor(104, 34, 139);
-        x11colormap["purple1"] = mcolor(155, 48, 255);
-        x11colormap["purple2"] = mcolor(145, 44, 238);
-        x11colormap["purple3"] = mcolor(125, 38, 205);
-        x11colormap["purple4"] = mcolor(85, 26, 139);
-        x11colormap["mediumpurple1"] = mcolor(171, 130, 255);
-        x11colormap["mediumpurple2"] = mcolor(159, 121, 238);
-        x11colormap["mediumpurple3"] = mcolor(137, 104, 205);
-        x11colormap["mediumpurple4"] = mcolor(93, 71, 139);
-        x11colormap["thistle1"] = mcolor(255, 225, 255);
-        x11colormap["thistle2"] = mcolor(238, 210, 238);
-        x11colormap["thistle3"] = mcolor(205, 181, 205);
-        x11colormap["thistle4"] = mcolor(139, 123, 139);
-        x11colormap["gray0"] = mcolor(0, 0, 0);
-        x11colormap["grey0"] = mcolor(0, 0, 0);
-        x11colormap["gray1"] = mcolor(3, 3, 3);
-        x11colormap["grey1"] = mcolor(3, 3, 3);
-        x11colormap["gray2"] = mcolor(5, 5, 5);
-        x11colormap["grey2"] = mcolor(5, 5, 5);
-        x11colormap["gray3"] = mcolor(8, 8, 8);
-        x11colormap["grey3"] = mcolor(8, 8, 8);
-        x11colormap["gray4"] = mcolor(10, 10, 10);
-        x11colormap["grey4"] = mcolor(10, 10, 10);
-        x11colormap["gray5"] = mcolor(13, 13, 13);
-        x11colormap["grey5"] = mcolor(13, 13, 13);
-        x11colormap["gray6"] = mcolor(15, 15, 15);
-        x11colormap["grey6"] = mcolor(15, 15, 15);
-        x11colormap["gray7"] = mcolor(18, 18, 18);
-        x11colormap["grey7"] = mcolor(18, 18, 18);
-        x11colormap["gray8"] = mcolor(20, 20, 20);
-        x11colormap["grey8"] = mcolor(20, 20, 20);
-        x11colormap["gray9"] = mcolor(23, 23, 23);
-        x11colormap["grey9"] = mcolor(23, 23, 23);
-        x11colormap["gray10"] = mcolor(26, 26, 26);
-        x11colormap["grey10"] = mcolor(26, 26, 26);
-        x11colormap["gray11"] = mcolor(28, 28, 28);
-        x11colormap["grey11"] = mcolor(28, 28, 28);
-        x11colormap["gray12"] = mcolor(31, 31, 31);
-        x11colormap["grey12"] = mcolor(31, 31, 31);
-        x11colormap["gray13"] = mcolor(33, 33, 33);
-        x11colormap["grey13"] = mcolor(33, 33, 33);
-        x11colormap["gray14"] = mcolor(36, 36, 36);
-        x11colormap["grey14"] = mcolor(36, 36, 36);
-        x11colormap["gray15"] = mcolor(38, 38, 38);
-        x11colormap["grey15"] = mcolor(38, 38, 38);
-        x11colormap["gray16"] = mcolor(41, 41, 41);
-        x11colormap["grey16"] = mcolor(41, 41, 41);
-        x11colormap["gray17"] = mcolor(43, 43, 43);
-        x11colormap["grey17"] = mcolor(43, 43, 43);
-        x11colormap["gray18"] = mcolor(46, 46, 46);
-        x11colormap["grey18"] = mcolor(46, 46, 46);
-        x11colormap["gray19"] = mcolor(48, 48, 48);
-        x11colormap["grey19"] = mcolor(48, 48, 48);
-        x11colormap["gray20"] = mcolor(51, 51, 51);
-        x11colormap["grey20"] = mcolor(51, 51, 51);
-        x11colormap["gray21"] = mcolor(54, 54, 54);
-        x11colormap["grey21"] = mcolor(54, 54, 54);
-        x11colormap["gray22"] = mcolor(56, 56, 56);
-        x11colormap["grey22"] = mcolor(56, 56, 56);
-        x11colormap["gray23"] = mcolor(59, 59, 59);
-        x11colormap["grey23"] = mcolor(59, 59, 59);
-        x11colormap["gray24"] = mcolor(61, 61, 61);
-        x11colormap["grey24"] = mcolor(61, 61, 61);
-        x11colormap["gray25"] = mcolor(64, 64, 64);
-        x11colormap["grey25"] = mcolor(64, 64, 64);
-        x11colormap["gray26"] = mcolor(66, 66, 66);
-        x11colormap["grey26"] = mcolor(66, 66, 66);
-        x11colormap["gray27"] = mcolor(69, 69, 69);
-        x11colormap["grey27"] = mcolor(69, 69, 69);
-        x11colormap["gray28"] = mcolor(71, 71, 71);
-        x11colormap["grey28"] = mcolor(71, 71, 71);
-        x11colormap["gray29"] = mcolor(74, 74, 74);
-        x11colormap["grey29"] = mcolor(74, 74, 74);
-        x11colormap["gray30"] = mcolor(77, 77, 77);
-        x11colormap["grey30"] = mcolor(77, 77, 77);
-        x11colormap["gray31"] = mcolor(79, 79, 79);
-        x11colormap["grey31"] = mcolor(79, 79, 79);
-        x11colormap["gray32"] = mcolor(82, 82, 82);
-        x11colormap["grey32"] = mcolor(82, 82, 82);
-        x11colormap["gray33"] = mcolor(84, 84, 84);
-        x11colormap["grey33"] = mcolor(84, 84, 84);
-        x11colormap["gray34"] = mcolor(87, 87, 87);
-        x11colormap["grey34"] = mcolor(87, 87, 87);
-        x11colormap["gray35"] = mcolor(89, 89, 89);
-        x11colormap["grey35"] = mcolor(89, 89, 89);
-        x11colormap["gray36"] = mcolor(92, 92, 92);
-        x11colormap["grey36"] = mcolor(92, 92, 92);
-        x11colormap["gray37"] = mcolor(94, 94, 94);
-        x11colormap["grey37"] = mcolor(94, 94, 94);
-        x11colormap["gray38"] = mcolor(97, 97, 97);
-        x11colormap["grey38"] = mcolor(97, 97, 97);
-        x11colormap["gray39"] = mcolor(99, 99, 99);
-        x11colormap["grey39"] = mcolor(99, 99, 99);
-        x11colormap["gray40"] = mcolor(102, 102, 102);
-        x11colormap["grey40"] = mcolor(102, 102, 102);
-        x11colormap["gray41"] = mcolor(105, 105, 105);
-        x11colormap["grey41"] = mcolor(105, 105, 105);
-        x11colormap["gray42"] = mcolor(107, 107, 107);
-        x11colormap["grey42"] = mcolor(107, 107, 107);
-        x11colormap["gray43"] = mcolor(110, 110, 110);
-        x11colormap["grey43"] = mcolor(110, 110, 110);
-        x11colormap["gray44"] = mcolor(112, 112, 112);
-        x11colormap["grey44"] = mcolor(112, 112, 112);
-        x11colormap["gray45"] = mcolor(115, 115, 115);
-        x11colormap["grey45"] = mcolor(115, 115, 115);
-        x11colormap["gray46"] = mcolor(117, 117, 117);
-        x11colormap["grey46"] = mcolor(117, 117, 117);
-        x11colormap["gray47"] = mcolor(120, 120, 120);
-        x11colormap["grey47"] = mcolor(120, 120, 120);
-        x11colormap["gray48"] = mcolor(122, 122, 122);
-        x11colormap["grey48"] = mcolor(122, 122, 122);
-        x11colormap["gray49"] = mcolor(125, 125, 125);
-        x11colormap["grey49"] = mcolor(125, 125, 125);
-        x11colormap["gray50"] = mcolor(127, 127, 127);
-        x11colormap["grey50"] = mcolor(127, 127, 127);
-        x11colormap["gray51"] = mcolor(130, 130, 130);
-        x11colormap["grey51"] = mcolor(130, 130, 130);
-        x11colormap["gray52"] = mcolor(133, 133, 133);
-        x11colormap["grey52"] = mcolor(133, 133, 133);
-        x11colormap["gray53"] = mcolor(135, 135, 135);
-        x11colormap["grey53"] = mcolor(135, 135, 135);
-        x11colormap["gray54"] = mcolor(138, 138, 138);
-        x11colormap["grey54"] = mcolor(138, 138, 138);
-        x11colormap["gray55"] = mcolor(140, 140, 140);
-        x11colormap["grey55"] = mcolor(140, 140, 140);
-        x11colormap["gray56"] = mcolor(143, 143, 143);
-        x11colormap["grey56"] = mcolor(143, 143, 143);
-        x11colormap["gray57"] = mcolor(145, 145, 145);
-        x11colormap["grey57"] = mcolor(145, 145, 145);
-        x11colormap["gray58"] = mcolor(148, 148, 148);
-        x11colormap["grey58"] = mcolor(148, 148, 148);
-        x11colormap["gray59"] = mcolor(150, 150, 150);
-        x11colormap["grey59"] = mcolor(150, 150, 150);
-        x11colormap["gray60"] = mcolor(153, 153, 153);
-        x11colormap["grey60"] = mcolor(153, 153, 153);
-        x11colormap["gray61"] = mcolor(156, 156, 156);
-        x11colormap["grey61"] = mcolor(156, 156, 156);
-        x11colormap["gray62"] = mcolor(158, 158, 158);
-        x11colormap["grey62"] = mcolor(158, 158, 158);
-        x11colormap["gray63"] = mcolor(161, 161, 161);
-        x11colormap["grey63"] = mcolor(161, 161, 161);
-        x11colormap["gray64"] = mcolor(163, 163, 163);
-        x11colormap["grey64"] = mcolor(163, 163, 163);
-        x11colormap["gray65"] = mcolor(166, 166, 166);
-        x11colormap["grey65"] = mcolor(166, 166, 166);
-        x11colormap["gray66"] = mcolor(168, 168, 168);
-        x11colormap["grey66"] = mcolor(168, 168, 168);
-        x11colormap["gray67"] = mcolor(171, 171, 171);
-        x11colormap["grey67"] = mcolor(171, 171, 171);
-        x11colormap["gray68"] = mcolor(173, 173, 173);
-        x11colormap["grey68"] = mcolor(173, 173, 173);
-        x11colormap["gray69"] = mcolor(176, 176, 176);
-        x11colormap["grey69"] = mcolor(176, 176, 176);
-        x11colormap["gray70"] = mcolor(179, 179, 179);
-        x11colormap["grey70"] = mcolor(179, 179, 179);
-        x11colormap["gray71"] = mcolor(181, 181, 181);
-        x11colormap["grey71"] = mcolor(181, 181, 181);
-        x11colormap["gray72"] = mcolor(184, 184, 184);
-        x11colormap["grey72"] = mcolor(184, 184, 184);
-        x11colormap["gray73"] = mcolor(186, 186, 186);
-        x11colormap["grey73"] = mcolor(186, 186, 186);
-        x11colormap["gray74"] = mcolor(189, 189, 189);
-        x11colormap["grey74"] = mcolor(189, 189, 189);
-        x11colormap["gray75"] = mcolor(191, 191, 191);
-        x11colormap["grey75"] = mcolor(191, 191, 191);
-        x11colormap["gray76"] = mcolor(194, 194, 194);
-        x11colormap["grey76"] = mcolor(194, 194, 194);
-        x11colormap["gray77"] = mcolor(196, 196, 196);
-        x11colormap["grey77"] = mcolor(196, 196, 196);
-        x11colormap["gray78"] = mcolor(199, 199, 199);
-        x11colormap["grey78"] = mcolor(199, 199, 199);
-        x11colormap["gray79"] = mcolor(201, 201, 201);
-        x11colormap["grey79"] = mcolor(201, 201, 201);
-        x11colormap["gray80"] = mcolor(204, 204, 204);
-        x11colormap["grey80"] = mcolor(204, 204, 204);
-        x11colormap["gray81"] = mcolor(207, 207, 207);
-        x11colormap["grey81"] = mcolor(207, 207, 207);
-        x11colormap["gray82"] = mcolor(209, 209, 209);
-        x11colormap["grey82"] = mcolor(209, 209, 209);
-        x11colormap["gray83"] = mcolor(212, 212, 212);
-        x11colormap["grey83"] = mcolor(212, 212, 212);
-        x11colormap["gray84"] = mcolor(214, 214, 214);
-        x11colormap["grey84"] = mcolor(214, 214, 214);
-        x11colormap["gray85"] = mcolor(217, 217, 217);
-        x11colormap["grey85"] = mcolor(217, 217, 217);
-        x11colormap["gray86"] = mcolor(219, 219, 219);
-        x11colormap["grey86"] = mcolor(219, 219, 219);
-        x11colormap["gray87"] = mcolor(222, 222, 222);
-        x11colormap["grey87"] = mcolor(222, 222, 222);
-        x11colormap["gray88"] = mcolor(224, 224, 224);
-        x11colormap["grey88"] = mcolor(224, 224, 224);
-        x11colormap["gray89"] = mcolor(227, 227, 227);
-        x11colormap["grey89"] = mcolor(227, 227, 227);
-        x11colormap["gray90"] = mcolor(229, 229, 229);
-        x11colormap["grey90"] = mcolor(229, 229, 229);
-        x11colormap["gray91"] = mcolor(232, 232, 232);
-        x11colormap["grey91"] = mcolor(232, 232, 232);
-        x11colormap["gray92"] = mcolor(235, 235, 235);
-        x11colormap["grey92"] = mcolor(235, 235, 235);
-        x11colormap["gray93"] = mcolor(237, 237, 237);
-        x11colormap["grey93"] = mcolor(237, 237, 237);
-        x11colormap["gray94"] = mcolor(240, 240, 240);
-        x11colormap["grey94"] = mcolor(240, 240, 240);
-        x11colormap["gray95"] = mcolor(242, 242, 242);
-        x11colormap["grey95"] = mcolor(242, 242, 242);
-        x11colormap["gray96"] = mcolor(245, 245, 245);
-        x11colormap["grey96"] = mcolor(245, 245, 245);
-        x11colormap["gray97"] = mcolor(247, 247, 247);
-        x11colormap["grey97"] = mcolor(247, 247, 247);
-        x11colormap["gray98"] = mcolor(250, 250, 250);
-        x11colormap["grey98"] = mcolor(250, 250, 250);
-        x11colormap["gray99"] = mcolor(252, 252, 252);
-        x11colormap["grey99"] = mcolor(252, 252, 252);
-        x11colormap["gray100"] = mcolor(255, 255, 255);
-        x11colormap["grey100"] = mcolor(255, 255, 255);
-        x11colormap["dark"] = mcolor(169, 169, 169);
-        x11colormap["darkgrey"] = mcolor(169, 169, 169);
-        x11colormap["dark"] = mcolor(169, 169, 169);
-        x11colormap["darkgray"] = mcolor(169, 169, 169);
-        x11colormap["dark"] = mcolor(0, 0, 139);
-        x11colormap["darkblue"] = mcolor(0, 0, 139);
-        x11colormap["dark"] = mcolor(0, 139, 139);
-        x11colormap["darkcyan"] = mcolor(0, 139, 139);
-        x11colormap["dark"] = mcolor(139, 0, 139);
-        x11colormap["darkmagenta"] = mcolor(139, 0, 139);
-        x11colormap["dark"] = mcolor(139, 0, 0);
-        x11colormap["darkred"] = mcolor(139, 0, 0);
-        x11colormap["light"] = mcolor(144, 238, 144);
-        x11colormap["lightgreen"] = mcolor(144, 238, 144);
+        static const colormap cmap[] = {      
+        { "snow", mcolor(255, 250, 250) },
+        { "ghost", mcolor(248, 248, 255) },
+        { "ghostwhite", mcolor(248, 248, 255) },
+        { "white", mcolor(245, 245, 245) },
+        { "whitesmoke", mcolor(245, 245, 245) },
+        { "gainsboro", mcolor(220, 220, 220) },
+        { "floral", mcolor(255, 250, 240) },
+        { "floralwhite", mcolor(255, 250, 240) },
+        { "old", mcolor(253, 245, 230) },
+        { "oldlace", mcolor(253, 245, 230) },
+        { "linen", mcolor(250, 240, 230) },
+        { "antique", mcolor(250, 235, 215) },
+        { "antiquewhite", mcolor(250, 235, 215) },
+        { "papaya", mcolor(255, 239, 213) },
+        { "papayawhip", mcolor(255, 239, 213) },
+        { "blanched", mcolor(255, 235, 205) },
+        { "blanchedalmond", mcolor(255, 235, 205) },
+        { "bisque", mcolor(255, 228, 196) },
+        { "peach", mcolor(255, 218, 185) },
+        { "peachpuff", mcolor(255, 218, 185) },
+        { "navajo", mcolor(255, 222, 173) },
+        { "navajowhite", mcolor(255, 222, 173) },
+        { "moccasin", mcolor(255, 228, 181) },
+        { "cornsilk", mcolor(255, 248, 220) },
+        { "ivory", mcolor(255, 255, 240) },
+        { "lemon", mcolor(255, 250, 205) },
+        { "lemonchiffon", mcolor(255, 250, 205) },
+        { "seashell", mcolor(255, 245, 238) },
+        { "honeydew", mcolor(240, 255, 240) },
+        { "mint", mcolor(245, 255, 250) },
+        { "mintcream", mcolor(245, 255, 250) },
+        { "azure", mcolor(240, 255, 255) },
+        { "alice", mcolor(240, 248, 255) },
+        { "aliceblue", mcolor(240, 248, 255) },
+        { "lavender", mcolor(230, 230, 250) },
+        { "lavender", mcolor(255, 240, 245) },
+        { "lavenderblush", mcolor(255, 240, 245) },
+        { "misty", mcolor(255, 228, 225) },
+        { "mistyrose", mcolor(255, 228, 225) },
+        { "white", mcolor(255, 255, 255) },
+        { "black", mcolor(0, 0, 0) },
+        { "dark", mcolor(47, 79, 79) },
+        { "darkslategray", mcolor(47, 79, 79) },
+        { "dark", mcolor(47, 79, 79) },
+        { "darkslategrey", mcolor(47, 79, 79) },
+        { "dim", mcolor(105, 105, 105) },
+        { "dimgray", mcolor(105, 105, 105) },
+        { "dim", mcolor(105, 105, 105) },
+        { "dimgrey", mcolor(105, 105, 105) },
+        { "slate", mcolor(112, 128, 144) },
+        { "slategray", mcolor(112, 128, 144) },
+        { "slate", mcolor(112, 128, 144) },
+        { "slategrey", mcolor(112, 128, 144) },
+        { "light", mcolor(119, 136, 153) },
+        { "lightslategray", mcolor(119, 136, 153) },
+        { "light", mcolor(119, 136, 153) },
+        { "lightslategrey", mcolor(119, 136, 153) },
+        { "gray", mcolor(190, 190, 190) },
+        { "grey", mcolor(190, 190, 190) },
+        { "light", mcolor(211, 211, 211) },
+        { "lightgrey", mcolor(211, 211, 211) },
+        { "light", mcolor(211, 211, 211) },
+        { "lightgray", mcolor(211, 211, 211) },
+        { "midnight", mcolor(25, 25, 112) },
+        { "midnightblue", mcolor(25, 25, 112) },
+        { "navy", mcolor(0, 0, 128) },
+        { "navy", mcolor(0, 0, 128) },
+        { "navyblue", mcolor(0, 0, 128) },
+        { "cornflower", mcolor(100, 149, 237) },
+        { "cornflowerblue", mcolor(100, 149, 237) },
+        { "dark", mcolor(72, 61, 139) },
+        { "darkslateblue", mcolor(72, 61, 139) },
+        { "slate", mcolor(106, 90, 205) },
+        { "slateblue", mcolor(106, 90, 205) },
+        { "medium", mcolor(123, 104, 238) },
+        { "mediumslateblue", mcolor(123, 104, 238) },
+        { "light", mcolor(132, 112, 255) },
+        { "lightslateblue", mcolor(132, 112, 255) },
+        { "medium", mcolor(0, 0, 205) },
+        { "mediumblue", mcolor(0, 0, 205) },
+        { "royal", mcolor(65, 105, 225) },
+        { "royalblue", mcolor(65, 105, 225) },
+        { "blue", mcolor(0, 0, 255) },
+        { "dodger", mcolor(30, 144, 255) },
+        { "dodgerblue", mcolor(30, 144, 255) },
+        { "deep", mcolor(0, 191, 255) },
+        { "deepskyblue", mcolor(0, 191, 255) },
+        { "sky", mcolor(135, 206, 235) },
+        { "skyblue", mcolor(135, 206, 235) },
+        { "light", mcolor(135, 206, 250) },
+        { "lightskyblue", mcolor(135, 206, 250) },
+        { "steel", mcolor(70, 130, 180) },
+        { "steelblue", mcolor(70, 130, 180) },
+        { "light", mcolor(176, 196, 222) },
+        { "lightsteelblue", mcolor(176, 196, 222) },
+        { "light", mcolor(173, 216, 230) },
+        { "lightblue", mcolor(173, 216, 230) },
+        { "powder", mcolor(176, 224, 230) },
+        { "powderblue", mcolor(176, 224, 230) },
+        { "pale", mcolor(175, 238, 238) },
+        { "paleturquoise", mcolor(175, 238, 238) },
+        { "dark", mcolor(0, 206, 209) },
+        { "darkturquoise", mcolor(0, 206, 209) },
+        { "medium", mcolor(72, 209, 204) },
+        { "mediumturquoise", mcolor(72, 209, 204) },
+        { "turquoise", mcolor(64, 224, 208) },
+        { "cyan", mcolor(0, 255, 255) },
+        { "light", mcolor(224, 255, 255) },
+        { "lightcyan", mcolor(224, 255, 255) },
+        { "cadet", mcolor(95, 158, 160) },
+        { "cadetblue", mcolor(95, 158, 160) },
+        { "medium", mcolor(102, 205, 170) },
+        { "mediumaquamarine", mcolor(102, 205, 170) },
+        { "aquamarine", mcolor(127, 255, 212) },
+        { "dark", mcolor(0, 100, 0) },
+        { "darkgreen", mcolor(0, 100, 0) },
+        { "dark", mcolor(85, 107, 47) },
+        { "darkolivegreen", mcolor(85, 107, 47) },
+        { "dark", mcolor(143, 188, 143) },
+        { "darkseagreen", mcolor(143, 188, 143) },
+        { "sea", mcolor(46, 139, 87) },
+        { "seagreen", mcolor(46, 139, 87) },
+        { "medium", mcolor(60, 179, 113) },
+        { "mediumseagreen", mcolor(60, 179, 113) },
+        { "light", mcolor(32, 178, 170) },
+        { "lightseagreen", mcolor(32, 178, 170) },
+        { "pale", mcolor(152, 251, 152) },
+        { "palegreen", mcolor(152, 251, 152) },
+        { "spring", mcolor(0, 255, 127) },
+        { "springgreen", mcolor(0, 255, 127) },
+        { "lawn", mcolor(124, 252, 0) },
+        { "lawngreen", mcolor(124, 252, 0) },
+        { "green", mcolor(0, 255, 0) },
+        { "chartreuse", mcolor(127, 255, 0) },
+        { "medium", mcolor(0, 250, 154) },
+        { "mediumspringgreen", mcolor(0, 250, 154) },
+        { "green", mcolor(173, 255, 47) },
+        { "greenyellow", mcolor(173, 255, 47) },
+        { "lime", mcolor(50, 205, 50) },
+        { "limegreen", mcolor(50, 205, 50) },
+        { "yellow", mcolor(154, 205, 50) },
+        { "yellowgreen", mcolor(154, 205, 50) },
+        { "forest", mcolor(34, 139, 34) },
+        { "forestgreen", mcolor(34, 139, 34) },
+        { "olive", mcolor(107, 142, 35) },
+        { "olivedrab", mcolor(107, 142, 35) },
+        { "dark", mcolor(189, 183, 107) },
+        { "darkkhaki", mcolor(189, 183, 107) },
+        { "khaki", mcolor(240, 230, 140) },
+        { "pale", mcolor(238, 232, 170) },
+        { "palegoldenrod", mcolor(238, 232, 170) },
+        { "light", mcolor(250, 250, 210) },
+        { "lightgoldenrodyellow", mcolor(250, 250, 210) },
+        { "light", mcolor(255, 255, 224) },
+        { "lightyellow", mcolor(255, 255, 224) },
+        { "yellow", mcolor(255, 255, 0) },
+        { "gold", mcolor(255, 215, 0) },
+        { "light", mcolor(238, 221, 130) },
+        { "lightgoldenrod", mcolor(238, 221, 130) },
+        { "goldenrod", mcolor(218, 165, 32) },
+        { "dark", mcolor(184, 134, 11) },
+        { "darkgoldenrod", mcolor(184, 134, 11) },
+        { "rosy", mcolor(188, 143, 143) },
+        { "rosybrown", mcolor(188, 143, 143) },
+        { "indian", mcolor(205, 92, 92) },
+        { "indianred", mcolor(205, 92, 92) },
+        { "saddle", mcolor(139, 69, 19) },
+        { "saddlebrown", mcolor(139, 69, 19) },
+        { "sienna", mcolor(160, 82, 45) },
+        { "peru", mcolor(205, 133, 63) },
+        { "burlywood", mcolor(222, 184, 135) },
+        { "beige", mcolor(245, 245, 220) },
+        { "wheat", mcolor(245, 222, 179) },
+        { "sandy", mcolor(244, 164, 96) },
+        { "sandybrown", mcolor(244, 164, 96) },
+        { "tan", mcolor(210, 180, 140) },
+        { "chocolate", mcolor(210, 105, 30) },
+        { "firebrick", mcolor(178, 34, 34) },
+        { "brown", mcolor(165, 42, 42) },
+        { "dark", mcolor(233, 150, 122) },
+        { "darksalmon", mcolor(233, 150, 122) },
+        { "salmon", mcolor(250, 128, 114) },
+        { "light", mcolor(255, 160, 122) },
+        { "lightsalmon", mcolor(255, 160, 122) },
+        { "orange", mcolor(255, 165, 0) },
+        { "dark", mcolor(255, 140, 0) },
+        { "darkorange", mcolor(255, 140, 0) },
+        { "coral", mcolor(255, 127, 80) },
+        { "light", mcolor(240, 128, 128) },
+        { "lightcoral", mcolor(240, 128, 128) },
+        { "tomato", mcolor(255, 99, 71) },
+        { "orange", mcolor(255, 69, 0) },
+        { "orangered", mcolor(255, 69, 0) },
+        { "red", mcolor(255, 0, 0) },
+        { "hot", mcolor(255, 105, 180) },
+        { "hotpink", mcolor(255, 105, 180) },
+        { "deep", mcolor(255, 20, 147) },
+        { "deeppink", mcolor(255, 20, 147) },
+        { "pink", mcolor(255, 192, 203) },
+        { "light", mcolor(255, 182, 193) },
+        { "lightpink", mcolor(255, 182, 193) },
+        { "pale", mcolor(219, 112, 147) },
+        { "palevioletred", mcolor(219, 112, 147) },
+        { "maroon", mcolor(176, 48, 96) },
+        { "medium", mcolor(199, 21, 133) },
+        { "mediumvioletred", mcolor(199, 21, 133) },
+        { "violet", mcolor(208, 32, 144) },
+        { "violetred", mcolor(208, 32, 144) },
+        { "magenta", mcolor(255, 0, 255) },
+        { "violet", mcolor(238, 130, 238) },
+        { "plum", mcolor(221, 160, 221) },
+        { "orchid", mcolor(218, 112, 214) },
+        { "medium", mcolor(186, 85, 211) },
+        { "mediumorchid", mcolor(186, 85, 211) },
+        { "dark", mcolor(153, 50, 204) },
+        { "darkorchid", mcolor(153, 50, 204) },
+        { "dark", mcolor(148, 0, 211) },
+        { "darkviolet", mcolor(148, 0, 211) },
+        { "blue", mcolor(138, 43, 226) },
+        { "blueviolet", mcolor(138, 43, 226) },
+        { "purple", mcolor(160, 32, 240) },
+        { "medium", mcolor(147, 112, 219) },
+        { "mediumpurple", mcolor(147, 112, 219) },
+        { "thistle", mcolor(216, 191, 216) },
+        { "snow1", mcolor(255, 250, 250) },
+        { "snow2", mcolor(238, 233, 233) },
+        { "snow3", mcolor(205, 201, 201) },
+        { "snow4", mcolor(139, 137, 137) },
+        { "seashell1", mcolor(255, 245, 238) },
+        { "seashell2", mcolor(238, 229, 222) },
+        { "seashell3", mcolor(205, 197, 191) },
+        { "seashell4", mcolor(139, 134, 130) },
+        { "antiquewhite1", mcolor(255, 239, 219) },
+        { "antiquewhite2", mcolor(238, 223, 204) },
+        { "antiquewhite3", mcolor(205, 192, 176) },
+        { "antiquewhite4", mcolor(139, 131, 120) },
+        { "bisque1", mcolor(255, 228, 196) },
+        { "bisque2", mcolor(238, 213, 183) },
+        { "bisque3", mcolor(205, 183, 158) },
+        { "bisque4", mcolor(139, 125, 107) },
+        { "peachpuff1", mcolor(255, 218, 185) },
+        { "peachpuff2", mcolor(238, 203, 173) },
+        { "peachpuff3", mcolor(205, 175, 149) },
+        { "peachpuff4", mcolor(139, 119, 101) },
+        { "navajowhite1", mcolor(255, 222, 173) },
+        { "navajowhite2", mcolor(238, 207, 161) },
+        { "navajowhite3", mcolor(205, 179, 139) },
+        { "navajowhite4", mcolor(139, 121, 94) },
+        { "lemonchiffon1", mcolor(255, 250, 205) },
+        { "lemonchiffon2", mcolor(238, 233, 191) },
+        { "lemonchiffon3", mcolor(205, 201, 165) },
+        { "lemonchiffon4", mcolor(139, 137, 112) },
+        { "cornsilk1", mcolor(255, 248, 220) },
+        { "cornsilk2", mcolor(238, 232, 205) },
+        { "cornsilk3", mcolor(205, 200, 177) },
+        { "cornsilk4", mcolor(139, 136, 120) },
+        { "ivory1", mcolor(255, 255, 240) },
+        { "ivory2", mcolor(238, 238, 224) },
+        { "ivory3", mcolor(205, 205, 193) },
+        { "ivory4", mcolor(139, 139, 131) },
+        { "honeydew1", mcolor(240, 255, 240) },
+        { "honeydew2", mcolor(224, 238, 224) },
+        { "honeydew3", mcolor(193, 205, 193) },
+        { "honeydew4", mcolor(131, 139, 131) },
+        { "lavenderblush1", mcolor(255, 240, 245) },
+        { "lavenderblush2", mcolor(238, 224, 229) },
+        { "lavenderblush3", mcolor(205, 193, 197) },
+        { "lavenderblush4", mcolor(139, 131, 134) },
+        { "mistyrose1", mcolor(255, 228, 225) },
+        { "mistyrose2", mcolor(238, 213, 210) },
+        { "mistyrose3", mcolor(205, 183, 181) },
+        { "mistyrose4", mcolor(139, 125, 123) },
+        { "azure1", mcolor(240, 255, 255) },
+        { "azure2", mcolor(224, 238, 238) },
+        { "azure3", mcolor(193, 205, 205) },
+        { "azure4", mcolor(131, 139, 139) },
+        { "slateblue1", mcolor(131, 111, 255) },
+        { "slateblue2", mcolor(122, 103, 238) },
+        { "slateblue3", mcolor(105, 89, 205) },
+        { "slateblue4", mcolor(71, 60, 139) },
+        { "royalblue1", mcolor(72, 118, 255) },
+        { "royalblue2", mcolor(67, 110, 238) },
+        { "royalblue3", mcolor(58, 95, 205) },
+        { "royalblue4", mcolor(39, 64, 139) },
+        { "blue1", mcolor(0, 0, 255) },
+        { "blue2", mcolor(0, 0, 238) },
+        { "blue3", mcolor(0, 0, 205) },
+        { "blue4", mcolor(0, 0, 139) },
+        { "dodgerblue1", mcolor(30, 144, 255) },
+        { "dodgerblue2", mcolor(28, 134, 238) },
+        { "dodgerblue3", mcolor(24, 116, 205) },
+        { "dodgerblue4", mcolor(16, 78, 139) },
+        { "steelblue1", mcolor(99, 184, 255) },
+        { "steelblue2", mcolor(92, 172, 238) },
+        { "steelblue3", mcolor(79, 148, 205) },
+        { "steelblue4", mcolor(54, 100, 139) },
+        { "deepskyblue1", mcolor(0, 191, 255) },
+        { "deepskyblue2", mcolor(0, 178, 238) },
+        { "deepskyblue3", mcolor(0, 154, 205) },
+        { "deepskyblue4", mcolor(0, 104, 139) },
+        { "skyblue1", mcolor(135, 206, 255) },
+        { "skyblue2", mcolor(126, 192, 238) },
+        { "skyblue3", mcolor(108, 166, 205) },
+        { "skyblue4", mcolor(74, 112, 139) },
+        { "lightskyblue1", mcolor(176, 226, 255) },
+        { "lightskyblue2", mcolor(164, 211, 238) },
+        { "lightskyblue3", mcolor(141, 182, 205) },
+        { "lightskyblue4", mcolor(96, 123, 139) },
+        { "slategray1", mcolor(198, 226, 255) },
+        { "slategray2", mcolor(185, 211, 238) },
+        { "slategray3", mcolor(159, 182, 205) },
+        { "slategray4", mcolor(108, 123, 139) },
+        { "lightsteelblue1", mcolor(202, 225, 255) },
+        { "lightsteelblue2", mcolor(188, 210, 238) },
+        { "lightsteelblue3", mcolor(162, 181, 205) },
+        { "lightsteelblue4", mcolor(110, 123, 139) },
+        { "lightblue1", mcolor(191, 239, 255) },
+        { "lightblue2", mcolor(178, 223, 238) },
+        { "lightblue3", mcolor(154, 192, 205) },
+        { "lightblue4", mcolor(104, 131, 139) },
+        { "lightcyan1", mcolor(224, 255, 255) },
+        { "lightcyan2", mcolor(209, 238, 238) },
+        { "lightcyan3", mcolor(180, 205, 205) },
+        { "lightcyan4", mcolor(122, 139, 139) },
+        { "paleturquoise1", mcolor(187, 255, 255) },
+        { "paleturquoise2", mcolor(174, 238, 238) },
+        { "paleturquoise3", mcolor(150, 205, 205) },
+        { "paleturquoise4", mcolor(102, 139, 139) },
+        { "cadetblue1", mcolor(152, 245, 255) },
+        { "cadetblue2", mcolor(142, 229, 238) },
+        { "cadetblue3", mcolor(122, 197, 205) },
+        { "cadetblue4", mcolor(83, 134, 139) },
+        { "turquoise1", mcolor(0, 245, 255) },
+        { "turquoise2", mcolor(0, 229, 238) },
+        { "turquoise3", mcolor(0, 197, 205) },
+        { "turquoise4", mcolor(0, 134, 139) },
+        { "cyan1", mcolor(0, 255, 255) },
+        { "cyan2", mcolor(0, 238, 238) },
+        { "cyan3", mcolor(0, 205, 205) },
+        { "cyan4", mcolor(0, 139, 139) },
+        { "darkslategray1", mcolor(151, 255, 255) },
+        { "darkslategray2", mcolor(141, 238, 238) },
+        { "darkslategray3", mcolor(121, 205, 205) },
+        { "darkslategray4", mcolor(82, 139, 139) },
+        { "aquamarine1", mcolor(127, 255, 212) },
+        { "aquamarine2", mcolor(118, 238, 198) },
+        { "aquamarine3", mcolor(102, 205, 170) },
+        { "aquamarine4", mcolor(69, 139, 116) },
+        { "darkseagreen1", mcolor(193, 255, 193) },
+        { "darkseagreen2", mcolor(180, 238, 180) },
+        { "darkseagreen3", mcolor(155, 205, 155) },
+        { "darkseagreen4", mcolor(105, 139, 105) },
+        { "seagreen1", mcolor(84, 255, 159) },
+        { "seagreen2", mcolor(78, 238, 148) },
+        { "seagreen3", mcolor(67, 205, 128) },
+        { "seagreen4", mcolor(46, 139, 87) },
+        { "palegreen1", mcolor(154, 255, 154) },
+        { "palegreen2", mcolor(144, 238, 144) },
+        { "palegreen3", mcolor(124, 205, 124) },
+        { "palegreen4", mcolor(84, 139, 84) },
+        { "springgreen1", mcolor(0, 255, 127) },
+        { "springgreen2", mcolor(0, 238, 118) },
+        { "springgreen3", mcolor(0, 205, 102) },
+        { "springgreen4", mcolor(0, 139, 69) },
+        { "green1", mcolor(0, 255, 0) },
+        { "green2", mcolor(0, 238, 0) },
+        { "green3", mcolor(0, 205, 0) },
+        { "green4", mcolor(0, 139, 0) },
+        { "chartreuse1", mcolor(127, 255, 0) },
+        { "chartreuse2", mcolor(118, 238, 0) },
+        { "chartreuse3", mcolor(102, 205, 0) },
+        { "chartreuse4", mcolor(69, 139, 0) },
+        { "olivedrab1", mcolor(192, 255, 62) },
+        { "olivedrab2", mcolor(179, 238, 58) },
+        { "olivedrab3", mcolor(154, 205, 50) },
+        { "olivedrab4", mcolor(105, 139, 34) },
+        { "darkolivegreen1", mcolor(202, 255, 112) },
+        { "darkolivegreen2", mcolor(188, 238, 104) },
+        { "darkolivegreen3", mcolor(162, 205, 90) },
+        { "darkolivegreen4", mcolor(110, 139, 61) },
+        { "khaki1", mcolor(255, 246, 143) },
+        { "khaki2", mcolor(238, 230, 133) },
+        { "khaki3", mcolor(205, 198, 115) },
+        { "khaki4", mcolor(139, 134, 78) },
+        { "lightgoldenrod1", mcolor(255, 236, 139) },
+        { "lightgoldenrod2", mcolor(238, 220, 130) },
+        { "lightgoldenrod3", mcolor(205, 190, 112) },
+        { "lightgoldenrod4", mcolor(139, 129, 76) },
+        { "lightyellow1", mcolor(255, 255, 224) },
+        { "lightyellow2", mcolor(238, 238, 209) },
+        { "lightyellow3", mcolor(205, 205, 180) },
+        { "lightyellow4", mcolor(139, 139, 122) },
+        { "yellow1", mcolor(255, 255, 0) },
+        { "yellow2", mcolor(238, 238, 0) },
+        { "yellow3", mcolor(205, 205, 0) },
+        { "yellow4", mcolor(139, 139, 0) },
+        { "gold1", mcolor(255, 215, 0) },
+        { "gold2", mcolor(238, 201, 0) },
+        { "gold3", mcolor(205, 173, 0) },
+        { "gold4", mcolor(139, 117, 0) },
+        { "goldenrod1", mcolor(255, 193, 37) },
+        { "goldenrod2", mcolor(238, 180, 34) },
+        { "goldenrod3", mcolor(205, 155, 29) },
+        { "goldenrod4", mcolor(139, 105, 20) },
+        { "darkgoldenrod1", mcolor(255, 185, 15) },
+        { "darkgoldenrod2", mcolor(238, 173, 14) },
+        { "darkgoldenrod3", mcolor(205, 149, 12) },
+        { "darkgoldenrod4", mcolor(139, 101, 8) },
+        { "rosybrown1", mcolor(255, 193, 193) },
+        { "rosybrown2", mcolor(238, 180, 180) },
+        { "rosybrown3", mcolor(205, 155, 155) },
+        { "rosybrown4", mcolor(139, 105, 105) },
+        { "indianred1", mcolor(255, 106, 106) },
+        { "indianred2", mcolor(238, 99, 99) },
+        { "indianred3", mcolor(205, 85, 85) },
+        { "indianred4", mcolor(139, 58, 58) },
+        { "sienna1", mcolor(255, 130, 71) },
+        { "sienna2", mcolor(238, 121, 66) },
+        { "sienna3", mcolor(205, 104, 57) },
+        { "sienna4", mcolor(139, 71, 38) },
+        { "burlywood1", mcolor(255, 211, 155) },
+        { "burlywood2", mcolor(238, 197, 145) },
+        { "burlywood3", mcolor(205, 170, 125) },
+        { "burlywood4", mcolor(139, 115, 85) },
+        { "wheat1", mcolor(255, 231, 186) },
+        { "wheat2", mcolor(238, 216, 174) },
+        { "wheat3", mcolor(205, 186, 150) },
+        { "wheat4", mcolor(139, 126, 102) },
+        { "tan1", mcolor(255, 165, 79) },
+        { "tan2", mcolor(238, 154, 73) },
+        { "tan3", mcolor(205, 133, 63) },
+        { "tan4", mcolor(139, 90, 43) },
+        { "chocolate1", mcolor(255, 127, 36) },
+        { "chocolate2", mcolor(238, 118, 33) },
+        { "chocolate3", mcolor(205, 102, 29) },
+        { "chocolate4", mcolor(139, 69, 19) },
+        { "firebrick1", mcolor(255, 48, 48) },
+        { "firebrick2", mcolor(238, 44, 44) },
+        { "firebrick3", mcolor(205, 38, 38) },
+        { "firebrick4", mcolor(139, 26, 26) },
+        { "brown1", mcolor(255, 64, 64) },
+        { "brown2", mcolor(238, 59, 59) },
+        { "brown3", mcolor(205, 51, 51) },
+        { "brown4", mcolor(139, 35, 35) },
+        { "salmon1", mcolor(255, 140, 105) },
+        { "salmon2", mcolor(238, 130, 98) },
+        { "salmon3", mcolor(205, 112, 84) },
+        { "salmon4", mcolor(139, 76, 57) },
+        { "lightsalmon1", mcolor(255, 160, 122) },
+        { "lightsalmon2", mcolor(238, 149, 114) },
+        { "lightsalmon3", mcolor(205, 129, 98) },
+        { "lightsalmon4", mcolor(139, 87, 66) },
+        { "orange1", mcolor(255, 165, 0) },
+        { "orange2", mcolor(238, 154, 0) },
+        { "orange3", mcolor(205, 133, 0) },
+        { "orange4", mcolor(139, 90, 0) },
+        { "darkorange1", mcolor(255, 127, 0) },
+        { "darkorange2", mcolor(238, 118, 0) },
+        { "darkorange3", mcolor(205, 102, 0) },
+        { "darkorange4", mcolor(139, 69, 0) },
+        { "coral1", mcolor(255, 114, 86) },
+        { "coral2", mcolor(238, 106, 80) },
+        { "coral3", mcolor(205, 91, 69) },
+        { "coral4", mcolor(139, 62, 47) },
+        { "tomato1", mcolor(255, 99, 71) },
+        { "tomato2", mcolor(238, 92, 66) },
+        { "tomato3", mcolor(205, 79, 57) },
+        { "tomato4", mcolor(139, 54, 38) },
+        { "orangered1", mcolor(255, 69, 0) },
+        { "orangered2", mcolor(238, 64, 0) },
+        { "orangered3", mcolor(205, 55, 0) },
+        { "orangered4", mcolor(139, 37, 0) },
+        { "red1", mcolor(255, 0, 0) },
+        { "red2", mcolor(238, 0, 0) },
+        { "red3", mcolor(205, 0, 0) },
+        { "red4", mcolor(139, 0, 0) },
+        { "deeppink1", mcolor(255, 20, 147) },
+        { "deeppink2", mcolor(238, 18, 137) },
+        { "deeppink3", mcolor(205, 16, 118) },
+        { "deeppink4", mcolor(139, 10, 80) },
+        { "hotpink1", mcolor(255, 110, 180) },
+        { "hotpink2", mcolor(238, 106, 167) },
+        { "hotpink3", mcolor(205, 96, 144) },
+        { "hotpink4", mcolor(139, 58, 98) },
+        { "pink1", mcolor(255, 181, 197) },
+        { "pink2", mcolor(238, 169, 184) },
+        { "pink3", mcolor(205, 145, 158) },
+        { "pink4", mcolor(139, 99, 108) },
+        { "lightpink1", mcolor(255, 174, 185) },
+        { "lightpink2", mcolor(238, 162, 173) },
+        { "lightpink3", mcolor(205, 140, 149) },
+        { "lightpink4", mcolor(139, 95, 101) },
+        { "palevioletred1", mcolor(255, 130, 171) },
+        { "palevioletred2", mcolor(238, 121, 159) },
+        { "palevioletred3", mcolor(205, 104, 137) },
+        { "palevioletred4", mcolor(139, 71, 93) },
+        { "maroon1", mcolor(255, 52, 179) },
+        { "maroon2", mcolor(238, 48, 167) },
+        { "maroon3", mcolor(205, 41, 144) },
+        { "maroon4", mcolor(139, 28, 98) },
+        { "violetred1", mcolor(255, 62, 150) },
+        { "violetred2", mcolor(238, 58, 140) },
+        { "violetred3", mcolor(205, 50, 120) },
+        { "violetred4", mcolor(139, 34, 82) },
+        { "magenta1", mcolor(255, 0, 255) },
+        { "magenta2", mcolor(238, 0, 238) },
+        { "magenta3", mcolor(205, 0, 205) },
+        { "magenta4", mcolor(139, 0, 139) },
+        { "orchid1", mcolor(255, 131, 250) },
+        { "orchid2", mcolor(238, 122, 233) },
+        { "orchid3", mcolor(205, 105, 201) },
+        { "orchid4", mcolor(139, 71, 137) },
+        { "plum1", mcolor(255, 187, 255) },
+        { "plum2", mcolor(238, 174, 238) },
+        { "plum3", mcolor(205, 150, 205) },
+        { "plum4", mcolor(139, 102, 139) },
+        { "mediumorchid1", mcolor(224, 102, 255) },
+        { "mediumorchid2", mcolor(209, 95, 238) },
+        { "mediumorchid3", mcolor(180, 82, 205) },
+        { "mediumorchid4", mcolor(122, 55, 139) },
+        { "darkorchid1", mcolor(191, 62, 255) },
+        { "darkorchid2", mcolor(178, 58, 238) },
+        { "darkorchid3", mcolor(154, 50, 205) },
+        { "darkorchid4", mcolor(104, 34, 139) },
+        { "purple1", mcolor(155, 48, 255) },
+        { "purple2", mcolor(145, 44, 238) },
+        { "purple3", mcolor(125, 38, 205) },
+        { "purple4", mcolor(85, 26, 139) },
+        { "mediumpurple1", mcolor(171, 130, 255) },
+        { "mediumpurple2", mcolor(159, 121, 238) },
+        { "mediumpurple3", mcolor(137, 104, 205) },
+        { "mediumpurple4", mcolor(93, 71, 139) },
+        { "thistle1", mcolor(255, 225, 255) },
+        { "thistle2", mcolor(238, 210, 238) },
+        { "thistle3", mcolor(205, 181, 205) },
+        { "thistle4", mcolor(139, 123, 139) },
+        { "gray0", mcolor(0, 0, 0) },
+        { "grey0", mcolor(0, 0, 0) },
+        { "gray1", mcolor(3, 3, 3) },
+        { "grey1", mcolor(3, 3, 3) },
+        { "gray2", mcolor(5, 5, 5) },
+        { "grey2", mcolor(5, 5, 5) },
+        { "gray3", mcolor(8, 8, 8) },
+        { "grey3", mcolor(8, 8, 8) },
+        { "gray4", mcolor(10, 10, 10) },
+        { "grey4", mcolor(10, 10, 10) },
+        { "gray5", mcolor(13, 13, 13) },
+        { "grey5", mcolor(13, 13, 13) },
+        { "gray6", mcolor(15, 15, 15) },
+        { "grey6", mcolor(15, 15, 15) },
+        { "gray7", mcolor(18, 18, 18) },
+        { "grey7", mcolor(18, 18, 18) },
+        { "gray8", mcolor(20, 20, 20) },
+        { "grey8", mcolor(20, 20, 20) },
+        { "gray9", mcolor(23, 23, 23) },
+        { "grey9", mcolor(23, 23, 23) },
+        { "gray10", mcolor(26, 26, 26) },
+        { "grey10", mcolor(26, 26, 26) },
+        { "gray11", mcolor(28, 28, 28) },
+        { "grey11", mcolor(28, 28, 28) },
+        { "gray12", mcolor(31, 31, 31) },
+        { "grey12", mcolor(31, 31, 31) },
+        { "gray13", mcolor(33, 33, 33) },
+        { "grey13", mcolor(33, 33, 33) },
+        { "gray14", mcolor(36, 36, 36) },
+        { "grey14", mcolor(36, 36, 36) },
+        { "gray15", mcolor(38, 38, 38) },
+        { "grey15", mcolor(38, 38, 38) },
+        { "gray16", mcolor(41, 41, 41) },
+        { "grey16", mcolor(41, 41, 41) },
+        { "gray17", mcolor(43, 43, 43) },
+        { "grey17", mcolor(43, 43, 43) },
+        { "gray18", mcolor(46, 46, 46) },
+        { "grey18", mcolor(46, 46, 46) },
+        { "gray19", mcolor(48, 48, 48) },
+        { "grey19", mcolor(48, 48, 48) },
+        { "gray20", mcolor(51, 51, 51) },
+        { "grey20", mcolor(51, 51, 51) },
+        { "gray21", mcolor(54, 54, 54) },
+        { "grey21", mcolor(54, 54, 54) },
+        { "gray22", mcolor(56, 56, 56) },
+        { "grey22", mcolor(56, 56, 56) },
+        { "gray23", mcolor(59, 59, 59) },
+        { "grey23", mcolor(59, 59, 59) },
+        { "gray24", mcolor(61, 61, 61) },
+        { "grey24", mcolor(61, 61, 61) },
+        { "gray25", mcolor(64, 64, 64) },
+        { "grey25", mcolor(64, 64, 64) },
+        { "gray26", mcolor(66, 66, 66) },
+        { "grey26", mcolor(66, 66, 66) },
+        { "gray27", mcolor(69, 69, 69) },
+        { "grey27", mcolor(69, 69, 69) },
+        { "gray28", mcolor(71, 71, 71) },
+        { "grey28", mcolor(71, 71, 71) },
+        { "gray29", mcolor(74, 74, 74) },
+        { "grey29", mcolor(74, 74, 74) },
+        { "gray30", mcolor(77, 77, 77) },
+        { "grey30", mcolor(77, 77, 77) },
+        { "gray31", mcolor(79, 79, 79) },
+        { "grey31", mcolor(79, 79, 79) },
+        { "gray32", mcolor(82, 82, 82) },
+        { "grey32", mcolor(82, 82, 82) },
+        { "gray33", mcolor(84, 84, 84) },
+        { "grey33", mcolor(84, 84, 84) },
+        { "gray34", mcolor(87, 87, 87) },
+        { "grey34", mcolor(87, 87, 87) },
+        { "gray35", mcolor(89, 89, 89) },
+        { "grey35", mcolor(89, 89, 89) },
+        { "gray36", mcolor(92, 92, 92) },
+        { "grey36", mcolor(92, 92, 92) },
+        { "gray37", mcolor(94, 94, 94) },
+        { "grey37", mcolor(94, 94, 94) },
+        { "gray38", mcolor(97, 97, 97) },
+        { "grey38", mcolor(97, 97, 97) },
+        { "gray39", mcolor(99, 99, 99) },
+        { "grey39", mcolor(99, 99, 99) },
+        { "gray40", mcolor(102, 102, 102) },
+        { "grey40", mcolor(102, 102, 102) },
+        { "gray41", mcolor(105, 105, 105) },
+        { "grey41", mcolor(105, 105, 105) },
+        { "gray42", mcolor(107, 107, 107) },
+        { "grey42", mcolor(107, 107, 107) },
+        { "gray43", mcolor(110, 110, 110) },
+        { "grey43", mcolor(110, 110, 110) },
+        { "gray44", mcolor(112, 112, 112) },
+        { "grey44", mcolor(112, 112, 112) },
+        { "gray45", mcolor(115, 115, 115) },
+        { "grey45", mcolor(115, 115, 115) },
+        { "gray46", mcolor(117, 117, 117) },
+        { "grey46", mcolor(117, 117, 117) },
+        { "gray47", mcolor(120, 120, 120) },
+        { "grey47", mcolor(120, 120, 120) },
+        { "gray48", mcolor(122, 122, 122) },
+        { "grey48", mcolor(122, 122, 122) },
+        { "gray49", mcolor(125, 125, 125) },
+        { "grey49", mcolor(125, 125, 125) },
+        { "gray50", mcolor(127, 127, 127) },
+        { "grey50", mcolor(127, 127, 127) },
+        { "gray51", mcolor(130, 130, 130) },
+        { "grey51", mcolor(130, 130, 130) },
+        { "gray52", mcolor(133, 133, 133) },
+        { "grey52", mcolor(133, 133, 133) },
+        { "gray53", mcolor(135, 135, 135) },
+        { "grey53", mcolor(135, 135, 135) },
+        { "gray54", mcolor(138, 138, 138) },
+        { "grey54", mcolor(138, 138, 138) },
+        { "gray55", mcolor(140, 140, 140) },
+        { "grey55", mcolor(140, 140, 140) },
+        { "gray56", mcolor(143, 143, 143) },
+        { "grey56", mcolor(143, 143, 143) },
+        { "gray57", mcolor(145, 145, 145) },
+        { "grey57", mcolor(145, 145, 145) },
+        { "gray58", mcolor(148, 148, 148) },
+        { "grey58", mcolor(148, 148, 148) },
+        { "gray59", mcolor(150, 150, 150) },
+        { "grey59", mcolor(150, 150, 150) },
+        { "gray60", mcolor(153, 153, 153) },
+        { "grey60", mcolor(153, 153, 153) },
+        { "gray61", mcolor(156, 156, 156) },
+        { "grey61", mcolor(156, 156, 156) },
+        { "gray62", mcolor(158, 158, 158) },
+        { "grey62", mcolor(158, 158, 158) },
+        { "gray63", mcolor(161, 161, 161) },
+        { "grey63", mcolor(161, 161, 161) },
+        { "gray64", mcolor(163, 163, 163) },
+        { "grey64", mcolor(163, 163, 163) },
+        { "gray65", mcolor(166, 166, 166) },
+        { "grey65", mcolor(166, 166, 166) },
+        { "gray66", mcolor(168, 168, 168) },
+        { "grey66", mcolor(168, 168, 168) },
+        { "gray67", mcolor(171, 171, 171) },
+        { "grey67", mcolor(171, 171, 171) },
+        { "gray68", mcolor(173, 173, 173) },
+        { "grey68", mcolor(173, 173, 173) },
+        { "gray69", mcolor(176, 176, 176) },
+        { "grey69", mcolor(176, 176, 176) },
+        { "gray70", mcolor(179, 179, 179) },
+        { "grey70", mcolor(179, 179, 179) },
+        { "gray71", mcolor(181, 181, 181) },
+        { "grey71", mcolor(181, 181, 181) },
+        { "gray72", mcolor(184, 184, 184) },
+        { "grey72", mcolor(184, 184, 184) },
+        { "gray73", mcolor(186, 186, 186) },
+        { "grey73", mcolor(186, 186, 186) },
+        { "gray74", mcolor(189, 189, 189) },
+        { "grey74", mcolor(189, 189, 189) },
+        { "gray75", mcolor(191, 191, 191) },
+        { "grey75", mcolor(191, 191, 191) },
+        { "gray76", mcolor(194, 194, 194) },
+        { "grey76", mcolor(194, 194, 194) },
+        { "gray77", mcolor(196, 196, 196) },
+        { "grey77", mcolor(196, 196, 196) },
+        { "gray78", mcolor(199, 199, 199) },
+        { "grey78", mcolor(199, 199, 199) },
+        { "gray79", mcolor(201, 201, 201) },
+        { "grey79", mcolor(201, 201, 201) },
+        { "gray80", mcolor(204, 204, 204) },
+        { "grey80", mcolor(204, 204, 204) },
+        { "gray81", mcolor(207, 207, 207) },
+        { "grey81", mcolor(207, 207, 207) },
+        { "gray82", mcolor(209, 209, 209) },
+        { "grey82", mcolor(209, 209, 209) },
+        { "gray83", mcolor(212, 212, 212) },
+        { "grey83", mcolor(212, 212, 212) },
+        { "gray84", mcolor(214, 214, 214) },
+        { "grey84", mcolor(214, 214, 214) },
+        { "gray85", mcolor(217, 217, 217) },
+        { "grey85", mcolor(217, 217, 217) },
+        { "gray86", mcolor(219, 219, 219) },
+        { "grey86", mcolor(219, 219, 219) },
+        { "gray87", mcolor(222, 222, 222) },
+        { "grey87", mcolor(222, 222, 222) },
+        { "gray88", mcolor(224, 224, 224) },
+        { "grey88", mcolor(224, 224, 224) },
+        { "gray89", mcolor(227, 227, 227) },
+        { "grey89", mcolor(227, 227, 227) },
+        { "gray90", mcolor(229, 229, 229) },
+        { "grey90", mcolor(229, 229, 229) },
+        { "gray91", mcolor(232, 232, 232) },
+        { "grey91", mcolor(232, 232, 232) },
+        { "gray92", mcolor(235, 235, 235) },
+        { "grey92", mcolor(235, 235, 235) },
+        { "gray93", mcolor(237, 237, 237) },
+        { "grey93", mcolor(237, 237, 237) },
+        { "gray94", mcolor(240, 240, 240) },
+        { "grey94", mcolor(240, 240, 240) },
+        { "gray95", mcolor(242, 242, 242) },
+        { "grey95", mcolor(242, 242, 242) },
+        { "gray96", mcolor(245, 245, 245) },
+        { "grey96", mcolor(245, 245, 245) },
+        { "gray97", mcolor(247, 247, 247) },
+        { "grey97", mcolor(247, 247, 247) },
+        { "gray98", mcolor(250, 250, 250) },
+        { "grey98", mcolor(250, 250, 250) },
+        { "gray99", mcolor(252, 252, 252) },
+        { "grey99", mcolor(252, 252, 252) },
+        { "gray100", mcolor(255, 255, 255) },
+        { "grey100", mcolor(255, 255, 255) },
+        { "dark", mcolor(169, 169, 169) },
+        { "darkgrey", mcolor(169, 169, 169) },
+        { "dark", mcolor(169, 169, 169) },
+        { "darkgray", mcolor(169, 169, 169) },
+        { "dark", mcolor(0, 0, 139) },
+        { "darkblue", mcolor(0, 0, 139) },
+        { "dark", mcolor(0, 139, 139) },
+        { "darkcyan", mcolor(0, 139, 139) },
+        { "dark", mcolor(139, 0, 139) },
+        { "darkmagenta", mcolor(139, 0, 139) },
+        { "dark", mcolor(139, 0, 0) },
+        { "darkred", mcolor(139, 0, 0) },
+        { "light", mcolor(144, 238, 144) },
+        { "lightgreen", mcolor(144, 238, 144) } 
+        };
+
+        for (unsigned int i = 0; i < (sizeof(cmap) / sizeof(cmap[0])); i++)
+            x11colormap[QString(cmap[i].name)] = QColor(cmap[i].col.r,
+                                                        cmap[i].col.g,
+                                                        cmap[i].col.b);
     }
 
-    QMap<const char *, mcolor>::const_iterator it = x11colormap.find(color.toLower().toLatin1().constData());
+    QMap<QString, QColor>::const_iterator it = x11colormap.find(color.toLower());
     if (it != x11colormap.end())
-        return QColor(it.value().r, it.value().g, it.value().b);
+    {
+        return it.value();
+    }
 
     return QColor(color);
 }
