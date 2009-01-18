@@ -794,7 +794,6 @@ void VideoSource::fillSelections(SelectSetting* setting)
 void VideoSource::loadByID(int sourceid)
 {
     id->setValue(sourceid);
-    Load();
 }
 
 class VideoDevice : public PathSetting, public CaptureCardDBStorage
