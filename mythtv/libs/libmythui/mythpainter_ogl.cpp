@@ -18,8 +18,8 @@
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"
 
-#define MAX_GL_ITEMS 128
-#define MAX_STRING_ITEMS 48
+#define MAX_GL_ITEMS 256
+#define MAX_STRING_ITEMS 256
 
 #ifndef GL_TEXTURE_RECTANGLE_ARB
 #define GL_TEXTURE_RECTANGLE_ARB 0x84F5
@@ -300,6 +300,8 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
 
         return m_StringToImageMap[incoming];
     }
+
+printf("generating image for: %s\n", incoming.toLocal8Bit().constData());
 
     MythImage *im = GetFormatImage();
 
