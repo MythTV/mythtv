@@ -43,8 +43,6 @@ void MythUIButtonList::Const(void)
     m_active         = false;
     m_drawFromBottom = false;
 
-    m_topItem = 0;
-    m_selItem = 0;
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount = 0;
@@ -118,8 +116,6 @@ void MythUIButtonList::Reset()
 
     m_clearing = false;
 
-    m_topItem     = NULL;
-    m_selItem     = NULL;
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount   = 0;
@@ -150,6 +146,49 @@ void MythUIButtonList::SetPositionArrowStates(void)
     {
         int button = 0;
 
+        // set topitem, top position
+        if (m_selPosition < 0 || m_selPosition > m_itemList.size())
+        {
+            if (m_wrapStyle > WrapNone)
+                m_selPosition = m_itemList.size() - 1;
+            else
+                m_selPosition = 0;
+        }
+
+        switch (m_scrollStyle)
+        {
+            case ScrollCenter:
+                m_topPosition = qMax(m_selPosition - (int)((float)m_itemsVisible / 2), 0);
+                break;
+            case ScrollFree:
+            {
+                int adjust = 0;
+                if (m_topPosition == -1 || m_keepSelAtBottom)
+                {
+                    if (m_topPosition == -1)
+                        m_topPosition = 0;
+                    if (m_layout == LayoutHorizontal)
+                        adjust = 1 - m_itemsVisible;
+                    else
+                        adjust = m_columns - m_itemsVisible;
+                    m_keepSelAtBottom = false;
+                }
+
+                if (m_selPosition < m_topPosition ||
+                    m_topPosition + (int)m_itemsVisible <= m_selPosition)
+                {
+                    if (m_layout == LayoutHorizontal)
+                        m_topPosition = m_selPosition + adjust;
+                    else
+                        m_topPosition = (m_selPosition + adjust) /
+                                        m_columns * m_columns;
+                }
+
+                m_topPosition = qMax(m_topPosition, 0);
+                break;
+            }
+        }    
+
         QList<MythUIButtonListItem*>::iterator it = m_itemList.begin() + m_topPosition;
 
         if (m_scrollStyle == ScrollCenter)
@@ -157,7 +196,8 @@ void MythUIButtonList::SetPositionArrowStates(void)
             if (m_selPosition <= (int)(m_itemsVisible/2))
             {
                 button = (m_itemsVisible / 2) - m_selPosition;
-                if (m_wrapStyle == WrapItems && button > 0)
+                if (m_wrapStyle == WrapItems && button > 0 &&
+                    m_itemCount >= (int)m_itemsVisible)
                 {
                     it = m_itemList.end() - button;
                     button = 0;
@@ -182,16 +222,17 @@ void MythUIButtonList::SetPositionArrowStates(void)
         if (it < m_itemList.begin())
             it = m_itemList.begin();
 
+        int curItem = GetItemPos(*it);
         while (it < m_itemList.end() && button < (int)m_itemsVisible)
         {
             realButton = m_ButtonList[button];
             buttonItem = *it;
 
-            if (!realButton || ! buttonItem)
+            if (!realButton || !buttonItem)
                 break;
 
             bool selected = false;
-            if (!seenSelected && (buttonItem == m_selItem))
+            if (!seenSelected && (curItem == m_selPosition))
             {
                 seenSelected = true;
                 selected = true;
@@ -201,10 +242,18 @@ void MythUIButtonList::SetPositionArrowStates(void)
             buttonItem->SetToRealButton(realButton, selected);
             realButton->SetVisible(true);
 
-            if ((m_wrapStyle == WrapItems) && (it == (m_itemList.end()-1)))
+            if (m_wrapStyle == WrapItems && it == (m_itemList.end()-1) &&
+                m_itemCount >= (int)m_itemsVisible)
+            {
                 it = m_itemList.begin();
+                curItem = 0;
+            }
             else
+            {
                 ++it;
+                ++curItem;
+            }
+
             button++;
         }
 
@@ -223,7 +272,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
     }
     else
     {
-        if (m_topItem != m_itemList.first())
+        if (m_topPosition != 0)
             m_upArrow->DisplayState(MythUIStateType::Full);
         else
             m_upArrow->DisplayState(MythUIStateType::Off);
@@ -244,10 +293,7 @@ void MythUIButtonList::InsertItem(MythUIButtonListItem *item)
 
     if (wasEmpty)
     {
-        m_topItem = item;
-        m_selItem = item;
         m_selPosition = m_topPosition = 0;
-
         emit itemSelected(item);
     }
 
@@ -263,40 +309,18 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     if (curIndex == -1)
         return;
 
-    if (item == m_topItem)
+    if (curIndex == m_topPosition && 
+        m_topPosition > 0 &&
+        m_topPosition == m_itemCount - 1)
     {
-        if (m_topItem != m_itemList.last())
-        {
-            m_topItem = *(m_itemList.begin() + m_topPosition + 1);
-        }
-        else if (m_topItem != m_itemList.first())
-        {
-            --m_topPosition;
-            m_topItem = *(m_itemList.begin() + m_topPosition);
-        }
-        else
-        {
-            m_topItem = NULL;
-            m_topPosition = 0;
-        }
+        m_topPosition--;
     }
 
-    if (item == m_selItem)
+    if (curIndex == m_selPosition &&
+        m_selPosition > 0 &&
+        m_selPosition == m_itemCount - 1)
     {
-        if (m_selItem != m_itemList.last())
-        {
-            m_selItem = *(m_itemList.begin() + m_selPosition + 1);
-        }
-        else if (m_selItem != m_itemList.first())
-        {
-            --m_selPosition;
-            m_selItem = *(m_itemList.begin() + m_selPosition);
-        }
-        else
-        {
-            m_selItem = NULL;
-            m_selPosition = 0;
-        }
+        m_selPosition--;
     }
 
     m_itemList.removeAt(curIndex);
@@ -304,8 +328,10 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
 
     Update();
 
-    if (m_selItem)
-        emit itemSelected(m_selItem);
+    if (m_selPosition < m_itemCount)
+        emit itemSelected(m_itemList.at(m_selPosition));
+    else 
+        emit itemSelected(NULL);
 }
 
 void MythUIButtonList::SetValueByData(QVariant data)
@@ -326,82 +352,53 @@ void MythUIButtonList::SetValueByData(QVariant data)
 
 void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
 {
-    if (!m_initialized)
-        Init();
-
-    if (m_selItem == item)
-        return;
-
-    m_selPosition = m_itemList.indexOf(item);
-
-    if (m_selPosition == -1)
-        m_selPosition = 0;
-
-    m_selItem = m_itemList.at(m_selPosition);
-
-    if (m_itemsVisible == 0)
-        return;
-
-    m_topPosition = 0;
-
-    switch (m_scrollStyle)
-    {
-        case ScrollCenter :
-            while (m_topPosition + (int)((float)m_itemsVisible/2) <
-                        m_selPosition)
-                ++m_topPosition;
-            break;
-        case ScrollFree :
-            if (m_topPosition + (int)m_itemsVisible <= m_selPosition)
-            {
-                if (m_layout == LayoutHorizontal)
-                    m_topPosition = m_selPosition - m_itemsVisible + 1;
-                else
-                    m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
-                                        / m_columns * m_columns;
-
-                m_topPosition = qMax(0, m_topPosition);
-            }
-            break;
-    }
-
-    m_topItem = m_itemList.at(m_topPosition);
-
-    Update();
-
-    emit itemSelected(m_selItem);
+    int newIndex = m_itemList.indexOf(item);
+    SetItemCurrent(newIndex);
 }
 
 void MythUIButtonList::SetItemCurrent(int current)
 {
-    if (current >= m_itemList.size())
+    if (!m_initialized)
+        Init();
+
+    if (current == -1 || current >= m_itemList.size())
         return;
 
-    MythUIButtonListItem* item = m_itemList.at(current);
-    if (!item && !m_itemList.empty())
-        item = m_itemList[0];
+    if (current == m_selPosition)
+        return;
 
-    if (item)
-        SetItemCurrent(item);
+    m_selPosition = current;
+    if (m_itemsVisible == 0)
+        return;
+
+    m_topPosition = -1;
+
+    Update();
+
+    emit itemSelected(GetItemCurrent());
 }
 
 MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
 {
-    return m_selItem;
+    if (m_itemList.isEmpty())
+        return NULL;
+    return m_itemList.at(m_selPosition);
 }
 
 int MythUIButtonList::GetIntValue()
 {
-    if (GetItemCurrent())
-        return GetItemCurrent()->GetText().toInt();
+    MythUIButtonListItem *item = GetItemCurrent();
+    if (item)
+        return item->GetText().toInt();
 
     return 0;
 }
 
 QString MythUIButtonList::GetValue()
 {
-    if (GetItemCurrent())
-        return GetItemCurrent()->GetText();
+    MythUIButtonListItem *item = GetItemCurrent();
+    if (item)
+        return item->GetText();
 
     return QString();
 }
@@ -511,40 +508,11 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
             break;
     }
 
-    if (m_selPosition < 0 || m_selPosition >= m_itemList.size())
-    {
-        if (m_wrapStyle > WrapNone)
-            m_selPosition = m_itemList.size() - 1;
-        else
-            m_selPosition = 0;
-    }
-
-    m_selItem = m_itemList.at(m_selPosition);
-
-    switch (m_scrollStyle)
-    {
-        case ScrollCenter :
-            m_topPosition = qMax(m_selPosition - (int)((float)m_itemsVisible/2), 0);
-            m_topItem = m_itemList.at(m_topPosition);
-            break;
-        case ScrollFree :
-            if (m_selPosition < m_topPosition ||
-                m_topPosition + (int)m_itemsVisible <= m_selPosition)
-            {
-                if (m_layout == LayoutHorizontal)
-                    m_topPosition = m_selPosition;
-                else
-                    m_topPosition = m_selPosition / m_columns * m_columns;
-            }
-            break;
-    }
-
-    m_topItem = m_itemList.at(m_topPosition);
-
-    Update();
-
     if (pos != m_selPosition)
-        emit itemSelected(m_selItem);
+    {
+        Update();
+        emit itemSelected(GetItemCurrent());
+    }
 
     return true;
 }
@@ -591,42 +559,12 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
             break;
     }
 
-    if (m_selPosition < 0)
-        m_selPosition = 0;
-
-    if (m_selPosition >= m_itemList.size())
-        m_selPosition = m_itemList.size()-1;
-
-    m_selItem = m_itemList.at(m_selPosition);
-
-    switch (m_scrollStyle)
-    {
-        case ScrollCenter :
-            while (m_topPosition + (int)((float)m_itemsVisible/2) <
-                        m_selPosition)
-                ++m_topPosition;
-            break;
-        case ScrollFree :
-            if (m_topPosition + (int)m_itemsVisible <= m_selPosition ||
-                m_topPosition > m_selPosition)
-            {
-                if (m_layout == LayoutHorizontal)
-                    m_topPosition = m_selPosition - m_itemsVisible + 1;
-                else
-                    m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
-                                        / m_columns * m_columns;
-
-                m_topPosition = std::max(0, m_topPosition);
-            }
-            break;
-    }
-
-    m_topItem = m_itemList.at(m_topPosition);
-
-    Update();
-
     if (pos != m_selPosition)
-        emit itemSelected(m_selItem);
+    {
+        m_keepSelAtBottom = true;
+        Update();
+        emit itemSelected(GetItemCurrent());
+    }
 
     return true;
 }
@@ -656,58 +594,24 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
     if (!found_it || m_selPosition == selectedPosition)
         return false;
 
-    m_selPosition = selectedPosition;
-    m_selItem =  m_itemList.at(m_selPosition);
-
-    m_topPosition = 0;
-
-    switch (m_scrollStyle)
-    {
-        case ScrollCenter :
-            while (m_topPosition + (int)((float)m_itemsVisible/2) <
-                        m_selPosition)
-                ++m_topPosition;
-            break;
-        case ScrollFree :
-            if (m_topPosition + (int)m_itemsVisible <= m_selPosition)
-            {
-                if (m_layout == LayoutHorizontal)
-                    m_topPosition = m_selPosition - m_itemsVisible + 1;
-                else
-                    m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
-                                        / m_columns * m_columns;
-
-                m_topPosition = qMax(0, m_topPosition);
-            }
-            break;
-    }
-
-    m_topItem = m_itemList.at(m_topPosition);
-
-    Update();
-
-    emit itemSelected(m_selItem);
-
+    SetItemCurrent(selectedPosition);
     return true;
 }
 
-bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool flag)
+bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
 {
-    if (item != m_selItem)
-    {
+    if (GetItemCurrent() != item)
         return false;
-    }
-
-    if (item == m_itemList.first() && flag)
+    if (item == m_itemList.first() && up)
         return false;
-    if (item == m_itemList.last() && !flag)
+    if (item == m_itemList.last() && !up)
         return false;
 
     int oldpos = m_selPosition;
     int insertat = 0;
     bool dolast = false;
 
-    if (flag)
+    if (up)
     {
         insertat = m_selPosition - 1;
         if (item == m_itemList.last())
@@ -715,17 +619,16 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool flag)
         else
             ++m_selPosition;
 
-        if (item == m_topItem)
+        if (item == m_itemList.at(m_topPosition))
             ++m_topPosition;
     }
     else
         insertat = m_selPosition + 1;
 
     m_itemList.removeAt(oldpos);
-
     m_itemList.insert(insertat, item);
 
-    if (flag)
+    if (up)
     {
         MoveUp();
         if (!dolast)
@@ -1076,8 +979,6 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
     m_wrapStyle = lb->m_wrapStyle;
 
     m_clearing = false;
-    m_topItem = m_selItem = NULL;
-
     m_selPosition = m_topPosition = m_itemCount = 0;
 
     MythUIType::CopyFrom(base);

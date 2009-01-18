@@ -143,7 +143,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     uint ItemWidth(void) const { return m_itemWidth; }
     uint ItemHeight(void) const { return m_itemHeight; }
 
-    bool MoveItemUpDown(MythUIButtonListItem *item, bool flag);
+    bool MoveItemUpDown(MythUIButtonListItem *item, bool up);
 
     void SetAllChecked(MythUIButtonListItem::CheckState state);
 
@@ -221,12 +221,10 @@ class MPUBLIC MythUIButtonList : public MythUIType
     bool m_needsUpdate;
     bool m_clearing;
 
-    MythUIButtonListItem* m_topItem;
-    MythUIButtonListItem* m_selItem;
-
     int m_selPosition;
     int m_topPosition;
     int m_itemCount;
+    bool m_keepSelAtBottom;
 
     QList<MythUIButtonListItem*> m_itemList;
 
