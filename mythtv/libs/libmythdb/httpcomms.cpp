@@ -332,7 +332,7 @@ QString HttpComms::getHttp(QString     &url,
         {
             VERBOSE(VB_NETWORK, QString("timeout for url: %1").arg(url));
 
-            // Increment the counter and check were not over the limit
+            // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
                 VERBOSE(VB_IMPORTANT, QString("Failed to contact server for url: %1").arg(url));
@@ -355,8 +355,15 @@ QString HttpComms::getHttp(QString     &url,
                                 .arg(httpGrabber->getRedirectedURL())
                                 .arg(redirectCount)
                                 .arg(maxRedirects));
-            if (redirectCount++ < maxRedirects)
-                url = httpGrabber->getRedirectedURL();
+
+            // Increment the counter and check we're not over the limit
+            if (redirectCount++ >= maxRedirects)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Maximum redirections reached for url: %1").arg(url));
+                break;
+            }
+
+            url = httpGrabber->getRedirectedURL();
 
             // Try again
             timeoutCount = 0;
@@ -434,7 +441,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
             VERBOSE(VB_NETWORK, QString("Timeout for url: '%1'")
                                         .arg(url));
 
-            // Increment the counter and check were not over the limit
+            // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
                 VERBOSE(VB_IMPORTANT, QString("Failed to contact server for url: '%1'")
@@ -459,8 +466,14 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
                                         .arg(redirectCount)
                                         .arg(maxRedirects));
 
-            if (redirectCount++ < maxRedirects)
-                url = httpGrabber->getRedirectedURL();
+            // Increment the counter and check we're not over the limit
+            if (redirectCount++ >= maxRedirects)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Maximum redirections reached for url: %1").arg(url));
+                break;
+            }
+
+            url = httpGrabber->getRedirectedURL();
 
             // Try again
             timeoutCount = 0;
@@ -576,7 +589,7 @@ QString HttpComms::postHttp(QUrl               &url         ,
         {
             VERBOSE(VB_NETWORK, QString("timeout for url: %1").arg(url.toString()));
 
-            // Increment the counter and check were not over the limit
+            // Increment the counter and check we're not over the limit
             if (timeoutCount++ >= maxRetries)
             {
                 VERBOSE(VB_IMPORTANT, QString("Failed to contact server for url: %1").arg(url.toString()));
@@ -599,8 +612,15 @@ QString HttpComms::postHttp(QUrl               &url         ,
                                 .arg(httpGrabber->getRedirectedURL())
                                 .arg(redirectCount)
                                 .arg(maxRedirects));
-            if (redirectCount++ < maxRedirects)
-                url = QUrl( httpGrabber->getRedirectedURL() );
+
+            // Increment the counter and check we're not over the limit
+            if (redirectCount++ >= maxRedirects)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Maximum redirections reached for url: %1").arg(url.toString()));
+                break;
+            }
+
+            url = QUrl( httpGrabber->getRedirectedURL() );
 
             // Try again
             timeoutCount = 0;
