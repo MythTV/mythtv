@@ -2877,8 +2877,7 @@ static HostComboBox *ThemePainter()
     gc->addSelection(QObject::tr("Qt"), "qt");
     gc->addSelection(QObject::tr("OpenGL"), "opengl");
     gc->setHelpText(QObject::tr("This selects what MythTV uses to draw.  If "
-                    "you have decent hardware, select OpenGL. Changing this "
-                    "requires a restart."));
+                    "you have decent hardware, select OpenGL."));
     return gc;
 }
 
