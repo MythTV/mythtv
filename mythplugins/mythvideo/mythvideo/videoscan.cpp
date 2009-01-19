@@ -215,8 +215,8 @@ class VideoScannerThread : public QThread
             // add files not already in the DB
             if (!p->second)
             {
-                Metadata newFile(p->first, VIDEO_COVERFILE_DEFAULT,
-                                 VIDEO_TRAILER_DEFAULT,
+                Metadata newFile(p->first, VIDEO_TRAILER_DEFAULT,
+                                 VIDEO_COVERFILE_DEFAULT,
                                  Metadata::FilenameToTitle(p->first),
                                  VIDEO_YEAR_DEFAULT,
                                  VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
