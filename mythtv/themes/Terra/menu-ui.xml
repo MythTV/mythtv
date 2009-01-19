@@ -7,6 +7,7 @@
         <imagetype name="topbar" from="basetopbar" />
 
         <statetype name="titles">
+            <loadondemand>true</loadondemand>
             <state name="TV">
                 <textarea name="heading" from="baseheading">
                     <value>Television</value>
@@ -107,6 +108,7 @@
             <layout>horizontal</layout>
             <spacing>0</spacing>
             <statetype name="buttonitem">
+                <loadondemand>true</loadondemand>
                 <state name="active">
                     <area>0,17,256,218</area>
 
@@ -118,6 +120,7 @@
                     </textarea>
 
                     <statetype name="icon">
+                        <loadondemand>true</loadondemand>
                         <state name="DEFAULT">
                             <imagetype name="icon">
                                 <area>0,0,256,220</area>
@@ -463,6 +466,7 @@
                     </textarea>
 
                     <statetype name="icon">
+                        <loadondemand>true</loadondemand>
                         <state name="DEFAULT">
                             <imagetype name="icon">
                                 <area>0,2,277,238</area>

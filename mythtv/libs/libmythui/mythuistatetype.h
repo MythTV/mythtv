@@ -38,6 +38,8 @@ class MPUBLIC MythUIStateType : public MythUIType
     void EnsureStateLoaded(const QString &name);
     void EnsureStateLoaded(StateType type);
 
+    virtual void LoadNow(void);
+
   protected:
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);

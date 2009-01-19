@@ -304,4 +304,9 @@ void MythUIStateType::EnsureStateLoaded(StateType type)
         i.value()->LoadNow();
 }
 
+void MythUIStateType::LoadNow(void)
+{
+    if (!m_deferload)
+        MythUIType::LoadNow();
+}
 
