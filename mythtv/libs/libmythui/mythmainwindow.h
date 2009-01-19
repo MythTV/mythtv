@@ -34,6 +34,7 @@ class MPUBLIC MythMainWindow : public QWidget
 
   public:
     void Init(void);
+    void ReinitDone(void);
     void Show(void);
 
     void AddScreenStack(MythScreenStack *stack, bool main = false);

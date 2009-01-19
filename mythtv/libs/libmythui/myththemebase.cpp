@@ -39,7 +39,7 @@ void MythThemeBase::Reload(void)
     XMLParseBase::ClearGlobalObjectStore();
     XMLParseBase::LoadBaseTheme();
 
-    d->background->PopScreen();
+    d->background->PopScreen(false, true);
 
     d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
 

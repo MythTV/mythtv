@@ -24,8 +24,7 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
     m_newTop = NULL;
     m_topScreen = NULL;
 
-    m_DoTransitions = (GetMythPainter()->SupportsAlpha() &&
-                       GetMythPainter()->SupportsAnimation());
+    EnableEffects();
     m_InNewTransition = false;
 
     m_DoInit = false;
@@ -33,6 +32,12 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
 
 MythScreenStack::~MythScreenStack()
 {
+}
+
+void MythScreenStack::EnableEffects(void)
+{
+    m_DoTransitions = (GetMythPainter()->SupportsAlpha() &&
+                       GetMythPainter()->SupportsAnimation());
 }
 
 int MythScreenStack::TotalScreens(void)

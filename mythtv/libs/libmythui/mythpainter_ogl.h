@@ -49,6 +49,9 @@ class MythOpenGLPainter : public MythPainter
     int q_gl_texture;
     bool texture_rects;
     int m_maxTexDim;
+
+    bool init_extensions;
+    bool generate_mipmaps;
 };
 
 #endif

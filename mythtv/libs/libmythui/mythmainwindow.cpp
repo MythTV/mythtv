@@ -160,6 +160,9 @@ class MythMainWindowPrivate
     std::vector<QWidget *> widgetList;
 
     QWidget *paintwin;
+
+    QWidget *oldpaintwin;
+    MythPainter *oldpainter;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -294,28 +297,10 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     // This prevents database errors from RegisterKey() when there is no DB:
     d->m_useDB = useDB;
-
-    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
-#ifdef USE_OPENGL_PAINTER
-    if (painter == "opengl")
-    {
-        VERBOSE(VB_GENERAL, "Using the OpenGL painter");
-        d->painter = new MythOpenGLPainter();
-    }
-    else
-#endif
-#ifdef USING_VDPAU
-    if (painter == "vdpau")
-    {
-        VERBOSE(VB_GENERAL, "Using the VDPAU painter");
-        d->painter = new MythVDPAUPainter();
-    }
-    else
-#endif
-    {
-        VERBOSE(VB_GENERAL, "Using the Qt painter");
-        d->painter = new MythQtPainter();
-    }
+    d->painter = NULL;
+    d->paintwin = NULL;
+    d->oldpainter = NULL;
+    d->oldpaintwin = NULL;
 
     //Init();
 
@@ -510,6 +495,9 @@ void MythMainWindow::animate(void)
 {
     /* FIXME: remove */
     if (currentWidget())
+        return;
+
+    if (!d->paintwin)
         return;
 
     bool redraw = false;
@@ -753,33 +741,50 @@ void MythMainWindow::Init(void)
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
-    /* FIXME these two lines should go away */
-    //setFont(GetMythUI()->GetMediumFont());
-    GetMythUI()->ThemeWidget(this);
-
+    if (!d->paintwin)
+        GetMythUI()->ThemeWidget(this);
     Show();
-
+ 
     // Set cursor call must come after Show() to work on some systems.
     setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
 
     move(d->xbase, d->ybase);
 
-    // allocate painter
-#ifdef USE_OPENGL_PAINTER
-    if (dynamic_cast<MythOpenGLPainter *>(d->painter))
+    if (d->paintwin)
     {
+        d->oldpaintwin = d->paintwin;
+        d->paintwin = NULL;
+        d->drawTimer->stop();
+    }
+
+    if (d->painter)
+    {
+        d->oldpainter = d->painter;
+        d->painter = NULL;
+    }
+
+    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
+#ifdef USE_OPENGL_PAINTER
+    if (painter == "opengl")
+    {
+        VERBOSE(VB_GENERAL, "Using the OpenGL painter");
+        d->painter = new MythOpenGLPainter();
         d->paintwin = new MythPainterWindowGL(this, d);
     }
     else
 #endif
 #ifdef USING_VDPAU
-    if (dynamic_cast<MythVDPAUPainter *>(d->painter))
+    if (painter == "vdpau")
     {
+        VERBOSE(VB_GENERAL, "Using the VDPAU painter");
+        d->painter = new MythVDPAUPainter();
         d->paintwin = new MythPainterWindowVDPAU(this, d);
     }
     else
 #endif
     {
+        VERBOSE(VB_GENERAL, "Using the Qt painter");
+        d->painter = new MythQtPainter();
         d->paintwin = new MythPainterWindowQt(this, d);
     }
 
@@ -787,6 +792,30 @@ void MythMainWindow::Init(void)
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
     d->paintwin->show();
+}
+
+void MythMainWindow::ReinitDone(void)
+{
+    qApp->processEvents();
+
+    if (d->oldpainter)
+    {
+        delete d->oldpainter;
+        d->oldpainter = NULL;
+    }
+
+    if (d->oldpaintwin)
+    {
+        delete d->oldpaintwin;
+        d->oldpaintwin = NULL;
+    }
+
+    d->paintwin->move(0, 0);
+    d->paintwin->setFixedSize(size());
+    d->paintwin->raise();
+    d->paintwin->show();
+
+    d->drawTimer->start(1000 / 70);
 }
 
 void MythMainWindow::Show(void)
@@ -801,9 +830,6 @@ void MythMainWindow::Show(void)
 
     activateWindow();
     raise();
-
-    //-=>TODO: The following method does not exist in Qt4
-    //qApp->wakeUpGuiThread();    // ensures that setActiveWindow() occurs
 }
 
 /* FIXME compatability only */

@@ -29,6 +29,7 @@ class MPUBLIC MythScreenStack : public QObject
     int TotalScreens();
 
     void DisableEffects(void) { m_DoTransitions = false; }
+    void EnableEffects(void);
 
   private slots:
     void doInit(void);

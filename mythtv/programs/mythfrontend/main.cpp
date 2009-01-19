@@ -763,13 +763,18 @@ int reloadTheme(void)
 {
     LanguageSettings::reload();
 
-    GetMythUI()->LoadQtConfig();
-    GetMythMainWindow()->Init();
+    GetMythMainWindow()->GetMainStack()->DisableEffects();
 
+    GetMythUI()->LoadQtConfig();
+
+    GetMythMainWindow()->Init();
+    menu->Close();
     themeBase->Reload();
     GetMythUI()->UpdateImageCache();
 
-    menu->Close();
+    GetMythMainWindow()->ReinitDone();
+
+    GetMythMainWindow()->GetMainStack()->EnableEffects();
 
     QString themename = gContext->GetSetting("Theme", "blue");
     QString themedir = GetMythUI()->FindThemeDir(themename);

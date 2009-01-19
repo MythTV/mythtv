@@ -34,12 +34,33 @@
 #endif
 
 MythOpenGLPainter::MythOpenGLPainter() :
-    MythPainter(), q_gl_texture(-1), texture_rects(false), m_maxTexDim(-1)
+    MythPainter(), q_gl_texture(-1), texture_rects(false), m_maxTexDim(-1),
+    init_extensions(true), generate_mipmaps(false)
 {
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
 {
+    QMutableMapIterator<QString, MythImage *> j(m_StringToImageMap);
+    while (j.hasNext())
+    {
+        j.next();
+
+        j.value()->DownRef();
+        j.remove();
+    }
+
+    QMutableMapIterator<MythImage *, unsigned int> i(m_ImageIntMap);
+    while (i.hasNext())
+    {
+        i.next();
+
+        GLuint textures[1];
+        textures[0] = i.value();
+
+        glDeleteTextures(1, textures);
+        i.remove();
+    }
 }
 
 void MythOpenGLPainter::Begin(QWidget *parent)
@@ -123,9 +144,6 @@ void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
 void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
                                              bool alphaonly)
 {
-    static bool init_extensions = true;
-    static bool generate_mipmaps = false;
-
     if (init_extensions)
     {
         QString extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
