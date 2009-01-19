@@ -497,7 +497,10 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
     }
 
     if (m_titleState)
+    {
+        m_titleState->EnsureStateLoaded(m_menumode);
         m_titleState->DisplayState(m_menumode);
+    }
 
     m_selection = "";
     return true;
@@ -547,6 +550,9 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
     newbutton.action = action;
     newbutton.text = text;
     newbutton.description = description;
+
+    if (m_watermarkState)
+        m_watermarkState->EnsureStateLoaded(type);
 
     MythUIButtonListItem *listbuttonitem =
                                 new MythUIButtonListItem(m_buttonList, text,

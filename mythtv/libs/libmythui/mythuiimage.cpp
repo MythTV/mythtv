@@ -636,6 +636,10 @@ bool MythUIImage::ParseElement(QDomElement &element)
         return MythUIType::ParseElement(element);
 
     m_NeedLoad = true;
+
+    if (m_Parent && m_Parent->IsDeferredLoading(true))
+        m_NeedLoad = false;
+
     return true;
 }
 
@@ -688,7 +692,10 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
     MythUIType::CopyFrom(base);
 
-    Load();
+    m_NeedLoad = im->m_NeedLoad;
+
+    if (m_NeedLoad)
+        Load();
 }
 
 /**
@@ -710,3 +717,15 @@ void MythUIImage::Finalize(void)
 
     MythUIType::Finalize();
 }
+
+void MythUIImage::LoadNow(void)
+{
+    if (m_NeedLoad)
+        return;
+
+    m_NeedLoad = true;
+    Load();
+
+    MythUIType::LoadNow();
+}
+

@@ -107,6 +107,10 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     void SetHelpText(const QString &text) { m_helptext = text; }
     QString GetHelpText(void) const { return m_helptext; }
 
+    bool IsDeferredLoading(bool recurse = false);
+    void SetDeferLoad(bool defer) { m_deferload = defer; }
+    virtual void LoadNow(void);
+
   protected:
     virtual void customEvent(QEvent *);
 
@@ -179,7 +183,9 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
 
     QString m_helptext;
 
-  friend class XMLParseBase;
+    bool m_deferload;
+
+    friend class XMLParseBase;
 };
 
 

@@ -36,6 +36,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_Moving = false;
     m_XYDestination = QPoint(0, 0);
     m_XYSpeed = QPoint(0, 0);
+    m_deferload = false;
 
     m_Parent = NULL;
     if (parent)
@@ -637,6 +638,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_Moving = base->m_Moving;
     m_XYDestination = base->m_XYDestination;
     m_XYSpeed = base->m_XYSpeed;
+    m_deferload = base->m_deferload;
 
     QList<MythUIType *>::Iterator it;
     for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end();
@@ -678,6 +680,10 @@ bool MythUIType::ParseElement(QDomElement &element)
     {
         int order = getFirstText(element).toInt();
         SetFocusOrder(order);
+    }
+    else if (element.tagName() == "loadondemand")
+    {
+        SetDeferLoad(parseBool(element));
     }
     else
         return false;
@@ -752,3 +758,22 @@ bool MythUIType::MoveToTop(void)
 
     return false;
 }
+
+bool MythUIType::IsDeferredLoading(bool recurse) 
+{
+     if (m_deferload)
+         return true;
+
+     if (recurse && m_Parent)
+         return m_Parent->IsDeferredLoading(recurse);
+
+     return false;
+}
+
+void MythUIType::LoadNow(void)
+{
+    QList<MythUIType *>::Iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        (*it)->LoadNow();
+}
+

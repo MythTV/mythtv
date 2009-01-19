@@ -110,6 +110,9 @@ bool MythUIStateType::DisplayState(const QString &name)
     {
         if (m_ShowEmpty || m_CurrentState != NULL)
         {
+            if (m_deferload)
+                m_CurrentState->LoadNow();
+
             if (old)
                 old->SetVisible(false);
             if (m_CurrentState)
@@ -134,6 +137,9 @@ bool MythUIStateType::DisplayState(StateType type)
     {
         if (m_ShowEmpty || m_CurrentState != NULL)
         {
+            if (m_deferload)
+                m_CurrentState->LoadNow();
+
             if (m_CurrentState)
                 m_CurrentState->SetVisible(true);
             if (old)
@@ -280,4 +286,22 @@ void MythUIStateType::CreateCopy(MythUIType *parent)
 void MythUIStateType::Finalize(void)
 {
 }
+
+void MythUIStateType::EnsureStateLoaded(const QString &name)
+{
+    if (name.isEmpty())
+        return;
+
+    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
+    if (i != m_ObjectsByName.end())
+        i.value()->LoadNow();
+}
+
+void MythUIStateType::EnsureStateLoaded(StateType type)
+{
+    QMap<int, MythUIType *>::Iterator i = m_ObjectsByState.find((int)type);
+    if (i != m_ObjectsByState.end())
+        i.value()->LoadNow();
+}
+
 

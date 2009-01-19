@@ -40,6 +40,8 @@ class MPUBLIC MythUIImage : public MythUIType
 
     virtual void Pulse(void);
 
+    virtual void LoadNow(void);
+
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect);
