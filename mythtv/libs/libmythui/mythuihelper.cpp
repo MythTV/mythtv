@@ -352,7 +352,8 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
     d->maxImageCacheSize = GetMythDB()->GetNumSetting("UIImageCacheSize", 20)
                                 * 1024 * 1024;
 
-    VERBOSE(VB_GENERAL, QString("MythUI Image Cache size set to %1 bytes").arg(d->maxImageCacheSize));
+    VERBOSE(VB_GENERAL, QString("MythUI Image Cache size set to %1 bytes")
+                        .arg(d->maxImageCacheSize));
 }
 
 MythUIMenuCallbacks *MythUIHelper::GetMenuCBs(void)
@@ -425,7 +426,7 @@ void MythUIHelper::LoadQtConfig(void)
     d->m_themeloaded = false;
 
     themename = GetMythDB()->GetSetting("MenuTheme");
-    d->m_menuthemepathname = FindMenuThemeDir(themename) +"/";
+    d->m_menuthemepathname = FindMenuThemeDir(themename) + "/";
 
     d->bigfontsize    = GetMythDB()->GetNumSetting("QtFontBig",    25);
     d->mediumfontsize = GetMythDB()->GetNumSetting("QtFontMedium", 16);
@@ -529,7 +530,8 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
             }
         }
 
-        VERBOSE(VB_FILE, QString("%1 images are eligible for expiry").arg(count));
+        VERBOSE(VB_FILE,
+                QString("%1 images are eligible for expiry").arg(count));
 
         if (count > 0)
         {
@@ -589,7 +591,7 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
     QMap<QString, MythImage*>::iterator it;
 
     QString partialKey = fname;
-    partialKey.replace("/","-");
+    partialKey.replace('/', '-');
 
     for (it = d->imageCache.begin(); it != d->imageCache.end(); ++it)
     {
@@ -628,9 +630,9 @@ QString MythUIHelper::GetThemeCacheDir(void)
 {
     QString cachedirname = GetConfDir() + "/themecache/";
 
-    QString tmpcachedir = cachedirname + GetMythDB()->GetSetting("Theme") + "." +
-                          QString::number(d->m_screenwidth) + "." +
-                          QString::number(d->m_screenheight);
+    QString tmpcachedir = cachedirname + GetMythDB()->GetSetting("Theme") +
+                          "." + QString::number(d->m_screenwidth) +
+                          "." + QString::number(d->m_screenheight);
 
     return tmpcachedir;
 }
@@ -992,7 +994,8 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
         return testdir;
     }
     else {
-        VERBOSE(VB_IMPORTANT, QString("Could not find menu theme: %1 - Fallback to default failed.").arg(menuname));
+        VERBOSE(VB_IMPORTANT, QString("Could not find menu theme: %1 - "
+                "Fallback to default failed.").arg(menuname));
     }
 
     return QString();
@@ -1084,7 +1087,8 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
             widget->setPalette(d->m_palette);
         }
     }
-    else if (!d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap").isEmpty())
+    else if (!d->m_qtThemeSettings
+                 ->GetSetting("TiledBackgroundPixmap").isEmpty())
     {
         QString pmapname = d->m_themepathname +
                       d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
@@ -1277,7 +1281,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
                 ret = GetMythPainter()->GetFormatImage();
                 if (!ret->Load(cachefilepath, false))
                 {
-                    VERBOSE(VB_FILE, QString("MythUIHelper::LoadCacheImage Could not load :%1").arg(cachefilepath));
+                    VERBOSE(VB_FILE, QString("MythUIHelper::LoadCacheImage "
+                                     "Could not load :%1").arg(cachefilepath));
                     ret->DownRef();
                     ret = NULL;
                 }
@@ -1312,7 +1317,8 @@ QFont MythUIHelper::GetBigFont(void)
 QFont MythUIHelper::GetMediumFont(void)
 {
     QFont font = QApplication::font();
-    font.setPointSize(GetMythMainWindow()->NormalizeFontSize(d->mediumfontsize));
+    font.setPointSize(GetMythMainWindow()
+                          ->NormalizeFontSize(d->mediumfontsize));
     font.setWeight(QFont::Bold);
 
     return font;
