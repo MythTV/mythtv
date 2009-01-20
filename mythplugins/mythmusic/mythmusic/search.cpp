@@ -33,7 +33,7 @@ SearchDialog::SearchDialog(MythMainWindow *parent, const char *name)
     searchText = new MythLineEdit(this);
     searchText->setRW();
     searchText->setFocus();
-    searchText->setPopupPosition(VK_POSBOTTOMDIALOG);
+    searchText->setPopupPosition(VKQT_POSBOTTOMDIALOG);
     connect(searchText, SIGNAL(textChanged(const QString &)),
             this, SLOT(searchTextChanged(const QString &)));
     addWidget(searchText); 
