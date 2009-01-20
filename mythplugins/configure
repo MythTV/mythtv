@@ -17,7 +17,6 @@ gallery="yes"
 game="yes"
 news="yes"
 browser="yes"
-controls="yes"
 flix="yes"
 archive="yes"
 zoneminder="yes"
@@ -59,9 +58,6 @@ MythArchive related options:
 
 MythBrowser related options:
   --enable-mythbrowser     build the mythbrowser plugin [$browser]
-
-MythControls related options:
-  --enable-mythcontrols    build the mythcontrols plugin [$controls]
 
 MythFlix related options:
   --enable-mythflix        build the mythflix plugin [$flix]
@@ -174,10 +170,6 @@ for opt do
   ;;
   --disable-mythzoneminder) zoneminder="no"
   ;;
-  --enable-mythcontrols) controls="yes"
-  ;;
-  --disable-mythcontrols) controls="no"
-  ;;
   --enable-mythflix) flix="yes"
   ;;
   --disable-mythflix) flix="no"
@@ -227,7 +219,6 @@ for opt do
                  news="yes";
                  browser="yes";
                  zoneminder="yes";
-                 controls="yes";
                  flix="yes";
                  movies="yes";
                  sdl="yes";
@@ -247,7 +238,6 @@ for opt do
                  news="no";
                  browser="no";
                  zoneminder="no";
-                 controls="no";
                  flix="no";
                  movies="no";
                  sdl="no";
@@ -533,13 +523,6 @@ if test "$browser" = "yes" ; then
   echo "SUBDIRS += mythbrowser" >> ./config.pro
 else
   echo "        MythBrowser    plugin will not be built"
-fi
-
-if test "$controls" = "yes" ; then
-  echo "        MythControls   plugin will be built"
-  echo "SUBDIRS += mythcontrols" >> ./config.pro
-else
-  echo "        MythControls   plugin will not be built"
 fi
 
 if test "$flix" = "yes" ; then
