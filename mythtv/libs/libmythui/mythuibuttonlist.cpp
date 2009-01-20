@@ -187,7 +187,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
                 m_topPosition = qMax(m_topPosition, 0);
                 break;
             }
-        }    
+        }
 
         QList<MythUIButtonListItem*>::iterator it = m_itemList.begin() + m_topPosition;
 
@@ -309,7 +309,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     if (curIndex == -1)
         return;
 
-    if (curIndex == m_topPosition && 
+    if (curIndex == m_topPosition &&
         m_topPosition > 0 &&
         m_topPosition == m_itemCount - 1)
     {
@@ -330,7 +330,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
 
     if (m_selPosition < m_itemCount)
         emit itemSelected(m_itemList.at(m_selPosition));
-    else 
+    else
         emit itemSelected(NULL);
 }
 
@@ -1301,7 +1301,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
     if (!buttonstate)
     {
-        VERBOSE(VB_IMPORTANT, "Failed to query buttonlist statetype");
+        VERBOSE(VB_IMPORTANT, QString("Failed to query buttonlist state: %1")
+                                            .arg(button->GetCurrentState()));
         return;
     }
 
