@@ -70,17 +70,17 @@ class MythUIHelperPrivate
 
     void Init();
 
-    bool IsWideMode() const {return (m_baseWidth == 1280);}
-    void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
+    bool IsWideMode()   const {return (m_baseWidth == 1280);}
+    void SetWideMode()        {m_baseWidth = 1280; m_baseHeight = 720;}
     bool IsSquareMode() const {return (m_baseWidth == 800);}
-    void SetSquareMode() {m_baseWidth = 800; m_baseHeight = 600;}
+    void SetSquareMode()      {m_baseWidth = 800; m_baseHeight = 600;}
 
     void GetScreenBounds(void);
     void StoreGUIsettings(void);
 
-    Settings *m_qtThemeSettings;   ///< everything else theme-related
+    Settings *m_qtThemeSettings;   ///< Text/button/background colours, etc
 
-    bool      m_themeloaded;       ///< To we have a palette and pixmap to use?
+    bool      m_themeloaded;       ///< Do we have a palette and pixmap to use?
     QString   m_menuthemepathname;
     QString   m_themepathname;
     QPalette  m_palette;           ///< Colour scheme
