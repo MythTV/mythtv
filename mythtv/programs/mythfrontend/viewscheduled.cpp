@@ -38,8 +38,9 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
              : MythScreenType(parent, "ViewScheduled")
 {
-    m_dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_shortdateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+    m_dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
     m_showAll = !gContext->GetNumSetting("ViewSchedShowLevel", 0);
 
@@ -53,6 +54,9 @@ ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
     m_maxcard  = 0;
     m_curinput = 0;
     m_maxinput = 0;
+
+    m_defaultGroup = QDate();
+    m_currentGroup = m_defaultGroup;
 
     gContext->addListener(this);
 }
@@ -70,6 +74,7 @@ bool ViewScheduled::Create()
 
     //if (m_player && m_player->IsRunning() && showTV)
 
+    m_groupList     = dynamic_cast<MythUIButtonList *> (GetChild("groups"));
     m_schedulesList = dynamic_cast<MythUIButtonList *> (GetChild("schedules"));
 
     if (!m_schedulesList)
@@ -83,7 +88,15 @@ bool ViewScheduled::Create()
     connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(selected(MythUIButtonListItem*)));
 
-    FillList();
+    LoadList();
+
+    if (m_groupList)
+    {
+        connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                SLOT(ChangeGroup(MythUIButtonListItem*)));
+        connect(m_groupList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+                SLOT(SwitchList()));
+    }
 
     if (m_player)
         EmbedTVWindow();
@@ -91,6 +104,14 @@ bool ViewScheduled::Create()
     BuildFocusList();
 
     return true;
+}
+
+void ViewScheduled::SwitchList()
+{
+    if (GetFocusWidget() == m_groupList)
+        SetFocusWidget(m_schedulesList);
+    else if (GetFocusWidget() == m_schedulesList)
+        SetFocusWidget(m_groupList);
 }
 
 bool ViewScheduled::keyPressEvent(QKeyEvent *event)
@@ -116,7 +137,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "MENU" || action == "INFO")
+        if (action == "INFO")
             edit();
         else if (action == "CUSTOMEDIT")
             customEdit();
@@ -141,7 +162,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
     }
 
     if (m_needFill)
-        FillList();
+        LoadList();
 
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
@@ -151,45 +172,49 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void ViewScheduled::FillList(void)
+void ViewScheduled::LoadList(void)
 {
     if (m_inFill)
         return;
 
     m_inFill = true;
 
-    int listPos = m_schedulesList->GetCurrentPos();
-
-    m_schedulesList->Reset();
+    MythUIButtonListItem *currentItem = m_schedulesList->GetItemCurrent();
 
     QString callsign;
     QDateTime startts, recstartts;
 
-    if (m_recList[listPos])
+    if (currentItem)
     {
-        callsign = m_recList[listPos]->chansign;
-        startts = m_recList[listPos]->startts;
-        recstartts = m_recList[listPos]->recstartts;
+        ProgramInfo *currentpginfo = qVariantValue<ProgramInfo*>
+                                                    (currentItem->GetData());
+        if (currentpginfo)
+        {
+            callsign = currentpginfo->chansign;
+            startts = currentpginfo->startts;
+            recstartts = currentpginfo->recstartts;
+        }
     }
-
-    m_recList.FromScheduler(m_conflictBool);
 
     QDateTime now = QDateTime::currentDateTime();
 
     QMap<int, int> toomanycounts;
 
-    MythUIText *norecordingText = dynamic_cast<MythUIText*>
-                                                (GetChild("norecordings_info"));
+    m_schedulesList->Reset();
+    if (m_groupList)
+        m_groupList->Reset();
 
-    if (norecordingText)
-        norecordingText->SetVisible(m_recList.isEmpty());
+    m_recgroupList.clear();
 
-    if (m_recList.isEmpty())
-        return;
+    m_recList.FromScheduler(m_conflictBool);
 
     ProgramList::iterator pit = m_recList.begin();
+    QString currentDate;
+    m_recgroupList[m_defaultGroup] = ProgramList(false);
+    m_recgroupList[m_defaultGroup].setAutoDelete(false);
     while (pit != m_recList.end())
     {
+
         ProgramInfo *pginfo = *pit;
         if ((pginfo->recendts >= now || pginfo->endts >= now) &&
             (m_showAll || pginfo->recstatus <= rsWillRecord ||
@@ -208,11 +233,113 @@ void ViewScheduled::FillList(void)
             if (pginfo->inputid > m_maxinput)
                 m_maxinput = pginfo->inputid;
 
+            QDate date = (pginfo->recstartts).date();
+            m_recgroupList[date].append(pginfo);
+            m_recgroupList[date].setAutoDelete(false);
+
+            m_recgroupList[m_defaultGroup].append(pginfo);
+
             ++pit;
         }
         else
         {
             pit = m_recList.erase(pit);
+            continue;
+        }
+    }
+
+    if (m_groupList)
+    {
+        QString label;
+        QMap<QDate,ProgramList>::iterator dateit = m_recgroupList.begin();
+        while (dateit != m_recgroupList.end())
+        {
+            if (dateit.key().isNull())
+                label = tr("All");
+            else
+                label = dateit.key().toString(m_dateFormat);
+
+            new MythUIButtonListItem(m_groupList, label,
+                                     qVariantFromValue(dateit.key()));
+            ++dateit;
+        }
+        if (!m_recgroupList.contains(m_currentGroup))
+            m_groupList->SetValueByData(qVariantFromValue(m_currentGroup));
+    }
+
+    FillList();
+
+    // Restore position after a list update
+    if (!callsign.isNull())
+    {
+        ProgramList plist;
+
+        if (!m_recgroupList.contains(m_currentGroup))
+            m_currentGroup = m_defaultGroup;
+
+        plist = m_recgroupList[m_currentGroup];
+
+        int listPos = plist.count() - 1;
+        int i;
+        for (i = listPos; i >= 0; i--)
+        {
+            if (callsign == plist[i]->chansign &&
+                startts == plist[i]->startts)
+            {
+                listPos = i;
+                break;
+            }
+            else if (recstartts <= plist[i]->recstartts)
+                listPos = i;
+        }
+        m_schedulesList->SetItemCurrent(listPos);
+    }
+
+    m_inFill = false;
+    m_needFill = false;
+}
+
+
+void ViewScheduled::ChangeGroup(MythUIButtonListItem* item)
+{
+    if (!item || m_recList.isEmpty())
+        return;
+
+    QDate group = qVariantValue<QDate>(item->GetData());
+
+    m_currentGroup = group;
+
+    if (!m_inFill)
+        FillList();
+}
+
+void ViewScheduled::FillList()
+{
+    m_schedulesList->Reset();
+
+    MythUIText *norecordingText = dynamic_cast<MythUIText*>
+                                                (GetChild("norecordings_info"));
+
+    if (norecordingText)
+        norecordingText->SetVisible(m_recList.isEmpty());
+
+    if (m_recList.isEmpty())
+        return;
+
+    ProgramList plist;
+
+    if (!m_recgroupList.contains(m_currentGroup))
+        m_currentGroup = m_defaultGroup;
+
+    plist = m_recgroupList[m_currentGroup];
+
+    ProgramList::iterator pit = plist.begin();
+    while (pit != plist.end())
+    {
+        ProgramInfo *pginfo = *pit;
+        if (!pginfo)
+        {
+            ++pit;
             continue;
         }
 
@@ -244,41 +371,33 @@ void ViewScheduled::FillList(void)
                                 new MythUIButtonListItem(m_schedulesList,"",
                                                     qVariantFromValue(pginfo));
 
-        QString temp;
-        temp = (pginfo->recstartts).toString(m_dateformat);
-        temp += " " + (pginfo->recstartts).toString(m_timeformat);
-        item->SetText(temp, "time", state); //,font
+        QString shortDate = (pginfo->recstartts).toString(m_shortdateFormat);
+        QString date = (pginfo->recstartts).toString(m_dateFormat);
+        QString time = (pginfo->recstartts).toString(m_timeFormat);
+
+        item->SetText(QString("%1 %2").arg(shortDate).arg(time), "timedate", state);
+        item->SetText(shortDate, "shortdate", state);
+        item->SetText(date, "longdate", state);
+        item->SetText(time, "time", state);
 
         item->SetText(pginfo->ChannelText(m_channelFormat), "channel", state);
 
-        temp = pginfo->title;
-        if ((pginfo->subtitle).trimmed().length() > 0)
-            temp += " - \"" + pginfo->subtitle + "\"";
-        item->SetText(temp, "title", state);
+        QString tempSubTitle = pginfo->title;
+        if (!pginfo->subtitle.trimmed().isEmpty())
+        {
+            tempSubTitle = QString("%1 - \"%2\"")
+                .arg(tempSubTitle).arg(pginfo->subtitle);
+        }
 
-        temp = pginfo->RecStatusChar();
-        item->SetText(temp, "card", state);
+        item->SetText(tempSubTitle,        "titlesubtitle", state);
+        item->SetText(pginfo->title,       "title",         state);
+        item->SetText(pginfo->subtitle,    "subtitle",      state);
+        item->SetText(pginfo->description, "description",   state);
+        item->SetText(pginfo->RecStatusChar(), "card", state);
 
         item->DisplayState(state, "status");
-    }
 
-    // Restore position after a list update
-    if (!callsign.isNull())
-    {
-        listPos = m_recList.count() - 1;
-        int i;
-        for (i = listPos; i >= 0; i--)
-        {
-            if (callsign == m_recList[i]->chansign &&
-                startts == m_recList[i]->startts)
-            {
-                listPos = i;
-                break;
-            }
-            else if (recstartts <= m_recList[i]->recstartts)
-                listPos = i;
-        }
-        m_schedulesList->SetItemCurrent(listPos);
+        ++pit;
     }
 
     MythUIText *statusText = dynamic_cast<MythUIText*>(GetChild("status"));
@@ -287,9 +406,9 @@ void ViewScheduled::FillList(void)
         if (m_conflictBool)
         {
             // Find first conflict and store in m_conflictDate field
-            for (uint i = 0; i < m_recList.count(); i++)
+            for (uint i = 0; i < plist.count(); i++)
             {
-                ProgramInfo *p = m_recList[i];
+                ProgramInfo *p = plist[i];
                 if (p->recstatus == rsConflict)
                 {
                     m_conflictDate = p->recstartts.date();
@@ -306,7 +425,7 @@ void ViewScheduled::FillList(void)
                 cstring = tr("Conflict Today");
             else if (daysToConflict > 0)
                 cstring = QString(tr("Conflict %1"))
-                                .arg(m_conflictDate.toString(m_dateformat));
+                                .arg(m_conflictDate.toString(m_dateFormat));
 
             statusText->SetText(cstring);
         }
@@ -322,9 +441,6 @@ void ViewScheduled::FillList(void)
         else
             filterText->SetText(tr("Important"));
     }
-
-    m_inFill = false;
-    m_needFill = false;
 }
 
 void ViewScheduled::updateInfo(MythUIButtonListItem *item)
@@ -424,7 +540,7 @@ void ViewScheduled::upcoming()
     else
         delete pl;
 
-    //FIXME: 
+    //FIXME:
     //EmbedTVWindow();
 }
 
@@ -518,7 +634,7 @@ void ViewScheduled::customEvent(QEvent *event)
 
         m_inEvent = true;
 
-        FillList();
+        LoadList();
 
         m_inEvent = false;
     }
