@@ -211,8 +211,7 @@ ActionID *KeyBindings::GetConflict(
     return NULL; // no conflicts
 }
 
-/** \fn ReplaceActionKey(const QString&,const QString&,
-                         const QString&,const QString&)
+/**
  *  \brief Replace a key in an action.
  *
  *   This does not take effect until CommitChanges() is called.
@@ -345,7 +344,7 @@ void KeyBindings::CommitChanges(void)
     }
 }
 
-/** \fn KeyBindings::RetrieveJumppoints(void)
+/**
  *  \brief Load the jumppoints from the database.
  *
  *   This method will load the keybindings for jump points.
@@ -383,7 +382,7 @@ void KeyBindings::LoadJumppoints(void)
     }
 }
 
-/** \fn KeyBindings::RetrieveContexts(void)
+/**
  *  \brief Load the keybindings from the database.
  *
  *   This will load the keybindings which apply to the hostname

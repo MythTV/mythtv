@@ -144,7 +144,7 @@ MetaIO *Decoder::doCreateTagger(void)
     return NULL;
 }
 
-/** \fn commitMetadata(Metadata*)
+/**
  *  \brief Write the given metadata to the \p filename.
  *
  *  Creates a \p MetaIO object using \p Decoder::doCreateTagger and
