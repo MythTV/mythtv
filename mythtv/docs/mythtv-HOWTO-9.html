@@ -529,7 +529,7 @@ rotated (so that they don't fill up a partition).  See the section called
 <A HREF="mythtv-HOWTO-23.html#logrotate">Automatically rotating logs</A> for more
 information.</P>
 
-<H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a non-master backend </A>
+<H2><A NAME="nonmaster_backend"></A> <A NAME="ss9.3">9.3</A> <A HREF="mythtv-HOWTO.html#toc9.3">Configuring a slave backend </A>
 </H2>
 
 <P>Ensure that you've granted access to the master MySQL database for remote
@@ -558,16 +558,16 @@ ideas of which MySQL database they should talk to.</CAPTION>
 <P>Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.</P>
-<P>Configuration of a non-master backend follows the same general procedure
+<P>Configuration of a slave backend follows the same general procedure
 as that of the master backend, with the exception that you skip over the
 "Video Sources" step.  All possible video sources need to be defined on the
 master backend system; only the master backend will query a listings
-provider to obtain guide data for all the non-master backends.</P>
+provider to obtain guide data for all the slave backends.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Do not run <CODE>mythfilldatabase</CODE> on a non-master backend.</CAPTION>
+<CAPTION><B>NOTE</B>: Do not run <CODE>mythfilldatabase</CODE> on a slave backend.</CAPTION>
 </FIGURE>
 </P>
 <H2><A NAME="ss9.4">9.4</A> <A HREF="mythtv-HOWTO.html#toc9.4">Configuring and running mythfilldatabase</A>

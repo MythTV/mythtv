@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2009-01-11, v0.21.06
+  2009-01-20, v0.21.07
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -127,7 +127,7 @@
            9.1.6.3 Migrating to Storage Groups.
            9.1.6.4 Advanced: Algorithm used by the Storage Group
      9.2 Post-configuration
-     9.3 Configuring a non-master backend
+     9.3 Configuring a slave backend
      9.4 Configuring and running mythfilldatabase
         9.4.1 Periodically running mythfilldatabase
      9.5 Grabbing channel icons for Schedules Direct users
@@ -3450,7 +3450,7 @@
   called ``Automatically rotating logs'' for more information.
 
 
-  [1m9.3.  Configuring a non-master backend[0m
+  [1m9.3.  Configuring a slave backend[0m
 
   Ensure that you've granted access to the master MySQL database for
   remote backends as discussed in the section titled ``Modifying access
@@ -3480,16 +3480,15 @@
   backend due to IP address misconfiguration then MythTV will not
   function properly.
 
-  Configuration of a non-master backend follows the same general
-  procedure as that of the master backend, with the exception that you
-  skip over the "Video Sources" step.  All possible video sources need
-  to be defined on the master backend system; only the master backend
-  will query a listings provider to obtain guide data for all the non-
-  master backends.
+  Configuration of a slave backend follows the same general procedure as
+  that of the master backend, with the exception that you skip over the
+  "Video Sources" step.  All possible video sources need to be defined
+  on the master backend system; only the master backend will query a
+  listings provider to obtain guide data for all the slave backends.
 
 
 
-        [1mNOTE[22m: Do not run mythfilldatabase on a non-master backend.
+          [1mNOTE[22m: Do not run mythfilldatabase on a slave backend.
 
   [1m9.4.  Configuring and running mythfilldatabase[0m
 
@@ -3527,7 +3526,6 @@
   Setup>General screen and advance to "Mythfilldatabase", the fourth
   screen.  Select the checkbox, then complete the options as you see
   fit.  The [1mmythbackend [22mprogram will now run [1mmythfilldatabase [22mfor you.
-
 
 
   [1m9.5.  Grabbing channel icons for Schedules Direct users[0m
@@ -3591,6 +3589,9 @@
         [1mNOTE[22m:  You should go through the various setup screens in
   mythfrontend before using any other modules to ensure that the the
   database is correctly initialized.
+
+
+
   [1m10.1.  General[0m
 
   The General screen has configuration items that don't really fit
