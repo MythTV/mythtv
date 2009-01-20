@@ -486,7 +486,7 @@ bool MythUIImage::Load(void)
 }
 
 /**
- *  \copydoc See MythUIType::Pulse()
+ *  \copydoc MythUIType::Pulse()
  */
 void MythUIImage::Pulse(void)
 {
@@ -505,7 +505,7 @@ void MythUIImage::Pulse(void)
 }
 
 /**
- *  \copydoc See MythUIType::DrawSelf()
+ *  \copydoc MythUIType::DrawSelf()
  */
 void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                            int alphaMod, QRect clipRect)
@@ -549,7 +549,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 }
 
 /**
- *  \copydoc See MythUIType::ParseElement()
+ *  \copydoc MythUIType::ParseElement()
  */
 bool MythUIImage::ParseElement(QDomElement &element)
 {

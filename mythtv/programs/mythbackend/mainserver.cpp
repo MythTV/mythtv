@@ -1107,7 +1107,7 @@ void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
 }
 
 /**
- * \addingroup myth_network_protocol
+ * \addtogroup myth_network_protocol
  * \par        QUERY_RECORDINGS \e type
  * The \e type parameter can be either "Play", "Recording" or "Delete".
  * Returns programinfo (title, subtitle, description, category, chanid,
@@ -1426,7 +1426,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 }
 
 /**
- * \addingroup myth_network_protocol
+ * \addtogroup myth_network_protocol
  * \par        QUERY_RECORDING BASENAME \e basename
  * \par        QUERY_RECORDING TIMESLOT \e chanid \e starttime
  */
