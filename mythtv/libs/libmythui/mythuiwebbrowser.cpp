@@ -154,7 +154,8 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_browser(NULL),
 #endif
       m_image(NULL),         m_active(false),
-      m_initialized(false),  m_zoom(1.0),
+      m_initialized(false),  m_lastUpdateTime(QTime()),
+      m_updateInterval(0),   m_zoom(1.0),
       m_bgColor("White"),    m_widgetUrl(QUrl()),
       m_inputToggled(false), m_lastMouseAction(""),
       m_mouseKeyCount(0),    m_lastMouseActionTime()
@@ -514,6 +515,17 @@ void MythUIWebBrowser::UpdateBuffer(void)
     }
 }
 
+void MythUIWebBrowser::Pulse(void)
+{
+    if (m_updateInterval && m_lastUpdateTime.elapsed() > m_updateInterval)
+    {
+        UpdateBuffer();
+        m_lastUpdateTime.start();
+    }
+
+    MythUIType::Pulse();
+}
+
 void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                        int alphaMod, QRect clipRegion)
 {
@@ -767,6 +779,11 @@ bool MythUIWebBrowser::ParseElement(QDomElement &element)
     {
         m_widgetUrl.setUrl(getFirstText(element));
     }
+    else if (element.tagName() == "updateinterval")
+    {
+        QString interval = getFirstText(element);
+        m_updateInterval = interval.toInt();
+    }
     else if (element.tagName() == "background")
     {
         m_bgColor = QColor(element.attribute("color", "#ffffff"));
@@ -793,6 +810,7 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
     m_zoom = browser->m_zoom;
     m_bgColor = browser->m_bgColor;
     m_widgetUrl = browser->m_widgetUrl;
+    m_updateInterval = browser->m_updateInterval;
 
     MythUIType::CopyFrom(base);
 }

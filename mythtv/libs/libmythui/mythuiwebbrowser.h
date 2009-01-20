@@ -29,6 +29,7 @@ class MythWebView : public QWebView
     MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser);
 
     virtual void keyPressEvent(QKeyEvent *event);
+
   protected slots:
     void  handleUnsupportedContent(QNetworkReply *reply);
   private:
@@ -50,6 +51,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void SetHtml(const QString &html, const QUrl &baseUrl = QUrl());
 
     virtual bool keyPressEvent(QKeyEvent *event);
+    virtual void Pulse(void);
 
     QIcon GetIcon(void);
     QUrl  GetUrl(void);
@@ -107,6 +109,9 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
 
     bool         m_active;
     bool         m_initialized;
+    QTime        m_lastUpdateTime;
+    int          m_updateInterval;
+
     float        m_zoom;
     QColor       m_bgColor;
     QUrl         m_widgetUrl;
