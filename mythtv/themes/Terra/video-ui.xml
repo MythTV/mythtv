@@ -252,7 +252,7 @@
             <spacing>0</spacing>
             <buttonarea>0,0,600,646</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,590,88</area>
+                <area>0,0,590,92</area>
                 <state name="active">
                     <imagetype name="buttonimage">
                         <area>17,0,58,92</area>
