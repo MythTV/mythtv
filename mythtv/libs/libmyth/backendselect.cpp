@@ -1,6 +1,6 @@
 /**
  * \class BackendSelect
- * \desc  Classes to Prompt user for a master backend.
+ * \brief Classes to Prompt user for a master backend.
  *
  * \author Originally based on masterselection.cpp/h by David Blain.
  */
