@@ -7,6 +7,7 @@
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythuiimage.h"
+#include "mythvirtualkeyboard.h"
 
 class MythFontProperties;
 
@@ -45,6 +46,9 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
     enum MoveDirection { MoveLeft, MoveRight, MoveEnd };
     bool MoveCursor(MoveDirection);
 
+    void SetKeyboardPosition(PopupPosition pos) { m_keyboardPosition = pos; }
+    PopupPosition GetKeyboardPosition(void)  { return m_keyboardPosition; }
+
     // StorageUser
     void SetDBValue(const QString &text) { SetText(text); }
     QString GetDBValue(void) const { return GetText(); }
@@ -82,6 +86,8 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
     int m_Position;
 
     bool m_isPassword;
+
+    PopupPosition m_keyboardPosition;
 
     MythUIStateType *m_backgroundState;
     MythUIImage *m_cursorImage;

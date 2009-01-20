@@ -16,11 +16,11 @@ using namespace std;
 #include "mythcontext.h"
 #include "util.h"
 #include "mythdialogs.h"
-#include "virtualkeyboard.h"
+#include "virtualkeyboard_qt.h"
 #include "libmythdb/mythverbose.h"
 #include "libmythui/mythmainwindow.h"
 
-typedef VirtualKeyboard* QWidgetP;
+typedef VirtualKeyboardQt* QWidgetP;
 static void qt_delete(QWidgetP &widget)
 {
     if (widget)
@@ -36,7 +36,7 @@ MythComboBox::MythComboBox(bool rw, QWidget *parent, const char *name) :
     QComboBox(parent),
     popup(NULL), helptext(QString::null), AcceptOnSelect(false),
     useVirtualKeyboard(true), allowVirtualKeyboard(rw),
-    popupPosition(VK_POSBELOWEDIT), step(1)
+    popupPosition(VKQT_POSBELOWEDIT), step(1)
 {
     setObjectName(name);
     setEditable(rw);
@@ -71,7 +71,7 @@ void MythComboBox::popupVirtualKeyboard(void)
 {
     qt_delete(popup);
 
-    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+    popup = new VirtualKeyboardQt(gContext->GetMainWindow(), this);
     gContext->GetMainWindow()->detach(popup);
     popup->exec();
 
@@ -435,7 +435,7 @@ MythLineEdit::MythLineEdit(QWidget *parent, const char *name) :
     popup(NULL), helptext(QString::null), rw(true),
     useVirtualKeyboard(true),
     allowVirtualKeyboard(true),
-    popupPosition(VK_POSBELOWEDIT)
+    popupPosition(VKQT_POSBELOWEDIT)
 {
     setObjectName(name);
     useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
@@ -447,7 +447,7 @@ MythLineEdit::MythLineEdit(
     popup(NULL), helptext(QString::null), rw(true),
     useVirtualKeyboard(true),
     allowVirtualKeyboard(true),
-    popupPosition(VK_POSBELOWEDIT)
+    popupPosition(VKQT_POSBELOWEDIT)
 {
     setObjectName(name);
     useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
@@ -473,7 +473,7 @@ void MythLineEdit::popupVirtualKeyboard(void)
 {
     qt_delete(popup);
 
-    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+    popup = new VirtualKeyboardQt(gContext->GetMainWindow(), this);
     gContext->GetMainWindow()->detach(popup);
     popup->exec();
 
@@ -648,7 +648,7 @@ void MythRemoteLineEdit::Init()
 
     popup = NULL;
     useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
-    popupPosition = VK_POSBELOWEDIT;
+    popupPosition = VKQT_POSBELOWEDIT;
 }
 
 
@@ -1144,7 +1144,7 @@ void MythRemoteLineEdit::popupVirtualKeyboard(void)
 {
     qt_delete(popup);
 
-    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+    popup = new VirtualKeyboardQt(gContext->GetMainWindow(), this);
     gContext->GetMainWindow()->detach(popup);
     popup->exec();
 

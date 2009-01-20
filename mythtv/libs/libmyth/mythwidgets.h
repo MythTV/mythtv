@@ -25,7 +25,7 @@
 
 using namespace std;
 
-#include "virtualkeyboard.h"
+#include "virtualkeyboard_qt.h"
 
 #include "mythexp.h"
 
@@ -50,8 +50,8 @@ class MPUBLIC MythComboBox: public QComboBox
     void setStep(int _step = 1)              { step = _step; }
     void setAllowVirtualKeyboard(bool allowKbd = true)
     { allowVirtualKeyboard = allowKbd; }
-    void setPopupPosition(PopupPosition pos) { popupPosition = pos; }
-    PopupPosition getPopupPosition(void)     { return popupPosition; }
+    void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; }
+    PopupPositionQt getPopupPosition(void)     { return popupPosition; }
 
   signals:
     void changeHelpText(QString);
@@ -75,12 +75,12 @@ class MPUBLIC MythComboBox: public QComboBox
     virtual void popupVirtualKeyboard(void);
 
   private:
-    VirtualKeyboard *popup;
+    VirtualKeyboardQt *popup;
     QString helptext;
     bool AcceptOnSelect;
     bool useVirtualKeyboard;
     bool allowVirtualKeyboard;
-    PopupPosition popupPosition;
+    PopupPositionQt popupPosition;
     int step;
 };
 
@@ -156,8 +156,8 @@ class MPUBLIC MythLineEdit : public QLineEdit
     // may be a better way to do it
     //void setSmartVirtualKeyboard(bool allowKbd = true)
 	//       { allowSmartKeyboard   = allowKbd; }
-    void setPopupPosition(PopupPosition pos) { popupPosition = pos; }
-    PopupPosition getPopupPosition(void) { return popupPosition; }
+    void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; }
+    PopupPositionQt getPopupPosition(void) { return popupPosition; }
 
     virtual QString text();
 
@@ -180,12 +180,12 @@ class MPUBLIC MythLineEdit : public QLineEdit
     virtual void popupVirtualKeyboard(void);
 
   private:
-    VirtualKeyboard *popup;
+    VirtualKeyboardQt *popup;
     QString helptext;
     bool rw;
     bool useVirtualKeyboard;
     bool allowVirtualKeyboard;
-    PopupPosition popupPosition;
+    PopupPositionQt popupPosition;
 };
 
 /**
@@ -212,8 +212,8 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
     void insert(QString text);
     void backspace();
     void del();
-    void setPopupPosition(PopupPosition pos) { popupPosition = pos; };
-    PopupPosition getPopupPosition(void)     { return popupPosition; };
+    void setPopupPosition(PopupPositionQt pos) { popupPosition = pos; };
+    PopupPositionQt getPopupPosition(void)     { return popupPosition; };
 
     virtual QString text();
 
@@ -272,9 +272,9 @@ class MPUBLIC MythRemoteLineEdit : public QTextEdit
 
     int m_lines;
 
-    VirtualKeyboard *popup;
+    VirtualKeyboardQt *popup;
     bool             useVirtualKeyboard;
-    PopupPosition    popupPosition;
+    PopupPositionQt    popupPosition;
 };
 
 class MPUBLIC MythPushButton : public QPushButton

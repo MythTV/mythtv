@@ -1811,7 +1811,7 @@ MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name)
     connect(editor, SIGNAL(textChanged()), this, SLOT(searchTextChanged()));
     addWidget(editor);
     editor->setFocus();
-    editor->setPopupPosition(VK_POSBOTTOMDIALOG);
+    editor->setPopupPosition(VKQT_POSBOTTOMDIALOG);
 
     listbox = new MythListBox(this);
     connect(listbox, SIGNAL(accepted(int)), this, SLOT(AcceptItem(int)));

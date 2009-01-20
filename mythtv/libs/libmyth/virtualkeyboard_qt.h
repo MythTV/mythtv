@@ -1,25 +1,25 @@
-#ifndef VIRTUALKEYBOARD_H_
-#define VIRTUALKEYBOARD_H_
+#ifndef VIRTUALKEYBOARDQT_H_
+#define VIRTUALKEYBOARDQT_H_
 
 #include "mythdialogs.h"
 
 class QKeyEvent;
 
 /// Preferred position to place virtual keyboard popup.
-enum PopupPosition 
+enum PopupPositionQt 
 {
-    VK_POSABOVEEDIT = 1,
-    VK_POSBELOWEDIT,
-    VK_POSTOPDIALOG,
-    VK_POSBOTTOMDIALOG,
-    VK_POSCENTERDIALOG
+    VKQT_POSABOVEEDIT = 1,
+    VKQT_POSBELOWEDIT,
+    VKQT_POSTOPDIALOG,
+    VKQT_POSBOTTOMDIALOG,
+    VKQT_POSCENTERDIALOG
 };
 
-class MPUBLIC VirtualKeyboard : public MythThemedDialog
+class MPUBLIC VirtualKeyboardQt : public MythThemedDialog
 {
     Q_OBJECT
   public:
-    VirtualKeyboard(MythMainWindow *parent, 
+    VirtualKeyboardQt(MythMainWindow *parent, 
                     QWidget *parentEdit,
                     const char *name = 0,
                     bool setsize = true);
@@ -36,7 +36,7 @@ class MPUBLIC VirtualKeyboard : public MythThemedDialog
 
   protected:
     void Teardown(void);
-    ~VirtualKeyboard(); // use deleteLater() instead for thread safety
+    ~VirtualKeyboardQt(); // use deleteLater() instead for thread safety
 
   private:
     UIKeyboardType *m_keyboard;

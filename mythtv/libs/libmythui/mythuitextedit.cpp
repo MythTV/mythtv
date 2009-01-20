@@ -31,6 +31,8 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     m_cursorImage = NULL;
     m_Text = NULL;
 
+    m_keyboardPosition = VK_POSBELOWEDIT;
+
     connect(this, SIGNAL(TakingFocus()), SLOT(Select()));
     connect(this, SIGNAL(LosingFocus()), SLOT(Deselect()));
 
@@ -91,6 +93,27 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
     {
         QString maxlength = getFirstText(element);
         SetMaxLength(maxlength.toInt());
+    }
+    else if (element.tagName() == "keyboardposition")
+    {
+        QString pos = getFirstText(element);
+        if (pos == "aboveedit")
+            m_keyboardPosition = VK_POSABOVEEDIT;
+        else if (pos == "belowedit")
+            m_keyboardPosition = VK_POSBELOWEDIT;
+        else if (pos == "screentop")
+            m_keyboardPosition = VK_POSTOPDIALOG;
+        else if (pos == "screenbottom")
+            m_keyboardPosition = VK_POSBOTTOMDIALOG;
+        else if (pos == "screencenter")
+            m_keyboardPosition = VK_POSCENTERDIALOG;
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("MythUITextEdit: Unknown popup position '%1'")
+                            .arg(pos));
+            m_keyboardPosition = VK_POSBELOWEDIT;
+        }
     }
     else
         return MythUIType::ParseElement(element);
@@ -342,6 +365,22 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
         {
             RemoveCharacter();
         }
+        else if (action == "SELECT")
+        {
+            if (true) //gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
+            {
+                MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+                MythUIVirtualKeyboard *kb =  new MythUIVirtualKeyboard(popupStack, this);
+
+                if (kb->Create())
+                {
+                    //connect(kb, SIGNAL(keyPress(QString)), SLOT(keyPress(QString)));
+                    popupStack->AddScreen(kb);
+                }
+                else
+                    delete kb;
+            }
+        }
         else
             handled = false;
     }
@@ -368,6 +407,7 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
     m_cursorBlinkRate = textedit->m_cursorBlinkRate;
     m_maxLength = textedit->m_maxLength;
     m_Filter = textedit->m_Filter;
+    m_keyboardPosition = textedit->m_keyboardPosition;
 
     MythUIType::CopyFrom(base);
 

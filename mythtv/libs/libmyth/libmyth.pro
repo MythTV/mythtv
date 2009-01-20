@@ -24,10 +24,13 @@ HEADERS += mythwidgets.h mythwizard.h schemawizard.h
 HEADERS += output.h remotefile.h
 HEADERS += settings.h 
 HEADERS += uilistbtntype.h uitypes.h util.h
-HEADERS += volumebase.h virtualkeyboard.h visual.h xmlparse.h
+HEADERS += volumebase.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
 HEADERS += mythhttppool.h mythhttphandler.h
+
+# remove when everything is switched to mythui
+HEADERS += virtualkeyboard_qt.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
 SOURCES += audiooutputdigitalencoder.cpp audiosettings.cpp
@@ -41,10 +44,13 @@ SOURCES += mythwidgets.cpp mythwizard.cpp schemawizard.cpp
 SOURCES += output.cpp remotefile.cpp
 SOURCES += settings.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp
-SOURCES += volumebase.cpp virtualkeyboard.cpp xmlparse.cpp
+SOURCES += volumebase.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 SOURCES += mythhttppool.cpp mythhttphandler.cpp
+
+# remove when everything is switched to mythui
+SOURCES += virtualkeyboard_qt.cpp
 
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
@@ -80,11 +86,13 @@ inc.files += audiooutput.h audiosettings.h util.h
 inc.files += inetcomms.h mythmedia.h mythwizard.h schemawizard.h dbutil.h
 inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h
-inc.files += virtualkeyboard.h
 inc.files += mythexp.h mythpluginapi.h storagegroup.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
 inc.files += mythterminal.h mythdeque.h
 inc.files += mythhttppool.h
+
+# remove when everything is switched to mythui
+inc.files += virtualkeyboard_qt.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

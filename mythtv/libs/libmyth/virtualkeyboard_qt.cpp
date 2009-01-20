@@ -4,7 +4,7 @@
 #include <QFrame>
 #include <QKeyEvent>
 
-#include "virtualkeyboard.h"
+#include "virtualkeyboard_qt.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
@@ -17,7 +17,7 @@
 #define LOC_WARN QString("VirtualKeyboard, Warning: ")
 #define LOC_ERR  QString("VirtualKeyboard, Error: ")
 
-VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
+VirtualKeyboardQt::VirtualKeyboardQt(MythMainWindow *parent,
                     QWidget *parentEdit,
                     const char *name,
                     bool setsize)
@@ -30,7 +30,7 @@ VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
     SwitchLayout(GetMythUI()->GetLanguageAndVariant());
 }
 
-void VirtualKeyboard::SwitchLayout(const QString &lang)
+void VirtualKeyboardQt::SwitchLayout(const QString &lang)
 {
     if (!m_parentEdit)
     {
@@ -95,7 +95,7 @@ void VirtualKeyboard::SwitchLayout(const QString &lang)
 
     QPoint newpos;
 
-    PopupPosition preferredPos;
+    PopupPositionQt preferredPos;
     if (m_parentEdit->inherits("MythLineEdit"))
     {
         MythLineEdit *par = (MythLineEdit *)m_parentEdit;
@@ -113,10 +113,10 @@ void VirtualKeyboard::SwitchLayout(const QString &lang)
     }
     else
     {
-        preferredPos = VK_POSCENTERDIALOG;
+        preferredPos = VKQT_POSCENTERDIALOG;
     }
 
-    if (preferredPos == VK_POSBELOWEDIT)
+    if (preferredPos == VKQT_POSBELOWEDIT)
     {
         if (pw->mapTo(tlw, QPoint(0,pwg.height() + m_popupHeight + 5)).y()
                 < tlwg.height())
@@ -128,7 +128,7 @@ void VirtualKeyboard::SwitchLayout(const QString &lang)
             newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, - 5 - m_popupHeight);
         }
     }
-    else if (preferredPos == VK_POSABOVEEDIT)
+    else if (preferredPos == VKQT_POSABOVEEDIT)
     {
         if (pw->mapTo(tlw, QPoint(0, - m_popupHeight - 5)).y()
             > 0)
@@ -140,25 +140,25 @@ void VirtualKeyboard::SwitchLayout(const QString &lang)
             newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, pwg.height() + 5);
         }
     }
-    else if (preferredPos == VK_POSTOPDIALOG)
+    else if (preferredPos == VKQT_POSTOPDIALOG)
     {
         newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 5);
         this->move(newpos);
     }
-    else if (preferredPos == VK_POSBOTTOMDIALOG)
+    else if (preferredPos == VKQT_POSBOTTOMDIALOG)
     {
         newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
                         tlwg.height() - 5 - m_popupHeight);
         this->move(newpos);
     }
-    else if (preferredPos == VK_POSCENTERDIALOG)
+    else if (preferredPos == VKQT_POSCENTERDIALOG)
     {
         newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
                         tlwg.height() / 2 - m_popupHeight / 2);
         this->move(newpos);
     }
 
-    if (preferredPos == VK_POSABOVEEDIT || preferredPos == VK_POSBELOWEDIT)
+    if (preferredPos == VKQT_POSABOVEEDIT || preferredPos == VKQT_POSBELOWEDIT)
     {
         int delx = pw->mapTo(tlw,newpos).x() + m_popupWidth - tlwg.width() + 5;
         newpos = QPoint(newpos.x() - (delx > 0 ? delx : 0), newpos.y());
@@ -196,23 +196,23 @@ void VirtualKeyboard::SwitchLayout(const QString &lang)
     m_keyboard->SetParentDialog(this);
 }
 
-VirtualKeyboard::~VirtualKeyboard(void)
+VirtualKeyboardQt::~VirtualKeyboardQt(void)
 {
     Teardown();
 }
 
-void VirtualKeyboard::deleteLater(void)
+void VirtualKeyboardQt::deleteLater(void)
 {
     Teardown();
 }
 
-void VirtualKeyboard::Teardown(void)
+void VirtualKeyboardQt::Teardown(void)
 {
     m_keyboard   = NULL;
     m_parentEdit = NULL;
 }
 
-void VirtualKeyboard::Show(void)
+void VirtualKeyboardQt::Show(void)
 {
     grabKeyboard();
 
@@ -222,7 +222,7 @@ void VirtualKeyboard::Show(void)
         m_parentEdit->setFocus();
 }
 
-void VirtualKeyboard::hide()
+void VirtualKeyboardQt::hide()
 {
     releaseKeyboard();
 
@@ -232,7 +232,7 @@ void VirtualKeyboard::hide()
     MythDialog::hide();
 }
 
-void VirtualKeyboard::keyPressEvent(QKeyEvent *e)
+void VirtualKeyboardQt::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
