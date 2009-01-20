@@ -1,5 +1,5 @@
 /** -*- Mode: c++ -*-
- * @file main.cpp
+ * @file mythplugins/mythcontrols/mythcontrols/main.cpp
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
  * @brief This file contains the plug-in glue functions
  *
