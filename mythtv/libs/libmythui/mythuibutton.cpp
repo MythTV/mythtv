@@ -18,6 +18,7 @@ MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
     m_clickTimer->setSingleShot(true);
 
     m_Pushed = false;
+    m_Lockable = false;
 
     m_Text = NULL;
     m_BackgroundState = NULL;
@@ -185,6 +186,9 @@ void MythUIButton::UnPush()
         SetState("active");
     else
         SetState("disabled");
+
+    if (m_Lockable)
+        emit Clicked();
 }
 
 void MythUIButton::SetText(const QString &msg)
@@ -243,6 +247,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
     }
 
     m_Message = button->m_Message;
+    m_Lockable = button->m_Lockable;
 
     MythUIType::CopyFrom(base);
 
