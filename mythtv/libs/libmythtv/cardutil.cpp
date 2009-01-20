@@ -383,7 +383,7 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
     return false;
 }
 
-/** \fn CardUtil::GetCardIDs(const QString&, QString, QString)
+/**
  *  \brief Returns all cardids of cards that uses the specified
  *         videodevice if specified, and optionally rawtype and a non-local 
  *         hostname. The result is ordered from smallest to largest.

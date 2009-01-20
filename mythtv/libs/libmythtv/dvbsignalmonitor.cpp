@@ -25,7 +25,7 @@
 #define LOC_WARN QString("DVBSM(%1), Warning: ").arg(channel->GetDevice())
 #define LOC_ERR QString("DVBSM(%1), Error: ").arg(channel->GetDevice())
 
-/** \fn DVBSignalMonitor::DVBSignalMonitor(int,DVBChannel*,uint,const char*)
+/**
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous

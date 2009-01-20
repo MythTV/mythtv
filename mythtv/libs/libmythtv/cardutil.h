@@ -133,7 +133,7 @@ class MPUBLIC CardUtil
             (rawtype == "HDPVR");
     }
 
-    /// Convenience function for GetCardIDs(const QString&, QString, QString)
+    /// Convenience function for GetCardIDs()
     static uint         GetFirstCardID(const QString &videodevice)
     {
         vector<uint> list = GetCardIDs(videodevice);

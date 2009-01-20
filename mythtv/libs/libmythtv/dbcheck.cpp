@@ -439,7 +439,7 @@ static bool performActualUpdate(
     return true;
 }
 
-/** \fn UpgradeTVDatabaseSchema(void)
+/**
  *  \brief Called from outside dbcheck.cpp to update the schema.
  *
  *   If the "DBSchemaVer" property equals the currentDatabase version this

@@ -4150,7 +4150,7 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                 "Audio buffer overflow, audio data lost!");
 }
 
-/** \fn void SetWatched(bool forceWatched = false);
+/**
  *  \brief Determines if the recording should be considered watched
  *
  *   By comparing the number of framesPlayed to the total number of

@@ -22,7 +22,7 @@
 #define LOC QString("HDHRSM(%1): ").arg(channel->GetDevice())
 #define LOC_ERR QString("HDHRSM(%1), Error: ").arg(channel->GetDevice())
 
-/** \fn HDHRSignalMonitor::HDHRSignalMonitor(int,HDHRChannel*,uint,const char*)
+/**
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous

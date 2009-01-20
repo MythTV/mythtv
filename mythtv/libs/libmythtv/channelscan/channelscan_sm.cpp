@@ -112,9 +112,6 @@ class ScannedChannelInfo
  *
  */
 
-/** \fn ChannelScanSM::ChannelScanSM(ScanMonitor*,QString,ChannelBase*,
-                       int,uint,uint,const QString&)
- */
 ChannelScanSM::ChannelScanSM(
     ScanMonitor *_scan_monitor,
     const QString &_cardtype, ChannelBase *_channel,
