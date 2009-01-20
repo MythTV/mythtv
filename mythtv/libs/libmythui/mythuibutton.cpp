@@ -191,6 +191,29 @@ void MythUIButton::UnPush()
         emit Clicked();
 }
 
+void MythUIButton::SetLocked(bool locked)
+{
+    if (!m_Lockable)
+        return;
+
+    if (locked)
+    {
+        m_Pushed = true;
+        SetState("pushed");
+    }
+    else
+    {
+        m_Pushed = false;
+
+        if (m_HasFocus)
+            SetState("selected");
+        else if (m_Enabled)
+            SetState("active");
+        else
+            SetState("disabled");
+    }
+}
+
 void MythUIButton::SetText(const QString &msg)
 {
     if (m_Message == msg)

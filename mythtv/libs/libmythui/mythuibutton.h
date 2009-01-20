@@ -36,6 +36,7 @@ class MPUBLIC MythUIButton : public MythUIType
     void Push(bool lock=false);
 
     void SetLockable(bool lockable) { m_Lockable = lockable; };
+    void SetLocked(bool locked);
 
   protected slots:
     void Select();
