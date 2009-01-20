@@ -45,7 +45,7 @@
       <text>Screen Setup Wizards</text>
       <action>SCREENSETUPWIZARD</action>
    </button>
-    
+
     <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
@@ -61,8 +61,7 @@
       <text lang="PL">Ustaw klawisze</text>
       <text lang="JA">キー設定</text>
       <text lang="RU">Редактировать клавиши</text>
-      <action>PLUGIN mythcontrols</action>
-      <depends>mythcontrols</depends>
+      <action>SETUP_KEYS</action>
    </button>
 
    <button>
