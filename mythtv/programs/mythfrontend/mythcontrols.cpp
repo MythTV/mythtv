@@ -27,7 +27,6 @@
  */
 
 // Qt headers
-#include <qnamespace.h>
 #include <QStringList>
 #include <QApplication>
 #include <QKeyEvent>

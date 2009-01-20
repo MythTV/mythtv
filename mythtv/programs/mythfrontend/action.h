@@ -1,8 +1,8 @@
 /* -*- myth -*- */
 /**
- * @file actionid.h
+ * @file action.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
- * @brief Header for the action identifier.
+ * @brief Main header for the action class.
  *
  * Copyright (C) 2005 Micah Galizia
  *
@@ -21,12 +21,72 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA
  */
-#ifndef ACTIONID_H
-#define ACTIONID_H
+#ifndef ACTION_H
+#define ACTION_H
 
 // Qt headers
-#include <QString>
-#include <QList>
+#include <QStringList>
+#include <QHash>
+
+/** \class Action
+ *  \brief An action (for this plugin) consists of a description,
+ *         and a set of key sequences.
+ *
+ *   On its own, the action cannot actually identify a particular
+ *   action. This is a class to make the keybinding class easier
+ *   to manage.
+ */
+class Action
+{
+  public:
+    /// \brief Create a new empty action.
+    Action(const QString &description) : m_description(description)
+    {
+        m_description.detach();
+    }
+    Action(const QString &description, const QString &keys);
+
+    // Commands
+    bool AddKey(const QString &key);
+    bool ReplaceKey(const QString &newkey, const QString &oldkey);
+    /// \brief Remove a key from this action.
+    /// \return true on success, false otherwise.
+    bool RemoveKey(const QString &key)
+    {
+        return m_keys.removeAll(key);
+    }
+
+    // Gets
+    /// \brief Returns the action description. (note: not threadsafe)
+    QString     GetDescription(void) const
+    {
+        QString desc = m_description;
+        desc.detach();
+        return desc;
+    }
+    /// \brief Returns the key sequence(s) that trigger this action.
+    ///        (note: not threadsafe)
+    QStringList GetKeys(void)        const
+    {
+        QStringList keys = m_keys;
+        keys.detach();
+        return keys;
+    }
+    /// \brief Returns comma delimited string of key bindings
+    QString     GetKeyString(void)   const { return m_keys.join(","); }
+    /// \brief Returns true iff the action has no keys
+    bool        IsEmpty(void)        const { return m_keys.empty(); }
+    bool        HasKey(const QString &key) const;
+
+  public:
+    /// \brief The maximum number of keys that can be bound to an action.
+    static const unsigned int kMaximumNumberOfBindings = 4;
+
+  private:
+    QString     m_description; ///< The actions description.
+    QStringList m_keys;        ///< The keys bound to the action.
+};
+typedef QHash<QString, Action*> Context;
 
 /** \class ActionID
  *  \brief A class that uniquely identifies an action.
@@ -85,4 +145,4 @@ class ActionID
 };
 typedef QList<ActionID> ActionList;
 
-#endif /* ACTIONID_H */
+#endif /* ACTION_H */

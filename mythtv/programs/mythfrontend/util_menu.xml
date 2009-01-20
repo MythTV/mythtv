@@ -23,7 +23,7 @@
       <text lang="PL">Narzędzia muzyczne</text>
       <text lang="HE">כלי מוסיקה</text>
       <action>PLUGIN mythmusic</action>
-      <depends>mythmusic</depends>	
+      <depends>mythmusic</depends>
    </button>
 
    <button>
@@ -52,7 +52,7 @@
       <action>JUMP Video Manager</action>
       <depends>mythvideo</depends>
    </button>
-    
+
    <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
@@ -73,10 +73,9 @@
       <text lang="SL">Urejanje tipk</text>
       <text lang="PL">Edytuj klawisze</text>
       <text lang="HE">עריכת מקשים</text>
-      <action>PLUGIN mythcontrols</action>
-      <depends>mythcontrols</depends>	
+      <action>SETUP_KEYS</action>
    </button>
-      
+
    <button>
       <type>SETUP_MENU</type>
       <text>Setup</text>

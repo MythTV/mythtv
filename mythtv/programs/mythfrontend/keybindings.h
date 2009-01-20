@@ -26,7 +26,6 @@
 
 // MythControls headers
 #include "action.h"
-#include "actionid.h"
 #include "actionset.h"
 
 /** @class KeyBindings.
@@ -38,7 +37,7 @@
 class KeyBindings
 {
   public:
-    /// \brief Levels of conflict 
+    /// \brief Levels of conflict
     enum ConflictLevels { kKeyBindingWarning, kKeyBindingError, };
 
     KeyBindings(const QString &hostname);

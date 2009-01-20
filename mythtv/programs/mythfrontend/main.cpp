@@ -58,6 +58,7 @@ using namespace std;
 #include "mediarenderer.h"
 #include "mythmainwindow.h"
 #include "mythappearance.h"
+#include "mythcontrols.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
 
@@ -124,8 +125,22 @@ void startAppearWiz(void)
 
     if (mythappearance->Create())
         mainStack->AddScreen(mythappearance);
+    else
+        delete mythappearance;
 }
 
+
+void startKeysSetup()
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythControls *mythcontrols = new MythControls(mainStack, "mythcontrols");
+
+    if (mythcontrols->Create())
+        mainStack->AddScreen(mythcontrols);
+    else
+        delete mythcontrols;
+}
 
 void startGuide(void)
 {
@@ -439,12 +454,14 @@ void TVMenuCallback(void *data, QString &selection)
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
     }
-
     else if (sel == "screensetupwizard")
     {
        startAppearWiz();
     }
-
+    else if (sel == "setup_keys")
+    {
+        startKeysSetup();
+    }
     else if (sel == "settings recording")
     {
         ProfileGroupEditor editor;

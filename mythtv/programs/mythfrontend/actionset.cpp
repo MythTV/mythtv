@@ -26,7 +26,6 @@
 
 // MythContext headers
 #include "action.h"
-#include "actionid.h"
 #include "actionset.h"
 
 const QString ActionSet::kJumpContext   = "JumpPoints";
@@ -166,7 +165,7 @@ QStringList ActionSet::GetContextStrings(void) const
     ContextMap::const_iterator it = m_contexts.begin();
     for (; it != m_contexts.end(); ++it)
         context_strings.append(it.key());
-    
+
     context_strings.detach();
     return context_strings;
 }
@@ -185,7 +184,7 @@ QStringList ActionSet::GetActionStrings(const QString &context_name) const
     Context::const_iterator it = (*cit).begin();
     for (; it != (*cit).end(); ++it)
         action_strings.append(it.key());
-    
+
     action_strings.detach();
     return action_strings;
 }
