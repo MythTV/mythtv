@@ -50,9 +50,8 @@ extern "C" {
 static QString to_comma_list(const QStringList &list);
 
 /**
- * \fn VideoOutput::Create(const QString&, MythCodecID, const QSize&,
-                            PIPState pipState,
-                           float, WId, const QRect&, Wid, PIPType)
+ * \brief  Depending on compile-time configure settings and run-time
+ *         renderer settings, create a relevant VideoOutput subclass.
  * \return instance of VideoOutput if successful, NULL otherwise.
  */
 VideoOutput *VideoOutput::Create(
@@ -589,7 +588,6 @@ void VideoOutput::ResizeDisplayWindow(const QRect &rect, bool save_visible_rect)
 }
 
 /**
- * \fn VideoOutput::EmbedInWidget(WId, int, int, int, int)
  * \brief Tells video output to embed video in an existing window.
  * \param x   X location where to locate video
  * \param y   Y location where to locate video

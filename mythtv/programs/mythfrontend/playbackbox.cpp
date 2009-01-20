@@ -2644,7 +2644,7 @@ void PlaybackBox::doEditScheduled()
 
 }
 
-/** \fn doAllowRerecord
+/**
  *  \brief Callback function when Allow Re-record is pressed in Watch Recordings
  *
  * Hide the current program from the scheduler by calling ForgetHistory

@@ -103,9 +103,9 @@ AutoExpire::~AutoExpire()
     }
 }
 
-/** \fn AutoExpire::GetDesiredSpace(int fsID)
- *   returns the desired free space for each file system
- *   used by the scheduler to select the next recording dir
+/**
+ *   \brief  Used by the scheduler to select the next recording dir
+ *   \return the desired free space for each file system
  */
 
 size_t AutoExpire::GetDesiredSpace(int fsID) const
