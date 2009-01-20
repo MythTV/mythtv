@@ -1282,19 +1282,20 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     if (!m_parent)
         return;
 
+    QString state = "active";
     if (selected)
     {
         button->MoveToTop();
 
         if (m_parent->m_active)
         {
-            button->DisplayState("selected");
+            state = "selected";
         }
         else
-            button->DisplayState("inactive");
+            state = "inactive";
     }
-    else
-        button->DisplayState("active");
+
+    button->DisplayState(state);
 
     MythUIGroup *buttonstate = dynamic_cast<MythUIGroup *>
                                             (button->GetCurrentState());
@@ -1302,7 +1303,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     if (!buttonstate)
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to query buttonlist state: %1")
-                                            .arg(button->GetCurrentState()));
+                                                                    .arg(state));
         return;
     }
 
