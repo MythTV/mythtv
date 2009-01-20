@@ -55,7 +55,7 @@ const char *PreviewGenerator::kInUseID = "preview_generator";
  *   and when the preview thread finishes running if Start(void) was called.
  */
 
-/** \fn PreviewGenerator::PreviewGenerator(const ProgramInfo*,bool)
+/**
  *  \brief Constructor
  *
  *   ProgramInfo::pathname must include recording prefix, so that
@@ -581,8 +581,7 @@ bool PreviewGenerator::IsLocal(void) const
     return (QFileInfo(pathname).exists() && QFileInfo(pathdir).isWritable());
 }
 
-/** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*, const QString&,
-    long long, bool, int&, int&, int&, float&)
+/**
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
  *  \param pginfo       Recording to grab from.

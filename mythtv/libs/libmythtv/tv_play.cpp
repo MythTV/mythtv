@@ -7158,7 +7158,7 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
 }
 
 
-/** \fn TV::GetNextProgram(RemoteEncoder*,int,InfoMap&)
+/**
  *  \brief Fetches information on the desired program from the backend.
  *  \param enc RemoteEncoder to query, if null query the actx->recorder.
  *  \param direction BrowseDirection to get information on.

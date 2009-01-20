@@ -983,7 +983,6 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 }
 
 /**
- * \fn VideoOutputXv::InitVideoBuffers(MythCodecID,bool,bool,bool)
  * Creates and initializes video buffers.
  *
  * \sideeffect sets video_output_subtype if it succeeds.

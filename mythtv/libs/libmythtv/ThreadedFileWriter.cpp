@@ -509,7 +509,7 @@ uint ThreadedFileWriter::BufUsed(void) const
     return (wpos >= rpos) ? wpos - rpos : tfw_buf_size - rpos + wpos;
 }
 
-/** \fn ThreadedFileWriter::BufFree(void)
+/**
  *  \brief Number of bytes that can be written without blocking. With locking.
  */
 uint ThreadedFileWriter::BufFree(void) const

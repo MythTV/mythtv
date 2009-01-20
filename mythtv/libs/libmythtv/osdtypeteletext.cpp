@@ -147,11 +147,11 @@ void OSDTypeTeletext::Reset(void)
     m_pageinput[2] = '0';
 }
 
-/** \fn OSDTypeTeletext::AddPageHeader(int,int,const unsigned char*,int,int,int)
+/**
  *  \brief Adds a new page header (page=0 if none).
  */
 void OSDTypeTeletext::AddPageHeader(int page, int subpage,
-                                    const unsigned char* buf,
+                                    const uint8_t * buf,
                                     int vbimode, int lang, int flags)
 {
     OSDUpdateLocker locker(&m_lock, this);
@@ -226,11 +226,11 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
     }
 }
 
-/** \fn OSDTypeTeletext::AddTeletextData(int,int,const unsigned char*,int)
+/**
  *  \brief Adds Teletext Data from TeletextDecoder
  */
 void OSDTypeTeletext::AddTeletextData(int magazine, int row, 
-                                      const unsigned char* buf, int vbimode)
+                                      const uint8_t * buf, int vbimode)
 {
     OSDUpdateLocker locker(&m_lock, this);
 
@@ -350,14 +350,14 @@ void OSDTypeTeletext::PageUpdated(int page, int subpage)
     m_osd_changed  = true;
 }
 
-/** \fn OSDTypeTeletext::HeaderUpdated(unsigned char*,int)
+/**
  *  \brief Updates the header (given in page with language lang)
  * 
  *  \param page Pointer to the header which should be displayed
  *  \param lang Language of the header
  *
  */
-void OSDTypeTeletext::HeaderUpdated(unsigned char *page, int lang)
+void OSDTypeTeletext::HeaderUpdated(uint8_t * page, int lang)
 {
     (void)lang;
 
@@ -379,7 +379,7 @@ void OSDTypeTeletext::HeaderUpdated(unsigned char *page, int lang)
     //m_osd->UpdateTeletext();
 }
 
-/** \fn OSDTypeTeletext::FindPageInternal(int, int)
+/**
  *  \brief Finds the given page
  *
  *  \param page Page number
@@ -683,7 +683,7 @@ void OSDTypeTeletext::KeyPress(uint key)
     }
 }
 
-/** \fn OSDTypeTeletext::SetPage(uint)
+/**
  *  \brief Set TeletextPage to display
  *  \param page PageNr. (in hex)
  *  \param subpage Subpage (-1 if first available)
@@ -869,7 +869,7 @@ void OSDTypeTeletext::DrawCharacter(OSDSurface *surface,
                        255, doubleheight);
 }
 
-/** \fn OSDTypeTeletext::DrawMosaic(int, int, code, int)
+/**
  *  \brief Draws a mosaic as defined in ETSI EN 300 706
  *
  *  \param x X position (40 cols)

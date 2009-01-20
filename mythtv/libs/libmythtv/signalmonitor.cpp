@@ -140,7 +140,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     return signalMonitor;
 }
 
-/** \fn SignalMonitor::SignalMonitor(int,ChannelBase*,uint,const char*)
+/**
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
