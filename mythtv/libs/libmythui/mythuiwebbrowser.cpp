@@ -58,7 +58,7 @@ void MythWebView::keyPressEvent(QKeyEvent *event)
 
 void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 {
-    if (reply->error() == QNetworkReply::NoError) 
+    if (reply->error() == QNetworkReply::NoError)
     {
         return;
     }
@@ -89,10 +89,10 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
 
     QList<QWebFrame*> frames;
     frames.append(page()->mainFrame());
-    while (!frames.isEmpty()) 
+    while (!frames.isEmpty())
     {
         QWebFrame *frame = frames.takeFirst();
-        if (frame->url() == reply->url()) 
+        if (frame->url() == reply->url())
         {
             frame->setHtml(html, reply->url());
             return;
@@ -137,8 +137,8 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
  * you can scroll it but that is all.
  *
  * One thing to be aware of is you cannot show popups above this widget when it
- * is in active mode and has focus so either call Active(false) or move the focus
- * to another widget before showing the popup.
+ * is in active mode and has focus so either call Active(false) or move the
+ * focus to another widget before showing the popup.
 */
 
 
@@ -377,7 +377,8 @@ void MythUIWebBrowser::SetZoom(float zoom)
 
 /** \fn MythUIWebBrowser::CanGoForward(void)
  *  \brief Can go forward in page history
- *  \return Return true if it is possible to go forward in the pages visited history
+ *  \return Return true if it is possible to go
+ *          forward in the pages visited history
  */
 bool MythUIWebBrowser::CanGoForward(void)
 {
@@ -389,7 +390,8 @@ bool MythUIWebBrowser::CanGoForward(void)
 
 /** \fn MythUIWebBrowser::CanGoBack(void)
  *  \brief Can we go backward in page history
- *  \return Return true if it is possible to go backward in the pages visited history
+ *  \return Return true if it is possible to go
+ *          backward in the pages visited history
  */
 bool MythUIWebBrowser::CanGoBack(void)
 {
@@ -555,7 +557,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 
         if (action == "TOGGLEINPUT")
         {
-#if 0 
+#if 0
             if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
             {
                 if (inputToggled)
@@ -585,10 +587,12 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 
         if (action == "UP")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Vertical);
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                          Qt::Vertical);
             if (pos > 0)
             {
-                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos - m_Area.height() / 10);
+                m_browser->page()->mainFrame()->setScrollBarValue(
+                    Qt::Vertical, pos - m_Area.height() / 10);
                 UpdateBuffer();
             }
             else
@@ -596,10 +600,13 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "DOWN")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Vertical);
-            if (pos != m_browser->page()->mainFrame()->scrollBarMaximum(Qt::Vertical))
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                          Qt::Vertical);
+            if (pos != m_browser->page()->mainFrame()->scrollBarMaximum(
+                           Qt::Vertical))
             {
-                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos + m_Area.height() / 10);
+                m_browser->page()->mainFrame()->setScrollBarValue(
+                    Qt::Vertical, pos + m_Area.height() / 10);
                 UpdateBuffer();
             }
             else
@@ -607,10 +614,12 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "LEFT")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Horizontal);
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                          Qt::Horizontal);
             if (pos > 0)
             {
-                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos - m_Area.width() / 10);
+                m_browser->page()->mainFrame()->setScrollBarValue(
+                    Qt::Horizontal, pos - m_Area.width() / 10);
                 UpdateBuffer();
             }
             else
@@ -618,10 +627,13 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "RIGHT")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Horizontal);
-            if (pos != m_browser->page()->mainFrame()->scrollBarMaximum(Qt::Horizontal))
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                          Qt::Horizontal);
+            if (pos != m_browser->page()->mainFrame()->scrollBarMaximum(
+                           Qt::Horizontal))
             {
-                m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos + m_Area.width() / 10);
+                m_browser->page()->mainFrame()->setScrollBarValue(
+                    Qt::Horizontal, pos + m_Area.width() / 10);
                 UpdateBuffer();
             }
             else
@@ -629,14 +641,18 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "PAGEUP")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Vertical);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos - m_Area.height());
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                          Qt::Vertical);
+            m_browser->page()->mainFrame()->setScrollBarValue(
+                Qt::Vertical, pos - m_Area.height());
             UpdateBuffer();
         }
         else if (action == "PAGEDOWN")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Vertical);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Vertical, pos + m_Area.height());
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                          Qt::Vertical);
+            m_browser->page()->mainFrame()->setScrollBarValue(
+                Qt::Vertical, pos + m_Area.height());
             UpdateBuffer();
         }
         else if (action == "ZOOMIN")
@@ -655,20 +671,25 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "PAGELEFT")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Horizontal);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos - m_Area.width());
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                Qt::Horizontal);
+            m_browser->page()->mainFrame()->setScrollBarValue(
+                Qt::Horizontal, pos - m_Area.width());
             UpdateBuffer();
         }
         else if (action == "PAGERIGHT")
         {
-            int pos = m_browser->page()->mainFrame()->scrollBarValue(Qt::Horizontal);
-            m_browser->page()->mainFrame()->setScrollBarValue(Qt::Horizontal, pos + m_Area.width());
+            int pos = m_browser->page()->mainFrame()->scrollBarValue(
+                Qt::Horizontal);
+            m_browser->page()->mainFrame()->setScrollBarValue(
+                Qt::Horizontal, pos + m_Area.width());
             UpdateBuffer();
         }
         else if (action == "NEXTLINK")
         {
-            QKeyEvent tabKey(event->type(), Qt::Key_Tab, event->modifiers(), QString::null,
-                         event->isAutoRepeat(), event->count());
+            QKeyEvent tabKey(event->type(), Qt::Key_Tab,
+                             event->modifiers(), QString::null,
+                             event->isAutoRepeat(), event->count());
 
             *event = tabKey;
 
@@ -687,8 +708,9 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "FOLLOWLINK")
         {
-            QKeyEvent returnKey(event->type(), Qt::Key_Return, event->modifiers(),
-                            QString::null, event->isAutoRepeat(), event->count());
+            QKeyEvent returnKey(event->type(), Qt::Key_Return,
+                                event->modifiers(), QString::null,
+                                event->isAutoRepeat(), event->count());
             *event = returnKey;
 
             return false;
@@ -863,7 +885,7 @@ void MythUIWebBrowser::Init(void)
     painter.fillRect(area, QColor(Qt::white));
     painter.setPen(Qt::black);
     painter.setFont(QFont("Arial", 30));
-    painter.drawText(area, Qt::AlignCenter|Qt::TextWordWrap, 
+    painter.drawText(area, Qt::AlignCenter|Qt::TextWordWrap,
                      "This feature requires QtWebKit from Qt 4.4.0 or later");
     painter.end();
 
@@ -966,7 +988,7 @@ void MythUIWebBrowser::slotLoadProgress(int progress)
     (void) progress;
 }
 
-void MythUIWebBrowser::slotTitleChanged( const QString &title)
+void MythUIWebBrowser::slotTitleChanged(const QString &title)
 {
     (void) title;
 }
@@ -989,6 +1011,10 @@ void MythUIWebBrowser::slotLosingFocus(void)
 }
 
 void MythUIWebBrowser::UpdateBuffer(void)
+{
+}
+
+void MythUIWebBrowser::Pulse(void)
 {
 }
 
