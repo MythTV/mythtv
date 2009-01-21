@@ -1005,6 +1005,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         field = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD;
 
     outputSurface = outputSurfaces[surfaceNum];
+    usleep(2000);
     vdp_st = vdp_presentation_queue_block_until_surface_idle(
         vdp_flip_queue,
         outputSurface, 
