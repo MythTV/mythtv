@@ -305,7 +305,6 @@ void VideoOutputQuartzView::Transform(QRect newRect)
     h = newRect.height();
     sw = parentData->srcWidth;
     sh = parentData->srcHeight;
-    float aspect = parentData->srcAspect;
 
     // constants for transformation operations
     Fixed one, zero;
