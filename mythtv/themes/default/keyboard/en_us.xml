@@ -25,11 +25,11 @@
         <move left="key_`" right="key_2" up="key_lshift" down="key_q"></move>
     </key>
     <key name="key_2" type="char">
-        <char normal="2" shift="0x0022" alt="2" altshift="0x0022"></char>
+        <char normal="2" shift="@" alt="2" altshift="@"></char>
         <move left="key_1" right="key_3" up="key_lshift" down="key_w"></move>
     </key>
     <key name="key_3" type="char">
-        <char normal="3" shift="0x00a3" alt="3" altshift="0x00a3"></char>
+        <char normal="3" shift="#" alt="3" altshift="#"></char>
         <move left="key_2" right="key_4" up="key_lock" down="key_e"></move>
     </key>
     <key name="key_4" type="char">
@@ -69,11 +69,11 @@
         <move left="key_-" right="key_#" up="key_moveright" down="key_]"></move>
     </key>
     <key name="key_#" type="char">
-        <char normal="#" shift="~" alt="#" altshift="~"></char>
+        <char normal="\" shift="|" alt="\" altshift="|"></char>
         <move left="key_=" right="key_`" up="key_rshift" down="key_back"></move>
     </key>
     <key name="key_`" type="char">
-        <char normal="`" shift="0x00ac" alt="`" altshift="0x00ac"></char>
+        <char normal="`" shift="~" alt="`" altshift="~"></char>
         <move left="key_#" right="key_1" up="key_rshift" down="key_back"></move>
     </key>
 
@@ -169,13 +169,13 @@
         <move left="key_l" right="key_'" up="key_p" down="key_/"></move>
     </key>
     <key name="key_'" type="char">
-        <char normal="'" shift="@" alt="'" altshift="@"></char>
+        <char normal="'" shift="0x0022" alt="'" altshift="0x0022"></char>
         <move left="key_;" right="key_done" up="key_[" down="key_comp"></move>
     </key>
 
     <!-- row 4 -->
     <key name="key_\" type="char">
-        <char normal="\" shift="|" alt="\" altshift="|"></char>
+        <char normal="0x00a3" shift="0x00ac" alt="0x00a3" altshift="0x00ac"></char>
         <move left="key_del" right="key_z" up="key_a" down="key_lshift"></move>
     </key>
     <key name="key_z" type="char">
