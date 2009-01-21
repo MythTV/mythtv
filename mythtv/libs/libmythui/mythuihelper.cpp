@@ -70,11 +70,6 @@ class MythUIHelperPrivate
 
     void Init();
 
-    bool IsWideMode()   const {return (m_baseWidth == 1280);}
-    void SetWideMode()        {m_baseWidth = 1280; m_baseHeight = 720;}
-    bool IsSquareMode() const {return (m_baseWidth == 800);}
-    void SetSquareMode()      {m_baseWidth = 800; m_baseHeight = 600;}
-
     void GetScreenBounds(void);
     void StoreGUIsettings(void);
 
@@ -96,6 +91,7 @@ class MythUIHelperPrivate
 
     // Dimensions of the theme
     int m_baseWidth, m_baseHeight;
+    bool m_isWide;
 
     QMap<QString, MythImage*> imageCache;
     QMap<QString, uint> CacheTrack;
@@ -400,21 +396,15 @@ void MythUIHelper::LoadQtConfig(void)
 
     ThemeInfo *themeinfo = new ThemeInfo(themedir);
 
-    if (themeinfo && themeinfo->IsWide())
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Switching to wide mode (%1)").arg(themename));
-        d->SetWideMode();
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Switching to square mode (%1)").arg(themename));
-        d->SetSquareMode();
-    }
-
     if (themeinfo)
+    {
+        d->m_isWide = themeinfo->IsWide();
+        d->m_baseWidth = themeinfo->BaseRes()->width();
+        d->m_baseHeight = themeinfo->BaseRes()->height();
+        VERBOSE(VB_GENERAL, QString("Using theme base resolution of %1x%2")
+                                    .arg(d->m_baseWidth).arg(d->m_baseHeight));
         delete themeinfo;
+    }
 
     // Recalculate GUI dimensions
     d->StoreGUIsettings();
@@ -738,7 +728,7 @@ void MythUIHelper::CacheThemeImages(void)
         d->m_screenheight == d->m_baseHeight)
         return;
 
-    if (d->IsWideMode())
+    if (d->m_isWide)
         CacheThemeImagesDirectory(GetThemesParentDir() + "default-wide/");
     CacheThemeImagesDirectory(GetThemesParentDir() + "default/");
 }
@@ -1016,7 +1006,7 @@ QList<QString> MythUIHelper::GetThemeSearchPath(void)
     QList<QString> searchpath;
 
     searchpath.append(GetThemeDir());
-    if (d->IsWideMode())
+    if (d->m_isWide)
         searchpath.append(GetThemesParentDir() + "default-wide/");
     searchpath.append(GetThemesParentDir() + "default/");
     searchpath.append("/tmp/");
