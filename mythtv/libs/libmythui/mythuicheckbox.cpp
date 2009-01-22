@@ -70,6 +70,26 @@ void MythUICheckBox::SetCheckState(MythUIStateType::StateType state)
 {
     m_currentCheckState = state;
     m_CheckState->DisplayState(state);
+
+    emit valueChanged();
+}
+
+void MythUICheckBox::SetCheckState(bool onOff)
+{
+    if (onOff)
+    {
+        m_currentCheckState = MythUIStateType::Full;
+    }
+    else
+    {
+        m_currentCheckState = MythUIStateType::Off;
+    }
+
+    if (m_CheckState)
+        m_CheckState->DisplayState(m_currentCheckState);
+
+    emit toggled(onOff);
+    emit valueChanged();
 }
 
 MythUIStateType::StateType MythUICheckBox::GetCheckState()

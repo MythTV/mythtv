@@ -27,6 +27,7 @@ class MPUBLIC MythUICheckBox : public MythUIType
     void toggleCheckState(void);
 
     void SetCheckState(MythUIStateType::StateType state);
+    void SetCheckState(bool onoff);
     MythUIStateType::StateType GetCheckState();
 
   protected slots:
