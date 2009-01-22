@@ -367,11 +367,8 @@ diff -ru qt-mac-free-3.3.8.orig/src/tools/qglobal.h qt-mac-free-3.3.8.new/src/to
   'exif'
   =>
   {
-    'url'  => "$sourceforge/sourceforge/libexif/libexif-0.6.13.tar.bz2",
-    'conf' => [ '--disable-nls' ],
-    'post-conf' => 'echo "install-apidocs:
-install-apidocs-internals:
-" >> doc/Makefile.in'
+    'url'  => "$sourceforge/sourceforge/libexif/libexif-0.6.17.tar.bz2",
+    'conf' => [ '--disable-docs' ]
   }
 );
 
