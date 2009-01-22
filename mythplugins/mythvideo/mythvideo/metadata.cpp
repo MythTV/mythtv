@@ -460,10 +460,10 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_rating = query.value(3).toString();
     m_year = query.value(4).toInt();
     m_userrating = (float)query.value(5).toDouble();
-    if (isnan(m_userrating))
+    if (isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
-    if (m_userrating < -10.0 || m_userrating >= 10.0)
-        m_userrating = 0.0;
+    if (m_userrating > 10.0)
+        m_userrating = 10.0;
     m_length = query.value(6).toInt();
     m_filename = query.value(7).toString();
     m_showlevel = ParentalLevel(query.value(8).toInt()).GetLevel();
