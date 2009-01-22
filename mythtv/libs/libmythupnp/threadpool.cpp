@@ -21,6 +21,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <QCoreApplication>
+
 #include <algorithm>
 using namespace std;
 
@@ -118,6 +120,34 @@ bool CEvent::WaitForEvent( unsigned long time /*= ULONG_MAX */ )
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
+// WorkerEvent Class Implementation
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void WorkerEvent::customEvent(QEvent *e)
+{
+    if (m_parent)
+        m_parent->WakeForWork();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void WorkerEvent::TimeOut()
+{
+    if (m_parent && m_parent->m_nIdleTimeoutMS > 0 && !m_parent->m_bTermRequested)
+        m_parent->quit();
+}
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
 // WorkerThread Class Implementation
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -134,9 +164,6 @@ WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
     m_pThreadPool    = pThreadPool;
     m_sName          = sName;
     m_nIdleTimeoutMS = 60000;
-    m_bAllowTimeout  = false;
-    m_timer = new QTimer(this);
-    m_timer->setSingleShot(true);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -146,12 +173,9 @@ WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
 WorkerThread::~WorkerThread()
 {
     m_bTermRequested = true;
-    m_timer->stop();
 
     quit();
     wait();
-
-    delete m_timer;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -176,11 +200,24 @@ bool WorkerThread::WaitForInitialized( unsigned long msecs )
 
 void WorkerThread::SignalWork()
 {
+    if (!m_bInitialized)
+        return;
+
+    QCoreApplication::postEvent(m_wakeup, new QEvent(QEvent::User));
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void WorkerThread::WakeForWork()
+{
     try
     {
+        m_timer->stop();
         ProcessWork();
 
-        if (m_bAllowTimeout)
+        if (m_nIdleTimeoutMS > 0)
             m_timer->start(m_nIdleTimeoutMS);
     }
     catch(...)
@@ -188,6 +225,7 @@ void WorkerThread::SignalWork()
         VERBOSE( VB_IMPORTANT, QString( "WorkerThread::Run( %1 ) - Unexpected Exception." )
                  .arg( m_sName ));
     }
+
     if (!m_bTermRequested)
     {
         m_pThreadPool->ThreadAvailable( this );
@@ -201,26 +239,6 @@ void WorkerThread::SignalWork()
 void WorkerThread::SetTimeout( long nIdleTimeout )
 {
     m_nIdleTimeoutMS = nIdleTimeout;
-
-    if (m_nIdleTimeoutMS == -1 )
-    {
-        m_bAllowTimeout = false;
-    }
-    else
-    {
-        m_bAllowTimeout = true;
-        m_timer->start(m_nIdleTimeoutMS);
-    }
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-void WorkerThread::TimeOut()
-{
-    if (m_bAllowTimeout)
-        quit();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -229,14 +247,19 @@ void WorkerThread::TimeOut()
 
 void WorkerThread::run( void )
 {
+    m_timer = new QTimer();
+    m_timer->setSingleShot(true);
+
+    m_wakeup = new WorkerEvent(this);
+
     m_mutex.lock();
     m_bInitialized = true;
     m_mutex.unlock();
 
     m_Initialized.SetEvent();
 
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
-    if (m_bAllowTimeout)
+    connect(m_timer, SIGNAL(timeout()), m_wakeup, SLOT(TimeOut()));
+    if (m_nIdleTimeoutMS > 0)
         m_timer->start(m_nIdleTimeoutMS);
 
     exec();
@@ -246,6 +269,9 @@ void WorkerThread::run( void )
         m_pThreadPool->ThreadTerminating( this );
         m_pThreadPool = NULL;
     }
+
+    delete m_wakeup;
+    delete m_timer;
 
     VERBOSE( VB_UPNP, QString( "WorkerThread:Run - Exiting: %1" ).arg( m_sName ));
 }

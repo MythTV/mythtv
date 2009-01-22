@@ -66,6 +66,31 @@ class CEvent
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
+// WorkerEvent Class Declaration
+//
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+class WorkerThread;
+class WorkerEvent : public QObject
+{
+    Q_OBJECT
+
+    public:
+        WorkerEvent(WorkerThread *parent) : m_parent(parent) { }
+
+        virtual void customEvent(QEvent *e);
+
+    public slots:
+        void     TimeOut();
+ 
+    private:
+        WorkerThread *m_parent;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
 // WorkerThread Class Declaration
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -88,9 +113,10 @@ class WorkerThread : public QThread
         QString             m_sName;
 
         long                m_nIdleTimeoutMS;
-        bool                m_bAllowTimeout;
         QTimer             *m_timer;
+        WorkerEvent        *m_wakeup;
 
+        void                WakeForWork();
 
     protected:
 
@@ -108,8 +134,8 @@ class WorkerThread : public QThread
 
     public slots:
         void     SignalWork();
-        void     TimeOut();
 
+    friend class WorkerEvent;
 };
 
 //////////////////////////////////////////////////////////////////////////////
