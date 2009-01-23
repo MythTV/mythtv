@@ -61,6 +61,7 @@ VDPAUContext::VDPAUContext()
     pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
     videoSurfaces(0),       surface_render(0), numSurfaces(0),
     videoSurface(0),        outputSurface(0),  decoder(0),
+    maxReferences(0),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
     osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
     osdSize(QSize(0,0)),    osdReady(false),   deintAvail(false),
@@ -818,7 +819,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
 
     VdpStatus vdp_st;
     bool ok = true;
-    vdpau_render_state_t *render;
+    vdpau_render_state_t *render = (vdpau_render_state_t *)frame->buf;
 
     if (frame->pix_fmt != pix_fmt)
     {
@@ -827,12 +828,18 @@ void VDPAUContext::Decode(VideoFrame *frame)
         if (frame->pix_fmt == PIX_FMT_VDPAU_H264_MAIN ||
             frame->pix_fmt == PIX_FMT_VDPAU_H264_HIGH)
         {
-            uint32_t round_width = (frame->width + 15) & ~15;
-            uint32_t round_height = (frame->height + 15) & ~15;
-            uint32_t surf_size = (round_width * round_height * 3) / 2;
-            max_references = (12 * 1024 * 1024) / surf_size;
-            if (max_references > 16)
-                max_references = 16;
+            if (render)
+                maxReferences = render->info.h264.num_ref_frames;
+
+            if (maxReferences < 1 || maxReferences > 16)
+            {
+                uint32_t round_width = (frame->width + 15) & ~15;
+                uint32_t round_height = (frame->height + 15) & ~15;
+                uint32_t surf_size = (round_width * round_height * 3) / 2;
+                maxReferences = (12 * 1024 * 1024) / surf_size;
+            }
+            if (maxReferences > 16)
+                maxReferences = 16;
         }
 
         VdpDecoderProfile vdp_decoder_profile;
@@ -858,7 +865,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
             vdp_decoder_profile,
             frame->width,
             frame->height,
-            max_references,
+            maxReferences,
             &decoder
         );
         CHECK_ST
@@ -868,7 +875,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
             pix_fmt = frame->pix_fmt;
             VERBOSE(VB_PLAYBACK, LOC +
                 QString("Created VDPAU decoder (%1 ref frames)")
-                .arg(max_references));
+                .arg(maxReferences));
         }
         else
         {

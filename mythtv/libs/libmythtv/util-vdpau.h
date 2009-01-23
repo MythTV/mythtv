@@ -101,6 +101,7 @@ class VDPAUContext
     VdpOutputSurface outputSurface;
 
     VdpDecoder decoder;
+    uint32_t   maxReferences;
     VdpVideoMixer videoMixer;
 
     VdpRect outRect;
