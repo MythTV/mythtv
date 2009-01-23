@@ -1,0 +1,270 @@
+<keydefinitions>
+
+    <!-- key definitions 
+        name  - should match one of the keys defined in keyboard.xml
+
+        type  - char      add shown char to edit
+                - shift     toggle shift state
+                - done      close popup keyboard
+                - moveleft  move cursor left
+                - moveright move cursor right
+                - lock      lock shift on 
+                - del       delete char to right
+                - back      delete char to left
+                - alt       show alternate layout
+
+        char  - the char to show on the key in the four modes
+                can be any char or a hex char code like 0x1234
+
+        move  - key to move to in the up/down/left/right directions
+    -->
+
+    <!-- top row -->
+    <key name="key_1" type="char">
+        <char normal="0x0026" shift="1" alt="0x0026" altshift="1"></char>
+        <move left="key_`" right="key_2" up="key_lshift" down="key_q"></move>
+    </key>
+    <key name="key_2" type="char">
+        <char normal="0x00e9" shift="2" alt="~" altshift="2"></char>
+        <move left="key_1" right="key_3" up="key_lshift" down="key_w"></move>
+    </key>
+    <key name="key_3" type="char">
+        <char normal="0x0022" shift="3" alt="#" altshift="3"></char>
+        <move left="key_2" right="key_4" up="key_lock" down="key_e"></move>
+    </key>
+    <key name="key_4" type="char">
+        <char normal="'" shift="4" alt="{" altshift="4"></char>
+        <move left="key_3" right="key_5" up="key_lock" down="key_r"></move>
+    </key>
+    <key name="key_5" type="char">
+        <char normal="(" shift="5" alt="[" altshift="5"></char>
+        <move left="key_4" right="key_6" up="key_lock" down="key_t"></move>
+    </key>
+    <key name="key_6" type="char">
+          <char normal="-" shift="6" alt="|" altshift="6"></char>
+        <move left="key_5" right="key_7" up="key_space" down="key_y"></move>
+    </key>
+    <key name="key_7" type="char">
+        <char normal="0x00e8" shift="7" alt="`" altshift="7"></char>
+        <move left="key_6" right="key_8" up="key_space" down="key_u"></move>
+    </key>
+    <key name="key_8" type="char">
+        <char normal="_" shift="8" alt="\" altshift="8"></char>
+        <move left="key_7" right="key_9" up="key_alt" down="key_i"></move>
+    </key>
+    <key name="key_9" type="char">
+        <char normal="0x00e7" shift="9" alt="^" altshift="9"></char>
+        <move left="key_8" right="key_0" up="key_alt" down="key_o"></move>
+    </key>
+    <key name="key_0" type="char">
+        <char normal="0x00e0" shift="0" alt="@" altshift="0"></char>
+        <move left="key_9" right="key_-" up="key_moveleft" down="key_p"></move>
+    </key>
+    <key name="key_-" type="char">
+        <char normal=")" shift="0x00b0" alt="]" altshift="0x00b0"></char>
+        <move left="key_0" right="key_=" up="key_moveright" down="key_["></move>
+    </key>
+    <key name="key_=" type="char">
+        <char normal="=" shift="+" alt="}" altshift="+"></char>
+        <move left="key_-" right="key_#" up="key_moveright" down="key_]"></move>
+    </key>
+    <key name="key_#" type="char">
+        <char normal="0x00b2" shift="0x00b3" alt="0x00b2" altshift="0x00b3"></char>
+        <move left="key_=" right="key_`" up="key_rshift" down="key_back"></move>
+    </key>
+    <key name="key_`" type="char">
+        <char normal="*" shift="0x00b5" alt="*" altshift="0x00b5"></char>
+        <move left="key_#" right="key_1" up="key_rshift" down="key_back"></move>
+    </key>
+
+    <!-- row 2 -->
+    <key name="key_q" type="char">
+        <char normal="a" shift="A" alt="a" altshift="A"></char>
+        <move left="key_back" right="key_w" up="key_1" down="key_a"></move>
+    </key>
+    <key name="key_w" type="char">
+        <char normal="z" shift="Z" alt="z" altshift="Z"></char>
+        <move left="key_q" right="key_e" up="key_2" down="key_s"></move>
+    </key>
+    <key name="key_e" type="char">
+        <char normal="e" shift="E" alt="e" altshift="E"></char>
+        <move left="key_w" right="key_r" up="key_3" down="key_d"></move>
+    </key>
+    <key name="key_r" type="char">
+        <char normal="r" shift="R" alt="r" altshift="R"></char>
+        <move left="key_e" right="key_t" up="key_4" down="key_f"></move>
+    </key>
+    <key name="key_t" type="char">
+        <char normal="t" shift="T" alt="t" altshift="T"></char>
+        <move left="key_r" right="key_y" up="key_5" down="key_g"></move>
+    </key>
+    <key name="key_y" type="char">
+        <char normal="y" shift="Y" alt="y" altshift="Y"></char>
+        <move left="key_t" right="key_u" up="key_6" down="key_h"></move>
+    </key>
+    <key name="key_u" type="char">
+        <char normal="u" shift="U" alt="u" altshift="U"></char>
+        <move left="key_y" right="key_i" up="key_7" down="key_j"></move>
+    </key>
+    <key name="key_i" type="char">
+        <char normal="i" shift="I" alt="i" altshift="I"></char>
+        <move left="key_u" right="key_o" up="key_8" down="key_k"></move>
+    </key>
+    <key name="key_o" type="char">
+        <char normal="o" shift="O" alt="o" altshift="O"></char>
+        <move left="key_i" right="key_p" up="key_9" down="key_l"></move>
+    </key>
+    <key name="key_p" type="char">
+        <char normal="p" shift="P" alt="p" altshift="P"></char>
+        <move left="key_o" right="key_[" up="key_0" down="key_;"></move>
+    </key>
+    <key name="key_[" type="char">
+        <char normal="^" shift="0x00a8" alt="^" altshift="0x00a8"></char>
+        <move left="key_p" right="key_]" up="key_-" down="key_'"></move>
+    </key>
+    <key name="key_]" type="char">
+        <char normal="$" shift="0x00a3" alt="0x00a4" altshift="0x00a3"></char>
+        <move left="key_[" right="key_back" up="key_=" down="key_'"></move>
+    </key>
+
+    <!-- row 3 -->
+    <key name="key_a" type="char">
+        <char normal="q" shift="Q" alt="q" altshift="Q"></char>
+        <move left="key_done" right="key_s" up="key_q" down="key_z"></move>
+    </key>
+    <key name="key_s" type="char">
+        <char normal="s" shift="S" alt="s" altshift="S"></char>
+        <move left="key_a" right="key_d" up="key_w" down="key_x"></move>
+    </key>
+    <key name="key_d" type="char">
+        <char normal="d" shift="D" alt="d" altshift="D"></char>
+        <move left="key_s" right="key_f" up="key_e" down="key_c"></move>
+    </key>
+    <key name="key_f" type="char">
+        <char normal="f" shift="F" alt="f" altshift="F"></char>
+        <move left="key_d" right="key_g" up="key_r" down="key_v"></move>
+    </key>
+    <key name="key_g" type="char">
+        <char normal="g" shift="G" alt="g" altshift="G"></char>
+        <move left="key_f" right="key_h" up="key_t" down="key_b"></move>
+    </key>
+    <key name="key_h" type="char">
+        <char normal="h" shift="H" alt="h" altshift="H"></char>
+        <move left="key_g" right="key_j" up="key_y" down="key_n"></move>
+    </key>
+    <key name="key_j" type="char">
+        <char normal="j" shift="J" alt="j" altshift="J"></char>
+        <move left="key_h" right="key_k" up="key_u" down="key_m"></move>
+    </key>
+    <key name="key_k" type="char">
+        <char normal="k" shift="K" alt="k" altshift="K"></char>
+        <move left="key_j" right="key_l" up="key_i" down="key_,"></move>
+    </key>
+    <key name="key_l" type="char">
+        <char normal="l" shift="L" alt="l" altshift="L"></char>
+        <move left="key_k" right="key_;" up="key_o" down="key_."></move>
+    </key>
+    <key name="key_;" type="char">
+        <char normal="m" shift="M" alt="m" altshift="M"></char>
+        <move left="key_l" right="key_'" up="key_p" down="key_/"></move>
+    </key>
+    <key name="key_'" type="char">
+        <char normal="0x00f9" shift="%" alt="0x00f9" altshift="%"></char>
+        <move left="key_;" right="key_done" up="key_[" down="key_comp"></move>
+    </key>
+
+    <!-- row 4 -->
+    <key name="key_\" type="char">
+        <char normal="0x003c" shift=">" alt="0x003c" altshift=">"></char>
+        <move left="key_del" right="key_z" up="key_a" down="key_lshift"></move>
+    </key>
+    <key name="key_z" type="char">
+        <char normal="w" shift="W" alt="w" altshift="W"></char>
+        <move left="key_\" right="key_x" up="key_a" down="key_lshift"></move>
+    </key>
+    <key name="key_x" type="char">
+        <char normal="x" shift="X" alt="x" altshift="X"></char>
+        <move left="key_z" right="key_c" up="key_s" down="key_lock"></move>
+    </key>
+    <key name="key_c" type="char">
+        <char normal="c" shift="C" alt="c" altshift="C"></char>
+        <move left="key_x" right="key_v" up="key_d" down="key_lock"></move>
+    </key>
+    <key name="key_v" type="char">
+        <char normal="v" shift="V" alt="v" altshift="V"></char>
+        <move left="key_c" right="key_b" up="key_f" down="key_lock"></move>
+    </key>
+    <key name="key_b" type="char">
+        <char normal="b" shift="B" alt="b" altshift="B"></char>
+        <move left="key_v" right="key_n" up="key_g" down="key_space"></move>
+    </key>
+    <key name="key_n" type="char">
+        <char normal="n" shift="N" alt="n" altshift="N"></char>
+        <move left="key_b" right="key_m" up="key_h" down="key_space"></move>
+    </key>
+    <key name="key_m" type="char">
+        <char normal="," shift="?" alt="," altshift="?"></char>
+        <move left="key_n" right="key_," up="key_j" down="key_alt"></move>
+    </key>
+    <key name="key_," type="char">
+        <char normal=";" shift="." alt=";" altshift="."></char>
+        <move left="key_m" right="key_." up="key_k" down="key_alt"></move>
+    </key>
+    <key name="key_." type="char">
+        <char normal=":" shift="/" alt=":" altshift="/"></char>
+        <move left="key_," right="key_/" up="key_l" down="key_moveleft"></move>
+    </key>
+    <key name="key_/" type="char">
+        <char normal="!" shift="0x00a7" alt="!" altshift="0x00a7"></char>
+        <move left="key_." right="key_comp" up="key_;" down="key_moveleft"></move>
+    </key>
+
+    <!-- row 5 -->
+    <key name="key_space" type="char">
+        <char normal=" " shift=" " alt=" " altshift=" "></char>
+        <move left="key_lock" right="key_alt" up="key_n" down="key_7"></move>
+    </key>
+
+    <!-- special keys -->
+    <key name="key_lshift" type="shift">
+        <char normal="" shift="" alt="" altshift=""></char>
+        <move left="key_rshift" right="key_lock" up="key_\" down="key_1"></move>
+    </key>
+    <key name="key_lock" type="lock">
+        <char normal="Lock" shift="Lock" alt="Lock" altshift="Lock"></char>
+        <move left="key_lshift" right="key_space" up="key_x" down="key_4"></move>
+    </key>
+    <key name="key_moveleft" type="moveleft">
+        <char normal="" shift="" alt="" altshift=""></char>
+        <move left="key_alt" right="key_moveright" up="key_/" down="key_0"></move>
+    </key>
+    <key name="key_moveright" type="moveright">
+        <char normal="" shift="" alt="" altshift=""></char>
+        <move left="key_moveleft" right="key_rshift" up="key_comp" down="key_="></move>
+    </key>
+    <key name="key_rshift" type="shift">
+        <char normal="" shift="" alt="" altshift=""></char>
+        <move left="key_moveright" right="key_lshift" up="key_del" down="key_`"></move>
+    </key>
+    <key name="key_back" type="back">
+        <char normal="Back" shift="Back" alt="Back" altshift="Back"></char>
+        <move left="key_]" right="key_q" up="key_`" down="key_done"></move>
+    </key>
+    <key name="key_comp" type="comp">
+        <char normal="Comp" shift="Comp" alt="Comp" altshift="Comp"></char>
+        <move left="key_/" right="key_del" up="key_'" down="key_moveright"></move>
+    </key>
+    <key name="key_del" type="del">
+        <char normal="Del" shift="Del" alt="Del" altshift="Del"></char>
+        <move left="key_comp" right="key_\" up="key_done" down="key_rshift"></move>
+    </key>
+    <key name="key_done" type="done">
+        <char normal="" shift="" alt="" altshift=""></char>
+        <move left="key_'" right="key_a" up="key_back" down="key_del"></move>
+    </key>
+    <key name="key_alt" type="alt">
+        <char normal="AltGr" shift="AltGr" alt="AltGr" altshift="AltGr"></char>
+        <move left="key_space" right="key_moveleft" up="key_," down="key_9"></move>
+    </key>
+
+</keydefinitions>
