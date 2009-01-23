@@ -359,7 +359,7 @@ void ThumbFinder::updateThumb(void)
     if (itemNo != 0)
     {
         thumb->caption = frameToTime(thumb->frame);
-        item->setText(thumb->caption);
+        item->SetText(thumb->caption);
     }
 
     m_imageGrid->SetRedraw();
