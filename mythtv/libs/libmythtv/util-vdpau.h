@@ -46,7 +46,7 @@ class VDPAUContext
                       bool pause_frame);
     void DisplayNextFrame(void);
     void SetNextFrameDisplayTimeOffset(int delayus);
-    bool InitOSD(QSize osd_size);
+    bool InitOSD(void);
     void UpdateOSD(void* const planes[3], QSize size,
                    void* const alpha[1]);
     void DisableOSD(void) { osdReady = false; }
@@ -77,6 +77,7 @@ class VDPAUContext
     bool InitFlipQueue(Window win);
     void DeinitFlipQueue(void);
 
+    void AddOutputSurfaces(void);
     bool UpdateReferenceFrames(VideoFrame *frame);
     bool InitColorControl(void);
     bool SetPictureAttributes(void);
@@ -94,11 +95,14 @@ class VDPAUContext
     uint maxVideoHeight;
     VdpVideoSurface *videoSurfaces;
     vdpau_render_state_t *surface_render;
+    int checkVideoSurfaces;
     int numSurfaces;
 
-    VdpOutputSurface outputSurfaces[2];
-    VdpVideoSurface videoSurface;
+    vector<VdpOutputSurface> outputSurfaces;
+    VdpVideoSurface  videoSurface;
     VdpOutputSurface outputSurface;
+    bool             checkOutputSurfaces;
+    QSize            outputSize;
 
     VdpDecoder decoder;
     uint32_t   maxReferences;
@@ -114,7 +118,6 @@ class VDPAUContext
     VdpVideoMixer     osdVideoMixer;
     VdpBitmapSurface  osdAlpha;
     VdpLayer          osdLayer;
-    QSize             osdSize;
     VdpRect           osdRect;
     bool              osdReady;
 
@@ -136,7 +139,6 @@ class VDPAUContext
     VdpBitmapSurface  pipClear;
     QMap<NuppelVideoPlayer*,vdpauPIP> pips;
     int  pipReady;
-    QSize             pipLayerSize;
     bool              pipNeedsClear;
 
     VdpPresentationQueueTarget vdp_flip_target;

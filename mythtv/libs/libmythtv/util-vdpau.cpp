@@ -19,7 +19,8 @@ extern "C" {
 #define LOC QString("VDPAU: ")
 #define LOC_ERR QString("VDPAU Error: ")
 
-#define NUM_OUTPUT_SURFACES 2
+#define MIN_OUTPUT_SURFACES 2
+#define MAX_OUTPUT_SURFACES 4
 #define NUM_REFERENCE_FRAMES 3
 
 #define ARSIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -59,20 +60,20 @@ static const VdpOutputSurfaceRenderBlendState pip_blend =
 VDPAUContext::VDPAUContext()
   : nextframedelay(0),      lastframetime(0),
     pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
-    videoSurfaces(0),       surface_render(0), numSurfaces(0),
-    videoSurface(0),        outputSurface(0),  decoder(0),
-    maxReferences(0),
+    videoSurfaces(0),       surface_render(0), checkVideoSurfaces(8),
+    numSurfaces(0),
+    videoSurface(0),        outputSurface(0),  checkOutputSurfaces(false),
+    outputSize(QSize(0,0)), decoder(0),        maxReferences(2),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
     osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
-    osdSize(QSize(0,0)),    osdReady(false),   deintAvail(false),
+    osdReady(false),        deintAvail(false),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
     needDeintRefs(false),   useColorControl(false),
     pipOutputSurface(0),    pipAlpha(0),       pipBorder(0),
-    pipClear(0),            pipReady(0),       pipLayerSize(QSize(0,0)),
+    pipClear(0),            pipReady(0),       
     pipNeedsClear(false),   vdp_flip_target(NULL), vdp_flip_queue(NULL),
     vdpauDecode(false),     vdp_device(NULL),  errored(false)
 {
-    memset(outputSurfaces, 0, sizeof(outputSurfaces));
 }
 
 VDPAUContext::~VDPAUContext()
@@ -83,6 +84,8 @@ bool VDPAUContext::Init(Display *disp, int screen,
                         Window win, QSize screen_size,
                         bool color_control, MythCodecID mcodecid)
 {
+    outputSize = screen_size;
+
     if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END))
         vdpauDecode = true;
 
@@ -120,6 +123,7 @@ void VDPAUContext::Deinit(void)
     DeinitFlipQueue();
     DeinitPIPLayer();
     DeinitProcs();
+    outputSize =  QSize(0,0);
 }
 
 static const char* dummy_get_error_string(VdpStatus status)
@@ -761,14 +765,15 @@ bool VDPAUContext::InitOutput(QSize size)
         return false;
     }
     
-    for (i = 0; i < NUM_OUTPUT_SURFACES; i++)
+    for (i = 0; i < MIN_OUTPUT_SURFACES; i++)
     {
+        VdpOutputSurface tmp;
         vdp_st = vdp_output_surface_create(
             vdp_device,
             VDP_RGBA_FORMAT_B8G8R8A8,
             size.width(),
             size.height(),
-            &outputSurfaces[i]
+            &tmp
         );
         CHECK_ST
 
@@ -778,6 +783,7 @@ bool VDPAUContext::InitOutput(QSize size)
                 QString("Failed to create output surface."));
             return false;
         }
+        outputSurfaces.push_back(tmp);
     }
 
     outRect.x0 = 0;
@@ -795,9 +801,9 @@ void VDPAUContext::FreeOutput(void)
 
     VdpStatus vdp_st;
     bool ok = true;
-    int i;
+    uint i;
 
-    for (i = 0; i < NUM_OUTPUT_SURFACES; i++)
+    for (i = 0; i < outputSurfaces.size(); i++)
     {
         if (outputSurfaces[i])
         {
@@ -806,6 +812,8 @@ void VDPAUContext::FreeOutput(void)
             CHECK_ST
         }
     }
+    outputSurfaces.clear();
+    checkOutputSurfaces = false;
 }
 
 void VDPAUContext::Decode(VideoFrame *frame)
@@ -823,8 +831,6 @@ void VDPAUContext::Decode(VideoFrame *frame)
 
     if (frame->pix_fmt != pix_fmt)
     {
-        uint32_t max_references = 2;
-
         if (frame->pix_fmt == PIX_FMT_VDPAU_H264_MAIN ||
             frame->pix_fmt == PIX_FMT_VDPAU_H264_HIGH)
         {
@@ -903,6 +909,12 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
                                 QSize screen_size, FrameScanType scan,
                                 bool pause_frame)
 {
+    if (checkVideoSurfaces == 1)
+        checkOutputSurfaces = true;
+
+    if (checkVideoSurfaces > 0)
+        checkVideoSurfaces--;
+
     VdpStatus vdp_st;
     bool ok = true;
     VdpTime dummy;
@@ -1141,7 +1153,46 @@ void VDPAUContext::DisplayNextFrame(void)
     );
     CHECK_ST
 
-    surfaceNum = surfaceNum ^ 1;
+    surfaceNum++;
+    if (surfaceNum >= (int)(outputSurfaces.size()))
+        surfaceNum = 0;;
+
+    if (checkOutputSurfaces)
+        AddOutputSurfaces();
+}
+
+void VDPAUContext::AddOutputSurfaces(void)
+{
+    checkOutputSurfaces = false;
+    VdpStatus vdp_st;
+    bool ok = true;
+
+    int cnt = 0;
+    int extra = MAX_OUTPUT_SURFACES - outputSurfaces.size();
+    if (extra <= 0)
+        return;
+
+    for (int i = 0; i < extra; i++)
+    {
+        VdpOutputSurface tmp;
+        vdp_st = vdp_output_surface_create(
+            vdp_device,
+            VDP_RGBA_FORMAT_B8G8R8A8,
+            outputSize.width(),
+            outputSize.height(),
+            &tmp
+        );
+        // suppress non-fatal error messages
+        ok &= (vdp_st == VDP_STATUS_OK);
+
+        if (!ok)
+            break;
+
+        outputSurfaces.push_back(tmp);
+        cnt++;
+    }
+    VERBOSE(VB_PLAYBACK, LOC + QString("Using %1 output surfaces (max %2)")
+        .arg(outputSurfaces.size()).arg(MAX_OUTPUT_SURFACES));
 }
 
 void VDPAUContext::SetNextFrameDisplayTimeOffset(int delayus)
@@ -1149,7 +1200,7 @@ void VDPAUContext::SetNextFrameDisplayTimeOffset(int delayus)
     nextframedelay = delayus;
 }
 
-bool VDPAUContext::InitOSD(QSize osd_size)
+bool VDPAUContext::InitOSD(void)
 {
     if (!vdp_device)
         return false;
@@ -1157,8 +1208,8 @@ bool VDPAUContext::InitOSD(QSize osd_size)
     VdpStatus vdp_st;
     bool ok = true;
 
-    uint width = osd_size.width();
-    uint height = osd_size.height();
+    uint width = outputSize.width();
+    uint height = outputSize.height();
     VdpBool supported = false;
 
     vdp_st = vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(
@@ -1290,7 +1341,6 @@ bool VDPAUContext::InitOSD(QSize osd_size)
     }
     else
     {
-        osdSize = osd_size;
         osdRect.x0 = 0;
         osdRect.y0 = 0;
         osdRect.x1 = width;
@@ -1304,7 +1354,6 @@ bool VDPAUContext::InitOSD(QSize osd_size)
         return ok;
     }
 
-    osdSize = QSize(0,0);
     return ok;
 }
 
@@ -1312,14 +1361,20 @@ void VDPAUContext::UpdateOSD(void* const planes[3],
                              QSize size,
                              void* const alpha[1])
 {
-    if (size != osdSize)
-        return;
+    if (size != outputSize)
+    {
+        DeinitOSD();
+        if (!InitOSD())
+            return;
+    }
 
     VdpStatus vdp_st;
     bool ok = true;
 
     // upload OSD YV12 data
-    uint32_t pitches[3] = {size.width(), size.width()>>1, size.width()>>1};
+    uint32_t pitches[3] = {outputSize.width(),
+                           outputSize.width()>>1,
+                           outputSize.width()>>1};
     void * const realplanes[3] = { planes[0], planes[2], planes[1] };
 
     vdp_st = vdp_video_surface_put_bits_y_cb_cr(osdVideoSurface,
@@ -1354,7 +1409,7 @@ void VDPAUContext::UpdateOSD(void* const planes[3],
     // upload OSD alpha data
     if (ok)
     {
-        uint32_t pitch[1] = {size.width()};
+        uint32_t pitch[1] = {outputSize.width()};
         vdp_st = vdp_bitmap_surface_put_bits_native(
             osdAlpha,
             alpha,
@@ -1821,13 +1876,12 @@ void VDPAUContext::DeinitPIPLayer(void)
         pipClear = 0;
     }
 
-    pipLayerSize = QSize(0, 0);
     pipReady     = 0;
 }
 
 bool VDPAUContext::InitPIPLayer(QSize screen_size)
 {
-    if (pipLayerSize != screen_size)
+    if (outputSize != screen_size)
         DeinitPIPLayer();
 
     bool ok = true;
@@ -1838,8 +1892,8 @@ bool VDPAUContext::InitPIPLayer(QSize screen_size)
         vdp_st = vdp_output_surface_create(
             vdp_device,
             VDP_RGBA_FORMAT_B8G8R8A8,
-            screen_size.width(),
-            screen_size.height(),
+            outputSize.width(),
+            outputSize.height(),
             &pipOutputSurface
         );
         CHECK_ST
@@ -1932,7 +1986,6 @@ bool VDPAUContext::InitPIPLayer(QSize screen_size)
 
     if (ok && pipNeedsClear)
     {
-        pipLayerSize = screen_size;
         vdp_st = vdp_output_surface_render_bitmap_surface(
             pipOutputSurface,
             NULL,

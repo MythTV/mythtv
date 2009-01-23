@@ -1671,7 +1671,7 @@ bool VideoOutputXv::InitOSD(const QString &osd_renderer)
     if (osd_renderer == "vdpau" && vdpau)
     {
         vdpau_use_osd = true;
-        if (!vdpau->InitOSD(GetTotalOSDBounds().size()))
+        if (!vdpau->InitOSD())
         {
             vdpau_use_osd = false;
             VERBOSE(VB_IMPORTANT, LOC + "Init VDPAU osd failed.");
