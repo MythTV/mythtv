@@ -4,10 +4,10 @@
     <window name="gallery">
 
         <buttonlist name="images">
-            <area>15,20,770,560</area>
+            <area>20,20,1260,680</area>
             <layout>grid</layout>
             <spacing>5</spacing>
-            <buttonarea>0,0,770,520</buttonarea>
+            <buttonarea>0,0,1240,650</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,150,125</area>
                 <state name="active">
@@ -41,7 +41,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>240,530</position>
+                <position>530,650</position>
                 <state type="off">
                     <imagetype name="upon">
                         <filename>up_arrow.png</filename>
@@ -49,7 +49,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>456,530</position>
+                <position>670,650</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>down_arrow.png</filename>
