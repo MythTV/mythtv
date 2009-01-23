@@ -80,6 +80,9 @@ class MPUBLIC SchemaUpgradeWizard : public DBUtil, public QObject
     int     versionsBehind;   ///< How many schema versions old is the DB?
 
   private:
+    MythSchemaUpgrade GuiPrompt(const QString &message,
+                                bool upgradable, bool expert);
+
     bool     m_autoUpgrade;        ///< If no UI, always upgrade
     QString  m_backupResult;       ///< File path, or __FAILED__
     bool     m_expertMode;         ///< Also allow newer DB schema

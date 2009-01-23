@@ -160,6 +160,39 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
 }
 
 
+MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
+                                                 bool upgradable, bool expert)
+{
+    DialogBox       * dlg;
+    MythMainWindow  * win = gContext->GetMainWindow();
+
+    if (!win)
+        return MYTH_SCHEMA_ERROR;
+
+    dlg = new DialogBox(win, message);
+    dlg->AddButton(tr("Exit"));
+    if (upgradable)
+        dlg->AddButton(tr("Upgrade"));
+    if (expert)
+        dlg->AddButton(tr("Use current schema"));
+
+    DialogCode selected = dlg->exec();
+    dlg->deleteLater();
+
+    switch (selected)
+    {
+        case kDialogCodeRejected:
+        case kDialogCodeButton0:
+            return MYTH_SCHEMA_EXIT;
+        case kDialogCodeButton1:
+            return upgradable ? MYTH_SCHEMA_UPGRADE: MYTH_SCHEMA_USE_EXISTING;
+        case kDialogCodeButton2:
+            return MYTH_SCHEMA_USE_EXISTING;
+        default:
+            return MYTH_SCHEMA_ERROR;
+    }
+}
+
 /**
  * Tell the user that a schema needs to be upgraded, ask if that's OK,
  * remind them about backups, et c.  The GUI buttons default to Exit.
@@ -328,35 +361,14 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
     if (gui)
     {
-        DialogBox       * dlg;
-        MythScreenStack * pop;
-        MythMainWindow  * win = gContext->GetMainWindow();
-
-        if (!win)
-            return MYTH_SCHEMA_ERROR;
-
-        pop = win->GetStack("popup stack");
-
-        dlg = new DialogBox(win, message);
-        dlg->AddButton(tr("Exit"));
-
         if (returnValue == MYTH_SCHEMA_ERROR)
         {
             // Display error, return warning to caller
-            dlg->exec();
-            dlg->deleteLater();
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "", message);
             return MYTH_SCHEMA_ERROR;
         }
 
-        if (upgradable)
-            dlg->AddButton(tr("Upgrade"));
-        if (m_expertMode)
-            dlg->AddButton(tr("Use current schema"));
-
-        DialogCode selected = dlg->exec();
-        dlg->deleteLater();
-
-        if (selected == kDialogCodeRejected || selected == kDialogCodeButton0)
+        if (GuiPrompt(message, upgradable, m_expertMode) == MYTH_SCHEMA_EXIT)
             return MYTH_SCHEMA_EXIT;
 
         // The annoying extra confirmation:
@@ -380,33 +392,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         if (connections)
             message += "\n\n" + warnOtherCl;
 
-        DialogBox *dlg2 = new DialogBox(win, message);
-
-        dlg2->AddButton(tr("Exit"));
-        if (upgradable)
-            dlg2->AddButton(tr("Upgrade"));
-        if (m_expertMode)
-            dlg2->AddButton(tr("Use current schema"));
-
-        selected = dlg2->exec();
-        dlg2->deleteLater();
-
-        switch (selected)
-        {
-            case kDialogCodeRejected:
-            case kDialogCodeButton0:
-                returnValue = MYTH_SCHEMA_EXIT;         break;
-            case kDialogCodeButton1:
-                returnValue = upgradable ?
-                              MYTH_SCHEMA_UPGRADE:
-                              MYTH_SCHEMA_USE_EXISTING; break;
-            case kDialogCodeButton2:
-                returnValue = MYTH_SCHEMA_USE_EXISTING; break;
-            default:
-                returnValue = MYTH_SCHEMA_ERROR;
-        }
-
-        return returnValue;
+        return GuiPrompt(message, upgradable, m_expertMode);
     }
 
     // We are not in a GUI environment, so try to prompt the user in the shell
