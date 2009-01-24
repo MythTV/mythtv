@@ -26,7 +26,6 @@ SOURCES += ../libs/libmythtv/DVDRingBuffer.cpp
 SOURCES += ../libs/libmythtv/eithelper.cpp
 SOURCES += ../libs/libmythtv/guidegrid.cpp
 SOURCES += ../libs/libmythtv/importicons.cpp
-SOURCES += ../libs/libmythtv/infodialog.cpp
 SOURCES += ../libs/libmythtv/jobqueue.cpp
 SOURCES += ../libs/libmythtv/jobqueue.h
 SOURCES += ../libs/libmythtv/NuppelVideoPlayer.cpp
