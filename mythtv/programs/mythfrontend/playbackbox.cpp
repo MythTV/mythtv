@@ -1933,7 +1933,13 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              break;
     }
 
-    m_popupMenu->AddButton(tmpmessage, tmpslot);
+    bool defaultIsYes = true;
+    if ((types == DeleteRecording) ||
+        (types == ForceDeleteRecording) ||
+        (!program->GetAutoExpireFromRecorded()))
+        defaultIsYes = false;
+
+    m_popupMenu->AddButton(tmpmessage, tmpslot, false, defaultIsYes);
 
     switch (types)
     {
@@ -1947,7 +1953,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              tmpslot = SLOT(noStop());
              break;
     }
-    m_popupMenu->AddButton(tmpmessage, tmpslot);
+    m_popupMenu->AddButton(tmpmessage, tmpslot, false, !defaultIsYes);
 }
 
 void PlaybackBox::showAvailablePopup(ProgramInfo *rec)

@@ -92,15 +92,19 @@ void MythDialogBox::SetReturnEvent(QObject *retobject,
     m_id = resultid;
 }
 
-void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu)
+void MythDialogBox::AddButton(const QString &title, QVariant data, bool newMenu,
+                              bool setCurrent)
 {
     MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
     button->SetData(data);
     button->setDrawArrow(newMenu);
+
+    if (setCurrent)
+        m_buttonList->SetItemCurrent(button);
 }
 
 void MythDialogBox::AddButton(const QString &title, const char *slot,
-                              bool newMenu)
+                              bool newMenu, bool setCurrent)
 {
     MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
 
@@ -109,6 +113,9 @@ void MythDialogBox::AddButton(const QString &title, const char *slot,
     if (slot)
         button->SetData(qVariantFromValue(slot));
     button->setDrawArrow(newMenu);
+
+    if (setCurrent)
+        m_buttonList->SetItemCurrent(button);
 }
 
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)

@@ -66,9 +66,9 @@ class MPUBLIC MythDialogBox : public MythScreenType
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
     void AddButton(const QString &title, QVariant data = 0,
-                   bool newMenu = false);
+                   bool newMenu = false, bool setCurrent = false);
     void AddButton(const QString &title, const char *slot,
-                   bool newMenu = false);
+                   bool newMenu = false, bool setCurrent = false);
 
     virtual bool keyPressEvent(QKeyEvent *event);
 
