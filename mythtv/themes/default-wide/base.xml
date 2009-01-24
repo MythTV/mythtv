@@ -544,6 +544,7 @@
             <drawfrombottom>yes</drawfrombottom>
             <align>center</align>
             <showarrow>no</showarrow>
+            <wrapstyle>selection</wrapstyle>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
@@ -588,6 +589,7 @@
             <drawfrombottom>yes</drawfrombottom>
             <align>center</align>
             <showarrow>no</showarrow>
+            <wrapstyle>selection</wrapstyle>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
