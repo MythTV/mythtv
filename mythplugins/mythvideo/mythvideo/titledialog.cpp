@@ -240,11 +240,9 @@ void TitleDialog::setAudio(MythUIButtonListItem *item)
 
 void TitleDialog::toggleTitle()
 {
-    m_currentTitle->setSelected(m_ripCheck->GetCheckState() ==
-            MythUIStateType::Full);
+    m_currentTitle->setSelected(m_ripCheck->GetBooleanCheckState());
 
-    m_currentTitle->setAC3(m_ripacthreeCheck->GetCheckState() ==
-            MythUIStateType::Full);
+    m_currentTitle->setAC3(m_ripacthreeCheck->GetBooleanCheckState());
 
     //
     //  Should we be showing the Process Title(s)
@@ -278,8 +276,7 @@ void TitleDialog::changeName()
 
 void TitleDialog::toggleAC3()
 {
-    m_currentTitle->setAC3(m_ripacthreeCheck->GetCheckState() ==
-            MythUIStateType::Full);
+    m_currentTitle->setAC3(m_ripacthreeCheck->GetBooleanCheckState());
 }
 
 void TitleDialog::viewTitle()

@@ -99,12 +99,7 @@ MythUIStateType::StateType MythUICheckBox::GetCheckState() const
 
 bool MythUICheckBox::GetBooleanCheckState() const
 {
-    bool onOff = false;
-
-    if (m_currentCheckState == MythUIStateType::Full)
-        onOff = true;
-
-    return onOff;
+    return m_currentCheckState == MythUIStateType::Full;
 }
 
 void MythUICheckBox::Select()

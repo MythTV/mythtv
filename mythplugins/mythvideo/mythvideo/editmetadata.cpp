@@ -283,7 +283,7 @@ void EditMetadataDialog::setChild(MythUIButtonListItem *item)
 void EditMetadataDialog::toggleBrowse()
 {
     m_workingMetadata->
-            setBrowse(m_browseCheck->GetCheckState() != MythUIStateType::Off);
+            setBrowse(m_browseCheck->GetBooleanCheckState());
 }
 
 void EditMetadataDialog::findCoverArt()

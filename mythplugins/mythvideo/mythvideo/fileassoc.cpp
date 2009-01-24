@@ -392,16 +392,14 @@ void FileAssocDialog::OnUseDefaltChanged()
 {
     if (m_private->GetCurrentFA(m_extensionList))
         m_private->GetCurrentFA(m_extensionList)->
-                SetDefault(m_defaultCheck->GetCheckState() ==
-                        MythUIStateType::Full);
+                SetDefault(m_defaultCheck->GetBooleanCheckState());
 }
 
 void FileAssocDialog::OnIgnoreChanged()
 {
     if (m_private->GetCurrentFA(m_extensionList))
         m_private->GetCurrentFA(m_extensionList)->
-                SetIgnore(m_ignoreCheck->GetCheckState() ==
-                MythUIStateType::Full);
+                SetIgnore(m_ignoreCheck->GetBooleanCheckState());
 }
 
 void FileAssocDialog::OnPlayerCommandChanged()
