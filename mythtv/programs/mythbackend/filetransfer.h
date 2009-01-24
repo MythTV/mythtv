@@ -13,6 +13,7 @@ using namespace std;
 #include <qmutex.h>
 #include <qwaitcondition.h>
 
+class ProgramInfo;
 class RingBuffer;
 class MythSocket;
 
@@ -51,6 +52,7 @@ class FileTransfer
     bool           readsLocked;
     QWaitCondition readsUnlockedCond;
 
+    ProgramInfo *pginfo;
     RingBuffer *rbuffer;
     MythSocket *sock;
     bool ateof;

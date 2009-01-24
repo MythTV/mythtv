@@ -6,6 +6,7 @@
 #include "RingBuffer.h"
 #include "util.h"
 #include "mythsocket.h"
+#include "programinfo.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int retries) :
@@ -14,6 +15,15 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0)
 {
+    QFileInfo finfo = QFileInfo(filename);
+    pginfo =
+        ProgramInfo::GetProgramFromBasename(finfo.fileName());
+
+    if (pginfo)
+    {
+        pginfo->pathname = pginfo->GetPlaybackURL();
+        pginfo->MarkAsInUse(true, "filetransfer");
+    }
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote) :
@@ -22,6 +32,15 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote) :
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
     refLock(QMutex::NonRecursive), refCount(0)
 {
+    QFileInfo finfo = QFileInfo(filename);
+    pginfo =
+        ProgramInfo::GetProgramFromBasename(finfo.fileName());
+
+    if (pginfo)
+    {
+        pginfo->pathname = pginfo->GetPlaybackURL();
+        pginfo->MarkAsInUse(true, "filetransfer");
+    }
 }
 
 FileTransfer::~FileTransfer()
@@ -32,6 +51,12 @@ FileTransfer::~FileTransfer()
     {
         delete rbuffer;
         rbuffer = NULL;
+    }
+
+    if (pginfo)
+    {
+        pginfo->MarkAsInUse(false);
+        delete pginfo;
     }
 }
 
@@ -71,6 +96,9 @@ void FileTransfer::Stop(void)
         QMutexLocker locker(&lock);
         readsLocked = true;
     }
+
+    if (pginfo)
+        pginfo->UpdateInUseMark();
 }
 
 void FileTransfer::Pause(void)
@@ -78,6 +106,9 @@ void FileTransfer::Pause(void)
     rbuffer->StopReads();
     QMutexLocker locker(&lock);
     readsLocked = true;
+
+    if (pginfo)
+        pginfo->UpdateInUseMark();
 }
 
 void FileTransfer::Unpause(void)
@@ -88,6 +119,9 @@ void FileTransfer::Unpause(void)
         readsLocked = false;
     }
     readsUnlockedCond.wakeAll();
+
+    if (pginfo)
+        pginfo->UpdateInUseMark();
 }
 
 int FileTransfer::RequestBlock(int size)
@@ -124,11 +158,17 @@ int FileTransfer::RequestBlock(int size)
             break; // we hit eof
     }
 
+    if (pginfo)
+        pginfo->UpdateInUseMark();
+
     return (ret < 0) ? -1 : tot;
 }
 
 long long FileTransfer::Seek(long long curpos, long long pos, int whence)
 {
+    if (pginfo)
+        pginfo->UpdateInUseMark();
+
     if (!rbuffer)
         return -1;
     if (!readthreadlive)
@@ -149,16 +189,27 @@ long long FileTransfer::Seek(long long curpos, long long pos, int whence)
     long long ret = rbuffer->Seek(pos, whence);
 
     Unpause();
+
+    if (pginfo)
+        pginfo->UpdateInUseMark();
+
     return ret;
 }
 
 long long FileTransfer::GetFileSize(void)
 {
+    if (pginfo)
+        pginfo->UpdateInUseMark();
+
     return QFileInfo(rbuffer->GetFilename()).size();
 }
 
 void FileTransfer::SetTimeout(bool fast)
 {
+    if (pginfo)
+        pginfo->UpdateInUseMark();
+
     rbuffer->SetTimeout(fast);
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
