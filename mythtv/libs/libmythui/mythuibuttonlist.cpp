@@ -380,13 +380,9 @@ void MythUIButtonList::SetItemCurrent(int current)
 
 MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
 {
-    if (m_itemList.isEmpty())
+    if (m_itemList.isEmpty() || m_selPosition > m_itemList.size() ||
+        m_selPosition < 0)
         return NULL;
-
-    if (m_wrapStyle > WrapNone)
-        m_selPosition = m_itemList.size() - 1;
-    else
-        m_selPosition = 0;
 
     return m_itemList.at(m_selPosition);
 }
