@@ -3767,10 +3767,6 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
 
     m_connected = FillList(true);
 
-    // Don't save anything if we forced a new group
-    if (!newRecGroup.isEmpty())
-        return;
-
     if (gContext->GetNumSetting("RememberRecGroup",1))
         gContext->SaveSetting("DisplayRecGroup", m_recGroup);
 
