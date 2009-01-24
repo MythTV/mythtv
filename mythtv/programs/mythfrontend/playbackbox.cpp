@@ -3151,15 +3151,6 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             showIconHelp();
         else if (action == "MENU")
             showMenu();
-        else if (action == "ESCAPE")
-        {
-            if (GetFocusWidget() == m_recordingList)
-            {
-                SwitchList();
-            }
-            else
-                handled = false;
-        }
         else if (action == "NEXTFAV")
         {
             if (GetFocusWidget() == m_groupList)
