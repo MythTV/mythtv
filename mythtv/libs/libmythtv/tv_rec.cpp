@@ -4460,6 +4460,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
         delete oldinfo;
     }
 
+    pginfo->MarkAsInUse(true, "recorder");
     pginfo->SetAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
@@ -4476,7 +4477,10 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     else if (!set_rec)
     {
         if (curRecording)
+        {
+            curRecording->MarkAsInUse(false);
             delete curRecording;
+        }
         curRecording = pginfo;
         SetRingBuffer(rb);
     }
