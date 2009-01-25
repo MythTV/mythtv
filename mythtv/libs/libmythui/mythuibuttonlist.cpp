@@ -924,7 +924,9 @@ bool MythUIButtonList::ParseElement(QDomElement &element)
     {
         QString wrapstyle = getFirstText(element).toLower();
 
-        if (wrapstyle == "selection")
+        if (wrapstyle == "none")
+            m_wrapStyle = WrapNone;
+        else if (wrapstyle == "selection")
             m_wrapStyle = WrapSelect;
         else if (wrapstyle == "items")
             m_wrapStyle = WrapItems;
