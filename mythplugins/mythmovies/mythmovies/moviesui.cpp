@@ -7,14 +7,18 @@
 // Qt headers
 #include <QApplication>
 #include <QKeyEvent>
-#include <QTimer>
 #include <QProcess>
 #include <QFileInfo>
+#include <QDomDocument>
 
 // MythTV headers
 #include <mythcontext.h>
-#include <uitypes.h>
 #include <compat.h>
+#include <mythuitext.h>
+#include <mythuibuttontree.h>
+#include <mythgenerictree.h>
+#include <mythdialogbox.h>
+#include <mythmainwindow.h>
 
 // MythMovies headers
 #include "moviesui.h"
@@ -28,7 +32,6 @@ namespace
             return start.name < end.name;
         }
     };
-    
 
     bool HandleError(const QString &err, const QString &purpose)
     {
@@ -38,10 +41,7 @@ namespace
         QString tempPurpose = purpose.isEmpty() ? "Command" : purpose;
 
         VERBOSE(VB_IMPORTANT, err);
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(),
-            QString(tempPurpose + " failed"),
-            QString(err + "\n\nCheck MythMovies Settings"));
+        ShowOkPopup(tempPurpose + " failed\n" + err + "\n\nCheck MythMovies Settings");
 
         return true;
     }
@@ -136,63 +136,44 @@ namespace
     }
 }
 
-MoviesUI::MoviesUI(MythMainWindow *parent,
-                   const QString  &windowName,
-                   const QString  &themeFilename,
-                   const char     *name)
-    : MythThemedDialog(parent, windowName, themeFilename, name)
+MoviesUI::MoviesUI(MythScreenStack *parent)
+        : MythScreenType(parent, "MoviesUI")
 {
-    query = new MSqlQuery(MSqlQuery::InitCon());
-    subQuery = new MSqlQuery(MSqlQuery::InitCon());
-    aboutPopup = NULL;
-    menuPopup = NULL;
-    //m_movieTree = new GenericTree("Theaters", 0, false);
     m_currentMode = "Undefined";
-    setupTheme();
+
+    gContext->addCurrentLocation("mythmovies");
 }
 
 MoviesUI::~MoviesUI()
 {
-    delete query;
-    delete subQuery;
+    gContext->removeCurrentLocation();
 }
 
-void MoviesUI::setupTheme(void)
+bool MoviesUI::Create()
 {
-    m_movieTreeUI = getUIManagedTreeListType("movietreelist");
+    if (!LoadWindowFromXML("movies-ui.xml", "moviesui", this))
+        return false;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_movieTreeUI, "movietreelist", &err);
+    UIUtilE::Assign(this, m_movieTitle, "movietitle", &err);
+    UIUtilE::Assign(this, m_movieRating, "ratingvalue", &err);
+    UIUtilE::Assign(this, m_movieRunningTime, "runningtimevalue", &err);
+    UIUtilE::Assign(this, m_movieShowTimes, "showtimesvalue", &err);
+    UIUtilE::Assign(this, m_theaterName, "theatername", &err);
+
+
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesui'");
+        return false;
+    }
+
     m_currentNode = NULL;
-    m_movieTreeUI->showWholeTree(true);
-    m_movieTreeUI->colorSelectables(true);
 
-    connect(m_movieTreeUI, SIGNAL(nodeSelected(int, IntVector*)),
-            this, SLOT(handleTreeListSelection(int, IntVector*)));
-    connect(m_movieTreeUI, SIGNAL(nodeEntered(int, IntVector*)),
-            this, SLOT(handleTreeListEntry(int, IntVector*)));
+    connect(m_movieTreeUI, SIGNAL(nodeChanged(MythGenericTree*)),
+            this, SLOT(nodeChanged(MythGenericTree*)));
 
-
-    m_movieTitle = getUITextType("movietitle");
-    if (!m_movieTitle)
-        VERBOSE(VB_IMPORTANT, "moviesui.o: Couldn't find text area movietitle");
-
-    m_movieRating = getUITextType("ratingvalue");
-    if (!m_movieRating)
-        VERBOSE(VB_IMPORTANT,
-                "moviesui.o: Couldn't find text area ratingvalue");
-
-    m_movieRunningTime = getUITextType("runningtimevalue");
-    if (!m_movieRunningTime)
-        VERBOSE(VB_IMPORTANT,
-                "moviesui.o: Couldn't find text area runningtimevalue");
-
-    m_movieShowTimes = getUITextType("showtimesvalue");
-    if (!m_movieShowTimes)
-        VERBOSE(VB_IMPORTANT,
-                "moviesui.o: Couldn't find text area showtimesvalue");
-
-    m_theaterName = getUITextType("theatername");
-    if (!m_theaterName)
-        VERBOSE(VB_IMPORTANT,
-                "moviesui.o: Couldn't find text area theatername");
     gContext->ActivateSettingsCache(false);
     QString currentDate = QDate::currentDate().toString();
     QString lastDate = gContext->GetSetting("MythMovies.LastGrabDate");
@@ -206,16 +187,23 @@ void MoviesUI::setupTheme(void)
 
     updateDataTrees();
     drawDisplayTree();
-    updateForeground();
+
+    BuildFocusList();
+
+    return true;
 }
 
 void MoviesUI::updateMovieTimes()
 {
     gContext->ActivateSettingsCache(false);
+
     QString currentDate = QDate::currentDate().toString();
-    query->exec("truncate table movies_showtimes");
-    query->exec("truncate table movies_movies");
-    query->exec("truncate table movies_theaters");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("truncate table movies_showtimes");
+    query.exec("truncate table movies_movies");
+    query.exec("truncate table movies_theaters");
+
     QString grabber = gContext->GetSetting("MythMovies.Grabber");
     grabber.replace("%z", gContext->GetSetting("MythMovies.ZipCode"));
     grabber.replace("%r", gContext->GetSetting("MythMovies.Radius"));
@@ -233,8 +221,7 @@ void MoviesUI::updateMovieTimes()
         gContext->SaveSetting("MythMovies.LastGrabDate", currentDate);
     else
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                "Error", tr("Failed to process the grabber data!"));
+        ShowOkPopup(tr("Failed to process the grabber data!"));
         VERBOSE(VB_IMPORTANT, "Failed to process the grabber data!");
     }
 
@@ -244,28 +231,31 @@ void MoviesUI::updateMovieTimes()
 MovieVector MoviesUI::buildMovieDataTree()
 {
     MovieVector ret;
-    if (query->exec("select id, moviename, rating, runningtime from movies_movies order by moviename asc"))
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery subQuery(MSqlQuery::InitCon());
+
+    if (query.exec("select id, moviename, rating, runningtime from movies_movies order by moviename asc"))
     {
-        while (query->next())
+        while (query.next())
         {
             Movie m;
-            m.name = query->value(1).toString();
-            m.rating = query->value(2).toString();
-            m.runningTime = query->value(3).toString();
-            subQuery->prepare("select theatername, theateraddress, showtimes "
+            m.name = query.value(1).toString();
+            m.rating = query.value(2).toString();
+            m.runningTime = query.value(3).toString();
+            subQuery.prepare("select theatername, theateraddress, showtimes "
                     "from movies_showtimes left join movies_theaters "
                     "on movies_showtimes.theaterid = movies_theaters.id "
                     "where movies_showtimes.movieid = :MOVIEID");
-            subQuery->bindValue(":MOVIEID", query->value(0).toString());
+            subQuery.bindValue(":MOVIEID", query.value(0).toString());
 
-            if (subQuery->exec())
+            if (subQuery.exec())
             {
-                while (subQuery->next())
+                while (subQuery.next())
                 {
                     Theater t;
-                    t.name = subQuery->value(0).toString();
-                    t.address = subQuery->value(1).toString();
-                    t.showTimes = subQuery->value(2).toString();
+                    t.name = subQuery.value(0).toString();
+                    t.address = subQuery.value(1).toString();
+                    t.showTimes = subQuery.value(2).toString();
                     m.theaters.push_back(t);
                 }
             }
@@ -278,28 +268,31 @@ MovieVector MoviesUI::buildMovieDataTree()
 TheaterVector MoviesUI::buildTheaterDataTree()
 {
     TheaterVector ret;
-    if (query->exec("select id, theatername, theateraddress from movies_theaters order by theatername asc"))
+    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery subQuery(MSqlQuery::InitCon());
+
+    if (query.exec("select id, theatername, theateraddress from movies_theaters order by theatername asc"))
     {
-        while (query->next())
+        while (query.next())
         {
             Theater t;
-            t.name = query->value(1).toString();
-            t.address = query->value(2).toString();
-            subQuery->prepare("select moviename, rating, runningtime, showtimes "
+            t.name = query.value(1).toString();
+            t.address = query.value(2).toString();
+            subQuery.prepare("select moviename, rating, runningtime, showtimes "
                     "from movies_showtimes left join movies_movies "
                     "on movies_showtimes.movieid = movies_movies.id "
                     "where movies_showtimes.theaterid = :THEATERID");
-            subQuery->bindValue(":THEATERID", query->value(0).toString());
+            subQuery.bindValue(":THEATERID", query.value(0).toString());
 
-            if (subQuery->exec())
+            if (subQuery.exec())
             {
-                while (subQuery->next())
+                while (subQuery.next())
                 {
                     Movie m;
-                    m.name = subQuery->value(0).toString();
-                    m.rating = subQuery->value(1).toString();
-                    m.runningTime = subQuery->value(2).toString();
-                    m.showTimes = subQuery->value(3).toString();
+                    m.name = subQuery.value(0).toString();
+                    m.rating = subQuery.value(1).toString();
+                    m.runningTime = subQuery.value(2).toString();
+                    m.showTimes = subQuery.value(3).toString();
                     t.movies.push_back(m);
                 }
             }
@@ -310,112 +303,61 @@ TheaterVector MoviesUI::buildTheaterDataTree()
     return ret;
 }
 
-void MoviesUI::keyPressEvent(QKeyEvent *e)
+bool MoviesUI::keyPressEvent(QKeyEvent *event)
 {
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Movies", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Movies", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
-        //cout << "Action: " << action << endl << flush;
         handled = true;
-        if (action == "SELECT")
-            m_movieTreeUI->select();
-        else if (action == "MENU")
+
+        if (action == "MENU")
             showMenu();
-        else if (action == "INFO")
-            //todo: redirect info to an info screen via imdb.pl
-            showAbout();
-        else if (action == "UP")
-            m_movieTreeUI->moveUp();
-        else if (action == "DOWN")
-            m_movieTreeUI->moveDown();
-        else if (action == "LEFT")
-            m_movieTreeUI->popUp();
-        else if (action == "RIGHT")
-            m_movieTreeUI->pushDown();
-        else if (action == "PAGEUP")
-            m_movieTreeUI->pageUp();
-        else if (action == "PAGEDOWN")
-            m_movieTreeUI->pageDown();
-        else if (action == "INCSEARCH")
-            m_movieTreeUI->incSearchStart();
-        else if (action == "INCSEARCHNEXT")
-            m_movieTreeUI->incSearchNext();
         else
             handled = false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 void MoviesUI::showMenu()
 {
-    if (menuPopup)
-        return;
-    menuPopup = new MythPopupBox(gContext->GetMainWindow(), "menuPopup");
-    menuPopup->addLabel("MythMovies Menu");
-    updateButton = menuPopup->addButton("Update Movie Times", this, SLOT(slotUpdateMovieTimes()));
-    OKButton = menuPopup->addButton("Close Menu", this, SLOT(closeMenu()));
-    OKButton->setFocus();
-    menuPopup->ShowPopup(this, SLOT(closeMenu()));
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menuPopup = new MythDialogBox("Menu", popupStack, "actionmenu");
+
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
+
+    menuPopup->SetReturnEvent(this, "action");
+
+    menuPopup->AddButton(tr("Update Movie Times"), SLOT(slotUpdateMovieTimes()));
+    menuPopup->AddButton(tr("Cancel"));
 }
 
 void MoviesUI::slotUpdateMovieTimes()
 {
     VERBOSE(VB_IMPORTANT, "Doing Manual Movie Times Update");
 
-    menuPopup->hide();
-    menuPopup->deleteLater();
-    menuPopup = NULL;
-
     updateMovieTimes();
     updateDataTrees();
     drawDisplayTree();
 }
 
-void MoviesUI::closeMenu(void)
+void MoviesUI::nodeChanged(MythGenericTree* node)
 {
-    if (menuPopup)
-    {
-        menuPopup->deleteLater();
-        menuPopup = NULL;
-    }
-}
+    m_currentNode = node;
+    int nodeInt = node->getInt();
 
-void MoviesUI::showAbout()
-{
-    if (aboutPopup)
-        return;
-
-    aboutPopup = new MythPopupBox(gContext->GetMainWindow(), "aboutPopup");
-    aboutPopup->addLabel("MythMovies");
-    aboutPopup->addLabel("Copyright (c) 2006 Josh Lefler.");
-    aboutPopup->addLabel("Released under GNU GPL v2");
-    aboutPopup->addLabel("Special Thanks to Ignyte.com for\nproviding the "
-                         "listings data.\n and the #mythtv IRC channel for "
-                         "assistance.");
-    OKButton = aboutPopup->addButton(QString("Close"), this,
-                                     SLOT(closeAboutPopup()));
-    OKButton->setFocus();
-    aboutPopup->ShowPopup(this,SLOT(closeAboutPopup()));
-}
-
-void MoviesUI::closeAboutPopup(void)
-{
-    if (aboutPopup)
-    {
-        aboutPopup->deleteLater();
-        aboutPopup = NULL;
-    }
-}
-
-void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
-{
-    m_currentNode = m_movieTreeUI->getCurrentNode();
     if (nodeInt == 0)
     {
         m_currentMode = m_currentNode->getString();
@@ -499,24 +441,17 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
     }
 }
 
-void MoviesUI::handleTreeListSelection(int nodeInt, IntVector *)
-{
-    (void) nodeInt;
-    //perhaps the same as info?
-    //VERBOSE(VB_IMPORTANT, QString("In Selection with %1").arg(nodeInt));
-}
-
-GenericTree* MoviesUI::getDisplayTreeByTheater()
+MythGenericTree* MoviesUI::getDisplayTreeByTheater()
 {
     TheaterVector *theaters;
     theaters = &m_dataTreeByTheater;
     int tbase = 0;
-    GenericTree *parent = new GenericTree("By Theater", 0, false);
+    MythGenericTree *parent = new MythGenericTree("By Theater", 0, false);
     for (int i = 0; i < theaters->size(); i++)
     {
         int mbase = 0;
         Theater x = theaters->at(i);
-        GenericTree *node = new GenericTree(x.name, --tbase, false);
+        MythGenericTree *node = new MythGenericTree(x.name, --tbase, false);
         for (int m =0; m < x.movies.size(); m++)
         {
             Movie y = x.movies.at(m);
@@ -527,17 +462,17 @@ GenericTree* MoviesUI::getDisplayTreeByTheater()
     return parent;
 }
 
-GenericTree* MoviesUI::getDisplayTreeByMovie()
+MythGenericTree* MoviesUI::getDisplayTreeByMovie()
 {
     MovieVector *movies;
     movies = &m_dataTreeByMovie;
     int mbase = 0;
-    GenericTree *parent = new GenericTree("By Movie", 0, false);
+    MythGenericTree *parent = new MythGenericTree("By Movie", 0, false);
     for (int i = 0; i < movies->size(); i++)
     {
         int tbase = 0;
         Movie x = movies->at(i);
-        GenericTree *node = new GenericTree(x.name, --mbase, false);
+        MythGenericTree *node = new MythGenericTree(x.name, --mbase, false);
         for (int m = 0; m < x.theaters.size(); m++)
         {
             Theater y = x.theaters.at(m);
@@ -547,6 +482,7 @@ GenericTree* MoviesUI::getDisplayTreeByMovie()
     }
     return parent;
 }
+
 void MoviesUI::updateDataTrees()
 {
     m_dataTreeByTheater = buildTheaterDataTree();
@@ -555,15 +491,11 @@ void MoviesUI::updateDataTrees()
 
 void MoviesUI::drawDisplayTree()
 {
-    m_movieTree = new GenericTree("Theaters", 0, false);
+    m_movieTree = new MythGenericTree("Theaters", 0, false);
     m_movieTree->addNode(getDisplayTreeByTheater());
     m_movieTree->addNode(getDisplayTreeByMovie());
-    m_movieTreeUI->assignTreeData(m_movieTree);
-    m_movieTreeUI->popUp();
-    m_movieTreeUI->popUp();
-    m_movieTreeUI->popUp();
-    m_movieTreeUI->enter();
-    m_currentMode = m_movieTreeUI->getCurrentNode()->getString();
+    m_movieTreeUI->AssignTree(m_movieTree);
+    m_currentMode = m_movieTreeUI->GetItemCurrent()->GetText();
 }
 
 bool MoviesUI::populateDatabaseFromGrabber(QString ret)
@@ -587,7 +519,6 @@ bool MoviesUI::populateDatabaseFromGrabber(QString ret)
     while (!n.isNull())
     {
         processTheatre(n);
-        //list.push_back(t);
         n = n.nextSibling();
     }
 
@@ -597,10 +528,11 @@ bool MoviesUI::populateDatabaseFromGrabber(QString ret)
 void MoviesUI::processTheatre(QDomNode &n)
 {
     Theater t;
-    //Movie m;
     QDomNode movieNode;
     const QDomElement theater = n.toElement();
     QDomNode child = theater.firstChild();
+    MSqlQuery query(MSqlQuery::InitCon());
+
     while (!child.isNull())
     {
         if (!child.isNull())
@@ -620,22 +552,21 @@ void MoviesUI::processTheatre(QDomNode &n)
             }
             if (child.toElement().tagName() == "Movies")
             {
-                query->prepare("INSERT INTO movies_theaters "
+                query.prepare("INSERT INTO movies_theaters "
                         "(theatername, theateraddress)" 
                         "values (:NAME,:ADDRESS)");
 
-                query->bindValue(":NAME", t.name);
-                query->bindValue(":ADDRESS", t.address);
-                if (!query->exec())
+                query.bindValue(":NAME", t.name);
+                query.bindValue(":ADDRESS", t.address);
+                if (!query.exec())
                 {
                     VERBOSE(VB_IMPORTANT, "Failure to Insert Theater");
                 }
-                int lastid = query->lastInsertId().toInt();
+                int lastid = query.lastInsertId().toInt();
                 movieNode = child.firstChild();
                 while (!movieNode.isNull())
                 {
                     processMovie(movieNode, lastid);
-                    //t.movies.push_back(m);
                     movieNode = movieNode.nextSibling();
                 }
             }
@@ -650,6 +581,8 @@ void MoviesUI::processMovie(QDomNode &n, int theaterId)
     Movie m;
     QDomNode mi = n.firstChild();
     int movieId = 0;
+    MSqlQuery query(MSqlQuery::InitCon());
+
     while (!mi.isNull())
     {
         if (mi.toElement().tagName() == "Name")
@@ -678,41 +611,39 @@ void MoviesUI::processMovie(QDomNode &n, int theaterId)
         }
         mi = mi.nextSibling();
     }
-    
-    query->prepare("SELECT id FROM movies_movies Where moviename = :NAME");
-    query->bindValue(":NAME", m.name);
-    if (query->exec() && query->next())
+
+    query.prepare("SELECT id FROM movies_movies Where moviename = :NAME");
+    query.bindValue(":NAME", m.name);
+    if (query.exec() && query.next())
     {
-        movieId = query->value(0).toInt();
+        movieId = query.value(0).toInt();
     }
     else
     {
-        query->prepare("INSERT INTO movies_movies ("
+        query.prepare("INSERT INTO movies_movies ("
                 "moviename, rating, runningtime) values ("
                 ":NAME, :RATING, :RUNNINGTIME)");
-        query->bindValue(":NAME", m.name);
-        query->bindValue(":RATING", m.rating);
-        query->bindValue(":RUNNINGTIME", m.runningTime);
-        if (query->exec())
+        query.bindValue(":NAME", m.name);
+        query.bindValue(":RATING", m.rating);
+        query.bindValue(":RUNNINGTIME", m.runningTime);
+        if (query.exec())
         {
-            movieId = query->lastInsertId().toInt();
+            movieId = query.lastInsertId().toInt();
         }
         else
         {
             VERBOSE(VB_IMPORTANT, "Failure to Insert Movie");
         }
     }
-    query->prepare("INSERT INTO movies_showtimes ("
+    query.prepare("INSERT INTO movies_showtimes ("
             "theaterid, movieid, showtimes) values ("
             ":THEATERID, :MOVIEID, :SHOWTIMES)");
-    query->bindValue(":THEATERID", theaterId);
-    query->bindValue(":MOVIEID", movieId);
-    query->bindValue(":SHOWTIMES", m.showTimes);
+    query.bindValue(":THEATERID", theaterId);
+    query.bindValue(":MOVIEID", movieId);
+    query.bindValue(":SHOWTIMES", m.showTimes);
 
-    if (!query->exec())
+    if (!query.exec())
     {
         VERBOSE(VB_IMPORTANT, "Failure to Link Movie to Theater");
     }
 }
-
-

@@ -10,6 +10,8 @@ TARGET = mythmovies
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
+
 # Input
 HEADERS += moviesui.h helperobjects.h moviessettings.h
 

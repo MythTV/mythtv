@@ -1,74 +1,72 @@
 #ifndef MOVIESUI_H_
 #define MOVIESUI_H_
 
+// qt
 #include <QVector>
 #include <QKeyEvent>
 
-#include <mythdialogs.h>
+// myth
+#include <mythscreentype.h>
 #include <mythdbcon.h>
 
+// mythmovies
 #include "helperobjects.h"
 
 class QTimer;
+class QDomNode;
+class MythUIText;
+class MythUIButtonTree;
+class MythGenericTree;
 
-class MoviesUI : public MythThemedDialog
+class MoviesUI : public MythScreenType
 {
     Q_OBJECT
+
   public:
     typedef QVector<int> IntVector;
 
-    MoviesUI(MythMainWindow *parent,
-             const QString  &windowName,
-             const QString  &themeFilename,
-             const char     *name = "MoviesUI");
+    MoviesUI(MythScreenStack *parentStack);
     ~MoviesUI();
 
+    bool Create();
+    bool keyPressEvent(QKeyEvent *event);
+
   protected:
-    void keyPressEvent(QKeyEvent *e);
-    void showAbout();
     void showMenu();
+
   private:
     void updateDataTrees();
     void updateMovieTimes();
     void setupTheme(void);
     TheaterVector loadTrueTreeFromFile(QString);
     void drawDisplayTree();
-    GenericTree* getDisplayTreeByMovie();
-    GenericTree* getDisplayTreeByTheater();
+    MythGenericTree* getDisplayTreeByMovie();
+    MythGenericTree* getDisplayTreeByTheater();
     bool populateDatabaseFromGrabber(QString ret);
     void processTheatre(QDomNode &n);
     void processMovie(QDomNode &n, int theaterId);
     TheaterVector buildTheaterDataTree();
     MovieVector buildMovieDataTree();
-    TheaterVector m_dataTreeByTheater;
-    Theater m_currentTheater;
-    MovieVector m_dataTreeByMovie;
-    Movie m_currentMovie;
-    GenericTree           *m_movieTree;
-    UIManagedTreeListType *m_movieTreeUI;
-    GenericTree *m_currentNode;
-    QString m_currentMode;
-    QTimer *waitForReady;
-    MSqlQuery *query;
-    MSqlQuery *subQuery;
 
-    UITextType  *m_movieTitle;
-    UITextType  *m_movieRating;
-    UITextType  *m_movieRunningTime;
-    UITextType  *m_movieShowTimes;
-    UITextType  *m_theaterName;
-    MythPopupBox *aboutPopup;
-    MythPopupBox *menuPopup;
-    QAbstractButton *OKButton;
-    QAbstractButton *updateButton;
+    TheaterVector m_dataTreeByTheater;
+    Theater       m_currentTheater;
+    MovieVector   m_dataTreeByMovie;
+    Movie         m_currentMovie;
+    MythGenericTree  *m_movieTree;
+    MythGenericTree  *m_currentNode;
+    QString       m_currentMode;
+
+    MythUIButtonTree *m_movieTreeUI;
+    MythUIText  *m_movieTitle;
+    MythUIText  *m_movieRating;
+    MythUIText  *m_movieRunningTime;
+    MythUIText  *m_movieShowTimes;
+    MythUIText  *m_theaterName;
 
   public slots:
-    void handleTreeListSelection(int, IntVector*);
-    void handleTreeListEntry(int, IntVector*);
+    void nodeChanged(MythGenericTree* node);
 
   protected slots:
-    void closeAboutPopup();
-    void closeMenu();
     void slotUpdateMovieTimes();
 };
 

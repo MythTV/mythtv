@@ -38,10 +38,13 @@ int mythplugin_init(const char *libversion)
 
 void runMovies(void)
 {
-    gContext->addCurrentLocation("mythmovies");
-    MoviesUI moviesui(gContext->GetMainWindow(), "moviesui", "movies-");
-    moviesui.exec();
-    gContext->removeCurrentLocation();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MoviesUI *movies = new MoviesUI(mainStack);
+
+    if (movies->Create())
+        mainStack->AddScreen(movies);
+    else
+        delete movies;
 }
 
 void runConfig()

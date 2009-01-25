@@ -1,140 +1,63 @@
 <mythuitheme>
+
     <window name="moviesui">
-        <font name="active" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
 
-        <font name="inactive" face="Bitstream Vera Sans">
-            <color>#9999cc</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
+        <imagetype name="infofiller">
+            <filename>pf-top.png</filename>
+            <area>40,460,1200,220</area>
+        </imagetype>
 
-        <font name="selectable" face="Bitstream Vera Sans">
-            <color>#8cdeff</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
+        <buttontree name="movietreelist">
+            <area>40,40,1200,330</area>
+            <numlists>2</numlists>
+            <spacing>10</spacing>
+            <buttonlist name="listtemplate" from="basebuttonlist" />
+        </buttontree>
 
-        <font name="largetitle" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <dropcolor>#000000</dropcolor>
-            <size>32</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
+        <textarea name="theatername" from="basetextarea">
+            <area>40,385,1200,80</area>
+            <font>baselarge</font>
+            <multiline>yes</multiline>
+            <value>Theater name</value>
+        </textarea>
 
-        <font name="infofont" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <size>16</size>
-            <bold>yes</bold>
-        </font>
+        <textarea name="movietitle" from="basetextarea">
+            <area>58,475,700,80</area>
+            <font>baselarge</font>
+            <multiline>yes</multiline>
+        </textarea>
 
-        <font name="infofontunderline" face="Bitstream Vera Sans">
-            <color>#ffffff</color>
-            <size>16</size>
-            <bold>yes</bold>
-            <underline>yes</underline>
-        </font>
+        <textarea name="rating" from="basetextarea">
+            <area>58,550,150,35</area>
+            <font>basemediumyellow</font>
+            <align>left,vcenter</align>
+            <value>Rating:</value>
+        </textarea>
 
-        <container name="background">
-            <image name="filler" draworder="0" fleximage="yes">
-                <filename>background.png</filename> <!-- 1280x326 -->
-                <position>0,48</position>
-            </image>
-            <image name="titlelines" draworder="0" fleximage="no">
-                <filename>trans-titles.png</filename> <!-- 1280x326 -->
-                <position>0,48</position>
-            </image>
-            <image name="infofiller" draworder="0" fleximage="no">
-                <filename>pf-top.png</filename> <!-- 1152x260 -->
-                <position>64,412</position>
-            </image>
-        </container>
+        <textarea name="ratingvalue" from="basetextarea">
+            <area>260,550,500,35</area>
+            <align>left,vcenter</align>
+        </textarea>
 
-        <container name="movieselector">
-            <area>8,52,1264,310</area>
-            <managedtreelist name="movietreelist" draworder="1" bins="2">
-                <area>32,0,1200,296</area>
-                <image function="selectionbar" filename="mv_selectionbar.png"></image>
-                <image function="uparrow" filename="mv_up_arrow.png"></image>
-                <image function="downarrow" filename="mv_down_arrow.png"></image>
-                <image function="leftarrow" filename="mv_left_arrow.png"></image>
-                <image function="rightarrow" filename="mv_right_arrow.png"></image>
-                <bin number="1">
-                    <area>56,28,288,250</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                    <fcnfont name="active" function="selected"></fcnfont>
-                    <fcnfont name="selectable" function="selectable"></fcnfont>
-                </bin>
-                <bin number="2">
-                    <area>384,0,816,296</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="active" function="selected"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                    <fcnfont name="selectable" function="selectable"></fcnfont>
-                </bin>
-            </managedtreelist>
+        <textarea name="runningtime" from="rating">
+            <area>58,580,300,35</area>
+            <value>Running Time:</value>
+        </textarea>
 
-	    <image name="showinglines" draworder="2" fleximage="yes">
-                <filename>showings.png</filename>
-                <position>0,0</position>
-            </image>
-        </container>
+        <textarea name="runningtimevalue" from="ratingvalue">
+            <area>260,580,300,35</area>
+        </textarea>
 
-        <container name="theater_info">
-            <area>25,363,750,55</area>
-            <textarea name="theatername" draworder="6">
-                <area>10,10,2000,55</area>
-                <font>infofont</font>
-            </textarea>
-        </container>
+        <textarea name="showtimes" from="rating">
+            <area>58,610,300,35</area>
+            <value>Show Times:</value>
+        </textarea>
 
-        <container name="movie_info">
-            <area>64,412,1152,260</area>
-
-            <textarea name="movietitle" draworder="6">
-                <area>32,15,752,60</area>
-                <font>largetitle</font>
-            </textarea>
-
-            <textarea name="rating" draworder="6">
-                <area>32,100,140,35</area>
-                <font>infofont</font>
-                <value>Rating:</value>
-            </textarea>
-
-            <textarea name="ratingvalue" draworder="6">
-                <area>172,100,580,35</area>
-                <font>infofont</font>
-            </textarea>
-
-            <textarea name="runningtime" draworder="6">
-                <area>32,75,300,35</area>
-                <font>infofont</font>
-                <value>Running Time:</value>
-            </textarea>
-
-            <textarea name="runningtimevalue" draworder="6">
-                <area>270,75,500,35</area>
-                <font>infofont</font>
-            </textarea>
-
-            <textarea name="showtimes" draworder="6">
-                <area>32,130,140,35</area>
-                <font>infofontunderline</font>
-                <value>Showtimes</value>
-            </textarea>
-
-            <textarea name="showtimesvalue" draworder="6">
-                <area>32,160,10000,100</area><!--set absurdly large to prevent trimming-->
-                <font>infofont</font>
-            </textarea>  
-
-        </container>
+        <textarea name="showtimesvalue" from="ratingvalue">
+            <area>260,615,490,60</area>
+            <align>left,top</align>
+            <multiline>yes</multiline>
+        </textarea>
 
     </window>
 
