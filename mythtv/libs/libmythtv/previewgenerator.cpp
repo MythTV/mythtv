@@ -641,10 +641,10 @@ char *PreviewGenerator::GetScreenGrab(
         return NULL;
     }
 
-    PlayerContext *ctx = new PlayerContext();
+    PlayerContext *ctx = new PlayerContext("previewgenerator");
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
-    ctx->SetNVP(new NuppelVideoPlayer("Preview"));
+    ctx->SetNVP(new NuppelVideoPlayer());
     ctx->nvp->SetPlayerInfo(NULL, NULL, true, ctx);
 
     if (time_in_secs)

@@ -147,7 +147,7 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
     kDisplayNUVTeletextCaptions,
 };
 
-NuppelVideoPlayer::NuppelVideoPlayer(const QString &inUseID)
+NuppelVideoPlayer::NuppelVideoPlayer()
     : decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
       // Window stuff
@@ -176,7 +176,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(const QString &inUseID)
       // Playback misc.
       videobuf_retries(0),          framesPlayed(0),
       totalFrames(0),               totalLength(0),
-      rewindtime(0),                m_recusage(inUseID),
+      rewindtime(0),
       // Input Video Attributes
       video_disp_dim(0,0), video_dim(0,0),
       video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),

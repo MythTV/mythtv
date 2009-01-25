@@ -398,9 +398,9 @@ int Transcode::TranscodeFile(
 
     // Input setup
     inRingBuffer = new RingBuffer(inputname, false, false);
-    nvp = new NuppelVideoPlayer("transcoder");
+    nvp = new NuppelVideoPlayer();
 
-    player_ctx = new PlayerContext();
+    player_ctx = new PlayerContext("transcoder");
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
     player_ctx->SetNVP(nvp);

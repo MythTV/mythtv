@@ -105,7 +105,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     friend class PlayerContext;
 
   public:
-    NuppelVideoPlayer(const QString &inUseID = QString("Unknown"));
+    NuppelVideoPlayer();
    ~NuppelVideoPlayer();
 
     // Initialization

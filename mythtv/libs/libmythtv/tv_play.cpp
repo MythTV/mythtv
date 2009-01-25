@@ -753,7 +753,7 @@ TV::TV(void)
     gContext->addCurrentLocation("Playback");
 
     playerLock.lockForWrite();
-    player.push_back(new PlayerContext());
+    player.push_back(new PlayerContext("player"));
     playerActive = 0;
     playerLock.unlock();
 }
@@ -4718,7 +4718,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     mctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     // This is safe because we are already holding lock for a ctx
-    player.push_back(new PlayerContext());
+    player.push_back(new PlayerContext("pbpplayer"));
     PlayerContext *pbpctx = player.back();
     pbpctx->SetPIPState(kPBPRight);
 
@@ -4813,7 +4813,7 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
         return false;
     }
 
-    PlayerContext *pipctx = new PlayerContext();
+    PlayerContext *pipctx = new PlayerContext("pipplayer");
 
     pipctx->SetNullVideo(true);
     pipctx->SetPIPState(kPIPonTV);

@@ -29,8 +29,8 @@ static void *SpawnDecode(void *param)
     return NULL;
 }
 
-PlayerContext::PlayerContext() :
-    nvp(NULL), nvpUnsafe(false), recorder(NULL),
+PlayerContext::PlayerContext(const QString &inUseID) :
+    recUsage(inUseID), nvp(NULL), nvpUnsafe(false), recorder(NULL),
     tvchain(NULL), buffer(NULL), playingInfo(NULL),
     decoding(false), last_cardid(-1), last_framerate(30.0f),
     // Fast forward state
@@ -407,7 +407,7 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
         return false;
     }
 
-    NuppelVideoPlayer *_nvp = new NuppelVideoPlayer("player");
+    NuppelVideoPlayer *_nvp = new NuppelVideoPlayer();
 
     _nvp->SetPlayerInfo(tv, widget, exact_seeking, this);
     _nvp->SetAudioInfo(gContext->GetSetting("AudioOutputDevice"),
@@ -897,7 +897,7 @@ void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
     {
         playingInfo = new ProgramInfo(*info);
         if (!ignoreDB)
-            playingInfo->MarkAsInUse(true, "player");
+            playingInfo->MarkAsInUse(true, recUsage);
         playingLen  = playingInfo->CalculateLength();
     }
 }

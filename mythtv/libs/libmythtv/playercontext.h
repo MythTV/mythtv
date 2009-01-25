@@ -40,7 +40,7 @@ typedef QMap<QString,QString>  InfoMap;
 class MPUBLIC PlayerContext
 {
   public:
-    PlayerContext();
+    PlayerContext(const QString &inUseID = QString("Unknown"));
     ~PlayerContext();
 
     // Actions
@@ -130,6 +130,7 @@ class MPUBLIC PlayerContext
         { return nvp && tvchain && recorder && buffer; }
 
   public:
+    QString             recUsage;
     NuppelVideoPlayer  *nvp;
     volatile bool       nvpUnsafe;
     RemoteEncoder      *recorder;

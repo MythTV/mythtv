@@ -135,9 +135,9 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("seektable rebuilder");
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
 
-    PlayerContext *ctx = new PlayerContext();
+    PlayerContext *ctx = new PlayerContext("seektable rebuilder");
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetNVP(nvp);
@@ -687,9 +687,9 @@ int FlagCommercials(
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("flagger");
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
 
-    PlayerContext *ctx = new PlayerContext();
+    PlayerContext *ctx = new PlayerContext("flagger");
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetNVP(nvp);
