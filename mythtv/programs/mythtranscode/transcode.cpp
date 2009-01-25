@@ -420,6 +420,8 @@ int Transcode::TranscodeFile(
     if (nvp->OpenFile(false) < 0)
     {
         VERBOSE(VB_IMPORTANT, "Transcoding aborted, error opening file.");
+        if (player_ctx)
+            delete player_ctx;
         return REENCODE_ERROR;
     }
 
@@ -466,6 +468,8 @@ int Transcode::TranscodeFile(
             (JobQueue::IsJobRunning(JOB_COMMFLAG, m_proginfo)))
         {
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
+            if (player_ctx)
+                delete player_ctx;
             return REENCODE_CUTLIST_CHANGE;
         }
         m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false);
@@ -500,6 +504,8 @@ int Transcode::TranscodeFile(
         if (!GetProfile(profileName, encodingType, video_height,
                         (int)round(video_frame_rate))) {
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, no profile found.");
+            if (player_ctx)
+                delete player_ctx;
             return REENCODE_ERROR;
         }
 
@@ -527,6 +533,8 @@ int Transcode::TranscodeFile(
             get_int_option(profile, "transcodelossless"))
         {
             VERBOSE(VB_IMPORTANT, "Switching to MPEG-2 transcoder.");
+            if (player_ctx)
+                delete player_ctx;
             return REENCODE_MPEG2TRANS;
         }
 
@@ -627,11 +635,15 @@ int Transcode::TranscodeFile(
             VERBOSE(VB_IMPORTANT, "No video information found!");
             VERBOSE(VB_IMPORTANT, "Please ensure that recording profiles "
                                   "for the transcoder are set");
+            if (player_ctx)
+                delete player_ctx;
             return REENCODE_ERROR;
         }
         else
         {
             VERBOSE(VB_IMPORTANT, QString("Unknown video codec: %1").arg(vidsetting));
+            if (player_ctx)
+                delete player_ctx;
             return REENCODE_ERROR;
         }
 
@@ -719,12 +731,7 @@ int Transcode::TranscodeFile(
         VERBOSE(VB_IMPORTANT, "Unable to initialize NuppelVideoPlayer "
                 "for Transcode");
         if (player_ctx)
-        {
-            nvp          = NULL;
-            inRingBuffer = NULL;
             delete player_ctx;
-            player_ctx = NULL;
-        }
         return REENCODE_ERROR;
     }
 
@@ -759,6 +766,8 @@ int Transcode::TranscodeFile(
         {
             VERBOSE(VB_IMPORTANT, "Error initializing fifo writer.  Aborting");
             unlink(outputname.toLocal8Bit().constData());
+            if (player_ctx)
+                delete player_ctx;
             return REENCODE_ERROR;
         }
         VERBOSE(VB_GENERAL, QString("Video %1x%2@%3fps Audio rate: %4")
@@ -910,6 +919,8 @@ int Transcode::TranscodeFile(
                 delete newFrame;
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, NuppelVideoPlayer "
                                       "is not in raw audio mode.");
+                if (player_ctx)
+                    delete player_ctx;
                 return REENCODE_ERROR;
             }
 
@@ -1073,6 +1084,8 @@ int Transcode::TranscodeFile(
                         VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
                                 "irrecoverable error in NVR::WriteAudio");
                         delete newFrame;
+                        if (player_ctx)
+                            delete player_ctx;
                         return REENCODE_ERROR;
                     }
                 }
@@ -1106,6 +1119,8 @@ int Transcode::TranscodeFile(
                 unlink(outputname.toLocal8Bit().constData());
                 delete newFrame;
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist updated");
+                if (player_ctx)
+                    delete player_ctx;
                 return REENCODE_CUTLIST_CHANGE;
             }
 
@@ -1116,6 +1131,8 @@ int Transcode::TranscodeFile(
                     unlink(outputname.toLocal8Bit().constData());
                     delete newFrame;
                     VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
+                    if (player_ctx)
+                        delete player_ctx;
                     return REENCODE_STOPPED;
                 }
 
@@ -1160,6 +1177,8 @@ int Transcode::TranscodeFile(
         fifow->FIFODrain();
     }
     delete newFrame;
+    if (player_ctx)
+        delete player_ctx;
     return REENCODE_OK;
 }
 
