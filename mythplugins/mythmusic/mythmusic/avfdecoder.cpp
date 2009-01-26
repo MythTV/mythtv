@@ -54,7 +54,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     totalTime(0.0),  seekTime(-1.0),
     devicename(""),  start(0),
     end(0),          m_outputFormat(0),
-    m_inputFormat(NULL),    m_ap(&m_params),
+    m_inputFormat(NULL),
     m_outputContext(NULL),  m_inputContext(NULL),
     m_decStream(NULL),      m_codec(NULL),
     m_audioEnc(NULL),       m_audioDec(NULL),
@@ -63,7 +63,9 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     data_size(0)
 {
     setFilename(file);
-    bzero(samples, sizeof(samples));
+    memset(samples, 0, sizeof(samples));
+    memset(&m_params, 0, sizeof(AVFormatParameters));
+
 }
 
 avfDecoder::~avfDecoder(void)
@@ -139,7 +141,7 @@ bool avfDecoder::initialize()
     // this should populate the input context
     int error;
     error = av_open_input_file(&m_inputContext, filename, m_inputFormat, 0,
-                               m_ap);
+                               &m_params);
     if (error < 0)
     {
         VERBOSE(VB_GENERAL, QString("Could open file with the AV decoder. "

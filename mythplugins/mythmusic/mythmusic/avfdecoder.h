@@ -49,7 +49,6 @@ class avfDecoder : public Decoder
     AVOutputFormat *m_outputFormat; // Encoding format (PCM)
     AVInputFormat *m_inputFormat; // Decoding format
     AVFormatParameters m_params;
-    AVFormatParameters *m_ap;
     AVFormatContext *m_outputContext, *m_inputContext;
     AVStream *m_decStream;
     AVCodec *m_codec; // Codec
