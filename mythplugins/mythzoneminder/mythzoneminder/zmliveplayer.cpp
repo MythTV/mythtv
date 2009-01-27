@@ -471,6 +471,7 @@ void Player::updateFrame(const unsigned char* buffer)
 
     m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
     m_image->Assign(image);
+    m_image->UpRef();
 
     m_frameImage->SetImage(m_image);
 }

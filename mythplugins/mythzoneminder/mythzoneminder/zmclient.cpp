@@ -3,20 +3,15 @@
 */
 
 #include <unistd.h>
-#include <sys/wait.h>
-#include <cmath>
-#include <netinet/in.h>
-#include <assert.h>
 
 // qt
-//#include <qapplication.h>
-//#include <qregexp.h>
 #include <QTimer>
 
 //myth
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdialogs.h"
-#include "mythtv/util.h"
+#include "mythcontext.h"
+#include "mythdialogbox.h"
+#include "util.h"
+#include "mythmainwindow.h"
 
 //zoneminder
 #include "zmclient.h"
@@ -118,9 +113,8 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (!m_bConnected)
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-                              tr("Cannot connect to the mythzmserver - Is it running? " 
-                                 "Have you set the correct IP and port in the settings?"));
+        ShowOkPopup(tr("Cannot connect to the mythzmserver - Is it running? " 
+                       "Have you set the correct IP and port in the settings?"));
     }
 
     // check the server uses the same protocol as us
@@ -194,8 +188,8 @@ bool ZMClient::checkProtoVersion(void)
     {
         VERBOSE(VB_IMPORTANT, QString("Server didn't respond to 'HELLO'!!"));
 
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-            tr("The mythzmserver didn't respond to our request to get the protocol version!!"));
+        ShowOkPopup(tr("The mythzmserver didn't respond to our request "
+                       "to get the protocol version!!"));
         return false;
     }
 
@@ -204,12 +198,11 @@ bool ZMClient::checkProtoVersion(void)
         VERBOSE(VB_IMPORTANT, QString("Protocol version mismatch (plugin=%1, "
                 "mythzmserver=%2)").arg(ZM_PROTOCOL_VERSION).arg(strList[1]));
 
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-                         QString("The mythzmserver uses protocol version %1, "
-                                    "but this client only understands version %2. "
-                                    "Make sure you are running compatible versions of "
-                                    "both the server and plugin.")
-                                    .arg(strList[1]).arg(ZM_PROTOCOL_VERSION));
+        ShowOkPopup(QString("The mythzmserver uses protocol version %1, "
+                            "but this client only understands version %2. "
+                            "Make sure you are running compatible versions of "
+                            "both the server and plugin.")
+                            .arg(strList[1]).arg(ZM_PROTOCOL_VERSION));
         return false;
     }
 
@@ -533,6 +526,7 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage 
 
     // get a MythImage
     *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    (*image)->UpRef();
 
     // extract the image data and create a MythImage from it
     if (!(*image)->loadFromData(data, imageSize, "JPEG"))
@@ -596,7 +590,11 @@ int ZMClient::getLiveFrame(int monitorID, QString &status, unsigned char* buffer
     // get frame length from data
     int imageSize = strList[3].toInt();
 
-    assert(bufferSize > imageSize);
+    if (bufferSize < imageSize)
+    {
+        VERBOSE(VB_GENERAL, "ZMClient::getLiveFrame(): Live frame buffer is too small!");
+        return 0;
+    }
 
     // read the frame data
     if (imageSize == 0)
