@@ -107,7 +107,7 @@ BLOCK_QUOTE
   echo "  --enable-libdirac        enable Dirac support via libdirac [default=no]"
   echo "  --enable-libfaac         enable FAAC support via libfaac [default=no]"
 BLOCK_QUOTE
-  echo "  --enable-libfaad         enable FAAD support via libfaad [default=no]"
+  echo "  --enable-libfaad         enable AAC decoding support via libfaad [default=no]"
 <<BLOCK_QUOTE
   echo "  --enable-libfaadbin      open libfaad.so.0 at runtime [default=no]"
   echo "  --enable-libgsm          enable GSM support via libgsm [default=no]"
@@ -1783,8 +1783,8 @@ case $target_os in
         disable ivtv
         disable hdpvr
         # Prevent linker problems on default Intel 10.5 XCode:
-        ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//) 
-        osxver=$(uname -r | cut -c 1) 
+        ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
+        osxver=$(uname -r | cut -c 1)
         if [[ ${ldver%.*} -lt "82" && ${osxver} = "9" && ${arch} = "x86_32" ]]; then
             cat <<EOF
 You have a broken ld. Please upgrade XCode to 3.1.1 or newer.
@@ -2704,7 +2704,7 @@ fi
 # Work around weird g++ build error with <stdint.h> in some myth src:
 if test $target_os = darwin; then
     _restrict=__restrict__
-fi  
+fi
 
 test "$vhook" = "default" && vhook="$dlopen"
 
