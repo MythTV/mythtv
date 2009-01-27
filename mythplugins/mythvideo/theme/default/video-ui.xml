@@ -990,6 +990,7 @@
 
         <button name="done_button" from="basebutton">
             <position>310,505</position>
+            <value>Done</value>
         </button>
 
     </window>

@@ -1,5 +1,7 @@
 #include <algorithm>
 
+#include <QImageReader>
+
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
 
@@ -61,8 +63,6 @@ bool EditMetadataDialog::Create()
         VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
         return false;
     }
-
-    m_doneButton->SetText(tr("Done"));
 
     fillWidgets();
 
@@ -288,45 +288,43 @@ void EditMetadataDialog::toggleBrowse()
 
 void EditMetadataDialog::findCoverArt()
 {
-    QString new_coverart_file;
-    if (!IsDefaultCoverFile(m_workingMetadata->CoverFile()))
-    {
-        new_coverart_file = m_workingMetadata->CoverFile();
-    }
-
     QString fileprefix = gContext->GetSetting("VideoArtworkDir");
     // If the video artwork setting hasn't been set default to
     // using ~/.mythtv/MythVideo
-    if (fileprefix.length() == 0)
+    if (fileprefix.isEmpty())
     {
         fileprefix = GetConfDir() + "/MythVideo";
     }
 
-//     QStringList imageExtensions;
-//
-//     QList< QByteArray > exts = QImageReader::supportedImageFormats();
-//
-//     for (QList< QByteArray >::Iterator it  = exts.begin();
-//                                        it != exts.end();
-//                                      ++it )
-//     {
-//         imageExtensions.append( QString( *it ) );
-//     }
+    QStringList imageExtensions;
 
-//     MythImageFileDialog *nca =
-//         new MythImageFileDialog(&new_coverart_file,
-//                                 fileprefix,
-//                                 gContext->GetMainWindow(),
-//                                 "file_chooser",
-//                                 "video-",
-//                                 "image file chooser",
-//                                 true);
-//     nca->exec();
-//     if (new_coverart_file.length() > 0)
-//     {
-//         m_workingMetadata->setCoverFile(new_coverart_file);
-//         CheckedSet(m_coverartText, new_coverart_file);
-//     }
-//
-//     nca->deleteLater();
+    QList< QByteArray > exts = QImageReader::supportedImageFormats();
+    QList< QByteArray >::Iterator it = exts.begin();
+    for (;it != exts.end();++it)
+    {
+        imageExtensions.append( QString("*.").append(*it) );
+    }
+
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
+
+    MythUIFileBrowser *nca = new MythUIFileBrowser(popupStack, fileprefix);
+    nca->SetNameFilter(imageExtensions);
+
+    if (nca->Create())
+    {
+        popupStack->AddScreen(nca);
+        connect(nca, SIGNAL(haveResult(QString)), SLOT(SetCoverArt(QString)));
+    }
+    else
+        delete nca;
+}
+
+void EditMetadataDialog::SetCoverArt(QString file)
+{
+    if (file.isEmpty())
+        return;
+
+    m_workingMetadata->setCoverFile(file);
+    CheckedSet(m_coverartText, file);
 }

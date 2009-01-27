@@ -42,6 +42,7 @@ class EditMetadataDialog : public MythScreenType
     void findCoverArt();
     void NewCategoryPopup();
     void AddCategory(QString category);
+    void SetCoverArt(QString file);
 
   private:
 
