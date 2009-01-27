@@ -508,7 +508,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         uint oldestTime = d->CacheTrack[it.key()];
         QString oldestKey = it.key();
 
-        int count;
+        int count = 0;
         for ( ; it != d->imageCache.end(); ++it)
         {
             if (d->CacheTrack[it.key()] < oldestTime &&
