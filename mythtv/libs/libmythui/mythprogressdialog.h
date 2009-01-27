@@ -69,4 +69,6 @@ class MPUBLIC MythUIProgressDialog : public MythScreenType
     MythUIProgressBar *m_progressBar;
 };
 
+MPUBLIC MythUIBusyDialog  *ShowBusyPopup(const QString &message);
+
 #endif

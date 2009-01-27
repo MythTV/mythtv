@@ -33,6 +33,39 @@ bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)
     return false;
 }
 
+MythUIBusyDialog  *ShowBusyPopup(const QString &message)
+{
+    QString                  LOC = "ShowBusyPopup('" + message + "') - ";
+    MythUIBusyDialog        *pop = NULL;
+    static MythScreenStack  *stk = NULL;
+
+
+    if (!stk)
+    {
+        MythMainWindow *win = GetMythMainWindow();
+
+        if (win)
+            stk = win->GetStack("popup stack");
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "no main window?");
+            return NULL;
+        }
+
+        if (!stk)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "no popup stack?\n"
+                                        "Is there a MythThemeBase?");
+            return NULL;
+        }
+    }
+
+    pop = new MythUIBusyDialog(message, stk, "showBusyPopup");
+    if (pop->Create())
+        stk->AddScreen(pop);
+
+    return pop;
+}
 //---------------------------------------------------------
 
 MythUIProgressDialog::MythUIProgressDialog(const QString &message,
