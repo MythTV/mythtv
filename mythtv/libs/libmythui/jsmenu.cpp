@@ -333,12 +333,12 @@ void JoystickMenuThread::EmitKey(QString code)
  */
 void JoystickMenuThread::ButtonUp(int button)
 {
-    std::vector<buttonMapType>::iterator bmap;
-
     /*------------------------------------------------------------------------
     ** Process chords first
     **----------------------------------------------------------------------*/
-    for (bmap = m_map.buttonMap().begin(); bmap < m_map.buttonMap().end(); bmap++)
+    JoystickMap::button_map_t::const_iterator bmap;
+    for (bmap = m_map.buttonMap().begin(); bmap != m_map.buttonMap().end();
+            ++bmap)
     {
         if (button == bmap->button && bmap->chord != -1
             && m_buttons[bmap->chord] == 1)
@@ -352,7 +352,8 @@ void JoystickMenuThread::ButtonUp(int button)
     /*------------------------------------------------------------------------
     ** Process everything else
     **----------------------------------------------------------------------*/
-    for (bmap = m_map.buttonMap().begin(); bmap < m_map.buttonMap().end(); bmap++)
+    for (bmap = m_map.buttonMap().begin(); bmap != m_map.buttonMap().end();
+            ++bmap)
     {
         if (button == bmap->button && bmap->chord == -1)
             EmitKey(bmap->keystring);
@@ -364,8 +365,8 @@ void JoystickMenuThread::ButtonUp(int button)
  */
 void JoystickMenuThread::AxisChange(int axis, int value)
 {
-    std::vector<axisMapType>::iterator amap;
-    for (amap = m_map.axisMap().begin(); amap < m_map.axisMap().end(); amap++)
+    JoystickMap::axis_map_t::const_iterator amap;
+    for (amap = m_map.axisMap().begin(); amap < m_map.axisMap().end(); ++amap)
     {
         if (axis == amap->axis)
         {
