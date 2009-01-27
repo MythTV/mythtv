@@ -191,6 +191,8 @@ class MPUBLIC MythUIButtonList : public MythUIType
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
 
+    void SanitizePosition(void);
+
     /**/
 
     LayoutType m_layout;

@@ -131,6 +131,14 @@ void MythUIButtonList::Update()
     SetRedraw();
 }
 
+void MythUIButtonList::SanitizePosition(void)
+{
+    if (m_selPosition < 0)
+        m_selPosition = (m_wrapStyle > WrapNone) ? m_itemList.size() - 1 : 0;
+    else if (m_selPosition >= m_itemList.size())
+        m_selPosition = (m_wrapStyle > WrapNone) ? 0 : m_itemList.size() - 1;
+}
+
 void MythUIButtonList::SetPositionArrowStates(void)
 {
     if (!m_initialized)
@@ -148,13 +156,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
         int button = 0;
 
         // set topitem, top position
-        if (m_selPosition < 0 || m_selPosition > m_itemList.size())
-        {
-            if (m_wrapStyle > WrapNone)
-                m_selPosition = m_itemList.size() - 1;
-            else
-                m_selPosition = 0;
-        }
+        SanitizePosition();
 
         switch (m_scrollStyle)
         {
@@ -511,6 +513,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
             break;
     }
 
+    SanitizePosition();
+
     if (pos != m_selPosition)
     {
         Update();
@@ -561,6 +565,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
             m_selPosition = m_itemCount - 1;
             break;
     }
+
+    SanitizePosition();
 
     if (pos != m_selPosition)
     {
