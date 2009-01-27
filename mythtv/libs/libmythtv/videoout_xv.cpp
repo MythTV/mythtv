@@ -5120,12 +5120,14 @@ static void SetFromHW(Display *d,
         }
         if (useVDPAU)
         {
-            // this hangs playback when using sofware decoding in live tv
-            //VDPAUContext *c = new VDPAUContext();
-            //useVDPAU = c->Init(d, screen, curwin, QSize(1920,1200),
-            //                   false, vdpau_codec_id);
-            //c->Deinit();
-            //delete c;
+            // N.B. This only confirms another VDPAU context can be created.
+            // Creating a second hardware decoder will still fail (180.25)
+            // e.g. when attempting to use PBP.
+            VDPAUContext *c = new VDPAUContext();
+            useVDPAU = c->Init(d, screen, curwin, QSize(1920,1200),
+                               false, vdpau_codec_id);
+            c->Deinit();
+            delete c;
         }
 
 #endif // USING_VDPAU
