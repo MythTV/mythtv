@@ -46,6 +46,7 @@ void MythUIButtonList::Const(void)
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount = 0;
+    m_keepSelAtBottom = false;
 
     m_initialized      = false;
     m_needsUpdate      = false;
@@ -553,7 +554,7 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
                 m_selPosition = (pos % m_columns);
             break;
         case MovePage:
-            m_selPosition = std::min(m_itemCount - 1,
+            m_selPosition = qMin(m_itemCount - 1,
                                      m_selPosition + (int)m_itemsVisible);
             break;
         case MoveMax:
@@ -1118,11 +1119,6 @@ void MythUIButtonListItem::SetFontState(const QString &state,
 
     if (m_parent)
         m_parent->Update();
-}
-
-const QString MythUIButtonListItem::Image() const
-{
-    return m_imageFilename;
 }
 
 void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
