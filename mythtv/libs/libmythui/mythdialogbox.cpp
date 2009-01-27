@@ -1,5 +1,8 @@
 
 #include <QApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QImageReader>
 
 #include "mythverbose.h"
 
@@ -7,6 +10,12 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 #include "mythuiutils.h"
+#include "mythuitext.h"
+#include "mythuiimage.h"
+#include "mythuitextedit.h"
+#include "mythuibuttonlist.h"
+#include "mythuibutton.h"
+#include "mythuistatetype.h"
 
 MythDialogBox::MythDialogBox(const QString &text,
                              MythScreenStack *parent, const char *name,
@@ -205,9 +214,6 @@ bool MythConfirmationDialog::Create(void)
 
     connect(okButton, SIGNAL(Clicked()), SLOT(Confirm()));
 
-    okButton->SetText(tr("OK"));
-    cancelButton->SetText(tr("Cancel"));
-
     messageText->SetText(m_message);
 
     BuildFocusList();
@@ -376,7 +382,6 @@ bool MythTextInputDialog::Create(void)
     m_textEdit->SetPassword(m_isPassword);
 
     messageText->SetText(m_message);
-    okButton->SetText(tr("OK"));
 
     BuildFocusList();
 
@@ -466,10 +471,7 @@ bool MythUISearchDialog::Create(void)
     }
 
     if (cancelButton)
-    {
-        cancelButton->SetText(tr("Cancel"));
         connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
-    }
 
     connect(okButton, SIGNAL(Clicked()), SLOT(slotSendResult()));
 
@@ -481,8 +483,6 @@ bool MythUISearchDialog::Create(void)
     m_titleText->SetText(m_title);
     if (m_matchesText)
         m_matchesText->SetText(tr("0 matches"));
-
-    okButton->SetText(tr("OK"));
 
     BuildFocusList();
 
@@ -544,4 +544,259 @@ void MythUISearchDialog::slotUpdateList(void)
 
     if (m_matchesText)
         m_matchesText->SetText(tr("%1 matches").arg(m_list.size()));
+}
+
+/////////////////////////////////////////////////////////////////////
+
+/** \fn MythUIFileBrowser::MythUIFileBrowser(MythScreenStack*,
+                                   const QString&)
+ *  \brief Browse the filesystem at a given starting path for a directory or
+ *         file, returns the selected file. Includes previews of images and
+ *         file metadata.
+ *
+ *         Accepts filtering on name (*.png, *.pl) and by type (directory, file)
+ */
+
+MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
+                                 const QString &startPath)
+                :MythScreenType(parent, "mythuifilebrowser")
+{
+    m_curDirectory = startPath;
+    m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files | QDir::Readable
+                    | QDir::Writable | QDir::Executable);
+    m_nameFilter << "*";
+}
+
+MythUIFileBrowser::~MythUIFileBrowser()
+{
+}
+
+bool MythUIFileBrowser::Create()
+{
+    if (!CopyWindowFromBase("MythFileBrowser", this))
+        return false;
+
+    m_fileList = dynamic_cast<MythUIButtonList *>(GetChild("filelist"));
+    m_locationEdit = dynamic_cast<MythUITextEdit *>(GetChild("location"));
+    m_okButton = dynamic_cast<MythUIButton *>(GetChild("ok"));
+    m_cancelButton = dynamic_cast<MythUIButton *>(GetChild("cancel"));
+    m_backButton = dynamic_cast<MythUIButton *>(GetChild("back"));
+    m_homeButton = dynamic_cast<MythUIButton *>(GetChild("home"));
+    m_previewImage = dynamic_cast<MythUIImage *>(GetChild("preview"));
+    m_infoText = dynamic_cast<MythUIText *>(GetChild("info"));
+
+    if (!m_fileList || !m_locationEdit || !m_okButton || !m_cancelButton)
+    {
+        VERBOSE(VB_IMPORTANT, "MythUIFileBrowser: Your theme is missing"
+                              " some UI elements! Bailing out.");
+        return false;
+    }
+
+    connect(m_fileList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            SLOT(PathClicked(MythUIButtonListItem *)));
+    connect(m_fileList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            SLOT(PathSelected(MythUIButtonListItem *)));
+    connect(m_locationEdit, SIGNAL(LosingFocus()), SLOT(editLostFocus()));
+    connect(m_okButton, SIGNAL(Clicked()), SLOT(OKPressed()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(cancelPressed()));
+    if (m_backButton)
+        connect(m_backButton, SIGNAL(Clicked()), SLOT(backPressed()));
+    if (m_homeButton)
+        connect(m_homeButton, SIGNAL(Clicked()), SLOT(homePressed()));
+
+    BuildFocusList();
+    updateFileList();
+
+    return true;
+}
+
+void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    if (m_previewImage)
+        m_previewImage->Reset();
+
+    QFileInfo file = qVariantValue<QFileInfo>(item->GetData());
+    if (file.fileName() != "..")
+    {
+        if (IsImage(file.suffix()) && m_previewImage)
+        {
+            m_previewImage->SetFilename(file.absoluteFilePath());
+            m_previewImage->Load();
+        }
+
+        if (m_infoText)
+        {
+            QString filesize("%L1 KB");
+            filesize = filesize.arg((int)(file.size() / 1024));
+            m_infoText->SetText(filesize);
+        }
+    }
+}
+
+void MythUIFileBrowser::PathClicked(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    QFileInfo file = qVariantValue<QFileInfo>(item->GetData());
+
+    if (file.isFile())
+    {
+        OKPressed();
+        return;
+    }
+
+    if (!file.isDir())
+        return;
+
+    if (file.fileName() == "..")
+    {
+        backPressed();
+    }
+    else
+    {
+        if (!m_curDirectory.endsWith("/"))
+            m_curDirectory += "/";
+        m_curDirectory += file.fileName();
+    }
+
+    updateFileList();
+}
+
+bool MythUIFileBrowser::IsImage(QString extension)
+{
+    if (extension.isEmpty())
+        return false;
+
+    extension = extension.toLower();
+
+    QList<QByteArray> formats = QImageReader::supportedImageFormats();
+    if (formats.contains(extension.toAscii()))
+        return true;
+
+    return false;
+}
+
+void MythUIFileBrowser::editLostFocus()
+{
+    m_curDirectory = m_locationEdit->GetText();
+    updateFileList();
+}
+
+void MythUIFileBrowser::backPressed()
+{
+    // move up one directory
+    int pos = m_curDirectory.lastIndexOf('/');
+    if (pos > 0)
+        m_curDirectory = m_curDirectory.left(pos);
+    else
+        m_curDirectory = "/";
+
+    updateFileList();
+}
+
+void MythUIFileBrowser::homePressed()
+{
+    char *home = getenv("HOME");
+    m_curDirectory = home;
+
+    updateFileList();
+}
+
+void MythUIFileBrowser::OKPressed()
+{
+    MythUIButtonListItem *item = m_fileList->GetItemCurrent();
+    QFileInfo file = qVariantValue<QFileInfo>(item->GetData());
+
+    if (file.isFile())
+    {
+        if (!m_curDirectory.endsWith("/"))
+            m_curDirectory += "/";
+        m_curDirectory += file.fileName();
+    }
+
+    emit haveResult(m_curDirectory);
+
+    Close();
+}
+
+void MythUIFileBrowser::cancelPressed()
+{
+    Close();
+}
+
+void MythUIFileBrowser::updateFileList()
+{
+    m_fileList->Reset();
+
+    QDir d;
+
+    d.setPath(m_curDirectory);
+    d.setNameFilters(m_nameFilter);
+    d.setFilter(m_typeFilter);
+    d.setSorting(QDir::Name);
+
+    if (!d.exists())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MythUIFileBrowser: current directory does not exist!");
+        m_locationEdit->SetText("/");
+        m_curDirectory = "/";
+        d.setPath("/");
+    }
+
+    QFileInfoList list = d.entryInfoList();
+
+    if (list.isEmpty())
+    {
+        MythUIButtonListItem* item = new MythUIButtonListItem(m_fileList,
+                                                        tr("Parent Directory"));
+        item->DisplayState("upfolder", "nodetype");
+    }
+    else
+    {
+        QFileInfoList::const_iterator it = list.begin();
+        const QFileInfo *fi;
+        while (it != list.end())
+        {
+            fi = &(*it);
+            if (fi->fileName() != ".")
+            {
+                QString displayName = fi->fileName();
+                QString type;
+                if (displayName == "..")
+                {
+                    displayName = tr("Parent");
+                    type = "upfolder";
+                }
+                else if (fi->isDir())
+                {
+                    type = "folder";
+                }
+                else if (fi->isExecutable())
+                {
+                    type = "executable";
+                }
+                else if (fi->isFile())
+                {
+                    type = "file";
+                }
+
+                MythUIButtonListItem* item = new MythUIButtonListItem(
+                                                    m_fileList, displayName);
+
+                if (IsImage(fi->suffix()))
+                    item->SetImage(fi->absoluteFilePath());
+
+                item->DisplayState(type, "nodetype");
+                item->SetData(qVariantFromValue(*fi));
+            }
+            ++it;
+        }
+    }
+
+    m_locationEdit->SetText(m_curDirectory);
 }

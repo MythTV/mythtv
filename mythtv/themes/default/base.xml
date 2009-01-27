@@ -585,7 +585,6 @@
         <buttonlist name="list" from="basebuttonlist">
             <area>20,280,760,300</area>
             <drawfrombottom>yes</drawfrombottom>
-            <align>center</align>
             <showarrow>no</showarrow>
             <wrapstyle>selection</wrapstyle>
             <statetype name="buttonitem">
@@ -662,10 +661,12 @@
 
         <button name="cancel" from="basebutton">
             <position>90,110</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
             <position>338,110</position>
+            <value>Ok</value>
         </button>
     </window>
 
@@ -687,6 +688,7 @@
 
         <button name="ok" from="basebutton">
             <position>109,110</position>
+            <value>Ok</value>
         </button>
     </window>
 
@@ -708,7 +710,6 @@
 
         <buttonlist name="itemlist" from="basebuttonlist">
             <area>12,150,470,270</area>
-            <align>left,vcenter</align>
             <showarrow>no</showarrow>
             <statetype name="buttonitem">
                 <state name="active">
@@ -731,10 +732,105 @@
 
         <button name="cancel" from="basebutton">
             <position>30,435</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
             <position>315,435</position>
+            <value>Ok</value>
+        </button>
+
+    </window>
+
+    <window name="MythFileBrowser">
+        <area>-1,-1,730,510</area>
+        <imagetype name="backimg">
+            <filename>mythfilebrowser-background.png</filename>
+        </imagetype>
+
+        <textedit name="location" from="basetextedit">
+            <position>40,15</position>
+        </textedit>
+
+        <button name="back" from="basebutton">
+            <position>530,15</position>
+            <value>Up Level</value>
+        </button>
+
+        <button name="home" from="basebutton">
+            <position>530,70</position>
+            <value>Home</value>
+        </button>
+
+        <buttonlist name="filelist">
+            <area>5,70,500,440</area>
+            <layout>grid</layout>
+            <buttonarea>0,0,500,430</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,165,105</area>
+                    <imagetype name="buttonbackground" />
+                    <statetype name="nodetype">
+                        <state name="folder">
+                            <imagetype name="icon">
+                                <area>5,4,150,74</area>
+                                <filename>mv_gallery_dir.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder" from="folder">
+                            <imagetype name="icon">
+                                <filename>mv_gallery_dir_up.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="executable" from="folder">
+                            <imagetype name="icon">
+                                <filename>file.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="file" from="folder">
+                            <imagetype name="icon">
+                                <filename>file.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <imagetype name="buttonimage">
+                        <area>5,4,150,74</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>2,80,160,25</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active" />
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <area>0,0,165,105</area>
+                        <gradient start="#999999" end="#666666" alpha="220" />
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="preview">
+            <area>510,125,200,230</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="info" from="basetextarea">
+            <area>520,355,180,25</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>530,385</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>530,440</position>
+            <value>Ok</value>
         </button>
 
     </window>

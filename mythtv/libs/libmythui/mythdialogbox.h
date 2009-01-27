@@ -2,6 +2,9 @@
 #define MYTHDIALOGBOX_H_
 
 #include <QEvent>
+#include <QString>
+#include <QStringList>
+#include <QDir>
 
 #include "mythscreentype.h"
 #include "mythuibuttonlist.h"
@@ -10,6 +13,10 @@
 
 class MythUIButtonListItem;
 class MythUIButtonList;
+class MythUIButton;
+class MythUITextEdit;
+class MythUIImage;
+class MythUIStateType;
 
 const int kMythDialogBoxCompletionEventType = 34111;
 
@@ -77,6 +84,7 @@ class MPUBLIC MythDialogBox : public MythScreenType
 
   signals:
     void Selected();
+    void Closed();
 
   protected:
     void SendEvent(int res, QString text = "", QVariant data = 0);
@@ -219,9 +227,57 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
+class MythUIFileBrowser : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
+   ~MythUIFileBrowser();
+
+    bool Create(void);
+
+    void SetTypeFilter(QDir::Filter filter) { m_typeFilter = filter; }
+    void SetNameFilter(QStringList filter) { m_nameFilter = filter; }
+
+  signals:
+     void haveResult(QString);
+
+  private slots:
+    void OKPressed();
+    void cancelPressed();
+    void backPressed();
+    void homePressed();
+    void editLostFocus();
+    void PathSelected(MythUIButtonListItem *item);
+    void PathClicked(MythUIButtonListItem *item);
+
+  private:
+    void updateFileList(void);
+    void updateSelectedList(void);
+    void updateWidgets(void);
+
+    bool IsImage(QString extension);
+
+    QString            m_curDirectory;
+
+    QDir::Filters      m_typeFilter;
+    QStringList        m_nameFilter;
+
+    MythUIButtonList  *m_fileList;
+    MythUITextEdit    *m_locationEdit;
+    MythUIButton      *m_okButton;
+    MythUIButton      *m_cancelButton;
+    MythUIButton      *m_backButton;
+    MythUIButton      *m_homeButton;
+    MythUIImage       *m_previewImage;
+    MythUIText        *m_infoText;
+};
+
 MPUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
 
 Q_DECLARE_METATYPE(const char*)
+Q_DECLARE_METATYPE(QFileInfo)
 
 #endif

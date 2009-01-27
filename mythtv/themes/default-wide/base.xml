@@ -664,10 +664,12 @@
 
         <button name="cancel" from="basebutton">
             <position>90,110</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
             <position>338,110</position>
+            <value>Ok</value>
         </button>
     </window>
 
@@ -689,6 +691,7 @@
 
         <button name="ok" from="basebutton">
             <position>109,110</position>
+            <value>Ok</value>
         </button>
     </window>
 
@@ -733,10 +736,12 @@
 
         <button name="cancel" from="basebutton">
             <position>30,435</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
             <position>315,435</position>
+            <value>Ok</value>
         </button>
 
     </window>
