@@ -174,6 +174,7 @@ inline int statfs(const char* path, struct statfs* buffer)
 #define SIGPIPE 3   // not implemented in MINGW, will produce "unable to ignore sigpipe"
 #define SIGALRM 13
 #define SIGUSR1 16  // used to force UPnP mediamap rebuild in the backend
+#define SIGUSR2 17  // used to restart LIRC as required
 
 #define S_IRGRP 0
 #define S_IROTH 0
