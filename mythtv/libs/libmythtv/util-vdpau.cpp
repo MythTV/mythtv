@@ -2015,6 +2015,12 @@ void VDPAUContext::DeinitPIP(NuppelVideoPlayer *pipplayer)
 
     pips.remove(pipplayer);
     VERBOSE(VB_PLAYBACK, LOC + "Removed 1 PIP");
+
+    if (pips.size() < 1)
+    {
+        DeinitPIPLayer();
+        VERBOSE(VB_PLAYBACK, LOC + "Removed PIP Layer");
+    }
 }
 
 bool VDPAUContext::InitPIP(NuppelVideoPlayer *pipplayer,

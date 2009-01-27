@@ -3701,9 +3701,9 @@ void VideoOutputXv::ShowPIP(VideoFrame        *frame,
     QRect dvr = GetTotalVisibleRect();
  
 #ifdef USING_VDPAU
-    if (vdpau && vdpau_use_pip && VideoOutputSubType() == XVideoVDPAU)
+    if (vdpau && VideoOutputSubType() == XVideoVDPAU)
     {
-        if (vdpau->InitPIPLayer(dvr.size()))
+        if (vdpau_use_pip && vdpau->InitPIPLayer(dvr.size()))
             vdpau_use_pip = vdpau->ShowPIP(pipplayer, pipimage,
                                            position, pipActive);
         pipplayer->ReleaseCurrentFrame(pipimage);
