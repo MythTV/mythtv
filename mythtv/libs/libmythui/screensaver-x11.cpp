@@ -15,6 +15,9 @@ extern "C" {
 #include <X11/extensions/dpms.h>
 }
 
+#define LOC      QString("ScreenSaverX11Private: ")
+#define LOC_WARN QString("ScreenSaverX11Private, Warning: ")
+#define LOC_ERR  QString("ScreenSaverX11Private, Error: ")
 
 class ScreenSaverX11Private
 {
@@ -36,9 +39,13 @@ class ScreenSaverX11Private
         if (IsScreenSaverRunning())
         {
             m_resetTimer = new QTimer(outer);
+            m_resetTimer->setSingleShot(false);
             QObject::connect(m_resetTimer, SIGNAL(timeout()),
                              outer, SLOT(resetSlot()));
-            VERBOSE(VB_GENERAL, "XScreenSaver support enabled");
+            if (m_xscreensaverRunning)
+                VERBOSE(VB_GENERAL, LOC + "XScreenSaver support enabled");
+            if (m_gscreensaverRunning)
+                VERBOSE(VB_GENERAL, LOC + "Gnome screen saver support enabled");
         }
 
         m_display = MythXOpenDisplay();
@@ -47,6 +54,10 @@ class ScreenSaverX11Private
         {
             int dummy0, dummy1;
             m_dpmsaware = DPMSQueryExtension(m_display, &dummy0, &dummy1);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open connection to X11 server");
         }
 
         if (m_dpmsaware)
@@ -79,7 +90,7 @@ class ScreenSaverX11Private
             XCloseDisplay(m_display);
     }
 
-    bool IsScreenSaverRunning(void)
+    bool IsScreenSaverRunning(void) const
     {
         return m_xscreensaverRunning || m_gscreensaverRunning;
     }
@@ -88,21 +99,22 @@ class ScreenSaverX11Private
 
     void StopTimer(void)
     {
+        VERBOSE(VB_PLAYBACK, LOC + "StopTimer");
         if (m_resetTimer)
             m_resetTimer->stop();
     }
 
     void StartTimer(void)
     {
+        VERBOSE(VB_PLAYBACK, LOC + "StartTimer");
         if (m_resetTimer)
-        {
-            m_resetTimer->setSingleShot(false);
             m_resetTimer->start(m_timeoutInterval);
-        }
     }
 
     void ResetTimer(void)
     {
+        VERBOSE(VB_PLAYBACK, LOC + "ResetTimer -- begin");
+
         StopTimer();
 
         if (m_timeoutInterval == -1)
@@ -113,6 +125,8 @@ class ScreenSaverX11Private
 
         if (m_timeoutInterval > 0)
             StartTimer();
+
+        VERBOSE(VB_PLAYBACK, LOC + "ResetTimer -- end");
     }
 
     // DPMS
@@ -127,7 +141,7 @@ class ScreenSaverX11Private
         {
             m_dpmsdeactivated = true;
             DPMSDisable(m_display);
-            VERBOSE(VB_GENERAL, "DPMS Deactivated ");
+            VERBOSE(VB_GENERAL, LOC + "DPMS Deactivated ");
         }
     }
 
@@ -137,7 +151,7 @@ class ScreenSaverX11Private
         {
             m_dpmsdeactivated = false;
             DPMSEnable(m_display);
-            VERBOSE(VB_GENERAL, "DPMS Reactivated.");
+            VERBOSE(VB_GENERAL, LOC + "DPMS Reactivated.");
         }
     }
 
@@ -166,14 +180,20 @@ class ScreenSaverX11Private
         if (!IsScreenSaverRunning())
             return;
 
-        QDateTime current_time = QDateTime::currentDateTime ();
+        QDateTime current_time = QDateTime::currentDateTime();
         if ((!m_last_deactivated.isValid()) ||
             (m_last_deactivated.secsTo(current_time) > 30))
         {
             if (m_xscreensaverRunning)
+            {
+                VERBOSE(VB_PLAYBACK, LOC + "Calling xscreensaver-command -deactivate");
                 myth_system("xscreensaver-command -deactivate >&- 2>&- &");
-            else if (m_gscreensaverRunning)
+            }
+            if (m_gscreensaverRunning)
+            {
+                VERBOSE(VB_PLAYBACK, LOC + "Calling gnome-screensaver-command --poke");
                 myth_system("gnome-screensaver-command --poke >&- 2>&- &");
+            }
             m_last_deactivated = current_time;
         }
     }
