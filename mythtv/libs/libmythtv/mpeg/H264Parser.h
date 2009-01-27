@@ -24,7 +24,7 @@
 #define H264PARSER_H
 
 #include <stdint.h>
-#include <sys/types.h>  // for uint on Darwin
+#include "compat.h" // for uint on Darwin, MinGW
 
 extern "C" {
 #include <limits.h> // golomb.h should include this...
