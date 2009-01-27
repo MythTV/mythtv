@@ -328,7 +328,7 @@ namespace
                     new MythConfirmationDialog(popupStack, message, false);
 
             if (okPopup->Create())
-                popupStack->AddScreen(okPopup, false);
+                popupStack->AddScreen(okPopup);
         }
 
       private:
@@ -1562,7 +1562,7 @@ void VideoDialog::createBusyDialog(QString title)
             "mythvideobusydialog");
 
     if (m_busyPopup->Create())
-        m_popupStack->AddScreen(m_busyPopup, false);
+        m_popupStack->AddScreen(m_busyPopup);
 }
 
 void VideoDialog::createOkDialog(QString title)
@@ -1573,7 +1573,7 @@ void VideoDialog::createOkDialog(QString title)
             new MythConfirmationDialog(m_popupStack, message, false);
 
     if (okPopup->Create())
-        m_popupStack->AddScreen(okPopup, false);
+        m_popupStack->AddScreen(okPopup);
 }
 
 bool VideoDialog::goBack()
@@ -1654,7 +1654,7 @@ void VideoDialog::VideoMenu()
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
     if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup, false);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "actions");
 
@@ -1698,7 +1698,7 @@ void VideoDialog::ViewMenu()
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
     if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup, false);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "view");
 
@@ -1741,7 +1741,7 @@ void VideoDialog::InfoMenu()
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
     if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup, false);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "info");
 
@@ -1764,7 +1764,7 @@ void VideoDialog::ManageMenu()
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
     if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup, false);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "manage");
 
@@ -1873,7 +1873,7 @@ void VideoDialog::SwitchLayout(DialogType type)
     if (mythvideo->Create())
     {
         MythScreenStack *screenStack = GetScreenStack();
-        screenStack->AddScreen(mythvideo, false);
+        screenStack->AddScreen(mythvideo);
         screenStack->PopScreen(this, false, false);
         deleteLater();
     }
@@ -1904,7 +1904,7 @@ bool VideoDialog::DoItemDetailShow()
 
         if (idp->Create())
         {
-            m_popupStack->AddScreen(idp, false);
+            m_popupStack->AddScreen(idp);
             return true;
         }
     }
