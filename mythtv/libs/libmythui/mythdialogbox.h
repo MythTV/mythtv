@@ -227,7 +227,7 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
-class MythUIFileBrowser : public MythScreenType
+class MPUBLIC MythUIFileBrowser : public MythScreenType
 {
     Q_OBJECT
 
