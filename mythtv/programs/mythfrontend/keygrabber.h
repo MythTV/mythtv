@@ -2,8 +2,8 @@
 #ifndef KEYGRABBER_H_
 #define KEYGRABBER_H_
 
-// MythTV headers
-#include <mythdialogbox.h>
+class MythUIText;
+class MythUIButton;
 
 /** \class KeyGrabPopupBox
  *  \brief Captures a key.

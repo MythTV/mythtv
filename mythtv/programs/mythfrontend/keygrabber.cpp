@@ -5,6 +5,10 @@
 // MythTV headers
 #include <mythcontext.h>
 
+// MythUI headers
+#include <mythuitext.h>
+#include <mythuibutton.h>
+
 // MythControls headers
 #include "keygrabber.h"
 
