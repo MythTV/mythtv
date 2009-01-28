@@ -44,7 +44,7 @@ to documentation on the code itself.
 
 \section libs Libraries
 
-%MythTV is divided up into eleven libraries:
+%MythTV is divided up into 17 libraries:
 <dl>
   <dt>libmythdb              <dd>Lowest-level %MythTV library. Used by the Plugins.
       Contains the \ref database_subsystem "database", \ref lcd_subsystem "LCD",
@@ -145,6 +145,10 @@ to documentation on the code itself.
       This library does not depend on any of our libraries.
 
   <dt>libmythlivemedia       <dd>Support for the FreeBox recorder device
+
+      This library does not depend on any of our libraries.
+
+  <dt>libmythhdhomerun       <dd>Support for the HDHomeRun recorder device
 
       This library does not depend on any of our libraries.
 

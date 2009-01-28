@@ -23,8 +23,8 @@ contains(INCLUDEPATH, /usr/local/include) {
 
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
-DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav ../libmythdb
-DEPENDPATH  += ./dvbdev ./mpeg ./hdhomerun ./iptv
+DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav ../libmythdb ../libmythhdhomerun
+DEPENDPATH  += ./dvbdev ./mpeg ./iptv
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
 DEPENDPATH  += ../libmythlivemedia/groupsock/include
@@ -42,7 +42,7 @@ INCLUDEPATH += $$POSTINC
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
-LIBS += -L../libmythdb 
+LIBS += -L../libmythdb
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
@@ -50,6 +50,7 @@ LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
+using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 using_backend: LIBS += -lmp3lame
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
@@ -61,7 +62,7 @@ TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
-
+using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
 DEFINES += _LARGEFILE_SOURCE
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
@@ -490,21 +491,6 @@ using_backend {
         SOURCES += hdhrrecorder.cpp
 
         DEFINES += USING_HDHOMERUN
-
-        # HDHomeRun library
-        HEADERS += hdhomerun/hdhomerun_pkt.h   hdhomerun/hdhomerun_discover.h
-        HEADERS += hdhomerun/hdhomerun_video.h hdhomerun/hdhomerun_control.h
-        HEADERS += hdhomerun/hdhomerun_os.h    hdhomerun/hdhomerun.h
-        HEADERS += hdhomerun/hdhomerun_dhcp.h  hdhomerun/hdhomerun_types.h
-        HEADERS += hdhomerun/hdhomerun_channels.h
-        HEADERS += hdhomerun/hdhomerun_channelscan.h
-        HEADERS += hdhomerun/hdhomerun_debug.h
-
-        SOURCES += hdhomerun/hdhomerun_pkt.c   hdhomerun/hdhomerun_discover.c
-        SOURCES += hdhomerun/hdhomerun_video.c hdhomerun/hdhomerun_control.c
-        SOURCES += hdhomerun/hdhomerun_debug.c hdhomerun/hdhomerun_channels.c
-        SOURCES += hdhomerun/hdhomerun_dhcp.c  hdhomerun/hdhomerun_channelscan.c
-        SOURCES += hdhomerun/hdhomerun_device.c
     }
 
     # Support for PVR-150/250/350/500, etc. on Linux

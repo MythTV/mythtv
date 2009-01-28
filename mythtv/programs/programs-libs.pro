@@ -1,7 +1,8 @@
 INCLUDEPATH += ../.. ../../libs/ ../../libs/libmyth ../../libs/libmythtv
 INCLUDEPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui
-INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb
+INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb ../../libmythhdhomerun
+INCLUDEPATH += ../../libs/libmythdvdnav
 INCLUDEPATH += ../../libs/libmythdvdnav
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
@@ -18,6 +19,7 @@ LIBS += -lmythdb-$$LIBVERSION
 
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
+using_hdhomerun:LIBS += -L../../libs/libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
 
 mingw {
     LIBS += -lpthread
@@ -33,11 +35,12 @@ TARGETDEPS += ../../libs/libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmythdb/libmythdb-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
+using_hdhomerun: TARGETDEPS += ../../libs/libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmythtv
 DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libsavcodec
 DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
-DEPENDPATH += ../../libs/libmythlivemedia ../../libmythdb
+DEPENDPATH += ../../libs/libmythlivemedia ../../libmythdb ../../libmythhdhomerun
 
 CONFIG += opengl
 
