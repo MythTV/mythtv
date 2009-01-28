@@ -29,7 +29,7 @@
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 
-#include "../libmyth/mythcontext.h"
+#include "mythcontext.h"
 
 #include "dithertable.h"
 

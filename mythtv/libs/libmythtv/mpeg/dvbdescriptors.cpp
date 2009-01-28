@@ -5,7 +5,7 @@
 #include "dvbdescriptors.h"
 #include "iso6937tables.h"
 #include "freesat_huffman.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 
 // Only some of the QTextCodec calls are reenterant.

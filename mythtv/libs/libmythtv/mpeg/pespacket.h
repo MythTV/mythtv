@@ -9,7 +9,7 @@
 */
 
 #include "tspacket.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 unsigned char *pes_alloc(uint size);
 void pes_free(unsigned char *ptr);

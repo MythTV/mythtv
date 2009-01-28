@@ -60,7 +60,9 @@
 #include "hdhrsignalmonitor.h"
 #endif
 
+#ifdef USING_IPTV
 #include "iptvchannelfetcher.h"
+#endif
 
 #define LOC QString("SWizScan: ")
 #define LOC_ERR QString("SWizScan, Error: ")

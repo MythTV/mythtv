@@ -5,6 +5,8 @@
 // MythUI
 #include <mythscreentype.h>
 
+#include "mythscreentype.h"
+
 class MythUIText;
 class MythUIButton;
 

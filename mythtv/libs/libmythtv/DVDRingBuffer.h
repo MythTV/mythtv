@@ -15,7 +15,7 @@ extern "C" {
 }
 
 #define DVDNAV_COMPILE
-#include "../libmythdvdnav/dvdnav.h"
+#include "dvdnav.h"
 
 /** \class DVDRingBufferPriv
  *  \brief RingBuffer class for DVD's
