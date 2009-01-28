@@ -9,15 +9,22 @@ using namespace std;
 #include <QRegExp>
 
 // myth
+#include "mythcontext.h"
+
+// mythtv
 #include "proglist.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
-#include "mythcontext.h"
 #include "remoteutil.h"
+#include "channelutil.h"
+
+// mythdb
 #include "libmythdb/mythdbcon.h"
 #include "libmythdb/mythverbose.h"
-#include "channelutil.h"
+
+// mythui
 #include "mythuitext.h"
+#include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
 
@@ -322,7 +329,7 @@ void ProgLister::chooseView(void)
         }
 
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-        MythUISearchDialog *searchDlg = 
+        MythUISearchDialog *searchDlg =
                 new MythUISearchDialog(popupStack, msg, m_viewTextList, true, "");
 
         if (!searchDlg->Create())
@@ -624,7 +631,7 @@ void ProgLister::fillViewList(const QString &view)
     else if (m_type == plCategory) // list by category
     {
         QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
-        MSqlQuery query(MSqlQuery::InitCon()); 
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT g1.genre, g2.genre "
                       "FROM program "
                       "JOIN programgenres g1 ON "
@@ -696,7 +703,7 @@ void ProgLister::fillViewList(const QString &view)
     else if (m_type == plTitleSearch || m_type == plKeywordSearch ||
              m_type == plPeopleSearch || m_type == plPowerSearch)
     {
-        MSqlQuery query(MSqlQuery::InitCon()); 
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT phrase FROM keyword "
                       "WHERE searchtype = :SEARCHTYPE;");
         query.bindValue(":SEARCHTYPE", m_searchType);
@@ -722,7 +729,7 @@ void ProgLister::fillViewList(const QString &view)
             {
                 QString qphrase = view;
 
-                MSqlQuery query(MSqlQuery::InitCon()); 
+                MSqlQuery query(MSqlQuery::InitCon());
                 query.prepare("REPLACE INTO keyword (phrase, searchtype)"
                               "VALUES(:VIEW, :SEARCHTYPE );");
                 query.bindValue(":VIEW", qphrase);
@@ -821,7 +828,7 @@ void ProgLister::fillViewList(const QString &view)
     {
         m_curView = 0;
 
-        MSqlQuery query(MSqlQuery::InitCon()); 
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT title FROM record "
                       "WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", view);
@@ -840,7 +847,7 @@ void ProgLister::fillViewList(const QString &view)
     }
     else if (m_type == plStoredSearch) // stored searches
     {
-        MSqlQuery query(MSqlQuery::InitCon()); 
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT rulename FROM customexample "
                       "WHERE search > 0 ORDER BY rulename;");
         query.exec();
@@ -870,7 +877,7 @@ class plTitleSort
     public:
         plTitleSort(void) {;}
 
-        bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
+        bool operator()(const ProgramInfo *a, const ProgramInfo *b)
         {
             if (a->sortTitle != b->sortTitle)
                     return (a->sortTitle < b->sortTitle);
@@ -893,7 +900,7 @@ class plTimeSort
     public:
         plTimeSort(void) {;}
 
-        bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
+        bool operator()(const ProgramInfo *a, const ProgramInfo *b)
         {
             if (a->startts == b->startts)
                 return (a->chanid < b->chanid);
@@ -1098,7 +1105,7 @@ void ProgLister::fillItemList(bool restorePosition)
     else if (m_type == plStoredSearch) // stored search
     {
         QString fromc, wherec;
-        MSqlQuery query(MSqlQuery::InitCon()); 
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT fromclause, whereclause FROM customexample "
                       "WHERE rulename = :RULENAME;");
         query.bindValue(":RULENAME", qphrase);
