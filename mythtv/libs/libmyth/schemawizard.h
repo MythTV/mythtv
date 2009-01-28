@@ -6,6 +6,7 @@
 
 #include "dbutil.h"
 #include "libmythui/mythmainwindow.h"
+#include "libmythui/mythprogressdialog.h"
 
 /// Return values from PromptForUpgrade()
 enum MythSchemaUpgrade
@@ -44,8 +45,10 @@ enum MythSchemaUpgrade
  * }
  */
 
-class MPUBLIC SchemaUpgradeWizard : public DBUtil, public QObject
+class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
 {
+    Q_OBJECT
+
   public:
     SchemaUpgradeWizard(const QString &DBSchemaSetting,
                         const QString &upgradeSchemaVal);
@@ -79,15 +82,22 @@ class MPUBLIC SchemaUpgradeWizard : public DBUtil, public QObject
     bool    emptyDB;          ///< Is the database currently empty?
     int     versionsBehind;   ///< How many schema versions old is the DB?
 
+  public slots:
+    void upgrade(void);
+    void use(void);
+
   private:
+    void              BusyPopup(const QString &message);
     MythSchemaUpgrade GuiPrompt(const QString &message,
                                 bool upgradable, bool expert);
 
-    bool     m_autoUpgrade;        ///< If no UI, always upgrade
-    QString  m_backupResult;       ///< File path, or __FAILED__
-    bool     m_expertMode;         ///< Also allow newer DB schema
-    QString  m_schemaSetting;      ///< To lookup the schema version
-    QString  m_newSchemaVer;       ///< What we need to upgrade to
+    bool              m_autoUpgrade;        ///< If no UI, always upgrade
+    QString           m_backupResult;       ///< File path, or __FAILED__
+    MythUIBusyDialog *m_busyPopup;          ///< Displayed during long pauses
+    bool              m_expertMode;         ///< Also allow newer DB schema
+    QString           m_schemaSetting;      ///< To lookup the schema version
+    QString           m_newSchemaVer;       ///< What we need to upgrade to
+
 };
 
 #endif // SCHEMA_WIZARD_H
