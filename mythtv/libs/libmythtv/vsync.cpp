@@ -31,8 +31,8 @@
 #include <sys/poll.h>
 #endif
 
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mythmainwindow.h"
 
 #ifdef USING_XV

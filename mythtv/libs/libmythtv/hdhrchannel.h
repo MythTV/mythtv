@@ -15,7 +15,7 @@
 
 // HDHomeRun headers
 #ifdef USING_HDHOMERUN
-#include "hdhomerun/hdhomerun.h"
+#include "hdhomerun.h"
 #else
 struct hdhomerun_control_sock_t { int dummy; };
 #endif

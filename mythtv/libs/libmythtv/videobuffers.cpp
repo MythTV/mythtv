@@ -6,11 +6,11 @@
 #include "mythcontext.h"
 #include "videobuffers.h"
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 #include "fourcc.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
 #if defined(USING_XVMC) || defined(USING_VDPAU)
 #include "videoout_xv.h" // for xvmc stuff

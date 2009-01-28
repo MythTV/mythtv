@@ -9,7 +9,7 @@ using namespace std;
 #ifdef MMX
 
 extern "C" {
-#include "config.h"
+#include "mythconfig.h"
 #include "dsputil.h"
 #include "i386/mmx.h"
 }

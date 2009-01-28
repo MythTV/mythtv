@@ -9,7 +9,7 @@
 #include "settings.h"
 #include "mythwidgets.h"
 #include "mythwizard.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "mythverbose.h"
 
 class ChannelID : public IntegerSetting, public TransientStorage

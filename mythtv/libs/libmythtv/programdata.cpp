@@ -1,6 +1,6 @@
 // MythTV headers
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "programinfo.h"
 #include "programdata.h"
 

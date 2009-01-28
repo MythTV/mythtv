@@ -5,13 +5,13 @@ using namespace std;
 
 #include "remoteencoder.h"
 #include "programinfo.h"
-#include "libmyth/util.h"
-#include "libmyth/mythcontext.h"
+#include "util.h"
+#include "mythcontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythsocket.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythsocket.h"
+#include "mythverbose.h"
 
 #define LOC QString("RemoteEncoder(%1): ").arg(recordernum)
 #define LOC_WARN QString("RemoteEncoder(%1), Warning: ").arg(recordernum)

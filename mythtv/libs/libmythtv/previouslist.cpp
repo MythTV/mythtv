@@ -25,8 +25,8 @@ using namespace std;
 #include "customedit.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdbcon.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdbcon.h"
+#include "mythverbose.h"
 #include "remoteutil.h"
 
 PreviousList::PreviousList(MythMainWindow *parent, const char *name,

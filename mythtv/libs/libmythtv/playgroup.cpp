@@ -1,5 +1,5 @@
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qlayout.h>

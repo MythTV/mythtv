@@ -18,8 +18,8 @@
 #include "dvbchannel.h"
 #include "diseqcsettings.h"
 #include "sourceutil.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

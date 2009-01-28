@@ -16,7 +16,7 @@ using namespace std;
 #include <QKeyEvent>
 #include <QEvent>
 
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "osd.h"
@@ -40,7 +40,7 @@ using namespace std;
 #include "signalmonitorvalue.h"
 #include "scheduledrecording.h"
 #include "previewgenerator.h"
-#include "config.h"
+#include "mythconfig.h"
 #include "livetvchain.h"
 #include "playgroup.h"
 #include "DVDRingBuffer.h"
@@ -49,8 +49,8 @@ using namespace std;
 #include "cardutil.h"
 #include "channelutil.h"
 #include "util-osx-cocoa.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 #include "mythuihelper.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"

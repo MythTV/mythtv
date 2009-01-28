@@ -9,9 +9,9 @@
 #include <qdatetime.h>
 
 #include "eitcache.h"
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 #define LOC QString("EITCache: ")
 

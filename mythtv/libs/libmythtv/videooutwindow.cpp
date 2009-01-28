@@ -35,7 +35,7 @@
 
 extern "C"
 {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 #include "filtermanager.h"

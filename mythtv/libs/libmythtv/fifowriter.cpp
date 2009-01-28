@@ -11,10 +11,10 @@
 #include <cmath>
 
 #include "fifowriter.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
-#include "config.h"
+#include "mythconfig.h"
 #ifdef CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif

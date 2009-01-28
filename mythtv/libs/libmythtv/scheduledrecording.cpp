@@ -15,8 +15,8 @@
 #include "sr_root.h"
 #include "sr_dialog.h"
 #include "jobqueue.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "viewschdiff.h"
 
 // NOTE: if this changes, you _MUST_ update the RecTypePriority function

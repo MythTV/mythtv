@@ -8,9 +8,9 @@
 #include <cmath>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythdbcon.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "mythverbose.h"
 #include "diseqcsettings.h"
 
 /* Lat/Long items relocated from videosource.cpp */

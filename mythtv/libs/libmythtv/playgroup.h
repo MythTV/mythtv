@@ -2,8 +2,8 @@
 #define PLAYGROUP_H
 
 #include "qstringlist.h"
-#include "libmyth/settings.h"
-#include "libmyth/mythwidgets.h"
+#include "settings.h"
+#include "mythwidgets.h"
 
 class ProgramInfo;
 

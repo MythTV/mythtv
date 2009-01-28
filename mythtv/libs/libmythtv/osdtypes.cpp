@@ -15,9 +15,9 @@ using namespace std;
 #include "osdtypeteletext.h"
 #include "util.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdialogs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythdialogs.h"
+#include "mythverbose.h"
 
 #ifdef USING_FRIBIDI
     #include "fribidi/fribidi.h"

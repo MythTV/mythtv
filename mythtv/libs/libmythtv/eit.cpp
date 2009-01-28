@@ -5,8 +5,8 @@
 using namespace std;
 
 // MythTV includes
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "eit.h"
 #include "dvbdescriptors.h"
 #include "programinfo.h" // for subtitle types and audio and video properties

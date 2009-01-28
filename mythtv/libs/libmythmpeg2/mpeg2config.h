@@ -3,6 +3,7 @@
 
 /* just uses ARCH_X86                                         */
 #ifdef ARCH_X86_64
+#undef ARCH_X86
 #define ARCH_X86
 #endif
 

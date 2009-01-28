@@ -16,7 +16,7 @@ using namespace std;
 #undef UNICODE
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 const int kNumBuffers = 31;

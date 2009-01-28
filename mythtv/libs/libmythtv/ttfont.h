@@ -9,7 +9,7 @@
 #include <qmap.h>
 #include <qcolor.h>
 
-#include "config.h"
+#include "mythconfig.h"
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>

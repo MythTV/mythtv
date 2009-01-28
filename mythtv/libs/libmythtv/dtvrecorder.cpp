@@ -13,7 +13,7 @@
 #include "tv_rec.h"
 
 extern "C" {
-#include "../libavcodec/mpegvideo.h"
+#include "mpegvideo.h"
 }
 
 #define LOC QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())

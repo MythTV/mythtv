@@ -20,7 +20,7 @@
 #include <algorithm>
 
 #include "inputgroupmap.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 
 bool InputGroupMap::Build(void)
 {

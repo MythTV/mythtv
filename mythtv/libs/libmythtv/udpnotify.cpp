@@ -29,8 +29,8 @@ match they will be ignored.
 #include <QDomDocument>
 
 #include "udpnotify.h"
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 
 UDPNotifyOSDSet::UDPNotifyOSDSet(const QString &name, uint timeout)
     : m_name(name), m_timeout(timeout)

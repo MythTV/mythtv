@@ -37,7 +37,7 @@ using namespace std;
 #include "videosource.h"
 #include "cardutil.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 
 #define LOC QString("DTVMux: ")
 #define LOC_ERR QString("DTVMux, Error: ")

@@ -7,8 +7,8 @@
 #include "iptvchannel.h"
 
 // MythTV headers
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "iptvchannelfetcher.h"
 #include "iptvfeederwrapper.h"
 

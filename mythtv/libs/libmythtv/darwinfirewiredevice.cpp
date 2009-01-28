@@ -26,7 +26,7 @@ using namespace std;
 // MythTV headers
 #include "darwinfirewiredevice.h"
 #include "darwinavcinfo.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 // Apple Firewire example headers
 #include <AVCVideoServices/StringLogger.h>

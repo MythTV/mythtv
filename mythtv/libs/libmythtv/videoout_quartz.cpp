@@ -59,8 +59,8 @@ using namespace std;
 
 #include "osd.h"
 #include "osdsurface.h"
-#include "libmythdb/mythconfig.h"
-#include "libmythdb/mythverbose.h"
+#include "mythconfig.h"
+#include "mythverbose.h"
 #include "videodisplayprofile.h"
 #include "videoout_dvdv.h"
 

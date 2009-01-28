@@ -1,7 +1,7 @@
 #include <qsqldatabase.h>
 #include "settings.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "mythwidgets.h"
 #include "channeleditor.h"
 

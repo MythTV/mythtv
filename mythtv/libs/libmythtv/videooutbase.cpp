@@ -7,8 +7,8 @@
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"
@@ -39,7 +39,7 @@
 #include "dithertable.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 #include "filtermanager.h"

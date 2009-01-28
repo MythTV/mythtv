@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "uitypes.h"
 #include "scheduledrecording.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "mythuihelper.h"
 
 #include "progdetails.h"

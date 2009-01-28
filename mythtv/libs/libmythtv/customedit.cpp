@@ -15,13 +15,13 @@ using namespace std;
 
 #include "customedit.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/dialogbox.h"
+#include "mythcontext.h"
+#include "dialogbox.h"
 #include "programinfo.h"
 #include "proglist_qt.h"
 #include "scheduledrecording.h"
 #include "recordingtypes.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 
 CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
                        ProgramInfo *pginfo)

@@ -24,8 +24,8 @@ using namespace std;
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"
-#include "libmythdb/mythdbcon.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdbcon.h"
+#include "mythverbose.h"
 #include "channelutil.h"
 
 ProgListerQt::ProgListerQt(ProgListTypeQt pltype,

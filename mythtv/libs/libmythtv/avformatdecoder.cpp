@@ -34,22 +34,22 @@ using namespace std;
 #ifdef USING_XVMC
 #include "videoout_xv.h"
 extern "C" {
-#include "libavcodec/xvmc_render.h"
+#include "xvmc_render.h"
 }
 #endif // USING_XVMC
 
 #ifdef USING_VDPAU
 #include "videoout_xv.h"
 extern "C" {
-#include "libavcodec/vdpau_render.h"
+#include "vdpau_render.h"
 }
 #endif // USING_VDPAU
 
 extern "C" {
-#include "../libavutil/avutil.h"
-#include "../libavcodec/ac3_parser.h"
-#include "../libavcodec/mpegvideo.h"
-#include "../libavformat/avio.h"
+#include "avutil.h"
+#include "ac3_parser.h"
+#include "mpegvideo.h"
+#include "avio.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
 }

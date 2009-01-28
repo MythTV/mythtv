@@ -4,7 +4,7 @@
 #include "RingBuffer.h"
 
 extern "C" {
-#include "../libavformat/avformat.h"
+#include "avformat.h"
 }
 
 extern URLProtocol AVF_RingBuffer_Protocol;

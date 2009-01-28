@@ -23,7 +23,7 @@ using namespace std;
 
 #ifdef WORDS_BIGENDIAN
 extern "C" {
-#include "libavutil/bswap.h"
+#include "bswap.h"
 }
 #endif
 

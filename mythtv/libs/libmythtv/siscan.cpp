@@ -12,7 +12,7 @@
 #include "siscan.h"
 #include "scheduledrecording.h"
 #include "frequencies.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "channelutil.h"
 #include "cardutil.h"
 

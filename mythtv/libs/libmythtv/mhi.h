@@ -30,7 +30,7 @@ using namespace std;
 #include "mythdeque.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h" // to decode single MPEG I-frames
+#include "avcodec.h" // to decode single MPEG I-frames
 }
 
 class OSDSet;

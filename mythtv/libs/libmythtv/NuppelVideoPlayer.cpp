@@ -25,7 +25,7 @@ using namespace std;
 #include <QDir>
 
 // MythTV headers
-#include "config.h"
+#include "mythconfig.h"
 #include "mythdbcon.h"
 #include "dialogbox.h"
 #include "NuppelVideoPlayer.h"
@@ -51,7 +51,7 @@ using namespace std;
 #include "tv_play.h"
 #include "interactivetv.h"
 #include "util-osx-cocoa.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 extern "C" {
 #include "vbitext/vbi.h"

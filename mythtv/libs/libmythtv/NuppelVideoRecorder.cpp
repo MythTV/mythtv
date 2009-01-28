@@ -20,8 +20,8 @@
 #include <iostream>
 using namespace std;
 
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 #include "NuppelVideoRecorder.h"
 #include "vbitext/cc.h"
 #include "channelbase.h"
@@ -32,7 +32,7 @@ using namespace std;
 
 #ifdef WORDS_BIGENDIAN
 extern "C" {
-#include "libavutil/bswap.h"
+#include "bswap.h"
 }
 #endif
 

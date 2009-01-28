@@ -1,8 +1,8 @@
 #ifndef PROFILEGROUP_H
 #define PROFILEGROUP_H
 
-#include "libmyth/settings.h"
-#include "libmyth/mythwidgets.h"
+#include "settings.h"
+#include "mythwidgets.h"
 
 class ProfileGroup;
 

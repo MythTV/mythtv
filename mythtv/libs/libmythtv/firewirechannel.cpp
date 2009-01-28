@@ -5,7 +5,7 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 #include "tv_rec.h"
 #include "linuxfirewiredevice.h"
 #include "darwinfirewiredevice.h"

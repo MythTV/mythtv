@@ -6,7 +6,7 @@
 
 // AVLib header
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 // OpenGL headers

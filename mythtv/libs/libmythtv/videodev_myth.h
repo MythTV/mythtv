@@ -1,7 +1,7 @@
 #ifndef __LINUX_VIDEODEV_H
 #define __LINUX_VIDEODEV_H
 
-#include "config.h"
+#include "mythconfig.h"
 
 #if defined(__FreeBSD__) || defined(CONFIG_DARWIN) || defined(USING_MINGW)
 #include <sys/types.h>

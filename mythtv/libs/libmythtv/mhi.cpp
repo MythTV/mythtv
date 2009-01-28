@@ -7,8 +7,8 @@
 
 #include "mhi.h"
 #include "osd.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 
 static bool       ft_loaded = false;
 static FT_Library ft_library;

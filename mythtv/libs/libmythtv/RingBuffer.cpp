@@ -27,8 +27,8 @@ using namespace std;
 #include "livetvchain.h"
 #include "DVDRingBuffer.h"
 #include "util.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0

@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "config.h"
+#include "mythconfig.h"
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif

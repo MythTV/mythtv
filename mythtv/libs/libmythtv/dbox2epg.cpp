@@ -9,8 +9,8 @@
 
 #include "dbox2channel.h"
 #include "dbox2epg.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "tv_rec.h"
 
 #define DEBUG_DBOX2EPG

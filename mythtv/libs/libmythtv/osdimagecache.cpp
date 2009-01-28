@@ -16,8 +16,8 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "osdimagecache.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 
 // Print statistics of OSD image access in the destructor of OSDImageCache
 //#define PRINT_OSD_IMAGE_CACHE_STATS

@@ -5,7 +5,7 @@
 
 #ifdef MMX
 extern "C" {
-#include "libavcodec/i386/mmx.h"
+#include "i386/mmx.h"
 }
 #endif
 

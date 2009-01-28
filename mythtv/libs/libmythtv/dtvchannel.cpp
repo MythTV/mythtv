@@ -1,7 +1,7 @@
 #include "dtvchannel.h"
 
 // MythTV headers
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "cardutil.h"
 
 #define LOC QString("DTVChan(%1): ").arg(GetDevice())

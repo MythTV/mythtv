@@ -11,7 +11,7 @@
 #include "dsmcccache.h"
 #include "dsmcc.h"
 
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 // Construct the data for a new module from a DII message.
 DSMCCCacheModuleData::DSMCCCacheModuleData(DsmccDii *dii,

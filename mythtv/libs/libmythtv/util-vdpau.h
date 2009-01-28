@@ -2,7 +2,7 @@
 #define UTIL_VDPAU_H_
 
 extern "C" {
-#include "../libavcodec/vdpau_render.h"
+#include "vdpau_render.h"
 }
 
 #include "videobuffers.h"

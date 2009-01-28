@@ -8,11 +8,11 @@ using namespace std;
 #include "datadirect.h"          // for DataDirectProcessor::FixProgramIDs
 #include "videodisplayprofile.h" // for "1214"
 
-#include "libmyth/dbutil.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/schemawizard.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "dbutil.h"
+#include "mythcontext.h"
+#include "schemawizard.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 
 #define MINIMUM_DBMS_VERSION 5,0,15

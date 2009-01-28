@@ -36,8 +36,8 @@
 
 // MythTV headers
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "frequencies.h"
 #include "videosource.h"
 #include "cardutil.h"

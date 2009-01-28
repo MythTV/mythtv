@@ -14,7 +14,7 @@ using namespace std;
 
 extern "C" {
 #include "frame.h"
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 class RawDataList

@@ -1,7 +1,7 @@
 // MythTV headers
 #include "dtvmultiplex.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 #define LOC QString("DTVMux: ")
 #define LOC_ERR QString("DTVMux, Error: ")

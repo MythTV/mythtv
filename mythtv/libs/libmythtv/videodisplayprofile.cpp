@@ -3,9 +3,9 @@
 using namespace std;
 
 #include "videodisplayprofile.h"
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 bool ProfileItem::IsMatch(const QSize &size, float rate) const
 {

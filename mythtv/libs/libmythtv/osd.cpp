@@ -27,8 +27,8 @@ using namespace std;
 #include "textsubtitleparser.h"
 #include "oldsettings.h"
 #include "udpnotify.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 #include "util.h"
 
 #include "x11colors.h"

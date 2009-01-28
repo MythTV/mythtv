@@ -21,16 +21,7 @@ contains(INCLUDEPATH, /usr/local/include) {
   INCLUDEPATH -= /usr/local/include
 }
 
-INCLUDEPATH += ../.. .. .
-INCLUDEPATH += ../libmyth ../libavcodec ../libavutil ../libmythmpeg2
-INCLUDEPATH += ./dvbdev ./mpeg ./iptv
-INCLUDEPATH += ../libmythlivemedia/BasicUsageEnvironment/include
-INCLUDEPATH += ../libmythlivemedia/groupsock/include
-INCLUDEPATH += ../libmythlivemedia/liveMedia/include
-INCLUDEPATH += ../libmythlivemedia/UsageEnvironment/include
-INCLUDEPATH += ../libmythdb ../libmythui
-INCLUDEPATH += $$POSTINC
-
+DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
 DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav ../libmythdb
 DEPENDPATH  += ./dvbdev ./mpeg ./hdhomerun ./iptv
@@ -42,6 +33,11 @@ DEPENDPATH  += ../libmythlivemedia/liveMedia/include
 DEPENDPATH  += ../libmythlivemedia/liveMedia
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
+DEPENDPATH  += ../libmythdb ../libmythui
+
+INCLUDEPATH += .. ../.. # for avlib headers
+INCLUDEPATH += $$DEPENDPATH
+INCLUDEPATH += $$POSTINC
 
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythui -L../libmythupnp

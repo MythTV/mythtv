@@ -2,7 +2,7 @@
 #ifndef _CARDUTIL_H_
 #define _CARDUTIL_H_
 
-#include "libmyth/settings.h"
+#include "settings.h"
 
 // C++ headers
 #include <stdint.h>

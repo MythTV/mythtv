@@ -28,11 +28,11 @@
 #include <algorithm>
 #include <inttypes.h>
 #include <limits.h>
-#include "config.h"
+#include "mythconfig.h"
 
 #ifdef MMX
 extern "C" {
-#include "libavcodec/i386/mmx.h"
+#include "i386/mmx.h"
 }
 #define CPU_MMXEXT 0
 #define CPU_MMX 1

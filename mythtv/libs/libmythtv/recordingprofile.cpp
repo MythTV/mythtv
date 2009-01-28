@@ -5,10 +5,10 @@
 
 #include "recordingprofile.h"
 #include "cardutil.h"
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
-#include "libmyth/mythwizard.h"
+#include "mythcontext.h"
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "mythwizard.h"
 #include "managedlist.h"
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const

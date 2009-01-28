@@ -38,8 +38,8 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "osdlistbtntype.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 
 #define LOC QString("OSDListTreeType: ")
 #define LOC_ERR QString("OSDListTreeType, Error: ")

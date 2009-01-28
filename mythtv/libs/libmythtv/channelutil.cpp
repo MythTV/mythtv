@@ -10,7 +10,7 @@ using namespace std;
 #include <qfile.h>
 
 #include "channelutil.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "dvbtables.h"
 #include "tv.h" // for CHANNEL_DIRECTION
 

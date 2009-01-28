@@ -8,9 +8,9 @@
 
 #include "mythwizard.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 #include "httpcomms.h"
 #include "importicons.h"
 #include "util.h"

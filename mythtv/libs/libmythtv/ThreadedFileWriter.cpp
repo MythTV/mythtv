@@ -16,8 +16,8 @@
 // MythTV headers
 #include "ThreadedFileWriter.h"
 #include "mythcontext.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
 #define HAVE_FDATASYNC

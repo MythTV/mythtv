@@ -13,7 +13,7 @@
 // MythTV headers
 #include "interactivetv.h"
 #include "mhi.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 InteractiveTV::InteractiveTV(NuppelVideoPlayer *nvp)
     : m_context(new MHIContext(this)), m_nvp(nvp)

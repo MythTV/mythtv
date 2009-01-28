@@ -13,7 +13,7 @@
 #include "fourcc.h"
 
 extern "C" {
-#include "../libavcodec/xvmc_render.h"
+#include "xvmc_render.h"
 }
 
 #ifndef XVMC_VLD

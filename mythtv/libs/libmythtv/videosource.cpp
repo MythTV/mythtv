@@ -35,10 +35,10 @@ using namespace std;
 #include "frequencies.h"
 #include "diseqcsettings.h"
 #include "firewiredevice.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

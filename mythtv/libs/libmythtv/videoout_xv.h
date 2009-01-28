@@ -16,7 +16,7 @@
 
 #undef HAVE_AV_CONFIG_H
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 class NuppelVideoPlayer;

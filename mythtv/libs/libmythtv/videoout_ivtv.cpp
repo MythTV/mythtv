@@ -35,11 +35,11 @@ extern "C" {
 #include "ivtv_myth.h"
 }
 
-#include "libmyth/mythcontext.h"
+#include "mythcontext.h"
 
 #include "NuppelVideoPlayer.h"
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 #include "yuv2rgb.h"
 #include "osd.h"

@@ -35,8 +35,8 @@
 #include <QEvent>
 
 // MythTV headers
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 #include "scanwizard.h"
 #include "scanwizardhelpers.h"
 #include "scanwizardscanner.h"

@@ -25,7 +25,7 @@ using namespace std;
 #include "programinfo.h"
 #include "NuppelVideoPlayer.h"
 #include "dtvsignalmonitor.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "jobqueue.h"
 #include "scheduledrecording.h"
 #include "eitscanner.h"

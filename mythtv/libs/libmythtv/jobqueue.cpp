@@ -14,16 +14,16 @@ using namespace std;
 #include "exitcodes.h"
 #include "jobqueue.h"
 #include "programinfo.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/util.h"
+#include "mythcontext.h"
+#include "util.h"
 #include "NuppelVideoPlayer.h"
 #include "previewgenerator.h"
 #include "compat.h"
 #include "recordingprofile.h"
 
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 
 #define LOC     QString("JobQueue: ")
 #define LOC_ERR QString("JobQueue Error: ")

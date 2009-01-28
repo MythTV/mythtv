@@ -72,9 +72,9 @@ using namespace std;
 
 // AVLib/FFMPEG includes
 extern "C" {
-#include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
-#include "../libavformat/mpegts.h"
+#include "avcodec.h"
+#include "avformat.h"
+#include "mpegts.h"
 }
 
 const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 20000;

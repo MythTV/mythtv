@@ -9,11 +9,11 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "signalmonitor.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 #include "../libmyth/util.h"
 

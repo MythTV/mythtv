@@ -2,7 +2,7 @@
 #include "videosource.h"
 #include "profilegroup.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "mythuihelper.h"
 #include "cardutil.h"
 #include <qsqldatabase.h>

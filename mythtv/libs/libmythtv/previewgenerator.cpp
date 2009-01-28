@@ -28,8 +28,8 @@
 #include "storagegroup.h"
 #include "util.h"
 #include "playercontext.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")

@@ -10,8 +10,8 @@
 
 extern "C" {
 #include "frame.h"
-#include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
+#include "avcodec.h"
+#include "avformat.h"
 }
 
 class ProgramInfo;

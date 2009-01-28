@@ -12,7 +12,7 @@ using namespace std;
 #include "eithelper.h"
 #include "eitfixup.h"
 #include "eitcache.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
 #include "atsctables.h"
 #include "dvbtables.h"
 #include "premieretables.h"

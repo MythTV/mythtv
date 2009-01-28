@@ -11,7 +11,7 @@ using namespace std;
 #include "filtermanager.h"
 #include "fourcc.h"
 #include "videodisplayprofile.h"
-#include "libmythui/mythmainwindow.h"
+#include "mythmainwindow.h"
 
 #include "mmsystem.h"
 #include "tv.h"
@@ -21,7 +21,7 @@ using namespace std;
 #undef UNICODE
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 typedef struct

@@ -11,7 +11,7 @@
 
 #include "util.h"
 extern "C" {
-#include "../libavcodec/avcodec.h"
+#include "avcodec.h"
 }
 
 #define DVDNAV_COMPILE

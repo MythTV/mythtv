@@ -14,8 +14,8 @@
 #include "eithelper.h"
 #include "scheduledrecording.h"
 #include "util.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)

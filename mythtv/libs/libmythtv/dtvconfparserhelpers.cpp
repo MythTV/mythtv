@@ -2,7 +2,7 @@
 #include <QMutex>
 #include <QMap>
 
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 #include "dtvconfparserhelpers.h"
 
 bool DTVParamHelper::ParseParam(const QString &symbol, int &value,
