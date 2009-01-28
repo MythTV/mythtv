@@ -18,7 +18,6 @@
 #include "previewgenerator.h"
 #include "compat.h"
 #include "mythverbose.h"
-#include "mythversion.h"
 #include "mythuihelper.h"
 
 #define LOC QString("NetworkControl: ")
