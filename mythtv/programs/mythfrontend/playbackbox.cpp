@@ -32,6 +32,8 @@ using namespace std;
 
 #include "mythuihelper.h"
 #include "mythuitext.h"
+#include "mythuibutton.h"
+#include "mythuibuttonlist.h"
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
 #include "mythuitextedit.h"
