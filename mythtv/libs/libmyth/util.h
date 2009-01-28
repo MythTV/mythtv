@@ -13,8 +13,8 @@ using namespace std;
 #include <time.h>
 
 #include "mythexp.h"
-#include "libmythdb/mythtimer.h"
-#include "libmythui/mythsystem.h"
+#include "mythtimer.h"
+#include "mythsystem.h"
 
 class QPixmap;
 class QImage;

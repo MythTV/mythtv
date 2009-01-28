@@ -13,7 +13,7 @@
 // MythTV headers
 #include "mythmedia.h"
 #include "mythconfig.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 #include "util.h"
 
 using namespace std;

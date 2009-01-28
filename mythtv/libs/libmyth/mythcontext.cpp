@@ -29,15 +29,15 @@
 #include "themeinfo.h"
 #include "dbutil.h"
 
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythversion.h"
-#include "libmythui/mythdialogbox.h"
-#include "libmythui/mythmainwindow.h"
-#include "libmythui/mythuihelper.h"
-#include "libmythui/mythimage.h"
-#include "libmythupnp/mythxmlclient.h"
-#include "libmythupnp/upnp.h"
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "mythversion.h"
+#include "mythdialogbox.h"
+#include "mythmainwindow.h"
+#include "mythuihelper.h"
+#include "mythimage.h"
+#include "mythxmlclient.h"
+#include "upnp.h"
 
 #ifdef USING_MINGW
 #include <winsock2.h>

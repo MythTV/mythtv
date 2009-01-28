@@ -44,7 +44,7 @@ class MythMainWindow;
 class QVBoxLayout;
 class QProgressBar;
 
-#include "libmythui/mythmainwindow.h"
+#include "mythmainwindow.h"
 
 typedef enum DialogCode
 {

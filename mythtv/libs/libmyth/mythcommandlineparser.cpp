@@ -3,8 +3,8 @@
 #include "mythcommandlineparser.h"
 #include "exitcodes.h"
 #include "mythcontext.h"
-#include "libmythdb/mythverbose.h"
-#include "libmythdb/mythversion.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 
 MythCommandLineParser::MythCommandLineParser(uint64_t things_to_parse) :
     parseTypes(things_to_parse),

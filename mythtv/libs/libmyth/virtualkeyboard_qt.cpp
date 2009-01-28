@@ -8,7 +8,7 @@
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 #include "mythfontproperties.h"
 #include "mythuihelper.h"

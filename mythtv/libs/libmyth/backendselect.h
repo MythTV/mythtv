@@ -4,7 +4,7 @@
 #include <QListWidget>
 
 #include "mythdialogs.h"
-#include "libmythupnp/upnpdevice.h"
+#include "upnpdevice.h"
 
 // define this to add a search button. In Nigel's testing, an extra ssdp
 // doesn't get any extra responses, so it is disabled by default.

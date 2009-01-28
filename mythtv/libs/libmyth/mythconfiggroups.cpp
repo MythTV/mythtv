@@ -5,8 +5,8 @@
 
 #include "mythconfiggroups.h"
 #include "mythcontext.h"
-#include "libmythdb/mythverbose.h"
-#include "libmythui/mythuihelper.h"
+#include "mythverbose.h"
+#include "mythuihelper.h"
 
 static void clear_widgets(vector<Configurable*> &children,
                           vector<QWidget*>      &childwidget)

@@ -7,11 +7,11 @@
 #include "schemawizard.h"
 #include "util.h"
 
-#include "libmythdb/mythtimer.h"
-#include "libmythdb/mythverbose.h"
-#include "libmythui/mythdialogbox.h"
-#include "libmythui/mythmainwindow.h"
-#include "libmythui/mythuihelper.h"
+#include "mythtimer.h"
+#include "mythverbose.h"
+#include "mythdialogbox.h"
+#include "mythmainwindow.h"
+#include "mythuihelper.h"
 
 
 static SchemaUpgradeWizard * c_wizard = 0;

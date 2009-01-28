@@ -3,8 +3,8 @@
 
 #include <QStringList>
 
-#include "libmyth/settings.h"
-#include "libmyth/mythwidgets.h"
+#include "settings.h"
+#include "mythwidgets.h"
 
 class MPUBLIC StorageGroup: public ConfigurationWizard
 {

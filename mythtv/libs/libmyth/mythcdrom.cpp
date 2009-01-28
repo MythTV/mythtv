@@ -10,7 +10,7 @@
 #include <qfileinfo.h>
 
 #include "mythconfig.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 
 // If your DVD has directories in lowercase, then it is wrongly mounted!

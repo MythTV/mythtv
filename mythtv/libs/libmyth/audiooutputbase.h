@@ -17,7 +17,7 @@ using namespace std;
 // MythTV headers
 #include "audiooutput.h"
 #include "samplerate.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 namespace soundtouch {
 class SoundTouch;

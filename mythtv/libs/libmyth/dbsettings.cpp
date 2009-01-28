@@ -3,8 +3,8 @@
 
 #include "dbsettings.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdbcon.h"
-#include "libmythdb/mythdbparams.h"
+#include "mythdbcon.h"
+#include "mythdbparams.h"
 
 class MythDbSettings1: public VerticalConfigurationGroup {
 public:

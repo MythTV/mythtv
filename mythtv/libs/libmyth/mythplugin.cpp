@@ -13,9 +13,9 @@
 #include "mythcontext.h"
 #include "langsettings.h"
 
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythversion.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdirs.h"
+#include "mythversion.h"
+#include "mythverbose.h"
 
 using namespace std;
 

@@ -27,10 +27,10 @@ using namespace std;
 
 #include "mythwidgets.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
-#include "libmythui/DisplayRes.h"
-#include "libmythui/mythuihelper.h"
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "DisplayRes.h"
+#include "mythuihelper.h"
 
 /** \class Configurable
  *  \brief Configurable is the root of all the database aware widgets.

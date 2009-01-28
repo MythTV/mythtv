@@ -16,7 +16,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "x11colors.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 #ifdef USING_MINGW
 #undef LoadImage

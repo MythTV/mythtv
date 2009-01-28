@@ -5,8 +5,8 @@
 #include <QString>
 
 #include "dbutil.h"
-#include "libmythui/mythmainwindow.h"
-#include "libmythui/mythprogressdialog.h"
+#include "mythmainwindow.h"
+#include "mythprogressdialog.h"
 
 /// Return values from PromptForUpgrade()
 enum MythSchemaUpgrade

@@ -18,8 +18,8 @@ extern "C" {
 
 // MythTV headers
 #include "audiooutputdigitalencoder.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
 #define LOC QString("DEnc: ")
 #define LOC_ERR QString("DEnc, Error: ")

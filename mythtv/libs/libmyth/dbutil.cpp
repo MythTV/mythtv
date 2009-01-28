@@ -13,9 +13,9 @@
 #include "mythcontext.h"
 #include "storagegroup.h"
 #include "util.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythdirs.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "mythverbose.h"
 
 #define LOC QString("DBUtil: ")
 #define LOC_ERR QString("DBUtil Error: ")

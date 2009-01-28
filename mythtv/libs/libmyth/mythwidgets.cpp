@@ -17,8 +17,8 @@ using namespace std;
 #include "util.h"
 #include "mythdialogs.h"
 #include "virtualkeyboard_qt.h"
-#include "libmythdb/mythverbose.h"
-#include "libmythui/mythmainwindow.h"
+#include "mythverbose.h"
+#include "mythmainwindow.h"
 
 typedef VirtualKeyboardQt* QWidgetP;
 static void qt_delete(QWidgetP &widget)

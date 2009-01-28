@@ -8,8 +8,8 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 #include "mythsocket.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
 RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries) :
     path(_path),

@@ -10,7 +10,7 @@
 #include "mythconfigdialogs.h"
 #include "mythcontext.h"
 
-#include "libmythupnp/mythxmlclient.h"
+#include "mythxmlclient.h"
 
 
 BackendSelect::BackendSelect(MythMainWindow *parent, DatabaseParams *params)

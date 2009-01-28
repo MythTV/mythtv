@@ -19,7 +19,7 @@ using namespace std;
 #include "mythdialogs.h"
 #include "generictree.h"
 #include "mythwidgets.h"
-#include "libmythui/mythfontproperties.h"
+#include "mythfontproperties.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
