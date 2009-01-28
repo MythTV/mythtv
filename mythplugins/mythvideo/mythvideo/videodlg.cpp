@@ -19,6 +19,7 @@
 #include <mythtv/libmythui/mythuihelper.h>
 #include <mythtv/libmythui/mythprogressdialog.h>
 #include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuibuttontree.h>
 #include <mythtv/libmythui/mythuiimage.h>
