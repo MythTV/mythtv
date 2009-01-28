@@ -140,8 +140,9 @@ class ScreenSaverX11Private
         if (IsDPMSEnabled() && m_display)
         {
             m_dpmsdeactivated = true;
-            DPMSDisable(m_display);
-            VERBOSE(VB_GENERAL, LOC + "DPMS Deactivated ");
+            Status status = DPMSDisable(m_display);
+            XSync(m_display, FALSE);
+            VERBOSE(VB_GENERAL, LOC + QString("DPMS Deactivated %1").arg(status));
         }
     }
 
@@ -150,8 +151,9 @@ class ScreenSaverX11Private
         if (m_dpmsdeactivated && m_display)
         {
             m_dpmsdeactivated = false;
-            DPMSEnable(m_display);
-            VERBOSE(VB_GENERAL, LOC + "DPMS Reactivated.");
+            Status status = DPMSEnable(m_display);
+            XSync(m_display, FALSE);
+            VERBOSE(VB_GENERAL, LOC + QString("DPMS Reactivated %1").arg(status));
         }
     }
 
@@ -171,6 +173,7 @@ class ScreenSaverX11Private
         {
             XSetScreenSaver(m_display, m_state.timeout, m_state.interval,
                             m_state.preferblank, m_state.allowexposure);
+            XSync(m_display, FALSE);
             m_state.saved = false;
         }
     }
@@ -250,6 +253,7 @@ void ScreenSaverX11::Disable(void)
     {
         XResetScreenSaver(d->m_display);
         XSetScreenSaver(d->m_display, 0, 0, 0, 0);
+        XSync(d->m_display, FALSE);
     }
 
     d->DisableDPMS();
@@ -265,7 +269,10 @@ void ScreenSaverX11::Restore(void)
 
     // One must reset after the restore
     if (d->m_display)
+    {
         XResetScreenSaver(d->m_display);
+        XSync(d->m_display, FALSE);
+    }
 
     if (d->IsScreenSaverRunning())
         d->StopTimer();
@@ -273,18 +280,24 @@ void ScreenSaverX11::Restore(void)
 
 void ScreenSaverX11::Reset(void)
 {
+    bool need_xsync = false;
     if (d->m_display)
+    {
         XResetScreenSaver(d->m_display);
+        need_xsync = true;
+    }
+
     if (d->IsScreenSaverRunning())
         resetSlot();
 
     if (Asleep() && d->m_display)
     {
         DPMSForceLevel(d->m_display, DPMSModeOn);
-        // Calling XSync is necessary for the case when Myth executes
-        // another application before the event loop regains control
-        XSync(d->m_display, false);
+        need_xsync = true;
     }
+
+    if (need_xsync)
+        XSync(d->m_display, FALSE);
 }
 
 bool ScreenSaverX11::Asleep(void)
