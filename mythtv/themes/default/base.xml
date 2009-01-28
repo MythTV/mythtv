@@ -774,23 +774,23 @@
                         <state name="folder">
                             <imagetype name="icon">
                                 <area>5,4,150,74</area>
-                                <filename>mv_gallery_dir.png</filename>
+                                <filename>shared/directory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder" from="folder">
                             <imagetype name="icon">
-                                <filename>mv_gallery_dir_up.png</filename>
+                                <filename>shared/updirectory.png</filename>
                             </imagetype>
                         </state>
                         <state name="executable" from="folder">
                             <imagetype name="icon">
-                                <filename>file.png</filename>
+                                <filename>shared/executable.png</filename>
                             </imagetype>
                         </state>
                         <state name="file" from="folder">
                             <imagetype name="icon">
-                                <filename>file.png</filename>
+                                <filename>shared/file.png</filename>
                             </imagetype>
                         </state>
                     </statetype>
