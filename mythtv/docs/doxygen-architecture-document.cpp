@@ -65,6 +65,10 @@ to documentation on the code itself.
       This library depends on libmyth. Any changes to this library's ABI 
       may trigger a myth binary version change because the plugins depend on it.
 
+  <dt>libmythupnp            <dd>Initial uPnP (universal Plug and Play) support
+
+      This library depends on libmythdb.
+
   <dt>libmyth                <dd>Core %MythTV library. Used by the Plugins.
       The
       \ref audio_subsystem "audio",
@@ -73,9 +77,9 @@ to documentation on the code itself.
       \ref myth_media "media manager",
       and some UI widgets are implemented by libmyth.
 
-      This library depends on both libmyth and libmythui. Any changes to
-      this library's ABI may trigger a myth binary version change because
-      the plugins depend on it.
+      This library depends on both libmyth, libmythupnp and libmythui.
+      Any changes to this library's ABI may trigger a myth binary version
+      change because the plugins depend on it.
 
   <dt>libmythtv              <dd>%MythTV %TV functionality library. Used by some Plugins.
       The 
@@ -94,13 +98,6 @@ to documentation on the code itself.
       \ref myth_network_protocol "myth network protocol" (for example
       ProgramInfo) or to the protocol itself require the protocol version
       number to be incremented.
-
-  <dt>libmythupnp            <dd>Initial uPnP (universal Plug and Play) support
-
-      This library depends on libmythdb, libmythui, libmyth and libmythtv.
-      Through libmythtv, it also depends implicitly on avlib, libmythmpeg2,
-      libmythsamplerate, libmythsoundtouch, libdvdnav, libfreemheg and
-      liblivemedia.
 
   <dt>libavcodec/libavformat/libavutil/libpostproc/libswscale
       <dd>These together form the FFmpeg A/V decoding library (aka avlib).

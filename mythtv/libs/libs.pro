@@ -13,13 +13,12 @@ using_live:SUBDIRS += libmythlivemedia
 using_hdhomerun:SUBDIRS += libmythhdhomerun
 
 # Libraries with dependencies
-SUBDIRS += libmythui libmyth libmythtv
+SUBDIRS += libmythui libmyth libmythupnp libmythtv
 libmythui.depends = libmythdb
-libmyth.depends = libmythdb libmythui
+libmythupnp.depends = libmythdb
+libmyth.depends = libmythdb libmythui libmythupnp
 
 LIBMYTHTVDEPS = $$SUBDIRS
 LIBMYTHTVDEPS -= libmythtv
 libmythtv.depends = $$LIBMYTHTVDEPS
 
-SUBDIRS += libmythupnp
-libmythupnp.depends = libmythtv
