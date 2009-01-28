@@ -35,6 +35,12 @@
 #include <mythcontext.h>
 #include <mythmainwindow.h>
 
+// MythUI headers
+#include <mythuitext.h>
+#include <mythuibuttonlist.h>
+#include <mythuiimage.h>
+#include <mythdialogbox.h>
+
 // MythControls headers
 #include "mythcontrols.h"
 #include "keygrabber.h"

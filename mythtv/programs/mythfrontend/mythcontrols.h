@@ -24,15 +24,19 @@
 #ifndef MYTHCONTROLS_H
 #define MYTHCONTROLS_H
 
-#include <mythscreentype.h>
-#include <mythuitext.h>
-#include <mythuibuttonlist.h>
-#include <mythuiimage.h>
-#include <mythdialogbox.h>
-
-#include "keybindings.h"
+// QT
 #include <QList>
 #include <QHash>
+
+// MythUI
+#include <mythscreentype.h>
+
+#include "keybindings.h"
+
+class MythUIText;
+class MythUIButtonList;
+class MythUIImage;
+class MythDialogBox;
 
 typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
 
