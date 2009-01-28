@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mythburntheme>
+
+  <!-- Theme for MythBurn - show intro & main menu with 4 recordings -->
+
+  <fonts>
+    <font name="title" size="22" color="yellow"
+     effect="outline" shadowcolor="black" shadowsize="2">FreeSans.ttf</font>
+    <font name="desc"  size="17" color="white"
+     effect="outline" shadowcolor="black" shadowsize="1">FreeSans.ttf</font>
+  </fonts>
+
+  <intro filename="mythtv_intro.mpg"/>
+
+  <menu background="Black-Background.png">
+    <item>
+      <previous filename="previous.png"
+            x="20" y="400" w="48" h="48"
+       mask="previous_mask.png" static="True"/>
+
+<!-- The text here should be Page X of Y, but mythburn can't do that yet -->
+      <text x="60" y="500" w="200" h="25"
+       value="Page %page" font="desc"
+       static="True" align="left"/>
+
+      <graphic filename="%thumbnail"
+            x="148" y="35" w="140" h="105"
+       static="False" halign="left" valign="top"/>
+      <text x="320" y="35" w="380" h="25"
+       value="%title" font="title"
+       static="False" align="left"/>
+      <text x="320" y="65" w="380" h="25"
+       value="%subtitle" font="title"
+       static="False" align="left"/>
+      <text x="320" y="100" w="380" h="20"
+       value="%recordingdate %recordingtime" font="desc"
+       static="False" align="left"/>
+<!-- The text here should be the category, but mythburn can't do that yet -->
+      <text x="320" y="120" w="380" h="20"
+       value="" font="desc"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="148" y="150" w="140" h="105"
+       static="False" halign="left" valign="top"/>
+      <text x="320" y="150" w="380" h="25"
+       value="%title" font="title"
+       static="False" align="left"/>
+      <text x="320" y="180" w="380" h="25"
+       value="%subtitle" font="title"
+       static="False" align="left"/>
+      <text x="320" y="215" w="380" h="20"
+       value="%recordingdate %recordingtime" font="desc"
+       static="False" align="left"/>
+      <text x="320" y="235" w="380" h="20"
+       value="" font="desc"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <graphic filename="%thumbnail"
+            x="148" y="265" w="140" h="105"
+       static="False" halign="left" valign="top"/>
+      <text x="320" y="265" w="380" h="25"
+       value="%title" font="title"
+       static="False" align="left"/>
+      <text x="320" y="295" w="380" h="25"
+       value="%subtitle" font="title"
+       static="False" align="left"/>
+      <text x="320" y="330" w="380" h="20"
+       value="%recordingdate %recordingtime" font="desc"
+       static="False" align="left"/>
+      <text x="320" y="350" w="380" h="20"
+       value="" font="desc"
+       static="False" align="left"/>
+    </item>
+
+    <item>
+      <next filename="next.png"
+            x="82" y="400" w="48" h="48"
+       mask="next_mask.png" static="False"/>
+
+      <graphic filename="%thumbnail"
+            x="148" y="380" w="140" h="105"
+       static="False" halign="left" valign="top"/>
+      <text x="320" y="380" w="380" h="25"
+       value="%subtitle" font="title"
+       static="False" align="left"/>
+      <text x="320" y="410" w="380" h="25"
+       value="%subtitle" font="title"
+       static="False" align="left"/>
+      <text x="320" y="445" w="380" h="20"
+       value="%recordingdate %recordingtime" font="desc"
+       static="False" align="left"/>
+      <text x="320" y="465" w="380" h="20"
+       value="" font="desc"
+       static="False" align="left"/>
+    </item>
+  </menu>
+</mythburntheme>
