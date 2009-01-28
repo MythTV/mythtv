@@ -46,6 +46,25 @@ to documentation on the code itself.
 
 %MythTV is divided up into eleven libraries:
 <dl>
+  <dt>libmythdb              <dd>Lowest-level %MythTV library. Used by the Plugins.
+      Contains the \ref database_subsystem "database", \ref lcd_subsystem "LCD",
+      and network support code (used by the
+      \ref myth_network_protocol "myth network protocol").
+
+      This also contains some other basic functionality and classes which
+      are used by one or more of libmyth, libmythui and libmythtv.
+
+      Any changes to this library's ABI may trigger a myth binary version
+      change because the plugins depend on it.
+
+  <dt>libmythui              <dd>Main user interface rendering library. Used by the Plugins.
+      The mouse/touchscreen gesture, remote control
+      (\ref lirc_subsystem "LIRC" and AppleRemote)
+      and screen saver control code are also contained in this library.
+
+      This library depends on libmyth. Any changes to this library's ABI 
+      may trigger a myth binary version change because the plugins depend on it.
+
   <dt>libmyth                <dd>Core %MythTV library. Used by the Plugins.
       The
       \ref audio_subsystem "audio",
@@ -53,37 +72,82 @@ to documentation on the code itself.
       \ref plugin_arch "plugin manager",
       \ref myth_media "media manager",
       and some UI widgets are implemented by libmyth.
-  <dt>libmythdb              <dd>Low-level %MythTV library. Contains the
-      \ref database_subsystem "database",
-      \ref lcd_subsystem "LCD",
-      and network support code
-      (used by the \ref myth_network_protocol "myth network protocol").
-  <dt>libmythtv              <dd>%MythTV %TV functionality library.
+
+      This library depends on both libmyth and libmythui. Any changes to
+      this library's ABI may trigger a myth binary version change because
+      the plugins depend on it.
+
+  <dt>libmythtv              <dd>%MythTV %TV functionality library. Used by some Plugins.
       The 
       \ref osd_subsystem "OSD",
       \ref recorder_subsystem "recorders", \ref video_subsystem "video" and 
       \ref av_player_subsystem "A/V players" are supported by libmythtv.
-  <dt>libmythui              <dd>Main user interface rendering library.
-      The mouse/touchscreen gesture, remote control
-      (\ref lirc_subsystem "LIRC" and AppleRemote)
-      and screen saver control code are also contained in this library.
-  <dt>libavcodec/libavformat/libavutil
-      <dd>This is the FFmpeg A/V decoding library (aka avlib).
+
+      This library depends on libmythdb, libmythui and libmyth.
+      It also depends on avlib, libmythmpeg2, libmythsamplerate,
+      libmythsoundtouch, libdvdnav, libfreemheg and liblivemedia.
+
+      This library is used by some plugins so changes to it's ABI may
+      require a myth binary version change.
+
+      Any changes to classes that are serialized by the 
+      \ref myth_network_protocol "myth network protocol" (for example
+      ProgramInfo) or to the protocol itself require the protocol version
+      number to be incremented.
+
+  <dt>libmythupnp            <dd>Initial uPnP (universal Plug and Play) support
+
+      This library depends on libmythdb, libmythui, libmyth and libmythtv.
+      Through libmythtv, it also depends implicitly on avlib, libmythmpeg2,
+      libmythsamplerate, libmythsoundtouch, libdvdnav, libfreemheg and
+      liblivemedia.
+
+  <dt>libavcodec/libavformat/libavutil/libpostproc/libswscale
+      <dd>These together form the FFmpeg A/V decoding library (aka avlib).
       <a href="http://ffmpeg.mplayerhq.hu/documentation.html">Documented Externally</a>.
+
+      These should be modified as little as possible, and any changes
+      should be sent upstream for inclusion in the FFmpeg project's
+      version of these libraries.
+
+      These libraries do not depend on any of our libraries.
+
   <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
       <a href="http://libmpeg2.sourceforge.net/">External Website</a>.
+
+      This is an alternate MPEG-2 decoding library. It is offered as
+      an option for software decoding of MPEG-1 and MPEG-2 files.
+      FFmpeg is still used for decoding MPEG still frames when this
+      library is selected for playback.
+
+      This library does not depend on any of our libraries.
+
   <dt>libmythsamplerate      <dd>Audio resampling library
       <a href="http://www.mega-nerd.com/SRC/api.html">Documented Externally</a>.
       We use this to support different output sample rates than the sample
       rate used in the audio streams we play.
+
+      This library does not depend on any of our libraries.
+
   <dt>libmythsoundtouch      <dd>Pitch preserving audio resampling library.
       <a href="http://www.surina.net/soundtouch/">External Website</a>.
       We use this for the time-stretch feature.
+
+      This library does not depend on any of our libraries.
+
   <dt>libmythdvdnav
       <dd>Used for navigating DVD menus when using the internal player
+
+      This library should not depend on any of our libraries.
+
   <dt>libmythfreemheg        <dd>UK interactive %TV viewer
+
+      This library does not depend on any of our libraries.
+
   <dt>libmythlivemedia       <dd>Support for the FreeBox recorder device
-  <dt>libmythupnp            <dd>Initial uPnP (universal Plug and Play) support
+
+      This library does not depend on any of our libraries.
+
 </dl>
 Two libraries libmythmpeg2 and libmythsamplerate appear redundant, but
 libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and
@@ -94,10 +158,14 @@ to match the hardware sample rate to the A/V streams audio sample rate.
 The database schema is documented here \ref db_schema.
 
 \section apps Applications
-%MythTV contains 14 applications:
+%MythTV contains 12 applications which are installed by make install
 
 <dl>
-  <dt>mythbackend      <dd>This is the backend which runs the recorders.
+  <dt>mythbackend      <dd>This is the backend server which runs the recorders.
+                           On frontend only systems, the binary needs to be
+                           installed to perform some functions for the
+                           frontend, but does not need to be constantly
+                           running -- the frontend will run it as needed.
   <dt>mythfrontend
       <dd>This is the frontend which is the main application
           for viewing programs and using the %MythTV plugins.
@@ -125,17 +193,14 @@ The database schema is documented here \ref db_schema.
                            This is used to shrink HDTV programs to lower
                            quality recordings that match the hardware the
                            user has.
-  <dt>mythjobqueue     <dd>This is used internally by mythfrontend to schedule
-                           jobs such as commercial flagging and transcoding.
+  <dt>mythjobqueue     <dd>This can be run on a frontend only system instead
+                           of mythbackend to handle commercial flagging,
+                           transcode and user jobs. The only advantage over
+                           running a full mythbackend is to use sligtly less
+                           memory.
   <dt>mythcommflag     <dd>This is used internally by mythfrontend to flag
-                           commercials.
-  <dt>mythepg          <dd>This is used internally by mythfrontend to find
-                           upcoming programs to record based on the channel
-                           and time.
-  <dt>mythprogfind     <dd>This is used internally by mythfrontend to find 
-                           programs to record based on the first letter of
-                           the program name.
-  <dt>mythuitest       <dd>This is a test program for libmythui development.
+                           commercials. It can also be used to repair keyframe
+                           maps for recordings.
   <dt>mythlcdserver    <dd>This is an interface between a number of Myth
                            clients and a small text display (LCDProc server).
   <dt>mythwelcome/mythshutdown
