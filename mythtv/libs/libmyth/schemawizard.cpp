@@ -1,7 +1,6 @@
 #include <unistd.h>      // for isatty() on Windows
 
-#include <QApplication>
-
+#include "dialogbox.h"
 #include "langsettings.h"
 #include "mythcontext.h"
 #include "schemawizard.h"
@@ -9,7 +8,6 @@
 
 #include "mythtimer.h"
 #include "mythverbose.h"
-#include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 
@@ -84,24 +82,7 @@ bool SchemaUpgradeWizard::BackupDB(void)
         return false;
     }
 
-
-    if (GetMythUI()->IsScreenSetup())
-    {
-        if (m_busyPopup)
-            m_busyPopup->Close();
-
-        m_busyPopup = ShowBusyPopup(tr("Attempting Database Backup"));
-        if (m_busyPopup)
-            qApp->processEvents();    // Force draw if no main loop yet
-    }
-
     didBackup = DBUtil::BackupDB(m_backupResult);
-
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
 
     return didBackup;
 }
@@ -141,16 +122,6 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
                              " Waiting to see if DB is being upgraded.");
 
         VERBOSE(VB_IMPORTANT, message);
-
-        if (GetMythUI()->IsScreenSetup())
-        {
-            if (m_busyPopup)
-                m_busyPopup->Close();
-
-            m_busyPopup = ShowBusyPopup(message);
-            if (m_busyPopup)
-                qApp->processEvents();    // Force draw if no main loop yet
-        }
 
         MSqlQuery query(MSqlQuery::InitCon());
         bool      backupRunning  = false;
@@ -204,55 +175,37 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
     return versionsBehind;
 }
 
-static MythSchemaUpgrade  selected;
-
-void SchemaUpgradeWizard::upgrade(void)
-{
-    selected = MYTH_SCHEMA_UPGRADE;
-}
-
-void SchemaUpgradeWizard::use(void)
-{
-    selected = MYTH_SCHEMA_USE_EXISTING;
-}
-
 MythSchemaUpgrade SchemaUpgradeWizard::GuiPrompt(const QString &message,
                                                  bool upgradable, bool expert)
 {
-    MythDialogBox   * dlg;
-    MythScreenStack * pop;
+    DialogBox       * dlg;
     MythMainWindow  * win = gContext->GetMainWindow();
 
     if (!win)
         return MYTH_SCHEMA_ERROR;
 
-    pop = win->GetStack("popup stack");
-    if (!pop)
-        pop = win->GetMainStack();
-    if (!pop)
-        return MYTH_SCHEMA_ERROR;
-
-    dlg = new MythDialogBox(message, pop, "schema prompt");
-    if (!dlg->Create())
-    {
-        delete dlg;
-        return MYTH_SCHEMA_ERROR;
-    }
-
-    selected = MYTH_SCHEMA_EXIT;
-
-    pop->AddScreen(dlg);
+    dlg = new DialogBox(win, message);
     dlg->AddButton(tr("Exit"));
-
     if (upgradable)
-        dlg->AddButton(tr("Upgrade"),            SLOT(upgrade()));
+        dlg->AddButton(tr("Upgrade"));
     if (expert)
-        dlg->AddButton(tr("Use current schema"), SLOT(use()));
+        dlg->AddButton(tr("Use current schema"));
 
-    dlg->SetReturnEvent(this, QString());
-    WaitForPopups();
-    win->Show();     // otherwise, popup remains 'till MythThemedMenu drawn
-    return selected;
+    DialogCode selected = dlg->exec();
+    dlg->deleteLater();
+
+    switch (selected)
+    {
+        case kDialogCodeRejected:
+        case kDialogCodeButton0:
+            return MYTH_SCHEMA_EXIT;
+        case kDialogCodeButton1:
+            return upgradable ? MYTH_SCHEMA_UPGRADE: MYTH_SCHEMA_USE_EXISTING;
+        case kDialogCodeButton2:
+            return MYTH_SCHEMA_USE_EXISTING;
+        default:
+            return MYTH_SCHEMA_ERROR;
+    }
 }
 
 /**
@@ -426,8 +379,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         if (returnValue == MYTH_SCHEMA_ERROR)
         {
             // Display error, return warning to caller
-            ShowOkPopup(message);
-            WaitForPopups();
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(), "", message);
             return MYTH_SCHEMA_ERROR;
         }
 

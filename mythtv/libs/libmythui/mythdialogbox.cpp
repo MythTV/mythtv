@@ -334,37 +334,6 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent,
     return pop;
 }
 
-/**
- * \brief    While there are dialogs in the popup stack, process events
- *
- * \warning  Effectively changes non-blocking dialogs into blocking ones.
- *           This is dangerous from a UI point of view, so use wisely.
- *           It is almost always possible to prompt the user with a
- *           non-blocking popup or question
- *
- * \todo     Can only be safely used when the Qt runloop is not active.
- *           (If there are two loops grabbing events, some will be lost).
- *           Needs appropriate checking code, but Nigel couldn't work out how
- */
-void WaitForPopups(void)
-{
-    static MythScreenStack *popups;
-
-    if (!popups)
-        popups = GetMythMainWindow()->GetStack("popup stack");
-
-    if (popups)
-        while (popups->TotalScreens())
-        {
-            VERBOSE(VB_IMPORTANT+VB_EXTRA,
-                    "Waiting for " + QString::number(popups->TotalScreens())
-                    + " popup screens?");
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 250);
-            qApp->sendPostedEvents(0, QEvent::DeferredDelete);
-            usleep(300000);
-        }
-}
-
 /////////////////////////////////////////////////////////////////
 
 MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,

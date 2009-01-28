@@ -282,7 +282,6 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
 
 MPUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
-MPUBLIC void WaitForPopups(void);
 
 Q_DECLARE_METATYPE(const char*)
 Q_DECLARE_METATYPE(QFileInfo)

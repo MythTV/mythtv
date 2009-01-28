@@ -82,10 +82,6 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
     bool    emptyDB;          ///< Is the database currently empty?
     int     versionsBehind;   ///< How many schema versions old is the DB?
 
-  public slots:
-    void upgrade(void);
-    void use(void);
-
   private:
     void              BusyPopup(const QString &message);
     MythSchemaUpgrade GuiPrompt(const QString &message,
