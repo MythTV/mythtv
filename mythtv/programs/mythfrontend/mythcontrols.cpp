@@ -37,6 +37,7 @@
 
 // MythUI headers
 #include <mythuitext.h>
+#include <mythuibutton.h>
 #include <mythuibuttonlist.h>
 #include <mythuiimage.h>
 #include <mythdialogbox.h>

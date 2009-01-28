@@ -35,6 +35,7 @@
 
 class MythUIText;
 class MythUIButtonList;
+class MythUIButton;
 class MythUIImage;
 class MythDialogBox;
 
