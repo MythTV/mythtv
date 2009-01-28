@@ -2853,18 +2853,20 @@ void TV::HandleIsNearEndWhenEmbeddingTimerEvent(void)
 {
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
-    actx->LockDeleteNVP(__FILE__, __LINE__);
-    if (actx->nvp && actx->nvp->IsNearEnd() &&
-        actx->nvp->IsEmbedding() && !actx->paused)
-    {
-        actx->UnlockDeleteNVP(__FILE__, __LINE__);
-        DoTogglePause(actx, true);
-    }
-    else
-    {
-        actx->UnlockDeleteNVP(__FILE__, __LINE__);
-    }
+    bool toggle = !actx->paused && !StateIsLiveTV(GetState(actx));
 
+    if (toggle)
+    {
+        actx->LockDeleteNVP(__FILE__, __LINE__);
+
+        toggle = actx->nvp && actx->nvp->IsEmbedding()
+                           && actx->nvp->IsNearEnd();
+
+        actx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+        if (toggle)
+            DoTogglePause(actx, true);
+    }
     ReturnPlayerLock(actx);
 }
 
