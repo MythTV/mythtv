@@ -520,6 +520,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
         Update();
         emit itemSelected(GetItemCurrent());
     }
+    else
+        return false;
 
     return true;
 }
@@ -574,6 +576,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
         Update();
         emit itemSelected(GetItemCurrent());
     }
+    else
+        return false;
 
     return true;
 }
@@ -760,32 +764,32 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         if (action == "UP")
         {
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
-                MoveUp(MoveRow);
+                handled = MoveUp(MoveRow);
             else
                 handled = false;
         }
         else if (action == "DOWN")
         {
             if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
-                MoveDown(MoveRow);
+                handled = MoveDown(MoveRow);
             else
                 handled = false;
         }
         else if (action == "RIGHT")
         {
             if (m_layout == LayoutHorizontal)
-                MoveDown(MoveItem);
+                handled = MoveDown(MoveItem);
             else if (m_layout == LayoutGrid)
-                MoveDown(MoveColumn);
+                handled = MoveDown(MoveColumn);
             else
                 handled = false;
         }
         else if (action == "LEFT")
         {
             if (m_layout == LayoutHorizontal)
-                MoveUp(MoveItem);
+                handled = MoveUp(MoveItem);
             else if (m_layout == LayoutGrid)
-                MoveUp(MoveColumn);
+                handled = MoveUp(MoveColumn);
             else
                 handled = false;
         }
