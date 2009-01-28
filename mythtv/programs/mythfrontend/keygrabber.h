@@ -2,6 +2,9 @@
 #ifndef KEYGRABBER_H_
 #define KEYGRABBER_H_
 
+// MythUI
+#include <mythscreentype.h>
+
 class MythUIText;
 class MythUIButton;
 
