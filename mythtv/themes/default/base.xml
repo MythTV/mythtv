@@ -752,16 +752,6 @@
             <position>40,15</position>
         </textedit>
 
-        <button name="back" from="basebutton">
-            <position>530,15</position>
-            <value>Up Level</value>
-        </button>
-
-        <button name="home" from="basebutton">
-            <position>530,70</position>
-            <value>Home</value>
-        </button>
-
         <buttonlist name="filelist">
             <area>5,70,500,440</area>
             <layout>grid</layout>
@@ -822,6 +812,16 @@
             <area>520,355,180,25</area>
             <align>allcenter</align>
         </textarea>
+
+        <button name="back" from="basebutton">
+            <position>530,15</position>
+            <value>Up Level</value>
+        </button>
+
+        <button name="home" from="basebutton">
+            <position>530,70</position>
+            <value>Home</value>
+        </button>
 
         <button name="cancel" from="basebutton">
             <position>530,385</position>

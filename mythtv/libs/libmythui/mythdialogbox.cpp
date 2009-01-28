@@ -1,8 +1,10 @@
 
 #include <QApplication>
-#include <QDir>
 #include <QFileInfo>
 #include <QImageReader>
+#include <QString>
+#include <QStringList>
+#include <QTimer>
 
 #include "mythverbose.h"
 
@@ -12,7 +14,6 @@
 #include "mythuiutils.h"
 #include "mythuitext.h"
 #include "mythuiimage.h"
-#include "mythuitextedit.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuistatetype.h"
@@ -589,17 +590,25 @@ void MythUISearchDialog::slotUpdateList(void)
  */
 
 MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
-                                 const QString &startPath)
+                                  QObject *retobject, const QString &startPath)
                 :MythScreenType(parent, "mythuifilebrowser")
 {
+    m_retObject = retobject;
+
     m_curDirectory = startPath;
     m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files | QDir::Readable
                     | QDir::Writable | QDir::Executable);
     m_nameFilter << "*";
+
+    m_previewTimer = new QTimer();
+    m_previewTimer->setSingleShot(true);
+    connect(m_previewTimer, SIGNAL(timeout()), SLOT(LoadPreview()));
 }
 
 MythUIFileBrowser::~MythUIFileBrowser()
 {
+    if (m_previewTimer)
+        delete m_previewTimer;
 }
 
 bool MythUIFileBrowser::Create()
@@ -615,6 +624,8 @@ bool MythUIFileBrowser::Create()
     m_homeButton = dynamic_cast<MythUIButton *>(GetChild("home"));
     m_previewImage = dynamic_cast<MythUIImage *>(GetChild("preview"));
     m_infoText = dynamic_cast<MythUIText *>(GetChild("info"));
+    m_filenameText = dynamic_cast<MythUIText *>(GetChild("filename"));
+    m_fullpathText = dynamic_cast<MythUIText *>(GetChild("fullpath"));
 
     if (!m_fileList || !m_locationEdit || !m_okButton || !m_cancelButton)
     {
@@ -641,6 +652,12 @@ bool MythUIFileBrowser::Create()
     return true;
 }
 
+void MythUIFileBrowser::LoadPreview()
+{
+    if (m_previewImage)
+        m_previewImage->Load();
+}
+
 void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
 {
     if (!item)
@@ -650,20 +667,33 @@ void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
         m_previewImage->Reset();
 
     QFileInfo file = qVariantValue<QFileInfo>(item->GetData());
-    if (file.fileName() != "..")
+    if (file.fileName() == "..")
+    {
+        if (m_infoText)
+            m_infoText->Reset();
+        if (m_infoText)
+            m_infoText->Reset();
+        if (m_filenameText)
+            m_filenameText->Reset();
+        if (m_fullpathText)
+            m_fullpathText->Reset();
+    }
+    else
     {
         if (IsImage(file.suffix()) && m_previewImage)
         {
             m_previewImage->SetFilename(file.absoluteFilePath());
-            m_previewImage->Load();
+            m_previewTimer->start(250);
         }
 
         if (m_infoText)
-        {
-            QString filesize("%L1 KB");
-            filesize = filesize.arg((int)(file.size() / 1024));
-            m_infoText->SetText(filesize);
-        }
+            m_infoText->SetText(FormatSize(file.size()));
+
+        if (m_filenameText)
+            m_filenameText->SetText(file.fileName());
+
+        if (m_fullpathText)
+            m_fullpathText->SetText(file.fileName());
     }
 }
 
@@ -749,7 +779,10 @@ void MythUIFileBrowser::OKPressed()
         m_curDirectory += file.fileName();
     }
 
-    emit haveResult(m_curDirectory);
+    DialogCompletionEvent *dce = new DialogCompletionEvent("filebrowser",
+                                                            0, m_curDirectory,
+                                                            item->GetData());
+    QApplication::postEvent(m_retObject, dce);
 
     Close();
 }
@@ -768,7 +801,7 @@ void MythUIFileBrowser::updateFileList()
     d.setPath(m_curDirectory);
     d.setNameFilters(m_nameFilter);
     d.setFilter(m_typeFilter);
-    d.setSorting(QDir::Name);
+    d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
 
     if (!d.exists())
     {
@@ -820,8 +853,13 @@ void MythUIFileBrowser::updateFileList()
                                                     m_fileList, displayName);
 
                 if (IsImage(fi->suffix()))
+                {
                     item->SetImage(fi->absoluteFilePath());
+                    type = "image";
+                }
 
+                item->SetText(FormatSize(fi->size()), "filesize");
+                item->SetText(fi->absoluteFilePath(), "fullpath");
                 item->DisplayState(type, "nodetype");
                 item->SetData(qVariantFromValue(*fi));
             }
@@ -831,3 +869,18 @@ void MythUIFileBrowser::updateFileList()
 
     m_locationEdit->SetText(m_curDirectory);
 }
+
+QString MythUIFileBrowser::FormatSize(int size)
+{
+    QString filesize("%L1 %2");
+
+    if (size < 1000000)
+        filesize = filesize.arg((double)(size / 1000)).arg("KB");
+    else if (size < 1000000000)
+        filesize = filesize.arg((double)(size / 1000000)).arg("MB");
+    else
+        filesize = filesize.arg((double)(size / 1000000000)).arg("GB");
+
+    return filesize;
+}
+

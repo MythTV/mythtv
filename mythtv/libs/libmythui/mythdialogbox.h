@@ -1,15 +1,15 @@
 #ifndef MYTHDIALOGBOX_H_
 #define MYTHDIALOGBOX_H_
 
-#include <QEvent>
-#include <QString>
-#include <QStringList>
 #include <QDir>
+#include <QEvent>
 
 #include "mythscreentype.h"
-#include "mythuibuttonlist.h"
 #include "mythuitextedit.h"
-#include "mythuibutton.h"
+
+class QString;
+class QStringList;
+class QTimer;
 
 class MythUIButtonListItem;
 class MythUIButtonList;
@@ -232,7 +232,8 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
     Q_OBJECT
 
   public:
-    MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
+    MythUIFileBrowser(MythScreenStack *parent, QObject *retobject,
+                      const QString &startPath);
    ~MythUIFileBrowser();
 
     bool Create(void);
@@ -240,17 +241,15 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
     void SetTypeFilter(QDir::Filter filter) { m_typeFilter = filter; }
     void SetNameFilter(QStringList filter) { m_nameFilter = filter; }
 
-  signals:
-     void haveResult(QString);
-
   private slots:
-    void OKPressed();
-    void cancelPressed();
-    void backPressed();
-    void homePressed();
-    void editLostFocus();
+    void OKPressed(void);
+    void cancelPressed(void);
+    void backPressed(void);
+    void homePressed(void);
+    void editLostFocus(void);
     void PathSelected(MythUIButtonListItem *item);
     void PathClicked(MythUIButtonListItem *item);
+    void LoadPreview(void);
 
   private:
     void updateFileList(void);
@@ -258,6 +257,9 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
     void updateWidgets(void);
 
     bool IsImage(QString extension);
+    QString FormatSize(int size);
+
+    QTimer            *m_previewTimer;
 
     QString            m_curDirectory;
 
@@ -272,6 +274,10 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
     MythUIButton      *m_homeButton;
     MythUIImage       *m_previewImage;
     MythUIText        *m_infoText;
+    MythUIText        *m_filenameText;
+    MythUIText        *m_fullpathText;
+
+    QObject           *m_retObject;
 };
 
 MPUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,

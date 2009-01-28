@@ -308,7 +308,7 @@ void EditMetadataDialog::findCoverArt()
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIFileBrowser *nca = new MythUIFileBrowser(popupStack, fileprefix);
+    MythUIFileBrowser *nca = new MythUIFileBrowser(popupStack, this, fileprefix);
     nca->SetNameFilter(imageExtensions);
 
     if (nca->Create())
@@ -328,3 +328,24 @@ void EditMetadataDialog::SetCoverArt(QString file)
     m_workingMetadata->setCoverFile(file);
     CheckedSet(m_coverartText, file);
 }
+
+void EditMetadataDialog::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+            dynamic_cast<DialogCompletionEvent*>(event);
+
+        if (!dce)
+            return;
+
+        QString resultid = dce->GetId();
+
+        if (resultid == "filebrowser")
+        {
+            QString filename = dce->GetResultText();
+            SetCoverArt(filename);
+        }
+    }
+}
+

@@ -24,6 +24,7 @@ class EditMetadataDialog : public MythScreenType
     ~EditMetadataDialog();
 
     bool Create();
+    void customEvent(QEvent*);
 
     void fillWidgets();
 
