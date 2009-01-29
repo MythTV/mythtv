@@ -17,7 +17,6 @@
 #include <cstdlib>
 
 // qt
-#include <QKeyEvent>
 #include <QTimer>
 
 // myth
@@ -161,7 +160,7 @@ bool ZMConsole::Create(void)
     m_load_text = dynamic_cast<MythUIText *> (GetChild("load_text"));
     m_disk_text = dynamic_cast<MythUIText *> (GetChild("disk_text"));
 
-    if (!m_monitor_list || !m_status_text || !m_time_text || 
+    if (!m_monitor_list || !m_status_text || !m_time_text ||
         !m_date_text || !m_load_text || !m_disk_text)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
