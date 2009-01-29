@@ -9341,9 +9341,19 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (action.left(11) == "SELECTSCAN_")
     {
+        QString msg = QString::null;
         actx->LockDeleteNVP(__FILE__, __LINE__);
         actx->nvp->SetScanType((FrameScanType) action.right(1).toInt());
         actx->UnlockDeleteNVP(__FILE__, __LINE__);
+        msg = toString(actx->nvp->GetScanType());
+
+        if (!msg.isEmpty())
+        {
+            OSD *osd = GetOSDLock(actx);
+            if (osd)
+                osd->SetSettingsText(msg, 3);
+            ReturnOSDLock(actx, osd);
+        }
     }
     else if (action.left(15) == "TOGGLEAUDIOSYNC")
         ChangeAudioSync(actx, 0);
