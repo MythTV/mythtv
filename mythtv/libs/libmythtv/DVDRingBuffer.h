@@ -34,7 +34,7 @@ class MPUBLIC DVDRingBufferPriv
     // gets
     int  GetTitle(void) const { return title;        }
     int  GetPart(void)  const { return part;         }
-    bool IsInMenu(void) const; 
+    bool IsInMenu(void) const;
     bool IsOpen(void)   const { return dvdnav;       }
     long long GetReadPosition(void);
     long long GetTotalReadPosition(void) { return titleLength; }
@@ -63,13 +63,13 @@ class MPUBLIC DVDRingBufferPriv
     uint GetSubtitleLanguage(int key);
     void SetMenuPktPts(long long pts) { menupktpts = pts; }
     long long GetMenuPktPts(void) { return menupktpts; }
-    bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles, 
+    bool DecodeSubtitles(AVSubtitle * sub, int * gotSubtitles,
                          const uint8_t * buf, int buf_size);
     bool GetNameAndSerialNum(QString& _name, QString& _serialnum);
     bool JumpToTitle(void) { return jumptotitle; }
     double GetFrameRate(void);
     bool StartOfTitle(void) { return (part == 0); }
-    bool EndOfTitle(void)   { return    ((!titleParts) || 
+    bool EndOfTitle(void)   { return    ((!titleParts) ||
                                         (part == (titleParts - 1)) ||
                                         (titleParts == 1)); }
     int GetCellID(void) { return cellid; }
@@ -79,7 +79,7 @@ class MPUBLIC DVDRingBufferPriv
 
     // commands
     bool OpenFile(const QString &filename);
-    void PlayTitleAndPart(int _title, int _part) 
+    void PlayTitleAndPart(int _title, int _part)
         { dvdnav_part_play(dvdnav, _title, _part); }
     void CloseDVD(void);
     bool nextTrack(void);
@@ -200,4 +200,3 @@ class MPUBLIC DVDRingBufferPriv
 };
 
 #endif // DVD_RING_BUFFER_H_
-

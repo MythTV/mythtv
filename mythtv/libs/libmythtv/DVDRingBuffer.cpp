@@ -43,17 +43,17 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       menuSpuPkt(0),
       menuBuflength(0),
       skipstillorwait(true),
-      cellstartPos(0), buttonSelected(false), 
-      buttonExists(false), cellid(0), 
-      lastcellid(0), vobid(0), 
-      lastvobid(0), cellRepeated(false), 
-      buttonstreamid(0), runningCellStart(false), 
+      cellstartPos(0), buttonSelected(false),
+      buttonExists(false), cellid(0),
+      lastcellid(0), vobid(0),
+      lastvobid(0), cellRepeated(false),
+      buttonstreamid(0), runningCellStart(false),
       runSeekCellStart(false),
       menupktpts(0), curAudioTrack(0),
       curSubtitleTrack(0), autoselectaudio(true),
-      autoselectsubtitle(true), 
+      autoselectsubtitle(true),
       jumptotitle(true),
-      seekpos(0), seekwhence(0), 
+      seekpos(0), seekwhence(0),
       dvdname(NULL), serialnumber(NULL),
       seeking(false), seektime(0),
       currentTime(0),
@@ -126,7 +126,7 @@ long long DVDRingBufferPriv::Seek(long long time)
 
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + 
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
                 QString("Seek() to time %1 failed").arg(time));
         return -1;
     }
@@ -155,7 +155,7 @@ void DVDRingBufferPriv::GetDescForPos(QString &desc) const
     }
 }
 
-bool DVDRingBufferPriv::OpenFile(const QString &filename) 
+bool DVDRingBufferPriv::OpenFile(const QString &filename)
 {
     dvdFilename = filename;
     dvdFilename.detach();
@@ -192,7 +192,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Failed to get the number of titles on the DVD" ));
-        } 
+        }
         else
         {
             VERBOSE(VB_IMPORTANT, QString("There are %1 titles on the disk")
@@ -214,7 +214,7 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
         dvdnav_get_serial_number(dvdnav, &serialnum);
         dvdname = QString(name);
         serialnumber = QString(serialnum);
-        SetDVDSpeed(); 
+        SetDVDSpeed();
         return true;
     }
 }
@@ -260,7 +260,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
         dvdStat = dvdnav_get_next_cache_block(
             dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
 
-        if (dvdStat == DVDNAV_STATUS_ERR) 
+        if (dvdStat == DVDNAV_STATUS_ERR)
         {
             VERBOSE(VB_IMPORTANT, QString("Error reading block from DVD: %1")
                     .arg(dvdnav_err_to_string(dvdnav)));
@@ -457,14 +457,14 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                             audioTrackMap.insert(dtsStreamId + id, i);
                             break;
                         default:
-                            VERBOSE(VB_PLAYBACK, LOC_ERR + 
+                            VERBOSE(VB_PLAYBACK, LOC_ERR +
                                 QString("AUDIO_STREAM_CHANGE: "
                                         "Unhandled audio format %1")
                                         .arg(i));
                             break;
                     }
                 }
-                
+
                 audioStreamsChanged = true;
 
                 if (blockBuf != dvdBlockWriteBuf)
@@ -482,7 +482,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 {
                     vobid  = dsi->dsi_gi.vobu_vob_idn;
                     cellid = dsi->dsi_gi.vobu_c_idn;
-                    if ((lastvobid == vobid) && (lastcellid == cellid) 
+                    if ((lastvobid == vobid) && (lastcellid == cellid)
                             && IsInMenu())
                     {
                         cellRepeated = true;
@@ -496,7 +496,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 if (seeking)
                 {
-                    
+
                     int relativetime = (int)((seektime - currentTime)/ 90000);
                     if (relativetime <= 0)
                     {
@@ -556,12 +556,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         .arg(hl->pts).arg(hl->buttonN));
 
                 menuBtnLock.lock();
-                
+
                 DVDButtonUpdate(false);
                 ClearSubtitlesOSD();
-                
+
                 menuBtnLock.unlock();
-                
+
                 if (parent && buttonExists)
                     parent->HideDVDButton(false);
 
@@ -584,7 +584,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     int elapsedTime = 0;
                     if (still->length  < 0xff)
                     {
-                        elapsedTime = stillFrameTimer.elapsed() / 1000; 
+                        elapsedTime = stillFrameTimer.elapsed() / 1000;
                         if (elapsedTime >= still->length)
                             SkipStillFrame();
                     }
@@ -602,7 +602,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 if (skipstillorwait)
                     WaitSkip();
-                else 
+                else
                 {
                     dvdWaiting = true;
                     usleep(10000);
@@ -646,7 +646,7 @@ void DVDRingBufferPriv::prevTrack(void)
 {
     int newPart = part - 1;
 
-    QMutexLocker lock(&seekLock); 
+    QMutexLocker lock(&seekLock);
     if (newPart > 0)
         dvdnav_part_play(dvdnav, title, newPart);
     else
@@ -659,7 +659,7 @@ void DVDRingBufferPriv::prevTrack(void)
  */
 uint DVDRingBufferPriv::GetTotalTimeOfTitle(void)
 {
-    return pgcLength / 90000; 
+    return pgcLength / 90000;
 }
 
 /** \brief get the start of the cell in seconds
@@ -722,7 +722,7 @@ bool DVDRingBufferPriv::GoToMenu(const QString str)
             dvdnav_menu_supported(dvdnav, DVD_MENU_Root);
         dvdnav_status_t titleMenuSupported =
             dvdnav_menu_supported(dvdnav, DVD_MENU_Title);
-        
+
         if (rootMenuSupported == DVDNAV_STATUS_OK)
             menuid = DVD_MENU_Root;
         else if (titleMenuSupported == DVDNAV_STATUS_OK)
@@ -804,11 +804,11 @@ void DVDRingBufferPriv::ActivateButton(void)
 /** \brief get SPU pkt from dvd menu subtitle stream
  */
 void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
-{ 
+{
     if (buf_size < 4)
         return;
 
-    if (buttonstreamid != stream_id) 
+    if (buttonstreamid != stream_id)
         return;
 
     QMutexLocker lock(&menuBtnLock);
@@ -828,7 +828,7 @@ void DVDRingBufferPriv::GetMenuSPUPkt(uint8_t *buf, int buf_size, int stream_id)
     if (DVDButtonUpdate(false))
     {
         int32_t gotbutton;
-        buttonExists = DecodeSubtitles(&dvdMenuButton, &gotbutton, 
+        buttonExists = DecodeSubtitles(&dvdMenuButton, &gotbutton,
                                         menuSpuPkt, menuBuflength);
     }
 }
@@ -841,7 +841,7 @@ AVSubtitle *DVDRingBufferPriv::GetMenuSubtitle(void)
     menuBtnLock.lock();
 
     if ((menuBuflength > 4) && buttonExists &&
-        (dvdMenuButton.rects[0].h >= hl_button.height()) && 
+        (dvdMenuButton.rects[0].h >= hl_button.height()) &&
         (dvdMenuButton.rects[0].w >= hl_button.width()))
     {
         return &(dvdMenuButton);
@@ -872,12 +872,12 @@ QRect DVDRingBufferPriv::GetButtonCoords(void)
         x = hl_button.x() - x1;
     if (hl_button.y() > y1)
         y  = hl_button.y() - y1;
-    rect.setRect(x, y, hl_button.width(), hl_button.height());    
-    
+    rect.setRect(x, y, hl_button.width(), hl_button.height());
+
     return rect;
 }
 
-/** \brief generate dvd subtitle bitmap or dvd menu bitmap. 
+/** \brief generate dvd subtitle bitmap or dvd menu bitmap.
  * code obtained from ffmpeg project
  */
 bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
@@ -892,7 +892,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
     int date;
 
     if (!spu_pkt)
-        return false; 
+        return false;
 
     if (buf_size < 4)
         return false;
@@ -915,11 +915,11 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
         while (pos < buf_size)
         {
             cmd = spu_pkt[pos++];
-            switch(cmd) 
+            switch(cmd)
             {
                 case 0x00:
                     force_subtitle_display = true;
-                break;  
+                break;
                 case 0x01:
                     sub->start_display_time = (date << 10) / 90;
                 break;
@@ -930,7 +930,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 {
                     if ((buf_size - pos) < 2)
                         goto fail;
-                    
+
                     palette[3] = spu_pkt[pos] >> 4;
                     palette[2] = spu_pkt[pos] & 0x0f;
                     palette[1] = spu_pkt[pos + 1] >> 4;
@@ -975,7 +975,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             }
         }
         the_end:
-        if (offset1 >= 0) 
+        if (offset1 >= 0)
         {
             int w, h;
             uint8_t *bitmap;
@@ -985,7 +985,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
             h = y2 - y1 + 2;
             if (h < 0)
                 h = 0;
-            if (w > 0 && h > 0) 
+            if (w > 0 && h > 0)
             {
                 if (sub->rects != NULL)
                 {
@@ -1018,7 +1018,7 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 if (NumMenuButtons() > 0)
                 {
                     sub->rects[1].rgba_palette = (uint32_t*)av_malloc(4 *4);
-                    guess_palette(sub->rects[1].rgba_palette, 
+                    guess_palette(sub->rects[1].rgba_palette,
                                 button_color, button_alpha);
                 }
                 else
@@ -1077,7 +1077,7 @@ bool DVDRingBufferPriv::DVDButtonUpdate(bool b_mode)
 
     hl_button.setCoords(hl.sx, hl.sy, hl.ex, hl.ey);
 
-    if (((hl.sx + hl.sy) > 0) && 
+    if (((hl.sx + hl.sy) > 0) &&
             (hl.sx < videowidth && hl.sy < videoheight))
         return true;
 
@@ -1124,7 +1124,7 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
 {
     pci_t *pci = dvdnav_get_current_nav_pci(dvdnav);
     int numButtons = pci->hli.hl_gi.btn_ns;
-    if (numButtons > 0 && numButtons < 36) 
+    if (numButtons > 0 && numButtons < 36)
         return numButtons;
     else
         return 0;
@@ -1133,15 +1133,15 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
 void DVDRingBufferPriv::InStillFrame(bool change)
 {
     QString str;
-    
+
     if (change)
         str = "Entering DVD Still Frame";
     else
         str = "Leaving DVD Still Frame";
-    
+
     if (cellHasStillFrame != change)
         VERBOSE(VB_PLAYBACK, str);
-    
+
     cellHasStillFrame = change;
 }
 
@@ -1227,7 +1227,7 @@ void DVDRingBufferPriv::SelectDefaultButton(void)
     if (button > 0 && button <= NumMenuButtons())
         dvdnav_button_select(dvdnav,pci,button);
     else
-        dvdnav_button_select(dvdnav,pci,1);    
+        dvdnav_button_select(dvdnav,pci,1);
 }
 
 /** \brief set the dvd subtitle/audio track used
@@ -1271,7 +1271,7 @@ uint8_t DVDRingBufferPriv::GetNumAudioChannels(int id)
     unsigned char channels = dvdnav_audio_get_channels(dvdnav, id);
     if (channels == 0xff)
         return 0;
-    return (uint8_t)channels + 1; 
+    return (uint8_t)channels + 1;
 }
 
 /** \brief clear the currently displaying subtitles or
@@ -1291,14 +1291,14 @@ void DVDRingBufferPriv::ClearSubtitlesOSD(void)
  */
 bool DVDRingBufferPriv::GetNameAndSerialNum(QString& _name, QString& _serial)
 {
-    (_name)    = dvdname; 
+    (_name)    = dvdname;
     (_serial)  = serialnumber;
     if (dvdname == "" && serialnumber == "")
         return false;
     return true;
 }
 
-/** \brief used by DecoderBase for the total frame number calculation 
+/** \brief used by DecoderBase for the total frame number calculation
  * for position map support and ffw/rew.
  * FPS for a dvd is determined by AFD::normalized_fps
  */
@@ -1308,14 +1308,14 @@ double DVDRingBufferPriv::GetFrameRate(void)
     int format = dvdnav_get_video_format(dvdnav);
     if (format)
         dvdfps = 23.97;
-    else 
+    else
         dvdfps = 29.97;
 
     return dvdfps;
 }
 
 /** \brief check if the current chapter is the same as
- * the previously accessed chapter. 
+ * the previously accessed chapter.
  */
 bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
 {
@@ -1333,12 +1333,12 @@ void DVDRingBufferPriv::RunSeekCellStart(void)
 {
     if (!runSeekCellStart)
         return;
-    
+
     bool ret = true;
     if (NumMenuButtons() > 0 && !buttonExists)
         ret = false;
-    
-    if (ret) 
+
+    if (ret)
     {
         ret = SeekCellStart();
         runSeekCellStart = false;
@@ -1354,7 +1354,7 @@ bool DVDRingBufferPriv::SeekCellStart(void)
     return (Seek(cellStart) == 0);
 }
 
-/** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings 
+/** \brief set dvd speed. uses the DVDDriveSpeed Setting from the settings
  *  table
  */
 void DVDRingBufferPriv::SetDVDSpeed(void)
@@ -1412,7 +1412,7 @@ void DVDRingBufferPriv::guess_palette(uint32_t *rgba_palette,uint8_t *palette,
 /** \brief decodes the bitmap from the subtitle packet.
  *         copied from ffmpeg's dvdsubdec.c.
  */
-int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h, 
+int DVDRingBufferPriv::decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                                   const uint8_t *buf, int nibble_offset, int buf_size)
 {
     unsigned int v;
@@ -1492,21 +1492,21 @@ int DVDRingBufferPriv::find_smallest_bounding_rectangle(AVSubtitle *s)
     int y1, y2, x1, x2, y, w, h, i;
     uint8_t *bitmap;
 
-    if (s->num_rects == 0 || s->rects == NULL || 
+    if (s->num_rects == 0 || s->rects == NULL ||
         s->rects[0].w <= 0 || s->rects[0].h <= 0)
     {
         return 0;
     }
 
     memset(transp_color, 0, 256);
-    for (i = 0; i < s->rects[0].nb_colors; i++) 
+    for (i = 0; i < s->rects[0].nb_colors; i++)
     {
         if ((s->rects[0].rgba_palette[i] >> 24) == 0)
             transp_color[i] = 1;
     }
 
     y1 = 0;
-    while (y1 < s->rects[0].h && 
+    while (y1 < s->rects[0].h &&
             is_transp(s->rects[0].bitmap + y1 * s->rects[0].linesize,
                     1, s->rects[0].w, transp_color))
     {
@@ -1521,7 +1521,7 @@ int DVDRingBufferPriv::find_smallest_bounding_rectangle(AVSubtitle *s)
     }
 
     y2 = s->rects[0].h - 1;
-    while (y2 > 0 && 
+    while (y2 > 0 &&
             is_transp(s->rects[0].bitmap + y2 * s->rects[0].linesize, 1,
                     s->rects[0].w, transp_color))
     {
