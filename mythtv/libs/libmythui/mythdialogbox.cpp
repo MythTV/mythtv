@@ -621,7 +621,7 @@ bool MythUIFileBrowser::Create()
     return true;
 }
 
-void MythUISearchDialog::SetReturnEvent(QObject *retobject,
+void MythUIFileBrowser::SetReturnEvent(QObject *retobject,
                                         const QString &resultid)
 {
     m_retObject = retobject;

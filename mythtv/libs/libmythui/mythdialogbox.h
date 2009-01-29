@@ -279,6 +279,7 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
     MythUIText        *m_fullpathText;
 
     QObject           *m_retObject;
+    QString           m_id;
 };
 
 MPUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
