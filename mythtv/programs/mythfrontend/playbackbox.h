@@ -167,6 +167,9 @@ class PlaybackBox : public MythScreenType
 
     void doPlayFromBeg();
     void doPlayListRandom();
+    void doPIPPlay(void);
+    void doPIPPlay(PIPState state);
+    void doPBPPlay(void);
 
     void askStop();
     void doStop();

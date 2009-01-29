@@ -1869,6 +1869,28 @@ void PlaybackBox::showActions(ProgramInfo *pginfo)
         showActionPopup(pginfo);
 }
 
+void PlaybackBox::doPIPPlay(void)
+{
+    doPIPPlay(kPIPonTV);
+}
+
+void PlaybackBox::doPBPPlay(void)
+{
+    doPIPPlay(kPBPLeft);
+}
+
+void PlaybackBox::doPIPPlay(PIPState state)
+{
+    if (m_player)
+    {
+        ProgramInfo *pginfo = CurrentItem();
+        m_player->SetNextProgPIPState(state);
+        if (pginfo)
+            pginfo->setIgnoreBookmark(true);
+        Close();
+    }
+}
+
 void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 {
     if (m_popupMenu)
@@ -2477,17 +2499,33 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
 
     m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    if (!(m_player && m_player->IsSameProgram(0, pginfo)))
-    {
-        if (pginfo->programflags & FL_BOOKMARK)
-            m_popupMenu->AddButton(tr("Play from..."),
-                                        SLOT(showPlayFromPopup()), true);
-        else
-            m_popupMenu->AddButton(tr("Play"), SLOT(playSelected()));
-    }
+    bool sameProgram = false;
 
-    if (!m_player)
+    if (m_player)
+        sameProgram = m_player->IsSameProgram(0, pginfo);
+
+    TVState tvstate = kState_None;
+    if (m_player)
     {
+        if (!sameProgram && m_player->IsPIPSupported())
+        {
+            m_popupMenu->AddButton(tr("Start As PIP"), SLOT(doPIPPlay()));
+            m_popupMenu->AddButton(tr("Start As PBP"), SLOT(doPBPPlay()));
+        }
+
+        tvstate = m_player->GetState(0);
+    }
+    else
+    {
+        if (sameProgram)
+        {
+            if (pginfo->programflags & FL_BOOKMARK)
+                m_popupMenu->AddButton(tr("Play from..."),
+                                            SLOT(showPlayFromPopup()), true);
+            else
+                m_popupMenu->AddButton(tr("Play"), SLOT(playSelected()));
+        }
+
         if (m_playList.filter(pginfo->MakeUniqueKey()).size())
             m_popupMenu->AddButton(tr("Remove from Playlist"),
                                         SLOT(togglePlayListItem()));
@@ -2496,15 +2534,10 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
                                         SLOT(togglePlayListItem()));
     }
 
-    TVState m_tvstate = kState_None;
-    if (m_player)
-        m_tvstate = m_player->GetState(0);
-
     if (pginfo->recstatus == rsRecording &&
-        (!(m_player &&
-            (m_tvstate == kState_WatchingLiveTV ||
-            m_tvstate == kState_WatchingRecording) &&
-            m_player->IsSameProgram(0, pginfo))))
+        (!(sameProgram &&
+            (tvstate == kState_WatchingLiveTV ||
+                tvstate == kState_WatchingRecording))))
     {
         m_popupMenu->AddButton(tr("Stop Recording"), SLOT(askStop()));
     }
@@ -2520,7 +2553,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
                            true);
     m_popupMenu->AddButton(tr("Job Options"), SLOT(showJobPopup()), true);
 
-    if (!(m_player && m_player->IsSameProgram(0, pginfo)))
+    if (!sameProgram)
     {
         if (pginfo->recgroup == "Deleted")
         {
