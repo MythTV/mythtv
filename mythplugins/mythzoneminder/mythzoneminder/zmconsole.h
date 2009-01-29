@@ -20,7 +20,7 @@
 
 // libmythui
 #include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythbutton.h>
+#include <libmythui/mythuibutton.h>
 #include <libmythui/mythuicheckbox.h>
 #include <libmythui/mythscreentype.h>
 #include <libmythui/mythdialogbox.h>
