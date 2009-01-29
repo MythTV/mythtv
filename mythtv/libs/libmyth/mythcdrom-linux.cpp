@@ -689,17 +689,22 @@ void MythCDROMLinux::setSpeed(int speed)
     buffer[18] = buffer[26] = 0x03;
     buffer[19] = buffer[27] = 0xe8;
 
-    // On my system (2.6.18 + ide-cd),  SG_IO succeeds without doing anything,
-    // while CDROM_SELECT_SPEED works...
-    if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0)
+    if (ioctl(fd, SG_IO, &sghdr) < 0)
     {
-        if (ioctl(fd, SG_IO, &sghdr) < 0)
-            VERBOSE(VB_MEDIA, LOC_ERR + "Limit CD/DVD Speed Failed");
+        VERBOSE(VB_MEDIA, LOC_ERR + "Limit CD/DVD Speed Failed");
     }
     else
+    {
+        // On my system (2.6.18 + ide-cd),  SG_IO succeeds without doing anything,
+        // while CDROM_SELECT_SPEED works...
+        if (ioctl(fd, CDROM_SELECT_SPEED, speed) < 0)
+        {
+            VERBOSE(VB_MEDIA, LOC_ERR +
+                    "Limit CD/DVD CDROM_SELECT_SPEED Failed");
+        }
         VERBOSE(VB_MEDIA, LOC + ":setSpeed() - CD/DVD Speed Set Successful");
+    }
 
     close(fd);
 }
 #endif
-
