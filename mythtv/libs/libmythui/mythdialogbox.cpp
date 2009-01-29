@@ -559,10 +559,10 @@ void MythUISearchDialog::slotUpdateList(void)
  */
 
 MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
-                                  QObject *retobject, const QString &startPath)
+                                     const QString &startPath)
                 :MythScreenType(parent, "mythuifilebrowser")
 {
-    m_retObject = retobject;
+    m_retObject = NULL;
 
     m_curDirectory = startPath;
     m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files | QDir::Readable
@@ -621,6 +621,13 @@ bool MythUIFileBrowser::Create()
     return true;
 }
 
+void MythUISearchDialog::SetReturnEvent(QObject *retobject,
+                                        const QString &resultid)
+{
+    m_retObject = retobject;
+    m_id = resultid;
+}
+
 void MythUIFileBrowser::LoadPreview()
 {
     if (m_previewImage)
@@ -662,7 +669,7 @@ void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
             m_filenameText->SetText(file.fileName());
 
         if (m_fullpathText)
-            m_fullpathText->SetText(file.fileName());
+            m_fullpathText->SetText(file.absoluteFilePath());
     }
 }
 
@@ -748,10 +755,13 @@ void MythUIFileBrowser::OKPressed()
         m_curDirectory += file.fileName();
     }
 
-    DialogCompletionEvent *dce = new DialogCompletionEvent("filebrowser",
-                                                            0, m_curDirectory,
+    if (m_retObject)
+    {
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
+                                                            m_curDirectory,
                                                             item->GetData());
-    QApplication::postEvent(m_retObject, dce);
+        QApplication::postEvent(m_retObject, dce);
+    }
 
     Close();
 }

@@ -232,11 +232,12 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
     Q_OBJECT
 
   public:
-    MythUIFileBrowser(MythScreenStack *parent, QObject *retobject,
-                      const QString &startPath);
+    MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
    ~MythUIFileBrowser();
 
     bool Create(void);
+
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
 
     void SetTypeFilter(QDir::Filter filter) { m_typeFilter = filter; }
     void SetNameFilter(QStringList filter) { m_nameFilter = filter; }
