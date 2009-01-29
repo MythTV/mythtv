@@ -337,16 +337,18 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 cellid = 0;
                 cellRepeated = false;
                 menupktpts = 0;
-                if (cellHasStillFrame)
-                    GetMythUI()->DisableScreensaver();
                 InStillFrame(false);
 
-                if (parent && IsInMenu())
+                if (IsInMenu())
                 {
-                    parent->HideDVDButton(true);
+                    if (parent)
+                        parent->HideDVDButton(true);
                     autoselectaudio = true;
                     autoselectsubtitle = true;
+                    GetMythUI()->RestoreScreensaver();
                 }
+                else
+                    GetMythUI()->DisableScreensaver();
 
                 if (blockBuf != dvdBlockWriteBuf)
                 {

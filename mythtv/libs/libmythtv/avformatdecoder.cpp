@@ -3196,7 +3196,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 if (storedPackets.count() < 2 && !decodeStillFrame)
                     storevideoframes = true;
                 
-                VERBOSE(VB_EXTRA, QString("DVD Playback Debugging"
+                VERBOSE(VB_EXTRA, QString("DVD Playback Debugging "
                     "inDVDMenu %1 storedPacketcount %2 dvdstill %3")
                     .arg(inDVDMenu).arg(storedPackets.count()).arg(inDVDStill));
                 
@@ -3335,7 +3335,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (!decodeStillFrame && inDVDStill)
             {
                 decodeStillFrame = true;
-                GetMythUI()->RestoreScreensaver();
                 d->ResetMPEG2();
             }
             
