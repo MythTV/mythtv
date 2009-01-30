@@ -471,7 +471,7 @@ void MythBurn::updateArchiveList(void)
                 item->SetText(tr("No Cut List"), "cutlist");
                 item->DisplayState("none", "cutliststatus");
             }
-            item->SetText(a->encoderProfile->name, "profile");
+            item->SetText(tr("Encoder: ") + a->encoderProfile->name, "profile");
         }
 
         m_nofilesText->Hide();
