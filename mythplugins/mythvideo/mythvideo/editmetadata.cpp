@@ -230,10 +230,11 @@ void EditMetadataDialog::NewCategoryPopup()
                                     new MythTextInputDialog(popupStack,message);
 
     if (categorydialog->Create())
+    {
+        categorydialog->SetReturnEvent(this, "newcategory");
         popupStack->AddScreen(categorydialog);
+    }
 
-    connect(categorydialog, SIGNAL(haveResult(QString)),
-            SLOT(AddCategory(QString)), Qt::QueuedConnection);
 }
 
 void EditMetadataDialog::AddCategory(QString category)
@@ -345,6 +346,11 @@ void EditMetadataDialog::customEvent(QEvent *event)
         {
             QString filename = dce->GetResultText();
             SetCoverArt(filename);
+        }
+
+        if (resultid == "newcategory")
+        {
+            AddCategory(dce->GetResultText());
         }
     }
 }
