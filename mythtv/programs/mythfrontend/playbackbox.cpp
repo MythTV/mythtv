@@ -1902,7 +1902,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
         case DeleteRecording:
              label = tr("Are you sure you want to delete:"); break;
         case ForceDeleteRecording:
-             label = tr("ERROR: Recorded file does not exist.\n"
+             label = tr("Recording file does not exist.\n"
                         "Are you sure you want to delete:");
              break;
         case StopRecording:
@@ -1952,7 +1952,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              tmpslot = SLOT(doForceDelete());
              break;
         case StopRecording:
-             tmpmessage = tr("Yes, stop recording it");
+             tmpmessage = tr("Yes, stop recording");
              tmpslot = SLOT(doStop());
              break;
     }
@@ -1969,11 +1969,11 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     {
         case DeleteRecording:
         case ForceDeleteRecording:
-             tmpmessage = tr("No, keep it, I changed my mind");
+             tmpmessage = tr("No, keep it");
              tmpslot = SLOT(noDelete());
              break;
         case StopRecording:
-             tmpmessage = tr("No, continue recording it");
+             tmpmessage = tr("No, continue recording");
              tmpslot = SLOT(noStop());
              break;
     }
@@ -2068,7 +2068,7 @@ void PlaybackBox::showPlaylistPopup()
             m_popupMenu->AddButton(tr("Toggle playlist for this Category/Title"),
                                 SLOT(togglePlayListTitle()));
         else
-            m_popupMenu->AddButton(tr("Toggle playlist for this Recording Group"),
+            m_popupMenu->AddButton(tr("Toggle playlist for this Group"),
                                 SLOT(togglePlayListTitle()));
     }
     else
@@ -3871,6 +3871,9 @@ void PlaybackBox::showRecGroupChanger(void)
     QString itemStr;
     QString dispGroup;
 
+    groupNames.append("addnewgroup");
+    displayNames.append(tr("Add New"));
+
     if (query.exec())
     {
         while (query.next())
@@ -4024,6 +4027,26 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
     if (newRecGroup.isEmpty() || !tmpItem)
         return;
+
+    if (newRecGroup == "addnewgroup")
+    {
+        MythScreenStack *popupStack =
+                                GetMythMainWindow()->GetStack("popup stack");
+
+        QString label = tr("New Recording Group");
+
+        MythTextInputDialog *newgroup = new MythTextInputDialog(popupStack,
+                                                                label);
+
+        connect(newgroup, SIGNAL(haveResult(QString)),
+                SLOT(setRecGroup(QString)));
+
+        if (newgroup->Create())
+            popupStack->AddScreen(newgroup, false);
+        else
+            delete newgroup;
+        return;
+    }
 
     if (m_playList.size() > 0)
     {
