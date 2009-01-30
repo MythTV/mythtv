@@ -913,7 +913,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             new PlaybackBoxListItem(this, m_recordingList, *it);
 
         QString tempSubTitle;
-        if (groupname != (*it)->title)
+        if (groupname != (*it)->title.toLower())
         {
             tempSubTitle = (*it)->title;
             if (!(*it)->subtitle.trimmed().isEmpty())
