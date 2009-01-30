@@ -564,6 +564,7 @@ bool RunMenu(QString themedir, QString themename)
                 .arg(themename));
         menu->setCallback(TVMenuCallback, gContext);
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
+        GetMythUI()->HideLoadingDialog();
         return true;
     }
 
@@ -571,6 +572,8 @@ bool RunMenu(QString themedir, QString themename)
             .arg(themename));
     delete menu;
     menu = NULL;
+
+    GetMythUI()->HideLoadingDialog();
 
     return false;
 }
@@ -771,6 +774,7 @@ bool resetTheme(QString themedir, const QString badtheme)
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
     themeBase->Reload();
+    GetMythUI()->ShowLoadingDialog();
     GetMythUI()->UpdateImageCache();
 
     return RunMenu(themedir, themename);
@@ -788,6 +792,7 @@ int reloadTheme(void)
     menu->Close();
     GetMythUI()->UpdateImageCache();
     themeBase->Reload();
+    GetMythUI()->ShowLoadingDialog();
 
     GetMythMainWindow()->ReinitDone();
 
@@ -805,7 +810,6 @@ int reloadTheme(void)
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
         return FRONTEND_BUGGY_EXIT_NO_THEME;
-
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
@@ -1317,6 +1321,7 @@ int main(int argc, char **argv)
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
     themeBase = new MythThemeBase();
+    GetMythUI()->ShowLoadingDialog();
     GetMythUI()->UpdateImageCache();
 
     LanguageSettings::prompt();

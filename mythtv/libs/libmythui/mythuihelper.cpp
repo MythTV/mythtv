@@ -125,6 +125,8 @@ class MythUIHelperPrivate
     MythUIMenuCallbacks callbacks;
 
     MythUIHelper *parent;
+
+    MythUIBusyDialog *m_loadingDialog;
 };
 
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
@@ -141,7 +143,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       themecachedir(QString::null),
       bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
-      screenSetup(false), parent(p)
+      screenSetup(false), parent(p), m_loadingDialog(NULL)
 {
 }
 
@@ -443,7 +445,6 @@ void MythUIHelper::UpdateImageCache(void)
     m_cacheSize = 0;
 
     ClearOldImageCache();
-    CacheThemeImages();
 }
 
 MythImage *MythUIHelper::GetImageFromCache(const QString &url)
@@ -720,62 +721,6 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
     }
 
     dir.rmdir(dirname);
-}
-
-void MythUIHelper::CacheThemeImages(void)
-{
-    if (d->m_screenwidth == d->m_baseWidth &&
-        d->m_screenheight == d->m_baseHeight)
-        return;
-
-    if (d->m_isWide)
-        CacheThemeImagesDirectory(GetThemesParentDir() + "default-wide/");
-    CacheThemeImagesDirectory(GetThemesParentDir() + "default/");
-}
-
-void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
-                                             const QString &subdirname)
-{
-    QDir dir(dirname);
-
-    if (!dir.exists())
-        return;
-
-    MythUIProgressDialog *caching = NULL;
-    QFileInfoList list = dir.entryInfoList();
-
-    if (subdirname.length() == 0)
-    {
-        MythScreenStack *popupStack =
-                                GetMythMainWindow()->GetStack("popup stack");
-
-        QString message = QObject::tr("Initializing MythTV");
-        caching = new MythUIProgressDialog(message, popupStack,
-                                                    "scalingprogressdialog");
-
-        if (caching->Create())
-        {
-            popupStack->AddScreen(caching, false);
-            caching->SetTotal(list.count());
-        }
-        else
-        {
-            delete caching;
-            caching = NULL;
-        }
-    }
-    int progress = 0;
-
-    // This is just to make the progressbar show activity
-    for (progress = 0; progress <= list.count(); progress++)
-    {
-        if (caching)
-            caching->SetProgress(progress);
-        qApp->processEvents();
-    }
-
-    if (caching)
-        caching->Close();
 }
 
 void MythUIHelper::GetScreenBounds(int &xbase, int &ybase,
@@ -1419,3 +1364,34 @@ QString MythUIHelper::GetX11Display(void)
     return ret;
 }
 
+void MythUIHelper::ShowLoadingDialog(void)
+{
+    if (d->m_loadingDialog)
+        return;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString message = QObject::tr("Initializing MythTV");
+    d->m_loadingDialog = new MythUIBusyDialog(message, popupStack, "startupbusydialog");
+
+    if (d->m_loadingDialog->Create())
+    {
+        popupStack->AddScreen(d->m_loadingDialog, false);
+    }
+    else
+    {
+        delete d->m_loadingDialog;
+        d->m_loadingDialog = NULL;
+    }
+
+    if (d->m_loadingDialog)
+        d->m_loadingDialog->Close();
+}
+
+void MythUIHelper::HideLoadingDialog(void)
+{
+    if (d->m_loadingDialog)
+        d->m_loadingDialog->Close();
+
+    d->m_loadingDialog = NULL;
+}

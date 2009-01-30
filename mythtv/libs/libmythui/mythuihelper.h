@@ -62,7 +62,7 @@ class MPUBLIC MythUIHelper
     // Parse an X11 style command line (-geometry) string
     bool ParseGeometryOverride(const QString geometry);
     bool IsGeometryOverridden(void);
- 
+
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
     MythImage *LoadCacheImage(QString srcfile, QString label);
@@ -110,6 +110,9 @@ class MPUBLIC MythUIHelper
     static MythUIHelper *getMythUI(void);
     static void destroyMythUI(void);
 
+    void ShowLoadingDialog(void);
+    void HideLoadingDialog(void);
+
   protected:
     MythUIHelper();
    ~MythUIHelper();
@@ -119,9 +122,6 @@ class MPUBLIC MythUIHelper
     void InitializeScreenSettings(void);
 
     void ClearOldImageCache(void);
-    void CacheThemeImages(void);
-    void CacheThemeImagesDirectory(const QString &dirname,
-                                   const QString &subdirname = "");
     void RemoveCacheDir(const QString &dirname);
 
     MythUIHelperPrivate *d;
