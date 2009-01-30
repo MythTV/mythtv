@@ -97,7 +97,6 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 //    TESTVIDEOSYNC(VDPAUVideoSync);
 #endif    
 #ifndef _WIN32
-    TESTVIDEOSYNC(nVidiaVideoSync);
     TESTVIDEOSYNC(DRMVideoSync);
     if (tryOpenGL)
         TESTVIDEOSYNC(OpenGLVideoSync);
@@ -359,93 +358,6 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
 }
 
 void DRMVideoSync::AdvanceTrigger(void)
-{
-    KeepPhase();
-    UpdateNexttrigger();
-}
-#endif /* !_WIN32 */
-
-#ifndef _WIN32
-const char *nVidiaVideoSync::sm_nvidia_dev = "/dev/nvidia0";
-
-nVidiaVideoSync::nVidiaVideoSync(VideoOutput *vo,
-                                 int fi, int ri, bool intr) : 
-    VideoSync(vo, fi, ri, intr), m_nvidia_fd(-1)
-{
-}
-
-nVidiaVideoSync::~nVidiaVideoSync()
-{
-    if (m_nvidia_fd >= 0)
-        close(m_nvidia_fd);
-}
-
-bool nVidiaVideoSync::dopoll() const
-{
-    int ret;
-    struct pollfd polldata;
-    polldata.fd = m_nvidia_fd;
-    polldata.events = 0xff;
-    polldata.revents = 0;
-    ret = poll( &polldata, 1, 100 );
-    if (!ret)
-        return false;
-    if (ret < 0) 
-    {
-        perror("nVidiaVideoSync::");
-        return false;
-    }
-    return true;
-}
-
-bool nVidiaVideoSync::TryInit(void)
-{
-    m_nvidia_fd = open(sm_nvidia_dev, O_RDONLY);
-    if (m_nvidia_fd < 0)
-    {
-        VERBOSE(VB_PLAYBACK, QString("nVidiaVideoSync: Could not open device"
-                " %1, %2").arg(sm_nvidia_dev).arg(strerror(errno)));
-        return false;
-    }
-
-    if (!dopoll())
-    {
-        VERBOSE(VB_PLAYBACK, QString("nVidiaVideoSync: VBlank ioctl did not work,"
-                " unimplemented in this driver?"));
-        close(m_nvidia_fd);
-        return false;
-    }
-    return true;
-}
-
-void nVidiaVideoSync::Start(void)
-{
-    dopoll();
-    VideoSync::Start();
-}
-
-void nVidiaVideoSync::WaitForFrame(int sync_delay)
-{
-    OffsetTimeval(m_nexttrigger, sync_delay);
-    
-    m_delay = CalcDelay();
-
-    // Always sync to the next retrace execpt when we are very late.
-    if (m_delay > -(m_refresh_interval/2))
-    {
-        dopoll();
-        m_delay = CalcDelay();
-    }
-
-    // Wait for any remaining retrace intervals.
-    while (m_delay > 0)
-    {
-        dopoll();
-        m_delay = CalcDelay();
-    }
-}
-
-void nVidiaVideoSync::AdvanceTrigger(void)
 {
     KeepPhase();
     UpdateNexttrigger();

@@ -154,34 +154,6 @@ class DRMVideoSync : public VideoSync
 #endif // !_WIN32
 
 #ifndef _WIN32
-/** \brief Video synchronization class employing /dev/nvidia0
- *
- *   Polls /dev/nvidia0 to wait for retrace.  Phase-maintaining, meaning
- *   WaitForFrame should always return approximately the same time after
- *   a vertical retrace. This does not work with version 50 or later
- *   of the nVidia vendor drivers.
- */
-class nVidiaVideoSync : public VideoSync
-{
-  public:
-    nVidiaVideoSync(VideoOutput*,
-                    int frame_interval, int refresh_interval, bool interlaced);
-    ~nVidiaVideoSync();
-
-    QString getName(void) const { return QString("nVidia polling"); }
-    bool TryInit(void);
-    void Start(void);
-    void WaitForFrame(int sync_delay);
-    void AdvanceTrigger(void);
-
-  private:
-    bool dopoll(void) const;
-    int m_nvidia_fd;
-    static const char *sm_nvidia_dev;
-};
-#endif // !_WIN32
-
-#ifndef _WIN32
 /** \brief Video synchronization class employing SGI_video_sync
  *         OpenGL extension.
  *
