@@ -19,7 +19,7 @@
 #include <linux/dvb/frontend.h>
 #include <linux/dvb/dmx.h>
 
-#if (DVB_API_VERSION != 3)
+#if (DVB_API_VERSION != 3 && DVB_API_VERSION != 5)
 #    error "DVB driver includes with API version 3 not found!"
 #endif
 
@@ -27,7 +27,7 @@
 #    define DVB_API_VERSION_MINOR 0
 #endif
 
-#if (DVB_API_VERSION >= 3 && DVB_API_VERSION_MINOR >= 1)
+#if ((DVB_API_VERSION == 3 && DVB_API_VERSION_MINOR >= 1) || (DVB_API_VERSION > 3))
 #    define USE_ATSC
 #else
 #warning DVB API version < 3.1
