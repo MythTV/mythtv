@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20081229-1"
+VERSION="0.1.20090139-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -2595,6 +2595,11 @@ def BurnDVDISO(title):
         os.close(f);
 
         if drivestatus == CDROM.CDS_DISC_OK or drivestatus == CDROM.CDS_NO_INFO:
+
+            # If the frontend has a previously burnt DVD+RW mounted,
+            # growisofs will fail to burn it, so try to pumount it first...
+            runCommand("pumount " + dvddrivepath);
+
             if mediatype == DVD_RW and erasedvdrw == True:
                 command = path_growisofs[0] + " -dvd-compat "
                 if drivespeed != 0:
