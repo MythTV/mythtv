@@ -36,8 +36,9 @@
 #include "videoselector.h"
 #include "logviewer.h"
 
-MythBurn::MythBurn(MythScreenStack *parent,
-                   MythScreenType *destinationScreen, MythScreenType *themeScreen,
+MythBurn::MythBurn(MythScreenStack   *parent,
+                   MythScreenType    *destinationScreen,
+                   MythScreenType    *themeScreen,
                    ArchiveDestination archiveDestination, QString name)
          :MythScreenType(parent, name)
 {
@@ -119,7 +120,8 @@ bool MythBurn::Create(void)
     updateArchiveList();
 
     m_addrecordingButton->SetText(tr("Add Recording"));
-    connect(m_addrecordingButton, SIGNAL(Clicked()), this, SLOT(handleAddRecording()));
+    connect(m_addrecordingButton, SIGNAL(Clicked()),
+            this, SLOT(handleAddRecording()));
 
     m_addvideoButton->SetText(tr("Add Video"));
     connect(m_addvideoButton, SIGNAL(Clicked()), this, SLOT(handleAddVideo()));
@@ -131,7 +133,8 @@ bool MythBurn::Create(void)
             this, SLOT(itemClicked(MythUIButtonListItem *)));
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+        VERBOSE(VB_IMPORTANT,
+                "Failed to build a focuslist. Something is wrong");
 
     SetFocusWidget(m_nextButton);
 
@@ -152,7 +155,8 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        // if we are currently moving an item we only accept UP/DOWN/SELECT/ESCAPE
+        // if we are currently moving an item,
+        // we only accept UP/DOWN/SELECT/ESCAPE
         if (m_moveMode)
         {
             MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
@@ -267,8 +271,8 @@ void MythBurn::loadEncoderProfiles()
                 .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
     }
 
-    VERBOSE(VB_IMPORTANT, QString("MythArchive: Loading encoding profiles from %1")
-            .arg(filename));
+    VERBOSE(VB_IMPORTANT,
+            "MythArchive: Loading encoding profiles from " + filename);
 
     QDomDocument doc("mydocument");
     QFile file(filename);
@@ -443,7 +447,8 @@ void MythBurn::updateArchiveList(void)
 
             recalcItemSize(a);
 
-            MythUIButtonListItem* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
+            MythUIButtonListItem* item = new
+                    MythUIButtonListItem(m_archiveButtonList, a->title);
             item->SetData(qVariantFromValue(a));
             item->SetText(a->subtitle, "subtitle");
             item->SetText(a->startDate + " " + a->startTime, "date");
@@ -471,7 +476,8 @@ void MythBurn::updateArchiveList(void)
 
         m_nofilesText->Hide();
 
-        m_archiveButtonList->SetItemCurrent(m_archiveButtonList->GetItemFirst());
+        m_archiveButtonList->SetItemCurrent(
+            m_archiveButtonList->GetItemFirst());
     }
 
     updateSizeBar();
@@ -494,20 +500,24 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("MythArchive: Recording not found (%1)").arg(filename));
+            VERBOSE(VB_IMPORTANT,
+                    QString("MythArchive: Recording not found (%1)")
+                    .arg(filename));
         }
     }
     else if (type == "Video")
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT title FROM videometadata WHERE filename = :FILENAME");
+        query.prepare("SELECT title FROM videometadata"
+                      " WHERE filename = :FILENAME");
         query.bindValue(":FILENAME", filename);
         query.exec();
         if (query.isActive() && query.size())
             return true;
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("MythArchive: Video not found (%1)").arg(filename));
+            VERBOSE(VB_IMPORTANT,
+                    QString("MythArchive: Video not found (%1)").arg(filename));
         }
     }
     else if (type == "File")
@@ -516,7 +526,8 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("MythArchive: File not found (%1)").arg(filename));
+            VERBOSE(VB_IMPORTANT,
+                    QString("MythArchive: File not found (%1)").arg(filename));
         }
     }
 
@@ -536,7 +547,8 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     if (item->videoCodec.toLower() == "mpeg2video")
     {
         // does the file already have a valid DVD resolution?
-        if (gContext->GetSetting("MythArchiveVideoFormat", "pal").toLower() == "ntsc")
+        if (gContext->GetSetting("MythArchiveVideoFormat", "pal").toLower()
+                    == "ntsc")
         {
             if ((item->videoWidth == 720 && item->videoHeight == 480) ||
                 (item->videoWidth == 704 && item->videoHeight == 480) ||
@@ -743,9 +755,9 @@ void MythBurn::saveConfiguration(void)
             continue;
 
         query.prepare("INSERT INTO archiveitems (type, title, subtitle, "
-                "description, startdate, starttime, size, filename, hascutlist, "
-                "duration, cutduration, videowidth, videoheight, filecodec,"
-                "videocodec, encoderprofile) "
+                "description, startdate, starttime, size, filename, "
+                "hascutlist, duration, cutduration, videowidth, "
+                "videoheight, filecodec, videocodec, encoderprofile) "
                 "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
                 ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST, :DURATION, "
                 ":CUTDURATION, :VIDEOWIDTH, :VIDEOHEIGHT, :FILECODEC, "
@@ -785,7 +797,8 @@ void MythBurn::showMenu()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox("Menu", popupStack, "actionmenu");
+    MythDialogBox *menuPopup = new MythDialogBox("Menu",
+                                                 popupStack, "actionmenu");
 
     if (menuPopup->Create())
         popupStack->AddScreen(menuPopup);
@@ -795,9 +808,11 @@ void MythBurn::showMenu()
     if (curItem->hasCutlist)
     {
         if (curItem->useCutlist)
-            menuPopup->AddButton(tr("Don't Use Cutlist"), SLOT(toggleUseCutlist()));
+            menuPopup->AddButton(tr("Don't Use Cutlist"),
+                                 SLOT(toggleUseCutlist()));
         else
-            menuPopup->AddButton(tr("Use Cutlist"), SLOT(toggleUseCutlist()));
+            menuPopup->AddButton(tr("Use Cutlist"),
+                                 SLOT(toggleUseCutlist()));
     }
 
     menuPopup->AddButton(tr("Remove Item"), SLOT(removeItem()));
@@ -878,7 +893,8 @@ void MythBurn::changeProfile()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    ProfileDialog *profileDialog = new ProfileDialog(popupStack, curItem, m_profileList);
+    ProfileDialog *profileDialog = new ProfileDialog(popupStack,
+                                                     curItem, m_profileList);
 
     if (profileDialog->Create())
     {
@@ -928,9 +944,9 @@ void MythBurn::runScript()
 
     createConfigFile(configDir + "/mydata.xml");
     commandline = "python " + GetShareDir() + "mytharchive/scripts/mythburn.py";
-    commandline += " -j " + configDir + "/mydata.xml";             // job file
-    commandline += " -l " + logDir + "/progress.log";              // progress log
-    commandline += " > "  + logDir + "/mythburn.log 2>&1 &";       //Logs
+    commandline += " -j " + configDir + "/mydata.xml";          // job file
+    commandline += " -l " + logDir + "/progress.log";           // progress log
+    commandline += " > "  + logDir + "/mythburn.log 2>&1 &";    // Logs
 
     gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
@@ -956,7 +972,8 @@ void MythBurn::handleAddRecording()
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    RecordingSelector *selector = new RecordingSelector(mainStack, &m_archiveList);
+    RecordingSelector *selector = new RecordingSelector(mainStack,
+                                                        &m_archiveList);
 
     connect(selector, SIGNAL(haveResult(bool)),
             this, SLOT(selectorClosed(bool)));
@@ -1072,7 +1089,8 @@ bool ProfileDialog::Create()
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(save()));
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+        VERBOSE(VB_IMPORTANT,
+                "Failed to build a focuslist. Something is wrong");
 
     SetFocusWidget(m_profile_list);
 
@@ -1122,15 +1140,18 @@ void BurnMenu::start(void)
 {
     if (!gContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
     {
-        showWarningDialog(QObject::tr("Cannot burn a DVD.\nThe last run failed to create a DVD."));
+        showWarningDialog(QObject::tr("Cannot burn a DVD.\n"
+                                      "The last run failed to create a DVD."));
         return;
     }
 
     // ask the user what type of disk to burn to
-    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
     QString title = "Burn DVD";
-    QString msg = QObject::tr("\nPlace a blank DVD in the drive and select an option below.");
-    MythDialogBox *menuPopup = new MythDialogBox(title, msg, mainStack, "actionmenu", true);
+    QString msg   = QObject::tr("\nPlace a blank DVD in the"
+                                " drive and select an option below.");
+    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
+    MythDialogBox   *menuPopup = new MythDialogBox(title, msg, mainStack,
+                                                   "actionmenu", true);
 
     if (menuPopup->Create())
         mainStack->AddScreen(menuPopup);
@@ -1147,7 +1168,8 @@ void BurnMenu::customEvent(QEvent *event)
 {
     if (event->type() == kMythDialogBoxCompletionEventType)
     {
-        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce
+            = dynamic_cast<DialogCompletionEvent*>(event);
 
         QString resultid= dce->GetId();
         int buttonnum  = dce->GetResult();
@@ -1184,15 +1206,18 @@ void BurnMenu::doBurn(int mode)
 
     QString sArchiveFormat = QString::number(mode);
     QString sEraseDVDRW = (mode == 2) ? "1" : "0";
-    QString sNativeFormat = (gContext->GetSetting("MythArchiveLastRunType").startsWith("Native") ? "1" : "0");
+    QString sNativeFormat = (gContext->GetSetting("MythArchiveLastRunType")
+                             .startsWith("Native") ? "1" : "0");
 
-    commandline = "mytharchivehelper -b " + sArchiveFormat + " " + sEraseDVDRW  + " " + sNativeFormat;
+    commandline = "mytharchivehelper -b " + sArchiveFormat +
+                  " " + sEraseDVDRW  + " " + sNativeFormat;
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
     int state = system(qPrintable(commandline));
 
     if (state != 0)
     {
-        showWarningDialog(QObject::tr("It was not possible to run mytharchivehelper to burn the DVD."));
+        showWarningDialog(QObject::tr("It was not possible to run "
+                                      "mytharchivehelper to burn the DVD."));
         return;
     }
 
