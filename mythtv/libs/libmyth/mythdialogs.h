@@ -19,7 +19,6 @@ class XMLParse;
 class UIType;
 class UIManagedTreeListType;
 class UITextType;
-class UIRichTextType;
 class UIPushButtonType;
 class UITextButtonType;
 class UIRemoteEditType;
@@ -367,7 +366,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
 
     UIManagedTreeListType *getUIManagedTreeListType(const QString &name);
     UITextType *getUITextType(const QString &name);
-    UIRichTextType *getUIRichTextType(const QString &name);
     UIPushButtonType *getUIPushButtonType(const QString &name);
     UITextButtonType *getUITextButtonType(const QString &name);
     UIRemoteEditType *getUIRemoteEditType(const QString &name);
@@ -494,49 +492,6 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
     MythListBox         *listbox;
     QAbstractButton     *ok_button;
     QAbstractButton     *cancel_button;
-};
-
-class MPUBLIC MythImageFileDialog: public MythThemedDialog
-{
-    //
-    //  Simple little popup dialog (themeable)
-    //  that lets a user find files/directories
-    //
-
-    Q_OBJECT
-
-  public:
-
-    typedef QVector<int> IntVector;
-
-    MythImageFileDialog(QString        *result,
-                        QString         top_directory,
-                        MythMainWindow *parent,
-                        QString         window_name,
-                        QString         theme_filename = QString(),
-                        const char     *name = "MythImageFileDialog",
-                        bool            setsize=true);
-  public slots:
-
-    void handleTreeListSelection(int, IntVector*);
-    void handleTreeListEntered(int, IntVector*);
-    void buildTree(QString starting_where);
-    void buildFileList(QString directory);
-
-  protected:
-    ~MythImageFileDialog(); // use deleteLater() instead for thread safety
-    void keyPressEvent(QKeyEvent *e);
-
-  private:
-
-    QString               *selected_file;
-    UIManagedTreeListType *file_browser;
-    GenericTree           *root_parent;
-    GenericTree           *file_root;
-    GenericTree           *initial_node;
-    UIImageType           *image_box;
-    QStringList           image_files;
-    QString               initialDir;
 };
 
 #endif

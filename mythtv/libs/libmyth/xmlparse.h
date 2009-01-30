@@ -38,8 +38,6 @@ class MPUBLIC XMLParse
     void parseImageGrid(LayerSet *, QDomElement &);
     void parseManagedTreeList(LayerSet *, QDomElement &);
     void parseTextArea(LayerSet *, QDomElement &);
-    void parseRichTextArea(LayerSet *, QDomElement &);
-    void parseMultiTextArea(LayerSet *, QDomElement &);
     void parseRemoteEdit(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
@@ -49,11 +47,11 @@ class MPUBLIC XMLParse
     void parseCheckBox(LayerSet *, QDomElement &);
     void parseSelector(LayerSet *, QDomElement &);
     void parseBlackHole(LayerSet *, QDomElement &);
-    void parseListBtnArea(LayerSet *, QDomElement &); 
+    void parseListBtnArea(LayerSet *, QDomElement &);
     void parseListTreeArea(LayerSet *, QDomElement &);
     void parseKeyboard(LayerSet *, QDomElement &);
     void parseKey(LayerSet *, QDomElement &);
- 
+
   private:
     bool doLoadTheme(QDomElement &, QString, QString);
     QMap<QString, fontProp> fontMap;
@@ -64,7 +62,7 @@ class MPUBLIC XMLParse
     double hmult;
 
     int usetrans;
-    
+
     QString fontSizeType;
 
     MythUIHelper *ui;
