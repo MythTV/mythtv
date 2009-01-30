@@ -786,8 +786,8 @@ int reloadTheme(void)
 
     GetMythMainWindow()->Init();
     menu->Close();
-    themeBase->Reload();
     GetMythUI()->UpdateImageCache();
+    themeBase->Reload();
 
     GetMythMainWindow()->ReinitDone();
 
