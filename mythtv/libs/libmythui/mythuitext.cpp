@@ -16,7 +16,8 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
             m_Justification(Qt::AlignLeft | Qt::AlignTop), m_OrigDisplayRect(),
             m_AltDisplayRect(),                            m_drawRect(),
             m_Message(""),                                 m_CutMessage(""),
-            m_DefaultMessage(""),                          m_Cutdown(true),
+            m_DefaultMessage(""),                          m_TemplateText(""),
+            m_Cutdown(true),
             m_Font(new MythFontProperties()),              m_colorCycling(false),
             m_startColor(),                                m_endColor(),
             m_numSteps(0),                                 m_curStep(0),
@@ -456,6 +457,10 @@ bool MythUIText::ParseElement(QDomElement &element)
         SetText(m_Message);
         m_DefaultMessage = m_Message;
     }
+    else if (element.tagName() == "template")
+    {
+        m_TemplateText = getFirstText(element);
+    }
     else if (element.tagName() == "cutdown")
     {
         SetCutDown(parseBool(element));
@@ -552,6 +557,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     SetText(text->m_Message);
     m_CutMessage = text->m_CutMessage;
     m_DefaultMessage = text->m_DefaultMessage;
+    m_TemplateText = text->m_TemplateText;
 
     m_Cutdown = text->m_Cutdown;
     m_MultiLine = text->m_MultiLine;

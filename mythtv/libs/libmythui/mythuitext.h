@@ -35,6 +35,9 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
     QString GetText(void) const;
     QString GetDefaultText(void) const;
 
+    void SetTemplateText(const QString &text) { m_TemplateText = text; }
+    QString GetTemplateText(void) const { return m_TemplateText; }
+
     void UseAlternateArea(bool useAlt);
 
     virtual void Pulse(void);
@@ -87,6 +90,7 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
     QString m_Message;
     QString m_CutMessage;
     QString m_DefaultMessage;
+    QString m_TemplateText;
 
     bool m_Cutdown;
     bool m_MultiLine;
