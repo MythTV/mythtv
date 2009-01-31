@@ -80,6 +80,7 @@ void WelcomeDialog::startFrontend(void)
                          m_installDir + "/bin/mythfrontend");
 
     myth_system(startFECmd.ascii());
+    updateAll();
 }
 
 void WelcomeDialog::startFrontendClick(void)
