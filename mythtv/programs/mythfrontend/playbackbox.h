@@ -300,9 +300,6 @@ class PlaybackBox : public MythScreenType
     void UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel,
                            bool force_preview_reload = false);
 
-    void SetTextFromMap(MythUIType *parent, QMap<QString, QString> &infoMap);
-    void ResetMap(MythUIType *parent, QMap<QString, QString> &infoMap);
-
     void clearProgramCache(void);
 
     void HandlePreviewEvent(const ProgramInfo &evinfo);

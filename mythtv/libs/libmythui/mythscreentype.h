@@ -2,6 +2,7 @@
 #define MYTHSCREEN_TYPE_H_
 
 #include "mythuitype.h"
+#include "mythuitext.h"
 #include "mythuiutils.h"
 
 class MythScreenStack;
@@ -38,6 +39,9 @@ class MPUBLIC MythScreenType : public MythUIType
 
     bool IsDeleting(void) const;
     void SetDeleting(bool deleting);
+
+    void SetTextFromMap(QMap<QString, QString> &infoMap);
+    void ResetMap(QMap<QString, QString> &infoMap);
 
   public slots:
     void Close();

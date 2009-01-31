@@ -197,7 +197,6 @@ class ProgLister : public MythScreenType
     void details(void);
     void chooseView(void);
     void updateInfo(MythUIButtonListItem *item);
-    void setTextFromMap(MythUIType *parent, QMap<QString, QString> &infoMap);
     void setViewFromList(QString item);
     void doRemove(bool ok);
 

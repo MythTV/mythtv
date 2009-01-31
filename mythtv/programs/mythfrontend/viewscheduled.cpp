@@ -453,7 +453,7 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
     {
         QMap<QString, QString> infoMap;
         pginfo->ToMap(infoMap);
-        SetTextFromMap(this, infoMap);
+        SetTextFromMap(infoMap);
     }
 }
 
@@ -663,54 +663,4 @@ void ViewScheduled::customEvent(QEvent *event)
         }
     }
 
-}
-
-void ViewScheduled::SetTextFromMap(MythUIType *parent,
-                                   QMap<QString, QString> &infoMap)
-{
-    if (!parent)
-        return;
-
-    QList<MythUIType *> *children = parent->GetAllChildren();
-
-    MythUIText *textType;
-    QMutableListIterator<MythUIType *> i(*children);
-    while (i.hasNext())
-    {
-        MythUIType *type = i.next();
-        if (!type->IsVisible())
-            continue;
-
-        textType = dynamic_cast<MythUIText *> (type);
-        if (textType && infoMap.contains(textType->objectName()))
-        {
-            QString newText = textType->GetDefaultText();
-            QRegExp regexp("%(\\|(.))?([^\\|]+)(\\|(.))?%");
-            regexp.setMinimal(true);
-            if (newText.contains(regexp))
-            {
-                int pos = 0;
-                QString tempString = newText;
-                while ((pos = regexp.indexIn(newText, pos)) != -1)
-                {
-                    QString key = regexp.cap(3).toLower().trimmed();
-                    QString replacement;
-                    if (!infoMap.value(key).isEmpty())
-                    {
-                        replacement = QString("%1%2%3")
-                                                .arg(regexp.cap(2))
-                                                .arg(infoMap.value(key))
-                                                .arg(regexp.cap(5));
-                    }
-                    tempString.replace(regexp.cap(0), replacement);
-                    pos += regexp.matchedLength();
-                }
-                newText = tempString;
-            }
-            else
-                newText = infoMap.value(textType->objectName());
-
-            textType->SetText(newText);
-        }
-    }
 }

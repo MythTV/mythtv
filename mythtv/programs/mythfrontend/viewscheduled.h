@@ -54,8 +54,6 @@ class ViewScheduled : public MythScreenType
 
     void EmbedTVWindow(void);
 
-    void SetTextFromMap(MythUIType *parent, QMap<QString, QString> &infoMap);
-
     bool m_conflictBool;
     QDate m_conflictDate;
     QString m_shortdateFormat;
