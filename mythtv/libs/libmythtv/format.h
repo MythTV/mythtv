@@ -19,8 +19,7 @@ typedef struct rtfileheader
   int  desiredheight; // 0 .. as it is
   char pimode;        // P .. progressive
 		      // I .. interlaced  (2 half pics) [NI]
-  double aspect;      // 1.0 .. square pixel (1.5 .. e.g. width=480: width*1.5=720
-                      // for capturing for svcd material
+  double aspect;      // physical aspect ratio
   double fps;
   int videoblocks;   // count of video-blocks -1 .. unknown   0 .. no video
   int audioblocks;   // count of audio-blocks -1 .. unknown   0 .. no audio
