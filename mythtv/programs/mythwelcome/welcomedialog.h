@@ -48,9 +48,6 @@ class WelcomeDialog : public MythScreenType
     void checkAutoStart(void);
     void runMythFillDatabase(void);
 
-    MythUIText   *GetMythUIText(const QString &name, bool optional = false);
-    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
-
     //
     //  GUI stuff
     //

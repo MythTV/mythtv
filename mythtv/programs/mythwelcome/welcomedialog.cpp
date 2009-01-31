@@ -73,26 +73,22 @@ bool WelcomeDialog::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_status_text, "status_text", &err);
+    UIUtilE::Assign(this, m_recording_text, "recording_text", &err);
+    UIUtilE::Assign(this, m_scheduled_text, "scheduled_text", &err);
+    UIUtilE::Assign(this, m_time_text, "time_text", &err);
+    UIUtilE::Assign(this, m_date_text, "date_text", &err);
+    UIUtilE::Assign(this, m_warning_text, "conflicts_text", &err);
+    UIUtilE::Assign(this, m_startfrontend_button, "startfrontend_button", &err);
+
+    if (err)
     {
-        m_status_text = GetMythUIText("status_text");
-        m_recording_text = GetMythUIText("recording_text");
-        m_scheduled_text = GetMythUIText("scheduled_text");
-        m_time_text = GetMythUIText("time_text");
-        m_date_text = GetMythUIText("date_text");
-
-        m_warning_text = GetMythUIText("conflicts_text");
-        m_warning_text->SetVisible(false);
-
-        m_startfrontend_button = GetMythUIButton("startfrontend_button");
-
-    }
-    catch (const QString name)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Theme is missing a critical theme element ('%1')")
-                                      .arg(name));
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'welcome_screen'");
         return false;
     }
+
+    m_warning_text->SetVisible(false);
 
     m_startfrontend_button->SetText(tr("Start Frontend"));
     connect(m_startfrontend_button, SIGNAL(Clicked()),
@@ -108,26 +104,6 @@ bool WelcomeDialog::Create(void)
     checkAutoStart();
 
     return true;
-}
-
-MythUIText* WelcomeDialog::GetMythUIText(const QString &name, bool optional)
-{
-    MythUIText *text = dynamic_cast<MythUIText *> (GetChild(name));
-
-    if (!optional && !text)
-        throw name;
-
-    return text;
-}
-
-MythUIButton* WelcomeDialog::GetMythUIButton(const QString &name, bool optional)
-{
-    MythUIButton *button = dynamic_cast<MythUIButton *> (GetChild(name));
-
-    if (!optional && !button)
-        throw name;
-
-    return button;
 }
 
 void WelcomeDialog::startFrontend(void)
