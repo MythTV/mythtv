@@ -112,6 +112,7 @@ void WelcomeDialog::startFrontend(void)
                          m_installDir + "/bin/mythfrontend");
 
     myth_system(startFECmd);
+    updateAll();
 }
 
 void WelcomeDialog::startFrontendClick(void)
