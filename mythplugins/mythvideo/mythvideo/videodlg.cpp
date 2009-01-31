@@ -1607,7 +1607,8 @@ void VideoDialog::SetCurrentNode(MythGenericTree *node)
 
 void VideoDialog::UpdatePosition()
 {
-    MythUIButtonList *currentList = GetItemCurrent()->parent();
+    MythUIButtonListItem *ci = GetItemCurrent();
+    MythUIButtonList *currentList = ci ? ci->parent() : 0;
 
     if (!currentList)
         return;
