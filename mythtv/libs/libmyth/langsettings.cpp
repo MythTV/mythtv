@@ -19,12 +19,12 @@ class LangEditorSetting : public ListBoxSetting, public Storage
     {
         setLabel(QObject::tr("Select your preferred language"));
     };
-    
+
     virtual void Load(void)
     {
         LanguageSettings::fillSelections(this);
     }
-    
+
     virtual void Save(void)
     {
         gContext->SetSetting("Language", getValue());
@@ -46,7 +46,7 @@ public:
     LanguageSettingsPrivate():
         m_loaded(false),
         m_language("")    { };
-        
+
     void Init(void) {
         if (!m_loaded)
         {
@@ -54,7 +54,7 @@ public:
             m_language = gContext->GetSetting("Language");
         }
     };
-    
+
     bool LanguageChanged(void) {
         QString cur_language = gContext->GetSetting("Language");
         bool ret = false;
@@ -64,12 +64,12 @@ public:
         m_language = cur_language;
         return ret;
     };
-    
+
     bool m_loaded;
     QString m_language;
     TransMap m_translators;
  };
- 
+
 LanguageSettingsPrivate LanguageSettings::d;
 
 void LanguageSettings::load(QString module_name)
@@ -79,9 +79,17 @@ void LanguageSettings::load(QString module_name)
     {
         // unload any previous version
         unload(module_name);
-        
+
         // install translator
         QString      lang  = d.m_language.toLower();
+
+        if (lang == "en")
+        {
+            gContext->SetSetting("Language", "EN_US");
+            gContext->SaveSetting("Language", "EN_US");
+            lang = "en_us";
+        }
+
         QTranslator *trans = new QTranslator(0);
         if (trans->load(GetTranslationsDir() + module_name
                         + "_" + lang + ".qm", "."))
@@ -91,9 +99,8 @@ void LanguageSettings::load(QString module_name)
         }
         else
         {
-            if (!lang.startsWith("en"))
-                VERBOSE(VB_IMPORTANT, "Cannot load language " + lang
-                                      + " for module " + module_name);
+            VERBOSE(VB_IMPORTANT, "Cannot load language " + lang
+                                  + " for module " + module_name);
         }
     }
 }
@@ -139,18 +146,18 @@ void LanguageSettings::reload(void)
              it != d.m_translators.end();
              ++it)
             keys.append(it.key());
-        
+
         for (QStringList::Iterator it = keys.begin();
              it != keys.end();
              ++it)
             load(*it);
     }
-}   
+}
 
 QStringList LanguageSettings::getLanguages(void)
 {
     QStringList langs;
-    langs << QString::fromUtf8("English (US)")<< "EN"   // English
+    langs << QString::fromUtf8("English (US)")<< "EN_US"   // English
           << QString::fromUtf8("Italiano")    << "IT"   // Italian
           << QString::fromUtf8("Català")
               << "CA"                                   // Catalan
