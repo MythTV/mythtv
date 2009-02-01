@@ -975,13 +975,16 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
-        if (hoursLeft > 3)
-            out<<QObject::tr("%1 hours left").arg(hoursLeft) + pro;
-        else if (minLeft > 90)
-            out<<QObject::tr("%1 hours and %2 minutes left")
-                .arg(hoursLeft).arg(minLeft%60) + pro;
+        QString hourstring = QObject::tr("%n hour(s)", "", hoursLeft);
+        QString minstring = QObject::tr("%n minute(s)", "", minLeft%60);
+        QString remainstring = QObject::tr("%1 remaining", "time");
+        if (minLeft%60 == 0)
+            out<<remainstring.arg(hourstring) + pro;
+        else if (minLeft > 60)
+            out<<QObject::tr("%1 and %2 remaining", "time").arg(hourstring)
+                                                   .arg(minstring) + pro;
         else
-            out<<QObject::tr("%1 minutes left").arg(minLeft) + pro;
+            out<<remainstring.arg(minstring) + pro;
     }
 }
 

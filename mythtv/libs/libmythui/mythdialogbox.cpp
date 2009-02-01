@@ -483,7 +483,7 @@ bool MythUISearchDialog::Create(void)
 
     m_titleText->SetText(m_title);
     if (m_matchesText)
-        m_matchesText->SetText(tr("0 matches"));
+        m_matchesText->SetText(tr("%n match(es)", "", 0));
 
     BuildFocusList();
 
@@ -544,7 +544,7 @@ void MythUISearchDialog::slotUpdateList(void)
     m_itemList->SetItemCurrent(0);
 
     if (m_matchesText)
-        m_matchesText->SetText(tr("%1 matches").arg(m_list.size()));
+        m_matchesText->SetText(tr("%n match(es)", "", 0));
 }
 
 /////////////////////////////////////////////////////////////////////

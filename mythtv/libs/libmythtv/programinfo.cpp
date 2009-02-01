@@ -525,7 +525,6 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
 
     QDateTime timeNow = QDateTime::currentDateTime();
 
-    QString length;
     int hours, minutes, seconds;
 
     progMap["title"] = title;
@@ -599,12 +598,20 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
         minutes = seconds / 60;
     }
 
-    progMap["lenmins"] = QString("%1 %2").
-                         arg(minutes).arg(QObject::tr("minutes"));
+    progMap["lenmins"] = QObject::tr("%n minute(s)","",minutes);
     hours   = minutes / 60;
     minutes = minutes % 60;
-    length.sprintf("%d:%02d", hours, minutes);
-    progMap["lentime"] = length;
+
+    QString minstring = QObject::tr("%n minute(s)","",minutes);
+
+    if (hours > 0)
+    {
+        progMap["lentime"] = QString("%1 %2")
+                                    .arg(QObject::tr("%n hour(s)","", hours))
+                                    .arg(minstring);
+    }
+    else
+        progMap["lentime"] = minstring;
 
     progMap["rec_type"] = RecTypeChar();
     progMap["rec_str"] = RecTypeText();
@@ -687,15 +694,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
 
     if (stars)
     {
-        QString str = QObject::tr("stars");
-        if (stars > 0 && stars <= 0.25)
-            str = QObject::tr("star");
-
-        if (year != "")
-            progMap["stars"] = QString("(%1, %2 %3) ")
-                                       .arg(year).arg(4.0 * stars).arg(str);
-        else
-            progMap["stars"] = QString("(%1 %2) ").arg(4.0 * stars).arg(str);
+        progMap["stars"] = QObject::tr("%n star(s)", "", stars * 4.0);
     }
     else
         progMap["stars"] = "";
@@ -3009,7 +3008,7 @@ void ProgramInfo::SetAspectChange(MarkTypes type, long long frame,
         query.bindValue(":DATA", customAspect);
     else
         query.bindValue(":DATA", QVariant::UInt);
-        
+
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("aspect ratio change insert", query);
@@ -3697,7 +3696,7 @@ void ProgramInfo::showDetails(void) const
 
     mainStack->AddScreen(details_dialog);
 
-    // HACK begin - remove when everything is using mythui 
+    // HACK begin - remove when everything is using mythui
     if (GetMythMainWindow()->currentWidget())
     {
         QWidget *widget = GetMythMainWindow()->currentWidget();
@@ -4039,11 +4038,11 @@ void ProgramInfo::ShowRecordingDialog(void)
                 !((findid == 0 || !IsFindApplicable()) &&
                   catType == "series" &&
                   programid.contains(QRegExp("0000$"))) &&
-                ((!(dupmethod & kDupCheckNone) && programid != "" &&
+                ((!(dupmethod & kDupCheckNone) && !programid.isEmpty() &&
                   (findid != 0 || !IsFindApplicable())) ||
-                 ((dupmethod & kDupCheckSub) && subtitle != "") ||
-                 ((dupmethod & kDupCheckDesc) && description != "") ||
-                 ((dupmethod & kDupCheckSubThenDesc) && (subtitle != "" || description != "")) ))
+                 ((dupmethod & kDupCheckSub) && !subtitle.isEmpty()) ||
+                 ((dupmethod & kDupCheckDesc) && !description.isEmpty()) ||
+                 ((dupmethod & kDupCheckSubThenDesc) && (!subtitle.isEmpty() || !description.isEmpty())) ))
             {
                 dlg->AddButton(QObject::tr("Never record"));
                 forget = button++;
@@ -4186,8 +4185,8 @@ void ProgramInfo::ShowNotRecordingDialog(void)
 
     QDateTime now = QDateTime::currentDateTime();
 
-    if (recstartts < now && recendts > now &&
-        recstatus != rsDontRecord && recstatus != rsNotListed)
+    if ((recstartts < now) && (recendts > now) &&
+        (recstatus != rsDontRecord) && (recstatus != rsNotListed))
     {
         dlg->AddButton(QObject::tr("Reactivate"));
         react = button++;
@@ -4233,10 +4232,10 @@ void ProgramInfo::ShowNotRecordingDialog(void)
                     !((findid == 0 || !IsFindApplicable()) &&
                       catType == "series" &&
                       programid.contains(QRegExp("0000$"))) &&
-                    ((!(dupmethod & kDupCheckNone) && programid != "" &&
+                    ((!(dupmethod & kDupCheckNone) && !programid.isEmpty() &&
                       (findid != 0 || !IsFindApplicable())) ||
-                     ((dupmethod & kDupCheckSub) && subtitle != "") ||
-                     ((dupmethod & kDupCheckDesc) && description != "")))
+                     ((dupmethod & kDupCheckSub) && !subtitle.isEmpty()) ||
+                     ((dupmethod & kDupCheckDesc) && !description.isEmpty())))
                 {
                     dlg->AddButton(QObject::tr("Never record"));
                     forget1 = button++;

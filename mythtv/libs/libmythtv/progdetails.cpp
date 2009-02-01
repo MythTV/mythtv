@@ -308,13 +308,7 @@ void ProgDetails::loadPage(void)
             attr += year + ", ";
 
         if (stars > 0.0)
-        {
-            QString str = QObject::tr("stars");
-            if (stars > 0 && stars <= 0.25)
-                str = QObject::tr("star");
-
-            attr += QString("%1 %2, ").arg(4.0 * stars).arg(str);
-        }
+            attr += QObject::tr("%n star(s), ", "", stars * 4.0);
     }
     if (colorcode != "")
         attr += colorcode + ", ";
@@ -588,7 +582,7 @@ void ProgDetails::loadPage(void)
                 nextRecording = query.value(1).toDateTime().toString(fullDateFormat);
             if (query.value(2).toInt() > 0)
                 averageTimeShift = QString("%1 %2").arg(query.value(2).toInt())
-                                        .arg(QObject::tr("hours"));
+                                        .arg(QObject::tr("hour(s)", "", query.value(2).toInt()));
         }
         if (recorded)
         {
