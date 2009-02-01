@@ -57,6 +57,16 @@ static const VdpOutputSurfaceRenderBlendState pip_blend =
         VDP_OUTPUT_SURFACE_RENDER_BLEND_EQUATION_ADD
     };
 
+static void vdpau_preemption_callback(VdpDevice device, void *vdpau_ctx)
+{
+    (void)device;
+    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("DISPLAY PRE-EMPTED. Aborting playback."));
+    VDPAUContext *ctx = (VDPAUContext*)vdpau_ctx;
+    // TODO this should really kick off re-initialisation
+    if (ctx)
+        ctx->SetErrored();
+}
+
 VDPAUContext::VDPAUContext()
   : nextframedelay(0),      lastframetime(0),
     pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
@@ -191,6 +201,22 @@ bool VDPAUContext::InitProcs(Display *disp, int screen)
             vdp_get_information_string(&info);
             VERBOSE(VB_PLAYBACK, LOC + QString("Information %2").arg(info));
         }
+    }
+
+    // non-fatal callback registration
+    vdp_get_proc_address(
+        vdp_device,
+        VDP_FUNC_ID_PREEMPTION_CALLBACK_REGISTER,
+        (void **)&vdp_preemption_callback_register
+    );
+
+    if (vdp_preemption_callback_register)
+    {
+        vdp_preemption_callback_register(
+            vdp_device,
+            &vdpau_preemption_callback,
+            (void*)this
+        );
     }
 
     vdp_st = vdp_get_proc_address(

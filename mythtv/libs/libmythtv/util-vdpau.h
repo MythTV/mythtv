@@ -26,6 +26,7 @@ class VDPAUContext
               MythCodecID mcodecid);
     void Deinit(void);
     bool IsErrored(void) { return errored; }
+    void SetErrored(void) { errored = true; }
 
     bool InitBuffers(int width, int height, int numbufs);
     void FreeBuffers(void);
@@ -199,6 +200,8 @@ class VDPAUContext
     VdpBitmapSurfaceDestroy * vdp_bitmap_surface_destroy;
     VdpBitmapSurfacePutBitsNative * vdp_bitmap_surface_put_bits_native;
     VdpBitmapSurfaceQueryCapabilities * vdp_bitmap_surface_query_capabilities;
+
+    VdpPreemptionCallbackRegister * vdp_preemption_callback_register;
 };
 
 #endif
