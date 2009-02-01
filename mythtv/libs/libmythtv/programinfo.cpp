@@ -2292,8 +2292,10 @@ bool ProgramInfo::IsInUse(QString &byWho) const
                 usageStr = QObject::tr("Commercial Flagging");
             else if (recusage == "transcoder")
                 usageStr = QObject::tr("Transcoding");
-            else if (recusage == "PIP player")
+            else if (recusage == "pipplayer")
                 usageStr = QObject::tr("PIP");
+            else if (recusage == "pbpplayer")
+                usageStr = QObject::tr("PBP");
 
             byWho += query.value(0).toString() + " (" + usageStr + ")\n";
         }

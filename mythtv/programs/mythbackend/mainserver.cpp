@@ -1153,7 +1153,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             if ((inUseForWhat == "player") ||
                 (inUseForWhat == "preview player") ||
-                (inUseForWhat == "PIP player"))
+                (inUseForWhat == "pipplayer") ||
+                (inUseForWhat == "pbpplayer"))
                 inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSEPLAYING;
             else if (inUseForWhat == "recorder")
                 inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSERECORDING;
