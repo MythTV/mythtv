@@ -299,16 +299,17 @@ bool MythScreenType::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
     {
-        MythRect rect = parseRect(element);
+        MythRect rect = parseRect(element, false);
+        MythRect rectN = parseRect(element);
         QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
 
         if (rect.x() == -1)
-            rect.setX((screenArea.width() - rect.width()) / 2);
+            rectN.setX((screenArea.width() - rectN.width()) / 2);
 
         if (rect.y() == -1)
-            rect.setY((screenArea.height() - rect.height()) / 2);
+            rectN.setY((screenArea.height() - rectN.height()) / 2);
 
-        SetArea(rect);
+        SetArea(rectN);
 
         if (m_Area.width() < screenArea.width() ||
             m_Area.height() < screenArea.height())
