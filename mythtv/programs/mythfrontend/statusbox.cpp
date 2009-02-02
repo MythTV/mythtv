@@ -526,15 +526,8 @@ void StatusBox::doListingsStatus()
                         .arg(QDateTime(GuideDataThrough)
                             .toString("yyyy-MM-dd hh:mm")));
 
-        if (DaysOfData > 0)
-        {
-            QString daystring = tr("day");
-            if (DaysOfData > 1)
-                daystring = tr("days");
-
-            Status = QString("(%1 %2).").arg(DaysOfData).arg(daystring);
-            AddLogLine(Status);
-        }
+        Status = QString("(%1).").arg(tr("%n day(s)", "", DaysOfData));
+        AddLogLine(Status);
     }
 
     if (DaysOfData <= 3)
@@ -561,8 +554,8 @@ void StatusBox::doScheduleStatus()
     query.prepare("SELECT COUNT(*) FROM record WHERE search = 0");
     if (query.exec() && query.next())
     {
-        QString rules = QString("%1 %2").arg(query.value(0).toInt())
-                                        .arg(tr("standard rules are defined"));
+        QString rules = tr("%n standard rule(s) (is) defined", "",
+                            query.value(0).toInt());
         AddLogLine(rules, rules);
     }
     else
@@ -574,8 +567,8 @@ void StatusBox::doScheduleStatus()
     query.prepare("SELECT COUNT(*) FROM record WHERE search > 0");
     if (query.exec() && query.next())
     {
-        QString rules = QString("%1 %2").arg(query.value(0).toInt())
-                                        .arg(tr("search rules are defined"));
+        QString rules = tr("%n search rule(s) are defined", "",
+                            query.value(0).toInt());
         AddLogLine(rules, rules);
     }
     else
@@ -634,7 +627,7 @@ void StatusBox::doScheduleStatus()
     ProgramList schedList;
     schedList.FromScheduler();
 
-    tmpstr = QString("%1 %2").arg(schedList.count()).arg("matching showings");
+    tmpstr = tr("%n matching showing(s)", "", schedList.count());
     AddLogLine(tmpstr, tmpstr);
 
     ProgramList::const_iterator it = schedList.begin();
@@ -1008,16 +1001,11 @@ static const QString uptimeStr(time_t uptime)
     if (days > 0)
     {
         char    buff[6];
-        QString dayLabel;
-
-        if (days == 1)
-            dayLabel = QObject::tr("day");
-        else
-            dayLabel = QObject::tr("days");
+        QString dayLabel = QObject::tr("%n day(s)", "", days);
 
         sprintf(buff, "%d:%02d", hours, min);
 
-        return str + QString("%1 %2, %3").arg(days).arg(dayLabel).arg(buff);
+        return str + QString("%1, %2").arg(dayLabel).arg(buff);
     }
     else
     {
@@ -1300,16 +1288,17 @@ void StatusBox::doAutoExpireList()
         }
     }
 
-    staticInfo = tr("%1 recordings consuming %2 are allowed to expire")
-                    .arg(m_expList.size()).arg(sm_str(totalSize / 1024)) + "\n";
+    staticInfo = tr("%n recording(s) consuming %1 (is) allowed to expire\n", "",
+                     m_expList.size()).arg(sm_str(totalSize / 1024));
 
     if (liveTVCount)
-        staticInfo += tr("%1 of these are LiveTV and consume %2")
-                        .arg(liveTVCount).arg(sm_str(liveTVSize / 1024)) + "\n";
+        staticInfo += tr("%n (is) LiveTV and consume(s) %2\n", "", liveTVCount)
+                            .arg(sm_str(liveTVSize / 1024));
 
     if (deletedGroupCount)
-        staticInfo += tr("%1 of these are Deleted and consume %2")
-                .arg(deletedGroupCount).arg(sm_str(deletedGroupSize / 1024)) + "\n";
+        staticInfo += tr("%1 (is) Deleted and consume(s) %2\n", "",
+                        deletedGroupCount)
+                        .arg(sm_str(deletedGroupSize / 1024));
 
     for (it = m_expList.begin(); it != m_expList.end(); it++)
     {

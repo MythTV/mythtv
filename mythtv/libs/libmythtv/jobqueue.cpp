@@ -1662,7 +1662,7 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
         runningJobTypes.remove(key);
         runningJobIDs.remove(key);
         runningJobDescs.remove(key);
-        runningJobCommands.remove(key);	
+        runningJobCommands.remove(key);
     }
     else if ((jobType == JOB_TRANSCODE) ||
         (runningJobCommands[key] == "mythtranscode"))
@@ -2120,7 +2120,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     jobControlFlags[key] = &controlFlagging;
     controlFlagsLock.unlock();
 
-    QString msg = "Commercial Flagging Starting";
+    QString msg = tr("Commercial Flagging Starting");
     VERBOSE(VB_GENERAL, (LOC + QString("%1 for %2").arg(msg).arg(logDesc)));
     gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
@@ -2145,38 +2145,38 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     breaksFound = myth_system(command);
     int priority = LP_NOTICE;
-    QString comment = "";
+    QString comment;
 
     controlFlagsLock.lock();
 
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (breaksFound == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
-        comment = "unable to find mythcommflag";
+        comment = tr("Unable to find mythcommflag");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
         priority = LP_WARNING;
     }
     else if ((*(jobControlFlags[key]) == JOB_STOP))
     {
-        comment = "aborted by user";
+        comment = tr("Aborted by user");
         ChangeJobStatus(jobID, JOB_ABORTED, comment);
         priority = LP_WARNING;
     }
     else if (breaksFound == COMMFLAG_EXIT_NO_PROGRAM_DATA)
     {
-        comment = "unable to open file or init decoder";
+        comment = tr("Unable to open file or init decoder");
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
         priority = LP_WARNING;
     }
     else if (breaksFound >= COMMFLAG_EXIT_START)
     {
-        comment = QString("failed with exit status %1").arg(breaksFound);
+        comment = tr("Failed with exit status %1").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
         priority = LP_WARNING;
     }
     else
     {
-        comment = QString("%1 commercial break(s)").arg(breaksFound);
+        comment = tr("%n commercial break(s)", "", breaksFound);
         ChangeJobStatus(jobID, JOB_FINISHED, comment);
 
         MythEvent me("RECORDING_LIST_CHANGE");
@@ -2186,7 +2186,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         (new PreviewGenerator(program_info, PreviewGenerator::kLocal))->Run();
     }
 
-    msg = QString("Commercial Flagging %1")
+    msg = tr("Commercial Flagging %1", "Job ID")
         .arg(StatusText(GetJobStatus(jobID)));
 
     if (comment != "")

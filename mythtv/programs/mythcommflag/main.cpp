@@ -758,7 +758,7 @@ int FlagCommercials(
     {
         jobID = -1;
         JobQueue::ChangeJobStatus(fakeJobID, JOB_FINISHED,
-            QObject::tr("Finished, %1 break(s) found.").arg(breaksFound));
+            QObject::tr("Finished, %n break(s) found.", "", breaksFound));
     }
 
     if (!quiet)

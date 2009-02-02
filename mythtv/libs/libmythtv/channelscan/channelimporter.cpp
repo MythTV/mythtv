@@ -117,16 +117,16 @@ void ChannelImporter::InsertChannels(
         if (new_chan)
         {
             QString msg = QObject::tr(
-                "Found %1 new non-conflicting %2 channels.")
-                .arg(new_chan).arg(human_name[chantype]);
+                "Found %n new non-conflicting %1 channel(s).", "", new_chan)
+                .arg(human_name[chantype]);
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, filtered);
         }
         if (old_chan)
         {
-            QString msg = QObject::tr("Found %1 old %2 channels.")
-                .arg(old_chan).arg(human_name[chantype]);;
+            QString msg = QObject::tr("Found %n old %2 channel(s).", "", old_chan)
+                            .arg(human_name[chantype]);;
 
             UpdateAction action = QueryUserUpdate(msg);
             list = UpdateChannels(list, info, action, type, filtered);
@@ -158,22 +158,21 @@ void ChannelImporter::InsertChannels(
         CountChannels(list, info, type, new_chan, old_chan);
         if (new_chan)
         {
-            QString msg = QObject::tr(
-                "Found %1 new conflicting %2 channels.")
-                .arg(new_chan).arg(human_name[chantype]);
+            QString msg = QObject::tr("Found %n new conflicting %2 channel(s).",
+                                        "", new_chan).arg(human_name[chantype]);
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, filtered);
         }
         if (old_chan)
         {
-            QString msg = QObject::tr("Found %1 conflicting old %2 channels.")
-                .arg(old_chan).arg(human_name[chantype]);;
+            QString msg = QObject::tr("Found %n conflicting old %2 channel(s).",
+                                        "", old_chan).arg(human_name[chantype]);
 
             UpdateAction action = QueryUserUpdate(msg);
             list = UpdateChannels(list, info, action, type, filtered);
         }
-    }    
+    }
 
     // if scan was not aborted prematurely
     //   ask user whether to delete all or some of these stale channels
@@ -675,8 +674,8 @@ QString ChannelImporter::GetSummary(
     const ChannelImporterBasicStats      &info,
     const ChannelImporterUniquenessStats &stats)
 {
-    
-    QString msg = QObject::tr("Found %1 transports:\n").arg(transport_count);
+
+    QString msg = QObject::tr("Found %n transport(s):\n", "", transport_count);
     msg += QObject::tr("Channels: FTA Enc Dec\n") +
         QString("ATSC      %1 %2 %3\n")
         .arg(info.atsc_channels[0],3).arg(info.atsc_channels[1],3)
@@ -891,7 +890,7 @@ bool ChannelImporter::QueryUserResolve(
 
     if (use_gui)
     {
-        
+
     }
     else if (is_interactive)
     {
@@ -919,7 +918,7 @@ bool ChannelImporter::QueryUserResolve(
                     "Please enter a non-conflicting channel number:")
                     .ascii() << endl;
             }
-            
+
         }
     }
 

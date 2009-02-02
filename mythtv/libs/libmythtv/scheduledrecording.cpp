@@ -334,12 +334,20 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         seconds = startts.secsTo(endts);
 
         minutes = seconds / 60;
-        progMap["lenmins"] = QString("%1 %2").arg(minutes).arg(QObject::tr("minutes"));
+        progMap["lenmins"] = QObject::tr("%n minute(s)","",minutes);
         hours   = minutes / 60;
         minutes = minutes % 60;
-        length.sprintf("%d:%02d", hours, minutes);
 
-        progMap["lentime"] = length;
+        QString minstring = QObject::tr("%n minute(s)","",minutes);
+
+        if (hours > 0)
+        {
+            progMap["lentime"] = QString("%1 %2")
+                                        .arg(QObject::tr("%n hour(s)","", hours))
+                                        .arg(minstring);
+        }
+        else
+            progMap["lentime"] = minstring;
 
         progMap["timedate"] = startts.date().toString(dateFormat) + ", " +
                               startts.time().toString(timeFormat) + " - " +

@@ -263,9 +263,9 @@ void MythAppearance::updateScreen()
     m_yoffset = m_topleftarrow_y;
     m_topleftarrow->SetPosition(QPoint(m_topleftarrow_x, m_topleftarrow_y));
     m_bottomrightarrow->SetPosition(QPoint(m_bottomrightarrow_x, m_bottomrightarrow_y));
-    m_size->SetText(QString("Size: %1 x %2").arg(m_xsize).arg(m_ysize));
-    m_offsets->SetText(QString("Offset: %1 x %2").arg(m_xoffset).arg(m_yoffset));
-    m_changeamount->SetText(QString("Change amount: %1 pixel(s)").arg(m_change));
+    m_size->SetText(tr("Size: %1 x %2").arg(m_xsize).arg(m_ysize));
+    m_offsets->SetText(tr("Offset: %1 x %2").arg(m_xoffset).arg(m_yoffset));
+    m_changeamount->SetText(tr("Change amount: %n pixel(s)", "", m_change));
 
 }
 
