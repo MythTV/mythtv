@@ -24,5 +24,6 @@ LIBS += -lmythavformat-$$LIBVERSION
 
 using_live: LIBS += -lmythlivemedia-$$LIBVERSION
 using_mheg: LIBS += -lmythfreemheg-$$LIBVERSION
+using_hdhomerun: LIBS += -lmythhdhomerun-$$LIBVERSION
 
 QT += xml sql opengl
