@@ -8,6 +8,7 @@ INCLUDEPATH += $${PREFIX}/include/mythtv/libmythtv
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 using_live: LIBS += -lmythlivemedia-$$LIBVERSION
 using_mheg: LIBS += -lmythfreemheg-$$LIBVERSION
+using_hdhomerun: LIBS += -lmythhdhomerun-$$LIBVERSION
 
 TEMPLATE = lib opengl
 CONFIG += plugin thread
