@@ -1220,6 +1220,92 @@
     </message>
 </context>
 <context>
+    <name>EditPowerSearchPopup</name>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1856"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1900"/>
+        <source>(Any Program Type)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1902"/>
+        <source>Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1904"/>
+        <source>Series</source>
+        <translation type="unfinished">Serije</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1906"/>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1908"/>
+        <source>Sports</source>
+        <translation type="unfinished">Šport</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1914"/>
+        <source>(Any Genre)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1942"/>
+        <source>(Any Channel)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ExitPrompter</name>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="93"/>
+        <source>Do you really want to exit MythTV?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="102"/>
+        <source>No</source>
+        <translation type="unfinished">Ne</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtv-setup/exitprompt.cpp" line="41"/>
+        <source>If this is the master backend server, please run &apos;mythfilldatabase&apos; to populate the database with channel information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtv-setup/exitprompt.cpp" line="50"/>
+        <source>OK</source>
+        <translation type="unfinished">Vredu</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtv-setup/exitprompt.cpp" line="70"/>
+        <source>Do you want to fix these problems?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtv-setup/exitprompt.cpp" line="72"/>
+        <source>Do you want to fix this problem?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtv-setup/exitprompt.cpp" line="82"/>
+        <source>Yes please</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythtv-setup/exitprompt.cpp" line="83"/>
+        <source>No, I know what I am doing</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FirewireDesc</name>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1276"/>
@@ -1256,92 +1342,92 @@
 <context>
     <name>HelpPopup</name>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4442"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4368"/>
         <source>Commercials are flagged</source>
         <translation type="unfinished">Reklame so označene</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4443"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4369"/>
         <source>An editing cutlist is present</source>
         <translation type="unfinished">Obstaja seznam rezov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4444"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4370"/>
         <source>The program is able to auto-expire</source>
         <translation type="unfinished">Program je zmožen avtomatskega odstranjevanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4445"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4371"/>
         <source>Commercials are being flagged</source>
         <translation type="unfinished">Reklame se označujejo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4446"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4372"/>
         <source>A bookmark is set</source>
         <translation type="unfinished">Priljubljene so nastavljene</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4447"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4373"/>
         <source>Recording is in use</source>
         <translation type="unfinished">Posnetek je v uporabi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4448"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4374"/>
         <source>Recording has been transcoded</source>
         <translation type="unfinished">Posnetek je bil dekodiran</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4450"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4376"/>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4451"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4377"/>
         <source>Recording is in Stereo</source>
         <translation type="unfinished">Stereo posnetek</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4452"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4378"/>
         <source>Recording is in Surround Sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4453"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4379"/>
         <source>Recording is in Dolby Surround Sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4455"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4381"/>
         <source>Recording is Closed Captioned</source>
         <translation type="unfinished">Posnetek ima zaklenjen naslov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4456"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4382"/>
         <source>Recording has Subtitles Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4457"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4383"/>
         <source>Recording is Subtitled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4459"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4385"/>
         <source>Recording is in High Definition</source>
         <translation type="unfinished">HD posnetek</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4460"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4386"/>
         <source>Recording is in WideScreen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4462"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4388"/>
         <source>Recording has been watched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4463"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4389"/>
         <source>Recording is preserved</source>
         <translation type="unfinished">Posnetek je ohranjen</translation>
     </message>
@@ -1428,6 +1514,77 @@
         <location filename="../libs/libmythtv/jobqueue.cpp" line="1089"/>
         <source>Undefined</source>
         <translation>Nedefinirano</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/jobqueue.cpp" line="2123"/>
+        <source>Commercial Flagging Starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/jobqueue.cpp" line="2155"/>
+        <source>Unable to find mythcommflag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/jobqueue.cpp" line="2161"/>
+        <source>Aborted by user</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/jobqueue.cpp" line="2167"/>
+        <source>Unable to open file or init decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/jobqueue.cpp" line="2173"/>
+        <source>Failed with exit status %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/jobqueue.cpp" line="2179"/>
+        <source>%n commercial break(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/jobqueue.cpp" line="2190"/>
+        <source>Commercial Flagging %1</source>
+        <comment>Job ID</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KeyGrabPopupBox</name>
+    <message>
+        <location filename="../programs/mythfrontend/keygrabber.cpp" line="48"/>
+        <source>Press A Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/keygrabber.cpp" line="49"/>
+        <source>Waiting for key press</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/keygrabber.cpp" line="52"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/keygrabber.cpp" line="53"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/keygrabber.cpp" line="111"/>
+        <source>Pressed key not recognized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/keygrabber.cpp" line="116"/>
+        <source>Add key &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1541,6 +1698,26 @@
     </message>
 </context>
 <context>
+    <name>MythAppearance</name>
+    <message>
+        <location filename="../programs/mythfrontend/mythappearance.cpp" line="266"/>
+        <source>Size: %1 x %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythappearance.cpp" line="267"/>
+        <source>Offset: %1 x %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/mythappearance.cpp" line="268"/>
+        <source>Change amount: %n pixel(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>MythContext</name>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1369"/>
@@ -1570,6 +1747,104 @@
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1975"/>
         <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="207"/>
+        <source>Modify Action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="220"/>
+        <source>Set Binding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="221"/>
+        <source>Remove Binding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="660"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="285"/>
+        <source>Change View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="246"/>
+        <source>Actions By Context</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="247"/>
+        <source>Contexts By Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="248"/>
+        <source>Keys By Context</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="271"/>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="284"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="296"/>
+        <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="309"/>
+        <source>Save then Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="310"/>
+        <source>Exit without saving changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="609"/>
+        <source>This action is manditory and needs at least one key bound to it. Instead, try rebinding with another key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="656"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="636"/>
+        <source>This key binding conflicts with %1 in the %2 context.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="639"/>
+        <source> Unable to bind key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="641"/>
+        <source> Do you want to bind it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/mythcontrols.cpp" line="661"/>
+        <source>Bind Key</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1687,6 +1962,49 @@ Vračam se na prejšnji menu.</translation>
     </message>
 </context>
 <context>
+    <name>PhrasePopup</name>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1357"/>
+        <source>Select Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1358"/>
+        <source>&lt;New Search&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1359"/>
+        <source>Edit</source>
+        <translation type="unfinished">Uredi</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1363"/>
+        <source>Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1364"/>
+        <source>&lt;New Phrase&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1365"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1381"/>
+        <source>Delete</source>
+        <translation type="unfinished">Odstrani</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1382"/>
+        <source>Record</source>
+        <translation type="unfinished">Snemaj</translation>
+    </message>
+</context>
+<context>
     <name>PlayGroupEditor</name>
     <message>
         <location filename="../libs/libmythtv/playgroup.cpp" line="222"/>
@@ -1732,297 +2050,297 @@ Vračam se na prejšnji menu.</translation>
 <context>
     <name>PlaybackBox</name>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="572"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="496"/>
         <source>There are %1 recordings in this display group</source>
         <translation>V tej skupini je 1% posnetkov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="576"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="500"/>
         <source>There is one recording in this display group</source>
         <translation>V tej skupini je samo en posnetek</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="579"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="503"/>
         <source>There are no recordings in this display group</source>
         <translation>V tej skupini ni posnetkov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="787"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="713"/>
         <source>% used</source>
         <translation>% uporabljenega</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="791"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="717"/>
         <source>, %1 GB free</source>
         <translation>, %1 GB prosto</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1680"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1606"/>
         <source>Recording List Menu</source>
         <translation>Menu seznama zajemov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1701"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1627"/>
         <source>Change Group View</source>
         <translation>Spremeni pogled skupine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1705"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1631"/>
         <source>Change Group Password</source>
         <translation>Spremeni geslo skupine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1903"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1829"/>
         <source>Are you sure you want to delete:</source>
         <translation>Ali ste prepričani, da želite odstraniti:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1909"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1835"/>
         <source>Are you sure you want to stop:</source>
         <translation>Ali ste prepričani, da želite ustaviti:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1939"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1865"/>
         <source>Yes, and allow re-record</source>
         <translation>Da, vendar dopusti ponovna snemanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1951"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1877"/>
         <source>Yes, delete it</source>
         <translation>Da, odstrani</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2526"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2452"/>
         <source>Play</source>
         <translation>Predvajaj</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2542"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2468"/>
         <source>Stop Recording</source>
         <translation>Ustavi snemanje</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2275"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2201"/>
         <source>Change Recording Group</source>
         <translation>Spremeni snemalno skupino</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2323"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2249"/>
         <source>Edit Recording Schedule</source>
         <translation>Spremeni snemalne nastavitve</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2365"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2291"/>
         <source>Stop Transcoding</source>
         <translation>Prenehaj z dekodiranjem</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2368"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2294"/>
         <source>Begin Transcoding</source>
         <translation>Začni z dekodiranjem</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2373"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2299"/>
         <source>Stop Commercial Flagging</source>
         <translation>Ustavi označevanje reklam</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2376"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2302"/>
         <source>Begin Commercial Flagging</source>
         <translation>Začni z označevanjem reklam</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2596"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2522"/>
         <source>Delete</source>
         <translation>Odstrani</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4093"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4019"/>
         <source>Default</source>
         <translation>Privzeto</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2248"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2174"/>
         <source>Play from beginning</source>
         <translation>Predvajaj od začetka</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2247"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2173"/>
         <source>Play from bookmark</source>
         <translation>Predvajaj od zaznamka</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2291"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2217"/>
         <source>Do not preserve this episode</source>
         <translation>Ne ohrani te oddaje</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2294"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2220"/>
         <source>Preserve this episode</source>
         <translation>Ohrani to oddajo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2523"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2449"/>
         <source>Play from...</source>
         <translation>Predvajaj od...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2550"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2476"/>
         <source>Storage Options</source>
         <translation>Nastavitve za shrambo zajema</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2552"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2478"/>
         <source>Recording Options</source>
         <translation>Možnosti snemanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2554"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2480"/>
         <source>Job Options</source>
         <translation>Možnosti opravil</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2062"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1988"/>
         <source>Shuffle Play</source>
         <translation>Mešano predvajanje</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1710"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1636"/>
         <source>Playlist options</source>
         <translation>Možnosti predvajalnega seznama</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1722"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1648"/>
         <source>Add this recording to Playlist</source>
         <translation>Dodaj to snemanje v seznam predvajanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2096"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2022"/>
         <source>There are %1 items in the playlist.</source>
         <translation>V seznamu predvajanja je %1 posnetkov.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2098"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2024"/>
         <source>There is %1 item in the playlist.</source>
         <translation>V seznamu predvajanja je %1 posnetek.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2063"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1989"/>
         <source>Clear Playlist</source>
         <translation>Isprazni seznam predvajanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2068"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1994"/>
         <source>Toggle playlist for this Category/Title</source>
         <translation>Zamenjaj seznam predvajanja s to kategorijo/naslov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2075"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2001"/>
         <source>Toggle playlist for this recording</source>
         <translation>Zamenjaj seznam predvajanja s tem snemanjem</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2530"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2456"/>
         <source>Remove from Playlist</source>
         <translation>Odstrani iz seznama predvajanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2533"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2459"/>
         <source>Add to Playlist</source>
         <translation>Dodaj v seznam predvajanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2424"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2350"/>
         <source>User Job</source>
         <translation>Uporabniško opravilo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2428"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2354"/>
         <source>Stop</source>
         <translation>Ustavi</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2431"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2357"/>
         <source>Begin</source>
         <translation>Začni</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1698"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1624"/>
         <source>Change Group Filter</source>
         <translation>Spremeni sito skupine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1717"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1643"/>
         <source>Add this Group to Playlist</source>
         <translation>Dodaj skupino v seznam predvajanja</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3893"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3819"/>
         <source>item</source>
         <translation>posnetek</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3895"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3821"/>
         <source>items</source>
         <translation>posnetki</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3669"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3595"/>
         <source>Groups</source>
         <translation>Skupine</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3751"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3677"/>
         <source>Categories</source>
         <translation>Kategorije</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2284"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2210"/>
         <source>Disable Auto Expire</source>
         <translation>Onemogoči avtomatsko brisanje</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2287"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2213"/>
         <source>Enable Auto Expire</source>
         <translation>Omogoči avtomatsko brisanje</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2332"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2258"/>
         <source>Change Recording Title</source>
         <translation>Spremeni naslov posnetka</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3888"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3814"/>
         <source>LiveTV</source>
         <translation>ŽivaTV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2278"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2204"/>
         <source>Change Playback Group</source>
         <translation>Spremeni predvajalno skupino</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2594"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2520"/>
         <source>Show Program Details</source>
         <translation>Pokaži podrobnosti o programu</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2458"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2384"/>
         <source>Autodetect</source>
         <translation>Samozaznava</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2460"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2386"/>
         <source>High Quality</source>
         <translation>Visoka kvaliteta</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2462"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2388"/>
         <source>Medium Quality</source>
         <translation>Srednja kvaliteta</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2464"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2390"/>
         <source>Low Quality</source>
         <translation>Nizka kvaliteta</translation>
     </message>
@@ -2032,210 +2350,210 @@ Vračam se na prejšnji menu.</translation>
         <translation>Preglej seznam</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="997"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="923"/>
         <source>There are no recordings in your current view</source>
         <translation>V tem pogledu ni posnetkov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="998"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="924"/>
         <source>There are no recordings available</source>
         <translation>Na voljo ni posnetkov</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2546"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2472"/>
         <source>Mark as Unwatched</source>
         <translation>Označi kot negledan</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2548"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2474"/>
         <source>Mark as Watched</source>
         <translation>Označi kot gledan</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1124"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1050"/>
         <source>_NO_TITLE_</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3740"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3666"/>
         <source>Unknown</source>
         <translation type="unfinished">Neznan</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1727"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1653"/>
         <source>Help (Status Icons)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2085"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2011"/>
         <source>Delete, and allow re-record</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2326"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2252"/>
         <source>Allow this program to re-record</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2561"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2487"/>
         <source>Undelete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2562"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2488"/>
         <source>Delete Forever</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3890"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3816"/>
         <source>Deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="525"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="449"/>
         <source>Password for group &apos;%1&apos;:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="936"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="862"/>
         <source>%1 GB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1906"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1832"/>
         <source>Recording file does not exist.
 Are you sure you want to delete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1955"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1881"/>
         <source>Yes, stop recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1972"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1898"/>
         <source>No, keep it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1976"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1902"/>
         <source>No, continue recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2007"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1933"/>
         <source>Recording Available
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2003"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1929"/>
         <source>This recording is currently in use by:</source>
         <translation type="unfinished">Ta posnetek je trenutno uporablja:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2009"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1935"/>
         <source>This recording is currently Available</source>
         <translation type="unfinished">Ta posnetek je na voljo</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2028"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1954"/>
         <source>Recording Unavailable
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2015"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1941"/>
         <source>This recording is currently being deleted and is unavailable</source>
         <translation type="unfinished">Ta posnetek ni na voljo, ker se pravkar odstranjuje</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2020"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1946"/>
         <source>The file for this recording can not be found</source>
         <translation type="unfinished">Ne najdem datoteka za ta posnetek</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2025"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1951"/>
         <source>The file for this recording is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2030"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1956"/>
         <source>This recording is not yet available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2045"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1971"/>
         <source>Actions affect all items in the playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2071"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1997"/>
         <source>Toggle playlist for this Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2226"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2152"/>
         <source>Play options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2256"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2182"/>
         <source>Storage options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2304"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2230"/>
         <source>Scheduling options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2338"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2264"/>
         <source>Job options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2441"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2367"/>
         <source>Transcoding profiles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2512"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2438"/>
         <source>Start As PIP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2513"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2439"/>
         <source>Start As PBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2576"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2502"/>
         <source>Recording file can not be found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3761"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3687"/>
         <source>Change Filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3875"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3801"/>
         <source>Add New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3905"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3831"/>
         <source>Select Recording Group</source>
         <translation type="unfinished">Izberi snemalno skupino</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3955"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3881"/>
         <source>Select Playback Group</source>
         <translation type="unfinished">Izberi predvajalno skupino</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4036"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3962"/>
         <source>New Recording Group</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2316,6 +2634,34 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="916"/>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PowerSearchPopup</name>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1642"/>
+        <source>Select Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1643"/>
+        <source>&lt;New Search&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1658"/>
+        <source>Edit</source>
+        <translation type="unfinished">Uredi</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1659"/>
+        <source>Delete</source>
+        <translation type="unfinished">Odstrani</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1660"/>
+        <source>Record</source>
+        <translation type="unfinished">Snemaj</translation>
     </message>
 </context>
 <context>
@@ -2405,6 +2751,457 @@ Are you sure you want to delete:</source>
         <location filename="../libs/libmythtv/progfind.cpp" line="585"/>
         <source>       !! No Programs !!</source>
         <translation>       !! Ni programov !!</translation>
+    </message>
+</context>
+<context>
+    <name>ProgLister</name>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="110"/>
+        <source>Program Listings</source>
+        <translation type="unfinished">Televizijski program</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="111"/>
+        <source>New Title Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="112"/>
+        <source>Title Search</source>
+        <translation type="unfinished">Iskanje po naslovu</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="113"/>
+        <source>Keyword Search</source>
+        <translation type="unfinished">Iskanje po ključni besedi</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="114"/>
+        <source>People Search</source>
+        <translation type="unfinished">Iskanje po igralcih</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="115"/>
+        <source>Stored Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="117"/>
+        <source>Power Search</source>
+        <translation type="unfinished">Napredno iskanje</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="118"/>
+        <source>Rule Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="119"/>
+        <source>Category Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="120"/>
+        <source>Channel Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="121"/>
+        <source>Movie Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="122"/>
+        <source>Time Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="123"/>
+        <source>Unknown Search</source>
+        <translation type="unfinished">Splošno iskanje</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="321"/>
+        <source>Select Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="322"/>
+        <source>Select Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="323"/>
+        <source>Select Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="324"/>
+        <source>Select List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="326"/>
+        <source>Select a search stored from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="327"/>
+        <source>Custom Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="328"/>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="556"/>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="780"/>
+        <source>All</source>
+        <translation type="unfinished">Vsi</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="765"/>
+        <source>Premieres</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="768"/>
+        <source>Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="771"/>
+        <source>Series</source>
+        <translation type="unfinished">Serije</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="774"/>
+        <source>Specials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="782"/>
+        <source>Unrated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="800"/>
+        <source>At least ***/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="802"/>
+        <source>At least ***</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="804"/>
+        <source>At least **/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="806"/>
+        <source>At least **</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="808"/>
+        <source>At least */</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="810"/>
+        <source>At least *</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="812"/>
+        <source>At least /</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="825"/>
+        <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ProgListerQt</name>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="290"/>
+        <source>Program Listings</source>
+        <translation type="unfinished">Televizijski program</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="291"/>
+        <source>New Title Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="292"/>
+        <source>Title Search</source>
+        <translation type="unfinished">Iskanje po naslovu</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="293"/>
+        <source>Keyword Search</source>
+        <translation type="unfinished">Iskanje po ključni besedi</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="294"/>
+        <source>People Search</source>
+        <translation type="unfinished">Iskanje po igralcih</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="295"/>
+        <source>Stored Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="297"/>
+        <source>Power Search</source>
+        <translation type="unfinished">Napredno iskanje</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="298"/>
+        <source>Rule Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="299"/>
+        <source>Category Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="300"/>
+        <source>Channel Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="301"/>
+        <source>Movie Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="302"/>
+        <source>Time Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="303"/>
+        <source>Unknown Search</source>
+        <translation type="unfinished">Splošno iskanje</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="704"/>
+        <source>Select Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="705"/>
+        <source>Select Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="706"/>
+        <source>Select Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="707"/>
+        <source>Select List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="709"/>
+        <source>Select a search stored from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="710"/>
+        <source>Custom Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="711"/>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="724"/>
+        <source>0 .. 9 moves to Nx10 percent in list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="744"/>
+        <source>Select Phrase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="747"/>
+        <source>&lt;New Phrase&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1034"/>
+        <source>OK</source>
+        <translation type="unfinished">Vredu</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="838"/>
+        <source>Delete</source>
+        <translation type="unfinished">Odstrani</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="842"/>
+        <source>Record</source>
+        <translation type="unfinished">Snemaj</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="820"/>
+        <source>Select Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="823"/>
+        <source>&lt;New Search&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="834"/>
+        <source>Edit</source>
+        <translation type="unfinished">Uredi</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="888"/>
+        <source>Select Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="951"/>
+        <source>Edit Power Search Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="953"/>
+        <source>Optional title phrase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="957"/>
+        <source>Optional subtitle phrase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="961"/>
+        <source>Optional description phrase:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="966"/>
+        <source>(Any Program Type)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1387"/>
+        <source>Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1390"/>
+        <source>Series</source>
+        <translation type="unfinished">Serije</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="973"/>
+        <source>Show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="975"/>
+        <source>Sports</source>
+        <translation type="unfinished">Šport</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="981"/>
+        <source>(Any Genre)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1007"/>
+        <source>(Any Station)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1189"/>
+        <source>Delete &apos;%1&apos; %2 rule?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1399"/>
+        <source>All</source>
+        <translation type="unfinished">Vsi</translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1384"/>
+        <source>Premieres</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1393"/>
+        <source>Specials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1401"/>
+        <source>Unrated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1419"/>
+        <source>At least ***/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1421"/>
+        <source>At least ***</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1423"/>
+        <source>At least **/</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1425"/>
+        <source>At least **</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1427"/>
+        <source>At least */</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1429"/>
+        <source>At least *</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1431"/>
+        <source>At least /</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/proglist_qt.cpp" line="1444"/>
+        <source>Power Recording Rule</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2790,32 +3587,32 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5289"/>
         <source>1 second</source>
-        <translation>1 sekunda</translation>
+        <translation type="obsolete">1 sekunda</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5290"/>
         <source>5 seconds</source>
-        <translation>5 sekund</translation>
+        <translation type="obsolete">5 sekund</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5291"/>
         <source>20 seconds</source>
-        <translation>20 sekund</translation>
+        <translation type="obsolete">20 sekund</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5292"/>
         <source>1 minute</source>
-        <translation>1 minuta</translation>
+        <translation type="obsolete">1 minuta</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5293"/>
         <source>5 minutes</source>
-        <translation>5 minut</translation>
+        <translation type="obsolete">5 minut</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5294"/>
         <source>10 minutes</source>
-        <translation>10 minut</translation>
+        <translation type="obsolete">10 minut</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5295"/>
@@ -2911,170 +3708,170 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/scheduledrecording.cpp" line="337"/>
         <source>minutes</source>
-        <translation>minut</translation>
+        <translation type="obsolete">minut</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3414"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3423"/>
         <source>Repeat</source>
         <translation>Ponovi</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/progdetails.cpp" line="312"/>
         <source>stars</source>
-        <translation>zvezdice</translation>
+        <translation type="obsolete">zvezdice</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3311"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3320"/>
         <source>Override Recording</source>
         <translation>Prepiši snemanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3382"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3391"/>
         <source>Not Recording</source>
         <translation>Ne snemam</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3390"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3399"/>
         <source>Recorded</source>
         <translation>Posneto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3392"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3401"/>
         <source>Recording</source>
         <translation>Snemanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3394"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3403"/>
         <source>Will Record</source>
         <translation>Se bo posnela</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3396"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3405"/>
         <source>Don&apos;t Record</source>
         <translation>Ne posnami</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3402"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3411"/>
         <source>Earlier Showing</source>
         <translation>Prejšnje predvajanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3404"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3413"/>
         <source>Max Recordings</source>
         <translation>Največje število posnetkov</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3406"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3415"/>
         <source>Manual Cancel</source>
         <translation>Ročni preklic</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3410"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3419"/>
         <source>Conflicting</source>
         <translation>V konfliktu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3412"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3421"/>
         <source>Later Showing</source>
         <translation>Kasnejše predvajanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3418"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3427"/>
         <source>Low Disk Space</source>
         <translation>Malo prostora na disku</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3420"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3429"/>
         <source>Tuner Busy</source>
         <translation>Kartica zaposlena</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="941"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="934"/>
         <source>Unknown</source>
         <translation>Neznan</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3452"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3461"/>
         <source>This showing will be recorded.</source>
         <translation>To predvajanje se bo posnelo.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3455"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3464"/>
         <source>This showing is being recorded.</source>
         <translation>To predvajanje se snema.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3458"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3467"/>
         <source>This showing was recorded.</source>
         <translation>To predvajanje je bilo posneto.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3482"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3491"/>
         <source>The status of this showing is unknown.</source>
         <translation>Neznan status predvajanja.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3489"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3498"/>
         <source>This showing will not be recorded because </source>
         <translation>To predvajanje se ne bo posnelo, ker </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3491"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3500"/>
         <source>This showing was not recorded because </source>
         <translation>To predvajanje ni bilo posneto, ker </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3496"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3505"/>
         <source>it was manually set to not record.</source>
         <translation>je bilo ročno nastavljeno, naj se ne posname.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3501"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3510"/>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
         <translation>se je ta oddaja že posnela. Glede na snemalna pravila.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3506"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3515"/>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
         <translation>se je ta oddaja že posnela in je še vedno na voljo v seznamu posnetkov.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3510"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3519"/>
         <source>this episode will be recorded at an earlier time instead.</source>
         <translation>se bo namesto tega posnela prej.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3525"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3534"/>
         <source>this episode is a repeat.</source>
         <translation>je ta oddajo ponovitev.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3514"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3523"/>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>je bilo posnetih že preveč predvajanj tega programa.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3518"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3527"/>
         <source>another program with a higher priority will be recorded.</source>
         <translation>se bo posnel drugi program z višjo prioriteto.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3522"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3531"/>
         <source>this episode will be recorded at a later time.</source>
         <translation>se bo ta oddaja posnela kasneje.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3473"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3482"/>
         <source>there wasn&apos;t enough disk space available.</source>
         <translation>ni bilo na voljo dovolj prostega mesta na disku.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3476"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3485"/>
         <source>the tuner card was already being used.</source>
         <translation>je bila kartica že v uporabi.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3545"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3554"/>
         <source>you should never see this.</source>
         <translation>tega naj ne bi videli NIKOLI.</translation>
     </message>
@@ -3084,54 +3881,54 @@ Are you sure you want to delete:</source>
         <translation>Vredu</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4182"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4191"/>
         <source>Reactivate</source>
         <translation>Reaktivacija</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4219"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4228"/>
         <source>Don&apos;t record</source>
         <translation>Ne posnami</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4231"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4240"/>
         <source>Never record</source>
         <translation>Nikoli ne posnemi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4236"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4245"/>
         <source>Edit Options</source>
         <translation>Urejanje možnosti</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4242"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4251"/>
         <source>Add Override</source>
         <translation>Dodaj prepis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4249"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4258"/>
         <source>Edit Override</source>
         <translation>Uredi prepis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4252"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4261"/>
         <source>Clear Override</source>
         <translation>Odstrani prepis</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4151"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4160"/>
         <source> The following programs will be recorded instead:
 </source>
         <translation> Namesto tega bodo posneti naslednji programi:
 </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4200"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4209"/>
         <source>Record anyway</source>
         <translation>Vseeno posnami</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4204"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4213"/>
         <source>Forget Previous</source>
         <translation>Zanemari prejšnjo</translation>
     </message>
@@ -3896,7 +4693,7 @@ Are you sure you want to delete:</source>
         <translation>Privzeti vhod</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="559"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="553"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
@@ -5223,12 +6020,12 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1013"/>
         <source>days</source>
-        <translation>dni</translation>
+        <translation type="obsolete">dni</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1011"/>
         <source>day</source>
-        <translation>dan</translation>
+        <translation type="obsolete">dan</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="19"/>
@@ -5468,7 +6265,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmythtv/progdetails.cpp" line="314"/>
         <source>star</source>
-        <translation>zvezdica</translation>
+        <translation type="obsolete">zvezdica</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/progdetails.cpp" line="292"/>
@@ -5476,7 +6273,7 @@ Are you sure you want to delete:</source>
         <translation>Naslov</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="362"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="356"/>
         <source>Description</source>
         <translation>Opis</translation>
     </message>
@@ -5486,12 +6283,12 @@ Are you sure you want to delete:</source>
         <translation>Del %1 od %2, </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="336"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="330"/>
         <source>HDTV</source>
         <translation>HDTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="347"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="341"/>
         <source>Subtitled</source>
         <translation>Podnaslov</translation>
     </message>
@@ -5501,23 +6298,23 @@ Are you sure you want to delete:</source>
         <translation>Stereo</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="382"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="376"/>
         <source>Category</source>
         <translation>Kategorija</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="393"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="387"/>
         <source>Type</source>
         <comment>category_type</comment>
         <translation>Tip</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="395"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="389"/>
         <source>Episode Number</source>
         <translation>Številka oddaje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="402"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="396"/>
         <source>Original Airdate</source>
         <translation>Čas predvajanja</translation>
     </message>
@@ -5527,27 +6324,27 @@ Are you sure you want to delete:</source>
         <translation>ID programa</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="493"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="487"/>
         <source>Actors</source>
         <translation>Igralci</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="498"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="492"/>
         <source>Guest Star</source>
         <translation>Igra še</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="494"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="488"/>
         <source>Director</source>
         <translation>Režiser</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="678"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="672"/>
         <source>Recording Group</source>
         <translation>Snemalna skupina</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4015"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4024"/>
         <source>Stop recording</source>
         <translation>Ustavi snemanje</translation>
     </message>
@@ -5682,7 +6479,7 @@ Are you sure you want to delete:</source>
         <translation>Mac OS X video nastavitve</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="993"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="989"/>
         <source>Uptime</source>
         <translation>Čas delovanja</translation>
     </message>
@@ -5782,7 +6579,7 @@ Are you sure you want to delete:</source>
         <translation>Če omogočeno, bo Quickime popravil svetilnost gledanega videa.  Če izklopite boste prihranili nekaj procesorske moči.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="674"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="668"/>
         <source>Recording Host</source>
         <translation>Gostitelj, na katerem so posnetki</translation>
     </message>
@@ -5797,67 +6594,67 @@ Are you sure you want to delete:</source>
         <translation>Če nastavljeno bodo informacije za vodiča vzete od vodiča &quot;po zraku&quot;.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3294"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3303"/>
         <source>Single Record</source>
         <translation>Enojno snemanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3296"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3305"/>
         <source>Record Daily</source>
         <translation>Dnevno snemanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3298"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3307"/>
         <source>Record Weekly</source>
         <translation>Tedensko snemanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3300"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3309"/>
         <source>Channel Record</source>
         <translation>Kanalno snemanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3302"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3311"/>
         <source>Record All</source>
         <translation>Snemaj vse</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3304"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3313"/>
         <source>Find One</source>
         <translation>Najdi eno</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3306"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3315"/>
         <source>Find Daily</source>
         <translation>Najdi dnevno</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3308"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3317"/>
         <source>Find Weekly</source>
         <translation>Najdi tedensko</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3398"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3407"/>
         <source>Previously Recorded</source>
         <translation>Že posneto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3400"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3409"/>
         <source>Currently Recorded</source>
         <translation>Trenutno snemanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3416"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3425"/>
         <source>Inactive</source>
         <translation>Neaktivno</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3528"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3537"/>
         <source>this recording rule is inactive.</source>
         <translation>ta plan snemanja je neaktiven.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="639"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="633"/>
         <source>Find ID</source>
         <translation>Najdi ID</translation>
     </message>
@@ -5947,127 +6744,127 @@ Are you sure you want to delete:</source>
         <translation>Izbor, kako se naj razvrstijo oddaje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3262"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3271"/>
         <source>S</source>
         <comment>RecTypeChar kSingleRecord</comment>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3264"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3273"/>
         <source>T</source>
         <comment>RecTypeChar kTimeslotRecord</comment>
         <translation>T</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3266"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3275"/>
         <source>W</source>
         <comment>RecTypeChar kWeekslotRecord</comment>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3268"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3277"/>
         <source>C</source>
         <comment>RecTypeChar kChannelRecord</comment>
         <translation>C</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3270"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3279"/>
         <source>A</source>
         <comment>RecTypeChar kAllRecord</comment>
         <translation>A</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3272"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3281"/>
         <source>F</source>
         <comment>RecTypeChar kFindOneRecord</comment>
         <translation>F</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3274"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3283"/>
         <source>d</source>
         <comment>RecTypeChar kFindDailyRecord</comment>
         <translation>d</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3276"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3285"/>
         <source>w</source>
         <comment>RecTypeChar kFindWeeklyRecord</comment>
         <translation>w</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3279"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3288"/>
         <source>O</source>
         <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
         <translation>O</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3327"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3336"/>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
         <translation>R</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3336"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3345"/>
         <source>X</source>
         <comment>RecStatusChar rsDontRecord</comment>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3338"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3347"/>
         <source>P</source>
         <comment>RecStatusChar rsPreviousRecording</comment>
         <translation>P</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3340"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3349"/>
         <source>R</source>
         <comment>RecStatusChar rsCurrentRecording</comment>
         <translation>R</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3354"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3363"/>
         <source>r</source>
         <comment>RecStatusChar rsRepeat</comment>
         <translation>r</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3342"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3351"/>
         <source>E</source>
         <comment>RecStatusChar rsEarlierShowing</comment>
         <translation>E</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3344"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3353"/>
         <source>T</source>
         <comment>RecStatusChar rsTooManyRecordings</comment>
         <translation>T</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3350"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3359"/>
         <source>C</source>
         <comment>RecStatusChar rsConflict</comment>
         <translation>C</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3352"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3361"/>
         <source>L</source>
         <comment>RecStatusChar rsLaterShowing</comment>
         <translation>L</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3358"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3367"/>
         <source>K</source>
         <comment>RecStatusChar rsLowDiskSpace</comment>
         <translation>K</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3360"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3369"/>
         <source>B</source>
         <comment>RecStatusChar rsTunerBusy</comment>
         <translation>B</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3356"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3365"/>
         <source>x</source>
         <comment>RecStatusChar rsInactive</comment>
         <translation>x</translation>
@@ -6412,19 +7209,19 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Moč signala</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3346"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3355"/>
         <source>c</source>
         <comment>RecStatusChar rsCancelled</comment>
         <translation>c</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3364"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3373"/>
         <source>N</source>
         <comment>RecStatusChar rsNotListed</comment>
         <translation>N</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3424"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3433"/>
         <source>Not Listed</source>
         <translation>Ni na seznamu</translation>
     </message>
@@ -6694,7 +7491,7 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Splošno (Napredno)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="946"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="939"/>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
         <translation>Skupaj %1, uporabljenega %2, prostega %3 (ali %4%).</translation>
     </message>
@@ -6709,23 +7506,23 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Dovoli opravila dekodiranja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="627"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="634"/>
         <source>Re-Record</source>
         <translation>Ponovno posnami</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3366"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3375"/>
         <source>V</source>
         <comment>RecStatusChar rsNeverRecord</comment>
         <translation>V</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3426"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3435"/>
         <source>Never Record</source>
         <translation>Nikoli ne snemaj</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3535"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3544"/>
         <source>it was marked to never be recorded.</source>
         <translation>je bila označena, naj se nikoli ne posname.</translation>
     </message>
@@ -6795,44 +7592,44 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Kanal</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3325"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3334"/>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
         <translation>A</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3348"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3357"/>
         <source>M</source>
         <comment>RecStatusChar rsMissed</comment>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3388"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3397"/>
         <source>Aborted</source>
         <translation>Preklicano</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3408"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3417"/>
         <source>Missed</source>
         <translation>Zgrešen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3462"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3471"/>
         <source>This showing was recorded but was aborted before recording was completed.</source>
         <translation>Ta oddaja se je snemala, a je bilo snemanje preklicano pred koncem.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3466"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3475"/>
         <source>This showing was not recorded because it was scheduled after it would have ended.</source>
         <translation>Ta oddaja se ni posnela, ker je bil začetek snemanje nastavljen po koncu predvajanja oddaje.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3470"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3479"/>
         <source>This showing was not recorded because it was manually cancelled.</source>
         <translation>Ta oddaja se ni posnela, ker je bilo snemanje ročno preklicano.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4067"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4076"/>
         <source>Change Ending Time</source>
         <translation>Spremeni končni čas</translation>
     </message>
@@ -7397,22 +8194,22 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>konec</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="2280"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="2287"/>
         <source>Playing</source>
         <translation>Predvajanje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="2284"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="2291"/>
         <source>Commercial Flagging</source>
         <translation>Označevanje reklam</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="2286"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="2293"/>
         <source>Transcoding</source>
         <translation>Dekodiranje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="2288"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="2295"/>
         <source>PIP</source>
         <translation>PIP</translation>
     </message>
@@ -7462,7 +8259,7 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Začetna hitrost predvajanja s spremenjenim zvokom.  Za normalno hitrost uporabite 100, 50 za polovično in 200 za dvojno.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="680"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="674"/>
         <source>Playback Group</source>
         <translation>Predvajalna skupina</translation>
     </message>
@@ -7492,67 +8289,67 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Izgovorjava naslovov</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="352"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="346"/>
         <source>Unidentified Episode</source>
         <translation>Neznane oddaje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="495"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="489"/>
         <source>Producer</source>
         <translation>Producent</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="496"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="490"/>
         <source>Executive Producer</source>
         <translation>Glavni producent</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="497"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="491"/>
         <source>Writer</source>
         <translation>Scenarist</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="499"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="493"/>
         <source>Host</source>
         <translation>Gostitelj</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="500"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="494"/>
         <source>Adapter</source>
         <translation>Prilagodil</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="501"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="495"/>
         <source>Presenter</source>
         <translation>Izdajatelj</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="502"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="496"/>
         <source>Commentator</source>
         <translation>Komentator</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="503"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="497"/>
         <source>Guest</source>
         <translation>Gost</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="624"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="618"/>
         <source>Recording Rule</source>
         <translation>Snemalno pravilo</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="630"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="624"/>
         <source>Search Phrase</source>
         <translation>Iskana fraza</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="676"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="670"/>
         <source>Recorded File Size</source>
         <translation>Velikost datoteke posnetka</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="677"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="671"/>
         <source>Recording Profile</source>
         <translation>Snemalni profil</translation>
     </message>
@@ -7632,24 +8429,24 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Zagon mythfilldatabasea ob času, ki ga predvideva grabber.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="962"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="955"/>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>, vaša ocena %1 pri %2 Kb/sek</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="979"/>
         <source>%1 hours left</source>
-        <translation>Preostanek %1 ur</translation>
+        <translation type="obsolete">Preostanek %1 ur</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="982"/>
         <source>%1 hours and %2 minutes left</source>
-        <translation>Preostanek %1 ur in %2 minut</translation>
+        <translation type="obsolete">Preostanek %1 ur in %2 minut</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="984"/>
         <source>%1 minutes left</source>
-        <translation>Preostanek %1 minut</translation>
+        <translation type="obsolete">Preostanek %1 minut</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="51"/>
@@ -7807,23 +8604,23 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Program uporabljen za izpuščanje reklam v posnetkih. Če pustite prazno, bo uporabljen privzeti, to je &apos;mythcommflag&apos;.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3368"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3377"/>
         <source>F</source>
         <comment>RecStatusChar rsOffLine</comment>
         <translation>F</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3428"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3437"/>
         <source>Recorder Off-Line</source>
         <translation>Snemalnik izklopljen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3538"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3547"/>
         <source>the backend recorder is off-line.</source>
         <translation>Backend snemalnik ni prižgan.</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="343"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="337"/>
         <source>CC</source>
         <comment>Closed Captioned</comment>
         <translation>CC</translation>
@@ -8943,69 +9740,69 @@ Frekvenca kanala v</translation>
         <translation>Skupina</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3362"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3371"/>
         <source>f</source>
         <comment>RecStatusChar rsFailed</comment>
         <translation>f</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3370"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3379"/>
         <source>O</source>
         <comment>RecStatusChar rsOtherShowing</comment>
         <translation>O</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3422"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3431"/>
         <source>Recorder Failed</source>
         <translation>Napaka snemalnika</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3430"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3439"/>
         <source>Other Showing</source>
         <translation>Ostale oddaje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="625"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="619"/>
         <source>Last Recorded</source>
         <translation>Zadnje posneto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="626"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="620"/>
         <source>Next Recording</source>
         <translation>Naslednji posnetek</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="628"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="622"/>
         <source>Watch List Score</source>
         <translation>Preglej seznam ocen</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="603"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="597"/>
         <source>Auto-expire off</source>
         <translation>AvtoBrisanje izklopljeno</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="606"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="600"/>
         <source>Marked as &apos;watched&apos;</source>
         <translation>Označeno kot &apos;gledano&apos;</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="609"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="603"/>
         <source>Not the earliest episode</source>
         <translation>Ni najprejšnja oddaja</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="612"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="606"/>
         <source>Recently deleted episode</source>
         <translation>Pred kratkim odstranjene oddaje</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="629"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="623"/>
         <source>Watch List Status</source>
         <translation>Preglej status</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="679"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="673"/>
         <source>Storage Group</source>
         <translation>Skupina za shrambo</translation>
     </message>
@@ -9505,42 +10302,42 @@ Frekvenca kanala v</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3479"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3488"/>
         <source>the recorder failed to record.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3532"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3541"/>
         <source>this rule does not match any showings in the current program listings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="3542"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="3551"/>
         <source>this episode will be recorded on a different channel in this time slot.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="323"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="317"/>
         <source>Mono</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="327"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="321"/>
         <source>Surround Sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="329"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="323"/>
         <source>Dolby Sound</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="331"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="325"/>
         <source>Audio for Hearing Impaired</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="333"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="327"/>
         <source>Audio for Visually Impaired</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9550,32 +10347,27 @@ Frekvenca kanala v</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="340"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="334"/>
         <source>AVC/H.264</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="345"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="339"/>
         <source>Subtitles Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="349"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="343"/>
         <source>Deaf Signing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="627"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="621"/>
         <source>Average Time Shift</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="591"/>
-        <source>hours</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/progdetails.cpp" line="675"/>
+        <location filename="../libs/libmythtv/progdetails.cpp" line="669"/>
         <source>Recorded File Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11297,14 +12089,14 @@ name can not be blank.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="398"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="375"/>
         <source>Tuner %1 is recording:
 </source>
         <translation type="unfinished">Kartica %1 snema:
 </translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="409"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="386"/>
         <source>Tuner %1 is not recording</source>
         <translation type="unfinished">Kartica %1 ne snema</translation>
     </message>
@@ -11417,7 +12209,7 @@ You may have to use the eject button under its tray.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="843"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="842"/>
         <source>Channel Importer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11427,85 +12219,59 @@ You may have to use the eject button under its tray.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="121"/>
-        <source>Found %1 new non-conflicting %2 channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="129"/>
-        <source>Found %1 old %2 channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="163"/>
-        <source>Found %1 new conflicting %2 channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="171"/>
-        <source>Found %1 conflicting old %2 channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="679"/>
-        <source>Found %1 transports:
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="681"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="680"/>
         <source>Channels: FTA Enc Dec
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="695"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="694"/>
         <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="698"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="697"/>
         <source>Max atsc major count: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="778"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="777"/>
         <source>Insert all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="779"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="778"/>
         <source>Insert manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="860"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="859"/>
         <source>Ignore all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="858"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="857"/>
         <source>Update all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="859"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="858"/>
         <source>Update manually</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="877"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="876"/>
         <source>Please enter either 1, 2, or 3:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="890"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="889"/>
         <source>This channel was found to be in conflict with other channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="920"/>
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="919"/>
         <source>Please enter a non-conflicting channel number:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11767,203 +12533,196 @@ You may have to use the eject button under its tray.</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/programinfo.cpp" line="602"/>
-        <source>minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../libs/libmythtv/programinfo.cpp" line="606"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="971"/>
         <source>%n hour(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/programinfo.cpp" line="607"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="972"/>
         <source>%n minute(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../libs/libmythtv/programinfo.cpp" line="690"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="697"/>
         <source>%n star(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4308"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4317"/>
         <source>Default</source>
         <comment>Recording Profile Default</comment>
         <translation type="unfinished">Privzeto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4309"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4318"/>
         <source>High Quality</source>
         <comment>Recording Profile High Quality</comment>
         <translation type="unfinished">Visoka kvaliteta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4310"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4319"/>
         <source>Live TV</source>
         <comment>Recording Profile Live TV</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4311"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4320"/>
         <source>Low Quality</source>
         <comment>Recording Profile Low Quality</comment>
         <translation type="unfinished">Nizka kvaliteta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4312"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4321"/>
         <source>Medium Quality</source>
         <comment>Recording Profile Medium Quality</comment>
         <translation type="unfinished">Srednja kvaliteta</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4313"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4322"/>
         <source>MPEG2</source>
         <comment>Recording Profile MPEG2</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4313"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4322"/>
         <source>RTjpeg/MPEG4</source>
         <comment>Recording Profile RTjpeg/MPEG4</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4319"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4328"/>
         <source>CRC IP Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4321"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4330"/>
         <source>DBOX2 Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4323"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4332"/>
         <source>FireWire Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4325"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4334"/>
         <source>Freebox Input</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4327"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4336"/>
         <source>Hardware DVB Encoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4329"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4338"/>
         <source>Hardware HDTV</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4331"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4340"/>
         <source>Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4333"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4342"/>
         <source>HD-PVR Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4335"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4344"/>
         <source>HDHomeRun Recorders</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4337"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4346"/>
         <source>MPEG-2 Encoders (PVR-x50, PVR-500)</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4339"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4348"/>
         <source>Software Encoders (v4l based)</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4341"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4350"/>
         <source>Transcoders</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished">Pretvorniki</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4342"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4351"/>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
         <comment>Recording Profile Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4346"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4355"/>
         <source>All Programs</source>
         <comment>Recording Group All Programs</comment>
         <translation type="unfinished">Vsi programi</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4347"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4356"/>
         <source>LiveTV</source>
         <comment>Recording Group LiveTV</comment>
         <translation type="unfinished">ŽivaTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4348"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4357"/>
         <source>Default</source>
         <comment>Recording Group Default</comment>
         <translation type="unfinished">Privzeto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4348"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4357"/>
         <source>Deleted</source>
         <comment>Recording Group Deleted</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4352"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4361"/>
         <source>Default</source>
         <comment>Storage Group Name</comment>
         <translation type="unfinished">Privzeto</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4353"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4362"/>
         <source>LiveTV</source>
         <comment>Storage Group Name</comment>
         <translation type="unfinished">ŽivaTV</translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4354"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4363"/>
         <source>Thumbnails</source>
         <comment>Storage Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4354"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4363"/>
         <source>DB Backups</source>
         <comment>Storage Group Name</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/programinfo.cpp" line="4357"/>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="4366"/>
         <source>Default</source>
         <comment>Playback Group Name</comment>
         <translation type="unfinished">Privzeto</translation>
@@ -12219,11 +12978,6 @@ Do you wish to continue watching?</source>
         <location filename="../programs/mythcommflag/main.cpp" line="409"/>
         <source>Running</source>
         <translation type="unfinished">Teče</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythcommflag/main.cpp" line="761"/>
-        <source>Finished, %1 break(s) found.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../programs/mythfilldatabase/main.cpp" line="578"/>
@@ -12540,6 +13294,182 @@ Do you wish to continue watching?</source>
         <source>MythTV Setup</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5291"/>
+        <source>%n second(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="120"/>
+        <source>Found %n new non-conflicting %1 channel(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="128"/>
+        <source>Found %n old %2 channel(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="162"/>
+        <source>Found %n new conflicting %2 channel(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="170"/>
+        <source>Found %n conflicting old %2 channel(s).</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="678"/>
+        <source>Found %n transport(s):
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/playercontext.cpp" line="789"/>
+        <source>Play</source>
+        <translation type="unfinished">Predvajaj</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/progdetails.cpp" line="311"/>
+        <source>%n star(s), </source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/progdetails.cpp" line="585"/>
+        <source>hour(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/programinfo.cpp" line="2297"/>
+        <source>PBP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/xmltvconfig.cpp" line="40"/>
+        <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/xmltvconfig.cpp" line="43"/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythtv/xmltvconfig.cpp" line="47"/>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythui/mythuiutils.cpp" line="8"/>
+        <source>Warning: container &apos;%1&apos; is missing child &apos;%2&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythui/mythuiutils.cpp" line="15"/>
+        <source>Warning: no valid container to search for child &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythui/mythuiutils.cpp" line="23"/>
+        <source>Error: container &apos;%1&apos; is missing child &apos;%2&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../libs/libmythui/mythuiutils.cpp" line="30"/>
+        <source>Error: no valid container to search for child &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythbackend/httpstatus.cpp" line="849"/>
+        <source> %n day(s),</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythbackend/httpstatus.cpp" line="850"/>
+        <source> %n hour(s) and</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythbackend/httpstatus.cpp" line="851"/>
+        <source> %n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../programs/mythbackend/httpstatus.cpp" line="854"/>
+        <source>within one minute</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythbackend/httpstatus.cpp" line="857"/>
+        <source>soon</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythcommflag/main.cpp" line="761"/>
+        <source>Finished, %n break(s) found.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="104"/>
+        <source>Yes, Exit now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="106"/>
+        <source>Yes, Exit and Reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/exitprompt.cpp" line="108"/>
+        <source>Yes, Exit and Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="973"/>
+        <source>%1 remaining</source>
+        <comment>time</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="977"/>
+        <source>%1 and %2 remaining</source>
+        <comment>time</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1004"/>
+        <source>%n day(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -12849,7 +13779,7 @@ Do you wish to continue watching?</source>
 <context>
     <name>ScheduledRecording</name>
     <message>
-        <location filename="../libs/libmythtv/scheduledrecording.cpp" line="366"/>
+        <location filename="../libs/libmythtv/scheduledrecording.cpp" line="374"/>
         <source>or later</source>
         <translation>ali pozneje</translation>
     </message>
@@ -12962,32 +13892,32 @@ is located in %2</source>
 <context>
     <name>StatusBox</name>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="752"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="745"/>
         <source>is watching live TV</source>
         <translation>predvaja živo TV</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="755"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="748"/>
         <source>is recording</source>
         <translation>snema</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="757"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="750"/>
         <source>is not recording</source>
         <translation>ne snema</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="875"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="868"/>
         <source>Job:</source>
         <translation>Opravilo:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="877"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="870"/>
         <source>Status: </source>
         <translation>Status: </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="810"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="803"/>
         <source>On %1 %2 from %3.%4
 %5
 %6</source>
@@ -12996,7 +13926,7 @@ is located in %2</source>
 %6</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="820"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="813"/>
         <source>On %1 %2 from %3.%4
 %5
 No other details</source>
@@ -13007,51 +13937,46 @@ Ni ostalih podatkov</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1301"/>
         <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation>%1 posnetkom, ki uporabljajo %2, je dovoljeno brisanje</translation>
+        <translation type="obsolete">%1 posnetkom, ki uporabljajo %2, je dovoljeno brisanje</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1305"/>
         <source>%1 of these are LiveTV and consume %2</source>
-        <translation>%1 jih je ŽivaTV in uporabljajo %2</translation>
+        <translation type="obsolete">%1 jih je ŽivaTV in uporabljajo %2</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="748"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="741"/>
         <source>is unavailable</source>
         <translation>ni na voljo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="565"/>
         <source>standard rules are defined</source>
-        <translation>standardna pravila so definirana</translation>
+        <translation type="obsolete">standardna pravila so definirana</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="578"/>
         <source>search rules are defined</source>
-        <translation>pravila iskanja so definirana</translation>
+        <translation type="obsolete">pravila iskanja so definirana</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="884"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="877"/>
         <source>Scheduled Run Time:</source>
         <translation>Čas snemanja:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="689"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="682"/>
         <source>marked as HDTV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="698"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="691"/>
         <source>from source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="708"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="701"/>
         <source>on input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1309"/>
-        <source>%1 of these are Deleted and consume %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13217,147 +14142,199 @@ Ni ostalih podatkov</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="531"/>
         <source>day</source>
-        <translation type="unfinished">dan</translation>
+        <translation type="obsolete">dan</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="533"/>
         <source>days</source>
-        <translation type="unfinished">dni</translation>
+        <translation type="obsolete">dni</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="541"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="534"/>
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished">OPOZORILO: ali je mythfilldatabase zagnan?</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="545"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="538"/>
         <source>DataDirect Status: </source>
         <translation type="unfinished">Stanje DataDirect-a: </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="557"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="550"/>
         <source>Schedule Status shows current statistics from the scheduler.</source>
         <translation type="unfinished">Prikaže trenutne statistike iz planov snemanj.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="720"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="713"/>
         <source>Tuner Status shows the current information about the state of backend tuner cards</source>
         <translation type="unfinished">Status tunerja pokaže trenutne informacije o stanju backend kartic za zajem</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="759"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="752"/>
         <source>Tuner %1 %2 %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="791"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="784"/>
         <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
         <translation type="unfinished">Dnevniški vnosi pokažejo katerikoli neprebrani sistemski vnos, seveda če je dnevnik omogočen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="833"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="826"/>
         <source>No items found at priority level %1 or lower.</source>
         <translation type="unfinished">Noben posnetek, s prioriteto %1 ali manj, ni najden.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="834"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="827"/>
         <source>Use 1-8 to change priority level.</source>
         <translation type="unfinished">Za spremembo nivoja prioritete, uporabi tipke 1-8.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="845"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="838"/>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
         <translation type="unfinished">Opravila v čakalni vrsti pokaže vsa opravila, ki so trenutno v MythTV-jevi čakalni vrsti, npr. označevanje reklam.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="903"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="896"/>
         <source>Job Queue is currently empty.</source>
         <translation type="unfinished">Čakalna vrsta je trenutno prazna.</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1051"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1042"/>
         <source>average</source>
         <translation type="unfinished">povprečje</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1067"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1058"/>
         <source>maximum</source>
         <translation type="unfinished">maksimum</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1086"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1077"/>
         <source>Machine Status shows some operating system statistics of this machine</source>
         <translation type="unfinished">Status prikaže nekatere statistične podatke o računalniku</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1088"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1079"/>
         <source>and the MythTV server</source>
         <translation type="unfinished">in MythTV strežniku</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1098"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1089"/>
         <source>System:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1100"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1091"/>
         <source>This machine:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1157"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1148"/>
         <source>Load</source>
         <translation type="unfinished">Uporaba</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1167"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1158"/>
         <source>unknown</source>
         <translation type="unfinished">neznano</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1116"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1107"/>
         <source>failed</source>
         <translation type="unfinished">napaka</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1178"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1169"/>
         <source>RAM</source>
         <translation type="unfinished">RAM</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1186"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1177"/>
         <source>Swap</source>
         <translation type="unfinished">Swap</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1148"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1139"/>
         <source>MythTV server</source>
         <translation type="unfinished">MythTV strežnik</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1218"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1209"/>
         <source>Total Disk Space:</source>
         <translation type="unfinished">Skupna velikost diska:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1223"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1214"/>
         <source>MythTV Drive #%1:</source>
         <translation type="unfinished">MythTV pogon #%1:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1230"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1221"/>
         <source>Directories:</source>
         <translation type="unfinished">Mape:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1238"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1229"/>
         <source>Directory:</source>
         <translation type="unfinished">Mapa:</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/statusbox.cpp" line="1264"/>
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1255"/>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
         <translation type="unfinished">Seznam AvtoBrisanja prikaže vse posnetke, ki se bodo odstranili in v kakšnem vrstem redu se bodo odstranili. Posnetki, ki so najvišje se bobo odstranili prvi.</translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="529"/>
+        <source>%n day(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="558"/>
+        <source>%n standard rule(s) (is) defined</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="571"/>
+        <source>%n search rule(s) are defined</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="630"/>
+        <source>%n matching showing(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1292"/>
+        <source>%n recording(s) consuming %1 (is) allowed to expire
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1295"/>
+        <source>%n (is) LiveTV and consume(s) %2
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/statusbox.cpp" line="1300"/>
+        <source>%1 (is) Deleted and consume(s) %2
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -13592,7 +14569,7 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9975"/>
         <source>minutes</source>
-        <translation>minut</translation>
+        <translation type="obsolete">minut</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9877"/>
@@ -14510,6 +15487,13 @@ Izberite trenutno snemanje</translation>
         <source>No, keep it, I changed my mind</source>
         <translation type="unfinished">Ne, obdrži ga, spremislil sem si</translation>
     </message>
+    <message numerus="yes">
+        <location filename="../libs/libmythtv/tv_play.cpp" line="9975"/>
+        <source>%n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -14760,6 +15744,14 @@ Izberite trenutno snemanje</translation>
     </message>
 </context>
 <context>
+    <name>TimePopup</name>
+    <message>
+        <location filename="../programs/mythfrontend/proglist.cpp" line="1581"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TransportList</name>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="87"/>
@@ -14979,132 +15971,132 @@ Izberite trenutno snemanje</translation>
 <context>
     <name>WelcomeDialog</name>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="97"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="93"/>
         <source>Start Frontend</source>
         <translation>Zaženi frontend</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="382"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="359"/>
         <source>Cannot connect to server!</source>
         <translation>Ne morem se povezati k strežniku!</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="418"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="395"/>
         <source>There are no recordings currently taking place</source>
         <translation>Trenutno ne snemam</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="452"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="429"/>
         <source>There are no scheduled recordings</source>
         <translation>Nastavljena snemanja ne obstajajo</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="459"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="436"/>
         <source>Please Wait ...</source>
         <translation>Prosim počakajte ...</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="569"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="546"/>
         <source>MythTV is about to start recording.</source>
         <translation>MythTV bo pravkar začel s snemanjem.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="574"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="551"/>
         <source>MythTV is busy recording.</source>
         <translation>MythTV je zaposlen s snemanjem.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="584"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="561"/>
         <source>MythTV is busy transcoding.</source>
         <translation>MythTV je zaposlen z dekodiranjem.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="586"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="563"/>
         <source>MythTV is busy flagging commercials.</source>
         <translation>MythTV je zaposlen z označevanjem reklam.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="588"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="565"/>
         <source>MythTV is busy grabbing EPG data.</source>
         <translation>MythTV je zaposlen s pridobivanjem podatkov za EPG.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="590"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="567"/>
         <source>MythTV is locked by a user.</source>
         <translation>MythTV je zaklenil uporabnik.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="594"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="571"/>
         <source>MythTV is in a daily wakeup/shutdown period.</source>
         <translation>MythTV je v dnevni periodi prižgi/ugasni.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="596"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="573"/>
         <source>MythTV is about to start a wakeup/shutdown period.</source>
         <translation>MythTV bo pravkar začel s periodo prižgi/ugasni.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="604"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="581"/>
         <source>MythTV is idle.</source>
         <translation>MythTV miruje.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="655"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="632"/>
         <source>Unlock Shutdown</source>
         <translation>Odkleni ogašanje</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="657"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="634"/>
         <source>Lock Shutdown</source>
         <translation>Zakleni ugašanje</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="659"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="636"/>
         <source>Run mythfilldatabase</source>
         <translation>Poženi mythfilldatabase</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="660"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="637"/>
         <source>Shutdown Now</source>
         <translation>Ugasni zdaj</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="661"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="638"/>
         <source>Exit</source>
         <translation>Izhod</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="662"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="639"/>
         <source>Cancel</source>
         <translation>Prekliči</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="708"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="685"/>
         <source>Cannot shutdown because MythTV is currently recording</source>
         <translation>Ker MythTV trenutno snema, ga ne morem ugasniti</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="720"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="697"/>
         <source>Cannot shutdown because MythTV is about to start recording</source>
         <translation>Ker bo MythTV pravkar začel s snemanjem, ga ne morem ugasniti</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="735"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="712"/>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
         <translation>Ker bo MythTV pravkar začel z periodo prižgi/ugasni, ga ne morem ugasniti.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="602"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="579"/>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>
         <translation>MythTV miruje in se bo ugasnil čez %1 sekund.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="443"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="420"/>
         <source>to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="592"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="569"/>
         <source>MythTV has running or pending jobs.</source>
         <translation type="unfinished"></translation>
     </message>
