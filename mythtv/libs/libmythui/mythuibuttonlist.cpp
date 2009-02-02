@@ -750,6 +750,20 @@ void MythUIButtonList::Init()
     m_initialized = true;
 }
 
+uint MythUIButtonList::ItemWidth(void)
+{
+    if (!m_initialized)
+        Init();
+    return m_itemWidth;
+}
+
+uint MythUIButtonList::ItemHeight(void)
+{
+    if (!m_initialized)
+        Init();
+    return m_itemHeight;
+}
+
 bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
 {
     QStringList actions;
@@ -865,7 +879,7 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 QPoint MythUIButtonList::GetButtonPosition(int column, int row) const
 {
     int x = m_contentsRect.x() +
-                            ((column - 1) * (ItemWidth() + m_itemHorizSpacing));
+                            ((column - 1) * (m_itemWidth + m_itemHorizSpacing));
     int y = m_contentsRect.y() +
                             ((row - 1) * (m_itemHeight + m_itemVertSpacing));
 

@@ -139,8 +139,8 @@ class MPUBLIC MythUIButtonList : public MythUIType
     MythUIButtonListItem* GetItemAt(int pos) const;
     MythUIButtonListItem* GetItemByData(QVariant data);
 
-    uint ItemWidth(void) const { return m_itemWidth; }
-    uint ItemHeight(void) const { return m_itemHeight; }
+    uint ItemWidth(void);
+    uint ItemHeight(void);
 
     bool MoveItemUpDown(MythUIButtonListItem *item, bool up);
 
