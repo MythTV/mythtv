@@ -101,7 +101,6 @@ IconView::IconView(MythScreenStack *parent, const char *name,
 
     m_isGallery = false;
     m_showDevices = false;
-    m_currDir = QString::null;
     m_currDevice = initialDevice;
 
     m_thumbGen = new ThumbGenerator(this,0,0);
@@ -114,7 +113,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
     m_errorStr = QString::null;
 
     m_captionText = NULL;
-    m_noImagesText = NULL; 
+    m_noImagesText = NULL;
 
     m_menuPopup = NULL;
 
@@ -140,7 +139,6 @@ IconView::~IconView()
 
 bool IconView::Create(void)
 {
-
     bool foundtheme = false;
 
     // Load the theme for this screen
@@ -149,14 +147,9 @@ bool IconView::Create(void)
     if (!foundtheme)
         return false;
 
-    m_imageList = dynamic_cast<MythUIButtonList *>
-                (GetChild("images"));
-
-    m_captionText = dynamic_cast<MythUIText *>
-                (GetChild("text"));
-
-    m_noImagesText = dynamic_cast<MythUIText *>
-                (GetChild("noimages"));
+    m_imageList = dynamic_cast<MythUIButtonList *> (GetChild("images"));
+    m_captionText = dynamic_cast<MythUIText *> (GetChild("text"));
+    m_noImagesText = dynamic_cast<MythUIText *> (GetChild("noimages"));
 
     if (!m_imageList)
     {
@@ -177,6 +170,13 @@ bool IconView::Create(void)
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    // TODO Not accurate, the image may be smaller than the button
+    uint buttonwidth = m_imageList->ItemWidth();
+    uint buttonheight = m_imageList->ItemHeight();
+
+    if (m_thumbGen)
+        m_thumbGen->setSize((int)buttonwidth, (int)buttonheight);
 
     SetupMediaMonitor();
 
@@ -209,6 +209,9 @@ void IconView::LoadDirectory(const QString &dir)
     m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, m_sortorder,
                                              false, &m_itemHash, m_thumbGen);
 
+    if (m_thumbGen && !m_thumbGen->isRunning())
+        m_thumbGen->start();
+
     ThumbItem *thumbitem;
     for (int x = 0; x < m_itemList.size(); x++)
     {
@@ -231,17 +234,6 @@ void IconView::LoadDirectory(const QString &dir)
 
     if (m_noImagesText)
         m_noImagesText->SetVisible((m_itemList.size() == 0));
-
-    // TODO Not accurate, the image may be smaller than the button
-    uint buttonwidth = m_imageList->ItemWidth();
-    uint buttonheight = m_imageList->ItemHeight();
-
-    if (m_thumbGen)
-    {
-        m_thumbGen->setSize((int)buttonwidth, (int)buttonheight);
-        if (!m_thumbGen->isRunning())
-            m_thumbGen->start();
-    }
 }
 
 void IconView::LoadThumbnail(ThumbItem *item)
@@ -632,7 +624,6 @@ bool IconView::HandleEscape(void)
 
 void IconView::customEvent(QEvent *event)
 {
-
     if (event->type() == kMythGalleryThumbGenEventType)
     {
         ThumbGenEvent *tge = (ThumbGenEvent *)event;
@@ -659,7 +650,8 @@ void IconView::customEvent(QEvent *event)
             LoadThumbnail(thumbitem);
 
             MythUIButtonListItem *item = m_imageList->GetItemAt(pos);
-            item->SetImage(thumbitem->GetImageFilename());
+            if (QFile(thumbitem->GetImageFilename()).exists())
+                item->SetImage(thumbitem->GetImageFilename());
         }
         delete td;
     }
@@ -935,9 +927,9 @@ void IconView::HandleSettings(void)
     SetFocusWidget(m_imageList);
 }
 
-void IconView::HandleEject(void) 
-{ 
-    myth_eject(); 
+void IconView::HandleEject(void)
+{
+    myth_eject();
 }
 
 void IconView::HandleImport(void)
@@ -970,13 +962,13 @@ void IconView::HandleImport(void)
         {
             ImportFromDir(*it, importdir.absolutePath());
         }
-        else if (path.isFile() && path.isExecutable())
-        {
-            // TODO this should not be enabled by default!!!
-            QString cmd = *it + " " + importdir.absolutePath();
-            VERBOSE(VB_GENERAL, LOC + QString("Executing %1").arg(cmd));
-            myth_system(cmd);
-        }
+//         else if (path.isFile() && path.isExecutable())
+//         {
+//             // TODO this should not be enabled by default!!!
+//             QString cmd = *it + " " + importdir.absolutePath();
+//             VERBOSE(VB_GENERAL, LOC + QString("Executing %1").arg(cmd));
+//             myth_system(cmd);
+//         }
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +

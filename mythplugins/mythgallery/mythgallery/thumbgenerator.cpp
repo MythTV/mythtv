@@ -90,7 +90,8 @@ void ThumbGenerator::cancel()
 void ThumbGenerator::run()
 {
 
-    while (moreWork()) {
+    while (moreWork())
+    {
 
         QString file, dir;
         bool    isGallery;
@@ -111,7 +112,8 @@ void ThumbGenerator::run()
         if (!fileInfo.exists())
             continue;
 
-        if (isGallery) {
+        if (isGallery)
+        {
 
             if (fileInfo.isDir())
                 isGallery = checkGalleryDir(fileInfo);
@@ -119,25 +121,26 @@ void ThumbGenerator::run()
                 isGallery = checkGalleryFile(fileInfo);
         }
 
-        if (!isGallery) {
+        if (!isGallery)
+        {
 
             QString cachePath = QString("%1%2.jpg").arg(getThumbcacheDir(dir))
                                                    .arg(file);
             QFileInfo cacheInfo(cachePath);
 
             if (cacheInfo.exists() &&
-                cacheInfo.lastModified() >= fileInfo.lastModified()) {
+                cacheInfo.lastModified() >= fileInfo.lastModified())
+            {
                 continue;
             }
-            else {
-
+            else
+            {
                 // cached thumbnail not there or out of date
                 QImage image;
 
-                if (cacheInfo.exists()) {
-                    // Remove the old one if it exists
+                // Remove the old one if it exists
+                if (cacheInfo.exists())
                     QFile::remove(cachePath);
-                }
 
                 if (fileInfo.isDir())
                     loadDir(image, fileInfo);
@@ -190,7 +193,8 @@ bool ThumbGenerator::checkGalleryDir(const QFileInfo& fi)
                 QDir::Files);
 
 
-    if (subdir.count() > 0) {
+    if (subdir.count() > 0)
+    {
         // check if the image format is understood
         QString path(subdir.entryInfoList().begin()->absoluteFilePath());
         QImageReader testread(path);
@@ -233,21 +237,25 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
     const QFileInfo *f;
 
     bool found = false;
-    while (it != list.end()) {
+    while (it != list.end())
+    {
         f = &(*it);
         QImageReader testread(f->absoluteFilePath());
-        if (testread.canRead()) {
+        if (testread.canRead())
+        {
             found = true;
             break;
         }
         ++it;
     }
 
-    if (found) {
+    if (found)
+    {
         loadFile(image, *f);
         return;
     }
-    else {
+    else
+    {
         // if we didn't find the image yet
         // go into subdirs and keep looking
 
@@ -259,7 +267,8 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
         QFileInfoList::const_iterator it = dirlist.begin();
         const QFileInfo *f;
 
-        while (it != dirlist.end() && image.isNull() ) {
+        while (it != dirlist.end() && image.isNull() )
+        {
 
             f = &(*it);
             ++it;
@@ -357,10 +366,12 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
     {
         // Arrive here if storing thumbs in home dir,
         // OR failed to create thumb dir in gallery pics location
-        int prefixLen = gContext->GetSetting("GalleryDir").length();
-        aPath = GetConfDir() + "/MythGallery";
-        aPath += inDir.right(inDir.length() - prefixLen);
-        aPath += QString("/.thumbcache/");
+        int prefixLen = galleryDir.length();
+        QString location = "";
+        if (prefixLen < inDir.length())
+            location = QString("%1/").arg(inDir.right(inDir.length() - prefixLen));
+        aPath = QString("%1/MythGallery/%2").arg(GetConfDir())
+                        .arg(location);
         dir.setPath(aPath);
         dir.mkpath(aPath);
     }
