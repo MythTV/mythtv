@@ -88,37 +88,6 @@ inline int random(void)
 #endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
-/* TODO: most small usleep's in MythTV are just a quick way to perform
- * a yield() call, those should just be replaced with an actual yield().
- * There is a known bug with Win32 yield(), it basically functions as
- * a no-op. Sleep(0) yields, but only to higher priority threads, while
- * Sleep(1), performs an actual yield() to any other thread.
- * See: http://lists.boost.org/Archives/boost/2003/02/44937.php
- */
-inline int usleep(unsigned int timeout)
-{
-    /*
-    // windows seems to have 1us-resolution timers,
-    // however this produces the same results as Sleep
-    HANDLE hTimer = ::CreateWaitableTimer(NULL, TRUE, NULL);
-    if (hTimer) {
-        LARGE_INTEGER li;
-        li.QuadPart = -((int)timeout * 10);
-        if (SetWaitableTimer(hTimer, &li, 0, NULL, 0, FALSE)) {
-            DWORD res = WaitForSingleObject(hTimer, (timeout / 1000 + 1));
-            if (res == WAIT_TIMEOUT || res == WAIT_OBJECT_0)
-                return 0;
-        }
-        CloseHandle(hTimer);
-    }
-    */
-    //fallback
-    Sleep(timeout < 1000 ? 1 : (timeout + 500) / 1000);
-    return 0;
-}
-#endif // defined(__cplusplus) && defined(USING_MINGW)
-
-#if defined(__cplusplus) && defined(USING_MINGW)
 inline unsigned sleep(unsigned int x)
 {
     Sleep(x * 1000);
