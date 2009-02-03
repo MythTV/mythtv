@@ -125,8 +125,6 @@ class MythUIHelperPrivate
     MythUIMenuCallbacks callbacks;
 
     MythUIHelper *parent;
-
-    MythUIBusyDialog *m_loadingDialog;
 };
 
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
@@ -143,7 +141,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       themecachedir(QString::null),
       bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
-      screenSetup(false), parent(p), m_loadingDialog(NULL)
+      screenSetup(false), parent(p)
 {
 }
 
@@ -1356,36 +1354,4 @@ QString MythUIHelper::GetX11Display(void)
     QString ret = x11_display;
     ret.detach();
     return ret;
-}
-
-void MythUIHelper::ShowLoadingDialog(void)
-{
-    if (d->m_loadingDialog)
-        return;
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    QString message = QObject::tr("Initializing MythTV");
-    d->m_loadingDialog = new MythUIBusyDialog(message, popupStack, "startupbusydialog");
-
-    if (d->m_loadingDialog->Create())
-    {
-        popupStack->AddScreen(d->m_loadingDialog, false);
-    }
-    else
-    {
-        delete d->m_loadingDialog;
-        d->m_loadingDialog = NULL;
-    }
-
-    if (d->m_loadingDialog)
-        d->m_loadingDialog->Close();
-}
-
-void MythUIHelper::HideLoadingDialog(void)
-{
-    if (d->m_loadingDialog)
-        d->m_loadingDialog->Close();
-
-    d->m_loadingDialog = NULL;
 }

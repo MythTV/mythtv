@@ -110,9 +110,6 @@ class MPUBLIC MythUIHelper
     static MythUIHelper *getMythUI(void);
     static void destroyMythUI(void);
 
-    void ShowLoadingDialog(void);
-    void HideLoadingDialog(void);
-
   protected:
     MythUIHelper();
    ~MythUIHelper();
