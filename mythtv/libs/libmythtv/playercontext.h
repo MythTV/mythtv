@@ -108,6 +108,7 @@ class MPUBLIC PlayerContext
 
     // Boolean Gets
     bool IsPIPSupported(void) const;
+    bool IsPBPSupported(void) const;
     bool IsOSDFullScreen(void) const;
     bool IsPIP(void) const
         { return (kPIPonTV == pipState) || (kPIPStandAlone == pipState); }

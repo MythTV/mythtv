@@ -113,7 +113,7 @@ void PlayerContext::SetInitialTVState(bool islivetv)
 
 /**
  * \brief Check if PIP is supported for current video
- * renderer running. Current support written for XV and Opengl.
+ * renderer running. Current support written for XV, Opengl and VDPAU.
  * Not sure about ivtv.
  */
 bool PlayerContext::IsPIPSupported(void) const
@@ -127,6 +127,28 @@ bool PlayerContext::IsPIPSupported(void) const
             (vid->hasXVAcceleration() ||
              vid->hasOpenGLAcceleration() ||
              vid->hasVDPAUAcceleration()))
+        {
+            supported = true;
+        }
+    }
+    return supported;
+}
+
+/**
+ * \brief Check if PBP is supported for current video
+ * renderer running. Current support written for XV and Opengl.
+ * Not sure about ivtv.
+ */
+bool PlayerContext::IsPBPSupported(void) const
+{
+    bool supported = false;
+    QMutexLocker locker(&deleteNVPLock);
+    if (nvp)
+    {
+        const VideoOutput *vid = nvp->getVideoOutput();
+        if (vid &&
+            (vid->hasXVAcceleration() ||
+             vid->hasOpenGLAcceleration()))
         {
             supported = true;
         }
