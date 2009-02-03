@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <actionList>
+      <action>
+         <name>GetScreenShot</name>
+         <argumentList>
+            <argument>
+               <name>Height</name>
+               <direction>in</direction>
+               <relatedStateVariable>A_ARG_TYPE_Height</relatedStateVariable>
+            </argument>
+            <argument>
+               <name>Width</name>
+               <direction>in</direction>
+               <relatedStateVariable>A_ARG_TYPE_Width</relatedStateVariable>
+            </argument>
+         </argumentList>
+      </action>
+   </actionList>
+   <serviceStateTable>
+      <stateVariable sendEvents="no">
+         <name>A_ARG_TYPE_Height</name>
+         <dataType>i2</dataType>
+      </stateVariable>
+      <stateVariable sendEvents="no">
+         <name>A_ARG_TYPE_Width</name>
+         <dataType>i2</dataType>
+      </stateVariable>
+   </serviceStateTable>
+</scpd>
