@@ -2,7 +2,6 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-INCLUDEPATH += $${PREFIX}/include/mythtv
 INCLUDEPATH += $${PREFIX}/include/mythtv/libmythtv
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
