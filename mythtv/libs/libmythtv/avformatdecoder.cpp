@@ -4163,9 +4163,9 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (!codec_ctx)
     {
-        VERBOSE(VB_IMPORTANT, "No codec context. Returning false");
+        VERBOSE(VB_PLAYBACK, "No codec context. Returning false");
         return false;
-    } 
+    }
 
     if (info == audioIn)
         return false; // no change
