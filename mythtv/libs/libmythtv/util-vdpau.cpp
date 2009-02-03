@@ -2028,7 +2028,7 @@ bool VDPAUContext::InitPIPLayer(QSize screen_size)
     return ok;
 }
 
-void VDPAUContext::DeinitPIP(NuppelVideoPlayer *pipplayer)
+void VDPAUContext::DeinitPIP(NuppelVideoPlayer *pipplayer, bool check_layer)
 {
     if (!pips.contains(pipplayer))
         return;
@@ -2042,7 +2042,7 @@ void VDPAUContext::DeinitPIP(NuppelVideoPlayer *pipplayer)
     pips.remove(pipplayer);
     VERBOSE(VB_PLAYBACK, LOC + "Removed 1 PIP");
 
-    if (pips.size() < 1)
+    if (pips.size() < 1 && check_layer)
     {
         DeinitPIPLayer();
         VERBOSE(VB_PLAYBACK, LOC + "Removed PIP Layer");
@@ -2129,7 +2129,7 @@ bool VDPAUContext::ShowPIP(NuppelVideoPlayer *pipplayer,
     if (pips.contains(pipplayer) &&
         pips[pipplayer].videoSize != vid_size)
     {
-        DeinitPIP(pipplayer);
+        DeinitPIP(pipplayer, false);
     }
 
     if (!pips.contains(pipplayer))

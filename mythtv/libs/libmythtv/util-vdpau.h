@@ -68,7 +68,7 @@ class VDPAUContext
     bool ShowPIP(NuppelVideoPlayer *pipplayer,
                  VideoFrame * frame, QRect position,
                  bool pip_is_active);
-    void DeinitPIP(NuppelVideoPlayer *pipplayer);
+    void DeinitPIP(NuppelVideoPlayer *pipplayer, bool check_layer = true);
 
   private:
     bool InitProcs(Display *disp, int screen);
