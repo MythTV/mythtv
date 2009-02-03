@@ -417,7 +417,9 @@ void MythUIHelper::LoadQtConfig(void)
     d->m_qtThemeSettings->ReadSettings(themedir);
     d->m_themeloaded = false;
 
-    themename = GetMythDB()->GetSetting("MenuTheme");
+    themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
+    if (themename == "default")
+        themename = "defaultmenu";
     d->m_menuthemepathname = FindMenuThemeDir(themename) + "/";
 
     d->bigfontsize    = GetMythDB()->GetNumSetting("QtFontBig",    25);
@@ -900,14 +902,6 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
     QString testdir;
     QDir dir;
 
-    if (menuname == "default")
-    {
-        testdir = GetShareDir();
-        dir.setPath(testdir);
-        if (dir.exists())
-            return testdir;
-    }
-
     testdir = GetConfDir() + "/themes/" + menuname;
 
     dir.setPath(testdir);
@@ -1287,7 +1281,7 @@ QString MythUIHelper::GetLanguage(void)
 QString MythUIHelper::GetLanguageAndVariant(void)
 {
     if (d->language == QString::null || d->language.isEmpty())
-        d->language = GetMythDB()->GetSetting("Language", "EN").toLower();
+        d->language = GetMythDB()->GetSetting("Language", "EN_US").toLower();
 
     return d->language;
 }

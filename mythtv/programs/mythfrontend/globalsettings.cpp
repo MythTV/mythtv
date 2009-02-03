@@ -73,10 +73,10 @@ static HostComboBox *AudioOutputDevice()
     gc->addSelection("ARTS:", "ARTS:");
 #endif
 #ifdef USING_JACK
-    gc->addSelection("JACK:output", "JACK:output"); 
+    gc->addSelection("JACK:output", "JACK:output");
 #endif
 #ifdef USING_COREAUDIO
-    gc->addSelection("CoreAudio:", "CoreAudio:"); 
+    gc->addSelection("CoreAudio:", "CoreAudio:");
 #endif
 #ifdef USING_MINGW
 	gc->addSelection("Windows:");
@@ -182,10 +182,10 @@ static HostComboBox *MixerControl()
 {
     HostComboBox *gc = new HostComboBox("MixerControl", true);
     gc->setLabel(QObject::tr("Mixer Controls"));
-    for (unsigned int i = 0; i < sizeof(MixerControlControls) / sizeof(char*); 
-         ++i) 
+    for (unsigned int i = 0; i < sizeof(MixerControlControls) / sizeof(char*);
+         ++i)
     {
-        gc->addSelection(QObject::tr(MixerControlControls[i]), 
+        gc->addSelection(QObject::tr(MixerControlControls[i]),
                          MixerControlControls[i]);
     }
 
@@ -602,7 +602,7 @@ static GlobalSpinBox *AutoExpireExtraSpace()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
     bs->setLabel(QObject::tr("Extra Disk Space"));
-    bs->setHelpText(QObject::tr("Extra disk space (in Gigabytes) that you want " 
+    bs->setHelpText(QObject::tr("Extra disk space (in Gigabytes) that you want "
                     "to keep free on the recording file systems beyond what "
                     "MythTV requires."));
     bs->setValue(1);
@@ -678,11 +678,11 @@ static GlobalComboBox *AutoExpireMethod()
     return bc;
 }
 
-static GlobalCheckBox *AutoExpireWatchedPriority() 
+static GlobalCheckBox *AutoExpireWatchedPriority()
 {
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireWatchedPriority"); 
-    bc->setLabel(QObject::tr("Watched before UNwatched")); 
-    bc->setValue(false); 
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireWatchedPriority");
+    bc->setLabel(QObject::tr("Watched before UNwatched"));
+    bc->setValue(false);
     bc->setHelpText(QObject::tr("If set, programs that have been marked as "
                     "watched will be expired before programs that have not "
                     "been watched."));
@@ -738,11 +738,11 @@ static GlobalSpinBox *MinRecordDiskThreshold()
 }
 #endif
 
-static GlobalCheckBox *RerecordWatched() 
+static GlobalCheckBox *RerecordWatched()
 {
-    GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched"); 
-    bc->setLabel(QObject::tr("Re-record Watched")); 
-    bc->setValue(true); 
+    GlobalCheckBox *bc = new GlobalCheckBox("RerecordWatched");
+    bc->setLabel(QObject::tr("Re-record Watched"));
+    bc->setValue(true);
     bc->setHelpText(QObject::tr("If set, programs that have been marked as "
                     "watched and are auto-expired will be re-recorded if "
                     "they are shown again."));
@@ -1292,7 +1292,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
 
         items.push_back(item);
         InitUI();
-        needs_save = true;        
+        needs_save = true;
     }
 
     repaint();
@@ -1565,7 +1565,7 @@ static HostCheckBox *FFRewReverse()
                     "vice versa.  If disabled, it will decrease the "
                     "current speed or switch to play mode if "
                     "the speed can't be decreased further."));
-    return gc; 
+    return gc;
 }
 
 static HostSpinBox *OSDGeneralTimeout()
@@ -1617,7 +1617,7 @@ static HostComboBox *MenuTheme()
     QDir themes(GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
-    gc->addSelection(QObject::tr("Default"), "default");
+    gc->addSelection(QObject::tr("Default"), "defaultmenu");
 
     QFileInfoList fil = themes.entryInfoList(QDir::Dirs);
 
@@ -1629,7 +1629,10 @@ static HostComboBox *MenuTheme()
 
         QFileInfo xml(theme.absoluteFilePath() + "/mainmenu.xml");
 
-        if (theme.fileName()[0] != '.' && xml.exists())
+        if (theme.fileName()[0] == '.' || theme.fileName() == "defaultmenu")
+            continue;
+
+        if (xml.exists())
             gc->addSelection(theme.fileName());
     }
 
@@ -1882,7 +1885,7 @@ static HostSpinBox *XScanDisplacement()
     gs->setLabel(QObject::tr("Scan displacement (X)"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("Adjust this to move the image horizontally."));
-    return gs; 
+    return gs;
 }
 
 static HostSpinBox *YScanDisplacement()
@@ -1894,7 +1897,7 @@ static HostSpinBox *YScanDisplacement()
     return gs;
 };
 
-static HostCheckBox *AlwaysStreamFiles() 
+static HostCheckBox *AlwaysStreamFiles()
 {
     HostCheckBox *gc = new HostCheckBox("AlwaysStreamFiles");
     gc->setLabel(QObject::tr("Always stream recordings from the backend"));
@@ -2565,7 +2568,7 @@ static HostComboBox *GuiVidModeResolution()
     gc->setLabelAboveWidget(true);
     gc->setHelpText(QObject::tr("Resolution of screen "
                     "when not watching a video."));
-    
+
     const vector<DisplayResScreen> scr = GetVideoModes();
     for (uint i=0; i<scr.size(); ++i)
     {
@@ -2573,7 +2576,7 @@ static HostComboBox *GuiVidModeResolution()
         QString sel = QString("%1x%2").arg(w).arg(h);
         gc->addSelection(sel, sel);
     }
-    
+
     // if no resolution setting, set it with a reasonable initial value
     if (scr.size() && ("" == gContext->GetSetting("GuiVidModeResolution")))
     {
@@ -2608,10 +2611,10 @@ static HostComboBox *TVVidModeResolution(int idx=-1)
     gc->setLabel(lstr);
     gc->setLabelAboveWidget(idx<1);
     gc->setHelpText(hstr);
-    
+
     const vector<DisplayResScreen> scr = GetVideoModes();
     for (uint i=0; i<scr.size(); ++i)
-    {        
+    {
         QString sel = QString("%1x%2").arg(scr[i].Width()).arg(scr[i].Height());
         gc->addSelection(sel, sel);
     }
@@ -2688,7 +2691,7 @@ class VideoModeSettings : public TriggeredConfigurationGroup
         ConfigurationGroup* overrides =
             new GridConfigurationGroup(5, true, true, false, true);
         overrides->setLabel(QObject::tr("Overrides for specific video sizes"));
-            
+
         for (int idx = 0; idx < 3; ++idx)
         {
             //input side
@@ -3496,7 +3499,7 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
     QString q = QString("ISO639Language%1").arg(i);
     QString lang = gContext->GetSetting(q, "").toLower();
 
-    if ((lang.isEmpty() || lang == "aar") && 
+    if ((lang.isEmpty() || lang == "aar") &&
         !gContext->GetSetting("Language", "").isEmpty())
     {
         lang = iso639_str2_to_str3(GetMythUI()->GetLanguage().toLower());
@@ -3504,7 +3507,7 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
 
     QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();
     QMap<int,QString>::iterator ite = _iso639_key_to_english_name.end();
-    
+
     for (; it != ite; ++it)
     {
         QString desc = (*it);
@@ -4375,7 +4378,7 @@ class LcdSettings : public TriggeredConfigurationGroup
          setHoriz->addChild(setRight);
          settings->addChild(setHoriz);
          settings->addChild(LCDPopupTime());
-         
+
          addTarget("1", settings);
 
          addTarget("0", new VerticalConfigurationGroup(true));
@@ -4465,11 +4468,11 @@ class MacMainSettings : public TriggeredConfigurationGroup
         addChild(gc);
         setTrigger(gc);
 
-        VerticalConfigurationGroup *opts = 
+        VerticalConfigurationGroup *opts =
             new VerticalConfigurationGroup(false, false);
         opts->addChild(MacMainSkip());
         opts->addChild(MacMainOpacity());
-        
+
         addTarget("1", opts);
         addTarget("0", new VerticalConfigurationGroup(false, false));
     }
@@ -4520,11 +4523,11 @@ class MacFloatSettings : public TriggeredConfigurationGroup
         addChild(gc);
         setTrigger(gc);
 
-        VerticalConfigurationGroup *opts = 
+        VerticalConfigurationGroup *opts =
             new VerticalConfigurationGroup(false, false);
         opts->addChild(MacFloatSkip());
         opts->addChild(MacFloatOpacity());
-        
+
         addTarget("1", opts);
         addTarget("0", new VerticalConfigurationGroup(false, false));
     }
