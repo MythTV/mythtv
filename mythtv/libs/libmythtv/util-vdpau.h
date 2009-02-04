@@ -47,7 +47,7 @@ class VDPAUContext
                       bool pause_frame);
     void DisplayNextFrame(void);
     void SetNextFrameDisplayTimeOffset(int delayus);
-    bool InitOSD(void);
+    bool InitOSD(QSize size);
     void UpdateOSD(void* const planes[3], QSize size,
                    void* const alpha[1]);
     void DisableOSD(void) { osdReady = false; }
@@ -121,6 +121,7 @@ class VDPAUContext
     VdpLayer          osdLayer;
     VdpRect           osdRect;
     bool              osdReady;
+    QSize             osdSize;
 
     bool              deintAvail;
     QString           deinterlacer;

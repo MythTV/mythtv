@@ -76,7 +76,7 @@ VDPAUContext::VDPAUContext()
     outputSize(QSize(0,0)), decoder(0),        maxReferences(2),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
     osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
-    osdReady(false),        deintAvail(false),
+    osdReady(false),        osdSize(QSize(0,0)) ,deintAvail(false),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
     needDeintRefs(false),   useColorControl(false),
     pipOutputSurface(0),    pipAlpha(0),       pipBorder(0),
@@ -1226,7 +1226,7 @@ void VDPAUContext::SetNextFrameDisplayTimeOffset(int delayus)
     nextframedelay = delayus;
 }
 
-bool VDPAUContext::InitOSD(void)
+bool VDPAUContext::InitOSD(QSize size)
 {
     if (!vdp_device)
         return false;
@@ -1234,8 +1234,8 @@ bool VDPAUContext::InitOSD(void)
     VdpStatus vdp_st;
     bool ok = true;
 
-    uint width = outputSize.width();
-    uint height = outputSize.height();
+    uint width = size.width();
+    uint height = size.height();
     VdpBool supported = false;
 
     vdp_st = vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(
@@ -1367,19 +1367,21 @@ bool VDPAUContext::InitOSD(void)
     }
     else
     {
+        osdSize = size;
         osdRect.x0 = 0;
         osdRect.y0 = 0;
         osdRect.x1 = width;
         osdRect.y1 = height;
         osdLayer.struct_version = VDP_LAYER_VERSION;
         osdLayer.source_surface = osdOutputSurface;
-        osdLayer.source_rect    = NULL;
-        osdLayer.destination_rect = NULL;
+        osdLayer.source_rect    = &osdRect;
+        osdLayer.destination_rect = &osdRect;
         VERBOSE(VB_PLAYBACK, LOC + QString("Created OSD (%1x%2)")
                     .arg(width).arg(height));
         return ok;
     }
 
+    osdSize = QSize(0,0);
     return ok;
 }
 
@@ -1387,10 +1389,10 @@ void VDPAUContext::UpdateOSD(void* const planes[3],
                              QSize size,
                              void* const alpha[1])
 {
-    if (size != outputSize)
+    if (size != osdSize)
     {
         DeinitOSD();
-        if (!InitOSD())
+        if (!InitOSD(size))
             return;
     }
 
@@ -1398,9 +1400,9 @@ void VDPAUContext::UpdateOSD(void* const planes[3],
     bool ok = true;
 
     // upload OSD YV12 data
-    uint32_t pitches[3] = {outputSize.width(),
-                           outputSize.width()>>1,
-                           outputSize.width()>>1};
+    uint32_t pitches[3] = {osdSize.width(),
+                           osdSize.width()>>1,
+                           osdSize.width()>>1};
     void * const realplanes[3] = { planes[0], planes[2], planes[1] };
 
     vdp_st = vdp_video_surface_put_bits_y_cb_cr(osdVideoSurface,
@@ -1435,7 +1437,7 @@ void VDPAUContext::UpdateOSD(void* const planes[3],
     // upload OSD alpha data
     if (ok)
     {
-        uint32_t pitch[1] = {outputSize.width()};
+        uint32_t pitch[1] = {osdSize.width()};
         vdp_st = vdp_bitmap_surface_put_bits_native(
             osdAlpha,
             alpha,
@@ -1488,6 +1490,7 @@ void VDPAUContext::DeinitOSD(void)
         vdp_bitmap_surface_destroy(osdAlpha);
         osdAlpha = 0;
     }
+    osdSize = QSize(0,0);
 }
 
 bool VDPAUContext::SetDeinterlacer(const QString &deint)
