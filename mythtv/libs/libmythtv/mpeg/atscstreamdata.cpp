@@ -761,16 +761,16 @@ void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
     _cached_cvcts[pid] = cvct;
 }
 
-void ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
 {
     if (!psip)
-        return;
+        return false;
 
     QMutexLocker locker(&_cache_lock);
     if (_cached_ref_cnt[psip] > 0)
     {
         _cached_slated_for_deletion[psip] = 1;
-        return;
+        return false;
     }
     else if (TableID::MGT == psip->TableID())
     {
@@ -792,13 +792,14 @@ void ATSCStreamData::DeleteCachedTable(PSIPTable *psip) const
     }
     else
     {
-        MPEGStreamData::DeleteCachedTable(psip);
-        return;
+        return MPEGStreamData::DeleteCachedTable(psip);
     }
     psip_refcnt_map_t::iterator it;
     it = _cached_slated_for_deletion.find(psip);
     if (it != _cached_slated_for_deletion.end())
         _cached_slated_for_deletion.erase(it);
+
+    return true;
 }
 
 void ATSCStreamData::ReturnCachedTVCTTables(tvct_vec_t &tvcts) const

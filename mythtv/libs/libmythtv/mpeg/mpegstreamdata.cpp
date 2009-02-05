@@ -1405,10 +1405,10 @@ void MPEGStreamData::IncrementRefCnt(const PSIPTable *psip) const
     _cached_ref_cnt[psip] = _cached_ref_cnt[psip] + 1;
 }
 
-void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
 {
     if (!psip)
-        return;
+        return false;
 
     uint tid = psip->TableIDExtension();
 
@@ -1416,7 +1416,7 @@ void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
     if (_cached_ref_cnt[psip] > 0)
     {
         _cached_slated_for_deletion[psip] = 1;
-        return;
+        return false;
     }
     else if (TableID::PAT == psip->TableID() &&
              (_cached_pats[(tid << 8) | psip->Section()] == psip))
@@ -1433,12 +1433,14 @@ void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
     else
     {
         _cached_slated_for_deletion[psip] = 2;
-        return;
+        return false;
     }
     psip_refcnt_map_t::iterator it;
     it = _cached_slated_for_deletion.find(psip);
     if (it != _cached_slated_for_deletion.end())
         _cached_slated_for_deletion.erase(it);
+
+    return true;
 }
 
 void MPEGStreamData::CachePAT(const ProgramAssociationTable *_pat)

@@ -29,7 +29,7 @@ class ScanStreamData :
     QString GetSIStandard(QString guess = "mpeg") const;
 
   private:
-    virtual void DeleteCachedTable(PSIPTable *psip) const;  
+    virtual bool DeleteCachedTable(PSIPTable *psip) const;  
 };
 
 #endif // SCANSTREAMDATA_H_

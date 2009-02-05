@@ -186,7 +186,7 @@ class DVBStreamData : virtual public MPEGStreamData
     void CacheNIT(NetworkInformationTable*);
     void CacheSDT(ServiceDescriptionTable*);
   protected:
-    virtual void DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTable(PSIPTable *psip) const;
 
   private:
     /// DVB table monitoring

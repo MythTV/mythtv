@@ -300,7 +300,7 @@ class MPEGStreamData : public EITSource
 
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
-    virtual void DeleteCachedTable(PSIPTable *psip) const;
+    virtual bool DeleteCachedTable(PSIPTable *psip) const;
     void CachePAT(const ProgramAssociationTable *pat);
     void CachePMT(const ProgramMapTable *pmt);
 

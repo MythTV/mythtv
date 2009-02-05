@@ -81,12 +81,13 @@ QString ScanStreamData::GetSIStandard(QString guess) const
 }
 
 
-void ScanStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool ScanStreamData::DeleteCachedTable(PSIPTable *psip) const
 {
     if (!psip)
-        return;
+        return false;
 
-    ATSCStreamData::DeleteCachedTable(psip);
-    if (psip->pesdata())
-        DVBStreamData::DeleteCachedTable(psip);
+    if (ATSCStreamData::DeleteCachedTable(psip))
+        return true;
+    else
+        return DVBStreamData::DeleteCachedTable(psip);
 }

@@ -853,10 +853,10 @@ void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
     sdts.clear();
 }
 
-void DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
+bool DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
 {
     if (!psip)
-        return;
+        return false;
 
     uint tid = psip->TableIDExtension();
 
@@ -864,7 +864,7 @@ void DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
     if (_cached_ref_cnt[psip] > 0)
     {
         _cached_slated_for_deletion[psip] = 1;
-        return;
+        return false;
     }
     else if ((TableID::NIT == psip->TableID()) &&
              _cached_nit[psip->Section()])
@@ -880,13 +880,14 @@ void DVBStreamData::DeleteCachedTable(PSIPTable *psip) const
     }
     else
     {
-        MPEGStreamData::DeleteCachedTable(psip);
-        return;
+        return MPEGStreamData::DeleteCachedTable(psip);
     }
     psip_refcnt_map_t::iterator it;
     it = _cached_slated_for_deletion.find(psip);
     if (it != _cached_slated_for_deletion.end())
         _cached_slated_for_deletion.erase(it);
+
+    return true;
 }
 
 void DVBStreamData::CacheNIT(NetworkInformationTable *nit)
