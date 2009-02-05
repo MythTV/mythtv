@@ -152,7 +152,7 @@
             <area>20,430,720,140</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <value>%|"SUBTITLE|"%\n%STARS%%DESCRIPTION%</value>
+            <value>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</value>
         </textarea>
 
         <textarea name="recordingstatus" from="basetextarea">
@@ -769,7 +769,7 @@
         <textarea name="description" from="basetextarea">
             <area>30,475,720,90</area>
             <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"%\n%STARS%%DESCRIPTION%</value>
+            <value>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</value>
         </textarea>
         <textarea name="type" from="basetextarea">
             <area>30,560,560,30</area>

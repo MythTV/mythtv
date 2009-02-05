@@ -694,10 +694,18 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
 
     if (stars)
     {
-        progMap["stars"] = QObject::tr("%n star(s)", "", stars * 4.0);
+        progMap["stars"] = QObject::tr("%n star(s)", "", (int)(stars * 4));
     }
     else
         progMap["stars"] = "";
+
+    if (stars)
+    {
+        QString str = QObject::tr("%n star(s)", "", (int)(stars * 4));
+        progMap["yearstars"] = QString("(%1, %2) ").arg(year).arg(str);
+    }
+    else
+        progMap["yearstars"] = "";
 
     if (!hasAirDate ||
         (!programid.isEmpty() && (programid.left(2) == "MV")))
