@@ -720,12 +720,8 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("One Field (1x, Hw)");
     else if ("vdpaubobdeint" == short_name)
         return QObject::tr("Bob (2x, Hw)");
-    else if ("vdpaubasic" == short_name)
-        return QObject::tr("Temporal (1x, Hw)");
     else if ("vdpaubasicdoublerate" == short_name)
         return QObject::tr("Temporal (2x, Hw)");
-    else if ("vdpauadvanced" == short_name)
-        return QObject::tr("Advanced (1x, Hw)");
     else if ("vdpauadvanceddoublerate" == short_name)
         return QObject::tr("Advanced (2x, Hw)");
 
@@ -1502,8 +1498,6 @@ QString VideoDisplayProfile::toString(void) const
 "opengldoublerateyadif"
 "vdpauonefield"
 "vdpaubobdeint"
-"vdpaubasic"
-"vdpauadvanced"
 "vdpaubasicdoublerate"
 "vdpauadvanceddoublerate"
 */
@@ -1568,8 +1562,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_deint["vdpau"] += "none";
     safe_deint["vdpau"] += "vdpauonefield";
     safe_deint["vdpau"] += "vdpaubobdeint";
-    safe_deint["vdpau"] += "vdpaubasic";
-    safe_deint["vdpau"] += "vdpauadvanced";
     safe_deint["vdpau"] += "vdpaubasicdoublerate";
     safe_deint["vdpau"] += "vdpauadvanceddoublerate";
 
