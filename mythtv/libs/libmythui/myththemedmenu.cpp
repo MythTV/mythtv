@@ -21,18 +21,11 @@
 
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
-                    : MythScreenType(parent, name)
+    : MythScreenType(parent, name),
+      m_callback(NULL), m_callbackdata(NULL),
+      m_killable(false), m_loaded(false), m_titleState(NULL),
+      m_watermarkState(NULL), m_buttonList(NULL), m_descriptionText(NULL)
 {
-    m_loaded = false;
-
-    m_titleState = m_watermarkState = NULL;
-    m_buttonList = NULL;
-    m_descriptionText = NULL;
-
-    m_callback = NULL;
-    m_callbackdata = NULL;
-
-    m_killable = false;
 }
 
 MythThemedMenuState::~MythThemedMenuState()
@@ -91,14 +84,10 @@ void MythThemedMenuState::CopyFrom(MythUIType *base)
 MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
                                MythScreenStack *parent, const QString &name,
                                bool allowreorder, MythThemedMenuState *state)
-              : MythThemedMenuState(parent, name)
+    : MythThemedMenuState(parent, name),
+      m_state(state), m_allocedstate(false), m_foundtheme(false),
+      m_exitModifier(-1), m_ignorekeys(false), m_wantpop(false)
 {
-    m_state = state;
-    m_allocedstate = m_foundtheme = m_ignorekeys = m_wantpop = false;
-    m_exitModifier = -1;
-    m_menumode = "";
-    m_buttonList = NULL;
-
     if (!m_state)
     {
         m_state = new MythThemedMenuState(parent, "themedmenustate");
@@ -698,6 +687,7 @@ bool MythThemedMenu::handleAction(const QString &action)
     }
     else
     {
+        VERBOSE(VB_IMPORTANT, "Unknown menu action: " + action);
         m_selection = action;
         if (m_state->m_callback)
             m_state->m_callback(m_state->m_callbackdata, m_selection);
