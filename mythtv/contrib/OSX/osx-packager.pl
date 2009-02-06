@@ -552,6 +552,8 @@ mkdir $PREFIX;
 our $SRCDIR = "$WORKDIR/src";
 mkdir $SRCDIR;
 
+our $SVNDIR = "$SRCDIR/myth-svn";
+
 # configure mythplugins, and mythtv, etc
 our %conf = (
   'mythplugins'
@@ -631,7 +633,8 @@ my $cpus = `$cmd`; chomp $cpus;
 $cpus =~ s/.*, (\d+) processors$/$1/;
 if ( $cpus gt 1 )
 {
-  &Verbose("Using $cpus parallel CPUs");
+  &Verbose("Using", $cpus+1, "jobs on $cpus parallel CPUs");
+  ++$cpus;
   $parallel_make_flags = "-j$cpus";
 }
 
@@ -644,7 +647,11 @@ if ($OPT{'distclean'})
   &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/libmyth*' ]);
   &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/lib/mythtv'   ]);
   &Syscall([ '/bin/rm', '-f', '-r', '$PREFIX/share/mythtv' ]);
-  &Syscall([ '/bin/rm', '-f', '-r', $SRCDIR ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.o',     '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.a',     '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.dylib', '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.orig',  '-delete' ]);
+  &Syscall([ 'find', $SVNDIR, '-name', '*.rej',   '-delete' ]);
   exit;
 }
 
@@ -666,6 +673,21 @@ END
 ### Third party packages
 my (@build_depends, %seen_depends);
 my @comps = ('mythtv', @components);
+
+# Deal with user-supplied skip arguments
+if ( $OPT{'mythtvskip'} )
+{   @comps = grep(!m/mythtv/,      @comps)   }
+if ( $OPT{'pluginskip'} )
+{   @comps = grep(!m/mythplugins/, @comps)   }
+if ( $OPT{'themeskip'} )
+{   @comps = grep(!m/myththemes/,  @comps)   }
+
+if ( ! @comps )
+{
+  &Complain("Nothing to build! Too many ...skip arguments?");
+  exit;
+}
+
 &Verbose("Including components:", @comps);
 
 # If no SubVersion in path, and we are checking something out, build SVN:
@@ -703,7 +725,7 @@ foreach my $sw (@build_depends)
   unless (-e $filename)
   {
     &Verbose("Downloading $sw");
-    unless (&Syscall([ '/usr/bin/curl', '-L', $url, '>', $filename ],
+    unless (&Syscall([ '/usr/bin/curl', '-f', '-L', $url, '>', $filename ],
                      'munge' => 1))
     {
       &Syscall([ '/bin/rm', $filename ]) if (-e $filename);
@@ -845,8 +867,7 @@ foreach my $dir ('include', 'lib', 'share')
 }
 }
 
-my $svndir = "$SRCDIR/myth-svn";
-mkdir $svndir;
+mkdir $SVNDIR;
 
 # Deal with Subversion branches, revisions and tags:
 my $svnrepository = 'http://svn.mythtv.org/svn/';
@@ -896,34 +917,20 @@ elsif ( ! $OPT{'nohead'} )
 if (! $OPT{'nohead'})
 {
   # Empty subdirectory 'config' sometimes causes checkout problems
-  &Syscall(['rm', '-fr', $svndir . '/mythtv/config']);
+  &Syscall(['rm', '-fr', $SVNDIR . '/mythtv/config']);
   Verbose("Checking out source code");
   &Syscall([ $svn, 'co', @svnrevision,
-            map($svnrepository . $_, @comps), $svndir ]) or die;
+            map($svnrepository . $_, @comps), $SVNDIR ]) or die;
 }
 else
 {
-  &Syscall("mkdir -p $svndir/mythtv/config")
-}
-
-# Deal with user-supplied skip arguments
-if ( $OPT{'mythtvskip'} )
-{   @comps = grep(!m/mythtv/,      @comps)   }
-if ( $OPT{'pluginskip'} )
-{   @comps = grep(!m/mythplugins/, @comps)   }
-if ( $OPT{'themeskip'} )
-{   @comps = grep(!m/myththemes/,  @comps)   }
-
-if ( ! @comps )
-{
-  &Complain("Nothing to build! Too many ...skip arguments?");
-  exit;
+  &Syscall("mkdir -p $SVNDIR/mythtv/config")
 }
 
 # Build MythTV and any plugins
 foreach my $comp (@comps)
 {
-  my $compdir = "$svndir/$comp/" ;
+  my $compdir = "$SVNDIR/$comp/" ;
 
   chdir $compdir;
 
@@ -1035,15 +1042,16 @@ $VERS =~ s/^.*\-(.*)\.dylib$/$1/s;
 $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
 
 ### Program which creates bundles:
-our @bundler = "$svndir/mythtv/contrib/OSX/osx-bundler.pl";
+our @bundler = "$SVNDIR/mythtv/contrib/OSX/osx-bundler.pl";
 if ( $OPT{'verbose'} )
 {   push @bundler, '--verbose'   }
+
 
 ### Framework that has a screwed up link dependency path
 my $AVCfw = '/Developer/FireWireSDK*/Examples/' .
             'Framework/AVCVideoServices.framework';
 my @AVCfw = split / /, `ls -d $AVCfw`;
-my $AVCfw = pop @AVCfw;
+$AVCfw = pop @AVCfw;
 chop $AVCfw;
 
 ### Create each package.
@@ -1065,14 +1073,13 @@ foreach my $target ( @targets )
   # Get a fresh copy of the binary
   &Verbose("Building self-contained $target");
   &Syscall([ 'rm', '-fr', $finalTarget ]) or die;
-  &Syscall([ 'cp',  "$svndir/mythtv/programs/$builtTarget/$builtTarget",
+  &Syscall([ 'cp',  "$SVNDIR/mythtv/programs/$builtTarget/$builtTarget",
              "$SCRIPTDIR/$target" ]) or die;
 
   # Convert it to a bundled .app
   &Syscall([ @bundler, "$SCRIPTDIR/$target",
              "$PREFIX/lib/", "$PREFIX/lib/mysql" ])
       or die;
-
 
   # Remove copy of binary
   unlink "$SCRIPTDIR/$target" or die;
@@ -1097,7 +1104,7 @@ foreach my $target ( @targets )
   {   &Syscall([ @bundler, $lib ]) or die   }
 
   # The icon
-  &Syscall([ 'cp',  "$svndir/mythtv/programs/mythfrontend/mythfrontend.icns",
+  &Syscall([ 'cp',  "$SVNDIR/mythtv/programs/mythfrontend/mythfrontend.icns",
              "$res/application.icns" ]) or die;
   &Syscall([ '/Developer/Tools/SetFile', '-a', 'C', $finalTarget ]) or die;
  }
@@ -1187,7 +1194,7 @@ sub RecursiveCopy($$)
     my ($src, $dst) = @_;
 
     # First copy absolutely everything
-    &Syscall([ '/bin/cp', '-R', "$src", "$dst"]) or die;
+    &Syscall([ '/bin/cp', '-pR', "$src", "$dst"]) or die;
 
     # Then strip out any .svn directories
     my @files = map { chomp $_; $_ } `find $dst -name .svn`;
@@ -1205,7 +1212,7 @@ sub RecursiveCopy($$)
 }
 
 ######################################
-## CleanMakefiles removes every Makefile
+## CleanMakefiles removes every generated Makefile
 ## from our MythTV build that contains PREFIX.
 ## Necessary when we change the
 ## PREFIX variable.
@@ -1215,7 +1222,7 @@ sub CleanMakefiles
 {
   &Verbose("Cleaning MythTV makefiles containing PREFIX");
   &Syscall([ 'find', '.', '-name', 'Makefile', '-exec',
-             'egrep', '-q', 'PREFIX', '{}', ';', '-delete' ]) or die;
+             'egrep', '-q', 'qmake.*PREFIX', '{}', ';', '-delete' ]) or die;
 } # end CleanMakefiles
 
 
