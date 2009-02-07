@@ -1099,6 +1099,29 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-l") ||
+            !strcmp(a.argv()[argpos],"--logfile"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                logfile = a.argv()[argpos+1];
+                if (logfile.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument"
+                            " to -l/--logfile option\n";
+                    return FRONTEND_EXIT_INVALID_CMDLINE;
+                }
+                else
+                {
+                    ++argpos;
+                }
+            }
+            else
+            {
+                cerr << "Missing argument to -l/--logfile option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
@@ -1108,6 +1131,24 @@ int main(int argc, char **argv)
         }
     }
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
+
+    if (logfile.size())
+    {
+        if (log_rotate(1) < 0)
+            cerr << "cannot open logfile; using stdout/stderr" << endl;
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                                    .arg(binname)
+                                    .arg(myth_source_path)
+                                    .arg(myth_source_version));
+
+            signal(SIGHUP, &log_rotate_handler);
+        }
+    }
+
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        cerr << "Unable to ignore SIGPIPE\n";
 
     if (!cmdline.GetDisplay().isEmpty())
     {
@@ -1130,25 +1171,8 @@ int main(int argc, char **argv)
         if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile"))
         {
-            if (a.argc()-1 > argpos)
-            {
-                logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument"
-                            " to -l/--logfile option\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    ++argpos;
-                }
-            }
-            else
-            {
-                cerr << "Missing argument to -l/--logfile option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
+            // Arg processing for logfile already done (before MythContext)
+            ++argpos;
         } else if (!strcmp(a.argv()[argpos],"-v") ||
                    !strcmp(a.argv()[argpos],"--verbose"))
         {
@@ -1215,17 +1239,6 @@ int main(int argc, char **argv)
         }
         return FRONTEND_EXIT_OK;
     }
-
-    if (logfile.size())
-    {
-        if (log_rotate(1) < 0)
-            cerr << "cannot open logfile; using stdout/stderr" << endl;
-        else
-            signal(SIGHUP, &log_rotate_handler);
-    }
-
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        cerr << "Unable to ignore SIGPIPE\n";
 
     QString fileprefix = GetConfDir();
 
