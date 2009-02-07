@@ -641,7 +641,7 @@ char *PreviewGenerator::GetScreenGrab(
         return NULL;
     }
 
-    PlayerContext *ctx = new PlayerContext("previewgenerator");
+    PlayerContext *ctx = new PlayerContext(kInUseID);
     ctx->SetRingBuffer(rbuf);
     ctx->SetPlayingInfo(&pginfo);
     ctx->SetNVP(new NuppelVideoPlayer());
