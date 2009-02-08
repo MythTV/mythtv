@@ -44,23 +44,23 @@
         </buttonlist>
 
         <button name="action_0" from="basebutton">
-            <position>40,450</position>
+            <position>40,480</position>
         </button>
 
         <button name="action_1" from="action_0">
-            <position>220,450</position>
+            <position>220,480</position>
         </button>
 
         <button name="action_2" from="action_0">
-            <position>410,450</position>
+            <position>410,480</position>
         </button>
 
         <button name="action_3" from="action_0">
-            <position>600,450</position>
+            <position>600,480</position>
         </button>
 
         <textarea name="description" from="basetextarea">
-            <area>30,490,740,110</area>
+            <area>30,515,740,80</area>
             <multiline>yes</multiline>
             <align>center</align>
         </textarea>

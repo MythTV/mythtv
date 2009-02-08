@@ -24,43 +24,43 @@
     <window name="controls">
 
         <textarea name="leftdesc" from="basetextarea">
-            <area>64,86,560,30</area>
+            <area>64,46,560,30</area>
             <value>Contexts</value>
             <align>center</align>
         </textarea>
 
         <buttonlist name="leftlist" from="basebuttonlist">
-            <area>64,126,560,410</area>
+            <area>64,86,560,440</area>
             <showarrow>no</showarrow>
         </buttonlist>
 
         <textarea name="rightdesc" from="leftdesc">
-            <area>656,86,560,20</area>
+            <area>656,46,560,30</area>
             <value>Actions</value>
         </textarea>
 
         <buttonlist name="rightlist" from="leftlist">
-            <area>656,126,560,418</area>
+            <area>656,86,560,440</area>
         </buttonlist>
 
         <button name="action_0" from="basebutton">
-            <position>275,544</position>
+            <position>275,560</position>
         </button>
 
         <button name="action_1" from="action_0">
-            <position>465,544</position>
+            <position>465,560</position>
         </button>
 
         <button name="action_2" from="action_0">
-            <position>655,544</position>
+            <position>655,560</position>
         </button>
 
         <button name="action_3" from="action_0">
-            <position>845,544</position>
+            <position>845,560</position>
         </button>
 
         <textarea name="description" from="basetextarea">
-            <area>64,594,1152,90</area>
+            <area>64,600,1152,90</area>
             <multiline>yes</multiline>
             <align>center</align>
         </textarea>
