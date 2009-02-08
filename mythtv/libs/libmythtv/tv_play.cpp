@@ -9438,18 +9438,18 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (StateIsPlaying(actx->GetState()))
     {
-        if (action == "JUMPTODVDROOTMENU")
+        if (action == "JUMPTODVDROOTMENU" ||
+            action == "JUMPTODVDCHAPTERMENU" ||
+            action == "JUMPTODVDTITLEMENU")
         {
+            QString menu = "root";
+            if (action == "JUMPTODVDCHAPTERMENU")
+                menu = "chapter";
+            else if (action == "JUMPTODVDTITLEMENU")
+                menu = "title";
             actx->LockDeleteNVP(__FILE__, __LINE__);
             if (actx->nvp)
-                actx->nvp->GoToDVDMenu("menu");
-            actx->UnlockDeleteNVP(__FILE__, __LINE__);
-        }
-        else if (action == "JUMPTODVDCHAPTERMENU")
-        {
-            actx->LockDeleteNVP(__FILE__, __LINE__);
-            if (actx->nvp)
-                actx->nvp->GoToDVDMenu("chapter");
+                actx->nvp->GoToDVDMenu(menu);
             actx->UnlockDeleteNVP(__FILE__, __LINE__);
         }
         else if (action == "TOGGLEEDIT")
@@ -9559,6 +9559,8 @@ void TV::FillOSDTreeMenu(
     {
         new OSDGenericTree(
             treeMenu, tr("DVD Root Menu"),    "JUMPTODVDROOTMENU");
+        new OSDGenericTree(
+            treeMenu, tr("DVD Title Menu"),   "JUMPTODVDTITLEMENU");
         new OSDGenericTree(
             treeMenu, tr("DVD Chapter Menu"), "JUMPTODVDCHAPTERMENU");
     }

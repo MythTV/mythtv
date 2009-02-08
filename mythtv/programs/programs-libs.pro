@@ -3,7 +3,6 @@ INCLUDEPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
 INCLUDEPATH += ../../libs/libmythupnp ../../libs/libmythui
 INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb ../../libmythhdhomerun
 INCLUDEPATH += ../../libs/libmythdvdnav
-INCLUDEPATH += ../../libs/libmythdvdnav
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat

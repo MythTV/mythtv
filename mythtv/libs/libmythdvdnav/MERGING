@@ -1,0 +1,185 @@
+Updated Jan09
+
+This is libdvdnav and libdvdread from:
+svn://svn.mplayerhq.hu/dvdnav/trunk/libdvdnav
+svn://svn.mplayerhq.hu/dvdnav/trunk/libdvdread
+
+Version 1166 (post release 4.1.3)
+
+Merging:
+1. Retrieve from svn/package.
+2. Apply both patches below.
+3. Copy libdvdnav/src/* > libmythdvdnav/dvdnav
+4. Copy libdvdread/src/* > libmythdvdnav/dvdread
+
+
+Two additional patches are applied for mythtv.
+1. Adds dvdnav_get_serial_string function
+2. Adds dvdnav_get_video_format function
+
+<<<<< BEGIN PATCH dvdnav_get_serial_string >>>>>
+Index: src/dvdnav/dvdnav.h
+===================================================================
+--- src/dvdnav/dvdnav.h	(révision 1166)
++++ src/dvdnav/dvdnav.h	(copie de travail)
+@@ -537,6 +537,13 @@
+ dvdnav_status_t dvdnav_get_title_string(dvdnav_t *self, const char **title_str);
+ 
+ /*
++ * Returns a string containing the serial number of the DVD.
++ * This has a max of 15 characters and should be more unique than the
++ * title string.
++ */
++dvdnav_status_t dvdnav_get_serial_string(dvdnav_t *self, const char **serial_str);
++
++/*
+  * Get video aspect code.
+  * The aspect code does only change on VTS boundaries.
+  * See the DVDNAV_VTS_CHANGE event.
+Index: src/vm/vm.c
+===================================================================
+--- src/vm/vm.c	(révision 1166)
++++ src/vm/vm.c	(copie de travail)
+@@ -156,7 +156,7 @@
+ }
+ #endif
+ 
+-static void dvd_read_name(char *name, const char *device) {
++static void dvd_read_name(char *name, char *serial, const char *device) {
+     /* Because we are compiling with _FILE_OFFSET_BITS=64
+      * all off_t are 64bit.
+      */
+@@ -192,6 +192,8 @@
+               fprintf(MSG_OUT, " ");
+             }
+           }
++          strncpy(serial, (char*) &data[73], (i-73));
++          serial[15] = 0;
+           fprintf(MSG_OUT, "\nlibdvdnav: DVD Title (Alternative): ");
+           for(i=89; i < 128; i++ ) {
+             if((data[i] == 0)) break;
+@@ -352,7 +354,7 @@
+       fprintf(MSG_OUT, "libdvdnav: vm: failed to open/read the DVD\n");
+       return 0;
+     }
+-    dvd_read_name(vm->dvd_name, dvdroot);
++    dvd_read_name(vm->dvd_name, vm->dvd_serial, dvdroot);
+     vm->map  = remap_loadmap(vm->dvd_name);
+     vm->vmgi = ifoOpenVMGI(vm->dvd);
+     if(!vm->vmgi) {
+Index: src/vm/vm.h
+===================================================================
+--- src/vm/vm.h	(révision 1166)
++++ src/vm/vm.h	(copie de travail)
+@@ -82,6 +82,7 @@
+   dvd_state_t   state;
+   int32_t       hop_channel;
+   char          dvd_name[50];
++  char          dvd_serial[15];
+   remap_t      *map;
+   int           stopped;
+ } vm_t;
+Index: src/dvdnav.c
+===================================================================
+--- src/dvdnav.c	(révision 1166)
++++ src/dvdnav.c	(copie de travail)
+@@ -825,6 +825,11 @@
+   return DVDNAV_STATUS_OK;
+ }
+ 
++dvdnav_status_t dvdnav_get_serial_string(dvdnav_t *this, const char **serial_str) {
++  (*serial_str) = this->vm->dvd_serial;
++  return DVDNAV_STATUS_OK;
++}
++
+ uint8_t dvdnav_get_video_aspect(dvdnav_t *this) {
+   uint8_t         retval;
+<<<<< END PATCH dvdnav_get_serial_string >>>>>
+
+<<<<< BEGIN PATCH dvdnav_get_video_format >>>>>
+Index: src/dvdnav/dvdnav.h
+===================================================================
+--- src/dvdnav/dvdnav.h	(révision 1166)
++++ src/dvdnav/dvdnav.h	(copie de travail)
+@@ -555,6 +555,12 @@
+ uint8_t dvdnav_get_video_scale_permission(dvdnav_t *self);
+ 
+ /*
++ * Get video format
++ * 0 - NTSC , 1 - PAL
++ */
++uint8_t dvdnav_get_video_format(dvdnav_t *self);
++
++/*
+  * Converts a *logical* audio stream id into language code
+  * (returns 0xffff if no such stream).
+  */
+Index: src/vm/vm.c
+===================================================================
+--- src/vm/vm.c	(révision 1166)
++++ src/vm/vm.c	(copie de travail)
+@@ -893,6 +893,10 @@
+   return vm_get_video_attr(vm).permitted_df;
+ }
+ 
++int vm_get_video_format(vm_t *vm) {
++  return vm_get_video_attr(vm).video_format;
++}
++
+ video_attr_t vm_get_video_attr(vm_t *vm) {
+   switch ((vm->state).domain) {
+   case VTS_DOMAIN:
+@@ -1706,7 +1710,7 @@
+       (vm->state).PTTN_REG = part;
+     } else {
+       /* FIXME: Handle RANDOM or SHUFFLE titles. */
+-      fprintf(MSG_OUT, "libdvdnav: RANDOM or SHUFFLE titles are NOT handled yet.\n");
++//      fprintf(MSG_OUT, "libdvdnav: RANDOM or SHUFFLE titles are NOT handled yet.\n");
+     }
+   }
+   return 1;
+Index: src/vm/vm.h
+===================================================================
+--- src/vm/vm.h	(révision 1166)
++++ src/vm/vm.h	(copie de travail)
+@@ -162,6 +162,7 @@
+ #endif
+ int  vm_get_video_aspect(vm_t *vm);
+ int  vm_get_video_scale_permission(vm_t *vm);
++int  vm_get_video_format(vm_t *vm);
+ video_attr_t vm_get_video_attr(vm_t *vm);
+ audio_attr_t vm_get_audio_attr(vm_t *vm, int streamN);
+ subp_attr_t  vm_get_subp_attr(vm_t *vm, int streamN);
+Index: src/dvdnav.c
+===================================================================
+--- src/dvdnav.c	(révision 1166)
++++ src/dvdnav.c	(copie de travail)
+@@ -855,6 +855,25 @@
+   return retval;
+ }
+ 
++uint8_t dvdnav_get_video_format(dvdnav_t *this) {
++  uint8_t         retval;
++
++  if(!this) {
++    printerr("Passed a NULL pointer.");
++    return -1;
++  }
++  if(!this->started) {
++   printerr("Virtual DVD machine not started.");
++   return -1;
++  }
++  
++  pthread_mutex_lock(&this->vm_lock);
++  retval = (uint8_t)vm_get_video_format(this->vm);
++  pthread_mutex_unlock(&this->vm_lock);
++
++  return retval;
++}
++
+ uint16_t dvdnav_audio_stream_to_lang(dvdnav_t *this, uint8_t stream) {
+   audio_attr_t  attr;
+ 
+<<<<< END PATCH dvdnav_get_video_format >>>>>
+
+

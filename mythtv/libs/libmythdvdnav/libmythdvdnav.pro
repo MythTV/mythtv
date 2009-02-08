@@ -7,30 +7,46 @@ CONFIG += thread staticlib warn_off
 CONFIG -= qt
 target.path = $${LIBDIR}
 
-INCLUDEPATH += ../ ../../ ../libmythdb
+INCLUDEPATH += ../../
+INCLUDEPATH += ./dvdnav
+
 
 #build position independent code since the library is linked into a shared library
 QMAKE_CFLAGS += -fPIC -DPIC
 
-DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE DVDNAV_COMPILE
+DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
+
+DEFINES += VERSION=\\\"svnR1166\\\"
+
+# DEFINES += LOG_DEBUG TRACE
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
-# Input
-HEADERS += bswap.h decoder.h dvd_input.h dvdnav_events.h dvdnav.h 
-HEADERS += dvdnav_internal.h dvd_reader.h dvdread_internal.h dvd_types.h
-HEADERS += dvd_udf.h ifo_read.h ifo_types.h md5.h nav_print.h nav_read.h
-HEADERS += nav_types.h read_cache.h remap.h vmcmd.h vm.h
+# dvdnav
+HEADERS += dvdnav/dvdnav_internal.h dvdnav/read_cache.h dvdnav/remap.h
+HEADERS += dvdnav/vm/decoder.h dvdnav/vm/vm.h dvdnav/vm/vmcmd.h
 
-SOURCES += decoder.c dvd_input.c dvdnav.c dvd_reader.c dvd_udf.c highlight.c
-SOURCES += ifo_read.c md5.c navigation.c nav_print.c nav_read.c read_cache.c
-SOURCES += remap.c searching.c settings.c vm.c vmcmd.c
+SOURCES += dvdnav/dvdnav.c dvdnav/read_cache.c dvdnav/navigation.c
+SOURCES += dvdnav/highlight.c dvdnav/searching.c dvdnav/settings.c
+SOURCES += dvdnav/remap.c dvdnav/vm/decoder.c dvdnav/vm/vm.c
+SOURCES += dvdnav/vm/vmcmd.c
 
-inc.path = $${PREFIX}/include/mythtv/dvdnav
-inc.files = dvdnav_events.h dvd_reader.h ifo_types.h nav_read.h dvdnav.h
-inc.files += dvd_types.h ifo_read.h nav_print.h nav_types.h
+# dvdread
+HEADERS += dvdread/bswap.h dvdread/dvd_input.h dvdread/dvdread_internal.h
+HEADERS += dvdread/dvdread/dvd_udf.h dvdread/md5.h
+HEADERS += dvdread/dvdread/bitreader.h
 
-INSTALLS += target inc
+SOURCES += dvdread/dvd_reader.c dvdread/nav_read.c dvdread/ifo_read.c
+SOURCES += dvdread/dvd_input.c dvdread/dvd_udf.c dvdread/md5.c
+SOURCES += dvdread/nav_print.c dvdread/ifo_print.c dvdread/bitreader.c
+
+inc_dvdnav.path = $${PREFIX}/include/mythtv/dvdnav
+inc_dvdnav.files = dvdnav/dvdnav.h dvdnav/dvdnav_events.h dvdnav/dvd_types.h 
+inc_dvdread.path = $${PREFIX}/include/mythtv/dvdread
+inc_dvdread.files = dvdread/dvd_reader.h dvdread/nav_types.h dvdread/ifo_types.h
+inc_dvdread.files += dvdread/nav_read.h dvdread/ifo_read.h
+
+INSTALLS += target inc_dvdnav inc_dvdread
 
 
 macx {
