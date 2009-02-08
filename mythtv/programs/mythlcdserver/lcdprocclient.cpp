@@ -426,7 +426,8 @@ void LCDProcClient::init()
         sendToServer("widget_add Time sep num");
         sendToServer("widget_add Time d2 num");
         sendToServer("widget_add Time d3 num");
-        dobigclock(1);
+        sendToServer("widget_add Time ampm string");
+        sendToServer("widget_add Time dot string");
     }
     else
     {
@@ -532,7 +533,10 @@ void LCDProcClient::loadSettings()
     QString aString;
     QString old_keystring = lcd_keystring;
 
-    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    timeformat = gContext->GetSetting("LCDTimeFormat", "");
+    if (timeformat.isEmpty())
+        timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    
     dateformat = gContext->GetSetting("DateFormat", "dd.MM.yyyy");
 
     // Get LCD settings
@@ -1779,58 +1783,79 @@ void LCDProcClient::reset()
 
 void LCDProcClient::dobigclock (bool init)
 {
-    // kludge ahead: use illegal number to clear num display type
     QString aString;
+    QString time = QTime::currentTime().toString(timeformat); 
+    int toffset = 0;
+    int xoffset = 0;
 
-    QString time = QTime::currentTime().toString("hh:mm");
-    // each char is 3 wide, colon is 1
+    // kludge ahead: use illegal number (11) to clear num display type
+    
+    // kluge - Uses string length to determine time format for parsing
+    // 1:00     = 4 characters  =  24-hour format, 1 digit hour
+    // 12:00    = 5 characters  =  24-hour format, 2 digit hour
+    // 1:00 am  = 7 characters  =  12-hour format, 1 digit hour
+    // 12:00 am = 8 characters  =  12-hour format, 2 digit hour 
+    if ((time.length() == 8) || (time.length() == 5)) 
+       toffset = 1;
+
+    // if 12-hour clock, add AM/PM indicator to end of the 2nd line
+    if (time.length() > 6)
+    {
+       aString = time.at(5 + toffset);
+       aString += time.at(6 + toffset);
+       xoffset = 1;
+    }
+    else 
+    {
+       aString = "  ";
+    }
+    outputRightText("Time", aString, "ampm", lcdHeight - 1);
+
+    // Add Hour 10's Digit 
     aString = "widget_set Time d0 ";
-    aString += QString::number(lcdWidth/2 - 7) + " ";
-    if (init)
+    aString += QString::number(lcdWidth/2 - 6 - xoffset) + " ";
+    if (toffset == 0)
         aString += "11";
     else
-        aString += time.at(0);
+        aString += time.at(0); 
     sendToServer(aString);
 
+    // Add Hour 1's Digit
     aString = "widget_set Time d1 ";
-    aString += QString::number(lcdWidth/2 - 4) + " ";
-    if (init)
-        aString += "11";
-    else
-        aString += time.at(1);
+    aString += QString::number(lcdWidth/2 - 3 - xoffset) + " ";  
+    aString += time.at(0 + toffset);
     sendToServer(aString);
 
-    aString = "widget_set Time d2 ";
-    aString += QString::number(lcdWidth/2 + 2) + " ";
-    if (init)
-        aString += "11";
-    else
-        aString += time.at(3);
-    sendToServer(aString);
-
-    aString = "widget_set Time d3 ";
-    aString += QString::number(lcdWidth/2 + 5) + " ";
-    if (init)
-        aString += "11";
-    else
-        aString += time.at(4);
-    sendToServer(aString);
-
+    // Add the Colon
     aString = "widget_set Time sep ";
-    aString += QString::number(lcdWidth/2);
+    aString += QString::number(lcdWidth/2 - xoffset);
+    aString += " 10";	    // 10 means: colon
+    sendToServer(aString);
+
+    // Add Minute 10's Digit
+    aString = "widget_set Time d2 ";
+    aString += QString::number(lcdWidth/2 + 1 - xoffset) + " ";	
+    aString += time.at(2 + toffset);
+    sendToServer(aString);
+
+    // Add Minute 1's Digit
+    aString = "widget_set Time d3 ";
+    aString += QString::number(lcdWidth/2 + 4 - xoffset) + " ";	
+    aString += time.at(3 + toffset);
+    sendToServer(aString);
+
+    // Added a flashing dot in the bottom-right corner
     if (timeFlash)
-    {   // 10 means: colon
-        aString += " 10";
+    {   
+        outputRightText("Time", ".", "dot", lcdHeight);
         timeFlash = false;
     }
     else 
     {
-        aString += " 11";
+        outputRightText("Time", " ", "dot", lcdHeight);
         timeFlash = true;
     }
-    sendToServer(aString);
 }
-
 
 void LCDProcClient::outputTime()
 {
@@ -2305,6 +2330,8 @@ void LCDProcClient::removeWidgets()
         sendToServer("widget_del Time sep");
         sendToServer("widget_del Time d2");
         sendToServer("widget_del Time d3");
+        sendToServer("widget_del Time ampm");
+        sendToServer("widget_del Time dot");
     }
     else
     {
