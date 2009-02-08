@@ -36,6 +36,7 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     virtual void Pulse(void);
     virtual bool keyPressEvent(QKeyEvent *);
+    virtual void Reset(void);
 
     void SetText(const QString text, bool moveCursor = true);
     QString GetText(void) const { return m_Message; }

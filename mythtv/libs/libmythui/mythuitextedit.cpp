@@ -57,6 +57,11 @@ void MythUITextEdit::Deselect()
         VERBOSE(VB_IMPORTANT, "MythUITextEdit: active state doesn't exist");
 }
 
+void MythUITextEdit::Reset()
+{
+    SetText("");
+}
+
 void MythUITextEdit::Pulse(void)
 {
     if (!m_cursorImage)
