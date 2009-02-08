@@ -1214,10 +1214,7 @@ double DVDRingBufferPriv::GetFrameRate(void)
     double dvdfps = 0;
     int format = dvdnav_get_video_format(m_dvdnav);
 
-    if (format == 1)
-        dvdfps = 23.97;
-    else
-        dvdfps = 29.97;
+    dvdfps = (format == 1)? 25.00 : 29.97;
 
     VERBOSE(VB_PLAYBACK, QString("DVD Frame Rate %1").arg(dvdfps));
 
