@@ -95,6 +95,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
         return SetFocusWidget(NULL);
 
     bool reachedCurrent = false;
+    bool looped = false;
 
     QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
     MythUIType *current;
@@ -107,13 +108,25 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
         {
             current = *it;
 
-            if (reachedCurrent && current->IsVisible() && current->IsEnabled())
+            if ((looped || reachedCurrent) &&
+                current->IsVisible() && current->IsEnabled())
                 return SetFocusWidget(current);
 
             if (current == m_CurrentFocusWidget)
                 reachedCurrent = true;
 
             ++it;
+
+            if (it == m_FocusWidgetList.end())
+            {
+                if (looped)
+                    return false;
+                else
+                {
+                    looped = true;
+                    it = m_FocusWidgetList.begin();
+                }
+            }
         }
     }
     else
@@ -123,21 +136,27 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
         {
             current = *it;
 
-            if (reachedCurrent && current->IsVisible() && current->IsEnabled())
+            if ((looped || reachedCurrent) &&
+                current->IsVisible() && current->IsEnabled())
                 return SetFocusWidget(current);
 
             if (current == m_CurrentFocusWidget)
                 reachedCurrent = true;
 
             --it;
+
+            if (it == m_FocusWidgetList.begin() - 1)
+            {
+                if (looped)
+                    return false;
+                else
+                {
+                    looped = true;
+                    it = m_FocusWidgetList.end() - 1;
+                }
+            }
         }
     }
-
-    // fall back to first/last possible widget
-    if (up)
-        return SetFocusWidget(*(m_FocusWidgetList.begin()));
-    else
-        return SetFocusWidget(*(m_FocusWidgetList.end() - 1));
 
     return false;
 }
