@@ -2043,6 +2043,24 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
             (gContext->GetNumSetting("AutoExpireInsteadOfDelete") &&
             (pginfo->recgroup != "Deleted") && (pginfo->recgroup != "LiveTV"));
 
+    QString filename = GetPlaybackURL(pginfo, false);
+    if (filename == "")
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("ERROR when trying to delete file for %1 @ %2.  Unable "
+                        "to determine filename of recording.")
+                        .arg(pginfo->chanid)
+                        .arg(pginfo->recstartts.toString(Qt::ISODate)));
+
+        if (pbssock)
+        {
+            resultCode = -2;
+            QStringList outputlist = QString::number(resultCode);
+            SendResponse(pbssock, outputlist);
+        }
+        delete pginfo;
+        return;
+    }
 
     if (justexpire && !forceMetadataDelete && pginfo->filesize > (1024 * 1024) )
     {
@@ -2059,8 +2077,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         gContext->dispatch(me);
         return;
     }
-
-    QString filename = GetPlaybackURL(pginfo, false);
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.

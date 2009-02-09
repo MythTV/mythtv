@@ -1613,7 +1613,9 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
         if (!query.exec() || !query.isActive())
             MythDB::DBError("GetRecordBasename", query);
         else if (query.size() < 1)
-            VERBOSE(VB_IMPORTANT, QString("GetRecordBasename found no entry"));
+            VERBOSE(VB_IMPORTANT, QString("GetRecordBasename found no entry "
+                    "for %1 @ %2")
+                    .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
         else
         {
             query.next();
@@ -1634,6 +1636,9 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
     QString tmpURL;
     QString basename = GetRecordBasename(true);
 
+    if (basename == "")
+        return "";
+
     bool alwaysStream = gContext->GetNumSetting("AlwaysStreamFiles", 0);
 
     if ((!alwaysStream) ||
@@ -1652,8 +1657,9 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
         }
         else if (hostname == gContext->GetHostName())
         {
-            VERBOSE(VB_FILE, LOC_ERR + QString("GetPlaybackURL: '%1' should be "
-                    "local, but it can not be found.").arg(basename));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("GetPlaybackURL: '%1' should be local, but it can "
+                            "not be found.").arg(basename));
             return QString("/GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
                            .arg(hostname).arg(basename);
         }
@@ -3940,7 +3946,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         recDir = "";
     }
-    else if (RemoteCheckFile(this) && pathname.left(1) == "/")
+    else if (!gContext->IsMasterBackend() &&
+              RemoteCheckFile(this) && pathname.left(1) == "/")
     {
         recDir = pathname.section("/", 0, -2);
     }

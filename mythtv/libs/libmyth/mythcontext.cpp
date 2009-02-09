@@ -1296,6 +1296,15 @@ MythContext::~MythContext()
 
 bool MythContext::ConnectToMasterServer(bool blockingClient)
 {
+    if (gContext->IsMasterBackend())
+    {
+        // Should never get here unless there is a bug in the code somewhere.
+        // If this happens, it can cause endless event loops.
+        VERBOSE(VB_IMPORTANT, "ERROR: Master backend tried to connect back "
+                "to itself!");
+        return false;
+    }
+
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
 
