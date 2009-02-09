@@ -2055,7 +2055,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         if (pbssock)
         {
             resultCode = -2;
-            QStringList outputlist << QString::number(resultCode);
+            QStringList outputlist(QString::number(resultCode));
             SendResponse(pbssock, outputlist);
         }
         delete pginfo;
