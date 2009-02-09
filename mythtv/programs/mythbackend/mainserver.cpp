@@ -2055,7 +2055,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         if (pbssock)
         {
             resultCode = -2;
-            QStringList outputlist = QString::number(resultCode);
+            QStringList outputlist << QString::number(resultCode);
             SendResponse(pbssock, outputlist);
         }
         delete pginfo;
@@ -2993,7 +2993,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long start = slist[2].toLongLong();
         long long end   = slist[3].toLongLong();
         PosMap map;
-        
+
         if (!enc->GetKeyframePositions(start, end, map))
         {
             retlist << "error";
