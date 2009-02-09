@@ -1345,7 +1345,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             if (proginfo->hostname != gContext->GetHostName())
                 slave = getSlaveByHostname(proginfo->hostname);
 
-            if (proginfo->hostname == gContext->GetHostName())
+            if ((proginfo->hostname == gContext->GetHostName()) ||
+                (!slave && masterBackendOverride))
             {
                 proginfo->pathname = QString("myth://") + ip + ":" + port
                                      + "/" + proginfo->pathname;
