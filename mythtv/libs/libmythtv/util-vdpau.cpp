@@ -552,7 +552,8 @@ void VDPAUContext::DeinitFlipQueue(void)
     }
 }
 
-bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
+bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
+                               LetterBoxColour letterbox_colour)
 {
     int num_bufs = numbufs;
 
@@ -718,6 +719,29 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
     // minimise green screen
     if (ok)
         ClearScreen();
+
+    // set letterbox colour
+    if (ok && (letterbox_colour == kLetterBoxColour_Gray25))
+    {
+        VdpColor gray;
+        gray.red = 0.5f;
+        gray.green = 0.5f;
+        gray.blue = 0.5f;
+        gray.alpha = 1.0f;
+
+        VdpVideoMixerAttribute attributes[] = {
+            VDP_VIDEO_MIXER_ATTRIBUTE_BACKGROUND_COLOR,
+        };
+        void const * attribute_values[] = { &gray };
+
+        vdp_st = vdp_video_mixer_set_attribute_values(
+           videoMixer,
+           ARSIZE(attributes),
+           attributes,
+           attribute_values
+        );
+        CHECK_ST
+    }
 
     return ok;
 }

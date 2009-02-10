@@ -28,7 +28,8 @@ class VDPAUContext
     bool IsErrored(void) { return errored; }
     void SetErrored(void) { errored = true; }
 
-    bool InitBuffers(int width, int height, int numbufs);
+    bool InitBuffers(int width, int height, int numbufs,
+                     LetterBoxColour letterbox_colour);
     void FreeBuffers(void);
     void *GetRenderData(int i) 
     { if (i < numSurfaces && i >= 0) return (void*)&(surface_render[i]); 

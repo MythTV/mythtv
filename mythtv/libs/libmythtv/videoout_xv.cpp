@@ -2322,9 +2322,8 @@ bool VideoOutputXv::CreateVDPAUBuffers(void)
         return false;
 
     const QSize video_dim = windows[0].GetVideoDim();
-    if (!vdpau->InitBuffers(video_dim.width(),
-                            video_dim.height(),
-                            NUM_VDPAU_BUFFERS))
+    if (!vdpau->InitBuffers(video_dim.width(), video_dim.height(),
+                            NUM_VDPAU_BUFFERS, db_letterbox_colour))
     {
         vdpau->FreeBuffers();
         return false;
