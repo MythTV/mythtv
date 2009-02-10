@@ -485,7 +485,7 @@ bool VDPAUContext::InitProcs(Display *disp, int screen)
 
 void VDPAUContext::DeinitProcs(void)
 {
-    if (vdp_device)
+    if (vdp_device && vdp_device_destroy)
     {
         vdp_device_destroy(vdp_device);
         vdp_device = 0;
