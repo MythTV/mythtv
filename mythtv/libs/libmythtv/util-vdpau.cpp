@@ -1516,18 +1516,30 @@ bool VDPAUContext::SetDeinterlacing(bool interlaced)
         VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
     };
 
-    VdpBool temporal = interlaced;
-    VdpBool spatial  = interlaced && deinterlacer.contains("advanced");
-    const VdpBool * feature_values[] = {
-        &temporal,
-        &spatial,
+    VdpBool temporal = false;
+    VdpBool spatial  = false;
+    if (deinterlacer.contains("basic"))
+    {
+        temporal = interlaced;
+    }
+    else if (deinterlacer.contains("advanced"))
+    {
+        temporal = interlaced;
+        spatial  = interlaced;
+    }
+    
+    const VdpBool feature_values[] = {
+        temporal,
+        spatial,
     };
 
+    // the following call generates a VDPAU error when both temporal
+    // and spatial are false (i.e. when disabling deinterlacing)
     vdp_st = vdp_video_mixer_set_feature_enables(
         videoMixer,
         ARSIZE(features),
         features,
-        *feature_values
+        feature_values
     );
     CHECK_ST
 
