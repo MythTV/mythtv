@@ -3051,7 +3051,7 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
 
             if (tmpItem)
             {
-                m_recordingList->SetValueByData(tmpItem);
+                m_recordingList->SetValueByData(qVariantFromValue(tmpItem));
 
                 MythEvent me("NETWORK_CONTROL RESPONSE OK");
                 gContext->dispatch(me);
