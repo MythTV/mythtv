@@ -162,7 +162,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 #ifdef USING_VDPAU
       vdpau(NULL),
 #endif
-      vdpau_use_osd(false), vdpau_use_pip(true), vdpau_use_colorkey(false),
+      vdpau_use_osd(false), vdpau_use_pip(true),
 
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
@@ -1877,7 +1877,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
     InitOSD(osdrenderer);
 
     // Initialize chromakeying, if we need to
-    if (!xvmc_tex && video_output_subtype >= XVideo)
+    if (!xvmc_tex && video_output_subtype >= XVideo &&
+        video_output_subtype != XVideoVDPAU)
         InitColorKey(true);
 
     // Check if we can actually use the OSD we want to use...
@@ -1996,15 +1997,6 @@ bool VideoOutputXv::Init(
  */
 void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 {
-    if (VideoOutputSubType() == XVideoVDPAU)
-    {
-        if (getenv("USE_VDPAU_COLORKEY"))
-            vdpau_use_colorkey = true;
-        VERBOSE(VB_PLAYBACK, LOC + QString("VDPAU colorkeying %1.")
-            .arg(vdpau_use_colorkey ? "enabled" : "disabled"));
-        return;
-    }
-
     static const char *attr_autopaint = "XV_AUTOPAINT_COLORKEY";
     int xv_val=0;
 
@@ -3801,16 +3793,18 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
 
     if (XVideoVDPAU == VideoOutputSubType())
     {
-        if (!vdpau_use_colorkey)
-            return;
-        X11L;
-        XSetForeground(XJ_disp, XJ_gc, 0x020202);
-        XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
-                       display_visible_rect.left(),
-                       display_visible_rect.top(),
-                       display_visible_rect.width(),
-                       display_visible_rect.height());
-        X11U;
+        if (windows[0].IsRepaintNeeded())
+        {
+            X11L;
+            XSetForeground(XJ_disp, XJ_gc, 0x020202);
+            XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
+                           display_visible_rect.left(),
+                           display_visible_rect.top(),
+                           display_visible_rect.width(),
+                           display_visible_rect.height());
+            X11U;
+            windows[0].SetNeedRepaint(false);
+        }
         return;
     }
 

@@ -3050,6 +3050,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
             return true;
         }
         case QEvent::Paint:
+        case QEvent::UpdateRequest:
         {
             PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
             for (uint i = 0; mctx && (i < player.size()); i++)
