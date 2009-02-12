@@ -1,6 +1,5 @@
 #include <cmath>
 
-#include "videooutbase.h"
 #include "osd.h"
 #include "osdsurface.h"
 #include "NuppelVideoPlayer.h"
@@ -40,9 +39,12 @@
 
 extern "C" {
 #include "avcodec.h"
+#include "libswscale/swscale.h"
 }
 
 #include "filtermanager.h"
+
+#include "videooutbase.h"
 
 #define LOC QString("VideoOutput: ")
 #define LOC_ERR QString("VideoOutput, Error: ")
@@ -814,9 +816,19 @@ void VideoOutput::DoPipResize(int pipwidth, int pipheight)
     pip_tmp_buf = new unsigned char[sz];
     pip_tmp_buf2 = new unsigned char[sz];
 
+#if ENABLE_SWSCALE
+    pip_scaling_context = sws_getCachedContext(pip_scaling_context,
+                              pip_video_size.width(), pip_video_size.height(),
+                              PIX_FMT_YUV420P,
+                              pip_display_size.width(),
+                              pip_display_size.height(),
+                              PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                              NULL, NULL, NULL);
+#else
     pip_scaling_context = img_resample_init(
         pip_display_size.width(), pip_display_size.height(),
         pip_video_size.width(),   pip_video_size.height());
+#endif
 }
 
 /**
@@ -841,7 +853,11 @@ void VideoOutput::ShutdownPipResize(void)
 
     if (pip_scaling_context)
     {
+#if ENABLE_SWSCALE
+        sws_freeContext(pip_scaling_context);
+#else
         img_resample_close(pip_scaling_context);
+#endif
         pip_scaling_context = NULL;
     }
 
@@ -925,7 +941,12 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
             avpicture_fill(&img_in, (uint8_t *)pipimage->buf, PIX_FMT_YUV420P,
                            pipw, piph);
 
+#if ENABLE_SWSCALE
+            sws_scale(pip_scaling_context, img_in.data, img_in.linesize, 0,
+                      piph, img_out.data, img_out.linesize);
+#else
             img_resample(pip_scaling_context, &img_out, &img_in);
+#endif
           
             if (pipActive)
             {
@@ -1000,9 +1021,19 @@ void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
     int sz = vsz_display_size.height() * vsz_display_size.width() * 3 / 2;
     vsz_tmp_buf = new unsigned char[sz];
 
+#if ENABLE_SWSCALE
+    vsz_scale_context = sws_getCachedContext(vsz_scale_context,
+                              vsz_video_size.width(), vsz_video_size.height(),
+                              PIX_FMT_YUV420P,
+                              vsz_display_size.width(),
+                              vsz_display_size.height(),
+                              PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                              NULL, NULL, NULL);
+#else
     vsz_scale_context = img_resample_init(
         vsz_display_size.width(), vsz_display_size.height(),
         vsz_video_size.width(),   vsz_video_size.height());
+#endif
 }
 
 void VideoOutput::ResizeVideo(VideoFrame *frame)
@@ -1038,7 +1069,12 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
                        resize.width(), resize.height());
         avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
                        frame->width, frame->height);
+#if ENABLE_SWSCALE
+        sws_scale(vsz_scale_context, img_in.data, img_in.linesize, 0,
+                      frame->height, img_out.data, img_out.linesize);
+#else
         img_resample(vsz_scale_context, &img_out, &img_in);
+#endif
     }
 
     int xoff = resize.left();
@@ -1100,7 +1136,11 @@ void VideoOutput::ShutdownVideoResize(void)
 
     if (vsz_scale_context)
     {
+#if ENABLE_SWSCALE
+        sws_freeContext(vsz_scale_context);
+#else
         img_resample_close(vsz_scale_context);
+#endif
         vsz_scale_context = NULL;
     }
 

@@ -9,6 +9,7 @@
 #include "osd.h"
 #include "mythdirs.h"
 #include "mythverbose.h"
+#include "myth_imgconvert.h"
 
 static bool       ft_loaded = false;
 static FT_Library ft_library;
@@ -1524,7 +1525,12 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
         avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGB24,
                        nContentWidth, nContentHeight);
 
-        img_convert(&retbuf, PIX_FMT_RGB24, (AVPicture*)picture, c->pix_fmt,
+#if ENABLE_SWSCALE
+        myth_sws_img_convert(
+#else
+        img_convert(
+#endif
+            &retbuf, PIX_FMT_RGB24, (AVPicture*)picture, c->pix_fmt,
                     nContentWidth, nContentHeight);
 
         uint8_t * buf = outputbuf;

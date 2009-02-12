@@ -26,6 +26,8 @@
 #include <libmythui/mythuibutton.h>
 #include <libmythui/mythuiimage.h>
 #include <libmythui/mythuibuttonlist.h>
+#include <mythtv/mythconfig.h>
+#include <mythtv/libmythtv/myth_imgconvert.h>
 
 #ifndef INT64_C    // Used in ffmpeg headers to define some constants
 #define INT64_C(v)   (v ## LL)
@@ -789,7 +791,12 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         avpicture_deinterlace((AVPicture*)m_frame, (AVPicture*)m_frame,
                                 m_codecCtx->pix_fmt, m_frameWidth, m_frameHeight);
 
-        img_convert(&retbuf, PIX_FMT_RGBA32, 
+#if ENABLE_SWSCALE
+        myth_sws_img_convert(
+#else
+        img_convert(
+#endif
+                    &retbuf, PIX_FMT_RGBA32, 
                         (AVPicture*) m_frame, m_codecCtx->pix_fmt, m_frameWidth, m_frameHeight);
 
         QImage img(m_outputbuf, m_frameWidth, m_frameHeight,

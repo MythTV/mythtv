@@ -22,7 +22,7 @@ contains(INCLUDEPATH, /usr/local/include) {
 }
 
 DEPENDPATH  += .
-DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
+DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil ../libswscale
 DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav ../libmythdb ../libmythhdhomerun
 DEPENDPATH  += ./dvbdev ./mpeg ./iptv
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
@@ -39,7 +39,7 @@ INCLUDEPATH += .. ../.. # for avlib headers
 INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += $$POSTINC
 
-LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
+LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
 LIBS += -L../libmythdb
@@ -51,6 +51,9 @@ LIBS += -lmythdb-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
+contains( CONFIG_SWSCALE, yes) {
+    LIBS += -L../libswscale -lmythswscale-$$LIBVERSION
+}
 using_backend: LIBS += -lmp3lame
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
@@ -63,6 +66,9 @@ TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
+contains( CONFIG_SWSCALE, yes) {
+    TARGETDEPS += ../libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
+}
 
 DEFINES += _LARGEFILE_SOURCE
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
@@ -156,6 +162,7 @@ HEADERS += playgroup.h              progdetails.h
 HEADERS += channeleditor.h          channelsettings.h
 HEADERS += previewgenerator.h       transporteditor.h
 HEADERS += importicons.h
+HEADERS += myth_imgconvert.h
 
 # Remove when everything is switched to MythUI
 HEADERS += proglist_qt.h
@@ -181,6 +188,10 @@ SOURCES += progdetails.cpp
 SOURCES += channeleditor.cpp        channelsettings.cpp
 SOURCES += previewgenerator.cpp     transporteditor.cpp
 SOURCES += importicons.cpp
+
+contains( CONFIG_SWSCALE, yes ) {
+    SOURCES += myth_imgconvert.cpp
+}
 
 # Remove when everything is switched to MythUI
 SOURCES += proglist_qt.cpp
@@ -547,7 +558,7 @@ mingw {
 
 # install headers required by mytharchive
 inc.path = $${PREFIX}/include/mythtv/libmythtv/
-inc.files = programinfo.h remoteutil.h recordingtypes.h
+inc.files = programinfo.h remoteutil.h recordingtypes.h myth_imgconvert.h
 
 INSTALLS += inc
 

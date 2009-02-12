@@ -27,6 +27,7 @@ using namespace std;
 #include "DVDRingBuffer.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
+#include "myth_imgconvert.h"
 
 #include "videoout_dvdv.h"    // AvFormatDecoderPrivate has DVDV ptr
 #include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
@@ -3844,7 +3845,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         tmppicture.linesize[1] = picframe->pitches[1];
                         tmppicture.linesize[2] = picframe->pitches[2];
 
-                        img_convert(&tmppicture, PIX_FMT_YUV420P,
+#if ENABLE_SWSCALE
+                        myth_sws_img_convert(
+#else
+                        img_convert(
+#endif
+                            &tmppicture, PIX_FMT_YUV420P,
                                     (AVPicture *)&mpa_pic,
                                     context->pix_fmt,
                                     context->width,

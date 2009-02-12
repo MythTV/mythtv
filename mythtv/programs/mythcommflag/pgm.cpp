@@ -5,6 +5,7 @@ extern "C" {
 }
 #include "frame.h"
 #include "mythcontext.h"
+#include "myth_imgconvert.h"
 #include "pgm.h"
 
 /*
@@ -44,7 +45,12 @@ pgm_fill(AVPicture *dst, const VideoFrame *frame)
         return -1;
     }
 
-    if (img_convert(dst, PIX_FMT_GRAY8, &src, srcfmt, frame->width,
+#if ENABLE_SWSCALE
+    if (myth_sws_img_convert(
+#else
+    if (img_convert(
+#endif
+            dst, PIX_FMT_GRAY8, &src, srcfmt, frame->width,
                 frame->height))
     {
         VERBOSE(VB_COMMFLAG, "pgm_fill img_convert failed");

@@ -44,6 +44,8 @@ SOURCES += eval.c raw.c faanidct.c parser.c rangecoder.c
 SOURCES += h263.c opt.c bitstream_filter.c audioconvert.c
 SOURCES += myth_utils.c
 
+!contains( CONFIG_SWSCALE, yes )                { SOURCES *= imgresample.c }
+
 inc.path = $${PREFIX}/include/mythtv/libavcodec/
 inc.files = avcodec.h i386/mmx.h opt.h
 
@@ -422,8 +424,6 @@ using_dvdv {
 }
 
 contains( HAVE_VDPAU, yes )                     { SOURCES *= vdpauvideo.c }
-
-!contains( CONFIG_SWSCALER, yes )               { SOURCES *= imgresample.c }
 
 contains( HAVE_GPROF, yes ) {
     QMAKE_CFLAGS_RELEASE += -p

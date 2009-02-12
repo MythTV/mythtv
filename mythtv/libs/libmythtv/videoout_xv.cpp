@@ -51,6 +51,7 @@ using namespace std;
 #include "tv.h"
 #include "fourcc.h"
 #include "mythmainwindow.h"
+#include "myth_imgconvert.h"
 
 #ifdef USING_VDPAU
 #include "util-vdpau.h"
@@ -74,6 +75,8 @@ extern "C" {
 #endif // silences warning when these are already defined
     extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*,
                                       int, int, XShmSegmentInfo*);
+
+#include "libswscale/swscale.h"
 }
 
 #ifndef HAVE_ROUND
@@ -3293,7 +3296,11 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     unsigned char *sbuf = new unsigned char[
         display_visible_rect.width() * display_visible_rect.height() * 3 / 2];
     AVPicture image_in, image_out;
+#if ENABLE_SWSCALE
+    static struct SwsContext  *scontext;
+#else
     ImgReSampleContext *scontext;
+#endif
 
     avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
                    display_visible_rect.width(),
@@ -3309,12 +3316,22 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     {
         avpicture_fill(&image_in, buffer->buf, PIX_FMT_YUV420P,
                        width, height);
+#if ENABLE_SWSCALE
+        scontext = sws_getCachedContext(scontext, width, height,
+                       PIX_FMT_YUV420P, display_visible_rect.width(),
+                       display_visible_rect.height(), PIX_FMT_YUV420P,
+                       SWS_FAST_BILINEAR, NULL, NULL, NULL);
+
+        sws_scale(scontext, image_in.data, image_in.linesize, 0, height,
+                  image_out.data, image_out.linesize);
+#else
         scontext = img_resample_init(display_visible_rect.width(),
                                      display_visible_rect.height(),
                                      width, height);
         img_resample(scontext, &image_out, &image_in);
 
         img_resample_close(scontext);
+#endif
     }
     vbuffers.UnlockFrame(buffer, "PrepareFrameMem");
 
@@ -3322,7 +3339,14 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
                    non_xv_av_format, display_visible_rect.width(),
                    display_visible_rect.height());
 
-    img_convert(&image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
+
+#if ENABLE_SWSCALE
+    // XXX TODO: join with the scaling after removing img_convert, img_resample
+    myth_sws_img_convert(
+#else
+    img_convert(
+#endif
+        &image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
                 display_visible_rect.width(), display_visible_rect.height());
 
     {

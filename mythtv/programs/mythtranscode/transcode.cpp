@@ -34,6 +34,7 @@ using namespace std;
 
 extern "C" {
 #include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
 }
 
 #define LOC QString("Transcode: ")
@@ -804,7 +805,11 @@ int Transcode::TranscodeFile(
 
     frame.buf = newFrame;
     AVPicture imageIn, imageOut;
+#if ENABLE_SWSCALE
+    struct SwsContext  *scontext;
+#else
     ImgReSampleContext *scontext;
+#endif
 
     if (fifow)
         VERBOSE(VB_GENERAL, "Dumping Video and Audio data to fifos");
@@ -998,16 +1003,25 @@ int Transcode::TranscodeFile(
                                    video_width, video_height);
                     avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
                                    newWidth, newHeight);
-                    if (video_height != 1088) {
-                        scontext = img_resample_init(newWidth, newHeight,
-                                                     video_width, video_height);
-                    } else {
-                        scontext = img_resample_full_init(newWidth, newHeight,
-                                                     video_width, video_height,
-                                                     0,8,0,0,0,0,0,0);
-                    }
+
+                    int bottomBand = (video_height == 1088) ? 8 : 0;
+#if ENABLE_SWSCALE
+                    scontext = sws_getCachedContext(scontext, video_width,
+                                   video_height, PIX_FMT_YUV420P, newWidth,
+                                   newHeight, PIX_FMT_YUV420P,
+                                   SWS_FAST_BILINEAR, NULL, NULL, NULL);
+
+                    sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
+                              video_height - bottomBand,
+                              imageOut.data, imageOut.linesize);
+#else
+                    scontext = img_resample_full_init(newWidth, newHeight,
+                                   video_width, video_height,
+                                   0, bottomBand, 0, 0, 0, 0, 0, 0);
+
                     img_resample(scontext, &imageOut, &imageIn);
                     img_resample_close(scontext);
+#endif
                 }
 
                 nvr->WriteVideo(&frame, true, writekeyframe);
@@ -1055,19 +1069,25 @@ int Transcode::TranscodeFile(
                                video_width, video_height);
                 avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
                                newWidth, newHeight);
-                if (video_height != 1088) {
-                    scontext = img_resample_init(newWidth, newHeight,
-                                                 video_width, video_height);
-                }
-                else
-                {
-                    scontext = img_resample_full_init(newWidth, newHeight,
-                                                      video_width, video_height,
-                                                      0,8,0,0,0,0,0,0);
-                }
- 
+
+                int bottomBand = (video_height == 1088) ? 8 : 0;
+#if ENABLE_SWSCALE
+                scontext = sws_getCachedContext(scontext, video_width,
+                               video_height, PIX_FMT_YUV420P, newWidth,
+                               newHeight, PIX_FMT_YUV420P,
+                               SWS_FAST_BILINEAR, NULL, NULL, NULL);
+
+                sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
+                          video_height - bottomBand,
+                          imageOut.data, imageOut.linesize);
+#else
+                scontext = img_resample_full_init(newWidth, newHeight,
+                                   video_width, video_height,
+                                   0, bottomBand, 0, 0, 0, 0, 0, 0);
+
                 img_resample(scontext, &imageOut, &imageIn);
                 img_resample_close(scontext);
+#endif
             }
 
             // audio is fully decoded, so we need to reencode it
@@ -1160,6 +1180,10 @@ int Transcode::TranscodeFile(
         curFrameNum++;
         frame.frameNumber = 1 + (curFrameNum << 1);
     }
+
+#if ENABLE_SWSCALE
+    sws_freeContext(scontext);
+#endif
 
     if (! fifow)
     {

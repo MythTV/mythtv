@@ -53,10 +53,12 @@ using namespace std;
 #include "interactivetv.h"
 #include "util-osx-cocoa.h"
 #include "mythverbose.h"
+#include "myth_imgconvert.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
 #include "vsync.h"
+#include "libswscale/swscale.h"
 }
 
 #include "remoteencoder.h"
@@ -1617,7 +1619,11 @@ void NuppelVideoPlayer::ShutdownYUVResize(void)
 
     if (yuv_scaler)
     {
+#if ENABLE_SWSCALE
+        sws_freeContext(yuv_scaler);
+#else
         img_resample_close(yuv_scaler);
+#endif
         yuv_scaler = NULL;
     }
 
@@ -2783,9 +2789,18 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             yuv_scaler_in_size  = vsize;
             yuv_scaler_out_size = yuv_desired_size;
 
+#if ENABLE_SWSCALE
+            yuv_scaler = sws_getCachedContext(yuv_scaler,
+                yuv_scaler_in_size.width(),  yuv_scaler_in_size.height(),
+                PIX_FMT_YUV420P,
+                yuv_scaler_out_size.width(), yuv_scaler_out_size.height(),
+                PIX_FMT_YUV420P,
+                SWS_FAST_BILINEAR, NULL, NULL, NULL);
+#else
             yuv_scaler = img_resample_init(
                 yuv_scaler_out_size.width(), yuv_scaler_out_size.height(),
                 yuv_scaler_in_size.width(),  yuv_scaler_in_size.height());
+#endif
         }
 
         AVPicture img_out, img_in;
@@ -2796,7 +2811,13 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
                        yuv_scaler_in_size.width(),
                        yuv_scaler_in_size.height());
 
+#if ENABLE_SWSCALE
+        sws_scale(yuv_scaler, img_in.data, img_in.linesize, 0,
+                  yuv_scaler_in_size.height(),
+                  img_out.data, img_out.linesize);
+#else
         img_resample(yuv_scaler, &img_out, &img_in);
+#endif
         yuv_need_copy = false;
         yuv_wait.wakeAll();
     }
@@ -5928,7 +5949,12 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
     avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32,
                    video_dim.width(), video_dim.height());
 
-    img_convert(&retbuf, PIX_FMT_RGBA32, &orig, PIX_FMT_YUV420P,
+#if ENABLE_SWSCALE
+    myth_sws_img_convert(
+#else
+    img_convert(
+#endif
+        &retbuf, PIX_FMT_RGBA32, &orig, PIX_FMT_YUV420P,
                 video_dim.width(), video_dim.height());
 
     vw = video_dim.width();

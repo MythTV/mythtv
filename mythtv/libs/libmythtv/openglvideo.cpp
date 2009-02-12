@@ -3,6 +3,7 @@
 #include "tv.h"
 #include "openglvideo.h"
 #include "openglcontext.h"
+#include "myth_imgconvert.h"
 
 // AVLib header
 extern "C" {
@@ -654,7 +655,13 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
                        convertSize.width(), convertSize.height());
         avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
                        convertSize.width(), convertSize.height());
-        img_convert(&img_out, PIX_FMT_BGRA,
+
+#if ENABLE_SWSCALE
+    myth_sws_img_convert(
+#else
+    img_convert(
+#endif
+                    &img_out, PIX_FMT_BGRA,
                     &img_in,  PIX_FMT_YUV420P,
                     convertSize.width(), convertSize.height());
 

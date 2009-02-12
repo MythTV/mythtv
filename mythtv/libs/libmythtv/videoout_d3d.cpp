@@ -12,6 +12,7 @@ using namespace std;
 #include "fourcc.h"
 #include "videodisplayprofile.h"
 #include "mythmainwindow.h"
+#include "myth_imgconvert.h"
 
 #include "mmsystem.h"
 #include "tv.h"
@@ -522,7 +523,13 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     image_out.linesize[0] = d3drect.Pitch;
     avpicture_fill(&image_in, buffer->buf,
                    PIX_FMT_YUV420P, m_InputCX, m_InputCY);
-    img_convert(&image_out, PIX_FMT_RGBA32, &image_in,
+
+#if ENABLE_SWSCALE
+    myth_sws_img_convert(
+#else
+    img_convert(
+#endif
+        &image_out, PIX_FMT_RGBA32, &image_in,
                 PIX_FMT_YUV420P, m_InputCX, m_InputCY);
 
     hr = m_pSurface->UnlockRect();

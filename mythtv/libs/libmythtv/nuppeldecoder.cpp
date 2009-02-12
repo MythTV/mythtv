@@ -18,6 +18,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "mythcontext.h"
 #include "mythverbose.h"
+#include "myth_imgconvert.h"
 
 #include "minilzo.h"
 
@@ -908,7 +909,12 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         avpicture_fill(&tmppicture, outbuf, PIX_FMT_YUV420P, video_width,
                        video_height);
 
-        img_convert(&tmppicture, PIX_FMT_YUV420P, (AVPicture *)&mpa_pic,
+#if ENABLE_SWSCALE
+        myth_sws_img_convert(
+#else
+        img_convert(
+#endif
+            &tmppicture, PIX_FMT_YUV420P, (AVPicture *)&mpa_pic,
                     mpa_vidctx->pix_fmt, video_width, video_height);
     }
 

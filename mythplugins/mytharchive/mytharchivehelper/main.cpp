@@ -30,6 +30,8 @@ using namespace std;
 #include <mythtv/libmythdb/mythdb.h>
 #include <mythtv/libmythtv/programinfo.h>
 #include <mythtv/mythdirs.h>
+#include <mythtv/mythconfig.h>
+#include <mythtv/libmythtv/myth_imgconvert.h>
 extern "C" {
 #include <mythtv/libavcodec/avcodec.h>
 #include <mythtv/libavformat/avformat.h>
@@ -1884,7 +1886,12 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
                                               (AVPicture*)frame,
                                               codecCtx->pix_fmt, width, height);
 
-                        img_convert(&retbuf, PIX_FMT_RGBA32,
+#if ENABLE_SWSCALE
+                        myth_sws_img_convert(
+#else
+                        img_convert(
+#endif
+                                    &retbuf, PIX_FMT_RGBA32,
                                     (AVPicture*) frame,
                                     codecCtx->pix_fmt, width, height);
 
