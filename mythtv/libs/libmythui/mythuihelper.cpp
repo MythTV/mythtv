@@ -24,6 +24,7 @@
 #include "DisplayRes.h"
 #include "mythprogressdialog.h"
 #include "mythimage.h"
+#include "remotefile.h"
 
 static MythUIHelper *mythui = NULL;
 static QMutex uiLock;
@@ -1079,10 +1080,11 @@ bool MythUIHelper::FindThemeFile(QString &path)
 
 QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
 {
-    if (filename.left(5) == "myth:" || filename.isEmpty())
+    //VERBOSE(VB_GENERAL, QString("LoadScaleImage  : %1 ").arg(filename));
+    if (filename.isEmpty())
         return NULL;
 
-    if (!FindThemeFile(filename))
+    if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to find image file: %1").arg(filename));
@@ -1091,17 +1093,31 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     }
 
     QImage *ret = NULL;
-
+    QImage tmpimage;
     int width, height;
     float wmult, hmult;
 
     GetScreenSettings(width, wmult, height, hmult);
 
+    if (filename.startsWith("myth://"))
+    {
+        RemoteFile *rf = new RemoteFile(filename, false, 0);
+
+        QByteArray data;
+        bool loaded = rf->SaveAs(data);
+        delete rf;
+
+        if (loaded)
+            tmpimage.loadFromData(data);
+        else
+            VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
+    }
+    else 
+        tmpimage.load(filename);
+
     if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
-        QImage tmpimage;
-
-        if (!tmpimage.load(filename))
+        if (tmpimage.isNull())
         {
             VERBOSE(VB_IMPORTANT,
                     "Error loading image to scale, from file: " + filename);
@@ -1116,7 +1132,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     }
     else
     {
-        ret = new QImage(filename);
+        ret = new QImage(tmpimage);
         if (ret->width() == 0)
         {
             VERBOSE(VB_IMPORTANT, "Error loading image from file: "
@@ -1132,10 +1148,11 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
 
 QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 {
-    if (filename.left(5) == "myth:")
+    //VERBOSE(VB_GENERAL, QString("LoadScalePixmap  : %1 ").arg(filename));
+    if (filename.isEmpty())
         return NULL;
 
-    if (!FindThemeFile(filename))
+    if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to find image file: %1").arg(filename));
@@ -1144,17 +1161,30 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     }
 
     QPixmap *ret = NULL;
-
+    QImage tmpimage;
     int width, height;
     float wmult, hmult;
 
     GetScreenSettings(width, wmult, height, hmult);
+    if (filename.startsWith("myth://"))
+    {
+        RemoteFile *rf = new RemoteFile(filename, false, 0);
+
+        QByteArray data;
+        bool loaded = rf->SaveAs(data);
+        delete rf;
+
+        if (loaded)
+            tmpimage.loadFromData(data);
+        else
+            VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
+    }
+    else
+        tmpimage.load(filename);
 
     if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
-        QImage tmpimage;
-
-        if (!tmpimage.load(filename))
+        if (!tmpimage.isNull())
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Error loading image file: %1").arg(filename));
@@ -1169,8 +1199,8 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     }
     else
     {
-        ret = new QPixmap();
-        if (!ret->load(filename))
+        ret = new QPixmap(QPixmap::fromImage(tmpimage));
+        if (ret->width() == 0)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Error loading image file: %1").arg(filename));
@@ -1185,9 +1215,8 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 
 MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
 {
-    if (srcfile.left(5) == "myth:")
-        return NULL;
-
+    //VERBOSE(VB_GENERAL, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
+       
     QString cachefilepath = GetThemeCacheDir() + "/" + label;
     QFileInfo fi(cachefilepath);
 

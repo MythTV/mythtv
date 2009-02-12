@@ -8,6 +8,7 @@
 #include "mythimage.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "remotefile.h"
 
 MythUIHelper *MythImage::m_ui = NULL;
 
@@ -223,7 +224,28 @@ bool MythImage::Load(const QString &filename, bool scale)
     if (scale)
         im = GetMythUI()->LoadScaleImage(filename);
     else
-        im = new QImage(filename);
+    {
+        if (filename.startsWith("myth://"))
+        {
+            im = new QImage();
+            RemoteFile *rf = new RemoteFile(filename, false, 0);
+
+            QByteArray data;
+            bool ret = rf->SaveAs(data);
+
+            delete rf;
+
+            if (ret)
+                im->loadFromData(data);
+//            else
+//                VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
+
+        }
+        else
+        {
+            im = new QImage(filename);
+        }
+    }
 
     SetFileName(filename);
     if (im)
