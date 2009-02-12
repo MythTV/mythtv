@@ -1647,6 +1647,7 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
     {
         // Check to see if the file exists locally
         StorageGroup sgroup(storagegroup);
+        //VERBOSE(VB_FILE, LOC +QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
         tmpURL = sgroup.FindRecordingFile(basename);
 
         if (tmpURL != "")

@@ -2,12 +2,12 @@
 #include <qstringlist.h>
 #include <unistd.h>
 
-#include "util.h"
 #include "remoteutil.h"
 #include "cardutil.h"
 #include "inputinfo.h"
 #include "programinfo.h"
 #include "mythcontext.h"
+#include "decodeencode.h"
 #include "remoteencoder.h"
 #include "tv_rec.h"
 

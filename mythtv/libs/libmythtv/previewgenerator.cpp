@@ -27,6 +27,7 @@
 #include "remotefile.h"
 #include "storagegroup.h"
 #include "util.h"
+#include "decodeencode.h"
 #include "playercontext.h"
 #include "mythdirs.h"
 #include "mythverbose.h"

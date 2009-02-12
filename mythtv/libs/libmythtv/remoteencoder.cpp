@@ -6,6 +6,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "programinfo.h"
 #include "util.h"
+#include "decodeencode.h"
 #include "mythcontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"

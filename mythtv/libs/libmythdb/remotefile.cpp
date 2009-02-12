@@ -4,9 +4,10 @@ using namespace std;
 
 #include <QUrl>
 
+#include "mythdb.h"
 #include "remotefile.h"
-#include "util.h"
-#include "mythcontext.h"
+#include "decodeencode.h"
+// #include "mythcontext.h"
 #include "mythsocket.h"
 #include "compat.h"
 #include "mythverbose.h"
@@ -21,6 +22,7 @@ RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries) :
     query("QUERY_FILETRANSFER %1")
 {
     Open();
+    VERBOSE(VB_GENERAL,QString("RemoteFile(%1)").arg(path));
 }
 
 RemoteFile::~RemoteFile()
@@ -42,7 +44,7 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     MythSocket *lsock = new MythSocket();
     QString stype = (control) ? "control socket" : "file data socket";
-    
+
     if (!lsock->connect(host, port))
     {
         VERBOSE(VB_IMPORTANT,
@@ -53,7 +55,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         return NULL;
     }
     
-    QString hostname = gContext->GetHostName();
+    QString hostname = GetMythDB()->GetHostName();
 
     QStringList strlist;
 

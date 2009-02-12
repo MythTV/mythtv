@@ -15,10 +15,12 @@ HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h qcodecs.h
 HEADERS += mythtimer.h mythdirs.h mythsocket.h lcddevice.h
 HEADERS += exitcodes.h msocketdevice.h mythstorage.h
+HEADERS += remotefile.h decodeencode.h
 
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp
 SOURCES += mythobservable.cpp httpcomms.cpp qcodecs.cpp mythdirs.cpp
 SOURCES += msocketdevice.cpp mythsocket.cpp lcddevice.cpp mythstorage.cpp
+SOURCES += remotefile.cpp decodeencode.cpp
 
 win32:SOURCES += msocketdevice_win.cpp
 unix:SOURCES  += msocketdevice_unix.cpp
