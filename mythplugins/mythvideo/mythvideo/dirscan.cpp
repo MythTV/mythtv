@@ -123,7 +123,7 @@ namespace
             path = "";
 
         QStringList list;
-        bool ok = GetRemoteFileList(host, start_path, &list);
+        bool ok = GetRemoteFileList(host, start_path, &list, "Videos");
 
         if (!ok || list.at(0).startsWith("SLAVE UNREACHABLE"))
         {

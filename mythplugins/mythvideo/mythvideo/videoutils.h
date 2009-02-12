@@ -19,7 +19,7 @@ void CheckedSet(class MythUIStateType *uiItem, const QString &state);
 void CheckedSet(class MythUIType *container, const QString &itemName,
         const QString &value);
 
-bool GetRemoteFileList(QString host, QString path, QStringList* list);
+bool GetRemoteFileList(QString host, QString path, QStringList* list, QString sgroup);
 QString GenRemoteFileURL(QString sgroup, QString host, QString path);
 QStringList GetVideoDirsByHost(QString host);
 QStringList GetVideoDirs();

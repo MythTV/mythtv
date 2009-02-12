@@ -54,15 +54,18 @@ void CheckedSet(MythUIType *container, const QString &itemName,
     }
 }
 
-bool GetRemoteFileList(QString host, QString path, QStringList* list)
+bool GetRemoteFileList(QString host, QString path, QStringList* list, QString sgroup)
 {
 
     // Make sure the list is empty when we get started
     list->clear();
 
+    if (sgroup.isEmpty())
+        sgroup = "Videos";
+
     *list << "QUERY_SG_GETFILELIST";
     *list << host;
-    *list << "Videos";
+    *list << sgroup;
     *list << path;
 
     bool ok = gContext->SendReceiveStringList(*list);

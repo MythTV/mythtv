@@ -1556,7 +1556,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                         path = path + "/" + subdir;
 
                         QStringList tmpList;
-                        bool ok = GetRemoteFileList(host, path, &tmpList);
+                        bool ok = GetRemoteFileList(host, path, &tmpList, "Videos");
 
                         if (ok)
                         {
