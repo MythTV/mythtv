@@ -57,7 +57,7 @@ class TreeNodeData
   public:
     TreeNodeData();
     TreeNodeData(Metadata *metadata);
-    TreeNodeData(QString path);
+    TreeNodeData(QString path, QString host, QString prefix);
 
     TreeNodeData(const TreeNodeData &other);
     TreeNodeData &operator=(const TreeNodeData &rhs);
@@ -67,6 +67,8 @@ class TreeNodeData
     Metadata *GetMetadata();
     const Metadata *GetMetadata() const;
     QString GetPath() const;
+    QString GetHost() const;
+    QString GetPrefix() const;
 
   private:
     class TreeNodeDataPrivate *m_d;

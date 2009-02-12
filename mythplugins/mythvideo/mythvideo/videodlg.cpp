@@ -1373,7 +1373,8 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     QString imgFilename = GetCoverImage(node);
 
-    if (!imgFilename.isEmpty() && QFileInfo(imgFilename).exists())
+    if (!imgFilename.isEmpty() && 
+       (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
         item->SetImage(imgFilename);
 
     int nodeInt = node->getInt();
@@ -1424,6 +1425,53 @@ void VideoDialog::fetchVideos()
         SetCurrentNode(m_d->m_rootNode);
 }
 
+QString VideoDialog::RemoteImageCheck(QString host, QString filename)
+{
+    QString result = "";
+    //VERBOSE(VB_GENERAL, QString("RemoteImageCheck(%1)").arg(filename));
+
+    QStringList dirs = GetVideoDirsByHost(host);
+
+    if (dirs.size() > 0)
+    {
+        for (QStringList::const_iterator iter = dirs.begin();
+             iter != dirs.end(); ++iter)
+        {
+            QUrl sgurl = *iter;
+            QString path = sgurl.path();
+
+            QString fname = QString("%1/%2").arg(path).arg(filename);
+
+            QStringList list( QString("QUERY_SG_FILEQUERY") );
+            list << host;
+            list << "Videos";
+            list << fname;
+
+            bool ok = gContext->SendReceiveStringList(list);
+
+            if (!ok || list.at(0).startsWith("SLAVE UNREACHABLE"))
+            {
+                VERBOSE(VB_GENERAL, QString("Backend : %1 currently Unreachable. Skipping this one.")
+                                    .arg(host));
+                break;
+            }
+
+            if ((list.size() > 0) && (list.at(0) == fname))
+                result = GenRemoteFileURL("Videos", host, filename);
+
+            if (!result.isEmpty())
+            {
+            //    VERBOSE(VB_GENERAL, QString("RemoteImageCheck(%1) res :%2: :%3:")
+            //                        .arg(fname).arg(result).arg(*iter));
+                break;
+            }
+
+        }
+    }
+
+    return result;
+}
+
 QString VideoDialog::GetCoverImage(MythGenericTree *node)
 {
     int nodeInt = node->getInt();
@@ -1434,19 +1482,47 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
     {
         // load folder icon
         QString folder_path = node->GetData().value<TreeNodeData>().GetPath();
+        QString host = node->GetData().value<TreeNodeData>().GetHost();
+        QString prefix = node->GetData().value<TreeNodeData>().GetPrefix();
 
         QString filename = QString("%1/folder").arg(folder_path);
 
+        // VERBOSE(VB_GENERAL, QString("GetCoverImage host : %1  prefix : %2 file : %3")
+        //                            .arg(host).arg(prefix).arg(filename));
+ 
         QStringList test_files;
         test_files.append(filename + ".png");
         test_files.append(filename + ".jpg");
         test_files.append(filename + ".gif");
+        bool foundCover;
+
         for (QStringList::const_iterator tfp = test_files.begin();
                 tfp != test_files.end(); ++tfp)
         {
-            if (QFile::exists(*tfp))
+            QString imagePath = *tfp;
+//            VERBOSE(VB_GENERAL, QString("Cover check :%1 : ").arg(*tfp));
+
+            foundCover = false;
+            if (!host.isEmpty())
             {
-                icon_file = *tfp;
+                // Strip out any extra /'s 
+                imagePath.replace("//", "/");
+                prefix.replace("//","/");
+                imagePath = imagePath.right(imagePath.length() - (prefix.length() + 1));
+                QString tmpCover = RemoteImageCheck(host, imagePath);
+
+                if (!tmpCover.isEmpty())
+                {
+                    foundCover = true;
+                    imagePath = tmpCover;
+                }
+            }
+            else
+                foundCover = QFile::exists(imagePath);
+
+            if (foundCover)
+            {
+                icon_file = imagePath;
                 break;
             }
         }
@@ -1454,22 +1530,82 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         // If we found nothing, load the first image we find
         if (icon_file.isEmpty())
         {
-            QDir vidDir(folder_path);
             QStringList imageTypes;
-
-            imageTypes.append("*.jpg");
             imageTypes.append("*.png");
+            imageTypes.append("*.jpg");
             imageTypes.append("*.gif");
-            vidDir.setNameFilters(imageTypes);
 
-            QStringList fList = vidDir.entryList();
+            QStringList fList;
+
+            if (!host.isEmpty())
+            {
+                // TODO: This can likely get a little cleaner
+
+                QStringList dirs = GetVideoDirsByHost(host);
+
+                if (dirs.size() > 0)
+                {
+                    for (QStringList::const_iterator iter = dirs.begin();
+                         iter != dirs.end(); ++iter)
+                    {
+                        QUrl sgurl = *iter;
+                        QString path = sgurl.path();
+
+                        QString subdir = folder_path.right(folder_path.length() - (prefix.length() + 2));
+                   
+                        path = path + "/" + subdir;
+
+                        QStringList tmpList;
+                        bool ok = GetRemoteFileList(host, path, &tmpList);
+
+                        if (ok)
+                        {
+                            for (QStringList::const_iterator pattern = imageTypes.begin(); 
+                                 pattern != imageTypes.end(); ++pattern)
+                            {
+                                QRegExp rx(*pattern);
+                                rx.setPatternSyntax(QRegExp::Wildcard);
+                                QStringList matches = tmpList.filter(rx);
+                                if (matches.size() > 0)
+                                {    
+                                    fList.clear();
+                                    fList.append(subdir + "/" + matches.at(0).split("::").at(1));
+                                    break;
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                QDir vidDir(folder_path);
+                vidDir.setNameFilters(imageTypes);
+                fList = vidDir.entryList();
+            }
+
             if (!fList.isEmpty())
             {
-                icon_file = QString("%1/%2")
+                if (host.isEmpty())
+                    icon_file = QString("%1/%2")
                                     .arg(folder_path)
                                     .arg(fList.at(0));
+                else
+                    icon_file = GenRemoteFileURL("Videos", host, fList.at(0));
             }
         }
+
+        if (!icon_file.isEmpty()) 
+            VERBOSE(VB_GENERAL, QString("Found Image : %1 :")
+                                        .arg(icon_file));
+        else
+            VERBOSE(VB_GENERAL, QString("Could not find folder cover Image : %1 ")
+                                        .arg(folder_path));
+
+
     }
     else
     {
@@ -1946,10 +2082,11 @@ namespace
         }
 
         void handleFile(const QString &fileName, const QString &fqFileName,
-                const QString &extension)
+                const QString &extension, const QString &host)
         {
             (void) fileName;
             (void) extension;
+            (void) host;
             m_fileList.push_back(fqFileName);
         }
 
@@ -1964,7 +2101,8 @@ namespace
                 .getExtensionIgnoreList(extensions);
         QStringList ret;
         SimpleCollect sc(ret);
-        ScanVideoDirectory(startDir, &sc, extensions, false);
+
+        (void) ScanVideoDirectory(startDir, &sc, extensions, false);
         return ret;
     }
 }

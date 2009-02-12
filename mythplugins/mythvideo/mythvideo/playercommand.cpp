@@ -8,6 +8,7 @@
 #include "dbaccess.h"
 #include "metadata.h"
 #include "playercommand.h"
+#include "videoutils.h"
 
 namespace
 {
@@ -193,7 +194,15 @@ class VideoPlayerCommandPrivate
                         item->Title(), item->Director(), item->Length(),
                         QString::number(item->Year()));
             else
-                PlayerFor(item->Filename());
+            {
+                QString filename;
+                if (item->Host() != "")
+                    filename = GenRemoteFileURL("Videos", item->Host(), item->Filename());
+                else
+                   filename = item->Filename();
+
+                PlayerFor(filename);
+            }
         }
     }
 

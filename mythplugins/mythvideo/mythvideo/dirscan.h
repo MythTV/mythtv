@@ -9,10 +9,11 @@ class DirectoryHandler
                                      const QString &fq_dir_name) = 0;
     virtual void handleFile(const QString &file_name,
                             const QString &fq_file_name,
-                            const QString &extension) = 0;
+                            const QString &extension,
+                            const QString &host) = 0;
 };
 
-void ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
+bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
         const FileAssociations::ext_ignore_list &ext_disposition,
         bool list_unknown_extensions);
 

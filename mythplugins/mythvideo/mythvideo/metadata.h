@@ -68,7 +68,8 @@ class Metadata
              const QString &category = QString(),
              const genre_list &genres = genre_list(),
              const country_list &countries = country_list(),
-             const cast_list &cast = cast_list());
+             const cast_list &cast = cast_list(),
+             const QString &host = "");
     ~Metadata();
     Metadata(MSqlQuery &query);
     Metadata(const Metadata &rhs);
@@ -120,6 +121,9 @@ class Metadata
 
     ParentalLevel::Level ShowLevel() const;
     void setShowLevel(ParentalLevel::Level showLevel);
+
+    const QString& Host() const;
+    void setHost(const QString &host);
 
     const QString& Filename() const;
     void setFilename(const QString &filename);

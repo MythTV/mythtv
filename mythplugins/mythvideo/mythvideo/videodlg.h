@@ -110,6 +110,7 @@ class VideoDialog : public MythScreenType
 
     virtual void loadData();
     void fetchVideos();
+    QString RemoteImageCheck(QString host, QString filename);
     QString GetCoverImage(MythGenericTree *node);
 
     Metadata *GetMetadata(MythUIButtonListItem *item);

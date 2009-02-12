@@ -97,7 +97,8 @@ class MetadataImp
              const QString &playcommand, const QString &category,
              const genre_list &genres,
              const country_list &countries,
-             const cast_list &cast) :
+             const cast_list &cast,
+             const QString &host = "") :
         m_title(title),
         m_inetref(inetref), m_director(director), m_plot(plot),
         m_rating(rating), m_playcommand(playcommand), m_category(category),
@@ -105,7 +106,7 @@ class MetadataImp
         m_filename(filename), m_trailer(trailer), m_coverfile(coverfile),
         m_categoryID(categoryID), m_childID(childID), m_year(year),
         m_length(length), m_showlevel(showlevel), m_browse(browse), m_id(id),
-        m_userrating(userrating)
+        m_userrating(userrating), m_host(host)
     {
         VideoCategory::getCategory().get(m_categoryID, m_category);
     }
@@ -146,6 +147,7 @@ class MetadataImp
             m_browse = rhs.m_browse;
             m_id = rhs.m_id;
             m_userrating = rhs.m_userrating;
+            m_host = rhs.m_host;
 
             // No DB vars
             m_sort_key = rhs.m_sort_key;
@@ -206,6 +208,9 @@ class MetadataImp
 
     const cast_list &GetCast() const { return m_cast; }
     void SetCast(const cast_list &cast) { m_cast = cast; }
+
+    const QString &getHost() const { return m_host; }
+    void setHost(const QString &host) { m_host = host; }
 
     const QString &getFilename() const { return m_filename; }
     void setFilename(const QString &filename) { m_filename = filename; }
@@ -281,6 +286,7 @@ class MetadataImp
     QString m_filename;
     QString m_trailer;
     QString m_coverfile;
+    QString m_host;
 
     int m_categoryID;
     int m_childID;
@@ -387,7 +393,8 @@ void MetadataImp::Reset()
                     VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
                     VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT, 0, m_id,
                     ParentalLevel::plLowest, 0, -1, true, "", "",
-                    Metadata::genre_list(), Metadata::country_list(), Metadata::cast_list());
+                    Metadata::genre_list(), Metadata::country_list(), 
+                    Metadata::cast_list(), m_host);
     tmp.m_prefix = m_prefix;
     tmp.m_flat_index = m_flat_index;
 
@@ -475,6 +482,7 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_categoryID = query.value(14).toInt();
     m_id = query.value(15).toInt();
     m_trailer = query.value(16).toString();
+    m_host = query.value(17).toString();
 
     VideoCategory::getCategory().get(m_categoryID, m_category);
 
@@ -519,9 +527,10 @@ void MetadataImp::saveToDatabase()
 
         query.prepare("INSERT INTO videometadata (title,director,plot,"
                       "rating,year,userrating,length,filename,showlevel,"
-                      "coverfile,inetref,browse,trailer) VALUES (:TITLE, :DIRECTOR, "
+                      "coverfile,inetref,browse,trailer, host) VALUES (:TITLE, :DIRECTOR, "
                       ":PLOT, :RATING, :YEAR, :USERRATING, :LENGTH, "
-                      ":FILENAME, :SHOWLEVEL, :COVERFILE, :INETREF, :BROWSE, :TRAILER)");
+                      ":FILENAME, :SHOWLEVEL, :COVERFILE, :INETREF, :BROWSE, "
+                      ":TRAILER, :HOST)");
 
     }
     else
@@ -531,7 +540,7 @@ void MetadataImp::saveToDatabase()
                       "year = :YEAR, userrating = :USERRATING, "
                       "length = :LENGTH, filename = :FILENAME, trailer = :TRAILER, "
                       "showlevel = :SHOWLEVEL, coverfile = :COVERFILE, "
-                      "inetref = :INETREF, browse = :BROWSE, "
+                      "inetref = :INETREF, browse = :BROWSE, host = :HOST, "
                       "playcommand = :PLAYCOMMAND, childid = :CHILDID, "
                       "category = :CATEGORY WHERE intid = :INTID");
 
@@ -554,6 +563,7 @@ void MetadataImp::saveToDatabase()
     query.bindValue(":COVERFILE", m_coverfile);
     query.bindValue(":INETREF", m_inetref);
     query.bindValue(":BROWSE", m_browse);
+    query.bindValue(":HOST", m_host);
 
     if (!query.exec() || !query.isActive())
     {
@@ -793,12 +803,13 @@ Metadata::Metadata(const QString &filename, const QString &trailer, const QStrin
              const QString &playcommand, const QString &category,
              const genre_list &genres,
              const country_list &countries,
-             const cast_list &cast)
+             const cast_list &cast,
+             const QString &host)
 {
     m_imp = new MetadataImp(filename, trailer, coverfile, title, year, inetref, director,
                             plot, userrating, rating, length, id, showlevel,
                             categoryID, childID, browse, playcommand, category,
-                            genres, countries, cast);
+                            genres, countries, cast, host);
 }
 
 Metadata::~Metadata()
@@ -984,6 +995,16 @@ void Metadata::setShowLevel(ParentalLevel::Level showLevel)
 const QString &Metadata::Filename() const
 {
     return m_imp->getFilename();
+}
+
+const QString &Metadata::Host() const
+{
+    return m_imp->getHost();
+}
+
+void Metadata::setHost(const QString &host)
+{
+        m_imp->setHost(host);
 }
 
 void Metadata::setFilename(const QString &filename)

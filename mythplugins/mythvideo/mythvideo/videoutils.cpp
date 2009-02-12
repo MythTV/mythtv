@@ -11,6 +11,7 @@
 #include "globals.h"
 #include "metadatalistmanager.h"
 #include "videoutils.h"
+#include "storagegroup.h"
 
 namespace
 {
@@ -53,15 +54,55 @@ void CheckedSet(MythUIType *container, const QString &itemName,
     }
 }
 
+bool GetRemoteFileList(QString host, QString path, QStringList* list)
+{
+
+    // Make sure the list is empty when we get started
+    list->clear();
+
+    *list << "QUERY_SG_GETFILELIST";
+    *list << host;
+    *list << "Videos";
+    *list << path;
+
+    bool ok = gContext->SendReceiveStringList(*list);
+
+// Should the SLAVE UNREACH test be here ?
+    return ok;
+}
+
+QString GenRemoteFileURL(QString sgroup, QString host, QString path)
+{
+    return QString("myth://%1@").arg(sgroup) +
+              gContext->GetSettingOnHost("BackendServerIP", host) + ":" +
+              gContext->GetSettingOnHost("BackendServerPort", host) + "/" +
+              path;
+
+}
+
+QStringList GetVideoDirsByHost(QString host)
+{
+    QStringList tmp;
+
+    if (host.isEmpty()) {
+        tmp = gContext->GetSetting("VideoStartupDir",
+                    DEFAULT_VIDEOSTARTUP_DIR).split(":", QString::SkipEmptyParts);
+        for (QStringList::iterator p = tmp.begin(); p != tmp.end(); ++p)
+        {
+            *p = QDir::cleanPath(*p);
+        }
+    }
+
+    QStringList tmp2 = StorageGroup::getGroupDirs("Videos", host);
+    for (QStringList::iterator p = tmp2.begin(); p != tmp2.end(); ++p)
+        tmp.append(*p);
+
+    return tmp;
+}
+
 QStringList GetVideoDirs()
 {
-    QStringList tmp = gContext->GetSetting("VideoStartupDir",
-                DEFAULT_VIDEOSTARTUP_DIR).split(":", QString::SkipEmptyParts);
-    for (QStringList::iterator p = tmp.begin(); p != tmp.end(); ++p)
-    {
-        *p = QDir::cleanPath(*p);
-    }
-    return tmp;
+    return GetVideoDirsByHost("");
 }
 
 bool IsDefaultCoverFile(const QString &coverfile)

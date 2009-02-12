@@ -26,9 +26,14 @@ class TreeNodeDataPrivate
     TreeNodeDataPrivate(Metadata *metadata) :
         m_metadata(metadata)
     {
+        if (m_metadata)
+            m_host = m_metadata->Host();
+        else
+            m_host = "";
     }
 
-    TreeNodeDataPrivate(QString path) : m_metadata(0), m_path(path)
+    TreeNodeDataPrivate(QString path, QString host, QString prefix) 
+                        : m_metadata(0), m_path(path), m_host(host), m_prefix(prefix)
     {
     }
 
@@ -47,9 +52,21 @@ class TreeNodeDataPrivate
         return m_path;
     }
 
+    QString GetHost() const
+    {
+        return m_host;
+    }
+
+    QString GetPrefix() const
+    {
+        return m_prefix;
+    }
+
   private:
     Metadata *m_metadata;
+    QString m_host;
     QString m_path;
+    QString m_prefix;
 };
 
 TreeNodeData::TreeNodeData() : m_d(0)
@@ -61,9 +78,9 @@ TreeNodeData::TreeNodeData(Metadata *metadata)
     m_d = new TreeNodeDataPrivate(metadata);
 }
 
-TreeNodeData::TreeNodeData(QString path)
+TreeNodeData::TreeNodeData(QString path, QString host, QString prefix)
 {
-    m_d = new TreeNodeDataPrivate(path);
+    m_d = new TreeNodeDataPrivate(path, host, prefix);
 }
 
 TreeNodeData::TreeNodeData(const TreeNodeData &other) : m_d(0)
@@ -107,6 +124,20 @@ QString TreeNodeData::GetPath() const
 {
     if (m_d)
         return m_d->GetPath();
+    return QString();
+}
+
+QString TreeNodeData::GetHost() const
+{
+    if (m_d)
+        return m_d->GetHost();
+    return QString();
+}
+
+QString TreeNodeData::GetPrefix() const
+{
+    if (m_d)
+        return m_d->GetPrefix();
     return QString();
 }
 
@@ -215,13 +246,17 @@ namespace fake_unnamed
 
       public:
         meta_dir_node(const QString &path, const QString &name = "",
-                      meta_dir_node *parent = NULL, bool is_path_root = false) :
+                      meta_dir_node *parent = NULL, bool is_path_root = false,
+                      const QString &host = "", const QString &prefix = "") :
             meta_node(parent, is_path_root), m_path(path), m_name(name)
         {
             if (!name.length())
             {
                 m_name = path;
             }
+
+            m_host = host;
+            m_prefix = prefix;
         }
 
         meta_dir_node() : meta_node(NULL)
@@ -238,6 +273,26 @@ namespace fake_unnamed
             return m_name;
         }
 
+        void setHost(const QString &host)
+        {
+            m_host = host;
+        }
+
+        const QString &getHost() const
+        {
+            return m_host;
+        }
+
+        void setPrefix(const QString &prefix)
+        {
+            m_prefix = prefix;
+        }
+
+        const QString &getPrefix() const
+        {
+            return m_prefix;
+        }
+
         const QString &getPath() const
         {
             return m_path;
@@ -249,9 +304,11 @@ namespace fake_unnamed
         }
 
         smart_dir_node addSubDir(const QString &subdir,
-                                 const QString &name = "")
+                                 const QString &name = "",
+                                 const QString &host = "",
+                                 const QString &prefix = "")
         {
-            return getSubDir(subdir, name, true);
+            return getSubDir(subdir, name, true, host, prefix);
         }
 
         void addSubDir(const smart_dir_node &subdir)
@@ -260,7 +317,10 @@ namespace fake_unnamed
         }
 
         smart_dir_node getSubDir(const QString &subdir,
-                                 const QString &name = "", bool create = true)
+                                 const QString &name = "", 
+                                 bool create = true,
+                                 const QString &host = "",
+                                 const QString &prefix = "")
         {
             for (meta_dir_list::const_iterator p = m_subdirs.begin();
                  p != m_subdirs.end(); ++p)
@@ -273,7 +333,7 @@ namespace fake_unnamed
 
             if (create)
             {
-                smart_dir_node node(new meta_dir_node(subdir, name, this));
+                smart_dir_node node(new meta_dir_node(subdir, name, this, false ,host, prefix));
                 m_subdirs.push_back(node);
                 return node;
             }
@@ -377,6 +437,8 @@ namespace fake_unnamed
       private:
         QString m_path;
         QString m_name;
+        QString m_host;
+        QString m_prefix;
         meta_dir_list m_subdirs;
         meta_data_list m_entries;
     };
@@ -460,6 +522,8 @@ namespace fake_unnamed
     {
         meta_dir_node *start = dir;
         QString insert_chunk = metadata->Filename();
+        QString host = metadata->Host();
+        QString prefix = metadata->getPrefix();
 
         if (hint)
         {
@@ -488,7 +552,7 @@ namespace fake_unnamed
 
         for (QStringList::const_iterator p = path.begin(); p != path.end(); ++p)
         {
-            smart_dir_node sdn = start->addSubDir(*p);
+            smart_dir_node sdn = start->addSubDir(*p, "" , host, prefix);
             start = sdn.get();
         }
 
@@ -524,14 +588,15 @@ namespace fake_unnamed
     };
 
     MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
-            QString name, QString fqPath, bool add_up_dirs)
+            QString name, QString fqPath, bool add_up_dirs,
+            QString host = "", QString prefix = "")
     {
         // Add the subdir node...
         MythGenericTree *sub_node =
                 where_to_add->addNode(name, kSubFolder, false);
         sub_node->setAttribute(kNodeSort, kOrderSub);
         sub_node->setOrderingIndex(kNodeSort);
-        sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath)));
+        sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath, host, prefix)));
 
         // ...and the updir node.
         if (add_up_dirs)
@@ -751,7 +816,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         if ((*dir)->has_entries())
         {
             MythGenericTree *t = AddDirNode(dst, (*dir)->getName(),
-                    (*dir)->getFQPath(), include_updirs);
+                    (*dir)->getFQPath(), include_updirs, (*dir)->getHost(), (*dir)->getPrefix());
 
             build_generic_tree(t, dir->get(), include_updirs);
         }
@@ -797,7 +862,7 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
         video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
                         kRootNode, false));
         AddDirNode(video_tree_root.get(), QString(),
-                QObject::tr("No files found"), include_updirs);
+                QObject::tr("No files found"), include_updirs, "");
     }
 
     return video_tree_root.get();
@@ -908,6 +973,12 @@ void VideoListImp::buildDbList()
                     break;
                 }
             }
+
+            // TODO: Should this be based on a GUI option.
+            if (!found_prefix)
+                if ((*p)->Host() != "")
+                    found_prefix = true;
+
         }
 
         if (found_prefix)
@@ -918,7 +989,7 @@ void VideoListImp::buildDbList()
             {
                 smart_dir_node sdn =
                         video_root->addSubDir(test_prefix,
-                                              path_to_node_name(test_prefix));
+                                              path_to_node_name(test_prefix), (*p)->Host(), (*p)->getPrefix());
                 insert_base = sdn.get();
                 insert_base->setPathRoot();
 
@@ -1059,7 +1130,9 @@ namespace fake_unnamed
              dir != src.dirs_end(); ++dir)
         {
             smart_dir_node sdn = dst.addSubDir((*dir)->getPath(),
-                                               (*dir)->getName());
+                                               (*dir)->getName(),
+                                               (*dir)->getHost(),
+                                               (*dir)->getPrefix());
             copy_filtered_tree(*sdn, *(dir->get()), filter);
         }
     }
@@ -1176,6 +1249,14 @@ namespace fake_unnamed
                         const QString &fq_file_name,
                         const QString &extension)
         {
+            handleFile(file_name, fq_file_name, extension, "");
+        }
+
+        void handleFile(const QString &file_name,
+                        const QString &fq_file_name,
+                        const QString &extension,
+                        const QString &host)
+        {
             (void) file_name;
             (void) extension;
             QString file_string(fq_file_name);
@@ -1192,6 +1273,7 @@ namespace fake_unnamed
             myData->setTitle(title);
             myData->setPrefix(m_prefix);
 
+            myData->setHost(host);
             m_metalist.push_back(myData);
 
             m_directory->addEntry(new meta_data_node(myData.get()));
@@ -1214,5 +1296,5 @@ void VideoListImp::buildFileList(smart_dir_node &directory,
 
     dirhandler::free_list fl;
     dirhandler dh(directory, prefix, metalist, fl, false);
-    ScanVideoDirectory(directory->getFQPath(), &dh, ext_list, m_ListUnknown);
+    (void) ScanVideoDirectory(directory->getFQPath(), &dh, ext_list, m_ListUnknown);
 }

@@ -6,11 +6,13 @@
 #include <QApplication>
 #include <QThread>
 #include <QStringList>
+#include <QUrl>
 
 #include <mythtv/mythcontext.h>
 
 #include <mythtv/libmythui/mythscreenstack.h>
 #include <mythtv/libmythui/mythprogressdialog.h>
+#include <mythtv/libmythui/mythdialogbox.h>
 
 #include "globals.h"
 #include "dbaccess.h"
@@ -45,12 +47,17 @@ namespace
 
         void handleFile(const QString &file_name,
                         const QString &fq_file_name,
-                        const QString &extension)
+                        const QString &extension,
+			const QString &host)
 
         {
+		    //VERBOSE(VB_GENERAL,QString("handleFile: %1 :: %2").arg(fq_file_name).arg(host));
             (void) file_name;
             if (m_image_ext.find(extension.toLower()) == m_image_ext.end())
-                m_video_files[fq_file_name] = false;
+            {
+                m_video_files[fq_file_name].check = false;
+                m_video_files[fq_file_name].host = host;
+            }
         }
 
       private:
@@ -94,13 +101,27 @@ class VideoScannerThread : public QThread
 
         uint counter = 0;
         FileCheckList fs_files;
+        failedSGHosts.clear();
 
         SendProgressEvent(counter, (uint)m_directories.size(),
                           tr("Searching for video files"));
         for (QStringList::const_iterator iter = m_directories.begin();
              iter != m_directories.end(); ++iter)
         {
-            buildFileList(*iter, imageExtensions, fs_files);
+            if (!buildFileList(*iter, imageExtensions, fs_files))
+            {
+                if (iter->startsWith("myth://"))
+                {
+                    QUrl sgurl = *iter;
+                    QString host = sgurl.host();
+                    QString path = sgurl.path();
+
+                    failedSGHosts.append(host);
+
+                    VERBOSE(VB_GENERAL, QString("Failed to scan :%1:").arg(*iter));
+                }
+            }
+
             SendProgressEvent(++counter);
         }
 
@@ -119,9 +140,21 @@ class VideoScannerThread : public QThread
         m_dialog = dialog;
     }
 
+    QStringList GetFailedSGHosts(void)
+    {
+        return failedSGHosts;
+    }
+
   private:
+
+    struct CheckStruct
+    {
+        bool check;
+        QString host;
+    };
+
     typedef std::vector<std::pair<unsigned int, QString> > PurgeList;
-    typedef std::map<QString, bool> FileCheckList;
+    typedef std::map<QString, CheckStruct> FileCheckList;
 
     void promptForRemoval(unsigned int id, const QString &filename)
     {
@@ -183,6 +216,7 @@ class VideoScannerThread : public QThread
              p != m_dbmetadata->getList().end(); ++p)
         {
             QString lname = (*p)->Filename();
+            QString lhost = (*p)->Host();
             if (lname != QString::null)
             {
                 iter = files.find(lname);
@@ -190,13 +224,26 @@ class VideoScannerThread : public QThread
                 {
                     // If it's both on disk and in the database we're done with
                     // it.
-                    iter->second = true;
+                    iter->second.check= true;
                 }
                 else
                 {
                     // If it's only in the database mark it as such for removal
-                    // later
-                    remove.push_back(std::make_pair((*p)->ID(), lname));
+                    // later and NOT a remote backend.
+                    if (lhost == "")
+                    {
+                        remove.push_back(std::make_pair((*p)->ID(), lname));
+                    }
+                    else
+                    {
+                        if (!failedSGHosts.contains(lhost))
+                        {
+                            VERBOSE(VB_GENERAL, QString("Removing file SG(%1) :%2: ").arg(lhost).arg(lname));
+                            remove.push_back(std::make_pair((*p)->ID(), lname));
+                        }
+                        else
+                            VERBOSE(VB_GENERAL, QString("SG(%1) not available. Not removing file :%2: ").arg(lhost).arg(lname));
+                    }
                 }
             }
 
@@ -213,7 +260,7 @@ class VideoScannerThread : public QThread
         for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
         {
             // add files not already in the DB
-            if (!p->second)
+            if (!p->second.check)
             {
                 Metadata newFile(p->first, VIDEO_TRAILER_DEFAULT,
                                  VIDEO_COVERFILE_DEFAULT,
@@ -222,6 +269,9 @@ class VideoScannerThread : public QThread
                                  VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
                                  VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT,
                                  0, 0, ParentalLevel::plLowest);
+
+                VERBOSE(VB_GENERAL, QString("Adding : %1 : %2").arg(newFile.Host()).arg(newFile.Filename()));
+                newFile.setHost(p->second.host);
 
                 newFile.dumpToDatabase();
             }
@@ -236,15 +286,16 @@ class VideoScannerThread : public QThread
         }
     }
 
-    void buildFileList(const QString &directory,
+    bool buildFileList(const QString &directory,
                                         const QStringList &imageExtensions,
                                         FileCheckList &filelist)
     {
+        VERBOSE(VB_GENERAL, QString("buildFileList directory = %1").arg(directory));
         FileAssociations::ext_ignore_list ext_list;
         FileAssociations::getFileAssociation().getExtensionIgnoreList(ext_list);
 
         dirhandler<FileCheckList> dh(filelist, imageExtensions);
-        ScanVideoDirectory(directory, &dh, ext_list, m_ListUnknown);
+        return ScanVideoDirectory(directory, &dh, ext_list, m_ListUnknown);
     }
 
     void SendProgressEvent(uint progress, uint total = 0,
@@ -263,6 +314,7 @@ class VideoScannerThread : public QThread
     bool m_RemoveAll;
     bool m_KeepAll;
     QStringList m_directories;
+    QStringList failedSGHosts;
 
     MetadataListManager *m_dbmetadata;
     MythUIProgressDialog *m_dialog;
@@ -311,6 +363,20 @@ void VideoScanner::doScan(const QStringList &dirs)
 void VideoScanner::finishedScan()
 {
     emit finished();
+
+    QStringList failedHosts = m_scanThread->GetFailedSGHosts();
+    if (failedHosts.size() > 0)
+    {
+        QString msg = tr("Failed to Scan SG Video Hosts") + ":\n\n";
+
+        for (int i = 0; i < failedHosts.size(); ++i)
+            msg += " " + failedHosts.at(i);
+
+        msg += "\n" + tr("If they no longer exist please remove them") + "\n\n";
+
+        ShowOkPopup(msg);
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////
