@@ -454,7 +454,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3], 
 
         for (y=0; y<h; y++)
         {
-            if ((y ^ parity) & 1)
+            if ((y ^ (1 - (parity ^ tff))) & 1)
             {
                 uint8_t *prev= &p->ref[nr_p][i][y*refs];
                 uint8_t *cur = &p->ref[nr_c][i][y*refs];
