@@ -18,6 +18,7 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
     << "LiveTV"
 //    << "Thumbnails"
     << "DB Backups"
+    << "Videos"
     ;
 
 /****************************************************************************/
@@ -121,6 +122,103 @@ void StorageGroup::Init(const QString group, const QString hostname)
     }
 }
 
+QStringList StorageGroup::GetFileList(QString Path)
+{
+    QStringList files;
+    bool badPath = true;
+
+    for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
+    {
+        if (Path.startsWith(*it))
+        {
+            badPath = false;
+        }
+    }
+
+    VERBOSE(VB_FILE, LOC + QString("GetFileList: Reading '%1'").arg(Path));
+
+    if (badPath)
+        return files;
+
+    QDir d(Path);
+    if (!d.exists())
+        return files;
+
+    QFileInfoList list = d.entryInfoList();
+    if (!list.size())
+        return files;
+
+    for (QFileInfoList::iterator p = list.begin(); p != list.end(); ++p)
+    {
+        if (p->fileName() == "." ||
+            p->fileName() == ".." ||
+            p->fileName() == "Thumbs.db")
+        {
+            continue;
+        }
+
+        QString tmp;
+
+        if (p->isDir())
+            tmp = QString("dir::%1").arg(p->fileName());
+        else
+            tmp = QString("file::%1").arg(p->fileName());
+
+        VERBOSE(VB_FILE, LOC + QString("GetFileList: (%1)").arg(tmp));
+        files.append(tmp);
+    }
+
+    return files;
+}
+
+bool StorageGroup::FileExists(QString filename)
+{
+    VERBOSE(VB_FILE, LOC + QString("FileExist: Testing for '%1'")
+                                               .arg(filename));
+    bool badPath = true;
+
+    for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
+    {
+        if (filename.startsWith(*it))
+        {
+            badPath = false;
+        }
+    }
+
+    if (badPath)
+        return false;
+
+    bool result = false;
+
+    QFile checkFile(filename);
+    if (checkFile.exists(filename))
+        result = true;
+
+    return result;
+}
+
+
+// Returns a string list of details about the file
+// in the order EXISTS, DATE, SIZE
+QStringList StorageGroup::GetFileInfo(QString filename)
+{
+    VERBOSE(VB_FILE, LOC + QString("GetFileInfo: For '%1'")
+                                               .arg(filename));
+
+    QStringList details;
+
+    if (FileExists(filename))
+    {
+        QFileInfo fInfo(filename);
+
+        details << filename;
+        details << QString("%1").arg(fInfo.lastModified().toTime_t());
+        details << QString("%1").arg(fInfo.size());
+    }
+
+    return details;
+}
+
 QString StorageGroup::FindRecordingFile(QString filename)
 {
     VERBOSE(VB_FILE, LOC + QString("FindRecordingFile: Searching for '%1'")
@@ -154,8 +252,8 @@ QString StorageGroup::FindRecordingDir(QString filename)
     while (curDir < m_dirlist.size())
     {
         QString testFile = m_dirlist[curDir] + "/" + filename;
-        VERBOSE(VB_FILE, LOC + QString("FindRecordingDir: Checking '%1'")
-                .arg(m_dirlist[curDir]));
+        VERBOSE(VB_FILE, LOC + QString("FindRecordingDir: Checking '%1' for '%2'")
+                .arg(m_dirlist[curDir]).arg(testFile));
         checkFile.setFileName(testFile);
         if (checkFile.exists())
         {
@@ -326,6 +424,41 @@ QStringList StorageGroup::getRecordingsGroups(void)
 
     return groups;
 }
+
+QStringList StorageGroup::getGroupDirs(QString groupname, QString host)
+{
+    QStringList groups;
+    QString addHost;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!host.isEmpty())
+        addHost = " AND hostname = :HOSTNAME";
+    else
+        addHost = "";
+
+    QString sql = QString("SELECT dirname,hostname "
+                  "FROM storagegroup "
+                  "WHERE groupname = :GROUPNAME %1").arg(addHost);
+    
+    query.prepare(sql);
+    query.bindValue(":GROUPNAME", groupname);
+
+    if (!host.isEmpty())
+        query.bindValue(":HOSTNAME", host);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+        while (query.next())
+            groups += QString("myth://%1@%2%3").arg(groupname)
+                                       .arg(query.value(1).toString())
+                                       .arg(query.value(0).toString());
+
+    groups.sort();
+    groups.detach();
+
+    return groups;
+}
+
 
 /****************************************************************************/
 typedef enum {

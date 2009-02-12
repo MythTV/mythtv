@@ -99,6 +99,8 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleGetScheduledRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, PlaybackSock *pbs);
     void HandleGetExpiringRecordings(PlaybackSock *pbs);
+    void HandleSGGetFileList(QStringList &sList, PlaybackSock *pbs);
+    void HandleSGFileQuery(QStringList &sList, PlaybackSock *pbs);
     void HandleGetNextFreeRecorder(QStringList &slist, PlaybackSock *pbs);
     void HandleGetFreeRecorder(PlaybackSock *pbs);
     void HandleGetFreeRecorderCount(PlaybackSock *pbs);
@@ -150,7 +152,7 @@ class MainServer : public QObject, public MythSocketCBs
     FileTransfer *getFileTransferByID(int id);
     FileTransfer *getFileTransferBySock(MythSocket *socket);
 
-    QString LocalFilePath(const QUrl &url);
+    QString LocalFilePath(const QUrl &url, const QString wantgroup);
 
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(const DeleteStruct *ds);

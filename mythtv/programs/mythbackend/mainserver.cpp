@@ -44,7 +44,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"
-#include "util.h"
+#include "decodeencode.h"
 #include "mythdb.h"
 
 #include "mainserver.h"
@@ -435,6 +435,14 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "QUERY_GETEXPIRING")
     {
         HandleGetExpiringRecordings(pbs);
+    }
+    else if (command == "QUERY_SG_GETFILELIST")
+    {
+        HandleSGGetFileList(listline, pbs);
+    }
+    else if (command == "QUERY_SG_FILEQUERY")
+    {   
+        HandleSGFileQuery(listline, pbs);
     }
     else if (command == "GET_FREE_RECORDER")
     {
@@ -1054,7 +1062,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a remote file transfer")
                                .arg(commands[2]));
         QUrl qurl = slist[1];
-        QString filename = LocalFilePath(qurl);
+        QString wantgroup = slist[2];
+        QString filename = LocalFilePath(qurl, wantgroup);
 
         FileTransfer *ft = NULL;
         bool usereadahead = true;
@@ -2573,6 +2582,102 @@ void MainServer::HandleGetExpiringRecordings(PlaybackSock *pbs)
         m_expirer->GetAllExpiring(strList);
     else
         strList << QString::number(0);
+
+    SendResponse(pbssock, strList);
+}
+
+void MainServer::HandleSGGetFileList(QStringList &sList,
+                                     PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString host = gContext->GetHostName();
+    QString wantHost = sList.at(1);
+    QString groupname = sList.at(2);
+    QString path = sList.at(3);
+    QStringList strList;
+
+    bool slaveUnreachable = false;
+
+    VERBOSE(VB_FILE, QString("HandleSGGetFileList: group = %1  host = %2  path = %3 wanthost = %4").arg(groupname).arg(host).arg(path).arg(wantHost));
+
+    if (host == wantHost)
+    {
+        StorageGroup sg(groupname, host);
+        VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting local info"));
+        strList = sg.GetFileList(path);
+    }
+    else
+    {
+        PlaybackSock *slave = getSlaveByHostname(wantHost);
+        if (slave)
+        {
+            VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting remote info"));
+            strList = slave->GetSGFileList(wantHost, groupname, path);
+            slave->DownRef();
+            slaveUnreachable = false;
+        }
+        else
+        {
+            VERBOSE(VB_FILE, QString("HandleSGGetFileList: Failed to grab slave socket : %1 :").arg(wantHost));
+            slaveUnreachable = true;
+        }
+
+    }
+
+    if (slaveUnreachable)
+        strList << "SLAVE UNREACHABLE: " << host;
+
+    if (strList.count() == 0 || (strList.at(0) == "0"))
+        strList << "EMPTY LIST";
+
+    SendResponse(pbssock, strList);
+}
+
+void MainServer::HandleSGFileQuery(QStringList &sList,
+                                     PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+
+    QString host = gContext->GetHostName();
+    QString wantHost = sList.at(1);
+    QString groupname = sList.at(2);
+    QString filename = sList.at(3);
+    QStringList strList;
+
+    bool slaveUnreachable = false;
+
+    VERBOSE(VB_FILE, QString("HandleSGFileQuery: group = %1  host = %2  filename = %3 wanthost = %4").arg(groupname).arg(host).arg(filename).arg(wantHost));
+
+    if (host == wantHost)
+    {
+        StorageGroup sg(groupname, host);
+        VERBOSE(VB_FILE, QString("HandleSGFileQuery: Getting local info"));
+        strList = sg.GetFileInfo(filename);
+    }
+    else
+    {
+        PlaybackSock *slave = getSlaveByHostname(wantHost);
+        if (slave)
+        {
+            VERBOSE(VB_FILE, QString("HandleSGFileQuery: Getting remote info"));
+            strList = slave->GetSGFileQuery(wantHost, groupname, filename);
+            slave->DownRef();
+            slaveUnreachable = false;
+        }
+        else
+        {
+            VERBOSE(VB_FILE, QString("HandleSGFileQuery: Failed to grab slave socket : %1 :").arg(wantHost));
+            slaveUnreachable = true;
+        }
+
+    }
+
+    if (slaveUnreachable)
+        strList << "SLAVE UNREACHABLE: " << host;
+
+    if (strList.count() == 0 || (strList.at(0) == "0"))
+        strList << "EMPTY LIST";
 
     SendResponse(pbssock, strList);
 }
@@ -4367,7 +4472,7 @@ void MainServer::SetExitCode(int exitCode, bool closeApplication)
         QApplication::exit(m_exitCode);
 }
 
-QString MainServer::LocalFilePath(const QUrl &url)
+QString MainServer::LocalFilePath(const QUrl &url, const QString wantgroup)
 {
     QString lpath = url.path();
 
@@ -4425,8 +4530,18 @@ QString MainServer::LocalFilePath(const QUrl &url)
         {
             // For securities sake, make sure filename is really the pathless.
             QString opath = lpath;
-            lpath = QFileInfo(lpath).fileName();
             StorageGroup sgroup;
+
+            if (!wantgroup.isEmpty())
+            {
+                sgroup.Init(wantgroup);
+                lpath = url.toString();
+            }
+            else
+            {
+                lpath = QFileInfo(lpath).fileName();
+            }
+
             QString tmpFile = sgroup.FindRecordingFile(lpath);
             if (!tmpFile.isEmpty())
             {
@@ -4444,6 +4559,7 @@ QString MainServer::LocalFilePath(const QUrl &url)
                         .arg(opath));
                 lpath = "";
             }
+
         }
         else
         {

@@ -235,8 +235,10 @@ int main(int argc, char *argv[])
         pginfo->isVideo = true;
 
         // RingBuffer doesn't like relative pathnames
-        if (filename.left(1) != "/" && !filename.startsWith("dvd:"))
+        if (filename.left(1) != "/" && !filename.startsWith("dvd:") &&
+            !filename.startsWith("myth:"))
             pginfo->pathname.prepend(QDir::currentPath() + '/');
+
     }
 
     TV::StartTV(pginfo, false);

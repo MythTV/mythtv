@@ -27,7 +27,7 @@
 #include "mythxml.h"
 
 #include "mythcontext.h"
-#include "util.h"
+#include "decodeencode.h"
 #include "mythdbcon.h"
 #include "compat.h"
 #include "mythconfig.h"

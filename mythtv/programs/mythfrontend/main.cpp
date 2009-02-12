@@ -646,7 +646,8 @@ int internal_play_media(const QString &mrl, const QString &plot,
     int res = -1;
 
     QFile checkFile(mrl);
-    if (!checkFile.exists() && !mrl.startsWith("dvd:"))
+    if ((!checkFile.exists() && !mrl.startsWith("dvd:")
+         && !mrl.startsWith("myth:")))
     {
         QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
                                         "Check if the video exists")

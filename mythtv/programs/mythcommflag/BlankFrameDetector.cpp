@@ -3,8 +3,8 @@
 #include <cmath>
 
 // MythTV headers
-#include "util.h"           /* for absLongLong */
 #include "mythcontext.h"    /* gContext */
+#include "decodeencode.h"           /* for absLongLong */
 #include "NuppelVideoPlayer.h"
 
 // Commercial Flagging headers

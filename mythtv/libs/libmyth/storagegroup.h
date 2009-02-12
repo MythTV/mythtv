@@ -20,6 +20,10 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     QStringList GetDirList(void) const
         { QStringList tmp = m_dirlist; tmp.detach(); return tmp; }
 
+    QStringList GetFileList(QString Path);
+    bool FileExists(QString filename);
+    QStringList GetFileInfo(QString filename);
+
     QString FindRecordingFile(QString filename);
     QString FindRecordingDir(QString filename);
 
@@ -31,6 +35,7 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     static const QStringList kSpecialGroups;
 
     static QStringList getRecordingsGroups(void);
+    static QStringList getGroupDirs(QString groupname, QString host);
 
   private:
     QString      m_groupname;

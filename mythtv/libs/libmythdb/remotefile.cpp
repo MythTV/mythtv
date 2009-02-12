@@ -41,6 +41,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     QString host = qurl.host();
     int port = qurl.port();
     QString dir = qurl.path();
+    QString sgroup = qurl.userName();
 
     MythSocket *lsock = new MythSocket();
     QString stype = (control) ? "control socket" : "file data socket";
@@ -79,6 +80,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         strlist.append( QString("ANN FileTransfer %1 %2 %3")
             .arg(hostname).arg(usereadahead).arg(retries) );
         strlist << QString("%1").arg(dir);
+        strlist << sgroup;
 
         lsock->writeStringList(strlist);
         lsock->readStringList(strlist, true);

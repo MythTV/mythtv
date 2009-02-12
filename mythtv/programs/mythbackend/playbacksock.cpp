@@ -8,9 +8,10 @@ using namespace std;
 #include "programinfo.h"
 #include "mainserver.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/util.h"
-#include "libmythtv/inputinfo.h"
+#include "mythcontext.h"
+#include "util.h"
+#include "inputinfo.h"
+#include "decodeencode.h"
 
 #define LOC QString("PlaybackSock: ")
 #define LOC_ERR QString("PlaybackSock, Error: ")
@@ -153,6 +154,32 @@ bool PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
     SendReceiveStringList(strlist);
 
     return pginfo->FromStringList(strlist, 0);
+}
+
+QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
+                                      QString &directory)
+{
+    QStringList strlist( QString("QUERY_SG_GETFILELIST") );
+    strlist << host;
+    strlist << groupname;
+    strlist << directory;
+
+    SendReceiveStringList(strlist);
+
+    return strlist;
+}
+
+QStringList PlaybackSock::GetSGFileQuery(QString &host, QString &groupname,
+                                      QString &filename)
+{
+    QStringList strlist( QString("QUERY_SG_FILEQUERY") );
+    strlist << host;
+    strlist << groupname;
+    strlist << filename;
+
+    SendReceiveStringList(strlist);
+
+    return strlist;
 }
 
 QStringList PlaybackSock::GenPreviewPixmap(const ProgramInfo *pginfo)

@@ -18,6 +18,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "util.h"
+#include "decodeencode.h"
 #include "compat.h"
 
 static QMap<QString, int> fsID_cache;
