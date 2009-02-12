@@ -1100,9 +1100,17 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
 
     if (scan == kScan_Interlaced && deinterlacing)
-        field = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD;
+    {
+        field = frame->top_field_first ?
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD :
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD;
+    }
     else if (scan == kScan_Intr2ndField && deinterlacing)
-        field = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD;
+    {
+        field = frame->top_field_first ?
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD :
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD;
+    }
 
     outputSurface = outputSurfaces[surfaceNum];
     usleep(2000);
@@ -1138,7 +1146,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         }
 
         videoSurface = refs[1];
- 
+
         if (scan == kScan_Interlaced)
         {
             // next field is in the current frame
