@@ -25,6 +25,8 @@ using namespace std;
 
 #include "mythverbose.h"
 
+#include "decodeencode.h"
+
 /** \fn encodeLongLong(QStringList&,long long)
  *  \brief Encodes a long for streaming in the MythTV protocol.
  *
