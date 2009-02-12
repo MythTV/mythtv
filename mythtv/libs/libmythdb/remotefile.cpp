@@ -45,6 +45,15 @@ MythSocket *RemoteFile::openSocket(bool control)
     MythSocket *lsock = new MythSocket();
     QString stype = (control) ? "control socket" : "file data socket";
 
+    if (port <= 0)
+    {
+        port = GetMythDB()->GetSettingOnHost("BackendServerPort", host).toInt();
+
+        // if we still have no port use the default
+        if (port <= 0)
+            port = 6543;
+    }
+
     if (!lsock->connect(host, port))
     {
         VERBOSE(VB_IMPORTANT,
