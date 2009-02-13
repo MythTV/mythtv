@@ -165,7 +165,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 #ifdef USING_VDPAU
       vdpau(NULL),
 #endif
-      vdpau_use_osd(false), vdpau_use_pip(true),
+      vdpau_use_osd(false), vdpau_use_pip(true), vdpau_colorkey(0x020202),
 
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
@@ -1330,7 +1330,7 @@ bool VideoOutputXv::InitVDPAU(MythCodecID mcodecid)
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
     bool ok = vdpau->Init(XJ_disp, XJ_screen_num, XJ_curwin,
                           display_visible_rect.size(),
-                          db_use_picture_controls, mcodecid);
+                          db_use_picture_controls, vdpau_colorkey, mcodecid);
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, "Unable to init VDPAU");
@@ -1880,8 +1880,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     InitOSD(osdrenderer);
 
     // Initialize chromakeying, if we need to
-    if (!xvmc_tex && video_output_subtype >= XVideo &&
-        video_output_subtype != XVideoVDPAU)
+    if (!xvmc_tex && video_output_subtype >= XVideo)
         InitColorKey(true);
 
     // Check if we can actually use the OSD we want to use...
@@ -2000,6 +1999,17 @@ bool VideoOutputXv::Init(
  */
 void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 {
+    if (VideoOutputSubType() == XVideoVDPAU)
+    {
+        // if the color depth is less than 24 just use black for colorkey
+        if (XJ_depth < 24)
+            vdpau_colorkey = 0x0;
+
+        VERBOSE(VB_PLAYBACK, LOC + QString("VDPAU Colorkey: 0x%1 (depth %2)")
+                .arg(vdpau_colorkey, 0, 16).arg(XJ_depth));
+        return;
+    }
+
     static const char *attr_autopaint = "XV_AUTOPAINT_COLORKEY";
     int xv_val=0;
 
@@ -3820,7 +3830,7 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
         if (windows[0].IsRepaintNeeded())
         {
             X11L;
-            XSetForeground(XJ_disp, XJ_gc, 0x020202);
+            XSetForeground(XJ_disp, XJ_gc, vdpau_colorkey);
             XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
                            display_visible_rect.left(),
                            display_visible_rect.top(),
@@ -5142,7 +5152,7 @@ static void SetFromHW(Display *d,
             // e.g. when attempting to use PBP.
             VDPAUContext *c = new VDPAUContext();
             useVDPAU = c->Init(d, screen, curwin, QSize(1920,1200),
-                               false, vdpau_codec_id);
+                               false, 0, vdpau_codec_id);
             c->Deinit();
             delete c;
         }

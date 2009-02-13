@@ -23,7 +23,7 @@ class VDPAUContext
 
     bool Init(Display *disp, int screen, Window win,
               QSize screen_size, bool color_control,
-              MythCodecID mcodecid);
+              int color_key, MythCodecID mcodecid);
     void Deinit(void);
     bool IsErrored(void) { return errored; }
     void SetErrored(void) { errored = true; }
@@ -76,7 +76,7 @@ class VDPAUContext
     void DeinitProcs(void);
     void ClearScreen(void);
 
-    bool InitFlipQueue(Window win);
+    bool InitFlipQueue(Window win, int color_key);
     void DeinitFlipQueue(void);
 
     void AddOutputSurfaces(void);

@@ -123,7 +123,8 @@ VDPAUContext::~VDPAUContext()
 
 bool VDPAUContext::Init(Display *disp, int screen,
                         Window win, QSize screen_size,
-                        bool color_control, MythCodecID mcodecid)
+                        bool color_control, int color_key,
+                        MythCodecID mcodecid)
 {
     outputSize = screen_size;
 
@@ -136,7 +137,7 @@ bool VDPAUContext::Init(Display *disp, int screen,
     if (!ok)
         return ok;
 
-    ok = InitFlipQueue(win);
+    ok = InitFlipQueue(win, color_key);
     if (!ok)
         return ok;
 
@@ -523,7 +524,7 @@ void VDPAUContext::DeinitProcs(void)
     }
 }
 
-bool VDPAUContext::InitFlipQueue(Window win)
+bool VDPAUContext::InitFlipQueue(Window win, int color_key)
 {
     VdpStatus vdp_st;
     bool ok = true;
@@ -542,11 +543,10 @@ bool VDPAUContext::InitFlipQueue(Window win)
     );
     CHECK_ST
 
-    float tmp = 2.0 / 255.0;
     VdpColor background;
-    background.red = tmp;
-    background.green = tmp;
-    background.blue = tmp;
+    background.red   = (float)((color_key & 0xFF0000) >> 16) / 255.0f;
+    background.green = (float)((color_key & 0xFF00) >> 8) / 255.0f;
+    background.blue  = (float)(color_key & 0xFF) / 255.0f;
     background.alpha = 1.0f;
 
     if (ok)

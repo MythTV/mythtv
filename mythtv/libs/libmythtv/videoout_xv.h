@@ -298,7 +298,7 @@ class VideoOutputXv : public VideoOutput
 #endif
     bool                 vdpau_use_osd;
     bool                 vdpau_use_pip;
-    bool                 vdpau_use_colorkey;
+    int                  vdpau_colorkey;
 
     // Basic Xv drawing info
     int                  xv_port;
