@@ -687,10 +687,11 @@ bool MythThemedMenu::handleAction(const QString &action)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Unknown menu action: " + action);
         m_selection = action;
         if (m_state->m_callback)
             m_state->m_callback(m_state->m_callbackdata, m_selection);
+        else
+            VERBOSE(VB_IMPORTANT, "Unknown menu action: " + action);
     }
 
     return true;

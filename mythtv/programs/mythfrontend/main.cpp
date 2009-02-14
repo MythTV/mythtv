@@ -524,6 +524,8 @@ void TVMenuCallback(void *data, QString &selection)
         showStatus();
     else if (sel == "exiting_app")
         handleExit();
+    else
+        VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 
     if (sel.left(9) == "settings ")
     {
