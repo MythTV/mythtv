@@ -363,46 +363,47 @@ bool IconView::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "MENU")
+        if (m_itemList.size() != 0)
         {
-            HandleMainMenu();
-        }
-        else if (action == "ROTRIGHT")
-            HandleRotateCW();
-        else if (action == "ROTLEFT")
-            HandleRotateCCW();
-        else if (action == "DELETE")
-            HandleDelete();
-        else if (action == "MARK")
-        {
-            ThumbItem *thumbitem = GetCurrentThumb();
-            MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-
-            if (thumbitem)
+            if (action == "MENU")
             {
-                if (!m_itemMarked.contains(thumbitem->GetPath()))
+                HandleMainMenu();
+            }
+            else if (action == "ROTRIGHT")
+                HandleRotateCW();
+            else if (action == "ROTLEFT")
+                HandleRotateCCW();
+            else if (action == "DELETE")
+                HandleDelete();
+            else if (action == "MARK")
+            {
+                ThumbItem *thumbitem = GetCurrentThumb();
+                MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+
+                if (thumbitem)
                 {
-                    m_itemMarked.append(thumbitem->GetPath());
-                    item->setChecked(MythUIButtonListItem::FullChecked);
-                }
-                else
-                {
-                    m_itemMarked.removeAll(thumbitem->GetPath());
-                    item->setChecked(MythUIButtonListItem::NotChecked);
+                    if (!m_itemMarked.contains(thumbitem->GetPath()))
+                    {
+                        m_itemMarked.append(thumbitem->GetPath());
+                        item->setChecked(MythUIButtonListItem::FullChecked);
+                    }
+                    else
+                    {
+                        m_itemMarked.removeAll(thumbitem->GetPath());
+                        item->setChecked(MythUIButtonListItem::NotChecked);
+                    }
                 }
             }
-        }
-        else if (action == "SLIDESHOW")
-            HandleSlideShow();
-        else if (action == "RANDOMSHOW")
-            HandleRandomShow();
-        else if (action == "ESCAPE")
-        {
-            if (!HandleEscape())
+            else if (action == "SLIDESHOW")
+                HandleSlideShow();
+            else if (action == "RANDOMSHOW")
+                HandleRandomShow();
+            else
                 handled = false;
         }
-        else
-            handled = false;
+
+        if (action == "ESCAPE")
+            handled = HandleEscape();
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -877,6 +878,9 @@ void IconView::HandleDeleteCurrent(void)
 {
     ThumbItem *thumbitem = GetCurrentThumb();
 
+    if (!thumbitem)
+        return;
+    
     QString title = tr("Delete Current File or Folder");
     QString msg = (thumbitem->IsDir()) ?
         tr("Deleting 1 folder, including any subfolders and files.") :
@@ -890,6 +894,10 @@ void IconView::DoDeleteCurrent(bool doDelete)
     if (doDelete)
     {
         ThumbItem *thumbitem = GetCurrentThumb();
+        
+        if (!thumbitem)
+            return;
+            
         QFileInfo fi;
         fi.setFile(thumbitem->GetPath());
         GalleryUtil::Delete(fi);
@@ -1305,5 +1313,7 @@ void IconView::mediaStatusChanged(MediaStatus oldStatus,
 ThumbItem *IconView::GetCurrentThumb(void)
 {
     MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-    return qVariantValue<ThumbItem *>(item->GetData());
+    if (item)
+        return qVariantValue<ThumbItem *>(item->GetData());
+    return NULL;
 }
