@@ -935,7 +935,9 @@ void VDPAUContext::Decode(VideoFrame *frame)
             case PIX_FMT_VDPAU_MPEG1: vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG1; break;
             case PIX_FMT_VDPAU_MPEG2_SIMPLE: vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_SIMPLE; break;
             case PIX_FMT_VDPAU_MPEG2_MAIN: vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_MAIN; break;
-            case PIX_FMT_VDPAU_H264_BASELINE: vdp_decoder_profile = VDP_DECODER_PROFILE_H264_BASELINE; break;
+            case PIX_FMT_VDPAU_H264_BASELINE:
+                VERBOSE(VB_IMPORTANT, LOC + QString("Forcing H.264 baseline profile to main - "
+                                                   "decoding may fail."));
             case PIX_FMT_VDPAU_H264_MAIN: vdp_decoder_profile = VDP_DECODER_PROFILE_H264_MAIN; break;
             case PIX_FMT_VDPAU_H264_HIGH: vdp_decoder_profile = VDP_DECODER_PROFILE_H264_HIGH; break;
             case PIX_FMT_VDPAU_VC1_SIMPLE: vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_SIMPLE; break;
@@ -1700,6 +1702,7 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
     if (ok)
     {
         int support = 0;
+        int fully_supported = 3;
         VdpBool supported;
         // not checked yet
         uint level, refs, width, height;
@@ -1731,13 +1734,7 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
                 break;
 
             case kCodec_H264_VDPAU:
-                vdp_st = decoder_query(
-                    device,
-                    VDP_DECODER_PROFILE_H264_BASELINE,
-                    &supported,
-                    &level, &refs, &width, &height);
-                CHECK_ST
-                support += supported;
+                fully_supported = 2;
                 vdp_st = decoder_query(
                     device,
                     VDP_DECODER_PROFILE_H264_MAIN,
@@ -1784,7 +1781,7 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
                 ok = false;
         }
         ok = (ok && (support > 0));
-        if (ok && support != 3)
+        if (ok && (support != fully_supported))
         {
             VERBOSE(VB_IMPORTANT,
                 QString("VDPAU WARNING: %1 GPU decode not fully supported"
