@@ -68,9 +68,22 @@ void MythHttpHandler::Get(const QUrl &url)
     m_cur_status_str   = QString::null;
     m_cur_redirect_cnt = 0;
 
-    m_qhttp->setHost(m_cur_url.host());
+    QHttp::ConnectionMode mode = 
+        m_cur_url.scheme().toLower() == "https" ? QHttp::ConnectionModeHttps : 
+                                                  QHttp::ConnectionModeHttp;
+    m_qhttp->setHost(m_cur_url.host(), mode, 
+                     m_cur_url.port() == -1 ? 0 : m_cur_url.port());
+    
+    if (!m_cur_url.userName().isEmpty())
+        m_qhttp->setUser(m_cur_url.userName(), m_cur_url.password());
 
-    QString path = (m_cur_url.path().isEmpty()) ? "/" : m_cur_url.path();
+    QByteArray path = QUrl::toPercentEncoding(m_cur_url.path(), "!$&'()*+,;=:@/");
+    if (path.isEmpty())
+        path = "/";
+    
+    if (m_cur_url.hasQuery()) 
+        path += "?" + m_cur_url.encodedQuery();  
+
     m_cur_get_id = m_qhttp->get(path);
 }
 
