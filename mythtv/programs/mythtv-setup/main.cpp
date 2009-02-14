@@ -73,6 +73,8 @@ void SetupMenuCallback(void* data, QString& selection)
             exitPrompt = new ExitPrompter();
         exitPrompt->handleExit();
     }
+    else 
+        VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 }
 
 void SetupMenu(MythMainWindow *win)
