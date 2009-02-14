@@ -1184,7 +1184,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 
     if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
-        if (!tmpimage.isNull())
+        if (tmpimage.isNull())
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Error loading image file: %1").arg(filename));
