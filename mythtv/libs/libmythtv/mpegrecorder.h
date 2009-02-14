@@ -80,11 +80,14 @@ class MpegRecorder : public DTVRecorder,
     uint GetFilteredAudioLayer(void) const;
     uint GetFilteredAudioBitRate(uint audio_layer) const;
 
+    void RestartEncoding(void);
     bool StartEncoding(int fd);
     bool StopEncoding(int fd);
 
     void ResetForNewFile(void);
 
+    bool WaitFor_HDPVR(void);
+    void SetBitrate(int bitrate, int maxbitrate, const QString & reason);
     void HandleResolutionChanges(void);
 
     inline bool CheckCC(uint pid, uint cc);
@@ -104,7 +107,6 @@ class MpegRecorder : public DTVRecorder,
     // State
     bool recording;
     bool encoding;
-    bool needs_resolution;
     mutable QMutex start_stop_encoding_lock;
     QMutex recording_wait_lock;
     QWaitCondition recording_wait;

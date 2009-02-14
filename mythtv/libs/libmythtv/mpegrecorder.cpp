@@ -19,6 +19,7 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#include <sys/poll.h>
 
 // avlib headers
 extern "C" {
@@ -86,7 +87,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     requires_special_pause(false),
     // State
     recording(false),             encoding(false),
-    needs_resolution(false),      start_stop_encoding_lock(QMutex::Recursive),
+    start_stop_encoding_lock(QMutex::Recursive),
     recording_wait_lock(),        recording_wait(),
     // Pausing state
     cleartimeonpause(false),
@@ -493,12 +494,20 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
 bool MpegRecorder::SetFormat(int chanfd)
 {
+    uint   idx;
     struct v4l2_format vfmt;
     bzero(&vfmt, sizeof(vfmt));
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) < 0)
+    for (idx = 0; idx < 20; ++idx)
+    {
+        if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) == 0)
+            break;
+        usleep(100 * 1000);
+    }
+
+    if (idx == 20)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Error getting format" + ENO);
         return false;
@@ -1012,6 +1021,14 @@ void MpegRecorder::StartRecording(void)
 
     if (driver == "hdpvr")
     {
+        if (curRecording->recgroup == "LiveTV")
+        {
+            // Don't bother checking resolution, always use best bitrate
+            int maxbitrate = std::max(high_mpeg4peakbitrate,
+                                      high_mpeg4avgbitrate);
+            SetBitrate(high_mpeg4avgbitrate, maxbitrate, "LiveTV");
+        }
+
         int progNum = 1;
         MPEGStreamData *sd = new MPEGStreamData(progNum, true);
         sd->SetRecordingType(_recording_type);
@@ -1042,17 +1059,26 @@ void MpegRecorder::StartRecording(void)
     if (deviceIsMpegFile)
         elapsedTimer.start();
     else if (_device_read_buffer)
-        _device_read_buffer->Start();
+    {
+        VERBOSE(VB_RECORD, LOC + "Initial startup of recorder");
 
-    needs_resolution = (driver == "hdpvr");
+        if (StartEncoding(readfd))
+            _device_read_buffer->Start();
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to start recording");
+            recording = false;
+            QMutexLocker locker(&recording_wait_lock);
+            recording_wait.wakeAll();
+            _error = true;
+        }
+    }
 
     QByteArray vdevice = videodevice.toAscii();
     while (encoding && !_error)
     {
         if (PauseAndWait(100))
             continue;
-
-        HandleResolutionChanges();
         
         if (deviceIsMpegFile)
         {
@@ -1096,35 +1122,7 @@ void MpegRecorder::StartRecording(void)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Device error detected");
 
-                _device_read_buffer->Stop();
-
-                QMutexLocker locker(&start_stop_encoding_lock);
-
-                StopEncoding(readfd);
-
-                // Make sure the next things in the file are a PAT & PMT
-                if (_stream_data->PATSingleProgram() &&
-                    _stream_data->PMTSingleProgram())
-                {
-                    bool tmp = _wait_for_keyframe_option;
-                    _wait_for_keyframe_option = false;
-                    HandleSingleProgramPAT(_stream_data->PATSingleProgram());
-                    HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
-                    _wait_for_keyframe_option = tmp;
-                }
-
-                if (StartEncoding(readfd))
-                {
-                    _device_read_buffer->Start();
-                }
-                else
-                {
-                    if (0 != close(readfd))
-                        VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
-                    
-                    // Force card to be reopened on next iteration..
-                    readfd = -1;
-                }
+                RestartEncoding();
             }
             else if (_device_read_buffer->IsEOF())
             {
@@ -1221,6 +1219,8 @@ void MpegRecorder::StartRecording(void)
             }
         }
     }
+
+    VERBOSE(VB_RECORD, LOC + "StartRecording finishing up");
 
     if (_device_read_buffer)
     {
@@ -1381,19 +1381,14 @@ bool MpegRecorder::PauseAndWait(int timeout)
 
         if (!paused)
         {
+            VERBOSE(VB_RECORD, LOC + "PauseAndWait pause");
+
             if (_device_read_buffer)
             {
                 QMutex drb_lock;
                 drb_lock.lock();
-
                 _device_read_buffer->SetRequestPause(true);
-
-                pauseWait.wait(&drb_lock, timeout);
-            }
-            else
-            {
-                paused = true;
-                pauseWait.wakeAll();
+                _device_read_buffer->WaitForPaused(4000);
             }
 
             // Some drivers require streaming to be disabled before
@@ -1401,30 +1396,73 @@ bool MpegRecorder::PauseAndWait(int timeout)
             if (requires_special_pause)
                 StopEncoding(readfd);
 
+            paused = true;
+            pauseWait.wakeAll();
+
             if (tvrec)
                 tvrec->RecorderPaused();
         }
 
         unpauseWait.wait(&waitlock, timeout);
     }
-    if (!request_pause)
+
+    if (!request_pause && paused)
     {
-        if (paused)
+        VERBOSE(VB_RECORD, LOC + "PauseAndWait unpause");
+
+        if (driver == "hdpvr")
         {
-            // Some drivers require streaming to be disabled before
-            // an input switch and other channel format setting.
-            if (requires_special_pause)
-                StartEncoding(readfd);
-
-            if (_device_read_buffer)
-                _device_read_buffer->SetRequestPause(false);
-
-            if (_stream_data)
-                _stream_data->Reset(_stream_data->DesiredProgram());
+            m_h264_parser.Reset();
+            _wait_for_keyframe_option = true;
+            _seen_sps = false;
         }
+
+        // Some drivers require streaming to be disabled before
+        // an input switch and other channel format setting.
+        if (requires_special_pause)
+            StartEncoding(readfd);
+        
+        if (_device_read_buffer)
+            _device_read_buffer->SetRequestPause(false);
+        
+        if (_stream_data)
+            _stream_data->Reset(_stream_data->DesiredProgram());
+
         paused = false;
     }
     return paused;
+}
+
+void MpegRecorder::RestartEncoding(void)
+{
+    VERBOSE(VB_RECORD, LOC + "RestartEncoding");
+
+    _device_read_buffer->Stop();
+    
+    QMutexLocker locker(&start_stop_encoding_lock);
+    
+    StopEncoding(readfd);
+    
+    // Make sure the next things in the file are a PAT & PMT
+    if (_stream_data->PATSingleProgram() &&
+        _stream_data->PMTSingleProgram())
+    {
+        _wait_for_keyframe_option = false;
+        HandleSingleProgramPAT(_stream_data->PATSingleProgram());
+        HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
+    }
+    
+    if (StartEncoding(readfd))
+    {
+        _device_read_buffer->Start();
+    }
+    else
+    {
+        if (0 != close(readfd))
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
+        
+        readfd = -1;
+    }
 }
 
 bool MpegRecorder::StartEncoding(int fd)
@@ -1435,13 +1473,22 @@ bool MpegRecorder::StartEncoding(int fd)
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_START;
 
-    VERBOSE(VB_RECORD, LOC + "StartEncoding");
-    needs_resolution = (driver == "hdpvr");
+    if (driver == "hdpvr" && curRecording->recgroup != "LiveTV")
+        HandleResolutionChanges();
 
-    for (int idx = 0; idx < 10; ++idx)
+    VERBOSE(VB_RECORD, LOC + "StartEncoding");
+
+    for (int idx = 0; idx < 20; ++idx)
     {
         if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
         {
+            if (driver == "hdpvr")
+            {
+                m_h264_parser.Reset();
+                _wait_for_keyframe_option = true;
+                _seen_sps = false;
+            }
+
             VERBOSE(VB_RECORD, LOC + "Encoding started");
             return true;
         }
@@ -1452,7 +1499,7 @@ bool MpegRecorder::StartEncoding(int fd)
             return false;
         }
 
-        usleep(250 * 1000);
+        usleep(100 * 1000);
     }
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncoding - giving up" + ENO);
@@ -1469,7 +1516,7 @@ bool MpegRecorder::StopEncoding(int fd)
 
     VERBOSE(VB_RECORD, LOC + "StopEncoding");
 
-    for (int idx = 0; idx < 10; ++idx)
+    for (int idx = 0; idx < 20; ++idx)
     {
 
         if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
@@ -1484,7 +1531,7 @@ bool MpegRecorder::StopEncoding(int fd)
             return false;
         }
 
-        usleep(250 * 1000);
+        usleep(100 * 1000);
     }
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncoding - giving up" + ENO);
@@ -1552,7 +1599,7 @@ void MpegRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
 void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 {
     if (!pmt)
-{
+    {
         return;
     }
 
@@ -1572,27 +1619,122 @@ void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
         DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
 }
 
+bool MpegRecorder::WaitFor_HDPVR(void)
+{
+    // After a resolution change, it can take the HD-PVR a few
+    // seconds before it is usable again.
+
+    // Tell it to start encoding, then wait for it to actually feed us
+    // some data.
+    QMutexLocker locker(&start_stop_encoding_lock);
+
+    // Sleep any less than 1.5 seconds, and the HD-PVR will
+    // return the old resolution, when the resolution is changing.
+    usleep(1500 * 1000);
+
+    struct v4l2_encoder_cmd command;
+    struct pollfd polls;
+    int    idx;
+
+    memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
+    command.cmd = V4L2_ENC_CMD_START;
+
+    for (idx = 0; idx < 20; ++idx)
+    {
+        if (ioctl(readfd, VIDIOC_ENCODER_CMD, &command) == 0)
+            break;
+        usleep(100 * 1000);
+    }
+
+    if (idx == 20)
+        return false;
+
+    polls.fd      = readfd;
+    polls.events  = POLLIN;
+    polls.revents = 0;
+
+    for (idx = 0; idx < 10; ++idx)
+    {
+        if (poll(&polls, 1, 250) > 0)
+            break;
+    }
+
+    if (idx == 10)
+        return false;
+
+    // HD-PVR should now be "ready"
+    command.cmd = V4L2_ENC_CMD_STOP;
+
+    for (idx = 0; idx < 20; ++idx)
+    {
+        if (ioctl(readfd, VIDIOC_ENCODER_CMD, &command) == 0)
+            return true;
+        usleep(100 * 1000);
+    }
+
+    return false;
+}
+
+void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,
+                              const QString & reason)
+{
+    if (maxbitrate == bitrate)
+    {
+        VERBOSE(VB_RECORD, LOC + QString("%1 bitrate %2 kbps CBR")
+                .arg(reason).arg(bitrate));
+    }
+    else
+    {
+        VERBOSE(VB_RECORD, LOC + QString("%1 bitrate %2/%3 kbps VBR")
+                .arg(reason).arg(bitrate).arg(maxbitrate));
+    }
+
+    vector<struct v4l2_ext_control> ext_ctrls;
+    add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
+                 (maxbitrate == bitrate) ?
+                 V4L2_MPEG_VIDEO_BITRATE_MODE_CBR :
+                 V4L2_MPEG_VIDEO_BITRATE_MODE_VBR);
+
+    add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
+                 bitrate * 1000);
+
+    add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
+                 maxbitrate * 1000);
+
+    set_ctrls(readfd, ext_ctrls);
+}
+
 void MpegRecorder::HandleResolutionChanges(void)
 {
-    if (!needs_resolution)
-        return;
-
     VERBOSE(VB_RECORD, LOC + "Checking Resolution");
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             
+    if (driver == "hdpvr")
+        WaitFor_HDPVR();
+
+    uint idx;
     uint pix = 0;
-    if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
+
+    for (idx = 0; idx < 20; ++idx)
     {
-        VERBOSE(VB_RECORD, LOC + QString("Got Resolution %1x%2")
+        if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
+        {
+            VERBOSE(VB_RECORD, LOC + QString("Got Resolution %1x%2")
                 .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
-        pix = vfmt.fmt.pix.width * vfmt.fmt.pix.height;
-        needs_resolution = false;
+            pix = vfmt.fmt.pix.width * vfmt.fmt.pix.height;
+            break;
+        }
+        // Typically takes 0.9 seconds after a resolution change
+        usleep(100 * 1000);
     }
 
     if (!pix)
+    {
+        VERBOSE(VB_RECORD, LOC + "Giving up detecting resolution");
         return; // nothing to do, we don't have a resolution yet
+    }
 
     int old_max = maxbitrate, old_avg = bitrate;
     if (pix <= 768*568)
@@ -1626,36 +1768,6 @@ void MpegRecorder::HandleResolutionChanges(void)
                     .arg(old_avg).arg(old_max));
         }
 
-        if (maxbitrate == bitrate)
-        {
-            VERBOSE(VB_RECORD, LOC + QString("New bitrate %1 kbps CBR")
-                    .arg(bitrate));
-        }
-        else
-        {
-            VERBOSE(VB_RECORD, LOC + QString("New bitrate %1/%2 kbps VBR")
-                    .arg(bitrate).arg(maxbitrate));
-        }
-
-        vector<struct v4l2_ext_control> ext_ctrls;
-        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
-                     (maxbitrate == bitrate) ?
-                     V4L2_MPEG_VIDEO_BITRATE_MODE_CBR :
-                     V4L2_MPEG_VIDEO_BITRATE_MODE_VBR);
-
-        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
-                     bitrate * 1000);
-
-        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
-                     maxbitrate * 1000);
-
-        set_ctrls(readfd, ext_ctrls);
+        SetBitrate(bitrate, maxbitrate, "New");
     }
-
-    // Restart streaming. Shouldn't be needed? seems to be with current driver.
-    QMutexLocker locker(&start_stop_encoding_lock);
-    StopEncoding(readfd);
-    StartEncoding(readfd);
-
-    needs_resolution = false;
 }

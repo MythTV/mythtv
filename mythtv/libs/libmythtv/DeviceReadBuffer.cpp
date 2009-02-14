@@ -158,7 +158,17 @@ bool DeviceReadBuffer::IsPaused(void) const
     return paused;
 }
 
-bool DeviceReadBuffer::WaitForUnpause(int timeout)
+bool DeviceReadBuffer::WaitForPaused(unsigned long timeout)
+{
+    QMutexLocker locker(&lock);
+
+    if (!paused)
+        pauseWait.wait(&lock, timeout);
+
+    return paused;
+}
+
+bool DeviceReadBuffer::WaitForUnpause(unsigned long timeout)
 {
     QMutexLocker locker(&lock);
 
