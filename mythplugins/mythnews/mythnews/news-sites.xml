@@ -830,7 +830,7 @@
 
     <item>
         <title>MythTV - Wiki Recent Changes</title>
-        <url>http://www.mythtv.org/wiki/index.php?title=Special:Recentchanges&amp;feed=rss</url>
+        <url>http://www.mythtv.org/wiki?title=Special:RecentChanges&amp;feed=rss</url>
     </item>
   
 </category>
