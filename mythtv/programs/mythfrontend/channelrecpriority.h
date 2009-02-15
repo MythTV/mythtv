@@ -4,7 +4,6 @@
 #include "mythscreentype.h"
 
 #include "programinfo.h"
-#include "channeleditor.h"
 
 class ChannelInfo;
 
@@ -39,7 +38,6 @@ class ChannelRecPriority : public MythScreenType
 
   protected slots:
     void updateInfo(MythUIButtonListItem *);
-    void edit(MythUIButtonListItem *);
 
   private:
     void FillList(void);

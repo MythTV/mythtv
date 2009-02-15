@@ -95,8 +95,6 @@ bool ChannelRecPriority::Create()
 
     connect(m_channelList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateInfo(MythUIButtonListItem*)));
-    connect(m_channelList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            SLOT(edit(MythUIButtonListItem*)));
 
     FillList();
 
@@ -121,8 +119,6 @@ bool ChannelRecPriority::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
             menu();
-        else if (action == "INFO" || action == "CUSTOMEDIT")
-            edit(m_channelList->GetItemCurrent());
         else if (action == "UPCOMING")
             upcoming();
         else if (action == "RANKINC")
@@ -186,7 +182,6 @@ void ChannelRecPriority::menu()
 
     menuPopup->SetReturnEvent(this, "options");
 
-    menuPopup->AddButton(tr("Edit Channel"));
     menuPopup->AddButton(tr("Program List"));
     //menuPopup->AddButton(tr("Reset All Priorities"));
 
@@ -448,46 +443,6 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
         norecordingText->SetVisible(m_channelData.isEmpty());
 }
 
-void ChannelRecPriority::edit(MythUIButtonListItem *item)
-{
-    if (!item)
-        return;
-
-    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
-
-    if (!chanInfo)
-        return;
-
-    ChannelWizard cw(chanInfo->chanid, chanInfo->sourceid);
-    cw.exec();
-
-    // Make sure that any changes are reflected in m_channelData.
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT chanid, channum, sourceid, callsign, "
-                   "icon, recpriority, name, visible FROM channel "
-                   "WHERE chanid = :CHANID;");
-    result.bindValue(":CHANID", chanInfo->chanid);
-
-    if (result.exec() && result.next())
-    {
-        chanInfo->chanid = result.value(0).toInt();
-        chanInfo->chanstr = result.value(1).toString();
-        chanInfo->sourceid = result.value(2).toInt();
-        chanInfo->callsign = result.value(3).toString();
-        chanInfo->iconpath = result.value(4).toString();
-        chanInfo->recpriority = result.value(5).toString();
-        chanInfo->channame = result.value(6).toString();
-        if (result.value(7).toInt() > 0)
-            m_visMap[chanInfo->chanid] = true;
-        else
-            m_visMap[chanInfo->chanid] = false;
-    }
-    else if (!result.isActive())
-        MythDB::DBError("Get channel priorities update", result);
-
-    SortList();
-}
-
 void ChannelRecPriority::upcoming()
 {
     MythUIButtonListItem *item = m_channelList->GetItemCurrent();
@@ -525,13 +480,7 @@ void ChannelRecPriority::customEvent(QEvent *event)
             switch (buttonnum)
             {
                 case 0:
-                    edit(m_channelList->GetItemCurrent());
-                    break;
-                case 1:
                     upcoming();
-                    break;
-                case 2:
-                    //resetAll();
                     break;
             }
         }
