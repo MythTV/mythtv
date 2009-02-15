@@ -67,7 +67,7 @@
         <!-- optional - shows a message when no images are available
              in the current directory -->
         <textarea name="noimages" from="basetextarea">
-            <area>15,20,770,560</area>
+            <area>15,20,1250,680</area>
             <font>basemedium</font>
             <align>allcenter</align>
         </textarea>
