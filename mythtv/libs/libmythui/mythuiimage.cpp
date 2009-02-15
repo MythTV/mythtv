@@ -336,8 +336,13 @@ bool MythUIImage::Load(void)
 {
     Clear();
 
+//     if (!IsVisible(true))
+//         return false;
+
     if (m_Filename.isEmpty() && (!m_gradient))
         return false;
+
+    QSize newSize;
 
     VERBOSE(VB_FILE, QString("MythUIImage::Load (%1) Object %2").arg(m_Filename).arg(objectName()));
 
@@ -362,8 +367,8 @@ bool MythUIImage::Load(void)
         else
             bNeedLoad = true;
 
-        int w = 0;
-        int h = 0;
+        int w = -1;
+        int h = -1;
 
         bool bForceResize = false;
         bool bFoundInCache = false;
@@ -379,14 +384,6 @@ bool MythUIImage::Load(void)
                 h = m_ForceSize.height();
 
             bForceResize = true;
-        }
-        else
-        {
-            if (!m_Area.isEmpty())
-            {
-                w = m_Area.width();
-                h = m_Area.height();
-            }
         }
 
         if (bNeedLoad)
@@ -462,9 +459,8 @@ bool MythUIImage::Load(void)
 
         if (!bForceResize)
         {
-            QSize aSize = m_Area.size();
-            aSize = aSize.expandedTo(image->size());
-            SetSize(aSize);
+            newSize = newSize.expandedTo(image->size());
+            SetSize(newSize);
         }
 
         if (image->isNull())
