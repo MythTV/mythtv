@@ -10,7 +10,7 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-POSTINC = 
+POSTINC =
 
 contains(INCLUDEPATH, /usr/include) {
   POSTINC += /usr/include
@@ -118,7 +118,7 @@ using_valgrind:DEFINES += USING_VALGRIND
 
 # old libvbitext (Caption decoder)
 !win32 {
-    HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h 
+    HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h
     HEADERS += vbitext/vbi.h vbitext/vt.h
     SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
 }
@@ -159,9 +159,8 @@ HEADERS += sr_items.h               scheduledrecording.h
 HEADERS += signalmonitorvalue.h     signalmonitorlistener.h
 HEADERS += viewschdiff.h            livetvchain.h
 HEADERS += playgroup.h              progdetails.h
-HEADERS += channeleditor.h          channelsettings.h
-HEADERS += previewgenerator.h       transporteditor.h
-HEADERS += importicons.h
+HEADERS += channelsettings.h        previewgenerator.h
+HEADERS += transporteditor.h
 HEADERS += myth_imgconvert.h
 
 # Remove when everything is switched to MythUI
@@ -182,12 +181,10 @@ SOURCES += sr_dialog.cpp            sr_root.cpp
 SOURCES += sr_items.cpp             scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
 SOURCES += viewschdiff.cpp
-SOURCES += livetvchain.cpp
-SOURCES += playgroup.cpp
+SOURCES += livetvchain.cpp          playgroup.cpp
 SOURCES += progdetails.cpp
-SOURCES += channeleditor.cpp        channelsettings.cpp
-SOURCES += previewgenerator.cpp     transporteditor.cpp
-SOURCES += importicons.cpp
+SOURCES += channelsettings.cpp      previewgenerator.cpp
+SOURCES += transporteditor.cpp
 
 contains( CONFIG_SWSCALE, yes ) {
     SOURCES += myth_imgconvert.cpp
@@ -272,7 +269,7 @@ using_frontend {
     HEADERS += decoderbase.h
     HEADERS += nuppeldecoder.h          avformatdecoder.h
     SOURCES += decoderbase.cpp
-    SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp 
+    SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
 
     using_ivtv:HEADERS += ivtvdecoder.h
     using_ivtv:SOURCES += ivtvdecoder.cpp
@@ -282,11 +279,11 @@ using_frontend {
     HEADERS += osd.h                    osdtypes.h
     HEADERS += osdsurface.h             osdlistbtntype.h
     HEADERS += osdimagecache.h          osdtypeteletext.h
-    HEADERS += udpnotify.h 
+    HEADERS += udpnotify.h
     SOURCES += osd.cpp                  osdtypes.cpp
     SOURCES += osdsurface.cpp           osdlistbtntype.cpp
     SOURCES += osdimagecache.cpp        osdtypeteletext.cpp
-    SOURCES += udpnotify.cpp 
+    SOURCES += udpnotify.cpp
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h
@@ -453,7 +450,7 @@ using_backend {
             SOURCES += darwinfirewiredevice.cpp darwinavcinfo.cpp
             DEFINES += USING_OSX_FIREWIRE
         }
-        
+
         !macx {
             HEADERS += linuxfirewiredevice.h   linuxavcinfo.h
             SOURCES += linuxfirewiredevice.cpp linuxavcinfo.cpp
@@ -468,7 +465,7 @@ using_backend {
     using_dbox2:SOURCES += dbox2recorder.cpp dbox2channel.cpp dbox2epg.cpp
     using_dbox2:HEADERS += dbox2recorder.h dbox2channel.h dbox2epg.h
     using_dbox2:DEFINES += USING_DBOX2
-    
+
     # Support for MPEG2 TS streams (including FreeBox http://adsl.free.fr/)
     using_iptv {
         HEADERS += iptvchannel.h              iptvrecorder.h

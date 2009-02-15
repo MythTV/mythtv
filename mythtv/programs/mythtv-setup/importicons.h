@@ -13,23 +13,41 @@
 #ifndef IMPORTICONS_H
 #define IMPORTICONS_H
 
-#include <qsqldatabase.h>
-#include <qurl.h>
-#include <QList>
+#include <QUrl>
+#include <QDir>
+
+#include "mythscreentype.h"
 
 #include "settings.h"
 
-class ImportIconsWizard : public QObject, public ConfigurationWizard
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUITextEdit;
+class MythUIText;
+class MythUIProgressDialog;
+
+class ImportIconsWizard : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    ImportIconsWizard(bool fRefresh, const QString &channelname = QString(""));
-    MythDialog *dialogWidget(MythMainWindow *parent, const char *widgetName);
+    ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
+                      const QString &channelname = "");
+   ~ImportIconsWizard();
 
-    int exec();
+    bool Create(void);
+//    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent *event);
 
-private:
+    struct SearchEntry               //! search entry results
+    {
+        QString strID;               //!< the remote channel id
+        QString strName;             //!< the remote name
+        QString strLogo;             //!< the actual logo
+    };
+
+  private:
 
     enum dialogState
     {
@@ -62,31 +80,10 @@ private:
     ListEntriesIter m_iter;          //!< the current iterator
     ListEntriesIter m_missingIter;
 
-    struct SearchEntry               //! search entry results
-    {
-        QString strID;               //!< the remote channel id
-        QString strName;             //!< the remote name
-        QString strLogo;             //!< the actual logo
-    };
     //! List of SearchEntry entries
     typedef QList<SearchEntry> ListSearchEntries;
     //! iterator over list of SearchEntry entries
     typedef QList<SearchEntry>::Iterator ListSearchEntriesIter;
-
-    ListSearchEntries m_listSearch;  //!< the list of SearchEntry
-    QString m_strMatches;            //!< the string for the submit() call
-
-    static const QString url;        //!< the default url
-    QString m_strChannelDir;         //!< the location of the channel icon dir
-    QString m_strChannelname;        //!< the channel name if searching for a single channel icon
-
-    bool m_fRefresh;                 //!< are we doing a refresh or not
-    int m_nMaxCount;                 //!< the maximum number of TV channels
-    int m_nCount;                    //!< the current search point (0..m_nMaxCount)
-    int m_missingMaxCount;           //!< the total number of missing icons
-    int m_missingCount;              //!< the current search point (0..m_missingCount)
-
-    void startDialog();
 
     /*! \brief changes a string into csv format
      * \param str the string to change
@@ -107,19 +104,6 @@ private:
      */
     QString wget(QUrl& url,const QString& strParam);
 
-    TransLineEditSetting *m_editName;    //!< name field for the icon
-    TransListBoxSetting *m_listIcons;    //!< list of potential icons
-    TransLineEditSetting *m_editManual;  //!< manual edit field
-    TransButtonSetting *m_buttonManual;  //!< manual button field
-    TransButtonSetting *m_buttonSkip;    //!< button skip
-    TransButtonSetting *m_buttonSelect;    //!< button skip
-
-    /*! \brief determines if a particular icon is blocked
-     * \param str the string to work on
-     * \return true/false
-     */
-    bool isBlocked(const QString& strParam);
-
     /*! \brief looks up the string to determine the caller/xmltvid
      * \param str the string to work on
      * \return true/false
@@ -133,10 +117,9 @@ private:
     bool search(const QString& strParam);
 
     /*! \brief submit the icon information back to the remote db
-     * \param str the string to work on
      * \return true/false
      */
-    bool submit(const QString& strParam);
+    bool submit();
 
     /*! \brief retrieve the actual logo for the TV channel
      * \param str the string to work on
@@ -146,35 +129,60 @@ private:
 
     /*! \brief checks and attempts to download the logo file to the appropriate
      *   place
-     * \param str the string of the downloaded url
+     * \param url the icon url
      * \param localChanId the local ID number of the channel
      * \return true/false
      */
-    bool checkAndDownload(const QString& str, const QString& localChanId);
+    bool checkAndDownload(const QString& url, const QString& localChanId);
 
     /*! \brief attempt the inital load of the TV channel information
-     * \return the number of TV channels
+     * \return true if successful
      */
-    uint initialLoad(QString name="");
+    bool initialLoad(QString name="");
 
-    /*! \brief attempts to move the itaration on one/more than one
+    /*! \brief attempts to move the iteration on one/more than one
      * \return true if we can go again or false if we can not
      */
     bool doLoad();
 
-    bool m_closeDialog;
-
-    ~ImportIconsWizard() { };
-
-protected slots:
+  protected slots:
     void enableControls(dialogState state=STATE_NORMAL, bool selectEnabled=true);         //!< enable/disable the controls
     void manualSearch();           //!< process the manual search
-    void menuSelect();
-    void menuSelection(int nIndex);//!< process the icon selection
+    void menuSelection(MythUIButtonListItem *);//!< process the icon selection
     void skip();                   //!< skip this icon
-    void cancelPressed();
-    void finishButtonPressed();
+    void askSubmit(const QString& strParam);
+
+  private:
+    ListSearchEntries m_listSearch;  //!< the list of SearchEntry
+    QString m_strMatches;            //!< the string for the submit() call
+
+    QString m_strChannelDir;         //!< the location of the channel icon dir
+    QString m_strChannelname;        //!< the channel name if searching for a single channel icon
+    QString m_strParam;
+
+    bool m_fRefresh;                 //!< are we doing a refresh or not
+    int m_nMaxCount;                 //!< the maximum number of TV channels
+    int m_nCount;                    //!< the current search point (0..m_nMaxCount)
+    int m_missingMaxCount;           //!< the total number of missing icons
+    int m_missingCount;              //!< the current search point (0..m_missingCount)
+
+    const QString m_url;        //!< the default url
+    QDir m_tmpDir;
+
+    void startDialog();
+
+    MythScreenStack    *m_popupStack;
+    MythUIProgressDialog *m_progressDialog;
+
+    MythUIButtonList *m_iconsList;    //!< list of potential icons
+    MythUITextEdit   *m_manualEdit;  //!< manual edit field
+    MythUIText       *m_nameText;    //!< name field for the icon
+    MythUIButton     *m_manualButton;  //!< manual button field
+    MythUIButton     *m_skipButton;    //!< button skip
+    MythUIText       *m_statusText;
 
 };
+
+Q_DECLARE_METATYPE(ImportIconsWizard::SearchEntry)
 
 #endif // IMPORTICONS_H

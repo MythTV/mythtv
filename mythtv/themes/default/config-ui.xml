@@ -1,0 +1,143 @@
+<mythuitheme>
+    <window name="iconimport">
+        <textarea name="name" from="basetextarea">
+            <area>30,15,740,30</area>
+            <font>basemedium</font>
+            <align>hcenter</align>
+        </textarea>
+
+        <buttonlist name="icons">
+            <area>20,50,760,460</area>
+            <buttonarea>0,0,760,460</buttonarea>
+            <layout>grid</layout>
+            <spacing>5</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,240,60</area>
+                    <imagetype name="buttonbackground">
+                        <area>0,0,250,60</area>
+                        <gradient start="#666666" end="#333333" alpha="200" />
+                    </imagetype>
+                    <imagetype name="icon">
+                        <area>0,5,80,50</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>100,5,140,50</area>
+                        <align>allcenter</align>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#669966" end="#339933" alpha="200" />
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+        </buttonlist>
+
+        <textarea name="manuallabel" from="basetextarea">
+            <area>30,505,300,25</area>
+            <value>Search terms:</value>
+        </textarea>
+
+        <textedit name="manualsearch" from="basetextedit">
+            <position>30,535</position>
+        </textedit>
+
+        <button name="search" from="basebutton">
+            <position>440,538</position>
+            <value>Search</value>
+        </button>
+
+        <button name="skip" from="basebutton">
+            <position>620,538</position>
+            <value>Skip</value>
+        </button>
+
+    </window>
+
+    <window name="channeloverview">
+
+        <buttonlist name="channels" from="basebuttonlist">
+            <area>20,20,740,345</area>
+            <buttonarea>0,0,740,345</buttonarea>
+            <statetype name="upscrollarrow">
+                <position>745,2</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>745,325</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="sortlabel" from="basetextarea">
+            <area>30,385,170,30</area>
+            <value>Sort Mode:</value>
+            <font>basemedium</font>
+        </textarea>
+
+        <buttonlist name="sorting" from="basewideselector">
+            <position>210,380</position>
+        </buttonlist>
+
+        <textarea name="sourcelabel" from="sortlabel">
+            <position>30,445</position>
+            <value>Video Source:</value>
+        </textarea>
+
+        <buttonlist name="source" from="basewideselector">
+            <position>210,440</position>
+        </buttonlist>
+
+        <button name="delete" from="basebutton">
+            <position>620,437</position>
+            <value>Delete</value>
+        </button>
+
+        <textarea name="nochannumlabel" from="basetextarea">
+            <area>70,506,500,60</area>
+            <value>Hide Channels without channel number.</value>
+        </textarea>
+
+        <checkbox name="nochannum" from="basecheckbox">
+            <position>30,500</position>
+        </checkbox>
+
+        <button name="scan" from="basewidebutton">
+            <position>55,550</position>
+            <value>Channel Scan</value>
+        </button>
+
+        <button name="importicons" from="basewidebutton">
+            <position>325,550</position>
+            <value>Icon Download</value>
+        </button>
+
+        <button name="edittransport" from="basewidebutton">
+            <position>585,550</position>
+            <value>Edit Transports</value>
+        </button>
+
+    </window>
+</mythuitheme>

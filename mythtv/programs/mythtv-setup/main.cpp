@@ -22,7 +22,7 @@
 
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/videosource.h"
-#include "libmythtv/channeleditor.h"
+#include "channeleditor.h"
 #include "libmythtv/remoteutil.h"
 #include "backendsettings.h"
 #include "checksetup.h"
@@ -59,8 +59,14 @@ void SetupMenuCallback(void* data, QString& selection)
     }
     else if (sel == "channel editor")
     {
-        ChannelEditor ce;
-        ce.exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        ChannelEditor *chanedit = new ChannelEditor(mainStack);
+
+        if (chanedit->Create())
+            mainStack->AddScreen(chanedit);
+        else
+            delete chanedit;
     }
     else if (sel == "storage groups")
     {

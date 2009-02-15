@@ -18,9 +18,15 @@ INSTALLS += menu
 
 QMAKE_CLEAN += $(TARGET)
 
+using_backend {
+    DEFINES += USING_BACKEND
+}
+
 # Input
-HEADERS += backendsettings.h   checksetup.h   exitprompt.h
+HEADERS += backendsettings.h   checksetup.h   exitprompt.h importicons.h
+HEADERS += channeleditor.h
 SOURCES += backendsettings.cpp checksetup.cpp exitprompt.cpp main.cpp
+SOURCES += importicons.cpp channeleditor.cpp
 
 macx {
     mac_bundle {
