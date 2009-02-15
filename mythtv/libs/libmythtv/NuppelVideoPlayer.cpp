@@ -419,6 +419,7 @@ bool NuppelVideoPlayer::SetMuted(bool mute)
         (kMuteAll == SetMuteState(kMuteAll)))
     {
         VERBOSE(VB_AUDIO, "muting sound " <<IsMuted());
+        SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
         ClearAfterSeek(false);
         return true;
     }
@@ -426,6 +427,7 @@ bool NuppelVideoPlayer::SetMuted(bool mute)
              (kMuteOff == SetMuteState(kMuteOff)))
     {
         VERBOSE(VB_AUDIO, "unmuting sound "<<IsMuted());
+        SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
         ClearAfterSeek(false);
         return true;
     }
@@ -4339,6 +4341,7 @@ void NuppelVideoPlayer::DoPause(void)
 
         GetDecoder()->setExactSeeks(exactseeks && ffrew_skip == 1);
         GetDecoder()->DoFastForward(framesPlayed + ffrew_skip);
+        SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
         ClearAfterSeek();
     }
 
@@ -4410,6 +4413,7 @@ void NuppelVideoPlayer::DoPlay(void)
 
         GetDecoder()->setExactSeeks(exactseeks && ffrew_skip == 1);
         GetDecoder()->DoRewind(framesPlayed);
+        SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
         ClearAfterSeek();
     }
 
