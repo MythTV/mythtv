@@ -7,6 +7,8 @@ extern "C" {
 
 #include "videobuffers.h"
 
+#define MAX_VDPAU_ERRORS 10
+
 struct vdpauPIP
 {
     QSize           videoSize;
@@ -25,8 +27,8 @@ class VDPAUContext
               QSize screen_size, bool color_control,
               int color_key, MythCodecID mcodecid);
     void Deinit(void);
-    bool IsErrored(void) { return errored; }
-    void SetErrored(void) { errored = true; }
+    bool IsErrored(void) { return (errored > MAX_VDPAU_ERRORS); }
+    void SetErrored(void) { errored = 10000; }
 
     bool InitBuffers(int width, int height, int numbufs,
                      LetterBoxColour letterbox_colour);
@@ -141,7 +143,7 @@ class VDPAUContext
     VdpBitmapSurface  pipBorder;
     VdpBitmapSurface  pipClear;
     QMap<NuppelVideoPlayer*,vdpauPIP> pips;
-    int  pipReady;
+    int               pipReady;
     bool              pipNeedsClear;
 
     VdpPresentationQueueTarget vdp_flip_target;
@@ -150,7 +152,7 @@ class VDPAUContext
     bool              vdpauDecode;
 
     VdpDevice vdp_device;
-    bool      errored;
+    int       errored;
 
     VdpGetProcAddress * vdp_get_proc_address;
     VdpDeviceDestroy * vdp_device_destroy;

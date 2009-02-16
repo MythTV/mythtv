@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 #include <QSize>
 #include <QRect>
 
@@ -82,7 +81,7 @@ VDPAUContext::VDPAUContext()
     pipOutputSurface(0),    pipAlpha(0),       pipBorder(0),
     pipClear(0),            pipReady(0),       
     pipNeedsClear(false),   vdp_flip_target(NULL), vdp_flip_queue(NULL),
-    vdpauDecode(false),     vdp_device(NULL),  errored(false),
+    vdpauDecode(false),     vdp_device(NULL),  errored(0),
     vdp_get_proc_address(NULL),       vdp_device_destroy(NULL),
     vdp_get_error_string(NULL),       vdp_get_api_version(NULL),
     vdp_get_information_string(NULL), vdp_video_surface_create(NULL),
@@ -166,6 +165,7 @@ void VDPAUContext::Deinit(void)
     DeinitPIPLayer();
     DeinitProcs();
     outputSize =  QSize(0,0);
+    errored = 0;
 }
 
 static const char* dummy_get_error_string(VdpStatus status)
@@ -903,6 +903,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("VDPAUContext::Decode called for cpu decode."));
+        errored++;
         return;
     }
 
@@ -910,14 +911,28 @@ void VDPAUContext::Decode(VideoFrame *frame)
     bool ok = true;
     vdpau_render_state_t *render = (vdpau_render_state_t *)frame->buf;
 
+    if (!render)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("No video surface to decode to."));
+        errored++;
+        return;
+    }
+
     if (frame->pix_fmt != pix_fmt)
     {
+        if (decoder)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Picture format has changed."));
+            errored++;
+            return;
+        }
+
         if (frame->pix_fmt == PIX_FMT_VDPAU_H264_MAIN ||
             frame->pix_fmt == PIX_FMT_VDPAU_H264_HIGH)
         {
-            if (render)
-                maxReferences = render->info.h264.num_ref_frames;
-
+            maxReferences = render->info.h264.num_ref_frames;
             if (maxReferences < 1 || maxReferences > 16)
             {
                 uint32_t round_width = (frame->width + 15) & ~15;
@@ -932,19 +947,38 @@ void VDPAUContext::Decode(VideoFrame *frame)
         VdpDecoderProfile vdp_decoder_profile;
         switch (frame->pix_fmt)
         {
-            case PIX_FMT_VDPAU_MPEG1: vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG1; break;
-            case PIX_FMT_VDPAU_MPEG2_SIMPLE: vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_SIMPLE; break;
-            case PIX_FMT_VDPAU_MPEG2_MAIN: vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_MAIN; break;
+            case PIX_FMT_VDPAU_MPEG1:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG1;
+                break;
+            case PIX_FMT_VDPAU_MPEG2_SIMPLE:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_SIMPLE;
+                break;
+            case PIX_FMT_VDPAU_MPEG2_MAIN:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_MAIN;
+                break;
             case PIX_FMT_VDPAU_H264_BASELINE:
-                VERBOSE(VB_IMPORTANT, LOC + QString("Forcing H.264 baseline profile to main - "
-                                                   "decoding may fail."));
-            case PIX_FMT_VDPAU_H264_MAIN: vdp_decoder_profile = VDP_DECODER_PROFILE_H264_MAIN; break;
-            case PIX_FMT_VDPAU_H264_HIGH: vdp_decoder_profile = VDP_DECODER_PROFILE_H264_HIGH; break;
-            case PIX_FMT_VDPAU_VC1_SIMPLE: vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_SIMPLE; break;
-            case PIX_FMT_VDPAU_VC1_MAIN: vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_MAIN; break;
-            case PIX_FMT_VDPAU_VC1_ADVANCED: vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_ADVANCED; break;
+                VERBOSE(VB_IMPORTANT, LOC +
+                    QString("Forcing H.264 baseline profile to main -"
+                            " decoding may fail."));
+            case PIX_FMT_VDPAU_H264_MAIN:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_H264_MAIN;
+                break;
+            case PIX_FMT_VDPAU_H264_HIGH:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_H264_HIGH;
+                break;
+            case PIX_FMT_VDPAU_VC1_SIMPLE:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_SIMPLE;
+                break;
+            case PIX_FMT_VDPAU_VC1_MAIN:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_MAIN;
+                break;
+            case PIX_FMT_VDPAU_VC1_ADVANCED:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
+                break;
             default:
-                assert(0);
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Picture format is not supported."));
+                errored++;
                 return;
         }
 
@@ -959,7 +993,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
         );
         CHECK_ST
 
-        if (ok)
+        if (ok && decoder)
         {
             pix_fmt = frame->pix_fmt;
             VERBOSE(VB_PLAYBACK, LOC +
@@ -969,13 +1003,17 @@ void VDPAUContext::Decode(VideoFrame *frame)
         else
         {
             VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to create decoder."));
-            errored = true;
+            errored++;
+            return;
         }
     }
-
-    render = (vdpau_render_state_t *)frame->buf;
-    if (!render || !decoder)
+    else if (!decoder)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Pix format already set but no VDPAU decoder."));
+        errored++;
         return;
+    }
 
     vdp_st = vdp_decoder_render(
         decoder,
@@ -985,6 +1023,11 @@ void VDPAUContext::Decode(VideoFrame *frame)
         render->bitstreamBuffers
     );
     CHECK_ST
+
+    if (ok && (errored > 0))
+        errored--;
+    else if (!ok)
+        errored++;
 }
 
 void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
