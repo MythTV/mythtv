@@ -126,7 +126,8 @@ long long DVDRingBufferPriv::Seek(long long time)
         dvdRet = dvdnav_time_search(m_dvdnav, m_seektime);
     }
 
-    VERBOSE(VB_EXTRA, QString("DVD Playback Seek() time: %1; seekSpeed: %2")
+    VERBOSE(VB_PLAYBACK+VB_EXTRA, 
+        QString("DVD Playback Seek() time: %1; seekSpeed: %2")
                         .arg(time).arg(seekSpeed));
 
     if (dvdRet == DVDNAV_STATUS_ERR)

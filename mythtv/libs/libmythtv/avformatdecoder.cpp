@@ -3193,7 +3193,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 if (storedPackets.count() < 2 && !decodeStillFrame)
                     storevideoframes = true;
 
-                VERBOSE(VB_EXTRA, QString("DVD Playback Debugging "
+                VERBOSE(VB_PLAYBACK+VB_EXTRA, QString("DVD Playback Debugging "
                     "inDVDMenu %1 storedPacketcount %2 dvdstill %3")
                     .arg(inDVDMenu).arg(storedPackets.count()).arg(inDVDStill));
 
@@ -3325,7 +3325,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
 
-            VERBOSE(VB_EXTRA, QString("DVD Playback Debugging: mpeg seq end %1 "
+            VERBOSE(VB_PLAYBACK+VB_EXTRA, 
+                QString("DVD Playback Debugging: mpeg seq end %1 "
                 " inDVDStill %2 decodeStillFrame %3")
                 .arg(mpeg_seq_end_seen).arg(inDVDStill).arg(decodeStillFrame));
 
