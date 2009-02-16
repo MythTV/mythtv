@@ -2999,7 +2999,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 {
                     if (nbframes == 0)
                     {
-                        VERBOSE(VB_PLAYBACK, LOC_ERR +
+                        VERBOSE(VB_EXTRA, LOC_ERR +
                                 "In DVD Menu: No video frames in queue");
                         if (pausevideo)
                             UnpauseVideo();

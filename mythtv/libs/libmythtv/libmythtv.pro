@@ -23,7 +23,8 @@ contains(INCLUDEPATH, /usr/local/include) {
 
 DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil ../libswscale
-DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav ../libmythdb ../libmythhdhomerun
+DEPENDPATH  += ../libmythmpeg2 ../libmythdb ../libmythhdhomerun
+DEPENDPATH  += ../libmythdvdnav/
 DEPENDPATH  += ./dvbdev ./mpeg ./iptv
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
