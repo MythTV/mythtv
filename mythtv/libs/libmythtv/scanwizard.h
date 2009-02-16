@@ -40,7 +40,7 @@
 class ScanWizardConfig;
 class ScanWizardScanner;
 
-class ScanWizard : public QObject, public ConfigurationWizard 
+class MPUBLIC ScanWizard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
 

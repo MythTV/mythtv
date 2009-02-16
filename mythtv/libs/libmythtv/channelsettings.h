@@ -110,7 +110,7 @@ class ChannelDBStorage : public SimpleDBStorage
 class OnAirGuide;
 class XmltvID;
 
-class ChannelOptionsCommon: public VerticalConfigurationGroup
+class MPUBLIC ChannelOptionsCommon: public VerticalConfigurationGroup
 {
     Q_OBJECT
 
@@ -127,13 +127,13 @@ class ChannelOptionsCommon: public VerticalConfigurationGroup
     XmltvID    *xmltvID;
 };
 
-class ChannelOptionsFilters: public VerticalConfigurationGroup {
-public:
+class MPUBLIC ChannelOptionsFilters: public VerticalConfigurationGroup {
+  public:
     ChannelOptionsFilters(const ChannelID& id);
 };
 
-class ChannelOptionsV4L: public VerticalConfigurationGroup {
-public:
+class MPUBLIC ChannelOptionsV4L: public VerticalConfigurationGroup {
+  public:
     ChannelOptionsV4L(const ChannelID& id);
 };
 

@@ -67,7 +67,7 @@ class TransportList : public ListBoxSetting, public TransientStorage
 };
 
 // Page for selecting a transport to be created/edited
-class TransportListEditor : public QObject, public ConfigurationDialog
+class MPUBLIC TransportListEditor : public QObject, public ConfigurationDialog
 {
     Q_OBJECT
 
