@@ -211,7 +211,10 @@ bool MediaMonitorUnix::CheckRemovable(const QString &dev)
 QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 {
     QString msg = LOC + ":GetDeviceFile(" + sysfs + ")";
-    QString ret = QString::null;
+    QString ret = sysfs;
+
+    // In case of error, a working default?  (device names usually match)
+    ret.replace(QRegExp(".*/"), "/dev/");
 
 #ifdef linux
     QProcess    *udevinfo = new QProcess();
