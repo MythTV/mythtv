@@ -255,7 +255,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 
     ret = stream.readLine();
     if (ret.startsWith("device not found in database"))
-        ret = QString::null;
+        return ret;
 
     udevinfo->deleteLater();
 #endif // linux
