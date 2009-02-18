@@ -219,7 +219,7 @@ long long RemoteEncoder::GetFilePosition(void)
     return -1;
 }
 
-/** \fn TVRec::GetMaxBitrate(void)
+/**
  *   Returns the maximum bits per second this recorder can produce.
  *  \sa TVRec::GetMaxBitrate(void), EncoderLink::GetMaxBitrate(void)
  */
