@@ -69,7 +69,7 @@ static void vdpau_preemption_callback(VdpDevice device, void *vdpau_ctx)
 VDPAUContext::VDPAUContext()
   : nextframedelay(0),      lastframetime(0),
     pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
-    checkVideoSurfaces(8),
+    checkVideoSurfaces(8),  last_video_surface(0),
     outputSurface(0),       checkOutputSurfaces(false),
     outputSize(QSize(0,0)), decoder(0),        maxReferences(2),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
@@ -672,6 +672,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
             return false;
         }
     }
+    last_video_surface = videoSurfaces[0].surface;
 
     // clear video surfaces to black
     vdp_st = vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(
@@ -821,6 +822,7 @@ void VDPAUContext::FreeBuffers(void)
         videoSurfaces.clear();
     }
     checkVideoSurfaces = 8;
+    last_video_surface = 0;
 }
 
 bool VDPAUContext::InitOutput(QSize size)
@@ -1104,8 +1106,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     else if (!frame)
     {
         deint = false;
-        if (!video_surface)
-            video_surface = videoSurfaces[0].surface;
+        video_surface = last_video_surface;
     }
 
     if (outRect.x1 != (uint)screen_size.width() ||
@@ -1260,6 +1261,9 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         num_layers ? layers : NULL
     );
     CHECK_ST
+
+    if (ok)
+        last_video_surface = video_surface;
 
     if (pipReady)
         pipReady--;

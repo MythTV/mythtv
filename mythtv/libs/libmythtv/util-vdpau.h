@@ -107,6 +107,7 @@ class VDPAUContext
     uint maxVideoHeight;
     vector<video_surface> videoSurfaces;
     int checkVideoSurfaces;
+    VdpVideoSurface last_video_surface;
 
     vector<VdpOutputSurface> outputSurfaces;
     VdpOutputSurface outputSurface;
