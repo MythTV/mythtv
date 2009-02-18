@@ -2561,8 +2561,9 @@ long long TVRec::GetFilePosition(void)
     return -1;
 }
 
-/** \fn TVRec::GetKeyframePosition(long long)
- *  \brief Returns byte position in RingBuffer of a keyframe according to recorder.
+/**
+ *  \brief Returns byte position in RingBuffer
+ *         of a keyframe according to recorder.
  *
  *  \sa EncoderLink::GetKeyframePosition(long long),
  *      RemoteEncoder::GetKeyframePosition(long long)
@@ -2577,7 +2578,7 @@ long long TVRec::GetKeyframePosition(long long desired) const
     return -1;
 }
 
-/** \fn TVRec::GetKeyframePositions(long long, long long, PosMap&)
+/**
  *  \brief Returns byte position in RingBuffer of a keyframes
  *         according to recorder.
  *
