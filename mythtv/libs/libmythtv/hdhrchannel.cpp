@@ -29,7 +29,7 @@ using namespace std;
 
 #define DEBUG_PID_FILTERS
 
-#define LOC QString("HDHRChan(%1): ").arg(GetDevice())
+#define LOC     QString("HDHRChan(%1): ").arg(GetDevice())
 #define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
@@ -45,7 +45,7 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
 
     /* Otherwise, is it a valid IP address? */
     struct in_addr address;
-    if (inet_aton(device.toLatin1().constData(), &address)) 
+    if (inet_aton(device.toLatin1().constData(), &address))
     {
 	_device_ip = ntohl(address.s_addr);
 	return;
@@ -100,10 +100,12 @@ bool HDHRChannel::FindDevice(void)
 
     /* Discover. */
     struct hdhomerun_discover_device_t result;
-    int ret = hdhomerun_discover_find_devices_custom(0, HDHOMERUN_DEVICE_TYPE_WILDCARD, _device_id, &result, 1);
+    int ret = hdhomerun_discover_find_devices_custom(
+                  0, HDHOMERUN_DEVICE_TYPE_WILDCARD, _device_id, &result, 1);
     if (ret < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to send discovery request" + ENO);
+        VERBOSE(VB_IMPORTANT,
+                LOC_ERR + "Unable to send discovery request" + ENO);
         return false;
     }
     if (ret == 0)
@@ -253,7 +255,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
     QString loc_err = loc + ", Error: ";
     VERBOSE(VB_CHANNEL, loc);
-    
+
     if (!Open())
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
@@ -396,17 +398,26 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 bool HDHRChannel::Tune(uint frequency, QString /*input*/,
                        QString modulation, QString si_std)
 {
+    QString name;
     bool ok = false;
 
     VERBOSE(VB_CHANNEL, LOC +
             QString("TuneTo(%1,%2)").arg(frequency).arg(modulation));
 
     if (modulation == "8vsb")
-        ok = !TunerSet("channel", QString("8vsb:%1").arg(frequency)).isEmpty();
+        name = "8vsb";
     else if (modulation == "qam_64")
-        ok = !TunerSet("channel", QString("qam64:%1").arg(frequency)).isEmpty();
+        name = "qam64";
     else if (modulation == "qam_256")
-        ok = !TunerSet("channel", QString("qam256:%1").arg(frequency)).isEmpty();
+        name = "qam256";
+    else if (modulation == "auto")
+        name = "auto";
+    else
+        return false;  // invalid modulation type
+
+    name.append(':' + QString::number(frequency));
+
+    ok = ! TunerSet("channel", name).isEmpty();
 
     if (ok)
         SetSIStandard(si_std);
