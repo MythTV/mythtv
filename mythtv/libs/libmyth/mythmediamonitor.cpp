@@ -20,6 +20,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythdialogbox.h"
 #include "mythverbose.h"
+#include "util.h"
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h" 
@@ -305,7 +306,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
 
         if (fi && fi->isSymLink())
         {
-            QString target = fi->readLink();
+            QString target = getSymlinkTarget(*dev);
 
             if (m_IgnoreList.filter(target).isEmpty())
             {
