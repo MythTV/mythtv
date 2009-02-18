@@ -438,54 +438,54 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 
     switch (nCardType)
     {
-    case CardUtil::V4L:
-    case CardUtil::MPEG:
-        addSelection(tr("Full Scan"),
-                     QString::number(FullScan_Analog), true);
-        return;
-    case CardUtil::OFDM:
-        addSelection(tr("Full Scan"),
-                     QString::number(FullScan_OFDM), true);
-        addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(NITAddScan_OFDM));
-        importConf = true;
-        break;
-    case CardUtil::QPSK:
-        addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(NITAddScan_QPSK));
-        importConf = true;
-        break;
-    case CardUtil::QAM:
-        addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(NITAddScan_QAM));
-        importConf = true;
-        break;
-    case CardUtil::ATSC:
-        addSelection(tr("Full Scan"),
-                     QString::number(FullScan_ATSC), true);
-        importConf = true;
-        break;
-    case CardUtil::HDHOMERUN:
-        addSelection(tr("Full Scan (ATSC)"),
-                     QString::number(FullScan_ATSC), true);
-        addSelection(tr("Full Scan (DVB)"),
-                     QString::number(FullScan_OFDM), true);
-        addSelection(tr("Full Scan (DVB, tuned)"),
-                     QString::number(NITAddScan_OFDM));
-        importConf = true;
-        break;
-    case CardUtil::FREEBOX:
-        addSelection(tr("M3U Import"),
-                     QString::number(IPTVImport), true);
-        return;
-    case CardUtil::ERROR_PROBE:
-        addSelection(QObject::tr("Failed to probe the card"),
-                     QString::number(Error_Probe), true);
-        return;
-    default:
-        addSelection(QObject::tr("Failed to open the card"),
-                     QString::number(Error_Open), true);
-        return;
+        case CardUtil::V4L:
+        case CardUtil::MPEG:
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_Analog), true);
+            return;
+        case CardUtil::OFDM:
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_OFDM), true);
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_OFDM));
+            importConf = true;
+            break;
+        case CardUtil::QPSK:
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_QPSK));
+            importConf = true;
+            break;
+        case CardUtil::QAM:
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_QAM));
+            importConf = true;
+            break;
+        case CardUtil::ATSC:
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_ATSC), true);
+            importConf = true;
+            break;
+        case CardUtil::HDHOMERUN:
+            addSelection(tr("Full Scan (ATSC)"),
+                         QString::number(FullScan_ATSC), true);
+            addSelection(tr("Full Scan (DVB)"),
+                         QString::number(FullScan_OFDM), true);
+            addSelection(tr("Full Scan (DVB, tuned)"),
+                         QString::number(NITAddScan_OFDM));
+            importConf = true;
+            break;
+        case CardUtil::FREEBOX:
+            addSelection(tr("M3U Import"),
+                         QString::number(IPTVImport), true);
+            return;
+        case CardUtil::ERROR_PROBE:
+            addSelection(QObject::tr("Failed to probe the card"),
+                         QString::number(Error_Probe), true);
+            return;
+        default:
+            addSelection(QObject::tr("Failed to open the card"),
+                         QString::number(Error_Open), true);
+            return;
     }
 
     if (importConf)
