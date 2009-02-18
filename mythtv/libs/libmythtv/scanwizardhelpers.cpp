@@ -434,6 +434,8 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
     int nCardType   = CardUtil::toCardType(subtype);
     clearSelections();
 
+    bool importConf = false;
+
     switch (nCardType)
     {
     case CardUtil::V4L:
@@ -446,27 +448,31 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                      QString::number(FullScan_OFDM), true);
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_OFDM));
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
+        importConf = true;
         break;
     case CardUtil::QPSK:
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_QPSK));
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
+        importConf = true;
         break;
     case CardUtil::QAM:
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_QAM));
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
+        importConf = true;
         break;
     case CardUtil::ATSC:
-    case CardUtil::HDHOMERUN:
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_ATSC), true);
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
+        importConf = true;
+        break;
+    case CardUtil::HDHOMERUN:
+        addSelection(tr("Full Scan (ATSC)"),
+                     QString::number(FullScan_ATSC), true);
+        addSelection(tr("Full Scan (DVB)"),
+                     QString::number(FullScan_OFDM), true);
+        addSelection(tr("Full Scan (DVB, tuned)"),
+                     QString::number(NITAddScan_OFDM));
+        importConf = true;
         break;
     case CardUtil::FREEBOX:
         addSelection(tr("M3U Import"),
@@ -481,6 +487,10 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                      QString::number(Error_Open), true);
         return;
     }
+
+    if (importConf)
+        addSelection(tr("Import channels.conf"),
+                     QString::number(DVBUtilsImport));
 
     addSelection(tr("Full Scan of Existing Transports"),
                  QString::number(FullTransportScan));
