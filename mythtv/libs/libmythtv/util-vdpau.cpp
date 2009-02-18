@@ -69,9 +69,8 @@ static void vdpau_preemption_callback(VdpDevice device, void *vdpau_ctx)
 VDPAUContext::VDPAUContext()
   : nextframedelay(0),      lastframetime(0),
     pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
-    videoSurfaces(0),       surface_render(0), checkVideoSurfaces(8),
-    numSurfaces(0),
-    videoSurface(0),        outputSurface(0),  checkOutputSurfaces(false),
+    checkVideoSurfaces(8),
+    outputSurface(0),       checkOutputSurfaces(false),
     outputSize(QSize(0,0)), decoder(0),        maxReferences(2),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
     osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
@@ -583,6 +582,44 @@ void VDPAUContext::DeinitFlipQueue(void)
     }
 }
 
+int VDPAUContext::AddBuffer(int width, int height)
+{
+    VdpStatus vdp_st;
+    bool ok = true;
+
+    video_surface tmp;
+    tmp.surface = 0;
+
+    vdp_st = vdp_video_surface_create(
+        vdp_device,
+        vdp_chroma_type,
+        width,
+        height,
+        &(tmp.surface)
+    );
+    CHECK_ST
+
+    if (!ok || !tmp.surface)
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+            QString("Failed to create video surface."));
+        return -1;
+    }
+
+    if (vdpauDecode)
+    {
+        vdpau_render_state_t new_rend;
+        memset(&new_rend, 0, sizeof(vdpau_render_state_t));
+        new_rend.magic = MP_VDPAU_RENDER_MAGIC;
+        new_rend.state = 0;
+        new_rend.surface = tmp.surface;
+        tmp.render = new_rend;
+    }
+
+    videoSurfaces.push_back(tmp);
+    return GetNumBufs() - 1;
+}
+
 bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
                                LetterBoxColour letterbox_colour)
 {
@@ -624,38 +661,15 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
         return false;
     }
 
-    videoSurfaces = (VdpVideoSurface *)malloc(sizeof(VdpVideoSurface) * num_bufs);
-    if (vdpauDecode)
-    {
-        surface_render = (vdpau_render_state_t*)malloc(sizeof(vdpau_render_state_t) * num_bufs);
-        memset(surface_render, 0, sizeof(vdpau_render_state_t) * num_bufs);
-    }
-
-    numSurfaces = num_bufs;
-
     for (i = 0; i < num_bufs; i++)
     {
-        vdp_st = vdp_video_surface_create(
-            vdp_device,
-            vdp_chroma_type,
-            width,
-            height,
-            &(videoSurfaces[i])
-        );
-        CHECK_ST
-
-        if (!ok)
+        int tmp = AddBuffer(width, height);
+        if (tmp != i)
         {
-            VERBOSE(VB_PLAYBACK, LOC_ERR +
-                QString("Failed to create video surface."));
+            VERBOSE(VB_IMPORTANT, LOC +
+                QString("Failed to add buffer %1 of %2")
+                .arg(i+1).arg(num_bufs));
             return false;
-        }
-
-        if (vdpauDecode)
-        {
-            surface_render[i].magic = MP_VDPAU_RENDER_MAGIC;
-            surface_render[i].state = 0;
-            surface_render[i].surface = videoSurfaces[i];
         }
     }
 
@@ -680,7 +694,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
             for (i = 0; i < num_bufs; i++)
             {
                 vdp_video_surface_put_bits_y_cb_cr(
-                    videoSurfaces[i],
+                    videoSurfaces[i].surface,
                     VDP_YCBCR_FORMAT_YV12,
                     planes,
                     pitches
@@ -793,24 +807,20 @@ void VDPAUContext::FreeBuffers(void)
         CHECK_ST
     }
 
-    if (videoSurfaces)
+    if (videoSurfaces.size())
     {
-        for (i = 0; i < numSurfaces; i++)
+        for (i = 0; i < GetNumBufs(); i++)
         {
-            if (videoSurfaces[i])
+            if (videoSurfaces[i].surface)
             {
                 vdp_st = vdp_video_surface_destroy(
-                    videoSurfaces[i]);
+                    videoSurfaces[i].surface);
                 CHECK_ST
             }
         }
-        free(videoSurfaces);
-        videoSurfaces = NULL;
+        videoSurfaces.clear();
     }
-
-    if (surface_render)
-        free(surface_render);
-    surface_render = NULL;
+    checkVideoSurfaces = 8;
 }
 
 bool VDPAUContext::InitOutput(QSize size)
@@ -1045,6 +1055,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     bool ok = true;
     VdpTime dummy;
     vdpau_render_state_t *render;
+    VdpVideoSurface video_surface = 0;
 
     bool new_frame = true;
     bool deint = (deinterlacing && needDeintRefs && !pause_frame);
@@ -1061,7 +1072,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         if (!render)
             return;
 
-        videoSurface = render->surface;
+        video_surface = render->surface;
     }
     else if (new_frame && frame)
     {
@@ -1069,7 +1080,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         if (deint)
             surf = (currentFrameNum + 1) % NUM_REFERENCE_FRAMES;
 
-        videoSurface = videoSurfaces[surf];
+        video_surface = videoSurfaces[surf].surface;
 
         uint32_t pitches[3] = {
             frame->pitches[0],
@@ -1082,7 +1093,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
             frame->buf + frame->offsets[1]
         };
         vdp_st = vdp_video_surface_put_bits_y_cb_cr(
-            videoSurface,
+            video_surface,
             VDP_YCBCR_FORMAT_YV12,
             planes,
             pitches);
@@ -1093,8 +1104,8 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     else if (!frame)
     {
         deint = false;
-        if (!videoSurface)
-            videoSurface = videoSurfaces[0];
+        if (!video_surface)
+            video_surface = videoSurfaces[0].surface;
     }
 
     if (outRect.x1 != (uint)screen_size.width() ||
@@ -1186,11 +1197,11 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
                 int ref = (currentFrameNum + i - 1) % NUM_REFERENCE_FRAMES;
                 if (ref < 0)
                     ref = 0;
-                refs[i] = videoSurfaces[ref];
+                refs[i] = videoSurfaces[ref].surface;
             }
         }
 
-        videoSurface = refs[1];
+        video_surface = refs[1];
 
         if (scan == kScan_Interlaced)
         {
@@ -1238,7 +1249,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         field,
         deint ? ARSIZE(past_surfaces) : 0,
         deint ? past_surfaces : NULL,
-        videoSurface,
+        video_surface,
         deint ? ARSIZE(future_surfaces) : 0,
         deint ? future_surfaces : NULL,
         &srcRect,
@@ -1974,7 +1985,7 @@ void VDPAUContext::ClearScreen(void)
         VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
         0,
         NULL,
-        videoSurfaces[0],
+        videoSurfaces[0].surface,
         0,
         NULL,
         &srcRect,

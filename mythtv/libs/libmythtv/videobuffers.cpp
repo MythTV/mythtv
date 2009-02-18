@@ -1164,11 +1164,11 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 }
 
 #ifdef USING_VDPAU
+static unsigned char *ffmpeg_vdpau_hack = (unsigned char*)
+    "avlib should not use this private data in VDPAU mode.";
+
 bool VideoBuffers::CreateBuffers(int width, int height, VDPAUContext *ctx)
 {
-    static unsigned char *ffmpeg_vdpau_hack = (unsigned char*)
-        "avlib should not use this private data in VDPAU mode.";
-
     if (!ctx)
         return false;
 
@@ -1190,6 +1190,48 @@ bool VideoBuffers::CreateBuffers(int width, int height, VDPAUContext *ctx)
         buffers[i].priv[1]      = ffmpeg_vdpau_hack;
     }
     return true;
+}
+
+void VideoBuffers::Add(int width, int height, VDPAUContext *ctx, int num)
+{
+    if (!ctx)
+        return;
+
+    int cnt = 0;
+    QMutexLocker locker(&global_lock);
+
+    for (int i =0; i < num; i++)
+    {
+        int new_surf = ctx->AddBuffer(width, height);
+        if (new_surf > 0)
+        {
+            int ref = allocSize();
+            if (ref != new_surf)
+            {
+                VERBOSE(VB_PLAYBACK, QString("VideoBuffers::Add - ") +
+                    QString("mis-match between VideoBuffers and VDPAU."));
+                continue;
+            }
+            VideoFrame tmp;
+            memset(&tmp, 0, sizeof(VideoFrame));
+            buffers.push_back(tmp);
+            init(&buffers[ref], FMT_VDPAU, (unsigned char*)ctx->GetRenderData(new_surf), width, height, -1, 0);
+            vbufferMap[at(ref)] = ref;
+            numbuffers = allocSize();
+            buffers[ref].priv[0]      = ffmpeg_vdpau_hack;
+            buffers[ref].priv[1]      = ffmpeg_vdpau_hack;
+            enqueue(kVideoBuffer_avail, at(ref));
+            cnt++;
+        }
+        else
+        {
+            continue;
+        }
+    }
+    VERBOSE(VB_PLAYBACK,
+        QString("Added %1 VDPAU video buffer(s) (%2 requested).")
+            .arg(cnt).arg(num));
+    return;
 }
 #endif
 

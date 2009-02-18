@@ -165,6 +165,7 @@ class VideoBuffers
 
 #ifdef USING_VDPAU
     bool CreateBuffers(int width, int height, VDPAUContext *ctx);
+    void Add(int width, int height, VDPAUContext *ctx, int num);
 #endif
 
     QString GetStatus(int n=-1) const; // debugging method

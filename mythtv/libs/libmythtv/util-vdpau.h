@@ -15,6 +15,13 @@ struct vdpauPIP
     VdpVideoSurface videoSurface;
     VdpVideoMixer   videoMixer;
 };
+
+struct video_surface
+{
+    VdpVideoSurface      surface;
+    vdpau_render_state_t render;
+};
+
 class NuppelVideoPlayer;
 
 class VDPAUContext
@@ -32,12 +39,13 @@ class VDPAUContext
 
     bool InitBuffers(int width, int height, int numbufs,
                      LetterBoxColour letterbox_colour);
+    int  AddBuffer(int width, int height);
     void FreeBuffers(void);
-    void *GetRenderData(int i) 
-    { if (i < numSurfaces && i >= 0) return (void*)&(surface_render[i]); 
+    void *GetRenderData(int i)
+    { if (i < GetNumBufs() && i >= 0) return (void*)&(videoSurfaces[i].render);
       return NULL;
     }
-    int GetNumBufs(void) { return numSurfaces; }
+    int GetNumBufs(void) { return videoSurfaces.size(); }
 
     bool InitOutput(QSize size);
     void FreeOutput(void);
@@ -97,13 +105,10 @@ class VDPAUContext
 
     uint maxVideoWidth;
     uint maxVideoHeight;
-    VdpVideoSurface *videoSurfaces;
-    vdpau_render_state_t *surface_render;
+    vector<video_surface> videoSurfaces;
     int checkVideoSurfaces;
-    int numSurfaces;
 
     vector<VdpOutputSurface> outputSurfaces;
-    VdpVideoSurface  videoSurface;
     VdpOutputSurface outputSurface;
     bool             checkOutputSurfaces;
     QSize            outputSize;
