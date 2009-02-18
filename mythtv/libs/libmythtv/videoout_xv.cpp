@@ -3119,11 +3119,6 @@ void VideoOutputXv::PrepareFrameVDPAU(VideoFrame *frame, FrameScanType scan)
     (void)frame;
     (void)scan;
 
-    bool pause = (frame == NULL);
-    // select the correct still frame on certain dvds
-    if (pause && vbuffers.size(kVideoBuffer_used))
-        frame = vbuffers.head(kVideoBuffer_used);
-
     if (frame)
         framesPlayed = frame->frameNumber + 1;
 
@@ -3133,11 +3128,10 @@ void VideoOutputXv::PrepareFrameVDPAU(VideoFrame *frame, FrameScanType scan)
 
     vdpau->PrepareVideo(
         frame, windows[0].GetVideoRect(), windows[0].GetDisplayVideoRect(),
-    	windows[0].GetDisplayVisibleRect().size(), scan, pause);
-
+    	windows[0].GetDisplayVisibleRect().size(), scan);
 #endif
 
-    if (pause)
+    if (!frame)
         vbuffers.SetLastShownFrameToScratch();
 }
 
@@ -4103,6 +4097,10 @@ void VideoOutputXv::UpdatePauseFrame(void)
 #ifdef USING_VDPAU
     else if (VideoOutputSubType() == XVideoVDPAU)
     {
+        vbuffers.begin_lock(kVideoBuffer_used);
+        if (vbuffers.size(kVideoBuffer_used) && vdpau)
+            vdpau->UpdatePauseFrame(vbuffers.head(kVideoBuffer_used));
+        vbuffers.end_lock();
         return;
     }
 #endif

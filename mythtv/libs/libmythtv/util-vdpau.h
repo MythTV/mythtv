@@ -52,10 +52,10 @@ class VDPAUContext
 
     void Decode(VideoFrame *frame);
 
+    void UpdatePauseFrame(VideoFrame *frame);
     void PrepareVideo(VideoFrame *frame, QRect video_rect,
                       QRect display_video_rect,
-                      QSize screen_size, FrameScanType scan,
-                      bool pause_frame);
+                      QSize screen_size, FrameScanType scan);
     void DisplayNextFrame(void);
     void SetNextFrameDisplayTimeOffset(int delayus);
     bool InitOSD(QSize size);
@@ -107,7 +107,7 @@ class VDPAUContext
     uint maxVideoHeight;
     vector<video_surface> videoSurfaces;
     int checkVideoSurfaces;
-    VdpVideoSurface last_video_surface;
+    VdpVideoSurface pause_surface;
 
     vector<VdpOutputSurface> outputSurfaces;
     VdpOutputSurface outputSurface;

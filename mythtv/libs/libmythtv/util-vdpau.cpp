@@ -69,7 +69,7 @@ static void vdpau_preemption_callback(VdpDevice device, void *vdpau_ctx)
 VDPAUContext::VDPAUContext()
   : nextframedelay(0),      lastframetime(0),
     pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
-    checkVideoSurfaces(8),  last_video_surface(0),
+    checkVideoSurfaces(8),  pause_surface(0),
     outputSurface(0),       checkOutputSurfaces(false),
     outputSize(QSize(0,0)), decoder(0),        maxReferences(2),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
@@ -672,7 +672,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
             return false;
         }
     }
-    last_video_surface = videoSurfaces[0].surface;
+    pause_surface = videoSurfaces[0].surface;
 
     // clear video surfaces to black
     vdp_st = vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(
@@ -822,7 +822,7 @@ void VDPAUContext::FreeBuffers(void)
         videoSurfaces.clear();
     }
     checkVideoSurfaces = 8;
-    last_video_surface = 0;
+    pause_surface = 0;
 }
 
 bool VDPAUContext::InitOutput(QSize size)
@@ -1042,10 +1042,49 @@ void VDPAUContext::Decode(VideoFrame *frame)
         errored++;
 }
 
+void VDPAUContext::UpdatePauseFrame(VideoFrame *frame)
+{
+    if (vdpauDecode)
+    {
+        vdpau_render_state_t *render = (vdpau_render_state_t *)frame->buf;
+        if (render)
+        {
+            pause_surface = render->surface;
+            return;
+        }
+    }
+    else
+    {
+        VdpStatus vdp_st;
+        bool ok = true;
+        pause_surface = videoSurfaces[0].surface;
+        uint32_t pitches[3] = {
+            frame->pitches[0],
+            frame->pitches[2],
+            frame->pitches[1]
+        };
+        void* const planes[3] = {
+            frame->buf,
+            frame->buf + frame->offsets[2],
+            frame->buf + frame->offsets[1]
+        };
+        vdp_st = vdp_video_surface_put_bits_y_cb_cr(
+            pause_surface,
+            VDP_YCBCR_FORMAT_YV12,
+            planes,
+            pitches);
+        CHECK_ST;
+        if (ok)
+            return;
+    }
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("Failed to update pause surface."));
+    return;
+}
+
 void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
                                 QRect display_video_rect,
-                                QSize screen_size, FrameScanType scan,
-                                bool pause_frame)
+                                QSize screen_size, FrameScanType scan)
 {
     if (checkVideoSurfaces == 1)
         checkOutputSurfaces = true;
@@ -1060,8 +1099,9 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     VdpVideoSurface video_surface = 0;
 
     bool new_frame = true;
-    bool deint = (deinterlacing && needDeintRefs && !pause_frame);
-    if (deint && frame)
+    bool deint = (deinterlacing && needDeintRefs && frame);
+
+    if (deint)
     {
         new_frame = UpdateReferenceFrames(frame);
         if (vdpauDecode && (referenceFrames.size() != NUM_REFERENCE_FRAMES))
@@ -1106,7 +1146,9 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     else if (!frame)
     {
         deint = false;
-        video_surface = last_video_surface;
+        video_surface = pause_surface;
+        if (!video_surface)
+            video_surface = videoSurfaces[0].surface;
     }
 
     if (outRect.x1 != (uint)screen_size.width() ||
@@ -1261,9 +1303,6 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         num_layers ? layers : NULL
     );
     CHECK_ST
-
-    if (ok)
-        last_video_surface = video_surface;
 
     if (pipReady)
         pipReady--;
