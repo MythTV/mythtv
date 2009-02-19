@@ -17,11 +17,13 @@ long TDStretchSSE2::calcCrossCorrMulti(const short *mPos, const short *cPos) con
     int count = (overlapLength * channels) - channels;
     long loops = count >> 5;
     long remainder = count - (loops<<5);
+    const short *mp = mPos;
+    const short *cp = cPos;
 
-    mPos += channels;
-    cPos += channels;
+    mp += channels;
+    cp += channels;
 
-    asm(
+    asm volatile (
         "xorps      %%xmm5, %%xmm5      \n\t"
         "movd       %4, %%xmm7          \n\t"
         "1:                             \n\t"
@@ -50,14 +52,11 @@ long TDStretchSSE2::calcCrossCorrMulti(const short *mPos, const short *cPos) con
         "sub        $1, %%ecx           \n\t"
         "jnz        1b                  \n\t"
         "movdqa     %%xmm5, %0          \n\t"
-        :"=m"(out[0])
-        :"r"(mPos), "r"(cPos), "c"(loops), "m"(overlapDividerBits)
+        :"=m"(out[0]),"+r"(mp), "+r"(cp)
+        :"c"(loops), "m"(overlapDividerBits)
     );
 
     corr = out[0] + out[1] + out[2] + out[3];
-
-    mPos += loops<<5;
-    cPos += loops<<5;
 
     for (i = 0; i < remainder; i++)
         corr += (mPos[i] * cPos[i]) >> overlapDividerBits;
@@ -72,11 +71,13 @@ long TDStretchSSE2::calcCrossCorrStereo(const short *mPos, const short *cPos) co
     int count = (overlapLength<<1) - 2;
     long loops = count >> 5;
     long remainder = count - (loops<<5);
+    const short *mp = mPos;
+    const short *cp = cPos;
 
-    mPos += 2;
-    cPos += 2;
+    mp += 2;
+    cp += 2;
 
-    asm(
+    asm volatile (
         "xorps      %%xmm5, %%xmm5      \n\t"
         "movd       %4, %%xmm7          \n\t"
         "1:                             \n\t"
@@ -105,14 +106,11 @@ long TDStretchSSE2::calcCrossCorrStereo(const short *mPos, const short *cPos) co
         "sub        $1, %%ecx           \n\t"
         "jnz        1b                  \n\t"
         "movdqa     %%xmm5, %0          \n\t"
-        :"=m"(out[0])
-        :"r"(mPos), "r"(cPos), "c"(loops), "m"(overlapDividerBits)
+        :"=m"(out[0]),"+r"(mp),"+r"(cp)
+        :"c"(loops), "m"(overlapDividerBits)
     );
 
     corr = out[0] + out[1] + out[2] + out[3];
-
-    mPos += loops<<5;
-    cPos += loops<<5;
 
     for (i = 0; i < remainder; i += 2)
         corr += (mPos[i] * cPos[i] +
@@ -121,10 +119,15 @@ long TDStretchSSE2::calcCrossCorrStereo(const short *mPos, const short *cPos) co
     return corr;
 }
 
-__attribute__((noinline))
 void TDStretchSSE2::overlapMulti(short *output, const short *input) const
 {
-    asm(
+
+    short *o = output;
+    const short *i = input;
+    const short *m = pMidBuffer;
+    long ch = (long)channels;
+
+    asm volatile (
         "movd       %%ecx, %%xmm0       \n\t"
         "shl        %6                  \n\t"
         "punpckldq  %%xmm0, %%xmm0      \n\t"
@@ -160,15 +163,18 @@ void TDStretchSSE2::overlapMulti(short *output, const short *input) const
         "add        %6, %5              \n\t"
         "sub        $1, %%ecx           \n\t"
         "jnz        1b                  \n\t"
-        ::"c"(overlapLength),"m"(sadd),"m"(ones),"r"(input),"r"(pMidBuffer),
-          "r"(output),"r"((long)channels)
+        ::"c"(overlapLength),"m"(sadd),"m"(ones),"r"(i),"r"(m),"r"(o),"r"(ch)
+        :"memory"
     );
 }
 
-__attribute__((noinline)) 
 void TDStretchSSE2::overlapStereo(short *output, const short *input) const
 {
-    asm(
+    short *o = output;
+    const short *i = input;
+    const short *m = pMidBuffer;
+
+    asm volatile (
         "movd       %%ecx, %%mm0        \n\t"
         "pxor       %%mm7, %%mm7        \n\t"
         "punpckldq  %%mm0, %%mm0        \n\t"
@@ -206,7 +212,7 @@ void TDStretchSSE2::overlapStereo(short *output, const short *input) const
         "sub        $1, %%ecx           \n\t"
         "jnz        1b                  \n\t"
         "emms                           \n\t"
-        ::"c"(overlapLength),"m"(sadd),"m"(ones),"r"(input),"r"(pMidBuffer),
-          "r"(output)
+        ::"c"(overlapLength),"m"(sadd),"m"(ones),"r"(i),"r"(m),"r"(o)
+        :"memory"
     );
 }
