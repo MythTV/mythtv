@@ -22,6 +22,7 @@
             <spacing>0</spacing>
             <statetype name="buttonitem">
                 <state name="active">
+                    <area>0,0,256,192</area>
                     <imagetype name="buttonimage">
                         <area>0,0,256,192</area>
                         <preserveaspect>yes</preserveaspect>

@@ -2,8 +2,6 @@
 str BackgroundColor=#484537
 # Color of lines, text, etc
 str ForegroundColor=#dddddd
-# Pixmap to use for the background
-str BackgroundPixmap=backgrounds/background.png
 
 # Colors for the different program categories
 str Cat_Comedy=DarkOrchid
@@ -38,7 +36,7 @@ str ActiveText=#333333
 str ActiveBrightText=#5788c3
 str ActiveButtonText=#484537
 str ActiveBase=#9fa589
-str ActiveBackground=#426794
+str ActiveBackground=#484537
 str ActiveShadow=#333333
 str ActiveHighlight=#8a916f
 str ActiveHighlightedText=#000000
@@ -53,7 +51,7 @@ str InactiveText=#999999
 str InactiveBrightText=#5788c3
 str InactiveButtonText=#dddddd
 str InactiveBase=#a7ac93
-str InactiveBackground=#426794
+str InactiveBackground=#484537
 str InactiveShadow=#333333
 str InactiveHighlight=#8a916f
 str InactiveHighlightedText=#000000
@@ -68,7 +66,7 @@ str DisabledText=#464345
 str DisabledBrightText=#5788c3
 str DisabledButtonText=#dddddd
 str DisabledBase=#767662
-str DisabledBackground=#426794
+str DisabledBackground=#484537
 str DisabledShadow=#333333
 str DisabledHighlight=#a7ac93
 str DisabledHighlightedText=#dddddd

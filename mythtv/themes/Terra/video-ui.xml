@@ -403,9 +403,10 @@
                     <area>0,2,30,30</area>
                     <filename>video/parental_level_lowest.png</filename>
                 </imagetype>
-                <textarea name="label" from="director">
+                <textarea name="label">
                     <area>35,6,100,35</area>
                     <value>Lowest</value>
+                    <align>vcenter</align>
                 </textarea>
             </state>
             <state name="Low" from="Lowest">
@@ -569,13 +570,22 @@
         </textarea>
 
         <statetype name="userratingstate" from="baserating">
-            <position>1193,433</position>
+            <position>1193,435</position>
         </statetype>
 
         <textarea name="plot" from="basetextarea">
-            <area>48,489,1190,180</area>
+            <area>48,487,1182,145</area>
             <multiline>yes</multiline>
-            <value></value>
+<!--            <align>vcenter</align>-->
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>48,647,290,30</area>
+        </textarea>
+
+        <textarea name="director" from="basetextarea">
+            <area>430,647,800,30</area>
+            <align>right</align>
         </textarea>
 
     </window>
@@ -811,7 +821,7 @@
         <imagetype name="topbar" from="basetopbar" />
 
         <textarea name="heading" from="baseheading">
-            <value>Videos - File Associations</value>
+            <value>Video File Associations</value>
         </textarea>
 
         <textarea name="extension_text" from="basetextarea">
@@ -869,7 +879,7 @@
         <imagetype name="topbar" from="basetopbar" />
 
         <textarea name="heading" from="baseheading">
-            <value>Videos - Edit Metadata</value>
+            <value>Edit Video Metadata</value>
         </textarea>
 
         <!-- Labels  -->
@@ -1001,18 +1011,100 @@
 
     </window>
 
-    <!-- TODO - Incomplete, replace with a global file selection dialog in
-         mythdialogbox.cpp and base.xml -->
-    <window name="file_chooser">
-
-        <imagetype name="file_browser_background">
-            <filename>mv_filerequest.png</filename>
+    <window name="itemdetailpopup">
+        <area>0,42,1280,515</area>
+        <imagetype name="fade">
+            <filename>popups/fade_background.png</filename>
         </imagetype>
 
-        <imagetype name="image_box">
-            <area>19,20,143,209</area>
+        <imagetype name="backimg">
+            <position>236,78</position>
+            <filename>video/filters_background.png</filename>
         </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>251,110,774,40</area>
+            <value>Video List Filters</value>
+            <align>hcenter,vcenter</align>
+            <font>basemedium</font>
+        </textarea>
+
+            <imagetype name="coverimage">
+                <area>25,100,227,350</area>
+                <filename>mv_browse_nocover_large.png</filename>
+                <preserveaspect>true</preserveaspect>
+            </imagetype>
+
+            <textarea name="title" from="basetextarea">
+                <area>25,25,682,70</area>
+                <multiline>yes</multiline>
+                <font>baselarge</font>
+                <align>center</align>
+            </textarea>
+
+            <textarea name="plot" from="basetextarea">
+                <area>284,100,423,140</area>
+                <multiline>yes</multiline>
+            </textarea>
+
+            <textarea name="rating" from="basetextarea">
+                <area>284,245,423,90</area>
+                <multiline>yes</multiline>
+            </textarea>
+
+            <textarea name="dirlbl" from="basetextarea">
+                <area>284,340,140,35</area>
+                <value>Directed by:</value>
+                <align>right</align>
+            </textarea>
+
+            <textarea name="director" from="basetextarea">
+                <area>429,340,278,35</area>
+                <font>basemedium</font>
+            </textarea>
+
+            <textarea name="yrlbl" from="basetextarea">
+                <area>284,380,80,35</area>
+                <value>Year:</value>
+                <align>right</align>
+            </textarea>
+
+            <textarea name="year" from="basetextarea">
+                <area>369,380,80,35</area>
+            </textarea>
+
+            <textarea name="userratinglbl" from="basetextarea">
+                <area>454,380,150,35</area>
+                <align>right,top</align>
+                <value>User Rating:</value>
+            </textarea>
+
+            <textarea name="userrating" from="basetextarea">
+                <area>609,380,98,35</area>
+                <align>left,top</align>
+            </textarea>
+
+            <textarea name="lenlbl" from="basetextarea">
+                <area>284,420,140,35</area>
+                <value>Runtime:</value>
+                <align>right</align>
+            </textarea>
+
+            <textarea name="length" from="basetextarea">
+                <area>429,420,278,35</area>
+            </textarea>
+
+            <button name="done_button" from="basebutton">
+                <position>693,515</position>
+                <value>Done</value>
+            </button>
+
+            <button name="play_button" from="basebutton">
+                <position>363,515</position>
+                <value>Play</value>
+        </button>
 
     </window>
+
 </mythuitheme>
 <!-- vim: set expandtab ts=4 sw=4 : -->

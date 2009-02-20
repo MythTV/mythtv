@@ -123,7 +123,7 @@
                         <align>hcenter</align>
                         <font>basesmallbrown</font>
                     </textarea>
-                    <textarea name="time" from="subtitle">
+                    <textarea name="starttime" from="subtitle">
                         <area>16,242,92,25</area>
                         <align>left</align>
                     </textarea>
@@ -291,9 +291,18 @@
         </statetype>
 
         <textarea name="description" from="basetextarea">
-            <area>48,489,1190,180</area>
+            <area>48,487,1190,145</area>
             <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</value>
+            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>48,647,290,30</area>
+        </textarea>
+
+        <textarea name="lentime" from="basetextarea">
+            <area>430,647,800,30</area>
+            <align>right</align>
         </textarea>
 
         <textarea name="norecordings">
