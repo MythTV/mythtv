@@ -1,18 +1,18 @@
 <mythuitheme>
 
     <window name="watchrecordings">
-        
+
         <textarea name="pagetitle" from="basetextarea">
             <area>20,5,570,40</area>
             <font>baselarge</font>
             <value>Watch Recordings</value>
         </textarea>
-        
+
         <imagetype name="listbackground">
             <filename>reclist_background.png</filename>
             <position>0,60</position>
         </imagetype>
-        
+
         <buttonlist name="groups">
             <area>45,98,300,300</area>
             <buttonarea>0,0,250,250</buttonarea>
@@ -32,7 +32,7 @@
                 <state name="selected" from="active" />
             </statetype>
         </buttonlist>
-        
+
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>365,44,880,350</area>
             <buttonarea>0,30,880,290</buttonarea>
@@ -45,7 +45,7 @@
                         <area>640,1,120,28</area>
                         <align>right</align>
                     </textarea>
-                    <textarea name="time" from="shortdate">
+                    <textarea name="starttime" from="shortdate">
                         <area>770,1,105,28</area>
                         <align>right</align>
                     </textarea>
@@ -84,27 +84,27 @@
                 <position>850,328</position>
             </statetype>
         </buttonlist>
-        
+
         <imagetype name="autoexpire">
             <filename>autoexpire.png</filename>
             <position>988,670</position>
         </imagetype>
-        
+
         <imagetype name="commflagged">
             <filename>commflagged.png</filename>
             <position>1024,670</position>
         </imagetype>
-        
+
         <imagetype name="bookmark">
             <filename>bookmark.png</filename>
             <position>1060,670</position>
         </imagetype>
-        
+
         <imagetype name="cutlist">
             <filename>cutlist.png</filename>
             <position>1094,670</position>
         </imagetype>
-        
+
         <statetype name="audioprops">
             <position>1128,670</position>
             <showempty>yes</showempty>
@@ -129,7 +129,7 @@
                 </imagetype>
             </state>
         </statetype>
-        
+
         <statetype name="subtitletypes">
             <position>1162,670</position>
             <showempty>yes</showempty>
@@ -149,7 +149,7 @@
                 </imagetype>
             </state>
         </statetype>
-        
+
         <statetype name="videoprops">
             <position>1196,670</position>
             <showempty>yes</showempty>
@@ -164,44 +164,44 @@
                 </imagetype>
             </state>
         </statetype>
-        
+
         <!--        <imagetype name="watched">
             <filename>watched.png</filename>
             <position>716,500</position>
         </imagetype>-->
-        
+
         <imagetype name="processing">
             <filename>processing.png</filename>
             <position>1230,670</position>
         </imagetype>
-        
+
         <textarea name="title" from="basetextarea">
             <area>25,400,700,40</area>
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
         </textarea>
-        
+
         <textarea name="channel" from="basetextarea">
             <area>25,445,160,30</area>
         </textarea>
-        
+
         <textarea name="timedate" from="basetextarea">
             <area>195,445,480,30</area>
         </textarea>
-        
+
         <textarea name="description" from="basetextarea">
             <area>25,485,890,220</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
             <value>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</value>
         </textarea>
-        
+
         <imagetype name="preview">
             <area>920,410,320,240</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
-        
+
         <textarea name="norecordings">
             <area>20,75,760,300</area>
             <font>basemedium</font>
@@ -211,5 +211,5 @@
             <align>allcenter</align>
         </textarea>
     </window>
-    
+
 </mythuitheme>

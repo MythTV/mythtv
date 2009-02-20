@@ -45,7 +45,7 @@
                         <area>365,1,100,24</area>
                         <align>right</align>
                     </textarea>
-                    <textarea name="time" from="shortdate">
+                    <textarea name="starttime" from="shortdate">
                         <area>465,1,80,24</area>
                         <align>right</align>
                     </textarea>
@@ -305,11 +305,11 @@
 
     <window name="passwordchanger">
         <area>-1,-1,500,500</area>
-        
+
         <imagetype name="backimg">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
-        
+
         <textarea name="label" from="basetextarea">
             <area>12,15,470,160</area>
             <multiline>yes</multiline>
@@ -321,7 +321,7 @@
             <area>58,180,300,30</area>
             <value>Old Password:</value>
         </textarea>
-        
+
         <textedit name="oldpassword" from="basetextedit">
             <position>58,210</position>
         </textedit>
@@ -347,28 +347,28 @@
         <imagetype name="backimg">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
-        
+
         <textarea name="label" from="basetextarea">
             <area>12,15,470,160</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
         </textarea>
-        
+
         <textarea name="titlelabel" from="basetextarea">
             <area>58,180,300,30</area>
             <value>Title:</value>
         </textarea>
-        
+
         <textedit name="title" from="basetextedit">
             <position>58,210</position>
         </textedit>
-        
+
         <textarea name="subtitlelabel" from="basetextarea">
             <area>58,310,300,30</area>
             <value>Subtitle:</value>
         </textarea>
-        
+
         <textedit name="subtitle" from="basetextedit">
             <position>58,340</position>
         </textedit>

@@ -658,8 +658,6 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
                           recstartts.time().toString(timeFormat) + " - " +
                           recendts.time().toString(timeFormat);
 
-    progMap["time"] = timeNow.time().toString(timeFormat);
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT icon FROM channel WHERE chanid = :CHANID ;");
