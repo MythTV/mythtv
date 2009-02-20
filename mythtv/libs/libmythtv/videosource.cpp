@@ -2082,7 +2082,7 @@ class QuickTune : public ComboBoxSetting, public CardInputDBStorage
     {
         setLabel(QObject::tr("Use quick tuning"));
         addSelection(QObject::tr("Never"),        "0", true);
-        addSelection(QObject::tr("Live TV only"), "1", true);
+        addSelection(QObject::tr("Live TV only"), "1", false);
         addSelection(QObject::tr("Always"),       "2", false);
         setHelpText(QObject::tr(
                         "If enabled MythTV will tune using only the "
