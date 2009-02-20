@@ -858,8 +858,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
         QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
         QString tempTime      = ((*it)->recstartts).toString(m_formatTime);
-        QString tempSize      = tr("%1 GB")
-            .arg((*it)->filesize * (1.0/(1024.0*1024.0*1024.0)), 0, 'f', 2);
 
         QString state = ((*it)->recstatus == rsRecording) ?
             QString("running") : QString::null;
@@ -881,14 +879,13 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             lcdItems.push_back(lcdItem);
         }
 
+        QMap<QString, QString> infoMap;
+        (*it)->ToMap(infoMap);
+        item->SetTextFromMap(infoMap, state);
+
         item->SetText(tempSubTitle,       "titlesubtitle", state);
-        item->SetText((*it)->title,       "title",         state);
-        item->SetText((*it)->subtitle,    "subtitle",      state);
-        item->SetText((*it)->description, "description",   state);
         item->SetText(tempLongDate,       "longdate",      state);
         item->SetText(tempShortDate,      "shortdate",     state);
-        item->SetText(tempTime,           "time",          state);
-        item->SetText(tempSize,           "size",          state);
 
         item->DisplayState(state, "status");
 
