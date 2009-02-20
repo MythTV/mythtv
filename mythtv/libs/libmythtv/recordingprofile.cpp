@@ -424,6 +424,15 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
         params->addChild(new SampleRate(parent));
         params->addChild(new BTTVVolume(parent));
         addTarget("Uncompressed", params);
+
+        params = new VerticalConfigurationGroup(false);
+        params->setLabel("AC3 Hardware Encoder");
+        addTarget("AC3 Hardware Encoder", params);
+
+        params = new VerticalConfigurationGroup(false);
+        params->setLabel("AAC Hardware Encoder");
+        addTarget("AAC Hardware Encoder", params);
+
     };
 
     void selectCodecs(QString groupType)
@@ -432,6 +441,11 @@ class AudioCompressionSettings : public TriggeredConfigurationGroup
         {
             if (groupType == "MPEG")
                codecName->addSelection("MPEG-2 Hardware Encoder");
+            else if (groupType == "HDPVR")
+            {
+                codecName->addSelection("AC3 Hardware Encoder");
+                codecName->addSelection("AAC Hardware Encoder");
+            }
             else
             {
                 // V4L, TRANSCODE (and any undefined types)
@@ -1260,11 +1274,8 @@ void RecordingProfile::loadByID(int profileId)
         videoSettings = new VideoCompressionSettings(*this, profileName);
         addChild(videoSettings);
 
-        if (type.toUpper() != "HDPVR")
-        {
-            audioSettings = new AudioCompressionSettings(*this, profileName);
-            addChild(audioSettings);
-        }
+        audioSettings = new AudioCompressionSettings(*this, profileName);
+        addChild(audioSettings);
 
         if (!profileName.isEmpty() && profileName.left(11) == "Transcoders")
         {

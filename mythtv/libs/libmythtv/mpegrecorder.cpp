@@ -285,6 +285,13 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
                     QString("%1 is invalid").arg(value));
         }
     }
+    else if (opt == "audiocodec")
+    {
+        if (value == "AAC Hardware Encoder")
+            audtype = 4;
+        else if (value == "AC3 Hardware Encoder")
+            audtype = 5;
+    }
     else
     {
         RecorderBase::SetOption(opt, value);
@@ -340,6 +347,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     SetIntOption(profile, "medium_mpeg4peakbitrate");
     SetIntOption(profile, "high_mpeg4avgbitrate");
     SetIntOption(profile, "high_mpeg4peakbitrate");
+
+    SetStrOption(profile, "audiocodec");
 }
 
 // same as the base class, it just doesn't complain if an option is missing
@@ -868,6 +877,24 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
                 VERBOSE(VB_IMPORTANT, LOC_WARN +
                         "Unable to set audio input.");
             }
+        }
+    }
+
+    // query supported audio codecs if spdif is not used
+    if (driver == "hdpvr" && audioinput != 2)
+    {
+        struct v4l2_queryctrl qctrl;
+        qctrl.id = V4L2_CID_MPEG_AUDIO_ENCODING;
+
+        if (!ioctl(chanfd, VIDIOC_QUERYCTRL, &qctrl))
+        {
+            uint audio_enc = max(min(audtype-1, qctrl.maximum), qctrl.minimum);
+            add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_ENCODING, audio_enc);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Unable to get supported audio codecs." + ENO);
         }
     }
 
