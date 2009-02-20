@@ -2030,6 +2030,13 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                                      "be $time if command "
                                                      "set.\'");
 
+        if (setwakeup_cmd.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "SetWakeuptimeCommand is empty, shutdown aborted");
+            idleSince = QDateTime();
+            m_isShuttingDown = false;
+            return;
+        }
         if (wakeup_timeformat == "time_t")
         {
             QString time_ts;
@@ -2045,8 +2052,14 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                     setwakeup_cmd);
 
         // now run the command to set the wakeup time
-        if (!setwakeup_cmd.isEmpty())
-            myth_system(setwakeup_cmd.ascii());
+        if (myth_system(setwakeup_cmd.ascii()))
+        {
+            VERBOSE(VB_IMPORTANT, "SetWakeuptimeCommand failed, "
+                    "shutdown aborted");
+            idleSince = QDateTime();
+            m_isShuttingDown = false;
+            return;
+        }
     }
 
     // tell anyone who is listening the master server is going down now
@@ -2065,7 +2078,10 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                     "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
 
         // and now shutdown myself
-        myth_system(halt_cmd.ascii());
+        if (!myth_system(halt_cmd.ascii()))
+            return;
+        else
+            VERBOSE(VB_IMPORTANT, "ServerHaltCommand failed, shutdown aborted");
     }
 
     // If we make it here then either the shutdown failed
