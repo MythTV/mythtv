@@ -50,6 +50,7 @@ class MPUBLIC MythUIButtonListItem
 
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
+    void SetTextFromMap(QMap<QString, QString> &infoMap, const QString &state="");
     QString GetText(void) const;
 
     void SetFontState(const QString &state, const QString &name="");
@@ -235,6 +236,6 @@ class MPUBLIC MythUIButtonList : public MythUIType
     friend class MythUIButtonTree;
 };
 
-Q_DECLARE_METATYPE(MythUIButtonListItem *);
+Q_DECLARE_METATYPE(MythUIButtonListItem *)
 
 #endif
