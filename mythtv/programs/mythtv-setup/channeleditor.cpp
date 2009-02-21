@@ -118,8 +118,8 @@ int ChannelWizard::countCardtypes()
 ChannelEditor::ChannelEditor(MythScreenStack *parent)
               : MythScreenType(parent, "channeleditor")
 {
-    m_currentSourceName = "";
     m_currentSortMode = tr("Channel Name");
+    m_sourceFilter = FILTER_ALL; // All
     m_currentHideMode = false;
 }
 
@@ -158,14 +158,14 @@ bool ChannelEditor::Create()
     // Sort List
     new MythUIButtonListItem(sortList, tr("Channel Name"));
     new MythUIButtonListItem(sortList, tr("Channel Number"));
-    connect(m_sourceList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+    connect(m_sourceList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(setSourceID(MythUIButtonListItem *)));
     sortList->SetValue(m_currentSortMode);
 
 
     // Source List
     new MythUIButtonListItem(m_sourceList,tr("All"),
-                             qVariantFromValue(QString("All")));
+                             qVariantFromValue((int)FILTER_ALL));
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name, sourceid FROM videosource");
     if (query.exec())
@@ -173,14 +173,13 @@ bool ChannelEditor::Create()
         while(query.next())
         {
             new MythUIButtonListItem(m_sourceList, query.value(0).toString(),
-                                     query.value(1).toString());
+                                     query.value(1).toInt());
         }
     }
     new MythUIButtonListItem(m_sourceList,tr("(Unassigned)"),
-                             qVariantFromValue(QString("Unassigned")));
-    connect(sortList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+                             qVariantFromValue((int)FILTER_UNASSIGNED));
+    connect(sortList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(setSortMode(MythUIButtonListItem *)));
-    m_sourceList->SetValue(m_currentSourceName);
 
     // Hide/Show channels without channum checkbox
     hideCheck->SetCheckState(m_currentHideMode);
@@ -260,9 +259,7 @@ void ChannelEditor::fillList(void)
 
     QString querystr = "SELECT channel.name,channum,chanid ";
 
-    if ((m_currentSourceName.isEmpty()) ||
-        (m_currentSourceName == "Unassigned") ||
-        (m_currentSourceName == "All"))
+    if (m_sourceFilter == FILTER_ALL)
     {
         querystr += ",videosource.name FROM channel "
                     "LEFT JOIN videosource ON "
@@ -272,7 +269,7 @@ void ChannelEditor::fillList(void)
     else
     {
         querystr += QString("FROM channel WHERE sourceid='%1' ")
-                           .arg(m_currentSourceName);
+                           .arg(m_sourceFilter);
         fAllSources = false;
     }
 
@@ -301,7 +298,7 @@ void ChannelEditor::fillList(void)
             if (fAllSources && !query.value(3).toString().isNull())
             {
                 sourceid = query.value(3).toString();
-                if (m_currentSourceName == "Unassigned")
+                if (m_sourceFilter == FILTER_UNASSIGNED)
                     continue;
             }
 
@@ -324,7 +321,7 @@ void ChannelEditor::fillList(void)
                     name = "???. " + name;
             }
 
-            if ((m_currentSourceName.isEmpty()) && (m_currentSourceName != "Unassigned"))
+            if (m_sourceFilter == FILTER_ALL)
                 name += " (" + sourceid  + ")";
 
             bool sel = (chanid == currentValue);
@@ -360,10 +357,10 @@ void ChannelEditor::setSourceID(MythUIButtonListItem *item)
     QString sourceName = item->GetText();
     int sourceID = item->GetData().toInt();
 
-    if (m_currentSourceID != sourceID)
+    if (m_sourceFilter != sourceID)
     {
-        m_currentSourceName = sourceName;
-        m_currentSourceID = sourceID;
+        m_sourceFilterName = sourceName;
+        m_sourceFilter = sourceID;
         fillList();
     }
 }
@@ -379,10 +376,10 @@ void ChannelEditor::setHideMode(bool hide)
 
 void ChannelEditor::deleteChannels(void)
 {
-    const QString currentLabel    = m_sourceList->GetValue();
+    const QString currentLabel = m_sourceList->GetValue();
 
-    bool del_all = m_currentSourceName.isEmpty() || m_currentSourceName == "All";
-    bool del_nul = m_currentSourceName == "Unassigned";
+    bool del_all = m_sourceFilter == FILTER_ALL;
+    bool del_nul = m_sourceFilter == FILTER_UNASSIGNED;
 
     QString chan_msg =
         (del_all) ? tr("Are you sure you would like to delete ALL channels?") :
@@ -435,7 +432,7 @@ void ChannelEditor::deleteChannels(void)
     {
         query.prepare("DELETE FROM channel "
                       "WHERE sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", m_currentSourceName);
+        query.bindValue(":SOURCEID", m_sourceFilter);
     }
 
     if (!query.exec())
@@ -450,7 +447,7 @@ void ChannelEditor::edit(MythUIButtonListItem *item)
         return;
 
     m_id = item->GetData().toInt();
-    ChannelWizard cw(m_id, m_currentSourceID);
+    ChannelWizard cw(m_id, m_sourceFilter);
     cw.exec();
 
     fillList();
@@ -521,7 +518,7 @@ void ChannelEditor::menu()
 void ChannelEditor::scan(void)
 {
 #ifdef USING_BACKEND
-    ScanWizard *scanwizard = new ScanWizard(m_currentSourceID);
+    ScanWizard *scanwizard = new ScanWizard(m_sourceFilter);
     scanwizard->exec(false, true);
     scanwizard->deleteLater();
 
@@ -534,7 +531,7 @@ void ChannelEditor::scan(void)
 
 void ChannelEditor::transportEditor(void)
 {
-    TransportListEditor *editor = new TransportListEditor(m_currentSourceID);
+    TransportListEditor *editor = new TransportListEditor(m_sourceFilter);
     editor->exec();
     editor->deleteLater();
 

@@ -34,9 +34,14 @@ class MPUBLIC ChannelEditor : public MythScreenType
     void fillList();
 
   private:
+    enum sourceFilter {
+        FILTER_ALL = -1,
+        FILTER_UNASSIGNED = 0
+    };
+
     int m_id;
-    int m_currentSourceID;
-    QString m_currentSourceName;
+    int m_sourceFilter;
+    QString m_sourceFilterName;
     QString m_currentSortMode;
     bool m_currentHideMode;
 
