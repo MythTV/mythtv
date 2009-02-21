@@ -4171,10 +4171,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         recDir = "";
     }
-    else if (!gContext->IsMasterBackend() && RemoteCheckFile(this))
+    else if (!gContext->IsBackend() && RemoteCheckFile(this))
     {
-        // master backend can't connect to itself so don't even try.
-        // if we hit here we're not recording this file
         recDir = pathname.section("/", 0, -2);
     }
 
