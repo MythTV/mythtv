@@ -3945,7 +3945,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         recDir = "";
     }
-    else if (!gContext->IsMasterBackend() &&
+    else if (!gContext->IsBackend() &&
               RemoteCheckFile(this) && pathname.left(1) == "/")
     {
         recDir = pathname.section("/", 0, -2);
