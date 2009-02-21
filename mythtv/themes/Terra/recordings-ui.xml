@@ -127,7 +127,7 @@
                         <area>16,242,92,25</area>
                         <align>left</align>
                     </textarea>
-                    <textarea name="shortdate" from="time">
+                    <textarea name="shortdate" from="starttime">
                         <area>108,242,132,25</area>
                         <align>right</align>
                     </textarea>
@@ -148,7 +148,7 @@
                     <textarea name="subtitle">
                         <area>8,239,272,25</area>
                     </textarea>
-                    <textarea name="time">
+                    <textarea name="starttime">
                         <area>20,270,100,25</area>
                     </textarea>
                     <textarea name="shortdate">
