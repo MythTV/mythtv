@@ -3476,7 +3476,9 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
                                            recStart.toString(Qt::ISODate);
                         }
                     }
-                    else if (recUsage == "player")
+                    else if ((recUsage == "player") ||
+                             (recUsage == "pipplayer") ||
+                             (recUsage == "pbpplayer"))
                         weightOffset += weightPerPlayback;
                     else if (recUsage == "flagger")
                         weightOffset += weightPerCommFlag;
