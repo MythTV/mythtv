@@ -6,8 +6,9 @@
 #include <qmutex.h>
 #include <QVariant>
 #include "tv.h"
+#include "mythexp.h"
 
-class TVOSDMenuEntry
+class MPUBLIC TVOSDMenuEntry
 {
     public:
         TVOSDMenuEntry(QString category_entry, int livetv_setting,
@@ -50,7 +51,7 @@ class TVOSDMenuEntry
 
 Q_DECLARE_METATYPE(TVOSDMenuEntry*)
 
-class TVOSDMenuEntryList
+class MPUBLIC TVOSDMenuEntryList
 {
     public:
         TVOSDMenuEntryList(void);
