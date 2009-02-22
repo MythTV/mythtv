@@ -1565,7 +1565,9 @@ bool TV::StateIsRecording(TVState state)
 bool TV::StateIsPlaying(TVState state)
 {
     return (state == kState_WatchingPreRecorded ||
-            state == kState_WatchingRecording);
+            state == kState_WatchingRecording   ||
+            state == kState_WatchingVideo       ||
+            state == kState_WatchingDVD);
 }
 
 bool TV::StateIsLiveTV(TVState state)
