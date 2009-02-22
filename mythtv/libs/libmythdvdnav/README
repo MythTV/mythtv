@@ -1,0 +1,8 @@
+using dvdnav from the mplayer project.
+
+Feb 22nd 2009
+current svn rev 1166.
+
+when doing a resync, pls update the DVDNAV_SVN_REV constant
+in dvdnav.h
+
