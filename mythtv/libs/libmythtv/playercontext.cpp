@@ -38,7 +38,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     // Other state
     paused(false), playingState(kState_None),
     errored(false),
-    // pseudo states 
+    // pseudo states
     pseudoLiveTVRec(NULL), pseudoLiveTVState(kPseudoNormalLiveTV),
     // DB values
     fftime(0), rewtime(0),
@@ -47,7 +47,7 @@ PlayerContext::PlayerContext(const QString &inUseID) :
     playingInfoLock(QMutex::Recursive), deleteNVPLock(QMutex::Recursive),
     stateLock(QMutex::Recursive),
     // pip
-    pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL), 
+    pipState(kPIPOff), pipRect(0,0,0,0), parentWidget(NULL),
     useNullVideo(false),
     // embedding
     embedWinID(0), embedBounds(0,0,0,0)
@@ -100,6 +100,13 @@ void PlayerContext::SetInitialTVState(bool islivetv)
 
         if (curtime < recendts && !playingInfo->isVideo)
             newState = kState_WatchingRecording;
+        else if (playingInfo->isVideo)
+        {
+            if (playingInfo->pathname.startsWith("dvd:"))
+                newState = kState_WatchingDVD;
+            else
+                newState = kState_WatchingVideo;
+        }
         else
             newState = kState_WatchingPreRecorded;
 
@@ -174,7 +181,7 @@ void PlayerContext::CreatePIPWindow(const QRect &rect, int pos,
     }
     else
         name = "pip player";
-    
+
     if (widget)
         parentWidget = widget;
 
@@ -230,18 +237,18 @@ void PlayerContext::DrawARGBFrame(QPainter *p)
 
         // Centre video in the y axis
         if (img.height() < pipRect.height())
-            video_y = pipRect.y() + 
+            video_y = pipRect.y() +
                             (pipRect.height() - img.height()) / 2;
         else
             video_y = pipRect.y();
 
         // Centre video in the x axis
         if (img.width() < pipRect.width())
-            video_x = pipRect.x() + 
+            video_x = pipRect.x() +
                             (pipRect.width() - img.width()) / 2;
         else
             video_x = pipRect.x();
-       
+
         p->drawImage(video_x, video_y, img);
     }
 }
@@ -257,8 +264,8 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
                      parentWidget->winId(), &rect);
     }
 
-    if (useNullVideo || !ok) 
-    { 
+    if (useNullVideo || !ok)
+    {
         SetNVP(NULL);
         useNullVideo = true;
         ok = CreateNVP(tv, NULL, desiredState,
@@ -270,7 +277,7 @@ bool PlayerContext::StartPIPPlayer(TV *tv, TVState desiredState)
 
 
 /**
- * \brief stop NVP but pause the ringbuffer. used in PIP/PBP swap or 
+ * \brief stop NVP but pause the ringbuffer. used in PIP/PBP swap or
  * switching from PIP <-> PBP or enabling PBP
  */
 
@@ -450,7 +457,7 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
     {
         _nvp->LoadExternalSubtitles(buffer->GetFilename());
     }
-        
+
     if ((embedwinid > 0) && embedbounds)
     {
         _nvp->EmbedInWidget(
@@ -502,20 +509,20 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
                 gContext->SaveSetting("AudioNag", 0);
             if (kDialogCodeButton2 == ret)
                 gContext->SetSetting("AudioNag", 0);
-            else if ((kDialogCodeButton3 == ret) || 
+            else if ((kDialogCodeButton3 == ret) ||
                     (kDialogCodeRejected == ret))
             {
                 return false;
             } */
         }
-        
+
     }
     else if (pipState == kPBPRight)
         nvp->SetMuted(true);
 
     int maxWait = -1;
     //if (isPIP())
-    //   maxWait = 1000; 
+    //   maxWait = 1000;
 
     return StartDecoderThread(maxWait);
 }
@@ -634,7 +641,7 @@ void PlayerContext::PushPreviousChannel(void)
 
     // This method builds the stack of previous channels
     QString curChan = tvchain->GetChannelName(-1);
-    if (prevChan.size() == 0 || 
+    if (prevChan.size() == 0 ||
         curChan != prevChan[prevChan.size() - 1])
     {
         QString chan = curChan;
@@ -789,7 +796,7 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
         {
             filters = chanFilters;
         }
-        else 
+        else
         {
             if (!filters.isEmpty() && (filters.right(1) != ","))
                 filters += ",";

@@ -18,7 +18,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1229";
+const QString currentDatabaseVersion = "1230";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4361,7 +4361,7 @@ NULL
         const char *updates[] = {
 "ALTER TABLE people         CHANGE name   name   VARCHAR(128) "
 "  CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '';",
-"ALTER TABLE programgenres  CHANGE genre  genre  VARCHAR(30);", 
+"ALTER TABLE programgenres  CHANGE genre  genre  VARCHAR(30);",
 "ALTER TABLE programrating  CHANGE rating rating VARCHAR(16);",
 "ALTER TABLE programrating  CHANGE system system VARCHAR(8);",
 "ALTER TABLE recordedrating CHANGE rating rating VARCHAR(16);",
@@ -4409,6 +4409,22 @@ NULL
             return false;
     }
 
+    if (dbver == "1229")
+    {
+        const char *updates[] = {
+"CREATE TABLE IF NOT EXISTS tvosdmenu ("
+"osdcategory VARCHAR(32) NOT NULL PRIMARY KEY,"
+"livetv tinyint(4) NOT NULL default '0',"
+"recorded tinyint(4) NOT NULL default '0',"
+"video tinyint(4) NOT NULL default '0',"
+"dvd tinyint(4) NOT NULL default '0',"
+"description varchar(32) NOT NULL);",
+NULL
+};
+        if (!performActualUpdate(updates, "1230", dbver))
+            return false;
+    }
+
     return true;
 }
 
@@ -4419,7 +4435,7 @@ NULL
  *     --ignore-table=schemalock mythconverg | \
  *   sed '/^SET.*;$/d;s/^.*[^;]$/"&"/;s/^);$/");",/'
  *
- * don't forget to add auto_increment annotations 
+ * don't forget to add auto_increment annotations
  *
  * command to get the initial data:
  *

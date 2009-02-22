@@ -61,6 +61,7 @@ using namespace std;
 #include "mythcontrols.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
+#include "mythosdmenueditor.h"
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -141,6 +142,18 @@ void startKeysSetup()
     else
         delete mythcontrols;
 }
+
+void startOSDMenuEditor(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythOSDMenuEditor *mythosdmenueditor =
+        new MythOSDMenuEditor(mainStack, "mythosdmenueditor");
+
+    if (mythosdmenueditor->Create())
+        mainStack->AddScreen(mythosdmenueditor);
+}
+
 
 void startGuide(void)
 {
@@ -457,6 +470,10 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "screensetupwizard")
     {
        startAppearWiz();
+    }
+    else if (sel == "osdmenueditor")
+    {
+        startOSDMenuEditor();
     }
     else if (sel == "setup_keys")
     {

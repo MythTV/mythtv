@@ -17,7 +17,7 @@ typedef enum
 
 /** \brief TVState is an enumeration of the states used by TV and TVRec.
  */
-typedef enum 
+typedef enum
 {
     /** \brief Error State, if we ever try to enter this state errored is set.
      */
@@ -35,6 +35,12 @@ typedef enum
      *         watching a pre-existing recording.
      */
     kState_WatchingPreRecorded,
+    /** \brief Watching Video is the state when we are watching a video and is not
+    *             a dvd
+    */
+    kState_WatchingVideo,
+    /** \brief Watching DVD is the state when we are watching a DVD */
+    kState_WatchingDVD,
     /** \brief Watching Recording is the state for when we are watching
      *         an in progress recording, but the user does not have control
      *         over the channel and recorder to use.
@@ -51,7 +57,7 @@ typedef enum
     kState_ChangingState,
 } TVState;
 
-QString StateToString(TVState state);
+QString StateToString(TVState state, bool brief = false);
 
 typedef enum PictureAdjustType
 {
@@ -72,5 +78,4 @@ typedef enum
     kCommSkipIncr,
 } CommSkipMode;
 QString toString(CommSkipMode type);
-
 #endif

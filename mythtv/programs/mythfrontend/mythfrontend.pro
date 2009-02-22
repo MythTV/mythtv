@@ -26,6 +26,7 @@ HEADERS += statusbox.h networkcontrol.h custompriority.h
 HEADERS += mediarenderer.h mythfexml.h playbackboxlistitem.h
 HEADERS += mythappearance.h exitprompt.h proglist.h
 HEADERS += action.h mythcontrols.h keybindings.h keygrabber.h
+HEADERS += mythosdmenueditor.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -33,7 +34,7 @@ SOURCES += channelrecpriority.cpp statusbox.cpp networkcontrol.cpp
 SOURCES += mediarenderer.cpp mythfexml.cpp playbackboxlistitem.cpp
 SOURCES += custompriority.cpp mythappearance.cpp exitprompt.cpp proglist.cpp
 SOURCES += action.cpp actionset.cpp  mythcontrols.cpp keybindings.cpp
-SOURCES += keygrabber.cpp
+SOURCES += keygrabber.cpp mythosdmenueditor.cpp
 
 macx {
     mac_bundle {

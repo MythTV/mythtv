@@ -280,11 +280,11 @@ using_frontend {
     HEADERS += osd.h                    osdtypes.h
     HEADERS += osdsurface.h             osdlistbtntype.h
     HEADERS += osdimagecache.h          osdtypeteletext.h
-    HEADERS += udpnotify.h
+    HEADERS += udpnotify.h                  tvosdmenuentry.h
     SOURCES += osd.cpp                  osdtypes.cpp
     SOURCES += osdsurface.cpp           osdlistbtntype.cpp
     SOURCES += osdimagecache.cpp        osdtypeteletext.cpp
-    SOURCES += udpnotify.cpp
+    SOURCES += udpnotify.cpp              tvosdmenuentry.cpp
 
     # Video output
     HEADERS += videooutbase.h           videoout_null.h

@@ -43,6 +43,7 @@ class OSDListTreeType;
 class OSDGenericTree;
 class PlayerContext;
 class UDPNotifyOSDSet;
+class TVOSDMenuEntryList;
 
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
@@ -84,7 +85,7 @@ typedef void (*EMBEDRETURNVOID) (void *, bool);
 class VBIMode
 {
   public:
-    typedef enum 
+    typedef enum
     {
         None    = 0,
         PAL_TT  = 1,
@@ -363,7 +364,7 @@ class MPUBLIC TV : public QThread
 
     // key queue commands
     void AddKeyToInputQueue(PlayerContext*, char key);
-    void ClearInputQueues(const PlayerContext*, bool hideosd); 
+    void ClearInputQueues(const PlayerContext*, bool hideosd);
     bool CommitQueuedInput(PlayerContext*);
     bool ProcessSmartChannel(const PlayerContext*, QString&);
 
@@ -381,7 +382,7 @@ class MPUBLIC TV : public QThread
 
     void SwitchSource(uint source_direction);
     void SwitchInputs(PlayerContext*, uint inputid);
-    void ToggleInputs(PlayerContext*, uint inputid = 0); 
+    void ToggleInputs(PlayerContext*, uint inputid = 0);
     void SwitchCards(PlayerContext*,
                      uint chanid = 0, QString channum = "", uint inputid = 0);
 
@@ -434,7 +435,7 @@ class MPUBLIC TV : public QThread
     static void *load_dd_map_thunk(void*);
     static void *load_dd_map_post_thunk(void*);
 
-    void DoQueueTranscode(PlayerContext*,QString profile);  
+    void DoQueueTranscode(PlayerContext*,QString profile);
 
     void SetAutoCommercialSkip(const PlayerContext*,
                                CommSkipMode skipMode = kCommSkipOff);
@@ -445,9 +446,9 @@ class MPUBLIC TV : public QThread
                                 const QStringList &actions);
 
     void DoDisplayJumpMenu(void);
- 
+
     bool ClearOSD(const PlayerContext*);
-    void ToggleOSD(const PlayerContext*, bool includeStatusOSD); 
+    void ToggleOSD(const PlayerContext*, bool includeStatusOSD);
     void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
     void UpdateOSDSeekMessage(const PlayerContext*,
                               const QString &mesg, int disptime);
@@ -507,8 +508,8 @@ class MPUBLIC TV : public QThread
 
     void ShowOSDTreeMenu(const PlayerContext*);
 
-    void FillOSDTreeMenu(       const PlayerContext*, OSDGenericTree*) const;
-    void FillMenuPlaying(       const PlayerContext*, OSDGenericTree*) const;
+    void FillOSDTreeMenu(       const PlayerContext*, OSDGenericTree*, QString category) const;
+    void FillMenuPlaying(       const PlayerContext*, OSDGenericTree*, QString category) const;
     void FillMenuPxP(           const PlayerContext*, OSDGenericTree*) const;
     void FillMenuInputSwitching(const PlayerContext*, OSDGenericTree*) const;
     void FillMenuVideoAspect(   const PlayerContext*, OSDGenericTree*) const;
@@ -559,7 +560,7 @@ class MPUBLIC TV : public QThread
     static bool StateIsLiveTV(TVState state);
     static TVState RemoveRecording(TVState state);
     void RestoreScreenSaver(const PlayerContext*);
-    
+
     void InitUDPNotifyEvent(void);
 
     /// true if dialog is either videoplayexit, playexit or askdelete dialog
@@ -606,7 +607,7 @@ class MPUBLIC TV : public QThread
     int     stickykeys;
     float   ff_rew_repos;
     bool    ff_rew_reverse;
-    bool    jumped_back; ///< Used by PromptDeleteRecording 
+    bool    jumped_back; ///< Used by PromptDeleteRecording
     vector<int> ff_rew_speeds;
 
     uint    vbimode;
@@ -716,6 +717,7 @@ class MPUBLIC TV : public QThread
     // OSD info
     OSDGenericTree *treeMenu;   ///< OSD menu, 'm' using default keybindings
     QMap<OSD*,const PlayerContext*> osd_lctx;
+    TVOSDMenuEntryList *osdMenuEntries;
 
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.

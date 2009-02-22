@@ -55,6 +55,7 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
+#include "tvosdmenuentry.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -687,7 +688,7 @@ TV::TV(void)
       //Recorder switching info
       switchToRec(NULL),
       // OSD info
-      treeMenu(NULL), udpnotify(NULL),
+      treeMenu(NULL), osdMenuEntries(NULL), udpnotify(NULL),
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
@@ -748,6 +749,8 @@ TV::TV(void)
     sleep_times.push_back(SleepTimerInfo(QObject::tr("1h"),    60*60));
     sleep_times.push_back(SleepTimerInfo(QObject::tr("1h30m"), 90*60));
     sleep_times.push_back(SleepTimerInfo(QObject::tr("2h"),   120*60));
+
+    osdMenuEntries = new TVOSDMenuEntryList();
 
     gContext->addListener(this);
     gContext->addCurrentLocation("Playback");
@@ -948,6 +951,9 @@ TV::~TV(void)
             pthread_detach(ddMapLoader);
         }
     }
+    
+    if (osdMenuEntries)
+        delete osdMenuEntries;
 
     PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
     while (!player.empty())
@@ -1736,6 +1742,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         SET_NEXT();
     }
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
+             TRANSITION(kState_None, kState_WatchingVideo) ||
+             TRANSITION(kState_None, kState_WatchingDVD)   ||
              TRANSITION(kState_None, kState_WatchingRecording))
     {
         ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -1809,6 +1817,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         }
     }
     else if (TRANSITION(kState_WatchingPreRecorded, kState_None) ||
+             TRANSITION(kState_WatchingVideo, kState_None)       ||
+             TRANSITION(kState_WatchingDVD, kState_None)         ||
              TRANSITION(kState_WatchingRecording, kState_None))
     {
         SET_NEXT();
@@ -9499,6 +9509,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
 void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
 {
+    int osdMenuCount = osdMenuEntries->GetCount();
     if (treeMenu)
     {
         for (uint i = 0; i < player.size(); i++)
@@ -9513,7 +9524,13 @@ void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
 
     treeMenu = new OSDGenericTree(NULL, "treeMenu");
 
-    FillOSDTreeMenu(ctx, treeMenu);
+    QListIterator<TVOSDMenuEntry*> cm = osdMenuEntries->GetIterator();
+    while(cm.hasNext())
+    {
+        TVOSDMenuEntry *entry = cm.next();
+        if (entry->GetEntry(GetState(ctx)) > 0)
+            FillOSDTreeMenu(ctx, treeMenu, entry->GetCategory());
+    }
 
     OSDListTreeType *tree = NULL;
 
@@ -9521,7 +9538,13 @@ void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
 
     OSD *osd = GetOSDLock(ctx);
     if (osd)
-        tree = osd->ShowTreeMenu("menu", treeMenu);
+    {
+        // something is wrong with reading osd menu DB table
+        if (osdMenuCount == 0)
+            osd->SetSettingsText("Cannot Display OSD Menu", 5);
+        else
+            tree = osd->ShowTreeMenu("menu", treeMenu);
+    }
     ReturnOSDLock(ctx, osd);
 
     if (tree)
@@ -9539,24 +9562,12 @@ void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
 }
 
 void TV::FillOSDTreeMenu(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+    const PlayerContext *ctx, OSDGenericTree *treeMenu,
+    QString category) const
 {
-    new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
-
-    FillMenuPxP(ctx, treeMenu);
-
-    TVState state      = GetState(ctx);
-    bool    liveTV     = StateIsLiveTV(state);
-    bool    playingRec = StateIsPlaying(state);
-    bool    playingDVD = playingRec && ctx->buffer && ctx->buffer->isDVD();
     bool    mainCtx    = ctx == GetPlayer(ctx, 0);
-
-    if (liveTV)
-    {
-        FillMenuInputSwitching(ctx, treeMenu);
-        new OSDGenericTree(treeMenu, tr("Edit Channel"), "TOGGLEEDIT");
-    }
-    else if (playingDVD)
+    // DVD menu stuff first
+    if (category == "DVD")
     {
         new OSDGenericTree(
             treeMenu, tr("DVD Root Menu"),    "JUMPTODVDROOTMENU");
@@ -9565,126 +9576,157 @@ void TV::FillOSDTreeMenu(
         new OSDGenericTree(
             treeMenu, tr("DVD Chapter Menu"), "JUMPTODVDCHAPTERMENU");
     }
-    else if (playingRec && mainCtx)
-    {
+    else if (category == "GUIDE")
+        new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
+    else if (category ==  "PIP")
+        FillMenuPxP(ctx, treeMenu);
+    else if (category == "INPUTSWITCHING")
+        FillMenuInputSwitching(ctx, treeMenu);
+    else if (category == "EDITCHANNEL")
+        new OSDGenericTree(treeMenu, tr("Edit Channel"), "TOGGLEEDIT");
+    else if (category == "EDITRECORDING")
         new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
-    }
-
-    OSDGenericTree *jtp_item =
+    else if (category == "JUMPREC")
+    {
+        OSDGenericTree *jtp_item =
         new OSDGenericTree(treeMenu, tr("Jump to Program"));
-    new OSDGenericTree(jtp_item, tr("Recorded Program"), "JUMPREC");
-    if (lastProgram != NULL)
-        new OSDGenericTree(jtp_item, lastProgram->title, "JUMPPREV");
-
-    if (liveTV)
+        new OSDGenericTree(jtp_item, tr("Recorded Program"), "JUMPREC");
+        if (lastProgram != NULL)
+            new OSDGenericTree(jtp_item, lastProgram->title, "JUMPPREV");
+    }
+    else if (category == "TOGGLEBROWSE")
     {
         if (!db_browse_always)
         {
             new OSDGenericTree(
                 treeMenu, tr("Enable Browse Mode"), "TOGGLEBROWSE");
         }
-        new OSDGenericTree(treeMenu, tr("Previous Channel"), "PREVCHAN");
     }
-    else if (playingRec && !playingDVD)
-        FillMenuPlaying(ctx, treeMenu);
+    else if ( category == "PREVCHAN")
+        new OSDGenericTree(treeMenu, tr("Previous Channel"), "PREVCHAN");
 
-    FillMenuTracks(ctx, treeMenu, kTrackTypeAudio);
-    FillMenuTracks(ctx, treeMenu, kTrackTypeSubtitle);
-    FillMenuTracks(ctx, treeMenu, kTrackTypeCC708);
+    FillMenuPlaying(ctx, treeMenu, category);
 
-    if (VBIMode::NTSC_CC == vbimode)
-        FillMenuTracks(ctx, treeMenu, kTrackTypeCC608);
-    else if (VBIMode::PAL_TT == vbimode)
+    if (category == "AUDIOTRACKS")
+        FillMenuTracks(ctx, treeMenu, kTrackTypeAudio);
+    else if (category == "SUBTITLETRACKS")
+        FillMenuTracks(ctx, treeMenu, kTrackTypeSubtitle);
+    else if (category == "CCTRACKS")
     {
-        new OSDGenericTree(
-            treeMenu, tr("Toggle Teletext Captions"), "TOGGLETTC");
-        new OSDGenericTree(
-            treeMenu, tr("Toggle Teletext Menu"), "TOGGLETTM");
-        FillMenuTracks(ctx, treeMenu, kTrackTypeTeletextCaptions);
+        FillMenuTracks(ctx, treeMenu, kTrackTypeCC708);
+        if (VBIMode::NTSC_CC == vbimode)
+            FillMenuTracks(ctx, treeMenu, kTrackTypeCC608);
+        else if (VBIMode::PAL_TT == vbimode)
+        {
+            new OSDGenericTree(
+                treeMenu, tr("Toggle Teletext Captions"), "TOGGLETTC");
+            new OSDGenericTree(
+                treeMenu, tr("Toggle Teletext Menu"), "TOGGLETTM");
+            FillMenuTracks(ctx, treeMenu, kTrackTypeTeletextCaptions);
+        }
     }
 
     if (mainCtx)
     {
-        FillMenuVideoAspect(ctx, treeMenu);
-        FillMenuAdjustFill(ctx, treeMenu);
-        new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), "TOGGLEMANUALZOOM");
-        FillMenuAdjustPicture(ctx, treeMenu);
+        if (category == "VIDEOASPECT")
+            FillMenuVideoAspect(ctx, treeMenu);
+        else if (category == "ADJUSTFILL")
+            FillMenuAdjustFill(ctx, treeMenu);
+        else if (category ==  "MANUAL_ZOOM")
+            new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), "TOGGLEMANUALZOOM");
+        else if (category == "ADJUSTPICTURE")
+            FillMenuAdjustPicture(ctx, treeMenu);
     }
 
-    new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
-    FillMenuTimeStretch(ctx, treeMenu);
-    FillMenuVideoScan(ctx, treeMenu);
-    FillMenuSleepMode(ctx, treeMenu);
+    if (category == "AUDIOSYNC")
+        new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
+    else if (category == "TIMESTRETCH")
+        FillMenuTimeStretch(ctx, treeMenu);
+    else if (category == "VIDEOSCAN")
+        FillMenuVideoScan(ctx, treeMenu);
+    else if (category == "SLEEP")
+        FillMenuSleepMode(ctx, treeMenu);
 }
 
 void TV::FillMenuPlaying(
-    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+    const PlayerContext *ctx, OSDGenericTree *treeMenu,
+    QString category) const
 {
     ctx->LockPlayingInfo(__FILE__, __LINE__);
-    if (JobQueue::IsJobQueuedOrRunning(
+    if (category == "TRANSCODE")
+    {
+        if (JobQueue::IsJobQueuedOrRunning(
             JOB_TRANSCODE, ctx->playingInfo->chanid,
             ctx->playingInfo->startts))
-    {
-        new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
-    }
-    else
-    {
-        OSDGenericTree *bt_item =
-            new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
-        new OSDGenericTree(bt_item, tr("Default"),
-                           "QUEUETRANSCODE");
-        new OSDGenericTree(bt_item, tr("Autodetect"),
+        {
+            new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
+        }
+        else
+        {
+            OSDGenericTree *bt_item =
+                new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
+            new OSDGenericTree(bt_item, tr("Default"),
+                            "QUEUETRANSCODE");
+            new OSDGenericTree(bt_item, tr("Autodetect"),
                            "QUEUETRANSCODE_AUTO");
-        new OSDGenericTree(bt_item, tr("High Quality"),
+            new OSDGenericTree(bt_item, tr("High Quality"),
                            "QUEUETRANSCODE_HIGH");
-        new OSDGenericTree(bt_item, tr("Medium Quality"),
+            new OSDGenericTree(bt_item, tr("Medium Quality"),
                            "QUEUETRANSCODE_MEDIUM");
-        new OSDGenericTree(bt_item, tr("Low Quality"),
+            new OSDGenericTree(bt_item, tr("Low Quality"),
                            "QUEUETRANSCODE_LOW");
+        }
     }
 
-    OSDGenericTree *cas_item =
-        new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
-    uint cas_ord[] = { 0, 2, 1 };
-
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    CommSkipMode cur = kCommSkipOff;
-    if (ctx->nvp)
-        cur = ctx->nvp->GetAutoCommercialSkip();
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    for (uint i = 0; i < sizeof(cas_ord)/sizeof(uint); i++)
+    else if (category == "COMMSKIP")
     {
-        const CommSkipMode mode = (CommSkipMode) cas_ord[i];
-        new OSDGenericTree(
-            cas_item, toString(mode),
-            QString("TOGGLECOMMSKIP%1").arg(cas_ord[i]),
-            (mode == cur) ? 1 : 0, NULL, "COMMSKIPGROUP");
+        OSDGenericTree *cas_item =
+            new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
+        uint cas_ord[] = { 0, 2, 1 };
+
+        ctx->LockDeleteNVP(__FILE__, __LINE__);
+        CommSkipMode cur = kCommSkipOff;
+        if (ctx->nvp)
+            cur = ctx->nvp->GetAutoCommercialSkip();
+        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+        for (uint i = 0; i < sizeof(cas_ord)/sizeof(uint); i++)
+        {
+            const CommSkipMode mode = (CommSkipMode) cas_ord[i];
+            new OSDGenericTree(
+                cas_item, toString(mode),
+                QString("TOGGLECOMMSKIP%1").arg(cas_ord[i]),
+                (mode == cur) ? 1 : 0, NULL, "COMMSKIPGROUP");
+        }
     }
 
-    if (ctx->playingInfo->GetAutoExpireFromRecorded())
+    else if (category == "TOGGLEEXPIRE")
     {
-        new OSDGenericTree(
-            treeMenu, tr("Turn Auto-Expire OFF"), "TOGGLEAUTOEXPIRE");
-    }
-    else
-    {
-        new OSDGenericTree(
-            treeMenu, tr("Turn Auto-Expire ON"), "TOGGLEAUTOEXPIRE");
+        if (ctx->playingInfo->GetAutoExpireFromRecorded())
+        {
+            new OSDGenericTree(
+                treeMenu, tr("Turn Auto-Expire OFF"), "TOGGLEAUTOEXPIRE");
+        }
+        else
+        {
+            new OSDGenericTree(
+                treeMenu, tr("Turn Auto-Expire ON"), "TOGGLEAUTOEXPIRE");
+        }
     }
 
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    OSDGenericTree *sr_item =
-        new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
-    new OSDGenericTree(
-        sr_item, tr("Program Guide"),           "GUIDE");
-    new OSDGenericTree(
-        sr_item, tr("Upcoming Recordings"),     "VIEWSCHEDULED");
-    new OSDGenericTree(
-        sr_item, tr("Program Finder"),          "FINDER");
-    new OSDGenericTree(
-        sr_item, tr("Edit Recording Schedule"), "SCHEDULE");
+    if (category == "SCHEDULERECORDING")
+    {
+        OSDGenericTree *sr_item =
+            new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
+         new OSDGenericTree(
+            sr_item, tr("Upcoming Recordings"),     "VIEWSCHEDULED");
+        new OSDGenericTree(
+            sr_item, tr("Program Finder"),          "FINDER");
+        new OSDGenericTree(
+            sr_item, tr("Edit Recording Schedule"), "SCHEDULE");
+    }
 }
 
 /// \brief Constructs Picture-X-Picture portion of menu
@@ -11237,6 +11279,5 @@ void TV::ReturnPlayerLock(const PlayerContext *&ctx) const
     playerLock.unlock();
     ctx = NULL;
 }
-
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

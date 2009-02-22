@@ -9,20 +9,42 @@ using namespace std;
  *  \brief Returns a human readable QString representing a TVState.
  *  \param state State to print.
  */
-QString StateToString(TVState state)
+QString StateToString(TVState state, bool brief)
 {
+    bool appendWatching = false;
     QString statestr = QString("Unknown(%1)").arg((int)state);
     switch (state) {
         case kState_Error: statestr = "Error"; break;
         case kState_None: statestr = "None"; break;
-        case kState_WatchingLiveTV: statestr = "WatchingLiveTV"; break;
+        case kState_WatchingLiveTV:
+            statestr = "WatchingLiveTV";
+            appendWatching = true;
+            break;
         case kState_WatchingPreRecorded:
-            statestr = "WatchingPreRecorded"; break;
-        case kState_WatchingRecording: statestr = "WatchingRecording"; break;
-        case kState_RecordingOnly: statestr = "RecordingOnly"; break;
+            statestr = "WatchingPreRecorded";
+            appendWatching = true;
+            break;
+        case kState_WatchingVideo:
+            statestr = "Video";
+            appendWatching = true;
+            break;
+        case kState_WatchingDVD:
+            statestr = "DVD";
+            appendWatching = true;
+            break;
+        case kState_WatchingRecording:
+            statestr = "WatchingRecording";
+            appendWatching = true;
+            break;
+        case kState_RecordingOnly:
+            statestr = "RecordingOnly";
+            appendWatching  = true;
+            break;
         case kState_ChangingState: statestr = "ChangingState"; break;
     }
     statestr.detach();
+    if (!brief && appendWatching)
+        statestr.prepend("Watching ");
     return statestr;
 }
 
