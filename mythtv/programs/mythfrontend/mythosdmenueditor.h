@@ -18,7 +18,6 @@ class MythOSDMenuEditor : public MythScreenType
     ~MythOSDMenuEditor();
 
     bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
 
   private:
     TVOSDMenuEntryList *m_menuEntryList;
@@ -34,8 +33,6 @@ class MythOSDMenuEditor : public MythScreenType
     TVState m_tvstate;
 
     void updateCategoryList(bool active = true);
-    bool moveUpOrDown(QString direction);
-    void moveRightOrLeft(QString direction);
 
   private slots:
     void slotStateChanged(MythUIButtonListItem *item);
