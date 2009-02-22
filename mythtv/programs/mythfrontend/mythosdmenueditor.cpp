@@ -41,8 +41,11 @@ MythOSDMenuEditor::MythOSDMenuEditor(MythScreenStack *parent, const char *name)
 }
 
 MythOSDMenuEditor::~MythOSDMenuEditor() {
-    m_menuEntryList->UpdateDB();
-    delete m_menuEntryList;
+    if (m_menuEntryList)
+    {
+        m_menuEntryList->UpdateDB();
+        delete m_menuEntryList;
+    }
 }
 
 void MythOSDMenuEditor::updateCategoryList(bool active)
