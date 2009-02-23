@@ -18,7 +18,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1230";
+const QString currentDatabaseVersion = "1231";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4422,6 +4422,26 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1230", dbver))
+            return false;
+    }
+    if (dbver == "1230")
+    {
+        const char *updates[] = {
+// Content identfiers are authority (32) + data (29) + instance (3) = 64
+"ALTER TABLE program"
+"  MODIFY programid varchar(64) CHARACTER SET utf8 NOT NULL default '',"
+"  MODIFY seriesid varchar(64) CHARACTER SET utf8 NOT NULL default '';",
+// tidy up content identifiers without authorities
+"UPDATE program SET programid = '' WHERE programid like '/%';",
+"UPDATE program SET seriesid = '' WHERE seriesid like '/%';",
+// Add network level default authorities to the multiplex tables
+"ALTER TABLE dtv_multiplex ADD COLUMN"
+"    default_authority varchar(32) CHARACTER SET utf8 NOT NULL default '';",
+"ALTER TABLE channelscan_dtv_multiplex ADD COLUMN"
+"    default_authority varchar(32) CHARACTER SET utf8 NOT NULL default '';",
+NULL
+};
+        if (!performActualUpdate(updates, "1231", dbver))
             return false;
     }
 
