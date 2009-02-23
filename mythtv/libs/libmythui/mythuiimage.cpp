@@ -110,6 +110,8 @@ void MythUIImage::Init(void)
     m_isMasked = false;
     m_maskImage = NULL;
 
+    m_isGreyscale = false;
+
     m_preserveAspect = false;
 }
 
@@ -181,6 +183,9 @@ void MythUIImage::SetImage(MythImage *img)
         img->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                         m_reflectLength, m_reflectSpacing);
 
+    if (m_isGreyscale && !img->isGrayscale())
+        img->ToGreyscale();
+
     if (m_ForceSize.isNull())
         SetSize(img->size());
 
@@ -224,6 +229,9 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
         if (m_isReflected && !im->IsReflected())
             im->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                          m_reflectLength, m_reflectSpacing);
+
+        if (m_isGreyscale && !img->isGrayscale())
+            img->ToGreyscale();
 
         m_Images.push_back(im);
 
@@ -313,6 +321,9 @@ QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
 
     if (m_isReflected)
         s_Attrib += "reflected";
+
+    if (m_isGreyscale)
+        s_Attrib += "greyscale";
 
     imagelabel  = QString("%1-%2-%3x%4.png")
                           .arg(filename)
@@ -451,6 +462,9 @@ bool MythUIImage::Load(void)
             if (m_isReflected)
                 image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                             m_reflectLength, m_reflectSpacing);
+
+            if (m_isGreyscale)
+                image->ToGreyscale();
 
             // Save scaled copy to cache
             if (bNeedLoad)
@@ -628,6 +642,11 @@ bool MythUIImage::ParseElement(QDomElement &element)
             m_isMasked = false;
         }
     }
+    else if (element.tagName() == "grayscale" ||
+             element.tagName() == "greyscale")
+    {
+        m_isGreyscale = parseBool(element);
+    }
     else
         return MythUIType::ParseElement(element);
 
@@ -683,6 +702,8 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_gradientDirection = im->m_gradientDirection;
 
     m_preserveAspect = im->m_preserveAspect;
+
+    m_isGreyscale = im->m_isGreyscale;
 
     //SetImages(im->m_Images);
 

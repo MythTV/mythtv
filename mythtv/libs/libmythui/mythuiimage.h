@@ -98,6 +98,8 @@ class MPUBLIC MythUIImage : public MythUIType
 
     bool m_preserveAspect;
 
+    bool m_isGreyscale;
+
     friend class MythThemeBase;
     friend class MythUIButtonListItem;
     friend class MythUIProgressBar;

@@ -205,6 +205,22 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
     m_isReflected = true;
 }
 
+void MythImage::ToGreyscale()
+{
+    if (isGrayscale())
+        return;
+
+    for (int y = 0; y < height(); y++)
+    {
+        for (int x = 0; x < width(); x++)
+        {
+            QRgb oldPixel = pixel(x, y);
+            int greyVal = qGray(oldPixel);
+            setPixel(x, y, qRgba(greyVal, greyVal, greyVal, qAlpha(oldPixel)));
+        }
+    }
+}
+
 MythImage *MythImage::FromQImage(QImage **img)
 {
     if (!img || !*img)

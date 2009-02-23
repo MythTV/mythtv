@@ -40,6 +40,7 @@ class MPUBLIC MythImage : public QImage
     void Resize(const QSize &newSize, bool preserveAspect = false);
     void Reflect(ReflectAxis axis, int shear, int scale, int length,
                  int spacing = 0);
+    void ToGreyscale();
 
     /**
      * @brief Create a gradient image.
