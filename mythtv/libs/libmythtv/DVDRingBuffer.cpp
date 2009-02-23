@@ -118,12 +118,12 @@ long long DVDRingBufferPriv::Seek(long long time)
             seekSpeed = *it;
         if (time < 0)
             seekSpeed = -seekSpeed;
-        dvdRet = dvdnav_time_search(m_dvdnav, seekSpeed);
+        dvdRet = dvdnav_relative_time_search(m_dvdnav, seekSpeed);
     }
     else
     {
         m_seektime = (uint64_t)time;
-        dvdRet = dvdnav_time_search(m_dvdnav, m_seektime);
+        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime, 1);
     }
 
     VERBOSE(VB_PLAYBACK+VB_EXTRA, 
@@ -450,7 +450,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                         m_seektime = 0;
                     }
                     else
-                        dvdnav_time_search(m_dvdnav, relativetime * 2);
+                        dvdnav_relative_time_search(m_dvdnav, relativetime * 2);
                 }
 
                 if (blockBuf != m_dvdBlockWriteBuf)
@@ -653,6 +653,9 @@ bool DVDRingBufferPriv::GoToMenu(const QString str)
 {
     DVDMenuID_t menuid;
     QMutexLocker locker(&m_seekLock);
+
+    VERBOSE(VB_PLAYBACK, QString("DVDRingBuf: GoToMenu %1").arg(str));
+
     if (str.compare("chapter") == 0)
     {
         menuid = DVD_MENU_Part;
