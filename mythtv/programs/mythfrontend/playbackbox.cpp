@@ -1440,9 +1440,7 @@ void PlaybackBox::playSelectedPlaylist(bool random)
 void PlaybackBox::playSelected(MythUIButtonListItem *item)
 {
     if (!item)
-        return;
-
-    item = m_recordingList->GetItemCurrent();
+        item = m_recordingList->GetItemCurrent();
 
     if (!item)
         return;
@@ -2153,8 +2151,9 @@ void PlaybackBox::showPlayFromPopup()
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    if (m_popupMenu)
+    if (!m_popupMenu)
         return;
+
     connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
 
     if (m_popupMenu->Create())
@@ -2163,6 +2162,7 @@ void PlaybackBox::showPlayFromPopup()
     {
         delete m_popupMenu;
         m_popupMenu = NULL;
+        return;
     }
 
     m_popupMenu->SetReturnEvent(this, "slotmenu");
@@ -2440,14 +2440,11 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
     }
     else
     {
-        if (sameProgram)
-        {
-            if (pginfo->programflags & FL_BOOKMARK)
-                m_popupMenu->AddButton(tr("Play from..."),
-                                            SLOT(showPlayFromPopup()), true);
-            else
-                m_popupMenu->AddButton(tr("Play"), SLOT(playSelected()));
-        }
+        if (pginfo->programflags & FL_BOOKMARK)
+            m_popupMenu->AddButton(tr("Play from..."),
+                                        SLOT(showPlayFromPopup()), true);
+        else
+            m_popupMenu->AddButton(tr("Play"), SLOT(playSelected()));
 
         if (m_playList.filter(pginfo->MakeUniqueKey()).size())
             m_popupMenu->AddButton(tr("Remove from Playlist"),
