@@ -115,6 +115,7 @@ class IconView : public MythScreenType
     MythUIButtonList   *m_imageList;
     MythUIText         *m_captionText;
     MythUIText         *m_noImagesText;
+    MythUIImage        *m_selectedImage;
     MythDialogBox      *m_menuPopup;
     MythScreenStack    *m_popupStack;
 
@@ -137,6 +138,7 @@ class IconView : public MythScreenType
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice *pMedia);
     void HandleItemSelect(MythUIButtonListItem *);
     void UpdateText(MythUIButtonListItem *);
+    void UpdateImage(MythUIButtonListItem *);
 
     friend class FileCopyThread;
 };

@@ -114,6 +114,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
 
     m_captionText = NULL;
     m_noImagesText = NULL;
+    m_selectedImage = NULL;
 
     m_menuPopup = NULL;
 
@@ -151,6 +152,9 @@ bool IconView::Create(void)
     m_captionText = dynamic_cast<MythUIText *> (GetChild("text"));
     m_noImagesText = dynamic_cast<MythUIText *> (GetChild("noimages"));
 
+    m_selectedImage = dynamic_cast<MythUIImage *>
+                (GetChild("selectedimage"));
+
     if (!m_imageList)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
@@ -161,6 +165,8 @@ bool IconView::Create(void)
             this, SLOT( HandleItemSelect(MythUIButtonListItem*)));
     connect(m_imageList, SIGNAL(itemSelected( MythUIButtonListItem*)),
             this, SLOT( UpdateText(MythUIButtonListItem*)));
+    connect(m_imageList, SIGNAL(itemSelected( MythUIButtonListItem*)),
+            this, SLOT( UpdateImage(MythUIButtonListItem*)));
 
     if (m_noImagesText)
     {
@@ -348,6 +354,24 @@ void IconView::UpdateText(MythUIButtonListItem *item)
     }
     m_captionText->SetText(caption);
 }
+
+void IconView::UpdateImage(MythUIButtonListItem *item)
+{
+    if (!m_selectedImage)
+        return;
+
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+
+    QString selectedimage;
+    if (thumbitem)
+    {
+        selectedimage = thumbitem->GetImageFilename();
+        selectedimage = (selectedimage.isNull()) ? "" : selectedimage;
+    }
+    m_selectedImage->SetFilename(selectedimage);
+    m_selectedImage->Load();
+}
+
 
 bool IconView::keyPressEvent(QKeyEvent *event)
 {
