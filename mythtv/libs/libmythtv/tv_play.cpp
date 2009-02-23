@@ -9512,6 +9512,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
 {
     int osdMenuCount = osdMenuEntries->GetCount();
+    
     if (treeMenu)
     {
         for (uint i = 0; i < player.size(); i++)
@@ -9541,9 +9542,12 @@ void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
     OSD *osd = GetOSDLock(ctx);
     if (osd)
     {
+        int treeMenuDepth = treeMenu->calculateDepth(0) - 1;
         // something is wrong with reading osd menu DB table
         if (osdMenuCount == 0)
             osd->SetSettingsText("Cannot Display OSD Menu", 5);
+        else if (treeMenuDepth <= 0)
+            osd->SetSettingsText("No OSD Menu Entries", 3);
         else
             tree = osd->ShowTreeMenu("menu", treeMenu);
     }
