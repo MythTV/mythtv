@@ -9634,7 +9634,7 @@ void TV::FillOSDTreeMenu(
             FillMenuVideoAspect(ctx, treeMenu);
         else if (category == "ADJUSTFILL")
             FillMenuAdjustFill(ctx, treeMenu);
-        else if (category ==  "MANUAL_ZOOM")
+        else if (category ==  "MANUALZOOM")
             new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), "TOGGLEMANUALZOOM");
         else if (category == "ADJUSTPICTURE")
             FillMenuAdjustPicture(ctx, treeMenu);
