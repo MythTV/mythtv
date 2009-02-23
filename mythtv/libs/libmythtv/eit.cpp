@@ -573,12 +573,35 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     return 1;
 }
 
-// If a series id or program id does not have an authority add the default.
+/** \fn DBEvent::AddAuthority(const QString&, MSqlQuery &)
+*
+*  If a series id or program id is a CRID URI, just keep important info
+*  ID's are case insensitive, so lower case the whole id.
+*  If there is no authority on the ID, add the default one.
+*  If there is no default, return an empty id.
+*
+*  \param id The ID string to add the authority to.
+*  \param query Object to use for SQL queries.
+*
+*  \return ID with the authority added or empty string if not a valid CRID.
+*/
 QString DBEvent::AddAuthority(const QString& id, MSqlQuery &query) const
 {
-    if (id.length() == 0 || id[0] != '/')
+    if (id.length() == 0)
         return id;
 
+    // CRIDs are not case sensitive, so change all to lower case
+    QString crid = id.toLower();
+
+    // remove "crid://"
+    if (crid.startsWith("crid://"))
+        crid.remove(0,7);
+
+    // if id is a CRID with authority, return it
+    if (crid[0] != '/')
+        return crid;
+
+    // CRID without authority, so try to add the default channel authority
     query.prepare("SELECT default_authority "
         "FROM channel "
         "WHERE chanid    = :CHANID");
@@ -588,11 +611,36 @@ QString DBEvent::AddAuthority(const QString& id, MSqlQuery &query) const
     if (!query.exec())
     {
         MythDB::DBError("AddAuthority", query);
-        return id;
+        return "";
     }
 
     if (query.next())
-        return query.value(0).toString() + id;
-    else
-        return id;
+    {
+        const QString &authority = query.value(0).toString();
+        if (authority.length()>0)
+            return authority + crid;
+    }
+
+    // No channel specific default authority, try a multiplex specific one
+    query.prepare("SELECT m.default_authority "
+                  "FROM channel c LEFT JOIN dtv_multiplex m "
+                  "on (c.mplexid = m.mplexid) "
+                  "WHERE c.chanid    = :CHANID");
+
+    query.bindValue(":CHANID",      chanid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("AddAuthority", query);
+        return "";
+    }
+
+    if (query.next())
+    {
+        const QString &authority = query.value(0).toString();
+        if (authority.length()>0)
+            return authority + crid;
+    }
+
+    return ""; // no authority, not a valid CRID, return empty
 }
