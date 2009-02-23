@@ -230,8 +230,8 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
             im->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                          m_reflectLength, m_reflectSpacing);
 
-        if (m_isGreyscale && !img->isGrayscale())
-            img->ToGreyscale();
+        if (m_isGreyscale && !im->isGrayscale())
+            im->ToGreyscale();
 
         m_Images.push_back(im);
 
