@@ -6,7 +6,7 @@ INCLUDEPATH += $${PREFIX}/include
 #INCLUDEPATH += /usr/include/cdda
 #INCLUDEPATH += /usr/include/FLAC
 
-LIBS *= -L$${PREFIX}/lib
+LIBS *= -L$${PREFIX}/${LIBDIRNAME}
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
