@@ -11,6 +11,7 @@
 
 #include "mythverbose.h"
 #include "mythuihelper.h"
+#include "mythdb.h"
 
 MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
            : MythUIType(parent, name)
@@ -372,7 +373,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
-            if (true) //gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
+            if (GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
             {
                 MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
                 MythUIVirtualKeyboard *kb =  new MythUIVirtualKeyboard(popupStack, this);
