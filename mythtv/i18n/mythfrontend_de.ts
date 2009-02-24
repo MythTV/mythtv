@@ -12468,7 +12468,7 @@ Wählen Sie eine laufende Aufnahme.
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %d seconds. Do you want to:</source>
-        <translation>MythTV wird &quot;%1&quot; auf %2 in %d Sekunden aufnehmen. Was m�chten Sie tun?</translation>
+        <translation>MythTV wird &quot;%1&quot; auf %2 in %d Sekunden aufnehmen. Was möchten Sie tun?</translation>
     </message>
     <message>
         <source>Let them record and go back to the Main Menu</source>
@@ -12931,7 +12931,7 @@ Wählen Sie eine laufende Aufnahme.
     <name>WelcomeDialog</name>
     <message>
         <source>Start Frontend</source>
-        <translation>Hauptmen� anzeigen</translation>
+        <translation>Hauptmenü anzeigen</translation>
     </message>
     <message>
         <source>Cannot connect to server!</source>
