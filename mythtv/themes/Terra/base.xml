@@ -505,14 +505,22 @@
                         <filename>popups/menu_button.png</filename>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>5,0,350,50</area>
+                        <area>18,0,324,50</area>
                         <align>allcenter</align>
                         <font>basemedium</font>
                     </textarea>
+                    <imagetype name="buttonarrow">
+                        <position>346,16</position>
+                        <filename>popups/submenu_arrow.png</filename>
+                    </imagetype>
                 </state>
                 <state name="inactive" from="active">
                 </state>
                 <state name="selected" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <position>5,16</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
                     <textarea name="buttontext">
                         <font>basemediumbrown</font>
                     </textarea>
