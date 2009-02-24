@@ -3707,7 +3707,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
         newRecGroup = "All Programs";
     else if (newRecGroup == ProgramInfo::i18n("LiveTV"))
         newRecGroup = "LiveTV";
-    else if (m_recGroup == ProgramInfo::i18n("Deleted"))
+    else if (newRecGroup == ProgramInfo::i18n("Deleted"))
         newRecGroup = "Deleted";
 
     m_curGroupPassword = m_recGroupPassword;
