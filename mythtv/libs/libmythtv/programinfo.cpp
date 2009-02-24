@@ -547,8 +547,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
 
         if (startts.date().year() == 1895)
         {
-           progMap["startdate"] = "?";
-           progMap["recstartdate"] = "?";
+           progMap["startdate"] = "";
+           progMap["recstartdate"] = "";
         }
         else
         {
@@ -663,9 +663,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     query.prepare("SELECT icon FROM channel WHERE chanid = :CHANID ;");
     query.bindValue(":CHANID", chanid);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
-        if (query.next())
-            progMap["iconpath"] = query.value(0).toString();
+    if (query.exec() && query.next())
+        progMap["iconpath"] = query.value(0).toString();
 
     progMap["RECSTATUS"] = RecStatusText();
 
@@ -688,7 +687,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     progMap["programid"] = programid;
     progMap["catType"] = catType;
 
-    progMap["year"] = year;
+    progMap["year"] = year == "0" ? "" : year;
 
     if (stars)
     {
@@ -886,10 +885,8 @@ ProgramInfo *ProgramInfo::GetProgramFromBasename(const QString filename)
                   "WHERE basename = :BASENAME;");
     query.bindValue(":BASENAME", inf.fileName());
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
-
         return GetProgramFromRecorded(query.value(0).toString(),
                                       query.value(1).toDateTime());
     }
@@ -931,10 +928,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
     query.bindValue(":CHANNEL", channel);
     query.bindValue(":STARTTIME", starttime);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
-
         ProgramInfo *proginfo = new ProgramInfo;
         proginfo->chanid = query.value(0).toString();
         proginfo->startts = query.value(23).toDateTime();
@@ -1116,9 +1111,8 @@ int ProgramInfo::GetChannelRecPriority(const QString &channel)
     query.prepare("SELECT recpriority FROM channel WHERE chanid = :CHANID ;");
     query.bindValue(":CHANID", channel);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         return query.value(0).toInt();
     }
 
@@ -1608,17 +1602,18 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
 
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
+        {
             MythDB::DBError("GetRecordBasename", query);
-        else if (query.size() < 1)
+        }
+        else if (query.next())
+        {
+            retval = query.value(0).toString();
+        }
+        else
             VERBOSE(VB_IMPORTANT, QString("GetRecordBasename found no entry "
                     "for %1 @ %2")
                     .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
-        else
-        {
-            query.next();
-            retval = query.value(0).toString();
-        }
     }
 
     return retval;
@@ -1634,7 +1629,7 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
     QString tmpURL;
     QString basename = GetRecordBasename(true);
 
-    if (basename == "")
+    if (basename.isEmpty())
         return "";
 
     bool alwaysStream = gContext->GetNumSetting("AlwaysStreamFiles", 0);
@@ -1973,9 +1968,8 @@ long long ProgramInfo::GetFilesize(void)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         filesize = stringToLongLong(query.value(0).toString());
     }
     else
@@ -2085,9 +2079,8 @@ QStringList ProgramInfo::GetDVDBookmark(QString serialid, bool delbookmark) cons
                         " WHERE serialid = ? ");
         query.addBindValue(serialid);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             for(int i = 0; i < 4; i++)
                 fields.append(query.value(i).toString());
         }
@@ -2190,9 +2183,8 @@ bool ProgramInfo::IsEditing(void) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         return query.value(0).toBool();
     }
 
@@ -2257,9 +2249,8 @@ bool ProgramInfo::IsCommFlagged(void) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         return query.value(0).toBool();
     }
 
@@ -2288,7 +2279,7 @@ bool ProgramInfo::IsInUse(QString &byWho) const
     query.bindValue(":ONEHOURAGO", oneHourAgo);
 
     byWho = "";
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.size() > 0)
     {
         QString usageStr, recusage;
         while(query.next())
@@ -2331,9 +2322,8 @@ int ProgramInfo::GetTranscodedStatus(void) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         return query.value(0).toInt();
     }
 
@@ -2471,9 +2461,8 @@ int ProgramInfo::GetAutoExpireFromRecorded(void) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         return query.value(0).toInt();
     }
 
@@ -2493,9 +2482,8 @@ bool ProgramInfo::GetPreserveEpisodeFromRecorded(void) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         return query.value(0).toBool();
     }
 
@@ -2513,9 +2501,8 @@ bool ProgramInfo::UsesMaxEpisodes(void) const
                   "recordid = :RECID ;");
     query.bindValue(":RECID", recordid);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         return query.value(0).toInt();
     }
 
@@ -2627,10 +2614,10 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
 
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
             MythDB::DBError("SetMarkupMap checking record table", query);
 
-        if (query.size() < 1 || !query.next())
+        if (!query.next())
             return;
     }
 
@@ -2701,7 +2688,7 @@ void ProgramInfo::GetMarkupMap(frm_dir_map_t &marks,
     }
     query.bindValue(":TYPE", type);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.size() > 0)
     {
         while(query.next())
             marks[query.value(0).toLongLong()] = query.value(1).toInt();
@@ -2783,7 +2770,7 @@ void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
     }
     query.bindValue(":TYPE", type);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.size() > 0)
     {
         while (query.next())
             posMap[query.value(0).toLongLong()] = query.value(1).toLongLong();
@@ -3759,10 +3746,8 @@ int ProgramInfo::getProgramFlags(void) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
-
         flags |= (query.value(0).toInt() == COMM_FLAG_DONE) ? FL_COMMFLAG : 0;
         flags |= (query.value(1).toInt() == 1) ? FL_CUTLIST : 0;
         flags |= query.value(2).toInt() ? FL_AUTOEXP : 0;
@@ -3790,10 +3775,8 @@ void ProgramInfo::getProgramProperties(void)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
-
         audioproperties = query.value(0).toInt();
         videoproperties = query.value(1).toInt();
         subtitleType = query.value(2).toInt();
@@ -3806,7 +3789,7 @@ void ProgramInfo::UpdateInUseMark(bool force)
     if (isVideo)
         return;
 
-    if (inUseForWhat == "")
+    if (inUseForWhat.isEmpty())
         return;
 
     if (force || lastInUseTime.secsTo(QDateTime::currentDateTime()) > 15 * 60)
@@ -3838,9 +3821,8 @@ QString ProgramInfo::GetRecGroupPassword(QString group)
                         "WHERE recgroup = :GROUP ;");
         query.bindValue(":GROUP", group);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
-            if (query.next())
-                result = query.value(0).toString();
+        if (query.exec() && query.next())
+            result = query.value(0).toString();
     }
 
     if (result == QString::null)
