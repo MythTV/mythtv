@@ -478,7 +478,11 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
 
     // An upgrade is likely. We do the backup first so that
     // the UI can tell the user where the backup is located.
-    DBup->BackupDB();
+    if (upgradeAllowed)
+        DBup->BackupDB();
+    else
+        VERBOSE(VB_IMPORTANT, "Not allowed to upgrade the database. "
+                              "Skipping backup.");
 
     // Pop up messages, questions, warnings, et c.
     switch (DBup->PromptForUpgrade("TV", upgradeAllowed,
