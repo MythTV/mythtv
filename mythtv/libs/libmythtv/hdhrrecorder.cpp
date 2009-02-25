@@ -27,6 +27,7 @@ using namespace std;
 #include "hdhrrecorder.h"
 #include "atsctables.h"
 #include "atscstreamdata.h"
+#include "dvbstreamdata.h"
 #include "eithelper.h"
 #include "tv_rec.h"
 
@@ -176,10 +177,13 @@ void HDHRRecorder::SetStreamData(MPEGStreamData *data)
         data->AddMPEGListener(this);
 
         ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
+        DVBStreamData  *dvb  = dynamic_cast<DVBStreamData*>(data);
 
         if (atsc && atsc->DesiredMinorChannel())
             atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
                                     atsc->DesiredMinorChannel());
+        else if (dvb)
+            dvb->AddDVBMainListener(this);
         else if (data->DesiredProgram() >= 0)
             data->SetDesiredProgram(data->DesiredProgram());
     }
