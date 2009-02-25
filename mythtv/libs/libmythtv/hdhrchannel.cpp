@@ -1,6 +1,6 @@
 /**
- *  DBox2Channel
- *  Copyright (c) 2006 by Silicondust Engineering Ltd.
+ *  HDHRChannel
+ *  Copyright (c) 2006-2009 by Silicondust Engineering Ltd.
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -25,7 +25,6 @@ using namespace std;
 #include "hdhrchannel.h"
 #include "videosource.h"
 #include "channelutil.h"
-#include "frequencytables.h"
 
 #define DEBUG_PID_FILTERS
 
@@ -398,31 +397,24 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 bool HDHRChannel::Tune(uint frequency, QString /*input*/,
                        QString modulation, QString si_std)
 {
-    QString name;
-    bool ok = false;
+    // Convert dtv_multiplex.modulation strings to something the HDHR can use:
+    modulation.replace("qam_", "qam");  // e.g. qam_256 -> qam256
+#if 0
+    if (modulation == "qamauto")
+        modulation = "qam";             // "auto" works just as well?
+#endif
 
-    VERBOSE(VB_CHANNEL, LOC +
-            QString("TuneTo(%1,%2)").arg(frequency).arg(modulation));
+    QString chan = modulation + ':' + QString::number(frequency);
 
-    if (modulation == "8vsb")
-        name = "8vsb";
-    else if (modulation == "qam_64")
-        name = "qam64";
-    else if (modulation == "qam_256")
-        name = "qam256";
-    else if (modulation == "auto")
-        name = "auto";
-    else
-        return false;  // invalid modulation type
+    VERBOSE(VB_CHANNEL, LOC + "Tune()ing to " + chan);
 
-    name.append(':' + QString::number(frequency));
-
-    ok = ! TunerSet("channel", name).isEmpty();
-
-    if (ok)
+    if (TunerSet("channel", chan).length())
+    {
         SetSIStandard(si_std);
+        return true;
+    }
 
-    return ok;
+    return false;
 }
 
 bool HDHRChannel::AddPID(uint pid, bool do_update)
