@@ -319,12 +319,14 @@ void MythUIType::HandleAlphaPulse(void)
         return;
 
     m_Alpha += m_AlphaChange;
-    if (m_Alpha > 255)
-        m_Alpha = 255;
-    if (m_Alpha < 0)
-        m_Alpha = 0;
 
-    if (m_Alpha >= m_AlphaMax || m_Alpha <= m_AlphaMin)
+    if (m_Alpha > m_AlphaMax)
+        m_Alpha = m_AlphaMax;
+    if (m_Alpha < m_AlphaMin)
+        m_Alpha = m_AlphaMin;
+
+    // Reached limits so change direction
+    if (m_Alpha == m_AlphaMax || m_Alpha == m_AlphaMin)
     {
         if (m_AlphaChangeMode == 2)
         {
@@ -673,7 +675,11 @@ bool MythUIType::ParseElement(QDomElement &element)
     {
         m_AlphaChangeMode = 2;
         m_AlphaMin = element.attribute("min", "0").toInt();
-        m_AlphaMax = element.attribute("max", "255").toInt();
+        m_Alpha = m_AlphaMax = element.attribute("max", "255").toInt();
+        if (m_AlphaMax > 255)
+            m_Alpha = m_AlphaMax = 255;
+        if (m_AlphaMin < 0)
+            m_AlphaMin = 0;
         m_AlphaChange = element.attribute("change", "5").toInt();
     }
     else if (element.tagName() == "focusorder")
@@ -759,7 +765,7 @@ bool MythUIType::MoveToTop(void)
     return false;
 }
 
-bool MythUIType::IsDeferredLoading(bool recurse) 
+bool MythUIType::IsDeferredLoading(bool recurse)
 {
      if (m_deferload)
          return true;
