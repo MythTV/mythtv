@@ -95,6 +95,8 @@ enum VideoProps {
     VID_HDTV          = 0x01,
     VID_WIDESCREEN    = 0x02,
     VID_AVC           = 0x04,
+    VID_720           = 0x08,
+    VID_1080          = 0x10,
 };
 
 // if SubtitleTypes changes, the audioprop column in program and
@@ -317,8 +319,10 @@ class MPUBLIC ProgramInfo
     void SetAspectChange(MarkTypes type, long long frame,
                          uint customAspect);
 
-    // Resolution Set
+    // Resolution Set/Get
     void SetResolution(uint width, uint height, long long frame);
+    int GetHeight(void);
+    void SetVidpropHeight(int height);
 
     // GUI stuff
     void showDetails(void) const;
@@ -332,7 +336,7 @@ class MPUBLIC ProgramInfo
     static QString GetRecGroupPassword(QString group);
     void   UpdateRecGroup(void);
 
-    // Translations for play,recording, & storage groups + 
+    // Translations for play,recording, & storage groups +
     static QString i18n(const QString&);
 
   private:
@@ -355,7 +359,7 @@ class MPUBLIC ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
-
+    uint m_videoHeight;
 
     int recpriority;
     QString recgroup;

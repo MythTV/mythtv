@@ -1083,12 +1083,17 @@ void TVRec::TeardownRecorder(bool killFile)
     int filelen = -1;
     pauseNotify = false;
     ispip = false;
+    int recHeight;
 
     if (recorder && HasFlags(kFlagRecorderRunning))
     {
         // This is a bad way to calculate this, the framerate
         // may not be constant if using a DTV based recorder.
         filelen = (int)((float)GetFramesWritten() / GetFramerate());
+
+        // Get the height and set the videoprops
+        recHeight = curRecording->GetHeight(); 
+        curRecording->SetVidpropHeight(recHeight);
 
         QString message = QString("DONE_RECORDING %1 %2")
             .arg(cardid).arg(filelen);

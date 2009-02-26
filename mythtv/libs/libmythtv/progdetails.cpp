@@ -332,6 +332,10 @@ void ProgDetails::loadPage(void)
         attr += QObject::tr("Widescreen") + ", ";
     if  (videoprop & VID_AVC)
         attr += QObject::tr("AVC/H.264") + ", ";
+    if  (videoprop & VID_720)
+        attr += QObject::tr("720p Resolution") + ", ";
+    if  (videoprop & VID_1080)
+        attr += QObject::tr("1080i/p Resolution") + ", ";
 
     if (subtype & SUB_HARDHEAR)
         attr += QObject::tr("CC","Closed Captioned") + ", ";

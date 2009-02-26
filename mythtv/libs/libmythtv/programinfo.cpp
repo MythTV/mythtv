@@ -159,6 +159,8 @@ ProgramInfo::ProgramInfo(void) :
     inUseForWhat = "";
 
     record = NULL;
+
+    m_videoHeight = 0;
 }
 
 /** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other)
@@ -262,6 +264,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     inUseForWhat = other.inUseForWhat;
     lastInUseTime = other.lastInUseTime;
     record = NULL;
+
+    m_videoHeight = other.m_videoHeight;
 
     positionMapDBReplacement = other.positionMapDBReplacement;
 
@@ -3050,6 +3054,86 @@ void ProgramInfo::SetResolution(uint width, uint height, long long frame)
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Resolution insert", query);
 }
+
+/** \fn ProgramInfo::GetHeight(void)
+ *  \brief Gets overall average height.
+ */
+int ProgramInfo::GetHeight(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT recordedmarkup.DATA FROM recordedmarkup"
+                  " WHERE recordedmarkup.chanid = :CHANID"
+                  " AND recordedmarkup.starttime = :STARTTIME"
+                  " AND recordedmarkup.type = 31"
+                  " GROUP BY recordedmarkup.data ORDER BY"
+                  " SUM((SELECT IFNULL(rm.mark, recordedmarkup.mark)"
+                  " FROM recordedmarkup AS rm WHERE rm.chanid = recordedmarkup.chanid"
+                  " AND rm.starttime = recordedmarkup.starttime AND"
+                  " rm.type = recordedmarkup.type AND"
+                  " rm.mark > recordedmarkup.mark"
+                  " ORDER BY rm.mark ASC LIMIT 1)"
+                  " - recordedmarkup.mark) DESC LIMIT 1;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    if (query.exec() && query.next())
+    {
+        m_videoHeight = query.value(0).toInt();
+    }
+    else
+        m_videoHeight = 0;
+
+    return m_videoHeight;
+}
+
+/** \fn ProgramInfo::SetVidpropHeight(int height)
+ *  \brief Sets overall average height flag in videoprops.
+ */
+void ProgramInfo::SetVidpropHeight(int height)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recordedprogram SET videoprop ="
+    " CONCAT_WS(',', IF(videoprop = '', NULL, videoprop), :VALUE)"
+    " WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+
+    if (height > 700 && height < 800)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Recording designated 720p because height was %1").arg(height));
+        videoproperties |= VID_720;
+
+        query.bindValue(":VALUE", "720");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts);
+
+        query.exec();
+        if (!query.isActive())
+            MythDB::DBError("UpdateRes", query);
+
+    }
+    else if (height > 1000 && height < 1100)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Recording designated 1080i/p because height was %1").arg(height));
+        videoproperties |= VID_1080;
+
+        query.bindValue(":VALUE", "1080");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts);
+
+        query.exec();
+        if (!query.isActive())
+            MythDB::DBError("UpdateRes", query);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unknown type, recording height was %1").arg(height));
+        return;
+    }
+
+    m_videoHeight = height;
+}
+
 
 /** \fn ProgramInfo::ReactivateRecording(void)
  *  \brief Asks the scheduler to restart this recording if possible.
