@@ -550,6 +550,7 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
                                                 qVariantFromValue(newbutton));
 
     listbuttonitem->DisplayState(type, "icon");
+    listbuttonitem->SetText(description, "description");
 }
 
 void MythThemedMenu::buttonAction(MythUIButtonListItem *item)
