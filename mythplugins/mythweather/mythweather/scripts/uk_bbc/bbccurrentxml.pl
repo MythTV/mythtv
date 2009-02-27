@@ -15,7 +15,7 @@ use File::Basename;
 use lib dirname($0);
 use BBCLocation;
 
-our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
+our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d);
 
 my $name = 'BBC-Current-XML';
 my $version = 0.1;
@@ -104,7 +104,7 @@ if (!$xml) {
 # The required elements which aren't provided by this feed
 printf "appt::NA\n";
 
-printf "copyright::©BBC Weather\n";
+printf "copyright::From bbc.co.uk\n";
 printf "station_id::" . $locid . "\n";
 my $location = $xml->{channel}->{title};
 $location =~ s/.*?Observations for (.*)$/$1/s;
@@ -148,20 +148,20 @@ elsif ($weather_string =~ /^thundery rain$/i ||
        $weather_string =~ /^thundery showers$/i) {
     printf "weather_icon::thunshowers.png\n";
 }
-elsif ($weather_string =~ /^heavy snow$/i) { 
-    printf "weather_icon::snowshow.png\n"; 
+elsif ($weather_string =~ /^heavy snow$/i) {
+    printf "weather_icon::snowshow.png\n";
 }
 elsif ($weather_string =~ /^light snow$/i ||
-    $weather_string =~ /^light snow showers$/i) { 
-    printf "weather_icon::flurries.png\n"; 
+    $weather_string =~ /^light snow showers$/i) {
+    printf "weather_icon::flurries.png\n";
 }
 elsif ($weather_string =~ /^sleet$/i ||
     $weather_string =~ /^sleet showers$/i ||
     $weather_string =~ /^hail showers$/i) {
-    printf "weather_icon::rainsnow.png\n"; 
+    printf "weather_icon::rainsnow.png\n";
 }
-elsif ($weather_string =~ /^clear$/i) { 
-    printf "weather_icon::fair.png\n"; 
+elsif ($weather_string =~ /^clear$/i) {
+    printf "weather_icon::fair.png\n";
 }
 else {
     printf "weather_icon::unknown.png\n";

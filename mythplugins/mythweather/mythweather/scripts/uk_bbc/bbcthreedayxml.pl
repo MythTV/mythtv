@@ -15,7 +15,7 @@ use File::Basename;
 use lib dirname($0);
 use BBCLocation;
 
-our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
+our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d);
 
 my $name = 'BBC-3day-XML';
 my $version = 0.2;
@@ -97,7 +97,7 @@ if (!$xml) {
     die "Not xml";
 }
 
-printf "copyright::©BBC Weather\n";
+printf "copyright::From bbc.co.uk\n";
 printf "station_id::" . $locid . "\n";
 my $location = $xml->{channel}->{title};
 $location =~ s/.*?Forecast for (.*)$/$1/s;
