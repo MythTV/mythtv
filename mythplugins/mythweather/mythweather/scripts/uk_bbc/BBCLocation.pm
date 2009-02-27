@@ -21,19 +21,17 @@ sub Search {
     my $isredirect = 0;
     my $isworld = 0;
 
+    my $havename = 0;
+    my $haveid = 0;
+
     my $resultline = "";
 
     foreach (split("\n", $response)) {
-        if (/<title>/) {
-            if (/Search Results\<\/title\>/) {
-                $isresults = 1;
-            }
-            elsif (/5 Day Forecast in Celsius for/) {
-                $isredirect = 1;
-                my $locname = $_;
-                $locname =~ s/.*?Celsius for (.*?)<\/title>.*/$1/;
-                $resultline = "::" . $locname;
-            }
+        if (/<title>.*?Search Results.*?<\/title>/) {
+            $isresults = 1;
+        }
+        else {
+            $isredirect = 1;
         }
 
         my $locname;
@@ -83,18 +81,24 @@ sub Search {
 
         }
         elsif ($isredirect) {
-            if (s/.*?<link.*?rss\/5day\/id\/(\d{4})\.xml.*/$1/) {
-                $resultline = "L" . $_ . $resultline;
-                push (@searchresults, $resultline);
-                last;
+            if (/name : \"/) {
+                my $locname = $_;
+                $locname =~ s/^.*name : \"(.*?)\".*$/$1/;
+                $resultline = $resultline . "::" . $locname . ", United Kingdom";
+                $havename = 1;
             }
-            if (s/.*?<link.*?rss\/5day\/world\/(\d{4})\.xml.*/$1/) {
+            if (/rssloc :/) {
+                my $id = 0;
+                $id = s/.*rssloc : (\d{4}),.*/$1/;
                 $resultline = "W" . $_ . $resultline;
-                push (@searchresults, $resultline);
-                last;
+                $haveid = 1;
             }
         }
 
+        if ($havename && $haveid) {
+            push (@searchresults, $resultline);
+            last;
+        }
     }
 
     return @searchresults;
