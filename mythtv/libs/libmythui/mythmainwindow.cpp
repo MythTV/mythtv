@@ -744,7 +744,7 @@ void MythMainWindow::Init(void)
     if (!d->paintwin)
         GetMythUI()->ThemeWidget(this);
     Show();
- 
+
     // Set cursor call must come after Show() to work on some systems.
     setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
 
@@ -1698,10 +1698,10 @@ int MythMainWindow::NormalizeFontSize(int pointSize)
 MythRect MythMainWindow::NormRect(const MythRect &rect)
 {
     MythRect ret;
-    ret.setWidth((int)(rect.width() * d->wmult));
-    ret.setHeight((int)(rect.height() * d->hmult));
-    ret.moveTopLeft(QPoint((int)(rect.x() * d->wmult),
-                           (int)(rect.y() * d->hmult)));
+    ret.setWidth((int)((rect.width() * d->wmult) + 0.5));
+    ret.setHeight((int)((rect.height() * d->hmult) + 0.5));
+    ret.moveTopLeft(QPoint((int)((rect.x() * d->wmult) + 0.5),
+                           (int)((rect.y() * d->hmult) + 0.5)));
     ret = ret.normalized();
 
     return ret;
@@ -1710,8 +1710,8 @@ MythRect MythMainWindow::NormRect(const MythRect &rect)
 QPoint MythMainWindow::NormPoint(const QPoint &point)
 {
     QPoint ret;
-    ret.setX((int)(point.x() * d->wmult));
-    ret.setY((int)(point.y() * d->hmult));
+    ret.setX((int)((point.x() * d->wmult) + 0.5));
+    ret.setY((int)((point.y() * d->hmult) + 0.5));
 
     return ret;
 }
@@ -1719,20 +1719,20 @@ QPoint MythMainWindow::NormPoint(const QPoint &point)
 QSize MythMainWindow::NormSize(const QSize &size)
 {
     QSize ret;
-    ret.setWidth((int)(size.width() * d->wmult));
-    ret.setHeight((int)(size.height() * d->hmult));
+    ret.setWidth((int)((size.width() * d->wmult) + 0.5));
+    ret.setHeight((int)((size.height() * d->hmult) + 0.5));
 
     return ret;
 }
 
 int MythMainWindow::NormX(const int x)
 {
-    return (int)(x * d->wmult);
+    return (int)((x * d->wmult) + 0.5);
 }
 
 int MythMainWindow::NormY(const int y)
 {
-    return (int)(y * d->hmult);
+    return (int)((y * d->hmult) + 0.5);
 }
 
 QRect MythMainWindow::GetUIScreenRect(void)
