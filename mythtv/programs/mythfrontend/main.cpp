@@ -323,11 +323,13 @@ void startPlaybackWithGroup(QString recGroup = "")
     PlaybackBox *pbb = new PlaybackBox(mainStack, "playbackbox",
                                         PlaybackBox::Play);
 
-    if (!recGroup.isEmpty())
-        pbb->displayRecGroup(recGroup);
-
     if (pbb->Create())
+    {
+        if (!recGroup.isEmpty())
+            pbb->displayRecGroup(recGroup);
+
         mainStack->AddScreen(pbb);
+    }
     else
         delete pbb;
 }
