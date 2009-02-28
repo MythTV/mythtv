@@ -101,8 +101,8 @@
         </imagetype>
 
         <buttonlist name="menu">
-            <area>0,152,1280,300</area>
-            <buttonarea>0,0,1280,300</buttonarea>
+            <area>0,152,1281,300</area>
+            <buttonarea>0,0,1281,300</buttonarea>
             <wrapstyle>items</wrapstyle>
             <scrollstyle>center</scrollstyle>
             <layout>horizontal</layout>
