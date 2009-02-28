@@ -1373,7 +1373,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     QString imgFilename = GetCoverImage(node);
 
-    if (!imgFilename.isEmpty() && 
+    if (!imgFilename.isEmpty() &&
        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
         item->SetImage(imgFilename);
 
@@ -1489,7 +1489,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
         // VERBOSE(VB_GENERAL, QString("GetCoverImage host : %1  prefix : %2 file : %3")
         //                            .arg(host).arg(prefix).arg(filename));
- 
+
         QStringList test_files;
         test_files.append(filename + ".png");
         test_files.append(filename + ".jpg");
@@ -1505,7 +1505,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             foundCover = false;
             if (!host.isEmpty())
             {
-                // Strip out any extra /'s 
+                // Strip out any extra /'s
                 imagePath.replace("//", "/");
                 prefix.replace("//","/");
                 imagePath = imagePath.right(imagePath.length() - (prefix.length() + 1));
@@ -1552,7 +1552,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                         QString path = sgurl.path();
 
                         QString subdir = folder_path.right(folder_path.length() - (prefix.length() + 2));
-                   
+
                         path = path + "/" + subdir;
 
                         QStringList tmpList;
@@ -1560,14 +1560,14 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
                         if (ok)
                         {
-                            for (QStringList::const_iterator pattern = imageTypes.begin(); 
+                            for (QStringList::const_iterator pattern = imageTypes.begin();
                                  pattern != imageTypes.end(); ++pattern)
                             {
                                 QRegExp rx(*pattern);
                                 rx.setPatternSyntax(QRegExp::Wildcard);
                                 QStringList matches = tmpList.filter(rx);
                                 if (matches.size() > 0)
-                                {    
+                                {
                                     fList.clear();
                                     fList.append(subdir + "/" + matches.at(0).split("::").at(1));
                                     break;
@@ -1598,7 +1598,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             }
         }
 
-        if (!icon_file.isEmpty()) 
+        if (!icon_file.isEmpty())
             VERBOSE(VB_GENERAL, QString("Found Image : %1 :")
                                         .arg(icon_file));
         else
@@ -1922,7 +1922,7 @@ void VideoDialog::ManageMenu()
 void VideoDialog::ToggleBrowseMode()
 {
     m_d->m_isFileBrowser = !m_d->m_isFileBrowser;
-    gContext->SetSetting("VideoDialogNoDB",
+    gContext->SaveSetting("VideoDialogNoDB",
             QString("%1").arg((int)m_d->m_isFileBrowser));
     reloadData();
 }
@@ -1930,7 +1930,7 @@ void VideoDialog::ToggleBrowseMode()
 void VideoDialog::ToggleFlatView()
 {
     m_d->m_isFlatList = !m_d->m_isFlatList;
-    gContext->SetSetting(QString("mythvideo.folder_view_%1").arg(m_d->m_type),
+    gContext->SaveSetting(QString("mythvideo.folder_view_%1").arg(m_d->m_type),
                          QString("%1").arg((int)m_d->m_isFlatList));
     // TODO: This forces a complete tree rebuild, this is SLOW and shouldn't
     // be necessary since MythGenericTree can do a flat view without a rebuild,
