@@ -1,14 +1,8 @@
 #define MYTHAPPEARANCE_CPP
 
 /* QT includes */
-#include <qnamespace.h>
 #include <QStringList>
 #include <QApplication>
-#include <QDomNode>
-#include <QButtonGroup>
-#include <QImage>
-#include <QEvent>
-#include <QDir>
 #include <QString>
 
 /* MythTV includes */
@@ -274,31 +268,32 @@ void MythAppearance::doMenu()
     if (m_menuPopup)
         return;
 
-    QString label = "MythAppearance Menu";
+    QString label = tr("Options");
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     m_menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
 
     if (m_menuPopup->Create())
+    {
+        if (m_changed)
+        {
+            m_menuPopup->SetReturnEvent(this, "save");
+            m_menuPopup->AddButton(tr("Save and Quit"));
+        }
+        else
+            m_menuPopup->SetReturnEvent(this, "nosave");
+
+        m_menuPopup->AddButton(tr("Reset Changes and Quit"));
+        m_menuPopup->AddButton(tr("Coarse/Fine adjustment"));
+        m_menuPopup->AddButton(tr("Close Menu"));
+
         popupStack->AddScreen(m_menuPopup);
+    }
     else
     {
         delete m_menuPopup;
-        return;
     }
-
-    if (m_changed)
-    {
-        m_menuPopup->SetReturnEvent(this, "save");
-        m_menuPopup->AddButton("Save and Quit");
-    }
-    else
-        m_menuPopup->SetReturnEvent(this, "nosave");
-
-    m_menuPopup->AddButton("Reset Screen Size Settings and Quit");
-    m_menuPopup->AddButton("Coarse/Fine adjustment");
-    m_menuPopup->AddButton("Close Menu");
 }
 
 void MythAppearance::slotSaveSettings()
