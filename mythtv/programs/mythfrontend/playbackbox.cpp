@@ -313,8 +313,28 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     m_viewMask = (ViewMask)gContext->GetNumSetting(
                                     "DisplayGroupDefaultViewMask", VIEW_TITLES);
 
-    if (gContext->GetNumSetting("PlaybackWatchList", 1))
+    // Translate these external settings into mask values
+    if (gContext->GetNumSetting("PlaybackWatchList", 1) &&
+        !(m_viewMask & VIEW_WATCHLIST))
+    {
         m_viewMask = (ViewMask)(m_viewMask | VIEW_WATCHLIST);
+        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
+    }
+    else if (! gContext->GetNumSetting("PlaybackWatchList", 1) &&
+             m_viewMask & VIEW_WATCHLIST)
+    {
+        m_viewMask = (ViewMask)(m_viewMask & ~VIEW_WATCHLIST);
+        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
+    }
+
+    // This setting is deprecated in favour of viewmask, this just ensures the
+    // that it is converted over when upgrading from earlier versions
+    if (gContext->GetNumSetting("LiveTVInAllPrograms",0) &&
+        !(m_viewMask & VIEW_LIVETVGRP))
+    {
+        m_viewMask = (ViewMask)(m_viewMask | VIEW_LIVETVGRP);
+        gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
+    }
 
     if (player)
     {
@@ -989,8 +1009,6 @@ bool PlaybackBox::FillList(bool useCachedData)
     QMap<int, int> recidEpisodes;
     QString sTitle;
 
-    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
-
     m_progCacheLock.lock();
     if (!useCachedData || !m_progCache || m_progCache->empty())
     {
@@ -1048,15 +1066,16 @@ bool PlaybackBox::FillList(bool useCachedData)
 
             if ((((p->recgroup == m_recGroup) ||
                   ((m_recGroup == "All Programs") &&
-                   (p->recgroup != "Deleted") &&
-                   (p->recgroup != "LiveTV" || LiveTVInAllPrograms))) &&
+                   (p->recgroup != "Deleted")) ||
+                  (p->recgroup == "LiveTV" && (m_viewMask & VIEW_LIVETVGRP))) &&
                  (m_recGroupPassword == m_curGroupPassword)) ||
                 ((m_recGroupType[m_recGroup] == "category") &&
                  ((p->category == m_recGroup ) ||
                   ((p->category.isEmpty()) && (m_recGroup == tr("Unknown")))) &&
                  ( !m_recGroupPwCache.contains(p->recgroup))))
             {
-                if (m_viewMask != VIEW_NONE)
+                if (m_viewMask != VIEW_NONE &&
+                    (p->recgroup != "LiveTV" || m_recGroup == "LiveTV"))
                     m_progLists[""].prepend(p);
 
                 asKey = p->MakeUniqueKey();
@@ -1065,11 +1084,19 @@ bool PlaybackBox::FillList(bool useCachedData)
                 else
                     p->availableStatus = asAvailable;
 
+                if (m_recGroup != "LiveTV" &&
+                    (p->recgroup == "LiveTV") &&
+                    (m_viewMask & VIEW_LIVETVGRP))
+                {
+                    QString tmpTitle = tr("LiveTV");
+                    sortedList[tmpTitle.toLower()] = tmpTitle;
+                    m_progLists[tmpTitle.toLower()].prepend(p);
+                    m_progLists[tmpTitle.toLower()].setAutoDelete(false);
+                    continue;
+                }
+
                 if ((m_viewMask & VIEW_TITLES) && // Show titles
-                    ((p->recgroup != "LiveTV") ||
-                     (m_recGroup == "LiveTV") ||
-                     ((m_recGroup == "All Programs") &&
-                      ((m_viewMask & VIEW_LIVETVGRP) == 0))))
+                    ((p->recgroup != "LiveTV") || (m_recGroup == "LiveTV")))
                 {
                     sTitle = sortTitle(p->title, m_viewMask, titleSort,
                             p->recpriority);
@@ -1103,17 +1130,6 @@ bool PlaybackBox::FillList(bool useCachedData)
                 {
                     QString tmpTitle = QString("(%1)")
                                                .arg(searchRule[p->recordid]);
-                    sortedList[tmpTitle.toLower()] = tmpTitle;
-                    m_progLists[tmpTitle.toLower()].prepend(p);
-                    m_progLists[tmpTitle.toLower()].setAutoDelete(false);
-                }
-
-                if ((LiveTVInAllPrograms) &&
-                    (m_recGroup == "All Programs") &&
-                    (m_viewMask & VIEW_LIVETVGRP) &&
-                    (p->recgroup == "LiveTV"))
-                {
-                    QString tmpTitle = QString(" %1").arg(tr("LiveTV"));
                     sortedList[tmpTitle.toLower()] = tmpTitle;
                     m_progLists[tmpTitle.toLower()].prepend(p);
                     m_progLists[tmpTitle.toLower()].setAutoDelete(false);
@@ -1402,6 +1418,8 @@ bool PlaybackBox::FillList(bool useCachedData)
     m_titleList = QStringList("");
     if (m_progLists[m_watchGroupLabel].size() > 1)
         m_titleList << m_watchGroupName;
+    if (m_progLists["livetv"].size() > 0)
+        m_titleList << tr("LiveTV");
     m_titleList << sortedList.values();
 
     updateGroupList();
@@ -3550,21 +3568,20 @@ void PlaybackBox::showViewChanger(void)
 
     if (viewPopup->Create())
     {
-        connect(viewPopup, SIGNAL(result(int)), SLOT(saveViewChanges(int)));
+        connect(viewPopup, SIGNAL(save()), SLOT(saveViewChanges()));
         m_popupStack->AddScreen(viewPopup);
     }
     else
         delete viewPopup;
 }
 
-void PlaybackBox::saveViewChanges(int viewMask)
+void PlaybackBox::saveViewChanges()
 {
-    if (viewMask == VIEW_NONE)
-        viewMask = VIEW_TITLES;
-    gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)viewMask);
+    if (m_viewMask == VIEW_NONE)
+        m_viewMask = VIEW_TITLES;
+    gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     gContext->SaveSetting("PlaybackWatchList",
-                                            (bool)(viewMask & VIEW_WATCHLIST));
-    m_viewMask = (ViewMask)viewMask;
+                                            (bool)(m_viewMask & VIEW_WATCHLIST));
 }
 
 void PlaybackBox::showGroupFilter(void)
@@ -3576,8 +3593,6 @@ void PlaybackBox::showGroupFilter(void)
     QStringList groups;
 
     MSqlQuery query(MSqlQuery::InitCon());
-
-    bool liveTVInAll = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
     QMap<QString,QString> recGroupType;
 
@@ -3600,7 +3615,7 @@ void PlaybackBox::showGroupFilter(void)
             items     = query.value(1).toInt();
             itemStr   = (items == 1) ? tr("item") : tr("items");
 
-            if ((dispGroup != "LiveTV" || liveTVInAll) &&
+            if ((dispGroup != "LiveTV" || (m_viewMask & VIEW_LIVETVGRP)) &&
                 (dispGroup != "Deleted"))
                 totalItems += items;
 
@@ -4201,10 +4216,6 @@ bool ChangeView::Create()
 
     // TODO Do we need two separate settings to determine whether livetv
     //      recordings are shown? Same issue as the watchlist above
-
-    //if ((m_recGroup == "All Programs") &&
-    //    (gContext->GetNumSetting("LiveTVInAllPrograms",0)))
-    //{
         checkBox = dynamic_cast<MythUICheckBox*>(GetChild("livetv"));
         if (checkBox)
         {
@@ -4213,7 +4224,6 @@ bool ChangeView::Create()
             connect(checkBox, SIGNAL(toggled(bool)),
                     m_parentScreen, SLOT(toggleLiveTVView(bool)));
         }
-    //}
 
     MythUIButton *savebutton = dynamic_cast<MythUIButton*>(GetChild("save"));
     connect(savebutton, SIGNAL(Clicked()), SLOT(SaveChanges()));
@@ -4226,7 +4236,7 @@ bool ChangeView::Create()
 
 void ChangeView::SaveChanges()
 {
-    emit result(m_viewMask);
+    emit save();
     Close();
 }
 

@@ -239,7 +239,7 @@ class PlaybackBox : public MythScreenType
     void playSelectedPlaylist(bool random);
     void doPlayList(void);
     void showViewChanger(void);
-    void saveViewChanges(int viewMask);
+    void saveViewChanges(void);
 
     void previewThreadDone(const QString &fn, bool &success);
     void previewReady(const ProgramInfo *pginfo);
@@ -460,7 +460,7 @@ class ChangeView : public MythScreenType
     bool Create(void);
 
   signals:
-    void result(int);
+    void save();
 
   protected slots:
     void SaveChanges(void);

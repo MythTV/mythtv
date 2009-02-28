@@ -386,18 +386,6 @@ static HostCheckBox *UseGroupNameAsAllPrograms()
     return gc;
 }
 
-static HostCheckBox *LiveTVInAllPrograms()
-{
-    HostCheckBox *gc = new HostCheckBox("LiveTVInAllPrograms");
-    gc->setLabel(QObject::tr("Show 'LiveTV' recordings when using "
-                             "\"All Programs\" filter"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If this setting is disabled, LiveTV "
-                    "recordings will only be visible via the special "
-                    "\"LiveTV\" Recording Group."));
-    return gc;
-}
-
 static HostCheckBox *PBBStartInTitle()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackBoxStartInTitle");
@@ -4790,7 +4778,6 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
     pbox2->addChild(UseGroupNameAsAllPrograms());
-    pbox2->addChild(LiveTVInAllPrograms());
     addChild(pbox2);
 
     VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
