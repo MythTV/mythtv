@@ -60,82 +60,96 @@
 
     <window name="channeloverview">
 
-        <buttonlist name="channels" from="basebuttonlist">
-            <area>20,20,740,345</area>
-            <buttonarea>0,0,740,345</buttonarea>
-            <statetype name="upscrollarrow">
-                <position>745,2</position>
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename>lb-uparrow-reg.png</filename>
+        <textarea name="pagetitle">
+            <area>20,5,570,40</area>
+            <font>baselarge</font>
+            <value>Channel Editor</value>
+        </textarea>
+
+        <imagetype name="filler">
+            <filename>cr-background.png</filename>
+            <position>0,39</position>
+        </imagetype>
+
+        <imagetype name="channum_column">
+            <area>51,50,60,260</area>
+            <gradient start="#333333" end="#333333" alpha="180" />
+        </imagetype>
+
+        <imagetype name="sourcename_background">
+            <area>515,50,219,260</area>
+            <gradient start="#333333" end="#333333" alpha="180" />
+        </imagetype>
+
+        <buttonlist name="channels" from="basebuttonlist2">
+            <position>19,50</position>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <imagetype name="icon">
+                        <area>705,0,60,25</area>
+                        <preserveaspect>true</preserveaspect>
                     </imagetype>
+                    <textarea name="channum" from="buttontext">
+                        <area>32,1,60,24</area>
+                        <align>center</align>
+                    </textarea>
+                    <textarea name="name" from="buttontext">
+                        <area>100,1,380,24</area>
+                    </textarea>
+                    <textarea name="sourcename" from="name">
+                        <area>500,1,200,24</area>
+                    </textarea>
                 </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename>lb-uparrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>745,325</position>
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename>lb-dnarrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename>lb-dnarrow-sel.png</filename>
-                    </imagetype>
-                </state>
+                <state name="selected" from="active" />
+                <state name="inactive" from="active" />
             </statetype>
         </buttonlist>
 
         <textarea name="sortlabel" from="basetextarea">
-            <area>30,385,170,30</area>
+            <area>30,375,170,30</area>
             <value>Sort Mode:</value>
             <font>basemedium</font>
         </textarea>
 
         <buttonlist name="sorting" from="basewideselector">
-            <position>210,380</position>
+            <position>210,370</position>
         </buttonlist>
 
         <textarea name="sourcelabel" from="sortlabel">
-            <position>30,445</position>
+            <position>30,435</position>
             <value>Video Source:</value>
         </textarea>
 
         <buttonlist name="source" from="basewideselector">
-            <position>210,440</position>
+            <position>210,430</position>
         </buttonlist>
 
         <button name="delete" from="basebutton">
-            <position>620,437</position>
+            <position>620,427</position>
             <value>Delete</value>
         </button>
 
         <textarea name="nochannumlabel" from="basetextarea">
-            <area>70,506,500,60</area>
+            <area>70,496,500,60</area>
             <value>Hide Channels without channel number.</value>
         </textarea>
 
         <checkbox name="nochannum" from="basecheckbox">
-            <position>30,500</position>
+            <position>30,490</position>
         </checkbox>
 
         <button name="scan" from="basewidebutton">
-            <position>55,550</position>
+            <position>55,540</position>
             <value>Channel Scan</value>
         </button>
 
         <button name="importicons" from="basewidebutton">
-            <position>325,550</position>
+            <position>325,540</position>
             <value>Icon Download</value>
         </button>
 
         <button name="edittransport" from="basewidebutton">
-            <position>585,550</position>
+            <position>585,540</position>
             <value>Edit Transports</value>
         </button>
 

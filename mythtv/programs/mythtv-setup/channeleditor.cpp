@@ -253,22 +253,25 @@ void ChannelEditor::fillList(void)
     QString currentValue = m_channelList->GetValue();
     uint    currentIndex = qMax(m_channelList->GetCurrentPos(), 0);
     m_channelList->Reset();
-    new MythUIButtonListItem(m_channelList, tr("(Add New Channel)"));
+    QString newchanlabel = tr("(Add New Channel)");
+    MythUIButtonListItem *item = new MythUIButtonListItem(m_channelList, "");
+    item->SetText(newchanlabel, "compoundname");
+    item->SetText(newchanlabel, "name");
 
     bool fAllSources = true;
 
-    QString querystr = "SELECT channel.name,channum,chanid ";
+    QString querystr = "SELECT channel.name,channum,chanid,callsign,icon,"
+                       "visible ,videosource.name FROM channel "
+                       "LEFT JOIN videosource ON "
+                       "(channel.sourceid = videosource.sourceid) ";
 
     if (m_sourceFilter == FILTER_ALL)
     {
-        querystr += ",videosource.name FROM channel "
-                    "LEFT JOIN videosource ON "
-                    "(channel.sourceid = videosource.sourceid) ";
         fAllSources = true;
     }
     else
     {
-        querystr += QString("FROM channel WHERE sourceid='%1' ")
+        querystr += QString(" WHERE channel.sourceid='%1' ")
                            .arg(m_sourceFilter);
         fAllSources = false;
     }
@@ -293,14 +296,24 @@ void ChannelEditor::fillList(void)
             QString name = query.value(0).toString();
             QString channum = query.value(1).toString();
             QString chanid = query.value(2).toString();
+            QString callsign = query.value(3).toString();
+            QString icon = query.value(4).toString();
+            bool visible =  query.value(5).toBool();
             QString sourceid = "Unassigned";
 
-            if (fAllSources && !query.value(3).toString().isNull())
+            QString state = "normal";
+
+            if (!visible)
+                state = "disabled";
+
+            if (!query.value(6).toString().isNull())
             {
-                sourceid = query.value(3).toString();
-                if (m_sourceFilter == FILTER_UNASSIGNED)
+                sourceid = query.value(6).toString();
+                if (fAllSources && m_sourceFilter == FILTER_UNASSIGNED)
                     continue;
             }
+            else
+                state = "warning";
 
             if (channum.isEmpty() && m_currentHideMode)
                 continue;
@@ -308,25 +321,37 @@ void ChannelEditor::fillList(void)
             if (name.isEmpty())
                 name = "(Unnamed : " + chanid + ")";
 
+            QString compoundname = name;
+
             if (m_currentSortMode == tr("Channel Name"))
             {
                 if (!channum.isEmpty())
-                    name += " (" + channum + ")";
+                    compoundname += " (" + channum + ")";
             }
             else if (m_currentSortMode == tr("Channel Number"))
             {
                 if (!channum.isEmpty())
-                    name = channum + ". " + name;
+                    compoundname = channum + ". " + compoundname;
                 else
-                    name = "???. " + name;
+                    compoundname = "???. " + compoundname;
             }
 
             if (m_sourceFilter == FILTER_ALL)
-                name += " (" + sourceid  + ")";
+                compoundname += " (" + sourceid  + ")";
 
             bool sel = (chanid == currentValue);
             selidx = (sel) ? idx : selidx;
-            new MythUIButtonListItem(m_channelList, name, qVariantFromValue(chanid));
+            item = new MythUIButtonListItem(m_channelList, "",
+                                                     qVariantFromValue(chanid));
+            item->SetText(compoundname, "compoundname");
+            item->SetText(name, "name");
+            item->SetText(channum, "channum");
+            item->SetText(chanid, "chanid");
+            item->SetText(callsign, "callsign");
+            item->SetText(sourceid, "sourcename");
+            item->SetImage(icon);
+            item->SetImage(icon, "icon");
+            item->DisplayState(state, "status");
         }
     }
 
