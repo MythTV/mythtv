@@ -738,7 +738,18 @@ void StatusBox::doTunerStatus()
         QString fontstate;
         if (state == kState_Error)
         {
-            status = tr("is unavailable");
+            strlist.clear();
+            strlist << QString("QUERY_REMOTEENCODER %1").arg(cardid);
+            strlist << "GET_SLEEPSTATUS";
+
+            gContext->SendReceiveStringList(strlist);
+            state = strlist[0].toInt();
+
+            if (state == sStatus_Undefined)
+                status = tr("is unavailable");
+            else
+                status = tr("is asleep");
+
             fontstate = "warning";
         }
         else if (state == kState_WatchingLiveTV)

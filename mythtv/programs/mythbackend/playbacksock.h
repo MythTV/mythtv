@@ -42,6 +42,7 @@ class PlaybackSock
     void setIP(QString &lip) { ip = lip; }
     QString getIP(void) { return ip; }
 
+    bool GoToSleep(void);
     void GetDiskSpace(QStringList &o_strlist);
     int StopRecording(const ProgramInfo *pginfo);
     int CheckRecordingActive(const ProgramInfo *pginfo);

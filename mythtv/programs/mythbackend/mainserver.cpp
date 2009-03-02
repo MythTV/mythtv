@@ -345,6 +345,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleQueryRecording(tokens, pbs);
     }
+    else if (command == "GO_TO_SLEEP")
+    {
+        HandleGoToSleep(pbs);
+    }
     else if (command == "QUERY_FREE_SPACE")
     {
         HandleQueryFreeSpace(pbs, false);
@@ -1032,15 +1036,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             m_sched->SlaveConnected(slavelist);
         }
 
+        bool wasAsleep = true;
         QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
         for (; iter != encoderList->end(); ++iter)
         {
             EncoderLink *elink = *iter;
             if (elink->GetHostName() == commands[2])
+            {
+                if (!elink->IsWaking())
+                    wasAsleep = false;
                 elink->SetSocket(pbs);
+            }
         }
 
-        if (m_sched)
+        if (!wasAsleep && m_sched)
             m_sched->Reschedule(0);
 
         QString message = QString("LOCAL_SLAVE_BACKEND_ONLINE %2")
@@ -2289,6 +2298,33 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
 
 }
 
+/*
+ * \addtogroup myth_network_protocol
+ * \par        GO_TO_SLEEP
+ * Commands a slave to go to sleep
+ */
+void MainServer::HandleGoToSleep(PlaybackSock *pbs)
+{
+    QStringList strlist;
+
+    QString sleepCmd = gContext->GetSetting("SleepCommand");
+    if (!sleepCmd.isEmpty())
+    {
+        strlist << "OK";
+        SendResponse(pbs->getSocket(), strlist);
+        VERBOSE(VB_IMPORTANT, "Received GO_TO_SLEEP command from master, "
+                "running SleepCommand.");
+        myth_system(sleepCmd);
+    }
+    else
+    {
+        strlist << "ERROR: SleepCommand is empty";
+        VERBOSE(VB_IMPORTANT,
+                "ERROR: in HandleGoToSleep(), but no SleepCommand found!");
+        SendResponse(pbs->getSocket(), strlist);
+    }
+}
+
 /**
  * \addtogroup myth_network_protocol
  * \par        QUERY_FREE_SPACE
@@ -3460,6 +3496,10 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     {
         retlist << QString::number((int)enc->GetState());
     }
+    else if (command == "GET_SLEEPSTATUS")
+    {
+        retlist << QString::number(enc->GetSleepStatus());
+    }
     else if (command == "GET_FLAGS")
     {
         retlist << QString::number(enc->GetFlags());
@@ -4229,18 +4269,22 @@ void MainServer::connectionClosed(MythSocket *socket)
                 VERBOSE(VB_IMPORTANT,QString("Slave backend: %1 no longer connected")
                                        .arg(pbs->getHostname()));
 
+                bool isFallingAsleep = true;
                 QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
                 for (; iter != encoderList->end(); ++iter)
                 {
                     EncoderLink *elink = *iter;
                     if (elink->GetSocket() == pbs)
                     {
+                        if (!elink->IsFallingAsleep())
+                            isFallingAsleep = false;
+
                         elink->SetSocket(NULL);
                         if (m_sched)
                             m_sched->SlaveDisconnected(elink->GetCardID());
                     }
                 }
-                if (m_sched)
+                if (m_sched && !isFallingAsleep)
                     m_sched->Reschedule(0);
 
                 QString message = QString("LOCAL_SLAVE_BACKEND_OFFLINE %2")

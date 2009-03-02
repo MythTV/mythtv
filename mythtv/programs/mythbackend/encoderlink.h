@@ -27,18 +27,45 @@ class EncoderLink
     /// \brief Returns the socket, if set, for a non-local EncoderLink.
     PlaybackSock *GetSocket(void) { return sock; }
 
+    /// \brief Used to set the asleep status of an encoder
+    void SetSleepStatus(SleepStatus newStatus);
+    /// \brief Get the last time the sleep status was changed
+    QDateTime GetSleepStatusTime(void) { return sleepStatusTime; }
+    /// \brief Get the last time the encoder was put to sleep
+    QDateTime GetLastSleepTime(void) { return lastSleepTime; }
+    /// \brief Used to set the last wake time of an encoder
+    void SetLastWakeTime(QDateTime newTime) { lastWakeTime = newTime; }
+    /// \brief Get the last time the encoder was awakened
+    QDateTime GetLastWakeTime(void) { return lastWakeTime; }
+
     /// \brief Returns the remote host for a non-local EncoderLink.
     QString GetHostName(void) const { return hostname; }
     /// \brief Returns true for a local EncoderLink.
     bool IsLocal(void) const { return local; }
     /// \brief Returns true if the EncoderLink instance is usable.
     bool IsConnected(void) const { return (IsLocal() || sock!=NULL); }
+    /// \brief Returns true if the encoder is awake.
+    bool IsAwake(void) const { return (sleepStatus == sStatus_Awake); }
+    /// \brief Returns true if the encoder is asleep.
+    bool IsAsleep(void) const { return (sleepStatus & sStatus_Asleep); }
+    /// \brief Returns true if the encoder is waking up.
+    bool IsWaking(void) const { return (sleepStatus == sStatus_Waking); }
+    /// \brief Returns true if the encoder is falling asleep.
+    bool IsFallingAsleep(void) const
+                        { return (sleepStatus == sStatus_FallingAsleep); }
+    /// \brief Returns true if the encoder can sleep.
+    bool CanSleep(void) const { return (sleepStatus != sStatus_Undefined); }
+
+    /// \brief Returns the current Sleep Status of the encoder.
+    SleepStatus GetSleepStatus(void) const { return (sleepStatus); }
 
     /// \brief Returns the cardid used to refer to the recorder in the DB.
     int GetCardID(void) const { return m_capturecardnum; }
     /// \brief Returns the TVRec used by a local EncoderLink instance.
     TVRec *GetTVRec(void) { return tv; }
 
+    /// \brief Tell a slave backend to go to sleep
+    bool GoToSleep(void);
     int LockTuner(void);
     /// \brief Unlock the tuner.
     /// \sa LockTuner(), IsTunerLocked()
@@ -120,6 +147,11 @@ class EncoderLink
 
     bool local;
     bool locked;
+
+    SleepStatus sleepStatus;
+    QDateTime sleepStatusTime;
+    QDateTime lastSleepTime;
+    QDateTime lastWakeTime;
 
     QDateTime endRecordingTime;
     QDateTime startRecordingTime;

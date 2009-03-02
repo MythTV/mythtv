@@ -183,6 +183,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             encoder.setAttribute("local"         , isLocal                  );
             encoder.setAttribute("connected"     , elink->IsConnected()     );
             encoder.setAttribute("state"         , elink->GetState()        );
+            encoder.setAttribute("sleepstatus"   , elink->GetSleepStatus()  );
             //encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
 
             if (isLocal)
@@ -674,7 +675,14 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
                 if ((sIsLocal == "remote") && !bConnected)
                 {
-                    os << " (currently not connected).<br />";
+                    SleepStatus sleepStatus =
+                        (SleepStatus) e.attribute("sleepstatus",
+                            QString((int)sStatus_Undefined)).toInt();
+
+                    if (sleepStatus == sStatus_Asleep)
+                        os << " (currently asleep).<br />";
+                    else
+                        os << " (currently not connected).<br />";
 
                     node = node.nextSibling();
                     continue;

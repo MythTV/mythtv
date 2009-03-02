@@ -369,13 +369,25 @@ static GlobalLineEdit *WOLbackendCommand()
     return gc;
 };
 
-static GlobalLineEdit *WOLslaveBackendsCommand()
+static HostLineEdit *SleepCommand()
 {
-    GlobalLineEdit *gc = new GlobalLineEdit("WOLslaveBackendsCommand");
-    gc->setLabel(QObject::tr("Wake command"));
+    HostLineEdit *gc = new HostLineEdit("SleepCommand");
+    gc->setLabel(QObject::tr("Sleep Command"));
     gc->setValue("");
-    gc->setHelpText(QObject::tr("The command used to wakeup your slave "
-                    "backends. Leave empty to disable."));
+    gc->setHelpText(QObject::tr("The command used to put this slave to sleep. "
+                    "If set, the master backend will use this command to put "
+                    "this slave to sleep when it is not needed for recording."));
+    return gc;
+};
+
+static HostLineEdit *WakeUpCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("WakeUpCommand");
+    gc->setLabel(QObject::tr("Wake Command"));
+    gc->setValue("");
+    gc->setHelpText(QObject::tr("The command used to wake up this slave "
+                    "from sleep.  This setting is not used on the master "
+                    "backend."));
     return gc;
 };
 
@@ -773,7 +785,8 @@ BackendSettings::BackendSettings() {
     
     VerticalConfigurationGroup* slaveBackend = new VerticalConfigurationGroup();
     slaveBackend->setLabel(QObject::tr("Slave Backends"));
-    slaveBackend->addChild(WOLslaveBackendsCommand());
+    slaveBackend->addChild(SleepCommand());
+    slaveBackend->addChild(WakeUpCommand());
     group4->addChild(slaveBackend);
     addChild(group4);
 

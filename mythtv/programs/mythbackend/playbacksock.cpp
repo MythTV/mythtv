@@ -96,6 +96,17 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
     return ok;
 }
 
+/** \brief Tells a slave to go to sleep
+ */
+bool PlaybackSock::GoToSleep(void)
+{
+    QStringList strlist( QString("GO_TO_SLEEP") );
+
+    SendReceiveStringList(strlist);
+
+    return (strlist[0] == "OK");
+}
+
 /**
  *  \brief Appends host's dir's total and used space in kilobytes.
  */

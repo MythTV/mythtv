@@ -1040,18 +1040,6 @@ int main(int argc, char **argv)
         return exitCode;
     }
 
-    if (ismaster)
-    {
-        QString WOLslaveBackends
-            = gContext->GetSetting("WOLslaveBackendsCommand","");
-        if (!WOLslaveBackends.isEmpty())
-        {
-            VERBOSE(VB_IMPORTANT, "Waking slave Backends now.");
-            QByteArray tmp = WOLslaveBackends.toAscii();
-            system(tmp.constData());
-        }
-    }
-
     StorageGroup::CheckAllStorageGroupDirs();
 
     exitCode = a.exec();

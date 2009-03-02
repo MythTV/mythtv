@@ -41,11 +41,15 @@ using namespace std;
 EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock, 
                          QString lhostname)
     : m_capturecardnum(capturecardnum), sock(lsock), hostname(lhostname),
-      freeDiskSpaceKB(-1), tv(NULL), local(false), locked(false), 
-      chanid("")
+      freeDiskSpaceKB(-1), tv(NULL), local(false), locked(false),
+      sleepStatus(sStatus_Undefined), chanid("")
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
+
+    sleepStatusTime = QDateTime::currentDateTime();
+    lastSleepTime   = QDateTime::currentDateTime();
+    lastWakeTime    = QDateTime::currentDateTime();
 
     if (sock)
         sock->UpRef();
@@ -56,11 +60,15 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
  */
 EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
     : m_capturecardnum(capturecardnum), sock(NULL), hostname(QString::null),
-      freeDiskSpaceKB(-1), tv(ltv), local(true), locked(false), 
-      chanid("")
+      freeDiskSpaceKB(-1), tv(ltv), local(true), locked(false),
+      sleepStatus(sStatus_Undefined), chanid("")
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
+
+    sleepStatusTime = QDateTime::currentDateTime();
+    lastSleepTime   = QDateTime::currentDateTime();
+    lastWakeTime    = QDateTime::currentDateTime();
 }
 
 /** \fn EncoderLink::~EncoderLink()
@@ -84,11 +92,34 @@ EncoderLink::~EncoderLink(void)
 void EncoderLink::SetSocket(PlaybackSock *lsock)
 {
     if (lsock)
+    {
         lsock->UpRef();
+
+        if (gContext->GetSettingOnHost("SleepCommand", hostname).isEmpty())
+            SetSleepStatus(sStatus_Undefined);
+        else
+            SetSleepStatus(sStatus_Awake);
+    }
+    else
+    {
+        if (IsFallingAsleep())
+            SetSleepStatus(sStatus_Asleep);
+        else
+            SetSleepStatus(sStatus_Undefined);
+    }
 
     if (sock)
         sock->DownRef();
     sock = lsock;
+}
+
+/** \fn EncoderLink::SetSleepStatus(SleepStatus)
+ *  \brief Sets the sleep status of a recorder
+ */
+void EncoderLink::SetSleepStatus(SleepStatus newStatus)
+{
+    sleepStatus     = newStatus;
+    sleepStatusTime = QDateTime::currentDateTime();
 }
 
 /** \fn EncoderLink::IsBusy(TunedInputInfo*,int)
@@ -323,6 +354,18 @@ int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
         return sock->SetSignalMonitoringRate(m_capturecardnum, rate,
                                              notifyFrontend);
     return -1;
+}
+
+/** \brief Tell a slave to go to sleep
+ */
+bool EncoderLink::GoToSleep(void)
+{
+    if (IsLocal() || !sock)
+        return false;
+
+    lastSleepTime = QDateTime::currentDateTime();
+
+    return sock->GoToSleep();
 }
 
 /** \brief Lock the tuner for exclusive use.

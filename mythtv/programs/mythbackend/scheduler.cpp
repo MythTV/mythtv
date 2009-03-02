@@ -100,6 +100,8 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
                     .arg(err));
             threadrunning = false;
         }
+
+        WakeUpSlaves();
     }
 }
 
@@ -1542,6 +1544,7 @@ void Scheduler::RunScheduler(void)
 
     QDateTime curtime;
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
+    QDateTime lastSleepCheck = QDateTime::currentDateTime().addDays(-1);
 
     RecIter startIter = reclist.begin();
 
@@ -1698,6 +1701,9 @@ void Scheduler::RunScheduler(void)
                 }
                 firstRun = false;
             }
+
+            PutInactiveSlavesToSleep();
+            lastSleepCheck = QDateTime::currentDateTime();
         }
       }
 
@@ -1707,8 +1713,61 @@ void Scheduler::RunScheduler(void)
 
         curtime = QDateTime::currentDateTime();
 
+        // About every 5 minutes check for slaves that can be put to sleep
+        if (lastSleepCheck.secsTo(curtime) > 300)
+        {
+            PutInactiveSlavesToSleep();
+            lastSleepCheck = QDateTime::currentDateTime();
+        }
+
+        // Go through the list of recordings starting in the next few minutes
+        // and wakeup any slaves that are asleep
+        int wakeThreshold = gContext->GetNumSetting("WakeUpThreshold", 240);
         RecIter recIter = startIter;
-        for ( ; recIter != reclist.end(); recIter++)
+        for ( ; schedulingEnabled && recIter != reclist.end(); recIter++)
+        {
+            nextRecording = *recIter;
+            nextrectime = nextRecording->recstartts;
+            secsleft = curtime.secsTo(nextrectime);
+
+            if ((secsleft - prerollseconds) > wakeThreshold)
+                break;
+
+            if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
+                continue;
+
+            nexttv = (*m_tvList)[nextRecording->cardid];
+
+            if (nexttv->IsAsleep() && !nexttv->IsWaking())
+            {
+                VERBOSE(VB_SCHEDULE, QString("Slave Backend %1 is being "
+                        "awakened to record: %2")
+                        .arg(nexttv->GetHostName())
+                        .arg(nextRecording->title));
+
+                if (!WakeUpSlave(nexttv->GetHostName()))
+                {
+                    Reschedule(0);
+                    continue;
+                }
+            }
+            else if ((nexttv->IsWaking()) &&
+                     ((secsleft - prerollseconds) < 90) &&
+                     (nexttv->GetSleepStatusTime().secsTo(curtime) < 300) &&
+                     (nexttv->GetLastWakeTime().secsTo(curtime) > 10))
+            {
+                VERBOSE(VB_SCHEDULE, QString("Slave Backend %1 not "
+                        "available yet, trying to wake it up again.")
+                        .arg(nexttv->GetHostName()));
+                if (!WakeUpSlave(nexttv->GetHostName(), false))
+                {
+                    Reschedule(0);
+                    continue;
+                }
+            }
+        }
+
+        for ( recIter = startIter ; recIter != reclist.end(); recIter++)
         {
             QString msg, details;
             int fsID = -1;
@@ -1792,6 +1851,38 @@ void Scheduler::RunScheduler(void)
             if (secsleft > 30)
                 continue;
 
+            if (nexttv->IsWaking())
+            {
+                if (secsleft > 0)
+                {
+                    VERBOSE(VB_SCHEDULE, QString("WARNING: Slave Backend %1 "
+                            "has NOT come back from sleep yet.  Recording can "
+                            "not begin yet for: %2")
+                            .arg(nexttv->GetHostName())
+                            .arg(nextRecording->title));
+                }
+                else if (nexttv->GetLastWakeTime().secsTo(curtime) > 300)
+                {
+                    VERBOSE(VB_SCHEDULE, QString("WARNING: Slave Backend %1 "
+                            "has NOT come back from sleep yet in 300 seconds. "
+                            "Attempting to reschedule around sleeping tuners.")
+                            .arg(nexttv->GetHostName()));
+
+                    QMap<int, EncoderLink *>::Iterator enciter =
+                        m_tvList->begin();
+                    for (; enciter != m_tvList->end(); ++enciter)
+                    {
+                        EncoderLink *enc = *enciter;
+                        if (enc->GetHostName() == nexttv->GetHostName())
+                            enc->SetSleepStatus(sStatus_Undefined);
+                    }
+
+                    Reschedule(0);
+                }
+
+                continue;
+            }
+
             if (nextRecording->pathname.isEmpty())
             {
                 QMutexLocker lockit(reclist_lock);
@@ -1827,7 +1918,7 @@ void Scheduler::RunScheduler(void)
                 .arg(nextRecording->cardid)
                 .arg(nextRecording->sourceid);
 
-            if (schedulingEnabled)
+            if (schedulingEnabled && nexttv->IsConnected())
             {
                 nextRecording->recstatus =
                     nexttv->StartRecording(nextRecording);
@@ -2130,6 +2221,231 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
     // OR we suspended or hibernated the OS instead
     idleSince = QDateTime();
     m_isShuttingDown = false;
+}
+
+void Scheduler::PutInactiveSlavesToSleep(void)
+{
+    int prerollseconds = 0;
+    int secsleft = 0;
+    EncoderLink *enc = NULL;
+
+    bool someSlavesCanSleep = false;
+    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+    for (; enciter != m_tvList->end(); ++enciter)
+    {
+        EncoderLink *enc = *enciter;
+
+        if (enc->CanSleep())
+            someSlavesCanSleep = true;
+    }
+
+    if (!someSlavesCanSleep)
+        return;
+
+    VERBOSE(VB_SCHEDULE,
+            "Scheduler, Checking for slaves that can be shut down");
+
+    int sleepThreshold =
+        gContext->GetNumSetting( "SleepThreshold", 60 * 45);
+
+    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("  Getting list of slaves that "
+            "will be active in the next %1 minutes.")
+            .arg(sleepThreshold / 60));
+
+    VERBOSE(VB_SCHEDULE+VB_EXTRA, "Checking scheduler's reclist");
+    RecIter recIter = reclist.begin();
+    QDateTime curtime = QDateTime::currentDateTime();
+    QStringList SlavesInUse;
+    for ( ; recIter != reclist.end(); recIter++)
+    {
+        ProgramInfo *pginfo = *recIter;
+
+        if ((pginfo->recstatus != rsRecording) &&
+            (pginfo->recstatus != rsWillRecord))
+            continue;
+
+        secsleft = curtime.secsTo(pginfo->recstartts) - prerollseconds;
+        if (secsleft > sleepThreshold)
+            continue;
+
+        if (m_tvList->find(pginfo->cardid) != m_tvList->end())
+        {
+            enc = (*m_tvList)[pginfo->cardid];
+            if ((!enc->IsLocal()) &&
+                (!SlavesInUse.contains(enc->GetHostName())))
+            {
+                if (pginfo->recstatus == rsWillRecord)
+                    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 will "
+                            "be in use in %2 minutes").arg(enc->GetHostName())
+                            .arg(secsleft / 60));
+                else
+                    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 is "
+                            "in use currently recording '%1'")
+                            .arg(enc->GetHostName()).arg(pginfo->title));
+                SlavesInUse << enc->GetHostName();
+            }
+        }
+    }
+
+    VERBOSE(VB_SCHEDULE+VB_EXTRA, "  Checking inuseprograms table:");
+    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT hostname, recusage FROM inuseprograms "
+                    "WHERE lastupdatetime > :ONEHOURAGO ;");
+    query.bindValue(":ONEHOURAGO", oneHourAgo);
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while(query.next()) {
+            SlavesInUse << query.value(0).toString();
+            VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Slave %1 is marked as "
+                    "in use by a %2")
+                    .arg(query.value(0).toString())
+                    .arg(query.value(1).toString()));
+        }
+    }
+
+    VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("  Shutting down slaves which will "
+            "be inactive for the next %1 minutes and can be put to sleep.")
+            .arg(sleepThreshold / 60));
+
+    enciter = m_tvList->begin();
+    for (; enciter != m_tvList->end(); ++enciter)
+    {
+        enc = *enciter;
+
+        if ((!enc->IsLocal()) &&
+            (enc->IsAwake()) &&
+            (!SlavesInUse.contains(enc->GetHostName())) &&
+            (!enc->IsFallingAsleep()))
+        {
+            QString sleepCommand = gContext->GetSettingOnHost("SleepCommand",
+                enc->GetHostName());
+            QString wakeUpCommand = gContext->GetSettingOnHost("WakeUpCommand",
+                enc->GetHostName());
+
+            if (!sleepCommand.isEmpty() && !wakeUpCommand.isEmpty())
+            {
+                QString thisHost = enc->GetHostName();
+
+                VERBOSE(VB_SCHEDULE+VB_EXTRA, QString("    Commanding %1 to "
+                        "go to sleep.").arg(thisHost));
+
+                if (enc->GoToSleep())
+                {
+                    QMap<int, EncoderLink *>::Iterator slviter =
+                        m_tvList->begin();
+                    for (; slviter != m_tvList->end(); ++slviter)
+                    {
+                        EncoderLink *slv = *slviter;
+                        if (slv->GetHostName() == thisHost)
+                        {
+                            VERBOSE(VB_SCHEDULE+VB_EXTRA,
+                                    QString("    Marking card %1 on slave %2 "
+                                            "as falling asleep.")
+                                            .arg(slv->GetCardID())
+                                            .arg(slv->GetHostName()));
+                            slv->SetSleepStatus(sStatus_FallingAsleep);
+                        }
+                    }
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unable to "
+                            "shutdown %1 slave backend, setting sleep "
+                            "status to undefined.").arg(thisHost));
+                    QMap<int, EncoderLink *>::Iterator slviter =
+                        m_tvList->begin();
+                    for (; slviter != m_tvList->end(); ++slviter)
+                    {
+                        EncoderLink *slv = *slviter;
+                        if (slv->GetHostName() == thisHost)
+                            slv->SetSleepStatus(sStatus_Undefined);
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool Scheduler::WakeUpSlave(QString slaveHostname, bool setWakingStatus)
+{
+    if (slaveHostname == gContext->GetHostName())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Tried to Wake Up %1, but this is the "
+                "master backend and it is not asleep.")
+                .arg(slaveHostname));
+        return false;
+    }
+
+    QString wakeUpCommand = gContext->GetSettingOnHost( "WakeUpCommand",
+        slaveHostname);
+
+    if (wakeUpCommand.isEmpty()) {
+        VERBOSE(VB_IMPORTANT, QString("Trying to Wake Up %1, but this slave "
+                "does not have a WakeUpCommand set.").arg(slaveHostname));
+
+        QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+        for (; enciter != m_tvList->end(); ++enciter)
+        {
+            EncoderLink *enc = *enciter;
+            if (enc->GetHostName() == slaveHostname)
+                enc->SetSleepStatus(sStatus_Undefined);
+        }
+
+        return false;
+    }
+
+    QDateTime curtime = QDateTime::currentDateTime();
+    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+    for (; enciter != m_tvList->end(); ++enciter)
+    {
+        EncoderLink *enc = *enciter;
+        if (setWakingStatus && (enc->GetHostName() == slaveHostname))
+            enc->SetSleepStatus(sStatus_Waking);
+        enc->SetLastWakeTime(curtime);
+    }
+
+    if (!IsMACAddress(wakeUpCommand))
+    {
+        VERBOSE(VB_SCHEDULE, QString("Executing '%1' to wake up slave.")
+                .arg(wakeUpCommand));
+        myth_system(wakeUpCommand);
+    }
+    else
+        return WakeOnLAN(wakeUpCommand);
+
+    return true;
+}
+
+void Scheduler::WakeUpSlaves(void)
+{
+    QStringList SlavesThatCanWake;
+    QString thisSlave;
+    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+    for (; enciter != m_tvList->end(); ++enciter)
+    {
+        EncoderLink *enc = *enciter;
+
+        if (enc->IsLocal())
+            continue;
+
+        thisSlave = enc->GetHostName();
+
+        if ((!gContext->GetSettingOnHost("WakeUpCommand", thisSlave)
+                .isEmpty()) &&
+            (!SlavesThatCanWake.contains(thisSlave)))
+            SlavesThatCanWake << thisSlave;
+    }
+
+    int slave = 0;
+    for (; slave < SlavesThatCanWake.count(); slave++)
+    {
+        thisSlave = SlavesThatCanWake[slave];
+        VERBOSE(VB_SCHEDULE,
+                QString("Scheduler, Sending wakeup command to slave: %1")
+                        .arg(thisSlave));
+        WakeUpSlave(thisSlave, false);
+    }
 }
 
 void *Scheduler::SchedulerThread(void *param)
@@ -2545,7 +2861,7 @@ void Scheduler::AddNewRecords(void)
     for (; enciter != m_tvList->end(); ++enciter)
     {
         EncoderLink *enc = *enciter;
-        if (enc->IsConnected())
+        if (enc->IsConnected() || enc->IsAsleep())
             cardMap[enc->GetCardID()] = true;
     }
 

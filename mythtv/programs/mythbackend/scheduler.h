@@ -128,6 +128,9 @@ class Scheduler : public QObject
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                              bool &blockShutdown);
     void ShutdownServer(int prerollseconds, QDateTime &idleSince);
+    void PutInactiveSlavesToSleep(void);
+    bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);
+    void WakeUpSlaves(void);
 
     bool WasStartedAutomatically();
 

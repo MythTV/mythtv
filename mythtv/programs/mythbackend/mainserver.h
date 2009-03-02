@@ -91,6 +91,7 @@ class MainServer : public QObject, public MythSocketCBs
     void DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
+    void HandleGoToSleep(PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
     void HandleQueryFreeSpaceSummary(PlaybackSock *pbs);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
