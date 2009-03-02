@@ -3971,18 +3971,15 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         return;
     }
 
-    if (pathname.left(7) == "myth://")
-        pathname = GetPlaybackURL();
-
-    if (pathname.right(1) == "/")
-        pathname.remove(pathname.length() - 1, 1);
+    if (pathname.left(1) != "/")
+        pathname = GetPlaybackURL(false, true);
 
     QString recDir = "";
-    if (hostname == gContext->GetHostName())
+    QFileInfo testFile(pathname);
+    if (testFile.exists() || hostname == gContext->GetHostName())
     {
         // we may be recording this file and it may not exist yet so we need
         // to do some checking to see what is in pathname
-        QFileInfo testFile(pathname);
         if (testFile.exists())
         {
             while (testFile.isSymLink())
@@ -4014,7 +4011,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     else if (!gContext->IsBackend() &&
               RemoteCheckFile(this) && pathname.left(1) == "/")
     {
-        recDir = pathname.section("/", 0, -2);
+        testFile.setFile(pathname);
+        recDir = testFile.path();
     }
 
     lastInUseTime = mythCurrentDateTime();
