@@ -394,6 +394,26 @@ bool MSocketDevice::atEnd() const
 }
 
 /*!
+    Returns true if this socket has the broadcast option set.
+
+    \sa setBroadcast()
+*/
+bool MSocketDevice::broadcast() const
+{
+	return option( Broadcast );
+}
+
+/*!
+    Sets the broadcast option for this socket.
+
+    \sa broadcast()
+*/
+void MSocketDevice::setBroadcast( bool enable )
+{
+    setOption( Broadcast, enable );
+}
+
+/*!
     Returns true if the address of this socket can be used by other
     sockets at the same time, and false if this socket claims
     exclusive ownership.

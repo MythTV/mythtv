@@ -83,6 +83,9 @@ public:
     bool	 blocking() const;
     virtual void setBlocking( bool );
 
+    bool	 broadcast() const;
+    virtual void setBroadcast( bool );
+
     bool	 addressReusable() const;
     virtual void setAddressReusable( bool );
 
