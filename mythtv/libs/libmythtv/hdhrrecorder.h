@@ -1,6 +1,6 @@
 /** -*- Mode: c++ -*-
  *  HDHRRecorder
- *  Copyright (c) 2006 by Silicondust Engineering Ltd.
+ *  Copyright (c) 2006-2009 by Silicondust Engineering Ltd.
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -18,11 +18,11 @@ class ProgramMapTable;
 typedef vector<uint>        uint_vec_t;
 
 class HDHRRecorder : public DTVRecorder,
+                     public DVBMainStreamListener,
+                     public ATSCMainStreamListener,
                      public MPEGStreamListener,
                      public MPEGSingleProgramStreamListener
 {
-    friend class ATSCStreamData;
-
   public:
     HDHRRecorder(TVRec *rec, HDHRChannel *channel);
     ~HDHRRecorder();
@@ -52,12 +52,15 @@ class HDHRRecorder : public DTVRecorder,
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
-    /*
     // ATSC
     void HandleSTT(const SystemTimeTable*) {}
-    void HandleMGT(const MasterGuideTable *mgt);
+    void HandleMGT(const MasterGuideTable *) {};
     void HandleVCT(uint, const VirtualChannelTable*) {}
-    */
+
+    // DVB
+    void HandleTDT(const TimeDateTable*) {}
+    void HandleNIT(const NetworkInformationTable*) {}
+    void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) {}
 
   private:
     bool AdjustFilters(void);
