@@ -101,19 +101,19 @@
         </imagetype>
 
         <buttonlist name="menu">
-            <area>0,152,1281,300</area>
-            <buttonarea>0,0,1281,300</buttonarea>
+            <area>0,152,1280,300</area>
+            <buttonarea>0,0,1280,300</buttonarea>
             <wrapstyle>items</wrapstyle>
             <scrollstyle>center</scrollstyle>
             <layout>horizontal</layout>
-            <spacing>0</spacing>
+            <spacing>1</spacing>
             <statetype name="buttonitem">
                 <loadondemand>true</loadondemand>
                 <state name="active">
-                    <area>0,17,256,218</area>
+                    <area>0,17,255,218</area>
 
                     <textarea name="buttontext">
-                        <area>5,225,246,73</area>
+                        <area>5,225,245,73</area>
                         <align>allcenter</align>
                         <font>baselarge</font>
                         <multiline>yes</multiline>
@@ -123,7 +123,7 @@
                         <loadondemand>true</loadondemand>
                         <state name="DEFAULT">
                             <imagetype name="icon">
-                                <area>0,0,256,220</area>
+                                <area>0,0,255,220</area>
                                 <filename>watermarks/default.png</filename>
                             </imagetype>
                         </state>
@@ -458,10 +458,10 @@
                     </statetype>
                 </state>
                 <state name="selected" from="active">
-                    <area>-11,0,277,278</area>
+                    <area>-11,0,276,278</area>
 
                     <textarea name="buttontext">
-                        <area>5,250,267,73</area>
+                        <area>5,250,266,73</area>
                         <font>baselargebrown</font>
                     </textarea>
 
@@ -469,7 +469,7 @@
                         <loadondemand>true</loadondemand>
                         <state name="DEFAULT">
                             <imagetype name="icon">
-                                <area>0,2,277,238</area>
+                                <area>0,2,276,238</area>
                                 <mask>menu/iconmask.png</mask>
                             </imagetype>
                         </state>
