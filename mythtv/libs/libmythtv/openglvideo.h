@@ -37,6 +37,8 @@ typedef map<OpenGLFilterType,OpenGLFilter*> glfilt_map_t;
 
 #ifdef USING_OPENGL_VIDEO
 
+#include "util-opengl.h"
+
 class OpenGLVideo
 {
   public:
@@ -65,7 +67,8 @@ class OpenGLVideo
          { return hardwareDeinterlacer; };
     void SetSoftwareDeinterlacer(const QString &filter);
 
-    void PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
+    void PrepareFrame(bool topfieldfirst, FrameScanType scan,
+                      bool softwareDeinterlacing,
                       long long frame, bool draw_border = false);
 
     void  SetMasterViewport(QSize size)   { masterViewportSize = size; }
@@ -102,8 +105,8 @@ class OpenGLVideo
     void SetFiltering(void);
 
     void RotateTextures(void);
-    void SetTextureFilters(vector<uint> *textures, int filt, int clamp);
-    void DeleteTextures(vector<uint> *textures);
+    void SetTextureFilters(vector<GLuint> *textures, int filt, int clamp);
+    void DeleteTextures(vector<GLuint> *textures);
     void TearDownDeinterlacer(void);
     uint ParseOptions(QString options);
 
@@ -121,8 +124,8 @@ class OpenGLVideo
     bool           hardwareDeinterlacing;
     bool           useColourControl;
     bool           viewportControl;
-    vector<uint>   referenceTextures;
-    vector<uint>   inputTextures;
+    vector<GLuint>   referenceTextures;
+    vector<GLuint>   inputTextures;
     QSize          inputTextureSize;
     glfilt_map_t   filters;
     long long      currentFrameNum;

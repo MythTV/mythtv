@@ -1216,9 +1216,9 @@ ivtv_deps="backend v4l"
 hdpvr_deps="backend v4l"
 hdhomerun_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
-opengl_deps="GL_gl_h"
-opengl_deps_any="windows x11"
-opengl_video_deps="opengl xv"
+opengl_deps_any="agl_h GL_gl_h"
+opengl_deps_any="darwin windows x11"
+opengl_video_deps="opengl"
 opengl_vsync_deps="opengl"
 v4l_deps="backend"
 vdpau_deps="x11 vdpau_vdpau_h"
@@ -1793,7 +1793,6 @@ Playback of HD videos may be very poor.
 EOF
             disable mmx
         fi
-        disable opengl_video
         disable opengl_vsync
         enable  proc_opt
         disable v4l
@@ -2983,7 +2982,9 @@ enabled xrandr && check_header X11/extensions/Xrandr.h || disable xrandr
 enabled xv && has_library libXv || disable xv
 
 check_header GL/gl.h
-has_library libGL || has_library libopengl32 || disable opengl
+if ! enabled windows; then
+    has_library libGL || has_library libopengl32 || disable opengl
+fi
 
 VENDOR_XVMC_LIBS=""
 check_header X11/extensions/XvMClib.h
@@ -3717,8 +3718,10 @@ if enabled directx; then
   append CONFIG_DEFINES "USING_DIRECTX"
 fi
 
-if enabled opengl; then
-  echo "CONFIG_OPENGL_LIBS=-lGL -lGLU" >> $MYTH_CONFIG_MAK
+if ! enabled darwin; then
+  if enabled opengl; then
+    echo "CONFIG_OPENGL_LIBS=-lGL -lGLU" >> $MYTH_CONFIG_MAK
+  fi
 fi
 
 if test x"$CCONFIG" != x"" ; then

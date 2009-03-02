@@ -11,6 +11,7 @@ QMutex x11_lock;
 #include "util-x11.h"
 extern "C" {
 #include <X11/extensions/Xinerama.h>
+#include <X11/extensions/xf86vmode.h>
 }
 typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
 typedef std::vector<XErrorEvent>       XErrorVectorType;
@@ -233,4 +234,46 @@ double MythXGetPixelAspectRatio(Display *d, int screen)
     return pixelAspect;
 }
 
+int MythXGetRefreshRate(Display *display, int screen)
+{
+    if (!display)
+        return -1;
+
+    XF86VidModeModeLine mode_line;
+    int dot_clock;
+
+    int ret = False;
+    X11S(ret = XF86VidModeGetModeLine(display, screen,
+                                      &dot_clock, &mode_line));
+    if (!ret)
+    {
+        VERBOSE(VB_IMPORTANT, "MythXGetRefreshRate(): "
+                "X11 ModeLine query failed");
+        return -1;
+    }
+
+    double rate = mode_line.htotal * mode_line.vtotal;
+
+    // Catch bad data from video drivers (divide by zero causes return of NaN)
+    if (rate == 0.0 || dot_clock == 0)
+    {
+        VERBOSE(VB_IMPORTANT, "MythXGetRefreshRate(): "
+                "X11 ModeLine query returned zeroes");
+        return -1;
+    }
+
+    rate = (dot_clock * 1000.0) / rate;
+
+    // Assume 60Hz if rate isn't good:
+    if (rate < 20 || rate > 200)
+    {
+        VERBOSE(VB_PLAYBACK, QString("MythXGetRefreshRate(): "
+                "Unreasonable refresh rate %1Hz reported by X").arg(rate));
+        rate = 60;
+    }
+
+    rate = 1000000.0 / rate;
+
+    return (int)rate;
+}
 #endif // USING_X11

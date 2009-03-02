@@ -60,6 +60,8 @@ using_xvmc:DEFINES += USING_XVMC
 using_xvmc_vld:DEFINES += USING_XVMC_VLD
 using_xrandr:DEFINES += USING_XRANDR
 using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
+using_opengl_video:DEFINES += USING_OPENGL_VIDEO
+using_vdpau:DEFINES += USING_VDPAU
 
 using_alsa:DEFINES += USING_ALSA
 using_arts:DEFINES += USING_ARTS

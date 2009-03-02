@@ -19,6 +19,7 @@ MPUBLIC std::vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printEr
 MPUBLIC QSize  MythXGetDisplaySize(      Display *d = NULL, int screen = -1);
 MPUBLIC QSize  MythXGetDisplayDimensions(Display *d = NULL, int screen = -1);
 MPUBLIC double MythXGetPixelAspectRatio( Display *d = NULL, int screen = -1);
+MPUBLIC int    MythXGetRefreshRate(      Display *display,  int screen);
 #endif // USING_X11
 
 MPUBLIC int GetNumberOfXineramaScreens();

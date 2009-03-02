@@ -131,9 +131,12 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
 
     SetViewPort(display_visible_rect.size());
 
-    bool use_pbo = gl_features & kGLExtPBufObj;
+    bool use_pbo        =  gl_features & kGLExtPBufObj;
+    bool osd_features   = (gl_features & kGLExtFragProg) &&
+                          (gl_features & kGLExtFBufObj);
+    bool basic_features = (gl_features & kGLExtFragProg);
 
-    if (osd)
+    if (osd && osd_features)
     {
         QSize osdsize = display_visible_rect.size();
         GLuint tex = CreateVideoTexture(osdsize, inputTextureSize, use_pbo);
@@ -149,7 +152,7 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
             Teardown();
         }
     }
-    else
+    else if (!osd && basic_features)
     {
         GLuint tex = CreateVideoTexture(actual_video_dim,
                                         inputTextureSize, use_pbo);
@@ -168,9 +171,23 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
     {
         if (osd)
         {
+            if (!osd_features)
+            {
+                VERBOSE(VB_PLAYBACK, LOC_ERR +
+                    QString("OpenGL OSD not available - "
+                            "correct extensions not present."));
+            }
             Teardown();
             return false;
         }
+
+        if (!basic_features)
+        {
+            VERBOSE(VB_PLAYBACK, LOC_ERR +
+                QString("GL_ARB_fragment_program not available."
+                        " for colorspace conversion."));
+        }
+
 
         VERBOSE(VB_PLAYBACK, LOC +
                 "OpenGL colour conversion failed.\n\t\t\t"
@@ -332,6 +349,7 @@ void OpenGLVideo::SetFiltering(void)
             SetTextureFilters(&(rit->second->frameBufferTextures),
                               GL_NEAREST, GL_CLAMP_TO_EDGE);
         }
+        last_filter++;
     }
 }
 
@@ -340,6 +358,31 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 {
     if (filters.count(filter))
         return true;
+
+    if (!(gl_features & kGLExtFBufObj) && (filter == kGLFilterResize) &&
+        filters.size())
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+            QString("GL_EXT_framebuffer_object not available"
+                    " for scaling/resizing filter."));
+        return false;
+    }
+
+    if (!((gl_features & kGLExtFragProg) && (gl_features & kGLExtFBufObj)) &&
+        filter == kGLFilterBicubic)
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+            QString("Features not available for bicubic filter."));
+        return false;
+    }
+
+    if (!(gl_features & kGLExtFragProg) &&
+        ((filter == kGLFilterYUV2RGB) || (filter == kGLFilterYUV2RGBA)))
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+            QString("GL_ARB_fragment_program not available."
+                    " for colorspace conversion."));
+    }
 
     bool success = true;
 
@@ -361,7 +404,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
             success = false;
     }
 
-    if (filter != kGLFilterNone && filter != kGLFilterResize)
+    if (success && (filter != kGLFilterNone) && (filter != kGLFilterResize))
     {
         program = AddFragmentProgram(filter);
         if (!program)
@@ -370,14 +413,14 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
             temp->fragmentPrograms.push_back(program);
     }
 
-    temp->outputBuffer       = kDefaultBuffer;
-
-    temp->frameBuffers.clear();
-    temp->frameBufferTextures.clear();
-
-    filters[filter] = temp;
-
-    success &= OptimiseFilters();
+    if (success)
+    {
+        temp->outputBuffer = kDefaultBuffer;
+        temp->frameBuffers.clear();
+        temp->frameBufferTextures.clear();
+        filters[filter] = temp;
+        success &= OptimiseFilters();
+    }
 
     if (success)
         return true;
@@ -443,6 +486,14 @@ void OpenGLVideo::TearDownDeinterlacer(void)
 
 bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 {
+    if (!(gl_features & kGLExtFragProg))
+    {
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+            QString("GL_ARB_fragment_program not available."
+                    " for OpenGL deinterlacing."));
+        return false;
+    }
+
     OpenGLContextLocker ctx_lock(gl_context);
 
     if (!filters.count(kGLFilterYUV2RGB))
@@ -781,7 +832,8 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 }
 
 // locking ok
-void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
+void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
+                               bool softwareDeinterlacing,
                                long long frame, bool draw_border)
 {
     if (inputTextures.empty() || filters.empty())
@@ -842,14 +894,16 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
             (filter->outputBuffer == kDefaultBuffer))
         {
             float bob = (trueheight / (float)video_dim.height()) / 4.0f;
-            if (scan == kScan_Intr2ndField)
+            if ((scan == kScan_Intr2ndField && topfieldfirst) ||
+                (scan == kScan_Interlaced && !topfieldfirst))
             {
                 t_top /= 2;
                 t_bottom /= 2;
                 t_bottom += bob;
                 t_top    += bob;
             }
-            if (scan == kScan_Interlaced)
+            if ((scan == kScan_Interlaced && topfieldfirst) ||
+                (scan == kScan_Intr2ndField && !topfieldfirst))
             {
                 t_top = (trueheight / 2) + (t_top / 2);
                 t_bottom = (trueheight / 2) + (t_bottom / 2);
@@ -871,25 +925,6 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
         float vtop   = display.top();
         float vbot   = display.bottom();
 
-        // hardware bobdeint
-        if (filter->outputBuffer == kDefaultBuffer &&
-            hardwareDeinterlacing &&
-            hardwareDeinterlacer == "openglbobdeint")
-        {
-            float bob = ((float)display.height() / (float)video_dim.height())
-                        / 2.0f;
-            if (scan == kScan_Interlaced)
-            {
-                vbot -= bob;
-                vtop -= bob;
-            }
-            if (scan == kScan_Intr2ndField)
-            {
-                vbot += bob;
-                vtop += bob;
-            }
-        }
-
         // resize for interactive tv
         if (videoResize && filter->outputBuffer == kDefaultBuffer)
             CalculateResize(vleft, vtop, vright, vbot);
@@ -910,6 +945,26 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
             // now need to adjust for vertical offsets 
             vbot = (visible.height()- 1) - display.top();
             vtop = vbot - (display.height() - 1);
+        }
+
+        // hardware bobdeint
+        if (filter->outputBuffer == kDefaultBuffer &&
+            hardwareDeinterlacing &&
+            hardwareDeinterlacer == "openglbobdeint")
+        {
+            float bob = ((float)display.height() / (float)video_rect.height())
+                        / 2.0f;
+            bob = bob * (topfieldfirst ? 1.0f : -1.0f);
+            if (scan == kScan_Interlaced)
+            {
+                vbot -= bob;
+                vtop -= bob;
+            }
+            if (scan == kScan_Intr2ndField)
+            {
+                vbot += bob;
+                vtop += bob;
+            }
         }
 
         // bind correct frame buffer (default onscreen) and set viewport
@@ -998,9 +1053,9 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                     filter->fragmentPrograms.size() == 3)
                 {
                     if (scan == kScan_Interlaced)
-                        prog_ref = 1;
+                        prog_ref = topfieldfirst ? 1 : 2;
                     else if (scan == kScan_Intr2ndField)
-                        prog_ref = 2;
+                        prog_ref = topfieldfirst ? 2 : 1;
                 }
             }
             program = filter->fragmentPrograms[prog_ref];
@@ -1063,7 +1118,7 @@ void OpenGLVideo::RotateTextures(void)
     inputTextures[0] = tmp;
 }
 
-void OpenGLVideo::DeleteTextures(vector<uint> *textures)
+void OpenGLVideo::DeleteTextures(vector<GLuint> *textures)
 {
     if ((*textures).empty())
         return;

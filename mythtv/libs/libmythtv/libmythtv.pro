@@ -355,8 +355,8 @@ using_frontend {
     using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 
     using_opengl_video:DEFINES += USING_OPENGL_VIDEO
-    using_opengl_video:HEADERS += openglvideo.h
-    using_opengl_video:SOURCES += openglvideo.cpp
+    using_opengl_video:HEADERS += openglvideo.h   videoout_opengl.h
+    using_opengl_video:SOURCES += openglvideo.cpp videoout_opengl.cpp
 
     using_glx_proc_addr_arb:DEFINES += USING_GLX_PROC_ADDR_ARB
 
@@ -546,9 +546,8 @@ mingw {
     DEFINES -= USING_OPENGL_VSYNC
     DEFINES += USING_D3D
 
-    HEADERS -= util-opengl.h   openglcontext.h
     HEADERS += videoout_d3d.h
-    SOURCES -= util-opengl.cpp openglcontext.cpp NuppelVideoRecorder.cpp
+    SOURCES -= NuppelVideoRecorder.cpp
     SOURCES += videoout_d3d.cpp
 
     LIBS += -lpthread

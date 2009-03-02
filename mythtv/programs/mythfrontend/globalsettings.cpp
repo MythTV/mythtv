@@ -2023,7 +2023,7 @@ static HostCheckBox *AltClearSavedPosition()
     return gc;
 }
 
-#ifdef USING_XV
+#if defined(USING_XV) || defined(USING_OPENGL_VIDEO) || defined(USING_VDPAU)
 static HostCheckBox *UsePicControls()
 {
     HostCheckBox *gc = new HostCheckBox("UseOutputPictureControls");
@@ -4716,7 +4716,7 @@ PlaybackSettings::PlaybackSettings()
 #ifdef USING_OPENGL_VSYNC
     general1->addChild(UseOpenGLVSync());
 #endif // USING_OPENGL_VSYNC
-#ifdef USING_XV
+#if defined(USING_XV) || defined(USING_OPENGL_VIDEO) || defined(USING_VDPAU)
     general1->addChild(UsePicControls());
 #endif // USING_XV
     addChild(general1);

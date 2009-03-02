@@ -33,6 +33,10 @@
 #include "videoout_quartz.h"
 #endif
 
+#ifdef USING_OPENGL_VIDEO
+#include "videoout_opengl.h"
+#endif
+
 #include "videoout_null.h"
 
 #include "dithertable.h"
@@ -96,6 +100,10 @@ VideoOutput *VideoOutput::Create(
     renderers += osxlist;
 #endif // Q_OS_MACX
 
+#ifdef USING_OPENGL_VIDEO
+    renderers += VideoOutputOpenGL::GetAllowedRenderers(codec_id, video_dim);
+#endif // USING_OPENGL_VIDEO
+
     VERBOSE(VB_PLAYBACK, LOC + "Allowed renderers: " +
             to_comma_list(renderers));
 
@@ -156,6 +164,11 @@ VideoOutput *VideoOutput::Create(
         if (osxlist.contains(renderer))
             vo = new VideoOutputQuartz(codec_id, codec_priv);
 #endif // Q_OS_MACX
+
+#ifdef USING_OPENGL_VIDEO
+        if (renderer == "opengl")
+            vo = new VideoOutputOpenGL();
+#endif // USING_OPENGL_VIDEO
 
 #ifdef USING_XV
         if (xvlist.contains(renderer))
@@ -520,7 +533,7 @@ bool VideoOutput::NeedsDoubleFramerate() const
     return ((m_deintfiltername.contains("bobdeint") ||
              m_deintfiltername.contains("doublerate") ||
              m_deintfiltername.contains("doubleprocess")) &&
-            m_deinterlacing);
+             m_deinterlacing);
 }
 
 bool VideoOutput::IsBobDeint(void) const
@@ -644,8 +657,24 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
 QRect VideoOutput::GetVisibleOSDBounds(
     float &visible_aspect, float &font_scaling, float themeaspect) const
 {
-    return windows[0].GetVisibleOSDBounds(
-        visible_aspect, font_scaling, themeaspect);
+    if (!hasFullScreenOSD())
+    {
+        return windows[0].GetVisibleOSDBounds(
+            visible_aspect, font_scaling, themeaspect);
+    }
+
+    QRect dvr = windows[0].GetDisplayVisibleRect();
+
+    // This rounding works for I420 video...
+    QSize dvr2 = QSize(dvr.width()  & ~0x3,
+                       dvr.height() & ~0x1);
+
+    float dispPixelAdj = 1.0f;
+    if (dvr2.height() && dvr2.width())
+        dispPixelAdj = (GetDisplayAspect() * dvr2.height()) / dvr2.width();
+    visible_aspect = themeaspect / dispPixelAdj;
+    font_scaling   = 1.0f;
+    return QRect(QPoint(0,0), dvr2);
 }
 
 /**
@@ -654,7 +683,14 @@ QRect VideoOutput::GetVisibleOSDBounds(
  */
 QRect VideoOutput::GetTotalOSDBounds(void) const
 {
-    return windows[0].GetTotalOSDBounds();
+    if (!hasFullScreenOSD())
+        return windows[0].GetTotalOSDBounds();
+
+    QRect dvr = windows[0].GetDisplayVisibleRect();
+    QSize dvr2 = QSize(dvr.width()  & ~0x3,
+                       dvr.height() & ~0x1);
+
+    return QRect(QPoint(0,0), dvr2);
 }
 
 bool VideoOutput::AllowPreviewEPG(void) const

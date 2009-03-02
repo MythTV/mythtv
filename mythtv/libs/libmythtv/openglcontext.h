@@ -89,9 +89,11 @@ class OpenGLContext
     virtual int  GetRefreshRate(void) = 0;
     virtual void SetSwapInterval(int interval) = 0;
     virtual void GetDisplayDimensions(QSize &dimensions) = 0;
+    virtual bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
+        { return false; }
     virtual void GetDisplaySize(QSize &size) = 0;
     virtual void MoveResizeWindow(QRect rect) { }
-    virtual void EmbedInWidget(WId window, int x, int y, int w, int h) { }
+    virtual void EmbedInWidget(int x, int y, int w, int h) { }
     virtual void StopEmbedding(void) { }
 
     void GetWindowRect(QRect &rect) { rect = m_window_rect; }
@@ -138,7 +140,7 @@ class OpenGLContext
   protected:
     virtual bool MakeContextCurrent(bool current) = 0;
     virtual void DeleteWindowResources(void) = 0;
-    bool CreateCommon(bool colour_control);
+    bool CreateCommon(bool colour_control, QRect display_visible);
     void DeleteOpenGLResources(void);
     void Init2DState(void);
     uint CreatePBO(uint tex);
@@ -185,6 +187,7 @@ class OpenGLContextGLX : public OpenGLContext
     int  GetRefreshRate(void);
     void SetSwapInterval(int interval);
     void GetDisplayDimensions(QSize &dimensions);
+    bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect);
     void GetDisplaySize(QSize &size);
     void MoveResizeWindow(QRect rect);
 
@@ -258,7 +261,7 @@ class OpenGLContextAGL : public OpenGLContext
     void GetDisplayDimensions(QSize &dimensions);
     void GetDisplaySize(QSize &size);
     void MoveResizeWindow(QRect rect);    
-    void EmbedInWidget(WId window, int x, int y, int w, int h);
+    void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
 
   private:
@@ -298,7 +301,7 @@ class OpenGLContext
     void GetDisplayDimensions(QSize&) { }
     void GetDisplaySize(QSize&) { }
     void MoveResizeWindow(QRect) { }
-    void EmbedInWidget(WId, int, int, int, int) { }
+    void EmbedInWidget(int, int, int, int) { }
     void StopEmbedding(void) { }
 
     void GetWindowRect(QRect&) { }

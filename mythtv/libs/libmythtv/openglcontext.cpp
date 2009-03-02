@@ -104,11 +104,12 @@ OpenGLContext::~OpenGLContext()
     }
 }
 
-bool OpenGLContext::CreateCommon(bool colour_control)
+bool OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
 {
     static bool debugged = false;
 
     m_colour_control = colour_control;
+    m_window_rect = display_visible;
 
     MakeCurrent(true);
 
@@ -1036,10 +1037,6 @@ void OpenGLContext::SetFence(void)
 
 #ifdef USING_X11
 
-extern "C" {
-#include <X11/extensions/xf86vmode.h>
-}
-
 OpenGLContextGLX::OpenGLContextGLX(QMutex *lock)
     : OpenGLContext(lock),
       m_display(NULL), m_created_display(false), m_screen_num(0),
@@ -1203,7 +1200,7 @@ bool OpenGLContextGLX::Create(
 
         bool direct = false; 
         X11S(direct = glXIsDirect(m_display, m_glx_context));
-       
+
         VERBOSE(VB_PLAYBACK, LOC + QString("GLX Version: %1.%2")
                 .arg(major).arg(minor));
         VERBOSE(VB_PLAYBACK, LOC + QString("Direct rendering: %1")
@@ -1216,12 +1213,10 @@ bool OpenGLContextGLX::Create(
     m_ext_supported = ((minor >= 3) ? kGLXPBuffer : 0) |
         (has_glx_swapinterval_support(glx_ext) ? kGLGLXSwap : 0);
 
-    m_window_rect = display_visible;
-
     if (map_window)
         Show();
 
-    return CreateCommon(colour_control);
+    return CreateCommon(colour_control, display_visible);
 }
 
 bool OpenGLContextGLX::MakeContextCurrent(bool current)
@@ -1331,45 +1326,7 @@ bool OpenGLContextGLX::IsGLXSupported(
 
 int OpenGLContextGLX::GetRefreshRate(void)
 {
-    if (!m_display)
-        return -1;
-
-    XF86VidModeModeLine mode_line;
-    int dot_clock;
-
-    int ret = False;
-    X11S(ret = XF86VidModeGetModeLine(m_display, m_screen_num,
-                                      &dot_clock, &mode_line));
-    if (!ret)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetRefreshRate(): "
-                "X11 ModeLine query failed");
-        return -1;
-    }
-
-    double rate = mode_line.htotal * mode_line.vtotal;
-
-    // Catch bad data from video drivers (divide by zero causes return of NaN)
-    if (rate == 0.0 || dot_clock == 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetRefreshRate(): "
-                "X11 ModeLine query returned zeroes");
-        return -1;
-    }
-
-    rate = (dot_clock * 1000.0) / rate;
-
-    // Assume 60Hz if rate isn't good:
-    if (rate < 20 || rate > 200)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + QString("Unreasonable refresh rate %1Hz "
-                                           "reported by X").arg(rate));
-        rate = 60;
-    }
-
-    rate = 1000000.0 / rate;
-
-    return (int)rate;
+    return MythXGetRefreshRate(m_display, m_screen_num);
 }
 
 void OpenGLContextGLX::SetSwapInterval(int interval)
@@ -1403,6 +1360,22 @@ void OpenGLContextGLX::MoveResizeWindow(QRect rect)
                            rect.left(), rect.top(),
                            rect.width(), rect.height()));
     m_window_rect = rect;
+}
+
+bool OpenGLContextGLX::OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
+{
+    bool ret = (GetNumberOfXineramaScreens() > 1);
+    if (ret)
+    {
+        float displayAspect = gContext->GetFloatSettingOnHost(
+            "XineramaMonitorAspectRatio",
+            gContext->GetHostName(), pixel_aspect);
+        if (disp_dim.height() <= 0)
+            disp_dim.setHeight(300);
+        disp_dim.setWidth((int)((float)disp_dim.height() * displayAspect));
+    }
+
+    return ret;
 }
 #endif // USING_X11
 
@@ -1470,8 +1443,7 @@ bool OpenGLContextWGL::Create(WId window, const QRect &display_visible,
 
     VERBOSE(VB_PLAYBACK, LOC + "Created window and WGL context");
 
-    m_window_rect = display_visible;
-    return CreateCommon(colour_control);
+    return CreateCommon(colour_control, display_visible);
 }
 
 bool OpenGLContextWGL::MakeContextCurrent(bool current)
@@ -1649,8 +1621,8 @@ bool OpenGLContextAGL::Create(WId window, const QRect &display_visible,
 
     m_extensions = kGLAGLSwap;
     VERBOSE(VB_PLAYBACK, LOC + QString("Created window and AGL context."));
-    m_window_rect = display_visible;
-    return CreateCommon(colour_control);
+
+    return CreateCommon(colour_control, display_visible);
 }
 
 bool OpenGLContextAGL::MakeContextCurrent(bool current)
@@ -1763,7 +1735,7 @@ void OpenGLContextAGL::MoveResizeWindow(QRect rect)
     m_window_rect = rect;
 }
 
-void OpenGLContextAGL::EmbedInWidget(WId window, int x, int y, int w, int h)
+void OpenGLContextAGL::EmbedInWidget(int x, int y, int w, int h)
 {
     if (m_context)
         aglSetDrawable(m_context, NULL);

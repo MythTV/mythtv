@@ -22,7 +22,6 @@ extern "C" {
 class NuppelVideoPlayer;
 class ChromaKeyOSD;
 
-class OpenGLVideo;
 class GLContextCreator;
 class OpenGLContextGLX;
 
@@ -48,7 +47,7 @@ class XvMCOSD;
 
 typedef enum VideoOutputSubType
 {
-    XVUnknown = 0, Xlib, XShm, OpenGL, XVideo, XVideoVDPAU, 
+    XVUnknown = 0, Xlib, XShm, XVideo, XVideoVDPAU, 
     XVideoMC, XVideoIDCT, XVideoVLD, 
 } VOSType;
 
@@ -109,10 +108,8 @@ class VideoOutputXv : public VideoOutput
         { return XVideoVLD == VideoOutputSubType(); }
     virtual bool hasXVAcceleration(void) const
         { return XVideo == VideoOutputSubType(); }
-    virtual bool hasOpenGLAcceleration(void) const
-        { return OpenGL == VideoOutputSubType(); }
     virtual bool hasHWAcceleration(void) const
-        { return OpenGL <= VideoOutputSubType(); }
+        { return XVideo <= VideoOutputSubType(); }
     virtual bool hasVDPAUAcceleration(void) const
         { return XVideoVDPAU == VideoOutputSubType(); }
 
@@ -122,8 +119,6 @@ class VideoOutputXv : public VideoOutput
                              NuppelVideoPlayer *pipplayer = NULL,
                              bool               do_pixel_adj = true) const;
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
-
-    virtual void ShutdownVideoResize(void);
 
     // OpenGL
     OpenGLContextGLX *GetGLContext(void) { return gl_context; }
@@ -157,8 +152,6 @@ class VideoOutputXv : public VideoOutput
     void SetNextFrameDisplayTimeOffset(int delayus);
 
   private:
-    virtual QRect GetVisibleOSDBounds(float&, float&, float) const;
-    virtual QRect GetTotalOSDBounds(void) const;
     virtual bool hasFullScreenOSD(void) const;
     QRect GetTotalVisibleRect(void) const;
 
@@ -170,9 +163,6 @@ class VideoOutputXv : public VideoOutput
     void ProcessFrameVDPAU(VideoFrame *frame, OSD *osd,
                            const PIPMap &pipPlayers);
     void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
-    void ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
-                            FilterChain *filterList,
-                            const PIPMap &pipPlayers);
     void ProcessFrameMem(VideoFrame *frame, OSD *osd,
                          FilterChain *filterList,
                          const PIPMap &pipPlayers);
@@ -180,7 +170,6 @@ class VideoOutputXv : public VideoOutput
     void PrepareFrameVDPAU(VideoFrame *, FrameScanType);
     void PrepareFrameXvMC(VideoFrame *, FrameScanType);
     void PrepareFrameXv(VideoFrame *);
-    void PrepareFrameOpenGL(VideoFrame *, FrameScanType);
     void PrepareFrameMem(VideoFrame *, FrameScanType);
 
     void ShowVDPAU(FrameScanType scan);
@@ -199,12 +188,10 @@ class VideoOutputXv : public VideoOutput
     void InitColorKey(bool turnoffautopaint);
 
     bool InitVideoBuffers(MythCodecID, bool use_xv,
-                          bool use_shm, bool use_opengl,
-                          bool use_vdpau);
+                          bool use_shm, bool use_vdpau);
 
     bool InitXvMC(MythCodecID);
     bool InitXVideo(void);
-    bool InitOpenGL(void);
     bool InitXShm(void);
     bool InitXlib(void);
     bool InitVDPAU(MythCodecID);
@@ -317,13 +304,6 @@ class VideoOutputXv : public VideoOutput
     GLContextCreator    *gl_context_creator;
     QWaitCondition       gl_context_wait;
     OpenGLContextGLX    *gl_context;
-    OpenGLVideo         *gl_videochain;
-    QMap<NuppelVideoPlayer*,OpenGLVideo*> gl_pipchains;
-    QMap<NuppelVideoPlayer*,bool>         gl_pip_ready;
-    OpenGLVideo         *gl_pipchain_active;
-    OpenGLVideo         *gl_osdchain;
-    bool                 gl_use_osd_opengl2;
-    bool                 gl_osd_ready;
 
     // Chromakey OSD info
     ChromaKeyOSD        *chroma_osd;

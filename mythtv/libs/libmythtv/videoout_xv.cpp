@@ -59,7 +59,7 @@ using namespace std;
 
 // MythTV OpenGL headers
 #include "openglcontext.h"
-#include "openglvideo.h"
+
 #include "mythuihelper.h"
 
 #define LOC      QString("VideoOutputXv: ")
@@ -93,18 +93,17 @@ static QStringList allowed_video_renderers(
     MythCodecID codec_id, Display *display, int screen, Window curwin);
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
-                       bool &useXV, bool &useShm, bool &useOpenGL,
-                       bool &useVDPAU);
+                       bool &useXV, bool &useShm, bool &useVDPAU);
 static void SetFromHW(Display *d, int screen, Window curwin,
                       bool &useXvMC, bool &useXV,
                       bool &useShm, bool &useXvMCOpenGL,
-                      bool &useOpenGL, bool &useVDPAU,
+                      bool &useVDPAU,
                       MythCodecID myth_codec_id);
 static int calc_hue_base(const QString &adaptor_name);
 
 const char *vr_str[] =
 {
-    "unknown", "xlib", "xshm", "opengl", "xv-blit", "vdpau", "xvmc", "xvmc",
+    "unknown", "xlib", "xshm", "xv-blit", "vdpau", "xvmc", "xvmc",
     "xvmc",
 };
 
@@ -173,12 +172,6 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 
       gl_context_lock(QMutex::Recursive),
       gl_context_creator(NULL), gl_context(NULL),
-      gl_videochain(NULL), gl_pipchain_active(NULL),
-      gl_osdchain(NULL),
-
-      gl_use_osd_opengl2(false),
-      gl_osd_ready(false),
-
 
       chroma_osd(NULL)
 {
@@ -290,13 +283,6 @@ void VideoOutputXv::MoveResize(void)
         chroma_osd->Reset();
         windows[0].SetNeedRepaint(true);
     }
-
-    if (gl_videochain && gl_context)
-    {
-        OpenGLContextLocker ctx_lock(gl_context);
-        gl_videochain->SetVideoRect(windows[0].GetDisplayVideoRect(),
-                                    windows[0].GetVideoRect());
-    }
 }
 
 void VideoOutputXv::WindowResized(const QSize &new_size)
@@ -331,8 +317,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     bool cid_changed = (myth_codec_id != av_codec_id);
     bool res_changed = input_size     != windows[0].GetVideoDispDim();
     bool asp_changed = aspect         != windows[0].GetVideoAspect();
-    bool gpu_deint   = (VideoOutputSubType() == OpenGL ||
-                        VideoOutputSubType() == XVideoVDPAU);
+    bool gpu_deint   = (VideoOutputSubType() == XVideoVDPAU);
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
@@ -345,7 +330,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
         return true;
     }
 
-    bool delete_pause_frame = cid_changed || (OpenGL == VideoOutputSubType());
+    bool delete_pause_frame = cid_changed;
     DeleteBuffers(VideoOutputSubType(), delete_pause_frame);
 
     const QSize video_disp_dim = windows[0].GetVideoDispDim();
@@ -353,8 +338,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
                    (uint) video_disp_dim.height());
 
     bool ok = true;
-    if (cid_changed ||
-        XVideoVDPAU == VideoOutputSubType() || OpenGL == VideoOutputSubType())
+    if (cid_changed || XVideoVDPAU == VideoOutputSubType())
     {
         myth_codec_id = av_codec_id;
 
@@ -386,39 +370,11 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     }
     else
     {
-        if ((VideoOutputSubType() == OpenGL ||
-             VideoOutputSubType() == XVideoVDPAU) ||
-             gpu_deint)
-        {
+        if (VideoOutputSubType() == XVideoVDPAU || gpu_deint)
             BestDeint();
-        }
     }
 
     return ok;
-}
-
-// documented in videooutbase.cpp
-QRect VideoOutputXv::GetVisibleOSDBounds(
-    float &visible_aspect, float &font_scaling, float themeaspect) const
-{
-    QRect dvr = GetTotalVisibleRect();
-
-    // This rounding works for I420 video...
-    QSize dvr2 = QSize(dvr.width()  & ~0x3,
-                       dvr.height() & ~0x1);
-
-    if (!hasFullScreenOSD())
-    {
-        return VideoOutput::GetVisibleOSDBounds(
-            visible_aspect, font_scaling, themeaspect);
-    }
-
-    float dispPixelAdj = 1.0f;
-    if (dvr2.height() && dvr2.width())
-        dispPixelAdj = (GetDisplayAspect() * dvr2.height()) / dvr2.width();
-    visible_aspect = themeaspect / dispPixelAdj;
-    font_scaling   = 1.0f;
-    return QRect(QPoint(0,0), dvr2);
 }
 
 /**
@@ -429,18 +385,6 @@ QRect VideoOutputXv::GetTotalVisibleRect(void) const
     const QRect tvr = windows[0].GetDisplayVisibleRect();
     QString osdrenderer = db_vdisp_profile->GetOSDRenderer();
     return tvr;
-}
-
-// documented in videooutbase.cpp
-QRect VideoOutputXv::GetTotalOSDBounds(void) const
-{
-    QRect dvr = GetTotalVisibleRect();
-
-    QSize dvr2 = QSize(dvr.width()  & ~0x3,
-                       dvr.height() & ~0x1);
-
-    QSize sz = hasFullScreenOSD() ? dvr2 : windows[0].GetVideoDispDim();
-    return QRect(QPoint(0,0), sz);
 }
 
 /**
@@ -460,42 +404,7 @@ int VideoOutputXv::GetRefreshRate(void)
     if (!XJ_started)
         return -1;
 
-    XF86VidModeModeLine mode_line;
-    int dot_clock;
-
-    int ret = False;
-    X11S(ret = XF86VidModeGetModeLine(XJ_disp, XJ_screen_num,
-                                      &dot_clock, &mode_line));
-    if (!ret)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetRefreshRate(): "
-                "X11 ModeLine query failed");
-        return -1;
-    }
-
-    double rate = mode_line.htotal * mode_line.vtotal;
-
-    // Catch bad data from video drivers (divide by zero causes return of NaN)
-    if (rate == 0.0 || dot_clock == 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetRefreshRate(): "
-                "X11 ModeLine query returned zeroes");
-        return -1;
-    }
-
-    rate = (dot_clock * 1000.0) / rate;
-
-    // Assume 60Hz if rate isn't good:
-    if (rate < 20 || rate > 200)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + QString("Unreasonable refresh rate %1Hz "
-                                           "reported by X").arg(rate));
-        rate = 60;
-    }
-
-    rate = 1000000.0 / rate;
-
-    return (int)rate;
+    return MythXGetRefreshRate(XJ_disp, XJ_screen_num);
 }
 
 void VideoOutputXv::ResizeForVideo(void) 
@@ -605,11 +514,10 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     GetMythUI()->GetScreenBounds(xbase, ybase, w, h);
 
     // Determine window dimensions in pixels
-    int window_w = w, window_h = h;
+    int window_w = windows[0].GetDisplayVisibleRect().size().width();
+    int window_h = windows[0].GetDisplayVisibleRect().size().height();
     if (gContext->GetNumSetting("GuiSizeForTV", 0))
         gContext->GetResolutionSetting("Gui", window_w,  window_h);
-    else
-        GetMythUI()->GetScreenBounds(xbase, ybase, window_w, window_h);
     window_w = (window_w) ? window_w : w;
     window_h = (window_h) ? window_h : h;
     float pixel_aspect = ((float)w) / ((float)h);
@@ -960,7 +868,7 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
 void VideoOutputXv::CreatePauseFrame(VOSType subtype)
 {
     // All methods but XvMC use a pause frame, create it if needed
-    if ((subtype <= XVideo) || (subtype == OpenGL))
+    if ((subtype <= XVideo))
     {
         vbuffers.LockFrame(&av_pause_frame, "CreatePauseFrame");
 
@@ -997,7 +905,7 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
  */
 bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
                                      bool use_xv, bool use_shm,
-                                     bool use_opengl, bool use_vdpau)
+                                     bool use_vdpau)
 {
     (void)mcodecid;
 
@@ -1053,9 +961,6 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     // Create ffmpeg VideoFrames
     if (!done)
         vbuffers.Init(31, true, 1, 12, 4, 2, false);
-
-    if (!done && use_opengl)
-        done = InitOpenGL();
 
     // Fall back to XVideo if there is an xv_port
     if (!done && use_xv)
@@ -1136,106 +1041,6 @@ void VideoOutputXv::GLContextCreatedWait(void)
                 QString("GLContextCreatedWait: Waited %1 ms")
                 .arg(t.elapsed()));
     }
-}
-
-bool VideoOutputXv::InitOpenGL(void)
-{
-    bool ok = false;
-
-#ifdef USING_OPENGL_VIDEO
-    ok = gl_context;
-
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    if (!ok)
-        GLContextCreatedWait();
-
-    if (gl_context)
-    {
-        gl_context->MapWindow(); // make GL window visible
-
-        if (windows[0].GetPIPState() >= kPIPStandAlone)
-        {
-            QRect tmprect = QRect(QPoint(0,0), display_visible_rect.size());
-            ResizeDisplayWindow(tmprect, true);
-        }
-        OpenGLContextLocker ctx_lock(gl_context);
-        gl_context->Show();
-        gl_videochain = new OpenGLVideo();
-        ok = gl_videochain->Init(gl_context, db_use_picture_controls,
-                                 windows[0].GetVideoDim(),
-                                 GetTotalVisibleRect(),
-                                 windows[0].GetDisplayVisibleRect(),
-                                 windows[0].GetVideoRect(), true, GetFilters(),
-                                 false, db_letterbox_colour);
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to allocate opengl context.");
-    }
-
-    if (ok)
-    {
-        OpenGLContextLocker ctx_lock(gl_context);
-        InstallXErrorHandler(XJ_disp);
-
-        ok = CreateBuffers(OpenGL);
-
-        vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
-        if (!ok || errs.size())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to allocate video buffers.");
-
-            PrintXErrors(XJ_disp, errs);
-            DeleteBuffers(OpenGL, false);
-            ok = false;
-        }
-        else
-        {
-            video_output_subtype = OpenGL;
-
-            // ensure deinterlacing is re-enabled after input change
-            bool temp_deinterlacing = m_deinterlacing;
-
-            if (!m_deintfiltername.isEmpty() &&
-                !m_deintfiltername.contains("opengl"))
-            {
-                gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);
-            }
-
-            SetDeinterlacingEnabled(true);
-
-            if (!temp_deinterlacing)
-            {
-                SetDeinterlacingEnabled(false);
-            }
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to initialize GL video renderer.");
-    }
-
-    if (!ok)
-    {
-        QMutexLocker locker(&gl_context_lock);
-        if (gl_videochain)
-        {
-            delete gl_videochain;
-            gl_videochain = NULL;
-        }
-
-        if (gl_context)
-        {
-            delete gl_context;
-            gl_context = NULL;
-        }
-    }
-#endif // USING_OPENGL_VIDEO
-
-    return ok;
 }
 
 /**
@@ -1571,7 +1376,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
-    bool use_xv = true, use_shm = true, use_opengl = true;
+    bool use_xv = true, use_shm = true;
     bool use_vdpau = false;
 
     if (dec == "xvmc")
@@ -1582,7 +1387,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
         use_vdpau = true;
 
     SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv,
-               use_shm, use_opengl, use_vdpau);
+               use_shm, use_vdpau);
 
     // Disable features based on hardware capabilities.
     bool use_xvmc_opengl = use_xvmc;
@@ -1592,7 +1397,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     Window root = DefaultRootWindow(disp);
     X11U;
     SetFromHW(disp, screen, root, use_xvmc, use_xv, use_shm,
-              use_xvmc_opengl, use_opengl, use_vdpau,
+              use_xvmc_opengl, use_vdpau,
               (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1)));
 
     MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
@@ -1699,31 +1504,6 @@ bool VideoOutputXv::InitOSD(const QString &osd_renderer)
         }
 
         return xvmc_tex;
-    }
-
-    if (osd_renderer == "opengl2" && gl_context)
-    {
-        OpenGLContextLocker ctx_lock(gl_context);
-        gl_use_osd_opengl2 = true;
-
-        gl_osdchain = new OpenGLVideo();
-        if (!gl_osdchain->Init(
-                gl_context, db_use_picture_controls,
-                GetTotalOSDBounds().size(),
-                GetTotalOSDBounds(), GetTotalVisibleRect(), 
-                QRect(QPoint(0, 0), GetTotalOSDBounds().size()),
-                false, GetFilters(), true))
-        {
-            VERBOSE(VB_PLAYBACK, LOC_ERR + 
-                    "InitOSD(): Failed to create OpenGL2 OSD");
-            delete gl_osdchain;
-            gl_osdchain = NULL;
-            gl_use_osd_opengl2 = false;
-        }
-        else if (gl_videochain)
-        {
-            gl_osdchain->SetMasterViewport(gl_videochain->GetViewPort());
-        }
     }
 
     if (osd_renderer == "chromakey")
@@ -1834,11 +1614,6 @@ bool VideoOutputXv::InitSetupBuffers(void)
         {
             swap(renderers[0], renderers[renderers.indexOf("xv-blit")]);
         }
-        else if ((db_vdisp_profile->GetVideoRenderer() == "xvmc-opengl") &&
-                 (renderers.indexOf("opengl") > 0))
-        {
-            swap(renderers[0], renderers[renderers.indexOf("opengl")]);
-        }
         // HACK HACK HACK -- end
 
         QString tmp;
@@ -1859,18 +1634,17 @@ bool VideoOutputXv::InitSetupBuffers(void)
     // Create video buffers
     bool use_xv     = (renderer.left(2) == "xv");
     bool use_shm    = (renderer == "xshm");
-    bool use_opengl = (renderer == "opengl");
     bool use_vdpau  = (renderer == "vdpau");
     bool ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm,
-                               use_opengl, use_vdpau);
+                               use_vdpau);
+
     if (!ok && windows[0].GetPIPState() == kPIPOff)
     {
         use_xv     |= (bool) renderers.contains("xv-blit");
         use_shm    |= (bool) renderers.contains("xshm");
-        use_opengl |= (bool) renderers.contains("opengl");
         use_vdpau  |= (bool) renderers.contains("vdpau");
         ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm,
-                              use_opengl, use_vdpau);
+                              use_vdpau);
     }
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
 
@@ -1887,7 +1661,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     if (!CheckOSDInit())
     {
         ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm,
-                              use_opengl, use_vdpau);
+                              use_vdpau);
         XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
     }
 
@@ -1965,7 +1739,7 @@ bool VideoOutputXv::Init(
                       winid, winx, winy, winw, winh,
                       embedid);
 
-#if defined(USING_OPENGL_VIDEO) || defined(USING_OPENGL_VSYNC)
+#if defined(USING_OPENGL_VSYNC)
     gl_context_creator = new GLContextCreator(
         this, windows[0].GetDisplayVisibleRect(), false);
     // HACK -- begin, see #6036
@@ -2079,9 +1853,6 @@ bool VideoOutputXv::SetDeinterlacingEnabled(bool enable)
     if (VideoOutputSubType() == XVideoVDPAU)
         return SetDeinterlacingEnabledVDPAU(enable);
 
-    if (VideoOutputSubType() == OpenGL)
-        return SetDeinterlacingEnabledOpenGL(enable);
-
     bool deint = VideoOutput::SetDeinterlacingEnabled(enable);
     xv_need_bobdeint_repaint = (m_deintfiltername == "bobdeint");
     return deint;
@@ -2092,9 +1863,6 @@ bool VideoOutputXv::SetupDeinterlace(bool interlaced,
 {
     if (VideoOutputSubType() == XVideoVDPAU)
         return SetupDeinterlaceVDPAU(interlaced, overridefilter);
-
-    if (VideoOutputSubType() == OpenGL)
-        return SetupDeinterlaceOpenGL(interlaced, overridefilter);
 
     bool deint = VideoOutput::SetupDeinterlace(interlaced, overridefilter);
     windows[0].SetNeedRepaint(true);
@@ -2147,116 +1915,6 @@ bool VideoOutputXv::SetupDeinterlaceVDPAU(
     return m_deinterlacing;
 }
 
-bool VideoOutputXv::SetDeinterlacingEnabledOpenGL(bool enable)
-{
-    (void) enable;
-
-    if (!gl_videochain || !gl_context)
-        return false;
-
-    if (enable && m_deinterlacing && (OpenGL != VideoOutputSubType()))
-        return m_deinterlacing;
-
-    OpenGLContextLocker ctx_lock(gl_context);
-
-    if (enable)
-    {
-        if (m_deintfiltername == "")
-            return SetupDeinterlace(enable);
-        if (m_deintfiltername.contains("opengl"))
-        {
-            if (gl_videochain->GetDeinterlacer() == "")
-                return SetupDeinterlace(enable);
-        }
-        else if (!m_deintfiltername.contains("opengl"))
-        {
-            // make sure opengl deinterlacing is disabled
-            gl_videochain->SetDeinterlacing(false);
-
-            if (!m_deintFiltMan || !m_deintFilter)
-                return VideoOutput::SetupDeinterlace(enable);
-        }
-    }
-
-    if (gl_videochain)
-        gl_videochain->SetDeinterlacing(enable);
-
-    m_deinterlacing = enable;
-
-    return m_deinterlacing;
-}
-
-bool VideoOutputXv::SetupDeinterlaceOpenGL(
-    bool interlaced, const QString &overridefilter)
-{
-    (void) interlaced;
-    (void) overridefilter;
-
-    if (!gl_videochain || !gl_context)
-        return false;
-
-    OpenGLContextLocker ctx_lock(gl_context);
-
-    m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
-
-    if (!m_deintfiltername.contains("opengl"))
-    {
-        gl_videochain->SetDeinterlacing(false);
-
-        gl_videochain->SetSoftwareDeinterlacer(QString::null);
-
-        VideoOutput::SetupDeinterlace(interlaced, overridefilter);
-        if (m_deinterlacing)
-            gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);
-
-        return m_deinterlacing;
-    }
-
-    // clear any non opengl filters
-    if (m_deintFiltMan)
-    {
-        delete m_deintFiltMan;
-        m_deintFiltMan = NULL;
-    }
-    if (m_deintFilter)
-    {
-        delete m_deintFilter;
-        m_deintFilter = NULL;
-    }
-
-    if (m_deinterlacing == interlaced && (OpenGL != VideoOutputSubType()))
-        return m_deinterlacing;
-    m_deinterlacing = interlaced;
-
-    if (!gl_videochain)
-        return false;
-
-    if (m_deinterlacing && !m_deintfiltername.isEmpty()) 
-    {
-        if (gl_videochain->GetDeinterlacer() != m_deintfiltername)
-        {
-            if (!gl_videochain->AddDeinterlacer(m_deintfiltername))
-            {
-                VERBOSE(VB_IMPORTANT, LOC +
-                        QString("Couldn't load deinterlace filter %1")
-                        .arg(m_deintfiltername));
-                m_deinterlacing = false;
-                m_deintfiltername = "";
-            }
-            else
-            {
-                VERBOSE(VB_PLAYBACK, LOC +
-                        QString("Using deinterlace method %1")
-                   .arg(m_deintfiltername));
-            }
-        }
-    }
-
-    gl_videochain->SetDeinterlacing(m_deinterlacing);
-
-    return m_deinterlacing;
-}
-
 /**
  * \fn VideoOutput::ApproveDeintFilter(const QString&) const
  * Approves bobdeint filter for XVideo and XvMC surfaces,
@@ -2274,10 +1932,7 @@ bool VideoOutputXv::ApproveDeintFilter(const QString &filtername) const
     if (XVideoVDPAU == vos)
         return filtername.contains("vdpau");
 
-    if ((OpenGL == vos) && filtername.contains("opengl"))
-        return true;
-
-    if (filtername == "bobdeint" && (vos >= OpenGL) && (XVideoVDPAU != vos))
+    if (filtername == "bobdeint" && (vos >= XVideo) && (vos != XVideoVDPAU))
         return true;
 
     return VideoOutput::ApproveDeintFilter(filtername);
@@ -2724,11 +2379,6 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         else
             ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
     }
-    else if (subtype == OpenGL)
-    {
-        QSize size = gl_videochain->GetVideoSize();
-        ok = vbuffers.CreateBuffers(size.width(), size.height());
-    }
 
     if (ok)
         CreatePauseFrame(subtype);
@@ -2793,33 +2443,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 
     // OpenGL stuff
     if (gl_context)
-        gl_context->MakeCurrent(true);
-
-    if (gl_videochain)
-    {
-        delete gl_videochain;
-        gl_videochain = NULL;
-    }
-    while (!gl_pipchains.empty())
-    {
-        delete *gl_pipchains.begin();
-        gl_pipchains.erase(gl_pipchains.begin());
-    }
-    if (gl_osdchain)
-    {
-        delete gl_osdchain;
-        gl_osdchain = NULL;
-    }
-
-    if (gl_context)
-    {
         gl_context->Hide();
-        gl_context->MakeCurrent(false);
-    }
-
-    gl_use_osd_opengl2 = false;
-    gl_pip_ready.clear();
-    gl_osd_ready = false;
 
     // end OpenGL stuff
 
@@ -3202,47 +2826,6 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
         vbuffers.SetLastShownFrameToScratch();
 }
 
-void VideoOutputXv::PrepareFrameOpenGL(VideoFrame *buffer, FrameScanType t)
-{
-    (void) t;
-
-    if (!gl_videochain || !gl_context)
-        return;
-
-    OpenGLContextLocker ctx_lock(gl_context);
-
-    if (!buffer)
-        buffer = vbuffers.GetScratchFrame();
-
-    framesPlayed = buffer->frameNumber + 1;
-
-    // TODO should cope with YUV422P, rgb24, argb32 etc
-    if (buffer->codec != FMT_YV12)
-        return;
-
-    gl_videochain->SetVideoRect(windows[0].GetDisplayVideoRect(),
-                                windows[0].GetVideoRect());
-    gl_videochain->PrepareFrame(t, m_deinterlacing, framesPlayed, false);
-
-    QMap<NuppelVideoPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
-    for (; it != gl_pipchains.end(); ++it)
-    {
-        if (gl_pip_ready[it.key()])
-        {
-            bool active = gl_pipchain_active == *it;
-            (*it)->PrepareFrame(t, m_deinterlacing, framesPlayed, active);
-        }
-    }
-
-    if (gl_osd_ready && gl_osdchain)
-        gl_osdchain->PrepareFrame(t, m_deinterlacing, framesPlayed, false);
-
-    gl_context->Flush(false);
-
-    if (vbuffers.GetScratchFrame() == buffer)
-        vbuffers.SetLastShownFrameToScratch();
-}
-
 /**
  * \fn VideoOutputXv::PrepareFrameMem(VideoFrame*, FrameScanType)
  *
@@ -3385,8 +2968,6 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan)
         PrepareFrameXvMC(buffer, scan);
     else if (VideoOutputSubType() == XVideo)
         PrepareFrameXv(buffer);
-    else if (VideoOutputSubType() == OpenGL)
-        PrepareFrameOpenGL(buffer, scan);
     else
         PrepareFrameMem(buffer, scan);
 }
@@ -3665,8 +3246,6 @@ void VideoOutputXv::Show(FrameScanType scan)
         ShowXvMC(scan);
     else if (VideoOutputSubType() == XVideo)
         ShowXVideo(scan);
-    else if (VideoOutputSubType() == OpenGL && gl_context)
-        gl_context->SwapBuffers();
 
     X11S(XSync(XJ_disp, False));
 }
@@ -3681,8 +3260,7 @@ void VideoOutputXv::ShowPIP(VideoFrame        *frame,
         return;
     }
 
-    if (VideoOutputSubType() != OpenGL &&
-        VideoOutputSubType() != XVideoVDPAU)
+    if (VideoOutputSubType() != XVideoVDPAU)
     {
         VideoOutput::ShowPIP(frame, pipplayer, loc);
         return;
@@ -3699,8 +3277,6 @@ void VideoOutputXv::ShowPIP(VideoFrame        *frame,
     const bool  pipVisible     = pipplayer->IsPIPVisible();
     const float pipVideoAspect = pipplayer->GetVideoAspect();
     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
-    const uint  pipVideoWidth  = pipVideoDim.width();
-    const uint  pipVideoHeight = pipVideoDim.height();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
     if ((pipVideoAspect <= 0) || !pipimage || 
@@ -3726,91 +3302,21 @@ void VideoOutputXv::ShowPIP(VideoFrame        *frame,
             vdpau_use_pip = vdpau->ShowPIP(pipplayer, pipimage,
                                            position, pipActive);
         pipplayer->ReleaseCurrentFrame(pipimage);
-        return;
     }
 #endif // USING_VDPAU
-
-    gl_pip_ready[pipplayer] = false;
-    OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
-    if (!gl_pipchain)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + "Initialise PiP.");
-        gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
-        bool success = gl_pipchain->Init(gl_context, db_use_picture_controls,
-                     QSize(pipVideoWidth, pipVideoHeight),
-                     dvr, position,
-                     QRect(0, 0, pipVideoWidth, pipVideoHeight),
-                     false, GetFilters());
-        gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
-        if (!success)
-        {
-            pipplayer->ReleaseCurrentFrame(pipimage);
-            return;
-        }
-    }
-
-    QSize current = gl_pipchain->GetVideoSize();
-    if ((uint)current.width()  != pipVideoWidth ||
-        (uint)current.height() != pipVideoHeight)
-    {
-        VERBOSE(VB_PLAYBACK, LOC + "Re-initialise PiP.");
-        delete gl_pipchain;
-        gl_pipchains[pipplayer] = gl_pipchain = new OpenGLVideo();
-        bool success = gl_pipchain->Init(
-            gl_context, db_use_picture_controls,
-            QSize(pipVideoWidth, pipVideoHeight),
-            dvr, position,
-            QRect(0, 0, pipVideoWidth, pipVideoHeight),
-            false, GetFilters());
-
-        gl_pipchain->SetMasterViewport(gl_videochain->GetViewPort());
-        if (!success)
-        {
-            pipplayer->ReleaseCurrentFrame(pipimage);
-            return;
-        }
-
-    }
-    gl_pipchain->SetVideoRect(position,
-                              QRect(0, 0, pipVideoWidth, pipVideoHeight));
-    gl_pipchain->UpdateInputFrame(pipimage);
-
-    gl_pip_ready[pipplayer] = true;
-
-    if (pipActive)
-        gl_pipchain_active = gl_pipchain;
-
-    pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
 void VideoOutputXv::RemovePIP(NuppelVideoPlayer *pipplayer)
 {
-    if (VideoOutputSubType() == OpenGL)
-    {
-        if (!gl_pipchains.contains(pipplayer))
-            return;
-
-        OpenGLContextLocker ctx_lock(gl_context);
-
-        OpenGLVideo *gl_pipchain = gl_pipchains[pipplayer];
-        if (gl_pipchain)
-            delete gl_pipchain;
-        gl_pip_ready.remove(pipplayer);
-        gl_pipchains.remove(pipplayer);
-    }
+    (void)pipplayer;
 #ifdef USING_VDPAU
-    else if (vdpau && VideoOutputSubType() == XVideoVDPAU)
-    {
+    if (vdpau && VideoOutputSubType() == XVideoVDPAU)
         vdpau->DeinitPIP(pipplayer);
-    }
 #endif // USING_VDPAU
 }
 
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
-    if (VideoOutputSubType() == OpenGL)
-        return;
-
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
     bool use_bob   = (m_deinterlacing && m_deintfiltername == "bobdeint");
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
@@ -4062,8 +3568,7 @@ void VideoOutputXv::UpdatePauseFrame(void)
 
     VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame() " + vbuffers.GetStatus());
 
-    if ((VideoOutputSubType() <= XVideo) ||
-        (VideoOutputSubType() == OpenGL) || xvmc_tex)
+    if ((VideoOutputSubType() <= XVideo) || xvmc_tex)
     {
         // Try used frame first, then fall back to scratch frame.
         vbuffers.LockFrame(&av_pause_frame, "UpdatePauseFrame -- pause");
@@ -4369,51 +3874,6 @@ void VideoOutputXv::ReturnAvailableOSD(XvMCOSD *avail)
 }
 #endif // USING_XVMC
 
-void VideoOutputXv::ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
-                                       FilterChain *filterList,
-                                       const PIPMap &pipPlayers)
-{
-    (void) osd;
-    (void) filterList;
-    (void) pipPlayers;
-
-    if (!gl_videochain || !gl_context)
-        return;
-
-    OpenGLContextLocker ctx_lock(gl_context);
-
-    bool pauseframe = false;
-    if (!frame)
-    {
-        frame = vbuffers.GetScratchFrame();
-        CopyFrame(vbuffers.GetScratchFrame(), &av_pause_frame);
-        pauseframe = true;
-    }
-
-    if (filterList)
-        filterList->ProcessFrame(frame);
-
-    bool safepauseframe = pauseframe && !IsBobDeint();
-    if (m_deinterlacing && m_deintFilter != NULL &&
-        m_deinterlaceBeforeOSD && (!pauseframe || safepauseframe))
-    {
-        m_deintFilter->ProcessFrame(frame);
-    }
-    
-    if (!windows[0].IsEmbedding())
-    {
-        gl_pipchain_active = NULL;
-        ShowPIPs(frame, pipPlayers);
-        if (osd)
-            DisplayOSD(frame, osd);
-    }
-
-    bool soft_bob = m_deinterlacing && (m_deintfiltername == "bobdeint");
-
-    if (gl_videochain)
-        gl_videochain->UpdateInputFrame(frame, soft_bob);
-}
-
 void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
                                     FilterChain *filterList,
                                     const PIPMap &pipPlayers)
@@ -4480,8 +3940,6 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     if (VideoOutputSubType() == XVideoVDPAU)
         ProcessFrameVDPAU(frame, osd, pipPlayers);
-    else if (VideoOutputSubType() == OpenGL)
-        ProcessFrameOpenGL(frame, osd, filterList, pipPlayers);
     else if (VideoOutputSubType() <= XVideo)
         ProcessFrameMem(frame, osd, filterList, pipPlayers);
     else
@@ -4507,15 +3965,6 @@ int VideoOutputXv::SetPictureAttribute(
             return newValue;
         }
 #endif // USING_VDPAU
-    }
-
-    if (VideoOutputSubType() == OpenGL && gl_context)
-    {
-        newValue = min(max(newValue, 0), 100);
-        newValue = gl_context->SetPictureAttribute(attribute, newValue);
-        if (newValue >= 0)
-            SetPictureAttributeDBValue(attribute, newValue);
-        return newValue;
     }
 
     QString attrName = toXVString(attribute);
@@ -4580,10 +4029,6 @@ void VideoOutputXv::InitPictureAttributes(void)
         if (vdpau)
             supported_attributes = vdpau->GetSupportedPictureAttributes();
 #endif //USING_VDPAU
-    }
-    else if (VideoOutputSubType() == OpenGL && gl_context)
-    {
-        supported_attributes = gl_context->GetSupportedPictureAttributes();
     }
     else if (VideoOutputSubType() >= XVideo)
     {
@@ -4847,7 +4292,7 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
 {
     (void)do_pixel_adj;
 
-    if (!pipplayer || OpenGL == VideoOutputSubType() ||
+    if (!pipplayer || XVideoVDPAU == VideoOutputSubType() ||
         XVideoVDPAU == VideoOutputSubType() ||
         !pipplayer->UsingNullVideo())
     {
@@ -4922,33 +4367,11 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
     return position;
 }
 
-void VideoOutputXv::ShutdownVideoResize(void)
-{
-    if (VideoOutputSubType() != OpenGL)
-    {
-        VideoOutput::ShutdownVideoResize();
-        return;
-    }
-
-    if (!gl_osdchain)
-    {
-        VideoOutput::ShutdownVideoResize();
-        return;
-    }
-
-    if (gl_videochain)
-        gl_videochain->DisableVideoResize();
-
-    vsz_enabled = false;
-}
-
 int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
                               int stride, int revision)
 {
-    if (!gl_use_osd_opengl2 && !vdpau_use_osd)
+    if (!vdpau_use_osd)
         return VideoOutput::DisplayOSD(frame, osd, stride, revision);
-
-    gl_osd_ready = false;
 
     if (!osd)
         return -1;
@@ -4965,9 +4388,6 @@ int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
 
     bool changed = (-1 == revision) ?
         surface->Changed() : (surface->GetRevision()!=revision);
-
-    if (gl_use_osd_opengl2)
-        gl_osd_ready = true;
 
     if (changed)
     {
@@ -4987,29 +4407,13 @@ int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
             vdpau->UpdateOSD(offsets, visible, alpha);
 #endif // USING_VDPAU
         }
-        else if (gl_use_osd_opengl2)
-        {
-            if (!gl_osdchain)
-                return -1;
-
-            if (vsz_enabled && gl_videochain)
-                gl_videochain->SetVideoResize(vsz_desired_display_rect);
-
-            int offsets[3];
-            offsets[0] = surface->y - surface->yuvbuffer;
-            offsets[1] = surface->u - surface->yuvbuffer;
-            offsets[2] = surface->v - surface->yuvbuffer;
-
-            gl_osdchain->UpdateInput(surface->yuvbuffer, offsets,
-				     FMT_YV12, visible, surface->alpha);
-        }
     }
     return changed;
 }
 
 bool VideoOutputXv::hasFullScreenOSD(void) const
 {
-    return (vdpau_use_osd || gl_use_osd_opengl2 || chroma_osd);
+    return (vdpau_use_osd || chroma_osd);
 }
 
 QStringList VideoOutputXv::GetAllowedRenderers(
@@ -5037,8 +4441,7 @@ QStringList VideoOutputXv::GetAllowedRenderers(
 }
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
-                       bool &useXVideo, bool &useShm, bool &useOpenGL,
-                       bool &useVDPAU)
+                       bool &useXVideo, bool &useShm, bool &useVDPAU)
 {
     // can be used to force non-Xv mode as well as non-Xv/non-Shm mode
     if (getenv("NO_XVMC_VLD"))
@@ -5051,8 +4454,6 @@ static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
         useXvVLD = useXvIDCT = useXvMC = useXVideo = false;
     if (getenv("NO_SHM"))
         useXVideo = useShm = false;
-    if (getenv("NO_OPENGL"))
-        useOpenGL = false;
     if (getenv("NO_VDPAU"))
         useVDPAU = false;
 }
@@ -5061,7 +4462,7 @@ static void SetFromHW(Display *d,
                       int     screen,     Window  curwin,
                       bool    &useXvMC,   bool   &useXVideo,
                       bool    &useShm,    bool   &useXvMCOpenGL,
-                      bool    &useOpenGL, bool   &useVDPAU,
+                      bool    &useVDPAU,
                       MythCodecID vdpau_codec_id)
 {
     (void)screen;
@@ -5123,14 +4524,6 @@ static void SetFromHW(Display *d,
 #endif // USING_XVMC_OPENGL
     }
 
-    if (useOpenGL)
-    {
-        useOpenGL = false;
-#ifdef USING_OPENGL_VIDEO
-        useOpenGL = OpenGLContextGLX::IsGLXSupported(d, 1, 2);
-#endif // USING_OPENGL_VIDEO
-    }
-
     if (useVDPAU)
     {
         useVDPAU = false;
@@ -5162,7 +4555,7 @@ static void SetFromHW(Display *d,
 static QStringList allowed_video_renderers(
     MythCodecID myth_codec_id, Display *display, int screen, Window curwin)
 {
-    bool vld, idct, mc, xv, shm, xvmc_opengl, opengl, vdpau;
+    bool vld, idct, mc, xv, shm, xvmc_opengl, vdpau;
 
     myth2av_codecid(myth_codec_id, vld, idct, mc, vdpau);
 
@@ -5170,19 +4563,17 @@ static QStringList allowed_video_renderers(
     if (myth_codec_id < kCodec_NORMAL_END)
         vdpau = true;
 
-    opengl = xv = shm = !vld && !idct;
+    xv = shm = !vld && !idct;
     xvmc_opengl = vld || idct || mc;
 
-    SetFromEnv(vld, idct, mc, xv, shm, opengl, vdpau);
+    SetFromEnv(vld, idct, mc, xv, shm, vdpau);
     SetFromHW(display, screen, curwin, mc, xv, shm, xvmc_opengl,
-              opengl, vdpau, myth_codec_id);
+              vdpau, myth_codec_id);
     idct &= mc;
 
     QStringList list;
     if (myth_codec_id < kCodec_NORMAL_END)
     {
-        if (opengl)
-            list += "opengl";
         if (xv)
             list += "xv-blit";
         if (shm)

@@ -100,11 +100,6 @@ VideoOutWindow::VideoOutWindow() :
  */
 void VideoOutWindow::MoveResize(void)
 {
-    // HACK HACK HACK -- BEGIN
-    if (kPBPLeft == pip_state || kPBPRight == pip_state)
-        display_aspect *= 0.5f;
-    // HACK HACK HACK -- END
-
     // Preset all image placement and sizing variables.
     video_rect = QRect(QPoint(0, 0), video_disp_dim);
     display_video_rect = display_visible_rect;
@@ -128,11 +123,6 @@ void VideoOutWindow::MoveResize(void)
     }
     PrintMoveResizeDebug();
     needrepaint = true;
-
-    // HACK HACK HACK -- BEGIN
-    if (kPBPLeft == pip_state || kPBPRight == pip_state)
-        display_aspect *= 2.0f;
-    // HACK HACK HACK -- END
 }
 
 /** \fn VideoOutWindow::ApplyDBScaleAndMove(void)

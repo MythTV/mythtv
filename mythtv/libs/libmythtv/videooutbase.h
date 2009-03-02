@@ -261,8 +261,8 @@ class VideoOutput
 
     virtual void SetPictureAttributeDBValue(
         PictureAttribute attributeType, int newValue);
-    virtual QRect GetVisibleOSDBounds(float&, float&, float) const;
-    virtual QRect GetTotalOSDBounds(void) const;
+    QRect GetVisibleOSDBounds(float&, float&, float) const;
+    QRect GetTotalOSDBounds(void) const;
     virtual bool hasFullScreenOSD(void) const { return false; }
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);
