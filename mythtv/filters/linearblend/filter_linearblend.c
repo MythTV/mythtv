@@ -21,14 +21,7 @@
 
 typedef struct LBFilter
 {
-    int (*filter)(VideoFilter *, VideoFrame *);
-    void (*cleanup)(VideoFilter *);
-
-    void *handle; // Library handle;
-    VideoFrameType inpixfmt;
-    VideoFrameType outpixfmt;
-    char *opts;
-    FilterInfo *info;
+    VideoFilter vf;
 
     /* functions and variables below here considered "private" */
     int mm_flags;
@@ -347,7 +340,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    filter->filter = &linearBlendFilter;
+    filter->vf.filter = &linearBlendFilter;
     filter->subfilter = &linearBlend;    /* Default, non accellerated */
     filter->mm_flags = mm_support();
 #ifdef MMX
@@ -358,10 +351,10 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 #endif
 #ifdef HAVE_ALTIVEC
     if (filter->mm_flags & MM_ALTIVEC)
-        filter->filter = &linearBlendFilterAltivec;
+        filter->vf.filter = &linearBlendFilterAltivec;
 #endif
 
-    filter->cleanup = NULL;
+    filter->vf.cleanup = NULL;
     TF_INIT(filter);
     return (VideoFilter *)filter;
 }

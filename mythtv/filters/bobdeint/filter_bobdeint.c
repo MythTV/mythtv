@@ -16,14 +16,7 @@
 
 typedef struct BDFilter
 {
-    int (*filter)(VideoFilter *, VideoFrame *);
-    void (*cleanup)(VideoFilter *);
-
-    void *handle; // Library handle;
-    VideoFrameType inpixfmt;
-    VideoFrameType outpixfmt;
-    char *opts;
-    FilterInfo *info;
+    VideoFilter vf;
 
     /* functions and variables below here considered "private" */
     unsigned char *tmp_ptr;
@@ -127,12 +120,12 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    filter->filter = &bobDeintFilter;
+    filter->vf.filter = &bobDeintFilter;
     filter->tmp_size = 0;
     filter->tmp_ptr = NULL;
     filter->state_size = 0;
     filter->line_state = NULL;
-    filter->cleanup = &bobDtor;
+    filter->vf.cleanup = &bobDtor;
     return (VideoFilter *)filter;
 }
 

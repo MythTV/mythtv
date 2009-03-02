@@ -15,14 +15,7 @@
 
 typedef struct OFFilter
 {
-    int (*filter)(VideoFilter *, VideoFrame *);
-    void (*cleanup)(VideoFilter *);
-
-    void *handle; // Library handle;
-    VideoFrameType inpixfmt;
-    VideoFrameType outpixfmt;
-    char *opts;
-    FilterInfo *info;
+    VideoFilter vf;
 
     /* functions and variables below here considered "private" */
     int bottom;
@@ -81,12 +74,12 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
 
-    filter->filter = &oneFieldFilter;
+    filter->vf.filter = &oneFieldFilter;
     filter->bottom = 0;
     if (options != NULL && strstr(options, "bottom") != NULL)
         filter->bottom = 1;
 
-    filter->cleanup = NULL;
+    filter->vf.cleanup = NULL;
     return (VideoFilter *)filter;
 }
 
