@@ -1683,6 +1683,8 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
 
     runningJobs[key] = jInfo;
 
+    pginfo->MarkAsInUse(true, "jobqueue");
+
     if (pginfo->recgroup == "Deleted")
     {
         ChangeJobStatus(id, JOB_CANCELLED,
@@ -1839,6 +1841,7 @@ void JobQueue::RemoveRunningJob(QString key)
         ProgramInfo *pginfo = runningJobs[key].pginfo;
         if (pginfo)
         {
+            pginfo->MarkAsInUse(false);
             delete pginfo;
         }
 
