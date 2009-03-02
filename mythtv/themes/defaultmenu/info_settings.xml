@@ -23,6 +23,7 @@
      <text lang="RU">Настройки погоды</text>
      <text lang="PL">Ustaw Pogodę</text>
      <text lang="HE">הגדרות מזג האויר</text>
+     <description>Weather locale and sources</description>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -31,6 +32,7 @@
      <type>SETTINGS_WEATHER</type>
      <text>Weather Station Settings</text>
      <text lang="DE">Wetterstation</text>
+     <description>???</description>
      <action>CONFIGPLUGIN mythwstation</action>
      <depends>mythwstation</depends>
    </button>
@@ -58,6 +60,7 @@
      <text lang="RU">Настройки новостей</text>
      <text lang="PL">Ustaw wiadomości</text>
      <text lang="HE">הגדרות חדשות</text>
+     <description>Choose which news sources interest you</description>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -77,6 +80,7 @@
      <text lang="RU">Настройки афиши кино</text>
      <text lang="PL">Ustaw repertuar kin</text>
      <text lang="HE">הגדרות Movie Times</text>
+     <description>Select local movie theaters</description>
      <action>CONFIGPLUGIN mythmovies</action>
      <depends>mythmovies</depends>
    </button>
@@ -96,6 +100,7 @@
      <text lang="SL">MythFlix nastavitve</text>
      <text lang="PL">Ustaw Filmy z internetu</text>
      <text lang="HE">הגדרות NetFlix</text>
+     <description>Choose the genres that interest you</description>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -123,6 +128,7 @@
      <text lang="PL">Ustaw zakładki WWW</text>
      <text lang="HE">הגדרות אינטרנט</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
+     <description>Manage web bookmarks</description>
      <depends>mythbookmarkmanager</depends>
    </button>
 
@@ -149,6 +155,7 @@
      <text lang="HE">הגדרות מתכונים</text>
      <alttext lang="ET">Retseptid</alttext>
      <alttext lang="PT">Receitas</alttext>
+     <description></description>
      <action>CONFIGPLUGIN mythrecipe</action>
      <depends>mythrecipe</depends>
    </button>

@@ -21,6 +21,7 @@
      <text lang="RU">Телефон</text>
      <text lang="PL">Telefon</text>
      <text lang="HE">טלפון</text>
+     <description>Make or accept a VoIP call</description>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -48,6 +49,7 @@
      <text lang="RU">Новости</text>
      <text lang="PL">Wiadomości</text>
      <text lang="HE">חדשות</text>
+     <description>Keep up with the news</description>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -69,6 +71,7 @@
      <text lang="RU">Афиша кино</text>
      <text lang="PL">Repertuar kin</text>
      <text lang="HE">זמני הקרנת סרטים</text>
+     <description>See when local movies are playing</description>
      <action>PLUGIN mythmovies</action>
      <depends>mythmovies</depends>
    </button>
@@ -97,6 +100,7 @@
      <text lang="PL">Pogoda</text>
      <text lang="HE">מזג האויר</text>
      <action>PLUGIN mythweather</action>
+     <description>Local weather forecast</description>
      <depends>mythweather</depends>
    </button>
 
@@ -104,6 +108,7 @@
        <type>WEATHER</type>
        <text>Weather Station</text>
        <text lang="DE">Wetterstation</text>
+       <description></description>
        <action>PLUGIN mythwstation</action>
        <depends>mythwstation</depends>
    </button>
@@ -119,6 +124,7 @@
      <text lang="SL">MythFlix</text>
      <text lang="FR">Location Films</text>
      <text lang="PL">Filmy z internetu</text>
+     <description>Manage your NetFlix queue</description>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -145,6 +151,7 @@
       <text lang="RU">WWW</text>
       <text lang="PL">Internet WWW</text>
       <text lang="HE">אינטרנט</text>
+      <description>Browse the web</description>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -171,6 +178,7 @@
      <text lang="RU">Рецепты</text>
      <text lang="PL">Przepisy</text>
      <text lang="HE">מתכונים</text>
+     <description>Start cooking!</description>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -197,6 +205,7 @@
       <text lang="RU">Состояние системы</text>
       <text lang="PL">Status systemu</text>
       <text lang="HE">מצב מערכת</text>
+      <description>What your system is doing right now</description>
       <action>TV_STATUS</action>
    </button>
 
@@ -206,6 +215,7 @@
       <text lang="IT">Videosorveglianza</text>
       <text lang="PL">Strażnik</text>
       <text lang="FI">ZoneMinder</text>
+      <description>Home surveillance</description>
       <action>PLUGIN mythzoneminder</action>
       <depends>mythzoneminder</depends>
  </button>
@@ -213,6 +223,7 @@
    <button>
       <type>SMOLT</type>
       <text>Hardware profile</text>
+      <description>Tell us what hardware you have so we can support it</description>
       <action>PLUGIN mythsmolt</action>
       <depends>mythsmolt</depends>
  </button>

@@ -23,6 +23,7 @@
       <text lang="RU">Смотреть ТВ</text>
       <text lang="PL">Oglądanie TV</text>
       <text lang="HE">צפיה בטלויזיה</text>
+      <description>Watch live television</description>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -65,6 +66,7 @@
       <alttext lang="ET">Plaanimine</alttext>
       <alttext lang="NB">Planlegg</alttext>
       <alttext lang="RU">Расписание</alttext>
+      <description>Pick shows to record</description>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -93,6 +95,7 @@
       <text lang="HE">צפיה בהקלטות</text>
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="PL">Oglądanie</alttext>
+      <description>Play Recordings</description>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -122,6 +125,7 @@
       <alttext lang="ET">Kustutamine</alttext>
       <alttext lang="DE">Löschen</alttext>
       <alttext lang="PL">Kasowanie</alttext>
+      <description>Remove television recordings</description>
       <action>TV_DELETE</action>
    </button> 
 
@@ -164,6 +168,7 @@
       <text lang="RU">Состояние системы</text>
       <text lang="PL">Status systemu</text>
       <text lang="HE">מצב מערכת</text>      
+      <description>What your system is doing right now</description>
       <action>TV_STATUS</action>
    </button>
 

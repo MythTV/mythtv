@@ -27,6 +27,7 @@
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="RU">Записи</alttext>
       <alttext lang="PL">Nagrania</alttext>
+      <description>Play recordings</description>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -57,6 +58,7 @@
      <alttext lang="ET">Video</alttext>
      <alttext lang="RU">Фильмы</alttext>
      <alttext lang="PL">Filmy</alttext>
+     <description>Play videos</description>
      <action>JUMP MythVideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -84,6 +86,7 @@
       <text lang="RU">Слушать музыку</text>
       <text lang="PL">Odtwarzaj muzykę</text>
       <text lang="HE">האזנה למוסיקה</text>
+      <description></description>
       <action>JUMP Play music</action>
       <depends>mythmusic</depends>
    </button>
@@ -113,6 +116,7 @@
      <alttext lang="PT">Rádio</alttext>
      <alttext lang="ET">Raadio</alttext>
      <alttext lang="RU">Радио</alttext>
+     <description></description>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>
@@ -121,6 +125,7 @@
      <type>STREAM</type>
      <text>Play Online Streams</text>
      <text lang="HE">נגן מדיה מכוונת</text>
+     <description></description>
      <action>PLUGIN mythstream</action>
      <depends>mythstream</depends>
    </button>
@@ -148,6 +153,7 @@
      <text lang="RU">Изображения</text>
      <text lang="PL">Galeria zdjęć</text>
      <text lang="HE">גלרית תמונות</text>
+     <description>Look at Pictures</description>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -175,6 +181,7 @@
      <text lang="RU">Играть в игры</text>
      <text lang="PL">Graj w gry</text>
      <text lang="HE">לשחק משחקים</text>
+     <description>Play video games</description>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>

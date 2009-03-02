@@ -23,6 +23,7 @@
      <text lang="RU">Настройки музыки</text>
      <text lang="PL">Ustaw muzykę</text>
      <text lang="HE">הגדרות מוסיקה</text>
+     <description>Configure playback and CD ripping</description>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -50,6 +51,7 @@
        <text lang="RU">Настройки фильмов</text>
        <text lang="PL">Ustaw filmy</text>
        <text lang="HE">הגדרות וידאו</text>
+       <description>Configure playback and DVD ripping</description>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -77,6 +79,7 @@
       <text lang="RU">Настройки изображений</text>
       <text lang="PL">Ustaw zdjęcia</text>
       <text lang="HE">הגדרות תמונות</text>
+      <description>Configure display of image gallery</description>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -103,6 +106,7 @@
      <text lang="RU">Настройки игр</text>
      <text lang="PL">Ustaw gry</text>
      <text lang="HE">הגדרות משחק</text>
+     <description>Configure playback of games</description>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -127,6 +131,7 @@
      <text lang="RU">Настройки радио</text>
      <text lang="PL">Ustaw radio</text>
      <text lang="HE">הגדרות רדיו</text>
+     <description></description>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>
@@ -136,6 +141,7 @@
      <text>MythStream Settings</text>
      <text lang="SL">Nastavitve Mythstream</text>
      <text lang="HE">הגדרות MythStream</text>
+     <description></description>
      <action>CONFIGPLUGIN mythstream</action>
      <depends>mythstream</depends>
    </button>
@@ -155,6 +161,7 @@
       <text lang="HE">הגדרות ארכיון קבצים</text>
       <text lang="FI">Arkistointiasetukset</text>
       <text lang="DE">Archivieren</text>
+      <description>Configure how to archive video to DVD</description>
       <action>CONFIGPLUGIN mytharchive</action>
       <depends>mytharchive</depends>
    </button>

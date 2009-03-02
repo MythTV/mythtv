@@ -22,6 +22,7 @@
       <text lang="RU">Работа с музыкой</text>
       <text lang="PL">Narzędzia muzyczne</text>
       <text lang="HE">כלי מוסיקה</text>
+      <description>Select, import, or play music</description>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>
    </button>
@@ -49,6 +50,7 @@
       <text lang="RU">Управление фильмами</text>
       <text lang="PL">Zarządca Filmów</text>
       <text lang="HE">מנהל וידאו</text>
+      <description>Scan for new videos, edit metadata, or delete</description>
       <action>JUMP Video Manager</action>
       <depends>mythvideo</depends>
    </button>
@@ -73,6 +75,7 @@
       <text lang="SL">Urejanje tipk</text>
       <text lang="PL">Edytuj klawisze</text>
       <text lang="HE">עריכת מקשים</text>
+      <description>Change mythtv key bindings.</description>
       <action>SETUP_KEYS</action>
    </button>
 
@@ -99,7 +102,14 @@
       <text lang="RU">Настройки</text>
       <text lang="PL">Ustawienia</text>
       <text lang="HE">הגדרה</text>
+      <description>Configure MythTV and plugins</description>
       <action>MENU main_settings.xml</action>
    </button>
 
+   <button>
+       <type>MENU_UTILITIES_SETUP</type>
+       <text>Save or Restore settings</text>
+       <description>Save or restore settings settings for MythTV</description>
+       <action>settings_profile</action>
+   </button>
 </mythmenu>

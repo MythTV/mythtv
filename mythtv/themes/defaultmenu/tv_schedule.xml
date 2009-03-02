@@ -43,6 +43,7 @@
       <alttext lang="RU">Программа</alttext>
       <alttext lang="PL">Program TV</alttext>
       <alttext lang="HE">מדריך</alttext>
+      <description>Choose programs from a grid-style list</description>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -89,6 +90,7 @@
       <alttext lang="RU">Поиск</alttext>
       <alttext lang="PL">Znajdź</alttext>
       <alttext lang="HE">מציאה</alttext>
+      <description>Choose programs from an alphabetical index</description>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -130,6 +132,7 @@
       <alttext lang="RU">Слова</alttext>
       <alttext lang="PL">Słowa</alttext>
       <alttext lang="HE">חיפוש</alttext>
+      <description>Find programs matching search words</description>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -169,6 +172,7 @@
       <alttext lang="PT">Listas</alttext>
       <alttext lang="RU">Списки</alttext>
       <alttext lang="HE">חיפוש</alttext>
+      <description>Pick a program to record from a set of lists</description>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -194,6 +198,7 @@
       <text lang="RU">Дополнительно</text>
       <text lang="PL">Dostosuj nagrywanie</text>
       <text lang="HE">הקלטה לפי כללים</text>
+      <description>Advanced program finder</description>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -241,6 +246,7 @@
       <alttext lang="RU">Вручную</alttext>
       <alttext lang="PL">Ręcznie</alttext>
       <alttext lang="HE">הקלטה ידנית</alttext>
+      <description>VCR-like recording scheduler</description>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

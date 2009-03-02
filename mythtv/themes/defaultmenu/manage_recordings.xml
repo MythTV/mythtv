@@ -28,6 +28,7 @@
       <alttext lang="ET">Plaanimine</alttext>
       <alttext lang="RU">Расписание</alttext>
       <alttext lang="PL">Harmonogram</alttext>
+      <description>Pick shows to record</description>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -52,6 +53,7 @@
       <text lang="RU">Установка приоритетов</text>
       <text lang="PL">Ustaw priorytety</text>
       <text lang="HE">הגדרת קדימויות</text>
+      <description>Prioritize some shows over others</description>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -79,6 +81,7 @@
       <text lang="PL">Zaplanowane nagrania</text>
       <text lang="HE">ההקלטות הבאות</text>
       <alttext lang="SV">Kommande</alttext>
+      <description>See what will be recorded next</description>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -110,6 +113,7 @@
       <alttext lang="ET">Kustutamine</alttext>
       <alttext lang="RU">Удалить</alttext>
       <alttext lang="PL">Kasowanie</alttext>
+      <description>Remove television recordings</description>
       <action>TV_DELETE</action>
    </button>
 
@@ -135,6 +139,7 @@
       <text lang="PL">Poprzednio nagrane</text>
       <text lang="HE">הוקלט מקודם</text>
       <alttext lang="SV">Tidigare</alttext>
+      <description>See what you have recorded before</description>
       <action>TV_PREVIOUS</action>
    </button>
 
