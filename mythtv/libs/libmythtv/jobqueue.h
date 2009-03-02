@@ -96,6 +96,15 @@ typedef struct jobqueueentry {
     QString comment;
 } JobQueueEntry;
 
+typedef struct runningjobinfo {
+    int          id;
+    int          type;
+    int          flag;
+    QString      desc;
+    QString      command;
+    ProgramInfo *pginfo;
+} RunningJobInfo;
+
 class MPUBLIC JobQueue : public QObject
 {
     Q_OBJECT
@@ -194,6 +203,7 @@ class MPUBLIC JobQueue : public QObject
 
     QString GetJobDescription(int jobType);
     QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
+    void RemoveRunningJob(QString key);
 
     static void *TranscodeThread(void *param);
     static QString PrettyPrint(off_t bytes);
@@ -215,10 +225,8 @@ class MPUBLIC JobQueue : public QObject
     QMutex controlFlagsLock;
     QMap<QString, int *> jobControlFlags;
 
-    QMap<QString, int> runningJobIDs;
-    QMap<QString, int> runningJobTypes;
-    QMap<QString, QString> runningJobDescs;
-    QMap<QString, QString> runningJobCommands;
+    QMutex *runningJobsLock;
+    QMap<QString, RunningJobInfo> runningJobs;
 
     bool childThreadStarted;
     bool isMaster;

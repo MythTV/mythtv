@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <cstdlib>
+#include <fcntl.h>
 using namespace std;
 
 #include <QDateTime>
@@ -25,6 +26,14 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythverbose.h"
 
+#ifndef O_STREAMING
+#define O_STREAMING 0
+#endif
+
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 #define LOC     QString("JobQueue: ")
 #define LOC_ERR QString("JobQueue Error: ")
 
@@ -32,6 +41,8 @@ JobQueue::JobQueue(bool master)
 {
     isMaster = master;
     m_hostname = gContext->GetHostName();
+
+    runningJobsLock = new QMutex(QMutex::Recursive);
 
     jobQueueCPU = gContext->GetNumSetting("JobQueueCPU", 0);
 
@@ -56,6 +67,8 @@ JobQueue::~JobQueue(void)
     pthread_join(queueThread, NULL);
 
     gContext->removeListener(this);
+
+    delete runningJobsLock;
 }
 
 void JobQueue::customEvent(QEvent *e)
@@ -110,22 +123,21 @@ void JobQueue::customEvent(QEvent *e)
                  (action == "PAUSE") ||
                  (action == "RESTART") ||
                  (action == "RESUME" )) &&
-                (jobControlFlags.contains(key)) &&
-                (runningJobTypes.contains(key)) &&
-                (runningJobTypes[key] == jobType))
+                (runningJobs.contains(key)) &&
+                (runningJobs[key].type == jobType))
             {
-                controlFlagsLock.lock();
+                runningJobsLock->lock();
 
                 if (action == "STOP")
-                    *(jobControlFlags[key]) = JOB_STOP;
+                    runningJobs[key].flag = JOB_STOP;
                 else if (action == "PAUSE")
-                    *(jobControlFlags[key]) = JOB_PAUSE;
+                    runningJobs[key].flag = JOB_PAUSE;
                 else if (action == "RESUME")
-                    *(jobControlFlags[key]) = JOB_RUN;
+                    runningJobs[key].flag = JOB_RUN;
                 else if (action == "RESTART")
-                    *(jobControlFlags[key]) = JOB_RESTART;
+                    runningJobs[key].flag = JOB_RESTART;
 
-                controlFlagsLock.unlock();
+                runningJobsLock->unlock();
             }
         }
     }
@@ -175,6 +187,7 @@ void JobQueue::ProcessQueue(void)
     bool atMax = false;
     bool inTimeWindow = true;
     bool startedJobAlready = false;
+    QMap<QString, RunningJobInfo>::Iterator rjiter;
 
     for (;;)
     {
@@ -188,6 +201,14 @@ void JobQueue::ProcessQueue(void)
                         .arg(maxJobs));
 
         jobStatus.clear();
+
+        runningJobsLock->lock();
+        for (rjiter = runningJobs.begin(); rjiter != runningJobs.end();
+            ++rjiter)
+        {
+            (*rjiter).pginfo->UpdateInUseMark();
+        }
+        runningJobsLock->unlock();
 
         GetJobsInQueue(jobs);
 
@@ -321,10 +342,10 @@ void JobQueue::ProcessQueue(void)
                                           .arg(chanid).arg(startts);
                         VERBOSE(VB_JOBQUEUE, LOC + message);
 
-                        controlFlagsLock.lock();
-                        if (jobControlFlags.contains(key))
-                            *(jobControlFlags[key]) = JOB_STOP;
-                        controlFlagsLock.unlock();
+                        runningJobsLock->lock();
+                        if (runningJobs.contains(key))
+                            runningJobs[key].flag = JOB_STOP;
+                        runningJobsLock->unlock();
 
                         // ChangeJobCmds(m_db, id, JOB_RUN);
                         continue;
@@ -366,10 +387,10 @@ void JobQueue::ProcessQueue(void)
                                       .arg(chanid).arg(startts);
                     VERBOSE(VB_JOBQUEUE, LOC + message);
 
-                    controlFlagsLock.lock();
-                    if (jobControlFlags.contains(key))
-                        *(jobControlFlags[key]) = JOB_PAUSE;
-                    controlFlagsLock.unlock();
+                    runningJobsLock->lock();
+                    if (runningJobs.contains(key))
+                        runningJobs[key].flag = JOB_PAUSE;
+                    runningJobsLock->unlock();
 
                     ChangeJobCmds(id, JOB_RUN);
                     continue;
@@ -382,10 +403,10 @@ void JobQueue::ProcessQueue(void)
                                       .arg(chanid).arg(startts);
                     VERBOSE(VB_JOBQUEUE, LOC + message);
 
-                    controlFlagsLock.lock();
-                    if (jobControlFlags.contains(key))
-                        *(jobControlFlags[key]) = JOB_RUN;
-                    controlFlagsLock.unlock();
+                    runningJobsLock->lock();
+                    if (runningJobs.contains(key))
+                        runningJobs[key].flag = JOB_RUN;
+                    runningJobsLock->unlock();
 
                     ChangeJobCmds(id, JOB_RUN);
                     continue;
@@ -1647,30 +1668,34 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
         return;
     }
 
-    controlFlagsLock.lock();
+    pginfo->pathname = pginfo->GetPlaybackURL();
+
+    runningJobsLock->lock();
 
     ChangeJobStatus(id, JOB_STARTING);
-    runningJobTypes[key] = jobType;
-    runningJobIDs[key] = id;
-    runningJobDescs[key] = GetJobDescription(jobType);
-    runningJobCommands[key] = GetJobCommand(id, jobType, pginfo);
+    RunningJobInfo jInfo;
+    jInfo.type    = jobType;
+    jInfo.id      = id;
+    jInfo.flag    = JOB_RUN;
+    jInfo.desc    = GetJobDescription(jobType);
+    jInfo.command = GetJobCommand(id, jobType, pginfo);
+    jInfo.pginfo  = pginfo;
+
+    runningJobs[key] = jInfo;
 
     if (pginfo->recgroup == "Deleted")
     {
         ChangeJobStatus(id, JOB_CANCELLED,
                         "Program has been deleted");
-        runningJobTypes.remove(key);
-        runningJobIDs.remove(key);
-        runningJobDescs.remove(key);
-        runningJobCommands.remove(key);
+        RemoveRunningJob(key);
     }
     else if ((jobType == JOB_TRANSCODE) ||
-        (runningJobCommands[key] == "mythtranscode"))
+        (runningJobs[key].command == "mythtranscode"))
     {
         StartChildJob(TranscodeThread, pginfo);
     }
     else if ((jobType == JOB_COMMFLAG) ||
-             (runningJobCommands[key] == "mythcommflag"))
+             (runningJobs[key].command == "mythcommflag"))
     {
         StartChildJob(FlagCommercialsThread, pginfo);
     }
@@ -1682,13 +1707,10 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     {
         ChangeJobStatus(id, JOB_ERRORED,
                         "UNKNOWN JobType, unable to process!");
-        runningJobTypes.remove(key);
-        runningJobIDs.remove(key);
-        runningJobDescs.remove(key);
-        runningJobCommands.remove(key);
+        RemoveRunningJob(key);
     }
 
-    controlFlagsLock.unlock();
+    runningJobsLock->unlock();
 }
 
 void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *),
@@ -1707,7 +1729,6 @@ void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *),
     while (!childThreadStarted)
         usleep(50);
 
-    delete m_pginfo;
     m_pginfo = NULL;
 }
 
@@ -1809,6 +1830,24 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
     return command;
 }
 
+void JobQueue::RemoveRunningJob(QString key)
+{
+    runningJobsLock->lock();
+
+    if (runningJobs.contains(key))
+    {
+        ProgramInfo *pginfo = runningJobs[key].pginfo;
+        if (pginfo)
+        {
+            delete pginfo;
+        }
+
+        runningJobs.remove(key);
+    }
+
+    runningJobsLock->unlock();
+}
+
 QString JobQueue::PrettyPrint(off_t bytes)
 {
     // Pretty print "bytes" as KB, MB, GB, TB, etc., subject to the desired
@@ -1855,23 +1894,18 @@ void JobQueue::DoTranscodeThread(void)
     if (!m_pginfo)
         return;
 
-    ProgramInfo *program_info = new ProgramInfo(*m_pginfo);
-    int controlTranscoding = JOB_RUN;
+    QString key = GetJobQueueKey(m_pginfo);
+    ProgramInfo *program_info = runningJobs[key].pginfo;
     QString subtitle = program_info->subtitle.isEmpty() ? "" :
                            QString(" \"%1\"").arg(program_info->subtitle);
 
-    QString key = GetJobQueueKey(program_info);
-    int jobID = runningJobIDs[key];
+    int jobID = runningJobs[key].id;
 
     childThreadStarted = true;
 
     ChangeJobStatus(jobID, JOB_RUNNING);
     bool hasCutlist = !!(program_info->getProgramFlags() & FL_CUTLIST);
     bool useCutlist = !!(GetJobFlags(jobID) & JOB_USE_CUTLIST) && hasCutlist;
-
-    controlFlagsLock.lock();
-    jobControlFlags[key] = &controlTranscoding;
-    controlFlagsLock.unlock();
 
     int transcoder = program_info->transcoder;
     QString profilearg = transcoder == RecordingProfile::TranscoderAutodetect ?
@@ -1881,7 +1915,7 @@ void JobQueue::DoTranscodeThread(void)
     QString path;
     QString command;
 
-    if (runningJobCommands[key] == "mythtranscode")
+    if (runningJobs[key].command == "mythtranscode")
     {
         path = GetInstallPrefix() + "/bin/mythtranscode";
         QByteArray parg = profilearg.toAscii();
@@ -1891,7 +1925,7 @@ void JobQueue::DoTranscodeThread(void)
     }
     else
     {
-        command = runningJobCommands[key];
+        command = runningJobs[key].command;
 
         QStringList tokens = command.split(" ", QString::SkipEmptyParts);
         path = (!tokens.empty()) ? tokens[0] : "";
@@ -2063,12 +2097,7 @@ void JobQueue::DoTranscodeThread(void)
         ChangeJobStatus(jobID, JOB_ERRORED, "Retry limit exceeded");
     }
 
-    controlFlagsLock.lock();
-    runningJobIDs.remove(key);
-    runningJobTypes.remove(key);
-    runningJobDescs.remove(key);
-    runningJobCommands.remove(key);
-    controlFlagsLock.unlock();
+    RemoveRunningJob(key);
 }
 
 void *JobQueue::FlagCommercialsThread(void *param)
@@ -2084,18 +2113,18 @@ void JobQueue::DoFlagCommercialsThread(void)
     if (!m_pginfo)
         return;
 
-    ProgramInfo *program_info = new ProgramInfo(*m_pginfo);
-    int controlFlagging = JOB_RUN;
+    QString key = GetJobQueueKey(m_pginfo);
+    ProgramInfo *program_info = runningJobs[key].pginfo;
     QString subtitle = program_info->subtitle.isEmpty() ? "" :
                            QString(" \"%1\"").arg(program_info->subtitle);
-    QString logDesc = QString("%1%2 recorded from channel %3 at %4")
+    QString detailstr = QString("%1%2 recorded from channel %3 at %4")
                           .arg(program_info->title)
                           .arg(subtitle)
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
+    QByteArray details = detailstr.toLocal8Bit();
 
-    QString key = GetJobQueueKey(program_info);
-    int jobID = runningJobIDs[key];
+    int jobID = runningJobs[key].id;
 
     childThreadStarted = true;
 
@@ -2105,7 +2134,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         QString msg = QString("Commercial Flagging failed.  Could not open "
                               "new database connection for %1. "
                               "Program can not be flagged.")
-                              .arg(logDesc);
+                              .arg(details.constData());
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
@@ -2116,19 +2145,16 @@ void JobQueue::DoFlagCommercialsThread(void)
         return;
     }
 
-    controlFlagsLock.lock();
-    jobControlFlags[key] = &controlFlagging;
-    controlFlagsLock.unlock();
-
     QString msg = tr("Commercial Flagging Starting");
-    VERBOSE(VB_GENERAL, (LOC + QString("%1 for %2").arg(msg).arg(logDesc)));
-    gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
+    VERBOSE(VB_GENERAL, (LOC + QString("%1 for %2")
+            .arg(msg).arg(details.constData())));
+    gContext->LogEntry("commflag", LP_NOTICE, msg, detailstr);
 
     int breaksFound = 0;
     QString path;
     QString command;
 
-    if (runningJobCommands[key] == "mythcommflag")
+    if (runningJobs[key].command == "mythcommflag")
     {
         path = GetInstallPrefix() + "/bin/mythcommflag";
         command = QString("%1 -j %2 -V %3")
@@ -2136,7 +2162,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     }
     else
     {
-        command = runningJobCommands[key];
+        command = runningJobs[key].command;
         QStringList tokens = command.split(" ", QString::SkipEmptyParts);
         path = (!tokens.empty()) ? tokens[0] : "";
     }
@@ -2147,7 +2173,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     int priority = LP_NOTICE;
     QString comment;
 
-    controlFlagsLock.lock();
+    runningJobsLock->lock();
 
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (breaksFound == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
@@ -2156,7 +2182,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
         priority = LP_WARNING;
     }
-    else if ((*(jobControlFlags[key]) == JOB_STOP))
+    else if (runningJobs[key].flag == JOB_STOP)
     {
         comment = tr("Aborted by user");
         ChangeJobStatus(jobID, JOB_ABORTED, comment);
@@ -2190,21 +2216,18 @@ void JobQueue::DoFlagCommercialsThread(void)
         .arg(StatusText(GetJobStatus(jobID)));
 
     if (comment != "")
-        logDesc += QString(" (%1)").arg(comment);
+    {
+        detailstr += QString(" (%1)").arg(comment);
+        details = detailstr.toLocal8Bit();
+    }
 
-    gContext->LogEntry("commflag", priority, msg, logDesc);
+    gContext->LogEntry("commflag", priority, msg, detailstr);
 
     if (priority <= LP_WARNING)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + logDesc);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + details.constData());
 
-    jobControlFlags.remove(key);
-    runningJobIDs.remove(key);
-    runningJobTypes.remove(key);
-    runningJobDescs.remove(key);
-    runningJobCommands.remove(key);
-    controlFlagsLock.unlock();
-
-    delete program_info;
+    RemoveRunningJob(key);
+    runningJobsLock->unlock();
 }
 
 void *JobQueue::UserJobThread(void *param)
@@ -2220,10 +2243,10 @@ void JobQueue::DoUserJobThread(void)
     if (!m_pginfo)
         return;
 
-    ProgramInfo *program_info = new ProgramInfo(*m_pginfo);
-    QString key = GetJobQueueKey(program_info);
-    int jobID = runningJobIDs[key];
-    QString jobDesc = runningJobDescs[key];
+    QString key = GetJobQueueKey(m_pginfo);
+    ProgramInfo *program_info = runningJobs[key].pginfo;
+    int jobID = runningJobs[key].id;
+    QString jobDesc = runningJobs[key].desc;
 
     childThreadStarted = true;
 
@@ -2252,16 +2275,16 @@ void JobQueue::DoUserJobThread(void)
     }
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
-                                       .arg(runningJobCommands[key]));
+                                       .arg(runningJobs[key].command));
 
-    int result = myth_system(runningJobCommands[key]);
+    int result = myth_system(runningJobs[key].command);
 
     if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
         msg = QString("User Job '%1' failed, unable to find "
                       "executable, check your PATH and backend logs.")
-                      .arg(runningJobCommands[key]);
+                      .arg(runningJobs[key].command);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
         VERBOSE(VB_IMPORTANT, LOC + QString("Current PATH: '%1'")
                                             .arg(getenv("PATH")));
@@ -2294,12 +2317,7 @@ void JobQueue::DoUserJobThread(void)
         gContext->dispatch(me);
     }
 
-    controlFlagsLock.lock();
-    runningJobIDs.remove(key);
-    runningJobTypes.remove(key);
-    runningJobDescs.remove(key);
-    runningJobCommands.remove(key);
-    controlFlagsLock.unlock();
+    RemoveRunningJob(key);
 }
 
 int JobQueue::UserJobTypeToIndex(int jobType)
