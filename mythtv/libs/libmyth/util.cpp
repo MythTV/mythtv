@@ -45,6 +45,7 @@ using namespace std;
 #include "util-x11.h"
 #include "mythmediamonitor.h"
 #include "mythverbose.h"
+#include "msocketdevice.h"
 
 /** \fn mythCurrentDateTime()
  *  \brief Returns the current QDateTime object, stripped of its msec component
@@ -1269,3 +1270,90 @@ QString getSymlinkTarget(const QString &start_file,
 
     return (!fi.isSymLink()) ? cur_file : QString::null;
 }
+
+bool IsMACAddress(QString MAC)
+{
+    QStringList tokens = MAC.split(':');
+    if (tokens.size() != 6)
+    {
+        VERBOSE(VB_NETWORK,
+            QString("IsMACAddress(%1) = false, doesn't have 6 parts").arg(MAC));
+        return false;
+    }
+
+    int y;
+    bool ok;
+    int value;
+    for (y = 0; y < 6; y++)
+    {
+        if (tokens[y].isEmpty())
+        {
+            VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = false, part #%2 "
+                    "is empty.").arg(MAC).arg(y));
+            return false;
+        }
+
+        value = tokens[y].toInt(&ok, 16);
+        if (!ok)
+        {
+            VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = false, unable to "
+                    "convert part '%2' to integer.").arg(MAC).arg(tokens[y]));
+            return false;
+        }
+
+        if (value > 255)
+        {
+            VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = false, part #%2 "
+                    "evaluates to %3 which is higher than 255.")
+                    .arg(MAC).arg(y).arg(value));
+            return false;
+        }
+    }
+
+    VERBOSE(VB_NETWORK, QString("IsMACAddress(%1) = true").arg(MAC));
+    return true;
+}
+
+bool WakeOnLAN(QString MAC)
+{
+    char msg[1024] = "\xFF\xFF\xFF\xFF\xFF\xFF";
+    int  msglen = 6;
+    int  x, y;
+    QStringList tokens = MAC.split(':');
+    int macaddr[6];
+    bool ok;
+
+    if (tokens.size() != 6)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString( "WakeOnLan(%1): Incorrect MAC length").arg(MAC));
+        return false;
+    }
+
+    for (y = 0; y < 6; y++)
+    {
+        macaddr[y] = tokens[y].toInt(&ok, 16);
+
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString( "WakeOnLan(%1): Invalid MAC address").arg(MAC));
+            return false;
+        }
+    }
+
+    for (x = 0; x < 16; x++)
+        for (y = 0; y < 6; y++)
+            msg[msglen++] = macaddr[y];
+
+    VERBOSE(VB_NETWORK,
+            QString("WakeOnLan(): Sending WOL packet to %1").arg(MAC));
+
+    MSocketDevice socket(MSocketDevice::Datagram);
+    socket.setBroadcast(true);
+    socket.writeBlock(msg, msglen, QHostAddress("255.255.255.255"), 32767);
+
+    return true;
+}
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

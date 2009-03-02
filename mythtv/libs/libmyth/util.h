@@ -82,6 +82,9 @@ inline int   lerp(float r, int a, int b)
 inline float sq(float a) { return a*a; }
 inline int   sq(int   a) { return a*a; }
 
+MPUBLIC bool IsMACAddress(QString MAC);
+MPUBLIC bool WakeOnLAN(QString MAC);
+
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32
