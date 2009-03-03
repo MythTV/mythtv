@@ -4,11 +4,11 @@
         <type>SETTINGS_WEATHER</type>
         <text>Weather Settings</text>
         <text lang="IT">Impostazioni Meteo</text>
-        <text lang="ES">El Tiempo</text>
-        <text lang="FR">Paramètres météo</text>
-        <text lang="CS">Configurar El Temps</text>
+        <text lang="ES">Configurar El Tiempo</text>
+        <text lang="FR">Paramètres Météo</text>
+        <text lang="CA">Configurar El Temps</text>
         <text lang="DE">Wetter</text>
-        <text lang="DA">Vejrindstillinger</text>
+        <text lang="DA">Vejr Indstillinger</text>
         <text lang="IS">Stillingar veðurs</text>
         <text lang="NL">"Het Weer" Instellingen</text>
         <text lang="PT">Configurar Meteorologia</text>
@@ -42,8 +42,8 @@
         <text>News Settings</text>
         <text lang="IT">Impostazioni Notizie</text>
         <text lang="DE">Nachrichten</text>
-        <text lang="CS">Configurar Notícies</text>
-        <text lang="ES">Noticias</text>
+        <text lang="CA">Configurar Notícies</text>
+        <text lang="ES">Configurar Noticias</text>
         <text lang="NL">Nieuws Instellingen</text>
         <text lang="FR">Paramètres des infos</text>
         <text lang="IS">Stillingar frétta</text>
@@ -54,7 +54,7 @@
         <text lang="SL">Nastavitve novic</text>
         <text lang="ET">Uudiste sätted</text>
         <text lang="NB">Innstillinger for nyheter</text>
-        <text lang="DA">Nyhedsindstillinger</text>
+        <text lang="DA">Nyheds Indstillingen</text>
         <text lang="PT">Configurar Notícias</text>
         <text lang="CS">Nastavení zpráv</text>
         <text lang="RU">Настройки новостей</text>
@@ -68,15 +68,19 @@
     <button>
         <type>SETTINGS_MOVIETIME</type>
         <text>Movie Time Settings</text>
+        <text lang="EN_GB">Cinema Listings Settings</text>
+        <text lang="IT">Impostazioni Orari</text>
         <text lang="FI">Elokuvahaun Asetukset</text>
         <text lang="SL">Nastavitve kino programa</text>
         <text lang="ET">Filmiaegade sätted</text>
         <text lang="FR">Paramètres des films</text>
         <text lang="SV">Biotider</text>
+        <text lang="DA">Biograf Indstillinger</text>
         <text lang="PT">Configurar Horários de Cinema</text>
         <text lang="DE">Kinoprogramm</text>
         <text lang="NL">Bioscoop Tijden</text>
         <text lang="CS">Nastavení programů kin</text>
+        <text lang="JA">ムービータイム設定</text>
         <text lang="RU">Настройки афиши кино</text>
         <text lang="PL">Ustaw repertuar kin</text>
         <text lang="HE">הגדרות Movie Times</text>
@@ -89,15 +93,16 @@
         <type>SETTINGS_NETFLIX</type>
         <text>NetFlix Settings</text>
         <text lang="IT">Impostazioni NetFlix</text>
-        <text lang="FI">MythFlix Asetukset</text>
+        <text lang="FI">NetFlix Asetukset</text>
         <text lang="PT">Configurar Aluguer de Filmes</text>
-        <text lang="DE">MythFlix</text>
+        <text lang="DE">NetFlix</text>
         <text lang="FR">Paramètres Loc. films</text>
-        <text lang="ES">MythFlix</text>
-        <text lang="ET">MythFlix sätted</text>
-        <text lang="NL">MythFlix Instellingen</text>
-        <text lang="RU">Настройки MythFlix</text>
-        <text lang="SL">MythFlix nastavitve</text>
+        <text lang="ES">NetFlix</text>
+        <text lang="ET">NetFlix sätted</text>
+        <text lang="NL">NetFlix Instellingen</text>
+        <text lang="JA">NetFlix設定</text>
+        <text lang="RU">Настройки NetFlix</text>
+        <text lang="SL">NetFlix nastavitve</text>
         <text lang="PL">Ustaw Filmy z internetu</text>
         <text lang="HE">הגדרות NetFlix</text>
         <description>Choose the genres that interest you</description>
@@ -112,7 +117,7 @@
         <text lang="DE">WWW</text>
         <text lang="SV">Webb</text>
         <text lang="JA">Web設定</text>
-        <text lang="FR">Paramètres du web</text>
+        <text lang="FR">Paramètres du Web</text>
         <text lang="IS">Stillingar vefs</text>
         <text lang="NL">Internet Instellingen</text>    
         <text lang="FI">Nettiasetukset</text>
@@ -121,7 +126,7 @@
         <text lang="ET">Veebi sätted</text>
         <text lang="NB">Innstilinger for nettleser</text>
         <text lang="DA">Web-indstillinger</text>
-        <text lang="ES">Web</text>
+        <text lang="ES">Configurar Web</text>
         <text lang="PT">Configurar Navegação Web</text>
         <text lang="CS">Nastavení webu</text>
         <text lang="RU">Настройки браузера</text>
@@ -139,14 +144,14 @@
         <text lang="SV">Recept</text>
         <text lang="JA">レシピ設定</text>
         <text lang="DE">Rezepte</text>
-        <text lang="FR">Paramètres des recettes</text>
+        <text lang="FR">Paramètres des Recettes</text>
         <text lang="FI">Reseptiasetukset</text>
         <text lang="IS">Stillingar uppskrifta</text>
         <text lang="NL">Recepten Instellingen</text>    
         <text lang="SL">Nastavitve receptov</text>
         <text lang="ET">Retseptide sätted</text>    
         <text lang="NB">Innstillinger for oppskrifter</text>
-        <text lang="DA">Opskriftsindstillinger</text>
+        <text lang="DA">Opskrifts Indstillinger</text>
         <text lang="ES">Recetas</text>
         <text lang="PT">Configurar Receitas</text>
         <text lang="CS">Nastavení receptů</text>

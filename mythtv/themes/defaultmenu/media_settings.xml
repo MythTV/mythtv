@@ -4,11 +4,11 @@
         <type>SETTINGS_MUSIC</type>
         <text>Music Settings</text>
         <text lang="IT">Impostazioni Musica</text>
-        <text lang="ES">Música</text>
+        <text lang="ES">Configurar Música</text>
         <text lang="FR">Paramètres Musique</text>
-        <text lang="CS">Configurar Música</text>
+        <text lang="CA">Configurar Música</text>
         <text lang="DE">Musik</text>
-        <text lang="DA">Musikindstillinger</text>
+        <text lang="DA">Musik Indstillinger</text>
         <text lang="IS">Stillingar tónlistar</text>
         <text lang="NL">Muziek Instellingen</text>
         <text lang="PT">Configurar Música</text>
@@ -32,11 +32,11 @@
         <type>SETTINGS_VIDEO</type>
         <text>Videos Settings</text>
         <text lang="IT">Impostazioni Video</text>
-        <text lang="ES">Videos</text>
-        <text lang="CS">Configurar Videos</text>
+        <text lang="ES">Configurar Videos</text>
+        <text lang="CA">Configurar Videos</text>
         <text lang="FR">Paramètres Vidéos</text>
         <text lang="DE">Videos</text>
-        <text lang="DA">Videoindstillinger</text>
+        <text lang="DA">Video Indstillinger</text>
         <text lang="IS">Stillingar kvikmynda</text>
         <text lang="NL">Films Instellingen</text>
         <text lang="PT">Configurar Filmes</text>
@@ -60,11 +60,11 @@
         <type>SETTINGS_IMAGES</type>
         <text>Images Settings</text>
         <text lang="IT">Impostazioni Immagini</text>
-        <text lang="ES">Fotos</text>
-        <text lang="CS">Configurar Imatges</text>
+        <text lang="ES">Configurar Fotos</text>
+        <text lang="CA">Configurar Imatges</text>
         <text lang="FR">Paramètres Photos</text>
         <text lang="DE">Bilder</text>
-        <text lang="DA">Billedindstillinger</text>
+        <text lang="DA">Billed indstillinger</text>
         <text lang="IS">Stillingar ljósmynda</text>
         <text lang="NL">Foto's Instellingen</text>
         <text lang="PT">Configurar Fotos</text>
@@ -88,11 +88,11 @@
         <type>SETTINGS_GAME</type>
         <text>Game Settings</text>
         <text lang="IT">Impostazioni Giochi</text>
-        <text lang="ES">Juegos</text>
-        <text lang="CS">Configurar Jocs</text>
+        <text lang="ES">Configurar Juegos</text>
+        <text lang="CA">Configurar Jocs</text>
         <text lang="DE">Spiele</text>
         <text lang="FR">Paramètres Jeux</text>
-        <text lang="DA">Spilindstillinger</text>
+        <text lang="DA">Spil Indstillinger</text>
         <text lang="IS">Stillingar leikja</text>
         <text lang="NL">Spelen Instellingen</text>
         <text lang="PT">Configurar Jogos</text>
@@ -125,7 +125,7 @@
         <text lang="ET">Raadio sätted</text>
         <text lang="NB">Radioinnstillinger</text>
         <text lang="DA">Radioindstillinger</text>
-        <text lang="ES">Radio</text>
+        <text lang="ES">Configurar Radio</text>
         <text lang="PT">Configurar Rádio</text>
         <text lang="NL">Radio Instellingen</text>
         <text lang="RU">Настройки радио</text>
@@ -151,11 +151,11 @@
         <text>Archive Files Settings</text>
         <text lang="IT">Impostazioni Archivia Files</text>
         <text lang="ET">Arhiveerimise sätted</text>
-        <text lang="FR">Paramètres archivage</text>
+        <text lang="FR">Paramètres Archivage</text>
         <text lang="SV">Filarkivering</text>
         <text lang="ES">Archivado Ficheros</text>
         <text lang="RU">Настройки архива</text>
-        <text lang="DA">Filarkivering</text>
+        <text lang="DA">Fil Arkivering</text>
         <text lang="SL">Nastavitve arhiviranja</text>
         <text lang="PL">Ustaw pliki archiwum</text>
         <text lang="HE">הגדרות ארכיון קבצים</text>
