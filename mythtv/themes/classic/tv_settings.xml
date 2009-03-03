@@ -16,6 +16,7 @@
       <text lang="ET">Üldine</text>
       <text lang="RU">Общие</text>
       <text lang="PL">Ogólne</text>
+      <description>TV navigation and recording preferences</description> 
       <action>SETTINGS GENERAL</action>
    </button>
 
@@ -41,6 +42,7 @@
       <alttext lang="ET">Kava</alttext>
       <alttext lang="RU">Программа</alttext>
       <alttext lang="PL">Program TV</alttext>
+      <description>Guide appearance and behavior</description> 
       <action>SETTINGS EPG</action>
    </button>
 
@@ -61,12 +63,14 @@
       <text lang="ET">Mahamängimine</text>
       <text lang="RU">Воспроизведение</text>
       <text lang="PL">Odtwarzanie</text>
+      <description>Settings for viewing and playing TV</description> 
       <action>SETTINGS PLAYBACK</action>
    </button>
 
    <button>
       <type>TV_SETTINGS_PLAYBACK_OSD</type>
       <text>Playback OSD</text>
+      <description>Theme and settings for OSD</description> 
       <action>SETTINGS OSD</action>
    </button>
 
@@ -90,6 +94,7 @@
       <text lang="PL">Grupy odtwarzania</text>
       <alttext lang="RU">Группы</alttext>
       <alttext lang="PL">Grupy</alttext>
+      <description>Adjust settings for different playback styles</description> 
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -116,6 +121,7 @@
       <alttext lang="PT">Perfis</alttext>
       <alttext lang="RU">Профили</alttext>
       <alttext lang="PL">Profile</alttext>
+      <description> </description> 
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -139,6 +145,7 @@
       <alttext lang="PT">Prioridades</alttext>
       <alttext lang="RU">Приоритеты</alttext>
       <alttext lang="PL">Priorytety</alttext>
+      <description>Global recording priority and scheduling</description> 
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

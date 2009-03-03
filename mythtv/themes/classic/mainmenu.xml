@@ -304,6 +304,7 @@
      <text lang="ET">Sätted</text>
      <text lang="PL">Ustawienia</text>
      <text lang="RU">Настройки</text>
+     <description>Settings for TV, Images, Music, Video, Weather, et c.</description> 
      <action>MENU main_settings.xml</action>
    </button>
 

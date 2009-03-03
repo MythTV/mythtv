@@ -16,6 +16,7 @@
       <text lang="SL">Gledanje TV</text>
       <text lang="ET">Vaata telerit</text>
       <text lang="RU">Смотреть ТВ</text>
+      <description>Watch live television</description> 
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -40,6 +41,7 @@
       <alttext lang="SV">Radera</alttext>
       <alttext lang="NL">Verwijderen</alttext>
       <alttext lang="RU">Удалить</alttext>
+      <description>Remove television recordings</description> 
       <action>TV_DELETE</action>
    </button> 
 
@@ -75,6 +77,7 @@
       <text lang="NL">Eerder Opgenomen</text>
       <text lang="JA">録画履歴</text>
       <text lang="RU">Ранее записано</text>
+      <description>See what you have recorded before</description> 
       <action>TV_PREVIOUS</action>
    </button>
 

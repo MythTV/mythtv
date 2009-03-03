@@ -19,6 +19,7 @@
       <alttext lang="DE">Wiedergabe</alttext>
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="SV">Inspelningar</alttext>
+      <description>Play Recordings</description> 
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -42,6 +43,7 @@
       <text lang="RU">Будущие записи</text>
       <alttext lang="SV">Kommande</alttext>
       <alttext lang="ET">Tulevased</alttext>
+      <description>See what will be recorded next</description> 
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -76,6 +78,7 @@
       <alttext lang="SL">Planiranje</alttext>
       <alttext lang="ET">Plaanimine</alttext>
       <alttext lang="RU">Расписание</alttext>
+      <description>Pick shows to record</description> 
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -103,6 +106,7 @@
       <alttext lang="PT">Prioridades</alttext>
       <alttext lang="ES">Prioridades</alttext>
       <alttext lang="RU">Приоритеты</alttext>
+      <description>Prioritize some shows over others</description> 
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -120,6 +124,7 @@
       <text lang="ES">Estado Sistema</text>
       <text lang="NL">Systeemstatus</text>
       <text lang="RU">Состояние системы</text>
+      <description>What your system is doing right now</description> 
       <action>TV_STATUS</action>
    </button>
 
@@ -146,6 +151,7 @@
      <alttext lang="NL">Beheer</alttext>
      <alttext lang="ET">Sätted</alttext>
      <alttext lang="RU">Настройки</alttext>
+     <description>Settings for TV, Images, Music, Video, Weather, et c.</description> 
      <action>MENU util_menu.xml</action>
    </button>
 

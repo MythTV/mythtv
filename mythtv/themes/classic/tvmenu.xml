@@ -17,6 +17,7 @@
       <text lang="ET">Vaata telerit</text>
       <text lang="RU">Смотреть ТВ</text>
       <text lang="PL">Oglądanie TV</text>
+      <description>Watch live television</description> 
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -53,6 +54,7 @@
       <alttext lang="ET">Plaanimine</alttext>
       <alttext lang="RU">Расписание</alttext>
       <alttext lang="PL">Harmonogram</alttext>
+      <description>Pick shows to record</description> 
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -77,6 +79,7 @@
       <alttext lang="ET">Salvestised</alttext>
       <alttext lang="SV">Inspelningar</alttext>
       <alttext lang="PL">Oglądanie</alttext>
+      <description>Play TV Recordings</description> 
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -102,6 +105,7 @@
       <alttext lang="SV">Radera</alttext>
       <alttext lang="RU">Удалить</alttext>
       <alttext lang="PL">Kasowanie</alttext>
+      <description>Remove television recordings</description> 
       <action>TV_DELETE</action>
    </button> 
 
@@ -138,6 +142,7 @@
       <text lang="JA">録画履歴</text>
       <text lang="RU">Ранее записано</text>
       <text lang="PL">Poprzednio nagrane</text>
+      <description>See what you have recorded before</description> 
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -157,6 +162,7 @@
       <text lang="NL">Systeemstatus</text>
       <text lang="RU">Состояние системы</text>
       <text lang="PL">Status systemu</text>
+      <description>What your system is doing right now</description> 
       <action>TV_STATUS</action>
    </button>
 
@@ -177,6 +183,7 @@
      <text lang="ET">TV sätted</text>
      <text lang="PL">Konfiguracja TV</text>
      <text lang="RU">Настройка ТВ</text>
+     <description>Settings for TV recording and playback</description> 
      <action>MENU tv_settings.xml</action>
    </button>
 
