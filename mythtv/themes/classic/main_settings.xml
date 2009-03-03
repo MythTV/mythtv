@@ -65,21 +65,27 @@
         <action>SCREENSETUPWIZARD</action>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/util_menu.xml -->
     <button>
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
-        <text lang="FR">Configuration touches</text>
+        <text lang="FR">Configurer les touches</text>
+        <text lang="IS">Stilla takka</text>
         <text lang="DE">Tastenbelegung ändern</text>
-        <text lang="SV">Ändra knappar</text>
+        <text lang="FI">Muokkaa Näppäimiä</text>
         <text lang="DA">Tasteopsætning</text>
+        <text lang="SV">Ändra knappar</text>
+        <text lang="ES">Configurar Teclas</text>
         <text lang="PT">Configurar Teclas</text>
         <text lang="ET">Klahvide muutmine</text>
-        <text lang="ES">Configurar Teclas</text>
         <text lang="NL">Toetsen Instellen</text>
-        <text lang="PL">Ustaw klawisze</text>
+        <text lang="CS">Editovat klávesy</text>
         <text lang="JA">キー設定</text>
         <text lang="RU">Редактировать клавиши</text>
+        <text lang="SL">Urejanje tipk</text>
+        <text lang="PL">Ustaw klawisze</text>
+        <text lang="HE">עריכת מקשים</text>
         <description>Change mythtv key bindings.</description>
         <action>SETUP_KEYS</action>
     </button>
@@ -111,101 +117,131 @@
         <action>MENU tv_settings.xml</action>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
     <button>
         <type>SETTINGS_MUSIC</type>
         <text>Music Settings</text>
         <text lang="IT">Impostazioni Musica</text>
         <text lang="ES">Configurar Música</text>
+        <text lang="FR">Paramètres Musique</text>
         <text lang="CA">Configurar Música</text>
         <text lang="DE">Musik</text>
-        <text lang="FR">Paramètres musique</text>
         <text lang="DA">Musik Indstillinger</text>
+        <text lang="IS">Stillingar tónlistar</text>
         <text lang="NL">Muziek Instellingen</text>
         <text lang="PT">Configurar Música</text>
         <text lang="SV">Musik</text>
         <text lang="JA">ミュージック設定</text>
+        <text lang="FI">Musiikkiasetukset</text>
+        <text lang="ZH_TW">音樂設定</text>
         <text lang="SL">Glasbene nastavitve</text>
         <text lang="ET">Muusika sätted</text>
-        <text lang="PL">Konfiguracja Muzyki</text>
+        <text lang="NB">Musikkinnstillinger</text>
+        <text lang="CS">Nastavení muziky</text>
         <text lang="RU">Настройка музыки</text>
+        <text lang="PL">Konfiguracja Muzyki</text>
+        <text lang="HE">הגדרות מוסיקה</text>
         <description>Configure playback and CD ripping</description>
         <action>CONFIGPLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
     <button>
         <type>SETTINGS_VIDEO</type>
         <text>Videos Settings</text>
         <text lang="IT">Impostazioni Video</text>
         <text lang="ES">Configurar Videos</text>
         <text lang="CA">Configurar Videos</text>
+        <text lang="FR">Paramètres Vidéos</text>
         <text lang="DE">Videos</text>
-        <text lang="FR">Paramètres Videos</text>
         <text lang="DA">Video Indstillinger</text>
+        <text lang="IS">Stillingar kvikmynda</text>
         <text lang="NL">Films Instellingen</text>
         <text lang="PT">Configurar Filmes</text>
         <text lang="SV">Video</text>
         <text lang="JA">ビデオ設定</text>
+        <text lang="FI">Videoasetukset</text>
+        <text lang="ZH_TW">電影設定</text>
         <text lang="SL">Video nastavitve</text>
         <text lang="ET">Video sätted</text>
-        <text lang="PL">Ustaw Filmy</text>
+        <text lang="NB">Videoinnstillinger</text>
+        <text lang="CS">Nastavení videa</text>
         <text lang="RU">Настройка фильмов</text>
+        <text lang="PL">Ustaw Filmy</text>
+        <text lang="HE">הגדרות וידאו</text>
         <description>Configure playback and DVD ripping</description>
         <action>CONFIGPLUGIN mythvideo</action>
         <depends>mythvideo</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/util_menu.xml -->
     <button>
         <type>SETTINGS_FM</type>
         <text>Radio Settings</text>
         <text lang="IT">Impostazioni Radio</text>
+        <text lang="SV">Radio</text>
+        <text lang="JA">ラジオ設定</text>
         <text lang="DE">Radio</text>
+        <text lang="IS">Stillingar útvarps</text>
         <text lang="FR">Paramètres Radio</text>
+        <text lang="FI">Radioasetukset</text>
         <text lang="SL">Radio nastavitve</text>
         <text lang="ET">Raadio sätted</text>
-        <text lang="SV">Radio</text>
+        <text lang="NB">Radioinnstillinger</text>
         <text lang="DA">Radio Indstillinger</text>
-        <text lang="PT">Configurar Rádio</text>
         <text lang="ES">Configurar Radio</text>
+        <text lang="PT">Configurar Rádio</text>
         <text lang="NL">Radio Instellingen</text>
-        <text lang="PL">Konfiguracja Radia</text>
-        <text lang="JA">ラジオ設定</text>
         <text lang="RU">Настройка радио</text>
+        <text lang="PL">Konfiguracja Radia</text>
+        <text lang="HE">הגדרות רדיו</text>
         <description></description>
         <action>CONFIGPLUGIN mythFM</action>
         <depends>mythFM</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/util_menu.xml -->
     <button>
         <type>SETTINGS_STREAM</type>
         <text>MythStream Settings</text>
-        <action>CONFIGPLUGIN mythstream</action>
+        <text lang="SL">Nastavitve Mythstream</text>
+        <text lang="HE">הגדרות MythStream</text>
         <description></description>
+        <action>CONFIGPLUGIN mythstream</action>
         <depends>mythstream</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
     <button>
         <type>SETTINGS_IMAGES</type>
         <text>Images Settings</text>
         <text lang="IT">Impostazioni Immagini</text>
         <text lang="ES">Configurar Fotos</text>
         <text lang="CA">Configurar Imatges</text>
-        <text lang="DE">Bilder</text>
         <text lang="FR">Paramètres Photos</text>
+        <text lang="DE">Bilder</text>
         <text lang="DA">Billed indstillinger</text>
+        <text lang="IS">Stillingar ljósmynda</text>
         <text lang="NL">Foto's Instellingen</text>
         <text lang="PT">Configurar Fotos</text>
         <text lang="SV">Bilder</text>
         <text lang="JA">イメージ設定</text>
+        <text lang="FI">Kuva-asetukset</text>
+        <text lang="ZH_TW">照相館設定</text>
         <text lang="SL">Nastavitve slik</text>
         <text lang="ET">Galerii sätted</text>
-        <text lang="PL">Konfiguracja Galerii</text>
+        <text lang="NB">Bildeinnstillinger</text>
+        <text lang="CS">Nastavení obrázků</text>
         <text lang="RU">Настройка изображений</text>
+        <text lang="PL">Konfiguracja Galerii</text>
+        <text lang="HE">הגדרות תמונות</text>
         <description>Configure display of image gallery</description>
         <action>CONFIGPLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
     <button>
         <type>SETTINGS_GAME</type>
         <text>Game Settings</text>
@@ -215,71 +251,93 @@
         <text lang="DE">Spiele</text>
         <text lang="FR">Paramètres Jeux</text>
         <text lang="DA">Spil Indstillinger</text>
+        <text lang="IS">Stillingar leikja</text>
         <text lang="NL">Spelen Instellingen</text>
         <text lang="PT">Configurar Jogos</text>
         <text lang="SV">Spel</text>
         <text lang="JA">ゲーム設定</text>
+        <text lang="FI">Peliasetukset</text>
+        <text lang="ZH_TW">遊戲設定</text>
         <text lang="SL">Nastavitve iger</text>
         <text lang="ET">Mängude sätted</text>
-        <text lang="PL">Konfiguracja Gier</text>
+        <text lang="NB">Spillinnstillinger</text>
         <text lang="RU">Настройка игр</text>
+        <text lang="PL">Konfiguracja Gier</text>
+        <text lang="HE">הגדרות משחק</text>
         <description>Configure playback of games</description>
         <action>CONFIGPLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
     <button>
         <type>SETTINGS_WEATHER</type>
         <text>Weather Settings</text>
         <text lang="IT">Impostazioni Meteo</text>
         <text lang="ES">Configurar El Tiempo</text>
+        <text lang="FR">Paramètres Météo</text>
         <text lang="CA">Configurar El Temps</text>
         <text lang="DE">Wetter</text>
-        <text lang="FR">Paramètres Météo</text>
-        <text lang="DA">Vejr Indstililnger</text>
+        <text lang="DA">Vejr Indstillinger</text>
+        <text lang="IS">Stillingar veðurs</text>
         <text lang="NL">"Het Weer" Instellingen</text>
         <text lang="PT">Configurar Meteorologia</text>
         <text lang="SV">Väder</text>
         <text lang="JA">天気設定</text>
+        <text lang="FI">Sään Asetukset</text>
+        <text lang="ZH_TW">天氣報告設定</text>
         <text lang="SL">Nastavitve vremena</text>
         <text lang="ET">Ilmateate sätted</text>
-        <text lang="PL">Konfiguracja Pogody</text>
+        <text lang="NB">Innstillinger for vær</text>
+        <text lang="CS">Nastavení počasí</text>
         <text lang="RU">Настройка погоды</text>
+        <text lang="PL">Konfiguracja Pogody</text>
+        <text lang="HE">הגדרות מזג האויר</text>
         <description>Weather locale and sources</description>
         <action>CONFIGPLUGIN mythweather</action>
         <depends>mythweather</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
     <button>
         <type>SETTINGS_WEATHER</type>
         <text>Weather Station Settings</text>
+        <text lang="DE">Wetterstation</text>
         <description>???</description>
         <action>CONFIGPLUGIN mythwstation</action>
         <depends>mythwstation</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
     <button>
         <type>SETTINGS_NEWS</type>
         <text>News Settings</text>
         <text lang="IT">Impostazioni Notizie</text>
         <text lang="DE">Nachrichten</text>
-        <text lang="FR">Paramètres Nouvelles</text>
         <text lang="CA">Configurar Notícies</text>
         <text lang="ES">Configurar Noticias</text>
         <text lang="NL">Nieuws Instellingen</text>
+        <text lang="FR">Paramètres Nouvelles</text>
+        <text lang="IS">Stillingar frétta</text>
         <text lang="SV">Nyheter</text>
         <text lang="JA">ニュース設定</text>
+        <text lang="FI">Uutisten Asetukset</text>
+        <text lang="ZH_TW">網上新聞設定</text>
         <text lang="SL">Nastavitve novic</text>
         <text lang="ET">Uudiste sätted</text>
+        <text lang="NB">Innstillinger for nyheter</text>
         <text lang="DA">Nyheds Indstillingen</text>
         <text lang="PT">Configurar Notícias</text>
-        <text lang="PL">Ustaw WiadomoĹci</text>
+        <text lang="CS">Nastavení zpráv</text>
         <text lang="RU">Настройка новостей</text>
+        <text lang="PL">Ustaw WiadomoĹci</text>
+        <text lang="HE">הגדרות חדשות</text>
         <description>Choose which news sources interest you</description>
         <action>CONFIGPLUGIN mythnews</action>
         <depends>mythnews</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
     <button>
         <type>SETTINGS_WEBPAGE</type>
         <text>Web Settings</text>
@@ -287,36 +345,50 @@
         <text lang="DE">WWW</text>
         <text lang="SV">Webb</text>
         <text lang="JA">Web設定</text>
+        <text lang="FR">Paramètres du Web</text>
+        <text lang="IS">Stillingar vefs</text>
+        <text lang="NL">Web Instellingen</text>
+        <text lang="FI">Nettiasetukset</text>
+        <text lang="ZH_TW">互聯網設定</text>
         <text lang="SL">Spletne Nastavitve</text>
         <text lang="ET">Veebi sätted</text>
+        <text lang="NB">Innstilinger for nettleser</text>
         <text lang="DA">Web Indstillinger</text>
-        <text lang="FR">Paramètres Web</text>
-        <text lang="PT">Config. Navegação Web</text>
         <text lang="ES">Configurar Web</text>
-        <text lang="NL">Web Instellingen</text>
-        <text lang="PL">Konfiguracja przegladarki WWW</text>
+        <text lang="PT">Configurar Navegação Web</text>
+        <text lang="CS">Nastavení webu</text>
         <text lang="RU">Настройка браузера</text>
+        <text lang="PL">Konfiguracja przegladarki WWW</text>
+        <text lang="HE">הגדרות אינטרנט</text>
         <description>Manage web bookmarks</description>
         <action>CONFIGPLUGIN mythbookmarkmanager</action>
         <depends>mythbookmarkmanager</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
     <button>
         <type>SETTINGS_RECIPE</type>
         <text>Recipe Settings</text>
         <text lang="IT">Impostazioni Ricette</text>
+        <text lang="SV">Recept</text>
+        <text lang="JA">レシピ設定</text>
         <text lang="DE">Rezepte</text>
-        <text lang="FR">Paramètres Recettes</text>
+        <text lang="FR">Paramètres des Recettes</text>
+        <text lang="FI">Reseptiasetukset</text>
+        <text lang="IS">Stillingar uppskrifta</text>
+        <text lang="NL">Recepten Instellingen</text>
         <text lang="SL">Nastavitve receptov</text>
         <text lang="ET">Retseptide sätted</text>
-        <text lang="SV">Recept</text>
+        <text lang="NB">Innstillinger for oppskrifter</text>
         <text lang="DA">Opskrifts Indstillinger</text>
-        <text lang="PT">Configurar Receitas</text>
         <text lang="ES">Configurar Recetas</text>
-        <text lang="NL">Recepten Instellingen</text>
-        <text lang="JA">レシピ設定</text>
-        <text lang="PL">Ustaw Przepisy</text>>
+        <text lang="PT">Configurar Receitas</text>
+        <text lang="CS">Nastavení receptů</text>
         <text lang="RU">Настройка рецептов</text>
+        <text lang="PL">Ustaw Przepisy</text>>
+        <text lang="HE">הגדרות מתכונים</text>
+        <alttext lang="ET">Retseptid</alttext>
+        <alttext lang="PT">Receitas</alttext>
         <description></description>
         <action>CONFIGPLUGIN mythRecipe</action>
         <depends>mythRecipe</depends>
@@ -348,22 +420,26 @@
         <depends>mythphone</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
     <button>
         <type>SETTINGS_MOVIETIME</type>
         <text>Movie Time Settings</text>
         <text lang="EN_GB">Cinema Listings Settings</text>
         <text lang="IT">Impostazioni Orari</text>
-        <text lang="FR">Paramètres horaires films</text>
         <text lang="FI">Elokuvien Aika-asetukset</text>
         <text lang="SL">Nastavitve čas filmov</text>
         <text lang="ET">Filmiaegade sätted</text>
+        <text lang="FR">Paramètres horaires films</text>
         <text lang="SV">Biotider</text>
         <text lang="DA">Biograf Indstillinger</text>
         <text lang="PT">Configurar Horários de Cinema</text>
+        <text lang="DE">Kinoprogramm</text>
         <text lang="NL">Bioscoop Instellingen</text>
+        <text lang="CS">Nastavení programů kin</text>
         <text lang="JA">ムービータイム設定</text>
-        <text lang="PL">Konfiguracja MovieTime</text>
         <text lang="RU">Настройка афиши кино</text>
+        <text lang="PL">Konfiguracja MovieTime</text>
+        <text lang="HE">הגדרות Movie Times</text>
         <description>Select local movie theaters</description>
         <action>CONFIGPLUGIN mythmovies</action>
         <depends>mythmovies</depends>
@@ -397,32 +473,44 @@
         <dependssetting>EnableXbox</dependssetting>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
     <button>
         <type>SETTINGS_NETFLIX</type>
         <text>NetFlix Settings</text>
         <text lang="IT">Impostazioni NetFlix</text>
+        <text lang="FI">NetFlix Asetukset</text>
         <text lang="PT">Configurar Aluguer de Filmes</text>
-        <text lang="ES">MythFlix</text>
+        <text lang="DE">NetFlix</text>
         <text lang="FR">Paramètres Location films</text>
+        <text lang="ES">NetFlix</text>
         <text lang="ET">NetFlix'i sätted</text>
         <text lang="NL">NetFlix Instellingen</text>
         <text lang="JA">NetFlix設定</text>
-        <text lang="PL">Konfiguracja NetFlix</text>
         <text lang="RU">Настройка NetFlix</text>
+        <text lang="SL">NetFlix nastavitve</text>
+        <text lang="PL">Konfiguracja NetFlix</text>
+        <text lang="HE">הגדרות NetFlix</text>
         <description>Choose the genres that interest you</description>
         <action>CONFIGPLUGIN mythflix</action>
         <depends>mythflix</depends>
     </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
     <button>
         <type>SETTINGS_ARCHIVE</type>
         <text>Archive Files Settings</text>
         <text lang="IT">Impostazioni Archivia Files</text>
         <text lang="ET">Arhiveerimise sätted</text>
-        <text lang="SV">Filarkivering</text>
         <text lang="FR">Paramètres Archivage</text>
+        <text lang="SV">Filarkivering</text>
+        <text lang="ES">Archivado Ficheros</text>
         <text lang="RU">Настройка архива</text>
         <text lang="DA">Fil arkivering</text>
+        <text lang="SL">Nastavitve arhiviranja</text>
+        <text lang="PL">Ustaw pliki archiwum</text>
+        <text lang="HE">הגדרות ארכיון קבצים</text>
+        <text lang="FI">Arkistointiasetukset</text>
+        <text lang="DE">Archivieren</text>
         <description>Configure how to archive video to DVD</description>
         <action>CONFIGPLUGIN mytharchive</action>
         <depends>mytharchive</depends>
