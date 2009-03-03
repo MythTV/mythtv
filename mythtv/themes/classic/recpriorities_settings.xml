@@ -28,6 +28,7 @@
       <alttext lang="RU">Записи</alttext>
       <alttext lang="PL">Priorytet nagrywania</alttext>
       <alttext lang="HE">קדימיות ההקלטות</alttext>
+      <description>Settings to prioritize some shows over others</description> 
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -62,6 +63,7 @@
       <alttext lang="RU">Каналы</alttext>
       <alttext lang="PL">Priorytet kanałów</alttext>
       <alttext lang="HE">קדימיות ההקלטות לערוץ</alttext>
+      <description>Settings to prioritize some channels over others</description> 
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 
@@ -71,6 +73,7 @@
       <text lang="IT">Personalizzate</text>
       <text lang="PL">Dostosuj priorytety</text>
       <alttext>Custom Priority</alttext>
+      <description>???</description>
       <action>SETTINGS CUSTOMPRIORITY</action>
    </button>
 

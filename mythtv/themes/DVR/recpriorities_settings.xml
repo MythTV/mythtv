@@ -25,6 +25,7 @@
       <alttext lang="NL">Opnameprioriteit</alttext>
       <alttext lang="JA">録画優先順位</alttext>
       <alttext lang="RU">Записи</alttext>
+      <description>Settings to prioritize some shows over others</description> 
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -53,6 +54,7 @@
       <alttext lang="ES">Prioridades Canales</alttext>
       <alttext lang="NL">Prioriteit Per Zender</alttext>
       <alttext lang="RU">Каналы</alttext>
+      <description>Settings to prioritize some channels over others</description> 
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 
@@ -60,6 +62,7 @@
       <type>TV_RECPRIORITIES_CUSTOM</type>
       <text>Custom Priority</text>
       <alttext>Custom Priority</alttext>
+      <description>???</description>
       <action>SETTINGS CUSTOMPRIORITY</action>
    </button>
 

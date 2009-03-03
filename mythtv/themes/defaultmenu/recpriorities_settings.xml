@@ -30,6 +30,7 @@
       <alttext lang="PT">Prioridades de Gravação</alttext>
       <alttext lang="RU">Записи</alttext>
       <alttext lang="PL">Nagrania</alttext>
+      <description>Settings to prioritize some shows over others</description> 
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -66,6 +67,7 @@
       <alttext lang="PT">Prioridades de Gravação de Canais</alttext>
       <alttext lang="RU">Каналы</alttext>
       <alttext lang="PL">Kanały</alttext>
+      <description>Settings to prioritize some channels over others</description> 
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 
@@ -76,6 +78,7 @@
       <text lang="SL">Poljubne prioritete</text>
       <text lang="FI">Muokatut Prioriteetit</text>
       <alttext>Custom Priority</alttext>
+      <description>???</description>
       <action>SETTINGS CUSTOMPRIORITY</action>
    </button>
 
