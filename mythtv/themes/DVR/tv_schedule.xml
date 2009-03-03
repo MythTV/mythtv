@@ -1,188 +1,188 @@
 <mythmenu name="SCHEDULE">
 
-   <button>
-      <type>TV_PROGRAM_GUIDE</type>
-      <text>Program Guide</text>
-      <text lang="IT">Guida programmi</text>
-      <text lang="ES">Guía de Programas</text>
-      <text lang="CA">Guia de programes</text>
-      <text lang="NL">Programmagids</text>
-      <text lang="FR">Grille des programmes</text>
-      <text lang="DE">Programmübersicht</text>
-      <text lang="DA">Program Guide</text>
-      <text lang="PT">Guia de Programação</text>
-      <text lang="SV">Programguide</text>
-      <text lang="JA">番組ガイド</text>
-      <text lang="FI">Ohjelmaopas</text>
-      <text lang="ZH_TW">節目表</text>
-      <text lang="SL">Programski vodič</text>
-      <text lang="ET">Telekava</text>
-      <text lang="RU">Программа передач</text>
-      <alttext>Guide</alttext>
-      <alttext lang="FR">Grille</alttext>
-      <alttext lang="ES">Guía</alttext>
-      <alttext lang="CA">Guia</alttext>
-      <alttext lang="DE">EPG</alttext>
-      <alttext lang="DA">Guide</alttext>
-      <alttext lang="NL">Gids</alttext>
-      <alttext lang="SV">Guide</alttext>
-      <alttext lang="JA">ガイド</alttext>
-      <alttext lang="ZH_TW">節目</alttext>
-      <alttext lang="SL">Vodič</alttext>
-      <alttext lang="ET">Kava</alttext>
-      <alttext lang="PT">Guia</alttext>
-      <alttext lang="RU">Программа</alttext>
-      <description>Choose programs from a grid-style list</description> 
-      <action>TV_SCHEDULE</action>
-   </button>
+    <button>
+        <type>TV_PROGRAM_GUIDE</type>
+        <text>Program Guide</text>
+        <text lang="IT">Guida programmi</text>
+        <text lang="ES">Guía de Programas</text>
+        <text lang="CA">Guia de programes</text>
+        <text lang="NL">Programmagids</text>
+        <text lang="FR">Grille des programmes</text>
+        <text lang="DE">Programmübersicht</text>
+        <text lang="DA">Program Guide</text>
+        <text lang="PT">Guia de Programação</text>
+        <text lang="SV">Programguide</text>
+        <text lang="JA">番組ガイド</text>
+        <text lang="FI">Ohjelmaopas</text>
+        <text lang="ZH_TW">節目表</text>
+        <text lang="SL">Programski vodič</text>
+        <text lang="ET">Telekava</text>
+        <text lang="RU">Программа передач</text>
+        <alttext>Guide</alttext>
+        <alttext lang="FR">Grille</alttext>
+        <alttext lang="ES">Guía</alttext>
+        <alttext lang="CA">Guia</alttext>
+        <alttext lang="DE">EPG</alttext>
+        <alttext lang="DA">Guide</alttext>
+        <alttext lang="NL">Gids</alttext>
+        <alttext lang="SV">Guide</alttext>
+        <alttext lang="JA">ガイド</alttext>
+        <alttext lang="ZH_TW">節目</alttext>
+        <alttext lang="SL">Vodič</alttext>
+        <alttext lang="ET">Kava</alttext>
+        <alttext lang="PT">Guia</alttext>
+        <alttext lang="RU">Программа</alttext>
+        <description>Choose programs from a grid-style list</description>
+        <action>TV_SCHEDULE</action>
+    </button>
 
-   <button>
-      <type>TV_PROGFIND</type>
-      <text>Program Finder</text>
-      <text lang="IT">Ricerca programmi</text>
-      <text lang="ES">Buscar Programas</text>
-      <text lang="CA">Cercar programes</text>
-      <text lang="NL">Programma's Zoeken</text>
-      <text lang="FR">Recherche d'émission</text>
-      <text lang="DE">Alphabetische Suche</text>
-      <text lang="DA">Program SØger</text>
-      <text lang="PT">Procurar Programas</text>
-      <text lang="SV">Programletaren</text>
-      <text lang="JA">番組検索</text>
-      <text lang="FI">Ohjelman Etsintä</text>
-      <text lang="ZH_TW">搜尋節目</text>
-      <text lang="SL">Iskalec programov</text>
-      <text lang="ET">Programmiotsija</text>
-      <text lang="RU">Поиск программы</text>
-      <alttext>Finder</alttext>
-      <alttext lang="FR">Recherche</alttext>
-      <alttext lang="ES">Buscar</alttext>
-      <alttext lang="CA">Cercar</alttext>
-      <alttext lang="DE">ABC Suche</alttext>
-      <alttext lang="DA">Søger</alttext>
-      <alttext lang="NL">Zoek A-Z</alttext>
-      <alttext lang="PT">Procurar</alttext>
-      <alttext lang="SV">Letaren</alttext>
-      <alttext lang="JA">検索</alttext>
-      <alttext lang="ZH_TW">搜尋</alttext>
-      <alttext lang="SL">Iskalec</alttext>
-      <alttext lang="ET">Otsija</alttext>
-      <alttext lang="RU">Поиск</alttext>
-      <description>Choose programs from an alphabetical index</description> 
-      <action>TV_PROGFIND</action>
-   </button>
+    <button>
+        <type>TV_PROGFIND</type>
+        <text>Program Finder</text>
+        <text lang="IT">Ricerca programmi</text>
+        <text lang="ES">Buscar Programas</text>
+        <text lang="CA">Cercar programes</text>
+        <text lang="NL">Programma's Zoeken</text>
+        <text lang="FR">Recherche d'émission</text>
+        <text lang="DE">Alphabetische Suche</text>
+        <text lang="DA">Program SØger</text>
+        <text lang="PT">Procurar Programas</text>
+        <text lang="SV">Programletaren</text>
+        <text lang="JA">番組検索</text>
+        <text lang="FI">Ohjelman Etsintä</text>
+        <text lang="ZH_TW">搜尋節目</text>
+        <text lang="SL">Iskalec programov</text>
+        <text lang="ET">Programmiotsija</text>
+        <text lang="RU">Поиск программы</text>
+        <alttext>Finder</alttext>
+        <alttext lang="FR">Recherche</alttext>
+        <alttext lang="ES">Buscar</alttext>
+        <alttext lang="CA">Cercar</alttext>
+        <alttext lang="DE">ABC Suche</alttext>
+        <alttext lang="DA">Søger</alttext>
+        <alttext lang="NL">Zoek A-Z</alttext>
+        <alttext lang="PT">Procurar</alttext>
+        <alttext lang="SV">Letaren</alttext>
+        <alttext lang="JA">検索</alttext>
+        <alttext lang="ZH_TW">搜尋</alttext>
+        <alttext lang="SL">Iskalec</alttext>
+        <alttext lang="ET">Otsija</alttext>
+        <alttext lang="RU">Поиск</alttext>
+        <description>Choose programs from an alphabetical index</description>
+        <action>TV_PROGFIND</action>
+    </button>
 
-   <button>
-      <type>TV_SEARCH_WORDS</type>
-      <text>Search Words</text>
-      <text lang="FR">Recherche textuelle</text>
-      <text lang="DE">Volltextsuche</text>
-      <text lang="SV">Sök ord</text>
-      <text lang="NL">Woorden Zoeken</text>
-      <text lang="JA">単語検索</text>
-      <text lang="FI">Etsi Sanoista</text>
-      <text lang="ZH_TW">關鍵字</text>
-      <text lang="SL">Besedno iskanje</text>
-      <text lang="ET">Sõnade otsimine</text>
-      <text lang="DA">Søgeord</text>
-      <text lang="PT">Pesquisar Palavras</text>
-      <text lang="ES">Palabras</text>
-      <text lang="RU">Поиск слов</text>
-      <alttext>Search</alttext>
-      <alttext lang="FR">Texte</alttext>
-      <alttext lang="NL">Zoeken</alttext>
-      <alttext lang="SV">Ord</alttext>
-      <alttext lang="DE">Wörter</alttext>
-      <alttext lang="SL">Iskanje</alttext>
-      <alttext lang="ET">Sõnad</alttext>
-      <alttext lang="DA">Ord</alttext>
-      <alttext lang="PT">Palavras</alttext>
-      <alttext lang="RU">Слова</alttext>
-      <description>Find programs matching search words</description> 
-      <action>MENU tv_search.xml</action>
-   </button>
+    <button>
+        <type>TV_SEARCH_WORDS</type>
+        <text>Search Words</text>
+        <text lang="FR">Recherche textuelle</text>
+        <text lang="DE">Volltextsuche</text>
+        <text lang="SV">Sök ord</text>
+        <text lang="NL">Woorden Zoeken</text>
+        <text lang="JA">単語検索</text>
+        <text lang="FI">Etsi Sanoista</text>
+        <text lang="ZH_TW">關鍵字</text>
+        <text lang="SL">Besedno iskanje</text>
+        <text lang="ET">Sõnade otsimine</text>
+        <text lang="DA">Søgeord</text>
+        <text lang="PT">Pesquisar Palavras</text>
+        <text lang="ES">Palabras</text>
+        <text lang="RU">Поиск слов</text>
+        <alttext>Search</alttext>
+        <alttext lang="FR">Texte</alttext>
+        <alttext lang="NL">Zoeken</alttext>
+        <alttext lang="SV">Ord</alttext>
+        <alttext lang="DE">Wörter</alttext>
+        <alttext lang="SL">Iskanje</alttext>
+        <alttext lang="ET">Sõnad</alttext>
+        <alttext lang="DA">Ord</alttext>
+        <alttext lang="PT">Palavras</alttext>
+        <alttext lang="RU">Слова</alttext>
+        <description>Find programs matching search words</description>
+        <action>MENU tv_search.xml</action>
+    </button>
 
-   <button>
-      <type>TV_SEARCH_LISTS</type>
-      <text>Search Lists</text>
-      <text lang="SV">Sök listor</text>
-      <text lang="NL">Overzichtslijsten</text>
-      <text lang="FR">Listes de recherches</text>
-      <text lang="JA">リスト検索</text>
-      <text lang="DE">Listensuche</text>
-      <text lang="FI">Etsi Oppaasta</text>
-      <text lang="SL">Seznamsko iskanje</text>
-      <text lang="ET">Nimekirjade otsimine</text>
-      <text lang="DA">Søg på lister</text>
-      <text lang="PT">Pesquisar Listas</text>
-      <text lang="ES">Listados</text>
-      <text lang="RU">Поиск по списку</text>
-      <alttext>Lists</alttext>
-      <alttext lang="DE">Listen</alttext>
-      <alttext lang="SV">Listor</alttext>
-      <alttext lang="FR">Listes</alttext>
-      <alttext lang="NL">Lijsten</alttext>
-      <alttext lang="SL">Seznami</alttext>
-      <alttext lang="ET">Nimekirjad</alttext>
-      <alttext lang="DA">Lister</alttext>
-      <alttext lang="PT">Listas</alttext>
-      <alttext lang="RU">Списки</alttext>
-      <description>Pick a program to record from a set of lists</description> 
-      <action>MENU tv_lists.xml</action>
-   </button>
+    <button>
+        <type>TV_SEARCH_LISTS</type>
+        <text>Search Lists</text>
+        <text lang="SV">Sök listor</text>
+        <text lang="NL">Overzichtslijsten</text>
+        <text lang="FR">Listes de recherches</text>
+        <text lang="JA">リスト検索</text>
+        <text lang="DE">Listensuche</text>
+        <text lang="FI">Etsi Oppaasta</text>
+        <text lang="SL">Seznamsko iskanje</text>
+        <text lang="ET">Nimekirjade otsimine</text>
+        <text lang="DA">Søg på lister</text>
+        <text lang="PT">Pesquisar Listas</text>
+        <text lang="ES">Listados</text>
+        <text lang="RU">Поиск по списку</text>
+        <alttext>Lists</alttext>
+        <alttext lang="DE">Listen</alttext>
+        <alttext lang="SV">Listor</alttext>
+        <alttext lang="FR">Listes</alttext>
+        <alttext lang="NL">Lijsten</alttext>
+        <alttext lang="SL">Seznami</alttext>
+        <alttext lang="ET">Nimekirjad</alttext>
+        <alttext lang="DA">Lister</alttext>
+        <alttext lang="PT">Listas</alttext>
+        <alttext lang="RU">Списки</alttext>
+        <description>Pick a program to record from a set of lists</description>
+        <action>MENU tv_lists.xml</action>
+    </button>
 
-   <button>
-      <type>TV_CUSTOM_RECORD</type>
-      <text>Custom Record</text>
-      <text lang="SV">Avancerad</text>
-      <text lang="NL">Geavanceerd Opnameschema</text>
-      <text lang="JA">カスタム録画</text>
-      <text lang="FR">Enregistrement avancé</text>
-      <text lang="DE">freie Planung</text>
-      <text lang="FI">Edistyneet Valinnat</text>
-      <text lang="SL">Poljubno snemanje</text>
-      <text lang="ET">Kohandatud salvestamine</text>
-      <text lang="DA">Avanceret</text>
-      <text lang="PT">Regras de Gravação</text>
-      <text lang="ES">Avanzada</text>
-      <text lang="RU">Дополнительно</text>
-      <description>Advanced program finder</description> 
-      <action>TV_CUSTOM_RECORD</action>
-   </button>
+    <button>
+        <type>TV_CUSTOM_RECORD</type>
+        <text>Custom Record</text>
+        <text lang="SV">Avancerad</text>
+        <text lang="NL">Geavanceerd Opnameschema</text>
+        <text lang="JA">カスタム録画</text>
+        <text lang="FR">Enregistrement avancé</text>
+        <text lang="DE">freie Planung</text>
+        <text lang="FI">Edistyneet Valinnat</text>
+        <text lang="SL">Poljubno snemanje</text>
+        <text lang="ET">Kohandatud salvestamine</text>
+        <text lang="DA">Avanceret</text>
+        <text lang="PT">Regras de Gravação</text>
+        <text lang="ES">Avanzada</text>
+        <text lang="RU">Дополнительно</text>
+        <description>Advanced program finder</description>
+        <action>TV_CUSTOM_RECORD</action>
+    </button>
 
-   <button>
-      <type>TV_MANUAL_SCHEDULE</type>
-      <text>Manual Schedule</text>
-      <text lang="ES">Grabación Manual</text>
-      <text lang="CA">Programar Gravacions</text>
-      <text lang="DE">Manuelle Aufnahme</text>
-      <text lang="DA">Manuel programmering</text>
-      <text lang="FR">Programmation manuelle</text>
-      <text lang="NL">Manuele Opname</text>
-      <text lang="PT">Gravação Manual</text>
-      <text lang="SV">Manuell schemaläggning</text>
-      <text lang="JA">手動予約</text>
-      <text lang="FI">Manuaalinen Ajastus</text>
-      <text lang="ZH_TW">手動預錄</text>
-      <text lang="SL">Ročno snemanje</text>
-      <text lang="ET">Käsitsi salvestamine</text>
-      <text lang="RU">Ручная запись</text>
-      <alttext>Man. Sched.</alttext>
-      <alttext lang="ES">Manual</alttext>
-      <alttext lang="CA">Programar</alttext>
-      <alttext lang="DE">Manuell</alttext>
-      <alttext lang="FR">Prog. Man.</alttext>
-      <alttext lang="DA">Manuel prog.</alttext>
-      <alttext lang="NL">Manueel</alttext>
-      <alttext lang="PT">Manual</alttext>
-      <alttext lang="SV">Manuell</alttext>
-      <alttext lang="JA">手動</alttext>
-      <alttext lang="ZH_TW">手動預錄</alttext>
-      <alttext lang="SL">Ročno</alttext>
-      <alttext lang="ET">Käsitsi</alttext>
-      <alttext lang="RU">Вручную</alttext>
-      <description>VCR-like recording scheduler</description> 
-      <action>TV_MANUALSCHEDULE</action>
-   </button>
+    <button>
+        <type>TV_MANUAL_SCHEDULE</type>
+        <text>Manual Schedule</text>
+        <text lang="ES">Grabación Manual</text>
+        <text lang="CA">Programar Gravacions</text>
+        <text lang="DE">Manuelle Aufnahme</text>
+        <text lang="DA">Manuel programmering</text>
+        <text lang="FR">Programmation manuelle</text>
+        <text lang="NL">Manuele Opname</text>
+        <text lang="PT">Gravação Manual</text>
+        <text lang="SV">Manuell schemaläggning</text>
+        <text lang="JA">手動予約</text>
+        <text lang="FI">Manuaalinen Ajastus</text>
+        <text lang="ZH_TW">手動預錄</text>
+        <text lang="SL">Ročno snemanje</text>
+        <text lang="ET">Käsitsi salvestamine</text>
+        <text lang="RU">Ручная запись</text>
+        <alttext>Man. Sched.</alttext>
+        <alttext lang="ES">Manual</alttext>
+        <alttext lang="CA">Programar</alttext>
+        <alttext lang="DE">Manuell</alttext>
+        <alttext lang="FR">Prog. Man.</alttext>
+        <alttext lang="DA">Manuel prog.</alttext>
+        <alttext lang="NL">Manueel</alttext>
+        <alttext lang="PT">Manual</alttext>
+        <alttext lang="SV">Manuell</alttext>
+        <alttext lang="JA">手動</alttext>
+        <alttext lang="ZH_TW">手動預錄</alttext>
+        <alttext lang="SL">Ročno</alttext>
+        <alttext lang="ET">Käsitsi</alttext>
+        <alttext lang="RU">Вручную</alttext>
+        <description>VCR-like recording scheduler</description>
+        <action>TV_MANUALSCHEDULE</action>
+    </button>
 
 </mythmenu>

@@ -1,190 +1,190 @@
 <mythmenu name="TV">
 
-   <button>
-      <type>TV_WATCH_TV</type>
-      <text>Watch TV</text>
-      <text lang="IT">Guarda la TV</text>
-      <text lang="ES">Ver la TV</text>
-      <text lang="CA">Veure la TV</text>
-      <text lang="NL">TV Kijken</text>
-      <text lang="FR">Regarder la TV</text>
-      <text lang="DE">Fernsehen</text>
-      <text lang="DA">Se TV</text>
-      <text lang="PT">Ver Televisão</text>
-      <text lang="SV">Se på TV</text>
-      <text lang="JA">TVを見る</text>
-      <text lang="SL">Gledanje TV</text>
-      <text lang="ET">Vaata telerit</text>
-      <text lang="RU">Смотреть ТВ</text>
-      <text lang="PL">Oglądanie TV</text>
-      <description>Watch live television</description> 
-      <action>TV_WATCH_LIVE</action>
-   </button>
+    <button>
+        <type>TV_WATCH_TV</type>
+        <text>Watch TV</text>
+        <text lang="IT">Guarda la TV</text>
+        <text lang="ES">Ver la TV</text>
+        <text lang="CA">Veure la TV</text>
+        <text lang="NL">TV Kijken</text>
+        <text lang="FR">Regarder la TV</text>
+        <text lang="DE">Fernsehen</text>
+        <text lang="DA">Se TV</text>
+        <text lang="PT">Ver Televisão</text>
+        <text lang="SV">Se på TV</text>
+        <text lang="JA">TVを見る</text>
+        <text lang="SL">Gledanje TV</text>
+        <text lang="ET">Vaata telerit</text>
+        <text lang="RU">Смотреть ТВ</text>
+        <text lang="PL">Oglądanie TV</text>
+        <description>Watch live television</description>
+        <action>TV_WATCH_LIVE</action>
+    </button>
 
-   <button>
-      <type>TV_SCHEDULE_RECORDINGS</type>
-      <text>Schedule Recordings</text>
-      <text lang="IT">Pianifica Registrazioni</text>
-      <text lang="ES">Programar Grabaciones</text>
-      <text lang="CA">Programar Gravacions</text>
-      <text lang="NL">Opnames Plannen</text>
-      <text lang="FR">Planifier les enregistrements</text>
-      <text lang="DE">Aufnahmen planen</text>
-      <text lang="DA">Optag udsendelse</text>
-      <text lang="PT">Programar Gravações</text>
-      <text lang="SV">Schemalägg inspelningar</text>
-      <text lang="JA">録画予約</text>
-      <text lang="SL">Planiranje snemanj</text>
-      <text lang="ET">Salvestamise plaanimine</text>
-      <text lang="RU">Расписание записи</text>
-      <text lang="PL">Harmonogram nagrywania</text>
-      <alttext>Schedule</alttext>
-      <alttext lang="IT">Pianifica</alttext>
-      <alttext lang="FR">Planifier</alttext>
-      <alttext lang="ES">Temporizadores</alttext>
-      <alttext lang="CA">Temporitzadors</alttext>
-      <alttext lang="DA">Optagelser</alttext>
-      <alttext lang="NL">Planning</alttext>
-      <alttext lang="PT">Programar</alttext>
-      <alttext lang="SV">Schemalägg</alttext>
-      <alttext lang="JA">予約</alttext>
-      <alttext lang="IT">Pianifica</alttext>
-      <alttext lang="DE">Planung</alttext>
-      <alttext lang="SL">Planiranje</alttext>
-      <alttext lang="ET">Plaanimine</alttext>
-      <alttext lang="RU">Расписание</alttext>
-      <alttext lang="PL">Harmonogram</alttext>
-      <description>Pick shows to record</description> 
-      <action>MENU tv_schedule.xml</action>
-   </button>
+    <button>
+        <type>TV_SCHEDULE_RECORDINGS</type>
+        <text>Schedule Recordings</text>
+        <text lang="IT">Pianifica Registrazioni</text>
+        <text lang="ES">Programar Grabaciones</text>
+        <text lang="CA">Programar Gravacions</text>
+        <text lang="NL">Opnames Plannen</text>
+        <text lang="FR">Planifier les enregistrements</text>
+        <text lang="DE">Aufnahmen planen</text>
+        <text lang="DA">Optag udsendelse</text>
+        <text lang="PT">Programar Gravações</text>
+        <text lang="SV">Schemalägg inspelningar</text>
+        <text lang="JA">録画予約</text>
+        <text lang="SL">Planiranje snemanj</text>
+        <text lang="ET">Salvestamise plaanimine</text>
+        <text lang="RU">Расписание записи</text>
+        <text lang="PL">Harmonogram nagrywania</text>
+        <alttext>Schedule</alttext>
+        <alttext lang="IT">Pianifica</alttext>
+        <alttext lang="FR">Planifier</alttext>
+        <alttext lang="ES">Temporizadores</alttext>
+        <alttext lang="CA">Temporitzadors</alttext>
+        <alttext lang="DA">Optagelser</alttext>
+        <alttext lang="NL">Planning</alttext>
+        <alttext lang="PT">Programar</alttext>
+        <alttext lang="SV">Schemalägg</alttext>
+        <alttext lang="JA">予約</alttext>
+        <alttext lang="IT">Pianifica</alttext>
+        <alttext lang="DE">Planung</alttext>
+        <alttext lang="SL">Planiranje</alttext>
+        <alttext lang="ET">Plaanimine</alttext>
+        <alttext lang="RU">Расписание</alttext>
+        <alttext lang="PL">Harmonogram</alttext>
+        <description>Pick shows to record</description>
+        <action>MENU tv_schedule.xml</action>
+    </button>
 
-   <button>
-      <type>TV_WATCH_RECORDINGS</type>
-      <text>Watch Recordings</text>
-      <text lang="IT">Guarda Registrazioni</text>
-      <text lang="ES">Ver Grabaciones</text>
-      <text lang="CA">Veure Gravacions</text>
-      <text lang="NL">Opnames Bekijken</text>
-      <text lang="FR">Regarder les enregistrements</text>
-      <text lang="DE">Aufnahmen ansehen</text>
-      <text lang="DA">Afspil optagelser</text>
-      <text lang="PT">Ver Gravações</text>
-      <text lang="SV">Titta på inspelningar</text>
-      <text lang="JA">録画再生</text>
-      <text lang="SL">Predvajanje snemanj</text>
-      <text lang="ET">Salvestiste vaatamine</text>
-      <text lang="RU">Смотреть записи</text>
-      <text lang="PL">Odtwarzanie nagrań</text>
-      <alttext lang="DE">Wiedergabe</alttext>
-      <alttext lang="ET">Salvestised</alttext>
-      <alttext lang="SV">Inspelningar</alttext>
-      <alttext lang="PL">Oglądanie</alttext>
-      <description>Play TV Recordings</description> 
-      <action>TV_WATCH_RECORDING</action>
-   </button>
+    <button>
+        <type>TV_WATCH_RECORDINGS</type>
+        <text>Watch Recordings</text>
+        <text lang="IT">Guarda Registrazioni</text>
+        <text lang="ES">Ver Grabaciones</text>
+        <text lang="CA">Veure Gravacions</text>
+        <text lang="NL">Opnames Bekijken</text>
+        <text lang="FR">Regarder les enregistrements</text>
+        <text lang="DE">Aufnahmen ansehen</text>
+        <text lang="DA">Afspil optagelser</text>
+        <text lang="PT">Ver Gravações</text>
+        <text lang="SV">Titta på inspelningar</text>
+        <text lang="JA">録画再生</text>
+        <text lang="SL">Predvajanje snemanj</text>
+        <text lang="ET">Salvestiste vaatamine</text>
+        <text lang="RU">Смотреть записи</text>
+        <text lang="PL">Odtwarzanie nagrań</text>
+        <alttext lang="DE">Wiedergabe</alttext>
+        <alttext lang="ET">Salvestised</alttext>
+        <alttext lang="SV">Inspelningar</alttext>
+        <alttext lang="PL">Oglądanie</alttext>
+        <description>Play TV Recordings</description>
+        <action>TV_WATCH_RECORDING</action>
+    </button>
 
-   <button>
-      <type>TV_DELETE</type>
-      <text>Delete Recordings</text>
-      <text lang="IT">Elimina Registrazioni</text>
-      <text lang="ES">Borrar Grabaciones</text>
-      <text lang="CA">Esborrar Gravacions</text>
-      <text lang="NL">Opnames Verwijderen</text>
-      <text lang="FR">Supprimer enregistrements</text>
-      <text lang="DE">Aufnahmen löschen</text>
-      <text lang="DA">Slet optagelser</text>
-      <text lang="PT">Apagar Gravações</text>
-      <text lang="SV">Radera inspelningar</text>
-      <text lang="JA">録画削除</text>
-      <text lang="SL">Brisanje snemanj</text>
-      <text lang="ET">Salvestiste kustutamine</text>
-      <text lang="RU">Удалить записи</text>
-      <text lang="PL">Kasowanie nagrań</text>
-      <alttext lang="DE">Löschen</alttext>
-      <alttext lang="ET">Kustuta</alttext>
-      <alttext lang="SV">Radera</alttext>
-      <alttext lang="RU">Удалить</alttext>
-      <alttext lang="PL">Kasowanie</alttext>
-      <description>Remove television recordings</description> 
-      <action>TV_DELETE</action>
-   </button> 
+    <button>
+        <type>TV_DELETE</type>
+        <text>Delete Recordings</text>
+        <text lang="IT">Elimina Registrazioni</text>
+        <text lang="ES">Borrar Grabaciones</text>
+        <text lang="CA">Esborrar Gravacions</text>
+        <text lang="NL">Opnames Verwijderen</text>
+        <text lang="FR">Supprimer enregistrements</text>
+        <text lang="DE">Aufnahmen löschen</text>
+        <text lang="DA">Slet optagelser</text>
+        <text lang="PT">Apagar Gravações</text>
+        <text lang="SV">Radera inspelningar</text>
+        <text lang="JA">録画削除</text>
+        <text lang="SL">Brisanje snemanj</text>
+        <text lang="ET">Salvestiste kustutamine</text>
+        <text lang="RU">Удалить записи</text>
+        <text lang="PL">Kasowanie nagrań</text>
+        <alttext lang="DE">Löschen</alttext>
+        <alttext lang="ET">Kustuta</alttext>
+        <alttext lang="SV">Radera</alttext>
+        <alttext lang="RU">Удалить</alttext>
+        <alttext lang="PL">Kasowanie</alttext>
+        <description>Remove television recordings</description>
+        <action>TV_DELETE</action>
+    </button>
 
 <!-- EXECTV sample.  %s args in order are video, audio, and vbi devices
-   <button>
-      <type>TV_PLAYBACK</type>
-      <text>Passthrough Mode</text>
-      <text lang="PT">Modo Directo de TV</text>
-      <text lang="ES">TV directo</text>
-      <text lang="CA">TV directe</text>
-      <text lang="FR">TV directe</text>
-      <text lang="DE">TV direkt</text>
-      <text lang="SV">TV direkt</text>
-      <text lang="JA">パススルーモード</text>
-      <text lang="ET">Otse-TV</text>
-      <text lang="NL">TV Direct</text>
-      <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
-   </button>
+    <button>
+        <type>TV_PLAYBACK</type>
+        <text>Passthrough Mode</text>
+        <text lang="PT">Modo Directo de TV</text>
+        <text lang="ES">TV directo</text>
+        <text lang="CA">TV directe</text>
+        <text lang="FR">TV directe</text>
+        <text lang="DE">TV direkt</text>
+        <text lang="SV">TV direkt</text>
+        <text lang="JA">パススルーモード</text>
+        <text lang="ET">Otse-TV</text>
+        <text lang="NL">TV Direct</text>
+        <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
+    </button>
 -->
 
-   <button>
-      <type>TV_PREVIOUS</type>
-      <text>Previously Recorded</text>
-      <text lang="IT">Recentemente Registrati</text>
-      <text lang="SV">Föregående</text>
-      <text lang="DE">Alte Aufnahmen</text>
-      <text lang="SL">Že posneto</text>
-      <text lang="ET">Varem salvestatud</text>
-      <text lang="FR">Déjà enregistré</text>
-      <text lang="DA">Gamle optagelser</text>
-      <text lang="PT">Gravações Feitas</text>
-      <text lang="ES">Grabaciones Antiguas</text>
-      <text lang="NL">Eerdere Opnames</text>
-      <text lang="JA">録画履歴</text>
-      <text lang="RU">Ранее записано</text>
-      <text lang="PL">Poprzednio nagrane</text>
-      <description>See what you have recorded before</description> 
-      <action>TV_PREVIOUS</action>
-   </button>
+    <button>
+        <type>TV_PREVIOUS</type>
+        <text>Previously Recorded</text>
+        <text lang="IT">Recentemente Registrati</text>
+        <text lang="SV">Föregående</text>
+        <text lang="DE">Alte Aufnahmen</text>
+        <text lang="SL">Že posneto</text>
+        <text lang="ET">Varem salvestatud</text>
+        <text lang="FR">Déjà enregistré</text>
+        <text lang="DA">Gamle optagelser</text>
+        <text lang="PT">Gravações Feitas</text>
+        <text lang="ES">Grabaciones Antiguas</text>
+        <text lang="NL">Eerdere Opnames</text>
+        <text lang="JA">録画履歴</text>
+        <text lang="RU">Ранее записано</text>
+        <text lang="PL">Poprzednio nagrane</text>
+        <description>See what you have recorded before</description>
+        <action>TV_PREVIOUS</action>
+    </button>
 
-   <button>
-      <type>TV_STATUS</type>
-      <text>System Status</text>
-      <text lang="IT">Stato del Sistema</text>
-      <text lang="DE">Systemstatus</text>
-      <text lang="FR">Etat système</text>
-      <text lang="SV">Systemstatus</text>
-      <text lang="JA">システムステータス</text>
-      <text lang="SL">Status sistema</text>
-      <text lang="ET">Süsteemi olek</text>
-      <text lang="DA">Systemstatus</text>
-      <text lang="PT">Estado do Sistema</text>
-      <text lang="ES">Estado Sistema</text>
-      <text lang="NL">Systeemstatus</text>
-      <text lang="RU">Состояние системы</text>
-      <text lang="PL">Status systemu</text>
-      <description>What your system is doing right now</description> 
-      <action>TV_STATUS</action>
-   </button>
+    <button>
+        <type>TV_STATUS</type>
+        <text>System Status</text>
+        <text lang="IT">Stato del Sistema</text>
+        <text lang="DE">Systemstatus</text>
+        <text lang="FR">Etat système</text>
+        <text lang="SV">Systemstatus</text>
+        <text lang="JA">システムステータス</text>
+        <text lang="SL">Status sistema</text>
+        <text lang="ET">Süsteemi olek</text>
+        <text lang="DA">Systemstatus</text>
+        <text lang="PT">Estado do Sistema</text>
+        <text lang="ES">Estado Sistema</text>
+        <text lang="NL">Systeemstatus</text>
+        <text lang="RU">Состояние системы</text>
+        <text lang="PL">Status systemu</text>
+        <description>What your system is doing right now</description>
+        <action>TV_STATUS</action>
+    </button>
 
-   <button>
-     <type>SETTINGS_TV</type>
-     <text>TV Settings</text>
-     <text lang="IT">Impostazioni TV</text>
-     <text lang="CA">Configuració de TV</text>
-     <text lang="ES">Configuración de TV</text>
-     <text lang="FR">Paramètres TV</text>
-     <text lang="DE">TV</text>
-     <text lang="DA">TV Indstillinger</text>
-     <text lang="NL">TV Instellingen</text>
-     <text lang="PT">Configurar Televisão</text>
-     <text lang="SV">TV</text>
-     <text lang="JA">TV設定</text>
-     <text lang="SL">TV nastavitve</text>
-     <text lang="ET">TV sätted</text>
-     <text lang="PL">Konfiguracja TV</text>
-     <text lang="RU">Настройка ТВ</text>
-     <description>Settings for TV recording and playback</description> 
-     <action>MENU tv_settings.xml</action>
-   </button>
+    <button>
+        <type>SETTINGS_TV</type>
+        <text>TV Settings</text>
+        <text lang="IT">Impostazioni TV</text>
+        <text lang="CA">Configuració de TV</text>
+        <text lang="ES">Configuración de TV</text>
+        <text lang="FR">Paramètres TV</text>
+        <text lang="DE">TV</text>
+        <text lang="DA">TV Indstillinger</text>
+        <text lang="NL">TV Instellingen</text>
+        <text lang="PT">Configurar Televisão</text>
+        <text lang="SV">TV</text>
+        <text lang="JA">TV設定</text>
+        <text lang="SL">TV nastavitve</text>
+        <text lang="ET">TV sätted</text>
+        <text lang="PL">Konfiguracja TV</text>
+        <text lang="RU">Настройка ТВ</text>
+        <description>Settings for TV recording and playback</description>
+        <action>MENU tv_settings.xml</action>
+    </button>
 
 </mythmenu>

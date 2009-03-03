@@ -1,164 +1,164 @@
 <mythmenu name="INFO_SETUP">
 
-   <button>
-     <type>SETTINGS_WEATHER</type>
-     <text>Weather Settings</text>
-     <text lang="IT">Impostazioni Meteo</text>
-     <text lang="ES">El Tiempo</text>
-     <text lang="FR">Paramètres météo</text>
-     <text lang="CS">Configurar El Temps</text>
-     <text lang="DE">Wetter</text>
-     <text lang="DA">Vejrindstillinger</text>
-     <text lang="IS">Stillingar veðurs</text>
-     <text lang="NL">"Het Weer" Instellingen</text>
-     <text lang="PT">Configurar Meteorologia</text>
-     <text lang="SV">Väder</text>
-     <text lang="JA">天気設定</text>
-     <text lang="FI">Sään Asetukset</text>
-     <text lang="ZH_TW">天氣報告設定</text>
-     <text lang="SL">Nastavitve vremena</text>
-     <text lang="ET">Ilmateate sätted</text>
-     <text lang="NB">Innstillinger for vær</text>
-     <text lang="CS">Nastavení počasí</text>
-     <text lang="RU">Настройки погоды</text>
-     <text lang="PL">Ustaw Pogodę</text>
-     <text lang="HE">הגדרות מזג האויר</text>
-     <description>Weather locale and sources</description>
-     <action>CONFIGPLUGIN mythweather</action>
-     <depends>mythweather</depends>
-   </button>
+    <button>
+        <type>SETTINGS_WEATHER</type>
+        <text>Weather Settings</text>
+        <text lang="IT">Impostazioni Meteo</text>
+        <text lang="ES">El Tiempo</text>
+        <text lang="FR">Paramètres météo</text>
+        <text lang="CS">Configurar El Temps</text>
+        <text lang="DE">Wetter</text>
+        <text lang="DA">Vejrindstillinger</text>
+        <text lang="IS">Stillingar veðurs</text>
+        <text lang="NL">"Het Weer" Instellingen</text>
+        <text lang="PT">Configurar Meteorologia</text>
+        <text lang="SV">Väder</text>
+        <text lang="JA">天気設定</text>
+        <text lang="FI">Sään Asetukset</text>
+        <text lang="ZH_TW">天氣報告設定</text>
+        <text lang="SL">Nastavitve vremena</text>
+        <text lang="ET">Ilmateate sätted</text>
+        <text lang="NB">Innstillinger for vær</text>
+        <text lang="CS">Nastavení počasí</text>
+        <text lang="RU">Настройки погоды</text>
+        <text lang="PL">Ustaw Pogodę</text>
+        <text lang="HE">הגדרות מזג האויר</text>
+        <description>Weather locale and sources</description>
+        <action>CONFIGPLUGIN mythweather</action>
+        <depends>mythweather</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_WEATHER</type>
-     <text>Weather Station Settings</text>
-     <text lang="DE">Wetterstation</text>
-     <description>???</description>
-     <action>CONFIGPLUGIN mythwstation</action>
-     <depends>mythwstation</depends>
-   </button>
+    <button>
+        <type>SETTINGS_WEATHER</type>
+        <text>Weather Station Settings</text>
+        <text lang="DE">Wetterstation</text>
+        <description>???</description>
+        <action>CONFIGPLUGIN mythwstation</action>
+        <depends>mythwstation</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_NEWS</type>
-     <text>News Settings</text>
-     <text lang="IT">Impostazioni Notizie</text>
-     <text lang="DE">Nachrichten</text>
-     <text lang="CS">Configurar Notícies</text>
-     <text lang="ES">Noticias</text>
-     <text lang="NL">Nieuws Instellingen</text>
-     <text lang="FR">Paramètres des infos</text>
-     <text lang="IS">Stillingar frétta</text>
-     <text lang="SV">Nyheter</text>
-     <text lang="JA">ニュース設定</text>
-     <text lang="FI">Uutisten Asetukset</text>
-     <text lang="ZH_TW">網上新聞設定</text>
-     <text lang="SL">Nastavitve novic</text>
-     <text lang="ET">Uudiste sätted</text>
-     <text lang="NB">Innstillinger for nyheter</text>
-     <text lang="DA">Nyhedsindstillinger</text>
-     <text lang="PT">Configurar Notícias</text>
-     <text lang="CS">Nastavení zpráv</text>
-     <text lang="RU">Настройки новостей</text>
-     <text lang="PL">Ustaw wiadomości</text>
-     <text lang="HE">הגדרות חדשות</text>
-     <description>Choose which news sources interest you</description>
-     <action>CONFIGPLUGIN mythnews</action>
-     <depends>mythnews</depends>
-   </button>
+    <button>
+        <type>SETTINGS_NEWS</type>
+        <text>News Settings</text>
+        <text lang="IT">Impostazioni Notizie</text>
+        <text lang="DE">Nachrichten</text>
+        <text lang="CS">Configurar Notícies</text>
+        <text lang="ES">Noticias</text>
+        <text lang="NL">Nieuws Instellingen</text>
+        <text lang="FR">Paramètres des infos</text>
+        <text lang="IS">Stillingar frétta</text>
+        <text lang="SV">Nyheter</text>
+        <text lang="JA">ニュース設定</text>
+        <text lang="FI">Uutisten Asetukset</text>
+        <text lang="ZH_TW">網上新聞設定</text>
+        <text lang="SL">Nastavitve novic</text>
+        <text lang="ET">Uudiste sätted</text>
+        <text lang="NB">Innstillinger for nyheter</text>
+        <text lang="DA">Nyhedsindstillinger</text>
+        <text lang="PT">Configurar Notícias</text>
+        <text lang="CS">Nastavení zpráv</text>
+        <text lang="RU">Настройки новостей</text>
+        <text lang="PL">Ustaw wiadomości</text>
+        <text lang="HE">הגדרות חדשות</text>
+        <description>Choose which news sources interest you</description>
+        <action>CONFIGPLUGIN mythnews</action>
+        <depends>mythnews</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_MOVIETIME</type>
-     <text>Movie Time Settings</text>
-     <text lang="FI">Elokuvahaun Asetukset</text>
-     <text lang="SL">Nastavitve kino programa</text>
-     <text lang="ET">Filmiaegade sätted</text>
-     <text lang="FR">Paramètres des films</text>
-     <text lang="SV">Biotider</text>
-     <text lang="PT">Configurar Horários de Cinema</text>
-     <text lang="DE">Kinoprogramm</text>
-     <text lang="NL">Bioscoop Tijden</text>
-     <text lang="CS">Nastavení programů kin</text>
-     <text lang="RU">Настройки афиши кино</text>
-     <text lang="PL">Ustaw repertuar kin</text>
-     <text lang="HE">הגדרות Movie Times</text>
-     <description>Select local movie theaters</description>
-     <action>CONFIGPLUGIN mythmovies</action>
-     <depends>mythmovies</depends>
-   </button>
+    <button>
+        <type>SETTINGS_MOVIETIME</type>
+        <text>Movie Time Settings</text>
+        <text lang="FI">Elokuvahaun Asetukset</text>
+        <text lang="SL">Nastavitve kino programa</text>
+        <text lang="ET">Filmiaegade sätted</text>
+        <text lang="FR">Paramètres des films</text>
+        <text lang="SV">Biotider</text>
+        <text lang="PT">Configurar Horários de Cinema</text>
+        <text lang="DE">Kinoprogramm</text>
+        <text lang="NL">Bioscoop Tijden</text>
+        <text lang="CS">Nastavení programů kin</text>
+        <text lang="RU">Настройки афиши кино</text>
+        <text lang="PL">Ustaw repertuar kin</text>
+        <text lang="HE">הגדרות Movie Times</text>
+        <description>Select local movie theaters</description>
+        <action>CONFIGPLUGIN mythmovies</action>
+        <depends>mythmovies</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_NETFLIX</type>
-     <text>NetFlix Settings</text>
-     <text lang="IT">Impostazioni NetFlix</text>
-     <text lang="FI">MythFlix Asetukset</text>
-     <text lang="PT">Configurar Aluguer de Filmes</text>
-     <text lang="DE">MythFlix</text>
-     <text lang="FR">Paramètres Loc. films</text>
-     <text lang="ES">MythFlix</text>
-     <text lang="ET">MythFlix sätted</text>
-     <text lang="NL">MythFlix Instellingen</text>
-     <text lang="RU">Настройки MythFlix</text>
-     <text lang="SL">MythFlix nastavitve</text>
-     <text lang="PL">Ustaw Filmy z internetu</text>
-     <text lang="HE">הגדרות NetFlix</text>
-     <description>Choose the genres that interest you</description>
-     <action>CONFIGPLUGIN mythflix</action>
-     <depends>mythflix</depends>
-   </button>
-   
-   <button>
-     <type>SETTINGS_WEBPAGE</type>
-     <text>Web Settings</text>
-     <text lang="IT">Impostazioni Web</text>
-     <text lang="DE">WWW</text>
-     <text lang="SV">Webb</text>
-     <text lang="JA">Web設定</text>
-     <text lang="FR">Paramètres du web</text>
-     <text lang="IS">Stillingar vefs</text>
-     <text lang="NL">Internet Instellingen</text>     
-     <text lang="FI">Nettiasetukset</text>
-     <text lang="ZH_TW">互聯網設定</text>
-     <text lang="SL">Spletne nastavitve</text>
-     <text lang="ET">Veebi sätted</text>
-     <text lang="NB">Innstilinger for nettleser</text>
-     <text lang="DA">Web-indstillinger</text>
-     <text lang="ES">Web</text>
-     <text lang="PT">Configurar Navegação Web</text>
-     <text lang="CS">Nastavení webu</text>
-     <text lang="RU">Настройки браузера</text>
-     <text lang="PL">Ustaw zakładki WWW</text>
-     <text lang="HE">הגדרות אינטרנט</text>
-     <action>CONFIGPLUGIN mythbookmarkmanager</action>
-     <description>Manage web bookmarks</description>
-     <depends>mythbookmarkmanager</depends>
-   </button>
+    <button>
+        <type>SETTINGS_NETFLIX</type>
+        <text>NetFlix Settings</text>
+        <text lang="IT">Impostazioni NetFlix</text>
+        <text lang="FI">MythFlix Asetukset</text>
+        <text lang="PT">Configurar Aluguer de Filmes</text>
+        <text lang="DE">MythFlix</text>
+        <text lang="FR">Paramètres Loc. films</text>
+        <text lang="ES">MythFlix</text>
+        <text lang="ET">MythFlix sätted</text>
+        <text lang="NL">MythFlix Instellingen</text>
+        <text lang="RU">Настройки MythFlix</text>
+        <text lang="SL">MythFlix nastavitve</text>
+        <text lang="PL">Ustaw Filmy z internetu</text>
+        <text lang="HE">הגדרות NetFlix</text>
+        <description>Choose the genres that interest you</description>
+        <action>CONFIGPLUGIN mythflix</action>
+        <depends>mythflix</depends>
+    </button>
+  
+    <button>
+        <type>SETTINGS_WEBPAGE</type>
+        <text>Web Settings</text>
+        <text lang="IT">Impostazioni Web</text>
+        <text lang="DE">WWW</text>
+        <text lang="SV">Webb</text>
+        <text lang="JA">Web設定</text>
+        <text lang="FR">Paramètres du web</text>
+        <text lang="IS">Stillingar vefs</text>
+        <text lang="NL">Internet Instellingen</text>    
+        <text lang="FI">Nettiasetukset</text>
+        <text lang="ZH_TW">互聯網設定</text>
+        <text lang="SL">Spletne nastavitve</text>
+        <text lang="ET">Veebi sätted</text>
+        <text lang="NB">Innstilinger for nettleser</text>
+        <text lang="DA">Web-indstillinger</text>
+        <text lang="ES">Web</text>
+        <text lang="PT">Configurar Navegação Web</text>
+        <text lang="CS">Nastavení webu</text>
+        <text lang="RU">Настройки браузера</text>
+        <text lang="PL">Ustaw zakładki WWW</text>
+        <text lang="HE">הגדרות אינטרנט</text>
+        <action>CONFIGPLUGIN mythbookmarkmanager</action>
+        <description>Manage web bookmarks</description>
+        <depends>mythbookmarkmanager</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_RECIPE</type>
-     <text>Recipe Settings</text>
-     <text lang="IT">Impostazioni Ricette</text>
-     <text lang="SV">Recept</text>
-     <text lang="JA">レシピ設定</text>
-     <text lang="DE">Rezepte</text>
-     <text lang="FR">Paramètres des recettes</text>
-     <text lang="FI">Reseptiasetukset</text>
-     <text lang="IS">Stillingar uppskrifta</text>
-     <text lang="NL">Recepten Instellingen</text>     
-     <text lang="SL">Nastavitve receptov</text>
-     <text lang="ET">Retseptide sätted</text>     
-     <text lang="NB">Innstillinger for oppskrifter</text>
-     <text lang="DA">Opskriftsindstillinger</text>
-     <text lang="ES">Recetas</text>
-     <text lang="PT">Configurar Receitas</text>
-     <text lang="CS">Nastavení receptů</text>
-     <text lang="RU">Настройки рецептов</text>
-     <text lang="PL">Ustaw przepisy</text>
-     <text lang="HE">הגדרות מתכונים</text>
-     <alttext lang="ET">Retseptid</alttext>
-     <alttext lang="PT">Receitas</alttext>
-     <description></description>
-     <action>CONFIGPLUGIN mythrecipe</action>
-     <depends>mythrecipe</depends>
-   </button>
+    <button>
+        <type>SETTINGS_RECIPE</type>
+        <text>Recipe Settings</text>
+        <text lang="IT">Impostazioni Ricette</text>
+        <text lang="SV">Recept</text>
+        <text lang="JA">レシピ設定</text>
+        <text lang="DE">Rezepte</text>
+        <text lang="FR">Paramètres des recettes</text>
+        <text lang="FI">Reseptiasetukset</text>
+        <text lang="IS">Stillingar uppskrifta</text>
+        <text lang="NL">Recepten Instellingen</text>    
+        <text lang="SL">Nastavitve receptov</text>
+        <text lang="ET">Retseptide sätted</text>    
+        <text lang="NB">Innstillinger for oppskrifter</text>
+        <text lang="DA">Opskriftsindstillinger</text>
+        <text lang="ES">Recetas</text>
+        <text lang="PT">Configurar Receitas</text>
+        <text lang="CS">Nastavení receptů</text>
+        <text lang="RU">Настройки рецептов</text>
+        <text lang="PL">Ustaw przepisy</text>
+        <text lang="HE">הגדרות מתכונים</text>
+        <alttext lang="ET">Retseptid</alttext>
+        <alttext lang="PT">Receitas</alttext>
+        <description></description>
+        <action>CONFIGPLUGIN mythrecipe</action>
+        <depends>mythrecipe</depends>
+    </button>
 
 </mythmenu>
 

@@ -136,7 +136,7 @@
   <catcolor category="kinderprogramma" color="MediumSlateBlue"></catcolor>
   <catcolor category="tekenfilm" color="MediumSlateBlue"></catcolor>
   <catcolor category="tekenfilm kind" color="MediumSlateBlue"></catcolor>
-  
+ 
   <!-- Categories used by tvgids.nl (grabbed with tv_grab_nl) -->
   <catcolor category="Amusement" color="orchid"></catcolor>
   <catcolor category="Animatie" color="#3333aa"></catcolor>
@@ -153,7 +153,7 @@
   <catcolor category="Religieus" color="CornflowerBlue"></catcolor>
   <catcolor category="Serie/soap" color="DarkOrchid"></catcolor>
   <catcolor category="Wetenschap" color="#33ff99"></catcolor>
-  
+ 
   <!-- Categories introduced by tv_grab_jp -->
   <catcolor category="その他" color="#222200"></catcolor>
   <catcolor category="ドラマ" color="rosybrown3"></catcolor>
@@ -169,7 +169,7 @@
   <catcolor category="趣味・実用" color="goldenrod"></catcolor>
   <catcolor category="情報" color="#00aa00"></catcolor>
   <catcolor category="教育" color="CornflowerBlue"></catcolor>
-  
+ 
   <!-- Categories introduced by tv_grab_br -->
   <catcolor category="Educativo" color="CornflowerBlue"></catcolor>
   <catcolor category="Infantil" color="MediumSlateBlue"></catcolor>

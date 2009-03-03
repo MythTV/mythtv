@@ -1,408 +1,408 @@
 <mythmenu name="SETUP">
 
-   <button>
-      <type>SETTINGS_GENERAL</type>
-      <text>General</text>
-      <text lang="IT">Generale</text>
-      <text lang="ES">General</text>
-      <text lang="CA">General</text>
-      <text lang="FR">Généraux</text>
-      <text lang="DE">Grundeinstellungen</text>
-      <text lang="DA">Generelt</text>
-      <text lang="NL">Algemeen</text>
-      <text lang="PT">Configurações Gerais</text>
-      <text lang="SV">Generellt</text>
-      <text lang="JA">全般</text>
-      <text lang="SL">Splošno</text>
-      <text lang="ET">Üldine</text>
-      <text lang="PL">Ustawienia</text>
-      <text lang="RU">Общее</text>
-      <description>Core MythTV behavior and system settings</description>
-      <action>SETTINGS MAINGENERAL</action>
-   </button>
-
-   <button>
-      <type>SETTINGS_APPEARANCE</type>
-      <text>Appearance</text>
-      <text lang="IT">Aspetto</text>
-      <text lang="ES">Aspecto</text>
-      <text lang="CA">Aspecte</text>
-      <text lang="FR">Aspect</text>
-      <text lang="DE">Erscheinungsbild</text>
-      <text lang="DA">Udseende</text>
-      <text lang="NL">Uiterlijk</text>
-      <text lang="PT">Configurar Aparência</text>
-      <text lang="SV">Utseende</text>
-      <text lang="JA">画面表示</text>
-      <text lang="SL">Vzgled</text>
-      <text lang="ET">Kujundus</text>
-      <text lang="PL">Ustaw wyglądy</text>
-      <text lang="RU">Внешний вид</text>
-      <description>pick the theme, font, size, and locale</description>
-      <action>SETTINGS APPEARANCE</action>
-   </button>
-
-   <button>
-      <type>SCREENSETUPWIZARD</type>
-      <text>Screen Setup Wizards</text>
-      <description>Compensate for TVs with overscan</description>
-      <action>SCREENSETUPWIZARD</action>
-   </button>
+    <button>
+        <type>SETTINGS_GENERAL</type>
+        <text>General</text>
+        <text lang="IT">Generale</text>
+        <text lang="ES">General</text>
+        <text lang="CA">General</text>
+        <text lang="FR">Généraux</text>
+        <text lang="DE">Grundeinstellungen</text>
+        <text lang="DA">Generelt</text>
+        <text lang="NL">Algemeen</text>
+        <text lang="PT">Configurações Gerais</text>
+        <text lang="SV">Generellt</text>
+        <text lang="JA">全般</text>
+        <text lang="SL">Splošno</text>
+        <text lang="ET">Üldine</text>
+        <text lang="PL">Ustawienia</text>
+        <text lang="RU">Общее</text>
+        <description>Core MythTV behavior and system settings</description>
+        <action>SETTINGS MAINGENERAL</action>
+    </button>
 
     <button>
-      <type>SETUP_KEYS</type>
-      <text>Edit Keys</text>
-      <text lang="IT">Modifica Tasti</text>
-      <text lang="FR">Configuration touches</text>
-      <text lang="DE">Tastenbelegung ändern</text>
-      <text lang="SV">Ändra knappar</text>
-      <text lang="DA">Tasteopsætning</text>
-      <text lang="PT">Configurar Teclas</text>
-      <text lang="ET">Klahvide muutmine</text>
-      <text lang="ES">Configurar Teclas</text>
-      <text lang="NL">Toetsen Instellen</text>
-      <text lang="PL">Ustaw klawisze</text>
-      <text lang="JA">キー設定</text>
-      <text lang="RU">Редактировать клавиши</text>
-      <description>Change mythtv key bindings.</description> 
-      <action>SETUP_KEYS</action>
-   </button>
+        <type>SETTINGS_APPEARANCE</type>
+        <text>Appearance</text>
+        <text lang="IT">Aspetto</text>
+        <text lang="ES">Aspecto</text>
+        <text lang="CA">Aspecte</text>
+        <text lang="FR">Aspect</text>
+        <text lang="DE">Erscheinungsbild</text>
+        <text lang="DA">Udseende</text>
+        <text lang="NL">Uiterlijk</text>
+        <text lang="PT">Configurar Aparência</text>
+        <text lang="SV">Utseende</text>
+        <text lang="JA">画面表示</text>
+        <text lang="SL">Vzgled</text>
+        <text lang="ET">Kujundus</text>
+        <text lang="PL">Ustaw wyglądy</text>
+        <text lang="RU">Внешний вид</text>
+        <description>pick the theme, font, size, and locale</description>
+        <action>SETTINGS APPEARANCE</action>
+    </button>
 
-   <button>
-     <type>SETTINGS_TV</type>
-     <text>TV Settings</text>
-     <text lang="IT">Impostazioni TV</text>
-     <text lang="CA">Configuració de TV</text>
-     <text lang="ES">Configuración de TV</text>
-     <text lang="FR">Paramètres TV</text>
-     <text lang="DE">TV</text>
-     <text lang="DA">TV Indstillinger</text>
-     <text lang="NL">TV Instellingen</text>
-     <text lang="PT">Configurar Televisão</text>
-     <text lang="SV">TV</text>
-     <text lang="JA">TV設定</text>
-     <text lang="SL">TV nastavitve</text>
-     <text lang="ET">TV sätted</text>
-     <text lang="PL">Konfiguracja TV</text>
-     <text lang="RU">Настройка ТВ</text>
-     <description>Settings for TV recording and playback</description>
-     <action>MENU tv_settings.xml</action>
-   </button>
+    <button>
+        <type>SCREENSETUPWIZARD</type>
+        <text>Screen Setup Wizards</text>
+        <description>Compensate for TVs with overscan</description>
+        <action>SCREENSETUPWIZARD</action>
+    </button>
 
-   <button>
-     <type>SETTINGS_MUSIC</type>
-     <text>Music Settings</text>
-     <text lang="IT">Impostazioni Musica</text>
-     <text lang="ES">Configurar Música</text>
-     <text lang="CA">Configurar Música</text>
-     <text lang="DE">Musik</text>
-     <text lang="FR">Paramètres musique</text>
-     <text lang="DA">Musik Indstillinger</text>
-     <text lang="NL">Muziek Instellingen</text>
-     <text lang="PT">Configurar Música</text>
-     <text lang="SV">Musik</text>
-     <text lang="JA">ミュージック設定</text>
-     <text lang="SL">Glasbene nastavitve</text>
-     <text lang="ET">Muusika sätted</text>
-     <text lang="PL">Konfiguracja Muzyki</text>
-     <text lang="RU">Настройка музыки</text>
-     <description>Configure playback and CD ripping</description> 
-     <action>CONFIGPLUGIN mythmusic</action>
-     <depends>mythmusic</depends>
-   </button>
+    <button>
+        <type>SETUP_KEYS</type>
+        <text>Edit Keys</text>
+        <text lang="IT">Modifica Tasti</text>
+        <text lang="FR">Configuration touches</text>
+        <text lang="DE">Tastenbelegung ändern</text>
+        <text lang="SV">Ändra knappar</text>
+        <text lang="DA">Tasteopsætning</text>
+        <text lang="PT">Configurar Teclas</text>
+        <text lang="ET">Klahvide muutmine</text>
+        <text lang="ES">Configurar Teclas</text>
+        <text lang="NL">Toetsen Instellen</text>
+        <text lang="PL">Ustaw klawisze</text>
+        <text lang="JA">キー設定</text>
+        <text lang="RU">Редактировать клавиши</text>
+        <description>Change mythtv key bindings.</description>
+        <action>SETUP_KEYS</action>
+    </button>
 
-   <button>
-       <type>SETTINGS_VIDEO</type>
-       <text>Videos Settings</text>
-       <text lang="IT">Impostazioni Video</text>
-       <text lang="ES">Configurar Videos</text>
-       <text lang="CA">Configurar Videos</text>
-       <text lang="DE">Videos</text>
-       <text lang="FR">Paramètres Videos</text>
-       <text lang="DA">Video Indstillinger</text>
-       <text lang="NL">Films Instellingen</text>
-       <text lang="PT">Configurar Filmes</text>
-       <text lang="SV">Video</text>
-       <text lang="JA">ビデオ設定</text>
-       <text lang="SL">Video nastavitve</text>
-       <text lang="ET">Video sätted</text>
-       <text lang="PL">Ustaw Filmy</text>
-       <text lang="RU">Настройка фильмов</text>
-       <description>Configure playback and DVD ripping</description> 
-       <action>CONFIGPLUGIN mythvideo</action>
-       <depends>mythvideo</depends>
-   </button>
+    <button>
+        <type>SETTINGS_TV</type>
+        <text>TV Settings</text>
+        <text lang="IT">Impostazioni TV</text>
+        <text lang="CA">Configuració de TV</text>
+        <text lang="ES">Configuración de TV</text>
+        <text lang="FR">Paramètres TV</text>
+        <text lang="DE">TV</text>
+        <text lang="DA">TV Indstillinger</text>
+        <text lang="NL">TV Instellingen</text>
+        <text lang="PT">Configurar Televisão</text>
+        <text lang="SV">TV</text>
+        <text lang="JA">TV設定</text>
+        <text lang="SL">TV nastavitve</text>
+        <text lang="ET">TV sätted</text>
+        <text lang="PL">Konfiguracja TV</text>
+        <text lang="RU">Настройка ТВ</text>
+        <description>Settings for TV recording and playback</description>
+        <action>MENU tv_settings.xml</action>
+    </button>
 
-   <button>
-      <type>SETTINGS_FM</type>
-      <text>Radio Settings</text>
-      <text lang="IT">Impostazioni Radio</text>
-      <text lang="DE">Radio</text>
-      <text lang="FR">Paramètres Radio</text>
-      <text lang="SL">Radio nastavitve</text>
-      <text lang="ET">Raadio sätted</text>
-      <text lang="SV">Radio</text>
-      <text lang="DA">Radio Indstillinger</text>
-      <text lang="PT">Configurar Rádio</text>
-      <text lang="ES">Configurar Radio</text>
-      <text lang="NL">Radio Instellingen</text>
-      <text lang="PL">Konfiguracja Radia</text>
-      <text lang="JA">ラジオ設定</text>
-      <text lang="RU">Настройка радио</text>
-      <description></description> 
-      <action>CONFIGPLUGIN mythFM</action>
-      <depends>mythFM</depends>
-   </button>
+    <button>
+        <type>SETTINGS_MUSIC</type>
+        <text>Music Settings</text>
+        <text lang="IT">Impostazioni Musica</text>
+        <text lang="ES">Configurar Música</text>
+        <text lang="CA">Configurar Música</text>
+        <text lang="DE">Musik</text>
+        <text lang="FR">Paramètres musique</text>
+        <text lang="DA">Musik Indstillinger</text>
+        <text lang="NL">Muziek Instellingen</text>
+        <text lang="PT">Configurar Música</text>
+        <text lang="SV">Musik</text>
+        <text lang="JA">ミュージック設定</text>
+        <text lang="SL">Glasbene nastavitve</text>
+        <text lang="ET">Muusika sätted</text>
+        <text lang="PL">Konfiguracja Muzyki</text>
+        <text lang="RU">Настройка музыки</text>
+        <description>Configure playback and CD ripping</description>
+        <action>CONFIGPLUGIN mythmusic</action>
+        <depends>mythmusic</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_STREAM</type>
-     <text>MythStream Settings</text>
-     <action>CONFIGPLUGIN mythstream</action>
-     <description></description> 
-     <depends>mythstream</depends>
-   </button>
+    <button>
+        <type>SETTINGS_VIDEO</type>
+        <text>Videos Settings</text>
+        <text lang="IT">Impostazioni Video</text>
+        <text lang="ES">Configurar Videos</text>
+        <text lang="CA">Configurar Videos</text>
+        <text lang="DE">Videos</text>
+        <text lang="FR">Paramètres Videos</text>
+        <text lang="DA">Video Indstillinger</text>
+        <text lang="NL">Films Instellingen</text>
+        <text lang="PT">Configurar Filmes</text>
+        <text lang="SV">Video</text>
+        <text lang="JA">ビデオ設定</text>
+        <text lang="SL">Video nastavitve</text>
+        <text lang="ET">Video sätted</text>
+        <text lang="PL">Ustaw Filmy</text>
+        <text lang="RU">Настройка фильмов</text>
+        <description>Configure playback and DVD ripping</description>
+        <action>CONFIGPLUGIN mythvideo</action>
+        <depends>mythvideo</depends>
+    </button>
 
-   <button>
-      <type>SETTINGS_IMAGES</type>
-      <text>Images Settings</text>
-      <text lang="IT">Impostazioni Immagini</text>
-      <text lang="ES">Configurar Fotos</text>
-      <text lang="CA">Configurar Imatges</text>
-      <text lang="DE">Bilder</text>
-      <text lang="FR">Paramètres Photos</text>
-      <text lang="DA">Billed indstillinger</text>
-      <text lang="NL">Foto's Instellingen</text>
-      <text lang="PT">Configurar Fotos</text>
-      <text lang="SV">Bilder</text>
-      <text lang="JA">イメージ設定</text>
-      <text lang="SL">Nastavitve slik</text>
-      <text lang="ET">Galerii sätted</text>
-      <text lang="PL">Konfiguracja Galerii</text>
-      <text lang="RU">Настройка изображений</text>
-      <description>Configure display of image gallery</description> 
-      <action>CONFIGPLUGIN mythgallery</action>
-      <depends>mythgallery</depends>
-   </button>
+    <button>
+        <type>SETTINGS_FM</type>
+        <text>Radio Settings</text>
+        <text lang="IT">Impostazioni Radio</text>
+        <text lang="DE">Radio</text>
+        <text lang="FR">Paramètres Radio</text>
+        <text lang="SL">Radio nastavitve</text>
+        <text lang="ET">Raadio sätted</text>
+        <text lang="SV">Radio</text>
+        <text lang="DA">Radio Indstillinger</text>
+        <text lang="PT">Configurar Rádio</text>
+        <text lang="ES">Configurar Radio</text>
+        <text lang="NL">Radio Instellingen</text>
+        <text lang="PL">Konfiguracja Radia</text>
+        <text lang="JA">ラジオ設定</text>
+        <text lang="RU">Настройка радио</text>
+        <description></description>
+        <action>CONFIGPLUGIN mythFM</action>
+        <depends>mythFM</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_GAME</type>
-     <text>Game Settings</text>
-     <text lang="IT">Impostazioni Giochi</text>
-     <text lang="ES">Configurar Juegos</text>
-     <text lang="CA">Configurar Jocs</text>
-     <text lang="DE">Spiele</text>
-     <text lang="FR">Paramètres Jeux</text>
-     <text lang="DA">Spil Indstillinger</text>
-     <text lang="NL">Spelen Instellingen</text>
-     <text lang="PT">Configurar Jogos</text>
-     <text lang="SV">Spel</text>
-     <text lang="JA">ゲーム設定</text>
-     <text lang="SL">Nastavitve iger</text>
-     <text lang="ET">Mängude sätted</text>
-     <text lang="PL">Konfiguracja Gier</text>
-     <text lang="RU">Настройка игр</text>
-     <description>Configure playback of games</description> 
-     <action>CONFIGPLUGIN mythgame</action>
-     <depends>mythgame</depends>
-   </button>
+    <button>
+        <type>SETTINGS_STREAM</type>
+        <text>MythStream Settings</text>
+        <action>CONFIGPLUGIN mythstream</action>
+        <description></description>
+        <depends>mythstream</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_WEATHER</type>
-     <text>Weather Settings</text>
-     <text lang="IT">Impostazioni Meteo</text>
-     <text lang="ES">Configurar El Tiempo</text>
-     <text lang="CA">Configurar El Temps</text>
-     <text lang="DE">Wetter</text>
-     <text lang="FR">Paramètres Météo</text>
-     <text lang="DA">Vejr Indstililnger</text>
-     <text lang="NL">"Het Weer" Instellingen</text>
-     <text lang="PT">Configurar Meteorologia</text>
-     <text lang="SV">Väder</text>
-     <text lang="JA">天気設定</text>
-     <text lang="SL">Nastavitve vremena</text>
-     <text lang="ET">Ilmateate sätted</text>
-     <text lang="PL">Konfiguracja Pogody</text>
-     <text lang="RU">Настройка погоды</text>
-     <description>Weather locale and sources</description> 
-     <action>CONFIGPLUGIN mythweather</action>
-     <depends>mythweather</depends>
-   </button>
+    <button>
+        <type>SETTINGS_IMAGES</type>
+        <text>Images Settings</text>
+        <text lang="IT">Impostazioni Immagini</text>
+        <text lang="ES">Configurar Fotos</text>
+        <text lang="CA">Configurar Imatges</text>
+        <text lang="DE">Bilder</text>
+        <text lang="FR">Paramètres Photos</text>
+        <text lang="DA">Billed indstillinger</text>
+        <text lang="NL">Foto's Instellingen</text>
+        <text lang="PT">Configurar Fotos</text>
+        <text lang="SV">Bilder</text>
+        <text lang="JA">イメージ設定</text>
+        <text lang="SL">Nastavitve slik</text>
+        <text lang="ET">Galerii sätted</text>
+        <text lang="PL">Konfiguracja Galerii</text>
+        <text lang="RU">Настройка изображений</text>
+        <description>Configure display of image gallery</description>
+        <action>CONFIGPLUGIN mythgallery</action>
+        <depends>mythgallery</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_WEATHER</type>
-     <text>Weather Station Settings</text>
-     <description>???</description> 
-     <action>CONFIGPLUGIN mythwstation</action>
-     <depends>mythwstation</depends>
-   </button>
+    <button>
+        <type>SETTINGS_GAME</type>
+        <text>Game Settings</text>
+        <text lang="IT">Impostazioni Giochi</text>
+        <text lang="ES">Configurar Juegos</text>
+        <text lang="CA">Configurar Jocs</text>
+        <text lang="DE">Spiele</text>
+        <text lang="FR">Paramètres Jeux</text>
+        <text lang="DA">Spil Indstillinger</text>
+        <text lang="NL">Spelen Instellingen</text>
+        <text lang="PT">Configurar Jogos</text>
+        <text lang="SV">Spel</text>
+        <text lang="JA">ゲーム設定</text>
+        <text lang="SL">Nastavitve iger</text>
+        <text lang="ET">Mängude sätted</text>
+        <text lang="PL">Konfiguracja Gier</text>
+        <text lang="RU">Настройка игр</text>
+        <description>Configure playback of games</description>
+        <action>CONFIGPLUGIN mythgame</action>
+        <depends>mythgame</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_NEWS</type>
-     <text>News Settings</text>
-     <text lang="IT">Impostazioni Notizie</text>
-     <text lang="DE">Nachrichten</text>
-     <text lang="FR">Paramètres Nouvelles</text>
-     <text lang="CA">Configurar Notícies</text>
-     <text lang="ES">Configurar Noticias</text>
-     <text lang="NL">Nieuws Instellingen</text>
-     <text lang="SV">Nyheter</text>
-     <text lang="JA">ニュース設定</text>
-     <text lang="SL">Nastavitve novic</text>
-     <text lang="ET">Uudiste sätted</text>
-     <text lang="DA">Nyheds Indstillingen</text>
-     <text lang="PT">Configurar Notícias</text>
-     <text lang="PL">Ustaw WiadomoĹci</text>
-     <text lang="RU">Настройка новостей</text>
-     <description>Choose which news sources interest you</description> 
-     <action>CONFIGPLUGIN mythnews</action>
-     <depends>mythnews</depends>
-   </button>
+    <button>
+        <type>SETTINGS_WEATHER</type>
+        <text>Weather Settings</text>
+        <text lang="IT">Impostazioni Meteo</text>
+        <text lang="ES">Configurar El Tiempo</text>
+        <text lang="CA">Configurar El Temps</text>
+        <text lang="DE">Wetter</text>
+        <text lang="FR">Paramètres Météo</text>
+        <text lang="DA">Vejr Indstililnger</text>
+        <text lang="NL">"Het Weer" Instellingen</text>
+        <text lang="PT">Configurar Meteorologia</text>
+        <text lang="SV">Väder</text>
+        <text lang="JA">天気設定</text>
+        <text lang="SL">Nastavitve vremena</text>
+        <text lang="ET">Ilmateate sätted</text>
+        <text lang="PL">Konfiguracja Pogody</text>
+        <text lang="RU">Настройка погоды</text>
+        <description>Weather locale and sources</description>
+        <action>CONFIGPLUGIN mythweather</action>
+        <depends>mythweather</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_WEBPAGE</type>
-     <text>Web Settings</text>
-     <text lang="IT">Impostazioni Web</text>
-     <text lang="DE">WWW</text>
-     <text lang="SV">Webb</text>
-     <text lang="JA">Web設定</text>
-     <text lang="SL">Spletne Nastavitve</text>
-     <text lang="ET">Veebi sätted</text>
-     <text lang="DA">Web Indstillinger</text>
-     <text lang="FR">Paramètres Web</text>
-     <text lang="PT">Config. Navegação Web</text>
-     <text lang="ES">Configurar Web</text>
-     <text lang="NL">Web Instellingen</text>
-     <text lang="PL">Konfiguracja przegladarki WWW</text>
-     <text lang="RU">Настройка браузера</text>
-     <description>Manage web bookmarks</description> 
-     <action>CONFIGPLUGIN mythbookmarkmanager</action>
-     <depends>mythbookmarkmanager</depends>
-   </button>
+    <button>
+        <type>SETTINGS_WEATHER</type>
+        <text>Weather Station Settings</text>
+        <description>???</description>
+        <action>CONFIGPLUGIN mythwstation</action>
+        <depends>mythwstation</depends>
+    </button>
 
-   <button>
-      <type>SETTINGS_RECIPE</type>
-      <text>Recipe Settings</text>
-      <text lang="IT">Impostazioni Ricette</text>
-      <text lang="DE">Rezepte</text>
-      <text lang="FR">Paramètres Recettes</text>
-      <text lang="SL">Nastavitve receptov</text>
-      <text lang="ET">Retseptide sätted</text>
-      <text lang="SV">Recept</text>
-      <text lang="DA">Opskrifts Indstillinger</text>
-      <text lang="PT">Configurar Receitas</text>
-      <text lang="ES">Configurar Recetas</text>
-      <text lang="NL">Recepten Instellingen</text>
-      <text lang="JA">レシピ設定</text>
-      <text lang="PL">Ustaw Przepisy</text>>
-      <text lang="RU">Настройка рецептов</text>
-      <description></description> 
-      <action>CONFIGPLUGIN mythRecipe</action>
-      <depends>mythRecipe</depends>
-   </button>
+    <button>
+        <type>SETTINGS_NEWS</type>
+        <text>News Settings</text>
+        <text lang="IT">Impostazioni Notizie</text>
+        <text lang="DE">Nachrichten</text>
+        <text lang="FR">Paramètres Nouvelles</text>
+        <text lang="CA">Configurar Notícies</text>
+        <text lang="ES">Configurar Noticias</text>
+        <text lang="NL">Nieuws Instellingen</text>
+        <text lang="SV">Nyheter</text>
+        <text lang="JA">ニュース設定</text>
+        <text lang="SL">Nastavitve novic</text>
+        <text lang="ET">Uudiste sätted</text>
+        <text lang="DA">Nyheds Indstillingen</text>
+        <text lang="PT">Configurar Notícias</text>
+        <text lang="PL">Ustaw WiadomoĹci</text>
+        <text lang="RU">Настройка новостей</text>
+        <description>Choose which news sources interest you</description>
+        <action>CONFIGPLUGIN mythnews</action>
+        <depends>mythnews</depends>
+    </button>
 
-   <button>
-      <type>PHONE</type>
-      <text>Phone Settings</text>
-      <text lang="IT">Impostazioni Telefono</text>
-      <text lang="DE">Telefon</text>
-      <text lang="FR">Paramètres Téléphone</text>
-      <text lang="SL">Telefonske Nastavitve</text>
-      <text lang="ET">Telefoni sätted</text>
-      <text lang="SV">Telefon</text>
-      <text lang="DA">Telefon Indstillinger</text>
-      <text lang="PT">Configurar Telefone</text>
-      <text lang="ES">Configurar Teléfono</text>
-      <text lang="NL">Telefoon Instellingen</text>
-      <text lang="PL">Konfiguracja Telefonu</text>
-      <text lang="JA">電話設定</text>
-      <text lang="RU">Настройка телефона</text>
-      <description>Configure SIP-based VoIP phone</description>
-      <action>CONFIGPLUGIN mythphone</action>
-      <depends>mythphone</depends>
-   </button>
+    <button>
+        <type>SETTINGS_WEBPAGE</type>
+        <text>Web Settings</text>
+        <text lang="IT">Impostazioni Web</text>
+        <text lang="DE">WWW</text>
+        <text lang="SV">Webb</text>
+        <text lang="JA">Web設定</text>
+        <text lang="SL">Spletne Nastavitve</text>
+        <text lang="ET">Veebi sätted</text>
+        <text lang="DA">Web Indstillinger</text>
+        <text lang="FR">Paramètres Web</text>
+        <text lang="PT">Config. Navegação Web</text>
+        <text lang="ES">Configurar Web</text>
+        <text lang="NL">Web Instellingen</text>
+        <text lang="PL">Konfiguracja przegladarki WWW</text>
+        <text lang="RU">Настройка браузера</text>
+        <description>Manage web bookmarks</description>
+        <action>CONFIGPLUGIN mythbookmarkmanager</action>
+        <depends>mythbookmarkmanager</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_MOVIETIME</type>
-     <text>Movie Time Settings</text>
-     <text lang="EN_GB">Cinema Listings Settings</text>
-     <text lang="IT">Impostazioni Orari</text>
-     <text lang="FR">Paramètres horaires films</text>
-     <text lang="FI">Elokuvien Aika-asetukset</text>
-     <text lang="SL">Nastavitve čas filmov</text>
-     <text lang="ET">Filmiaegade sätted</text>
-     <text lang="SV">Biotider</text>
-     <text lang="DA">Biograf Indstillinger</text>
-     <text lang="PT">Configurar Horários de Cinema</text>
-     <text lang="NL">Bioscoop Instellingen</text>
-     <text lang="JA">ムービータイム設定</text>
-     <text lang="PL">Konfiguracja MovieTime</text>
-     <text lang="RU">Настройка афиши кино</text>
-     <description>Select local movie theaters</description> 
-     <action>CONFIGPLUGIN mythmovies</action>
-     <depends>mythmovies</depends>
-   </button>
+    <button>
+        <type>SETTINGS_RECIPE</type>
+        <text>Recipe Settings</text>
+        <text lang="IT">Impostazioni Ricette</text>
+        <text lang="DE">Rezepte</text>
+        <text lang="FR">Paramètres Recettes</text>
+        <text lang="SL">Nastavitve receptov</text>
+        <text lang="ET">Retseptide sätted</text>
+        <text lang="SV">Recept</text>
+        <text lang="DA">Opskrifts Indstillinger</text>
+        <text lang="PT">Configurar Receitas</text>
+        <text lang="ES">Configurar Recetas</text>
+        <text lang="NL">Recepten Instellingen</text>
+        <text lang="JA">レシピ設定</text>
+        <text lang="PL">Ustaw Przepisy</text>>
+        <text lang="RU">Настройка рецептов</text>
+        <description></description>
+        <action>CONFIGPLUGIN mythRecipe</action>
+        <depends>mythRecipe</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_XBOX</type>
-     <text>Xbox Settings</text>
-     <text lang="IT">Impostazioni Xbox</text>
-     <text lang="PT">Configurar Xbox</text>
-     <text lang="FR">Paramètres Xbox</text>
-     <text lang="CA">Configurar Xbox</text>
-     <text lang="ES">Configurar Xbox</text>
-     <text lang="DE">Xbox</text>
-     <text lang="NL">Xbox Instellingen</text>
-     <text lang="SV">Xbox</text>
-     <text lang="JA">Xbox設定</text>
-     <text lang="SL">Nastavitve Xbox</text>
-     <text lang="ET">Xbox-i sätted</text>
-     <text lang="DA">Xbox Indstillinger</text>
-     <text lang="PL">Konfiguracja Xbox</text>
-     <text lang="RU">Настройка Xbox</text>
-     <description></description> 
-     <action>SETTINGS XBOXSETTINGS</action>
-     <dependssetting>EnableXbox</dependssetting>
-   </button>
+    <button>
+        <type>PHONE</type>
+        <text>Phone Settings</text>
+        <text lang="IT">Impostazioni Telefono</text>
+        <text lang="DE">Telefon</text>
+        <text lang="FR">Paramètres Téléphone</text>
+        <text lang="SL">Telefonske Nastavitve</text>
+        <text lang="ET">Telefoni sätted</text>
+        <text lang="SV">Telefon</text>
+        <text lang="DA">Telefon Indstillinger</text>
+        <text lang="PT">Configurar Telefone</text>
+        <text lang="ES">Configurar Teléfono</text>
+        <text lang="NL">Telefoon Instellingen</text>
+        <text lang="PL">Konfiguracja Telefonu</text>
+        <text lang="JA">電話設定</text>
+        <text lang="RU">Настройка телефона</text>
+        <description>Configure SIP-based VoIP phone</description>
+        <action>CONFIGPLUGIN mythphone</action>
+        <depends>mythphone</depends>
+    </button>
 
-   <button>
-     <type>SETTINGS_NETFLIX</type>
-     <text>NetFlix Settings</text>
-     <text lang="IT">Impostazioni NetFlix</text>
-     <text lang="PT">Configurar Aluguer de Filmes</text>
-     <text lang="ES">MythFlix</text>
-     <text lang="FR">Paramètres Location films</text>
-     <text lang="ET">NetFlix'i sätted</text>
-     <text lang="NL">NetFlix Instellingen</text>
-     <text lang="JA">NetFlix設定</text>
-     <text lang="PL">Konfiguracja NetFlix</text>
-     <text lang="RU">Настройка NetFlix</text>
-     <description>Choose the genres that interest you</description> 
-     <action>CONFIGPLUGIN mythflix</action>
-     <depends>mythflix</depends>
-   </button>
+    <button>
+        <type>SETTINGS_MOVIETIME</type>
+        <text>Movie Time Settings</text>
+        <text lang="EN_GB">Cinema Listings Settings</text>
+        <text lang="IT">Impostazioni Orari</text>
+        <text lang="FR">Paramètres horaires films</text>
+        <text lang="FI">Elokuvien Aika-asetukset</text>
+        <text lang="SL">Nastavitve čas filmov</text>
+        <text lang="ET">Filmiaegade sätted</text>
+        <text lang="SV">Biotider</text>
+        <text lang="DA">Biograf Indstillinger</text>
+        <text lang="PT">Configurar Horários de Cinema</text>
+        <text lang="NL">Bioscoop Instellingen</text>
+        <text lang="JA">ムービータイム設定</text>
+        <text lang="PL">Konfiguracja MovieTime</text>
+        <text lang="RU">Настройка афиши кино</text>
+        <description>Select local movie theaters</description>
+        <action>CONFIGPLUGIN mythmovies</action>
+        <depends>mythmovies</depends>
+    </button>
 
-   <button>
-       <type>SETTINGS_ARCHIVE</type>
-       <text>Archive Files Settings</text>
-       <text lang="IT">Impostazioni Archivia Files</text>
-       <text lang="ET">Arhiveerimise sätted</text>
-       <text lang="SV">Filarkivering</text>
-       <text lang="FR">Paramètres Archivage</text>
-       <text lang="RU">Настройка архива</text>
-       <text lang="DA">Fil arkivering</text>
-       <description>Configure how to archive video to DVD</description> 
-       <action>CONFIGPLUGIN mytharchive</action>
-       <depends>mytharchive</depends>
-   </button>
+    <button>
+        <type>SETTINGS_XBOX</type>
+        <text>Xbox Settings</text>
+        <text lang="IT">Impostazioni Xbox</text>
+        <text lang="PT">Configurar Xbox</text>
+        <text lang="FR">Paramètres Xbox</text>
+        <text lang="CA">Configurar Xbox</text>
+        <text lang="ES">Configurar Xbox</text>
+        <text lang="DE">Xbox</text>
+        <text lang="NL">Xbox Instellingen</text>
+        <text lang="SV">Xbox</text>
+        <text lang="JA">Xbox設定</text>
+        <text lang="SL">Nastavitve Xbox</text>
+        <text lang="ET">Xbox-i sätted</text>
+        <text lang="DA">Xbox Indstillinger</text>
+        <text lang="PL">Konfiguracja Xbox</text>
+        <text lang="RU">Настройка Xbox</text>
+        <description></description>
+        <action>SETTINGS XBOXSETTINGS</action>
+        <dependssetting>EnableXbox</dependssetting>
+    </button>
 
-   <button>
-       <type>SETTINGS_ZONEMINDER</type>
-       <text>ZoneMinder Settings</text>
-       <text lang="IT">Impostazioni Videosorveglianza</text>
-       <text lang="PL">Ustaw straĹźnika</text>
-       <description>Set up surveillance software</description>
-       <action>CONFIGPLUGIN mythzoneminder</action>
-       <depends>mythzoneminder</depends>
-   </button>
+    <button>
+        <type>SETTINGS_NETFLIX</type>
+        <text>NetFlix Settings</text>
+        <text lang="IT">Impostazioni NetFlix</text>
+        <text lang="PT">Configurar Aluguer de Filmes</text>
+        <text lang="ES">MythFlix</text>
+        <text lang="FR">Paramètres Location films</text>
+        <text lang="ET">NetFlix'i sätted</text>
+        <text lang="NL">NetFlix Instellingen</text>
+        <text lang="JA">NetFlix設定</text>
+        <text lang="PL">Konfiguracja NetFlix</text>
+        <text lang="RU">Настройка NetFlix</text>
+        <description>Choose the genres that interest you</description>
+        <action>CONFIGPLUGIN mythflix</action>
+        <depends>mythflix</depends>
+    </button>
+
+    <button>
+        <type>SETTINGS_ARCHIVE</type>
+        <text>Archive Files Settings</text>
+        <text lang="IT">Impostazioni Archivia Files</text>
+        <text lang="ET">Arhiveerimise sätted</text>
+        <text lang="SV">Filarkivering</text>
+        <text lang="FR">Paramètres Archivage</text>
+        <text lang="RU">Настройка архива</text>
+        <text lang="DA">Fil arkivering</text>
+        <description>Configure how to archive video to DVD</description>
+        <action>CONFIGPLUGIN mytharchive</action>
+        <depends>mytharchive</depends>
+    </button>
+
+    <button>
+        <type>SETTINGS_ZONEMINDER</type>
+        <text>ZoneMinder Settings</text>
+        <text lang="IT">Impostazioni Videosorveglianza</text>
+        <text lang="PL">Ustaw straĹźnika</text>
+        <description>Set up surveillance software</description>
+        <action>CONFIGPLUGIN mythzoneminder</action>
+        <depends>mythzoneminder</depends>
+    </button>
 
 </mythmenu>

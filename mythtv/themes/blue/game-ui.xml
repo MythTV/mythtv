@@ -11,7 +11,7 @@
             <filename>trans-titles.png</filename>
             <position>0,40</position>
         </image>
-      <!--  <image name="infofiller" draworder="0" fleximage="no">
+        <!--  <image name="infofiller" draworder="0" fleximage="no">
             <filename>pf-top.png</filename>
             <position>26,350</position>
         </image> -->
@@ -49,63 +49,63 @@
     </container>
 
     <container name="game_info">
-      <area>35,400,750,220</area>
+        <area>35,400,750,220</area>
 
-      <textarea name="gametitle" draworder="6">
+        <textarea name="gametitle" draworder="6">
         <area>13,8,500,50</area>
         <font>title</font>
-      </textarea>
+        </textarea>
 
-      <textarea name="system" draworder="6">
+        <textarea name="system" draworder="6">
         <area>13,55,150,35</area>
         <font>info</font>
         <value>System:</value>
-      </textarea>
+        </textarea>
 
-      <textarea name="systemname" draworder="6">
+        <textarea name="systemname" draworder="6">
         <area>100,55,200,35</area>
         <font>metadata</font>
-      </textarea>
+        </textarea>
 
-      <textarea name="year" draworder="6">
+        <textarea name="year" draworder="6">
         <area>213,55,150,35</area>
         <font>info</font>
         <value>Year:</value>
-      </textarea>
+        </textarea>
 
-      <textarea name="yearname" draworder="6">
+        <textarea name="yearname" draworder="6">
         <area>253,55,500,35</area>
         <font>metadata</font>
-      </textarea>
+        </textarea>
 
-      <textarea name="genre" draworder="6">
+        <textarea name="genre" draworder="6">
         <area>20,90,150,35</area>
         <font>info</font>
         <value>Genre:</value>
-      </textarea>
+        </textarea>
 
-      <textarea name="genrename" draworder="6">
+        <textarea name="genrename" draworder="6">
         <area>100,90,500,35</area>
         <font>metadata</font>
-      </textarea>
+        </textarea>
 
-      <textarea name="favorite" draworder="6">
+        <textarea name="favorite" draworder="6">
         <area>0,125,150,35</area>
         <font>info</font>
         <value>Favorite:</value>
-      </textarea>
+        </textarea>
 
-      <textarea name="showfavorite" draworder="6">
+        <textarea name="showfavorite" draworder="6">
         <area>100,125,500,35</area>
         <font>metadata</font>
-      </textarea>
+        </textarea>
 
-      <image name="gameimage" draworder="6" fleximage="no">
+        <image name="gameimage" draworder="6" fleximage="no">
           <position>562,14</position>
           <staticsize>180,166</staticsize>
-      </image>
+        </image>
     </container>
-  
+ 
   </window>
 
 </mythuitheme>

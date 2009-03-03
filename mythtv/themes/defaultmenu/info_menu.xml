@@ -1,230 +1,230 @@
 <mythmenu name="INFO">
 
-   <button>
-     <type>PHONE</type>
-     <text>Phone</text>
-     <text lang="IT">Telefono</text>
-     <text lang="JA">電話</text>
-     <text lang="DE">Telefon</text>
-     <text lang="IS">Sími</text>
-     <text lang="FI">Puhelin</text>
-     <text lang="NL">Telefoon</text>     
-     <text lang="SV">Telefon</text>
-     <text lang="FR">Téléphone</text>
-     <text lang="SL">Telefon</text>
-     <text lang="ET">Telefon</text>
-     <text lang="NB">Telefon</text>
-     <text lang="DA">Telefon</text>
-     <text lang="ES">Teléfono</text>
-     <text lang="PT">Telefone</text>
-     <text lang="CS">Telefon</text>
-     <text lang="RU">Телефон</text>
-     <text lang="PL">Telefon</text>
-     <text lang="HE">טלפון</text>
-     <description>Make or accept a VoIP call</description>
-     <action>PLUGIN mythphone</action>
-     <depends>mythphone</depends>
-   </button>
-
-   <button>
-     <type>NEWS</type>
-     <text>News Feeds</text>
-     <text lang="IT">Notizie</text>
-     <text lang="DE">Nachrichten</text>
-     <text lang="CS">Notícies</text>
-     <text lang="ES">Noticias</text>
-     <text lang="FR">Nouvelles</text>
-     <text lang="IS">Fréttir</text>
-     <text lang="NL">Nieuws</text>
-     <text lang="SV">Nyheter</text>
-     <text lang="JA">ニュース</text>
-     <text lang="FI">Uutiset</text>
-     <text lang="ZH_TW">網上新聞</text>
-     <text lang="SL">Novice</text>
-     <text lang="ET">Uudised</text>
-     <text lang="NB">Nyheter</text>
-     <text lang="DA">Nyheder</text>
-     <text lang="PT">Notícias</text>
-     <text lang="CS">Novinky</text>
-     <text lang="RU">Новости</text>
-     <text lang="PL">Wiadomości</text>
-     <text lang="HE">חדשות</text>
-     <description>Keep up with the news</description>
-     <action>PLUGIN mythnews</action>
-     <depends>mythnews</depends>
-   </button>
-
-   <button>
-     <type>MOVIETIMES</type>
-     <text>Movie Times</text>
-     <text lang="IT">Orari</text>
-     <text lang="FI">Elokuvahaku</text>
-     <text lang="SL">Kino program</text>
-     <text lang="ET">Filmide ajad</text>
-     <text lang="FR">Programme Télé</text>
-     <text lang="SV">Biotider</text>
-     <text lang="PT">Horário de Cinema</text>
-     <text lang="DE">Kinoprogramm</text>
-     <text lang="NL">Bioscoop Tijden</text>
-     <text lang="CS">Programy kin</text>
-     <text lang="JA">ムービータイム</text>
-     <text lang="RU">Афиша кино</text>
-     <text lang="PL">Repertuar kin</text>
-     <text lang="HE">זמני הקרנת סרטים</text>
-     <description>See when local movies are playing</description>
-     <action>PLUGIN mythmovies</action>
-     <depends>mythmovies</depends>
-   </button>
-   
-   <button>
-     <type>WEATHER</type>
-     <text>Weather</text>
-     <text lang="IT">Meteo</text>
-     <text lang="ES">El Tiempo</text>
-     <text lang="CS">El Temps</text>
-     <text lang="NL">Het Weer</text>
-     <text lang="FR">Météo</text>
-     <text lang="DE">Wetter</text>
-     <text lang="DA">Vejret</text>
-     <text lang="IS">Veðrið</text>
-     <text lang="PT">Meteorologia</text>
-     <text lang="SV">Väder</text>
-     <text lang="JA">天気</text>
-     <text lang="FI">Säätiedotus</text>
-     <text lang="ZH_TW">天氣報告</text>
-     <text lang="SL">Vreme</text>
-     <text lang="ET">Ilmateade</text>
-     <text lang="NB">Været</text>
-     <text lang="CS">Počasí</text>
-     <text lang="RU">Погода</text>
-     <text lang="PL">Pogoda</text>
-     <text lang="HE">מזג האויר</text>
-     <action>PLUGIN mythweather</action>
-     <description>Local weather forecast</description>
-     <depends>mythweather</depends>
-   </button>
-
-   <button>
-       <type>WEATHER</type>
-       <text>Weather Station</text>
-       <text lang="DE">Wetterstation</text>
-       <description></description>
-       <action>PLUGIN mythwstation</action>
-       <depends>mythwstation</depends>
-   </button>
-
-   <button>
-     <type>NETFLIX</type>
-     <text>NetFlix</text>
-     <text lang="FI">MythFlix</text>
-     <text lang="PT">Aluguer de Filmes</text>
-     <text lang="DE">MythFlix</text>
-     <text lang="NL">MythFlix</text>
-     <text lang="ET">MythFlix</text>
-     <text lang="SL">MythFlix</text>
-     <text lang="FR">Location Films</text>
-     <text lang="PL">Filmy z internetu</text>
-     <description>Manage your NetFlix queue</description>
-     <action>PLUGIN mythflix</action>
-     <depends>mythflix</depends>
-   </button>
-
-   <button>
-      <type>WEBPAGE</type>
-      <text>Web</text>
-      <text lang="IT">Web</text>
-      <text lang="DE">WWW</text>
-      <text lang="FR">Web</text>
-      <text lang="IS">Vefurinn</text>
-      <text lang="SV">Webb</text>
-      <text lang="JA">ウェブ</text>
-      <text lang="FI">Nettiselain</text>
-      <text lang="ZH_TW">互聯網</text>
-      <text lang="SL">Splet</text>
-      <text lang="ET">Veeb</text>
-      <text lang="NB">Nettleser</text>
-      <text lang="DA">Web</text>
-      <text lang="ES">Web</text>
-      <text lang="PT">Navegação Web</text>
-      <text lang="NL">Internet</text>
-      <text lang="CS">Prohlížení webu</text>
-      <text lang="RU">WWW</text>
-      <text lang="PL">Internet WWW</text>
-      <text lang="HE">אינטרנט</text>
-      <description>Browse the web</description>
-      <action>PLUGIN mythbookmarkmanager</action>
-      <depends>mythbookmarkmanager</depends>
-   </button>
+    <button>
+        <type>PHONE</type>
+        <text>Phone</text>
+        <text lang="IT">Telefono</text>
+        <text lang="JA">電話</text>
+        <text lang="DE">Telefon</text>
+        <text lang="IS">Sími</text>
+        <text lang="FI">Puhelin</text>
+        <text lang="NL">Telefoon</text>    
+        <text lang="SV">Telefon</text>
+        <text lang="FR">Téléphone</text>
+        <text lang="SL">Telefon</text>
+        <text lang="ET">Telefon</text>
+        <text lang="NB">Telefon</text>
+        <text lang="DA">Telefon</text>
+        <text lang="ES">Teléfono</text>
+        <text lang="PT">Telefone</text>
+        <text lang="CS">Telefon</text>
+        <text lang="RU">Телефон</text>
+        <text lang="PL">Telefon</text>
+        <text lang="HE">טלפון</text>
+        <description>Make or accept a VoIP call</description>
+        <action>PLUGIN mythphone</action>
+        <depends>mythphone</depends>
+    </button>
 
     <button>
-     <type>RECIPE</type>
-     <text>Recipes</text>
-     <text lang="IT">Ricette</text>
-     <text lang="SV">Recept</text>
-     <text lang="IS">Uppskriftir</text>
-     <text lang="NL">Recepten</text>     
-     <text lang="FR">Recettes</text>
-     <text lang="NL">Recepten</text>
-     <text lang="JA">レシピ</text>
-     <text lang="DE">Rezepte</text>
-     <text lang="FI">Reseptit</text>
-     <text lang="SL">Recepti</text> 
-     <text lang="ET">Retseptid</text>
-     <text lang="NB">Oppskrifter</text>
-     <text lang="DA">Opskrifter</text>
-     <text lang="ES">Recetas</text>
-     <text lang="PT">Receitas</text>
-     <text lang="CS">Recepty</text>
-     <text lang="RU">Рецепты</text>
-     <text lang="PL">Przepisy</text>
-     <text lang="HE">מתכונים</text>
-     <description>Start cooking!</description>
-     <action>PLUGIN mythRecipe</action>
-     <depends>mythrecipe</depends>
-   </button>
+        <type>NEWS</type>
+        <text>News Feeds</text>
+        <text lang="IT">Notizie</text>
+        <text lang="DE">Nachrichten</text>
+        <text lang="CS">Notícies</text>
+        <text lang="ES">Noticias</text>
+        <text lang="FR">Nouvelles</text>
+        <text lang="IS">Fréttir</text>
+        <text lang="NL">Nieuws</text>
+        <text lang="SV">Nyheter</text>
+        <text lang="JA">ニュース</text>
+        <text lang="FI">Uutiset</text>
+        <text lang="ZH_TW">網上新聞</text>
+        <text lang="SL">Novice</text>
+        <text lang="ET">Uudised</text>
+        <text lang="NB">Nyheter</text>
+        <text lang="DA">Nyheder</text>
+        <text lang="PT">Notícias</text>
+        <text lang="CS">Novinky</text>
+        <text lang="RU">Новости</text>
+        <text lang="PL">Wiadomości</text>
+        <text lang="HE">חדשות</text>
+        <description>Keep up with the news</description>
+        <action>PLUGIN mythnews</action>
+        <depends>mythnews</depends>
+    </button>
 
-   <button>
-      <type>TV_STATUS</type>
-      <text>System Status</text>
-      <text lang="IT">Stato del Sistema</text>
-      <text lang="DE">Systemstatus</text>
-      <text lang="FR">Etat système</text>
-      <text lang="IS">Staða kerfis</text>
-      <text lang="NL">Systeemstatus</text>
-      <text lang="SV">Systemstatus</text>
-      <text lang="JA">システムステータス</text>
-      <text lang="FI">Systeemin Tila</text>
-      <text lang="ZH_TW">系統狀態</text>
-      <text lang="SL">Status sistema</text>
-      <text lang="ET">Süsteemi olek</text>
-      <text lang="NB">Systemstatus</text>
-      <text lang="DA">Systemstatus</text>
-      <text lang="ES">Estado Sistema</text> 
-      <text lang="PT">Estado do Sistema</text>
-      <text lang="CS">Stav systému</text>
-      <text lang="RU">Состояние системы</text>
-      <text lang="PL">Status systemu</text>
-      <text lang="HE">מצב מערכת</text>
-      <description>What your system is doing right now</description>
-      <action>TV_STATUS</action>
-   </button>
+    <button>
+        <type>MOVIETIMES</type>
+        <text>Movie Times</text>
+        <text lang="IT">Orari</text>
+        <text lang="FI">Elokuvahaku</text>
+        <text lang="SL">Kino program</text>
+        <text lang="ET">Filmide ajad</text>
+        <text lang="FR">Programme Télé</text>
+        <text lang="SV">Biotider</text>
+        <text lang="PT">Horário de Cinema</text>
+        <text lang="DE">Kinoprogramm</text>
+        <text lang="NL">Bioscoop Tijden</text>
+        <text lang="CS">Programy kin</text>
+        <text lang="JA">ムービータイム</text>
+        <text lang="RU">Афиша кино</text>
+        <text lang="PL">Repertuar kin</text>
+        <text lang="HE">זמני הקרנת סרטים</text>
+        <description>See when local movies are playing</description>
+        <action>PLUGIN mythmovies</action>
+        <depends>mythmovies</depends>
+    </button>
+  
+    <button>
+        <type>WEATHER</type>
+        <text>Weather</text>
+        <text lang="IT">Meteo</text>
+        <text lang="ES">El Tiempo</text>
+        <text lang="CS">El Temps</text>
+        <text lang="NL">Het Weer</text>
+        <text lang="FR">Météo</text>
+        <text lang="DE">Wetter</text>
+        <text lang="DA">Vejret</text>
+        <text lang="IS">Veðrið</text>
+        <text lang="PT">Meteorologia</text>
+        <text lang="SV">Väder</text>
+        <text lang="JA">天気</text>
+        <text lang="FI">Säätiedotus</text>
+        <text lang="ZH_TW">天氣報告</text>
+        <text lang="SL">Vreme</text>
+        <text lang="ET">Ilmateade</text>
+        <text lang="NB">Været</text>
+        <text lang="CS">Počasí</text>
+        <text lang="RU">Погода</text>
+        <text lang="PL">Pogoda</text>
+        <text lang="HE">מזג האויר</text>
+        <action>PLUGIN mythweather</action>
+        <description>Local weather forecast</description>
+        <depends>mythweather</depends>
+    </button>
 
-   <button>
-      <type>ZONEMINDER</type>
-      <text>Zone Minder</text>
-      <text lang="IT">Videosorveglianza</text>
-      <text lang="PL">Strażnik</text>
-      <text lang="FI">ZoneMinder</text>
-      <description>Home surveillance</description>
-      <action>PLUGIN mythzoneminder</action>
-      <depends>mythzoneminder</depends>
+    <button>
+        <type>WEATHER</type>
+        <text>Weather Station</text>
+        <text lang="DE">Wetterstation</text>
+        <description></description>
+        <action>PLUGIN mythwstation</action>
+        <depends>mythwstation</depends>
+    </button>
+
+    <button>
+        <type>NETFLIX</type>
+        <text>NetFlix</text>
+        <text lang="FI">MythFlix</text>
+        <text lang="PT">Aluguer de Filmes</text>
+        <text lang="DE">MythFlix</text>
+        <text lang="NL">MythFlix</text>
+        <text lang="ET">MythFlix</text>
+        <text lang="SL">MythFlix</text>
+        <text lang="FR">Location Films</text>
+        <text lang="PL">Filmy z internetu</text>
+        <description>Manage your NetFlix queue</description>
+        <action>PLUGIN mythflix</action>
+        <depends>mythflix</depends>
+    </button>
+
+    <button>
+        <type>WEBPAGE</type>
+        <text>Web</text>
+        <text lang="IT">Web</text>
+        <text lang="DE">WWW</text>
+        <text lang="FR">Web</text>
+        <text lang="IS">Vefurinn</text>
+        <text lang="SV">Webb</text>
+        <text lang="JA">ウェブ</text>
+        <text lang="FI">Nettiselain</text>
+        <text lang="ZH_TW">互聯網</text>
+        <text lang="SL">Splet</text>
+        <text lang="ET">Veeb</text>
+        <text lang="NB">Nettleser</text>
+        <text lang="DA">Web</text>
+        <text lang="ES">Web</text>
+        <text lang="PT">Navegação Web</text>
+        <text lang="NL">Internet</text>
+        <text lang="CS">Prohlížení webu</text>
+        <text lang="RU">WWW</text>
+        <text lang="PL">Internet WWW</text>
+        <text lang="HE">אינטרנט</text>
+        <description>Browse the web</description>
+        <action>PLUGIN mythbookmarkmanager</action>
+        <depends>mythbookmarkmanager</depends>
+    </button>
+
+    <button>
+        <type>RECIPE</type>
+        <text>Recipes</text>
+        <text lang="IT">Ricette</text>
+        <text lang="SV">Recept</text>
+        <text lang="IS">Uppskriftir</text>
+        <text lang="NL">Recepten</text>    
+        <text lang="FR">Recettes</text>
+        <text lang="NL">Recepten</text>
+        <text lang="JA">レシピ</text>
+        <text lang="DE">Rezepte</text>
+        <text lang="FI">Reseptit</text>
+        <text lang="SL">Recepti</text>
+        <text lang="ET">Retseptid</text>
+        <text lang="NB">Oppskrifter</text>
+        <text lang="DA">Opskrifter</text>
+        <text lang="ES">Recetas</text>
+        <text lang="PT">Receitas</text>
+        <text lang="CS">Recepty</text>
+        <text lang="RU">Рецепты</text>
+        <text lang="PL">Przepisy</text>
+        <text lang="HE">מתכונים</text>
+        <description>Start cooking!</description>
+        <action>PLUGIN mythRecipe</action>
+        <depends>mythrecipe</depends>
+    </button>
+
+    <button>
+        <type>TV_STATUS</type>
+        <text>System Status</text>
+        <text lang="IT">Stato del Sistema</text>
+        <text lang="DE">Systemstatus</text>
+        <text lang="FR">Etat système</text>
+        <text lang="IS">Staða kerfis</text>
+        <text lang="NL">Systeemstatus</text>
+        <text lang="SV">Systemstatus</text>
+        <text lang="JA">システムステータス</text>
+        <text lang="FI">Systeemin Tila</text>
+        <text lang="ZH_TW">系統狀態</text>
+        <text lang="SL">Status sistema</text>
+        <text lang="ET">Süsteemi olek</text>
+        <text lang="NB">Systemstatus</text>
+        <text lang="DA">Systemstatus</text>
+        <text lang="ES">Estado Sistema</text>
+        <text lang="PT">Estado do Sistema</text>
+        <text lang="CS">Stav systému</text>
+        <text lang="RU">Состояние системы</text>
+        <text lang="PL">Status systemu</text>
+        <text lang="HE">מצב מערכת</text>
+        <description>What your system is doing right now</description>
+        <action>TV_STATUS</action>
+    </button>
+
+    <button>
+        <type>ZONEMINDER</type>
+        <text>Zone Minder</text>
+        <text lang="IT">Videosorveglianza</text>
+        <text lang="PL">Strażnik</text>
+        <text lang="FI">ZoneMinder</text>
+        <description>Home surveillance</description>
+        <action>PLUGIN mythzoneminder</action>
+        <depends>mythzoneminder</depends>
  </button>
 
-   <button>
-      <type>SMOLT</type>
-      <text>Hardware profile</text>
-      <description>Tell us what hardware you have so we can support it</description>
-      <action>PLUGIN mythsmolt</action>
-      <depends>mythsmolt</depends>
+    <button>
+        <type>SMOLT</type>
+        <text>Hardware profile</text>
+        <description>Tell us what hardware you have so we can support it</description>
+        <action>PLUGIN mythsmolt</action>
+        <depends>mythsmolt</depends>
  </button>
 </mythmenu>

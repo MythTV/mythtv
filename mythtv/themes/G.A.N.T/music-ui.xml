@@ -9,19 +9,19 @@
 
     <!-- music selection screen -->
     <window name="music_select">
-      <font name="active" face="Arial">
+        <font name="active" face="Arial">
          <color>#ffffff</color>
          <size>18</size>
          <bold>yes</bold>
-      </font>
+        </font>
 
-      <font name="inactive" face="Arial">
+        <font name="inactive" face="Arial">
         <color>#9999cc</color>
         <size>18</size>
         <bold>yes</bold>
-      </font>
+        </font>
 
-      <container name="musictree">
+        <container name="musictree">
         <area>20,20,780,400</area>
 
         <listtreearea name="musictree" draworder="0">
@@ -35,9 +35,9 @@
           <fcnfont name="active" function="active"></fcnfont>
           <fcnfont name="inactive" function="inactive"></fcnfont>
         </listtreearea>
-      </container>
+        </container>
 
-      <container name="info">
+        <container name="info">
         <area>0,400,800,200</area>
 
         <image name="background" draworder="0" fleximage="no">
@@ -82,7 +82,7 @@
         </textarea>
 
 
-      </container>
+        </container>
 
     </window>
 
@@ -90,7 +90,7 @@
         The play music screen
     -->
     <window name="music_play">
-    
+   
         <!--
             First, define all the fonts we need on this screen
         -->
@@ -105,7 +105,7 @@
             <size>18</size>
             <bold>yes</bold>
         </font>
-  
+ 
         <font name="selected" face="Arial">
             <color>#ffff00</color>
             <size>18</size>
@@ -157,7 +157,7 @@
                 <filename>mm_blackhole_border.png</filename>
                 <position>133,332</position>
             </image>
-            
+           
         </container>
 
         <!--
@@ -170,10 +170,10 @@
                 I'll explain as we go
 
                 bins is how many visible layers of the
-                tree there are. 
+                tree there are.
             -->
             <managedtreelist name="musictreelist" draworder="1" bins="2">
-                <!-- 
+                <!--
                     regular area, but is only used if the user has
                     ShowWholeTree set to false.
                 -->
@@ -189,10 +189,10 @@
                 <image function="downarrow" filename="gantdown.png" location="5,5"></image>
                 <image function="leftarrow" filename="mm_left_arrow.png"></image>
                 <image function="rightarrow" filename="mm_right_arrow.png"></image>
-                <!-- 
+                <!--
                     the area of particular bins
                     you can make them show right to left,
-                    top to bottom, and layer graphics on top 
+                    top to bottom, and layer graphics on top
                     however you like
 
                     NB: bins number 1 to # of bins inclusive
@@ -238,7 +238,7 @@
             </textarea>
 
             <!--
-                An image for when we're only showing the last bin 
+                An image for when we're only showing the last bin
                 (ie. just the active playlist)
             -->
 
@@ -396,71 +396,71 @@
                 <image function="off" filename="mm_ffw.png"></image>
                 <image function="pushed" filename="mm_ffw.png"></image>
             </pushbutton>
-            
+           
             <pushbutton name="next_button" draworder="0">
                 <position>700,45</position>
                 <image function="on" filename="mm_next.png"></image>
                 <image function="off" filename="mm_next.png"></image>
                 <image function="pushed" filename="mm_next.png"></image>
             </pushbutton>
-            
+           
         </container>
 
   </window>
-  
+ 
   <window name="edit_metadata">
 
-     <font name="title" face="Arial">
+        <font name="title" face="Arial">
          <color>#ffff00</color>
          <dropcolor>#000000</dropcolor>
          <size>24</size>
          <shadow>3,3</shadow>
          <bold>yes</bold>
-     </font>
+        </font>
 
-     <font name="labels" face="Arial">
+        <font name="labels" face="Arial">
          <color>#ffff00</color>
          <dropcolor>#000000</dropcolor>
          <size>18</size>
          <shadow>3,3</shadow>
          <bold>yes</bold>
-     </font>
+        </font>
 
-     <font name="display" face="Arial">
+        <font name="display" face="Arial">
          <color>#ffffff</color>
          <dropcolor>#000000</dropcolor>
          <size>18</size>
          <shadow>3,3</shadow>
          <bold>no</bold>
-     </font>
+        </font>
 
-     <font name="button" face="Arial">
+        <font name="button" face="Arial">
          <color>#ffffff</color>
          <dropcolor>#000000</dropcolor>
          <size>14</size>
          <shadow>2,2</shadow>
          <bold>yes</bold>
-     </font>
+        </font>
 
-     <font name="subtitle_active" face="Arial">
+        <font name="subtitle_active" face="Arial">
          <color>#ffffff</color>
          <size>14</size>
          <bold>no</bold>
-     </font>
+        </font>
 
-     <font name="subtitle_inactive" face="Arial">
+        <font name="subtitle_inactive" face="Arial">
          <color>#9999cc</color>
          <size>14</size>
          <bold>no</bold>
-     </font>
+        </font>
 
-     <font name="subtitle_selected" face="Arial">
+        <font name="subtitle_selected" face="Arial">
          <color>#ff0000</color>
          <size>14</size>
          <bold>no</bold>
-     </font>
+        </font>
 
-     <container name="edit_container">
+        <container name="edit_container">
             <area>0,0,800,600</area>
 
             <textarea name="title" draworder="1" align="center">
@@ -570,7 +570,7 @@
                 <image function="unchecked" filename="unchecked.png"></image>
                 <image function="checked_high" filename="checked_high.png"></image>
                 <image function="unchecked_high" filename="unchecked_high.png"></image>
-            </checkbox> 
+            </checkbox>
 
             <remoteedit name="compilation_artist_edit" draworder="1" align="left">
                 <context>1</context>
@@ -818,75 +818,75 @@
                 <image function="pushed" filename="mm_simple_button_pushed.png"></image>
             </textbutton>
 
-      </container>
-   </window>
+        </container>
+    </window>
 
-   <window name="cdripper">
+    <window name="cdripper">
 
-       <font name="title" face="Arial">
+        <font name="title" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>24</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="labels" face="Arial">
+        <font name="labels" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>18</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="smalllabel" face="Arial">
+        <font name="smalllabel" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>14</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="display" face="Arial">
+        <font name="display" face="Arial">
            <color>#ffffff</color>
            <dropcolor>#000000</dropcolor>
            <size>18</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="button" face="Arial">
+        <font name="button" face="Arial">
            <color>#ffffff</color>
            <dropcolor>#000000</dropcolor>
            <size>16</size>
            <shadow>2,2</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="active" face="Arial">
+        <font name="active" face="Arial">
            <color>#ffffff</color>
            <size>18</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="inactive" face="Arial">
+        <font name="inactive" face="Arial">
            <color>#9999cc</color>
            <size>18</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="selected" face="Arial">
+        <font name="selected" face="Arial">
            <color>#00ff00</color>
            <size>18</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="listlabel" face="Arial">
+        <font name="listlabel" face="Arial">
            <color>#ffff00</color>
            <size>14</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <container name="edit_container">
+        <container name="edit_container">
            <area>0,0,800,600</area>
 
            <!--
@@ -946,7 +946,7 @@
                <image function="on" filename="leftright_on.png"></image>
                <image function="off" filename="leftright_off.png"></image>
                <image function="pushed" filename="leftright_pushed.png"></image>
-           </selector> 
+           </selector>
 
            <remoteedit name="artist_edit" draworder="1" align="left">
                <area>195,90,525,35</area>
@@ -992,7 +992,7 @@
                <image function="unchecked" filename="unchecked.png"></image>
                <image function="checked_high" filename="checked_high.png"></image>
                <image function="unchecked_high" filename="unchecked_high.png"></image>
-           </checkbox> 
+           </checkbox>
 
            <textbutton name="switch_button" draworder="0">
                <position>270,210</position>
@@ -1077,44 +1077,44 @@
                <image function="pushed" filename="mm_simple_button_pushed.png"></image>
            </textbutton>
 
-       </container>
-   </window>
+        </container>
+    </window>
 
-   <window name="ripstatus">
+    <window name="ripstatus">
 
-       <font name="title" face="Arial">
+        <font name="title" face="Arial">
            <color>#ffffff</color>
            <dropcolor>#000000</dropcolor>
            <size>40</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="label" face="Arial">
+        <font name="label" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>20</size>
            <shadow>2,2</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="display" face="Arial">
+        <font name="display" face="Arial">
            <color>#ffffff</color>
            <dropcolor>#000000</dropcolor>
            <size>20</size>
            <shadow>2,2</shadow>
            <bold>no</bold>
-       </font>
+        </font>
 
-       <font name="percent" face="Arial">
+        <font name="percent" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>20</size>
            <shadow>3,3</shadow>
            <bold>Yes</bold>
-       </font>
+        </font>
 
-       <container name="background">
+        <container name="background">
            <image name="banner" draworder="0" fleximage="no">
                <filename>mm_rip_banner.png</filename>
                <position>70,20</position>
@@ -1129,9 +1129,9 @@
                <position>50,70</position>
                <staticsize>700,500</staticsize>
            </image>
-       </container>
+        </container>
 
-       <container name="main_display">
+        <container name="main_display">
            <area>50,100,700,500</area>
 
            <textarea name="overall_label" draworder="1" align="center">
@@ -1185,36 +1185,36 @@
                <area>300,330,100,30</area>
            </textarea>
 
-       </container>
-   </window>
+        </container>
+    </window>
 
-   <window name="import_music">
+    <window name="import_music">
 
-       <font name="title" face="Arial">
+        <font name="title" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>24</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="labels" face="Arial">
+        <font name="labels" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>18</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="display" face="Arial">
+        <font name="display" face="Arial">
            <color>#ffffff</color>
            <dropcolor>#000000</dropcolor>
            <size>16</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <container name="background">
+        <container name="background">
            <area>0,0,800,600</area>
 
            <image name="image" draworder="0">
@@ -1277,9 +1277,9 @@
                <staticsize>300,40</staticsize>
            </image>
 
-       </container>
+        </container>
 
-       <container name="foreground">
+        <container name="foreground">
            <area>0,0,800,600</area>
 
            <textarea name="title" draworder="1" align="center">
@@ -1408,7 +1408,7 @@
                <image function="unchecked" filename="unchecked.png"></image>
                <image function="checked_high" filename="checked_high.png"></image>
                <image function="unchecked_high" filename="unchecked_high.png"></image>
-           </checkbox> 
+           </checkbox>
 
            <textarea name="compartist_text" draworder="1" align="left">
                <area>200,235,515,30</area>
@@ -1502,61 +1502,61 @@
                <image function="pushed" filename="mm_simple_button_pushed.png"></image>
            </textbutton>
 
-       </container>
-   </window>
+        </container>
+    </window>
 
-   <!--
+    <!--
        File Selector
    -->
 
-   <window name="directory_finder">
-       <font name="title" face="Arial">
+    <window name="directory_finder">
+        <font name="title" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>24</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="buttons" face="Arial">
+        <font name="buttons" face="Arial">
            <color>#ffffff</color>
            <size>12</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="edit" face="Arial">
+        <font name="edit" face="Arial">
            <color>#ffffff</color>
            <size>14</size>
            <bold>no</bold>
-       </font>
+        </font>
 
-       <font name="active" face="Arial">
+        <font name="active" face="Arial">
            <color>#ffffff</color>
            <size>18</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="inactive" face="Arial">
+        <font name="inactive" face="Arial">
            <color>#9999cc</color>
            <size>18</size>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="info" face="Arial">
+        <font name="info" face="Arial">
            <color>#9999cc</color>
            <size>14</size>
            <bold>no</bold>
-       </font>
+        </font>
 
-       <font name="label" face="Arial">
+        <font name="label" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>18</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <container name="title">
+        <container name="title">
            <area>0,5,800,45</area>
            <textarea name="title" draworder="1" align="center">
                <area>0,0,800,45</area>
@@ -1564,9 +1564,9 @@
                <multiline>no</multiline>
                <value>Directory Finder</value>
            </textarea>
-       </container>
+        </container>
 
-       <container name="location">
+        <container name="location">
            <area>0,55,800,80</area>
 
            <textbutton name="back_button" draworder="1">
@@ -1593,9 +1593,9 @@
                <area>180,50,580,30</area>
                <font>edit</font>
            </remoteedit>
-       </container>
+        </container>
 
-       <container name="file_list">
+        <container name="file_list">
            <area>20,140,760,400</area>
            <listbtnarea name="filelist"  draworder="1">
                <area>0,0,760,400</area>
@@ -1608,12 +1608,12 @@
                <showscrollarrows>yes</showscrollarrows>
                <showarrow>no</showarrow>
            </listbtnarea>
-       </container>
+        </container>
 
-       <!--
+        <!--
            button area shown on all pages
        -->
-       <container name="buttons">
+        <container name="buttons">
            <area>0,550,800,50</area>
            <textbutton name="cancel_button" draworder="1">
                <position>35,0</position>
@@ -1629,36 +1629,36 @@
                <image function="pushed" filename="mm_simple_button_pushed.png"></image>
                <font>buttons</font>
            </textbutton>
-       </container>
-   </window>
+        </container>
+    </window>
 
-   <window name="import_coverart">
+    <window name="import_coverart">
 
-       <font name="title" face="Arial">
+        <font name="title" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>24</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="labels" face="Arial">
+        <font name="labels" face="Arial">
            <color>#ffff00</color>
            <dropcolor>#000000</dropcolor>
            <size>18</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <font name="display" face="Arial">
+        <font name="display" face="Arial">
            <color>#ffffff</color>
            <dropcolor>#000000</dropcolor>
            <size>16</size>
            <shadow>3,3</shadow>
            <bold>yes</bold>
-       </font>
+        </font>
 
-       <container name="background">
+        <container name="background">
            <area>0,0,800,600</area>
 
            <image name="image" draworder="0">
@@ -1685,9 +1685,9 @@
                <staticsize>300,40</staticsize>
            </image>
 
-       </container>
+        </container>
 
-       <container name="foreground">
+        <container name="foreground">
            <area>0,0,800,600</area>
 
            <textarea name="title" draworder="1" align="center">
@@ -1789,7 +1789,7 @@
                <image function="pushed" filename="mm_simple_button_pushed.png"></image>
            </textbutton>
 
-       </container>
-   </window>
+        </container>
+    </window>
 
 </mythuitheme>

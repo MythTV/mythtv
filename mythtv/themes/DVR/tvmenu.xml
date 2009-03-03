@@ -1,84 +1,84 @@
 <mythmenu name="TV">
 
-   <button>
-      <type>TV_WATCH_TV</type>
-      <text>Watch TV</text>
-      <text lang="IT">Guarda la TV</text>
-      <text lang="ES">Ver la TV</text>
-      <text lang="CA">Veure la TV</text>
-      <text lang="NL">TV Kijken</text>
-      <text lang="FR">Regarder la TV</text>
-      <text lang="DE">Fernsehen</text>
-      <text lang="DA">Se TV</text>
-      <text lang="PT">Ver Televisão</text>
-      <text lang="SV">Se på TV</text>
-      <text lang="JA">TVを見る</text>
-      <text lang="SL">Gledanje TV</text>
-      <text lang="ET">Vaata telerit</text>
-      <text lang="RU">Смотреть ТВ</text>
-      <description>Watch live television</description> 
-      <action>TV_WATCH_LIVE</action>
-   </button>
+    <button>
+        <type>TV_WATCH_TV</type>
+        <text>Watch TV</text>
+        <text lang="IT">Guarda la TV</text>
+        <text lang="ES">Ver la TV</text>
+        <text lang="CA">Veure la TV</text>
+        <text lang="NL">TV Kijken</text>
+        <text lang="FR">Regarder la TV</text>
+        <text lang="DE">Fernsehen</text>
+        <text lang="DA">Se TV</text>
+        <text lang="PT">Ver Televisão</text>
+        <text lang="SV">Se på TV</text>
+        <text lang="JA">TVを見る</text>
+        <text lang="SL">Gledanje TV</text>
+        <text lang="ET">Vaata telerit</text>
+        <text lang="RU">Смотреть ТВ</text>
+        <description>Watch live television</description>
+        <action>TV_WATCH_LIVE</action>
+    </button>
 
-   <button>
-      <type>TV_DELETE</type>
-      <text>Delete Recordings</text>
-      <text lang="IT">Elimina Registrazioni</text>
-      <text lang="ES">Borrar Grabaciones</text>
-      <text lang="CA">Esborrar Gravacions</text>
-      <text lang="NL">Opnames Verwijderen</text>
-      <text lang="FR">Supprimer Enregistrement</text>
-      <text lang="DE">Aufnahmen löschen</text>
-      <text lang="DA">Slet optagelser</text>
-      <text lang="PT">Apagar Gravações</text>
-      <text lang="SV">Radera inspelningar</text>
-      <text lang="JA">録画削除</text>
-      <text lang="SL">Brisanje Snemanj</text>
-      <text lang="ET">Salvestiste kustutamine</text>
-      <text lang="RU">Удалить записи</text>
-      <alttext lang="DE">Löschen</alttext>
-      <alttext lang="ET">Kustutamine</alttext>
-      <alttext lang="SV">Radera</alttext>
-      <alttext lang="NL">Verwijderen</alttext>
-      <alttext lang="RU">Удалить</alttext>
-      <description>Remove television recordings</description> 
-      <action>TV_DELETE</action>
-   </button> 
+    <button>
+        <type>TV_DELETE</type>
+        <text>Delete Recordings</text>
+        <text lang="IT">Elimina Registrazioni</text>
+        <text lang="ES">Borrar Grabaciones</text>
+        <text lang="CA">Esborrar Gravacions</text>
+        <text lang="NL">Opnames Verwijderen</text>
+        <text lang="FR">Supprimer Enregistrement</text>
+        <text lang="DE">Aufnahmen löschen</text>
+        <text lang="DA">Slet optagelser</text>
+        <text lang="PT">Apagar Gravações</text>
+        <text lang="SV">Radera inspelningar</text>
+        <text lang="JA">録画削除</text>
+        <text lang="SL">Brisanje Snemanj</text>
+        <text lang="ET">Salvestiste kustutamine</text>
+        <text lang="RU">Удалить записи</text>
+        <alttext lang="DE">Löschen</alttext>
+        <alttext lang="ET">Kustutamine</alttext>
+        <alttext lang="SV">Radera</alttext>
+        <alttext lang="NL">Verwijderen</alttext>
+        <alttext lang="RU">Удалить</alttext>
+        <description>Remove television recordings</description>
+        <action>TV_DELETE</action>
+    </button>
 
 <!-- EXECTV sample.  %s args in order are video, audio, and vbi devices
-   <button>
-      <type>TV_PLAYBACK</type>
-      <text>Passthrough Mode</text>
-      <text lang="PT">Modo Directo de TV</text>
-      <text lang="ES">TV directo</text>
-      <text lang="CA">TV directe</text>
-      <text lang="FR">TV directe</text>
-      <text lang="DE">TV direkt</text>
-      <text lang="SV">TV direkt</text>
-      <text lang="JA">パススルーモード</text>
-      <text lang="ET">Otse-TV</text>
-      <text lang="NL">TV Direct</text>
-      <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
-   </button>
+    <button>
+        <type>TV_PLAYBACK</type>
+        <text>Passthrough Mode</text>
+        <text lang="PT">Modo Directo de TV</text>
+        <text lang="ES">TV directo</text>
+        <text lang="CA">TV directe</text>
+        <text lang="FR">TV directe</text>
+        <text lang="DE">TV direkt</text>
+        <text lang="SV">TV direkt</text>
+        <text lang="JA">パススルーモード</text>
+        <text lang="ET">Otse-TV</text>
+        <text lang="NL">TV Direct</text>
+        <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
+    </button>
 -->
 
-   <button>
-      <type>TV_PREVIOUS</type>
-      <text>Previously Recorded</text>
-      <text lang="IT">Recentemente Registrati</text>
-      <text lang="FR">Enregistré précedemment</text>
-      <text lang="SV">Föregående</text>
-      <text lang="DE">Alte Aufnahmen</text>
-      <text lang="SL">Že posneto</text>
-      <text lang="ET">Varem salvestatud</text>
-      <text lang="DA">Tidligere optagelser</text>
-      <text lang="PT">Gravações Feitas</text>
-      <text lang="ES">Grabaciones Anteriores</text>
-      <text lang="NL">Eerder Opgenomen</text>
-      <text lang="JA">録画履歴</text>
-      <text lang="RU">Ранее записано</text>
-      <description>See what you have recorded before</description> 
-      <action>TV_PREVIOUS</action>
-   </button>
+    <button>
+        <type>TV_PREVIOUS</type>
+        <text>Previously Recorded</text>
+        <text lang="IT">Recentemente Registrati</text>
+        <text lang="FR">Enregistré précedemment</text>
+        <text lang="SV">Föregående</text>
+        <text lang="DE">Alte Aufnahmen</text>
+        <text lang="SL">Že posneto</text>
+        <text lang="ET">Varem salvestatud</text>
+        <text lang="DA">Tidligere optagelser</text>
+        <text lang="PT">Gravações Feitas</text>
+        <text lang="ES">Grabaciones Anteriores</text>
+        <text lang="NL">Eerder Opgenomen</text>
+        <text lang="JA">録画履歴</text>
+        <text lang="RU">Ранее записано</text>
+        <description>See what you have recorded before</description>
+        <action>TV_PREVIOUS</action>
+    </button>
 
 </mythmenu>
