@@ -17,6 +17,7 @@
       <text lang="ET">Üldine</text>
       <text lang="PL">Ustawienia</text>
       <text lang="RU">Общее</text>
+      <description>Core MythTV behavior and system settings</description>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -37,12 +38,14 @@
       <text lang="ET">Kujundus</text>
       <text lang="PL">Ustaw wyglądy</text>
       <text lang="RU">Внешний вид</text>
+      <description>pick the theme, font, size, and locale</description>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
    <button>
       <type>SCREENSETUPWIZARD</type>
       <text>Screen Setup Wizards</text>
+      <description>Compensate for TVs with overscan</description>
       <action>SCREENSETUPWIZARD</action>
    </button>
 
@@ -61,6 +64,7 @@
       <text lang="PL">Ustaw klawisze</text>
       <text lang="JA">キー設定</text>
       <text lang="RU">Редактировать клавиши</text>
+      <description>Change mythtv key bindings.</description> 
       <action>SETUP_KEYS</action>
    </button>
 
@@ -81,6 +85,7 @@
      <text lang="ET">TV sätted</text>
      <text lang="PL">Konfiguracja TV</text>
      <text lang="RU">Настройка ТВ</text>
+     <description>Settings for TV recording and playback</description>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -101,6 +106,7 @@
      <text lang="ET">Muusika sätted</text>
      <text lang="PL">Konfiguracja Muzyki</text>
      <text lang="RU">Настройка музыки</text>
+     <description>Configure playback and CD ripping</description> 
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -122,6 +128,7 @@
        <text lang="ET">Video sätted</text>
        <text lang="PL">Ustaw Filmy</text>
        <text lang="RU">Настройка фильмов</text>
+       <description>Configure playback and DVD ripping</description> 
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -142,6 +149,7 @@
       <text lang="PL">Konfiguracja Radia</text>
       <text lang="JA">ラジオ設定</text>
       <text lang="RU">Настройка радио</text>
+      <description></description> 
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -150,6 +158,7 @@
      <type>SETTINGS_STREAM</type>
      <text>MythStream Settings</text>
      <action>CONFIGPLUGIN mythstream</action>
+     <description></description> 
      <depends>mythstream</depends>
    </button>
 
@@ -170,6 +179,7 @@
       <text lang="ET">Galerii sätted</text>
       <text lang="PL">Konfiguracja Galerii</text>
       <text lang="RU">Настройка изображений</text>
+      <description>Configure display of image gallery</description> 
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -191,6 +201,7 @@
      <text lang="ET">Mängude sätted</text>
      <text lang="PL">Konfiguracja Gier</text>
      <text lang="RU">Настройка игр</text>
+     <description>Configure playback of games</description> 
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -212,6 +223,7 @@
      <text lang="ET">Ilmateate sätted</text>
      <text lang="PL">Konfiguracja Pogody</text>
      <text lang="RU">Настройка погоды</text>
+     <description>Weather locale and sources</description> 
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -219,6 +231,7 @@
    <button>
      <type>SETTINGS_WEATHER</type>
      <text>Weather Station Settings</text>
+     <description>???</description> 
      <action>CONFIGPLUGIN mythwstation</action>
      <depends>mythwstation</depends>
    </button>
@@ -240,6 +253,7 @@
      <text lang="PT">Configurar Notícias</text>
      <text lang="PL">Ustaw WiadomoĹci</text>
      <text lang="RU">Настройка новостей</text>
+     <description>Choose which news sources interest you</description> 
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -260,6 +274,7 @@
      <text lang="NL">Web Instellingen</text>
      <text lang="PL">Konfiguracja przegladarki WWW</text>
      <text lang="RU">Настройка браузера</text>
+     <description>Manage web bookmarks</description> 
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -280,6 +295,7 @@
       <text lang="JA">レシピ設定</text>
       <text lang="PL">Ustaw Przepisy</text>>
       <text lang="RU">Настройка рецептов</text>
+      <description></description> 
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -300,6 +316,7 @@
       <text lang="PL">Konfiguracja Telefonu</text>
       <text lang="JA">電話設定</text>
       <text lang="RU">Настройка телефона</text>
+      <description>Configure SIP-based VoIP phone</description>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -320,6 +337,7 @@
      <text lang="JA">ムービータイム設定</text>
      <text lang="PL">Konfiguracja MovieTime</text>
      <text lang="RU">Настройка афиши кино</text>
+     <description>Select local movie theaters</description> 
      <action>CONFIGPLUGIN mythmovies</action>
      <depends>mythmovies</depends>
    </button>
@@ -341,7 +359,8 @@
      <text lang="DA">Xbox Indstillinger</text>
      <text lang="PL">Konfiguracja Xbox</text>
      <text lang="RU">Настройка Xbox</text>
-     <action>SETTINGS XboxSETTINGS</action>
+     <description></description> 
+     <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
 
@@ -357,6 +376,7 @@
      <text lang="JA">NetFlix設定</text>
      <text lang="PL">Konfiguracja NetFlix</text>
      <text lang="RU">Настройка NetFlix</text>
+     <description>Choose the genres that interest you</description> 
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -370,6 +390,7 @@
        <text lang="FR">Paramètres Archivage</text>
        <text lang="RU">Настройка архива</text>
        <text lang="DA">Fil arkivering</text>
+       <description>Configure how to archive video to DVD</description> 
        <action>CONFIGPLUGIN mytharchive</action>
        <depends>mytharchive</depends>
    </button>
@@ -379,6 +400,7 @@
        <text>ZoneMinder Settings</text>
        <text lang="IT">Impostazioni Videosorveglianza</text>
        <text lang="PL">Ustaw straĹźnika</text>
+       <description>Set up surveillance software</description>
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>
