@@ -114,54 +114,16 @@ static void AllocFilter(ThisFilter* filter, int width, int height)
     }
 }
 
-
 #include <sys/time.h>
 #include <time.h>
 
-/*
-   XINE Algorithm
-   int top_field_first = frame->top_field_first;
-
-   if ( (frame->flags & VO_BOTH_FIELDS) != VO_BOTH_FIELDS ) {
-   top_field_first = (frame->flags & VO_TOP_FIELD) ? 1 : 0;
-   }
-
-   if ( top_field_first ) {
-   fields[0] = 0;
-   fields[1] = 1;
-   } else {
-   fields[0] = 1;
-   fields[1] = 0;
-   }
-
-   skip = deinterlace_build_output_field( 
-   this, port, stream,
-   frame, yuy2_frame,
-   fields[0], 0,   //int bottom_field, int second_field,
-   frame->pts,
-   (framerate_mode == FRAMERATE_FULL) ? frame->duration/2 : frame->duration,
-   0);
-
-   skip = deinterlace_build_output_field( 
-   this, port, stream,
-   frame, yuy2_frame,
-   fields[1], 1,   //int bottom_field, int second_field,
-   0,
-   frame->duration/2,
-   skip);          
-
-   move-recent-frames-ahead, last full frame only needed for greedyH
- * */
-
-
-static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
+static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 {
     ThisFilter *filter = (ThisFilter *) f;
     TF_VARS;
 
     int last_frame = 0;
     int cur_frame = 0;
-    int second_field = 0;
     int bottom_field = 0;
 
     AllocFilter((ThisFilter*)f, frame->width, frame->height);
@@ -177,41 +139,12 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
             cur_frame = frame->frameNumber & 1;
             last_frame = cur_frame;
         }
-        second_field = 0;
         bottom_field = frame->top_field_first? 0 : 1;
-    }
-    else
-    {
-        //double call
-        cur_frame = (filter->last_framenr) & 1;
-        last_frame = (filter->last_framenr + 1) & 1;
-        second_field = 1;
-        bottom_field = frame->top_field_first? 1 : 0;
-    }
-    filter->got_frames[cur_frame] = 1;
-    filter->frames_nr[cur_frame] = frame->frameNumber;
-
-#if 0
-    struct timeval l_stTV;
-    char l_achBuf[256];
-    char lbuf[13];
-    gettimeofday(&l_stTV, NULL);
-    strftime(&l_achBuf[0], 255, "%Y-%m-%d %H:%M:%S", localtime(&l_stTV.tv_sec));
-    snprintf(lbuf, 13, ".%ld", l_stTV.tv_usec);
-    strcat(l_achBuf, lbuf);
-
-    printf("GreedyHDeint call: %s\n", l_achBuf);
-#endif 
-
-    switch(frame->codec)
-    {
-        case FMT_YV12: //must convert from yv12 planar to yuv422 packed
-            /*printf(" CF=%d, LF=%d, FNr=%lld T=%lld IL=%d TF=%d RP=%d -> ", cur_frame, last_frame, frame->frameNumber, frame->timecode, frame->interlaced_frame, frame->top_field_first, frame->repeat_pict);*/
-            /*printf("SAVE Nr %lld to %d\n", frame->frameNumber, cur_frame);*/
-
-            //only needed for first call, on second we already have this frame
-            if (second_field == 0)
-            {
+        switch(frame->codec)
+        {
+            case FMT_YV12:
+                //must convert from yv12 planar to yuv422 packed
+                //only needed on first call for this frame
                 yv12_to_yuy2(
                         frame->buf + frame->offsets[0], frame->pitches[0],
                         frame->buf + frame->offsets[1], frame->pitches[1],
@@ -219,12 +152,23 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
                         filter->frames[cur_frame], 2 * frame->width,
                         frame->width, frame->height,
                         1 - frame->interlaced_frame);
-            }
-            break;
-        default:
-            fprintf(stderr, "Unsupported pixel format.\n");
-            return 0;
+                break;
+            default:
+                fprintf(stderr, "Unsupported pixel format.\n");
+                return 0;
+        }
+
     }
+    else
+    {
+        //double call
+        cur_frame = (filter->last_framenr) & 1;
+        last_frame = (filter->last_framenr + 1) & 1;
+        bottom_field = frame->top_field_first? 1 : 0;
+    }
+    filter->got_frames[cur_frame] = 1;
+    filter->frames_nr[cur_frame] = frame->frameNumber;
+
     //must be done for first frame or deinterlacing would use an "empty" memory block/frame
     if (!filter->got_frames[last_frame])
         last_frame = cur_frame;
@@ -236,21 +180,21 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
         greedyh_filter_sse(
             filter->deint_frame, 2 * frame->width,
             filter->frames[cur_frame], filter->frames[last_frame],
-            bottom_field, second_field, frame->width, frame->height);
+            bottom_field, field, frame->width, frame->height);
     }
     else if (filter->mm_flags & MM_3DNOW)
     {
         greedyh_filter_3dnow(
             filter->deint_frame, 2 * frame->width,
             filter->frames[cur_frame], filter->frames[last_frame],
-            bottom_field, second_field, frame->width, frame->height);
+            bottom_field, field, frame->width, frame->height);
     }
     else if (filter->mm_flags & MM_MMX) 
     {
         greedyh_filter_mmx(
             filter->deint_frame, 2 * frame->width,
             filter->frames[cur_frame], filter->frames[last_frame],
-            bottom_field, second_field, frame->width, frame->height);
+            bottom_field, field, frame->width, frame->height);
     }
     else
 #endif
@@ -275,7 +219,6 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame)
 
     return 0;
 }
-
 
 void CleanupGreedyHDeintFilter (VideoFilter * filter)
 {
@@ -319,7 +262,6 @@ VideoFilter* GreedyHDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixf
     return (VideoFilter *) filter;
 }
 
-
 static FmtConv FmtList[] =
 {
     { FMT_YV12, FMT_YV12 } ,
@@ -329,14 +271,14 @@ static FmtConv FmtList[] =
 ConstFilterInfo filter_table[] =
 {
     {
-symbol:     "GreedyHDeintFilter",
+            symbol:     "GreedyHDeintFilter",
             name:       "greedyhdeint",
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,
             libname:    NULL
     },
     {
-symbol:     "GreedyHDeintFilter",
+            symbol:     "GreedyHDeintFilter",
             name:       "greedyhdoubleprocessdeint",
             descript:   "combines data from several fields to deinterlace with less motion blur",
             formats:    FmtList,

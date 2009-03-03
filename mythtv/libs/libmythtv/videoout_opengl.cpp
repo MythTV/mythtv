@@ -276,8 +276,9 @@ bool VideoOutputOpenGL::CreateBuffers(void)
 }
 
 void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                              FilterChain *filterList,
-                                              const PIPMap &pipPlayers)
+                                     FilterChain *filterList,
+                                     const PIPMap &pipPlayers,
+                                     FrameScanType scan)
 {
     QMutexLocker locker(&gl_context_lock);
     if (!gl_videochain || !gl_context)
@@ -301,7 +302,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (deint_proc && m_deinterlaceBeforeOSD &&
        (!pauseframe || safepauseframe))
     {
-        m_deintFilter->ProcessFrame(frame);
+        m_deintFilter->ProcessFrame(frame, scan);
     }
 
     if (!windows[0].IsEmbedding())
@@ -315,7 +316,7 @@ void VideoOutputOpenGL::ProcessFrame(VideoFrame *frame, OSD *osd,
     if ((!pauseframe || safepauseframe) &&
         deint_proc && !m_deinterlaceBeforeOSD)
     {
-        m_deintFilter->ProcessFrame(frame);
+        m_deintFilter->ProcessFrame(frame, scan);
     }
 
     bool soft_bob = m_deinterlacing && (m_deintfiltername == "bobdeint");

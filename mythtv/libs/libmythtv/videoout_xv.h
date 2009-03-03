@@ -71,7 +71,8 @@ class VideoOutputXv : public VideoOutput
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      const PIPMap &pipPlayers);
+                      const PIPMap &pipPlayers,
+                      FrameScanType scan);
 
     void PrepareFrame(VideoFrame*, FrameScanType);
     void DrawSlice(VideoFrame*, int x, int y, int w, int h);
@@ -165,7 +166,8 @@ class VideoOutputXv : public VideoOutput
     void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
     void ProcessFrameMem(VideoFrame *frame, OSD *osd,
                          FilterChain *filterList,
-                         const PIPMap &pipPlayers);
+                         const PIPMap &pipPlayers,
+                         FrameScanType scan);
 
     void PrepareFrameVDPAU(VideoFrame *, FrameScanType);
     void PrepareFrameXvMC(VideoFrame *, FrameScanType);

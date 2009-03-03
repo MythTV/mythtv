@@ -17,13 +17,15 @@ using namespace std;
 typedef map<QString,void*>       library_map_t;
 typedef map<QString,FilterInfo*> filter_map_t;
 
+#include "videoouttypes.h"
+
 class FilterChain
 {
   public:
     FilterChain() { }
     virtual ~FilterChain();
 
-    void ProcessFrame(VideoFrame *Frame);
+    void ProcessFrame(VideoFrame *Frame, FrameScanType scan = kScan_Ignore);
 
     void Append(VideoFilter *f) { filters.push_back(f); }
 

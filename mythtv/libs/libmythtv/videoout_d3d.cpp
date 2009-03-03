@@ -776,7 +776,8 @@ void VideoOutputD3D::UpdatePauseFrame(void)
 
 void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
                                   FilterChain *filterList,
-                                  const PIPMap &pipPlayers)
+                                  const PIPMap &pipPlayers,
+                                  FrameScanType scan)
 {
     QMutexLocker locker(&m_lock);
     if (IsErrored())
@@ -793,7 +794,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
     }
 
     if (m_deinterlacing && m_deintFilter != NULL)
-        m_deintFilter->ProcessFrame(frame);
+        m_deintFilter->ProcessFrame(frame, scan);
 
     if (filterList)
         filterList->ProcessFrame(frame);

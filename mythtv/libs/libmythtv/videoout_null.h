@@ -37,7 +37,8 @@ class VideoOutputNull : public VideoOutput
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      const PIPMap &pipPlayers);
+                      const PIPMap &pipPlayers,
+                      FrameScanType scan);
 
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);

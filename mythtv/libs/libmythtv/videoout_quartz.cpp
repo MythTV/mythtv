@@ -1694,7 +1694,8 @@ void VideoOutputQuartz::UpdatePauseFrame(void)
  */
 void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      FilterChain *filterList,
-                                     const PIPMap &pipPlayers)
+                                     const PIPMap &pipPlayers,
+                                     FrameScanType scan)
 {
 #ifdef USING_DVDV
     if (data->dvdv)
@@ -1729,7 +1730,7 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter != NULL &&
         m_deinterlaceBeforeOSD)
     {
-        m_deintFilter->ProcessFrame(frame);
+        m_deintFilter->ProcessFrame(frame, scan);
     }
 
     ShowPIPs(frame, pipPlayers);
@@ -1739,7 +1740,7 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter != NULL &&
         !m_deinterlaceBeforeOSD)
     {
-        m_deintFilter->ProcessFrame(frame);
+        m_deintFilter->ProcessFrame(frame, scan);
     }
 
     QMutexLocker locker(&data->pixelLock);

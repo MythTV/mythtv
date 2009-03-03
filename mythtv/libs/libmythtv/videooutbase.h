@@ -119,7 +119,8 @@ class VideoOutput
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
                               FilterChain *filterList,
-                              const PIPMap &pipPlayers) = 0;
+                              const PIPMap &pipPlayers,
+                              FrameScanType scan = kScan_Ignore) = 0;
 
     /// \brief Tells video output that a full repaint is needed.
     void ExposeEvent(void);

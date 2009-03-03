@@ -474,35 +474,23 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3], 
 }
 
 
-static int YadifDeint (VideoFilter * f, VideoFrame * frame)
+static int YadifDeint (VideoFilter * f, VideoFrame * frame, int field)
 {
     ThisFilter *filter = (ThisFilter *) f;
     TF_VARS;
 
-    int second_field = 0;
     AllocFilter(filter, frame->width, frame->height);
-
-    //printf("FNr=%lld T=%lld IL=%d TF=%d RP=%d G[2]=%d G[1]=%d G[0]=%d\n", frame->frameNumber, frame->timecode, frame->interlaced_frame, frame->top_field_first, frame->repeat_pict, filter->got_frames[2], filter->got_frames[1], filter->got_frames[0]);
 
     if (filter->last_framenr != frame->frameNumber)
     {
         if (filter->last_framenr != (frame->frameNumber - 1))
-        {
-            //printf("yadifdeint: Framenumbers not consecutive %lld -> %lld\n", filter->last_framenr, frame->frameNumber);
             memset(filter->got_frames, 0, sizeof(filter->got_frames));
-        }
         store_ref(filter, frame->buf,  frame->offsets, frame->pitches, frame->width, frame->height);
-        second_field = 0;
-    }
-    else
-    {
-        second_field = 1;
     }
 
-    /* filter all frames, even if frame->interlaced_frame is not set */
     filter_func(
         filter, frame->buf, frame->offsets, frame->pitches,
-        frame->width, frame->height, second_field, frame->top_field_first);
+        frame->width, frame->height, field, frame->top_field_first);
 
     filter->last_framenr = frame->frameNumber;
 

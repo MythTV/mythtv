@@ -56,14 +56,14 @@ FilterChain::~FilterChain()
     filters.clear();
 }
 
-void FilterChain::ProcessFrame(VideoFrame *frame)
+void FilterChain::ProcessFrame(VideoFrame *frame, FrameScanType scan)
 {
     if (!frame)
         return;
 
     vector<VideoFilter*>::iterator it = filters.begin();
     for (; it != filters.end(); ++it)
-        (*it)->filter(*it, frame);
+        (*it)->filter(*it, frame, kScan_Intr2ndField == scan);
 }
 
 FilterManager::FilterManager()

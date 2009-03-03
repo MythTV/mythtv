@@ -217,10 +217,12 @@ void VideoOutputNull::UpdatePauseFrame(void)
 
 void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    FilterChain *filterList,
-                                   const PIPMap &pipPlayers)
+                                   const PIPMap &pipPlayers,
+                                   FrameScanType scan)
 {
     (void)frame;
     (void)osd;
     (void)filterList;
     (void)pipPlayers;
+    (void)scan;
 }

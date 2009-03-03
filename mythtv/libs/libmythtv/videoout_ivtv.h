@@ -32,7 +32,8 @@ class VideoOutputIvtv: public VideoOutput
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      const PIPMap &pipPlayers);
+                      const PIPMap &pipPlayers,
+                      FrameScanType scan);
 
     uint WriteBuffer(unsigned char *buf, int count);
     int Poll(int delay);

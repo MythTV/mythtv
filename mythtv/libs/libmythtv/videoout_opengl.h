@@ -20,7 +20,8 @@ class VideoOutputOpenGL : public VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      const PIPMap &pipPlayers);
+                      const PIPMap &pipPlayers,
+                      FrameScanType scan);
     void Show(FrameScanType );
     bool InputChanged(const QSize &input_size, float aspect,
                       MythCodecID  av_codec_id, void *codec_private);

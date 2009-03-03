@@ -39,7 +39,7 @@ typedef struct ConstFilterInfo_
 
 typedef struct  VideoFilter_
 {
-    int (*filter)(struct VideoFilter_ *, VideoFrame *);
+    int (*filter)(struct VideoFilter_ *, VideoFrame *, int);
     void (*cleanup)(struct VideoFilter_ *);
 
     void *handle; /* Library handle */

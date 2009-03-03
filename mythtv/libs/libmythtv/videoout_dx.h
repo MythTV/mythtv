@@ -25,7 +25,8 @@ class VideoOutputDX : public VideoOutput
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      const PIPMap &pipPlayers);
+                      const PIPMap &pipPlayers,
+                      FrameScanType scan);
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 

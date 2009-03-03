@@ -879,7 +879,8 @@ void VideoOutputDirectfb::UpdatePauseFrame(void)
 
 void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
                                        FilterChain *filterList,
-                                       const PIPMap &pipPlayers)
+                                       const PIPMap &pipPlayers,
+                                       FrameScanType scan)
 {
     bool copy_from_pause = false;
     if (!frame)
@@ -913,7 +914,7 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(&mem_frame, &pauseFrame);
 
     if (m_deinterlacing && m_deintFilter != NULL)
-	m_deintFilter->ProcessFrame(&mem_frame);
+	m_deintFilter->ProcessFrame(&mem_frame, scan);
 
     if (filterList)
         filterList->ProcessFrame(&mem_frame);

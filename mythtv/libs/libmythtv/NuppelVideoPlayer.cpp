@@ -2468,6 +2468,9 @@ void NuppelVideoPlayer::AVSync(void)
         if (m_double_framerate)
         {
             //second stage of deinterlacer processing
+            ps = (kScan_Intr2ndField == ps) ?
+                kScan_Interlaced : kScan_Intr2ndField;
+
             if (m_double_process && ps != kScan_Progressive)
             {
                 videofiltersLock.lock();
@@ -2475,18 +2478,16 @@ void NuppelVideoPlayer::AVSync(void)
                     player_ctx->buffer->DVD()->InStillFrame() &&
                     videoOutput->ValidVideoFrames() < 3)
                 {
-                    videoOutput->ProcessFrame(buffer, NULL, NULL, pip_players);
+                    videoOutput->ProcessFrame(buffer, NULL, NULL,
+                                              pip_players, ps);
                 }
                 else
                 {
                     videoOutput->ProcessFrame(
-                        buffer, osd, videoFilters, pip_players);
+                        buffer, osd, videoFilters, pip_players, ps);
                 }
                 videofiltersLock.unlock();
             }
-
-            ps = (kScan_Intr2ndField == ps) ?
-                kScan_Interlaced : kScan_Intr2ndField;
 
             if (buffer)
                 videoOutput->PrepareFrame(buffer, ps);
@@ -2874,16 +2875,20 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     // handle scan type changes
     AutoDeint(frame);
 
+    FrameScanType ps = m_scan;
+    if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
+        ps = kScan_Progressive;
+
     videofiltersLock.lock();
     if (player_ctx->buffer->isDVD() &&
         player_ctx->buffer->DVD()->InStillFrame() &&
         videoOutput->ValidVideoFrames() < 3)
     {
-        videoOutput->ProcessFrame(frame, NULL, NULL, pip_players);
+        videoOutput->ProcessFrame(frame, NULL, NULL, pip_players, ps);
     }
     else
     {
-        videoOutput->ProcessFrame(frame, osd, videoFilters, pip_players);
+        videoOutput->ProcessFrame(frame, osd, videoFilters, pip_players, ps);
     }
     videofiltersLock.unlock();
 

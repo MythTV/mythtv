@@ -3876,7 +3876,8 @@ void VideoOutputXv::ReturnAvailableOSD(XvMCOSD *avail)
 
 void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
                                     FilterChain *filterList,
-                                    const PIPMap &pipPlayers)
+                                    const PIPMap &pipPlayers,
+                                    FrameScanType scan)
 {
     bool deint_proc = m_deinterlacing && (m_deintFilter != NULL);
     bool pauseframe = false;
@@ -3901,7 +3902,7 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
             filterList->ProcessFrame(frame);
 
         if (deint_proc && m_deinterlaceBeforeOSD)
-            m_deintFilter->ProcessFrame(frame);
+            m_deintFilter->ProcessFrame(frame, scan);
     }
 
     ShowPIPs(frame, pipPlayers);
@@ -3921,7 +3922,7 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
     if ((!pauseframe || safepauseframe) &&
         deint_proc && !m_deinterlaceBeforeOSD)
     {
-        m_deintFilter->ProcessFrame(frame);
+        m_deintFilter->ProcessFrame(frame, scan);
     }
 
     vbuffers.UnlockFrame(frame, "ProcessFrameMem");
@@ -3930,7 +3931,8 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
 // this is documented in videooutbase.cpp
 void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
                                  FilterChain *filterList,
-                                 const PIPMap &pipPlayers)
+                                 const PIPMap &pipPlayers,
+                                 FrameScanType scan)
 {
     if (IsErrored())
     {
@@ -3941,7 +3943,7 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (VideoOutputSubType() == XVideoVDPAU)
         ProcessFrameVDPAU(frame, osd, pipPlayers);
     else if (VideoOutputSubType() <= XVideo)
-        ProcessFrameMem(frame, osd, filterList, pipPlayers);
+        ProcessFrameMem(frame, osd, filterList, pipPlayers, scan);
     else
         ProcessFrameXvMC(frame, osd);
 }

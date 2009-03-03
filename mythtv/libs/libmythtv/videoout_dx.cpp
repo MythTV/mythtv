@@ -460,7 +460,8 @@ void VideoOutputDX::UpdatePauseFrame(void)
 
 void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
                                  FilterChain *filterList,
-                                 const PIPMap &pipPlayers)
+                                 const PIPMap &pipPlayers,
+                                 FrameScanType scan)
 {
     if (IsErrored())
     {
@@ -475,7 +476,7 @@ void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
     }
 
     if (m_deinterlacing && m_deintFilter != NULL)
-	m_deintFilter->ProcessFrame(frame);
+	m_deintFilter->ProcessFrame(frame, scan);
     if (filterList)
         filterList->ProcessFrame(frame);
 

@@ -790,10 +790,12 @@ void VideoOutputIvtv::ShowPIP(VideoFrame        *frame,
 
 void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    FilterChain *filterList, 
-                                   const PIPMap &pipPlayers)
+                                   const PIPMap &pipPlayers,
+                                   FrameScanType scan)
 { 
     (void)filterList;
     (void)frame;
+    (void)scan;
 
     if (fbfd < 0)
         return;
