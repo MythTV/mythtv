@@ -926,6 +926,12 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         }
     }
 
+    if (m_currentItem)
+    {
+        delete m_currentItem;
+        m_currentItem = NULL;
+    }
+
     if (lcddev && !lcdItems.isEmpty())
         lcddev->switchToMenu(lcdItems, lcdTitle);
 
