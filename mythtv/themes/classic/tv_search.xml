@@ -18,6 +18,7 @@
       <text lang="ES">Títulos</text>
       <text lang="RU">Заголовки</text>
       <text lang="PL">Tytuły</text>
+      <description>Find a program based on title</description> 
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -39,6 +40,7 @@
       <text lang="ES">Palabras</text>
       <text lang="RU">Ключевые слова</text>
       <text lang="PL">Słowa kluczowe</text>
+      <description>Find a program matching a keyword</description> 
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -58,6 +60,7 @@
       <text lang="NL">Personen</text>
       <text lang="RU">Действующие лица</text>
       <text lang="PL">Osoby</text>
+      <description>Find a program including a given person</description> 
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -79,6 +82,7 @@
       <text lang="RU">Дополнительно</text>
       <text lang="PL">Zaawansowane</text>
       <alttext lang="ET">Muud</alttext>
+      <description>Combine more than one word search</description> 
       <action>TV_SEARCH_POWER</action>
    </button>
 
@@ -100,6 +104,7 @@
       <text lang="ES">Nuevos Títulos</text>
       <text lang="RU">Новые заголовки</text>
       <text lang="PL">Nowe tytuły</text>
+      <description>Pick a program to record for a list of new titles</description> 
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -122,6 +127,7 @@
       <text lang="ES">Películas</text>
       <text lang="RU">Фильмы</text>
       <text lang="PL">Filmy</text>
+      <description>Pick a movie to record</description> 
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -143,6 +149,7 @@
       <text lang="ES">Categorías</text>
       <text lang="RU">Категории</text>
       <text lang="PL">Kategorie</text>
+      <description>Pick a program based on category</description> 
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -164,6 +171,7 @@
       <text lang="ES">Canales</text>
       <text lang="RU">Каналы</text>
       <text lang="PL">Kanały</text>
+      <description>Pick a program on a given channel</description> 
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -185,6 +193,7 @@
       <text lang="ES">Horas</text>
       <text lang="RU">Время</text>
       <text lang="PL">Czas</text>
+      <description>Pick a program based on time</description> 
       <action>TV_SEARCH_TIME</action>
    </button>
 
@@ -193,6 +202,7 @@
       <text>Stored Searches</text>
       <text lang="SL">Shranjena iskanja</text>
       <text lang="PL">Znaleziony zapamiętany</text>
+      <description>Results of searches you have saved</description> 
       <action>TV_SEARCH_STORED</action>
    </button>
 

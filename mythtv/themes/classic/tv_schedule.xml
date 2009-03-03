@@ -37,6 +37,7 @@
       <alttext lang="RU">Программа</alttext>
       <alttext lang="PL">Program TV</alttext>
       <alttext lang="HE">מדריך</alttext>
+      <description>Choose programs from a grid-style list</description> 
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -75,6 +76,7 @@
       <alttext lang="RU">Поиск</alttext>
       <alttext lang="PL">Znajdź</alttext>
       <alttext lang="HE">מוצא</alttext>
+      <description>Choose programs from an alphabetical index</description> 
       <action>TV_PROGFIND</action>
    </button>
 
@@ -105,6 +107,7 @@
       <alttext lang="RU">Списки</alttext>
       <alttext lang="PL">Szukaj</alttext>
       <alttext lang="HE">חיפוש</alttext>
+      <description>Find programs matching search words</description> 
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -125,6 +128,7 @@
       <text lang="RU">Дополнительно</text>
       <text lang="PL">Dostosuj nagrywanie</text>
       <text lang="HE">התאמת הקלטה</text>
+      <description>Advanced program finder</description> 
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -161,6 +165,7 @@
       <alttext lang="RU">Вручную</alttext>
       <alttext lang="PL">Ręczny</alttext>
       <alttext lang="HE">תיז. יד.</alttext>
+      <description>VCR-like recording scheduler</description> 
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
@@ -192,6 +197,7 @@
       <alttext lang="RU">Приоритеты</alttext>
       <alttext lang="PL">Priorytet</alttext>
       <alttext lang="HE">קדימויות</alttext>
+      <description>Prioritize some shows over others</description> 
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -219,6 +225,7 @@
       <alttext lang="ET">Tulevased</alttext>
       <alttext lang="ES">Conflictos</alttext>
       <alttext lang="PL">Konflikty</alttext>
+      <description>See what will be recorded next</description> 
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

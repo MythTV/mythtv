@@ -16,6 +16,7 @@
       <text lang="PT">Por Novos Títulos</text>
       <text lang="ES">Nuevos Títulos</text>
       <text lang="RU">Новые заголовки</text>
+      <description>Pick a program to record for a list of new titles</description> 
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -35,6 +36,7 @@
       <text lang="PT">Por Filme</text>
       <text lang="ES">Películas</text>
       <text lang="RU">Фильмы</text>
+      <description>Pick a movie to record</description> 
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -54,6 +56,7 @@
       <text lang="PT">Por Categoria</text>
       <text lang="ES">Categorías</text>
       <text lang="RU">Категории</text>
+      <description>Pick a program based on category</description> 
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -73,6 +76,7 @@
       <text lang="PT">Por Canal</text>
       <text lang="ES">Canales</text>
       <text lang="RU">Каналы</text>
+      <description>Pick a program on a given channel</description> 
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -92,6 +96,7 @@
       <text lang="PT">Por Data e Hora</text>
       <text lang="ES">Horas</text>
       <text lang="RU">Время</text>
+      <description>Pick a program based on time</description> 
       <action>TV_SEARCH_TIME</action>
    </button>
 

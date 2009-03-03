@@ -16,6 +16,7 @@
       <text lang="PT">Por Títulos</text>
       <text lang="ES">Títulos</text>
       <text lang="RU">Заголовки</text>
+      <description>Find a program based on title</description> 
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -35,6 +36,7 @@
       <text lang="PT">Por Palavras-Chave</text>
       <text lang="ES">Palabras</text>
       <text lang="RU">Ключевые слова</text>
+      <description>Find a program matching a keyword</description> 
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -53,6 +55,7 @@
       <text lang="PT">Por Pessoas</text>
       <text lang="ES">Personas</text>
       <text lang="RU">Действующие лица</text>
+      <description>Find a program including a given person</description> 
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -74,6 +77,7 @@
       <alttext lang="DE">Erweitert</alttext>
       <alttext lang="ET">Muud</alttext>
       <alttext lang="PT">Avançada</alttext>
+      <description>Combine more than one word search</description> 
       <action>TV_SEARCH_POWER</action>
    </button>
 
@@ -81,6 +85,7 @@
       <type>TV_SEARCH_STORED</type>
       <text>Stored Searches</text>
       <text lang="SL">Shranjena iskanja</text>
+      <description>Results of searches you have saved</description> 
       <action>TV_SEARCH_STORED</action>
    </button>
 
