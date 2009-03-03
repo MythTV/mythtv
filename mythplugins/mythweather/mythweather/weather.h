@@ -22,7 +22,7 @@ class Weather : public MythScreenType
     Q_OBJECT
 
   public:
-    Weather(MythScreenStack *parent, const char *name, SourceManager *srcMan);
+    Weather(MythScreenStack *parent, const QString &name, SourceManager *srcMan);
     ~Weather();
 
     bool Create(void);
@@ -63,7 +63,7 @@ class Weather : public MythScreenType
     QTimer *m_nextpage_Timer;
 
     bool m_gotDataHook;
-    
+
     bool m_firstSetup;
 
     bool m_createdSrcMan;

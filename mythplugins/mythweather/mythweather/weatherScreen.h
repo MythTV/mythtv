@@ -28,7 +28,7 @@ class WeatherScreen : public MythScreenType
     Q_OBJECT
 
   public:
-    WeatherScreen(MythScreenStack *parent, const char *name,
+    WeatherScreen(MythScreenStack *parent, const QString &name,
                                ScreenListInfo *screenDefn, int id);
     ~WeatherScreen();
 
@@ -65,6 +65,7 @@ class WeatherScreen : public MythScreenType
     virtual void prepareWidget(MythUIType *widget);
     virtual void prepareScreen();
     virtual QString getTemperatureUnit();
+    QString formatDataItem(const QString &key, const QString &value);
 
   private:
     QMap<QString, QString> m_dataValueMap;
@@ -74,50 +75,12 @@ class WeatherScreen : public MythScreenType
     int m_id;
 };
 
-class CurrCondScreen : public WeatherScreen
-{
-    Q_OBJECT
-
-  public:
-    CurrCondScreen(MythScreenStack *parent, const char *name,
-                               ScreenListInfo *screenDefn, int id);
-
-  protected:
-    virtual QString prepareDataItem(const QString &key, const QString &value);
-};
-
-class ThreeDayForecastScreen : public WeatherScreen
-{
-    Q_OBJECT
-
-  public:
-    ThreeDayForecastScreen(MythScreenStack *parent, const char *name,
-                               ScreenListInfo *screenDefn, int id);
-
-  protected:
-    virtual QString prepareDataItem(const QString &key, const QString &value);
-
-};
-
-class SixDayForecastScreen : public WeatherScreen
-{
-    Q_OBJECT
-
-  public:
-    SixDayForecastScreen(MythScreenStack *parent, const char *name,
-                               ScreenListInfo *screenDefn, int id);
-
-  protected:
-    virtual QString prepareDataItem(const QString &key, const QString &value);
-
-};
-
 class SevereWeatherScreen : public WeatherScreen
 {
     Q_OBJECT
 
   public:
-    SevereWeatherScreen(MythScreenStack *parent, const char *name,
+    SevereWeatherScreen(MythScreenStack *parent, const QString &name,
                                ScreenListInfo *screenDefn, int id);
     bool usingKeys() { return true; }
 
@@ -130,7 +93,7 @@ class StaticImageScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    StaticImageScreen(MythScreenStack *parent, const char *name,
+    StaticImageScreen(MythScreenStack *parent, const QString &name,
                                ScreenListInfo *screenDefn, int id);
 
   protected:
@@ -146,7 +109,7 @@ class AnimatedImageScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    AnimatedImageScreen(MythScreenStack *parent, const char *name,
+    AnimatedImageScreen(MythScreenStack *parent, const QString &name,
                                ScreenListInfo *screenDefn, int id);
 
   protected:

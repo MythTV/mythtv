@@ -13,12 +13,7 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
                                          ScreenListInfo *screenDefn, int id)
 {
     QString key = screenDefn->name;
-    if (key == "Current Conditions")
-        return new CurrCondScreen(parent, "Current Conditions", screenDefn, id);
-    if (key == "Three Day Forecast")
-        return new ThreeDayForecastScreen(parent,"Three Day Forecast" , screenDefn, id);
-    if (key == "Six Day Forecast")
-        return new SixDayForecastScreen(parent, "Six Day Forecast", screenDefn, id);
+
     if (key == "Severe Weather Alerts")
         return new SevereWeatherScreen(parent, "Severe Weather Alerts", screenDefn, id);
     if (key == "Static Map")
@@ -26,10 +21,10 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
     if (key == "Animated Map")
         return new AnimatedImageScreen(parent, "Animated Map", screenDefn, id);
 
-    return new WeatherScreen(parent, "Unknown Screen", screenDefn, id);
+    return new WeatherScreen(parent, key, screenDefn, id);
 }
 
-WeatherScreen::WeatherScreen(MythScreenStack *parent, const char *name,
+WeatherScreen::WeatherScreen(MythScreenStack *parent, const QString &name,
                              ScreenListInfo *screenDefn, int id)
     : MythScreenType (parent, name)
 {
@@ -161,28 +156,7 @@ void WeatherScreen::prepareWidget(MythUIType *widget)
     }
 }
 
-QString WeatherScreen::prepareDataItem(const QString &key, const QString &value)
-{
-    (void) key;
-    return value;
-}
-
-bool WeatherScreen::keyPressEvent(QKeyEvent *event)
-{
-    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
-        return true;
-
-    return false;
-}
-
-CurrCondScreen::CurrCondScreen(MythScreenStack *parent, const char *name,
-                               ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, name, screenDefn, id)
-{
-}
-
-QString CurrCondScreen::prepareDataItem(const QString &key,
-                                        const QString &value)
+QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
 {
     if (key == "relative_humidity")
         return value + " %";
@@ -193,10 +167,8 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
     if (key == "visibility")
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
-    if (key == "appt")
-        return value == "NA" ? value : value + getTemperatureUnit();
-
-    if (key == "temp")
+    if (key == "temp" || key == "appt" || key.contains("low",Qt::CaseInsensitive) ||
+        key.contains("high",Qt::CaseInsensitive))
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
@@ -206,28 +178,6 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
         return value + (m_units == ENG_UNITS ? " mph" : " kph");
-
-    return value;
-}
-
-ThreeDayForecastScreen::ThreeDayForecastScreen(MythScreenStack *parent,
-                                               const char *name,
-                                               ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, name, screenDefn, id)
-{
-}
-
-QString ThreeDayForecastScreen::prepareDataItem(const QString &key,
-                                        const QString &value)
-{
-    if (key.contains("low",  Qt::CaseInsensitive) ||
-        key.contains("high", Qt::CaseInsensitive) )
-    {
-       if ( (value == "NA") || (value == "N/A") )
-          return value;
-       else
-          return value + getTemperatureUnit();
-    }
 
     /*The days of the week will be translated if the script sends elements from
      the enum DaysOfWeek.*/
@@ -270,35 +220,28 @@ QString ThreeDayForecastScreen::prepareDataItem(const QString &key,
     return value;
 }
 
-SixDayForecastScreen::SixDayForecastScreen(MythScreenStack *parent,
-                                            const char *name,
-                                            ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, name, screenDefn, id)
+QString WeatherScreen::prepareDataItem(const QString &key, const QString &value)
 {
+//    (void) key;
+//    return value;
+    return formatDataItem(key, value);
 }
 
-QString SixDayForecastScreen::prepareDataItem(const QString &key,
-                                        const QString &value)
+bool WeatherScreen::keyPressEvent(QKeyEvent *event)
 {
-    if (key.contains("low",  Qt::CaseInsensitive) ||
-        key.contains("high", Qt::CaseInsensitive) )
-    {
-       if ( (value == "NA") || (value == "N/A") )
-          return value;
-       else
-          return value + getTemperatureUnit();
-    }
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
 
-    return value;
+    return false;
 }
 
-SevereWeatherScreen::SevereWeatherScreen(MythScreenStack *parent, const char *name,
+SevereWeatherScreen::SevereWeatherScreen(MythScreenStack *parent, const QString &name,
                                          ScreenListInfo *screenDefn, int id)
     : WeatherScreen(parent, name, screenDefn, id)
 {
 }
 
-StaticImageScreen::StaticImageScreen(MythScreenStack *parent, const char *name,
+StaticImageScreen::StaticImageScreen(MythScreenStack *parent, const QString &name,
                                      ScreenListInfo *screenDefn, int id)
     : WeatherScreen(parent, name, screenDefn, id)
 {
@@ -338,7 +281,7 @@ void StaticImageScreen::prepareWidget(MythUIType *widget)
     (void) widget;
 }
 
-AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent, const char *name,
+AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent, const QString &name,
                                          ScreenListInfo *screenDefn, int id)
     : WeatherScreen(parent, name, screenDefn, id)
 {

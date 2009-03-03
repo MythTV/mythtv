@@ -42,7 +42,7 @@ class GlobalSetup : public MythScreenType
     Q_OBJECT
 
   public:
-    GlobalSetup(MythScreenStack *parent, const char *name);
+    GlobalSetup(MythScreenStack *parent, const QString &name);
     ~GlobalSetup();
 
     bool Create(void);
@@ -66,7 +66,7 @@ class ScreenSetup : public MythScreenType
     Q_OBJECT
 
   public:
-    ScreenSetup(MythScreenStack *parent, const char *name, SourceManager *srcman);
+    ScreenSetup(MythScreenStack *parent, const QString &name, SourceManager *srcman);
     ~ScreenSetup();
 
     bool Create(void);
@@ -100,7 +100,7 @@ class SourceSetup : public MythScreenType
     Q_OBJECT
 
   public:
-    SourceSetup(MythScreenStack *parent, const char *name);
+    SourceSetup(MythScreenStack *parent, const QString &name);
     ~SourceSetup();
 
     bool Create(void);
@@ -136,7 +136,7 @@ class LocationDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    LocationDialog(MythScreenStack *parent, const char *name,
+    LocationDialog(MythScreenStack *parent, const QString &name,
                    MythScreenType *retScreen,
                    ScreenListInfo *si, SourceManager *srcman);
     ~LocationDialog();

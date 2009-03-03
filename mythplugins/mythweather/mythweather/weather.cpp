@@ -16,7 +16,7 @@
 #include "weatherSetup.h"
 #include "weather.h"
 
-Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMan)
+Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *srcMan)
     : MythScreenType(parent, name),
       m_cur_screen(-1)
 {
@@ -115,10 +115,10 @@ void Weather::setupScreens()
 {
     // Delete any existing screens
     clearScreens();
-    
+
     m_paused = false;
     m_pauseText->Hide();
-    
+
     // Refresh sources
     m_srcMan->clearSources();
     m_srcMan->findScriptsDB();
@@ -152,7 +152,7 @@ void Weather::setupScreens()
             {
                 mainStack->AddScreen(ssetup);
             }
-            
+
             m_firstSetup = false;
         }
         else
@@ -182,7 +182,7 @@ void Weather::setupScreens()
                     SLOT(screenReady(WeatherScreen *)));
             m_srcMan->connectScreen(id, ws);
         }
-        
+
         m_srcMan->startTimers();
         m_srcMan->doUpdate();
     }
@@ -319,7 +319,7 @@ void Weather::setupPage()
         clearScreens();
         mainStack->AddScreen(ssetup);
     }
-        
+
     m_firstRun = true;
 }
 
@@ -331,7 +331,7 @@ void Weather::cursorRight()
         hideScreen();
         showScreen(ws);
         if (!m_paused)
-            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval)); 
+            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
     }
 }
 
@@ -343,7 +343,7 @@ void Weather::cursorLeft()
         hideScreen();
         showScreen(ws);
         if (!m_paused)
-            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval)); 
+            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
     }
 }
 

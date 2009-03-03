@@ -70,5 +70,6 @@ typedef QMap<QString, ScreenListInfo *> ScreenListMap;
 
 ScreenListMap loadScreens();
 QStringList loadScreen(QDomElement ScreenListInfo);
+bool doLoadScreens(const QString &filename, ScreenListMap &screens);
 
 #endif

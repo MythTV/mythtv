@@ -16,7 +16,7 @@
 #define SCREEN_SETUP_SCREEN 1
 #define SRC_SCREEN 2
 
-GlobalSetup::GlobalSetup(MythScreenStack *parent, const char *name)
+GlobalSetup::GlobalSetup(MythScreenStack *parent, const QString &name)
     : MythScreenType(parent, name),
       m_backgroundCheckbox(NULL), m_timeoutSpinbox(NULL),
       m_timeout(0),               m_hold_timeout(0),
@@ -84,7 +84,7 @@ void GlobalSetup::saveData()
 
 ///////////////////////////////////////////////////////////////////////
 
-ScreenSetup::ScreenSetup(MythScreenStack *parent, const char *name,
+ScreenSetup::ScreenSetup(MythScreenStack *parent, const QString &name,
                          SourceManager *srcman)
     : MythScreenType(parent, name),
       m_sourceManager(srcman ? srcman : new SourceManager()),
@@ -662,7 +662,7 @@ void ScreenSetup::customEvent(QEvent *event)
 
 ///////////////////////////////////////////////////////////////////////
 
-SourceSetup::SourceSetup(MythScreenStack *parent, const char *name)
+SourceSetup::SourceSetup(MythScreenStack *parent, const QString &name)
     : MythScreenType(parent, name)
 {
     m_sourceList = NULL;
@@ -845,7 +845,7 @@ void SourceSetup::sourceListItemSelected(MythUIButtonListItem *item)
 
 ///////////////////////////////////////////////////////////////////////
 
-LocationDialog::LocationDialog(MythScreenStack *parent, const char *name,
+LocationDialog::LocationDialog(MythScreenStack *parent, const QString &name,
                                MythScreenType *retScreen, ScreenListInfo *si,
                                SourceManager *srcman)
     : MythScreenType(parent, name),
