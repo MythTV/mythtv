@@ -32,6 +32,7 @@
       <alttext lang="ET">Kava</alttext>
       <alttext lang="PT">Guia</alttext>
       <alttext lang="RU">Программа</alttext>
+      <description>Choose programs from a grid-style list</description> 
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -67,6 +68,7 @@
       <alttext lang="SL">Iskalec</alttext>
       <alttext lang="ET">Otsija</alttext>
       <alttext lang="RU">Поиск</alttext>
+      <description>Choose programs from an alphabetical index</description> 
       <action>TV_PROGFIND</action>
    </button>
 
@@ -96,6 +98,7 @@
       <alttext lang="DA">Ord</alttext>
       <alttext lang="PT">Palavras</alttext>
       <alttext lang="RU">Слова</alttext>
+      <description>Find programs matching search words</description> 
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -124,6 +127,7 @@
       <alttext lang="DA">Lister</alttext>
       <alttext lang="PT">Listas</alttext>
       <alttext lang="RU">Списки</alttext>
+      <description>Pick a program to record from a set of lists</description> 
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -142,6 +146,7 @@
       <text lang="PT">Regras de Gravação</text>
       <text lang="ES">Avanzada</text>
       <text lang="RU">Дополнительно</text>
+      <description>Advanced program finder</description> 
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -176,6 +181,7 @@
       <alttext lang="SL">Ročno</alttext>
       <alttext lang="ET">Käsitsi</alttext>
       <alttext lang="RU">Вручную</alttext>
+      <description>VCR-like recording scheduler</description> 
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
