@@ -2,7 +2,7 @@ CONFIG += $$CCONFIG
 
 #check QT major version
 contains(QT_MAJOR_VERSION, 3) {
-        error("Not building against Qt4")
+        error("Must build against Qt4")
 }
 
 # Where binaries, includes and runtime assets are installed by 'make install'
@@ -39,9 +39,9 @@ isEmpty(TARGET_OS) : win32 {
     QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
 }
 
-# if CYGWIN compile, set up flag in CONFIG 
-contains(TARGET_OS, CYGWIN) { 
-    CONFIG += cygwin 
+# if CYGWIN compile, set up flag in CONFIG
+contains(TARGET_OS, CYGWIN) {
+    CONFIG += cygwin
     QMAKE_EXTENSION_SHLIB=dll.a
     DEFINES += CONFIG_CYGWIN
 }
@@ -101,7 +101,7 @@ release:contains( ARCH_POWERPC, yes ) {
 }
 
 
-# figure out defines 
+# figure out defines
 DEFINES += $$CONFIG_DEFINES
 DEFINES += _GNU_SOURCE
 DEFINES += _FILE_OFFSET_BITS=64
@@ -111,7 +111,7 @@ LOCAL_LIBDIR_X11 =
 !isEmpty( QMAKE_LIBDIR_X11 ) {
     LOCAL_LIBDIR_X11 = -L$$QMAKE_LIBDIR_X11
 }
-QMAKE_LIBDIR_X11 = 
+QMAKE_LIBDIR_X11 =
 
 LOCAL_LIBDIR_OGL =
 !isEmpty( QMAKE_LIBDIR_OPENGL ) {
