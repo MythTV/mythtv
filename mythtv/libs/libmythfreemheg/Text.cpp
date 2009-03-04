@@ -244,7 +244,7 @@ static void InterpretAttributes(const MHOctetString &attrs, int &style, int &siz
     }
     else { // Textual form.
         const unsigned char *str = attrs.Bytes();
-        const char *p = (const char *)str;
+        char *p = (char *)str;
         char *q = strchr(p, '.'); // Find the terminating dot
         if (q != NULL) { // plain, italic etc.
             if (q-p == 6 && strncmp(p, "italic", 6) == 0) style = 1;
