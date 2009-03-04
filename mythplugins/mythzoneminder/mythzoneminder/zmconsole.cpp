@@ -299,7 +299,7 @@ void ZMConsole::updateMonitorList()
         item->SetText(monitor->zmcStatus, "zmcstatus");
         item->SetText(monitor->zmaStatus, "zmastatus");
         item->SetText(QString("%1").arg(monitor->events), "eventcount");
-        item->SetData((void*) monitor);
+        //item->SetData((void*) monitor);
     }
 
     m_monitor_list->SetItemCurrent(pos);
