@@ -822,6 +822,7 @@ QString MediaMonitor::defaultCDWriter()
 { 
     return defaultDevice("CDWriterDeviceLocation", 
                          tr("Select a CD writer"), "/dev/cdrom");
+}
 
 /**
  * \brief MythArchiveDVDLocation, user-selected drive, or /dev/dvd
