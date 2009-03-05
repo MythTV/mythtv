@@ -877,7 +877,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             QFileInfo finfo(oldfile);
             if (followLinks && finfo.isSymLink())
             {
-                QString link = finfo.readLink();
+                QString link = getSymlinkTarget(oldfile);
                 QByteArray alink = link.toLocal8Bit();
                 err = transUnlink(alink.constData());
 
