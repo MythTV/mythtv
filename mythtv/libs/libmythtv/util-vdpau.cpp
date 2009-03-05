@@ -1485,7 +1485,7 @@ bool VDPAUContext::InitOSD(QSize size)
             VDP_RGBA_FORMAT_A8,
             width,
             height,
-            false,
+            true,
             &osdAlpha
         );
         CHECK_ST
@@ -2108,7 +2108,7 @@ bool VDPAUContext::InitPIPLayer(QSize screen_size)
             vdp_device,
             VDP_RGBA_FORMAT_A8,
             1, 1,
-            false,
+            true,
             &pipAlpha
         );
         CHECK_ST
@@ -2134,7 +2134,7 @@ bool VDPAUContext::InitPIPLayer(QSize screen_size)
             vdp_device,
             VDP_RGBA_FORMAT_R8G8B8A8,
             1, 1,
-            false,
+            true,
             &pipBorder
         );
         CHECK_ST
@@ -2160,7 +2160,7 @@ bool VDPAUContext::InitPIPLayer(QSize screen_size)
             vdp_device,
             VDP_RGBA_FORMAT_R8G8B8A8,
             1, 1,
-            false,
+            true,
             &pipClear
         );
         CHECK_ST
