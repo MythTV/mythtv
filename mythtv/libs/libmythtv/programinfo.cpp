@@ -3982,8 +3982,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         // to do some checking to see what is in pathname
         if (testFile.exists())
         {
-            while (testFile.isSymLink())
-                testFile.setFile(testFile.readLink());
+            if (testFile.isSymLink())
+                testFile.setFile(getSymlinkTarget(pathname));
 
             if (testFile.isFile())
                 recDir = testFile.path();
@@ -3995,11 +3995,10 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             testFile.setFile(testFile.absolutePath());
             if (testFile.exists())
             {
-                uint i = 0;
-                for (; (i < 256) && testFile.isSymLink(); i++)
-                    testFile.setFile(testFile.readLink());
+                if (testFile.isSymLink())
+                    testFile.setFile(getSymlinkTarget(testFile.path()));
 
-                if ((256 != i) && testFile.isDir())
+                if (testFile.isDir())
                     recDir = testFile.filePath();
             }
         }

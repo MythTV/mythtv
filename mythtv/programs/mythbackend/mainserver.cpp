@@ -83,9 +83,7 @@ int delete_file_immediately(const QString &filename,
         QFileInfo finfo(filename);
         if (finfo.isSymLink())
         {
-            QString linktext = finfo.readLink();
-            if (linktext.left(1) != "/")
-                linktext = finfo.absolutePath() + "/" + finfo.readLink();
+            QString linktext = getSymlinkTarget(filename);
 
             QFile target(linktext);
             if (!(success1 = target.remove()))
@@ -1752,9 +1750,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
     QString errmsg = QString("Delete Error '%1'").arg(fname.constData());
     if (finfo.isSymLink())
     {
-        linktext = finfo.readLink();
-        if (linktext.left(1) != "/")
-            linktext = finfo.absolutePath() + "/" + finfo.readLink();
+        linktext = getSymlinkTarget(filename);
         QByteArray alink = linktext.toLocal8Bit();
         errmsg += QString(" -> '%2'").arg(alink.constData());
     }
