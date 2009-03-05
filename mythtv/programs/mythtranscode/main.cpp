@@ -18,6 +18,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythversion.h"
+#include "util.h"
 #include "transcode.h"
 #include "mpeg2fix.h"
 
