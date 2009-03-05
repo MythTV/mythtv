@@ -815,13 +815,21 @@ QString MediaMonitor::defaultDVDdevice()
                          tr("Select a DVD drive"), "/dev/dvd");
 }
 
+/** 
+ * \brief CDWriterDeviceLocation, user-selected drive, or /dev/cdrom 
+ */ 
+QString MediaMonitor::defaultCDWriter() 
+{ 
+    return defaultDevice("CDWriterDeviceLocation", 
+                         tr("Select a CD writer"), "/dev/cdrom");
+
 /**
  * \brief MythArchiveDVDLocation, user-selected drive, or /dev/dvd
  *
  * This should also look for drives with blanks or RWs in them,
  * but Nigel hasn't worked out how to do this tidily (yet).
  */
-QString MediaMonitor::defaultWriter()
+QString MediaMonitor::defaultDVDWriter()
 {
     QString device = defaultDevice("MythArchiveDVDLocation",
                                    tr("Select a DVD writer"), "/dev/dvd");
