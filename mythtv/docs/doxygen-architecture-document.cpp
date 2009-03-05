@@ -537,8 +537,8 @@ Command sequences can be easily sent to the backend using telnet.
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.\endverbatim
-<B>\verbatim21      MYTH_PROTO_VERSION 42 23     ANN Playback hostname 1   10   QUERY_LOAD       4DONE\endverbatim</B>
-\verbatim13      ACCEPT[]:[]402       OK34      0.919922[]:[]0.908203[]:[]0.856445Connection closed by foreign host.\endverbatim
+<B>\verbatim21      MYTH_PROTO_VERSION 44 23     ANN Playback hostname 1   10   QUERY_LOAD       4DONE\endverbatim</B>
+\verbatim13      ACCEPT[]:[]442       OK34      0.919922[]:[]0.908203[]:[]0.856445Connection closed by foreign host.\endverbatim
 The command string is prefixed by 8 characters, containing the length
 of the forthcoming command. This can be justified in any way
 (as the above example shows)
