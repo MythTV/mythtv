@@ -79,16 +79,10 @@ bool ProgLister::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_curviewText, "curview", &err);
+    UIUtilW::Assign(this, m_curviewText, "curview", &err);
     UIUtilE::Assign(this, m_progList, "proglist", &err);
-    UIUtilE::Assign(this, m_titleText, "title", &err);
-    UIUtilE::Assign(this, m_chanText, "channel", &err);
-    UIUtilE::Assign(this, m_timedateText, "timedate", &err);
-    UIUtilE::Assign(this, m_subdescText, "description", &err);
-    UIUtilE::Assign(this, m_typeText, "type", &err);
-    UIUtilE::Assign(this, m_progIDText, "programid", &err);
-    UIUtilE::Assign(this, m_schedText, "sched", &err);
-    UIUtilE::Assign(this, m_messageText, "msg", &err);
+    UIUtilW::Assign(this, m_schedText, "sched", &err);
+    UIUtilW::Assign(this, m_messageText, "msg", &err);
 
     if (err)
     {
@@ -122,9 +116,8 @@ bool ProgLister::Create()
         case plTime: value = tr("Time Search"); break;
         default: value = tr("Unknown Search"); break;
     }
-    m_schedText->SetText(value);
-
-    m_subdescText->SetVisible(false);
+    if (m_schedText)
+        m_schedText->SetText(value);
 
     fillItemList(false);
 
@@ -1181,13 +1174,8 @@ void ProgLister::fillItemList(bool restorePosition)
             m_itemList.append(*i);
     }
 
-    m_messageText->SetVisible((m_itemList.count() == 0));
-    m_titleText->SetVisible((m_itemList.count() != 0));
-    m_chanText->SetVisible((m_itemList.count() != 0));
-    m_timedateText->SetVisible((m_itemList.count() != 0));
-    m_subdescText->SetVisible((m_itemList.count() != 0));
-    m_typeText->SetVisible((m_itemList.count() != 0));
-    m_progIDText->SetVisible((m_itemList.count() != 0));
+    if (m_messageText)
+        m_messageText->SetVisible((m_itemList.count() == 0));
 
     updateButtonList();
 

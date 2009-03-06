@@ -208,7 +208,7 @@ class ProgLister : public MythScreenType
     void fillItemList(bool restorePosition);
     void updateButtonList(void);
 
-    bool powerStringToSQL(const QString &qphrase, QString &output, 
+    bool powerStringToSQL(const QString &qphrase, QString &output,
                           MSqlBindings &bindings);
 
     void updateKeywordInDB(const QString &text, const QString &oldValue);
@@ -245,12 +245,6 @@ class ProgLister : public MythScreenType
     MythUIText       *m_schedText;
     MythUIText       *m_curviewText;
     MythUIButtonList *m_progList;
-    MythUIText       *m_titleText;
-    MythUIText       *m_chanText;
-    MythUIText       *m_timedateText;
-    MythUIText       *m_subdescText;
-    MythUIText       *m_typeText;
-    MythUIText       *m_progIDText;
     MythUIText       *m_messageText;
 };
 
