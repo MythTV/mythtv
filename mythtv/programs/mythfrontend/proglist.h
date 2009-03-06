@@ -244,6 +244,7 @@ class ProgLister : public MythScreenType
 
     MythUIText       *m_schedText;
     MythUIText       *m_curviewText;
+    MythUIText       *m_positionText;
     MythUIButtonList *m_progList;
     MythUIText       *m_messageText;
 };

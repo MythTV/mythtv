@@ -44,6 +44,10 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
+    m_schedText = m_curviewText = m_positionText = m_messageText = NULL;
+    m_positionText = NULL;
+    m_progList = NULL;
+
     switch (pltype)
     {
         case plTitleSearch:   m_searchType = kTitleSearch;   break;
@@ -83,6 +87,7 @@ bool ProgLister::Create()
     UIUtilE::Assign(this, m_progList, "proglist", &err);
     UIUtilW::Assign(this, m_schedText, "sched", &err);
     UIUtilW::Assign(this, m_messageText, "msg", &err);
+    UIUtilW::Assign(this, m_positionText, "position", &err);
 
     if (err)
     {
@@ -1177,6 +1182,17 @@ void ProgLister::fillItemList(bool restorePosition)
     if (m_messageText)
         m_messageText->SetVisible((m_itemList.count() == 0));
 
+    QMap<QString, QString> infoMap;
+    ProgramInfo pginfo;
+    pginfo.ToMap(infoMap);
+    ResetMap(infoMap);
+    if (m_positionText)
+        m_positionText->Reset();
+    if (m_curviewText)
+        m_curviewText->Reset();
+    if (m_schedText)
+        m_schedText->Reset();
+
     updateButtonList();
 
     // Restore position after a list update
@@ -1264,7 +1280,18 @@ void ProgLister::updateButtonList(void)
         item->SetText(tmptitle, "title", state);
         item->SetText(pginfo->RecStatusChar(), "card", state);
 
+        QMap<QString, QString> infoMap;
+        pginfo->ToMap(infoMap);
+        item->SetTextFromMap(infoMap);
+
         item->DisplayState(state, "status");
+    }
+
+    if (m_positionText)
+    {
+        m_positionText->SetText(tr("%1 of %2")
+                .arg(m_progList->GetCurrentPos())
+                .arg(m_progList->GetCount()));
     }
 }
 
@@ -1279,6 +1306,12 @@ void ProgLister::updateInfo(MythUIButtonListItem *item)
         QMap<QString, QString> infoMap;
         pginfo->ToMap(infoMap);
         SetTextFromMap(infoMap);
+        if (m_positionText)
+        {
+            m_positionText->SetText(tr("%1 of %2")
+                   .arg(m_progList->GetCurrentPos())
+                   .arg(m_progList->GetCount()));
+        }
     }
 }
 
