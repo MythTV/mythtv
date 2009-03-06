@@ -762,7 +762,7 @@ void PlaybackBox::updateGroupList()
     if (lcddev)
     {
         if (GetFocusWidget() == m_groupList)
-            lcdTitle = "Recordings";;
+            lcdTitle = "Recordings";
     }
 
     if (!m_titleList.isEmpty())
@@ -924,12 +924,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         {
             m_recordingList->SetItemCurrent(item);
         }
-    }
-
-    if (m_currentItem)
-    {
-        delete m_currentItem;
-        m_currentItem = NULL;
     }
 
     if (lcddev && !lcdItems.isEmpty())
@@ -1430,6 +1424,12 @@ bool PlaybackBox::FillList(bool useCachedData)
 
     updateGroupList();
     updateUsage();
+
+    if (m_currentItem)
+    {
+        delete m_currentItem;
+        m_currentItem = NULL;
+    }
 
     m_isFilling = false;
 
