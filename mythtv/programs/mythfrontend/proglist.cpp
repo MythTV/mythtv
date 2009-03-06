@@ -1258,8 +1258,6 @@ void ProgLister::updateButtonList(void)
 
         MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_progList, "", qVariantFromValue(pginfo));
-        item->SetText(pginfo->startts.toString(m_timeFormat), "time", state);
-        item->SetText(pginfo->ChannelText(m_channelFormat), "channel", state);
 
         if (pginfo->stars > 0.0)
             tmptitle = QString("%1 (%2, %3 )")
@@ -1277,12 +1275,12 @@ void ProgLister::updateButtonList(void)
                                     .arg(pginfo->subtitle);
         }
 
-        item->SetText(tmptitle, "title", state);
+        item->SetText(tmptitle, "titlesubtitle", state);
         item->SetText(pginfo->RecStatusChar(), "card", state);
 
         QMap<QString, QString> infoMap;
         pginfo->ToMap(infoMap);
-        item->SetTextFromMap(infoMap);
+        item->SetTextFromMap(infoMap, state);
 
         item->DisplayState(state, "status");
     }
