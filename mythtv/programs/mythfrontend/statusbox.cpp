@@ -57,8 +57,8 @@ Q_DECLARE_METATYPE(LogLine)
 StatusBox::StatusBox(MythScreenStack *parent)
           : MythScreenType(parent, "StatusBox")
 {
-    m_dateFormat = gContext->GetSetting("Shortm_dateFormat", "M/d");
-    m_timeFormat = gContext->GetSetting("m_timeFormat", "h:mm AP");
+    m_dateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     m_timeDateFormat = QString("%1 %2").arg(m_timeFormat).arg(m_dateFormat);
 
     m_minLevel = gContext->GetNumSetting("LogDefaultView",5);
