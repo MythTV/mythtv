@@ -1224,15 +1224,6 @@ void ProgLister::updateButtonList(void)
 
     QString tmptitle;
 
-    QStringList starMap;
-    QString starstr = "";
-    for (int i = 0; i <= 4; i++)
-    {
-        starMap << starstr;
-        starMap << starstr + "/";
-        starstr += "*";
-    }
-
     for (uint i = 0; i < m_itemList.count(); i++)
     {
         ProgramInfo *pginfo = m_itemList.at(i);
@@ -1259,28 +1250,12 @@ void ProgLister::updateButtonList(void)
         MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_progList, "", qVariantFromValue(pginfo));
 
-        if (pginfo->stars > 0.0)
-            tmptitle = QString("%1 (%2, %3 )")
-                                .arg(pginfo->title).arg(pginfo->year)
-                                .arg(starMap[(int) (pginfo->stars * 8)]);
-        else if (pginfo->subtitle == "")
-            tmptitle = pginfo->title;
-        else
-        {
-            if (m_type == plTitle)
-                tmptitle = pginfo->subtitle;
-            else
-                tmptitle = QString("%1 - \"%2\"")
-                                    .arg(pginfo->title)
-                                    .arg(pginfo->subtitle);
-        }
-
-        item->SetText(tmptitle, "titlesubtitle", state);
-        item->SetText(pginfo->RecStatusChar(), "card", state);
-
         QMap<QString, QString> infoMap;
         pginfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
+
+        QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+        item->DisplayState(rating, "ratingstate");
 
         item->DisplayState(state, "status");
     }

@@ -117,7 +117,7 @@
             <statetype name="buttonitem">
                 <area>0,0,760,25</area>
                 <state name="active">
-                    <textarea name="time" from="buttontext">
+                    <textarea name="starttime" from="buttontext">
                         <area>32,1,148,24</area>
                     </textarea>
                     <textarea name="channel" from="time">
@@ -322,11 +322,11 @@
             <buttonarea>0,0,760,340</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <textarea name="rectype" from="buttontext">
+                    <textarea name="rec_type" from="buttontext">
                         <area>30,1,20,24</area>
                         <align>hcenter</align>
                     </textarea>
-                    <textarea name="title" from="buttontext">
+                    <textarea name="titlesubtitle" from="buttontext">
                         <area>60,1,550,24</area>
                     </textarea>
                     <textarea name="progpriority" from="buttontext">
@@ -357,7 +357,7 @@
             <area>30,440,740,30</area>
         </textarea>
 
-        <textarea name="recordingtype" from="basetextarea">
+        <textarea name="rec_str" from="basetextarea">
             <area>30,480,430,30</area>
         </textarea>
 

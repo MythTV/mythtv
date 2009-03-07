@@ -318,11 +318,11 @@
             <position>20,53</position>
             <statetype name="buttonitem">
                 <state name="active">
-                    <textarea name="rectype" from="buttontext">
+                    <textarea name="rec_type" from="buttontext">
                         <area>30,1,20,24</area>
                         <align>hcenter</align>
                     </textarea>
-                    <textarea name="title" from="buttontext">
+                    <textarea name="titlesubtitle" from="buttontext">
                         <area>60,1,850,24</area>
                     </textarea>
                     <textarea name="progpriority" from="buttontext">
@@ -347,7 +347,7 @@
             <area>230,490,740,30</area>
         </textarea>
 
-        <textarea name="recordingtype" from="basetextarea">
+        <textarea name="rec_str" from="basetextarea">
             <area>230,530,430,30</area>
         </textarea>
 

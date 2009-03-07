@@ -371,30 +371,12 @@ void ViewScheduled::FillList()
                                 new MythUIButtonListItem(m_schedulesList,"",
                                                     qVariantFromValue(pginfo));
 
-        QString shortDate = (pginfo->recstartts).toString(m_shortdateFormat);
-        QString date = (pginfo->recstartts).toString(m_dateFormat);
-        QString time = (pginfo->recstartts).toString(m_timeFormat);
+        QMap<QString, QString> infoMap;
+        pginfo->ToMap(infoMap);
+        item->SetTextFromMap(infoMap, state);
 
-        item->SetText(QString("%1 %2").arg(shortDate).arg(time), "timedate", state);
-        item->SetText(shortDate, "shortdate", state);
-        item->SetText(date, "longdate", state);
-        item->SetText(time, "time", state);
-
-        item->SetText(pginfo->ChannelText(m_channelFormat), "channel", state);
-
-        QString tempSubTitle = pginfo->title;
-        if (!pginfo->subtitle.trimmed().isEmpty())
-        {
-            tempSubTitle = QString("%1 - \"%2\"")
-                .arg(tempSubTitle).arg(pginfo->subtitle);
-        }
-
-        item->SetText(tempSubTitle,        "titlesubtitle", state);
-        item->SetText(pginfo->title,       "title",         state);
-        item->SetText(pginfo->subtitle,    "subtitle",      state);
-        item->SetText(pginfo->description, "description",   state);
-        item->SetText(pginfo->RecStatusChar(), "card", state);
-
+        QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+        item->DisplayState(rating, "ratingstate");
         item->DisplayState(state, "status");
 
         ++pit;

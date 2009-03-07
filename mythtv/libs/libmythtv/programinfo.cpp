@@ -533,6 +533,16 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
 
     progMap["title"] = title;
     progMap["subtitle"] = subtitle;
+
+    QString tempSubTitle = title;
+    if (!subtitle.trimmed().isEmpty())
+    {
+        tempSubTitle = QString("%1 - \"%2\"")
+            .arg(tempSubTitle).arg(subtitle);
+    }
+
+    progMap["titlesubtitle"] = tempSubTitle;
+
     progMap["description"] = StripHTMLTags(description);
     progMap["category"] = category;
     progMap["callsign"] = chansign;
@@ -643,6 +653,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     progMap["recordingstatus"] = progMap["rec_str"];
     progMap["type"] = progMap["rec_str"];
 
+    progMap["card"] = RecStatusChar();
+
     progMap["recpriority"] = recpriority;
     progMap["recpriority2"] = recpriority2;
     progMap["recgroup"] = recgroup;
@@ -670,21 +682,21 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     if (query.exec() && query.next())
         progMap["iconpath"] = query.value(0).toString();
 
-    progMap["RECSTATUS"] = RecStatusText();
+    progMap["recstatus"] = RecStatusText();
 
     if (repeat)
     {
-        progMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
-        progMap["LONGREPEAT"] = progMap["REPEAT"];
+        progMap["repeat"] = QString("(%1) ").arg(QObject::tr("Repeat"));
+        progMap["longrepeat"] = progMap["repeat"];
         if (hasAirDate)
-            progMap["LONGREPEAT"] = QString("(%1 %2) ")
+            progMap["longrepeat"] = QString("(%1 %2) ")
                                 .arg(QObject::tr("Repeat"))
                                 .arg(originalAirDate.toString(fullDateFormat));
     }
     else
     {
-        progMap["REPEAT"] = "";
-        progMap["LONGREPEAT"] = "";
+        progMap["repeat"] = "";
+        progMap["longrepeat"] = "";
     }
 
     progMap["seriesid"] = seriesid;

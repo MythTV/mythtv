@@ -336,9 +336,7 @@ bool ProgramRecPriority::Create()
 
     m_programList = dynamic_cast<MythUIButtonList *> (GetChild("programs"));
 
-    m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
     m_schedInfoText = dynamic_cast<MythUIText *> (GetChild("scheduleinfo"));
-    m_typeText = dynamic_cast<MythUIText *> (GetChild("recordingtype"));
     m_rectypePriorityText = dynamic_cast<MythUIText *>
                                                  (GetChild("rectypepriority"));
     m_recPriorityText = dynamic_cast<MythUIText *> (GetChild("recpriority"));
@@ -1094,13 +1092,18 @@ void ProgramRecPriority::UpdateList()
                                 progInfo->autoRecPriority +
                                 progInfo->recTypeRecPriority;
 
-        QString tempSubTitle = progInfo->title;
         if ((progInfo->rectype == kSingleRecord ||
                 progInfo->rectype == kOverrideRecord ||
                 progInfo->rectype == kDontRecord) &&
             (progInfo->subtitle).trimmed().length() > 0)
-            tempSubTitle = tempSubTitle + " - \"" +
-                            progInfo->subtitle + "\"";
+        {
+
+            QString rating = QString::number((int)((progInfo->stars * 10.0) + 0.5));
+
+            item->DisplayState(rating, "ratingstate");
+        }
+        else
+            progInfo->subtitle = "";
 
         QString state;
         if (progInfo->recType == kDontRecord ||
@@ -1113,8 +1116,10 @@ void ProgramRecPriority::UpdateList()
         else if (m_recMatch[progInfo->recordid] > 0)
             state = "normal";
 
-        item->SetText(tempSubTitle, "title", state);
-        item->SetText(progInfo->RecTypeChar(), "rectype", state);
+        QMap<QString, QString> infoMap;
+        progInfo->ToMap(infoMap);
+        item->SetTextFromMap(infoMap, state);
+
         item->SetText(QString::number(progRecPriority), "progpriority", state);
         item->SetText(QString::number(finalRecPriority), "finalpriority", state);
         item->DisplayState(state, "status");
@@ -1144,14 +1149,11 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
         return;
 
     int progRecPriority, autorecpri, rectyperecpriority, finalRecPriority;
-    RecordingType rectype;
 
     progRecPriority = pgRecInfo->recpriority;
     autorecpri = pgRecInfo->autoRecPriority;
     rectyperecpriority = pgRecInfo->recTypeRecPriority;
     finalRecPriority = progRecPriority + autorecpri + rectyperecpriority;
-
-    rectype = pgRecInfo->recType;
 
     QString subtitle = "";
     if (pgRecInfo->subtitle != "(null)" &&
@@ -1173,56 +1175,12 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
 
-    if (m_titleText)
-        m_titleText->SetText(pgRecInfo->title);
+    QMap<QString, QString> infoMap;
+    pgRecInfo->ToMap(infoMap);
+    SetTextFromMap(infoMap);
 
     if (m_schedInfoText)
         m_schedInfoText->SetText(subtitle);
-
-    if (m_typeText)
-    {
-        QString text;
-        switch (rectype)
-        {
-            case kSingleRecord:
-                text = tr("Recording just this showing");
-                break;
-            case kOverrideRecord:
-                text = tr("Recording with override options");
-                break;
-            case kWeekslotRecord:
-                text = tr("Recording every week");
-                break;
-            case kTimeslotRecord:
-                text = tr("Recording in this timeslot");
-                break;
-            case kChannelRecord:
-                text = tr("Recording on this channel");
-                break;
-            case kAllRecord:
-                text = tr("Recording all showings");
-                break;
-            case kFindOneRecord:
-                text = tr("Recording one showing");
-                break;
-            case kFindDailyRecord:
-                text = tr("Recording a showing daily");
-                break;
-            case kFindWeeklyRecord:
-                text = tr("Recording a showing weekly");
-                break;
-            case kDontRecord:
-                text = tr("Not allowed to record this showing");
-                break;
-            case kNotRecording:
-                text = tr("Not recording this showing");
-                break;
-            default:
-                text = tr("Error!");
-                break;
-        }
-        m_typeText->SetText(text);
-    }
 
     if (m_rectypePriorityText)
         m_rectypePriorityText->SetText(QString::number(rectyperecpriority));

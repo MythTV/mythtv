@@ -82,9 +82,7 @@ class ProgramRecPriority : public MythScreenType
 
     MythUIButtonList *m_programList;
 
-    MythUIText *m_titleText;
     MythUIText *m_schedInfoText;
-    MythUIText *m_typeText;
     MythUIText *m_rectypePriorityText;
     MythUIText *m_recPriorityText;
     MythUIText *m_recPriorityBText;
