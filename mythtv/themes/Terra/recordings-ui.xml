@@ -337,10 +337,35 @@
             <multiline>yes</multiline>
         </textarea>
 
-        <buttonlist name="groups" from="basebuttonlist">
+        <buttonlist name="groups">
             <area>900,248,364,307</area>
             <buttonarea>0,0,378,300</buttonarea>
             <spacing>2</spacing>
+
+            <statetype name="buttonitem">
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <filename>popups/menu_button.png</filename>
+                        <area>0,0,364,31</area>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>16,0,332,31</area>
+                        <align>allcenter</align>
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active">
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <position>3,6</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                         <font>basesmallbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
         </buttonlist>
     </window>
 
