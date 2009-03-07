@@ -308,7 +308,7 @@ void ProgDetails::loadPage(void)
             attr += year + ", ";
 
         if (stars > 0.0)
-            attr += QObject::tr("%n star(s), ", "", stars * 4.0);
+            attr += QObject::tr("%n star(s), ", "", stars * 4.0) + ", ";
     }
     if (colorcode != "")
         attr += colorcode + ", ";
