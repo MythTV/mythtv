@@ -39,13 +39,14 @@ int invert(VideoFilter *vf, VideoFrame *frame, int field)
 }
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options)
+                        int *width, int *height, char *options, int threads)
 {
     ThisFilter *filter;
     
     (void)width;
     (void)height;
     (void)options;
+    (void)threads;
 
     if ((inpixfmt != outpixfmt) || 
         (inpixfmt != FMT_YV12 && inpixfmt != FMT_RGB24 && 

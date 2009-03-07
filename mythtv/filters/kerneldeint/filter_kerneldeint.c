@@ -303,11 +303,12 @@ CleanupKernelDeintFilter (VideoFilter * filter)
 
 VideoFilter *
 NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
-                    int *width, int *height, char *options)
+                    int *width, int *height, char *options, int threads)
 {
     ThisFilter *filter;
     int numopts;
     (void) height;
+    (void) threads;
 
     if ( inpixfmt != outpixfmt ||
         (inpixfmt != FMT_YV12 && inpixfmt != FMT_YUV422P) )

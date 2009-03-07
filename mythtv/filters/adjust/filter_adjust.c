@@ -236,13 +236,14 @@ int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
 VideoFilter *
 newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                 int *width, int *height, char *options)
+                 int *width, int *height, char *options, int threads)
 {
     ThisFilter *filter;
     int numopts = 0, ymin = 16, ymax = 253, cmin = 16, cmax = 240;
     float ygamma = 1.0f, cgamma = 1.0f;
     (void) width;
     (void) height;
+    (void) threads;
 
     if (inpixfmt != outpixfmt ||
         (inpixfmt != FMT_YV12 && inpixfmt != FMT_YUV422P))

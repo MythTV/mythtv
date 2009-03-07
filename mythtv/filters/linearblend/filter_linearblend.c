@@ -324,13 +324,13 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
 }
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options)
+                        int *width, int *height, char *options, int threads)
 {
     LBFilter *filter;
     (void)width;
     (void)height;
     (void)options;
-
+    (void)threads;
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
         return NULL;
 

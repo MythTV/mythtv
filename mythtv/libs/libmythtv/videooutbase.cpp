@@ -462,11 +462,14 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
             }
             else
             {
+                int threads = db_vdisp_profile ?
+                                db_vdisp_profile->GetMaxCPUs() : 1;
                 const QSize video_dim = windows[0].GetVideoDim();
                 int width  = video_dim.width();
                 int height = video_dim.height();
                 m_deintFilter = m_deintFiltMan->LoadFilters(
-                    m_deintfiltername, itmp, otmp, width, height, btmp);
+                    m_deintfiltername, itmp, otmp,
+                    width, height, btmp, threads);
                 windows[0].SetVideoDim(QSize(width, height));
             }
         }

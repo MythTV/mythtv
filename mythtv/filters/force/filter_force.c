@@ -61,11 +61,12 @@ new_force_rgb24 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
 
 VideoFilter *
 new_force_argb32 (VideoFrameType inpixfmt, VideoFrameType outpixfmt, int *width,
-            int *height, char *options)
+            int *height, char *options, int threads)
 {
     (void) width;
     (void) height;
     (void) options;
+    (void) threads;
 
     return new_force_template (inpixfmt, outpixfmt, FMT_ARGB32);
 }

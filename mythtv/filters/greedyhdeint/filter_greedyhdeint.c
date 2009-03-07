@@ -229,11 +229,12 @@ void CleanupGreedyHDeintFilter (VideoFilter * filter)
 }
 
 VideoFilter* GreedyHDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
-        int *width, int *height, char *options)
+        int *width, int *height, char *options, int threads)
 {
     ThisFilter *filter;
     (void) height;
     (void) options;
+    (void) threads;
 
     filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)

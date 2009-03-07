@@ -199,7 +199,8 @@ const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
 FilterChain *FilterManager::LoadFilters(QString Filters, 
                                         VideoFrameType &inpixfmt,
                                         VideoFrameType &outpixfmt, int &width,
-                                        int &height, int &bufsize)
+                                        int &height, int &bufsize,
+                                        int max_threads)
 {
     if (Filters.toLower() == "none")
         return NULL;
@@ -382,7 +383,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         QByteArray tmp = OptsList[i].toLocal8Bit();
         NewFilt = LoadFilter(FiltInfoChain[i], FmtList[i]->in,
                              FmtList[i]->out, postfilt_width, 
-                             postfilt_height, tmp.constData());
+                             postfilt_height, tmp.constData(),
+                             max_threads);
 
         if (!NewFilt)
         {
@@ -488,11 +490,12 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo, 
                                         VideoFrameType inpixfmt,
                                         VideoFrameType outpixfmt, int &width, 
-                                        int &height, const char *opts)
+                                        int &height, const char *opts,
+                                        int max_threads)
 {
     void *handle;
     VideoFilter *Filter;
-    VideoFilter *(*InitFilter)(int, int, int *, int *, char *);
+    VideoFilter *(*InitFilter)(int, int, int *, int *, char *, int);
 
     if (FiltInfo == NULL)
     {
@@ -527,7 +530,7 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
     }
 
     InitFilter =
-        (VideoFilter * (*)(int, int, int *, int *, char *))dlsym(handle,
+        (VideoFilter * (*)(int, int, int *, int *, char *, int))dlsym(handle,
                                                                  FiltInfo->
                                                                  symbol);
 
@@ -543,7 +546,7 @@ VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
     }
 
     Filter = (*InitFilter)(inpixfmt, outpixfmt, &width, &height,
-                           const_cast<char*>(opts));
+                           const_cast<char*>(opts), max_threads);
 
     if (Filter == NULL)
     {

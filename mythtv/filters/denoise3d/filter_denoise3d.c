@@ -384,7 +384,7 @@ void Denoise3DFilterCleanup(VideoFilter *filter)
 }
 
 VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                                int *width, int *height, char *options)
+                                int *width, int *height, char *options, int threads)
 {
     double LumSpac   = PARAM1_DEFAULT;
     double LumTmp    = PARAM3_DEFAULT;
@@ -394,7 +394,7 @@ VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt, VideoFrameType outpixfm
 
     (void) width;
     (void) height;
-
+    (void) threads;
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
     {
         fprintf(stderr, "Denoise3D: attempt to initialize "

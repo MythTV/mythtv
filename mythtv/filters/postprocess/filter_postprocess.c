@@ -82,8 +82,9 @@ void cleanup(VideoFilter *filter)
 }
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options)
+                        int *width, int *height, char *options, int threads)
 {
+    (void) threads;
     ThisFilter *filter;
 
     if ( inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12 )

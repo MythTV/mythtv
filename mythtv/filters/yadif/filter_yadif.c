@@ -511,11 +511,12 @@ void CleanupYadifDeintFilter (VideoFilter * filter)
 }
 
 VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
-    int *width, int *height, char *options)
+    int *width, int *height, char *options, int threads)
 {
     ThisFilter *filter;
     (void) height;
     (void) options;
+    (void) threads;
 
     fprintf(stderr, "Initialize Yadif Deinterlacer. In-Pixformat = %d Out-Pixformat=%d\n", inpixfmt, outpixfmt);
     filter = (ThisFilter *) malloc (sizeof(ThisFilter));

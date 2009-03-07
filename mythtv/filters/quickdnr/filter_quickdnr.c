@@ -449,7 +449,7 @@ void cleanup(VideoFilter *vf)
 }
 
 VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                        int *width, int *height, char *options)
+                        int *width, int *height, char *options, int threads)
 {
     unsigned int Param1, Param2, Param3, Param4;
     int i, double_threshold = 1;
@@ -458,6 +458,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     (void) width;
     (void) height;
     (void) i;
+    (void) threads;
 
     if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
     {

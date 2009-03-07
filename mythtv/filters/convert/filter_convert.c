@@ -103,10 +103,11 @@ Cvt420422 (VideoFilter * f, VideoFrame * frame, int field)
 
 VideoFilter *
 newConvertFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
-                    int *width, int *height, char *options)
+                    int *width, int *height, char *options, int threads)
 {
     ThisFilter *filter;
 
+    (void) threads;
     (void) options;
     if ((inpixfmt != FMT_YUV422P || outpixfmt != FMT_YV12) &&
         (inpixfmt != FMT_YV12 || outpixfmt != FMT_YUV422P) &&

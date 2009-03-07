@@ -192,8 +192,10 @@ static void SetupFilter(ThisFilter *vf, int width, int height, int *pitches)
 
 VideoFilter *
 NewIvtcFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
-                        int *width, int *height, char *options)
+                        int *width, int *height, char *options, int threads)
 {
+    (void) threads;
+
     ThisFilter *filter;
 
     options = NULL;
