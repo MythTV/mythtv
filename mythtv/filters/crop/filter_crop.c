@@ -37,8 +37,9 @@ typedef struct ThisFilter
 
 } ThisFilter;
 
-int crop(VideoFilter *f, VideoFrame *frame)
+int crop(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter *tf = (ThisFilter*) f;
     uint64_t *ybuf = (uint64_t*) (frame->buf + frame->offsets[0]);
     uint64_t *ubuf = (uint64_t*) (frame->buf + frame->offsets[1]);
@@ -129,8 +130,9 @@ int crop(VideoFilter *f, VideoFrame *frame)
 }
 
 #ifdef MMX
-int cropMMX(VideoFilter *f, VideoFrame *frame)
+int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter *tf = (ThisFilter*) f;  
     uint64_t *ybuf = (uint64_t*) (frame->buf + frame->offsets[0]);
     uint64_t *ubuf = (uint64_t*) (frame->buf + frame->offsets[1]);

@@ -36,8 +36,9 @@ typedef struct ThisFilter
 } ThisFilter;
 
 
-int pp(VideoFilter *vf, VideoFrame *frame)
+int pp(VideoFilter *vf, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter* tf = (ThisFilter*)vf;
     TF_VARS;
 

@@ -21,8 +21,9 @@ typedef struct OFFilter
     int bottom;
 } OFFilter;
 
-int oneFieldFilter(VideoFilter *f, VideoFrame *frame)
+int oneFieldFilter(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     OFFilter *filter = (OFFilter *)(f);
     int height = frame->height;
     int bottom = filter->bottom;

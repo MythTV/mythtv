@@ -135,8 +135,9 @@ void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
 }
 #endif /* MMX */
 
-int adjustFilter (VideoFilter *vf, VideoFrame *frame)
+int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter *filter = (ThisFilter *) vf;
     TF_VARS;
 

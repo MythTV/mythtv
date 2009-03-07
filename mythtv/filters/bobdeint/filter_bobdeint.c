@@ -57,8 +57,9 @@ static void doSplit(BDFilter *filter, unsigned char *buf, int lines, int width)
     }
 }
 
-int bobDeintFilter(VideoFilter *f, VideoFrame *frame)
+int bobDeintFilter(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     BDFilter *filter = (BDFilter *)(f);
     int width = frame->width;
     int height = frame->height;

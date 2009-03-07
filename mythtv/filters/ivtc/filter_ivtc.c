@@ -44,8 +44,9 @@ static inline void * memcpy_pic(void * dst, const void * src, int height, int ds
 }
 
 static int
-IvtcFilter (VideoFilter *vf, VideoFrame *frame)
+IvtcFilter (VideoFilter *vf, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter *filter = (ThisFilter *) vf; 
 
     if (!frame->interlaced_frame)

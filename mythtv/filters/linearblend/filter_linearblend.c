@@ -149,8 +149,9 @@ inline void linearBlendAltivec(unsigned char *src, int stride)
     }
 }
 
-int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
+int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     (void)f;
     int height = frame->height;
     unsigned char *yptr = frame->buf + frame->offsets[0];
@@ -273,8 +274,9 @@ void linearBlend(unsigned char *src, int stride)
     }
 }
 
-int linearBlendFilter(VideoFilter *f, VideoFrame *frame)
+int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
 {
+    (void)field;
     int height = frame->height;
     unsigned char *yptr = frame->buf + frame->offsets[0];
     int stride = frame->pitches[0];

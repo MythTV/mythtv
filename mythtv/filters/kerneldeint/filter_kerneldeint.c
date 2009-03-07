@@ -247,8 +247,9 @@ KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 #endif
 
 static int
-KernelDeint (VideoFilter * f, VideoFrame * frame)
+KernelDeint (VideoFilter * f, VideoFrame * frame, int field)
 {
+    (void)field;
     ThisFilter *filter = (ThisFilter *) f;
     TF_VARS;
 

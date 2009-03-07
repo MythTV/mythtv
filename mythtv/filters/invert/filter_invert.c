@@ -15,8 +15,9 @@ typedef struct ThisFilter
     TF_STRUCT;
 } ThisFilter;
 
-int invert(VideoFilter *vf, VideoFrame *frame)
-{  
+int invert(VideoFilter *vf, VideoFrame *frame, int field)
+{
+    (void)field;
     int size = frame->size;
     unsigned char *buf = frame->buf;
     TF_VARS;

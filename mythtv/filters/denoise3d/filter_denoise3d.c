@@ -332,8 +332,9 @@ static int init_buf(ThisFilter *filter, VideoFrame *frame)
     return 1;
 }
 
-static int denoise3DFilter(VideoFilter *f, VideoFrame *frame)
+static int denoise3DFilter(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter *filter = (ThisFilter*) f;
     TF_VARS;
 

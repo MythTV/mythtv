@@ -42,8 +42,9 @@ typedef struct ThisFilter
 } ThisFilter;
 
 static int
-Cvt422420 (VideoFilter * f, VideoFrame * frame)
+Cvt422420 (VideoFilter * f, VideoFrame * frame, int field)
 {
+    (void)field;
     ThisFilter * filter = (ThisFilter *) f;
     int X, Y, field;
     unsigned char * lineout, * linein0, * linein1;
@@ -71,8 +72,9 @@ Cvt422420 (VideoFilter * f, VideoFrame * frame)
 }
 
 static int
-Cvt420422 (VideoFilter * f, VideoFrame * frame)
+Cvt420422 (VideoFilter * f, VideoFrame * frame, int field)
 {
+    (void)field;
     ThisFilter * filter = (ThisFilter *) f;
     int X, Y, field;
     unsigned char * lineout0, * lineout1, * linein;

@@ -126,8 +126,9 @@ static void init_vars(ThisFilter *tf, VideoFrame *frame,
     buf[2] = frame->buf + frame->offsets[2];
 }
 
-int quickdnr(VideoFilter *f, VideoFrame *frame)
-{  
+int quickdnr(VideoFilter *f, VideoFrame *frame, int field)
+{
+    (void)field;
     ThisFilter *tf = (ThisFilter *)f; 
     int thr1[3], thr2[3], height[3];
     uint8_t *avg[3], *buf[3];
@@ -159,8 +160,9 @@ int quickdnr(VideoFilter *f, VideoFrame *frame)
     return 0;
 }
 
-int quickdnr2(VideoFilter *f, VideoFrame *frame)
-{  
+int quickdnr2(VideoFilter *f, VideoFrame *frame, int field)
+{
+    (void)field;
     ThisFilter *tf = (ThisFilter *)f; 
     int thr1[3], thr2[3], height[3];
     uint8_t *avg[3], *buf[3];
@@ -201,8 +203,9 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame)
 
 #ifdef MMX
 
-int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
+int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter *tf = (ThisFilter *)f;
     const uint64_t sign_convert = 0x8080808080808080LL;
     int thr1[3], thr2[3], height[3];
@@ -307,8 +310,9 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
 }
 
 
-int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
+int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
 {
+    (void)field;
     ThisFilter *tf = (ThisFilter *)f;
     const uint64_t sign_convert = 0x8080808080808080LL;
     int thr1[3], thr2[3], height[3];
