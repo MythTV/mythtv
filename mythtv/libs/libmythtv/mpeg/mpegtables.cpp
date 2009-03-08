@@ -188,7 +188,7 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
         if (!ok)
         {
             VERBOSE(VB_SIPARSER, "PSIPTable: PAT: program "
-                    "list extends past end of buffer");            
+                    "list extends past end of buffer");
             return false;
         }
 
@@ -320,7 +320,7 @@ ProgramMapTable* ProgramMapTable::CreateBlank(bool smallPacket)
         psip.SetLength(len_for_alloc[0]);
         pmt = new ProgramMapTable(psip);
     }
-    else 
+    else
     {
         PSIPTable psip(*tspacket);
         psip.SetLength(len_for_alloc[1]);
@@ -385,7 +385,7 @@ ProgramMapTable* ProgramMapTable::Create(
             pdesc.insert(pdesc.end(),
                          prog_desc[i][j], prog_desc[i][j] + len);
         }
-        
+
         pmt->AppendStream(pids[i], types[i], &pdesc[0], pdesc.size());
     }
     pmt->Finalize();
@@ -426,7 +426,7 @@ void ProgramMapTable::AppendStream(
 }
 
 /** \fn ProgramMapTable::IsVideo(uint,QString) const
- *  \brief Returns true iff the stream at index i is an audio stream.
+ *  \brief Returns true iff the stream at index i is a video stream.
  *
  *   This of course returns true if StreamID::IsVideo() is true.
  *   And, it also returns true if IsVideo returns true after
@@ -529,7 +529,7 @@ bool ProgramMapTable::IsStreamEncrypted(uint i) const
 bool ProgramMapTable::IsStillPicture(QString sistandard) const
 {
     static const unsigned char STILL_PICTURE_FLAG = 0x01;
-    
+
     for (uint i = 0; i < StreamCount(); i++)
     {
         if (IsVideo(i, sistandard))
@@ -718,14 +718,14 @@ const QString ProgramAssociationTable::toString() const
 
 const QString ProgramMapTable::toString() const
 {
-    QString str = 
+    QString str =
         QString("Program Map Table ver(%1) pid(0x%2) pnum(%3) len(%4)\n")
         .arg(Version()).arg(tsheader()->PID(), 0, 16)
         .arg(ProgramNumber()).arg(Length());
 
     if (0 != StreamCount())
     {
-        vector<const unsigned char*> desc = 
+        vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
         for (uint i=0; i<desc.size(); i++)
             str.append(QString("  %1\n")
@@ -739,7 +739,7 @@ const QString ProgramMapTable::toString() const
                    .arg(StreamTypeString(i)).arg(StreamType(i), 0, 16));
         if (0 != StreamInfoLength(i))
         {
-            vector<const unsigned char*> desc = 
+            vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
             for (uint i=0; i<desc.size(); i++)
                 str.append(QString("  %1\n")
@@ -805,7 +805,7 @@ const char *StreamID::toString(uint streamID)
         return "service location"; // required in VCT
     case TableID::TSS: // other channels with same stuff
         return "time-shifted service";
-    case TableID::CMPNAME: 
+    case TableID::CMPNAME:
         return "component name"; //??? PMT
     }
     return "unknown";
