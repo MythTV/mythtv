@@ -440,6 +440,8 @@ QString MPEGDescriptor::toString() const
         str = FrequencyListDescriptor(_data).toString();
     else if (DescriptorID::service == DescriptorTag())
         str = ServiceDescriptor(_data).toString();
+    else if (DescriptorID::stream_identifier == DescriptorTag())
+        str = StreamIdentifierDescriptor(_data).toString();
     else
     {
         str.append(QString("%1 Descriptor (0x%2)")

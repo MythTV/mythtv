@@ -87,7 +87,7 @@ class LinkageDescriptor : public MPEGDescriptor
     enum
     {
         lt_InformationService          = 0x01,
-        lt_EPGService                  = 0x02, 
+        lt_EPGService                  = 0x02,
         lt_CAReplacementService        = 0x03,
         lt_TSContainingCompleteNetworkBouquetSI = 0x04,
         lt_ServiceReplacementService   = 0x05,
@@ -115,25 +115,25 @@ class LinkageDescriptor : public MPEGDescriptor
     uint ServiceID()           const { return (_data[6]<<8) | _data[7]; }
     // linkage_type 8 uimsbf
     uint LinkageType()         const { return _data[8]; }
-    
+
     // if (linkage_type != 0x08)
     //    { for (i=0;i<N;i++) { private_data_byte 8 bslbf } }
     uint PrivateDataLength_N8()   const { return DescriptorLength() - 7; }
     const unsigned char* PrivateData_N8() const { return _data+9; }
     // if (linkage_type == 0x08)
     //   {
-    //      hand-over_type 4 bslbf 
+    //      hand-over_type 4 bslbf
     uint HandOverType()        const { return _data[10]>>4; }
-    //      reserved_future_use 3 bslbf 
-    //      origin_type 1 bslbf 
+    //      reserved_future_use 3 bslbf
+    //      origin_type 1 bslbf
     bool OriginType()          const { return _data[10]&0x1; }
-    //      if (hand-over_type == 0x01 || hand-over_type == 0x02 || 
+    //      if (hand-over_type == 0x01 || hand-over_type == 0x02 ||
     //          hand-over_type == 0x03)
-    //        { network_id 16 uimsbf } 
+    //        { network_id 16 uimsbf }
     bool HasNetworkID()        const { return bool(HandOverType() & 0x3); }
     uint NetworkID()           const { return (_data[11]<<8) | _data[12]; }
     //      if (origin_type ==0x00)
-    //        { initial_service_id 16 uimsbf } 
+    //        { initial_service_id 16 uimsbf }
     bool HasInitialServiceID() const { return !OriginType(); }
     uint InitialServiceID()    const
         { return HasNetworkID() ? (_data[13]<<8) | _data[14] : NetworkID(); }
@@ -211,8 +211,8 @@ class AnnouncementSupportDescriptor : public MPEGDescriptor
     //     service_id          16   4.0+p
     //     component_tag        8   6.0+p
     //   }                          7.0
-    // } 
-    QString toString() const { return QString("AnnouncementSupportDescriptor(stub)"); }  
+    // }
+    QString toString() const { return QString("AnnouncementSupportDescriptor(stub)"); }
 };
 
 class BouquetNameDescriptor : public MPEGDescriptor
@@ -226,7 +226,7 @@ class BouquetNameDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
 
-    // for(i=0;i<N;i++) { char 8 } 
+    // for(i=0;i<N;i++) { char 8 }
     QString toString() const { return QString("BouquetNameDescriptor(stub)"); }
 };
 
@@ -241,7 +241,7 @@ class CAIdentifierDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
 
-    // 
+    //
     // for (i=0; i<N; i++)
     //   { CA_system_id 16 }
     QString toString() const { return QString("CAIdentifierDescriptor(stub)"); }
@@ -268,7 +268,7 @@ class CellFrequencyLinkDescriptor : public MPEGDescriptor
     //     cell_id_extension    8   0.0+p2
     //     transposer_freq     32   1.0+p2
     //   }                          5.0
-    // } 
+    // }
     QString toString() const { return QString("CellFrequencyLinkDescriptor(stub)"); }
 };
 
@@ -283,7 +283,7 @@ class CellListDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
 
-    // 
+    //
     // for (i=0; i<N; i++)
     // {
     //   cell_id               16  0.0+p
@@ -300,7 +300,7 @@ class CellListDescriptor : public MPEGDescriptor
     //     subcell_ext_of_lat  12  4.0+p2
     //     subcell_ext_of_long 12  5.4+p2
     //   }                         7.0
-    // } 
+    // }
     QString toString() const { return QString("CellListDescriptor(stub)"); }
 };
 
@@ -331,7 +331,7 @@ class ComponentDescriptor : public MPEGDescriptor
         { return iso639_key_to_canonical_key(LanguageKey()); }
     QString CanonicalLanguageString(void) const
         { return iso639_key_to_str3(CanonicalLanguageKey()); }
-    // 
+    //
     // for (i=0; i<N; i++) { text_char 8 }
 
     bool IsVideo(void) const
@@ -572,9 +572,9 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
 
     // country_avail_flag       1   2.0
     // reserved_future_use      7   2.1
-    // 
+    //
     // for (i=0; i<N; i++)
-    //   { country_code        24 } 
+    //   { country_code        24 }
     QString toString() const { return QString("CountryAvailabilityDescriptor(stub)"); }
 };
 
@@ -598,7 +598,7 @@ class DataBroadcastDescriptor : public MPEGDescriptor
     // }
     // ISO_639_language_code   24
     // text_length              8
-    // for (i=0; i<text_length; i++) { text_char 8 } 
+    // for (i=0; i<text_length; i++) { text_char 8 }
     QString toString() const { return QString("DataBroadcastDescriptor(stub)"); }
 };
 
@@ -615,7 +615,7 @@ class DataBroadcastIdDescriptor : public MPEGDescriptor
 
     // data_broadcast_id       16   2.0
     // for(i=0; i < N;i++ )
-    // { id_selector_byte       8 } 
+    // { id_selector_byte       8 }
     QString toString() const { return QString("DataBroadcastIdDescriptor(stub)"); }
 };
 
@@ -941,7 +941,7 @@ class DSNGDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
 
-    // for (i=0;i<N;i++) { byte 8 } 
+    // for (i=0;i<N;i++) { byte 8 }
     QString toString() const { return QString("DSNGDescriptor(stub)"); }
 };
 
@@ -978,9 +978,9 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     //   item_length            8   1.0+p2
     //   for (j=0;j<N;j++) { item_char 8 }
     // }
-    // text_length 8 
+    // text_length 8
     uint TextLength(void)       const { return _data[7 + _data[6]]; }
-    // for (i=0; i<N; i++) { text_char 8 } 
+    // for (i=0; i<N; i++) { text_char 8 }
     QString Text(void) const
         { return dvb_decode_text(&_data[8 + _data[6]], TextLength()); }
 
@@ -1114,7 +1114,7 @@ class MosaicDescriptor : public MPEGDescriptor
     //     service_id          16
     //     event_id            16
     //   }
-    // } 
+    // }
     QString toString() const { return QString("MosaicDescriptor(stub)"); }
 };
 
@@ -1133,9 +1133,9 @@ class MultilingualBouquetNameDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++)
     // {
     //   ISO_639_language_code 24
-    //   bouquet_name_length    8 
+    //   bouquet_name_length    8
     //   for (j=0;j<N;j++) { char 8 }
-    // } 
+    // }
     QString toString() const { return QString("MultilingualBouguetNameDescriptor(stub)"); }
 };
 
@@ -1174,11 +1174,11 @@ class MultilingualServiceNameDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++)
     // {
     //   ISO_639_language_code 24
-    //   service_provider_name_length 8 
+    //   service_provider_name_length 8
     //   for (j=0;j<N;j++) { char 8 }
     //   service_name_length    8
     //   for (j=0;j<N;j++) { char 8 }
-    // } 
+    // }
     QString toString() const { return QString("MultiLingualServiceNameDescriptor(stub)"); }
 };
 
@@ -1217,7 +1217,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     // {
     //   country_code          24
     //   rating                 8
-    // } 
+    // }
     QString toString() const { return QString("ParentalRatingDescriptor(stub)"); }
 };
 
@@ -1308,7 +1308,7 @@ class ServiceDescriptor : public MPEGDescriptor
         kServiceTypeNimiqTV3                 = 0x86,
         kServiceTypeNimiqTV4                 = 0x89,
         kServiceTypeNimiqTV5                 = 0x8a,
-        kServiceTypeNimiqTV6                 = 0x8d, 
+        kServiceTypeNimiqTV6                 = 0x8d,
         kServiceTypeNimiqTV7                 = 0x8f,
         kServiceTypeNimiqTV8                 = 0x90,
         kServiceTypeNimiqTV9                 = 0x96,
@@ -1371,7 +1371,7 @@ class ServiceAvailabilityDescriptor : public MPEGDescriptor
 
     // availability_flag        1   2.0
     // reserved                 7   2.1
-    // for (i=0;i<N;i++) { cell_id 16 } 
+    // for (i=0;i<N;i++) { cell_id 16 }
     QString toString() const { return QString("ServiceAvailabilityDescriptor(stub)"); }
 };
 
@@ -1390,7 +1390,7 @@ class ServiceListDescriptor : public MPEGDescriptor
     // {
     //   service_id            16  0.0+p
     //   service_type           8  2.0+p
-    // } 
+    // }
     QString toString() const { return QString("ServiceListDescriptor(stub)"); }
 };
 
@@ -1476,7 +1476,7 @@ class ShortSmoothingBufferDescriptor : public MPEGDescriptor
     // sb_size                  2   2.0
     // sb_leak_rate             6   2.2
     // for (i=0; i<N; i++)
-    // { DVB_reserved           8 } 
+    // { DVB_reserved           8 }
     QString toString() const { return QString("ShortSmoothingBufferDescriptor(stub)"); }
 };
 
@@ -1492,7 +1492,9 @@ class StreamIdentifierDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
     // component_tag            8   2.0
-    QString toString() const { return QString("StreamIdentifierDescriptor(stub)"); }
+    int ComponentTag() const { return _data[2]; }
+    QString toString() const { return QString("Stream Identifier Descriptor (0x52): ComponentTag=0x%1")
+                            .arg(ComponentTag(),1,16); }
 };
 
 class SubtitlingDescriptor : public MPEGDescriptor
@@ -1553,7 +1555,7 @@ class TelephoneDescriptor : public MPEGDescriptor
     // reserved_future_use      1   3.7
     // national_area_code_len   3   4.0
     // core_number_length       4   4.4
-    // 
+    //
     // for (i=0; i<N; i++)
     //   { country_prefix_char   8 }
     // for (i=0; i<N; i++)
@@ -1647,7 +1649,7 @@ class TransportStreamDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
 
-    // for (i=0; i<N; i++) { byte 8 } 
+    // for (i=0; i<N; i++) { byte 8 }
     QString toString() const { return QString("TransportStreamDescriptor(stub)"); }
 };
 
@@ -1667,7 +1669,7 @@ class VBIDataDescriptor : public MPEGDescriptor
     //   data_service_id        8  0.0+p
     //   data_service_length    8  1.0+p
     //   if ((data_service_id&0x7) && data_service_id!=0x3))
-    //   { 
+    //   {
     //     for (i=0; i<N; i++)
     //     {
     //       reserved           2  2.0+p2
@@ -1676,7 +1678,7 @@ class VBIDataDescriptor : public MPEGDescriptor
     //     }
     //   }
     //   else
-    //   { 
+    //   {
     //     for (i=0; i<N; i++) { reserved 8 }
     //   }
     // }
@@ -1780,7 +1782,7 @@ class UKChannelListDescriptor : public MPEGDescriptor
     // descriptor_tag           8   0.0       0x83
         assert(DescriptorID::dvb_uk_channel_list == DescriptorTag());
     // descriptor_length        8   1.0
-    }  
+    }
 
     uint ChannelCount() const { return DescriptorLength() >> 2; }
 
