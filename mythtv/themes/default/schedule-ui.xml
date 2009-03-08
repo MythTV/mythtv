@@ -765,7 +765,7 @@
         <textarea name="description" from="basetextarea">
             <area>30,475,720,90</area>
             <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
         <textarea name="type" from="basetextarea">
             <area>30,560,560,30</area>
