@@ -163,7 +163,7 @@ class MPUBLIC MythTextInputDialog : public MythScreenType
   signals:
      void haveResult(QString);
 
-  private:
+  protected:
     MythUITextEdit *m_textEdit;
     QString m_message;
     QString m_defaultValue;
@@ -172,7 +172,7 @@ class MPUBLIC MythTextInputDialog : public MythScreenType
     QObject *m_retObject;
     QString m_id;
 
-  private slots:
+  protected slots:
     void sendResult();
 };
 

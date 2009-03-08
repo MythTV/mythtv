@@ -28,7 +28,7 @@ using namespace std;
 #include "oldsettings.h"
 #include "tv_play.h"
 #include "tv_rec.h"
-#include "progfind.h"
+//#include "progfind.h"
 #include "proglist_qt.h"
 #include "customedit.h"
 #include "util.h"
@@ -2130,7 +2130,7 @@ void GuideGrid::pageUp()
  
 void GuideGrid::showProgFinder()
 {
-    RunProgramFind(false, true);
+//    RunProgramFind(false, true);
 
     activateWindow();
     setFocus();

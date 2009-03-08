@@ -805,5 +805,184 @@
 
     </window>
 
+    <window name="searchpopup" from="MythTextInputDialog">
+        <area>-1,10,580,165</area>
+
+        <imagetype name="backimg">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>20,15,540,30</area>
+            <align>allcenter</align>
+            <value>Enter Search Text</value>
+        </textarea>
+
+        <textedit name="input" from="basetextedit">
+            <position>102,50</position>
+        </textedit>
+
+        <button name="ok" from="basebutton">
+            <position>209,110</position>
+            <value>Close</value>
+        </button>
+
+    </window>
+
+    <window name="programfind">
+
+        <imagetype name="filler">
+            <filename>pf-topbackground.png</filename>
+            <position>26,28</position>
+        </imagetype>
+
+        <imagetype name="lineback">
+            <filename>pf-background.png</filename>
+            <position>15,270</position>
+        </imagetype>
+
+        <buttonlist name="alphabet" from="basebuttonlist2">
+            <area>28,288,50,300</area>
+            <scrollstyle>center</scrollstyle>
+            <spacing>6</spacing>
+            <buttonarea>0,0,50,300</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,0,50,25</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <textarea name="buttontext">
+                        <font>basesmallyellow</font>
+                    </textarea>
+                    <imagetype name="selectbar">
+                        <area>0,0,50,25</area>
+                        <filename>blank.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="selected">
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <buttonlist name="shows" from="alphabet">
+            <area>98,288,380,295</area>
+            <statetype name="buttonitem">
+                <area>0,0,380,25</area>
+                <state name="active">
+                    <textarea name="buttontext">
+                        <area>5,0,365,25</area>
+                        <font>basesmall</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <textarea name="buttontext">
+                        <font>basesmallyellow</font>
+                    </textarea>
+                </state>
+                <state name="inactive" from="selected">
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <buttonlist name="times" from="alphabet">
+            <area>500,288,280,295</area>
+            <statetype name="buttonitem">
+                <area>0,0,30,25</area>
+                <state name="active">
+                    <textarea name="buttontext">
+                        <area>35,0,230,25</area>
+                        <font>basesmall</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selectbar"/>
+                </state>
+                <state name="inactive" from="active"/>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="lines">
+            <filename>pf-lines.png</filename>
+            <position>15,270</position>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>50,35,700,45</area>
+            <font>baselarge</font>
+        </textarea>
+        <textarea name="timedate" from="basetextarea">
+            <area>50,180,440,27</area>
+        </textarea>
+        <textarea name="channel" from="basetextarea">
+            <area>550,180,200,35</area>
+            <align>right</align>
+        </textarea>
+        <textarea name="description" from="basetextarea">
+            <area>50,70,700,125</area>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"%\n%LONGREPEAT%%STARS| %%DESCRIPTION%</template>
+        </textarea>
+        <textarea name="recordingstatus" from="basetextarea">
+            <area>50,210,600,35</area>
+            <font>basesmallyellow</font>
+        </textarea>
+
+        <textarea name="help1text" from="basetextarea">
+            <area>45,45,700,30</area>
+        </textarea>
+        <textarea name="help2text" from="basetextarea">
+            <area>45,100,700,120</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <textarea name="searchlable" from="basetextarea">
+            <area>25,245,190,30</area>
+            <font>basesmallyellow</font>
+            <align>right</align>
+            <value>Search For: </value>
+        </textarea>
+        <textarea name="search" from="basetextarea">
+            <area>230,245,300,30</area>
+            <value></value>
+        </textarea>
+
+    </window>
 
 </mythuitheme>

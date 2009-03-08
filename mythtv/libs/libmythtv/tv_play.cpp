@@ -28,7 +28,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "remoteutil.h"
 #include "guidegrid.h"
-#include "progfind.h"
+//#include "progfind.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "udpnotify.h"
@@ -7615,7 +7615,7 @@ void TV::DoEditSchedule(int editType)
             break;
         }
         case kScheduleProgramFinder:
-            RunProgramFind(false, false);
+//            RunProgramFind(false, false);
             break;
         case kScheduledRecording:
         {

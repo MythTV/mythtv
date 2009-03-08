@@ -362,9 +362,9 @@ using_frontend {
 
     # Misc. frontend
     HEADERS += guidegrid.h              infostructs.h
-    HEADERS += progfind.h               ttfont.h
+    HEADERS += ttfont.h
     SOURCES += guidegrid.cpp            infostructs.cpp
-    SOURCES += progfind.cpp             ttfont.cpp
+    SOURCES += ttfont.cpp
 
     using_mheg {
         # DSMCC stuff
