@@ -180,7 +180,7 @@ our %depend = (
   =>
   {
     'url' 
-    => 'http://mysql.osuosl.org/Downloads/MySQL-4.1/mysql-4.1.22.tar.gz',
+    => 'http://mirror.provenscaling.com/mysql/community/source/4.1/mysql-4.1.22.tar.gz',
     'conf'
     =>  [
           '--without-debug',
@@ -195,35 +195,6 @@ our %depend = (
   
   'qt-mt'
   =>
-#   {
-#     'url'
-#     =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/sources/qt-mac-opensource-src-4.0.1.tar.gz',
-#     'conf-cmd'
-#     =>  'echo yes | ./configure',
-#     'conf'
-#     =>  [
-#           '-prefix', '"$PREFIX"',
-#           '-system-zlib',
-#           '-fast',
-#           '-qt-sql-mysql',
-#           '-qt-libpng',
-#           '-qt-libjpeg',
-#           '-qt-gif',
-#           '-platform macx-g++',
-#           '-no-tablet',
-#           '-I"$PREFIX/include/mysql"',
-#           '-L"$PREFIX/lib/mysql"',
-#         ],
-#     'post-conf'
-#     =>  'echo "QMAKE_LFLAGS_SHLIB += -single_module" >> src/qt.pro',
-#     'make'
-#     =>  [
-#           'sub-src',
-#           'qmake-install',
-#           'moc-install',
-#           'src-install'
-#         ],
-#   },
   {
     'url'
     =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/source/qt-mac-free-3.3.8.tar.gz',
@@ -531,6 +502,15 @@ rule is only for the build process itself.
 
 END
   die;
+}
+
+if ( ! $OPT{'svnbranch'} )
+{
+    &Complain(<<END);
+This script can probably only build branch release-0-21-fixes.
+To build SVN HEAD, please try the latest version instead. e.g.
+http://svn.mythtv.org/svn/trunk/packaging/OSX/build/osx-packager.pl
+END
 }
 
 our $WORKDIR = "$SCRIPTDIR/.osx-packager";
