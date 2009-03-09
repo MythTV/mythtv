@@ -122,6 +122,8 @@ bool OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
     GLint maxtexsz = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
     m_max_tex_size = (maxtexsz) ? maxtexsz : 512;
+    GLint maxunits = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxunits);
     m_extensions = (const char*) glGetString(GL_EXTENSIONS);
 
     if (!debugged)
@@ -136,6 +138,8 @@ bool OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
                 .arg((const char*) glGetString(GL_VERSION)));
         VERBOSE(VB_PLAYBACK, LOC + QString("Max texture size: %1 x %2")
                 .arg(m_max_tex_size).arg(m_max_tex_size));
+        VERBOSE(VB_PLAYBACK, LOC + QString("Max texture units: %1")
+                .arg(maxunits));
     }
 
     m_ext_supported |=
