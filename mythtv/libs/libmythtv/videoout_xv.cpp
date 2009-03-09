@@ -107,30 +107,6 @@ const char *vr_str[] =
     "xvmc",
 };
 
-class GLContextCreator : public QThread
-{
-  public:
-    GLContextCreator(VideoOutputXv *parent,
-                     const QRect &display_visible_rect,
-                     bool map_window) :
-        m_parent(parent), m_rect(display_visible_rect),
-        m_map_window(map_window), m_gl_context(NULL)
-    {
-        start();
-    }
-
-    virtual void run(void)
-    {
-        m_gl_context = m_parent->CreateGLContext(m_rect, m_map_window);
-        m_parent->GLContextCreatedNotify();
-    }
-
-    VideoOutputXv    *m_parent;
-    QRect             m_rect;
-    bool              m_map_window;
-    OpenGLContextGLX *m_gl_context;
-};
-
 /** \class  VideoOutputXv
  *  \brief Supports common video output methods used with %X11 Servers.
  *
@@ -169,9 +145,6 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
       xv_chroma(0),
-
-      gl_context_lock(QMutex::Recursive),
-      gl_context_creator(NULL), gl_context(NULL),
 
       chroma_osd(NULL)
 {
@@ -214,27 +187,6 @@ VideoOutputXv::~VideoOutputXv()
 
     // Delete the video buffers
     DeleteBuffers(VideoOutputSubType(), true);
-
-    gl_context_creator_lock.lock();
-    if (gl_context_creator)
-    {
-        if (!gl_context)
-        {
-            gl_context_creator_lock.unlock();
-            GLContextCreatedWait();
-            gl_context_creator_lock.lock();
-        }
-        gl_context_creator->deleteLater();
-        gl_context_creator = NULL;
-    }
-    gl_context_creator_lock.unlock();
-
-    if (gl_context)
-    {
-        QMutexLocker locker(&gl_context_lock);
-        delete gl_context;
-        gl_context = NULL;
-    }
 
     // ungrab port...
     if (xv_port >= 0)
@@ -990,59 +942,6 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     return done;
 }
 
-OpenGLContextGLX *VideoOutputXv::CreateGLContext(
-    const QRect &display_rect, bool map_window)
-{
-    OpenGLContextGLX *m_context = NULL;
-#ifdef USING_OPENGL
-    bool ok = false;
-    
-    gl_context_lock.lock();
-
-    m_context = new OpenGLContextGLX(&gl_context_lock);
-
-    ok = m_context->Create(
-            XJ_disp, XJ_win, XJ_screen_num,
-            display_rect, db_use_picture_controls, map_window);
-
-    gl_context_lock.unlock();
-#else
-    (void)display_rect;
-    (void)map_window;
-#endif  
-
-    return m_context;
-}
-
-void VideoOutputXv::GLContextCreatedNotify(void)
-{
-    QMutexLocker locker(&gl_context_creator_lock);
-    if (gl_context_creator)
-    {
-        gl_context = gl_context_creator->m_gl_context;
-        gl_context_wait.wakeAll();
-    }
-}
-
-void VideoOutputXv::GLContextCreatedWait(void)
-{
-    MythTimer t; t.start();
-    QMutexLocker locker(&gl_context_creator_lock);
-
-    if (!gl_context_creator)
-        return;
-
-    while (!gl_context_creator->m_gl_context)
-        gl_context_wait.wait(&gl_context_creator_lock, 100);
-
-    if (t.elapsed() > 5)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                QString("GLContextCreatedWait: Waited %1 ms")
-                .arg(t.elapsed()));
-    }
-}
-
 /**
  * \fn VideoOutputXv::InitXvMC(MythCodecID)
  *  Creates and initializes video buffers.
@@ -1092,8 +991,6 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
         if (XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD))
             video_output_subtype = XVideoVLD;
         windows[0].SetAllowPreviewEPG(true);
-
-        GLContextCreatedWait();
     }
     else
     {
@@ -1275,8 +1172,6 @@ bool VideoOutputXv::InitXVideo()
     {
         video_output_subtype = XVideo;
         windows[0].SetAllowPreviewEPG(true);
-
-        GLContextCreatedWait();
     }
 
     return ok;
@@ -1738,14 +1633,6 @@ bool VideoOutputXv::Init(
     VideoOutput::Init(width, height, aspect,
                       winid, winx, winy, winw, winh,
                       embedid);
-
-#if defined(USING_OPENGL_VSYNC)
-    gl_context_creator = new GLContextCreator(
-        this, windows[0].GetDisplayVisibleRect(), false);
-    // HACK -- begin, see #6036
-    GLContextCreatedWait();
-    // HACK -- end 
-#endif  
 
     // Set resolution/measurements (check XRandR, Xinerama, config settings)
     InitDisplayMeasurements(width, height);
@@ -2440,12 +2327,6 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         xvmc_tex = NULL;
     }
 #endif // USING_XVMC
-
-    // OpenGL stuff
-    if (gl_context)
-        gl_context->Hide();
-
-    // end OpenGL stuff
 
     vbuffers.DeleteBuffers();
 

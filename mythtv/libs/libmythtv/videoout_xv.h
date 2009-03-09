@@ -21,10 +21,6 @@ extern "C" {
 
 class NuppelVideoPlayer;
 class ChromaKeyOSD;
-
-class GLContextCreator;
-class OpenGLContextGLX;
-
 class XvMCBufferSettings;
 class XvMCSurfaceTypes;
 class XvMCTextures;
@@ -56,7 +52,6 @@ class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
     friend class OpenGLVideoSync;
-    friend class GLContextCreator;
     friend class XvMCOSD;
   public:
     VideoOutputXv(MythCodecID av_codec_id);
@@ -120,13 +115,6 @@ class VideoOutputXv : public VideoOutput
                              NuppelVideoPlayer *pipplayer = NULL,
                              bool               do_pixel_adj = true) const;
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
-
-    // OpenGL
-    OpenGLContextGLX *GetGLContext(void) { return gl_context; }
-    OpenGLContextGLX *CreateGLContext(const QRect &display_rect,
-                                   bool m_map_window);
-    void GLContextCreatedNotify(void);
-    void GLContextCreatedWait(void);
 
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
@@ -299,13 +287,6 @@ class VideoOutputXv : public VideoOutput
     bool                 xv_need_bobdeint_repaint;
     QMap<PictureAttribute,int> xv_attribute_min;
     QMap<PictureAttribute,int> xv_attribute_max;
-
-    // OpenGL drawing info
-    QMutex               gl_context_lock;
-    QMutex               gl_context_creator_lock;
-    GLContextCreator    *gl_context_creator;
-    QWaitCondition       gl_context_wait;
-    OpenGLContextGLX    *gl_context;
 
     // Chromakey OSD info
     ChromaKeyOSD        *chroma_osd;

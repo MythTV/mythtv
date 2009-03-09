@@ -1087,8 +1087,19 @@ bool OpenGLContextGLX::Create(WId window, const QRect &display_visible,
     m_created_display = true;
     X11S(m_screen_num = DefaultScreen(m_display));
 
+    bool show_window = true;
+
+    if (!window)
+    {
+        X11S(window = DefaultRootWindow(m_display));
+        show_window = false;
+    }
+
+    if (!window)
+        return false;
+
     return Create(m_display, window, m_screen_num,
-                  display_visible, colour_control);
+                  display_visible, colour_control, show_window);
 }
 
 bool OpenGLContextGLX::Create(
