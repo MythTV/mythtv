@@ -238,15 +238,15 @@
     <!-- Main Windows -->
     <window name="manager">
 
-        <imagetype name="backdrop" from="basebackdrop" />
+        <imagetype name="fanart" from="basebackdrop" />
 
         <imagetype name="framebackground">
-            <position>66,41</position>
+            <position>68,41</position>
             <filename>video/managerlistbackground.png</filename>
         </imagetype>
 
         <buttonlist name="videos">
-            <area>66,41,600,644</area>
+            <area>67,41,600,644</area>
             <layout>vertical</layout>
             <scrollstyle>center</scrollstyle>
             <spacing>0</spacing>
@@ -498,7 +498,7 @@
 
     <window name="browser">
 
-        <imagetype name="backdrop" from="basebackdrop" />
+        <imagetype name="fanart" from="basebackdrop" />
 
         <imagetype name="topbar" from="basetopbar" />
 
@@ -507,12 +507,12 @@
         </textarea>
 
         <imagetype name="browserbackground">
-            <position>0,65</position>
+            <position>0,345</position>
             <filename>video/browserlistbackground.png</filename>
         </imagetype>
 
         <buttonlist name="videos">
-            <area>0,65,1280,299</area>
+            <area>0,345,1280,299</area>
             <layout>horizontal</layout>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
@@ -555,36 +555,36 @@
         </buttonlist>
 
         <imagetype name="posterframe">
-            <position>0,60</position>
+            <position>0,340</position>
             <filename>video/browserlistframe.png</filename>
         </imagetype>
 
         <imagetype name="textbackground">
-            <position>30,433</position>
+            <position>30,70</position>
             <filename>recordings/descriptionbackground.png</filename>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>48,438,980,35</area>
+            <area>48,78,980,35</area>
             <font>baselarge</font>
         </textarea>
 
         <statetype name="userratingstate" from="baserating">
-            <position>1193,435</position>
+            <position>1193,72</position>
         </statetype>
 
         <textarea name="plot" from="basetextarea">
-            <area>48,487,1182,145</area>
+            <area>48,164,1182,145</area>
             <multiline>yes</multiline>
 <!--            <align>vcenter</align>-->
         </textarea>
 
         <textarea name="year" from="basetextarea">
-            <area>48,647,290,30</area>
+            <area>48,284,290,30</area>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>430,647,800,30</area>
+            <area>430,284,800,30</area>
             <align>right</align>
         </textarea>
 

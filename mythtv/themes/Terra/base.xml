@@ -430,8 +430,8 @@
     </statetype>
 
     <imagetype name="basebackdrop">
-        <area>0,0,1280,720</area>
-        <crop>0,0,1280,685</crop>
+        <area>0,39,1280,720</area>
+        <crop>0,65,1280,646</crop>
 <!--        <filename>nature.jpg</filename>-->
     </imagetype>
 
