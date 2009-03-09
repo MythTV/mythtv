@@ -888,7 +888,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     filters->setLabel(tr("Custom Filters"));
 
     max_cpus->setHelpText(
-        tr("Maximum number of CPU cores used for decoding.") +
+        tr("Maximum number of CPU cores used for video decoding and filtering.") +
         (ENABLE_THREADS ? "" :
          tr(" Multithreaded decoding disabled-only one CPU "
             "will be used, please recompile with "
