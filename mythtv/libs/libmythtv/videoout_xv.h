@@ -51,7 +51,6 @@ class VDPAUContext;
 class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
-    friend class OpenGLVideoSync;
     friend class XvMCOSD;
   public:
     VideoOutputXv(MythCodecID av_codec_id);

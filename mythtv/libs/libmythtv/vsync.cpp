@@ -390,7 +390,7 @@ bool OpenGLVideoSync::TryInit(void)
 #ifdef USING_OPENGL_VSYNC
     QRect window_rect = QRect(0,0,1,1);
 
-    VideoOutputXv *vo =  dynamic_cast<VideoOutputXv*>(m_video_output);
+    VideoOutput *vo =  dynamic_cast<VideoOutput*>(m_video_output);
     if (vo)
     {
         // center the window to ensure we sync to the correct display
@@ -456,7 +456,7 @@ void OpenGLVideoSync::Start(void)
     int err;
 
     bool embedding = false;
-    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+    VideoOutput *vo = dynamic_cast<VideoOutput*>(m_video_output);
     if (vo && vo->IsEmbedding())
         embedding = true;
 
@@ -481,7 +481,7 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
     OffsetTimeval(m_nexttrigger, sync_delay);
 
-    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+    VideoOutput *vo = dynamic_cast<VideoOutput*>(m_video_output);
     if (vo && vo->IsEmbedding())
     {
         m_delay = CalcDelay();

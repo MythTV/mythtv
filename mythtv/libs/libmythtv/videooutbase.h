@@ -39,6 +39,8 @@ struct SwsContext;
 
 class VideoOutput
 {
+    friend class OpenGLVideoSync;
+
   public:
     static VideoOutput *Create(
         const QString &decoder,   MythCodecID  codec_id,
