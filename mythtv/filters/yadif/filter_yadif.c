@@ -80,7 +80,7 @@ typedef struct ThisFilter
     void (*filter_line)(struct ThisFilter *p, uint8_t *dst,
                         uint8_t *prev, uint8_t *cur, uint8_t *next,
                         int w, int refs, int parity);
-
+    int mode;
     int width;
     int height;
 
@@ -234,7 +234,7 @@ static void filter_line_mmx2(struct ThisFilter *p, uint8_t *dst,
 {
     static const uint64_t pw_1 = 0x0001000100010001ULL;
     static const uint64_t pb_1 = 0x0101010101010101ULL;
-    const int mode = 1;
+    const int mode = p->mode;
     uint64_t tmp0, tmp1, tmp2, tmp3;
     int x;
 
@@ -609,6 +609,7 @@ VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt,
 
     filter->width = 0;
     filter->height = 0;
+    filter->mode = 1;
     memset(filter->ref, 0, sizeof(filter->ref));
 
     AllocFilter(filter, *width, *height);
