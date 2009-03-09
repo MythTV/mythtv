@@ -1251,7 +1251,7 @@ class VideoDialogPrivate
         m_isFileBrowser = gContext->GetNumSetting("VideoDialogNoDB", 0);
 
         m_artDir = gContext->GetSetting("VideoArtworkDir");
-        m_fanDir = gContext->GetSetting("VideoFanartDir");
+        m_fanDir = gContext->GetSetting("mythvideo.fanartDir");
     }
 
     ~VideoDialogPrivate()
@@ -1499,7 +1499,7 @@ bool VideoDialog::Create()
     UIUtilW::Assign(this, m_crumbText, "breadcrumbs");
 
     UIUtilW::Assign(this, m_coverImage, "coverimage");
-    UIUtilW::Assign(this, m_screenshot, "screenshot");   
+    UIUtilW::Assign(this, m_screenshot, "screenshot");
     UIUtilW::Assign(this, m_banner, "banner");
     UIUtilW::Assign(this, m_fanart, "fanart");
 

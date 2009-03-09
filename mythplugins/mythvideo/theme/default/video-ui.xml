@@ -1091,20 +1091,6 @@
 
     </window>
 
-    <!-- TODO - Incomplete, replace with a global file selection dialog in
-         mythdialogbox.cpp and base.xml -->
-    <window name="file_chooser">
-
-        <imagetype name="file_browser_background">
-            <filename>mv_filerequest.png</filename>
-        </imagetype>
-
-        <imagetype name="image_box">
-            <area>19,20,143,209</area>
-        </imagetype>
-
-    </window>
-
     <window name="filter">
 
         <textarea name="title" from="basetextarea">
