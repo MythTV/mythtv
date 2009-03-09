@@ -1,8 +1,8 @@
 /*
- * 6200ch - an external channel changer for Motorola DCT-6200 Tuner 
- * 
- * Copyright 2004,2005 by Stacey D. Son <mythdev@son.org> 
- * 
+ * 6200ch - an external channel changer for Motorola DCT-6200 Tuner
+ *
+ * Copyright 2004,2005 by Stacey D. Son <mythdev@son.org>
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -75,8 +75,13 @@
 #define DCT6412_MODEL_ID2  0x000064cb
 
 #define DCT6416_VENDOR_ID1 0x000017ee
-#define DCT6416_VENDOR_ID2 0x00001a66 
+#define DCT6416_VENDOR_ID2 0x00001a66
 #define DCT6416_MODEL_ID1  0x0000646b
+
+#define QIP7100_VENDOR_ID1 0x00002374
+#define QIP7100_VENDOR_ID2 0x00d00d1e
+#define QIP7100_MODEL_ID1  0x00008100
+#define QIP7100_MODEL_ID2  0x00000001
 
 #define PACE_VENDOR_ID1    0x00005094 /* 550 & 779 */
 #define PACE550_MODEL_ID1  0x00010551
@@ -130,7 +135,7 @@ int main (int argc, char *argv[])
    int starting_port = STARTING_PORT;
    int c;
 
-   if (argc < 2) 
+   if (argc < 2)
       usage();
 
    opterr = 0;
@@ -188,7 +193,7 @@ int main (int argc, char *argv[])
          fprintf(stderr, "Is ieee1394, driver, and raw1394 loaded?\n");
       }
       exit(1);
-   } 
+   }
 
    if (raw1394_set_port(handle, starting_port) < 0) {
       perror("couldn't set port");
@@ -204,18 +209,18 @@ int main (int argc, char *argv[])
       if (cli_GUID==0LL || cli_GUID==LLONG_MAX || cli_GUID==LLONG_MIN) {
 	  fprintf(stderr, "error parsing GUID command line parameter\n");
           exit(1);
-      }	  
-   }	  
+      }
+   }
    for (i=starting_node; i < nc; ++i) {
       if (bGUID!=0) {
          node_GUID=rom1394_get_guid(handle, i);
 #ifdef DEBUG
 	 printf("node=%d, node_GUID=%LX, cli_GUID=%LX\n", i, node_GUID, cli_GUID);
-#endif	 
+#endif
          if (cli_GUID!=node_GUID) {
              continue;
          }
-      } 
+      }
 
       if (rom1394_get_directory(handle, i, &dir) < 0) {
          fprintf(stderr,"error reading config rom directory for node %d\n", i);
@@ -223,16 +228,16 @@ int main (int argc, char *argv[])
          exit(1);
       }
 
-      if (verbose) 
-         printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n", 
-                 i, dir.vendor_id, dir.model_id); 
+      if (verbose)
+         printf("node %d: vendor_id = 0x%08x model_id = 0x%08x\n",
+                 i, dir.vendor_id, dir.model_id);
 
       // WARNING: Please update firewiredevice.cpp when adding to this list.
       if ( ((dir.vendor_id == DCH3200_VENDOR_ID1) ||
             (dir.vendor_id == DCH3200_VENDOR_ID2) ||
-            (dir.vendor_id == DCT3412_VENDOR_ID1) || 
-            (dir.vendor_id == DCT3416_VENDOR_ID1) || 
-            (dir.vendor_id == DCT3416_VENDOR_ID2) || 
+            (dir.vendor_id == DCT3412_VENDOR_ID1) ||
+            (dir.vendor_id == DCT3416_VENDOR_ID1) ||
+            (dir.vendor_id == DCT3416_VENDOR_ID2) ||
             (dir.vendor_id == DCT5100_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID1) ||
             (dir.vendor_id == DCT6200_VENDOR_ID2) ||
@@ -252,8 +257,10 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6200_VENDOR_ID16) ||
             (dir.vendor_id == DCT6412_VENDOR_ID1) ||
             (dir.vendor_id == DCT6412_VENDOR_ID2) ||
-            (dir.vendor_id == DCT6416_VENDOR_ID1) || 
+            (dir.vendor_id == DCT6416_VENDOR_ID1) ||
             (dir.vendor_id == DCT6416_VENDOR_ID2) ||
+            (dir.vendor_id == QIP7100_VENDOR_ID1) ||
+            (dir.vendor_id == QIP7100_VENDOR_ID2) ||
             (dir.vendor_id == PACE_VENDOR_ID1)) &&
            ((dir.model_id == DCH3200_MODEL_ID1) ||
             (dir.model_id == DCT3412_MODEL_ID1) ||
@@ -265,6 +272,8 @@ int main (int argc, char *argv[])
             (dir.model_id == DCT6412_MODEL_ID1) ||
             (dir.model_id == DCT6412_MODEL_ID2) ||
             (dir.model_id == DCT6416_MODEL_ID1) ||
+            (dir.model_id == QIP7100_MODEL_ID1) ||
+            (dir.model_id == QIP7100_MODEL_ID2) ||
             (dir.model_id == PACE550_MODEL_ID1) ||
             (dir.model_id == PACE779_MODEL_ID1)) )
       {
@@ -276,7 +285,7 @@ int main (int argc, char *argv[])
             break;
       }
    }
-    
+
    if (device == -1) {
         fprintf(stderr, "Could not find Motorola DCT-6200 on the 1394 bus.\n");
         raw1394_destroy_handle(handle);
@@ -309,14 +318,14 @@ void set_chan_slow(raw1394handle_t handle, int device, int verbose, int chn)
    dig[0] = (chn % 1000) / 100;
 
    if (verbose)
-      printf("AV/C Command: %d%d%d = Op1=0x%08X Op2=0x%08X Op3=0x%08X\n", 
-            dig[0], dig[1], dig[2], 
+      printf("AV/C Command: %d%d%d = Op1=0x%08X Op2=0x%08X Op3=0x%08X\n",
+            dig[0], dig[1], dig[2],
             CTL_CMD0 | dig[0], CTL_CMD0 | dig[1], CTL_CMD0 | dig[2]);
 
    for (i=0; i<3; i++) {
       cmd[0] = CTL_CMD0 | dig[i];
       cmd[1] = 0x0;
-    
+
       avc1394_transaction_block(handle, device, cmd, 2, RETRY_COUNT_SLOW);
       usleep(500000);  // small delay for button to register
    }
@@ -331,9 +340,9 @@ void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn)
     cmd[2] = 0xFF << 24;
 
     if (verbose)
-        printf("AV/C command for channel %d = 0x%08X %08X %08X\n", 
+        printf("AV/C command for channel %d = 0x%08X %08X %08X\n",
                chn, cmd[0], cmd[1], cmd[2]);
- 
+
     avc1394_transaction_block(handle, device, cmd, 3, RETRY_COUNT_FAST);
 }
 
