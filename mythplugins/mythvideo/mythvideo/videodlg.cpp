@@ -2548,13 +2548,6 @@ Metadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
     }
 
     return metadata;
-
-    // Obtain video fanart
-    VideoFanartSearch *vfs = new VideoFanartSearch(this);
-    connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
-            SLOT(OnFanartURL(QString, Metadata *)));
-    vfs->Run(metadata->GetInetRef(), metadata);
-
 }
 
 void VideoDialog::customEvent(QEvent *levent)
@@ -2798,6 +2791,12 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
     connect(vps, SIGNAL(SigPosterURL(QString, Metadata *)),
             SLOT(OnPosterURL(QString, Metadata *)));
     vps->Run(metadata->GetInetRef(), metadata);
+
+    // Obtain video fanart
+    VideoFanartSearch *vfs = new VideoFanartSearch(this);
+    connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
+            SLOT(OnFanartURL(QString, Metadata *)));
+    vfs->Run(metadata->GetInetRef(), metadata);
 }
 
 void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
