@@ -729,7 +729,7 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
 
     dvb_transportid = query.value(0).toUInt();
     dvb_networkid   = query.value(1).toUInt();
-    frequency       = query.value(2).toUInt();
+    frequency       = query.value(2).toULongLong();
     modulation      = query.value(3).toString();
     si_std          = query.value(4).toString();
 
