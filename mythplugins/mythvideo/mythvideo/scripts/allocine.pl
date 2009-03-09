@@ -91,20 +91,21 @@ sub getMovieData {
 
    # parse title and year
    my $title = parseBetween($response, "<title>", "</title>");
-   my $original_title = parseBetween($response, "<h4>Titre original : <i>","</i></h4></div>");
+   $title =~ s/\s*-\s*AlloCin.*//;
+   my $original_title = parseBetween($response, ">Titre original : <i>","</i></h3></div>");
    $original_title = removeTag($original_title);
    if (defined $opt_originaltitle){
-      if ($original_title  ne  ""){
+      if ($original_title ne  ""){
         $title = $title . " (" . $original_title . ")";
       }
    }
    
    #print "titre = $title\n";
    $title = removeTag($title);
-   my $year = parseBetween($response,"<h4>Année de production : ","</h4>");
+   my $year = parseBetween($response,">Année de production : ","</h");
 
    # parse director 
-   my $director = parseBetween($response,"<h4>Réalisé par ","</h4>");
+   my $director = parseBetween($response,">Réalisé par ","</h");
    $director = removeTag($director);
 
    # parse plot
@@ -136,7 +137,7 @@ sub getMovieData {
    
 
    # parse movie length
-   my $runtime = parseBetween($response,"Durée : ",".&nbsp;</h4>");
+   my $runtime = parseBetween($response,"Durée : ",".&nbsp;</h");
    my $heure;
    my $minutes;
    ($heure,$minutes)=($runtime=~/[^\d]*(\d+)[^\d]*(\d*)/);
@@ -161,7 +162,7 @@ sub getMovieData {
    }
    
    if (!$castchunk) {
-      $castchunk = parseBetween($response, "<h4>Avec ","</h4>");
+      $castchunk = parseBetween($response, ">Avec ","</h");
    }
    
    my $cast = "";
@@ -170,11 +171,11 @@ sub getMovieData {
    }
 
    #genres
-   my $genres = parseBetween($response,"<h4>Genre : ","</h4>");
+   my $genres = parseBetween($response,">Genre : ","</h");
    $genres = removeTag($genres);
    
    #countries
-   my $countries = parseBetween($response,"<h4>Film ",".&nbsp;</h4>");
+   my $countries = parseBetween($response,">Film ",".&nbsp;</h");
    $countries = removeTag($countries);
 
    # output fields (these field names must match what MythVideo is looking for)
@@ -275,78 +276,65 @@ sub getMoviePoster {
    print "$uri\n";
 }
 
-# dump Movie list:  1 entry per line, each line as 'movieid:Movie Title'
 sub getMovieList {
-   my ($filename, $options)=@_; # grab parameters
+	my ($filename, $options) = @_; # grab parameters
 
-   # If we wanted to inspect the file for any reason we can do that now
+	my $query = cleanTitleQuery($filename);
+	if (!$options) { $options = ""; }
+	if (defined $opt_d) { 
+		printf("# query: '%s', options: '%s'\n", $query, $options);
+	}
 
-   #
-   # Convert filename into a query string 
-   # (use same rules that Metadata::guesTitle does)
-   my $query = cleanTitleQuery($filename);
-   if (!$options) { $options = "" ;}
-   if (defined $opt_d) { 
-      printf("# query: '%s', options: '%s'\n", $query, $options);
-   }
-   my $count = 0;
-   my $typerecherche = 3;
-  
-   while (($typerecherche <=5) && ($count ==0)){
-	   # get the search results  page
-	   my $request = "http://www.allocine.fr/recherche/?rub=1&motcle=$query";
-	   if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-	   my ($rc, $response) = myth_url_get($request);
+	# get the search results  page
+	my $request = "http://www.allocine.fr/recherche/?rub=1&motcle=$query";
+	if (defined $opt_d) { printf("# request: '%s'\n", $request); }
+	my ($rc, $response) = myth_url_get($request);
 
-	   #
-	   # don't try to invent if it doesn't exist
-	   #
-	   return if $response =~ /Pas de résultats/;
-	
-	   # extract possible matches
-	   #    possible matches are grouped in several catagories:  
-	   #        exact, partial, and approximate
-	   my $exact_matches = $response;
-	   # parse movie list from matches
-	   my $beg = "<h4><a href=\"/film/fichefilm_gen_cfilm=";
-	   my $end = "</a></h4>";
-	   
-	   my @movies;
-	
-	   my $data = $exact_matches;
-	   if ($data eq "") {
-	      if (defined $opt_d) { printf("# no results\n"); }
-	   	$typerecherche = $typerecherche +2 ;
-	   }else{
-	      my $start = index($data, $beg);
-	      my $finish = index($data, $end, $start);
-	   
-	      my $title;
-	      while ($start != -1) {
-	         $start += length($beg);
-	         my $sub = substr($data, $start, $finish - $start);
-	         my ($movienum, $moviename) = split(".html\" class=\"link1\">", $sub);
-	         $title = removeTag($moviename);
-	         $moviename = removeTag($moviename);
-	         my ($movieyear)= $moviename =~/\((\d+)\)/;
-	         if ($movieyear){$title = $title." (".$movieyear.")"; }
-	         $moviename=$title ;
-	      
-	         # advance data to next movie
-	         $data = substr($data, - (length($data) - $finish));
-	         $start = index($data, $beg);
-	         $finish = index($data, $end, $start + 1); 
-	      
-	         # add to array
-	         $movies[$count++] = $movienum . ":" . $moviename;
-	      }
-	      
-	      # display array of values
-	      for $movie (@movies) { 
-	        print "$movie\n"; 
-	      }
-	   }
-      }
+	# extract possible matches
+	#    possible matches are grouped in several catagories:  
+	#        exact, partial, and approximate
+	my $exact_matches = $response;
+	# parse movie list from matches
+	my $beg = "<h4><a href=\"/film/fichefilm_gen_cfilm=";
+	my $end = "</a></h4>";
+
+	my @movies;
+
+	my $data = $exact_matches;
+	if ($data eq "") {
+		if (defined $opt_d) { printf("# no results\n"); }
+	} else {
+		my $start = index($data, $beg);
+		my $finish = index($data, $end, $start);
+
+		my $title;
+		while ($start != -1) {
+			$start += length($beg);
+			my $sub = substr($data, $start, $finish - $start);
+			my ($movienum, $moviename) =
+				split(".html\" class=\"link1\">", $sub);
+			$title = removeTag($moviename);
+			$moviename = removeTag($moviename);
+			my ($movieyear)= $moviename =~/\((\d+)\)/;
+			if ($movieyear) {
+				$title = $title." (".$movieyear.")";
+			}
+			$moviename=$title ;
+
+			# advance data to next movie
+			$data = substr($data, - (length($data) - $finish));
+			$start = index($data, $beg);
+			$finish = index($data, $end, $start + 1); 
+
+			# add to array
+			push(@movies, "$movienum:$moviename");
+		}
+
+		# display array of values
+		for $movie (@movies) { 
+			print "$movie\n"; 
+		}
+	}
 }
 
 #
@@ -395,3 +383,4 @@ elsif (defined $opt_M) {
    }
    getMovieList($query, $options);
 }
+# vim: set expandtab ts=3 sw=3 :
