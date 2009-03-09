@@ -215,6 +215,16 @@ HostLineEdit *GetPostersCommand()
     return gc;
 }
 
+HostLineEdit *GetFanartCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("MovieFanartCommandLine");
+    gc->setLabel(QObject::tr("Command to search for movie fanart"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -B");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
 HostLineEdit *GetDataCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieDataCommandLine");
@@ -744,6 +754,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     vman->setLabel(QObject::tr("Video Manager"));
     vman->addChild(SearchListingsCommand());
     vman->addChild(GetPostersCommand());
+    vman->addChild(GetFanartCommand());
     vman->addChild(GetDataCommand());
 
     VConfigPage page4(pages, false);

@@ -397,7 +397,7 @@ void MetadataImp::Reset()
 
 bool MetadataImp::IsHostSet() const
 {
-    return m_host.isEmpty();
+    return !m_host.isEmpty();
 }
 
 void MetadataImp::fillGenres()

@@ -181,6 +181,113 @@ namespace
         CoverDownloadErrorState m_error_state;
     };
 
+    class FanartDownloadProxy : public QObject
+    {
+        Q_OBJECT
+
+      signals:
+        void SigFinished(FanartDownloadErrorState reason, QString errorMsg,
+                         Metadata *item);
+      public:
+        static FanartDownloadProxy *Create(const QUrl &url, const QString &dest,
+                                          Metadata *item)
+        {
+            return new FanartDownloadProxy(url, dest, item);
+        }
+
+      public:
+        void StartCopy()
+        {
+            m_id = m_http.get(m_url.toString(), &m_data_buffer);
+
+            m_timer.start(gContext->GetNumSetting("FanartDownloadTimeout", 30)
+                          * 1000);
+        }
+
+        void Stop()
+        {
+            if (m_timer.isActive())
+                m_timer.stop();
+
+            VERBOSE(VB_GENERAL, tr("Fanart download stopped."));
+            m_http.abort();
+        }
+
+      private:
+        FanartDownloadProxy(const QUrl &url, const QString &dest,
+                           Metadata *item) : m_item(item), m_dest_file(dest),
+            m_id(0), m_url(url), m_error_state(fesOK)
+        {
+            connect(&m_http, SIGNAL(requestFinished(int, bool)),
+                    SLOT(OnFinished(int, bool)));
+
+            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
+            m_timer.setSingleShot(true);
+            m_http.setHost(m_url.host());
+        }
+
+        ~FanartDownloadProxy() {}
+
+      private slots:
+        void OnDownloadTimeout()
+        {
+            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
+                    .arg(m_url.toString()));
+            m_error_state = fesTimeout;
+            Stop();
+        }
+
+        void OnFinished(int id, bool error)
+        {
+            QString errorMsg;
+            if (error)
+                errorMsg = m_http.errorString();
+
+            if (id == m_id)
+            {
+                if (m_timer.isActive())
+                    m_timer.stop();
+
+                if (!error)
+                {
+                    QFile dest_file(m_dest_file);
+                    if (dest_file.exists())
+                        dest_file.remove();
+
+                    if (dest_file.open(QIODevice::WriteOnly))
+                    {
+                        const QByteArray &data = m_data_buffer.data();
+                        qint64 size = dest_file.write(data);
+                        if (size != data.size())
+                        {
+                            errorMsg = tr("Error writing data to file %1.")
+                                    .arg(m_dest_file);
+                            m_error_state = fesError;
+                        }
+                    }
+                    else
+                    {
+                        errorMsg = tr("Error: file error '%1' for file %2").
+                                arg(dest_file.errorString()).arg(m_dest_file);
+                        m_error_state = fesError;
+                    }
+                }
+
+                emit SigFinished(m_error_state, errorMsg, m_item);
+            }
+        }
+
+      private:
+        Metadata *m_item;
+        QHttp m_http;
+        QBuffer m_data_buffer;
+        QString m_dest_file;
+        int m_id;
+        QTimer m_timer;
+        QUrl m_url;
+        FanartDownloadErrorState m_error_state;
+    };
+
     /** \class ExecuteExternalCommand
      *
      * \brief Base class for executing an external script or other process, must
@@ -500,6 +607,64 @@ namespace
       private:
         Metadata *m_item;
     };
+
+    /** \class VideoFanartSearch
+     *
+     * \brief Execute external video fanart command.
+     *
+     */
+    class VideoFanartSearch : public ExecuteExternalCommand
+    {
+        Q_OBJECT
+
+      signals:
+        void SigFanartURL(QString url, Metadata *item);
+
+      public:
+        VideoFanartSearch(QObject *oparent) :
+            ExecuteExternalCommand(oparent), m_item(0) {}
+
+        void Run(QString video_uid, Metadata *item)
+        {
+            m_item = item;
+
+            const QString default_cmd =
+                    QDir::cleanPath(QString("%1/%2")
+                                        .arg(GetShareDir())
+                                        .arg("mythvideo/scripts/tmdb.pl -B"));
+            const QString cmd = gContext->GetSetting("MovieFanartCommandLine",
+                                                        default_cmd);
+            StartRun(cmd, QStringList(video_uid), "Fanart Query");
+        }
+
+      private:
+        ~VideoFanartSearch() {}
+
+        void OnExecDone(bool normal_exit, QStringList out, QStringList err)
+        {
+            (void) err;
+            QString url;
+            if (normal_exit && out.size())
+            {
+                for (QStringList::const_iterator p = out.begin();
+                        p != out.end(); ++p)
+                {
+                    if ((*p).length())
+                    {
+                        url = *p;
+                        break;
+                    }
+                }
+            }
+
+            emit SigFanartURL(url, m_item);
+            deleteLater();
+        }
+
+      private:
+        Metadata *m_item;
+    };
+
 
     class ParentalLevelNotifyContainer : public QObject
     {
@@ -1086,6 +1251,7 @@ class VideoDialogPrivate
         m_isFileBrowser = gContext->GetNumSetting("VideoDialogNoDB", 0);
 
         m_artDir = gContext->GetSetting("VideoArtworkDir");
+        m_fanDir = gContext->GetSetting("VideoFanartDir");
     }
 
     ~VideoDialogPrivate()
@@ -1138,6 +1304,22 @@ class VideoDialogPrivate
         }
     }
 
+    void AddFanartDownload(FanartDownloadProxy *download)
+    {
+        m_running_fdownloads.insert(download);
+    }
+
+    void RemoveFanartDownload(FanartDownloadProxy *download)
+    {
+        if (download)
+        {
+            fanart_download_list::iterator p =
+                    m_running_fdownloads.find(download);
+            if (p != m_running_fdownloads.end())
+                m_running_fdownloads.erase(p);
+        }
+    }
+
     void StopAllRunningCoverDownloads()
     {
         cover_download_list tmp(m_running_downloads);
@@ -1145,9 +1327,19 @@ class VideoDialogPrivate
             (*p)->Stop();
     }
 
+    void StopAllRunningFanartDownloads()
+    {
+        fanart_download_list tmp(m_running_fdownloads);
+        for (fanart_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
+            (*p)->Stop();
+    }
+
+
   public:
     typedef std::set<CoverDownloadProxy *> cover_download_list;
     cover_download_list m_running_downloads;
+    typedef std::set<FanartDownloadProxy *> fanart_download_list;
+    fanart_download_list m_running_fdownloads;
     ParentalLevelNotifyContainer m_parentalLevel;
     bool m_switchingLayout;
 
@@ -1169,6 +1361,7 @@ class VideoDialogPrivate
     VideoDialog::DialogType m_type;
 
     QString m_artDir;
+    QString m_fanDir;
     VideoScanner *m_scanner;
 
     QString m_lastTreeNodePath;
@@ -2355,6 +2548,13 @@ Metadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
     }
 
     return metadata;
+
+    // Obtain video fanart
+    VideoFanartSearch *vfs = new VideoFanartSearch(this);
+    connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
+            SLOT(OnFanartURL(QString, Metadata *)));
+    vfs->Run(metadata->GetInetRef(), metadata);
+
 }
 
 void VideoDialog::customEvent(QEvent *levent)
@@ -2684,6 +2884,100 @@ void VideoDialog::OnPosterCopyFinished(CoverDownloadErrorState error,
 void VideoDialog::OnVideoPosterSetDone(Metadata *metadata)
 {
     // The metadata has some cover file set
+    if (m_busyPopup)
+    {
+        m_busyPopup->Close();
+        m_busyPopup = NULL;
+    }
+
+    metadata->UpdateDatabase();
+    UpdateItem(GetItemCurrent());
+}
+
+void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
+{
+    if (metadata)
+    {
+        if (uri.length())
+        {
+            QString fileprefix = m_d->m_fanDir;
+
+            QDir dir;
+
+            // If the fanart setting hasn't been set default to
+            // using ~/.mythtv/MythVideo/Fanart
+            if (fileprefix.length() == 0)
+            {
+                fileprefix = GetConfDir();
+
+                dir.setPath(fileprefix);
+                if (!dir.exists())
+                    dir.mkdir(fileprefix);
+
+                fileprefix += "/MythVideo/Fanart";
+            }
+
+            dir.setPath(fileprefix);
+            if (!dir.exists())
+                dir.mkdir(fileprefix);
+
+            QUrl url(uri);
+
+            QString ext = QFileInfo(url.path()).suffix();
+            QString dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    .arg(metadata->GetInetRef()).arg(ext);
+            VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
+                    .arg(url.toString()).arg(dest_file));
+
+            FanartDownloadProxy *d =
+                    FanartDownloadProxy::Create(url, dest_file, metadata);
+            metadata->SetFanart(dest_file);
+
+            connect(d, SIGNAL(SigFinished(FanartDownloadErrorState,
+                                          QString, Metadata *)),
+                    SLOT(OnFanartCopyFinished(FanartDownloadErrorState,
+                                              QString, Metadata *)));
+
+            d->StartCopy();
+            m_d->AddFanartDownload(d);
+        }
+        else
+        {
+            metadata->SetFanart("");
+            OnVideoFanartSetDone(metadata);
+        }
+    }
+    else
+        OnVideoFanartSetDone(metadata);
+}
+
+void VideoDialog::OnFanartCopyFinished(FanartDownloadErrorState error,
+                                       QString errorMsg, Metadata *item)
+{
+    QObject *src = sender();
+    if (src)
+        m_d->RemoveFanartDownload(dynamic_cast<FanartDownloadProxy *>
+                                       (src));
+
+    if (error != fesOK && item)
+        item->SetFanart("");
+
+    VERBOSE(VB_IMPORTANT, tr("Fanart download finished: %1 %2")
+            .arg(errorMsg).arg(error));
+
+    if (error == fesTimeout)
+    {
+        createOkDialog(tr("Fanart exists for this item but could not be "
+                            "retrieved within the timeout period.\n"));
+    }
+
+    OnVideoFanartSetDone(item);
+}
+
+// This is the final call as part of a StartVideoFanartSet
+void VideoDialog::OnVideoFanartSetDone(Metadata *metadata)
+{
+    // The metadata has some fanart set
     if (m_busyPopup)
     {
         m_busyPopup->Close();
