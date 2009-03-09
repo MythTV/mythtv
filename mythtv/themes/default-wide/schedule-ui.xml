@@ -119,16 +119,16 @@
             <statetype name="buttonitem">
                 <area>0,0,1200,25</area>
                 <state name="active">
-                    <textarea name="starttime" from="buttontext">
+                    <textarea name="shorttimedate" from="buttontext">
                         <area>32,1,190,24</area>
                     </textarea>
-                    <textarea name="channel" from="starttime">
+                    <textarea name="channel" from="shorttimedate">
                         <area>240,1,190,24</area>
                     </textarea>
-                    <textarea name="titlesubtitle" from="starttime">
+                    <textarea name="titlesubtitle" from="shorttimedate">
                         <area>440,1,650,24</area>
                     </textarea>
-                    <textarea name="card" from="starttime">
+                    <textarea name="card" from="shorttimedate">
                         <area>1160,1,30,24</area>
                     </textarea>
                 </state>
