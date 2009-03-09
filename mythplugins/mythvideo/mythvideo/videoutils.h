@@ -25,6 +25,9 @@ QStringList GetVideoDirsByHost(QString host);
 QStringList GetVideoDirs();
 
 bool IsDefaultCoverFile(const QString &coverfile);
+bool IsDefaultScreenshot(const QString &screenshot);
+bool IsDefaultBanner(const QString &banner);
+bool IsDefaultFanart(const QString &fanart);
 
 class Metadata;
 

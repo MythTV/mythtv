@@ -247,6 +247,39 @@ HostLineEdit *VideoArtworkDirectory()
     return gc;
 }
 
+HostLineEdit *VideoScreenshotDirectory()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.screenshotDir");
+    gc->setLabel(QObject::tr("Directory that holds movie screenshots"));
+    gc->setValue(GetConfDir() + "/MythVideo/Screenshots");
+    gc->setHelpText(QObject::tr("This directory must exist, and the user "
+                    "running MythVideo needs to have read/write permission "
+                    "to the directory."));
+    return gc;
+}
+
+HostLineEdit *VideoBannerDirectory()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.bannerDir");
+    gc->setLabel(QObject::tr("Directory that holds movie/TV Banners"));
+    gc->setValue(GetConfDir() + "/MythVideo/Banners");
+    gc->setHelpText(QObject::tr("This directory must exist, and the user "
+                    "running MythVideo needs to have read/write permission "
+                    "to the directory."));
+    return gc;
+}
+
+HostLineEdit *VideoFanartDirectory()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.fanartDir");
+    gc->setLabel(QObject::tr("Directory that holds movie fanart"));
+    gc->setValue(GetConfDir() + "/MythVideo/Fanart");
+    gc->setHelpText(QObject::tr("This directory must exist, and the user "
+                    "running MythVideo needs to have read/write permission "
+                    "to the directory."));
+    return gc;
+}
+
 HostLineEdit *TrailerDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TrailersDir");
@@ -682,6 +715,9 @@ VideoGeneralSettings::VideoGeneralSettings()
     VConfigPage page1(pages, false);
     page1->addChild(VideoStartupDirectory());
     page1->addChild(VideoArtworkDirectory());
+    page1->addChild(VideoScreenshotDirectory()); 
+    page1->addChild(VideoBannerDirectory()); 
+    page1->addChild(VideoFanartDirectory()); 
     page1->addChild(VideoDefaultView());
 
     VConfigPage page2(pages, false);

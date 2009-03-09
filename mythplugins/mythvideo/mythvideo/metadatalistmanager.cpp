@@ -24,8 +24,9 @@ class MetadataListManagerImp
         for (metadata_list::iterator p = m_meta_list.begin();
              p != m_meta_list.end(); ++p)
         {
-            m_id_map.insert(int_to_meta::value_type((*p)->ID(), p));
-            m_file_map.insert(string_to_meta::value_type((*p)->Filename(), p));
+            m_id_map.insert(int_to_meta::value_type((*p)->GetID(), p));
+            m_file_map.insert(
+                    string_to_meta::value_type((*p)->GetFilename(), p));
         }
     }
 
@@ -70,16 +71,16 @@ class MetadataListManagerImp
     {
         if (metadata)
         {
-            int_to_meta::iterator im = m_id_map.find(metadata->ID());
+            int_to_meta::iterator im = m_id_map.find(metadata->GetID());
 
             if (im != m_id_map.end())
             {
                 metadata_list::iterator mdi = im->second;
-                (*mdi)->dropFromDB();
+                (*mdi)->DeleteFromDatabase();
 
                 m_id_map.erase(im);
                 string_to_meta::iterator sm =
-                        m_file_map.find(metadata->Filename());
+                        m_file_map.find(metadata->GetFilename());
                 if (sm != m_file_map.end())
                     m_file_map.erase(sm);
                 m_meta_list.erase(mdi);
@@ -113,7 +114,8 @@ void MetadataListManager::loadAllFromDatabase(metadata_list &items)
     const QString BaseMetadataQuery(
         "SELECT title, director, plot, rating, year, userrating,"
         "length, filename, showlevel, coverfile, inetref, childid,"
-        "browse, playcommand, category, intid, trailer, host FROM videometadata");
+        "browse, playcommand, category, intid, trailer, screenshot,"
+        "banner, fanart, host FROM videometadata");
 
     query.prepare(BaseMetadataQuery);
 

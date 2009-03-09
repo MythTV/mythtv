@@ -215,8 +215,8 @@ class VideoScannerThread : public QThread
              m_dbmetadata->getList().begin();
              p != m_dbmetadata->getList().end(); ++p)
         {
-            QString lname = (*p)->Filename();
-            QString lhost = (*p)->Host();
+            QString lname = (*p)->GetFilename();
+            QString lhost = (*p)->GetHost();
             if (lname != QString::null)
             {
                 iter = files.find(lname);
@@ -232,14 +232,14 @@ class VideoScannerThread : public QThread
                     // later and NOT a remote backend.
                     if (lhost == "")
                     {
-                        remove.push_back(std::make_pair((*p)->ID(), lname));
+                        remove.push_back(std::make_pair((*p)->GetID(), lname));
                     }
                     else
                     {
                         if (!failedSGHosts.contains(lhost))
                         {
                             VERBOSE(VB_GENERAL, QString("Removing file SG(%1) :%2: ").arg(lhost).arg(lname));
-                            remove.push_back(std::make_pair((*p)->ID(), lname));
+                            remove.push_back(std::make_pair((*p)->GetID(), lname));
                         }
                         else
                             VERBOSE(VB_GENERAL, QString("SG(%1) not available. Not removing file :%2: ").arg(lhost).arg(lname));
@@ -263,17 +263,21 @@ class VideoScannerThread : public QThread
             if (!p->second.check)
             {
                 Metadata newFile(p->first, VIDEO_TRAILER_DEFAULT,
-                                 VIDEO_COVERFILE_DEFAULT,
+                                 VIDEO_COVERFILE_DEFAULT, 
+                                 VIDEO_SCREENSHOT_DEFAULT,
+                                 VIDEO_BANNER_DEFAULT,
+                                 VIDEO_FANART_DEFAULT,
                                  Metadata::FilenameToTitle(p->first),
                                  VIDEO_YEAR_DEFAULT,
                                  VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
                                  VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT,
                                  0, 0, ParentalLevel::plLowest);
 
-                VERBOSE(VB_GENERAL, QString("Adding : %1 : %2").arg(newFile.Host()).arg(newFile.Filename()));
-                newFile.setHost(p->second.host);
+                VERBOSE(VB_GENERAL, QString("Adding : %1 : %2")
+                        .arg(newFile.GetHost()).arg(newFile.GetFilename()));
+                newFile.SetHost(p->second.host);
 
-                newFile.dumpToDatabase();
+                newFile.SaveToDatabase();
             }
             SendProgressEvent(++counter);
         }

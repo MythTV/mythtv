@@ -57,8 +57,8 @@ class VideoFilterSettings
         kOrderByID = 5
     };
 
-    int getCategory() const { return category; }
-    void setCategory(int lcategory)
+    int GetCategory() const { return category; }
+    void SetCategory(int lcategory)
     {
         m_changed_state |= kFilterCategoryChanged;
         category = lcategory;
@@ -71,8 +71,8 @@ class VideoFilterSettings
         genre = lgenre;
     }
 
-    int getCast() const { return cast; }
-    void setCast(int lcast)
+    int GetCast() const { return cast; }
+    void SetCast(int lcast)
     {
         m_changed_state |= kFilterCastChanged;
         cast = lcast;
@@ -86,7 +86,7 @@ class VideoFilterSettings
     }
 
     int getYear() const { return year; }
-    void setYear(int lyear)
+    void SetYear(int lyear)
     {
         m_changed_state |= kFilterYearChanged;
         year = lyear;
@@ -99,15 +99,15 @@ class VideoFilterSettings
         runtime = lruntime;
     }
 
-    int getUserrating() const { return userrating; }
-    void setUserrating(int luserrating)
+    int GetUserRating() const { return userrating; }
+    void SetUserRating(int luserrating)
     {
         m_changed_state |= kFilterUserRatingChanged;
         userrating = luserrating;
     }
 
-    int getBrowse() const {return browse; }
-    void setBrowse(int lbrowse)
+    int GetBrowse() const {return browse; }
+    void SetBrowse(int lbrowse)
     {
         m_changed_state |= kFilterBrowseChanged;
         browse = lbrowse;
@@ -128,14 +128,14 @@ class VideoFilterSettings
     }
 
     int getInteRef() const { return m_inetref; }
-    void setInetRef(int inetref)
+    void SetInetRef(int inetref)
     {
         m_inetref = inetref;
         m_changed_state |= kFilterInetRefChanged;
     }
 
-    int getCoverFile() const { return m_coverfile; }
-    void setCoverFile(int coverfile)
+    int GetCoverFile() const { return m_coverfile; }
+    void SetCoverFile(int coverfile)
     {
         m_coverfile = coverfile;
         m_changed_state |= kFilterCoverFileChanged;
@@ -211,16 +211,16 @@ class VideoFilterDialog : public MythScreenType
   public slots:
     void saveAndExit();
     void saveAsDefault();
-    void setYear(MythUIButtonListItem *item);
-    void setUserRating(MythUIButtonListItem *item);
-    void setCategory(MythUIButtonListItem *item);
+    void SetYear(MythUIButtonListItem *item);
+    void SetUserRating(MythUIButtonListItem *item);
+    void SetCategory(MythUIButtonListItem *item);
     void setCountry(MythUIButtonListItem *item);
     void setGenre(MythUIButtonListItem *item);
-    void setCast(MythUIButtonListItem *item);
+    void SetCast(MythUIButtonListItem *item);
     void setRunTime(MythUIButtonListItem *item);
-    void setBrowse(MythUIButtonListItem *item);
-    void setInetRef(MythUIButtonListItem *item);
-    void setCoverFile(MythUIButtonListItem *item);
+    void SetBrowse(MythUIButtonListItem *item);
+    void SetInetRef(MythUIButtonListItem *item);
+    void SetCoverFile(MythUIButtonListItem *item);
     void setOrderby(MythUIButtonListItem *item);
 
  private:

@@ -25,6 +25,9 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
     m_origMetadata(source_metadata), m_titleEdit(0), m_playerEdit(0),
     m_categoryList(0), m_levelList(0), m_childList(0), m_browseCheck(0),
     m_coverartButton(0), m_coverartText(0),
+    m_screenshotButton(0), m_screenshotText(0),
+    m_bannerButton(0), m_bannerText(0),
+    m_fanartButton(0), m_fanartText(0),
     m_trailerButton(0), m_trailerText(0),
     m_doneButton(0), cachedChildSelection(0),
     m_metaCache(cache)
@@ -47,6 +50,9 @@ bool EditMetadataDialog::Create()
     UIUtilE::Assign(this, m_playerEdit, "player_edit", &err);
 
     UIUtilE::Assign(this, m_coverartText, "coverart_text", &err);
+    UIUtilE::Assign(this, m_screenshotText, "screenshot_text", &err);
+    UIUtilE::Assign(this, m_bannerText, "banner_text", &err);
+    UIUtilE::Assign(this, m_fanartText, "fanart_text", &err);
     UIUtilE::Assign(this, m_trailerText, "trailer_text", &err);
 
     UIUtilE::Assign(this, m_categoryList, "category_select", &err);
@@ -56,6 +62,9 @@ bool EditMetadataDialog::Create()
     UIUtilE::Assign(this, m_browseCheck, "browse_check", &err);
 
     UIUtilE::Assign(this, m_coverartButton, "coverart_button", &err);
+    UIUtilE::Assign(this, m_bannerButton, "banner_button", &err);
+    UIUtilE::Assign(this, m_fanartButton, "fanart_button", &err);
+    UIUtilE::Assign(this, m_screenshotButton, "screenshot_button", &err);
     UIUtilE::Assign(this, m_doneButton, "done_button", &err);
 
     if (err)
@@ -69,20 +78,23 @@ bool EditMetadataDialog::Create()
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 
-    connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(setTitle()));
-    connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(setPlayer()));
+    connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(SetTitle()));
+    connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(SetPlayer()));
 
-    connect(m_doneButton, SIGNAL(Clicked()), SLOT(saveAndExit()));
-    connect(m_coverartButton, SIGNAL(Clicked()), SLOT(findCoverArt()));
+    connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
+    connect(m_coverartButton, SIGNAL(Clicked()), SLOT(FindCoverArt()));
+    connect(m_bannerButton, SIGNAL(Clicked()), SLOT(FindBanner()));
+    connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
+    connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
 
-    connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(toggleBrowse()));
+    connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(ToggleBrowse()));
 
     connect(m_childList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setChild(MythUIButtonListItem*)));
+            SLOT(SetChild(MythUIButtonListItem*)));
     connect(m_levelList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setLevel(MythUIButtonListItem*)));
+            SLOT(SetLevel(MythUIButtonListItem*)));
     connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            SLOT(setCategory(MythUIButtonListItem*)));
+            SLOT(SetCategory(MythUIButtonListItem*)));
     connect(m_categoryList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(NewCategoryPopup()));
 
@@ -99,23 +111,61 @@ namespace
             return QString::localeAwareCompare(lhs.second, rhs.second) < 0;
         }
     };
+
+    QStringList GetSupportedImageExtensionFilter()
+    {
+        QStringList ret;
+
+        QList<QByteArray> exts = QImageReader::supportedImageFormats();
+        for (QList<QByteArray>::iterator p = exts.begin(); p != exts.end(); ++p)
+        {
+            ret.append(QString("*.").append(*p));
+        }
+
+        return ret;
+    }
+
+    void FindImagePopup(const QString &prefix, const QString &prefixAlt,
+            QObject &inst, const QString &returnEvent)
+    {
+        QString fp = prefix.isEmpty() ? prefixAlt : prefix;
+
+        MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+
+        MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, fp);
+        fb->SetNameFilter(GetSupportedImageExtensionFilter());
+        if (fb->Create())
+        {
+            fb->SetReturnEvent(&inst, returnEvent);
+            popupStack->AddScreen(fb);
+        }
+        else
+            delete fb;
+    }
+
+    const QString CEID_COVERARTFILE = "coverartfile";
+    const QString CEID_BANNERFILE = "bannerfile";
+    const QString CEID_FANARTFILE = "fanartfile";
+    const QString CEID_SCREENSHOTFILE = "screenshotfile";
+    const QString CEID_NEWCATEGORY = "newcategory";
 }
 
 void EditMetadataDialog::fillWidgets()
 {
-    m_titleEdit->SetText(m_workingMetadata->Title());
+    m_titleEdit->SetText(m_workingMetadata->GetTitle());
 
     MythUIButtonListItem *button =
         new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
     const VideoCategory::entry_list &vcl =
-            VideoCategory::getCategory().getList();
+            VideoCategory::GetCategory().getList();
     for (VideoCategory::entry_list::const_iterator p = vcl.begin();
             p != vcl.end(); ++p)
     {
         button = new MythUIButtonListItem(m_categoryList, p->second);
         button->SetData(p->first);
     }
-    m_categoryList->SetValueByData(m_workingMetadata->getCategoryID());
+    m_categoryList->SetValueByData(m_workingMetadata->GetCategoryID());
 
     for (ParentalLevel i = ParentalLevel::plLowest;
             i <= ParentalLevel::plHigh && i.good(); ++i)
@@ -124,7 +174,7 @@ void EditMetadataDialog::fillWidgets()
                                     QString(tr("Level %1")).arg(i.GetLevel()));
         button->SetData(i.GetLevel());
     }
-    m_levelList->SetValueByData(m_workingMetadata->ShowLevel());
+    m_levelList->SetValueByData(m_workingMetadata->GetShowLevel());
 
     //
     //  Fill the "always play this video next" option
@@ -146,7 +196,7 @@ void EditMetadataDialog::fillWidgets()
     for (MetadataListManager::metadata_list::const_iterator p = mdl.begin();
             p != mdl.end(); ++p)
     {
-        tc.push_back(std::make_pair((*p)->ID(), (*p)->Title()));
+        tc.push_back(std::make_pair((*p)->GetID(), (*p)->GetTitle()));
     }
     std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
 
@@ -177,15 +227,15 @@ void EditMetadataDialog::fillWidgets()
                     target_name.left((int)(length_compare * 0.75));
 
             if (caught_name_three_quarters == target_name_three_quarters &&
-                m_workingMetadata->ChildID() == -1)
+                m_workingMetadata->GetChildID() == -1)
             {
                 possible_starting_point = p->first;
-                m_workingMetadata->setChildID(possible_starting_point);
+                m_workingMetadata->SetChildID(possible_starting_point);
             }
             trip_catch = false;
         }
 
-        if (p->first != m_workingMetadata->ID())
+        if (p->first != m_workingMetadata->GetID())
         {
             button = new MythUIButtonListItem(m_childList,p->second);
             button->SetData(p->first);
@@ -202,10 +252,10 @@ void EditMetadataDialog::fillWidgets()
         }
     }
 
-    if (m_workingMetadata->ChildID() > 0)
+    if (m_workingMetadata->GetChildID() > 0)
     {
-        m_childList->SetValueByData(m_workingMetadata->ChildID());
-        cachedChildSelection = m_workingMetadata->ChildID();
+        m_childList->SetValueByData(m_workingMetadata->GetChildID());
+        cachedChildSelection = m_workingMetadata->GetChildID();
     }
     else
     {
@@ -213,11 +263,14 @@ void EditMetadataDialog::fillWidgets()
         cachedChildSelection = possible_starting_point;
     }
 
-    if (m_workingMetadata->Browse())
+    if (m_workingMetadata->GetBrowse())
         m_browseCheck->SetCheckState(MythUIStateType::Full);
-    m_coverartText->SetText(m_workingMetadata->CoverFile());
+    m_coverartText->SetText(m_workingMetadata->GetCoverFile());
+    m_screenshotText->SetText(m_workingMetadata->GetScreenshot());
+    m_bannerText->SetText(m_workingMetadata->GetBanner());
+    m_fanartText->SetText(m_workingMetadata->GetFanart());
     m_trailerText->SetText(m_workingMetadata->GetTrailer());
-    m_playerEdit->SetText(m_workingMetadata->PlayCommand());
+    m_playerEdit->SetText(m_workingMetadata->GetPlayCommand());
 }
 
 void EditMetadataDialog::NewCategoryPopup()
@@ -231,7 +284,7 @@ void EditMetadataDialog::NewCategoryPopup()
 
     if (categorydialog->Create())
     {
-        categorydialog->SetReturnEvent(this, "newcategory");
+        categorydialog->SetReturnEvent(this, CEID_NEWCATEGORY);
         popupStack->AddScreen(categorydialog);
     }
 
@@ -239,86 +292,59 @@ void EditMetadataDialog::NewCategoryPopup()
 
 void EditMetadataDialog::AddCategory(QString category)
 {
-    int id = VideoCategory::getCategory().add(category);
-    m_workingMetadata->setCategoryID(id);
+    int id = VideoCategory::GetCategory().add(category);
+    m_workingMetadata->SetCategoryID(id);
     new MythUIButtonListItem(m_categoryList, category, id);
     m_categoryList->SetValueByData(id);
 }
 
-void EditMetadataDialog::saveAndExit()
+void EditMetadataDialog::SaveAndExit()
 {
     *m_origMetadata = *m_workingMetadata;
-    m_origMetadata->updateDatabase();
+    m_origMetadata->UpdateDatabase();
 
     emit Finished();
     Close();
 }
 
-void EditMetadataDialog::setTitle()
+void EditMetadataDialog::SetTitle()
 {
-    m_workingMetadata->setTitle(m_titleEdit->GetText());
+    m_workingMetadata->SetTitle(m_titleEdit->GetText());
 }
 
-void EditMetadataDialog::setCategory(MythUIButtonListItem *item)
+void EditMetadataDialog::SetCategory(MythUIButtonListItem *item)
 {
-    m_workingMetadata->setCategoryID(item->GetData().toInt());
+    m_workingMetadata->SetCategoryID(item->GetData().toInt());
 }
 
-void EditMetadataDialog::setPlayer()
+void EditMetadataDialog::SetPlayer()
 {
-    m_workingMetadata->setPlayCommand(m_playerEdit->GetText());
+    m_workingMetadata->SetPlayCommand(m_playerEdit->GetText());
 }
 
-void EditMetadataDialog::setLevel(MythUIButtonListItem *item)
+void EditMetadataDialog::SetLevel(MythUIButtonListItem *item)
 {
     m_workingMetadata->
-            setShowLevel(ParentalLevel(item->GetData().toInt()).GetLevel());
+            SetShowLevel(ParentalLevel(item->GetData().toInt()).GetLevel());
 }
 
-void EditMetadataDialog::setChild(MythUIButtonListItem *item)
+void EditMetadataDialog::SetChild(MythUIButtonListItem *item)
 {
     cachedChildSelection = item->GetData().toInt();
-    m_workingMetadata->setChildID(cachedChildSelection);
+    m_workingMetadata->SetChildID(cachedChildSelection);
 }
 
-void EditMetadataDialog::toggleBrowse()
+void EditMetadataDialog::ToggleBrowse()
 {
     m_workingMetadata->
-            setBrowse(m_browseCheck->GetBooleanCheckState());
+            SetBrowse(m_browseCheck->GetBooleanCheckState());
 }
 
-void EditMetadataDialog::findCoverArt()
+void EditMetadataDialog::FindCoverArt()
 {
-    QString fileprefix = gContext->GetSetting("VideoArtworkDir");
-    // If the video artwork setting hasn't been set default to
-    // using ~/.mythtv/MythVideo
-    if (fileprefix.isEmpty())
-    {
-        fileprefix = GetConfDir() + "/MythVideo";
-    }
-
-    QStringList imageExtensions;
-
-    QList< QByteArray > exts = QImageReader::supportedImageFormats();
-    QList< QByteArray >::Iterator it = exts.begin();
-    for (;it != exts.end();++it)
-    {
-        imageExtensions.append( QString("*.").append(*it) );
-    }
-
-    MythScreenStack *popupStack =
-                            GetMythMainWindow()->GetStack("popup stack");
-
-    MythUIFileBrowser *nca = new MythUIFileBrowser(popupStack, fileprefix);
-    nca->SetNameFilter(imageExtensions);
-
-    if (nca->Create())
-    {
-        nca->SetReturnEvent(this, "coverartfile");
-        popupStack->AddScreen(nca);
-    }
-    else
-        delete nca;
+    FindImagePopup(gContext->GetSetting("VideoArtworkDir"),
+            GetConfDir() + "/MythVideo",
+            *this, CEID_COVERARTFILE);
 }
 
 void EditMetadataDialog::SetCoverArt(QString file)
@@ -326,32 +352,79 @@ void EditMetadataDialog::SetCoverArt(QString file)
     if (file.isEmpty())
         return;
 
-    m_workingMetadata->setCoverFile(file);
+    m_workingMetadata->SetCoverFile(file);
     CheckedSet(m_coverartText, file);
 }
 
-void EditMetadataDialog::customEvent(QEvent *event)
+void EditMetadataDialog::FindBanner()
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    FindImagePopup(gContext->GetSetting("mythvideo.bannerDir"),
+            GetConfDir() + "/MythVideo/Banners",
+            *this, CEID_BANNERFILE);
+}
+
+void EditMetadataDialog::SetBanner(QString file)
+{
+    if (file.isEmpty())
+        return;
+
+    m_workingMetadata->SetBanner(file);
+    CheckedSet(m_bannerText, file);
+}
+
+void EditMetadataDialog::FindFanart()
+{
+    FindImagePopup(gContext->GetSetting("mythvideo.fanartDir"),
+            GetConfDir() + "/MythVideo/Fanart",
+            *this, CEID_FANARTFILE);
+}
+
+void EditMetadataDialog::SetFanart(QString file)
+{
+    if (file.isEmpty())
+        return;
+
+    m_workingMetadata->SetFanart(file);
+    CheckedSet(m_fanartText, file);
+}
+
+void EditMetadataDialog::FindScreenshot()
+{
+    FindImagePopup(gContext->GetSetting("mythvideo.screenshotDir"),
+            GetConfDir() + "/MythVideo/Screenshots",
+            *this, CEID_SCREENSHOTFILE);
+}
+
+void EditMetadataDialog::SetScreenshot(QString file)
+{
+    if (file.isEmpty())
+        return;
+
+    m_workingMetadata->SetScreenshot(file);
+    CheckedSet(m_screenshotText, file);
+}
+
+void EditMetadataDialog::customEvent(QEvent *levent)
+{
+    if (levent->type() == kMythDialogBoxCompletionEventType)
     {
         DialogCompletionEvent *dce =
-            dynamic_cast<DialogCompletionEvent*>(event);
+                dynamic_cast<DialogCompletionEvent*>(levent);
 
         if (!dce)
             return;
 
-        QString resultid = dce->GetId();
+        const QString resultid = dce->GetId();
 
-        if (resultid == "coverartfile")
-        {
-            QString filename = dce->GetResultText();
-            SetCoverArt(filename);
-        }
-
-        if (resultid == "newcategory")
-        {
+        if (resultid == CEID_COVERARTFILE)
+            SetCoverArt(dce->GetResultText());
+        else if (resultid == CEID_BANNERFILE)
+            SetBanner(dce->GetResultText());
+        else if (resultid == CEID_FANARTFILE)
+            SetFanart(dce->GetResultText());
+        else if (resultid == CEID_SCREENSHOTFILE)
+            SetScreenshot(dce->GetResultText());
+        else if (resultid == CEID_NEWCATEGORY)
             AddCategory(dce->GetResultText());
-        }
     }
 }
-

@@ -114,6 +114,21 @@ bool IsDefaultCoverFile(const QString &coverfile)
             coverfile == VIDEO_COVERFILE_DEFAULT_OLD;
 }
 
+bool IsDefaultScreenshot(const QString &screenshot)
+{
+    return screenshot == VIDEO_SCREENSHOT_DEFAULT;
+}
+
+bool IsDefaultBanner(const QString &banner)
+{
+    return banner == VIDEO_BANNER_DEFAULT;
+}
+
+bool IsDefaultFanart(const QString &fanart)
+{
+    return fanart == VIDEO_FANART_DEFAULT;
+}
+
 QString GetDisplayUserRating(float userrating)
 {
     return QString::number(userrating, 'f', 1);
@@ -144,20 +159,20 @@ QString GetDisplayRating(const QString &rating)
 QString GetDisplayGenres(const Metadata &item)
 {
     QStringList ret;
-    CopySecond(item.Genres(), ret);
+    CopySecond(item.GetGenres(), ret);
     return ret.join(", ");
 }
 
 QString GetDisplayCountries(const Metadata &item)
 {
     QStringList ret;
-    CopySecond(item.Countries(), ret);
+    CopySecond(item.GetCountries(), ret);
     return ret.join(", ");
 }
 
 QStringList GetDisplayCast(const Metadata &item)
 {
     QStringList ret;
-    CopySecond(item.getCast(), ret);
+    CopySecond(item.GetCast(), ret);
     return ret;
 }

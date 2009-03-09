@@ -63,7 +63,7 @@ class MultiValue
 class VideoCategory : public SingleValue
 {
   public:
-    static VideoCategory &getCategory();
+    static VideoCategory &GetCategory();
 
   private:
     VideoCategory();
@@ -113,7 +113,7 @@ class VideoCountryMap : public MultiValue
 class VideoCast : public SingleValue
 {
   public:
-    static VideoCast &getCast();
+    static VideoCast &GetCast();
 
   private:
     VideoCast();

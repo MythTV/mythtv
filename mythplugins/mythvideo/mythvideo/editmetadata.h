@@ -24,7 +24,7 @@ class EditMetadataDialog : public MythScreenType
     ~EditMetadataDialog();
 
     bool Create();
-    void customEvent(QEvent*);
+    void customEvent(QEvent *levent);
 
     void fillWidgets();
 
@@ -32,18 +32,23 @@ class EditMetadataDialog : public MythScreenType
     void Finished();
 
   public slots:
-
-    void saveAndExit();
-    void setTitle();
-    void setCategory(MythUIButtonListItem*);
-    void setPlayer();
-    void setLevel(MythUIButtonListItem*);
-    void setChild(MythUIButtonListItem*);
-    void toggleBrowse();
-    void findCoverArt();
+    void SaveAndExit();
+    void SetTitle();
+    void SetCategory(MythUIButtonListItem*);
+    void SetPlayer();
+    void SetLevel(MythUIButtonListItem*);
+    void SetChild(MythUIButtonListItem*);
+    void ToggleBrowse();
+    void FindCoverArt();
+    void FindBanner();
+    void FindFanart();
+    void FindScreenshot();
     void NewCategoryPopup();
     void AddCategory(QString category);
     void SetCoverArt(QString file);
+    void SetBanner(QString file);
+    void SetFanart(QString file);
+    void SetScreenshot(QString file);
 
   private:
 
@@ -62,6 +67,12 @@ class EditMetadataDialog : public MythScreenType
     MythUICheckBox      *m_browseCheck;
     MythUIButton        *m_coverartButton;
     MythUIText          *m_coverartText;
+    MythUIButton        *m_screenshotButton;
+    MythUIText          *m_screenshotText;
+    MythUIButton        *m_bannerButton;
+    MythUIText          *m_bannerText;
+    MythUIButton        *m_fanartButton;
+    MythUIText          *m_fanartText;
     MythUIButton        *m_trailerButton;
     MythUIText          *m_trailerText;
     MythUIButton        *m_doneButton;

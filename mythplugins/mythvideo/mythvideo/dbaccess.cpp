@@ -503,7 +503,7 @@ VideoCategory::~VideoCategory()
 {
 }
 
-VideoCategory &VideoCategory::getCategory()
+VideoCategory &VideoCategory::GetCategory()
 {
     static VideoCategory vc;
     vc.load_data();
@@ -557,7 +557,7 @@ VideoCast::~VideoCast()
 {
 }
 
-VideoCast &VideoCast::getCast()
+VideoCast &VideoCast::GetCast()
 {
     static VideoCast vc;
     vc.load_data();

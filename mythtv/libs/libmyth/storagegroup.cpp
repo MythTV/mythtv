@@ -19,6 +19,11 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
 //    << "Thumbnails"
     << "DB Backups"
     << "Videos"
+    << "Trailers"
+    << "Coverart"
+    << "Fanart"
+    << "Screenshots"
+    << "Banners"
     ;
 
 /****************************************************************************/

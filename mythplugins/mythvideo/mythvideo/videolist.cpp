@@ -27,13 +27,13 @@ class TreeNodeDataPrivate
         m_metadata(metadata)
     {
         if (m_metadata)
-            m_host = m_metadata->Host();
+            m_host = m_metadata->GetHost();
         else
             m_host = "";
     }
 
-    TreeNodeDataPrivate(QString path, QString host, QString prefix) 
-                        : m_metadata(0), m_path(path), m_host(host), m_prefix(prefix)
+    TreeNodeDataPrivate(QString path, QString host, QString prefix) :
+        m_metadata(0), m_host(host), m_path(path), m_prefix(prefix)
     {
     }
 
@@ -205,7 +205,7 @@ namespace fake_unnamed
         {
             if (m_data)
             {
-                return m_data->Title();
+                return m_data->GetTitle();
             }
 
             return m_meta_bug;
@@ -273,22 +273,22 @@ namespace fake_unnamed
             return m_name;
         }
 
-        void setHost(const QString &host)
+        void SetHost(const QString &host)
         {
             m_host = host;
         }
 
-        const QString &getHost() const
+        const QString &GetHost() const
         {
             return m_host;
         }
 
-        void setPrefix(const QString &prefix)
+        void SetPrefix(const QString &prefix)
         {
             m_prefix = prefix;
         }
 
-        const QString &getPrefix() const
+        const QString &GetPrefix() const
         {
             return m_prefix;
         }
@@ -487,7 +487,7 @@ namespace fake_unnamed
       private:
         bool sort(const Metadata *lhs, const Metadata *rhs)
         {
-            return sort(lhs->Filename(), rhs->Filename());
+            return sort(lhs->GetFilename(), rhs->GetFilename());
         }
 
         bool sort(const QString &lhs, const QString &rhs)
@@ -521,23 +521,23 @@ namespace fake_unnamed
                      meta_dir_node *hint = NULL)
     {
         meta_dir_node *start = dir;
-        QString insert_chunk = metadata->Filename();
-        QString host = metadata->Host();
-        QString prefix = metadata->getPrefix();
+        QString insert_chunk = metadata->GetFilename();
+        QString host = metadata->GetHost();
+        QString prefix = metadata->GetPrefix();
 
         if (hint)
         {
-            if (metadata->Filename().startsWith(hint->getFQPath() + "/"))
+            if (metadata->GetFilename().startsWith(hint->getFQPath() + "/"))
             {
                 start = hint;
                 insert_chunk =
-                        metadata->Filename().mid(hint->getFQPath().length());
+                        metadata->GetFilename().mid(hint->getFQPath().length());
             }
         }
 
         if (insert_chunk.startsWith(dir->getFQPath() + "/"))
         {
-            insert_chunk = metadata->Filename().mid(dir->getFQPath().length());
+            insert_chunk = metadata->GetFilename().mid(dir->getFQPath().length());
         }
 
         QStringList path = insert_chunk.split("/", QString::SkipEmptyParts);
@@ -688,7 +688,7 @@ class VideoListImp
         MetadataPtr mp = m_metadata.byID(video_id);
         if (mp)
         {
-            ret = mp->deleteFile(dummy);
+            ret = mp->DeleteFile(dummy);
             if (ret) ret = m_metadata.purgeByID(video_id);
         }
 
@@ -816,7 +816,8 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
         if ((*dir)->has_entries())
         {
             MythGenericTree *t = AddDirNode(dst, (*dir)->getName(),
-                    (*dir)->getFQPath(), include_updirs, (*dir)->getHost(), (*dir)->getPrefix());
+                    (*dir)->getFQPath(), include_updirs, (*dir)->GetHost(),
+                    (*dir)->GetPrefix());
 
             build_generic_tree(t, dir->get(), include_updirs);
         }
@@ -825,7 +826,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
     for (meta_dir_node::const_entry_iterator entry = src->entries_begin();
          entry != src->entries_end(); ++entry)
     {
-        AddFileNode(dst, (*entry)->getData()->Title(), (*entry)->getData());
+        AddFileNode(dst, (*entry)->getData()->GetTitle(), (*entry)->getData());
     }
 }
 
@@ -957,7 +958,7 @@ void VideoListImp::buildDbList()
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
     {
         bool found_prefix = false;
-        if ((*p)->Filename().startsWith(test_prefix))
+        if ((*p)->GetFilename().startsWith(test_prefix))
         {
             found_prefix = true;
         }
@@ -966,7 +967,7 @@ void VideoListImp::buildDbList()
             for (QStringList::const_iterator prefix = dirs.begin();
                  prefix != dirs.end(); ++prefix)
             {
-                if ((*p)->Filename().startsWith(*prefix))
+                if ((*p)->GetFilename().startsWith(*prefix))
                 {
                     test_prefix = *prefix;
                     found_prefix = true;
@@ -976,7 +977,7 @@ void VideoListImp::buildDbList()
 
             // TODO: Should this be based on a GUI option.
             if (!found_prefix)
-                if ((*p)->Host() != "")
+                if ((*p)->IsHostSet())
                     found_prefix = true;
 
         }
@@ -987,9 +988,9 @@ void VideoListImp::buildDbList()
             prefix_to_node_map::iterator np = ptnm.find(test_prefix);
             if (np == ptnm.end())
             {
-                smart_dir_node sdn =
-                        video_root->addSubDir(test_prefix,
-                                              path_to_node_name(test_prefix), (*p)->Host(), (*p)->getPrefix());
+                smart_dir_node sdn = video_root->addSubDir(test_prefix,
+                        path_to_node_name(test_prefix), (*p)->GetHost(),
+                        (*p)->GetPrefix());
                 insert_base = sdn.get();
                 insert_base->setPathRoot();
 
@@ -1001,7 +1002,7 @@ void VideoListImp::buildDbList()
                 insert_base = np->second;
             }
 
-            (*p)->setPrefix(test_prefix);
+            (*p)->SetPrefix(test_prefix);
             insert_hint = AddMetadataToDir(*p, insert_base, insert_hint);
         }
         else
@@ -1100,7 +1101,7 @@ void VideoListImp::buildFsysList()
         mdlm.setList(db_metadata);
         for (metadata_list::iterator p = ml.begin(); p != ml.end(); ++p)
         {
-            (*p)->fillDataFromFilename(mdlm);
+            (*p)->FillDataFromFilename(mdlm);
         }
     }
     m_metadata.setList(ml);
@@ -1131,8 +1132,8 @@ namespace fake_unnamed
         {
             smart_dir_node sdn = dst.addSubDir((*dir)->getPath(),
                                                (*dir)->getName(),
-                                               (*dir)->getHost(),
-                                               (*dir)->getPrefix());
+                                               (*dir)->GetHost(),
+                                               (*dir)->GetPrefix());
             copy_filtered_tree(*sdn, *(dir->get()), filter);
         }
     }
@@ -1176,12 +1177,12 @@ void VideoListImp::update_meta_view(bool flat_list)
     for (metadata_list::const_iterator si = m_metadata.getList().begin();
          si != m_metadata.getList().end(); ++si)
     {
-        if (!(*si)->hasSortKey())
+        if (!(*si)->HasSortKey())
         {
             Metadata::SortKey skey =
                     Metadata::GenerateDefaultSortKey(*(*si),
                                                      m_sort_ignores_case);
-            (*si)->setSortKey(skey);
+            (*si)->SetSortKey(skey);
         }
     }
 
@@ -1270,10 +1271,10 @@ namespace fake_unnamed
                 if (tmptitle.length())
                     title = tmptitle;
             }
-            myData->setTitle(title);
-            myData->setPrefix(m_prefix);
+            myData->SetTitle(title);
+            myData->SetPrefix(m_prefix);
 
-            myData->setHost(host);
+            myData->SetHost(host);
             m_metalist.push_back(myData);
 
             m_directory->addEntry(new meta_data_node(myData.get()));

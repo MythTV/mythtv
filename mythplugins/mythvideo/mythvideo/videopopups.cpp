@@ -76,7 +76,7 @@ bool PlotDialog::Create()
 
     UIUtilW::Assign(this, okButton, "ok");
 
-    plotText->SetText(m_metadata->Plot());
+    plotText->SetText(m_metadata->GetPlot());
 
     if (okButton)
         connect(okButton, SIGNAL(Clicked()), SLOT(Close()));

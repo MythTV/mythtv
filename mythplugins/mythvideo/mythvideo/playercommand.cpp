@@ -188,18 +188,20 @@ class VideoPlayerCommandPrivate
     {
         if (item)
         {
-            QString play_command = item->PlayCommand();
+            QString play_command = item->GetPlayCommand();
             if (play_command.length())
-                AddPlayer(play_command, item->Filename(), item->Plot(),
-                        item->Title(), item->Director(), item->Length(),
-                        QString::number(item->Year()));
+                AddPlayer(play_command, item->GetFilename(), item->GetPlot(),
+                        item->GetTitle(), item->GetDirector(),
+                        item->GetLength(),
+                        QString::number(item->GetYear()));
             else
             {
                 QString filename;
-                if (item->Host() != "")
-                    filename = GenRemoteFileURL("Videos", item->Host(), item->Filename());
+                if (item->IsHostSet())
+                    filename = GenRemoteFileURL("Videos", item->GetHost(),
+                            item->GetFilename());
                 else
-                   filename = item->Filename();
+                   filename = item->GetFilename();
 
                 PlayerFor(filename);
             }

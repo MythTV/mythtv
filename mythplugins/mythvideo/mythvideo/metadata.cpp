@@ -88,6 +88,7 @@ class MetadataImp
 
   public:
     MetadataImp(const QString &filename, const QString &trailer, const QString &coverfile,
+             const QString &screenshot, const QString &banner, const QString &fanart,
              const QString &title, int year,
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
@@ -104,11 +105,12 @@ class MetadataImp
         m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries), m_cast(cast),
         m_filename(filename), m_trailer(trailer), m_coverfile(coverfile),
-        m_categoryID(categoryID), m_childID(childID), m_year(year),
-        m_length(length), m_showlevel(showlevel), m_browse(browse), m_id(id),
-        m_userrating(userrating), m_host(host)
+        m_screenshot(screenshot), m_banner(banner), m_fanart(fanart),
+        m_host(host), m_categoryID(categoryID), m_childID(childID),
+        m_year(year), m_length(length), m_showlevel(showlevel),
+        m_browse(browse), m_id(id), m_userrating(userrating)
     {
-        VideoCategory::getCategory().get(m_categoryID, m_category);
+        VideoCategory::GetCategory().get(m_categoryID, m_category);
     }
 
     MetadataImp(MSqlQuery &query)
@@ -138,6 +140,9 @@ class MetadataImp
             m_filename = rhs.m_filename;
             m_trailer = rhs.m_trailer;
             m_coverfile = rhs.m_coverfile;
+            m_screenshot = rhs.m_screenshot;
+            m_banner = rhs.m_banner;
+            m_fanart = rhs.m_fanart;
 
             m_categoryID = rhs.m_categoryID;
             m_childID = rhs.m_childID;
@@ -152,56 +157,55 @@ class MetadataImp
             // No DB vars
             m_sort_key = rhs.m_sort_key;
             m_prefix = rhs.m_prefix;
-            m_flat_index = rhs.m_flat_index;
         }
 
         return *this;
     }
 
   public:
-    bool hasSortKey() const { return m_sort_key.isSet(); }
-    const Metadata::SortKey &getSortKey() const { return m_sort_key; }
-    void setSortKey(const Metadata::SortKey &sort_key)
+    bool HasSortKey() const { return m_sort_key.isSet(); }
+    const Metadata::SortKey &GetSortKey() const { return m_sort_key; }
+    void SetSortKey(const Metadata::SortKey &sort_key)
     {
         m_sort_key = sort_key;
     }
 
-    const QString &getPrefix() const { return m_prefix; }
-    void setPrefix(const QString &prefix) { m_prefix = prefix; }
+    const QString &GetPrefix() const { return m_prefix; }
+    void SetPrefix(const QString &prefix) { m_prefix = prefix; }
 
     const QString &getTitle() const { return m_title; }
-    void setTitle(const QString& title)
+    void SetTitle(const QString& title)
     {
         m_sort_key.Clear();
         m_title = title;
     }
 
-    const QString &getInetRef() const { return m_inetref; }
-    void setInetRef(const QString &inetRef) { m_inetref = inetRef; }
+    const QString &GetInetRef() const { return m_inetref; }
+    void SetInetRef(const QString &inetRef) { m_inetref = inetRef; }
 
     const QString &getDirector() const { return m_director; }
-    void setDirector(const QString &director) { m_director = director; }
+    void SetDirector(const QString &director) { m_director = director; }
 
     const QString &getPlot() const { return m_plot; }
-    void setPlot(const QString &plot) { m_plot = plot; }
+    void SetPlot(const QString &plot) { m_plot = plot; }
 
-    const QString &getRating() const { return m_rating; }
-    void setRating(const QString &rating) { m_rating = rating; }
+    const QString &GetRating() const { return m_rating; }
+    void SetRating(const QString &rating) { m_rating = rating; }
 
     const QString &getPlayCommand() const { return m_playcommand; }
-    void setPlayCommand(const QString &playCommand)
+    void SetPlayCommand(const QString &playCommand)
     {
         m_playcommand = playCommand;
     }
 
-    const QString &getCategory() const { return m_category; }
-//    void setCategory(const QString &category) { m_category = category; }
+    const QString &GetCategory() const { return m_category; }
+//    void SetCategory(const QString &category) { m_category = category; }
 
     const genre_list &getGenres() const { return m_genres; }
-    void setGenres(const genre_list &genres) { m_genres = genres; }
+    void SetGenres(const genre_list &genres) { m_genres = genres; }
 
-    const country_list &getCountries() const { return m_countries; }
-    void setCountries(const country_list &countries)
+    const country_list &GetCountries() const { return m_countries; }
+    void SetCountries(const country_list &countries)
     {
         m_countries = countries;
     }
@@ -209,57 +213,68 @@ class MetadataImp
     const cast_list &GetCast() const { return m_cast; }
     void SetCast(const cast_list &cast) { m_cast = cast; }
 
-    const QString &getHost() const { return m_host; }
-    void setHost(const QString &host) { m_host = host; }
+    const QString &GetHost() const { return m_host; }
+    void SetHost(const QString &host) { m_host = host; }
 
     const QString &getFilename() const { return m_filename; }
-    void setFilename(const QString &filename) { m_filename = filename; }
+    void SetFilename(const QString &filename) { m_filename = filename; }
 
     const QString &GetTrailer() const { return m_trailer; }
     void SetTrailer(const QString &trailer) { m_trailer = trailer; }
 
-    const QString &getCoverFile() const { return m_coverfile; }
-    void setCoverFile(const QString &coverFile) { m_coverfile = coverFile; }
+    const QString &GetCoverFile() const { return m_coverfile; }
+    void SetCoverFile(const QString &coverFile) { m_coverfile = coverFile; }
 
-    int getCategoryID() const
+    const QString &GetScreenshot() const { return m_screenshot; }
+    void SetScreenshot(const QString &screenshot) { m_screenshot = screenshot; }
+
+    const QString &GetBanner() const { return m_banner; }
+    void SetBanner(const QString &banner) { m_banner = banner; }
+
+    const QString &GetFanart() const { return m_fanart; }
+    void SetFanart(const QString &fanart) { m_fanart = fanart; }
+
+    int GetCategoryID() const
     {
         return m_categoryID;
     }
-    void setCategoryID(int id);
+    void SetCategoryID(int id);
 
-    int getChildID() const { return m_childID; }
-    void setChildID(int childID) { m_childID = childID; }
+    int GetChildID() const { return m_childID; }
+    void SetChildID(int childID) { m_childID = childID; }
 
     int getYear() const { return m_year; }
-    void setYear(int year) { m_year = year; }
+    void SetYear(int year) { m_year = year; }
 
-    int getLength() const { return m_length; }
-    void setLength(int length) { m_length = length; }
+    int GetLength() const { return m_length; }
+    void SetLength(int length) { m_length = length; }
 
-    ParentalLevel::Level getShowLevel() const { return m_showlevel; }
-    void setShowLevel(ParentalLevel::Level showLevel)
+    ParentalLevel::Level GetShowLevel() const { return m_showlevel; }
+    void SetShowLevel(ParentalLevel::Level showLevel)
     {
         m_showlevel = ParentalLevel(showLevel).GetLevel();
     }
 
-    bool getBrowse() const { return m_browse; }
-    void setBrowse(bool browse) { m_browse = browse; }
+    bool GetBrowse() const { return m_browse; }
+    void SetBrowse(bool browse) { m_browse = browse; }
 
-    unsigned int getID() const { return m_id; }
-    void setID(int id) { m_id = id; }
+    unsigned int GetID() const { return m_id; }
+    void SetID(int id) { m_id = id; }
 
-    float getUserRating() const { return m_userrating; }
-    void setUserRating(float userRating) { m_userrating = userRating; }
+    float GetUserRating() const { return m_userrating; }
+    void SetUserRating(float userRating) { m_userrating = userRating; }
 
     ////////////////////////////////
 
-    void dumpToDatabase();
-    void updateDatabase();
+    void SaveToDatabase();
+    void UpdateDatabase();
+    bool DeleteFromDatabase();
 
-    bool deleteFile(class VideoList &dummy);
-    bool dropFromDB();
+    bool DeleteFile(class VideoList &dummy);
 
     void Reset();
+
+    bool IsHostSet() const;
 
   private:
     void fillCountries();
@@ -286,6 +301,9 @@ class MetadataImp
     QString m_filename;
     QString m_trailer;
     QString m_coverfile;
+    QString m_screenshot;
+    QString m_banner;
+    QString m_fanart;
     QString m_host;
 
     int m_categoryID;
@@ -300,7 +318,6 @@ class MetadataImp
     // not in DB
     Metadata::SortKey m_sort_key;
     QString m_prefix;
-    int m_flat_index;
 };
 
 /////////////////////////////
@@ -339,7 +356,7 @@ bool MetadataImp::removeDir(const QString &dirName)
 }
 
 /// Deletes the file associated with a metadata entry
-bool MetadataImp::deleteFile(class VideoList &dummy)
+bool MetadataImp::DeleteFile(class VideoList &dummy)
 {
     (void) dummy;
 
@@ -362,43 +379,25 @@ bool MetadataImp::deleteFile(class VideoList &dummy)
     return isremoved;
 }
 
-bool MetadataImp::dropFromDB()
-{
-    VideoGenreMap::getGenreMap().remove(m_id);
-    VideoCountryMap::getCountryMap().remove(m_id);
-    VideoCastMap::getCastMap().remove(m_id);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM videometadata WHERE intid = :ID");
-    query.bindValue(":ID", m_id);
-    if (!query.exec())
-    {
-        MythDB::DBError("delete from videometadata", query);
-    }
-
-    query.prepare("DELETE FROM filemarkup WHERE filename = :FILENAME");
-    query.bindValue(":FILENAME", m_filename);
-    if (!query.exec())
-    {
-        MythDB::DBError("delete from filemarkup", query);
-    }
-
-    return true;
-}
-
 void MetadataImp::Reset()
 {
     MetadataImp tmp(m_filename, VIDEO_TRAILER_DEFAULT, VIDEO_COVERFILE_DEFAULT,
-                    Metadata::FilenameToTitle(m_filename), VIDEO_YEAR_DEFAULT,
-                    VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
-                    VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT, 0, m_id,
+                    VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
+                    VIDEO_FANART_DEFAULT, Metadata::FilenameToTitle(m_filename),
+                    VIDEO_YEAR_DEFAULT, VIDEO_INETREF_DEFAULT,
+                    VIDEO_DIRECTOR_DEFAULT, VIDEO_PLOT_DEFAULT, 0.0,
+                    VIDEO_RATING_DEFAULT, 0, m_id,
                     ParentalLevel::plLowest, 0, -1, true, "", "",
-                    Metadata::genre_list(), Metadata::country_list(), 
+                    Metadata::genre_list(), Metadata::country_list(),
                     Metadata::cast_list(), m_host);
     tmp.m_prefix = m_prefix;
-    tmp.m_flat_index = m_flat_index;
 
     *this = tmp;
+}
+
+bool MetadataImp::IsHostSet() const
+{
+    return m_host.isEmpty();
 }
 
 void MetadataImp::fillGenres()
@@ -446,7 +445,7 @@ void MetadataImp::fillCast()
     VideoCastMap::entry cast;
     if (vcm.get(m_id, cast))
     {
-        VideoCast &vc = VideoCast::getCast();
+        VideoCast &vc = VideoCast::GetCast();
         for (VideoCastMap::entry::values_type::const_iterator p =
              cast.values.begin(); p != cast.values.end(); ++p)
         {
@@ -482,9 +481,12 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_categoryID = query.value(14).toInt();
     m_id = query.value(15).toInt();
     m_trailer = query.value(16).toString();
-    m_host = query.value(17).toString();
+    m_screenshot = query.value(17).toString();
+    m_banner = query.value(18).toString();
+    m_fanart = query.value(19).toString();
+    m_host = query.value(20).toString();
 
-    VideoCategory::getCategory().get(m_categoryID, m_category);
+    VideoCategory::GetCategory().get(m_categoryID, m_category);
 
     // Genres
     fillGenres();
@@ -508,6 +510,12 @@ void MetadataImp::saveToDatabase()
         m_rating = VIDEO_RATING_DEFAULT;
     if (m_coverfile.isEmpty())
         m_coverfile = VIDEO_COVERFILE_DEFAULT;
+    if (m_screenshot.isEmpty())
+        m_screenshot = VIDEO_SCREENSHOT_DEFAULT;
+    if (m_banner.isEmpty())
+        m_banner = VIDEO_BANNER_DEFAULT;
+    if (m_fanart.isEmpty())
+        m_fanart = VIDEO_FANART_DEFAULT;
     if (m_trailer.isEmpty())
         m_trailer = VIDEO_TRAILER_DEFAULT;
     if (m_inetref.isEmpty())
@@ -527,11 +535,11 @@ void MetadataImp::saveToDatabase()
 
         query.prepare("INSERT INTO videometadata (title,director,plot,"
                       "rating,year,userrating,length,filename,showlevel,"
-                      "coverfile,inetref,browse,trailer, host) VALUES (:TITLE, :DIRECTOR, "
-                      ":PLOT, :RATING, :YEAR, :USERRATING, :LENGTH, "
-                      ":FILENAME, :SHOWLEVEL, :COVERFILE, :INETREF, :BROWSE, "
-                      ":TRAILER, :HOST)");
-
+                      "coverfile,inetref,browse,trailer,screenshot,banner,"
+                      "fanart,host) VALUES (:TITLE, :DIRECTOR, :PLOT, :RATING, "
+                      ":YEAR, :USERRATING, :LENGTH, :FILENAME, :SHOWLEVEL, "
+                      ":COVERFILE, :INETREF, :BROWSE, :TRAILER, :SCREENSHOT, "
+                      ":BANNER, :FANART, :HOST)");
     }
     else
     {
@@ -540,6 +548,7 @@ void MetadataImp::saveToDatabase()
                       "year = :YEAR, userrating = :USERRATING, "
                       "length = :LENGTH, filename = :FILENAME, trailer = :TRAILER, "
                       "showlevel = :SHOWLEVEL, coverfile = :COVERFILE, "
+                      "screenshot = :SCREENSHOT, banner = :BANNER, fanart = :FANART, "
                       "inetref = :INETREF, browse = :BROWSE, host = :HOST, "
                       "playcommand = :PLAYCOMMAND, childid = :CHILDID, "
                       "category = :CATEGORY WHERE intid = :INTID");
@@ -561,6 +570,9 @@ void MetadataImp::saveToDatabase()
     query.bindValue(":TRAILER", m_trailer);
     query.bindValue(":SHOWLEVEL", m_showlevel);
     query.bindValue(":COVERFILE", m_coverfile);
+    query.bindValue(":SCREENSHOT", m_screenshot);
+    query.bindValue(":BANNER", m_banner);
+    query.bindValue(":FANART", m_fanart);
     query.bindValue(":INETREF", m_inetref);
     query.bindValue(":BROWSE", m_browse);
     query.bindValue(":HOST", m_host);
@@ -601,17 +613,41 @@ void MetadataImp::saveToDatabase()
     updateCast();
 }
 
-void MetadataImp::dumpToDatabase()
+void MetadataImp::SaveToDatabase()
 {
     saveToDatabase();
 }
 
-void MetadataImp::updateDatabase()
+void MetadataImp::UpdateDatabase()
 {
     saveToDatabase();
 }
 
-void MetadataImp::setCategoryID(int id)
+bool MetadataImp::DeleteFromDatabase()
+{
+    VideoGenreMap::getGenreMap().remove(m_id);
+    VideoCountryMap::getCountryMap().remove(m_id);
+    VideoCastMap::getCastMap().remove(m_id);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM videometadata WHERE intid = :ID");
+    query.bindValue(":ID", m_id);
+    if (!query.exec())
+    {
+        MythDB::DBError("delete from videometadata", query);
+    }
+
+    query.prepare("DELETE FROM filemarkup WHERE filename = :FILENAME");
+    query.bindValue(":FILENAME", m_filename);
+    if (!query.exec())
+    {
+        MythDB::DBError("delete from filemarkup", query);
+    }
+
+    return true;
+}
+
+void MetadataImp::SetCategoryID(int id)
 {
     if (id == 0)
     {
@@ -623,7 +659,7 @@ void MetadataImp::setCategoryID(int id)
         if (m_categoryID != id)
         {
             QString cat;
-            if (VideoCategory::getCategory().get(id, cat))
+            if (VideoCategory::GetCategory().get(id, cat))
             {
                 m_category = cat;
                 m_categoryID = id;
@@ -688,7 +724,7 @@ void MetadataImp::updateCast()
     {
         if (cast->second.trimmed().length())
         {
-            cast->first = VideoCast::getCast().add(cast->second);
+            cast->first = VideoCast::GetCast().add(cast->second);
             VideoCastMap::getCastMap().add(m_id, cast->first);
             ++cast;
         }
@@ -705,11 +741,11 @@ void MetadataImp::updateCast()
 Metadata::SortKey Metadata::GenerateDefaultSortKey(const Metadata &m,
                                                    bool ignore_case)
 {
-    QString title(ignore_case ? m.Title().toLower() : m.Title());
-    title = trimTitle(title, ignore_case);
+    QString title(ignore_case ? m.GetTitle().toLower() : m.GetTitle());
+    title = TrimTitle(title, ignore_case);
 
-    return SortKey(SortData(title, m.Filename(),
-                         QString().sprintf("%.7d", m.ID())));
+    return SortKey(SortData(title, m.GetFilename(),
+                         QString().sprintf("%.7d", m.GetID())));
 }
 
 namespace
@@ -786,14 +822,16 @@ namespace
     }
 }
 
-QString Metadata::trimTitle(const QString &title, bool ignore_case)
+QString Metadata::TrimTitle(const QString &title, bool ignore_case)
 {
     QString ret(title);
     ret.remove(getTitleTrim(ignore_case));
     return ret;
 }
 
-Metadata::Metadata(const QString &filename, const QString &trailer, const QString &coverfile,
+Metadata::Metadata(const QString &filename, const QString &trailer,
+             const QString &coverfile, const QString &screenshot,
+             const QString &banner, const QString &fanart,
              const QString &title, int year,
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
@@ -806,8 +844,9 @@ Metadata::Metadata(const QString &filename, const QString &trailer, const QStrin
              const cast_list &cast,
              const QString &host)
 {
-    m_imp = new MetadataImp(filename, trailer, coverfile, title, year, inetref, director,
-                            plot, userrating, rating, length, id, showlevel,
+    m_imp = new MetadataImp(filename, trailer, coverfile, screenshot, banner,
+                            fanart, title, year, inetref, director, plot,
+                            userrating, rating, length, id, showlevel,
                             categoryID, childID, browse, playcommand, category,
                             genres, countries, cast, host);
 }
@@ -837,179 +876,179 @@ Metadata &Metadata::operator=(const Metadata &rhs)
     return *this;
 }
 
-bool Metadata::hasSortKey() const
+bool Metadata::HasSortKey() const
 {
-    return m_imp->hasSortKey();
+    return m_imp->HasSortKey();
 }
 
-const Metadata::SortKey &Metadata::getSortKey() const
+const Metadata::SortKey &Metadata::GetSortKey() const
 {
-    return m_imp->getSortKey();
+    return m_imp->GetSortKey();
 }
 
-void Metadata::setSortKey(const Metadata::SortKey &sort_key)
+void Metadata::SetSortKey(const Metadata::SortKey &sort_key)
 {
-    m_imp->setSortKey(sort_key);
+    m_imp->SetSortKey(sort_key);
 }
 
-const QString &Metadata::getPrefix() const
+const QString &Metadata::GetPrefix() const
 {
-    return m_imp->getPrefix();
+    return m_imp->GetPrefix();
 }
 
-void Metadata::setPrefix(const QString &prefix)
+void Metadata::SetPrefix(const QString &prefix)
 {
-    m_imp->setPrefix(prefix);
+    m_imp->SetPrefix(prefix);
 }
 
-const QString &Metadata::Title() const
+const QString &Metadata::GetTitle() const
 {
     return m_imp->getTitle();
 }
 
-void Metadata::setTitle(const QString &title)
+void Metadata::SetTitle(const QString &title)
 {
-    m_imp->setTitle(title);
+    m_imp->SetTitle(title);
 }
 
-int Metadata::Year() const
+int Metadata::GetYear() const
 {
     return m_imp->getYear();
 }
 
-void Metadata::setYear(int year)
+void Metadata::SetYear(int year)
 {
-    m_imp->setYear(year);
+    m_imp->SetYear(year);
 }
 
-const QString &Metadata::InetRef() const
+const QString &Metadata::GetInetRef() const
 {
-    return m_imp->getInetRef();
+    return m_imp->GetInetRef();
 }
 
-void Metadata::setInetRef(const QString &inetRef)
+void Metadata::SetInetRef(const QString &inetRef)
 {
-    m_imp->setInetRef(inetRef);
+    m_imp->SetInetRef(inetRef);
 }
 
-const QString &Metadata::Director() const
+const QString &Metadata::GetDirector() const
 {
     return m_imp->getDirector();
 }
 
-void Metadata::setDirector(const QString &director)
+void Metadata::SetDirector(const QString &director)
 {
-    m_imp->setDirector(director);
+    m_imp->SetDirector(director);
 }
 
-const QString &Metadata::Plot() const
+const QString &Metadata::GetPlot() const
 {
     return m_imp->getPlot();
 }
 
-void Metadata::setPlot(const QString &plot)
+void Metadata::SetPlot(const QString &plot)
 {
-    m_imp->setPlot(plot);
+    m_imp->SetPlot(plot);
 }
 
-float Metadata::UserRating() const
+float Metadata::GetUserRating() const
 {
-    return m_imp->getUserRating();
+    return m_imp->GetUserRating();
 }
 
-void Metadata::setUserRating(float userRating)
+void Metadata::SetUserRating(float userRating)
 {
-    m_imp->setUserRating(userRating);
+    m_imp->SetUserRating(userRating);
 }
 
-const QString &Metadata::Rating() const
+const QString &Metadata::GetRating() const
 {
-    return m_imp->getRating();
+    return m_imp->GetRating();
 }
 
-void Metadata::setRating(const QString &rating)
+void Metadata::SetRating(const QString &rating)
 {
-    m_imp->setRating(rating);
+    m_imp->SetRating(rating);
 }
 
-int Metadata::Length() const
+int Metadata::GetLength() const
 {
-    return m_imp->getLength();
+    return m_imp->GetLength();
 }
 
-void Metadata::setLength(int length)
+void Metadata::SetLength(int length)
 {
-    m_imp->setLength(length);
+    m_imp->SetLength(length);
 }
 
-unsigned int Metadata::ID() const
+unsigned int Metadata::GetID() const
 {
-    return m_imp->getID();
+    return m_imp->GetID();
 }
 
-void Metadata::setID(int id)
+void Metadata::SetID(int id)
 {
-    m_imp->setID(id);
+    m_imp->SetID(id);
 }
 
-int Metadata::ChildID() const
+int Metadata::GetChildID() const
 {
-    return m_imp->getChildID();
+    return m_imp->GetChildID();
 }
 
-void Metadata::setChildID(int childID)
+void Metadata::SetChildID(int childID)
 {
-    m_imp->setChildID(childID);
+    m_imp->SetChildID(childID);
 }
 
-bool Metadata::Browse() const
+bool Metadata::GetBrowse() const
 {
-    return m_imp->getBrowse();
+    return m_imp->GetBrowse();
 }
 
-void Metadata::setBrowse(bool browse)
+void Metadata::SetBrowse(bool browse)
 {
-    m_imp->setBrowse(browse);
+    m_imp->SetBrowse(browse);
 }
 
-const QString &Metadata::PlayCommand() const
+const QString &Metadata::GetPlayCommand() const
 {
     return m_imp->getPlayCommand();
 }
 
-void Metadata::setPlayCommand(const QString &playCommand)
+void Metadata::SetPlayCommand(const QString &playCommand)
 {
-    m_imp->setPlayCommand(playCommand);
+    m_imp->SetPlayCommand(playCommand);
 }
 
-ParentalLevel::Level Metadata::ShowLevel() const
+ParentalLevel::Level Metadata::GetShowLevel() const
 {
-    return m_imp->getShowLevel();
+    return m_imp->GetShowLevel();
 }
 
-void Metadata::setShowLevel(ParentalLevel::Level showLevel)
+void Metadata::SetShowLevel(ParentalLevel::Level showLevel)
 {
-    m_imp->setShowLevel(showLevel);
+    m_imp->SetShowLevel(showLevel);
 }
 
-const QString &Metadata::Filename() const
+const QString &Metadata::GetFilename() const
 {
     return m_imp->getFilename();
 }
 
-const QString &Metadata::Host() const
+const QString &Metadata::GetHost() const
 {
-    return m_imp->getHost();
+    return m_imp->GetHost();
 }
 
-void Metadata::setHost(const QString &host)
+void Metadata::SetHost(const QString &host)
 {
-        m_imp->setHost(host);
+        m_imp->SetHost(host);
 }
 
-void Metadata::setFilename(const QString &filename)
+void Metadata::SetFilename(const QString &filename)
 {
-    m_imp->setFilename(filename);
+    m_imp->SetFilename(filename);
 }
 
 const QString &Metadata::GetTrailer() const
@@ -1022,74 +1061,109 @@ void Metadata::SetTrailer(const QString &trailer)
     m_imp->SetTrailer(trailer);
 }
 
-const QString &Metadata::CoverFile() const
+const QString &Metadata::GetCoverFile() const
 {
-    return m_imp->getCoverFile();
+    return m_imp->GetCoverFile();
 }
 
-void Metadata::setCoverFile(const QString &coverFile)
+void Metadata::SetCoverFile(const QString &coverFile)
 {
-    m_imp->setCoverFile(coverFile);
+    m_imp->SetCoverFile(coverFile);
 }
 
-const QString &Metadata::Category() const
+const QString &Metadata::GetScreenshot() const
 {
-    return m_imp->getCategory();
+    return m_imp->GetScreenshot();
 }
 
-//void Metadata::setCategory(const QString &category)
+void Metadata::SetScreenshot(const QString &screenshot)
+{
+    m_imp->SetScreenshot(screenshot);
+}
+
+const QString &Metadata::GetBanner() const
+{
+    return m_imp->GetBanner();
+}
+
+void Metadata::SetBanner(const QString &banner)
+{
+    m_imp->SetBanner(banner);
+}
+
+const QString &Metadata::GetFanart() const
+{
+    return m_imp->GetFanart();
+}
+
+void Metadata::SetFanart(const QString &fanart)
+{
+    m_imp->SetFanart(fanart);
+}
+
+const QString &Metadata::GetCategory() const
+{
+    return m_imp->GetCategory();
+}
+
+//void Metadata::SetCategory(const QString &category)
 //{
-//    m_imp->setCategory(category);
+//    m_imp->SetCategory(category);
 //}
 
-const Metadata::genre_list &Metadata::Genres() const
+const Metadata::genre_list &Metadata::GetGenres() const
 {
     return m_imp->getGenres();
 }
 
-void Metadata::setGenres(const genre_list &genres)
+void Metadata::SetGenres(const genre_list &genres)
 {
-    m_imp->setGenres(genres);
+    m_imp->SetGenres(genres);
 }
 
-const Metadata::cast_list &Metadata::getCast() const
+const Metadata::cast_list &Metadata::GetCast() const
 {
     return m_imp->GetCast();
 }
 
-void Metadata::setCast(const cast_list &cast)
+void Metadata::SetCast(const cast_list &cast)
 {
     m_imp->SetCast(cast);
 }
 
-const Metadata::country_list &Metadata::Countries() const
+const Metadata::country_list &Metadata::GetCountries() const
 {
-    return m_imp->getCountries();
+    return m_imp->GetCountries();
 }
 
-void Metadata::setCountries(const country_list &countries)
+void Metadata::SetCountries(const country_list &countries)
 {
-    m_imp->setCountries(countries);
+    m_imp->SetCountries(countries);
 }
 
-int Metadata::getCategoryID() const
+int Metadata::GetCategoryID() const
 {
-    return m_imp->getCategoryID();
+    return m_imp->GetCategoryID();
 }
 
-void Metadata::setCategoryID(int id)
+void Metadata::SetCategoryID(int id)
 {
-    m_imp->setCategoryID(id);
+    m_imp->SetCategoryID(id);
 }
 
-void Metadata::dumpToDatabase()
+void Metadata::SaveToDatabase()
 {
-    m_imp->dumpToDatabase();
+    m_imp->SaveToDatabase();
 }
 
-void Metadata::updateDatabase()
+void Metadata::UpdateDatabase()
 {
-    m_imp->updateDatabase();
+    m_imp->UpdateDatabase();
+}
+
+bool Metadata::DeleteFromDatabase()
+{
+    return m_imp->DeleteFromDatabase();
 }
 
 #if 0
@@ -1109,7 +1183,7 @@ bool Metadata::fillDataFromID(const MetadataListManager &cache)
 }
 #endif
 
-bool Metadata::fillDataFromFilename(const MetadataListManager &cache)
+bool Metadata::FillDataFromFilename(const MetadataListManager &cache)
 {
     if (m_imp->getFilename().isEmpty())
         return false;
@@ -1125,14 +1199,9 @@ bool Metadata::fillDataFromFilename(const MetadataListManager &cache)
     return false;
 }
 
-bool Metadata::deleteFile(class VideoList &dummy)
+bool Metadata::DeleteFile(class VideoList &dummy)
 {
-    return m_imp->deleteFile(dummy);
-}
-
-bool Metadata::dropFromDB()
-{
-    return m_imp->dropFromDB();
+    return m_imp->DeleteFile(dummy);
 }
 
 void Metadata::Reset()
@@ -1140,16 +1209,21 @@ void Metadata::Reset()
     m_imp->Reset();
 }
 
+bool Metadata::IsHostSet() const
+{
+    return m_imp->IsHostSet();
+}
+
 bool operator==(const Metadata& a, const Metadata& b)
 {
-    if (a.Filename() == b.Filename())
+    if (a.GetFilename() == b.GetFilename())
         return true;
     return false;
 }
 
 bool operator!=(const Metadata& a, const Metadata& b)
 {
-    if (a.Filename() != b.Filename())
+    if (a.GetFilename() != b.GetFilename())
         return true;
     return false;
 }

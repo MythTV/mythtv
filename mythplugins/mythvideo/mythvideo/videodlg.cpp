@@ -693,8 +693,8 @@ namespace
 
             VideoPlayerCommand::PlayerFor(item.get()).Play();
 
-            if (item->ChildID() > 0)
-                item = video_list.byID(item->ChildID());
+            if (item->GetChildID() > 0)
+                item = video_list.byID(item->GetChildID());
             else
                 break;
         }
@@ -778,36 +778,95 @@ namespace
 
         if (metadata)
         {
-            const QString coverfile = metadata->CoverFile();
+            QString coverfile;
+            if (metadata->IsHostSet() && !metadata->GetCoverFile().startsWith("/"))
+            {
+                coverfile = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                        metadata->GetCoverFile());
+            }
+            else
+            {
+                coverfile = metadata->GetCoverFile();
+            }
+
             if (!IsDefaultCoverFile(coverfile))
                 tmp["coverimage"] = coverfile;
 
             tmp["coverfile"] = coverfile;
 
+            QString screenshotfile;
+            if (metadata->IsHostSet() &&
+                    !metadata->GetScreenshot().startsWith("/"))
+            {
+                screenshotfile = GenRemoteFileURL("Screenshots",
+                        metadata->GetHost(), metadata->GetScreenshot());
+            }
+            else
+            {
+                screenshotfile = metadata->GetScreenshot();
+            }
+
+            if (!IsDefaultScreenshot(screenshotfile))
+                tmp["screenshot"] = screenshotfile;
+
+            tmp["screenshotfile"] = screenshotfile;
+
+            QString bannerfile;
+            if (metadata->IsHostSet() && !metadata->GetBanner().startsWith("/"))
+            {
+                bannerfile = GenRemoteFileURL("Banners", metadata->GetHost(),
+                        metadata->GetBanner());
+            }
+            else
+            {
+                bannerfile = metadata->GetBanner();
+            }
+
+            if (!IsDefaultBanner(bannerfile))
+                tmp["banner"] = bannerfile;
+
+            tmp["bannerfile"] = bannerfile;
+
+            QString fanartfile;
+            if (metadata->IsHostSet() && !metadata->GetFanart().startsWith("/"))
+            {
+                fanartfile = GenRemoteFileURL("Fanart", metadata->GetHost(),
+                        metadata->GetFanart());
+            }
+            else
+            {
+                fanartfile = metadata->GetFanart();
+            }
+
+            if (!IsDefaultFanart(fanartfile))
+                tmp["fanart"] = fanartfile;
+
+            tmp["fanartfile"] = fanartfile;
+
             tmp["video_player"] = VideoPlayerCommand::PlayerFor(metadata)
                     .GetCommandDisplayName();
-            tmp["player"] = metadata->PlayCommand();
+            tmp["player"] = metadata->GetPlayCommand();
 
-            tmp["filename"] = metadata->Filename();
-            tmp["title"] = metadata->Title();
-            tmp["director"] = metadata->Director();
-            tmp["plot"] = metadata->Plot();
+            tmp["filename"] = metadata->GetFilename();
+            tmp["title"] = metadata->GetTitle();
+            tmp["director"] = metadata->GetDirector();
+            tmp["plot"] = metadata->GetPlot();
             tmp["genres"] = GetDisplayGenres(*metadata);
             tmp["countries"] = GetDisplayCountries(*metadata);
             tmp["cast"] = GetDisplayCast(*metadata).join(", ");
-            tmp["rating"] = GetDisplayRating(metadata->Rating());
-            tmp["length"] = GetDisplayLength(metadata->Length());
-            tmp["year"] = GetDisplayYear(metadata->Year());
-            tmp["userrating"] = GetDisplayUserRating(metadata->UserRating());
+            tmp["rating"] = GetDisplayRating(metadata->GetRating());
+            tmp["length"] = GetDisplayLength(metadata->GetLength());
+            tmp["year"] = GetDisplayYear(metadata->GetYear());
+            tmp["userrating"] = GetDisplayUserRating(metadata->GetUserRating());
 
             tmp["userratingstate"] =
-                    QString::number((int)(metadata->UserRating()));
-            tmp["videolevel"] = ParentalLevelToState(metadata->ShowLevel());
+                    QString::number((int)(metadata->GetUserRating()));
+            tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
 
-            tmp["inetref"] = metadata->InetRef();
-            tmp["child_id"] = QString::number(metadata->ChildID());
-            tmp["browseable"] = GetDisplayBrowse(metadata->Browse());
-            tmp["category"] = metadata->Category();
+            tmp["inetref"] = metadata->GetInetRef();
+            tmp["child_id"] = QString::number(metadata->GetChildID());
+            tmp["browseable"] = GetDisplayBrowse(metadata->GetBrowse());
+            tmp["category"] = metadata->GetCategory();
         }
 
         struct helper
@@ -837,8 +896,14 @@ namespace
         helper h(tmp, dest);
 
         h.handleImage("coverimage");
+        h.handleImage("screenshot");
+        h.handleImage("banner");
+        h.handleImage("fanart");
 
         h.handleText("coverfile");
+        h.handleText("screenshotfile");
+        h.handleText("bannerfile");
+        h.handleText("fanartfile");
         h.handleText("video_player");
         h.handleText("player");
         h.handleText("filename");
@@ -910,7 +975,7 @@ class ItemDetailPopup : public MythScreenType
   private slots:
     void OnPlay()
     {
-        PlayVideo(m_metadata->Filename(), m_listManager);
+        PlayVideo(m_metadata->GetFilename(), m_listManager);
     }
 
     void OnDone()
@@ -1039,13 +1104,13 @@ class VideoDialogPrivate
     {
         if (metadata && m_rating_to_pl.size())
         {
-            QString rating = metadata->Rating();
+            QString rating = metadata->GetRating();
             for (parental_level_map::const_iterator p = m_rating_to_pl.begin();
                     rating.length() && p != m_rating_to_pl.end(); ++p)
             {
                 if (rating.indexOf(p->first) != -1)
                 {
-                    metadata->setShowLevel(p->second);
+                    metadata->SetShowLevel(p->second);
                     break;
                 }
             }
@@ -1163,7 +1228,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     MythScreenType(lparent, lname), m_menuPopup(0), m_busyPopup(0),
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
-    m_parentalLevelState(0)
+    m_screenshot(0), m_banner(0), m_fanart(0), m_parentalLevelState(0)
 {
     m_d = new VideoDialogPrivate(video_list, type);
 
@@ -1241,6 +1306,9 @@ bool VideoDialog::Create()
     UIUtilW::Assign(this, m_crumbText, "breadcrumbs");
 
     UIUtilW::Assign(this, m_coverImage, "coverimage");
+    UIUtilW::Assign(this, m_screenshot, "screenshot");   
+    UIUtilW::Assign(this, m_banner, "banner");
+    UIUtilW::Assign(this, m_fanart, "fanart");
 
     UIUtilW::Assign(this, m_parentalLevelState, "parentallevel");
 
@@ -1369,7 +1437,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     MythUIButtonListItemCopyDest dest(item);
     CopyMetadataToUI(metadata, dest);
 
-    item->SetText(metadata ? metadata->Title() : node->getString());
+    item->SetText(metadata ? metadata->GetTitle() : node->getString());
 
     QString imgFilename = GetCoverImage(node);
 
@@ -1602,21 +1670,123 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             VERBOSE(VB_GENERAL, QString("Found Image : %1 :")
                                         .arg(icon_file));
         else
-            VERBOSE(VB_GENERAL, QString("Could not find folder cover Image : %1 ")
-                                        .arg(folder_path));
-
-
+            VERBOSE(VB_GENERAL,
+                    QString("Could not find folder cover Image : %1 ")
+                    .arg(folder_path));
     }
     else
     {
         const Metadata *metadata = GetMetadataPtrFromNode(node);
 
         if (metadata)
-            icon_file = metadata->CoverFile();
+        {
+            if (metadata->IsHostSet() && !metadata->GetCoverFile().startsWith("/"))
+            {
+                icon_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                        metadata->GetCoverFile());
+            }
+            else
+            {
+                icon_file = metadata->GetCoverFile();
+            }
+        }
     }
 
     if (IsDefaultCoverFile(icon_file))
         icon_file.clear();
+
+    return icon_file;
+}
+
+QString VideoDialog::GetScreenshot(MythGenericTree *node)
+{
+    const int nodeInt = node->getInt();
+
+    QString icon_file;
+
+    if (nodeInt  == kSubFolder || nodeInt == kUpFolder)  // subdirectory
+    {
+        icon_file = VIDEO_SCREENSHOT_DEFAULT;
+    }
+    else
+    {
+        const Metadata *metadata = GetMetadataPtrFromNode(node);
+
+        if (metadata)
+        {
+            if (metadata->IsHostSet() &&
+                    !metadata->GetScreenshot().startsWith("/"))
+            {
+                icon_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
+                        metadata->GetScreenshot());
+            }
+            else
+            {
+                icon_file = metadata->GetScreenshot();
+            }
+        }
+    }
+
+    if (IsDefaultScreenshot(icon_file))
+        icon_file.clear();
+
+    return icon_file;
+}
+
+QString VideoDialog::GetBanner(MythGenericTree *node)
+{
+    const int nodeInt = node->getInt();
+
+    if (nodeInt == kSubFolder || nodeInt == kUpFolder)
+        return QString();
+
+    QString icon_file;
+    const Metadata *metadata = GetMetadataPtrFromNode(node);
+
+    if (metadata)
+    {
+        if (metadata->IsHostSet() && !metadata->GetBanner().startsWith("/"))
+        {
+            icon_file = GenRemoteFileURL("Banners", metadata->GetHost(),
+                    metadata->GetBanner());
+        }
+        else
+        {
+            icon_file = metadata->GetBanner();
+        }
+
+        if (IsDefaultBanner(icon_file))
+            icon_file.clear();
+    }
+
+    return icon_file;
+}
+
+QString VideoDialog::GetFanart(MythGenericTree *node)
+{
+    const int nodeInt = node->getInt();
+
+    if (nodeInt  == kSubFolder || nodeInt == kUpFolder)  // subdirectory
+        return QString();
+
+    QString icon_file;
+    const Metadata *metadata = GetMetadataPtrFromNode(node);
+
+    if (metadata)
+    {
+        if (metadata->IsHostSet() && !metadata->GetFanart().startsWith("/"))
+        {
+            icon_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
+                    metadata->GetFanart());
+        }
+        else
+        {
+            icon_file = metadata->GetFanart();
+        }
+
+        if (IsDefaultFanart(icon_file))
+            icon_file.clear();
+    }
 
     return icon_file;
 }
@@ -1889,7 +2059,7 @@ void VideoDialog::InfoMenu()
     m_menuPopup->AddButton(tr("View Full Plot"), SLOT(ViewPlot()));
 
     Metadata *metadata = GetMetadata(GetItemCurrent());
-    if (metadata && metadata->getCast().size())
+    if (metadata && metadata->GetCast().size())
         m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
 
     m_menuPopup->AddButton(tr("Cancel"));
@@ -2064,7 +2234,7 @@ void VideoDialog::playVideo()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
-        PlayVideo(metadata->Filename(), m_d->m_videoList->getListCache());
+        PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
 }
 
 namespace
@@ -2133,7 +2303,7 @@ void VideoDialog::playVideoWithTrailers()
         VideoPlayerCommand::PlayerFor(trailer).Play();
     }
 
-    PlayVideo(metadata->Filename(), m_d->m_videoList->getListCache());
+    PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
 }
 
 void VideoDialog::playTrailer()
@@ -2210,7 +2380,7 @@ void VideoDialog::VideoSearch()
     Metadata *metadata = GetMetadata(GetItemCurrent());
 
     if (metadata)
-        StartVideoSearchByTitle(metadata->InetRef(), metadata->Title(),
+        StartVideoSearchByTitle(metadata->GetInetRef(), metadata->GetTitle(),
                                 metadata);
 }
 
@@ -2219,8 +2389,8 @@ void VideoDialog::ToggleBrowseable()
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
-        metadata->setBrowse(!metadata->Browse());
-        metadata->updateDatabase();
+        metadata->SetBrowse(!metadata->GetBrowse());
+        metadata->UpdateDatabase();
 
         refreshData();
     }
@@ -2232,17 +2402,17 @@ void VideoDialog::ToggleBrowseable()
 //     // modification on Cancel is seems anathema to me.
 //     Metadata *item = GetItemCurrent();
 //
-//     if (item && isDefaultCoverFile(item->CoverFile()))
+//     if (item && isDefaultCoverFile(item->GetCoverFile()))
 //     {
 //         QStringList search_dirs;
 //         search_dirs += m_artDir;
 //         QString cover_file;
 //
-//         if (GetLocalVideoPoster(item->InetRef(), item->Filename(),
+//         if (GetLocalVideoPoster(item->InetRef(), item->GetFilename(),
 //                                 search_dirs, cover_file))
 //         {
-//             item->setCoverFile(cover_file);
-//             item->updateDatabase();
+//             item->SetCoverFile(cover_file);
+//             item->UpdateDatabase();
 //             loadData();
 //         }
 //     }
@@ -2262,14 +2432,14 @@ void VideoDialog::OnParentalChange(int amount)
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
     {
-        ParentalLevel curshowlevel = metadata->ShowLevel();
+        ParentalLevel curshowlevel = metadata->GetShowLevel();
 
         curshowlevel += amount;
 
-        if (curshowlevel.GetLevel() != metadata->ShowLevel())
+        if (curshowlevel.GetLevel() != metadata->GetShowLevel())
         {
-            metadata->setShowLevel(curshowlevel.GetLevel());
-            metadata->updateDatabase();
+            metadata->SetShowLevel(curshowlevel.GetLevel());
+            metadata->UpdateDatabase();
             refreshData();
         }
     }
@@ -2366,7 +2536,7 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
     if (!metadata)
         return;
 
-    if (m_d->m_videoList->Delete(metadata->ID()))
+    if (m_d->m_videoList->Delete(metadata->GetID()))
         refreshData();
     else
     {
@@ -2390,13 +2560,13 @@ void VideoDialog::ResetMetadata()
         metadata->Reset();
 
         QString cover_file;
-        if (GetLocalVideoPoster(metadata->InetRef(), metadata->Filename(),
+        if (GetLocalVideoPoster(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_artDir), cover_file))
         {
-            metadata->setCoverFile(cover_file);
+            metadata->SetCoverFile(cover_file);
         }
 
-        metadata->updateDatabase();
+        metadata->UpdateDatabase();
 
         UpdateItem(item);
     }
@@ -2415,10 +2585,10 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
 
     QString cover_file;
 
-    if (GetLocalVideoPoster(metadata->InetRef(), metadata->Filename(),
+    if (GetLocalVideoPoster(metadata->GetInetRef(), metadata->GetFilename(),
                             search_dirs, cover_file))
     {
-        metadata->setCoverFile(cover_file);
+        metadata->SetCoverFile(cover_file);
         OnVideoPosterSetDone(metadata);
         return;
     }
@@ -2427,7 +2597,7 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
     VideoPosterSearch *vps = new VideoPosterSearch(this);
     connect(vps, SIGNAL(SigPosterURL(QString, Metadata *)),
             SLOT(OnPosterURL(QString, Metadata *)));
-    vps->Run(metadata->InetRef(), metadata);
+    vps->Run(metadata->GetInetRef(), metadata);
 }
 
 void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
@@ -2461,13 +2631,13 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
 
             QString ext = QFileInfo(url.path()).suffix();
             QString dest_file = QString("%1/%2.%3").arg(fileprefix)
-                    .arg(metadata->InetRef()).arg(ext);
+                    .arg(metadata->GetInetRef()).arg(ext);
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
             CoverDownloadProxy *d =
                     CoverDownloadProxy::Create(url, dest_file, metadata);
-            metadata->setCoverFile(dest_file);
+            metadata->SetCoverFile(dest_file);
 
             connect(d, SIGNAL(SigFinished(CoverDownloadErrorState,
                                           QString, Metadata *)),
@@ -2479,7 +2649,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
         }
         else
         {
-            metadata->setCoverFile("");
+            metadata->SetCoverFile("");
             OnVideoPosterSetDone(metadata);
         }
     }
@@ -2496,7 +2666,7 @@ void VideoDialog::OnPosterCopyFinished(CoverDownloadErrorState error,
                                        (src));
 
     if (error != esOK && item)
-        item->setCoverFile("");
+        item->SetCoverFile("");
 
     VERBOSE(VB_IMPORTANT, tr("Poster download finished: %1 %2")
             .arg(errorMsg).arg(error));
@@ -2520,7 +2690,7 @@ void VideoDialog::OnVideoPosterSetDone(Metadata *metadata)
         m_busyPopup = NULL;
     }
 
-    metadata->updateDatabase();
+    metadata->UpdateDatabase();
     UpdateItem(GetItemCurrent());
 }
 
@@ -2555,13 +2725,13 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
             data[(*p).section(':', 0, 0)] = (*p).section(':', 1);
         }
         // set known values
-        metadata->setTitle(data["Title"]);
-        metadata->setYear(data["Year"].toInt());
-        metadata->setDirector(data["Director"]);
-        metadata->setPlot(data["Plot"]);
-        metadata->setUserRating(data["UserRating"].toFloat());
-        metadata->setRating(data["MovieRating"]);
-        metadata->setLength(data["Runtime"].toInt());
+        metadata->SetTitle(data["Title"]);
+        metadata->SetYear(data["Year"].toInt());
+        metadata->SetDirector(data["Director"]);
+        metadata->SetPlot(data["Plot"]);
+        metadata->SetUserRating(data["UserRating"].toFloat());
+        metadata->SetRating(data["MovieRating"]);
+        metadata->SetLength(data["Runtime"].toInt());
 
         m_d->AutomaticParentalAdjustment(metadata);
 
@@ -2580,7 +2750,7 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
             }
         }
 
-        metadata->setCast(cast);
+        metadata->SetCast(cast);
 
         // Genres
         Metadata::genre_list video_genres;
@@ -2597,7 +2767,7 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
             }
         }
 
-        metadata->setGenres(video_genres);
+        metadata->SetGenres(video_genres);
 
         // Countries
         Metadata::country_list video_countries;
@@ -2615,15 +2785,15 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
             }
         }
 
-        metadata->setCountries(video_countries);
+        metadata->SetCountries(video_countries);
 
-        metadata->setInetRef(video_uid);
+        metadata->SetInetRef(video_uid);
         StartVideoPosterSet(metadata);
     }
     else
     {
         metadata->Reset();
-        metadata->updateDatabase();
+        metadata->UpdateDatabase();
         UpdateItem(GetItemCurrent());
     }
 }
@@ -2670,7 +2840,7 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
         if (results.begin().value().isEmpty())
         {
             metadata->Reset();
-            metadata->updateDatabase();
+            metadata->UpdateDatabase();
             UpdateItem(GetItemCurrent());
             return;
         }

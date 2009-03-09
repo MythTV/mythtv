@@ -45,12 +45,15 @@ class Metadata
   public:
     static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
     static QString FilenameToTitle(const QString &file_name);
-    static QString trimTitle(const QString &title, bool ignore_case);
+    static QString TrimTitle(const QString &title, bool ignore_case);
 
   public:
     Metadata(const QString &filename = QString(),
              const QString &trailer = QString(),
              const QString &coverfile = QString(),
+             const QString &screenshot = QString(),
+             const QString &banner = QString(),
+             const QString &fanart = QString(),
              const QString &title = QString(),
              int year = VIDEO_YEAR_DEFAULT,
              const QString &inetref = QString(),
@@ -76,91 +79,102 @@ class Metadata
     Metadata &operator=(const Metadata &rhs);
 
     // returns a string to use when sorting
-    bool hasSortKey() const;
-    const SortKey &getSortKey() const;
-    void setSortKey(const SortKey &sort_key);
+    bool HasSortKey() const;
+    const SortKey &GetSortKey() const;
+    void SetSortKey(const SortKey &sort_key);
 
-    const QString &getPrefix() const;
-    void setPrefix(const QString &prefix);
+    const QString &GetPrefix() const;
+    void SetPrefix(const QString &prefix);
 
-    const QString &Title() const;
-    void setTitle(const QString& title);
+    const QString &GetTitle() const;
+    void SetTitle(const QString& title);
 
-    int Year() const;
-    void setYear(int year);
+    int GetYear() const;
+    void SetYear(int year);
 
-    const QString &InetRef() const;
-    void setInetRef(const QString &inetRef);
+    const QString &GetInetRef() const;
+    void SetInetRef(const QString &inetRef);
 
-    const QString &Director() const;
-    void setDirector(const QString &director);
+    const QString &GetDirector() const;
+    void SetDirector(const QString &director);
 
-    const QString &Plot() const;
-    void setPlot(const QString &plot);
+    const QString &GetPlot() const;
+    void SetPlot(const QString &plot);
 
-    float UserRating() const;
-    void setUserRating(float userRating);
+    float GetUserRating() const;
+    void SetUserRating(float userRating);
 
-    const QString &Rating() const;
-    void setRating(const QString &rating);
+    const QString &GetRating() const;
+    void SetRating(const QString &rating);
 
-    int Length() const;
-    void setLength(int length);
+    int GetLength() const;
+    void SetLength(int length);
 
-    unsigned int ID() const;
-    void setID(int id);
+    unsigned int GetID() const;
+    void SetID(int id);
 
-    int ChildID() const;
-    void setChildID(int childID);
+    int GetChildID() const;
+    void SetChildID(int childID);
 
-    bool Browse() const;
-    void setBrowse(bool browse);
+    bool GetBrowse() const;
+    void SetBrowse(bool browse);
 
-    const QString &PlayCommand() const;
-    void setPlayCommand(const QString &playCommand);
+    const QString &GetPlayCommand() const;
+    void SetPlayCommand(const QString &playCommand);
 
-    ParentalLevel::Level ShowLevel() const;
-    void setShowLevel(ParentalLevel::Level showLevel);
+    ParentalLevel::Level GetShowLevel() const;
+    void SetShowLevel(ParentalLevel::Level showLevel);
 
-    const QString& Host() const;
-    void setHost(const QString &host);
+    const QString &GetHost() const;
+    void SetHost(const QString &host);
 
-    const QString& Filename() const;
-    void setFilename(const QString &filename);
+    const QString &GetFilename() const;
+    void SetFilename(const QString &filename);
 
     const QString &GetTrailer() const;
     void SetTrailer(const QString &trailer);
 
-    const QString &CoverFile() const;
-    void setCoverFile(const QString &coverFile);
+    const QString &GetCoverFile() const;
+    void SetCoverFile(const QString &coverFile);
 
-    const QString &Category() const;
+    const QString &GetScreenshot() const;
+    void SetScreenshot(const QString &screenshot);
 
-    const genre_list &Genres() const;
-    void setGenres(const genre_list &genres);
+    const QString &GetBanner() const;
+    void SetBanner(const QString &banner);
 
-    const cast_list &getCast() const;
-    void setCast(const cast_list &cast);
+    const QString &GetFanart() const;
+    void SetFanart(const QString &fanart);
 
-    const country_list &Countries() const;
-    void setCountries(const country_list &countries);
+    const QString &GetCategory() const;
 
-    int getCategoryID() const;
-    void setCategoryID(int id);
+    const genre_list &GetGenres() const;
+    void SetGenres(const genre_list &genres);
 
-    void dumpToDatabase();
-    void updateDatabase();
+    const cast_list &GetCast() const;
+    void SetCast(const cast_list &cast);
+
+    const country_list &GetCountries() const;
+    void SetCountries(const country_list &countries);
+
+    int GetCategoryID() const;
+    void SetCategoryID(int id);
+
+    void SaveToDatabase();
+    void UpdateDatabase();
+    // drops the metadata from the DB
+    bool DeleteFromDatabase();
+
 //    bool fillDataFromID(const MetadataListManager &cache);
-    bool fillDataFromFilename(const MetadataListManager &cache);
+    bool FillDataFromFilename(const MetadataListManager &cache);
 
     // If you aren't VideoList don't call this
-    bool deleteFile(class VideoList &dummy);
-
-    // drops the metadata from the DB
-    bool dropFromDB();
+    bool DeleteFile(class VideoList &dummy);
 
     /// Resets to default metadata
     void Reset();
+
+    bool IsHostSet() const;
 
   private:
     class MetadataImp *m_imp;
