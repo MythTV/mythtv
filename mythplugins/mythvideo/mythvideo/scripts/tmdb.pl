@@ -139,24 +139,26 @@ if ($xml->{"opensearch:totalResults"} > 0) {
         my $dc = 0;
         my $cc = 0;
         my $wc = 0;
-        my @castlist = @{$xml->{moviematches}->{movie}->{people}->{person}};
-        for (my $i = 0; $i < @castlist; $i++)
-        {
-            if ($castlist[$i]->{job} eq "actor")
+        if (exists $xml->{moviematches}->{movie}->{people}) {
+            my @castlist = @{$xml->{moviematches}->{movie}->{people}->{person}};
+            for (my $i = 0; $i < @castlist; $i++)
             {
-                $lcast[$cc++] = $castlist[$i]->{name};
-            }
+                if ($castlist[$i]->{job} eq "actor")
+                {
+                    $lcast[$cc++] = $castlist[$i]->{name};
+                }
 
-            if ($castlist[$i]->{job} eq "director")
-            {
-                $ldirector[$dc++] = $castlist[$i]->{name};
-            }
+                if ($castlist[$i]->{job} eq "director")
+                {
+                    $ldirector[$dc++] = $castlist[$i]->{name};
+                }
 
-            if ($castlist[$i]->{job} eq "writer")
-            {
-                $lwriter[$wc++] = $castlist[$i]->{name};
-            }
+                if ($castlist[$i]->{job} eq "writer")
+                {
+                    $lwriter[$wc++] = $castlist[$i]->{name};
+                }
 
+            }
         }
         my $cast     = join(',', @lcast);
         my $director = join(',', @ldirector);
