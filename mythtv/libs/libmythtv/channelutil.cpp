@@ -729,7 +729,7 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
 
     dvb_transportid = query.value(0).toUInt();
     dvb_networkid   = query.value(1).toUInt();
-    frequency       = (uint64_t) query.value(2).toDouble(); // Qt 3.1 compat
+    frequency       = query.value(2).toUInt();
     modulation      = query.value(3).toString();
     si_std          = query.value(4).toString();
 
