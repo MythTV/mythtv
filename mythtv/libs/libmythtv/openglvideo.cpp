@@ -1681,7 +1681,13 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
 uint OpenGLVideo::ParseOptions(QString options)
 {
     uint ret = kGLMaxFeat - 1;
-
+    // HACK START
+    // workaround serious performance issue on latest nvidia drivers (180.xx)
+    // if we use glFinish on Linux
+#ifdef __linux__
+    ret -= kGLFinish;
+#endif
+    // HACK END
     QStringList list = options.split(",");
 
     if (list.empty())
@@ -1695,8 +1701,12 @@ uint OpenGLVideo::ParseOptions(QString options)
 
         if (name == "opengloptions")
         {
+    // HACK START
+#ifndef __linux__
             if (opts.contains("nofinish"))
                 ret -= kGLFinish;
+#endif
+    // HACK END
             if (opts.contains("nofence"))
             {
                 ret -= kGLAppleFence;
