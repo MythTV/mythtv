@@ -19,12 +19,12 @@
         </imagetype>
 
         <buttonlist name="groups">
-            <area>12,58,1260,30</area>
+            <area>12,58,1268,30</area>
             <spacing>15</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
-            <buttonarea>0,0,1260,40</buttonarea>
+            <buttonarea>0,0,1268,40</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,240,40</area>
@@ -68,12 +68,12 @@
             <wrapstyle>items</wrapstyle>
             <scrollstyle>center</scrollstyle>
             <layout>horizontal</layout>
-            <spacing>0</spacing>
+            <spacing>1</spacing>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,14,256,262</area>
+                    <area>0,14,255,262</area>
                     <imagetype name="preview">
-                        <area>0,2,256,144</area>
+                        <area>0,2,255,144</area>
                         <filename></filename>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
@@ -127,7 +127,7 @@
                         <area>16,242,92,25</area>
                         <align>left</align>
                     </textarea>
-                    <textarea name="shortdate" from="starttime">
+                    <textarea name="startdate" from="starttime">
                         <area>108,242,132,25</area>
                         <align>right</align>
                     </textarea>
@@ -151,7 +151,7 @@
                     <textarea name="starttime">
                         <area>20,270,100,25</area>
                     </textarea>
-                    <textarea name="shortdate">
+                    <textarea name="startdate">
                         <area>130,270,138,25</area>
                     </textarea>
                     <statetype name="jobstate">

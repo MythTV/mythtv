@@ -849,112 +849,115 @@
 
     <window name="programlist">
 
-        <textarea name="sched" from="basetextarea">
-            <area>20,5,400,40</area>
-            <font>baselarge</font>
-            <align>left,bottom</align>
-            <value>Program Listings</value>
-        </textarea>
-        <textarea name="keyinstr" from="basetextarea">
-            <area>500,5,200,40</area>
-            <align>hcenter,bottom</align>
-            <value>(1)Time (2)Title</value>
-        </textarea>
-        <imagetype name="filler">
-            <filename>rk-background.png</filename>
-            <area>0,45,1280,420</area>
-        </imagetype>
+        <imagetype name="backdrop" from="basebackdrop" />
 
         <textarea name="curview" from="basetextarea">
-            <area>800,5,440,40</area>
+            <area>800,100,440,40</area>
             <align>right,bottom</align>
         </textarea>
 
         <buttonlist name="proglist" from="basebuttonlist2">
-            <area>25,57,1200,380</area>
-            <buttonarea>0,0,1200,380</buttonarea>
-            <statetype name="buttonitem">
-                <area>0,0,1200,25</area>
-                <state name="active">
-                    <textarea name="timedate" from="buttontext">
-                        <area>32,1,190,24</area>
-                    </textarea>
-                    <textarea name="channel" from="timedate">
-                        <area>240,1,190,24</area>
-                    </textarea>
-                    <textarea name="title" from="timedate">
-                        <area>440,1,640,24</area>
-                    </textarea>
-                    <textarea name="card" from="timedate">
-                        <area>1160,1,30,24</area>
-                    </textarea>
-                </state>
-                <state name="selected" from="active" />
-                <state name="inactive" from="active" />
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>1190,5</position>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>1190,350</position>
-            </statetype>
+            <area>64,30,600,680</area>
+            <buttonarea>0,0,580,680</buttonarea>
         </buttonlist>
 
-        <imagetype name="showinglines">
-            <position>0,45</position>
-            <filename>rk-lines.png</filename>
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="sched" from="baseheading">
+            <value>Program Listings</value>
+        </textarea>
+
+
+        <imagetype name="overviewbackground">
+            <position>680,123</position>
+            <filename>recordings/overviewbackground.png</filename>
+        </imagetype>
+
+        <textarea name="overviewlabel" from="basetextarea">
+            <area>700,130,490,40</area>
+            <font>baselarge</font>
+            <value>Schedules Overview</value>
+        </textarea>
+
+        <textarea name="statuslabel" from="basetextarea">
+            <area>700,183,160,30</area>
+            <font>basemedium</font>
+            <value>First Conflict:</value>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="status" from="basetextarea">
+            <area>870,183,380,30</area>
+            <font state="warning">basesmallred</font>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="filterlabel" from="statuslabel">
+            <position>700,223</position>
+            <value>Filter:</value>
+        </textarea>
+
+        <textarea name="filter" from="status">
+            <position>870,223</position>
+        </textarea>
+
+        <imagetype name="descriptionbackground">
+            <position>680,307</position>
+            <filename>recordings/upcomingdescriptionbackground.png</filename>
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>30,455,1200,50</area>
+            <area>700,315,490,40</area>
             <font>baselarge</font>
         </textarea>
+
+        <statetype name="userratingstate" from="baserating">
+            <position>1195,312</position>
+        </statetype>
+
         <textarea name="channel" from="basetextarea">
-            <area>30,495,360,30</area>
-        </textarea>
-        <textarea name="timedate" from="basetextarea">
-            <area>410,495,520,30</area>
-        </textarea>
-        <textarea name="description" from="basetextarea">
-            <area>30,525,1200,150</area>
-            <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"%\n%STARS%%DESCRIPTION%</value>
-        </textarea>
-        <textarea name="type" from="basetextarea">
-            <area>30,670,560,30</area>
-            <font>basemediumyellow</font>
-        </textarea>
-        <textarea name="programid" from="basetextarea">
-            <area>800,670,440,30</area>
+            <area>1030,370,195,30</area>
             <align>right</align>
         </textarea>
-        <textarea name="msg" from="basetextarea">
-            <area>0,210,1280,70</area>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>700,370,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>700,405,535,230</area>
+            <multiline>yes</multiline>
+            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
+        </textarea>
+
+        <textarea name="recordingstatus" from="basetextarea">
+            <area>700,640,420,30</area>
+        </textarea>
+
+        <textarea name="msg">
+            <area>20,75,1240,400</area>
+            <font>basemedium</font>
+            <value></value>
+            <multiline>yes</multiline>
             <align>allcenter</align>
             <value>No listings found for this program.</value>
-            <multiline>yes</multiline>
         </textarea>
 
     </window>
 
     <window name="progdetails">
 
-        <textarea name="title" from="basetextarea">
-            <area>80,20,720,40</area>
-            <font>baselarge</font>
-            <value>Program Details:</value>
-        </textarea>
-
-        <imagetype name="background">
-            <filename>pd-background.png</filename>
-            <position>60,60</position>
-        </imagetype>
+        <imagetype name="backdrop" from="basebackdrop" />
 
         <webbrowser name="browser">
-            <area>80,70,1094,555</area>
-            <zoom>1.0</zoom>
-            <background color="#000000" alpha="1"/>
+            <area>40,40,1200,645</area>
         </webbrowser>
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Program Details</value>
+        </textarea>
 
     </window>
 

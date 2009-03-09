@@ -469,7 +469,7 @@
                         <loadondemand>true</loadondemand>
                         <state name="DEFAULT">
                             <imagetype name="icon">
-                                <area>0,2,276,238</area>
+                                <area>0,3,276,238</area>
                                 <mask>menu/iconmask.png</mask>
                             </imagetype>
                         </state>
