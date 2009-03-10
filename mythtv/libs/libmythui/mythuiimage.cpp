@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QDir>
 #include <QDomDocument>
+#include <QImageReader>
 
 #include "mythverbose.h"
 
@@ -564,7 +565,34 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 bool MythUIImage::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "filename")
+    {
         m_OrigFilename = m_Filename = getFirstText(element);
+        if (m_Filename.endsWith("/"))
+        {
+            QDir imageDir(m_Filename);
+            if (!imageDir.exists())
+            {
+                QString themeDir = GetMythUI()->GetThemeDir() + "/";
+                imageDir = themeDir + m_Filename;
+            }
+            QStringList imageTypes;
+
+            QList< QByteArray > exts = QImageReader::supportedImageFormats();
+            QList< QByteArray >::Iterator it = exts.begin();
+            for (;it != exts.end();++it)
+            {
+                imageTypes.append( QString("*.").append(*it) );
+            }
+
+            imageDir.setNameFilters(imageTypes);
+
+            QStringList imageList = imageDir.entryList();
+            srand(time(NULL));
+            QString randFile = QString("%1%2").arg(m_Filename)
+                           .arg(imageList.takeAt(rand() % imageList.size())); 
+            m_OrigFilename = m_Filename = randFile;
+        }     
+    }
     else if (element.tagName() == "filepattern")
     {
         m_OrigFilename = m_Filename = getFirstText(element);
