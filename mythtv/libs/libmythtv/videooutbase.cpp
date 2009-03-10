@@ -886,8 +886,8 @@ void VideoOutput::ShutdownPipResize(void)
 
     if (pip_tmp_buf2)
     {
-        delete [] pip_tmp_buf;
-        pip_tmp_buf = NULL;
+        delete [] pip_tmp_buf2;
+        pip_tmp_buf2 = NULL;
     }
 
     if (pip_scaling_context)
