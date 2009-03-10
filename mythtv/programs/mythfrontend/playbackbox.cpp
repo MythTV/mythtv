@@ -405,6 +405,9 @@ bool PlaybackBox::Create()
     m_noRecordingsText = dynamic_cast<MythUIText *> (GetChild("norecordings"));
 
     m_previewImage = dynamic_cast<MythUIImage *>(GetChild("preview"));
+    m_fanart = dynamic_cast<MythUIImage *>(GetChild("fanart"));
+    m_banner = dynamic_cast<MythUIImage *>(GetChild("banner"));
+    m_coverart = dynamic_cast<MythUIImage *>(GetChild("coverart"));
 
     if (!m_recordingList || !m_groupList)
     {
@@ -541,6 +544,15 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     if (m_previewImage)
         m_previewImage->SetVisible(false);
 
+    if (m_fanart)
+        m_fanart->SetVisible(false);
+
+    if (m_banner)
+        m_banner->SetVisible(false);
+
+    if (m_coverart)
+        m_coverart->SetVisible(false);
+
     updateIcons();
 }
 
@@ -605,6 +617,42 @@ void PlaybackBox::UpdateProgramInfo(
             m_previewImage->SetVisible(!imagefile.isEmpty());
             m_previewImage->SetFilename(imagefile);
             m_previewImage->Load();
+        }
+
+        if (m_fanart)
+        {
+            QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
+            QString fanartTitle = pginfo->title;
+            QString fanartSeriesID = pginfo->seriesid;
+            QString fanartFile = testImageFiles(fanartDir, 
+                                                 fanartSeriesID, fanartTitle);
+            m_fanart->SetVisible(!fanartFile.isEmpty());
+            m_fanart->SetFilename(fanartFile);
+            m_fanart->Load();
+        }
+
+        if (m_banner)
+        {
+            QString bannerDir = gContext->GetSetting("mythvideo.bannerDir");
+            QString bannerTitle = pginfo->title;
+            QString bannerSeriesID = pginfo->seriesid;
+            QString bannerFile = testImageFiles(bannerDir,
+                                                 bannerSeriesID, bannerTitle);
+            m_banner->SetVisible(!bannerFile.isEmpty());
+            m_banner->SetFilename(bannerFile);
+            m_banner->Load();
+        }
+
+        if (m_coverart)
+        {
+            QString coverDir = gContext->GetSetting("VideoArtworkDir");
+            QString coverTitle = pginfo->title;
+            QString coverSeriesID = pginfo->seriesid;
+            QString coverFile = testImageFiles(coverDir,
+                                                 coverSeriesID, coverTitle);
+            m_coverart->SetVisible(!coverFile.isEmpty());
+            m_coverart->SetFilename(coverFile);
+            m_coverart->Load();
         }
 
         updateIcons(pginfo);
@@ -1806,6 +1854,84 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
 
     return result;
 }
+
+QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
+                                    QString &titleIn)
+{
+    QString foundFile;
+                
+    // Attempts to match image file in specified directory.
+    // Falls back like this:
+    //   
+    //     Pushing Daisies 5.png
+    //     PushingDaisies5.png
+    //     PushingDaisiesSeason5.png
+    //     Pushing Daisies Season 5 Episode 1.png
+    //     PuShinG DaisIES s05e01.png
+    //     etc. (you get it)
+    //
+    // Or any permutation thereof including -,_, or . instead of space
+    // Then, match by seriesid (for future PBB grabber):
+    //  
+    //     EP0012345.png
+    //
+    // Then, as a final fallback, match just title
+    //
+    //     Pushing Daisies.png (or Pushing_Daisies.png, etc.)
+    //      
+    // All this allows for grabber to grab an image with format:
+    //
+    //     Title SeasonNumber.ext or Title SeasonNum # Epnum #.ext
+    //     or SeriesID.ext or Title.ext (without caring about cases,
+    //     spaces, dashes, periods, or underscores)
+
+    QDir dir(testDirectory);
+    dir.setSorting(QDir::Name | QDir::Reversed | QDir::IgnoreCase);
+
+    QStringList entries = dir.entryList();
+
+    int regIndex = 0;
+    titleIn.replace(" ", "(?:\\s|-|_|\\.)?");
+    QString regs[] = {
+        QString("%1" // title
+            "(?:\\s|-|_|\\.)?" // optional separator
+            "(?:" // begin optional Season portion
+            "S(?:eason)?" // optional "S" or "Season"
+            "(?:\\s|-|_|\\.)?" // optional separator
+            ")?" // end optional Season portion
+            "[0-9]{1,3}" // number
+            "(?:" // begin optional Episode portion
+            "(?:\\s|-|_|\\.)?" // optional separator
+            "(?:x?" // optional "x"
+            "(?:\\s|-|_|\\.)?" // optional separator
+            "(?:E(?:pisode)?)?" // optional "E" or "Episode"
+            "(?:\\s|-|_|\\.)?)?" // optional separator
+            "[0-9]{1,3}" // number portion of optional Episode portion
+            ")?" // end optional Episode portion
+            "\\.(?:png|gif|jpg)" // file extension
+            ).arg(titleIn),
+        QString("%1\\.(?:png|jpg|gif)").arg(seriesID),
+        QString("%1\\.(?:png|jpg|gif)").arg(titleIn),
+        "" };  // This blank entry must exist, do not remove.
+
+    QString reg = regs[regIndex];
+    while ((!reg.isEmpty()) && (foundFile.isEmpty()))
+    {
+        QRegExp re(reg, Qt::CaseInsensitive);   
+        for (QStringList::const_iterator it = entries.begin();
+            it != entries.end(); ++it)
+        {
+            if (re.exactMatch(*it))
+            {
+                foundFile = *it;
+                break;
+            }
+        }   
+        reg = regs[++regIndex];
+    }
+ 
+    return QString("%1/%2").arg(testDirectory).arg(foundFile);
+}    
 
 void PlaybackBox::showActions(ProgramInfo *pginfo)
 {

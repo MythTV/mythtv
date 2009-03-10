@@ -293,6 +293,9 @@ class PlaybackBox : public MythScreenType
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);
 
+    QString testImageFiles(QString &testDirectory,
+                           QString &seriesID, QString &titleIn);
+
     void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);
     void updateUsage();
@@ -310,6 +313,9 @@ class PlaybackBox : public MythScreenType
     MythUIText *m_noRecordingsText;
 
     MythUIImage *m_previewImage;
+    MythUIImage *m_fanart;
+    MythUIImage *m_banner;
+    MythUIImage *m_coverart;
 
     QMap<QString, QString> m_currentMap;
 
