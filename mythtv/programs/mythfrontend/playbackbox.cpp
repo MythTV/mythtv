@@ -624,7 +624,7 @@ void PlaybackBox::UpdateProgramInfo(
             QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
             QString fanartTitle = pginfo->title;
             QString fanartSeriesID = pginfo->seriesid;
-            QString fanartFile = testImageFiles(fanartDir, 
+            QString fanartFile = testImageFiles(fanartDir,
                                                  fanartSeriesID, fanartTitle);
             m_fanart->SetVisible(!fanartFile.isEmpty());
             m_fanart->SetFilename(fanartFile);
@@ -1859,10 +1859,10 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
                                     QString &titleIn)
 {
     QString foundFile;
-                
+
     // Attempts to match image file in specified directory.
     // Falls back like this:
-    //   
+    //
     //     Pushing Daisies 5.png
     //     PushingDaisies5.png
     //     PushingDaisiesSeason5.png
@@ -1872,13 +1872,13 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
     //
     // Or any permutation thereof including -,_, or . instead of space
     // Then, match by seriesid (for future PBB grabber):
-    //  
+    //
     //     EP0012345.png
     //
     // Then, as a final fallback, match just title
     //
     //     Pushing Daisies.png (or Pushing_Daisies.png, etc.)
-    //      
+    //
     // All this allows for grabber to grab an image with format:
     //
     //     Title SeasonNumber.ext or Title SeasonNum # Epnum #.ext
@@ -1917,7 +1917,7 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
     QString reg = regs[regIndex];
     while ((!reg.isEmpty()) && (foundFile.isEmpty()))
     {
-        QRegExp re(reg, Qt::CaseInsensitive);   
+        QRegExp re(reg, Qt::CaseInsensitive);
         for (QStringList::const_iterator it = entries.begin();
             it != entries.end(); ++it)
         {
@@ -1926,12 +1926,12 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
                 foundFile = *it;
                 break;
             }
-        }   
+        }
         reg = regs[++regIndex];
     }
- 
+
     return QString("%1/%2").arg(testDirectory).arg(foundFile);
-}    
+}
 
 void PlaybackBox::showActions(ProgramInfo *pginfo)
 {
@@ -2698,6 +2698,20 @@ void PlaybackBox::popupString(ProgramInfo *program, QString &message)
 
 void PlaybackBox::doClearPlaylist(void)
 {
+    QStringList::Iterator it;
+    for (it = m_playList.begin(); it != m_playList.end(); ++it)
+    {
+        ProgramInfo *tmpItem = findMatchingProg(*it);
+
+        if (!tmpItem)
+            continue;
+
+        MythUIButtonListItem *item =
+                        m_recordingList->GetItemByData(qVariantFromValue(tmpItem));
+
+        if (item)
+            item->DisplayState("no", "playlist");
+    }
     m_playList.clear();
 }
 
@@ -2913,8 +2927,9 @@ void PlaybackBox::playlistDelete(bool forgetHistory)
             RemoteDeleteRecording(tmpItem, forgetHistory, false);
     }
 
-    m_connected = FillList(true);
     m_playList.clear();
+
+    m_connected = FillList(true);
 }
 
 void PlaybackBox::doUndelete(void)
@@ -4160,7 +4175,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
                 tmpItem->ApplyRecordRecGroupChange(newRecGroup);
             }
         }
-        m_playList.clear();
+        doClearPlaylist();
     }
     else
     {
@@ -4197,7 +4212,7 @@ void PlaybackBox::setPlayGroup(QString newPlayGroup)
             if (tmpItem)
                 tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
         }
-        m_playList.clear();
+        doClearPlaylist();
     }
     else if (tmpItem)
         tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
