@@ -4847,9 +4847,6 @@ void NuppelVideoPlayer::ClearAfterSeek(bool clearvideobuffers)
         QMutexLocker locker(&commBreakMapLock);
         SetCommBreakIter();
     }
-
-    if (player_ctx->tvchain)
-        player_ctx->tvchain->ClearSwitch();
 }
 
 void NuppelVideoPlayer::SetPlayerInfo(
