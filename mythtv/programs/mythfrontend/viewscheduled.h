@@ -51,6 +51,7 @@ class ViewScheduled : public MythScreenType
     void setShowAll(bool all);
     void viewCards(void);
     void viewInputs(void);
+    void showMenu(void);
 
     void EmbedTVWindow(void);
 

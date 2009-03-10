@@ -139,6 +139,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
 
         if (action == "INFO")
             edit();
+        else if (action == "MENU")
+            showMenu();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")
@@ -170,6 +172,37 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
     m_inEvent = false;
 
     return handled;
+}
+
+void ViewScheduled::showMenu(void)
+{
+    QString label = tr("Options");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "menu");
+
+        if (m_showAll)
+            menuPopup->AddButton(tr("Show Important"));
+        else
+            menuPopup->AddButton(tr("Show All"));
+        menuPopup->AddButton(tr("Program Details"));
+        menuPopup->AddButton(tr("Upcoming"));
+        menuPopup->AddButton(tr("Custom Edit"));
+        menuPopup->AddButton(tr("Delete Rule"));
+        menuPopup->AddButton(tr("Show Cards"));
+        menuPopup->AddButton(tr("Show Inputs"));
+        menuPopup->AddButton(tr("Cancel"));
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
 }
 
 void ViewScheduled::LoadList(void)
@@ -626,6 +659,7 @@ void ViewScheduled::customEvent(QEvent *event)
                                 dynamic_cast<DialogCompletionEvent*>(event);
 
         QString resultid= dce->GetId();
+        QString resulttext  = dce->GetResultText();
         int buttonnum  = dce->GetResult();
 
         if (resultid == "deleterule")
@@ -642,6 +676,44 @@ void ViewScheduled::customEvent(QEvent *event)
             }
 
             EmbedTVWindow();
+        }
+        else if (resultid == "menu")
+        {
+            if (resulttext == tr("Show Important"))
+            {
+                setShowAll(false);
+            }
+            else if (resulttext == tr("Show All"))
+            {
+                setShowAll(true);
+            }
+            else if (resulttext == tr("Program Details"))
+            {
+                details();
+            }
+            else if (resulttext == tr("Upcoming"))
+            {
+                upcoming();
+            }
+            else if (resulttext == tr("Custom Edit"))
+            {
+                customEdit();
+            }
+            else if (resulttext == tr("Delete Rule"))
+            {
+                deleteRule();
+            }
+            else if (resulttext == tr("Show Cards"))
+            {
+                viewCards();
+            }
+            else if (resulttext == tr("Show Inputs"))
+            {
+                viewInputs();
+            }
+
+            if (m_needFill)
+                LoadList();
         }
     }
 
