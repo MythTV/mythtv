@@ -177,7 +177,7 @@ class PlaybackBox : public MythScreenType
     void doEditScheduled();
     void doAllowRerecord();
 
-    void askDelete(ProgramInfo *pginfo = NULL);
+    void askDelete();
     void doUndelete();
     void doDelete();
     void doDeleteForgetHistory();
@@ -281,7 +281,7 @@ class PlaybackBox : public MythScreenType
                                   const QString &recstartts);
 
     bool doRemove(ProgramInfo *, bool forgetHistory, bool forceMetadataDelete);
-    void showDeletePopup(ProgramInfo *, deletePopupType);
+    void showDeletePopup(deletePopupType);
     void showActionPopup(ProgramInfo *program);
     void showFileNotFoundActionPopup(ProgramInfo *program);
     void popupString(ProgramInfo *program, QString &message);

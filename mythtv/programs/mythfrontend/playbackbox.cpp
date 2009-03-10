@@ -877,7 +877,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
         QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
         QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
-        QString tempTime      = ((*it)->recstartts).toString(m_formatTime);
 
         QString state = ((*it)->recstatus == rsRecording) ?
             QString("running") : QString::null;
@@ -903,7 +902,8 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         (*it)->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
-        item->SetText(tempSubTitle,       "titlesubtitle", state);
+        if (groupname == (*it)->title.toLower())
+            item->SetText(tempSubTitle,       "titlesubtitle", state);
         item->SetText(tempLongDate,       "longdate",      state);
         item->SetText(tempShortDate,      "shortdate",     state);
 
@@ -1486,9 +1486,6 @@ void PlaybackBox::playSelected(MythUIButtonListItem *item)
     else
         showAvailablePopup(pginfo);
 
-    if (m_player)
-    {
-    }
 }
 
 void PlaybackBox::stopSelected()
@@ -1511,19 +1508,26 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
+    if (m_delItem)
+    {
+        delete m_delItem;
+        m_delItem = NULL;
+    }
+
+    m_delItem = new ProgramInfo(*pginfo);
+
     bool undelete_possible =
             gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
 
     if (pginfo->recgroup == "Deleted" && undelete_possible)
     {
-        m_delItem = pginfo;
-        doRemove(pginfo, false, false);
+        doRemove(m_delItem, false, false);
     }
-    else if ((pginfo->availableStatus != asPendingDelete) &&
-        (REC_CAN_BE_DELETED(pginfo)))
-        askDelete(pginfo);
+    else if ((m_delItem->availableStatus != asPendingDelete) &&
+        (REC_CAN_BE_DELETED(m_delItem)))
+        askDelete();
     else
-        showAvailablePopup(pginfo);
+        showAvailablePopup(m_delItem);
 }
 
 void PlaybackBox::upcoming()
@@ -1763,34 +1767,42 @@ void PlaybackBox::stop(ProgramInfo *rec)
 bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
                            bool forceMetadataDelete)
 {
-    m_delItem = NULL;
+    ProgramInfo *delItem = findMatchingProg(rec);
 
-    if (!rec)
+    if (!delItem)
         return false;
 
     if (!forceMetadataDelete &&
-        ((rec->availableStatus == asPendingDelete) ||
-        (!REC_CAN_BE_DELETED(rec))))
+        ((delItem->availableStatus == asPendingDelete) ||
+        (!REC_CAN_BE_DELETED(delItem))))
     {
-        showAvailablePopup(rec);
+        showAvailablePopup(m_delItem);
         return false;
     }
 
-    if (m_playList.filter(rec->MakeUniqueKey()).size())
-        togglePlayListItem(rec);
+    if (m_playList.filter(delItem->MakeUniqueKey()).size())
+        togglePlayListItem(delItem);
 
     if (!forceMetadataDelete)
-        rec->UpdateLastDelete(true);
+        delItem->UpdateLastDelete(true);
 
-    bool result = RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
+    bool result = RemoteDeleteRecording(delItem, forgetHistory,
+                                        forceMetadataDelete);
 
     if (result)
     {
-        rec->availableStatus = asPendingDelete;
-        m_recordingList->RemoveItem(m_recordingList->GetItemCurrent());
+        delItem->availableStatus = asPendingDelete;
+        m_recordingList->RemoveItem(
+                        m_recordingList->GetItemByData(qVariantFromValue(delItem)));
+
+        if (m_delItem)
+        {
+            delete m_delItem;
+            m_delItem = NULL;
+        }
     }
     else if (!forceMetadataDelete)
-        showDeletePopup(rec, ForceDeleteRecording);
+        showDeletePopup(ForceDeleteRecording);
 
     return result;
 }
@@ -1836,7 +1848,7 @@ void PlaybackBox::doPIPPlay(PIPState state)
     }
 }
 
-void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
+void PlaybackBox::showDeletePopup(deletePopupType types)
 {
     if (m_popupMenu)
         return;
@@ -1854,7 +1866,8 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              label = tr("Are you sure you want to stop:"); break;
     }
 
-    m_delItem = CurrentItem();
+    if (!m_delItem)
+        m_delItem = new ProgramInfo(*(CurrentItem()));
 
     popupString(m_delItem, label);
 
@@ -1878,8 +1891,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     const char *tmpslot = NULL;
 
     if ((types == DeleteRecording) &&
-        (program->IsSameProgram(*program)) &&
-        (program->recgroup != "LiveTV"))
+        (m_delItem->recgroup != "LiveTV"))
     {
         tmpmessage = tr("Yes, and allow re-record");
         tmpslot = SLOT(doDeleteForgetHistory());
@@ -1905,7 +1917,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     bool defaultIsYes = true;
     if ((types == DeleteRecording) ||
         (types == ForceDeleteRecording) ||
-        (!program->GetAutoExpireFromRecorded()))
+        (!m_delItem->GetAutoExpireFromRecorded()))
         defaultIsYes = false;
 
     m_popupMenu->AddButton(tmpmessage, tmpslot, false, defaultIsYes);
@@ -2584,7 +2596,16 @@ void PlaybackBox::doPlayListRandom(void)
 void PlaybackBox::askStop(void)
 {
     ProgramInfo *pginfo = CurrentItem();
-    showDeletePopup(pginfo, StopRecording);
+
+    if (m_delItem)
+    {
+        delete m_delItem;
+        m_delItem = NULL;
+    }
+
+    m_delItem = new ProgramInfo(*pginfo);
+
+    showDeletePopup(StopRecording);
 }
 
 void PlaybackBox::doStop(void)
@@ -2731,11 +2752,17 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
     }
 }
 
-void PlaybackBox::askDelete(ProgramInfo *pginfo)
+void PlaybackBox::askDelete()
 {
-    if (!pginfo)
-        pginfo = CurrentItem();
-    showDeletePopup(pginfo, DeleteRecording);
+    if (m_delItem)
+    {
+        delete m_delItem;
+        m_delItem = NULL;
+    }
+
+    m_delItem = new ProgramInfo(*(CurrentItem()));
+
+    showDeletePopup(DeleteRecording);
 }
 
 void PlaybackBox::doPlaylistDelete(void)
