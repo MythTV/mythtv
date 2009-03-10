@@ -4003,10 +4003,10 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     {
         long long seekloc = +1;
         ctx->LockDeleteNVP(__FILE__, __LINE__);
-        if (ctx->nvp && ctx->last_framerate)
+        if (ctx->nvp && ctx->last_framerate >= 0.0001f)
         {
-            seekloc = -ctx->nvp->GetFramesPlayed() /
-                (long long) ctx->last_framerate;
+            seekloc = (int64_t) (-1.0 * ctx->nvp->GetFramesPlayed() /
+                                 ctx->last_framerate);
         }
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
