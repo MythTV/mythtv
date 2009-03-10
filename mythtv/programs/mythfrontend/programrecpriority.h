@@ -38,7 +38,7 @@ class ProgramRecPriority : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-//    void customEvent(QEvent *event);
+    void customEvent(QEvent *event);
 
     enum SortType
     {
@@ -69,6 +69,9 @@ class ProgramRecPriority : public MythScreenType
     void deactivate();
     void upcoming();
     void details();
+
+    void showMenu(void);
+    void showSortMenu(void);
 
     QMap<QString, ProgramRecPriorityInfo> m_programData;
     QMap<QString, ProgramRecPriorityInfo*> m_sortedProgram;

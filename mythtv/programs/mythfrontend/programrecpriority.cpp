@@ -478,11 +478,14 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_sortType = byTitle;
             SortList();
         }
-        else if (action == "SELECT" || action == "MENU" ||
-                    action == "INFO")
+        else if (action == "SELECT" || action == "INFO")
         {
             saveRecPriority();
             edit(m_programList->GetItemCurrent());
+        }
+        else if (action == "MENU")
+        {
+            showMenu();
         }
         else if (action == "CUSTOMEDIT")
         {
@@ -509,6 +512,197 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
+}
+
+void ProgramRecPriority::showMenu(void)
+{
+    QString label = tr("Options");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "menu");
+
+        menuPopup->AddButton(tr("Increase Priority"));
+        menuPopup->AddButton(tr("Decrease Priority"));
+        menuPopup->AddButton(tr("Sort"), NULL, true);
+        menuPopup->AddButton(tr("Program Details"));
+        menuPopup->AddButton(tr("Upcoming"));
+        menuPopup->AddButton(tr("Custom Edit"));
+        menuPopup->AddButton(tr("Delete Rule"));
+        menuPopup->AddButton(tr("Cancel"));
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
+}
+
+void ProgramRecPriority::showSortMenu(void)
+{
+    QString label = tr("Sort Options");
+    
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+    
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "sortmenu");
+
+        menuPopup->AddButton(tr("Reverse Sort Order"));
+        menuPopup->AddButton(tr("Sort By Title"));
+        menuPopup->AddButton(tr("Sort By Priority"));
+        menuPopup->AddButton(tr("Sort By Type"));
+        menuPopup->AddButton(tr("Sort By Count"));
+        menuPopup->AddButton(tr("Sort By Record Count"));
+        menuPopup->AddButton(tr("Sort By Last Recorded"));
+        menuPopup->AddButton(tr("Sort By Average Delay"));
+        menuPopup->AddButton(tr("Cancel"));
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
+}
+
+void ProgramRecPriority::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        QString resulttext  = dce->GetResultText();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "menu")
+        {
+            if (resulttext == tr("Increase Priority"))
+            {
+                changeRecPriority(1);
+            }
+            else if (resulttext == tr("Decrease Priority"))
+            {
+                changeRecPriority(-1);
+            }
+            else if (resulttext == tr("Sort"))
+            {
+                showSortMenu();
+            }
+            else if (resulttext == tr("Program Details"))
+            {
+                details();
+            }
+            else if (resulttext == tr("Upcoming"))
+            {
+                saveRecPriority();
+                upcoming();
+            }
+            else if (resulttext == tr("Custom Edit"))
+            {
+                saveRecPriority();
+                customEdit();
+            }
+            else if (resulttext == tr("Delete Rule"))
+            {
+                saveRecPriority();
+                remove();
+            }
+        }
+        else if (resultid == "sortmenu")
+        {
+            if (resulttext == tr("Reverse Sort Order"))
+            {
+                m_reverseSort = !m_reverseSort;
+                SortList();
+            }
+            else if (resulttext == tr("Sort By Title"))
+            {
+                if (m_sortType != byTitle)
+                {
+                    m_sortType = byTitle;
+                    m_reverseSort = false;
+                }
+                else
+                    m_reverseSort = !m_reverseSort;
+                SortList();
+            }
+            else if (resulttext == tr("Sort By Priority"))
+            {
+                if (m_sortType != byRecPriority)
+                {
+                    m_sortType = byRecPriority;
+                    m_reverseSort = false;
+                }
+                else
+                    m_reverseSort = !m_reverseSort;
+                SortList();
+            }
+            else if (resulttext == tr("Sort By Type"))
+            {
+                if (m_sortType != byRecType)
+                {
+                    m_sortType = byRecType;
+                    m_reverseSort = false;
+                }
+                else
+                    m_reverseSort = !m_reverseSort;
+                SortList();
+            }
+            else if (resulttext == tr("Sort By Count"))
+            {
+                if (m_sortType != byCount)
+                {
+                    m_sortType = byCount;
+                    m_reverseSort = false;
+                }
+                else
+                {
+                    m_reverseSort = !m_reverseSort;
+                }
+                SortList();
+            }
+            else if (resulttext == tr("Sort By Record Count"))
+            {
+                if (m_sortType != byRecCount)
+                {
+                    m_sortType = byRecCount;
+                    m_reverseSort = false;
+                }
+                else
+                    m_reverseSort = !m_reverseSort;
+                SortList();
+            }
+            else if (resulttext == tr("Sort By Last Recorded"))
+            {
+                if (m_sortType != byLastRecord)
+                {
+                    m_sortType = byLastRecord;
+                    m_reverseSort = false;
+                }
+                else
+                    m_reverseSort = !m_reverseSort;
+                SortList();
+            }
+            else if (resulttext == tr("Sort By Average Delay"))
+            {
+                if (m_sortType != byAvgDelay)
+                {
+                    m_sortType = byAvgDelay;
+                    m_reverseSort = false;
+                }
+                else
+                    m_reverseSort = !m_reverseSort;
+                SortList();
+            }
+        }
+    }
 }
 
 void ProgramRecPriority::edit(MythUIButtonListItem *item)
