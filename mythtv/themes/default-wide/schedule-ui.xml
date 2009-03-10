@@ -119,16 +119,16 @@
             <statetype name="buttonitem">
                 <area>0,0,1200,25</area>
                 <state name="active">
-                    <textarea name="shorttimedate" from="buttontext">
+                    <textarea name="shortstarttimedate" from="buttontext">
                         <area>32,1,190,24</area>
                     </textarea>
-                    <textarea name="channel" from="shorttimedate">
+                    <textarea name="channel" from="shortstarttimedate">
                         <area>240,1,190,24</area>
                     </textarea>
-                    <textarea name="titlesubtitle" from="shorttimedate">
+                    <textarea name="titlesubtitle" from="shortstarttimedate">
                         <area>440,1,650,24</area>
                     </textarea>
-                    <textarea name="card" from="shorttimedate">
+                    <textarea name="card" from="shortstarttimedate">
                         <area>1160,1,30,24</area>
                     </textarea>
                 </state>
@@ -717,16 +717,16 @@
             <statetype name="buttonitem">
                 <area>0,0,1200,25</area>
                 <state name="active">
-                    <textarea name="time" from="buttontext">
+                    <textarea name="shortstarttimedate" from="buttontext">
                         <area>32,1,190,24</area>
                     </textarea>
-                    <textarea name="channel" from="time">
+                    <textarea name="channel" from="shortstarttimedate">
                         <area>240,1,190,24</area>
                     </textarea>
-                    <textarea name="title" from="time">
+                    <textarea name="title" from="shortstarttimedate">
                         <area>440,1,640,24</area>
                     </textarea>
-                    <textarea name="card" from="time">
+                    <textarea name="card" from="shortstarttimedate">
                         <area>1160,1,30,24</area>
                     </textarea>
                 </state>

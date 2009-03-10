@@ -117,16 +117,16 @@
             <statetype name="buttonitem">
                 <area>0,0,760,25</area>
                 <state name="active">
-                    <textarea name="shorttimedate" from="buttontext">
+                    <textarea name="shortstarttimedate" from="buttontext">
                         <area>32,1,148,24</area>
                     </textarea>
-                    <textarea name="channel" from="shorttimedate">
+                    <textarea name="channel" from="shortstarttimedate">
                         <area>190,1,140,24</area>
                     </textarea>
-                    <textarea name="title" from="shorttimedate">
+                    <textarea name="title" from="shortstarttimedate">
                         <area>340,1,380,24</area>
                     </textarea>
-                    <textarea name="card" from="shorttimedate">
+                    <textarea name="card" from="shortstarttimedate">
                         <area>730,1,30,24</area>
                     </textarea>
                 </state>
@@ -723,16 +723,16 @@
             <statetype name="buttonitem">
                 <area>0,0,760,25</area>
                 <state name="active">
-                    <textarea name="starttime" from="buttontext">
+                    <textarea name="shortstarttimedate" from="buttontext">
                         <area>32,1,148,24</area>
                     </textarea>
-                    <textarea name="channel" from="starttime">
+                    <textarea name="channel" from="shortstarttimedate">
                         <area>190,1,140,24</area>
                     </textarea>
-                    <textarea name="titlesubtitle" from="starttime">
+                    <textarea name="titlesubtitle" from="shortstarttimedate">
                         <area>340,1,380,24</area>
                     </textarea>
-                    <textarea name="card" from="starttime">
+                    <textarea name="card" from="shortstarttimedate">
                         <area>730,1,30,24</area>
                     </textarea>
                 </state>
