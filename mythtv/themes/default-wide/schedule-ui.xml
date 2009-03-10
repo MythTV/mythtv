@@ -851,16 +851,13 @@
                     <textarea name="buttontext">
                         <font>basesmallyellow</font>
                     </textarea>
+
                     <imagetype name="selectbar">
-                        <area>0,0,50,25</area>
-                        <filename>blank.png</filename>
+                        <filename></filename>
                     </imagetype>
+
                 </state>
-                <state name="inactive" from="selected">
-                    <textarea name="buttontext">
-                        <font>basesmall</font>
-                    </textarea>
-                </state>
+                <state name="inactive" from="active"/>
             </statetype>
             <statetype name="upscrollarrow">
                 <state type="off">
@@ -905,11 +902,7 @@
                         <font>basesmallyellow</font>
                     </textarea>
                 </state>
-                <state name="inactive" from="selected">
-                    <textarea name="buttontext">
-                        <font>basesmall</font>
-                    </textarea>
-                </state>
+                <state name="inactive" from="active"/>
             </statetype>
         </buttonlist>
 
@@ -925,9 +918,7 @@
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
-                    <imagetype name="selectbar"/>
-                </state>
+                <state name="selected" from="active"/>
                 <state name="inactive" from="active"/>
             </statetype>
         </buttonlist>
