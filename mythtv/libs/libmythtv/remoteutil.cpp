@@ -795,6 +795,11 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
             reclist->push_back(new ProgramInfo(*p));
     }
     
+    while (!info->empty())
+    {
+        delete info->back();
+        info->pop_back();
+    }
     if (info)
         delete info;
 
