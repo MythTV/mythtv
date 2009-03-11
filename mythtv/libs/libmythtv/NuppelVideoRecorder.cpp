@@ -662,8 +662,8 @@ void NuppelVideoRecorder::Initialize(void)
 
     audiobytes = 0;
 
-    InitFilters();
     InitBuffers();
+    InitFilters();
 }
 
 int NuppelVideoRecorder::AudioInit(bool skipdevice)
@@ -826,7 +826,7 @@ bool NuppelVideoRecorder::MJPEGInit(void)
 
 void NuppelVideoRecorder::InitFilters(void)
 {
-    int btmp;
+    int btmp = video_buffer_size;
     if (videoFilters)
         delete videoFilters;
 
