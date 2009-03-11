@@ -3271,8 +3271,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     }
     else
     {
-        if (player_ctx)
-            player_ctx->SetNVPChangingBuffers(true);
+        player_ctx->SetNVPChangingBuffers(true);
         GetDecoder()->SetReadAdjust(player_ctx->buffer->SetAdjustFilesize());
         GetDecoder()->SetWaitForChange();
     }
