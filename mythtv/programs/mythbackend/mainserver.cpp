@@ -2633,7 +2633,7 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
 
     VERBOSE(VB_FILE, QString("HandleSGGetFileList: group = %1  host = %2  path = %3 wanthost = %4").arg(groupname).arg(host).arg(path).arg(wantHost));
 
-    if (host == wantHost)
+    if (host.toLower() == wantHost.toLower())
     {
         StorageGroup sg(groupname, host);
         VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting local info"));
@@ -2681,7 +2681,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
 
     VERBOSE(VB_FILE, QString("HandleSGFileQuery: group = %1  host = %2  filename = %3 wanthost = %4").arg(groupname).arg(host).arg(filename).arg(wantHost));
 
-    if (host == wantHost)
+    if (host.toLower() == wantHost.toLower())
     {
         StorageGroup sg(groupname, host);
         VERBOSE(VB_FILE, QString("HandleSGFileQuery: Getting local info"));
@@ -4359,7 +4359,7 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->isSlaveBackend() &&
-            ((pbs->getHostname() == hostname) || (pbs->getIP() == hostname)))
+            ((pbs->getHostname().toLower() == hostname.toLower()) || (pbs->getIP() == hostname)))
         {
             sockListLock.unlock();
             pbs->UpRef();
