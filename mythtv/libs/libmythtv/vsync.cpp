@@ -376,8 +376,10 @@ OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
 OpenGLVideoSync::~OpenGLVideoSync()
 {
     VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- closing opengl vsync");
+#ifdef USING_OPENGL_VSYNC
     if (m_context)
         delete m_context;
+#endif
 }
 
 /** \fn OpenGLVideoSync::TryInit(void)
