@@ -26,8 +26,8 @@
     <!-- Colour variations on base fonts -->
     <font name="basesmallbrown" from="basesmall">
         <color>#484537</color>
-        <outlinecolor>#6C6753</outlinecolor>
-        <outlinesize>1</outlinesize>
+<!--        <outlinecolor>#6C6753</outlinecolor>
+        <outlinesize>1</outlinesize>-->
     </font>
 
     <font name="basesmallgrey" from="basesmall">
@@ -76,14 +76,14 @@
 
     <font name="basemediumbrown" from="basemedium">
         <color>#484537</color>
-        <outlinecolor>#6C6753</outlinecolor>
-        <outlinesize>1</outlinesize>
+<!--        <outlinecolor>#6C6753</outlinecolor>
+        <outlinesize>1</outlinesize>-->
     </font>
 
     <font name="baselargebrown" from="baselarge">
         <color>#484537</color>
-        <outlinecolor>#6C6753</outlinecolor>
-        <outlinesize>1</outlinesize>
+<!--        <outlinecolor>#6C6753</outlinecolor>
+        <outlinesize>1</outlinesize>-->
     </font>
 
     <textarea name="baseheading">
@@ -428,7 +428,7 @@
         </state>
         <state name="10" from="9" />
     </statetype>
-
+<!--
     <buttonlist name="basebuttonlist2">
         <area>64,97,600,610</area>
         <layout>vertical</layout>
@@ -558,12 +558,11 @@
             <state type="full">
             </state>
         </statetype>
-        </buttonlist>
+    </buttonlist>-->
 
     <imagetype name="basebackdrop">
         <area>0,39,1280,720</area>
         <crop>0,65,1280,646</crop>
-<!--        <filename>nature.jpg</filename>-->
     </imagetype>
 
     <imagetype name="basetopbar">

@@ -101,8 +101,8 @@
         </imagetype>
 
         <buttonlist name="menu">
-            <area>0,152,1280,300</area>
-            <buttonarea>0,0,1280,300</buttonarea>
+            <area>0,152,1280,310</area>
+            <buttonarea>0,0,1280,310</buttonarea>
             <wrapstyle>items</wrapstyle>
             <scrollstyle>center</scrollstyle>
             <layout>horizontal</layout>
@@ -110,10 +110,10 @@
             <statetype name="buttonitem">
                 <loadondemand>true</loadondemand>
                 <state name="active">
-                    <area>0,17,255,218</area>
+                    <area>0,17,255,300</area>
 
                     <textarea name="buttontext">
-                        <area>5,225,245,73</area>
+                        <area>5,225,245,75</area>
                         <align>allcenter</align>
                         <font>baselarge</font>
                         <multiline>yes</multiline>
@@ -458,10 +458,10 @@
                     </statetype>
                 </state>
                 <state name="selected" from="active">
-                    <area>-11,0,276,278</area>
+                    <area>-11,0,276,330</area>
 
                     <textarea name="buttontext">
-                        <area>5,250,266,73</area>
+                        <area>5,250,266,75</area>
                         <font>baselargebrown</font>
                     </textarea>
 
