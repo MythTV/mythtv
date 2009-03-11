@@ -948,7 +948,6 @@ namespace
                 && !metadata->GetCoverFile().startsWith("/"))
                 && (metadata->GetCoverFile() != "No Cover"))
             {
-		    VERBOSE(VB_GENERAL, "MOOO1");
                 coverfile = GenRemoteFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
             }
