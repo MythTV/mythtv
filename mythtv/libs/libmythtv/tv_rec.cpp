@@ -2844,8 +2844,8 @@ void TVRec::StopLiveTV(void)
     VERBOSE(VB_RECORD, LOC + "StopLiveTV(void) curRec: "<<curRecording
             <<" pseudoRec: "<<pseudoLiveTVRecording);
 
-    if (internalState == kState_None)
-        return; // already stopped
+    if (internalState != kState_WatchingLiveTV)
+        return;
 
     bool hadPseudoLiveTVRec = pseudoLiveTVRecording;
     CheckForRecGroupChange();
