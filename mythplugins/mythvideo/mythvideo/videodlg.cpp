@@ -944,8 +944,11 @@ namespace
         if (metadata)
         {
             QString coverfile;
-            if (metadata->IsHostSet() && !metadata->GetCoverFile().startsWith("/"))
+            if ((metadata->IsHostSet()
+                && !metadata->GetCoverFile().startsWith("/"))
+                && (metadata->GetCoverFile() != "No Cover"))
             {
+		    VERBOSE(VB_GENERAL, "MOOO1");
                 coverfile = GenRemoteFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
             }
@@ -1873,7 +1876,9 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
         if (metadata)
         {
-            if (metadata->IsHostSet() && !metadata->GetCoverFile().startsWith("/"))
+            if ((metadata->IsHostSet() 
+               && !metadata->GetCoverFile().startsWith("/")) 
+               && (metadata->GetCoverFile() != "No Cover"))
             {
                 icon_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
