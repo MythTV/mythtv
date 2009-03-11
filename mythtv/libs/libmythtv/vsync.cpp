@@ -40,7 +40,6 @@
 #endif
 
 #ifdef USING_OPENGL_VSYNC
-#include "util.h" // for MythTimer
 #include "util-opengl.h"
 #include "openglcontext.h"
 #endif // USING_OPENGL_VSYNC

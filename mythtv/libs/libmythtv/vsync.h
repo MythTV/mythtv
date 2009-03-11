@@ -25,13 +25,6 @@
 class VideoOutput;
 class OpenGLContext;
 
-typedef unsigned long GLXDrawable;
-#ifdef USING_OPENGL
-typedef struct __GLXcontextRec *GLXContext;
-#else
-typedef void *GLXContext;
-#endif
-
 extern bool tryingVideoSync;
 
 /** \class VideoSync
