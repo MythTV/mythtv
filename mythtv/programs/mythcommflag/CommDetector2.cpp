@@ -100,14 +100,14 @@ bool nuppelVideoPlayerInited(FrameAnalyzerItem &pass,
 
         if (ares == FrameAnalyzer::ANALYZE_FINISHED)
         {
-            pass.erase(iifa);
+            jjfa = pass.erase(iifa);
             finishedAnalyzers.push_back(fa);
             continue;
         }
 
         if (ares == FrameAnalyzer::ANALYZE_FATAL)
         {
-            pass.erase(iifa);
+            jjfa = pass.erase(iifa);
             deadAnalyzers.push_back(fa);
             continue;
         }
@@ -150,14 +150,14 @@ long long processFrame(FrameAnalyzerItem &pass,
 
         if (ares == FrameAnalyzer::ANALYZE_FINISHED)
         {
-            pass.erase(iifa);
+            jjfa = pass.erase(iifa);
             finishedAnalyzers.push_back(fa);
             continue;
         }
 
         if (ares == FrameAnalyzer::ANALYZE_FATAL)
         {
-            pass.erase(iifa);
+            jjfa = pass.erase(iifa);
             deadAnalyzers.push_back(fa);
             continue;
         }
@@ -166,7 +166,7 @@ long long processFrame(FrameAnalyzerItem &pass,
                     " %1::analyzeFrame: %2")
                 .arg(fa->name()).arg(ares));
 
-        pass.erase(iifa);
+        jjfa = pass.erase(iifa);
         deadAnalyzers.push_back(fa);
     }
 
