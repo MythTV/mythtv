@@ -708,22 +708,22 @@ bool SourceSetup::Create()
     SetFocusWidget(m_sourceList);
 
     connect(m_sourceList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(sourceListItemSelected(MythUIButtonListItem *)));
+            SLOT(sourceListItemSelected(MythUIButtonListItem *)));
 //     connect(m_sourceList, SIGNAL(TakingFocus()),
 //             this, SLOT(sourceListItemSelected()));
 
     // 12 Hour max interval
     m_updateSpinbox->SetRange(10, 720, 10);
     connect(m_updateSpinbox, SIGNAL(LosingFocus()),
-            this,  SLOT(updateSpinboxUpdate()));
+            SLOT(updateSpinboxUpdate()));
 
     // 2 Minute retrieval timeout max
     m_retrieveSpinbox->SetRange(10, 120, 5);
     connect(m_retrieveSpinbox, SIGNAL(LosingFocus()),
-            this, SLOT(retrieveSpinboxUpdate()));
+            SLOT(retrieveSpinboxUpdate()));
 
     m_finishButton->SetText(tr("Finish"));
-    connect(m_finishButton, SIGNAL(Clicked()), this, SLOT(saveData()));
+    connect(m_finishButton, SIGNAL(Clicked()), SLOT(saveData()));
 
     loadData();
 
@@ -776,8 +776,8 @@ void SourceSetup::saveData()
 {
     SourceListInfo *si = qVariantValue<SourceListInfo *>
                                     (m_sourceList->GetItemCurrent()->GetData());
-    si->update_timeout = m_updateSpinbox->GetItemCurrent()->GetText().toInt();
-    si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->GetText().toInt();
+    si->update_timeout = m_updateSpinbox->GetIntValue();
+    si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "UPDATE weathersourcesettings "
@@ -808,7 +808,7 @@ void SourceSetup::updateSpinboxUpdate()
     {
         SourceListInfo *si = qVariantValue<SourceListInfo *>
                                     (m_sourceList->GetItemCurrent()->GetData());
-        si->update_timeout = m_updateSpinbox->GetItemCurrent()->GetText().toInt();
+        si->update_timeout = m_updateSpinbox->GetIntValue();
     }
 }
 
@@ -818,7 +818,7 @@ void SourceSetup::retrieveSpinboxUpdate()
     {
         SourceListInfo *si = qVariantValue<SourceListInfo *>
                                     (m_sourceList->GetItemCurrent()->GetData());
-        si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->GetText().toInt();
+        si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
     }
 }
 
@@ -834,8 +834,8 @@ void SourceSetup::sourceListItemSelected(MythUIButtonListItem *item)
     if (!si)
         return;
 
-    m_updateSpinbox->MoveToNamedPosition(QString::number(si->update_timeout));
-    m_retrieveSpinbox->MoveToNamedPosition(QString::number(si->retrieve_timeout));
+    m_updateSpinbox->GetIntValue(si->update_timeout);
+    m_retrieveSpinbox->GetIntValue(si->retrieve_timeout);
     QString txt = tr("Author: ");
     txt += si->author;
     txt += "\n" + tr("Email: ") + si->email;
