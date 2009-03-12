@@ -98,7 +98,7 @@ sub TMDBAPIRequest($$) {
 
     my $request = join('/', $base_url, $relurl);
 
-    ${$queryargs_hashref}{'api_key'} = $API_KEY;
+    $queryargs_hashref->{'api_key'} = $API_KEY;
     $request = $request . "?" . encode_args($queryargs_hashref);
 
     if (defined $opt_d) { printf("# request: '%s'\n", $request); }
@@ -134,17 +134,17 @@ sub getMovieData {
             ForceArray => ['category', 'production_countries'],
             KeyAttr => ['key', 'id']);
 
-        my $movie = \$xml->{moviematches}->{movie};
-        my $title       = $$movie->{title};
-        my $releasedate = $$movie->{release};
+        my $movie = $xml->{moviematches}->{movie};
+        my $title       = $movie->{title};
+        my $releasedate = $movie->{release};
         my $year        = substr($releasedate, 0, 4);
-        my $plot        = $$movie->{short_overview};
-        my $userrating  = $$movie->{rating};
-        my $runtime     = $$movie->{runtime};
-        my $budget      = $$movie->{budget};
-        my $revenue     = $$movie->{revenue};
-        my $trailer     = $$movie->{trailer}->{content};
-        my $homepage    = $$movie->{homepage};
+        my $plot        = $movie->{short_overview};
+        my $userrating  = $movie->{rating};
+        my $runtime     = $movie->{runtime};
+        my $budget      = $movie->{budget};
+        my $revenue     = $movie->{revenue};
+        my $trailer     = $movie->{trailer}->{content};
+        my $homepage    = $movie->{homepage};
 
         # Country
         my @countrylist =
@@ -272,8 +272,7 @@ sub getMovieBackdrop {
 
         $xml = XMLin($response, ForceArray=> [], KeyAttr => ['key', 'id']);
 
-        foreach my $backdrop (@{$xml->{moviematches}->{movie}->{backdrop}})
-        {
+        foreach my $backdrop (@{$xml->{moviematches}->{movie}->{backdrop}}) {
             # print "$backdrop->{content}\n";
 
             if ($backdrop->{size} eq "original")
@@ -307,8 +306,7 @@ sub getMovieList {
     if ($xml->{"opensearch:totalResults"} > 0) {
         my @movies;
 
-        foreach my $movie (@{$xml->{moviematches}->{movie}})
-        {
+        foreach my $movie (@{$xml->{moviematches}->{movie}}) {
             if ($movie->{type} ne 'movie') {
                 next;
             }
@@ -360,7 +358,7 @@ if (defined $opt_D) {
     getMoviePoster($movieid);
 } elsif (defined $opt_B) {
     # take movieid from cmdline arg
-    my $movieid = shift || die "Usage : $0 -P <movieid>\n";
+    my $movieid = shift || die "Usage : $0 -B <movieid>\n";
     getMovieBackdrop($movieid);
 } elsif (defined $opt_M) {
     # take query from cmdline arg
