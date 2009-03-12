@@ -579,7 +579,6 @@ void ProgramRecPriority::customEvent(QEvent *event)
 
         QString resultid= dce->GetId();
         QString resulttext  = dce->GetResultText();
-        int buttonnum  = dce->GetResult();
 
         if (resultid == "menu")
         {

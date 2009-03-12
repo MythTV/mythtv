@@ -24,7 +24,6 @@ using namespace std;
 #include "progfind.h"
 #include "manualschedule.h"
 #include "playbackbox.h"
-#include "previouslist.h"
 #include "customedit.h"
 #include "viewscheduled.h"
 #include "programrecpriority.h"
@@ -354,8 +353,12 @@ void startDelete(void)
 
 void startPrevious(void)
 {
-    PreviousList previous(gContext->GetMainWindow(), "previous list");
-    previous.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack);
+    if (pl->Create())
+        mainStack->AddScreen(pl);
+    else
+        delete pl;
 }
 
 void startCustomEdit(void)

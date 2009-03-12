@@ -697,16 +697,18 @@
     <window name="programlist">
 
         <textarea name="sched" from="basetextarea">
-            <area>20,5,245,40</area>
+            <area>20,5,380,40</area>
             <font>baselarge</font>
             <align>left,bottom</align>
             <value>Program Listings</value>
         </textarea>
+        <!--
         <textarea name="keyinstr" from="basetextarea">
             <area>260,5,180,40</area>
             <align>hcenter,bottom</align>
             <value>(1)Time (2)Title</value>
         </textarea>
+        -->
         <imagetype name="filler">
             <filename>rk-background.png</filename>
             <position>0,45</position>

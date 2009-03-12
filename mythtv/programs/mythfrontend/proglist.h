@@ -26,7 +26,8 @@ enum ProgListType {
     plChannel,
     plTime,
     plRecordid,
-    plStoredSearch
+    plStoredSearch,
+    plPreviouslyRecorded
 };
 
 class MythUIText;
@@ -178,11 +179,13 @@ class ProgLister : public MythScreenType
   public:
     ProgLister(MythScreenStack *parent, ProgListType pltype,
                const QString &view, const QString &from);
+    ProgLister(MythScreenStack *parent, int recid = 0, 
+               const QString &title = "");
     ~ProgLister();
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
+    void customEvent(QEvent *);
 
   protected slots:
     void Init(void);
@@ -192,13 +195,19 @@ class ProgLister : public MythScreenType
     void select(void);
     void edit(void);
     void customEdit(void);
-    void remove(void);
+    void deleteItem(void);
+    void deleteRule(void);
+    void deleteOldRecorded(void);
     void upcoming(void);
     void details(void);
     void chooseView(void);
     void updateInfo(MythUIButtonListItem *item);
     void setViewFromList(QString item);
-    void doRemove(bool ok);
+    void doDeleteRule(bool ok);
+    void doDeleteOldRecorded(void);
+
+    void showMenu(void);
+    void showSortMenu();
 
   protected:
     void quickRecord(void);
@@ -214,6 +223,8 @@ class ProgLister : public MythScreenType
     void updateKeywordInDB(const QString &text, const QString &oldValue);
 
     ProgListType m_type;
+    int          m_recid;
+    QString      m_title;
     QString      m_addTables;
     QDateTime    m_startTime;
     QDateTime    m_searchTime;
