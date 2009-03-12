@@ -168,28 +168,32 @@ void startDatabaseTree(void)
     gPlayer->constructPlaylist();
 }
 
-bool startRipper(void)
+void startRipper(void)
 {
-#ifndef USING_MINGW
-    Ripper rip(chooseCD(), gContext->GetMainWindow(), "cd ripper");
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    rip.exec();
-    if (rip.somethingWasRipped())
-        return true;
-#endif
-    return false;
+    Ripper *rip = new Ripper(mainStack, chooseCD());
+
+    if (rip->Create())
+        mainStack->AddScreen(rip);
+    else
+        delete rip;
+
+//   connect(rip, SIGNAL(Success()), SLOT(RebuildMusicTree()));
 }
 
-bool startImport(void)
+void startImport(void)
 {
-#ifndef USING_MINGW
-    ImportMusicDialog import(gContext->GetMainWindow(), "import music");
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    import.exec();
-    if (import.somethingWasImported())
-        return true;
-#endif
-    return false;
+    ImportMusicDialog *import = new ImportMusicDialog(mainStack);
+
+    if (import->Create())
+        mainStack->AddScreen(import);
+    else
+        delete import;
+
+//   connect(import, SIGNAL(Changed()), SLOT(RebuildMusicTree()));
 }
 
 void RebuildMusicTree(void)
@@ -225,18 +229,11 @@ void MusicCallback(void *data, QString &selection)
         startPlayback();
     else if (sel == "music_rip")
     {
-        if (startRipper())
-        {
-            // If startRipper returns true, then new data should be present
-
-            //  Tell the metadata to reset itself
-            RebuildMusicTree();
-        }
+        startRipper();
     }
     else if (sel == "music_import")
     {
-        if (startImport())
-            RebuildMusicTree();
+        startImport();
     }
     else if (sel == "settings_scan")
     {
@@ -553,18 +550,20 @@ void runMusicSelection(void)
 
 void runRipCD(void)
 {
-    gContext->addCurrentLocation("ripcd");
     preMusic();
-    if (startRipper())
-    {
-        // if startRipper returns true, then new files should be present
-        // so we should look for them.
-        FileScanner *fscan = new FileScanner();
-        fscan->SearchDir(gMusicData->startdir);
-        RebuildMusicTree();
-    }
-    postMusic();
-    gContext->removeCurrentLocation();
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    Ripper *rip = new Ripper(mainStack, chooseCD());
+
+    if (rip->Create())
+        mainStack->AddScreen(rip);
+    else
+        delete rip;
+
+//   connect(rip, SIGNAL(Success()), SLOT(RebuildMusicTree()));
+
+//     postMusic();
 }
 
 void runScan(void)

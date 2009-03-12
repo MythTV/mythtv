@@ -14,6 +14,7 @@
 #include "metaiotaglib.h"
 #include "treebuilders.h"
 #include "playlist.h"
+#include "playlistcontainer.h"
 
 
 // this is the global MusicData object shared thoughout MythMusic
@@ -44,11 +45,11 @@ static bool music_less_than(const MusicNode *itemA, const MusicNode *itemB)
 {
     QString title1 = itemA->getTitle().toLower();
     QString title2 = itemB->getTitle().toLower();
-    
+
     // Cut "the " off the front of titles
-    if (title1.left(4) == thePrefix) 
+    if (title1.left(4) == thePrefix)
         title1 = title1.mid(4);
-    if (title2.left(4) == thePrefix) 
+    if (title2.left(4) == thePrefix)
         title2 = title2.mid(4);
 
     return title1.localeAwareCompare(title2) < 0;
@@ -103,12 +104,12 @@ void Metadata::persist()
 
 int Metadata::compare(const Metadata *other) const
 {
-    if (m_format == "cast") 
+    if (m_format == "cast")
     {
         int artist_cmp = Artist().toLower().localeAwareCompare(
             other->Artist().toLower());
 
-        if (artist_cmp == 0) 
+        if (artist_cmp == 0)
             return Title().toLower().localeAwareCompare(
                 other->Title().toLower());
 
@@ -480,35 +481,35 @@ QString Metadata::m_formatcompilationcdtrack    = "TITLE (ARTIST)";
 void Metadata::setArtistAndTrackFormats()
 {
     QString tmp;
-    
+
     tmp = gContext->GetSetting("MusicFormatNormalFileArtist");
     if (!tmp.isEmpty())
         m_formatnormalfileartist = tmp;
-    
+
     tmp = gContext->GetSetting("MusicFormatNormalFileTrack");
     if (!tmp.isEmpty())
         m_formatnormalfiletrack = tmp;
-        
+
     tmp = gContext->GetSetting("MusicFormatNormalCDArtist");
     if (!tmp.isEmpty())
         m_formatnormalcdartist = tmp;
-        
+
     tmp = gContext->GetSetting("MusicFormatNormalCDTrack");
     if (!tmp.isEmpty())
         m_formatnormalcdtrack = tmp;
-        
+
     tmp = gContext->GetSetting("MusicFormatCompilationFileArtist");
     if (!tmp.isEmpty())
         m_formatcompilationfileartist = tmp;
-        
+
     tmp = gContext->GetSetting("MusicFormatCompilationFileTrack");
     if (!tmp.isEmpty())
         m_formatcompilationfiletrack = tmp;
-        
+
     tmp = gContext->GetSetting("MusicFormatCompilationCDArtist");
     if (!tmp.isEmpty())
         m_formatcompilationcdartist = tmp;
-        
+
     tmp = gContext->GetSetting("MusicFormatCompilationCDTrack");
     if (!tmp.isEmpty())
         m_formatcompilationcdtrack = tmp;
@@ -516,8 +517,8 @@ void Metadata::setArtistAndTrackFormats()
 
 
 bool Metadata::determineIfCompilation(bool cd)
-{ 
-    m_compilation = (!m_compilation_artist.isEmpty() 
+{
+    m_compilation = (!m_compilation_artist.isEmpty()
                    && m_artist != m_compilation_artist);
     setCompilationFormatting(cd);
     return m_compilation;
@@ -552,7 +553,7 @@ void Metadata::checkEmptyFields()
 inline void Metadata::setCompilationFormatting(bool cd)
 {
     QString format_artist, format_title;
-    
+
     if (!m_compilation
         || "" == m_compilation_artist
         || m_artist == m_compilation_artist)
@@ -612,7 +613,7 @@ void Metadata::setField(const QString &field, const QString &data)
         m_artist = data;
     // myth@colin.guthr.ie: Not sure what calls this method as I can't seem
     //                      to find anything that does!
-    //                      I've added the compilation_artist stuff here for 
+    //                      I've added the compilation_artist stuff here for
     //                      completeness.
     else if (field == "compilation_artist")
       m_compilation_artist = data;
@@ -716,7 +717,7 @@ QStringList Metadata::fillFieldList(QString field)
     }
     else if ("compilation_artist" == field)
     {
-        query.prepare("SELECT DISTINCT artist_name FROM music_artists, music_albums where "  
+        query.prepare("SELECT DISTINCT artist_name FROM music_artists, music_albums where "
                 "music_albums.artist_id=music_artists.artist_id ORDER BY artist_name");
     }
     else if ("album" == field)
@@ -877,7 +878,7 @@ MetadataLoadingThread::MetadataLoadingThread(AllMusic *parent_ptr)
 void MetadataLoadingThread::run()
 {
     //if you want to simulate a big music collection load
-    //sleep(3); 
+    //sleep(3);
     parent->resync();
 }
 
@@ -924,7 +925,7 @@ bool AllMusic::cleanOutThreads()
     //  If this is still running, the user
     //  probably selected mythmusic and then
     //  escaped out right away
-    
+
     if(m_metadata_loader->isFinished())
     {
         return true;
@@ -1064,10 +1065,10 @@ void AllMusic::resync()
     for (; it != m_all_music.end(); ++it)
         music_map[(*it)->ID()] = *it;
 
-    //  Build a tree to reflect current state of 
+    //  Build a tree to reflect current state of
     //  the metadata. Once built, sort it.
 
-    buildTree(); 
+    buildTree();
     //printTree();
     sortTree();
     //printTree();
@@ -1094,7 +1095,7 @@ void AllMusic::buildTree()
     //  build a tree (nodes, leaves, and all)
     //  that reflects the desired structure
     //  of the metadata. This is a structure
-    //  that makes it easy (and QUICK) to 
+    //  that makes it easy (and QUICK) to
     //  display metadata on (for example) a
     //  Select Music screen
     //
@@ -1141,7 +1142,7 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
         }
         QString title_temp = QString("%1 - %2").arg((*anit).Track()).arg(title_string);
         QString level_temp = QObject::tr("title");
-        CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp, 
+        CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp,
                                                 -(*anit).Track());
         new_item->setCheck(false); //  Avoiding -Wall
     }
@@ -1152,18 +1153,18 @@ QString AllMusic::getLabel(int an_id, bool *error_flag)
     QString a_label = "";
     if(an_id > 0)
     {
-   
+
         if (!music_map.contains(an_id))
         {
             a_label = QString(QObject::tr("Missing database entry: %1")).arg(an_id);
             *error_flag = true;
             return a_label;
         }
-      
+
         a_label += music_map[an_id]->FormatArtist();
         a_label += " ~ ";
         a_label += music_map[an_id]->FormatTitle();
-    
+
 
         if(a_label.length() < 1)
         {
@@ -1202,7 +1203,7 @@ Metadata* AllMusic::getMetadata(int an_id)
     {
         if (music_map.contains(an_id))
         {
-            return music_map[an_id];    
+            return music_map[an_id];
         }
     }
     else if(an_id < 0)
@@ -1227,7 +1228,7 @@ bool AllMusic::updateMetadata(int an_id, Metadata *the_track)
         if (mdata)
         {
             *mdata = the_track;
-            return true;    
+            return true;
         }
     }
     return false;
@@ -1279,7 +1280,7 @@ bool AllMusic::getCDMetadata(int the_track, Metadata *some_metadata)
             return true;
         }
 
-    }  
+    }
     return false;
 }
 
@@ -1298,8 +1299,8 @@ void AllMusic::setSorting(QString a_paths)
     {
         if (*it != "genre"        &&
             *it != "artist"       &&
-            *it != "splitartist"  && 
-            *it != "splitartist1" && 
+            *it != "splitartist"  &&
+            *it != "splitartist1" &&
             *it != "album"        &&
             *it != "title")
         {
@@ -1353,7 +1354,7 @@ void MusicNode::SetStaticData(const QString &startdir, const QString &paths)
     m_LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2);
     m_RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
 }
-    
+
 void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
 {
     TreeCheckItem *current_parent;
@@ -1378,18 +1379,18 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
         QString level_temp = QObject::tr("title");
         TreeCheckItem *new_item = new TreeCheckItem(
             current_parent, title_temp, level_temp, (*it)->ID());
-        new_item->setCheck(false); //  Avoiding -Wall     
-    }  
+        new_item->setCheck(false); //  Avoiding -Wall
+    }
 
     MusicNodePtrList::iterator mit = my_subnodes.begin();
     for (; mit != my_subnodes.end(); ++mit)
         (*mit)->putYourselfOnTheListView(current_parent, true);
-    
+
 }
 
 void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
 {
-    
+
     GenericTree *sub_node = tree_to_write_to->addNode(my_title);
     sub_node->setAttribute(0, 0);
     sub_node->setAttribute(1, a_counter);
@@ -1448,7 +1449,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         int integer_rating = (int) (4000001 - rating_value * 10000);
         subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order
         ++track_counter;
-    }  
+    }
 
     MusicNodePtrList::const_iterator sit = my_subnodes.begin();
     for (int another_counter = 0; sit != my_subnodes.end(); ++sit)
@@ -1470,7 +1471,7 @@ void MusicNode::sort()
 
     //  Sort any subnodes
     qStableSort(my_subnodes.begin(), my_subnodes.end(), music_less_than);
-    
+
     //  Tell any subnodes to sort themselves
     MusicNodePtrList::const_iterator sit = my_subnodes.begin();
     for (; sit != my_subnodes.end(); ++sit)

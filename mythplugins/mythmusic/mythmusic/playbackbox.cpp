@@ -93,7 +93,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     m_pushedButton = NULL;
 
-    // Through the magic of themes, our "GUI" already exists we just need to 
+    // Through the magic of themes, our "GUI" already exists we just need to
     // wire up it
 
     wireUpTheme();
@@ -119,7 +119,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     // Set some button values
 
-    if (!keyboard_accelerators) 
+    if (!keyboard_accelerators)
     {
         if (pledit_button)
             pledit_button->setText(tr("Edit Playlist"));
@@ -132,7 +132,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
             exit(0);
         }
     }
-    else 
+    else
     {
         if (pledit_button)
             pledit_button->setText(tr("3 Edit Playlist"));
@@ -145,19 +145,19 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         // Set please wait on the LCD
         QList<LCDTextItem> textItems;
 
-        textItems.append(LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
+        textItems.append(LCDTextItem(1, ALIGN_CENTERED, "Please Wait",
                          "Generic"));
         lcd->switchToGeneric(textItems);
     }
 
-    // We set a timer to load the playlists. We do this for two reasons: 
-    // (1) the playlists may not be fully loaded, and (2) even if they are 
-    // fully loaded, they do take a while to write out a GenericTree for 
+    // We set a timer to load the playlists. We do this for two reasons:
+    // (1) the playlists may not be fully loaded, and (2) even if they are
+    // fully loaded, they do take a while to write out a GenericTree for
     // navigation use, and that slows down the appearance of this dialog
     // if we were to do it right here.
 
     waiting_for_playlists_timer = new QTimer(this);
-    connect(waiting_for_playlists_timer, SIGNAL(timeout()), this, 
+    connect(waiting_for_playlists_timer, SIGNAL(timeout()), this,
             SLOT(checkForPlaylists()));
     waiting_for_playlists_timer->setSingleShot(true);
     waiting_for_playlists_timer->start(50);
@@ -173,7 +173,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     gPlayer->setVisual(mainvisual);
 
-    fullscreen_blank = false; 
+    fullscreen_blank = false;
 
     visual_modes = gContext->GetSetting("VisualMode")
         .split(';', QString::SkipEmptyParts);
@@ -280,21 +280,21 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 previous();
         }
         else if (action == "FFWD")
-        { 
+        {
             if (ff_button)
                 ff_button->push();
             else
                 seekforward();
         }
         else if (action == "RWND")
-        { 
+        {
             if (rew_button)
                 rew_button->push();
             else
                 seekback();
         }
         else if (action == "PAUSE")
-        { 
+        {
             if (gPlayer->isPlaying())
             {
                 if (pause_button)
@@ -311,7 +311,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             }
         }
         else if (action == "PLAY")
-        { 
+        {
             if (play_button)
                 play_button->push();
             else
@@ -357,11 +357,11 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "BLANKSCR")
             toggleFullBlankVisualizer();
-        else if (action == "VOLUMEDOWN") 
+        else if (action == "VOLUMEDOWN")
             changeVolume(false);
         else if (action == "VOLUMEUP")
             changeVolume(true);
-        else if (action == "SPEEDDOWN") 
+        else if (action == "SPEEDDOWN")
             changeSpeed(false);
         else if (action == "SPEEDUP")
             changeSpeed(true);
@@ -378,7 +378,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             showMenu();
         }
         else if (action == "INFO")
-            if (visualizer_status == 2) 
+            if (visualizer_status == 2)
                 bannerToggle(curMeta);
             else
                 showEditMetadataDialog();
@@ -454,8 +454,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 if (visual_blackhole)
                     mainvisual->setGeometry(visual_blackhole->getScreenArea());
                 else
-                    mainvisual->setGeometry(screenwidth + 10, 
-                                            screenheight + 10, 
+                    mainvisual->setGeometry(screenwidth + 10,
+                                            screenheight + 10,
                                             160, 160);
                 mainvisual->setVisual(visual_modes[current_visual]);
                 bannerDisable();
@@ -535,7 +535,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 if (visualizer_status > 0 && cycle_visualizer)
                     CycleVisualizer();
             }
-            else if (action == "REFRESH") 
+            else if (action == "REFRESH")
             {
                 music_tree_list->syncCurrentWithActive();
                 music_tree_list->forceLastBin();
@@ -638,7 +638,7 @@ void PlaybackBoxMusic::showMenu()
         playlist_popup->addButton(tr("Tracks with same Title"), this,
                                   SLOT(byTitle()));
     }
-    
+
     playlist_popup->ShowPopup(this, SLOT(closePlaylistPopup()));
 
     button->setFocus();
@@ -720,7 +720,7 @@ void PlaybackBoxMusic::byArtist()
 
     QString value = formattedFieldValue(curMeta->Artist().toUtf8().constData());
     QString whereClause = "WHERE music_artists.artist_name = " + value +
-                          " ORDER BY album_name, track"; 
+                          " ORDER BY album_name, track";
 
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
@@ -732,7 +732,7 @@ void PlaybackBoxMusic::byAlbum()
         return;
 
     QString value = formattedFieldValue(curMeta->Album().toUtf8().constData());
-    QString whereClause = "WHERE album_name = " + value + 
+    QString whereClause = "WHERE album_name = " + value +
                           " ORDER BY track";
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
@@ -743,9 +743,9 @@ void PlaybackBoxMusic::byGenre()
    if (!playlist_popup || !curMeta)
         return;
 
-    QString value = formattedFieldValue(curMeta->Genre().toUtf8().constData()); 
+    QString value = formattedFieldValue(curMeta->Genre().toUtf8().constData());
     QString whereClause = "WHERE genre = " + value +
-                          " ORDER BY music_artists.artist_name, album_name, track";   
+                          " ORDER BY music_artists.artist_name, album_name, track";
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
 }
@@ -755,8 +755,8 @@ void PlaybackBoxMusic::byYear()
    if (!playlist_popup || !curMeta)
         return;
 
-    QString value = formattedFieldValue(curMeta->Year()); 
-    QString whereClause = "WHERE music_songs.year = " + value + 
+    QString value = formattedFieldValue(curMeta->Year());
+    QString whereClause = "WHERE music_songs.year = " + value +
                           " ORDER BY music_artists.artist_name, album_name, track";
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
@@ -767,8 +767,8 @@ void PlaybackBoxMusic::byTitle()
    if (!playlist_popup || !curMeta)
         return;
 
-    QString value = formattedFieldValue(curMeta->Title().toUtf8().constData()); 
-    QString whereClause = "WHERE music_songs.name = " + value + 
+    QString value = formattedFieldValue(curMeta->Title().toUtf8().constData());
+    QString whereClause = "WHERE music_songs.name = " + value +
                           " ORDER BY music_artists.artist_name, album_name, track";
     closePlaylistPopup();
     updatePlaylistFromQuickPlaylist(whereClause);
@@ -800,7 +800,7 @@ void PlaybackBoxMusic::doUpdatePlaylist(QString whereClause)
     }
     else
     {
-        // No current metadata, so when we come back we'll try and play the 
+        // No current metadata, so when we come back we'll try and play the
         // first thing on the active queue
         branches_to_current_node.clear();
         branches_to_current_node.append(0); //  Root node
@@ -1125,7 +1125,7 @@ void PlaybackBoxMusic::checkForPlaylists()
                 updateForeground();
                 mainvisual->setVisual(visual_modes[current_visual]);
 
-                if (curMeta) 
+                if (curMeta)
                     updateTrackInfo(curMeta);
 
                 return;     // Do not restart Timer
@@ -1151,7 +1151,7 @@ void PlaybackBoxMusic::checkForPlaylists()
                     }
                     progress->setProgress(gMusicData->all_music->countLoaded());
                 }
-            } 
+            }
             else if (progress_type == kProgressMusic)
             {
                 if (progress)
@@ -1234,7 +1234,7 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                 if (class LCD *lcd = LCD::Get())
                     lcd->switchToVolume("Music");
 
-                volume_level = 
+                volume_level =
                     (gPlayer->IsMuted()) ? 0.0f : gPlayer->GetVolume() * 0.01f;
 
                 if (class LCD *lcd = LCD::Get())
@@ -1328,7 +1328,7 @@ void PlaybackBoxMusic::play()
 
     if (gPlayer->isPlaying())
     {
-        if (resumemode == MusicPlayer::RESUME_EXACT && 
+        if (resumemode == MusicPlayer::RESUME_EXACT &&
                 gContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
         {
             seek(gContext->GetNumSetting("MusicBookmarkPosition", 0));
@@ -1352,7 +1352,7 @@ void PlaybackBoxMusic::visEnable()
 
 void PlaybackBoxMusic::bannerEnable(QString text, int millis)
 {
-    if (visualizer_status != 2) 
+    if (visualizer_status != 2)
         return;
 
     mainvisual->showBanner(text, millis);
@@ -1363,7 +1363,7 @@ void PlaybackBoxMusic::bannerEnable(Metadata *mdata, bool fullScreen)
     mainvisual->showBanner(mdata, fullScreen, visualizer_status, 8000);
 }
 
-void PlaybackBoxMusic::bannerToggle(Metadata *mdata) 
+void PlaybackBoxMusic::bannerToggle(Metadata *mdata)
 {
     if (mainvisual->bannerIsShowing())
         bannerDisable();
@@ -1394,7 +1394,7 @@ void PlaybackBoxMusic::CycleVisualizer()
         }
         else
         {
-            //Change to the next selected visual 
+            //Change to the next selected visual
             current_visual = (current_visual + 1) % visual_modes.count();
         }
 
@@ -1403,8 +1403,8 @@ void PlaybackBoxMusic::CycleVisualizer()
         mainvisual->setVisual("Blank");
         mainvisual->setVisual(visual_modes[current_visual]);
     }
-    else if (visual_modes.count() == 1 && visual_modes[current_visual] == "AlbumArt" && 
-             visualizer_status > 0) 
+    else if (visual_modes.count() == 1 && visual_modes[current_visual] == "AlbumArt" &&
+             visualizer_status > 0)
     {
         // If only the AlbumArt visualization is selected, then go ahead and
         // restart the visualization.  This will give AlbumArt the opportunity
@@ -1422,8 +1422,8 @@ void PlaybackBoxMusic::setTrackOnLCD(Metadata *mdata)
         return;
 
     // Set the Artist and Tract on the LCD
-    lcd->switchToMusic(mdata->Artist(), 
-                       mdata->Album(), 
+    lcd->switchToMusic(mdata->Artist(),
+                       mdata->Album(),
                        mdata->Title());
 }
 
@@ -1474,7 +1474,7 @@ void PlaybackBoxMusic::previous()
         if (music_tree_list->prevActive(false, show_whole_tree))
             music_tree_list->activate();
     }
-     
+
     if (visualizer_status > 0 && cycle_visualizer)
         CycleVisualizer();
 }
@@ -1484,21 +1484,21 @@ void PlaybackBoxMusic::next()
     if (gPlayer->getRepeatMode() == MusicPlayer::REPEAT_ALL)
     {
         // Grab the next track after this one. First flag is to wrap around
-        // to the beginning of the list. Second decides if we will traverse up 
+        // to the beginning of the list. Second decides if we will traverse up
         // and down the tree.
         if (music_tree_list->nextActive(true, show_whole_tree))
             music_tree_list->activate();
-        else 
+        else
             end();
     }
     else
     {
         if (music_tree_list->nextActive(false, show_whole_tree))
-            music_tree_list->activate(); 
-        else 
+            music_tree_list->activate();
+        else
             end();
     }
-     
+
     if (visualizer_status > 0 && cycle_visualizer)
         CycleVisualizer();
 }
@@ -1507,7 +1507,7 @@ void PlaybackBoxMusic::nextAuto()
 {
     if (gPlayer->getRepeatMode() == MusicPlayer::REPEAT_TRACK)
         play();
-    else 
+    else
         next();
 }
 
@@ -1534,12 +1534,12 @@ void PlaybackBoxMusic::seek(int pos)
         gPlayer->getOutput()->Reset();
         gPlayer->getOutput()->SetTimecode(pos*1000);
 
-        if (gPlayer->getDecoder() && gPlayer->getDecoder()->isRunning()) 
+        if (gPlayer->getDecoder() && gPlayer->getDecoder()->isRunning())
         {
             gPlayer->getDecoder()->lock();
             gPlayer->getDecoder()->seek(pos);
 
-            if (mainvisual) 
+            if (mainvisual)
             {
                 mainvisual->mutex()->lock();
                 mainvisual->prepare();
@@ -1649,7 +1649,7 @@ void PlaybackBoxMusic::increaseRating()
     if(!curMeta)
         return;
 
-    // Rationale here is that if you can't get visual feedback on ratings 
+    // Rationale here is that if you can't get visual feedback on ratings
     // adjustments, you probably should not be changing them
 
     if (showrating)
@@ -1756,9 +1756,9 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
         if (!show_whole_tree)
         {
             // sanity check - if we are not in 'show whole tree' mode we
-            // should only restore the position if it points to a track 
+            // should only restore the position if it points to a track
             // in the active play queue
-            if (branches_to_current_node[0] == 0 && 
+            if (branches_to_current_node[0] == 0 &&
                 branches_to_current_node[1] == 1 &&
                 branches_to_current_node[2] == 0)
             {
@@ -1853,7 +1853,7 @@ void PlaybackBoxMusic::editPlaylist()
     }
     else
     {
-        // No current metadata, so when we come back we'll try and play the 
+        // No current metadata, so when we come back we'll try and play the
         // first thing on the active queue
 
         branches_to_current_node.clear();
@@ -1864,7 +1864,7 @@ void PlaybackBoxMusic::editPlaylist()
 
     visual_mode_timer->stop();
     DatabaseBox *dbbox = new DatabaseBox(
-        gContext->GetMainWindow(), m_CDdevice, 
+        gContext->GetMainWindow(), m_CDdevice,
         "music_select", "music-", "database box");
 
     if (cd_watcher)
@@ -1903,7 +1903,7 @@ void PlaybackBoxMusic::editPlaylist()
 
 void PlaybackBoxMusic::customEvent(QEvent *event)
 {
-    switch ((int)event->type()) 
+    switch ((int)event->type())
     {
         case OutputEvent::Playing:
         {
@@ -1935,15 +1935,15 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
             QString time_string = getTimeString(rs, maxTime);
 
             showProgressBar();
-            
+
             if (curMeta)
             {
                 if (class LCD *lcd = LCD::Get())
                 {
-                    float percent_heard = maxTime<=0?0.0:((float)rs / 
+                    float percent_heard = maxTime<=0?0.0:((float)rs /
                                                           (float)curMeta->Length()) * 1000.0;
 
-                    QString lcd_time_string = time_string; 
+                    QString lcd_time_string = time_string;
 
                     // if the string is longer than the LCD width, remove all spaces
                     if (time_string.length() > (int)lcd->getLCDWidth())
@@ -1992,7 +1992,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
 
             VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
                 .arg(*aoe->errorMessage()));
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                       statusString,
                                       QString("MythMusic has encountered the following error:\n%1")
                                       .arg(*aoe->errorMessage()));
@@ -2024,7 +2024,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
 
             VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
                 .arg(*dxe->errorMessage()));
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                       statusString,
                                       QString("MythMusic has encountered the following error:\n%1")
                                       .arg(*dxe->errorMessage()));
@@ -2090,7 +2090,7 @@ void PlaybackBoxMusic::showAlbumArtImage(Metadata *mdata)
     if (!albumArt.isNull())
     {
        // draw the albumArt image
-       albumArt = albumArt.scaled(img_size.width(), img_size.height(), 
+       albumArt = albumArt.scaled(img_size.width(), img_size.height(),
             Qt::KeepAspectRatio, Qt::SmoothTransformation);
        QPixmap img(albumArt);
        albumart_image->SetImage(img);
@@ -2193,14 +2193,14 @@ void PlaybackBoxMusic::toggleFullBlankVisualizer()
         fullscreen_blank = false;
 
         //
-        //  If we are already full screen and 
+        //  If we are already full screen and
         //  blank, go back to regular dialog
         //
 
         if(visual_blackhole)
             mainvisual->setGeometry(visual_blackhole->getScreenArea());
         else
-            mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 
+            mainvisual->setGeometry(screenwidth + 10, screenheight + 10,
                                     160, 160);
         mainvisual->setVisual(visual_modes[current_visual]);
         bannerDisable();
@@ -2234,7 +2234,7 @@ void PlaybackBoxMusic::end()
 {
     stop();
 
-    if (class LCD *lcd = LCD::Get()) 
+    if (class LCD *lcd = LCD::Get())
         lcd->switchToTime ();
 }
 
@@ -2250,7 +2250,7 @@ void PlaybackBoxMusic::wireUpTheme()
                               "in your theme");
         exit(0);
     }
-    connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)), 
+    connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)),
             this, SLOT(handleTreeListSignals(int, IntVector*)));
 
     // All the other GUI elements are **optional**
@@ -2434,20 +2434,20 @@ QString PlaybackBoxMusic::getTimeString(int exTime, int maxTime)
     int maxm = (maxTime / 60) % 60;
     int maxs = maxTime % 60;
 
-    if (maxTime <= 0) 
+    if (maxTime <= 0)
     {
-        if (eh > 0) 
+        if (eh > 0)
             time_string.sprintf("%d:%02d:%02d", eh, em, es);
-        else 
+        else
             time_string.sprintf("%02d:%02d", em, es);
-    } 
+    }
     else
     {
         if (maxh > 0)
             time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em,
                     es, maxh, maxm, maxs);
         else
-            time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
+            time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm,
                     maxs);
     }
 

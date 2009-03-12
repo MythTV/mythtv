@@ -1,11 +1,6 @@
 // qt
-#include <qdir.h>
-#include <qapplication.h>
-#include <qfontmetrics.h>
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <QLabel>
-#include <Q3Frame>
+#include <QDir>
+#include <QFontMetrics>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -22,33 +17,13 @@
 #include "editmetadata.h"
 #include "musicplayer.h"
 
-static QString truncateFilename(QString filename, UITextType *textType)
-{
-    int width = textType->DisplayArea().width();
-    QFontMetrics fm(textType->GetFont()->face);
-    QStringList list = QStringList::split('/', filename);
-
-    QString s = filename;
-    int newWidth = width + 1;
-
-    for (int x = 0; x < filename.length(); x++)
-    {
-        if (x != 0)
-            newWidth = fm.width(QString("...") + s, -1);
-        else
-            newWidth = fm.width(s, -1);
-
-        if (newWidth < width)
-            break;
-
-        s = s.right(s.length() -1);
-    }
-
-    if (s == filename)
-        return s;
-
-    return QString("...") + s;
-}
+#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuiimage.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
+#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 
 static bool copyFile(const QString &src, const QString &dst)
 {
@@ -96,8 +71,8 @@ void FileScannerThread::run()
 ///////////////////////////////////////////////////////////////////////////////
 
 
-ImportMusicDialog::ImportMusicDialog(MythMainWindow *parent, const char* name)
-                :MythThemedDialog(parent, "import_music", "music-", name)
+ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
+                :MythScreenType(parent, "musicimportfiles")
 {
     m_popupMenu = NULL;
 
@@ -110,17 +85,13 @@ ImportMusicDialog::ImportMusicDialog(MythMainWindow *parent, const char* name)
     m_defaultRating = 0;
     m_haveDefaults = false;
 
-    wireUpTheme();
-    assignFirstFocus();
     m_somethingWasImported = false;
     m_tracks = new vector<TrackInfo*>;
-    fillWidgets();
-    m_location_edit->setText(gContext->GetSetting("MythMusicLastImportDir", "/"));
 }
 
 ImportMusicDialog::~ImportMusicDialog()
 {
-    gContext->SaveSetting("MythMusicLastImportDir", m_location_edit->getText());
+    gContext->SaveSetting("MythMusicLastImportDir", m_locationEdit->GetText());
 
     delete m_tracks;
 }
@@ -130,78 +101,69 @@ void ImportMusicDialog::fillWidgets()
     if (m_tracks->size() > 0)
     {
         // update current
-        m_current_text->SetText(QString("%1 of %2")
+        m_currentText->SetText(QString("%1 of %2")
                 .arg(m_currentTrack + 1).arg(m_tracks->size()));
 
         Metadata *meta = m_tracks->at(m_currentTrack)->metadata;
-        m_filename_text->SetText(truncateFilename(meta->Filename(), m_filename_text));
-        m_compilation_check->setState(meta->Compilation());
-        m_compartist_text->SetText(meta->CompilationArtist());
-        m_artist_text->SetText(meta->Artist());
-        m_album_text->SetText(meta->Album());
-        m_title_text->SetText(meta->Title());
-        m_genre_text->SetText(meta->Genre());
-        m_year_text->SetText(QString::number(meta->Year()));
-        m_track_text->SetText(QString::number(meta->Track()));
+        m_filenameText->SetText(meta->Filename());
+        m_compilationCheck->SetCheckState(meta->Compilation());
+        m_compartistText->SetText(meta->CompilationArtist());
+        m_artistText->SetText(meta->Artist());
+        m_albumText->SetText(meta->Album());
+        m_titleText->SetText(meta->Title());
+        m_genreText->SetText(meta->Genre());
+        m_yearText->SetText(QString::number(meta->Year()));
+        m_trackText->SetText(QString::number(meta->Track()));
         if (m_tracks->at(m_currentTrack)->isNewTune)
         {
-            m_coverart_button->hide();
-            m_status_text->SetText(tr("New File"));
+            m_coverartButton->SetVisible(false);
+            m_statusText->SetText(tr("New File"));
         }
         else
         {
-            m_coverart_button->show();
-            m_status_text->SetText(tr("All Ready in Database"));
+            m_coverartButton->SetVisible(true);
+            m_statusText->SetText(tr("All Ready in Database"));
         }
     }
     else
     {
         // update current
-        m_current_text->SetText(tr("Non found"));
-        m_filename_text->SetText("");
-        m_compilation_check->setState(false);
-        m_compartist_text->SetText("");
-        m_artist_text->SetText("");
-        m_album_text->SetText("");
-        m_title_text->SetText("");
-        m_genre_text->SetText("");
-        m_year_text->SetText("");
-        m_track_text->SetText("");
-        m_status_text->SetText("");
-        m_coverart_button->hide();
+        m_currentText->SetText(tr("Non found"));
+        m_filenameText->Reset();
+        m_compilationCheck->SetCheckState(false);
+        m_compartistText->Reset();
+        m_artistText->Reset();
+        m_albumText->Reset();
+        m_titleText->Reset();
+        m_genreText->Reset();
+        m_yearText->Reset();
+        m_trackText->Reset();
+        m_statusText->Reset();
+        m_coverartButton->SetVisible(false);
     }
-
-    buildFocusList();
 }
 
-void ImportMusicDialog::keyPressEvent(QKeyEvent *e)
+bool ImportMusicDialog::keyPressEvent(QKeyEvent *event)
 {
-    bool handled = false;
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
 
+    bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "UP")
-            nextPrevWidgetFocus(false);
-        else if (action == "DOWN")
-            nextPrevWidgetFocus(true);
-        else if (action == "LEFT")
+        if (action == "LEFT")
         {
-            m_prev_button->push();
+            m_prevButton->Push();
         }
         else if (action == "RIGHT")
         {
-            m_next_button->push();
-        }
-        else if (action == "SELECT")
-        {
-            if (getCurrentFocusWidget() != m_compilation_check)
-                activateCurrent();
+            m_nextButton->Push();
         }
         else if (action == "INFO")
         {
@@ -256,106 +218,91 @@ void ImportMusicDialog::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
-void ImportMusicDialog::wireUpTheme()
+bool ImportMusicDialog::Create()
 {
-    m_location_edit = getUIRemoteEditType("location_edit");
-    if (m_location_edit)
-    {
-        m_location_edit->createEdit(this);
-//        connect(m_location_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
-    }
+    if (!LoadWindowFromXML("music-ui.xml", "import_music", this))
+        return false;
 
-    m_location_button = getUIPushButtonType("location_button");
-    if (m_location_button)
-    {
-        connect(m_location_button, SIGNAL(pushed()), this, SLOT(locationPressed()));
-    }
+    m_locationEdit = dynamic_cast<MythUITextEdit *>(GetChild("location"));
 
-    m_scan_button = getUITextButtonType("scan_button");
-    if (m_scan_button)
-    {
-        m_scan_button->setText(tr("Search"));
-        connect(m_scan_button, SIGNAL(pushed()), this, SLOT(scanPressed()));
-    }
+    m_locationButton = dynamic_cast<MythUIButton *>(GetChild("directoryfinder"));
+    if (m_locationButton)
+        connect(m_locationButton, SIGNAL(Clicked()), SLOT(locationPressed()));
 
-    m_coverart_button = getUITextButtonType("coverart_button");
-    if (m_coverart_button)
-    {
-        m_coverart_button->setText(tr("Cover Art"));
-        connect(m_coverart_button, SIGNAL(pushed()), this, SLOT(coverArtPressed()));
-    }
+    m_scanButton = dynamic_cast<MythUIButton *>(GetChild("scan"));
+    if (m_scanButton)
+        connect(m_scanButton, SIGNAL(Clicked()), SLOT(startScan()));
 
-    m_filename_text = getUITextType("filename_text");
-    m_compartist_text = getUITextType("compartist_text");
-    m_artist_text = getUITextType("artist_text");
-    m_album_text = getUITextType("album_text");
-    m_title_text = getUITextType("title_text");
-    m_genre_text = getUITextType("genre_text");
-    m_year_text = getUITextType("year_text");
-    m_track_text = getUITextType("track_text");
-    m_current_text = getUITextType("current_text");
-    m_status_text = getUITextType("status_text");
+    m_coverartButton = dynamic_cast<MythUIButton *>(GetChild("coverart"));
+    if (m_coverartButton)
+        connect(m_coverartButton, SIGNAL(Clicked()), SLOT(coverArtPressed()));
 
-    m_compilation_check = getUICheckBoxType("compilation_check");
+    m_filenameText = dynamic_cast<MythUIText *>(GetChild("filename"));
+    m_compartistText = dynamic_cast<MythUIText *>(GetChild("compartist"));
+    m_artistText = dynamic_cast<MythUIText *>(GetChild("artist"));
+    m_albumText = dynamic_cast<MythUIText *>(GetChild("album"));
+    m_titleText = dynamic_cast<MythUIText *>(GetChild("title"));
+    m_genreText = dynamic_cast<MythUIText *>(GetChild("genre"));
+    m_yearText = dynamic_cast<MythUIText *>(GetChild("year"));
+    m_trackText = dynamic_cast<MythUIText *>(GetChild("track"));
+    m_currentText = dynamic_cast<MythUIText *>(GetChild("position"));
+    m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
 
-    m_play_button = getUITextButtonType("play_button");
-    if (m_play_button)
-    {
-        m_play_button->setText(tr("Play"));
-        connect(m_play_button, SIGNAL(pushed()), this, SLOT(playPressed()));
-    }
+    m_compilationCheck = dynamic_cast<MythUICheckBox *>
+                                                (GetChild("compilation"));
 
-    m_nextnew_button = getUITextButtonType("nextnew_button");
-    if (m_nextnew_button)
-    {
-        m_nextnew_button->setText(tr("Next New"));
-        connect(m_nextnew_button, SIGNAL(pushed()), this, SLOT(nextNewPressed()));
-    }
+    m_playButton = dynamic_cast<MythUIButton *>(GetChild("play"));
+    if (m_playButton)
+        connect(m_playButton, SIGNAL(Clicked()), SLOT(playPressed()));
 
-    m_add_button = getUITextButtonType("add_button");
-    if (m_add_button)
-    {
-        m_add_button->setText(tr("Add"));
-        connect(m_add_button, SIGNAL(pushed()), this, SLOT(addPressed()));
-    }
+    m_nextnewButton = dynamic_cast<MythUIButton *>(GetChild("nextnew"));
+    if (m_nextnewButton)
+        connect(m_nextnewButton, SIGNAL(Clicked()), SLOT(nextNewPressed()));
 
-    m_addallnew_button = getUITextButtonType("addallnew_button");
-    if (m_addallnew_button)
-    {
-        m_addallnew_button->setText(tr("Add All New"));
-        connect(m_addallnew_button, SIGNAL(pushed()), this, SLOT(addAllNewPressed()));
-    }
+    m_addButton = dynamic_cast<MythUIButton *>(GetChild("add"));
+    if (m_addButton)
+        connect(m_addButton, SIGNAL(Clicked()), SLOT(addPressed()));
 
-    m_next_button = getUIPushButtonType("next_button");
-    if (m_next_button)
-    {
-        connect(m_next_button, SIGNAL(pushed()), this, SLOT(nextPressed()));
-    }
+    m_addallnewButton = dynamic_cast<MythUIButton *>(GetChild("addallnew"));
+    if (m_addallnewButton)
+        connect(m_addallnewButton, SIGNAL(Clicked()), SLOT(addAllNewPressed()));
 
-    m_prev_button = getUIPushButtonType("prev_button");
-    if (m_prev_button)
-    {
-        connect(m_prev_button, SIGNAL(pushed()), this, SLOT(prevPressed()));
-    }
+    m_nextButton = dynamic_cast<MythUIButton *>(GetChild("next"));
+    if (m_nextButton)
+        connect(m_nextButton, SIGNAL(Clicked()), SLOT(nextPressed()));
 
-    buildFocusList();
+    m_prevButton = dynamic_cast<MythUIButton *>(GetChild("prev"));
+    if (m_prevButton)
+        connect(m_prevButton, SIGNAL(Clicked()), SLOT(prevPressed()));
+
+    fillWidgets();
+
+    BuildFocusList();
+
+    m_locationEdit->SetText(gContext->GetSetting("MythMusicLastImportDir", "/"));
+
+    return true;
 }
 
 void ImportMusicDialog::locationPressed()
 {
-    DirectoryFinder finder(m_location_edit->getText(),
-                           gContext->GetMainWindow(), "directory finder");
-    DialogCode res = finder.exec();
-
-    if (kDialogCodeRejected != res)
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, m_locationEdit->GetText());
+    // TODO Install a name filter on supported music formats
+    fb->SetTypeFilter(QDir::AllDirs | QDir::Readable);
+    if (fb->Create())
     {
-        m_location_edit->setText(finder.getSelected());
-        editLostFocus();
+        fb->SetReturnEvent(this, "locationchange");
+        popupStack->AddScreen(fb);
     }
+    else
+        delete fb;
 }
 
 void ImportMusicDialog::coverArtPressed()
@@ -411,8 +358,8 @@ void ImportMusicDialog::addPressed()
         // copy the file to the new location
         if (!copyFile(meta->Filename(), saveFilename))
         {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Copy Failed"),
-                                      tr("Could not copy file to:") + saveFilename);
+            ShowOkPopup(tr("Copy Failed\nCould not copy file to: %1")
+                                                        .arg(saveFilename));
             return;
         }
 
@@ -440,10 +387,7 @@ void ImportMusicDialog::addPressed()
         fillWidgets();
     }
     else
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Duplicate Track"),
-                                  tr("This track is already in the database"));
-    }
+        ShowOkPopup(tr("This track is already in the database"));
 }
 
 void ImportMusicDialog::addAllNewPressed()
@@ -457,7 +401,7 @@ void ImportMusicDialog::addAllNewPressed()
     while (m_currentTrack < (int) m_tracks->size())
     {
         fillWidgets();
-        qApp->processEvents();
+    //        qApp->processEvents();
 
         if (m_tracks->at(m_currentTrack)->isNewTune)
         {
@@ -465,15 +409,14 @@ void ImportMusicDialog::addAllNewPressed()
             newCount++;
         }
 
-        qApp->processEvents();
+//        qApp->processEvents();
 
         m_currentTrack++;
     }
 
     m_currentTrack--;
 
-    MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Add Tracks"),
-                              tr("%1 new tracks were added to the database").arg(newCount));
+    ShowOkPopup(tr("%1 new tracks were added to the database").arg(newCount));
 }
 
 void ImportMusicDialog::nextNewPressed()
@@ -494,16 +437,6 @@ void ImportMusicDialog::nextNewPressed()
     }
 }
 
-void ImportMusicDialog::scanPressed()
-{
-    startScan();
-}
-
-void ImportMusicDialog::editLostFocus()
-{
-    startScan();
-}
-
 void ImportMusicDialog::startScan()
 {
     MythBusyDialog *busy = new MythBusyDialog(QObject::tr("Searching for music files"));
@@ -515,7 +448,7 @@ void ImportMusicDialog::startScan()
     while (!scanner->isFinished())
     {
         usleep(500);
-        qApp->processEvents();
+//        qApp->processEvents();
     }
 
     delete scanner;
@@ -531,7 +464,7 @@ void ImportMusicDialog::doScan()
 {
     m_tracks->clear();
     m_sourceFiles.clear();
-    QString location = m_location_edit->getText();
+    QString location = m_locationEdit->GetText();
     scanDirectory(location, m_tracks);
 }
 
@@ -609,59 +542,37 @@ void ImportMusicDialog::showMenu()
     if (m_tracks->size() == 0)
         return;
 
-    m_popupMenu = new MythPopupBox(gContext->GetMainWindow(),
-                                      "menu");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    QAbstractButton *button = m_popupMenu->addButton(tr("Save Defaults"), this,
-            SLOT(saveDefaults()));
+    MythDialogBox *menu = new MythDialogBox("", popupStack, "importmusicmenu");
 
-    QLabel *splitter = m_popupMenu->addLabel(" ", MythPopupBox::Small);
-    splitter->setLineWidth(2);
-    splitter->setFrameShape(Q3Frame::HLine);
-    splitter->setFrameShadow(Q3Frame::Sunken);
-    splitter->setMaximumHeight((int) (5 * hmult));
-    splitter->setMaximumHeight((int) (5 * hmult));
+    if (menu->Create())
+        popupStack->AddScreen(menu);
+    else
+    {
+        delete menu;
+        return;
+    }
+
+    menu->AddButton(tr("Save Defaults"), SLOT(saveDefaults()));
 
     if (m_haveDefaults)
     {
-        m_popupMenu->addButton(tr("Change Compilation Flag"), this,
-                                SLOT(setCompilation()));
-        m_popupMenu->addButton(tr("Change Compilation Artist"), this,
+        menu->AddButton(tr("Change Compilation Flag"), SLOT(setCompilation()));
+        menu->AddButton(tr("Change Compilation Artist"),
                                 SLOT(setCompilationArtist()));
-        m_popupMenu->addButton(tr("Change Artist"), this,
-                                SLOT(setArtist()));
-        m_popupMenu->addButton(tr("Change Album"), this,
-                            SLOT(setAlbum()));
-        m_popupMenu->addButton(tr("Change Genre"), this,
-                            SLOT(setGenre()));
-        m_popupMenu->addButton(tr("Change Year"), this,
-                            SLOT(setYear()));
-        m_popupMenu->addButton(tr("Change Rating"), this,
-                            SLOT(setRating()));
+        menu->AddButton(tr("Change Artist"), SLOT(setArtist()));
+        menu->AddButton(tr("Change Album"), SLOT(setAlbum()));
+        menu->AddButton(tr("Change Genre"), SLOT(setGenre()));
+        menu->AddButton(tr("Change Year"), SLOT(setYear()));
+        menu->AddButton(tr("Change Rating"), SLOT(setRating()));
     }
 
-    m_popupMenu->addButton(tr("Cancel"), this,
-                           SLOT(closeMenu()));
-
-    m_popupMenu->ShowPopup(this, SLOT(closeMenu()));
-
-    button->setFocus();
-}
-
-void ImportMusicDialog::closeMenu()
-{
-    if (!m_popupMenu)
-        return;
-
-    m_popupMenu->hide();
-    m_popupMenu->deleteLater();
-    m_popupMenu = NULL;
+    menu->AddButton(tr("Cancel"));
 }
 
 void ImportMusicDialog::saveDefaults(void)
 {
-    closeMenu();
-
     Metadata *data = m_tracks->at(m_currentTrack)->metadata;
     m_defaultCompilation = data->Compilation();
     m_defaultCompArtist = data->CompilationArtist();
@@ -676,8 +587,6 @@ void ImportMusicDialog::saveDefaults(void)
 
 void ImportMusicDialog::setCompilation(void)
 {
-    closeMenu();
-
     if (!m_haveDefaults)
         return;
 
@@ -699,8 +608,6 @@ void ImportMusicDialog::setCompilation(void)
 
 void ImportMusicDialog::setCompilationArtist(void)
 {
-    closeMenu();
-
     if (!m_haveDefaults)
         return;
 
@@ -712,8 +619,6 @@ void ImportMusicDialog::setCompilationArtist(void)
 
 void ImportMusicDialog::setArtist(void)
 {
-    closeMenu();
-
     if (!m_haveDefaults)
         return;
 
@@ -728,8 +633,6 @@ void ImportMusicDialog::setArtist(void)
 
 void ImportMusicDialog::setAlbum(void)
 {
-    closeMenu();
-
     if (!m_haveDefaults)
         return;
 
@@ -744,8 +647,6 @@ void ImportMusicDialog::setAlbum(void)
 
 void ImportMusicDialog::setYear(void)
 {
-    closeMenu();
-
     if (!m_haveDefaults)
         return;
 
@@ -757,8 +658,6 @@ void ImportMusicDialog::setYear(void)
 
 void ImportMusicDialog::setGenre(void)
 {
-    closeMenu();
-
     if (!m_haveDefaults)
         return;
 
@@ -770,8 +669,6 @@ void ImportMusicDialog::setGenre(void)
 
 void ImportMusicDialog::setRating(void)
 {
-    closeMenu();
-
     if (!m_haveDefaults)
         return;
 
@@ -781,8 +678,6 @@ void ImportMusicDialog::setRating(void)
 
 void ImportMusicDialog::setTitleInitialCap(void)
 {
-    closeMenu();
-
     Metadata *data = m_tracks->at(m_currentTrack)->metadata;
     QString title = data->Title();
     bool bFoundCap = false;
@@ -807,7 +702,6 @@ void ImportMusicDialog::setTitleInitialCap(void)
 
 void ImportMusicDialog::setTitleWordCaps(void)
 {
-    closeMenu();
     Metadata *data = m_tracks->at(m_currentTrack)->metadata;
     QString title = data->Title();
     bool bInWord = false;
@@ -842,22 +736,47 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
 
     QFileInfo fi(m_sourceFiles.at(m_currentTrack));
 
-    ImportCoverArtDialog dialog(fi.dirPath(true), m_tracks->at(m_currentTrack)->metadata,
-                                gContext->GetMainWindow(), "import_coverart");
-    dialog.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ImportCoverArtDialog *import = new ImportCoverArtDialog(mainStack,
+                                        fi.dirPath(true),
+                                        m_tracks->at(m_currentTrack)->metadata);
+
+    if (import->Create())
+        mainStack->AddScreen(import);
+    else
+        delete import;
+}
+
+void ImportMusicDialog::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+
+        if (!dce)
+            return;
+
+        const QString resultid = dce->GetId();
+
+        if (resultid == "locationchange")
+        {
+            m_locationEdit->SetText(dce->GetResultText());
+            startScan();
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ImportCoverArtDialog::ImportCoverArtDialog(const QString &sourceDir, Metadata *metadata,
-                                           MythMainWindow *parent, const char* name)
-    :MythThemedDialog(parent, "import_coverart", "music-", name)
+ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
+                                           const QString &sourceDir,
+                                           Metadata *metadata)
+    :MythScreenType(parent, "import_coverart")
 {
     m_sourceDir = sourceDir;
     m_metadata = metadata;
 
-    wireUpTheme();
-    assignFirstFocus();
     scanDirectory();
 }
 
@@ -866,100 +785,89 @@ ImportCoverArtDialog::~ImportCoverArtDialog()
 
 }
 
-void ImportCoverArtDialog::keyPressEvent(QKeyEvent *e)
+bool ImportCoverArtDialog::keyPressEvent(QKeyEvent *event)
 {
-    bool handled = false;
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
 
+    bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "UP")
-            nextPrevWidgetFocus(false);
-        else if (action == "DOWN")
-            nextPrevWidgetFocus(true);
-        else if (action == "LEFT")
+        if (action == "LEFT")
         {
-            if (getCurrentFocusWidget() == m_type_selector)
-                m_type_selector->push(false);
-            else
-                m_prev_button->push();
+            m_prevButton->Push();
         }
         else if (action == "RIGHT")
         {
-            if (getCurrentFocusWidget() == m_type_selector)
-                m_type_selector->push(true);
-            else
-                m_next_button->push();
-        }
-        else if (action == "SELECT")
-        {
-            activateCurrent();
+            m_nextButton->Push();
         }
         else
             handled = false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
-void ImportCoverArtDialog::wireUpTheme()
+bool ImportCoverArtDialog::Create()
 {
-    m_filename_text = getUITextType("file_text");
-    m_current_text = getUITextType("current_text");
-    m_status_text = getUITextType("status_text");
-    m_destination_text = getUITextType("destination_text");
+    if (!LoadWindowFromXML("music-ui.xml", "import_coverart", this))
+        return false;
 
-    m_coverart_image = getUIImageType("coverart_image");
+    m_filenameText = dynamic_cast<MythUIText *>(GetChild("file"));
+    m_currentText = dynamic_cast<MythUIText *>(GetChild("position"));
+    m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
+    m_destinationText = dynamic_cast<MythUIText *>(GetChild("destination"));
 
-    m_copy_button = getUITextButtonType("copy_button");
-    if (m_copy_button)
+    m_coverartImage = dynamic_cast<MythUIImage *>(GetChild("coverart"));
+
+    m_copyButton = dynamic_cast<MythUIButton *>(GetChild("copyButton"));
+    if (m_copyButton)
+        connect(m_copyButton, SIGNAL(Clicked()), this, SLOT(copyPressed()));
+
+    m_exitButton = dynamic_cast<MythUIButton *>(GetChild("exit"));
+    if (m_exitButton)
+        connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(reject()));
+
+    m_prevButton = dynamic_cast<MythUIButton *>(GetChild("prev"));
+    if (m_prevButton)
+        connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
+
+    m_nextButton = dynamic_cast<MythUIButton *>(GetChild("next"));
+    if (m_nextButton)
+        connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
+
+    m_typeList = dynamic_cast<MythUIButtonList *>(GetChild("type"));
+    if (m_typeList)
     {
-        m_copy_button->setText(tr("Copy"));
-        connect(m_copy_button, SIGNAL(pushed()), this, SLOT(copyPressed()));
+        new MythUIButtonListItem(m_typeList, tr("Front Cover"),
+                                 qVariantFromValue(0));
+        new MythUIButtonListItem(m_typeList, tr("Back Cover"),
+                                 qVariantFromValue(1));
+        new MythUIButtonListItem(m_typeList, tr("CD"),
+                                 qVariantFromValue(2));
+        new MythUIButtonListItem(m_typeList, tr("Inlay"),
+                                 qVariantFromValue(3));
+        new MythUIButtonListItem(m_typeList, tr("<Unknown>"),
+                                 qVariantFromValue(4));
+
+        connect(m_typeList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+                SLOT(selectorChanged()));
     }
 
-    m_exit_button = getUITextButtonType("exit_button");
-    if (m_exit_button)
-    {
-        m_exit_button->setText(tr("Exit"));
-        connect(m_exit_button, SIGNAL(pushed()), this, SLOT(reject()));
-    }
-
-    m_prev_button = getUIPushButtonType("prev_button");
-    if (m_prev_button)
-    {
-        connect(m_prev_button, SIGNAL(pushed()), this, SLOT(prevPressed()));
-    }
-
-    m_next_button = getUIPushButtonType("next_button");
-    if (m_next_button)
-    {
-        connect(m_next_button, SIGNAL(pushed()), this, SLOT(nextPressed()));
-    }
-
-    m_type_selector = getUISelectorType("type_selector");
-    if (m_type_selector)
-    {
-        m_type_selector->addItem(0, tr("Front Cover"));
-        m_type_selector->addItem(1, tr("Back Cover"));
-        m_type_selector->addItem(2, tr("CD"));
-        m_type_selector->addItem(3, tr("Inlay"));
-        m_type_selector->addItem(4, tr("<Unknown>"));
-        m_type_selector->setToItem(0);
-
-        connect(m_type_selector, SIGNAL(pushed(int)), this, SLOT(selectorChanged(int)));
-    }
+    return true;
 }
 
-void ImportCoverArtDialog::selectorChanged(int item)
+void ImportCoverArtDialog::selectorChanged()
 {
-    (void) item;
     updateStatus();
 }
 
@@ -1031,17 +939,19 @@ void ImportCoverArtDialog::updateStatus()
 {
     if (m_filelist.size() > 0)
     {
-        m_current_text->SetText(QString("%1 of %2").arg(m_currentFile + 1).arg(m_filelist.size()));
-        m_filename_text->SetText(truncateFilename(m_filelist[m_currentFile], m_filename_text));
-        m_coverart_image->SetImage(m_filelist[m_currentFile]);
-        m_coverart_image->LoadImage();
+        if (m_currentText)
+            m_currentText->SetText(QString("%1 of %2").arg(m_currentFile + 1)
+                                                      .arg(m_filelist.size()));
+        m_filenameText->SetText(m_filelist[m_currentFile]);
+        m_coverartImage->SetFilename(m_filelist[m_currentFile]);
+        m_coverartImage->Load();
 
         QString saveFilename = Ripper::filenameFromMetadata(m_metadata, false);
         QFileInfo fi(saveFilename);
         QString saveDir = fi.dirPath(true);
 
         fi.setFile(m_filelist[m_currentFile]);
-        switch (m_type_selector->getCurrentInt())
+        switch (m_typeList->GetItemCurrent()->GetData().toInt())
         {
             case 0:
                 saveFilename = "front." + fi.extension(false);
@@ -1060,21 +970,21 @@ void ImportCoverArtDialog::updateStatus()
         }
 
         m_saveFilename = saveDir + "/" + saveFilename;
-        m_destination_text->SetText(truncateFilename(m_saveFilename, m_destination_text));
+        m_destinationText->SetText(m_saveFilename);
 
         if (QFile::exists(m_saveFilename))
-            m_status_text->SetText(tr("File Already Exists"));
+            m_statusText->SetText(tr("File Already Exists"));
         else
-            m_status_text->SetText(tr("New File"));
+            m_statusText->SetText(tr("New File"));
     }
     else
     {
-        m_current_text->SetText(tr("Non Found"));
-        m_status_text->SetText("");
-        m_filename_text->SetText("");
-        m_coverart_image->SetImage("mm_trans_background.png");
-        m_coverart_image->LoadImage();
-        m_destination_text->SetText("");
+        if (m_currentText)
+            m_currentText->Reset();
+        m_statusText->Reset();
+        m_filenameText->Reset();
+        m_coverartImage->Reset();
+        m_destinationText->Reset();
     }
 }
 
@@ -1083,18 +993,18 @@ void ImportCoverArtDialog::updateTypeSelector()
     if (m_filelist.size() == 0)
         return;
 
-    QString filename = m_filelist[m_currentFile]; 
+    QString filename = m_filelist[m_currentFile];
     QFileInfo fi(filename);
     filename = fi.fileName();
 
     if (filename.contains("front", Qt::CaseInsensitive) > 0)
-        m_type_selector->setToItem(tr("Front Cover"));
+        m_typeList->SetValue(tr("Front Cover"));
     else if (filename.contains("back", Qt::CaseInsensitive) > 0)
-        m_type_selector->setToItem(tr("Back Cover"));
+        m_typeList->SetValue(tr("Back Cover"));
     else if (filename.contains("inlay", Qt::CaseInsensitive) > 0)
-        m_type_selector->setToItem(tr("Inlay"));
+        m_typeList->SetValue(tr("Inlay"));
     else if (filename.contains("cd", Qt::CaseInsensitive) > 0)
-        m_type_selector->setToItem(tr("CD"));
+        m_typeList->SetValue(tr("CD"));
     else
-        m_type_selector->setToItem(tr("<Unknown>"));
+        m_typeList->SetValue(tr("<Unknown>"));
 }

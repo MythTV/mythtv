@@ -2,16 +2,24 @@
 #define IMPORTMUSIC_H_
 
 #include <iostream>
+#include <vector>
 using namespace std;
 
-//Added by qt3to4:
-#include <QKeyEvent>
 #include <QThread>
+#include <QStringList>
 
-#include <mythtv/mythdialogs.h>
+#include <mythtv/libmythui/mythscreentype.h>
 
 class Metadata;
 class ImportMusicDialog;
+
+class MythUIText;
+class MythUITextEdit;
+class MythUIImage;
+class MythUIButton;
+class MythUIButtonList;
+class MythUICheckBox;
+class MythDialogBox;
 
 typedef struct
 {
@@ -30,21 +38,23 @@ class FileScannerThread: public QThread
         ImportMusicDialog *m_parent;
 };
 
-class ImportMusicDialog : public MythThemedDialog
+class ImportMusicDialog : public MythScreenType
 {
 
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-
-    ImportMusicDialog(MythMainWindow *parent, const char* name = 0);
+    ImportMusicDialog(MythScreenStack *parent);
     ~ImportMusicDialog();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent *);
 
     bool somethingWasImported() { return m_somethingWasImported; }
     void doScan(void);
 
   public slots:
-    void editLostFocus();
     void addAllNewPressed(void);
     void playPressed(void);
     void addPressed(void);
@@ -55,11 +65,10 @@ class ImportMusicDialog : public MythThemedDialog
     void nextPressed(void);
     void prevPressed(void);
     void showEditMetadataDialog(void);
-    void scanPressed(void);
+    void startScan(void);
 
     // popup menu
     void showMenu(void);
-    void closeMenu(void);
     void saveDefaults(void);
     void setCompilation(void);
     void setCompilationArtist(void);
@@ -72,10 +81,7 @@ class ImportMusicDialog : public MythThemedDialog
     void setTitleInitialCap(void);
 
   private:
-    void keyPressEvent(QKeyEvent *e);
-    void wireUpTheme();
     void fillWidgets();
-    void startScan(void);
     void scanDirectory(QString &directory, vector<TrackInfo*> *tracks);
     void showImportCoverArtDialog();
 
@@ -84,37 +90,35 @@ class ImportMusicDialog : public MythThemedDialog
     QStringList          m_sourceFiles;
     int                  m_currentTrack;
 
-    //
     //  GUI stuff
-    //
-    UIRemoteEditType    *m_location_edit;
-    UIPushButtonType    *m_location_button;
-    UITextButtonType    *m_scan_button;
-    UITextButtonType    *m_coverart_button;
+    MythUITextEdit  *m_locationEdit;
+    MythUIButton    *m_locationButton;
+    MythUIButton    *m_scanButton;
+    MythUIButton    *m_coverartButton;
 
-    UITextType          *m_filename_text;
-    UITextType          *m_compartist_text;
-    UITextType          *m_artist_text;
-    UITextType          *m_album_text;
-    UITextType          *m_title_text;
-    UITextType          *m_genre_text;
-    UITextType          *m_year_text;
-    UITextType          *m_track_text;
+    MythUIText      *m_filenameText;
+    MythUIText      *m_compartistText;
+    MythUIText      *m_artistText;
+    MythUIText      *m_albumText;
+    MythUIText      *m_titleText;
+    MythUIText      *m_genreText;
+    MythUIText      *m_yearText;
+    MythUIText      *m_trackText;
 
-    UIPushButtonType    *m_next_button;
-    UIPushButtonType    *m_prev_button;
+    MythUIButton    *m_nextButton;
+    MythUIButton    *m_prevButton;
 
-    UITextType          *m_current_text;
-    UITextType          *m_status_text;
+    MythUIText      *m_currentText;
+    MythUIText      *m_statusText;
 
-    UITextButtonType    *m_play_button;
-    UITextButtonType    *m_add_button;
-    UITextButtonType    *m_addallnew_button;
-    UITextButtonType    *m_nextnew_button;
+    MythUIButton    *m_playButton;
+    MythUIButton    *m_addButton;
+    MythUIButton    *m_addallnewButton;
+    MythUIButton    *m_nextnewButton;
 
-    UICheckBoxType      *m_compilation_check;
+    MythUICheckBox      *m_compilationCheck;
 
-    MythPopupBox        *m_popupMenu;
+    MythDialogBox       *m_popupMenu;
 
     // default metadata values
     bool                 m_defaultCompilation;
@@ -129,27 +133,27 @@ class ImportMusicDialog : public MythThemedDialog
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class ImportCoverArtDialog : public MythThemedDialog
+class ImportCoverArtDialog : public MythScreenType
 {
 
-  Q_OBJECT
+    Q_OBJECT
 
   public:
 
-      ImportCoverArtDialog(const QString &sourceDir, Metadata *metadata,
-                           MythMainWindow *parent, const char* name = 0);
+    ImportCoverArtDialog(MythScreenStack *parent, const QString &sourceDir,
+                         Metadata *metadata);
     ~ImportCoverArtDialog();
 
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
   public slots:
     void copyPressed(void);
     void prevPressed(void);
     void nextPressed(void);
-    void selectorChanged(int item);
+    void selectorChanged(void);
 
   private:
-    void wireUpTheme();
-    void keyPressEvent(QKeyEvent *e);
     void scanDirectory(void);
     void updateStatus(void);
     void updateTypeSelector(void);
@@ -163,18 +167,18 @@ class ImportCoverArtDialog : public MythThemedDialog
     //
     //  GUI stuff
     //
-    UITextType          *m_filename_text;
-    UITextType          *m_current_text;
-    UITextType          *m_status_text;
-    UITextType          *m_destination_text;
+    MythUIText          *m_filenameText;
+    MythUIText          *m_currentText;
+    MythUIText          *m_statusText;
+    MythUIText          *m_destinationText;
 
-    UIImageType         *m_coverart_image;
-    UISelectorType      *m_type_selector;
+    MythUIImage         *m_coverartImage;
+    MythUIButtonList      *m_typeList;
 
-    UIPushButtonType    *m_next_button;
-    UIPushButtonType    *m_prev_button;
-    UITextButtonType    *m_copy_button;
-    UITextButtonType    *m_exit_button;
+    MythUIButton    *m_nextButton;
+    MythUIButton    *m_prevButton;
+    MythUIButton    *m_copyButton;
+    MythUIButton    *m_exitButton;
 };
 
 #endif

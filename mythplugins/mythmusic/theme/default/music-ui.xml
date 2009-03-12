@@ -1,99 +1,91 @@
-<!--
-
-    This is a myth style theme file for mythmusic.
-
-    (c) 2003 by a whole bunch of people associated with MythTV
-
--->
 <mythuitheme>
 
     <!-- music selection screen -->
     <window name="music_select">
-      <font name="active" face="Arial">
-         <color>#ffffff</color>
-         <size>18</size>
-         <bold>yes</bold>
-      </font>
+        <font name="active" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
 
-      <font name="inactive" face="Arial">
-        <color>#9999cc</color>
-        <size>18</size>
-        <bold>yes</bold>
-      </font>
+        <font name="inactive" face="Arial">
+            <color>#9999cc</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
 
-      <container name="musictree">
-        <area>20,20,780,400</area>
+        <container name="musictree">
+            <area>20,20,780,400</area>
 
-        <listtreearea name="musictree" draworder="0">
-          <area>0,0,760,400</area>
-          <listsize>0,0,450,360</listsize>
-          <leveloffset>10</leveloffset>
-          <gradient type="unselected" start="#505050" end="#000000" alpha="100">
-          </gradient>
-          <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
-          </gradient>
-          <fcnfont name="active" function="active"></fcnfont>
-          <fcnfont name="inactive" function="inactive"></fcnfont>
-        </listtreearea>
-      </container>
+            <listtreearea name="musictree" draworder="0">
+                <area>0,0,760,400</area>
+                <listsize>0,0,450,360</listsize>
+                <leveloffset>10</leveloffset>
+                <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+                </gradient>
+                <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+                </gradient>
+                <fcnfont name="active" function="active"></fcnfont>
+                <fcnfont name="inactive" function="inactive"></fcnfont>
+            </listtreearea>
+        </container>
 
-      <container name="info">
-        <area>0,400,800,200</area>
+        <container name="info">
+            <area>0,400,800,200</area>
 
-        <image name="background" draworder="0" fleximage="no">
-          <filename>music-sel-bg.png</filename>
-          <position>0,0</position>
-        </image>
+            <image name="background" draworder="0" fleximage="no">
+                <filename>music-sel-bg.png</filename>
+                <position>0,0</position>
+            </image>
 
-        <textarea name="line1" draworder="1" align="left">
-            <font>active</font>
-            <area>10,0,780,30</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+            <textarea name="line1" draworder="1">
+                <font>active</font>
+                <area>10,0,780,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
 
-        <textarea name="line2" draworder="1" align="left">
-            <font>active</font>
-            <area>10,30,780,30</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+            <textarea name="line2" draworder="1">
+                <font>active</font>
+                <area>10,30,780,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
 
-        <textarea name="line3" draworder="1" align="left">
-            <font>active</font>
-            <area>10,60,780,30</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+            <textarea name="line3" draworder="1">
+                <font>active</font>
+                <area>10,60,780,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
 
-        <textarea name="line4" draworder="1" align="left">
-            <font>active</font>
-            <area>10,90,780,30</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+            <textarea name="line4" draworder="1">
+                <font>active</font>
+                <area>10,90,780,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
 
-        <textarea name="line5" draworder="1" align="left">
-            <font>active</font>
-            <area>10,120,780,30</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+            <textarea name="line5" draworder="1">
+                <font>active</font>
+                <area>10,120,780,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
 
-        <textarea name="line6" draworder="1" align="left">
-            <font>active</font>
-            <area>10,150,780,30</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+            <textarea name="line6" draworder="1">
+                <font>active</font>
+                <area>10,150,780,30</area>
+                <cutdown>yes</cutdown>
+            </textarea>
 
-
-      </container>
+        </container>
 
     </window>
 
     <!--
         The play music screen
-    -->
+        -->
     <window name="music_play">
 
         <!--
             First, define all the fonts we need on this screen
-        -->
+            -->
         <font name="active" face="Arial">
             <color>#ffffff</color>
             <size>18</size>
@@ -138,7 +130,7 @@
 
         <!--
             The (unchanging) background
-        -->
+            -->
 
         <container name="background">
             <image name="filler" draworder="0" fleximage="yes">
@@ -164,7 +156,7 @@
 
         <!--
             The view of playlists; tracks at the top
-        -->
+            -->
         <container name="musicselector">
             <area>0,10,800,310</area>
             <!--
@@ -173,20 +165,20 @@
 
                 bins is how many visible layers of the
                 tree there are.
-            -->
+                -->
             <managedtreelist name="musictreelist" draworder="1" bins="2">
                 <!--
                     regular area, but is only used if the user has
                     ShowWholeTree set to false.
-                -->
+                    -->
                 <area>40,10,720,270</area>
                 <!--
                     An image to show the current navigation node
-                -->
+                    -->
                 <image function="selectionbar" filename="selectionbar.png"></image>
                 <!--
                     Some arrow images
-                -->
+                    -->
                 <image function="uparrow" filename="mm_up_arrow.png"></image>
                 <image function="downarrow" filename="mm_down_arrow.png"></image>
                 <image function="leftarrow" filename="mm_left_arrow.png"></image>
@@ -198,8 +190,8 @@
                     however you like
 
                     NB: bins number 1 to # of bins inclusive
-                        not 0 to #-1
-                -->
+                    not 0 to #-1
+                    -->
                 <bin number="1">
                     <area>30,16,190,250</area>
                     <fcnfont name="active" function="active"></fcnfont>
@@ -216,7 +208,7 @@
 
             <!--
                 An image that go "on top" of the list bins
-            -->
+                -->
 
             <image name="showinglines" draworder="2" fleximage="yes">
                 <context>1</context>
@@ -226,7 +218,7 @@
 
             <!--
                 An image for when we're waiting for data
-            -->
+                -->
             <image name="mm_waiting" draworder="0" fleximage="no">
                 <context>0</context>
                 <filename>mm_waiting.png</filename>
@@ -242,7 +234,7 @@
             <!--
                 An image for when we're only showing the last bin
                 (ie. just the active playlist)
-            -->
+                -->
 
             <image name="mm_waiting" draworder="0" fleximage="no">
                 <context>2</context>
@@ -253,24 +245,24 @@
 
         <!--
             An area to hold info about the playing track
-        -->
+            -->
 
         <container name="trackinfo">
             <area>0,315,680,160</area>
 
-            <textarea name="title_text" draworder="1" align="left">
+            <textarea name="title_text" draworder="1">
                 <font>currenttitle</font>
                 <area>275,5,415,34</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
-            <textarea name="artist_text" draworder="1" align="left">
+            <textarea name="artist_text" draworder="1">
                 <font>currentartist</font>
                 <area>275,40,415,25</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
-            <textarea name="album_text" draworder="1" align="left">
+            <textarea name="album_text" draworder="1">
                 <font>currentartist</font>
                 <area>275,63,415,25</area>
                 <cutdown>yes</cutdown>
@@ -288,12 +280,12 @@
                 <cutdown>no</cutdown>
             </textarea>
 
-            <textarea name="info_text" draworder="1" align="left">
+            <textarea name="info_text" draworder="1">
                 <font>infotext</font>
                 <area>275,114,250,25</area>
             </textarea>
 
-            <textarea name="volume_text" draworder="5" align="left">
+            <textarea name="volume_text" draworder="5">
                 <font>infotext</font>
                 <area>490,95,250,25</area>
             </textarea>
@@ -307,13 +299,6 @@
                 <area>125,10,142,144</area>
             </blackhole>
 
-            <!-- this is an optional image that shows the current tracks album art
-            <image name="albumart" draworder="2" fleximage="no">
-                <position>125,10</position>
-                <staticsize>142,144</staticsize>
-            </image>
-            -->
-
             <statusbar name="progress_bar" draworder="2" whitespace="5">
                 <container fleximage="no">mm_progress-bg.png</container>
                 <fill>mm_progress-fg.png</fill>
@@ -325,7 +310,7 @@
 
         <!--
             On screen volume display
-        -->
+            -->
 
         <container name="volumedisplay">
             <area>690,320,40,160</area>
@@ -338,7 +323,7 @@
         </container>
         <container name="speeddisplay">
             <area>690,385,105,25</area>
-            <textarea name="speed_status" draworder="-1" align="left">
+            <textarea name="speed_status" draworder="-1">
                 <font>infotext</font>
                 <area>0,0,105,25</area>
             </textarea>
@@ -346,7 +331,7 @@
 
         <!--
             All the buttons
-        -->
+            -->
 
         <container name="musicbuttons">
             <area>15,490,785,110</area>
@@ -434,7 +419,8 @@
 
         </container>
 
-  </window>
+    </window>
+
 
   <window name="edit_metadata">
 
@@ -849,1034 +835,880 @@
       </container>
    </window>
 
-   <window name="cdripper">
+    <window name="albumart_browser">
 
-       <font name="title" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>24</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
+        <textarea name="heading" from="basetextarea">
+            <area>0,0,800,50</area>
+            <value>Album Art</value>
+            <font>baselarge</font>
+            <align>hcenter</align>
+        </textarea>
 
-       <font name="labels" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>18</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
+        <imagetype name="background">
+            <area>300,55,440,390</area>
+            <filename>mm_trans_background.png</filename>
+        </imagetype>
 
-       <font name="smalllabel" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>14</size>
-           <bold>yes</bold>
-       </font>
+        <textarea name="imagefilename" from="basetextarea">
+            <area>320,75,400,350</area>
+            <value>No Album Art Found</value>
+            <align>allcenter</align>
+        </textarea>
 
-       <font name="display" face="Arial">
-           <color>#ffffff</color>
-           <dropcolor>#000000</dropcolor>
-           <size>18</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
+        <imagetype name="coverart_image">
+            <area>320,75,350,350</area>
+        </imagetype>
 
-       <font name="button" face="Arial">
-           <color>#ffffff</color>
-           <dropcolor>#000000</dropcolor>
-           <size>16</size>
-           <shadow>2,2</shadow>
-           <bold>yes</bold>
-       </font>
+        <imagetype name="another_background">
+            <area>300,450,440,70</area>
+            <filename>mm_trans_background.png</filename>
+        </imagetype>
 
-       <font name="active" face="Arial">
-           <color>#ffffff</color>
-           <size>18</size>
-           <bold>yes</bold>
-       </font>
+        <textarea name="filenamelabel" from="basetextarea">
+            <area>290,455,170,30</area>
+            <value>Filename:</value>
+            <align>right</align>
+        </textarea>
 
-       <font name="inactive" face="Arial">
-           <color>#9999cc</color>
-           <size>18</size>
-           <bold>yes</bold>
-       </font>
+        <textarea name="typelabel" from="filenamelabel">
+            <position>290,485</position>
+            <value>Type:</value>
+        </textarea>
 
-       <font name="selected" face="Arial">
-           <color>#00ff00</color>
-           <size>18</size>
-           <bold>yes</bold>
-       </font>
+        <textarea name="imagefilename" from="basetextarea">
+            <area>465,455,190,30</area>
+        </textarea>
 
-       <font name="listlabel" face="Arial">
-           <color>#ffff00</color>
-           <size>14</size>
-           <bold>yes</bold>
-       </font>
+        <textarea name="imagetype" from="imagefilename">
+            <position>465,485</position>
+        </textarea>
 
-       <container name="edit_container">
-           <area>0,0,800,600</area>
+        <buttonlist name="coverart_grid">
+            <area>70,65,450,450</area>
+            <layout>grid</layout>
+            <buttonarea>0,0,450,450</buttonarea>
+            <spacing>10</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100,100</area>
+                    <imagetype name="buttonbackground">
+                        <filename>mm_browser_back_reg.png</filename>
+                    </imagetype>
+                    <imagetype name="buttonimage">
+                        <filename>mm_nothumb.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>mm_browser_back_sel.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="selected" />
+            </statetype>
+        </buttonlist>
 
-           <!--
-               Labels
+        <!-- Push buttons -->
+
+        <button name="metadata" from="basebutton">
+            <position>20,540</position>
+            <value>Metadata</value>
+        </button>
+
+        <button name="done" from="basebutton">
+            <position>630,540</position>
+            <value>Done</value>
+        </button>
+    </window>
+
+    <window name="cdripper">
+
+        <!-- Labels -->
+
+        <textarea name="label">
+            <area>15,10,770,30</area>
+            <value>Please select a quality level and check the album\n
+                information below:</value>
+            <align>hcenter</align>
+        </textarea>
+
+        <textarea name="quality_label">
+            <area>15,50,170,30</area>
+            <font>labels</font>
+            <value>Quality:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="artist_label" from="quality_label">
+            <position>15,90</position>
+            <value>Artist:</value>
+        </textarea>
+
+        <textarea name="album_label" from="quality_label">
+            <position>15,130</position>
+            <value>Album:</value>
+        </textarea>
+
+        <textarea name="genre_text" from="quality_label">
+            <position>15,170</position>
+            <value>Genre:</value>
+        </textarea>
+
+        <textarea name="comp_label" from="quality_label">
+            <position>15,215</position>
+            <value>Multi-Artist:</value>
+        </textarea>
+
+        <textarea name="year_label" from="quality_label">
+            <area>385,210,120,30</area>
+            <value>Year:</value>
+        </textarea>
+
+        <!-- edits -->
+
+        <buttonlist name="quality" from="baseselector">
+            <position>195,50</position>
+        </buttonlist>
+
+        <textedit name="artist" from="basetextedit">
+            <position>195,90</position>
+        </textedit>
+
+        <button name="searchartist" from="basesearchbutton">
+            <position>725,90</position>
+        </button>
+
+        <textedit name="album_edit" from="basetextedit">
+            <position>195,130</position>
+        </textedit>
+
+        <button name="searchalbum" from="basesearchbutton">
+            <position>725,130</position>
+        </button>
+
+        <textedit name="genre_edit" from="basetextedit">
+            <position>195,170</position>
+        </textedit>
+
+        <button name="searchgenre" from="basesearchbutton">
+            <position>725,170</position>
+        </button>
+
+        <checkbox name="compilation_check" from="basecheckbox">
+            <position>195,210</position>
+        </checkbox>
+
+        <button name="switch" from="basebutton">
+            <position>270,210</position>
+            <value>Switch Titles</value>
+        </button>
+
+        <textedit name="year" from="basetextedit">
+            <position>520,210</position>
+        </textedit>
+
+        <textarea name="track_label" from="basetextarea">
+            <area>40,250,130,30</area>
+            <value>Track:</value>
+        </textarea>
+
+        <textarea name="list_label" from="track_label">
+            <position>100,250</position>
+            <value>Title:</value>
+        </textarea>
+
+        <textarea name="artist_label" from="track_label">
+            <position>450,250</position>
+            <value>Artist:</value>
+        </textarea>
+
+        <textarea name="length_label" from="track_label">
+            <position>660,250</position>
+            <value>Length:</value>
+        </textarea>
+
+        <imagetype name="image">
+            <area>25,275,750,280</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+        <buttonlist name="track_list" from="basebuttonlist">
+            <area>40,287,740,225</area>
+            <buttonarea>0,0,740,225</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="track" from="buttontext">
+                        <area>0,0,50,30</area>
+                    </textarea>
+                    <textarea name="title" from="buttontext">
+                        <area>55,0,340,30</area>
+                    </textarea>
+                    <textarea name="artist" from="buttontext">
+                        <area>395,0,200,30</area>
+                    </textarea>
+                    <textarea name="length" from="buttontext">
+                        <area>600,0,100,30</area>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <textarea name="track" from="buttontext" />
+                    <textarea name="title" from="buttontext" />
+                    <textarea name="artist" from="buttontext" />
+                    <textarea name="length" from="buttontext" />
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+        </buttonlist>
+
+        <!-- Buttons -->
+
+        <button name="scan_button" from="basebutton">
+            <position>220,545</position>
+            <value>Scan CD</value>
+        </button>
+
+        <button name="rip_button" from="basebutton">
+            <position>450,545</position>
+            <value>Rip CD</value>
+        </button>
+    </window>
+
+    <window name="ripstatus">
+
+        <imagetype name="banner">
+            <filename>mm_rip_banner.png</filename>
+            <position>70,20</position>
+        </imagetype>
+
+        <textarea name="banner">
+            <area>150,0,500,90</area>
+            <value>Rip CD</value>
+            <font>baselarge</font>
+            <align>hcenter</align>
+        </textarea>
+
+        <imagetype name="progress_background">
+            <filename>mm_rip_background.png</filename>
+            <area>50,70,700,500</area>
+        </imagetype>
+
+        <textarea name="overall_label" from="basetextarea">
+            <area>50,110,700,40</area>
+            <value>Importing CD</value>
+        </textarea>
+
+        <textarea name="overall" from="overall_label">
+            <position>50,150</position>
+            <align>hcenter</align>
+        </textarea>
+
+        <textarea name="track_label" from="overall_label">
+            <position>50,320</position>
+            <value>Encoding Track</value>
+        </textarea>
+
+        <textarea name="track" from="overall">
+            <position>50,355</position>
+        </textarea>
+
+        <textarea name="status" from="overall">
+            <position>50,500</position>
+        </textarea>
+
+        <progressbar name="overall" from="baseprogressbar">
+            <position>160,190</position>
+        </progressbar>
+
+        <textarea name="overallpct" from="basetextarea">
+            <area>350,220,100,30</area>
+            <align>hcenter</align>
+        </textarea>
+
+        <progressbar name="track" from="baseprogressbar">
+            <position>160,400</position>
+        </progressbar>
+
+        <textarea name="trackpct" from="basetextarea">
+            <area>350,430,100,30</area>
+            <align>hcenter</align>
+        </textarea>
+
+    </window>
+
+    <window name="import_music">
+        <!-- <imagetype name="image">
+            <position>195,150</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>525,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>195,230</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>525,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>195,270</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>525,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>195,310</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>525,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>195,350</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>525,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>195,390</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>525,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>195,430</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>175,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>545,430</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>175,35</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>275,490</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>250,40</staticsize>
+        </imagetype>
+
+        <imagetype name="image">
+            <position>250,540</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>300,40</staticsize>
+        </imagetype>
+        -->
+
+        <textarea name="title">
+            <area>0,5,800,50</area>
+            <font>baselarge</font>
+            <value>Import Music</value>
+        </textarea>
+
+        <!-- Labels -->
+
+        <textarea name="location_label" from="basetextarea">
+            <area>15,65,170,30</area>
+            <value>Location:</value>
+        </textarea>
+
+        <textarea name="filename_label" from="location_label">
+            <position>15,155</position>
+            <value>Filename:</value>
+        </textarea>
+
+        <textarea name="compilation_label" from="location_label">
+            <position>15,195</position>
+            <value>Compilation:</value>
+        </textarea>
+
+        <textarea name="compilation_artist_label" from="location_label">
+            <position>15,235</position>
+            <value>Comp. Artist:</value>
+        </textarea>
+
+        <textarea name="artist_label" from="location_label">
+            <position>15,275</position>
+            <value>Artist:</value>
+        </textarea>
+
+        <textarea name="album_label" from="location_label">
+            <position>15,315</position>
+            <value>Album:</value>
+        </textarea>
+
+        <textarea name="title_text" from="location_label">
+            <position>15,355</position>
+            <value>Title:</value>
+        </textarea>
+
+        <textarea name="genre_label" from="location_label">
+            <position>15,395</position>
+            <value>Genre:</value>
+        </textarea>
+
+        <textarea name="year_label" from="location_label">
+            <position>15,435</position>
+            <value>Year:</value>
+        </textarea>
+
+        <textarea name="track_label" from="location_label">
+            <position>365,435</position>
+            <value>Track No.:</value>
+        </textarea>
+
+        <textarea name="position" from="basetextarea">
+            <area>250,495,300,30</area>
+            <align>hcenter</align>
+        </textarea>
+
+        <textarea name="status" from="position">
+            <position>250,545</position>
+            <value>All ready in database</value>
+        </textarea>
+
+        <!-- data fields -->
+
+        <textedit name="location" from="basetextedit">
+            <position>195,60</position>
+        </textedit>
+
+        <button name="directoryfinder" from="basesearchbutton">
+            <position>725,60</position>
+        </button>
+
+        <button name="scan" from="basebutton">
+            <position>195,100</position>
+            <value>Search</value>
+        </button>
+
+        <button name="coverart" from="basebutton">
+            <position>570,100</position>
+            <value>Cover Art</value>
+        </button>
+
+        <textarea name="filename" from="basetextarea">
+            <area>200,155,515,30</area>
+            <align>right</align>
+        </textarea>
+
+        <checkbox name="compilation" from="basecheckbox">
+            <position>195,190</position>
+        </checkbox>
+
+        <textarea name="compartist" from="basetextarea">
+            <area>200,235,515,30</area>
+        </textarea>
+
+        <textarea name="artist" from="basetextarea">
+            <area>200,275,515,30</area>
+        </textarea>
+
+        <textarea name="album" from="basetextarea">
+            <area>200,315,515,30</area>
+        </textarea>
+
+        <textarea name="title" from="basetextarea">
+            <area>200,355,515,30</area>
+        </textarea>
+
+        <textarea name="genre" from="basetextarea">
+            <area>200,395,515,30</area>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>200,435,165,30</area>
+        </textarea>
+
+        <textarea name="track" from="basetextarea">
+            <area>550,435,165,30</area>
+        </textarea>
+
+        <!-- Push buttons -->
+
+        <button name="play" from="basebutton">
+            <position>35,490</position>
+            <value>Play</value>
+        </button>
+
+        <button name="add" from="basebutton">
+            <position>35,540</position>
+            <value>Add</value>
+        </button>
+
+        <button name="prev">
+            <area>230,480,60,60</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>mm_prev_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>mm_prev_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>mm_prev_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <button name="next">
+            <area>510,480,60,60</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>mm_next_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>mm_next_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>mm_next_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <button name="nextnew" from="basebutton">
+            <position>620,490</position>
+            <value>Next New</value>
+        </button>
+
+        <button name="addallnew" from="basebutton">
+            <position>620,540</position>
+            <value>Add All New</value>
+        </button>
+
+    </window>
+
+    <!--
+        File Selector
+        -->
+
+    <window name="directory_finder">
+        <font name="title" face="Arial">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="buttons" face="Arial">
+            <color>#ffffff</color>
+            <size>12</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="edit" face="Arial">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
+
+        <font name="active" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="inactive" face="Arial">
+            <color>#9999cc</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="info" face="Arial">
+            <color>#9999cc</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
+
+        <font name="label" face="Arial">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>18</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <container name="title">
+            <area>0,5,800,45</area>
+            <textarea name="title" draworder="1" align="center">
+                <area>0,0,800,45</area>
+                <font>title</font>
+                <multiline>no</multiline>
+                <value>Directory Finder</value>
+            </textarea>
+        </container>
+
+        <container name="location">
+            <area>0,55,800,80</area>
+
+            <textbutton name="back_button" draworder="1">
+                <position>35,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+            <textbutton name="home_button" draworder="1">
+                <position>200,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+            <textarea name="location_label" draworder="0" align="right">
+                <area>20,50,140,30</area>
+                <font>label</font>
+                <multiline>no</multiline>
+                <value>Location:</value>
+            </textarea>
+            <remoteedit name="location_edit" draworder="0">
+                <area>180,50,580,30</area>
+                <font>edit</font>
+            </remoteedit>
+        </container>
+
+        <container name="file_list">
+            <area>20,140,760,400</area>
+            <listbtnarea name="filelist"  draworder="1">
+                <area>0,0,760,400</area>
+                <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+                </gradient>
+                <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
+                </gradient>
+                <fcnfont name="active" function="active"></fcnfont>
+                <fcnfont name="inactive" function="inactive"></fcnfont>
+                <showscrollarrows>yes</showscrollarrows>
+                <showarrow>no</showarrow>
+            </listbtnarea>
+        </container>
+
+        <!--
+            button area shown on all pages
             -->
+        <container name="buttons">
+            <area>0,550,800,50</area>
+            <textbutton name="cancel_button" draworder="1">
+                <position>35,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+            <textbutton name="ok_button" draworder="1">
+                <position>610,0</position>
+                <image function="on" filename="text_button_on.png"></image>
+                <image function="off" filename="text_button_off.png"></image>
+                <image function="pushed" filename="text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+        </container>
+    </window>
 
+    <window name="import_coverart">
 
-           <textarea name="label" draworder="1" align="center">
-               <area>15,10,770,30</area>
-               <font>smalllabel</font>
-               <value>Please select a quality level and check the album information below:</value>
-           </textarea>
+        <!-- <image name="image" draworder="0">
+            <position>195,60</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>565,35</staticsize>
+        </image>
 
-           <textarea name="quality_label" draworder="1" align="right">
-               <area>15,50,170,30</area>
-               <font>labels</font>
-               <value>Quality:</value>
-           </textarea>
+        <image name="image" draworder="0">
+            <position>195,450</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>565,35</staticsize>
+        </image>
 
-           <textarea name="artist_label" draworder="1" align="right">
-               <area>15,90,170,30</area>
-               <font>labels</font>
-               <value>Artist:</value>
-           </textarea>
+        <image name="image" draworder="0">
+            <position>95,150</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>250,40</staticsize>
+        </image>
 
-           <textarea name="album_label" draworder="1" align="right">
-               <area>15,130,170,30</area>
-               <font>labels</font>
-               <value>Album:</value>
-           </textarea>
+        <image name="image" draworder="0">
+            <position>70,240</position>
+            <filename>mm_trans_background.png</filename>
+            <staticsize>300,40</staticsize>
+        </image> -->
 
-           <textarea name="genre_text" draworder="1" align="right">
-               <area>15,170,170,30</area>
-               <font>labels</font>
-               <value>Genre:</value>
-           </textarea>
+        <textarea name="title">
+            <area>0,5,800,50</area>
+            <font>baselarge</font>
+            <value>Import Cover Art</value>
+            <align>hcenter</align>
+        </textarea>
 
-           <textarea name="comp_label" draworder="1" align="right">
-               <area>15,215,170,30</area>
-               <font>labels</font>
-               <value>Multi-Artist:</value>
-           </textarea>
+        <!-- Labels -->
+        <textarea name="file_label" from="basetextarea">
+            <area>15,65,170,30</area>
+            <value>File:</value>
+            <align>right</align>
+        </textarea>
 
-           <textarea name="year_label" draworder="1" align="right">
-               <area>385,210,120,30</area>
-               <font>labels</font>
-               <value>Year:</value>
-           </textarea>
+        <textarea name="destination_label" from="file_label">
+            <position>15,455</position>
+            <value>Destination:</value>
+        </textarea>
 
-           <!--
-               edits
+        <textarea name="title" from="file_label">
+            <position>15,400</position>
+            <value>Image Type:</value>
+        </textarea>
+
+        <!-- data fields -->
+
+        <imagetype name="coverart">
+            <area>420,125,300,300</area>
+            <filename>mm_trans_background.png</filename>
+        </imagetype>
+
+        <button name="prev" from="basebutton">
+            <area>50,140,60,60</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>mm_prev_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>mm_prev_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>mm_prev_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <button name="next" from="basebutton">
+            <area>330,140,60,60</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>mm_next_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>mm_next_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>mm_next_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <button name="copy" from="basebutton">
+            <position>150,310</position>
+            <value>Copy</value>
+        </button>
+
+        <textarea name="file">
+            <area>200,65,550,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="destination" from="basetextarea">
+            <area>200,455,550,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="position">
+            <area>70,155,300,30</area>
+            <align>hcenter</align>
+        </textarea>
+
+        <textarea name="status">
+            <area>70,245,300,30</area>
+            <value>All ready in database</value>
+            <align>hcenter</align>
+        </textarea>
+
+        <buttonlist name="type_selector" from="baseselector">
+            <position>200,400</position>
+        </buttonlist>
+
+        <button name="exit_button" from="basebutton">
+            <position>325,540</position>
+            <value>Done</value>
+        </button>
+    </window>
+
+    <window name="miniplayer">
+        <area>-1,5,590,190</area>
+        <imagetype name="track_info_background">
+            <filename>miniplayer_background.png</filename>
+            <area>10,10,569,170</area>
+        </imagetype>
+
+        <imagetype name="mm_blackhole_border">
+            <filename>mm_blackhole_border.png</filename>
+            <area>20,20,146,148</area>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>170,15,415,34</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="artist" from="basetextarea">
+            <area>170,50,415,27</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="album" from="basetextarea">
+            <area>170,77,415,27</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <statetype name="ratings_state">
+        </statetype>
+
+        <textarea name="info" from="basetextarea">
+            <area>170,129,250,25</area>
+        </textarea>
+
+        <textarea name="time" from="basetextarea">
+            <area>385,125,185,25</area>
+            <align>right</align>
+        </textarea>
+
+        <imagetype name="coverart">
+            <filename>mm_nothumb.png</filename>
+            <area>22,22,144,144</area>
+        </imagetype>
+
+        <progressbar name="progress" from="baseprogressbar">
+            <position>170,150</position>
+        </progressbar>
+        <!--
+            <textarea name="volume_text" draworder="5">
+                <font>infotext</font>
+                <area>490,105,250,25</area>
+                <value>%1</value>                - this would show as '12'
+                <value>%1%</value>               - this would show as '12%'
+                <value>Vol: %1</value>           - this would show as 'Vol: 12'
+                <value>Vol: %1%</value>          - this would show as 'Vol: 12%'
+            </textarea>
             -->
+        </window>
 
-           <selector name="quality_selector" draworder="0">
-               <area>195,50,300,40</area>
-               <font>display</font>
-               <image function="on" filename="leftright_on.png"></image>
-               <image function="off" filename="leftright_off.png"></image>
-               <image function="pushed" filename="leftright_pushed.png"></image>
-           </selector>
-
-           <remoteedit name="artist_edit" draworder="1" align="left">
-               <area>195,90,525,35</area>
-               <font>display</font>
-           </remoteedit>
-
-           <pushbutton name="searchartist_button" draworder="2">
-               <position>725,90</position>
-               <image function="on" filename="blankbutton_on.png"></image>
-               <image function="off" filename="blankbutton_off.png"></image>
-               <image function="pushed" filename="blankbutton_pushed.png"></image>
-           </pushbutton>
-
-
-           <remoteedit name="album_edit" draworder="1" align="left">
-               <area>195,130,525,35</area>
-               <font>display</font>
-           </remoteedit>
-
-           <pushbutton name="searchalbum_button" draworder="2">
-               <position>725,130</position>
-               <image function="on" filename="blankbutton_on.png"></image>
-               <image function="off" filename="blankbutton_off.png"></image>
-               <image function="pushed" filename="blankbutton_pushed.png"></image>
-           </pushbutton>
-
-
-           <remoteedit name="genre_edit" draworder="1" align="left">
-               <area>195,170,525,35</area>
-               <font>display</font>
-           </remoteedit>
-
-           <pushbutton name="searchgenre_button" draworder="2">
-               <position>725,170</position>
-               <image function="on" filename="blankbutton_on.png"></image>
-               <image function="off" filename="blankbutton_off.png"></image>
-               <image function="pushed" filename="blankbutton_pushed.png"></image>
-           </pushbutton>
-
-           <checkbox name="compilation_check" draworder="0">
-               <position>195,210</position>
-               <image function="checked" filename="checked.png"></image>
-               <image function="unchecked" filename="unchecked.png"></image>
-               <image function="checked_high" filename="checked_high.png"></image>
-               <image function="unchecked_high" filename="unchecked_high.png"></image>
-           </checkbox>
-
-           <textbutton name="switch_button" draworder="0">
-               <position>270,210</position>
-               <font>button</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <remoteedit name="year_edit" draworder="1" align="left">
-               <area>520,210,200,35</area>
-               <font>display</font>
-           </remoteedit>
-
-           <textarea name="title" draworder="4" align="left">
-               <area>40,250,130,30</area>
-               <font>listlabel</font>
-               <value>Track</value>
-           </textarea>
-
-           <textarea name="title" draworder="4" align="left">
-               <area>100,250,130,30</area>
-               <font>listlabel</font>
-               <value>Title</value>
-           </textarea>
-
-           <textarea name="title" draworder="4" align="left">
-               <area>450,250,130,30</area>
-               <font>listlabel</font>
-               <value>Artist</value>
-           </textarea>
-
-           <textarea name="title" draworder="4" align="left">
-               <area>660,250,130,30</area>
-               <font>listlabel</font>
-               <value>Length</value>
-           </textarea>
-
-           <image name="image" draworder="0">
-               <position>25,275</position>
-               <filename>trans-cr-background.png</filename>
-               <staticsize>750,280</staticsize>
-           </image>
-           <listarea name="track_list" draworder="4">
-               <area>40,287,740,225</area>
-               <fcnfont name="active" function="active"></fcnfont>
-               <fcnfont name="inactive" function="inactive"></fcnfont>
-               <fcnfont name="selected" function="selected"></fcnfont>
-               <columnpadding>10</columnpadding>
-               <column number="1" width="50" context="-1"></column>
-               <column number="2" width="340" context="-1"></column>
-               <column number="3" width="200" context="-1"></column>
-               <column number="4" width="100" context="-1"></column>
-               <items>7</items>
-               <image function="selectionbar" filename="selectbar.png" location="-2,0"></image>
-               <image function="uparrow" filename="uparrow.png" location="735,290"></image>
-               <image function="downarrow" filename="downarrow.png" location="735,465"></image>
-           </listarea>
-           <image name="showinglines" draworder="5" fleximage="no">
-               <filename>rk-lines.png</filename>
-               <position>25,275</position>
-               <staticsize>750,260</staticsize>
-           </image>
-
-           <!--
-               Push buttons
-           -->
-
-           <textbutton name="scan_button" draworder="0">
-               <position>220,545</position>
-               <font>button</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <textbutton name="rip_button" draworder="0">
-               <position>450,545</position>
-               <font>button</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-       </container>
-   </window>
-
-   <window name="ripstatus">
-
-       <font name="title" face="Arial">
-           <color>#ffffff</color>
-           <dropcolor>#000000</dropcolor>
-           <size>40</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <font name="label" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>20</size>
-           <shadow>2,2</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <font name="display" face="Arial">
-           <color>#ffffff</color>
-           <dropcolor>#000000</dropcolor>
-           <size>20</size>
-           <shadow>2,2</shadow>
-           <bold>no</bold>
-       </font>
-
-       <font name="percent" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>20</size>
-           <shadow>3,3</shadow>
-           <bold>Yes</bold>
-       </font>
-
-       <container name="background">
-           <image name="banner" draworder="0" fleximage="no">
-               <filename>mm_rip_banner.png</filename>
-               <position>70,20</position>
-           </image>
-           <textarea name="banner" draworder="0" align="center">
-               <font>title</font>
-               <area>150,0,500,90</area>
-               <value>Rip CD</value>
-           </textarea>
-           <image name="progress_background" draworder="0">
-               <filename>mm_rip_background.png</filename>
-               <position>50,70</position>
-               <staticsize>700,500</staticsize>
-           </image>
-       </container>
-
-       <container name="main_display">
-           <area>50,100,700,500</area>
-
-           <textarea name="overall_label" draworder="1" align="center">
-               <font>label</font>
-               <area>0,10,700,40</area>
-               <value>Importing CD</value>
-           </textarea>
-
-           <textarea name="overall_text" draworder="1" align="center">
-               <font>display</font>
-               <area>0,50,700,40</area>
-           </textarea>
-
-           <textarea name="track_label" draworder="1" align="center">
-               <font>label</font>
-               <area>0,220,700,40</area>
-               <value>Encoding Track</value>
-           </textarea>
-
-           <textarea name="track_text" draworder="1" align="center">
-               <font>display</font>
-               <area>0,255,700,40</area>
-           </textarea>
-
-           <textarea name="status_text" draworder="1" align="center">
-               <font>display</font>
-               <area>0,400,700,30</area>
-           </textarea>
-
-           <statusbar name="overall_progress" draworder="1" whitespace="15">
-               <container fleximage="no">mm_progress_background.png</container>
-               <fill>mm_progress_foreground.png</fill>
-               <position>110,90</position>
-               <orientation>LeftToRight</orientation>
-           </statusbar>
-
-           <textarea name="overallpct_text" draworder="2" align="center">
-               <font>percent</font>
-               <area>300,120,100,30</area>
-           </textarea>
-
-           <statusbar name="track_progress" draworder="1" whitespace="15">
-               <container fleximage="no">mm_progress_background.png</container>
-               <fill>mm_progress_foreground.png</fill>
-               <position>110,300</position>
-               <orientation>LeftToRight</orientation>
-           </statusbar>
-
-           <textarea name="trackpct_text" draworder="2" align="center">
-               <font>percent</font>
-               <area>300,330,100,30</area>
-           </textarea>
-
-       </container>
-   </window>
-
-   <window name="import_music">
-
-       <font name="title" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>24</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <font name="labels" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>18</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <font name="display" face="Arial">
-           <color>#ffffff</color>
-           <dropcolor>#000000</dropcolor>
-           <size>16</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <container name="background">
-           <area>0,0,800,600</area>
-
-           <image name="image" draworder="0">
-               <position>195,150</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>525,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>195,230</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>525,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>195,270</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>525,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>195,310</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>525,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>195,350</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>525,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>195,390</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>525,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>195,430</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>175,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>545,430</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>175,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>275,490</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>250,40</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>250,540</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>300,40</staticsize>
-           </image>
-
-       </container>
-
-       <container name="foreground">
-           <area>0,0,800,600</area>
-
-           <textarea name="title" draworder="1" align="center">
-               <area>0,5,800,50</area>
-               <font>title</font>
-               <value>Import Music</value>
-           </textarea>
-
-           <!--
-               Labels
-            -->
-
-           <textarea name="location_label" draworder="1" align="right">
-               <area>15,65,170,30</area>
-               <font>labels</font>
-               <value>Location:</value>
-           </textarea>
-
-           <textarea name="filename_label" draworder="1" align="right">
-               <area>15,155,170,30</area>
-               <font>labels</font>
-               <value>Filename:</value>
-           </textarea>
-
-           <textarea name="compilation_label" draworder="1" align="right">
-               <area>15,195,170,30</area>
-               <font>labels</font>
-               <value>Compilation:</value>
-           </textarea>
-
-           <textarea name="compilation_artist_label" draworder="1" align="right">
-               <area>15,235,170,30</area>
-               <font>labels</font>
-               <value>Comp. Artist:</value>
-           </textarea>
-
-           <textarea name="artist_label" draworder="1" align="right">
-               <area>15,275,170,30</area>
-               <font>labels</font>
-               <value>Artist:</value>
-           </textarea>
-
-           <textarea name="album_label" draworder="1" align="right">
-               <area>15,315,170,30</area>
-               <font>labels</font>
-               <value>Album:</value>
-           </textarea>
-
-           <textarea name="title_text" draworder="1" align="right">
-               <area>15,355,170,30</area>
-               <font>labels</font>
-               <value>Title:</value>
-           </textarea>
-
-           <textarea name="genre_label" draworder="1" align="right">
-               <area>15,395,170,30</area>
-               <font>labels</font>
-               <value>Genre:</value>
-           </textarea>
-
-           <textarea name="year_label" draworder="1" align="right">
-               <area>15,435,170,30</area>
-               <font>labels</font>
-               <value>Year:</value>
-           </textarea>
-
-           <textarea name="track_label" draworder="1" align="right">
-               <area>365,435,170,30</area>
-               <font>labels</font>
-               <value>Track No.:</value>
-           </textarea>
-
-           <textarea name="current_text" draworder="1" align="center">
-               <area>250,495,300,30</area>
-               <font>labels</font>
-               <value>123 of 345</value>
-           </textarea>
-
-           <textarea name="status_text" draworder="1" align="center">
-               <area>250,545,300,30</area>
-               <font>labels</font>
-               <value>All ready in database</value>
-           </textarea>
-
-           <!--
-               data fields
-           -->
-
-           <remoteedit name="location_edit" draworder="1" align="left">
-               <area>195,60,525,35</area>
-               <font>display</font>
-           </remoteedit>
-
-           <pushbutton name="location_button" draworder="2">
-               <position>725,60</position>
-               <image function="on" filename="blankbutton_on.png"></image>
-               <image function="off" filename="blankbutton_off.png"></image>
-               <image function="pushed" filename="blankbutton_pushed.png"></image>
-           </pushbutton>
-
-           <textbutton name="scan_button" draworder="0">
-               <position>195,100</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <textbutton name="coverart_button" draworder="0">
-               <position>570,100</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <textarea name="filename_text" draworder="1" align="right">
-               <area>200,155,515,30</area>
-               <font>display</font>
-               <value>/some/file/goes/here/test.mp3</value>
-           </textarea>
-
-           <checkbox name="compilation_check" draworder="0">
-               <position>195,190</position>
-               <image function="checked" filename="checked.png"></image>
-               <image function="unchecked" filename="unchecked.png"></image>
-               <image function="checked_high" filename="checked_high.png"></image>
-               <image function="unchecked_high" filename="unchecked_high.png"></image>
-           </checkbox>
-
-           <textarea name="compartist_text" draworder="1" align="left">
-               <area>200,235,515,30</area>
-               <font>display</font>
-               <value>Compilation Artist</value>
-           </textarea>
-
-           <textarea name="artist_text" draworder="1" align="left">
-               <area>200,275,515,30</area>
-               <font>display</font>
-               <value>Artist</value>
-           </textarea>
-
-           <textarea name="album_text" draworder="1" align="left">
-               <area>200,315,515,30</area>
-               <font>display</font>
-               <value>Album</value>
-           </textarea>
-
-           <textarea name="title_text" draworder="1" align="left">
-               <area>200,355,515,30</area>
-               <font>display</font>
-               <value>Title</value>
-           </textarea>
-
-           <textarea name="genre_text" draworder="1" align="left">
-               <area>200,395,515,30</area>
-               <font>display</font>
-               <value>Genre</value>
-           </textarea>
-
-           <textarea name="year_text" draworder="1" align="left">
-               <area>200,435,165,30</area>
-               <font>display</font>
-               <value>Year</value>
-           </textarea>
-
-           <textarea name="track_text" draworder="1" align="left">
-               <area>550,435,165,30</area>
-               <font>display</font>
-               <value>Track</value>
-           </textarea>
-
-           <!--
-               Push buttons
-           -->
-
-           <textbutton name="play_button" draworder="0">
-               <position>35,490</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <textbutton name="add_button" draworder="0">
-               <position>35,540</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <pushbutton name="prev_button" draworder="0">
-               <position>230,480</position>
-               <image function="on" filename="mm_prev_on.png"></image>
-               <image function="off" filename="mm_prev_off.png"></image>
-               <image function="pushed" filename="mm_prev_pushed.png"></image>
-           </pushbutton>
-
-           <pushbutton name="next_button" draworder="0">
-               <position>510,480</position>
-               <image function="on" filename="mm_next_on.png"></image>
-               <image function="off" filename="mm_next_off.png"></image>
-               <image function="pushed" filename="mm_next_pushed.png"></image>
-           </pushbutton>
-
-           <textbutton name="nextnew_button" draworder="0">
-               <position>620,490</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <textbutton name="addallnew_button" draworder="0">
-               <position>620,540</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-       </container>
-   </window>
-
-   <!--
-       File Selector
-   -->
-
-   <window name="directory_finder">
-       <font name="title" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>24</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <font name="buttons" face="Arial">
-           <color>#ffffff</color>
-           <size>12</size>
-           <bold>yes</bold>
-       </font>
-
-       <font name="edit" face="Arial">
-           <color>#ffffff</color>
-           <size>14</size>
-           <bold>no</bold>
-       </font>
-
-       <font name="active" face="Arial">
-           <color>#ffffff</color>
-           <size>18</size>
-           <bold>yes</bold>
-       </font>
-
-       <font name="inactive" face="Arial">
-           <color>#9999cc</color>
-           <size>18</size>
-           <bold>yes</bold>
-       </font>
-
-       <font name="info" face="Arial">
-           <color>#9999cc</color>
-           <size>14</size>
-           <bold>no</bold>
-       </font>
-
-       <font name="label" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>18</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <container name="title">
-           <area>0,5,800,45</area>
-           <textarea name="title" draworder="1" align="center">
-               <area>0,0,800,45</area>
-               <font>title</font>
-               <multiline>no</multiline>
-               <value>Directory Finder</value>
-           </textarea>
-       </container>
-
-       <container name="location">
-           <area>0,55,800,80</area>
-
-           <textbutton name="back_button" draworder="1">
-               <position>35,0</position>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-               <font>buttons</font>
-           </textbutton>
-           <textbutton name="home_button" draworder="1">
-               <position>200,0</position>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-               <font>buttons</font>
-           </textbutton>
-           <textarea name="location_label" draworder="0" align="right">
-               <area>20,50,140,30</area>
-               <font>label</font>
-               <multiline>no</multiline>
-               <value>Location:</value>
-           </textarea>
-           <remoteedit name="location_edit" draworder="0" align="left">
-               <area>180,50,580,30</area>
-               <font>edit</font>
-           </remoteedit>
-       </container>
-
-       <container name="file_list">
-           <area>20,140,760,400</area>
-           <listbtnarea name="filelist"  draworder="1">
-               <area>0,0,760,400</area>
-               <gradient type="unselected" start="#505050" end="#000000" alpha="100">
-               </gradient>
-               <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
-               </gradient>
-               <fcnfont name="active" function="active"></fcnfont>
-               <fcnfont name="inactive" function="inactive"></fcnfont>
-               <showscrollarrows>yes</showscrollarrows>
-               <showarrow>no</showarrow>
-           </listbtnarea>
-       </container>
-
-       <!--
-           button area shown on all pages
-       -->
-       <container name="buttons">
-           <area>0,550,800,50</area>
-           <textbutton name="cancel_button" draworder="1">
-               <position>35,0</position>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-               <font>buttons</font>
-           </textbutton>
-           <textbutton name="ok_button" draworder="1">
-               <position>610,0</position>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-               <font>buttons</font>
-           </textbutton>
-       </container>
-   </window>
-
-   <window name="import_coverart">
-
-       <font name="title" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>24</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <font name="labels" face="Arial">
-           <color>#ffff00</color>
-           <dropcolor>#000000</dropcolor>
-           <size>18</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <font name="display" face="Arial">
-           <color>#ffffff</color>
-           <dropcolor>#000000</dropcolor>
-           <size>16</size>
-           <shadow>3,3</shadow>
-           <bold>yes</bold>
-       </font>
-
-       <container name="background">
-           <area>0,0,800,600</area>
-
-           <image name="image" draworder="0">
-               <position>195,60</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>565,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>195,450</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>565,35</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>95,150</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>250,40</staticsize>
-           </image>
-
-           <image name="image" draworder="0">
-               <position>70,240</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>300,40</staticsize>
-           </image>
-
-       </container>
-
-       <container name="foreground">
-           <area>0,0,800,600</area>
-
-           <textarea name="title" draworder="1" align="center">
-               <area>0,5,800,50</area>
-               <font>title</font>
-               <value>Import Cover Art</value>
-           </textarea>
-
-           <!--
-               Labels
-           -->
-           <textarea name="file_label" draworder="1" align="right">
-               <area>15,65,170,30</area>
-               <font>labels</font>
-               <value>File:</value>
-           </textarea>
-
-           <textarea name="destination_label" draworder="1" align="right">
-               <area>15,455,170,30</area>
-               <font>labels</font>
-               <value>Destination:</value>
-           </textarea>
-
-           <textarea name="title" draworder="1" align="right">
-               <area>15,400,170,30</area>
-               <font>labels</font>
-               <value>Image Type:</value>
-           </textarea>
-
-           <!--
-               data fields
-            -->
-
-           <image name="coverart_image" draworder="0">
-               <position>420,125</position>
-               <filename>mm_trans_background.png</filename>
-               <staticsize>300,250</staticsize>
-           </image>
-
-           <pushbutton name="prev_button" draworder="0">
-               <position>50,140</position>
-               <image function="on" filename="mm_prev_on.png"></image>
-               <image function="off" filename="mm_prev_off.png"></image>
-               <image function="pushed" filename="mm_prev_pushed.png"></image>
-           </pushbutton>
-
-           <pushbutton name="next_button" draworder="0">
-               <position>330,140</position>
-               <image function="on" filename="mm_next_on.png"></image>
-               <image function="off" filename="mm_next_off.png"></image>
-               <image function="pushed" filename="mm_next_pushed.png"></image>
-           </pushbutton>
-
-           <textbutton name="copy_button" draworder="0">
-               <position>150,310</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-           <textarea name="file_text" draworder="1" align="right">
-               <area>200,65,550,30</area>
-               <font>display</font>
-               <value>/some/file/goes/here/test.mp3</value>
-           </textarea>
-
-           <textarea name="destination_text" draworder="1" align="right">
-               <area>200,455,550,30</area>
-               <font>display</font>
-               <value>/some/file/goes/here/test.mp3</value>
-           </textarea>
-
-           <textarea name="current_text" draworder="1" align="center">
-               <area>70,155,300,30</area>
-               <font>labels</font>
-               <value>123 of 345</value>
-           </textarea>
-
-           <textarea name="status_text" draworder="1" align="center">
-               <area>70,245,300,30</area>
-               <font>labels</font>
-               <value>All ready in database</value>
-           </textarea>
-
-           <selector name="type_selector" draworder="1">
-               <area>200,400,300,40</area>
-               <font>display</font>
-               <image function="on" filename="leftright_on.png"></image>
-               <image function="off" filename="leftright_off.png"></image>
-               <image function="pushed" filename="leftright_pushed.png"></image>
-           </selector>
-
-           <textbutton name="exit_button" draworder="0">
-               <position>325,540</position>
-               <font>display</font>
-               <image function="on" filename="text_button_on.png"></image>
-               <image function="off" filename="text_button_off.png"></image>
-               <image function="pushed" filename="text_button_pushed.png"></image>
-           </textbutton>
-
-       </container>
-   </window>
-
-   <window name="miniplayer">
-       <area>-1,5,590,190</area>
-       <imagetype name="track_info_background">
-           <filename>miniplayer_background.png</filename>
-           <area>10,10,569,170</area>
-       </imagetype>
-
-       <imagetype name="mm_blackhole_border">
-           <filename>mm_blackhole_border.png</filename>
-           <area>20,20,146,148</area>
-       </imagetype>
-
-       <textarea name="title" from="basetextarea">
-           <area>170,15,415,34</area>
-           <font>baselarge</font>
-       </textarea>
-
-       <textarea name="artist" from="basetextarea">
-           <area>170,50,415,27</area>
-           <font>basemedium</font>
-       </textarea>
-
-       <textarea name="album" from="basetextarea">
-           <area>170,77,415,27</area>
-           <font>basemedium</font>
-       </textarea>
-
-       <statetype name="ratings_state">
-       </statetype>
-
-       <textarea name="info" from="basetextarea">
-           <area>170,129,250,25</area>
-       </textarea>
-
-       <textarea name="time" from="basetextarea">
-           <area>385,125,185,25</area>
-           <align>right</align>
-       </textarea>
-
-       <imagetype name="coverart">
-           <filename>mm_nothumb.png</filename>
-           <area>22,22,144,144</area>
-       </imagetype>
-
-       <progressbar name="progress" from="baseprogressbar">
-           <position>170,150</position>
-       </progressbar>
-       <!--
-           <textarea name="volume_text" draworder="5" align="left">
-               <font>infotext</font>
-               <area>490,105,250,25</area>
-               <value>%1</value>                - this would show as '12'
-               <value>%1%</value>               - this would show as '12%'
-               <value>Vol: %1</value>           - this would show as 'Vol: 12'
-               <value>Vol: %1%</value>          - this would show as 'Vol: 12%'
-           </textarea>
-           -->
-  </window>
-
-</mythuitheme>
+    </mythuitheme>

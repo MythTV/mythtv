@@ -3,11 +3,16 @@
 
 #include "metadata.h"
 
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdialogs.h>
-//Added by qt3to4:
 #include <QEvent>
-#include <QKeyEvent>
+
+#include <mythtv/libmythui/mythscreentype.h>
+
+class MythUIText;
+class MythUITextEdit;
+class MythUIImage;
+class MythUIButton;
+class MythUIButtonList;
+class MythUICheckBox;
 
 class CdDecoder;
 class Encoder;
@@ -71,12 +76,15 @@ class CDRipperThread: public QThread
         int                m_lastOverallPct;
 };
 
-class Ripper : public MythThemedDialog
+class Ripper : public MythScreenType
 {
     Q_OBJECT
   public:
-    Ripper(QString device, MythMainWindow *parent, const char *name = 0);
+    Ripper(MythScreenStack *parent, QString device);
    ~Ripper(void);
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
     bool somethingWasRipped();
     void scanCD(void);
@@ -100,10 +108,9 @@ class Ripper : public MythThemedDialog
     void searchArtist(void);
     void searchAlbum(void);
     void searchGenre(void);
+    void RipComplete(bool result);
 
   private:
-    void wireupTheme(void);
-    void keyPressEvent(QKeyEvent *e);
     void deleteTrack(QString& artist, QString& album, QString& title);
     void updateTrackList(void);
     void updateTrackLengths(void);
@@ -116,20 +123,24 @@ class Ripper : public MythThemedDialog
     static QString fixFileToken(QString token);
     static QString fixFileToken_sl(QString token);
 
-    CdDecoder         *m_decoder;
-    UIRemoteEditType  *m_artistEdit;
-    UISelectorType    *m_qualitySelector;
-    UIRemoteEditType  *m_albumEdit;
-    UIRemoteEditType  *m_genreEdit;
-    UIRemoteEditType  *m_yearEdit;
-    UICheckBoxType    *m_compilation;
-    UITextButtonType  *m_switchTitleArtist;
-    UIListType        *m_trackList;
-    UITextButtonType  *m_scanButton;
-    UITextButtonType  *m_ripButton;
-    UIPushButtonType  *m_searchArtistButton;
-    UIPushButtonType  *m_searchAlbumButton;
-    UIPushButtonType  *m_searchGenreButton;
+    CdDecoder           *m_decoder;
+
+    MythUITextEdit      *m_artistEdit;
+    MythUITextEdit      *m_albumEdit;
+    MythUITextEdit      *m_genreEdit;
+    MythUITextEdit      *m_yearEdit;
+
+    MythUICheckBox      *m_compilationCheck;
+
+    MythUIButtonList    *m_trackList;
+    MythUIButtonList    *m_qualityList;
+
+    MythUIButton        *m_switchTitleArtist;
+    MythUIButton  *m_scanButton;
+    MythUIButton  *m_ripButton;
+    MythUIButton  *m_searchArtistButton;
+    MythUIButton  *m_searchAlbumButton;
+    MythUIButton  *m_searchGenreButton;
 
     int                m_currentTrack;
     int                m_totalTracks;
@@ -172,36 +183,34 @@ class RipStatusEvent : public QEvent
     int value;
 };
 
-class RipStatus : public MythThemedDialog
+class RipStatus : public MythScreenType
 {
   Q_OBJECT
   public:
-    RipStatus(const QString &device, vector<RipTrack*> *tracks, int quality,
-              MythMainWindow *parent, const char *name = 0);
+    RipStatus(MythScreenStack *parent, const QString &device,
+              vector<RipTrack*> *tracks, int quality);
     ~RipStatus(void);
 
-    QString getErrorMessage(void) { return m_errorMessage; }
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
   protected slots:
     void startRip(void);
 
   private:
-    void wireupTheme(void);
-    void keyPressEvent(QKeyEvent *e);
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *event);
 
     vector<RipTrack*> *m_tracks;
     int                m_quality;
     QString            m_CDdevice;
-    QString            m_errorMessage;
 
-    UITextType        *m_overallText;
-    UITextType        *m_trackText;
-    UITextType        *m_statusText; 
-    UITextType        *m_overallPctText;
-    UITextType        *m_trackPctText;
-    UIStatusBarType   *m_overallProgress;
-    UIStatusBarType   *m_trackProgress;
+    MythUIText        *m_overallText;
+    MythUIText        *m_trackText;
+    MythUIText        *m_statusText;
+    MythUIText        *m_overallPctText;
+    MythUIText        *m_trackPctText;
+    MythUIProgressBar   *m_overallProgress;
+    MythUIProgressBar   *m_trackProgress;
 
     CDRipperThread    *m_ripperThread;
 };
