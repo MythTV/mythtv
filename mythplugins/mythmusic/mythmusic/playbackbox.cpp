@@ -1863,14 +1863,13 @@ void PlaybackBoxMusic::editPlaylist()
     }
 
     visual_mode_timer->stop();
-    DatabaseBox *dbbox = new DatabaseBox(
-        gContext->GetMainWindow(), m_CDdevice,
-        "music_select", "music-", "database box");
+    DatabaseBox dbbox(gContext->GetMainWindow(), m_CDdevice,
+                      "music_select", "music-", "database box");
 
     if (cd_watcher)
         cd_watcher->stop();
 
-    dbbox->exec();
+    dbbox.exec();
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);
 
@@ -1897,8 +1896,6 @@ void PlaybackBoxMusic::editPlaylist()
 
     if (scan_for_cd && cd_watcher)
         cd_watcher->start(1000);
-
-    dbbox->deleteLater();
 }
 
 void PlaybackBoxMusic::customEvent(QEvent *event)

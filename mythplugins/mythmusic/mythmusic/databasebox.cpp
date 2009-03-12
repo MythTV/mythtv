@@ -50,7 +50,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     cd_checking_flag = gContext->GetNumSetting("AutoLookupCD");
 
     QString treelev = gContext->GetSetting("TreeLevels", "artist album title");
-    QStringList treelevels = treelev.toLower().split(" ");
+    QStringList treelevels = treelev.toLower().split(" ", QString::SkipEmptyParts);
 
     active_popup = NULL;
     active_pl_edit = NULL;
