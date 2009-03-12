@@ -944,26 +944,8 @@
             <position>310,290</position>
         </checkbox>
 
-        <button name="coverart_button">
-            <area>310,323,32,32</area>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                <state name="pushed" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_pushed.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
+        <button name="coverart_button" from="basesearchbutton">
+            <position>310,323</position>
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
@@ -971,26 +953,8 @@
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
-        <button name="screenshot_button">
-            <area>310,352,32,32</area>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                <state name="pushed" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_pushed.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
+        <button name="screenshot_button" from="basesearchbutton">
+            <position>310,352</position>
         </button>
 
         <textarea name="screenshot_text" from="basetextarea">
@@ -998,26 +962,8 @@
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
-        <button name="banner_button">
-            <area>310,381,32,32</area>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                <state name="pushed" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_pushed.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
+        <button name="banner_button" from="basesearchbutton">
+            <position>310,381</position>
         </button>
 
         <textarea name="banner_text" from="basetextarea">
@@ -1025,26 +971,8 @@
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
-        <button name="fanart_button">
-            <area>310,412,32,32</area>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                <state name="pushed" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_pushed.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
+        <button name="fanart_button" from="basesearchbutton">
+            <position>310,412</position>
         </button>
 
         <textarea name="fanart_text" from="basetextarea">
@@ -1052,26 +980,8 @@
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
-        <button name="trailer_button">
-            <area>310,442,32,32</area>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                <state name="pushed" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_pushed.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
+        <button name="trailer_button" from="basesearchbutton">
+            <position>310,442</position>
         </button>
 
         <textarea name="trailer_text" from="basetextarea">

@@ -305,6 +305,30 @@
         </statetype>
     </button>
 
+    <!-- Base definition of 'search' button, those little search launch buttons
+         which appear next to some text input fields in forms -->
+    <button name="basesearchbutton">
+        <area>0,0,32,32</area>
+        <statetype name="buttonstate">
+            <state name="active">
+                <imagetype name="background">
+                    <filename>blankbutton_off.png</filename>
+                </imagetype>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="background">
+                    <filename>blankbutton_on.png</filename>
+                </imagetype>
+            </state>
+            <state name="disabled" from="active" />
+            <state name="pushed" from="active">
+                <imagetype name="background">
+                    <filename>blankbutton_pushed.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </button>
+
     <!-- Base definition of checkbox -->
     <checkbox name="basecheckbox">
         <position>0,0</position>
