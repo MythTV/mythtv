@@ -228,7 +228,7 @@ namespace
 
                 VERBOSE(VB_MEDIA, "MythVideo: Multiple DVD drives? Forgetting "
                                     + gDVDdevice);
-                gDVDdevice = QString::null;
+                gDVDdevice.clear();
             }
             else
             {
@@ -244,7 +244,7 @@ namespace
             {
                 VERBOSE(VB_MEDIA,
                         "MythVideo: Forgetting existing DVD " + gDVDdevice);
-                gDVDdevice = QString::null;
+                gDVDdevice.clear();
 
                 // How do I tell the MTD to ignore this device?
             }
