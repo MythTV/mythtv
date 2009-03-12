@@ -2134,7 +2134,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     if (container)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("NewDialogBox, dialog containter for "
+                QString("NewDialogBox, dialog container for "
                         "'%1' already exists.").arg(name));
         return;
     }
