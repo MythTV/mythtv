@@ -178,9 +178,17 @@ bool DecoderBase::PosMapFromDb(void)
     return true;
 }
 
+/** \fn DecoderBase::PosMapFromEnc(void)
+ *  \brief Queries encoder for position map data
+ *         that has not been committed to the DB yet.
+ *
+ *  PosMapFromDb(void) must be called first in order
+ *  to set positionMapType and keyframedist correctly.
+ *
+ */
 bool DecoderBase::PosMapFromEnc(void)
 {
-    if (!m_parent)
+    if (!m_parent || keyframedist < 1)
         return false;
 
     unsigned long long start = 0;
@@ -191,21 +199,17 @@ bool DecoderBase::PosMapFromEnc(void)
     }
 
     QMap<long long, long long> posMap;
-    if (m_parent->PosMapFromEnc(start, posMap))
+    if (!m_parent->PosMapFromEnc(start, posMap))
         return false;
 
     QMutexLocker locker(&m_positionMapLock);
-
-    // LiveTV will always have a by frame keyframe map..
-    positionMapType = MARK_GOP_BYFRAME;
-    keyframedist = 1;
 
     // append this new position map to class's
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
          it != posMap.end(); it++) 
     {
-        PosMapEntry e = {it.key(), it.key(), *it};
+        PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
     }
     if (!m_positionMap.empty())
