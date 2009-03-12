@@ -239,7 +239,7 @@ class MPUBLIC MythUIFileBrowser : public MythScreenType
 
     void SetReturnEvent(QObject *retobject, const QString &resultid);
 
-    void SetTypeFilter(QDir::Filter filter) { m_typeFilter = filter; }
+    void SetTypeFilter(QDir::Filters filter) { m_typeFilter = filter; }
     void SetNameFilter(QStringList filter) { m_nameFilter = filter; }
 
   private slots:
