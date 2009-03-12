@@ -10733,10 +10733,15 @@ bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
  */
 bool TV::IsDeleteAllowed(const PlayerContext *ctx) const
 {
-    ctx->LockPlayingInfo(__FILE__, __LINE__);
-    ProgramInfo *curProgram = ctx->playingInfo;
-    bool allowed = (curProgram && !curProgram->isVideo);
-    ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    bool allowed = false;
+
+    if (!StateIsLiveTV(GetState(ctx)))
+    {
+        ctx->LockPlayingInfo(__FILE__, __LINE__);
+        ProgramInfo *curProgram = ctx->playingInfo;
+        allowed = (curProgram && !curProgram->isVideo);
+        ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+    }
 
     return allowed;
 }
