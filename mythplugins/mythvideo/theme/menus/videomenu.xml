@@ -144,4 +144,32 @@
       <action>EJECT</action>
    </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
+    <button>
+        <type>SETTINGS_VIDEO</type>
+        <text>Videos Settings</text>
+        <text lang="IT">Impostazioni Video</text>
+        <text lang="ES">Configurar Videos</text>
+        <text lang="CA">Configurar Videos</text>
+        <text lang="FR">Paramètres Videos</text>
+        <text lang="DE">Videos</text>
+        <text lang="DA">Video Indstillinger</text>
+        <text lang="IS">Stillingar kvikmynda</text>
+        <text lang="NL">Films Instellingen</text>
+        <text lang="PT">Configurar Filmes</text>
+        <text lang="SV">Video</text>
+        <text lang="JA">ビデオ設定</text>
+        <text lang="FI">Videoasetukset</text>
+        <text lang="ZH_TW">電影設定</text>
+        <text lang="SL">Video nastavitve</text>
+        <text lang="ET">Video sätted</text>
+        <text lang="NB">Videoinnstillinger</text>
+        <text lang="CS">Nastavení videa</text>
+        <text lang="RU">Настройка фильмов</text>
+        <text lang="PL">Ustaw Filmy</text>
+        <text lang="HE">הגדרות וידאו</text>
+        <description>Configure playback and DVD ripping</description>
+        <action>MENU video_settings.xml</action>
+    </button>
+
 </mythmenu>

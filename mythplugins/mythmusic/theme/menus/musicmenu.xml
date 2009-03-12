@@ -108,4 +108,32 @@
       <action>EJECT</action>
    </button>
 
+    <!-- Keep this in synch with mythtv/themes/defaultmenu/media_settings.xml -->
+   <button>
+     <type>SETTINGS_MUSIC</type>
+     <text>Music Settings</text>
+     <text lang="IT">Impostazioni Musica</text>
+     <text lang="ES">Configurar Música</text>
+     <text lang="FR">Paramètres Musique</text>
+     <text lang="CA">Configurar Música</text>
+     <text lang="DE">Musik</text>
+     <text lang="DA">Musik Indstillinger</text>
+     <text lang="IS">Stillingar tónlistar</text>
+     <text lang="NL">Muziek Instellingen</text>
+     <text lang="PT">Configurar Música</text>
+     <text lang="SV">Musik</text>
+     <text lang="JA">ミュージック設定</text>
+     <text lang="FI">Musiikkiasetukset</text>
+     <text lang="ZH_TW">音樂設定</text>
+     <text lang="SL">Glasbene nastavitve</text>
+     <text lang="ET">Muusika sätted</text>
+     <text lang="NB">Musikkinnstillinger</text>
+     <text lang="CS">Nastavení muziky</text>
+     <text lang="RU">Настройка музыки</text>
+     <text lang="PL">Konfiguracja Muzyki</text>
+     <text lang="HE">הגדרות מוסיקה</text>
+     <description>Configure playback and CD ripping</description>
+     <action>MENU music_settings.xml</action>
+   </button>
+
 </mythmenu>
