@@ -1,15 +1,17 @@
 #ifndef SMARTPLAYLIST_H_
 #define SMARTPLAYLIST_H_
 
-#include <qdatetime.h>
-#include <qlayout.h>
-#include <q3hbox.h>
-#include <qvariant.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
-#include <QLabel>
-#include <Q3PtrList>
+#include <vector>
+using namespace std;
+
+#include <QDateTime>
+#include <QVariant>
 #include <QKeyEvent>
+//Added by qt3to4:
+#include <QLayout>
+#include <QLabel>
+#include <Q3HBox>
+#include <Q3HBoxLayout>
 #include <Q3VBoxLayout>
 
 #include <mythtv/mythwidgets.h>
@@ -155,7 +157,7 @@ class SmartPlaylistEditor : public MythDialog
     QAbstractButton            *renameCategoryButton;
     QAbstractButton            *deleteCategoryButton;
     
-    Q3PtrList<SmartPLCriteriaRow> criteriaRows;
+    vector<SmartPLCriteriaRow*> criteriaRows;
     int matchesCount;
     bool bNewPlaylist;
     bool bPlaylistIsValid;

@@ -1,17 +1,18 @@
 #ifndef PLAYLIST_H_
 #define PLAYLIST_H_
 
-#include <q3valuelist.h>
-#include <q3listview.h>
-#include <q3ptrlist.h>
-#include <qthread.h>
+#include <vector>
+#include <list>
+using namespace std;
+
+#include <QList>
 
 #include "metadata.h"
 #include "treecheckitem.h"
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 
-class PlaylistsContainer;
+class PlaylistContainer;
 
 
 enum InsertPLOption
@@ -30,6 +31,14 @@ enum PlayPLOption
     PL_CURRENT
 };
 
+typedef enum TrackTypes
+{
+    kTrackCD,
+    kTrackPlaylist,
+    kTrackSong,
+    kTrackUnknown,
+} TrackType;
+
 class Track
 {
     //  Why isn't this class just Metadata?
@@ -40,7 +49,7 @@ class Track
   public: 
     Track(int x, AllMusic *all_music_ptr);
 
-    void postLoad(PlaylistsContainer *grandparent);
+    void postLoad(PlaylistContainer *grandparent);
 
     void setParent(Playlist *parent_ptr);
     void setValue(int x){index_value = x;}
@@ -58,6 +67,8 @@ class Track
     void setCDFlag(bool yes_or_no) { cd_flag = yes_or_no; }
     bool getCDFlag(void) { return cd_flag; }
 
+    TrackType GetTrackType(void) const;
+
   private:    
     int           index_value;
     PlaylistTrack *my_widget;
@@ -74,9 +85,9 @@ class Playlist
     Playlist(AllMusic *all_music_ptr);
     ~Playlist();
 
-    Playlist& operator=(const Playlist& rhs);
+    //Playlist& operator=(const Playlist& rhs);
 
-    void setParent(PlaylistsContainer *myparent) { parent = myparent; }
+    void setParent(PlaylistContainer *myparent) { parent = myparent; }
 
     void postLoad(void);
 
@@ -89,7 +100,7 @@ class Playlist
 
     int writeTree(GenericTree *tree_to_write_to, int a_counter);
 
-    void describeYourself(void); //  debugging
+    void describeYourself(void) const; //  debugging
 
     void fillSongsFromCD();
     void fillSongsFromSonglist(bool filter);
@@ -107,7 +118,7 @@ class Playlist
 
     void moveTrackUpDown(bool flag, Track *the_track);
 
-    bool checkTrack(int a_track_id, bool cd_flag);
+    bool checkTrack(int a_track_id, bool cd_flag) const;
 
     void addTrack(int the_track_id, bool update_display, bool cd_flag);
 
@@ -115,7 +126,7 @@ class Playlist
     void removeAllTracks(void);
     void removeAllWidgets(void);
     
-    void copyTracks(Playlist *to_ptr, bool update_display);
+    void copyTracks(Playlist *to_ptr, bool update_display) const;
 
     bool hasChanged(void) { return changed; }
     void Changed(void) { changed = true; }
@@ -124,7 +135,7 @@ class Playlist
     void    setName(QString a_name) { name = a_name; }
 
     int     getID(void) { return playlistid; }
-    int     getFirstTrackID(void);
+    int     getFirstTrackID(void) const;
     void    setID(int x) { playlistid = x; }
 
     bool    containsReference(int to_check, int depth);
@@ -139,92 +150,11 @@ class Playlist
     int                 playlistid;
     QString             name;
     QString             raw_songlist;
-    Q3PtrList<Track>     songs;
-    AllMusic            *all_available_music;
-    PlaylistsContainer  *parent;
+    typedef QList<Track*> SongList;
+    SongList            songs;
+    AllMusic           *all_available_music;
+    PlaylistContainer  *parent;
     bool                changed;
-};
-
-class PlaylistLoadingThread : public QThread
-{
-  public:
-    PlaylistLoadingThread(PlaylistsContainer *parent_ptr,
-                          AllMusic *all_music_ptr);
-    virtual void run();
-    
-  private:  
-    PlaylistsContainer* parent;
-    AllMusic*           all_music;
-};
-
-class PlaylistsContainer
-{
-  public:
-    PlaylistsContainer(AllMusic *all_music, QString host_name);
-   ~PlaylistsContainer();
-
-    void            load();
-    void            describeYourself();    // debugging
-
-    Playlist*       getActive(void) { return active_playlist; }
-    Playlist*       getPlaylist(int id);
-
-    void            setActiveWidget(PlaylistTitle *widget);
-    PlaylistTitle*  getActiveWidget(void) { return active_widget; }
-
-    GenericTree*    writeTree(GenericTree *tree_to_write_to);
-    void            clearCDList();
-    void            addCDTrack(int x);
-    void            removeCDTrack(int x);
-    bool            checkCDTrack(int x);
-    void            save();
-
-    void            createNewPlaylist(QString name);
-    void            copyNewPlaylist(QString name);
-    void            copyToActive(int index);
-
-    void            showRelevantPlaylists(TreeCheckItem *alllist);
-    void            refreshRelevantPlaylists(TreeCheckItem *alllist);
-
-    QString         getPlaylistName(int index, bool &reference);
-
-    void            postLoad();
-
-    void            deletePlaylist(int index);
-    void            renamePlaylist(int index, QString new_name);
-
-    void            popBackPlaylist();
-    bool            pendingWriteback();
-    void            setPending(int x){pending_writeback_index = x;}
-    int             getPending(){return pending_writeback_index;}
-
-    bool            nameIsUnique(QString a_name, int which_id);
-
-    void            clearActive();
-
-    bool            doneLoading(){return done_loading;}
-
-    bool            cleanOutThreads();
-
-    void            FillIntelliWeights(int &rating, int &playcount,
-                                       int &lastplay, int &random);
-  private:  
-    Playlist            *active_playlist;
-    Playlist            *backup_playlist;
-    Q3ValueList<int>     cd_playlist;
-    Q3PtrList<Playlist>  *all_other_playlists;
-    AllMusic            *all_available_music;
-    PlaylistTitle       *active_widget;
-    int                 pending_writeback_index;
-    
-    PlaylistLoadingThread  *playlists_loader;
-    bool                    done_loading;
-    QString                 my_host;
-
-    int RatingWeight;
-    int PlayCountWeight;
-    int LastPlayWeight;
-    int RandomWeight;
 };
 
 #endif

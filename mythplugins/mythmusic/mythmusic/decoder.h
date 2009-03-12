@@ -5,7 +5,6 @@
 #include <qstring.h>
 #include <qevent.h>
 #include <qthread.h>
-#include <q3ptrlist.h>
 #include <qwaitcondition.h>
 #include <qmutex.h>
 
@@ -72,7 +71,7 @@ class Decoder : public QThread, public MythObservable
     virtual void lock(void) { return mtx.lock(); }
     virtual void unlock(void) { return mtx.unlock(); }
     virtual bool tryLock(void) { return mtx.tryLock(); }
-    virtual bool locked(void) { return mtx.locked(); }
+    //virtual bool locked(void) { return mtx.locked(); }
 
     QWaitCondition *cond() { return &cnd; }
 

@@ -1,13 +1,14 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
+// C++
+#include <vector>
+using namespace std;
+
 // qt
-#include <qstring.h>
-#include <qstringlist.h>
-#include <q3ptrlist.h>
-#include <q3valuelist.h>
-#include <qmap.h>
-#include <qthread.h>
+#include <QStringList>
+#include <QMap>
+#include <QThread>
 
 // mythtv
 #include <mythtv/uitypes.h>
@@ -18,7 +19,7 @@
 
 class AllMusic;
 class CoverArt;
-class PlaylistsContainer;
+class PlaylistContainer;
 
 enum ImageType
 {
@@ -170,7 +171,7 @@ class Metadata
     }
     bool determineIfCompilation(bool cd = false);
 
-    void setEmbeddedAlbumArt(Q3ValueList<struct AlbumArtImage> art);
+    void setEmbeddedAlbumArt(const QList<struct AlbumArtImage> &art);
 
     bool isInDatabase(void);
     void dumpToDatabase(void);
@@ -178,7 +179,7 @@ class Metadata
     void getField(const QString& field, QString *data);
     void persist();
     bool hasChanged() {return m_changed;}
-    int compare (Metadata *other);
+    int compare(const Metadata *other) const;
     static void setArtistAndTrackFormats();
 
     static void SetStartdir(const QString &dir);
@@ -217,7 +218,7 @@ class Metadata
     QString m_lastplay;
     int m_playcount;
     bool m_compilation;
-    Q3ValueList<struct AlbumArtImage> m_albumart;
+    QList<struct AlbumArtImage> m_albumart;
 
     unsigned int m_id;
     QString m_filename;
@@ -242,28 +243,9 @@ class Metadata
 bool operator==(const Metadata& a, const Metadata& b);
 bool operator!=(const Metadata& a, const Metadata& b);
 
-class MetadataPtrList : public Q3PtrList<Metadata>
-{
-  public:
-    MetadataPtrList() {}
-    ~MetadataPtrList() {}
-
-  protected:
-    int compareItems(Q3PtrCollection::Item item1,
-                     Q3PtrCollection::Item item2);
-};
-
+typedef QList<Metadata*> MetadataPtrList;
 class MusicNode;
-class MusicNodePtrList : public Q3PtrList<MusicNode>
-{
-  public:
-    MusicNodePtrList() {}
-    ~MusicNodePtrList() {}
-
-  protected:
-    int compareItems(Q3PtrCollection::Item item1,
-                     Q3PtrCollection::Item item2);
-};
+typedef QList<MusicNode*> MusicNodePtrList;
 
 class MusicNode
 {    
@@ -272,8 +254,8 @@ class MusicNode
     MusicNode(const QString &a_title, const QString &tree_level);
    ~MusicNode();
 
-    QString     getTitle(){return my_title;}
-    void        printYourself(int indent_amount);   // debugging
+    QString     getTitle(void) const { return my_title; }
+    void        printYourself(int indent_amount) const;   // debugging
     void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
     void        writeTree(GenericTree *tree_to_write_to, int a_counter);
     void        sort();
@@ -384,7 +366,7 @@ class AllMusic
     typedef QMap<int, Metadata*> MusicMap;
     MusicMap music_map;
     
-    typedef Q3ValueList<Metadata>  ValueMetadata;
+    typedef QList<Metadata>       ValueMetadata;
     ValueMetadata                 m_cd_data; //  More than one cd player?
     QString                       m_cd_title;
 
@@ -414,7 +396,7 @@ class MusicData
 
     QString             paths;
     QString             startdir;
-    PlaylistsContainer *all_playlists;
+    PlaylistContainer  *all_playlists;
     AllMusic           *all_music;
     bool                runPost;
 };
@@ -424,21 +406,20 @@ extern MPUBLIC MusicData *gMusicData;
 
 //----------------------------------------------------------------------------
 
-class AlbumArtImages: public QObject
+class AlbumArtImages
 {
-  Q_OBJECT
-
   public:
     AlbumArtImages(Metadata *metadata);
+    ~AlbumArtImages();
 
-    uint                     getImageCount() { return m_imageList.count(); }
-    AlbumArtImage            getImage(ImageType type);
+    typedef vector<AlbumArtImage*> ImageList;
+
+    uint                     getImageCount() { return m_imageList.size(); }
+    AlbumArtImage           *getImage(ImageType type);
     QString                  getTypeName(ImageType type);
-    QStringList              getImageFilenames();
-    Q3PtrList<AlbumArtImage> *getImageList() { return &m_imageList; }
-    AlbumArtImage            getImageAt(uint index);
-
-    bool isImageAvailable(ImageType type);
+    QStringList              getImageFilenames(void) const;
+    ImageList               *getImageList(void) { return &m_imageList; }
+    AlbumArtImage           *getImageAt(uint index);
 
     bool saveImageType(const int id, ImageType type);
 
@@ -447,8 +428,8 @@ class AlbumArtImages: public QObject
   private:
     void findImages(void);
 
-    Metadata                *m_parent;
-    Q3PtrList<AlbumArtImage>  m_imageList;
+    Metadata  *m_parent;
+    ImageList  m_imageList;
 };
 
 #endif

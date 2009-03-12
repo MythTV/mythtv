@@ -1,18 +1,16 @@
+// C
 #include <cstdlib>
+
+// C++
 #include <iostream>
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <Q3PtrList>
 using namespace std;
 
 // qt
-#include <qapplication.h>
-#include <qstringlist.h>
-#include <qpixmap.h>
-#include <qregexp.h>
-#include <q3frame.h>
-#include <qlayout.h>
-#include <qevent.h>
+#include <QApplication>
+#include <QKeyEvent>
+#include <QRegExp>
+#include <QLayout>
+#include <QEvent>
 
 // mythtv
 #include <mythtv/dialogbox.h>
@@ -26,7 +24,7 @@ using namespace std;
 #include "databasebox.h"
 #include "treecheckitem.h"
 #include "cddecoder.h"
-#include "playlist.h"
+#include "playlistcontainer.h"
 #include "musicplayer.h"
 #ifndef USING_MINGW
 #include "cddecoder.h"
@@ -52,7 +50,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     cd_checking_flag = gContext->GetNumSetting("AutoLookupCD");
 
     QString treelev = gContext->GetSetting("TreeLevels", "artist album title");
-    QStringList treelevels = QStringList::split(" ", treelev.lower());
+    QStringList treelevels = treelev.toLower().split(" ");
 
     active_popup = NULL;
     active_pl_edit = NULL;
@@ -88,10 +86,10 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     {
         QString linename = QString("line%1").arg(i);
         if ((line = getUITextType(linename)))
-            m_lines.append(line);
+            m_lines.push_back(line);
     }
 
-    if (m_lines.count() < 3)
+    if (m_lines.size() < 3)
     {
         DialogBox *dlg = new DialogBox(
             gContext->GetMainWindow(),
@@ -234,8 +232,9 @@ void DatabaseBox::keepFilling()
 
 void DatabaseBox::occasionallyCheckCD()
 {
-    if (cd_reader_thread->getLock()->locked())
+    if (!cd_reader_thread->getLock()->tryLock())
         return;
+    cd_reader_thread->getLock()->unlock();
 
     if (cd_reader_thread->statusChanged())
     {
@@ -245,7 +244,7 @@ void DatabaseBox::occasionallyCheckCD()
             fillCD();
         }
     }
-    if (!cd_reader_thread->running())
+    if (!cd_reader_thread->isRunning())
         cd_reader_thread->start();
 }
 
@@ -700,7 +699,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
         }
 
         // Pre increment as not incremented from previous use.
-        while (++line < m_lines.count())
+        while (++line < (unsigned) m_lines.size())
           m_lines.at(line)->SetText("");
 
         // Don't forget to delete the mdata storage if we allocated it.
@@ -749,7 +748,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
         dispat++;
     }
 
-    for (unsigned int i = dispat; i < m_lines.count(); i++)
+    for (unsigned int i = dispat; i < (unsigned) m_lines.size(); i++)
         m_lines.at(i)->SetText("");
 }
 

@@ -1,7 +1,5 @@
 #include <iostream>
 #include <sys/stat.h>
-//Added by qt3to4:
-#include <Q3CString>
 using namespace std;
 
 #include "metaioflacvorbiscomment.h"
@@ -298,9 +296,9 @@ QString MetaIOFLACVorbisComment::getComment(FLAC__StreamMetadata* pBlock,
 
         // we need to make sure the '=' comes immediately after
         // the desired label
-        if ((loc = entrytext.find("=")) && 
+        if ((loc = entrytext.indexOf("=")) && 
             (loc == (int)qlabel.length()) && 
-            entrytext.lower().left(qlabel.length()) == qlabel.lower())
+            entrytext.toLower().left(qlabel.length()) == qlabel.toLower())
         {
             return QString::fromUtf8(entrytext.right(entrytext.length() - loc - 1));
         }
@@ -328,7 +326,7 @@ void MetaIOFLACVorbisComment::setComment(FLAC__StreamMetadata* pBlock,
 
     QString test = getComment(pBlock, pLabel);
 
-    QString thenewentry = QString(pLabel).upper() + "=" + rData;
+    QString thenewentry = QString(pLabel).toUpper() + "=" + rData;
     QByteArray utf8str = thenewentry.toUtf8();
 
     FLAC__StreamMetadata_VorbisComment_Entry entry;

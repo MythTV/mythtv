@@ -1,37 +1,33 @@
 #ifndef MINIPLAYER_H_
 #define MINIPLAYER_H_
 
-#include <qstring.h>
-#include <QKeyEvent>
-
-#include "mythtv/mythdialogs.h"
+#include <mythtv/libmythui/mythscreentype.h>
 
 class MusicPlayer;
 class QTimer;
 class Metadata;
+class MythUIText;
+class MythUIImage;
+class MythUIStateType;
+class MythUIProgressBar;
 
-class MPUBLIC MiniPlayer : public MythThemedDialog
+class MPUBLIC MiniPlayer : public MythScreenType
 {
   Q_OBJECT
 
   public:
-    MiniPlayer(MythMainWindow *parent, MusicPlayer *parentPlayer,
-               const char *name = "MiniPlayer", bool setsize = true);
+    MiniPlayer(MythScreenStack *parent, MusicPlayer *parentPlayer);
     ~MiniPlayer();
 
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent*);
+
   public slots:
-    virtual void show();
-    virtual void hide();
     void timerTimeout(void);
-    void showPlayer(int showTime);
     void showInfoTimeout(void);
 
-  protected:
-    virtual void keyPressEvent(QKeyEvent *e);
-    virtual void customEvent(QEvent *event);
-
   private:
-    void    wireupTheme(void);
     QString getTimeString(int exTime, int maxTime);
     void    updateTrackInfo(Metadata *mdata);
     void    seekforward(void);
@@ -54,16 +50,13 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
 
     bool          m_showingInfo;
 
-    UITextType   *m_titleText;
-    UITextType   *m_artistText;
-    UITextType   *m_albumText;
-    UITextType   *m_timeText;
-    UITextType   *m_infoText;
-    UITextType   *m_volText;
-    UIImageType  *m_coverImage;
+    MythUIText   *m_timeText;
+    MythUIText   *m_infoText;
+    MythUIText   *m_volText;
+    MythUIImage  *m_coverImage;
 
-    UIStatusBarType     *m_progressBar;
-    UIRepeatedImageType *m_ratingsImage;
+    MythUIProgressBar     *m_progressBar;
+    MythUIStateType       *m_ratingsState;
 
     QString       m_volFormat;
 };

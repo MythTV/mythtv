@@ -1,10 +1,7 @@
 #ifndef TREEBUILDERS_H_
 #define TREEBUILDERS_H_
 
-#include <qstring.h>
-#include <qstringlist.h>
-#include <q3ptrdict.h>
-#include <q3dict.h>
+#include <QStringList>
 
 #include "metadata.h"
 

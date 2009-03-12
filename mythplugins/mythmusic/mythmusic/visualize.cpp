@@ -18,7 +18,6 @@
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qdir.h>
-#include <q3url.h>
 
 // mythtv
 #include <mythtv/mythdbcon.h>
@@ -108,15 +107,16 @@ void Spectrum::resize(const QSize &newsize)
     scale.setMax(192, size.width() / analyzerBarWidth);
 
     rects.resize( scale.range() );
-    int i = 0, w = 0;
-    for (; (unsigned) i < rects.count(); i++, w += analyzerBarWidth)
+    unsigned int i = 0;
+    int w = 0;
+    for (; i < rects.size(); i++, w += analyzerBarWidth)
     {
         rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
     }
 
-    int os = magnitudes.size();
+    unsigned int os = magnitudes.size();
     magnitudes.resize( scale.range() * 2 );
-    for (; (unsigned) os < magnitudes.size(); os++)
+    for (; os < magnitudes.size(); os++)
     {
         magnitudes[os] = 0.0;
     }
@@ -161,7 +161,7 @@ bool Spectrum::process(VisualNode *node)
 #endif
 
     index = 1;
-    for (i = 0; i < rects.count(); i++, w += analyzerBarWidth)
+    for (i = 0; i < rects.size(); i++, w += analyzerBarWidth)
     {        
 #ifdef FFTW3_SUPPORT
         magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) * 
@@ -252,7 +252,7 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     double r, g, b, per;
 
     p->fillRect(0, 0, size.width(), size.height(), back);
-    for (uint i = 0; i < rects.count(); i++)
+    for (uint i = 0; i < rects.size(); i++)
     {
         per = double( rectsp[i].height() - 2 ) / double( size.height() );
 
@@ -324,13 +324,13 @@ void AlbumArt::findFrontCover(void)
 {
     // if a front cover image is available show that first
     AlbumArtImages albumArt(m_pParent->metadata());
-    if (albumArt.isImageAvailable(IT_FRONTCOVER))
+    if (albumArt.getImage(IT_FRONTCOVER))
         m_currImageType = IT_FRONTCOVER;
     else
     {
         // not available so just show the first image available
         if (albumArt.getImageCount() > 0)
-            m_currImageType = albumArt.getImageAt(0).imageType;
+            m_currImageType = albumArt.getImageAt(0)->imageType;
         else
             m_currImageType = IT_UNKNOWN;
     }
@@ -362,7 +362,7 @@ void AlbumArt::handleKeyPress(const QString &action)
         {
             newType++;
 
-            while(!albumArt.isImageAvailable((ImageType) newType))
+            while (!albumArt.getImage((ImageType) newType))
             {
                 newType++;
                 if (newType == IT_LAST)
@@ -568,7 +568,7 @@ bool Squares::draw(QPainter *p, const QColor &back)
 
 #if defined(FFTW3_SUPPORT) || defined(FFTW2_SUPPORT)
     QRect *rectsp = rects.data();
-    for (uint i = 0; i < rects.count(); i++)
+    for (uint i = 0; i < rects.size(); i++)
         drawRect(p, &(rectsp[i]), i, center, w, h);
 
 #else
@@ -732,9 +732,10 @@ static void gear( GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 static GLfloat view_rotx=20.0, view_rotz=0.0;
 static GLint gear1, gear2, gear3;
 
-Gears::Gears(QWidget *parent, const char *name)
-     : QGLWidget(parent, name)
+Gears::Gears(QWidget *parent, const char *name) :
+    QGLWidget(parent)
 {
+    setObjectName(name);
     falloff = 4.0;
     analyzerBarWidth = 10;
     fps = 60;
@@ -807,7 +808,7 @@ void Gears::resize(const QSize &newsize)
 
     rects.resize( scale.range() );
     int i = 0, w = 0;
-    for (; (unsigned) i < rects.count(); i++, w += analyzerBarWidth)
+    for (; (unsigned) i < rects.size(); i++, w += analyzerBarWidth)
     {
         rects[i].setRect(w, size.height() / 2, analyzerBarWidth - 1, 1);
     }
@@ -858,7 +859,7 @@ bool Gears::process(VisualNode *node)
     rfftw_one(plan, rin, rout);
 #endif
     index = 1;
-    for (i = 0; i < rects.count(); i++, w += analyzerBarWidth)
+    for (i = 0; i < rects.size(); i++, w += analyzerBarWidth)
     {
 #ifdef FFTW3_SUPPORT
         magL = (log(sq(real(lout[index])) + sq(real(lout[FFTW_N - index]))) - 22.0) * 

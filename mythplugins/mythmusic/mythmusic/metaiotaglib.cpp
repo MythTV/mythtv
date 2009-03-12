@@ -1,11 +1,15 @@
-#include <math.h>
+#include <cmath>
 
 #include "metaiotaglib.h"
 #include "metadata.h"
 
-#include <mythtv/mythcontext.h>
-//Added by qt3to4:
-#include <Q3ValueList>
+#include <mythverbose.h>
+
+#undef QStringToTString
+#define QStringToTString(s) TagLib::String(s.toUtf8().data(), TagLib::String::UTF8)
+#undef TStringToQString
+#define TStringToQString(s) QString::fromUtf8(s.toCString(true))
+
 
 MetaIOTagLib::MetaIOTagLib(void)
     : MetaIO(".mp3")
@@ -129,7 +133,7 @@ Metadata* MetaIOTagLib::read(QString filename)
             genre = "";
     int year = 0, tracknum = 0, length = 0, playcount = 0, rating = 0, id = 0;
     bool compilation = false;
-    Q3ValueList<struct AlbumArtImage> albumart;
+    QList<struct AlbumArtImage> albumart;
 
     QString extension = filename.section( '.', -1 ) ;
 
@@ -148,12 +152,12 @@ Metadata* MetaIOTagLib::read(QString filename)
     // Basic Tags
     if (! tag->isEmpty())
     {
-        title = TStringToQString(tag->title()).stripWhiteSpace();
-        artist = TStringToQString(tag->artist()).stripWhiteSpace();
-        album = TStringToQString(tag->album()).stripWhiteSpace();
+        title = TStringToQString(tag->title()).trimmed();
+        artist = TStringToQString(tag->artist()).trimmed();
+        album = TStringToQString(tag->album()).trimmed();
         tracknum = tag->track();
         year = tag->year();
-        genre = TStringToQString(tag->genre()).stripWhiteSpace();
+        genre = TStringToQString(tag->genre()).trimmed();
     }
 
     // ID3V2 Only Tags
@@ -164,7 +168,7 @@ Metadata* MetaIOTagLib::read(QString filename)
         {
             compilation_artist = TStringToQString(
             taglib->ID3v2Tag()->frameListMap()["TPE4"].front()->toString())
-            .stripWhiteSpace();
+                .trimmed();
         }
 
         // Look for MusicBrainz Album+Artist ID in TXXX Frame
@@ -323,8 +327,7 @@ QImage MetaIOTagLib::getAlbumArt(QString filename, ImageType type)
  */
 AlbumArtList MetaIOTagLib::readAlbumArt(TagLib::ID3v2::Tag *tag)
 {
-
-    Q3ValueList<struct AlbumArtImage> artlist;
+    QList<struct AlbumArtImage> artlist;
 
     if (!tag->frameListMap()["APIC"].isEmpty())
     {

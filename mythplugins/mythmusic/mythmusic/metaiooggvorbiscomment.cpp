@@ -70,10 +70,10 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
         {
             // find the tagname
             tmp = pComment->user_comments[i];
-            int tag = tmp.find('=');
+            int tag = tmp.indexOf('=');
             if (tag)
             {
-                tmp = tmp.left(tag).upper();
+                tmp = tmp.left(tag).toUpper();
                 if (MYTH_VORBISCOMMENT_ARTIST != tmp
                     && MYTH_VORBISCOMMENT_COMPILATIONARTIST != tmp
                     && MYTH_VORBISCOMMENT_TITLE != tmp
@@ -209,7 +209,7 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
     QString newfilename = createTempFile(
         QString(l8bit.constData()) + ".XXXXXX");
 
-    FILE *p_output = fopen(newfilename, "wb");
+    FILE *p_output = fopen(newfilename.toLocal8Bit().constData(), "wb");
 
     if (!p_output)
     {

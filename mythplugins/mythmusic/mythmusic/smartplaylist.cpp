@@ -975,27 +975,26 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
 
     // criteria Rows
     SmartPLCriteriaRow *row;
-    criteriaRows.setAutoDelete(true);
 
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
-    criteriaRows.append(row);
+    criteriaRows.push_back(row);
 
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
-    criteriaRows.append(row);
+    criteriaRows.push_back(row);
 
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
-    criteriaRows.append(row);
+    criteriaRows.push_back(row);
 
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     row = new SmartPLCriteriaRow(this, hbox);
     connect(row, SIGNAL(criteriaChanged(void)), this, SLOT(updateMatches(void)));
-    criteriaRows.append(row);
+    criteriaRows.push_back(row);
 
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
     message = tr("Order By:");
@@ -1108,6 +1107,11 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
 SmartPlaylistEditor::~SmartPlaylistEditor(void)
 {
     gContext->removeListener(this);
+    while (!criteriaRows.empty())
+    {
+        delete criteriaRows.back();
+        criteriaRows.pop_back();
+    }
 }
 
 void SmartPlaylistEditor::titleChanged(void)
@@ -1117,32 +1121,27 @@ void SmartPlaylistEditor::titleChanged(void)
 
 void SmartPlaylistEditor::updateMatches(void)
 {
-    QString sql = "select count(*) from music_songs "
-                  "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
-                  "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
-                  "LEFT JOIN music_artists AS music_comp_artists ON "
-                  "music_albums.artist_id=music_comp_artists.artist_id "
-                  "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id ";
+    QString sql =
+        "SELECT count(*) "
+        "FROM music_songs "
+        "LEFT JOIN music_artists ON "
+        "    music_songs.artist_id=music_artists.artist_id "
+        "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id "
+        "LEFT JOIN music_artists AS music_comp_artists ON "
+        "    music_albums.artist_id=music_comp_artists.artist_id "
+        "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id ";
 
     sql += getWhereClause();
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (query.exec(sql))
-    {
-        if (query.size() > 0)
-        {
-            query.first();
-            matchesCount = query.value(0).toInt();
-        }
-        else
-            matchesCount = 0;
-    }
-    else
-    {
-        matchesCount = 0;
-    }
+    matchesCount = 0;
 
-    matchesLabel->setText(QString().setNum(matchesCount));
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.exec(sql))
+        MythDB::DBError("SmartPlaylistEditor::updateMatches", query);
+    else if (query.next())
+        matchesCount = query.value(0).toInt();
+
+    matchesLabel->setText(QString::number(matchesCount));
 
     bPlaylistIsValid = (matchesCount > 0);
     showResultsButton->setEnabled(matchesCount > 0);
@@ -1210,11 +1209,9 @@ void SmartPlaylistEditor::saveClicked(void)
     }
 
     // save smartplaylist items
-    SmartPLCriteriaRow *row;
-    for (row = criteriaRows.first(); row; row = criteriaRows.next())
-    {
-        row->saveToDatabase(ID);
-    }
+    vector<SmartPLCriteriaRow*>::iterator it = criteriaRows.begin();
+    for (; it != criteriaRows.end(); ++it)
+        (*it)->saveToDatabase(ID);
 
     reject();
 }
@@ -1291,9 +1288,9 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
     if (query.isActive() && query.size() > 0)
     {
         rowCount = query.size();
-        if (rowCount > criteriaRows.count())
+        if (rowCount > criteriaRows.size())
         {
-            rowCount = criteriaRows.count();
+            rowCount = criteriaRows.size();
             VERBOSE(VB_IMPORTANT, QString("Warning:"
                     " got too many smartplaylistitems: %1").arg(rowCount));
         }
@@ -1301,7 +1298,7 @@ void SmartPlaylistEditor::loadFromDatabase(QString category, QString name)
         query.first();
         for (uint x = 0; x < rowCount; x++)
         {
-            row = criteriaRows.at(x);
+            row = criteriaRows[x];
             QString Field = query.value(0).toString();
             QString Operator = query.value(1).toString();
             QString Value1 = query.value(2).toString();
@@ -1474,15 +1471,13 @@ QString SmartPlaylistEditor::getOrderByClause(void)
 
 QString SmartPlaylistEditor::getWhereClause(void)
 {
-    SmartPLCriteriaRow *row;
-    QString sql, criteria, matchType;
-
     bool bFirst = true;
+    QString sql = "WHERE ";
 
-    sql = "WHERE ";
-    for (row = criteriaRows.first(); row; row = criteriaRows.next())
+    vector<SmartPLCriteriaRow*>::iterator it = criteriaRows.begin();
+    for (; it != criteriaRows.end(); ++it)
     {
-        criteria = row->getSQL();
+        QString criteria = (*it)->getSQL();
         if (criteria.isEmpty())
             continue;
 

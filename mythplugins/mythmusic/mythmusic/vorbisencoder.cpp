@@ -1,7 +1,5 @@
 #include <qstring.h>
-#include <q3cstring.h>
 #include <qapplication.h>
-#include <q3progressbar.h>
 
 #include "metadata.h"
 #include "encoder.h"

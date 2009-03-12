@@ -257,8 +257,8 @@ void SearchListBoxItem::paint(QPainter *p)
 
     while (index < (int) sText.length())
     {
-        start = sText.find('[', index);
-        end = sText.find(']', start);
+        start = sText.indexOf('[', index);
+        end = sText.indexOf(']', start);
 
         if (start != -1 && end != -1)
         {

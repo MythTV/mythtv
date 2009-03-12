@@ -102,10 +102,10 @@ void MusicTreeBuilder::makeTree(MusicNode *root, const MetadataPtrList &metas)
     typedef QMap<QString, Branch*> BranchMap;
     BranchMap branches;
     
-    Metadata *meta;
-    Q3PtrListIterator<Metadata> iter(metas);
-    while ((meta = iter.current()) != 0) 
+    MetadataPtrList::const_iterator it = metas.begin();
+    for (; it != metas.end(); ++it)
     {
+        Metadata *meta = *it;
         if (isLeafDone(meta)) 
         {
             root->addLeaf(meta);
@@ -113,7 +113,7 @@ void MusicTreeBuilder::makeTree(MusicNode *root, const MetadataPtrList &metas)
         else 
         {
             QString field = getField(meta);
-            QString field_key = field.lower();
+            QString field_key = field.toLower();
 
             if (field_key.left(4) == thePrefix) 
                 field_key = field_key.mid(4);
@@ -127,13 +127,11 @@ void MusicTreeBuilder::makeTree(MusicNode *root, const MetadataPtrList &metas)
             }
             branch->list.append(meta);
         }
-
-        ++iter;
     }
 
     for(BranchMap::iterator it = branches.begin(); it != branches.end(); it++) 
     {
-        Branch *branch = it.data();
+        Branch *branch = *it;
         MusicNode *sub_node = createNode(branch->field);
         root->addChild(sub_node);
         makeTree(sub_node, branch->list);
@@ -148,7 +146,7 @@ class MusicFieldTreeBuilder : public MusicTreeBuilder
   public:
     MusicFieldTreeBuilder(const QString &paths) 
     {
-        m_paths = QStringList::split(' ', paths);
+        m_paths = paths.split(' ', QString::SkipEmptyParts);
     }
 
     ~MusicFieldTreeBuilder() 
@@ -198,12 +196,12 @@ private:
 
     QString getSplitField(Metadata *meta, const QString &field) 
     {
-        QString firstchar_str = meta->FormatArtist().stripWhiteSpace();
+        QString firstchar_str = meta->FormatArtist().trimmed();
 
-        if (firstchar_str.left(4).lower() == thePrefix) 
-            firstchar_str = firstchar_str.mid(4,1).upper();
+        if (firstchar_str.left(4).toLower() == thePrefix) 
+            firstchar_str = firstchar_str.mid(4,1).toUpper();
         else 
-            firstchar_str = firstchar_str.left(1).upper();
+            firstchar_str = firstchar_str.left(1).toUpper();
         
         QChar firstchar = firstchar_str[0];
         QString split = m_split_map[firstchar];
@@ -291,7 +289,7 @@ class MusicDirectoryTreeBuilder : public MusicTreeBuilder
     ~MusicDirectoryTreeBuilder() 
     {
         for(MetaMap::iterator it = m_map.begin(); it != m_map.end(); it++)
-            delete it.data();
+            delete *it;
     }
 
 protected:
@@ -321,7 +319,7 @@ protected:
             return paths;
 
         QString filename = meta->Filename().remove(0, getStartdir().length());
-        paths = new QStringList(QStringList::split('/', filename));
+        paths = new QStringList(filename.split('/'));
         m_map[meta] = paths;
         
         return paths;

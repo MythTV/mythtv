@@ -13,7 +13,7 @@
 MetaIO::MetaIO(QString fileExtension)
     : mFileExtension(fileExtension)
 {
-    mFilenameFormat = gContext->GetSetting("NonID3FileNameFormat").upper();
+    mFilenameFormat = gContext->GetSetting("NonID3FileNameFormat").toUpper();
 }
 
 
@@ -44,8 +44,8 @@ void MetaIO::readFromFilename(QString filename,
     static QString regext = mFileExtension + "$";
     int part_num = 0;
     filename.replace(QRegExp(QString("_")), QString(" "));
-    filename.replace(QRegExp(regext, FALSE), QString(""));
-    QStringList fmt_list = QStringList::split("/", mFilenameFormat);
+    filename.replace(QRegExp(regext, Qt::CaseInsensitive), QString(""));
+    QStringList fmt_list = mFilenameFormat.split("/");
     QStringList::iterator fmt_it = fmt_list.begin();
 
     // go through loop once to get minimum part number
@@ -67,22 +67,22 @@ void MetaIO::readFromFilename(QString filename,
             title = part_str;
         else if ( *fmt_it == "TRACK_TITLE" ) 
         {
-            QStringList tracktitle_list = QStringList::split("-", part_str);
+            QStringList tracktitle_list = part_str.split("-");
             if (tracktitle_list.size() > 1)
             {
                 tracknum = tracktitle_list[0].toInt();
-                title = tracktitle_list[1].simplifyWhiteSpace();
+                title = tracktitle_list[1].simplified();
             }
             else
                 title = part_str;
         }
         else if ( *fmt_it == "ARTIST_TITLE" ) 
         {
-            QStringList artisttitle_list = QStringList::split("-", part_str);
+            QStringList artisttitle_list = part_str.split("-");
             if (artisttitle_list.size() > 1)
             {
-                artist = artisttitle_list[0].simplifyWhiteSpace();
-                title = artisttitle_list[1].simplifyWhiteSpace();
+                artist = artisttitle_list[0].simplified();
+                title = artisttitle_list[1].simplified();
             }
             else
             {

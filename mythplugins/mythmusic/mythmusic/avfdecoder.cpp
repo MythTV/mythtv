@@ -126,7 +126,7 @@ bool avfDecoder::initialize()
     seekTime = -1.0;
     totalTime = 0.0;
 
-    filename = ((QFile *)input())->name();
+    filename = ((QFile *)input())->fileName();
 
     if (!output_buf)
         output_buf = new char[globalBufferSize];
@@ -142,6 +142,7 @@ bool avfDecoder::initialize()
     int error;
     error = av_open_input_file(&m_inputContext, filename, m_inputFormat, 0,
                                &m_params);
+
     if (error < 0)
     {
         VERBOSE(VB_GENERAL, QString("Could open file with the AV decoder. "
@@ -429,14 +430,14 @@ MetaIO* avfDecoder::doCreateTagger(void)
 
 bool avfDecoderFactory::supports(const QString &source) const
 {
-     QStringList list = QStringList::split("|", extension());
-     for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
-     {
-         if (*it == source.right((*it).length()).lower())
-             return true;
-     }
+    QStringList list = extension().split("|", QString::SkipEmptyParts);
+    for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
+    {
+        if (*it == source.right((*it).length()).toLower())
+            return true;
+    }
 
-     return false;
+    return false;
 }
 
 const QString &avfDecoderFactory::extension() const

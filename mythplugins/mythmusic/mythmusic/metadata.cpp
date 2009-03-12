@@ -1,14 +1,8 @@
-#include <iostream> 
-
 // qt
-#include <qapplication.h>
-#include <qregexp.h> 
-#include <qdatetime.h>
-#include <qdir.h>
-//Added by qt3to4:
-#include <Q3ValueList>
-
-using namespace std;
+#include <QApplication>
+#include <QRegExp>
+#include <QDateTime>
+#include <QDir>
 
 // mythtv
 #include <mythtv/mythcontext.h>
@@ -40,6 +34,27 @@ bool operator!=(const Metadata& a, const Metadata& b)
         return true;
     return false;
 }
+
+static bool meta_less_than(const Metadata *item1, const Metadata *item2)
+{
+    return item1->compare(item2) < 0;
+}
+
+static bool music_less_than(const MusicNode *itemA, const MusicNode *itemB)
+{
+    QString title1 = itemA->getTitle().toLower();
+    QString title2 = itemB->getTitle().toLower();
+    
+    // Cut "the " off the front of titles
+    if (title1.left(4) == thePrefix) 
+        title1 = title1.mid(4);
+    if (title2.left(4) == thePrefix) 
+        title2 = title2.mid(4);
+
+    return title1.localeAwareCompare(title2) < 0;
+}
+
+/**************************************************************************/
 
 Metadata& Metadata::operator=(Metadata *rhs)
 {
@@ -86,14 +101,16 @@ void Metadata::persist()
         MythDB::DBError("music persist", query);
 }
 
-int Metadata::compare(Metadata *other) 
+int Metadata::compare(const Metadata *other) const
 {
     if (m_format == "cast") 
     {
-        int artist_cmp = Artist().lower().localeAwareCompare(other->Artist().lower());
+        int artist_cmp = Artist().toLower().localeAwareCompare(
+            other->Artist().toLower());
 
         if (artist_cmp == 0) 
-            return Title().lower().localeAwareCompare(other->Title().lower());
+            return Title().toLower().localeAwareCompare(
+                other->Title().toLower());
 
         return artist_cmp;
     }
@@ -102,7 +119,8 @@ int Metadata::compare(Metadata *other)
         int track_cmp = Track() - other->Track();
 
         if (track_cmp == 0)
-            return Title().lower().localeAwareCompare(other->Title().lower());
+            return Title().toLower().localeAwareCompare(
+                other->Title().toLower());
 
         return track_cmp;
     }
@@ -398,7 +416,7 @@ void Metadata::dumpToDatabase()
 
     if (! m_albumart.empty())
     {
-        Q3ValueList<struct AlbumArtImage>::iterator it;
+        QList<struct AlbumArtImage>::iterator it;
         for ( it = m_albumart.begin(); it != m_albumart.end(); ++it )
         {
             query.prepare("SELECT albumart_id FROM music_albumart WHERE "
@@ -681,7 +699,7 @@ void Metadata::incPlayCount()
     m_changed = true;
 }
 
-void Metadata::setEmbeddedAlbumArt(Q3ValueList<struct AlbumArtImage> albumart)
+void Metadata::setEmbeddedAlbumArt(const QList<struct AlbumArtImage> &albumart)
 {
     m_albumart = albumart;
 }
@@ -735,25 +753,26 @@ QImage Metadata::getAlbumArt(void)
     QImage image;
     ImageType type;
 
-    if (albumArt.isImageAvailable(IT_FRONTCOVER))
+    AlbumArtImage *albumart_image = NULL;
+
+    if ((albumart_image = albumArt.getImage(IT_FRONTCOVER)))
         type = IT_FRONTCOVER;
-    else if (albumArt.isImageAvailable(IT_UNKNOWN))
+    else if ((albumart_image = albumArt.getImage(IT_UNKNOWN)))
         type = IT_UNKNOWN;
-    else if (albumArt.isImageAvailable(IT_BACKCOVER))
+    else if ((albumart_image = albumArt.getImage(IT_BACKCOVER)))
         type = IT_BACKCOVER;
-    else if (albumArt.isImageAvailable(IT_INLAY))
+    else if ((albumart_image = albumArt.getImage(IT_INLAY)))
         type = IT_INLAY;
-    else if (albumArt.isImageAvailable(IT_CD))
+    else if ((albumart_image = albumArt.getImage(IT_CD)))
         type = IT_CD;
-    else
-        return image;
 
-    AlbumArtImage albumart_image = albumArt.getImage(type);
-
-    if (albumart_image.embedded)
-        image = QImage(MetaIOTagLib::getAlbumArt(m_filename, type));
-    else
-        image = QImage(albumart_image.filename);
+    if (albumart_image)
+    {
+        if (albumart_image->embedded)
+            image = QImage(MetaIOTagLib::getAlbumArt(m_filename, type));
+        else
+            image = QImage(albumart_image->filename);
+    }
 
     return image;
 }
@@ -764,14 +783,13 @@ QImage Metadata::getAlbumArt(ImageType type)
 
     QImage image;
 
-    if (albumArt.isImageAvailable(type))
+    AlbumArtImage *albumart_image = albumArt.getImage(type);
+    if (albumart_image)
     {
-        AlbumArtImage albumart_image = albumArt.getImage(type);
-
-        if (albumart_image.embedded)
+        if (albumart_image->embedded)
             image = QImage(MetaIOTagLib::getAlbumArt(m_filename, type));
         else
-            image = QImage(albumart_image.filename);
+            image = QImage(albumart_image->filename);
     }
 
     return image;
@@ -884,14 +902,16 @@ AllMusic::AllMusic(QString path_assignment, QString a_startdir)
     m_metadata_loader = NULL;
     startLoading();
 
-    m_all_music.setAutoDelete(true);
-
     m_last_listed = -1;
 }
 
 AllMusic::~AllMusic()
 {
-    m_all_music.clear();
+    while (!m_all_music.empty())
+    {
+        delete m_all_music.back();
+        m_all_music.pop_back();
+    }
 
     delete m_root_node;
 
@@ -1039,16 +1059,10 @@ void AllMusic::resync()
 
     //  To find this data quickly, build a map
     //  (a map to pointers!)
-
-    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
-    Metadata *map_add;
-
     music_map.clear();
-    while ( (map_add = an_iterator.current()) != 0 )
-    {
-        music_map[map_add->ID()] = map_add; 
-        ++an_iterator;
-    }
+    MetadataPtrList::iterator it = m_all_music.begin();
+    for (; it != m_all_music.end(); ++it)
+        music_map[(*it)->ID()] = *it;
 
     //  Build a tree to reflect current state of 
     //  the metadata. Once built, sort it.
@@ -1085,21 +1099,18 @@ void AllMusic::buildTree()
     //  Select Music screen
     //
 
-    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
-    Metadata *inserter;
     MetadataPtrList list;
 
-    while ( (inserter = an_iterator.current()) != 0 )
+    MetadataPtrList::iterator it = m_all_music.begin();
+    for (; it != m_all_music.end(); ++it)
     {
-        if (inserter->isVisible())
-            list.append(inserter);
-        ++an_iterator;
-
+        if ((*it)->isVisible())
+            list.append(*it);
         m_numLoaded++;
     }
 
-    MusicTreeBuilder *builder = MusicTreeBuilder::createBuilder (m_paths);
-    builder->makeTree (m_root_node, list);
+    MusicTreeBuilder *builder = MusicTreeBuilder::createBuilder(m_paths);
+    builder->makeTree(m_root_node, list);
     delete builder;
 }
 
@@ -1222,21 +1233,14 @@ bool AllMusic::updateMetadata(int an_id, Metadata *the_track)
     return false;
 }
 
-void AllMusic::save()
+/// \brief Check each Metadata entry and save those that have changed (ratings, etc.)
+void AllMusic::save(void)
 {
-    //  Check each Metadata entry and save those that 
-    //  have changed (ratings, etc.)
-    
-    
-    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
-    Metadata *searcher;
-    while ( (searcher = an_iterator.current()) != 0 )
+    MetadataPtrList::iterator it = m_all_music.begin();
+    for (; it != m_all_music.end(); ++it)
     {
-        if(searcher->hasChanged())
-        {
-            searcher->persist();
-        }
-        ++an_iterator;
+        if ((*it)->hasChanged())
+            (*it)->persist();
     }
 }
 
@@ -1288,7 +1292,7 @@ void AllMusic::setSorting(QString a_paths)
         return;
 
     //  Error checking
-    QStringList tree_levels = QStringList::split(" ", m_paths);
+    QStringList tree_levels = m_paths.split(" ");
     QStringList::const_iterator it = tree_levels.begin();
     for (; it != tree_levels.end(); ++it)
     {
@@ -1307,20 +1311,15 @@ void AllMusic::setSorting(QString a_paths)
 
 void AllMusic::setAllVisible(bool visible)
 {
-    Q3PtrListIterator<Metadata> an_iterator( m_all_music );
-    Metadata *md;
-    while ( (md = an_iterator.current()) != 0 )
-    {
-        md->setVisible(visible);
-        ++an_iterator;
-    }
+    MetadataPtrList::iterator it = m_all_music.begin();
+    for (; it != m_all_music.end(); ++it)
+        (*it)->setVisible(visible);
 }
 
 MusicNode::MusicNode(const QString &a_title, const QString &tree_level)
 {
     my_title = a_title;
     my_level = tree_level;
-    my_subnodes.setAutoDelete(true);
     setPlayCountMin(0);
     setPlayCountMax(0);
     setLastPlayMin(0);
@@ -1329,7 +1328,11 @@ MusicNode::MusicNode(const QString &a_title, const QString &tree_level)
 
 MusicNode::~MusicNode()
 {
-    my_subnodes.clear();
+    while (!my_subnodes.empty())
+    {
+        delete my_subnodes.back();
+        my_subnodes.pop_back();
+    }
 }
 
 // static member vars
@@ -1367,27 +1370,20 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
     }
 
 
-    Q3PtrListIterator<Metadata>  anit(my_tracks);
-    Metadata *a_track;
-    while ((a_track = anit.current() ) != 0)
+    MetadataPtrList::iterator it = my_tracks.begin();
+    for (; it != my_tracks.end(); ++it)
     {
         QString title_temp = QString(QObject::tr("%1 - %2"))
-                                  .arg(a_track->Track()).arg(a_track->Title());
+            .arg((*it)->Track()).arg((*it)->Title());
         QString level_temp = QObject::tr("title");
-        TreeCheckItem *new_item = new TreeCheckItem(current_parent, title_temp,
-                                                    level_temp, a_track->ID());
-        ++anit;
+        TreeCheckItem *new_item = new TreeCheckItem(
+            current_parent, title_temp, level_temp, (*it)->ID());
         new_item->setCheck(false); //  Avoiding -Wall     
     }  
 
-    
-    Q3PtrListIterator<MusicNode> iter(my_subnodes);
-    MusicNode *sub_traverse;
-    while ((sub_traverse = iter.current() ) != 0)
-    {
-        sub_traverse->putYourselfOnTheListView(current_parent, true);
-        ++iter;
-    }
+    MusicNodePtrList::iterator mit = my_subnodes.begin();
+    for (; mit != my_subnodes.end(); ++mit)
+        (*mit)->putYourselfOnTheListView(current_parent, true);
     
 }
 
@@ -1402,14 +1398,14 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
     sub_node->setAttribute(4, a_counter);
     sub_node->setAttribute(5, a_counter);
 
-    Q3PtrListIterator<Metadata>  anit(my_tracks);
-    Metadata *a_track;
     int track_counter = 0;
-    anit.toFirst();
-    while( (a_track = anit.current() ) != 0)
+
+    MetadataPtrList::iterator it = my_tracks.begin();
+    for (; it != my_tracks.end(); ++it)
     {
-        QString title_temp = QString(QObject::tr("%1 - %2")).arg(a_track->Track()).arg(a_track->Title());
-        GenericTree *subsub_node = sub_node->addNode(title_temp, a_track->ID(), true);
+        QString title_temp = QObject::tr("%1 - %2")
+            .arg((*it)->Track()).arg((*it)->Title());
+        GenericTree *subsub_node = sub_node->addNode(title_temp, (*it)->ID(), true);
         subsub_node->setAttribute(0, 1);
         subsub_node->setAttribute(1, track_counter);    // regular order
         subsub_node->setAttribute(2, rand());           // random order
@@ -1417,44 +1413,52 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         //
         //  "Intelligent" ordering
         //
-        int rating = a_track->Rating();
-        int playcount = a_track->PlayCount();
-        double lastplaydbl = a_track->LastPlay();
+        int rating = (*it)->Rating();
+        int playcount = (*it)->PlayCount();
+        double lastplaydbl = (*it)->LastPlay();
         double ratingValue = (double)(rating) / 10;
         double playcountValue, lastplayValue;
 
-        if (m_playcountMax == m_playcountMin) 
-            playcountValue = 0; 
-        else 
-            playcountValue = ((m_playcountMin - (double)playcount) / (m_playcountMax - m_playcountMin) + 1); 
-        if (m_lastplayMax == m_lastplayMin) 
-            lastplayValue = 0;
-        else 
-            lastplayValue = ((m_lastplayMin - lastplaydbl) / (m_lastplayMax - m_lastplayMin) + 1);
+        if (m_playcountMax == m_playcountMin)
+        {
+            playcountValue = 0;
+        }
+        else
+        {
+            playcountValue = ((m_playcountMin - (double)playcount) /
+                              (m_playcountMax - m_playcountMin) + 1);
+        }
 
-        double rating_value =  (m_RatingWeight * ratingValue + m_PlayCountWeight * playcountValue +
-                                m_LastPlayWeight * lastplayValue + m_RandomWeight * (double)rand() /
-                                (RAND_MAX + 1.0));
+        if (m_lastplayMax == m_lastplayMin)
+        {
+            lastplayValue = 0;
+        }
+        else
+        {
+            lastplayValue = ((m_lastplayMin - lastplaydbl) /
+                             (m_lastplayMax - m_lastplayMin) + 1);
+        }
+
+        double rating_value =
+            m_RatingWeight * ratingValue +
+            m_PlayCountWeight * playcountValue +
+            m_LastPlayWeight * lastplayValue +
+            m_RandomWeight * (double)rand() / (RAND_MAX + 1.0);
+
         int integer_rating = (int) (4000001 - rating_value * 10000);
         subsub_node->setAttribute(3, integer_rating);   //  "intelligent" order
         ++track_counter;
-        ++anit;
     }  
 
-    
-    Q3PtrListIterator<MusicNode> iter(my_subnodes);
-    MusicNode *sub_traverse;
-    int another_counter = 0;
-    iter.toFirst();
-    while( (sub_traverse = iter.current() ) != 0)
+    MusicNodePtrList::const_iterator sit = my_subnodes.begin();
+    for (int another_counter = 0; sit != my_subnodes.end(); ++sit)
     {
-        sub_traverse->setPlayCountMin(m_playcountMin);
-        sub_traverse->setPlayCountMax(m_playcountMax);
-        sub_traverse->setLastPlayMin(m_lastplayMin);
-        sub_traverse->setLastPlayMax(m_lastplayMax);
-        sub_traverse->writeTree(sub_node, another_counter);
+        (*sit)->setPlayCountMin(m_playcountMin);
+        (*sit)->setPlayCountMax(m_playcountMax);
+        (*sit)->setLastPlayMin(m_lastplayMin);
+        (*sit)->setLastPlayMax(m_lastplayMax);
+        (*sit)->writeTree(sub_node, another_counter);
         ++another_counter;
-        ++iter;
     }
 }
 
@@ -1462,76 +1466,39 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
 void MusicNode::sort()
 {
     //  Sort any tracks
-    my_tracks.sort();
+    qStableSort(my_tracks.begin(), my_tracks.end(), meta_less_than);
 
     //  Sort any subnodes
-    my_subnodes.sort();
+    qStableSort(my_subnodes.begin(), my_subnodes.end(), music_less_than);
     
     //  Tell any subnodes to sort themselves
-    Q3PtrListIterator<MusicNode> iter(my_subnodes);
-    MusicNode *crawler;
-    while ( (crawler = iter.current()) != 0 )
-    {
-        crawler->sort();
-        ++iter;
-    }
+    MusicNodePtrList::const_iterator sit = my_subnodes.begin();
+    for (; sit != my_subnodes.end(); ++sit)
+        (*sit)->sort();
 }
 
 
-void MusicNode::printYourself(int indent_level)
+void MusicNode::printYourself(int indent_level) const
 {
+    QString tmp = "";
+    for (int i = 0; i < indent_level; ++i)
+        tmp += "    ";
+    tmp += my_title;
+    VERBOSE(VB_GENERAL, tmp);
 
-    for(int i = 0; i < (indent_level) * 4; ++i)
+    MetadataPtrList::const_iterator it = my_tracks.begin();
+    for (; it != my_tracks.end(); ++it)
     {
-        cout << " " ;
+        QString tmp = "";
+        for (int i = 0; i < indent_level + 1; ++i)
+            tmp += "    ";
+        tmp += (*it)->Title();
+        VERBOSE(VB_GENERAL, tmp);
     }
-    cout << my_title.toLocal8Bit().constData() << endl;
 
-    Q3PtrListIterator<Metadata>  anit(my_tracks);
-    Metadata *a_track;
-    while( (a_track = anit.current() ) != 0)
-    {
-        for(int j = 0; j < (indent_level + 1) * 4; j++)
-        {
-            cout << " " ;
-        } 
-        cout << a_track->Title().toLocal8Bit().constData() << endl ;
-        ++anit;
-    }       
-    
-    Q3PtrListIterator<MusicNode> iter(my_subnodes);
-    MusicNode *print;
-    while( (print = iter.current() ) != 0)
-    {
-        print->printYourself(indent_level + 1);
-        ++iter;
-    }
-}
-
-/**************************************************************************/
-
-int MetadataPtrList::compareItems(Q3PtrCollection::Item item1, 
-                                  Q3PtrCollection::Item item2)
-{
-    return ((Metadata*)item1)->compare((Metadata*)item2);
-}
-
-int MusicNodePtrList::compareItems (Q3PtrCollection::Item item1, 
-                                    Q3PtrCollection::Item item2)
-{
-    MusicNode *itemA = (MusicNode*)item1;
-    MusicNode *itemB = (MusicNode*)item2;
-
-    QString title1 = itemA->getTitle().lower();
-    QString title2 = itemB->getTitle().lower();
-    
-    // Cut "the " off the front of titles
-    if (title1.left(4) == thePrefix) 
-        title1 = title1.mid(4);
-    if (title2.left(4) == thePrefix) 
-        title2 = title2.mid(4);
-
-    return title1.localeAwareCompare(title2);
+    MusicNodePtrList::const_iterator sit = my_subnodes.begin();
+    for (; sit != my_subnodes.end(); ++sit)
+        (*sit)->printYourself(indent_level + 1);
 }
 
 /**************************************************************************/
@@ -1539,14 +1506,25 @@ int MusicNodePtrList::compareItems (Q3PtrCollection::Item item1,
 AlbumArtImages::AlbumArtImages(Metadata *metadata)
     : m_parent(metadata)
 {
-    m_imageList.setAutoDelete(true);
-
     findImages();
+}
+
+AlbumArtImages::~AlbumArtImages()
+{
+    while (!m_imageList.empty())
+    {
+        delete m_imageList.back();
+        m_imageList.pop_back();
+    }
 }
 
 void AlbumArtImages::findImages(void)
 {
-    m_imageList.clear();
+    while (!m_imageList.empty())
+    {
+        delete m_imageList.back();
+        m_imageList.pop_back();
+    }
 
     if (m_parent == NULL)
         return;
@@ -1557,7 +1535,7 @@ void AlbumArtImages::findImages(void)
         return;
 
     QFileInfo fi(m_parent->Filename());
-    QString dir = fi.dirPath(true);
+    QString dir = fi.absolutePath();
     dir.remove(0, Metadata::GetStartdir().length());
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1586,59 +1564,44 @@ void AlbumArtImages::findImages(void)
                 image->description = query.value(1).toString();
                 image->embedded = true;
             }
-            else {
+            else
+            {
                 image->embedded = false;
             }
-            m_imageList.append(image);
+            m_imageList.push_back(image);
         }
     }
 }
 
-AlbumArtImage AlbumArtImages::getImage(ImageType type)
+AlbumArtImage *AlbumArtImages::getImage(ImageType type)
 {
-    // try to find a matching image
-    AlbumArtImage *image;
-
-    for (image = m_imageList.first(); image; image = m_imageList.next())
+    ImageList::iterator it = m_imageList.begin();
+    for (; it != m_imageList.end(); ++it)
     {
-        if (image->imageType == type)
-            return *image;
+        if ((*it)->imageType == type)
+            return *it;
     }
 
-    return *image;
+    return NULL;
 }
 
-QStringList AlbumArtImages::getImageFilenames()
+QStringList AlbumArtImages::getImageFilenames(void) const
 {
     QStringList paths;
 
-    AlbumArtImage *image;
-
-    for (image = m_imageList.first(); image; image = m_imageList.next())
-    {
-        paths += image->filename;
-    }
+    ImageList::const_iterator it = m_imageList.begin();
+    for (; it != m_imageList.end(); ++it)
+        paths += (*it)->filename;
 
     return paths;
 }
 
-AlbumArtImage AlbumArtImages::getImageAt(uint index)
+AlbumArtImage *AlbumArtImages::getImageAt(uint index)
 {
-    return *(m_imageList.at(index));
-}
+    if (index < m_imageList.size())
+        return m_imageList[index];
 
-bool AlbumArtImages::isImageAvailable(ImageType type)
-{
-    // try to find a matching image
-    AlbumArtImage *image;
-
-    for (image = m_imageList.first(); image; image = m_imageList.next())
-    {
-        if (image->imageType == type)
-            return true;
-    }
-
-    return false;
+    return NULL;
 }
 
 bool AlbumArtImages::saveImageType(const int id, ImageType type)
@@ -1662,7 +1625,7 @@ QString AlbumArtImages::getTypeName(ImageType type)
         QT_TR_NOOP("Inlay")               // IT_INLAY
     };
 
-    return tr(type_strings[type]);
+    return QObject::tr(type_strings[type]);
 }
 
 // static method to guess the image type from the filename
@@ -1670,15 +1633,15 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
 {
     ImageType type = IT_FRONTCOVER;
 
-    if (filename.contains(tr("front"), false))
+    if (filename.contains(QObject::tr("front"),      Qt::CaseInsensitive))
         type = IT_FRONTCOVER;
-    else if (filename.contains(tr("back"), false))
+    else if (filename.contains(QObject::tr("back"),  Qt::CaseInsensitive))
         type = IT_BACKCOVER;
-    else if (filename.contains(tr("inlay"), false))
+    else if (filename.contains(QObject::tr("inlay"), Qt::CaseInsensitive))
         type = IT_INLAY;
-    else if (filename.contains(tr("cd"), false))
+    else if (filename.contains(QObject::tr("cd"),    Qt::CaseInsensitive))
         type = IT_CD;
-    else if (filename.contains(tr("cover"), false))
+    else if (filename.contains(QObject::tr("cover"), Qt::CaseInsensitive))
         type = IT_FRONTCOVER;
 
     return type;

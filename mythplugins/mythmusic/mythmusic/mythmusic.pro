@@ -3,6 +3,8 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 include (config.pro)
 
+QT += xml sql opengl qt3support network
+
 !exists( config.pro ) {
    error(Missing config.pro: please run the configure script)
 }
@@ -35,6 +37,7 @@ HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
 HEADERS += editmetadata.h smartplaylist.h search.h genres.h
 HEADERS += treebuilders.h importmusic.h directoryfinder.h
 HEADERS += filescanner.h libvisualplugin.h musicplayer.h miniplayer.h
+HEADERS += playlistcontainer.h
 HEADERS += mythlistview-qt3.h mythlistbox-qt3.h
 
 SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp
@@ -52,6 +55,7 @@ SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c goom/mythgoom.cpp
 SOURCES += avfdecoder.cpp editmetadata.cpp smartplaylist.cpp search.cpp
 SOURCES += treebuilders.cpp importmusic.cpp directoryfinder.cpp
 SOURCES += filescanner.cpp libvisualplugin.cpp musicplayer.cpp miniplayer.cpp
+SOURCES += playlistcontainer.cpp
 SOURCES += mythlistview-qt3.cpp mythlistbox-qt3.cpp
 
 macx {
@@ -68,9 +72,5 @@ mingw {
 
     LIBS += -logg
 }
-
-
-#The following line was inserted by qt3to4
-QT += xml  sql opengl qt3support
 
 include ( ../../libs-targetfix.pro )

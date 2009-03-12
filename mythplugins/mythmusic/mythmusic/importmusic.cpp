@@ -555,7 +555,7 @@ void ImportMusicDialog::scanDirectory(QString &directory, vector<TrackInfo*> *tr
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
             continue;
-        QString filename = fi->absFilePath();
+        QString filename = fi->absoluteFilePath();
         if (fi->isDir())
             scanDirectory(filename, tracks);
         else
@@ -1087,13 +1087,13 @@ void ImportCoverArtDialog::updateTypeSelector()
     QFileInfo fi(filename);
     filename = fi.fileName();
 
-    if (filename.contains("front", false) > 0)
+    if (filename.contains("front", Qt::CaseInsensitive) > 0)
         m_type_selector->setToItem(tr("Front Cover"));
-    else if (filename.contains("back", false) > 0)
+    else if (filename.contains("back", Qt::CaseInsensitive) > 0)
         m_type_selector->setToItem(tr("Back Cover"));
-    else if (filename.contains("inlay", false) > 0)
+    else if (filename.contains("inlay", Qt::CaseInsensitive) > 0)
         m_type_selector->setToItem(tr("Inlay"));
-    else if (filename.contains("cd", false) > 0)
+    else if (filename.contains("cd", Qt::CaseInsensitive) > 0)
         m_type_selector->setToItem(tr("CD"));
     else
         m_type_selector->setToItem(tr("<Unknown>"));

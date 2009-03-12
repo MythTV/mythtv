@@ -6,7 +6,7 @@
 #include <QPixmap>
 
 class QPixmap;
-class PlaylistsContainer;
+class PlaylistContainer;
 class Playlist;
 class Track;
 

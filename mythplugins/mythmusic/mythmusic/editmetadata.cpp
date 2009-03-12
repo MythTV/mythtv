@@ -1,16 +1,16 @@
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/libmythui/mythuihelper.h>
-#include <qdir.h>
-//Added by qt3to4:
+#include <QDir>
 #include <QKeyEvent>
 #include <QLabel>
-#include <Q3PtrList>
 #include <QPixmap>
+
 #include "editmetadata.h"
 #include "decoder.h"
 #include "genres.h"
 #include "metadata.h"
+
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <libmythui/mythuihelper.h>
 
 EditMetadataDialog::EditMetadataDialog(Metadata       *source_metadata,
                                        MythMainWindow *parent,
@@ -148,11 +148,11 @@ void EditMetadataDialog::gridItemChanged(ImageGridItem *item)
 
 void EditMetadataDialog::updateImageGrid()
 {
-    Q3PtrList<AlbumArtImage> *albumArtList = albumArt->getImageList();
+    vector<AlbumArtImage*> *albumArtList = albumArt->getImageList();
 
     QSize size = coverart_grid->getImageItemSize();
 
-    for (uint x = 0; x < albumArtList->count(); x++)
+    for (uint x = 0; x < albumArtList->size(); x++)
     {
         if (albumArtList->at(x)->embedded)
             continue;
@@ -166,10 +166,10 @@ void EditMetadataDialog::updateImageGrid()
         coverart_grid->appendItem(item);
     }
 
-    coverart_grid->setItemCount(albumArtList->count());
+    coverart_grid->setItemCount(albumArtList->size());
     coverart_grid->recalculateLayout();
 
-    if (albumArtList->count() > 0)
+    if (!albumArtList->empty())
         gridItemChanged(coverart_grid->getItemAt(0));
 
     coverart_grid->refresh();
@@ -536,7 +536,7 @@ bool EditMetadataDialog::showList(QString caption, QString &value)
     }
 
     searchDialog->deleteLater();
-    setActiveWindow();
+    activateWindow();
 
     return res;
 }
@@ -653,7 +653,7 @@ void EditMetadataDialog::cancelPopup(void)
     {
         popup->deleteLater();
         popup = NULL;
-        setActiveWindow();
+        activateWindow();
     }
 }
 

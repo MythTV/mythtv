@@ -100,7 +100,7 @@ void vcedit_clear(vcedit_state *state)
 /* Next two functions pulled straight from libvorbis, apart from one change
  * - we don't want to overwrite the vendor string.
  */
-static void _v_writestring(oggpack_buffer *o,char *s, int len)
+static void _v_writestring(oggpack_buffer *o,const char *s, int len)
 {
 	while(len--)
 	{

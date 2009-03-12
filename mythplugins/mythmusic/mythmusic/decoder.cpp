@@ -13,7 +13,6 @@
 
 #include <qapplication.h>
 #include <qobject.h>
-#include <q3ptrlist.h>
 #include <qdir.h>
 #include <qstringlist.h>
 #include <qregexp.h>
@@ -171,7 +170,7 @@ QString Decoder::musiclocation = "";
 void Decoder::SetLocationFormatUseTags(void)
 {
     QString startdir = gContext->GetSetting("MusicLocation");
-    startdir = QDir::cleanDirPath(startdir);
+    startdir = QDir::cleanPath(startdir);
     if (!startdir.endsWith("/"))
         startdir += "/";
 
@@ -180,13 +179,13 @@ void Decoder::SetLocationFormatUseTags(void)
     ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
-static Q3PtrList<DecoderFactory> *factories = 0;
+static QList<DecoderFactory*> *factories = NULL;
 
 static void checkFactories()
 {
     if (!factories)
     {
-        factories = new Q3PtrList<DecoderFactory>;
+        factories = new QList<DecoderFactory*>;
 
 #ifndef USING_MINGW
         Decoder::registerFactory(new CdDecoderFactory);
@@ -203,12 +202,10 @@ QStringList Decoder::all()
     checkFactories();
 
     QStringList l;
-    DecoderFactory *fact = factories->first();
-    while (fact)
-    {
-        l << fact->description();
-        fact = factories->next();
-    }
+
+    QList<DecoderFactory*>::iterator it = factories->begin();
+    for (; it != factories->end(); ++it)
+        l += (*it)->description();
 
     return l;
 }
@@ -217,21 +214,19 @@ bool Decoder::supports(const QString &source)
 {
     checkFactories();
 
-    DecoderFactory *fact = factories->first();
-    while (fact)
+    QList<DecoderFactory*>::iterator it = factories->begin();
+    for (; it != factories->end(); ++it)
     {
-        if (fact->supports(source))
-            return TRUE;
-
-        fact = factories->next();
+        if ((*it)->supports(source))
+            return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 void Decoder::registerFactory(DecoderFactory *fact)
 {
-    factories->append(fact);
+    factories->push_back(fact);
 }
 
 Decoder *Decoder::create(const QString &source, QIODevice *input,
@@ -239,21 +234,14 @@ Decoder *Decoder::create(const QString &source, QIODevice *input,
 {
     checkFactories();
 
-    Decoder *decoder = 0;
-
-    DecoderFactory *fact = factories->first();
-    while (fact)
+    QList<DecoderFactory*>::iterator it = factories->begin();
+    for (; it != factories->end(); ++it)
     {
-        if (fact->supports(source))
-        {
-            decoder = fact->create(source, input, output, deletable);
-            break;
-        }
-
-        fact = factories->next();
+        if ((*it)->supports(source))
+            return (*it)->create(source, input, output, deletable);
     }
 
-    return decoder;
+    return NULL;
 }
 
 

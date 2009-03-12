@@ -12,6 +12,9 @@
 #ifndef VISUALIZE_H
 #define VISUALIZE_H
 
+#include <vector>
+using namespace std;
+
 #include <mythtv/visual.h>
 #include "mainvisual.h"
 #include "metadata.h"
@@ -19,8 +22,6 @@
 #include "config.h"
 
 #include <complex>
-//Added by qt3to4:
-#include <Q3MemArray>
 extern "C" {
 #ifdef FFTW3_SUPPORT
 #include <fftw3.h>
@@ -63,8 +64,8 @@ class Spectrum : public VisualBase
     inline double clamp(double cur, double max, double min);
 
     QColor startColor, targetColor;
-    Q3MemArray<QRect> rects;
-    Q3MemArray<double> magnitudes;
+    vector<QRect> rects;
+    vector<double> magnitudes;
     QSize size;
     LogScale scale;
     double scaleFactor, falloff;
@@ -159,8 +160,8 @@ class Gears : public QGLWidget, public VisualBase
 		
   private:
     QColor startColor, targetColor;
-    Q3MemArray<QRect> rects;
-    Q3MemArray<double> magnitudes;
+    vector<QRect> rects;
+    vector<double> magnitudes;
     QSize size;
     LogScale scale;
     double scaleFactor, falloff;

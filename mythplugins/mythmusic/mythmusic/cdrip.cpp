@@ -12,10 +12,6 @@
 #include "config.h"
 #ifdef HAVE_CDAUDIO
 #include <cdaudio.h>
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <Q3PtrList>
-#include <QEvent>
 extern "C" {
 #include <cdda_interface.h>
 #include <cdda_paranoia.h>
@@ -28,9 +24,11 @@ extern "C" {
 using namespace std;
 
 // Qt includes
-#include <qapplication.h>
-#include <qdir.h>
-#include <qregexp.h>
+#include <QApplication>
+#include <QDir>
+#include <QRegExp>
+#include <QKeyEvent>
+#include <QEvent>
 
 // MythTV plugin includes
 #include <mythtv/mythcontext.h>
@@ -940,7 +938,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
 
             // delete file
             QString musicdir = gContext->GetSetting("MusicLocation");
-            musicdir = QDir::cleanDirPath(musicdir);
+            musicdir = QDir::cleanPath(musicdir);
             if (!musicdir.endsWith("/"))
                 musicdir += "/";
             QFile::remove(musicdir + filename);
@@ -961,7 +959,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
 QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
 {
     QString musicdir = gContext->GetSetting("MusicLocation");
-    musicdir = QDir::cleanDirPath(musicdir);
+    musicdir = QDir::cleanPath(musicdir);
     if (!musicdir.endsWith("/"))
         musicdir += "/";
 
@@ -976,7 +974,7 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
     int old_i = 0;
     while (i >= 0)
     {
-        i = rx.search(fntempl, i);
+        i = rx.indexIn(fntempl, i);
         if (i >= 0)
         {
             if (i > 0)
@@ -1024,19 +1022,19 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
 
     filename = QString(filename.toLocal8Bit().constData());
 
-    QStringList directoryList = QStringList::split("/", filename);
+    QStringList directoryList = filename.split("/");
     for (int i = 0; i < (directoryList.size() - 1); i++)
     {
         musicdir += "/" + directoryList[i];
         if (createDir)
         {
             umask(022);
-            directoryQD.mkdir(musicdir, true);
+            directoryQD.mkdir(musicdir);
             directoryQD.cd(musicdir);
         }
     }
 
-    filename = QDir::cleanDirPath(musicdir) + "/" + directoryList.last();
+    filename = QDir::cleanPath(musicdir) + "/" + directoryList.last();
 
     return filename;
 }
@@ -1453,7 +1451,7 @@ bool Ripper::showList(QString caption, QString &value)
     }
 
     searchDialog->deleteLater();
-    setActiveWindow();
+    activateWindow();
 
     return res;
 }
@@ -1571,7 +1569,7 @@ void RipStatus::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
         {
-            if (m_ripperThread && m_ripperThread->running())
+            if (m_ripperThread && m_ripperThread->isRunning())
             {
                 if (MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
                     "Stop Rip?",

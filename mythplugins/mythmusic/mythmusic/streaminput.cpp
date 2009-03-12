@@ -6,24 +6,25 @@
 
 #include "streaminput.h"
 
-#include "mythtv/mythcontext.h"
+#include "mythverbose.h"
 
-#include <qapplication.h>
-#include <q3socket.h>
+#include <QApplication>
 
+#define LOC      QString("StreamInput: ")
+#define LOC_WARN QString("StreamInput, Warning: ")
+#define LOC_ERR  QString("StreamInput, Error: ")
 
-StreamInput::StreamInput(const Q3Url &source)
-    : request(0), url(source), sock(0), stage(0)
+StreamInput::StreamInput(const QUrl &source) :
+    request(QString::null), url(source), sock(NULL), stage(0)
 {
 }
 
-
-void StreamInput::setup()
+void StreamInput::Setup(void)
 {
-    if (! url.isValid())
+    if (!url.isValid())
         return;
 
-    QString protocol = url.protocol();
+    QString protocol = url.scheme();
     QString host = url.host();
     QString path = url.path();
     int port = url.port();
@@ -31,70 +32,79 @@ void StreamInput::setup()
     if (protocol != "mqp" || host.isNull())
         return;
 
-    if (port == -1)
-        port = 42666;
+    port = (port < 0) ? 42666 : port;
 
-    request = ".song " + QString(path.toUtf8()) + "\r\n";
+    request = path;
+    request.detach();
 
+    sock = new QTcpSocket();
+    connect(sock, SIGNAL(Error(QAbstractSocket::SocketError)),
+            this, SLOT(  Error(QAbstractSocket::SocketError)));
+    connect(sock, SIGNAL(hostFound()), this, SLOT(HostFound()));
+    connect(sock, SIGNAL(connected()), this, SLOT(Connected()));
+    connect(sock, SIGNAL(readyRead()), this, SLOT(Readyread()));
 
-    sock = new Q3Socket;
-    connect(sock, SIGNAL(error(int)), this, SLOT(error(int)));
-    connect(sock, SIGNAL(hostFound()), this, SLOT(hostfound()));
-    connect(sock, SIGNAL(connected()), this, SLOT(connected()));
-    connect(sock, SIGNAL(readyRead()), this, SLOT(readyread()));
-
-    sock->connectToHost(host, port);
+    sock->connectToHost(host, port, QIODevice::ReadWrite);
 
     while (stage != -1 && stage < 4) 
     {
-        qDebug("processing one event: stage %d %d %ld",
-               stage, sock->canReadLine(), (long int)sock->bytesAvailable());
-        qApp->processOneEvent();
+        VERBOSE(VB_GENERAL, LOC +
+                QString("Processing one event: stage %1 %2 %3")
+                .arg(stage).arg(sock->canReadLine())
+                .arg(sock->bytesAvailable()));
+
+        qApp->processEvents();
     }
 
-    qDebug("disconnecting from socket");
-    disconnect(sock, SIGNAL(error(int)), this, SLOT(error(int)));
-    disconnect(sock, SIGNAL(hostFound()), this, SLOT(hostfound()));
-    disconnect(sock, SIGNAL(connected()), this, SLOT(connected()));
-    disconnect(sock, SIGNAL(readyRead()), this, SLOT(readyread()));
+    VERBOSE(VB_GENERAL, LOC + "Disconnecting from socket");
+    disconnect(sock, SIGNAL(Error(QAbstractSocket::SocketError)),
+               this, SLOT(  Error(QAbstractSocket::SocketError)));
+    disconnect(sock, SIGNAL(hostFound()), this, SLOT(HostFound()));
+    disconnect(sock, SIGNAL(connected()), this, SLOT(Connected()));
+    disconnect(sock, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
 
     if (stage == -1) 
     {
         // some sort of error
         delete sock;
-        sock = 0;
+        sock = NULL;
     }
 }
 
 
-void StreamInput::hostfound()
+void StreamInput::HostFound(void)
 {
-    qDebug("host found");
+    VERBOSE(VB_GENERAL, LOC + "Host found");
     stage = 1;
 }
 
 
-void StreamInput::connected()
+void StreamInput::Connected(void)
 {
-    qDebug("connected... sending request '%s' %d", request.data(), request.length());
+    QString tmp = QString(".song %1\r\n").arg(QString(request.toUtf8()));
+    QByteArray ba = tmp.toAscii();
 
-    sock->writeBlock(request.data(), request.length());
+    VERBOSE(VB_GENERAL, LOC +
+            QString("Connected... sending request '%1' %2")
+            .arg(ba.constData()).arg(ba.length()));
+
+    sock->write(ba.constData(), ba.length());
     sock->flush();
 
     stage = 2;
 }
 
 
-void StreamInput::readyread()
+void StreamInput::ReadyRead(void)
 {
     if (stage == 2) 
     {
-        qDebug("readyread... checking response");
+        VERBOSE(VB_GENERAL, LOC + "ReadyRead... checking response");
         
         if (! sock->canReadLine()) 
         {
             stage = -1;
-            qDebug("can't read line");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "ReadyRead... can't read line");
             return;
         }
         
@@ -102,14 +112,14 @@ void StreamInput::readyread()
         if (line.isEmpty()) 
         {
             stage = -1;
-            qDebug("line is empty");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "ReadyRead... line is empty");
             return;
         }
 
         if (line.left(5) != "*GOOD") 
         {
-            VERBOSE(VB_IMPORTANT, QString("server error response: %1")
-                    .arg(line));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Server error response: %1").arg(line));
             stage = -1;
             return;
         }
@@ -122,10 +132,10 @@ void StreamInput::readyread()
     }
 }
 
-
-void StreamInput::error(int err)
+void StreamInput::Error(QAbstractSocket::SocketError)
 {
-    qDebug("socket error: %d", err);
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Socket error: %1").arg(sock->errorString()));
 
     stage = -1;
 }

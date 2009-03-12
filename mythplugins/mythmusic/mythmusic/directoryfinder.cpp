@@ -56,7 +56,7 @@ void DirectoryFinder::keyPressEvent(QKeyEvent *e)
                 if (m_directoryList[index] == "..")
                 {
                     // move up on directory
-                    int pos = m_curDirectory.findRev('/');
+                    int pos = m_curDirectory.lastIndexOf('/');
                     if (pos > 0)
                         m_curDirectory = m_curDirectory.left(pos);
                     else
@@ -195,7 +195,7 @@ void DirectoryFinder::locationEditLostFocus()
 void DirectoryFinder::backPressed()
 {
     // move up one directory
-    int pos = m_curDirectory.findRev('/');
+    int pos = m_curDirectory.lastIndexOf('/');
     if (pos > 0)
         m_curDirectory = m_curDirectory.left(pos);
     else

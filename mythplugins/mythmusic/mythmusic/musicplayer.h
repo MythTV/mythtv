@@ -1,8 +1,6 @@
 #ifndef MUSICPLAYER_H_
 #define MUSICPLAYER_H_
 
-#include <iostream>
-
 #include <mythtv/mythdialogs.h>
 #include <mythtv/audiooutput.h>
 
@@ -14,12 +12,8 @@ class MainVisual;
 
 class MusicPlayer : public QObject
 {
-  //Q_OBJECT
-
   public:
-
      MusicPlayer(QObject *parent, const QString &dev);
-    ~MusicPlayer(void);
 
     void playFile(const QString &filename);
     void playFile(const Metadata &meta);
@@ -111,6 +105,7 @@ class MusicPlayer : public QObject
     ResumeMode  getResumeMode(void) { return m_resumeMode; }
 
   protected:
+    ~MusicPlayer(void);
     void customEvent(QEvent *event);
 
   private:

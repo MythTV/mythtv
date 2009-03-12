@@ -6,15 +6,12 @@
 using namespace std;
 
 // Qt includes
-#include <qapplication.h>
-#include <qregexp.h>
-//Added by qt3to4:
+#include <QApplication>
 #include <QLabel>
 #include <QPixmap>
-#include <Q3ValueList>
-#include <QKeyEvent>
+
 #include <Q3Frame>
-#include <Q3PtrList>
+#include <Q3ValueList>
 
 // MythTV plugin includes
 #include <mythtv/mythcontext.h>
@@ -33,6 +30,7 @@ using namespace std;
 #include "databasebox.h"
 #include "mainvisual.h"
 #include "smartplaylist.h"
+#include "playlistcontainer.h"
 #include "search.h"
 
 #ifndef USING_MINGW
@@ -108,7 +106,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     {
         volume_control = true;
     }
-    volume_display_timer->start(2000, true);
+    volume_display_timer->setSingleShot(true);
+    volume_display_timer->start(2000);
     connect(volume_display_timer, SIGNAL(timeout()),
             this, SLOT(hideVolume()));
 
@@ -160,7 +159,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     waiting_for_playlists_timer = new QTimer(this);
     connect(waiting_for_playlists_timer, SIGNAL(timeout()), this, 
             SLOT(checkForPlaylists()));
-    waiting_for_playlists_timer->start(50, TRUE);
+    waiting_for_playlists_timer->setSingleShot(true);
+    waiting_for_playlists_timer->start(50);
 
     // Warm up the visualizer
 
@@ -175,7 +175,9 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     fullscreen_blank = false; 
 
-    visual_modes = QStringList::split(';', gContext->GetSetting("VisualMode"));
+    visual_modes = gContext->GetSetting("VisualMode")
+        .split(';', QString::SkipEmptyParts);
+
     if (!visual_modes.count())
         visual_modes.push_front("Blank");
 
@@ -491,7 +493,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                     resetScrollCount();
 
                 speed_scroll_timer->stop();
-                speed_scroll_timer->start(300, true);
+                speed_scroll_timer->setSingleShot(true);
+                speed_scroll_timer->start(300);
 
             }
             else if (action == "DOWN")
@@ -512,7 +515,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                     resetScrollCount();
 
                 speed_scroll_timer->stop();
-                speed_scroll_timer->start(300, true);
+                speed_scroll_timer->setSingleShot(true);
+                speed_scroll_timer->start(300);
             }
             else if (action == "LEFT")
                 music_tree_list->popUp();
@@ -956,8 +960,9 @@ void PlaybackBoxMusic::postUpdate()
 
 void PlaybackBoxMusic::occasionallyCheckCD()
 {
-    if (cd_reader_thread->getLock()->locked())
+    if (!cd_reader_thread->getLock()->tryLock())
         return;
+    cd_reader_thread->getLock()->unlock();
 
     if (!scan_for_cd)
     {
@@ -1160,7 +1165,8 @@ void PlaybackBoxMusic::checkForPlaylists()
         }
     }
 
-    waiting_for_playlists_timer->start(100, TRUE); // Restart Timer
+    waiting_for_playlists_timer->setSingleShot(true);
+    waiting_for_playlists_timer->start(100); // Restart Timer
 }
 
 void PlaybackBoxMusic::changeVolume(bool up_or_down)
@@ -1223,7 +1229,8 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                 volume_status->SetUsed(gPlayer->getOutput()->GetCurrentVolume());
                 volume_status->SetOrder(0);
                 volume_status->refresh();
-                volume_display_timer->start(2000, true);
+                volume_display_timer->setSingleShot(true);
+                volume_display_timer->start(2000);
                 if (class LCD *lcd = LCD::Get())
                     lcd->switchToVolume("Music");
 
@@ -1266,7 +1273,8 @@ void PlaybackBoxMusic::showSpeed(bool on_or_off)
             speed_status->SetText(speed_text);
             speed_status->SetOrder(0);
             speed_status->refresh();
-            volume_display_timer->start(2000, true);
+            volume_display_timer->setSingleShot(true);
+            volume_display_timer->start(2000);
         }
     }
 
@@ -1286,7 +1294,7 @@ void PlaybackBoxMusic::showSpeed(bool on_or_off)
 void PlaybackBoxMusic::resetTimer()
 {
     if (visual_mode_delay > 0)
-        visual_mode_timer->changeInterval(visual_mode_delay * 1000);
+        visual_mode_timer->start(visual_mode_delay * 1000);
 }
 
 void PlaybackBoxMusic::play()
@@ -1526,7 +1534,7 @@ void PlaybackBoxMusic::seek(int pos)
         gPlayer->getOutput()->Reset();
         gPlayer->getOutput()->SetTimecode(pos*1000);
 
-        if (gPlayer->getDecoder() && gPlayer->getDecoder()->running()) 
+        if (gPlayer->getDecoder() && gPlayer->getDecoder()->isRunning()) 
         {
             gPlayer->getDecoder()->lock();
             gPlayer->getDecoder()->seek(pos);
@@ -1740,7 +1748,7 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
 
     if (position != "")
     {
-        QStringList list = QStringList::split(",", position);
+        QStringList list = position.split(",", QString::SkipEmptyParts);
 
         for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
             branches_to_current_node.append((*it).toInt());
@@ -1855,13 +1863,14 @@ void PlaybackBoxMusic::editPlaylist()
     }
 
     visual_mode_timer->stop();
-    DatabaseBox dbbox(gContext->GetMainWindow(), m_CDdevice, 
-                      "music_select", "music-", "database box");
+    DatabaseBox *dbbox = new DatabaseBox(
+        gContext->GetMainWindow(), m_CDdevice, 
+        "music_select", "music-", "database box");
 
     if (cd_watcher)
         cd_watcher->stop();
 
-    dbbox.exec();
+    dbbox->exec();
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);
 
@@ -1888,6 +1897,8 @@ void PlaybackBoxMusic::editPlaylist()
 
     if (scan_for_cd && cd_watcher)
         cd_watcher->start(1000);
+
+    dbbox->deleteLater();
 }
 
 void PlaybackBoxMusic::customEvent(QEvent *event)

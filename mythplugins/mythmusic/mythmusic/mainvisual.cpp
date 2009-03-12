@@ -74,16 +74,17 @@ void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size,
     int y = size.height() / 2 - height / 2;
 
     for (int offset = 0; offset < height; offset += fm.height()) {
-        QString l = warning.left(warning.find("\n"));
+        QString l = warning.left(warning.indexOf("\n"));
         p->drawText(x, y + offset, width, height, Qt::AlignCenter, l);
         warning.remove(0, l.length () + 1);
     }
 }
 
 MainVisual::MainVisual(QWidget *parent, const char *name)
-    : QWidget(parent, name), vis(0), meta(0), playing(FALSE), fps(20),
+    : QWidget(parent), vis(0), meta(0), playing(FALSE), fps(20),
       timer (0), bannerTimer(0), info_widget(0)
 {
+    setObjectName(name);
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
 
@@ -121,8 +122,11 @@ MainVisual::~MainVisual()
     delete bannerTimer;
     bannerTimer = 0;
 
-    nodes.setAutoDelete(TRUE);
-    nodes.clear();
+    while (!nodes.empty())
+    {
+        delete nodes.back();
+        nodes.pop_back();
+    }
 }
 
 void MainVisual::setVisual(const QString &name)
@@ -167,9 +171,11 @@ void MainVisual::setVisual(const QString &name)
 
 void MainVisual::prepare()
 {
-    nodes.setAutoDelete(TRUE);
-    nodes.clear();
-    nodes.setAutoDelete(FALSE);
+    while (!nodes.empty())
+    {
+        delete nodes.back();
+        nodes.pop_back();
+    }
 }
 
 void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int p)
@@ -219,19 +225,21 @@ void MainVisual::timeout()
         return;
     }
 
-    VisualNode *node = 0;
-
+    VisualNode *node = NULL;
     if (playing && output())
     {
         long synctime = output()->GetAudiotime();
         mutex()->lock();
-        VisualNode *prev = 0;
-        while ((node = nodes.first()))
+        VisualNode *prev = NULL;
+        while (!nodes.empty())
         {
+            node = nodes.front();
             if (node->offset > synctime)
                 break;
-            delete prev;
-            nodes.removeFirst();
+            nodes.pop_front();
+
+            if (prev)
+                delete prev;
             prev = node;
         }
         mutex()->unlock();
@@ -443,7 +451,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
         QString info_copy = info;
         for (int offset = 0; offset < textHeight; offset += fm.height())
         {
-            QString l = info_copy.left(info_copy.find("\n"));
+            QString l = info_copy.left(info_copy.indexOf("\n"));
             p.setPen(Qt::black);
             p.drawText(x + 2, y + offset + 2, textWidth, textHeight, Qt::AlignLeft, l);
             p.setPen(Qt::white);
@@ -489,7 +497,7 @@ void InfoWidget::showInformation(const QString &text)
     QString info_copy = info;
     for (int offset = 0; offset < textHeight; offset += fm.height())
     {
-        QString l = info_copy.left(info_copy.find("\n"));
+        QString l = info_copy.left(info_copy.indexOf("\n"));
         p.setPen(Qt::black);
         p.drawText(x + 2, y + offset + 2, textWidth, textHeight, Qt::AlignLeft, l);
         p.setPen(Qt::white);
@@ -527,7 +535,7 @@ void StereoScope::resize( const QSize &newsize )
     uint os = magnitudes.size();
     magnitudes.resize( size.width() * 2 );
     for ( ; os < magnitudes.size(); os++ )
-    magnitudes[os] = 0.0;
+        magnitudes[os] = 0.0;
 }
 
 bool StereoScope::process( VisualNode *node )

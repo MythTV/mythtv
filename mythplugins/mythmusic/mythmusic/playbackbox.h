@@ -2,10 +2,8 @@
 #define PLAYBACKBOX_H_
 
 // qt
-#include <qtimer.h>
-#include <qmutex.h>
-#include <q3valuevector.h>
 #include <QKeyEvent>
+#include <q3valuevector.h>
 
 // mythtv
 #include <mythtv/mythwidgets.h>
@@ -22,6 +20,7 @@
 
 class Output;
 class Decoder;
+class QTimer;
 
 class PlaybackBoxMusic : public MythThemedDialog
 {

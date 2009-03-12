@@ -1,5 +1,3 @@
-//Added by qt3to4:
-#include <Q3CString>
 // Copyright (c) 2000-2001 Brad Hughes <bhughes@trolltech.com>
 //
 // Use, modification and distribution is allowed without limitation,
@@ -11,33 +9,31 @@
 
 class StreamInput;
 
-#include <q3url.h>
-#include <q3socket.h>
-
+#include <QUrl>
+#include <QTcpSocket>
 
 class StreamInput : public QObject
 {
     Q_OBJECT
-public:
-    StreamInput(const Q3Url &);
 
-    QIODevice *socket() { return sock; }
+  public:
+    StreamInput(const QUrl&);
 
-    void setup();
+    QIODevice *GetSocket(void) { return sock; }
 
+    void Setup(void);
 
-private slots:
-    void hostfound();
-    void connected();
-    void readyread();
-    void error(int);
+  private slots:
+    void HostFound(void);
+    void Connected(void);
+    void ReadyRead(void);
+    void Error(QAbstractSocket::SocketError);
 
-
-private:
-    Q3CString request;
-    Q3Url url;
-    Q3Socket *sock;
-    int stage;
+  private:
+    QString     request;
+    QUrl        url;
+    QTcpSocket *sock;
+    int         stage;
 };
 
 

@@ -1,15 +1,12 @@
 #ifndef DATABASEBOX_H_
 #define DATABASEBOX_H_
 
-#include <qwidget.h>
-#include <qdialog.h>
-#include <qstringlist.h>
-#include <qthread.h>
-#include <qtimer.h>
-#include <q3ptrlist.h>
-//Added by qt3to4:
+#include <vector>
+using namespace std;
+
+#include <QStringList>
+#include <QThread>
 #include <QPixmap>
-#include <QKeyEvent>
 
 #include "metadata.h"
 #include "playlist.h"
@@ -18,6 +15,8 @@
 #include <mythtv/uilistbtntype.h>
 
 class TreeCheckItem;
+class QTimer;
+class QKeyEvent;
 
 class ReadCDThread : public QThread
 {
@@ -115,7 +114,7 @@ class DatabaseBox : public MythThemedDialog
 
     QStringList         treelevels;
 
-    Q3PtrList<UITextType> m_lines;
+    vector<UITextType*> m_lines;
 };
 
 #endif

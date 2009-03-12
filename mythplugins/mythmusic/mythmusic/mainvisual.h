@@ -7,16 +7,17 @@
 #ifndef __mainvisual_h
 #define __mainvisual_h
 
+#include <vector>
+using namespace std;
+
 #include <mythtv/visual.h>
 #include "polygon.h"
 #include "constants.h"
 
 #include <qwidget.h>
 #include <qdialog.h>
-#include <q3memarray.h>
 #include <qpixmap.h>
 #include <qimage.h>
-#include <q3ptrlist.h>
 #include <qstringlist.h>
 #include <qtimer.h>
 #include <QPaintEvent>
@@ -136,7 +137,7 @@ private:
     VisualBase *vis;
     Metadata *meta;
     QPixmap pixmap;
-    Q3PtrList<VisualNode> nodes;
+    QList<VisualNode*> nodes;
     bool playing;
     int fps;
     QTimer *timer;
@@ -176,7 +177,7 @@ public:
 
 protected:
     QColor startColor, targetColor;
-    Q3MemArray<double> magnitudes;
+    vector<double> magnitudes;
     QSize size;
     bool rubberband;
     double falloff;

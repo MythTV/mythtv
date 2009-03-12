@@ -25,7 +25,7 @@
 #include "metadata.h"
 #include "databasebox.h"
 #include "playbackbox.h"
-#include "playlist.h"
+#include "playlistcontainer.h"
 #include "globalsettings.h"
 #include "dbcheck.h"
 #include "filescanner.h"
@@ -218,7 +218,7 @@ void MusicCallback(void *data, QString &selection)
 {
     (void) data;
 
-    QString sel = selection.lower();
+    QString sel = selection.toLower();
     if (sel == "music_create_playlist")
         startDatabaseTree();
     else if (sel == "music_play")
@@ -443,7 +443,7 @@ static void preMusic()
 
     //  Load all available info about songs (once!)
     QString startdir = gContext->GetSetting("MusicLocation");
-    startdir = QDir::cleanDirPath(startdir);
+    startdir = QDir::cleanPath(startdir);
     if (!startdir.endsWith("/"))
         startdir += "/";
 
@@ -468,7 +468,8 @@ static void preMusic()
     AllMusic *all_music = new AllMusic(paths, startdir);
 
     //  Load all playlists into RAM (once!)
-    PlaylistsContainer *all_playlists = new PlaylistsContainer(all_music, gContext->GetHostName());
+    PlaylistContainer *all_playlists = new PlaylistContainer(
+        all_music, gContext->GetHostName());
 
     gMusicData->paths = paths;
     gMusicData->startdir = startdir;
@@ -512,7 +513,7 @@ int mythplugin_config(void)
     gMusicData->runPost = false;
     gMusicData->paths = gContext->GetSetting("TreeLevels");
     gMusicData->startdir = gContext->GetSetting("MusicLocation");
-    gMusicData->startdir = QDir::cleanDirPath(gMusicData->startdir);
+    gMusicData->startdir = QDir::cleanPath(gMusicData->startdir);
 
     if (!gMusicData->startdir.endsWith("/"))
         gMusicData->startdir += "/";
@@ -528,7 +529,7 @@ int mythplugin_config(void)
 
 void mythplugin_destroy(void)
 {
-    delete gPlayer;
+    gPlayer->deleteLater();
     delete gMusicData;
 }
 

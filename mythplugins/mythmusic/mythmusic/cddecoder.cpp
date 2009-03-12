@@ -258,7 +258,7 @@ void CdDecoder::run()
 void CdDecoder::setCDSpeed(int speed)
 {
     QMutexLocker lock(getMutex());
-    MediaMonitor::SetCDSpeed(devicename, speed);
+    MediaMonitor::SetCDSpeed(devicename.toLocal8Bit().constData(), speed);
 }
 
 int CdDecoder::getNumTracks(void)
@@ -408,7 +408,7 @@ Metadata *CdDecoder::getMetadata()
 
     compilation_artist = M_QSTRING_UNICODE(discdata.data_artist);
 
-    if (compilation_artist.lower().left(7) == "various")
+    if (compilation_artist.toLower().left(7) == "various")
     {
         compilation_artist = QObject::tr("Various Artists");
     }
@@ -419,8 +419,8 @@ Metadata *CdDecoder::getMetadata()
 
     if (!genre.isEmpty())
     {
-        QString flet = genre.upper().left(1);
-        QString rt = genre.right(genre.length()-1).lower();
+        QString flet = genre.toUpper().left(1);
+        QString rt = genre.right(genre.length()-1).toLower();
         genre = flet + rt;
     }
 
@@ -547,7 +547,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
 
 bool CdDecoderFactory::supports(const QString &source) const
 {
-    return (source.right(extension().length()).lower() == extension());
+    return (source.right(extension().length()).toLower() == extension());
 }
 
 const QString &CdDecoderFactory::extension() const

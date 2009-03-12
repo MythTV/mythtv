@@ -1,17 +1,11 @@
 // ANSI C includes
 #include <cstdlib>
 
-// C++ includes
-#include <iostream>
-#include <Q3ValueList>
-
-using namespace std;
-
 // qt
-#include <qapplication.h>
-#include <q3url.h>
-#include <qwidget.h>
+#include <QApplication>
+#include <QWidget>
 #include <QFile>
+#include <QList>
 
 // mythtv
 #include <mythtv/mythcontext.h>
@@ -25,7 +19,7 @@ using namespace std;
 #include "constants.h"
 #include "mainvisual.h"
 #include "miniplayer.h"
-#include "playlist.h"
+#include "playlistcontainer.h"
 
 // how long to wait before updating the lastplay and playcount fields
 #define LASTPLAY_DELAY 15
@@ -58,29 +52,29 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_playSpeed = 1.0;
 
     QString playmode = gContext->GetSetting("PlayMode", "none");
-    if (playmode.lower() == "random")
+    if (playmode.toLower() == "random")
         setShuffleMode(SHUFFLE_RANDOM);
-    else if (playmode.lower() == "intelligent")
+    else if (playmode.toLower() == "intelligent")
         setShuffleMode(SHUFFLE_INTELLIGENT);
-    else if (playmode.lower() == "album")
+    else if (playmode.toLower() == "album")
         setShuffleMode(SHUFFLE_ALBUM);
-    else if (playmode.lower() == "artist")
+    else if (playmode.toLower() == "artist")
         setShuffleMode(SHUFFLE_ARTIST);
     else
         setShuffleMode(SHUFFLE_OFF);
 
     QString repeatmode = gContext->GetSetting("RepeatMode", "all");
-    if (repeatmode.lower() == "track")
+    if (repeatmode.toLower() == "track")
         setRepeatMode(REPEAT_TRACK);
-    else if (repeatmode.lower() == "all")
+    else if (repeatmode.toLower() == "all")
         setRepeatMode(REPEAT_ALL);
     else
         setRepeatMode(REPEAT_OFF);
 
     QString resumestring = gContext->GetSetting("ResumeMode", "off");
-    if (resumestring.lower() == "off")
+    if (resumestring.toLower() == "off")
         m_resumeMode = RESUME_OFF;
-    else if (resumestring.lower() == "track")
+    else if (resumestring.toLower() == "track")
         m_resumeMode = RESUME_TRACK;
     else
         m_resumeMode = RESUME_EXACT;
@@ -326,7 +320,7 @@ void MusicPlayer::play(void)
 
 void MusicPlayer::stopDecoder(void)
 {
-    if (m_decoder && m_decoder->running())
+    if (m_decoder && m_decoder->isRunning())
     {
         m_decoder->lock();
         m_decoder->stop();
@@ -459,10 +453,15 @@ void MusicPlayer::nextAuto(void)
 
     if (m_canShowPlayer && m_autoShowPlayer)
     {
-        MiniPlayer *popup = new MiniPlayer(gContext->GetMainWindow(), this);
-        popup->showPlayer(10);
-        popup->deleteLater();
-        popup = NULL;
+        MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
+
+        MiniPlayer *miniplayer = new MiniPlayer(popupStack, this);
+
+        if (miniplayer->Create())
+            popupStack->AddScreen(miniplayer);
+        else
+            delete miniplayer;
     }
 }
 
@@ -666,11 +665,11 @@ void MusicPlayer::savePosition(void)
 
 void MusicPlayer::restorePosition(const QString &position)
 {
-    Q3ValueList <int> branches_to_current_node;
+    QList<int> branches_to_current_node;
 
     if (position != "")
     {
-        QStringList list = QStringList::split(",", position);
+        QStringList list = position.split(",", QString::SkipEmptyParts);
 
         for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
             branches_to_current_node.append((*it).toInt());
@@ -707,7 +706,7 @@ void MusicPlayer::seek(int pos)
         m_output->Reset();
         m_output->SetTimecode(pos*1000);
 
-        if (m_decoder && m_decoder->running())
+        if (m_decoder && m_decoder->isRunning())
         {
             m_decoder->lock();
             m_decoder->seek(pos);
@@ -720,10 +719,15 @@ void MusicPlayer::showMiniPlayer(void)
 {
     if (m_canShowPlayer)
     {
-        MiniPlayer *popup = new MiniPlayer(gContext->GetMainWindow(), this);
-        popup->exec();
-        popup->deleteLater();
-        popup = NULL;
+        MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
+
+        MiniPlayer *miniplayer = new MiniPlayer(popupStack, this);
+
+        if (miniplayer->Create())
+            popupStack->AddScreen(miniplayer);
+        else
+            delete miniplayer;
     }
 }
 

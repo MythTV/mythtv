@@ -90,7 +90,7 @@
         The play music screen
     -->
     <window name="music_play">
-    
+
         <!--
             First, define all the fonts we need on this screen
         -->
@@ -105,7 +105,7 @@
             <size>18</size>
             <bold>yes</bold>
         </font>
-  
+
         <font name="selected" face="Arial">
             <color>#ffff00</color>
             <size>18</size>
@@ -159,7 +159,7 @@
                 <position>123,322</position>
                 <staticsize>146,149</staticsize>
             </image>
-            
+
         </container>
 
         <!--
@@ -172,10 +172,10 @@
                 I'll explain as we go
 
                 bins is how many visible layers of the
-                tree there are. 
+                tree there are.
             -->
             <managedtreelist name="musictreelist" draworder="1" bins="2">
-                <!-- 
+                <!--
                     regular area, but is only used if the user has
                     ShowWholeTree set to false.
                 -->
@@ -191,10 +191,10 @@
                 <image function="downarrow" filename="mm_down_arrow.png"></image>
                 <image function="leftarrow" filename="mm_left_arrow.png"></image>
                 <image function="rightarrow" filename="mm_right_arrow.png"></image>
-                <!-- 
+                <!--
                     the area of particular bins
                     you can make them show right to left,
-                    top to bottom, and layer graphics on top 
+                    top to bottom, and layer graphics on top
                     however you like
 
                     NB: bins number 1 to # of bins inclusive
@@ -240,7 +240,7 @@
             </textarea>
 
             <!--
-                An image for when we're only showing the last bin 
+                An image for when we're only showing the last bin
                 (ie. just the active playlist)
             -->
 
@@ -389,53 +389,53 @@
                 <image function="off" filename="prev_button_off.png"></image>
                 <image function="pushed" filename="prev_button_pushed.png"></image>
             </pushbutton>
-            
+
             <pushbutton name="rew_button" draworder="0">
                 <position>125,40</position>
                 <image function="on" filename="rew_button_on.png"></image>
                 <image function="off" filename="rew_button_off.png"></image>
                 <image function="pushed" filename="rew_button_pushed.png"></image>
             </pushbutton>
-            
+
             <pushbutton name="pause_button" draworder="0">
                 <position>240,40</position>
                 <image function="on" filename="pause_button_on.png"></image>
                 <image function="off" filename="pause_button_off.png"></image>
                 <image function="pushed" filename="pause_button_pushed.png"></image>
             </pushbutton>
-            
+
             <pushbutton name="play_button" draworder="0">
                 <position>355,40</position>
                 <image function="on" filename="play_button_on.png"></image>
                 <image function="off" filename="play_button_off.png"></image>
                 <image function="pushed" filename="play_button_pushed.png"></image>
             </pushbutton>
-            
+
             <pushbutton name="stop_button" draworder="0">
                 <position>470,40</position>
                 <image function="on" filename="stop_button_on.png"></image>
                 <image function="off" filename="stop_button_off.png"></image>
                 <image function="pushed" filename="stop_button_pushed.png"></image>
             </pushbutton>
-            
+
             <pushbutton name="ff_button" draworder="0">
                 <position>585,40</position>
                 <image function="on" filename="ff_button_on.png"></image>
                 <image function="off" filename="ff_button_off.png"></image>
                 <image function="pushed" filename="ff_button_pushed.png"></image>
             </pushbutton>
-            
+
             <pushbutton name="next_button" draworder="0">
                 <position>700,40</position>
                 <image function="on" filename="next_button_on.png"></image>
                 <image function="off" filename="next_button_off.png"></image>
                 <image function="pushed" filename="next_button_pushed.png"></image>
             </pushbutton>
-            
+
         </container>
 
   </window>
-  
+
   <window name="edit_metadata">
 
      <font name="title" face="Arial">
@@ -598,7 +598,7 @@
                 <image function="unchecked" filename="unchecked.png"></image>
                 <image function="checked_high" filename="checked_high.png"></image>
                 <image function="unchecked_high" filename="unchecked_high.png"></image>
-            </checkbox> 
+            </checkbox>
 
             <remoteedit name="compilation_artist_edit" draworder="1" align="left">
                 <context>1</context>
@@ -974,7 +974,7 @@
                <image function="on" filename="leftright_on.png"></image>
                <image function="off" filename="leftright_off.png"></image>
                <image function="pushed" filename="leftright_pushed.png"></image>
-           </selector> 
+           </selector>
 
            <remoteedit name="artist_edit" draworder="1" align="left">
                <area>195,90,525,35</area>
@@ -1020,7 +1020,7 @@
                <image function="unchecked" filename="unchecked.png"></image>
                <image function="checked_high" filename="checked_high.png"></image>
                <image function="unchecked_high" filename="unchecked_high.png"></image>
-           </checkbox> 
+           </checkbox>
 
            <textbutton name="switch_button" draworder="0">
                <position>270,210</position>
@@ -1436,7 +1436,7 @@
                <image function="unchecked" filename="unchecked.png"></image>
                <image function="checked_high" filename="checked_high.png"></image>
                <image function="unchecked_high" filename="unchecked_high.png"></image>
-           </checkbox> 
+           </checkbox>
 
            <textarea name="compartist_text" draworder="1" align="left">
                <area>200,235,515,30</area>
@@ -1821,101 +1821,62 @@
    </window>
 
    <window name="miniplayer">
+       <area>-1,5,590,190</area>
+       <imagetype name="track_info_background">
+           <filename>miniplayer_background.png</filename>
+           <area>10,10,569,170</area>
+       </imagetype>
 
-    <font name="currenttitle" face="Arial">
-        <color>#ffffff</color>
-        <size>20</size>
-        <bold>yes</bold>
-    </font>
+       <imagetype name="mm_blackhole_border">
+           <filename>mm_blackhole_border.png</filename>
+           <area>20,20,146,148</area>
+       </imagetype>
 
-    <font name="currentartist" face="Arial">
-        <color>#ffffff</color>
-        <size>16</size>
-        <bold>yes</bold>
-    </font>
+       <textarea name="title" from="basetextarea">
+           <area>170,15,415,34</area>
+           <font>baselarge</font>
+       </textarea>
 
-    <font name="infotext" face="Arial">
-        <color>#ffffff</color>
-        <size>12</size>
-        <bold>yes</bold>
-    </font>
+       <textarea name="artist" from="basetextarea">
+           <area>170,50,415,27</area>
+           <font>basemedium</font>
+       </textarea>
 
-    <!--
-       This container determines the size and position of the 
-       popup mini player and must be present
-    -->
-    <container name="player_container">
-        <area>105,5,590,190</area>
-        <image name="track_info_background" draworder="0" fleximage="no">
-            <filename>miniplayer_background.png</filename>
-            <position>10,10</position>
-            <staticsize>569,170</staticsize>
-        </image>
+       <textarea name="album" from="basetextarea">
+           <area>170,77,415,27</area>
+           <font>basemedium</font>
+       </textarea>
 
-        <image name="mm_blackhole_border" draworder="0" fleximage="no">
-            <filename>mm_blackhole_border.png</filename>
-            <position>20,20</position>
-            <staticsize>146,148</staticsize>
-        </image>
+       <statetype name="ratings_state">
+       </statetype>
 
-        <textarea name="title_text" draworder="1" align="left">
-            <font>currenttitle</font>
-            <area>170,15,415,34</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+       <textarea name="info" from="basetextarea">
+           <area>170,129,250,25</area>
+       </textarea>
 
-        <textarea name="artist_text" draworder="1" align="left">
-            <font>currentartist</font>
-            <area>170,50,415,27</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+       <textarea name="time" from="basetextarea">
+           <area>385,125,185,25</area>
+           <align>right</align>
+       </textarea>
 
-        <textarea name="album_text" draworder="1" align="left">
-            <font>currentartist</font>
-            <area>170,77,415,27</area>
-            <cutdown>yes</cutdown>
-        </textarea>
+       <imagetype name="coverart">
+           <filename>mm_nothumb.png</filename>
+           <area>22,22,144,144</area>
+       </imagetype>
 
-        <repeatedimage name="ratings_image" draworder="1" fleximage="no">
-            <filename>mm_rating.png</filename>
-            <position>173,107</position>
-            <orientation>LeftToRight</orientation>
-        </repeatedimage>
-
-        <textarea name="info_text" draworder="1" align="left">
-            <font>infotext</font>
-            <area>170,129,250,25</area>
-        </textarea>
-
-        <textarea name="time_text" draworder="1" align="right">
-            <font>currentartist</font>
-            <area>385,125,185,25</area>
-        </textarea>
-
-        <image name="cover_image" draworder="2">
-            <filename>mm_nothumb.png</filename>
-            <position>22,22</position>
-            <staticsize>142,144</staticsize>
-        </image>
-
-        <statusbar name="progress_bar" draworder="5" whitespace="5">
-            <container fleximage="no">mm_progress-bg.png</container>
-            <fill>mm_progress-fg.png</fill>
-            <position>170,150</position>
-            <orientation>LeftToRight</orientation>
-        </statusbar>
-<!--
-        <textarea name="volume_text" draworder="5" align="left">
-            <font>infotext</font>
-            <area>490,105,250,25</area>
-            <value>%1</value>                - this would show as '12'
-            <value>%1%</value>               - this would show as '12%'
-            <value>Vol: %1</value>           - this would show as 'Vol: 12'
-            <value>Vol: %1%</value>          - this would show as 'Vol: 12%'
-        </textarea>
--->
-    </container>
-
+       <progressbar name="progress" from="baseprogressbar">
+           <position>170,150</position>
+       </progressbar>
+       <!--
+           <textarea name="volume_text" draworder="5" align="left">
+               <font>infotext</font>
+               <area>490,105,250,25</area>
+               <value>%1</value>                - this would show as '12'
+               <value>%1%</value>               - this would show as '12%'
+               <value>Vol: %1</value>           - this would show as 'Vol: 12'
+               <value>Vol: %1%</value>          - this would show as 'Vol: 12%'
+           </textarea>
+           -->
   </window>
 
 </mythuitheme>
