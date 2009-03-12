@@ -834,8 +834,8 @@ void SourceSetup::sourceListItemSelected(MythUIButtonListItem *item)
     if (!si)
         return;
 
-    m_updateSpinbox->GetIntValue(si->update_timeout);
-    m_retrieveSpinbox->GetIntValue(si->retrieve_timeout);
+    m_updateSpinbox->SetValue(si->update_timeout);
+    m_retrieveSpinbox->SetValue(si->retrieve_timeout);
     QString txt = tr("Author: ");
     txt += si->author;
     txt += "\n" + tr("Email: ") + si->email;
