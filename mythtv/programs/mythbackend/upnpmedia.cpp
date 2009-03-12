@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 
+#include "mythdb.h"
 #include "upnpmedia.h"
 #include "mythcontext.h"
 
@@ -239,9 +240,15 @@ void UPnpMedia::BuildMediaMap(void)
 
             query.prepare("DELETE FROM upnpmedia WHERE class = :ITEMCLASS");
             query.bindValue(":ITEMCLASS", sMediaType);
-            query.exec();
+            if (!query.exec())
+            {
+                MythDB::DBError("BuildMediaMap -- clearing table upnpmedia", query);
+                VERBOSE(VB_IMPORTANT, LOC + "BuildMediaMap - abourting");
+                return;
+            }
 
-            query.exec("LOCK TABLES upnpmedia WRITE");
+            if (!query.exec("LOCK TABLES upnpmedia WRITE"))
+                MythDB::DBError("BuildMediaMap -- lock tables", query);
 
             VERBOSE(VB_UPNP, LOC + QString("VideoStartupDir = %1")
                                             .arg(RootVidDir));
@@ -276,7 +283,8 @@ void UPnpMedia::BuildMediaMap(void)
 
             }
 
-            query.exec("UNLOCK TABLES");
+            if (!query.exec("UNLOCK TABLES"))
+                MythDB::DBError("BuildMediaMap -- unlock tables", query);
 
         }
         else

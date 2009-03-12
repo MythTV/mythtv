@@ -1817,8 +1817,8 @@ static bool insert_program(const ProgramInfo        *pg,
         else
             VERBOSE(VB_IMPORTANT, "recording already exists...");
 
-        //query.prepare("UNLOCK TABLES");
-        query.exec("UNLOCK TABLES");
+        if (!query.exec("UNLOCK TABLES"))
+            MythDB::DBError("insert_program -- unlock tables", query);
         return false;
     }
 
@@ -1878,8 +1878,8 @@ static bool insert_program(const ProgramInfo        *pg,
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     bool active = query.isActive();
 
-    //query.prepare("UNLOCK TABLES");
-    query.exec("UNLOCK TABLES");
+    if (!query.exec("UNLOCK TABLES"))
+        MythDB::DBError("insert_program -- unlock tables", query);
 
     if (!ok && !active)
         MythDB::DBError("insert_program -- insert", query);

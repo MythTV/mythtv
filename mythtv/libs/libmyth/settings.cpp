@@ -905,9 +905,8 @@ void AutoIncrementDBSetting::Save(QString table)
                 + GetColumnName() + ") VALUES (0);");
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec(querystr);
 
-        if (!query.isActive() || query.numRowsAffected() < 1) 
+        if (!query.exec(querystr))
         {
             MythDB::DBError("inserting row", query);
             return;

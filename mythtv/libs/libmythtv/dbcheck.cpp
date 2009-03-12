@@ -414,9 +414,7 @@ static bool performActualUpdate(
 
     while (thequery != NULL)
     {
-        query.exec(thequery);
-
-        if (query.lastError().type() != QSqlError::NoError)
+        if (!query.exec(thequery))
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"
@@ -499,9 +497,11 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(QString("ALTER DATABASE %1 DEFAULT"
-                       " CHARACTER SET utf8 COLLATE utf8_general_ci;")
-               .arg(gContext->GetDatabaseParams().dbName));
+    if (!query.exec(QString("ALTER DATABASE %1 DEFAULT"
+                            " CHARACTER SET utf8 COLLATE utf8_general_ci;")
+                    .arg(gContext->GetDatabaseParams().dbName)))
+        MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
+        
 
     VERBOSE(VB_IMPORTANT, "Newest Schema Version : " + currentDatabaseVersion);
 
