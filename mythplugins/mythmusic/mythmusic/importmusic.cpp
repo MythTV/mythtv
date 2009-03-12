@@ -12,7 +12,6 @@
 #include "decoder.h"
 #include "genres.h"
 #include "metadata.h"
-#include "directoryfinder.h"
 #include "cdrip.h"
 #include "editmetadata.h"
 #include "musicplayer.h"
