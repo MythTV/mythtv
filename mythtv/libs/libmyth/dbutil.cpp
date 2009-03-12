@@ -710,7 +710,9 @@ bool DBUtil::lockSchema(MSqlQuery &query)
 
 void DBUtil::unlockSchema(MSqlQuery &query)
 {
-    query.exec("UNLOCK TABLES;");  // Should this _just_ unlock schemalock?
+    // Should this _just_ unlock schemalock?
+    if (!query.exec("UNLOCK TABLES;"))
+        MythDB::DBError("unlockSchema -- unlocking tables", query);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

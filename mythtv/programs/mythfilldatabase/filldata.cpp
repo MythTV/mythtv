@@ -25,6 +25,7 @@ using namespace std;
 #include "compat.h"
 #include "util.h"
 #include "mythdirs.h"
+#include "mythdb.h"
 
 // libmythtv headers
 #include "videosource.h" // for is_grabber..
@@ -35,6 +36,53 @@ using namespace std;
 #define LOC QString("FillData: ")
 #define LOC_WARN QString("FillData, Warning: ")
 #define LOC_ERR QString("FillData, Error: ")
+
+static bool updateLastRunEnd(MSqlQuery &query)
+{
+    QDateTime qdtNow = QDateTime::currentDateTime();                                     
+    query.prepare("UPDATE settings SET data = :ENDTIME "
+                  "WHERE value='mythfilldatabaseLastRunEnd'");
+
+    query.bindValue(qdtNow.toString("yyyy-MM-dd hh:mm"), ":ENDTIME");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("updateLastRunEnd", query);
+        return false;
+    }
+    return true;
+}
+
+static bool updateLastRunStart(MSqlQuery &query)
+{
+    QDateTime qdtNow = QDateTime::currentDateTime();                                     
+    query.prepare("UPDATE settings SET data = :STARTTIME "
+                  "WHERE value='mythfilldatabaseLastRunStart'");
+
+    query.bindValue(qdtNow.toString("yyyy-MM-dd hh:mm"), ":STARTTIME");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("updateLastRunStart", query);
+        return false;
+    }
+    return true;
+}
+
+static bool updateLastRunStatus(MSqlQuery &query, QString &status)
+{                               
+    query.prepare("UPDATE settings SET data = :STATUS "
+                  "WHERE value='mythfilldatabaseLastRunStatus'");
+
+    query.bindValue(status, ":STATUS");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("updateLastRunStatus", query);
+        return false;
+    }
+    return true;
+}
 
 void FillData::SetRefresh(int day, bool set)
 {
@@ -169,13 +217,10 @@ bool FillData::GrabDDData(Source source, int poffset,
     if (dd_grab_all && dddataretrieved)
         needtoretrieve = false;
 
-    QDateTime qdtNow = QDateTime::currentDateTime();
     MSqlQuery query(MSqlQuery::DDCon());
     QString status = QObject::tr("currently running.");
 
-    query.exec(QString("UPDATE settings SET data ='%1' "
-                       "WHERE value='mythfilldatabaseLastRunStart'")
-                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
+    updateLastRunStart(query);
 
     if (needtoretrieve)
     {
@@ -221,10 +266,7 @@ bool FillData::GrabDDData(Source source, int poffset,
             .arg(ddprocessor.GetDDProgramsStartAt().toString())
             .arg(ddprocessor.GetDDProgramsEndAt().toString()));
 
-    qdtNow = QDateTime::currentDateTime();
-    query.exec(QString("UPDATE settings SET data ='%1' "
-                       "WHERE value='mythfilldatabaseLastRunEnd'")
-                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
+    updateLastRunEnd(query);
 
     VERBOSE(VB_GENERAL, "Main temp tables populated.");
     if (!channel_update_run)
@@ -239,8 +281,8 @@ bool FillData::GrabDDData(Source source, int poffset,
     DataDirectProcessor::UpdateProgramViewTable(source.id);
     //cerr <<  "Finished creating program view table...\n";
 
-    query.exec("SELECT count(*) from dd_v_program;");
-    if (query.isActive() && query.size() > 0)
+    query.prepare("SELECT count(*) from dd_v_program;");
+    if (query.exec() && query.size() > 0)
     {
         query.next();
         if (query.value(0).toInt() < 1)
@@ -381,17 +423,11 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         VERBOSE(VB_XMLTV, QString("Using graboptions: %1").arg(graboptions));
     }
 
-    QDateTime qdtNow = QDateTime::currentDateTime();
     MSqlQuery query(MSqlQuery::InitCon());
     QString status = QObject::tr("currently running.");
 
-    query.exec(QString("UPDATE settings SET data ='%1' "
-                       "WHERE value='mythfilldatabaseLastRunStart'")
-                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
-
-    query.exec(QString("UPDATE settings SET data ='%1' "
-                       "WHERE value='mythfilldatabaseLastRunStatus'")
-                       .arg(status));
+    updateLastRunStart(query);
+    updateLastRunStatus(query, status);
 
     VERBOSE(VB_XMLTV, QString("Grabber Command: %1").arg(command));
 
@@ -406,10 +442,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     VERBOSE(VB_XMLTV,
             "------------------ End of XMLTV output ------------------");
 
-    qdtNow = QDateTime::currentDateTime();
-    query.exec(QString("UPDATE settings SET data ='%1' "
-                       "WHERE value='mythfilldatabaseLastRunEnd'")
-                       .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
+    updateLastRunEnd(query);
 
     status = QObject::tr("Successful.");
 
@@ -430,9 +463,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         }
     }
 
-    query.exec(QString("UPDATE settings SET data ='%1' "
-                           "WHERE value='mythfilldatabaseLastRunStatus'")
-                           .arg(status));
+    updateLastRunStatus(query, status);
 
     succeeded &= GrabDataFromFile(source.id, filename);
 
@@ -518,8 +549,8 @@ bool FillData::Run(SourceList &sourcelist)
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
                       "AND manualid = 0;");
         query.bindValue(":SRCID", (*it).id);
-        query.exec();
-        if (query.isActive() && query.size() > 0)
+
+        if (query.exec() && query.size() > 0)
         {
             query.next();
 
@@ -541,10 +572,8 @@ bool FillData::Run(SourceList &sourcelist)
                     .arg((*it).id));
 
             externally_handled++;
-            query.exec(QString("UPDATE settings SET data ='%1' "
-                               "WHERE value='mythfilldatabaseLastRunStart' OR "
-                               "value = 'mythfilldatabaseLastRunEnd'")
-                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
+            updateLastRunStart(query);
+            updateLastRunEnd(query);
             continue;
         }
         else if (xmltv_grabber == "/bin/true" ||
@@ -556,10 +585,8 @@ bool FillData::Run(SourceList &sourcelist)
                             "Nothing to do.").arg((*it).id));
 
             externally_handled++;
-            query.exec(QString("UPDATE settings SET data ='%1' "
-                               "WHERE value='mythfilldatabaseLastRunStart' OR "
-                               "value = 'mythfilldatabaseLastRunEnd'")
-                       .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
+            updateLastRunStart(query);
+            updateLastRunEnd(query);
             continue;
         }
 
@@ -571,9 +598,8 @@ bool FillData::Run(SourceList &sourcelist)
             "SELECT COUNT(chanid) FROM channel WHERE sourceid = "
              ":SRCID AND xmltvid != ''");
         query.bindValue(":SRCID", (*it).id);
-        query.exec();
 
-        if (query.isActive() && query.size() > 0)
+        if (query.exec() && query.size() > 0)
         {
             query.next();
             source_channels = query.value(0).toInt();
@@ -962,8 +988,8 @@ bool FillData::Run(SourceList &sourcelist)
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
                       "AND manualid = 0;");
         query.bindValue(":SRCID", (*it).id);
-        query.exec();
-        if (query.isActive() && query.size() > 0)
+
+        if (query.exec() && query.size() > 0)
         {
             query.next();
 
@@ -1004,9 +1030,7 @@ bool FillData::Run(SourceList &sourcelist)
         else
             status = QObject::tr("Successful.");
 
-        query.exec(QString("UPDATE settings SET data ='%1' "
-                           "WHERE value='mythfilldatabaseLastRunStatus'")
-                           .arg(status));
+        updateLastRunStatus(query, status);
     }
 
     return (failures == 0);
