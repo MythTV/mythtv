@@ -993,7 +993,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     // If we don't have a position map, set up ffmpeg for seeking
-    if (!recordingHasPositionMap)
+    if (!recordingHasPositionMap && !livetv)
     {
         VERBOSE(VB_PLAYBACK, LOC +
                 "Recording has no position -- using libavformat seeking.");
@@ -2364,12 +2364,12 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         int tempKeyFrameDist = framesRead - 1 - prevgoppos;
         bool reset_kfd = false;
 
-        if (!gopset) // gopset: we've seen 2 keyframes
+        if (!gopset || livetv) // gopset: we've seen 2 keyframes
         {
             VERBOSE(VB_PLAYBACK, LOC + "HandleGopStart: "
                     "gopset not set, syncing positionMap");
             SyncPositionMap();
-            if (tempKeyFrameDist > 0)
+            if (tempKeyFrameDist > 0 && !livetv)
             {
                 VERBOSE(VB_PLAYBACK, LOC + "HandleGopStart: " +
                         QString("Initial key frame distance: %1.")
