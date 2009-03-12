@@ -4099,6 +4099,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             if (ctx->HasNVP() && (12 & db_playback_exit_prompt))
             {
                 PromptStopWatchingRecording(ctx);
+                return handled;
             }
             else
             {
