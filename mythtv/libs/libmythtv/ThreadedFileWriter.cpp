@@ -220,6 +220,8 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
 
     uint iobound_cnt = 0;
     uint remaining = count;
+    char *wdata = (char *)data;
+
     while (remaining)
     {
         bool first = true;
@@ -253,13 +255,13 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
         {
             int first_chunk_size  = tfw_buf_size - twpos;
             int second_chunk_size = bytes - first_chunk_size;
-            memcpy(buf + twpos, data, first_chunk_size);
-            memcpy(buf, ((const char*)data) + first_chunk_size,
+            memcpy(buf + twpos, wdata, first_chunk_size);
+            memcpy(buf, wdata + first_chunk_size,
                    second_chunk_size);
         }
         else
         {
-            memcpy(buf + twpos, data, bytes);
+            memcpy(buf + twpos, wdata, bytes);
         }
 
         buflock.lock();
@@ -277,11 +279,15 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
         bufferHasData.wakeAll();
 
         remaining -= bytes;
+        wdata += bytes;
 
-        buflock.lock();
-        if (remaining && (0 == BufFreePriv()))
-            bufferWroteData.wait(&buflock, 10000);
-        buflock.unlock();
+        if (remaining)
+        {
+            buflock.lock();
+            if (0 == BufFreePriv())
+                bufferWroteData.wait(&buflock, 10000);
+            buflock.unlock();
+        }
     }
 
     return count;

@@ -53,8 +53,8 @@ class ThreadedFileWriter
     long long       tfw_min_write_size;
 
     // buffer position state
-    uint            rpos;    ///< points to end of data written to disk
-    uint            wpos;    ///< points to end of data added to buffer
+    volatile uint   rpos;    ///< points to end of data written to disk
+    volatile uint   wpos;    ///< points to end of data added to buffer
     mutable QMutex  buflock; ///< lock needed to update rpos and wpos
     long long       written;
 
