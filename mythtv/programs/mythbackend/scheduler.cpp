@@ -1336,7 +1336,7 @@ void Scheduler::UpdateNextRecord(void)
             if (next_record == nextRecMap[recid])
                 continue;
 
-            if (nextRecMap[recid].isNull() && next_record.isValid())
+            if (nextRecMap[recid].isNull() || !next_record.isValid())
             {
                 subquery.prepare("UPDATE record "
                                  "SET next_record = '0000-00-00T00:00:00' "
