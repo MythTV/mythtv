@@ -1756,8 +1756,8 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
     int screen;
     X11S(screen = DefaultScreen(disp));
 
-    VdpDevice device;
-    VdpGetProcAddress * vdp_proc_address;
+    VdpDevice device = 0;
+    VdpGetProcAddress * vdp_proc_address = NULL;
     VdpStatus vdp_st;
     VdpGetErrorString * vdp_get_error_string;
     vdp_get_error_string = &dummy_get_error_string;
@@ -1773,8 +1773,11 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
         CHECK_ST
     }
 
-    VdpDecoderQueryCapabilities * decoder_query;
-    VdpDeviceDestroy * device_destroy;
+    if (!device || !vdp_proc_address)
+        ok = false;
+
+    VdpDecoderQueryCapabilities * decoder_query = NULL;
+    VdpDeviceDestroy * device_destroy = NULL;
 
     if (ok)
     {
