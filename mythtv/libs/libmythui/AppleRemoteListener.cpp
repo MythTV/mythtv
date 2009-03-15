@@ -61,10 +61,11 @@ AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
     {
         keycode = a[i];
 
-        QApplication::postEvent(mainWindow, new LircKeycodeEvent(
-            QEvent::KeyPress, keycode, Qt::NoModifier, code, code));
+        if (pressedDown)
+            QApplication::postEvent(mainWindow, new LircKeycodeEvent(
+                QEvent::KeyPress,   keycode, Qt::NoModifier, code, code));
 
-        if (!separateRelease)
+        if (!separateRelease || !pressedDown)
             QApplication::postEvent(mainWindow, new LircKeycodeEvent(
                 QEvent::KeyRelease, keycode, Qt::NoModifier, code, code));
     }
