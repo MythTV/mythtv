@@ -1285,8 +1285,6 @@ void OpenGLContextGLX::SwapBuffers(void)
 
 void OpenGLContextGLX::DeleteWindowResources(void)
 {
-    MakeCurrent(true);
-
     if (m_glx_window)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Destroying glx window");
@@ -1303,7 +1301,6 @@ void OpenGLContextGLX::DeleteWindowResources(void)
         m_gl_window = 0;
     }
 
-    MakeCurrent(false);
     X11L;
 
     if (m_glx_context)
