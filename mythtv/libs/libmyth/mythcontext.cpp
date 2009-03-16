@@ -701,7 +701,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         cout << endl << error.toLocal8Bit().constData() << endl << endl;
         response = getResponse("Would you like to configure the database "
                                "connection now?",
-                               "yes");
+                               "no");
         if (!response.startsWith('y', Qt::CaseInsensitive))
             return false;
 
