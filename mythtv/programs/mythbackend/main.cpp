@@ -826,6 +826,13 @@ int main(int argc, char **argv)
                         gContext->GetSetting("MasterServerIP", "127.0.0.1"),
                         gContext->GetNumSetting("MasterServerPort", 6543)))
         {
+            if (!gContext->CheckProtoVersion(tempMonitorConnection))
+            {
+                VERBOSE(VB_IMPORTANT, "Master backend is incompatible with "
+                                      "this backend.\nCannot become a slave.");
+                return BACKEND_EXIT_NO_CONNECT;
+            }
+
             QStringList tempMonitorDone("DONE");
 
             QStringList tempMonitorAnnounce("ANN Monitor tzcheck 0");
