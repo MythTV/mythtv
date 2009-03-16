@@ -2632,6 +2632,12 @@ void TV::timerEvent(QTimerEvent *te)
     {
         bool error = false;
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+
+        if (mctx->IsNVPErrored() && mctx->IsNVPRecoverable())
+        {
+            RestartMainNVP(mctx);
+        }
+
         if (mctx->IsRecorderErrored() ||
             mctx->IsNVPErrored() ||
             mctx->IsErrored())
@@ -5405,6 +5411,36 @@ void TV::PxPSwap(PlayerContext *mctx, PlayerContext *pipctx)
     SetActive(mctx, playerActive, false);
 
     VERBOSE(VB_PLAYBACK, LOC + "PxPSwap -- end");
+}
+
+void TV::RestartMainNVP(PlayerContext *mctx)
+{
+    if (!mctx)
+        return;
+
+    VERBOSE(VB_PLAYBACK, LOC + "Restart main player -- begin");
+    lockTimerOn = false;
+
+    mctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (!mctx->nvp)
+    {
+        mctx->deleteNVPLock.unlock();
+        return;
+    }
+
+    MuteState mctx_mute = mctx->nvp->GetMuteState();
+    mctx->deleteNVPLock.unlock();
+
+    vector<long long> pos = TeardownAllNVPs(mctx);
+    RestartAllNVPs(mctx, pos, mctx_mute);
+    SetActive(mctx, playerActive, false);
+
+    OSD *osd = GetOSDLock(mctx);
+    if (osd)
+        osd->SetSettingsText(tr("Recovered from video error"), 3);
+    ReturnOSDLock(mctx, osd);
+
+    VERBOSE(VB_PLAYBACK, LOC + "Restart main player -- end");
 }
 
 void TV::DoPlay(PlayerContext *ctx)

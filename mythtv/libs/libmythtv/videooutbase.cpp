@@ -295,7 +295,7 @@ VideoOutput::VideoOutput() :
     m_deinterlaceBeforeOSD(true),
 
     // Various state variables
-    errored(false),
+    errorState(kError_None),
     framesPlayed(0),
     supported_attributes(kPictureAttributeSupported_None)
 {

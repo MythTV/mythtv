@@ -475,6 +475,7 @@ class MPUBLIC TV : public QThread
     void RestartAllNVPs(PlayerContext *lctx,
                         const vector<long long> &pos,
                         MuteState mctx_mute);
+    void RestartMainNVP(PlayerContext *mctx);
 
     void PxPToggleView(  PlayerContext *actx, bool wantPBP);
     void PxPCreateView(  PlayerContext *actx, bool wantPBP);

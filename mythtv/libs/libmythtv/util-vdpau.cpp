@@ -63,7 +63,7 @@ static void vdpau_preemption_callback(VdpDevice device, void *vdpau_ctx)
     VDPAUContext *ctx = (VDPAUContext*)vdpau_ctx;
     // TODO this should really kick off re-initialisation
     if (ctx)
-        ctx->SetErrored();
+        ctx->SetErrored(kError_Preempt, 1000);
 }
 
 VDPAUContext::VDPAUContext()
@@ -78,9 +78,9 @@ VDPAUContext::VDPAUContext()
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
     needDeintRefs(false),   useColorControl(false),
     pipOutputSurface(0),    pipAlpha(0),       pipBorder(0),
-    pipClear(0),            pipReady(0),       
-    pipNeedsClear(false),   vdp_flip_target(NULL), vdp_flip_queue(NULL),
-    vdpauDecode(false),     vdp_device(NULL),  errored(0),
+    pipClear(0),            pipReady(0),       pipNeedsClear(false),
+    vdp_flip_target(NULL),  vdp_flip_queue(NULL), vdpauDecode(false),
+    vdp_device(NULL),       errorCount(0),     errorState(kError_None),
     vdp_get_proc_address(NULL),       vdp_device_destroy(NULL),
     vdp_get_error_string(NULL),       vdp_get_api_version(NULL),
     vdp_get_information_string(NULL), vdp_video_surface_create(NULL),
@@ -164,7 +164,8 @@ void VDPAUContext::Deinit(void)
     DeinitPIPLayer();
     DeinitProcs();
     outputSize =  QSize(0,0);
-    errored = 0;
+    errorCount = 0;
+    errorState = kError_None;
 }
 
 static const char* dummy_get_error_string(VdpStatus status)
@@ -915,7 +916,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("VDPAUContext::Decode called for cpu decode."));
-        errored++;
+        SetErrored(kError_Unknown);
         return;
     }
 
@@ -927,7 +928,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("No video surface to decode to."));
-        errored++;
+        SetErrored(kError_Unknown);
         return;
     }
 
@@ -937,7 +938,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Picture format has changed."));
-            errored++;
+            SetErrored(kError_Unknown);
             return;
         }
 
@@ -990,7 +991,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
             default:
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Picture format is not supported."));
-                errored++;
+                SetErrored(kError_Unknown);
                 return;
         }
 
@@ -1015,7 +1016,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
         else
         {
             VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to create decoder."));
-            errored++;
+            SetErrored(kError_Decode);
             return;
         }
     }
@@ -1023,7 +1024,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("Pix format already set but no VDPAU decoder."));
-        errored++;
+            SetErrored(kError_Unknown);
         return;
     }
 
@@ -1036,10 +1037,12 @@ void VDPAUContext::Decode(VideoFrame *frame)
     );
     CHECK_ST
 
-    if (ok && (errored > 0))
-        errored--;
+    if (ok && (errorCount > 0))
+        errorCount--;
     else if (!ok)
-        errored++;
+    {
+        SetErrored(kError_Unknown);
+    }
 }
 
 void VDPAUContext::UpdatePauseFrame(VideoFrame *frame)

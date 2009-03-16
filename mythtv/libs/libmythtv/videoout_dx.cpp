@@ -303,7 +303,7 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
                 case FOURCC_RV32: av_format = PIX_FMT_RGBA32; break;
                 default: 
                     VERBOSE(VB_IMPORTANT, "VODX: Non Xv mode only supports 16, 24, and 32 bpp displays");
-                    errored = true;
+                    errorState = kError_Unknown;
                     return;
             }
             

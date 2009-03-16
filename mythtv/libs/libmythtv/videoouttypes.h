@@ -96,6 +96,14 @@ typedef enum PictureAttributeSupported
     kPictureAttributeSupported_Volume     = 0x10,
 } PictureAttributeSupported;
 
+typedef enum VideoErrorState
+{
+    kError_None,
+    kError_Unknown,
+    kError_Decode,
+    kError_Preempt,
+} VideoErrorState;
+
 inline bool is_interlaced(FrameScanType scan)
 {
     return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);

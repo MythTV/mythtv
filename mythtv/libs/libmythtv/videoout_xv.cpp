@@ -318,7 +318,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "InputChanged(): "
                 "Failed to recreate buffers");
-        errored = true;
+        errorState = kError_Unknown;
     }
     else
     {
@@ -1467,7 +1467,7 @@ do { \
     if (test) \
     { \
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg << " Exiting playback."); \
-        errored = true; \
+        errorState = kError_Unknown; \
         return false; \
     } \
 } while (false)
@@ -2952,7 +2952,7 @@ void VideoOutputXv::ShowVDPAU(FrameScanType scan)
 
     if (vdpau->IsErrored())
     {
-        errored = true;
+        errorState = vdpau->GetError();
         return;
     }
 

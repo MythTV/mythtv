@@ -101,7 +101,7 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
     {
         VERBOSE(VB_IMPORTANT, "VideoOutputNull::InputChanged(): "
                 "Failed to recreate buffers");
-        errored = true;
+        errorState = kError_Unknown;
     }
     CreatePauseFrame();
 

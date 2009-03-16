@@ -141,7 +141,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
     {
         VERBOSE(VB_IMPORTANT, LOC + "InputChanged(): "
                 "Failed to recreate buffers");
-        errored = true;
+        errorState = kError_Unknown;
     }
 
     if (!InitD3D())

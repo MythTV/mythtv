@@ -121,6 +121,7 @@ class MPUBLIC PlayerContext
     bool IsEmbedding(void) const;
     bool HasNVP(void) const;
     bool IsNVPErrored(void) const;
+    bool IsNVPRecoverable(void) const;
     bool IsNVPPlaying(void) const;
     bool IsRecorderErrored(void) const;
     bool InStateChange(void) const;

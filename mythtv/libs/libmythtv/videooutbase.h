@@ -157,8 +157,9 @@ class VideoOutput
     virtual long long GetFramesPlayed(void) { return framesPlayed; };
 
     /// \brief Returns true if a fatal error has been encountered.
-    bool IsErrored() { return errored; }
-
+    bool IsErrored() { return errorState != kError_None; }
+    /// \brief Returns error type
+    VideoErrorState GetError(void) { return errorState; }
     // Video Buffer Management
     /// \brief Sets whether to use a normal number of buffers or fewer buffers.
     void SetPrebuffering(bool normal) { vbuffers.SetPrebuffering(normal); }
@@ -332,7 +333,7 @@ class VideoOutput
     VideoBuffers vbuffers;
 
     // Various state variables
-    bool    errored;
+    VideoErrorState errorState;
     long long framesPlayed;
 
     // PIP

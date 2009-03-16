@@ -34,8 +34,17 @@ class VDPAUContext
               QSize screen_size, bool color_control,
               int color_key, MythCodecID mcodecid);
     void Deinit(void);
-    bool IsErrored(void) { return (errored > MAX_VDPAU_ERRORS); }
-    void SetErrored(void) { errored = 10000; }
+    VideoErrorState GetError(void) { return errorState; }
+    bool IsErrored(void)
+    {
+        return (errorCount > MAX_VDPAU_ERRORS && errorState != kError_None);
+    }
+    void SetErrored(VideoErrorState error, int errors = 1)
+    {
+        if (errorState == kError_None || errorCount < 1)
+            errorState = error;
+        errorCount += errors;
+    }
 
     bool InitBuffers(int width, int height, int numbufs,
                      LetterBoxColour letterbox_colour);
@@ -156,9 +165,10 @@ class VDPAUContext
     VdpPresentationQueue       vdp_flip_queue;
 
     bool              vdpauDecode;
+    VdpDevice         vdp_device;
 
-    VdpDevice vdp_device;
-    int       errored;
+    int               errorCount;
+    VideoErrorState   errorState;
 
     VdpGetProcAddress * vdp_get_proc_address;
     VdpDeviceDestroy * vdp_device_destroy;

@@ -374,6 +374,12 @@ bool PlayerContext::IsNVPErrored(void) const
     return nvp && nvp->IsErrored();
 }
 
+bool PlayerContext::IsNVPRecoverable(void) const
+{
+    QMutexLocker locker(&deleteNVPLock);
+    return nvp && nvp->IsErrorRecoverable();
+}
+
 bool PlayerContext::IsNVPPlaying(void) const
 {
     QMutexLocker locker(&deleteNVPLock);

@@ -170,7 +170,7 @@ NuppelVideoPlayer::NuppelVideoPlayer()
       no_audio_in(false),           no_audio_out(false),
       transcoding(false),
       hasFullPositionMap(false),    limitKeyRepeat(false),
-      errorMsg(QString::null),
+      errorMsg(QString::null),      errorType(kError_None),
       // Bookmark stuff
       bookmarkseek(0),              previewFromBookmark(false),
       // Seek
@@ -7654,6 +7654,10 @@ bool NuppelVideoPlayer::PosMapFromEnc(unsigned long long          start,
 void NuppelVideoPlayer::SetErrored(const QString &reason) const
 {
     QMutexLocker locker(&errorLock);
+
+    if (videoOutput)
+        errorType = videoOutput->GetError();
+
     if (errorMsg.isEmpty())
     {
         errorMsg = reason;
