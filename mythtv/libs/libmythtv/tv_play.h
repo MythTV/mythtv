@@ -711,6 +711,8 @@ class MPUBLIC TV : public QThread
     /// lock on player and playerActive changes
     mutable QReadWriteLock  playerLock;
 
+    bool noHardwareDecoders;
+
     // Remote Encoders
     /// Main recorder to use after a successful SwitchCards() call.
     RemoteEncoder *switchToRec;

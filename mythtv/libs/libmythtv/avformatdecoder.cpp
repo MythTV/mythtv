@@ -399,7 +399,8 @@ bool AvFormatDecoderPrivate::SetVideoSize(const QSize &video_dim)
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  bool use_null_videoout,
-                                 bool allow_libmpeg2)
+                                 bool allow_libmpeg2,
+                                 bool no_hardware_decode)
     : DecoderBase(parent, pginfo),
       d(new AvFormatDecoderPrivate(allow_libmpeg2)),
       is_db_ignored(gContext->IsDatabaseIgnored()),
@@ -416,6 +417,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       lastccptsu(0),
       using_null_videoout(use_null_videoout),
       video_codec_id(kCodec_NONE),
+      no_hardware_decoders(no_hardware_decode),
       maxkeyframedist(-1),
       // Closed Caption & Teletext decoders
       ccd608(new CC608Decoder(parent)),
@@ -1570,7 +1572,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         enc->codec_id = CODEC_ID_MPEG2VIDEO;
                     // HACK -- end
 
-                    bool force_xv = false;
+                    bool force_xv = no_hardware_decoders;
                     if (ringBuffer && ringBuffer->isDVD())
                     {
                         if (dec.left(4) == "xvmc")

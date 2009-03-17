@@ -88,7 +88,8 @@ class AvFormatDecoder : public DecoderBase
     friend void HandleStreamChange(void*);
   public:
     AvFormatDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo,
-                    bool use_null_video_out, bool allow_libmpeg2 = true);
+                    bool use_null_video_out, bool allow_libmpeg2 = true,
+                    bool no_hardware_decode = false);
    ~AvFormatDecoder();
 
     void CloseCodecs();
@@ -251,6 +252,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool using_null_videoout;
     MythCodecID video_codec_id;
+    bool no_hardware_decoders;
 
     int maxkeyframedist;
 

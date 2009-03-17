@@ -685,6 +685,7 @@ TV::TV(void)
       jumpToProgram(false),
       // Video Player currently receiving UI input
       playerActive(-1),
+      noHardwareDecoders(false),
       //Recorder switching info
       switchToRec(NULL),
       // OSD info
@@ -2633,9 +2634,17 @@ void TV::timerEvent(QTimerEvent *te)
         bool error = false;
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
 
-        if (mctx->IsNVPErrored() && mctx->IsNVPRecoverable())
+        if (mctx->IsNVPErrored())
         {
-            RestartMainNVP(mctx);
+            if (mctx->IsNVPDecoderErrored())
+            {
+                noHardwareDecoders = true;
+                for (uint i = 0; i < player.size(); i++)
+                    player[i]->SetNoHardwareDecoders();
+                RestartMainNVP(mctx);
+            }                
+            if (mctx->IsNVPRecoverable())
+                RestartMainNVP(mctx);
         }
 
         if (mctx->IsRecorderErrored() ||
@@ -4743,6 +4752,8 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     // This is safe because we are already holding lock for a ctx
     player.push_back(new PlayerContext("pbpplayer"));
     PlayerContext *pbpctx = player.back();
+    if (noHardwareDecoders)
+        pbpctx->SetNoHardwareDecoders();
     pbpctx->SetPIPState(kPBPRight);
 
     if (info)
@@ -4837,7 +4848,8 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
     }
 
     PlayerContext *pipctx = new PlayerContext("pipplayer");
-
+    if (noHardwareDecoders)
+        pipctx->SetNoHardwareDecoders();
     pipctx->SetNullVideo(true);
     pipctx->SetPIPState(kPIPonTV);
     if (info)

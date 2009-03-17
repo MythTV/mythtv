@@ -153,6 +153,7 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
 NuppelVideoPlayer::NuppelVideoPlayer()
     : decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
+      no_hardware_decoders(false),
       // Window stuff
       parentWidget(NULL), embedid(0),
       embx(-1), emby(-1), embw(-1), embh(-1),
@@ -1216,7 +1217,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         {
             SetDecoder(new AvFormatDecoder(this, *player_ctx->playingInfo,
                                            using_null_videoout,
-                                           allow_libmpeg2));
+                                           allow_libmpeg2,
+                                           no_hardware_decoders));
         }
         player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
         if (GetDecoder())

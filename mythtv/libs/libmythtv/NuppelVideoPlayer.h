@@ -154,6 +154,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
     bool AddPIPPlayer(NuppelVideoPlayer *pip, PIPLocation loc, uint timeout);
     bool RemovePIPPlayer(NuppelVideoPlayer *pip, uint timeout);
+    void DisableHardwareDecoders(void)        { no_hardware_decoders = true; }
 
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
@@ -205,6 +206,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
         { return (errorType == kError_Preempt); }
+    bool      IsDecoderErrored(void)   const
+        { return (errorType == kError_Decode); }
     QString   GetEncodingType(void) const;
     QString   GetXDS(const QString &key) const;
     bool      GetAudioBufferStatus(uint &fill, uint &total) const;
@@ -546,6 +549,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     QMutex         decoder_change_lock;
     VideoOutput   *videoOutput;
     PlayerContext *player_ctx;
+    bool           no_hardware_decoders;
 
     // Window stuff
     QWidget *parentWidget;

@@ -32,6 +32,7 @@ static void *SpawnDecode(void *param)
 PlayerContext::PlayerContext(const QString &inUseID) :
     recUsage(inUseID), nvp(NULL), nvpUnsafe(false), recorder(NULL),
     tvchain(NULL), buffer(NULL), playingInfo(NULL),
+    nohardwaredecoders(false),
     decoding(false), last_cardid(-1), last_framerate(30.0f),
     // Fast forward state
     ff_rew_state(0), ff_rew_index(0), ff_rew_speed(0),
@@ -380,6 +381,12 @@ bool PlayerContext::IsNVPRecoverable(void) const
     return nvp && nvp->IsErrorRecoverable();
 }
 
+bool PlayerContext::IsNVPDecoderErrored(void) const
+{
+    QMutexLocker locker(&deleteNVPLock);
+    return nvp && nvp->IsDecoderErrored();
+}
+
 bool PlayerContext::IsNVPPlaying(void) const
 {
     QMutexLocker locker(&deleteNVPLock);
@@ -443,6 +450,9 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
     }
 
     NuppelVideoPlayer *_nvp = new NuppelVideoPlayer();
+
+    if (nohardwaredecoders)
+        _nvp->DisableHardwareDecoders();
 
     _nvp->SetPlayerInfo(tv, widget, exact_seeking, this);
     _nvp->SetAudioInfo(gContext->GetSetting("AudioOutputDevice"),

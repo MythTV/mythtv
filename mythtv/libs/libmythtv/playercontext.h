@@ -94,6 +94,7 @@ class MPUBLIC PlayerContext
     void SetPIPLocation(int loc) { pipLocation = loc; }
     void SetPIPState(PIPState change) { pipState = change; }
     void SetNVPChangingBuffers(bool val) { nvpUnsafe = val; }
+    void SetNoHardwareDecoders(void) { nohardwaredecoders = true; }
 
     // Gets
     QRect    GetStandAlonePIPRect(void);
@@ -122,6 +123,7 @@ class MPUBLIC PlayerContext
     bool HasNVP(void) const;
     bool IsNVPErrored(void) const;
     bool IsNVPRecoverable(void) const;
+    bool IsNVPDecoderErrored(void) const;
     bool IsNVPPlaying(void) const;
     bool IsRecorderErrored(void) const;
     bool InStateChange(void) const;
@@ -140,6 +142,7 @@ class MPUBLIC PlayerContext
     RingBuffer         *buffer;
     ProgramInfo        *playingInfo; ///< Currently playing info
     long long           playingLen;  ///< Initial CalculateLength()
+    bool                nohardwaredecoders; // < Disable use of VDPAU decoding
     bool                decoding;    ///< Video decoder thread started
     pthread_t           decode;      ///< Video decoder thread
     int                 last_cardid; ///< CardID of current/last recorder
