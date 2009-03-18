@@ -289,13 +289,20 @@ MediaError MythMediaDevice::eject(bool open_close)
 
 bool MythMediaDevice::isSameDevice(const QString &path)
 {
+#ifdef Q_OS_MAC
+    // The caller may be using a raw device instead of the BSD 'leaf' name
+    if (path == "/dev/r" + m_DevicePath)
+        return true;
+#endif
+
     return (path == m_DevicePath);
 }
 
 void MythMediaDevice::setSpeed(int speed)
 {
-    (void)speed;
-    return;
+    VERBOSE(VB_MEDIA,
+            QString("Cannot setSpeed(%1) for device %2 - not implemented.")
+            .arg(speed).arg(m_DevicePath));
 }
 
 MediaError MythMediaDevice::lock() 
