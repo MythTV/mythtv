@@ -464,7 +464,7 @@ Ripper::~Ripper(void)
 
 bool Ripper::Create(void)
 {
-    if (!LoadWindowFromXML("music-ui.xml", "cd_ripper", this))
+    if (!LoadWindowFromXML("music-ui.xml", "cdripper", this))
         return false;
 
     m_qualityList = dynamic_cast<MythUIButtonList *>(GetChild("quality"));
