@@ -2787,20 +2787,25 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
     {
         metadata->SetCoverFile(cover_file);
         OnVideoPosterSetDone(metadata);
-        return;
     }
 
-    // Obtain video poster
-    VideoPosterSearch *vps = new VideoPosterSearch(this);
-    connect(vps, SIGNAL(SigPosterURL(QString, Metadata *)),
-            SLOT(OnPosterURL(QString, Metadata *)));
-    vps->Run(metadata->GetInetRef(), metadata);
+    if (cover_file.isEmpty() || IsDefaultCoverFile(cover_file))
+    {
+        // Obtain video poster
+        VideoPosterSearch *vps = new VideoPosterSearch(this);
+        connect(vps, SIGNAL(SigPosterURL(QString, Metadata *)),
+                SLOT(OnPosterURL(QString, Metadata *)));
+        vps->Run(metadata->GetInetRef(), metadata);
+    }
 
-    // Obtain video fanart
-    VideoFanartSearch *vfs = new VideoFanartSearch(this);
-    connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
-            SLOT(OnFanartURL(QString, Metadata *)));
-    vfs->Run(metadata->GetInetRef(), metadata);
+    if (metadata->GetFanart().isEmpty())
+    {
+        // Obtain video fanart
+        VideoFanartSearch *vfs = new VideoFanartSearch(this);
+        connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
+                SLOT(OnFanartURL(QString, Metadata *)));
+        vfs->Run(metadata->GetInetRef(), metadata);
+    }
 }
 
 void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
