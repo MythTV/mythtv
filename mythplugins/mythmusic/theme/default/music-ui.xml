@@ -308,9 +308,7 @@
 
         </container>
 
-        <!--
-            On screen volume display
-            -->
+        <!-- On screen volume display -->
 
         <container name="volumedisplay">
             <area>690,320,40,160</area>
@@ -329,9 +327,7 @@
             </textarea>
         </container>
 
-        <!--
-            All the buttons
-            -->
+        <!-- All the buttons -->
 
         <container name="musicbuttons">
             <area>15,490,785,110</area>
@@ -422,59 +418,59 @@
     </window>
 
 
-  <window name="edit_metadata">
+    <window name="edit_metadata">
 
-     <font name="title" face="Arial">
-         <color>#ffff00</color>
-         <dropcolor>#000000</dropcolor>
-         <size>24</size>
-         <shadow>3,3</shadow>
-         <bold>yes</bold>
-     </font>
+        <font name="title" face="Arial">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
 
-     <font name="labels" face="Arial">
-         <color>#ffff00</color>
-         <dropcolor>#000000</dropcolor>
-         <size>18</size>
-         <shadow>3,3</shadow>
-         <bold>yes</bold>
-     </font>
+        <font name="labels" face="Arial">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>18</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
 
-     <font name="display" face="Arial">
-         <color>#ffffff</color>
-         <dropcolor>#000000</dropcolor>
-         <size>18</size>
-         <shadow>3,3</shadow>
-         <bold>no</bold>
-     </font>
+        <font name="display" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>18</size>
+            <shadow>3,3</shadow>
+            <bold>no</bold>
+        </font>
 
-     <font name="button" face="Arial">
-         <color>#ffffff</color>
-         <dropcolor>#000000</dropcolor>
-         <size>14</size>
-         <shadow>2,2</shadow>
-         <bold>yes</bold>
-     </font>
+        <font name="button" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>14</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
 
-     <font name="subtitle_active" face="Arial">
-         <color>#ffffff</color>
-         <size>14</size>
-         <bold>no</bold>
-     </font>
+        <font name="subtitle_active" face="Arial">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
 
-     <font name="subtitle_inactive" face="Arial">
-         <color>#9999cc</color>
-         <size>14</size>
-         <bold>no</bold>
-     </font>
+        <font name="subtitle_inactive" face="Arial">
+            <color>#9999cc</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
 
-     <font name="subtitle_selected" face="Arial">
-         <color>#ff0000</color>
-         <size>14</size>
-         <bold>no</bold>
-     </font>
+        <font name="subtitle_selected" face="Arial">
+            <color>#ff0000</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
 
-     <container name="edit_container">
+        <container name="edit_container">
             <area>0,0,800,600</area>
 
             <textarea name="title" draworder="1" align="center">
@@ -484,9 +480,7 @@
                 <value>Track Information</value>
             </textarea>
 
-            <!--
-                    Labels
-            -->
+            <!-- Labels -->
 
 
             <textarea name="compilation_label" draworder="1" align="right">
@@ -573,9 +567,7 @@
                 <value>Filename:</value>
             </textarea>
 
-            <!--
-                    edits
-            -->
+            <!-- edits -->
 
             <checkbox name="compilation_check" draworder="0">
                 <context>1</context>
@@ -698,9 +690,7 @@
             </textarea>
 
 
-            <!--
-                Cover Art page
-            -->
+            <!-- Cover Art page -->
 
             <textarea name="title" draworder="1" align="center">
                 <area>0,0,800,50</area>
@@ -794,9 +784,7 @@
                 <image function="default" filename="mm_nothumb.png"></image>
             </imagegrid>
 
-            <!--
-                    Push buttons
-            -->
+            <!-- Push buttons -->
 
             <textbutton name="metadata_button" draworder="0">
                 <context>2</context>
@@ -815,15 +803,7 @@
                 <image function="off" filename="text_button_off.png"></image>
                 <image function="pushed" filename="text_button_pushed.png"></image>
             </textbutton>
-<!--
-            <textbutton name="dbstats_button" draworder="0">
-                <position>360,540</position>
-                <font>display</font>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-            </textbutton>
--->
+
             <textbutton name="done_button" draworder="0">
                 <position>630,540</position>
                 <font>display</font>
@@ -832,8 +812,8 @@
                 <image function="pushed" filename="text_button_pushed.png"></image>
             </textbutton>
 
-      </container>
-   </window>
+        </container>
+    </window>
 
     <window name="albumart_browser">
 
@@ -924,22 +904,15 @@
 
         <!-- Labels -->
 
-        <textarea name="label">
-            <area>15,10,770,30</area>
-            <value>Please select a quality level and check the album\n
-                information below:</value>
-            <align>hcenter</align>
-        </textarea>
-
         <textarea name="quality_label">
-            <area>15,50,170,30</area>
-            <font>labels</font>
+            <area>15,27,170,30</area>
+            <font>basemedium</font>
             <value>Quality:</value>
             <align>right</align>
         </textarea>
 
         <textarea name="artist_label" from="quality_label">
-            <position>15,90</position>
+            <position>15,80</position>
             <value>Artist:</value>
         </textarea>
 
@@ -949,110 +922,115 @@
         </textarea>
 
         <textarea name="genre_text" from="quality_label">
-            <position>15,170</position>
+            <position>15,180</position>
             <value>Genre:</value>
         </textarea>
 
         <textarea name="comp_label" from="quality_label">
-            <position>15,215</position>
+            <position>15,240</position>
             <value>Multi-Artist:</value>
         </textarea>
 
         <textarea name="year_label" from="quality_label">
-            <area>385,210,120,30</area>
+            <area>385,235,120,30</area>
             <value>Year:</value>
         </textarea>
 
         <!-- edits -->
 
         <buttonlist name="quality" from="baseselector">
-            <position>195,50</position>
+            <position>195,20</position>
         </buttonlist>
 
         <textedit name="artist" from="basetextedit">
-            <position>195,90</position>
+            <position>195,65</position>
         </textedit>
 
         <button name="searchartist" from="basesearchbutton">
-            <position>725,90</position>
+            <position>580,70</position>
         </button>
 
-        <textedit name="album_edit" from="basetextedit">
-            <position>195,130</position>
+        <textedit name="album" from="basetextedit">
+            <position>195,120</position>
         </textedit>
 
         <button name="searchalbum" from="basesearchbutton">
-            <position>725,130</position>
+            <position>580,125</position>
         </button>
 
-        <textedit name="genre_edit" from="basetextedit">
-            <position>195,170</position>
+        <textedit name="genre" from="basetextedit">
+            <position>195,175</position>
         </textedit>
 
         <button name="searchgenre" from="basesearchbutton">
-            <position>725,170</position>
+            <position>580,180</position>
         </button>
 
-        <checkbox name="compilation_check" from="basecheckbox">
-            <position>195,210</position>
+        <checkbox name="compilation" from="basecheckbox">
+            <position>195,240</position>
         </checkbox>
 
         <button name="switch" from="basebutton">
-            <position>270,210</position>
+            <position>270,235</position>
             <value>Switch Titles</value>
         </button>
 
         <textedit name="year" from="basetextedit">
-            <position>520,210</position>
+            <position>520,230</position>
         </textedit>
 
         <textarea name="track_label" from="basetextarea">
-            <area>40,250,130,30</area>
-            <value>Track:</value>
+            <area>70,275,50,30</area>
+            <value>Track</value>
+            <align>allcenter</align>
         </textarea>
 
-        <textarea name="list_label" from="track_label">
-            <position>100,250</position>
-            <value>Title:</value>
+        <textarea name="title_label" from="track_label">
+            <area>95,275,320,30</area>
+            <value>Title</value>
         </textarea>
 
-        <textarea name="artist_label" from="track_label">
-            <position>450,250</position>
-            <value>Artist:</value>
+        <textarea name="list_artist_label" from="track_label">
+            <area>435,275,220,30</area>
+            <value>Artist</value>
         </textarea>
 
         <textarea name="length_label" from="track_label">
-            <position>660,250</position>
-            <value>Length:</value>
+            <area>660,275,100,30</area>
+            <value>Length</value>
         </textarea>
 
         <imagetype name="image">
-            <area>25,275,750,280</area>
+            <area>25,295,750,280</area>
             <filename>trans-cr-background.png</filename>
         </imagetype>
-        <buttonlist name="track_list" from="basebuttonlist">
-            <area>40,287,740,225</area>
-            <buttonarea>0,0,740,225</buttonarea>
+
+        <buttonlist name="tracks" from="basebuttonlist">
+            <area>40,307,710,245</area>
+            <buttonarea>0,0,710,230</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
+                    <statetype name="buttoncheck">
+                        <position>5,5</position>
+                    </statetype>
                     <textarea name="track" from="buttontext">
-                        <area>0,0,50,30</area>
+                        <area>30,0,45,30</area>
                     </textarea>
-                    <textarea name="title" from="buttontext">
-                        <area>55,0,340,30</area>
+                    <textarea name="title" from="track">
+                        <area>80,0,315,30</area>
                     </textarea>
-                    <textarea name="artist" from="buttontext">
-                        <area>395,0,200,30</area>
+                    <textarea name="artist" from="track">
+                        <area>395,0,220,30</area>
                     </textarea>
-                    <textarea name="length" from="buttontext">
-                        <area>600,0,100,30</area>
+                    <textarea name="length" from="track">
+                        <area>620,0,90,30</area>
+                        <align>center</align>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
-                    <textarea name="track" from="buttontext" />
-                    <textarea name="title" from="buttontext" />
-                    <textarea name="artist" from="buttontext" />
-                    <textarea name="length" from="buttontext" />
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                    </imagetype>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -1060,12 +1038,12 @@
 
         <!-- Buttons -->
 
-        <button name="scan_button" from="basebutton">
+        <button name="scan" from="basebutton">
             <position>220,545</position>
             <value>Scan CD</value>
         </button>
 
-        <button name="rip_button" from="basebutton">
+        <button name="rip" from="basebutton">
             <position>450,545</position>
             <value>Rip CD</value>
         </button>
@@ -1113,7 +1091,7 @@
             <position>50,500</position>
         </textarea>
 
-        <progressbar name="overall" from="baseprogressbar">
+        <progressbar name="overall_progress" from="baseprogressbar">
             <position>160,190</position>
         </progressbar>
 
@@ -1122,7 +1100,7 @@
             <align>hcenter</align>
         </textarea>
 
-        <progressbar name="track" from="baseprogressbar">
+        <progressbar name="track_progress" from="baseprogressbar">
             <position>160,400</position>
         </progressbar>
 
@@ -1388,133 +1366,6 @@
 
     </window>
 
-    <!--
-        File Selector
-        -->
-
-    <window name="directory_finder">
-        <font name="title" face="Arial">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <font name="buttons" face="Arial">
-            <color>#ffffff</color>
-            <size>12</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="edit" face="Arial">
-            <color>#ffffff</color>
-            <size>14</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="active" face="Arial">
-            <color>#ffffff</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="inactive" face="Arial">
-            <color>#9999cc</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="info" face="Arial">
-            <color>#9999cc</color>
-            <size>14</size>
-            <bold>no</bold>
-        </font>
-
-        <font name="label" face="Arial">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>18</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <container name="title">
-            <area>0,5,800,45</area>
-            <textarea name="title" draworder="1" align="center">
-                <area>0,0,800,45</area>
-                <font>title</font>
-                <multiline>no</multiline>
-                <value>Directory Finder</value>
-            </textarea>
-        </container>
-
-        <container name="location">
-            <area>0,55,800,80</area>
-
-            <textbutton name="back_button" draworder="1">
-                <position>35,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
-            <textbutton name="home_button" draworder="1">
-                <position>200,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
-            <textarea name="location_label" draworder="0" align="right">
-                <area>20,50,140,30</area>
-                <font>label</font>
-                <multiline>no</multiline>
-                <value>Location:</value>
-            </textarea>
-            <remoteedit name="location_edit" draworder="0">
-                <area>180,50,580,30</area>
-                <font>edit</font>
-            </remoteedit>
-        </container>
-
-        <container name="file_list">
-            <area>20,140,760,400</area>
-            <listbtnarea name="filelist"  draworder="1">
-                <area>0,0,760,400</area>
-                <gradient type="unselected" start="#505050" end="#000000" alpha="100">
-                </gradient>
-                <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
-                </gradient>
-                <fcnfont name="active" function="active"></fcnfont>
-                <fcnfont name="inactive" function="inactive"></fcnfont>
-                <showscrollarrows>yes</showscrollarrows>
-                <showarrow>no</showarrow>
-            </listbtnarea>
-        </container>
-
-        <!--
-            button area shown on all pages
-            -->
-        <container name="buttons">
-            <area>0,550,800,50</area>
-            <textbutton name="cancel_button" draworder="1">
-                <position>35,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
-            <textbutton name="ok_button" draworder="1">
-                <position>610,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
-        </container>
-    </window>
-
     <window name="import_coverart">
 
         <!-- <image name="image" draworder="0">
@@ -1699,16 +1550,6 @@
         <progressbar name="progress" from="baseprogressbar">
             <position>170,150</position>
         </progressbar>
-        <!--
-            <textarea name="volume_text" draworder="5">
-                <font>infotext</font>
-                <area>490,105,250,25</area>
-                <value>%1</value>                - this would show as '12'
-                <value>%1%</value>               - this would show as '12%'
-                <value>Vol: %1</value>           - this would show as 'Vol: 12'
-                <value>Vol: %1%</value>          - this would show as 'Vol: 12%'
-            </textarea>
-            -->
-        </window>
+    </window>
 
-    </mythuitheme>
+</mythuitheme>

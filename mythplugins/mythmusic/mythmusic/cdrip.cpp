@@ -3,8 +3,6 @@
 #include <cstring>
 
 // Unix C includes
-#include <unistd.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 
@@ -119,12 +117,12 @@ static void paranoia_cb(long inpos, int function)
 }
 
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
-                               vector<RipTrack*> *tracks, int quality) :
+                               QVector<RipTrack*> *tracks, int quality) :
     m_parent(parent),   m_quit(false),
     m_CDdevice(device), m_quality(quality),
-    m_tracks(tracks),   m_totalTracks(m_tracks->size()),
-    m_totalSectors(0),  m_totalSectorsDone(0),
-    m_lastTrackPct(0),  m_lastOverallPct(0)
+    m_tracks(tracks), m_totalSectors(0),
+    m_totalSectorsDone(0), m_lastTrackPct(0),
+    m_lastOverallPct(0)
 {
 }
 
@@ -146,6 +144,9 @@ bool CDRipperThread::isCancelled(void)
 
 void CDRipperThread::run(void)
 {
+    if (!m_tracks->size() > 0)
+        return;
+
     Metadata *track = m_tracks->at(0)->metadata;
     QString tots;
 
@@ -171,7 +172,7 @@ void CDRipperThread::run(void)
 
     m_totalSectors = 0;
     m_totalSectorsDone = 0;
-    for (int trackno = 0; trackno < m_totalTracks; trackno++)
+    for (int trackno = 0; trackno < m_tracks->size(); trackno++)
     {
         m_totalSectors += getSectorCount(m_CDdevice, trackno + 1);
     }
@@ -193,15 +194,15 @@ void CDRipperThread::run(void)
 
     std::auto_ptr<Encoder> encoder;
 
-    for (int trackno = 0; trackno < m_totalTracks; trackno++)
+    for (int trackno = 0; trackno < m_tracks->size(); trackno++)
     {
         if (isCancelled())
-            return;
+            break;
 
         QApplication::postEvent(m_parent,
                     new RipStatusEvent(RipStatusEvent::ST_STATUS_TEXT,
                                         QString("Track %1 of %2")
-                                        .arg(trackno + 1).arg(m_totalTracks)));
+                                        .arg(trackno + 1).arg(m_tracks->size())));
 
         QApplication::postEvent(m_parent,
                     new RipStatusEvent(RipStatusEvent::ST_TRACK_PROGRESS, 0));
@@ -441,9 +442,7 @@ Ripper::Ripper(MythScreenStack *parent, QString device)
     // (i.e. we can tell if the user quit prior to ripping)
     m_somethingwasripped = false;
     m_decoder = NULL;
-    m_tracks = new vector<RipTrack*>;
-
-    QTimer::singleShot(500, this, SLOT(startScanCD()));
+    m_tracks = new QVector<RipTrack*>;
 }
 
 Ripper::~Ripper(void)
@@ -468,69 +467,55 @@ bool Ripper::Create(void)
         return false;
 
     m_qualityList = dynamic_cast<MythUIButtonList *>(GetChild("quality"));
-    if (m_qualityList)
-    {
-        new MythUIButtonListItem(m_qualityList, tr("Low"), qVariantFromValue(0));
-        new MythUIButtonListItem(m_qualityList, tr("Medium"), qVariantFromValue(1));
-        new MythUIButtonListItem(m_qualityList, tr("High"), qVariantFromValue(2));
-        new MythUIButtonListItem(m_qualityList, tr("Perfect"), qVariantFromValue(3));
-        m_qualityList->SetValueByData(qVariantFromValue(
-                            gContext->GetNumSetting("DefaultRipQuality", 1)));
-    }
-
     m_artistEdit = dynamic_cast<MythUITextEdit *>(GetChild("artist"));
-    if (m_artistEdit)
-        connect(m_artistEdit, SIGNAL(textChanged(QString)),
-                SLOT(artistChanged(QString)));
-
     m_searchArtistButton = dynamic_cast<MythUIButton *>(GetChild("searchartist"));
-    if (m_searchArtistButton)
-        connect(m_searchArtistButton, SIGNAL(Clicked()), SLOT(searchArtist()));
-
     m_albumEdit = dynamic_cast<MythUITextEdit *>(GetChild("album"));
-    if (m_albumEdit)
-        connect(m_albumEdit, SIGNAL(textChanged(QString)),
-                SLOT(albumChanged(QString)));
-
     m_searchAlbumButton = dynamic_cast<MythUIButton *>(GetChild("searchalbum"));
-    if (m_searchAlbumButton)
-        connect(m_searchAlbumButton, SIGNAL(Clicked()), SLOT(searchAlbum()));
-
     m_genreEdit = dynamic_cast<MythUITextEdit *>(GetChild("genre"));
-    if (m_genreEdit)
-        connect(m_genreEdit, SIGNAL(textChanged(QString)),
-                SLOT(genreChanged(QString)));
-
     m_yearEdit = dynamic_cast<MythUITextEdit *>(GetChild("year"));
-    if (m_yearEdit)
-        connect(m_yearEdit, SIGNAL(textChanged(QString)),
-                SLOT(yearChanged(QString)));
-
     m_searchGenreButton = dynamic_cast<MythUIButton *>(GetChild("searchgenre"));
-    if (m_searchGenreButton)
-        connect(m_searchGenreButton, SIGNAL(Clicked()), SLOT(searchGenre()));
-
-    m_compilationCheck = dynamic_cast<MythUICheckBox *>(GetChild("compilation_check"));
-    if (m_compilationCheck)
-        connect(m_compilationCheck, SIGNAL(pushed(bool)),
-                SLOT(compilationChanged(bool)));
-
+    m_compilationCheck = dynamic_cast<MythUICheckBox *>(GetChild("compilation"));
     m_switchTitleArtist = dynamic_cast<MythUIButton *>(GetChild("switch"));
-    if (m_switchTitleArtist)
-        connect(m_switchTitleArtist, SIGNAL(Clicked()),
-                SLOT(switchTitlesAndArtists()));
-
     m_scanButton = dynamic_cast<MythUIButton *>(GetChild("scan"));
-    if (m_scanButton)
-        connect(m_scanButton, SIGNAL(Clicked()), SLOT(startScanCD()));
-
     m_ripButton = dynamic_cast<MythUIButton *>(GetChild("rip"));
-    if (m_ripButton)
-        connect(m_ripButton, SIGNAL(Clicked()), SLOT(startRipper()));
-
-    m_trackList = dynamic_cast<MythUIButtonList *>(GetChild("track"));
+    m_trackList = dynamic_cast<MythUIButtonList *>(GetChild("tracks"));
 
     BuildFocusList();
+
+    if (!m_artistEdit || !m_scanButton || !m_ripButton || !m_switchTitleArtist
+        || !m_trackList || !m_compilationCheck || !m_searchGenreButton
+        || !m_yearEdit || !m_genreEdit || !m_artistEdit || !m_searchArtistButton
+        || !m_albumEdit || !m_searchAlbumButton || !m_qualityList)
+    {
+        VERBOSE(VB_IMPORTANT, "Missing theme elements for screen 'cdripper'");
+        return false;
+    }
+
+    connect(m_trackList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            SLOT(toggleTrackActive(MythUIButtonListItem *)));
+    connect(m_ripButton, SIGNAL(Clicked()), SLOT(startRipper()));
+    connect(m_scanButton, SIGNAL(Clicked()), SLOT(startScanCD()));
+    connect(m_switchTitleArtist, SIGNAL(Clicked()),
+            SLOT(switchTitlesAndArtists()));
+    connect(m_compilationCheck, SIGNAL(toggled(bool)),
+            SLOT(compilationChanged(bool)));
+    connect(m_searchGenreButton, SIGNAL(Clicked()), SLOT(searchGenre()));
+    connect(m_genreEdit, SIGNAL(valueChanged()), SLOT(genreChanged()));
+    connect(m_yearEdit, SIGNAL(valueChanged()), SLOT(yearChanged()));
+    connect(m_artistEdit, SIGNAL(valueChanged()), SLOT(artistChanged()));
+    connect(m_searchArtistButton, SIGNAL(Clicked()), SLOT(searchArtist()));
+    connect(m_albumEdit, SIGNAL(valueChanged()), SLOT(albumChanged()));
+    connect(m_searchAlbumButton, SIGNAL(Clicked()), SLOT(searchAlbum()));
+
+    // Populate Quality List
+    new MythUIButtonListItem(m_qualityList, tr("Low"), qVariantFromValue(0));
+    new MythUIButtonListItem(m_qualityList, tr("Medium"), qVariantFromValue(1));
+    new MythUIButtonListItem(m_qualityList, tr("High"), qVariantFromValue(2));
+    new MythUIButtonListItem(m_qualityList, tr("Perfect"), qVariantFromValue(3));
+    m_qualityList->SetValueByData(qVariantFromValue(
+                        gContext->GetNumSetting("DefaultRipQuality", 1)));
+
+    QTimer::singleShot(500, this, SLOT(startScanCD()));
 
     return true;
 }
@@ -551,7 +536,7 @@ bool Ripper::keyPressEvent(QKeyEvent *event)
 
         if (action == "INFO")
         {
-            showEditMetadataDialog();
+            showEditMetadataDialog(m_trackList->GetItemCurrent());
         }
         else if (action == "1")
             m_scanButton->Push();
@@ -711,11 +696,7 @@ void Ripper::startScanCD(void)
             m_switchTitleArtist->SetVisible(false);
         else
             m_switchTitleArtist->SetVisible(true);
-
-        m_totalTracks = m_tracks->size();
     }
-
-    m_currentTrack = 0;
 
     BuildFocusList();
     updateTrackList();
@@ -963,72 +944,90 @@ bool Ripper::somethingWasRipped()
     return m_somethingwasripped;
 }
 
-void Ripper::artistChanged(QString newartist)
+void Ripper::artistChanged()
 {
+    QString newartist = m_artistEdit->GetText();
     Metadata *data;
 
-    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    if (m_tracks->size() > 0)
     {
-        data = m_tracks->at(trackno)->metadata;
-
-        if (data)
+        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
         {
-            if (m_compilationCheck->GetBooleanCheckState())
+            data = m_tracks->at(trackno)->metadata;
+
+            if (data)
             {
-                data->setCompilationArtist(newartist);
-            }
-            else
-            {
-                data->setArtist(newartist);
-                data->setCompilationArtist("");
+                if (m_compilationCheck->GetBooleanCheckState())
+                {
+                    data->setCompilationArtist(newartist);
+                }
+                else
+                {
+                    data->setArtist(newartist);
+                    data->setCompilationArtist("");
+                }
             }
         }
+
+        updateTrackList();
     }
 
-    updateTrackList();
     m_artistName = newartist;
 }
 
-void Ripper::albumChanged(QString newalbum)
+void Ripper::albumChanged()
 {
+    QString newalbum = m_albumEdit->GetText();
     Metadata *data;
 
-    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    if (m_tracks->size() > 0)
     {
-        data = m_tracks->at(trackno)->metadata;
+        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+        {
+            data = m_tracks->at(trackno)->metadata;
 
-        if (data)
-            data->setAlbum(newalbum);
+            if (data)
+                data->setAlbum(newalbum);
+        }
     }
 
     m_albumName = newalbum;
 }
 
-void Ripper::genreChanged(QString newgenre)
+void Ripper::genreChanged()
 {
+    QString newgenre = m_genreEdit->GetText();
     Metadata *data;
 
-    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    if (m_tracks->size() > 0)
     {
-        data = m_tracks->at(trackno)->metadata;
+        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+        {
+            data = m_tracks->at(trackno)->metadata;
 
-        if (data)
-            data->setGenre(newgenre);
+            if (data)
+                data->setGenre(newgenre);
+        }
     }
 
     m_genreName = newgenre;
 }
 
-void Ripper::yearChanged(QString newyear)
+void Ripper::yearChanged()
 {
+    QString newyear = m_yearEdit->GetText();
+
     Metadata *data;
 
-    for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+    if (m_tracks->size() > 0)
     {
-        data = m_tracks->at(trackno)->metadata;
+        for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
+        {
+            data = m_tracks->at(trackno)->metadata;
 
-        if (data)
-            data->setYear(newyear.toInt());
+            if (data)
+                data->setYear(newyear.toInt());
+        }
     }
 
     m_year = newyear;
@@ -1039,17 +1038,19 @@ void Ripper::compilationChanged(bool state)
     if (!state)
     {
         Metadata *data;
-
-        // Update artist MetaData of each track on the ablum...
-        for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+        if (m_tracks->size() > 0)
         {
-            data = m_tracks->at(trackno)->metadata;
-
-            if (data)
+            // Update artist MetaData of each track on the ablum...
+            for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
             {
-                data->setCompilationArtist("");
-                data->setArtist(m_artistName);
-                data->setCompilation(false);
+                data = m_tracks->at(trackno)->metadata;
+
+                if (data)
+                {
+                    data->setCompilationArtist("");
+                    data->setArtist(m_artistName);
+                    data->setCompilation(false);
+                }
             }
         }
 
@@ -1057,16 +1058,19 @@ void Ripper::compilationChanged(bool state)
     }
     else
     {
-        // Update artist MetaData of each track on the album...
-        for (int trackno = 0; trackno < m_totalTracks; ++trackno)
+        if (m_tracks->size() > 0)
         {
-            Metadata *data;
-            data = m_tracks->at(trackno)->metadata;
-
-            if (data)
+            // Update artist MetaData of each track on the album...
+            for (int trackno = 0; trackno < m_tracks->size(); ++trackno)
             {
-                data->setCompilationArtist(m_artistName);
-                data->setCompilation(true);
+                Metadata *data;
+                data = m_tracks->at(trackno)->metadata;
+
+                if (data)
+                {
+                    data->setCompilationArtist(m_artistName);
+                    data->setCompilation(true);
+                }
             }
         }
 
@@ -1086,20 +1090,22 @@ void Ripper::switchTitlesAndArtists()
 
     // Switch title and artist for each track
     QString tmp;
-
-    for (int track = 0; track < m_totalTracks; ++track)
+    if (m_tracks->size() > 0)
     {
-        data = m_tracks->at(track)->metadata;
-
-        if (data)
+        for (int track = 0; track < m_tracks->size(); ++track)
         {
-            tmp = data->Artist();
-            data->setArtist(data->Title());
-            data->setTitle(tmp);
-        }
-    }
+            data = m_tracks->at(track)->metadata;
 
-    updateTrackList();
+            if (data)
+            {
+                tmp = data->Artist();
+                data->setArtist(data->Title());
+                data->setTitle(tmp);
+            }
+        }
+
+        updateTrackList();
+    }
 }
 
 void Ripper::reject()
@@ -1209,6 +1215,9 @@ void Ripper::ejectCD()
 
 void Ripper::updateTrackList(void)
 {
+    if (m_tracks->size() == 0)
+        return;
+
     QString tmptitle;
     if (m_trackList)
     {
@@ -1217,7 +1226,7 @@ void Ripper::updateTrackList(void)
         int i;
         for (i = 0; i < (int)m_tracks->size(); i++)
         {
-            if (i >= m_totalTracks)
+            if (i >= m_tracks->size())
                 break;
 
             RipTrack *track = m_tracks->at(i);
@@ -1225,11 +1234,16 @@ void Ripper::updateTrackList(void)
 
             MythUIButtonListItem *item = new MythUIButtonListItem(m_trackList,"");
 
-            if (track->active)
-                item->SetText(QString::number(metadata->Track()), "track");
-            else
-                item->SetText("", "track");
+            item->setCheckable(true);
 
+            item->SetData(qVariantFromValue(metadata));
+
+            if (track->active)
+                item->setChecked(MythUIButtonListItem::FullChecked);
+            else
+                item->setChecked(MythUIButtonListItem::NotChecked);
+
+            item->SetText(QString::number(metadata->Track()), "track");
             item->SetText(metadata->Title(), "title");
             item->SetText(metadata->Artist(), "artist");
 
@@ -1246,8 +1260,8 @@ void Ripper::updateTrackList(void)
             else
                 item->SetText("", "length");
 
-            if (i == m_currentTrack)
-                m_trackList->SetItemCurrent(i);
+//             if (i == m_currentTrack)
+//                 m_trackList->SetItemCurrent(i);
         }
     }
 }
@@ -1262,8 +1276,6 @@ void Ripper::searchArtist()
     if (showList(tr("Select an Artist"), s))
     {
         m_artistEdit->SetText(s);
-        artistChanged(s);
-        updateTrackList();
     }
 }
 
@@ -1277,7 +1289,6 @@ void Ripper::searchAlbum()
     if (showList(tr("Select an Album"), s))
     {
         m_albumEdit->SetText(s);
-        albumChanged(s);
     }
 }
 
@@ -1295,7 +1306,6 @@ void Ripper::searchGenre()
     if (showList(tr("Select a Genre"), s))
     {
         m_genreEdit->SetText(s);
-        genreChanged(s);
     }
 }
 
@@ -1320,9 +1330,12 @@ bool Ripper::showList(QString caption, QString &value)
     return res;
 }
 
-void Ripper::showEditMetadataDialog()
+void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)
 {
-    Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
+    if (!item || m_tracks->size() == 0)
+        return;
+
+    Metadata *editMeta = qVariantValue<Metadata *>(item->GetData());
 
     EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
                                   "edit_metadata", "music-", "edit metadata");
@@ -1334,26 +1347,30 @@ void Ripper::showEditMetadataDialog()
     }
 }
 
-void Ripper::toggleTrackActive()
+void Ripper::toggleTrackActive(MythUIButtonListItem *item)
 {
-    if (m_currentTrack == 0)
+    if (m_tracks->size() == 0 || !item)
         return;
 
-    RipTrack *track = m_tracks->at(m_currentTrack);
+    RipTrack *track = m_tracks->at(m_trackList->GetItemPos(item));
 
     track->active = !track->active;
 
+    if (track->active)
+        item->setChecked(MythUIButtonListItem::FullChecked);
+    else
+        item->setChecked(MythUIButtonListItem::NotChecked);
+
     updateTrackLengths();
-    updateTrackList();
 }
 
 void Ripper::updateTrackLengths()
 {
-    vector<RipTrack*>::reverse_iterator it;
+    QVector<RipTrack*>::iterator it;
     RipTrack *track;
     int length = 0;
 
-    for (it = m_tracks->rbegin(); it != m_tracks->rend(); ++it)
+    for (it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
     {
         track = *it;
         if (track->active)
@@ -1372,7 +1389,7 @@ void Ripper::updateTrackLengths()
 ///////////////////////////////////////////////////////////////////////////////
 
 RipStatus::RipStatus(MythScreenStack *parent, const QString &device,
-                     vector<RipTrack*> *tracks, int quality)
+                     QVector<RipTrack*> *tracks, int quality)
     : MythScreenType(parent, "ripstatus")
 {
     m_CDdevice = device;
@@ -1380,7 +1397,10 @@ RipStatus::RipStatus(MythScreenStack *parent, const QString &device,
     m_quality = quality;
     m_ripperThread = NULL;
 
-    QTimer::singleShot(500, this, SLOT(startRip()));
+    m_overallText = m_trackText = m_statusText = m_trackPctText =
+    m_overallPctText = NULL;
+
+    m_overallProgress = m_trackProgress = NULL;
 }
 
 RipStatus::~RipStatus(void)
@@ -1404,20 +1424,11 @@ bool RipStatus::Create(void)
     m_overallPctText = dynamic_cast<MythUIText *>(GetChild("overallpct"));
 
     m_overallProgress = dynamic_cast<MythUIProgressBar *>(GetChild("overall_progress"));
-    if (m_overallProgress)
-    {
-        m_overallProgress->SetUsed(0);
-        m_overallProgress->SetTotal(1);
-    }
-
     m_trackProgress = dynamic_cast<MythUIProgressBar *>(GetChild("track_progress"));
-    if (m_trackProgress)
-    {
-        m_trackProgress->SetUsed(0);
-        m_trackProgress->SetTotal(1);
-    }
 
     BuildFocusList();
+
+    startRip();
 
     return true;
 }
@@ -1470,60 +1481,70 @@ void RipStatus::customEvent(QEvent *event)
     {
         case RipStatusEvent::ST_TRACK_TEXT:
         {
-            m_trackText->SetText(rse->text);
+            if (m_trackText)
+                m_trackText->SetText(rse->text);
             break;
         }
 
         case RipStatusEvent::ST_OVERALL_TEXT:
         {
-            m_overallText->SetText(rse->text);
+            if (m_overallText)
+                m_overallText->SetText(rse->text);
             break;
         }
 
         case RipStatusEvent::ST_STATUS_TEXT:
         {
-            m_statusText->SetText(rse->text);
+            if (m_statusText)
+                m_statusText->SetText(rse->text);
             break;
         }
 
         case RipStatusEvent::ST_TRACK_PROGRESS:
         {
-            m_trackProgress->SetUsed(rse->value);
+            if (m_trackProgress)
+                m_trackProgress->SetUsed(rse->value);
             break;
         }
 
         case RipStatusEvent::ST_TRACK_PERCENT:
         {
-            m_trackPctText->SetText(QString("%1%").arg(rse->value));
+            if (m_trackPctText)
+                m_trackPctText->SetText(QString("%1%").arg(rse->value));
             break;
         }
 
         case RipStatusEvent::ST_TRACK_START:
         {
-            m_trackProgress->SetTotal(rse->value);
+            if (m_trackProgress)
+                m_trackProgress->SetTotal(rse->value);
             break;
         }
 
         case RipStatusEvent::ST_OVERALL_PROGRESS:
         {
-            m_overallProgress->SetUsed(rse->value);
+            if (m_overallProgress)
+                m_overallProgress->SetUsed(rse->value);
             break;
         }
 
         case RipStatusEvent::ST_OVERALL_START:
         {
-            m_overallProgress->SetTotal(rse->value);
+            if (m_overallProgress)
+                m_overallProgress->SetTotal(rse->value);
             break;
         }
 
         case RipStatusEvent::ST_OVERALL_PERCENT:
         {
-            m_overallPctText->SetText(QString("%1%").arg(rse->value));
+            if (m_overallPctText)
+                m_overallPctText->SetText(QString("%1%").arg(rse->value));
             break;
         }
 
         case RipStatusEvent::ST_FINISHED:
         {
+            emit Result(true);
             Close();
             break;
         }

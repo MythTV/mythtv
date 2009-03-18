@@ -4,6 +4,7 @@
 #include "metadata.h"
 
 #include <QEvent>
+#include <QVector>
 
 #include <mythtv/libmythui/mythscreentype.h>
 
@@ -51,7 +52,7 @@ class CDRipperThread: public QThread
 {
     public:
         CDRipperThread(RipStatus *parent,  QString device,
-                       vector<RipTrack*> *tracks, int quality);
+                       QVector<RipTrack*> *tracks, int quality);
         ~CDRipperThread();
 
         void cancel(void);
@@ -66,9 +67,8 @@ class CDRipperThread: public QThread
         bool               m_quit;
         QString            m_CDdevice;
         int                m_quality;
-        vector<RipTrack*> *m_tracks;
+        QVector<RipTrack*> *m_tracks;
 
-        int                m_totalTracks;
         long int           m_totalSectors;
         long int           m_totalSectorsDone;
 
@@ -98,10 +98,10 @@ class Ripper : public MythScreenType
     void startRipper(void);
     void startScanCD(void);
     void startEjectCD(void);
-    void artistChanged(QString newartist);
-    void albumChanged(QString newalbum);
-    void genreChanged(QString newgenre);
-    void yearChanged(QString newyear);
+    void artistChanged(void);
+    void albumChanged(void);
+    void genreChanged(void);
+    void yearChanged(void);
     void compilationChanged(bool state);
     void switchTitlesAndArtists();
     void reject();
@@ -109,17 +109,16 @@ class Ripper : public MythScreenType
     void searchAlbum(void);
     void searchGenre(void);
     void RipComplete(bool result);
+    void toggleTrackActive(MythUIButtonListItem *);
+    void showEditMetadataDialog(MythUIButtonListItem *);
 
   private:
     void deleteTrack(QString& artist, QString& album, QString& title);
     void updateTrackList(void);
     void updateTrackLengths(void);
-    void toggleTrackActive(void);
 
-    void trackListDown(bool page);
-    void trackListUp(bool page);
     bool showList(QString caption, QString &value);
-    void showEditMetadataDialog();
+
     static QString fixFileToken(QString token);
     static QString fixFileToken_sl(QString token);
 
@@ -142,9 +141,7 @@ class Ripper : public MythScreenType
     MythUIButton  *m_searchAlbumButton;
     MythUIButton  *m_searchGenreButton;
 
-    int                m_currentTrack;
-    int                m_totalTracks;
-    vector<RipTrack*> *m_tracks;
+    QVector<RipTrack*> *m_tracks;
 
     QString            m_albumName, m_artistName, m_genreName, m_year;
     QStringList        m_searchList;
@@ -174,7 +171,7 @@ class RipStatusEvent : public QEvent
     };
 
     RipStatusEvent(Type t, int val)
-        : QEvent((QEvent::Type)t), text(   ), value(val) {}
+        : QEvent((QEvent::Type)t), text(""), value(val) {}
     RipStatusEvent(Type t, const QString &val)
         : QEvent((QEvent::Type)t), text(val), value( -1) {}
     ~RipStatusEvent() {}
@@ -188,11 +185,14 @@ class RipStatus : public MythScreenType
   Q_OBJECT
   public:
     RipStatus(MythScreenStack *parent, const QString &device,
-              vector<RipTrack*> *tracks, int quality);
+              QVector<RipTrack*> *tracks, int quality);
     ~RipStatus(void);
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
+
+  signals:
+    void Result(bool);
 
   protected slots:
     void startRip(void);
@@ -200,7 +200,7 @@ class RipStatus : public MythScreenType
   private:
     void customEvent(QEvent *event);
 
-    vector<RipTrack*> *m_tracks;
+    QVector<RipTrack*> *m_tracks;
     int                m_quality;
     QString            m_CDdevice;
 

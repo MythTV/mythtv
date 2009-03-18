@@ -96,8 +96,8 @@ class Metadata
     QString CompilationArtist() const { return m_compilation_artist; }
     void setCompilationArtist(const QString &lcompilation_artist)
     {
-        m_compilation_artist = lcompilation_artist; 
-        m_formattedartist = m_formattedtitle = ""; 
+        m_compilation_artist = lcompilation_artist;
+        m_formattedartist = m_formattedtitle = "";
     }
 
     QString Album() const { return m_album; }
@@ -243,14 +243,16 @@ class Metadata
 bool operator==(const Metadata& a, const Metadata& b);
 bool operator!=(const Metadata& a, const Metadata& b);
 
+Q_DECLARE_METATYPE(Metadata *)
+
 typedef QList<Metadata*> MetadataPtrList;
 class MusicNode;
 typedef QList<MusicNode*> MusicNodePtrList;
 
 class MusicNode
-{    
+{
   public:
-  
+
     MusicNode(const QString &a_title, const QString &tree_level);
    ~MusicNode();
 
@@ -268,15 +270,15 @@ class MusicNode
     inline void addLeaf(Metadata *leaf) { my_tracks.append(leaf); }
     inline void setLeaves(MetadataPtrList leaves) { my_tracks = leaves; }
 
-    void clear(void) { 
-        my_tracks.clear(); 
+    void clear(void) {
+        my_tracks.clear();
         my_subnodes.clear();
     }
 
     static void SetStaticData(const QString &startdir, const QString &paths);
- 
+
   private:
-  
+
     MetadataPtrList     my_tracks;
     MusicNodePtrList    my_subnodes;
     QString             my_title;
@@ -318,7 +320,7 @@ class AllMusic
     //  And save any changes at mythmusic stop
 
   public:
-  
+
     AllMusic(QString path_assignment, QString a_startdir);
     ~AllMusic();
 
@@ -326,7 +328,7 @@ class AllMusic
     Metadata*   getMetadata(int an_id);
     bool        updateMetadata(int an_id, Metadata *the_track);
     int         count() const { return m_numPcs; }
-    int         countLoaded() const { return m_numLoaded; } 
+    int         countLoaded() const { return m_numLoaded; }
     void        save();
     bool        startLoading(void);
     void        resync();   //  After a CD rip, for example
@@ -349,12 +351,12 @@ class AllMusic
     int         getCDTrackCount(){return m_cd_data.count();}
     void        resetListings(){m_last_listed = -1;}
     void        setAllVisible(bool visible);
-    
+
   private:
-  
+
     MetadataPtrList     m_all_music;
     MusicNode           *m_root_node;
-    
+
     int m_numPcs;
     int m_numLoaded;
 
@@ -365,15 +367,15 @@ class AllMusic
     //  you NEED to clear and rebuild the map
     typedef QMap<int, Metadata*> MusicMap;
     MusicMap music_map;
-    
+
     typedef QList<Metadata>       ValueMetadata;
     ValueMetadata                 m_cd_data; //  More than one cd player?
     QString                       m_cd_title;
 
     QString     m_startdir;
     QString     m_paths;
-    
-    
+
+
     MetadataLoadingThread   *m_metadata_loader;
     bool                     m_done_loading;
     int                      m_last_listed;
