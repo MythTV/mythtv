@@ -404,6 +404,9 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
         modulation = "qam";             // "auto" works just as well?
 #endif
 
+    if (modulation.isEmpty()) 
+        modulation = "auto";
+
     QString chan = modulation + ':' + QString::number(frequency);
 
     VERBOSE(VB_CHANNEL, LOC + "Tune()ing to " + chan);
