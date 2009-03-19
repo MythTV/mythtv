@@ -90,7 +90,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
     }
 
     MythCDROM *cd = MythCDROM::get(NULL, device, false, false);
-    cd->SetSpeed(device, speed);
+    cd->setSpeed(device, speed);
     delete cd;
 }
 
