@@ -15,6 +15,7 @@ using namespace std;
 
 // MythTV headers
 #include "mythmediamonitor.h"
+#include "mythcdrom.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "mythconfig.h"
@@ -84,8 +85,13 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
         {
             pMedia->setSpeed(speed);
             mon->Unlock(pMedia);
+            return;
         }
     }
+
+    MythCDROM *cd = MythCDROM::get(NULL, device, false, false);
+    cd->SetSpeed(device, speed);
+    delete cd;
 }
 
 // When ejecting one of multiple devices, present a nice name to the user
