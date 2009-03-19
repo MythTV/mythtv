@@ -174,7 +174,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
         if (elink != NULL)
         {
-            isLocal = elink->IsLocal();
+            TVState state = elink->GetState();
+            isLocal       = elink->IsLocal();
 
             QDomElement encoder = pDoc->createElement("Encoder");
             encoders.appendChild(encoder);
@@ -182,7 +183,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             encoder.setAttribute("id"            , elink->GetCardID()       );
             encoder.setAttribute("local"         , isLocal                  );
             encoder.setAttribute("connected"     , elink->IsConnected()     );
-            encoder.setAttribute("state"         , elink->GetState()        );
+            encoder.setAttribute("state"         , state                    );
             encoder.setAttribute("sleepstatus"   , elink->GetSleepStatus()  );
             //encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
 
@@ -194,7 +195,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             if (elink->IsConnected())
                 numencoders++;
 
-            switch (elink->GetState())
+            switch (state)
             {
                 case kState_WatchingLiveTV:
                 case kState_RecordingOnly:
