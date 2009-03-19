@@ -959,7 +959,6 @@ TV::~TV(void)
     PlayerContext *mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
     while (!player.empty())
     {
-        StopStuff(mctx, player.back(), true, true, true);
         delete player.back();
         player.pop_back();
     }
