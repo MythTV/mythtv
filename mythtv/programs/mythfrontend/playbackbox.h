@@ -144,6 +144,10 @@ class PlaybackBox : public MythScreenType
     void showMetadataEditor();
     void showGroupFilter();
     void showRecGroupPasswordChanger();
+    MythDialogBox *createPopupMenu(const QString &title);
+    MythDialogBox *createProgramPopupMenu(const QString &title,
+                                          ProgramInfo *pginfo = NULL);
+    MythDialogBox *createPlaylistPopupMenu();
     void showPlayFromPopup();
     void showRecordingPopup();
     void showJobPopup();
@@ -159,6 +163,7 @@ class PlaybackBox : public MythScreenType
              { changeProfileAndTranscode("Low Quality"); }
     void showStoragePopup();
     void showPlaylistPopup();
+    void showPlaylistStoragePopup();
     void showPlaylistJobPopup();
     void showProgramDetails();
     void showIconHelp();
@@ -234,6 +239,9 @@ class PlaybackBox : public MythScreenType
     void doPlaylistDeleteForgetHistory();
     void doPlaylistChangeRecGroup();
     void doPlaylistChangePlayGroup();
+    void doPlaylistExpireSetting(bool turnOn);
+    void doPlaylistExpireSetOn()      { doPlaylistExpireSetting(true);  }
+    void doPlaylistExpireSetOff()     { doPlaylistExpireSetting(false); }
     void togglePlayListTitle(void);
     void togglePlayListItem(void);
     void playSelectedPlaylist(bool random);

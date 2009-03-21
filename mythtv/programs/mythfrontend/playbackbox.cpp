@@ -2119,27 +2119,8 @@ void PlaybackBox::showPlaylistPopup()
     if (m_popupMenu)
         return;
 
-    QString label;
-    if (m_playList.size() > 1)
-        label = tr("There are %1 items in the playlist.").arg(m_playList.size());
-    else
-        label = tr("There is %1 item in the playlist.").arg(m_playList.size());
-
-    label.append(tr("Actions affect all items in the playlist"));
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    if (!(m_popupMenu = createPlaylistPopupMenu()))
+        return;
 
     m_popupMenu->AddButton(tr("Play"), SLOT(doPlayList()));
     m_popupMenu->AddButton(tr("Shuffle Play"), SLOT(doPlayListRandom()));
@@ -2158,10 +2139,8 @@ void PlaybackBox::showPlaylistPopup()
         m_popupMenu->AddButton(tr("Toggle playlist for this recording"),
                          SLOT(togglePlayListItem()));
 
-    m_popupMenu->AddButton(tr("Change Recording Group"),
-                     SLOT(doPlaylistChangeRecGroup()));
-    m_popupMenu->AddButton(tr("Change Playback Group"),
-                     SLOT(doPlaylistChangePlayGroup()));
+    m_popupMenu->AddButton(tr("Storage Options"),
+                     SLOT(showPlaylistStoragePopup()), true);
     m_popupMenu->AddButton(tr("Job Options"),
                      SLOT(showPlaylistJobPopup()), true);
     m_popupMenu->AddButton(tr("Delete"), SLOT(doPlaylistDelete()));
@@ -2169,30 +2148,31 @@ void PlaybackBox::showPlaylistPopup()
                      SLOT(doPlaylistDeleteForgetHistory()));
 }
 
+void PlaybackBox::showPlaylistStoragePopup()
+{
+    if (m_popupMenu)
+        return;
+
+    if (!(m_popupMenu = createPlaylistPopupMenu()))
+        return;
+
+    m_popupMenu->AddButton(tr("Change Recording Group"),
+                     SLOT(doPlaylistChangeRecGroup()));
+    m_popupMenu->AddButton(tr("Change Playback Group"),
+                     SLOT(doPlaylistChangePlayGroup()));
+    m_popupMenu->AddButton(tr("Disable Auto Expire"),
+                     SLOT(doPlaylistExpireSetOff()));
+    m_popupMenu->AddButton(tr("Enable Auto Expire"),
+                     SLOT(doPlaylistExpireSetOn()));
+}
+
 void PlaybackBox::showPlaylistJobPopup()
 {
     if (m_popupMenu)
         return;
 
-    QString label;
-    if (m_playList.size() > 1)
-        label = tr("There are %1 items in the playlist.").arg(m_playList.size());
-    else
-        label = tr("There is %1 item in the playlist.").arg(m_playList.size());
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    if (!(m_popupMenu = createPlaylistPopupMenu()))
+        return;
 
     QString jobTitle;
     QString command;
@@ -2301,33 +2281,77 @@ void PlaybackBox::showPlaylistJobPopup()
     }
 }
 
+MythDialogBox *PlaybackBox::createPopupMenu(const QString &label)
+{
+    if (m_popupMenu)
+        return NULL;
+
+    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
+
+    if (!m_popupMenu)
+        return NULL;
+
+    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
+
+    if (m_popupMenu->Create())
+    {
+        m_popupStack->AddScreen(m_popupMenu);
+        m_popupMenu->SetReturnEvent(this, "slotmenu");
+    }
+    else
+    {
+        delete m_popupMenu;
+        m_popupMenu = NULL;
+        return NULL;
+    }
+
+    return m_popupMenu;
+}
+
+MythDialogBox *PlaybackBox::createProgramPopupMenu(const QString &title,
+                                                   ProgramInfo *pginfo)
+{
+    if (m_popupMenu)
+        return NULL;
+
+    QString label = title;
+    if (pginfo)
+    {
+        popupString(pginfo, label);
+    }
+    else
+    {
+        ProgramInfo *pginfo = CurrentItem();
+        popupString(pginfo, label);
+    }
+
+    return createPopupMenu(label);
+}
+
+MythDialogBox *PlaybackBox::createPlaylistPopupMenu()
+{
+    if (m_popupMenu)
+        return NULL;
+
+    QString label;
+    if (m_playList.size() > 1)
+        label = tr("There are %1 items in the playlist.").arg(m_playList.size());
+    else
+        label = tr("There is %1 item in the playlist.").arg(m_playList.size());
+
+    label.append(" ");
+    label.append(tr("Actions affect all items in the playlist"));
+
+    return createPopupMenu(label);
+}
+
 void PlaybackBox::showPlayFromPopup()
 {
     if (m_popupMenu)
         return;
 
-    QString label = tr("Play options");
-
-    ProgramInfo *pginfo = CurrentItem();
-    popupString(pginfo, label);
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    if (!m_popupMenu)
+    if (!(m_popupMenu = createProgramPopupMenu(tr("Play Options"))))
         return;
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-        return;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
 
     m_popupMenu->AddButton(tr("Play from bookmark"), SLOT(playSelected()));
     m_popupMenu->AddButton(tr("Play from beginning"), SLOT(doPlayFromBeg()));
@@ -2338,24 +2362,8 @@ void PlaybackBox::showStoragePopup()
     if (m_popupMenu)
         return;
 
-    QString label = tr("Storage options");
-
-    ProgramInfo *pginfo = CurrentItem();
-    popupString(pginfo, label);
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    if (!(m_popupMenu = createProgramPopupMenu(tr("Storage Options"))))
+        return;
 
     m_popupMenu->AddButton(tr("Change Recording Group"),
                             SLOT(showRecGroupChanger()));
@@ -2363,6 +2371,7 @@ void PlaybackBox::showStoragePopup()
     m_popupMenu->AddButton(tr("Change Playback Group"),
                             SLOT(showPlayGroupChanger()));
 
+    ProgramInfo *pginfo = CurrentItem();
     if (pginfo)
     {
         if (pginfo->programflags & FL_AUTOEXP)
@@ -2386,24 +2395,8 @@ void PlaybackBox::showRecordingPopup()
     if (m_popupMenu)
         return;
 
-    QString label = tr("Scheduling options");
-
-    ProgramInfo *pginfo = CurrentItem();
-    popupString(pginfo, label);
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    if (!(m_popupMenu = createProgramPopupMenu(tr("Scheduling Options"))))
+        return;
 
     m_popupMenu->AddButton(tr("Edit Recording Schedule"),
                             SLOT(doEditScheduled()));
@@ -2420,27 +2413,15 @@ void PlaybackBox::showRecordingPopup()
 
 void PlaybackBox::showJobPopup()
 {
-    QString label = tr("Job options");
-
-    ProgramInfo *pginfo = CurrentItem();
-    popupString(pginfo, label);
-
-    if (m_popupMenu || !pginfo)
+    if (m_popupMenu)
         return;
 
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
+    if (!(m_popupMenu = createProgramPopupMenu(tr("Job Options"))))
+        return;
 
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    ProgramInfo *pginfo = CurrentItem();
+    if (!pginfo)
+        return;
 
     QString jobTitle;
     QString command;
@@ -2523,21 +2504,8 @@ void PlaybackBox::showTranscodingProfiles()
     if (m_popupMenu)
         return;
 
-    QString label = tr("Transcoding profiles");
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    if (!(m_popupMenu = createPopupMenu(tr("Transcoding profiles"))))
+        return;
 
     m_popupMenu->AddButton(tr("Default"), SLOT(doBeginTranscoding()));
     m_popupMenu->AddButton(tr("Autodetect"),
@@ -2567,22 +2535,8 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
         return;
 
     QString label = tr("Recording Options");
-
-    popupString(pginfo, label);
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    if (!(m_popupMenu = createProgramPopupMenu(label, pginfo)))
+        return;
 
     bool sameProgram = false;
 
@@ -2656,22 +2610,8 @@ void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *pginfo)
         return;
 
     QString label = tr("Recording file can not be found");
-
-    popupString(pginfo, label);
-
-    m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
-
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
-
-    if (m_popupMenu->Create())
-        m_popupStack->AddScreen(m_popupMenu);
-    else
-    {
-        delete m_popupMenu;
-        m_popupMenu = NULL;
-    }
-
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    if (!(m_popupMenu = createProgramPopupMenu(label, pginfo)))
+        return;
 
     m_popupMenu->AddButton(tr("Show Program Details"),
                                 SLOT(showProgramDetails()));
@@ -4077,6 +4017,20 @@ void PlaybackBox::showPlayGroupChanger(void)
     }
     else
         delete pgChanger;
+}
+
+void PlaybackBox::doPlaylistExpireSetting(bool turnOn)
+{
+    ProgramInfo *tmpItem;
+    QStringList::Iterator it;
+
+    for (it = m_playList.begin(); it != m_playList.end(); ++it)
+    {
+        if ((tmpItem = findMatchingProg(*it)))
+        {
+            tmpItem->SetAutoExpire(turnOn, true);
+        }
+    }
 }
 
 void PlaybackBox::showMetadataEditor()
