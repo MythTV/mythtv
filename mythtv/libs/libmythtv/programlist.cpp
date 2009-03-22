@@ -200,7 +200,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
             querystr += "atsc_major_chan,atsc_minor_chan,channum,callsign ";
     }
     if (!sql.contains(" LIMIT "))
-        querystr += " LIMIT 1000 ";
+        querystr += " LIMIT 20000 ";
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
