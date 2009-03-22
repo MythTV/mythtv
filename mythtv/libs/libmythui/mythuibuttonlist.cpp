@@ -478,12 +478,16 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
                 --m_selPosition;
             else if (m_wrapStyle > WrapNone)
                 m_selPosition = m_itemList.size() - 1;
+            else if (m_wrapStyle == WrapCaptive)
+                return true;
             break;
         case MoveColumn:
             if (pos % m_columns > 0)
                 --m_selPosition;
             else if (m_wrapStyle > WrapNone)
                 m_selPosition = pos + (m_columns-1);
+            else if (m_wrapStyle == WrapCaptive)
+                return true;
             break;
         case MoveRow:
             if ((pos - m_columns) >= 0)
@@ -504,6 +508,8 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
                 if (m_layout == LayoutVertical)
                     m_topPosition = qMax(0, m_selPosition - (int)m_itemsVisible + 1);
             }
+            else if (m_wrapStyle == WrapCaptive)
+                return true;
             break;
         case MovePage:
             m_selPosition = qMax(0, m_selPosition - (int)m_itemsVisible);
@@ -539,12 +545,16 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
                 ++m_selPosition;
             else if (m_wrapStyle > WrapNone)
                 m_selPosition = 0;
+            else if (m_wrapStyle == WrapCaptive)
+                return true;
             break;
         case MoveColumn:
             if ((pos+1) % m_columns > 0)
                 ++m_selPosition;
             else if (m_wrapStyle > WrapNone)
                 m_selPosition = pos - (m_columns-1);
+            else if (m_wrapStyle == WrapCaptive)
+                return true;
             break;
         case MoveRow:
             if (((m_itemList.size()-1) / m_columns) > (pos / m_columns))
@@ -558,6 +568,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
             }
             else if (m_wrapStyle > WrapNone)
                 m_selPosition = (pos % m_columns);
+            else if (m_wrapStyle == WrapCaptive)
+                return true;
             break;
         case MovePage:
             m_selPosition = qMin(m_itemCount - 1,
@@ -949,7 +961,9 @@ bool MythUIButtonList::ParseElement(QDomElement &element)
     {
         QString wrapstyle = getFirstText(element).toLower();
 
-        if (wrapstyle == "none")
+        if (wrapstyle == "captive")
+            m_wrapStyle = WrapCaptive;
+        else if (wrapstyle == "none")
             m_wrapStyle = WrapNone;
         else if (wrapstyle == "selection")
             m_wrapStyle = WrapSelect;
