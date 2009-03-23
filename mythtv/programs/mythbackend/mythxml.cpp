@@ -543,8 +543,8 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     MSqlBindings bindings;
     QString      sSQL = "WHERE program.chanid >= :StartChanId "
                          "AND program.chanid <= :EndChanId "
-                         "AND program.starttime >= :StartDate "
-                         "AND program.endtime <= :EndDate "
+                         "AND program.endtime >= :StartDate "
+                         "AND program.starttime <= :EndDate "
                         "GROUP BY program.starttime, channel.channum, "
                          "channel.callsign, program.title "
                         "ORDER BY program.chanid ";
