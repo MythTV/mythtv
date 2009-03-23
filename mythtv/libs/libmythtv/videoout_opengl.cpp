@@ -716,7 +716,22 @@ void VideoOutputOpenGL::InitDisplayMeasurements(void)
         source = "Database";
     }
 
-    gl_context->GetDisplaySize(screen_size);
+    QDesktopWidget * desktop = QApplication::desktop();
+    bool             usingXinerama = (GetNumberOfXineramaScreens() > 1);
+    int              screen = desktop->primaryScreen();
+ 
+    if (usingXinerama)
+    {
+        screen = gContext->GetNumSetting("XineramaScreen", screen);
+        if (screen >= desktop->numScreens())
+            screen = 0;
+    }
+ 
+    if (screen == -1)
+        screen_size = desktop->size();
+    else
+        screen_size = desktop->screenGeometry(screen).size();
+
     gl_context->GetWindowRect(window_rect);
 
     int xbase, ybase;
