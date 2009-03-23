@@ -1,3 +1,4 @@
+#include "config.h"
 #include "osdsurface.h"
 #include "dithertable.h"
 #include "mythcontext.h"
