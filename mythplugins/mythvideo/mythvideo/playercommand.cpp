@@ -189,26 +189,29 @@ class VideoPlayerCommandPrivate
         if (item)
         {
             QString play_command = item->GetPlayCommand();
+            QString filename;
+
+            if (item->IsHostSet())
+                filename = GenRemoteFileURL("Videos", item->GetHost(),
+                        item->GetFilename());
+            else
+                filename = item->GetFilename();
+
             if (play_command.length())
-                AddPlayer(play_command, item->GetFilename(), item->GetPlot(),
+            {
+                AddPlayer(play_command, filename, item->GetPlot(),
                         item->GetTitle(), item->GetDirector(),
                         item->GetLength(),
                         QString::number(item->GetYear()));
+            }
             else
             {
-                QString filename;
-                if (item->IsHostSet())
-                    filename = GenRemoteFileURL("Videos", item->GetHost(),
-                            item->GetFilename());
-                else
-                   filename = item->GetFilename();
-
-                PlayerFor(filename);
+                PlayerFor(filename, item);
             }
         }
     }
 
-    void PlayerFor(const QString &filename)
+    void PlayerFor(const QString &filename, const Metadata *extraData = 0)
     {
         QString extension = filename.section(".", -1, -1);
         QDir dir_test(QString("%1/VIDEO_TS").arg(filename));
@@ -233,9 +236,22 @@ class VideoPlayerCommandPrivate
         if (play_command.trimmed().isEmpty())
             play_command = "Internal";
 
-        AddPlayer(play_command, filename, QString(),
-                Metadata::FilenameToTitle(filename), QString(), 0,
-                QString::number(VIDEO_YEAR_DEFAULT));
+        QString plot;
+        QString title = Metadata::FilenameToTitle(filename);
+        QString director;
+        int length = 0;
+        QString year = QString::number(VIDEO_YEAR_DEFAULT);
+
+        if (extraData)
+        {
+            plot = extraData->GetPlot();
+            title = extraData->GetTitle();
+            director = extraData->GetDirector();
+            length = extraData->GetLength();
+            year = QString::number(extraData->GetYear());
+        }
+
+        AddPlayer(play_command, filename, plot, title, director, length, year);
     }
 
     void ClearPlayerList()
