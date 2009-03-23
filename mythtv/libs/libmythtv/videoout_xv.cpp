@@ -460,10 +460,28 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
                 MythXGetDisplayDimensions(XJ_disp, XJ_screen_num));
         }
     }
+    QDesktopWidget * desktop = QApplication::desktop();
+    bool             usingXinerama = (GetNumberOfXineramaScreens() > 1);
+    int              screen = desktop->primaryScreen();
+    int              w, h;
 
-    // Fetch pixel width and height of the display
-    int xbase, ybase, w, h;
-    GetMythUI()->GetScreenBounds(xbase, ybase, w, h);
+    if (usingXinerama)
+    {
+        screen = gContext->GetNumSetting("XineramaScreen", screen);
+        if (screen >= desktop->numScreens())
+            screen = 0;
+    }
+
+    if (screen == -1)
+    {
+        w = desktop->width();
+        h = desktop->height();
+    }
+    else
+    {
+        w = desktop->screenGeometry(screen).width();
+        h = desktop->screenGeometry(screen).height();
+    }
 
     // Determine window dimensions in pixels
     int window_w = windows[0].GetDisplayVisibleRect().size().width();
@@ -477,9 +495,6 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     VERBOSE(VB_PLAYBACK, LOC + QString(
                 "Pixel dimensions: Screen %1x%2, window %3x%4")
             .arg(w).arg(h).arg(window_w).arg(window_h));
-
-    // Determine if we are using Xinerama
-    bool usingXinerama = (GetNumberOfXineramaScreens() > 1);
 
     // If the dimensions are invalid, assume square pixels and 17" screen.
     // Only print warning if this isn't Xinerama, we will fix Xinerama later.
