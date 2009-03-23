@@ -166,10 +166,12 @@
 
         <buttonlist name="states" from="basebuttonlist">
             <area>26,100,220,200</area>
+            <wrapstyle>captive</wrapstyle>
         </buttonlist>
 
         <buttonlist name="categories" from="basebuttonlist">
             <area>260,100,400,400</area>
+            <wrapstyle>captive</wrapstyle>
         </buttonlist>
 
         <button name="done" from="basebutton">
