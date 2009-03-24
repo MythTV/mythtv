@@ -853,6 +853,13 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[ 1094LL << 32 | 1 << 16 | 17028 ] = // NT1
         fix[ 1100LL << 32 | 1 << 16 |  8710 ] = // NRJ 12
         EITFixUp::kEFixForceISO8859_15;
+
+    // DVB-T Espoo, Finland
+    fix[ 8438U << 16] = EITFixUp::kFixFI;
+
+    // DVB-C Welho Finland
+    fix[ 42249U << 16] = EITFixUp::kFixFI;
+    fix[ 15U << 16] = EITFixUp::kFixFI;
 }
 
 static int calc_eit_utc_offset(void)

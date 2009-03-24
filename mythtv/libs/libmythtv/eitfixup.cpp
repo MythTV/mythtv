@@ -83,7 +83,8 @@ EITFixUp::EITFixUp()
       m_RTLSubtitle5("^'(.+)'\\.\\s*"),
       m_RTLEpisodeNo1("^(Folge\\s\\d{1,4})\\.*\\s*"),
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
-      m_fiRerun("Uusinta.?"),
+      m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
+      m_fiRerun2("\\([Uu]\\)"),
       m_Stereo("(Stereo)"),
       m_dePremiereInfos("([^.]+)?\\s?([0-9]{4})\\.\\s[0-9]+\\sMin\\.(?:\\sVon"
                         "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
@@ -1125,6 +1126,13 @@ void EITFixUp::FixFI(DBEvent &event) const
     {
         event.previouslyshown = true;
         event.description = event.description.replace(m_fiRerun, "");
+    }
+
+    position = event.description.indexOf(m_fiRerun2);
+    if (position != -1)
+    {
+        event.previouslyshown = true;
+        event.description = event.description.replace(m_fiRerun2, "");
     }
 
     // Check for (Stereo) in the decription and set the <audio> tags

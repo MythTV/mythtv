@@ -144,6 +144,7 @@ class EITFixUp
     const QRegExp m_RTLEpisodeNo1;
     const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;
+    const QRegExp m_fiRerun2;
     const QRegExp m_Stereo;
     const QRegExp m_dePremiereInfos;
     const QRegExp m_dePremiereOTitle;
