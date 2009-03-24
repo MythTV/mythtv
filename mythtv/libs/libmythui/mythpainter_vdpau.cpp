@@ -708,8 +708,8 @@ void MythVDPAUPainter::DrawRect(const QRect &area,
 }
 
 void MythVDPAUPainter::DrawRoundRect(const QRect &area, int radius, 
-                                     bool drawFill, QColor fillColor, 
-                                     bool drawLine, int lineWidth, QColor lineColor)
+                                     bool drawFill, const QColor &fillColor, 
+                                     bool drawLine, int lineWidth, const QColor &lineColor)
 {
 }
 
