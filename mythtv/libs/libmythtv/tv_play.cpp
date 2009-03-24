@@ -6074,6 +6074,9 @@ void TV::SwitchCards(PlayerContext *ctx,
 
     if (testrec && testrec->IsValidRecorder())
     {
+        // Switching cards so clear the pseudoLiveTVState.
+        ctx->SetPseudoLiveTV(NULL, kPseudoNormalLiveTV);
+
         PlayerContext *mctx = GetPlayer(ctx, 0);
         if (mctx != ctx)
             PIPRemovePlayer(mctx, ctx);
@@ -6452,8 +6455,7 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
         if (HasQueuedInput())
             DoArbSeek(ctx, ARBSEEK_FORWARD);
     }
-    else if (StateIsLiveTV(GetState(ctx)) &&
-             !ctx->pseudoLiveTVState)
+    else if (StateIsLiveTV(GetState(ctx)))
     {
         QString channum = GetQueuedChanNum();
         QString chaninput = GetQueuedInput();
@@ -6548,11 +6550,14 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         channum = ChannelUtil::GetChanNum(chanid);
     }
 
+    bool getit = false;
     if (ctx->recorder)
     {
-        bool getit = false;
-
-        if (chanid)
+        if (ctx->pseudoLiveTVState == kPseudoRecording)
+        {
+            getit = true;
+        }
+        else if (chanid)
         {
             getit = ctx->recorder->ShouldSwitchToAnotherCard(
                 QString::number(chanid));
@@ -6603,7 +6608,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         return;
     }
 
-    if (!ctx->recorder || !ctx->recorder->CheckChannel(channum))
+    if (getit || !ctx->recorder || !ctx->recorder->CheckChannel(channum))
         return;
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
