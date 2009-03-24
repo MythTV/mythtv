@@ -447,6 +447,9 @@ void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
                                  int flags, const MythFontProperties &font,
                                  int alpha, const QRect &boundRect)
 {
+    if (r.width() <= 0 || r.height() <= 0)
+        return;
+
     glClearDepth(1.0f);
 
     MythImage *im = GetImageFromString(msg, flags, r, font);
