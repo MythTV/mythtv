@@ -279,7 +279,7 @@ void VideoOutWindow::ApplyLetterboxing(void)
 {
     float disp_aspect = fix_aspect(GetDisplayAspect());
     float aspect_diff = disp_aspect - overriden_video_aspect;
-    bool aspects_match = abs(aspect_diff / disp_aspect) <= 0.1f;
+    bool aspects_match = abs(aspect_diff / disp_aspect) <= 0.02f;
     bool nomatch_with_fill = (!aspects_match && (adjustfill
                                                  == kAdjustFill_Stretch));
     bool nomatch_without_fill = (!aspects_match) && !nomatch_with_fill;
