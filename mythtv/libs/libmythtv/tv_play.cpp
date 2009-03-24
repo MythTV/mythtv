@@ -7405,7 +7405,7 @@ bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
     mplexid = (32767 == mplexid) ? 0 : mplexid;
 
     vector<uint> excluded_cards;
-    if (ctx->recorder)
+    if (ctx->recorder && ctx->pseudoLiveTVState == kPseudoNormalLiveTV)
         excluded_cards.push_back(ctx->GetCardID());
 
     uint sourceid = ChannelUtil::GetSourceIDForChannel(chanid);
