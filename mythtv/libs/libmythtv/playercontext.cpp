@@ -977,7 +977,7 @@ void PlayerContext::SetPseudoLiveTV(
 
     if (old_rec)
     {
-        QString msg = QString("Done to recording: %1 %2 %3 %4")
+        QString msg = QString("Done recording: %1 %2 %3 %4")
             .arg(old_rec->title).arg(old_rec->chanstr)
             .arg(old_rec->recstartts.toString())
             .arg(old_rec->recendts.toString());
