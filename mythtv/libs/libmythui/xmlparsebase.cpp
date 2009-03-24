@@ -23,6 +23,7 @@
 #include "mythuigroup.h"
 #include "mythuiwebbrowser.h"
 #include "mythuibuttontree.h"
+#include "mythuishape.h"
 #include "mythfontproperties.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
@@ -216,7 +217,8 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                      type == "statetype" ||
                      type == "clock" ||
                      type == "progressbar" ||
-                     type == "webbrowser")
+                     type == "webbrowser" ||
+                     type == "shape")
             {
                 ParseUIType(info, type, parent);
             }
@@ -303,6 +305,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIProgressBar(parent, name);
     else if (type == "webbrowser")
         uitype = new MythUIWebBrowser(parent, name);
+    else if (type == "shape")
+        uitype = new MythUIShape(parent, name);
     else if (type == "window" && parent == GetGlobalObjectStore())
         uitype = new MythScreenType(parent, name);
     else
@@ -383,7 +387,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "statetype" ||
                      info.tagName() == "clock" ||
                      info.tagName() == "progressbar" ||
-                     info.tagName() == "webbrowser")
+                     info.tagName() == "webbrowser" ||
+                     info.tagName() == "shape")
             {
                 ParseUIType(info, info.tagName(), uitype, screen);
             }
@@ -501,7 +506,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "window" ||
                          type == "clock" ||
                          type == "progressbar" ||
-                         type == "webbrowser")
+                         type == "webbrowser" ||
+                         type == "shape")
                 {
                     ParseUIType(e, type, parent);
                 }
