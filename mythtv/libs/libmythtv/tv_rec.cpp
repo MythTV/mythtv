@@ -76,6 +76,8 @@ QMap<uint,TVRec*> TVRec::cards;
 
 static bool is_dishnet_eit(int cardid);
 static QString load_profile(QString,void*,ProgramInfo*,RecordingProfile&);
+static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
+                     bool on_host, bool transcode_bfr_comm, bool on_line_comm);
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -2809,6 +2811,7 @@ void TVRec::SetLiveRecording(int recording)
         // cancel -- 'recording' should be 0 or -1
         SetFlags(kFlagCancelNextRecording);
         curRecording->recgroup = "LiveTV";
+        autoRunJobs = JOB_NONE;
     }
     else if (!was_rec && pseudoLiveTVRecording)
     {
@@ -2822,6 +2825,11 @@ void TVRec::SetLiveRecording(int recording)
         NotifySchedulerOfRecording(curRecording);
         recstat = curRecording->recstatus;
         curRecording->recgroup = "Default";
+
+        RecordingProfile profile;
+        load_profile(genOpt.cardtype, NULL, curRecording, profile);
+        autoRunJobs = init_jobs(curRecording, profile, runJobOnHostOnly,
+                                transcodeFirst, earlyCommFlag);
     }
 
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
