@@ -25,6 +25,12 @@ class MythOpenGLPainter : public MythPainter
     virtual void DrawText(const QRect &dest, const QString &msg, int flags,
                           const MythFontProperties &font, int alpha,
                           const QRect &boundRect);
+    virtual void DrawRect(const QRect &area,
+                          bool drawFill, const QColor &fillColor, 
+                          bool drawLine, int lineWidth, const QColor &lineColor);
+    virtual void DrawRoundRect(const QRect &area, int radius, 
+                               bool drawFill, const QColor &fillColor, 
+                               bool drawLine, int lineWidth, const QColor &lineColor);
 
     virtual MythImage *GetFormatImage();
     virtual void DeleteFormatImage(MythImage *im);

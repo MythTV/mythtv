@@ -1,4 +1,5 @@
 #include <cassert>
+#include <math.h>
 
 #include <QApplication>
 #include <QPixmap>
@@ -499,6 +500,153 @@ void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
     }
 
     DrawImage(destRect, im, srcRect, alpha);
+}
+
+void MythOpenGLPainter::DrawRect(const QRect &area,
+                                 bool drawFill, const QColor &fillColor, 
+                                 bool drawLine, int lineWidth, const QColor &lineColor)
+{
+    glEnable(GL_BLEND);
+
+    if (drawFill)
+    {
+        glColor4f(fillColor.redF(), fillColor.greenF(), fillColor.blueF(), fillColor.alphaF());
+        glRectf(area.x(), area.y(), area.x() + area.width(), area.y() + area.height());
+    }
+
+    if (drawLine)
+    {
+        glColor4f(lineColor.redF(), lineColor.greenF(), lineColor.blueF(), lineColor.alphaF());
+        glLineWidth(lineWidth);
+
+        glBegin(GL_LINES);
+        glVertex2f(area.x(), area.y());
+        glVertex2f(area.x() + area.width(), area.y());
+
+        glVertex2f(area.x() + area.width(), area.y());
+        glVertex2f(area.x() + area.width(), area.y() + area.height());
+
+        glVertex2f(area.x() + area.width(), area.y() + area.height());
+        glVertex2f(area.x(), area.y() + area.height());
+
+        glVertex2f(area.x(), area.y() + area.height());
+        glVertex2f(area.x(), area.y());
+        glEnd();
+    }
+
+    glDisable(GL_BLEND);
+}
+
+void MythOpenGLPainter::DrawRoundRect(const QRect &area, int radius,
+                                      bool drawFill, const QColor &fillColor,
+                                      bool drawLine, int lineWidth, const QColor &lineColor)
+{
+    int x = area.x();
+    int y = area.y();
+    int w = area.width();
+    int h = area.height();
+    float step = 0.01f;
+
+    glEnable(GL_BLEND);
+
+    if (drawFill)
+    {
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+        glColor4f(fillColor.redF(), fillColor.greenF(), fillColor.blueF(), fillColor.alphaF());
+        glLineWidth(lineWidth);
+
+        glBegin(GL_POLYGON);
+        glVertex2f(x + radius, y);
+        glVertex2f(x + w - radius, y);
+        for (float t = 3.1415f * 1.5f; t < 3.1415f * 2; t += step)
+        {
+            float sx = x +w - radius + cos(t) * radius;
+            float sy = y + radius + sin(t) * radius;
+            glVertex2f(sx, sy);
+        }
+        glVertex2f (x + w, y + radius);
+        glVertex2f (x + w, y + h - radius);
+        for (float t = 0; t < 3.1415f * 0.5f; t += step)
+        {
+            float sx = x + w - radius + cos(t) * radius;
+            float sy = y +h -radius + sin(t) * radius;
+            glVertex2f (sx, sy);
+        }
+
+        glVertex2f(x + w -radius, y+h);
+        glVertex2f(x +radius, y+h);
+        for (float t = 3.1415f * 0.5f; t < 3.1415f; t += step)
+        {
+            float sx = x  + radius + cos(t) * radius;
+            float sy = y + h - radius + sin(t) * radius;
+            glVertex2f(sx, sy);
+        }
+
+        glVertex2f (x, y + h - radius);
+        glVertex2f (x, y + radius);
+        for (float t = 3.1415f; t < 3.1415f * 1.5f; t += step)
+        {
+            float sx = x + radius + cos(t) * radius;
+            float sy = y + radius + sin(t) * radius;
+            glVertex2f(sx, sy);
+        }
+
+        glEnd();
+        glDisable(GL_LINE_SMOOTH);
+    }
+
+    if (drawLine)
+    {
+        glEnable(GL_LINE_SMOOTH);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+        glColor4f(lineColor.redF(), lineColor.greenF(), lineColor.blueF(), lineColor.alphaF());
+        glLineWidth(lineWidth);
+
+
+        glBegin(GL_LINES);
+        glVertex2f(x + radius, y);
+        glVertex2f(x + w - radius, y);
+        for (float t = 3.1415f * 1.5f; t < 3.1415f * 2; t += step)
+        {
+            float sx = x +w - radius + cos(t) * radius;
+            float sy = y + radius + sin(t) * radius;
+            glVertex2f(sx, sy);
+        }
+        glVertex2f (x + w, y + radius);
+        glVertex2f (x + w, y + h - radius);
+        for (float t = 0; t < 3.1415f * 0.5f; t += step)
+        {
+            float sx = x + w - radius + cos(t) * radius;
+            float sy = y +h -radius + sin(t) * radius;
+            glVertex2f (sx, sy);
+        }
+
+        glVertex2f(x + w -radius, y+h);
+        glVertex2f(x +radius, y+h);
+        for (float t = 3.1415f * 0.5f; t < 3.1415f; t += step)
+        {
+            float sx = x  + radius + cos(t) * radius;
+            float sy = y + h - radius + sin(t) * radius;
+            glVertex2f(sx, sy);
+        }
+
+        glVertex2f (x, y + h - radius);
+        glVertex2f (x, y + radius);
+        for (float t = 3.1415f; t < 3.1415f * 1.5f; t += step)
+        {
+            float sx = x + radius + cos(t) * radius;
+            float sy = y + radius + sin(t) * radius;
+            glVertex2f(sx, sy);
+        }
+
+        glEnd();
+        glDisable(GL_LINE_SMOOTH);
+    }
+
+    glDisable(GL_BLEND);
 }
 
 MythImage *MythOpenGLPainter::GetFormatImage()

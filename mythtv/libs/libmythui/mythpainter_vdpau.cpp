@@ -701,6 +701,18 @@ void MythVDPAUPainter::DrawText(const QRect &r, const QString &msg,
     d->DrawText(r, msg, flags, font, alpha, boundRect);
 }
 
+void MythVDPAUPainter::DrawRect(const QRect &area,
+                                bool drawFill, const QColor &fillColor, 
+                                bool drawLine, int lineWidth, const QColor &lineColor)
+{
+}
+
+void MythVDPAUPainter::DrawRoundRect(const QRect &area, int radius, 
+                                     bool drawFill, QColor fillColor, 
+                                     bool drawLine, int lineWidth, QColor lineColor)
+{
+}
+
 MythImage *MythVDPAUPainter::GetFormatImage()
 {
     return new MythImage(this);

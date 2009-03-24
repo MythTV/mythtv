@@ -152,6 +152,44 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
     painter->drawText(r, flags, msg);
 }
 
+void MythQtPainter::DrawRect(const QRect &area,
+                             bool drawFill, const QColor &fillColor, 
+                             bool drawLine, int lineWidth, const QColor &lineColor)
+{
+    if (drawLine)
+        painter->setPen(QPen(lineColor, lineWidth));
+    else
+        painter->setPen(QPen(Qt::NoPen));
+
+    if (drawFill)
+        painter->setBrush(QBrush(fillColor));
+    else
+        painter->setBrush(QBrush(Qt::NoBrush));
+
+    painter->drawRect(area);
+}
+
+void MythQtPainter::DrawRoundRect(const QRect &area, int radius, 
+                                  bool drawFill, const QColor &fillColor, 
+                                  bool drawLine, int lineWidth, const QColor &lineColor)
+{
+    painter->setRenderHint(QPainter::Antialiasing);
+
+    if (drawLine)
+        painter->setPen(QPen(lineColor, lineWidth));
+    else
+        painter->setPen(QPen(Qt::NoPen));
+
+    if (drawFill)
+        painter->setBrush(QBrush(fillColor));
+    else
+        painter->setBrush(QBrush(Qt::NoBrush));
+
+    painter->drawRoundRect(area, 100 / (area.width() / radius / 2), 100 / (area.height() / radius / 2));
+
+    painter->setRenderHint(QPainter::Antialiasing, false);
+}
+
 MythImage *MythQtPainter::GetFormatImage()
 {
     return new MythQtImage(this);
