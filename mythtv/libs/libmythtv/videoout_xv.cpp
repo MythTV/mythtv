@@ -3223,7 +3223,7 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
 
     if (XVideoVDPAU == VideoOutputSubType())
     {
-        if (windows[0].IsRepaintNeeded())
+        if (windows[0].IsRepaintNeeded() && !windows[0].IsEmbedding())
         {
             X11L;
             XSetForeground(XJ_disp, XJ_gc, vdpau_colorkey);
