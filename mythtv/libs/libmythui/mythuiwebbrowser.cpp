@@ -818,7 +818,6 @@ bool MythUIWebBrowser::ParseElement(QDomElement &element)
     return true;
 }
 
-//FIXME check this is correct
 void MythUIWebBrowser::CopyFrom(MythUIType *base)
 {
     MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *>(base);
@@ -828,13 +827,14 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
         return;
     }
 
+    MythUIType::CopyFrom(base);
 
     m_zoom = browser->m_zoom;
     m_bgColor = browser->m_bgColor;
     m_widgetUrl = browser->m_widgetUrl;
     m_updateInterval = browser->m_updateInterval;
 
-    MythUIType::CopyFrom(base);
+    Init();
 }
 
 void MythUIWebBrowser::CreateCopy(MythUIType *parent)
