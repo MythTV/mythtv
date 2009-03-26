@@ -722,7 +722,7 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t 
   uint16_t parts, i;
   title_info_t *ptitle = NULL;
   ptt_info_t *ptt = NULL;
-  ifo_handle_t *ifo;
+  ifo_handle_t *ifo = NULL;
   pgc_t *pgc;
   cell_playback_t *cell;
   uint64_t length, *tmp=NULL;
@@ -742,6 +742,7 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t 
   ifo = vm_get_title_ifo(this->vm, title);
   if(!ifo || !ifo->vts_pgcit) {
     printerr("Couldn't open IFO for chosen title, exit.");
+    retval = 0;
     goto fail;
   }
 
@@ -782,11 +783,14 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t 
   }
   *duration = length;
   vm_ifo_close(ifo);
+  ifo = NULL;
   retval = parts;
   *times = tmp;
 
 fail:
   pthread_mutex_unlock(&this->vm_lock);
+  if(!retval && ifo)
+    vm_ifo_close(ifo);
   if(!retval && tmp)
     free(tmp);
   return retval;
