@@ -1039,6 +1039,21 @@ void OpenGLContext::SetFence(void)
     MakeCurrent(false);
 }
 
+bool OpenGLContext::OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
+{
+    bool ret = (GetNumberOfScreens() > 1);
+    if (ret)
+    {
+        float displayAspect = gContext->GetFloatSettingOnHost(
+            "XineramaMonitorAspectRatio",
+            gContext->GetHostName(), pixel_aspect);
+        if (disp_dim.height() <= 0)
+            disp_dim.setHeight(300);
+        disp_dim.setWidth((int)((float)disp_dim.height() * displayAspect));
+    }
+
+    return ret;
+}
 #ifdef USING_X11
 
 OpenGLContextGLX::OpenGLContextGLX(QMutex *lock)
@@ -1372,22 +1387,6 @@ void OpenGLContextGLX::MoveResizeWindow(QRect rect)
                            rect.left(), rect.top(),
                            rect.width(), rect.height()));
     m_window_rect = rect;
-}
-
-bool OpenGLContextGLX::OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
-{
-    bool ret = (GetNumberOfXineramaScreens() > 1);
-    if (ret)
-    {
-        float displayAspect = gContext->GetFloatSettingOnHost(
-            "XineramaMonitorAspectRatio",
-            gContext->GetHostName(), pixel_aspect);
-        if (disp_dim.height() <= 0)
-            disp_dim.setHeight(300);
-        disp_dim.setWidth((int)((float)disp_dim.height() * displayAspect));
-    }
-
-    return ret;
 }
 #endif // USING_X11
 

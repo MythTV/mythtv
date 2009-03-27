@@ -19,6 +19,9 @@ using namespace std;
 #ifdef Q_WS_MACX
 #include "util-osx.h"
 #import <agl.h>
+#if CONFIG_DARWIN
+#include "util-x11.h"
+#endif
 #endif
 
 #include "frame.h"
@@ -90,8 +93,7 @@ class OpenGLContext
     virtual void SetSwapInterval(int interval) = 0;
     virtual void GetDisplayDimensions(QSize &dimensions) = 0;
     virtual int  GetNumberOfScreens(void) { return 1; }
-    virtual bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
-        { return false; }
+    virtual bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect);
     virtual void GetDisplaySize(QSize &size) = 0;
     virtual void MoveResizeWindow(QRect rect) { }
     virtual void EmbedInWidget(int x, int y, int w, int h) { }
@@ -189,7 +191,6 @@ class OpenGLContextGLX : public OpenGLContext
     void SetSwapInterval(int interval);
     void GetDisplayDimensions(QSize &dimensions);
     int  GetNumberOfScreens(void) { return GetNumberOfXineramaScreens(); }
-    bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect);
     void GetDisplaySize(QSize &size);
     void MoveResizeWindow(QRect rect);
 
@@ -251,7 +252,8 @@ class OpenGLContextAGL : public OpenGLContext
     OpenGLContextAGL(QMutex *lock);
     ~OpenGLContextAGL();
 
-    bool Create(WId window, const QRect &display_visible, bool colour_control = false);
+    bool Create(WId window, const QRect &display_visible,
+                bool colour_control = false);
     void Show(void) { }
     void MapWindow(void) { }
     void Hide(void) { }
@@ -262,6 +264,8 @@ class OpenGLContextAGL : public OpenGLContext
     void SetSwapInterval(int interval);
     void GetDisplayDimensions(QSize &dimensions);
     void GetDisplaySize(QSize &size);
+    int  GetNumberOfScreens(void)
+        { return GetNumberOfXineramaScreens(); }
     void MoveResizeWindow(QRect rect);    
     void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
