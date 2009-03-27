@@ -1680,13 +1680,7 @@ bool MpegRecorder::WaitFor_HDPVR(void)
     polls.events  = POLLIN;
     polls.revents = 0;
 
-    for (idx = 0; idx < 10; ++idx)
-    {
-        if (poll(&polls, 1, 250) > 0)
-            break;
-    }
-
-    if (idx == 10)
+    if (poll(&polls, 1, 5000) <= 0)
         return false;
 
     // HD-PVR should now be "ready"
