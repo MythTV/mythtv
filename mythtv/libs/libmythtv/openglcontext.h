@@ -89,6 +89,7 @@ class OpenGLContext
     virtual int  GetRefreshRate(void) = 0;
     virtual void SetSwapInterval(int interval) = 0;
     virtual void GetDisplayDimensions(QSize &dimensions) = 0;
+    virtual int  GetNumberOfScreens(void) { return 1; }
     virtual bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
         { return false; }
     virtual void GetDisplaySize(QSize &size) = 0;
@@ -187,6 +188,7 @@ class OpenGLContextGLX : public OpenGLContext
     int  GetRefreshRate(void);
     void SetSwapInterval(int interval);
     void GetDisplayDimensions(QSize &dimensions);
+    int  GetNumberOfScreens(void) { return GetNumberOfXineramaScreens(); }
     bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect);
     void GetDisplaySize(QSize &size);
     void MoveResizeWindow(QRect rect);

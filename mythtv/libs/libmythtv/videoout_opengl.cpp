@@ -717,7 +717,7 @@ void VideoOutputOpenGL::InitDisplayMeasurements(void)
     }
 
     QDesktopWidget * desktop = QApplication::desktop();
-    bool             usingXinerama = (GetNumberOfXineramaScreens() > 1);
+    bool             usingXinerama = (gl_context->GetNumberOfScreens() > 1);
     int              screen = desktop->primaryScreen();
  
     if (usingXinerama)
