@@ -18,16 +18,16 @@ INCLUDEPATH = .. ../..
 DEFINES -= MMX
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
-# Debug mode on x86 must compile without -fPIC and with -O, 
+# Debug mode on x86 must compile without -fPIC and with -O,
 # otherwise gcc runs out of registers.
 # libavcodec rev 7671 needs another register
 # -fomit-frame-pointer frees it. gcc-4 enables "location lists"
 # which allows debugging without frame pointer
 debug:contains(ARCH_X86_32, yes) {
-        QMAKE_CFLAGS_SHLIB = 
+        QMAKE_CFLAGS_SHLIB =
         QMAKE_CFLAGS_DEBUG += -fomit-frame-pointer
 }
-# "-Os" can not compiled with PIC 
+# "-Os" can not compiled with PIC
 contains(CONFIG_SMALL, yes):contains(ARCH_X86_32, yes) {
 	QMAKE_CFLAGS_SHLIB =
 }
@@ -498,7 +498,7 @@ contains( CONFIG_MLIB, yes ) {
 }
 
 contains( ARCH_ALPHA, yes ) {
-    SOURCES += alpha/dsputil_alpha.c alpha/mpegvideo_alpha.c 
+    SOURCES += alpha/dsputil_alpha.c alpha/mpegvideo_alpha.c
     SOURCES += alpha/motion_est_alpha.c alpha/dsputil_alpha_asm.S
     SOURCES += alpha/simple_idct_alpha.c alpha/motion_est_mvi_asm.S
     QMAKE_CFLAGS_RELEASE += -fforce-addr -freduce-all-givs
