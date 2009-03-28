@@ -9,6 +9,9 @@ QMutex x11_lock;
 
 #ifdef USING_X11
 #include "util-x11.h"
+#ifndef V_INTERLACE
+#define V_INTERLACE (0x010)
+#endif
 extern "C" {
 #include <X11/extensions/Xinerama.h>
 #include <X11/extensions/xf86vmode.h>
@@ -263,6 +266,14 @@ int MythXGetRefreshRate(Display *display, int screen)
     }
 
     rate = (dot_clock * 1000.0) / rate;
+
+    if (((mode_line.flags & V_INTERLACE) != 0) &&
+        rate > 24.5 && rate < 30.5)
+    {
+        VERBOSE(VB_PLAYBACK, "MythXGetRefreshRate(): "
+                "Doubling refresh rate for interlaced display.");
+        rate *= 2.0;
+    }
 
     // Assume 60Hz if rate isn't good:
     if (rate < 20 || rate > 200)
