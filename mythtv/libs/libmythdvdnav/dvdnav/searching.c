@@ -272,7 +272,7 @@ dvdnav_status_t dvdnav_sector_search(dvdnav_t *this,
     target += offset;
     break;
    case SEEK_END:
-    if(length - offset < 0) {
+    if(length < offset) {
       printerr("Request to seek before start.");
       pthread_mutex_unlock(&this->vm_lock);
       return DVDNAV_STATUS_ERR;
@@ -636,7 +636,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
     return DVDNAV_STATUS_ERR;
   }
 
-  uint32_t cur_vobu, new_vobu, start, offset;
+  uint32_t cur_vobu, new_vobu = 0, start, offset;
   uint32_t first_cell_nr, last_cell_nr, cell_nr;
   cell_playback_t *cell;
   int i, length, scan_admap;
@@ -658,6 +658,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
     last_cell_nr = state->pgc->nr_of_cells - 1;
   } else {
     printerr("dvdnav_time_relative_time_search: works only if pgc_based is enabled");
+    pthread_mutex_unlock(&this->vm_lock);
     return DVDNAV_STATUS_ERR;
   }
 
@@ -666,7 +667,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
     dsi = dvdnav_get_current_nav_dsi(this);
     if (length > 0) {
       for (i = 1; i <= 19; i++) {
-        if (stime[i]/2.0 <= length/2.0) {
+        if (stime[i-1]/2.0 <= length/2.0) {
           offset = dsi->vobu_sri.fwda[i];
           if (offset >> 31) {
             new_vobu = cur_vobu + (offset & 0xffff);
@@ -707,6 +708,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
   if (scan_admap)
   {
     if (dvdnav_scan_admap(this, state->domain, offset, &new_vobu) == DVDNAV_STATUS_ERR)
+      pthread_mutex_unlock(&this->vm_lock);
       return DVDNAV_STATUS_ERR;
   }
   start =  state->pgc->cell_playback[cell_nr].first_sector;
