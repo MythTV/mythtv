@@ -43,7 +43,7 @@ static bool updateLastRunEnd(MSqlQuery &query)
     query.prepare("UPDATE settings SET data = :ENDTIME "
                   "WHERE value='mythfilldatabaseLastRunEnd'");
 
-    query.bindValue(qdtNow.toString("yyyy-MM-dd hh:mm"), ":ENDTIME");
+    query.bindValue(":ENDTIME", qdtNow.toString("yyyy-MM-dd hh:mm"));
 
     if (!query.exec())
     {
@@ -59,7 +59,7 @@ static bool updateLastRunStart(MSqlQuery &query)
     query.prepare("UPDATE settings SET data = :STARTTIME "
                   "WHERE value='mythfilldatabaseLastRunStart'");
 
-    query.bindValue(qdtNow.toString("yyyy-MM-dd hh:mm"), ":STARTTIME");
+    query.bindValue(":STARTTIME", qdtNow.toString("yyyy-MM-dd hh:mm"));
 
     if (!query.exec())
     {
@@ -74,7 +74,7 @@ static bool updateLastRunStatus(MSqlQuery &query, QString &status)
     query.prepare("UPDATE settings SET data = :STATUS "
                   "WHERE value='mythfilldatabaseLastRunStatus'");
 
-    query.bindValue(status, ":STATUS");
+    query.bindValue(":STATUS", status);
 
     if (!query.exec())
     {
