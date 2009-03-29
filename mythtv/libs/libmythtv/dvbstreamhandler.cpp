@@ -200,9 +200,9 @@ void DVBStreamHandler::Start(void)
             return;
         }
 
+        is_running_lock.lock();
         while (!IsRunning())
         {
-            is_running_lock.lock();
             _running_state_changed.wait(&is_running_lock, 100);
         }
     }
