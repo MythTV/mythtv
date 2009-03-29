@@ -37,7 +37,7 @@ using namespace std;
 #define LOC_WARN QString("FillData, Warning: ")
 #define LOC_ERR QString("FillData, Error: ")
 
-static bool updateLastRunEnd(MSqlQuery &query)
+bool updateLastRunEnd(MSqlQuery &query)
 {
     QDateTime qdtNow = QDateTime::currentDateTime();                                     
     query.prepare("UPDATE settings SET data = :ENDTIME "
@@ -53,7 +53,7 @@ static bool updateLastRunEnd(MSqlQuery &query)
     return true;
 }
 
-static bool updateLastRunStart(MSqlQuery &query)
+bool updateLastRunStart(MSqlQuery &query)
 {
     QDateTime qdtNow = QDateTime::currentDateTime();                                     
     query.prepare("UPDATE settings SET data = :STARTTIME "
@@ -69,7 +69,7 @@ static bool updateLastRunStart(MSqlQuery &query)
     return true;
 }
 
-static bool updateLastRunStatus(MSqlQuery &query, QString &status)
+bool updateLastRunStatus(MSqlQuery &query, QString &status)
 {                               
     query.prepare("UPDATE settings SET data = :STATUS "
                   "WHERE value='mythfilldatabaseLastRunStatus'");

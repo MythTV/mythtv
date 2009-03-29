@@ -526,20 +526,15 @@ int main(int argc, char *argv[])
         QDateTime GuideDataBefore, GuideDataAfter;
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec(QString("UPDATE settings SET data ='%1' "
-                           "WHERE value='mythfilldatabaseLastRunStart'")
-                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
-
-        query.exec(QString("UPDATE settings SET data ='%1' "
-                           "WHERE value='mythfilldatabaseLastRunStatus'")
-                           .arg(status));
+        updateLastRunStart(query);
+        updateLastRunStatus(query, status);
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
                       "AND manualid = 0;");
         query.bindValue(":SRCID", fromfile_id);
-        query.exec();
-        if (query.isActive() && query.size() > 0)
+
+        if (query.exec() && query.size() > 0)
         {
             query.next();
 
@@ -554,16 +549,14 @@ int main(int argc, char *argv[])
             return FILLDB_EXIT_GRAB_DATA_FAILED;
         }
 
-        query.exec(QString("UPDATE settings SET data ='%1' "
-                           "WHERE value='mythfilldatabaseLastRunEnd'")
-                          .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
+        updateLastRunEnd(query);
 
         query.prepare("SELECT MAX(endtime) FROM program p LEFT JOIN channel c "
                       "ON p.chanid=c.chanid WHERE c.sourceid= :SRCID "
                       "AND manualid = 0;");
         query.bindValue(":SRCID", fromfile_id);
-        query.exec();
-        if (query.isActive() && query.size() > 0)
+
+        if (query.exec() && query.size() > 0)
         {
             query.next();
 
@@ -579,9 +572,7 @@ int main(int argc, char *argv[])
         else
             status = QObject::tr("Successful.");
 
-        query.exec(QString("UPDATE settings SET data ='%1' "
-                           "WHERE value='mythfilldatabaseLastRunStatus'")
-                           .arg(status));
+        updateLastRunStatus(query, status);
     }
     else if (from_dd_file)
     {
@@ -607,9 +598,8 @@ int main(int argc, char *argv[])
                                    "password,lineupid "
                                    "FROM videosource ") + where +
                                    QString(" ORDER BY sourceid;");
-        sourcequery.exec(querystr);
 
-        if (sourcequery.isActive())
+        if (sourcequery.exec(querystr))
         {
              if (sourcequery.size() > 0)
              {
@@ -691,8 +681,8 @@ int main(int argc, char *argv[])
     if (update_icon_data)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("SELECT sourceid FROM videosource ORDER BY sourceid;");
-        if (query.isActive() && query.size() > 0)
+        query.prepare("SELECT sourceid FROM videosource ORDER BY sourceid;");
+        if (query.exec() && query.size() > 0)
         {
             while (query.next())
             {
@@ -720,13 +710,16 @@ int main(int argc, char *argv[])
         VERBOSE(VB_GENERAL, "Marking generic episodes.");
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("UPDATE program SET generic = 1 WHERE "
+        query.prepare("UPDATE program SET generic = 1 WHERE "
             "((programid = '' AND subtitle = '' AND description = '') OR "
             " (programid <> '' AND category_type = 'series' AND "
             "  program.programid LIKE '%0000'));");
 
-        VERBOSE(VB_GENERAL,
-                QString("    Found %1").arg(query.numRowsAffected()));
+        if (!query.exec())
+            MythDB::DBError("mark generic", query);
+        else
+            VERBOSE(VB_GENERAL,
+                    QString("    Found %1").arg(query.numRowsAffected()));
     }
 
     if (mark_repeats)
@@ -736,24 +729,28 @@ int main(int argc, char *argv[])
         int newEpiWindow = gContext->GetNumSetting( "NewEpisodeWindow", 14);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec( QString( "UPDATE program SET previouslyshown = 1 "
-                    "WHERE previouslyshown = 0 "
-                    "AND originalairdate is not null "
-                    "AND (to_days(starttime) - to_days(originalairdate)) > %1;")
-                    .arg(newEpiWindow));
+        query.prepare("UPDATE program SET previouslyshown = 1 "
+                      "WHERE previouslyshown = 0 "
+                      "AND originalairdate is not null "
+                      "AND (to_days(starttime) - to_days(originalairdate)) "
+                      "    > :NEWWINDOW;");
+        query.bindValue(newEpiWindow, ":NEWWINDOW");
 
-        VERBOSE(VB_GENERAL,
-                QString("    Found %1").arg(query.numRowsAffected()));
+        if (query.exec())
+            VERBOSE(VB_GENERAL,
+                    QString("    Found %1").arg(query.numRowsAffected()));
 
         VERBOSE(VB_GENERAL, "Unmarking new episode rebroadcast repeats.");
-        query.exec( QString( "UPDATE program SET previouslyshown = 0 "
-                             "WHERE previouslyshown = 1 "
-                             "AND originalairdate is not null "
-                             "AND (to_days(starttime) - to_days(originalairdate)) <= %1;")
-                             .arg(newEpiWindow));
+        query.prepare("UPDATE program SET previouslyshown = 0 "
+                      "WHERE previouslyshown = 1 "
+                      "AND originalairdate is not null "
+                      "AND (to_days(starttime) - to_days(originalairdate)) "
+                      "    <= :NEWWINDOW;");
+        query.bindValue(newEpiWindow, ":NEWWINDOW");
 
-        VERBOSE(VB_GENERAL,
-                QString("    Found %1").arg(query.numRowsAffected()));
+        if (query.exec())
+            VERBOSE(VB_GENERAL,
+                    QString("    Found %1").arg(query.numRowsAffected()));
     }
 
     // Mark first and last showings

@@ -19,6 +19,11 @@ using namespace std;
 
 #define REFRESH_MAX 21
 
+// helper functions to update mfdb status fields in settings
+bool updateLastRunEnd(MSqlQuery &query);
+bool updateLastRunStart(MSqlQuery &query);
+bool updateLastRunStatus(MSqlQuery &query, QString &status);
+
 struct Source
 {
     int id;
