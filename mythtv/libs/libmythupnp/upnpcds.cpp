@@ -892,9 +892,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem(
             {
                 BuildItemQuery( query, mapParams );
 
-                query.exec();
-    
-                if (query.isActive() && query.size() > 0)
+                if (query.exec() && query.size() > 0)
                 {
                     if ( query.next() )
                     {
@@ -969,9 +967,8 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
 
                     query.prepare  ( sSQL );
                     query.bindValue( ":KEY", sKey );
-                    query.exec();
 
-                    if (query.isActive() && query.size() > 0)
+                    if (query.exec() && query.size() > 0)
                     {
                         if ( query.next() )
                         {
@@ -1075,9 +1072,8 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessContainer( UPnpCDSRequest     
                            .arg( pRequest->m_nRequestedCount );
 
                 query.prepare( sSQL );
-                query.exec();
 
-                if (query.isActive() && query.size() > 0)
+                if (query.exec() && query.size() > 0)
                 {
 
                     while(query.next())
@@ -1147,9 +1143,8 @@ int UPnpCDSExtension::GetDistinctCount( UPnpCDSRootInfo *pInfo )
         }
 
         query.prepare( sSQL );
-        query.exec();
 
-        if (query.size() > 0)
+        if (query.exec() && query.size() > 0)
         {
             query.next();
 
@@ -1181,9 +1176,8 @@ int UPnpCDSExtension::GetCount( const QString &sColumn, const QString &sKey )
         query.prepare( sSQL );
         if ( sKey.length() )
             query.bindValue( ":KEY", sKey );
-        query.exec();
 
-        if (query.size() > 0)
+        if (query.exec() && query.size() > 0)
         {
             query.next();
 
@@ -1241,9 +1235,8 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
         query.prepare  ( sSQL );
         if ( sKey.length() )
             query.bindValue(":KEY", sKey );
-        query.exec();
 
-        if (query.isActive() && query.size() > 0)
+        if (query.exec() && query.size() > 0)
         {
             while(query.next()) 
                 AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );
