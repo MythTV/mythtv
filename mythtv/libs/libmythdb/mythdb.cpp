@@ -306,9 +306,8 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
                           "= :KEY AND hostname = :HOSTNAME ;");
             query.bindValue(":KEY", key);
             query.bindValue(":HOSTNAME", d->m_localhostname);
-            query.exec();
 
-            if (query.isActive() && query.size() > 0)
+            if (query.exec() && query.size() > 0)
             {
                 query.next();
                 value = query.value(0).toString();
@@ -320,9 +319,8 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
                               "WHERE value = :KEY AND "
                               "hostname IS NULL;");
                 query.bindValue(":KEY", key);
-                query.exec();
 
-                if (query.isActive() && query.size() > 0)
+                if (query.exec() && query.size() > 0)
                 {
                     query.next();
                     value = query.value(0).toString();

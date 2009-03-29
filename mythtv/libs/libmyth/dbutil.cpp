@@ -237,12 +237,14 @@ bool DBUtil::BackupDB(QString &filename)
         QString dbTag("BackupDB");
         query.prepare("DELETE FROM housekeeping WHERE tag = :TAG ;");
         query.bindValue(":TAG", dbTag);
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("DBUtil::BackupDB", query);
 
         query.prepare("INSERT INTO housekeeping(tag,lastrun) "
                        "values(:TAG ,now()) ;");
         query.bindValue(":TAG", dbTag);
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("DBUtil::BackupDB", query);
     }
 
     return result;
