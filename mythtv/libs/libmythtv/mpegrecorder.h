@@ -61,7 +61,7 @@ class MpegRecorder : public DTVRecorder,
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
     // ReaderPausedCB
-    virtual void ReaderPaused(int fd) { paused = true; pauseWait.wakeAll(); }
+    virtual void ReaderPaused(int fd) { pauseWait.wakeAll(); }
 
   private:
     void SetIntOption(RecordingProfile *profile, const QString &name);
