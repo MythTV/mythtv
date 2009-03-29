@@ -419,7 +419,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
 
         // draw the albumArt image
         QImage image(albumArt);
-        image = image.scaled(width(), height(), 
+        image = image.scaled(width(), height(),
                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
         p.drawImage(QPoint(width() / 2 - image.width() / 2, height() / 2 - image.height() / 2), image);
 
@@ -438,7 +438,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
             // draw the albumArt image
 
             QImage image(albumArt);
-            image = image.scaled(height(), height(), 
+            image = image.scaled(height(), height(),
                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
             p.drawImage(QPoint(0, 0), image);
             x += height();
@@ -543,7 +543,6 @@ bool StereoScope::process( VisualNode *node )
     bool allZero = TRUE;
     int i;
     long s, indexTo;
-    double *magnitudesp = magnitudes.data();
     double valL, valR, tmpL, tmpR;
     double index, step = 512.0 / size.width();
 
@@ -555,8 +554,8 @@ bool StereoScope::process( VisualNode *node )
                 indexTo = (int)(index + 1);
 
         if ( rubberband ) {
-        valL = magnitudesp[ i ];
-        valR = magnitudesp[ i + size.width() ];
+        valL = magnitudes[ i ];
+        valR = magnitudes[ i + size.width() ];
         if (valL < 0.) {
             valL += falloff;
             if ( valL > 0. )
@@ -598,14 +597,14 @@ bool StereoScope::process( VisualNode *node )
         if (valL != 0. || valR != 0.)
         allZero = FALSE;
 
-        magnitudesp[ i ] = valL;
-        magnitudesp[ i + size.width() ] = valR;
+        magnitudes[ i ] = valL;
+        magnitudes[ i + size.width() ] = valR;
 
         index = index + step;
     }
     } else if (rubberband) {
     for ( i = 0; i < size.width(); i++) {
-        valL = magnitudesp[ i ];
+        valL = magnitudes[ i ];
         if (valL < 0) {
         valL += 2;
         if (valL > 0.)
@@ -616,7 +615,7 @@ bool StereoScope::process( VisualNode *node )
             valL = 0.;
         }
 
-        valR = magnitudesp[ i + size.width() ];
+        valR = magnitudes[ i + size.width() ];
         if (valR < 0.) {
         valR += falloff;
         if (valR > 0.)
@@ -630,12 +629,12 @@ bool StereoScope::process( VisualNode *node )
         if (valL != 0. || valR != 0.)
         allZero = FALSE;
 
-        magnitudesp[ i ] = valL;
-        magnitudesp[ i + size.width() ] = valR;
+        magnitudes[ i ] = valL;
+        magnitudes[ i + size.width() ] = valR;
     }
     } else {
     for ( i = 0; (unsigned) i < magnitudes.size(); i++ )
-        magnitudesp[ i ] = 0.;
+        magnitudes[ i ] = 0.;
     }
 
     return allZero;
@@ -643,13 +642,12 @@ bool StereoScope::process( VisualNode *node )
 
 bool StereoScope::draw( QPainter *p, const QColor &back )
 {
-    double *magnitudesp = magnitudes.data();
     double r, g, b, per;
 
     p->fillRect(0, 0, size.width(), size.height(), back);
     for ( int i = 1; i < size.width(); i++ ) {
     // left
-    per = double( magnitudesp[ i ] * 2 ) /
+    per = double( magnitudes[ i ] * 2 ) /
           double( size.height() / 4 );
     if (per < 0.0)
         per = -per;
@@ -682,11 +680,11 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
 
     p->setPen( QColor( int(r), int(g), int(b) ) );
         p->setPen(Qt::red);
-    p->drawLine( i - 1, (int)((size.height() / 4) + magnitudesp[i - 1]),
-             i, (int)((size.height() / 4) + magnitudesp[i]));
+    p->drawLine( i - 1, (int)((size.height() / 4) + magnitudes[i - 1]),
+             i, (int)((size.height() / 4) + magnitudes[i]));
 
     // right
-    per = double( magnitudesp[ i + size.width() ] * 2 ) /
+    per = double( magnitudes[ i + size.width() ] * 2 ) /
           double( size.height() / 4 );
     if (per < 0.0)
         per = -per;
@@ -720,9 +718,9 @@ bool StereoScope::draw( QPainter *p, const QColor &back )
     p->setPen( QColor( int(r), int(g), int(b) ) );
         p->setPen(Qt::red);
     p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
-             magnitudesp[i + size.width() - 1]),
+             magnitudes[i + size.width() - 1]),
              i, (int)((size.height() * 3 / 4) +
-                     magnitudesp[i + size.width()]));
+                     magnitudes[i + size.width()]));
     }
 
     return true;
@@ -741,7 +739,6 @@ bool MonoScope::process( VisualNode *node )
     bool allZero = TRUE;
     int i;
     long s, indexTo;
-    double *magnitudesp = magnitudes.data();
     double val, tmp;
 
     double index, step = 512.0 / size.width();
@@ -757,7 +754,7 @@ bool MonoScope::process( VisualNode *node )
 
             if ( rubberband )
             {
-                val = magnitudesp[ i ];
+                val = magnitudes[ i ];
                 if (val < 0.)
                 {
                     val += falloff;
@@ -799,14 +796,14 @@ bool MonoScope::process( VisualNode *node )
             {
                 allZero = FALSE;
             }
-            magnitudesp[ i ] = val;
+            magnitudes[ i ] = val;
             index = index + step;
         }
     }
     else if (rubberband)
     {
         for ( i = 0; i < size.width(); i++) {
-            val = magnitudesp[ i ];
+            val = magnitudes[ i ];
             if (val < 0) {
                 val += 2;
                 if (val > 0.)
@@ -819,13 +816,13 @@ bool MonoScope::process( VisualNode *node )
 
             if ( val != 0. )
                 allZero = FALSE;
-            magnitudesp[ i ] = val;
+            magnitudes[ i ] = val;
         }
     }
     else
     {
         for ( i = 0; i < size.width(); i++ )
-            magnitudesp[ i ] = 0.;
+            magnitudes[ i ] = 0.;
     }
 
     return allZero;
@@ -833,12 +830,11 @@ bool MonoScope::process( VisualNode *node )
 
 bool MonoScope::draw( QPainter *p, const QColor &back )
 {
-    double *magnitudesp = magnitudes.data();
     double r, g, b, per;
 
     p->fillRect( 0, 0, size.width(), size.height(), back );
     for ( int i = 1; i < size.width(); i++ ) {
-        per = double( magnitudesp[ i ] ) /
+        per = double( magnitudes[ i ] ) /
               double( size.height() / 4 );
         if (per < 0.0)
             per = -per;
@@ -871,8 +867,8 @@ bool MonoScope::draw( QPainter *p, const QColor &back )
 
         p->setPen(Qt::red);
         //p->setPen(QColor(int(r), int(g), int(b)));
-        p->drawLine( i - 1, (int)(size.height() / 2 + magnitudesp[ i - 1 ]),
-                     i, (int)(size.height() / 2 + magnitudesp[ i ] ));
+        p->drawLine( i - 1, (int)(size.height() / 2 + magnitudes[ i - 1 ]),
+                     i, (int)(size.height() / 2 + magnitudes[ i ] ));
     }
 
     return true;
