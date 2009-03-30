@@ -503,20 +503,12 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
 bool MpegRecorder::SetFormat(int chanfd)
 {
-    uint   idx;
     struct v4l2_format vfmt;
     bzero(&vfmt, sizeof(vfmt));
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    for (idx = 0; idx < 20; ++idx)
-    {
-        if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) == 0)
-            break;
-        usleep(100 * 1000);
-    }
-
-    if (idx == 20)
+    if (ioctl(chanfd, VIDIOC_G_FMT, &vfmt) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Error getting format" + ENO);
         return false;
@@ -1505,31 +1497,20 @@ bool MpegRecorder::StartEncoding(int fd)
 
     VERBOSE(VB_RECORD, LOC + "StartEncoding");
 
-    for (int idx = 0; idx < 20; ++idx)
+    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
     {
-        if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+        if (driver == "hdpvr")
         {
-            if (driver == "hdpvr")
-            {
-                m_h264_parser.Reset();
-                _wait_for_keyframe_option = true;
-                _seen_sps = false;
-            }
-
-            VERBOSE(VB_RECORD, LOC + "Encoding started");
-            return true;
+            m_h264_parser.Reset();
+            _wait_for_keyframe_option = true;
+            _seen_sps = false;
         }
 
-        if (errno != EAGAIN)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncoding" + ENO);
-            return false;
-        }
-
-        usleep(100 * 1000);
+        VERBOSE(VB_RECORD, LOC + "Encoding started");
+        return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncoding - giving up" + ENO);
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncoding failed" + ENO);
     return false;
 }
 
@@ -1543,25 +1524,13 @@ bool MpegRecorder::StopEncoding(int fd)
 
     VERBOSE(VB_RECORD, LOC + "StopEncoding");
 
-    for (int idx = 0; idx < 20; ++idx)
+    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
     {
-
-        if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
-        {
-            VERBOSE(VB_RECORD, LOC + "Encoding stopped");
-            return true;
-        }
-
-        if (errno != EAGAIN)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncoding" + ENO);
-            return false;
-        }
-
-        usleep(100 * 1000);
+        VERBOSE(VB_RECORD, LOC + "Encoding stopped");
+        return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncoding - giving up" + ENO);
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncoding failed" + ENO);
     return false;
 }
 
@@ -1646,10 +1615,14 @@ void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
         DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
 }
 
+/// After a resolution change, it can take the HD-PVR a few
+/// seconds before it is usable again.
 bool MpegRecorder::WaitFor_HDPVR(void)
 {
-    // After a resolution change, it can take the HD-PVR a few
-    // seconds before it is usable again.
+    struct v4l2_encoder_cmd command;
+    struct v4l2_format vfmt;
+    struct pollfd polls;
+    int    idx;
 
     // Tell it to start encoding, then wait for it to actually feed us
     // some data.
@@ -1658,10 +1631,6 @@ bool MpegRecorder::WaitFor_HDPVR(void)
     // Sleep any less than 1.5 seconds, and the HD-PVR will
     // return the old resolution, when the resolution is changing.
     usleep(1500 * 1000);
-
-    struct v4l2_encoder_cmd command;
-    struct pollfd polls;
-    int    idx;
 
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_START;
@@ -1686,13 +1655,21 @@ bool MpegRecorder::WaitFor_HDPVR(void)
     // HD-PVR should now be "ready"
     command.cmd = V4L2_ENC_CMD_STOP;
 
+    if (ioctl(readfd, VIDIOC_ENCODER_CMD, &command) < 0)
+        return false;
+
+    memset(&vfmt, 0, sizeof(vfmt));
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
     for (idx = 0; idx < 20; ++idx)
     {
-        if (ioctl(readfd, VIDIOC_ENCODER_CMD, &command) == 0)
+        if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
             return true;
+        // Typically takes 0.9 seconds after a resolution change
         usleep(100 * 1000);
     }
 
+    VERBOSE(VB_RECORD, LOC + "WaitForHDPVR failed");
     return false;
 }
 
@@ -1728,6 +1705,7 @@ void MpegRecorder::SetBitrate(int bitrate, int maxbitrate,
 void MpegRecorder::HandleResolutionChanges(void)
 {
     VERBOSE(VB_RECORD, LOC + "Checking Resolution");
+    uint pix = 0;
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1735,20 +1713,11 @@ void MpegRecorder::HandleResolutionChanges(void)
     if (driver == "hdpvr")
         WaitFor_HDPVR();
 
-    uint idx;
-    uint pix = 0;
-
-    for (idx = 0; idx < 20; ++idx)
+    if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
     {
-        if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
-        {
-            VERBOSE(VB_RECORD, LOC + QString("Got Resolution %1x%2")
+        VERBOSE(VB_RECORD, LOC + QString("Got Resolution %1x%2")
                 .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
-            pix = vfmt.fmt.pix.width * vfmt.fmt.pix.height;
-            break;
-        }
-        // Typically takes 0.9 seconds after a resolution change
-        usleep(100 * 1000);
+        pix = vfmt.fmt.pix.width * vfmt.fmt.pix.height;
     }
 
     if (!pix)
