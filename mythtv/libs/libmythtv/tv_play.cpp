@@ -7618,12 +7618,14 @@ void TV::DoEditSchedule(int editType)
     bool pause_active = true;
     bool isNearEnd = false;
     bool isLiveTV = StateIsLiveTV(GetState(actx));
+    bool allowEPG = false;
 
     {
         actx->LockDeleteNVP(__FILE__, __LINE__);
-        pause_active =
-            !actx->nvp || !actx->nvp->getVideoOutput() ||
-            !actx->nvp->getVideoOutput()->AllowPreviewEPG();
+        pause_active = !actx->nvp || !actx->nvp->getVideoOutput();
+        if (actx->nvp && actx->nvp->getVideoOutput())
+            allowEPG = actx->nvp->getVideoOutput()->AllowPreviewEPG();
+
         if (!pause_active)
         {
             long long margin = (long long)
@@ -7668,7 +7670,8 @@ void TV::DoEditSchedule(int editType)
         {
             TV *player = (pause_active) ? NULL : this;
             changeChannel = GuideGrid::Run(
-                chanid, channum, false, player, isLiveTV && player);
+                chanid, channum, false, player,
+                isLiveTV && player && allowEPG);
             break;
         }
         case kScheduleProgramFinder:
