@@ -412,7 +412,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
             usingv4l2     = true;
             has_v4l2_vbi  = true;
             has_buggy_vbi = true;
-            requires_special_pause = true;
+            requires_special_pause = false;
         }
         else if (driver == "hdpvr")
         {
@@ -1081,9 +1081,7 @@ void MpegRecorder::StartRecording(void)
     {
         VERBOSE(VB_RECORD, LOC + "Initial startup of recorder");
 
-        if (StartEncoding(readfd))
-            _device_read_buffer->Start();
-        else
+        if (requires_special_pause && !StartEncoding(readfd))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to start recording");
             recording = false;
@@ -1091,6 +1089,8 @@ void MpegRecorder::StartRecording(void)
             recording_wait.wakeAll();
             _error = true;
         }
+        else
+            _device_read_buffer->Start();
     }
 
     QByteArray vdevice = videodevice.toAscii();
@@ -1249,7 +1249,8 @@ void MpegRecorder::StartRecording(void)
         delete _device_read_buffer;
         _device_read_buffer = NULL;
     }
-    StopEncoding(readfd);
+    if (requires_special_pause)
+        StopEncoding(readfd);
 
     FinishRecording();
 
@@ -1460,7 +1461,8 @@ void MpegRecorder::RestartEncoding(void)
     
     QMutexLocker locker(&start_stop_encoding_lock);
     
-    StopEncoding(readfd);
+    if (requires_special_pause)
+        StopEncoding(readfd);
     
     // Make sure the next things in the file are a PAT & PMT
     if (_stream_data->PATSingleProgram() &&
@@ -1471,17 +1473,16 @@ void MpegRecorder::RestartEncoding(void)
         HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
     }
     
-    if (StartEncoding(readfd))
-    {
-        _device_read_buffer->Start();
-    }
-    else
+    if (requires_special_pause && !StartEncoding(readfd))
     {
         if (0 != close(readfd))
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
         
         readfd = -1;
+        return;
     }
+
+    _device_read_buffer->Start();
 }
 
 bool MpegRecorder::StartEncoding(int fd)
