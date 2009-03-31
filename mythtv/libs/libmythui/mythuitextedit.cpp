@@ -371,21 +371,19 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
         {
             RemoveCharacter();
         }
-        else if (action == "SELECT")
+        else if (action == "SELECT"
+                 && GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
         {
-            if (GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
-            {
-                MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-                MythUIVirtualKeyboard *kb =  new MythUIVirtualKeyboard(popupStack, this);
+            MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+            MythUIVirtualKeyboard *kb =  new MythUIVirtualKeyboard(popupStack, this);
 
-                if (kb->Create())
-                {
-                    //connect(kb, SIGNAL(keyPress(QString)), SLOT(keyPress(QString)));
-                    popupStack->AddScreen(kb);
-                }
-                else
-                    delete kb;
+            if (kb->Create())
+            {
+                //connect(kb, SIGNAL(keyPress(QString)), SLOT(keyPress(QString)));
+                popupStack->AddScreen(kb);
             }
+            else
+                delete kb;
         }
         else
             handled = false;
