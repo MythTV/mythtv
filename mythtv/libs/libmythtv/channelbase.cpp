@@ -419,7 +419,7 @@ static bool is_input_group_busy(
         if (*it)
         {
             QMutexLocker locker(&igrpLock);
-            if (igrp.GetSharedInputGroup(info.inputid, inputid))
+            if (igrp.GetSharedInputGroup(busyin[cardids[i]].inputid, inputid))
                 conflicts.push_back(busyin[cardids[i]]);
         }
     }
