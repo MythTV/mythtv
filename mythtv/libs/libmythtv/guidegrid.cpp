@@ -978,7 +978,15 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     uint i = (chanid) ? 0 : GetChannelCount();
     for (; i < GetChannelCount(); i++)
     {
-        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        if (m_channelInfos[i][0].chanid == chanid)
+                return i;
+    }
+
+    // then check for chanid in duplicates
+    i = (chanid) ? 0 : GetChannelCount();
+    for (; i < GetChannelCount(); i++)
+    {
+        for (uint j = 1; j < m_channelInfos[i].size(); j++)
         {
             if (m_channelInfos[i][j].chanid == chanid)
                 return i;
@@ -989,17 +997,17 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     i = (channum.isEmpty()) ? GetChannelCount() : 0;
     for (; i < GetChannelCount(); i++)
     {
-        if (m_channelInfos[i][0].chanid == chanid)
+        if (m_channelInfos[i][0].channum == channum)
             return i;
     }
 
-    // then check all channum
+    // then check channum duplicates
     i = (channum.isEmpty()) ? GetChannelCount() : 0;
     for (; i < GetChannelCount(); i++)
     {
-        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        for (uint j = 1; j < m_channelInfos[i].size(); j++)
         {
-            if (m_channelInfos[i][j].chanid == chanid)
+            if (m_channelInfos[i][j].channum == channum)
                 return i;
         }
     }
