@@ -1065,6 +1065,12 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
     else if (commands[1] == "FileTransfer")
     {
+        if (slist.size() < 3)
+        {
+            VERBOSE(VB_IMPORTANT, "Received malformed FileTransfer command");
+            return;
+        }
+
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce FileTransfer");
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a remote file transfer")
                                .arg(commands[2]));
