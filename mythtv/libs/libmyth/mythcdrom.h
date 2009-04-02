@@ -18,6 +18,7 @@ class MPUBLIC MythCDROM : public MythMediaDevice
     {
         return setStatus(MEDIASTAT_UNKNOWN, false);
     }
+    virtual void setSpeed(const char *devicePath, int speed);
 
     static MythCDROM* get(QObject* par, const char* devicePath,
                                   bool SuperMount, bool AllowEject);

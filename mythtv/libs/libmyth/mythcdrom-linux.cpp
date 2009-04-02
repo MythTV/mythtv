@@ -133,6 +133,7 @@ public:
     virtual MediaStatus checkMedia(void);
     virtual MediaError eject(bool open_close = true);
     virtual void setSpeed(int speed);
+    virtual void setSpeed(const char *device, int speed);
     virtual bool isSameDevice(const QString &path);
     virtual MediaError lock(void);
     virtual MediaError unlock(void);
@@ -613,6 +614,11 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
  */
 void MythCDROMLinux::setSpeed(int speed)
 {
+    MythCDROMLinux::setSpeed(m_DevicePath, speed);
+}
+
+void MythCDROMLinux::setSpeed(const char *device, int speed)
+{
     int fd;
     unsigned char buffer[28];
     unsigned char cmd[16];
@@ -627,11 +633,11 @@ void MythCDROMLinux::setSpeed(int speed)
     memset(cmd, 0, sizeof(cmd));
     memset(&st, 0, sizeof(st));
 
-    if (stat(m_DevicePath, &st) == -1)
+    if (stat(device, &st) == -1)
     {
         VERBOSE(VB_MEDIA, LOC_ERR +
                 QString("setSpeed() Failed. device %1 not found")
-                .arg(m_DevicePath));
+                .arg(device));
         return;
     }
 
@@ -641,7 +647,7 @@ void MythCDROMLinux::setSpeed(int speed)
         return;
     }
 
-    if ((fd = open(m_DevicePath, O_RDWR | O_NONBLOCK)) == -1)
+    if ((fd = open(device, O_RDWR | O_NONBLOCK)) == -1)
     {
         VERBOSE(VB_MEDIA, LOC_ERR + "Changing CD/DVD speed needs write access");
         return;
