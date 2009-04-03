@@ -696,6 +696,8 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Bob (2x)");
     else if ("onefield" == short_name)
         return QObject::tr("One field");
+    else if ("fieldorderdoubleprocessdeint" == short_name)
+        return QObject::tr("Interlaced (2x)");
     else if ("opengllinearblend" == short_name)
         return QObject::tr("Linear blend (HW)");
     else if ("openglkerneldeint" == short_name)
@@ -1275,6 +1277,11 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         "This deinterlacer uses several fields to reduce motion blur. "
         "It has increased CPU requirements.");
 
+    QString kFieldOrderMsg = QObject::tr(
+        "This deinterlacer attempts to syncronise with interlaced displays "
+        "whose size and refresh rate exactly match the video source. "
+        "It has low CPU requirements.");
+
     if (deint == "none")
         msg = kNoneMsg;
     else if (deint == "onefield")
@@ -1302,7 +1309,7 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
     else if (deint == "opengldoubleratekerneldeint")
         msg = kKernelMsg + " " + kUsingOpenGLWorkaround;
     else if (deint == "opengldoubleratefieldorder")
-        msg = kNoneMsg  + " " + kUsingOpenGLWorkaround;
+        msg = kFieldOrderMsg  + " " + kUsingOpenGLWorkaround;
     else if (deint == "greedyhdeint")
         msg = kGreedyHMsg;
     else if (deint == "greedyhdoubleprocessdeint")
@@ -1311,6 +1318,8 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kYadifMsg;
     else if (deint == "yadifdoubleprocessdeint")
         msg = kYadifMsg + " " +  kDoubleRateMsg;
+    else if (deint == "fieldorderdoubleprocessdeint")
+        msg = kFieldOrderMsg + " " +  kDoubleRateMsg;
     else if (deint == "opengldoublerateyadif")
         msg = kYadifMsg + " " +  kUsingOpenGLWorkaround;
     else
@@ -1490,6 +1499,7 @@ QString VideoDisplayProfile::toString(void) const
 "greedyhdoubleprocessdeint"
 "yadifdeint"
 "yadifdoubleprocessdeint"
+"fieldorderdoubleprocessdeint"
 "opengllinearblend"
 "openglkerneldeint"
 "openglonefield"
@@ -1534,6 +1544,7 @@ void VideoDisplayProfile::init_statics(void)
         safe_deint[*it] += "greedyhdoubleprocessdeint";
         safe_deint[*it] += "yadifdeint";
         safe_deint[*it] += "yadifdoubleprocessdeint";
+        safe_deint[*it] += "fieldorderdoubleprocessdeint";
         safe_deint[*it] += "none";
         safe_osd[*it]   += "softblend";
     }
