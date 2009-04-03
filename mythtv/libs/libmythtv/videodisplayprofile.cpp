@@ -1264,10 +1264,7 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         "This filter disables deinterlacing when the two fields are "
         "similar, and performs linear deinterlacing otherwise.");
 
-    QString kUsingOpenGL = QObject::tr("(Hardware Accelerated)");
-    QString kUsingOpenGLWorkaround =
-        QObject::tr("With workaround for broken interlaced modelines.") + " " +
-        kUsingOpenGL;
+    QString kUsingGPU = QObject::tr("(Hardware Accelerated)");
 
     QString kGreedyHMsg = QObject::tr(
         "This deinterlacer uses several fields to reduce motion blur. "
@@ -1282,6 +1279,13 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         "whose size and refresh rate exactly match the video source. "
         "It has low CPU requirements.");
 
+    QString kBasicMsg = QObject::tr(
+        "This deinterlacer uses several fields to reduce motion blur. ");
+
+    QString kAdvMsg = QObject::tr(
+        "This deinterlacer uses multiple fields to reduce motion blur "
+        "and smooth edges. ");
+
     if (deint == "none")
         msg = kNoneMsg;
     else if (deint == "onefield")
@@ -1293,23 +1297,23 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
     else if (deint == "kerneldeint")
         msg = kKernelMsg;
     else if (deint == "openglonefield")
-        msg = kOneFieldMsg + " " + kUsingOpenGL;
+        msg = kOneFieldMsg + " " + kUsingGPU;
     else if (deint == "openglbobdeint")
-        msg = kBobMsg + " " + kUsingOpenGL;
+        msg = kBobMsg + " " + kUsingGPU;
     else if (deint == "opengllinearblend")
-        msg = kLinearBlendMsg + " " + kUsingOpenGL;
+        msg = kLinearBlendMsg + " " + kUsingGPU;
     else if (deint == "openglkerneldeint")
-        msg = kKernelMsg + " " + kUsingOpenGL;
+        msg = kKernelMsg + " " + kUsingGPU;
     else if (deint == "openglyadif")
-        msg = kYadifMsg + " " + kUsingOpenGL;
+        msg = kYadifMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratelinearblend")
-        msg = kLinearBlendMsg + " " + kUsingOpenGLWorkaround;
+        msg = kLinearBlendMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else if (deint == "opengldoublerateonefield")
-        msg = kOneFieldMsg + " " + kUsingOpenGLWorkaround;
+        msg = kOneFieldMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratekerneldeint")
-        msg = kKernelMsg + " " + kUsingOpenGLWorkaround;
+        msg = kKernelMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratefieldorder")
-        msg = kFieldOrderMsg  + " " + kUsingOpenGLWorkaround;
+        msg = kFieldOrderMsg + " " +  kDoubleRateMsg  + " " + kUsingGPU;
     else if (deint == "greedyhdeint")
         msg = kGreedyHMsg;
     else if (deint == "greedyhdoubleprocessdeint")
@@ -1321,7 +1325,19 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
     else if (deint == "fieldorderdoubleprocessdeint")
         msg = kFieldOrderMsg + " " +  kDoubleRateMsg;
     else if (deint == "opengldoublerateyadif")
-        msg = kYadifMsg + " " +  kUsingOpenGLWorkaround;
+        msg = kYadifMsg + " " +  kDoubleRateMsg + " " +  kUsingGPU;
+    else if (deint == "vdpauonefield")
+        msg = kOneFieldMsg + " " + kUsingGPU;
+    else if (deint == "vdpaubobdeint")
+        msg = kBobMsg + " " + kUsingGPU;
+    else if (deint == "vdpaubasic")
+        msg = kBasicMsg + " " + kUsingGPU;
+    else if (deint == "vdpauadvanced")
+        msg = kAdvMsg + " " + kUsingGPU;
+    else if (deint == "vdpaubasicdoublerate")
+        msg = kBasicMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
+    else if (deint == "vdpauadvanceddoublerate")
+        msg = kAdvMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else
         msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
 
