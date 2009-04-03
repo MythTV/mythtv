@@ -38,27 +38,27 @@ typedef struct ThisFilter
 {
     VideoFilter vf;
 
-    int threshold;
-    int skipchroma;
-    int mm_flags;
-    void (*filtfunc)(uint8_t*, uint8_t*, int, int, int);
+    int   threshold;
+    int   skipchroma;
+    int   mm_flags;
+    void  (*filtfunc)(uint8_t*, uint8_t*, int, int, int);
     mmx_t threshold_low;
     mmx_t threshold_high;
+    int   linesize;
     uint8_t *line;
-    int linesize;
+
     TF_STRUCT;
 } ThisFilter;
 
-void
-KDP (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
+void KDP (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 {
     int X, Y;
     uint8_t *LineCur, *LineCur1U, *LineCur1D, *LineCur2D, tmp;
 
-    LineCur = Plane+W;
     LineCur1U = Plane;
-    LineCur1D = Plane+2*W;
-    LineCur2D = Plane+3*W;
+    LineCur   = Plane + W;
+    LineCur1D = Plane + 2 * W;
+    LineCur2D = Plane + 3 * W;
 
     for (X = 0; X < W ; X++)
     {
@@ -67,7 +67,7 @@ KDP (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
             > Threshold - 1)
             LineCur[X] = (LineCur1U[X] + LineCur1D[X]) / 2;
     }
-    LineCur += 2 * W;
+    LineCur   += 2 * W;
     LineCur1U += 2 * W;
     LineCur1D += 2 * W;
     LineCur2D += 2 * W;
@@ -83,7 +83,7 @@ KDP (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
                         + LineCur[X] * 2 - tmp - LineCur2D[X])
                          / 8, 0, 255);
         }
-        LineCur += 2 * W;
+        LineCur   += 2 * W;
         LineCur1U += 2 * W;
         LineCur1D += 2 * W;
         LineCur2D += 2 * W;
@@ -95,8 +95,7 @@ KDP (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 }
 
 #ifdef MMX
-void
-KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
+void KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 {
     int X, Y;
     uint8_t *LineCur, *LineCur1U, *LineCur1D, *LineCur2D, tmp;
@@ -104,10 +103,10 @@ KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
     mmx_t mm_hthr = { w:{Threshold-(Threshold>0),Threshold-(Threshold>0),
                          Threshold-(Threshold>0),Threshold-(Threshold>0)} };
     
-    LineCur = Plane+W;
     LineCur1U = Plane;
-    LineCur1D = Plane+2*W;
-    LineCur2D = Plane+3*W;
+    LineCur   = Plane + W;
+    LineCur1D = Plane + 2 * W;
+    LineCur2D = Plane + 3 * W;
 
     for (X = 0; X < W - 7; X += 8)
     {
@@ -156,7 +155,7 @@ KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
             LineCur[X] = (LineCur1U[X] + LineCur1D[X]) / 2;
     }
 
-    LineCur += 2 * W;
+    LineCur   += 2 * W;
     LineCur1U += 2 * W;
     LineCur1D += 2 * W;
     LineCur2D += 2 * W;
@@ -234,7 +233,7 @@ KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
                         + LineCur[X] * 2 - tmp - LineCur2D[X])
                          / 8, 0, 255);
         }
-        LineCur += 2 * W;
+        LineCur   += 2 * W;
         LineCur1U += 2 * W;
         LineCur1D += 2 * W;
         LineCur2D += 2 * W;
@@ -246,8 +245,7 @@ KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
 }
 #endif
 
-static int
-KernelDeint (VideoFilter * f, VideoFrame * frame, int field)
+static int KernelDeint (VideoFilter * f, VideoFrame * frame, int field)
 {
     (void)field;
     ThisFilter *filter = (ThisFilter *) f;
@@ -294,16 +292,16 @@ KernelDeint (VideoFilter * f, VideoFrame * frame, int field)
     return 0;
 }
 
-void
-CleanupKernelDeintFilter (VideoFilter * filter)
+void CleanupKernelDeintFilter (VideoFilter * filter)
 {
     if (((ThisFilter *)filter)->line)
         free (((ThisFilter *)filter)->line);
 }
 
-VideoFilter *
-NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
-                    int *width, int *height, char *options, int threads)
+VideoFilter *NewKernelDeintFilter (VideoFrameType inpixfmt,
+                                   VideoFrameType outpixfmt,
+                                   int *width, int *height,
+                                   char *options, int threads)
 {
     ThisFilter *filter;
     int numopts;
@@ -326,7 +324,8 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return NULL;
     }
     
-    numopts = options ? sscanf(options, "%d:%d", &(filter->threshold), &(filter->skipchroma)) : 0;
+    numopts = options ? sscanf(options, "%d:%d", &(filter->threshold),
+                               &(filter->skipchroma)) : 0;
     if (numopts < 2)
         filter->skipchroma = 0;
     if (numopts < 1)
@@ -340,9 +339,9 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
 #else
         filter->mm_flags = 0,
 #endif
-        filter->filtfunc = &KDP;
 
-    filter->line = malloc(*width);
+    filter->filtfunc = &KDP;
+    filter->line     = malloc(*width);
     filter->linesize = *width;
 
     if (filter->line == NULL)
@@ -353,7 +352,7 @@ NewKernelDeintFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     }
     TF_INIT(filter);
 
-    filter->vf.filter = &KernelDeint;
+    filter->vf.filter  = &KernelDeint;
     filter->vf.cleanup = &CleanupKernelDeintFilter;
     return (VideoFilter *) filter;
 }
@@ -370,7 +369,8 @@ ConstFilterInfo filter_table[] =
     {
         symbol:     "NewKernelDeintFilter",
         name:       "kerneldeint",
-        descript:   "combines data from several fields to deinterlace with less motion blur",
+        descript:   "combines data from several fields to deinterlace "
+                    "with less motion blur",
         formats:    FmtList,
         libname:    NULL
     },
