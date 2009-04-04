@@ -407,8 +407,6 @@
 
   +o  MythBrowser, a web browser
 
-  +o  MythControls, an application to configure your remote control
-
   +o  MythFlix, a Netflix module
 
   +o  MythGallery, a picture-viewing application
@@ -419,8 +417,6 @@
      and FLAC
 
   +o  MythNews, a RSS news grabber
-
-  +o  MythPhone, phone and videophone using SIP.
 
   +o  MythVideo, DVD ripper and a media-viewer for content not created
      within MythTV
@@ -469,7 +465,6 @@
   installing a new version of MythTV.
 
   See ``Saving or Restoring the database'' for instructions.
-
 
 
   [1m1.4.  How to obtain this document / PDF versions of this document[0m
@@ -595,6 +590,7 @@
   information.
 
 
+
   [1m1.10.  Contributing to this document[0m
 
   Contributions to the HOWTO are welcome, especially if you find a
@@ -658,6 +654,7 @@
   http://pvrhw.goldfish.org/ <http://pvrhw.goldfish.org/>. The website
   will let you browse what other users have reported as their hardware
   configuration, and how happy they are with the results.
+
   If you have specific questions about the suitability of specific
   hardware choices, you can consult the archives of the mythtv-users
   mailing list at http://www.gossamer-threads.com/lists/mythtv/
@@ -723,7 +720,6 @@
   requirements are quite low.  See the ``Video Capture Device'' section
   for details.
 
-
   The price differential between a frame grabber and a card that
   implements hardware MPEG-2 encoding, such as the Hauppauge PVR-x50
   series, is now less than $30 US.  Primary development in MythTV has
@@ -786,6 +782,8 @@
   rather than one of the known-good high-performance file systems.
   There are other ramifications to using XFS and JFS - neither offer the
   opportunity to shrink a filesystem; they may only be expanded.
+
+
 
                  [1mNOTE[22m:  You [4mmust[24m [4mnot[24m use ReiserFS v3 for
   your recordings. You will get corrupted recordings if you do.
@@ -5737,10 +5735,6 @@
   MythNews related options:
     --enable-mythnews        build the mythnews plugin [default=yes]
 
-  MythPhone related options:
-    --enable-mythphone       build the mythphone plugin [default=yes]
-    --enable-festival        enable festival TTS Engine [default=no]
-
   MythVideo related options:
     --enable-mythvideo       build the mythvideo plugin [default=yes]
 
@@ -5765,14 +5759,16 @@
   MythMusic, you would like to enable support for the opengl and FFT
   visualizations.  The command line would look like:
 
-       $ cd ~/mythplugins-0.21
-       $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
-       $ qmake mythplugins.pro
-       $ make
-       $ su -
-       # make install
-       # exit
-       $
+
+
+  $ cd ~/mythplugins-0.21
+  $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
+  $ qmake mythplugins.pro
+  $ make
+  $ su -
+  # make install
+  # exit
+  $
 
 
 

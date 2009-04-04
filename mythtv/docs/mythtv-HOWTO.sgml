@@ -67,14 +67,12 @@ Other modules in MythTV include:
 <itemize>
 <item>MythArchive, a tool to create DVDs
 <item>MythBrowser, a web browser
-<item>MythControls, an application to configure your remote control
 <item>MythFlix, a Netflix module
 <item>MythGallery, a picture-viewing application
 <item>MythGame
 <item>MythMusic, a music playing / ripping application which supports MP3
 and FLAC
 <item>MythNews, a RSS news grabber
-<item>MythPhone, phone and videophone using SIP.
 <item>MythVideo, DVD ripper and a media-viewer for content not created within MythTV
 <item>MythWeather
 <item>MythWeb, which allows you to control your MythTV system using a web
@@ -4910,10 +4908,6 @@ MythMusic related options:
 
 MythNews related options:
   --enable-mythnews        build the mythnews plugin [default=yes]
-
-MythPhone related options:
-  --enable-mythphone       build the mythphone plugin [default=yes]
-  --enable-festival        enable festival TTS Engine [default=no]
 
 MythVideo related options:
   --enable-mythvideo       build the mythvideo plugin [default=yes]

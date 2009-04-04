@@ -4,17 +4,17 @@
 \section intro Introduction
 
 Over the last couple years %MythTV has grown into a rather large
-application. The purpose of these pages is to provide a portal 
-into the code for developers to get their heads around it. 
-This is intended for both those new to %MythTV and experienced 
+application. The purpose of these pages is to provide a portal
+into the code for developers to get their heads around it.
+This is intended for both those new to %MythTV and experienced
 with it to get familiar with different aspects of the code base.
 
-If you are just looking for the code formatting standards, 
-see the official %MythTV wiki article 
+If you are just looking for the code formatting standards,
+see the official %MythTV wiki article
 <a href="http://www.mythtv.org/wiki/index.php/Coding_Standards">
-coding standards</a>. If you are looking for the 
+coding standards</a>. If you are looking for the
 <a href="http://svn.mythtv.org/trac/wiki/TicketHowTo">bug tracker</a>,
-it can be found on the official pages. 
+it can be found on the official pages.
 If you haven't already, you should subscribe to
 the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">
 developer mailing list</a> and the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">SVN commits mailing list</a>
@@ -22,21 +22,21 @@ developer mailing list</a> and the <a href="http://www.mythtv.org/mailman/listin
 If you just stumbled onto the developer pages
 by accident, maybe you want to go to the official
 <a href="http://www.mythtv.org/modules.php?name=MythInstall">%MythTV
-Installation page</a>. There is also a good unofficial 
+Installation page</a>. There is also a good unofficial
 <a href="http://wilsonet.com/mythtv/fcmyth.php">Fedora %MythTV installation</a> page,
-and a 
+and a
 <a href="http://dev.gentoo.org/~cardoe/mythtv/">Gentoo %MythTV installation</a> page.
 
 If you are new to Qt programming it is essential that you keep in mind
 that almost all Qt objects are not thread-safe, including QString.
 Almost all Qt container objects, including QString, make shallow copies
 on assignment, the two copies of the object must only be used in one
-thread unless you use a lock on the object. You can use the 
+thread unless you use a lock on the object. You can use the
 <a href="http://doc.trolltech.com/3.1/qdeepcopy.html">QDeepCopy</a>
 template on most Qt containers to make a copy you can use in another
 thread.
 
-There are also special dangers when 
+There are also special dangers when
 \ref qobject_dangers "using QObject" outside the Qt event thread.
 
 The is also short HOWTO on \ref profiling_mythtv available in addition
@@ -62,7 +62,7 @@ to documentation on the code itself.
       (\ref lirc_subsystem "LIRC" and AppleRemote)
       and screen saver control code are also contained in this library.
 
-      This library depends on libmyth. Any changes to this library's ABI 
+      This library depends on libmyth. Any changes to this library's ABI
       may trigger a myth binary version change because the plugins depend on it.
 
   <dt>libmythupnp            <dd>Initial uPnP (universal Plug and Play) support
@@ -82,9 +82,9 @@ to documentation on the code itself.
       change because the plugins depend on it.
 
   <dt>libmythtv              <dd>%MythTV %TV functionality library. Used by some Plugins.
-      The 
+      The
       \ref osd_subsystem "OSD",
-      \ref recorder_subsystem "recorders", \ref video_subsystem "video" and 
+      \ref recorder_subsystem "recorders", \ref video_subsystem "video" and
       \ref av_player_subsystem "A/V players" are supported by libmythtv.
 
       This library depends on libmythdb, libmythui and libmyth.
@@ -94,7 +94,7 @@ to documentation on the code itself.
       This library is used by some plugins so changes to it's ABI may
       require a myth binary version change.
 
-      Any changes to classes that are serialized by the 
+      Any changes to classes that are serialized by the
       \ref myth_network_protocol "myth network protocol" (for example
       ProgramInfo) or to the protocol itself require the protocol version
       number to be incremented.
@@ -190,7 +190,7 @@ The database schema is documented here \ref db_schema.
           <a href="http://membled.com/work/apps/xmltv/xmltv">XMLTV</a>
           web spiders.
   <dt>mythtranscode    <dd>This is used both internally and externally to
-                           transcode videos from one format to another. 
+                           transcode videos from one format to another.
                            This is used to shrink HDTV programs to lower
                            quality recordings that match the hardware the
                            user has.
@@ -213,14 +213,12 @@ The database schema is documented here \ref db_schema.
   <dt>mytharchive <dd>Creates themed Video DVDs from recordings
                       (and other video files).
   <dt>mythbrowser <dd>Provides a simple web browser.
-  <dt>mythcontrols<dd>Editor for Myth Key bindings, \e et \e c.
   <dt>mythflix    <dd>
   <dt>mythgallery <dd>A simple picture viewer for your %TV.
   <dt>mythgame    <dd>Launches the xmame classic game system emulator.
   <dt>mythmovies  <dd>
   <dt>mythmusic   <dd>A simple music player for your %TV.
   <dt>mythnews    <dd>Browses RSS news feeds.
-  <dt>mythphone   <dd>SIP based video phone.
   <dt>mythvideo   <dd>Launch DVD players, and a Video Browser for other files
                       (non-%MythTV recordings).
   <dt>mythweather <dd>Presents your local weather report.
@@ -245,7 +243,7 @@ These tools are in the contrib directory of the source tree:
 /** \defgroup database_subsystem    Database Subsystem
     \todo No one is working on documenting the database subsystem.
 
-There are a few classes that deal directly with the database: 
+There are a few classes that deal directly with the database:
 MythContext, MSqlDatabase, DBStorage, MDBManager, SimpleDBStorage.
 
 And one function UpgradeTVDatabaseSchema() located in dbcheck.cpp.
@@ -277,7 +275,7 @@ from the database automagically when used in %MythTV's window classes.
 /** \defgroup recorder_subsystem    Recorder Subsystem
 This line is filler that is ignored by Doxygen.
 
-TVRec is the main class for handling recording. 
+TVRec is the main class for handling recording.
 It is passed a ProgramInfo for the current and next recordings,
 and in turn creates three main worker classes:
 <dl>
@@ -286,13 +284,13 @@ and in turn creates three main worker classes:
   <dt>RingBuffer   <dd>Handles A/V file I/O, including streaming.
 </dl>
 
-%TVRec also presents the public face of a recordings to the 
+%TVRec also presents the public face of a recordings to the
 \ref myth_network_protocol, and hence the rest of %MythTV. This
 means that any call to the %RecorderBase, %RingBuffer, or
 %ChannelBase is marshalled via methods in the %TVRec.
 
-RecorderBase contains classes for recording %MythTV's 
-specialized Nuppel Video files, as well as classes for 
+RecorderBase contains classes for recording %MythTV's
+specialized Nuppel Video files, as well as classes for
 handling various hardware encoding devices such as MPEG2,
 HDTV, DVB and Firewire recorders.
 ChannelBase meanwhile only contains three subclasses, %Channel
@@ -308,11 +306,11 @@ over network connections to the frontend's %RingBuffer.
 correspond to the same states in %TV: kState_WatchingLiveTV,
 kState_WatchingPreRecorded, kState_WatchingRecording, and
 kState_RecordingOnly.
-When watching "Live TV" the recorder records whatever the 
+When watching "Live TV" the recorder records whatever the
 frontend requests and streams it out using the %RingBuffer,
 this may be to disk or over the network.
 When watching pre-recorded programs %TVRec simply streams a
-file on disk out using the %RingBuffer. 
+file on disk out using the %RingBuffer.
 When just watching a recording, %TVRec continues a recording
 started as recording-only while simultaneously streaming out
 using the %RingBuffer.
@@ -354,14 +352,14 @@ that class for more on what it does.
 %TV has three active states that correspond to the same states in TVRec:
 kState_WatchingLiveTV, kState_WatchingPreRecorded, kState_WatchingRecording.
 When watching "LiveTV" the %TVRec via RemoteEncoder responds to channel
-changing and other commands from %TV while streaming the recording to 
+changing and other commands from %TV while streaming the recording to
 %TV's %RingBuffer.
 When watching a pre-recorded stream, a recording is streamed from TVRec's
 %RingBuffer to %TV's %RingBuffer, but no channel changing commands can be
 sent to TVRec.
 When watching an 'in-progress' recording things work pretty much as when
 watching a pre-recorded stream, except %TV must be prevented from seeking
-too far ahead in the program, and keyframe and commercial flags must be 
+too far ahead in the program, and keyframe and commercial flags must be
 synced from the recorder periodically.
 
 %TV also has three additional states: kState_Error,
@@ -692,7 +690,7 @@ QObject derived classes can be quite useful, they can send and receive
 signals, get keyboard events, translate strings into another language
 and use QTimers.
 
-But they also can't be \ref qobject_delete "deleted" easily, they 
+But they also can't be \ref qobject_delete "deleted" easily, they
 are not \ref qobject_threadsafe "thread-safe", can't participate
 as equals in multiple \ref qobject_inheritence "inheritence", can
 not be used at all in virtual \ref qobject_inheritence "inheritence".
@@ -703,17 +701,17 @@ The problem with deleting QObjects has to do with signals, and events.
 These can arrive from any thread, and often arrive from the Qt event
 thread even if you have not explicitly requested them.
 
-If you have not explicitly connected any signals or slots, and the 
+If you have not explicitly connected any signals or slots, and the
 only events you might get are dispatched with qApp->postEvent(),
 not qApp->sendEvent(), then it is safe to delete the QObject in the
-Qt event thread. If your QObject is a GUI object you've passed 
-given to Qt for it to delete all is good. If your object is only 
+Qt event thread. If your QObject is a GUI object you've passed
+given to Qt for it to delete all is good. If your object is only
 deleted in response to a posted event or a signal from the Qt event
 thread (say from a QTimer()) then you are OK as well.
 
 If your class may be deleted outside a Qt thread, but it does not
 explicitly connect any signals or slots, and the only events it
-might get are dispatched with qApp->postEvent(), then you can 
+might get are dispatched with qApp->postEvent(), then you can
 safely use deleteLater() to queue your object up for deletion
 in the event thread.
 
@@ -724,7 +722,7 @@ thread, then you can use deleteLater() or delete depending on whether
 you are deleteing the QObject in the event thread, see above. But
 if you are not in the Qt event thread then you need to call disconnect()
 in the thread that is sending the signals, before calling deleteLater().
-This prevents your object from sending events after you consider it 
+This prevents your object from sending events after you consider it
 deleted (and begin to delete other QObjects that may still be getting
 signals from your object.)
 
@@ -734,7 +732,7 @@ discourage this in %MythTV and prefer that you use callbacks if at all
 possible. But in say you need to do this, then you need to disconnect
 all the signals being sent to your QObject. But disconnect() itself
 is not atomic. That is you may still get a signal after you disconnect
-it. What you need to is disconnect the signal from your slot in the 
+it. What you need to is disconnect the signal from your slot in the
 thread that is sending the signal. This prevents the signal from
 being emitted while you are disconnecting. Doing this gracefully is
 left as an excersize for the reader.
@@ -760,7 +758,7 @@ the data when you assign one to another. This reference counter is
 not protected by a mutex so you can not use regular assignment when
 passing a QString or other Qt container from one thread to another.
 
-In order to use these classes safely you must use 
+In order to use these classes safely you must use
 <a href="http://doc.trolltech.com/3.1/qdeepcopy.html">QDeepCopy</a>
 when passing them from one thread to another. This is thankfully quite
 easy to use.
@@ -772,7 +770,7 @@ easy to use.
 \endcode
 
 In this case safe and original can be used by two seperate
-threads, while unsafe can only be used in the same thread 
+threads, while unsafe can only be used in the same thread
 as originalStr.
 
 The QDeepCopy template will work on the most popular Qt containers,
@@ -809,7 +807,7 @@ This line is filler that is ignored by Doxygen.
 You can use any sampling profiler to profile %MythTV, the most
 popular GPL one is OProfile and this section tells you how to
 use it to profile %MythTV. For Intel also makes VTune, AMD
-makes CodeAnalyst, and Apple makes Shark. These all work 
+makes CodeAnalyst, and Apple makes Shark. These all work
 similarly to oprofile, so the %MythTV portions are the same.
 
 This do not describe how to install oprofile. There are a
@@ -827,9 +825,9 @@ version of oprofile, or compile your own kernel.
 
 The first thing you need to do is compile with profiling in
 mind. %MythTV has three compile types "release", "debug" and
-"profile". The "release" type enables optimizations that 
+"profile". The "release" type enables optimizations that
 make debugging practically impossible, while "debug" has so
-few optimizations that profiling it usually won't tell you 
+few optimizations that profiling it usually won't tell you
 where the real performance problems are. The "profile" compile
 type enables the all the optimizations in "release" but also
 enables debugging symbols, so that you know which functions
@@ -844,7 +842,7 @@ So we configure thusly:
 The "make distclean" clears out all your old binaries and the the configure
 sets the compile type approriately. You may not want the "--enable-proc-opt"
 if you plan on making a package for other CPUs. This only makes about a
-10% difference in playback speed because MMX and CMOV are enabled for 
+10% difference in playback speed because MMX and CMOV are enabled for
 CPUs that support them regardless of this option.
 
 Next, you compile and install %MythTV as you normally would.
@@ -892,7 +890,7 @@ it did in 1985.
 So modern processors include explicit support for profiling. For,
 example the Pentium Pro has the INST_RETIRED counter, the Pentium 4
 has the INSTR_RETIRED counter, the AMD64 has the RETIRED_INSNS
-counter, etc. For a full list see the 
+counter, etc. For a full list see the
 <a href="http://oprofile.sourceforge.net/docs/">OProfile documentation</a>.
 You need to find a performance counter you can use for your CPU,
 after you've run "opcontrol --init" you can run the following command:
@@ -908,12 +906,12 @@ For an Intel Pentium 4, the following will work
   opcontrol -e INSTR_RETIRED:6000:0x0f:0:1
 \endcode
 
-This tells OProfile to schedule an interrupt on every 6000th 
+This tells OProfile to schedule an interrupt on every 6000th
 instruction that finishes and matches the flag 0x0f. You
 could also count cycles when not in idle for the same type of
-measurements. The last two numbers tell OProfile it should not 
-profile the kernel and should profile userspace, if you want 
-to profile the kernel as well you need to replace the zero with 
+measurements. The last two numbers tell OProfile it should not
+profile the kernel and should profile userspace, if you want
+to profile the kernel as well you need to replace the zero with
 a one.
 
 It is possible to profile in oprofile the old fashioned way, by
@@ -925,7 +923,7 @@ enough samples for a good report.
 \section prof_run Running Profiler
 
 Normally, oprofile will tell you about everything running in
-its reports. You can limit what information is collected by 
+its reports. You can limit what information is collected by
 running a opcontrol command such as:
 \code
   opcontrol --image=/usr/local/bin/mythfrontend
