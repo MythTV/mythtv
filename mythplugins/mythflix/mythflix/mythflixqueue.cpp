@@ -110,9 +110,9 @@ void MythFlixQueue::loadData()
                           "AND queue = :QUEUENAME "
                       "ORDER BY name");
 
-    if (QString::compare("netflix history",name())==0)
+    if (QString::compare("flixhistory",name())==0)
         query.bindValue(":ISQUEUE", 2);
-    else if (QString::compare("netflix queue",name())==0)
+    else if (QString::compare("flixqueue",name())==0)
         query.bindValue(":ISQUEUE", 1);
     else
         query.bindValue(":ISQUEUE", 1);
@@ -155,7 +155,7 @@ void MythFlixQueue::UpdateNameText()
         if (queuename == "default")
             queuename = QObject::tr("Default");
 
-        if (QString::compare("netflix history",name())==0)
+        if (QString::compare("flixhistory",name())==0)
             m_nameText->SetText(tr("History for Queue: ") + queuename);
         else
             m_nameText->SetText(tr("Items in Queue: ") + queuename);
