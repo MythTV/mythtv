@@ -362,7 +362,13 @@ if (defined $opt_D) {
     getMovieBackdrop($movieid);
 } elsif (defined $opt_M) {
     # take query from cmdline arg
-    my $query = shift || die "Usage : $0 -M <query>\n";
+    # ignore any options, such as those used by imdb.pl
+    my $options = shift || die "Usage : $0 -M <query>\n";
+    my $query = shift;
+    if (!$query) {
+       $query = $options;
+       $options = "";
+    }
     getMovieList($query);
 }
 
