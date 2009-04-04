@@ -43,6 +43,8 @@ class ThreadedFileWriter
     int             flags;
     mode_t          mode;
     int             fd;
+    uint64_t        m_file_sync;  ///< offset synced to disk
+    uint64_t        m_file_wpos; ///< offset written to disk
 
     // state
     bool            no_writes;

@@ -18,6 +18,7 @@
 #include "mythcontext.h"
 #include "compat.h"
 #include "mythverbose.h"
+#include "mythconfig.h"
 
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
 #define HAVE_FDATASYNC
@@ -122,6 +123,7 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     // file stuff
     filename(fname),                     flags(pflags),
     mode(pmode),                         fd(-1),
+    m_file_sync(0),                      m_file_wpos(0),
     // state
     no_writes(false),                    flush(false),
     write_is_blocked(false),             in_dtor(false),
@@ -161,6 +163,8 @@ bool ThreadedFileWriter::Open(void)
     {
         buf = new char[TFW_DEF_BUF_SIZE + 1024];
         bzero(buf, TFW_DEF_BUF_SIZE + 64);
+
+        m_file_sync =  m_file_wpos = 0;
 
         tfw_buf_size = TFW_DEF_BUF_SIZE;
         tfw_min_write_size = TFW_MIN_WRITE_SIZE;
@@ -343,7 +347,22 @@ void ThreadedFileWriter::Sync(void)
 {
     if (fd >= 0)
     {
-#ifdef HAVE_FDATASYNC
+#ifdef HAVE_SYNC_FILE_RANGE
+        uint64_t write_position;
+
+        buflock.lock();
+        write_position = m_file_wpos;
+        buflock.unlock();
+
+        if ((write_position - m_file_sync) > TFW_MAX_WRITE_SIZE ||
+            (write_position && m_file_sync < (uint64_t)tfw_min_write_size))
+        {
+            sync_file_range(fd, m_file_sync, write_position - m_file_sync,
+                            SYNC_FILE_RANGE_WRITE);
+            m_file_sync = write_position;
+        }
+
+#elif defined(HAVE_FDATASYNC)
         fdatasync(fd);
 #else
         fsync(fd);
@@ -484,6 +503,7 @@ void ThreadedFileWriter::DiskLoop(void)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Programmer Error detected! "
                     "rpos was changed from under the DiskLoop() function.");
         }
+        m_file_wpos += size;
         buflock.unlock();
 
         bufferWroteData.wakeAll();
