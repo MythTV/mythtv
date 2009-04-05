@@ -20,6 +20,7 @@ using namespace std;
 #include "compat.h"
 #include "mythuihelper.h"
 #include "dbcheck.h"
+#include "util.h" // for IsPulseAudioRunning()
 
 static void *run_priv_thread(void *data)
 {
@@ -75,6 +76,13 @@ static void *run_priv_thread(void *data)
 
 int main(int argc, char *argv[])
 {
+    if (IsPulseAudioRunning())
+    {
+        cerr << "***Pulse Audio is running!!!!***" << endl
+             << "Pulse Audio is incompatible with MythTV." << endl;
+        return GENERIC_EXIT_NOT_OK;
+    }
+
     bool cmdline_err;
     MythCommandLineParser cmdline(
         kCLPOverrideSettings     |

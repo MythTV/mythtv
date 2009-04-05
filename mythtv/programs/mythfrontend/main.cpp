@@ -61,6 +61,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdirs.h"
 #include "mythosdmenueditor.h"
+#include "util.h" // for IsPulseAudioRunning()
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -1035,6 +1036,13 @@ void log_rotate_handler(int)
 
 int main(int argc, char **argv)
 {
+    if (IsPulseAudioRunning())
+    {
+        cerr << "***Pulse Audio is running!!!!***" << endl
+             << "Pulse Audio is incompatible with MythTV." << endl;
+        return GENERIC_EXIT_NOT_OK;
+    }
+
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
     bool upgradeAllowed = false;

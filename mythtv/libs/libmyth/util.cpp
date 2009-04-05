@@ -47,6 +47,8 @@ using namespace std;
 #include "mythverbose.h"
 #include "msocketdevice.h"
 
+#include "mythconfig.h" // for CONFIG_DARWIN
+
 /** \fn mythCurrentDateTime()
  *  \brief Returns the current QDateTime object, stripped of its msec component
  */
@@ -1354,6 +1356,19 @@ bool WakeOnLAN(QString MAC)
     socket.writeBlock(msg, msglen, QHostAddress("255.255.255.255"), 32767);
 
     return true;
+}
+
+bool IsPulseAudioRunning(void)
+{
+#if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
+    const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
+#else
+    const char *command = "ps -ae | grep pulseaudio > /dev/null";
+#endif
+    bool res = myth_system(command,
+                           MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                           MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+    return !res;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
