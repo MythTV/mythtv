@@ -407,7 +407,7 @@ void ThreadedFileWriter::DiskLoop(void)
             ignore_writes = true;
         }
 
-        if (written < tfw_min_write_size)
+        if (written <= tfw_min_write_size)
         {
             written += size;
         }
