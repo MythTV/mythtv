@@ -4,10 +4,12 @@
     <window name="browse">
 
         <buttonlist name="siteslist" from="basebuttonlist">
+            <wrapstyle>captive</wrapstyle>
             <area>20,20,200,300</area>
         </buttonlist>
 
         <buttonlist name="articleslist" from="basebuttonlist">
+            <wrapstyle>captive</wrapstyle>
             <area>250,20,530,300</area>
             <showarrow>no</showarrow>
         </buttonlist>

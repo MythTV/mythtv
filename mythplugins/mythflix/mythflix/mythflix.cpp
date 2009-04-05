@@ -315,8 +315,11 @@ void MythFlix::processAndShowNews(NewsSite* site)
             MythUIButtonListItem* item =
                 new MythUIButtonListItem(m_articlesList, article->title(),
                                             qVariantFromValue(article));
-            QString posterImage = LoadPosterImage(article->articleURL());
-            item->SetImage(posterImage);
+            if (!article->articleURL().isEmpty())
+            {
+                QString posterImage = LoadPosterImage(article->articleURL());
+                item->SetImage(posterImage);
+            }
             item->SetText(article->description(), "description");
         }
     }
