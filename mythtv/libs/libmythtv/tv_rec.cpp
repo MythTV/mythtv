@@ -1072,18 +1072,15 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
  */
 void TVRec::TeardownRecorder(bool killFile)
 {
-    int filelen = -1;
     pauseNotify = false;
     ispip = false;
 
     if (recorder && HasFlags(kFlagRecorderRunning))
     {
-        // This is a bad way to calculate this, the framerate
-        // may not be constant if using a DTV based recorder.
-        filelen = (int)((float)GetFramesWritten() / GetFramerate());
-
-        QString message = QString("DONE_RECORDING %1 %2")
-            .arg(cardid).arg(filelen);
+        int secsSince = curRecording->recstartts
+            .secsTo(QDateTime::currentDateTime());
+        QString message = QString("DONE_RECORDING %1 %2 %3")
+            .arg(cardid).arg(secsSince).arg(GetFramesWritten());
         MythEvent me(message);
         gContext->dispatch(me);
 

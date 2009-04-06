@@ -6295,12 +6295,13 @@ void TV::customEvent(QCustomEvent *e)
                 message = message.simplifyWhiteSpace();
                 QStringList tokens = QStringList::split(" ", message);
                 int cardnum = tokens[1].toInt();
-                int filelen = tokens[2].toInt();
+                //int seconds = tokens[2].toInt();
+                long long frames = tokens[3].toLongLong();
 
                 if (recorder && cardnum == recorder->GetRecorderNumber())
                 {
                     nvp->SetWatchingRecording(false);
-                    nvp->SetLength(filelen);
+                    nvp->SetLength(frames / nvp->GetFrameRate());
                     ChangeState(kState_WatchingPreRecorded);
                 }
             }
@@ -6309,13 +6310,14 @@ void TV::customEvent(QCustomEvent *e)
                 message = message.simplifyWhiteSpace();
                 QStringList tokens = QStringList::split(" ", message);
                 int cardnum = tokens[1].toInt();
-                int filelen = tokens[2].toInt();
+                //int seconds = tokens[2].toInt();
+                long long frames = tokens[3].toLongLong();
 
                 if (recorder && cardnum == recorder->GetRecorderNumber() &&
                     tvchain && tvchain->HasNext())
                 {
                     nvp->SetWatchingRecording(false);
-                    nvp->SetLength(filelen);
+                    nvp->SetLength(frames / nvp->GetFrameRate());
                 }
             }
         }
