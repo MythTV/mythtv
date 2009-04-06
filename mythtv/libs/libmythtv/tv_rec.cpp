@@ -1089,16 +1089,14 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (recorder && HasFlags(kFlagRecorderRunning))
     {
-        // This is a bad way to calculate this, the framerate
-        // may not be constant if using a DTV based recorder.
-        filelen = (int)((float)GetFramesWritten() / GetFramerate());
-
         // Get the height and set the videoprops
         recHeight = curRecording->GetHeight(); 
         curRecording->SetVidpropHeight(recHeight);
 
-        QString message = QString("DONE_RECORDING %1 %2")
-            .arg(cardid).arg(filelen);
+        int secsSince = curRecording->recstartts
+            .secsTo(QDateTime::currentDateTime());
+        QString message = QString("DONE_RECORDING %1 %2 %3")
+            .arg(cardid).arg(secsSince).arg(GetFramesWritten());
         MythEvent me(message);
         gContext->dispatch(me);
 
