@@ -1082,7 +1082,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
  */
 void TVRec::TeardownRecorder(bool killFile)
 {
-    int filelen = -1;
     pauseNotify = false;
     ispip = false;
     int recHeight;
