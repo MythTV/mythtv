@@ -722,6 +722,62 @@ int main(int argc, char *argv[])
                     QString("    Found %1").arg(query.numRowsAffected()));
     }
 
+    if (grab_data)
+    {
+        VERBOSE(VB_GENERAL, "Fudging non-unique programids "
+                "with multiple parts.");
+
+        MSqlQuery sel(MSqlQuery::InitCon());
+        sel.exec("SELECT DISTINCT programid, partnumber, parttotal "
+                 "FROM program WHERE partnumber > 0 AND parttotal > 0 AND "
+                 "programid LIKE '%0000'");
+
+        if (sel.isActive() && sel.size() > 0)
+        {
+            MSqlQuery repl(MSqlQuery::InitCon());
+
+            while (sel.next())
+            {
+                QString orig_programid = sel.value(0).toString();
+                QString new_programid = orig_programid.left(10);
+                int     partnum, parttotal;
+                QString part;
+
+                partnum   = sel.value(1).toInt();
+                parttotal = sel.value(2).toInt();
+
+                part.setNum(parttotal);
+                new_programid.append(part.rightJustify(2, '0'));
+                part.setNum(partnum);
+                new_programid.append(part.rightJustify(2, '0'));
+
+                VERBOSE(VB_GENERAL,
+                        QString("    %1 -> %2 (part %3 of %4)")
+                        .arg(orig_programid).arg(new_programid)
+                        .arg(partnum).arg(parttotal));
+
+                repl.prepare("UPDATE program SET programid = :NEWID "
+                             "WHERE programid = :OLDID AND "
+                             "partnumber = :PARTNUM AND "
+                             "parttotal = :PARTTOTAL");
+                repl.bindValue(":NEWID", new_programid);
+                repl.bindValue(":OLDID", orig_programid);
+                repl.bindValue(":PARTNUM",   partnum);
+                repl.bindValue(":PARTTOTAL", parttotal);
+                if (!repl.exec())
+                {
+                    VERBOSE(VB_GENERAL,
+                            QString("Fudging programid from '%1' to '%2'")
+                            .arg(orig_programid)
+                            .arg(new_programid));
+                }
+            }
+        }
+
+        VERBOSE(VB_GENERAL,
+                QString("    Found %1").arg(sel.numRowsAffected()));
+    }
+
     if (mark_repeats)
     {
         VERBOSE(VB_GENERAL, "Marking repeats.");
