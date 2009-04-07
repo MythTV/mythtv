@@ -734,7 +734,7 @@ int main(int argc, char *argv[])
                       "AND originalairdate is not null "
                       "AND (to_days(starttime) - to_days(originalairdate)) "
                       "    > :NEWWINDOW;");
-        query.bindValue(newEpiWindow, ":NEWWINDOW");
+        query.bindValue(":NEWWINDOW", newEpiWindow);
 
         if (query.exec())
             VERBOSE(VB_GENERAL,
@@ -746,7 +746,7 @@ int main(int argc, char *argv[])
                       "AND originalairdate is not null "
                       "AND (to_days(starttime) - to_days(originalairdate)) "
                       "    <= :NEWWINDOW;");
-        query.bindValue(newEpiWindow, ":NEWWINDOW");
+        query.bindValue(":NEWWINDOW", newEpiWindow);
 
         if (query.exec())
             VERBOSE(VB_GENERAL,
