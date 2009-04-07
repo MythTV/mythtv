@@ -547,6 +547,12 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &area, int radius,
     int h = area.height();
     float step = 0.01f;
 
+    if ((w / 2) < radius)
+        radius = w / 2;
+
+    if ((h / 2) < radius)
+        radius = h / 2;
+
     glEnable(GL_BLEND);
 
     if (drawFill)
