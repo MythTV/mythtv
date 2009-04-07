@@ -734,6 +734,8 @@ void ProgFinder::restoreSelectedData(QString &data)
         data = "The " + data.left(data.length() - 5);
     if (data.right(3) == ", A")
         data = "A " + data.left(data.length() - 3);
+    if (data.right(4) == ", An")
+        data = "An " + data.left(data.length() - 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
