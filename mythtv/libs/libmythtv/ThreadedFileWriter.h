@@ -6,6 +6,7 @@
 #include <qmutex.h>
 #include <qwaitcondition.h>
 #include <qstring.h>
+#include <stdint.h>
 
 class ThreadedFileWriter
 {
