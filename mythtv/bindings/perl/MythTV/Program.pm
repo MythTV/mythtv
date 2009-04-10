@@ -301,7 +301,14 @@ package MythTV::Program;
         $epminute = "0$epminute" if ($epminute < 10);
         $epsecond = "0$epsecond" if ($epsecond < 10);
     # Original airdate
-        my ($oyear, $omonth, $oday) = split('-', $self->{'airdate'}, 3);
+        if ($self->{'airdate'} =~ /-/) {
+            my ($oyear, $omonth, $oday) = split('-', $self->{'airdate'}, 3);
+        }
+        else {
+            $oyear  = '0000';
+            $omonth = '00';
+            $oday   = '00';
+        }
     # Build a list of name format options
         my %fields;
         ($fields{'T'} = ($self->{'title'}       or '')) =~ s/%/%%/g;
