@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.2';
+    $VERSION        = '1.0.3';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -482,6 +482,9 @@ EOF
             elsif ($var eq 'DBPassword')
             {
                 $mysql_conf{'db_pass'} = $val;
+                $mysql_conf{'db_pass'} =~ s/&amp;/&/sg;
+                $mysql_conf{'db_pass'} =~ s/&gt;/>/sg;
+                $mysql_conf{'db_pass'} =~ s/&lt;/</sg;
             }
             elsif ($var eq 'DBName')
             {
