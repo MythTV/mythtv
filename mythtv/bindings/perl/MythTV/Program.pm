@@ -301,8 +301,9 @@ package MythTV::Program;
         $epminute = "0$epminute" if ($epminute < 10);
         $epsecond = "0$epsecond" if ($epsecond < 10);
     # Original airdate
+        my ($oyear, $omonth, $oday);
         if ($self->{'airdate'} =~ /-/) {
-            my ($oyear, $omonth, $oday) = split('-', $self->{'airdate'}, 3);
+            ($oyear, $omonth, $oday) = split('-', $self->{'airdate'}, 3);
         }
         else {
             $oyear  = '0000';
