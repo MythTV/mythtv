@@ -277,6 +277,9 @@ EOF
         }
         elsif ($line =~ m#<DBPassword>(.*?)</DBPassword>#) {
             $mysql_conf{'db_pass'}  = $1;
+            $mysql_conf{'db_pass'} =~ s/&amp;/&/sg;
+            $mysql_conf{'db_pass'} =~ s/&gt;/>/sg;
+            $mysql_conf{'db_pass'} =~ s/&lt;/</sg;
         }
         elsif ($line =~ m#<DBName>(.*?)</DBName>#) {
             $mysql_conf{'db_name'}  = $1;
