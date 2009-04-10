@@ -27,10 +27,18 @@ package MythTV;
 # Load the UPNP libraries if we have them, but die nicely if we don't.
     BEGIN {
         our $has_upnp = 1;
-        eval 'use Net::UPnP::ControlPoint;';
+        eval 'use Net::UPnP::QueryResponse;';
         if ($@) {
             $has_upnp = 0;
-            print STDERR "Net::UPnP::ControlPoint is not installed!\n";
+            print STDERR "Net::UPnP::QueryResponse is not installed!\n";
+        }
+        else
+        {
+            eval 'use Net::UPnP::ControlPoint;';
+            if ($@) {
+                $has_upnp = 0;
+                print STDERR "Net::UPnP::ControlPoint is not installed!\n";
+            }
         }
     }
 
