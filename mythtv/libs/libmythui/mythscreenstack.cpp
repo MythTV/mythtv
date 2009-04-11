@@ -87,6 +87,8 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
     if (!screen || screen->IsDeleting())
         return;
 
+    screen->aboutToHide();
+
     if (m_Children.isEmpty())
         return;
 
