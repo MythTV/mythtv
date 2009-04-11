@@ -27,8 +27,6 @@ using namespace std;
 #include "dialogbox.h"
 #include "remoteencoder.h"
 #include "remoteutil.h"
-#include "guidegrid.h"
-//#include "progfind.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "udpnotify.h"
@@ -55,7 +53,9 @@ using namespace std;
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
+#include "mythscreentype.h"
 #include "tvosdmenuentry.h"
+#include "tv_play_win.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -115,6 +115,16 @@ EMBEDRETURNPROGRAM TV::RunPlaybackBoxPtr = NULL;
  * \brief function pointer for RunViewScheduled in viewscheduled.cpp
  */
 EMBEDRETURNVOID TV::RunViewScheduledPtr = NULL;
+
+/**
+ * \brief function pointer for RunProgramGuide in guidegrid.cpp
+ */
+EMBEDRETURNVOIDEPG TV::RunProgramGuidePtr = NULL;
+
+/**
+ * \brief function pointer for RunProgramFinder in progfind.cpp
+ */
+EMBEDRETURNVOIDFINDER TV::RunProgramFinderPtr = NULL;
 
 
 /**
@@ -395,6 +405,10 @@ void TV::SetFuncPtr(const char *string, void *lptr)
         RunPlaybackBoxPtr = (EMBEDRETURNPROGRAM)lptr;
     else if (name == "viewscheduled")
         RunViewScheduledPtr = (EMBEDRETURNVOID)lptr;
+    else if (name == "programguide")
+        RunProgramGuidePtr = (EMBEDRETURNVOIDEPG)lptr;
+    else if (name == "programfinder")
+        RunProgramFinderPtr = (EMBEDRETURNVOIDFINDER)lptr;
 }
 
 void TV::InitKeys(void)
@@ -693,7 +707,8 @@ TV::TV(void)
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
-      myWindow(NULL),
+      myWindow(NULL),               isEmbedded(false),
+      ignoreKeyPresses(false),
       // Timers
       lcdTimerId(0),                keyListTimerId(0),
       networkControlTimerId(0),     jumpMenuTimerId(0),
@@ -804,12 +819,11 @@ bool TV::Init(bool createWindow)
 
     if (createWindow)
     {
-        MythMainWindow *mainWindow = gContext->GetMainWindow();
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
         bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
 
-        saved_gui_bounds = QRect(mainWindow->geometry().topLeft(),
-                                 mainWindow->size());
+        saved_gui_bounds = QRect(GetMythMainWindow()->geometry().topLeft(),
+                                 GetMythMainWindow()->size());
 
         // adjust for window manager wierdness.
         {
@@ -821,7 +835,7 @@ bool TV::Init(bool createWindow)
                 (abs(saved_gui_bounds.y()-ybase) < 3))
             {
                 saved_gui_bounds = QRect(QPoint(xbase, ybase),
-                                         mainWindow->size());
+                                         GetMythMainWindow()->size());
             }
         }
 
@@ -859,25 +873,25 @@ bool TV::Init(bool createWindow)
                 player_bounds.setSize(QSize(maxWidth, maxHeight));
 
                 // resize possibly avoids a bug on some systems
-                mainWindow->resize(player_bounds.size());
+                GetMythMainWindow()->resize(player_bounds.size());
             }
         }
 
         // player window sizing
-        myWindow = new MythDialog(mainWindow, "video playback window");
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        myWindow->installEventFilter(this);
-        myWindow->setNoErase();
-        QRect win_bounds(0, 0, player_bounds.width(), player_bounds.height());
-        myWindow->setGeometry(win_bounds);
-        myWindow->setBaseSize(win_bounds.size());
-        myWindow->setMinimumSize(
-            (db_use_fixed_size) ? win_bounds.size() : QSize(16, 16));
-        myWindow->setMaximumSize(
-            (db_use_fixed_size) ? win_bounds.size() :
-            QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+        myWindow = new TvPlayWindow(mainStack, "video playback window");
 
-        // resize main window
+        if (myWindow->Create())
+            mainStack->AddScreen(myWindow, false);
+        else
+        {
+            delete myWindow;
+            myWindow = NULL;
+        }
+
+        // resize main window for TV playback
+        MythMainWindow *mainWindow = GetMythMainWindow();
         mainWindow->setGeometry(player_bounds);
         mainWindow->setBaseSize(player_bounds.size());
         mainWindow->setMinimumSize(
@@ -885,13 +899,8 @@ bool TV::Init(bool createWindow)
         mainWindow->setMaximumSize(
             (db_use_fixed_size) ? player_bounds.size() :
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-        mainWindow->installEventFilter(this);
 
-        // finally we put the player window on screen...
-        myWindow->show();
-        QPalette p = myWindow->palette();
-        p.setColor(myWindow->backgroundRole(), Qt::black);
-        myWindow->setPalette(p);
+        GetMythMainWindow()->installEventFilter(this);
         qApp->processEvents();
     }
 
@@ -901,6 +910,7 @@ bool TV::Init(bool createWindow)
     errorRecoveryTimerId = StartTimer(kErrorRecoveryCheckFrequency, __LINE__);
     lcdTimerId           = StartTimer(1, __LINE__);
     speedChangeTimerId   = StartTimer(kSpeedChangeCheckFrequency, __LINE__);
+
     mainLoopCondLock.unlock();
 
     return true;
@@ -918,16 +928,18 @@ TV::~TV(void)
 
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- lock");
 
+    // restore window to gui size and position
+    MythMainWindow* mwnd = gContext->GetMainWindow();
+    mwnd->resize(saved_gui_bounds.size());
+    mwnd->setFixedSize(saved_gui_bounds.size());
+    mwnd->show();
+    if (!db_use_gui_size_for_tv)
+        mwnd->move(saved_gui_bounds.topLeft());
+
     if (myWindow)
     {
-        myWindow->deleteLater();
+        ((MythScreenType*)myWindow)->Close();
         myWindow = NULL;
-        MythMainWindow* mwnd = gContext->GetMainWindow();
-        mwnd->resize(saved_gui_bounds.size());
-        mwnd->setFixedSize(saved_gui_bounds.size());
-        mwnd->show();
-        if (!db_use_gui_size_for_tv)
-            mwnd->move(saved_gui_bounds.topLeft());
     }
 
     if (treeMenu)
@@ -963,6 +975,8 @@ TV::~TV(void)
         player.pop_back();
     }
     ReturnPlayerLock(mctx);
+    
+    GetMythMainWindow()->GetPaintWindow()->show();
 
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- end");
 }
@@ -1766,6 +1780,8 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         if (ctx->buffer && ctx->buffer->IsOpen())
         {
             GetMythUI()->DisableScreensaver();
+            myWindow->Close(500);
+            myWindow = NULL;
 
             if (desiredNextState == kState_WatchingRecording)
             {
@@ -1888,6 +1904,9 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             VERBOSE(VB_IMPORTANT, LOC + "UpdateLCD done");
             ITVRestart(ctx, true);
             VERBOSE(VB_IMPORTANT, LOC + "ITVRestart done");
+
+            myWindow->Close(1000);
+            myWindow = NULL;
         }
         else if (StateIsPlaying(ctx->GetState()) && lastState == kState_None)
         {
@@ -2330,6 +2349,7 @@ void TV::timerEvent(QTimerEvent *te)
     QKeyEvent *keyEvent = NULL;
     {
         QMutexLocker locker(&timerIdLock);
+
         if (timer_id == keyListTimerId)
         {
             keyEvent = keyList.dequeue();
@@ -2347,6 +2367,7 @@ void TV::timerEvent(QTimerEvent *te)
         if (actx->HasNVP())
         {
             ProcessKeypress(actx, keyEvent);
+
             delete keyEvent;
         }
         else
@@ -3059,37 +3080,27 @@ bool TV::eventFilter(QObject *o, QEvent *e)
             mctx->UnlockDeleteNVP(__FILE__, __LINE__);
             ReturnPlayerLock(mctx);
         }
-        return false;
     }
 
     switch (e->type())
     {
         case QEvent::KeyPress:
         {
-            QKeyEvent *k = new QKeyEvent(*(QKeyEvent *)e);
-
-            QMutexLocker locker(&timerIdLock);
-            keyList.enqueue(k);
-            if (!keyListTimerId)
-                keyListTimerId = StartTimer(1, __LINE__);
-
-            return true;
-        }
-        case QEvent::Paint:
-        case QEvent::UpdateRequest:
-        case QEvent::Enter:
-        {
-            PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-            for (uint i = 0; mctx && (i < player.size()); i++)
+            // we ignore keypresses if the epg is running for example
+            if (!ignoreKeyPresses)
             {
-                PlayerContext *ctx = GetPlayer(mctx, i);
-                ctx->LockDeleteNVP(__FILE__, __LINE__);
-                if (ctx->nvp)
-                    ctx->nvp->ExposeEvent();
-                ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-            }
-            ReturnPlayerLock(mctx);
-            return true;
+                QKeyEvent *k = new QKeyEvent(*(QKeyEvent *)e);
+                QMutexLocker locker(&timerIdLock);
+                keyList.enqueue(k);
+                if (!keyListTimerId)
+                    keyListTimerId = StartTimer(1, __LINE__);
+
+                return true;
+             }
+             else
+             {
+                return false;
+             }
         }
         case MythEvent::MythEventMessage:
         {
@@ -4781,7 +4792,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
         mctx->buffer->Unpause();
 
     bool ok = mctx->CreateNVP(
-        this, myWindow, mctx->GetState(), 0, &mctx->embedBounds);
+        this, gContext->GetMainWindow(), mctx->GetState(), 0, &mctx->embedBounds);
 
     if (ok)
     {
@@ -4917,7 +4928,7 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
     }
     else
     {
-        ok = ctx->CreateNVP(this, myWindow, desiredState,
+        ok = ctx->CreateNVP(this, gContext->GetMainWindow(), desiredState,
                             mctx->embedWinID, &mctx->embedBounds);
         ScheduleStateChange(ctx);
     }
@@ -5286,7 +5297,7 @@ void TV::PBPRestartMainNVP(PlayerContext *mctx)
     mctx->SetPIPState(kPIPOff);
     mctx->buffer->Seek(0, SEEK_SET);
 
-    if (mctx->CreateNVP(this, myWindow, mctx->GetState(),
+    if (mctx->CreateNVP(this, gContext->GetMainWindow(), mctx->GetState(),
                         mctx->embedWinID, &mctx->embedBounds))
     {
         ScheduleStateChange(mctx);
@@ -6128,7 +6139,7 @@ void TV::SwitchCards(PlayerContext *ctx,
             PlayerContext *mctx = GetPlayer(ctx, 0);
 
             if (ctx->CreateNVP(
-                    this, myWindow, ctx->GetState(),
+                    this, gContext->GetMainWindow(), ctx->GetState(),
                     mctx->embedWinID, &mctx->embedBounds))
             {
                 ScheduleStateChange(ctx);
@@ -7551,7 +7562,7 @@ void TV::StopEmbedding(PlayerContext *ctx)
 
 void TV::DrawUnusedRects(bool sync, PlayerContext *ctx)
 {
-    VERBOSE(VB_IMPORTANT, LOC + "DrawUnusedRects() -- begin");
+    VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- begin");
 
     PlayerContext *mctx = NULL;
     if (ctx)
@@ -7567,7 +7578,7 @@ void TV::DrawUnusedRects(bool sync, PlayerContext *ctx)
     if (!ctx)
         ReturnPlayerLock(mctx);
 
-    VERBOSE(VB_IMPORTANT, LOC + "DrawUnusedRects() -- end");
+    VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- end");
 }
 
 vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
@@ -7635,8 +7646,7 @@ void TV::DoEditSchedule(int editType)
         actx->UnlockDeleteNVP(__FILE__, __LINE__);
     }
 
-    pause_active |= (kScheduleProgramFinder == editType ||
-                     kScheduledRecording == editType);
+    pause_active |= kScheduledRecording == editType;
     pause_active |=
         !isLiveTV && (!db_continue_embedded || isNearEnd);
 
@@ -7644,7 +7654,7 @@ void TV::DoEditSchedule(int editType)
     do_pause.insert(do_pause.begin(), true, player.size());
     do_pause[find_player_index(actx)] = pause_active;
 
-    vector<bool> was_paused = DoSetPauseState(actx, do_pause);
+    saved_pause = DoSetPauseState(actx, do_pause);
 
     // Resize window to the MythTV GUI size
     PlayerContext *mctx = GetPlayer(actx,0);
@@ -7669,14 +7679,19 @@ void TV::DoEditSchedule(int editType)
         case kScheduleProgramGuide:
         {
             TV *player = (pause_active) ? NULL : this;
-            changeChannel = GuideGrid::Run(
-                chanid, channum, false, player,
-                isLiveTV && player && allowEPG);
+            isEmbedded = (isLiveTV && player && allowEPG);
+            RunProgramGuidePtr(chanid, channum, player, true);
+            ignoreKeyPresses = true;
             break;
         }
         case kScheduleProgramFinder:
-//            RunProgramFind(false, false);
+        {
+            TV *player = (pause_active) ? NULL : this;
+            isEmbedded = (isLiveTV && player && allowEPG);
+            RunProgramFinderPtr(player, true);
+            ignoreKeyPresses = true;
             break;
+        }
         case kScheduledRecording:
         {
             ScheduledRecording *record = new ScheduledRecording();
@@ -7686,65 +7701,80 @@ void TV::DoEditSchedule(int editType)
             break;
         }
         case kViewSchedule:
+        {
             RunViewScheduledPtr((void *)this, !pause_active);
+            ignoreKeyPresses = true;
             break;
+        }
         case kPlaybackBox:
+        {
             nextProgram = RunPlaybackBoxPtr((void *)this, !pause_active);
+            ignoreKeyPresses = true;
             break;
+        }
     }
 
-    // Resize the window back to the MythTV Player size
-    if (!db_use_gui_size_for_tv)
+    // TODO need to remove this once everything is using mythui
+    if (editType == kScheduledRecording)
     {
-        mwnd->setGeometry(player_bounds.left(), player_bounds.top(),
-                          player_bounds.width(), player_bounds.height());
-        mwnd->setFixedSize(player_bounds.size());
-    }
-    mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    mctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (mctx->nvp && mctx->nvp->getVideoOutput())
-        mctx->nvp->getVideoOutput()->ResizeForVideo();
-    mctx->UnlockDeleteNVP(__FILE__, __LINE__);
-    ReturnPlayerLock(mctx);
-
-    actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-    StopEmbedding(actx);               // Undo any embedding
-    DoSetPauseState(actx, was_paused); // Restore pause states
-    // If user selected a new channel in the EPG, change to that channel
-    if (isLiveTV && changeChannel.size())
-        ChangeChannel(actx, changeChannel);
-    ReturnPlayerLock(actx);
-
-    // Handle RunPlaybackBoxPtr return value..
-    if (nextProgram)
-    {
-        if (jumpToProgramPIPState == kPIPonTV)
+        // Resize the window back to the MythTV Player size
+        if (!db_use_gui_size_for_tv)
         {
-            mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-            CreatePIP(mctx, nextProgram);
+            mwnd->setGeometry(player_bounds.left(), player_bounds.top(),
+                            player_bounds.width(), player_bounds.height());
+            mwnd->setFixedSize(player_bounds.size());
         }
-        else if (jumpToProgramPIPState == kPBPLeft)
-        {
-            mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-            CreatePBP(mctx, nextProgram);
-        }
-        else
-        {
-            mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-            SetLastProgram(nextProgram);
-            mctx->LockDeleteNVP(__FILE__, __LINE__);
-            if (mctx->nvp)
-                mctx->nvp->DiscardVideoFrames(true);
-            mctx->UnlockDeleteNVP(__FILE__, __LINE__);
-            jumpToProgram = true;
-            SetExitPlayer(true, true);
-        }
-
-        jumpToProgramPIPState = kPIPOff;
-        delete nextProgram;
-        nextProgram = NULL;
-
+        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+        mctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (mctx->nvp && mctx->nvp->getVideoOutput())
+            mctx->nvp->getVideoOutput()->ResizeForVideo();
+        mctx->UnlockDeleteNVP(__FILE__, __LINE__);
         ReturnPlayerLock(mctx);
+
+        actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+        StopEmbedding(actx);               // Undo any embedding
+        DoSetPauseState(actx, saved_pause); // Restore pause states
+        // If user selected a new channel in the EPG, change to that channel
+        if (isLiveTV && changeChannel.size())
+            ChangeChannel(actx, changeChannel);
+        ReturnPlayerLock(actx);
+
+        // Handle RunPlaybackBoxPtr return value..
+        if (nextProgram)
+        {
+            if (jumpToProgramPIPState == kPIPonTV)
+            {
+                mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
+                CreatePIP(mctx, nextProgram);
+            }
+            else if (jumpToProgramPIPState == kPBPLeft)
+            {
+                mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
+                CreatePBP(mctx, nextProgram);
+            }
+            else
+            {
+                mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+                SetLastProgram(nextProgram);
+                mctx->LockDeleteNVP(__FILE__, __LINE__);
+                if (mctx->nvp)
+                    mctx->nvp->DiscardVideoFrames(true);
+                mctx->UnlockDeleteNVP(__FILE__, __LINE__);
+                jumpToProgram = true;
+                SetExitPlayer(true, true);
+            }
+
+            jumpToProgramPIPState = kPIPOff;
+            delete nextProgram;
+            nextProgram = NULL;
+
+            ReturnPlayerLock(mctx);
+        }
+    }
+    else
+    {
+        //we are embedding in a mythui window so show the gui paint window again
+        GetMythMainWindow()->GetPaintWindow()->show();
     }
 }
 
@@ -7756,7 +7786,7 @@ void TV::EditSchedule(const PlayerContext *ctx, int editType)
     // on the main thread and avoid a deadlock on Win32
     QString message = QString("START_EPG %1").arg(editType);
     MythEvent* me = new MythEvent(message);
-    qApp->postEvent(myWindow, me);
+    qApp->postEvent(gContext->GetMainWindow(), me);
 }
 
 void TV::ChangeVolume(PlayerContext *ctx, bool up)
@@ -8118,7 +8148,7 @@ void TV::SetMuteTimer(PlayerContext *ctx, int timeout)
     // this will properly set the mute timer
     // otherwise it never fires on Win32
     QString message = QString("UNMUTE %1 %2").arg((long long)ctx).arg(timeout);
-    qApp->postEvent(myWindow, new MythEvent(message));
+    qApp->postEvent(gContext->GetMainWindow(), new MythEvent(message));
 }
 
 void TV::customEvent(QEvent *e)
@@ -8156,7 +8186,7 @@ void TV::customEvent(QEvent *e)
                     if (ctx->nvp)
                     {
                         ctx->nvp->SetWatchingRecording(false);
-                        ctx->nvp->SetLength(frames / ctx->nvp->GetFrameRate());
+                        ctx->nvp->SetLength((int)(frames / ctx->nvp->GetFrameRate()));
                     }
                     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
@@ -8173,7 +8203,7 @@ void TV::customEvent(QEvent *e)
                     if (ctx->nvp)
                     {
                         ctx->nvp->SetWatchingRecording(false);
-                        ctx->nvp->SetLength(frames / ctx->nvp->GetFrameRate());
+                        ctx->nvp->SetLength((int)(frames / ctx->nvp->GetFrameRate()));
                     }
                     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
                 }
@@ -8406,6 +8436,41 @@ void TV::customEvent(QEvent *e)
     {
         int editType = tokens[1].toInt();
         DoEditSchedule(editType);
+    }
+
+    if (message.left(11) == "EPG_EXITING" || message.left(18) == "PROGFINDER_EXITING")
+    {
+        GetMythMainWindow()->GetPaintWindow()->hide();
+
+        // Resize the window back to the MythTV Player size
+        PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
+        PlayerContext *mctx;
+        MythMainWindow *mwnd = gContext->GetMainWindow();
+
+        if (!db_use_gui_size_for_tv)
+        {
+            mwnd->setGeometry(player_bounds.left(), player_bounds.top(),
+                            player_bounds.width(), player_bounds.height());
+            mwnd->setFixedSize(player_bounds.size());
+        }
+        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+        mctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (mctx->nvp && mctx->nvp->getVideoOutput())
+            mctx->nvp->getVideoOutput()->ResizeForVideo();
+        mctx->UnlockDeleteNVP(__FILE__, __LINE__);
+        ReturnPlayerLock(mctx);
+
+        StopEmbedding(actx);                // Undo any embedding
+
+        DoSetPauseState(actx, saved_pause); // Restore pause states
+
+        qApp->processEvents();
+        DrawUnusedRects(true, actx);
+
+        ReturnPlayerLock(actx);
+
+        isEmbedded = false;
+        ignoreKeyPresses = false;
     }
 
     if (message.left(14) == "COMMFLAG_START")

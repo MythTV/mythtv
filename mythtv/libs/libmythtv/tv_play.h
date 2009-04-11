@@ -44,12 +44,16 @@ class OSDGenericTree;
 class PlayerContext;
 class UDPNotifyOSDSet;
 class TVOSDMenuEntryList;
+class TvPlayWindow;
+class TV;
 
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);
 typedef void (*EMBEDRETURNVOID) (void *, bool);
+typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool);
+typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool);
 
 // Locking order
 //
@@ -152,6 +156,7 @@ class MPUBLIC TV : public QThread
     friend class QTVEventThread;
     friend class PlaybackBox;
     friend class GuideGrid;
+    friend class TvPlayWindow;
 
     Q_OBJECT
   public:
@@ -294,6 +299,8 @@ class MPUBLIC TV : public QThread
     static QStringList lastProgramStringList;
     static EMBEDRETURNPROGRAM RunPlaybackBoxPtr;
     static EMBEDRETURNVOID RunViewScheduledPtr;
+    static EMBEDRETURNVOIDEPG RunProgramGuidePtr;
+    static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
 
   private:
     void SetActive(PlayerContext *lctx, int index, bool osd_msg);
@@ -734,12 +741,17 @@ class MPUBLIC TV : public QThread
     QString   lcdCallsign;
 
     // Window info (GUI is optional, transcoding, preview img, etc)
-    MythDialog *myWindow;   ///< Our MythDialog window, if it exists
+    TvPlayWindow *myWindow;   ///< Our screen, if it exists
     ///< player bounds, for after DoEditSchedule() returns to normal playing.
     QRect player_bounds;
     ///< Prior GUI window bounds, for DoEditSchedule() and player exit().
     QRect saved_gui_bounds;
 
+    // embedded status
+    bool         isEmbedded;       ///< are we currently embedded
+    bool         ignoreKeyPresses; ///< should we ignore keypresses
+    vector<bool> saved_pause;      ///< saved pause state before embedding
+    
     // IsTunable() cache, used by embedded program guide
     mutable QMutex                 is_tunable_cache_lock;
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
