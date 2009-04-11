@@ -95,6 +95,34 @@ bool PixmapChannel::LoadChannelIcon(uint size) const
     return iconLoaded;
 }
 
+bool PixmapChannel::LoadChannelImage(void) const
+{
+    iconImage = QImage(icon);
+
+    if (iconImage.width() == 0)
+    {
+        QFile existtest(icon);
+
+        // we have the file, just couldn't load it.
+        if (existtest.exists())
+            return false;
+
+        QString url = gContext->GetMasterHostPrefix();
+        if (url.length() < 1)
+            return false;
+
+        url += icon;
+
+        MythImage *im = gContext->CacheRemotePixmap(url);
+        if (im)
+            iconImage = *(QImage*)im;
+    }
+
+    imageLoaded = (iconImage.width() > 0);
+
+    return imageLoaded;
+}
+
 QString PixmapChannel::GetFormatted(const QString &format) const
 {
     QString tmp = format;

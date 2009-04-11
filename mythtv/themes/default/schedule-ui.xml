@@ -1,5 +1,428 @@
 <mythuitheme>
 
+    <window name="programguide">
+
+        <shape name="shape1">
+            <area>15,15,770,150</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>15</cornerradius>
+        </shape>
+
+        <shape name="shape2">
+            <area>20,110,760,50</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>10</cornerradius>
+        </shape>
+
+        <shape name="shape3">
+            <area>20,75,380,30</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>10</cornerradius>
+        </shape>
+
+        <shape name="shape4">
+            <area>400,75,380,30</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>10</cornerradius>
+        </shape>
+
+        <shape name="shape5">
+            <area>15,170,770,415</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>15</cornerradius>
+        </shape>
+
+        <textarea name="datetext" from="basetextarea">
+            <area>20,175,135,30</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <guidegrid name="guidegrid">
+            <area>155,205,632,375</area>
+            <layout>horizontal</layout>
+            <channels>5</channels>
+            <timeslots>4</timeslots>
+            <solidcolor>#003256</solidcolor>
+            <selector type="roundbox" linecolor="#ffff33"></selector>
+            <showcategories>yes</showcategories>
+            <categoryalpha>60</categoryalpha>
+            <recordingcolor>#00aa00</recordingcolor>
+            <conflictingcolor>#ff6600</conflictingcolor>
+            <cutdown>no</cutdown>
+            <multiline>yes</multiline>
+            <textoffset>6,2</textoffset>
+            <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
+            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
+            <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
+            <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
+            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+            <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
+            <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
+            <arrow direction="left" image="gg-arrow-left.png"></arrow>
+            <arrow direction="right" image="gg-arrow-right.png"></arrow>
+            <font>basesmall</font>
+        </guidegrid>
+
+        <buttonlist name="timelist">
+            <area>155,175,630,30</area>
+            <layout>horizontal</layout>
+            <spacing>0</spacing>
+            <buttonarea>0,0,630,30</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,156,30</area>
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <area>0,0,156,30</area>
+                        <filename>gg-times.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,3,156,28</area>
+                        <font>basesmall</font>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active"/>
+                <state name="inactive" from="active"/>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <buttonlist name="channellist">
+            <area>20,205,135,380</area>
+            <layout>vertical</layout>
+            <spacing>0</spacing>
+            <buttonarea>0,0,135,380</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,135,74</area>
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <area>0,0,135,75</area>
+                        <filename>gg-chans.png</filename>
+                    </imagetype>
+                    <imagetype name="channelicon">
+                        <area>5,15,40,40</area>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>45,0,90,75</area>
+                        <font>basesmall</font>
+                        <font state="favourite">basesmallyellow</font>
+                        <font state="unavailable">basesmallblue</font>
+                        <font state="favunavailable">basesmallpurple</font>
+                        <cutdown>no</cutdown>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active"/>
+                <state name="inactive" from="active"/>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <clock name="time">
+            <area>670,15,100,60</area>
+            <align>right,vcenter</align>
+            <format>%TIME%</format>
+            <secondflash>yes</secondflash>
+        </clock>
+
+        <imagetype name="channelicon">
+            <area>23,20,50,50</area>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>95,15,590,60</area>
+            <align>left,vcenter</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="subtitle" from="basetextarea">
+            <area>30,75,376,30</area>
+            <align>left,vcenter</align>
+            <font>basesmallpurple</font> 
+        </textarea>
+
+        <textarea name="description"  from="basetextarea">
+            <area>30,110,740,60</area>
+            <multiline>yes</multiline>
+            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+        </textarea>
+
+        <textarea name="recordingstatus" from="basetextarea">
+            <area>390,75,380,30</area>
+            <align>right,vcenter</align>
+            <font>basesmallyellow</font>
+        </textarea>
+
+    </window>
+
+    <window name="programguide-video">
+
+        <shape name="shape1">
+            <area>15,15,770,210</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>15</cornerradius>
+        </shape>
+
+        <shape name="shape2">
+            <area>25,135,530,80</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>10</cornerradius>
+        </shape>
+
+        <shape name="shape3">
+            <area>25,75,530,30</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>10</cornerradius>
+        </shape>
+
+        <shape name="shape4">
+            <area>25,105,530,30</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>10</cornerradius>
+        </shape>
+
+        <shape name="shape5">
+            <area>15,240,770,340</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="30"></fill>
+            <cornerradius>15</cornerradius>
+        </shape>
+
+        <shape name="shape6">
+            <area>565,75,210,140</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="255"></fill>
+            <cornerradius>6</cornerradius>
+        </shape>
+
+        <imagetype name="video">
+            <area>570,80,200,130</area>
+        </imagetype>
+
+        <textarea name="datetext" from="basetextarea">
+            <area>20,245,135,31</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <guidegrid name="guidegrid">
+            <area>155,275,632,300</area>
+            <layout>horizontal</layout>
+            <channels>5</channels>
+            <timeslots>4</timeslots>
+            <solidcolor>#003256</solidcolor>
+            <selector type="roundbox" linecolor="#ffff33"></selector>
+            <showcategories>yes</showcategories>
+            <categoryalpha>60</categoryalpha>
+            <recordingcolor>#00aa00</recordingcolor>
+            <conflictingcolor>#ff6600</conflictingcolor>
+            <cutdown>no</cutdown>
+            <multiline>yes</multiline>
+            <textoffset>9,6</textoffset>
+            <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
+            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
+            <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
+            <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
+            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+            <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
+            <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
+            <arrow direction="left" image="gg-arrow-left.png"></arrow>
+            <arrow direction="right" image="gg-arrow-right.png"></arrow>
+            <font>basesmall</font>
+        </guidegrid>
+
+        <buttonlist name="timelist">
+            <area>155,245,630,31</area>
+            <layout>horizontal</layout>
+            <spacing>0</spacing>
+            <buttonarea>0,0,634,31</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,156,29</area>
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <area>0,0,156,29</area>
+                        <filename>gg-times.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,0,156,29</area>
+                        <font>basesmall</font>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active"/>
+                <state name="inactive" from="active"/>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <buttonlist name="channellist">
+            <area>20,275,135,305</area>
+            <layout>vertical</layout>
+            <spacing>0</spacing>
+            <buttonarea>0,0,135,305</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,135,74</area>
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <area>0,0,135,60</area>
+                        <filename>gg-chans.png</filename>
+                    </imagetype>
+                    <imagetype name="channelicon">
+                        <area>5,15,40,40</area>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>45,0,85,60</area>
+                        <font>basesmall</font>
+                        <font state="favourite">basesmallyellow</font>
+                        <font state="unavailable">basesmallblue</font>
+                        <font state="favunavailable">basesmallpurple</font>
+                        <cutdown>no</cutdown>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active"/>
+                <state name="inactive" from="active"/>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename></filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <clock name="time">
+            <area>655,12,120,60</area>
+            <align>right,vcenter</align>
+            <format>%TIME%</format>
+            <secondflash>yes</secondflash>
+        </clock>
+
+        <imagetype name="channelicon">
+            <area>30,18,50,50</area>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>95,12,590,60</area>
+            <align>left,vcenter</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="subtitle" from="basetextarea">
+            <area>30,75,520,30</area>
+            <align>left,vcenter</align>
+            <font>basesmallpurple</font> 
+        </textarea>
+
+        <textarea name="description"  from="basetextarea">
+            <area>30,140,520,80</area>
+            <multiline>yes</multiline>
+            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+        </textarea>
+
+        <textarea name="recordingstatus" from="basetextarea">
+            <area>30,105,520,30</area>
+            <align>left,vcenter</align>
+            <font>basesmallyellow</font>
+        </textarea>
+
+    </window>
+
     <window name="manualschedule">
 
         <textarea name="pagetitle" from="basetextarea">

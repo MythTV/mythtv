@@ -9,11 +9,13 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qpixmap.h>
+#include <QString>
+#include <QPixmap>
+#include <QImage>
 
 // MythTV headers
 #include "mythexp.h" // for MPUBLIC
+
 
 class MPUBLIC DBChannel
 {
@@ -48,17 +50,23 @@ class MPUBLIC PixmapChannel : public DBChannel
     PixmapChannel(const PixmapChannel &other) :
         DBChannel(other),
         iconPixmap(other.iconPixmap),
-        iconLoaded(other.iconLoaded) { }
+        iconImage(other.iconImage),
+        iconLoaded(other.iconLoaded),
+        imageLoaded(other.imageLoaded){ }
     PixmapChannel(const DBChannel &other) :
         DBChannel(other),
-        iconLoaded(false) { }
+        iconLoaded(false),
+        imageLoaded(false){ }
 
     bool LoadChannelIcon(uint size) const;
+    bool LoadChannelImage(void) const;
     QString GetFormatted(const QString &format) const;
 
   public:
-    mutable QPixmap iconPixmap;
+    mutable QPixmap iconPixmap;  //FIXME remove?
+    mutable QImage  iconImage;
     mutable bool    iconLoaded;
+    mutable bool    imageLoaded;
 };
 
 class MPUBLIC ChannelInsertInfo

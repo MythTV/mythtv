@@ -716,5 +716,4 @@ void ViewScheduled::customEvent(QEvent *event)
                 LoadList();
         }
     }
-
 }

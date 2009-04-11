@@ -2,6 +2,10 @@
 #ifndef GUIDEGRID_H_
 #define GUIDEGRID_H_
 
+// c++
+#include <vector>
+
+// qt
 #include <QString>
 #include <QDateTime>
 #include <QLayout>
@@ -10,11 +14,9 @@
 #include <QPixmap>
 #include <QKeyEvent>
 #include <QDomElement>
-#include <vector>
 
-#include "mythwidgets.h"
-#include "uitypes.h"
-#include "xmlparse.h"
+// myth
+#include "mythscreentype.h"
 #include "programinfo.h"
 #include "programlist.h"
 #include "channelutil.h"
@@ -25,10 +27,11 @@ class ProgramInfo;
 class TimeInfo;
 class TV;
 class QTimer;
-class QWidget;
+class MythUIButtonList;
+class MythUIGuideGrid;
 
 #define MAX_DISPLAY_CHANS 12
-#define MAX_DISPLAY_TIMES 30
+#define MAX_DISPLAY_TIMES 36
 
 typedef vector<PixmapChannel>   pix_chan_list_t;
 typedef vector<pix_chan_list_t> pix_chan_list_list_t;
@@ -74,23 +77,28 @@ class MPUBLIC JumpToChannel : public QObject
     static const uint kJumpToChannelTimeout = 3500; // ms
 };
 
-class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
+class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
 {
     Q_OBJECT
 
   public:
     // Use this function to instantiate a guidegrid instance.
-    static DBChanList Run(uint           startChanId,
-                          const QString &startChanNum,
-                          bool           thread = false,
-                          TV            *player = NULL,
-                          bool           allowsecondaryepg = true);
+    static void RunProgramGuide(uint           startChanId,
+                                const QString &startChanNum,
+                                TV            *player = NULL,
+                                bool           allowFinder = true);
 
     DBChanList GetSelection(void) const;
 
     virtual void GoTo(int start, int cur_row);
     virtual void SetJumpToChannel(JumpToChannel *ptr);
 
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *event);
+
+    virtual void aboutToShow();
+    virtual void aboutToHide();
+    
   protected slots:
     void cursorLeft();
     void cursorRight();
@@ -124,75 +132,37 @@ class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
     void editRecording();
     void editScheduled();
     void customEdit();
-    void remove();
+    void deleteRule();
     void upcoming();
     void details();
 
-    void customEvent(QEvent *e);
+    void customEvent(QEvent *event);
 
   protected:
-    GuideGrid(MythMainWindow *parent,
+      GuideGrid(MythScreenStack *parentStack,
               uint chanid = 0, QString channum = "",
-              TV *player = NULL, bool allowsecondaryepg = true,
-              const char *name = "GuideGrid");
+              TV *player = NULL, bool allowFinder = true);
    ~GuideGrid();
 
-    void paintEvent(QPaintEvent *);
-
   private slots:
-    void timeCheckTimeout(void);
+    void updateTimeout(void);
     void refreshVideo(void);
+    void updateInfo(void);
+    void updateChannels(void);
+    void updateJumpToChannel(void);
 
   private:
-    void keyPressEvent(QKeyEvent *e);
-    void keyReleaseEvent(QKeyEvent *e);
+    void showMenu(void);
 
-    void updateBackground(void);
-    void paintDate(QPainter *);
-    void paintJumpToChannel(QPainter *);
-    bool paintChannels(QPainter *);
-    void paintTimes(QPainter *);
-    void paintPrograms(QPainter *);
-    void paintCurrentInfo(QPainter *);
-    void paintInfo(QPainter *);
-    void paintVideo(QPainter *);
- 
-    void resizeImage(QPixmap *, QString);
-    void LoadWindow(QDomElement &);
-    void parseContainer(QDomElement &);
-    XMLParse *theme;
-    QDomElement xmldata;
-
-    int m_context;
-
-    bool selectChangesChannel;
-    int selectRecThreshold;
-    
-    int gridfilltype;
-    int scrolltype;
-
-    QRect fullRect;
-    QRect dateRect;
-    QRect jumpToChannelRect;
-    QRect channelRect;
-    QRect timeRect;
-    QRect programRect;
-    QRect infoRect;
-    QRect curInfoRect;
-    QRect videoRect;
-
-    void fillChannelInfos(bool gotostartchannel = true);
     int  FindChannel(uint chanid, const QString &channum,
                      bool exact = true) const;
 
-    void fillTimeInfos();
-
+    void fillChannelInfos(bool gotostartchannel = true);
+    void fillTimeInfos(void);
     void fillProgramInfos(void);
     void fillProgramRowInfos(unsigned int row);
 
     void setStartChannel(int newStartChannel);
-
-    void createProgramLabel(int, int);
 
     PixmapChannel       *GetChannelInfo(uint chan_idx, int sel = -1);
     const PixmapChannel *GetChannelInfo(uint chan_idx, int sel = -1) const;
@@ -203,55 +173,64 @@ class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
     uint GetAlternateChannelIndex(uint chan_idx, bool with_same_channum) const;
 
   private:
+    bool  m_selectChangesChannel;
+    int   m_selectRecThreshold;
+
+    bool m_allowFinder;
     pix_chan_list_list_t m_channelInfos;
     QMap<uint,uint>      m_channelInfoIdx;
 
-    TimeInfo *m_timeInfos[MAX_DISPLAY_TIMES];
+    TimeInfo    *m_timeInfos[MAX_DISPLAY_TIMES];
     ProgramList *m_programs[MAX_DISPLAY_CHANS];
     ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
-    ProgramList m_recList;
+    ProgramList  m_recList;
 
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
     QDateTime m_currentEndTime;
     uint      m_currentStartChannel;
-    uint      startChanID;
-    QString   startChanNum;
+    uint      m_startChanID;
+    QString   m_startChanNum;
     
     int m_currentRow;
     int m_currentCol;
 
-    bool selectState;
-    bool showFavorites;
-    bool sortReverse;
-    QString channelFormat;
+    bool    m_showFavorites;
+    bool    m_sortReverse;
+    QString m_channelFormat;
 
-    int desiredDisplayChans;
-    int DISPLAY_CHANS;
-    int DISPLAY_TIMES;
+    int  m_channelCount;
+    int  m_timeCount;
+    bool m_verticalLayout;
 
-    QDateTime firstTime;
-    QDateTime lastTime;
+    QDateTime m_firstTime;
+    QDateTime m_lastTime;
 
-    TV *m_player;
-    bool using_null_video;
+    TV     *m_player;
+    bool    m_usingNullVideo;
     QTimer *previewVideoRefreshTimer;
-    void EmbedTVWindow(void);
+    void    EmbedTVWindow(void);
+    void    HideTVWindow(void);
+    QRect   m_videoRect;
 
-    QString channelOrdering;
-    QString dateformat;
-    QString timeformat;
-    QString unknownTitle;
-    QString unknownCategory;
+    QString m_channelOrdering;
+    QString m_dateFormat;
+    QString m_timeFormat;
+    QString m_unknownTitle;
+    QString m_unknownCategory;
 
-    QTimer *timeCheck;
+    QTimer *m_updateTimer;
 
-    bool keyDown;
+    QMutex            m_jumpToChannelLock;
+    JumpToChannel    *m_jumpToChannel;
+    bool              m_jumpToChannelEnabled;
 
-    QMutex         jumpToChannelLock;
-    JumpToChannel *jumpToChannel;
-    bool           jumpToChannelEnabled;
-    bool           jumpToChannelHasRect;
+    MythUIButtonList *m_timeList;
+    MythUIButtonList *m_channelList;
+    MythUIGuideGrid  *m_guideGrid;
+    MythUIText       *m_dateText;
+    MythUIText       *m_jumpToText;
+    MythUIImage      *m_channelImage;
 };
 
 #endif
