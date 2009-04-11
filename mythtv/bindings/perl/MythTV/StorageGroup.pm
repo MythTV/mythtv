@@ -3,7 +3,7 @@
 #
 # Object containing info about a particular MythTV Storage Group.
 #
-# @url       $URL: svn+ssh://cpinkham@cvs.mythtv.org/var/lib/svn/trunk/mythtv/bindings/perl/MythTV/StorageGroup.pm $
+# @url       $URL$
 # @date      $Date$
 # @version   $Revision$
 # @author    $Author$

@@ -1,6 +1,6 @@
 /*
  #
- # $Id: pxsup2dast.c 1280 2007-03-05 16:26:44Z too $
+ # $Id$
  #
  # Project X sup to dvdauthor subtitle xml file.
  # too ät iki piste fi
