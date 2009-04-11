@@ -259,8 +259,10 @@ using_frontend {
     # Video playback
     HEADERS += tv_play.h                NuppelVideoPlayer.h
     HEADERS += DVDRingBuffer.h          playercontext.h
+    HEADERS += tv_play_win.h
     SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
     SOURCES += DVDRingBuffer.cpp        playercontext.cpp
+    SOURCES += tv_play_win.cpp
 
     # Text subtitle parser
     HEADERS += textsubtitleparser.h     xine_demux_sputext.h
@@ -361,9 +363,9 @@ using_frontend {
     using_glx_proc_addr_arb:DEFINES += USING_GLX_PROC_ADDR_ARB
 
     # Misc. frontend
-    HEADERS += guidegrid.h              infostructs.h
+    HEADERS += infostructs.h
     HEADERS += ttfont.h
-    SOURCES += guidegrid.cpp            infostructs.cpp
+    SOURCES += infostructs.cpp
     SOURCES += ttfont.cpp
 
     using_mheg {

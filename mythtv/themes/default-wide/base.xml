@@ -746,4 +746,21 @@
 
     </window>
 
+    <window name="videowindow">
+
+        <shape name="shape1">
+            <area>0,0,1280,720</area>
+            <type>box</type>
+            <fill color="#000000" alpha="255"></fill>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>500,335,280,50</area>
+            <font>baselarge</font>
+            <align>allcenter</align>
+            <value>Please Wait....</value>
+        </textarea>
+
+    </window>
+
 </mythuitheme>
