@@ -38,21 +38,17 @@ using namespace std;
 #define LOC_ERR  QString("ProgFinder, Error: ")
 #define LOC_WARN QString("ProgFinder, Warning: ")
 
-void RunProgramFind(bool thread, bool ggActive)
+void RunProgramFinder(TV *player, bool allowEPG)
 {
-    //if (thread)
-    //    qApp->lock();
-
-
     // Language specific progfinder, if needed
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgFinder *programFind = NULL;
     if (GetMythUI()->GetLanguage() == "ja")
-        programFind = new JaProgFinder(mainStack, ggActive);
+        programFind = new JaProgFinder(mainStack, allowEPG, player);
     else if (GetMythUI()->GetLanguage() == "he")
-        programFind = new HeProgFinder(mainStack, ggActive);
+        programFind = new HeProgFinder(mainStack, allowEPG, player);
     else // default
-        programFind = new ProgFinder(mainStack, ggActive);
+        programFind = new ProgFinder(mainStack, allowEPG, player);
 
     if (programFind->Create())
         mainStack->AddScreen(programFind);
@@ -60,13 +56,14 @@ void RunProgramFind(bool thread, bool ggActive)
         delete programFind;
 }
 
-ProgFinder::ProgFinder(MythScreenStack *parentStack, bool gg) 
+ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG, TV *player) 
           : MythScreenType(parentStack, "ProgFinder"),
     m_searchStr(QString::null),
-    m_ggActive(gg),              m_allowKeypress(false),
+    m_allowEPG(allowEPG),              m_allowKeypress(false),
     m_dateFormat(QString::null), m_timeFormat(QString::null)
 {
     gContext->addCurrentLocation("ProgFinder");
+    m_player = player;
 }
 
 bool ProgFinder::Create()
@@ -88,10 +85,6 @@ bool ProgFinder::Create()
         VERBOSE(VB_IMPORTANT, "Cannot load screen 'programfind'");
         return false;
     }
-
-//    MythUIText *type = dynamic_cast<MythUIText*>(GetChild("description"));
-//    if (type)
-//        type->SetText("");
 
     BuildFocusList();
 
@@ -132,6 +125,14 @@ ProgFinder::~ProgFinder()
 {
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
+
+    // if we have a player and we are returning to it we need 
+    // to tell it to stop embedding and return to fullscreen
+    if (m_player && m_allowEPG)
+    {
+        QString message = QString("PROGFINDER_EXITING");
+        qApp->postEvent(m_player, new MythEvent(message));
+    }
 }
 
 void ProgFinder::alphabetListItemSelected(MythUIButtonListItem *item)
@@ -380,16 +381,14 @@ void ProgFinder::updateInfo(void)
 
 void ProgFinder::showGuide()
 {
-    if (!m_ggActive)
+    if (m_allowEPG)
     {
         QString startchannel = gContext->GetSetting("DefaultTVChannel");
         if (startchannel == "")
             startchannel = "3";
         uint startchanid = 0;
-        GuideGrid::Run(startchanid, startchannel);
+        GuideGrid::RunProgramGuide(startchanid, startchannel, m_player, false);
     }
-
-    Close();
 }
 
 void ProgFinder::getInfo(bool toggle)
@@ -734,8 +733,6 @@ void ProgFinder::restoreSelectedData(QString &data)
         data = "The " + data.left(data.length() - 5);
     if (data.right(3) == ", A")
         data = "A " + data.left(data.length() - 3);
-    if (data.right(4) == ", An")
-        data = "An " + data.left(data.length() - 4);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -748,8 +745,8 @@ const char* JaProgFinder::searchChars[] = {
     0,
 };
 
-JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg)
-            : ProgFinder(parentStack, gg)
+JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg, TV *player)
+            : ProgFinder(parentStack, gg, player)
 {
     for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
          numberOfSearchChars++)
@@ -854,8 +851,8 @@ const char* HeProgFinder::searchChars[] = {
     "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת", "E", "#", 0, 
 };
 
-HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg)
-            : ProgFinder(parentStack, gg)
+HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg, TV *player)
+            : ProgFinder(parentStack, gg, player)
 {
     for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
          numberOfSearchChars++)

@@ -160,12 +160,12 @@ void startGuide(void)
     uint chanid = 0;
     QString channum = gContext->GetSetting("DefaultTVChannel");
     channum = (channum.isEmpty()) ? "3" : channum;
-    GuideGrid::Run(chanid, channum);
+    GuideGrid::RunProgramGuide(chanid, channum);
 }
 
 void startFinder(void)
 {
-    RunProgramFind();
+    RunProgramFinder();
 }
 
 void startSearchTitle(void)
@@ -881,6 +881,8 @@ void InitJumpPoints(void)
 
     TV::SetFuncPtr("playbackbox", (void *)PlaybackBox::RunPlaybackBox);
     TV::SetFuncPtr("viewscheduled", (void *)ViewScheduled::RunViewScheduled);
+    TV::SetFuncPtr("programguide", (void *)GuideGrid::RunProgramGuide);
+    TV::SetFuncPtr("programfinder", (void *)RunProgramFinder);
 }
 
 
