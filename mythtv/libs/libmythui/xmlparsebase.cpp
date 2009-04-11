@@ -22,8 +22,9 @@
 #include "mythuiprogressbar.h"
 #include "mythuigroup.h"
 #include "mythuiwebbrowser.h"
-#include "mythuibuttontree.h"
+#include "mythuiguidegrid.h"
 #include "mythuishape.h"
+#include "mythuibuttontree.h"
 #include "mythfontproperties.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
@@ -218,6 +219,7 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                      type == "clock" ||
                      type == "progressbar" ||
                      type == "webbrowser" ||
+                     type == "guidegrid" ||
                      type == "shape")
             {
                 ParseUIType(info, type, parent);
@@ -305,6 +307,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIProgressBar(parent, name);
     else if (type == "webbrowser")
         uitype = new MythUIWebBrowser(parent, name);
+    else if (type == "guidegrid")
+        uitype = new MythUIGuideGrid(parent, name);
     else if (type == "shape")
         uitype = new MythUIShape(parent, name);
     else if (type == "window" && parent == GetGlobalObjectStore())
@@ -388,6 +392,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "clock" ||
                      info.tagName() == "progressbar" ||
                      info.tagName() == "webbrowser" ||
+                     info.tagName() == "guidegrid" ||
                      info.tagName() == "shape")
             {
                 ParseUIType(info, info.tagName(), uitype, screen);
@@ -507,6 +512,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "clock" ||
                          type == "progressbar" ||
                          type == "webbrowser" ||
+                         type == "guidegrid" ||
                          type == "shape")
                 {
                     ParseUIType(e, type, parent);
