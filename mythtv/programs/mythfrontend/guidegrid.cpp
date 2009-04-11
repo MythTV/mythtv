@@ -1373,6 +1373,8 @@ void GuideGrid::updateChannels(void)
                 item->setImage(image, "channelicon");
             }
         }
+        else
+            item->SetImage("", "channelicon");
     }
 }
 
@@ -1399,19 +1401,30 @@ void GuideGrid::updateInfo(void)
 
     bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
 
-    if (m_channelImage && showChannelIcon && !chinfo->icon.isEmpty())
+    if (m_channelImage)
     {
-        if (!chinfo->imageLoaded)
-            chinfo->LoadChannelImage();
-
-        if (chinfo->imageLoaded)
+        if (showChannelIcon && !chinfo->icon.isEmpty())
         {
-            MythImage *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-            image->Assign(chinfo->iconImage);
-            m_channelImage->SetImage(image);
+            if (!chinfo->imageLoaded)
+                chinfo->LoadChannelImage();
+
+            if (chinfo->imageLoaded)
+            {
+                MythImage *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+                image->Assign(chinfo->iconImage);
+                m_channelImage->SetImage(image);
+            }
+            else
+            {
+                m_channelImage->SetFilename("");
+                m_channelImage->Load();
+            }
         }
         else
-            m_channelImage->Reset();
+        {
+            m_channelImage->SetFilename("");
+            m_channelImage->Load();
+        }
     }
 
     pginfo->ToMap(infoMap);
