@@ -220,6 +220,8 @@ void MythUIWebBrowser::Init(void)
     if (!dir.exists())
         dir.mkdir(path);
     QWebSettings::setIconDatabasePath(path);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,
+                                                 true);
 
     QImage image = QImage(m_Area.size(), QImage::Format_ARGB32);
     m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
