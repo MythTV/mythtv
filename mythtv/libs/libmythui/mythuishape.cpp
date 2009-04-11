@@ -43,10 +43,10 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     area.translate(xoffset, yoffset);
 
     if (m_type == "box")
-        p->DrawRect(area, m_drawFill, m_fillColor, 
+        p->DrawRect(area, m_drawFill, m_fillColor,
                     m_drawLine, m_lineWidth, m_lineColor);
     else if (m_type == "roundbox")
-        p->DrawRoundRect(area, m_cornerRadius, m_drawFill, m_fillColor, 
+        p->DrawRoundRect(area, m_cornerRadius, m_drawFill, m_fillColor,
                          m_drawLine, m_lineWidth, m_lineColor);
 }
 
@@ -61,7 +61,7 @@ bool MythUIShape::ParseElement(QDomElement &element)
         QString color = element.attribute("color", "");
         int alpha = element.attribute("alpha", "255").toInt();
 
-        if (color != "")
+        if (!color.isEmpty())
         {
             m_fillColor = QColor(color);
             m_fillColor.setAlpha(alpha);
@@ -78,7 +78,7 @@ bool MythUIShape::ParseElement(QDomElement &element)
         QString color = element.attribute("color", "");
         int alpha = element.attribute("alpha", "255").toInt();
 
-        if (color != "")
+        if (!color.isEmpty())
         {
             m_lineColor = QColor(color);
             m_lineColor.setAlpha(alpha);
