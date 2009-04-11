@@ -68,6 +68,8 @@ class MPUBLIC MythScreenType : public MythUIType
     QMap<int, MythUIType *> m_FocusWidgetList;
 
     MythScreenStack *m_ScreenStack;
+    
+    QRegion m_SavedMask;
 
     friend class XMLParseBase;
 };

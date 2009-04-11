@@ -184,10 +184,32 @@ MythScreenStack *MythScreenType::GetScreenStack(void) const
 
 void MythScreenType::aboutToHide(void)
 {
+    if (!m_FullScreen)
+    {
+        if (!GetMythMainWindow()->GetPaintWindow()->mask().isEmpty())
+        {
+            // remove this screen's area from the mask so any embedded video is
+            // shown which was covered by this screen
+            if (!m_SavedMask.isEmpty())
+                GetMythMainWindow()->GetPaintWindow()->setMask(m_SavedMask);
+        }
+    }
 }
 
 void MythScreenType::aboutToShow(void)
 {
+    if (!m_FullScreen)
+    {
+        if (!GetMythMainWindow()->GetPaintWindow()->mask().isEmpty())
+        {
+            // add this screens area to the mask so any embedded video isn't
+            // shown in front of this screen
+            QRegion region = GetMythMainWindow()->GetPaintWindow()->mask();
+            m_SavedMask = region;
+            region = region.unite(QRegion(m_Area));
+            GetMythMainWindow()->GetPaintWindow()->setMask(region);
+        }
+    }
 }
 
 bool MythScreenType::IsDeleting(void) const
