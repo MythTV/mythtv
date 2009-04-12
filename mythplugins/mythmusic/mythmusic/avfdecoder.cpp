@@ -60,10 +60,10 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     m_audioEnc(NULL),       m_audioDec(NULL),
     m_pkt(&m_pkt1),         errcode(0),
     ptr(NULL),              dec_len(0),
-    data_size(0)
+    data_size(0),           m_samples(NULL)
 {
     setFilename(file);
-    memset(samples, 0, sizeof(samples));
+
     memset(&m_params, 0, sizeof(AVFormatParameters));
 
 }
@@ -72,6 +72,8 @@ avfDecoder::~avfDecoder(void)
 {
     if (inited)
         deinit();
+
+    av_freep((void *)&m_samples);
 
     if (output_buf)
     {
@@ -127,6 +129,18 @@ bool avfDecoder::initialize()
     totalTime = 0.0;
 
     filename = ((QFile *)input())->fileName();
+
+    if (!m_samples)
+    {
+        m_samples = (int16_t *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE / 2 *
+                                          sizeof(*m_samples));
+        if (!m_samples)
+        {
+            VERBOSE(VB_GENERAL, "Could not allocate output buffer in "
+                    "avfDecoder::initialize");
+            return false;
+        }
+    }
 
     if (!output_buf)
         output_buf = new char[globalBufferSize];
@@ -337,11 +351,11 @@ void avfDecoder::run()
         {
             lock();
             // Decode the stream to the output codec
-            // Samples is the output buffer
+            // m_samples is the output buffer
             // data_size is the size in bytes of the frame
             // ptr is the input buffer
             // len is the size of the input buffer
-            dec_len = avcodec_decode_audio(m_audioDec, samples, &data_size,
+            dec_len = avcodec_decode_audio(m_audioDec, m_samples, &data_size,
                                            ptr, len);
             if (dec_len < 0)
             {
@@ -349,7 +363,7 @@ void avfDecoder::run()
                 break;
             }
 
-            s = (char *)samples;
+            s = (char *)m_samples;
             unlock();
 
             while (data_size > 0 && !done && !finish && !user_stop &&

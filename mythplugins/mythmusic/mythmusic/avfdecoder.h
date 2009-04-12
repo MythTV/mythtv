@@ -1,6 +1,8 @@
 #ifndef AVFECODER_H_
 #define AVFECODER_H_
 
+#include <stdint.h>
+
 #include "decoder.h"
 
 extern "C" {
@@ -60,8 +62,7 @@ class avfDecoder : public Decoder
 
     unsigned char *ptr;
     int dec_len, data_size;
-    short samples[AVCODEC_MAX_AUDIO_FRAME_SIZE / 2];
-    // short samples[(2 * 1024 * 32) / 2];
+    int16_t *m_samples;
 };
 
 #endif
