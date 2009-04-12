@@ -19,12 +19,12 @@
         </imagetype>
 
         <buttonlist name="groups">
-            <area>12,58,1268,30</area>
+            <area>12,58,1260,30</area>
             <spacing>15</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
-            <buttonarea>0,0,1268,40</buttonarea>
+            <buttonarea>0,0,1260,40</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,240,40</area>
@@ -68,12 +68,12 @@
             <wrapstyle>items</wrapstyle>
             <scrollstyle>center</scrollstyle>
             <layout>horizontal</layout>
-            <spacing>1</spacing>
+            <spacing>0</spacing>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,14,255,262</area>
+                    <area>0,14,256,262</area>
                     <imagetype name="preview">
-                        <area>0,2,255,144</area>
+                        <area>0,2,256,144</area>
                         <filename></filename>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
