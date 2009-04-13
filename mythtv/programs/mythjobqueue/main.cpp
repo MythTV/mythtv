@@ -1,4 +1,8 @@
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -19,16 +23,108 @@
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "mythversion.h"
+#include "mythcommandlineparser.h"
+
+#define LOC      QString("MythJobQueue: ")
+#define LOC_WARN QString("MythJobQueue, Warning: ")
+#define LOC_ERR  QString("MythJobQueue, Error: ")
 
 using namespace std;
 
 JobQueue *jobqueue = NULL;
+QString   pidfile;
+QString   logfile  = QString::null;
+
+void cleanup(void)
+{
+    delete gContext;
+    gContext = NULL;
+
+    if (pidfile.size())
+    {
+        unlink(pidfile.toAscii().constData());
+        pidfile.clear();
+    }
+
+    signal(SIGHUP, SIG_DFL);
+}
+
+int log_rotate(int report_error)
+{
+    int new_logfd = open(logfile.toLocal8Bit().constData(),
+                         O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
+    if (new_logfd < 0)
+    {
+        // If we can't open the new logfile, send data to /dev/null
+        if (report_error)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Cannot open logfile '%1'").arg(logfile));
+            return -1;
+        }
+        new_logfd = open("/dev/null", O_WRONLY);
+        if (new_logfd < 0)
+        {
+            // There's not much we can do, so punt.
+            return -1;
+        }
+    }
+    while (dup2(new_logfd, 1) < 0 && errno == EINTR) ;
+    while (dup2(new_logfd, 2) < 0 && errno == EINTR) ;
+    while (close(new_logfd) < 0 && errno == EINTR) ;
+    return 0;
+}
+
+void log_rotate_handler(int)
+{
+    log_rotate(0);
+}
+
+namespace
+{
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
+}
 
 int main(int argc, char *argv[])
 {
+    bool cmdline_err;
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettingsFile |
+        kCLPOverrideSettings     |
+        kCLPQueryVersion);
+
+    for (int argpos = 0; argpos < argc; ++argpos)
+    {
+        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return JOBQUEUE_EXIT_INVALID_CMDLINE;
+
+            if (cmdline.WantsToExit())
+                return JOBQUEUE_EXIT_OK;
+        }
+    }
+
     QApplication a(argc, argv, false);
     QMap<QString, QString> settingsOverride;
     int argpos = 1;
+    bool daemonize = false;
 
     QString filename;
 
@@ -54,6 +150,45 @@ int main(int argc, char *argv[])
                 return JOBQUEUE_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"-l") ||
+                 !strcmp(a.argv()[argpos],"--logfile"))
+        {
+            if (a.argc() > argpos)
+            {
+                logfile = a.argv()[argpos+1];
+                if (logfile.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -l/--logfile option\n";
+                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                }
+                else
+                {
+                    ++argpos;
+                }
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-p") ||
+                 !strcmp(a.argv()[argpos],"--pidfile"))
+        {
+            if (a.argc() > argpos)
+            {
+                pidfile = a.argv()[argpos+1];
+                if (pidfile.startsWith("-"))
+                {
+                    cerr << "Invalid or missing argument to -p/--pidfile option\n";
+                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
+                }
+                else
+                {
+                   ++argpos;
+                }
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-d") ||
+                 !strcmp(a.argv()[argpos],"--daemon"))
+        {
+            daemonize = true;
+        }
         else if (!strcmp(a.argv()[argpos],"-O") ||
                  !strcmp(a.argv()[argpos],"--override-setting"))
         {
@@ -64,7 +199,7 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Invalid or missing argument to "
                             "-O/--override-setting option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
+                    return JOBQUEUE_EXIT_INVALID_CMDLINE;
                 }
 
                 QStringList pairs = tmpArg.split(",");
@@ -92,8 +227,19 @@ int main(int argc, char *argv[])
         {
             cerr << "Valid Options are:" << endl <<
                     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
+                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+                    "-p or --pidfile filename       Write PID of mythjobqueue to filename " <<
+                    "-d or --daemon                 Runs mythjobqueue as a daemon" << endl <<
                     endl;
             return JOBQUEUE_EXIT_INVALID_CMDLINE;
+        }
+        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return JOBQUEUE_EXIT_INVALID_CMDLINE;
+
+            if (cmdline.WantsToExit())
+                return JOBQUEUE_EXIT_OK;
         }
         else
         {
@@ -104,11 +250,58 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
-    gContext = NULL;
+    if (logfile != "" )
+    {
+        if (log_rotate(1) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Cannot open logfile; using stdout/stderr instead");
+        }
+        else
+            signal(SIGHUP, &log_rotate_handler);
+    }
+
+    CleanupGuard callCleanup(cleanup);
+
+    ofstream pidfs;
+    if (pidfile.size())
+    {
+        pidfs.open(pidfile.toAscii().constData());
+        if (!pidfs)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Could not open pid file" + ENO);
+            return JOBQUEUE_EXIT_OPENING_PIDFILE_ERROR;
+        }
+    }
+
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
+
+    if (daemonize && (daemon(0, 1) < 0))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
+        return JOBQUEUE_EXIT_DAEMONIZING_ERROR;
+    }
+
+    if (pidfs)
+    {
+        pidfs << getpid() << endl;
+        pidfs.close();
+    }
+
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                            .arg(binname)
+                            .arg(myth_source_path)
+                            .arg(myth_source_version));
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to init MythContext, exiting.");
         return JOBQUEUE_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -127,9 +320,9 @@ int main(int argc, char *argv[])
 
     jobqueue = new JobQueue(false);
 
-    a.exec();
+    int exitCode = a.exec();
 
-    delete gContext;
-
-    return JOBQUEUE_EXIT_OK;
+    return exitCode ? exitCode : JOBQUEUE_EXIT_OK;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
