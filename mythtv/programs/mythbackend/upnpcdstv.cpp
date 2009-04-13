@@ -273,7 +273,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     // Build Support Strings
     // ----------------------------------------------------------------------
 
-    QString sName      = sTitle + ": " + sSubtitle;
+    QString sName      = sTitle + ": " + (sSubtitle.isEmpty() ? sDescription : sSubtitle);
 
     QString sURIBase   = QString( "http://%1:%2/Myth/" )
                             .arg( m_mapBackendIp  [ sHostName ] ) 
