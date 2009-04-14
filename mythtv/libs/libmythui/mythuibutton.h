@@ -58,6 +58,7 @@ class MPUBLIC MythUIButton : public MythUIType
     void SetState(QString state);
 
     QString m_Message;
+    QString m_ValueText;
 
     MythUIStateType *m_BackgroundState;
     MythUIText *m_Text;

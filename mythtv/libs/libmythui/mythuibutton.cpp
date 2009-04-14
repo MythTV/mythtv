@@ -244,8 +244,7 @@ bool MythUIButton::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "value")
     {
-        QString message = getFirstText(element);
-        SetText(message);
+        m_ValueText = getFirstText(element);
     }
     else
         return MythUIType::ParseElement(element);
@@ -270,6 +269,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
     }
 
     m_Message = button->m_Message;
+    m_ValueText = button->m_ValueText;
     m_Lockable = button->m_Lockable;
 
     MythUIType::CopyFrom(base);
@@ -280,4 +280,5 @@ void MythUIButton::CopyFrom(MythUIType *base)
 void MythUIButton::Finalize()
 {
     SetInitialStates();
+    SetText(m_ValueText);
 }
