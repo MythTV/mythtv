@@ -199,7 +199,7 @@ static HostLineEdit *MiscStatusScript()
     he->setHelpText(QObject::tr("External application or script that outputs "
                                 "extra information for inclusion in the "
                                 "backend status page.  See "
-                                "contrib/misc_status_info/README"));
+                                "contrib/info/misc_status_info/README"));
     return he;
 }
 
