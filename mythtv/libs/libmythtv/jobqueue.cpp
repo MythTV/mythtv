@@ -2298,6 +2298,16 @@ void JobQueue::DoUserJobThread(void)
         ChangeJobStatus(jobID, JOB_ERRORED,
             "ERROR: Unable to find executable, check backend logs.");
     }
+    else if (result != 0)
+    {
+        msg = QString("User Job '%1' failed.").arg(runningJobs[key].command);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+
+        gContext->LogEntry("jobqueue", LP_WARNING, "User Job Errored", msg);
+
+        ChangeJobStatus(jobID, JOB_ERRORED,
+            "ERROR: User Job returned non-zero, check logs.");
+    }
     else
     {
         msg = QString("Finished \"%1\" for \"%2\" recorded from "
