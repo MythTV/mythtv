@@ -177,9 +177,9 @@
             <buttonarea>20,32,300,410</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,300,50</area>
+                    <area>0,0,400,50</area>
                     <textarea name="buttontext">
-                        <area>0,0,300,50</area>
+                        <area>0,0,400,50</area>
                         <font>menufont</font>
                         <align>left,vcenter</align>
                         <cutdown>yes</cutdown>
