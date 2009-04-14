@@ -232,7 +232,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     short          nTotalMatches   = 0;
     short          nUpdateID       = 0;
     QString        sResultXML;
-    FilterMap filter =  (FilterMap) request.m_sFilter.split(",");
+    FilterMap filter =  (FilterMap) request.m_sFilter.split(',');
 
     VERBOSE(VB_UPNP, QString("UPnpCDS::HandleBrowse ObjectID=%1, ContainerId=%2")
 		             .arg(request.m_sObjectId)
@@ -473,7 +473,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
         if (eErrorCode == UPnPResult_Success)
         {
-            FilterMap filter =  (FilterMap) request.m_sFilter.split(",");
+            FilterMap filter =  (FilterMap) request.m_sFilter.split(',');
             nNumberReturned = pResult->m_List.count();
             nTotalMatches   = pResult->m_nTotalMatches;
             nUpdateID       = pResult->m_nUpdateID;
@@ -631,7 +631,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
                     " ", QString::SkipEmptyParts);
                 idPath = idPath[0].split('?', QString::SkipEmptyParts);
 
-                if (idPath[0].startsWith("Id"))
+                if (idPath[0].startsWith(QString("Id")))
                     idPath[0] = QString("item=%1").arg(idPath[0].right(idPath[0].length() - 2));
             }
         }
@@ -643,10 +643,10 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
         if (sLast == m_sExtensionId         ) { return( ProcessRoot   ( pRequest, pResults, idPath )); }
         if (sLast == "0"                    ) { return( ProcessAll    ( pRequest, pResults, idPath )); }
 
-        if (sLast.startsWith("key" , Qt::CaseSensitive))
+        if (sLast.startsWith(QString("key") , Qt::CaseSensitive))
             return ProcessKey(pRequest, pResults, idPath);
 
-        if (sLast.startsWith("item", Qt::CaseSensitive))
+        if (sLast.startsWith(QString("item"), Qt::CaseSensitive))
             return ProcessItem(pRequest, pResults, idPath);
 
         int nNodeIdx = sLast.toInt();

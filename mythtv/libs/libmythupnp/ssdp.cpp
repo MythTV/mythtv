@@ -339,7 +339,7 @@ SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
     //      <method> <Resource URI> HTTP/m.n
     // ----------------------------------------------------------------------
 
-    if ( sLine.startsWith( "HTTP/" )) 
+    if ( sLine.startsWith( QString("HTTP/") ))
         return SSDP_MSearchResp;
     else
     {

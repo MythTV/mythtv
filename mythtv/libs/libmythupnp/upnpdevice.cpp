@@ -377,8 +377,8 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     bool bIsXbox360 =
-        sUserAgent.startsWith("Xbox/2.0", Qt::CaseInsensitive) ||
-        sUserAgent.startsWith( "Mozilla/4.0", Qt::CaseInsensitive);
+        sUserAgent.startsWith(QString("Xbox/2.0"), Qt::CaseInsensitive) ||
+        sUserAgent.startsWith( QString("Mozilla/4.0"), Qt::CaseInsensitive);
 
     os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
     os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );    
@@ -625,7 +625,7 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL, bool bInQtThread )
                                        NULL,  // login
                                        bInQtThread );
 
-    if (sXml.startsWith( "<?xml" ))
+    if (sXml.startsWith( QString("<?xml") ))
     {
         QString sErrorMsg;
 

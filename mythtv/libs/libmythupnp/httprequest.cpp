@@ -171,7 +171,7 @@ RequestType HTTPRequest::SetRequestType( const QString &sType )
     if (sType == "UNSUBSCRIBE") return( m_eType = RequestTypeUnsubscribe );
     if (sType == "NOTIFY"     ) return( m_eType = RequestTypeNotify      );
 
-    if (sType.startsWith( "HTTP/" )) return( m_eType = RequestTypeResponse );
+    if (sType.startsWith( QString("HTTP/") )) return( m_eType = RequestTypeResponse );
 
     VERBOSE( VB_UPNP, QString( "HTTPRequest::SentRequestType( %1 ) - returning Unknown." )
                          .arg( sType ) );
@@ -995,7 +995,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 
     // ----------------------------------------------------------------------
 
-    if ( sLine.startsWith( "HTTP/" ))
+    if ( sLine.startsWith( QString("HTTP/") ))
         m_eType = RequestTypeResponse;
     else
         m_eType = RequestTypeUnknown;
@@ -1196,8 +1196,8 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     // XML Document Loaded... now parse it
     // --------------------------------------------------------------
 
-    m_sNameSpace    = sSOAPAction.section( "#", 0, 0).remove( 0, 1);
-    m_sMethod       = sSOAPAction.section( "#", 1 );
+    m_sNameSpace    = sSOAPAction.section( '#', 0, 0).remove( 0, 1);
+    m_sMethod       = sSOAPAction.section( '#', 1 );
     m_sMethod.remove( m_sMethod.length()-1, 1 );
 
     QDomNodeList oNodeList = doc.elementsByTagNameNS( m_sNameSpace, m_sMethod );
