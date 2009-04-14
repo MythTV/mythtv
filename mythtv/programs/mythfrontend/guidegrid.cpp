@@ -182,7 +182,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
                                   player, allowFinder);
 
     if (gg->Create())
-        mainStack->AddScreen(gg);
+        mainStack->AddScreen(gg, (player == NULL));
     else
         delete gg;
 }
@@ -352,8 +352,6 @@ GuideGrid::~GuideGrid()
         QString message = QString("EPG_EXITING");
         qApp->postEvent(m_player, new MythEvent(message));
     }
-
-    HideTVWindow();
 }
 
 bool GuideGrid::keyPressEvent(QKeyEvent *event)
@@ -1763,7 +1761,11 @@ void GuideGrid::escape()
     if (m_updateTimer)
         m_updateTimer->stop();
 
-    Close();
+    // don't fade the screen if we are returning to the player
+    if (m_player && m_allowFinder)
+        GetScreenStack()->PopScreen(this, false);
+    else
+        GetScreenStack()->PopScreen(this, true);
 
     epgIsVisibleCond.wakeAll();
 }

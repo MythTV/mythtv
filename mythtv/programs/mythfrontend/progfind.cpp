@@ -51,7 +51,7 @@ void RunProgramFinder(TV *player, bool allowEPG)
         programFind = new ProgFinder(mainStack, allowEPG, player);
 
     if (programFind->Create())
-        mainStack->AddScreen(programFind);
+        mainStack->AddScreen(programFind, (player == NULL));
     else
         delete programFind;
 }
@@ -192,6 +192,14 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
             quickRecord();
         else if (action == "GUIDE" || action == "4")
             showGuide();
+        else if (action == "ESCAPE")
+        {
+            // don't fade the screen if we are returning to the player
+            if (m_player && m_allowEPG)
+                GetScreenStack()->PopScreen(this, false);
+            else
+                GetScreenStack()->PopScreen(this, true);
+        }
         else
             handled = false;
     }
