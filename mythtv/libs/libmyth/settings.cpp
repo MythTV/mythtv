@@ -96,7 +96,6 @@ QString Setting::getValue(void) const
 void Setting::setValue(const QString &newValue)
 {
     settingValue = newValue;
-    SetChanged(true);
     emit valueChanged(settingValue);
 }
 

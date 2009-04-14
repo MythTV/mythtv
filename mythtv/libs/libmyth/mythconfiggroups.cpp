@@ -107,6 +107,14 @@ void ConfigurationGroup::Save(QString destination)
             (*it)->GetStorage()->Save(destination);
 }
 
+void ConfigurationGroup::SetSaveRequired(void)
+{
+    childList::iterator it = children.begin();
+    for (; it != children.end() ; ++it)
+        if (*it && (*it)->GetStorage())
+            (*it)->GetStorage()->SetSaveRequired();
+}
+
 QWidget *VerticalConfigurationGroup::configWidget(
     ConfigurationGroup *cg, 
     QWidget            *parent,

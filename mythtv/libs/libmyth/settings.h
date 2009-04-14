@@ -97,17 +97,11 @@ class MPUBLIC Setting : public Configurable, public StorageUser
 
   public:
     // Gets
-    bool isChanged(void) const { return changed; }
     virtual QString getValue(void) const;
 
     // non-const Gets
     virtual Setting *byName(const QString &name)
         { return (name == configName) ? this : NULL; }
-
-    // Sets
-    void SetChanged(bool c) { changed = c;       }
-    void setUnchanged(void) { SetChanged(false); }
-    void setChanged(void)   { SetChanged(true);  }
 
     // StorageUser
     void SetDBValue(const QString &val) { setValue(val); }
@@ -119,12 +113,11 @@ class MPUBLIC Setting : public Configurable, public StorageUser
     void valueChanged(const QString&);
 
   protected:
-    Setting(Storage *_storage) : Configurable(_storage), changed(false) {};
+    Setting(Storage *_storage) : Configurable(_storage) {};
     virtual ~Setting() {};
 
   protected:
     QString settingValue;
-    bool    changed;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

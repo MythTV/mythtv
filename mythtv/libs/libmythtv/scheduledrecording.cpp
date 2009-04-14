@@ -130,7 +130,6 @@ void ScheduledRecording::Load(void)
                                       search->intValue() == kManualSearch);
 
         type->setValue(tmpType);
-        type->setUnchanged();
 
         fetchChannelInfo();
     }
@@ -488,7 +487,7 @@ void ScheduledRecording::Save(void)
 
 void ScheduledRecording::save(bool sendSig)
 {
-    if (type->isChanged() && getRecordingType() == kNotRecording)
+    if (type->IsSaveRequired() && getRecordingType() == kNotRecording)
     {
         remove();
     }
@@ -516,7 +515,7 @@ void ScheduledRecording::save(bool sendSig)
 
 void ScheduledRecording::Save(QString destination)
 {
-    if (type->isChanged() && getRecordingType() == kNotRecording)
+    if (type->IsSaveRequired() && getRecordingType() == kNotRecording)
     {
         remove();
     }
@@ -964,39 +963,19 @@ void ScheduledRecording::makeOverride(void)
         type->getValue().toInt() == kDontRecord)
         return;
 
+    SetSaveRequired();
     id->setValue(0);
     type->clearSelections();
     type->addOverrideSelections();
     type->setValue(kNotRecording);
     inactive->setValue(0);
 
-    if (search->intValue() == kManualSearch)
-        search->setChanged();
-    else
+    if (search->intValue() != kManualSearch)
         search->setValue(kNoSearch);
 
     setProgram(m_pginfo);
 
     parentid->setValue(m_pginfo->recordid);
-
-    profile->setChanged();
-    dupin->setChanged();
-    dupmethod->setChanged();
-    autoexpire->setChanged();
-    autotranscode->setChanged();
-    autocommflag->setChanged();
-    autouserjob1->setChanged();
-    autouserjob2->setChanged();
-    autouserjob3->setChanged();
-    autouserjob4->setChanged();
-    maxepisodes->setChanged();
-    maxnewest->setChanged();
-    startoffset->setChanged();
-    endoffset->setChanged();
-    recpriority->setChanged();
-    recgroup->setChanged();
-    storagegroup->setChanged();
-    playgroup->setChanged();
 }
 
 void

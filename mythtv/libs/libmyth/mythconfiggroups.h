@@ -47,6 +47,7 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
     virtual void Load(void);
     virtual void Save(void);
     virtual void Save(QString destination);
+    virtual void SetSaveRequired(void);
 
   signals:
     void changeHelpText(QString);

@@ -99,6 +99,11 @@ bool SimpleDBStorage::IsSaveRequired(void) const
     return user->GetDBValue() != initval;
 }
 
+void SimpleDBStorage::SetSaveRequired(void)
+{
+    initval.clear();
+}
+
 //////////////////////////////////////////////////////////////////////
 
 QString GenericDBStorage::GetWhereClause(MSqlBindings &bindings) const

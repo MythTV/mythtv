@@ -27,6 +27,8 @@ class MPUBLIC Storage
     virtual void Load(void) = 0;
     virtual void Save(void) = 0;
     virtual void Save(QString /*destination*/) { }
+    virtual bool IsSaveRequired(void) const { return true; };
+    virtual void SetSaveRequired(void) { };
 };
 
 class MPUBLIC DBStorage : public Storage
@@ -57,11 +59,12 @@ class MPUBLIC SimpleDBStorage : public DBStorage
     virtual void Load(void);
     virtual void Save(void);
     virtual void Save(QString destination);
+    virtual bool IsSaveRequired(void) const;
+    virtual void SetSaveRequired(void);
 
   protected:
     virtual QString GetWhereClause(MSqlBindings &bindings) const = 0;
     virtual QString GetSetClause(MSqlBindings &bindings) const;
-    virtual bool    IsSaveRequired(void) const;
 
   protected:
     QString initval;

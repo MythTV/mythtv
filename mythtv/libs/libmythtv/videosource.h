@@ -398,13 +398,13 @@ class DVBAudioDevice : public LineEditSetting, public CaptureCardDBStorage
 
     void Save(void)
     {
-        changed = true;
+        SetSaveRequired();
         settingValue = "";
         SimpleDBStorage::Save();
     }
     void Save(QString destination)
     {
-        changed = true;
+        SetSaveRequired();
         settingValue = "";
         SimpleDBStorage::Save(destination);
     }
@@ -423,13 +423,13 @@ class DVBVbiDevice : public LineEditSetting, public CaptureCardDBStorage
     };
     void Save(void)
     {
-        changed = true;
+        SetSaveRequired();
         settingValue = "";
         SimpleDBStorage::Save();
     }
     void Save(QString destination)
     {
-        changed = true;
+        SetSaveRequired();
         settingValue = "";
         SimpleDBStorage::Save(destination);
     }
