@@ -59,7 +59,7 @@ int BuildVideoMarkup(QString& filename)
     program_info->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
     program_info->recendts = QDateTime::currentDateTime().addSecs(-1);
     program_info->isVideo = true;
-    program_info->pathname = filename;
+    program_info->pathname = QFileInfo(filename).absFilePath();
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
     if (!tmprbuf)
@@ -681,7 +681,7 @@ int main(int argc, char *argv[])
                         "Missing or invalid parameters for --chanid option");
                 return COMMFLAG_EXIT_INVALID_CHANID;
             }
-            
+
             chanid += a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos],"-s") ||
@@ -694,7 +694,7 @@ int main(int argc, char *argv[])
                         "Missing or invalid parameters for --starttime option");
                 return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
-            
+
             starttime += a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos],"-f") ||
@@ -740,7 +740,7 @@ int main(int argc, char *argv[])
                 cerr << "Missing or invalid parameter for --allstart\n";
                 return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
-            
+
             allStart = a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos], "--allend"))
@@ -751,7 +751,7 @@ int main(int argc, char *argv[])
                 cerr << "Missing or invalid parameter for --allend\n";
                 return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
-            
+
             allEnd = a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos], "--quiet"))
@@ -849,8 +849,8 @@ int main(int argc, char *argv[])
                     cerr << "Invalid or missing argument to "
                             "-O/--override-setting option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
+                }
+
                 QStringList pairs = QStringList::split(",", tmpArg);
                 for (unsigned int index = 0; index < pairs.size(); ++index)
                 {
@@ -863,7 +863,7 @@ int main(int argc, char *argv[])
                 }
             }
             else
-            { 
+            {
                 cerr << "Invalid or missing argument to -O/--override-setting "
                         "option\n";
                 return GENERIC_EXIT_INVALID_CMDLINE;
