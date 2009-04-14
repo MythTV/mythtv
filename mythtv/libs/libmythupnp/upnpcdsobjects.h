@@ -60,10 +60,10 @@ class Property
 
     public:
 
-        Property( const QString &sName, 
-                  const QString &sNameSpace = "",
-                  bool           bRequired  = false,
-                  const QString &sValue     = "" )
+        explicit Property( const QString &sName, 
+                           const QString &sNameSpace = "",
+                           bool           bRequired  = false,
+                           const QString &sValue     = "" )
         {
             m_sName      = sName;
             m_sNameSpace = sNameSpace;
@@ -173,7 +173,7 @@ class CDSObject
 
     public:
 
-                      CDSObject( const QString sId = "-1", 
+        explicit      CDSObject( const QString sId = "-1", 
                                  const QString sTitle = "",
                                  const QString sParentId = "-1" );
         virtual      ~CDSObject();

@@ -70,8 +70,8 @@ class BufferedSocketDevice
     public:
 
         BufferedSocketDevice( int nSocket );
-        BufferedSocketDevice( MSocketDevice *pSocket = NULL,
-                              bool    bTakeOwnership = false );
+        explicit BufferedSocketDevice( MSocketDevice *pSocket = NULL,
+                                       bool bTakeOwnership    = false );
 
         virtual ~BufferedSocketDevice( );
 

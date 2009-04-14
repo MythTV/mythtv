@@ -114,7 +114,7 @@ class StateVariableBase
 
     public:
 
-        StateVariableBase( const QString &sName, bool bNotify = false ) 
+        explicit StateVariableBase( const QString &sName, bool bNotify = false ) 
         {
             m_bNotify = bNotify;
             m_sName   = sName;
