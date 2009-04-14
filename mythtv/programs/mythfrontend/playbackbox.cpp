@@ -2703,7 +2703,7 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
         return false;
     }
 
-    if (rec->GetFilesize() == 0)
+    if ((rec->filesize == 0) && (rec->GetFilesize() == 0))
     {
         VERBOSE(VB_IMPORTANT,
             QString("PlaybackBox::play(): Error, %1 is zero-bytes in size")
