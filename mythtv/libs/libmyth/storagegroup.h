@@ -38,6 +38,9 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     static QStringList getGroupDirs(QString groupname, QString host);
 
   private:
+    bool FindDirs(const QString group = "Default",
+                  const QString hostname = "");
+
     QString      m_groupname;
     QString      m_hostname;
     QStringList  m_dirlist;

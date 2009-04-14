@@ -44,67 +44,65 @@ StorageGroup::StorageGroup(const QString group, const QString hostname) :
     Init(m_groupname, m_hostname);
 }
 
+/** \fn StorageGroup::Init(const QString, const QString)
+ *  \brief Initilizes the groupname, hostname, and dirlist
+ *
+ *   First attempts to find the Storage Group defined with the specified name
+ *   for the given host.  If not found, checks for the named Storage Group, as
+ *   defined across all hosts.  If not found, tries the "Default" Storage Group
+ *   for the given host.  If not found, tries the "Default" Storage Group, as
+ *   defined across all hosts.
+ *
+ *  \param group    The name of the Storage Group
+ *  \param hostname The host whose Storage Group definition is desired
+ */
 void StorageGroup::Init(const QString group, const QString hostname)
 {
-    QString dirname;
-    MSqlQuery query(MSqlQuery::InitCon());
-
+    bool found = false;
     m_groupname = group;    m_groupname.detach();
     m_hostname  = hostname; m_hostname.detach();
     m_dirlist.clear();
 
-    QString sql = "SELECT DISTINCT dirname "
-                  "FROM storagegroup ";
-
-    if (!m_groupname.isEmpty())
+    found = FindDirs(m_groupname, m_hostname);
+    if ((!found) && (!hostname.isEmpty()))
     {
-        sql.append("WHERE groupname = :GROUP");
-        if (!m_hostname.isEmpty())
-            sql.append(" AND hostname = :HOSTNAME");
-    }
-
-    query.prepare(sql);
-    if (!m_groupname.isEmpty())
-    {
-        query.bindValue(":GROUP", m_groupname);
-        if (!m_hostname.isEmpty())
-            query.bindValue(":HOSTNAME", m_hostname);
-    }
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("StorageGroup::StorageGroup()", query);
-    else if (!query.next())
-    {
-        if (group != "Default")
+        VERBOSE(VB_FILE, LOC +
+                QString("Unable to find any directories for the local "
+                        "storage group '%1' on '%2', trying directories on "
+                        "all hosts!").arg(group).arg(hostname));
+        found = FindDirs(m_groupname, "");
+        if (found)
         {
-            VERBOSE(VB_FILE, LOC +
-                    QString("Unable to find storage group '%1', trying "
-                            "'Default' group!").arg(m_groupname));
-            Init("Default", m_hostname);
-            return;
+            m_hostname = "";
+            m_hostname.detach();
         }
-        else if (!m_hostname.isEmpty())
+    }
+    if ((!found) && (group != "Default"))
+    {
+        VERBOSE(VB_FILE, LOC +
+                QString("Unable to find storage group '%1', trying "
+                        "'Default' group!").arg(group));
+        found = FindDirs("Default", m_hostname);
+        if(found)
+        {
+            m_groupname = "Default";
+            m_groupname.detach();
+        }
+        else if (!hostname.isEmpty())
         {
             VERBOSE(VB_FILE, LOC +
                     QString("Unable to find any directories for the local "
-                            "Default storage group, trying directories in all "
-                            "Default groups!").arg(m_groupname));
-            Init("Default", "");
-            return;
+                            "Default storage group on '%1', trying directories "
+                            "in all Default groups!").arg(hostname));
+            found = FindDirs("Default", "");
+            if(found)
+            {
+                m_groupname = "Default";
+                m_hostname = "";
+                m_groupname.detach();
+                m_hostname.detach();
+            }
         }
-    }
-    else
-    {
-        do
-        {
-            dirname = query.value(0).toString();
-            dirname.replace(QRegExp("^\\s*"), "");
-            dirname.replace(QRegExp("\\s*$"), "");
-            if (dirname.right(1) == "/")
-                dirname.remove(dirname.length() - 1, 1);
-            m_dirlist << dirname;
-        }
-        while (query.next());
     }
 
     if (!m_dirlist.size())
@@ -222,6 +220,60 @@ QStringList StorageGroup::GetFileInfo(QString filename)
     }
 
     return details;
+}
+
+/** \fn StorageGroup::FindDirs(const QString, const QString)
+ *  \brief Finds and initializes the directory list associated with the Storage
+ *         Group
+ *
+ *   This function should only be called by StorageGroup::Init().
+ *
+ *  \param group    The name of the Storage Group
+ *  \param hostname The host whose directory list should be checked, first
+ *  \return         true if directories were found
+ */
+bool StorageGroup::FindDirs(const QString group, const QString hostname)
+{
+    bool found = false;
+    QString dirname;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString sql = "SELECT DISTINCT dirname "
+                  "FROM storagegroup ";
+
+    if (!group.isEmpty())
+    {
+        sql.append("WHERE groupname = :GROUP");
+        if (!hostname.isEmpty())
+            sql.append(" AND hostname = :HOSTNAME");
+    }
+
+    query.prepare(sql);
+    if (!group.isEmpty())
+    {
+        query.bindValue(":GROUP", group);
+        if (!hostname.isEmpty())
+            query.bindValue(":HOSTNAME", hostname);
+    }
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("StorageGroup::StorageGroup()", query);
+    else if (query.next())
+    {
+        do
+        {
+            dirname = query.value(0).toString();
+            dirname.replace(QRegExp("^\\s*"), "");
+            dirname.replace(QRegExp("\\s*$"), "");
+            if (dirname.right(1) == "/")
+                dirname.remove(dirname.length() - 1, 1);
+            m_dirlist << dirname;
+        }
+        while (query.next());
+        found = true;
+    }
+
+    return found;
 }
 
 QString StorageGroup::FindRecordingFile(QString filename)
