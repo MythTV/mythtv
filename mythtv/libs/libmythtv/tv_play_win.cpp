@@ -34,14 +34,3 @@ bool TvPlayWindow::Create()
     return true;
 }
 
-void TvPlayWindow::Close(int delay)
-{
-    // delay closing to give the player a little more time to start up
-    QTimer::singleShot(delay, this, SLOT(DoClose(void)));
-}
-
-void TvPlayWindow::DoClose(void)
-{
-    GetMythMainWindow()->GetPaintWindow()->hide();
-    MythScreenType::Close();
-}

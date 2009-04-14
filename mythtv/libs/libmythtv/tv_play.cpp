@@ -878,12 +878,12 @@ bool TV::Init(bool createWindow)
         }
 
         // player window sizing
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        myWindow = new TvPlayWindow(mainStack, "video playback window");
+        myWindow = new TvPlayWindow(popupStack, "video playback window");
 
         if (myWindow->Create())
-            mainStack->AddScreen(myWindow, false);
+            popupStack->AddScreen(myWindow, false);
         else
         {
             delete myWindow;
@@ -900,7 +900,10 @@ bool TV::Init(bool createWindow)
             (db_use_fixed_size) ? player_bounds.size() :
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
 
-        GetMythMainWindow()->installEventFilter(this);
+        QPalette p = mainWindow->palette(); 
+        p.setColor(mainWindow->backgroundRole(), Qt::black); 
+        mainWindow->setPalette(p); 
+        mainWindow->installEventFilter(this);
         qApp->processEvents();
     }
 
@@ -938,7 +941,7 @@ TV::~TV(void)
 
     if (myWindow)
     {
-        ((MythScreenType*)myWindow)->Close();
+        myWindow->Close();
         myWindow = NULL;
     }
 
@@ -1780,8 +1783,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         if (ctx->buffer && ctx->buffer->IsOpen())
         {
             GetMythUI()->DisableScreensaver();
-            myWindow->Close(500);
-            myWindow = NULL;
 
             if (desiredNextState == kState_WatchingRecording)
             {
@@ -1904,9 +1905,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             VERBOSE(VB_IMPORTANT, LOC + "UpdateLCD done");
             ITVRestart(ctx, true);
             VERBOSE(VB_IMPORTANT, LOC + "ITVRestart done");
-
-            myWindow->Close(1000);
-            myWindow = NULL;
         }
         else if (StateIsPlaying(ctx->GetState()) && lastState == kState_None)
         {
@@ -1951,6 +1949,23 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
     }
 
+    if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
+             TRANSITION(kState_None, kState_WatchingVideo) ||
+             TRANSITION(kState_None, kState_WatchingDVD)   ||
+             TRANSITION(kState_None, kState_WatchingRecording) ||
+             TRANSITION(kState_None, kState_WatchingLiveTV))
+    {
+        // playback has started close the player startup screen
+        if (myWindow)
+        {
+            myWindow->Close();
+            myWindow = NULL;
+        }
+
+        // hide the GUI paint window
+        GetMythMainWindow()->GetPaintWindow()->hide();
+    }
+    
     VERBOSE(VB_PLAYBACK, LOC +
             QString("HandleStateChange(%1) -- end")
             .arg(find_player_index(ctx)));
@@ -8440,8 +8455,6 @@ void TV::customEvent(QEvent *e)
 
     if (message.left(11) == "EPG_EXITING" || message.left(18) == "PROGFINDER_EXITING")
     {
-        GetMythMainWindow()->GetPaintWindow()->hide();
-
         // Resize the window back to the MythTV Player size
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         PlayerContext *mctx;
@@ -8463,6 +8476,9 @@ void TV::customEvent(QEvent *e)
         StopEmbedding(actx);                // Undo any embedding
 
         DoSetPauseState(actx, saved_pause); // Restore pause states
+
+        GetMythMainWindow()->GetPaintWindow()->hide();
+        GetMythMainWindow()->GetPaintWindow()->clearMask();
 
         qApp->processEvents();
         DrawUnusedRects(true, actx);

@@ -15,12 +15,6 @@ class TvPlayWindow : public MythScreenType
    ~TvPlayWindow();
 
     virtual bool Create(void);
-
-  public slots:
-    void Close(int delay);
-
-  private slots:
-    void DoClose(void);
 };
 
 #endif
