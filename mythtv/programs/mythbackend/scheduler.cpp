@@ -2897,7 +2897,6 @@ void Scheduler::AddNewRecords(void)
             epicnt.prepare("SELECT DISTINCT chanid, progstart, progend "
                            "FROM recorded "
                            "WHERE recordid = :RECID AND preserve = 0 "
-                               "AND duplicate <> 0 "
                                "AND recgroup NOT IN ('LiveTV','Deleted');");
             epicnt.bindValue(":RECID", recid);
 
