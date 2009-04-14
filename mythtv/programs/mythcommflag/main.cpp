@@ -1309,7 +1309,7 @@ int main(int argc, char *argv[])
         ProgramInfo *pginfo = new ProgramInfo;
         pginfo->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
         pginfo->recendts = QDateTime::currentDateTime().addSecs(-1);
-        pginfo->pathname = filename;
+        pginfo->pathname = QFileInfo(filename).absoluteFilePath();
         pginfo->isVideo = true;
 
         result = BuildVideoMarkup(pginfo, useDB);
