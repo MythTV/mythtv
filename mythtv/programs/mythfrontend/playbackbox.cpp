@@ -1059,14 +1059,14 @@ void PlaybackBox::drawVideo(QPainter *p)
 
             // Centre preview in the y axis
             if (temp.height() < blackholeBounds.height())
-                pixmap_y = blackholeBounds.y() + 
+                pixmap_y = blackholeBounds.y() +
                                 (blackholeBounds.height() - temp.height()) / 2;
             else
                 pixmap_y = blackholeBounds.y();
 
             // Centre preview in the x axis
             if (temp.width() < blackholeBounds.width())
-                pixmap_x = blackholeBounds.x() + 
+                pixmap_x = blackholeBounds.x() +
                                 (blackholeBounds.width() - temp.width()) / 2;
             else
                 pixmap_x = blackholeBounds.x();
@@ -1191,14 +1191,14 @@ void PlaybackBox::drawVideo(QPainter *p)
 
         // Centre video in the y axis
         if (img.height() < blackholeBounds.height())
-            video_y = blackholeBounds.y() + 
+            video_y = blackholeBounds.y() +
                             (blackholeBounds.height() - img.height()) / 2;
         else
             video_y = blackholeBounds.y();
 
         // Centre video in the x axis
         if (img.width() < blackholeBounds.width())
-            video_x = blackholeBounds.x() + 
+            video_x = blackholeBounds.x() +
                             (blackholeBounds.width() - img.width()) / 2;
         else
             video_x = blackholeBounds.x();
@@ -1679,7 +1679,7 @@ void PlaybackBox::pageTop()
         paintSkipUpdate = false;
         update(drawTotalBounds);
     }
-    else 
+    else
     {
         progIndex = 0;
 
@@ -1701,7 +1701,7 @@ void PlaybackBox::pageMiddle()
         paintSkipUpdate = false;
         update(drawTotalBounds);
     }
-    else 
+    else
     {
         int progCount = progLists[titleList[titleIndex].lower()].count();
 
@@ -1721,7 +1721,7 @@ void PlaybackBox::pageBottom()
 {
     if (inTitle)
         pageTop();
-    else 
+    else
     {
         progIndex = progLists[titleList[titleIndex].lower()].count() - 1;
 
@@ -2066,7 +2066,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         }
 
         ProgramInfo *p;
-        p = progLists[watchGroupLabel].first(); 
+        p = progLists[watchGroupLabel].first();
         while (p)
         {
             int recid = p->recordid;
@@ -2703,7 +2703,7 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
         return false;
     }
 
-    if (rec->filesize == 0)
+    if (rec->GetFilesize() == 0)
     {
         VERBOSE(VB_IMPORTANT,
             QString("PlaybackBox::play(): Error, %1 is zero-bytes in size")
@@ -3660,7 +3660,7 @@ void PlaybackBox::doAllowRerecord()
         return;
 
     curitem->ForgetHistory();
-}    
+}
 
 void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
 {
