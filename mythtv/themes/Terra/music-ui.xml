@@ -1,0 +1,46 @@
+<mythuitheme>
+
+        <window name="miniplayer">
+            <area>20,690,800,30</area>
+
+            <statetype name="playbackstate">
+                <state name="playing">
+                    <imagetype name="playicon">
+                        <filename>music/miniplayer_playicon.png</filename>
+                    </imagetype>
+                </state>
+                <state name="paused">
+                    <imagetype name="pauseicon">
+                        <filename>music/miniplayer_pauseicon.png</filename>
+                    </imagetype>
+                    <textarea name="text">
+                        <area>0,0,10,30</area>
+                        <value>P</value>
+                    </textarea>
+                </state>
+                <state name="stopped">
+                    <imagetype name="stopicon">
+                        <filename>music/miniplayer_stopicon.png</filename>
+                    </imagetype>
+                    <textarea name="text">
+                        <area>0,0,10,30</area>
+                        <value>S</value>
+                    </textarea>
+                </state>
+            </statetype>
+
+            <textarea name="label" from="basetextarea">
+                <area>20,0,85,25</area>
+                <font>basesmallbrown</font>
+                <value>Playing:</value>
+                <align>allcenter</align>
+            </textarea>
+
+            <textarea name="artisttitle" from="label">
+                <area>110,0,460,25</area>
+                <value>None</value>
+                <align>left,vcenter</align>
+            </textarea>
+        </window>
+
+</mythuitheme>

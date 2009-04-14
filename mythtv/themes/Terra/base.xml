@@ -187,10 +187,13 @@
         <layout>horizontal</layout>
         <style>reveal</style>
         <imagetype name="background">
-            <filename>progressbar_background.png</filename>
+            <filename>popups/progress_bar_background.png</filename>
         </imagetype>
         <imagetype name="progressimage">
-            <filename>progressbar_fill.png</filename>
+            <filename>popups/progress_bar_fill.png</filename>
+        </imagetype>
+        <imagetype name="overlay">
+            <filename>popups/progress_bar_overlay.png</filename>
         </imagetype>
     </progressbar>
 
@@ -733,22 +736,43 @@
 
     <!-- Progress Dialog -->
     <window name="MythProgressDialog">
-        <area>-1,-1,580,165</area>
+        <area>-1,-1,619,92</area>
         <imagetype name="backimg">
-            <filename>mythprogressdialog-background.png</filename>
+            <filename>popups/progress_dialog_background.png</filename>
         </imagetype>
         <textarea name="message" from="basetextarea">
-            <area>20,20,540,60</area>
+            <area>20,10,580,50</area>
             <align>allcenter</align>
+            <multiline>true</multiline>
         </textarea>
         <progressbar name="progressbar" from="baseprogressbar">
-            <position>22,80</position>
+            <position>22,62</position>
         </progressbar>
         <textarea name="progresstext" from="basetextarea">
-            <area>30,130,200,30</area>
-            <align>left,top</align>
+            <area>550,60,50,30</area>
+            <align>left</align>
             <value>0%</value>
         </textarea>
+    </window>
+
+    <window name="videowindow">
+        <shape name="background">
+            <area>0,0,1280,720</area>
+            <type>box</type>
+            <fill color="#000000" alpha="255" />
+        </shape>
+
+        <imagetype name="animation">
+            <position>114,64</position>
+            <filename>backgrounds/videobackground.png</filename>
+        </imagetype>
+
+        <textarea name="progresstext" from="basetextarea">
+            <area>0,660,1280,60</area>
+            <value>Playback starting ...</value>
+            <align>allcenter</align>
+        </textarea>
+
     </window>
 
 </mythuitheme>
