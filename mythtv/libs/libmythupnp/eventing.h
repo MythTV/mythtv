@@ -137,15 +137,14 @@ class StateVariable : public StateVariableBase
 
         // ------------------------------------------------------------------
 
-        StateVariable( const QString &sName, bool bNotify = false ) : StateVariableBase( sName, bNotify )
+        StateVariable( const QString &sName, bool bNotify = false ) : StateVariableBase( sName, bNotify ), m_value( T( ) )
         {
         }
 
         // ------------------------------------------------------------------
 
-        StateVariable( const QString &sName, T value, bool bNotify = false ) : StateVariableBase( sName, bNotify )
+        StateVariable( const QString &sName, T value, bool bNotify = false ) : StateVariableBase( sName, bNotify ), m_value(value)
         {
-            m_value = value;
         }
 
         // ------------------------------------------------------------------
