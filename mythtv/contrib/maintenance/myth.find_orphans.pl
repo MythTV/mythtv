@@ -151,6 +151,9 @@ while (my @row=$sth->fetchrow_array) {
 		$missing_recordings++;
 
 		if ($opt_dodbdelete) {
+			$title =~ s/"/\\"/g;
+			$subtitle =~ s/"/\\"/g;
+			$description =~ s/"/\\"/g;
 			my $sql = sprintf "DELETE FROM oldrecorded WHERE title LIKE \"%s\" AND subtitle LIKE \"%s\" AND description LIKE \"%s\" LIMIT 1", $title, $subtitle, $description;
 			printf "unmarking program as recorded: %s\n",$sql;
 			$dbh->do($sql) || die "Could not execute $sql: $!\n";
