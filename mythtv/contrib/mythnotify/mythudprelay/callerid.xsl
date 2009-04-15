@@ -18,7 +18,7 @@
       </textarea>
       <textarea name="notify_cid_num">
         <value>NUM : <xsl:variable name="phone" select="from/number/text()"/>
-<xsl:choose><xsl:when test="number($phone) = $phone"><xsl:value-of select="concat('(',substring($phone,1,3),') ',substring($phone,4,3),'-',substring($phone,7,4))"/></xsl:when><xsl:otherwise><xsl:value-of select="$phone"/></xsl:otherwise></xsl:choose>
+<xsl:choose><xsl:when test="(number($phone) = $phone) and (string-length($phone) = 7)"><xsl:value-of select="concat(substring($phone,1,3),'-',substring($phone,4,4))"/></xsl:when><xsl:when test="number($phone) = $phone"><xsl:value-of select="concat('(',substring($phone,1,3),') ',substring($phone,4,3),'-',substring($phone,7,4))"/></xsl:when><xsl:otherwise><xsl:value-of select="$phone"/></xsl:otherwise></xsl:choose>
 </value>
       </textarea>
       <textarea name="notify_cid_dt">
