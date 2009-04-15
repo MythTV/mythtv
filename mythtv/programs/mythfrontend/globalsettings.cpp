@@ -3091,32 +3091,6 @@ static HostSpinBox *QtFonTweak()
 }
 
 // EPG settings
-static HostCheckBox *EPGScrollType()
-{
-    HostCheckBox *gc = new HostCheckBox("EPGScrollType");
-    gc->setLabel(QObject::tr("Floating Program Guide Selector"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, the program guide's selector "
-                    "will be free to move throughout the guide, otherwise "
-                    "it will stay in the center of the guide at all times."));
-    return gc;
-}
-
-static HostComboBox *EPGFillType()
-{
-    HostComboBox *gc = new HostComboBox("EPGFillType");
-    gc->setLabel(QObject::tr("Guide Shading Method"));
-    gc->addSelection(QObject::tr("Alpha - Transparent (CPU Usage - High)"),
-                     QString::number((int)UIGuideType::Alpha));
-    gc->addSelection(QObject::tr("Blender - Transparent (CPU Usage - Middle)"),
-                     QString::number((int)UIGuideType::Dense));
-    gc->addSelection(QObject::tr("Eco - Transparent (CPU Usage - Low)"),
-                     QString::number((int)UIGuideType::Eco));
-    gc->addSelection(QObject::tr("Solid (CPU Usage - Middle)"),
-                     QString::number((int)UIGuideType::Solid));
-    return gc;
-};
-
 static HostCheckBox *EPGShowCategoryColors()
 {
     HostCheckBox *gc = new HostCheckBox("EPGShowCategoryColors");
@@ -3157,22 +3131,6 @@ static HostCheckBox *EPGShowFavorites()
                     "channels."));
     gc->setValue(false);
     return gc;
-}
-
-static HostSpinBox *EPGChanDisplay()
-{
-    HostSpinBox *gs = new HostSpinBox("chanPerPage", 3, 12, 1);
-    gs->setLabel(QObject::tr("Channels to Display"));
-    gs->setValue(5);
-    return gs;
-}
-
-static HostSpinBox *EPGTimeDisplay()
-{
-    HostSpinBox *gs = new HostSpinBox("timePerPage", 1, 5, 1);
-    gs->setLabel(QObject::tr("Time Blocks (30 mins) to Display"));
-    gs->setValue(4);
-    return gs;
 }
 
 static GlobalCheckBox *EPGEnableJumpToChannel()
@@ -4958,15 +4916,11 @@ EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
     epg->setLabel(QObject::tr("Program Guide") + " 1/2");
-    epg->addChild(EPGFillType());
     epg->addChild(EPGShowCategoryColors());
     epg->addChild(EPGShowCategoryText());
-    epg->addChild(EPGScrollType());
     epg->addChild(EPGShowChannelIcon());
     epg->addChild(EPGShowFavorites());
     epg->addChild(WatchTVGuide());
-    epg->addChild(EPGChanDisplay());
-    epg->addChild(EPGTimeDisplay());
     addChild(epg);
 
     VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);
