@@ -33,7 +33,7 @@ $debug = 0;
 #                                #
 ##################################
 
-$usage = "\nHow to use dvbradioexport.pl : \n"
+$usage = "\nHow to use ipodexport.pl : \n"
         ."ipodexport.pl exportdir=/foo/bar starttime=%STARTTIME% chanid=%CHANID bitrate=x size=320x240 aspect=4:3 debug\n"
         ."\n%CHANID% = channel ID associated with the recording to export\n"
         ."%STARTTIME% = recording start time in either 'yyyy-mm-dd hh:mm:ss' or 'yyyymmddhhmmss' format\n"
