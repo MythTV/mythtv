@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 #include <QPainter>
 #include <QPixmap>
 
@@ -167,6 +168,8 @@ void MythQtPainter::DrawRect(const QRect &area,
         painter->setBrush(QBrush(Qt::NoBrush));
 
     painter->drawRect(area);
+
+    painter->setBrush(QBrush(Qt::NoBrush));
 }
 
 void MythQtPainter::DrawRoundRect(const QRect &area, int radius, 
@@ -194,6 +197,8 @@ void MythQtPainter::DrawRoundRect(const QRect &area, int radius,
     painter->drawRoundRect(area, 100 / (area.width() / radius / 2), 100 / (area.height() / radius / 2));
 
     painter->setRenderHint(QPainter::Antialiasing, false);
+
+    painter->setBrush(QBrush(Qt::NoBrush));
 }
 
 MythImage *MythQtPainter::GetFormatImage()
