@@ -1414,13 +1414,13 @@ void GuideGrid::updateInfo(void)
             }
             else
             {
-                m_channelImage->SetFilename("");
+                m_channelImage->SetFilename("blank.png");
                 m_channelImage->Load();
             }
         }
         else
         {
-            m_channelImage->SetFilename("");
+            m_channelImage->SetFilename("blank.png");
             m_channelImage->Load();
         }
     }
