@@ -21,6 +21,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "dbcheck.h"
 #include "util.h" // for IsPulseAudioRunning()
+#include "myththemebase.h"
 
 static void *run_priv_thread(void *data)
 {
@@ -221,6 +222,7 @@ int main(int argc, char *argv[])
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
+    MythThemeBase *theme = new MythThemeBase();
 
     TV::InitKeys();
 
@@ -259,6 +261,7 @@ int main(int argc, char *argv[])
         gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
         pthread_join(priv_thread, NULL);
     }
+    delete theme;
     delete gContext;
 
     return TV_EXIT_OK;
