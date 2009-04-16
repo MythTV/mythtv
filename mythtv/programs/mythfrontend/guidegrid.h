@@ -8,12 +8,7 @@
 // qt
 #include <QString>
 #include <QDateTime>
-#include <QLayout>
 #include <QEvent>
-#include <QPaintEvent>
-#include <QPixmap>
-#include <QKeyEvent>
-#include <QDomElement>
 
 // myth
 #include "mythscreentype.h"
@@ -98,7 +93,7 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
 
     virtual void aboutToShow();
     virtual void aboutToHide();
-    
+
   protected slots:
     void cursorLeft();
     void cursorRight();
@@ -191,7 +186,7 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     uint      m_currentStartChannel;
     uint      m_startChanID;
     QString   m_startChanNum;
-    
+
     int m_currentRow;
     int m_currentCol;
 

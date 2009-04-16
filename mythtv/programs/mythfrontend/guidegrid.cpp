@@ -7,18 +7,8 @@ using namespace std;
 
 //qt
 #include <QApplication>
-#include <QPainter>
-#include <QFont>
 #include <QKeyEvent>
-#include <QEvent>
-#include <QPixmap>
-#include <QPaintEvent>
-#include <QCursor>
-#include <QImage>
-#include <QLayout>
-#include <QLabel>
 #include <QDateTime>
-#include <QRect>
 
 // myth
 #include "mythcontext.h"
@@ -189,7 +179,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 
 GuideGrid::GuideGrid(MythScreenStack *parent,
                      uint chanid, QString channum,
-                     TV *player, bool allowFinder) 
+                     TV *player, bool allowFinder)
          : MythScreenType(parent, "guidegrid"),
     m_allowFinder(allowFinder),
     m_player(player),
@@ -345,7 +335,7 @@ GuideGrid::~GuideGrid()
 
     gContext->SaveSetting("EPGSortReverse", m_sortReverse ? "1" : "0");
 
-    // if we have a player and we are returning to it we need 
+    // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
     if (m_player && m_allowFinder)
     {
@@ -772,7 +762,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         tmp.push_back(val);
         m_channelInfos.push_back(tmp);
     }
- 
+
     // handle duplicates
     for (uint i = 0; i < channels.size(); i++)
     {
@@ -1083,7 +1073,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     int arrow = 0;
     int cnt = 0;
     int spread = 1;
-    QDateTime lastprog; 
+    QDateTime lastprog;
     QRect tempRect;
     bool isCurrent = false;
 
@@ -1142,11 +1132,11 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
             if (m_currentRow == (int)row && (m_currentCol >= x) &&
                 (m_currentCol < (x + spread)))
                 isCurrent = true;
-            else 
+            else
                 isCurrent = false;
 
             int recFlag;
-            switch (pginfo->rectype) 
+            switch (pginfo->rectype)
             {
             case kSingleRecord:
                 recFlag = 1;
@@ -1188,7 +1178,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 recStat = 0;
 
             m_guideGrid->SetProgramInfo(row, cnt, tempRect, pginfo->title,
-                                    pginfo->category, arrow, recFlag, 
+                                    pginfo->category, arrow, recFlag,
                                     recStat, isCurrent);
             cnt++;
         }
@@ -1305,7 +1295,7 @@ void GuideGrid::updateChannels(void)
         if (chanNumber >= m_channelInfos.size())
             chanNumber -= m_channelInfos.size();
         if (chanNumber >= m_channelInfos.size())
-            break;  
+            break;
 
         chinfo = GetChannelInfo(chanNumber);
 
@@ -1467,18 +1457,18 @@ void GuideGrid::toggleChannelFavorite()
     uint favid  = ch->favorite;
     uint chanid = ch->chanid;
 
-    if (favid > 0) 
+    if (favid > 0)
     {
         query.prepare("DELETE FROM favorites WHERE favid = :FAVID ;");
         query.bindValue(":FAVID", favid);
-        query.exec(); 
+        query.exec();
     }
     else
     {
         // We have no favorites record...Add one to toggle...
         query.prepare("INSERT INTO favorites (chanid) VALUES (:FAVID);");
         query.bindValue(":FAVID", chanid);
-        query.exec(); 
+        query.exec();
     }
 
     if (m_showFavorites)
@@ -1734,7 +1724,7 @@ void GuideGrid::pageUp()
     updateInfo();
     updateChannels();
 }
- 
+
 void GuideGrid::showProgFinder()
 {
     if (m_allowFinder)
@@ -1983,7 +1973,7 @@ void GuideGrid::HideTVWindow(void)
 void GuideGrid::EmbedTVWindow(void)
 {
     previewVideoRefreshTimer->stop();
-    if (m_player && m_player->IsRunning() && 
+    if (m_player && m_player->IsRunning() &&
         m_videoRect.height() > 1 && m_videoRect.width() > 1)
     {
         PlayerContext *ctx =
