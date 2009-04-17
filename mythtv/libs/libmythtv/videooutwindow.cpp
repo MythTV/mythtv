@@ -280,8 +280,9 @@ void VideoOutWindow::ApplyLetterboxing(void)
     float disp_aspect = fix_aspect(GetDisplayAspect());
     float aspect_diff = disp_aspect - overriden_video_aspect;
     bool aspects_match = abs(aspect_diff / disp_aspect) <= 0.02f;
-    bool nomatch_with_fill = (!aspects_match && (adjustfill
-                                                 == kAdjustFill_Stretch));
+    bool nomatch_with_fill =
+        !aspects_match && ((kAdjustFill_HorizontalStretch == adjustfill) ||
+                           (kAdjustFill_VerticalStretch   == adjustfill));
     bool nomatch_without_fill = (!aspects_match) && !nomatch_with_fill;
 
     // Adjust for video/display aspect ratio mismatch
@@ -356,15 +357,25 @@ void VideoOutWindow::ApplyLetterboxing(void)
             display_video_rect.width() * 7 / 6,
             display_video_rect.height() * 7 / 6);
     }
-    else if (adjustfill == kAdjustFill_Stretch)
+    else if (adjustfill == kAdjustFill_HorizontalStretch)
     {
-        // Stretch mode -- intended to be used to eliminate side
-        //                 bars on 4:3 material encoded to 16:9.
-        // 1/6 of original is 1/8 of new
+        // Horizontal Stretch mode -- 1/6 of original is 1/8 of new
+        // Intended to be used to eliminate side bars on 4:3 material
+        // encoded to 16:9.
         display_video_rect.moveLeft(
             display_video_rect.left() - (display_video_rect.width() / 6));
 
         display_video_rect.setWidth(display_video_rect.width() * 4 / 3);
+    }
+    else if (adjustfill == kAdjustFill_VerticalStretch)
+    {
+        // Vertical Stretch mode -- 1/6 of original is 1/8 of new
+        // Intended to be used to eliminate top/bottom bars on 16:9 
+        // material encoded to 4:3.
+        display_video_rect.moveTop(
+            display_video_rect.top() - (display_video_rect.height() / 6));
+
+        display_video_rect.setHeight(display_video_rect.height() * 4 / 3);
     }
 }
 
@@ -552,7 +563,7 @@ QRect VideoOutWindow::GetTotalOSDBounds(void) const
 void VideoOutWindow::ToggleAdjustFill(AdjustFillMode adjustFill)
 {
     if (adjustFill == kAdjustFill_Toggle)
-        adjustFill = (AdjustFillMode) ((int) (adjustfill + 1) % kAspect_END);
+        adjustFill = (AdjustFillMode) ((int) (adjustfill + 1) % kAdjustFill_END);
 
     adjustfill = adjustFill;
 
