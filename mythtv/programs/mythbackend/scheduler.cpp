@@ -1242,6 +1242,7 @@ void Scheduler::PruneRedundants(void)
         // Restore the old status for some select cases that won't record.
         if (p->recstatus != rsWillRecord && 
             p->oldrecstatus != rsUnknown &&
+            p->oldrecstatus != rsNotListed &&
             !p->reactivate)
             p->recstatus = p->oldrecstatus;
 
@@ -2811,7 +2812,9 @@ void Scheduler::AddNewRecords(void)
         ProgramInfo *p = new ProgramInfo;
         p->reactivate = result.value(38).toInt();
         p->oldrecstatus = RecStatusType(result.value(37).toInt());
-        if (p->oldrecstatus == rsAborted || p->reactivate)
+        if (p->oldrecstatus == rsAborted || 
+            p->oldrecstatus == rsNotListed ||
+            p->reactivate)
             p->recstatus = rsUnknown;
         else
             p->recstatus = p->oldrecstatus;
