@@ -7695,7 +7695,7 @@ void TV::DoEditSchedule(int editType)
         {
             TV *player = (pause_active) ? NULL : this;
             isEmbedded = (isLiveTV && player && allowEPG);
-            RunProgramGuidePtr(chanid, channum, player, true);
+            RunProgramGuidePtr(chanid, channum, player, true, isEmbedded);
             ignoreKeyPresses = true;
             break;
         }

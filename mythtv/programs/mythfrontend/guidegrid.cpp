@@ -164,12 +164,12 @@ bool JumpToChannel::Update(void)
 }
 
 void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
-                    TV *player, bool allowFinder)
+                    TV *player, bool allowFinder, bool allowEPGVideo)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     GuideGrid *gg = new GuideGrid(mainStack,
                                   chanid, channum,
-                                  player, allowFinder);
+                                  player, allowFinder, allowEPGVideo);
 
     if (gg->Create())
         mainStack->AddScreen(gg, (player == NULL));
@@ -179,11 +179,12 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 
 GuideGrid::GuideGrid(MythScreenStack *parent,
                      uint chanid, QString channum,
-                     TV *player, bool allowFinder)
+                     TV *player, bool allowFinder,
+                     bool allowEPGVideo)
          : MythScreenType(parent, "guidegrid"),
     m_allowFinder(allowFinder),
     m_player(player),
-    m_usingNullVideo(false),
+    m_usingNullVideo(false), m_allowEPGVideo(allowEPGVideo),
     previewVideoRefreshTimer(new QTimer(this)),
     m_jumpToChannelLock(QMutex::Recursive),
     m_jumpToChannel(NULL),
@@ -231,13 +232,16 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
     m_startChanID  = chanid;
     m_startChanNum = channum;
+
+    if (m_player)
+        m_allowEPGVideo = m_player->IsRunning() && m_allowEPGVideo;
 }
 
 bool GuideGrid::Create()
 {
     QString windowName = "programguide";
 
-    if (m_player && m_player->IsRunning())
+    if (m_allowEPGVideo)
         windowName = "programguide-video";
 
     if (!LoadWindowFromXML("schedule-ui.xml", windowName, this))
@@ -260,7 +264,7 @@ bool GuideGrid::Create()
     BuildFocusList();
 
     MythUIImage *videoImage = dynamic_cast<MythUIImage *>(GetChild("video"));
-    if (videoImage)
+    if (videoImage && m_allowEPGVideo)
         m_videoRect = videoImage->GetArea();
     else
         m_videoRect = QRect(0,0,1,1);
@@ -1973,8 +1977,7 @@ void GuideGrid::HideTVWindow(void)
 void GuideGrid::EmbedTVWindow(void)
 {
     previewVideoRefreshTimer->stop();
-    if (m_player && m_player->IsRunning() &&
-        m_videoRect.height() > 1 && m_videoRect.width() > 1)
+    if (m_allowEPGVideo)
     {
         PlayerContext *ctx =
             m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);

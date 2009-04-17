@@ -52,7 +52,7 @@ typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);
 typedef void (*EMBEDRETURNVOID) (void *, bool);
-typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool);
+typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool, bool);
 typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool);
 
 // Locking order

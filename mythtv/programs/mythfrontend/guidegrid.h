@@ -81,7 +81,8 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     static void RunProgramGuide(uint           startChanId,
                                 const QString &startChanNum,
                                 TV            *player = NULL,
-                                bool           allowFinder = true);
+                                bool           allowFinder = true,
+                                bool           allowEPGVideo = true);
 
     DBChanList GetSelection(void) const;
 
@@ -136,7 +137,8 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
   protected:
       GuideGrid(MythScreenStack *parentStack,
               uint chanid = 0, QString channum = "",
-              TV *player = NULL, bool allowFinder = true);
+              TV *player = NULL, bool allowFinder = true,
+              bool allowEPGVideo = true);
    ~GuideGrid();
 
   private slots:
@@ -203,6 +205,7 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
 
     TV     *m_player;
     bool    m_usingNullVideo;
+    bool    m_allowEPGVideo;
     QTimer *previewVideoRefreshTimer;
     void    EmbedTVWindow(void);
     void    HideTVWindow(void);
