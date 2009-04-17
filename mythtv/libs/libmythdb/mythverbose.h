@@ -86,6 +86,11 @@
                              1, "Media Manager debugging messages")           \
     F(VB_IDLE,      0x01000000, "idle",                                       \
                              1, "System idle messages")                       \
+    F(VB_CHANSCAN,  0x02000000, "channelscan",                          \
+                             1, "Channel Scanning messages")                  \
+    /* space for more flags */                                                \
+    /* space for more flags */                                                \
+    /* space for more flags */                                                \
     F(VB_EXTRA,     0x40000000, "extra",                                      \
                              1, "More detailed messages in selected levels")  \
     F(VB_TIMESTAMP, 0x80000000, "timestamp",                                  \
