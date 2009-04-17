@@ -677,9 +677,19 @@ bool MythMainWindow::screenShot(void)
     return false;
 }
 
-#ifdef USING_APPLEREMOTE
-bool MythMainWindow::event(QEvent* e)
+bool MythMainWindow::event(QEvent *e)
 {
+    if (e->type() == QEvent::Show && !e->spontaneous())
+        QApplication::postEvent(this, new MythPostShowEvent());
+
+    if (e->type() == (QEvent::Type)kMythPostShowEventType)
+    {
+        raise();
+        activateWindow();
+        return true;
+    }
+
+#ifdef USING_APPLEREMOTE
     if (d->appleRemote)
     {
         if (e->type() == QEvent::WindowActivate)
@@ -688,10 +698,10 @@ bool MythMainWindow::event(QEvent* e)
         if (e->type() == QEvent::WindowDeactivate)
             d->appleRemote->stopListening();
     }
+#endif
 
     return QWidget::event(e);
 }
-#endif
 
 void MythMainWindow::Init(void)
 {
@@ -827,9 +837,6 @@ void MythMainWindow::Show(void)
     else
         ShowMenuBar();
 #endif
-
-    activateWindow();
-    raise();
 }
 
 /* FIXME compatability only */

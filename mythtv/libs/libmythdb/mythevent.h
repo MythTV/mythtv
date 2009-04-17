@@ -76,4 +76,11 @@ class ExitToMainMenuEvent : public QEvent
     ExitToMainMenuEvent(void) : QEvent((QEvent::Type)kExitToMainMenuEventType) {}
 };
 
+const int kMythPostShowEventType = QEvent::User + 2000;
+class MPUBLIC MythPostShowEvent : public QEvent
+{
+  public:
+    MythPostShowEvent() : QEvent((QEvent::Type)kMythPostShowEventType) {}
+};
+
 #endif /* MYTHEVENT_H */

@@ -118,9 +118,7 @@ class MPUBLIC MythMainWindow : public QWidget
 
     void drawScreen();
 
-#ifdef USING_APPLEREMOTE
     bool event(QEvent* e);
-#endif
 
     void ExitToMainMenu();
 
