@@ -7693,17 +7693,14 @@ void TV::DoEditSchedule(int editType)
     {
         case kScheduleProgramGuide:
         {
-            TV *player = (pause_active) ? NULL : this;
-            isEmbedded = (isLiveTV && player && allowEPG);
-            RunProgramGuidePtr(chanid, channum, player, true, isEmbedded);
+            isEmbedded = (isLiveTV && !pause_active && allowEPG);
+            RunProgramGuidePtr(chanid, channum, this, true, isEmbedded);
             ignoreKeyPresses = true;
             break;
         }
         case kScheduleProgramFinder:
         {
-            TV *player = (pause_active) ? NULL : this;
-            isEmbedded = (isLiveTV && player && allowEPG);
-            RunProgramFinderPtr(player, true);
+            RunProgramFinderPtr(this, true);
             ignoreKeyPresses = true;
             break;
         }

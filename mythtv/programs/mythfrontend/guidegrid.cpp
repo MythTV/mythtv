@@ -341,7 +341,7 @@ GuideGrid::~GuideGrid()
 
     // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
-    if (m_player && m_allowFinder)
+    if (m_player)
     {
         QString message = QString("EPG_EXITING");
         qApp->postEvent(m_player, new MythEvent(message));
@@ -1756,7 +1756,7 @@ void GuideGrid::escape()
         m_updateTimer->stop();
 
     // don't fade the screen if we are returning to the player
-    if (m_player && m_allowFinder)
+    if (m_player)
         GetScreenStack()->PopScreen(this, false);
     else
         GetScreenStack()->PopScreen(this, true);
