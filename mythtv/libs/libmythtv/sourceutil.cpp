@@ -117,6 +117,29 @@ uint SourceUtil::GetChannelCount(uint sourceid)
     return 0;
 }
 
+vector<uint> SourceUtil::GetMplexIDs(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT mplexid "
+        "FROM dtv_multiplex "
+        "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    vector<uint> list;
+    if (!query.exec())
+    {
+        MythDB::DBError("SourceUtil::GetMplexIDs()", query);
+        return list;
+    }
+
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
+
+    return list;
+}
+
 bool SourceUtil::GetListingsLoginData(uint sourceid,
                                       QString &grabber, QString &userid,
                                       QString &passwd,  QString &lineupid)

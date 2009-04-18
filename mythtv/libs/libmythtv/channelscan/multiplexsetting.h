@@ -16,7 +16,7 @@ class MultiplexSetting : public ComboBoxSetting, public TransientStorage
     MultiplexSetting() : ComboBoxSetting(this), sourceid(0)
         { setLabel(tr("Transport")); }
 
-    virtual void load(void);
+    virtual void Load(void);
 
     void SetSourceID(uint _sourceid);
 

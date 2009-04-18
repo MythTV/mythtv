@@ -617,19 +617,8 @@ bool ATSCStreamData::HasCachedAnyTVCTs(bool current) const
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    if (!_cached_mgt)
-        return false;
-
-    _cache_lock.lock();
-    bool ret = false;
-    for (uint i = 0; !ret && (i < _cached_mgt->TableCount()); ++i)
-    {
-        if (TableClass::TVCTc == _cached_mgt->TableClass(i))
-            ret |= HasCachedTVCT(_cached_mgt->TablePID(i));
-    }
-    _cache_lock.unlock();
-
-    return ret;
+    QMutexLocker locker(&_cache_lock);
+    return !_cached_tvcts.empty();
 }
 
 bool ATSCStreamData::HasCachedAnyCVCTs(bool current) const
@@ -637,19 +626,8 @@ bool ATSCStreamData::HasCachedAnyCVCTs(bool current) const
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
 
-    if (!_cached_mgt)
-        return false;
-
-    _cache_lock.lock();
-    bool ret = false;
-    for (uint i = 0; !ret && (i < _cached_mgt->TableCount()); ++i)
-    {
-        if (TableClass::CVCTc == _cached_mgt->TableClass(i))
-            ret |= HasCachedCVCT(_cached_mgt->TablePID(i));
-    }
-    _cache_lock.unlock();
-
-    return ret;
+    QMutexLocker locker(&_cache_lock);
+    return !_cached_cvcts.empty();
 }
 
 const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const

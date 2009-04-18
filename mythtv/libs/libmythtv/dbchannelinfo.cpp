@@ -7,6 +7,7 @@
 #include "dbchannelinfo.h"
 #include "mythcontext.h"
 #include "mythdb.h"
+#include "mpegstreamdata.h" // for CryptStatus
 
 DBChannel::DBChannel(const DBChannel &other)
 {
@@ -332,21 +333,109 @@ ChannelInsertInfo &ChannelInsertInfo::operator=(
     return *this;
 }
 
+void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
+{
+    if (other.db_mplexid && !db_mplexid)
+        db_mplexid         = other.db_mplexid;
+    if (other.source_id && !source_id)
+        source_id          = other.source_id;
+    if (other.channel_id && !channel_id)
+        channel_id         = other.channel_id;
+    if (!other.callsign.isEmpty() && callsign.isEmpty())
+    {
+        callsign           = other.callsign;     callsign.detach();
+    }
+    if (!other.service_name.isEmpty() && service_name.isEmpty())
+    {
+        service_name       = other.service_name; service_name.detach();
+    }
+    if (!other.chan_num.isEmpty() &&
+        ((chan_num.isEmpty() || chan_num == "0")))
+    {
+        chan_num           = other.chan_num;     chan_num.detach();
+    }
+    if (other.service_id && !service_id)
+        service_id         = other.service_id;
+    if (other.atsc_major_channel && !atsc_major_channel)
+        atsc_major_channel = other.atsc_major_channel;
+    if (other.atsc_minor_channel && !atsc_minor_channel)
+        atsc_minor_channel = other.atsc_minor_channel;
+    //use_on_air_guide   = other.use_on_air_guide;
+    //hidden             = other.hidden;
+    //hidden_in_guide    = other.hidden_in_guide;
+    if (!other.freqid.isEmpty() && freqid.isEmpty())
+    {
+        freqid             = other.freqid;      freqid.detach();
+    }
+    if (!other.icon.isEmpty() && icon.isEmpty())
+    {
+        icon               = other.icon;        icon.detach();
+    }
+    if (!other.format.isEmpty() && format.isEmpty())
+    {
+        format             = other.format;      format.detach();
+    }
+    if (!other.xmltvid.isEmpty() && xmltvid.isEmpty())
+    {
+        xmltvid            = other.xmltvid;     xmltvid.detach();
+    }
+    // non-DB info
+    if (other.pat_tsid && !pat_tsid)
+        pat_tsid           = other.pat_tsid;
+    if (other.vct_tsid && !vct_tsid)
+        vct_tsid           = other.vct_tsid;
+    if (other.vct_chan_tsid && !vct_chan_tsid)
+        vct_chan_tsid      = other.vct_chan_tsid;
+    if (other.sdt_tsid && !sdt_tsid)
+        sdt_tsid           = other.sdt_tsid;
+    if (other.orig_netid && !orig_netid)
+        orig_netid         = other.orig_netid;
+    if (other.netid && !netid)
+        netid              = other.netid;
+    if (!other.si_standard.isEmpty() && si_standard.isEmpty())
+    {
+        si_standard        = other.si_standard; si_standard.detach();
+    }
+    if (other.in_channels_conf && !in_channels_conf)
+        in_channels_conf   = other.in_channels_conf;
+    if (other.in_pat && !in_pat)
+        in_pat             = other.in_pat;
+    if (other.in_pmt && !in_pmt)
+        in_pmt             = other.in_pmt;
+    if (other.in_vct && !in_vct)
+        in_vct             = other.in_vct;
+    if (other.in_nit && !in_nit)
+        in_nit             = other.in_nit;
+    if (other.in_sdt && !in_sdt)
+        in_sdt             = other.in_sdt;
+    if (other.in_pat && !in_pat)
+        is_encrypted       = other.is_encrypted;
+    if (other.is_data_service && !is_data_service)
+        is_data_service    = other.is_data_service;
+    if (other.is_audio_service && !is_audio_service)
+        is_audio_service   = other.is_audio_service;
+    if (other.is_opencable && !is_opencable)
+        is_opencable       = other.is_opencable;
+    if (other.could_be_opencable && !could_be_opencable)
+        could_be_opencable = other.could_be_opencable;
+    if (kEncUnknown == decryption_status)
+        decryption_status  = other.decryption_status;
+}
+
 bool ChannelInsertInfo::IsSameChannel(const ChannelInsertInfo &other) const
 {
-    if ((atsc_major_channel == other.atsc_major_channel) &&
+    if (atsc_major_channel &&
+        (atsc_major_channel == other.atsc_major_channel) &&
         (atsc_minor_channel == other.atsc_minor_channel))
     {
         return true;
     }
 
-    if (pat_tsid == other.pat_tsid)
-        return true;
-
     if ((orig_netid == other.orig_netid) && (service_id == other.service_id))
         return true;
 
-    if (!orig_netid && !other.orig_netid && (service_id == other.service_id))
+    if (!orig_netid && !other.orig_netid &&
+        (pat_tsid == other.pat_tsid) && (service_id == other.service_id))
         return true;
 
     return false;

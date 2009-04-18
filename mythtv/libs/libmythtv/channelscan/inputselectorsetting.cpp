@@ -29,12 +29,15 @@
 
 #include "inputselectorsetting.h"
 #include "cardutil.h"
+#include "mythcontext.h"
+#include "mythdb.h"
 
 InputSelector::InputSelector(
     uint _default_cardid, const QString &_default_inputname) :
     ComboBoxSetting(this), sourceid(0), default_cardid(_default_cardid),
-    default_inputname(Q3DeepCopy<QString>(_default_inputname))
+    default_inputname(_default_inputname)
 {
+    default_inputname.detach();
     setLabel(tr("Input"));
 }
 
@@ -90,7 +93,7 @@ void InputSelector::SetSourceID(const QString &_sourceid)
     if (sourceid != _sourceid.toUInt())
     {
         sourceid = _sourceid.toUInt();
-        load();
+        Load();
     }
 }
 
@@ -121,7 +124,7 @@ bool InputSelector::Parse(const QString &cardid_inputname,
     cardid    = 0;
     inputname = QString::null;
 
-    int sep0 = cardid_inputname.find(':');
+    int sep0 = cardid_inputname.indexOf(':');
     if (sep0 < 1)
         return false;
 

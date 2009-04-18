@@ -32,7 +32,7 @@
 #include <unistd.h>
 
 // Qt includes
-#include <qmutex.h>
+#include <QMutex>
 
 // MythTV includes - General
 #include "channelscan_sm.h"
@@ -41,6 +41,8 @@
 #include "mythdbcon.h"
 #include "channelutil.h"
 #include "cardutil.h"
+#include "sourceutil.h"
+#include "mythdb.h"
 
 // MythTV includes - DTV
 #include "dtvsignalmonitor.h"
@@ -56,6 +58,15 @@
 #include "dvbchannel.h"
 #include "hdhrchannel.h"
 #include "v4lchannel.h"
+
+/// SDT's should be sent every 2 seconds and NIT's every
+/// 10 seconds, so lets wait at least 30 seconds, in
+/// case of bad transmitter or lost packets.
+const uint ChannelScanSM::kDVBTableTimeout  = 30 * 1000;
+/// No logic here, lets just wait at least 10 seconds.
+const uint ChannelScanSM::kATSCTableTimeout = 10 * 1000;
+/// No logic here, lets just wait at least 15 seconds.
+const uint ChannelScanSM::kMPEGTableTimeout = 15 * 1000;
 
 QString ChannelScanSM::loc(const ChannelScanSM *siscan)
 {
@@ -124,7 +135,7 @@ ChannelScanSM::ChannelScanSM(
       sourceID(_sourceID),
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
-      inputname(Q3DeepCopy<QString>(_inputname)),
+      inputname(_inputname),
       // State
       scanning(false),
       threadExit(false),
@@ -137,15 +148,15 @@ ChannelScanSM::ChannelScanSM(
       analogSignalHandler(new AnalogSignalHandler(this)),
       scanner_thread_running(false)
 {
-    // Initialize statics
-    init_freq_tables();
+    inputname.detach();
+
     current = scanTransports.end();
 
     // Create a stream data for digital signal monitors
     DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
     if (dtvSigMon)
     {
-        VERBOSE(VB_SIPARSER, LOC + "Connecting up DTVSignalMonitor");
+        VERBOSE(VB_CHANSCAN, LOC + "Connecting up DTVSignalMonitor");
         ScanStreamData *data = new ScanStreamData();
 
         dtvSigMon->SetStreamData(data);
@@ -167,7 +178,7 @@ ChannelScanSM::ChannelScanSM(
 ChannelScanSM::~ChannelScanSM(void)
 {
     StopScanner();
-    VERBOSE(VB_SIPARSER, LOC + "ChannelScanSMner Stopped");
+    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSMner Stopped");
 
     if (signalMonitor)
     {
@@ -181,6 +192,8 @@ ChannelScanSM::~ChannelScanSM(void)
         delete analogSignalHandler;
         analogSignalHandler = NULL;
     }
+
+    teardown_frequency_tables();
 }
 
 void ChannelScanSM::SetAnalog(bool is_analog)
@@ -194,7 +207,7 @@ void ChannelScanSM::SetAnalog(bool is_analog)
 void ChannelScanSM::HandleAllGood(void)
 {
     QString cur_chan = (*current).FriendlyName;
-    QStringList list = QStringList::split(" ", cur_chan);
+    QStringList list = cur_chan.split(" ", QString::SkipEmptyParts);
     QString freqid = (list.size() >= 2) ? list[1] : cur_chan;
 
     bool ok = false;
@@ -243,7 +256,7 @@ void ChannelScanSM::HandleAllGood(void)
     }
 }
 
-/** \fn ChannelScanSM::ScanServicesSourceID(int)
+/** \fn ChannelScanSM::ScanExistingTransports(uint)
  *  \brief If we are not already scanning a frequency table, this creates
  *         a new frequency table from database and begins scanning it.
  *
@@ -254,7 +267,7 @@ void ChannelScanSM::HandleAllGood(void)
  *   channels is available on another ATSC channel, as encouraged by the
  *   ATSC specification.
  */
-bool ChannelScanSM::ScanServicesSourceID(int SourceID)
+bool ChannelScanSM::ScanExistingTransports(uint sourceid)
 {
     if (scanning)
         return false;
@@ -262,43 +275,18 @@ bool ChannelScanSM::ScanServicesSourceID(int SourceID)
     scanTransports.clear();
     nextIt = scanTransports.end();
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    // Run DB query to get transports on sourceid SourceID
-    // connected to this card
-    QString theQuery = QString(
-        "SELECT sourceid, mplexid, sistandard, transportid "
-        "FROM dtv_multiplex WHERE sourceid = %1").arg(SourceID);
-    query.prepare(theQuery);
+    vector<uint> multiplexes = SourceUtil::GetMplexIDs(sourceid);
 
-    if (!query.exec() || !query.isActive())
+    if (!multiplexes.size())
     {
-        MythDB::DBError("Get Transports for SourceID", query);
-        return false;
-    }
-
-    if (query.size() <= 0)
-    {
-        VERBOSE(VB_SIPARSER, LOC + "Unable to find any transports for " +
-                QString("sourceid %1").arg(sourceID));
+        VERBOSE(VB_CHANSCAN, LOC + "Unable to find any transports for " +
+                QString("sourceid %1").arg(sourceid));
 
         return false;
     }
 
-    while (query.next())
-    {
-        int sourceid = query.value(0).toInt();
-        int mplexid  = query.value(1).toInt();
-        QString std  = query.value(2).toString();
-        int tsid     = query.value(3).toInt();
-
-        QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
-            QString("Multiplex #%1").arg(mplexid);
-
-        VERBOSE(VB_SIPARSER, LOC + "Adding " + fn);
-
-        TransportScanItem item(sourceid, std, fn, mplexid, signalTimeout);
-        scanTransports.push_back(item);
-    }
+    for (uint i = 0; i < multiplexes.size(); i++)
+        AddToList(multiplexes[i]);
 
     waitingForTables  = false;
     transportsScanned = 0;
@@ -307,13 +295,21 @@ bool ChannelScanSM::ScanServicesSourceID(int SourceID)
         nextIt   = scanTransports.begin();
         scanning = true;
     }
+    else
+    {
+        VERBOSE(VB_CHANSCAN, LOC + "Unable to find add any transports for " +
+                QString("sourceid %1").arg(sourceid));
+
+        return false;
+    }
+
 
     return scanning;
 }
 
 void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 {
-    VERBOSE(VB_SIPARSER, LOC +
+    VERBOSE(VB_CHANSCAN, LOC +
             QString("Got a Program Association Table for %1")
             .arg((*current).FriendlyName) + "\n" + pat->toString());
 
@@ -328,7 +324,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
 
 void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 {
-    VERBOSE(VB_SIPARSER, LOC +
+    VERBOSE(VB_CHANSCAN, LOC +
             QString("Got a Program Map Table for %1")
             .arg((*current).FriendlyName) + "\n" + pmt->toString());
 
@@ -338,7 +334,7 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 
 void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
 {
-    VERBOSE(VB_SIPARSER, LOC + QString("Got a Virtual Channel Table for %1")
+    VERBOSE(VB_CHANSCAN, LOC + QString("Got a Virtual Channel Table for %1")
             .arg((*current).FriendlyName) + "\n" + vct->toString());
 
     for (uint i = 0; !currentTestingDecryption && i < vct->ChannelCount(); i++)
@@ -354,7 +350,7 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
 
 void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 {
-    VERBOSE(VB_SIPARSER, LOC + QString("Got the Master Guide for %1")
+    VERBOSE(VB_CHANSCAN, LOC + QString("Got the Master Guide for %1")
             .arg((*current).FriendlyName) + "\n" + mgt->toString());
 
     UpdateChannelInfo(true);
@@ -362,7 +358,7 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
 
 void ChannelScanSM::HandleSDT(uint, const ServiceDescriptionTable *sdt)
 {
-    VERBOSE(VB_SIPARSER, LOC +
+    VERBOSE(VB_CHANSCAN, LOC +
             QString("Got a Service Description Table for %1")
             .arg((*current).FriendlyName) + "\n" + sdt->toString());
 
@@ -379,7 +375,7 @@ void ChannelScanSM::HandleSDT(uint, const ServiceDescriptionTable *sdt)
 
 void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
 {
-    VERBOSE(VB_SIPARSER, LOC +
+    VERBOSE(VB_CHANSCAN, LOC +
             QString("Got a Network Information Table for %1")
             .arg((*current).FriendlyName) + "\n" + nit->toString());
 
@@ -406,12 +402,20 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
         return false;
     }
 
-    uint pnum = 0;
     do
     {
+        uint pnum = 0;
         QMap<uint, uint>::const_iterator it = currentEncryptionStatus.begin();
-        for (; !pnum && (it != currentEncryptionStatus.end()); ++it)
-            pnum = (currentEncryptionStatusChecked[it.key()]) ? 0 : it.key();
+        cerr << currentEncryptionStatusChecked.size() << "/" << currentEncryptionStatus.size() << " checked" << endl;
+        while (it != currentEncryptionStatus.end())
+        {
+            if (!currentEncryptionStatusChecked[it.key()])
+            {
+                pnum = it.key();
+                break;
+            }
+            ++it;
+        }
 
         if (!pnum)
             break;
@@ -438,7 +442,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
                 .arg(cur_chan).arg(pnum);
 
             scan_monitor->ScanAppendTextToLog(msg_tr);
-            VERBOSE(VB_SIPARSER, msg);
+            VERBOSE(VB_CHANSCAN, msg);
 
             if (GetDVBChannel())
                 GetDVBChannel()->SetPMT(pmt);
@@ -451,9 +455,10 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
         }
 
         VERBOSE(VB_IMPORTANT, LOC +
-                "Can't monitor decryption of program %1 -- no pmt");
+                QString("Can't monitor decryption of program %1 -- no pmt")
+                .arg(pnum));
 
-    } while (pnum);
+    } while (true);
 
     currentTestingDecryption = false;
     return false;
@@ -518,7 +523,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
     if ((!wait_until_complete || sd->HasCachedAllTVCTs()) &&
-        info->cvcts.empty())
+        info->tvcts.empty())
     {
         info->tvcts = sd->GetCachedTVCTs();
     }
@@ -549,6 +554,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         transport_tune_complete &= !info->pmts.empty();
         if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
         {
+            transport_tune_complete &= sd->HasCachedMGT();
             transport_tune_complete &=
                 (!info->tvcts.empty() || !info->cvcts.empty());
         }
@@ -557,8 +563,29 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
             transport_tune_complete &= !info->nits.empty();
             transport_tune_complete &= !info->sdts.empty();
         }
+        if (transport_tune_complete)
+        {
+            VERBOSE(VB_CHANSCAN,
+                    QString("transport_tune_complete: "
+                            "\n\t\t\tinfo->pmts.empty():     %1"
+                            "\n\t\t\tsd->HasCachedAnyNIT():  %2"
+                            "\n\t\t\tsd->HasCachedAnySDTs(): %3"
+                            "\n\t\t\tinfo->nits.empty():     %4"
+                            "\n\t\t\tinfo->sdts.empty():     %5")
+                    .arg(info->pmts.empty())
+                    .arg(sd->HasCachedAnyNIT())
+                    .arg(sd->HasCachedAnySDTs())
+                    .arg(info->nits.empty())
+                    .arg(info->sdts.empty()));
+        }
     }
     transport_tune_complete |= !wait_until_complete;
+    if (transport_tune_complete)
+    {
+        VERBOSE(VB_CHANSCAN,
+                QString("transport_tune_complete: wait_until_complete %1")
+                .arg(wait_until_complete));
+    }
 
     if (transport_tune_complete &&
         /*!ignoreEncryptedServices &&*/ currentEncryptionStatus.size())
@@ -590,7 +617,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
                 msg = msg + " -- Unknown decryption status";
 
             scan_monitor->ScanAppendTextToLog(msg_tr);
-            VERBOSE(VB_SIPARSER, msg);
+            VERBOSE(VB_CHANSCAN, msg);
         }
     }
 
@@ -634,7 +661,7 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         }
 
         scan_monitor->ScanAppendTextToLog(msg_tr);
-        VERBOSE(VB_SIPARSER, LOC + msg);
+        VERBOSE(VB_CHANSCAN, LOC + msg);
 
         currentEncryptionStatus.clear();
         currentEncryptionStatusChecked.clear();
@@ -656,52 +683,6 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
     return false;
-}
-
-void ChannelScanSM::ScanNITs(void)
-{
-    dvbChanNums.clear();
-
-    ChannelMap::iterator it;
-    for (it = channelMap.begin(); it != channelMap.end(); ++it)
-    {
-        for (uint i = 0; i < (*it)->nits.size(); i++)
-        {
-            const NetworkInformationTable *nit = (*it)->nits[i];
-            if (!nit->TransportStreamCount())
-                continue;
-
-            scan_monitor->ScanAppendTextToLog(
-                QObject::tr("Processing NIT %1").arg(nit->NetworkName()));
-
-            vector<uint> mp;
-            mp = ChannelUtil::CreateMultiplexes(sourceID, nit);
-            VERBOSE(VB_SIPARSER, QString("Created %1 multiplexes from NIT")
-                    .arg(mp.size()));
-
-            // Get channel numbers from UK Frequency List Descriptors
-            for (uint i = 0; i < nit->TransportStreamCount(); i++)
-            {
-                const desc_list_t& list =
-                    MPEGDescriptor::Parse(nit->TransportDescriptors(i),
-                                          nit->TransportDescriptorsLength(i));
-
-                const unsigned char* desc =
-                    MPEGDescriptor::Find(list,
-                                         DescriptorID::dvb_uk_channel_list);
-
-                if (desc)
-                {
-                    UKChannelListDescriptor uklist(desc);
-                    for (uint j = 0; j < uklist.ChannelCount(); j++)
-                    {
-                        dvbChanNums[uklist.ServiceID(j)] =
-                            uklist.ChannelNumber(j);
-                    }
-                }
-            }
-        }
-    }
 }
 
 #define PCM_INFO_INIT(SISTD) \
@@ -760,7 +741,7 @@ static void update_info(ChannelInsertInfo &info,
     QString service_name = QString::null;
     if (desc)
         service_name = desc->ServiceName();
-    if (service_name.stripWhiteSpace().isEmpty())
+    if (service_name.trimmed().isEmpty())
         service_name = QString::null;
     if (info.service_name.isEmpty())
         info.service_name = service_name;
@@ -937,6 +918,7 @@ ChannelScanSM::GetChannelList(ChannelMap::const_iterator it) const
     }
 
     // NIT
+    QMap<qlonglong, uint> ukChanNums;
     QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
@@ -956,6 +938,30 @@ ChannelScanSM::GetChannelList(ChannelMap::const_iterator it) const
                     info.netid = nit->NetworkID();
                     info.in_nit = true;
                 }
+                else
+                {
+                    continue;
+                }
+
+                // Get channel numbers from UK Frequency List Descriptors
+                const desc_list_t &list =
+                    MPEGDescriptor::Parse(nit->TransportDescriptors(i),
+                                          nit->TransportDescriptorsLength(i));
+
+                const unsigned char *desc =
+                    MPEGDescriptor::Find(list,
+                                         DescriptorID::dvb_uk_channel_list);
+
+                if (desc)
+                {
+                    UKChannelListDescriptor uklist(desc);
+                    for (uint j = 0; j < uklist.ChannelCount(); j++)
+                    {
+                        ukChanNums[((qlonglong)info.orig_netid<<32) |
+                                   uklist.ServiceID(j)] =
+                            uklist.ChannelNumber(j);
+                    }
+                }
             }
         }
     }
@@ -964,14 +970,16 @@ ChannelScanSM::GetChannelList(ChannelMap::const_iterator it) const
     for (dbchan_it = pnum_to_dbchan.begin();
          dbchan_it != pnum_to_dbchan.end(); ++dbchan_it)
     {
-        uint pnum = dbchan_it.key();
         ChannelInsertInfo &info = *dbchan_it;
-            
-        if ((dvbChanNums.find(pnum) != dvbChanNums.end()) &&
-            info.chan_num.isEmpty())
-        {
-            info.chan_num = QString::number(dvbChanNums[pnum]);
-        }
+
+        if (!info.chan_num.isEmpty())
+            continue;
+
+        QMap<qlonglong, uint>::const_iterator it = ukChanNums.find(
+            ((qlonglong)info.orig_netid<<32) | info.service_id);
+
+        if (it != ukChanNums.end())
+            info.chan_num = QString::number(*it);
     }
 
     // Check for decryption success
@@ -1037,6 +1045,15 @@ DTVChannel *ChannelScanSM::GetDTVChannel(void)
     return dynamic_cast<DTVChannel*>(channel);
 }
 
+HDHRChannel *ChannelScanSM::GetHDHRChannel(void)
+{
+#ifdef USING_HDHOMERUN
+    return dynamic_cast<HDHRChannel*>(channel);
+#else
+    return NULL;
+#endif
+}
+
 DVBChannel *ChannelScanSM::GetDVBChannel(void)
 {
 #ifdef USING_DVB
@@ -1088,7 +1105,7 @@ void ChannelScanSM::StartScanner(void)
  */
 void ChannelScanSM::RunScanner(void)
 {
-    VERBOSE(VB_SIPARSER, LOC + "ChannelScanSM::RunScanner -- begin");
+    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- begin");
 
     scanner_thread_running = true;
     threadExit = false;
@@ -1102,7 +1119,7 @@ void ChannelScanSM::RunScanner(void)
     }
     scanner_thread_running = false;
 
-    VERBOSE(VB_SIPARSER, LOC + "ChannelScanSM::RunScanner -- end");
+    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::RunScanner -- end");
 }
 
 // See if we have timed out
@@ -1136,14 +1153,45 @@ bool ChannelScanSM::HasTimedOut(void)
 
     // have the tables have timed out?
     if (timer.elapsed() > (int)channelTimeout)
+    {
+        // the channelTimeout alone is only valid if we have seen no tables..
+        const ScanStreamData *sd = NULL;
+        if (GetDTVSignalMonitor())
+            sd = GetDTVSignalMonitor()->GetScanStreamData();
+
+        if (!sd)
+            return true;
+
+        if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
+            return timer.elapsed() > (int) kDVBTableTimeout;
+        if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
+            return timer.elapsed() > (int) kATSCTableTimeout;
+        if (sd->HasCachedAnyPAT() || sd->HasCachedAnyPMTs())
+            return timer.elapsed() > (int) kMPEGTableTimeout;
+
         return true;
+    }
 
     // ok the tables haven't timed out, but have we hit the signal timeout?
     SignalMonitor *sm = GetSignalMonitor();
     if ((timer.elapsed() > (int)(*current).timeoutTune) &&
         sm && !sm->HasSignalLock())
     {
-        return true;
+        const ScanStreamData *sd = NULL;
+        if (GetDTVSignalMonitor())
+            sd = GetDTVSignalMonitor()->GetScanStreamData();
+
+        if (!sd)
+            return true;
+
+        // Just is case we temporarily lose the signal after we've seen
+        // tables...
+        if (!sd->HasCachedAnyPAT() && !sd->HasCachedAnyPMTs() &&
+            !sd->HasCachedMGT()    && !sd->HasCachedAnyVCTs() &&
+            !sd->HasCachedAnyNIT() && !sd->HasCachedAnySDTs())
+        {
+            return true;
+        }
     }
 
     return false;
@@ -1244,12 +1292,12 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
     }
 
     scan_monitor->ScanUpdateStatusText(cur_chan);
-    VERBOSE(VB_SIPARSER, LOC + tune_msg_str);
+    VERBOSE(VB_CHANSCAN, LOC + tune_msg_str);
 
     if (!Tune(transport))
     {   // If we did not tune successfully, bail with message
         UpdateScanPercentCompleted();
-        VERBOSE(VB_SIPARSER, LOC +
+        VERBOSE(VB_CHANSCAN, LOC +
                 QString("Failed to tune %1 mplexid(%2) at offset %3")
                 .arg(item.FriendlyName).arg(item.mplexid)
                 .arg(transport.offset()));
@@ -1276,7 +1324,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
  */
 void ChannelScanSM::StopScanner(void)
 {
-    VERBOSE(VB_SIPARSER, LOC + "ChannelScanSM::StopScanner");
+    VERBOSE(VB_CHANSCAN, LOC + "ChannelScanSM::StopScanner");
 
     threadExit = true;
 
@@ -1287,16 +1335,18 @@ void ChannelScanSM::StopScanner(void)
         signalMonitor->Stop();
 }
 
-/** \fn ChannelScanSM::ScanTransports(int,const QString,const QString,const QString)
+/**
  *  \brief Generates a list of frequencies to scan and adds it to the
  *   scanTransport list, and then sets the scanning to TRANSPORT_LIST.
  */
-bool ChannelScanSM::ScanTransports(int SourceID,
-                            const QString std,
-                            const QString modulation,
-                            const QString country)
+bool ChannelScanSM::ScanTransports(
+    int SourceID,
+    const QString std,
+    const QString modulation,
+    const QString country,
+    const QString &table_start,
+    const QString &table_end)
 {
-    QString si_std = (std.lower() != "atsc") ? "dvb" : "atsc";
     QString name("");
     if (scanning)
         return false;
@@ -1307,10 +1357,12 @@ bool ChannelScanSM::ScanTransports(int SourceID,
     freq_table_list_t tables =
         get_matching_freq_tables(std, modulation, country);
 
-    VERBOSE(VB_SIPARSER, LOC + 
+    VERBOSE(VB_CHANSCAN, LOC + 
             QString("Looked up freq table (%1, %2, %3) w/%4 entries")
             .arg(std).arg(modulation).arg(country).arg(tables.size()));
 
+    QString start = table_start;
+    QString end   = table_end;
     freq_table_list_t::iterator it = tables.begin();
     for (; it != tables.end(); ++it)
     {
@@ -1321,18 +1373,34 @@ bool ChannelScanSM::ScanTransports(int SourceID,
         while (freq <= ft.frequencyEnd)
         {
             name = strNameFormat;
-            if (strNameFormat.find("%") >= 0)
+            if (strNameFormat.indexOf("%") >= 0)
                 name = strNameFormat.arg(name_num);
 
-            TransportScanItem item(SourceID, si_std, name, name_num,
-                                   freq, ft, signalTimeout);
-            scanTransports.push_back(item);
+            if (start.isEmpty() || name == start)
+            {
+                start = QString::null;
 
-            VERBOSE(VB_SIPARSER, LOC + item.toString());
+                TransportScanItem item(SourceID, std, name, name_num,
+                                       freq, ft, signalTimeout);
+                scanTransports.push_back(item);
+
+                VERBOSE(VB_CHANSCAN, LOC + item.toString());
+            }
 
             name_num++;
             freq += ft.frequencyStep;
+
+            if (!end.isEmpty() && name == end)
+                break;
         }
+        if (!end.isEmpty() && name == end)
+            break;
+    }
+
+    while (!tables.empty())
+    {
+        delete tables.back();
+        tables.pop_back();
     }
 
     timer.start();
@@ -1366,7 +1434,7 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
 
         scanTransports.push_back(item);
 
-        VERBOSE(VB_SIPARSER, LOC + item.toString());
+        VERBOSE(VB_CHANSCAN, LOC + item.toString());
     }
 
     if (scanTransports.empty())
@@ -1389,8 +1457,8 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
  *  \brief Generates a list of frequencies to scan and adds it to the
  *   scanTransport list, and then sets the scanning to TRANSPORT_LIST.
  */
-bool ChannelScanSM::ScanTransportsStartingOn(int sourceid,
-                                      const QMap<QString,QString> &startChan)
+bool ChannelScanSM::ScanTransportsStartingOn(
+    int sourceid, const QMap<QString,QString> &startChan)
 {
     QMap<QString,QString>::const_iterator it;
 
@@ -1401,8 +1469,8 @@ bool ChannelScanSM::ScanTransportsStartingOn(int sourceid,
     }
 
     QString std    = *startChan.find("std");
-    QString mod    = (*(startChan.find("modulation"))).upper();
-    QString si_std = (std.lower() != "atsc") ? "dvb" : "atsc";
+    QString mod    = (*(startChan.find("modulation"))).toUpper();
+    QString si_std = (std.toLower() != "atsc") ? "dvb" : "atsc";
     QString name   = "";
     bool    ok     = false;
 
@@ -1461,46 +1529,77 @@ bool ChannelScanSM::ScanTransportsStartingOn(int sourceid,
     return true;
 }
 
-bool ChannelScanSM::ScanTransport(int mplexid)
+bool ChannelScanSM::AddToList(uint mplexid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT sourceid, sistandard, transportid, frequency, modulation "
+        "FROM dtv_multiplex "
+        "WHERE mplexid = :MPLEXID");
+    query.bindValue(":MPLEXID", mplexid);
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelScanSM::AddToList()", query);
+        return false;
+    }
+
+    if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddToList() " +
+                QString("Failed to locate mplexid(%1) in DB").arg(mplexid));
+        return false;
+    }
+
+    uint    sourceid   = query.value(0).toUInt();
+    QString sistandard = query.value(1).toString();
+    uint    tsid       = query.value(2).toUInt();
+
+    QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
+        QString("Multiplex #%1").arg(mplexid);
+    if (query.value(4).toString() == "8vsb")
+    {
+        QString chan = QString("%1 Hz").arg(query.value(3).toInt());
+        struct CHANLIST *curList = chanlists[0].list;
+        int totalChannels = chanlists[0].count;
+        int findFrequency = (query.value(3).toInt() / 1000) - 1750;
+        for (int x = 0 ; x < totalChannels ; x++)
+        {
+            if ((curList[x].freq <= findFrequency + 200) &&
+                (curList[x].freq >= findFrequency - 200))
+            {
+                chan = QString("%1").arg(curList[x].name);
+            }
+        }
+        fn = QObject::tr("ATSC Channel %1").arg(chan);
+    }
+
+    TransportScanItem item(sourceid, sistandard, fn, mplexid, signalTimeout);
+
+    bool ok = false;
+    if (GetDVBChannel())
+        ok = item.tuning.FillFromDB(GetDVBChannel()->GetCardType(), mplexid);
+    else if (GetHDHRChannel())
+        ok = item.tuning.FillFromDB(DTVTunerType::kTunerTypeATSC, mplexid);
+
+    if (ok)
+    {
+        VERBOSE(VB_CHANSCAN, LOC + "Adding " + fn);
+        scanTransports.push_back(item);
+    }
+    else
+    {
+        VERBOSE(VB_CHANSCAN, LOC + "Not adding incomplete transport " + fn);
+    }
+
+    return ok;
+}
+
+bool ChannelScanSM::ScanTransport(uint mplexid)
 {
     scanTransports.clear();
     nextIt = scanTransports.end();
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    // Run DB query to get transports on sourceid SourceID
-    // connected to this card
-    QString theQuery = QString(
-        "SELECT sourceid, mplexid, sistandard, transportid "
-        "FROM dtv_multiplex WHERE mplexid = %2").arg(mplexid);
-    query.prepare(theQuery);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("Get Transports for SourceID", query);
-        return false;
-    }
-
-    if (query.size() <= 0)
-    {
-        VERBOSE(VB_SIPARSER, LOC + "Unable to find transport to scan.");
-        return false;
-    }
-
-    while (query.next())
-    {
-        int sourceid = query.value(0).toInt();
-        int mplexid  = query.value(1).toInt();
-        QString std  = query.value(2).toString();
-        int tsid     = query.value(3).toInt();
-
-        QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
-            QString("Multiplex #%1").arg(mplexid);
-        
-        VERBOSE(VB_SIPARSER, LOC + "Adding " + fn);
-
-        TransportScanItem item(sourceid, std, fn, mplexid, signalTimeout);
-        scanTransports.push_back(item);
-    }
+    AddToList(mplexid);
 
     timer.start();
     waitingForTables  = false;
@@ -1542,8 +1641,8 @@ bool ChannelScanSM::CheckImportedList(
             found = true;
             if (!channels[i].name.isEmpty())
             {
-                service_name = Q3DeepCopy<QString>(channels[i].name);
-                callsign     = Q3DeepCopy<QString>(channels[i].name);
+                service_name = channels[i].name; service_name.detach();
+                callsign     = channels[i].name; callsign.detach();
             }
         }
     }

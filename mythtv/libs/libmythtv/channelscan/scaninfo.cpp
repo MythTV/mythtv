@@ -2,11 +2,13 @@
 #include <stdint.h>
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // MythTV headers
+#include "mythdb.h"
 #include "scaninfo.h"
 #include "mythdbcon.h"
+#include "mythcontext.h"
 
 ScanInfo::ScanInfo() : scanid(0), cardid(0), sourceid(0), processed(false) { }
 
@@ -19,7 +21,7 @@ ScanInfo::ScanInfo(uint _scanid, uint _cardid, uint _sourceid,
 
 uint SaveScan(const ScanDTVTransportList &scan)
 {
-    VERBOSE(VB_IMPORTANT, QString("SaveScan() scan.size(): %1")
+    VERBOSE(VB_CHANSCAN, QString("SaveScan() scan.size(): %1")
             .arg(scan.size()));
 
     uint scanid = 0;
@@ -29,9 +31,12 @@ uint SaveScan(const ScanDTVTransportList &scan)
     uint sourceid = scan[0].channels[0].source_id;
     uint cardid   = scan[0].cardid;
 
+    // Delete very old scans
     const vector<ScanInfo> list = LoadScanList();
     for (uint i = 0; i < list.size(); i++)
     {
+        if (list[i].scandate > QDateTime::currentDateTime().addDays(-14))
+            continue;
         if ((list[i].cardid == cardid) && (list[i].sourceid == sourceid))
             ScanInfo::DeleteScan(list[i].scanid);
     }

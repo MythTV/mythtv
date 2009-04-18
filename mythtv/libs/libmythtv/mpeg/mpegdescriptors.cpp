@@ -438,6 +438,8 @@ QString MPEGDescriptor::toString() const
         str = TerrestrialDeliverySystemDescriptor(_data).toString();
     else if (DescriptorID::frequency_list == DescriptorTag())
         str = FrequencyListDescriptor(_data).toString();
+    else if (DescriptorID::dvb_uk_channel_list == DescriptorTag())
+        str = UKChannelListDescriptor(_data).toString();
     else if (DescriptorID::service == DescriptorTag())
         str = ServiceDescriptor(_data).toString();
     else if (DescriptorID::stream_identifier == DescriptorTag())

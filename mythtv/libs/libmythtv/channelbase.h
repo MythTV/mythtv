@@ -107,6 +107,7 @@ class ChannelBase
     // \brief Set cardid for scanning
     void SetCardID(uint _cardid) { cardid = _cardid; }
 
+    virtual int GetCardID(void) const;
   protected:
     /// \brief Switches to another input on hardware, 
     ///        and sets the channel is setstarting is true.
@@ -114,7 +115,6 @@ class ChannelBase
     virtual bool IsInputAvailable(
         int inputNum, uint &mplexid_restriction) const;
 
-    virtual int GetCardID(void) const;
     virtual bool ChangeExternalChannel(const QString &newchan);
     static void StoreInputChannels(const InputMap&);
     static void StoreDefaultInput(uint cardid, const QString &input);

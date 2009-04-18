@@ -115,8 +115,21 @@ bool DTVMultiplex::ParseATSC(const QString &_frequency,
                              const QString &_modulation)
 {
     bool ok = true;
-    frequency = _frequency.toUInt(&ok);
-    return ok && modulation.Parse(_modulation);
+    frequency = _frequency.toULongLong(&ok);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to parse ATSC frequency %1")
+                .arg(_frequency));
+        return false;
+    }
+
+    ok = modulation.Parse(_modulation);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to parse ATSC modulation %1")
+                .arg(_modulation));
+    }
+    return ok;
 }
 
 bool DTVMultiplex::ParseDVB_T(
@@ -210,6 +223,8 @@ bool DTVMultiplex::ParseTuningParams(
     if (DTVTunerType::kTunerTypeATSC == type)
         return ParseATSC(_frequency, _modulation);
 
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "ParseTuningParams -- Unknown tuner type");
+
     return false;
 }
 
@@ -228,7 +243,7 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
         "WHERE dtv_multiplex.mplexid = :MPLEXID");
     query.bindValue(":MPLEXID", mplexid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("DVBTuning::FillFromDB", query);
         return false;
@@ -264,7 +279,8 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
 
 bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
 {
-    DTVMultiplex::FillFromDB(type, mplexid);
+    if (!DTVMultiplex::FillFromDB(type, mplexid))
+        return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -367,3 +383,24 @@ uint ScanDTVTransport::SaveScan(uint scanid) const
 
     return transportid;
 }
+
+bool ScanDTVTransport::ParseTuningParams(
+    DTVTunerType type,
+    QString _frequency,    QString _inversion,      QString _symbolrate,
+    QString _fec,          QString _polarity,
+    QString _hp_code_rate, QString _lp_code_rate,   QString _ofdm_modulation,
+    QString _trans_mode,   QString _guard_interval, QString _hierarchy,
+    QString _modulation,   QString _bandwidth)
+{
+    tuner_type = type;
+
+    return DTVMultiplex::ParseTuningParams(
+        type,
+        _frequency,     _inversion,       _symbolrate,
+        _fec,           _polarity,
+        _hp_code_rate,  _lp_code_rate,    _ofdm_modulation,
+        _trans_mode,    _guard_interval,  _hierarchy,
+        _modulation,    _bandwidth);
+}
+
+

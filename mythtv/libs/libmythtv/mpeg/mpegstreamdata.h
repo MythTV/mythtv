@@ -198,6 +198,7 @@ class MPEGStreamData : public EITSource
     bool HasCachedAllPMT(uint program_num) const;
     bool HasCachedAnyPMT(uint program_num) const;
     bool HasCachedAllPMTs(void) const;
+    bool HasCachedAnyPMTs(void) const;
 
     const pat_ptr_t GetCachedPAT(uint tsid, uint section_num) const;
     pat_vec_t       GetCachedPATs(uint tsid) const;

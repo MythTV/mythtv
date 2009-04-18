@@ -94,15 +94,17 @@ class ChannelScanSM : public MPEGStreamListener,
     void StopScanner(void);
 
     bool ScanTransports(
-        int src, const QString std, const QString mod, const QString country);
+        int src, const QString std, const QString mod, const QString table,
+        const QString &table_start = QString::null,
+        const QString &table_end   = QString::null);
     bool ScanTransportsStartingOn(
         int sourceid, const QMap<QString,QString> &valueMap);
-    bool ScanTransport(int mplexid);
+    bool ScanTransport(uint mplexid);
     bool ScanForChannels(
         uint sourceid, const QString &std, const QString &cardtype,
         const DTVChannelList&);
 
-    bool ScanServicesSourceID(int SourceID);
+    bool ScanExistingTransports(uint sourceid);
 
     void SetAnalog(bool is_analog);
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
@@ -141,6 +143,7 @@ class ChannelScanSM : public MPEGStreamListener,
     // some useful gets
     DTVChannel       *GetDTVChannel(void);
     V4LChannel       *GetV4LChannel(void);
+    HDHRChannel      *GetHDHRChannel(void);
     DVBChannel       *GetDVBChannel(void);
     const DVBChannel *GetDVBChannel(void) const;
 
@@ -171,12 +174,16 @@ class ChannelScanSM : public MPEGStreamListener,
 
     bool TestNextProgramEncryption(void);
     bool UpdateChannelInfo(bool wait_until_complete);
-    void ScanNITs(void);
 
     void HandleAllGood(void); // used for analog scanner
 
+    bool AddToList(uint mplexid);
 
     static QString loc(const ChannelScanSM*);
+
+    static const uint kDVBTableTimeout;
+    static const uint kATSCTableTimeout;
+    static const uint kMPEGTableTimeout;
 
   private:
     // Set in constructor
@@ -202,7 +209,6 @@ class ChannelScanSM : public MPEGStreamListener,
     bool                        currentTestingDecryption;
     QMap<uint, uint>            currentEncryptionStatus;
     QMap<uint, bool>            currentEncryptionStatusChecked;
-    QMap<uint, uint>            dvbChanNums; // pnum->channel_num
 
     /// Found Channel Info
     ChannelMap        channelMap;

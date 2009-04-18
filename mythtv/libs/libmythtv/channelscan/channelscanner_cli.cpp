@@ -31,6 +31,10 @@
 #include "channelscan_sm.h"
 #include "channelimporter.h"
 
+#define LOC      QString("ChScanCLI: ")
+#define LOC_WARN QString("ChScanCLI, Warning: ")
+#define LOC_ERR  QString("ChScanCLI, Error: ")
+
 ChannelScannerCLI::ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk) :
     done(false), onlysavescan(doScanSaveOnly), interactive(promptsOk),
     status_lock(false), status_complete(0), status_snr(0),
@@ -100,17 +104,48 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
             break;
     }
 
-    printf("\r%3i%% S/N %3.1f %s : %s (%s) %20s\r",
-           status_complete, status_snr,
-           (status_lock) ? "l" : "L",
-           status_text.ascii(), status_last_log.ascii(), "");
 
-    cout<<flush;
+    //cout<<"HERE<"<<print_verbose_messages<<">"<<endl;
+    QString msg;
+    if ((print_verbose_messages == 0) ||
+        (print_verbose_messages & VB_CHANSCAN))
+    {
+        msg.sprintf("%3i%% S/N %3.1f %s : %s (%s) %20s",
+                    status_complete, status_snr,
+                    (status_lock) ? "l" : "L",
+                    status_text.toAscii().constData(),
+                    status_last_log.toAscii().constData());
+    }
+    //cout<<msg.toAscii().constData()<<endl;
+
+    if (print_verbose_messages & VB_CHANSCAN)
+    {
+        static QString old_msg;
+        if (msg != old_msg)
+        {
+            VERBOSE(VB_CHANSCAN, LOC + msg);
+            old_msg = msg;
+        }
+    }
+    else if (!print_verbose_messages)
+    {
+        if (msg.length() > 80)
+            msg = msg.left(77) + "...";
+        cout<<"\r"<<msg.toAscii().constData()<<"\r";
+        cout<<flush;
+    }
 }
 
 void ChannelScannerCLI::InformUser(const QString &error)
 {
-    cerr<<"ERROR: "<<error.ascii()<<endl;
+    if (!print_verbose_messages)
+    {
+        cerr<<"ERROR: "<<error.toAscii().constData()<<endl;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + error);
+    }
     post_event(scanMonitor, ScannerEvent::ScanComplete, 0);
 }
 
@@ -123,5 +158,6 @@ void ChannelScannerCLI::Process(const ScanDTVTransportList &_transports)
 void ChannelScannerCLI::MonitorProgress(
     bool lock, bool strength, bool snr, bool rotor)
 {
-    cout<<"\r0%"<<flush;
+    if (!print_verbose_messages)
+        cout<<"\r0%"<<flush;
 }

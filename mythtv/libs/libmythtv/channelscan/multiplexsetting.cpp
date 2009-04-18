@@ -30,7 +30,7 @@
 #include "multiplexsetting.h"
 #include "frequencies.h"
 
-void MultiplexSetting::load(void)
+void MultiplexSetting::Load(void)
 {
     clearSelections();
 
@@ -85,5 +85,5 @@ void MultiplexSetting::load(void)
 void MultiplexSetting::SetSourceID(uint _sourceid)
 {
     sourceid = _sourceid;
-    load();
+    Load();
 }

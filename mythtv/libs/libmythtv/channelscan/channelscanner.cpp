@@ -102,16 +102,18 @@ void ChannelScanner::Scan(
     const QMap<QString,QString> &startChan /* NITAddScan */,
     const QString &freq_std /* FullScan */,
     const QString &mod /* FullScan */,
-    const QString &tbl /* FullScan */)
+    const QString &tbl /* FullScan */,
+    const QString &tbl_start /* FullScan optional */,
+    const QString &tbl_end   /* FullScan optional */)
 {
     PreScanCommon(scantype, cardid, inputname,
                   sourceid, do_ignore_signal_timeout);
 
-    VERBOSE(VB_SIPARSER, LOC + "Scan()");
+    VERBOSE(VB_CHANSCAN, LOC + "Scan()");
 
     if (!sigmonScanner)
     {
-        VERBOSE(VB_SIPARSER, LOC + "Scan(): "
+        VERBOSE(VB_CHANSCAN, LOC + "Scan(): "
                 "scanner does not exist...");
         return;
     }
@@ -125,12 +127,12 @@ void ChannelScanner::Scan(
         (ScanTypeSetting::FullScan_DVBT   == scantype) ||
         (ScanTypeSetting::FullScan_Analog == scantype))
     {
-        VERBOSE(VB_SIPARSER, LOC +
+        VERBOSE(VB_CHANSCAN, LOC +
                 "ScanTransports("<<freq_std<<", "<<mod<<", "<<tbl<<")");
 
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
-        if ((mod.left(3).lower() == "qam") &&
+        if ((mod.left(3).toLower() == "qam") &&
             (sigmonScanner->GetSignalTimeout() < 1000))
         {
             sigmonScanner->SetSignalTimeout(1000);
@@ -139,21 +141,22 @@ void ChannelScanner::Scan(
 
         sigmonScanner->SetAnalog(ScanTypeSetting::FullScan_Analog == scantype);
 
-        ok = sigmonScanner->ScanTransports(sourceid, freq_std, mod, tbl);
+        ok = sigmonScanner->ScanTransports(
+            sourceid, freq_std, mod, tbl, tbl_start, tbl_end);
     }
     else if ((ScanTypeSetting::NITAddScan_DVBT == scantype) ||
              (ScanTypeSetting::NITAddScan_DVBS == scantype) ||
              (ScanTypeSetting::NITAddScan_DVBC == scantype))
     {
-        VERBOSE(VB_SIPARSER, LOC + "ScanTransports()");
+        VERBOSE(VB_CHANSCAN, LOC + "ScanTransports()");
 
         ok = sigmonScanner->ScanTransportsStartingOn(sourceid, startChan);
     }
     else if (ScanTypeSetting::FullTransportScan == scantype)
     {
-        VERBOSE(VB_SIPARSER, LOC + "ScanServicesSourceID("<<sourceid<<")");
+        VERBOSE(VB_CHANSCAN, LOC + "ScanExistingTransports("<<sourceid<<")");
 
-        ok = sigmonScanner->ScanServicesSourceID(sourceid);
+        ok = sigmonScanner->ScanExistingTransports(sourceid);
         if (ok)
         {
             scanMonitor->ScanPercentComplete(0);
@@ -168,7 +171,7 @@ void ChannelScanner::Scan(
     {
         ok = true;
 
-        VERBOSE(VB_SIPARSER, LOC + "ScanForChannels("<<sourceid<<")");
+        VERBOSE(VB_CHANSCAN, LOC + "ScanForChannels("<<sourceid<<")");
 
         QString card_type = CardUtil::GetRawCardType(cardid);
         QString sub_type  = card_type;
@@ -178,7 +181,7 @@ void ChannelScanner::Scan(
 
             ok = !device.isEmpty();
             if (ok)
-                sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
+                sub_type = CardUtil::ProbeDVBType(device).toUpper();
         }
 
         if (ok)
@@ -198,11 +201,10 @@ void ChannelScanner::Scan(
     }
     else if (ScanTypeSetting::TransportScan == scantype)
     {
-        VERBOSE(VB_SIPARSER, LOC + "ScanTransport("<<mplexid<<")");
+        VERBOSE(VB_CHANSCAN, LOC + "ScanTransport("<<mplexid<<")");
 
         ok = sigmonScanner->ScanTransport(mplexid);
     }
-
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to handle tune complete.");
@@ -299,7 +301,7 @@ void ChannelScanner::PreScanCommon(
 
     if ("DVB" == card_type)
     {
-        QString sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
+        QString sub_type = CardUtil::ProbeDVBType(device).toUpper();
         bool need_nit = (("QAM"  == sub_type) ||
                          ("QPSK" == sub_type) ||
                          ("OFDM" == sub_type));
@@ -319,7 +321,7 @@ void ChannelScanner::PreScanCommon(
 
 #ifdef USING_DVB
     if ("DVB" == card_type)
-        channel = new DVBChannel(device.toInt());
+        channel = new DVBChannel(device);
 #endif
 
 #ifdef USING_V4L

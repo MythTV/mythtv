@@ -93,6 +93,14 @@ class ScanDTVTransport : public DTVMultiplex
     virtual bool FillFromDB(DTVTunerType type, uint mplexid);
     uint SaveScan(uint scanid) const;
 
+    bool ParseTuningParams(
+        DTVTunerType type,
+        QString frequency,    QString inversion,      QString symbolrate,
+        QString fec,          QString polarity,
+        QString hp_code_rate, QString lp_code_rate,   QString constellation,
+        QString trans_mode,   QString guard_interval, QString hierarchy,
+        QString modulation,   QString bandwidth);
+
   public:
     DTVTunerType          tuner_type;
     uint                  cardid;

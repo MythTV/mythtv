@@ -395,3 +395,14 @@ QString TerrestrialDeliverySystemDescriptor::toString() const
     return str;
 }
 
+QString UKChannelListDescriptor::toString() const
+{
+    QString ret = "UKChannelListDescriptor sid->chan_num: ";
+    for (uint i = 0; i < ChannelCount(); i++)
+    {
+        ret += QString("%1->%2").arg(ServiceID(i)).arg(ChannelNumber(i));
+        ret += (i+1<ChannelCount()) ? ", " : "";
+    }
+    return ret;
+}
+

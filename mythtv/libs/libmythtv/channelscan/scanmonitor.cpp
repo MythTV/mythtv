@@ -34,7 +34,6 @@
 
 // Qt headers
 #include <qapplication.h>
-#include <Q3DeepCopy>
 
 /// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 6
@@ -51,7 +50,8 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
 void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
 {
     ScannerEvent *e = new ScannerEvent(type);
-    e->strValue(Q3DeepCopy<QString>(val));
+    QString tmp = val; tmp.detach();
+    e->strValue(tmp);
     QApplication::postEvent(dest, e);
 }
 

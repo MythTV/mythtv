@@ -90,17 +90,28 @@ class ChannelImporter
     typedef enum
     {
         kChannelTypeFirst = 0,
+
+        kChannelTypeNonConflictingFirst = kChannelTypeFirst,
         kATSCNonConflicting = kChannelTypeFirst,
         kDVBNonConflicting,
         kSCTENonConflicting,
         kMPEGNonConflicting,
-        kATSCConflicting,
+        kNTSCNonConflicting,
+        kChannelTypeNonConflictingLast = kNTSCNonConflicting,
+
+        kChannelTypeConflictingFirst,
+        kATSCConflicting = kChannelTypeConflictingFirst,
         kDVBConflicting,
         kSCTEConflicting,
         kMPEGConflicting,
-        kChannelTypeLast = kMPEGConflicting,
+        kNTSCConflicting,
+        kChannelTypeConflictingLast = kNTSCConflicting,
+        kChannelTypeLast = kChannelTypeConflictingLast,
     } ChannelType;
 
+    QString toString(ChannelType type);
+
+    void CleanupDuplicates(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;
 
@@ -119,13 +130,23 @@ class ChannelImporter
         UpdateAction action, ChannelType type,
         ScanDTVTransportList &filtered);
 
+    /// For a multiple channels
     InsertAction QueryUserInsert(const QString &msg);
 
+    /// For a multiple channels
     UpdateAction QueryUserUpdate(const QString &msg);
 
+    /// For a single channel
     bool QueryUserResolve(
         const ChannelImporterBasicStats &info,
-        ChannelInsertInfo &chan);
+        const ScanDTVTransport          &transport,
+        ChannelInsertInfo               &chan);
+
+    /// For a single channel
+    bool QueryUserInsert(
+        const ChannelImporterBasicStats &info,
+        const ScanDTVTransport          &transport,
+        ChannelInsertInfo               &chan);
 
     static void FixUpOpenCable(ScanDTVTransportList &transports);
 
@@ -139,6 +160,11 @@ class ChannelImporter
     static QString FormatChannels(
         const ScanDTVTransportList      &transports,
         const ChannelImporterBasicStats &info);
+
+    static QString FormatChannel(
+        const ScanDTVTransport          &transport,
+        const ChannelInsertInfo         &chan,
+        const ChannelImporterBasicStats *info = NULL);
 
     static QString GetSummary(
         uint                                  transport_count,

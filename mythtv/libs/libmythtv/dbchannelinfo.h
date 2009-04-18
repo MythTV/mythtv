@@ -128,6 +128,8 @@ class MPUBLIC ChannelInsertInfo
 
     bool SaveScan(uint scanid, uint transportid) const;
 
+    void ImportExtraInfo(const ChannelInsertInfo &other);
+
   public:
     uint    db_mplexid;
     uint    source_id;

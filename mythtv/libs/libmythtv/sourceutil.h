@@ -2,6 +2,10 @@
 #ifndef _SOURCEUTIL_H_
 #define _SOURCEUTIL_H_
 
+// C++ headers
+#include <vector>
+using namespace std;
+
 // Qt headers
 #include <qstring.h>
 
@@ -15,6 +19,7 @@ class MPUBLIC SourceUtil
     static QString GetChannelSeparator(uint sourceid);
     static QString GetChannelFormat(uint sourceid);
     static uint    GetChannelCount(uint sourceid);
+    static vector<uint> GetMplexIDs(uint sourceid);
     static bool    GetListingsLoginData(uint sourceid,
                                         QString &grabber, QString &userid,
                                         QString &passwd,  QString &lineupid);

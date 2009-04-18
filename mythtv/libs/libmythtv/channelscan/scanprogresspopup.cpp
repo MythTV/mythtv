@@ -28,6 +28,7 @@
  */
 
 #include "scanprogresspopup.h"
+#include "mythcontext.h"
 
 ScanProgressPopup::ScanProgressPopup(bool lock, bool strength,
                                      bool snr, bool rotorpos) :

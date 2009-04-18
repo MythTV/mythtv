@@ -1263,6 +1263,12 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
     return true;
 }
 
+bool MPEGStreamData::HasCachedAnyPMTs(void) const
+{
+    QMutexLocker locker(&_cache_lock);
+    return _cached_pmts.size();
+}
+
 const pat_ptr_t MPEGStreamData::GetCachedPAT(
     uint tsid, uint section_num) const
 {

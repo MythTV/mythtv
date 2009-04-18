@@ -16,6 +16,7 @@
 #include "paneanalog.h"
 #include "panesingle.h"
 #include "panedvbutilsimport.h"
+#include "paneexistingscanimport.h"
 
 static QString card_types(void)
 {
@@ -118,6 +119,8 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
     case CardUtil::MPEG:
         addSelection(tr("Full Scan"),
                      QString::number(FullScan_Analog), true);
+        addSelection(tr("Import existing scan"),
+                     QString::number(ExistingScanImport));
         return;
     case CardUtil::DVBT:
         addSelection(tr("Full Scan"),
@@ -126,18 +129,24 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                      QString::number(NITAddScan_DVBT));
         addSelection(tr("Import channels.conf"),
                      QString::number(DVBUtilsImport));
+        addSelection(tr("Import existing scan"),
+                     QString::number(ExistingScanImport));
         break;
     case CardUtil::DVBS:
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_DVBS));
         addSelection(tr("Import channels.conf"),
                      QString::number(DVBUtilsImport));
+        addSelection(tr("Import existing scan"),
+                     QString::number(ExistingScanImport));
         break;
     case CardUtil::QAM:
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(NITAddScan_DVBC));
         addSelection(tr("Import channels.conf"),
                      QString::number(DVBUtilsImport));
+        addSelection(tr("Import existing scan"),
+                     QString::number(ExistingScanImport));
         break;
     case CardUtil::ATSC:
     case CardUtil::HDHOMERUN:
@@ -145,6 +154,8 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                      QString::number(FullScan_ATSC), true);
         addSelection(tr("Import channels.conf"),
                      QString::number(DVBUtilsImport));
+        addSelection(tr("Import existing scan"),
+                     QString::number(ExistingScanImport));
         break;
     case CardUtil::FREEBOX:
         addSelection(tr("M3U Import"),
@@ -160,9 +171,9 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
         return;
     }
 
-    addSelection(tr("Full Scan of Existing Transports"),
+    addSelection(tr("Scan of all existing transports"),
                  QString::number(FullTransportScan));
-    addSelection(tr("Existing Transport Scan"),
+    addSelection(tr("Scan of single existing transport"),
                  QString::number(TransportScan));
 }
 
@@ -179,7 +190,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     paneDVBS2(new PaneDVBS2()),   paneATSC(new PaneATSC()),
     paneDVBC(new PaneDVBC()),     paneAnalog(new PaneAnalog()),
     paneSingle(new PaneSingle()),
-    paneDVBUtilsImport(new PaneDVBUtilsImport())
+    paneDVBUtilsImport(new PaneDVBUtilsImport()),
+    paneExistingScanImport(new PaneExistingScanImport())
 {
     setTrigger(scanType);
 
@@ -214,6 +226,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
               paneDVBUtilsImport);
+    addTarget(QString::number(ScanTypeSetting::ExistingScanImport),
+              paneExistingScanImport);
 }
 
 void ScanOptionalConfig::triggerChanged(const QString& value)
@@ -225,6 +239,7 @@ void ScanOptionalConfig::SetSourceID(const QString &sourceid)
 {
     paneAnalog->SetSourceID(sourceid.toUInt());
     paneSingle->SetSourceID(sourceid.toUInt());
+    paneExistingScanImport->SetSourceID(sourceid.toUInt());
 }
 
 QString ScanOptionalConfig::GetFrequencyStandard(void) const
@@ -269,6 +284,18 @@ QString ScanOptionalConfig::GetFrequencyTable(void) const
     return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : "unknown");
 }
 
+bool ScanOptionalConfig::GetFrequencyTableRange(
+    QString &start, QString &end) const
+{
+    start = end  = QString::null;
+
+    int st = scanType->getValue().toInt();
+    if (ScanTypeSetting::FullScan_ATSC == st)
+        return paneATSC->GetFrequencyTableRange(start, end);
+
+    return false;
+}
+
 bool ScanOptionalConfig::DoIgnoreSignalTimeout(void) const
 {
     int  st  = scanType->getValue().toInt();
@@ -294,6 +321,11 @@ uint ScanOptionalConfig::GetMultiplex(void) const
 {
     int mplexid = paneSingle->GetMultiplex();
     return (mplexid <= 0) ? 0 : mplexid;
+}
+
+uint ScanOptionalConfig::GetScanID(void) const
+{
+    return paneExistingScanImport->GetScanID();
 }
 
 QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const

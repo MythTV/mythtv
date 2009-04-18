@@ -48,6 +48,7 @@ class PaneDVBS;
 class PaneDVBS2;
 class PaneSingle;
 class PaneDVBUtilsImport;
+class PaneExistingScanImport;
 
 class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
 {
@@ -74,6 +75,8 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         IPTVImport,
         // Imports lists from dvb-utils scanners
         DVBUtilsImport,
+        // Imports lists from previous mythtv scan
+        ExistingScanImport,
     };
 
     ScanTypeSetting() : ComboBoxSetting(this), hw_cardid(0)
@@ -96,10 +99,12 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     QString GetFrequencyStandard(void)       const;
     QString GetModulation(void)              const;
     QString GetFrequencyTable(void)          const;
+    bool    GetFrequencyTableRange(QString&,QString&) const;
     bool    DoIgnoreSignalTimeout(void)      const;
     QString GetFilename(void)                const;
     uint    GetMultiplex(void)               const;
     QMap<QString,QString> GetStartChan(void) const;
+    uint    GetScanID(void)                  const;
 
   public slots:
     void SetSourceID(const QString&);
@@ -117,6 +122,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     PaneAnalog           *paneAnalog;
     PaneSingle           *paneSingle;
     PaneDVBUtilsImport   *paneDVBUtilsImport;
+    PaneExistingScanImport *paneExistingScanImport;
 };
 
 class ScanWizardConfig: public VerticalConfigurationGroup
@@ -136,6 +142,8 @@ class ScanWizardConfig: public VerticalConfigurationGroup
     QString GetInputName(void)    const { return input->GetInputName();       }
     QString GetFilename(void)     const { return scanConfig->GetFilename();   }
     uint    GetMultiplex(void)    const { return scanConfig->GetMultiplex();  }
+    bool    GetFrequencyTableRange(QString &start, QString &end) const
+        { return scanConfig->GetFrequencyTableRange(start, end); }
 
     QString GetFrequencyStandard(void) const
         { return scanConfig->GetFrequencyStandard(); }
@@ -145,6 +153,8 @@ class ScanWizardConfig: public VerticalConfigurationGroup
         { return scanConfig->GetStartChan(); }
     bool    DoIgnoreSignalTimeout(void) const
         { return scanConfig->DoIgnoreSignalTimeout(); }
+    uint    GetScanID(void)       const
+        { return scanConfig->GetScanID(); }
 
   protected:
     VideoSourceSelector *videoSource;

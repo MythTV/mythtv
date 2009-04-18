@@ -1792,7 +1792,7 @@ class UKChannelListDescriptor : public MPEGDescriptor
     uint ChannelNumber(uint i) const
         { return ((_data[4 + (i<<2)] << 8) | _data[5 + (i<<2)]) & 0x3ff; }
 
-    QString toString() const { return QString("UKChannelListDescriptor(stub)"); }
+    QString toString() const;
 };
 
 class DVBContentIdentifierDescriptor : public MPEGDescriptor
