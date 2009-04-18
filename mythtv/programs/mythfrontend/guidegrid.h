@@ -82,7 +82,7 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
                                 const QString &startChanNum,
                                 TV            *player = NULL,
                                 bool           allowFinder = true,
-                                bool           allowEPGVideo = true);
+                                bool           allowEPGVideo = false);
 
     DBChanList GetSelection(void) const;
 
