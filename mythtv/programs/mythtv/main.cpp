@@ -20,8 +20,9 @@ using namespace std;
 #include "compat.h"
 #include "mythuihelper.h"
 #include "dbcheck.h"
-#include "util.h" // for IsPulseAudioRunning()
 #include "myththemebase.h"
+#include "audiopulseutil.h"
+
 
 static void *run_priv_thread(void *data)
 {
@@ -77,13 +78,6 @@ static void *run_priv_thread(void *data)
 
 int main(int argc, char *argv[])
 {
-    if (IsPulseAudioRunning())
-    {
-        cerr << "***Pulse Audio is running!!!!***" << endl
-             << "Pulse Audio is incompatible with MythTV." << endl;
-        return GENERIC_EXIT_NOT_OK;
-    }
-
     bool cmdline_err;
     MythCommandLineParser cmdline(
         kCLPOverrideSettings     |
@@ -207,6 +201,10 @@ int main(int argc, char *argv[])
     
     GetMythUI()->LoadQtConfig();
 
+    int pa_ret = pulseaudio_handle_startup();
+    if (pa_ret != GENERIC_EXIT_OK)
+        return pa_ret;
+
 #if defined(Q_OS_MACX)
     // Mac OS X doesn't define the AudioOutputDevice setting
 #else
@@ -263,6 +261,10 @@ int main(int argc, char *argv[])
     }
     delete theme;
     delete gContext;
+
+    pa_ret = pulseaudio_handle_teardown();
+    if (GENERIC_EXIT_OK != pa_ret)
+        return pa_ret;
 
     return TV_EXIT_OK;
 }

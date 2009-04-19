@@ -63,6 +63,7 @@ using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO
 using_vdpau:DEFINES += USING_VDPAU
 
+using_pulse:DEFINES += USING_PULSE
 using_alsa:DEFINES += USING_ALSA
 using_arts:DEFINES += USING_ARTS
 using_jack:DEFINES += USING_JACK

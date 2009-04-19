@@ -28,6 +28,7 @@ HEADERS += volumebase.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
 HEADERS += mythhttppool.h mythhttphandler.h
+HEADERS += audiopulseutil.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h
@@ -48,6 +49,7 @@ SOURCES += volumebase.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 SOURCES += mythhttppool.cpp mythhttphandler.cpp
+SOURCES += audiopulseutil.cpp
 
 # remove when everything is switched to mythui
 SOURCES += virtualkeyboard_qt.cpp
@@ -103,6 +105,11 @@ using_oss {
     SOURCES += audiooutputoss.cpp
     HEADERS += audiooutputoss.h
     LIBS += $$OSS_LIBS
+}
+
+using_pulse {
+    DEFINES += USING_PULSE
+    LIBS += $$PULSE_LIBS
 }
 
 unix:!cygwin {

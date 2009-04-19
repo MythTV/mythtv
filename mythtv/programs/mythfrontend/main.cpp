@@ -61,7 +61,7 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdirs.h"
 #include "mythosdmenueditor.h"
-#include "util.h" // for IsPulseAudioRunning()
+#include "audiopulseutil.h"
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -1038,13 +1038,6 @@ void log_rotate_handler(int)
 
 int main(int argc, char **argv)
 {
-    if (IsPulseAudioRunning())
-    {
-        cerr << "***Pulse Audio is running!!!!***" << endl
-             << "Pulse Audio is incompatible with MythTV." << endl;
-        return GENERIC_EXIT_NOT_OK;
-    }
-
     bool bPromptForBackend    = false;
     bool bBypassAutoDiscovery = false;
     bool upgradeAllowed = false;
@@ -1166,6 +1159,10 @@ int main(int argc, char **argv)
         }
     }
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
+
+    int pa_ret = pulseaudio_handle_startup();
+    if (pa_ret != GENERIC_EXIT_OK)
+        return pa_ret;
 
     if (logfile.size())
     {
@@ -1481,6 +1478,10 @@ int main(int argc, char **argv)
         delete networkControl;
 
     DestroyMythMainWindow();
+
+    pa_ret = pulseaudio_handle_teardown();
+    if (GENERIC_EXIT_OK != pa_ret)
+        return pa_ret;
 
     return FRONTEND_EXIT_OK;
 
