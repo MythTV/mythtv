@@ -276,7 +276,7 @@ class PAThread : public QThread
 };
 
 /// \returns true if successful
-bool pulseaudio_suspend(void)
+MPUBLIC bool pulseaudio_suspend(void)
 {
     QThread *t = new PAThread();
     t->start();
@@ -289,7 +289,7 @@ bool pulseaudio_suspend(void)
 }
 
 /// \returns true if successful
-bool pulseaudio_unsuspend(void)
+MPUBLIC bool pulseaudio_unsuspend(void)
 {
     if (!pau_context)
     {
@@ -328,7 +328,7 @@ bool pulseaudio_unsuspend(void)
 
 #endif // USING_PULSE
 
-int pulseaudio_handle_startup(void)
+MPUBLIC int pulseaudio_handle_startup(void)
 {
 #ifdef USING_PULSE
     if (getenv("EXPERIMENTALLY_ALLOW_PULSE_AUDIO"))
@@ -360,7 +360,7 @@ int pulseaudio_handle_startup(void)
     return GENERIC_EXIT_OK;
 }
 
-int pulseaudio_handle_teardown(void)
+MPUBLIC int pulseaudio_handle_teardown(void)
 {
 #ifdef USING_PULSE
     if (getenv("EXPERIMENTALLY_ALLOW_PULSE_AUDIO"))
