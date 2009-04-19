@@ -25,14 +25,6 @@ MythUIShape::~MythUIShape()
 
 void MythUIShape::Reset()
 {
-    m_type = "box";
-    m_fillColor = QColor();
-    m_lineColor = QColor();
-    m_drawFill = false;
-    m_drawLine = false;
-    m_lineWidth = 1;
-    m_cornerRadius = 10;
-
     MythUIType::Reset();
 }
 
