@@ -17,13 +17,14 @@ class TV;
 class MythUIText;
 class MythUIButtonList;
 
-MPUBLIC void RunProgramFinder(TV *player = NULL, bool allowEPG = true);
+MPUBLIC void RunProgramFinder(TV *player = NULL, bool embedVideo = false, bool allowEPG = true);
 
 class ProgFinder : public MythScreenType
 {
     Q_OBJECT
   public:
-    ProgFinder(MythScreenStack *parentStack, bool allowEPG = true, TV *player = NULL);
+    ProgFinder(MythScreenStack *parentStack, bool allowEPG = true, 
+               TV *player = NULL, bool embedVideo = false);
     virtual ~ProgFinder();
 
     bool Create(void);
@@ -65,6 +66,7 @@ class ProgFinder : public MythScreenType
     QString m_searchStr;
 
     TV  *m_player;
+    bool m_embedVideo;
     bool m_allowEPG;
     bool m_allowKeypress;
 
@@ -88,7 +90,8 @@ class ProgFinder : public MythScreenType
 class JaProgFinder : public ProgFinder
 {
   public:
-    JaProgFinder(MythScreenStack *parentStack, bool gg = false, TV *player = NULL);
+    JaProgFinder(MythScreenStack *parentStack, bool gg = false, 
+                 TV *player = NULL, bool embedVideo = false);
 
   protected:
     virtual void initAlphabetList();
@@ -105,7 +108,8 @@ class JaProgFinder : public ProgFinder
 class HeProgFinder : public ProgFinder
 {
   public:
-    HeProgFinder(MythScreenStack *parentStack, bool gg = false, TV *player = NULL);
+    HeProgFinder(MythScreenStack *parentStack, bool gg = false, 
+                 TV *player = NULL, bool embedVideo = false);
 
   protected:
     virtual void initAlphabetList();

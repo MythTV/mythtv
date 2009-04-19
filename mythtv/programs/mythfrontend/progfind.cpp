@@ -38,17 +38,17 @@ using namespace std;
 #define LOC_ERR  QString("ProgFinder, Error: ")
 #define LOC_WARN QString("ProgFinder, Warning: ")
 
-void RunProgramFinder(TV *player, bool allowEPG)
+void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
 {
     // Language specific progfinder, if needed
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ProgFinder *programFind = NULL;
     if (GetMythUI()->GetLanguage() == "ja")
-        programFind = new JaProgFinder(mainStack, allowEPG, player);
+        programFind = new JaProgFinder(mainStack, allowEPG, player, embedVideo);
     else if (GetMythUI()->GetLanguage() == "he")
-        programFind = new HeProgFinder(mainStack, allowEPG, player);
+        programFind = new HeProgFinder(mainStack, allowEPG, player, embedVideo);
     else // default
-        programFind = new ProgFinder(mainStack, allowEPG, player);
+        programFind = new ProgFinder(mainStack, allowEPG, player, embedVideo);
 
     if (programFind->Create())
         mainStack->AddScreen(programFind, (player == NULL));
@@ -56,14 +56,15 @@ void RunProgramFinder(TV *player, bool allowEPG)
         delete programFind;
 }
 
-ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG, TV *player) 
+ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG, 
+                       TV *player, bool embedVideo) 
           : MythScreenType(parentStack, "ProgFinder"),
     m_searchStr(QString::null),
-    m_allowEPG(allowEPG),              m_allowKeypress(false),
+    m_player(player),            m_embedVideo(embedVideo),
+    m_allowEPG(allowEPG),        m_allowKeypress(false),
     m_dateFormat(QString::null), m_timeFormat(QString::null)
 {
     gContext->addCurrentLocation("ProgFinder");
-    m_player = player;
 }
 
 bool ProgFinder::Create()
@@ -395,7 +396,7 @@ void ProgFinder::showGuide()
         if (startchannel == "")
             startchannel = "3";
         uint startchanid = 0;
-        GuideGrid::RunProgramGuide(startchanid, startchannel, m_player, false);
+        GuideGrid::RunProgramGuide(startchanid, startchannel, m_player, m_embedVideo, false);
     }
 }
 
@@ -753,8 +754,9 @@ const char* JaProgFinder::searchChars[] = {
     0,
 };
 
-JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg, TV *player)
-            : ProgFinder(parentStack, gg, player)
+JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg, 
+                           TV *player, bool embedVideo)
+            : ProgFinder(parentStack, gg, player, embedVideo)
 {
     for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
          numberOfSearchChars++)
@@ -859,8 +861,9 @@ const char* HeProgFinder::searchChars[] = {
     "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת", "E", "#", 0, 
 };
 
-HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg, TV *player)
-            : ProgFinder(parentStack, gg, player)
+HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg, 
+                           TV *player, bool embedVideo)
+            : ProgFinder(parentStack, gg, player, embedVideo)
 {
     for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
          numberOfSearchChars++)

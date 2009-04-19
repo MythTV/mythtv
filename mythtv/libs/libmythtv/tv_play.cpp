@@ -7644,13 +7644,13 @@ void TV::DoEditSchedule(int editType)
     bool pause_active = true;
     bool isNearEnd = false;
     bool isLiveTV = StateIsLiveTV(GetState(actx));
-    bool allowEPG = false;
+    bool allowEmbedding = false;
 
     {
         actx->LockDeleteNVP(__FILE__, __LINE__);
         pause_active = !actx->nvp || !actx->nvp->getVideoOutput();
         if (actx->nvp && actx->nvp->getVideoOutput())
-            allowEPG = actx->nvp->getVideoOutput()->AllowPreviewEPG();
+            allowEmbedding = actx->nvp->getVideoOutput()->AllowPreviewEPG();
 
         if (!pause_active)
         {
@@ -7693,14 +7693,15 @@ void TV::DoEditSchedule(int editType)
     {
         case kScheduleProgramGuide:
         {
-            isEmbedded = (isLiveTV && !pause_active && allowEPG);
-            RunProgramGuidePtr(chanid, channum, this, true, isEmbedded);
+            isEmbedded = (isLiveTV && !pause_active && allowEmbedding);
+            RunProgramGuidePtr(chanid, channum, this, isEmbedded, true);
             ignoreKeyPresses = true;
             break;
         }
         case kScheduleProgramFinder:
         {
-            RunProgramFinderPtr(this, true);
+            isEmbedded = (isLiveTV && !pause_active && allowEmbedding);
+            RunProgramFinderPtr(this, isEmbedded, true);
             ignoreKeyPresses = true;
             break;
         }
