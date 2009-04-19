@@ -115,7 +115,7 @@ void ATSCStreamData::Reset(int major, int minor)
 {
     _desired_major_channel = major;
     _desired_minor_channel = minor;
-    
+
     MPEGStreamData::Reset(-1);
     _mgt_version = -1;
     _tvct_version.clear();
@@ -127,7 +127,7 @@ void ATSCStreamData::Reset(int major, int minor)
     _atsc_eit_pids.clear();
     _atsc_ett_pids.clear();
 
-    { 
+    {
         QMutexLocker locker(&_cache_lock);
 
         DeleteCachedTable(_cached_mgt);
@@ -230,7 +230,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             if (_cache_tables)
             {
                 TerrestrialVirtualChannelTable *vct =
-                    new TerrestrialVirtualChannelTable(psip); 
+                    new TerrestrialVirtualChannelTable(psip);
                 CacheTVCT(pid, vct);
                 ProcessTVCT(tsid, vct);
             }
@@ -284,7 +284,7 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             const uint mm = GetATSCMajorMinor(eit.SourceID());
             if (mm && _eit_helper)
                 _eit_helper->AddEIT(mm >> 16, mm & 0xffff, &eit);
-                
+
             return true;
         }
         case TableID::ETT:
@@ -343,6 +343,17 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
                 _atsc_aux_listeners[i]->HandleDCCSCT(&dccsct);
 
             return true;
+        }
+        case TableID::NIT:
+        case TableID::NITo:
+        case TableID::SDT:
+        case TableID::SDTo:
+        case TableID::BAT:
+        case TableID::TDT:
+        case TableID::TOT:
+        {
+            // All DVB specific tables, not handled here
+            return false;
         }
         default:
         {

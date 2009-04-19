@@ -38,7 +38,7 @@
 #include "settings.h"
 
 class ScanWizardConfig;
-class ScanWizardScanner;
+class ChannelScannerGUI;
 
 class MPUBLIC ScanWizard : public QObject, public ConfigurationWizard
 {
@@ -62,7 +62,7 @@ class MPUBLIC ScanWizard : public QObject, public ConfigurationWizard
     uint               lastHWCardID;
     uint               lastHWCardType;
     ScanWizardConfig  *configPane;
-    ScanWizardScanner *scannerPane;
+    ChannelScannerGUI *scannerPane;
 };
 
 #endif // SCANWIZARD_H

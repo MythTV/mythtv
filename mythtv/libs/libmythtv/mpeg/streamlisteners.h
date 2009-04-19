@@ -31,6 +31,7 @@ class DirectedChannelChangeTable;
 class DirectedChannelChangeSelectionCodeTable;
 
 class NetworkInformationTable;
+class BouquetAssociationTable;
 class ServiceDescriptionTable;
 class TimeDateTable;
 class DVBEventInformationTable;
@@ -134,6 +135,7 @@ class DVBOtherStreamListener
   public:
     virtual void HandleNITo(const NetworkInformationTable*) = 0;
     virtual void HandleSDTo(uint tsid, const ServiceDescriptionTable*) = 0;
+    virtual void HandleBAT(const BouquetAssociationTable*) = 0;
 };
 
 class DVBEITStreamListener

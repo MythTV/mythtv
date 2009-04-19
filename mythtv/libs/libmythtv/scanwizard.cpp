@@ -29,12 +29,14 @@
  *
  */
 
-#include "scanwizardhelpers.h"
-#include "scanwizardscanner.h"
+#include "scanwizardconfig.h"
+#include "channelscanner_gui.h"
 #include "scanwizard.h"
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "videosource.h"
+#include "scaninfo.h"
+#include "channelimporter.h"
 #include "mythverbose.h"
 
 #define LOC QString("SWiz: ")
@@ -47,7 +49,7 @@ ScanWizard::ScanWizard(uint    default_sourceid,
     lastHWCardType(CardUtil::ERROR_PROBE),
     configPane(new ScanWizardConfig(
                    this, default_sourceid, default_cardid, default_inputname)),
-    scannerPane(new ScanWizardScanner())
+    scannerPane(new ChannelScannerGUI())
 {
     addChild(configPane);
     addChild(scannerPane);
@@ -66,8 +68,8 @@ MythDialog *ScanWizard::dialogWidget(MythMainWindow *parent, const char*)
 
 void ScanWizard::SetPage(const QString &pageTitle)
 {
-    VERBOSE(VB_SIPARSER, QString("SetPage(%1)").arg(pageTitle));
-    if (pageTitle != ScanWizardScanner::kTitle)
+    VERBOSE(VB_CHANSCAN, QString("SetPage(%1)").arg(pageTitle));
+    if (pageTitle != ChannelScannerGUI::kTitle)
         return;
 
     QMap<QString,QString> start_chan;
@@ -79,7 +81,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
     int     scantype  = configPane->GetScanType();
     bool    do_scan   = true;
 
-    VERBOSE(VB_SIPARSER, LOC + "SetPage(): " +
+    VERBOSE(VB_CHANSCAN, LOC + "SetPage(): " +
             QString("type(%1) cardid(%2) inputname(%3)")
             .arg(scantype).arg(cardid).arg(inputname));
 
@@ -88,17 +90,17 @@ void ScanWizard::SetPage(const QString &pageTitle)
         scannerPane->ImportDVBUtils(sourceid, lastHWCardType,
                                     configPane->GetFilename());
     }
-    else if (scantype == ScanTypeSetting::NITAddScan_OFDM)
+    else if (scantype == ScanTypeSetting::NITAddScan_DVBT)
     {
         start_chan = configPane->GetStartChan();
         parse_type = DTVTunerType::kTunerTypeOFDM;
     }
-    else if (scantype == ScanTypeSetting::NITAddScan_QPSK)
+    else if (scantype == ScanTypeSetting::NITAddScan_DVBS)
     {
         start_chan = configPane->GetStartChan();
         parse_type = DTVTunerType::kTunerTypeQPSK;
     }
-    else if (scantype == ScanTypeSetting::NITAddScan_QAM)
+    else if (scantype == ScanTypeSetting::NITAddScan_DVBC)
     {
         start_chan = configPane->GetStartChan();
         parse_type = DTVTunerType::kTunerTypeQAM;
@@ -111,15 +113,23 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if ((scantype == ScanTypeSetting::FullScan_ATSC)     ||
              (scantype == ScanTypeSetting::FullTransportScan) ||
              (scantype == ScanTypeSetting::TransportScan)     ||
-             (scantype == ScanTypeSetting::FullScan_OFDM)     ||
+             (scantype == ScanTypeSetting::FullScan_DVBT)     ||
              (scantype == ScanTypeSetting::FullScan_Analog))
     {
         ;
     }
+    else if (scantype == ScanTypeSetting::ExistingScanImport)
+    {
+        do_scan = false;
+        uint scanid = configPane->GetScanID();
+        ScanDTVTransportList transports = LoadScan(scanid);
+        ChannelImporter ci(true, true, true, false);
+        ci.Process(transports);
+    }
     else
     {
         do_scan = false;
-        VERBOSE(VB_SIPARSER, LOC_ERR + "SetPage(): " +
+        VERBOSE(VB_CHANSCAN, LOC_ERR + "SetPage(): " +
                 QString("type(%1) src(%2) cardid(%3) not handled")
                 .arg(scantype).arg(sourceid).arg(cardid));
 
@@ -150,14 +160,18 @@ void ScanWizard::SetPage(const QString &pageTitle)
 
     if (do_scan)
     {
+        QString table_start, table_end;
+        configPane->GetFrequencyTableRange(table_start, table_end);
+
         scannerPane->Scan(
             configPane->GetScanType(),       configPane->GetCardID(),
             configPane->GetInputName(),      configPane->GetSourceID(),
-            configPane->DoDeleteChannels(),  configPane->DoRenameChannels(),
+            /*configPane->DoDeleteChannels(),configPane->DoRenameChannels(),*/
             configPane->DoIgnoreSignalTimeout(), configPane->GetMultiplex(),
             start_chan,
             configPane->GetFrequencyStandard(), configPane->GetModulation(),
-            configPane->GetFrequencyTable(), configPane->GetATSCFormat());
+            configPane->GetFrequencyTable()/*,configPane->GetATSCFormat()*/,
+            table_start, table_end);
     }
 }
 
@@ -177,7 +191,5 @@ void ScanWizard::SetInput(const QString &cardids_inputname)
         lastHWCardID    = cardid;
         QString subtype = CardUtil::ProbeSubTypeName(cardid);
         lastHWCardType  = CardUtil::toCardType(subtype);
-        configPane->SetDefaultATSCFormat(
-            SourceUtil::GetChannelFormat(configPane->GetSourceID()));
     }
 }

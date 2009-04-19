@@ -76,6 +76,22 @@ class FrequencyTable
           constellation(_constellation),   trans_mode(_trans_mode),
           guard_interval(_guard_interval), hierarchy(_hierarchy) { ; }
 
+    FrequencyTable(uint64_t                _frequencyStart,
+                   uint64_t                _frequencyEnd,
+                   uint                    _frequencyStep,
+                   QString                 _name_format,
+                   int                     _name_offset,
+                   DTVCodeRate             _fec_inner,
+                   DTVModulation           _modulation,
+                   uint                    _symbol_rate,
+                   int                     _offset1,
+                   int                     _offset2)
+        : name_format(_name_format),       name_offset(_name_offset),
+          frequencyStart(_frequencyStart), frequencyEnd(_frequencyEnd),
+          frequencyStep(_frequencyStep),   modulation(_modulation),
+          offset1(_offset1),               offset2(_offset2),
+          symbol_rate(_symbol_rate),       fec_inner(_fec_inner) { ; }
+
     virtual ~FrequencyTable() { ; }
 
     // Common Stuff
@@ -93,10 +109,14 @@ class FrequencyTable
     DTVBandwidth      bandwidth;
     DTVCodeRate       coderate_hp;
     DTVCodeRate       coderate_lp;
-    DTVModulation     constellation; 
+    DTVModulation     constellation;
     DTVTransmitMode   trans_mode;
     DTVGuardInterval  guard_interval;
     DTVHierarchy      hierarchy;
+
+    // DVB-C/DVB-S stuff
+    uint              symbol_rate;
+    DTVCodeRate       fec_inner;
 };
 
 /**

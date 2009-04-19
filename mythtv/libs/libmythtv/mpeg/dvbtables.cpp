@@ -21,12 +21,14 @@ QString NetworkInformationTable::toString(void) const
 {
     QString str = QString("NIT: NetID(%1) tranports(%2)\n")
         .arg(NetworkID()).arg(TransportStreamCount());
+    str.append(QString("Section (%1) Last Section (%2) IsCurrent (%3)\n")
+        .arg(Section()).arg(LastSection()).arg(IsCurrent()));
 
     if (0 != NetworkDescriptorsLength())
     {
         str.append(QString("Network descriptors length: %1\n")
                    .arg(NetworkDescriptorsLength()));
-        vector<const unsigned char*> desc = 
+        vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(NetworkDescriptors(),
                                   NetworkDescriptorsLength());
         for (uint i = 0; i < desc.size(); i++)
@@ -46,7 +48,7 @@ QString NetworkInformationTable::toString(void) const
         {
             str.append(QString("  Transport descriptors length: %1\n")
                        .arg(TransportDescriptorsLength(i)));
-            vector<const unsigned char*> desc = 
+            vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
             for (uint i = 0; i < desc.size(); i++)
@@ -70,7 +72,7 @@ QString NetworkInformationTable::NetworkName() const
 
         if (desc)
             _cached_network_name = NetworkNameDescriptor(desc).Name();
-        else 
+        else
             _cached_network_name = QString("Net ID 0x%1")
                 .arg(NetworkID(), 0, 16);
     }
@@ -96,7 +98,7 @@ QString ServiceDescriptionTable::toString(void) const
         QString("SDT: TSID(0x%1) original_network_id(0x%2) services(%3)\n")
         .arg(TSID(), 0, 16).arg(OriginalNetworkID(), 0, 16)
         .arg(ServiceCount());
-    
+
     for (uint i = 0; i < ServiceCount(); i++)
     {
         str.append(QString("  Service #%1 SID(0x%2) ")
@@ -110,7 +112,7 @@ QString ServiceDescriptionTable::toString(void) const
         {
             str.append(QString("  Service descriptors length: %1\n")
                        .arg(ServiceDescriptorsLength(i)));
-            vector<const unsigned char*> desc = 
+            vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(ServiceDescriptors(i),
                                       ServiceDescriptorsLength(i));
             for (uint i = 0; i < desc.size(); i++)
@@ -146,6 +148,57 @@ bool ServiceDescriptionTable::Mutate(void)
     }
     else
         return false;
+}
+
+void BouquetAssociationTable::Parse(void) const
+{
+    _tsc_ptr = pesdata() + 10 + BouquetDescriptorsLength();
+
+    _ptrs.clear();
+    _ptrs.push_back(_tsc_ptr + 2);
+    for (uint i=0; _ptrs[i] + 6 <= _ptrs[0] + TransportStreamDataLength(); i++)
+        _ptrs.push_back(_ptrs[i] + 6 + TransportDescriptorsLength(i));
+}
+
+QString BouquetAssociationTable::toString(void) const
+{
+    QString str =
+        QString("BAT: BouquetID(0x%1) transports(%2)\n")
+        .arg(BouquetID(), 0, 16).arg(TransportStreamCount());
+
+    if (0 != BouquetDescriptorsLength())
+    {
+        str.append(QString("Bouquet descriptors length: %1\n")
+                   .arg(BouquetDescriptorsLength()));
+        vector<const unsigned char*> desc = 
+            MPEGDescriptor::Parse(BouquetDescriptors(),
+                                  BouquetDescriptorsLength());
+        for (uint i = 0; i < desc.size(); i++)
+            str.append(QString("  %1\n")
+                       .arg(MPEGDescriptor(desc[i]).toString()));
+    }
+
+    for (uint i = 0; i < TransportStreamCount(); i++)
+    {
+        str.append(QString("  Transport #%1 TSID(0x%2) ")
+                   .arg(i, 2, 10).arg(TSID(i), 0, 16));
+        str.append(QString("original_network_id(0x%2) desc_len(%3)\n")
+                   .arg(OriginalNetworkID(i), 0, 16)
+                   .arg(TransportDescriptorsLength(i)));
+
+        if (0 != TransportDescriptorsLength(i))
+        {
+            str.append(QString("  Transport descriptors length: %1\n")
+                       .arg(TransportDescriptorsLength(i)));
+            vector<const unsigned char*> desc = 
+                MPEGDescriptor::Parse(TransportDescriptors(i),
+                                      TransportDescriptorsLength(i));
+            for (uint i = 0; i < desc.size(); i++)
+                str.append(QString("    %1\n")
+                           .arg(MPEGDescriptor(desc[i]).toString()));
+        }
+    }
+    return str;
 }
 
 void DVBEventInformationTable::Parse(void) const

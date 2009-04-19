@@ -164,6 +164,77 @@ class ServiceDescriptionTable : public PSIPTable
     mutable vector<const unsigned char*> _ptrs; // used to parse
 };
 
+/** \class BouquetAssociationTable
+ *  \brief Tells what channels can be found on each transponder
+ *  for one bouquet (a bunch of channels from one provider)
+ *  Note: French Provider Canal+ uses this to associate channels
+ *  with an index used in their proprietary EIT
+ */
+
+class BouquetAssociationTable : public PSIPTable
+{
+  public:
+    BouquetAssociationTable(const PSIPTable& table) : PSIPTable(table)
+    {
+       assert(TableID::BAT == TableID());
+       Parse();
+    }
+    ~BouquetAssociationTable() { ; }
+
+    // table_id                 8   0.0       0x4a
+    // section_syntax_indicator 1   1.0          1
+    // reserved_future_use      1   1.1          1
+    // reserved                 2   1.2          3
+    // section_length          12   1.4          0
+    // Bouquet ID              16   3.0          0
+    uint BouquetID() const { return TableIDExtension(); }
+
+    // reserved                 2   5.0          3
+    // version_number           5   5.2          0
+    // current_next_indicator   1   5.7          1
+    // section_number           8   6.0       0x00
+    // last_section_number      8   7.0       0x00
+    // reserved                 4   8         0x0d
+    uint BouquetDescriptorsLength(void) const
+        { return ((psipdata()[0]<<8) | psipdata()[1]) & 0xfff; }
+            
+    // Bouquet descriptors len 12   8.4
+    // for (i=0;i<N;i++)
+    // Descriptor();
+    const unsigned char* BouquetDescriptors(void) const
+        { return psipdata() + 2; }
+    // reserved                4 10+N.0
+
+    // Transport stream loop len 12
+    uint TransportStreamDataLength(void) const
+        { return ((_tsc_ptr[0]<<8) | _tsc_ptr[1]) & 0xfff; }
+    uint TransportStreamCount(void) const
+        { return _ptrs.size() - 1; }
+
+    // for (i=0;i<N;i++) {
+    //   transport_stream_id    16
+    uint TSID(uint i) const { return (_ptrs[i][0] << 8) | _ptrs[i][1]; }
+    //   original_network_id    16
+    uint OriginalNetworkID(uint i) const
+        { return (_ptrs[i][2] << 8) | _ptrs[i][3]; }
+    //   reserved                4
+    //   transport descriptor len 12
+    uint TransportDescriptorsLength(uint i) const
+        { return ((_ptrs[i][4]<<8) | _ptrs[i][5]) & 0xfff; }
+    ///    for(j=0;j<N;j++)     x  6.0+p
+    ///      { descriptor() }
+    const unsigned char* TransportDescriptors(uint i) const
+        { return _ptrs[i]+6; }
+    // }
+
+    void Parse(void) const;
+    QString toString(void) const;
+
+  private:
+    mutable const unsigned char* _tsc_ptr;
+    mutable vector<const unsigned char*> _ptrs;
+};
+
 class DiscontinuityInformationTable : public PSIPTable
 {
     DiscontinuityInformationTable(const PSIPTable& table) : PSIPTable(table)

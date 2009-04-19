@@ -444,6 +444,14 @@ QString MPEGDescriptor::toString() const
         str = ServiceDescriptor(_data).toString();
     else if (DescriptorID::stream_identifier == DescriptorTag())
         str = StreamIdentifierDescriptor(_data).toString();
+    else if (DescriptorID::default_authority == DescriptorTag())
+        str = DefaultAuthorityDescriptor(_data).toString();
+    else if (DescriptorID::bouquet_name == DescriptorTag())
+        str = BouquetNameDescriptor(_data).toString();
+    else if (DescriptorID::country_availability == DescriptorTag())
+        str = CountryAvailabilityDescriptor(_data).toString();
+    else if (DescriptorID::service_list == DescriptorTag())
+        str = ServiceListDescriptor(_data).toString();
     else
     {
         str.append(QString("%1 Descriptor (0x%2)")

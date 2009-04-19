@@ -92,24 +92,25 @@ TransportScanItem::TransportScanItem(uint sourceid,
 
     // setup tuning params
     tuning.frequency  = freq;
-    tuning.sistandard = std;
+    tuning.sistandard = (std.toLower() != "atsc") ? "dvb" : "atsc";
+    tuning.modulation = ft.modulation;
     freq_offsets[1]   = ft.offset1;
     freq_offsets[2]   = ft.offset2;
 
-    if (std == "dvb")
+    if (std == "dvbt")
     {
         tuning.inversion      = ft.inversion;
         tuning.bandwidth      = ft.bandwidth;
         tuning.hp_code_rate   = ft.coderate_hp;
         tuning.lp_code_rate   = ft.coderate_lp;
-        tuning.modulation     = ft.modulation;
         tuning.trans_mode     = ft.trans_mode;
         tuning.guard_interval = ft.guard_interval;
         tuning.hierarchy      = ft.hierarchy;
     }
-    else
+    else if (std == "dvbc" || std == "dvbs")
     {
-        tuning.modulation     = ft.modulation;
+        tuning.symbolrate     = ft.symbol_rate;
+        tuning.fec            = ft.fec_inner;
     }
 
     mplexid = GetMultiplexIdFromDB();
@@ -283,7 +284,8 @@ static void init_freq_tables(freq_table_map_t &fmap)
 {
     // United Kingdom
     fmap["dvbt_ofdm_uk0"] = new FrequencyTable(
-        474000000, 850000000, 8000000, "" , 0, DTVInversion::kInversionOff,
+        474000000, 850000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionMode2K,
@@ -292,7 +294,8 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // Finland
     fmap["dvbt_ofdm_fi0"] = new FrequencyTable(
-        474000000, 850000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        474000000, 850000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
         DTVTransmitMode::kTransmissionModeAuto,
@@ -301,7 +304,8 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // Sweden
     fmap["dvbt_ofdm_se0"] = new FrequencyTable(
-        474000000, 850000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        474000000, 850000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
         DTVTransmitMode::kTransmissionModeAuto,
@@ -310,13 +314,16 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // Australia
     fmap["dvbt_ofdm_au0"] = new FrequencyTable(
-        177500000, 226500000, 7000000, "", 0, DTVInversion::kInversionOff,
+        177500000, 226500000, 7000000, "Channel %1", 6,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
-        DTVTransmitMode::kTransmissionMode8K, DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAMAuto, 125000, 0); // VHF 6-12
     fmap["dvbt_ofdm_au1"] = new FrequencyTable(
-        529500000, 816500000, 7000000, "", 0, DTVInversion::kInversionOff,
+        529500000, 816500000, 7000000, "Channel %1", 28,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
         DTVTransmitMode::kTransmissionMode8K,
@@ -325,23 +332,26 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // Germany (Deuschland)
     fmap["dvbt_ofdm_de0"] = new FrequencyTable(
-        177500000, 226500000, 7000000, "", 0, DTVInversion::kInversionOff,
+        177500000, 226500000, 7000000, "Channel %1", 6,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionMode8K,
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
-        DTVModulation::kModulationQAMAuto, 125000, 0); // VHF 6-12
+        DTVModulation::kModulationQAMAuto, 0, 0); // VHF 6-12
     fmap["dvbt_ofdm_de1"] = new FrequencyTable(
-        474000000, 826000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        474000000, 826000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionModeAuto,
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
-        DTVModulation::kModulationQAMAuto, 125000, 0); // UHF 21-65
+        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 21-65
 
     // Spain
     fmap["dvbt_ofdm_es0"] = new FrequencyTable(
-        474000000, 858000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        474000000, 858000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionModeAuto,
@@ -350,7 +360,8 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // New Zealand
     fmap["dvbt_ofdm_nz0"] = new FrequencyTable(
-        474000000, 858000000, 8000000, "", 0, DTVInversion::kInversionOff,
+        474000000, 858000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFEC_3_4,
         DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAM64,
         DTVTransmitMode::kTransmissionMode8K,
@@ -359,13 +370,54 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // france
     fmap["dvbt_ofdm_fr0"] = new FrequencyTable(
-        474000000, 850000000, 8000000, "" , 0, DTVInversion::kInversionOff,
+        474000000, 850000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionMode8K,
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAMAuto, 167000, -166000);
-    
+
+    // DVB-C Germany
+    fmap["dvbc_qam_de0"] = new FrequencyTable(
+         73000000,  73000000, 8000000, "Channel D%1", 73,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        6900000, 0, 0);
+    fmap["dvbc_qam_de1"] = new FrequencyTable(
+         81000000,  81000000, 8000000, "Channel D%1", 81,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        6900000, 0, 0);
+    fmap["dvbc_qam_de2"] = new FrequencyTable(
+        113000000, 121000000, 8000000, "Channel S0%1", 2,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        6900000, 0, 0);
+    fmap["dvbc_qam_de3"] = new FrequencyTable(
+        306000000, 466000000, 8000000, "Channel S%1", 21,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        6900000, 0, 0);
+    fmap["dvbc_qam_de4"] = new FrequencyTable(
+        474000000, 858000000, 8000000, "Channel %1", 21,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        6900000, 0, 0);
+
+    fmap["dvbc_qam_uk0"] = new FrequencyTable(
+        12324000, 12324000+1, 10, "Channel %1", 1,
+        DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAMAuto,
+        29500000, 0, 0);
+    fmap["dvbc_qam_uk1"] = new FrequencyTable(
+        459000000, 459000000+1, 10, "Channel %1", 2,
+        DTVCodeRate::kFEC_3_4, DTVModulation::kModulationQAM64,
+        6952000, 0, 0);
+
+    fmap["dvbc_qam_bf0"] = new FrequencyTable(
+        203000000, 795000000, 100000, "BF Channel %1", 1,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        6900000, 0, 0);
+    fmap["dvbc_qam_bf1"] = new FrequencyTable(
+        194750000, 794750000, 100000, "BF Channel %1", 1 + (795000-203000) / 100,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        6900000, 0, 0);
+
 //#define DEBUG_DVB_OFFSETS
 #ifdef DEBUG_DVB_OFFSETS
     // UHF 14-69

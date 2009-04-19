@@ -20,6 +20,11 @@
 #include "mythuihelper.h"
 #include "mythdirs.h"
 
+#include "libmythtv/channelscan/channelscanner_cli.h"
+#include "libmythtv/channelscan/scanwizardconfig.h"
+#include "libmythtv/channelscan/scaninfo.h"
+#include "libmythtv/channelscan/channelimporter.h"
+#include "libmythtv/cardutil.h"
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/videosource.h"
 #include "channeleditor.h"
@@ -108,7 +113,15 @@ int main(int argc, char *argv[])
 {
     QString geometry = QString::null;
     QString display  = QString::null;
-    QString verboseString = QString(" important general");
+    bool    doScan   = false;
+    bool    doScanList = false;
+    bool    doScanSaveOnly = false;
+    bool    scanInteractive = true;
+    uint    scanImport = 0;
+    uint    scanCardId = 0;
+    QString scanTableName = "atsc-vsb8-us";
+    QString scanInputName = "";
+    bool    use_display = true;
 
 #ifdef USING_X11
     // Remember any -display or -geometry argument
@@ -119,6 +132,12 @@ int main(int argc, char *argv[])
             geometry = argv[argpos+1];
         else if (!strcmp(argv[argpos],"-display"))
             display = argv[argpos+1];
+        else if (QString(argv[argpos]).left(6) == "--scan")
+        {
+            use_display = false;
+            print_verbose_messages = 0;
+            verboseString = "";
+        }
     }
 #endif
 
@@ -127,7 +146,7 @@ int main(int argc, char *argv[])
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
-    QApplication a(argc, argv);
+    QApplication a(argc, argv, use_display);
 
     QMap<QString, QString> settingsOverride;
 
@@ -223,6 +242,53 @@ int main(int argc, char *argv[])
 
             ++argpos;
         }
+        else if (!strcmp(a.argv()[argpos],"--scan-list"))
+        {
+            doScanList = true;
+        }
+        else if (!strcmp(a.argv()[argpos],"--scan-import"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                QString tmpArg = a.argv()[argpos + 1];
+                scanImport = tmpArg.toUInt();
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing scan number for import, please run "
+                     << "--scan-list to list importable scans." << endl;
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"--scan-save-only"))
+        {
+            doScanSaveOnly = true;
+        }
+        else if (!strcmp(a.argv()[argpos],"--scan-non-interactive"))
+        {
+            scanInteractive = false;
+        }
+        else if (!strcmp(a.argv()[argpos],"--scan"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                scanTableName = a.argv()[argpos + 1];
+                ++argpos;
+            }
+            if (a.argc()-1 > argpos)
+            {
+                QString tmpArg = a.argv()[argpos + 1];
+                scanCardId = tmpArg.toUInt();
+                ++argpos;
+            }
+            if (a.argc()-1 > argpos)
+            {
+                scanInputName = a.argv()[argpos + 1];
+                ++argpos;
+            }
+            doScan = true;
+        }
         else
         {
             if (!(!strcmp(a.argv()[argpos],"-h") ||
@@ -245,7 +311,7 @@ int main(int argc, char *argv[])
                  << "-v or --verbose debug-level    "
                     "Use '-v help' for level info" << endl
                  << endl;
-            return -1;
+            return BACKEND_EXIT_INVALID_CMDLINE;
         }
     }
 
@@ -258,7 +324,7 @@ int main(int argc, char *argv[])
 
     std::auto_ptr<MythContext> contextScopeDelete(gContext);
 
-    if (!gContext->Init(true))
+    if (!gContext->Init(use_display))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
@@ -293,14 +359,128 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_ERROR;
     }
 
-    gContext->SetSetting("Theme", "G.A.N.T");
-    GetMythUI()->LoadQtConfig();
+    if (use_display)
+    {
+        gContext->SetSetting("Theme", "G.A.N.T");
+        GetMythUI()->LoadQtConfig();
 
-    QString fileprefix = GetConfDir();
+        QString fileprefix = GetConfDir();
 
-    QDir dir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
+        QDir dir(fileprefix);
+        if (!dir.exists())
+            dir.mkdir(fileprefix);
+    }
+
+    if (doScan)
+    {
+        bool okCardID = scanCardId;
+
+        QStringList inputnames = CardUtil::GetInputNames(scanCardId);
+        okCardID &= !inputnames.empty();
+
+        if (scanInputName.isEmpty())
+            scanInputName = CardUtil::GetDefaultInput(scanCardId);
+
+        bool okInputName = inputnames.contains(scanInputName);
+
+        doScan = (okCardID && okInputName);
+
+        if (!okCardID)
+        {
+            cerr << "You must enter a valid cardid to scan." << endl;
+            vector<uint> cardids = CardUtil::GetCardIDs();
+            if (cardids.empty())
+            {
+                cerr << "But no cards have been defined on this host"
+                     << endl;
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+            cerr << "Valid cards: " << endl;
+            for (uint i = 0; i < cardids.size(); i++)
+            {
+                fprintf(stderr, "%5i: %s %s\n",
+                        cardids[i],
+                        CardUtil::GetRawCardType(cardids[i])
+                        .toAscii().constData(),
+                        CardUtil::GetVideoDevice(cardids[i])
+                        .toAscii().constData());
+            }
+            return BACKEND_EXIT_INVALID_CMDLINE;
+        }
+
+        if (!okInputName)
+        {
+            cerr << "You must enter a valid input to scan this card."
+                 << endl;
+            cerr << "Valid inputs: " << endl;
+            for (int i = 0; i < inputnames.size(); i++)
+            {
+                cerr << inputnames[i].toAscii().constData() << endl;
+            }
+            return BACKEND_EXIT_INVALID_CMDLINE;
+        }
+    }
+
+    if (doScan)
+    {
+        int ret = 0;
+        int firstBreak   = scanTableName.indexOf("-");
+        int secondBreak  = scanTableName.lastIndexOf("-");
+        QString freq_std = scanTableName.mid(0, firstBreak).toLower();
+        QString mod      = scanTableName.mid(
+            firstBreak+1, secondBreak-firstBreak-1).toLower();
+        QString tbl      = scanTableName.mid(secondBreak+1).toLower();
+        uint    inputid  = CardUtil::GetInputID(scanCardId, scanInputName);
+        uint    sourceid = ChannelUtil::GetSourceID(inputid);
+        QMap<QString,QString> startChan;
+        {
+            ChannelScannerCLI scanner(doScanSaveOnly, scanInteractive);
+            scanner.Scan(
+                (freq_std=="atsc") ?
+                ScanTypeSetting::FullScan_ATSC :
+                ((freq_std=="dvbt") ?
+                 ScanTypeSetting::FullScan_DVBT :
+                 ScanTypeSetting::FullScan_ATSC),
+                /* cardid    */ scanCardId,
+                /* inputname */ scanInputName,
+                /* sourceid  */ sourceid,
+                false,
+                // stuff needed for particular scans
+                /* mplexid   */ 0,
+                startChan, freq_std, mod, tbl);
+            ret = a.exec();
+        }
+        return (ret) ? GENERIC_EXIT_NOT_OK : BACKEND_EXIT_OK;
+    }
+
+    if (doScanList)
+    {
+        vector<ScanInfo> scans = LoadScanList();
+
+        cout<<" scanid cardid sourceid processed        date"<<endl;
+        for (uint i = 0; i < scans.size(); i++)
+        {
+            printf("%5i %6i %8i %8s    %20s\n",
+                   scans[i].scanid,   scans[i].cardid,
+                   scans[i].sourceid, (scans[i].processed) ? "yes" : "no",
+                   scans[i].scandate.toString().toAscii().constData());
+        }
+        cout<<endl;
+
+        return BACKEND_EXIT_OK;
+    }
+
+    if (scanImport)
+    {
+        cout<<"*** SCAN IMPORT START ***"<<endl;
+        {
+            ScanDTVTransportList list = LoadScan(scanImport);
+            ChannelImporter ci(false, true, true, false);
+            ci.Process(list);
+        }
+        cout<<"*** SCAN IMPORT END ***"<<endl;
+        return BACKEND_EXIT_OK;
+    }
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();

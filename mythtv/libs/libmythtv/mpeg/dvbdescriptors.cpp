@@ -92,7 +92,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         memcpy(dst, encoding_override, encoding_override_length);
         length = encoding_override_length;
     }
-    
+
     // Strip formatting characters
     for (uint i = 0; i < raw_length; i++)
     {
@@ -234,18 +234,18 @@ void ContentDescriptor::Init(void)
         QObject::tr("Serious/Classical/Religious/Historical Movie/Drama");
     categoryDesc[0x18] = QObject::tr("Movie")+ " - " +
         QObject::tr("Adult", "Adult Movie");
-    
+
     categoryDesc[0x20] = QObject::tr("News");
     categoryDesc[0x21] = QObject::tr("News/weather report");
     categoryDesc[0x22] = QObject::tr("News magazine");
     categoryDesc[0x23] = QObject::tr("Documentary");
     categoryDesc[0x24] = QObject::tr("Intelligent Programmes");
-    
+
     categoryDesc[0x30] = QObject::tr("Entertainment");
     categoryDesc[0x31] = QObject::tr("Game Show");
     categoryDesc[0x32] = QObject::tr("Variety Show");
     categoryDesc[0x33] = QObject::tr("Talk Show");
-    
+
     categoryDesc[0x40] = QObject::tr("Sports");
     categoryDesc[0x41] =
         QObject::tr("Special Events (World Cup, World Series..)");
@@ -260,14 +260,14 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x49] = QObject::tr("Winter Sports");
     categoryDesc[0x4A] = QObject::tr("Equestrian");
     categoryDesc[0x4B] = QObject::tr("Martial Sports");
-    
+
     categoryDesc[0x50] = QObject::tr("Kids");
     categoryDesc[0x51] = QObject::tr("Pre-School Children's Programmes");
     categoryDesc[0x52] = QObject::tr("Entertainment Programmes for 6 to 14");
     categoryDesc[0x53] = QObject::tr("Entertainment Programmes for 10 to 16");
     categoryDesc[0x54] = QObject::tr("Informational/Educational");
     categoryDesc[0x55] = QObject::tr("Cartoons/Puppets");
-    
+
     categoryDesc[0x60] = QObject::tr("Music/Ballet/Dance");
     categoryDesc[0x61] = QObject::tr("Rock/Pop");
     categoryDesc[0x62] = QObject::tr("Classical Music");
@@ -288,12 +288,12 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x79] = QObject::tr("New Media");
     categoryDesc[0x7A] = QObject::tr("Arts/Culture Magazines");
     categoryDesc[0x7B] = QObject::tr("Fashion");
-    
+
     categoryDesc[0x80] = QObject::tr("Social/Policical/Economics");
     categoryDesc[0x81] = QObject::tr("Magazines/Reports/Documentary");
     categoryDesc[0x82] = QObject::tr("Economics/Social Advisory");
     categoryDesc[0x83] = QObject::tr("Remarkable People");
-    
+
     categoryDesc[0x90] = QObject::tr("Education/Science/Factual");
     categoryDesc[0x91] = QObject::tr("Nature/animals/Environment");
     categoryDesc[0x92] = QObject::tr("Technology/Natural Sciences");
@@ -302,7 +302,7 @@ void ContentDescriptor::Init(void)
     categoryDesc[0x95] = QObject::tr("Social/Spiritual Sciences");
     categoryDesc[0x96] = QObject::tr("Further Education");
     categoryDesc[0x97] = QObject::tr("Languages");
-    
+
     categoryDesc[0xA0] = QObject::tr("Leisure/Hobbies");
     categoryDesc[0xA1] = QObject::tr("Tourism/Travel");
     categoryDesc[0xA2] = QObject::tr("Handicraft");
@@ -332,9 +332,9 @@ QString FrequencyListDescriptor::toString() const
     return str;
 }
 
-QString ServiceDescriptor::toString() const
+QString ServiceDescriptorMapping::toString() const
 {
-    QString str = QString("ServiceDescriptor: %1").arg(ServiceName());
+    QString str = "";
 
     if (IsDTV())
         str.append(" (TV)");

@@ -2,13 +2,14 @@
 #define _IPTVCHANNELFETCHER_H_
 
 // Qt headers
-#include <qobject.h>
-#include <qmutex.h>
-#include <qthread.h>
+#include <QObject>
+#include <QMutex>
+#include <QThread>
 
 // MythTV headers
 #include "iptvchannelinfo.h"
 
+class ScanMonitor;
 class IPTVChannelFetcher;
 
 class IPTVChannelFetcherThread : public QThread
@@ -18,14 +19,14 @@ class IPTVChannelFetcherThread : public QThread
     IPTVChannelFetcher *iptvfetcher;
 };
 
-class IPTVChannelFetcher : public QObject
+class IPTVChannelFetcher
 {
-    Q_OBJECT
-
     friend class IPTVChannelFetcherThread;
 
   public:
-    IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid);
+    IPTVChannelFetcher(uint cardid, const QString &inputname, uint sourceid,
+                       ScanMonitor *monitor = NULL);
+    ~IPTVChannelFetcher();
 
     bool Scan(void);
     void Stop(void);
@@ -34,27 +35,17 @@ class IPTVChannelFetcher : public QObject
     static fbox_chan_map_t ParsePlaylist(
         const QString &rawdata, IPTVChannelFetcher *fetcher = NULL);
 
-  signals:
-    /** \brief Tells listener how far along we are from 0..100%
-     *  \param p percentage completion
-     */
-    void ServiceScanPercentComplete(int p);
-    /// \brief Returns tatus message from the scanner
-    void ServiceScanUpdateText(const QString &status);
-    /// \brief Signals that the scan is complete
-    void ServiceScanComplete(void);
-
-  protected:
-    void RunScan(void);
-
   private:
-    ~IPTVChannelFetcher();
     void SetTotalNumChannels(uint val) { _chan_cnt = (val) ? val : 1; }
     void SetNumChannelsParsed(uint);
     void SetNumChannelsInserted(uint);
     void SetMessage(const QString &status);
 
+  protected:
+    void RunScan(void);
+
   private:
+    ScanMonitor *_scan_monitor;
     uint      _cardid;
     QString   _inputname;
     uint      _sourceid;

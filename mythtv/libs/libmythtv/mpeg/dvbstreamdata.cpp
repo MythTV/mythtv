@@ -100,6 +100,13 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
     if (TableID::TDT == table_id)
         return false;
 
+    if (TableID::BAT == table_id)
+    {
+        if (VersionBAT(psip.TableIDExtension()) != version)
+            return false;
+        return BATSectionSeen(psip.TableIDExtension(), psip.Section());
+    }
+
     bool is_eit = false;
     if (DVB_EIT_PID == pid || FREESAT_EIT_PID == pid)
     {
@@ -188,6 +195,8 @@ void DVBStreamData::Reset(uint desired_netid, uint desired_tsid,
     SetVersionNITo(-1,0);
     _sdto_versions.clear();
     _sdto_section_seen.clear();
+    _bat_versions.clear();
+    _bat_section_seen.clear();
 
     {
         _cache_lock.lock();
@@ -330,6 +339,19 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
             return true;
         }
+        case TableID::BAT:
+        {
+            uint bid = psip.TableIDExtension();
+            SetVersionBAT(bid, psip.Version(), psip.LastSection());
+            SetBATSectionSeen(bid, psip.Section());
+            BouquetAssociationTable bat(psip);
+
+            QMutexLocker locker(&_listener_lock);
+            for (uint i = 0; i < _dvb_other_listeners.size(); i++)
+                _dvb_other_listeners[i]->HandleBAT(&bat);
+
+            return true;
+        }
     }
 
     if ((DVB_EIT_PID == pid || DVB_DNLONG_EIT_PID == pid || FREESAT_EIT_PID == pid ||
@@ -450,7 +472,7 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             add_pids.push_back(FREESAT_EIT_PID);
         }
 
-        if (MCA_ONID == _desired_netid && MCA_EIT_TSID == _desired_tsid && 
+        if (MCA_ONID == _desired_netid && MCA_EIT_TSID == _desired_tsid &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) MCA_EIT_PID) == cur_pids.end())
         {
@@ -606,6 +628,37 @@ bool DVBStreamData::HasAllSDToSections(uint tsid) const
             return false;
     return true;
 }
+
+void DVBStreamData::SetBATSectionSeen(uint bid, uint section)
+{
+    sections_map_t::iterator it = _bat_section_seen.find(bid);
+    if (it == _bat_section_seen.end())
+    {
+        _bat_section_seen[bid].resize(32, 0);
+        it = _bat_section_seen.find(bid);
+    }
+    (*it)[section>>3] |= bit_sel[section & 0x7];
+}
+
+bool DVBStreamData::BATSectionSeen(uint bid, uint section) const
+{
+    sections_map_t::const_iterator it = _bat_section_seen.find(bid);
+    if (it == _bat_section_seen.end())
+        return false;
+    return (bool) ((*it)[section>>3] & bit_sel[section & 0x7]);
+}
+
+bool DVBStreamData::HasAllBATSections(uint bid) const
+{
+    sections_map_t::const_iterator it = _bat_section_seen.find(bid);
+    if (it == _bat_section_seen.end())
+        return false;
+    for (uint i = 0; i < 32; i++)
+        if ((*it)[i] != 0xff)
+            return false;
+    return true;
+}
+
 void DVBStreamData::SetEITSectionSeen(uint tableid, uint serviceid,
                                       uint section)
 {
@@ -672,7 +725,7 @@ bool DVBStreamData::HasCachedAllNIT(bool current) const
     if (!last_section)
         return true;
 
-    for (uint i = 1; i <= last_section; i++)
+    for (uint i = 0; i <= last_section; i++)
         if (_cached_nit.find(i) == _cached_nit.end())
             return false;
 
