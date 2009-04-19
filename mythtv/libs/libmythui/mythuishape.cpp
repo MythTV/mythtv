@@ -34,12 +34,17 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     QRect area = m_Area.toQRect();
     area.translate(xoffset, yoffset);
 
+    QColor fillColor(m_fillColor);
+    fillColor.setAlpha((int)(m_fillColor.alpha() * (alphaMod / 255.0)));
+    QColor lineColor(m_lineColor);
+    lineColor.setAlpha((int)(m_lineColor.alpha() * (alphaMod / 255.0)));
+
     if (m_type == "box")
-        p->DrawRect(area, m_drawFill, m_fillColor,
-                    m_drawLine, m_lineWidth, m_lineColor);
+        p->DrawRect(area, m_drawFill, fillColor,
+                    m_drawLine, m_lineWidth, lineColor);
     else if (m_type == "roundbox")
-        p->DrawRoundRect(area, m_cornerRadius, m_drawFill, m_fillColor,
-                         m_drawLine, m_lineWidth, m_lineColor);
+        p->DrawRoundRect(area, m_cornerRadius, m_drawFill, fillColor,
+                         m_drawLine, m_lineWidth, lineColor);
 }
 
 bool MythUIShape::ParseElement(QDomElement &element)
