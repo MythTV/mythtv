@@ -14,6 +14,7 @@
 #include "libmyth/mythdbcon.h"
 #include "libmyth/mythdialogs.h"
 #include "libmyth/compat.h"
+#include "audiopulseutil.h"
 
 #include <iostream>
 using namespace std;
@@ -251,6 +252,10 @@ int main(int argc, char *argv[])
     
     gContext->LoadQtConfig();
 
+    int pa_ret = pulseaudio_handle_startup();
+    if (pa_ret != GENERIC_EXIT_OK)
+        return pa_ret;
+
 #if defined(Q_OS_MACX)
     // Mac OS X doesn't define the AudioOutputDevice setting
 #else
@@ -302,6 +307,10 @@ int main(int argc, char *argv[])
         pthread_join(priv_thread, NULL);
     }
     delete gContext;
+
+    pa_ret = pulseaudio_handle_teardown();
+    if (GENERIC_EXIT_OK != pa_ret)
+        return pa_ret;
 
     return TV_EXIT_OK;
 }

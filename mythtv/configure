@@ -911,6 +911,7 @@ MYTHTV_CONFIG_LIST='
 '
 
 MYTHTV_LIST='
+    audio_pulse
     audio_alsa
     audio_arts
     audio_jack
@@ -1160,6 +1161,8 @@ targetos=$(tolower $(uname -s))
 CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
+audio_pulse="default"
+audio_pulse_libs="-lpulse"
 audio_alsa="default"
 audio_alsa_libs="-lasound"
 audio_arts="default"
@@ -2552,6 +2555,12 @@ check_header dev/ic/bt8xx.h
 check_header sys/soundcard.h
 check_header soundcard.h
 
+# PulseAudio probe
+! disabled audio_pulse &&
+    check_lib pulse/version.h pa_get_library_version $audio_pulse_libs &&
+    enable  audio_pulse ||
+    disable audio_pulse
+
 # ALSA probe
 ! disabled audio_alsa &&
     check_lib alsa/asoundlib.h snd_asoundlib_version $audio_alsa_libs &&
@@ -3004,6 +3013,7 @@ fi
 if enabled frontend; then
   echo
   echo "# Sound Output Support"
+  echo "PulseAudio support        ${audio_pulse-no}"
   echo "OSS support               ${audio_oss-no}"
   echo "ALSA support              ${audio_alsa-no}"
   echo "aRts support              ${audio_arts-no}"
@@ -3182,6 +3192,11 @@ fi
 if enabled audio_alsa; then
     append CCONFIG "using_alsa"
   echo "CONFIG_AUDIO_ALSA_LIBS=$audio_alsa_libs" >> $MYTH_CONFIG_MAK
+fi
+
+if enabled audio_pulse; then
+  append CCONFIG "using_pulse"
+  echo "CONFIG_AUDIO_PULSE_LIBS=$audio_pulse_libs" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled audio_arts; then

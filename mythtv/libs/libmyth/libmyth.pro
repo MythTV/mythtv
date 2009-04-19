@@ -26,6 +26,7 @@ HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
 HEADERS += volumebase.h volumecontrol.h virtualkeyboard.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += compat.h
+HEADERS += audiopulseutil.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
 SOURCES += audiooutputdigitalencoder.cpp
@@ -42,6 +43,7 @@ SOURCES += screensaver.cpp screensaver-null.cpp settings.cpp themeinfo.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
 SOURCES += volumebase.cpp volumecontrol.cpp virtualkeyboard.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
+SOURCES += audiopulseutil.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libavcodec ../libavutil
@@ -91,6 +93,11 @@ using_oss {
     DEFINES += USING_OSS
     SOURCES += audiooutputoss.cpp
     HEADERS += audiooutputoss.h
+}
+
+using_pulse {
+    DEFINES += USING_PULSE
+    LIBS += $$PULSE_LIBS
 }
 
 unix:!cygwin {

@@ -84,6 +84,9 @@ MPUBLIC unsigned long long myth_get_approximate_large_file_size(
 
 MPUBLIC double MythGetPixelAspectRatio(void);
 
+/// Is A/V Sync destruction daemon is running on this host?
+MPUBLIC bool IsPulseAudioRunning(void);
+
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32

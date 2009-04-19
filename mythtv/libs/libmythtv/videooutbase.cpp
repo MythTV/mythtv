@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <cmath>
 
 #include "videooutbase.h"

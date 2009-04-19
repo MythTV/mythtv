@@ -58,6 +58,7 @@ using namespace std;
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
 #include "mythappearance.h"
+#include "audiopulseutil.h"
 
 #define NO_EXIT  0
 #define QUIT     1
@@ -1321,6 +1322,10 @@ int main(int argc, char **argv)
         }
     }
 
+    int pa_ret = pulseaudio_handle_startup();
+    if (pa_ret != GENERIC_EXIT_OK)
+        return pa_ret;
+
     if (logfile != "")
     {
         if (log_rotate(1) < 0)
@@ -1547,6 +1552,10 @@ int main(int argc, char **argv)
     // This takes a few seconds, so inform the user:
     VERBOSE(VB_GENERAL, "Deleting UPnP client...");
     delete g_pUPnp;
+
+    pa_ret = pulseaudio_handle_teardown();
+    if (GENERIC_EXIT_OK != pa_ret)
+        return pa_ret;
 
     return FRONTEND_EXIT_OK;
 
