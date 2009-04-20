@@ -19,6 +19,7 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "audiopulseutil.h"
 #include "util.h" // for IsPulseAudioRunning()
 #include "exitcodes.h"
 #include "mythverbose.h"
@@ -276,7 +277,7 @@ class PAThread : public QThread
 };
 
 /// \returns true if successful
-MPUBLIC bool pulseaudio_suspend(void)
+bool pulseaudio_suspend(void)
 {
     QThread *t = new PAThread();
     t->start();
@@ -289,7 +290,7 @@ MPUBLIC bool pulseaudio_suspend(void)
 }
 
 /// \returns true if successful
-MPUBLIC bool pulseaudio_unsuspend(void)
+bool pulseaudio_unsuspend(void)
 {
     if (!pau_context)
     {
@@ -328,7 +329,7 @@ MPUBLIC bool pulseaudio_unsuspend(void)
 
 #endif // USING_PULSE
 
-MPUBLIC int pulseaudio_handle_startup(void)
+int pulseaudio_handle_startup(void)
 {
 #ifdef USING_PULSE
     if (getenv("EXPERIMENTALLY_ALLOW_PULSE_AUDIO"))
@@ -360,7 +361,7 @@ MPUBLIC int pulseaudio_handle_startup(void)
     return GENERIC_EXIT_OK;
 }
 
-MPUBLIC int pulseaudio_handle_teardown(void)
+int pulseaudio_handle_teardown(void)
 {
 #ifdef USING_PULSE
     if (getenv("EXPERIMENTALLY_ALLOW_PULSE_AUDIO"))
