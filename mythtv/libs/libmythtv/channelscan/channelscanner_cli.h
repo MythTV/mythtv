@@ -30,17 +30,15 @@
 #ifndef _CHANNEL_SCANNER_CLI_H_
 #define _CHANNEL_SCANNER_CLI_H_
 
-// POSIX headers
-#include <pthread.h>
-
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // MythTV headers
+#include "mythexp.h"
 #include "settings.h"
 #include "channelscanner.h"
 
-class ChannelScannerCLI : public ChannelScanner
+class MPUBLIC ChannelScannerCLI : public ChannelScanner
 {
   public:
     ChannelScannerCLI(bool doScanSaveOnly, bool promptsOk);

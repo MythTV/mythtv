@@ -3,6 +3,7 @@
 #define _CARDUTIL_H_
 
 #include "settings.h"
+#include "mythexp.h"
 
 // C++ headers
 #include <stdint.h>
@@ -18,7 +19,7 @@ class CardInput;
 typedef QMap<int,QString> InputNames;
 typedef vector<QString>   QStringVec;
 
-QString get_on_cardid(const QString&, uint);
+MPUBLIC QString get_on_cardid(const QString&, uint);
 
 bool set_on_source(const QString&, uint, uint, const QString);
 

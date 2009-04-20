@@ -31,6 +31,7 @@
 #define _CHANNEL_SCANNER_H_
 
 // MythTV headers
+#include "mythexp.h"
 #include "dtvconfparser.h"
 #include "scanmonitor.h"
 
@@ -39,7 +40,7 @@ class IPTVChannelFetcher;
 class ChannelScanSM;
 class ChannelBase;
 
-class ChannelScanner
+class MPUBLIC ChannelScanner
 {
     friend class ScanMonitor;
 

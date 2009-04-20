@@ -14,6 +14,7 @@ using namespace std;
 #include <qdatetime.h>
 
 // MythTV headers
+#include "mythexp.h"
 #include "dtvmultiplex.h"
 
 class ScanInfo
@@ -34,8 +35,8 @@ class ScanInfo
     QDateTime scandate;
 };
 
-vector<ScanInfo> LoadScanList(void);
+MPUBLIC vector<ScanInfo> LoadScanList(void);
 uint SaveScan(const ScanDTVTransportList &scan);
-ScanDTVTransportList LoadScan(uint scanid);
+MPUBLIC ScanDTVTransportList LoadScan(uint scanid);
 
 #endif // _CHANNEL_IMPORTER_HELPERS_H_
