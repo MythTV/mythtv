@@ -2845,6 +2845,7 @@ check_header soundcard.h
 # PulseAudio probe
 ! disabled audio_pulse &&
     check_lib pulse/version.h pa_get_library_version $audio_pulse_libs &&
+    $(pkg-config --atleast-version=0.9.7 libpulse) &&
     enable  audio_pulse ||
     disable audio_pulse
 
