@@ -114,7 +114,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
                     status_complete, status_snr,
                     (status_lock) ? "l" : "L",
                     status_text.toAscii().constData(),
-                    status_last_log.toAscii().constData());
+                    status_last_log.toAscii().constData(), "");
     }
     //cout<<msg.toAscii().constData()<<endl;
 
