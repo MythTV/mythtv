@@ -19,6 +19,7 @@
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "audiopulseutil.h"
 #include "util.h" // for IsPulseAudioRunning()
 #include "exitcodes.h"
 #include "mythcontext.h"
