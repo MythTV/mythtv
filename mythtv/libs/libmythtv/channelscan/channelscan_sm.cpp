@@ -446,8 +446,10 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
             scan_monitor->ScanAppendTextToLog(msg_tr);
             VERBOSE(VB_CHANSCAN, msg);
 
+#ifdef USING_DVB
             if (GetDVBChannel())
                 GetDVBChannel()->SetPMT(pmt);
+#endif // USING_DVB
 
             GetDTVSignalMonitor()->GetStreamData()->TestDecryption(pmt);
 
