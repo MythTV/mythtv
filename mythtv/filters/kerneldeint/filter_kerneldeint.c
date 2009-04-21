@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
@@ -9,6 +10,7 @@
 
 #include <string.h>
 #include <math.h>
+#include <pthread.h>
 
 #include "libmythtv/filter.h"
 #include "libmythtv/frame.h"
@@ -24,343 +26,632 @@
 
 #ifdef MMX
 #include "i386/mmx.h"
-
-static const mmx_t mm_cpool[] =
-{
-    { 0x0000000000000000LL },
-};
-
+#define THRESHOLD 12
+static const mmx_t mm_lthr = { w:{ -THRESHOLD, -THRESHOLD,
+                                   -THRESHOLD, -THRESHOLD} };
+static const mmx_t mm_hthr = { w:{ THRESHOLD - 1, THRESHOLD - 1,
+                                   THRESHOLD - 1, THRESHOLD - 1} };
+static const mmx_t mm_cpool[] = { { 0x0000000000000000LL }, };
 #else
 #define mmx_t int
 #endif
+
+struct DeintThread
+{
+    int       ready;
+    pthread_t id;
+};
 
 typedef struct ThisFilter
 {
     VideoFilter vf;
 
-    int   threshold;
-    int   skipchroma;
-    int   mm_flags;
-    void  (*filtfunc)(uint8_t*, uint8_t*, int, int, int);
-    mmx_t threshold_low;
-    mmx_t threshold_high;
-    int   linesize;
-    uint8_t *line;
+    struct DeintThread *threads;
+    VideoFrame *frame;
+    int         field;
+    int         ready;
+    int         kill_threads;
+    int         actual_threads;
+    int         requested_threads;
+    pthread_mutex_t mutex;
 
+    int       skipchroma;
+    int       mm_flags;
+    int       width;
+    int       height;
+    long long last_framenr;
+    uint8_t  *ref[3];
+    int       ref_stride[3];
+
+    int       dirty_frame;
+    int       double_rate;
+    int       double_call;
+    void (*line_filter)(uint8_t *dst, int width, int start_width,
+                        uint8_t *src1, uint8_t *src2, uint8_t *src3,
+                        uint8_t *src4, uint8_t *src5);
+    void (*line_filter_fast)(uint8_t *dst, int width, int start_width,
+                             uint8_t *src1, uint8_t *src2, uint8_t *src3,
+                             uint8_t *src4, uint8_t *src5);
     TF_STRUCT;
 } ThisFilter;
 
-void KDP (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
+static void line_filter_c_fast(uint8_t *dst, int width, int start_width,
+                           uint8_t *buf, uint8_t *src2, uint8_t *src3,
+                           uint8_t *src4, uint8_t *src5)
 {
-    int X, Y;
-    uint8_t *LineCur, *LineCur1U, *LineCur1D, *LineCur2D, tmp;
-
-    LineCur1U = Plane;
-    LineCur   = Plane + W;
-    LineCur1D = Plane + 2 * W;
-    LineCur2D = Plane + 3 * W;
-
-    for (X = 0; X < W ; X++)
+    int X;
+    uint8_t tmp;
+    for (X = start_width; X < width; X++)
     {
-        Line[X] = LineCur[X];
-        if (Threshold == 0 || ABS((int)LineCur[X]-(int)LineCur1U[X])
-            > Threshold - 1)
-            LineCur[X] = (LineCur1U[X] + LineCur1D[X]) / 2;
+        tmp    = buf[X];
+        buf[X] = src3[X];
+        if (ABS((int)src3[X] - (int)src2[X]) > 11)
+            dst[X] = CLAMP((src2[X] * 4 + src4[X] * 4
+                    + src3[X] * 2 - tmp - src5[X])
+                    / 8, 0, 255);
     }
-    LineCur   += 2 * W;
-    LineCur1U += 2 * W;
-    LineCur1D += 2 * W;
-    LineCur2D += 2 * W;
-    for (Y = 3; Y < H / 2 - 1; Y++)
+}
+
+static void line_filter_c(uint8_t *dst, int width, int start_width,
+                          uint8_t *src1, uint8_t *src2, uint8_t *src3,
+                          uint8_t *src4, uint8_t *src5)
+{
+    int X;
+    for (X = start_width; X < width; X++)
     {
-        for (X = 0; X < W; X++)
-        {
-            tmp = Line[X];
-            Line[X] = LineCur[X];
-            if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-                > Threshold-1)
-                LineCur[X] = CLAMP((LineCur1U[X] * 4 + LineCur1D[X] * 4
-                        + LineCur[X] * 2 - tmp - LineCur2D[X])
-                         / 8, 0, 255);
-        }
-        LineCur   += 2 * W;
-        LineCur1U += 2 * W;
-        LineCur1D += 2 * W;
-        LineCur2D += 2 * W;
+        if (ABS((int)src3[X] - (int)src2[X]) > 11)
+            dst[X] = CLAMP((src2[X] * 4 + src4[X] * 4
+                    + src3[X] * 2 - src1[X] - src5[X])
+                    / 8, 0, 255);
+        else
+            dst[X] = src3[X];
     }
-    for (X = 0; X < W; X++)
-        if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-            > Threshold - 1)
-            LineCur[X] = LineCur1U[X];
 }
 
 #ifdef MMX
-void KDP_MMX (uint8_t *Plane, uint8_t *Line, int W, int H, int Threshold)
+static inline void mmx_start(uint8_t *src1, uint8_t *src2,
+                             uint8_t *src3, uint8_t *src4,
+                             int X)
 {
-    int X, Y;
-    uint8_t *LineCur, *LineCur1U, *LineCur1D, *LineCur2D, tmp;
-    mmx_t mm_lthr = { w:{-Threshold,-Threshold,-Threshold,-Threshold} };
-    mmx_t mm_hthr = { w:{Threshold-(Threshold>0),Threshold-(Threshold>0),
-                         Threshold-(Threshold>0),Threshold-(Threshold>0)} };
-    
-    LineCur1U = Plane;
-    LineCur   = Plane + W;
-    LineCur1D = Plane + 2 * W;
-    LineCur2D = Plane + 3 * W;
+    movq_m2r (src2[X], mm0);
+    movq_m2r (src2[X], mm1);
+    movq_m2r (src4[X], mm2);
+    movq_m2r (src4[X], mm3);
+    movq_m2r (src3[X], mm4);
+    movq_m2r (src3[X], mm5);
+    punpcklbw_m2r (mm_cpool[0], mm0);
+    punpckhbw_m2r (mm_cpool[0], mm1);
+    punpcklbw_m2r (mm_cpool[0], mm2);
+    punpckhbw_m2r (mm_cpool[0], mm3);
+    movq_r2r (mm0, mm6);
+    movq_r2r (mm1, mm7);
+    paddw_r2r (mm2, mm0);
+    paddw_r2r (mm3, mm1);
+    movq_m2r (src3[X], mm2);
+    movq_m2r (src3[X], mm3);
+    psllw_i2r (2, mm0);
+    psllw_i2r (2, mm1);
+    punpcklbw_m2r (mm_cpool[0], mm2);
+    punpckhbw_m2r (mm_cpool[0], mm3);
+    psllw_i2r (1, mm2);
+    psllw_i2r (1, mm3);
+    paddw_r2r (mm2, mm0);
+    paddw_r2r (mm3, mm1);
+    movq_m2r (src1[X], mm2);
+    movq_m2r (src1[X], mm3);
+    punpcklbw_m2r (mm_cpool[0], mm2);
+    punpckhbw_m2r (mm_cpool[0], mm3);
+}
 
-    for (X = 0; X < W - 7; X += 8)
+static inline void mmx_end(uint8_t *src3, uint8_t *src5,
+                           uint8_t *dst, int X)
+{
+    punpcklbw_m2r (mm_cpool[0], mm4);
+    punpckhbw_m2r (mm_cpool[0], mm5);
+    psubusw_r2r (mm2, mm0);
+    psubusw_r2r (mm3, mm1);
+    movq_m2r (src5[X], mm2);
+    movq_m2r (src5[X], mm3);
+    punpcklbw_m2r (mm_cpool[0], mm2);
+    punpckhbw_m2r (mm_cpool[0], mm3);
+    psubusw_r2r (mm2, mm0);
+    psubusw_r2r (mm3, mm1);
+    psrlw_i2r (3, mm0);
+    psrlw_i2r (3, mm1);
+    psubw_r2r (mm6, mm4);
+    psubw_r2r (mm7, mm5);
+    packuswb_r2r (mm1,mm0);
+    movq_r2r (mm4, mm6);
+    movq_r2r (mm5, mm7);
+    pcmpgtw_m2r (mm_lthr, mm4);
+    pcmpgtw_m2r (mm_lthr, mm5);
+    pcmpgtw_m2r (mm_hthr, mm6);
+    pcmpgtw_m2r (mm_hthr, mm7);
+    packsswb_r2r (mm5, mm4);
+    packsswb_r2r (mm7, mm6);
+    pxor_r2r (mm6, mm4);
+    movq_r2r (mm4, mm5);
+    pandn_r2r (mm0, mm4);
+    pand_m2r (src3[X], mm5);
+    por_r2r (mm4, mm5);
+    movq_r2m (mm5, dst[X]);
+}
+
+static void line_filter_mmx_fast(uint8_t *dst, int width, int start_width,
+                                 uint8_t *buf, uint8_t *src2, uint8_t *src3,
+                                 uint8_t *src4, uint8_t *src5)
+{
+    int X;
+    for (X = start_width; X < width - 7; X += 8)
     {
-        movq_m2r (LineCur1U[X], mm0);
-        movq_m2r (LineCur1U[X], mm1);
-        movq_m2r (LineCur1D[X], mm2);
-        movq_m2r (LineCur1D[X], mm3);
-        movq_m2r (LineCur[X], mm4);
-        movq_m2r (LineCur[X], mm5);
-        punpcklbw_m2r (mm_cpool[0], mm0);
-        punpckhbw_m2r (mm_cpool[0], mm1);
-        punpcklbw_m2r (mm_cpool[0], mm2);
-        punpckhbw_m2r (mm_cpool[0], mm3);
-        movq_r2r (mm0, mm6);
-        movq_r2r (mm1, mm7);
-        punpcklbw_m2r (mm_cpool[0], mm4);
-        punpckhbw_m2r (mm_cpool[0], mm5);
-        paddw_r2r (mm2, mm0);
-        paddw_r2r (mm3, mm1);
-        psrlw_i2r (1, mm0);
-        psrlw_i2r (1, mm1);
-        psubw_r2r (mm6, mm4);
-        psubw_r2r (mm7, mm5);
-        packuswb_r2r (mm1,mm0);
-        movq_r2r (mm4, mm6);
-        movq_r2r (mm5, mm7);
-        pcmpgtw_m2r (mm_lthr, mm4);
-        pcmpgtw_m2r (mm_lthr, mm5);
-        pcmpgtw_m2r (mm_hthr, mm6);
-        pcmpgtw_m2r (mm_hthr, mm7);
-        packsswb_r2r (mm5, mm4);
-        packsswb_r2r (mm7, mm6);
-        pxor_r2r (mm6, mm4);
-        movq_r2r (mm4, mm5);
-        pandn_r2r (mm0, mm4);
-        pand_m2r (LineCur[X], mm5);
-        por_r2r (mm4, mm5);
-        movq_r2m (mm5, LineCur[X]);
+        mmx_start(buf, src2, src3, src4, X);
+        movq_r2m (mm4, buf[X]);
+        mmx_end(src3, src5, dst, X);
     } 
 
-    for (/*X*/; X < W ; X++)
-    {
-        Line[X] = LineCur[X];
-        if (Threshold == 0 || ABS((int)LineCur[X]-(int)LineCur1U[X])
-            > Threshold - 1)
-            LineCur[X] = (LineCur1U[X] + LineCur1D[X]) / 2;
-    }
+    line_filter_c_fast(dst, width, X, buf, src2, src3, src4, src5);
+}
 
-    LineCur   += 2 * W;
-    LineCur1U += 2 * W;
-    LineCur1D += 2 * W;
-    LineCur2D += 2 * W;
-    for (Y = 0; Y < H / 2 - 2; Y++)
+static void line_filter_mmx(uint8_t *dst, int width, int start_width,
+                            uint8_t *src1, uint8_t *src2, uint8_t *src3,
+                            uint8_t *src4, uint8_t *src5)
+{
+    int X;
+    for (X = start_width; X < width - 7; X += 8)
     {
-        for (X = 0; X < W - 7; X += 8)
-        {
-            movq_m2r (LineCur1U[X], mm0);
-            movq_m2r (LineCur1U[X], mm1);
-            movq_m2r (LineCur1D[X], mm2);
-            movq_m2r (LineCur1D[X], mm3);
-            movq_m2r (LineCur[X], mm4);
-            movq_m2r (LineCur[X], mm5);
-            punpcklbw_m2r (mm_cpool[0], mm0);
-            punpckhbw_m2r (mm_cpool[0], mm1);
-            punpcklbw_m2r (mm_cpool[0], mm2);
-            punpckhbw_m2r (mm_cpool[0], mm3);
-            movq_r2r (mm0, mm6);
-            movq_r2r (mm1, mm7);
-            paddw_r2r (mm2, mm0);
-            paddw_r2r (mm3, mm1);
-            movq_m2r (LineCur[X], mm2);
-            movq_m2r (LineCur[X], mm3);
-            psllw_i2r (2, mm0);
-            psllw_i2r (2, mm1);
-            punpcklbw_m2r (mm_cpool[0], mm2);
-            punpckhbw_m2r (mm_cpool[0], mm3);
-            psllw_i2r (1, mm2);
-            psllw_i2r (1, mm3);
-            paddw_r2r (mm2, mm0);
-            paddw_r2r (mm3, mm1);
-            movq_m2r (Line[X], mm2);
-            movq_m2r (Line[X], mm3);
-            punpcklbw_m2r (mm_cpool[0], mm2);
-            punpckhbw_m2r (mm_cpool[0], mm3);
-            movq_r2m (mm4, Line[X]);
-            punpcklbw_m2r (mm_cpool[0], mm4);
-            punpckhbw_m2r (mm_cpool[0], mm5);
-            psubusw_r2r (mm2, mm0);
-            psubusw_r2r (mm3, mm1);
-            movq_m2r (LineCur2D[X], mm2);
-            movq_m2r (LineCur2D[X], mm3);
-            punpcklbw_m2r (mm_cpool[0], mm2);
-            punpckhbw_m2r (mm_cpool[0], mm3);
-            psubusw_r2r (mm2, mm0);
-            psubusw_r2r (mm3, mm1);
-            psrlw_i2r (3, mm0);
-            psrlw_i2r (3, mm1);
-            psubw_r2r (mm6, mm4);
-            psubw_r2r (mm7, mm5);
-            packuswb_r2r (mm1,mm0);
-            movq_r2r (mm4, mm6);
-            movq_r2r (mm5, mm7);
-            pcmpgtw_m2r (mm_lthr, mm4);
-            pcmpgtw_m2r (mm_lthr, mm5);
-            pcmpgtw_m2r (mm_hthr, mm6);
-            pcmpgtw_m2r (mm_hthr, mm7);
-            packsswb_r2r (mm5, mm4);
-            packsswb_r2r (mm7, mm6);
-            pxor_r2r (mm6, mm4);
-            movq_r2r (mm4, mm5);
-            pandn_r2r (mm0, mm4);
-            pand_m2r (LineCur[X], mm5);
-            por_r2r (mm4, mm5);
-            movq_r2m (mm5, LineCur[X]);
-        } 
+        mmx_start(src1, src2, src3, src4, X);
+        mmx_end(src3, src5, dst, X);
+    } 
 
-        for (/*X*/; X < W; X++)
-        {
-            tmp = Line[X];
-            Line[X] = LineCur[X];
-            if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-                > Threshold-1)
-                LineCur[X] = CLAMP((LineCur1U[X] * 4 + LineCur1D[X] * 4
-                        + LineCur[X] * 2 - tmp - LineCur2D[X])
-                         / 8, 0, 255);
-        }
-        LineCur   += 2 * W;
-        LineCur1U += 2 * W;
-        LineCur1D += 2 * W;
-        LineCur2D += 2 * W;
-    }
-    for (X = 0; X < W; X++)
-        if (Threshold == 0 || ABS((int)LineCur[X] - (int)LineCur1U[X])
-            > Threshold - 1)
-            LineCur[X] = LineCur1U[X];
+    line_filter_c(dst, width, X, src1, src2, src3, src4, src5);
 }
 #endif
 
-static int KernelDeint (VideoFilter * f, VideoFrame * frame, int field)
+static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
+                      int src_stride[3], int width, int height)
 {
-    (void)field;
+    int i;
+    for (i = 0; i < 3; i++)
+    {
+        if (src_stride[i] < 1)
+            continue;
+
+        int is_chroma = !!i;
+        int h = height >> is_chroma;
+        int w = width  >> is_chroma;
+
+        if (p->ref_stride[i] == src_stride[i])
+        {
+            memcpy(p->ref[i], src + src_offsets[i], src_stride[i] * h);
+        }
+        else
+        {
+            int j;
+            uint8_t *src2 = src + src_offsets[i];
+            uint8_t *dest = p->ref[i];
+            for (j = 0; j < h; j++)
+            {
+                memcpy(dest, src2, w);
+                src2 += src_stride[i];
+                dest += p->ref_stride[i];
+            }
+        }
+    }
+}
+
+static int AllocFilter(ThisFilter* filter, int width, int height)
+{
+    if ((width != filter->width) || (height != filter->height))
+    {
+        int i;
+        for (i = 0; i < 3; i++)
+        {
+            if (filter->ref[i])
+                free(filter->ref[i]);
+
+            int is_chroma= !!i;
+            int w = ((width      + 31) & (~31)) >> is_chroma;
+            int h = ((height + 6 + 31) & (~31)) >> is_chroma;
+            int size = w * h * sizeof(uint8_t);
+
+            filter->ref_stride[i] = w;
+            filter->ref[i] = (uint8_t*) malloc(size);
+            if (!filter->ref[i])
+                return 0;
+            memset(filter->ref[i], is_chroma ? 127 : 0, size);
+        }
+        filter->width  = width;
+        filter->height = height;
+    }
+    return 1;
+}
+
+static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
+                        int dst_stride[3], int width, int height, int parity,
+                        int tff, int double_rate, int dirty,
+                        int this_slice, int total_slices)
+{
+    if (height < 8 || total_slices < 1)
+        return;
+
+    if (total_slices > 1 && !double_rate)
+    {
+        this_slice   = 0;
+        total_slices = 1;
+    }
+
+    int i, y;
+    uint8_t *dest, *src1, *src2, *src3, *src4, *src5;
+    int channels = p->skipchroma ? 1 : 3;
+    int    field = parity ^ tff;
+
+    int first_slice  = (this_slice == 0);
+    int last_slice   = 0;
+    int slice_height = height / total_slices;
+    slice_height     = (slice_height >> 1) << 1;
+    int starth       = slice_height * this_slice;
+    int endh         = starth + slice_height;
+
+    if ((this_slice + 1) >= total_slices)
+    {
+        endh = height;
+        last_slice = 1;
+    }
+
+    for (i = 0; i < channels; i++)
+    {
+
+        int is_chroma = !!i;
+        int w         = width  >> is_chroma;
+        int start     = starth >> is_chroma;
+        int end       = endh   >> is_chroma;
+
+        if (!first_slice)
+            start -= 2;
+        if (last_slice)
+            end -= (5 + field);
+
+        int src_pitch = p->ref_stride[i];
+        dest = dst + dst_offsets[i] + (start * dst_stride[i]);
+        src1 = p->ref[i] + (start * src_pitch);
+
+        if (double_rate)
+        {
+            src2 = src1 + src_pitch;
+            src3 = src2 + src_pitch;
+            src4 = src3 + src_pitch;
+            src5 = src4 + src_pitch;
+
+            if (first_slice)
+            {
+                if (!field)
+                    p->line_filter(dest, w, 0, src1, src1, src1, src2, src3);
+                else if (dirty)
+                    memcpy(dest, src1, w);    
+                dest += dst_stride[i];
+
+                if (field)
+                    p->line_filter(dest, w, 0, src1, src1, src2, src3, src4);
+                else if (dirty)
+                    memcpy(dest, src2, w);    
+                dest += dst_stride[i];
+            }
+            else
+            {
+                dest += dst_stride[i] << 1;
+            }
+
+            for (y = start; y < end; y++)
+            {
+                if ((y ^ (1 - field)) & 1)
+                    p->line_filter(dest, w, 0, src1, src2, src3, src4, src5);
+                else if (dirty)
+                    memcpy(dest, src3, w);
+
+                dest += dst_stride[i];
+                src1  = src2;
+                src2  = src3;
+                src3  = src4;
+                src4  = src5;
+                src5 += src_pitch;
+            }
+
+            if (last_slice)
+            {
+                if (!field)
+                    p->line_filter(dest, w, 0, src2, src3, src4, src5, src5);
+                else if (dirty)
+                    memcpy(dest, src4, w);    
+                dest += dst_stride[i];
+
+                if (field)
+                    p->line_filter(dest, w, 0, src3, src4, src5, src5, src5);
+                else if (dirty)
+                    memcpy(dest, src5, w);
+            }
+        }
+        else
+        {
+            int field_stride = dst_stride[i] << 1;
+            src2 = dest + dst_stride[i];
+            src3 = src2 + dst_stride[i];
+            src4 = src3 + dst_stride[i];
+            src5 = src4 + dst_stride[i];
+            memcpy(src1, dest, w);
+
+            if (field)
+            {
+                dest += dst_stride[i];
+                p->line_filter_fast(dest, w, 0, src1, src2, src2, src3, src4);
+                src2 = src3;
+                src3 = src4;
+                src4 = src5;
+                src5 += dst_stride[i];
+            }
+            else
+            {
+                p->line_filter_fast(dest, w, 0, src1, src2, src2, src2, src3);
+            }
+            dest += field_stride;
+
+            for (y = start; y < end; y += 2)
+            {
+                p->line_filter_fast(dest, w, 0, src1, src2, src3, src4, src5);
+                dest += field_stride;
+                src2 = src4;
+                src3 = src5;
+                src4 += field_stride;
+                src5 += field_stride;
+            }
+
+            if (field)
+                p->line_filter_fast(dest, w, 0, src1, src4, src5, src5, src5);
+            else
+                p->line_filter_fast(dest, w, 0, src1, src3, src4, src5, src5);
+        }
+    }
+#ifdef MMX
+    if (p->mm_flags & MM_MMX)
+        emms();
+#endif
+}
+
+void *KernelThread(void *args)
+{
+    ThisFilter *filter = (ThisFilter*)args;
+
+    pthread_mutex_lock(&(filter->mutex));
+    int num = filter->actual_threads;
+    filter->actual_threads = num + 1;
+    pthread_mutex_unlock(&(filter->mutex));
+
+    while (!filter->kill_threads)
+    {
+        usleep(100);
+        if (filter->ready &&
+            filter->frame != NULL &&
+            filter->threads[num].ready)
+        {
+            filter_func(
+                filter, filter->frame->buf, filter->frame->offsets,
+                filter->frame->pitches, filter->frame->width,
+                filter->frame->height, filter->field,
+                filter->frame->top_field_first, filter->double_rate,
+                filter->dirty_frame, num, filter->actual_threads);
+
+            pthread_mutex_lock(&(filter->mutex));
+            filter->ready = filter->ready - 1;
+            filter->threads[num].ready = 0;
+            pthread_mutex_unlock(&(filter->mutex));
+        }
+    }
+    pthread_exit(NULL);
+}
+
+static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)
+{
     ThisFilter *filter = (ThisFilter *) f;
     TF_VARS;
 
-    if (frame->pitches[0] > filter->linesize)
+    if (!AllocFilter(filter, frame->width, frame->height))
     {
-        if (filter->line)
-            free(filter->line);
-        filter->line = malloc(frame->pitches[0]);
-        filter->linesize = frame->pitches[0];
-    }
-
-    if (!filter->line)
-    {
-        VERBOSE(VB_GENERAL, "KernelDeint: failed to allocate line buffer");
+        VERBOSE(VB_IMPORTANT, "KernelDeint: failed to allocate buffers.");
         return -1;
     }
 
     TF_START;
+
+    filter->dirty_frame = 1;
+    if (filter->last_framenr == frame->frameNumber)
     {
-        unsigned char *ybeg = frame->buf + frame->offsets[0];
-        unsigned char *ubeg = frame->buf + frame->offsets[1];
-        unsigned char *vbeg = frame->buf + frame->offsets[2];
-        int cheight = (frame->codec == FMT_YV12) ?
-            (frame->height >> 1) : frame->height;
-
-        (filter->filtfunc)(ybeg, filter->line, frame->pitches[0],
-                           frame->height, filter->threshold);
-
-        if (!filter->skipchroma)
-        {
-            (filter->filtfunc)(ubeg, filter->line, frame->pitches[1],
-                               cheight, filter->threshold);
-            (filter->filtfunc)(vbeg, filter->line, frame->pitches[2],
-                               cheight, filter->threshold);
-        }
-#ifdef MMX
-        if (filter->mm_flags)
-            emms();
-#endif
+        filter->double_call = 1;
     }
+    else
+    {
+        filter->double_rate = filter->double_call;
+        filter->double_call = 0;
+        filter->dirty_frame = 0;
+        if (filter->double_rate)
+        {
+            store_ref(filter, frame->buf,  frame->offsets,
+                      frame->pitches, frame->width, frame->height);
+        }
+    }
+
+    if (filter->actual_threads > 1 && filter->double_rate)
+    {
+        int i;
+        for (i = 0; i < filter->actual_threads; i++)
+            filter->threads[i].ready = 1;
+        filter->frame = frame;
+        filter->field = field;
+        filter->ready = filter->actual_threads;
+        i = 0;
+        while (filter->ready > 0 && i < 1000)
+        {
+            usleep(100);
+            i++;
+        }
+    }
+    else
+    {
+        filter_func(
+            filter, frame->buf, frame->offsets, frame->pitches,
+            frame->width, frame->height, field, frame->top_field_first,
+            filter->double_rate, filter->dirty_frame, 0, 1);
+    }
+
+    filter->last_framenr = frame->frameNumber;
+
     TF_END(filter, "KernelDeint: ");
+
     return 0;
 }
 
-void CleanupKernelDeintFilter (VideoFilter * filter)
+void CleanupKernelDeintFilter(VideoFilter *f)
 {
-    if (((ThisFilter *)filter)->line)
-        free (((ThisFilter *)filter)->line);
+    ThisFilter *filter = (ThisFilter *) f;
+
+    int i;
+    for (i = 0; i < 3; i++)
+    {
+        uint8_t **p= &filter->ref[i];
+        if (*p)
+            free(*p);
+        *p= NULL;
+    }
+
+    if (filter->threads != NULL)
+    {
+        filter->kill_threads = 1;
+        for (i = 0; i < filter->requested_threads; i++)
+            if (filter->threads[i].id != 0)
+                pthread_join(filter->threads[i].id, NULL);
+        free(filter->threads);
+    }
 }
 
-VideoFilter *NewKernelDeintFilter (VideoFrameType inpixfmt,
-                                   VideoFrameType outpixfmt,
-                                   int *width, int *height,
-                                   char *options, int threads)
+VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
+                                  VideoFrameType outpixfmt,
+                                  int *width, int *height,
+                                  char *options, int threads)
 {
     ThisFilter *filter;
-    int numopts;
+    (void) options;
     (void) height;
     (void) threads;
 
-    if ( inpixfmt != outpixfmt ||
-        (inpixfmt != FMT_YV12 && inpixfmt != FMT_YUV422P) )
+    if (inpixfmt != FMT_YV12 || outpixfmt != FMT_YV12)
     {
-        VERBOSE(VB_GENERAL, "KernelDeint: valid format conversions are"
-                            " YV12->YV12 or YUV422P->YUV422P\n");
+        VERBOSE(VB_IMPORTANT, "KernelDeint: valid formats are"
+                            " YV12->YV12");
         return NULL;
     }
 
     filter = (ThisFilter *) malloc (sizeof(ThisFilter));
     if (filter == NULL)
     {
-        VERBOSE(VB_GENERAL,
-                "KernelDeint: failed to allocate memory for filter");
+        VERBOSE(VB_IMPORTANT,
+                "KernelDeint: failed to allocate memory for filter.");
         return NULL;
     }
-    
-    numopts = options ? sscanf(options, "%d:%d", &(filter->threshold),
-                               &(filter->skipchroma)) : 0;
-    if (numopts < 2)
-        filter->skipchroma = 0;
-    if (numopts < 1)
-        filter->threshold = 12;
 
+    filter->mm_flags = 0;
+    filter->line_filter = &line_filter_c;
+    filter->line_filter_fast = &line_filter_c_fast;
 #ifdef MMX
     filter->mm_flags = mm_support();
     if (filter->mm_flags & MM_MMX)
-        filter->filtfunc = &KDP_MMX;
-    else
-#else
-        filter->mm_flags = 0,
+    {
+        filter->line_filter = &line_filter_mmx;
+        filter->line_filter_fast = &line_filter_mmx_fast;
+    }
 #endif
 
-    filter->filtfunc = &KDP;
-    filter->line     = malloc(*width);
-    filter->linesize = *width;
-
-    if (filter->line == NULL)
+    filter->skipchroma   = 0;
+    filter->width        = 0;
+    filter->height       = 0;
+    filter->last_framenr = -1;
+    filter->double_call  = 0;
+    filter->double_rate  = 1;
+    memset(filter->ref, 0, sizeof(filter->ref));
+    if (!AllocFilter(filter, *width, *height))
     {
-        VERBOSE(VB_GENERAL, "KernelDeint: failed to allocate line buffer");
+        VERBOSE(VB_IMPORTANT, "KernelDeint: failed to allocate buffers.");
         free (filter);
         return NULL;
     }
+
     TF_INIT(filter);
 
     filter->vf.filter  = &KernelDeint;
     filter->vf.cleanup = &CleanupKernelDeintFilter;
+
+    filter->frame = NULL;
+    filter->field = 0;
+    filter->ready = 0;
+    filter->kill_threads = 0;
+    filter->actual_threads  = 0;
+    filter->requested_threads  = threads;
+    filter->threads = NULL; 
+
+    if (filter->requested_threads > 1)
+    {
+        filter->threads = (struct DeintThread *) calloc(threads,
+                          sizeof(struct DeintThread));
+        if (filter->threads == NULL)
+        {
+            VERBOSE(VB_IMPORTANT, "KernelDeint: failed to allocate memory "
+                    "for threads - falling back to existing, single thread.");
+            filter->requested_threads = 1;
+        }
+    }
+
+    if (filter->requested_threads > 1)
+    {
+        pthread_mutex_init(&(filter->mutex), NULL);
+        int success = 0;
+        for (int i = 0; i < filter->requested_threads; i++)
+        {
+            if (pthread_create(&(filter->threads[i].id), NULL,
+                               KernelThread, (void*)filter) != 0)
+                filter->threads[i].id  = 0;
+            else
+                success++;
+        }
+
+        if (success < filter->requested_threads)
+        {
+            VERBOSE(VB_IMPORTANT, "KernelDeint: failed to create all threads"
+                   " - falling back to existing, single thread.");
+        }
+        else
+        {
+            int timeout = 0;
+            while (filter->actual_threads != filter->requested_threads)
+            {
+                timeout++;
+                if (timeout > 5000)
+                {
+                    VERBOSE(VB_IMPORTANT, "KernelDeint: waited too long for"
+                            " threads to start.- continuing.");
+                    break;
+                }
+                usleep(100);
+            }
+            VERBOSE(VB_PLAYBACK, "KernelDeint: Created threads.");
+        }
+    }
+
+    if (filter->actual_threads < 1 )
+        VERBOSE(VB_PLAYBACK, "KernelDeint: Using existing thread.");
+
     return (VideoFilter *) filter;
 }
 
 static FmtConv FmtList[] =
 {
     { FMT_YV12, FMT_YV12 },
-    { FMT_YUV422P, FMT_YUV422P },
     FMT_NULL
 };
 
@@ -369,6 +660,14 @@ ConstFilterInfo filter_table[] =
     {
         symbol:     "NewKernelDeintFilter",
         name:       "kerneldeint",
+        descript:   "combines data from several fields to deinterlace "
+                    "with less motion blur",
+        formats:    FmtList,
+        libname:    NULL
+    },
+    {
+        symbol:     "NewKernelDeintFilter",
+        name:       "kerneldoubleprocessdeint",
         descript:   "combines data from several fields to deinterlace "
                     "with less motion blur",
         formats:    FmtList,

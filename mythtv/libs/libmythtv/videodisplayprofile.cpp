@@ -684,6 +684,8 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Linear blend");
     else if ("kerneldeint" == short_name)
         return QObject::tr("Kernel");
+    else if ("kerneldoubleprocessdeint" == short_name)
+        return QObject::tr("Kernel (2x)");
     else if ("greedyhdeint" == short_name)
         return QObject::tr("Greedy HighMotion");
     else if ("greedyhdoubleprocessdeint" == short_name)
@@ -1296,6 +1298,8 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kLinearBlendMsg;
     else if (deint == "kerneldeint")
         msg = kKernelMsg;
+    else if (deint == "kerneldoubleprocessdeint")
+        msg = kKernelMsg + " " + kDoubleRateMsg;
     else if (deint == "openglonefield")
         msg = kOneFieldMsg + " " + kUsingGPU;
     else if (deint == "openglbobdeint")
@@ -1511,6 +1515,7 @@ QString VideoDisplayProfile::toString(void) const
 "bobdeint"
 "linearblend"
 "kerneldeint"
+"kerneldoubleprocessdeint"
 "greedyhdeint"
 "greedyhdoubleprocessdeint"
 "yadifdeint"
@@ -1556,6 +1561,7 @@ void VideoDisplayProfile::init_statics(void)
     {
         safe_deint[*it] += "linearblend";
         safe_deint[*it] += "kerneldeint";
+        safe_deint[*it] += "kerneldoubleprocessdeint";
         safe_deint[*it] += "greedyhdeint";
         safe_deint[*it] += "greedyhdoubleprocessdeint";
         safe_deint[*it] += "yadifdeint";
