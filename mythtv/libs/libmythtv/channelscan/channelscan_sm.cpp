@@ -165,9 +165,11 @@ ChannelScanSM::ChannelScanSM(
                             SignalMonitor::kDTVSigMon_WaitForNIT |
                             SignalMonitor::kDTVSigMon_WaitForSDT);
 
+#ifdef USING_DVB
         DVBChannel *dvbchannel = dynamic_cast<DVBChannel*>(channel);
         if (dvbchannel && dvbchannel->GetRotor())
             dtvSigMon->AddFlags(SignalMonitor::kDVBSigMon_WaitForPos);
+#endif
 
         data->AddMPEGListener(this);
         data->AddATSCMainListener(this);
