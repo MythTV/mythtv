@@ -86,7 +86,7 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
                                bool allowreorder, MythThemedMenuState *state)
     : MythThemedMenuState(parent, name),
       m_state(state), m_allocedstate(false), m_foundtheme(false),
-      m_exitModifier(-1), m_ignorekeys(false), m_wantpop(false)
+      m_exitModifier(0), m_ignorekeys(false), m_wantpop(false)
 {
     if (!m_state)
     {
@@ -180,7 +180,7 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
  */
 void MythThemedMenu::ReloadExitKey(void)
 {
-    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown");
+    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown", 0);
 
     if (allowsd == 1)
         m_exitModifier = Qt::ControlModifier;
