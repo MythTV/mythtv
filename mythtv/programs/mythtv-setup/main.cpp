@@ -97,7 +97,7 @@ void SetupMenu(MythMainWindow *win)
                                               "mainmenu", false);
 
     menu->setCallback(SetupMenuCallback, gContext);
-    menu->setKillable(true);
+    menu->setKillable();
 
     if (menu->foundTheme())
     {
