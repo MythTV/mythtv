@@ -84,7 +84,7 @@ void SetupMenuCallback(void* data, QString& selection)
             exitPrompt = new ExitPrompter();
         exitPrompt->handleExit();
     }
-    else 
+    else
         VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 }
 
@@ -97,6 +97,7 @@ void SetupMenu(MythMainWindow *win)
                                               "mainmenu", false);
 
     menu->setCallback(SetupMenuCallback, gContext);
+    menu->setKillable(true);
 
     if (menu->foundTheme())
     {
