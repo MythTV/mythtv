@@ -11,10 +11,12 @@ using namespace std;
 // Qt headers
 #include <QString>
 #include <QImage>
+#include <QVariant>
 
 // MythTV headers
 #include "mythexp.h" // for MPUBLIC
 
+// TODO: Refactor DBChannel, PixmapChannel and ChannelInfo into a single class
 
 class MPUBLIC DBChannel
 {
@@ -42,6 +44,25 @@ class MPUBLIC DBChannel
     QString icon;
 };
 typedef vector<DBChannel> DBChanList;
+
+class MPUBLIC ChannelInfo
+{
+ public:
+    ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
+    QString GetFormatted(const QString &format) const;
+
+    QString callsign;
+    QString iconpath;
+    QString chanstr;
+    QString channame;
+    int chanid;
+    int sourceid;
+    QString sourcename;
+    int favid;
+    QString recpriority;
+};
+
+Q_DECLARE_METATYPE(ChannelInfo*)
 
 class MPUBLIC PixmapChannel : public DBChannel
 {

@@ -14,7 +14,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
-#include "infostructs.h"
+#include "dbchannelinfo.h"
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "oldsettings.h"
@@ -190,8 +190,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_jumpToChannel(NULL),
     m_jumpToChannelEnabled(true)
 {
-    gContext->addCurrentLocation("GuideGrid");
-
     connect(previewVideoRefreshTimer, SIGNAL(timeout()),
             this,                     SLOT(refreshVideo()));
 
@@ -220,7 +218,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
 
     for (int x = 0; x < MAX_DISPLAY_TIMES; x++)
     {
-        m_timeInfos[x] = NULL;
         for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
             m_programInfos[y][x] = NULL;
     }
@@ -303,16 +300,6 @@ bool GuideGrid::Create()
 GuideGrid::~GuideGrid()
 {
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
-
-    for (int x = 0; x < MAX_DISPLAY_TIMES; x++)
-    {
-        if (m_timeInfos[x])
-        {
-            delete m_timeInfos[x];
-            m_timeInfos[x] = NULL;
-        }
-    }
 
     for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
     {
@@ -896,13 +883,6 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
 
 void GuideGrid::fillTimeInfos()
 {
-    for (int x = 0; x < m_timeCount; x++)
-    {
-        if (m_timeInfos[x])
-            delete m_timeInfos[x];
-        m_timeInfos[x] = NULL;
-    }
-
     m_timeList->Reset();
 
     QDateTime t = m_currentStartTime;
@@ -917,16 +897,9 @@ void GuideGrid::fillTimeInfos()
         mins = 5 * (mins / 5);
         if (mins % 30 == 0)
         {
-            TimeInfo *timeinfo = new TimeInfo;
-
             int hour = t.time().hour();
-            timeinfo->hour = hour;
-            timeinfo->min = mins;
-
-            timeinfo->usertime = QTime(hour, mins).toString(m_timeFormat);
-
-            m_timeInfos[x] = timeinfo;
-            new MythUIButtonListItem(m_timeList, timeinfo->usertime);
+            QString timeStr = QTime(hour, mins).toString(m_timeFormat);
+            new MythUIButtonListItem(m_timeList, timeStr);
 
             cnt++;
         }

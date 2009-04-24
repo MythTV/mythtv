@@ -13,7 +13,6 @@
 
 // myth
 #include "customedit.h"
-#include "infostructs.h"
 #include "programinfo.h"
 #include "oldsettings.h"
 #include "tv.h"
@@ -56,8 +55,8 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
         delete programFind;
 }
 
-ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG, 
-                       TV *player, bool embedVideo) 
+ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG,
+                       TV *player, bool embedVideo)
           : MythScreenType(parentStack, "ProgFinder"),
     m_searchStr(QString::null),
     m_player(player),            m_embedVideo(embedVideo),
@@ -127,7 +126,7 @@ ProgFinder::~ProgFinder()
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
 
-    // if we have a player and we are returning to it we need 
+    // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen
     if (m_player && m_allowEPG)
     {
@@ -283,7 +282,7 @@ void ProgFinder::customEvent(QEvent *event)
             else if (resulttext == tr("Edit Search"))
             {
                 MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-                SearchInputDialog *textInput = 
+                SearchInputDialog *textInput =
                         new SearchInputDialog(popupStack, m_searchStr);
 
                 if (textInput->Create())
@@ -363,7 +362,7 @@ void ProgFinder::updateInfo(void)
             m_help2Text->SetText(tr("Select the title of the program you wish to find. "
                                     "When finished return with the left arrow key. "
                                     "Press SELECT to schedule a recording."));
-        
+
         ResetMap(m_infoMap);
     }
     else if (GetFocusWidget() == m_timesList)
@@ -754,7 +753,7 @@ const char* JaProgFinder::searchChars[] = {
     0,
 };
 
-JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg, 
+JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
@@ -858,10 +857,10 @@ void JaProgFinder::restoreSelectedData(QString& data)
 // Hebrew alphabet list and more
 const char* HeProgFinder::searchChars[] = {
     "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כ", "ל", "מ",
-    "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת", "E", "#", 0, 
+    "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת", "E", "#", 0,
 };
 
-HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg, 
+HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg,
                            TV *player, bool embedVideo)
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
@@ -895,7 +894,7 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     {
         where += "WHERE ( title REGEXP '^[0-9]') ";
     }
-    else 
+    else
     {
         QString one = searchChar + "%";
         bindings[":ONE"] = one;
@@ -937,7 +936,7 @@ void HeProgFinder::restoreSelectedData(QString& data)
 
 SearchInputDialog::SearchInputDialog(MythScreenStack *parent,
                                      const QString &defaultValue)
-                 : MythTextInputDialog(parent, "", FilterNone, 
+                 : MythTextInputDialog(parent, "", FilterNone,
                                        false, defaultValue)
 {
 }
@@ -985,7 +984,7 @@ void SearchInputDialog::editChanged(void)
     if (m_retObject)
     {
         //FIXME: add a new event type for this?
-        DialogCompletionEvent *dce = 
+        DialogCompletionEvent *dce =
                 new DialogCompletionEvent(m_id, 0, inputString, "");
         QApplication::postEvent(m_retObject, dce);
     }

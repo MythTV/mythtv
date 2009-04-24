@@ -12,7 +12,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "scheduledrecording.h"
 #include "proglist.h"
-#include "infostructs.h"
+#include "dbchannelinfo.h"
 
 #include "mythuihelper.h"
 #include "mythuitext.h"
@@ -320,7 +320,7 @@ void ChannelRecPriority::updateList()
         QString stringFormat = item->GetText();
         if (stringFormat.isEmpty())
             stringFormat = "<num>  <sign>  \"<name>\"";
-        item->SetText(chanInfo->Text(stringFormat), fontState);
+        item->SetText(chanInfo->GetFormatted(stringFormat), fontState);
 
         item->SetText(chanInfo->chanstr, "channum", fontState);
         item->SetText(chanInfo->callsign, "callsign", fontState);
@@ -421,7 +421,7 @@ void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
         }
 
         if (m_chanstringText)
-            m_chanstringText->SetText(channelItem->Text(m_longchannelformat));
+            m_chanstringText->SetText(channelItem->GetFormatted(m_longchannelformat));
         if (m_callsignText)
             m_callsignText->SetText(channelItem->callsign);
         if (m_channumText)

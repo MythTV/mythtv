@@ -19,7 +19,6 @@
 using namespace std;
 
 class ProgramInfo;
-class TimeInfo;
 class TV;
 class QTimer;
 class MythUIButtonList;
@@ -177,7 +176,6 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     pix_chan_list_list_t m_channelInfos;
     QMap<uint,uint>      m_channelInfoIdx;
 
-    TimeInfo    *m_timeInfos[MAX_DISPLAY_TIMES];
     ProgramList *m_programs[MAX_DISPLAY_CHANS];
     ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
     ProgramList  m_recList;
