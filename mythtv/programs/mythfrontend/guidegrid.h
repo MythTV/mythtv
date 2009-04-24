@@ -135,7 +135,7 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     void customEvent(QEvent *event);
 
   protected:
-      GuideGrid(MythScreenStack *parentStack,
+    GuideGrid(MythScreenStack *parentStack,
               uint chanid = 0, QString channum = "",
               TV *player = NULL, bool embedVideo = false,
               bool allowFinder = true);

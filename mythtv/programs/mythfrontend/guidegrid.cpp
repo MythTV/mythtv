@@ -1355,18 +1355,12 @@ void GuideGrid::updateChannels(void)
 
         if (showChannelIcon && !chinfo->icon.isEmpty())
         {
-            if (!chinfo->imageLoaded)
-                chinfo->LoadChannelImage();
-
-            if (chinfo->imageLoaded)
+            if (chinfo->CacheChannelIcon())
             {
-                MythImage *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-                image->Assign(chinfo->iconImage);
-                item->setImage(image, "channelicon");
+                QString localpath = chinfo->m_localIcon;
+                item->SetImage(localpath, "channelicon");
             }
         }
-        else
-            item->SetImage("", "channelicon");
     }
 }
 
@@ -1395,27 +1389,15 @@ void GuideGrid::updateInfo(void)
 
     if (m_channelImage)
     {
+        m_channelImage->Reset();
         if (showChannelIcon && !chinfo->icon.isEmpty())
         {
-            if (!chinfo->imageLoaded)
-                chinfo->LoadChannelImage();
-
-            if (chinfo->imageLoaded)
+            if (chinfo->CacheChannelIcon())
             {
-                MythImage *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-                image->Assign(chinfo->iconImage);
-                m_channelImage->SetImage(image);
-            }
-            else
-            {
-                m_channelImage->SetFilename("blank.png");
+                QString localpath = chinfo->m_localIcon;
+                m_channelImage->SetFilename(localpath);
                 m_channelImage->Load();
             }
-        }
-        else
-        {
-            m_channelImage->SetFilename("blank.png");
-            m_channelImage->Load();
         }
     }
 

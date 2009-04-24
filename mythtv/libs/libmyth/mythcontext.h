@@ -125,7 +125,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     DatabaseParams GetDatabaseParams(void);
     bool SaveDatabaseParams(const DatabaseParams &params);
-    
+
     void LogEntry(const QString &module, int priority,
                   const QString &message, const QString &details);
 
@@ -155,10 +155,8 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     void SetSetting(const QString &key, const QString &newValue);
 
-    bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false, 
+    bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false,
                                bool block = true);
-
-    MythImage* CacheRemotePixmap(const QString &url, bool reCache = false);
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);

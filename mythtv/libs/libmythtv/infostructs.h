@@ -14,9 +14,7 @@
 class MPUBLIC ChannelInfo
 {
  public:
-    ChannelInfo() : chanid(-1), sourceid(-1), favid(-1), iconload(false) {}
-
-    void LoadChannelIcon(int width, int height = 0);
+    ChannelInfo() : chanid(-1), sourceid(-1), favid(-1) {}
     QString Text(QString format);
 
     QString callsign;
@@ -28,9 +26,6 @@ class MPUBLIC ChannelInfo
     QString sourcename;
     int favid;
     QString recpriority;
-
-    QPixmap icon;
-    bool iconload;
 };
 
 class TimeInfo

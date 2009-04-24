@@ -1699,35 +1699,6 @@ double MythContext::GetFloatSettingOnHost(
     return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
 }
 
-MythImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
-{
-    QUrl qurl = url;
-    if (qurl.host().isEmpty())
-        return NULL;
-
-    MythImage *im = d->m_ui->GetImageFromCache(url);
-
-    if (!reCache && im)
-        return im;
-
-    RemoteFile *rf = new RemoteFile(url, false, 0);
-
-    QByteArray data;
-    bool ret = rf->SaveAs(data);
-
-    delete rf;
-
-    if (ret)
-    {
-        MythImage *image = GetMythPainter()->GetFormatImage();
-        image->Assign(QImage::fromData(data));
-        if (image->width() > 0)
-            return d->m_ui->CacheImage(url, image);
-    }
-
-    return NULL;
-}
-
 void MythContext::SetSetting(const QString &key, const QString &newValue)
 {
     d->m_database->SetSetting(key, newValue);

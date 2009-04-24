@@ -10,7 +10,6 @@ using namespace std;
 
 // Qt headers
 #include <QString>
-#include <QPixmap>
 #include <QImage>
 
 // MythTV headers
@@ -48,25 +47,15 @@ class MPUBLIC PixmapChannel : public DBChannel
 {
   public:
     PixmapChannel(const PixmapChannel &other) :
-        DBChannel(other),
-        iconPixmap(other.iconPixmap),
-        iconImage(other.iconImage),
-        iconLoaded(other.iconLoaded),
-        imageLoaded(other.imageLoaded){ }
+        DBChannel(other) { }
     PixmapChannel(const DBChannel &other) :
-        DBChannel(other),
-        iconLoaded(false),
-        imageLoaded(false){ }
+        DBChannel(other) { }
 
-    bool LoadChannelIcon(uint size) const;
-    bool LoadChannelImage(void) const;
+    bool CacheChannelIcon(void);
     QString GetFormatted(const QString &format) const;
 
   public:
-    mutable QPixmap iconPixmap;  //FIXME remove?
-    mutable QImage  iconImage;
-    mutable bool    iconLoaded;
-    mutable bool    imageLoaded;
+    QString m_localIcon;
 };
 
 class MPUBLIC ChannelInsertInfo
@@ -74,7 +63,7 @@ class MPUBLIC ChannelInsertInfo
   public:
     ChannelInsertInfo(void) :
         db_mplexid(0), source_id(0), channel_id(0),
-        callsign(QString::null), service_name(QString::null), 
+        callsign(QString::null), service_name(QString::null),
         chan_num(QString::null), service_id(0),
         atsc_major_channel(0), atsc_minor_channel(0),
         use_on_air_guide(false),

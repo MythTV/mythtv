@@ -2,12 +2,18 @@
 
 // Qt headers
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
+#include <QImage>
+#include <QUrl>
 
 // MythTV headers
 #include "dbchannelinfo.h"
 #include "mythcontext.h"
 #include "mythdb.h"
+#include "mythdirs.h"
 #include "mpegstreamdata.h" // for CryptStatus
+#include "remotefile.h"
 
 DBChannel::DBChannel(const DBChannel &other)
 {
@@ -52,76 +58,66 @@ DBChannel &DBChannel::operator=(const DBChannel &other)
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-bool PixmapChannel::LoadChannelIcon(uint size) const
+bool PixmapChannel::CacheChannelIcon(void)
 {
-    if (!size || size > 3000 || icon.isEmpty())
+    m_localIcon = icon;
+
+    // Is icon local?
+    if (QFile(icon).exists())
+        return true;
+
+    QString localDirStr = QString("%1/channels").arg(GetConfDir());
+    QDir localDir(localDirStr);
+
+    if (!localDir.exists() && !localDir.mkdir(localDirStr))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Icons directory is missing and could "
+                                      "not be created: %1").arg(localDirStr));
+        return false;
+    }
+
+    // Has it been saved to the local cache?
+    m_localIcon = QString("%1/%2").arg(localDirStr)
+                                 .arg(QFileInfo(icon).fileName());
+    if (QFile(m_localIcon).exists())
+        return true;
+
+    // Get address of master backed
+    QString url = gContext->GetMasterHostPrefix();
+    if (url.length() < 1)
         return false;
 
-    QImage tempimage(icon);
+    url.append(icon);
 
-    if (tempimage.width() == 0)
+    QUrl qurl = url;
+    if (qurl.host().isEmpty())
+        return false;
+
+    RemoteFile *rf = new RemoteFile(url, false, 0);
+
+    QByteArray data;
+    bool ret = rf->SaveAs(data);
+
+    delete rf;
+
+    if (ret)
     {
-        QFile existtest(icon);
+        QImage image;
 
-        // we have the file, just couldn't load it.
-        if (existtest.exists())
-            return false;
+        image.loadFromData(data);
 
-        QString url = gContext->GetMasterHostPrefix();
-        if (url.length() < 1)
-            return false;
+        //if (image.loadFromData(data) && image.width() > 0
 
-        url += icon;
-
-        MythImage *im = gContext->CacheRemotePixmap(url);
-        if (im)
-            tempimage = *(QImage*)im;
-    }
-
-    if (tempimage.width() > 0)
-    {
-        iconLoaded = true;
-        if ((tempimage.width()  != (int) size) ||
-            (tempimage.height() != (int) size))
+        if (image.save(m_localIcon))
         {
-            QImage tmp2;
-            tmp2 = tempimage.scaled(size, size,
-                    Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            iconPixmap = QPixmap::fromImage(tmp2);
+            VERBOSE(VB_GENERAL, QString("Caching channel icon %1").arg(m_localIcon));
+            return true;
         }
         else
-            iconPixmap = QPixmap::fromImage(tempimage);
+            VERBOSE(VB_GENERAL, QString("Failed to save to %1").arg(m_localIcon));
     }
 
-    return iconLoaded;
-}
-
-bool PixmapChannel::LoadChannelImage(void) const
-{
-    iconImage = QImage(icon);
-
-    if (iconImage.width() == 0)
-    {
-        QFile existtest(icon);
-
-        // we have the file, just couldn't load it.
-        if (existtest.exists())
-            return false;
-
-        QString url = gContext->GetMasterHostPrefix();
-        if (url.length() < 1)
-            return false;
-
-        url += icon;
-
-        MythImage *im = gContext->CacheRemotePixmap(url);
-        if (im)
-            iconImage = *(QImage*)im;
-    }
-
-    imageLoaded = (iconImage.width() > 0);
-
-    return imageLoaded;
+    return false;
 }
 
 QString PixmapChannel::GetFormatted(const QString &format) const
