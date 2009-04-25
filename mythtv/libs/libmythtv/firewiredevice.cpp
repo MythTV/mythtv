@@ -400,8 +400,9 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 
     const uint64_t sa_vendor_ids[] =
     {
-        0x11e6,    0x14f8,    0x1692,    0x1947,    0x0f21,    0x1ac3,
-        0x0a73,
+        0x0a73,    0x0f21,    0x11e6,    0x14f8,    0x1692,    0x1868,
+        0x1947,    0x1ac3,    0x1bd7,    0x1cea,    0x1e6b,    0x21be,
+        0x223a,    0x22ce,    0x23be,    0x252e,
     };
     const uint sa_vendor_id_cnt =
         sizeof(sa_vendor_ids) / sizeof(uint64_t);
@@ -416,7 +417,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     const uint64_t motorola_vendor_ids[] =
     {
         /* DCH-3200 */
-        0x1c11,    0x1cfb,    0x1fc4,
+        0x1c11,    0x1cfb,    0x1fc4,    0x23a3,
         /* DCH-3416 */
         0x1e46,
         /* DCT-3416 */
@@ -431,6 +432,14 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         0x0f9f,    0x152f,
         /* DCT-6216, 2224 */
         0x17ee,    0x1a66,
+        /* QIP 7100 */
+        0x2374,
+        /* unknown, see http://standards.ieee.org/regauth/oui/oui.txt */
+        0x04db,    0x0406,    0x0ce5,    0x111a,    0x1225,    0x1404,
+        0x1626,    0x18c0,    0x1ade,    0x1cfb,    0x2040,    0x211e,
+        0x2180,    0x2210,    0x230b,    0x2375,    0x2395,    0x23a2,
+        0x23ed,    0x23ee,    0x23a0,    0x23a1,
+
     };
     const uint motorola_vendor_id_cnt =
         sizeof(motorola_vendor_ids) / sizeof(uint64_t);
@@ -447,12 +456,14 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[motorola_vendor_ids[i] << 32 | 0x64ca] = "DCT-6212";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x64cb] = "DCT-6212";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x646b] = "DCT-6216";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x8100] = "QIP-7100";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x0001] = "QIP-7100";
     }
 
     const uint64_t pace_vendor_ids[] =
     {
         /* PACE 550-HD & 779 */
-        0x5094,
+        0x1cc3, 0x5094,
     };
 
     const uint pace_vendor_id_cnt =
@@ -480,6 +491,7 @@ bool FirewireDevice::IsSTBSupported(const QString &panel_model)
             (model == "SA4250HDC") ||
             (model == "PACE-550") ||
             (model == "PACE-779") ||
+            (model == "QIP-7100") ||
             (model == "GENERIC"));
 }
 

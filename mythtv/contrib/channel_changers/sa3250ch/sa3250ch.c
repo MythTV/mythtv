@@ -32,13 +32,24 @@
 
 /* SA3250HD IDs */
 /* WARNING: Please update firewiredevice.cpp when adding to this list. */
-#define SA_VENDOR_ID1           0x000011e6
-#define SA_VENDOR_ID2           0x000014f8
-#define SA_VENDOR_ID3           0x00001692
-#define SA_VENDOR_ID4           0x00001947
-#define SA_VENDOR_ID5           0x00000f21
-#define SA_VENDOR_ID6           0x00001ac3
-#define SA_VENDOR_ID7           0x00000a73
+
+#define SA_VENDOR_ID1           0x00000a73
+#define SA_VENDOR_ID2           0x00000f21
+#define SA_VENDOR_ID3           0x000011e6
+#define SA_VENDOR_ID4           0x000014f8
+#define SA_VENDOR_ID5           0x00001692
+#define SA_VENDOR_ID6           0x00001868
+#define SA_VENDOR_ID7           0x00001947
+#define SA_VENDOR_ID8           0x00001ac3
+#define SA_VENDOR_ID9           0x00001bd7
+#define SA_VENDOR_ID10          0x00001cea
+#define SA_VENDOR_ID11          0x00001e6b
+#define SA_VENDOR_ID12          0x000021be
+#define SA_VENDOR_ID13          0x0000223a
+#define SA_VENDOR_ID14          0x000022ce
+#define SA_VENDOR_ID15          0x000023be
+#define SA_VENDOR_ID16          0x0000252e
+
 #define SA3250HD_MODEL_ID1      0x00000be0
 #define SA4200HD_MODEL_ID1      0x00001072
 #define SA4250HDC_MODEL_ID1     0x000010cc
@@ -130,13 +141,22 @@ int main (int argc, char *argv[])
                  i, dir.vendor_id, dir.model_id); 
 		
       /* WARNING: Please update firewiredevice.cpp when adding to this list. */
-      if (((dir.vendor_id == SA_VENDOR_ID1) ||
-           (dir.vendor_id == SA_VENDOR_ID2) ||
-           (dir.vendor_id == SA_VENDOR_ID3) ||
-           (dir.vendor_id == SA_VENDOR_ID4) ||
-           (dir.vendor_id == SA_VENDOR_ID5) ||
-           (dir.vendor_id == SA_VENDOR_ID6) ||
-           (dir.vendor_id == SA_VENDOR_ID7)) &&
+      if (((dir.vendor_id == SA_VENDOR_ID1)  ||
+           (dir.vendor_id == SA_VENDOR_ID2)  ||
+           (dir.vendor_id == SA_VENDOR_ID3)  ||
+           (dir.vendor_id == SA_VENDOR_ID4)  ||
+           (dir.vendor_id == SA_VENDOR_ID5)  ||
+           (dir.vendor_id == SA_VENDOR_ID6)  ||
+           (dir.vendor_id == SA_VENDOR_ID7)  ||
+           (dir.vendor_id == SA_VENDOR_ID8)  ||
+           (dir.vendor_id == SA_VENDOR_ID9)  ||
+           (dir.vendor_id == SA_VENDOR_ID10) ||
+           (dir.vendor_id == SA_VENDOR_ID11) ||
+           (dir.vendor_id == SA_VENDOR_ID12) ||
+           (dir.vendor_id == SA_VENDOR_ID13) ||
+           (dir.vendor_id == SA_VENDOR_ID14) ||
+           (dir.vendor_id == SA_VENDOR_ID15) ||
+           (dir.vendor_id == SA_VENDOR_ID16)) &&
           ((dir.model_id == SA3250HD_MODEL_ID1)  ||
            (dir.model_id == SA4200HD_MODEL_ID1)  ||
            (dir.model_id == SA4250HDC_MODEL_ID1)))

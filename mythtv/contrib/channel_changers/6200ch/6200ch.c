@@ -36,6 +36,7 @@
 #define DCH3200_VENDOR_ID1 0x00001c11
 #define DCH3200_VENDOR_ID2 0x00001cfb
 #define DCH3200_VENDOR_ID3 0x00001fc4
+#define DCH3200_VENDOR_ID4 0x000023a3
 #define DCH3200_MODEL_ID1  0x0000d330
 
 #define DCH3416_VENDOR_ID1 0x00001e46
@@ -83,11 +84,34 @@
 #define DCT6416_MODEL_ID1  0x0000646b
 
 #define QIP7100_VENDOR_ID1 0x00002374
-#define QIP7100_VENDOR_ID2 0x00d00d1e
 #define QIP7100_MODEL_ID1  0x00008100
 #define QIP7100_MODEL_ID2  0x00000001
 
+#define MOT_UNKNOWN_VENDOR_ID1 0x04db
+#define MOT_UNKNOWN_VENDOR_ID2 0x0406
+#define MOT_UNKNOWN_VENDOR_ID3 0x0ce5
+#define MOT_UNKNOWN_VENDOR_ID4 0x111a
+#define MOT_UNKNOWN_VENDOR_ID5 0x1225
+#define MOT_UNKNOWN_VENDOR_ID6 0x1404
+#define MOT_UNKNOWN_VENDOR_ID7 0x1626
+#define MOT_UNKNOWN_VENDOR_ID8 0x18c0
+#define MOT_UNKNOWN_VENDOR_ID9 0x1ade
+#define MOT_UNKNOWN_VENDOR_ID10 0x1cfb
+#define MOT_UNKNOWN_VENDOR_ID11 0x2040
+#define MOT_UNKNOWN_VENDOR_ID12 0x211e
+#define MOT_UNKNOWN_VENDOR_ID13 0x2180
+#define MOT_UNKNOWN_VENDOR_ID14 0x2210
+#define MOT_UNKNOWN_VENDOR_ID15 0x230b
+#define MOT_UNKNOWN_VENDOR_ID16 0x2375
+#define MOT_UNKNOWN_VENDOR_ID17 0x2395
+#define MOT_UNKNOWN_VENDOR_ID18 0x23a2
+#define MOT_UNKNOWN_VENDOR_ID19 0x23ed
+#define MOT_UNKNOWN_VENDOR_ID20 0x23ee
+#define MOT_UNKNOWN_VENDOR_ID21 0x23a0
+#define MOT_UNKNOWN_VENDOR_ID22 0x23a1
+
 #define PACE_VENDOR_ID1    0x00005094 /* 550 & 779 */
+#define PACE_VENDOR_ID2    0x00005094 /* unknown */
 #define PACE550_MODEL_ID1  0x00010551
 #define PACE779_MODEL_ID1  0x00010755
 
@@ -240,6 +264,7 @@ int main (int argc, char *argv[])
       if ( ((dir.vendor_id == DCH3200_VENDOR_ID1) ||
             (dir.vendor_id == DCH3200_VENDOR_ID2) ||
             (dir.vendor_id == DCH3200_VENDOR_ID3) ||
+            (dir.vendor_id == DCH3200_VENDOR_ID4) ||
             (dir.vendor_id == DCH3416_VENDOR_ID1) ||
             (dir.vendor_id == DCT3412_VENDOR_ID1) ||
             (dir.vendor_id == DCT3416_VENDOR_ID1) ||
@@ -266,8 +291,30 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6416_VENDOR_ID1) ||
             (dir.vendor_id == DCT6416_VENDOR_ID2) ||
             (dir.vendor_id == QIP7100_VENDOR_ID1) ||
-            (dir.vendor_id == QIP7100_VENDOR_ID2) ||
-            (dir.vendor_id == PACE_VENDOR_ID1)) &&
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID1) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID2) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID3) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID4) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID5) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID6) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID7) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID8) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID9) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID10) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID11) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID12) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID13) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID14) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID15) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID16) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID17) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID18) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID19) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID20) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID21) ||
+            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID22) ||
+            (dir.vendor_id == PACE_VENDOR_ID1) ||
+            (dir.vendor_id == PACE_VENDOR_ID2)) &&
            ((dir.model_id == DCH3200_MODEL_ID1) ||
             (dir.model_id == DCH3416_MODEL_ID1) ||
             (dir.model_id == DCT3412_MODEL_ID1) ||
