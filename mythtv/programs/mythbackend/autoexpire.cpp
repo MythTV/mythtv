@@ -36,7 +36,8 @@ using namespace std;
 #include "backendutil.h"
 #include "compat.h"
 
-#define LOC QString("AutoExpire: ")
+#define LOC     QString("AutoExpire: ")
+#define LOC_ERR QString("AutoExpire Error: ")
 
 extern AutoExpire *expirer;
 
@@ -422,6 +423,26 @@ void AutoExpire::ExpireRecordings(void)
                 .arg(fsit->totalSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->usedSpaceKB / 1024.0 / 1024.0, 7, 'f', 1)
                 .arg(fsit->freeSpaceKB / 1024.0 / 1024.0, 7, 'f', 1));
+
+        if ((fsit->totalSpaceKB == -1) || (fsit->usedSpaceKB == -1))
+        {
+            VERBOSE(VB_FILE, LOC_ERR + QString("fsID #%1 has invalid info, "
+                    "AutoExpire can not run for this filesystem.  "
+                    "Continuing on to next...").arg(fsit->fsID));
+            VERBOSE(VB_FILE, QString("Directories on filesystem ID %1:")
+                    .arg(fsit->fsID));
+            vector<FileSystemInfo>::iterator fsit2;
+            for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); fsit2++)
+            {
+                if (fsit2->fsID == fsit->fsID)
+                {
+                    VERBOSE(VB_FILE, QString("    %1:%2")
+                            .arg(fsit2->hostname).arg(fsit2->directory));
+                }
+            }
+
+            continue;
+        }
 
         if (truncateMap.contains(fsit->fsID))
         {
