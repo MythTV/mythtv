@@ -194,7 +194,7 @@ void MythQtPainter::DrawRoundRect(const QRect &area, int radius,
     if ((area.height() / 2) < radius)
         radius = area.height() / 2;
 
-    painter->drawRoundRect(area, 100 / (area.width() / radius / 2), 100 / (area.height() / radius / 2));
+    painter->drawRoundedRect(area, (qreal)radius, (qreal)radius);
 
     painter->setRenderHint(QPainter::Antialiasing, false);
 

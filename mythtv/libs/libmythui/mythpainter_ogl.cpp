@@ -541,118 +541,53 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &area, int radius,
                                       bool drawFill, const QColor &fillColor,
                                       bool drawLine, int lineWidth, const QColor &lineColor)
 {
-    int x = area.x();
-    int y = area.y();
-    int w = area.width();
-    int h = area.height();
-    float step = 0.01f;
+    int w, h;
 
-    if ((w / 2) < radius)
-        radius = w / 2;
-
-    if ((h / 2) < radius)
-        radius = h / 2;
-
-    glEnable(GL_BLEND);
-
-    if (drawFill)
+    if (!texture_rects)
     {
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-        glColor4f(fillColor.redF(), fillColor.greenF(), fillColor.blueF(), fillColor.alphaF());
-        glLineWidth(lineWidth);
-
-        glBegin(GL_POLYGON);
-        glVertex2f(x + radius, y);
-        glVertex2f(x + w - radius, y);
-        for (float t = 3.1415f * 1.5f; t < 3.1415f * 2; t += step)
-        {
-            float sx = x +w - radius + cos(t) * radius;
-            float sy = y + radius + sin(t) * radius;
-            glVertex2f(sx, sy);
-        }
-        glVertex2f (x + w, y + radius);
-        glVertex2f (x + w, y + h - radius);
-        for (float t = 0; t < 3.1415f * 0.5f; t += step)
-        {
-            float sx = x + w - radius + cos(t) * radius;
-            float sy = y +h -radius + sin(t) * radius;
-            glVertex2f (sx, sy);
-        }
-
-        glVertex2f(x + w -radius, y+h);
-        glVertex2f(x +radius, y+h);
-        for (float t = 3.1415f * 0.5f; t < 3.1415f; t += step)
-        {
-            float sx = x  + radius + cos(t) * radius;
-            float sy = y + h - radius + sin(t) * radius;
-            glVertex2f(sx, sy);
-        }
-
-        glVertex2f (x, y + h - radius);
-        glVertex2f (x, y + radius);
-        for (float t = 3.1415f; t < 3.1415f * 1.5f; t += step)
-        {
-            float sx = x + radius + cos(t) * radius;
-            float sy = y + radius + sin(t) * radius;
-            glVertex2f(sx, sy);
-        }
-
-        glEnd();
-        glDisable(GL_LINE_SMOOTH);
+        w = NearestGLTextureSize(area.width());
+        h = NearestGLTextureSize(area.height());
     }
+    else
+    {
+        w = area.width();
+        h = area.height();
+    }
+
+    QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
+    image.fill(0x00000000);
+    QPainter painter(&image);
+
+    painter.setRenderHint(QPainter::Antialiasing);
 
     if (drawLine)
-    {
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        painter.setPen(QPen(lineColor, lineWidth));
+    else
+        painter.setPen(QPen(Qt::NoPen));
 
-        glColor4f(lineColor.redF(), lineColor.greenF(), lineColor.blueF(), lineColor.alphaF());
-        glLineWidth(lineWidth);
+    if (drawFill)
+        painter.setBrush(QBrush(fillColor));
+    else
+        painter.setBrush(QBrush(Qt::NoBrush));
 
+    if ((area.width() / 2) < radius)
+        radius = area.width() / 2;
 
-        glBegin(GL_LINES);
-        glVertex2f(x + radius, y);
-        glVertex2f(x + w - radius, y);
-        for (float t = 3.1415f * 1.5f; t < 3.1415f * 2; t += step)
-        {
-            float sx = x +w - radius + cos(t) * radius;
-            float sy = y + radius + sin(t) * radius;
-            glVertex2f(sx, sy);
-        }
-        glVertex2f (x + w, y + radius);
-        glVertex2f (x + w, y + h - radius);
-        for (float t = 0; t < 3.1415f * 0.5f; t += step)
-        {
-            float sx = x + w - radius + cos(t) * radius;
-            float sy = y +h -radius + sin(t) * radius;
-            glVertex2f (sx, sy);
-        }
+    if ((area.height() / 2) < radius)
+        radius = area.height() / 2;
 
-        glVertex2f(x + w -radius, y+h);
-        glVertex2f(x +radius, y+h);
-        for (float t = 3.1415f * 0.5f; t < 3.1415f; t += step)
-        {
-            float sx = x  + radius + cos(t) * radius;
-            float sy = y + h - radius + sin(t) * radius;
-            glVertex2f(sx, sy);
-        }
+    QRect r(lineWidth / 2, lineWidth / 2, area.width() - lineWidth, area.height() - lineWidth);
+    painter.drawRoundedRect(r, (qreal)radius, qreal(radius));
 
-        glVertex2f (x, y + h - radius);
-        glVertex2f (x, y + radius);
-        for (float t = 3.1415f; t < 3.1415f * 1.5f; t += step)
-        {
-            float sx = x + radius + cos(t) * radius;
-            float sy = y + radius + sin(t) * radius;
-            glVertex2f(sx, sy);
-        }
+    painter.end();
 
-        glEnd();
-        glDisable(GL_LINE_SMOOTH);
-    }
+    if (w != image.width() || h != image.height())
+        image = image.scaled(w, h);
 
-    glDisable(GL_BLEND);
+    MythImage *im = GetFormatImage();
+    im->Assign(image);
+    MythPainter::DrawImage(area.x(), area.y(), im, 255);
+    im->DownRef();
 }
 
 MythImage *MythOpenGLPainter::GetFormatImage()
