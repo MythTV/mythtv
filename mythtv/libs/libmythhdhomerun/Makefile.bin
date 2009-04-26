@@ -5,6 +5,9 @@ SRCS += hdhomerun_control.c
 SRCS += hdhomerun_video.c
 SRCS += hdhomerun_device.c
 SRCS += hdhomerun_config.c
+SRCS += hdhomerun_debug.c
+SRCS += hdhomerun_channels.c
+SRCS += hdhomerun_channelscan.c
 
 CFLAGS += -Wall -O2 -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith
 
