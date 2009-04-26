@@ -246,6 +246,20 @@ void MythUIGuideGrid::CreateCopy(MythUIType *parent)
     gg->CopyFrom(this);
 }
 
+QColor MythUIGuideGrid::calcColor(const QColor &color, int alphaMod)
+{
+    QColor newColor(color);
+    newColor.setAlpha((int)(color.alpha() * (alphaMod / 255.0)));
+    return newColor;
+}
+
+QColor MythUIGuideGrid::calcColor(const QColor &color, int alpha, int alphaMod)
+{
+    QColor newColor(color);
+    newColor.setAlpha((int)(alpha * (alphaMod / 255.0)));
+    return newColor;
+}
+
 void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                                int alphaMod, QRect clipRect)
 {
@@ -256,15 +270,15 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         {
             UIGTCon *data = *it;
             if (data->recStat == 0)
-                drawBackground(p, data);
+                drawBackground(p, data, alphaMod);
             else if (data->recStat == 1)
-                drawBox(p, data, m_recordingColor);
+                drawBox(p, data, m_recordingColor, alphaMod);
             else
-                drawBox(p, data, m_conflictingColor);
+                drawBox(p, data, m_conflictingColor, alphaMod);
         }
     }
 
-    drawCurrent(p, &selectedItem);
+    drawCurrent(p, &selectedItem, alphaMod);
 
     for (int i = 0; i < m_rowCount; i++)
     {
@@ -272,15 +286,15 @@ void MythUIGuideGrid::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         for (; it != allData[i].end(); ++it)
         {
             UIGTCon *data = *it;
-            drawText(p, data);
+            drawText(p, data, alphaMod);
 
             if (data->recType != 0 || data->arrow != 0)
-                drawRecType(p, data);
+                drawRecType(p, data, alphaMod);
         }
     }
 }
 
-void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data)
+void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
 {
     int breakin = 2;
     QRect area = data->drawArea;
@@ -288,25 +302,34 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data)
     area.adjust(breakin, breakin, -breakin, -breakin);
 
     if (m_selType == "roundbox")
-        p->DrawRoundRect(area, 10, m_drawSelFill, m_selFillColor, 
-                         m_drawSelLine, 2, m_selLineColor);
+    {
+        QColor fillColor = calcColor(m_selFillColor, alphaMod);
+        QColor lineColor = calcColor(m_selLineColor, alphaMod);
+        p->DrawRoundRect(area, 10, m_drawSelFill, fillColor, 
+                         m_drawSelLine, 2, lineColor);
+    }
     else if (m_selType == "highlight")
     {
-        QColor fillColor = m_solidColor;
-        fillColor.setAlpha(m_categoryAlpha);
+        QColor fillColor;
+        QColor lineColor = calcColor(m_selFillColor, alphaMod);
 
         if (m_drawCategoryColors && data->categoryColor.isValid())
-        {
-            fillColor = data->categoryColor;
-            fillColor.setAlpha(m_categoryAlpha);
-        }
-        p->DrawRect(area, true, fillColor.lighter(), m_drawSelLine, 2, m_selLineColor);
+            fillColor = calcColor(data->categoryColor, m_categoryAlpha, alphaMod);
+        else
+            fillColor = calcColor(m_solidColor, m_categoryAlpha, alphaMod);
+
+        p->DrawRect(area, true, fillColor.lighter(), m_drawSelLine, 2, lineColor);
     }
     else
-        p->DrawRect(area, m_drawSelFill, m_selFillColor, m_drawSelLine, 2, m_selLineColor);
+    {
+        // default to "box" selection type
+        QColor fillColor = calcColor(m_selFillColor, alphaMod);
+        QColor lineColor = calcColor(m_selLineColor, alphaMod);
+        p->DrawRect(area, m_drawSelFill, fillColor, m_drawSelLine, 2, lineColor);
+    }
 }
 
-void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data)
+void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
 {
     int breakin = 1;
     QRect area = data->drawArea;
@@ -327,7 +350,7 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data)
                 MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
                 im->Assign(*arrowImg);
                 p->DrawImage(area.left() + (area.width() / 2) - (arrowImg->height() / 2), 
-                             area.top() , im, 255);
+                             area.top() , im, alphaMod);
             }
             else
             {
@@ -335,7 +358,7 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data)
                 MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
                 im->Assign(*arrowImg);
                 p->DrawImage(area.left(), area.top() + (area.height() / 2) -
-                            (arrowImg->height() / 2), im, 255);
+                            (arrowImg->height() / 2), im, alphaMod);
             }
         }
         if (data->arrow == 2 || data->arrow == 3)
@@ -347,7 +370,7 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data)
                 im->Assign(*arrowImg);
                 recTypeOffset = arrowImg->width();
                 p->DrawImage(area.left() + (area.width() / 2) - (arrowImg->height() / 2),
-                            area.top() + area.height() - arrowImg->height(), im, 255);
+                            area.top() + area.height() - arrowImg->height(), im, alphaMod);
             }
             else
             {
@@ -357,7 +380,7 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data)
                 recTypeOffset = arrowImg->width();
                 p->DrawImage(area.right() - arrowImg->width(),
                             area.top() + (area.height() / 2) -
-                            (arrowImg->height() / 2), im, 255);
+                            (arrowImg->height() / 2), im, alphaMod);
             }
         }
     }
@@ -369,23 +392,22 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data)
         MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
         im->Assign(*recImg);
         p->DrawImage(area.right() - recImg->width(),
-                     area.bottom() - recImg->height(), im, 255);
+                     area.bottom() - recImg->height(), im, alphaMod);
     }
 }
 
-void MythUIGuideGrid::drawBox(MythPainter *p, UIGTCon *data, const QColor &color)
+void MythUIGuideGrid::drawBox(MythPainter *p, UIGTCon *data, const QColor &color, int alphaMod)
 {
     int breakin = 1;
     QRect area = data->drawArea;
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(breakin, breakin, -breakin, -breakin);
 
-    QColor alphaColor(color);
-    alphaColor.setAlpha(100);
-    p->DrawRect(area, true, alphaColor, false, 0, QColor());
+    QColor fillColor = calcColor(color, m_categoryAlpha, alphaMod);
+    p->DrawRect(area, true, fillColor, false, 0, QColor());
 }
 
-void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data)
+void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data, int alphaMod)
 {
     QColor overColor;
     QRect overArea;
@@ -393,14 +415,12 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data)
     int breakin = 1;
     QRect area = data->drawArea;
     area.translate(m_Area.x(), m_Area.y());
-    QColor fillColor = m_solidColor;
-    fillColor.setAlpha(m_categoryAlpha);
+    QColor fillColor;
 
     if (m_drawCategoryColors && data->categoryColor.isValid())
-    {
-        fillColor = data->categoryColor;
-        fillColor.setAlpha(m_categoryAlpha);
-    }
+        fillColor = calcColor(data->categoryColor, m_categoryAlpha, alphaMod);
+    else
+        fillColor = calcColor(m_solidColor, m_categoryAlpha, alphaMod);
 
     if (m_verticalLayout)
     {
@@ -465,7 +485,7 @@ void MythUIGuideGrid::drawBackground(MythPainter *p, UIGTCon *data)
         p->DrawRect(overArea, true, overColor, false, 0, QColor());
 }
 
-void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data)
+void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
 {
     QString msg = data->title;
 
@@ -495,7 +515,7 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data)
     if (area.width() <= 0 || area.height() <= 0)
         return;
 
-    p->DrawText(area, msg, m_justification, *m_font, 255, area);
+    p->DrawText(area, msg, m_justification, *m_font, alphaMod, area);
 }
 
 void MythUIGuideGrid::SetProgramInfo(int row, int col, const QRect &area,

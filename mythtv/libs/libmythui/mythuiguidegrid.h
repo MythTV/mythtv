@@ -77,11 +77,14 @@ class MPUBLIC MythUIGuideGrid : public MythUIType
         int recStat;
     };
 
-    void drawBackground(MythPainter *p, UIGTCon *data);
-    void drawBox(MythPainter *p, UIGTCon *data, const QColor &color);
-    void drawText(MythPainter *p, UIGTCon *data);
-    void drawRecType(MythPainter *p, UIGTCon *data);
-    void drawCurrent(MythPainter *p, UIGTCon *data);
+    void drawBackground(MythPainter *p, UIGTCon *data, int alpaMod);
+    void drawBox(MythPainter *p, UIGTCon *data, const QColor &color, int alpaMod);
+    void drawText(MythPainter *p, UIGTCon *data, int alpaMod);
+    void drawRecType(MythPainter *p, UIGTCon *data, int alpaMod);
+    void drawCurrent(MythPainter *p, UIGTCon *data, int alpaMod);
+
+    QColor calcColor(const QColor &color, int alpha, int alphaMod);
+    QColor calcColor(const QColor &color, int alphaMod);
 
     QList<UIGTCon*> *allData;
     UIGTCon selectedItem;
