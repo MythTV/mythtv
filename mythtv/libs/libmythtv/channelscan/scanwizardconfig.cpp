@@ -156,6 +156,12 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                      QString::number(DVBUtilsImport));
         addSelection(tr("Import existing scan"),
                      QString::number(ExistingScanImport));
+        //break;
+    //case CardUtil::HDHR-DVB:
+        addSelection(tr("Full Scan (DVB)"),
+                     QString::number(FullScan_DVBT), true);
+        addSelection(tr("Full Scan (DVB, tuned)"),
+                     QString::number(NITAddScan_DVBT));
         break;
     case CardUtil::FREEBOX:
         addSelection(tr("M3U Import"),
