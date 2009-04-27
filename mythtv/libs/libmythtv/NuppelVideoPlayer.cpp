@@ -420,16 +420,12 @@ bool NuppelVideoPlayer::SetMuted(bool mute)
         (kMuteAll == SetMuteState(kMuteAll)))
     {
         VERBOSE(VB_AUDIO, "muting sound " <<IsMuted());
-        SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
-        ClearAfterSeek(false);
         return true;
     }
     else if (audioOutput && is_muted && !mute &&
              (kMuteOff == SetMuteState(kMuteOff)))
     {
         VERBOSE(VB_AUDIO, "unmuting sound "<<IsMuted());
-        SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
-        ClearAfterSeek(false);
         return true;
     }
 
@@ -4054,9 +4050,6 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
  */
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
-    if (IsMuted())
-        return;
-
     if (!player_ctx->buffer->InDVDMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
@@ -4124,9 +4117,6 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                                      int samples, long long timecode)
 {
-    if (IsMuted())
-        return;
-
     char *buffers[2];
 
     WrapTimecode(timecode, TC_AUDIO);
