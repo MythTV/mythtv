@@ -115,66 +115,66 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
 
     switch (nCardType)
     {
-    case CardUtil::V4L:
-    case CardUtil::MPEG:
-        addSelection(tr("Full Scan"),
-                     QString::number(FullScan_Analog), true);
-        addSelection(tr("Import existing scan"),
-                     QString::number(ExistingScanImport));
-        return;
-    case CardUtil::DVBT:
-        addSelection(tr("Full Scan"),
-                     QString::number(FullScan_DVBT), true);
-        addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(NITAddScan_DVBT));
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
-        addSelection(tr("Import existing scan"),
-                     QString::number(ExistingScanImport));
-        break;
-    case CardUtil::DVBS:
-        addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(NITAddScan_DVBS));
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
-        addSelection(tr("Import existing scan"),
-                     QString::number(ExistingScanImport));
-        break;
-    case CardUtil::QAM:
-        addSelection(tr("Full Scan (Tuned)"),
-                     QString::number(NITAddScan_DVBC));
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
-        addSelection(tr("Import existing scan"),
-                     QString::number(ExistingScanImport));
-        break;
-    case CardUtil::ATSC:
-    case CardUtil::HDHOMERUN:
-        addSelection(tr("Full Scan"),
-                     QString::number(FullScan_ATSC), true);
-        addSelection(tr("Import channels.conf"),
-                     QString::number(DVBUtilsImport));
-        addSelection(tr("Import existing scan"),
-                     QString::number(ExistingScanImport));
-        //break;
-    //case CardUtil::HDHR-DVB:
-        addSelection(tr("Full Scan (DVB)"),
-                     QString::number(FullScan_DVBT), true);
-        addSelection(tr("Full Scan (DVB, tuned)"),
-                     QString::number(NITAddScan_DVBT));
-        break;
-    case CardUtil::FREEBOX:
-        addSelection(tr("M3U Import"),
-                     QString::number(IPTVImport), true);
-        return;
-    case CardUtil::ERROR_PROBE:
-        addSelection(QObject::tr("Failed to probe the card"),
-                     QString::number(Error_Probe), true);
-        return;
-    default:
-        addSelection(QObject::tr("Failed to open the card"),
-                     QString::number(Error_Open), true);
-        return;
+        case CardUtil::V4L:
+        case CardUtil::MPEG:
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_Analog), true);
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
+            return;
+        case CardUtil::DVBT:
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_DVBT), true);
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_DVBT));
+            addSelection(tr("Import channels.conf"),
+                         QString::number(DVBUtilsImport));
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
+            break;
+        case CardUtil::DVBS:
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_DVBS));
+            addSelection(tr("Import channels.conf"),
+                         QString::number(DVBUtilsImport));
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
+            break;
+        case CardUtil::QAM:
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_DVBC));
+            addSelection(tr("Import channels.conf"),
+                         QString::number(DVBUtilsImport));
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
+            break;
+        case CardUtil::ATSC:
+        case CardUtil::HDHOMERUN:
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_ATSC), true);
+            addSelection(tr("Import channels.conf"),
+                         QString::number(DVBUtilsImport));
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
+            //break;
+        //case CardUtil::HDHR_DVB:
+            addSelection(tr("Full Scan (DVB)"),
+                         QString::number(FullScan_DVBT), true);
+            addSelection(tr("Full Scan (DVB, tuned)"),
+                         QString::number(NITAddScan_DVBT));
+            break;
+        case CardUtil::FREEBOX:
+            addSelection(tr("M3U Import"),
+                         QString::number(IPTVImport), true);
+            return;
+        case CardUtil::ERROR_PROBE:
+            addSelection(QObject::tr("Failed to probe the card"),
+                         QString::number(Error_Probe), true);
+            return;
+        default:
+            addSelection(QObject::tr("Failed to open the card"),
+                         QString::number(Error_Open), true);
+            return;
     }
 
     addSelection(tr("Scan of all existing transports"),
@@ -209,9 +209,9 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     scanAllTransports->addChild(ignoreSignalTimeoutAll);
 
     addTarget(QString::number(ScanTypeSetting::Error_Open),
-             new PaneError(QObject::tr("Failed to open the card")));
+              new PaneError(QObject::tr("Failed to open the card")));
     addTarget(QString::number(ScanTypeSetting::Error_Probe),
-             new PaneError(QObject::tr("Failed to probe the card")));
+              new PaneError(QObject::tr("Failed to probe the card")));
     addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBC),
               paneDVBC);
     addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBS),
