@@ -1107,7 +1107,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     if (deint)
     {
         new_frame = UpdateReferenceFrames(frame);
-        if (referenceFrames.size() != NUM_REFERENCE_FRAMES)
+        if (vdpauDecode && (referenceFrames.size() != NUM_REFERENCE_FRAMES))
             deint = false;
     }
 
