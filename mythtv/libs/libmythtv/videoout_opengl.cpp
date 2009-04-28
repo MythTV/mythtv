@@ -333,7 +333,11 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     OpenGLContextLocker ctx_lock(gl_context);
 
     if (!buffer)
+    {
         buffer = vbuffers.GetScratchFrame();
+        if (m_deinterlacing)
+            t = kScan_Interlaced;
+    }
 
     gl_context_lock.lock();
     framesPlayed = buffer->frameNumber + 1;
