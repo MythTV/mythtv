@@ -29,6 +29,10 @@
 #include "videodev_myth.h"
 #endif
 
+#ifdef USING_HDHOMERUN
+#include "hdhomerun.h"
+#endif
+
 #define LOC      QString("CardUtil: ")
 #define LOC_WARN QString("CardUtil, Warning: ")
 #define LOC_ERR  QString("CardUtil, Error: ")
@@ -1956,4 +1960,96 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
         return devname.replace(devname.indexOf("frontend"), 8, "video");
 
     return "";
+}
+
+/**
+ * If the device is valid, check if the model does DVB.
+ *
+ * \todo Replace with a more general purpose routine - something that gets
+ *       /sys/features and searches that for particular modulation types. e.g.
+ *       bool CardUtil::DoesHDHRsupport(const QString     &device,
+ *                                      const QStringList &modTypes);
+ */
+
+bool CardUtil::HDHRdoesDVB(const QString &device)
+{
+#ifdef USING_HDHOMERUN
+    hdhomerun_device_t  *hdhr;
+    hdhr = hdhomerun_device_create_from_str(device.toAscii());
+    if (!hdhr)
+        return false;
+
+    const char *model = hdhomerun_device_get_model_str(hdhr);
+    if (model && strstr(model, "dvb"))
+        return true;
+#endif
+
+    return false;
+}
+
+/**
+ * Get a nicely formatted string describing the device
+ */
+
+QString CardUtil::GetHDHRdesc(const QString &device)
+{
+    QString connectErr = QObject::tr("Unable to connect to device.");
+
+#ifdef USING_HDHOMERUN
+    bool      deviceIsIP = false;
+    uint32_t  dev;
+
+    if (device.contains('.'))  // Simplistic check, but also allows DNS names
+        deviceIsIP = true;
+    else
+    {
+        bool validID;
+
+        dev = device.toUInt(&validID, 16);
+        if (!validID || !hdhomerun_discover_validate_device_id(dev))
+            return QObject::tr("Invalid Device ID");
+    }
+
+
+    VERBOSE(VB_GENERAL, "CardUtil::GetHDHRdescription("
+                        + device + ") - trying to locate device");
+
+    hdhomerun_device_t  *hdhr;
+    hdhr = hdhomerun_device_create_from_str(device.toAscii());
+    if (!hdhr)
+        return QObject::tr("Invalid Device ID or address.");
+
+    const char *model = hdhomerun_device_get_model_str(hdhr);
+    if (!model)
+        return connectErr;
+
+
+    QString   description = QObject::tr("Model: %1").arg(model);
+    char     *sVersion;
+    uint32_t  iVersion;
+
+    if (hdhomerun_device_get_version(hdhr, &sVersion, &iVersion))
+        description += QObject::tr(", Firmware: %2").arg(sVersion);
+
+    // If device is an IP address, add deviceID:
+    if (deviceIsIP)
+    {
+        dev = hdhomerun_device_get_device_id(hdhr);
+
+        QString hex = QString::number(dev, 16).toUpper();
+
+        description += QObject::tr(", ID %1").arg(hex);
+    }
+    else
+    {
+        dev = hdhomerun_device_get_device_ip(hdhr);
+        description += QObject::tr(", at address %1.%2.%3.%4")
+                       .arg((dev>>24) & 0xFF).arg((dev>>16) & 0xFF)
+                       .arg((dev>> 8) & 0xFF).arg((dev>> 0) & 0xFF);
+    }
+
+    return description;
+#endif
+
+    return connectErr;
 }

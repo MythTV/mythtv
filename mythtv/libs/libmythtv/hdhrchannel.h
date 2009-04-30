@@ -1,6 +1,6 @@
 /** -*- Mode: c++ -*-
- *  Dbox2Channel
- *  Copyright (c) 2006 by Silicondust Engineering Ltd.
+ *  HDHRChannel
+ *  Copyright (c) 2006-2009 by Silicondust Engineering Ltd.
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -52,7 +52,7 @@ class HDHRChannel : public DTVChannel
     bool DelAllPIDs(void);
     bool UpdateFilters(void);
 
-    // ATSC scanning stuff
+    // ATSC/DVB scanning stuff
     bool TuneMultiplex(uint mplexid, QString inputname);
     bool Tune(const DTVMultiplex &tuning, QString inputname);
 

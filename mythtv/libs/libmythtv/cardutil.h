@@ -266,6 +266,10 @@ class MPUBLIC CardUtil
     static InputNames   ProbeV4LVideoInputs(int videofd, bool &ok);
     static InputNames   ProbeV4LAudioInputs(int videofd, bool &ok);
 
+    // HDHomeRun info
+    static bool         HDHRdoesDVB(const QString &device);
+    static QString      GetHDHRdesc(const QString &device);
+
   private:
     static QStringList  ProbeV4LVideoInputs(QString device);
     static QStringList  ProbeV4LAudioInputs(QString device);

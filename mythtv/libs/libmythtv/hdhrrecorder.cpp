@@ -1,6 +1,6 @@
 /** -*- Mode: c++ -*-
  *  HDHRRecorder
- *  Copyright (c) 2006 by Silicondust Engineering Ltd, and
+ *  Copyright (c) 2006-2009 by Silicondust Engineering Ltd, and
  *    Daniel Thor Kristjansson
  *  Distributed as part of MythTV under GPL v2 and later.
  */

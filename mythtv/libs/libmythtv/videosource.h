@@ -442,12 +442,27 @@ public:
     static void fillSelections(SelectSetting* setting);
 };
 
-class V4LConfigurationGroup : public VerticalConfigurationGroup
+class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
 {
-   Q_OBJECT
+    Q_OBJECT
 
   public:
-     V4LConfigurationGroup(CaptureCard &parent);
+    HDHomeRunConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void probeCard(const QString &device);
+
+  private:
+    CaptureCard       &parent;
+    TransLabelSetting *desc;
+};
+
+class V4LConfigurationGroup : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+
+  public:
+    V4LConfigurationGroup(CaptureCard &parent);
 
   public slots:
     void probeCard(const QString &device);

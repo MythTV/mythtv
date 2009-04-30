@@ -1465,24 +1465,36 @@ class HDHomeRunTunerIndex : public ComboBoxSetting, public CaptureCardDBStorage
     }
 };
 
-class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
+HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
+        (CaptureCard& a_parent) :
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent)
 {
-  public:
-    HDHomeRunConfigurationGroup(CaptureCard& a_parent) :
-        VerticalConfigurationGroup(false, true, false, false),
-        parent(a_parent)
-    {
-        setUseLabel(false);
-        addChild(new HDHomeRunDeviceID(parent));
-        addChild(new HDHomeRunTunerIndex(parent));
-        addChild(new SignalTimeout(parent, 1000, 250));
-        addChild(new ChannelTimeout(parent, 3000, 1750));
-        addChild(new SingleCardInput(parent));
-    };
+    HDHomeRunDeviceID *device = new HDHomeRunDeviceID(parent);
 
-  private:
-    CaptureCard &parent;
+    desc = new TransLabelSetting();
+
+    setUseLabel(false);
+    addChild(device);
+    addChild(desc);
+    addChild(new HDHomeRunTunerIndex(parent));
+    addChild(new SignalTimeout(parent, 1000, 250));
+    addChild(new ChannelTimeout(parent, 3000, 1750));
+    addChild(new SingleCardInput(parent));
+
+
+    // Wish we could use something like editingFinished() here...
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
 };
+
+void HDHomeRunConfigurationGroup::probeCard(const QString &device)
+{
+    if (device.contains('.') || device.contains(QRegExp("^[0-9a-fA-F]{8}$")))
+        desc->setValue(CardUtil::GetHDHRdesc(device));
+    else
+        desc->setValue(tr("Badly formatted Device ID"));
+}
 
 V4LConfigurationGroup::V4LConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
