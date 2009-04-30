@@ -149,19 +149,28 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
                          QString::number(ExistingScanImport));
             break;
         case CardUtil::ATSC:
-        case CardUtil::HDHOMERUN:
             addSelection(tr("Full Scan"),
                          QString::number(FullScan_ATSC), true);
             addSelection(tr("Import channels.conf"),
                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
-            //break;
-        //case CardUtil::HDHR_DVB:
-            addSelection(tr("Full Scan (DVB)"),
-                         QString::number(FullScan_DVBT), true);
-            addSelection(tr("Full Scan (DVB, tuned)"),
-                         QString::number(NITAddScan_DVBT));
+            break;
+        case CardUtil::HDHOMERUN:
+            if (CardUtil::HDHRdoesDVB(CardUtil::GetVideoDevice(cardid)))
+            {
+                addSelection(tr("Full Scan"),
+                             QString::number(FullScan_DVBT), true);
+                addSelection(tr("Full Scan (Tuned)"),
+                             QString::number(NITAddScan_DVBT));
+            }
+            else
+                addSelection(tr("Full Scan"),
+                             QString::number(FullScan_ATSC), true);
+            addSelection(tr("Import channels.conf"),
+                         QString::number(DVBUtilsImport));
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
             break;
         case CardUtil::FREEBOX:
             addSelection(tr("M3U Import"),
