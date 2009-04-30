@@ -1973,6 +1973,8 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 
 bool CardUtil::HDHRdoesDVB(const QString &device)
 {
+    (void) device;
+
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t  *hdhr;
     hdhr = hdhomerun_device_create_from_str(device.toAscii());
@@ -1994,6 +1996,7 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
 QString CardUtil::GetHDHRdesc(const QString &device)
 {
     QString connectErr = QObject::tr("Unable to connect to device.");
+    (void) device;
 
 #ifdef USING_HDHOMERUN
     bool      deviceIsIP = false;

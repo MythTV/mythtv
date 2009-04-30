@@ -52,7 +52,7 @@ class HDHRChannel : public DTVChannel
     bool DelAllPIDs(void);
     bool UpdateFilters(void);
 
-    // ATSC/DVB scanning stuff
+    // ATSC/DVB scanning/tuning stuff
     bool TuneMultiplex(uint mplexid, QString inputname);
     bool Tune(const DTVMultiplex &tuning, QString inputname);
 
