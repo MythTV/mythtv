@@ -137,6 +137,17 @@ bool BackendSelect::Connect(DeviceLocation *dev)
             VERBOSE(VB_UPNP, error);
             MythPopupBox::showOkPopup(m_parent, "",
                                       tr(message.toLatin1().constData()));
+            if (MythPopupBox::showOkCancelPopup(m_parent, "",
+                    tr("Shall I attempt to connect to this"
+                       " host with default database parameters?"), false))
+            {
+                QString  URL = dev->m_sLocation;
+
+                URL.remove("http://");
+                URL.remove(QRegExp("[:/].*"));
+                m_DBparams->dbHostName = URL;
+                return true;
+            }
             break;
 
         case UPnPResult_ActionNotAuthorized:
