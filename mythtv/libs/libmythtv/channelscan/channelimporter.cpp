@@ -33,11 +33,15 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
         {
             MythPopupBox::showOkPopup(
                 gContext->GetMainWindow(), QObject::tr("Channel Importer"),
-                QObject::tr("Failed to find any channels"));
+                ChannelUtil::GetChannelCount()
+                ? QObject::tr("Failed to find any new channels!")
+                : QObject::tr("Failed to find any channels."));
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC + "No channels to process..");
+            VERBOSE(VB_IMPORTANT, LOC + (ChannelUtil::GetChannelCount()
+                                         ? "No new channels to process"
+                                         : "No channels to process.."));
         }
 
         return;

@@ -1729,6 +1729,25 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     return lt_callsign(a,b);
 }
 
+uint ChannelUtil::GetChannelCount(int sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString   select;
+
+
+    select = "SELECT chanid FROM channel";
+    if (sourceid >= 0)
+        select += " WHERE sourceid=" + QString::number(sourceid);
+    select += ';';
+
+    query.prepare(select);
+
+    if (!query.exec() || !query.isActive())
+        return 0;
+
+    return query.size();
+}
+
 void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
                                bool eliminate_duplicates)
 {
