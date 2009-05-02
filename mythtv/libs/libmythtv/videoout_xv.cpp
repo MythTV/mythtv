@@ -408,7 +408,8 @@ void VideoOutputXv::ResizeForVideo(uint width, uint height)
         if (fullscreen)
         {
             QSize sz(display_res->GetWidth(), display_res->GetHeight());
-            const QRect display_visible_rect = QRect(QPoint(0,0), sz);
+            const QRect display_visible_rect = 
+                    QRect(gContext->GetMainWindow()->geometry().topLeft(), sz);
             windows[0].SetDisplayVisibleRect(display_visible_rect);
 
             // Resize X window to fill new resolution
@@ -433,7 +434,9 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
         // The very first Resize needs to be the maximum possible
         // desired res, because X will mask off anything outside
         // the initial dimensions
-        X11S(XMoveResizeWindow(XJ_disp, XJ_win, 0, 0,
+        X11S(XMoveResizeWindow(XJ_disp, XJ_win, 
+                               gContext->GetMainWindow()->geometry().x(), 
+                               gContext->GetMainWindow()->geometry().y(),
                                display_res->GetMaxWidth(),
                                display_res->GetMaxHeight()));
         ResizeForVideo(width, height);
@@ -448,7 +451,10 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
             availableGeometry(gContext->GetMainWindow()).size();
         int max_w = max(sz1.width(),  sz2.width());
         int max_h = max(sz1.height(), sz2.height());
-        X11S(XMoveResizeWindow(XJ_disp, XJ_win, 0, 0, max_w, max_h));
+        X11S(XMoveResizeWindow(XJ_disp, XJ_win, 
+                               gContext->GetMainWindow()->geometry().x(), 
+                               gContext->GetMainWindow()->geometry().y(), 
+                               max_w, max_h));
 
         if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
         {
