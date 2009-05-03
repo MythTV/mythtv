@@ -132,7 +132,7 @@ void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
         if (!url.startsWith("http://") && !url.startsWith("https://") &&
                 !url.startsWith("file:/") )
             newUrl.prepend("http://");
-        page->getBrowser()->LoadPage(newUrl);
+        page->getBrowser()->LoadPage(QUrl::fromEncoded(newUrl.toLocal8Bit()));
     }
 
     page->SetActive(false);
@@ -193,7 +193,7 @@ void MythBrowser::slotOpenURL(const QString &url)
             !sUrl.startsWith("file:/") )
         sUrl.prepend("http://");
 
-    activeBrowser()->LoadPage(QUrl(sUrl));
+    activeBrowser()->LoadPage(QUrl::fromEncoded(sUrl.toLocal8Bit()));
 }
 
 void MythBrowser::slotZoomOut()
