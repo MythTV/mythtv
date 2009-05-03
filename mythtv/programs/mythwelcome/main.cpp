@@ -20,6 +20,7 @@
 #include "mythuihelper.h"
 #include "lcddevice.h"
 #include "myththemebase.h"
+#include "mythcommandlineparser.h"
 
 #include "libmythtv/tv.h"
 
@@ -41,27 +42,54 @@ void initKeys(void)
     REG_KEY("Welcome", "STARTSETUP", "Start Mythtv-Setup", "");
 }
 
+void showUsage(const MythCommandLineParser &cmdlineparser)
+{
+    QString    help  = cmdlineparser.GetHelpString(false);
+    QByteArray ahelp = help.toLocal8Bit();
+    
+    QString binname = "mythwelcome";
+
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                            .arg(binname)
+                            .arg(myth_source_path)
+                            .arg(myth_source_version));
+    
+    cerr << "Valid options are: " << endl <<
+            "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
+            "-s or --setup                  Run setup for the mythshutdown program" << endl <<
+            "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+            ahelp.constData() <<
+            endl;
+    
+}
+
 int main(int argc, char **argv)
 {
     bool bShowSettings = false;
 
+    bool cmdline_err;
+    
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettingsFile |
+        kCLPOverrideSettings     |
+        kCLPQueryVersion);
+
+    for (int argpos = 0; argpos < argc; ++argpos)
+    {
+        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return BACKEND_EXIT_INVALID_CMDLINE;
+
+            if (cmdline.WantsToExit())
+                return BACKEND_EXIT_OK;
+        }
+    }
+    
     QApplication a(argc, argv);
-
-    gContext = NULL;
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init())
-    {
-        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not initialize myth context. "
-                        "Exiting.");
-        return FRONTEND_EXIT_NO_MYTHCONTEXT;
-    }
-
-    if (!MSqlQuery::testDBConnection())
-    {
-        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not open the database. "
-                        "Exiting.");
-        return -1;
-    }
 
     // Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -110,15 +138,35 @@ int main(int argc, char **argv)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return BACKEND_EXIT_INVALID_CMDLINE;
+
+            if (cmdline.WantsToExit())
+                return BACKEND_EXIT_OK;
+        }
         else
         {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
-                    "Valid options are: " << endl <<
-                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-                    "-s or --setup                  Run setup for the mythshutdown program" << endl <<
-                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl;
+            showUsage(cmdline);
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
+    }
+
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    if (!gContext->Init())
+    {
+        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not initialize myth context. "
+                        "Exiting.");
+        return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (!MSqlQuery::testDBConnection())
+    {
+        VERBOSE(VB_IMPORTANT, "mythwelcome: Could not open the database. "
+                        "Exiting.");
+        return -1;
     }
 
     if (logfile != "")

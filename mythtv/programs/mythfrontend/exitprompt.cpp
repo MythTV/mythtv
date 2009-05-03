@@ -7,6 +7,7 @@
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
+#include "mythsystem.h"
 
 void ExitPrompter::quit()
 {
@@ -19,8 +20,7 @@ void ExitPrompter::halt()
                                             "sudo /sbin/halt -p");
     if (!halt_cmd.isEmpty())
     {
-        QByteArray tmp = halt_cmd.toAscii();
-        system(tmp.constData());
+        myth_system(halt_cmd);
     }
     else
         VERBOSE(VB_IMPORTANT, "Cannot halt - null command!");
@@ -32,8 +32,7 @@ void ExitPrompter::reboot()
                                               "sudo /sbin/reboot");
     if (!reboot_cmd.isEmpty())
     {
-        QByteArray tmp = reboot_cmd.toAscii();
-        system(tmp.constData());
+        myth_system(reboot_cmd);
     }
     else
         VERBOSE(VB_IMPORTANT, "Cannot reboot - null command!");

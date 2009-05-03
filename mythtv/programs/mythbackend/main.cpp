@@ -431,6 +431,38 @@ namespace
     };
 }
 
+void showUsage(const MythCommandLineParser &cmdlineparser)
+{
+    QString    help  = cmdlineparser.GetHelpString(false);
+    QByteArray ahelp = help.toLocal8Bit();
+
+    cerr << "Valid options are: " << endl <<
+    "-h or --help                   List valid command line parameters" << endl <<
+    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+    "-p or --pidfile filename       Write PID of mythbackend to filename" << endl <<
+    "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
+    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
+    "--printexpire                  List of auto-expire programs" << endl <<
+    "--printsched                   Upcoming scheduled programs" << endl <<
+    "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<
+    "--resched                      Force the scheduler to update" << endl <<
+    "--nosched                      Do not perform any scheduling" << endl <<
+    "--noupnp                       Do not enable the UPNP server" << endl <<
+    "--nojobqueue                   Do not start the JobQueue" << endl <<
+    "--nohousekeeper                Do not start the Housekeeper" << endl <<
+    "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
+    "--clearcache                   Clear the settings cache on all myth servers" << endl <<
+    ahelp.constData() <<
+    "--generate-preview             Generate a preview image" << endl <<
+    "--upnprebuild                  Force an update of UPNP media" << endl <<
+    "--infile                       Input file for preview generation" << endl <<
+    "--outfile                      Optional output file for preview generation" << endl <<
+    "--chanid                       Channel ID for preview generation" << endl <<
+    "--starttime                    Recording start time for preview generation" << endl
+    << endl;
+
+}
+
 int main(int argc, char **argv)
 {
     bool cmdline_err;
@@ -485,6 +517,14 @@ int main(int argc, char **argv)
     QString printexpire = "";
     bool clearsettingscache = false;
     bool wantupnprebuild = false;
+    
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                            .arg(binname)
+                            .arg(myth_source_path)
+                            .arg(myth_source_version));
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -682,35 +722,10 @@ int main(int argc, char **argv)
         }
         else
         {
-            QString    help  = cmdline.GetHelpString(false);
-            QByteArray ahelp = help.toLocal8Bit();
             if (!(!strcmp(a.argv()[argpos],"-h") ||
                 !strcmp(a.argv()[argpos],"--help")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            cerr << "Valid options are: " << endl <<
-                    "-h or --help                   List valid command line parameters" << endl <<
-                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-p or --pidfile filename       Write PID of mythbackend " <<
-                                                    "to filename" << endl <<
-                    "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
-                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-                    "--printexpire                  List of auto-expire programs" << endl <<
-                    "--printsched                   Upcoming scheduled programs" << endl <<
-                    "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<
-                    "--resched                      Force the scheduler to update" << endl <<
-                    "--nosched                      Do not perform any scheduling" << endl <<
-                    "--noupnp                       Do not enable the UPNP server" << endl <<
-                    "--nojobqueue                   Do not start the JobQueue" << endl <<
-                    "--nohousekeeper                Do not start the Housekeeper" << endl <<
-                    "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
-                    "--clearcache                   Clear the settings cache on all myth servers" << endl <<
-                ahelp.constData() <<
-                    "--generate-preview             Generate a preview image" << endl <<
-                    "--upnprebuild                  Force an update of UPNP media" << endl <<
-                    "--infile                       Input file for preview generation" << endl <<
-                    "--outfile                      Optional output file for preview generation" << endl <<
-                    "--chanid                       Channel ID for preview generation" << endl <<
-                    "--starttime                    Recording start time for preview generation" << endl;
+                showUsage(cmdline);
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
     }
@@ -764,14 +779,6 @@ int main(int argc, char **argv)
         pidfs << getpid() << endl;
         pidfs.close();
     }
-
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))

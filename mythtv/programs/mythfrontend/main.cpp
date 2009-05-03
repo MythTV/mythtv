@@ -979,7 +979,7 @@ void CleanupMyOldInUsePrograms(void)
     query.exec();
 }
 
-void PrintHelp(const MythCommandLineParser &cmdlineparser)
+void ShowUsage(const MythCommandLineParser &cmdlineparser)
 {
     QString    help  = cmdlineparser.GetHelpString(false);
     QByteArray ahelp = help.toLocal8Bit();
@@ -1098,7 +1098,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage"))
         {
-            PrintHelp(cmdline);
+            ShowUsage(cmdline);
             return FRONTEND_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"--prompt") ||
@@ -1252,7 +1252,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            PrintHelp(cmdline);
+            ShowUsage(cmdline);
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
