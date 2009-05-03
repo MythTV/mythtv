@@ -109,6 +109,25 @@ void SetupMenu(MythMainWindow *win)
     }
 }
 
+static void print_usage()
+{
+        cerr << "Valid options are: "<<endl
+#ifdef USING_X11
+             << "-display X-server              "
+            "Create GUI on X-server, not localhost" << endl
+#endif
+             << "-geometry or --geometry WxH    "
+                "Override window size settings" << endl
+             << "-geometry WxH+X+Y              "
+                "Override window size and position" << endl
+             << "-O or " << endl
+             << "  --override-setting KEY=VALUE "
+                "Force the setting named 'KEY' to value 'VALUE'" << endl
+             << "-v or --verbose debug-level    "
+                "Use '-v help' for level info" << endl
+             << endl;
+}
+
 int main(int argc, char *argv[])
 {
     QString geometry = QString::null;
@@ -123,15 +142,23 @@ int main(int argc, char *argv[])
     QString scanInputName = "";
     bool    use_display = true;
 
+    for(int argpos = 1; argpos < argc; ++argpos)
+    {
+        if (!strcmp(argv[argpos], "-h") ||
+            !strcmp(argv[argpos], "--help") ||
+            !strcmp(argv[argpos], "--usage"))
+        {
+            print_usage();
+            return GENERIC_EXIT_OK;
+        }
 #ifdef USING_X11
     // Remember any -display or -geometry argument
     // which QApplication init will remove.
-    for(int argpos = 1; argpos + 1 < argc; ++argpos)
-    {
-        if (!strcmp(argv[argpos],"-geometry"))
+        else if (argpos+1 < argc && !strcmp(argv[argpos],"-geometry"))
             geometry = argv[argpos+1];
-        else if (!strcmp(argv[argpos],"-display"))
+        else if (argpos+1 < argc && !strcmp(argv[argpos],"-display"))
             display = argv[argpos+1];
+#endif
         else if (QString(argv[argpos]).left(6) == "--scan")
         {
             use_display = false;
@@ -139,7 +166,6 @@ int main(int argc, char *argv[])
             verboseString = "";
         }
     }
-#endif
 
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
@@ -291,26 +317,8 @@ int main(int argc, char *argv[])
         }
         else
         {
-            if (!(!strcmp(a.argv()[argpos],"-h") ||
-                !strcmp(a.argv()[argpos],"--help") ||
-                !strcmp(a.argv()[argpos],"--usage")))
-                cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-
-            cerr << "Valid options are: "<<endl
-#ifdef USING_X11
-                 << "-display X-server              "
-                    "Create GUI on X-server, not localhost" << endl
-#endif
-                 << "-geometry or --geometry WxH    "
-                    "Override window size settings" << endl
-                 << "-geometry WxH+X+Y              "
-                    "Override window size and position" << endl
-                 << "-O or " << endl
-                 << "  --override-setting KEY=VALUE "
-                    "Force the setting named 'KEY' to value 'VALUE'" << endl
-                 << "-v or --verbose debug-level    "
-                    "Use '-v help' for level info" << endl
-                 << endl;
+            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            print_usage();
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
     }
