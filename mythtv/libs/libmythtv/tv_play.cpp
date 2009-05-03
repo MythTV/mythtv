@@ -7709,7 +7709,6 @@ void TV::DoEditSchedule(int editType)
     }
 
     // Actually show the pop-up UI
-    DBChanList changeChannel;
     ProgramInfo *nextProgram = NULL;
     switch (editType)
     {
@@ -7769,9 +7768,6 @@ void TV::DoEditSchedule(int editType)
         actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         StopEmbedding(actx);               // Undo any embedding
         DoSetPauseState(actx, saved_pause); // Restore pause states
-        // If user selected a new channel in the EPG, change to that channel
-        if (isLiveTV && changeChannel.size())
-            ChangeChannel(actx, changeChannel);
         ReturnPlayerLock(actx);
 
         // Handle RunPlaybackBoxPtr return value..
