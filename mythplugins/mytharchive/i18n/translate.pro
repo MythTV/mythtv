@@ -1,11 +1,15 @@
 SOURCES += ../mytharchive/archivesettings.cpp
+SOURCES += ../mytharchive/archiveutil.cpp
 SOURCES += ../mytharchive/editmetadata.cpp
-SOURCES += ../mytharchive/exportnativewizard.cpp
+SOURCES += ../mytharchive/exportnative.cpp
 SOURCES += ../mytharchive/fileselector.cpp
 SOURCES += ../mytharchive/importnativewizard.cpp
 SOURCES += ../mytharchive/logviewer.cpp
+SOURCES += ../mytharchive/main.cpp
 SOURCES += ../mytharchive/mythburnwizard.cpp
 SOURCES += ../mytharchive/recordingselector.cpp
+SOURCES += ../mytharchive/selectdestination.cpp
+SOURCES += ../mytharchive/thumbfinder.cpp
 SOURCES += ../mytharchive/videoselector.cpp
 
 TRANSLATIONS  = mytharchive_de.ts mytharchive_sl.ts mytharchive_fr.ts

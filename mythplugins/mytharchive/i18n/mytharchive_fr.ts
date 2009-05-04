@@ -1,40 +1,81 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Save</source>
-        <translation>Enregistrer</translation>
+        <translation type="obsolete">Enregistrer</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+</context>
+<context>
+    <name>ExportNative</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished">Terminer</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Précédent</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished">Ajouter un enregistrement</translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished">Ajouter une vidéo</translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished">Vous devez sélectionner au moins un fichier à archiver!</translation>
+    </message>
+    <message>
+        <source>Remove Item</source>
+        <translation type="unfinished">Enlever l&apos;élément</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation type="unfinished">Vous n&apos;avez aucune vidéo!</translation>
     </message>
 </context>
 <context>
     <name>ExportNativeWizard</name>
     <message>
         <source>0 Mb</source>
-        <translation>0 Mo</translation>
+        <translation type="obsolete">0 Mo</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>Suivant</translation>
+        <translation type="obsolete">Suivant</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Précédent</translation>
+        <translation type="obsolete">Précédent</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="obsolete">Annuler</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation>Sélectionnez un fichier...</translation>
+        <translation type="obsolete">Sélectionnez un fichier...</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Archive</translation>
+        <translation type="obsolete">Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
@@ -42,7 +83,7 @@
     </message>
     <message>
         <source>Finish</source>
-        <translation>Terminer</translation>
+        <translation type="obsolete">Terminer</translation>
     </message>
     <message>
         <source>All Archive Items</source>
@@ -62,19 +103,19 @@ Cliquer OK</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation>Enlever l&apos;élément</translation>
+        <translation type="obsolete">Enlever l&apos;élément</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation>Ajouter un enregistrement</translation>
+        <translation type="obsolete">Ajouter un enregistrement</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation>Ajouter une vidéo</translation>
+        <translation type="obsolete">Ajouter une vidéo</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation>Vous devez sélectionner au moins un fichier à archiver!</translation>
+        <translation type="obsolete">Vous devez sélectionner au moins un fichier à archiver!</translation>
     </message>
 </context>
 <context>
@@ -97,7 +138,7 @@ Cliquer OK</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Archive</translation>
+        <translation type="obsolete">Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
@@ -107,71 +148,83 @@ Cliquer OK</translation>
         <source>The selected item is not a directory!</source>
         <translation>L&apos;élément sélectionné n&apos;est pas un répertoire!</translation>
     </message>
+    <message>
+        <source>Find File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Files</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ImportNativeWizard</name>
     <message>
         <source>Back</source>
-        <translation>Reculer</translation>
+        <translation type="obsolete">Reculer</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation>Début</translation>
+        <translation type="obsolete">Début</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>Suivant</translation>
+        <translation type="obsolete">Suivant</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Précédent</translation>
+        <translation type="obsolete">Précédent</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="obsolete">Annuler</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Archive</translation>
+        <translation type="obsolete">Myth Archive</translation>
     </message>
     <message>
         <source>You need to select a valid archive XML file!</source>
-        <translation>Vous devez sélectionner un fichier archive XML valide!</translation>
+        <translation type="obsolete">Vous devez sélectionner un fichier archive XML valide!</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation>Vous devez sélectionner un chanID valide!</translation>
+        <translation type="obsolete">Vous devez sélectionner un chanID valide!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation>Terminer</translation>
+        <translation type="obsolete">Terminer</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation>Sélectionner un ChanID</translation>
+        <translation type="obsolete">Sélectionner un ChanID</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation>Sélectionner un ChanNo</translation>
+        <translation type="obsolete">Sélectionner un ChanNo</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation>Sélectionner un nom de chaîne</translation>
+        <translation type="obsolete">Sélectionner un nom de chaîne</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation>Sélectionner un indicatif</translation>
+        <translation type="obsolete">Sélectionner un indicatif</translation>
     </message>
 </context>
 <context>
     <name>LogViewer</name>
     <message>
         <source>Log Viewer</source>
-        <translation>Visionneur de journaux</translation>
+        <translation type="obsolete">Visionneur de journaux</translation>
     </message>
     <message>
         <source>Seconds</source>
-        <translation>Secondes</translation>
+        <translation type="obsolete">Secondes</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -187,11 +240,11 @@ Cliquer OK</translation>
     </message>
     <message>
         <source>Increase Font Size</source>
-        <translation>Augmenter la taille de police</translation>
+        <translation type="obsolete">Augmenter la taille de police</translation>
     </message>
     <message>
         <source>Decrease Font Size</source>
-        <translation>Diminuer la taille de police</translation>
+        <translation type="obsolete">Diminuer la taille de police</translation>
     </message>
     <message>
         <source>Show Progress Log</source>
@@ -201,24 +254,32 @@ Cliquer OK</translation>
         <source>Show Full Log</source>
         <translation>Afficher le journal complet</translation>
     </message>
+    <message>
+        <source>Don&apos;t Auto Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Update</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythburnWizard</name>
     <message>
         <source>Next</source>
-        <translation>Suivant</translation>
+        <translation type="obsolete">Suivant</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Précédent</translation>
+        <translation type="obsolete">Précédent</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuler</translation>
+        <translation type="obsolete">Annuler</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Archive</translation>
+        <translation type="obsolete">Myth Archive</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
@@ -226,7 +287,7 @@ Cliquer OK</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation>Terminer</translation>
+        <translation type="obsolete">Terminer</translation>
     </message>
     <message>
         <source>All Archive Items</source>
@@ -246,43 +307,43 @@ Cliquez OK</translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation>Editer les détails</translation>
+        <translation type="obsolete">Editer les détails</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation>Enlever l&apos;élément</translation>
+        <translation type="obsolete">Enlever l&apos;élément</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation>Sélectionnez un fichier...</translation>
+        <translation type="obsolete">Sélectionnez un fichier...</translation>
     </message>
     <message>
         <source>Don&apos;t re-encode</source>
-        <translation>Ne pas réencoder</translation>
+        <translation type="obsolete">Ne pas réencoder</translation>
     </message>
     <message>
         <source>New Size </source>
-        <translation>Nouvelle taille </translation>
+        <translation type="obsolete">Nouvelle taille </translation>
     </message>
     <message>
         <source>Original Size </source>
-        <translation>Taille originale</translation>
+        <translation type="obsolete">Taille originale</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation>Ajouter un enregistrement</translation>
+        <translation type="obsolete">Ajouter un enregistrement</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation>Ajouter une vidéo</translation>
+        <translation type="obsolete">Ajouter une vidéo</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation>Ajouter un fichier</translation>
+        <translation type="obsolete">Ajouter un fichier</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation>Vous devez sélectionner au moins un fichier à archiver!</translation>
+        <translation type="obsolete">Vous devez sélectionner au moins un fichier à archiver!</translation>
     </message>
 </context>
 <context>
@@ -401,7 +462,7 @@ Cliquez OK</translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Burn</translation>
+        <translation type="obsolete">Myth Burn</translation>
     </message>
     <message>
         <source>Background creation has been asked to stop.
@@ -411,11 +472,11 @@ Cette opération peut prendre quelques minutes.</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Archive</translation>
+        <translation type="obsolete">Myth Archive</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation>Il est impossible de créer le DVD. Une erreur est survenue pendant l&apos;exécution des scripts</translation>
+        <translation type="obsolete">Il est impossible de créer le DVD. Une erreur est survenue pendant l&apos;exécution des scripts</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
@@ -475,7 +536,7 @@ Cette opération peut prendre quelques minutes.</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation>Il est impossible d&apos;importer l&apos;archive. Une erreur est survenue au cours de l&apos;exécution de &apos;mytharchivehelper&apos;</translation>
+        <translation type="obsolete">Il est impossible d&apos;importer l&apos;archive. Une erreur est survenue au cours de l&apos;exécution de &apos;mytharchivehelper&apos;</translation>
     </message>
     <message>
         <source>Date format</source>
@@ -535,11 +596,11 @@ Cette opération peut prendre quelques minutes.</translation>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation>Sélecteur de vidéo</translation>
+        <translation type="obsolete">Sélecteur de vidéo</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation>Vous n&apos;avez aucune vidéo!</translation>
+        <translation type="obsolete">Vous n&apos;avez aucune vidéo!</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
@@ -575,6 +636,36 @@ Cette opération peut prendre quelques minutes.</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot find the MythArchive work directory.
+Have you set the correct path in the settings?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>It was not possible to create the DVD. An error occured when running the scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot find any logs to show!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found a lock file but the owning process isn&apos;t running!
+Removing stale lock file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last run did not create a playable DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last run failed to create a DVD.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -618,15 +709,61 @@ Cliquer OK</translation>
     </message>
     <message>
         <source>MythArchive</source>
-        <translation>MythArchive</translation>
+        <translation type="obsolete">MythArchive</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!
 
 Click OK</source>
-        <translation>Vous n&apos;avez aucun enregistrement ou aucun enregistrement n&apos;est disponible localement.
+        <translation type="obsolete">Vous n&apos;avez aucun enregistrement ou aucun enregistrement n&apos;est disponible localement.
 
 Cliquer OK</translation>
+    </message>
+    <message>
+        <source>Retrieving Recording List. Please Wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SelectDestination</name>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Suivant</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Précédent</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Find...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThumbFinder</name>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Enregistrer</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Exit, Save Thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit, Don&apos;t Save Thumbnails</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -661,13 +798,13 @@ Cliquer OK</translation>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation>Sélecteur de vidéo</translation>
+        <translation type="obsolete">Sélecteur de vidéo</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!
 
 Click OK</source>
-        <translation>Vous n&apos;avez aucune vidéo ! 
+        <translation type="obsolete">Vous n&apos;avez aucune vidéo ! 
 
 Cliquer OK</translation>
     </message>

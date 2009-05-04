@@ -1,40 +1,81 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Save</source>
-        <translation>Shrani</translation>
+        <translation type="obsolete">Shrani</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Vredu</translation>
+    </message>
+</context>
+<context>
+    <name>ExportNative</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished">Konec</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Nazaj</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Item</source>
+        <translation type="unfinished">Odstrani datoteko</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ExportNativeWizard</name>
     <message>
         <source>0 Mb</source>
-        <translation>0 Mb</translation>
+        <translation type="obsolete">0 Mb</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>Naprej</translation>
+        <translation type="obsolete">Naprej</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Nazaj</translation>
+        <translation type="obsolete">Nazaj</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Prekliči</translation>
+        <translation type="obsolete">Prekliči</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation>Izberi datoteko...</translation>
+        <translation type="obsolete">Izberi datoteko...</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arhiv</translation>
+        <translation type="obsolete">Myth Arhiv</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
@@ -42,7 +83,7 @@
     </message>
     <message>
         <source>Finish</source>
-        <translation>Konec</translation>
+        <translation type="obsolete">Konec</translation>
     </message>
     <message>
         <source>All Archive Items</source>
@@ -62,19 +103,7 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation>Odstrani datoteko</translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Odstrani datoteko</translation>
     </message>
 </context>
 <context>
@@ -97,7 +126,7 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arhiv</translation>
+        <translation type="obsolete">Myth Arhiv</translation>
     </message>
     <message>
         <source>You need to select at least one file!</source>
@@ -107,71 +136,83 @@ Kliknite Vredu </translation>
         <source>The selected item is not a directory!</source>
         <translation>Izbrano ni mapa!</translation>
     </message>
+    <message>
+        <source>Find File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Files</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ImportNativeWizard</name>
     <message>
         <source>Back</source>
-        <translation>Nazaj</translation>
+        <translation type="obsolete">Nazaj</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation>Domov</translation>
+        <translation type="obsolete">Domov</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation>Naprej</translation>
+        <translation type="obsolete">Naprej</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Nazaj</translation>
+        <translation type="obsolete">Nazaj</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Prekliči</translation>
+        <translation type="obsolete">Prekliči</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arhiv</translation>
+        <translation type="obsolete">Myth Arhiv</translation>
     </message>
     <message>
         <source>You need to select a valid archive XML file!</source>
-        <translation>Izbrati morate veljavno arhivsko XML datoteko!</translation>
+        <translation type="obsolete">Izbrati morate veljavno arhivsko XML datoteko!</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation>Izbrati morate veljaven ID kanala!</translation>
+        <translation type="obsolete">Izbrati morate veljaven ID kanala!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation>Konec</translation>
+        <translation type="obsolete">Konec</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation>Izberi ID kanala</translation>
+        <translation type="obsolete">Izberi ID kanala</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation>Izberi številko kanala</translation>
+        <translation type="obsolete">Izberi številko kanala</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation>Izberi ime kanala</translation>
+        <translation type="obsolete">Izberi ime kanala</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation>Izberi kratico kanala</translation>
+        <translation type="obsolete">Izberi kratico kanala</translation>
     </message>
 </context>
 <context>
     <name>LogViewer</name>
     <message>
         <source>Log Viewer</source>
-        <translation>Pregledovalnik dnevnika</translation>
+        <translation type="obsolete">Pregledovalnik dnevnika</translation>
     </message>
     <message>
         <source>Seconds</source>
-        <translation>Sekund</translation>
+        <translation type="obsolete">Sekund</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -186,14 +227,6 @@ Kliknite Vredu </translation>
         <translation>Izhod</translation>
     </message>
     <message>
-        <source>Increase Font Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decrease Font Size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show Progress Log</source>
         <translation type="unfinished"></translation>
     </message>
@@ -201,24 +234,32 @@ Kliknite Vredu </translation>
         <source>Show Full Log</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Don&apos;t Auto Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Update</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythburnWizard</name>
     <message>
         <source>Next</source>
-        <translation>Naprej</translation>
+        <translation type="obsolete">Naprej</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation>Nazaj</translation>
+        <translation type="obsolete">Nazaj</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Prekliči</translation>
+        <translation type="obsolete">Prekliči</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arhiv</translation>
+        <translation type="obsolete">Myth Arhiv</translation>
     </message>
     <message>
         <source>You need to select at least one item to archive!</source>
@@ -226,7 +267,7 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation>Konec</translation>
+        <translation type="obsolete">Konec</translation>
     </message>
     <message>
         <source>All Archive Items</source>
@@ -246,43 +287,27 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation>Uredi podrobnosti</translation>
+        <translation type="obsolete">Uredi podrobnosti</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation>Odstrani datoteko</translation>
+        <translation type="obsolete">Odstrani datoteko</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation>Izberi datoteko...</translation>
+        <translation type="obsolete">Izberi datoteko...</translation>
     </message>
     <message>
         <source>Don&apos;t re-encode</source>
-        <translation>Ne kodiraj ponovno</translation>
+        <translation type="obsolete">Ne kodiraj ponovno</translation>
     </message>
     <message>
         <source>New Size </source>
-        <translation>Nova velikost </translation>
+        <translation type="obsolete">Nova velikost </translation>
     </message>
     <message>
         <source>Original Size </source>
-        <translation>Izvorna velikost </translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Izvorna velikost </translation>
     </message>
 </context>
 <context>
@@ -409,7 +434,7 @@ Kliknite Vredu </translation>
     </message>
     <message>
         <source>Myth Burn</source>
-        <translation>Myth Peka</translation>
+        <translation type="obsolete">Myth Peka</translation>
     </message>
     <message>
         <source>Background creation has been asked to stop.
@@ -419,11 +444,11 @@ Lahko traja nekaj minut.</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation>Myth Arhiv</translation>
+        <translation type="obsolete">Myth Arhiv</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation>DVD-ja ni mogoče ustvariti.  Med izvajanjem skript je prišlo do napake</translation>
+        <translation type="obsolete">DVD-ja ni mogoče ustvariti.  Med izvajanjem skript je prišlo do napake</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
@@ -483,7 +508,7 @@ Lahko traja nekaj minut.</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation>Uvoz arhiva ni bil mogoč.  Med izvajanjem &apos;mytharchivehelper&apos; je prišlo do napake</translation>
+        <translation type="obsolete">Uvoz arhiva ni bil mogoč.  Med izvajanjem &apos;mytharchivehelper&apos; je prišlo do napake</translation>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
@@ -579,10 +604,36 @@ Lahko traja nekaj minut.</translation>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation type="unfinished">Izbor filma</translation>
+        <translation type="obsolete">Izbor filma</translation>
     </message>
     <message>
-        <source>You don&apos;t have any videos!</source>
+        <source>Cannot find the MythArchive work directory.
+Have you set the correct path in the settings?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Vredu</translation>
+    </message>
+    <message>
+        <source>It was not possible to create the DVD. An error occured when running the scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot find any logs to show!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found a lock file but the owning process isn&apos;t running!
+Removing stale lock file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last run did not create a playable DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last run failed to create a DVD.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -629,13 +680,49 @@ Click OK</source>
 Kliknite Vredu</translation>
     </message>
     <message>
-        <source>MythArchive</source>
+        <source>Retrieving Recording List. Please Wait...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Either you don&apos;t have any recordings or no recordings are available locally!
-
-Click OK</source>
+        <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SelectDestination</name>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Naprej</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Nazaj</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <source>Find...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThumbFinder</name>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Shrani</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <source>Exit, Save Thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -671,13 +758,13 @@ Click OK</source>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation>Izbor filma</translation>
+        <translation type="obsolete">Izbor filma</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!
 
 Click OK</source>
-        <translation>Nimate nobenih filmov!
+        <translation type="obsolete">Nimate nobenih filmov!
 
 Kliknite Vredu</translation>
     </message>
