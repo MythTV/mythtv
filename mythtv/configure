@@ -2344,6 +2344,10 @@ if ! is_qmake4 $qmake; then
     is_qmake4 qmake-qt4 && qmake=qmake-qt4 || die "qmake for Qt4 not found. Please specify the correct qmake with --qmake="
 fi
 
+if ! expr $($qmake -query QT_VERSION) : "4\.[4-9]\.[0-9]" >/dev/null; then 
+    die "Qt4.4 or newer is required to build MythTV." 
+fi 
+    
 # make sure we can execute files in $TMPDIR
 cat > $TMPSH 2>> $logfile <<EOF
 #! /bin/sh
