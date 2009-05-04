@@ -431,12 +431,13 @@ namespace
     };
 }
 
-void showUsage(const MythCommandLineParser &cmdlineparser)
+void showUsage(const MythCommandLineParser &cmdlineparser, const QString &version)
 {
     QString    help  = cmdlineparser.GetHelpString(false);
     QByteArray ahelp = help.toLocal8Bit();
 
-    cerr << "Valid options are: " << endl <<
+    cerr << qPrintable(version) << endl <<
+    "Valid options are: " << endl <<
     "-h or --help                   List valid command line parameters" << endl <<
     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
     "-p or --pidfile filename       Write PID of mythbackend to filename" << endl <<
@@ -496,6 +497,12 @@ int main(int argc, char **argv)
     QApplication a(argc, argv, need_gui);
 
     QString binname = basename(a.argv()[0]);
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+    QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
+                                 .arg(binname)
+                                 .arg(myth_source_path)
+                                 .arg(myth_source_version);
 
     long long previewFrameNumber = -2;
     long long previewSeconds     = -2;
@@ -517,14 +524,6 @@ int main(int argc, char **argv)
     QString printexpire = "";
     bool clearsettingscache = false;
     bool wantupnprebuild = false;
-    
-    extern const char *myth_source_version;
-    extern const char *myth_source_path;
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
-                            .arg(binname)
-                            .arg(myth_source_path)
-                            .arg(myth_source_version));
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -725,7 +724,7 @@ int main(int argc, char **argv)
             if (!(!strcmp(a.argv()[argpos],"-h") ||
                 !strcmp(a.argv()[argpos],"--help")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-                showUsage(cmdline);
+                showUsage(cmdline, versionStr);
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
     }
@@ -779,6 +778,8 @@ int main(int argc, char **argv)
         pidfs << getpid() << endl;
         pidfs.close();
     }
+
+    VERBOSE(VB_IMPORTANT, versionStr);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
