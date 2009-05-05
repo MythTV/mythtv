@@ -55,12 +55,16 @@ class EITFixUp
 
     void Fix(DBEvent &event) const;
 
+    /** Corrects starttime to the multiple of a minute. 
+     *  Used for providers who fail to handle leap seconds timely. Changes the
+     *  starttime not more than 3 seconds. Sshould only be used if the
+     *  duration is the multiple of a minute. */
     static void TimeFix(QDateTime &dt)
     {
         int secs = dt.time().second();
-        if (secs < 5)
+        if (secs < 4)
             dt = dt.addSecs(-secs);
-        if (secs > 55)
+        if (secs > 56)
             dt = dt.addSecs(60 - secs);
     }
 
