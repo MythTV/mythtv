@@ -239,7 +239,7 @@ static int score_match(const QString &a, const QString &b)
     }
     score /= al.size();
 
-    return max(1000, score);
+    return min(1000, score);
 }
 
 int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
