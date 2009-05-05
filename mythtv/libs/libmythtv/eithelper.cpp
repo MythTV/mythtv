@@ -397,7 +397,9 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
         }
 
         QDateTime starttime = MythUTCToLocal(eit->StartTimeUTC(i));
-        EITFixUp::TimeFix(starttime);
+        // fix starttime only if the duration is a multiple of a minute
+        if (!(eit->DurationInSeconds(i) % 60))
+            EITFixUp::TimeFix(starttime);
         QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
 
         DBEvent *event = new DBEvent(chanid,
@@ -499,7 +501,9 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
         for (uint k=0; k<transmission.TransmissionCount(); ++k)
         {
             QDateTime starttime = transmission.StartTimeUTC(k);
-            EITFixUp::TimeFix(starttime);
+            // fix starttime only if the duration is a multiple of a minute
+            if (!(cit->DurationInSeconds() % 60))
+                EITFixUp::TimeFix(starttime);
             QDateTime endtime   = starttime.addSecs(cit->DurationInSeconds());
 
             DBEvent *event = new DBEvent(chanid,
@@ -555,7 +559,9 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
         starttime.setTime_t(tmp - utc_offset);
     }
 
-    EITFixUp::TimeFix(starttime);
+    // fix starttime only if the duration is a multiple of a minute
+    if (!(event.length % 60))
+        EITFixUp::TimeFix(starttime);
     QDateTime endtime = starttime.addSecs(event.length);
 
     desc_list_t list = MPEGDescriptor::Parse(event.desc, event.desc_length);
