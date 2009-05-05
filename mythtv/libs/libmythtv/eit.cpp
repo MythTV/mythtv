@@ -195,6 +195,39 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
     return count;
 }
 
+static int score_words(const QStringList &al, const QStringList &bl)
+{
+    QStringList::const_iterator ait = al.begin();
+    QStringList::const_iterator bit = bl.begin();
+    int score = 0;
+    for (; (ait != al.end()) && (bit != bl.end()); ait++)
+    {
+        QStringList::const_iterator bit2 = bit;
+        int dist = 0;
+        int bscore = 0;
+        for (; bit2 != bl.end(); bit2++)
+        {
+            if (*ait == *bit)
+            {
+                bscore = max(1000, 2000 - (dist * 500));
+                // lower score for short words
+                if (ait->length() < 5)
+                    bscore /= 5 - ait->length();
+                break;
+            }
+            dist++;
+        }
+        if (bscore && dist < 3)
+        {
+            for (int i = 0; (i < dist) && bit != bl.end(); i++)
+                bit++;
+        }
+        score += bscore;
+    }
+
+    return score / al.size();
+}
+
 static int score_match(const QString &a, const QString &b)
 {
     if (a.isEmpty() || b.isEmpty())
@@ -216,33 +249,10 @@ static int score_match(const QString &a, const QString &b)
     if (!bl.size())
         return 0;
 
-    QStringList::const_iterator ait = al.begin();
-    QStringList::const_iterator bit = bl.begin();
-    int score = 0;
-    for (; (ait != al.end()) && (bit != bl.end()); ait++)
-    {
-        QStringList::const_iterator bit2 = bit;
-        int dist = 0;
-        int bscore = 0;
-        for (; bit2 != bl.end(); bit2++)
-        {
-            if (*ait == *bit)
-            {
-                bscore = max(1000, 2000 - (dist * 500));
-                break;
-            }
-            dist++;
-        }
-        if (bscore && dist < 3)
-        {
-            for (int i = 0; (i < dist) && bit != bl.end(); i++)
-                bit++;
-        }
-        score += bscore;
-    }
-    score /= al.size();
+    // score words symmetrically
+    int score = (score_words(al, bl) + score_words(bl, al)) / 2;
 
-    return max(1000, score);
+    return min(900, score);
 }
 
 int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
