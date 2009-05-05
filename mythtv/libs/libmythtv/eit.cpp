@@ -114,12 +114,17 @@ uint DBEvent::UpdateDB(MSqlQuery &query, int match_threshold) const
     match = GetMatch(programs, i);
 
     if (match >= match_threshold)
+    {
+        VERBOSE(VB_EIT | VB_EXTRA, QString("EIT: accept match[%1]: %2 '%3' "
+                                           "vs. '%4'")
+                .arg(i).arg(match).arg(title).arg(programs[i].title));
         return UpdateDB(query, programs, i);
+    }
     else
     {
         if (i >= 0)
         {
-            VERBOSE(VB_EIT, QString("match[%1]: %2 '%3' vs. '%4'")
+            VERBOSE(VB_EIT, QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
                     .arg(i).arg(match).arg(title).arg(programs[i].title));
         }
         return UpdateDB(query, programs, -1);
@@ -259,18 +264,62 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
 {
     bestmatch = -1;
     int match_val = INT_MIN;
+    int overlap = 0;
+    int duration = starttime.secsTo(endtime);
 
     for (uint i = 0; i < programs.size(); i++)
     {
         int mv = 0;
+        int duration_loop = programs[i].starttime.secsTo(programs[i].endtime);
+
         mv -= abs(starttime.secsTo(programs[i].starttime));
         mv -= abs(endtime.secsTo(programs[i].endtime));
+        mv -= abs(duration - duration_loop);
         mv += score_match(title, programs[i].title) * 10;
         mv += score_match(subtitle, programs[i].subtitle);
         mv += score_match(description, programs[i].description);
 
+        /* determine overlap of both programs
+         * we don't know which one starts first */
+        if (starttime < programs[i].starttime)
+            overlap = programs[i].starttime.secsTo(endtime);
+        else if (starttime > programs[i].starttime)
+            overlap = starttime.secsTo(programs[i].endtime);
+        else
+        {
+            if (endtime <= programs[i].endtime)
+                overlap = starttime.secsTo(endtime);
+            else
+                overlap = starttime.secsTo(programs[i].endtime);
+        }
+
+        /* scale the score depending on the overlap length
+         * full score is preserved if the overlap is at least 1/2 of the length
+         * of the shorter program */
+        if (overlap > 0)
+        {
+            int min_dur = min(duration, duration_loop);
+            overlap = min(overlap, min_dur/2);
+            mv *= overlap * 2;
+            mv /= min_dur;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("Unexpected result: shows don't "
+                                  "overlap\n\t%1: %2 - %3\n\t%4: %5 - %6")
+                    .arg(title.left(30), 30)
+                    .arg(starttime.toString(Qt::ISODate))
+                    .arg(endtime.toString(Qt::ISODate))
+                    .arg(programs[i].title.left(30), 30)
+                    .arg(programs[i].starttime.toString(Qt::ISODate))
+                    .arg(programs[i].endtime.toString(Qt::ISODate))
+                );
+        }
+
         if (mv > match_val)
         {
+            VERBOSE(VB_EIT, QString("GM : %1 new best match %2 with score %3").arg(title.left(25))
+                    .arg(programs[i].title.left(25)).arg(mv));
             bestmatch = i;
             match_val = mv;
         }
