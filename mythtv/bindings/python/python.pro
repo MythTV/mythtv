@@ -20,3 +20,6 @@ PRE_TARGETDEPS += python_build
 QMAKE_LINK=@-echo
 QMAKE_EXTRA_UNIX_TARGETS += python_build
 INSTALLS += python_install
+
+# Work around Qt 4.4 Mac bug:
+macx : QMAKE_MACOSX_DEPLOYMENT_TARGET =
