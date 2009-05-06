@@ -1087,6 +1087,9 @@ foreach my $target ( @targets )
   foreach my $lib ( glob "$libs/mythtv/*/*" )
   {   &Syscall([ @bundler, $lib ]) or die   }
 
+  # Allow Finder's 'Get Info' to manage plugin list:
+  &Syscall([ 'ln', '-s', "Resources/lib/mythtv/plugins",
+                         "$finalTarget/Contents/Plugins" ]) or die;
   # The icon
   &Syscall([ 'cp',  "$SVNDIR/mythtv/programs/mythfrontend/mythfrontend.icns",
              "$res/application.icns" ]) or die;
