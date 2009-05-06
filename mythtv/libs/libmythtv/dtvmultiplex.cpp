@@ -285,13 +285,15 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT mplexid,       sourceid,        chanid,          "
-        "       callsign,      name,            channum,         "
-        "       serviceid,     atsc_major_chan, atsc_minor_chan, "
-        "       useonairguide, visible,         freqid,          "
-        "       icon,          tvformat,        xmltvid          "
-        "FROM channel "
-        "WHERE mplexid = :MPLEXID");
+        "SELECT c.mplexid,       c.sourceid,        c.chanid,          "
+        "       c.callsign,      c.name,            c.channum,         "
+        "       c.serviceid,     c.atsc_major_chan, c.atsc_minor_chan, "
+        "       c.useonairguide, c.visible,         c.freqid,          "
+        "       c.icon,          c.tvformat,        c.xmltvid,         "
+        "       d.transportid,   d.networkid                           "
+        "FROM channel AS c, dtv_multiplex AS d "
+        "WHERE c.mplexid = :MPLEXID AND"
+        "      c.mplexid = d.mplexid");
     query.bindValue(":MPLEXID", mplexid);
 
     if (!query.exec())
@@ -312,7 +314,9 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
             false,
             query.value(11).toString(),  query.value(12).toString(),
             query.value(13).toString(),  query.value(14).toString(),
-            0, 0, 0, 0, 0, 0,
+            0, 0, 0,
+            query.value(15).toUInt(),    query.value(16).toUInt(),
+            0,
             QString::null,
             false, false, false, false,
             false, false, false, false,
