@@ -102,6 +102,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
         return
             (inversion  == other.inversion)  &&
             (symbolrate == other.symbolrate) &&
+            (polarity   == other.polarity)   &&
             (fec        == other.fec);
     }
 
