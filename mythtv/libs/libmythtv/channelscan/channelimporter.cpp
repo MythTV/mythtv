@@ -632,7 +632,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
             }
 
             if (tmp.channels.size())
-                not_in_scan.push_back(newt);
+                not_in_scan.push_back(tmp);
         }
     }
 
