@@ -1989,6 +1989,11 @@ bool TV::StartRecorder(PlayerContext *ctx, int maxWait)
     MythTimer t;
     t.start();
     bool recording = false, ok = true;
+    if (!rec) {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid Remote Encoder");
+        SetErrored(ctx);
+        return false;
+    }
     while (!(recording = rec->IsRecording(&ok)) &&
            !exitPlayerTimerId && t.elapsed() < maxWait)
     {
