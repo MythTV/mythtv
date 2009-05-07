@@ -2686,7 +2686,7 @@ int main( void ) { return (round(3.999f) > 0)?0:1; }
 EOF
 
 # test for sync_file_range (linux only system call since 2.6.17)
-check_ld <<EOF && enable sync_file_range
+check_ld <<EOF #&& enable sync_file_range
 #define _GNU_SOURCE
 #include <fcntl.h>
 
