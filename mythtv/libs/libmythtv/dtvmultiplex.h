@@ -33,7 +33,7 @@ class DTVMultiplex
     virtual bool FillFromDB(DTVTunerType type, uint mplexid);
 
     bool IsEqual(DTVTunerType type, const DTVMultiplex& other,
-                 uint freq_range = 0) const;
+                 uint freq_range = 0, bool fuzzy = false) const;
 
     bool ParseATSC(const QString &frequency, const QString &modulation);
 

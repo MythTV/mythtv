@@ -595,7 +595,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
         for (uint i = 0; i < transports.size(); i++)
         {
-            if (!transports[i].IsEqual(tuner_type, newt, 500 * freq_mult))
+            if (!transports[i].IsEqual(tuner_type, newt, 500 * freq_mult, true))
                 continue;
 
             transports[i].mplex = mplexid;

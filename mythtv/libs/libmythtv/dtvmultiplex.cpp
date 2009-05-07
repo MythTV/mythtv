@@ -61,7 +61,7 @@ QString DTVMultiplex::toString() const
 }
 
 bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
-                           uint freq_range) const
+                           uint freq_range, bool fuzzy) const
 {
     if ((frequency + freq_range  < other.frequency             ) ||
         (frequency               > other.frequency + freq_range))
@@ -71,6 +71,12 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
 
     if (DTVTunerType::kTunerTypeQAM == type)
     {
+        if (fuzzy)
+            return
+                inversion.IsCompatible(other.inversion)   &&
+                (symbolrate == other.symbolrate)          &&
+                fec.IsCompatible(other.fec)               &&
+                modulation.IsCompatible(other.modulation);
         return
             (inversion  == other.inversion)  &&
             (symbolrate == other.symbolrate) &&
@@ -80,6 +86,16 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
 
     if (DTVTunerType::kTunerTypeOFDM == type)
     {
+        if (fuzzy)
+            return
+                inversion.IsCompatible(other.inversion)           &&
+                bandwidth.IsCompatible(other.bandwidth)           &&
+                hp_code_rate.IsCompatible(other.hp_code_rate)     &&
+                lp_code_rate.IsCompatible(other.lp_code_rate)     &&
+                modulation.IsCompatible(other.modulation)         &&
+                guard_interval.IsCompatible(other.guard_interval) &&
+                trans_mode.IsCompatible(other.trans_mode)         &&
+                hierarchy.IsCompatible(other.hierarchy);
         return
             (inversion      == other.inversion)      &&
             (bandwidth      == other.bandwidth)      &&
@@ -93,12 +109,20 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
 
     if (DTVTunerType::kTunerTypeATSC == type)
     {
+        if (fuzzy)
+            modulation.IsCompatible(other.modulation);
         return (modulation == other.modulation);
     }
 
     if ((DTVTunerType::kTunerTypeDVB_S2 == type) ||
         (DTVTunerType::kTunerTypeQPSK   == type))
     {
+        if (fuzzy)
+            return
+                inversion.IsCompatible(other.inversion) &&
+                (symbolrate == other.symbolrate)        &&
+                (polarity   == other.polarity)          &&
+                fec.IsCompatible(other.fec);
         return
             (inversion  == other.inversion)  &&
             (symbolrate == other.symbolrate) &&

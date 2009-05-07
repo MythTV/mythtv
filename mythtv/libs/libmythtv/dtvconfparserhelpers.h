@@ -133,6 +133,11 @@ class DTVInversion : public DTVParamHelper
     DTVInversion(int _default = kInversionAuto)
         : DTVParamHelper(_default) { }
 
+    bool IsCompatible(const DTVInversion &other) const
+        { return value == other.value || value == kInversionAuto ||
+                other.value == kInversionAuto;
+        }
+
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
     bool ParseVDR(const QString &_value)
@@ -168,6 +173,11 @@ class DTVBandwidth : public DTVParamHelper
     };
 
     DTVBandwidth(int _default = kBandwidthAuto) : DTVParamHelper(_default) { }
+
+    bool IsCompatible(const DTVBandwidth &other) const
+        { return value == other.value || value == kBandwidthAuto ||
+                other.value == kBandwidthAuto;
+        }
 
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
@@ -210,6 +220,11 @@ class DTVCodeRate : public DTVParamHelper
     };
 
     DTVCodeRate(int _default = kFECAuto) : DTVParamHelper(_default) { }
+
+    bool IsCompatible(const DTVCodeRate &other) const
+        { return value == other.value || value == kFECAuto ||
+                other.value == kFECAuto;
+        }
 
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
@@ -258,6 +273,11 @@ class DTVModulation : public DTVParamHelper
     DTVModulation(int _default = kModulationQAMAuto)
         : DTVParamHelper(_default) { }
 
+    bool IsCompatible(const DTVModulation &other) const
+        { return value == other.value || value == kModulationQAMAuto ||
+                other.value == kModulationQAMAuto;
+        }
+
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
     bool ParseVDR(const QString &_value)
@@ -290,6 +310,11 @@ class DTVTransmitMode : public DTVParamHelper
 
     DTVTransmitMode(int _default = kTransmissionModeAuto)
         : DTVParamHelper(_default) { }
+
+    bool IsCompatible(const DTVTransmitMode &other) const
+        { return value == other.value || value == kTransmissionModeAuto ||
+                other.value == kTransmissionModeAuto;
+        }
 
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
@@ -329,6 +354,11 @@ class DTVGuardInterval : public DTVParamHelper
     DTVGuardInterval(int _default = kGuardIntervalAuto)
         : DTVParamHelper(_default) { }
 
+    bool IsCompatible(const DTVGuardInterval &other) const
+        { return value == other.value || value == kGuardIntervalAuto ||
+                other.value == kGuardIntervalAuto;
+        }
+
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
     bool ParseVDR(const QString &_value)
@@ -362,6 +392,11 @@ class DTVHierarchy : public DTVParamHelper
     };
 
     DTVHierarchy(int _default = kHierarchyAuto) : DTVParamHelper(_default) { }
+
+    bool IsCompatible(const DTVHierarchy &other) const
+        { return value == other.value || value == kHierarchyAuto ||
+                other.value == kHierarchyAuto;
+        }
 
     bool ParseConf(const QString &_value)
        { return ParseParam(_value, value, confTable); }
