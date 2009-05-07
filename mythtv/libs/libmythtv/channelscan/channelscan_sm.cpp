@@ -740,13 +740,23 @@ static void update_info(ChannelInsertInfo &info,
     bool force_guide_present = (sdt->OriginalNetworkID() == 70);
     // HACK end -- special exception for this network
 
-    // Figure out best service name...
+    // Figure out best service name and callsign...
     ServiceDescriptor *desc = sdt->GetServiceDescriptor(i);
+    QString callsign = QString::null;
     QString service_name = QString::null;
     if (desc)
+    {
+        callsign = desc->ServiceShortName();
+        if (callsign.trimmed().isEmpty())
+            callsign = QString::null;
+
         service_name = desc->ServiceName();
-    if (service_name.trimmed().isEmpty())
-        service_name = QString::null;
+        if (service_name.trimmed().isEmpty())
+            service_name = QString::null;
+    }
+
+    if (info.callsign.isEmpty())
+        info.callsign = callsign;
     if (info.service_name.isEmpty())
         info.service_name = service_name;
 
