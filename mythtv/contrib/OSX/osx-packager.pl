@@ -1075,6 +1075,7 @@ foreach my $target ( @targets )
  {
   my $res  = "$finalTarget/Contents/Resources";
   my $libs = "$res/lib";
+  my $plug = "$libs/mythtv/plugins";
 
   # Install themes, filters, etc.
   &Verbose("Installing resources into $target");
