@@ -444,7 +444,9 @@ bool ChannelInsertInfo::IsSameChannel(const ChannelInsertInfo &other) const
         return true;
     }
 
-    if ((orig_netid == other.orig_netid) && (service_id == other.service_id))
+    if ((orig_netid == other.orig_netid) &&
+        (sdt_tsid == other.sdt_tsid)     &&
+        (service_id == other.service_id))
         return true;
 
     if (!orig_netid && !other.orig_netid &&
