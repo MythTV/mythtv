@@ -65,6 +65,8 @@ static QString decode_iso6937(const unsigned char *buf, uint length)
     return result;
 }
 
+static QString decode_text(const unsigned char *buf, uint length);
+
 // Decode a text string according to ETSI EN 300 468 Annex A
 QString dvb_decode_text(const unsigned char *src, uint raw_length,
                         const unsigned char *encoding_override,
@@ -108,6 +110,11 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     if (!length)
         return "";
 
+    return decode_text(buf, length);
+}
+
+static QString decode_text(const unsigned char *buf, uint length)
+{
     // Decode using the correct text codec
     if (buf[0] >= 0x20)
     {
@@ -136,6 +143,48 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         // Unknown/invalid encoding - assume local8Bit
         return QString::fromLocal8Bit((char*)(buf + 1), length - 1);
     }
+}
+
+
+QString dvb_decode_short_name(const unsigned char *src, uint raw_length)
+{
+    if (raw_length > 50)
+    {
+        VERBOSE(VB_SIPARSER, QString("dvb_decode_short_name: name is %1 chars "
+                                     "long. Unlikely to be a short name.")
+                .arg(raw_length));
+        return "";
+    }
+
+       if ((0x10 < src[0]) && (src[0] < 0x20))
+    {
+        // TODO: Handle multi-byte encodings
+        VERBOSE(VB_SIPARSER, "dvb_decode_short_name: "
+                "Multi-byte coded text is not yet supported.");
+        return "";
+    }
+
+    unsigned char dst[raw_length];
+    uint length = 0;
+
+    // check for emphasis control codes
+    for (uint i = 0; i < raw_length; i++)
+        if (src[i] == 0x86)
+            while ((++i < raw_length) && (src[i] != 0x87))
+            {
+                if ((src[i] < 0x80) || (src[i] > 0x9F))
+                    dst[length++] = src[i];
+                // replace CR/LF with a space
+                else if (src[i] == 0x8A)
+                    dst[length++] = 0x20;
+            }
+
+
+    if (!length)
+        return dvb_decode_text(src, raw_length);
+
+    const unsigned char *buf = dst;
+    return decode_text(buf, length);
 }
 
 QMutex            ContentDescriptor::categoryLock;

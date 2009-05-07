@@ -48,6 +48,8 @@ inline QString dvb_decode_text(const unsigned char *src, uint length)
     return dvb_decode_text(src, length, NULL, 0);
 }
 
+QString dvb_decode_short_name(const unsigned char *src, uint raw_length);
+
 #define byteBCDH2int(i) (i >> 4)
 #define byteBCDL2int(i) (i & 0x0f)
 #define byteBCD2int(i) (byteBCDH2int(i) * 10 + byteBCDL2int(i))
@@ -77,6 +79,8 @@ class NetworkNameDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++){ char 8 uimsbf }
     QString Name() const
         { return dvb_decode_text(_data+2, DescriptorLength()); }
+    QString ShortName() const
+        { return dvb_decode_short_name(_data+2, DescriptorLength()); }
     QString toString() const
         { return QString("NetworkNameDescriptor: ")+Name(); }
 };
@@ -228,7 +232,9 @@ class BouquetNameDescriptor : public MPEGDescriptor
 
     // for(i=0;i<N;i++) { char 8 }
     QString BouquetName() const
-         { return QString::fromAscii((const char *)_data+2, _data[1]); }
+         { return dvb_decode_text(_data+2, _data[1]); }
+    QString BouquetShortName() const
+         { return dvb_decode_short_name(_data+2, _data[1]); }
 
     QString toString() const { return QString("BouquetNameDescriptor: Bouquet Name(%1)")
         .arg(BouquetName()); }
@@ -1375,6 +1381,10 @@ class ServiceDescriptor : public MPEGDescriptor
     // for (i=0;i<N;I++) { char 8 }
     QString ServiceProviderName(void) const
         { return dvb_decode_text(_data + 4, ServiceProviderNameLength()); }
+    QString ServiceProviderShortName(void) const
+    {
+        return dvb_decode_short_name(_data + 4, ServiceProviderNameLength());
+    }
     // service_name_length      8
     uint ServiceNameLength(void) const
         { return _data[4 + ServiceProviderNameLength()]; }
@@ -1383,6 +1393,11 @@ class ServiceDescriptor : public MPEGDescriptor
     {
         return dvb_decode_text(_data + 5 + ServiceProviderNameLength(),
                                ServiceNameLength());
+    }
+    QString ServiceShortName(void) const
+    {
+        return dvb_decode_short_name(_data + 5 + ServiceProviderNameLength(),
+                                     ServiceNameLength());
     }
     bool IsDTV(void) const
         { return ServiceDescriptorMapping(ServiceType()).IsDTV(); }
@@ -1491,6 +1506,8 @@ class ShortEventDescriptor : public MPEGDescriptor
     // for (i=0;i<event_name_length;i++) { event_name_char 8 }
     QString EventName(void) const
         { return dvb_decode_text(&_data[6], _data[5]); }
+    QString EventShortName(void) const
+        { return dvb_decode_short_name(&_data[6], _data[5]); }
     // text_length              8
     uint TextLength(void) const { return _data[6 + _data[5]]; }
     // for (i=0;i<text_length;i++) { text_char 8 }
