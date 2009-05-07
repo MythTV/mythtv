@@ -2965,8 +2965,11 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
     enable qtwebkit
 else
-    # For environments that don't have pkg-config:
-    check_cpp <<EOF && enable qtwebkit
+    # For environments that don't have pkg-config, we do a compile test.
+    # Sadly, this requires some guesses about Qt's install location:
+    qt_inc="-I/usr/local/include/Qt -I/usr/include/Qt -I${prefix}/include/Qt"
+
+    check_cpp ${qt_inc} <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
 #if QT_VERSION < 0x040400
 die
