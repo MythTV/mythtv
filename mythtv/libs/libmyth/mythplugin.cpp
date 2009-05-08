@@ -134,6 +134,10 @@ MythPluginManager::MythPluginManager()
         int suffixLength = filter.length() - prefixLength - 1;
 
         QStringList libraries = filterDir.entryList();
+        if (libraries.isEmpty())
+            VERBOSE(VB_GENERAL,
+                    "No libraries in plugins directory " + filterDir.path());
+
         for (QStringList::iterator i = libraries.begin(); i != libraries.end();
              i++)
         {
@@ -146,6 +150,8 @@ MythPluginManager::MythPluginManager()
             init_plugin(library);
         }
     }
+    else
+        VERBOSE(VB_GENERAL, "No plugins directory " + filterDir.path());
 
     gContext->SetDisableLibraryPopup(false);
 
@@ -155,14 +161,14 @@ MythPluginManager::MythPluginManager()
 bool MythPluginManager::init_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
-   
+
     if (!m_dict[newname])
     {
         m_dict.insert(newname, new MythPlugin(newname));
     }
-   
+
     int result = m_dict[newname]->init(MYTH_BINARY_VERSION);
-  
+
     if (result == -1)
     {
         delete m_dict[newname];
@@ -171,7 +177,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
                 .arg(plugname));
         return false;
     }
-    
+
     LanguageSettings::load(plugname);
 
     switch (m_dict[newname]->type())
