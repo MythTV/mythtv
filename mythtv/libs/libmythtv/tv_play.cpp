@@ -3752,7 +3752,7 @@ bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
             else
             {
                 VERBOSE(VB_GENERAL, LOC +
-                        "No longer watching LiveTV, exiting");
+                        "No longer watching TV, exiting");
                 SetExitPlayer(true, true);
             }
         }
@@ -8078,14 +8078,10 @@ void TV::SleepDialogTimeout(void)
     KillTimer(sleepDialogTimerId);
     sleepDialogTimerId = 0;
 
-    PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-    if (StateIsLiveTV(mctx->GetState()))
-    {
-        VERBOSE(VB_GENERAL, LOC +
-                "Sleep timeout reached, leaving LiveTV");
-        SetExitPlayer(true, true);
-    }
-    ReturnPlayerLock(mctx);
+    VERBOSE(VB_GENERAL, LOC +
+            "Sleep timeout reached, exiting player.");
+
+    SetExitPlayer(true, true);
 }
 
 /*!
