@@ -3272,10 +3272,9 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
             .arg(ignoreKeys));
 #endif // DEBUG_ACTIONS
 
-    if (db_idle_timeout > 0)
+    if (idleTimerId)
     {
-        if (idleTimerId)
-            KillTimer(idleTimerId);
+        KillTimer(idleTimerId);
         idleTimerId = StartTimer(db_idle_timeout, __LINE__);
     }
 
