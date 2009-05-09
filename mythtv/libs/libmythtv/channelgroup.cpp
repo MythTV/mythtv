@@ -1,3 +1,6 @@
+// c++
+#include <algorithm>
+
 // mythtv
 #include "mythcontext.h"
 #include "mythdb.h"
