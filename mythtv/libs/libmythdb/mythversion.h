@@ -1,8 +1,8 @@
 #ifndef MYTHVERSION_H_
 #define MYTHVERSION_H_
 
-#if (QT_VERSION < 0x040300)
-#error You need Qt version >= 4.3.0 to compile MythTV.
+#if (QT_VERSION < 0x040400)
+#error You need Qt version >= 4.4.0 to compile MythTV.
 #endif
 
 /// Update this whenever the plug-in API changes.
