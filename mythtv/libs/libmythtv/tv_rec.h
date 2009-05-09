@@ -203,7 +203,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
-    void ToggleChannelFavorite(void);
+    void ToggleChannelFavorite(QString);
 
     void SetLiveRecording(int recording);
 

@@ -164,12 +164,13 @@ bool JumpToChannel::Update(void)
 }
 
 void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
-                    TV *player, bool embedVideo, bool allowFinder)
+                    TV *player, bool embedVideo, bool allowFinder, int changrpid)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     GuideGrid *gg = new GuideGrid(mainStack,
                                   chanid, channum,
-                                  player, embedVideo, allowFinder);
+                                  player, embedVideo, allowFinder,
+                                  changrpid);
 
     if (gg->Create())
         mainStack->AddScreen(gg, (player == NULL));
@@ -180,7 +181,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 GuideGrid::GuideGrid(MythScreenStack *parent,
                      uint chanid, QString channum,
                      TV *player, bool embedVideo,
-                     bool allowFinder)
+                     bool allowFinder, int changrpid) 
          : MythScreenType(parent, "guidegrid"),
     m_allowFinder(allowFinder),
     m_player(player),
@@ -196,9 +197,10 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_channelCount = 5;
     m_timeCount = 30;
     m_currentStartChannel = 0;
+    m_changrpid = changrpid;
+    m_changrplist = ChannelGroup::GetChannelGroups();
 
     m_jumpToChannelEnabled = gContext->GetNumSetting("EPGEnableJumpToChannel", 1);
-    m_showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);
     m_sortReverse = gContext->GetNumSetting("EPGSortReverse", 0);
     m_selectChangesChannel = gContext->GetNumSetting("SelectChangesChannel", 0);
     m_selectRecThreshold = gContext->GetNumSetting("SelChangeRecThreshold", 16);
@@ -249,6 +251,7 @@ bool GuideGrid::Create()
     UIUtilE::Assign(this, m_channelList, "channellist", &err);
     UIUtilE::Assign(this, m_guideGrid, "guidegrid", &err);
     UIUtilW::Assign(this, m_dateText, "datetext");
+    UIUtilW::Assign(this, m_changroupname, "channelgroup");
     UIUtilW::Assign(this, m_channelImage, "channelicon");
     UIUtilW::Assign(this, m_jumpToText, "jumptotext");
 
@@ -292,6 +295,11 @@ bool GuideGrid::Create()
     if (m_dateText)
         m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
 
+    QString changrpname = ChannelGroup::GetChannelGroupName(m_changrpid);
+
+    if (m_changroupname)
+        m_changroupname->SetText(changrpname);
+
     gContext->addListener(this);
 
     return true;
@@ -333,6 +341,11 @@ GuideGrid::~GuideGrid()
         QString message = QString("EPG_EXITING");
         qApp->postEvent(m_player, new MythEvent(message));
     }
+
+    // maybe the user selected a different channel group, 
+    // tell the player to update its channel list just in case
+    if (m_player)
+        m_player->UpdateChannelList(m_changrpid);
 }
 
 bool GuideGrid::keyPressEvent(QKeyEvent *event)
@@ -471,7 +484,12 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "TOGGLERECORD")
             quickRecord();
         else if (action == "TOGGLEFAV")
-            toggleChannelFavorite();
+        {
+            if (m_changrpid == -1)
+                ChannelGroupMenu(0); 
+            else
+                toggleChannelFavorite();
+        }
         else if (action == "CHANUPDATE")
             channelUpdate();
         else if (action == "VOLUMEUP")
@@ -517,14 +535,14 @@ void GuideGrid::showMenu(void)
         if (pginfo && pginfo->recordid > 0)
             menuPopup->AddButton(tr("Delete Rule"));
 
-        menuPopup->AddButton(tr("Toggle Favourite Channel"));
-
         menuPopup->AddButton(tr("Reverse Channel Order"));
 
-        if (m_showFavorites)
-            menuPopup->AddButton(tr("Show All Channels"));
+        if (m_changrpid == -1)
+            menuPopup->AddButton(tr("Add To Channel Group"));
         else
-            menuPopup->AddButton(tr("Show Favourite Channels"));
+            menuPopup->AddButton(tr("Remove from Channel Group"));
+
+        menuPopup->AddButton(tr("Choose Channel Group"));
 
         menuPopup->AddButton(tr("Cancel"));
 
@@ -709,21 +727,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     m_channelInfoIdx.clear();
     m_currentStartChannel = 0;
 
-    DBChanList channels = ChannelUtil::GetChannels(0, true);
+    DBChanList channels = ChannelUtil::GetChannels(0, true, "", m_changrpid);
     ChannelUtil::SortChannels(channels, m_channelOrdering, false);
-
-    if (m_showFavorites)
-    {
-        DBChanList tmp;
-        for (uint i = 0; i < channels.size(); i++)
-        {
-            if (channels[i].favorite)
-                tmp.push_back(channels[i]);
-        }
-
-        if (!tmp.empty())
-            channels = tmp;
-    }
 
     typedef vector<uint> uint_list_t;
     QMap<QString,uint_list_t> channum_to_index_map;
@@ -1233,24 +1238,69 @@ void GuideGrid::customEvent(QEvent *event)
                 generateListings();
                 updateChannels();
             }
-            else if (resulttext == tr("Toggle Favourite Channel"))
+            else if (resulttext == tr("Add To Channel Group"))
+            {
+                if (m_changrpid == -1)
+                    ChannelGroupMenu(0); 
+            }
+            else if (resulttext == tr("Remove from Channel Group"))
             {
                 toggleChannelFavorite();
             }
-            else if (resulttext == tr("Show All Channels"))
+            else if (resulttext == tr("Choose Channel Group"))
             {
-                m_showFavorites = false;
-                generateListings();
-                updateChannels();
+                ChannelGroupMenu(1);
             }
-            else if (resulttext == tr("Show Favourite Channels"))
+        }
+    else if (resultid == "channelgrouptogglemenu")
+        {
+            if (resulttext != tr("Cancel"))
             {
-                m_showFavorites = true;
+                int changroupid;
+                changroupid = ChannelGroup::GetChannelGroupId(resulttext);
+
+                if (changroupid > 0)
+                    toggleChannelFavorite(changroupid);
+            }
+        }
+    else if (resultid == "channelgroupmenu")
+        {
+            if (resulttext != tr("Cancel"))
+            {
+                int changroupid;
+
+                if (resulttext == QObject::tr("All Channels"))
+                    changroupid = -1;
+                else
+                    changroupid = ChannelGroup::GetChannelGroupId(resulttext);
+
+                m_changrpid = changroupid;
                 generateListings();
                 updateChannels();
+                updateInfo();
+
+                QString changrpname;
+                changrpname = ChannelGroup::GetChannelGroupName(m_changrpid);
+
+                if (m_changroupname)
+                    m_changroupname->SetText(changrpname);
+                else
+                {
+                    if (m_dateText)
+                    {
+                        m_dateText->SetText(changrpname);
+                        QTimer::singleShot(5000, this, SLOT(infoTimeout()));
+                    }
+                }
             }
         }
     }
+}
+
+void GuideGrid::infoTimeout(void)
+{
+    if (m_dateText)
+        m_dateText->SetText(m_currentStartTime.toString(m_dateFormat));
 }
 
 void GuideGrid::updateChannels(void)
@@ -1313,17 +1363,6 @@ void GuideGrid::updateChannels(void)
                 m_channelList, chinfo->GetFormatted(m_channelFormat));
 
         QString state = "";
-
-        if (chinfo->favorite > 0)
-        {
-            if (unavailable)
-                state = "favunavailable";
-            else
-                state = "favourite";
-        }
-        else if (unavailable)
-            state = "unavailable";
-
         item->SetText(chinfo->GetFormatted(m_channelFormat), "buttontext", state);
 
         if (showChannelIcon && !chinfo->icon.isEmpty())
@@ -1380,9 +1419,28 @@ void GuideGrid::updateInfo(void)
 
 void GuideGrid::toggleGuideListing()
 {
-    m_showFavorites = (!m_showFavorites);
-    generateListings();
+    int oldchangrpid = m_changrpid;
+
+    m_changrpid = ChannelGroup::GetNextChannelGroup(m_changrplist, oldchangrpid);
+
+    if (oldchangrpid != m_changrpid)
+      generateListings();
+
     updateChannels();
+    updateInfo();
+
+    QString changrpname = ChannelGroup::GetChannelGroupName(m_changrpid);
+
+    if (m_changroupname)
+        m_changroupname->SetText(changrpname);
+    else
+    {
+        if (m_dateText)
+        {
+            m_dateText->SetText(changrpname);
+            QTimer::singleShot(5000, this, SLOT(infoTimeout()));
+        }
+    }
 }
 
 void GuideGrid::generateListings()
@@ -1399,9 +1457,63 @@ void GuideGrid::generateListings()
     fillProgramInfos();
 }
 
-void GuideGrid::toggleChannelFavorite()
+void GuideGrid::ChannelGroupMenu(int mode)
+{
+    if (m_changrplist.empty())
+    {
+      QString message = tr("You don't have any channel groups defined");
+
+      MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+      MythConfirmationDialog *okPopup = new MythConfirmationDialog(popupStack,
+                                                                   message, false);
+      if (okPopup->Create())
+          popupStack->AddScreen(okPopup);
+      else
+          delete okPopup;
+
+      return;
+    }
+
+    QString label = tr("Select Channel Group");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+
+    if (menuPopup->Create())
+    {
+        if (mode == 0)
+            menuPopup->SetReturnEvent(this, "channelgrouptogglemenu");
+        else
+        {
+            menuPopup->SetReturnEvent(this, "channelgroupmenu");
+            menuPopup->AddButton(QObject::tr("All Channels"));
+        }
+
+        for (uint i = 0; i < m_changrplist.size(); i++)
+            menuPopup->AddButton(m_changrplist[i].name);
+
+        menuPopup->AddButton(tr("Cancel"));
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
+}
+
+void GuideGrid::toggleChannelFavorite(int grpid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+
+    if (grpid == -1)
+    {
+      if (m_changrpid == -1)
+          return;
+      else 
+          grpid = m_changrpid;
+    }
 
     // Get current channel id, and make sure it exists...
     int chanNum = m_currentRow + m_currentStartChannel;
@@ -1413,33 +1525,21 @@ void GuideGrid::toggleChannelFavorite()
         chanNum = 0;
 
     PixmapChannel *ch = GetChannelInfo(chanNum);
-    uint favid  = ch->favorite;
     uint chanid = ch->chanid;
 
-    if (favid > 0)
-    {
-        query.prepare("DELETE FROM favorites WHERE favid = :FAVID ;");
-        query.bindValue(":FAVID", favid);
-        query.exec();
-    }
+    if (m_changrpid == -1)
+        // If currently viewing all channels, allow to add only not delete
+        ChannelGroup::ToggleChannel(chanid, grpid, false);
     else
-    {
-        // We have no favorites record...Add one to toggle...
-        query.prepare("INSERT INTO favorites (chanid) VALUES (:FAVID);");
-        query.bindValue(":FAVID", chanid);
-        query.exec();
-    }
+        // Only allow delete if viewing the favorite group in question
+        ChannelGroup::ToggleChannel(chanid, grpid, true);
 
-    if (m_showFavorites)
-        generateListings();
-    else
+    // If viewing favorites, refresh because a channel was removed
+    if (m_changrpid != -1)
     {
-        int maxchannel = 0;
-        m_channelCount = m_guideGrid->getChannelCount();
-        fillChannelInfos(false);
-        maxchannel = max((int)GetChannelCount() - 1, 0);
-        m_channelCount = min(m_channelCount, maxchannel + 1);
+        generateListings();
         updateChannels();
+        updateInfo();
     }
 }
 

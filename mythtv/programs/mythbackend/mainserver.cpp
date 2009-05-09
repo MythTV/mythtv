@@ -3259,7 +3259,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "TOGGLE_CHANNEL_FAVORITE")
     {
-        enc->ToggleChannelFavorite();
+        QString changroup = slist[2];
+        enc->ToggleChannelFavorite(changroup);
         retlist << "ok";
     }
     else if (command == "CHANGE_CHANNEL")

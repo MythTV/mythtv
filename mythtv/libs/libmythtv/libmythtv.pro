@@ -163,6 +163,7 @@ HEADERS += playgroup.h              progdetails.h
 HEADERS += channelsettings.h        previewgenerator.h
 HEADERS += transporteditor.h
 HEADERS += myth_imgconvert.h
+HEADERS += channelgroup.h           channelgroupsettings.h
 
 # Remove when everything is switched to MythUI
 HEADERS += proglist_qt.h
@@ -186,6 +187,7 @@ SOURCES += livetvchain.cpp          playgroup.cpp
 SOURCES += progdetails.cpp
 SOURCES += channelsettings.cpp      previewgenerator.cpp
 SOURCES += transporteditor.cpp
+SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 
 contains( CONFIG_SWSCALE, yes ) {
     SOURCES += myth_imgconvert.cpp

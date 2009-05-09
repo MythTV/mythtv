@@ -14,6 +14,7 @@
 #include "mythscreentype.h"
 #include "programinfo.h"
 #include "programlist.h"
+#include "channelgroup.h"
 #include "channelutil.h"
 
 using namespace std;
@@ -81,7 +82,8 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
                                 const QString &startChanNum,
                                 TV            *player = NULL,
                                 bool           embedVideo = false,
-                                bool           allowFinder = true);
+                                bool           allowFinder = true,
+                                int            changrpid = -1);
 
     DBChanList GetSelection(void) const;
 
@@ -112,7 +114,8 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     void pageDown();
     void pageUp();
     void toggleGuideListing();
-    void toggleChannelFavorite();
+    void toggleChannelFavorite(int grpid = -1);
+    void ChannelGroupMenu(int mode = 0);
     void generateListings();
 
     void enter();
@@ -122,6 +125,7 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     void channelUpdate();
     void volumeUpdate(bool);
     void toggleMute();
+    void infoTimeout();
 
     void quickRecord();
     void editRecording();
@@ -137,7 +141,8 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     GuideGrid(MythScreenStack *parentStack,
               uint chanid = 0, QString channum = "",
               TV *player = NULL, bool embedVideo = false,
-              bool allowFinder = true);
+              bool allowFinder = true,
+              int changrpid = -1);
    ~GuideGrid();
 
   private slots:
@@ -190,7 +195,6 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     int m_currentRow;
     int m_currentCol;
 
-    bool    m_showFavorites;
     bool    m_sortReverse;
     QString m_channelFormat;
 
@@ -217,6 +221,9 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
 
     QTimer *m_updateTimer;
 
+    int               m_changrpid;
+    ChannelGroupList  m_changrplist;
+
     QMutex            m_jumpToChannelLock;
     JumpToChannel    *m_jumpToChannel;
     bool              m_jumpToChannelEnabled;
@@ -226,6 +233,7 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     MythUIGuideGrid  *m_guideGrid;
     MythUIText       *m_dateText;
     MythUIText       *m_jumpToText;
+    MythUIText       *m_changroupname;
     MythUIImage      *m_channelImage;
 };
 

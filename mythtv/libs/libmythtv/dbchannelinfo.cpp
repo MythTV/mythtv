@@ -23,12 +23,12 @@ DBChannel::DBChannel(const DBChannel &other)
 DBChannel::DBChannel(
     const QString &_channum, const QString &_callsign,
     uint _chanid, uint _major_chan, uint _minor_chan,
-    uint _favorite, uint _mplexid, bool _visible,
+    uint _mplexid, bool _visible,
     const QString &_name, const QString &_icon) :
     channum(_channum),
     callsign(_callsign), chanid(_chanid),
     major_chan(_major_chan), minor_chan(_minor_chan),
-    favorite(_favorite), mplexid(_mplexid), visible(_visible),
+    mplexid(_mplexid), visible(_visible),
     name(_name), icon(_icon)
 {
     channum.detach();
@@ -46,7 +46,6 @@ DBChannel &DBChannel::operator=(const DBChannel &other)
     chanid     = other.chanid;
     major_chan = other.major_chan;
     minor_chan = other.minor_chan;
-    favorite   = other.favorite;
     mplexid    = (other.mplexid == 32767) ? 0 : other.mplexid;
     visible    = other.visible;
     name       = other.name; name.detach();

@@ -24,7 +24,7 @@ class MPUBLIC DBChannel
     DBChannel(const DBChannel&);
     DBChannel(const QString &_channum, const QString &_callsign,
               uint _chanid, uint _major_chan, uint _minor_chan,
-              uint _favorite, uint _mplexid, bool _visible,
+              uint _mplexid, bool _visible,
               const QString &_name, const QString &_icon);
     DBChannel& operator=(const DBChannel&);
 
@@ -37,7 +37,6 @@ class MPUBLIC DBChannel
     uint    chanid;
     uint    major_chan;
     uint    minor_chan;
-    uint    favorite;
     uint    mplexid;
     bool    visible;
     QString name;

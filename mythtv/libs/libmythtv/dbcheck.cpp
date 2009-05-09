@@ -18,7 +18,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1233";
+const QString currentDatabaseVersion = "1234";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -41,6 +41,8 @@ The schema contains the following tables:
 <tr><td>capturecard                <td>pk(cardid)
 <tr><td>cardinput                  <td>pk(cardinputid)
 <tr><td>channel                    <td>pk(chanid) k(channum,sourceid)
+<tr><td>channelgroup               <td>pk(id)
+<tr><td>channelgroupnames          <td>pk(grpid)
 <tr><td>codecparams                <td>pk(profile,name)
 <tr><td>conflictresolutionany      <td>k(prefertitle) k(disliketitle)
 <tr><td>conflictresolutionoverride <td>k(chanid,starttime) k(endtime)
@@ -49,7 +51,6 @@ The schema contains the following tables:
 <tr><td>dtv_multiplex              <td>pk(mplexid)
 <tr><td>dtv_privatetypes
 <tr><td>dvb_signal_quality         <td>pk(id) k(sampletime,cardid)
-<tr><td>favorites                  <td>pk(favid)
 <tr><td>housekeeping               <td>pk(tag)
 <tr><td>jobqueue                   <td>pk(id) uk(chanid,starttime,type,inserttime)
 <tr><td>jumppoints                 <td>pk(destination,hostname)
@@ -4480,6 +4481,44 @@ NULL
             return false;
     }
 
+    if (dbver == "1233")
+    {
+       const char *updates[] = {
+"CREATE TABLE IF NOT EXISTS channelgroup ("
+"  id int(10) unsigned NOT NULL auto_increment,"
+"  chanid int(11) unsigned NOT NULL default '0',"
+"  grpid int(11) NOT NULL default '1', PRIMARY KEY (id));", 
+"CREATE TABLE IF NOT EXISTS channelgroupnames ("
+"  grpid int(10) unsigned NOT NULL auto_increment,"
+"  name varchar(64) NOT NULL default '0',"
+"  PRIMARY KEY (grpid));",
+"INSERT INTO channelgroupnames (grpid, name) VALUES (1, 'Favorites');",
+NULL
+        };
+        if (!performActualUpdate(updates, "1234", dbver))
+            return false;
+
+        // copy existing favorites to the new channel group
+        MSqlQuery favorites(MSqlQuery::InitCon());
+        favorites.prepare("SELECT DISTINCT chanid FROM favorites");
+        if (favorites.exec() && favorites.isActive() && favorites.size() > 0)
+        {
+            MSqlQuery update(MSqlQuery::InitCon());
+            while (favorites.next())
+            {
+                update.prepare("INSERT INTO channelgroup (chanid, grpid) "
+                               "VALUES (:CHANID, :GRPID);");
+                update.bindValue(":CHANID", favorites.value(0).toInt());
+                update.bindValue(":GRPID", 1);
+                update.exec();
+            }
+        }
+
+        // finally drop the favorites table
+        favorites.prepare("DROP TABLE IF EXISTS favorites;");
+        favorites.exec();
+    }
+
     return true;
 }
 
@@ -4614,6 +4653,16 @@ tmp.constData(),
 "  KEY channel_src (channum,sourceid),"
 "  KEY sourceid (sourceid,xmltvid,chanid),"
 "  KEY visible (visible)"
+");",
+"CREATE TABLE channelgroup ("
+"  id int(10) unsigned NOT NULL auto_increment,"
+"  chanid int(11) unsigned NOT NULL default '0',"
+"  grpid int(11) NOT NULL default '1', PRIMARY KEY (id)"
+");", 
+"CREATE TABLE channelgroupnames ("
+"  grpid int(10) unsigned NOT NULL auto_increment,"
+"  name varchar(64) NOT NULL default '0',"
+"  PRIMARY KEY (grpid)"
 ");",
 "CREATE TABLE channelscan ("
 "  scanid int(3) unsigned NOT NULL AUTO_INCREMENT,"
@@ -4792,12 +4841,6 @@ tmp.constData(),
 "  endtime int(10) unsigned NOT NULL,"
 "  `status` tinyint(4) NOT NULL default '0',"
 "  PRIMARY KEY  (chanid,eventid,`status`)"
-");",
-"CREATE TABLE favorites ("
-"  favid int(11) unsigned NOT NULL AUTO_INCREMENT,"
-"  userid int(11) unsigned NOT NULL default '0',"
-"  chanid int(11) unsigned NOT NULL default '0',"
-"  PRIMARY KEY  (favid)"
 ");",
 "CREATE TABLE housekeeping ("
 "  tag varchar(64) NOT NULL default '',"

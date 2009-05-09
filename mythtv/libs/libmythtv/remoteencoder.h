@@ -50,7 +50,7 @@ class MPUBLIC RemoteEncoder
         PictureAdjustType type, PictureAttribute attr, bool up);
     void ChangeChannel(int channeldirection);
     void ChangeDeinterlacer(int deint_mode);
-    void ToggleChannelFavorite(void);
+    void ToggleChannelFavorite(QString);
     void SetChannel(QString channel);
     int  SetSignalMonitoringRate(int msec, bool notifyFrontend = true);
     uint GetSignalLockTimeout(QString input);

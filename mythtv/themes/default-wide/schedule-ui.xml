@@ -31,19 +31,25 @@
         </shape>
 
         <shape name="shape5">
-            <area>20,240,1240,450</area>
+            <area>20,240,1240,455</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>15</cornerradius>
         </shape>
 
         <textarea name="datetext" from="basetextarea">
-            <area>25,255,190,25</area>
-            <align>allcenter</align>
+            <area>25,245,190,25</area>
+            <align>top,hcenter</align>
+        </textarea>
+
+        <textarea name="channelgroup" from="basetextarea">
+            <area>25,270,190,25</area>
+            <align>bottom,hcenter</align>
+            <font>basesmallpurple</font>
         </textarea>
 
         <guidegrid name="guidegrid">
-            <area>220,290,1032,390</area>
+            <area>220,295,1032,390</area>
             <layout>horizontal</layout>
             <channels>5</channels>
             <timeslots>4</timeslots>
@@ -116,7 +122,7 @@
         </buttonlist>
 
         <buttonlist name="channellist">
-            <area>25,290,190,395</area>
+            <area>25,295,190,395</area>
             <layout>vertical</layout>
             <spacing>0</spacing>
             <buttonarea>0,0,190,395</buttonarea>
@@ -237,7 +243,7 @@
         </shape>
 
         <shape name="shape5">
-            <area>20,240,1240,450</area>
+            <area>20,240,1240,455</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>15</cornerradius>
@@ -253,14 +259,20 @@
         <imagetype name="video">
             <area>940,50,300,170</area>
         </imagetype>
-        
+
         <textarea name="datetext" from="basetextarea">
-            <area>25,255,190,25</area>
-            <align>allcenter</align>
+            <area>25,245,190,25</area>
+            <align>top,hcenter</align>
+        </textarea>
+
+        <textarea name="channelgroup" from="basetextarea">
+            <area>25,270,190,25</area>
+            <align>bottom,hcenter</align>
+            <font>basesmallpurple</font>
         </textarea>
 
         <guidegrid name="guidegrid">
-            <area>220,290,1032,390</area>
+            <area>220,295,1032,390</area>
             <layout>horizontal</layout>
             <channels>5</channels>
             <timeslots>4</timeslots>
@@ -333,12 +345,12 @@
         </buttonlist>
 
         <buttonlist name="channellist">
-            <area>25,290,190,395</area>
+            <area>25,295,190,395</area>
             <layout>vertical</layout>
             <spacing>0</spacing>
             <buttonarea>0,0,190,395</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,190,74</area>
+                <area>0,0,195,74</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
                         <area>0,0,190,78</area>

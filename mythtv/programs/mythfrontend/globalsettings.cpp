@@ -3121,17 +3121,6 @@ static HostCheckBox *EPGShowChannelIcon()
     return gc;
 }
 
-static HostCheckBox *EPGShowFavorites()
-{
-    HostCheckBox *gc = new HostCheckBox("EPGShowFavorites");
-    gc->setLabel(QObject::tr("Only display 'favorite' channels"));
-    gc->setHelpText(QObject::tr("If enabled, the EPG will initially display "
-                    "only the channels marked as favorites. Pressing "
-                    "\"4\" will toggle between displaying favorites and all "
-                    "channels."));
-    gc->setValue(false);
-    return gc;
-}
 
 static GlobalCheckBox *EPGEnableJumpToChannel()
 {
@@ -3142,6 +3131,72 @@ static GlobalCheckBox *EPGEnableJumpToChannel()
     gc->setValue(false);
     return gc;
 }
+
+static HostCheckBox *ChannelGroupRememberLast()
+{
+    HostCheckBox *gc = new HostCheckBox("ChannelGroupRememberLast");
+    gc->setLabel(QObject::tr("Remember last channel group"));
+    gc->setHelpText(QObject::tr("If enabled, the EPG will initially display "
+                    "only the channels from the last channel group selected. Pressing "
+                    "\"4\" will toggle channel group."));
+    gc->setValue(false);
+    return gc;
+}
+
+static HostComboBox *ChannelGroupDefault()
+{
+    HostComboBox *gc = new HostComboBox("ChannelGroupDefault");
+    gc->setLabel(QObject::tr("Default channel group"));
+
+    ChannelGroupList changrplist;
+
+    changrplist = ChannelGroup::GetChannelGroups();
+
+    gc->addSelection(QObject::tr("All Channels"), "-1");
+
+    ChannelGroupList::iterator it;
+
+    for (it = changrplist.begin(); it < changrplist.end(); ++it)
+       gc->addSelection(it->name, QString("%1").arg(it->grpid));
+
+    gc->setHelpText(QObject::tr("Default channel group to be shown in the the EPG"
+                    "Pressing GUIDE key will toggle channel group."));
+    gc->setValue(false);
+    return gc;
+}
+
+static HostCheckBox *BrowseChannelGroup()
+{
+    HostCheckBox *gc = new HostCheckBox("BrowseChannelGroup");
+    gc->setLabel(QObject::tr("Browse/Change channels from Channel Group"));
+    gc->setHelpText(QObject::tr("If enabled, LiveTV will browse or change channels "
+                    "from the selected channel group. \"All Channels\" "
+                    "channel group may be selected to browse all channels."));
+    gc->setValue(false);
+    return gc;
+}
+
+// Channel Group Settings
+class ChannelGroupSettings : public TriggeredConfigurationGroup
+{
+  public:
+    ChannelGroupSettings() : TriggeredConfigurationGroup(false, true, false, false)
+    {
+         setLabel(QObject::tr("Remember last channel group"));
+         setUseLabel(false);
+
+         Setting* RememberChanGrpEnabled = ChannelGroupRememberLast();
+         addChild(RememberChanGrpEnabled);
+         setTrigger(RememberChanGrpEnabled);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false,false);
+         settings->addChild(ChannelGroupDefault());
+         addTarget("0", settings);
+
+         // show nothing if RememberChanGrpEnabled is on
+         addTarget("1", new VerticalConfigurationGroup(true,false));
+     };
+};
 
 // General RecPriorities settings
 
@@ -4909,7 +4964,13 @@ GeneralSettings::GeneralSettings()
     general2->addChild(RecordOverTime());
     general2->addChild(CategoryOverTimeSettings());
     addChild(general2);
-
+    
+    VerticalConfigurationGroup* changrp = new VerticalConfigurationGroup(false);
+    changrp->setLabel(QObject::tr("General (Channel Groups)"));
+    ChannelGroupSettings *changroupsettings = new ChannelGroupSettings();
+    changrp->addChild(changroupsettings);
+    changrp->addChild(BrowseChannelGroup());
+    addChild(changrp);
 }
 
 EPGSettings::EPGSettings()
@@ -4919,7 +4980,6 @@ EPGSettings::EPGSettings()
     epg->addChild(EPGShowCategoryColors());
     epg->addChild(EPGShowCategoryText());
     epg->addChild(EPGShowChannelIcon());
-    epg->addChild(EPGShowFavorites());
     epg->addChild(WatchTVGuide());
     addChild(epg);
 

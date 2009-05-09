@@ -167,7 +167,8 @@ class MPUBLIC ChannelUtil
     static QString GetVideoFilters(uint sourceid, const QString &channum)
         { return GetChannelValueStr("videofilters", sourceid, channum); }
 
-    static DBChanList GetChannels(uint srcid, bool vis_only, QString grp="");
+    static DBChanList GetChannels(uint srcid, bool vis_only, 
+                                  QString grp = "", int changrpid = -1);
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(DBChanList &list, const QString &order,
                                 bool eliminate_duplicates = false);

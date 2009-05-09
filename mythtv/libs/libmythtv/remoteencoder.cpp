@@ -402,10 +402,11 @@ QString RemoteEncoder::SetInput(QString input)
     return (lastinput.isEmpty()) ? "Error" : lastinput;
 }
 
-void RemoteEncoder::ToggleChannelFavorite(void)
+void RemoteEncoder::ToggleChannelFavorite(QString changroupname)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "TOGGLE_CHANNEL_FAVORITE";
+    strlist << changroupname;
 
     SendReceiveStringList(strlist);
 }

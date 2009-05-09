@@ -51,6 +51,7 @@ using namespace std;
 #include "lcddevice.h"
 #include "langsettings.h"
 #include "mythcommandlineparser.h"
+#include "channelgroupsettings.h"
 
 #include "myththemedmenu.h"
 #include "myththemebase.h"
@@ -523,6 +524,11 @@ void TVMenuCallback(void *data, QString &selection)
         EPGSettings settings;
         settings.exec();
     }
+    else if (sel == "settings channelgroups")
+    {
+        ChannelGroupEditor editor;
+        editor.exec();
+    } 
     else if (sel == "settings generalrecpriorities")
     {
         GeneralRecPrioritiesSettings settings;

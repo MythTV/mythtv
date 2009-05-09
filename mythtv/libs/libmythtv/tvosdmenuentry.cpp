@@ -202,6 +202,8 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(
         new TVOSDMenuEntry("JUMPREC",                 1,  1,  1,  0, "List of Recorded Shows"));
     curMenuEntries.append(
+        new TVOSDMenuEntry("CHANNELGROUP",            1,  -1,  -1,  -1, "Channel Groups"));
+    curMenuEntries.append(
         new TVOSDMenuEntry("TOGGLEBROWSE",     1,  -1,  -1,  -1, "Live TV Browse Mode"));
     curMenuEntries.append(
         new TVOSDMenuEntry("PREVCHAN",              1,  -1,  -1,  -1, "Previous TV Channel"));

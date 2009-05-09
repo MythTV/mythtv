@@ -16,7 +16,7 @@
  *   ProgramInfo network protocol layout in the following files:
  *
  *   MythWeb
- *       mythplugins/mythweb/includes/mythbackend.php (version number)
+ *       mythplugins/mythweb/classes/MythBackend.php (version number)
  *       mythplugins/mythweb/modules/tv/includes/objects/Program.php (layout)
  *
  *   MythTV Perl Bindings
@@ -27,7 +27,7 @@
  *       mythtv/bindings/python/MythTV/MythTV.py (version number)
  *       mythtv/bindings/python/MythTV/MythTV.py (layout)
  */
-#define MYTH_PROTO_VERSION "44"
+#define MYTH_PROTO_VERSION "45"
 
 #endif
 

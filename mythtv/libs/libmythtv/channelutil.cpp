@@ -1570,27 +1570,21 @@ bool ChannelUtil::GetChannelSettings(int chanid, bool &useonairguide,
     return true;
 }
 
-DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
+DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, int changrpid)
 {
     DBChanList list;
-    QMap<uint,uint> favorites;
+    
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT chanid, favid "
-        "FROM favorites");
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("get channels -- favorites", query);
-    else
-    {
-        while (query.next())
-            favorites[query.value(0).toUInt()] = query.value(1).toUInt();
-    }
 
     QString qstr =
-        "SELECT channum, callsign, chanid, "
+        "SELECT channum, callsign, channel.chanid, "
         "       atsc_major_chan, atsc_minor_chan, "
         "       name, icon, mplexid, visible "
         "FROM channel ";
+
+    // Select only channels from the specified channel group
+    if (changrpid > -1)
+        qstr += QString(",channelgroup ");
 
     if (sourceid)
         qstr += QString("WHERE sourceid='%1' ").arg(sourceid);
@@ -1598,6 +1592,12 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
         qstr += ",cardinput,capturecard "
             "WHERE cardinput.sourceid = channel.sourceid   AND "
             "      cardinput.cardid   = capturecard.cardid     ";
+
+    if (changrpid > -1)
+    {
+        qstr += QString("AND channel.chanid = channelgroup.chanid "
+                        "AND channelgroup.grpid ='%1' ").arg(changrpid);
+    }
 
     if (vis_only)
         qstr += "AND visible=1 ";
@@ -1623,7 +1623,6 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
             query.value(2).toUInt(),                      /* chanid     */
             query.value(3).toUInt(),                      /* ATSC major */
             query.value(4).toUInt(),                      /* ATSC minor */
-            favorites[query.value(2).toUInt()],           /* favid      */
             query.value(7).toUInt(),                      /* mplexid    */
             query.value(8).toBool(),                      /* visible    */
             query.value(5).toString(),                    /* name       */
@@ -1825,7 +1824,7 @@ uint ChannelUtil::GetNextChannel(
                 (mplexid_restriction &&
                  (mplexid_restriction != it->mplexid))));
     }
-    else if (CHANNEL_DIRECTION_UP == direction)
+    else if ((CHANNEL_DIRECTION_UP == direction) || (CHANNEL_DIRECTION_FAVORITE == direction))
     {
         do
         {
@@ -1835,20 +1834,6 @@ uint ChannelUtil::GetNextChannel(
         }
         while ((it != start) &&
                ((skip_non_visible && !it->visible) ||
-                (mplexid_restriction &&
-                 (mplexid_restriction != it->mplexid))));
-    }
-    else if (CHANNEL_DIRECTION_FAVORITE == direction)
-    {
-        do
-        {
-            it++;
-            if (it == sorted.end())
-                it = sorted.begin();
-        }
-        while ((it != start) &&
-               (!it->favorite ||
-                (skip_non_visible && !it->visible) ||
                 (mplexid_restriction &&
                  (mplexid_restriction != it->mplexid))));
     }

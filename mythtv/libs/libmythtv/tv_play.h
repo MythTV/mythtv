@@ -25,6 +25,7 @@
 #include "videoouttypes.h"
 #include "volumebase.h"
 #include "inputinfo.h"
+#include "channelgroup.h"
 
 #include <qobject.h>
 
@@ -52,7 +53,7 @@ typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);
 typedef void (*EMBEDRETURNVOID) (void *, bool);
-typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool, bool);
+typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool, bool, int);
 typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool, bool);
 
 // Locking order
@@ -276,6 +277,10 @@ class MPUBLIC TV : public QThread
     bool HasUDPNotifyEvent(void) const;
     void HandleUDPNotifyEvent(void);
 
+    // Channel Groups
+    void SaveChannelGroup(void);
+    void UpdateChannelList(int groupID);
+
   public slots:
     void HandleOSDClosed(int osdType);
     void timerEvent(QTimerEvent*);
@@ -346,7 +351,7 @@ class MPUBLIC TV : public QThread
     void StopStuff(PlayerContext *mctx, PlayerContext *ctx,
                    bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
 
-    void ToggleChannelFavorite(PlayerContext*);
+    void ToggleChannelFavorite(PlayerContext*, QString);
     void ChangeChannel(PlayerContext*, int direction);
     void ChangeChannel(PlayerContext*, uint chanid, const QString &channum);
     void PauseLiveTV(PlayerContext*);
@@ -527,6 +532,7 @@ class MPUBLIC TV : public QThread
     void FillMenuTimeStretch(   const PlayerContext*, OSDGenericTree*) const;
     void FillMenuSleepMode(     const PlayerContext*, OSDGenericTree*) const;
     bool FillMenuTracks(        const PlayerContext*, OSDGenericTree*, uint type) const;
+    void FillMenuChanGroups(    const PlayerContext *ctx, OSDGenericTree *treeMenu) const;
 
     void UpdateLCD(void);
     bool HandleLCDTimerEvent(void);
@@ -761,6 +767,12 @@ class MPUBLIC TV : public QThread
     QWaitCondition            recorderPlaybackInfoWaitCond;
     QMap<int,int>             recorderPlaybackInfoTimerId;
     QMap<int,ProgramInfo>     recorderPlaybackInfo;
+
+    // Channel group stuff    
+    int channel_group_id;
+    uint browse_changrp;
+    ChannelGroupList m_changrplist;
+    DBChanList m_channellist;
 
     // Network Control stuff
     MythDeque<QString> networkControlCommands;

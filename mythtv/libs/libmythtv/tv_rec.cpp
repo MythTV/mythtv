@@ -59,6 +59,8 @@ using namespace std;
 #include "iptvrecorder.h"
 #include "firewirerecorder.h"
 
+#include "channelgroup.h"
+
 #ifdef USING_V4L
 #include "v4lchannel.h"
 #endif
@@ -2915,7 +2917,7 @@ void TVRec::RecorderPaused(void)
 /** \fn TVRec::ToggleChannelFavorite()
  *  \brief Toggles whether the current channel should be on our favorites list.
  */
-void TVRec::ToggleChannelFavorite(void)
+void TVRec::ToggleChannelFavorite(QString changroupname)
 {
     QMutexLocker lock(&stateChangeLock);
 
@@ -2935,39 +2937,26 @@ void TVRec::ToggleChannelFavorite(void)
                 "\t\t\tCould not toggle favorite.").arg(channum));
         return;
     }
-
-    // Check if favorite exists for that chanid...
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT favorites.favid "
-        "FROM favorites "
-        "WHERE favorites.chanid = :CHANID "
-        "LIMIT 1");
-    query.bindValue(":CHANID", chanid);
-
-    if (!query.exec() || !query.isActive())
+    
+    int  changrpid;
+    bool result;
+    
+    changrpid = ChannelGroup::GetChannelGroupId(changroupname);
+    
+    if (changrpid <1)
     {
-        MythDB::DBError("togglechannelfavorite", query);
-    }
-    else if (query.size() > 0)
-    {
-        // We have a favorites record...Remove it to toggle...
-        query.next();
-        QString favid = query.value(0).toString();
-        query.prepare(
-            QString("DELETE FROM favorites "
-                    "WHERE favid = '%1'").arg(favid));
-        query.exec();
-        VERBOSE(VB_RECORD, LOC + "Removing Favorite.");
-    }
+          VERBOSE(VB_RECORD, LOC + QString("ToggleChannelFavorite: Invalid "
+                   "channel group name %1, ").arg(changroupname));
+    }   
     else
     {
-        // We have no favorites record...Add one to toggle...
-        query.prepare(
-            QString("INSERT INTO favorites (chanid) "
-                    "VALUES ('%1')").arg(chanid));
-        query.exec();
-        VERBOSE(VB_RECORD, LOC + "Adding Favorite.");
+        result = ChannelGroup::ToggleChannel(chanid, changrpid, true);
+
+        if (!result)
+           VERBOSE(VB_RECORD, LOC + "Unable to toggle channel favorite.");
+        else
+           VERBOSE(VB_RECORD, LOC + QString("Toggled channel favorite."
+                   "channum %1, chan group %2").arg(channum).arg(changroupname));
     }
 }
 

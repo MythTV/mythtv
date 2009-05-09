@@ -728,10 +728,10 @@ QString EncoderLink::SetInput(QString input)
  *         <b>This only works on local recorders.</b>
  *  \return -1 if query does not succeed, otherwise.
  */
-void EncoderLink::ToggleChannelFavorite(void)
+void EncoderLink::ToggleChannelFavorite(QString changroup)
 {
     if (local)
-        tv->ToggleChannelFavorite();
+        tv->ToggleChannelFavorite(changroup);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: ToggleChannelFavorite");
 }

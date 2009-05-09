@@ -357,6 +357,8 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->getRequestDelete();
+    
+    tv->SaveChannelGroup();
 
     delete tv;
 
@@ -436,8 +438,8 @@ void TV::InitKeys(void)
             "in the program guide", "0");
     REG_KEY("TV Frontend", "GUIDE", "Show the Program Guide", "S");
     REG_KEY("TV Frontend", "FINDER", "Show the Program Finder", "#");
-    REG_KEY("TV Frontend", "NEXTFAV", "Toggle showing all channels or just "
-            "favorites in the program guide.", "/");
+    REG_KEY("TV Frontend", "NEXTFAV", "Cycle through channel groups and all channels "
+            "in the program guide.", "/");
     REG_KEY("TV Frontend", "CHANUPDATE", "Switch channels without exiting "
             "guide in Live TV mode.", "X");
     REG_KEY("TV Frontend", "VOLUMEDOWN", "Volume down", "[,{,F10,Volume Down");
@@ -803,6 +805,8 @@ bool TV::Init(bool createWindow)
     osd_general_timeout  = gContext->GetNumSetting("OSDGeneralTimeout", 2);
     osd_prog_info_timeout= gContext->GetNumSetting("OSDProgramInfoTimeout", 3);
     tryUnflaggedSkip     = gContext->GetNumSetting("TryUnflaggedSkip", 0);
+    channel_group_id     = gContext->GetNumSetting("ChannelGroupDefault", -1);
+    browse_changrp       = gContext->GetNumSetting("BrowseChannelGroup", 0);
     smartForward         = gContext->GetNumSetting("SmartForward", 0);
     stickykeys           = gContext->GetNumSetting("StickyKeys");
     ff_rew_repos         = gContext->GetNumSetting("FFRewReposTime", 100)/100.0;
@@ -816,6 +820,17 @@ bool TV::Init(bool createWindow)
     QString feVBI = gContext->GetSetting("DecodeVBIFormat", "");
     if (!feVBI.isEmpty())
         vbimode = VBIMode::Parse(gContext->GetSetting(feVBI));
+
+    channel_group_id     = gContext->GetNumSetting("ChannelGroupDefault", -1);
+    browse_changrp       = gContext->GetNumSetting("BrowseChannelGroup", 0);
+
+    if (browse_changrp && (channel_group_id > -1))
+    {
+      m_channellist = ChannelUtil::GetChannels(0, true, "channum, callsign", channel_group_id);
+      ChannelUtil::SortChannels(m_channellist, "channum", true);
+    }
+
+    m_changrplist  = ChannelGroup::GetChannelGroups();
 
     if (createWindow)
     {
@@ -973,6 +988,34 @@ TV::~TV(void)
     GetMythMainWindow()->GetPaintWindow()->show();
 
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- end");
+}
+
+/**
+ * \brief save channel group setting to database
+ */
+void TV::SaveChannelGroup(void)
+{
+    int remember_last_changrp = gContext->GetNumSetting("ChannelGroupRememberLast", 0);
+
+    if (remember_last_changrp)
+       gContext->SaveSetting("ChannelGroupDefault", channel_group_id); 
+}
+
+/**
+ * \brief update the channel list with channels from the selected channel group
+ */
+void TV::UpdateChannelList(int groupID)
+{
+    if (groupID == channel_group_id)
+        return;
+
+    channel_group_id = groupID;
+
+    if (browse_changrp)
+    {
+        m_channellist = ChannelUtil::GetChannels(0, true, "channum, callsign", channel_group_id);
+        ChannelUtil::SortChannels(m_channellist, "channum", true);
+    }
 }
 
 /**
@@ -4306,8 +4349,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         ToggleSleepTimer(ctx);
     else if (has_action("TOGGLERECORD", actions) && islivetv)
         ToggleRecord(ctx);
-    else if (has_action("TOGGLEFAV", actions) && islivetv)
-        ToggleChannelFavorite(ctx);
+//    else if (has_action("TOGGLEFAV", actions) && islivetv)
+//        ToggleChannelFavorite(ctx);
     else if (has_action("TOGGLECHANCONTROLS", actions) && islivetv)
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Channel);
     else if (has_action("TOGGLERECCONTROLS", actions) && islivetv)
@@ -6282,10 +6325,10 @@ void TV::ToggleInputs(PlayerContext *ctx, uint inputid)
     UpdateOSDInput(ctx, inputname);
 }
 
-void TV::ToggleChannelFavorite(PlayerContext *ctx)
+void TV::ToggleChannelFavorite(PlayerContext *ctx, QString changroup_name)
 {
     if (ctx->recorder)
-        ctx->recorder->ToggleChannelFavorite();
+        ctx->recorder->ToggleChannelFavorite(changroup_name);
 }
 
 QString TV::GetQueuedInput(void) const
@@ -6539,6 +6582,34 @@ bool TV::CommitQueuedInput(PlayerContext *ctx)
 void TV::ChangeChannel(PlayerContext *ctx, int direction)
 {
     bool muted = false;
+
+    if ((browse_changrp || (direction == CHANNEL_DIRECTION_FAVORITE)) && 
+        (channel_group_id > -1))
+    {
+       uint    chanid;
+
+       ctx->LockPlayingInfo(__FILE__, __LINE__);
+       if (!ctx->playingInfo)
+       {
+           VERBOSE(VB_IMPORTANT,
+                   LOC_ERR + "ChangeChannel(): no active ctx playingInfo.");
+           ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+           ReturnPlayerLock(ctx);
+           return;
+       }
+
+       // Collect channel info
+       const ProgramInfo pginfo(*ctx->playingInfo);
+       uint    old_chanid  = pginfo.chanid.toUInt();
+       ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+       chanid = ChannelUtil::GetNextChannel(m_channellist, old_chanid, 0, direction);
+
+       ChangeChannel(ctx, chanid, "");
+       return;
+    } 
+    else if (direction == CHANNEL_DIRECTION_FAVORITE)
+        direction = CHANNEL_DIRECTION_UP;
 
     QString oldinputname = ctx->recorder->GetInput();
 
@@ -7662,6 +7733,7 @@ void TV::DoEditSchedule(int editType)
     const ProgramInfo pginfo(*actx->playingInfo);
     uint    chanid  = pginfo.chanid.toUInt();
     QString channum = pginfo.chanstr;
+    int changrpid   = channel_group_id;
     actx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     ClearOSD(actx);
@@ -7719,7 +7791,7 @@ void TV::DoEditSchedule(int editType)
         case kScheduleProgramGuide:
         {
             isEmbedded = (isLiveTV && !pause_active && allowEmbedding);
-            RunProgramGuidePtr(chanid, channum, this, isEmbedded, true);
+            RunProgramGuidePtr(chanid, channum, this, isEmbedded, true, changrpid);
             ignoreKeyPresses = true;
             break;
         }
@@ -8661,6 +8733,33 @@ void TV::BrowseDispInfo(PlayerContext *ctx, int direction)
     if (!browsemode)
         BrowseStart(ctx);
 
+    // if browsing channel groups is enabled or direction if BROWSE_FAVORITES
+    // Then pick the next channel in the channel group list to browse
+    // If channel group is ALL CHANNELS (-1), then bypass picking from 
+    // the channel group list
+    if ((browse_changrp || (direction == BROWSE_FAVORITE)) &&
+        (channel_group_id > -1) && (direction != BROWSE_SAME) &&
+        (direction != BROWSE_RIGHT) && (direction != BROWSE_LEFT))
+    {
+      uint chanid;
+      int  dir;
+
+      if ( (direction == BROWSE_UP) || (direction == BROWSE_FAVORITE) )
+        dir = CHANNEL_DIRECTION_UP;
+      else if (direction == BROWSE_DOWN)
+        dir = CHANNEL_DIRECTION_DOWN;
+      else // this should never happen, but just in case
+        dir = direction;
+
+      chanid = ChannelUtil::GetNextChannel(m_channellist, browsechanid, 0, dir);
+      VERBOSE(VB_IMPORTANT, QString("Get channel: %1").arg(chanid));
+      browsechanid  = chanid;
+      browsechannum = QString::null;
+      direction     = BROWSE_SAME;
+    }
+    else if ((channel_group_id == -1) && (direction == BROWSE_FAVORITE))
+      direction = BROWSE_UP;
+
     OSD *osd = GetOSDLock(ctx);
     if (ctx->paused || !osd)
     {
@@ -9564,6 +9663,69 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     }
     else if (action == "GUIDE")
         EditSchedule(actx, kScheduleProgramGuide);
+    else if (action.left(10) == "CHANGROUP_")
+    {
+        if (action == "CHANGROUP_ALL_CHANNELS")
+            channel_group_id = -1;
+        else
+        {
+            action.remove("CHANGROUP_");
+
+            channel_group_id = action.toInt();
+
+            if (browse_changrp)
+            {
+                m_channellist = ChannelUtil::GetChannels(0, true, "channum, callsign", channel_group_id);
+                ChannelUtil::SortChannels(m_channellist, "channum", true);
+
+                // make sure the current channel is from the selected group
+                // or tune to the first in the group
+                if (actx->tvchain)
+                {
+                    QString cur_channum = actx->tvchain->GetChannelName(-1);
+                    QString new_channum = cur_channum;
+
+                    DBChanList::const_iterator it = m_channellist.begin();
+                    for (; it != m_channellist.end(); ++it)
+                    {
+                        if ((*it).channum == cur_channum)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (it == m_channellist.end())
+                    {
+                        // current channel not found so switch to the
+                        // first channel in the group
+                        it = m_channellist.begin();
+                        if (it != m_channellist.end())
+                            new_channum = (*it).channum;
+                    }
+
+                    VERBOSE(VB_IMPORTANT, LOC + QString("Channel Group: '%1'->'%2'")
+                            .arg(cur_channum).arg(new_channum));
+
+                    // Only change channel if new channel != current channel
+                    if (cur_channum != new_channum && !new_channum.isEmpty())
+                    {
+                        QMutexLocker locker(&timerIdLock);
+                        queuedInput   = new_channum; queuedInput.detach();
+                        queuedChanNum = new_channum; queuedChanNum.detach();
+                        queuedChanID  = 0;
+                        if (!queueInputTimerId)
+                            queueInputTimerId = StartTimer(10, __LINE__);
+                    }
+
+                    // Turn off OSD Channel Num so the channel changes right away
+                    OSD *osd = GetOSDLock(actx);
+                    if (osd)
+                        osd->HideSet("channel_number");
+                    ReturnOSDLock(actx, osd);
+                }
+            }
+        }
+    }
     else if (action == "FINDER")
         EditSchedule(actx, kScheduleProgramFinder);
     else if (action == "SCHEDULE")
@@ -9761,6 +9923,10 @@ void TV::FillOSDTreeMenu(
         if (lastProgram != NULL)
             new OSDGenericTree(jtp_item, lastProgram->title, "JUMPPREV");
     }
+    else if (category == "CHANNELGROUP")
+    {
+        FillMenuChanGroups(ctx, treeMenu);
+    }
     else if (category == "TOGGLEBROWSE")
     {
         if (!db_browse_always)
@@ -9813,6 +9979,29 @@ void TV::FillOSDTreeMenu(
         FillMenuVideoScan(ctx, treeMenu);
     else if (category == "SLEEP")
         FillMenuSleepMode(ctx, treeMenu);
+}
+
+void TV::FillMenuChanGroups(
+    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+{
+    if (!browse_changrp)
+        return;
+
+    OSDGenericTree *cg_item = new OSDGenericTree(treeMenu, tr("Channel Groups"), 
+                                                 "CHANGROUP");
+    new OSDGenericTree(cg_item, tr("All Channels"), "CHANGROUP_ALL_CHANNELS",
+                                (channel_group_id == -1) ? 1 : 0,
+                                NULL, "CHANNELGROUP");
+
+    ChannelGroupList::const_iterator it;
+
+    for (it = m_changrplist.begin(); it != m_changrplist.end(); ++it)
+    {
+        QString name = QString("CHANGROUP_%1").arg(it->grpid);
+        new OSDGenericTree(cg_item, it->name, name, 
+                           ((int)(it->grpid) == channel_group_id) ? 1 : 0,
+                           NULL, "CHANNELGROUP");
+    }
 }
 
 void TV::FillMenuPlaying(

@@ -111,7 +111,7 @@ class EncoderLink
     vector<InputInfo> GetFreeInputs(const vector<uint> &excluded_cards) const;
     QString GetInput(void) const;
     QString SetInput(QString);
-    void ToggleChannelFavorite(void);
+    void ToggleChannelFavorite(QString);
     void ChangeChannel(int channeldirection);
     void SetChannel(const QString &name);
     int  GetPictureAttribute(PictureAttribute attr);
