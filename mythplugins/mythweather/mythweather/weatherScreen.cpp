@@ -327,7 +327,8 @@ void AnimatedImageScreen::prepareWidget(MythUIType *widget)
     {
         MythUIImage *img = (MythUIImage *) widget;
 
-        img->SetImageCount(0, m_count);
+        img->SetImageCount(0, m_count - 1);
+        img->SetDelay(500);
         img->Load();
     }
     return;

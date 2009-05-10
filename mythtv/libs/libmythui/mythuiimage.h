@@ -30,6 +30,8 @@ class MPUBLIC MythUIImage : public MythUIType
     void SetImage(MythImage *img) __attribute__ ((deprecated));
     void SetImages(QVector<MythImage *> &images) __attribute__ ((deprecated));
 
+    void SetDelay(int delayms);
+
     QString GenImageLabel(const QString &filename, int w, int h);
     QString GenImageLabel(int w, int h);
 
@@ -53,8 +55,6 @@ class MPUBLIC MythUIImage : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
-
-    void SetDelay(int delayms);
 
     void SetSize(int width, int height);
     void SetSize(const QSize &size);

@@ -78,7 +78,7 @@
     <screen name="Animated Map" hasunits="no">
         <datum name="amdesc" />
         <datum name="updatetime" />
-        <datum name="datum" />
+        <datum name="animatedimage" />
     </screen>
 
     <screen name="Severe Weather Alerts" hasunits="no">

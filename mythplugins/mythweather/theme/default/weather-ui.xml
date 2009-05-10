@@ -399,7 +399,7 @@
             <align>allcenter</align>
         </textarea>
 
-        <imagetype name="animatedimagetype">
+        <imagetype name="animatedimage">
             <area>160,225,485,300</area>
         </imagetype>
     </window>
