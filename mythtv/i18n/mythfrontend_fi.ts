@@ -1,65 +1,130 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
+<context>
+    <name></name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Tuntematon</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="unfinished">Jonossa</translation>
+    </message>
+    <message>
+        <source>Pending</source>
+        <translation type="unfinished">Odottamassa</translation>
+    </message>
+    <message>
+        <source>Starting</source>
+        <translation type="unfinished">Aloittamassa</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation type="unfinished">Ajossa</translation>
+    </message>
+    <message>
+        <source>Stopping</source>
+        <translation type="unfinished">Lopettamassa</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished">Tauko</translation>
+    </message>
+    <message>
+        <source>Retrying</source>
+        <translation type="unfinished">Uudelleenyritys</translation>
+    </message>
+    <message>
+        <source>Erroring</source>
+        <translation type="unfinished">Virhe</translation>
+    </message>
+    <message>
+        <source>Aborting</source>
+        <translation type="unfinished">Keskeytys</translation>
+    </message>
+    <message>
+        <source>Done (Invalid status!)</source>
+        <translation type="unfinished">Valmis (Tapahtui virhe)</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished">Valmis</translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished">Keskeytetty</translation>
+    </message>
+    <message>
+        <source>Errored</source>
+        <translation type="unfinished">Virhe</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished">Peruutettu</translation>
+    </message>
+</context>
 <context>
     <name>@default</name>
     <message>
         <source>Unknown</source>
-        <translation>Tuntematon</translation>
+        <translation type="obsolete">Tuntematon</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation>Jonossa</translation>
+        <translation type="obsolete">Jonossa</translation>
     </message>
     <message>
         <source>Pending</source>
-        <translation>Odottamassa</translation>
+        <translation type="obsolete">Odottamassa</translation>
     </message>
     <message>
         <source>Starting</source>
-        <translation>Aloittamassa</translation>
+        <translation type="obsolete">Aloittamassa</translation>
     </message>
     <message>
         <source>Running</source>
-        <translation>Ajossa</translation>
+        <translation type="obsolete">Ajossa</translation>
     </message>
     <message>
         <source>Stopping</source>
-        <translation>Lopettamassa</translation>
+        <translation type="obsolete">Lopettamassa</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation>Tauko</translation>
+        <translation type="obsolete">Tauko</translation>
     </message>
     <message>
         <source>Retrying</source>
-        <translation>Uudelleenyritys</translation>
+        <translation type="obsolete">Uudelleenyritys</translation>
     </message>
     <message>
         <source>Erroring</source>
-        <translation>Virhe</translation>
+        <translation type="obsolete">Virhe</translation>
     </message>
     <message>
         <source>Aborting</source>
-        <translation>Keskeytys</translation>
+        <translation type="obsolete">Keskeytys</translation>
     </message>
     <message>
         <source>Done (Invalid status!)</source>
-        <translation>Valmis (Tapahtui virhe)</translation>
+        <translation type="obsolete">Valmis (Tapahtui virhe)</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation>Valmis</translation>
+        <translation type="obsolete">Valmis</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation>Keskeytetty</translation>
+        <translation type="obsolete">Keskeytetty</translation>
     </message>
     <message>
         <source>Errored</source>
-        <translation>Virhe</translation>
+        <translation type="obsolete">Virhe</translation>
     </message>
     <message>
         <source>Cancelled</source>
-        <translation>Peruutettu</translation>
+        <translation type="obsolete">Peruutettu</translation>
     </message>
 </context>
 <context>
@@ -83,6 +148,10 @@
     <message>
         <source>Search</source>
         <translation>Haku</translation>
+    </message>
+    <message>
+        <source>Shall I attempt to connect to this host with default database parameters?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -315,6 +384,37 @@
     <message>
         <source>Delete</source>
         <translation>Poista</translation>
+    </message>
+</context>
+<context>
+    <name>ChannelGroupEditor</name>
+    <message>
+        <source>Channel Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New Channel Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete &apos;%1&apos; Channel group?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete group</source>
+        <translation type="unfinished">Kyllä, poista ryhmä</translation>
+    </message>
+    <message>
+        <source>No, Don&apos;t delete group</source>
+        <translation type="unfinished">Ei, älä poista ryhmää</translation>
+    </message>
+    <message>
+        <source>(Create new group)</source>
+        <translation type="unfinished">(Luo uusi ryhmä)</translation>
     </message>
 </context>
 <context>
@@ -976,11 +1076,11 @@
     <name>DVBUtilsImportPane</name>
     <message>
         <source>File location</source>
-        <translation>Tiedoston sijainti</translation>
+        <translation type="obsolete">Tiedoston sijainti</translation>
     </message>
     <message>
         <source>Location of the channels.conf file.</source>
-        <translation>channels.conf-tiedoston sijainti.</translation>
+        <translation type="obsolete">channels.conf-tiedoston sijainti.</translation>
     </message>
 </context>
 <context>
@@ -1402,6 +1502,69 @@
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Haluatko varmasti poistaa säännön &apos;%1&apos; %2?</translation>
     </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished">Asetukset</translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Nauhoita</translation>
+    </message>
+    <message>
+        <source>Edit Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished">Tietoa ohjelmasta</translation>
+    </message>
+    <message>
+        <source>Upcoming</source>
+        <translation type="unfinished">Tuleva</translation>
+    </message>
+    <message>
+        <source>Custom Edit</source>
+        <translation type="unfinished">Oma muokkaus</translation>
+    </message>
+    <message>
+        <source>Delete Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Channel Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add To Channel Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Channel Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose Channel Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any channel groups defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Channel Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunConfigurationGroup</name>
+    <message>
+        <source>Badly formatted Device ID</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HDPVRConfigurationGroup</name>
@@ -1497,43 +1660,43 @@
     <name>IPTVChannelFetcher</name>
     <message>
         <source>Downloading Playlist</source>
-        <translation>Ladataan soittolistaa</translation>
+        <translation type="obsolete">Ladataan soittolistaa</translation>
     </message>
     <message>
         <source>Processing Playlist</source>
-        <translation>Käsitellään soittolistaa</translation>
+        <translation type="obsolete">Käsitellään soittolistaa</translation>
     </message>
     <message>
         <source>Adding Channels</source>
-        <translation>Lisätään kanavia</translation>
+        <translation type="obsolete">Lisätään kanavia</translation>
     </message>
     <message>
         <source>Channel #%1 : %2</source>
-        <translation>Kanava #%1 : %2</translation>
+        <translation type="obsolete">Kanava #%1 : %2</translation>
     </message>
     <message>
         <source>Adding %1</source>
-        <translation>Lisätään kanava %1</translation>
+        <translation type="obsolete">Lisätään kanava %1</translation>
     </message>
     <message>
         <source>Updating %1</source>
-        <translation>Päivitetään kanava %1</translation>
+        <translation type="obsolete">Päivitetään kanava %1</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation>Valmis</translation>
+        <translation type="obsolete">Valmis</translation>
     </message>
     <message>
         <source>ERROR: M3U channel list is malformed</source>
-        <translation>VIRHE: M3U kanavalista on epämuodostunut</translation>
+        <translation type="obsolete">VIRHE: M3U kanavalista on epämuodostunut</translation>
     </message>
     <message>
         <source>Encountered malformed channel</source>
-        <translation>Löydettiin epämuodostunut kanava</translation>
+        <translation type="obsolete">Löydettiin epämuodostunut kanava</translation>
     </message>
     <message>
         <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation>Jäsentää kanavaa #%1 : %2 : %3</translation>
+        <translation type="obsolete">Jäsentää kanavaa #%1 : %2 : %3</translation>
     </message>
 </context>
 <context>
@@ -1695,9 +1858,11 @@
         <source>Failed with exit status %1</source>
         <translation>Poistuminen tilasta %1 epäonnistui</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n commercial break(s)</source>
-        <translation>%n mainoskatkoa
+        <translation type="unfinished">
+            <numerusform>%n mainoskatkoa
+        </numerusform>
         </translation>
     </message>
     <message>
@@ -1896,7 +2061,7 @@
     <name>MultiplexSetting</name>
     <message>
         <source>Transport</source>
-        <translation>Lähetysvirta</translation>
+        <translation type="obsolete">Lähetysvirta</translation>
     </message>
 </context>
 <context>
@@ -1909,9 +2074,11 @@
         <source>Offset: %1 x %2</source>
         <translation>Korjaus: %1 x %2</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Change amount: %n pixel(s)</source>
-        <translation>Muutettu määrä: %n pikseliä
+        <translation type="unfinished">
+            <numerusform>Muutettu määrä: %n pikseliä
+        </numerusform>
         </translation>
     </message>
     <message>
@@ -2217,9 +2384,11 @@ Palataan edelliseen valikkoon.</translation>
         <source>OK</source>
         <translation type="obsolete">Ok</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n match(es)</source>
-        <translation>%n vastaavuutta
+        <translation type="unfinished">
+            <numerusform>%n vastaavuutta
+        </numerusform>
         </translation>
     </message>
 </context>
@@ -2929,19 +3098,19 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Play options</source>
-        <translation>Toistoasetukset</translation>
+        <translation type="obsolete">Toistoasetukset</translation>
     </message>
     <message>
         <source>Storage options</source>
-        <translation>Tallennusasetukset</translation>
+        <translation type="obsolete">Tallennusasetukset</translation>
     </message>
     <message>
         <source>Scheduling options</source>
-        <translation>Ajastusasetukset</translation>
+        <translation type="obsolete">Ajastusasetukset</translation>
     </message>
     <message>
         <source>Job options</source>
-        <translation>Työasetukset</translation>
+        <translation type="obsolete">Työasetukset</translation>
     </message>
     <message>
         <source>Transcoding profiles</source>
@@ -3001,6 +3170,14 @@ Haluatko varmasti poistaa:</translation>
         <source>New Recording Group</source>
         <translation>Uusi nauhoitusryhmä</translation>
     </message>
+    <message>
+        <source>Play Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduling Options</source>
+        <translation type="unfinished">Ajastetun nauhoituksen asetukset</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -3046,7 +3223,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Maximum number of CPU cores used for decoding.</source>
-        <translation>Purkamiseen käytettävien suoritinydinten enimmäismäärä.</translation>
+        <translation type="obsolete">Purkamiseen käytettävien suoritinydinten enimmäismäärä.</translation>
     </message>
     <message>
         <source>H</source>
@@ -3063,6 +3240,10 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
         <translation>Poista valinta, jos video tärisee kun tietoikkuna on katoamassa.</translation>
+    </message>
+    <message>
+        <source>Maximum number of CPU cores used for video decoding and filtering.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3289,7 +3470,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="obsolete">Nauhoita</translation>
+        <translation type="unfinished">Nauhoita</translation>
     </message>
     <message>
         <source>Time Search</source>
@@ -3466,6 +3647,102 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>%1 of %2</source>
         <translation>%1/%2</translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished">Aika</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished">Asetukset</translation>
+    </message>
+    <message>
+        <source>Choose Search Phrase...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished">Tietoa ohjelmasta</translation>
+    </message>
+    <message>
+        <source>Upcoming</source>
+        <translation type="unfinished">Tuleva</translation>
+    </message>
+    <message>
+        <source>Custom Edit</source>
+        <translation type="unfinished">Oma muokkaus</translation>
+    </message>
+    <message>
+        <source>Delete Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Old Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Sort Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Sort Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NOTE: removing items from this list will not delete any recordings.</source>
+        <translation type="unfinished">Huomio: tietueen poisto ei tuhoa nauhoituksia.</translation>
+    </message>
+    <message>
+        <source>Allow this episode to re-record</source>
+        <translation type="unfinished">Salli tämän jakson uudelleennauhoitus</translation>
+    </message>
+    <message>
+        <source>Never record this episode</source>
+        <translation type="unfinished">Älä nauhoita tätä jaksoa uudelleen</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished">Poista jakso listasta</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished">Poista kaikki tämän nimikkeen jaksot listasta</translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished">Lähetysajalla päinvastoin</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished">Nimikkeellä päinvastoin</translation>
     </message>
 </context>
 <context>
@@ -3764,6 +4041,78 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source> + %1 automatic priority (%2hr)</source>
         <translation> + %1 automaattinen prioriteetti (%2hr)</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished">Asetukset</translation>
+    </message>
+    <message>
+        <source>Increase Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished">Tietoa ohjelmasta</translation>
+    </message>
+    <message>
+        <source>Upcoming</source>
+        <translation type="unfinished">Tuleva</translation>
+    </message>
+    <message>
+        <source>Custom Edit</source>
+        <translation type="unfinished">Oma muokkaus</translation>
+    </message>
+    <message>
+        <source>Delete Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Sort Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse Sort Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Record Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Last Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By Average Delay</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4254,7 +4603,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Guide Shading Method</source>
-        <translation>Oppaan varjostusmenetelmä</translation>
+        <translation type="obsolete">Oppaan varjostusmenetelmä</translation>
     </message>
     <message>
         <source>Display the channel icon</source>
@@ -4262,11 +4611,11 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Channels to Display</source>
-        <translation>Näytettävät kanavat</translation>
+        <translation type="obsolete">Näytettävät kanavat</translation>
     </message>
     <message>
         <source>Time Blocks (30 mins) to Display</source>
-        <translation>Kuinka monta 30 minuutin aikaväliä näytetään</translation>
+        <translation type="obsolete">Kuinka monta 30 minuutin aikaväliä näytetään</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -4755,19 +5104,19 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation>Alpha - läpinäkyvä (korkea prosessorin käyttöaste)</translation>
+        <translation type="obsolete">Alpha - läpinäkyvä (korkea prosessorin käyttöaste)</translation>
     </message>
     <message>
         <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation>Blender - läpinäkyvä (keskimääräinen prosessorin käyttöaste)</translation>
+        <translation type="obsolete">Blender - läpinäkyvä (keskimääräinen prosessorin käyttöaste)</translation>
     </message>
     <message>
         <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation>Eco - läpinäkyvä (matala prosessorin käyttöaste)</translation>
+        <translation type="obsolete">Eco - läpinäkyvä (matala prosessorin käyttöaste)</translation>
     </message>
     <message>
         <source>Solid (CPU Usage - Middle)</source>
-        <translation>Solid (keskimääräinen prosessorin käyttöaste)</translation>
+        <translation type="obsolete">Solid (keskimääräinen prosessorin käyttöaste)</translation>
     </message>
     <message>
         <source>Display Genre Colors</source>
@@ -5031,7 +5380,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Constellation</source>
-        <translation>Konstellaatio</translation>
+        <translation type="obsolete">Konstellaatio</translation>
     </message>
     <message>
         <source>FEC</source>
@@ -6304,11 +6653,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Floating Program Guide Selector</source>
-        <translation>Kelluva ohjelmaoppaan valitsin</translation>
+        <translation type="obsolete">Kelluva ohjelmaoppaan valitsin</translation>
     </message>
     <message>
         <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation>Jos valittuna, ohjelmaoppaan valitsin on vapaa liikkumaan oppaassa, muutoin se säilyy keskellä opasta.</translation>
+        <translation type="obsolete">Jos valittuna, ohjelmaoppaan valitsin on vapaa liikkumaan oppaassa, muutoin se säilyy keskellä opasta.</translation>
     </message>
     <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
@@ -6316,11 +6665,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Only display &apos;favorite&apos; channels</source>
-        <translation>Näytä vain suosikkikanavat</translation>
+        <translation type="obsolete">Näytä vain suosikkikanavat</translation>
     </message>
     <message>
         <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation>Jos valittuna, ohjelmaopas näyttää aluksi vain suosikkikanavat. Painamalla &quot;4&quot;-näppäintä pystyy vaihtamaan suosikkikanavien ja kaikkien kanavien näyttämisen välillä.</translation>
+        <translation type="obsolete">Jos valittuna, ohjelmaopas näyttää aluksi vain suosikkikanavat. Painamalla &quot;4&quot;-näppäintä pystyy vaihtamaan suosikkikanavien ja kaikkien kanavien näyttämisen välillä.</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
@@ -7384,16 +7733,16 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>Bandwidth (Default: Auto)
 </source>
-        <translation>Kaistaleveys (oletusarvo: Auto)
+        <translation type="obsolete">Kaistaleveys (oletusarvo: Auto)
 </translation>
     </message>
     <message>
         <source>Modulation (Default: Auto)</source>
-        <translation>Modulaatio (oletusarvo: Auto)</translation>
+        <translation type="obsolete">Modulaatio (oletusarvo: Auto)</translation>
     </message>
     <message>
         <source>Constellation (Default: Auto)</source>
-        <translation>Tähtikuvio (oletusarvo: Auto)</translation>
+        <translation type="obsolete">Tähtikuvio (oletusarvo: Auto)</translation>
     </message>
     <message>
         <source>Forward Error Correction (Default: Auto)</source>
@@ -7477,7 +7826,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
-        <translation>Maanpäällinen</translation>
+        <translation type="obsolete">Maanpäällinen</translation>
     </message>
     <message>
         <source>Cable</source>
@@ -7696,7 +8045,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Scan Type</source>
-        <translation>Viritystyyppi</translation>
+        <translation type="obsolete">Viritystyyppi</translation>
     </message>
     <message>
         <source>Channel Change Error</source>
@@ -8171,23 +8520,23 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>(5_1) Underscore</source>
-        <translation>(5_1) Alaviiva</translation>
+        <translation type="obsolete">(5_1) Alaviiva</translation>
     </message>
     <message>
         <source>(5-1) Minus</source>
-        <translation>(5-1) Miinus</translation>
+        <translation type="obsolete">(5-1) Miinus</translation>
     </message>
     <message>
         <source>(5.1) Period</source>
-        <translation>(5.1) Piste</translation>
+        <translation type="obsolete">(5.1) Piste</translation>
     </message>
     <message>
         <source>(501) Zero</source>
-        <translation>(501) Nolla</translation>
+        <translation type="obsolete">(501) Nolla</translation>
     </message>
     <message>
         <source>(51) None</source>
-        <translation>(51) Ei mitään</translation>
+        <translation type="obsolete">(51) Ei mitään</translation>
     </message>
     <message>
         <source>Using hardware MPEG decoder</source>
@@ -8243,11 +8592,11 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Minimal Updates</source>
-        <translation>Pienimmät päivitykset</translation>
+        <translation type="obsolete">Pienimmät päivitykset</translation>
     </message>
     <message>
         <source>Rename to Match</source>
-        <translation>Uudelleennimeä</translation>
+        <translation type="obsolete">Uudelleennimeä</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -8255,7 +8604,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Existing Channel Treatment</source>
-        <translation>Olemassaolevien kanavien kohtelu</translation>
+        <translation type="obsolete">Olemassaolevien kanavien kohtelu</translation>
     </message>
     <message>
         <source>Analog V4L capture card</source>
@@ -8427,7 +8776,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Ignore Signal Timeout</source>
-        <translation>Ohita signaalin aikakatkaisu</translation>
+        <translation type="obsolete">Ohita signaalin aikakatkaisu</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
@@ -9594,7 +9943,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Stretch</source>
-        <translation>Venytetty</translation>
+        <translation type="obsolete">Venytetty</translation>
     </message>
     <message>
         <source>Detective/Thriller</source>
@@ -10421,7 +10770,7 @@ Seuraava kuva on tyhjä. Poistu siitä ja palaa valikkoon.</translation>
     </message>
     <message>
         <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation>Tämä valinta mahdollistaa rikkinäisten ajureiden etsinnän hidastuksen, kuten DVB -ajurit Leadtek LR6650 DVB -korteille.</translation>
+        <translation type="obsolete">Tämä valinta mahdollistaa rikkinäisten ajureiden etsinnän hidastuksen, kuten DVB -ajurit Leadtek LR6650 DVB -korteille.</translation>
     </message>
     <message>
         <source>Frequency table to use.</source>
@@ -10433,32 +10782,32 @@ Seuraava kuva on tyhjä. Poistu siitä ja palaa valikkoon.</translation>
     </message>
     <message>
         <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation>Modulaation, 8-VSB, QAM-256, etc.</translation>
+        <translation type="obsolete">Modulaation, 8-VSB, QAM-256, etc.</translation>
     </message>
     <message>
         <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation>Useimmat kaapelijärjestelmät Yhdysvalloissa käyttävät QAM-256 tai QAM-64, mutta jotkin sekoitetut järjestelmät voivat käyttää 8-VSB:tä over-the-air -kanaville.</translation>
+        <translation type="obsolete">Useimmat kaapelijärjestelmät Yhdysvalloissa käyttävät QAM-256 tai QAM-64, mutta jotkin sekoitetut järjestelmät voivat käyttää 8-VSB:tä over-the-air -kanaville.</translation>
     </message>
     <message>
         <source>ATSC Channel Separator</source>
-        <translation>ATSC kanavaerotin</translation>
+        <translation type="obsolete">ATSC kanavaerotin</translation>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
-        <translation>Mitä käyttää suurten ja pienten ATSC -kanavien erottamiseen.</translation>
+        <translation type="obsolete">Mitä käyttää suurten ja pienten ATSC -kanavien erottamiseen.</translation>
     </message>
     <message>
         <source>How to treat existing channels.</source>
-        <translation>Kuinka jo olemassa olevia kanavia käsitellään.</translation>
+        <translation type="obsolete">Kuinka jo olemassa olevia kanavia käsitellään.</translation>
     </message>
     <message>
         <source>Frequency (%1)</source>
-        <translation>Taajuus (%1)</translation>
+        <translation type="obsolete">Taajuus (%1)</translation>
     </message>
     <message>
         <source>Frequency (Option has no default).
 The frequency for this channel in %1.</source>
-        <translation>Taajuus (Valinnalla ei ole oletusarvoa)
+        <translation type="obsolete">Taajuus (Valinnalla ei ole oletusarvoa)
 Taajuus tälle kanavalle %1:ssa.</translation>
     </message>
     <message>
@@ -10469,11 +10818,11 @@ Useimmat dvb-s transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</
     </message>
     <message>
         <source>Timeout Scanning %1 -- no tables</source>
-        <translation>Aikakatkaisu etsittäessä %1 - ei taulukkoja</translation>
+        <translation type="obsolete">Aikakatkaisu etsittäessä %1 - ei taulukkoja</translation>
     </message>
     <message>
         <source>Timeout Scanning %1 -- no signal</source>
-        <translation>Aikakatkaisu etsittäessä %1 - ei signaalia</translation>
+        <translation type="obsolete">Aikakatkaisu etsittäessä %1 - ei signaalia</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
@@ -10741,7 +11090,7 @@ Taajuus tälle kanavalle %1:ssa</translation>
     </message>
     <message>
         <source>With workaround for broken interlaced modelines.</source>
-        <translation>Rikkinäisten lomituslinjojen ohittamisen kanssa.</translation>
+        <translation type="obsolete">Rikkinäisten lomituslinjojen ohittamisen kanssa.</translation>
     </message>
     <message>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
@@ -11966,7 +12315,7 @@ Taajuus tälle kanavalle %1:ssa</translation>
     </message>
     <message>
         <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/misc_status_info/README</source>
-        <translation>Ulkoinen laitteisto tai komentokoodi, joka tuottaa ylimääräistä tietoa, jota lisätä järjestelmän tilannetietosivulle.  Katso contrib/misc_status_info/README</translation>
+        <translation type="obsolete">Ulkoinen laitteisto tai komentokoodi, joka tuottaa ylimääräistä tietoa, jota lisätä järjestelmän tilannetietosivulle.  Katso contrib/misc_status_info/README</translation>
     </message>
     <message>
         <source>Your Local Timezone (for XMLTV)</source>
@@ -12290,28 +12639,28 @@ Taajuus tälle kanavalle %1:ssa</translation>
     </message>
     <message>
         <source>Failed to find any channels</source>
-        <translation>Ei onnistunut löytämään yhtään kanavaa</translation>
+        <translation type="obsolete">Ei onnistunut löytämään yhtään kanavaa</translation>
     </message>
     <message>
         <source>Found %1 new non-conflicting %2 channels.</source>
-        <translation type="obsolete">Löytyi %1 uutta ei-ristiriitaista %2 kanavaa.</translation>
+        <translation type="unfinished">Löytyi %1 uutta ei-ristiriitaista %2 kanavaa.</translation>
     </message>
     <message>
         <source>Found %1 old %2 channels.</source>
-        <translation type="obsolete">löytyi %1 vanhaa %2 kanavaa.</translation>
+        <translation type="unfinished">löytyi %1 vanhaa %2 kanavaa.</translation>
     </message>
     <message>
         <source>Found %1 new conflicting %2 channels.</source>
-        <translation type="obsolete">Löytyi %1 uutta ristiriidassa olevaa %2 kanavaa.</translation>
+        <translation type="unfinished">Löytyi %1 uutta ristiriidassa olevaa %2 kanavaa.</translation>
     </message>
     <message>
         <source>Found %1 conflicting old %2 channels.</source>
-        <translation type="obsolete">Löytyi %1 ristiriidassa olevaa vanhaa %2 kanavaa.</translation>
+        <translation type="unfinished">Löytyi %1 ristiriidassa olevaa vanhaa %2 kanavaa.</translation>
     </message>
     <message>
         <source>Found %1 transports:
 </source>
-        <translation type="obsolete">Löytyi %1 uutta lähetysvirtaa:
+        <translation type="unfinished">Löytyi %1 uutta lähetysvirtaa:
 </translation>
     </message>
     <message>
@@ -12356,11 +12705,11 @@ Taajuus tälle kanavalle %1:ssa</translation>
     </message>
     <message>
         <source>This channel was found to be in conflict with other channels</source>
-        <translation>Tämä kanava on ristiriidassa muiden kanavien kanssa</translation>
+        <translation type="obsolete">Tämä kanava on ristiriidassa muiden kanavien kanssa</translation>
     </message>
     <message>
         <source>Please enter a non-conflicting channel number:</source>
-        <translation>Ole hyvä ja syötä ei-ristiriidassa oleva kanavanumero:</translation>
+        <translation type="obsolete">Ole hyvä ja syötä ei-ristiriidassa oleva kanavanumero:</translation>
     </message>
     <message>
         <source>Updated Channel %1</source>
@@ -12416,7 +12765,7 @@ Taajuus tälle kanavalle %1:ssa</translation>
     </message>
     <message>
         <source>Processing NIT %1</source>
-        <translation>Käsitellään NIT %1</translation>
+        <translation type="obsolete">Käsitellään NIT %1</translation>
     </message>
     <message>
         <source>: Found %1</source>
@@ -12895,7 +13244,7 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Temporal (1x, Hw)</source>
-        <translation type="obsolete">Temporal (1x, Hw)</translation>
+        <translation type="unfinished">Temporal (1x, Hw)</translation>
     </message>
     <message>
         <source>Temporal (2x, Hw)</source>
@@ -12903,7 +13252,7 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Advanced (1x, Hw)</source>
-        <translation type="obsolete">Advanced (1x, Hw)</translation>
+        <translation type="unfinished">Advanced (1x, Hw)</translation>
     </message>
     <message>
         <source>Advanced (2x, Hw)</source>
@@ -13049,40 +13398,44 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <source>Card %1 (type %2) is set to start on channel %3, which does not exist.</source>
         <translation>Kortin %1 (tyyppi %2) on asetettu alkamaan kanavalta %3, jota ei ole olemassa.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n second(s)</source>
-        <translation>%n sekuntia
+        <translation type="unfinished">
+            <numerusform>%n sekuntia
+        </numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n minute(s)</source>
-        <translation>%n minuuttia
+        <translation type="unfinished">
+            <numerusform>%n minuuttia
+        </numerusform>
         </translation>
     </message>
     <message>
         <source>Found %n new non-conflicting %1 channel(s).</source>
-        <translation>Löytyi %n uutta ristiriidatonta kanavaa.
+        <translation type="obsolete">Löytyi %n uutta ristiriidatonta kanavaa.
         </translation>
     </message>
     <message>
         <source>Found %n old %2 channel(s).</source>
-        <translation>Löytyi %n vanhaa %2 kanavaa.
+        <translation type="obsolete">Löytyi %n vanhaa %2 kanavaa.
         </translation>
     </message>
     <message>
         <source>Found %n new conflicting %2 channel(s).</source>
-        <translation>Löytyi %n uutta ristiriidassa olevaa %2 kanavaa.
+        <translation type="obsolete">Löytyi %n uutta ristiriidassa olevaa %2 kanavaa.
         </translation>
     </message>
     <message>
         <source>Found %n conflicting old %2 channel(s).</source>
-        <translation>Löytyi %n ristiriidassa olevaa vanhaa %2 kanavaa.
+        <translation type="obsolete">Löytyi %n ristiriidassa olevaa vanhaa %2 kanavaa.
         </translation>
     </message>
     <message>
         <source>Found %n transport(s):
 </source>
-        <translation>Löytyi %n lähetysvirtaa:
+        <translation type="obsolete">Löytyi %n lähetysvirtaa:
 
         </translation>
     </message>
@@ -13090,9 +13443,11 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <source>Play</source>
         <translation>Toista</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n star(s)</source>
-        <translation>%n tähteä
+        <translation type="unfinished">
+            <numerusform>%n tähteä
+        </numerusform>
         </translation>
     </message>
     <message>
@@ -13103,14 +13458,18 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <source>1080i/p Resolution</source>
         <translation>Resoluutio 1080i/p</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>hour(s)</source>
-        <translation>tuntia
+        <translation type="unfinished">
+            <numerusform>tuntia
+        </numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation>%n tuntia
+        <translation type="unfinished">
+            <numerusform>%n tuntia
+        </numerusform>
         </translation>
     </message>
     <message>
@@ -13133,9 +13492,11 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <source>Error: no valid container to search for child &apos;%1&apos;</source>
         <translation>Virhe: ei kelpaavaa pakkausta, josta hakea lapsiobjektia &quot;%2&quot;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Finished, %n break(s) found.</source>
-        <translation>Valmis, %n taukoa löydetty.
+        <translation type="unfinished">
+            <numerusform>Valmis, %n taukoa löydetty.
+        </numerusform>
         </translation>
     </message>
     <message>
@@ -13148,9 +13509,11 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <comment>time</comment>
         <translation>%1 ja %1 jäljellä</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n day(s)</source>
-        <translation>%n päivää
+        <translation type="unfinished">
+            <numerusform>%n päivää
+        </numerusform>
         </translation>
     </message>
     <message>
@@ -13164,6 +13527,174 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     <message>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation>Tämä komento herättää alisteisen koneen. Pääjärjestelmä ei käytä tätä asetusta.</translation>
+    </message>
+    <message>
+        <source>Unable to connect to device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Device ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Device ID or address.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Model: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, Firmware: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, ID %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, at address %1.%2.%3.%4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select/Unselect channels for this channel group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Group - Page </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>of</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to find any new channels!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to find any channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This channel &apos;%1&apos; was found to be in conflict with other channels. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a unique channel number. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number (or type %1 to skip): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You chose to manually insert this channel &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading Playlist</source>
+        <translation type="unfinished">Ladataan soittolistaa</translation>
+    </message>
+    <message>
+        <source>Processing Playlist</source>
+        <translation type="unfinished">Käsitellään soittolistaa</translation>
+    </message>
+    <message>
+        <source>Adding Channels</source>
+        <translation type="unfinished">Lisätään kanavia</translation>
+    </message>
+    <message>
+        <source>Channel #%1 : %2</source>
+        <translation type="unfinished">Kanava #%1 : %2</translation>
+    </message>
+    <message>
+        <source>Adding %1</source>
+        <translation type="unfinished">Lisätään kanava %1</translation>
+    </message>
+    <message>
+        <source>Updating %1</source>
+        <translation type="unfinished">Päivitetään kanava %1</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Valmis</translation>
+    </message>
+    <message>
+        <source>ERROR: M3U channel list is malformed</source>
+        <translation type="unfinished">VIRHE: M3U kanavalista on epämuodostunut</translation>
+    </message>
+    <message>
+        <source>Encountered malformed channel</source>
+        <translation type="unfinished">Löydettiin epämuodostunut kanava</translation>
+    </message>
+    <message>
+        <source>Parsing Channel #%1 : %2 : %3</source>
+        <translation type="unfinished">Jäsentää kanavaa #%1 : %2 : %3</translation>
+    </message>
+    <message>
+        <source>Kernel (2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interlaced (2x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This deinterlacer attempts to syncronise with interlaced displays whose size and refresh rate exactly match the video source. It has low CPU requirements.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This deinterlacer uses several fields to reduce motion blur. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This deinterlacer uses multiple fields to reduce motion blur and smooth edges. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>H.Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>V.Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember last channel group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, the EPG will initially display only the channels from the last channel group selected. Pressing &quot;4&quot; will toggle channel group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default channel group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default channel group to be shown in the the EPGPressing GUIDE key will toggle channel group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse/Change channels from Channel Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, LiveTV will browse or change channels from the selected channel group. &quot;All Channels&quot; channel group may be selected to browse all channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (Channel Groups)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/info/misc_status_info/README</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13200,91 +13731,91 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     <name>SIScan</name>
     <message>
         <source>Updated Channel %1</source>
-        <translation>Kanava %1 päivitetty</translation>
+        <translation type="obsolete">Kanava %1 päivitetty</translation>
     </message>
     <message>
         <source>Added Channel %1</source>
-        <translation>Kanava %1 lisätty</translation>
+        <translation type="obsolete">Kanava %1 lisätty</translation>
     </message>
     <message>
         <source>Failed to add channel %1</source>
-        <translation>Kanavan %1 lisäys epäonnistui</translation>
+        <translation type="obsolete">Kanavan %1 lisäys epäonnistui</translation>
     </message>
     <message>
         <source>Network %1 Processing</source>
-        <translation>Käsitellään verkkoa %1</translation>
+        <translation type="obsolete">Käsitellään verkkoa %1</translation>
     </message>
     <message>
         <source>Finished processing Transport List</source>
-        <translation>Lähetyslistan käsittely valmis</translation>
+        <translation type="obsolete">Lähetyslistan käsittely valmis</translation>
     </message>
     <message>
         <source>Updating Services</source>
-        <translation>Päivitetään palveluita</translation>
+        <translation type="obsolete">Päivitetään palveluita</translation>
     </message>
     <message>
         <source>Finished processing Services</source>
-        <translation>Palveluiden käsittely valmis</translation>
+        <translation type="obsolete">Palveluiden käsittely valmis</translation>
     </message>
     <message>
         <source>Frequency %1</source>
-        <translation>Taajuus %1</translation>
+        <translation type="obsolete">Taajuus %1</translation>
     </message>
     <message>
         <source>as</source>
-        <translation>nimellä</translation>
+        <translation type="obsolete">nimellä</translation>
     </message>
     <message>
         <source>Skipping %1, not in imported channel map</source>
-        <translation>Ohitetaan %1, puuttuu syötettystä kanavakartasta</translation>
+        <translation type="obsolete">Ohitetaan %1, puuttuu syötettystä kanavakartasta</translation>
     </message>
     <message>
         <source>%1%2%3 on %4 (%5)</source>
-        <translation>%1%2%3 %4:ssä (%5)</translation>
+        <translation type="obsolete">%1%2%3 %4:ssä (%5)</translation>
     </message>
     <message>
         <source>Adding %1</source>
-        <translation>Lisätään kanava %1</translation>
+        <translation type="obsolete">Lisätään kanava %1</translation>
     </message>
     <message>
         <source>Updating %1</source>
-        <translation>Päivitetään kanava %1</translation>
+        <translation type="obsolete">Päivitetään kanava %1</translation>
     </message>
     <message>
         <source>Skipping %1</source>
-        <translation>Ohitetaan kanava %1</translation>
+        <translation type="obsolete">Ohitetaan kanava %1</translation>
     </message>
     <message>
         <source>on %1</source>
-        <translation>%1:ssä</translation>
+        <translation type="obsolete">%1:ssä</translation>
     </message>
     <message>
         <source>Data Only Channel (off-air?)</source>
-        <translation>Vain tietoa sisältävä kanava (ei vastaanota?)</translation>
+        <translation type="obsolete">Vain tietoa sisältävä kanava (ei vastaanota?)</translation>
     </message>
     <message>
         <source>Empty Channel (off-air?)</source>
-        <translation>Tyhjä kanava (ei vastaanota?)</translation>
+        <translation type="obsolete">Tyhjä kanava (ei vastaanota?)</translation>
     </message>
     <message>
         <source>Audio Only Channel</source>
-        <translation>Vain ääntä sisältävä kanava</translation>
+        <translation type="obsolete">Vain ääntä sisältävä kanava</translation>
     </message>
     <message>
         <source>Encrypted Channel</source>
-        <translation>Salattu kanava</translation>
+        <translation type="obsolete">Salattu kanava</translation>
     </message>
     <message>
         <source>%1 %2-%3 as %4 on %5 (%6)</source>
-        <translation>%1 %2-%3 on %4 %5:ssä (%6)</translation>
+        <translation type="obsolete">%1 %2-%3 on %4 %5:ssä (%6)</translation>
     </message>
     <message>
         <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
-        <translation>Löydettiin kanava, mutta se ei vastaa käytettyä tsid:tä. Voit halutessasi poistaa käytössä olevat kanavat ja tehdä täyden haun.</translation>
+        <translation type="obsolete">Löydettiin kanava, mutta se ei vastaa käytettyä tsid:tä. Voit halutessasi poistaa käytössä olevat kanavat ja tehdä täyden haun.</translation>
     </message>
     <message>
         <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation>Ohitetaan %1 - löytyy jo tietokannasta, eikä meillä ole parempaa tietoa.</translation>
+        <translation type="obsolete">Ohitetaan %1 - löytyy jo tietokannasta, eikä meillä ole parempaa tietoa.</translation>
     </message>
 </context>
 <context>
@@ -13360,11 +13891,11 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Full Scan of Existing Transports</source>
-        <translation>Olemassaolevien lähetysvirtojen täysi haku</translation>
+        <translation type="obsolete">Olemassaolevien lähetysvirtojen täysi haku</translation>
     </message>
     <message>
         <source>Existing Transport Scan</source>
-        <translation>Olemassaolevan lähetysvirran etsintä</translation>
+        <translation type="obsolete">Olemassaolevan lähetysvirran etsintä</translation>
     </message>
     <message>
         <source>M3U Import</source>
@@ -13372,15 +13903,27 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Full Scan (ATSC)</source>
-        <translation>Täysi haku (ATSC)</translation>
+        <translation type="obsolete">Täysi haku (ATSC)</translation>
     </message>
     <message>
         <source>Full Scan (DVB)</source>
-        <translation>Täysi haku (DVB)</translation>
+        <translation type="obsolete">Täysi haku (DVB)</translation>
     </message>
     <message>
         <source>Full Scan (DVB, tuned)</source>
-        <translation>Täysi haku (viritetty DVB)</translation>
+        <translation type="obsolete">Täysi haku (viritetty DVB)</translation>
+    </message>
+    <message>
+        <source>Import existing scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan of all existing transports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan of single existing transport</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13412,15 +13955,15 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation>Etsitään</translation>
+        <translation type="obsolete">Etsitään</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation>Etsintävelho</translation>
+        <translation type="obsolete">Etsintävelho</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation>Virhe lähetysvirran virittämisessä</translation>
+        <translation type="obsolete">Virhe lähetysvirran virittämisessä</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
@@ -13428,7 +13971,7 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Error starting scan</source>
-        <translation>Virhe etsinnän aloittamisessa</translation>
+        <translation type="obsolete">Virhe etsinnän aloittamisessa</translation>
     </message>
     <message>
         <source>Failed to open : </source>
@@ -13440,11 +13983,11 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Failed to open &apos;%1&apos;</source>
-        <translation>Ei saatu avattua tiedostoa %1</translation>
+        <translation type="obsolete">Ei saatu avattua tiedostoa %1</translation>
     </message>
     <message>
         <source>Failed to parse &apos;%1&apos;</source>
-        <translation>Ei saatu jäsenneltyä tiedostoa %1</translation>
+        <translation type="obsolete">Ei saatu jäsenneltyä tiedostoa %1</translation>
     </message>
 </context>
 <context>
@@ -13886,48 +14429,62 @@ Ei muita tietoja</translation>
         <source>The AutoExpire List shows all recordings which may be expired and the order of their expiration. Recordings at the top of the list will be expired first.</source>
         <translation>Automaattisen vanhentumisen luettelo näyttää kaikki nauhoitukset, jotka voidaan poistaa niiden vanhentumisjärjestyksessä. Ylimmäiset poistetaan ensimmäiseksi.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n day(s)</source>
-        <translation>%n päivää
+        <translation type="unfinished">
+            <numerusform>%n päivää
+        </numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n standard rule(s) (is) defined</source>
-        <translation>%n standardisääntöä määritelty
+        <translation type="unfinished">
+            <numerusform>%n standardisääntöä määritelty
+        </numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n search rule(s) are defined</source>
-        <translation>%n hakusääntöä määritelty
+        <translation type="unfinished">
+            <numerusform>%n hakusääntöä määritelty
+        </numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n matching showing(s)</source>
-        <translation>%n vastaavaa esitystä
+        <translation type="unfinished">
+            <numerusform>%n vastaavaa esitystä
+        </numerusform>
         </translation>
     </message>
     <message>
         <source>is asleep</source>
         <translation>nukkuu</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n recording(s) consuming %1 (is) allowed to expire
 </source>
-        <translation>%n nauhoitusta käynnissä. %1 mahdollista vanhentua
+        <translation type="unfinished">
+            <numerusform>%n nauhoitusta käynnissä. %1 mahdollista vanhentua
 
+        </numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n (is) LiveTV and consume(s) %2
 </source>
-        <translation>%n on Television katselua ja kuluttaa %2
+        <translation type="unfinished">
+            <numerusform>%n on Television katselua ja kuluttaa %2
 
+        </numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 (is) Deleted and consume(s) %2
 </source>
-        <translation>%1 poistettu ja kuluttaa %2
+        <translation type="unfinished">
+            <numerusform>%1 poistettu ja kuluttaa %2
+        </numerusform>
         </translation>
     </message>
 </context>
@@ -15052,14 +15609,28 @@ Valitse nykyinen nauhoitus</translation>
         <source>Error: MythTV is using all inputs, but there are no active recordings?</source>
         <translation type="unfinished">Virhe: MythTV käyttää kaikkia sisääntuloja, mutta aktiivisia nauhoituksia ei ole</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n minute(s)</source>
-        <translation>%n minuuttia
+        <translation type="unfinished">
+            <numerusform>%n minuuttia
+        </numerusform>
         </translation>
     </message>
     <message>
         <source>DVD Title Menu</source>
         <translation>DVD-otsikkojen valikko</translation>
+    </message>
+    <message>
+        <source>Recovered from video error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Channels</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -15453,6 +16024,46 @@ Valitse nykyinen nauhoitus</translation>
     <message>
         <source>Conflict %1</source>
         <translation>Ristiriita %1</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished">Asetukset</translation>
+    </message>
+    <message>
+        <source>Show Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished">Tietoa ohjelmasta</translation>
+    </message>
+    <message>
+        <source>Upcoming</source>
+        <translation type="unfinished">Tuleva</translation>
+    </message>
+    <message>
+        <source>Custom Edit</source>
+        <translation type="unfinished">Oma muokkaus</translation>
+    </message>
+    <message>
+        <source>Delete Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
     </message>
 </context>
 <context>
