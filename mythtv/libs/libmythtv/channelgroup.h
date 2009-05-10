@@ -7,7 +7,10 @@
 // qt
 #include <QString>
 
-class ChannelGroupItem
+// mythtv
+#include "mythexp.h"
+
+class MPUBLIC ChannelGroupItem
 {
   public:
     ChannelGroupItem(const ChannelGroupItem&);
