@@ -3,27 +3,27 @@
 <context>
     <name>MythFlix</name>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="413"/>
+        <location filename="../mythflix/mythflix.cpp" line="407"/>
         <source>Browse Options</source>
         <translation>Bläddra inställningar</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="425"/>
+        <location filename="../mythflix/mythflix.cpp" line="419"/>
         <source>Add to Top of Queue</source>
         <translation>Lägg till först i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="426"/>
+        <location filename="../mythflix/mythflix.cpp" line="420"/>
         <source>Add to Bottom of Queue</source>
         <translation>Lägg till sist i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="427"/>
+        <location filename="../mythflix/mythflix.cpp" line="421"/>
         <source>Show NetFlix Page</source>
         <translation>Visa NetFlix sidan</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="428"/>
+        <location filename="../mythflix/mythflix.cpp" line="422"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -51,42 +51,42 @@ Minsta tillåtna värde är 30 minuter.</translation>
 <context>
     <name>MythFlixQueue</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="502"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="474"/>
         <source>Manage Queue</source>
         <translation>Hantera kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="514"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="486"/>
         <source>Top Of Queue</source>
         <translation>Först i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="515"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="487"/>
         <source>Remove From Queue</source>
         <translation>Ta bort från kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="519"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="491"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="183"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="159"/>
         <source>History for Queue: </source>
         <translation>Historia för kön:</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="185"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="161"/>
         <source>Items in Queue: </source>
         <translation>Nummer i kön:</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="517"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="489"/>
         <source>Move To Another Queue</source>
         <translation>Flytta till en annan kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="518"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="490"/>
         <source>Show NetFlix Page</source>
         <translation>Visa NetFlix sidan</translation>
     </message>
@@ -122,7 +122,7 @@ Minsta tillåtna värde är 30 minuter.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="180"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="156"/>
         <source>Default</source>
         <translation>Misslyckades</translation>
     </message>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="sv">
+<defaultcodec></defaultcodec>
 <context>
     <name>String::DayOfWeek</name>
     <message>
@@ -712,409 +713,442 @@
         <translation>UV Strålning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="14"/>
         <source>extended forecast</source>
         <translation>De kommande dagarna</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
+        <location filename="themestrings.h" line="15"/>
         <source>LO</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="17"/>
+        <location filename="themestrings.h" line="16"/>
         <source>HI</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
+        <location filename="themestrings.h" line="17"/>
         <source>today&apos;s forecast</source>
         <translation>Dagens prognos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="18"/>
         <source>tomorrow&apos;s outlook</source>
         <translation>Morgondagens prognos</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="20"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Forecast for</source>
         <translation>Prognos för</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="21"/>
+        <location filename="themestrings.h" line="20"/>
         <source>doppler radar</source>
         <translation>Dopplerradar</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Map Unavailable</source>
         <translation>Karta ej tillgänglig</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="22"/>
         <source>RAIN</source>
         <translation>REGN</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="24"/>
+        <location filename="themestrings.h" line="23"/>
         <source>MIX/ICE</source>
         <translation>MIX/IS</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="25"/>
+        <location filename="themestrings.h" line="24"/>
         <source>SNOW</source>
         <translation>SNÖ</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="28"/>
+        <location filename="themestrings.h" line="25"/>
         <source>LIGHT</source>
         <translation>LÄTT</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
+        <location filename="themestrings.h" line="26"/>
         <source>HEAVY</source>
         <translation>KRAFTIGT</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Enter Zip Code</source>
         <translation>Mata in postnummer</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="31"/>
         <source>weather setup</source>
         <translation>Inställningar för Vädervisaren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="32"/>
         <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
         <translation>För att spara, tryck &apos;i&apos;. För att avbryta tryck ESCAPE</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="27"/>
         <source>COLD</source>
         <translation>KALL</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="28"/>
         <source>COLDEST</source>
         <translation>KALLAST</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="29"/>
         <source>CLOUD TEMPERATURE</source>
         <translation>MOLNTEMPERATUR</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Wind(Gust)</source>
+        <translation>Blåst(pust)</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Wind Direction</source>
+        <translation>Vind Riktning</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Feels Like</source>
+        <translation>Känns som</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="33"/>
+        <source>High</source>
+        <translation>Hög</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="34"/>
+        <source>Low</source>
+        <translation>Låg</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="36"/>
+        <source>Global Settings</source>
+        <translation>Globala inställningar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Seconds to display each page:</source>
+        <translation>Sekunder att visa upp varje sida:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="38"/>
+        <source>Retrieve data in the background:</source>
+        <translation>Hämta data i bakgrunden:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Source Setup</source>
+        <translation>Källinställningar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>Data Retrieval Interval (minutes):</source>
+        <translation>Intervall för hämtning av data (minuter):</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="42"/>
+        <source>Source Update Timeout (seconds):</source>
+        <translation>Källuppdateringstimeout (sekunder):</translation>
+    </message>
+</context>
+<context>
+    <name>ThreeDayForecastScreen</name>
+    <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="246"/>
+        <source>Sunday</source>
+        <translation>Söndag</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="249"/>
+        <source>Monday</source>
+        <translation>Måndag</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="252"/>
+        <source>Tuesday</source>
+        <translation>Tisdag</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="255"/>
+        <source>Wednesday</source>
+        <translation>Onsdag</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="258"/>
+        <source>Thursday</source>
+        <translation>Torsdag</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="261"/>
+        <source>Friday</source>
+        <translation>Fredag</translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherScreen.cpp" line="264"/>
+        <source>Saturday</source>
+        <translation>Lördag</translation>
     </message>
 </context>
 <context>
     <name>Weather</name>
     <message>
-        <location filename="" line="0"/>
         <source> is invalid)</source>
         <translation type="obsolete">är ogiltig)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>   No Location Set, Please read the README</source>
         <translation type="obsolete"> Ingen plats satt, läs README-filen</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> - PAUSED -</source>
         <translation type="obsolete"> - PAUSAD -</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Configuring MythWeather...</source>
         <translation type="obsolete">Konfigurerar Vädervisaren...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Use the right arrow key to select unit conversion...</source>
         <translation type="obsolete">Använd höger piltangent för att välja enhet...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Weather Units</source>
         <translation type="obsolete">Väderenheter</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Location</source>
         <translation type="obsolete">Plats</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Aggressiveness</source>
         <translation type="obsolete">Agressivitet</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Imperial (Fahrenheit, in, etc)</source>
         <translation type="obsolete">Imperiella (Fahrenheit, tum etc)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Metric (Celsius, kPa, etc)</source>
         <translation type="obsolete">Metriska (Celsius, kPa etc)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Configuration Saved...</source>
         <translation type="obsolete">Konfiguration sparad...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Retrieving weather data...</source>
         <translation type="obsolete">Hämtar väderdata...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Use the right arrow key to select your location...</source>
         <translation type="obsolete">Använd höger piltangent för att välja plats...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Use the right arrow key to select the aggressiveness level...</source>
         <translation type="obsolete">Använd höger piltangent för att välja agressivitetsnivå...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> 1  High Speed Connection</source>
         <translation type="obsolete">1 Höghastighetsförbindelse</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> 8  Medium Speed Connection</source>
         <translation type="obsolete">8 Medelsnabb förbindelse</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> 15 Low Speed Connection</source>
         <translation type="obsolete">15 Låg förbindelsehastighet</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Obtaining initial weather data...</source>
         <translation type="obsolete">Hämtar väderdata...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Updating weather data...</source>
         <translation type="obsolete">Uppdaterar väderdata...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Calm</source>
         <translation type="obsolete">Lugn</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> at </source>
         <translation type="obsolete"> i </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Unlimited</source>
         <translation type="obsolete">Obegränsad</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> F</source>
         <translation type="obsolete">F</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> C</source>
         <translation type="obsolete">C</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> (minimal)</source>
         <translation type="obsolete">(minimal)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> (moderate)</source>
         <translation type="obsolete">(måttlig)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> (high)</source>
         <translation type="obsolete">(hög)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> (extreme)</source>
         <translation type="obsolete">(extrem)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Today a high of </source>
         <translation type="obsolete">Idag är högsta temperatur </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> and a low of </source>
         <translation type="obsolete"> och lägsta temperatur </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>. Currently there is a humidity of </source>
         <translation type="obsolete"> grader. För närvarande är luftfuktigheten </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>% and the winds are</source>
         <translation type="obsolete">% och vindhastigheten </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> calm.</source>
         <translation type="obsolete">lugn.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> coming in at </source>
         <translation type="obsolete">är </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> mph from the </source>
         <translation type="obsolete">mph från </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> Km/h from the </source>
         <translation type="obsolete">Km/h från </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> Visibility will be unlimited for today.</source>
         <translation type="obsolete"> Sikten kommer att vara obegränsad idag.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> Visibility conditions are unknown.</source>
         <translation type="obsolete"> Ingen prognos för sikten.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> There will be a visibility of </source>
         <translation type="obsolete"> Sikten kommer att vara </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> miles.</source>
         <translation type="obsolete">miles.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> km.</source>
         <translation type="obsolete">km.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Sunday</source>
         <translation type="obsolete">Söndag</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Monday</source>
         <translation type="obsolete">Måndag</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Tuesday</source>
         <translation type="obsolete">Tisdag</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Wednesday</source>
         <translation type="obsolete">Onsdag</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Thursday</source>
         <translation type="obsolete">Torsdag</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Friday</source>
         <translation type="obsolete">Fredag</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Saturday</source>
         <translation type="obsolete">Lördag</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Date Error</source>
         <translation type="obsolete">Datumfel</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Tomorrow expect a high of </source>
         <translation type="obsolete">Imorgon förväntas högsta temperatur vara </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>.</source>
         <translation type="obsolete">.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Expected conditions: </source>
         <translation type="obsolete">Prognos: </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Weather data from: </source>
         <translation type="obsolete">Väderdata från: </translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Updating...</source>
         <translation type="obsolete">Uppdaterar...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source> (Not All Information Available)</source>
         <translation type="obsolete">(All information ej tillgänglig)</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Unknown</source>
         <translation type="obsolete">Okänd</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>*** Invalid Area ID or Server Error ***</source>
         <translation type="obsolete">*** Ogiltigt plats-ID eller serverfel ***</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
         <translation type="obsolete">Myth kunde inte hämta dina väderdata inom utsatt tid (%1 sekunder).
 Tryck OK för att försöka igen med längre tid. Tryck Avbryt för att försöka igen utan animerade radarkartor.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
         <translation type="obsolete">Myth kunde inte hämta dina väderdata inom utsatt tid (%1 sekunder).
 Tryck OK för att försöka igen med längre tid. Tryck Avbryt för att avbryta.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>No Screens defined; Entering Screen Setup.</source>
         <translation type="obsolete">Ingen skärm definierad; Går till skärminställningar.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weather.cpp" line="94"/>
+        <location filename="../mythweather/weather.cpp" line="88"/>
         <source>Paused</source>
         <translation>Pausad</translation>
     </message>

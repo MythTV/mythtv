@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="sv">
+<defaultcodec></defaultcodec>
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="../mythgallery/glsingleview.cpp" line="237"/>
+        <location filename="../mythgallery/glsingleview.cpp" line="239"/>
         <source>Press SELECT to play again</source>
         <translation>Tryck SELECT för att spela igen</translation>
     </message>
@@ -11,234 +12,232 @@
 <context>
     <name>IconView</name>
     <message>
-        <location filename="" line="0"/>
         <source>Import pictures?</source>
         <translation type="obsolete">Importera bilder?</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>No</source>
         <translation type="obsolete">Nej</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Yes</source>
         <translation type="obsolete">Ja</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Nothing found to import</source>
         <translation type="obsolete">Hittar inget att importera</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>OK</source>
         <translation type="obsolete">OK</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="483"/>
+        <location filename="../mythgallery/iconview.cpp" line="474"/>
         <source>Error</source>
         <translation>Fel</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Sorry: OpenGL support not available</source>
         <translation type="obsolete">OpenGL-stöd inte tillgängligt</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="789"/>
+        <location filename="../mythgallery/iconview.cpp" line="774"/>
         <source>SlideShow</source>
         <translation>Bildspel</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="819"/>
+        <location filename="../mythgallery/iconview.cpp" line="804"/>
         <source>Rotate CW</source>
         <translation>Rotera medsols</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="820"/>
+        <location filename="../mythgallery/iconview.cpp" line="805"/>
         <source>Rotate CCW</source>
         <translation>Rotera motsols</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="850"/>
+        <location filename="../mythgallery/iconview.cpp" line="836"/>
         <source>Import</source>
         <translation>Importera</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="794"/>
+        <location filename="../mythgallery/iconview.cpp" line="779"/>
         <source>Settings</source>
         <translation>Inställningar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="790"/>
+        <location filename="../mythgallery/iconview.cpp" line="775"/>
         <source>Random</source>
         <translation>Slumpvis</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="853"/>
+        <location filename="../mythgallery/iconview.cpp" line="839"/>
         <source>Delete</source>
         <translation>Ta bort</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="128"/>
+        <location filename="../mythgallery/iconview.cpp" line="125"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>MythGallery-katalog &apos;%1&apos; finns inte eller är oläsbar.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>MythGallery failed to load theme, see console for details.</source>
         <translation type="obsolete">MythGallery kunde inte ladda tema, se konsol för detaljer.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="483"/>
+        <location filename="../mythgallery/iconview.cpp" line="474"/>
         <source>The selected device is no longer available</source>
         <translation>Vald enhet är inte längre tillgänglig</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Meta Data...</source>
         <translation type="obsolete">Metadata...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Marking...</source>
         <translation type="obsolete">Märkning...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>File...</source>
         <translation type="obsolete">Fil...</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Return</source>
         <translation type="obsolete">Återgå</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="834"/>
+        <location filename="../mythgallery/iconview.cpp" line="819"/>
         <source>Clear Marked</source>
         <translation>Rensa märkning</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="835"/>
+        <location filename="../mythgallery/iconview.cpp" line="820"/>
         <source>Select All</source>
         <translation>Välj alla</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="849"/>
+        <location filename="../mythgallery/iconview.cpp" line="834"/>
         <source>Show Devices</source>
         <translation>Visa enheter</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="851"/>
+        <location filename="../mythgallery/iconview.cpp" line="837"/>
         <source>Copy here</source>
         <translation>Kopiera hit</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="852"/>
+        <location filename="../mythgallery/iconview.cpp" line="838"/>
         <source>Move here</source>
         <translation>Flytta hit</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="854"/>
+        <location filename="../mythgallery/iconview.cpp" line="840"/>
         <source>Create Dir</source>
         <translation>Skapa katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="902"/>
+        <location filename="../mythgallery/iconview.cpp" line="888"/>
         <source>Delete Current File or Folder</source>
         <translation>Ta bort aktuell fil eller katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="904"/>
+        <location filename="../mythgallery/iconview.cpp" line="890"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Tar bort 1 katalog, inklusive underkataloger och filer.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="905"/>
+        <location filename="../mythgallery/iconview.cpp" line="891"/>
         <source>Deleting 1 image.</source>
         <translation>Tar bort 1 bild.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Delete Marked Files</source>
         <translation type="obsolete">Ta bort märkta filer</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1103"/>
+        <location filename="../mythgallery/iconview.cpp" line="1093"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Tar bort %1 bilder och kataloger, inklusive underkataloger och filer.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1149"/>
+        <location filename="../mythgallery/iconview.cpp" line="1139"/>
         <source>New Folder</source>
         <translation>Ny katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1151"/>
+        <location filename="../mythgallery/iconview.cpp" line="1141"/>
         <source>Create New Folder</source>
         <translation>Skapa ny katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1267"/>
+        <location filename="../mythgallery/iconview.cpp" line="1257"/>
         <source>Moving marked images...</source>
         <translation>Flyttar märkta bilder...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1267"/>
+        <location filename="../mythgallery/iconview.cpp" line="1257"/>
         <source>Copying marked images...</source>
         <translation>Kopierar märkta bilder...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1180"/>
+        <location filename="../mythgallery/iconview.cpp" line="1170"/>
         <source>Rename</source>
         <translation>Ändra namn</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1206"/>
+        <location filename="../mythgallery/iconview.cpp" line="1196"/>
         <source>Failed to rename directory</source>
         <translation>Misslyckades att ändra namn på katalog</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1208"/>
+        <location filename="../mythgallery/iconview.cpp" line="1198"/>
         <source>Failed to rename file</source>
         <translation>misslyckades att ändra namn på  fil</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="776"/>
+        <location filename="../mythgallery/iconview.cpp" line="761"/>
         <source>Gallery Options</source>
         <translation>Gallery inställningar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="791"/>
+        <location filename="../mythgallery/iconview.cpp" line="776"/>
         <source>Meta Data Menu</source>
         <translation>Metadata meny</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="792"/>
+        <location filename="../mythgallery/iconview.cpp" line="777"/>
         <source>Marking Menu</source>
         <translation>Betygsätta meny</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="793"/>
+        <location filename="../mythgallery/iconview.cpp" line="778"/>
         <source>File Menu</source>
         <translation>Filmeny</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="810"/>
+        <location filename="../mythgallery/iconview.cpp" line="795"/>
         <source>Metadata Options</source>
         <translation>MEtadata inställningar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="825"/>
+        <location filename="../mythgallery/iconview.cpp" line="810"/>
         <source>Marking Options</source>
         <translation>Betygsättningsinställningar</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="840"/>
+        <location filename="../mythgallery/iconview.cpp" line="825"/>
         <source>File Options</source>
         <translation>Filinställningar</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="174"/>
+        <source>No images found in this directory.</source>
+        <translation>Inga bilder hittade i denhär katalogen.</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="835"/>
+        <source>Eject</source>
+        <translation>Stöta ut</translation>
     </message>
 </context>
 <context>
@@ -314,7 +313,6 @@
         <translation>Detta är den typ av OpenGL-övergångseffekt som används mellan bilder vid uppspelning av bildspel.</translation>
     </message>
     <message>
-        <location filename="" line="0"/>
         <source>Ok</source>
         <translation type="obsolete">OK</translation>
     </message>
@@ -383,11 +381,18 @@
         <source>MythGallery Settings (General)</source>
         <translation>Inställningar för Galleriet (Generellt)</translation>
     </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="37"/>
+        <source>MythGallery cannot find its start directory.
+Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
+        <translation>MythGallery kan inte hitta dess start katalog
+Kontrollera att katalogen existerar, är läsbar och att inställningarna är rätta på MythGallery&apos;s inställningssida.</translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="../mythgallery/singleview.cpp" line="221"/>
+        <location filename="../mythgallery/singleview.cpp" line="222"/>
         <source>Press SELECT to play again</source>
         <translation>Tryck SELECT för att spela igen</translation>
     </message>
