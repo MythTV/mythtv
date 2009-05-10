@@ -3,27 +3,27 @@
 <context>
     <name>MythFlix</name>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="393"/>
+        <location filename="../mythflix/mythflix.cpp" line="407"/>
         <source>Browse Options</source>
         <translation>Selainasetukset</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="405"/>
+        <location filename="../mythflix/mythflix.cpp" line="419"/>
         <source>Add to Top of Queue</source>
         <translation>Lisää Jonon Alkuun</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="406"/>
+        <location filename="../mythflix/mythflix.cpp" line="420"/>
         <source>Add to Bottom of Queue</source>
         <translation>Lisää Jonon Loppuun</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="407"/>
+        <location filename="../mythflix/mythflix.cpp" line="421"/>
         <source>Show NetFlix Page</source>
         <translation>Näytä NetFlix Sivu</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="408"/>
+        <location filename="../mythflix/mythflix.cpp" line="422"/>
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
@@ -61,22 +61,22 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
 <context>
     <name>MythFlixQueue</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="482"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="474"/>
         <source>Manage Queue</source>
         <translation>Hallitse Jonoa</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="494"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="486"/>
         <source>Top Of Queue</source>
         <translation>Jonon Huippu</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="495"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="487"/>
         <source>Remove From Queue</source>
         <translation>Poista Jonosta</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="499"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="491"/>
         <source>Cancel</source>
         <translation>Peruuta</translation>
     </message>
@@ -86,12 +86,12 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
         <translation type="obsolete">Oletus</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="162"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="159"/>
         <source>History for Queue: </source>
         <translation>Jonon Historia: </translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="164"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="161"/>
         <source>Items in Queue: </source>
         <translation>Jonossa olevia artikkeleita: </translation>
     </message>
@@ -106,12 +106,12 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
         <translation type="obsolete">Artikkelia ei siirretty.</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="497"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="489"/>
         <source>Move To Another Queue</source>
         <translation>Siirrä Toiseen Jonoon</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="498"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="490"/>
         <source>Show NetFlix Page</source>
         <translation>Näytä NetFlix Sivu</translation>
     </message>
@@ -147,7 +147,7 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="159"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="156"/>
         <source>Default</source>
         <translation>Oletus</translation>
     </message>

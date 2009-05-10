@@ -1,6 +1,6 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
+    <name></name>
     <message>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
@@ -27,19 +27,62 @@
     </message>
     <message>
         <source>Error writing data to file %1.</source>
-        <translation>Virhe kirjoittaessa tietoa tiedostoon %1.</translation>
+        <translation>Virhe kirjoitettaessa tiedostoa %1.</translation>
     </message>
     <message>
         <source>Error: file error &apos;%1&apos; for file %2</source>
         <translation>Virhe: tiedostovirhe &apos;%1&apos; tiedostolle %2</translation>
     </message>
     <message>
+        <source>Fanart download stopped.</source>
+        <translation>Fanitaiteen lataus keskeytettiin.</translation>
+    </message>
+    <message>
         <source>No command to run.</source>
         <translation>Ei ajettavaa komentoa.</translation>
     </message>
+</context>
+<context>
+    <name>@default</name>
+    <message>
+        <source>G</source>
+        <comment>PL 1 default search string.</comment>
+        <translation type="obsolete">G</translation>
+    </message>
+    <message>
+        <source>PG</source>
+        <comment>PL 2 default search string.</comment>
+        <translation type="obsolete">PG</translation>
+    </message>
+    <message>
+        <source>PG-13</source>
+        <comment>PL3 default search string.</comment>
+        <translation type="obsolete">PG-13</translation>
+    </message>
+    <message>
+        <source>R:NC-17</source>
+        <comment>PL4 default search string.</comment>
+        <translation type="obsolete">R:NC-17</translation>
+    </message>
+    <message>
+        <source>Cover download stopped.</source>
+        <translation type="obsolete">Kansikuvan lataus lopetettu.</translation>
+    </message>
+    <message>
+        <source>Error writing data to file %1.</source>
+        <translation type="obsolete">Virhe kirjoittaessa tietoa tiedostoon %1.</translation>
+    </message>
+    <message>
+        <source>Error: file error &apos;%1&apos; for file %2</source>
+        <translation type="obsolete">Virhe: tiedostovirhe &apos;%1&apos; tiedostolle %2</translation>
+    </message>
+    <message>
+        <source>No command to run.</source>
+        <translation type="obsolete">Ei ajettavaa komentoa.</translation>
+    </message>
     <message>
         <source>An error occurred when switching views.</source>
-        <translation>Tapahtui virhe vaihdettaessa näyttöä.</translation>
+        <translation type="obsolete">Tapahtui virhe vaihdettaessa näyttöä.</translation>
     </message>
 </context>
 <context>
@@ -141,7 +184,7 @@
     </message>
     <message>
         <source>Done</source>
-        <translation>Valmis</translation>
+        <translation type="obsolete">Valmis</translation>
     </message>
     <message>
         <source>Enter new category</source>
@@ -622,7 +665,7 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation>Jälkikäsittely miettii :&gt; </translation>
+        <translation type="obsolete">Jälkikäsittely miettii :&gt; </translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
@@ -670,11 +713,11 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation>Poista DVD-kirjanmerkit vanhempia kuin (päivää)</translation>
+        <translation type="obsolete">Poista DVD-kirjanmerkit vanhempia kuin (päivää)</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation>Poista DVD-kirjanmerkit</translation>
+        <translation type="obsolete">Poista DVD-kirjanmerkit</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
@@ -748,7 +791,7 @@ Poistetaanko tietokannasta?</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minuuttia</translation>
+        <translation type="obsolete">minuuttia</translation>
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
@@ -800,7 +843,7 @@ Poistetaanko tietokannasta?</translation>
     </message>
     <message>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
-        <translation>Aseta DVD -aseman nopeus DVD toiston ytheydessä. Nopeus on 177 KB/s:n kertoimilla</translation>
+        <translation type="obsolete">Aseta DVD -aseman nopeus DVD toiston ytheydessä. Nopeus on 177 KB/s:n kertoimilla</translation>
     </message>
     <message>
         <source>Let transcode determine frame rate</source>
@@ -886,7 +929,7 @@ Varmista Videoasetukset</translation>
     </message>
     <message>
         <source>None defined</source>
-        <translation>Ei määritelty</translation>
+        <translation type="obsolete">Ei määritelty</translation>
     </message>
     <message>
         <source>Manager</source>
@@ -894,7 +937,7 @@ Varmista Videoasetukset</translation>
     </message>
     <message>
         <source>Loading videos ...</source>
-        <translation>LAtaa videoita...</translation>
+        <translation>Lataa videoita...</translation>
     </message>
     <message>
         <source>You have no VCD Player command defined.</source>
@@ -922,19 +965,71 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Warning: container &apos;%1&apos; is missing child &apos;%2&apos;</source>
-        <translation>Varoitus: pakkaus &apos;%1&apos;:stä puuttuu olio &apos;%2%&apos;</translation>
+        <translation type="obsolete">Varoitus: pakkaus &apos;%1&apos;:stä puuttuu olio &apos;%2%&apos;</translation>
     </message>
     <message>
         <source>Warning: no valid container to search for child &apos;%1&apos;</source>
-        <translation>Varoitus: ei kelpaavaa pakkausta, josta hakea olio &apos;%1&apos;</translation>
+        <translation type="obsolete">Varoitus: ei kelpaavaa pakkausta, josta hakea olio &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Error: container &apos;%1&apos; is missing a child element named &apos;%2&apos;</source>
-        <translation>Virhe: pakkaus &apos;%1&apos;:stä puuttuu olioelementti nimeltä &apos;%2&apos;</translation>
+        <translation type="obsolete">Virhe: pakkaus &apos;%1&apos;:stä puuttuu olioelementti nimeltä &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Error: an invalid container was passed while searching for child element &apos;%1&apos;</source>
-        <translation>Virhe: virheellinen säiliö ohitettiin etsittäessä olioelementtiä &apos;%1&apos;</translation>
+        <translation type="obsolete">Virhe: virheellinen säiliö ohitettiin etsittäessä olioelementtiä &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Transcode is thinking</source>
+        <translation>Jälkikäsittely miettii</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie trailers</source>
+        <translation>Hakemisto joka sisältää elokuvatrailereita</translation>
+    </message>
+    <message>
+        <source>Remove DVD Bookmarks Older than (days)</source>
+        <translation>Poista DVD -kirjainmerkit, jotka ovat vanhempia kuin (päivää)</translation>
+    </message>
+    <message>
+        <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
+        <translation>Poistaa DVD -kirjainmerkit, jotka ovat vanhempia kuin annettu määrä päiviä</translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
+        <translation>Aseta DVD:n nopeus DVD -toiston yhteydessä. Nopeus on 177 kB/s kertoimina. Hitaammat nopeudet voivat pienentää aseman ääntä, mutta voi aiheuttaa pysäyksiä toiston aikana.</translation>
+    </message>
+    <message>
+        <source>Enable random trailers before videos</source>
+        <translation>Mahdollista satunnaisten trailereiden näyttäminen videoiden alussa</translation>
+    </message>
+    <message>
+        <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
+        <translation>Jos asetettu, valikkoon ilmestyy painike, &quot;Katso trailereiden kanssa&quot;, joka näyttää käyttäjän määrittelemän määrän satunnaisia trailereita ennen elokuvan alkua.</translation>
+    </message>
+    <message>
+        <source>Number of trailers to play</source>
+        <translation>Lukumäärä toistettavia trailereita</translation>
+    </message>
+    <message>
+        <source>The number of trailers to play before playing the film itself </source>
+        <translation>Tämän verran trailereita näytetään ennen elokuvan alkua </translation>
+    </message>
+    <message>
+        <source>Command to search for movie fanart</source>
+        <translation>Komento jolla haetaan elokuvan fanitaidetta</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie screenshots</source>
+        <translation>Hakemisto elokuvien kuvankaappauksille</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie/TV Banners</source>
+        <translation>Hakemisto elokuvien/televisio-ohjelmien bannereille</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie fanart</source>
+        <translation>Hakemisto elokuvien fanitaiteelle</translation>
     </message>
 </context>
 <context>
@@ -1430,6 +1525,32 @@ Tarkista Videomanagerin asetukset</translation>
         <source>No matches were found.</source>
         <translation>Vastaavuuksia ei löytynyt.</translation>
     </message>
+    <message>
+        <source>Watch With Trailers</source>
+        <translation>Katso trailereiden kanssa</translation>
+    </message>
+    <message>
+        <source>Watch Trailer</source>
+        <translation>Katso traileri</translation>
+    </message>
+    <message>
+        <source>View Details</source>
+        <translation>Näytä yksityiskohdat</translation>
+    </message>
+    <message>
+        <source>An error occurred when switching views.</source>
+        <translation>Tapahtui virhe vaihdettaessa näkymää.</translation>
+    </message>
+    <message>
+        <source>Fanart download finished: %1 %2</source>
+        <translation>Fanitaiteen lataus valmistui: %1 %2</translation>
+    </message>
+    <message>
+        <source>Fanart exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Fanitaidetta löytyi tälle kohteelle, mutta sitä ei voitu hakea aikarajoituksen sisällä.
+</translation>
+    </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
@@ -1455,11 +1576,11 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation>Tallenna oletukseksi</translation>
+        <translation type="obsolete">Tallenna oletukseksi</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation>Valmis</translation>
+        <translation type="obsolete">Valmis</translation>
     </message>
 </context>
 <context>
@@ -1562,6 +1683,17 @@ Tarkista Videomanagerin asetukset</translation>
     <message>
         <source>Delete this file?</source>
         <translation type="obsolete">Poista tämä tiedosto?</translation>
+    </message>
+</context>
+<context>
+    <name>VideoScanner</name>
+    <message>
+        <source>Failed to Scan SG Video Hosts</source>
+        <translation>SG-videopalvelinten haku epäonnistui</translation>
+    </message>
+    <message>
+        <source>If they no longer exist please remove them</source>
+        <translation>Poista palvelimet, jos niitä ei ole enää olemassa</translation>
     </message>
 </context>
 <context>

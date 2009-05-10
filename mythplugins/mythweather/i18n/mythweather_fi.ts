@@ -646,6 +646,81 @@
         <source>CLOUD TEMPERATURE</source>
         <translation>PILVEN LÄMPÖTILA</translation>
     </message>
+    <message>
+        <source>Wind(Gust)</source>
+        <translation>Tuulenpuuska</translation>
+    </message>
+    <message>
+        <source>Wind Direction</source>
+        <translation>Tuulensuunta</translation>
+    </message>
+    <message>
+        <source>Feels Like</source>
+        <translation>Tuntuu kuin</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>Korkea</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>Matala</translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation>Maailmanlaajuiset asetukset</translation>
+    </message>
+    <message>
+        <source>Seconds to display each page:</source>
+        <translation>Sekuntia, jota näyttää jokaista sivua:</translation>
+    </message>
+    <message>
+        <source>Retrieve data in the background:</source>
+        <translation>Hae tietoa taustalla:</translation>
+    </message>
+    <message>
+        <source>Source Setup</source>
+        <translation>Lähdeasetukset</translation>
+    </message>
+    <message>
+        <source>Data Retrieval Interval (minutes):</source>
+        <translation>Tiedonhaun aikaväli (minuutteina):</translation>
+    </message>
+    <message>
+        <source>Source Update Timeout (seconds):</source>
+        <translation>Lähteiden päivityksen odotus (sekunteina):</translation>
+    </message>
+</context>
+<context>
+    <name>ThreeDayForecastScreen</name>
+    <message>
+        <source>Sunday</source>
+        <translation type="obsolete">Sunnuntai</translation>
+    </message>
+    <message>
+        <source>Monday</source>
+        <translation type="obsolete">Maanantai</translation>
+    </message>
+    <message>
+        <source>Tuesday</source>
+        <translation type="obsolete">Tiistai</translation>
+    </message>
+    <message>
+        <source>Wednesday</source>
+        <translation type="obsolete">Keskiviikko</translation>
+    </message>
+    <message>
+        <source>Thursday</source>
+        <translation type="obsolete">Torstai</translation>
+    </message>
+    <message>
+        <source>Friday</source>
+        <translation type="obsolete">Perjantai</translation>
+    </message>
+    <message>
+        <source>Saturday</source>
+        <translation type="obsolete">Lauantai</translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
@@ -904,6 +979,37 @@ Paina OK yrittääksesi uudelleen suuremmalla aikavälillä. Paina Peruuta jos h
     <message>
         <source>Paused</source>
         <translation>Pysäytetty</translation>
+    </message>
+</context>
+<context>
+    <name>WeatherScreen</name>
+    <message>
+        <source>Sunday</source>
+        <translation>Sunnuntai</translation>
+    </message>
+    <message>
+        <source>Monday</source>
+        <translation>Maanantai</translation>
+    </message>
+    <message>
+        <source>Tuesday</source>
+        <translation>Tiistai</translation>
+    </message>
+    <message>
+        <source>Wednesday</source>
+        <translation>Keskiviikko</translation>
+    </message>
+    <message>
+        <source>Thursday</source>
+        <translation>Torstai</translation>
+    </message>
+    <message>
+        <source>Friday</source>
+        <translation>Perjantai</translation>
+    </message>
+    <message>
+        <source>Saturday</source>
+        <translation>Lauantai</translation>
     </message>
 </context>
 </TS>
