@@ -1535,6 +1535,7 @@ bool Scheduler::IsBusyRecording(const ProgramInfo *rcinfo)
 void Scheduler::RunScheduler(void)
 {
     int prerollseconds = 0;
+    int wakeThreshold = gContext->GetNumSetting("WakeUpThreshold", 240);
 
     int secsleft;
     EncoderLink *nexttv = NULL;
@@ -1723,7 +1724,6 @@ void Scheduler::RunScheduler(void)
 
         // Go through the list of recordings starting in the next few minutes
         // and wakeup any slaves that are asleep
-        int wakeThreshold = gContext->GetNumSetting("WakeUpThreshold", 240);
         RecIter recIter = startIter;
         for ( ; schedulingEnabled && recIter != reclist.end(); recIter++)
         {
