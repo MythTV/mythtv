@@ -6,6 +6,7 @@ using namespace std;
 #include <QMap>
 #include <QRegExp>
 #include <QKeyEvent>
+#include <QApplication>
 
 #include "yuv2rgb.h"
 #include "osdtypes.h"
@@ -31,7 +32,6 @@ OSDImageCache OSDTypeImage::c_cache;
 OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
                int screenheight, float wmult, float hmult,
                int frint, int xoff, int yoff)
-      : QObject()
 {
     m_wantsupdates = false;
     m_lastupdate = 0;
@@ -39,6 +39,8 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
 
     m_name = name;
     m_cache = cache;
+
+    m_listener = NULL;
 
     m_frameint = frint;
 
@@ -75,7 +77,6 @@ OSDSet::OSDSet(const QString &name, bool cache, int screenwidth,
 }
 
 OSDSet::OSDSet(const OSDSet &other)
-      : QObject()
 {
     m_screenwidth = other.m_screenwidth;
     m_screenheight = other.m_screenheight;
@@ -511,7 +512,6 @@ QString OSDSet::HandleHotKey(const QKeyEvent *e)
 
 void OSDSet::Display(bool onoff, int osdFunctionalType)
 {
-
     if (onoff)
     {
         m_notimeout = true;
@@ -529,7 +529,7 @@ void OSDSet::Display(bool onoff, int osdFunctionalType)
     if (currentOSDFunctionalType != osdFunctionalType && 
         currentOSDFunctionalType != 0)
     {
-        emit OSDClosed(currentOSDFunctionalType);
+        SendOSDClosed(currentOSDFunctionalType);
     }
 
     currentOSDFunctionalType = osdFunctionalType;
@@ -547,7 +547,7 @@ void OSDSet::DisplayFor(int time, int osdFunctionalType)
     if (currentOSDFunctionalType != osdFunctionalType && 
         currentOSDFunctionalType != 0)
     {
-        emit OSDClosed(currentOSDFunctionalType);
+        SendOSDClosed(currentOSDFunctionalType);
     }
 
     currentOSDFunctionalType = osdFunctionalType;
@@ -567,6 +567,15 @@ void OSDSet::DisplayFor(int time, int osdFunctionalType)
 }
 */
 
+void OSDSet::SendOSDClosed(int OSDType)
+{
+    if (!m_listener)
+        return;
+
+    OSDCloseEvent *event = new OSDCloseEvent(m_name, OSDType);
+    QApplication::postEvent(m_listener, event);
+}
+
 void OSDSet::Hide(void)
 {
     m_timeleft = -1;
@@ -576,7 +585,7 @@ void OSDSet::Hide(void)
 
     if (currentOSDFunctionalType)
     {
-        emit OSDClosed(currentOSDFunctionalType);
+        SendOSDClosed(currentOSDFunctionalType);
         currentOSDFunctionalType = 0;
     }
 }
@@ -641,7 +650,7 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
         // Emit any functional type if the OSD is now gone.
         if (!m_displaying && currentOSDFunctionalType)
         {
-            emit OSDClosed(currentOSDFunctionalType);
+            SendOSDClosed(currentOSDFunctionalType);
             currentOSDFunctionalType = 0;
         }
     }

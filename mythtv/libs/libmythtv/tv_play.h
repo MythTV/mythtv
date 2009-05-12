@@ -47,6 +47,8 @@ class UDPNotifyOSDSet;
 class TVOSDMenuEntryList;
 class TvPlayWindow;
 class TV;
+class OSDListTreeItemEnteredEvent;
+class OSDListTreeItemSelectedEvent;
 
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
@@ -286,13 +288,13 @@ class MPUBLIC TV : public QThread
     void timerEvent(QTimerEvent*);
 
   protected slots:
-    void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
-    void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
-
     void AddUDPNotifyEvent(const QString &name, const UDPNotifyOSDSet*);
     void ClearUDPNotifyEvents(void);
 
   protected:
+    void TreeMenuEntered(OSDListTreeItemEnteredEvent *e);
+    void TreeMenuSelected(OSDListTreeItemSelectedEvent *e);
+
     void DoEditSchedule(int editType = kScheduleProgramGuide);
 
     virtual void run(void);

@@ -1,6 +1,6 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
-
+  
 QT += network xml sql
 using_dbox2:QT *= qt3support
 

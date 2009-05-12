@@ -57,7 +57,7 @@ const char *kOSDDialogInfo           = "infobox";
 const char *kOSDDialogEditChannel    = "channel_editor";
 
 OSD::OSD() :
-    QObject(),
+    QObject(),                          m_listener(NULL),
     osdBounds(),                        frameint(0),
     needPillarBox(false),
     themepath(FindTheme(gContext->GetSetting("OSDTheme"))),
@@ -250,6 +250,7 @@ bool OSD::InitCC608(void)
         new OSDSet(name, true,
                    osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
+    container->SetListener(m_listener);
     container->SetPriority(30);
     AddSet(container, name);
 
@@ -316,6 +317,7 @@ bool OSD::InitCC708(void)
         new OSDSet(
             name, true, osdBounds.width(), osdBounds.height(),
             wmult, hmult, frameint);
+    container->SetListener(m_listener);
     container->SetPriority(30);
 
     AddSet(container, name);
@@ -337,6 +339,7 @@ bool OSD::InitTeletext(void)
     OSDSet *container =
         new OSDSet(name, true, osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
+    container->SetListener(m_listener);
     container->SetAllowFade(false);
     container->SetWantsUpdates(true);
     AddSet(container, name);
@@ -498,6 +501,7 @@ bool OSD::InitMenu(void)
         new OSDSet(name, true,
                    osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
+    container->SetListener(m_listener);
     AddSet(container, name);
  
     QRect area = QRect(20, 40, 620, 300);
@@ -509,7 +513,9 @@ bool OSD::InitMenu(void)
 
     OSDListTreeType *lb = new OSDListTreeType("menu", area, listarea, 10,
                                               wmult, hmult);
- 
+
+    lb->SetListener(m_listener);
+    
     lb->SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
     lb->SetItemSelColor(QColor("#52CA38"), QColor("#349838"), 255);
  
@@ -556,6 +562,7 @@ bool OSD::InitSubtitles(void)
                    osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
 
+    container->SetListener(m_listener);
     container->SetPriority(30);
     AddSet(container, name);
     return true;
@@ -571,6 +578,7 @@ bool OSD::InitInteractiveTV(void)
         new OSDSet(name, true,
                    osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
+    container->SetListener(m_listener);
     container->SetPriority(25);
     container->Display(true);
     AddSet(container, name);
@@ -1450,6 +1458,7 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
 
     OSDListTreeType *lb = new OSDListTreeType(
         name, area, listsize, leveloffset, wmult, hmult);
+    lb->SetListener(m_listener);
     lb->SetFontActive(fpActive);
     lb->SetFontInactive(fpInactive);
     lb->SetItemRegColor(grUnselectedBeg, grUnselectedEnd, grUnselectedAlpha);
@@ -1479,6 +1488,7 @@ void OSD::parseContainer(QDomElement &element)
     container = new OSDSet(name, true,
                            osdBounds.width(), osdBounds.height(),
                            wmult, hmult, frameint);
+    container->SetListener(m_listener);
 
     QString prio = element.attribute("priority", "");
     if (!prio.isNull() && !prio.isEmpty())
@@ -1798,9 +1808,7 @@ void OSD::SetUpOSDClosedHandler(TV *tv)
     OSDSet *container = GetSet("status");
 
     if (container)
-        connect((QObject *)container, SIGNAL(OSDClosed(int)), (QObject *)tv,
-                SLOT(HandleOSDClosed(int)));
-
+        container->SetListener((QObject*)tv);
 }
 
 void OSD::ShowStatus(int pos, bool fill, QString msgtext, QString desc,
@@ -2147,6 +2155,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     }
 
     container = new OSDSet(*base);
+    container->SetListener(m_listener);
     container->SetName(name);
     container->SetCache(false);
     container->SetPriority(0);
@@ -2925,8 +2934,11 @@ bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
     return ret;
 }
 
-void OSD::HideTreeMenu(void)
+void OSD::HideTreeMenu(bool hideMenu)
 {
+    if (runningTreeMenu && hideMenu)
+        runningTreeMenu->SetVisible(false);
+
     QMutexLocker locker(&osdlock);
 
     if (runningTreeMenu && !runningTreeMenu->IsVisible())

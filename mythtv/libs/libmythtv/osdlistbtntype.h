@@ -41,6 +41,79 @@ class OSDListBtnTypeItem;
 typedef vector<OSDListBtnType*> OSDListBtnList;
 typedef vector<OSDListBtnTypeItem*> OSDListBtnItemList;
 
+const int kOSDListTreeItemEnteredEventType = 33301;
+const int kOSDListTreeItemSelectedEventType = 33302;
+const int kOSDListBtnItemSelectedEventType = 33303;
+
+/**
+ *  \class OSDListTreeItemEnteredEvent
+ *
+ *  \brief Event dispatched from OSDListTreeType when an item is focused
+ *
+ *   name is the name of the item selected
+ *   action is the action associated with the item
+ */
+ 
+class MPUBLIC OSDListTreeItemEnteredEvent : public QEvent
+{
+  public:
+    OSDListTreeItemEnteredEvent(const QString &name, const QString &action)
+        : QEvent((QEvent::Type)kOSDListTreeItemEnteredEventType),
+          m_name(name), m_action(action) { }
+
+    QString GetName() { return m_name; }
+    QString GetAction() { return m_action; }
+
+  private:
+    QString m_name;
+    QString m_action;
+};
+
+/**
+ *  \class OSDListTreeItemSelectedEvent
+ *
+ *  \brief Event dispatched from OSDListTreeType when an item is clicked
+ *
+ *   name is the name of the item selected
+ *   action is the action associated with the item
+ */
+
+class MPUBLIC OSDListTreeItemSelectedEvent : public QEvent
+{
+  public:
+    OSDListTreeItemSelectedEvent(const QString &name, const QString &action)
+        : QEvent((QEvent::Type)kOSDListTreeItemSelectedEventType),
+          m_name(name), m_action(action) { }
+
+    QString GetName() { return m_name; }
+    QString GetAction() { return m_action; }
+
+  private:
+    QString m_name;
+    QString m_action;
+};
+
+/**
+ *  \class OSDListBtnItemSelectedEvent
+ *
+ *  \brief Event dispatched from OSDListBtnType when an item is clicked
+ *
+ *   name is the name of the item selected
+ *   action is the action associated with the item
+ */
+class MPUBLIC OSDListBtnItemSelectedEvent : public QEvent
+{
+  public:
+    OSDListBtnItemSelectedEvent(const QString &name)
+        : QEvent((QEvent::Type)kOSDListBtnItemSelectedEventType),
+          m_name(name) { }
+
+    QString GetName() { return m_name; }
+
+  private:
+    QString m_name;
+};
+
 class OSDGenericTree : public GenericTree
 {
   public:
@@ -78,12 +151,13 @@ class OSDGenericTree : public GenericTree
 // Will _not_ delete the GenericTree that it's given.
 class OSDListTreeType : public OSDType
 {
-    Q_OBJECT
   public:
     OSDListTreeType(const QString &name,      const QRect &area,
                     const QRect   &levelsize, int          levelspacing,
                     float          wmult,     float        hmult);
     ~OSDListTreeType();
+
+    void SetListener(QObject *listener) { m_listener = listener; }
 
     bool IsVisible(void)          const { return m_visible;  }
  
@@ -106,9 +180,8 @@ class OSDListTreeType : public OSDType
     bool HandleKeypress(QKeyEvent *e);
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 
-  signals:
-    void itemSelected(OSDListTreeType *parent, OSDGenericTree *item);
-    void itemEntered(OSDListTreeType *parent, OSDGenericTree *item);
+    void SendItemSelected(OSDListTreeType *parent, OSDGenericTree *item);
+    void SendItemEntered(OSDListTreeType *parent, OSDGenericTree *item);
 
   private:
     void FillLevelFromTree(OSDGenericTree *item, uint levelnum);
@@ -149,18 +222,21 @@ class OSDListTreeType : public OSDType
     int       m_levelnum;
     bool      m_visible;
     bool      m_arrowAccel;
+
+    QObject  *m_listener;
 };
  
 class OSDListBtnType : public OSDType
 {
     friend class OSDListBtnTypeItem;
-    Q_OBJECT
 
   public:
     OSDListBtnType(const QString &name, const QRect& area,
                    float wmult, float hmult,
                    bool showScrollArrows = false);
     ~OSDListBtnType();
+
+    void SetListener(QObject *listener) { m_listener = listener; }
 
     // General Gets
     bool  IsVisible() const { return m_visible; }
@@ -260,8 +336,8 @@ class OSDListBtnType : public OSDType
 
     mutable QMutex m_update;
 
-  signals:
-    void itemSelected(OSDListBtnTypeItem* item);
+    void SendItemSelected(OSDListBtnTypeItem* item);
+    QObject * m_listener;
 };
 
 class OSDListBtnTypeItem

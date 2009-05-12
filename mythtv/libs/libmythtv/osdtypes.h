@@ -1,15 +1,22 @@
 #ifndef OSDDATATYPES_H_
 #define OSDDATATYPES_H_
 
-#include <qstring.h>
-#include <qrect.h>
-#include <qmap.h>
-#include <QKeyEvent>
-#include <vector>
-#include <qobject.h>
-#include <qregexp.h>
+// c/c++
 #include <cmath>
-#include <qcolor.h>
+#include <vector>
+
+// qt
+#include <QString>
+#include <QRect>
+#include <QMap>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QObject>
+#include <QRegExp>
+#include <QColor>
+
+// myth
+#include "mythexp.h"
 #include "cc708window.h"
 #include "osdimagecache.h"
 
@@ -40,14 +47,37 @@ static inline QRect bias(QRect rect, float wmult, float hmult)
                  (int)ceil( rect.height() * hmult));
 }
 
-class OSDSet : public QObject
+const int kOSDClosedEventType = 33300;
+
+/**
+ *  \class OSDClosedEvent
+ *
+ *  \brief Event dispatched from OSDSet when a set is closing
+ */
+class MPUBLIC OSDCloseEvent : public QEvent
 {
-    Q_OBJECT
+  public:
+    OSDCloseEvent(const QString &name, int osdFunctionalType)
+        : QEvent((QEvent::Type)kOSDClosedEventType),
+          m_name(name), m_osdFunctionalType(osdFunctionalType) { }
+
+    QString GetName() { return m_name; }
+    int GetFunctionType() { return m_osdFunctionalType; }
+
+  private:
+    QString m_name;
+    int m_osdFunctionalType;
+};
+
+class OSDSet
+{
   public:
     OSDSet(const QString &name, bool cache, int screenwidth, int screenheight,
            float wmult, float hmult, int frint, int xoff=0, int yoff=0);
     OSDSet(const OSDSet &other);
    ~OSDSet();
+
+    void SetListener(QObject *listener) { m_listener = listener; }
 
     void Clear(void);
     void ClearAllText(void);
@@ -103,11 +133,11 @@ class OSDSet : public QObject
     void SetShowWith(const QString &re) { m_showwith = QRegExp( re ); };
     bool SetSelected(int index);
     void SetText(const InfoMap &infoMap);
-    
-  signals:
-    void OSDClosed(int);
 
   protected:
+    void SendOSDClosed(int);
+    QObject *m_listener;
+
     int m_screenwidth;
     int m_screenheight;
     int m_frameint;
@@ -154,7 +184,6 @@ class OSDSet : public QObject
 
 class OSDType : public QObject
 {
-    Q_OBJECT
   public:
     OSDType(const QString &name);
 
@@ -168,7 +197,6 @@ class OSDType : public QObject
 
     virtual void Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
                       int yoff) = 0;
-
   protected:
     virtual ~OSDType();
 

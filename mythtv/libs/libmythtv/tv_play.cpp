@@ -8256,6 +8256,27 @@ void TV::SetMuteTimer(PlayerContext *ctx, int timeout)
 
 void TV::customEvent(QEvent *e)
 {
+    if ((MythEvent::Type)(e->type()) == kOSDClosedEventType)
+    {
+        OSDCloseEvent *ce = (OSDCloseEvent *)e;
+        HandleOSDClosed(ce->GetFunctionType());
+        return;
+    }
+
+    if ((MythEvent::Type)(e->type()) == kOSDListTreeItemEnteredEventType)
+    {
+        OSDListTreeItemEnteredEvent *ee = (OSDListTreeItemEnteredEvent *)e;
+        TreeMenuEntered(ee);
+        return;
+    }
+
+    if ((MythEvent::Type)(e->type()) == kOSDListTreeItemSelectedEventType)
+    {
+        OSDListTreeItemSelectedEvent *se = (OSDListTreeItemSelectedEvent *)e;
+        TreeMenuSelected(se);
+        return;
+    }
+
     if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
         return;
 
@@ -9109,11 +9130,10 @@ void TV::SetActive(PlayerContext *lctx, int index, bool osd_msg)
     VERBOSE(VB_PLAYBACK, loc + " -- end");
 }
 
-void TV::TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item)
+void TV::TreeMenuEntered(OSDListTreeItemEnteredEvent *e)
 {
     // show help text somewhere, perhaps?
-    (void)tree;
-    (void)item;
+    (void)e;
 }
 
 /** \fn TV::StartProgramEditMode(PlayerContext *ctx)
@@ -9588,15 +9608,12 @@ bool TV::LoadDDMap(uint sourceid)
     return !ddMap.empty();
 }
 
-void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
+void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
 {
-    if (!tree || !item)
-        return;
-
     bool hidetree = true;
     bool handled  = true;
 
-    QString action = item->getAction();
+    QString action = e->GetAction();
 
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
@@ -9738,13 +9755,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     else if (PxPHandleAction(actx, QStringList(action)))
     {
         // Hide the tree on old active context..
-        tree->SetVisible(false);
-        tree->disconnect();
         for (uint i = 0; i < player.size(); i++)
         {
             OSD *osd = GetOSDLock(GetPlayer(actx,i));
             if (osd)
-                osd->HideTreeMenu();
+                osd->HideTreeMenu(true);
             ReturnOSDLock(GetPlayer(actx,i), osd);
             ClearOSD(GetPlayer(actx,i));
         }
@@ -9822,11 +9837,9 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
     if (hidetree)
     {
-        tree->SetVisible(false);
-        tree->disconnect();
         OSD *osd = GetOSDLock(actx);
         if (osd)
-            osd->HideTreeMenu();
+            osd->HideTreeMenu(true);
         ReturnOSDLock(actx, osd);
     }
     ReturnPlayerLock(actx);
@@ -9877,17 +9890,7 @@ void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
     ReturnOSDLock(ctx, osd);
 
     if (tree)
-    {
-        connect(tree,
-                SIGNAL(itemSelected(OSDListTreeType*,OSDGenericTree*)),
-                this,
-                SLOT(TreeMenuSelected(OSDListTreeType*, OSDGenericTree*)));
-
-        connect(tree,
-                SIGNAL(itemEntered(OSDListTreeType*, OSDGenericTree*)),
-                this,
-                SLOT(TreeMenuEntered(OSDListTreeType*, OSDGenericTree*)));
-    }
+        tree->SetListener(this);
 }
 
 void TV::FillOSDTreeMenu(
@@ -11392,17 +11395,7 @@ void TV::DoDisplayJumpMenu(void)
         ClearOSD(actx);
         OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
         if (tree)
-        {
-            connect(tree,
-                    SIGNAL(itemSelected(OSDListTreeType*, OSDGenericTree*)),
-                    this,
-                    SLOT(TreeMenuSelected(OSDListTreeType*, OSDGenericTree*)));
-
-            connect(tree,
-                    SIGNAL(itemEntered(OSDListTreeType*, OSDGenericTree*)),
-                    this,
-                    SLOT(TreeMenuEntered(OSDListTreeType*, OSDGenericTree*)));
-        }
+            tree->SetListener(this);
     }
     ReturnOSDLock(actx, osd);
     ReturnPlayerLock(actx);

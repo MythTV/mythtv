@@ -80,6 +80,8 @@ class OSD : public QObject
 
     OSDSurface *GetDisplaySurface(void);
 
+    void SetListener(QObject *listener) { m_listener = listener; }
+
     void ClearAll(const QString &name);
     void ClearAllText(const QString &name);
     void SetText(const QString &name, QMap<QString, QString> &infoMap,
@@ -174,7 +176,7 @@ class OSD : public QObject
     OSDListTreeType *ShowTreeMenu(const QString &name, 
                                   OSDGenericTree *treeToShow);
 
-    void HideTreeMenu(void);
+    void HideTreeMenu(bool hideMenu = false);
     void DisableFade(void);
     bool IsSetDisplaying(const QString &name);
     bool HasSet(const QString &name);
@@ -222,6 +224,8 @@ class OSD : public QObject
     void parsePositionRects(OSDSet *container, QDomElement &element);
     void parsePositionImage(OSDSet *container, QDomElement &element);
     void parseListTree(OSDSet *container, QDomElement &element);
+
+    QObject *m_listener;
 
     QRect osdBounds;
     int   frameint;

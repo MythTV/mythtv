@@ -3463,6 +3463,8 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
         osd = new OSD();
 
+        osd->SetListener(m_tv);
+
         videoOutput->GetOSDBounds(total, visible, aspect, scaling, osd->GetThemeAspect());
         osd->Init(total, frame_interval, visible, aspect, scaling);
 

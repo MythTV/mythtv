@@ -62,7 +62,8 @@ OSDListTreeType::OSDListTreeType(
       m_wmult(wmult),                   m_hmult(hmult),
       m_depth(0),                        m_levelnum(-1),
       m_visible(true),
-      m_arrowAccel(gContext->GetNumSetting("UseArrowAccels", 1))
+      m_arrowAccel(gContext->GetNumSetting("UseArrowAccels", 1)),
+      m_listener(NULL)
 {
     m_wmult        = (wmult == 0.0f) ? 1.0f : wmult;
     m_hmult        = (hmult == 0.0f) ? 1.0f : hmult;
@@ -323,7 +324,7 @@ void OSDListTreeType::EnterItem(void)
     if (lbt)
     {
         currentpos = (OSDGenericTree*) (lbt->getData());
-        emit itemEntered(this, currentpos);
+        SendItemEntered(this, currentpos);
     }
 }
 
@@ -334,7 +335,26 @@ void OSDListTreeType::SelectItem(void)
 
     SetGroupCheckState(currentpos->getGroup(), OSDListBtnTypeItem::NotChecked);
     currentpos->getParentButton()->setChecked(OSDListBtnTypeItem::FullChecked);
-    emit itemSelected(this, currentpos);
+
+    SendItemSelected(this, currentpos);
+}
+
+void OSDListTreeType::SendItemSelected(OSDListTreeType *parent, OSDGenericTree *item)
+{
+    if (!m_listener)
+        return;
+
+    OSDListTreeItemSelectedEvent *event = new OSDListTreeItemSelectedEvent(item->getString(), item->getAction());
+    QApplication::postEvent(m_listener, event);
+}
+
+void OSDListTreeType::SendItemEntered(OSDListTreeType *parent, OSDGenericTree *item)
+{
+    if (!m_listener)
+        return;
+
+    OSDListTreeItemEnteredEvent *event = new OSDListTreeItemEnteredEvent(item->getString(), item->getAction());
+    QApplication::postEvent(m_listener, event);
 }
 
 #undef LOC_ERR
@@ -360,7 +380,7 @@ OSDListBtnType::OSDListBtnType(const QString &name, const QRect &area,
       m_itemRegAlpha(100),              m_itemSelAlpha(255),
       m_fontActive(NULL),               m_fontInactive(NULL),
       m_topIndx(0),                     m_selIndx(0),
-      m_update(QMutex::Recursive)
+      m_update(QMutex::Recursive),      m_listener(NULL)
 {
 }
 
@@ -401,7 +421,7 @@ void OSDListBtnType::InsertItem(OSDListBtnTypeItem *item)
     m_itemList.push_back(item);
     m_showDnArrow = m_showScrollArrows && m_itemList.size() > m_itemsVisible;
     if (m_itemList.size() == 1)
-        emit itemSelected(item);
+        SendItemSelected(item);
 }
 
 int find(const OSDListBtnItemList &list, const OSDListBtnTypeItem *item)
@@ -430,7 +450,7 @@ void OSDListBtnType::RemoveItem(OSDListBtnTypeItem *item)
     m_topIndx     = 0;
 
     if (m_itemList.size())
-        emit itemSelected(m_itemList[m_selIndx]);
+        SendItemSelected(m_itemList[m_selIndx]);
 }
 
 void OSDListBtnType::SetItemCurrent(const OSDListBtnTypeItem* item)
@@ -451,7 +471,7 @@ void OSDListBtnType::SetItemCurrent(uint current)
     m_topIndx     = max(m_selIndx - (int)m_itemsVisible, 0);
     m_showUpArrow = m_topIndx;
     m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
-    emit itemSelected(m_itemList[m_selIndx]);
+    SendItemSelected(m_itemList[m_selIndx]);
 }
 
 int OSDListBtnType::GetItemCurrentPos(void) const
@@ -520,7 +540,7 @@ void OSDListBtnType::MoveUp(void)
     m_showUpArrow = m_topIndx;
     m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
 
-    emit itemSelected(m_itemList[m_selIndx]);
+    SendItemSelected(m_itemList[m_selIndx]);
 }
 
 void OSDListBtnType::MoveDown(void)
@@ -538,7 +558,7 @@ void OSDListBtnType::MoveDown(void)
     m_showUpArrow = m_topIndx;
     m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
     
-    emit itemSelected(m_itemList[m_selIndx]);
+    SendItemSelected(m_itemList[m_selIndx]);
 }
 
 void OSDListBtnType::MovePageUp(void)
@@ -562,7 +582,7 @@ void OSDListBtnType::MovePageUp(void)
     m_showUpArrow = m_topIndx;
     m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
 
-    emit itemSelected(m_itemList[m_selIndx]);
+    SendItemSelected(m_itemList[m_selIndx]);
 }
 
 void OSDListBtnType::MovePageDown(void)
@@ -585,7 +605,7 @@ void OSDListBtnType::MovePageDown(void)
     m_showUpArrow = m_topIndx;
     m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
 
-    emit itemSelected(m_itemList[m_selIndx]);
+    SendItemSelected(m_itemList[m_selIndx]);
 }
 
 void OSDListBtnType::Draw(OSDSurface *surface,
@@ -748,6 +768,15 @@ void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
 {
     QString path = GetThemesParentDir() + "default/lb-";
     pix.Load(path + fileName + ".png", m_wmult, m_hmult);
+}
+
+void OSDListBtnType::SendItemSelected(OSDListBtnTypeItem* item)
+{
+    if (!m_listener)
+        return;
+
+    OSDListBtnItemSelectedEvent *event = new OSDListBtnItemSelectedEvent(item->text());
+    QApplication::postEvent(m_listener, event);
 }
 
 /////////////////////////////////////////////////////////////////////////////
