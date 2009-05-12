@@ -429,6 +429,8 @@ void VideoOutputXv::ResizeForVideo(uint width, uint height)
  */
 void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
 {
+    bool useGuiSize = gContext->GetNumSetting("GuiSizeForTV", 0);
+
     if (display_res)
     {
         // The very first Resize needs to be the maximum possible
@@ -451,9 +453,17 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
             availableGeometry(gContext->GetMainWindow()).size();
         int max_w = max(sz1.width(),  sz2.width());
         int max_h = max(sz1.height(), sz2.height());
+
+        // no need to resize if we are using the same window size as the GUI
+        if (useGuiSize)
+        {
+            max_w = gContext->GetMainWindow()->geometry().width();
+            max_h = gContext->GetMainWindow()->geometry().height();
+        }
+
         X11S(XMoveResizeWindow(XJ_disp, XJ_win, 
                                gContext->GetMainWindow()->geometry().x(), 
-                               gContext->GetMainWindow()->geometry().y(), 
+                               gContext->GetMainWindow()->geometry().y(),
                                max_w, max_h));
 
         if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
@@ -492,7 +502,7 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     // Determine window dimensions in pixels
     int window_w = windows[0].GetDisplayVisibleRect().size().width();
     int window_h = windows[0].GetDisplayVisibleRect().size().height();
-    if (gContext->GetNumSetting("GuiSizeForTV", 0))
+    if (useGuiSize)
         gContext->GetResolutionSetting("Gui", window_w,  window_h);
     window_w = (window_w) ? window_w : w;
     window_h = (window_h) ? window_h : h;
