@@ -682,7 +682,8 @@ bool ImportIconsWizard::submit()
         str.startsWith("Error", Qt::CaseInsensitive))
     {
         VERBOSE(VB_IMPORTANT, QString("Error from submit : %1").arg(str));
-        m_statusText->SetText(tr("Failed to submit icon choices."));
+        if (m_statusText)
+            m_statusText->SetText(tr("Failed to submit icon choices."));
         return false;
     }
     else
@@ -715,7 +716,8 @@ bool ImportIconsWizard::submit()
         }
         VERBOSE(VB_CHANNEL, QString("Icon Import: working submit : atsc=%1 callsign=%2 dvb=%3 tv=%4 xmltvid=%5")
                                               .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));
-        m_statusText->SetText(tr("Icon choices submitted successfully."));
+        if (m_statusText)
+            m_statusText->SetText(tr("Icon choices submitted successfully."));
         return true;
     }
 }
