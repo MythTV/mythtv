@@ -471,7 +471,8 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
         _nvp->SetNoAudio();
     else
     {
-        _nvp->LoadExternalSubtitles(buffer->GetFilename());
+// FIXME: This causes startup to take *forever*
+//        _nvp->LoadExternalSubtitles(buffer->GetFilename());
     }
 
     if ((embedwinid > 0) && embedbounds)
