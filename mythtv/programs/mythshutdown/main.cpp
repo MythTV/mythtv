@@ -394,7 +394,7 @@ int setScheduledWakeupTime()
         {
             VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: "
                                   "Could not connect to master server!");
-            return false;
+            return 1;
         }
     }
 
@@ -414,9 +414,9 @@ int setScheduledWakeupTime()
 
         setWakeupTime(restarttime.toString(Qt::ISODate));
 
-        return true;
+        return 0;
     }
-    return false;
+    return 1;
 }
 
 int shutdown()
