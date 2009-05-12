@@ -182,10 +182,11 @@ class OSDSet
     QRegExp m_showwith;
 };
 
-class OSDType : public QObject
+class OSDType
 {
   public:
     OSDType(const QString &name);
+    virtual ~OSDType();
 
     void SetParent(OSDSet *parent) { m_parent = parent; }
     void Hide(bool hidden = true) { m_hidden = hidden; }
@@ -197,8 +198,6 @@ class OSDType : public QObject
 
     virtual void Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
                       int yoff) = 0;
-  protected:
-    virtual ~OSDType();
 
   protected:
     mutable QMutex m_lock;

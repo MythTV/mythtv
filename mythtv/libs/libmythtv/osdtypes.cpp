@@ -166,7 +166,7 @@ void OSDSet::Clear()
     {
         OSDType *type = (*i);
         if (type)
-            type->deleteLater();
+            delete type;
     }
     allTypes->clear();
 }
