@@ -32,7 +32,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "storagegroup.h"
 #include "previewgenerator.h"
-#include "channelutil.h" // for SkipTypes
+#include "channelutil.h"
 #include "programlist.h"
 
 #define LOC QString("ProgramInfo: ")
@@ -678,13 +678,9 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
                           recstartts.date().toString(shortDateFormat) + " " +
                           recstartts.time().toString(timeFormat);
 
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT icon FROM channel WHERE chanid = :CHANID ;");
-    query.bindValue(":CHANID", chanid);
-
-    if (query.exec() && query.next())
-        progMap["iconpath"] = query.value(0).toString();
+    QString iconpath = ChannelUtil::GetIcon(chanid.toUInt());
+    if (!iconpath.isEmpty())
+        progMap["iconpath"] = iconpath;
 
     progMap["recstatus"] = RecStatusText();
 

@@ -145,7 +145,7 @@ class MPUBLIC ChannelUtil
     static int     GetServiceVersion(int mplexid);
 
     // Misc gets
-
+    static QString GetIcon(uint chanid);
     static vector<uint> GetCardIDs(uint chanid);
     static QString GetUnknownCallsign(void);
     static uint    FindChannel(uint sourceid, const QString &freqid);

@@ -743,20 +743,12 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
     int     nWidth    = pRequest->m_mapParams[ "Width"     ].toInt();
     int     nHeight   = pRequest->m_mapParams[ "Height"    ].toInt();
 
-    // Read Icon file path from database
+    // Get Icon file path
+    QString iconpath = ChannelUtil::GetIcon(iChanId);
+    if (!iconpath.isEmpty())
+        pRequest->m_sFileName = iconpath;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare( "SELECT icon FROM channel WHERE (chanid = :CHANID )" );
-    query.bindValue(":CHANID", iChanId );
-
-    if (!query.exec())
-        MythDB::DBError("Select ChanId", query);
-
-    if (query.next())
-        pRequest->m_sFileName = query.value(0).toString();
-
-    if ((nWidth == 0) && (nHeight == 0))
+    if ((nWidth <= 0) && (nHeight <= 0))
         return;  // Use default pixmap
 
     QString sFileName = QString( "%1.%2x%3.png" )

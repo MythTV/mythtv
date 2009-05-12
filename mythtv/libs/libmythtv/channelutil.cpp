@@ -1,13 +1,15 @@
 // -*- Mode: c++ -*-
 
+#include <stdint.h>
+
 #include <algorithm>
 #include <set>
 using namespace std;
 
-#include <qregexp.h>
-#include <stdint.h>
-#include <qimage.h>
-#include <qfile.h>
+#include <QRegExp>
+#include <QImage>
+#include <QFile>
+#include <QReadWriteLock>
 
 #include "channelutil.h"
 #include "mythdb.h"
@@ -1073,6 +1075,50 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     query.bindValue(":SOURCEID", sourceid);
 
     return query.exec();
+}
+
+QString ChannelUtil::GetIcon(uint chanid)
+{
+    static QReadWriteLock channel_icon_map_lock;
+    static QMap<uint,QString> channel_icon_map;
+    static bool run_init = false;
+
+    channel_icon_map_lock.lockForRead();
+
+    if (run_init)
+    {
+        channel_icon_map_lock.unlock();
+        channel_icon_map_lock.lockForWrite();
+        if (run_init)
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT chanid, icon FROM channel");
+            if (query.exec())
+            {
+                while (query.next())
+                {
+                    channel_icon_map[query.value(0).toUInt()] =
+                        query.value(1).toString();
+                }
+                run_init = false;
+            }
+            else
+            {
+                MythDB::DBError("GetIcon", query);
+            }
+        }
+    }
+
+    QMap<uint,QString>::iterator it = channel_icon_map.find(chanid);
+    QString ret = QString::null;
+    if (it != channel_icon_map.end())
+    {
+        ret = *it;
+        ret.detach();
+    }
+    channel_icon_map_lock.unlock();
+
+    return ret;
 }
 
 QString ChannelUtil::GetUnknownCallsign(void)
