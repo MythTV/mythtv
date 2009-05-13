@@ -57,6 +57,10 @@ char *      (*dvdinput_error) (dvd_input_t);
 #include "../../msvc/contrib/dlfcn.c"
 #endif
 
+#ifdef __APPLE__
+#include <CoreFoundation/CFBundle.h>
+#endif
+
 typedef struct dvdcss_s *dvdcss_handle;
 static dvdcss_handle (*DVDcss_open)  (const char *);
 static int           (*DVDcss_close) (dvdcss_handle);
@@ -294,6 +298,27 @@ int dvdinput_setup(void)
   #define CSS_LIB "libdvdcss.so.2"
 #endif
   dvdcss_library = dlopen(CSS_LIB, RTLD_LAZY);
+
+#ifdef __APPLE__
+  if (!dvdcss_library)
+  {
+    CFURLRef    appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFStringRef macPath   = CFURLCopyFileSystemPath(appUrlRef,
+                                                    kCFURLPOSIXPathStyle);
+    char        path[FILENAME_MAX];
+
+    snprintf(path, FILENAME_MAX-1, "%s/Contents/Plugins/%s",
+             CFStringGetCStringPtr(macPath, CFStringGetSystemEncoding()),
+             CSS_LIB);
+    fprintf(stderr, "libdvdread: dlopen(%s) failed.\n", CSS_LIB);
+    fprintf(stderr, "Trying %s\n", path);
+
+    dvdcss_library = dlopen(path, RTLD_LAZY);
+
+    CFRelease(appUrlRef);
+    CFRelease(macPath);
+  }
+#endif
 
   if(dvdcss_library != NULL) {
 #if defined(__OpenBSD__) && !defined(__ELF__) || defined(__OS2__)
