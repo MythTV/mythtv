@@ -80,8 +80,8 @@ VDPAUContext::VDPAUContext()
     useColorControl(false), pipOutputSurface(0),
     pipAlpha(0),            pipBorder(0),
     pipClear(0),            pipReady(0),       pipNeedsClear(false),
-    vdp_flip_target(NULL),  vdp_flip_queue(NULL), vdpauDecode(false),
-    vdp_device(NULL),       errorCount(0),     errorState(kError_None),
+    vdp_flip_target(0),     vdp_flip_queue(0), vdpauDecode(false),
+    vdp_device(0),          errorCount(0),     errorState(kError_None),
     vdp_get_proc_address(NULL),       vdp_device_destroy(NULL),
     vdp_get_error_string(NULL),       vdp_get_api_version(NULL),
     vdp_get_information_string(NULL), vdp_video_surface_create(NULL),
@@ -114,6 +114,12 @@ VDPAUContext::VDPAUContext()
     vdp_bitmap_surface_query_capabilities(NULL),
     vdp_preemption_callback_register(NULL)
 {
+    memset(&outRect, 0, sizeof(outRect));
+    memset(&outRectVid, 0, sizeof(outRectVid));
+    memset(&osdLayer, 0, sizeof(osdLayer));
+    memset(&osdRect, 0, sizeof(osdRect));
+    memset(&proCamp, 0, sizeof(proCamp));
+    memset(&pipLayer, 0, sizeof(pipLayer));
 }
 
 VDPAUContext::~VDPAUContext()
