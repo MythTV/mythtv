@@ -2975,7 +2975,8 @@ public:
 
     void fillSelections(void) {
         clearSelections();
-        addSelection(QObject::tr("Desktop Style"), "");
+        addSelection(QObject::tr("Desktop Style"),
+                     "UseSystemDefaultDesktopStyle");
         QStyleFactory factory;
         QStringList list = factory.keys();
         QStringList::iterator iter = list.begin();

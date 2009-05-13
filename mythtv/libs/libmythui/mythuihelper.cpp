@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QDesktopWidget>
+#include <QStyleFactory>
 
 #include "mythdirs.h"
 #include "mythuihelper.h"
@@ -388,8 +389,9 @@ void MythUIHelper::LoadQtConfig(void)
 
     d->m_qtThemeSettings = new Settings;
 
-    QString style = GetMythDB()->GetSetting("Style", "");
-    if (!style.isEmpty())
+    QString style = GetMythDB()->GetSetting("Style",
+                                            "UseSystemDefaultDesktopStyle");
+    if (QStyleFactory::keys().contains(style))
         qApp->setStyle(style);
 
     QString themename = GetMythDB()->GetSetting("Theme");
