@@ -147,6 +147,7 @@ class VDPAUContext
     long long         currentFrameNum;
     frame_queue_t     referenceFrames;
     bool              needDeintRefs;
+    QMutex            deintLock;
 
     bool              useColorControl;
     VdpCSCMatrix      cscMatrix;

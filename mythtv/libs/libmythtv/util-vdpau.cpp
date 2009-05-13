@@ -76,8 +76,9 @@ VDPAUContext::VDPAUContext()
     osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
     osdReady(false),        osdSize(QSize(0,0)) ,deintAvail(false),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
-    needDeintRefs(false),   useColorControl(false),
-    pipOutputSurface(0),    pipAlpha(0),       pipBorder(0),
+    needDeintRefs(false),   deintLock(QMutex::Recursive),
+    useColorControl(false), pipOutputSurface(0),
+    pipAlpha(0),            pipBorder(0),
     pipClear(0),            pipReady(0),       pipNeedsClear(false),
     vdp_flip_target(NULL),  vdp_flip_queue(NULL), vdpauDecode(false),
     vdp_device(NULL),       errorCount(0),     errorState(kError_None),
@@ -1095,6 +1096,8 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     if (checkVideoSurfaces > 0)
         checkVideoSurfaces--;
 
+    QMutexLocker locker(&deintLock);
+
     VdpStatus vdp_st;
     bool ok = true;
     VdpTime dummy;
@@ -1665,6 +1668,7 @@ void VDPAUContext::DeinitOSD(void)
 
 bool VDPAUContext::SetDeinterlacer(const QString &deint)
 {
+    QMutexLocker locker(&deintLock);
     deinterlacer = deint;
     deinterlacer.detach();
     return true;
@@ -1672,6 +1676,8 @@ bool VDPAUContext::SetDeinterlacer(const QString &deint)
 
 bool VDPAUContext::SetDeinterlacing(bool interlaced)
 {
+    QMutexLocker locker(&deintLock);
+
     if (!deintAvail)
         return false;
 
