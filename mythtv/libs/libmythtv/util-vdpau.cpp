@@ -1238,9 +1238,10 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         {
             if (vdpauDecode)
             {
-                vdpau_render_state_t *render;
+                refs[i] = VDP_INVALID_HANDLE;
                 render = (vdpau_render_state_t *)referenceFrames[i]->buf;
-                refs[i] = render ? render->surface : VDP_INVALID_HANDLE;
+                if (render && render->surface)
+                    refs[i] = render->surface;
             }
             else
             {
