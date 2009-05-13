@@ -111,9 +111,6 @@ int VDPAU_mpeg_field_start(MpegEncContext *s)
         if (last->magic != MP_VDPAU_RENDER_MAGIC) {
             return -1;
         }
-        if (last == NULL) { // FIXME: Does this test make sense?
-            last = render; // predict second field from the first
-        }
         render->info.mpeg.forward_reference = last->surface;
         return 0;
     }
@@ -399,9 +396,6 @@ int VDPAU_vc1_decode_picture(MpegEncContext *s, AVCodecContext *avctx, VC1Contex
         assert(last->magic == MP_VDPAU_RENDER_MAGIC);
         if (last->magic != MP_VDPAU_RENDER_MAGIC) {
             return -1;
-        }
-        if (last == NULL) { // FIXME: Does this test make sense?
-            last = render; // predict second field from the first
         }
         render->info.vc1.forward_reference = last->surface;
         break;
