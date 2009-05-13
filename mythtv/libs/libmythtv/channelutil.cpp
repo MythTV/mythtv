@@ -1081,7 +1081,7 @@ QString ChannelUtil::GetIcon(uint chanid)
 {
     static QReadWriteLock channel_icon_map_lock;
     static QMap<uint,QString> channel_icon_map;
-    static bool run_init = false;
+    static bool run_init = true;
 
     channel_icon_map_lock.lockForRead();
 
