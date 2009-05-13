@@ -298,7 +298,10 @@ int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
          * of the shorter program */
         if (overlap > 0)
         {
-            int min_dur = min(duration, duration_loop);
+            /* crappy providers apparently have events without duration
+             * ensure that the minimal duration is 2 second to avoid
+             * muliplying and more importantly dividing by zero */
+            int min_dur = max(2, min(duration, duration_loop));
             overlap = min(overlap, min_dur/2);
             mv *= overlap * 2;
             mv /= min_dur;
