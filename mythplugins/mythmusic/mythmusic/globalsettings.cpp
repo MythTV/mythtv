@@ -67,20 +67,11 @@ static HostComboBox *MusicAudioDevice()
     return gc;
 };
 
-static HostComboBox *CDDevice()
+static HostLineEdit *CDDevice()
 {
-    HostComboBox *gc = new HostComboBox("CDDevice", true);
+    HostLineEdit *gc = new HostLineEdit("CDDevice");
     gc->setLabel(QObject::tr("CD device"));
-    QDir dev("/dev", "cdrom*", QDir::Name, QDir::System);
-    gc->fillSelectionsFromDir(dev);
-    dev.setNameFilter("scd*");
-    gc->fillSelectionsFromDir(dev);
-    dev.setNameFilter("hd*");
-    gc->fillSelectionsFromDir(dev);
-
-    dev.setNameFilter("cdrom*");
-    dev.setPath("/dev/cdroms");
-    gc->fillSelectionsFromDir(dev);
+    gc->setValue("default");
     gc->setHelpText(QObject::tr("CDRom device used for ripping/playback."));
     return gc;
 };
@@ -492,59 +483,10 @@ static HostCheckBox *CDWriterEnabled()
     return gc;
 };
 
-static HostComboBox *CDWriterDevice()
+static HostLineEdit *CDWriterDevice()
 {
-    HostComboBox *gc = new HostComboBox("CDWriterDevice");
-
-    typedef std::vector<std::pair<QString, QString> > search_cmd_list;
-    search_cmd_list search_types;
-    search_types.push_back(std::make_pair("", ""));
-    search_types.push_back(std::make_pair("-dev=ATA", "ATA:"));
-    search_types.push_back(std::make_pair("-dev=ATAPI", "ATAPI:"));
-
-    const QString scan_command("cdrecord");
-    for (search_cmd_list::const_iterator p = search_types.begin();
-            p != search_types.end(); ++p)
-    {
-        QStringList args;
-        args << "--scanbus";
-        if (p->first.size())
-            args << p->first;
-
-        QProcess proc;
-
-        proc.start(scan_command, args, QIODevice::ReadOnly);
-        if (proc.waitForStarted() && proc.waitForFinished(1500) &&
-                proc.exitStatus() == QProcess::NormalExit)
-        {
-            QTextStream output(&proc);
-
-            QString line;
-            while (!(line = output.readLine()).isNull())
-            {
-                if (line.length() > 12)
-                {
-                    if (line[10] == ')' && line[12] != '*')
-                    {
-                        QString name = line.mid(24, 16);
-                        QString dev  = p->second + line.mid(1, 5);
-
-                        gc->addSelection(name, dev);
-                        VERBOSE(VB_GENERAL,
-                                QString("MythMusic adding CD-Writer: %1 -- %2")
-                                .arg(dev).arg(name));
-                    }
-                }
-            }
-        }
-        else
-        {
-                VERBOSE(VB_GENERAL, QString("Failed to run '%1 %2' "
-                                "error code: %3").arg(scan_command)
-                        .arg(args.join(" ")).arg(proc.error()));
-        }
-    }
-
+    HostLineEdit *gc = new HostLineEdit("CDWriterDevice");
+    gc->setValue("default");
     gc->setLabel(QObject::tr("CD-Writer Device"));
     gc->setHelpText(QObject::tr("Select the SCSI or IDE Device for CD Writing."));
     return gc;

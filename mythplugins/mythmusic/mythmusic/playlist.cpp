@@ -18,6 +18,7 @@ using namespace std;
 #include <mythcontext.h>
 #include <mythdb.h>
 #include <compat.h>
+#include <mythmediamonitor.h>
 
 const char *kID0err = "Song with ID of 0 in playlist, this shouldn't happen.";
 
@@ -1180,7 +1181,7 @@ int Playlist::CreateCDMP3(void)
         return 1;
     }
 
-    QString scsidev = gContext->GetSetting("CDWriterDevice");
+    QString scsidev = MediaMonitor::defaultCDWriter();
     if (scsidev.isEmpty() || scsidev.isNull())
     {
         VERBOSE(VB_GENERAL, "No CD Writer device defined.");
