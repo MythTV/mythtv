@@ -1350,7 +1350,7 @@ void ProgLister::fillItemList(bool restorePosition)
     ProgramInfo *s;
     vector<ProgramInfo *> sortedList;
 
-    while (m_itemList.count())
+    while (!m_itemList.empty()) 
     {
         s = m_itemList.take(0);
         if (m_type == plTitle)
@@ -1442,9 +1442,10 @@ void ProgLister::updateButtonList(void)
 
     QString tmptitle;
 
-    for (uint i = 0; i < m_itemList.count(); i++)
+    ProgramList::const_iterator it = m_itemList.begin();
+    for (; it != m_itemList.end(); ++it)
     {
-        ProgramInfo *pginfo = m_itemList.at(i);
+        ProgramInfo *pginfo = *it;
         QString state;
 
         if (pginfo->recstatus == rsRecording)
