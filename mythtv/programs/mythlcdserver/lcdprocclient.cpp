@@ -223,34 +223,36 @@ void LCDProcClient::sendToServer(const QString &someText)
 void LCDProcClient::setPriority(const QString &screen, PRIORITY priority)
 {
     QString aString;
-
+    int err  = 0;
     aString = "screen_set ";
     aString += screen;
     aString += " priority ";
 
     switch (priority) {
     case TOP: 
-      aString += QString::number (prioTop);
+      aString += prioTop;
       break;
     case URGENT: 
-      aString += QString::number (prioUrgent);
+      aString += prioUrgent;
       break;
     case HIGH:
-      aString += QString::number (prioHigh);
+      aString += prioHigh;
       break;
     case MEDIUM: 
-      aString += QString::number (prioMedium);
+      aString += prioMedium;
       break;
     case LOW:
-      aString += QString::number (prioLow);
+      aString += prioLow;
       break;
     case OFF:
-      aString += QString::number (prioOff);
+      aString += prioOff;
       break;
-
+    default:
+      err = 1;
+      break;
     }
-
-    sendToServer (aString);
+    if (err == 0)
+      sendToServer (aString);
 }
 
 void LCDProcClient::setHeartbeat (const QString &screen, bool onoff) 
@@ -669,22 +671,22 @@ void LCDProcClient::setVersion(const QString &sversion, const QString &pversion)
     {
         // Latest CVS versions of LCDd has priorities switched
         pVersion = LCD_VERSION_5;
-        prioTop = 252;
-        prioUrgent = 248;
-        prioHigh = 240;
-        prioMedium = 128;
-        prioLow = 64;
-        prioOff = 0;
+        prioTop = "input";
+        prioUrgent = "alert";
+        prioHigh = "foreground";
+        prioMedium = "info";
+        prioLow = "background";
+        prioOff = "hidden";
     }
     else
     {
         pVersion = LCD_VERSION_4;
-        prioTop = 64;
-        prioUrgent = 128;
-        prioHigh = 240;
-        prioMedium = 248;
-        prioLow = 252;
-        prioOff = 255;
+        prioTop = "64";
+        prioUrgent = "128";
+        prioHigh = "240";
+        prioMedium = "248";
+        prioLow = "252";
+        prioOff = "255";
     }
 }
 
