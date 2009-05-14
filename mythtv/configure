@@ -198,7 +198,7 @@ BLOCK_QUOTE
   #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
   echo "  --disable-opengl-video   disable OpenGL based video display "
   echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
-  echo "  --enable-opengl-vsync    enable OpenGL vsync method"
+  echo "  --disable-opengl-vsync   disable OpenGL vsync method"
   echo "  --disable-directfb       disable DirectFB (Linux non-X11 video)"
   echo "  --enable-directx         enable DirectX   (Microsoft video)"
   echo ""
@@ -1337,6 +1337,7 @@ enable lamemp3
 enable lirc
 enable mheg
 enable opengl
+enable opengl_vsync
 enable opengl_video
 enable v4l
 enable x11
