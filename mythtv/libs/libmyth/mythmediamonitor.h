@@ -75,7 +75,8 @@ class MPUBLIC MediaMonitor : public QObject
     static QString defaultCDdevice();
     static QString defaultVCDdevice();
     static QString defaultDVDdevice();
-    static QString defaultWriter();
+    static QString defaultCDWriter();
+    static QString defaultDVDWriter();
 
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
