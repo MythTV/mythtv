@@ -328,7 +328,9 @@ HostLineEdit *SetVCDDevice()
     gc->setValue("default");
     gc->setHelpText(QObject::tr("This device must exist, and the user "
                     "running MythDVD needs to have read permission "
-                    "on the device."));
+                    "on the device.")
+                    + QObject::tr(" 'default' will let the "
+                                  "MediaMonitor choose a device."));
     return gc;
 }
 
@@ -339,7 +341,9 @@ HostLineEdit *SetDVDDevice()
     gc->setValue("default");
     gc->setHelpText(QObject::tr("This device must exist, and the user "
                     "running MythDVD needs to have read permission "
-                    "on the device."));
+                    "on the device.")
+                    + QObject::tr(" 'default' will let the "
+                                  "MediaMonitor choose a device."));
     return gc;
 }
 

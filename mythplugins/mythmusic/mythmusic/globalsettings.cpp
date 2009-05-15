@@ -488,7 +488,9 @@ static HostLineEdit *CDWriterDevice()
     HostLineEdit *gc = new HostLineEdit("CDWriterDevice");
     gc->setValue("default");
     gc->setLabel(QObject::tr("CD-Writer Device"));
-    gc->setHelpText(QObject::tr("Select the SCSI or IDE Device for CD Writing."));
+    gc->setHelpText(QObject::tr("Select the SCSI or IDE Device for CD Writing.")
+                    + QObject::tr(" 'default' will let the "
+                                  "MediaMonitor choose a device."));
     return gc;
 };
 
