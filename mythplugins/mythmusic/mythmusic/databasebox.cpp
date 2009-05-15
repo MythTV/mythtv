@@ -17,6 +17,7 @@ using namespace std;
 #include <mythtv/lcddevice.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
+#include <mythtv/mythmediamonitor.h>
 
 // mythmusic
 #include "metadata.h"
@@ -421,12 +422,13 @@ void DatabaseBox::BlankCDRW()
         return;
     }
 
-    QString scsidev = gContext->GetSetting("CDWriterDevice");
-    if (scsidev.length()==0) 
+    QString scsidev = MediaMonitor::defaultCDWriter();
+    if (scsidev.isEmpty() || scsidev.isNull())
     {
-        VERBOSE(VB_GENERAL, "We don't have SCSI devices");
+        VERBOSE(VB_GENERAL, "No CD Writer device defined.");
         return;
     }
+
     // Begin Blanking
     MythProgressDialog *record_progress;
     record_progress = new MythProgressDialog(tr("CD-RW Blanking Progress"), 10);

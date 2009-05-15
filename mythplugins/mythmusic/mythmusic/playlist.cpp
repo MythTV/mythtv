@@ -10,6 +10,7 @@ using namespace std;
 #include "smartplaylist.h"
 #include <mythtv/mythdbcon.h>
 #include <mythtv/compat.h>
+#include <mythtv/mythmediamonitor.h>
 
 #include <qfileinfo.h>
 #include <qprocess.h>
@@ -1664,7 +1665,7 @@ int Playlist::CreateCDMP3(void)
         return 1;
     }
 
-    QString scsidev = gContext->GetSetting("CDWriterDevice");
+    QString scsidev = MediaMonitor::defaultCDWriter();
     if (scsidev.isEmpty() || scsidev.isNull()) 
     {
         VERBOSE(VB_GENERAL, "No CD Writer device defined.");
