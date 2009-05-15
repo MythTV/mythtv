@@ -1292,11 +1292,9 @@
                     <textarea name="buttontext">
                         <font>basesmallyellow</font>
                     </textarea>
-
-                    <imagetype name="selectbar">
-                        <filename></filename>
-                    </imagetype>
-
+                    <shape name="selectbar">
+                        <area>0,0,0,0</area>
+                    </shape>
                 </state>
                 <state name="inactive" from="active"/>
             </statetype>

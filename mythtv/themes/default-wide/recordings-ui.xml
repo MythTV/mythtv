@@ -71,11 +71,9 @@
                 </state>
                 <state name="inactive" from="active" />
                 <state name="selected" from="active">
-                    <imagetype name="selectbar">
-                        <!-- Full area to workaround inheritence bug -->
+                    <shape name="selectbar">
                         <area>25,0,857,30</area>
-                        <filename>watchrec_selectbar.png</filename>
-                    </imagetype>
+                    </shape>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">

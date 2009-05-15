@@ -204,10 +204,12 @@
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <imagetype name="selectbar">
-                    <position>25,0</position>
-                    <filename>schedule_selectbar.png</filename>
-                </imagetype>
+                <shape name="selectbar">
+                    <area>25,0,735,25</area>
+                    <type>roundbox</type>
+                    <line color="#999999" alpha="255" width="2" />
+                    <cornerradius>13</cornerradius>
+                </shape>
             </state>
             <state name="inactive" from="active" />
         </statetype>
