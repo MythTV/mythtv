@@ -188,24 +188,27 @@ int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
                                             "/dev/dvd");
     VERBOSE(VB_JOBQUEUE, "Burning ISO image to " + dvdDrive);
 
+    int     driveSpeed    = gContext->GetNumSetting("MythArchiveDriveSpeed");
     QString tempDirectory = getTempDirectory();
 
     tempDirectory += "work/";
 
-    QString growisofs = gContext->GetSetting("MythArchiveGrowisofsCmd",
-                                             "growisofs");
-    QString command;
+    QString command = gContext->GetSetting("MythArchiveGrowisofsCmd",
+                                           "growisofs");
+
+    if (driveSpeed)
+        command += " -speed=" + QString::number(driveSpeed);
 
     if (nativeFormat)
     {
         if (mediaType == AD_DVD_RW && bEraseDVDRW == true)
         {
-            command = growisofs + " -use-the-force-luke -Z " + dvdDrive;
+            command += " -use-the-force-luke -Z " + dvdDrive;
             command += " -V 'MythTV Archive' -R -J " + tempDirectory;
         }
         else
         {
-            command = growisofs + " -Z " + dvdDrive;
+            command += " -Z " + dvdDrive;
             command += " -V 'MythTV Archive' -R -J " + tempDirectory;
         }
     }
@@ -213,13 +216,12 @@ int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
     {
         if (mediaType == AD_DVD_RW && bEraseDVDRW == true)
         {
-            command = growisofs + " -dvd-compat -use-the-force-luke -Z "
-                      + dvdDrive;
+            command += " -dvd-compat -use-the-force-luke -Z " + dvdDrive;
             command += " -dvd-video -V 'MythTV DVD' " + tempDirectory + "/dvd";
         }
         else
         {
-            command = growisofs + " -dvd-compat -Z " + dvdDrive;
+            command += " -dvd-compat -Z " + dvdDrive;
             command += " -dvd-video -V 'MythTV DVD' " + tempDirectory + "/dvd";
         }
     }
