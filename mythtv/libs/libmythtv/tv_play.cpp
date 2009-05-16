@@ -1640,8 +1640,8 @@ TVState TV::RemoveRecording(TVState state)
 #define TRANSITION(ASTATE,BSTATE) \
    ((ctxState == ASTATE) && (desiredNextState == BSTATE))
 
-#define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0);
-#define SET_LAST() do { nextState = ctxState; changed = true; } while(0);
+#define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0)
+#define SET_LAST() do { nextState = ctxState; changed = true; } while(0)
 
 static QString tv_i18n(const QString &msg)
 {
