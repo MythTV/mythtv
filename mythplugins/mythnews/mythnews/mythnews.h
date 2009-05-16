@@ -26,14 +26,13 @@ class MythNews : public MythScreenType
 
   public:
     MythNews(MythScreenStack *parent, QString name);
+    ~MythNews();
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent*);
 
   private:
-    ~MythNews();
-
     void updateInfoView(void);
     void clearSites(void);
     void cancelRetrieve(void);

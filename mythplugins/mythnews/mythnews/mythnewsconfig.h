@@ -19,12 +19,12 @@ class MythNewsConfig : public MythScreenType
   public:
     MythNewsConfig(MythScreenStack *parent,
                    const QString name = "MythNewsConfig");
+    ~MythNewsConfig();
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
   private:
-    ~MythNewsConfig();
     void loadData(void);
     void populateSites(void);
 
