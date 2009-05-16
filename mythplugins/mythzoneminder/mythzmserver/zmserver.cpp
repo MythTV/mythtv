@@ -39,6 +39,12 @@
 #  endif // !CONFIG_CYGWIN
 #endif
 
+#include "mythtv/mythconfig.h"
+
+#ifdef CONFIG_DARWIN
+#define MSG_NOSIGNAL 0  // Apple also has SO_NOSIGPIPE?
+#endif
+
 #include "zmserver.h"
 
 // the version of the protocol we understand

@@ -15,6 +15,8 @@
 #ifndef ZMDEFINES_H
 #define ZMDEFINES_H
 
+#include <vector>
+
 // qt
 #include <QString>
 
