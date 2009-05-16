@@ -37,10 +37,16 @@ RemoteFile::~RemoteFile()
 MythSocket *RemoteFile::openSocket(bool control)
 {
     QUrl qurl(path);
+    QString dir;
 
     QString host = qurl.host();
     int port = qurl.port();
-    QString dir = qurl.path();
+
+    if (qurl.hasFragment()) 
+        dir = qurl.path() + "#" + qurl.fragment();
+    else
+        dir = qurl.path();
+
     QString sgroup = qurl.userName();
 
     MythSocket *lsock = new MythSocket();
