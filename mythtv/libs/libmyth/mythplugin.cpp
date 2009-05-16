@@ -55,25 +55,34 @@ int MythPlugin::init(const char *libversion)
     return -1;
 }
 
-void MythPlugin::run(void)
+int MythPlugin::run(void)
 {
     typedef int (*PluginRunFunc)();
+
+    int           rVal  = -1;
     PluginRunFunc rfunc = (PluginRunFunc)QLibrary::resolve("mythplugin_run");
 
     if (rfunc)
-        rfunc();
+        rVal = rfunc();
+
+    return rVal;
 }
 
-void MythPlugin::config(void)
+int MythPlugin::config(void)
 {
     typedef int (*PluginConfigFunc)();
-    PluginConfigFunc rfunc = (PluginConfigFunc)QLibrary::resolve("mythplugin_config");
+
+    int              rVal  = -1;
+    PluginConfigFunc rfunc = (PluginConfigFunc)QLibrary::resolve(
+                                                   "mythplugin_config");
 
     if (rfunc)
     {
-        rfunc();
+        rVal = rfunc();
         gContext->ClearSettingsCache();
     }
+
+    return rVal;
 }
 
 MythPluginType MythPlugin::type(void)
@@ -207,9 +216,9 @@ bool MythPluginManager::run_plugin(const QString &plugname)
     }
 
     gContext->addCurrentLocation(newname);
-    m_dict[newname]->run();
+    bool didRun = m_dict[newname]->run();
     gContext->removeCurrentLocation();
-    return true;
+    return didRun;
 }
 
 bool MythPluginManager::config_plugin(const QString &plugname)

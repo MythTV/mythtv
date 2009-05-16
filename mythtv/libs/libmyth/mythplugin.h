@@ -29,10 +29,10 @@ class MythPlugin : public QLibrary
     int init(const char *libversion);
 
     // This method will call the mythplugin_run() function of the library.
-    void run(void);
+    int run(void);
  
     // This method will call the mythplugin_config() function of the library.
-    void config(void);
+    int config(void);
 
     // This method will call the mythplugin_type() function of the library.
     // If such a function doesn't exist, it's a main module plugin.
