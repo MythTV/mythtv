@@ -178,14 +178,17 @@ static void configplugin_cb(const QString &cmd)
 {
     MythPluginManager *pmanager = gContext->getPluginManager();
     if (pmanager)
-        pmanager->config_plugin(cmd.trimmed());
+        if (pmanager->config_plugin(cmd.trimmed()))
+            ShowOkPopup(QObject::tr("Failed to configure plugin %1").arg(cmd));
 }
 
 static void plugin_cb(const QString &cmd)
 {
     MythPluginManager *pmanager = gContext->getPluginManager();
     if (pmanager)
-        pmanager->run_plugin(cmd.trimmed());
+        if (pmanager->run_plugin(cmd.trimmed()))
+            ShowOkPopup(QObject::tr("The plugin %1 has failed "
+                                    "to run for some reason...").arg(cmd));
 }
 
 static void eject_cb(void)
