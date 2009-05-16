@@ -16,7 +16,7 @@
 #include "gallerysettings.h"
 #include "dbcheck.h"
 
-static void run(MythMediaDevice *dev)
+static int run(MythMediaDevice *dev = NULL)
 {
     QDir startdir(gContext->GetSetting("GalleryDir"));
     if (startdir.exists() && startdir.isReadable())
@@ -27,7 +27,12 @@ static void run(MythMediaDevice *dev)
                                           startdir.absolutePath(), dev);
 
         if (iconview->Create())
+        {
             mainStack->AddScreen(iconview);
+            return 0;
+        }
+        else
+            delete iconview;
     }
     else
     {
@@ -36,11 +41,13 @@ static void run(MythMediaDevice *dev)
                                 "the setting is correct on MythGallery's "
                                 "settings page."));
     }
+
+    return -1;
 }
 
 void runGallery(void)
 {
-    run(NULL);
+    run();
 }
 
 void handleMedia(MythMediaDevice *dev)
@@ -104,8 +111,7 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run(void)
 {
-    runGallery();
-    return 0;
+    return run();
 }
 
 int mythplugin_config(void)

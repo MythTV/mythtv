@@ -24,6 +24,7 @@
 SourceManager *srcMan = 0;
 
 void runWeather();
+int  RunWeather();
 
 void setupKeys()
 {
@@ -59,6 +60,11 @@ int mythplugin_init(const char *libversion)
 
 void runWeather()
 {
+    RunWeather();
+}
+
+int RunWeather()
+{
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     Weather *weather = new Weather(mainStack, "mythweather", srcMan);
@@ -67,13 +73,18 @@ void runWeather()
     {
         mainStack->AddScreen(weather);
         weather->setupScreens();
+        return 0;
+    }
+    else
+    {
+        delete weather;
+        return -1;
     }
 }
 
 int mythplugin_run()
 {
-    runWeather();
-    return 0;
+    return RunWeather();
 }
 
 void WeatherCallback(void *data, QString &selection)
@@ -125,15 +136,15 @@ int mythplugin_config()
             lcd->switchToTime();
 
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
+        return 0;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
                               .arg(menuname).arg(themedir));
         delete menu;
+        return -1;
     }
-
-    return 0;
 }
 
 void  mythplugin_destroy()

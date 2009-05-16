@@ -74,7 +74,7 @@ void NetFlixCallback(void *data, QString &selection)
     }
 }
 
-void runMenu()
+int runMenu()
 {
     QString menuname = "netflix_menu.xml";
     QString themedir = GetMythUI()->GetThemeDir();
@@ -89,12 +89,14 @@ void runMenu()
     if (diag->foundTheme())
     {
         GetMythMainWindow()->GetMainStack()->AddScreen(diag);
+        return 0;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
                               .arg(menuname).arg(themedir));
         delete diag;
+        return -1;
     }
 }
 
@@ -113,8 +115,7 @@ void setupKeys(void)
 
 int mythplugin_run(void)
 {
-    runMenu();
-    return 0;
+    return runMenu();
 }
 
 int mythplugin_config(void)
@@ -125,9 +126,15 @@ int mythplugin_config(void)
                                                         "mythflixconfig");
 
     if (mythflixconfig->Create())
+    {
         mainStack->AddScreen(mythflixconfig);
-
-    return 0;
+        return 0;
+    }
+    else
+    {
+        delete mythflixconfig;
+        return -1;
+    }
 }
 
 int mythplugin_init(const char *libversion)

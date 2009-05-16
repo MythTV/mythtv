@@ -56,7 +56,7 @@ void GameCallback(void *data, QString &selection)
 
 }
 
-void runMenu(QString which_menu)
+int runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
@@ -75,12 +75,14 @@ void runMenu(QString which_menu)
             lcd->switchToTime();
         }
         GetMythMainWindow()->GetMainStack()->AddScreen(diag);
+        return 0;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
                               .arg(which_menu).arg(themedir));
         delete diag;
+        return -1;
     }
 }
 
@@ -140,7 +142,6 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    runMenu("game_settings.xml");
-    return 0;
+    return runMenu("game_settings.xml");
 }
 

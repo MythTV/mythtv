@@ -36,9 +36,15 @@ int mythplugin_run(void)
     BookmarkManager *manager = new BookmarkManager(mainStack, "bookmarkmanager");
 
     if (manager->Create())
+    {
         mainStack->AddScreen(manager);
-
-    return 0;
+        return 0;
+    }
+    else
+    {
+        delete manager;
+        return -1;
+    }
 }
 
 int mythplugin_config(void)
@@ -48,7 +54,13 @@ int mythplugin_config(void)
     BrowserConfig *config = new BrowserConfig(mainStack, "browserconfig");
 
     if (config->Create())
+    {
         mainStack->AddScreen(config);
-
-    return 0;
+        return 0;
+    }
+    else
+    {
+        delete config;
+        return -1;
+    }
 }

@@ -438,7 +438,7 @@ namespace
         }
     }
 
-    void runMenu(const QString &menuname)
+    int runMenu(const QString &menuname)
     {
         QString themedir = GetMythUI()->GetThemeDir();
 
@@ -457,12 +457,14 @@ namespace
                 lcd->switchToTime();
             }
             GetMythMainWindow()->GetMainStack()->AddScreen(diag);
+            return 0;
         }
         else
         {
             VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
                                   .arg(menuname).arg(themedir));
             delete diag;
+            return -1;
         }
     }
 }
@@ -496,15 +498,12 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run()
 {
-    runMenu("videomenu.xml");
-    return 0;
+    return runMenu("videomenu.xml");
 }
 
 int mythplugin_config()
 {
-    runMenu("video_settings.xml");
-
-    return 0;
+    return runMenu("video_settings.xml");
 }
 
 void mythplugin_destroy()

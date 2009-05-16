@@ -6,7 +6,7 @@
 #include "moviesui.h"
 #include "moviessettings.h"
 
-void runMovies(void);
+int runMovies(void);
 int setupDatabase();
 MythPopupBox *configPopup;
 const QString dbVersion = "4";
@@ -36,15 +36,21 @@ int mythplugin_init(const char *libversion)
     return 0;
 }
 
-void runMovies(void)
+int runMovies(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     MoviesUI *movies = new MoviesUI(mainStack);
 
     if (movies->Create())
+    {
         mainStack->AddScreen(movies);
+        return 0;
+    }
     else
+    {
         delete movies;
+        return -1;
+    }
 }
 
 void runConfig()
@@ -69,11 +75,10 @@ int mythplugin_run(void)
         VERBOSE(VB_IMPORTANT,
                 QString("Invalid configuration options supplied."));
         gContext->ActivateSettingsCache(true);
-        return 0;
+        return -1;
     }
     gContext->ActivateSettingsCache(true);
-    runMovies();
-    return 0;
+    return runMovies();
 }
 
 int mythplugin_config(void)
