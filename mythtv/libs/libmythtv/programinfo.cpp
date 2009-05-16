@@ -4262,6 +4262,11 @@ void ProgramInfo::ShowNotRecordingDialog(void)
             confList->erase(confList->begin());
         }
         message += "\n";
+        while (!confList->empty())
+        {
+            delete confList->back();
+            confList->pop_back();
+        }
         delete confList;
     }
 
