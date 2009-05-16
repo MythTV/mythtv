@@ -172,8 +172,6 @@ void ProgLister::Init(void)
 {
     if (m_curView < 0 && m_type != plPreviouslyRecorded)
         QApplication::postEvent(this, new MythEvent("CHOOSE_VIEW"));
-    else
-        setViewFromList(tr("Time"));
 }
 
 bool ProgLister::keyPressEvent(QKeyEvent *e)
