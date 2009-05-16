@@ -1286,12 +1286,15 @@ void ProgLister::fillItemList(bool restorePosition)
     }
     else if (m_type == plTime) // list by time
     {
-        bindings[":PGILSEARCHTIME"] = m_searchTime.toString("yyyy-MM-dd hh:00:00");
+        bindings[":PGILSEARCHTIME1"] = m_searchTime.toString("yyyy-MM-dd hh:00:00");
         where = "WHERE channel.visible = 1 "
-                "  AND program.starttime >= :PGILSEARCHTIME ";
+                "  AND program.starttime >= :PGILSEARCHTIME1 ";
         if (m_titleSort)
-            where += "  AND program.starttime < DATE_ADD(:PGILSEARCHTIME, "
+        {
+            where += "  AND program.starttime < DATE_ADD(:PGILSEARCHTIME2, "
                      "INTERVAL '1' HOUR) ";
+            bindings[":PGILSEARCHTIME2"] = bindings[":PGILSEARCHTIME1"];
+        }
     }
     else if (m_type == plRecordid) // list by recordid
     {
