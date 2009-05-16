@@ -134,6 +134,8 @@ mingw {
 macx {
     HEADERS += audiooutputca.h
     SOURCES += audiooutputca.cpp
+    HEADERS += mythcdrom-darwin.h
+    SOURCES += mythcdrom-darwin.cpp
 
     darwin_da {
         SOURCES -= mediamonitor-unix.cpp

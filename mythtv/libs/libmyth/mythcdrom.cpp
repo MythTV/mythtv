@@ -1,15 +1,15 @@
-#include "mythcdrom.h"
+#include <QDir>
+#include <QFileInfo>
 
+#include "mythcdrom.h"
+#include "mythconfig.h"
 #ifdef linux
 #include "mythcdrom-linux.h"
 #elif defined(__FreeBSD__)
 #include "mythcdrom-freebsd.h"
+#elif defined(CONFIG_DARWIN)
+#include "mythcdrom-darwin.h"
 #endif
-
-#include <qdir.h>
-#include <qfileinfo.h>
-
-#include "mythconfig.h"
 #include "mythverbose.h"
 
 
@@ -28,14 +28,15 @@
 #define PATHTO_AUDIO_DETECT "/.TOC.plist"
 
 
-MythCDROM* MythCDROM::get(QObject* par, const char* devicePath, bool SuperMount,
-                                 bool AllowEject) {
+MythCDROM* MythCDROM::get(QObject* par, const char* devicePath,
+                          bool SuperMount, bool AllowEject)
+{
 #ifdef linux
     return GetMythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 #elif defined(__FreeBSD__)
     return GetMythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
 #elif defined(CONFIG_DARWIN)
-    return new MythCDROM(par, devicePath, SuperMount, AllowEject);
+    return GetMythCDROMDarwin(par, devicePath, SuperMount, AllowEject);
 #else
     return NULL;
 #endif
