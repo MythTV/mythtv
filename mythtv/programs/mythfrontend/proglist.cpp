@@ -934,7 +934,9 @@ void ProgLister::fillViewList(const QString &view)
 
         m_viewList << "specials";
         m_viewTextList << tr("Specials");
-        m_curView = 0;
+
+        if (!view.isEmpty())
+            m_curView = m_viewList.indexOf(view);
     }
     else if (m_type == plMovies)
     {
@@ -972,7 +974,9 @@ void ProgLister::fillViewList(const QString &view)
         m_viewTextList << tr("At least *");
         m_viewList << ">= 0.125";
         m_viewTextList << tr("At least /");
-        m_curView = 0;
+
+        if (!view.isEmpty())
+            m_curView = m_viewList.indexOf(view);
     }
     else if (m_type == plTime)
     {
