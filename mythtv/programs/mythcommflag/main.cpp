@@ -28,7 +28,6 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "NuppelVideoPlayer.h"
-#include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "jobqueue.h"
