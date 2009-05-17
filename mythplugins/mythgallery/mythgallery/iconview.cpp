@@ -1215,6 +1215,9 @@ void IconView::HandleSubMenuFile(void)
     item = new UIListBtnTypeItem(m_submenuType, tr("Show Devices"));
     item->setData(new MenuAction(&IconView::HandleShowDevices));
 
+    item = new UIListBtnTypeItem(m_submenuType, tr("Eject"));
+    item->setData(new MenuAction(&IconView::HandleEject));
+
     item = new UIListBtnTypeItem(m_submenuType, tr("Import"));
     item->setData(new MenuAction(&IconView::HandleImport));
 
@@ -1325,6 +1328,11 @@ void IconView::HandleSettings(void)
         m_currDevice = NULL;
         LoadDirectory(m_galleryDir, true);
     }
+}
+
+void IconView::HandleEject(void)
+{
+    myth_eject();
 }
 
 void IconView::HandleImport(void)
