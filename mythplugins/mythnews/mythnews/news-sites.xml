@@ -29,7 +29,7 @@
 
     <item> 
         <title>Scotsman.com Entertainment News</title> 
-        <url>http://news.scotsman.com/entertainment.cfm?format=rss</url> 
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7010</url> 
         <ico>http://www.scotsman.com/favicon.ico</ico> 
     </item> 
 
@@ -456,73 +456,73 @@
 
     <item>
         <title>G4TV Attack of the Show Daily Video Podcast</title>
-        <url>http://www.g4tv.com/attackoftheshow/podcasts/5/Attack_of_the_Show_Daily_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/attackoftheshow/podcasts/5/Attack_of_the_Show_Daily_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV Cheat! Video Podcast</title>
-        <url>http://www.g4tv.com/cheat/podcasts/7/Cheat_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/cheat/podcasts/7/Cheat_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV Cinematech: Nocturnal Emissions Video Podcast</title>
-        <url>http://www.g4tv.com/cinematechnocturnalemissions/podcasts/9/Cinematech_Nocturnal_Emissions_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/cinematechnocturnalemissions/podcasts/9/Cinematech_Nocturnal_Emissions_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
     <item>
         <title>G4TV Cinematech Video Podcast</title>
-        <url>http://www.g4tv.com/cinematech/podcasts/8/Cinematech_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/cinematech/podcasts/8/Cinematech_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV ICONS Video Podcast</title>
-        <url>http://www.g4tv.com/icons/podcasts/17/ICONS_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/icons/podcasts/17/ICONS_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV Filter Video Podcast</title>
-        <url>http://www.g4tv.com/filter/podcasts/10/Filter_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/filter/podcasts/10/Filter_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item>
  
     <item>
         <title>G4TV Formula D Video Podcast</title>
-        <url>http://www.g4tv.com/formulad/podcasts/18/Formula_D_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/formulad/podcasts/18/Formula_D_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV Street Fury Video Podcast</title>
-        <url>http://www.g4tv.com/streetfury/podcasts/11/Street_Fury_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/streetfury/podcasts/11/Street_Fury_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV The Daily Feed Video Podcast</title>
-        <url>http://www.g4tv.com/thefeed/podcasts/19/The_Daily_Feed_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/thefeed/podcasts/19/The_Daily_Feed_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV The Daily Nut</title>
-        <url>http://www.g4tv.com/dailynut/podcasts/15/The_Daily_Nut.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/dailynut/podcasts/15/The_Daily_Nut.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV The Man Show Video Podcast</title>
-        <url>http://www.g4tv.com/themanshow/podcasts/14/The_Man_Show_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/themanshow/podcasts/14/The_Man_Show_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item> 
 
     <item>
         <title>G4TV X-Play Daily Video Podcast</title>
-        <url>http://www.g4tv.com/xplay/podcasts/6/XPlay_Daily_Video_Podcast.xml</url>
-        <ico>http://www.g4tv.com/favicon.ico</ico>
+        <url>http://g4tv.com/xplay/podcasts/6/XPlay_Daily_Video_Podcast.xml</url>
+        <ico>http://g4tv.com/favicon.ico</ico>
     </item>
 
 </category>
@@ -639,7 +639,7 @@
 
     <item>
         <title>Scotsman.com International News</title>
-        <url>http://news.scotsman.com/international.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7000</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
 
@@ -725,73 +725,53 @@
     </item>
 
     <item>
-        <title>Digital Spy - News Headlines</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsall.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Entertainment Headlines</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsentertainmentnews.xml</url>
-    </item>
-
-    <item>
         <title>Digital Spy - Media Headlines</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsmedianews.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/zones/gb/media.xml</url>
     </item>
 
     <item>
-        <title>Digital Spy - Digital TV</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsdigitaltv.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Broadcasting</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsbroadcasting.xml</url>
+        <title>Digital Spy - Big Brother</title>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/bigbrother.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Cult</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dscult.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Gay Spy</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsgayspy.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/cult.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Movies</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsmovies.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/movies.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Music</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsmusic.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/music.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Reality</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsrealitytv.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/realitytv.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Showbiz</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsshowbiz.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/showbiz.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Soaps</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dssoaps.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/soaps.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Television</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dstv.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/tv.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - US TV</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsustv.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/ustv.xml</url>
     </item>
 
 </category>
@@ -976,11 +956,6 @@
     </item>
 
     <item>
-        <title>Digital Spy - Odd Section</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsodd.xml</url>
-    </item>
-
-    <item>
         <title>Fark</title>
         <url>http://feeds.feedburner.com/fark</url>
         <ico>http://www.fark.com/favicon.ico</ico>
@@ -1014,7 +989,7 @@
 
     <item>
         <title>Scotsman.com Opinion</title>
-        <url>http://news.scotsman.com/opinion.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7074</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
     
@@ -1110,18 +1085,25 @@
 
     <item>
         <title>Helsingin Sanomat (FI)</title>
-        <url>http://siirto.helsinginsanomat.fi/aukio/HS-Tuoreet-RSS.xml</url>
+        <url>http://www.hs.fi/uutiset/rss/</url>
+        <ico>http://www.hs.fi/static/hs/img/favicon.ico</ico>
     </item>
 
     <item>
+        <title>YLE (FI)</title>
+        <url>http://www.yle.fi/uutiset/rss/paauutiset.xml</url>
+        <ico>http://www.yle.fi/favicon.ico</ico>
+    </item>
+    
+    <item>
         <title>Scotsman.com Headlines</title>
-        <url>http://news.scotsman.com/index.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=4068</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
 
     <item>
         <title>Scotsman.com UK News</title>
-        <url>http://news.scotsman.com/uk.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7071</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
 
