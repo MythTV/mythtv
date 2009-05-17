@@ -467,6 +467,9 @@ void BookmarkManager::slotEditBookmark(void)
 
 void BookmarkManager::slotDeleteCurrent(void)
 {
+    if (!m_bookmarkList->GetItemCurrent())
+        return;
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     QString message = tr("Are you sure you want to delete the selected bookmark");
