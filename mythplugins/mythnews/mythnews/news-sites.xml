@@ -725,73 +725,53 @@
     </item>
 
     <item>
-        <title>Digital Spy - News Headlines</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsall.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Entertainment Headlines</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsentertainmentnews.xml</url>
-    </item>
-
-    <item>
         <title>Digital Spy - Media Headlines</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsmedianews.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/zones/gb/media.xml</url>
     </item>
 
     <item>
-        <title>Digital Spy - Digital TV</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsdigitaltv.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Broadcasting</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsbroadcasting.xml</url>
+        <title>Digital Spy - Big Brother</title>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/bigbrother.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Cult</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dscult.xml</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Gay Spy</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsgayspy.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/cult.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Movies</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsmovies.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/movies.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Music</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsmusic.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/music.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Reality</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsrealitytv.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/realitytv.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Showbiz</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsshowbiz.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/showbiz.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Soaps</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dssoaps.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/soaps.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - Television</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dstv.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/tv.xml</url>
     </item>
 
     <item>
         <title>Digital Spy - US TV</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsustv.xml</url>
+        <url>http://www.digitalspy.co.uk/rss/categories/gb/ustv.xml</url>
     </item>
 
 </category>
@@ -973,11 +953,6 @@
     <item>
         <title>CNN - Offbeat</title>
         <url>http://rss.cnn.com/rss/cnn_offbeat.rss</url>
-    </item>
-
-    <item>
-        <title>Digital Spy - Odd Section</title>
-        <url>http://syndication.digitalspy.co.uk/rss_news/dsodd.xml</url>
     </item>
 
     <item>
