@@ -78,7 +78,7 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 void MediaMonitor::SetCDSpeed(const char *device, int speed)
 {
     MediaMonitor *mon = GetMediaMonitor();
-    if (mon != NULL)
+    if (mon)
     {
         MythMediaDevice *pMedia = mon->GetMedia(device);
         if (pMedia && mon->ValidateAndLock(pMedia))
@@ -90,8 +90,14 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
     }
 
     MythCDROM *cd = MythCDROM::get(NULL, device, false, false);
-    cd->setSpeed(device, speed);
-    delete cd;
+    if (cd)
+    {
+        cd->setSpeed(device, speed);
+        delete cd;
+    }
+
+    VERBOSE(VB_MEDIA, QString("MediaMonitor::setSpeed(%1) "
+                              "- Cannot find/create CDROM?") + device);
 }
 
 // When ejecting one of multiple devices, present a nice name to the user
