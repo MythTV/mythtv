@@ -93,8 +93,8 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
         delete cd;
     }
 
-    VERBOSE(VB_MEDIA, "MediaMonitor::setSpeed(" + device
-                      + ") - Cannot find/create CDROM?");
+    VERBOSE(VB_MEDIA, QString("MediaMonitor::setSpeed(%1) "
+                              "- Cannot find/create CDROM?") + device);
 }
 
 // When ejecting one of multiple devices, present a nice name to the user
