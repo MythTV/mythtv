@@ -165,6 +165,8 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     void RemoveItem(MythUIButtonListItem *item);
 
+    void SetLCDTitles(const QString &title, const QString &columnList = "");
+
   public slots:
     void Select();
     void Deselect();
@@ -182,6 +184,8 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void InsertItem(MythUIButtonListItem *item);
 
     void SetPositionArrowStates(void);
+
+    void updateLCD(void);
 
     /* methods for subclasses to override */
     virtual void CalculateVisibleItems(void);
@@ -231,6 +235,9 @@ class MPUBLIC MythUIButtonList : public MythUIType
     QList<MythUIButtonListItem*> m_itemList;
 
     bool m_drawFromBottom;
+
+    QString     m_lcdTitle;
+    QStringList m_lcdColumns;
 
     friend class MythUIButtonListItem;
     friend class MythUIButtonTree;

@@ -1,3 +1,5 @@
+#include <math.h>
+
 // QT headers
 #include <QDomDocument>
 
@@ -9,6 +11,7 @@
 #include "mythuigroup.h"
 #include "mythmainwindow.h"
 #include "mythuistatetype.h"
+#include "lcddevice.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 #define LOC_ERR QString("MythUIButtonList(%1), Error: ").arg(objectName())
@@ -58,6 +61,7 @@ void MythUIButtonList::Const(void)
     m_itemsVisible     = 0;
     m_columns          = 0;
     m_rows             = 0;
+    m_lcdTitle         = "";
 
     m_upArrow = m_downArrow = NULL;
 
@@ -264,6 +268,8 @@ void MythUIButtonList::SetPositionArrowStates(void)
             m_ButtonList[button]->SetVisible(false);
 
     }
+
+    updateLCD();
 
     if (!m_downArrow || !m_upArrow)
         return;
@@ -1047,6 +1053,72 @@ void MythUIButtonList::Finalize(void)
     MythUIType::Finalize();
 }
 
+void MythUIButtonList::SetLCDTitles(const QString &title, const QString &columnList)
+{
+    m_lcdTitle = title;
+    m_lcdColumns = columnList.split("|");
+}
+
+void MythUIButtonList::updateLCD(void)
+{
+    if (!m_HasFocus)
+        return;
+
+    LCD *lcddev = LCD::Get();
+    if (lcddev == NULL)
+        return;
+
+    // Build a list of the menu items
+    QList<LCDMenuItem> menuItems;
+    bool selected;
+
+    int start = std::max(0, (int)(m_selPosition - lcddev->getLCDHeight()));
+    int end = std::min(m_itemCount, (int)(start + (lcddev->getLCDHeight() * 2)));
+
+    for (int r = start; r < end; r++)
+    {
+        if (r == GetCurrentPos())
+            selected = true;
+        else
+            selected = false;
+
+        MythUIButtonListItem *item = GetItemAt(r);
+        CHECKED_STATE state = NOTCHECKABLE;
+        if (item->checkable())
+            state = (item->state() == MythUIButtonListItem::NotChecked) ? UNCHECKED : CHECKED;
+
+        QString text;
+        for (int x = 0; x < m_lcdColumns.count(); x++)
+        {
+            if (!m_lcdColumns[x].isEmpty() && item->m_strings.contains(m_lcdColumns[x]))
+            {
+                // named text column
+                MythUIButtonListItem::TextProperties props = item->m_strings[m_lcdColumns[x]];
+                if (text.isEmpty())
+                    text = props.text;
+                else
+                    text += " ~ " + props.text;
+            }
+            else
+            {
+                // default text column
+                if (text.isEmpty())
+                    text = item->GetText();
+                else
+                    text += " ~ " + item->GetText();
+            }
+        }
+
+        if (!text.isEmpty())
+            menuItems.append(LCDMenuItem(selected, state, text));
+        else
+            menuItems.append(LCDMenuItem(selected, state, item->GetText()));
+    }
+
+    if (!menuItems.isEmpty())
+        lcddev->switchToMenu(menuItems, m_lcdTitle);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
@@ -1463,4 +1535,3 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         ++state_it;
     }
 }
-
