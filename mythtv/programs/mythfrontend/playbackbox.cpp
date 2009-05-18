@@ -24,7 +24,6 @@ using namespace std;
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
-#include "lcddevice.h"
 #include "previewgenerator.h"
 #include "playgroup.h"
 #include "customedit.h"
@@ -424,6 +423,9 @@ bool PlaybackBox::Create()
     connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(playSelected(MythUIButtonListItem*)));
 
+    m_groupList->SetLCDTitles(tr("Groups"));
+    m_recordingList->SetLCDTitles(tr("Recordings"), "titlesubtitle|shortdate|starttime");
+
     if (!m_player && !m_recGroupPassword.isEmpty())
         displayRecGroup(m_recGroup);
     else if (gContext->GetNumSetting("QueryInitialFilter", 0) == 1)
@@ -803,16 +805,6 @@ void PlaybackBox::updateGroupList()
 {
     m_groupList->Reset();
 
-    LCD *lcddev = LCD::Get();
-    QString lcdTitle;
-    QList<LCDMenuItem> lcdItems;
-
-    if (lcddev)
-    {
-        if (GetFocusWidget() == m_groupList)
-            lcdTitle = "Recordings";
-    }
-
     if (!m_titleList.isEmpty())
     {
         MythUIButtonListItem *item = NULL;
@@ -848,9 +840,6 @@ void PlaybackBox::updateGroupList()
 
             int count = m_progLists[groupname.toLower()].size();
             item->SetText(QString::number(count), "reccount");
-
-            if (lcddev && (GetFocusWidget() == m_groupList))
-                lcdItems.append(LCDMenuItem(0, NOTCHECKABLE, groupname));
         }
 
         if (!foundGroup)
@@ -889,13 +878,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         return;
 
     ProgramList &progList = *pmit;
-
-    LCD    *lcddev   = LCD::Get();
-    QString lcdTitle = "Recordings";
-    if (lcddev && GetFocusWidget() != m_groupList)
-        lcdTitle = " <<" + groupname;
-
-    QList<LCDMenuItem> lcdItems;
 
     static const char *disp_flags[] = { "playlist", "watched", };
     bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
@@ -937,15 +919,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             state = "disabled";
         }
 
-        if (lcddev && !(GetFocusWidget() == m_groupList))
-        {
-            QString lcdSubTitle = tempSubTitle;
-            QString lcdStr = QString("%1 %2")
-                .arg(lcdSubTitle.replace('"', "'")).arg(tempShortDate);
-            LCDMenuItem lcdItem(m_currentItem == *it, NOTCHECKABLE, lcdStr);
-            lcdItems.push_back(lcdItem);
-        }
-
         QMap<QString, QString> infoMap;
         (*it)->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
@@ -973,9 +946,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             m_recordingList->SetItemCurrent(item);
         }
     }
-
-    if (lcddev && !lcdItems.isEmpty())
-        lcddev->switchToMenu(lcdItems, lcdTitle);
 
     if (m_noRecordingsText)
     {
