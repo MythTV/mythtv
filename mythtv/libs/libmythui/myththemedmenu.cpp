@@ -171,8 +171,6 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
 
     if (m_descriptionText)
         m_descriptionText->SetText(button.description);
-
-    updateLCD();
 }
 
 /** \brief Looks at "AllowQuitShutdown" setting in DB, in order to
@@ -287,7 +285,6 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
 void MythThemedMenu::aboutToShow()
 {
     MythScreenType::aboutToShow();
-    updateLCD();
 }
 
 /** \brief Parses the element's tags and set the ThemeButton's type,
@@ -481,11 +478,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
         return false;
     }
 
-    if (LCD::Get())
-    {
-        m_titleText = "MYTH-";
-        m_titleText += m_menumode;
-    }
+    m_buttonList->SetLCDTitles("MYTH-" + m_menumode);
 
     if (m_titleState)
     {
@@ -495,31 +488,6 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     m_selection = "";
     return true;
-}
-
-void MythThemedMenu::updateLCD(void)
-{
-    LCD *lcddev = LCD::Get();
-    if (lcddev == NULL)
-        return;
-
-    // Build a list of the menu items
-    QList<LCDMenuItem> menuItems;
-    bool selected;
-
-    for (int r = 0; r < m_buttonList->GetCount(); r++)
-    {
-        if (r == m_buttonList->GetCurrentPos())
-            selected = true;
-        else
-            selected = false;
-
-        MythUIButtonListItem *item = m_buttonList->GetItemAt(r);
-        menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,item->GetText()));
-    }
-
-    if (!menuItems.isEmpty())
-        lcddev->switchToMenu(menuItems, m_titleText);
 }
 
 /** \brief Create a new MythThemedButton based on the MythThemedMenuState

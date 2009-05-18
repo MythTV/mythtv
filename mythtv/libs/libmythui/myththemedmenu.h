@@ -104,8 +104,6 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
                       const QString &password_setting,
                       const QString &text);
 
-    void updateLCD(void);
-
     MythThemedMenu *m_parent;
 
     MythThemedMenuState *m_state;
@@ -120,7 +118,6 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
 
     bool m_wantpop;
 
-    QString m_titleText;
     QString m_menumode;
 };
 
