@@ -3170,20 +3170,16 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         case QEvent::UpdateRequest:
         case QEvent::Enter:
         {
-            if (ignoreKeyPresses)
+            PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+            for (uint i = 0; mctx && (i < player.size()); i++)
             {
-                PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-                for (uint i = 0; mctx && (i < player.size()); i++)
-                {
-                    PlayerContext *ctx = GetPlayer(mctx, i);
-                    ctx->LockDeleteNVP(__FILE__, __LINE__);
-                    if (ctx->nvp)
-                        ctx->nvp->ExposeEvent();
-                    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-                }
-                ReturnPlayerLock(mctx);
+                PlayerContext *ctx = GetPlayer(mctx, i);
+                ctx->LockDeleteNVP(__FILE__, __LINE__);
+                if (ctx->nvp)
+                    ctx->nvp->ExposeEvent();
+                ctx->UnlockDeleteNVP(__FILE__, __LINE__);
             }
-
+            ReturnPlayerLock(mctx);
             return false;
         }
 
@@ -8608,6 +8604,9 @@ void TV::customEvent(QEvent *e)
 
         isEmbedded = false;
         ignoreKeyPresses = false;
+
+        // ensure the player is visible
+        qApp->postEvent(gContext->GetMainWindow(), new QEvent(QEvent::Paint));
     }
 
     if (message.left(14) == "COMMFLAG_START")
