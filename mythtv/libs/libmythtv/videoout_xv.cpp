@@ -2664,7 +2664,7 @@ void VideoOutputXv::PrepareFrameVDPAU(VideoFrame *frame, FrameScanType scan)
 
     vdpau->PrepareVideo(
         frame, windows[0].GetVideoRect(), windows[0].GetDisplayVideoRect(),
-    	windows[0].GetDisplayVisibleRect().size(), scan);
+        windows[0].GetDisplayVisibleRect().size(), scan);
 #endif
 
     if (!frame)
@@ -3239,7 +3239,8 @@ void VideoOutputXv::DrawUnusedRects(bool sync)
 
     if (XVideoVDPAU == VideoOutputSubType())
     {
-        if (windows[0].IsRepaintNeeded() && !windows[0].IsEmbedding())
+        if (windows[0].IsRepaintNeeded() &&
+            windows[0].GetVisibility() == kVisibility_Normal)
         {
             X11L;
             XSetForeground(XJ_disp, XJ_gc, vdpau_colorkey);
