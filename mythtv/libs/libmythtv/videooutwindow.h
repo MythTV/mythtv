@@ -46,6 +46,7 @@ class VideoOutWindow
     void Zoom(ZoomDirection direction);
 
     // Sets
+    void SetVisibility(WindowVisibility vis) { visibility = vis; }
     void SetVideoScalingAllowed(bool change);
     void SetAllowPreviewEPG(bool allowPreviewEPG)
         { allowpreviewepg = allowPreviewEPG; }
@@ -64,7 +65,9 @@ class VideoOutWindow
     // Gets
     bool     IsVideoScalingAllowed(void) const { return db_scaling_allowed; }
     /// \brief Returns if videooutput is embedding
-    bool     IsEmbedding(void)           const { return embedding;       }
+    bool     IsEmbedding(void)
+        const { return visibility == kVisibility_Embedded; }
+    WindowVisibility GetVisibility(void) const { return visibility; }
     QSize    GetVideoDim(void)           const { return video_dim;       }
     QSize    GetDisplayDim(void)         const { return display_dim;     }
     float    GetMzScaleV(void)           const { return mz_scale_v;      }
@@ -149,10 +152,10 @@ class VideoOutWindow
     QRect   tmp_display_visible_rect;
 
     /// State variables
-    bool        embedding;
-    bool        needrepaint;
-    bool        allowpreviewepg;
-    PIPState    pip_state;
+    WindowVisibility visibility;
+    bool             needrepaint;
+    bool             allowpreviewepg;
+    PIPState         pip_state;
 
     // Constants
     static const float kManualZoomMaxHorizontalZoom;

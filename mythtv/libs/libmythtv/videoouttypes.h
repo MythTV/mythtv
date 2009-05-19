@@ -105,6 +105,13 @@ typedef enum VideoErrorState
     kError_Preempt,
 } VideoErrorState;
 
+typedef enum WindowVisibility
+{
+    kVisibility_Normal = 0,
+    kVisibility_Hidden,
+    kVisibility_Embedded,
+} WindowVisibility;
+
 inline bool is_interlaced(FrameScanType scan)
 {
     return (kScan_Interlaced == scan) || (kScan_Intr2ndField == scan);

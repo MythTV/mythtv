@@ -7617,6 +7617,12 @@ void TV::ClearTunableCache(void)
     is_tunable_cache_inputs.clear();
 }
 
+void TV::SetPlayerVisibility(PlayerContext *ctx, WindowVisibility visibility)
+{
+    if (ctx)
+        ctx->SetPlayerVisibility(visibility);
+}
+
 bool TV::StartEmbedding(PlayerContext *ctx, WId wid, const QRect &embedRect)
 {
     if (!ctx->IsNullVideoDesired())
@@ -7790,6 +7796,7 @@ void TV::DoEditSchedule(int editType)
     {
         case kScheduleProgramGuide:
         {
+            SetPlayerVisibility(mctx, kVisibility_Hidden);
             isEmbedded = (isLiveTV && !pause_active && allowEmbedding);
             RunProgramGuidePtr(chanid, channum, this, isEmbedded, true, changrpid);
             ignoreKeyPresses = true;
@@ -7797,6 +7804,7 @@ void TV::DoEditSchedule(int editType)
         }
         case kScheduleProgramFinder:
         {
+            SetPlayerVisibility(mctx, kVisibility_Hidden);
             isEmbedded = (isLiveTV && !pause_active && allowEmbedding);
             RunProgramFinderPtr(this, isEmbedded, true);
             ignoreKeyPresses = true;
@@ -7843,6 +7851,7 @@ void TV::DoEditSchedule(int editType)
 
         actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         StopEmbedding(actx);               // Undo any embedding
+        SetPlayerVisibility(actx, kVisibility_Normal);
         DoSetPauseState(actx, saved_pause); // Restore pause states
         ReturnPlayerLock(actx);
 
@@ -8570,6 +8579,7 @@ void TV::customEvent(QEvent *e)
         MythMainWindow *mwnd = gContext->GetMainWindow();
 
         StopEmbedding(actx);                // Undo any embedding
+        SetPlayerVisibility(actx, kVisibility_Normal);
 
         mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
         mctx->LockDeleteNVP(__FILE__, __LINE__);

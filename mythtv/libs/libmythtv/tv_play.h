@@ -188,6 +188,7 @@ class MPUBLIC TV : public QThread
     bool LiveTV(bool showDialogs = true, bool startInGuide = false);
 
     // Embedding commands for the guidegrid to use in LiveTV
+    void SetPlayerVisibility(PlayerContext*, WindowVisibility visibility);
     bool StartEmbedding(PlayerContext*, WId wid, const QRect&);
     void StopEmbedding(PlayerContext*);
     bool IsTunable(const PlayerContext*, uint chanid, bool use_cache = false);
