@@ -78,7 +78,7 @@ class PlaybackSock
     void CancelNextRecording(int capturecardnum, bool cancel);
 
   private:
-    bool SendReceiveStringList(QStringList &strlist);
+    bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);
 
     MythSocket *sock;
     QString hostname;

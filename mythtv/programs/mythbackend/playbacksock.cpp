@@ -1,6 +1,4 @@
-#include <qstringlist.h>
-
-#include <iostream>
+#include <QStringList>
 
 using namespace std;
 
@@ -64,36 +62,57 @@ bool PlaybackSock::DownRef(void)
     return false;
 }
 
-bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
+bool PlaybackSock::SendReceiveStringList(
+    QStringList &strlist, uint min_reply_length)
 {
+    bool ok = false;
+
     sock->Lock();
     sock->UpRef();
 
-    sockLock.lock();
-    expectingreply = true;
-
-    sock->writeStringList(strlist);
-    bool ok = sock->readStringList(strlist);
-
-    while (ok && strlist[0] == "BACKEND_MESSAGE")
     {
-        // oops, not for us
-        QString message = strlist[1];
-        strlist.pop_front(); strlist.pop_front();
+        QMutexLocker locker(&sockLock);
+        expectingreply = true;
 
-        MythEvent me(message, strlist);
-        gContext->dispatch(me);
-
+        sock->writeStringList(strlist);
         ok = sock->readStringList(strlist);
-    }
 
-    expectingreply = false;
-    sockLock.unlock();
+        while (ok && strlist[0] == "BACKEND_MESSAGE")
+        {
+            // oops, not for us
+            if (strlist.size() >= 2)
+            {
+                QString message = strlist[1];
+                strlist.pop_front();
+                strlist.pop_front();
+                MythEvent me(message, strlist);
+                gContext->dispatch(me);
+            }
+
+            ok = sock->readStringList(strlist);
+        }
+
+        expectingreply = false;
+    }
 
     sock->Unlock();
     sock->DownRef();
 
-    return ok;
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "PlaybackSock::SendReceiveStringList(): No response.");
+        return false;
+    }
+
+    if (min_reply_length && ((uint)strlist.size() < min_reply_length))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "PlaybackSock::SendReceiveStringList(): Response too short");
+        return false;
+    }
+
+    return true;
 }
 
 /** \brief Tells a slave to go to sleep
@@ -102,9 +121,7 @@ bool PlaybackSock::GoToSleep(void)
 {
     QStringList strlist( QString("GO_TO_SLEEP") );
 
-    SendReceiveStringList(strlist);
-
-    return (strlist[0] == "OK");
+    return SendReceiveStringList(strlist, 1) && (strlist[0] == "OK");
 }
 
 /**
@@ -125,9 +142,10 @@ int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)
     QStringList strlist( QString("CHECK_RECORDING") );
     pginfo->ToStringList(strlist);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toInt();
 
-    return strlist[0].toInt();
+    return 0;
 }
 
 int PlaybackSock::StopRecording(const ProgramInfo *pginfo)
@@ -135,9 +153,10 @@ int PlaybackSock::StopRecording(const ProgramInfo *pginfo)
     QStringList strlist( QString("STOP_RECORDING"));
     pginfo->ToStringList(strlist);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toInt();
 
-    return strlist[0].toInt();
+    return 0;
 }
 
 int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete)
@@ -151,9 +170,10 @@ int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataD
 
     pginfo->ToStringList(strlist);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toInt();
 
-    return strlist[0].toInt();
+    return 0;
 }
 
 bool PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
@@ -162,9 +182,10 @@ bool PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
     strlist << playbackhost;
     pginfo->ToStringList(strlist);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist))
+        return pginfo->FromStringList(strlist, 0);
 
-    return pginfo->FromStringList(strlist, 0);
+    return false;
 }
 
 QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
@@ -244,11 +265,13 @@ bool PlaybackSock::CheckFile(ProgramInfo *pginfo)
     strlist << QString::number(0); // don't check slaves
     pginfo->ToStringList(strlist);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 2))
+    {
+        pginfo->pathname = strlist[1];
+        return strlist[0].toInt();
+    }
 
-    bool exists = strlist[0].toInt();
-    pginfo->pathname = strlist[1];
-    return exists;
+    return false;
 }
 
 bool PlaybackSock::IsBusy(
@@ -259,7 +282,12 @@ bool PlaybackSock::IsBusy(
     strlist << "IS_BUSY";
     strlist << QString::number(time_buffer);
 
-    SendReceiveStringList(strlist);
+    if (!SendReceiveStringList(strlist, 1))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusy: " +
+                QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
+                " gave us no response.");
+    }
 
     QStringList::const_iterator it = strlist.begin();
     bool state = (*it).toInt();
@@ -287,10 +315,16 @@ int PlaybackSock::GetEncoderState(int capturecardnum)
     QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
     strlist << "GET_STATE";
 
-    SendReceiveStringList(strlist);
+    if (!SendReceiveStringList(strlist, 1))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetEncoderState: " +
+                QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) +
+                " gave us no response.");
 
-    int state = strlist[0].toInt();
-    return state;
+        return kState_Error;
+    }
+
+    return strlist[0].toInt();
 }
 
 long long PlaybackSock::GetMaxBitrate(int capturecardnum)
@@ -298,10 +332,10 @@ long long PlaybackSock::GetMaxBitrate(int capturecardnum)
     QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
     strlist << "GET_MAX_BITRATE";
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 2))
+        return decodeLongLong(strlist, 0);
 
-    long long ret = decodeLongLong(strlist, 0);
-    return ret;
+    return 20200000LL; // Peek bit rate for HD-PVR
 }
 
 /** \fn *PlaybackSock::GetRecording(int)
@@ -317,7 +351,8 @@ ProgramInfo *PlaybackSock::GetRecording(int capturecardnum)
 
     strlist << "GET_CURRENT_RECORDING";
 
-    SendReceiveStringList(strlist);
+    if (!SendReceiveStringList(strlist))
+        return NULL;
 
     ProgramInfo *info = new ProgramInfo();
     if (!info->FromStringList(strlist, 0))
@@ -335,10 +370,10 @@ bool PlaybackSock::EncoderIsRecording(int capturecardnum, const ProgramInfo *pgi
     strlist << "MATCHES_RECORDING";
     pginfo->ToStringList(strlist);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 1))
+        return (bool) strlist[0].toInt();
 
-    bool ret = strlist[0].toInt();
-    return ret;
+    return false;
 }
 
 RecStatusType PlaybackSock::StartRecording(int capturecardnum, 
@@ -348,9 +383,10 @@ RecStatusType PlaybackSock::StartRecording(int capturecardnum,
     strlist << "START_RECORDING";
     pginfo->ToStringList(strlist);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 1))
+        return RecStatusType(strlist[0].toInt());
 
-    return RecStatusType(strlist[0].toInt());
+    return rsUnknown; 
 }
 
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
@@ -373,10 +409,10 @@ int PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
     strlist << QString::number(rate);
     strlist << QString::number(notifyFrontend);
 
-    SendReceiveStringList(strlist);
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toInt();
 
-    int ret = strlist[0].toInt();
-    return ret;
+    return -1;
 }
 
 void PlaybackSock::SetNextLiveTVDir(int capturecardnum, QString dir)
