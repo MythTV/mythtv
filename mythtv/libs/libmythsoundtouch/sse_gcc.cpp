@@ -13,7 +13,10 @@ static uint64_t sadd = 0x000001ff000001ffULL;
 long TDStretchSSE2::calcCrossCorrMulti(const short *mPos, const short *cPos) const
 {
     long corr = 0;
-    int i, out[4];
+    // Need 16-byte align for int out[4], but gcc bug #16660 prevents use of
+    //  attribute(aligned()), so align it ourselves. Fixed in gcc >4.4 r138335
+    int i, x[8]; 
+    int *out=(int *)(((uintptr_t)&x+15) & ~(uintptr_t)0xf);
     int count = (overlapLength * channels) - channels;
     long loops = count >> 5;
     long remainder = count - (loops<<5);
@@ -67,7 +70,10 @@ long TDStretchSSE2::calcCrossCorrMulti(const short *mPos, const short *cPos) con
 long TDStretchSSE2::calcCrossCorrStereo(const short *mPos, const short *cPos) const
 {
     long corr = 0;
-    int i, out[4];
+    // Need 16-byte align for int out[4], but gcc bug #16660 prevents use of
+    //  attribute(aligned()), so align it ourselves. Fixed in gcc >4.4 r138335
+    int i, x[8]; 
+    int *out=(int *)(((uintptr_t)&x+15) & ~(uintptr_t)0xf);
     int count = (overlapLength<<1) - 2;
     long loops = count >> 5;
     long remainder = count - (loops<<5);
