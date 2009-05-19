@@ -3971,6 +3971,11 @@ PIPLocation NuppelVideoPlayer::GetNextPIPLocation(void) const
         }
     }
 
+    if (sim_pip_players.isEmpty())
+    {
+        return (PIPLocation)gContext->GetNumSetting("PIPLocation", kPIPTopLeft);
+    }
+
     // order of preference, could be stored in db if we want it configurable
     PIPLocation ols[] =
         { kPIPTopLeft, kPIPTopRight, kPIPBottomLeft, kPIPBottomRight };
