@@ -1255,7 +1255,8 @@ bool NuppelDecoder::GetFrame(int avignore)
                     }
                 }
 #endif
-                VERBOSE(VB_PLAYBACK, QString("A audio timecode %1").arg(frameheader.timecode));
+                VERBOSE(VB_PLAYBACK+VB_EXTRA, QString("A audio timecode %1")
+                                              .arg(frameheader.timecode));
                 GetNVP()->AddAudioData((char *)strm, frameheader.packetlength, 
                                        frameheader.timecode);
             }
