@@ -15,12 +15,9 @@ extern "C" {
 #ifdef USING_X11
 #define GLX_GLXEXT_PROTOTYPES
 #define XMD_H 1
-//#include <GL/glx.h>
 #include <GL/gl.h>
 #undef GLX_ARB_get_proc_address
 #endif // USING_X11
-//#include <GL/glxext.h>
-//#include <GL/glext.h>
 #include "util-opengl.h"
 
 #define LOC QString("GLVid: ")
@@ -61,7 +58,6 @@ OpenGLVideo::~OpenGLVideo()
     Teardown();
 }
 
-// locking ok
 void OpenGLVideo::Teardown(void)
 {
     ShutDownYUV2RGB();
@@ -80,7 +76,6 @@ void OpenGLVideo::Teardown(void)
     }
 }
 
-// locking ok
 bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
                        QSize videoDim, QRect displayVisibleRect,
                        QRect displayVideoRect, QRect videoRect,
@@ -321,7 +316,6 @@ bool OpenGLVideo::OptimiseFilters(void)
     return true;
 }
 
-// locking ok
 void OpenGLVideo::SetFiltering(void)
 {
     // filter settings included for performance only
@@ -353,7 +347,6 @@ void OpenGLVideo::SetFiltering(void)
     }
 }
 
-// locking ok
 bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 {
     if (filters.count(filter))
@@ -431,7 +424,6 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     return false;
 }
 
-// locking ok
 bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
 {
     if (!filters.count(filter))
@@ -461,7 +453,6 @@ bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
     return true;
 }
 
-// locking ok
 void OpenGLVideo::TearDownDeinterlacer(void)
 {
     if (!filters.count(kGLFilterYUV2RGB))
@@ -561,7 +552,6 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
     return false;
 }
 
-// locking ok
 uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
                                      QString deint, FrameScanType field)
 {
@@ -580,7 +570,6 @@ uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
     return 0;
 }
 
-// locking ok
 bool OpenGLVideo::AddFrameBuffer(uint &framebuffer, QSize fb_size,
                                  uint &texture, QSize vid_size)
 {
@@ -600,7 +589,6 @@ bool OpenGLVideo::AddFrameBuffer(uint &framebuffer, QSize fb_size,
     return ok;
 }
 
-// locking ok
 void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
 {
     uint w = max(viewPortSize.width(),  video_dim.width());
@@ -616,7 +604,6 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
     gl_context->SetViewPort(viewportSize);
 }
 
-// locking ok
 uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size,
                                      bool use_pbo)
 {
@@ -638,7 +625,6 @@ uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size,
     return tmp_tex;
 }
 
-// locking ok
 QSize OpenGLVideo::GetTextureSize(const QSize &size)
 {
     if (textureRects)
@@ -660,7 +646,6 @@ QSize OpenGLVideo::GetTextureSize(const QSize &size)
     return QSize(w, h);
 }
 
-// locking ok
 void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
 {
     OpenGLContextLocker ctx_lock(gl_context);
@@ -724,7 +709,6 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     inputUpdated = true;
 }
 
-// locking ok
 void OpenGLVideo::UpdateInput(const unsigned char *buf, const int *offsets,
                               int format, QSize size,
                               const unsigned char *alpha)
@@ -745,7 +729,6 @@ void OpenGLVideo::UpdateInput(const unsigned char *buf, const int *offsets,
     inputUpdated = true;
 }
 
-// locking ok
 void OpenGLVideo::ShutDownYUV2RGB(void)
 {
     if (convertBuf)
@@ -756,8 +739,6 @@ void OpenGLVideo::ShutDownYUV2RGB(void)
     convertSize = QSize(0,0);
 }
 
-// locking ok
-// TODO shouldn't this take a QSize, not QRect?
 void OpenGLVideo::SetVideoResize(const QRect &rect)
 {
     OpenGLContextLocker ctx_lock(gl_context);
@@ -768,7 +749,6 @@ void OpenGLVideo::SetVideoResize(const QRect &rect)
                   (rect.height() > video_dim.height()));
 
     // if resize == existing frame, no need to carry on
-
     abort |= !rect.left() && !rect.top() && (rect.size() == video_dim);
 
     if (!abort)
@@ -781,7 +761,6 @@ void OpenGLVideo::SetVideoResize(const QRect &rect)
     DisableVideoResize();
 }
 
-// locking ok
 void OpenGLVideo::DisableVideoResize(void)
 {
     OpenGLContextLocker ctx_lock(gl_context);
@@ -813,7 +792,6 @@ void OpenGLVideo::CalculateResize(float &left,  float &top,
     bottom = new_bottom;
 }
 
-// locking ok
 void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
 {
     if (deinterlacing == hardwareDeinterlacing)
@@ -831,7 +809,6 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
     softwareDeinterlacer.detach();
 }
 
-// locking ok
 void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                                bool softwareDeinterlacing,
                                long long frame, bool draw_border)
@@ -1128,7 +1105,6 @@ void OpenGLVideo::DeleteTextures(vector<GLuint> *textures)
     (*textures).clear();
 }
 
-// locking ok
 void OpenGLVideo::SetTextureFilters(vector<GLuint> *textures,
                                     int filt, int wrap)
 {
@@ -1139,7 +1115,6 @@ void OpenGLVideo::SetTextureFilters(vector<GLuint> *textures,
         gl_context->SetTextureFilters((*textures)[i], filt, wrap);
 }
 
-// locking ok
 OpenGLFilterType OpenGLVideo::StringToFilter(const QString &filter)
 {
     OpenGLFilterType ret = kGLFilterNone;
@@ -1156,7 +1131,6 @@ OpenGLFilterType OpenGLVideo::StringToFilter(const QString &filter)
     return ret;
 }
 
-// locking ok
 QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
 {
     switch (filt)
