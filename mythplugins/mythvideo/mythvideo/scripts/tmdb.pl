@@ -131,7 +131,7 @@ sub getMovieData {
             TMDBAPIRequest('Movie.getInfo', {'id' => $tmdbid});
 
         $xml = $xs->XMLin($response,
-            ForceArray => ['category', 'production_countries'],
+            ForceArray => ['category', 'production_countries', 'person'],
             KeyAttr => ['key', 'id']);
 
         my $movie = $xml->{moviematches}->{movie};
@@ -258,19 +258,19 @@ sub getMovieBackdrop {
     my ($rc, $response) =
         TMDBAPIRequest('Movie.imdbLookup', {'imdb_id' => "tt$movieid"});
 
-    my $xs = new XML::Simple(SuppressEmpty => '', ForceArray => [],
+    my $xs = new XML::Simple(SuppressEmpty => '', ForceArray => ['movie'],
         KeyAttr => []);
     my $xml = $xs->XMLin($response);
 
     if ($xml->{"opensearch:totalResults"} > 0) {
         # now get the movie data via Movie.getInfo, Movie.imdbLookup does not
         # provide us all the data
-        my $tmdbid = $xml->{moviematches}->{movie}->{id};
+        my $tmdbid = $xml->{moviematches}{movie}[0]{id};
 
         my ($rc, $response) =
             TMDBAPIRequest('Movie.getInfo', {'id' => $tmdbid});
 
-        $xml = XMLin($response, ForceArray=> [], KeyAttr => ['key', 'id']);
+        $xml = XMLin($response, ForceArray=> ['backdrop'], KeyAttr => ['key', 'id']);
 
         foreach my $backdrop (@{$xml->{moviematches}->{movie}->{backdrop}}) {
             # print "$backdrop->{content}\n";
