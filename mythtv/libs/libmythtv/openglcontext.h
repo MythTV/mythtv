@@ -64,7 +64,6 @@ typedef enum
 
 class OpenGLContext;
 
-#ifdef USING_OPENGL
 class OpenGLContextLocker
 {
     public:
@@ -279,108 +278,4 @@ class OpenGLContextAGL : public OpenGLContext
     CGrafPtr     m_port;
 };
 #endif //Q_WS_MACX
-
-#else // if !USING_OPENGL
-class OpenGLContextLocker
-{
-    public:
-        OpenGLContextLocker(OpenGLContext*) { }
-        ~OpenGLContextLocker() { }
-};
-
-class OpenGLContext
-{
-  public:
-    static OpenGLContext *Create(QMutex*);
-
-    OpenGLContext(QMutex*) { }
-    ~OpenGLContext() { }
-
-    bool Create(int, const QRect&, bool = false) { return false; }
-    void SetViewPort(const QSize&) { }
-    void Show(void) { }
-    void MapWindow(void) { }
-    void Hide(void) { }
-    void UnmapWindow(void) { }
-    void SetSwapInterval(int) { }
-    void SetFence(void) { }
-    void GetDisplayDimensions(QSize&) { }
-    void GetDisplaySize(QSize&) { }
-    void MoveResizeWindow(QRect) { }
-    void EmbedInWidget(int, int, int, int) { }
-    void StopEmbedding(void) { }
-
-    void GetWindowRect(QRect&) { }
-    bool MakeCurrent(bool) { return false; }
-    void SwapBuffers(void) { }
-    void Flush(bool) { }
-
-    uint GetScreenNum(void)  const { return 0; }
-
-    void UpdateTexture(uint, const unsigned char*,
-                       const int *, const int *,
-                       VideoFrameType, bool = FALSE,
-                       const unsigned char* = NULL) { }
-    uint CreateTexture(QSize, QSize, bool, uint,
-                       uint = 0, uint = 0, uint = 0,
-                       uint = 0, uint = 0) { return 0; }
-    void SetTextureFilters(uint, uint, uint) { }
-    void DeleteTexture(uint) { }
-    void GetTextureType(uint&, bool&) { }
-    void EnableTextures(uint, uint = 0) { }
-
-    bool CreateFragmentProgram(const QString&, uint&) { return false; }
-    void DeleteFragmentProgram(uint) { }
-    void EnableFragmentProgram(uint) { }
-    void InitFragmentParams(uint, float, float, float, float) { }
-
-    bool CreateFrameBuffer(uint&, uint) { return false; }
-    void DeleteFrameBuffer(uint);
-    void BindFramebuffer(uint);
-
-    uint GetFeatures(void) { return 0; }
-    void SetFeatures(uint) { }
-
-    int SetPictureAttribute(PictureAttribute, int) { return -1; }
-    PictureAttributeSupported GetSupportedPictureAttributes(void) const
-        { return kPictureAttributeSupported_None; }
-    void SetColourParams(void);
-    uint CreateHelperTexture(void) { return 0; }
-    void ActiveTexture(uint) { }
-};
-
-#ifdef USING_X11
-class OpenGLContextGLX : public OpenGLContext
-{
-  public:
-    OpenGLContextGLX(QMutex* lock) : OpenGLContext(lock) { }
-    ~OpenGLContextGLX() { }
-
-    bool Create(Display*, Window, uint,
-                const QRect&, bool = false,
-                bool = false) { return false; }
-    static bool IsGLXSupported(Display*, uint, uint) { return false; }
-};
-#endif // USING_X11
-
-#ifdef USING_MINGW
-class OpenGLContextWGL : public OpenGLContext
-{
-  public:
-    OpenGLContextWGL(QMutex*) : OpenGLContext(lock) { }
-    ~OpenGLContextWGL() { }
-};
-#endif //USING_MINGW
-
-#ifdef Q_WS_MACX
-class OpenGLContextAGL : public OpenGLContext
-{
-  public:
-    OpenGLContextAGL(QMutex*) : OpenGLContext(lock) { }
-    ~OpenGLContextAGL() { }
-};
-#endif //Q_WS_MACX
-
-#endif //!USING_OPENGL
-
 #endif // _OPENGL_CONTEXT_H_
