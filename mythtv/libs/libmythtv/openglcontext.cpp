@@ -52,7 +52,7 @@ class PrivateContext
   public:
     PrivateContext() :
         m_texture_type(0), m_fence(0),
-        m_active_tex(0), m_active_prog(0)
+        m_active_tex(0),   m_active_prog(0)
     {
     }
 
@@ -89,8 +89,8 @@ OpenGLContext *OpenGLContext::Create(QMutex *lock)
 OpenGLContext::OpenGLContext(QMutex *lock) :
     m_priv(new PrivateContext()), m_extensions(QString::null),
     m_ext_supported(0), m_ext_used(0),
-    m_max_tex_size(0), m_viewport(0,0),
-    m_lock(lock), m_lock_level(0),
+    m_max_tex_size(0),  m_viewport(0,0),
+    m_lock(lock),       m_lock_level(0),
     m_colour_control(false)
 {
 }
@@ -109,7 +109,7 @@ bool OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
     static bool debugged = false;
 
     m_colour_control = colour_control;
-    m_window_rect = display_visible;
+    m_window_rect    = display_visible;
 
     MakeCurrent(true);
 
@@ -189,7 +189,6 @@ void OpenGLContext::DeleteOpenGLResources(void)
     }
 
     Flush(false);
-
     MakeCurrent(false);
 }
 
@@ -402,14 +401,14 @@ uint OpenGLContext::CreateTexture(QSize tot_size, QSize vid_size,
 
     if (tex)
     {
-        MythGLTexture *texture = new MythGLTexture();
-        texture->m_type = type;
-        texture->m_data_type = data_type;
-        texture->m_data_fmt = data_fmt;
+        MythGLTexture *texture  = new MythGLTexture();
+        texture->m_type         = type;
+        texture->m_data_type    = data_type;
+        texture->m_data_fmt     = data_fmt;
         texture->m_internal_fmt = internal_fmt;
-        texture->m_size = tot_size;
-        texture->m_vid_size = vid_size;
-        texture->m_data_size = GetBufferSize(vid_size, data_fmt, data_type);
+        texture->m_size         = tot_size;
+        texture->m_vid_size     = vid_size;
+        texture->m_data_size    = GetBufferSize(vid_size, data_fmt, data_type);
         m_priv->m_textures[tex] = *texture;
 
         if (ClearTexture(tex) && m_priv->m_textures[tex].m_data_size)
@@ -428,7 +427,6 @@ uint OpenGLContext::CreateTexture(QSize tot_size, QSize vid_size,
     }
 
     Flush(true);
-
     MakeCurrent(false);
 
     return tex;
@@ -514,7 +512,7 @@ void OpenGLContext::SetTextureFilters(uint tex, uint filt, uint wrap)
     EnableTextures(tex);
 
     m_priv->m_textures[tex].m_filter = filt;
-    m_priv->m_textures[tex].m_wrap = wrap;
+    m_priv->m_textures[tex].m_wrap   = wrap;
 
     uint type = m_priv->m_textures[tex].m_type;
 
@@ -584,7 +582,7 @@ void OpenGLContext::GetTextureType(uint &current, bool &rect)
     uint type = get_gl_texture_rect_type(m_extensions);
     if (type)
     {
-        rect = true;
+        rect    = true;
         current = type;
         return;
     }
@@ -642,7 +640,6 @@ bool OpenGLContext::CreateFragmentProgram(const QString &program, uint &fp)
     }
 
     Flush(true);
-
     MakeCurrent(false);
 
     fp = glfp;
@@ -667,7 +664,6 @@ void OpenGLContext::DeleteFragmentProgram(uint fp)
     }
 
     Flush(true);
-
     MakeCurrent(false);
 }
 
@@ -803,7 +799,6 @@ bool OpenGLContext::CreateFrameBuffer(uint &fb, uint tex)
         gMythGLDeleteFramebuffersEXT(1, &glfb);
 
     Flush(true);
-
     glCheck();
     MakeCurrent(false);
 
@@ -830,7 +825,6 @@ void OpenGLContext::DeleteFrameBuffer(uint fb)
     }
 
     Flush(true);
-
     MakeCurrent(false);
 }
 
@@ -858,7 +852,7 @@ void OpenGLContext::Init2DState(void)
 {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glDisable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // for gl osd
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
@@ -884,8 +878,7 @@ void OpenGLContext::SetViewPort(const QSize &size)
     glViewport(0, 0, size.width(), size.height());
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, size.width() - 1,
-            0, size.height() - 1, 1, -1); // aargh...
+    glOrtho(0, size.width() - 1, 0, size.height() - 1, 1, -1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -909,7 +902,6 @@ uint OpenGLContext::CreatePBO(uint tex)
 
     GLuint tmp_pbo;
     gMythGLGenBuffersARB(1, &tmp_pbo);
-
     gMythGLBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 
     Flush(true);
@@ -922,7 +914,6 @@ uint OpenGLContext::CreateHelperTexture(void)
     MakeCurrent(true);
 
     uint width = m_max_tex_size;
-
     uint tmp_tex = CreateTexture(QSize(width, 1), QSize(width, 1),
                                  false,
                                  GL_TEXTURE_1D, GL_FLOAT,
@@ -1058,9 +1049,9 @@ bool OpenGLContext::OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
 
 OpenGLContextGLX::OpenGLContextGLX(QMutex *lock)
     : OpenGLContext(lock),
-      m_display(NULL), m_created_display(false), m_screen_num(0),
-      m_major_ver(1), m_minor_ver(1),
-      m_glx_fbconfig(0), m_gl_window(0), m_glx_window(0),
+      m_display(NULL),     m_created_display(false), m_screen_num(0),
+      m_major_ver(1),      m_minor_ver(1),
+      m_glx_fbconfig(0),   m_gl_window(0),   m_glx_window(0),
       m_glx_context(NULL), m_vis_info(NULL), m_attr_list(NULL)
 {
 }
@@ -1121,10 +1112,9 @@ bool OpenGLContextGLX::Create(WId window, const QRect &display_visible,
                   display_visible, colour_control, show_window);
 }
 
-bool OpenGLContextGLX::Create(
-    Display *XJ_disp, Window XJ_curwin, uint screen_num,
-    const QRect &display_visible, bool colour_control,
-    bool map_window)
+bool OpenGLContextGLX::Create(Display *XJ_disp, Window XJ_curwin,
+                              uint screen_num, const QRect &display_visible,
+                              bool colour_control, bool map_window)
 {
     m_display = XJ_disp;
     m_screen_num = screen_num;
@@ -1338,8 +1328,8 @@ void OpenGLContextGLX::DeleteWindowResources(void)
     X11U;
 }
 
-bool OpenGLContextGLX::IsGLXSupported(
-    Display *display, uint min_major, uint min_minor)
+bool OpenGLContextGLX::IsGLXSupported(Display *display, uint min_major,
+                                      uint min_minor)
 {
     uint major, minor;
     if (init_opengl() && get_glx_version(display, major, minor))
@@ -1392,8 +1382,7 @@ void OpenGLContextGLX::MoveResizeWindow(QRect rect)
 
 #ifdef USING_MINGW
 OpenGLContextWGL::OpenGLContextWGL(QMutex *lock)
-    : OpenGLContext(lock),
-      hDC(NULL), hRC(NULL), hWnd(NULL)
+    : OpenGLContext(lock), hDC(NULL), hRC(NULL), hWnd(NULL)
 {
 }
 
@@ -1486,11 +1475,13 @@ void OpenGLContextWGL::DeleteWindowResources(void)
     VERBOSE(VB_PLAYBACK, LOC + "Deleting WGL window resources.");
 
     wglMakeCurrent(NULL, NULL);
+
     if (hRC)
     {
         wglDeleteContext(hRC);
         hRC = NULL;
     }
+
     if (hDC)
     {
         ReleaseDC(hWnd, hDC);
@@ -1515,7 +1506,8 @@ void OpenGLContextWGL::SetSwapInterval(int interval)
 
     MakeCurrent(true);
     gMythWGLSwapIntervalEXT(interval);
-    VERBOSE(VB_PLAYBACK, LOC + QString("Swap interval set to %1.").arg(interval));
+    VERBOSE(VB_PLAYBACK, LOC +
+        QString("Swap interval set to %1.").arg(interval));
     MakeCurrent(false);
 }
 
@@ -1605,16 +1597,17 @@ bool OpenGLContextAGL::Create(WId window, const QRect &display_visible,
     }
 
     Rect rect;
-    rect.top = display_visible.top();
-    rect.left = display_visible.left();
-    rect.bottom = display_visible.bottom();
-    rect.right = display_visible.right();
+    rect.top     = display_visible.top();
+    rect.left    = display_visible.left();
+    rect.bottom  = display_visible.bottom();
+    rect.right   = display_visible.right();
     OSStatus err = CreateNewWindow(kOverlayWindowClass,
                                    kWindowNoAttributes,
                                    &rect, &m_window);
     if (!m_window)
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to create window for AGL (Error: %1)").arg(err));
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
+            QString("Failed to create window for AGL (Error: %1)").arg(err));
         return false;
     }
 
@@ -1730,10 +1723,10 @@ void OpenGLContextAGL::MoveResizeWindow(QRect rect)
         return;
 
     Rect bounds;
-    bounds.top = rect.top();
-    bounds.left = rect.left();
+    bounds.top    = rect.top();
+    bounds.left   = rect.left();
     bounds.bottom = rect.bottom();
-    bounds.right = rect.right();
+    bounds.right  = rect.right();
     SetWindowBounds(m_window, kWindowStructureRgn, &bounds);
     m_port = GetWindowPort (m_window);
     if (!m_port)
