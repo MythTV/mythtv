@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.3';
+    $VERSION        = '1.0.4';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -772,6 +772,7 @@ EOF
                 }
             }
             my @files = <$backup_conf{'directory'}/$backup_conf{'filename'}*>;
+            @files = grep(!/.*mythconverg_(backup|restore).pl$/, @files);
             my $num_files = @files;
             if ($num_files < 1)
             {
@@ -922,9 +923,12 @@ EOF
         my $exit = $? >> 8;
         verbose($verbose_level_debug,
                 "\n$mysql_client exited with status:  $exit");
-        verbose($verbose_level_error,
-                "$mysql_client output:", $result) if ($exit);
-        die("\nUnable to create initial database, stopped");
+        if ($exit)
+        {
+            verbose($verbose_level_error,
+                    "$mysql_client output:", $result);
+            die("\nUnable to create initial database, stopped");
+        }
         return $exit;
     }
 
@@ -1436,8 +1440,14 @@ EOF
             }
             if (!defined($restore_xmltvids))
             {
-                $filter = '^INSERT INTO \`(' .
-                          join('|', @partial_restore_tables) . ')\` ';
+                $filter = '^INSERT INTO \`?(' .
+                          join('|', @partial_restore_tables) . ')\`? ';
+                # If doing a whitelist restore, ensure we keep the character
+                # set info to prevent data corruption
+                if (!defined($with_plugin_data))
+                {
+                    $filter = '(40101 SET NAMES |'.$filter.')';
+                }
                 verbose($verbose_level_debug,
                         "\nRestoring partial backup with filter:", $filter);
             }
