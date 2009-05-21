@@ -35,8 +35,6 @@ class OpenGLContext;
 class OpenGLFilter;
 typedef map<OpenGLFilterType,OpenGLFilter*> glfilt_map_t;
 
-#ifdef USING_OPENGL_VIDEO
-
 #include "util-opengl.h"
 
 class OpenGLVideo
@@ -144,42 +142,4 @@ class OpenGLVideo
     uint           gl_features;
     LetterBoxColour gl_letterbox_colour;
 };
-
-#else // if !USING_OPENGL_VIDEO
-
-class OpenGLVideo
-{
-  public:
-    OpenGLVideo() { }
-    ~OpenGLVideo() { }
-
-    bool Init(OpenGLContext*, bool, QSize, QRect,
-              QRect, QRect, bool, QString, bool osd = false,
-              LetterBoxColour letterbox = kLetterBoxColour_Black)
-                { (void) osd; return false; }
-
-    void UpdateInputFrame(const VideoFrame*, bool = false) { }
-    void UpdateInput(const unsigned char*, const int*,
-                     int, QSize, unsigned char* = NULL) { }
-
-    bool AddFilter(const QString&) { return false; }
-    bool RemoveFilter(const QString&) { return false; }
-
-    bool AddDeinterlacer(const QString&) { return false; }
-    void SetDeinterlacing(bool) { }
-    QString GetDeinterlacer(void) const { return QString::null; }
-    void SetSoftwareDeinterlacer(const QString&) { }
-
-    void PrepareFrame(FrameScanType, bool, long long, bool) { }
-
-    void  SetMasterViewport(QSize) { }
-    QSize GetViewPort(void) const { return QSize(0,0); }
-    void  SetVideoRect(const QRect&, const QRect&) { }
-    QSize GetVideoSize(void) const { return QSize(0,0); }
-    void SetVideoResize(const QRect&) { }
-    void DisableVideoResize(void) { }
-};
-
-#endif // !USING_OPENGL_VIDEO
-
 #endif // _OPENGL_VIDEO_H__
