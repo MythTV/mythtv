@@ -7,6 +7,13 @@
 #define LOC QString("GLCtx: ")
 #define LOC_ERR QString("GLCtx, Error: ")
 
+/**
+ * \class OpenGLContextLocker
+ *  A convenience class used to ensure sections of OpenGL code are thread
+ *  safe without requiring an explicit 'unlock'.
+ * \see OpenGLContext
+ */
+
 OpenGLContextLocker::OpenGLContextLocker(OpenGLContext *ctx) : m_ctx(ctx)
 {
     if (m_ctx)
@@ -17,6 +24,13 @@ OpenGLContextLocker::~OpenGLContextLocker()
     if (m_ctx)
         m_ctx->MakeCurrent(false);
 }
+
+/**
+ * \class MythGLTexture
+ *  A simple OpenGL texture wrapper used to track key texture data
+ *  and properties.
+ * \see OpenGLContext
+ */
 
 class MythGLTexture
 {
@@ -47,6 +61,12 @@ class MythGLTexture
     QSize   m_vid_size;
 };
 
+/**
+ * \class PrivateContext
+ *  A simple wrapper holding OpenGL resource handles and state information.
+ * \see OpenGLContext
+ */
+
 class PrivateContext
 {
   public:
@@ -69,6 +89,32 @@ class PrivateContext
     GLuint         m_active_prog;
 };
 
+/**
+ * \class OpenGLContext
+ *  A class used to create an OpenGL window, rendering context and associated
+ *  OpenGL resources and perform limited OpenGL state management. Current 
+ *  implementations exist for GLX(X11/Linux), AGL(Max OS X) and WGL(Windows).
+ *  Although originally written to handle cross-platform video rendering, 
+ *  few member functions are video specific and hence it may be useful as a 
+ *  general purpose OpenGL context and resource handler.
+ *
+ *  It tracks all resources that it has created and to a lesser
+ *  extent their properties and/or state. It does not however track resource
+ *  ownership when the context is shared between objects - this is the
+ *  responsibility of the parent object.
+ *
+ *  N.B. Any OpenGL calls in public member functions, or calls to private
+ *  member functions that contain OpenGL calls, must be wrapped by calls
+ *  to MakeCurrent(true) and MakeCurrent(false) to ensure thread safety.
+ *  Alternatively use the convenience class OpenGLContextLocker.
+ */
+
+/**
+ * \fn OpenGLContext::Create(QMutex *lock)
+ *  Return a pointer to a platform specific instance of OpenGLContext.
+ * \param lock The QMutex that will be used to enforce thread safety.
+ */
+
 OpenGLContext *OpenGLContext::Create(QMutex *lock)
 {
     OpenGLContext *ctx = NULL;
@@ -85,6 +131,13 @@ OpenGLContext *OpenGLContext::Create(QMutex *lock)
 #endif
     return ctx;
 }
+
+/**
+ * \fn OpenGLContext::OpenGLContext(QMutex *lock)
+ *  Create an OpenGLContext which must be subsequently initialised with a
+ *  call to Create()
+ * \param lock The QMutex that will be used to enforce thread safety.
+ */
 
 OpenGLContext::OpenGLContext(QMutex *lock) :
     m_priv(new PrivateContext()), m_extensions(QString::null),
@@ -103,6 +156,14 @@ OpenGLContext::~OpenGLContext()
         m_priv = NULL;
     }
 }
+
+/**
+ * \fn OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
+ *  Platform independant initialisation of OpenGLContext.
+ * \param colour_control if true, manipulation of video attributes
+ *   (colour, contrast etc) will be enabled
+ * \param display_visible the bounding rectangle of the OpenGL window.
+ */
 
 bool OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
 {
@@ -192,6 +253,15 @@ void OpenGLContext::DeleteOpenGLResources(void)
     MakeCurrent(false);
 }
 
+/**
+ * \fn OpenGLContext::MakeCurrent(bool current)
+ *  Ensure the OpenGLContext is current to the current thread and thread
+ *  safety is ensured by locking the QMutex. Recursive calls are allowed
+ *  and the level of nesting is tracked to minimise unnecessary calls 
+ *  to MakeContextCurrent() as well as to ensure the context is not released
+ *  too early, which may cause unexpected behaviour.
+ */
+
 bool OpenGLContext::MakeCurrent(bool current)
 {
     bool ok = true;
@@ -225,6 +295,13 @@ bool OpenGLContext::MakeCurrent(bool current)
     return ok;
 }
 
+/**
+ * \fn OpenGLContext::Flush(bool use_fence)
+ *  Flush the OpenGL pipeline.
+ * \param use_fence if true and a fence has already been created, the fence
+ *  will be used to guarantee the pipeline is empty before continuing.
+ */
+
 void OpenGLContext::Flush(bool use_fence)
 {
     MakeCurrent(true);
@@ -249,6 +326,14 @@ void OpenGLContext::Flush(bool use_fence)
     MakeCurrent(false);
 }
 
+/**
+ * \fn OpenGLContext::ActiveTexture(uint active_tex)
+ *  Make the given texture resource active for OpenGL multi-texturing.
+ *  Store the currently active texture to minimise unnecessary OpenGL
+ *  state changes.
+ * \param active_tex the texture unit to make active
+ */
+
 void OpenGLContext::ActiveTexture(uint active_tex)
 {
     MakeCurrent(true);
@@ -261,6 +346,12 @@ void OpenGLContext::ActiveTexture(uint active_tex)
 
     MakeCurrent(false);
 }
+
+/**
+ * \fn OpenGLContext::EnableTextures(uint tex, uint tex_type)
+ *  Enable the given OpenGL texture type and store the currently enabled
+ *  texture type to avoid unnecessary OpenGL state changes.
+ */
 
 void OpenGLContext::EnableTextures(uint tex, uint tex_type)
 {
@@ -281,6 +372,11 @@ void OpenGLContext::EnableTextures(uint tex, uint tex_type)
     MakeCurrent(false);
 }
 
+/**
+ * \fn OpenGLContext::DisableTexture(void)
+ *  Disable OpenGL texturing.
+ */
+
 void OpenGLContext::DisableTextures(void)
 {
     MakeCurrent(true);
@@ -290,6 +386,25 @@ void OpenGLContext::DisableTextures(void)
 
     MakeCurrent(false);
 }
+
+/**
+ * \fn OpenGLContext::UpdateTexture(uint tex,
+                                    const unsigned char *buf,
+                                    const int *offsets,
+                                    const int *pitches,
+                                    VideoFrameType fmt,
+                                    bool interlaced,
+                                    const unsigned char* alpha)
+ *  Refresh the data for the given texture unit. If a PixelBufferObject
+ *  is available, this will be used to speed up the memory transfer.
+ *  Otherwise a standard texture update is used. BGRA video data is transferred
+ *  without alteration but YV12 video frames are pre-packed in software into a
+ *  YUVA format. This speeds up the data transfer (as only one texture is used)
+ *  and facilitates more coherent texture sampling in the OpenGL fragment
+ *  programs used for colourspace conversion and deinterlacing.
+ *  If an alpha plane is provided, this is integrated into the video frame
+ *  (YV12 data only)
+ */
 
 void OpenGLContext::UpdateTexture(uint tex,
                                   const unsigned char *buf,
@@ -381,6 +496,24 @@ void OpenGLContext::UpdateTexture(uint tex,
     MakeCurrent(false);
 }
 
+/**
+ * \fn OpenGLContext::CreateTexture(QSize tot_size, QSize vid_size,
+                                    bool use_pbo,
+                                    uint type, uint data_type,
+                                    uint data_fmt, uint internal_fmt,
+                                    uint filter, uint wrap)
+ *  Create an OpenGL texture unit using the given parameters.
+ * \param tot_size     total texture dimensions
+ * \param vid_size     portion of the texture actually used (in the case of
+ *  traditional, 'power of 2' dimensioned textures)
+ * \param type         texture rectangles (non 'power of 2') or 'power of 2'
+ * \param data_type    e.g. GL_UNSIGNED_BYTE
+ * \param data_fmt     e.g. GL_BGRA
+ * \param internal_fmt e.g. GL_RGBA8
+ * \param filter       filter type to apply when texture scaling
+ * \param wrap         e.g. GL_CLAMP_TO_EDGE
+ */
+
 uint OpenGLContext::CreateTexture(QSize tot_size, QSize vid_size,
                                   bool use_pbo,
                                   uint type, uint data_type,
@@ -432,6 +565,12 @@ uint OpenGLContext::CreateTexture(QSize tot_size, QSize vid_size,
     return tex;
 }
 
+/**
+ * \fn OpenGLContext::GetBufferSize(QSize size, uint fmt, uint type)
+ *  Return the number of bytes required to store texture data of a given
+ *  size, type and format.
+ */
+
 uint OpenGLContext::GetBufferSize(QSize size, uint fmt, uint type)
 {
     uint bytes;
@@ -464,6 +603,11 @@ uint OpenGLContext::GetBufferSize(QSize size, uint fmt, uint type)
 
     return size.width() * size.height() * bpp * bytes;
 }
+
+/**
+ * \fn OpenGLContext::ClearTexture(uint tex)
+ *  Clear an OpenGL texture unit to black.
+ */
 
 bool OpenGLContext::ClearTexture(uint tex)
 {
@@ -501,6 +645,11 @@ bool OpenGLContext::ClearTexture(uint tex)
 
     return (check == size.width());
 }
+
+/**
+ * \fn OpenGLContext::SetTextureFilters(uint tex, uint filt, uint wrap)
+ *  Set the filter and wrap properties for the given OpenGL texture unit.
+ */
 
 void OpenGLContext::SetTextureFilters(uint tex, uint filt, uint wrap)
 {
@@ -577,6 +726,13 @@ void OpenGLContext::DeleteTextures(void)
     Flush(true);
 }
 
+/**
+ * \fn OpenGLContext::GetTextureType(uint &current, bool &rect)
+ *  Determine the preferred OpenGL texture type (typically 
+ *  GL_ARB_texture_rectangle or one of its proprietary equivalents)
+ *  or default to GL_TEXTURE_2D.
+ */
+
 void OpenGLContext::GetTextureType(uint &current, bool &rect)
 {
     uint type = get_gl_texture_rect_type(m_extensions);
@@ -590,6 +746,14 @@ void OpenGLContext::GetTextureType(uint &current, bool &rect)
     rect = false;
     return;
 }
+
+/**
+ * \fn OpenGLContext::CreateFragmentProgram(const QString &program, uint &fp)
+ *  Create and compile an OpenGL fragment program and report any errors that
+ *  may have occurred.
+ * \param program the fragment program to be created
+ * \param fp      the handle to the newly created program
+ */
 
 bool OpenGLContext::CreateFragmentProgram(const QString &program, uint &fp)
 {
@@ -667,6 +831,13 @@ void OpenGLContext::DeleteFragmentProgram(uint fp)
     MakeCurrent(false);
 }
 
+/**
+ * \fn OpenGLContext::EnableFragmentProgram(uint fp)
+ *  Bind the given OpenGL fragment program and enable fragment programs
+ *  if not already done so. Store the current state to avoid unnecessary
+ *  OpenGL state changes.
+ */
+
 void OpenGLContext::EnableFragmentProgram(uint fp)
 {
     if ((!fp && !m_priv->m_active_prog) ||
@@ -714,6 +885,12 @@ void OpenGLContext::DeletePrograms(void)
 
     Flush(true);
 }
+/**
+ * \fn OpenGLContext::CreateFrameBuffer(uint &fb, uint tex)
+ *  Create an OpenGL FrameBufferObject using the parameters associated
+ *  with the given texture unit. Attach the texture unit to the
+ *  new FrameBufferObject and test for completeness.
+ */
 
 bool OpenGLContext::CreateFrameBuffer(uint &fb, uint tex)
 {
@@ -848,6 +1025,13 @@ void OpenGLContext::BindFramebuffer(uint fb)
     MakeCurrent(false);
 }
 
+/**
+ * \fn OpenGLContext::Init2DState(void)
+ *  Initialise the OpenGLContext to maximise performance for simple 2D
+ *  rendering. Disable unused features and ensure certain settings
+ *  are initiased to suitable values.
+ */
+
 void OpenGLContext::Init2DState(void)
 {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -864,6 +1048,11 @@ void OpenGLContext::Init2DState(void)
     glClear(GL_COLOR_BUFFER_BIT);
     Flush(true);
 }
+
+/**
+ * \fn OpenGLContext::SetViewPort(const QSize &size)
+ *  Update the viewport ONLY if it differs from the current settings.
+ */
 
 void OpenGLContext::SetViewPort(const QSize &size)
 {
@@ -884,6 +1073,13 @@ void OpenGLContext::SetViewPort(const QSize &size)
 
     MakeCurrent(false);
 }
+
+/**
+ * \fn OpenGLContext::CreatePBO(uint tex)
+ *  Create an OpenGL PixelBufferObject using the parameters associated
+ *  with the given OpenGL texure unit. The PBO is then used to speed up
+ *  memory transfer operations when updating the texture contents.
+ */
 
 uint OpenGLContext::CreatePBO(uint tex)
 {
@@ -908,6 +1104,12 @@ uint OpenGLContext::CreatePBO(uint tex)
 
     return tmp_pbo;
 }
+
+/**
+ * \fn OpenGLContext::CreateHelperTexture(void)
+ *  Create an extra OpenGL texture unit to use as a reference in Bicubic
+ *  filtering operations.
+ */
 
 uint OpenGLContext::CreateHelperTexture(void)
 {
@@ -1011,6 +1213,11 @@ void OpenGLContext::SetColourParams(void)
 
     MakeCurrent(false);    
 }
+
+/**
+ * \fn OpenGLContext::SetFence(void)
+ *  Create an OpenGL implementation specific fence object.
+ */
 
 void OpenGLContext::SetFence(void)
 {
