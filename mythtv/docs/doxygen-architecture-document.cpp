@@ -183,7 +183,7 @@ The database schema is documented here \ref db_schema.
       <dd>This is used both internally and externally to fetch program listings.
           <a href="http://tms.tribune.com/">Tribune Media</a> provides
           listings in exchange for demographic information in the USA,
-          and Australia uses a
+          and Australia has a
           <a href="http://minnie.tuhs.org/twiki/bin/view/TVGuide">
           community-driven TV guide</a> originally developed for OzTiVo.
           Other markets are served by the
@@ -213,16 +213,16 @@ The database schema is documented here \ref db_schema.
   <dt>mytharchive <dd>Creates themed Video DVDs from recordings
                       (and other video files).
   <dt>mythbrowser <dd>Provides a simple web browser.
-  <dt>mythflix    <dd>
+  <dt>mythflix    <dd>An interface to the NetFlix DVD/BluRay rental service.
   <dt>mythgallery <dd>A simple picture viewer for your %TV.
   <dt>mythgame    <dd>Launches the xmame classic game system emulator.
-  <dt>mythmovies  <dd>
+  <dt>mythmovies  <dd>Looks up movie times at local cinemas.
   <dt>mythmusic   <dd>A simple music player for your %TV.
   <dt>mythnews    <dd>Browses RSS news feeds.
   <dt>mythvideo   <dd>Launch DVD players, and a Video Browser for other files
                       (non-%MythTV recordings).
   <dt>mythweather <dd>Presents your local weather report.
-  <dt>mythzoneminder<dd>
+  <dt>mythzoneminder<dd>Video surveilance system interface.
 </dl>
 
 \section be_plugins Backend Plugins
@@ -231,7 +231,7 @@ The database schema is documented here \ref db_schema.
 </dl>
 
 \section spt_scripts Support Scripts
-These tools are in the contrib directory of the source tree:
+These tools are in the packaging repository:
 <dl>
   <dt>osx-packager.pl   <dd>Downloads and builds all dependencies, then the
                             source, of %MythTV and all the official plugins,
@@ -670,7 +670,7 @@ The XML files that define the menus in MythTV also
 have translations of the menu button labels. See:
 \verbatim
 mythtv/programs/*/*.xml
-mythtv/themes/DVR,
+mythtv/themes/DVR
 mythtv/themes/classic
 mythplugins/*/theme/menus/*.xml
 \endverbatim
@@ -956,22 +956,14 @@ an annotated versions of the code, and saving results.
 
 */
 
-// The file ac3.h in ffmpeg contains no Doxygen markup,
-// but for some reason generates the following modules:
-// * Coded elements
-// * Derived values
-//
-// They add nothing useful to this programmer doco, so I camouflage these
-// by manually defining the block here. Same thing for the few modules
-// in ffmpeg that are documented; Macroblock and VC9 bitplanes from vc1.c,
-// Monkey Audio from apedec.c, multithreaded slicing from h264.h,
+
+/** \defgroup db_schema    MythTV Database Schema
+This line is filler that is ignored by Doxygen.
+*/
 
 /**
- @defgroup coded   .
- @defgroup derived .
- @defgroup block   .
- @defgroup std_mb  .
- @defgroup rangecoder .
- @defgroup multithreading .
- @defgroup bitplane .
+ @defgroup filler1 .
+ @defgroup filler2 .
+ @defgroup filler3 Non-MythTV modules ...
+ @defgroup filler4 .
  */
