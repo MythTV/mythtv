@@ -69,7 +69,7 @@ deque<int> GetPreferredSkipTypeCombinations(void)
 }
 
 static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
-                              uint frequency,
+                              uint64_t frequency,
                               // DVB specific
                               int  transport_id,  int     network_id)
 {
@@ -94,7 +94,7 @@ static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
     query.bindValue(":SISTANDARD",        sistandard);
 
     if (sistandard.toLower() != "dvb")
-        query.bindValue(":FREQUENCY",     frequency);
+        query.bindValue(":FREQUENCY", (unsigned long long) frequency);
     else
     {
         query.bindValue(":TRANSPORTID",   transport_id);
@@ -115,7 +115,7 @@ static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
 
 static uint insert_dtv_multiplex(
     int         db_source_id,  QString     sistandard,
-    uint        frequency,     QString     modulation,
+    uint64_t    frequency,     QString     modulation,
     // DVB specific
     int         transport_id,  int         network_id,
     int         symbol_rate,   signed char bandwidth,
@@ -127,15 +127,20 @@ static uint insert_dtv_multiplex(
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_SIPARSER, QString("insert_dtv_multiplex(%1, %2, %3, %4...)")
-            .arg(db_source_id).arg(sistandard)
-            .arg(frequency).arg(modulation));
+    transport_id = 0;
 
     // If transport is already present, skip insert
-    int mplex = get_dtv_multiplex(
+    uint mplex = get_dtv_multiplex(
         db_source_id,  sistandard,    frequency,
         // DVB specific
         transport_id,  network_id);
+
+    VERBOSE(VB_CHANSCAN, QString(
+                "insert_dtv_multiplex(%1, '%2', %3, %4, %5, %6...) mplexid:%7")
+            .arg(db_source_id).arg(sistandard)
+            .arg(frequency).arg(modulation)
+            .arg(transport_id).arg(network_id)
+            .arg(mplex));
 
     bool isDVB = (sistandard.toLower() == "dvb");
 
@@ -176,7 +181,7 @@ static uint insert_dtv_multiplex(
 
     updateStr += (isDVB) ?
         " transportid = :TRANSPORTID AND networkid   = :NETWORKID " :
-        " frequency = :FREQUENCY ";
+        " frequency = :FREQUENCY2 ";
 
     QString insertStr =
         "INSERT INTO dtv_multiplex "
@@ -219,13 +224,13 @@ static uint insert_dtv_multiplex(
 
     query.prepare((mplex) ? updateStr : insertStr);
 
-    VERBOSE(VB_SIPARSER, "insert_dtv_multiplex -- "
+    VERBOSE(VB_CHANSCAN, "insert_dtv_multiplex -- "
             <<((mplex) ? "update" : "insert") << " " << mplex
             <<endl<<((mplex) ? updateStr : insertStr)<<endl);
 
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
-    query.bindValue(":FREQUENCY",         frequency);
+    query.bindValue(":FREQUENCY",         QString::number(frequency));
 
     if (!modulation.isNull())
         query.bindValue(":MODULATION",    modulation);
@@ -271,7 +276,7 @@ static uint insert_dtv_multiplex(
         // DVB specific
         transport_id,  network_id);
 
-    VERBOSE(VB_SIPARSER, QString("insert_dtv_multiplex -- ") +
+    VERBOSE(VB_CHANSCAN, QString("insert_dtv_multiplex -- ") +
             QString("inserted %1").arg(mplex));
 
     return mplex;
@@ -301,7 +306,7 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
 
         mux = ChannelUtil::CreateMultiplex(
             (int)sourceid,        "dvb",
-            (uint)freq,           QString(),
+            freq,                  QString(),
             // DVB specific
             (int)tsid,            (int)netid,
             -1,                   cd.BandwidthString()[0].toAscii(),
@@ -366,9 +371,9 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
     }
 }
 
-uint ChannelUtil::CreateMultiplex(int  sourceid,     QString sistandard,
-                                  uint frequency,    QString modulation,
-                                  int  transport_id, int     network_id)
+uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
+                                  uint64_t frequency, QString modulation,
+                                  int  transport_id,  int     network_id)
 {
     return CreateMultiplex(
         sourceid,           sistandard,
@@ -384,7 +389,7 @@ uint ChannelUtil::CreateMultiplex(int  sourceid,     QString sistandard,
 
 uint ChannelUtil::CreateMultiplex(
     int         sourceid,     QString     sistandard,
-    uint        freq,         QString     modulation,
+    uint64_t    freq,         QString     modulation,
     // DVB specific
     int         transport_id, int         network_id,
     int         symbol_rate,  signed char bandwidth,
@@ -473,7 +478,7 @@ uint ChannelUtil::GetMplexID(uint sourceid, const QString &channum)
     return 0;
 }
 
-int ChannelUtil::GetMplexID(uint sourceid, uint frequency)
+int ChannelUtil::GetMplexID(uint sourceid, uint64_t frequency)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     /* See if mplexid is already in the database */
@@ -484,7 +489,7 @@ int ChannelUtil::GetMplexID(uint sourceid, uint frequency)
         "      frequency = :FREQUENCY");
 
     query.bindValue(":SOURCEID",  sourceid);
-    query.bindValue(":FREQUENCY", frequency);
+    query.bindValue(":FREQUENCY", QString::number(frequency));
 
     if (!query.exec() || !query.isActive())
     {
@@ -498,8 +503,8 @@ int ChannelUtil::GetMplexID(uint sourceid, uint frequency)
     return -1;
 }
 
-int ChannelUtil::GetMplexID(uint sourceid,     uint frequency,
-                            uint transport_id, uint network_id)
+int ChannelUtil::GetMplexID(uint sourceid,     uint64_t frequency,
+                            uint transport_id, uint     network_id)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     // See if transport already in database
@@ -514,7 +519,7 @@ int ChannelUtil::GetMplexID(uint sourceid,     uint frequency,
     query.bindValue(":SOURCEID",    sourceid);
     query.bindValue(":NETWORKID",   network_id);
     query.bindValue(":TRANSPORTID", transport_id);
-    query.bindValue(":FREQUENCY",   frequency);
+    query.bindValue(":FREQUENCY",   QString::number(frequency));
 
     if (!query.exec() || !query.isActive())
     {
@@ -603,7 +608,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
                                   int transport_id,
                                   int network_id)
 {
-    VERBOSE(VB_SIPARSER,
+    VERBOSE(VB_CHANSCAN,
             QString("GetBetterMplexID(mplexId %1, tId %2, netId %3)")
             .arg(current_mplexid).arg(transport_id).arg(network_id));
 
@@ -626,7 +631,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     // Got a match, return it.
     if ((q_networkid == network_id) && (q_transportid == transport_id))
     {
-        VERBOSE(VB_SIPARSER,
+        VERBOSE(VB_CHANSCAN,
                 QString("GetBetterMplexID(): Returning perfect match %1")
                 .arg(current_mplexid));
         return current_mplexid;
@@ -644,7 +649,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         if (!query.exec() || !query.isActive())
             MythDB::DBError("Getting mplexid global search", query);
 
-        VERBOSE(VB_SIPARSER, QString(
+        VERBOSE(VB_CHANSCAN, QString(
                     "GetBetterMplexID(): net id and transport id "
                     "are null, qsize(%1), Returning %2")
                 .arg(qsize).arg(current_mplexid));
@@ -678,7 +683,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
 
         if (query.size() == 1)
         {
-            VERBOSE(VB_SIPARSER, QString(
+            VERBOSE(VB_CHANSCAN, QString(
                         "GetBetterMplexID(): query#%1 qsize(%2) "
                         "Returning %3")
                     .arg(i).arg(query.size()).arg(current_mplexid));
@@ -690,7 +695,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         {
             query.next();
             int ret = (i==0) ? current_mplexid : query.value(0).toInt();
-            VERBOSE(VB_SIPARSER, QString(
+            VERBOSE(VB_CHANSCAN, QString(
                         "GetBetterMplexID(): query#%1 qsize(%2) "
                         "Returning %3")
                     .arg(i).arg(query.size()).arg(ret));
@@ -699,7 +704,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     }
 
     // If you still didn't find this combo return -1 (failure)
-    VERBOSE(VB_SIPARSER, QString("GetBetterMplexID(): Returning -1"));
+    VERBOSE(VB_CHANSCAN, "GetBetterMplexID(): Returning -1");
     return -1;
 }
 

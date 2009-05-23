@@ -54,12 +54,12 @@ class MPUBLIC ChannelUtil
 
     static uint    CreateMultiplex(
         int  sourceid,          QString sistandard,
-        uint freq,              QString modulation,
+        uint64_t frequency,     QString modulation,
         int  transport_id = -1, int     network_id = -1);
 
     static uint    CreateMultiplex(
         int         sourceid,     QString     sistandard,
-        uint        freq,         QString     modulation,
+        uint64_t    frequency,    QString     modulation,
         // DVB specific
         int         transport_id, int         network_id,
         int         symbol_rate,  signed char bandwidth,
@@ -76,8 +76,8 @@ class MPUBLIC ChannelUtil
         int sourceid, const NetworkInformationTable *nit);
 
     static uint    GetMplexID(uint sourceid, const QString &channum);
-    static int     GetMplexID(uint sourceid,     uint frequency);
-    static int     GetMplexID(uint sourceid,     uint frequency,
+    static int     GetMplexID(uint sourceid,     uint64_t frequency);
+    static int     GetMplexID(uint sourceid,     uint64_t frequency,
                               uint transport_id, uint network_id);
     static int     GetMplexID(uint sourceid,
                               uint transport_id, uint network_id);
