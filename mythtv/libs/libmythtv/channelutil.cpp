@@ -68,10 +68,13 @@ deque<int> GetPreferredSkipTypeCombinations(void)
     return tmp;
 }
 
-static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
+static uint get_dtv_multiplex(uint     db_source_id,  QString sistandard,
                               uint64_t frequency,
                               // DVB specific
-                              int  transport_id,  int     network_id)
+                              uint     transport_id,
+                              // tsid exists with other sistandards,
+                              // but we only trust it in dvb-land.
+                              uint     network_id)
 {
     QString qstr =
         "SELECT mplexid "
@@ -94,7 +97,7 @@ static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
     query.bindValue(":SISTANDARD",        sistandard);
 
     if (sistandard.toLower() != "dvb")
-        query.bindValue(":FREQUENCY", (unsigned long long) frequency);
+        query.bindValue(":FREQUENCY", QString::number(frequency));
     else
     {
         query.bindValue(":TRANSPORTID",   transport_id);
@@ -126,8 +129,6 @@ static uint insert_dtv_multiplex(
     QString     lp_code_rate,  QString      guard_interval)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-
-    transport_id = 0;
 
     // If transport is already present, skip insert
     uint mplex = get_dtv_multiplex(
@@ -176,11 +177,11 @@ static uint insert_dtv_multiplex(
     updateStr = updateStr.left(updateStr.length()-2) + " ";
 
     updateStr +=
-        "WHERE sourceid    = :SOURCEID     AND "
-        "      sistandard  = :SISTANDARD   AND ";
+        "WHERE sourceid    = :SOURCEID2     AND "
+        "      sistandard  = :SISTANDARD2   AND ";
 
     updateStr += (isDVB) ?
-        " transportid = :TRANSPORTID AND networkid   = :NETWORKID " :
+        " transportid = :TRANSPORTID2 AND networkid = :NETWORKID2 " :
         " frequency = :FREQUENCY2 ";
 
     QString insertStr =
@@ -188,7 +189,7 @@ static uint insert_dtv_multiplex(
         "  (sourceid,        sistandard,        frequency,  ";
 
     insertStr += (!modulation.isNull())     ? "modulation, "        : "";
-    insertStr += (isDVB)                    ? "transportid, "       : "";
+    insertStr += (transport_id || isDVB)    ? "transportid, "       : "";
     insertStr += (isDVB)                    ? "networkid, "         : "";
     insertStr += (symbol_rate >= 0)         ? "symbolrate, "        : "";
     insertStr += (bandwidth   >= 0)         ? "bandwidth, "         : "";
@@ -207,7 +208,7 @@ static uint insert_dtv_multiplex(
         "VALUES "
         "  (:SOURCEID,       :SISTANDARD,       :FREQUENCY, ";
     insertStr += (!modulation.isNull())     ? ":MODULATION, "       : "";
-    insertStr += (isDVB)                    ? ":TRANSPORTID, "      : "";
+    insertStr += (transport_id || isDVB)    ? ":TRANSPORTID, "      : "";
     insertStr += (isDVB)                    ? ":NETWORKID, "        : "";
     insertStr += (symbol_rate >= 0)         ? ":SYMBOLRATE, "       : "";
     insertStr += (bandwidth   >= 0)         ? ":BANDWIDTH, "        : "";
@@ -229,16 +230,21 @@ static uint insert_dtv_multiplex(
             <<endl<<((mplex) ? updateStr : insertStr)<<endl);
 
     query.bindValue(":SOURCEID",          db_source_id);
+    query.bindValue(":SOURCEID2",         db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
+    query.bindValue(":SISTANDARD2",       sistandard);
     query.bindValue(":FREQUENCY",         QString::number(frequency));
     query.bindValue(":FREQUENCY2",        QString::number(frequency));
 
     if (!modulation.isNull())
         query.bindValue(":MODULATION",    modulation);
-    if (isDVB)
-        query.bindValue(":TRANSPORTID",   transport_id);
-    if (isDVB)
-        query.bindValue(":NETWORKID",     network_id);
+
+    query.bindValue(":TRANSPORTID",   transport_id);
+    query.bindValue(":TRANSPORTID2",  transport_id);
+
+    query.bindValue(":NETWORKID",     network_id);
+    query.bindValue(":NETWORKID2",    network_id);
+
     if (symbol_rate >= 0)
         query.bindValue(":SYMBOLRATE",    symbol_rate);
     if (bandwidth >= 0)
