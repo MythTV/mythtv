@@ -318,7 +318,7 @@ MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
 
     m_isConnected = m_db && m_db->isOpen();
 
-    m_testbindings = QRegExp("\\s(:\\w+)\\s.*\\s\\1\\b");
+    m_testbindings = QRegExp("(:\\w+)\\W.*\\1\\b");
 }
 
 MSqlQuery::~MSqlQuery()
@@ -444,9 +444,9 @@ bool MSqlQuery::prepare(const QString& query)
     if (query.contains(m_testbindings))
     {
         VERBOSE(VB_IMPORTANT,
-                QString("Query contains bind value \"%1\" twice:\n")
+                QString("\n\nQuery contains bind value \"%1\" twice:\n\n\n")
                 .arg(m_testbindings.cap(1)) + query);
-        exit(1);
+        //exit(1);
     }
     return QSqlQuery::prepare(query);
 }

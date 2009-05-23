@@ -114,10 +114,10 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     bool isConnected(void) { return m_isConnected; }
 
     /// \brief Wrap QSqlQuery::exec() so we can display SQL
-    bool exec(void);
+    bool exec(void) __attribute__ ((warn_unused_result));
 
     /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
-    bool exec(const QString &query);
+    bool exec(const QString &query) __attribute__ ((warn_unused_result));
 
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
