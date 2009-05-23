@@ -231,6 +231,7 @@ static uint insert_dtv_multiplex(
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
     query.bindValue(":FREQUENCY",         QString::number(frequency));
+    query.bindValue(":FREQUENCY2",        QString::number(frequency));
 
     if (!modulation.isNull())
         query.bindValue(":MODULATION",    modulation);
