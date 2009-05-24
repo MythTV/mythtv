@@ -564,10 +564,10 @@
                         <area>240,1,190,24</area>
                     </textarea>
                     <textarea name="titlesubtitle" from="shortstarttimedate">
-                        <area>440,1,650,24</area>
+                        <area>440,1,690,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1160,1,30,24</area>
+                        <area>1145,1,35,24</area>
                     </textarea>
                 </state>
                 <state name="selected" from="active" />
