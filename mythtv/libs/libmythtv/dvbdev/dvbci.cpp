@@ -1935,6 +1935,13 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
     state = 2;
 
     msg.msg[3] = CaPmt.length;
+
+    if (CaPmt.length > 256)
+    {
+	fprintf(stderr, "CA message too long\n");
+	return false;
+    }
+
     memcpy(&msg.msg[4], CaPmt.capmt, CaPmt.length);
 
     if ((SendData(AOT_CA_PMT, &msg)) < 0) {
