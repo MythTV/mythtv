@@ -84,7 +84,7 @@ class DeviceReadBuffer
     bool             run;
     bool             running;
     bool             eof;
-    bool             error;
+    mutable bool     error;
     bool             request_pause;
     bool             paused;
     bool             using_poll;
