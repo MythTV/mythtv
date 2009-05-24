@@ -1689,7 +1689,7 @@ bool cLlCiHandler::Process(void)
                                 if (Session->ResourceId() == RI_APPLICATION_INFORMATION)
                                 {
 #if 0
-                                    fprintf(stderr, "Test: %x\n",
+                                    esyslog("Test: %x",
                                             ((cCiApplicationInformation*)Session)->GetApplicationManufacturer());
 #endif
                                 }
@@ -1825,7 +1825,7 @@ cHlCiHandler::cHlCiHandler(int Fd, int NumSlots)
     caSystemIds[0] = 0;
     fdCa = Fd;
     state = 0;
-    fprintf(stderr, "New High level CI handler\n");
+    esyslog("New High level CI handler");
 }
 
 cHlCiHandler::~cHlCiHandler()
@@ -1840,7 +1840,7 @@ int cHlCiHandler::CommHL(unsigned tag, unsigned function, struct ca_msg *msg)
 	msg->msg[2] = tag & 0xff;
 	msg->msg[1] = (tag & 0xff00) >> 8;
 	msg->msg[0] = (tag & 0xff0000) >> 16;
- 	fprintf(stderr, "Sending message=[%02x %02x %02x ]\n",
+ 	esyslog("Sending message=[%02x %02x %02x ]",
  		       msg->msg[0], msg->msg[1], msg->msg[2]);
     }
     
@@ -1867,12 +1867,12 @@ bool cHlCiHandler::Process(void)
 	// Get CA_system_ids
 	/*	Enquire		*/
 	if ((SendData(AOT_CA_INFO_ENQ, &msg)) < 0) {
-	    fprintf(stderr, "HLCI communication failed\n");
+	    esyslog("HLCI communication failed");
 	} else {
 	    dbgprotocol("==> Ca Info Enquiry");
 	    /*	Receive		*/
 	    if ((GetData(AOT_CA_INFO, &msg)) < 0) {
-		fprintf(stderr, "HLCI communication failed\n");
+		esyslog("HLCI communication failed");
 	    } else {
 		printf("Debug: ");
 		for(int i = 0; i < 20; i++) {
@@ -1931,21 +1931,21 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
     cMutexLock MutexLock(&mutex);
     struct ca_msg msg;
 
-    fprintf(stderr, "Setting CA PMT.\n");
+    esyslog("Setting CA PMT.");
     state = 2;
 
     msg.msg[3] = CaPmt.length;
 
     if (CaPmt.length > 256)
     {
-	fprintf(stderr, "CA message too long\n");
+	esyslog("CA message too long");
 	return false;
     }
 
     memcpy(&msg.msg[4], CaPmt.capmt, CaPmt.length);
 
     if ((SendData(AOT_CA_PMT, &msg)) < 0) {
-	fprintf(stderr, "HLCI communication failed\n");
+	esyslog("HLCI communication failed");
 	return false;
     }
     
@@ -1955,7 +1955,7 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
 bool cHlCiHandler::Reset(int)
 {
     if ((ioctl(fdCa, CA_RESET)) < 0) {
-	fprintf(stderr, "ioctl CA_RESET failed.\n");
+	esyslog("ioctl CA_RESET failed.");
 	return false;
     }
     return true;
