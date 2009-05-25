@@ -130,11 +130,13 @@ bool ProgLister::Create()
         return false;
     }
 
-     connect(m_progList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+    connect(m_progList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateInfo(MythUIButtonListItem*)));
 
-     connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-             SLOT(select()));
+    connect(m_progList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(select()));
+
+    m_progList->SetLCDTitles(tr("Program List"), "title|channel|shortstarttimedate");
 
     BuildFocusList();
 
