@@ -354,6 +354,8 @@ bool ProgramRecPriority::Create()
     connect(m_programList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(edit(MythUIButtonListItem*)));
 
+    m_programList->SetLCDTitles(tr("Schedule Priorities"), "rec_type|titlesubtitle|progpriority|finalpriority");
+
     FillList();
 
     BuildFocusList();
