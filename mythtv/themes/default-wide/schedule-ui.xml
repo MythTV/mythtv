@@ -1352,7 +1352,7 @@
         </buttonlist>
 
         <buttonlist name="shows" from="alphabet">
-            <area>185,400,580,295</area>
+            <area>175,400,590,295</area>
             <statetype name="buttonitem">
                 <area>0,0,580,25</area>
                 <state name="active">
