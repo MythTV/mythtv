@@ -88,6 +88,8 @@ bool ViewScheduled::Create()
     connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(selected(MythUIButtonListItem*)));
 
+    m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"), "shortstarttimedate|channel|titlesubtitle|card");
+
     LoadList();
 
     if (m_groupList)
@@ -96,6 +98,7 @@ bool ViewScheduled::Create()
                 SLOT(ChangeGroup(MythUIButtonListItem*)));
         connect(m_groupList, SIGNAL(itemClicked(MythUIButtonListItem*)),
                 SLOT(SwitchList()));
+        m_groupList->SetLCDTitles(tr("Group List"), "");
     }
 
     if (m_player)
