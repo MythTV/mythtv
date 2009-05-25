@@ -227,14 +227,12 @@ bool VideoOutputQuartzView::Begin(void)
     VERBOSE(VB_PLAYBACK, QString("%0Viewport currently %1,%2 -> %3,%4")
                          .arg(name).arg(portBounds.left).arg(portBounds.top)
                          .arg(portBounds.right).arg(portBounds.bottom));
-    m_desired.setWidth(portBounds.right);
-    m_desired.setHeight(portBounds.bottom);
-#if 0
-    // The clipping mask
-    theMask = NewRgn();
-    SetRectRgn(theMask, m_desired.left(),  m_desired.top(),
-                        m_desired.width(), m_desired.height());
-#endif
+
+    if (!parentData->embeddedView)
+    {
+        m_desired.setWidth(portBounds.right);
+        m_desired.setHeight(portBounds.bottom);
+    }
 
     // create the decompressor
     if (DecompressSequenceBeginS(&theCodec,
