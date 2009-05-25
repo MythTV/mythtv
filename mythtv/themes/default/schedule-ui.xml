@@ -719,15 +719,13 @@
             <value>Schedule Priorities</value>
         </textarea>
 
-        <imagetype name="filler">
-            <filename>rk-background.png</filename>
-            <position>0,35</position>
-        </imagetype>
-
-        <imagetype name="showinglines">
-            <filename>rk-lines.png</filename>
-            <position>0,35</position>
-        </imagetype>
+        <shape name="list_background">
+            <area>15,50,770,332</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
 
         <textarea name="prioritylabel" from="basetextarea">
             <area>585,15,95,40</area>
@@ -1133,10 +1131,13 @@
             <value>(1)Time (2)Title</value>
         </textarea>
         -->
-        <imagetype name="filler">
-            <filename>rk-background.png</filename>
-            <position>0,45</position>
-        </imagetype>
+        <shape name="list_background">
+            <area>15,55,770,330</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
 
         <textarea name="curview" from="basetextarea">
             <area>410,5,360,40</area>
@@ -1144,7 +1145,7 @@
         </textarea>
 
         <buttonlist name="proglist" from="basebuttonlist2">
-            <area>15,62,760,370</area>
+            <area>20,62,760,370</area>
             <buttonarea>0,0,760,325</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,760,25</area>
@@ -1166,17 +1167,12 @@
                 <state name="inactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>690,350</position>
+                <position>700,330</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>720,350</position>
+                <position>730,330</position>
             </statetype>
         </buttonlist>
-
-        <imagetype name="showinglines">
-            <position>0,45</position>
-            <filename>rk-lines.png</filename>
-        </imagetype>
 
         <textarea name="title" from="basetextarea">
             <area>30,405,760,50</area>
@@ -1257,18 +1253,48 @@
 
     <window name="programfind">
 
-        <imagetype name="filler">
-            <filename>pf-topbackground.png</filename>
-            <position>26,28</position>
-        </imagetype>
+        <shape name="details_background">
+            <area>25,25,750,215</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
 
-        <imagetype name="lineback">
-            <filename>pf-background.png</filename>
-            <position>15,270</position>
-        </imagetype>
+        <shape name="alphabet_background">
+            <area>25,280,54,292</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+        <shape name="shows_background">
+            <area>88,280,390,292</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+        <shape name="times_background">
+            <area>490,280,285,292</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
+
+        <shape name="select_background">
+            <area>25,412,750,30</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="0" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
 
         <buttonlist name="alphabet" from="basebuttonlist2">
-            <area>28,288,50,300</area>
+            <area>25,290,50,300</area>
             <scrollstyle>center</scrollstyle>
             <spacing>6</spacing>
             <buttonarea>0,0,50,300</buttonarea>
@@ -1316,7 +1342,7 @@
         </buttonlist>
 
         <buttonlist name="shows" from="alphabet">
-            <area>98,288,380,295</area>
+            <area>98,290,380,295</area>
             <statetype name="buttonitem">
                 <area>0,0,380,25</area>
                 <state name="active">
@@ -1337,7 +1363,7 @@
         </buttonlist>
 
         <buttonlist name="times" from="alphabet">
-            <area>500,288,280,295</area>
+            <area>500,290,280,295</area>
             <statetype name="buttonitem">
                 <area>0,0,30,25</area>
                 <state name="active">
@@ -1352,11 +1378,6 @@
                 <state name="inactive" from="active"/>
             </statetype>
         </buttonlist>
-
-        <imagetype name="lines">
-            <filename>pf-lines.png</filename>
-            <position>15,270</position>
-        </imagetype>
 
         <textarea name="title" from="basetextarea">
             <area>50,35,700,45</area>
@@ -1388,13 +1409,13 @@
         </textarea>
 
         <textarea name="searchlable" from="basetextarea">
-            <area>25,245,190,30</area>
+            <area>25,250,190,30</area>
             <font>basesmallyellow</font>
             <align>right</align>
             <value>Search For: </value>
         </textarea>
         <textarea name="search" from="basetextarea">
-            <area>230,245,300,30</area>
+            <area>230,250,300,30</area>
             <value></value>
         </textarea>
 
