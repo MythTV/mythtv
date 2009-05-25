@@ -54,6 +54,7 @@ class OpenGLVideo
                      int format, QSize size,
                      const unsigned char *alpha);
 
+    /// \brief Public interface to AddFilter(OpenGLFilterType filter)
     bool AddFilter(const QString &filter)
          { return AddFilter(StringToFilter(filter)); }
     bool RemoveFilter(const QString &filter)

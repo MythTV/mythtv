@@ -33,6 +33,45 @@ class OpenGLFilter
         DisplayBuffer  outputBuffer;
 };
 
+/**
+ * \class OpenGLVideo
+ *  A class used to display video frames and associated imagery
+ *  using the OpenGL API. 
+ *
+ *  The basic operational concept is to use a series of filter stages to
+ *  generate the desired video output, using limited software assistance
+ *  alongside OpenGL fragment programs (deinterlacing and YUV->RGB conversion)
+ *  , FrameBuffer Objects (flexible GPU storage) and PixelBuffer Objects
+ *  (faster CPU->GPU memory transfers).
+ *
+ *  In the most basic case, for example, a YV12 frame pre-converted in software
+ *  to BGRA format is simply blitted to the frame buffer. 
+ *  Currently, the most complicated example is the rendering of a standard
+ *  definition, interlaced frame to a high(er) definition display using
+ *  OpenGL (i.e. hardware based) deinterlacing, colourspace conversion and
+ *  bicubic upsampling.
+ *
+ *  Higher level tasks such as coordination between OpenGLVideo instances,
+ *  video buffer management, audio/video synchronisation etc are handled by
+ *  the higher level classes VideoOutput and NuppelVideoPlayer. The bulk of
+ *  the lower level interface with the window system and OpenGL is handled by
+ *  OpenGLContext.
+ *
+ *  N.B. Direct use of OpenGL calls is minimised to maintain platform
+ *  independance. The only member function where this is impractical is
+ *  PrepareFrame().
+ *
+ *  \warning Any direct OpenGL calls must be wrapped by calls to
+ *  gl_context->MakeCurrent(). Alternatively use the convenience class
+ *  OpenGLContextLocker.
+ */
+
+/**
+ * \fn OpenGLVideo::OpenGLVideo()
+ *  Create a new OpenGLVideo instance that must be initialised
+ *  with a call to OpenGLVideo::Init()
+ */
+
 OpenGLVideo::OpenGLVideo() :
     gl_context(NULL),         video_dim(0,0),
     actual_video_dim(0,0),    viewportSize(0,0),
@@ -75,6 +114,31 @@ void OpenGLVideo::Teardown(void)
         filters.erase(filters.begin());
     }
 }
+
+/**
+ *  \fn OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
+                       QSize videoDim, QRect displayVisibleRect,
+                       QRect displayVideoRect, QRect videoRect,
+                       bool viewport_control, QString options, bool osd,
+                       LetterBoxColour letterbox_colour)
+ *  \param glcontext          the OpenGLContext object responsible for lower
+ *   levelwindow and OpenGL context integration
+ *  \param colour_control     if true, manipulation of video attributes
+ *   (colour, contrast etc) will be enabled
+ *  \param videoDim           the size of the video source
+ *  \param displayVisibleRect the bounding rectangle of the OpenGL window
+ *  \param displayVideoRect   the bounding rectangle for the area to display
+ *   the video frame
+ *  \param videoRect          the portion of the video frame to display in 
+     displayVideoRect
+ *  \param viewport_control   if true, this instance may permanently change
+     the OpenGL viewport
+ *  \param options            a string defining OpenGL features to disable
+ *  \param osd                if true, this instance describes an OSD (rather
+     than video)
+ *  \param letterbox_colour   the colour used to clear unused areas of the
+     window
+ */
 
 bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
                        QSize videoDim, QRect displayVisibleRect,
@@ -219,6 +283,12 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
     return true;
 }
 
+/**
+ *  \fn OpenGLVideo::CheckResize(bool deinterlacing)
+ *   Determine if the output is to be scaled at all and create or destroy
+ *   the appropriate filter as necessary.
+ */
+
 void OpenGLVideo::CheckResize(bool deinterlacing)
 {
     // to improve performance on slower cards
@@ -256,6 +326,12 @@ void OpenGLVideo::CheckResize(bool deinterlacing)
 
     OptimiseFilters();
 }
+
+/**
+ * \fn OpenGLVideo::OptimiseFilters(void)
+ *  Ensure the current chain of OpenGLFilters is logically correct
+ *  and has the resources required to complete rendering.
+ */
 
 bool OpenGLVideo::OptimiseFilters(void)
 {
@@ -316,6 +392,11 @@ bool OpenGLVideo::OptimiseFilters(void)
     return true;
 }
 
+/**
+ * \fn OpenGLVideo::SetFiltering(void)
+ *  Set the OpenGL texture mapping functions to optimise speed and quality.
+ */
+
 void OpenGLVideo::SetFiltering(void)
 {
     // filter settings included for performance only
@@ -346,6 +427,11 @@ void OpenGLVideo::SetFiltering(void)
         last_filter++;
     }
 }
+
+/**
+ * \fn OpenGLVideo::AddFilter(OpenGLFilterType filter)
+ *  Add a new filter stage and create any additional resources needed.
+ */
 
 bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 {
@@ -475,6 +561,14 @@ void OpenGLVideo::TearDownDeinterlacer(void)
     DeleteTextures(&referenceTextures);
 }
 
+/**
+ * \fn OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
+ *  Extends the functionality of the basic YUV->RGB filter stage to include
+ *  deinterlacing (combining the stages is significantly more efficient than
+ *  2 separate stages). Create 2 deinterlacing fragment programs, 1 for each
+ *  required field.
+ */
+
 bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 {
     if (!(gl_features & kGLExtFragProg))
@@ -552,6 +646,12 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
     return false;
 }
 
+/**
+ * \fn OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
+                                       QString deint, FrameScanType field)
+ *  Create the correct fragment program for the given filter type
+ */
+
 uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
                                      QString deint, FrameScanType field)
 {
@@ -569,6 +669,12 @@ uint OpenGLVideo::AddFragmentProgram(OpenGLFilterType name,
 
     return 0;
 }
+
+/**
+ * \fn OpenGLVideo::AddFrameBuffer(uint &framebuffer, QSize fb_size,
+                                   uint &texture, QSize vid_size)
+ *  Add a FrameBuffer object of the correct size to the given texture.
+ */
 
 bool OpenGLVideo::AddFrameBuffer(uint &framebuffer, QSize fb_size,
                                  uint &texture, QSize vid_size)
@@ -603,6 +709,13 @@ void OpenGLVideo::SetViewPort(const QSize &viewPortSize)
             .arg(w).arg(h));
     gl_context->SetViewPort(viewportSize);
 }
+
+/**
+ * \fn OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size,
+                                     bool use_pbo)
+ *  Create and initialise an OpenGL texture suitable for a YV12 video frame
+ *  of the given size.
+ */
 
 uint OpenGLVideo::CreateVideoTexture(QSize size, QSize &tex_size,
                                      bool use_pbo)
@@ -645,6 +758,13 @@ QSize OpenGLVideo::GetTextureSize(const QSize &size)
 
     return QSize(w, h);
 }
+
+/**
+ * \fn OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
+ *  Update the current input texture using the data from the given YV12 video
+ *  frame. If the required hardware support is not available, fall back to
+ *  software YUV->RGB conversion.
+ */
 
 void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
 {
@@ -709,6 +829,16 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
     inputUpdated = true;
 }
 
+/**
+ * \fn OpenGLVideo::UpdateInput(const unsigned char *buf, const int *offsets,
+                                int format, QSize size,
+                                const unsigned char *alpha)
+ *  Update the current input texture using the data from the given data buffer
+ *  and parameters.This is used to update the OSD frame. No software fallback
+ *  is available as the OpenGL OSD is not permitted if the correct hardware
+ *  support is not detected.
+ */
+ 
 void OpenGLVideo::UpdateInput(const unsigned char *buf, const int *offsets,
                               int format, QSize size,
                               const unsigned char *alpha)
@@ -729,6 +859,11 @@ void OpenGLVideo::UpdateInput(const unsigned char *buf, const int *offsets,
     inputUpdated = true;
 }
 
+/**
+ * \fn OpenGLVideo::ShutDownYUV2RB(void)
+ *  Disable software colourspace conversion of the video input.
+ */
+
 void OpenGLVideo::ShutDownYUV2RGB(void)
 {
     if (convertBuf)
@@ -738,6 +873,12 @@ void OpenGLVideo::ShutDownYUV2RGB(void)
     }
     convertSize = QSize(0,0);
 }
+
+/**
+ * \fn OpenGLVideo::SetVideoResize(const QRect &rect)
+ *  Start resizing the output video to the rectangle bounded by rect.
+ *  This functionality is used by some MHEG5 implementations.
+ */
 
 void OpenGLVideo::SetVideoResize(const QRect &rect)
 {
@@ -768,6 +909,15 @@ void OpenGLVideo::DisableVideoResize(void)
     videoResize     = false;
     videoResizeRect = QRect(0, 0, 0, 0);
 }
+
+/**
+ * \fn OpenGLVideo::CalculateResize(float &left,  float &top,
+                                    float &right, float &bottom)
+ *  Calculate the appropriate output coordinates for video resizing
+ *  given the current video and window size.
+ *  \bug the aspect ratio of the resulting video is set to the aspect ratio
+ *  of the display.
+ */
 
 void OpenGLVideo::CalculateResize(float &left,  float &top,
                                   float &right, float &bottom)
@@ -808,6 +958,22 @@ void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
     softwareDeinterlacer = filter;
     softwareDeinterlacer.detach();
 }
+
+/**
+ * \fn OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
+                                 bool softwareDeinterlacing,
+                                 long long frame, bool draw_border)
+ *  Render the contents of the current input texture to the framebuffer
+ *  using the currently enabled filters.
+ *  \param topfieldfirst        the frame is interlaced and top_field_first
+ *   is set
+ *  \param scan                 interlaced or progressive?
+ *  \param softwareDeinerlacing the frame has been deinterlaced in software
+ *  \param frame                the frame number
+ *  \param draw_border          if true, draw a red border around the frame
+ *  \warning This function is a finely tuned, sensitive beast. Tinker at
+ *   your own risk.
+ */
 
 void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                                bool softwareDeinterlacing,
