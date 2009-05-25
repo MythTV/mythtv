@@ -4473,6 +4473,6 @@ QString ProgramInfo::i18n(const QString &msg)
     QByteArray msg_arr = msg.toLatin1();
     QString msg_i18n = QObject::tr(msg_arr.constData());
     QByteArray msg_i18n_arr = msg_i18n.toLatin1();
-    return (msg_arr == msg_i18n_arr) ? msg_i18n : msg;
+    return (msg_arr == msg_i18n_arr) ? msg : msg_i18n;
 }
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

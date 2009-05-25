@@ -79,12 +79,13 @@ class MasterGuideTable : public PSIPTable
   public:
     MasterGuideTable(const MasterGuideTable& table) : PSIPTable(table)
     {
-        assert(TableID::MGT == TableID());
+        // note MGT == MGTscte, but we check "both"
+        assert(TableID::MGT == TableID() || TableID::MGTscte == TableID());
         Parse();        
     }
     MasterGuideTable(const PSIPTable& table) : PSIPTable(table)
     {
-        assert(TableID::MGT == TableID());
+        assert(TableID::MGT == TableID() || TableID::MGTscte == TableID());
         Parse();
     }
     ~MasterGuideTable() { ; }
@@ -95,6 +96,18 @@ class MasterGuideTable : public PSIPTable
     // private_indicator        1   1.1          1
     // reserved                 2   1.2          3
     // table_id_extension      16   3.0     0x0000
+
+    /* Each Map ID corresponds to one set of channel mappings. Each STB
+     * is expected to ignore any Map ID's other than the one corresponding
+     * to it's head-end.
+     *
+     * Note: This is only defined for SCTE streams, it is always 0 in ATSC streams
+     */
+    uint SCTEMapId() const
+    {
+        return (pesdata()[3]<<8) | pesdata()[4];
+    }
+
     // reserved                 2   5.0          3
     // current_next_indicator   1   5.7          1
     // section_number           8   6.0       0x00
@@ -413,6 +426,18 @@ class CableVirtualChannelTable : public VirtualChannelTable
     // private_indicator        1   1.1          1
     // reserved                 2   1.2          3
     // table_id_extension      16   3.0     0x0000
+
+    /* Each Map ID corresponds to one set of channel mappings. Each STB
+     * is expected to ignore any Map ID's other than the one corresponding
+     * to it's head-end.
+     *
+     * Note: This is only defined for SCTE streams, it is always 0 in ATSC streams
+     */
+    uint SCTEMapId() const
+    {
+        return (pesdata()[3]<<8) | pesdata()[4];
+    }
+
     // reserved                 2   5.0          3
     // current_next_indicator   1   5.7          1
     // section_number           8   6.0       0x00
@@ -428,6 +453,25 @@ class CableVirtualChannelTable : public VirtualChannelTable
     // 14 RRRR JJJJ 15 jjjj jjmm  16 MMMM MMMM
     //              JJ JJjj jjjj  mm MMMM MMMM
     //   minor_channel_number  10  15.6
+
+    bool SCTEIsChannelNumberOnePart(uint i) const
+    {
+        return (MajorChannel(i) >> 4) == 0x3f;
+    }
+    bool SCTEIsChannelNumberTwoPart(uint i) const
+    {
+        return MajorChannel(i) < 1000;
+    }
+    // Note: In SCTE streams, the channel number is undefined if
+    //       the two functions above return false. As of 2002 spec.
+
+    uint SCTEOnePartChannel(uint i) const
+    {
+        if (SCTEIsChannelNumberOnePart(i))
+            return ((MajorChannel(i) & 0xf) << 10) | MinorChannel(i);
+        return 0;
+    }
+
     //   modulation_mode        8  17.0
     //   carrier_frequency     32  18.0 deprecated
     //   channel_TSID          16  22.0
@@ -623,7 +667,7 @@ class ExtendedTextTable : public PSIPTable
  *  \brief This table contains the GPS time at the time of transmission.
  *
  *   It can we used to detect drift between GPS and UTC time, this
- *   is currently at 13 seconds.
+ *   is currently at 14 seconds.
  *   See also: a_65b.pdf page 23
  */
 class SystemTimeTable : public PSIPTable

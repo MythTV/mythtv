@@ -113,6 +113,13 @@ QString TerrestrialVirtualChannelTable::toString(int chan) const
         QObject::tr("ATSC 8-VSB"),  QObject::tr("ATSC 16-VSB"),
     };
 
+    static QString servicenames[5] =
+    {
+        QObject::tr("[Reserved]"),  QObject::tr("Analog"),
+        QObject::tr("ATSC TV"),     QObject::tr("ATSC Audio"),
+        QObject::tr("ATSC Data"),
+    };
+
     QString str;
     str.append(QString("Channel #%1 ").arg(chan));
     str.append(QString("name(%1) %2-%3 ").arg(ShortChannelName(chan))
@@ -131,7 +138,12 @@ QString TerrestrialVirtualChannelTable::toString(int chan) const
     str.append(QString("access_ctrl(%1) ").arg(IsAccessControlled(chan)));
     str.append(QString("hidden(%1) ").arg(IsHidden(chan)));
     str.append(QString("hide_guide(%1) ").arg(IsHiddenInGuide(chan)));
-    str.append(QString("service_type(%1) ").arg(ServiceType(chan)));
+
+    if (ServiceType(chan) > 4)
+        str.append(QString("service_type(UNKNOWN %1) ").arg(ServiceType(chan)));
+    else
+        str.append(QString("service_type(%1) ").arg(servicenames[ServiceType(chan)]));
+
     str.append(QString("source_id(%1)\n").arg(SourceID(chan)));
     if (0!=DescriptorsLength(chan))
     {
@@ -180,6 +192,12 @@ QString CableVirtualChannelTable::toString(int chan) const
         QObject::tr("SCTE mode 1"), QObject::tr("SCTE mode 2"),
         QObject::tr("ATSC 8-VSB"),  QObject::tr("ATSC 16-VSB"),
     };
+    static QString servicenames[5] =
+    {
+        QObject::tr("[Reserved]"),  QObject::tr("Analog"),
+        QObject::tr("ATSC TV"),     QObject::tr("ATSC Audio"),
+        QObject::tr("ATSC Data"),
+    };
 
     QString str;
     str.append(QString("Channel #%1 ").arg(chan));
@@ -202,7 +220,12 @@ QString CableVirtualChannelTable::toString(int chan) const
     str.append(QString("out_of_band(%1) ").arg(IsOutOfBand(chan)));
 
     str.append(QString("hide_guide(%1) ").arg(IsHiddenInGuide(chan)));
-    str.append(QString("service_type(%1) ").arg(ServiceType(chan)));
+
+    if (ServiceType(chan) > 4)
+        str.append(QString("service_type(UNKNOWN %1) ").arg(ServiceType(chan)));
+    else
+        str.append(QString("service_type(%1) ").arg(servicenames[ServiceType(chan)]));
+
     str.append(QString("source_id(%1)\n").arg(SourceID(chan)));
     if (0 != DescriptorsLength(chan))
     {
