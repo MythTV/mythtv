@@ -348,6 +348,8 @@ bool MythUIImage::Load(void)
 {
     Clear();
 
+    SetRedraw();
+
 //     if (!IsVisible(true))
 //         return false;
 
@@ -491,7 +493,6 @@ bool MythUIImage::Load(void)
     }
 
     m_LastDisplay = QTime::currentTime();
-    SetRedraw();
 
     return true;
 }
