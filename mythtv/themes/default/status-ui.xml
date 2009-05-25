@@ -9,7 +9,7 @@
         </textarea>
 
         <shape name="list_background">
-            <area>0,95,775,270</area>
+            <area>20,100,760,275</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="120" />
             <line color="#FFFFFF" alpha="255" width="2" />
@@ -75,7 +75,15 @@
         </buttonlist>
 
         <buttonlist name="log" from="basebuttonlist2">
-            <position>19,108</position>
+            <area>5,108,760,320</area>
+            <buttonarea>0,0,760,270</buttonarea>
+
+            <statetype name="upscrollarrow">
+                <position>700,280</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>730,280</position>
+            </statetype>
         </buttonlist>
 
         <textarea name="helplabel">
