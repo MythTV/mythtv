@@ -86,6 +86,10 @@ bool ProgFinder::Create()
         return false;
     }
 
+    m_alphabetList->SetLCDTitles(tr("Starts With"), "");
+    m_showList->SetLCDTitles(tr("Programs"), "");
+    m_timesList->SetLCDTitles(tr("Times"), "buttontext");
+
     BuildFocusList();
 
     return true;
