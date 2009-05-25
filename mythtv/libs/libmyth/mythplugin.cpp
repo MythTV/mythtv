@@ -203,6 +203,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     return true;
 }
 
+// return false on success, true on error
 bool MythPluginManager::run_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
@@ -212,15 +213,16 @@ bool MythPluginManager::run_plugin(const QString &plugname)
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to run plugin '%1': not initialized")
                 .arg(plugname));
-        return false;
+        return true;
     }
 
     gContext->addCurrentLocation(newname);
-    bool didRun = m_dict[newname]->run();
+    bool res = m_dict[newname]->run();
     gContext->removeCurrentLocation();
-    return didRun;
+    return res;
 }
 
+// return false on success, true on error
 bool MythPluginManager::config_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
@@ -230,13 +232,13 @@ bool MythPluginManager::config_plugin(const QString &plugname)
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to configure plugin '%1': not initialized")
                 .arg(plugname));
-        return false;
+        return true;
     }
 
     gContext->addCurrentLocation(newname + "setup");
-    m_dict[newname]->config();
+    bool res = m_dict[newname]->config();
     gContext->removeCurrentLocation();
-    return true;
+    return res;
 }
 
 bool MythPluginManager::destroy_plugin(const QString &plugname)
