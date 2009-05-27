@@ -1304,10 +1304,10 @@
         </shape>
 
         <buttonlist name="alphabet" from="basebuttonlist2">
-            <area>70,400,80,300</area>
+            <area>70,400,80,288</area>
             <scrollstyle>center</scrollstyle>
             <spacing>6</spacing>
-            <buttonarea>0,0,80,300</buttonarea>
+            <buttonarea>0,0,80,288</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext" from="basetextarea">
