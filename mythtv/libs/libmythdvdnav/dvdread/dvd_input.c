@@ -54,7 +54,7 @@ char *      (*dvdinput_error) (dvd_input_t);
 #include <dlfcn.h>
 #else
 /* Only needed on MINGW at the moment */
-#include "../../msvc/contrib/dlfcn.c"
+#include "compat.h"
 #endif
 
 #ifdef __APPLE__

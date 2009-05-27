@@ -41,7 +41,7 @@ extern "C" {
 #include <dvdread/ifo_types.h> /* For vm_cmd_t */
 #include <dvdnav/dvdnav_events.h>
 
-
+#include "compat.h"
 
 /*********************************************************************
  * dvdnav data types                                                 *
