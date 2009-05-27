@@ -3252,10 +3252,9 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         ClearSubtitles();
     }
 
-    player_ctx->tvchain->SetProgram(*pginfo);
-
     if (discontinuity || newtype)
     {
+        player_ctx->tvchain->SetProgram(*pginfo);
         GetDecoder()->SetProgramInfo(*pginfo);
 
         player_ctx->buffer->Reset(true);
