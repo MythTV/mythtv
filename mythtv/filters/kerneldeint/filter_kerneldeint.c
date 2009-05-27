@@ -40,6 +40,7 @@ struct DeintThread
 {
     int       ready;
     pthread_t id;
+    int       exists;
 };
 
 typedef struct ThisFilter
@@ -525,7 +526,7 @@ void CleanupKernelDeintFilter(VideoFilter *f)
     {
         filter->kill_threads = 1;
         for (i = 0; i < filter->requested_threads; i++)
-            if (filter->threads[i].id != 0)
+            if (filter->threads[i].exists)
                 pthread_join(filter->threads[i].id, NULL);
         free(filter->threads);
     }
@@ -615,9 +616,12 @@ VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
         {
             if (pthread_create(&(filter->threads[i].id), NULL,
                                KernelThread, (void*)filter) != 0)
-                filter->threads[i].id  = 0;
+                filter->threads[i].exists = 0;
             else
+            {
                 success++;
+                filter->threads[i].exists = 1;
+            }
         }
 
         if (success < filter->requested_threads)
