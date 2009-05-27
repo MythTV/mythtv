@@ -2968,7 +2968,7 @@ if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
 else
     # For environments that don't have pkg-config, we do a compile test.
     # Sadly, this requires some guesses about Qt's install location:
-    qt_inc="-I/usr/local/include/Qt -I/usr/include/Qt -I${prefix}/include/Qt"
+    qt_inc="-I/usr/local/include/Qt -I/usr/include/Qt -I${prefix}/include/Qt -I${QTDIR}/include"
 
     check_cpp ${qt_inc} <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
