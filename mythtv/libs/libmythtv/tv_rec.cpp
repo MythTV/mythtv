@@ -3341,6 +3341,8 @@ void TVRec::SetRingBuffer(RingBuffer *rb)
             ClearFlags(kFlagDummyRecorderRunning);
         delete rb_old;
     }
+
+    m_switchingBuffer = false;
 }
 
 void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
@@ -3360,8 +3362,6 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
         curRecording = new ProgramInfo(*pginfo);
         curRecording->MarkAsInUse(true, "recorder");
     }
-
-    m_switchingBuffer = false;
 }
 
 QString TVRec::TuningGetChanNum(const TuningRequest &request,
