@@ -176,6 +176,7 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     const QSize video_dim = windows[0].GetVideoDim();
     XJ_width  = video_dim.width();
     XJ_height = video_dim.height();
+    windows[0].SetDisplayAspect((float)winw / winh);
 
     vbuffers.CreateBuffers(XJ_width, XJ_height);
     MoveResize();

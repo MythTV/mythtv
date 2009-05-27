@@ -30,7 +30,7 @@ class VideoOutputD3D : public VideoOutput
                       const PIPMap &pipPlayers,
                       FrameScanType scan);
     void Show(FrameScanType );
-
+    void WindowResized(const QSize &new_size);
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,

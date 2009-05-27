@@ -112,6 +112,17 @@ void VideoOutputD3D::UnInitD3D(void)
     }
 }
 
+void VideoOutputD3D::WindowResized(const QSize &new_size)
+{
+    QMutexLocker locker(&m_lock);
+
+    windows[0].SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
+    windows[0].SetDisplayAspect(
+        ((float)new_size.width()) / new_size.height());
+
+    MoveResize();
+}
+
 bool VideoOutputD3D::InputChanged(const QSize &input_size,
                                   float        aspect,
                                   MythCodecID  av_codec_id,
@@ -489,6 +500,8 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
     m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
+    windows[0].SetDisplayAspect((float)winw / winh);
+
     MoveResize();
 
     return true;
@@ -822,3 +835,4 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
     list += "direct3d";
     return list;
 }
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
