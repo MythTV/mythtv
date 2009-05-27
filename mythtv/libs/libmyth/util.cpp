@@ -1360,6 +1360,10 @@ bool WakeOnLAN(QString MAC)
 
 bool IsPulseAudioRunning(void)
 {
+#ifdef USING_MINGW
+    return false;
+#endif
+
 #if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
 #else
