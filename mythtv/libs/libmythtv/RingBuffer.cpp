@@ -393,7 +393,16 @@ void RingBuffer::Reset(bool full, bool toAdjust, bool resetInternal)
 
     writepos = 0;
     readpos = (toAdjust) ? (readpos - readAdjust) : 0;
+
+    if (readpos != 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString(
+                "RingBuffer::Reset() nonzero readpos.  toAdjust: %1 readpos: %2"
+                " readAdjust: %3").arg(toAdjust).arg(readpos).arg(readAdjust));
+    }
+
     readAdjust = 0;
+    readpos = (readpos < 0) ? 0 : readpos;
 
     if (full)
         ResetReadAhead(readpos);
