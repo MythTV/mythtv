@@ -3647,17 +3647,17 @@ void Scheduler::GetNextLiveTVDir(int cardid)
     pginfo->cardid       = cardid;
 
     int fsID = FillRecordingDir(pginfo, reclist);
+
+    tv->SetNextLiveTVDir(pginfo->pathname);
+
+    VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
+            .arg(pginfo->pathname));
+
     if (expirer)
     {
         // update auto expirer
         expirer->Update(cardid, fsID, true);
     }
-
-    VERBOSE(VB_FILE, LOC + QString("FindNextLiveTVDir: next dir is '%1'")
-            .arg(pginfo->pathname));
-
-    tv->SetNextLiveTVDir(pginfo->pathname);
-
     delete pginfo;
 }
 

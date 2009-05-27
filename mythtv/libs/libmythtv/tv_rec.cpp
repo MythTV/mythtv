@@ -4297,16 +4297,12 @@ QString TVRec::FlagToString(uint f)
 
 bool TVRec::WaitForNextLiveTVDir(void)
 {
-    bool found = false;
-    MythTimer t;
-    t.start();
-    while (!found && ((unsigned long) t.elapsed()) < 1000)
-    {
-        usleep(50);
+    QMutexLocker lock(&nextLiveTVDirLock);
 
-        QMutexLocker lock(&nextLiveTVDirLock);
-        if (nextLiveTVDir != "")
-            found = true;
+    bool found = !nextLiveTVDir.isEmpty();
+    if (!found && triggerLiveTVDir.wait(&nextLiveTVDirLock, 500))
+    {
+        found = !nextLiveTVDir.isEmpty();
     }
 
     return found;
@@ -4317,6 +4313,7 @@ void TVRec::SetNextLiveTVDir(QString dir)
     QMutexLocker lock(&nextLiveTVDirLock);
 
     nextLiveTVDir = dir;
+    triggerLiveTVDir.wakeAll();
 }
 
 bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
@@ -4325,6 +4322,14 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
     VERBOSE(VB_RECORD, LOC + "GetProgramRingBufferForLiveTV()");
     if (!channel || !tvchain || !pginfo || !rb)
         return false;
+
+    nextLiveTVDirLock.lock();
+    nextLiveTVDir.clear();
+    nextLiveTVDirLock.unlock();
+
+    // Dispatch this early, the response can take a while.
+    MythEvent me(QString("QUERY_NEXT_LIVETV_DIR %1").arg(cardid));
+    gContext->dispatch(me);
 
     uint    sourceid = channel->GetCurrentSourceID();
     QString channum  = channel->GetCurrentName();
@@ -4365,13 +4370,6 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         prog->recstartts = mythCurrentDateTime();
 
     prog->storagegroup = "LiveTV";
-
-    nextLiveTVDirLock.lock();
-    nextLiveTVDir = "";
-    nextLiveTVDirLock.unlock();
-
-    MythEvent me(QString("QUERY_NEXT_LIVETV_DIR %1").arg(cardid));
-    gContext->dispatch(me);
 
     if (WaitForNextLiveTVDir())
     {

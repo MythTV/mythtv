@@ -395,6 +395,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     ProgramInfo *pseudoLiveTVRecording;
     QString      nextLiveTVDir;
     QMutex       nextLiveTVDirLock;
+    QWaitCondition triggerLiveTVDir;
     QString      LiveTVStartChannel;
 
     // LiveTV file chain
