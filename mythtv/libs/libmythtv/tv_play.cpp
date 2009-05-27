@@ -6205,7 +6205,12 @@ void TV::SwitchCards(PlayerContext *ctx,
         {
             ctx->LockPlayingInfo(__FILE__, __LINE__);
             QString playbackURL = ctx->playingInfo->GetPlaybackURL();
-            ctx->SetRingBuffer(new RingBuffer(playbackURL, false));
+
+            bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
+
+            ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
+                                              opennow ? 12 : (uint)-1));
+
             ctx->tvchain->SetProgram(*ctx->playingInfo);
             ctx->buffer->SetLiveMode(ctx->tvchain);
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
