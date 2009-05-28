@@ -6,9 +6,10 @@
 #include <stdint.h>
 
 // Qt includes
-#include <qmutex.h>
-#include <qobject.h>
-#include <qstring.h>
+#include <QMap>
+#include <QMutex>
+#include <QObject>
+#include <QString>
 
 // MythTV includes
 #include "mythdeque.h"

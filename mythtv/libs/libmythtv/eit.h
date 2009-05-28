@@ -5,10 +5,12 @@
 #include <vector>
 using namespace std;
 
-#include <qmap.h>
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qstringlist.h>
+// Qt includes
+#include <QDateTime>
+#include <QStringList>
+
+// MythTV includes
+#include "listingsources.h"
 
 class MSqlQuery;
 
@@ -77,7 +79,8 @@ class DBEvent
         category_type(_category_type),
         seriesId(_seriesId),
         programId(_programId),
-        previouslyshown(false)
+        previouslyshown(false),
+        listingsource(kListingSourceEIT)
     {
     }
 
@@ -100,7 +103,8 @@ class DBEvent
         fixup(_fixup),
         subtitleType(_subtitleType),
         audioProps(_audioProps), videoProps(_videoProps),
-        category_type(0/*kCategoryNone*/), previouslyshown(false)
+        category_type(0/*kCategoryNone*/), previouslyshown(false),
+        listingsource(kListingSourceEIT)
     {
     }
 
@@ -143,6 +147,7 @@ class DBEvent
     QString       seriesId;
     QString       programId;
     bool          previouslyshown;
+    uint32_t      listingsource;
 };
 
 #endif // _EIT_H_

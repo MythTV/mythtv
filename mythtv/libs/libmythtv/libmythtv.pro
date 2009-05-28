@@ -161,7 +161,7 @@ HEADERS += signalmonitorvalue.h     signalmonitorlistener.h
 HEADERS += viewschdiff.h            livetvchain.h
 HEADERS += playgroup.h              progdetails.h
 HEADERS += channelsettings.h        previewgenerator.h
-HEADERS += transporteditor.h
+HEADERS += transporteditor.h        listingsources.h
 HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
 

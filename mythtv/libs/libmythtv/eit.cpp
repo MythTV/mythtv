@@ -144,7 +144,7 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         "       partnumber,     parttotal, "
         "       syndicatedepisodenumber, "
         "       airdate,        originalairdate, "
-        "       previouslyshown "
+        "       previouslyshown,listingsource "
         "FROM program "
         "WHERE chanid   = :CHANID AND "
         "      manualid = 0       AND "
@@ -156,7 +156,7 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
     query.bindValue(":STIME2", starttime);
     query.bindValue(":ETIME2", endtime);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("GetOverlappingPrograms 1", query);
         return 0;
@@ -186,9 +186,9 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
         prog.parttotal  = query.value(13).toUInt();
         prog.syndicatedepisodenumber = query.value(14).toString();
         prog.airdate    = query.value(15).toString();
-        prog.originalairdate = query.value(16).toDate();
-
-        prog.previouslyshown = query.value(17).toBool();
+        prog.originalairdate  = query.value(16).toDate();
+        prog.previouslyshown  = query.value(17).toBool();
+        prog.listingsource   |= query.value(18).toUInt();
 
         if (prog.airdate == "0")
            prog.airdate = QString::null;
@@ -405,6 +405,8 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
 
     bool lpreviouslyshown = previouslyshown | match.previouslyshown;
 
+    uint32_t llistingsource = listingsource | match.listingsource;
+
     QString lsyndicatedepisodenumber = syndicatedepisodenumber;
     if (lsyndicatedepisodenumber.isEmpty() &&
         !match.syndicatedepisodenumber.isEmpty())
@@ -450,7 +452,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     query.bindValue(":SYNDICATENO", lsyndicatedepisodenumber);
     query.bindValue(":AIRDATE",     lairdate.isEmpty() ? "0000" : lairdate);
     query.bindValue(":ORIGAIRDATE", loriginalairdate);
-    query.bindValue(":LSOURCE",     1);
+    query.bindValue(":LSOURCE",     llistingsource);
     query.bindValue(":SERIESID",    lseriesId);
     query.bindValue(":PROGRAMID",   lprogramId);
     query.bindValue(":PREVSHOWN",   lpreviouslyshown);
@@ -615,7 +617,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
     query.bindValue(":SYNDICATENO", syndicatedepisodenumber);
     query.bindValue(":AIRDATE",     airdate.isEmpty() ? "0000" : airdate);
     query.bindValue(":ORIGAIRDATE", originalairdate);
-    query.bindValue(":LSOURCE",     1);
+    query.bindValue(":LSOURCE",     listingsource);
     query.bindValue(":SERIESID",    lseriesId);
     query.bindValue(":PROGRAMID",   lprogramId);
     query.bindValue(":PREVSHOWN",   previouslyshown);

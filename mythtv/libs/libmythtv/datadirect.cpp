@@ -13,6 +13,7 @@
 #include "sourceutil.h"
 #include "channelutil.h"
 #include "frequencytables.h"
+#include "listingsources.h"
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "mythdb.h"
@@ -829,29 +830,40 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
     MSqlQuery query(MSqlQuery::DDCon());
 
     //cerr << "Adding rows to main program table from view table..\n";
-    if (!query.exec("INSERT IGNORE INTO program (chanid, starttime, endtime, "
-                    "title, subtitle, description, "
-                    "showtype, category, category_type, "
-                    "airdate, stars, previouslyshown, stereo, subtitled, "
-                    "subtitletypes, videoprop, audioprop, "
-                    "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
-                    "originalairdate, colorcode, syndicatedepisodenumber, "
-                    "programid) "
-                    "SELECT dd_v_program.chanid, "
-                    "DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE), "
-                    "DATE_ADD(endtime, INTERVAL channel.tmoffset MINUTE), "
-                    "title, subtitle, description, "
-                    "showtype, dd_genre.class, category_type, "
-                    "airdate, stars, previouslyshown, stereo, subtitled, "
-                    "(subtitled << 1 ) | closecaptioned, hdtv, "
-                    "(dolby << 3) | stereo, "
-                    "hdtv, closecaptioned, partnumber, parttotal, seriesid, "
-                    "originalairdate, colorcode, syndicatedepisodenumber, "
-                    "dd_v_program.programid FROM (dd_v_program, channel) "
-                    "LEFT JOIN dd_genre ON ("
-                    "dd_v_program.programid = dd_genre.programid AND "
-                    "dd_genre.relevance = '0') "
-                    "WHERE dd_v_program.chanid = channel.chanid;"))
+    query.prepare(
+        "INSERT IGNORE INTO program "
+        "  ( chanid,        starttime,   endtime,         title,           "
+        "    subtitle,      description, showtype,        category,        "
+        "    category_type, airdate,     stars,           previouslyshown, "
+        "    stereo,        subtitled,   subtitletypes,   videoprop,       "
+        "    audioprop,     hdtv,        closecaptioned,  partnumber,      "
+        "    parttotal,     seriesid,    originalairdate, colorcode,       "
+        "    syndicatedepisodenumber,                                      "
+        "                   programid,   listingsource)                    "
+        "  SELECT                                                          "
+        "    dd_v_program.chanid,                                          "
+        "    DATE_ADD(starttime, INTERVAL channel.tmoffset MINUTE),        "
+        "    DATE_ADD(endtime, INTERVAL channel.tmoffset MINUTE),          "
+        "                                                 title,           "
+        "    subtitle,      description, showtype,        dd_genre.class,  "
+        "    category_type, airdate,     stars,           previouslyshown, "
+        "    stereo,        subtitled,                                     "
+        "    (subtitled << 1 ) | closecaptioned, hdtv,                     "
+        "    (dolby << 3) | stereo,                                        "
+        "                   hdtv,        closecaptioned,  partnumber,      "
+        "    parttotal,     seriesid,    originalairdate, colorcode,       "
+        "    syndicatedepisodenumber,                                      "
+        "                   dd_v_program.programid,                        "
+        "                               :LSOURCE                           "
+        "FROM (dd_v_program, channel) "
+        "LEFT JOIN dd_genre ON "
+        "  ( dd_v_program.programid = dd_genre.programid AND  "
+        "    dd_genre.relevance     = '0' ) "
+        "WHERE dd_v_program.chanid = channel.chanid");
+
+    query.bindValue(":LSOURCE", kListingSourceDDSchedulesDirect);
+
+    if (!query.exec())
         MythDB::DBError("Inserting into program table", query);
 
     //cerr << "Finished adding rows to main program table...\n";

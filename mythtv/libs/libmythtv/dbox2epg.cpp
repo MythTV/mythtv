@@ -9,6 +9,7 @@
 
 #include "dbox2channel.h"
 #include "dbox2epg.h"
+#include "listingsources.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "tv_rec.h"
@@ -183,11 +184,13 @@ void DBox2EPG::UpdateDB(uint chanid,
     query.prepare("INSERT INTO program "
                   "    (chanid,   starttime,  endtime,      "
                   "     title,    subtitle,   description,  "
-                  "     category, airdate,    stars)        "
+                  "     category, airdate,    stars,        "
+                  "     listingsource)"
                   "VALUES "
                   "    (:CHANID,  :STARTTIME, :ENDTIME,     "
                   "     :TITLE,   :SUBTITLE,  :DESCRIPTION, "
-                  "     :CATEGORY,:AIRDATE,   :STARS)");
+                  "     :CATEGORY,:AIRDATE,   :STARS,       "
+                  "     :LSOURCE);");
 
     query.bindValue(":CHANID",      chanid);
     query.bindValue(":STARTTIME",   startTime);
@@ -198,6 +201,7 @@ void DBox2EPG::UpdateDB(uint chanid,
     query.bindValue(":CATEGORY",    category);
     query.bindValue(":AIRDATE",     "0");
     query.bindValue(":STARS",       "0");
+    query.bindValue(":LSOURCE",      kListingSourceDBOX2EPG);
 
     if (!query.exec())
         MythDB::DBError("Saving new program", query);
