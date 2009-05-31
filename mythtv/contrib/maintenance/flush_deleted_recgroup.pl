@@ -22,6 +22,7 @@
     my %rows = $myth->backend_rows('QUERY_RECORDINGS Delete');
 
 # Parse each recording, and delete anything in the "Deleted" recgroup
+    my $i = 0;
     foreach my $row (@{$rows{'rows'}}) {
         my $show = $myth->new_recording(@$row);
         next unless ($show->{'recgroup'} eq 'Deleted');
@@ -30,7 +31,18 @@
         if ($err != -1) {
             print "  error:  $err\n";
         }
+        else {
+            $i++;
+        }
     }
 
 # Done
-    print "Done\n";
+    if ($i > 0) {
+        print
+            "\n",
+            "Depending on your configuration, it may be several minutes before\n",
+            "MythTV completely flushes these recordings from your system.\n";
+    }
+    else {
+        print "No recordings were found in the Deleted recording group.\n";
+    }
