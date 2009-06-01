@@ -1377,15 +1377,15 @@ field_calc +
 
 static const QString deint_end_top =
 "CMP other, mov, current, other;\n"
-"CMP res, prev, current, other;\n";
+"CMP res,  prev, current, other;\n";
 
 static const QString deint_end_bot =
 "CMP other, mov, current, other;\n"
-"CMP res, prev, other, current;\n";
+"CMP res,  prev, other, current;\n";
 
 static const QString motion_calc =
 "ABS mov, mov;\n"
-"SUB mov, mov, 0.07;\n";
+"SUB mov, mov, 0.01;\n";
 
 static const QString motion_top =
 "SUB mov, prev, current;\n" + motion_calc;
@@ -1438,15 +1438,15 @@ static const QString kerneldeint[2] = {
 "TEX prev, prev, texture[1], %1;\n"
 "MAD other, 0.5, prev, other;\n"
 "ADD prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX mov, prev, texture[1], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
-"TEX mov, prev, texture[2], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
+"TEX tmp, prev, texture[1], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
+"TEX tmp, prev, texture[2], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
 "SUB prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX mov, prev, texture[1], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
-"TEX mov, prev, texture[2], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
+"TEX tmp, prev, texture[1], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
+"TEX tmp, prev, texture[2], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
 + field_calc + deint_end_top,
 
 "TEX current, tex, texture[1], %1;\n"
@@ -1460,15 +1460,15 @@ static const QString kerneldeint[2] = {
 "TEX prev, prev, texture[1], %1;\n"
 "MAD other, 0.5, prev, other;\n"
 "ADD prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX mov, prev, texture[1], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
-"TEX mov, prev, texture[0], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
+"TEX tmp, prev, texture[1], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
+"TEX tmp, prev, texture[0], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
 "SUB prev, tex, {0.0, %4, 0.0, 0.0};\n"
-"TEX mov, prev, texture[1], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
-"TEX mov, prev, texture[0], %1;\n"
-"MAD other, -0.0625, mov, other;\n"
+"TEX tmp, prev, texture[1], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
+"TEX tmp, prev, texture[0], %1;\n"
+"MAD other, -0.0625, tmp, other;\n"
 + field_calc + deint_end_bot
 };
 
