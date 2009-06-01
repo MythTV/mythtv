@@ -1936,7 +1936,7 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
 
     msg.msg[3] = CaPmt.length;
 
-    if (CaPmt.length > 256)
+    if (CaPmt.length > (256 - 4))
     {
 	esyslog("CA message too long");
 	return false;
