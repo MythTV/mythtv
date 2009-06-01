@@ -5,6 +5,7 @@
 #include "eitfixup.h"
 #include "mythcontext.h"
 #include "dvbdescriptors.h" // for MythCategoryType
+#include "channelutil.h" // for GetDefaultAuthority()
 
 #include "programinfo.h" // for subtitle types and audio and video properties
 
@@ -108,7 +109,7 @@ EITFixUp::EITFixUp()
 {
 }
 
-void EITFixUp::Fix(DBEvent &event) const
+void EITFixUp::Fix(DBEventEIT &event) const
 {
     if (event.fixup)
     {
@@ -164,6 +165,50 @@ void EITFixUp::Fix(DBEvent &event) const
         if (!event.description.isEmpty())
             event.description = event.description.trimmed();
     }
+
+    if (kFixGenericDVB & event.fixup)
+    {
+        event.programId = AddDVBEITAuthority(event.chanid, event.programId);
+        event.seriesId  = AddDVBEITAuthority(event.chanid, event.seriesId);
+    }
+}
+
+/**
+ *  This adds a DVB EIT default authority to series id or program id if 
+ *  one exists in the DB for that channel, otherwise it returns a blank
+ *  id instead of the id passed in.
+ *
+ *  If a series id or program id is a CRID URI, just keep important info
+ *  ID's are case insensitive, so lower case the whole id.
+ *  If there is no authority on the ID, add the default one.
+ *  If there is no default, return an empty id.
+ *
+ *  \param id The ID string to add the authority to.
+ *  \param query Object to use for SQL queries.
+ *
+ *  \return ID with the authority added or empty string if not a valid CRID.
+ */
+QString EITFixUp::AddDVBEITAuthority(uint chanid, const QString &id)
+{
+    if (id.isEmpty())
+        return id;
+
+    // CRIDs are not case sensitive, so change all to lower case
+    QString crid = id.toLower();
+
+    // remove "crid://"
+    if (crid.startsWith("crid://"))
+        crid.remove(0,7);
+
+    // if id is a CRID with authority, return it
+    if (crid.length() >= 1 && crid[0] != '/')
+        return crid;
+
+    QString authority = ChannelUtil::GetDefaultAuthority(chanid);
+    if (authority.isEmpty())
+        return ""; // no authority, not a valid CRID, return empty
+
+    return authority + crid;
 }
 
 /**
@@ -171,7 +216,7 @@ void EITFixUp::Fix(DBEvent &event) const
  *  \todo  deal with events that don't have eventype at the begining?
  *  \TODO
  */
-void EITFixUp::FixBellExpressVu(DBEvent &event) const
+void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
 {
     QString tmp = "";
 
@@ -301,10 +346,10 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
 
 }
 
-/** \fn EITFixUp::SetUKSubtitle(DBEvent&) const
+/** \fn EITFixUp::SetUKSubtitle(DBEventEIT&) const
  *  \brief Use this in the United Kingdom to standardize DVB-T guide.
  */
-void EITFixUp::SetUKSubtitle(DBEvent &event) const
+void EITFixUp::SetUKSubtitle(DBEventEIT &event) const
 {
     QStringList strListColon = event.description.split(":");
     QStringList strListEnd;
@@ -423,10 +468,10 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
 }
 
 
-/** \fn EITFixUp::FixUK(DBEvent&) const
+/** \fn EITFixUp::FixUK(DBEventEIT&) const
  *  \brief Use this in the United Kingdom to standardize DVB-T guide.
  */
-void EITFixUp::FixUK(DBEvent &event) const
+void EITFixUp::FixUK(DBEventEIT &event) const
 {
     int position1;
     int position2;
@@ -483,7 +528,7 @@ void EITFixUp::FixUK(DBEvent &event) const
         }
     }
     if (series)
-        event.category_type = kCategorySeries;
+        event.categoryType = kCategorySeries;
 
     QRegExp tmpStarring = m_ukStarring;
     if (tmpStarring.indexIn(event.description) != -1)
@@ -493,11 +538,13 @@ void EITFixUp::FixUK(DBEvent &event) const
         event.AddPerson(DBPerson::kActor, tmpStarring.cap(2));
         if (tmpStarring.cap(3).length() > 0)
         {
-            event.airdate = tmpStarring.cap(3);
             bool ok;
             uint y = tmpStarring.cap(3).toUInt(&ok);
             if (ok)
+            {
+                event.airdate = y;
                 event.originalairdate = QDate(y, 1, 1);
+            }
         }
     }
 
@@ -599,11 +646,13 @@ void EITFixUp::FixUK(DBEvent &event) const
         QString stmp = event.description;
         int     itmp = position1 + tmpUKYear.cap(0).length();
         event.description = stmp.left(position1) + stmp.mid(itmp);
-        event.airdate = tmpUKYear.cap(1);
         bool ok;
         uint y = tmpUKYear.cap(1).toUInt(&ok);
         if (ok)
+        {
+            event.airdate = y;
             event.originalairdate = QDate(y, 1, 1);
+        }
     }
 
     // Trim leading/trailing '.'
@@ -619,10 +668,10 @@ void EITFixUp::FixUK(DBEvent &event) const
     }
 }
 
-/** \fn EITFixUp::FixPBS(DBEvent&) const
+/** \fn EITFixUp::FixPBS(DBEventEIT&) const
  *  \brief Use this to standardize PBS ATSC guide in the USA.
  */
-void EITFixUp::FixPBS(DBEvent &event) const
+void EITFixUp::FixPBS(DBEventEIT &event) const
 {
     /* Used for PBS ATSC Subtitles are seperated by a colon */
     int position = event.description.indexOf(':');
@@ -637,7 +686,7 @@ void EITFixUp::FixPBS(DBEvent &event) const
 /**
  *  \brief Use this to standardize ComHem DVB-C service in Sweden.
  */
-void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
+void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
 {
     // Reverse what EITFixUp::Fix() did
     if (event.subtitle.isEmpty() && !event.description.isEmpty())
@@ -744,7 +793,10 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
         // Year
         if (list[4].length() > 0)
         {
-            event.airdate = list[4].trimmed();
+            bool ok;
+            uint y = list[4].trimmed().toUInt(&ok);
+            if (ok)
+                event.airdate = y;
         }
 
         // Actors
@@ -764,7 +816,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
     }
 
     if (isSeries)
-        event.category_type = kCategorySeries;
+        event.categoryType = kCategorySeries;
 
     // Look for additional persons in the description
     QRegExp tmpPersons = m_comHemPersons;
@@ -873,10 +925,10 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
     }
 }
 
-/** \fn EITFixUp::FixAUStar(DBEvent&) const
+/** \fn EITFixUp::FixAUStar(DBEventEIT&) const
  *  \brief Use this to standardize DVB-S guide in Australia.
  */
-void EITFixUp::FixAUStar(DBEvent &event) const
+void EITFixUp::FixAUStar(DBEventEIT &event) const
 {
     event.category = event.subtitle;
     /* Used for DVB-S Subtitles are seperated by a colon */
@@ -889,10 +941,10 @@ void EITFixUp::FixAUStar(DBEvent &event) const
     }
 }
 
-/** \fn EITFixUp::FixMCA(DBEvent&) const
+/** \fn EITFixUp::FixMCA(DBEventEIT&) const
  *  \brief Use this to standardise the MultiChoice Africa DVB-S guide.
  */
-void EITFixUp::FixMCA(DBEvent &event) const
+void EITFixUp::FixMCA(DBEventEIT &event) const
 {
     const uint SUBTITLE_PCT     = 60; //% of description to allow subtitle to
     const uint SUBTITLE_MAX_LEN = 128;// max length of subtitle field in db.
@@ -946,7 +998,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
         event.subtitle = tmpExp1.cap(3).trimmed();
         event.syndicatedepisodenumber =
                 QString("E%1S%2").arg(episode).arg(season);
-        event.category_type = kCategorySeries;
+        event.categoryType = kCategorySeries;
     }
 
     // Close captioned?
@@ -977,7 +1029,10 @@ void EITFixUp::FixMCA(DBEvent &event) const
     {
         isMovie = true;
         event.description = tmpExp1.cap(1).trimmed();
-        event.airdate     = tmpExp1.cap(2).trimmed();
+        bool ok;
+        uint y = tmpExp1.cap(2).trimmed().toUInt(&ok);
+        if (ok)
+            event.airdate = y;
         event.AddPerson(DBPerson::kDirector, tmpExp1.cap(3).trimmed());
     }
     else
@@ -989,7 +1044,10 @@ void EITFixUp::FixMCA(DBEvent &event) const
         {
             isMovie = true;
             event.description = tmpExp1.cap(1).trimmed();
-            event.airdate     = tmpExp1.cap(2).trimmed();
+            bool ok;
+            uint y = tmpExp1.cap(2).trimmed().toUInt(&ok);
+            if (ok)
+                event.airdate = y;
         }
     }
 
@@ -1006,15 +1064,15 @@ void EITFixUp::FixMCA(DBEvent &event) const
                 event.AddPerson(DBPerson::kActor, (*it).trimmed());
             event.description = tmpExp1.cap(1).trimmed();
         }
-        event.category_type = kCategoryMovie;
+        event.categoryType = kCategoryMovie;
     }
 
 }
 
-/** \fn EITFixUp::FixRTL(DBEvent&) const
+/** \fn EITFixUp::FixRTL(DBEventEIT&) const
  *  \brief Use this to standardise the RTL group guide in Germany.
  */
-void EITFixUp::FixRTL(DBEvent &event) const
+void EITFixUp::FixRTL(DBEventEIT &event) const
 {
     int        pos;
 
@@ -1116,10 +1174,10 @@ void EITFixUp::FixRTL(DBEvent &event) const
     }
 }
 
-/** \fn EITFixUp::FixFI(DBEvent&) const
+/** \fn EITFixUp::FixFI(DBEventEIT&) const
  *  \brief Use this to clean DVB-T guide in Finland.
  */
-void EITFixUp::FixFI(DBEvent &event) const
+void EITFixUp::FixFI(DBEventEIT &event) const
 {
     int position = event.description.indexOf(m_fiRerun);
     if (position != -1)
@@ -1144,11 +1202,11 @@ void EITFixUp::FixFI(DBEvent &event) const
     }
 }
 
-/** \fn EITFixUp::FixPremiere(DBEvent&) const
+/** \fn EITFixUp::FixPremiere(DBEventEIT&) const
  *  \brief Use this to standardize DVB-C guide in Germany
  *         for the providers Kabel Deutschland and Premiere.
  */
-void EITFixUp::FixPremiere(DBEvent &event) const
+void EITFixUp::FixPremiere(DBEventEIT &event) const
 {
     QString country = "";
 
@@ -1157,7 +1215,10 @@ void EITFixUp::FixPremiere(DBEvent &event) const
     if (tmpInfos.indexIn(event.description) != -1)
     {
         country = tmpInfos.cap(1).trimmed();
-        event.airdate = tmpInfos.cap(2);
+        bool ok;
+        uint y = tmpInfos.cap(2).toUInt(&ok);
+        if (ok)
+            event.airdate = y;
         event.AddPerson(DBPerson::kDirector, tmpInfos.cap(3));
         const QStringList actors = tmpInfos.cap(4).split(
             ", ", QString::SkipEmptyParts);
@@ -1176,10 +1237,10 @@ void EITFixUp::FixPremiere(DBEvent &event) const
     }
 }
 
-/** \fn EITFixUp::FixNL(DBEvent&) const
+/** \fn EITFixUp::FixNL(DBEventEIT&) const
  *  \brief Use this to standardize \@Home DVB-C guide in the Netherlands.
  */
-void EITFixUp::FixNL(DBEvent &event) const
+void EITFixUp::FixNL(DBEventEIT &event) const
 {
     QString fullinfo = "";
     fullinfo.append (event.subtitle);
@@ -1192,82 +1253,82 @@ void EITFixUp::FixNL(DBEvent &event) const
     if (event.category == "Documentary")
     {
         event.category = "Documentaire";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "News")
     {
         event.category = "Nieuws/actualiteiten";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Kids")
     {
         event.category = "Jeugd";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Show/game Show")
     {
         event.category = "Amusement";
-        event.category_type = kCategoryTVShow;
+        event.categoryType = kCategoryTVShow;
     }
     if (event.category == "Music/Ballet/Dance")
     {
         event.category = "Muziek";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "News magazine")
     {
         event.category = "Informatief";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Movie")
     {
         event.category = "Film";
-        event.category_type = kCategoryMovie;
+        event.categoryType = kCategoryMovie;
     }
     if (event.category == "Nature/animals/Environment")
     {
         event.category = "Natuur";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Movie - Adult")
     {
         event.category = "Erotiek";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Movie - Soap/melodrama/folkloric")
     {
         event.category = "Serie/soap";
-        event.category_type = kCategorySeries;
+        event.categoryType = kCategorySeries;
     }
     if (event.category == "Arts/Culture")
     {
         event.category = "Kunst/Cultuur";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Sports")
     {
         event.category = "Sport";
-        event.category_type = kCategorySports;
+        event.categoryType = kCategorySports;
     }
     if (event.category == "Cartoons/Puppets")
     {
         event.category = "Animatie";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Movie - Comedy")
     {
         event.category = "Comedy";
-        event.category_type = kCategorySeries;
+        event.categoryType = kCategorySeries;
     }
     if (event.category == "Movie - Detective/Thriller")
     {
         event.category = "Misdaad";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
     if (event.category == "Social/Spiritual Sciences")
     {
         event.category = "Religieus";
-        event.category_type = kCategoryNone;
+        event.categoryType = kCategoryNone;
     }
 
     // Get stereo info

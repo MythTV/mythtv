@@ -5,9 +5,9 @@
 #ifndef EITFIXUP_H
 #define EITFIXUP_H
 
-#include <qregexp.h>
+#include <QRegExp>
 
-#include "eit.h"
+#include "programdata.h"
 
 typedef QMap<uint,uint> QMap_uint_t;
 
@@ -53,7 +53,7 @@ class EITFixUp
 
     EITFixUp();
 
-    void Fix(DBEvent &event) const;
+    void Fix(DBEventEIT &event) const;
 
     /** Corrects starttime to the multiple of a minute. 
      *  Used for providers who fail to handle leap seconds timely. Changes the
@@ -69,17 +69,20 @@ class EITFixUp
     }
 
   private:
-    void FixBellExpressVu(DBEvent &event) const; // Canada DVB-S
-    void SetUKSubtitle(DBEvent &event) const;
-    void FixUK(DBEvent &event) const;            // UK DVB-T
-    void FixPBS(DBEvent &event) const;           // USA ATSC
-    void FixComHem(DBEvent &event, bool parse_subtitle) const; // Sweden DVB-C
-    void FixAUStar(DBEvent &event) const;        // Australia DVB-S
-    void FixMCA(DBEvent &event) const;        // MultiChoice Africa DVB-S
-    void FixRTL(DBEvent &event) const;        // RTL group DVB
-    void FixFI(DBEvent &event) const;            // Finland DVB-T
-    void FixPremiere(DBEvent &event) const;   // german pay-tv Premiere
-    void FixNL(DBEvent &event) const;            // Netherlands DVB-C
+    void FixBellExpressVu(DBEventEIT &event) const; // Canada DVB-S
+    void SetUKSubtitle(DBEventEIT &event) const;
+    void FixUK(DBEventEIT &event) const;            // UK DVB-T
+    void FixPBS(DBEventEIT &event) const;           // USA ATSC
+    void FixComHem(DBEventEIT &event,
+                   bool parse_subtitle) const;      // Sweden DVB-C
+    void FixAUStar(DBEventEIT &event) const;        // Australia DVB-S
+    void FixMCA(DBEventEIT &event) const;           // MultiChoice Africa DVB-S
+    void FixRTL(DBEventEIT &event) const;           // RTL group DVB
+    void FixFI(DBEventEIT &event) const;            // Finland DVB-T
+    void FixPremiere(DBEventEIT &event) const;      // german pay-tv Premiere
+    void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
+
+    static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
     const QRegExp m_bellYear;
     const QRegExp m_bellActors;

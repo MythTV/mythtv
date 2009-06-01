@@ -145,6 +145,7 @@ class MPUBLIC ChannelUtil
     static int     GetServiceVersion(int mplexid);
 
     // Misc gets
+    static QString GetDefaultAuthority(uint chanid);
     static QString GetIcon(uint chanid);
     static vector<uint> GetCardIDs(uint chanid);
     static QString GetUnknownCallsign(void);
@@ -169,6 +170,7 @@ class MPUBLIC ChannelUtil
 
     static DBChanList GetChannels(uint srcid, bool vis_only, 
                                   QString grp = "", int changrpid = -1);
+    static vector<uint> GetChanIDs(int sourceid = -1);
     static uint    GetChannelCount(int sourceid = -1);
     static void    SortChannels(DBChanList &list, const QString &order,
                                 bool eliminate_duplicates = false);
@@ -220,6 +222,11 @@ class MPUBLIC ChannelUtil
      * \param chanid primary key for channel record
      */
     static QString GetServiceName(int chanid);
+    /**
+     * \brief Returns the listings time offset in minutes for given channel.
+     * \param chanid primary key for channel record
+     */
+    static int     GetTimeOffset(int chanid);
     static int     GetSourceID(int mplexid);
     static uint    GetSourceIDForChannel(uint chanid);
     static int     GetInputID(int sourceid, int cardid);

@@ -14,7 +14,7 @@ class QDomElement;
 class XMLTVParser
 {
   public:
-    XMLTVParser() : isJapan(false) {}
+    XMLTVParser();
 
     ChanInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
     ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset);
@@ -25,6 +25,9 @@ class XMLTVParser
 
   public:
     bool isJapan;
+
+  private:
+    unsigned int current_year;
 };
 
 #endif // _XMLTVPARSER_H_

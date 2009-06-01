@@ -8,7 +8,6 @@
 using namespace std;
 
 // MythTV includes
-#include "eit.h"
 #include "eithelper.h"
 #include "eitfixup.h"
 #include "eitcache.h"
@@ -19,6 +18,7 @@ using namespace std;
 #include "dishdescriptors.h"
 #include "premieredescriptors.h"
 #include "util.h"
+#include "programdata.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
 
 #ifdef USING_MINGW
@@ -91,7 +91,7 @@ uint EITHelper::ProcessEvents(void)
     MSqlQuery query(MSqlQuery::InitCon());
     for (uint i = 0; (i < kChunkSize) && (i < db_events.size()); i++)
     {
-        DBEvent *event = db_events.dequeue();
+        DBEventEIT *event = db_events.dequeue();
         eitList_lock.unlock();
 
         eitfixup->Fix(*event);
@@ -402,14 +402,16 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
             EITFixUp::TimeFix(starttime);
         QDateTime endtime   = starttime.addSecs(eit->DurationInSeconds(i));
 
-        DBEvent *event = new DBEvent(chanid,
-                                     title,     subtitle,      description,
-                                     category,  category_type,
-                                     starttime, endtime,       fix,
-                                     subtitle_type,
-                                     audio_props,
-                                     video_props,
-                                     seriesId,  programId);
+        DBEventEIT *event = new DBEventEIT(
+            chanid,
+            title,     subtitle,      description,
+            category,  category_type,
+            starttime, endtime,       fix,
+            subtitle_type,
+            audio_props,
+            video_props,
+            seriesId,  programId);
+
         db_events.enqueue(event);
     }
 }
@@ -506,14 +508,16 @@ void EITHelper::AddEIT(const PremiereContentInformationTable *cit)
                 EITFixUp::TimeFix(starttime);
             QDateTime endtime   = starttime.addSecs(cit->DurationInSeconds());
 
-            DBEvent *event = new DBEvent(chanid,
-                                         title,     subtitle,      description,
-                                         category,  category_type,
-                                         starttime, endtime,       fix,
-                                         subtitle_type,
-                                         audio_props,
-                                         video_props,
-                                         "",  "");
+            DBEventEIT *event = new DBEventEIT(
+                chanid,
+                title,     subtitle,      description,
+                category,  category_type,
+                starttime, endtime,       fix,
+                subtitle_type,
+                audio_props,
+                video_props,
+                "",  "");
+
             db_events.enqueue(event);
         }
     }
@@ -577,10 +581,10 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     QString title = event.title, subtitle = ett;
     title.detach();
     subtitle.detach();
-    db_events.enqueue(new DBEvent(chanid, title, subtitle,
-                                  starttime, endtime,
-                                  fixup[atsc_key], subtitle_type,
-                                  audio_properties, video_properties));
+    db_events.enqueue(new DBEventEIT(chanid, title, subtitle,
+                                     starttime, endtime,
+                                     fixup[atsc_key], subtitle_type,
+                                     audio_properties, video_properties));
 }
 
 uint EITHelper::GetChanID(uint atsc_major, uint atsc_minor)

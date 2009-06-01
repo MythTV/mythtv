@@ -1,61 +1,938 @@
+// -*- Mode: c++ -*-
+
+// C++ includes
+#include <algorithm>
+using namespace std;
+
 // MythTV headers
+#include "channelutil.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "programinfo.h"
 #include "programdata.h"
+#include "dvbdescriptors.h"
 
-bool operator<(const ProgInfo &a, const ProgInfo &b)
+#define LOC      QString("ProgramData: ")
+#define LOC_WARN QString("ProgramData, Warning: ")
+#define LOC_ERR  QString("ProgramData, Error: ")
+
+static const char *roles[] =
 {
-    return (a.start < b.start);
+    "",
+    "actor",     "director",    "producer", "executive_producer",
+    "writer",    "guest_star",  "host",     "adapter",
+    "presenter", "commentator", "guest",
+};
+
+DBPerson::DBPerson(const DBPerson &other) :
+    role(other.role), name(other.name)
+{
+    name.detach();
 }
 
-bool operator>(const ProgInfo &a, const ProgInfo &b)
+DBPerson::DBPerson(Role _role, const QString &_name) :
+    role(_role), name(_name)
 {
-    return (a.start > b.start);
+    name.detach();
 }
 
-bool operator<=(const ProgInfo &a, const ProgInfo &b)
+DBPerson::DBPerson(const QString &_role, const QString &_name) :
+    role(kUnknown), name(_name)
 {
-    return (a.start <= b.start);
+    if (!_role.isEmpty())
+    {
+        for (uint i = 0; i < sizeof(roles) / sizeof(char *); i++)
+        {
+            if (_role == QString(roles[i]))
+                role = (Role) i;
+        }
+    }
+    name.detach();
 }
 
-static bool conflict(ProgInfo &a, ProgInfo &b)
+QString DBPerson::GetRole(void) const
 {
-    if ((a.start <= b.start && b.start < a.end) ||
-        (b.end <= a.end && a.start < b.end))
-        return true;
-    return false;
+    if ((role < kActor) || (role > kGuest))
+        return "guest";
+    return roles[role];
 }
 
-void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to)
+uint DBPerson::InsertDB(MSqlQuery &query, uint chanid,
+                        const QDateTime &starttime) const
 {
-    int secs;
-    QDateTime newFrom, newTo;
+    uint personid = GetPersonDB(query);
+    if (!personid && InsertPersonDB(query))
+        personid = GetPersonDB(query);
+
+    return InsertCreditsDB(query, personid, chanid, starttime);
+}
+
+uint DBPerson::GetPersonDB(MSqlQuery &query) const
+{
+    query.prepare(
+        "SELECT person "
+        "FROM people "
+        "WHERE name = :NAME");
+    query.bindValue(":NAME", name);
+
+    if (!query.exec())
+        MythDB::DBError("get_person", query);
+    else if (query.next())
+        return query.value(0).toUInt();
+
+    return 0;
+}
+
+uint DBPerson::InsertPersonDB(MSqlQuery &query) const
+{
+    query.prepare(
+        "INSERT IGNORE INTO people (name) "
+        "VALUES (:NAME);");
+    query.bindValue(":NAME", name);
+
+    if (query.exec())
+        return 1;
+
+    MythDB::DBError("insert_person", query);
+    return 0;
+}
+
+uint DBPerson::InsertCreditsDB(MSqlQuery &query, uint personid, uint chanid,
+                               const QDateTime &starttime) const
+{
+    if (!personid)
+        return 0;
+
+    query.prepare(
+        "REPLACE INTO credits "
+        "       ( person,  chanid,  starttime,  role) "
+        "VALUES (:PERSON, :CHANID, :STARTTIME, :ROLE) ");
+    query.bindValue(":PERSON",    personid);
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", starttime);
+    query.bindValue(":ROLE",      GetRole());
+
+    if (query.exec())
+        return 1;
+
+    MythDB::DBError("insert_credits", query);
+    return 0;
+}
+
+bool operator<(const DBEvent &a, const DBEvent &b)
+{
+    return (a.starttime < b.starttime);
+}
+
+bool operator>(const DBEvent &a, const DBEvent &b)
+{
+    return (a.starttime > b.starttime);
+}
+
+bool operator<=(const DBEvent &a, const DBEvent &b)
+{
+    return (a.starttime <= b.starttime);
+}
+
+DBEvent &DBEvent::operator=(const DBEvent &other)
+{
+    if (this == &other)
+        return *this;
+
+    title           = other.title;
+    subtitle        = other.subtitle;
+    description     = other.description;
+    category        = other.category;
+    starttime       = other.starttime;
+    endtime         = other.endtime;
+    airdate         = other.airdate;
+    originalairdate = other.originalairdate;
+
+    if (credits != other.credits)
+    {
+        if (credits)
+        {
+            delete credits;
+            credits = NULL;
+        }
+
+        if (other.credits)
+        {
+            credits = new DBCredits;
+            credits->insert(credits->end(),
+                            other.credits->begin(),
+                            other.credits->end());
+        }
+    }
+
+    partnumber      = other.partnumber;
+    parttotal       = other.parttotal;
+    syndicatedepisodenumber = other.syndicatedepisodenumber;
+    subtitleType    = other.subtitleType;
+    audioProps      = other.audioProps;
+    videoProps      = other.videoProps;
+    categoryType    = other.categoryType;
+    seriesId        = other.seriesId;
+    programId       = other.programId;
+    previouslyshown = other.previouslyshown;
+
+    Squeeze();
+
+    return *this;
+}
+
+static void squeeze_str(QString &str)
+{
+    if (str.isEmpty())
+        str = QString::null;
+    else
+    {
+        str.detach();
+        str.squeeze();
+    }
+}
+
+void DBEvent::Squeeze(void)
+{
+    squeeze_str(title);
+    squeeze_str(subtitle);
+    squeeze_str(description);
+    squeeze_str(category);
+    squeeze_str(syndicatedepisodenumber);
+    squeeze_str(seriesId);
+    squeeze_str(programId);
+}
+
+void DBEvent::AddPerson(DBPerson::Role role, const QString &name)
+{
+    if (!credits)
+        credits = new DBCredits;
+
+    credits->push_back(DBPerson(role, name));
+}
+
+void DBEvent::AddPerson(const QString &role, const QString &name)
+{
+    if (!credits)
+        credits = new DBCredits;
+
+    credits->push_back(DBPerson(role, name));
+}
+
+bool DBEvent::HasTimeConflict(const DBEvent &o) const
+{
+    return ((starttime <= o.starttime && o.starttime < endtime) ||
+            (o.endtime <= endtime     && starttime   < o.endtime));
+}
+
+uint DBEvent::UpdateDB(
+    MSqlQuery &query, uint chanid, int match_threshold) const
+{
+    vector<DBEvent> programs;
+    uint count = GetOverlappingPrograms(query, chanid, programs);
+    int  match = INT_MIN;
+    int  i     = -1;
+
+    if (!count)
+        return InsertDB(query, chanid);
+
+    // move overlapping programs out of the way and update existing if possible
+    match = GetMatch(programs, i);
+
+    if (match >= match_threshold)
+    {
+        VERBOSE(VB_EIT | VB_EXTRA, QString("EIT: accept match[%1]: %2 '%3' "
+                                           "vs. '%4'")
+                .arg(i).arg(match).arg(title).arg(programs[i].title));
+        return UpdateDB(query, chanid, programs, i);
+    }
+    else
+    {
+        if (i >= 0)
+        {
+            VERBOSE(VB_EIT, QString("EIT: reject match[%1]: %2 '%3' vs. '%4'")
+                    .arg(i).arg(match).arg(title).arg(programs[i].title));
+        }
+        return UpdateDB(query, chanid, programs, -1);
+    }
+}
+
+uint DBEvent::GetOverlappingPrograms(
+    MSqlQuery &query, uint chanid, vector<DBEvent> &programs) const
+{
+    uint count = 0;
+    query.prepare(
+        "SELECT title,          subtitle,      description, "
+        "       category,       category_type, "
+        "       starttime,      endtime, "
+        "       subtitletypes+0,audioprop+0,   videoprop+0, "
+        "       seriesid,       programid, "
+        "       partnumber,     parttotal, "
+        "       syndicatedepisodenumber, "
+        "       airdate,        originalairdate, "
+        "       previouslyshown,listingsource "
+        "FROM program "
+        "WHERE chanid   = :CHANID AND "
+        "      manualid = 0       AND "
+        "      ( ( starttime >= :STIME1 AND starttime <  :ETIME1 ) OR "
+        "        ( endtime   >  :STIME2 AND endtime   <= :ETIME2 ) )");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STIME1", starttime);
+    query.bindValue(":ETIME1", endtime);
+    query.bindValue(":STIME2", starttime);
+    query.bindValue(":ETIME2", endtime);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetOverlappingPrograms 1", query);
+        return 0;
+    }
+
+    while (query.next())
+    {
+        MythCategoryType category_type =
+            string_to_myth_category_type(query.value(4).toString());
+
+        DBEvent prog(
+            query.value(0).toString(),
+            query.value(1).toString(),
+            query.value(2).toString(),
+            query.value(3).toString(),
+            category_type,
+            query.value(5).toDateTime(), query.value(6).toDateTime(),
+            query.value(7).toUInt(),
+            query.value(8).toUInt(),
+            query.value(9).toUInt(),
+            query.value(10).toString(),
+            query.value(11).toString(),
+            query.value(18).toUInt());
+
+        prog.partnumber = query.value(12).toUInt();
+        prog.parttotal  = query.value(13).toUInt();
+        prog.syndicatedepisodenumber = query.value(14).toString();
+        prog.airdate    = query.value(15).toUInt();
+        prog.originalairdate  = query.value(16).toDate();
+        prog.previouslyshown  = query.value(17).toBool();
+        ;
+
+        programs.push_back(prog);
+        count++;
+    }
+
+    return count;
+}
+
+
+static int score_words(const QStringList &al, const QStringList &bl)
+{
+    QStringList::const_iterator ait = al.begin();
+    QStringList::const_iterator bit = bl.begin();
+    int score = 0;
+    for (; (ait != al.end()) && (bit != bl.end()); ait++)
+    {
+        QStringList::const_iterator bit2 = bit;
+        int dist = 0;
+        int bscore = 0;
+        for (; bit2 != bl.end(); bit2++)
+        {
+            if (*ait == *bit)
+            {
+                bscore = max(1000, 2000 - (dist * 500));
+                // lower score for short words
+                if (ait->length() < 5)
+                    bscore /= 5 - ait->length();
+                break;
+            }
+            dist++;
+        }
+        if (bscore && dist < 3)
+        {
+            for (int i = 0; (i < dist) && bit != bl.end(); i++)
+                bit++;
+        }
+        score += bscore;
+    }
+
+    return score / al.size();
+}
+
+static int score_match(const QString &a, const QString &b)
+{
+    if (a.isEmpty() || b.isEmpty())
+        return 0;
+    else if (a == b)
+        return 1000;
+
+    QString A = a.simplified().toUpper();
+    QString B = b.simplified().toUpper();
+    if (A == B)
+        return 1000;
+
+    QStringList al, bl;
+    al = A.split(" ", QString::SkipEmptyParts);
+    if (!al.size())
+        return 0;
+
+    bl = B.split(" ", QString::SkipEmptyParts);
+    if (!bl.size())
+        return 0;
+
+    // score words symmetrically
+    int score = (score_words(al, bl) + score_words(bl, al)) / 2;
+
+    return min(900, score);
+}
+
+int DBEvent::GetMatch(const vector<DBEvent> &programs, int &bestmatch) const
+{
+    bestmatch = -1;
+    int match_val = INT_MIN;
+    int overlap = 0;
+    int duration = starttime.secsTo(endtime);
+
+    for (uint i = 0; i < programs.size(); i++)
+    {
+        int mv = 0;
+        int duration_loop = programs[i].starttime.secsTo(programs[i].endtime);
+
+        mv -= abs(starttime.secsTo(programs[i].starttime));
+        mv -= abs(endtime.secsTo(programs[i].endtime));
+        mv -= abs(duration - duration_loop);
+        mv += score_match(title, programs[i].title) * 10;
+        mv += score_match(subtitle, programs[i].subtitle);
+        mv += score_match(description, programs[i].description);
+
+        /* determine overlap of both programs
+         * we don't know which one starts first */
+        if (starttime < programs[i].starttime)
+            overlap = programs[i].starttime.secsTo(endtime);
+        else if (starttime > programs[i].starttime)
+            overlap = starttime.secsTo(programs[i].endtime);
+        else
+        {
+            if (endtime <= programs[i].endtime)
+                overlap = starttime.secsTo(endtime);
+            else
+                overlap = starttime.secsTo(programs[i].endtime);
+        }
+
+        /* scale the score depending on the overlap length
+         * full score is preserved if the overlap is at least 1/2 of the length
+         * of the shorter program */
+        if (overlap > 0)
+        {
+            /* crappy providers apparently have events without duration
+             * ensure that the minimal duration is 2 second to avoid
+             * muliplying and more importantly dividing by zero */
+            int min_dur = max(2, min(duration, duration_loop));
+            overlap = min(overlap, min_dur/2);
+            mv *= overlap * 2;
+            mv /= min_dur;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("Unexpected result: shows don't "
+                                  "overlap\n\t%1: %2 - %3\n\t%4: %5 - %6")
+                    .arg(title.left(30), 30)
+                    .arg(starttime.toString(Qt::ISODate))
+                    .arg(endtime.toString(Qt::ISODate))
+                    .arg(programs[i].title.left(30), 30)
+                    .arg(programs[i].starttime.toString(Qt::ISODate))
+                    .arg(programs[i].endtime.toString(Qt::ISODate))
+                );
+        }
+
+        if (mv > match_val)
+        {
+            VERBOSE(VB_EIT, QString("GM : %1 new best match %2 with score %3").arg(title.left(25))
+                    .arg(programs[i].title.left(25)).arg(mv));
+            bestmatch = i;
+            match_val = mv;
+        }
+    }
+
+    return match_val;
+}
+
+uint DBEvent::UpdateDB(
+    MSqlQuery &q, uint chanid, const vector<DBEvent> &p, int match) const
+{
+    // adjust/delete overlaps;
+    bool ok = true;
+    for (uint i = 0; i < p.size(); i++)
+    {
+        if (i != (uint)match)
+            ok &= MoveOutOfTheWayDB(q, chanid, p[i]);
+    }
+
+    // if we failed to move programs out of the way, don't insert new ones..
+    if (!ok)
+        return 0;
+
+    // if no match, insert current item
+    if ((match < 0) || ((uint)match >= p.size()))
+        return InsertDB(q, chanid);
+
+    // update matched item with current data
+    return UpdateDB(q, chanid, p[match]);
+}
+
+uint DBEvent::UpdateDB(
+    MSqlQuery &query, uint chanid, const DBEvent &match) const
+{
+    QString  ltitle     = title;
+    QString  lsubtitle  = subtitle;
+    QString  ldesc      = description;
+    QString  lcategory  = category;
+    uint16_t lairdate   = airdate;
+    QString  lprogramId = programId;
+    QString  lseriesId  = seriesId;
+    QDate loriginalairdate = originalairdate;
+
+    if (match.title.length() >= ltitle.length())
+        ltitle = match.title;
+
+    if (match.subtitle.length() >= lsubtitle.length())
+        lsubtitle = match.subtitle;
+
+    if (match.description.length() >= ldesc.length())
+        ldesc = match.description;
+
+    if (lcategory.isEmpty() && !match.category.isEmpty())
+        lcategory = match.category;
+
+    if (!lairdate && !match.airdate)
+        lairdate = match.airdate;
+
+    if (!loriginalairdate.isValid() && match.originalairdate.isValid())
+        loriginalairdate = match.originalairdate;
+
+    if (lprogramId.isEmpty() && !match.programId.isEmpty())
+        lprogramId = match.programId;
+
+    if (lseriesId.isEmpty() && !match.seriesId.isEmpty())
+        lseriesId = match.seriesId;
+
+    uint tmp = categoryType;
+    if (!categoryType && match.categoryType)
+        tmp = match.categoryType;
+
+    QString lcattype = myth_category_type_to_string(tmp);
+
+    unsigned char lsubtype = subtitleType | match.subtitleType;
+    unsigned char laudio   = audioProps   | match.audioProps;
+    unsigned char lvideo   = videoProps   | match.videoProps;
+
+    uint lpartnumber =
+        (!partnumber && match.partnumber) ? match.partnumber : partnumber;
+    uint lparttotal =
+        (!parttotal  && match.parttotal ) ? match.parttotal  : parttotal;
+
+    bool lpreviouslyshown = previouslyshown | match.previouslyshown;
+
+    uint32_t llistingsource = listingsource | match.listingsource;
+
+    QString lsyndicatedepisodenumber = syndicatedepisodenumber;
+    if (lsyndicatedepisodenumber.isEmpty() &&
+        !match.syndicatedepisodenumber.isEmpty())
+        lsyndicatedepisodenumber = match.syndicatedepisodenumber;
+
+    query.prepare(
+        "UPDATE program "
+        "SET title          = :TITLE,     subtitle      = :SUBTITLE, "
+        "    description    = :DESC, "
+        "    category       = :CATEGORY,  category_type = :CATTYPE, "
+        "    starttime      = :STARTTIME, endtime       = :ENDTIME, "
+        "    closecaptioned = :CC,        subtitled     = :HASSUBTITLES, "
+        "    stereo         = :STEREO,    hdtv          = :HDTV, "
+        "    subtitletypes  = :SUBTYPE, "
+        "    audioprop      = :AUDIOPROP, videoprop     = :VIDEOPROP, "
+        "    partnumber     = :PARTNO,    parttotal     = :PARTTOTAL, "
+        "    syndicatedepisodenumber = :SYNDICATENO, "
+        "    airdate        = :AIRDATE,   originalairdate=:ORIGAIRDATE, "
+        "    listingsource  = :LSOURCE, "
+        "    seriesid       = :SERIESID,  programid     = :PROGRAMID, "
+        "    previouslyshown = :PREVSHOWN "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :OLDSTART ");
+
+    query.bindValue(":CHANID",      chanid);
+    query.bindValue(":OLDSTART",    match.starttime);
+    query.bindValue(":TITLE",       ltitle);
+    query.bindValue(":SUBTITLE",    lsubtitle);
+    query.bindValue(":DESC",        ldesc);
+    query.bindValue(":CATEGORY",    lcategory);
+    query.bindValue(":CATTYPE",     lcattype);
+    query.bindValue(":STARTTIME",   starttime);
+    query.bindValue(":ENDTIME",     endtime);
+    query.bindValue(":CC",          lsubtype & SUB_HARDHEAR ? true : false);
+    query.bindValue(":HASSUBTITLES",lsubtype & SUB_NORMAL   ? true : false);
+    query.bindValue(":STEREO",      laudio   & AUD_STEREO   ? true : false);
+    query.bindValue(":HDTV",        lvideo   & VID_HDTV     ? true : false);
+    query.bindValue(":SUBTYPE",     lsubtype);
+    query.bindValue(":AUDIOPROP",   laudio);
+    query.bindValue(":VIDEOPROP",   lvideo);
+    query.bindValue(":PARTNO",      lpartnumber);
+    query.bindValue(":PARTTOTAL",   lparttotal);
+    query.bindValue(":SYNDICATENO", lsyndicatedepisodenumber);
+    query.bindValue(":AIRDATE",     lairdate?QString::number(lairdate):"0000");
+    query.bindValue(":ORIGAIRDATE", loriginalairdate);
+    query.bindValue(":LSOURCE",     llistingsource);
+    query.bindValue(":SERIESID",    lseriesId);
+    query.bindValue(":PROGRAMID",   lprogramId);
+    query.bindValue(":PREVSHOWN",   lpreviouslyshown);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("InsertDB", query);
+        return 0;
+    }
+
+    if (credits)
+    {
+        for (uint i = 0; i < credits->size(); i++)
+            (*credits)[i].InsertDB(query, chanid, starttime);
+    }
+
+    return 1;
+}
+
+static bool delete_program(MSqlQuery &query, uint chanid, const QDateTime &st)
+{
+    query.prepare(
+        "DELETE from program "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", st);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("delete_program", query);
+        return false;
+    }
+
+    query.prepare(
+        "DELETE from credits "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", st);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("delete_credits", query);
+        return false;
+    }
+
+    return true;
+}
+
+static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
+                           const QDateTime &new_st, const QDateTime &new_end)
+{
+    query.prepare(
+        "UPDATE program "
+        "SET starttime = :NEWSTART, "
+        "    endtime   = :NEWEND "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :OLDSTART");
+
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":OLDSTART", st);
+    query.bindValue(":NEWSTART", new_st);
+    query.bindValue(":NEWEND",   new_end);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("change_program", query);
+        return false;
+    }
+
+    query.prepare(
+        "UPDATE credits "
+        "SET starttime = :NEWSTART "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :OLDSTART");
+
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":OLDSTART", st);
+    query.bindValue(":NEWSTART", new_st);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("change_credits", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool DBEvent::MoveOutOfTheWayDB(
+    MSqlQuery &query, uint chanid, const DBEvent &prog) const
+{
+    if (prog.starttime >= starttime && prog.endtime <= endtime)
+    {
+        // inside current program
+        return delete_program(query, chanid, prog.starttime);
+    }
+    else if (prog.starttime < starttime && prog.endtime > starttime)
+    {
+        // starts before, but ends during our program
+        return change_program(query, chanid, prog.starttime,
+                              prog.starttime, starttime);
+    }
+    else if (prog.starttime < endtime && prog.endtime > endtime)
+    {
+        // starts during, but ends after our program
+        return change_program(query, chanid, prog.starttime,
+                              endtime, prog.endtime);
+    }
+    // must be non-conflicting...
+    return true;
+}
+
+uint DBEvent::InsertDB(MSqlQuery &query, uint chanid) const
+{
+    query.prepare(
+        "REPLACE INTO program ("
+        "  chanid,         title,          subtitle,        description, "
+        "  category,       category_type, "
+        "  starttime,      endtime, "
+        "  closecaptioned, stereo,         hdtv,            subtitled, "
+        "  subtitletypes,  audioprop,      videoprop, "
+        "  partnumber,     parttotal, "
+        "  syndicatedepisodenumber, "
+        "  airdate,        originalairdate,listingsource, "
+        "  seriesid,       programid,      previouslyshown ) "
+        "VALUES ("
+        " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
+        " :CATEGORY,      :CATTYPE, "
+        " :STARTTIME,     :ENDTIME, "
+        " :CC,            :STEREO,        :HDTV,           :HASSUBTITLES, "
+        " :SUBTYPES,      :AUDIOPROP,     :VIDEOPROP, "
+        " :PARTNUMBER,    :PARTTOTAL, "
+        " :SYNDICATENO, "
+        " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
+        " :SERIESID,      :PROGRAMID,     :PREVSHOWN) ");
+
+    QString cattype = myth_category_type_to_string(categoryType);
+
+    query.bindValue(":CHANID",      chanid);
+    query.bindValue(":TITLE",       title);
+    query.bindValue(":SUBTITLE",    subtitle);
+    query.bindValue(":DESCRIPTION", description);
+    query.bindValue(":CATEGORY",    category);
+    query.bindValue(":CATTYPE",     cattype);
+    query.bindValue(":STARTTIME",   starttime);
+    query.bindValue(":ENDTIME",     endtime);
+    query.bindValue(":CC",          subtitleType & SUB_HARDHEAR ? true : false);
+    query.bindValue(":STEREO",      audioProps   & AUD_STEREO   ? true : false);
+    query.bindValue(":HDTV",        videoProps   & VID_HDTV     ? true : false);
+    query.bindValue(":HASSUBTITLES",subtitleType & SUB_NORMAL   ? true : false);
+    query.bindValue(":SUBTYPES",    subtitleType);
+    query.bindValue(":AUDIOPROP",   audioProps);
+    query.bindValue(":VIDEOPROP",   videoProps);
+    query.bindValue(":PARTNUMBER",  partnumber);
+    query.bindValue(":PARTTOTAL",   parttotal);
+    query.bindValue(":SYNDICATENO", syndicatedepisodenumber);
+    query.bindValue(":AIRDATE",     airdate ? QString::number(airdate):"0000");
+    query.bindValue(":ORIGAIRDATE", originalairdate);
+    query.bindValue(":LSOURCE",     listingsource);
+    query.bindValue(":SERIESID",    seriesId);
+    query.bindValue(":PROGRAMID",   programId);
+    query.bindValue(":PREVSHOWN",   previouslyshown);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("InsertDB", query);
+        return 0;
+    }
+
+    if (credits)
+    {
+        for (uint i = 0; i < credits->size(); i++)
+            (*credits)[i].InsertDB(query, chanid, starttime);
+    }
+
+    return 1;
+}
+
+ProgInfo::ProgInfo(const ProgInfo &other) :
+    DBEvent(other.listingsource)
+{
+    *this = other;
+}
+
+ProgInfo &ProgInfo::operator=(const ProgInfo &other)
+{
+    if (this == &other)
+        return *this;
+
+    *((DBEvent*)(this)) = other;
+
+    channel         = other.channel;
+    startts         = other.startts;
+    endts           = other.endts;
+    stars           = other.stars;
+    title_pronounce = other.title_pronounce;
+    showtype        = other.showtype;
+    colorcode       = other.colorcode;
+    clumpidx        = other.clumpidx;
+    clumpmax        = other.clumpmax;
+    content         = other.content;
+    ratings         = other.ratings;
+
+    squeeze_str(channel);
+    squeeze_str(startts);
+    squeeze_str(endts);
+    squeeze_str(stars);
+    squeeze_str(title_pronounce);
+    squeeze_str(showtype);
+    squeeze_str(colorcode);
+    squeeze_str(clumpidx);
+    squeeze_str(clumpmax);
+    squeeze_str(content);
+
+    return *this;
+}
+
+void ProgInfo::Squeeze(void)
+{
+    DBEvent::Squeeze();
+    squeeze_str(channel);
+    squeeze_str(startts);
+    squeeze_str(endts);
+    squeeze_str(stars);
+    squeeze_str(title_pronounce);
+    squeeze_str(showtype);
+    squeeze_str(colorcode);
+    squeeze_str(clumpidx);
+    squeeze_str(clumpmax);
+    squeeze_str(content);
+}
+
+uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
+{
+    VERBOSE(VB_XMLTV,
+            QString("Inserting new program    : %1 - %2 %3 %4")
+            .arg(starttime.toString(Qt::ISODate))
+            .arg(endtime.toString(Qt::ISODate))
+            .arg(channel)
+            .arg(title));
+
+    query.prepare(
+        "REPLACE INTO program ("
+        "  chanid,         title,          subtitle,        description, "
+        "  category,       category_type,  "
+        "  starttime,      endtime, "
+        "  closecaptioned, stereo,         hdtv,            subtitled, "
+        "  subtitletypes,  audioprop,      videoprop, "
+        "  partnumber,     parttotal, "
+        "  syndicatedepisodenumber, "
+        "  airdate,        originalairdate,listingsource, "
+        "  seriesid,       programid,      previouslyshown, "
+        "  stars,          showtype,       title_pronounce, colorcode ) "
+
+        "VALUES("
+        " :CHANID,        :TITLE,         :SUBTITLE,       :DESCRIPTION, "
+        " :CATEGORY,      :CATTYPE,       "
+        " :STARTTIME,     :ENDTIME, "
+        " :CC,            :STEREO,        :HDTV,           :HASSUBTITLES, "
+        " :SUBTYPES,      :AUDIOPROP,     :VIDEOPROP, "
+        " :PARTNUMBER,    :PARTTOTAL, "
+        " :SYNDICATENO, "
+        " :AIRDATE,       :ORIGAIRDATE,   :LSOURCE, "
+        " :SERIESID,      :PROGRAMID,     :PREVSHOWN, "
+        " :STARS,         :SHOWTYPE,      :TITLEPRON,      :COLORCODE)");
+
+    QString cattype = myth_category_type_to_string(categoryType);
+
+    query.bindValue(":CHANID",      chanid);
+    query.bindValue(":TITLE",       title);
+    query.bindValue(":SUBTITLE",    subtitle);
+    query.bindValue(":DESCRIPTION", description);
+    query.bindValue(":CATEGORY",    category);
+    query.bindValue(":CATTYPE",     cattype);
+    query.bindValue(":STARTTIME",   starttime);
+    query.bindValue(":ENDTIME",     endtime);
+    query.bindValue(":CC",
+                    subtitleType & SUB_HARDHEAR ? true : false);
+    query.bindValue(":STEREO",
+                    audioProps   & AUD_STEREO   ? true : false);
+    query.bindValue(":HDTV",
+                    videoProps   & VID_HDTV     ? true : false);
+    query.bindValue(":HASSUBTITLES",
+                    subtitleType & SUB_NORMAL   ? true : false);
+    query.bindValue(":SUBTYPES",    subtitleType);
+    query.bindValue(":AUDIOPROP",   audioProps);
+    query.bindValue(":VIDEOPROP",   videoProps);
+    query.bindValue(":PARTNUMBER",  partnumber);
+    query.bindValue(":PARTTOTAL",   parttotal);
+    query.bindValue(":SYNDICATENO", syndicatedepisodenumber);
+    query.bindValue(":AIRDATE",     airdate ? QString::number(airdate):"0000");
+    query.bindValue(":ORIGAIRDATE", originalairdate);
+    query.bindValue(":LSOURCE",     listingsource);
+    query.bindValue(":SERIESID",    seriesId);
+    query.bindValue(":PROGRAMID",   programId);
+    query.bindValue(":PREVSHOWN",   previouslyshown);
+    query.bindValue(":STARS",       stars);
+    query.bindValue(":SHOWTYPE",    showtype);
+    query.bindValue(":TITLEPRON",   title_pronounce);
+    query.bindValue(":COLORCODE",   colorcode);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("program insert", query);
+        return 0;
+    }
+
+    QList<ProgRating>::const_iterator j = ratings.begin();
+    for (; j != ratings.end(); j++)
+    {
+        query.prepare(
+            "INSERT INTO programrating "
+            "       ( chanid, starttime, system, rating) "
+            "VALUES (:CHANID, :START,    :SYS,  :RATING)");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":START",  starttime);
+        query.bindValue(":SYS",    (*j).system);
+        query.bindValue(":RATING", (*j).rating);
+
+        if (!query.exec())
+            MythDB::DBError("programrating insert", query);
+    }
+
+    if (credits)
+    {
+        for (uint i = 0; i < credits->size(); i++)
+            (*credits)[i].InsertDB(query, chanid, starttime);
+    }
+
+    return 1;
+}
+
+bool ProgramData::ClearDataByChannel(
+    uint chanid, const QDateTime &from, const QDateTime &to,
+    bool use_channel_time_offset)
+{
+    int secs = 0;
+    if (use_channel_time_offset)
+        secs = ChannelUtil::GetTimeOffset(chanid) * 60;
+
+    QDateTime newFrom = from.addSecs(secs);
+    QDateTime newTo   = to.addSecs(secs);
 
     MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT tmoffset FROM channel where chanid = :CHANID ;");
-    query.bindValue(":CHANID", chanid);
-    query.exec();
-    if (!query.isActive() || query.size() != 1)
-    {
-        MythDB::DBError("clearDataByChannel", query);
-        return;
-    }
-    query.next();
-    secs = query.value(0).toInt();
-
-    secs *= 60;
-    newFrom = from.addSecs(secs);
-    newTo = to.addSecs(secs);
-
     query.prepare("DELETE FROM program "
                   "WHERE starttime >= :FROM AND starttime < :TO "
                   "AND chanid = :CHANID ;");
     query.bindValue(":FROM", newFrom);
     query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
-    query.exec();
+    bool ok = query.exec();
 
     query.prepare("DELETE FROM programrating "
                   "WHERE starttime >= :FROM AND starttime < :TO "
@@ -63,7 +940,7 @@ void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to)
     query.bindValue(":FROM", newFrom);
     query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
-    query.exec();
+    ok &= query.exec();
 
     query.prepare("DELETE FROM credits "
                   "WHERE starttime >= :FROM AND starttime < :TO "
@@ -71,7 +948,7 @@ void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to)
     query.bindValue(":FROM", newFrom);
     query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
-    query.exec();
+    ok &= query.exec();
 
     query.prepare("DELETE FROM programgenres "
                   "WHERE starttime >= :FROM AND starttime < :TO "
@@ -79,399 +956,166 @@ void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to)
     query.bindValue(":FROM", newFrom);
     query.bindValue(":TO", newTo);
     query.bindValue(":CHANID", chanid);
-    query.exec();
+    ok &= query.exec();
+
+    return ok;
 }
 
-void ProgramData::clearDataBySource(int sourceid, QDateTime from, QDateTime to)
+bool ProgramData::ClearDataBySource(
+    uint sourceid, const QDateTime &from, const QDateTime &to,
+    bool use_channel_time_offset)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid FROM channel WHERE "
-                  "sourceid = :SOURCE ;");
-    query.bindValue(":SOURCE", sourceid);
+    vector<uint> chanids = ChannelUtil::GetChanIDs(sourceid);
 
-    if (!query.exec())
-        MythDB::DBError("Selecting channels per source", query);
+    bool ok = true;
+    for (uint i = 0; i < chanids.size(); i++)
+        ok &= ClearDataByChannel(chanids[i], from, to, use_channel_time_offset);
 
-    if (query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            int chanid = query.value(0).toInt();
-            clearDataByChannel(chanid, from, to);
-        }
-    }
+    return ok;
 }
 
-void ProgramData::fixProgramList(QList<ProgInfo> *fixlist)
+bool start_time_less_than(const DBEvent *a, const DBEvent *b)
 {
-    qSort(fixlist->begin(), fixlist->end());
+    return (a->starttime < b->starttime);
+}
 
-    QList<ProgInfo>::iterator i = fixlist->begin();
-    QList<ProgInfo>::iterator cur;
+void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
+{
+    qStableSort(fixlist.begin(), fixlist.end(), start_time_less_than);
+
+    QList<ProgInfo*>::iterator it = fixlist.begin();
     while (1)
     {
-        cur = i;
-        i++;
+        QList<ProgInfo*>::iterator cur = it;
+        ++it;
+
         // fill in miss stop times
-        if ((*cur).endts == "" || (*cur).startts > (*cur).endts)
+        if ((*cur)->endts == "" || (*cur)->startts > (*cur)->endts)
         {
-            if (i != fixlist->end())
+            if (it != fixlist.end())
             {
-                (*cur).endts = (*i).startts;
-                (*cur).end = (*i).start;
+                (*cur)->endts   = (*it)->startts;
+                (*cur)->endtime = (*it)->starttime;
             }
             else
             {
-                (*cur).end = (*cur).start;
-                if ((*cur).end < QDateTime((*cur).end.date(), QTime(6, 0)))
+                (*cur)->endtime = (*cur)->starttime;
+                if ((*cur)->endtime < QDateTime((*cur)->endtime.date(), QTime(6, 0)))
                 {
-                    (*cur).end.setTime(QTime(6, 0));
+                    (*cur)->endtime.setTime(QTime(6, 0));
                 }
                 else
                 {
-                   (*cur).end.setTime(QTime(0, 0));
-                   (*cur).end.setDate((*cur).end.date().addDays(1));
+                   (*cur)->endtime.setTime(QTime(0, 0));
+                   (*cur)->endtime.setDate((*cur)->endtime.date().addDays(1));
                 }
 
-                QString    datestr = (*cur).end.toString("yyyyMMddhhmmss");
+                QString    datestr = (*cur)->endtime.toString("yyyyMMddhhmmss");
                 QByteArray datearr = datestr.toAscii();
-                (*cur).endts = QString(datearr.constData());
+                (*cur)->endts = QString(datearr.constData());
             }
         }
-        if (i == fixlist->end())
-            break;
-        // remove overlapping programs
-        if (conflict(*cur, *i))
-        {
-            QList<ProgInfo>::iterator tokeep, todelete;
 
-            if ((*cur).end <= (*cur).start)
-                tokeep = i, todelete = cur;
-            else if ((*i).end <= (*i).start)
-                tokeep = cur, todelete = i;
-            else if ((*cur).subtitle != "" && (*i).subtitle == "")
-                tokeep = cur, todelete = i;
-            else if ((*i).subtitle != "" && (*cur).subtitle == "")
-                tokeep = i, todelete = cur;
-            else if ((*cur).desc != "" && (*i).desc == "")
-                tokeep = cur, todelete = i;
-            else if ((*i).desc != "" && (*cur).desc == "")
-                tokeep = i, todelete = cur;
+        if (it == fixlist.end())
+            break;
+
+        // remove overlapping programs
+        if ((*cur)->HasTimeConflict(**it))
+        {
+            QList<ProgInfo*>::iterator tokeep, todelete;
+
+            if ((*cur)->endtime <= (*cur)->starttime)
+                tokeep = it, todelete = cur;
+            else if ((*it)->endtime <= (*it)->starttime)
+                tokeep = cur, todelete = it;
+            else if (!(*cur)->subtitle.isEmpty() &&
+                     (*it)->subtitle.isEmpty())
+                tokeep = cur, todelete = it;
+            else if (!(*it)->subtitle.isEmpty()  &&
+                     (*cur)->subtitle.isEmpty())
+                tokeep = it, todelete = cur;
+            else if (!(*cur)->description.isEmpty() &&
+                     (*it)->description.isEmpty())
+                tokeep = cur, todelete = it;
+            else if (!(*it)->description.isEmpty() &&
+                     (*cur)->description.isEmpty())
+                tokeep = it, todelete = cur;
             else
-                tokeep = i, todelete = cur;
+                tokeep = it, todelete = cur;
 
 
             VERBOSE(VB_XMLTV,
                 QString("Removing conflicting program: %1 - %2 %3 %4")
-                    .arg((*todelete).start.toString(Qt::ISODate))
-                    .arg((*todelete).end.toString(Qt::ISODate))
-                    .arg((*todelete).channel)
-                    .arg((*todelete).title));
+                    .arg((*todelete)->starttime.toString(Qt::ISODate))
+                    .arg((*todelete)->endtime.toString(Qt::ISODate))
+                    .arg((*todelete)->channel)
+                    .arg((*todelete)->title));
 
             VERBOSE(VB_XMLTV,
                 QString("Conflicted with            : %1 - %2 %3 %4")
-                    .arg((*tokeep).start.toString(Qt::ISODate))
-                    .arg((*tokeep).end.toString(Qt::ISODate))
-                    .arg((*tokeep).channel)
-                    .arg((*tokeep).title));
+                    .arg((*tokeep)->starttime.toString(Qt::ISODate))
+                    .arg((*tokeep)->endtime.toString(Qt::ISODate))
+                    .arg((*tokeep)->channel)
+                    .arg((*tokeep)->title));
 
-            bool step_back = todelete == i;
-            i = fixlist->erase(todelete);
+            bool step_back = todelete == it;
+            it = fixlist.erase(todelete);
             if (step_back)
-                --i;
+                --it;
         }
     }
 }
 
-void ProgramData::handlePrograms(
-    int id, QMap<QString, QList<ProgInfo> > *proglist)
+void ProgramData::HandlePrograms(
+    uint sourceid, QMap<QString, QList<ProgInfo> > &proglist)
 {
-    int unchanged = 0, updated = 0;
-    QMap<QString, QList<ProgInfo> >::Iterator mapiter;
+    uint unchanged = 0, updated = 0;
 
-    for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QMap<QString, QList<ProgInfo> >::const_iterator mapiter;
+    for (mapiter = proglist.begin(); mapiter != proglist.end(); ++mapiter)
     {
-        MSqlQuery query(MSqlQuery::InitCon()), chanQuery(MSqlQuery::InitCon());
-
-        if (mapiter.key() == "")
+        if (mapiter.key().isEmpty())
             continue;
 
-        int chanid = 0;
+        query.prepare(
+            "SELECT chanid "
+            "FROM channel "
+            "WHERE sourceid = :ID AND "
+            "      xmltvid  = :XMLTVID");
+        query.bindValue(":ID",      sourceid);
+        query.bindValue(":XMLTVID", mapiter.key());
 
-        chanQuery.prepare("SELECT chanid FROM channel WHERE sourceid = :ID AND "
-                          "xmltvid = :XMLTVID;");
-        chanQuery.bindValue(":ID", id);
-        chanQuery.bindValue(":XMLTVID", mapiter.key());
-
-        chanQuery.exec();
-
-        if (!chanQuery.isActive() || chanQuery.size() <= 0)
+        if (!query.exec())
         {
-            VERBOSE(VB_IMPORTANT, QString("Unknown xmltv channel identifier: "
-                                          "%1 - Skipping channel.")
-                                          .arg(mapiter.key()));
+            MythDB::DBError("ProgramData::HandlePrograms", query);
             continue;
         }
 
-        while (chanQuery.next())
+        vector<uint> chanids;
+        while (query.next())
+            chanids.push_back(query.value(0).toUInt());
+
+        if (chanids.empty())
         {
-            chanid = chanQuery.value(0).toInt();
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Unknown xmltv channel identifier: %1"
+                        " - Skipping channel.").arg(mapiter.key()));
+            continue;
+        }
 
-            if (chanid == 0)
-            {
-                VERBOSE(VB_IMPORTANT, QString("Unknown xmltv channel "
-                                              "identifier: %1 - Skipping "
-                                              "channel.")
-                                              .arg(mapiter.key()));
-                continue;
-            }
+        QList<ProgInfo> &list = proglist[mapiter.key()];
+        QList<ProgInfo*> sortlist;
+        QList<ProgInfo>::iterator it = list.begin();
+        for (; it != list.end(); ++it)
+            sortlist.push_back(&(*it));
 
-            QList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
+        FixProgramList(sortlist);
 
-            fixProgramList(sortlist);
-
-            QList<ProgInfo>::iterator i = sortlist->begin();
-            for (; i != sortlist->end(); i++)
-            {
-                query.prepare("SELECT * FROM program WHERE "
-                              "chanid=:CHANID AND starttime=:START AND "
-                              "endtime=:END AND title=:TITLE AND "
-                              "subtitle=:SUBTITLE AND description=:DESC AND "
-                              "category=:CATEGORY AND "
-                              "category_type=:CATEGORY_TYPE AND "
-                              "airdate=:AIRDATE AND "
-                              "stars >= (:STARS - 0.001) AND stars <= (:STARS + 0.001) AND "
-                              "previouslyshown=:PREVIOUSLYSHOWN AND "
-                              "title_pronounce=:TITLE_PRONOUNCE AND "
-                              "audioprop=:AUDIOPROP AND "
-                              "videoprop=:VIDEOPROP AND "
-                              "subtitletypes=:SUBTYPES AND "
-                              "partnumber=:PARTNUMBER AND "
-                              "parttotal=:PARTTOTAL AND "
-                              "seriesid=:SERIESID AND "
-                              "showtype=:SHOWTYPE AND "
-                              "colorcode=:COLORCODE AND "
-                              "syndicatedepisodenumber=:SYNDICATEDEPISODENUMBER AND "
-                              "programid=:PROGRAMID;");
-                query.bindValue(":CHANID", chanid);
-                query.bindValue(":START", (*i).start);
-                query.bindValue(":END", (*i).end);
-                query.bindValue(":TITLE", (*i).title);
-                query.bindValue(":SUBTITLE", (*i).subtitle);
-                query.bindValue(":DESC", (*i).desc);
-                query.bindValue(":CATEGORY", (*i).category);
-                query.bindValue(":CATEGORY_TYPE", (*i).catType);
-                query.bindValue(":AIRDATE", (*i).airdate);
-                query.bindValue(":STARS", (*i).stars);
-                query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
-                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce);
-                query.bindValue(":AUDIOPROP", (*i).audioproperties);
-                query.bindValue(":VIDEOPROP", (*i).videoproperties);
-                query.bindValue(":SUBTYPES", (*i).subtitletype);
-                query.bindValue(":PARTNUMBER", (*i).partnumber);
-                query.bindValue(":PARTTOTAL", (*i).parttotal);
-                query.bindValue(":SERIESID", (*i).seriesid);
-                query.bindValue(":SHOWTYPE", (*i).showtype);
-                query.bindValue(":COLORCODE", (*i).colorcode);
-                query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
-                query.bindValue(":PROGRAMID", (*i).programid);
-                query.exec();
-
-                if (query.isActive() && query.size() > 0)
-                {
-                    unchanged++;
-                    continue;
-                }
-
-                query.prepare("SELECT title,starttime,endtime FROM program "
-                              "WHERE chanid=:CHANID AND starttime>=:START AND "
-                              "starttime<:END;");
-                query.bindValue(":CHANID", chanid);
-                query.bindValue(":START", (*i).start);
-                query.bindValue(":END", (*i).end);
-                query.exec();
-
-                if (query.isActive() && query.size() > 0)
-                {
-
-                    while (query.next())
-                    {
-                        VERBOSE(VB_XMLTV,
-                            QString("Removing existing program: %1 - %2 %3 %4")
-                            .arg(query.value(1).toDateTime().toString(Qt::ISODate))
-                            .arg(query.value(2).toDateTime().toString(Qt::ISODate))
-                            .arg((*i).channel)
-                            .arg(query.value(0).toString()));
-                    }
-
-                    VERBOSE(VB_XMLTV,
-                        QString("Inserting new program    : %1 - %2 %3 %4")
-                            .arg((*i).start.toString(Qt::ISODate))
-                            .arg((*i).end.toString(Qt::ISODate))
-                            .arg((*i).channel)
-                            .arg((*i).title));
-
-                    MSqlQuery subquery(MSqlQuery::InitCon());
-                    subquery.prepare("DELETE FROM program WHERE "
-                                     "chanid=:CHANID AND starttime>=:START "
-                                     "AND starttime<:END;");
-                    subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":START", (*i).start);
-                    subquery.bindValue(":END", (*i).end);
-
-                    subquery.exec();
-
-                    subquery.prepare("DELETE FROM programrating WHERE "
-                                     "chanid=:CHANID AND starttime>=:START "
-                                     "AND starttime<:END;");
-                    subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":START", (*i).start);
-                    subquery.bindValue(":END", (*i).end);
-
-                    subquery.exec();
-
-                    subquery.prepare("DELETE FROM credits WHERE "
-                                     "chanid=:CHANID AND starttime>=:START "
-                                     "AND starttime<:END;");
-                    subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":START", (*i).start);
-                    subquery.bindValue(":END", (*i).end);
-
-                    subquery.exec();
-                }
-
-                query.prepare("INSERT INTO program (chanid,starttime,endtime,"
-                              "title,subtitle,description,category,"
-                              "category_type,airdate,stars,previouslyshown,"
-                              "title_pronounce,stereo,hdtv,"
-                              "audioprop,videoprop,subtitletypes,subtitled,"
-                              "closecaptioned,partnumber,parttotal,"
-                              "seriesid,originalairdate,showtype,colorcode,"
-                              "syndicatedepisodenumber,programid) "
-                              "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
-                              ":SUBTITLE,:DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,"
-                              ":AIRDATE,:STARS,:PREVIOUSLYSHOWN,"
-                              ":TITLE_PRONOUNCE,:STEREO,:HDTV,"
-                              ":AUDIOPROP,:VIDEOPROP,:SUBTYPES,:SUBTITLED,"
-                              ":CLOSECAPTIONED,:PARTNUMBER,:PARTTOTAL,"
-                              ":SERIESID,:ORIGINALAIRDATE,:SHOWTYPE,:COLORCODE,"
-                              ":SYNDICATEDEPISODENUMBER,:PROGRAMID);");
-                query.bindValue(":CHANID", chanid);
-                query.bindValue(":STARTTIME", (*i).start);
-                query.bindValue(":ENDTIME", (*i).end);
-                query.bindValue(":TITLE", (*i).title);
-                query.bindValue(":SUBTITLE", (*i).subtitle);
-                query.bindValue(":DESCRIPTION", (*i).desc);
-                query.bindValue(":CATEGORY", (*i).category);
-                query.bindValue(":CATEGORY_TYPE", (*i).catType);
-                query.bindValue(":AIRDATE", (*i).airdate);
-                query.bindValue(":STARS", (*i).stars);
-                query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
-                query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce);
-                query.bindValue(":AUDIOPROP", (*i).audioproperties);
-                query.bindValue(":VIDEOPROP", (*i).videoproperties);
-                query.bindValue(":SUBTYPES", (*i).subtitletype);
-                query.bindValue(":HDTV", (*i).videoproperties        & VID_HDTV     ? true : false);
-                query.bindValue(":STEREO", (*i).audioproperties      & AUD_STEREO   ? true : false);
-                query.bindValue(":SUBTITLED", (*i).subtitletype      & SUB_NORMAL   ? true : false);
-                query.bindValue(":CLOSECAPTIONED", (*i).subtitletype & SUB_HARDHEAR ? true : false);
-                query.bindValue(":PARTNUMBER", (*i).partnumber);
-                query.bindValue(":PARTTOTAL", (*i).parttotal);
-                query.bindValue(":SERIESID", (*i).seriesid);
-                query.bindValue(":ORIGINALAIRDATE", (*i).originalairdate);
-                query.bindValue(":SHOWTYPE", (*i).showtype);
-                query.bindValue(":COLORCODE", (*i).colorcode);
-                query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
-                query.bindValue(":PROGRAMID", (*i).programid);
-                if (!query.exec())
-                    MythDB::DBError("program insert", query);
-
-                updated++;
-
-                QList<ProgRating>::iterator j = (*i).ratings.begin();
-                for (; j != (*i).ratings.end(); j++)
-                {
-                    query.prepare("INSERT INTO programrating (chanid,starttime,"
-                                  "system,rating) VALUES (:CHANID,:START,:SYS,"
-                                  ":RATING);");
-                    query.bindValue(":CHANID", chanid);
-                    query.bindValue(":START", (*i).start);
-                    query.bindValue(":SYS", (*j).system);
-                    query.bindValue(":RATING", (*j).rating);
-
-                    if (!query.exec())
-                        MythDB::DBError("programrating insert", query);
-                }
-
-                QList<ProgCredit>::iterator k = (*i).credits.begin();
-                for (; k != (*i).credits.end(); k++)
-                {
-                    query.prepare("SELECT person FROM people WHERE "
-                                  "name = :NAME;");
-                    query.bindValue(":NAME", (*k).name);
-                    if (!query.exec())
-                        MythDB::DBError("person lookup", query);
-
-                    int personid = -1;
-                    if (query.isActive() && query.size() > 0)
-                    {
-                        query.next();
-                        personid = query.value(0).toInt();
-                    }
-
-                    if (personid < 0)
-                    {
-                        query.prepare("INSERT INTO people (name) VALUES "
-                                      "(:NAME);");
-                        query.bindValue(":NAME", (*k).name);
-                        if (!query.exec())
-                            MythDB::DBError("person insert", query);
-
-                        query.prepare("SELECT person FROM people WHERE "
-                                      "name = :NAME;");
-                        query.bindValue(":NAME", (*k).name);
-                        if (!query.exec())
-                            MythDB::DBError("person lookup", query);
-
-                        if (query.isActive() && query.size() > 0)
-                        {
-                            query.next();
-                            personid = query.value(0).toInt();
-                        }
-                    }
-
-                    if (personid < 0)
-                    {
-                        VERBOSE(VB_IMPORTANT, "Error inserting person");
-                        continue;
-                    }
-
-                    query.prepare("INSERT INTO credits (chanid,starttime,"
-                                  "role,person) VALUES "
-                                  "(:CHANID, :START, :ROLE, :PERSON);");
-                    query.bindValue(":CHANID", chanid);
-                    query.bindValue(":START", (*i).start);
-                    query.bindValue(":ROLE", (*k).role);
-                    query.bindValue(":PERSON", personid);
-                    if (!query.exec())
-                    {
-                        // be careful of the startime/timestamp "feature"!
-                        query.prepare("UPDATE credits SET "
-                                      "role = concat(role,',:ROLE'), "
-                                      "starttime = :START "
-                                      "WHERE chanid = :CHANID AND "
-                                      "starttime = :START2 and person = :PERSON");
-                        query.bindValue(":ROLE", (*k).role);
-                        query.bindValue(":START", (*i).start);
-                        query.bindValue(":CHANID", chanid);
-                        query.bindValue(":START2", (*i).start);
-                        query.bindValue(":PERSON", personid);
-
-                        if (!query.exec())
-                            MythDB::DBError("credits update", query);
-                    }
-                }
-            }
+        for (uint i = 0; i < chanids.size(); i++)
+        {
+            HandlePrograms(query, chanids[i], sortlist, unchanged, updated);
         }
     }
 
@@ -479,6 +1123,28 @@ void ProgramData::handlePrograms(
             QString("Updated programs: %1 Unchanged programs: %2")
                 .arg(updated)
                 .arg(unchanged));
+}
+
+void ProgramData::HandlePrograms(MSqlQuery             &query,
+                                 uint                   chanid,
+                                 const QList<ProgInfo*> &sortlist,
+                                 uint &unchanged,
+                                 uint &updated)
+{
+    QList<ProgInfo*>::const_iterator it = sortlist.begin();
+    for (; it != sortlist.end(); ++it)
+    {
+        if (IsUnchanged(query, chanid, **it))
+        {
+            unchanged++;
+            continue;
+        }
+
+        if (!DeleteOverlaps(query, chanid, **it))
+            continue;
+
+        updated += (*it)->InsertDB(query, chanid);
+    }
 }
 
 int ProgramData::fix_end_times(void)
@@ -540,4 +1206,116 @@ int ProgramData::fix_end_times(void)
     }
 
     return count;
+}
+
+bool ProgramData::IsUnchanged(
+    MSqlQuery &query, uint chanid, const ProgInfo &pi)
+{
+    query.prepare(
+        "SELECT count(*) "
+        "FROM program "
+        "WHERE chanid          = :CHANID     AND "
+        "      starttime       = :START      AND "
+        "      endtime         = :END        AND "
+        "      title           = :TITLE      AND "
+        "      subtitle        = :SUBTITLE   AND "
+        "      description     = :DESC       AND "
+        "      category        = :CATEGORY   AND "
+        "      category_type   = :CATEGORY_TYPE AND "
+        "      airdate         = :AIRDATE    AND "
+        "      stars >= (:STARS1 - 0.001)    AND "
+        "      stars <= (:STARS2 + 0.001)    AND "
+        "      previouslyshown = :PREVIOUSLYSHOWN AND "
+        "      title_pronounce = :TITLE_PRONOUNCE AND "
+        "      audioprop       = :AUDIOPROP  AND "
+        "      videoprop       = :VIDEOPROP  AND "
+        "      subtitletypes   = :SUBTYPES   AND "
+        "      partnumber      = :PARTNUMBER AND "
+        "      parttotal       = :PARTTOTAL  AND "
+        "      seriesid        = :SERIESID   AND "
+        "      showtype        = :SHOWTYPE   AND "
+        "      colorcode       = :COLORCODE  AND "
+        "      syndicatedepisodenumber = :SYNDICATEDEPISODENUMBER AND "
+        "      programid       = :PROGRAMID");
+
+    QString cattype = myth_category_type_to_string(pi.categoryType);
+
+    query.bindValue(":CHANID",     chanid);
+    query.bindValue(":START",      pi.starttime);
+    query.bindValue(":END",        pi.endtime);
+    query.bindValue(":TITLE",      pi.title);
+    query.bindValue(":SUBTITLE",   pi.subtitle);
+    query.bindValue(":DESC",       pi.description);
+    query.bindValue(":CATEGORY",   pi.category);
+    query.bindValue(":CATEGORY_TYPE", cattype);
+    query.bindValue(":AIRDATE",    pi.airdate);
+    query.bindValue(":STARS1",     pi.stars);
+    query.bindValue(":STARS2",     pi.stars);
+    query.bindValue(":PREVIOUSLYSHOWN", pi.previouslyshown);
+    query.bindValue(":TITLE_PRONOUNCE", pi.title_pronounce);
+    query.bindValue(":AUDIOPROP",  pi.audioProps);
+    query.bindValue(":VIDEOPROP",  pi.videoProps);
+    query.bindValue(":SUBTYPES",   pi.subtitleType);
+    query.bindValue(":PARTNUMBER", pi.partnumber);
+    query.bindValue(":PARTTOTAL",  pi.parttotal);
+    query.bindValue(":SERIESID",   pi.seriesId);
+    query.bindValue(":SHOWTYPE",   pi.showtype);
+    query.bindValue(":COLORCODE",  pi.colorcode);
+    query.bindValue(":SYNDICATEDEPISODENUMBER", pi.syndicatedepisodenumber);
+    query.bindValue(":PROGRAMID",  pi.programId);
+
+    if (query.exec() && query.next())
+        return query.value(0).toUInt() > 0;
+
+    return false;
+}
+
+bool ProgramData::DeleteOverlaps(
+    MSqlQuery &query, uint chanid, const ProgInfo &pi)
+{
+    if (print_verbose_messages & VB_XMLTV)
+    {
+        // Get overlaps..
+        query.prepare(
+            "SELECT title,starttime,endtime "
+            "FROM program "
+            "WHERE chanid     = :CHANID AND "
+            "      starttime >= :START AND "
+            "      starttime <  :END;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":START",  pi.starttime);
+        query.bindValue(":END",    pi.endtime);
+
+        if (!query.exec())
+            return false;
+
+        if (!query.next())
+            return true;
+
+        do
+        {
+            VERBOSE(VB_XMLTV,
+                    QString(
+                        "Removing existing program: %1 - %2 %3 %4")
+                    .arg(query.value(1).toDateTime()
+                         .toString(Qt::ISODate))
+                    .arg(query.value(2).toDateTime()
+                         .toString(Qt::ISODate))
+                    .arg(pi.channel)
+                    .arg(query.value(0).toString()));
+        } while (query.next());
+    }
+
+    if (!ClearDataByChannel(chanid, pi.starttime, pi.endtime, false))
+    {
+        VERBOSE(VB_XMLTV,
+                QString("Program delete failed    : %1 - %2 %3 %4")
+                .arg(pi.starttime.toString(Qt::ISODate))
+                .arg(pi.endtime.toString(Qt::ISODate))
+                .arg(pi.channel)
+                .arg(pi.title));
+        return false;
+    }
+
+    return true;
 }

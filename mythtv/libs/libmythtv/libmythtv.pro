@@ -443,10 +443,8 @@ using_backend {
     # EIT stuff
     HEADERS += eithelper.h                 eitscanner.h
     HEADERS += eitfixup.h                  eitcache.h
-    HEADERS += eit.h
     SOURCES += eithelper.cpp               eitscanner.cpp
     SOURCES += eitfixup.cpp                eitcache.cpp
-    SOURCES += eit.cpp
 
     # non-EIT EPG stuff
     HEADERS += programdata.h

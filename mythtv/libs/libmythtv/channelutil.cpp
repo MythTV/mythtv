@@ -785,6 +785,11 @@ QString ChannelUtil::GetServiceName(int chan_id)
     return GetChannelStringField(chan_id, QString("name"));
 }
 
+int ChannelUtil::GetTimeOffset(int chan_id)
+{
+    return GetChannelStringField(chan_id, QString("tmoffset")).toInt();
+}
+
 int ChannelUtil::GetSourceID(int db_mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1087,6 +1092,79 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     query.bindValue(":SOURCEID", sourceid);
 
     return query.exec();
+}
+
+/** Returns the DVB default authority for the chanid given. */ 
+QString ChannelUtil::GetDefaultAuthority(uint chanid)
+{
+    static QReadWriteLock channel_default_authority_map_lock;
+    static QMap<uint,QString> channel_default_authority_map;
+    static bool run_init = true;
+
+    channel_default_authority_map_lock.lockForRead();
+
+    if (run_init)
+    {
+        channel_default_authority_map_lock.unlock();
+        channel_default_authority_map_lock.lockForWrite();
+        if (run_init)
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare(
+                "SELECT chanid, m.default_authority "
+                "FROM channel c "
+                "LEFT JOIN dtv_multiplex m "
+                "ON (c.mplexid = m.mplexid)");
+            if (query.exec())
+            {
+                while (query.next())
+                {
+                    if (!query.value(1).toString().isEmpty())
+                    {
+                        channel_default_authority_map[query.value(0).toUInt()] =
+                            query.value(1).toString();
+                    }
+                }
+                run_init = false;
+            }
+            else
+            {
+                MythDB::DBError("GetDefaultAuthority 1", query);
+            }
+
+            query.prepare(
+                "SELECT chanid, default_authority "
+                "FROM channel");
+            if (query.exec())
+            {
+                while (query.next())
+                {
+                    if (!query.value(1).toString().isEmpty())
+                    {
+                        channel_default_authority_map[query.value(0).toUInt()] =
+                            query.value(1).toString();
+                    }
+                }
+                run_init = false;
+            }
+            else
+            {
+                MythDB::DBError("GetDefaultAuthority 2", query);
+            }
+
+        }
+    }
+
+    QMap<uint,QString>::iterator it = channel_default_authority_map.find(chanid);
+    QString ret = QString::null;
+    if (it != channel_default_authority_map.end())
+    {
+        ret = *it;
+        ret.detach();
+    }
+    channel_default_authority_map_lock.unlock();
+
+    return ret;
 }
 
 QString ChannelUtil::GetIcon(uint chanid)
@@ -1688,6 +1766,27 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, i
 
         list.push_back(chan);
     }
+
+    return list;
+}
+
+vector<uint> ChannelUtil::GetChanIDs(int sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString select = "SELECT chanid FROM channel";
+    if (sourceid > 0)
+        select += " WHERE sourceid=" + QString::number(sourceid);
+
+    vector<uint> list;
+    if (!query.exec(select))
+    {
+        MythDB::DBError("SourceUtil::GetChanIDs()", query);
+        return list;
+    }
+
+    while (query.next())
+        list.push_back(query.value(0).toUInt());
 
     return list;
 }

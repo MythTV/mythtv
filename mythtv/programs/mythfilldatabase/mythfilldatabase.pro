@@ -13,6 +13,9 @@ INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET)
 
+INCLUDEPATH += ../../libs/libmythtv/mpeg
+DEPENDPATH  += ../../libs/libmythtv/mpeg
+
 # Input
 HEADERS += filldata.h   channeldata.h
 HEADERS += icondata.h   xmltvparser.h

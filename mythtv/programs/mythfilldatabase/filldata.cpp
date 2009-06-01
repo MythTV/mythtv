@@ -304,7 +304,7 @@ bool FillData::GrabDDData(Source source, int poffset,
     VERBOSE(VB_GENERAL, QString("Clearing from %1 to %2 (localtime)")
                                   .arg(fromlocaldt.toString())
                                   .arg(tolocaldt.toString()));
-    ProgramData::clearDataBySource(source.id, fromlocaldt,tolocaldt);
+    ProgramData::ClearDataBySource(source.id, fromlocaldt, tolocaldt, true);
     VERBOSE(VB_GENERAL, "Data for source cleared.");
 
     VERBOSE(VB_GENERAL, "Updating programs.");
@@ -333,7 +333,7 @@ bool FillData::GrabDataFromFile(int id, QString &filename)
     }
     else
     {
-        prog_data.handlePrograms(id, &proglist);
+        prog_data.HandlePrograms(id, proglist);
     }
     return true;
 }
@@ -459,7 +459,9 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         {
             status = QString(QObject::tr("FAILED: xmltv returned error code %1."))
                             .arg(systemcall_status);
-            VERBOSE(VB_IMPORTANT, status);
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("xmltv returned error code %1")
+                    .arg(systemcall_status));
         }
     }
 
