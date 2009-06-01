@@ -476,7 +476,11 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     if (wait_until_complete && currentTestingDecryption)
         return false;
 
-    const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
+    DTVSignalMonitor *dtv_sm = GetDTVSignalMonitor();
+    if (!dtv_sm)
+        return false;
+
+    const ScanStreamData *sd = dtv_sm->GetScanStreamData();
     if (!channelMap[current])
         channelMap[current] = new ScannedChannelInfo();
     ScannedChannelInfo *info = channelMap[current];
