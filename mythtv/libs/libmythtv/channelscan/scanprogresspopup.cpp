@@ -33,7 +33,8 @@
 ScanProgressPopup::ScanProgressPopup(bool lock, bool strength,
                                      bool snr, bool rotorpos) :
     ConfigurationPopupDialog(),
-    done(false), ss(NULL), sn(NULL), progressBar(NULL), sl(NULL), sta(NULL)
+    done(false), ss(NULL), sn(NULL), pos(NULL),
+    progressBar(NULL), sl(NULL), sta(NULL)
 {
     setLabel(tr("Scan Progress"));
 
