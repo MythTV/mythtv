@@ -29,7 +29,7 @@
 #define MP_DVDNAV 1
 
 // Change this only when syncing to mplayer dvdnav trunk
-#define DVDNAV_SVN_REV "svnR1166"
+#define DVDNAV_SVN_REV "svnR1169"
 
 #ifdef __cplusplus
 extern "C" {
