@@ -89,7 +89,7 @@
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation>Kytkös Myth Jälkikäsittely-palvelimeen on hävinnyt.</translation>
+        <translation>Yhteys Mythin jälkikäsittely-palvelimeen on hävinnyt.</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
@@ -145,11 +145,11 @@
     </message>
     <message>
         <source>New Rip</source>
-        <translation>Uusi Tuonti</translation>
+        <translation>Uusi tuonti</translation>
     </message>
     <message>
         <source>Cancel Job</source>
-        <translation>Peruuta Työ</translation>
+        <translation>Peruuta työ</translation>
     </message>
     <message>
         <source>Attempting to launch mtd...</source>
@@ -157,7 +157,7 @@
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon.</source>
-        <translation>Ei pysty yhdistämään Myth Transcoing Daemoniin.</translation>
+        <translation>Ei pysty yhdistämään Mythjälkikäsittely ohjelmaan.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
@@ -176,7 +176,7 @@
     </message>
     <message>
         <source>None</source>
-        <translation>Ei Mikään</translation>
+        <translation>Ei mikään</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -230,7 +230,7 @@
     </message>
     <message>
         <source>Starting Parental Level</source>
-        <translation>Aloitus Ikäluokitus</translation>
+        <translation>Aloitus ikäluokitus</translation>
     </message>
     <message>
         <source>4 - Highest</source>
@@ -254,7 +254,7 @@
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation>Näytä Tuntemattomat Tiedostotyypit</translation>
+        <translation>Näytä tuntemattomat tiedostotyypit</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
@@ -282,7 +282,7 @@
     </message>
     <message>
         <source>No Cover</source>
-        <translation>Ei Kantta</translation>
+        <translation>Ei kantta</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -290,7 +290,7 @@
     </message>
     <message>
         <source>None</source>
-        <translation>Ei Mikään</translation>
+        <translation>Ei mikään</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -334,7 +334,7 @@
     </message>
     <message>
         <source>Video Manager</source>
-        <translation>Videoiden Hallinta</translation>
+        <translation>Videoiden hallinta</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
@@ -342,11 +342,11 @@
     </message>
     <message>
         <source>Aggressive Parental Control</source>
-        <translation>Aggressiivinen Ikälukko</translation>
+        <translation>Aggressiivinen ikälukko</translation>
     </message>
     <message>
         <source>Default View</source>
-        <translation>Oletus Näkymä</translation>
+        <translation>Oletus näkymä</translation>
     </message>
     <message>
         <source>Gallery</source>
@@ -414,7 +414,7 @@
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
-        <translation>Videolistaus Lataa Videoiden Metatiedot</translation>
+        <translation>Videolistaus lataa videoiden metatiedot</translation>
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
@@ -478,7 +478,7 @@
     </message>
     <message>
         <source>Video ID</source>
-        <translation>Videon ID</translation>
+        <translation>Videon tunnus</translation>
     </message>
     <message>
         <source>
@@ -525,11 +525,11 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation>DVD Toisto-komento</translation>
+        <translation>DVD soittimen komento</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation>VCD Toisto-komento</translation>
+        <translation>VCD soittimen komento</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
@@ -553,7 +553,7 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Title Playing Command</source>
-        <translation>Nimikkeen Toisto-komento</translation>
+        <translation>Nimikkeen toisto komento</translation>
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
@@ -561,7 +561,7 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation>Tekstitys-muuttujat:</translation>
+        <translation>Tekstitysmuuttujat:</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
@@ -569,15 +569,15 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
-        <translation>Perus Jälkikäsittely-komento</translation>
+        <translation>Perus jälkikäsittelykomento</translation>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation>Tämä on peruskomento (ilman argumenttejä) suorittaa transkoodauksen järjestelmässäsi.</translation>
+        <translation>Tämä on peruskomento (ilman argumenttejä) suorittaa  jälkikäsittelynjärjestelmässäsi.</translation>
     </message>
     <message>
         <source>MTD port number</source>
-        <translation>MTD portti-numero</translation>
+        <translation>MTD porttin numero</translation>
     </message>
     <message>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
@@ -633,7 +633,7 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Waiting For Access to DVD</source>
-        <translation>Odotetaan DVD-aseman Vapautumista</translation>
+        <translation>Odotetaan DVD-aseman vapautumista</translation>
     </message>
     <message>
         <source>Ripping to file ~</source>
@@ -649,15 +649,15 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation>Odotetaan Lupaa Aloittaa Jälkikäsittely</translation>
+        <translation>Odotetaan lupaa aloittaa jälkikäsittely</translation>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation>Jälkikäsittelyn Vaihe 1 2:sta ~</translation>
+        <translation>Jälkikäsittelyn vaihe 1/ 2 ~</translation>
     </message>
     <message>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation>Jälkikäsittelyn Vaihe 2 2:sta ~</translation>
+        <translation>Jälkikäsittelyn vaihe 2/ 2 ~</translation>
     </message>
     <message>
         <source>Transcoding ~</source>
@@ -669,7 +669,7 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
-        <translation>Yhtaikaiset Jälkikäsittelytyöt</translation>
+        <translation>Yhtaikaiset jälkikäsittelytyöt</translation>
     </message>
     <message>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
@@ -705,11 +705,11 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>Waiting for access to DVD</source>
-        <translation>Odotetaan DVD-aseman Vapautumista</translation>
+        <translation>Odotetaan DVD-aseman vapautumista</translation>
     </message>
     <message>
         <source>Default Video Player</source>
-        <translation>Oletus Videotoistaja</translation>
+        <translation>Oletus videotoistaja</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older then (days)</source>
@@ -725,7 +725,7 @@ DVD-asemaa ei ole määritelty.</translation>
     </message>
     <message>
         <source>DVD Bookmark Prompt</source>
-        <translation>DVD-kirjanmerkin Kysely</translation>
+        <translation>DVD-kirjanmerkin kysely</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
@@ -1092,7 +1092,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>No Videos Found</source>
-        <translation>Ei Videoita</translation>
+        <translation>Ei videoita</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -1112,7 +1112,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
-        <translation>Mythvideo Tiedostopäätteet</translation>
+        <translation>Mythvideon tiedostopäätteet</translation>
     </message>
     <message>
         <source>Extension:</source>
@@ -1132,7 +1132,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Edit Video Information</source>
-        <translation>Muokkaa Videon Tietoja</translation>
+        <translation>Muokkaa videon tietoja</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -1144,11 +1144,11 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation>Tiedosto, Joka Toistetaan Aina Seuraavaksi:</translation>
+        <translation>Tiedosto, joka toistetaan aina seuraavaksi:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
-        <translation>Sisällytä Selattaessa:</translation>
+        <translation>Sisällytä selattaessa:</translation>
     </message>
     <message>
         <source>Cover Art:</source>
@@ -1156,7 +1156,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Unique Player Command:</source>
-        <translation>Erillinen Toistokomento:</translation>
+        <translation>Erillinen toistokomento:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
@@ -1172,7 +1172,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation>Videoiden Suodatus</translation>
+        <translation>Videoiden suodatus</translation>
     </message>
     <message>
         <source>Category :</source>
@@ -1244,7 +1244,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation>Toista Tiedosto Tämän Jälkeen:</translation>
+        <translation>Toista tiedosto tämän jälkeen:</translation>
     </message>
     <message>
         <source>Rip/Transcode</source>
@@ -1307,7 +1307,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>Ei Mikään</translation>
+        <translation>Ei mikään</translation>
     </message>
     <message>
         <source>Title %1 of %2</source>
@@ -1323,7 +1323,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>ISO Image</source>
-        <translation>ISO-Kuvake</translation>
+        <translation>ISO-kuvake</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -1331,7 +1331,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Begin Ripping</source>
-        <translation>Aloita Tuonti</translation>
+        <translation>Aloita tuonti</translation>
     </message>
 </context>
 <context>
@@ -1377,15 +1377,15 @@ Tarkista Videomanagerin asetukset</translation>
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation>Vaihda Selaustilaan</translation>
+        <translation>Vaihda selaustilaan</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation>Vaihda Gallerianäkymään</translation>
+        <translation>Vaihda gallerianäkymään</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation>Vaihda Listanäkymään</translation>
+        <translation>Vaihda luettelonäkymään</translation>
     </message>
     <message>
         <source>Select action</source>
@@ -1560,7 +1560,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation>Suodattimen tulos: Ei Videoita</translation>
+        <translation>Suodattimen tulos: Ei videoita</translation>
     </message>
     <message>
         <source>Unknown</source>

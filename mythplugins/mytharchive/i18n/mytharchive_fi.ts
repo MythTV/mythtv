@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0">
+<!DOCTYPE TS><TS>
 <context>
     <name>EditMetadataDialog</name>
     <message>
@@ -13,42 +11,42 @@
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>ExportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Lopeta</translation>
+        <translation>Lopeta</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Edellinen</translation>
+        <translation>Edellinen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished">Lisää Nauhoitus</translation>
+        <translation>Lisää nauhoitus</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished">Lisää Video</translation>
+        <translation>Lisää video</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished">Tarvitaan ainakin yksi tiedosto!</translation>
+        <translation type="unfinished">Tarvitaan ainakin yksi tiedosto.</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Poista</translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished">Ei yhtään videoita!</translation>
+        <translation type="unfinished">Ei yhtään videoita.</translation>
     </message>
 </context>
 <context>
@@ -114,7 +112,7 @@
     </message>
     <message>
         <source>Home</source>
-        <translation>Ylin Valikko</translation>
+        <translation>Ylin valikko</translation>
     </message>
     <message>
         <source>Myth Archive</source>
@@ -122,19 +120,19 @@
     </message>
     <message>
         <source>The selected item is not a directory!</source>
-        <translation>Valittuna ei ole kansio!</translation>
+        <translation type="unfinished">Valittu kohde ei ole hakemisto.</translation>
     </message>
     <message>
         <source>Find File</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi tiedosto</translation>
     </message>
     <message>
         <source>Find Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi hakemisto</translation>
     </message>
     <message>
         <source>Find Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi tiedostoja</translation>
     </message>
 </context>
 <context>
@@ -224,19 +222,19 @@
     </message>
     <message>
         <source>Show Progress Log</source>
-        <translation>Näytä Edistyminen</translation>
+        <translation>Näytä edistyminen</translation>
     </message>
     <message>
         <source>Show Full Log</source>
-        <translation>Näytä Koko Loki</translation>
+        <translation>Näytä koko loki</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Älä päivitä automaattisesti</translation>
     </message>
     <message>
         <source>Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaattinen päivitys</translation>
     </message>
 </context>
 <context>
@@ -314,7 +312,7 @@
     </message>
     <message>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
-        <translation>Paikka, johon MythArchive tallentaa skriptit, alkuvideot ja teematiedostot</translation>
+        <translation>Paikka, johon MythArchive tallentaa komentojoukot, alkuvideot ja teematiedostot</translation>
     </message>
     <message>
         <source>Video format</source>
@@ -322,7 +320,7 @@
     </message>
     <message>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
-        <translation>Videmuoto DVD nauhoituksille, Pal tai NTSC.</translation>
+        <translation>Videmuoto DVD nauhoituksille, PAL tai NTSC.</translation>
     </message>
     <message>
         <source>File Selector Filter</source>
@@ -386,7 +384,7 @@
     </message>
     <message>
         <source>Command to run tcrequant (Part of transcode package). Optional - leave blank if you don&apos;t have the transcode package installed.</source>
-        <translation>Komento, jolla ajetaan tcrequant (Osana transkoodauspakettia). Vaihtoehtoinen - jätä tyhjäksi, jos sinulla ei ole transkoodauspakettia asennettuna.</translation>
+        <translation>Komento, jolla ajetaan tcrequant (Osana jälleenkäsittelypakettia). Vaihtoehtoinen - jätä tyhjäksi, jos sinulla ei ole jälkikäsittelypakettia asennettuna.</translation>
     </message>
     <message>
         <source>spumux command</source>
@@ -406,15 +404,15 @@
     </message>
     <message>
         <source>MythArchive Settings</source>
-        <translation>Mytharchive Asetukset</translation>
+        <translation>MythArchivea asetukset</translation>
     </message>
     <message>
         <source>MythArchive External Commands (1)</source>
-        <translation>Mytharchive Ulkoiset Komennot (1)</translation>
+        <translation>MythArchiven ulkoiset komennot (1)</translation>
     </message>
     <message>
         <source>MythArchive External Commands (2)</source>
-        <translation>Mytharchive Ulkoiset Komennot (2)</translation>
+        <translation>MythArchiven ulkoiset komennot (2)</translation>
     </message>
     <message>
         <source>Myth Burn</source>
@@ -456,7 +454,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Always Use Mythtranscode</source>
-        <translation>Käytä aina Mythtranscodea</translation>
+        <translation>Käytä aina Mythintranscodea jälkikäsittelyyn</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
@@ -464,7 +462,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
-        <translation>Päävalikon Kuvasuhde</translation>
+        <translation>Päävalikon kuvasuhde</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the main menu.</source>
@@ -472,7 +470,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Chapter Menu Aspect Ratio</source>
-        <translation>Kappalevalikon Kuvasuhde</translation>
+        <translation>Kappalevalikon kuvasuhde</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
@@ -480,7 +478,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>MythArchive Settings (2)</source>
-        <translation>Mytharchive Asetukset (2)</translation>
+        <translation>MythArchive asetukset (2)</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
@@ -520,7 +518,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Add Subtitles</source>
-        <translation>Lisää Tekstitys</translation>
+        <translation>Lisää tekstitys</translation>
     </message>
     <message>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
@@ -528,7 +526,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Date format</source>
-        <translation>Päiväyksen Muoto</translation>
+        <translation>Päiväyksen muoto</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
@@ -544,7 +542,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation>Ajan Esitys</translation>
+        <translation>Ajan esitysmuoto</translation>
     </message>
     <message>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
@@ -552,7 +550,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>Default Encoder Profile</source>
-        <translation>Oletus Purkuprofiili</translation>
+        <translation>Oletus purkuprofiili</translation>
     </message>
     <message>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
@@ -576,7 +574,7 @@ Voi kestää vielä hetken.</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
-        <translation>DVD Valikko-asetukset</translation>
+        <translation>DVD valikkon asetukset</translation>
     </message>
     <message>
         <source>Video Selector</source>
@@ -589,43 +587,45 @@ Voi kestää vielä hetken.</translation>
     <message>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MythArchiven työhakemistoa ei löytynyt.
+Tarkista hakemiston polku.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD:n luonti epäonnistui: Virhe komentojoukkoa suorittaessa</translation>
     </message>
     <message>
         <source>Cannot find any logs to show!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lokeja ei löytynyt näytettäväksi.</translation>
     </message>
     <message>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Löydettiin lukkotiedosto, mutta prosessi johon se kuuluu ei ole käynnissä.
+Käyttämätön lukkotiedosto poistetaan.</translation>
     </message>
     <message>
         <source>Last run did not create a playable DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Viimeisin ohjelman suoritus ei luonut toistettavaa DVD:tä.</translation>
     </message>
     <message>
         <source>Last run failed to create a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Viimeisin ohjelma nsuoritus epäonnistui luomaan DVD:n.</translation>
     </message>
 </context>
 <context>
     <name>RecordingSelector</name>
     <message>
         <source>Clear All</source>
-        <translation>Tyhjennä Kaikki</translation>
+        <translation>Tyhjennä kaikki</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>Valitse Kaikki</translation>
+        <translation>Valitse kaikki</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -637,7 +637,7 @@ Removing stale lock file.</source>
     </message>
     <message>
         <source>All Recordings</source>
-        <translation>Kaikki Nauhoitukset</translation>
+        <translation>Kaikki nauhoitukset</translation>
     </message>
     <message>
         <source>MythArchive</source>
@@ -652,60 +652,60 @@ Paina OK</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Hakee nauhoituslistaa. Odota hetki...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sinulla joko ei ole nauhoituksia tai nauhoituksesi eivät ole saatavilla paikallisesti.</translation>
     </message>
 </context>
 <context>
     <name>SelectDestination</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Seuraava</translation>
+        <translation>Seuraava</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Edellinen</translation>
+        <translation>Edellinen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi...</translation>
     </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Tallenna</translation>
+        <translation>Tallenna</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Exit, Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistu, tallenna koostekuvat</translation>
     </message>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistu, älä tallenna koostekuvia</translation>
     </message>
 </context>
 <context>
     <name>VideoSelector</name>
     <message>
         <source>Clear All</source>
-        <translation>Tyhjennä Kaikki</translation>
+        <translation>Tyhjennä kaikki</translation>
     </message>
     <message>
         <source>Select All</source>
-        <translation>Valitse Kaikki</translation>
+        <translation>Valitse kaikki</translation>
     </message>
     <message>
         <source>Cancel</source>

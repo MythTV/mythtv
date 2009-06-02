@@ -46,7 +46,7 @@
     </message>
     <message>
         <source>Light Rain</source>
-        <translation>Heikkoa Sadetta</translation>
+        <translation>Heikkoa sadetta</translation>
     </message>
     <message>
         <source>Showers</source>
@@ -58,7 +58,7 @@
     </message>
     <message>
         <source>AM Showers</source>
-        <translation>Aamulla Sadekuuroja</translation>
+        <translation>Aamulla sadekuuroja</translation>
     </message>
     <message>
         <source>Fog</source>
@@ -66,7 +66,7 @@
     </message>
     <message>
         <source>Few Showers</source>
-        <translation>Muutamia Sadekuuroja</translation>
+        <translation>Muutamia sadekuuroja</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
@@ -78,27 +78,27 @@
     </message>
     <message>
         <source>Scattered Flurries</source>
-        <translation>Hajanaisia Tuulenpuuskia</translation>
+        <translation>Hajanaisia tuulenpuuskia</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation>Aamulla Pilvistä/Illalla Aurinkoista</translation>
+        <translation>Aamulla pilvistä/Illalla aurinkoista</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation>Joitakin Myrskyjä</translation>
+        <translation>Paikallisia ukkosmyrskyjä</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation>Hajanaisia Ukkosmyrskyjä</translation>
+        <translation>Hajanaisia ukkosmyrskyjä</translation>
     </message>
     <message>
         <source>PM Showers</source>
-        <translation>Illalla Sadekuuroja</translation>
+        <translation>Illalla sadekuuroja</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation>Illalla Sadekuuroja ja Tuulenpuuskia</translation>
+        <translation>Illalla sadekuuroja ja tuulenpuuskia</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
@@ -106,11 +106,11 @@
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation>Heikkoja Lumikuuroja</translation>
+        <translation>Heikkoja lumikuuroja</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation>Pilvistä ja Tuulista</translation>
+        <translation>Pilvistä ja tuulista</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
@@ -118,31 +118,31 @@
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation>Puolipilvistä ja Tuulista</translation>
+        <translation>Puolipilvistä ja tuulista</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
-        <translation>Sadetta ja Ukkosta</translation>
+        <translation>Sadetta ja ukkosta</translation>
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation>Puolipilvistä ja Tuulista</translation>
+        <translation>Puolipilvistä ja tuulista</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation>Aamulla Sadetta tai Lumisadetta</translation>
+        <translation>Aamulla sadetta tai lumisadetta</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation>Heikkoa Sadetta ja Tuulista</translation>
+        <translation>Heikkoa sadetta ja tuulista</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
-        <translation>Sadekuuroja ja Tuulista</translation>
+        <translation>Sadekuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation>Poutaa ja Tuulista</translation>
+        <translation>Poutaa ja tuulista</translation>
     </message>
     <message>
         <source>Flurries</source>
@@ -150,7 +150,7 @@
     </message>
     <message>
         <source>Rain/Wind</source>
-        <translation>Sadetta ja Tuulista</translation>
+        <translation>Sadetta ja tuulista</translation>
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
@@ -158,11 +158,11 @@
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation>Voimakkaita Myrskyjä</translation>
+        <translation>Voimakkaita myrskyjä</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation>Illalla Myrskyjä</translation>
+        <translation>Illalla ukkosmyrskyjä</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
@@ -170,31 +170,31 @@
     </message>
     <message>
         <source>Sunny/Windy</source>
-        <translation>Aurinkoista ja Tuulista</translation>
+        <translation>Aurinkoista ja tuulista</translation>
     </message>
     <message>
         <source>AM Thunderstorms</source>
-        <translation>Aamulla Ukkosmyrskyjä</translation>
+        <translation>Aamulla ukkosmyrskyjä</translation>
     </message>
     <message>
         <source>AM Rain</source>
-        <translation>Aamulla Sadetta</translation>
+        <translation>Aamulla sadetta</translation>
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation>Joitakin Myrskyjä ja Tuulista</translation>
+        <translation>Joitakin myrskyjä ja tuulista</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
-        <translation>Sadetta ja Lumisadetta</translation>
+        <translation>Sadetta ja lumisadetta</translation>
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation>Myrskyjä ja Tuulista</translation>
+        <translation>Myrskyjä ja tuulista</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation>Aamulla Sadekuuroja ja Tuulista</translation>
+        <translation>Aamulla sadekuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
@@ -202,23 +202,23 @@
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
-        <translation>Jäistä Lumisadetta ja Tuulista</translation>
+        <translation>Jäistä lumisadetta ja tuulista</translation>
     </message>
     <message>
         <source>Snow to Rain</source>
-        <translation>Lumi -ja Vesisadetta</translation>
+        <translation>Lumi -ja vesisadetta</translation>
     </message>
     <message>
         <source>AM Light Rain</source>
-        <translation>Aamulla Kevyttä Sadetta</translation>
+        <translation>Aamulla kevyttä sadetta</translation>
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation>Illalla Kevyttä Sadetta</translation>
+        <translation>Illalla kevyttä sadetta</translation>
     </message>
     <message>
         <source>PM Rain</source>
-        <translation>Illalla Sadetta</translation>
+        <translation>Illalla sadetta</translation>
     </message>
     <message>
         <source>Snow Showers</source>
@@ -226,51 +226,51 @@
     </message>
     <message>
         <source>Rain to Snow</source>
-        <translation>Lumi -ja Vesisadetta</translation>
+        <translation>Lumi -ja vesisadetta</translation>
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation>Illalla Räntäkuuroja</translation>
+        <translation>Illalla räntäkuuroja</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation>Joitakin Kuuroja ja Tuulista</translation>
+        <translation>Joitakin kuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
-        <translation>Lunta ja Tuulista</translation>
+        <translation>Lunta ja tuulista</translation>
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation>Illalla Räntäsadetta</translation>
+        <translation>Illalla räntäsadetta</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation>Illalla Räntäsadetta ja Tuulista</translation>
+        <translation>Illalla räntäsadetta ja tuulista</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation>Räntäkuuroja ja Tuulista</translation>
+        <translation>Räntäkuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
-        <translation>Räntäsadetta ja Tuulista</translation>
+        <translation>Räntäsadetta ja tuulista</translation>
     </message>
     <message>
         <source>Light Snow</source>
-        <translation>Heikkoa Lumisadetta</translation>
+        <translation>Heikkoa lumisadetta</translation>
     </message>
     <message>
         <source>PM Snow</source>
-        <translation>Illalla Lumisadetta</translation>
+        <translation>Illalla lumisadetta</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation>Muutamia Lumikuuroja ja Tuulista</translation>
+        <translation>Muutamia lumikuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation>Heikkoa Lumisadetta ja Tuulista</translation>
+        <translation>Heikkoa lumisadetta ja tuulista</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
@@ -278,23 +278,23 @@
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation>Aamulla Lumi/räntäsadetta</translation>
+        <translation>Aamulla lumi/räntäsadetta</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation>Raskasta/jäätävää Sadetta</translation>
+        <translation>Raskasta/jäätävää sadetta</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
-        <translation>Aamulla Heikkoa Lumisadetta</translation>
+        <translation>Aamulla heikkoa lumisadetta</translation>
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation>Sadetta/jäätävää Sadetta</translation>
+        <translation>Sadetta/jäätävää sadetta</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
-        <translation>Myrskyjä ja Tuulista</translation>
+        <translation>Myrskyjä ja tuulista</translation>
     </message>
     <message>
         <source>Sprinkles</source>
@@ -302,19 +302,19 @@
     </message>
     <message>
         <source>AM Snow Showers</source>
-        <translation>Aamulla Lumikuuroja</translation>
+        <translation>Aamulla lumikuuroja</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation>Aamulla Pilvistä/Illalla Aurinkoista</translation>
+        <translation>Aamulla pilvistä/Illalla aurinkoista</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
-        <translation>Aamulla Räntäsadetta ja Tuulista</translation>
+        <translation>Aamulla räntäsadetta ja tuulista</translation>
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation>Lumi -ja Vesisadetta sekä Tuulta</translation>
+        <translation>Lumi -ja vesisadetta sekä tuulta</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
@@ -322,83 +322,83 @@
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation>Illalla Lumikuuroja ja Tuulista</translation>
+        <translation>Illalla lumikuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
-        <translation>Sadetta ja Raekuuroja</translation>
+        <translation>Sadetta ja raekuuroja</translation>
     </message>
     <message>
         <source>Heavy Rain</source>
-        <translation>Voimakasta Sadetta</translation>
+        <translation>Voimakasta sadetta</translation>
     </message>
     <message>
         <source>AM Rain/Ice</source>
-        <translation>Aamulla Sadetta ja Raekuuroja</translation>
+        <translation>Aamulla sadetta ja raekuuroja</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation>Aamulla Lumikuuroja ja Tuulista</translation>
+        <translation>Aamulla lumikuuroja ja tuulista</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation>Aamulla Heikkoa Lumisadetta</translation>
+        <translation>Aamulla heikkoa lumisadetta</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation>Illalla Kevyttä Sadetta ja Tuulista</translation>
+        <translation>Illalla kevyttä sadetta ja tuulista</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
-        <translation>Aamulla Kevyttä Lumi/räntäsadetta</translation>
+        <translation>Aamulla kevyttä lumi/räntäsadetta</translation>
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation>Illalla Heikkoa Lumisadetta</translation>
+        <translation>Illalla heikkoa lumisadetta</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation>Voimakasta Sadetta ja Tuulista</translation>
+        <translation>Voimakasta sadetta ja tuulista</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation>Illalla Lumikuuroja</translation>
+        <translation>Illalla lumikuuroja</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
-        <translation>Lumi -ja Vesisadetta sekä Tuulta</translation>
+        <translation>Lumi -ja vesisadetta sekä tuulta</translation>
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
-        <translation>Kevyttä Sadetta ja Raekuuroja</translation>
+        <translation>Kevyttä sadetta ja raekuuroja</translation>
     </message>
     <message>
         <source>AM Snow</source>
-        <translation>Aamulla Lumisadetta</translation>
+        <translation>Aamulla lumisadetta</translation>
     </message>
     <message>
         <source>Snow to Ice</source>
-        <translation>Lumisadetta ja Raekuuroja</translation>
+        <translation>Lumisadetta ja raekuuroja</translation>
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
-        <translation>Lumi/räntäsadetta ja Tuulista</translation>
+        <translation>Lumi/räntäsadetta ja tuulista</translation>
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation>Illalla Heikkoa Lumisadetta</translation>
+        <translation>Illalla heikkoa lumisadetta</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
-        <translation>Aamulla Tihkusadetta</translation>
+        <translation>Aamulla tihkusadetta</translation>
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation>Voimakkaita Myrskyjä ja Tuulista</translation>
+        <translation>Voimakkaita myrskyjä ja yuulista</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation>Illalla Tihkusadetta</translation>
+        <translation>Illalla tihkusadetta</translation>
     </message>
     <message>
         <source>Drizzle</source>
@@ -406,11 +406,11 @@
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation>Aamulla Kevyttä Sadetta ja Tuulista</translation>
+        <translation>Aamulla kevyttä sadetta ja tuulista</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
-        <translation>Aamulla Sadetta ja Tuulista</translation>
+        <translation>Aamulla sadetta ja tuulista</translation>
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
@@ -418,19 +418,19 @@
     </message>
     <message>
         <source>Snow Showers/Windy</source>
-        <translation>Lumikuuroja ja Tuulista</translation>
+        <translation>Lumikuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Light Rain Shower</source>
-        <translation>Heikkoja Sadekuuroja</translation>
+        <translation>Heikkoja sadekuuroja</translation>
     </message>
     <message>
         <source>Light Rain with Thunder</source>
-        <translation>Heikkoa Sadetta ja Ukkosmyrskyjä</translation>
+        <translation>Heikkoa sadetta ja ukkosmyrskyjä</translation>
     </message>
     <message>
         <source>Light Drizzle</source>
-        <translation>Kevyttä Tihkusadetta</translation>
+        <translation>Kevyttä tihkusadetta</translation>
     </message>
     <message>
         <source>Mist</source>
@@ -446,11 +446,11 @@
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation>Heikkoja Lumikuuroja</translation>
+        <translation>Heikkoja lumikuuroja</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation>Heikkoja Lumikuuroja ja Tuulista</translation>
+        <translation>Heikkoja lumikuuroja ja tuulista</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -458,7 +458,7 @@
     </message>
     <message>
         <source>A Few Clouds</source>
-        <translation>Muutamia Pilviä</translation>
+        <translation>Muutamia pilviä</translation>
     </message>
     <message>
         <source>Fair</source>
@@ -544,7 +544,7 @@
     </message>
     <message>
         <source>current conditions</source>
-        <translation>Nykyinen Säätila</translation>
+        <translation>Nykyinen säätila</translation>
     </message>
     <message>
         <source>Humidity</source>
@@ -564,7 +564,7 @@
     </message>
     <message>
         <source>Wind Chill</source>
-        <translation>Tuulen Viileys</translation>
+        <translation>Tuulen viileys</translation>
     </message>
     <message>
         <source>UV Index</source>
@@ -572,7 +572,7 @@
     </message>
     <message>
         <source>extended forecast</source>
-        <translation>Tuleva Sääennuste</translation>
+        <translation>Tuleva sääennuste</translation>
     </message>
     <message>
         <source>LO</source>
@@ -584,11 +584,11 @@
     </message>
     <message>
         <source>today&apos;s forecast</source>
-        <translation>Päivän Säätiedotus</translation>
+        <translation>Päivän säätiedotus</translation>
     </message>
     <message>
         <source>tomorrow&apos;s outlook</source>
-        <translation>Huomisen Sääennuste</translation>
+        <translation>Huomisen sääennuste</translation>
     </message>
     <message>
         <source>Forecast for</source>
@@ -600,7 +600,7 @@
     </message>
     <message>
         <source>Map Unavailable</source>
-        <translation>Kartta Ei Saatavilla</translation>
+        <translation>Kartta ei saatavilla</translation>
     </message>
     <message>
         <source>RAIN</source>
