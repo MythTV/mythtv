@@ -359,9 +359,8 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
 
     QString thequery = "DELETE FROM settings WHERE value='DBSchemaVer';";
     query.prepare(thequery);
-    query.exec();
 
-    if (query.lastError().type() != QSqlError::NoError)
+    if (!query.exec())
     {
         QString msg =
             QString("DB Error (Deleting old DB version number): \n"
@@ -377,9 +376,8 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     thequery = QString("INSERT INTO settings (value, data, hostname) "
                        "VALUES ('DBSchemaVer', %1, NULL);").arg(newnumber);
     query.prepare(thequery);
-    query.exec();
 
-    if (query.lastError().type() != QSqlError::NoError)
+    if (!query.exec())
     {
         QString msg =
             QString("DB Error (Setting new DB version number): \n"
