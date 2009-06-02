@@ -53,7 +53,8 @@ bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
         query.prepare(
             QString("DELETE FROM channelgroup "
                     "WHERE id = '%1'").arg(id));
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("ChannelGroup::ToggleChannel -- delete", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Removing channel with id=%1.").arg(id));
     }
     else if (query.size() == 0)
@@ -62,7 +63,8 @@ bool ChannelGroup::ToggleChannel(uint chanid, int changrpid, int delete_chan)
         query.prepare(
             QString("INSERT INTO channelgroup (chanid,grpid) "
                     "VALUES ('%1','%2')").arg(chanid).arg(changrpid));
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("ChannelGroup::ToggleChannel -- insert", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Adding channel %1 to group %2.").arg(chanid).arg(changrpid));
     }
 
@@ -84,7 +86,7 @@ bool ChannelGroup::AddChannel(uint chanid, int changrpid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("ChannelGroup::ToggleChannel", query);
+        MythDB::DBError("ChannelGroup::AddChannel", query);
         return false;
     }
     else if (query.size() == 0)
@@ -93,7 +95,8 @@ bool ChannelGroup::AddChannel(uint chanid, int changrpid)
         query.prepare(
             QString("INSERT INTO channelgroup (chanid,grpid) "
                     "VALUES ('%1','%2')").arg(chanid).arg(changrpid));
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("ChannelGroup::AddChannel -- insert", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Adding channel %1 to group %2.").arg(chanid).arg(changrpid));
     }
 
@@ -115,7 +118,7 @@ bool ChannelGroup::DeleteChannel(uint chanid, int changrpid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("ChannelGroup::ToggleChannel", query);
+        MythDB::DBError("ChannelGroup::DeleteChannel", query);
         return false;
     }
     else if (query.size() > 0)
@@ -126,7 +129,8 @@ bool ChannelGroup::DeleteChannel(uint chanid, int changrpid)
         query.prepare(
             QString("DELETE FROM channelgroup "
                     "WHERE id = '%1'").arg(id));
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("ChannelGroup::DeleteChannel -- delete", query);
         VERBOSE(VB_IMPORTANT, LOC + QString("Removing channel with id=%1.").arg(id));
     }
 

@@ -28,6 +28,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "remoteutil.h"
+#include "mythdb.h"
 
 PreviousList::PreviousList(MythMainWindow *parent, const char *name,
                          int recid, QString ltitle)
@@ -756,7 +757,8 @@ void PreviousList::removalDialog()
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE ;");
         query.bindValue(":TITLE", pi->title);
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("PreviousList -- remove title", query);
 
         ScheduledRecording::signalChange(0);
         fillItemList();
@@ -779,7 +781,9 @@ void PreviousList::deleteItem()
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", pi->chanid);
     query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("PreviousList -- delete item", query);
+
     ScheduledRecording::signalChange(0);
     fillItemList();
 }

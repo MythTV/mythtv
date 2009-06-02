@@ -151,7 +151,9 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
                 query.bindValue(":START", (*it).starttime);
                 query.bindValue(":CHAINID", m_id);
                 query.bindValue(":DISCONT", true);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("LiveTVChain::DeleteProgram -- "
+                                    "discontinuity", query);
             }
 
             query.prepare("DELETE FROM tvchain WHERE chanid = :CHANID "
@@ -159,7 +161,8 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
             query.bindValue(":CHANID", (*del).chanid);
             query.bindValue(":START", (*del).starttime);
             query.bindValue(":CHAINID", m_id);
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("LiveTVChain::DeleteProgram -- delete", query);
 
             m_chain.erase(del);
 
@@ -186,7 +189,8 @@ void LiveTVChain::DestroyChain(void)
     query.prepare("DELETE FROM tvchain WHERE chainid = :CHAINID ;");
     query.bindValue(":CHAINID", m_id);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("LiveTVChain::DestroyChain", query);
 }
 
 void LiveTVChain::ReloadAll(void)

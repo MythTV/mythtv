@@ -534,9 +534,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":JOBTYPE", jobType);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::QueueJob()", query);
         return false;
@@ -584,9 +582,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     query.bindValue(":COMMENT", comment);
     query.bindValue(":FLAGS", flags);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::StartJob()", query);
         return false;
@@ -648,9 +644,7 @@ int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":JOBTYPE", jobType);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::GetJobID()", query);
         return -1;
@@ -674,9 +668,7 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
 
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::GetJobID()", query);
         return false;
@@ -758,9 +750,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":QUEUED", JOB_QUEUED);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
         MythDB::DBError("Cancel Pending Jobs", query);
 
     query.prepare("UPDATE jobqueue SET cmds = :CMD "
@@ -795,9 +785,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         query.bindValue(":ERRORED", JOB_ERRORED);
         query.bindValue(":CANCELLED", JOB_CANCELLED);
 
-        query.exec();
-
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
         {
             MythDB::DBError("Stop Unfinished Jobs", query);
             return false;
@@ -827,9 +815,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", starttime);
 
-        query.exec();
-
-        if (!query.isActive())
+        if (!query.exec())
             MythDB::DBError("Delete All Jobs", query);
     }
     else
@@ -842,7 +828,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         query.bindValue(":STARTTIME", starttime);
         query.bindValue(":CANCELLED", JOB_CANCELLED);
 
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
         {
             MythDB::DBError("Error in JobQueue::DeleteAllJobs(), Unable "
                             "to query list of Jobs left in Queue.", query);
@@ -883,9 +869,7 @@ bool JobQueue::DeleteJob(int jobID)
 
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::DeleteJob()", query);
         return false;
@@ -906,9 +890,7 @@ bool JobQueue::ChangeJobCmds(int jobID, int newCmds)
     query.bindValue(":CMDS", newCmds);
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::ChangeJobCmds()", query);
         return false;
@@ -930,9 +912,7 @@ bool JobQueue::ChangeJobCmds(int jobType, QString chanid,
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::ChangeJobCmds()", query);
         return false;
@@ -953,9 +933,7 @@ bool JobQueue::ChangeJobFlags(int jobID, int newFlags)
     query.bindValue(":FLAGS", newFlags);
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::ChangeJobFlags()", query);
         return false;
@@ -981,9 +959,7 @@ bool JobQueue::ChangeJobStatus(int jobID, int newStatus, QString comment)
     query.bindValue(":COMMENT", comment);
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::ChangeJobStatus()", query);
         return false;
@@ -1008,9 +984,7 @@ bool JobQueue::ChangeJobComment(int jobID, QString comment)
     query.bindValue(":COMMENT", comment);
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::ChangeJobComment()", query);
         return false;
@@ -1032,9 +1006,7 @@ bool JobQueue::ChangeJobArgs(int jobID, QString args)
     query.bindValue(":ARGS", args);
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::ChangeJobArgs()", query);
         return false;
@@ -1275,7 +1247,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
                   "WHERE j.chanid = r.chanid AND j.starttime = r.starttime "
                   "ORDER BY j.schedruntime, j.id;");
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Error in JobQueue::GetJobs(), Unable to "
                         "query list of Jobs in Queue.", query);
@@ -1388,7 +1360,7 @@ bool JobQueue::ChangeJobHost(int jobID, QString newHostname)
         query.bindValue(":ID", jobID);
     }
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError(QString("Error in JobQueue::ChangeJobHost(), "
                                 "Unable to set hostname to '%1' for "
@@ -1442,9 +1414,7 @@ enum JobCmds JobQueue::GetJobCmd(int jobID)
 
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (query.isActive())
+    if (query.exec())
     {
         if (query.next())
             return (enum JobCmds)query.value(0).toInt();
@@ -1465,9 +1435,7 @@ QString JobQueue::GetJobArgs(int jobID)
 
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (query.isActive())
+    if (query.exec())
     {
         if (query.next())
             return query.value(0).toString();
@@ -1488,9 +1456,7 @@ enum JobFlags JobQueue::GetJobFlags(int jobID)
 
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (query.isActive())
+    if (query.exec())
     {
         if (query.next())
             return (enum JobFlags)query.value(0).toInt();
@@ -1511,9 +1477,7 @@ enum JobStatus JobQueue::GetJobStatus(int jobID)
 
     query.bindValue(":ID", jobID);
 
-    query.exec();
-
-    if (query.isActive())
+    if (query.exec())
     {
         if (query.next())
             return (enum JobStatus)query.value(0).toInt();
@@ -1537,9 +1501,7 @@ enum JobStatus JobQueue::GetJobStatus(int jobType, QString chanid,
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", startts);
 
-    query.exec();
-
-    if (query.isActive())
+    if (query.exec())
     {
         if (query.next())
             return (enum JobStatus)query.value(0).toInt();
@@ -1630,7 +1592,7 @@ void JobQueue::CleanupOldJobsInQueue()
     delquery.bindValue(":DONEPURGEDATE", donePurgeDate);
     delquery.bindValue(":ERRORSPURGEDATE", errorsPurgeDate);
 
-    if (!delquery.exec() || !delquery.isActive())
+    if (!delquery.exec())
     {
         MythDB::DBError("JobQueue::CleanupOldJobsInQueue: Error deleting "
                         "old finished jobs.", delquery);
@@ -1947,8 +1909,7 @@ void JobQueue::DoTranscodeThread(void)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT name FROM recordingprofiles WHERE id = :ID;");
         query.bindValue(":ID", transcoder);
-        query.exec();
-        if (query.isActive() && query.next())
+        if (query.exec() && query.next())
         {
             transcoderName = query.value(0).toString();
         }

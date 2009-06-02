@@ -1055,7 +1055,8 @@ NULL
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("UPDATE record SET autocommflag = 1;");
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("dbcheck -- set autocommflag", query);
         }
     }
     if (dbver == "1057")
@@ -1546,7 +1547,8 @@ NULL
                 update.prepare(QString(
                     "UPDATE record SET autotranscode = 1 WHERE recordid = %1;")
                     .arg(recordids.value(0).toInt()));
-                update.exec();
+                if (!update.exec())
+                    MythDB::DBError("dbcheck -- set autotranscode", update);
             }
         }
     }
@@ -2151,11 +2153,15 @@ NULL
 
                         insert.bindValue(":TYPE", 1);
                         insert.bindValue(":MARK", start);
-                        insert.exec();
+                        if (!insert.exec())
+                            MythDB::DBError("dbcheck -- recordedmarkup, "
+                                            "cut start", insert);
 
                         insert.bindValue(":TYPE", 0);
                         insert.bindValue(":MARK", end);
-                        insert.exec();
+                        if (!insert.exec())
+                            MythDB::DBError("dbcheck -- recordedmarkup, "
+                                            "cut end", insert);
                     }
                 }
             }
@@ -2594,7 +2600,8 @@ NULL
                 fixup.bindValue(":CHANID", query.value(0).toString());
                 fixup.bindValue(":STARTTIME", query.value(1).toDateTime());
 
-                fixup.exec();
+                if (!fixup.exec())
+                    MythDB::DBError("dbcheck -- cutlist", fixup);
             }
         }
 
@@ -2653,7 +2660,9 @@ NULL
             {
                 fixup.bindValue(":DATA", fixupMap[query.value(0).toInt()]);
                 fixup.bindValue(":HOSTNAME", query.value(1).toString());
-                fixup.exec();
+                if (!fixup.exec())
+                    MythDB::DBError("dbcheck -- DisplayGroupDefaultViewMask",
+                                    fixup);
             }
         }
 
@@ -3009,7 +3018,9 @@ NULL
 
                 update.bindValue(":CHANID", airdates.value(0).toString());
                 update.bindValue(":STARTTIME", airdates.value(1).toDateTime());
-                update.exec();
+                if (!update.exec())
+                    MythDB::DBError("dbcheck -- DisplayGroupDefaultViewMask",
+                                    update);
             }
         }
 
@@ -3070,7 +3081,8 @@ NULL
                          "VALUES('Priority When Shown Once', :VALUE, "
                          "'program.first > 0 AND program.last > 0');");
             ppuq.bindValue(":VALUE", oncepriority);
-            ppuq.exec();
+            if (!ppuq.exec())
+                MythDB::DBError("dbcheck -- OnceRecPriority", ppuq);
         }
 
         if (ccpriority)
@@ -3080,7 +3092,8 @@ NULL
                          "VALUES('Close Captioned Priority', :VALUE, "
                          "'program.closecaptioned > 0');");
             ppuq.bindValue(":VALUE", ccpriority);
-            ppuq.exec();
+            if (!ppuq.exec())
+                MythDB::DBError("dbcheck -- CCRecPriority", ppuq);
         }
 
         if (!UpdateDBVersionNumber("1186"))
@@ -4508,13 +4521,15 @@ NULL
                                "VALUES (:CHANID, :GRPID);");
                 update.bindValue(":CHANID", favorites.value(0).toInt());
                 update.bindValue(":GRPID", 1);
-                update.exec();
+                if (!update.exec())
+                    MythDB::DBError("dbcheck -- channelgroup", update);
             }
         }
 
         // finally drop the favorites table
         favorites.prepare("DROP TABLE IF EXISTS favorites;");
-        favorites.exec();
+        if (!favorites.exec())
+            MythDB::DBError("dbcheck -- dropping favorites", favorites);
     }
 
     if (dbver == "1234")

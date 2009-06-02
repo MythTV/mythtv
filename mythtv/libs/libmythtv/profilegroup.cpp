@@ -214,7 +214,8 @@ void ProfileGroupEditor::open(int id) {
                                    "(name, profilegroup) VALUES (:NAME, :PROFID);");
                     result.bindValue(":NAME", availProfiles[i]);
                     result.bindValue(":PROFID", profileID);
-                    result.exec();
+                    if (!result.exec())
+                        MythDB::DBError("ProfileGroup::getHostNames", result);
                 }
             }
         }
@@ -305,16 +306,22 @@ void ProfileGroupEditor::callDelete(void)
                             "codecparams.profile = recordingprofiles.id "
                             "AND recordingprofiles.profilegroup = %1").arg(id);
             result.prepare(querystr);
-            result.exec();
+            if (!result.exec())
+                MythDB::DBError("ProfileGroupEditor::callDelete -- "
+                                "delete codecparams", result);
 
             querystr = QString("DELETE FROM recordingprofiles WHERE "
                             "profilegroup = %1").arg(id);
             result.prepare(querystr);
-            result.exec();
+            if (!result.exec())
+                MythDB::DBError("ProfileGroupEditor::callDelete -- "
+                                "delete recordingprofiles", result);
 
             querystr = QString("DELETE FROM profilegroups WHERE id = %1;").arg(id);
             result.prepare(querystr);
-            result.exec();
+            if (!result.exec())
+                MythDB::DBError("ProfileGroupEditor::callDelete -- "
+                                "delete profilegroups", result);
 
             redraw = true;
 

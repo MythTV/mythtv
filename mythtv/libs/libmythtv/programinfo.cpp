@@ -1885,19 +1885,23 @@ static bool insert_program(const ProgramInfo        *pg,
         query.prepare("UPDATE channel SET last_record = NOW() "
                       "WHERE chanid = :CHANID");
         query.bindValue(":CHANID", pg->chanid);
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("insert_program -- channel last_record", query);
 
         query.prepare("UPDATE record SET last_record = NOW() "
                       "WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", pg->recordid);
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("insert_program -- record last_record", query);
 
         if (pg->rectype == kOverrideRecord && pg->parentid > 0)
         {
             query.prepare("UPDATE record SET last_record = NOW() "
                           "WHERE recordid = :PARENTID");
             query.bindValue(":PARENTID", pg->parentid);
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("insert_program -- record last_record override",
+                                query);
         }
     }
 
@@ -1920,9 +1924,7 @@ void ProgramInfo::FinishedRecording(bool prematurestop)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    query.exec();
-
-    if (!query.isActive())
+    if (!query.exec())
         MythDB::DBError("FinishedRecording update", query);
 
     GetProgramRecordingStatus();
@@ -1945,10 +1947,8 @@ void ProgramInfo::UpdateRecordingEnd(void)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    query.exec();
-
-    if (!query.isActive())
-        MythDB::DBError("FinishedRecording update", query);
+    if (!query.exec())
+        MythDB::DBError("UpdateRecordingEnd update", query);
 }
 
 
@@ -3119,8 +3119,7 @@ void ProgramInfo::SetVidpropHeight(int height)
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts);
 
-        query.exec();
-        if (!query.isActive())
+        if (!query.exec())
             MythDB::DBError("UpdateRes", query);
 
     }
@@ -3133,8 +3132,7 @@ void ProgramInfo::SetVidpropHeight(int height)
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts);
 
-        query.exec();
-        if (!query.isActive())
+        if (!query.exec())
             MythDB::DBError("UpdateRes", query);
     }
     else
@@ -3162,8 +3160,7 @@ void ProgramInfo::ReactivateRecording(void)
     result.bindValue(":TITLE", title);
     result.bindValue(":STATION", chansign);
 
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
         MythDB::DBError("ReactivateRecording", result);
 
     ScheduledRecording::signalChange(0);
@@ -3207,8 +3204,7 @@ void ProgramInfo::AddHistory(bool resched, bool forcedup)
     result.bindValue(":DUPLICATE", dup);
     result.bindValue(":REACTIVATE", reactivate);
 
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
         MythDB::DBError("addHistory", result);
 
     if (dup && findid)
@@ -3218,8 +3214,7 @@ void ProgramInfo::AddHistory(bool resched, bool forcedup)
         result.bindValue(":RECORDID", recordid);
         result.bindValue(":FINDID", findid);
 
-        result.exec();
-        if (!result.isActive())
+        if (!result.exec())
             MythDB::DBError("addFindHistory", result);
     }
 
@@ -3242,8 +3237,7 @@ void ProgramInfo::DeleteHistory(void)
     result.bindValue(":START", recstartts);
     result.bindValue(":STATION", chansign);
 
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
         MythDB::DBError("deleteHistory", result);
 
     if (/*duplicate &&*/ findid)
@@ -3253,8 +3247,7 @@ void ProgramInfo::DeleteHistory(void)
         result.bindValue(":RECORDID", recordid);
         result.bindValue(":FINDID", findid);
 
-        result.exec();
-        if (!result.isActive())
+        if (!result.exec())
             MythDB::DBError("deleteFindHistory", result);
     }
 
@@ -3283,8 +3276,7 @@ void ProgramInfo::ForgetHistory(void)
     result.bindValue(":TITLE", title);
     result.bindValue(":CHANID", chanid);
 
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
         MythDB::DBError("forgetRecorded", result);
 
     result.prepare("UPDATE oldrecorded SET duplicate = 0 "
@@ -3300,16 +3292,14 @@ void ProgramInfo::ForgetHistory(void)
     result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
 
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
         MythDB::DBError("forgetHistory", result);
 
     result.prepare("DELETE FROM oldrecorded "
                    "WHERE recstatus = :NEVER AND duplicate = 0");
     result.bindValue(":NEVER", rsNeverRecord);
 
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
         MythDB::DBError("forgetNeverHisttory", result);
 
     if (findid)
@@ -3319,8 +3309,7 @@ void ProgramInfo::ForgetHistory(void)
         result.bindValue(":RECORDID", recordid);
         result.bindValue(":FINDID", findid);
 
-        result.exec();
-        if (!result.isActive())
+        if (!result.exec())
             MythDB::DBError("forgetFindHistory", result);
     }
 
@@ -3349,8 +3338,7 @@ void ProgramInfo::SetDupHistory(void)
     result.bindValue(":PROGRAMID", programid);
     result.bindValue(":FINDID", findid);
 
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
         MythDB::DBError("setDupHistory", result);
 
     ScheduledRecording::signalChange(0);
@@ -3973,7 +3961,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     query.bindValue(":RECUSAGE", inUseForWhat);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("MarkAsInUse -- delete", query);
 
     if (!inuse)
     {

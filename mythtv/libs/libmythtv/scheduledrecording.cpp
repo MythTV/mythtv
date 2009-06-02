@@ -536,11 +536,13 @@ void ScheduledRecording::remove()
     MSqlQuery query(MSqlQuery::InitCon());
     querystr = QString("DELETE FROM record WHERE recordid = %1").arg(rid);
     query.prepare(querystr);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("ScheduledRecording::remove -- record", query);
 
     querystr = QString("DELETE FROM oldfind WHERE recordid = %1").arg(rid);
     query.prepare(querystr);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("ScheduledRecording::remove -- oldfind", query);
 }
 
 void ScheduledRecording::signalChange(int recordid)
@@ -1035,8 +1037,7 @@ ScheduledRecording::testRecording()
         thequery = QString("SELECT MAX(recordid) FROM %1 ORDER BY recordid;")
                            .arg(ttable);
         query.prepare(thequery);
-        query.exec();
-        if (query.isActive() && query.next())
+        if (query.exec() && query.next())
             id->setValue(query.value(0).toInt() + 1);
         else
             id->setValue(100000);

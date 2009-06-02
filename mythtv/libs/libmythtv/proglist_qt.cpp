@@ -27,6 +27,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "channelutil.h"
+#include "mythdb.h"
 
 ProgListerQt::ProgListerQt(ProgListTypeQt pltype,
                        const QString &view, const QString &from,
@@ -495,7 +496,9 @@ void ProgListerQt::updateKeywordInDB(const QString &text)
                           "WHERE phrase = :PHRASE AND searchtype = :TYPE;");
             query.bindValue(":PHRASE", qphrase);
             query.bindValue(":TYPE", searchtype);
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("ProgListerQt::updateKeywordInDB -- delete",
+                                query);
         }
         if (newview < 0)
         {
@@ -506,7 +509,9 @@ void ProgListerQt::updateKeywordInDB(const QString &text)
                           "VALUES(:PHRASE, :TYPE );");
             query.bindValue(":PHRASE", qphrase);
             query.bindValue(":TYPE", searchtype);
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("ProgListerQt::updateKeywordInDB -- replace",
+                                query);
         }
     }
 }
@@ -644,7 +649,8 @@ void ProgListerQt::deleteKeyword(void)
                   "WHERE phrase = :PHRASE AND searchtype = :TYPE;");
     query.bindValue(":PHRASE", qphrase);
     query.bindValue(":TYPE", searchtype);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("ProgListerQt::deleteKeyword", query);
 
     chooseListBox->removeRow(view + 1);
     viewList.removeAll(text);
@@ -985,9 +991,8 @@ void ProgListerQt::powerEdit()
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT genre FROM programgenres GROUP BY genre;");
-    query.exec();
 
-    if (query.isActive() && query.size())
+    if (query.exec())
     {
         while (query.next())
         {
@@ -1262,9 +1267,8 @@ void ProgListerQt::fillViewList(const QString &view)
                       "WHERE program.endtime > :PGILSTART "
                       "GROUP BY g1.genre, g2.genre;");
         query.bindValue(":PGILSTART", startstr);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec() && query.size())
         {
             QString lastGenre1;
 
@@ -1298,9 +1302,8 @@ void ProgListerQt::fillViewList(const QString &view)
                           "WHERE program.endtime > :PGILSTART "
                           "GROUP BY category;");
             query.bindValue(":PGILSTART", startstr);
-            query.exec();
 
-            if (query.isActive() && query.size())
+            if (query.exec())
             {
                 while (query.next())
                 {
@@ -1326,9 +1329,8 @@ void ProgListerQt::fillViewList(const QString &view)
         query.prepare("SELECT phrase FROM keyword "
                       "WHERE searchtype = :SEARCHTYPE;");
         query.bindValue(":SEARCHTYPE", searchtype);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec())
         {
             while (query.next())
             {
@@ -1353,7 +1355,9 @@ void ProgListerQt::fillViewList(const QString &view)
                               "VALUES(:VIEW, :SEARCHTYPE );");
                 query.bindValue(":VIEW", qphrase);
                 query.bindValue(":SEARCHTYPE", searchtype);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("ProgListerQt::fillViewList -- replace",
+                                    query);
 
                 viewList << qphrase;
                 viewTextList << qphrase;
@@ -1451,9 +1455,8 @@ void ProgListerQt::fillViewList(const QString &view)
         query.prepare("SELECT title FROM record "
                       "WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", view);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec())
         {
             if (query.next())
             {
@@ -1469,9 +1472,8 @@ void ProgListerQt::fillViewList(const QString &view)
         MSqlQuery query(MSqlQuery::InitCon()); 
         query.prepare("SELECT rulename FROM customexample "
                       "WHERE search > 0 ORDER BY rulename;");
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec())
         {
             while (query.next())
             {
@@ -1719,11 +1721,9 @@ void ProgListerQt::fillItemList(void)
         query.prepare("SELECT fromclause, whereclause FROM customexample "
                       "WHERE rulename = :RULENAME;");
         query.bindValue(":RULENAME", qphrase);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec() && query.next())
         {
-            query.next();
             fromc  = query.value(0).toString();
             wherec = query.value(1).toString();
 

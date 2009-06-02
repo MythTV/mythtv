@@ -731,7 +731,8 @@ void XMLTVConfig::Save(void)
         "SET userid=NULL, password=NULL "
         "WHERE xmltvgrabber NOT IN ( 'datadirect', 'technovera', "
         "                            'schedulesdirect1' )");
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("XMLTVConfig::Save", query);
 }
 
 VideoSource::VideoSource()
@@ -2531,7 +2532,8 @@ void CardInput::Save(void)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM cardinput WHERE cardinputid = :INPUTID");
         query.bindValue(":INPUTID", getInputID());
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("CardInput::Save", query);
     }
     else
     {

@@ -186,7 +186,6 @@ QString PlayGroup::GetInitialName(const ProgramInfo *pi)
     query.bindValue(":TITLE1", pi->title);
     query.bindValue(":TITLE2", pi->title);
     query.bindValue(":CATEGORY", pi->category);
-    query.exec();
 
     if (!query.exec())
         MythDB::DBError("GetInitialName", query);
