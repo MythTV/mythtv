@@ -71,7 +71,7 @@ EITFixUp::EITFixUp()
       m_mcaCC(",?\\s(HI|English) Subtitles\\.?"),
       m_mcaDD(",?\\sDD\\.?"),
       m_RTLrepeat("(\\(|\\s)?Wiederholung.+vo[m|n].+((?:\\d{2}\\.\\d{2}\\.\\d{4})|(?:\\d{2}[:\\.]\\d{2}\\sUhr))\\)?"),
-      m_RTLSubtitle("([^\\.]+)\\.\\s+(.+)"),
+      m_RTLSubtitle("^([^\\.]{3,})\\.\\s+(.+)"),
       m_RTLSubtitle1("^Folge\\s(\\d{1,4})\\s*:\\s+'(.*)'(?:\\.\\s*|$)"),
       m_RTLSubtitle2("^Folge\\s(\\d{1,4})\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
       m_RTLSubtitle3("^(?:Folge\\s)?(\\d{1,4}(?:\\/[IVX]+)?)\\s+(.{,5}[^\\.]{,120})[\\?!\\.]\\s*"),
