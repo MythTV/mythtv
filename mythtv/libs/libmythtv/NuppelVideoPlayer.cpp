@@ -4804,7 +4804,10 @@ void NuppelVideoPlayer::ClearAfterSeek(bool clearvideobuffers)
     VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek("<<clearvideobuffers<<")");
 
     if (clearvideobuffers)
+    {
         videoOutput->ClearAfterSeek();
+        videoOutput->UpdatePauseFrame();
+    }
 
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].timecode = 0;
