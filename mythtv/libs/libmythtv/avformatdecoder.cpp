@@ -1485,6 +1485,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 if (novideo)
                     break;
 
+                // HACK -- ignore CODEC_ID_MPEG1VIDEO if the bit_rate
+                // is 0.  CBS/KTVT recordings seem to be screwing up.
+                if (enc->codec_id == CODEC_ID_MPEG1VIDEO &&
+                    enc->bit_rate == 0)
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            LOC + QString("Stream #%1 is MPEG1VIDEO with 0 bit rate, skipping.").arg(i));
+                    continue;
+                }
+
                 d->DestroyMPEG2();
                 h264_kf_seq->Reset();
 
