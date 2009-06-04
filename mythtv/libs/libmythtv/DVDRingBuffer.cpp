@@ -494,7 +494,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 {
                     
                     int relativetime = (int)((seektime - currentTime)/ 90000);
-                    if (relativetime <= 0)
+                    if (relativetime <= 1)
                     {
                         seeking = false;
                         seektime = 0;
