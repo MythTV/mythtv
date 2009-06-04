@@ -17,6 +17,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 #include <errno.h>
 #include <sys/socket.h>
 #include <fcntl.h>

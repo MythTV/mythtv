@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 #include <map>
 #include <sys/types.h>
 #include <sys/socket.h>
