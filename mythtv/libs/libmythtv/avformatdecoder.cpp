@@ -1193,7 +1193,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
 }
 
-#if defined(USING_XVMC) || defined(USING_DVDV) || defined(USING_VDPAU)
 static int mpeg_version(int codec_id)
 {
     switch (codec_id)
@@ -1225,15 +1224,10 @@ static int mpeg_version(int codec_id)
     return 0;
 }
 
+#ifdef USING_XVMC
 static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 {
-    (void) pix_fmt;
-#ifdef USING_XVMC
     int xvmc_chroma = XVMC_CHROMA_FORMAT_420;
-#else
-    int xvmc_chroma = 0;
-#endif
-
 #if 0
 // We don't support other chromas yet
     if (PIX_FMT_YUV420P == pix_fmt)
@@ -1245,7 +1239,7 @@ static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 #endif
     return xvmc_chroma;
 }
-#endif
+#endif // USING_XVMC
 
 void default_captions(sinfo_vec_t *tracks, int av_index)
 {
@@ -1568,9 +1562,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 bool handled = false;
-#if defined(USING_VDPAU) || defined(USING_XVMC)
                 if (!using_null_videoout && mpeg_version(enc->codec_id))
                 {
+#if defined(USING_VDPAU) || defined(USING_XVMC)
                     // HACK -- begin
                     // Force MPEG2 decoder on MPEG1 streams.
                     // Needed for broken transmitters which mark
@@ -1603,42 +1597,48 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* test surface */ kCodec_NORMAL_END > video_codec_id,
                         /* force_xv     */ force_xv);
                     bool vcd, idct, mc, vdpau;
-                    enc->codec_id = (CodecID)
-                        myth2av_codecid(mcid, vcd, idct, mc, vdpau);
 
-                    if (ringBuffer && ringBuffer->isDVD() &&
-                        (mcid == video_codec_id) &&
-                        dvd_video_codec_changed)
+                    if (mcid > video_codec_id)
                     {
-                        dvd_video_codec_changed = false;
-                        dvd_xvmc_enabled = false;
-                    }
+                        enc->codec_id = (CodecID)
+                            myth2av_codecid(mcid, vcd, idct, mc, vdpau);
 
-                    video_codec_id = mcid;
-                    if (!force_xv && kCodec_NORMAL_END < mcid && kCodec_STD_XVMC_END > mcid)
-                    {
-                        enc->pix_fmt = (idct) ?
-                            PIX_FMT_XVMC_MPEG2_IDCT : PIX_FMT_XVMC_MPEG2_MC;
+                        if (ringBuffer && ringBuffer->isDVD() &&
+                            (mcid == video_codec_id) &&
+                            dvd_video_codec_changed)
+                        {
+                            dvd_video_codec_changed = false;
+                            dvd_xvmc_enabled = false;
+                        }
+
+                        video_codec_id = mcid;
+                        if (!force_xv && (kCodec_NORMAL_END < mcid) &&
+                            (kCodec_STD_XVMC_END > mcid))
+                        {
+                            enc->pix_fmt = (idct) ?
+                                PIX_FMT_XVMC_MPEG2_IDCT :
+                                PIX_FMT_XVMC_MPEG2_MC;
+                        }
+                        handled = true;
                     }
-                    handled = true;
-                }
-#elif USING_DVDV
-                if (!using_null_videoout && mpeg_version(enc->codec_id))
-                {
-                    MythCodecID mcid;
-                    mcid = VideoOutputQuartz::GetBestSupportedCodec(
+#endif // USING_XVMC || USING_VDPAU
+#ifdef USING_DVDV
+                    MythCodecID quartz_mcid;
+                    quartz_mcid = VideoOutputQuartz::GetBestSupportedCodec(
                         /* disp dim     */ width, height,
                         /* osd dim      */ 0, 0,
                         /* mpeg type    */ mpeg_version(enc->codec_id),
                         /* pixel format */
                         (PIX_FMT_YUV420P == enc->pix_fmt) ? FOURCC_I420 : 0);
 
-                    enc->codec_id = (CodecID) myth2av_codecid(mcid);
-                    video_codec_id = mcid;
-
-                    handled = true;
+                    if (quartx_mcid > video_codec_id)
+                    {
+                        enc->codec_id = (CodecID) myth2av_codecid(quartz_mcid);
+                        video_codec_id = quartz_mcid;
+                        handled = true;
+                    }
+#endif // USING_DVDV
                 }
-#endif // USING_XVMC || USING_DVDV
 
                 if (video_codec_id > kCodec_NORMAL_END)
                     thread_count = 1;
