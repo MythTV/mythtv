@@ -622,9 +622,9 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBList(void)
 
 vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
 {
-    VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- begin");
+    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- begin");
     QMutexLocker locker(&m_lock);
-    VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- got lock");
+    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- got lock");
 
     vector<AVCInfo> list;
 
@@ -638,7 +638,7 @@ vector<AVCInfo> DarwinFirewireDevice::GetSTBListPrivate(void)
         }
     }
 
-    VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- end");
+    //VERBOSE(VB_IMPORTANT, "GetSTBListPrivate -- end");
     return list;
 }
 
