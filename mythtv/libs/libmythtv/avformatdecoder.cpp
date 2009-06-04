@@ -1559,6 +1559,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 QString dec = "ffmpeg";
                 uint thread_count = 1;
 
+                if (!is_db_ignored)
+                {
+                    VideoDisplayProfile vdp;
+                    vdp.SetInput(QSize(width, height));
+                    dec = vdp.GetDecoder();
+                    thread_count = vdp.GetMaxCPUs();
+                }
+
                 bool handled = false;
 #if defined(USING_VDPAU) || defined(USING_XVMC)
                 if (!using_null_videoout && mpeg_version(enc->codec_id))
@@ -1631,14 +1639,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     handled = true;
                 }
 #endif // USING_XVMC || USING_DVDV
-
-                if (!is_db_ignored)
-                {
-                    VideoDisplayProfile vdp;
-                    vdp.SetInput(QSize(width, height));
-                    dec = vdp.GetDecoder();
-                    thread_count = vdp.GetMaxCPUs();
-                }
 
                 if (video_codec_id > kCodec_NORMAL_END)
                     thread_count = 1;
