@@ -107,6 +107,10 @@ bool VideoOutputDX::InputChanged(const QSize &input_size,
                                  MythCodecID  av_codec_id,
                                  void        *codec_private)
 {
+    VERBOSE(VB_PLAYBACK, QString("InputChanged(%1,%2,%3) %4")
+            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(toString(av_codec_id)));
+
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
     db_vdisp_profile->SetVideoRenderer("directx");
@@ -120,21 +124,27 @@ bool VideoOutputDX::InputChanged(const QSize &input_size,
     DirectXCloseSurface();
     MakeSurface();
     
-    vbuffers.CreateBuffers(XJ_width, XJ_height);
-
-    MoveResize();
+    bool ok = vbuffers.CreateBuffers(XJ_width, XJ_height);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, "InputChanged(): Failed to recreate buffers");
+        errorState = kError_Unknown;
+    }
 
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
-    pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    pauseFrame.buf    = new unsigned char[pauseFrame.size];
-    pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
-
-    return true;
+    if (ok)
+    {
+        MoveResize();
+        pauseFrame.height = vbuffers.GetScratchFrame()->height;
+        pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+        pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+        pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+        pauseFrame.buf    = new unsigned char[pauseFrame.size];
+        pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+    }
+    return ok;
 }
 
 int VideoOutputDX::GetRefreshRate(void)

@@ -77,6 +77,14 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
             .arg(input_size.width())
             .arg(input_size.height()).arg(aspect));
 
+    if (av_codec_id >= kCodec_NORMAL_END)
+    {
+        VERBOSE(VB_IMPORTANT, QString("VideoOutputNull::InputChanged(): "
+                                      "new video codec is not supported."));
+        errorState = kError_Unknown;
+        return false;
+    }
+
     QMutexLocker locker(&global_lock);
 
     bool res_changed = input_size != windows[0].GetVideoDispDim();
@@ -97,18 +105,22 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     const QSize video_dim = windows[0].GetVideoDim();
 
-    if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
+    bool ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+    if (!ok)
     {
         VERBOSE(VB_IMPORTANT, "VideoOutputNull::InputChanged(): "
                 "Failed to recreate buffers");
         errorState = kError_Unknown;
     }
-    CreatePauseFrame();
+    else
+    {
+        CreatePauseFrame();
+    }
 
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("null");
 
-    return true;
+    return ok;
 }
 
 int VideoOutputNull::GetRefreshRate(void)

@@ -810,16 +810,14 @@ void NuppelVideoPlayer::ReinitVideo(void)
     vidExitLock.lock();
     videofiltersLock.lock();
 
-    float aspect = (forced_video_aspect > 0) ? forced_video_aspect : video_aspect;
+    float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
+                                               video_aspect;
+    bool ok = videoOutput->InputChanged(video_disp_dim, aspect,
+                                        GetDecoder()->GetVideoCodecID(),
+                                        GetDecoder()->GetVideoCodecPrivate());
+    ok &= !videoOutput->IsErrored();
 
-    videoOutput->InputChanged(video_disp_dim, aspect,
-                              GetDecoder()->GetVideoCodecID(),
-                              GetDecoder()->GetVideoCodecPrivate());
-
-    // We need to tell it this for automatic deinterlacer settings
-    videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
-
-    if (videoOutput->IsErrored())
+    if (!ok)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Failed to Reinitialize Video. Exiting..");
@@ -827,11 +825,16 @@ void NuppelVideoPlayer::ReinitVideo(void)
     }
     else
     {
+        // We need to tell it this for automatic deinterlacer settings
+        videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
         ReinitOSD();
     }
 
     videofiltersLock.unlock();
     vidExitLock.unlock();
+
+    if (!ok)
+        return;
 
     ClearAfterSeek();
 

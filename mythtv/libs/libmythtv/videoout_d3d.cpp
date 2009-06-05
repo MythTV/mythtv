@@ -148,15 +148,19 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
 
     MoveResize();
 
-    if (!vbuffers.CreateBuffers(m_InputCX, m_InputCY))
+    bool ok = vbuffers.CreateBuffers(m_InputCX, m_InputCY);
+    if (!ok)
     {
         VERBOSE(VB_IMPORTANT, LOC + "InputChanged(): "
                 "Failed to recreate buffers");
         errorState = kError_Unknown;
     }
 
-    if (!InitD3D())
+    if (ok && !InitD3D())
+    {
         UnInitD3D();
+        ok = false;
+    }
 
     if (m_pauseFrame.buf)
     {
@@ -164,14 +168,16 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
         m_pauseFrame.buf = NULL;
     }
 
-    m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
-    m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
-    m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
-    m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
-    m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
-    m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
-
-    return true;
+    if (ok)
+    {
+        m_pauseFrame.height = vbuffers.GetScratchFrame()->height;
+        m_pauseFrame.width  = vbuffers.GetScratchFrame()->width;
+        m_pauseFrame.bpp    = vbuffers.GetScratchFrame()->bpp;
+        m_pauseFrame.size   = vbuffers.GetScratchFrame()->size;
+        m_pauseFrame.buf    = new unsigned char[m_pauseFrame.size + 128];
+        m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
+    }
+    return ok;
 }
 
 bool VideoOutputD3D::InitD3D()

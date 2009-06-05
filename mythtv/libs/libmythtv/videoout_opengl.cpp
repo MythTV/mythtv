@@ -134,10 +134,19 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
                                      MythCodecID  av_codec_id,
                                      void        *codec_private)
 {
+    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) %4")
+            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(toString(av_codec_id)));
+
     QMutexLocker locker(&gl_context_lock);
 
     if (av_codec_id >= kCodec_NORMAL_END)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("New video codec is not supported."));
+        errorState = kError_Unknown;
         return false;
+    }
 
     bool size_changed = (input_size != windows[0].GetVideoDim());
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
@@ -160,8 +169,15 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
                    gl_embed_win);
 
     if (ok)
+    {
         BestDeint();
-
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Failed to re-initialise video output."));
+        errorState = kError_Unknown;
+    }
     return ok;
 }
 
