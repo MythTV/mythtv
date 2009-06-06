@@ -1393,19 +1393,6 @@ static const QString motion_top =
 static const QString motion_bot =
 "SUB mov, res, current;\n" + motion_calc;
 
-static const QString doublerateonefield[2] = {
-"TEX current, tex, texture[1], %1;\n"
-"TEX prev, tex, texture[2], %1;\n"
-"ADD other, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX other, other, texture[1], %1;\n"
-+ motion_top + field_calc + deint_end_top,
-
-"TEX current, tex, texture[1], %1;\n"
-"SUB other, tex, {0.0, %3, 0.0, 0.0};\n"
-"TEX other, other, texture[1], %1;\n"
-+ motion_bot + field_calc + deint_end_bot
-};
-
 static const QString linearblend[2] = {
 "TEX current, tex, texture[1], %1;\n"
 "TEX prev, tex, texture[2], %1;\n"
@@ -1723,11 +1710,6 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
                     deint == "opengldoubleratefieldorder")
                 {
                     deint_bit = bobdeint[tmp_field];
-                }
-                else if (deint == "opengldoublerateonefield")
-                {
-                    deint_bit = doublerateonefield[tmp_field];
-                    if (!tmp_field) { need_tex = false; }
                 }
                 else if (deint == "opengllinearblend" ||
                          deint == "opengldoubleratelinearblend")

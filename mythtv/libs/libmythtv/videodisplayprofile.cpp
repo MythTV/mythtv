@@ -708,8 +708,6 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Bob (2x, HW)");
     else if ("openglonefield" == short_name)
         return QObject::tr("One field (HW)");
-    else if ("opengldoublerateonefield" == short_name)
-        return QObject::tr("One Field (2x, HW)");
     else if ("opengldoubleratekerneldeint" == short_name)
         return QObject::tr("Kernel (2x, HW)");
     else if ("opengldoubleratelinearblend" == short_name)
@@ -1312,8 +1310,6 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kYadifMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratelinearblend")
         msg = kLinearBlendMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
-    else if (deint == "opengldoublerateonefield")
-        msg = kOneFieldMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratekerneldeint")
         msg = kKernelMsg + " " +  kDoubleRateMsg + " " + kUsingGPU;
     else if (deint == "opengldoubleratefieldorder")
@@ -1527,7 +1523,6 @@ QString VideoDisplayProfile::toString(void) const
 "openglbobdeint"
 "openglyadif"
 "opengldoubleratelinearblend"
-"opengldoublerateonefield"
 "opengldoubleratekerneldeint"
 "opengldoubleratefieldorder"
 "opengldoublerateyadif"
@@ -1591,7 +1586,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_deint["opengl"] += "bobdeint";
     safe_deint["opengl"] += "openglbobdeint";
     safe_deint["opengl"] += "opengldoubleratelinearblend";
-    safe_deint["opengl"] += "opengldoublerateonefield";
     safe_deint["opengl"] += "opengldoubleratekerneldeint";
     safe_deint["opengl"] += "opengldoubleratefieldorder";
     safe_deint["opengl"] += "opengldoublerateyadif";
