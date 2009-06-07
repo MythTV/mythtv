@@ -36,11 +36,13 @@ thread unless you use a lock on the object. You can use the
 template on most Qt containers to make a copy you can use in another
 thread.
 
-There are also special dangers when
+There are some special dangers when
 \ref qobject_dangers "using QObject" outside the Qt event thread.
 
-The is also short HOWTO on \ref profiling_mythtv available in addition
+There is a short HOWTO on \ref profiling_mythtv available in addition
 to documentation on the code itself.
+
+There are also a few simple \ref testing "testing shortcuts".
 
 \section libs Libraries
 
@@ -956,6 +958,30 @@ an annotated versions of the code, and saving results.
 
 */
 
+/** \defgroup testing    Testing hints and shortcuts
+This line is filler that is ignored by Doxygen.
+
+The internal video playback can be tested by the programs/mythtv tool:
+
+\verbatim
+mythtv /myth/tv/1003_20060302232800.mpg
+mythtv dvd:\\
+mythtv dvd:\\/path/to/dvd.iso
+\endverbatim
+
+Without an argument, this tool also exercises the "Live TV" recording chain.
+This can even be done on a machine without any tuner cards by creating a dummy
+MpegRecorder which loops through a sample MPEG file.
+
+On a machine that supports V4L, just add an IVTV type card,
+with the device set to something like "file:/path/to/some/mpeg/file.mpg".
+You also need you to attach the card to a video source.
+
+On non-V4L machines, you currently need to manually create entries
+in the capturecard and cardinput tables.
+videodevice=file:/path/file.mpg, cardtype=MPEG, inputname=MPEG2TS.
+
+*/
 
 /** \defgroup db_schema    MythTV Database Schema
 This line is filler that is ignored by Doxygen.
