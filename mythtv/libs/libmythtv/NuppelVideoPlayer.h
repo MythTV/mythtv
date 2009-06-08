@@ -205,9 +205,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     long long GetBookmark(void) const;
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
-        { return (errorType == kError_Preempt); }
+        { return (errorType & kError_Preempt ||
+                  errorType & kError_Switch_Renderer); }
     bool      IsDecoderErrored(void)   const
-        { return (errorType == kError_Decode); }
+        { return (errorType & kError_Decode); }
     QString   GetEncodingType(void) const;
     QString   GetXDS(const QString &key) const;
     bool      GetAudioBufferStatus(uint &fill, uint &total) const;
@@ -591,7 +592,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     mutable bool     limitKeyRepeat;
     mutable QMutex   errorLock;
     mutable QString  errorMsg;   ///< Reason why NVP exited with a error
-    mutable VideoErrorState errorType;
+    mutable int errorType;
 
     // Bookmark stuff
     long long bookmarkseek;

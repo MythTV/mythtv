@@ -101,8 +101,9 @@ typedef enum VideoErrorState
 {
     kError_None,
     kError_Unknown,
-    kError_Decode,
-    kError_Preempt,
+    kError_Decode,          // VDPAU decoder error
+    kError_Preempt,         // VDPAU display pre-empted
+    kError_Switch_Renderer, // Current renderer is not preferred choice
 } VideoErrorState;
 
 typedef enum WindowVisibility

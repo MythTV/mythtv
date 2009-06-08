@@ -7660,7 +7660,7 @@ void NuppelVideoPlayer::SetErrored(const QString &reason) const
     QMutexLocker locker(&errorLock);
 
     if (videoOutput)
-        errorType = videoOutput->GetError();
+        errorType |= videoOutput->GetError();
 
     if (errorMsg.isEmpty())
     {

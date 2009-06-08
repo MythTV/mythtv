@@ -2719,6 +2719,9 @@ void TV::timerEvent(QTimerEvent *te)
 
         if (mctx->IsNVPErrored())
         {
+            if (mctx->IsNVPRecoverable())
+                RestartMainNVP(mctx);
+
             if (mctx->IsNVPDecoderErrored())
             {
                 noHardwareDecoders = true;
@@ -2726,8 +2729,6 @@ void TV::timerEvent(QTimerEvent *te)
                     player[i]->SetNoHardwareDecoders();
                 RestartMainNVP(mctx);
             }                
-            if (mctx->IsNVPRecoverable())
-                RestartMainNVP(mctx);
         }
 
         if (mctx->IsRecorderErrored() ||
