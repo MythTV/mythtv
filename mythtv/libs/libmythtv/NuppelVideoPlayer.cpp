@@ -812,18 +812,30 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
     float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
                                                video_aspect;
-    bool ok = videoOutput->InputChanged(video_disp_dim, aspect,
-                                        GetDecoder()->GetVideoCodecID(),
-                                        GetDecoder()->GetVideoCodecPrivate());
-    ok &= !videoOutput->IsErrored();
 
-    if (!ok)
+    bool ok = true;
+    if (videoOutput->IsPreferredRenderer(video_disp_dim))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to Reinitialize Video. Exiting..");
-        SetErrored(QObject::tr("Failed to reinitialize video output"));
+        if (!videoOutput->InputChanged(video_disp_dim, aspect,
+                                       GetDecoder()->GetVideoCodecID(),
+                                       GetDecoder()->GetVideoCodecPrivate()))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to Reinitialize Video. Exiting..");
+            SetErrored(QObject::tr("Failed to reinitialize video output"));
+            ok = false;
+        }
     }
     else
+    {
+        VERBOSE(VB_PLAYBACK, LOC + QString("Need to switch video renderer."));
+        SetErrored(QObject::tr("Need to switch video renderer."));
+        errorType |= kError_Switch_Renderer;
+        ok = false;
+    }
+
+    ok &= !videoOutput->IsErrored();
+    if (ok)
     {
         // We need to tell it this for automatic deinterlacer settings
         videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);

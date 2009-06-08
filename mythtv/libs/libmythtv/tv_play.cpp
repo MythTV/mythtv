@@ -5532,16 +5532,16 @@ void TV::RestartMainNVP(PlayerContext *mctx)
     }
 
     MuteState mctx_mute = mctx->nvp->GetMuteState();
+
+    // HACK - FIXME
+    // workaround muted audio when NVP is re-created
+    mctx_mute = kMuteOff;
+    // FIXME - end
     mctx->deleteNVPLock.unlock();
 
     vector<long long> pos = TeardownAllNVPs(mctx);
     RestartAllNVPs(mctx, pos, mctx_mute);
     SetActive(mctx, playerActive, false);
-
-    OSD *osd = GetOSDLock(mctx);
-    if (osd)
-        osd->SetSettingsText(tr("Recovered from video error"), 3);
-    ReturnOSDLock(mctx, osd);
 
     VERBOSE(VB_PLAYBACK, LOC + "Restart main player -- end");
 }
