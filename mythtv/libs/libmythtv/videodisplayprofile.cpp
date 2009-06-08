@@ -1661,6 +1661,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer["macaccel"] += "quartz-accel";
     safe_renderer["ivtv"]     += "ivtv";
     safe_renderer["vdpau"]    += "vdpau";
+    safe_renderer["dummy"]    += "vdpau";
 
     safe_renderer_priority["null"]         =  10;
     safe_renderer_priority["xlib"]         =  20;
@@ -1693,7 +1694,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer_group["x11"] += "xv-blit";
     safe_renderer_group["x11"] += "xvmc-blit";
     safe_renderer_group["x11"] += "xvmc-opengl";
-    safe_renderer_group["x11"] += "vdpau";
     safe_renderer_group["quartz"] += "quartz-blit";
     safe_renderer_group["quartz"] += "quartz-accel";
 }

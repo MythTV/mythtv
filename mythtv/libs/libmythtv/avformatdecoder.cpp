@@ -40,7 +40,7 @@ extern "C" {
 #endif // USING_XVMC
 
 #ifdef USING_VDPAU
-#include "videoout_xv.h"
+#include "videoout_vdpau.h"
 extern "C" {
 #include "vdpau_render.h"
 }
@@ -1224,15 +1224,10 @@ static int mpeg_version(int codec_id)
     return 0;
 }
 
-#if defined(USING_XVMC) || defined(USING_VDPAU)
+#ifdef USING_XVMC
 static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 {
-    (void)pix_fmt;
-#ifdef USING_XVMC
     int xvmc_chroma = XVMC_CHROMA_FORMAT_420;
-#else
-    int xvmc_chroma = 0;
-#endif
 
 #if 0
 // We don't support other chromas yet
@@ -1245,7 +1240,7 @@ static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 #endif
     return xvmc_chroma;
 }
-#endif // USING_XVMC || USING_VDPAU
+#endif // USING_XVMC
 
 void default_captions(sinfo_vec_t *tracks, int av_index)
 {
@@ -1579,6 +1574,21 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     if (CODEC_ID_MPEG1VIDEO == enc->codec_id)
                         enc->codec_id = CODEC_ID_MPEG2VIDEO;
                     // HACK -- end
+#endif // USING_XVMC || USING_VDPAU
+#ifdef USING_VDPAU
+                    MythCodecID vdpau_mcid;
+                    vdpau_mcid = VideoOutputVDPAU::GetBestSupportedCodec(
+                        width, height,
+                        mpeg_version(enc->codec_id), no_hardware_decoders);
+
+                    if (vdpau_mcid > video_codec_id)
+                    {
+                        enc->codec_id = (CodecID) myth2av_codecid(vdpau_mcid);
+                        video_codec_id = vdpau_mcid;
+                        handled = true;
+                    }
+#endif // USING_VDPAU
+#ifdef USING_XVMC
 
                     bool force_xv = no_hardware_decoders;
                     if (ringBuffer && ringBuffer->isDVD())
@@ -1627,7 +1637,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         }
                         handled = true;
                     }
-#endif // USING_XVMC || USING_VDPAU
+#endif // USING_XVMC
 #ifdef USING_DVDV
                     MythCodecID quartz_mcid;
                     quartz_mcid = VideoOutputQuartz::GetBestSupportedCodec(

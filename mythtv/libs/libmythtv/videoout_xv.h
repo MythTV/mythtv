@@ -43,11 +43,10 @@ class XvMCOSD;
 
 typedef enum VideoOutputSubType
 {
-    XVUnknown = 0, Xlib, XShm, XVideo, XVideoVDPAU, 
+    XVUnknown = 0, Xlib, XShm, XVideo,
     XVideoMC, XVideoIDCT, XVideoVLD, 
 } VOSType;
 
-class VDPAUContext;
 class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
@@ -105,15 +104,12 @@ class VideoOutputXv : public VideoOutput
         { return XVideo == VideoOutputSubType(); }
     virtual bool hasHWAcceleration(void) const
         { return XVideo <= VideoOutputSubType(); }
-    virtual bool hasVDPAUAcceleration(void) const
-        { return XVideoVDPAU == VideoOutputSubType(); }
 
     void CheckFrameStates(void);
 
     virtual QRect GetPIPRect(PIPLocation        location,
                              NuppelVideoPlayer *pipplayer = NULL,
                              bool               do_pixel_adj = true) const;
-    virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
 
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
@@ -140,7 +136,7 @@ class VideoOutputXv : public VideoOutput
     void SetNextFrameDisplayTimeOffset(int delayus);
 
   private:
-    virtual bool hasFullScreenOSD(void) const;
+    virtual bool hasFullScreenOSD(void) const { return chroma_osd; }
     QRect GetTotalVisibleRect(void) const;
 
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);
@@ -148,20 +144,16 @@ class VideoOutputXv : public VideoOutput
     void DiscardFrames(bool next_frame_keyframe);
     void DoneDisplayingFrame(void);
 
-    void ProcessFrameVDPAU(VideoFrame *frame, OSD *osd,
-                           const PIPMap &pipPlayers);
     void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
     void ProcessFrameMem(VideoFrame *frame, OSD *osd,
                          FilterChain *filterList,
                          const PIPMap &pipPlayers,
                          FrameScanType scan);
 
-    void PrepareFrameVDPAU(VideoFrame *, FrameScanType);
     void PrepareFrameXvMC(VideoFrame *, FrameScanType);
     void PrepareFrameXv(VideoFrame *);
     void PrepareFrameMem(VideoFrame *, FrameScanType);
 
-    void ShowVDPAU(FrameScanType scan);
     void ShowXvMC(FrameScanType scan);
     void ShowXVideo(FrameScanType scan);
 
@@ -169,25 +161,19 @@ class VideoOutputXv : public VideoOutput
                          NuppelVideoPlayer *pipplayer,
                          PIPLocation        loc);
 
-    virtual int DisplayOSD(VideoFrame *frame, OSD *osd,
-                           int stride = -1, int revision = -1);
-
     void ResizeForVideo(uint width, uint height);
     void InitDisplayMeasurements(uint width, uint height);
     void InitColorKey(bool turnoffautopaint);
 
-    bool InitVideoBuffers(MythCodecID, bool use_xv,
-                          bool use_shm, bool use_vdpau);
+    bool InitVideoBuffers(MythCodecID, bool use_xv, bool use_shm);
 
     bool InitXvMC(MythCodecID);
     bool InitXVideo(void);
     bool InitXShm(void);
     bool InitXlib(void);
-    bool InitVDPAU(MythCodecID);
     bool InitOSD(const QString&);
     bool CheckOSDInit(void);
 
-    bool CreateVDPAUBuffers(void);
     bool CreateXvMCBuffers(void);
     bool CreateBuffers(VOSType subtype);
     vector<void*> CreateXvMCSurfaces(uint num, bool surface_has_vld);
@@ -213,11 +199,6 @@ class VideoOutputXv : public VideoOutput
     // OpenGL specific helper functions
     bool SetDeinterlacingEnabledOpenGL(bool enable);
     bool SetupDeinterlaceOpenGL(
-        bool interlaced, const QString &overridefilter);
-
-    // VDPAU specific helper functions
-    bool SetDeinterlacingEnabledVDPAU(bool enable);
-    bool SetupDeinterlaceVDPAU(
         bool interlaced, const QString &overridefilter);
 
     // Misc.
@@ -268,13 +249,6 @@ class VideoOutputXv : public VideoOutput
 
     // Support for nVidia XvMC copy to texture feature
     XvMCTextures        *xvmc_tex;
-
-#ifdef USING_VDPAU
-    VDPAUContext        *vdpau;
-#endif
-    bool                 vdpau_use_osd;
-    bool                 vdpau_use_pip;
-    int                  vdpau_colorkey;
 
     // Basic Xv drawing info
     int                  xv_port;

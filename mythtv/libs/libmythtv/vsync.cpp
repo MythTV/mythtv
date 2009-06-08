@@ -39,6 +39,10 @@
 #include "videoout_xv.h"
 #endif
 
+#ifdef USING_VDPAU
+#include "videoout_vdpau.h"
+#endif
+
 #ifdef USING_OPENGL_VSYNC
 #include "util-opengl.h"
 #include "openglcontext.h"
@@ -605,11 +609,8 @@ VDPAUVideoSync::~VDPAUVideoSync()
 
 bool VDPAUVideoSync::TryInit(void)
 {
-    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+    VideoOutputVDPAU *vo = dynamic_cast<VideoOutputVDPAU*>(m_video_output);
     if (!vo)
-        return false;
-
-    if (vo->VideoOutputSubType() != XVideoVDPAU)
         return false;
 
     return true;
@@ -624,7 +625,7 @@ void VDPAUVideoSync::WaitForFrame(int sync_delay)
     if (m_delay < 0)
         m_delay = 0;
 
-    VideoOutputXv *vo = (VideoOutputXv *)(m_video_output);
+    VideoOutputVDPAU *vo = (VideoOutputVDPAU *)(m_video_output);
     vo->SetNextFrameDisplayTimeOffset(m_delay);
 }
 

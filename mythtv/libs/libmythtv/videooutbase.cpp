@@ -37,8 +37,11 @@
 #include "videoout_opengl.h"
 #endif
 
-#include "videoout_null.h"
+#ifdef USING_VDPAU
+#include "videoout_vdpau.h"
+#endif
 
+#include "videoout_null.h"
 #include "dithertable.h"
 
 extern "C" {
@@ -103,6 +106,10 @@ VideoOutput *VideoOutput::Create(
 #ifdef USING_OPENGL_VIDEO
     renderers += VideoOutputOpenGL::GetAllowedRenderers(codec_id, video_dim);
 #endif // USING_OPENGL_VIDEO
+
+#ifdef USING_VDPAU
+    renderers += VideoOutputVDPAU::GetAllowedRenderers(codec_id, video_dim);
+#endif // USING_VDPAU
 
     VERBOSE(VB_PLAYBACK, LOC + "Allowed renderers: " +
             to_comma_list(renderers));
@@ -169,6 +176,11 @@ VideoOutput *VideoOutput::Create(
         if (renderer == "opengl")
             vo = new VideoOutputOpenGL();
 #endif // USING_OPENGL_VIDEO
+
+#ifdef USING_VDPAU
+        if (renderer == "vdpau")
+            vo = new VideoOutputVDPAU(codec_id);
+#endif // USING_VDPAU
 
 #ifdef USING_XV
         if (xvlist.contains(renderer))
