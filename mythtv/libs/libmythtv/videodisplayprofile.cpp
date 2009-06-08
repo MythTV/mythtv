@@ -200,6 +200,7 @@ QString ProfileItem::toString(void) const
 QMutex      VideoDisplayProfile::safe_lock(QMutex::Recursive);
 bool        VideoDisplayProfile::safe_initialized = false;
 safe_map_t  VideoDisplayProfile::safe_renderer;
+safe_map_t  VideoDisplayProfile::safe_renderer_group;
 safe_map_t  VideoDisplayProfile::safe_deint;
 safe_map_t  VideoDisplayProfile::safe_osd;
 safe_map_t  VideoDisplayProfile::safe_equiv_dec;
@@ -307,6 +308,24 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
     VERBOSE(VB_PLAYBACK, LOC + "New preferences: " + toString());
 }
 
+bool VideoDisplayProfile::CheckVideoRendererGroup(const QString renderer)
+{
+    if (last_video_renderer == renderer ||
+        last_video_renderer == "null")
+        return true;
+
+    VERBOSE(VB_PLAYBACK, LOC +
+        QString("Preferred video renderer: %1 (current: %2)")
+                .arg(renderer).arg(last_video_renderer));
+
+    safe_map_t::const_iterator it = safe_renderer_group.begin();
+    for (; it != safe_renderer_group.end(); it++)
+        if (it->contains(last_video_renderer) &&
+            it->contains(renderer))
+            return true;
+    return false;
+}
+    
 bool VideoDisplayProfile::IsDecoderCompatible(const QString &decoder)
 {
     const QString dec = GetDecoder();
@@ -1668,4 +1687,13 @@ void VideoDisplayProfile::init_statics(void)
     safe_equiv_dec["macaccel"] += "dummy";
     safe_equiv_dec["ivtv"]     += "dummy";
     safe_equiv_dec["vdpau"]    += "dummy";
+
+    safe_renderer_group["x11"] += "xlib";
+    safe_renderer_group["x11"] += "xshm";
+    safe_renderer_group["x11"] += "xv-blit";
+    safe_renderer_group["x11"] += "xvmc-blit";
+    safe_renderer_group["x11"] += "xvmc-opengl";
+    safe_renderer_group["x11"] += "vdpau";
+    safe_renderer_group["quartz"] += "quartz-blit";
+    safe_renderer_group["quartz"] += "quartz-accel";
 }

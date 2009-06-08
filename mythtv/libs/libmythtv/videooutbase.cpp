@@ -380,6 +380,17 @@ QString VideoOutput::GetFilters(void) const
     return QString::null;
 }
 
+bool VideoOutput::IsPreferredRenderer(QSize video_size)
+{
+    if (!db_vdisp_profile)
+        return true;
+
+    VideoDisplayProfile vdisp;
+    vdisp.SetInput(video_size);
+    QString new_rend = vdisp.GetVideoRenderer();
+    return db_vdisp_profile->CheckVideoRendererGroup(new_rend);
+}
+
 void VideoOutput::SetVideoFrameRate(float playback_fps)
 {
     if (db_vdisp_profile)

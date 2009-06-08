@@ -58,7 +58,7 @@ class VideoOutput
                       int winh, WId embedid = 0);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
-
+    virtual bool IsPreferredRenderer(QSize video_size);
     virtual bool SetDeinterlacingEnabled(bool);
     virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
     virtual void FallbackDeint(void);

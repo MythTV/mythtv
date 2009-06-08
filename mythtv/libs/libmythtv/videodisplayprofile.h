@@ -75,6 +75,7 @@ class MPUBLIC VideoDisplayProfile
     void SetOutput(float framerate);
 
     void SetVideoRenderer(const QString &video_renderer);
+    bool CheckVideoRendererGroup(const QString renderer);
 
     QString GetDecoder(void) const
         { return GetPreference("pref_decoder"); }
@@ -174,6 +175,7 @@ class MPUBLIC VideoDisplayProfile
     static QMutex       safe_lock;
     static bool         safe_initialized;
     static safe_map_t   safe_renderer;
+    static safe_map_t   safe_renderer_group;
     static safe_map_t   safe_deint;
     static safe_map_t   safe_osd;
     static safe_map_t   safe_equiv_dec;
