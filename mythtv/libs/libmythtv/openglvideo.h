@@ -129,6 +129,7 @@ class OpenGLVideo
     glfilt_map_t   filters;
     long long      currentFrameNum;
     bool           inputUpdated;
+    int            refsNeeded;
     bool           textureRects;
     uint           textureType;
     uint           helperTexture;

@@ -81,7 +81,7 @@ OpenGLVideo::OpenGLVideo() :
     hardwareDeinterlacer(QString::null), hardwareDeinterlacing(false),
     useColourControl(false),  viewportControl(false),
     inputTextureSize(0,0),    currentFrameNum(0),
-    inputUpdated(false),
+    inputUpdated(false),      refsNeeded(0),
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
     convertSize(0,0),         convertBuf(NULL),
@@ -559,6 +559,7 @@ void OpenGLVideo::TearDownDeinterlacer(void)
     }
 
     DeleteTextures(&referenceTextures);
+    refsNeeded = 0;
 }
 
 /**
@@ -600,6 +601,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
         ref_size = 0;
     }
 
+    refsNeeded = ref_size;
     if (ref_size > 0)
     {
         bool use_pbo = gl_features & kGLExtPBufObj;
@@ -1193,7 +1195,8 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             if (type == kGLFilterYUV2RGB)
             {
                 if (hardwareDeinterlacing &&
-                    filter->fragmentPrograms.size() == 3)
+                    filter->fragmentPrograms.size() == 3 &&
+                    !refsNeeded)
                 {
                     if (scan == kScan_Interlaced)
                         prog_ref = topfieldfirst ? 1 : 2;
@@ -1249,8 +1252,11 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
 void OpenGLVideo::RotateTextures(void)
 {
-   if (referenceTextures.size() < 2)
+    if (referenceTextures.size() < 2)
         return;
+
+    if (refsNeeded > 0)
+        refsNeeded--;
 
     GLuint tmp = referenceTextures[referenceTextures.size() - 1];
 
