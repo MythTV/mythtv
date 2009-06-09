@@ -16,8 +16,19 @@ struct fsattab {
 
 QString freesat_huffman_to_string(const unsigned char *src, uint size)
 {
+    struct fsattab *fsat_table;
+    unsigned int *fsat_index;
+
     if (src[1] == 1 || src[1] == 2)
     {
+        if (src[1] == 1)
+        {
+            fsat_table = fsat_table_1;
+            fsat_index = fsat_index_1;
+        } else {
+            fsat_table = fsat_table_2;
+            fsat_index = fsat_index_2;
+        }
         QByteArray uncompressed(size * 3, '\0');
         int p = 0;
         unsigned value = 0, byte = 2, bit = 0;
@@ -50,8 +61,6 @@ QString freesat_huffman_to_string(const unsigned char *src, uint size)
             else
             {
                 unsigned indx = (unsigned)lastch;
-                if (src[1] == 2)
-                    indx |= 0x80;
                 for (unsigned j = fsat_index[indx]; j < fsat_index[indx+1]; j++)
                 {
                     unsigned mask = 0, maskbit = 0x80000000;
