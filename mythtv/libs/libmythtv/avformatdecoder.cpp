@@ -1581,7 +1581,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         width, height,
                         mpeg_version(enc->codec_id), no_hardware_decoders);
 
-                    if (vdpau_mcid > video_codec_id)
+                    if (vdpau_mcid >= video_codec_id)
                     {
                         enc->codec_id = (CodecID) myth2av_codecid(vdpau_mcid);
                         video_codec_id = vdpau_mcid;
@@ -1612,10 +1612,10 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
                         /* test surface */ kCodec_NORMAL_END > video_codec_id,
                         /* force_xv     */ force_xv);
-                    bool vcd, idct, mc, vdpau;
 
-                    if (mcid > video_codec_id)
+                    if (mcid >= video_codec_id)
                     {
+                        bool vcd, idct, mc, vdpau;
                         enc->codec_id = (CodecID)
                             myth2av_codecid(mcid, vcd, idct, mc, vdpau);
 
@@ -1647,7 +1647,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* pixel format */
                         (PIX_FMT_YUV420P == enc->pix_fmt) ? FOURCC_I420 : 0);
 
-                    if (quartx_mcid > video_codec_id)
+                    if (quartx_mcid >= video_codec_id)
                     {
                         enc->codec_id = (CodecID) myth2av_codecid(quartz_mcid);
                         video_codec_id = quartz_mcid;

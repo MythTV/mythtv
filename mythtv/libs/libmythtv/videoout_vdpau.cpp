@@ -383,9 +383,10 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     bool asp_changed = aspect      != windows[0].GetVideoAspect();
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
-    if (!res_changed && !cid_changed && asp_changed)
+    if (!res_changed && !cid_changed)
     {
-        MoveResize();
+        if (asp_changed)
+            MoveResize();
         return true;
     }
 
