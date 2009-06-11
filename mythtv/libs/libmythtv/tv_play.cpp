@@ -4424,9 +4424,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
 
     if (has_action("SELECT", actions))
     {
-        if (islivetv && !CommitQueuedInput(ctx))
-            handled = false;
-        else
+        if (!islivetv || !CommitQueuedInput(ctx))
         {
             if (isDVD && ctx->buffer && ctx->buffer->DVD())
                 ctx->buffer->DVD()->JumpToTitle(false);
