@@ -292,7 +292,7 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
-    if (frame && osd)
+    if (m_osd_avail && osd)
         DisplayOSD(frame, osd);
     ShowPIPs(frame, pipPlayers);
 }
