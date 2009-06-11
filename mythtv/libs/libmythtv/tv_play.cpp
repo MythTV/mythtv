@@ -1050,7 +1050,7 @@ bool TV::LiveTV(bool showDialogs, bool startInGuide)
 {
     requestDelete = false;
     allowRerecord = false;
-
+    jumpToProgram = false;
 
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
     if (actx->GetState() == kState_None &&
@@ -8415,6 +8415,7 @@ void TV::customEvent(QEvent *e)
                         StopStuff(mctx, ctx, true, true, true);
                     }
                 }
+                jumpToProgram = true;
                 SetExitPlayer(true, false);
             }
             else
