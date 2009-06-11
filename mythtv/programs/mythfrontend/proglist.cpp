@@ -1356,6 +1356,7 @@ void ProgLister::fillItemList(bool restorePosition)
 
     ProgramInfo *s;
     vector<ProgramInfo *> sortedList;
+    const QRegExp prefixes("^(The |A |An )");
 
     while (!m_itemList.empty()) 
     {
@@ -1365,7 +1366,7 @@ void ProgLister::fillItemList(bool restorePosition)
         else
             s->sortTitle = s->title;
 
-        s->sortTitle.remove(QRegExp("^(The |A |An )"));
+        s->sortTitle.remove(prefixes);
         sortedList.push_back(s);
     }
 
