@@ -3223,7 +3223,6 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 {
     if (!IsReallyNearEnd())
         return;
-    VERBOSE(VB_PLAYBACK, "SwitchToProgram(void)");
 
     bool discontinuity = false, newtype = false;
     int newid = -1;
@@ -3266,6 +3265,10 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         discontinuity = true;
         ClearSubtitles();
     }
+
+    VERBOSE(VB_PLAYBACK, QString("SwitchToProgram(void) "
+            "discont: %1 newtype: %2 newid: %3 eof: %4")
+            .arg(discontinuity).arg(newtype).arg(newid).arg(eof));
 
     if (discontinuity || newtype)
     {
@@ -3324,6 +3327,8 @@ void NuppelVideoPlayer::FileChangedCallback(void)
         player_ctx->buffer->Reset(false, true, true);
 
     player_ctx->buffer->Unpause();
+
+    eof = false;
 
     player_ctx->SetNVPChangingBuffers(false);
 
@@ -3429,6 +3434,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
     }
 
     eof = false;
+    player_ctx->SetNVPChangingBuffers(false);
 }
 
 bool NuppelVideoPlayer::StartPlaying(bool openfile)
@@ -3597,8 +3603,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
                 SwitchToProgram();
         }
 
-        if (player_ctx->tvchain && player_ctx->tvchain->NeedsToJump() &&
-            !GetDecoder()->GetWaitForChange())
+        if (player_ctx->tvchain && player_ctx->tvchain->NeedsToJump())
         {
             JumpToProgram();
         }

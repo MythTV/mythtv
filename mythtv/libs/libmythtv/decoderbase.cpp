@@ -75,6 +75,7 @@ void DecoderBase::Reset(void)
     framesPlayed = 0;
     framesRead = 0;
 
+    waitingForChange = false;
     ateof = false;
 }
 
