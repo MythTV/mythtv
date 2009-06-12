@@ -5,6 +5,7 @@
 #include "videooutbase.h"
 #include "util-vdpau.h"
 #include "DisplayRes.h"
+#include "mythxdisplay.h"
 
 class VDPAUContext;
 class VideoOutputVDPAU : public VideoOutput
@@ -71,18 +72,8 @@ class VideoOutputVDPAU : public VideoOutput
 
     MythCodecID          m_codec_id;
     DisplayRes          *m_display_res;
-    Window               XJ_root;
-    Window               XJ_win;
-    Window               XJ_curwin;
-    GC                   XJ_gc;
-    Screen              *XJ_screen;
-    Display             *XJ_disp;
-    int                  XJ_screen_num;
-    unsigned long        XJ_black;
-    int                  XJ_depth;
-    bool                 XJ_started;
-    QSize                XJ_monitor_sz;
-    QSize                XJ_monitor_dim;
+    Window               m_win;
+    MythXDisplay        *m_disp;
     VDPAUContext        *m_ctx;
     int                  m_colorkey;
     QMutex               m_lock;

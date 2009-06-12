@@ -6,7 +6,7 @@ extern "C" {
 }
 
 #include "videobuffers.h"
-
+#include "mythxdisplay.h"
 #define MAX_VDPAU_ERRORS 10
 
 struct vdpauPIP
@@ -30,7 +30,7 @@ class VDPAUContext
     VDPAUContext();
    ~VDPAUContext();
 
-    bool Init(Display *disp, int screen, Window win,
+    bool Init(MythXDisplay *disp, Window win,
               QSize screen_size, bool color_control,
               int color_key, MythCodecID mcodecid);
     void Deinit(void);
@@ -91,7 +91,7 @@ class VDPAUContext
     void DeinitPIP(NuppelVideoPlayer *pipplayer, bool check_layer = true);
 
   private:
-    bool InitProcs(Display *disp, int screen);
+    bool InitProcs(MythXDisplay *disp);
     void DeinitProcs(void);
     void ClearScreen(void);
 

@@ -12,7 +12,7 @@ extern "C" {
 
 #include "videoouttypes.h"
 #include "mythcodecid.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "util-vdpau.h"
 
 #define LOC QString("VDPAU: ")
@@ -61,7 +61,6 @@ static void vdpau_preemption_callback(VdpDevice device, void *vdpau_ctx)
     (void)device;
     VERBOSE(VB_IMPORTANT, LOC_ERR + QString("DISPLAY PRE-EMPTED. Aborting playback."));
     VDPAUContext *ctx = (VDPAUContext*)vdpau_ctx;
-    // TODO this should really kick off re-initialisation
     if (ctx)
         ctx->SetErrored(kError_Preempt, 1000);
 }
@@ -126,8 +125,7 @@ VDPAUContext::~VDPAUContext()
 {
 }
 
-bool VDPAUContext::Init(Display *disp, int screen,
-                        Window win, QSize screen_size,
+bool VDPAUContext::Init(MythXDisplay *disp, Window win, QSize screen_size,
                         bool color_control, int color_key,
                         MythCodecID mcodecid)
 {
@@ -138,7 +136,7 @@ bool VDPAUContext::Init(Display *disp, int screen,
 
     bool ok;
 
-    ok = InitProcs(disp, screen);
+    ok = InitProcs(disp);
     if (!ok)
         return ok;
 
@@ -181,18 +179,19 @@ static const char* dummy_get_error_string(VdpStatus status)
     return &dummy[0];
 }
 
-bool VDPAUContext::InitProcs(Display *disp, int screen)
+bool VDPAUContext::InitProcs(MythXDisplay *disp)
 {
     VdpStatus vdp_st;
     bool ok = true;
     vdp_get_error_string = &dummy_get_error_string;
 
-    vdp_st = vdp_device_create_x11(
-        disp,
-        screen,
+    
+    XLOCK(disp, vdp_st = vdp_device_create_x11(
+        disp->GetDisplay(),
+        disp->GetScreen(),
         &vdp_device,
         &vdp_get_proc_address
-    );
+    ));
     CHECK_ST
     if (!ok)
     {
@@ -1769,12 +1768,9 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
 {
     bool ok = true;
 
-    Display *disp = MythXOpenDisplay();
+    MythXDisplay *disp = OpenMythXDisplay();
     if (!disp)
         return false;
-
-    int screen;
-    X11S(screen = DefaultScreen(disp));
 
     VdpDevice device = 0;
     VdpGetProcAddress * vdp_proc_address = NULL;
@@ -1784,12 +1780,9 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
 
     if (ok)
     {
-        vdp_st = vdp_device_create_x11(
-            disp,
-            screen,
-            &device,
-            &vdp_proc_address
-        );
+        XLOCK(disp, vdp_st = vdp_device_create_x11(
+                       disp->GetDisplay(), disp->GetScreen(),
+                       &device, &vdp_proc_address));
         CHECK_ST
     }
 
@@ -1921,7 +1914,7 @@ bool VDPAUContext::CheckCodecSupported(MythCodecID myth_codec_id)
         device_destroy(device);
 
     if (disp)
-        X11S(XCloseDisplay(disp));
+        delete disp;
 
     return ok;
 }

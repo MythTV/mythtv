@@ -9,7 +9,7 @@
 #include "videodisplayprofile.h"
 #include "osd.h"
 #include "osdsurface.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 
@@ -19,12 +19,8 @@
 
 VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
   : VideoOutput(),
-    m_codec_id(codec_id),                      m_display_res(NULL),
-    XJ_root(0),        XJ_win(0),              XJ_curwin(0),
-    XJ_gc(0),          XJ_screen(NULL),        XJ_disp(NULL),
-    XJ_screen_num(0),  XJ_black(0),            XJ_depth(0),
-    XJ_started(false), XJ_monitor_sz(640,480), XJ_monitor_dim(400,300),
-    m_ctx(NULL),       m_colorkey(0x020202),
+    m_codec_id(codec_id), m_display_res(NULL), m_win(0),
+    m_disp(NULL), m_ctx(NULL), m_colorkey(0x020202),
     m_lock(QMutex::Recursive), m_osd_avail(false), m_pip_avail(true)
 {
     if (gContext->GetNumSetting("UseVideoModes", 0))
@@ -81,21 +77,22 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     if (m_ctx->InitOSD(GetTotalOSDBounds().size()))
         m_osd_avail = true;
     else
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to create VDPAU osd."));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Failed to create VDPAU osd."));
 
     return ok;
 }
 
 bool VideoOutputVDPAU::InitContext(void)
 {
-    if (m_ctx)
+    if (m_ctx || !m_disp)
         return false;
 
     QMutexLocker locker(&m_lock);
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
     m_ctx = new VDPAUContext();
     bool ok = m_ctx;
-    ok = ok ? m_ctx->Init(XJ_disp, XJ_screen_num, XJ_curwin,
+    ok = ok ? m_ctx->Init(m_disp, m_win,
                           display_visible_rect.size(),
                           db_use_picture_controls,
                           m_colorkey, m_codec_id): ok;
@@ -168,8 +165,8 @@ bool VideoOutputVDPAU::InitXDisplay(WId wid)
 
     if (ok)
     {
-        XJ_disp = MythXOpenDisplay();
-        if (!XJ_disp)
+        m_disp = OpenMythXDisplay();
+        if (!m_disp)
         {
             VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to open display."));
             ok = false;
@@ -178,29 +175,15 @@ bool VideoOutputVDPAU::InitXDisplay(WId wid)
 
     if (ok)
     {
-        X11L;
-        XJ_screen     = DefaultScreenOfDisplay(XJ_disp);
-        XJ_screen_num = DefaultScreen(XJ_disp);
-        XJ_curwin     = wid;
-        XJ_win        = wid;
-        XJ_black      = XBlackPixel(XJ_disp, XJ_screen_num);
-        XJ_root       = DefaultRootWindow(XJ_disp);
-        XJ_depth      = DefaultDepthOfScreen(XJ_screen);
-        X11U;
+        m_win = wid;
         // if the color depth is less than 24 just use black for colorkey
-        if (XJ_depth < 24)
+        int depth = m_disp->GetDepth();
+        if (depth < 24)
             m_colorkey = 0x0;
-
         VERBOSE(VB_PLAYBACK, LOC + QString("VDPAU Colorkey: 0x%1 (depth %2)")
-                .arg(m_colorkey, 0, 16).arg(XJ_depth));
+                .arg(m_colorkey, 0, 16).arg(depth));
 
-        VERBOSE(VB_PLAYBACK, LOC + "Creating XJ_gc");
-        InstallXErrorHandler(XJ_disp);
-        X11S(XJ_gc = XCreateGC(XJ_disp, XJ_win, 0, NULL));
-        vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
-        PrintXErrors(XJ_disp, errs);
-
-        if (errs.size())
+        if (!m_disp->CreateGC(m_win))
         {
             VERBOSE(VB_PLAYBACK, LOC + QString("Failed to create GC."));
             ok = false;
@@ -210,39 +193,28 @@ bool VideoOutputVDPAU::InitXDisplay(WId wid)
     if (!ok)
         DeleteXDisplay();
 
-    XJ_started = ok;
     return ok;
 }
 
 void VideoOutputVDPAU::DeleteXDisplay(void)
 {
     QMutexLocker locker(&m_lock);
-    if (XJ_started)
-    {
-        XJ_started = false;
-        const QRect tmp_display_visible_rect =
-            windows[0].GetTmpDisplayVisibleRect();
-        if (windows[0].GetPIPState() == kPIPStandAlone &&
-            !tmp_display_visible_rect.isEmpty())
-        {
-            windows[0].SetDisplayVisibleRect(tmp_display_visible_rect);
-        }
-        const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
 
-        if (XJ_disp)
-        {
-            X11L;
-            XSetForeground(XJ_disp, XJ_gc, XJ_black);
-            XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
-                           display_visible_rect.left(),
-                           display_visible_rect.top(),
-                           display_visible_rect.width(),
-                           display_visible_rect.height());
-            XFreeGC(XJ_disp, XJ_gc);
-            XCloseDisplay(XJ_disp);
-        }
-        XJ_disp = NULL;
-        X11U;
+    const QRect tmp_display_visible_rect =
+        windows[0].GetTmpDisplayVisibleRect();
+    if (windows[0].GetPIPState() == kPIPStandAlone &&
+        !tmp_display_visible_rect.isEmpty())
+    {
+        windows[0].SetDisplayVisibleRect(tmp_display_visible_rect);
+    }
+    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+
+    if (m_disp)
+    {
+        m_disp->SetForeground(m_disp->GetBlack());
+        m_disp->FillRectangle(m_win, display_visible_rect);
+        delete m_disp;
+        m_disp = NULL;
     }
 }
 
@@ -358,7 +330,7 @@ void VideoOutputVDPAU::Show(FrameScanType scan)
         DrawUnusedRects(false);
 
     m_ctx->DisplayNextFrame();
-    X11S(XSync(XJ_disp, False));
+    m_disp->Sync();
     CheckFrameStates();
 }
 
@@ -393,7 +365,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     m_codec_id = av_codec_id;
     TearDown();
     if (Init(input_size.width(), input_size.height(),
-             aspect, XJ_win,
+             aspect, m_win,
              windows[0].GetVideoRect().left(),
              windows[0].GetVideoRect().top(),
              windows[0].GetDisplayVisibleRect().width(),
@@ -475,11 +447,7 @@ void VideoOutputVDPAU::ResizeForVideo(uint width, uint height)
             const QRect display_visible_rect =
                     QRect(gContext->GetMainWindow()->geometry().topLeft(), sz);
             windows[0].SetDisplayVisibleRect(display_visible_rect);
-            X11S(XMoveResizeWindow(XJ_disp, XJ_win,
-                                   display_visible_rect.left(),
-                                   display_visible_rect.top(),
-                                   display_visible_rect.width(),
-                                   display_visible_rect.height()));
+            m_disp->MoveResizeWin(m_win, display_visible_rect);
         }
     }
 }
@@ -490,14 +458,8 @@ void VideoOutputVDPAU::DrawUnusedRects(bool sync)
         windows[0].GetVisibility() == kVisibility_Normal)
     {
         const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-        X11L;
-        XSetForeground(XJ_disp, XJ_gc, m_colorkey);
-        XFillRectangle(XJ_disp, XJ_curwin, XJ_gc,
-                       display_visible_rect.left(),
-                       display_visible_rect.top(),
-                       display_visible_rect.width(),
-                       display_visible_rect.height());
-        X11U;
+        m_disp->SetForeground(m_colorkey);
+        m_disp->FillRectangle(m_win, display_visible_rect);
         windows[0].SetNeedRepaint(false);
     }
 }
@@ -572,10 +534,10 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
 
 int VideoOutputVDPAU::GetRefreshRate(void)
 {
-    if (!XJ_started)
+    if (!m_disp)
         return -1;
 
-    return MythXGetRefreshRate(XJ_disp, XJ_screen_num);
+    return m_disp->GetRefreshRate();
 }
 
 void VideoOutputVDPAU::SetNextFrameDisplayTimeOffset(int delayus)
@@ -718,6 +680,9 @@ void VideoOutputVDPAU::RemovePIP(NuppelVideoPlayer *pipplayer)
 
 void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
 {
+    if (!m_disp)
+        return;
+
     bool useGuiSize = gContext->GetNumSetting("GuiSizeForTV", 0);
 
     if (m_display_res)
@@ -725,11 +690,11 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
         // The very first Resize needs to be the maximum possible
         // desired res, because X will mask off anything outside
         // the initial dimensions
-        X11S(XMoveResizeWindow(XJ_disp, XJ_win,
-                               gContext->GetMainWindow()->geometry().x(),
-                               gContext->GetMainWindow()->geometry().y(),
-                               m_display_res->GetMaxWidth(),
-                               m_display_res->GetMaxHeight()));
+        m_disp->MoveResizeWin(m_win,
+                    QRect(gContext->GetMainWindow()->geometry().x(),
+                          gContext->GetMainWindow()->geometry().y(),
+                          m_display_res->GetMaxWidth(),
+                          m_display_res->GetMaxHeight()));
         ResizeForVideo(width, height);
     }
     else
@@ -737,7 +702,7 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
         // The very first Resize needs to be the maximum possible
         // desired res, because X will mask off anything outside
         // the initial dimensions
-        QSize sz1 = MythXGetDisplaySize(XJ_disp, XJ_screen_num);
+        QSize sz1 = m_disp->GetDisplaySize();
         QSize sz2 = qApp->desktop()->
             availableGeometry(gContext->GetMainWindow()).size();
         int max_w = max(sz1.width(),  sz2.width());
@@ -750,10 +715,10 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
             max_h = gContext->GetMainWindow()->geometry().height();
         }
 
-        X11S(XMoveResizeWindow(XJ_disp, XJ_win,
-                               gContext->GetMainWindow()->geometry().x(),
-                               gContext->GetMainWindow()->geometry().y(),
-                               max_w, max_h));
+        m_disp->MoveResizeWin(m_win,
+                        QRect(gContext->GetMainWindow()->geometry().x(),
+                              gContext->GetMainWindow()->geometry().y(),
+                              max_w, max_h));
 
         if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
         {
@@ -761,12 +726,11 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
         }
         else
         {
-            windows[0].SetDisplayDim(
-                MythXGetDisplayDimensions(XJ_disp, XJ_screen_num));
+            windows[0].SetDisplayDim(m_disp->GetDisplayDimensions());
         }
     }
     QDesktopWidget * desktop = QApplication::desktop();
-    bool             usingXinerama = (GetNumberOfXineramaScreens() > 1);
+    bool             usingXinerama = (GetNumberXineramaScreens() > 1);
     int              screen = desktop->primaryScreen();
     int              w, h;
 
@@ -832,9 +796,6 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
             QString("Estimated display dimensions: %1x%2 mm  Aspect: %3")
             .arg(display_dim.width()).arg(display_dim.height())
             .arg(((float) display_dim.width()) / display_dim.height()));
-
-    XJ_monitor_sz  = QSize(w, h);
-    XJ_monitor_dim = display_dim;
 
     // We must now scale the display measurements to our window size.
     // If we are running fullscreen this is a no-op.
