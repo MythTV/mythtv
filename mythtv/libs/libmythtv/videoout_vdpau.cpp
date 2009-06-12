@@ -534,10 +534,7 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
 
 int VideoOutputVDPAU::GetRefreshRate(void)
 {
-    if (!m_disp)
-        return -1;
-
-    return m_disp->GetRefreshRate();
+    return MythXGetRefreshRate();
 }
 
 void VideoOutputVDPAU::SetNextFrameDisplayTimeOffset(int delayus)
