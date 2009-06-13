@@ -212,10 +212,13 @@ void MythNews::loadSites(void)
 
     slotRetrieveNews();
 
-    if (m_NewsSites.size() == 0)
-        m_nositesText->Show();
-    else
-        m_nositesText->Hide();
+    if (m_nositesText)
+    {
+        if (m_NewsSites.size() == 0)
+            m_nositesText->Show();
+        else
+            m_nositesText->Hide();
+    }
 }
 
 void MythNews::updateInfoView(MythUIButtonListItem *selected)
