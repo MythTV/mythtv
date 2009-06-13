@@ -150,12 +150,12 @@ class LCDProcClient : public QObject
     void setVersion(const QString &, const QString &);
     void describeServer();
 
-    unsigned int prioTop;
-    unsigned int prioUrgent;
-    unsigned int prioHigh;
-    unsigned int prioMedium;
-    unsigned int prioLow;
-    unsigned int prioOff;
+    QString  prioTop;
+    QString  prioUrgent;
+    QString  prioHigh;
+    QString  prioMedium;
+    QString  prioLow;
+    QString  prioOff;
 
     unsigned int lcdWidth;
     unsigned int lcdHeight;
