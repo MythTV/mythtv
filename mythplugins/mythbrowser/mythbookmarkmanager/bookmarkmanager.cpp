@@ -295,7 +295,7 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
             {
                 m_menuPopup->AddButton(tr("Edit Bookmark"), SLOT(slotEditBookmark()));
                 m_menuPopup->AddButton(tr("Delete Bookmark"), SLOT(slotDeleteCurrent()));
-                m_menuPopup->AddButton(tr("Show bookmark"), SLOT(slotShowCurrent()));
+                m_menuPopup->AddButton(tr("Show Bookmark"), SLOT(slotShowCurrent()));
             }
 
             if (GetMarkedCount() > 0)
