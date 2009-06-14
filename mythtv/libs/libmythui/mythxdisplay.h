@@ -13,7 +13,7 @@
 
 #include "mythexp.h"
 
-class MythXDisplay
+class MPUBLIC MythXDisplay
 {
   public:
     MythXDisplay();
@@ -71,10 +71,10 @@ class MythXLocker
     MythXDisplay *disp;
 };
 
-MythXDisplay *GetMythXDisplay(Display*);
-MythXDisplay *OpenMythXDisplay(void);
-QSize         MythXGetDisplayDimensions(void);
-int           MythXGetRefreshRate(void);
+MythXDisplay         *GetMythXDisplay(Display*);
+MPUBLIC MythXDisplay *OpenMythXDisplay(void);
+QSize                 MythXGetDisplayDimensions(void);
+MPUBLIC int           MythXGetRefreshRate(void);
 #define XLOCK(dpy, arg) { dpy->Lock(); arg; dpy->Unlock(); }
 #endif // USING_X11
 
