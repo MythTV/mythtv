@@ -211,4 +211,171 @@
         </textarea>
     </window>
 
+    <window name="iconhelp">
+        <area>-1,-1,700,500</area>
+
+        <imagetype name="backimg">
+            <area>0,0,700,500</area>
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>0,0,700,50</area>
+            <value>Status Icons</value>
+            <font>basemedium</font>
+            <align>center</align>
+        </textarea>
+
+        <buttonlist name="iconlist">
+            <area>20,70,660,450</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,660,410</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,660,40</area>
+                <state name="active">
+                    <statetype name="icons">
+                        <position>5,5</position>
+                        <state name="commflagged">
+                            <imagetype name="statusimage">
+                                <filename>commflagged.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="cutlist">
+                            <imagetype name="statusimage">
+                                <filename>cutlist.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="autoexpire">
+                            <imagetype name="statusimage">
+                                <filename>autoexpire.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="processing">
+                            <imagetype name="statusimage">
+                                <filename>processing.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="bookmark">
+                            <imagetype name="statusimage">
+                                <filename>bookmark.png</filename>
+                            </imagetype>
+                        </state>
+                        <!--
+                        <state name="inuse">
+                            <imagetype name="statusimage">
+                                <filename>inuse.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="transcoded">
+                            <imagetype name="statusimage">
+                                <filename>transcoded.png</filename>
+                            </imagetype>
+                        </state>
+                        -->
+                        <state name="mono">
+                            <imagetype name="statusimage">
+                                <filename>mono.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="stereo">
+                            <imagetype name="statusimage">
+                                <filename>stereo.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="surround">
+                            <imagetype name="statusimage">
+                                <filename>surround.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="dolby">
+                            <imagetype name="statusimage">
+                                <filename>dd.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="cc">
+                            <imagetype name="statusimage">
+                                <filename>cc.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="subtitles">
+                            <imagetype name="statusimage">
+                                <filename>subs.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="onscreensub">
+                            <imagetype name="statusimage">
+                                <filename>subs_onscreen.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="hdtv">
+                            <imagetype name="statusimage">
+                                <filename>hd.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="widescreen">
+                            <imagetype name="statusimage">
+                                <filename>wide.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="watched">
+                            <imagetype name="statusimage">
+                                <filename>watched.png</filename>
+                            </imagetype>
+                        </state>
+                        <!--
+                        <state name="preserved">
+                            <imagetype name="statusimage">
+                                <filename>preserved.png</filename>
+                            </imagetype>
+                        </state>
+                        -->
+                    </statetype>
+                    <textarea name="buttontext">
+                        <area>53,1,600,40</area>
+                        <multiline>yes</multiline>
+                        <font>basesmall</font>
+                        <align>vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,650,40</area>
+                        <type>roundbox</type>
+                        <line color="#999999" alpha="255" width="2" />
+                        <cornerradius>13</cornerradius>
+                    </shape>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>590,390</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>620,390</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+    </window>
+
 </mythuitheme>

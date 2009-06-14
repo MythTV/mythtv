@@ -378,197 +378,171 @@
         </button>
     </window>
 
-    <window name="help_popup">
-        <area>-1,-1,500,500</area>
+    <window name="iconhelp">
+        <area>-1,-1,700,500</area>
+
+        <imagetype name="backimg">
+            <area>0,0,700,500</area>
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>20,20,360,260</area>
+            <area>0,0,700,50</area>
             <value>Status Icons</value>
             <font>basemedium</font>
             <align>center</align>
         </textarea>
 
-        <imagetype name="commflagged">
-            <position>20,20</position>
-            <filename>metadata_icons/commflagged.png</filename>
-        </imagetype>
-
-        <textarea name="commflagged_label" from="basetextarea">
-            <area>60,y,200,40</area>
-            <value>Commercials are flagged</value>
-            <multiline>yes</multiline>
-        </textarea>
-
-        <imagetype name="cutlist">
-            <position>20,20</position>
-            <filename>metadata_icons/cutlist.png</filename>
-        </imagetype>
-
-        <textarea name="cutlist_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>An editing cutlist is present</value>
-        </textarea>
-
-        <imagetype name="autoexpire">
-            <position>20,20</position>
-            <filename>metadata_icons/autoexpire.png</filename>
-        </imagetype>
-
-        <textarea name="autoexpire_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>The program is able to auto-expire</value>
-        </textarea>
-
-        <imagetype name="processing">
-            <position>20,20</position>
-            <filename>metadata_icons/processing.png</filename>
-        </imagetype>
-
-        <textarea name="processing_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Commercials are being flagged</value>
-        </textarea>
-
-        <imagetype name="bookmark">
-            <position>20,20</position>
-            <filename>metadata_icons/bookmark.png</filename>
-        </imagetype>
-
-        <textarea name="bookmark_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>A bookmark is set</value>
-        </textarea>
-
-        <imagetype name="inuse">
-            <position>20,20</position>
-            <filename>metadata_icons/inuse.png</filename>
-        </imagetype>
-
-        <textarea name="inuse_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is in use</value>
-        </textarea>
-
-        <imagetype name="transcoded">
-            <position>20,20</position>
-            <filename>metadata_icons/transcoded.png</filename>
-        </imagetype>
-
-        <textarea name="transcoded_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording has been transcoded</value>
-        </textarea>
-
-        <imagetype name="mono">
-            <position>20,20</position>
-            <filename>metadata_icons/mono.png</filename>
-        </imagetype>
-
-        <textarea name="mono_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is in Mono</value>
-        </textarea>
-
-        <imagetype name="stereo">
-            <position>20,20</position>
-            <filename>metadata_icons/stereo.png</filename>
-        </imagetype>
-
-        <textarea name="stereo_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is in Stereo</value>
-        </textarea>
-
-        <imagetype name="surround">
-            <position>20,20</position>
-            <filename>metadata_icons/surround.png</filename>
-        </imagetype>
-
-        <textarea name="surround_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is in Surround Sound</value>
-        </textarea>
-
-        <imagetype name="dolby">
-            <position>20,20</position>
-            <filename> .png</filename>
-        </imagetype>
-
-        <textarea name="dolby_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is in Dolby Surround Sound</value>
-        </textarea>
-
-        <imagetype name="cc">
-            <position>20,20</position>
-            <filename>closedcaption.png</filename>
-        </imagetype>
-
-        <textarea name="cc_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is Closed Captioned</value>
-        </textarea>
-
-        <imagetype name="subtitles">
-            <position>20,20</position>
-            <filename>subtitles.png</filename>
-        </imagetype>
-
-        <textarea name="subtitles_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording has Subtitles Available</value>
-        </textarea>
-
-        <imagetype name="onscreensub">
-            <position>20,20</position>
-            <filename>onscreensub.png</filename>
-        </imagetype>
-
-        <textarea name="onscreensub_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is Subtitled</value>
-        </textarea>
-
-        <imagetype name="hdtv">
-            <position>20,20</position>
-            <filename>hdtv.png</filename>
-        </imagetype>
-
-        <textarea name="hdtv_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is in High Definition</value>
-        </textarea>
-
-        <imagetype name="widescreen">
-            <position>20,20</position>
-            <filename>widescreen.png</filename>
-        </imagetype>
-
-        <textarea name="widescreen_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is in WideScreen</value>
-        </textarea>
-
-        <imagetype name="watched">
-            <position>20,20</position>
-            <filename>watched.png</filename>
-        </imagetype>
-
-        <textarea name="watched_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording has been watched</value>
-        </textarea>
-
-        <imagetype name="preserved">
-            <position>20,20</position>
-            <filename>preserved.png</filename>
-        </imagetype>
-
-        <textarea name="preserved_label" from="commflagged_label">
-            <position>60,y</position>
-            <value>Recording is preserved</value>
-        </textarea>
-
+        <buttonlist name="iconlist">
+            <area>20,70,660,450</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,660,410</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,660,40</area>
+                <state name="active">
+                    <statetype name="icons">
+                        <position>5,5</position>
+                        <state name="commflagged">
+                            <imagetype name="statusimage">
+                                <filename>commflagged.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="cutlist">
+                            <imagetype name="statusimage">
+                                <filename>cutlist.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="autoexpire">
+                            <imagetype name="statusimage">
+                                <filename>autoexpire.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="processing">
+                            <imagetype name="statusimage">
+                                <filename>processing.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="bookmark">
+                            <imagetype name="statusimage">
+                                <filename>bookmark.png</filename>
+                            </imagetype>
+                        </state>
+                        <!--
+                        <state name="inuse">
+                            <imagetype name="statusimage">
+                                <filename>inuse.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="transcoded">
+                            <imagetype name="statusimage">
+                                <filename>transcoded.png</filename>
+                            </imagetype>
+                        </state>
+                        -->
+                        <state name="mono">
+                            <imagetype name="statusimage">
+                                <filename>mono.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="stereo">
+                            <imagetype name="statusimage">
+                                <filename>stereo.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="surround">
+                            <imagetype name="statusimage">
+                                <filename>surround.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="dolby">
+                            <imagetype name="statusimage">
+                                <filename>dd.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="cc">
+                            <imagetype name="statusimage">
+                                <filename>cc.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="subtitles">
+                            <imagetype name="statusimage">
+                                <filename>subs.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="onscreensub">
+                            <imagetype name="statusimage">
+                                <filename>subs_onscreen.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="hdtv">
+                            <imagetype name="statusimage">
+                                <filename>hd.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="widescreen">
+                            <imagetype name="statusimage">
+                                <filename>wide.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="watched">
+                            <imagetype name="statusimage">
+                                <filename>watched.png</filename>
+                            </imagetype>
+                        </state>
+                        <!--
+                        <state name="preserved">
+                            <imagetype name="statusimage">
+                                <filename>preserved.png</filename>
+                            </imagetype>
+                        </state>
+                        -->
+                    </statetype>
+                    <textarea name="buttontext">
+                        <area>53,1,600,40</area>
+                        <multiline>yes</multiline>
+                        <font>basesmall</font>
+                        <align>vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,650,40</area>
+                        <type>roundbox</type>
+                        <line color="#999999" alpha="255" width="2" />
+                        <cornerradius>13</cornerradius>
+                    </shape>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>590,395</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>620,395</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
     </window>
 
 </mythuitheme>

@@ -538,6 +538,11 @@ class HelpPopup : public MythScreenType
     HelpPopup(MythScreenStack *lparent);
 
     bool Create(void);
+
+  private:
+    void addItem(const QString &state, const QString &text);
+
+    MythUIButtonList *m_iconList;
 };
 
 #endif

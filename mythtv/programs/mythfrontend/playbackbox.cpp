@@ -4455,10 +4455,10 @@ bool HelpPopup::Create()
     if (!LoadWindowFromXML("recordings-ui.xml", "iconhelp", this))
         return false;
 
-    MythUIButtonList *iconList = dynamic_cast<MythUIButtonList*>
-                                                        (GetChild("icons"));
+    m_iconList = dynamic_cast<MythUIButtonList*>
+                                                        (GetChild("iconlist"));
 
-    if (!iconList)
+    if (!m_iconList)
     {
         VERBOSE(VB_IMPORTANT, "Window 'iconhelp' is missing required "
                               "elements.");
@@ -4468,43 +4468,36 @@ bool HelpPopup::Create()
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 
-    QMap <QString, QString>::iterator it;
-    QMap <QString, QString> iconMap;
-    iconMap["commflagged"] = tr("Commercials are flagged");
-    iconMap["cutlist"]     = tr("An editing cutlist is present");
-    iconMap["autoexpire"]  = tr("The program is able to auto-expire");
-    iconMap["processing"]  = tr("Commercials are being flagged");
-    iconMap["bookmark"]    = tr("A bookmark is set");
-    iconMap["inuse"]       = tr("Recording is in use");
-    iconMap["transcoded"]  = tr("Recording has been transcoded");
+    addItem("commflagged", tr("Commercials are flagged"));
+    addItem("cutlist",     tr("An editing cutlist is present"));
+    addItem("autoexpire",  tr("The program is able to auto-expire"));
+    addItem("processing",  tr("Commercials are being flagged"));
+    addItem("bookmark",    tr("A bookmark is set"));
+//    addItem("inuse",       tr("Recording is in use"));
+//    addItem("transcoded",  tr("Recording has been transcoded"));
 
-    iconMap["mono"]        = tr("Recording is in Mono");
-    iconMap["stereo"]      = tr("Recording is in Stereo");
-    iconMap["surround"]    = tr("Recording is in Surround Sound");
-    iconMap["dolby"]       = tr("Recording is in Dolby Surround Sound");
+    addItem("mono",        tr("Recording is in Mono"));
+    addItem("stereo",      tr("Recording is in Stereo"));
+    addItem("surround",    tr("Recording is in Surround Sound"));
+    addItem("dolby",       tr("Recording is in Dolby Surround Sound"));
 
-    iconMap["cc"]          = tr("Recording is Closed Captioned");
-    iconMap["subtitles"]    = tr("Recording has Subtitles Available");
-    iconMap["onscreensub"] = tr("Recording is Subtitled");
+    addItem("cc",          tr("Recording is Closed Captioned"));
+    addItem("subtitles",   tr("Recording has Subtitles Available"));
+    addItem("onscreensub", tr("Recording is Subtitled"));
 
-    iconMap["hdtv"]        = tr("Recording is in High Definition");
-    iconMap["widescreen"]  = tr("Recording is in WideScreen");
+    addItem("hdtv",        tr("Recording is in High Definition"));
+    addItem("widescreen",  tr("Recording is in WideScreen"));
 
-    iconMap["watched"]     = tr("Recording has been watched");
-    iconMap["preserved"]   = tr("Recording is preserved");
-
-    for (it = iconMap.begin(); it != iconMap.end(); ++it)
-    {
-        MythUIImage *iconImage = dynamic_cast<MythUIImage*>(GetChild(it.key()));
-        if (iconImage)
-        {
-            //MythUIButtonListItem *item = new MythUIButtonListItem(iconList,
-            //                                                      it.value());
-            //item->SetImage();
-        }
-    }
+    addItem("watched",     tr("Recording has been watched"));
+//    addItem("preserved",   tr("Recording is preserved"));
 
     return true;
+}
+
+void HelpPopup::addItem(const QString &state, const QString &text)
+{
+    MythUIButtonListItem *item = new MythUIButtonListItem(m_iconList, text);
+    item->DisplayState(state, "icons");
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
