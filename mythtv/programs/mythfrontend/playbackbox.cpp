@@ -3675,10 +3675,11 @@ void PlaybackBox::showGroupFilter(void)
     QStringList groupNames;
     QStringList displayNames;
     QStringList groups;
+    QStringList displayGroups;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QMap<QString,QString> recGroupType;
+    m_recGroupType.clear();
 
     uint items = 0;
     uint totalItems = 0;
@@ -3712,7 +3713,7 @@ void PlaybackBox::showGroupFilter(void)
             displayNames.append(QString("%1 [%2 %3]").arg(dispGroup).arg(items)
                                 .arg(itemStr));
 
-            recGroupType[query.value(0).toString()] = "recgroup";
+            m_recGroupType[query.value(0).toString()] = "recgroup";
         }
     }
 
@@ -3722,7 +3723,7 @@ void PlaybackBox::showGroupFilter(void)
                         .arg(ProgramInfo::i18n("All Programs"))
                         .arg(totalItems).arg(itemStr));
     groupNames.prepend("All Programs");
-    recGroupType["All Programs"] = "recgroup";
+    m_recGroupType["All Programs"] = "recgroup";
 
     // Find each category, and the number of recordings in each
     query.prepare("SELECT DISTINCT category, COUNT(title) FROM recorded "
@@ -3744,13 +3745,14 @@ void PlaybackBox::showGroupFilter(void)
             else if (dispGroup == tr("Unknown"))
                 unknownCount += items;
 
-            if ((!recGroupType.contains(dispGroup)) &&
+            if ((!m_recGroupType.contains(dispGroup)) &&
                 (dispGroup != tr("Unknown")))
             {
-                groups += QString("%1 [%2 %3]").arg(dispGroup)
+                displayGroups += QString("%1 [%2 %3]").arg(dispGroup)
                                   .arg(items).arg(itemStr);
+                groups += dispGroup;
 
-                recGroupType[dispGroup] = "category";
+                m_recGroupType[dispGroup] = "category";
             }
         }
 
@@ -3759,10 +3761,11 @@ void PlaybackBox::showGroupFilter(void)
             dispGroup = tr("Unknown");
             items     = unknownCount;
             itemStr   = (items == 1) ? tr("item") : tr("items");
-            groups += QString("%1 [%2 %3]").arg(dispGroup)
+            displayGroups += QString("%1 [%2 %3]").arg(dispGroup)
                               .arg(items).arg(itemStr);
+            groups += dispGroup;
 
-            recGroupType[dispGroup] = "category";
+            m_recGroupType[dispGroup] = "category";
         }
     }
 
@@ -3770,12 +3773,12 @@ void PlaybackBox::showGroupFilter(void)
     displayNames.append(QString("------- %1 -------").arg(tr("Categories")));
     groupNames.append("");
     groups.sort();
+    displayGroups.sort();
     QStringList::iterator it;
-    for (it = groups.begin(); it != groups.end(); it++)
-    {
+    for (it = displayGroups.begin(); it != displayGroups.end(); it++)
         displayNames.append(*it);
+    for (it = groups.begin(); it != groups.end(); it++)
         groupNames.append(*it);
-    }
 
     QString label = tr("Change Filter");
 
