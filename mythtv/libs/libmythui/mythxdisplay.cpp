@@ -60,6 +60,22 @@ int ErrorHandler(Display *d, XErrorEvent *xeev)
     return 0;
 }
 
+void LockMythXDisplays(bool lock)
+{
+    if (lock)
+    {
+        std::map<Display*, MythXDisplay*>::iterator it;
+        for (it = xdisplays.begin(); it != xdisplays.end(); it++)
+            it->second->Lock();
+    }
+    else
+    {
+        std::map<Display*, MythXDisplay*>::reverse_iterator it;
+        for (it = xdisplays.rbegin(); it != xdisplays.rend(); it++)
+            it->second->Unlock();
+    }
+}
+    
 MythXDisplay *GetMythXDisplay(Display *d)
 {
     if (xdisplays.count(d))
