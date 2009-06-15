@@ -195,10 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Chaînes</translation>
-    </message>
-    <message>
         <source>Are you sure you would like to delete this channel?</source>
         <translation>Êtes-vous sûr de vouloir supprimer cette chaîne?</translation>
     </message>
@@ -209,26 +205,6 @@
     <message>
         <source>No, don&apos;t</source>
         <translation>Non</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Menu des chaînes</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Édition..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Suppression..</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Supprimer des chaînes</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Supprimer toutes les chaînes de la/des source[s] sélectionnée[s].</translation>
     </message>
     <message>
         <source>Yes, delete the channels</source>
@@ -723,17 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Emplacement du fichier</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">Emplacement du fichier channels.conf.</translation>
     </message>
 </context>
 <context>
@@ -1249,14 +1214,6 @@
         <translation type="unfinished">Un signet est mis</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished">L&apos;enregistrement est en cours d&apos;utilisation</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1294,10 +1251,6 @@
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1534,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Transport</translation>
     </message>
 </context>
 <context>
@@ -2250,6 +2196,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Option d&apos;ordonnancement</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2406,10 +2356,6 @@ Are you sure you want to delete:</source>
         <translation>Aucun résultat pour cette recherche. Veuillez essayer une autre recherche.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">       !! Pas d&apos;émission!!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2460,6 +2406,18 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Sélectionner le titre de l&apos;émission que vous désirez trouver. Lorsque c&apos;est fini  retourner avec la flèche gauche. Appuyez sur SELECT pour planifier un enregistrement.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2708,6 +2666,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 de %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2935,56 +2897,8 @@ Are you sure you want to delete:</source>
         <translation>^(Le |La |Les |Un |Une |Des)</translation>
     </message>
     <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Enregistrer avec les options de remplacement</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Enregistrer dans ce créneau horaire</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Enregistrer cette chaîne</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Enregistrer un épisode</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Non autorisé à enregistrer cet épisode</translation>
-    </message>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Enregistrer seulement cet épisode</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Enregistré chaque semaine</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Toujours enregistré</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Pas enregistré</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Erreur!</translation>
-    </message>
-    <message>
         <source>Recording %1 of %2</source>
         <translation>Enregistre %1 de %2</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Enregistre une émission journalière</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Enregister une émission hebdomadaire</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
@@ -3064,6 +2978,10 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Sort By Average Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3296,14 +3214,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>&quot;Small&quot; font</source>
         <translation>&quot;Petite&quot; police</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Méthode d&apos;ombrage du guide</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Blocs de temps à afficher (30 mins)</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -3706,22 +3616,6 @@ Are you sure you want to delete:</source>
         <translation>Utiliser la taille d&apos;interface pour rejouer la TV</translation>
     </message>
     <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Transparent- Alpha (usage de CPU élevé)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Transparent- Blender (usage de CPU- Moyen)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Transparent -éco (usage de CPU faible)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Solide (usage de CPU moyen)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Afficher une couleur par genre</translation>
     </message>
@@ -3758,10 +3652,6 @@ Are you sure you want to delete:</source>
         <translation type="unfinished">Options de chaîne</translation>
     </message>
     <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Nouvelle chaîne)</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Nom de chaîne</translation>
     </message>
@@ -3772,22 +3662,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Video Source</source>
         <translation>Source vidéo</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Tout)</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Non assigné)</translation>
-    </message>
-    <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">mode de tri</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Cacher les chaînes sans numéro de canal</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -3902,10 +3776,6 @@ Are you sure you want to delete:</source>
         <translation>Modulation</translation>
     </message>
     <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Constellation</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Aucun</translation>
     </message>
@@ -3966,30 +3836,6 @@ Are you sure you want to delete:</source>
         <translation>0.5 secondes</translation>
     </message>
     <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 seconde</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 secondes</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 secondes</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 minute</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 minutes</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 minutes</translation>
-    </message>
-    <message>
         <source>error</source>
         <translation>erreur</translation>
     </message>
@@ -4045,18 +3891,6 @@ Are you sure you want to delete:</source>
         <source>GB</source>
         <comment>GigaBytes</comment>
         <translation>GB</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutes</translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">Étoiles</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">Étoile</translation>
     </message>
     <message>
         <source>Override Recording</source>
@@ -4898,28 +4732,8 @@ Are you sure you want to delete:</source>
         <translation>Si activé, le mode télé en live choisira une carte tuner qui aura le moins de chance d&apos;avoir des enregistrements programmés plutôt que choisir la meilleure carte disponible.</translation>
     </message>
     <message>
-        <source>Floating Program Guide Selector</source>
-        <translation type="obsolete">Sélecteur flottant de guide TV</translation>
-    </message>
-    <message>
-        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="obsolete">Si activé, le sélecteur de programme TV est libre de se déplacer dans le guide, sinon, il reste au centre du guide dans tous les cas</translation>
-    </message>
-    <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
         <translation>Colorier le guide des programmes en utilisant des couleurs par genre. (Disponible en fonction du grabbeur de programmes.)</translation>
-    </message>
-    <message>
-        <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Afficher seulement les chaînes &apos;favorites&apos;</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="obsolete">Si activé, le guide des programmes affichera uniquement les chaines marquées comme favorites. En pressant \&quot;4\&quot;, vous commuter dans un mode qui affiche toutes les chaines</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Chaînes à afficher</translation>
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
@@ -5150,14 +4964,6 @@ Are you sure you want to delete:</source>
         <translation>mis en scène par</translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">jours</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">jour</translation>
-    </message>
-    <message>
         <source>Uptime</source>
         <translation>Uptime</translation>
     </message>
@@ -5208,10 +5014,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Wake Command</source>
         <translation>Commande de réveil</translation>
-    </message>
-    <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">La commande utilisée pour réveiller les BackEnd esclaves. Laisser vide pour désactiver.</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
@@ -5985,19 +5787,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf si ça ne marche pas.</translation>
     </message>
     <message>
-        <source>Bandwidth (Default: Auto)
-</source>
-        <translation type="obsolete">Bande Passante (Défaut: Auto)</translation>
-    </message>
-    <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulation (Défaut: Auto)</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Constellation (Défaut: Auto)</translation>
-    </message>
-    <message>
         <source>Forward Error Correction (Default: Auto)</source>
         <translation>Correction d&apos;erreur d&apos;avance: FEC (Défaut Auto)</translation>
     </message>
@@ -6060,10 +5849,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>TV audio through PVR-350 only</source>
         <translation>Audio TV à travers le PVR 350 seulement</translation>
-    </message>
-    <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Terrestre</translation>
     </message>
     <message>
         <source>Cable</source>
@@ -6254,10 +6039,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>Germany</source>
         <translation>Allemagne</translation>
-    </message>
-    <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Type de balayage</translation>
     </message>
     <message>
         <source>Channel Change Error</source>
@@ -6505,10 +6286,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
         <translation>a été comme à ne jamais enregistrer.</translation>
     </message>
     <message>
-        <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="obsolete">Qu&apos;utiliser pour séparer les chaînes ATSC majeures des mineures.</translation>
-    </message>
-    <message>
         <source>DBOX2 Streaming Port</source>
         <translation>Port streaming de la DBOX2</translation>
     </message>
@@ -6699,24 +6476,8 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
         <translation>La modification des cartes d&apos;entrée, quelque destruction que ce soit ou la recherche de chaînes pourraient ne pas fonctionner.</translation>
     </message>
     <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Chercheur de chaînes</translation>
-    </message>
-    <message>
-        <source>Starts the channel scanner.</source>
-        <translation type="obsolete">Démarre la recherche de chaînes.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Editeur de transport</translation>
-    </message>
-    <message>
-        <source>Allows you to edit the transports directly</source>
-        <translation type="obsolete">Vous permet de modifier vos transports directement</translation>
-    </message>
-    <message>
-        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="obsolete">Ceci est rarement nécessaire à moins que vous n&apos;utilisiez une parabole satellite et ne deviez entrer une fréquence initiale pour la recherche de chaînes.</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6755,24 +6516,8 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
         <translation>Afficher l&apos;information de volume sur l&apos;afficheur LCD.</translation>
     </message>
     <message>
-        <source>Minimal Updates</source>
-        <translation type="obsolete">Mises à jour minimales</translation>
-    </message>
-    <message>
-        <source>Rename to Match</source>
-        <translation type="obsolete">Renommer pour correspondre</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Supprimer</translation>
-    </message>
-    <message>
-        <source>Existing Channel Treatment</source>
-        <translation type="obsolete">Traitement des chaînes existantes</translation>
-    </message>
-    <message>
-        <source>How to treat existing channels.</source>
-        <translation type="obsolete">Comment traiter les chaînes existantes.</translation>
     </message>
     <message>
         <source>Analog V4L capture card</source>
@@ -6857,10 +6602,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>Frequency table to use.</source>
         <translation>Standard de fréquences à utiliser.</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">La plupart des réseaux câbles aux Etats-Unis utilisent la modulation QAM256 ou QAM65, mais certains systèmes hybrides utilisent 8VSB pour les canaux hertziens.</translation>
     </message>
     <message>
         <source>Could not query inputs.</source>
@@ -6981,14 +6722,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation>et fournira généralement des informations limitées aux quelques jours qui suivent.</translation>
-    </message>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="obsolete">Ignorer le délai d&apos;attente du signal</translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="obsolete">Cette option vous permet de ralentir le balayage pour certaines cartes dont les pilotes sont défectueux, tels que les pilotes DVB pour les cartes DVB Leadtek LR6650.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
@@ -7195,14 +6928,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
         <translation>Active la sortie directe du son DTS sur la sortie SPDIF de votre carte son, pour les sources contenant des pistes audio DTS (normalement des DVD).  Nécessite que la sortie audio soit correctement définie.</translation>
     </message>
     <message>
-        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="obsolete">Montrer les enregistrements &quot;TV Directe&quot; dans le filtre &quot;Toutes les émissions&quot;</translation>
-    </message>
-    <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="obsolete">Si cette option est désactivée, les enregistrements &quot;TV Directe&quot; ne seront visibles que dans le groupe spécial &quot;TV Directe&quot;.</translation>
-    </message>
-    <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
         <translation>Méthode mise en oeuvre pour déterminer les enregistrements à détruire en premier.  Les enregistrement &quot;TV Directe&quot; seront toujours expurgés avant les enregistrements normaux.</translation>
     </message>
@@ -7213,18 +6938,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>, avec votre débit %1 de %2 Kb/sec</translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">%1 heures restantes</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">%1 heures et %2 minutes restantes</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">%1 minutes restantes</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
@@ -8840,10 +8553,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11224,6 +10933,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11327,14 +11060,6 @@ Do you wish to continue watching?</source>
         <translation>Importer channels.conf</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Balayage complet de tous les transports existants</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Balayage des transports existants</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11367,25 +11092,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">recherche</translation>
-    </message>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Assistant de Scan</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Erreur d&apos;ajustement de transport</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Erreur au démarrage du balayage</translation>
     </message>
 </context>
 <context>
@@ -11518,10 +11224,6 @@ No other details</source>
         <translation>Sur %1 %2 de %3.%4
 %5
 Pas d&apos;autres informations</translation>
-    </message>
-    <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%1 enregistrements occupant %2 sont autorisés à auto-expirer</translation>
     </message>
     <message>
         <source>is unavailable</source>
@@ -11672,14 +11374,6 @@ Pas d&apos;autres informations</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>day</source>
-        <translation type="obsolete">jour</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">jours</translation>
-    </message>
-    <message>
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished">ATTENTION: mythfilldatabase est-il lancé?</translation>
     </message>
@@ -11818,23 +11512,23 @@ Pas d&apos;autres informations</translation>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12013,10 +11707,6 @@ Directory From Storage Group?</source>
     <message>
         <source>Skip</source>
         <translation>Saut</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutes</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -12767,10 +12457,6 @@ Select a Current Recording</source>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13016,7 +12702,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Edition..</translation>
     </message>
     <message>
         <source>Delete..</source>
@@ -13206,6 +12892,14 @@ Select a Current Recording</source>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

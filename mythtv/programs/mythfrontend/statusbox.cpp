@@ -1303,11 +1303,11 @@ void StatusBox::doAutoExpireList()
                      m_expList.size()).arg(sm_str(totalSize / 1024));
 
     if (liveTVCount)
-        staticInfo += tr("%n (is) LiveTV and consume(s) %2\n", "", liveTVCount)
+        staticInfo += tr("%n (is) LiveTV and consume(s) %1\n", "", liveTVCount)
                             .arg(sm_str(liveTVSize / 1024));
 
     if (deletedGroupCount)
-        staticInfo += tr("%1 (is) Deleted and consume(s) %2\n", "",
+        staticInfo += tr("%n (is) Deleted and consume(s) %1\n", "",
                         deletedGroupCount)
                         .arg(sm_str(deletedGroupSize / 1024));
 

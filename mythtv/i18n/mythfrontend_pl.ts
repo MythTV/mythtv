@@ -195,14 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Usuń kanały</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Usuń wszystkie kanały dla wybranch źródeł.</translation>
-    </message>
-    <message>
         <source>Yes, delete the channels</source>
         <translation>Tak, usuń te kanały</translation>
     </message>
@@ -217,18 +209,6 @@
     <message>
         <source>Yes, delete the channel</source>
         <translation>Tak, usuń ten kanał</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Menu kanałów</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Edytuj..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Usuń..</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
@@ -1234,14 +1214,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1279,10 +1251,6 @@
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1519,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Transport</translation>
     </message>
 </context>
 <context>
@@ -2233,6 +2194,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2389,10 +2354,6 @@ Are you sure you want to delete:</source>
         <translation>Nie znaleziono programów wg tych kryteriów. Proszę powtórzyć szukanie.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">!! Brak programów !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2442,6 +2403,18 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2691,6 +2664,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 z %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2922,34 +2899,6 @@ Are you sure you want to delete:</source>
         <translation>Nagraj %1 z %2</translation>
     </message>
     <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Nagraj co tydzień</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Nagraj w tym czasie</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Nagraj na tym kanale</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Nagraj wszystkie *pokazy*</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Nagraj jeden *pokaz*</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Nie nagrywaj tego *pokazu*</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Błąd!</translation>
-    </message>
-    <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Usuń &apos;%1&apos; %2 regułę?</translation>
     </message>
@@ -3027,6 +2976,10 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Sort By Average Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3125,10 +3078,6 @@ Are you sure you want to delete:</source>
         <translation>Dowolny</translation>
     </message>
     <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Nowy kanał)</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Nazwa kanału</translation>
     </message>
@@ -3139,18 +3088,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Video Source</source>
         <translation>Źródło</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Wszystko)</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Nieprzydzielony)</translation>
-    </message>
-    <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Skaner kanałów</translation>
     </message>
     <message>
         <source>Transport Editor</source>
@@ -3358,10 +3295,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>8 MHz</translation>
     </message>
     <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulacja (Domyślnie: Auto)</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Brak</translation>
     </message>
@@ -3440,30 +3373,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>0.5 seconds</source>
         <translation>0.5 sekundy</translation>
-    </message>
-    <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 sekunda</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 sekund</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 sekund</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 minuta</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 minut</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 minut</translation>
     </message>
     <message>
         <source>error</source>
@@ -3627,24 +3536,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minut</translation>
-    </message>
-    <message>
         <source>Re-Record</source>
         <translation>Nagraj ponownie</translation>
     </message>
     <message>
         <source>Repeat</source>
         <translation>Powtórz</translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">gwiazdy</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">gwiazda</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -6007,22 +5904,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Domyślną wielkością jest 12.</translation>
     </message>
     <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Przeźroczysty  - alfa (wysokie użycie CPU)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Przeźroczysty - mieszany (średnie użycie CPU)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Przeźroczysty - ekonomiczny (niskie użycie CPU)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Stały - (średnie użycie CPU)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6691,32 +6572,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">dni</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dzień</translation>
-    </message>
-    <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
         <translation>%1 dostępne, %2 używane, %3 (lub %4%) wolne.</translation>
     </message>
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">%1 godzin pozostało</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">%1 godzin i %2 minut pozostało</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">%1 minut pozostało</translation>
     </message>
     <message>
         <source>Uptime</source>
@@ -8648,10 +8509,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11072,6 +10929,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11175,14 +11056,6 @@ Do you wish to continue watching?</source>
         <translation>Importuj z channels.conf</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Pełne skanowanie istniejących *transportów*</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Skanowanie istniejących *transportów</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation>Importuj M3U</translation>
     </message>
@@ -11215,21 +11088,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation>Skanuj konfigurację</translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Skanowanie</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Nie umiem otworzyć &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Nie umiem sprawdzić &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -11366,14 +11224,6 @@ No other details</source>
     <message>
         <source>is unavailable</source>
         <translation>niedostępny</translation>
-    </message>
-    <message>
-        <source>standard rules are defined</source>
-        <translation type="obsolete">standardowe zdefiniowane reguły</translation>
-    </message>
-    <message>
-        <source>search rules are defined</source>
-        <translation type="obsolete">znajdź zdefiniowane reguły</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
@@ -11520,14 +11370,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>day</source>
-        <translation type="obsolete">dzień</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">dni</translation>
-    </message>
-    <message>
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished">OSTRZEŻENIE: mythfilldatabase jest uruchomiony?</translation>
     </message>
@@ -11666,23 +11508,23 @@ No other details</source>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -11947,10 +11789,6 @@ Directory From Storage Group?</source>
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minut</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -12615,10 +12453,6 @@ Select a Current Recording</source>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13054,6 +12888,14 @@ Select a Current Recording</source>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Anuluj</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

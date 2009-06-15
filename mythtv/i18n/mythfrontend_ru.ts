@@ -195,18 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Каналы</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Удалить каналы</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Удалить все каналы на текущем выбранном источнике.</translation>
-    </message>
-    <message>
         <source>Yes, delete the channels</source>
         <translation>Да, удалить каналы</translation>
     </message>
@@ -221,18 +209,6 @@
     <message>
         <source>Yes, delete the channel</source>
         <translation>Да, удалить канал</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Меню каналов</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Редактировать</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Удалить</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
@@ -723,17 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Местоположение файла</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">Местоположения файла channels.conf.</translation>
     </message>
 </context>
 <context>
@@ -1249,14 +1214,6 @@
         <translation type="unfinished">Закладка установлена</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished">Запись используется</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished">Запись будет перекодирована</translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1294,10 +1251,6 @@
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1534,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Транспорт</translation>
     </message>
 </context>
 <context>
@@ -2250,6 +2196,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Опции расписания</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2406,10 +2356,6 @@ Are you sure you want to delete:</source>
         <translation>Нет программ при этих условиях поиска. Пожалуйста введите другие условия поиска.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">    !! Нет программ !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2460,6 +2406,18 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Выберите заголовок программы, которую Вы хотите найти. Когда закончите вернитесь с помощью стрелки влево. Нажмите ВЫБОР для планирования записи.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2708,6 +2666,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 из %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2939,54 +2901,6 @@ Are you sure you want to delete:</source>
         <translation>Записывается %1 из %2</translation>
     </message>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Записывается только этот показ</translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Записывать с перезаписью опций</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Записывать каждую неделю</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Записывать в это время</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Записывать на этом канале</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Записывать все показы</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Записывать один показ</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Записывать показ ежедневно</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Записывать показ еженедельно</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Не разрешено записывать этот показ</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Нет записей для этого показа</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Ошибка!</translation>
-    </message>
-    <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3064,6 +2978,10 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Sort By Average Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3166,10 +3084,6 @@ Are you sure you want to delete:</source>
         <translation type="unfinished">Опции канала</translation>
     </message>
     <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Новый канал)</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Имя канала</translation>
     </message>
@@ -3182,40 +3096,8 @@ Are you sure you want to delete:</source>
         <translation>Видео источник</translation>
     </message>
     <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Все)</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Не присвоен)</translation>
-    </message>
-    <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Режим сортировки</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Прятать каналы без номера</translation>
-    </message>
-    <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Сканнер каналов</translation>
-    </message>
-    <message>
-        <source>Starts the channel scanner.</source>
-        <translation type="obsolete">Запустить сканнер каналов</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Редактор транспорта</translation>
-    </message>
-    <message>
-        <source>Allows you to edit the transports directly</source>
-        <translation type="obsolete">Разрешить редактировать транспорты непосредственно</translation>
-    </message>
-    <message>
-        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="obsolete">Это очень редко используется, за исключением случаев, когда Вы используете спутниковую параболическую антенну и должны задавать начальную частоту для сканнера.</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -3412,18 +3294,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>8 МГц</translation>
     </message>
     <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Модуляция (По умолчанию: Авто)</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Созвездие</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Созвездие (группа спутников, по умолчанию Авто)</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Нет</translation>
     </message>
@@ -3506,30 +3376,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>0.5 seconds</source>
         <translation>0.5 секунды</translation>
-    </message>
-    <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 секунда</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 секунд</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 секунд</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 минута</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 минут</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 минут</translation>
     </message>
     <message>
         <source>error</source>
@@ -3685,24 +3531,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>ГБ</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">минут</translation>
-    </message>
-    <message>
         <source>Re-Record</source>
         <translation>Перезапись</translation>
     </message>
     <message>
         <source>Repeat</source>
         <translation>Повтор</translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">звезд</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">звезда</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -4498,18 +4332,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Германия</translation>
     </message>
     <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="obsolete">Игнорировать таймаут сигнала</translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="obsolete">Эта опция разрешает медленное сканирование с некорректными драйверами, как например DVB драйвера для Leadtek LR6650 DVB карты.</translation>
-    </message>
-    <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Тип сканирования</translation>
-    </message>
-    <message>
         <source>Broadcast</source>
         <translation>Широковещательный</translation>
     </message>
@@ -4530,62 +4352,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Таблица частот для использования</translation>
     </message>
     <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Наземное</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">Большинство кабельных систем в США используют QAM-256 или QAM-64, но некоторые смешанные системы могут использовать 8-VSB или другие.</translation>
-    </message>
-    <message>
-        <source>(5_1) Underscore</source>
-        <translation type="obsolete">(5_1) подчеркивание</translation>
-    </message>
-    <message>
-        <source>(5-1) Minus</source>
-        <translation type="obsolete">(5-1) Минус</translation>
-    </message>
-    <message>
-        <source>(5.1) Period</source>
-        <translation type="obsolete">(5.1) Точка</translation>
-    </message>
-    <message>
-        <source>(501) Zero</source>
-        <translation type="obsolete">(501) Ноль</translation>
-    </message>
-    <message>
-        <source>(51) None</source>
-        <translation type="obsolete">(51) Нет</translation>
-    </message>
-    <message>
-        <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="obsolete">Используется чтобы отделять старший и младший канал ATSC</translation>
-    </message>
-    <message>
-        <source>Minimal Updates</source>
-        <translation type="obsolete">Минимальное обновление</translation>
-    </message>
-    <message>
-        <source>Rename to Match</source>
-        <translation type="obsolete">Переименовать для соответствия</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Удалить</translation>
-    </message>
-    <message>
-        <source>Existing Channel Treatment</source>
-        <translation type="obsolete">Трактовка существующих каналов</translation>
-    </message>
-    <message>
-        <source>How to treat existing channels.</source>
-        <translation type="obsolete">Как трактовать существующие каналы.</translation>
-    </message>
-    <message>
-        <source>Bandwidth (Default: Auto)
-</source>
-        <translation type="obsolete">Полоса (По умолчанию: Авто)
-</translation>
     </message>
     <message>
         <source>Power Search</source>
@@ -5342,14 +5110,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
         <translation>Использовать имя текущего фильтра вместо &quot;Все программы&quot; на экране воспроизведения.</translation>
-    </message>
-    <message>
-        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="obsolete">Показывать записи &apos;LiveTV&apos; когда используется фильтр &quot;Все программы&quot;</translation>
-    </message>
-    <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="obsolete">Если эта установка отключена. записи LiveTV будут видны только через специальную &quot;LiveТВ&quot; Группу записи.</translation>
     </message>
     <message>
         <source>Show group summary</source>
@@ -6116,34 +5876,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Размер по умолчанию 12</translation>
     </message>
     <message>
-        <source>Floating Program Guide Selector</source>
-        <translation type="obsolete">Плавающий выбор программ</translation>
-    </message>
-    <message>
-        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="obsolete">Если разрешено, указатель выбора будет свободно перемещаться по расписанию, иначе он будет всегда оставаться в центре.</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Метод затенения расписания</translation>
-    </message>
-    <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Alpha - Прозрачность (Использование ЦПУ - Высокое)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Blender - Прозрачность (Использование ЦПУ - Среднее)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Eco - Прозрачность (Использование ЦПУ - Низкое)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Заполнение (Использование ЦПУ - Среднее)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Показывать цвета жанров</translation>
     </message>
@@ -6158,22 +5890,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>(Not available for all grabbers.)</source>
         <translation>(Доступно не для всех грабберов.)</translation>
-    </message>
-    <message>
-        <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Показывать только &apos;предпочитаемые&apos; каналы</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="obsolete">Если разрешено, в программе изначально будут показываться только каналы отмеченные как предпочитаемые. Нажатие &quot;4&quot; будет переключать режим показа между предпочитаемыми и всеми каналами.</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Канал для показа</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Количество временных блоков (30 мин) для показа</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -6816,14 +6532,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Режиссер</translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">дней</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">день</translation>
-    </message>
-    <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
         <translation>%1 всего, %2 используется, %3 (или %4%) свободно.</translation>
     </message>
@@ -6990,10 +6698,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Wake Command</source>
         <translation>Команда пробуждения</translation>
-    </message>
-    <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">Команда используемая для пробуждения подчиненных серверов. Оставьте пустой для запрета.</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
@@ -7250,18 +6954,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>, используя %1 со скоростью %2 Kb/sec</translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">%1 часов осталось</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">%1 часов и %2 минут осталось</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">%1 минут осталось</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
@@ -8863,10 +8555,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11247,6 +10935,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11350,14 +11062,6 @@ Do you wish to continue watching?</source>
         <translation>Импортировать channels.conf</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Полное сканирование существующих транспортов</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Сканирование существующих транспортов</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation>Импорт M3U</translation>
     </message>
@@ -11390,33 +11094,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Мастер сканирования</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Ошибка настройки транспорта</translation>
-    </message>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Сканирование</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Не удалось открыть &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Не удалось разобрать &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Ошибка запуска сканирования</translation>
     </message>
 </context>
 <context>
@@ -11549,14 +11226,6 @@ No other details</source>
     <message>
         <source>Status: </source>
         <translation>Состояние: </translation>
-    </message>
-    <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%1 записей уничтожают %2 разрешенных для устаревания</translation>
-    </message>
-    <message>
-        <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="obsolete">%1 из них LiveTV и уничтожают %2</translation>
     </message>
     <message>
         <source>is unavailable</source>
@@ -11707,14 +11376,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>day</source>
-        <translation type="obsolete">день</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">дней</translation>
-    </message>
-    <message>
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished">ВНИМАНИЕ: mythfilldatabase запущено?</translation>
     </message>
@@ -11853,23 +11514,23 @@ No other details</source>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12109,10 +11770,6 @@ Directory From Storage Group?</source>
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">Минут</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -12802,10 +12459,6 @@ Select a Current Recording</source>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13055,7 +12708,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить...</translation>
     </message>
     <message>
         <source>Multiplex Editor</source>
@@ -13240,6 +12893,14 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -207,32 +207,8 @@
         <translation>Nej, låt bli</translation>
     </message>
     <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Kanalmeny</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Ändra..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Ta bort..</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Ta bort kanaler</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Ta bort alla kanaler på markerade källor.</translation>
-    </message>
-    <message>
         <source>Yes, delete the channels</source>
         <translation>Ja, ta bort kanalerna</translation>
-    </message>
-    <message>
-        <source>Channels</source>
-        <translation type="obsolete">Kanaler</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
@@ -723,17 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation>Kunde inte få fram information för kort %1</translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Sökväg</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">Sökväg till filen channels.conf.</translation>
     </message>
 </context>
 <context>
@@ -1249,14 +1214,6 @@
         <translation type="unfinished">Ett bokmärke är satt</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished">Inspelning används</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished">Inspelning har omkodats</translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished">Inspelningen är i Mono</translation>
     </message>
@@ -1295,53 +1252,6 @@
     <message>
         <source>Recording has been watched</source>
         <translation type="unfinished">Inspelning har tittats på</translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
-        <translation type="unfinished">Inspelning bevaras</translation>
-    </message>
-</context>
-<context>
-    <name>IPTVChannelFetcher</name>
-    <message>
-        <source>Downloading Playlist</source>
-        <translation type="obsolete">Laddar ner spellista</translation>
-    </message>
-    <message>
-        <source>Processing Playlist</source>
-        <translation type="obsolete">Behandlar spellista</translation>
-    </message>
-    <message>
-        <source>Adding Channels</source>
-        <translation type="obsolete">Lägger till kanaler</translation>
-    </message>
-    <message>
-        <source>Channel #%1 : %2</source>
-        <translation type="obsolete">Kanal #%1 : %2</translation>
-    </message>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">Lägger till %1</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">Uppdaterar %1</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">Klart</translation>
-    </message>
-    <message>
-        <source>ERROR: M3U channel list is malformed</source>
-        <translation type="obsolete">FEL: M3U kanallista är förvrängd</translation>
-    </message>
-    <message>
-        <source>Encountered malformed channel</source>
-        <translation type="obsolete">Påträffade förvrängd kanal</translation>
-    </message>
-    <message>
-        <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation type="obsolete">Analysera kanal #%1 : %2 : %3</translation>
     </message>
 </context>
 <context>
@@ -1577,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Transport</translation>
     </message>
 </context>
 <context>
@@ -2293,6 +2196,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Schemaläggninginställningar</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished">Inspelningar</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2339,10 +2246,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Custom Filters</source>
         <translation>Egna filter</translation>
-    </message>
-    <message>
-        <source>Maximum number of CPU cores used for decoding.</source>
-        <translation type="obsolete">Maximalt antal processorkärnor använda för avkodning.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
@@ -2453,10 +2356,6 @@ Are you sure you want to delete:</source>
         <translation>Det finns inga program tillgängliga under denna sökning. Välj en annan sökning.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">      !! Inga program !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2507,6 +2406,18 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Välj titeln på det program du vill hitta. När du är klar, återgå med vänsterpil. Tryck OK för att schemalägga en inspelning.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2755,6 +2666,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 av %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2978,56 +2893,8 @@ Are you sure you want to delete:</source>
 <context>
     <name>ProgramRecPriority</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Endast denna visning</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Varje vecka</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Alla visningar</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Spelar inte in denna visning</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fel!</translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Spelar in med överskuggningsinställningar</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Spelar in i denna tidslucka</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Spelar in på denna kanal</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Spelar in en visning</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Inte tillåten att spela in denna visning</translation>
-    </message>
-    <message>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Spelar in en visning per dag</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Spelar in en visning per vecka</translation>
     </message>
     <message>
         <source>Recording %1 of %2</source>
@@ -3113,6 +2980,10 @@ Are you sure you want to delete:</source>
         <source>Sort By Average Delay</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Schedule Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -3135,30 +3006,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>0.5 seconds</source>
         <translation>0.5 sek</translation>
-    </message>
-    <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 sek</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 sek</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 sek</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 min</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 min</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 min</translation>
     </message>
     <message>
         <source>error</source>
@@ -3495,18 +3342,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>&quot;Small&quot; font</source>
         <translation>Litet typsnitt</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Skuggning av programguiden</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Antalet kanaler att visa</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Antal tidsluckor (30 min) att visa</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -3949,22 +3784,6 @@ Are you sure you want to delete:</source>
         <translation>Använd GUI-storlek för uppspelning</translation>
     </message>
     <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Transparent (CPU: hög)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Transparent (CPU: mellan)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Transparent (CPU: låg)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Solid (CPU: mellan)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Visa genrefärger</translation>
     </message>
@@ -4105,14 +3924,6 @@ Are you sure you want to delete:</source>
         <translation>Videokälla</translation>
     </message>
     <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Sorteringsläge</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Visa inte kanaler utan kanalnummer.</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Kanalnamn</translation>
     </message>
@@ -4215,10 +4026,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Modulation</source>
         <translation>Modulering</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Konstellation</translation>
     </message>
     <message>
         <source>FEC</source>
@@ -4409,10 +4216,6 @@ Are you sure you want to delete:</source>
         <translation>Väckningskommando</translation>
     </message>
     <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">Kommandot som används för att väcka inspelningsservrar. Lämna tomt för att avaktivera.</translation>
-    </message>
-    <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
         <translation>Hur länge huvudinspelningsservern är inaktiv innan den stänger ner alla inspelningsservrar. Sätt till 0 för att avaktivera automatisk nedstängning.</translation>
     </message>
@@ -4503,10 +4306,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
         <translation>Tillbakaspolning vid reklamöverhoppning</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Alla)</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -4703,10 +4502,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>TXT</source>
         <translation>Text-TV</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuter</translation>
     </message>
     <message>
         <source>Recording volume of the capture card</source>
@@ -4938,10 +4733,6 @@ Are you sure you want to delete:</source>
         <translation>GB</translation>
     </message>
     <message>
-        <source>stars</source>
-        <translation type="obsolete">stjärnor</translation>
-    </message>
-    <message>
         <source>this episode is a repeat.</source>
         <translation>detta avsnitt är en repris.</translation>
     </message>
@@ -5148,24 +4939,8 @@ Are you sure you want to delete:</source>
         <translation>Välj ett TV-kort för TV-läge som är mindre sannolikt att ha schemalagda inspelningar i stället för det bästa tillgängliga kortet.</translation>
     </message>
     <message>
-        <source>Floating Program Guide Selector</source>
-        <translation type="obsolete">Flytande programguidesväljare</translation>
-    </message>
-    <message>
-        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="obsolete">Låt programguidens väljare röra sig fritt igenom guiden, annars stannar den alltid i centrum av guiden.</translation>
-    </message>
-    <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
         <translation>Färglägg programguiden med genrefärger. (Inte tillgängligt för alla grabbers.)</translation>
-    </message>
-    <message>
-        <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Visa endast favoritkanaler</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="obsolete">Låt programguiden initialt endast visa de kanaler som är markerade som favoritkanaler. Ett tryck på &quot;4&quot; växlar mellan favoriter och alla kanaler.</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
@@ -5226,10 +5001,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
         <translation>Denna och följande inställning avgör när mythfilldatabase tillåts köra. Om exempelvis Min sätts till 11 och Max till 13 körs programmet bara mellan 11.00 och 12.59.</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Ej angiven)</translation>
     </message>
     <message>
         <source>Save these settings</source>
@@ -5408,14 +5179,6 @@ Are you sure you want to delete:</source>
         <translation>Öka prioritet med %1</translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">dagar</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dag</translation>
-    </message>
-    <message>
         <source>Show the program guide when starting Live TV</source>
         <translation>Visa programguiden när TV-läge startas</translation>
     </message>
@@ -5570,14 +5333,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
         <translation>Detta får Myth att följa symboliska länkar när inspelningar och relaterade filer tas bort, i stället för att ta bort den symboliska länken och lämna kvar den egentliga filen.</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">stjärna</translation>
-    </message>
-    <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Ny kanal)</translation>
     </message>
     <message>
         <source>Stop recording</source>
@@ -6024,19 +5779,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</translation>
     </message>
     <message>
-        <source>Bandwidth (Default: Auto)
-</source>
-        <translation type="obsolete">Bandbredd (Standard: Auto)</translation>
-    </message>
-    <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulation (Standard: Auto)</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Konstellation (Standard: Auto)</translation>
-    </message>
-    <message>
         <source>Forward Error Correction (Default: Auto)</source>
         <translation>Felkorrigering (Standard: Auto)</translation>
     </message>
@@ -6099,10 +5841,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>TV audio through PVR-350 only</source>
         <translation>TV-ljud endast genom PVR-350</translation>
-    </message>
-    <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Marksänt</translation>
     </message>
     <message>
         <source>Cable</source>
@@ -6467,10 +6205,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>ATSC kanal %1</translation>
     </message>
     <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Söktyp</translation>
-    </message>
-    <message>
         <source>Signal Lock</source>
         <translation>Signallås</translation>
     </message>
@@ -6481,10 +6215,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Allow Transcoding jobs</source>
         <translation>Tillåt omkodningsjobb</translation>
-    </message>
-    <message>
-        <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="obsolete">Tecken som används för att separera ATSC huvud- och underkanaler.</translation>
     </message>
     <message>
         <source>Auto Expire Default</source>
@@ -6694,44 +6424,8 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Att ändra existerande kanalingångar, radera något eller göra kanalsökningar kanske inte fungerar.</translation>
     </message>
     <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Kanalsökare</translation>
-    </message>
-    <message>
-        <source>Starts the channel scanner.</source>
-        <translation type="obsolete">Startar kanalsökaren.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Transporteditor</translation>
-    </message>
-    <message>
-        <source>Allows you to edit the transports directly</source>
-        <translation type="obsolete">Direkt ändring av transporter</translation>
-    </message>
-    <message>
-        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="obsolete">Används sällan såvida du inte använder en parabolantenn och måste ange en initial frekvens för kanalsökaren att pröva.</translation>
-    </message>
-    <message>
-        <source>(5_1) Underscore</source>
-        <translation type="obsolete">(5_1) Understrykning</translation>
-    </message>
-    <message>
-        <source>(5-1) Minus</source>
-        <translation type="obsolete">(5-1) Minus</translation>
-    </message>
-    <message>
-        <source>(5.1) Period</source>
-        <translation type="obsolete">(5.1) Punkt</translation>
-    </message>
-    <message>
-        <source>(501) Zero</source>
-        <translation type="obsolete">(501) Noll</translation>
-    </message>
-    <message>
-        <source>(51) None</source>
-        <translation type="obsolete">(51) Ingen</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6798,24 +6492,8 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Detta uppdateras vid varje lyckat kanalbyte.</translation>
     </message>
     <message>
-        <source>Minimal Updates</source>
-        <translation type="obsolete">Minimala uppdateringar</translation>
-    </message>
-    <message>
-        <source>Rename to Match</source>
-        <translation type="obsolete">Döp om för att matcha</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Radera</translation>
-    </message>
-    <message>
-        <source>Existing Channel Treatment</source>
-        <translation type="obsolete">Hantering av existerande kanal</translation>
-    </message>
-    <message>
-        <source>How to treat existing channels.</source>
-        <translation type="obsolete">Hur existerande kanaler ska hanteras.</translation>
     </message>
     <message>
         <source>Number of threads</source>
@@ -6872,10 +6550,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Frequency table to use.</source>
         <translation>Frekvenstabell att använda.</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">De flesta amerikanska kabelsystem använder QAM-256 eller QAM-64, men en del mixade system kan använda 8-VSB för marksända kanaler.</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -6984,14 +6658,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation>och innehåller oftast data endast för ett par dagar.</translation>
-    </message>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="obsolete">Ignorera signaltidsgräns</translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="obsolete">Sök efter kanaler långsammare så att kort med dåliga drivrutiner fungerar, exempelvis Leadtek LR6650 DVB-kortet.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
@@ -7146,14 +6812,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Gäst</translation>
     </message>
     <message>
-        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="obsolete">Visa &apos;LiveTV&apos;-inspelningar när &quot;Alla program&quot; visas</translation>
-    </message>
-    <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="obsolete">Visa LiveTV-inspelningar med &quot;Alla program&quot;, annars måste inspelningsgruppen &quot;LiveTV&quot; specifikt väljas för att se dessa inspelningar.</translation>
-    </message>
-    <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
         <translation>Metod för att avgöra vilka inspelningar som autoraderas först. LiveTV-inspelningar raderas alltid före vanliga inspelningar.</translation>
     </message>
@@ -7192,18 +6850,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>, med %1 bithastighet (%2 Kb/s)</translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">%1 tim kvar</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">%1 tim och %2 min kvar</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">%1 min kvar</translation>
     </message>
     <message>
         <source>Run mythfilldatabase at time suggested by the grabber.</source>
@@ -8364,14 +8010,6 @@ Frekvensen för denna kanal i</translation>
         <translation>Höjd att använda för kodning. Notera: PVR-x50-kort med ivtv före 0.4.0 kan ge skuggbild om höjden inte är satt till 480 (NTSC) eller 576 (PAL).</translation>
     </message>
     <message>
-        <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation type="obsolete">Modulation, 8-VSB, QAM-256, etc.</translation>
-    </message>
-    <message>
-        <source>ATSC Channel Separator</source>
-        <translation type="obsolete">ATSC kanalseparator</translation>
-    </message>
-    <message>
         <source>Include in the &quot;%1&quot; recording group</source>
         <translation>Inkludera i inspelningsgruppen &quot;%1&quot;</translation>
     </message>
@@ -8700,14 +8338,6 @@ Frekvensen för denna kanal i</translation>
         <translation>Kanal Alternativ</translation>
     </message>
     <message>
-        <source>Icon Download</source>
-        <translation type="obsolete">Ikon Nerladdning</translation>
-    </message>
-    <message>
-        <source>Starts the icon downloader</source>
-        <translation type="obsolete">Startar ikonnedladdaren</translation>
-    </message>
-    <message>
         <source>as a search</source>
         <translation>som sökning</translation>
     </message>
@@ -8784,26 +8414,12 @@ Frekvensen för denna kanal i</translation>
         <translation>Medeltal av tidskast</translation>
     </message>
     <message>
-        <source>hours</source>
-        <translation type="obsolete">timmar</translation>
-    </message>
-    <message>
         <source>Recorded File Name</source>
         <translation>Inspelat Filnamn</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
         <translation>Om inställt, så kommer specifierad bitrate användas för 640x480.  Om annan upplösning används, så kommer bitrate att skaleras om efter behov.</translation>
-    </message>
-    <message>
-        <source>Frequency (%1)</source>
-        <translation type="obsolete">Frekvens (%1)</translation>
-    </message>
-    <message>
-        <source>Frequency (Option has no default).
-The frequency for this channel in %1.</source>
-        <translation type="obsolete">Frekvens (Inget standardalternativ).
-Frekvensen för denna kanal i %1.</translation>
     </message>
     <message>
         <source>Symbol Rate (symbols/second).
@@ -8822,14 +8438,6 @@ Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</trans
     <message>
         <source> offset %2</source>
         <translation> kompensation %2</translation>
-    </message>
-    <message>
-        <source>Timeout Scanning %1 -- no tables</source>
-        <translation type="obsolete">Timeout vid avsökning %1 -- inga tabeller</translation>
-    </message>
-    <message>
-        <source>Timeout Scanning %1 -- no signal</source>
-        <translation type="obsolete">Timeout vid avsökning %1 -- ingen signal</translation>
     </message>
     <message>
         <source>Tuning to %1 mplexid(%2)</source>
@@ -8910,10 +8518,6 @@ Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</trans
     <message>
         <source>One field (HW)</source>
         <translation>One field (HW)</translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
-        <translation>One Field (2x, HW)</translation>
     </message>
     <message>
         <source>Kernel (2x, HW)</source>
@@ -9014,10 +8618,6 @@ Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</trans
     <message>
         <source>(Hardware Accelerated)</source>
         <translation>(Hårdvaruaccelererat)</translation>
-    </message>
-    <message>
-        <source>With workaround for broken interlaced modelines.</source>
-        <translation type="obsolete">Med kringgång av problem med söndriga  interlacade modelines.</translation>
     </message>
     <message>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
@@ -9154,10 +8754,6 @@ Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</trans
     <message>
         <source>Full</source>
         <translation>Hel</translation>
-    </message>
-    <message>
-        <source>Stretch</source>
-        <translation type="obsolete">Tänj</translation>
     </message>
     <message>
         <source>[Reserved]</source>
@@ -10085,10 +9681,6 @@ namnet &apos;%1&apos; är redan använt.</translation>
         <translation>Diverse Status Program</translation>
     </message>
     <message>
-        <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/misc_status_info/README</source>
-        <translation type="obsolete">Externt program eller skript som producerar extra information som ska inkluderas i MythTV servers status</translation>
-    </message>
-    <message>
         <source>Your Local Timezone (for XMLTV)</source>
         <translation>Din lokala tidszon (för XMLTV)</translation>
     </message>
@@ -10454,10 +10046,6 @@ Vill ni fortsätta att titta?</translation>
         <translation>Kanal importerare</translation>
     </message>
     <message>
-        <source>Failed to find any channels</source>
-        <translation type="obsolete">Misslyckades hitta några kanaler</translation>
-    </message>
-    <message>
         <source>Found %1 new non-conflicting %2 channels.</source>
         <translation type="unfinished">Hittade %1 ny icke-motstridig %2 kanaler.</translation>
     </message>
@@ -10520,14 +10108,6 @@ Vill ni fortsätta att titta?</translation>
         <translation>Vänligen ange antingen1, 2, or eller 3:</translation>
     </message>
     <message>
-        <source>This channel was found to be in conflict with other channels</source>
-        <translation type="obsolete">Denhär kanalen är i konflikt med andra kanaler</translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number:</source>
-        <translation type="obsolete">Vänligen ange ett icke-konfliktigt nummer:</translation>
-    </message>
-    <message>
         <source>Updated Channel %1</source>
         <translation>Uppdaterad Kanal %1</translation>
     </message>
@@ -10578,10 +10158,6 @@ Vill ni fortsätta att titta?</translation>
     <message>
         <source>%1 -- Found %2 probable channels</source>
         <translation>%1 -- Hittade %2 rimliga kanaler</translation>
-    </message>
-    <message>
-        <source>Processing NIT %1</source>
-        <translation type="obsolete">Bearbetar NIT %1</translation>
     </message>
     <message>
         <source>: Found %1</source>
@@ -10647,68 +10223,6 @@ Vill ni fortsätta att titta?</translation>
 Synthesized ringsignal</translation>
     </message>
     <message>
-        <source>Name of the icon file</source>
-        <translation type="obsolete">Namnet på ikonfilen</translation>
-    </message>
-    <message>
-        <source>List of possible icon files</source>
-        <translation type="obsolete">Lista på möjliga ikonfiler</translation>
-    </message>
-    <message>
-        <source>Enter text here for the manual search</source>
-        <translation type="obsolete">Ange text här för manuell sökning</translation>
-    </message>
-    <message>
-        <source>&amp;Search</source>
-        <translation type="obsolete">&amp;Sök</translation>
-    </message>
-    <message>
-        <source>Manually search for the text</source>
-        <translation type="obsolete">Manuell sökning för text</translation>
-    </message>
-    <message>
-        <source>S&amp;kip</source>
-        <translation type="obsolete">H&amp;oppa</translation>
-    </message>
-    <message>
-        <source>Skip this icon</source>
-        <translation type="obsolete">Hoppa över ikonen</translation>
-    </message>
-    <message>
-        <source>S&amp;elect</source>
-        <translation type="obsolete">V&amp;älj</translation>
-    </message>
-    <message>
-        <source>Select this icon</source>
-        <translation type="obsolete">Välj denhär ikonen</translation>
-    </message>
-    <message>
-        <source>Error downloading</source>
-        <translation type="obsolete">Fel i nedladdning</translation>
-    </message>
-    <message>
-        <source>Failed to download the icon file</source>
-        <translation type="obsolete">Misslyckades ladda ner ikonfilen</translation>
-    </message>
-    <message>
-        <source>Icon is blocked</source>
-        <translation type="obsolete">Ikonen är blockerad</translation>
-    </message>
-    <message>
-        <source>This combination of channel and icon has been blocked by the MythTV admins. The most common reason for this is that there is a better match available.
- Are you still sure that you want to use this icon?</source>
-        <translation type="obsolete">Denhär kombinationen av kanaler och ikoner är blockerade av MythTv admin. Mest enkla orsaken är att det finns en bättre träff tillgänglig.
-Är du säker på att du vill använda denhär kanalen?</translation>
-    </message>
-    <message>
-        <source>Submit information</source>
-        <translation type="obsolete">Avge information</translation>
-    </message>
-    <message>
-        <source>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</source>
-        <translation type="obsolete">Du har nu möjlighet att överföra dina val  tillbaka till mythtv.org så andra kan dra nytta av dina val.</translation>
-    </message>
-    <message>
         <source>Error querying recorder state</source>
         <translation>Fel bryta inspelningsstatus</translation>
     </message>
@@ -10731,10 +10245,6 @@ Synthesized ringsignal</translation>
     <message>
         <source>Running</source>
         <translation>Körs</translation>
-    </message>
-    <message>
-        <source>Finished, %1 break(s) found.</source>
-        <translation type="obsolete">Slutfört, %1 avbrott hittade.</translation>
     </message>
     <message>
         <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
@@ -11435,6 +10945,30 @@ You may have to use the eject button under its tray.</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11466,93 +11000,6 @@ Nästa bild kommer att vara tom.  Tryck EXIT för att gå tillbaka till menyn.</
     <message>
         <source>Enter the name of the new profile</source>
         <translation>Ange namnet på den nya profilen</translation>
-    </message>
-</context>
-<context>
-    <name>SIScan</name>
-    <message>
-        <source>Updated Channel %1</source>
-        <translation type="obsolete">Uppdaterad Kanal %1</translation>
-    </message>
-    <message>
-        <source>Added Channel %1</source>
-        <translation type="obsolete">Tillagd Kanal %1</translation>
-    </message>
-    <message>
-        <source>Failed to add channel %1</source>
-        <translation type="obsolete">Misslyckades att lägga till kanal %1</translation>
-    </message>
-    <message>
-        <source>Network %1 Processing</source>
-        <translation type="obsolete">Nätverk %1 Körning</translation>
-    </message>
-    <message>
-        <source>Finished processing Transport List</source>
-        <translation type="obsolete">Avslutade behandling av transportlista</translation>
-    </message>
-    <message>
-        <source>Updating Services</source>
-        <translation type="obsolete">Uppdaterar Tjänster</translation>
-    </message>
-    <message>
-        <source>Finished processing Services</source>
-        <translation type="obsolete">Avslutade behandling av tjänster</translation>
-    </message>
-    <message>
-        <source>Frequency %1</source>
-        <translation type="obsolete">Frekvens %1</translation>
-    </message>
-    <message>
-        <source>as</source>
-        <translation type="obsolete">som</translation>
-    </message>
-    <message>
-        <source>Skipping %1, not in imported channel map</source>
-        <translation type="obsolete">skippar %1, inte i importerad kanalkarta</translation>
-    </message>
-    <message>
-        <source>%1%2%3 on %4 (%5)</source>
-        <translation type="obsolete">%1%2%3 på %4 (%5)</translation>
-    </message>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">Lägger till %1</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">Uppdaterar %1</translation>
-    </message>
-    <message>
-        <source>Skipping %1</source>
-        <translation type="obsolete">Skippar %1</translation>
-    </message>
-    <message>
-        <source>on %1</source>
-        <translation type="obsolete">på %1</translation>
-    </message>
-    <message>
-        <source>Data Only Channel (off-air?)</source>
-        <translation type="obsolete">Endast Datakanal (inte i sändning?)</translation>
-    </message>
-    <message>
-        <source>Empty Channel (off-air?)</source>
-        <translation type="obsolete">Tom Kanal (inte i sändning?)</translation>
-    </message>
-    <message>
-        <source>Audio Only Channel</source>
-        <translation type="obsolete">Endast Ljudkanal</translation>
-    </message>
-    <message>
-        <source>Encrypted Channel</source>
-        <translation type="obsolete">Krypterad Kanal</translation>
-    </message>
-    <message>
-        <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
-        <translation type="obsolete">Hittade kanal, men den matchar inte existerande tsid. Du kanske vill radera existerande kanaler och göra en omsökning av kanaler.</translation>
-    </message>
-    <message>
-        <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation type="obsolete">Skippar %1 - redan i databas, och vi har ingen bättre data.</translation>
     </message>
 </context>
 <context>
@@ -11627,14 +11074,6 @@ Nästa bild kommer att vara tom.  Tryck EXIT för att gå tillbaka till menyn.</
         <translation>Importera channels.conf</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Full sökning av existerande transporter</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Sök av existerande transporter</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation>M3U-import</translation>
     </message>
@@ -11667,33 +11106,6 @@ Nästa bild kommer att vara tom.  Tryck EXIT för att gå tillbaka till menyn.</
     <message>
         <source>Scan Configuration</source>
         <translation>Sökkonfiguration</translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Söker</translation>
-    </message>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Sökguide</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Fel vid justering till transport</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Fel vid start av sökning</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Kan inte öppna &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Kan inte tolka &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -11832,24 +11244,8 @@ No other details</source>
 Inga andra detaljer</translation>
     </message>
     <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%1 inspelningar på %2 tillåts autoraderas</translation>
-    </message>
-    <message>
-        <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="obsolete">%1 av dessa är LiveTV och förbrukar %2</translation>
-    </message>
-    <message>
         <source>is unavailable</source>
         <translation>är otillgänglig</translation>
-    </message>
-    <message>
-        <source>standard rules are defined</source>
-        <translation type="obsolete">standardregler är definierade</translation>
-    </message>
-    <message>
-        <source>search rules are defined</source>
-        <translation type="obsolete">sökregler är definierade</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
@@ -11866,10 +11262,6 @@ Inga andra detaljer</translation>
     <message>
         <source>on input</source>
         <translation>på ingång</translation>
-    </message>
-    <message>
-        <source>%1 of these are Deleted and consume %2</source>
-        <translation type="obsolete">%1 av dessa är raderade och använder %2</translation>
     </message>
     <message>
         <source>Listings Status</source>
@@ -11998,14 +11390,6 @@ Inga andra detaljer</translation>
     <message>
         <source>There is guide data until %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dag</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">dagar</translation>
     </message>
     <message>
         <source>WARNING: is mythfilldatabase running?</source>
@@ -12146,23 +11530,23 @@ Inga andra detaljer</translation>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12446,10 +11830,6 @@ Katalog Från Lagringsgrupp?</translation>
     <message>
         <source>Manual Zoom Mode</source>
         <translation>Manuellt zoomläge</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuter</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
@@ -13097,10 +12477,6 @@ Välj ett inspelat program</translation>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13536,6 +12912,14 @@ Välj ett inspelat program</translation>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Avbryt</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

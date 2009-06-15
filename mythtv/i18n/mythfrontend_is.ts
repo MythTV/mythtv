@@ -195,10 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Sjónvarpstöðvar</translation>
-    </message>
-    <message>
         <source>Are you sure you would like to delete this channel?</source>
         <translation>Ertu viss um að þú viljir eyða þessari sjónvarpstöð?</translation>
     </message>
@@ -209,26 +205,6 @@
     <message>
         <source>No, don&apos;t</source>
         <translation>Nei, sleppa</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Valmynd rásar</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Klippa..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Eyða..</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Eyða stöðvum</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Eyða öllum stöðvum fyrir valin inntök.</translation>
     </message>
     <message>
         <source>Yes, delete the channels</source>
@@ -365,7 +341,7 @@
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Leitarálfur</translation>
     </message>
 </context>
 <context>
@@ -723,17 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Staðsetning skrár</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">Staðsetning channels.conf skráarinnar.</translation>
     </message>
 </context>
 <context>
@@ -1253,14 +1218,6 @@ Vestara jarðarhvel</translation>
         <translation type="unfinished">Bókamerki er sett</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished">Upptaka er í notkun</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished">Upptakan hefur verið þjöppuð</translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1299,10 +1256,6 @@ Vestara jarðarhvel</translation>
     <message>
         <source>Recording has been watched</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
-        <translation type="unfinished">Haldið er upp á upptöku</translation>
     </message>
 </context>
 <context>
@@ -1538,13 +1491,6 @@ Vestara jarðarhvel</translation>
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Flutningsleið</translation>
     </message>
 </context>
 <context>
@@ -2254,6 +2200,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Valmöguleikar upptöku</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2412,10 +2362,6 @@ Vestara jarðarhvel</translation>
         <translation>Það eru engir dagskrárliðir til staðar fyrir þessi leitarskilyrði. Vinsamlegast reyndu aðra leit.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">!!Engir dagskrárliðir!!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2466,6 +2412,18 @@ Vestara jarðarhvel</translation>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Veldu titill dagskrárliðs sem þú vilt finna. Þegar því er lokið ferðu til bara með vinstri ör. Veldu Velja til að stilla upptöku.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2714,6 +2672,10 @@ Vestara jarðarhvel</translation>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 af %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2937,56 +2899,8 @@ Vestara jarðarhvel</translation>
 <context>
     <name>ProgramRecPriority</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Taka einungis upp þessa sýningu</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Taka upp vikulega</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Taka upp allar útsendingar</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Tek ekki upp þessa útsendingu</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Villa!</translation>
-    </message>
-    <message>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Upptaka með hunsunarvalkostum</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Upptaka í þessum tímaramma</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Upptaka á þessari stöð</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Tek upp eina sýningu</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Ekki leyft að taka upp þessa sýningu</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Upptaka sýningar daglega</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Upptaka sýningar vikulega</translation>
     </message>
     <message>
         <source>Recording %1 of %2</source>
@@ -3072,6 +2986,10 @@ Vestara jarðarhvel</translation>
         <source>Sort By Average Delay</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Schedule Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -3094,30 +3012,6 @@ Vestara jarðarhvel</translation>
     <message>
         <source>0.5 seconds</source>
         <translation>0.5 sekúndur</translation>
-    </message>
-    <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 sekúnda</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 sekúndur</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 sekúndur</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 minúta</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 minútur</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 minútur</translation>
     </message>
     <message>
         <source>error</source>
@@ -3454,18 +3348,6 @@ Vestara jarðarhvel</translation>
     <message>
         <source>&quot;Small&quot; font</source>
         <translation>&quot;Lítil&quot; leturstærð</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Skyggingaraðferð dagskrárupplýsinga</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Stöðvar sem sýndar eru</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Tímabil kubba (30 mínútur) sem birtast</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -3908,22 +3790,6 @@ Vestara jarðarhvel</translation>
         <translation>Nota stærð grafíska hamsins fyrir afspilun sjónvarps</translation>
     </message>
     <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Alpha gegnumsæi (Örgjörvanýting - mikil)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Blöndun gægnumsæi (Örgjörvanýting - miðlungs)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Eco gegnumsæi (Örgjörvanýting - lítil)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Gegnheill (Örgjörvanýting - miðlungs)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Birta liti tegundar</translation>
     </message>
@@ -4068,14 +3934,6 @@ Vestara jarðarhvel</translation>
         <translation>Vídeó uppspretta</translation>
     </message>
     <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Röðunarmáti</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Fela stöðvar án stöðvarnúmers.</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Nafn stöðvar</translation>
     </message>
@@ -4178,10 +4036,6 @@ Vestara jarðarhvel</translation>
     <message>
         <source>Modulation</source>
         <translation>Tónstilling</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Stjörnumerki</translation>
     </message>
     <message>
         <source>FEC</source>
@@ -4372,10 +4226,6 @@ Vestara jarðarhvel</translation>
         <translation>Vakningaskipun</translation>
     </message>
     <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">Skipunin sem notuð er til að vekja biðlarabakenda. Skildu eftir tómt ef þú vilt hafa þennan kost óvirkan.</translation>
-    </message>
-    <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
         <translation>Tími sem aðal bakendaþjónn bíður áður en hann slekkur á öllum bakendum. Hafðu í 0 til að hafa þennan kost óvirkan.</translation>
     </message>
@@ -4442,10 +4292,6 @@ Vestara jarðarhvel</translation>
     <message>
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation>Ef stillt, þá mun sjálfvirk slökkvun á þjónum vera óvirk þangað til að biðill hefur tengst.</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Allt)</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -4666,10 +4512,6 @@ Vestara jarðarhvel</translation>
     <message>
         <source>TXT</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">mínútur</translation>
     </message>
     <message>
         <source>Recording volume of the capture card</source>
@@ -4899,10 +4741,6 @@ Vestara jarðarhvel</translation>
         <source>GB</source>
         <comment>GigaBytes</comment>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">stjörnur</translation>
     </message>
     <message>
         <source>this episode is a repeat.</source>
@@ -6194,10 +6032,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Tegund</translation>
-    </message>
-    <message>
         <source>Channel Change Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6635,10 +6469,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Transport Editor</source>
         <translation>Stillingar flutningsleiða</translation>
-    </message>
-    <message>
-        <source>(51) None</source>
-        <translation type="obsolete">(51) Engin</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -8731,10 +8561,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11114,6 +10940,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11217,14 +11067,6 @@ Do you wish to continue watching?</source>
         <translation>Færa inn channels.conf</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Full leit á tiltækum flutningsleiðum</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Leit á tiltækum flutningsleiðum</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation>Færa inn M3U</translation>
     </message>
@@ -11257,33 +11099,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation>Sjálfvirk hreinsun annála virk</translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Skimun</translation>
-    </message>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Skimunarálfur</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Villa við stillingu á flutningsleið</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Ekki tókst að opna &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Ekki tókst að greina &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Villa við upphaf skimunar</translation>
     </message>
 </context>
 <context>
@@ -11418,24 +11233,8 @@ No other details</source>
 Engar frekari smáatriði</translation>
     </message>
     <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%1 upptökur sem taka %2 fá að renna út</translation>
-    </message>
-    <message>
-        <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="obsolete">%1 að þeim er Lifandi Sjónvarp og taka %2</translation>
-    </message>
-    <message>
         <source>is unavailable</source>
         <translation>er ekki tiltækt</translation>
-    </message>
-    <message>
-        <source>standard rules are defined</source>
-        <translation type="obsolete">staðlaðar reglur eru skilgreindar</translation>
-    </message>
-    <message>
-        <source>search rules are defined</source>
-        <translation type="obsolete">leitarreglur eru skilgreindar</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
@@ -11720,23 +11519,23 @@ Engar frekari smáatriði</translation>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12019,10 +11818,6 @@ Directory From Storage Group?</source>
     <message>
         <source>Manual Zoom Mode</source>
         <translation>Aðdráttarhamur</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">mínútur</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
@@ -12676,10 +12471,6 @@ Veldu núverandi upptöku</translation>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13115,6 +12906,14 @@ Veldu núverandi upptöku</translation>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Hætta við</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

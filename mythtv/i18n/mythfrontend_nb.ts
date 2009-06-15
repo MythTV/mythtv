@@ -195,10 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Kanaler</translation>
-    </message>
-    <message>
         <source>Are you sure you would like to delete this channel?</source>
         <translation>Virkelig slette denne kanalen?</translation>
     </message>
@@ -209,26 +205,6 @@
     <message>
         <source>No, don&apos;t</source>
         <translation>Nei, ikke slett kanalen</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Kanalmeny</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Rediger . . .</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Slett . . .</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Slett kanaler</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Slett alle kanaler på valgte kilde[r].</translation>
     </message>
     <message>
         <source>Yes, delete the channels</source>
@@ -723,17 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Filplassering</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">Plasseringen til filen «channels.conf».</translation>
     </message>
 </context>
 <context>
@@ -1249,14 +1214,6 @@
         <translation type="unfinished">Et bokmerke er satt</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished">Opptak er i bruk</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished">Opptaket har blitt konvertert</translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished">Opptaket er i mono</translation>
     </message>
@@ -1295,21 +1252,6 @@
     <message>
         <source>Recording has been watched</source>
         <translation type="unfinished">Opptaket har blitt sett</translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>IPTVChannelFetcher</name>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">Legger til %1</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">Oppdaterer %1</translation>
     </message>
 </context>
 <context>
@@ -1545,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Transport</translation>
     </message>
 </context>
 <context>
@@ -2261,6 +2196,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Planleggingsinnstillinger</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2307,10 +2246,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Custom Filters</source>
         <translation>Egendefinerte filtre</translation>
-    </message>
-    <message>
-        <source>Maximum number of CPU cores used for decoding.</source>
-        <translation type="obsolete">Høyeste antall prosessorkjerner som brukes for dekoding.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
@@ -2421,10 +2356,6 @@ Are you sure you want to delete:</source>
         <translation>Det er ingen tilgjengelige programmet i dette søket.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">        !! Ingen programmer !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2475,6 +2406,18 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Velg tittelen på programmet som skal finnes, trykk venstre piltast for å returnere. Bruk VELG for å planlegge et opptak.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2723,6 +2666,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 av %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2954,54 +2901,6 @@ Are you sure you want to delete:</source>
         <translation>Tar opp %1 av %2</translation>
     </message>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Tar bare opp denne sendingen</translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Tar opp med overstyringsinnstillinger</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Tar opp hver uke</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Tar opp i dette tidsrommet</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Tar opp på denne kanalen</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Tar opp alle sendinger</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Tar opp én sending</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Tar opp én sending hver dag</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Tar opp én sending hver uke</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Ikke tillatt å ta opp denne sendingen</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Tar ikke opp denne sendingen</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Feil</translation>
-    </message>
-    <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Slette regelen &apos;%1&apos; %2?</translation>
     </message>
@@ -3079,6 +2978,10 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Sort By Average Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3181,10 +3084,6 @@ Are you sure you want to delete:</source>
         <translation>Kanalinnstillinger</translation>
     </message>
     <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Ny kanal)</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Kanalnavn</translation>
     </message>
@@ -3195,22 +3094,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Video Source</source>
         <translation>Videokilde</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Alle)</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Uoppnevnt)</translation>
-    </message>
-    <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Sorteringsmodus</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Skjul kanaler uten kanalnummer</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -3391,18 +3274,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>8MHz</translation>
     </message>
     <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulering (Standard: automatisk)</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Konstellasjon</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Konstellasjon (Standard: automatisk)</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Ingen</translation>
     </message>
@@ -3487,30 +3358,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>0,5 sekunder</translation>
     </message>
     <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 sekund</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 sekunder</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 sekunder</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 minutt</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 minutter</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 minutter</translation>
-    </message>
-    <message>
         <source>error</source>
         <translation>Feil</translation>
     </message>
@@ -3588,20 +3435,8 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>GB</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutter</translation>
-    </message>
-    <message>
         <source>Repeat</source>
         <translation>Gjenta</translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">stjerner</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">stjerne</translation>
     </message>
     <message>
         <source>S</source>
@@ -3999,17 +3834,8 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Glem forrige</translation>
     </message>
     <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Bakkenett</translation>
-    </message>
-    <message>
         <source>Cable</source>
         <translation>Kabel</translation>
-    </message>
-    <message>
-        <source>Bandwidth (Default: Auto)
-</source>
-        <translation type="obsolete">Båndbredde (standard: automatisk)</translation>
     </message>
     <message>
         <source>Power Search</source>
@@ -5424,34 +5250,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Standardstørrelsen er 12.</translation>
     </message>
     <message>
-        <source>Floating Program Guide Selector</source>
-        <translation type="obsolete">Flytende programoversiktvelger</translation>
-    </message>
-    <message>
-        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="obsolete">Hvis dette er på kan programoversiktens velger flytte fritt gjennom oversikten, ellers vil den være i sentrum av oversikten hele tiden.</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Skyggeleggingsmetode for oversikten</translation>
-    </message>
-    <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Alfa - gjennomsiktig (Høy prosessorbruk)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Blander - gjennomsiktig (Middels prosessorbruk)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Ekko - gjennomsiktig (Lav prosessorbruk)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Ensfarget (Middels prosessorbruk)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Vis sjangerfarger</translation>
     </message>
@@ -5466,22 +5264,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>(Not available for all grabbers.)</source>
         <translation>(Ikke tilgjengelig for alle hentere.)</translation>
-    </message>
-    <message>
-        <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Bare vis favorittkanaler</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="obsolete">Hvis dette slås på viser programoversikten først kun kanalene som er markert som favoritter. Å trykke «4» bytter da mellom å vise favoritter og alle kanaler.</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Kanaler som skal vises</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Tidsblokker (30 minutter) som skal vises</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -5980,14 +5762,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Regissert av</translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">dager</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dag</translation>
-    </message>
-    <message>
         <source>Uptime</source>
         <translation>Oppetid</translation>
     </message>
@@ -6050,10 +5824,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>Wake Command</source>
         <translation>Vekkingskommando</translation>
-    </message>
-    <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">Kommandoen som brukes for å vekke opp slavetjenerne. Behold tomt for å slå av.</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
@@ -6281,10 +6051,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>Germany</source>
         <translation>Tyskland</translation>
-    </message>
-    <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Søketype</translation>
     </message>
     <message>
         <source>Channel Change Error</source>
@@ -6705,44 +6471,8 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Det er ikke sikkert at det virker å endre eksisterende kortinndatakilder, slette hva som helst eller søke etter kanaler.</translation>
     </message>
     <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Kanalsøker</translation>
-    </message>
-    <message>
-        <source>Starts the channel scanner.</source>
-        <translation type="obsolete">Starter kanalsøkeren.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Transportredigerer</translation>
-    </message>
-    <message>
-        <source>Allows you to edit the transports directly</source>
-        <translation type="obsolete">Tillater deg å endre transportene direkte</translation>
-    </message>
-    <message>
-        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="obsolete">Dette er sjelden nødvendig med mindre du bruker en parabol og må skrive inn en startfrekvens som kanalsøkeren kan prøve.</translation>
-    </message>
-    <message>
-        <source>(5_1) Underscore</source>
-        <translation type="obsolete">(5_1) Understrek</translation>
-    </message>
-    <message>
-        <source>(5-1) Minus</source>
-        <translation type="obsolete">(5-1) Minus</translation>
-    </message>
-    <message>
-        <source>(5.1) Period</source>
-        <translation type="obsolete">(5.1) Punktum</translation>
-    </message>
-    <message>
-        <source>(501) Zero</source>
-        <translation type="obsolete">(501) Null</translation>
-    </message>
-    <message>
-        <source>(51) None</source>
-        <translation type="obsolete">(51) Ingen</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6781,24 +6511,8 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Vis volumnivå på LCD-enhet.</translation>
     </message>
     <message>
-        <source>Minimal Updates</source>
-        <translation type="obsolete">Minimale oppdateringer</translation>
-    </message>
-    <message>
-        <source>Rename to Match</source>
-        <translation type="obsolete">Gi nytt navn for å passe</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Slett</translation>
-    </message>
-    <message>
-        <source>Existing Channel Treatment</source>
-        <translation type="obsolete">Behandling av eksisterende kanaler</translation>
-    </message>
-    <message>
-        <source>How to treat existing channels.</source>
-        <translation type="obsolete">Hvordan eksisterende kanaler skal behandles.</translation>
     </message>
     <message>
         <source>Analog V4L capture card</source>
@@ -6883,10 +6597,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>Frequency table to use.</source>
         <translation>Frekvenstabell som skal brukes.</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">De fleste kabelsystemene i USA bruker QAM 256 eller QAM 64, men noen blandete systemer bruker kanskje 8 VSB for kanaler over luften.</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -6991,14 +6701,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation>og gir som regel bare data for noen få dager.</translation>
-    </message>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="obsolete">Ignorer tidsavbrudd for signal</translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="obsolete">Dette alternativet tillater deg å senke farten på søket etter drivere som ikke virker, sånn som DVB-driverne for Leadtek LR6650 DVB-kortet.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
@@ -7209,14 +6911,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Slå på sending av DTS-lyd direkte til lydkortets SPDIF-ut, for kilder som inneholder DTS-lydspor (som regel DVD&apos;er). Dette krever at enheten for lydavspilling angis som noe fornuftig.</translation>
     </message>
     <message>
-        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="obsolete">Vis «Direkte TV»-opptak når «Alle programmer»-filteret brukes</translation>
-    </message>
-    <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="obsolete">Hvis dette er av blir opptak fra Direkte TV kun synlige via den spesielle opptaksgruppen «Direkte TV».</translation>
-    </message>
-    <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
         <translation>Metoden som brukes for å bestemme hvilke programmer som skal slettes først. «Direkte TV»-opptak utløper alltid før vanlige opptak.</translation>
     </message>
@@ -7239,18 +6933,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>med %1 kvalitet på %2 KB/s</translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">%1 timer igjen</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">%1 t og %2 m igjen</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">%1 minutter igjen</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
@@ -8695,14 +8377,6 @@ Frekvensen for denne kanalen i</translation>
         <translation>Ny inndata</translation>
     </message>
     <message>
-        <source>Icon Download</source>
-        <translation type="obsolete">Ikonnedlasting</translation>
-    </message>
-    <message>
-        <source>Starts the icon downloader</source>
-        <translation type="obsolete">Laster ned ikoner</translation>
-    </message>
-    <message>
         <source>as a search</source>
         <translation>som et søk</translation>
     </message>
@@ -8779,26 +8453,12 @@ Frekvensen for denne kanalen i</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>hours</source>
-        <translation type="obsolete">timer</translation>
-    </message>
-    <message>
         <source>Recorded File Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
         <translation>Hvis oppgitt brukes denne bithastigheten for 640x480. For andre oppløsninger skaleres bithastigheten tilsvarende.</translation>
-    </message>
-    <message>
-        <source>Frequency (%1)</source>
-        <translation type="obsolete">Frekvens (%1)</translation>
-    </message>
-    <message>
-        <source>Frequency (Option has no default).
-The frequency for this channel in %1.</source>
-        <translation type="obsolete">Frekvens (ingen standardverdi) 
-Frekvensen for denne kanalen i %1.</translation>
     </message>
     <message>
         <source>Symbol Rate (symbols/second).
@@ -8892,10 +8552,6 @@ De fleste DVB-S-sendere bruker 27,5 millioner symboler per sekund.</translation>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9133,10 +8789,6 @@ De fleste DVB-S-sendere bruker 27,5 millioner symboler per sekund.</translation>
     <message>
         <source>Full</source>
         <translation>Full</translation>
-    </message>
-    <message>
-        <source>Stretch</source>
-        <translation type="obsolete">Strekk</translation>
     </message>
     <message>
         <source>[Reserved]</source>
@@ -11284,6 +10936,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11313,85 +10989,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Enter the name of the new profile</source>
         <translation>Skriv inn navnet på den nye profilen</translation>
-    </message>
-</context>
-<context>
-    <name>SIScan</name>
-    <message>
-        <source>Updated Channel %1</source>
-        <translation type="obsolete">Oppdaterte kanalen %1</translation>
-    </message>
-    <message>
-        <source>Added Channel %1</source>
-        <translation type="obsolete">La til kanalen %1</translation>
-    </message>
-    <message>
-        <source>Failed to add channel %1</source>
-        <translation type="obsolete">Klarte ikke legge til kanalen %1</translation>
-    </message>
-    <message>
-        <source>Updating Services</source>
-        <translation type="obsolete">Oppdaterer tjenester</translation>
-    </message>
-    <message>
-        <source>Finished processing Services</source>
-        <translation type="obsolete">Ferdig å behandle tjenester</translation>
-    </message>
-    <message>
-        <source>Frequency %1</source>
-        <translation type="obsolete">Frekvens %1</translation>
-    </message>
-    <message>
-        <source>as</source>
-        <translation type="obsolete">som</translation>
-    </message>
-    <message>
-        <source>Skipping %1, not in imported channel map</source>
-        <translation type="obsolete">Hopper over %1 siden den ikke finnes i kanaloversikten</translation>
-    </message>
-    <message>
-        <source>%1%2%3 on %4 (%5)</source>
-        <translation type="obsolete">%1%2%3 på %4 (%5)</translation>
-    </message>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">Legger til %1</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">Oppdaterer %1</translation>
-    </message>
-    <message>
-        <source>Skipping %1</source>
-        <translation type="obsolete">Hopper over %1</translation>
-    </message>
-    <message>
-        <source>on %1</source>
-        <translation type="obsolete">på %1</translation>
-    </message>
-    <message>
-        <source>Data Only Channel (off-air?)</source>
-        <translation type="obsolete">Kun data (ikke på luften?)</translation>
-    </message>
-    <message>
-        <source>Empty Channel (off-air?)</source>
-        <translation type="obsolete">Tom kanal (ikke på luften?)</translation>
-    </message>
-    <message>
-        <source>Audio Only Channel</source>
-        <translation type="obsolete">Kun lyd</translation>
-    </message>
-    <message>
-        <source>Encrypted Channel</source>
-        <translation type="obsolete">Kryptert kanal</translation>
-    </message>
-    <message>
-        <source>%1 %2-%3 as %4 on %5 (%6)</source>
-        <translation type="obsolete">%1 %2-%3 som %4 på %5 (%6)</translation>
-    </message>
-    <message>
-        <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation type="obsolete">Hopper over %1 siden den finnes i databasen og vi ikke har bedre data.</translation>
     </message>
 </context>
 <context>
@@ -11462,14 +11059,6 @@ Do you wish to continue watching?</source>
         <translation>Importer «channels.conf»</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Fullt søk i eksisterende transporter</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Søk i eksisterende transporter</translation>
-    </message>
-    <message>
         <source>Full Scan (Tuned)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11506,29 +11095,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Søkeveiviser</translation>
-    </message>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Søker</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Klarte ikke åpne «%1»</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Klarte ikke lese «%1»</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Klarte ikke starte søk</translation>
     </message>
 </context>
 <context>
@@ -11665,24 +11231,8 @@ Ingen flere detaljer</translation>
         <translation>Status: </translation>
     </message>
     <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%1 opptak som bruker %2 er tillat å autoutløpe</translation>
-    </message>
-    <message>
-        <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="obsolete">%1 av disse er Direkte TV og bruker %2</translation>
-    </message>
-    <message>
         <source>is unavailable</source>
         <translation>er utilgjengelig</translation>
-    </message>
-    <message>
-        <source>standard rules are defined</source>
-        <translation type="obsolete">standardregler er definert</translation>
-    </message>
-    <message>
-        <source>search rules are defined</source>
-        <translation type="obsolete">søkeregler er definert</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
@@ -11699,10 +11249,6 @@ Ingen flere detaljer</translation>
     <message>
         <source>on input</source>
         <translation>på inndata</translation>
-    </message>
-    <message>
-        <source>%1 of these are Deleted and consume %2</source>
-        <translation type="obsolete">%1 av disse er slettet og tar opp %2</translation>
     </message>
     <message>
         <source>Listings Status</source>
@@ -11831,14 +11377,6 @@ Ingen flere detaljer</translation>
     <message>
         <source>There is guide data until %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dag</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">dager</translation>
     </message>
     <message>
         <source>WARNING: is mythfilldatabase running?</source>
@@ -11979,23 +11517,23 @@ Ingen flere detaljer</translation>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12183,10 +11721,6 @@ fra opptaksgruppen?</translation>
     <message>
         <source>Skip</source>
         <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete"> minutter</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -12930,10 +12464,6 @@ Velg et (pågående) opptak i stedet</translation>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13369,6 +12899,14 @@ Velg et (pågående) opptak i stedet</translation>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Avbryt</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

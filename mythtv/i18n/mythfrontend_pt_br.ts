@@ -195,10 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Canais</translation>
-    </message>
-    <message>
         <source>Are you sure you would like to delete this channel?</source>
         <translation type="unfinished">Tem certeza que deseja remover este canal?</translation>
     </message>
@@ -209,18 +205,6 @@
     <message>
         <source>No, don&apos;t</source>
         <translation type="unfinished">Não</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Menu de Canal</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Editar..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Remover..</translation>
     </message>
     <message>
         <source>Yes, delete the channels</source>
@@ -715,13 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Arquivo de locação</translation>
     </message>
 </context>
 <context>
@@ -1237,14 +1214,6 @@
         <translation type="unfinished">Um marcador está definido</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1282,10 +1251,6 @@
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1522,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Transporte</translation>
     </message>
 </context>
 <context>
@@ -2236,6 +2194,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Opções de Agendamento</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2392,10 +2354,6 @@ Are you sure you want to delete:</source>
         <translation type="unfinished">Esta pesquisa não encontrou programas disponíveis. Favor selecionar outra pesquisa.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">     !! Sem Programas !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2445,6 +2403,18 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2694,6 +2664,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 de %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2925,54 +2899,6 @@ Are you sure you want to delete:</source>
         <translation type="unfinished">Gravando %1 de %2</translation>
     </message>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Gravando apenas esta exibição</translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Gravando com opção de override</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Gravando toda semana</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Gravando neste período de tempo</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Gravando neste canal</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Gravando todas exibições</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Gravando uma exibição</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Gravando uma exibição diária</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Gravando exibição semanal</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Não permitir que esta exibição seja gravada</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Esta exibição não esta sendo gravada</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Erro!</translation>
-    </message>
-    <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3050,6 +2976,10 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Sort By Average Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3152,10 +3082,6 @@ Are you sure you want to delete:</source>
         <translation type="unfinished">Opções de canais</translation>
     </message>
     <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Novo Canal)</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation type="unfinished">Nome do Canal</translation>
     </message>
@@ -3166,18 +3092,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Video Source</source>
         <translation type="unfinished">Fonte de Vídeo</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Tudo)</translation>
-    </message>
-    <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Ordenação Modal</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Ocultar canais sem o número do canal</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -3365,18 +3279,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">8 MHz</translation>
     </message>
     <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulação (Padrão: Auto)</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Constelação</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Constelação (Padrão: Auto)</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation type="unfinished">Nenhum</translation>
     </message>
@@ -3461,30 +3363,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">0.5 segundos</translation>
     </message>
     <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 segundo</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 segundos</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 segundos</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 minuto</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 minutos</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 minutos</translation>
-    </message>
-    <message>
         <source>error</source>
         <translation type="unfinished">erro</translation>
     </message>
@@ -3562,20 +3440,8 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">GB</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutos</translation>
-    </message>
-    <message>
         <source>Repeat</source>
         <translation type="unfinished">Repetir</translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">estrelas</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">estrela</translation>
     </message>
     <message>
         <source>S</source>
@@ -4021,10 +3887,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>Germany</source>
         <translation type="unfinished">Alemanha</translation>
-    </message>
-    <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Tipo de Varredura</translation>
     </message>
     <message>
         <source>Cable</source>
@@ -8686,10 +8548,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>One Field (2x, HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Kernel (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11070,6 +10928,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11205,13 +11087,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Varrendo</translation>
     </message>
 </context>
 <context>
@@ -11628,23 +11503,23 @@ No other details</source>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -11847,10 +11722,6 @@ Directory From Storage Group?</source>
     <message>
         <source>Skip</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutos</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -12577,10 +12448,6 @@ Select a Current Recording</source>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13015,6 +12882,14 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

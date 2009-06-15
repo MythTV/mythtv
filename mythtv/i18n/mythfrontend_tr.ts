@@ -195,18 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Kanallar</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Kanalları Sil</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Seçili kaynak[lar]daki tüm kanalları sil.</translation>
-    </message>
-    <message>
         <source>Yes, delete the channels</source>
         <translation>Evet, kanalları sil</translation>
     </message>
@@ -221,18 +209,6 @@
     <message>
         <source>Yes, delete the channel</source>
         <translation>Evet, kanalı sil</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Kanal Menüsü</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Düzenle..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Sil..</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
@@ -723,17 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Dosya konumu</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">channels.conf dosyasının konumu.</translation>
     </message>
 </context>
 <context>
@@ -1249,14 +1214,6 @@
         <translation type="unfinished">Bir sık kullanılan ayarlandı</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished">Kayıt kullanılıyor</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1294,10 +1251,6 @@
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1534,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Aktarma</translation>
     </message>
 </context>
 <context>
@@ -2248,6 +2194,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Çizelgeleme Seçenekleri</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2404,10 +2354,6 @@ Are you sure you want to delete:</source>
         <translation>Bu aramada kullanılabilir program yok. Lütfen başka arama seçin.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">       !! Program Yok !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2458,6 +2404,18 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Bulmak istediğiniz programın başlığını seçin. Bittiğinde sol ok tuşuyla geri dönün. Bir kaydı çizelgelemek için SEÇ tuşuna basın.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2706,6 +2664,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 / %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2937,54 +2899,6 @@ Are you sure you want to delete:</source>
         <translation>%1 / %2 kaydediliyor</translation>
     </message>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Sadece bu gösteri kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Geçersiz kılma seçenekleriyle kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Her hafta kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Bu zaman aralığında kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Bu kanalda kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Tüm gösterileri kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Tek bir gösteri kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Bir gösteri her gün kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Bir gösteri her hafta kaydediliyor</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Bu gösteriyi kaydetme izni yok</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Bu gösteri kaydedilmiyor</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Hata!</translation>
-    </message>
-    <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3062,6 +2976,10 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Sort By Average Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3164,10 +3082,6 @@ Are you sure you want to delete:</source>
         <translation type="unfinished">Kanal Seçenekleri</translation>
     </message>
     <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Yeni Kanal)</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Kanal Adı</translation>
     </message>
@@ -3180,40 +3094,8 @@ Are you sure you want to delete:</source>
         <translation>Video Kaynağı</translation>
     </message>
     <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Tümü)</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Atanmamış)</translation>
-    </message>
-    <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Sıralama Modu</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Kanal numarası olmayan kanalları gizle.</translation>
-    </message>
-    <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Kanal Tarayıcısı</translation>
-    </message>
-    <message>
-        <source>Starts the channel scanner.</source>
-        <translation type="obsolete">Kanal tarayıcısını başlatır.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Aktarma Düzenleyicisi</translation>
-    </message>
-    <message>
-        <source>Allows you to edit the transports directly</source>
-        <translation type="obsolete">Aktarmaları doğrudan düzenlemenizi sağlar</translation>
-    </message>
-    <message>
-        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="obsolete">Bir uydu çanağı kullanmadığınız ve kanal tarayıcısının yeniden denemesi için bir ilk frekans girmeniz gerekmediği takdirde bu nadiren gerekir.</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -3404,18 +3286,6 @@ Are you sure you want to delete:</source>
         <translation>8 MHz</translation>
     </message>
     <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modülasyon (Varsayılan: Otomatik)</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Grup</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Grup (Varsayılan: Otomatik)</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Hiçbiri</translation>
     </message>
@@ -3498,30 +3368,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>0.5 seconds</source>
         <translation>0,5 saniye</translation>
-    </message>
-    <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 saniye</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 saniye</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 saniye</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 dakika</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 dakika</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 dakika</translation>
     </message>
     <message>
         <source>error</source>
@@ -3672,24 +3518,12 @@ Are you sure you want to delete:</source>
         <translation>Kart Tipi</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">dakika</translation>
-    </message>
-    <message>
         <source>Re-Record</source>
         <translation>Yeniden Kaydet</translation>
     </message>
     <message>
         <source>Repeat</source>
         <translation>Tekrarla</translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">yıldız</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">yıldız</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -4344,18 +4178,6 @@ Are you sure you want to delete:</source>
         <translation>Almanya</translation>
     </message>
     <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="obsolete">Sinyal Zamanaşımını Göz Ardı Et</translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="obsolete">Bu seçenek, Leadtek LR6650 DVB kartının DVB sürücüleri gibi bozuk sürücüleri taramayı yavaşlatmanıza izin verir.</translation>
-    </message>
-    <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Tarama Türü</translation>
-    </message>
-    <message>
         <source>Broadcast</source>
         <translation>Yayın</translation>
     </message>
@@ -4376,56 +4198,8 @@ Are you sure you want to delete:</source>
         <translation>Kullanılacak olan frekans tablosu.</translation>
     </message>
     <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Karasal Yayın</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">Birleşik Devletlerdeki çoğu kablo sistemi, QAM-256 veya QAM-64 kullanır, ancak bazı karışık sistemler, havadan yayın kanalları için 8-VSB kullanabilir.</translation>
-    </message>
-    <message>
-        <source>(5_1) Underscore</source>
-        <translation type="obsolete">(5_1) Alt çizgi</translation>
-    </message>
-    <message>
-        <source>(5-1) Minus</source>
-        <translation type="obsolete">(5-1) Eksi</translation>
-    </message>
-    <message>
-        <source>(5.1) Period</source>
-        <translation type="obsolete">(5.1) Nokta</translation>
-    </message>
-    <message>
-        <source>(501) Zero</source>
-        <translation type="obsolete">(501) Sıfır</translation>
-    </message>
-    <message>
-        <source>(51) None</source>
-        <translation type="obsolete">(51) Hiçbiri</translation>
-    </message>
-    <message>
-        <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="obsolete">ATSC büyük ve küçük kanallarını ayırmak için ne kullanılır.</translation>
-    </message>
-    <message>
-        <source>Minimal Updates</source>
-        <translation type="obsolete">Minimum Güncelleme</translation>
-    </message>
-    <message>
-        <source>Rename to Match</source>
-        <translation type="obsolete">Eşleşmesi için Yeniden Adlandır</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Sil</translation>
-    </message>
-    <message>
-        <source>Existing Channel Treatment</source>
-        <translation type="obsolete">Mevcut Kanal Muamelesi</translation>
-    </message>
-    <message>
-        <source>How to treat existing channels.</source>
-        <translation type="obsolete">Mevcut kanallara nasıl davranılır.</translation>
     </message>
     <message>
         <source>Power Search</source>
@@ -5200,14 +4974,6 @@ Are you sure you want to delete:</source>
         <translation>Kayıttan çalma ekranındaki &quot;Tüm Programlar&quot; ifadesi yerine şu an uygulanmış olan ekran filtresinin adını kullanın.</translation>
     </message>
     <message>
-        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="obsolete">&quot;Tüm Programlar&quot; filtresini kullandığınızda &apos;Canlı TV&apos; kayıtlarını gösterin</translation>
-    </message>
-    <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="obsolete">Bu ayar devre dışı bırakılmışsa, Canlı TV kayıtları sadece özel &quot;Canlı TV&quot; Kayıt Grubu üzerinden görünür.</translation>
-    </message>
-    <message>
         <source>Show group summary</source>
         <translation>Grup özetini göster</translation>
     </message>
@@ -5972,34 +5738,6 @@ Are you sure you want to delete:</source>
         <translation>Varsayılan boyut 12&apos;tir.</translation>
     </message>
     <message>
-        <source>Floating Program Guide Selector</source>
-        <translation type="obsolete">Yüzen Program Kılavuzu Seçicisi</translation>
-    </message>
-    <message>
-        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="obsolete">Bu etkinse, program kılavuzunun seçicisi, kılavuzda gezmekte serbesttir, aksi takdirde her zaman kılavuzun ortasında kalır.</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Kılavuzu Gölgeleme Yöntemi</translation>
-    </message>
-    <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Alfa - Saydam (İşlemci Kullanımı - Yüksek)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Karıştırıcı  - Saydam (İşlemci Kullanımı - Orta)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Ekonomik - Saydam (İşlemci Kullanımı - Düşük)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Katı (İşlemci Kullanımı - Orta)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Tür Renklerini Görüntüle</translation>
     </message>
@@ -6014,22 +5752,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>(Not available for all grabbers.)</source>
         <translation>(Tüm yakalayıcılar için kullanılamaz.)</translation>
-    </message>
-    <message>
-        <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Sadece &apos;sık kullanılan&apos; kanalları görüntüleyin</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="obsolete">Bu etkinse, EPG ilk başta sadece sık kullanılan olarak işaretlenmiş olan kanalları görüntüler. &quot;4&quot;e bastığınızda sık kullanılanları görüntülemeyle tüm kanalları görüntüleme arasında geçiş yapılır.</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Görüntülenecek Kanallar</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Görüntülenecek Zaman Blokları (30 dak)</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -6672,14 +6394,6 @@ Are you sure you want to delete:</source>
         <translation>Yöneten</translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">gün</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">gün</translation>
-    </message>
-    <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
         <translation>%1 toplam, %2 kullanıldı, %3 (veya %4%) boş.</translation>
     </message>
@@ -6846,10 +6560,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Wake Command</source>
         <translation>Uyandırma Komutu</translation>
-    </message>
-    <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">İkincil arka uçları uyandırmak için kullanılan komut. Devre dışı bırakmak için boş bırakın.</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
@@ -7106,18 +6816,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>, %2 Kb/saniyelik %1 oranınızı kullanır</translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">%1 saat kaldı</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">%1 saat ve %2 dakika kaldı</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">%1 dakika kaldı</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
@@ -8851,10 +8549,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11234,6 +10928,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11337,14 +11055,6 @@ Do you wish to continue watching?</source>
         <translation>channels.conf dosyasını içeri al</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Mevcut Aktarmaların Tam Taraması</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Mevcut Aktarmaların Taraması</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11377,25 +11087,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Tarama Sihirbası</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Aktarmaya ayarlama hatası</translation>
-    </message>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Tarıyor</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Taramayı başlatma hatası</translation>
     </message>
 </context>
 <context>
@@ -11512,14 +11203,6 @@ is located in %2</source>
     <message>
         <source>Status: </source>
         <translation>Durum: </translation>
-    </message>
-    <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%2 kullanan %1 kayıtlarının zamanaşımına uğramasına izin verilmiştir</translation>
-    </message>
-    <message>
-        <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="obsolete">%1 tanesi Canlı TV&apos;dir ve %2 kullanır</translation>
     </message>
     <message>
         <source>is unavailable</source>
@@ -11684,14 +11367,6 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>day</source>
-        <translation type="obsolete">gün</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">gün</translation>
-    </message>
-    <message>
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished">UYARI : mythfilldatabase çalışıyor mu?</translation>
     </message>
@@ -11830,23 +11505,23 @@ No other details</source>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12081,10 +11756,6 @@ Directory From Storage Group?</source>
     <message>
         <source>OK</source>
         <translation>Tamam</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">dakika</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -12779,10 +12450,6 @@ Select a Current Recording</source>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13218,6 +12885,14 @@ Select a Current Recording</source>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">İptal</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

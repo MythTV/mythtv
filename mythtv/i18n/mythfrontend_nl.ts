@@ -196,10 +196,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Zenders</translation>
-    </message>
-    <message>
         <source>Are you sure you would like to delete this channel?</source>
         <translation>Bent u er zeker van dat u deze zender wil verwijderen?</translation>
     </message>
@@ -210,26 +206,6 @@
     <message>
         <source>No, don&apos;t</source>
         <translation>Nee, niet doen</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Zender Menu</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Bewerken...</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Verwijderen...</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Zenders verwijderen</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Alle zenders in de geselecteerde bron(nen) verwijderen.</translation>
     </message>
     <message>
         <source>Yes, delete the channels</source>
@@ -352,10 +328,6 @@
     <message>
         <source>Channel Options</source>
         <translation>Zender opties</translation>
-    </message>
-    <message>
-        <source>Edit Channel</source>
-        <translation type="obsolete">Zender aanpassen</translation>
     </message>
     <message>
         <source>Program List</source>
@@ -728,17 +700,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation>Kan informatie van kaart %1 niet openen</translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Bestandslocatie</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">Locatie van het channels.conf bestand.</translation>
     </message>
 </context>
 <context>
@@ -1254,14 +1215,6 @@
         <translation>Bladwijzer aanwezig</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation>Opname is in gebruik</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation>De opname is omgezet</translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation>Opname is in Mono</translation>
     </message>
@@ -1300,53 +1253,6 @@
     <message>
         <source>Recording has been watched</source>
         <translation>Opname is bekeken</translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
-        <translation>De opname is bewaard</translation>
-    </message>
-</context>
-<context>
-    <name>IPTVChannelFetcher</name>
-    <message>
-        <source>Downloading Playlist</source>
-        <translation type="obsolete">Afspeellijst downloaden</translation>
-    </message>
-    <message>
-        <source>Processing Playlist</source>
-        <translation type="obsolete">Afspeellijst in bewerking</translation>
-    </message>
-    <message>
-        <source>Adding Channels</source>
-        <translation type="obsolete">Kanalen toevoegen</translation>
-    </message>
-    <message>
-        <source>Channel #%1 : %2</source>
-        <translation type="obsolete">Kanaal  #%1 : %2</translation>
-    </message>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">%1 toevoegen</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">%1 bijwerken</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">Klaar</translation>
-    </message>
-    <message>
-        <source>ERROR: M3U channel list is malformed</source>
-        <translation type="obsolete">FOUT: M3U kanaallijst is misvormd</translation>
-    </message>
-    <message>
-        <source>Encountered malformed channel</source>
-        <translation type="obsolete">Misvorm kanaal tegengekomen</translation>
-    </message>
-    <message>
-        <source>Parsing Channel #%1 : %2 : %3</source>
-        <translation type="obsolete">Verwerk Kanaal #%1 : %2 : %3</translation>
     </message>
 </context>
 <context>
@@ -1583,13 +1489,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Transport</translation>
     </message>
 </context>
 <context>
@@ -2199,10 +2098,6 @@ Terug naar het vorige menu.</translation>
         <translation>Wachtwoord voor groep &apos;%1&apos;:</translation>
     </message>
     <message>
-        <source>%1 GB</source>
-        <translation type="obsolete">%1 GB</translation>
-    </message>
-    <message>
         <source>Recording file does not exist.
 Are you sure you want to delete:</source>
         <translation>Opname bestand bestaat niet.
@@ -2265,22 +2160,6 @@ Bent u zeker van het verwijderen van:</translation>
         <translation>Afspeellijst aan/uit voor deze Groep</translation>
     </message>
     <message>
-        <source>Play options</source>
-        <translation type="obsolete">Afspeel opties</translation>
-    </message>
-    <message>
-        <source>Storage options</source>
-        <translation type="obsolete">Opslag opties</translation>
-    </message>
-    <message>
-        <source>Scheduling options</source>
-        <translation type="obsolete">Programmeer opties</translation>
-    </message>
-    <message>
-        <source>Job options</source>
-        <translation type="obsolete">Taak opties</translation>
-    </message>
-    <message>
         <source>Transcoding profiles</source>
         <translation>Transcode profielen</translation>
     </message>
@@ -2323,6 +2202,10 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>Scheduling Options</source>
         <translation type="unfinished">Programmeer opties</translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished">Opnames</translation>
     </message>
 </context>
 <context>
@@ -2370,10 +2253,6 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>Custom Filters</source>
         <translation>Aangepaste filters</translation>
-    </message>
-    <message>
-        <source>Maximum number of CPU cores used for decoding.</source>
-        <translation type="obsolete">Maximum aantal CPU cores dat gebruikt mag worden om de decoden.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
@@ -2484,10 +2363,6 @@ Bent u zeker van het verwijderen van:</translation>
         <translation>Er werden geen programma&apos;s gevonden. Probeer een andere zoekopdracht.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">       !! Geen programma &apos;s !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished">Opties</translation>
     </message>
@@ -2538,6 +2413,18 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Titel van het programma dat je zoekt kiezen. Teruggaan met de linkse pijl. OK kiezen om een opname te plannen.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2786,6 +2673,10 @@ Bent u zeker van het verwijderen van:</translation>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 van %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished">Programmalijst</translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -3009,56 +2900,8 @@ Bent u zeker van het verwijderen van:</translation>
 <context>
     <name>ProgramRecPriority</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Enkel deze aflevering opnemen</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Elke week opnemen</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Elke aflevering opnemen</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Deze aflevering niet opnemen</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Fout!</translation>
-    </message>
-    <message>
         <source>^(The |A |An )</source>
         <translation>^(De |Een |Het )</translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Met aangepaste opties opnemen</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Op dit tijdstip opnemen</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Op deze zender opnemen</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Deze aflevering opnemen</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Deze aflevering opnemen is niet toegestaan</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Dagelijks een aflevering opnemen</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Wekelijks een aflevering opnemen</translation>
     </message>
     <message>
         <source>Recording %1 of %2</source>
@@ -3144,6 +2987,10 @@ Bent u zeker van het verwijderen van:</translation>
         <source>Sort By Average Delay</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Schedule Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -3162,30 +3009,6 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>0.5 seconds</source>
         <translation>0,5 seconden</translation>
-    </message>
-    <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 seconde</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 seconden</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 seconden</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 minuut</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 minuten</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 minuten</translation>
     </message>
     <message>
         <source>error</source>
@@ -3526,18 +3349,6 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>&quot;Small&quot; font</source>
         <translation>&quot;Klein&quot; lettertype</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Schaduw</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Zenders tonen</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Tijdsblokken (30 min) tonen</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
@@ -3980,22 +3791,6 @@ Bent u zeker van het verwijderen van:</translation>
         <translation>GUI-afmeting gebruiken om TV af te spelen</translation>
     </message>
     <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Alpha - Transparant (CPU gebruik - Hoog)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Blender - Transparant (CPU gebruik - Gemiddeld)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Eco - Transparant (CPU gebruik - Laag)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Gevuld (CPU gebruik - Gemiddeld)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Genre-kleuren tonen</translation>
     </message>
@@ -4140,14 +3935,6 @@ Bent u zeker van het verwijderen van:</translation>
         <translation>Video bron</translation>
     </message>
     <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Manier van rangschikken</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Zenders zonder zendernummer verbergen.</translation>
-    </message>
-    <message>
         <source>Channel Name</source>
         <translation>Zendernaam</translation>
     </message>
@@ -4250,10 +4037,6 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>Modulation</source>
         <translation>Modulatie</translation>
-    </message>
-    <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Constellatie</translation>
     </message>
     <message>
         <source>FEC</source>
@@ -4450,10 +4233,6 @@ Als u een antenne heeft, gebruik dan een &quot;-bcast&quot; frequentie.</transla
         <translation>Ontwaakcommando</translation>
     </message>
     <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">Het commando dat gebruikt wordt om de slave backends wakker te maken. Laat leeg om uit te schakelen.</translation>
-    </message>
-    <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
         <translation>De tijd dat de master backend niet gebruikt wordt voor hij alle backends uitschakelt. Zet op 0 om automatisch uitschakel niet te gebruiken.</translation>
     </message>
@@ -4521,10 +4300,6 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     <message>
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
         <translation>Indien geselecteerd zal het automatisch uitschakelen verhinderd worden tot een client verbinding maakt.</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Alle)</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -4746,10 +4521,6 @@ Voer 0 in om uit te schakelen.</translation>
     <message>
         <source>TXT</source>
         <translation>TXT</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuten</translation>
     </message>
     <message>
         <source>Recording volume of the capture card</source>
@@ -4983,10 +4754,6 @@ Vul niets in om optie uit te schakelen.</translation>
         <translation>GB</translation>
     </message>
     <message>
-        <source>stars</source>
-        <translation type="obsolete">sterren</translation>
-    </message>
-    <message>
         <source>this episode is a repeat.</source>
         <translation>deze aflevering een herhaling is.</translation>
     </message>
@@ -5199,24 +4966,8 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
         <translation>Indien geselecteerd zal Live TV een TV-kaart kiezen waarvan minder verwacht wordt dat zij gebruikt zal worden voor opname.</translation>
     </message>
     <message>
-        <source>Floating Program Guide Selector</source>
-        <translation type="obsolete">Zwevend selectievak programmagids</translation>
-    </message>
-    <message>
-        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="obsolete">Indien geselecteerd zal het selectievakje vrijelijk doorheen de programmagids kunnen bewegen. Anders blijft het ten alle tijden in het midden van de gids.</translation>
-    </message>
-    <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
         <translation>Kleur programmagids d.m.v. genre-kleuren. (Niet beschikbaar voor alle grabbers)</translation>
-    </message>
-    <message>
-        <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Enkel &apos;favoriete&apos; zenders weergeven</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="obsolete">Indien geselecteerd zal de gids enkel zenders weergeven die als favoriet gemarkeerd werden. Op &quot;4&quot; drukken wisselt tussen favorieten en alle zenders.</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
@@ -5277,10 +5028,6 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  For example, setting Start to 11 and End to 13 would mean that the process would only run between 11:00 AM and 1:59 PM.</source>
         <translation>Deze instelling en de vorige bepalen een tijdsperiode waarin mythfilldatabase uitgevoerd mag worden. Bv. start op 11 instellen en einde op 13 betekent dat mythfilldatabase mag uitgevoerd worden van 11.00 tot 13.00.</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Niet toegewezen)</translation>
     </message>
     <message>
         <source>Save these settings</source>
@@ -5463,14 +5210,6 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
         <translation>Programmagids bij starten LiveTV</translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">dagen</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dag</translation>
-    </message>
-    <message>
         <source>Post Recording Processing</source>
         <translation>Processing na opname</translation>
     </message>
@@ -5530,14 +5269,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     <message>
         <source>Job Queue (Global)</source>
         <translation>Taakrij (globaal)</translation>
-    </message>
-    <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Nieuwe zender)</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">ster</translation>
     </message>
     <message>
         <source>Title</source>
@@ -6068,20 +5799,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, tenzij dit niet werkt.</translation>
     </message>
     <message>
-        <source>Bandwidth (Default: Auto)
-</source>
-        <translation type="obsolete">Bandbreedte (standaard: auto)
-</translation>
-    </message>
-    <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulatie (standaard: auto)</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Constellatie (standaard: auto)</translation>
-    </message>
-    <message>
         <source>Forward Error Correction (Default: Auto)</source>
         <translation>Voorwaartse foutcorrectie (FEC) (standaard: auto)</translation>
     </message>
@@ -6152,10 +5869,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>TV audio through PVR-350 only</source>
         <translation>Tv-geluid enkel door PVR-350</translation>
-    </message>
-    <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Aards</translation>
     </message>
     <message>
         <source>Cable</source>
@@ -6341,10 +6054,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>Germany</source>
         <translation>Duitsland</translation>
-    </message>
-    <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Type zoeken</translation>
     </message>
     <message>
         <source>Channel Change Error</source>
@@ -6592,10 +6301,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>het gemarkeerd was om nooit opgenomen te worden.</translation>
     </message>
     <message>
-        <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="obsolete">Wat er gebruikt moet worden om ATSC major en minor kanalen te scheiden.</translation>
-    </message>
-    <message>
         <source>DBOX2 Streaming Port</source>
         <translation>Videopoort voor de DBOX2</translation>
     </message>
@@ -6781,44 +6486,8 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>Het kan zijn dat het veranderen van bestaande TV-kaartingangen, iets verwijderen of zoeken naar zenders niet werkt.</translation>
     </message>
     <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Zender scanner</translation>
-    </message>
-    <message>
-        <source>Starts the channel scanner.</source>
-        <translation type="obsolete">Start de zender scanner</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Transportbewerker</translation>
-    </message>
-    <message>
-        <source>Allows you to edit the transports directly</source>
-        <translation type="obsolete">Staat toe dat u transponders direct kan bewerken</translation>
-    </message>
-    <message>
-        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="obsolete">Dit is zelden nodig. Tenzij u een satelliet schotelantenne gebruikt en een startfrequentie moet opgeven voor de scanner.</translation>
-    </message>
-    <message>
-        <source>(5_1) Underscore</source>
-        <translation type="obsolete">(5_1) Liggend streepje</translation>
-    </message>
-    <message>
-        <source>(5-1) Minus</source>
-        <translation type="obsolete">(5-1) Minteken</translation>
-    </message>
-    <message>
-        <source>(5.1) Period</source>
-        <translation type="obsolete">(5.1) Punt</translation>
-    </message>
-    <message>
-        <source>(501) Zero</source>
-        <translation type="obsolete">(501) Nul</translation>
-    </message>
-    <message>
-        <source>(51) None</source>
-        <translation type="obsolete">(51) Geen</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6857,24 +6526,8 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>Volume-informatie op het LCD tonen.</translation>
     </message>
     <message>
-        <source>Minimal Updates</source>
-        <translation type="obsolete">Minimale update</translation>
-    </message>
-    <message>
-        <source>Rename to Match</source>
-        <translation type="obsolete">Hernoemen</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Verwijderen</translation>
-    </message>
-    <message>
-        <source>Existing Channel Treatment</source>
-        <translation type="obsolete">Behandeling van bestaande zenders</translation>
-    </message>
-    <message>
-        <source>How to treat existing channels.</source>
-        <translation type="obsolete">Hoe bestaande zenders te behandelen.</translation>
     </message>
     <message>
         <source>Analog V4L capture card</source>
@@ -6959,10 +6612,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>Frequency table to use.</source>
         <translation>Frequentietabel die gebruikt zal worden.</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">De meeste kabelsystemen in de Verenigde Staten gebruiken QAM-256 0f QAM-64, maar sommige gemengde systemen gebruiken 8-VSB voor zenders over de ether.</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -7067,14 +6716,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation>en levert waarschijnlijk slechts data voor een paar dagen op.</translation>
-    </message>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="obsolete">Signaaltime-out negeren</translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="obsolete">Deze optie zorgt ervoor dat het zoeken vertraagd wordt voor &apos;slechte&apos; drivers, zoals de drivers voor de Leadtek LR6650 DVB-kaart.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
@@ -7265,14 +6906,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>DTS-geluid wordt onmiddellijk naar de SPDIF-uitgang van uw geluidskaart gestuurd bij bronnen die een DTS-soundtrack hebben (meestal DVD &apos;s). Vereist dat het audiouitgang-apparaat ingesteld is op iets gepasts.</translation>
     </message>
     <message>
-        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="obsolete">&apos;LiveTV&apos; opnames tonen bij gebruik van &apos;Alle programma &apos;s&apos; filter.</translation>
-    </message>
-    <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="obsolete">Indien deze instelling uitgeschakeld is zullen LiveTV-opnames enkel te zien zijn via de speciale &apos;LiveTV&apos; opnamegroep.</translation>
-    </message>
-    <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
         <translation>Methode die gebruikt wordt om te bepalen welke opgenomen programma &apos;s eerst verwijderd worden. LiveTV-opnames zullen altijd voor normale opnames vervallen.</translation>
     </message>
@@ -7283,18 +6916,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>, bij gebruik van uw %1 snelheid van %2 Kb/sec</translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">%1 uur beschikbaar</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">%1 uur en %2 minuten beschikbaar</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">%1 minuten beschikbaar</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
@@ -8456,14 +8077,6 @@ The frequency for this channel in</source>
         <translation>Hoogte die gebruikt wordt tijdens encoden. Opmerking: PVR-x50 kaarten kunnen ghosting produceren indien dit niet op 480 ingesteld voor NTSC of 576 voor PAL.</translation>
     </message>
     <message>
-        <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation type="obsolete">Modulatie, 8-VSB, QAM-256, etc.</translation>
-    </message>
-    <message>
-        <source>ATSC Channel Separator</source>
-        <translation type="obsolete">ATSC Zenderscheidingsteken</translation>
-    </message>
-    <message>
         <source>Include in the &quot;%1&quot; recording group</source>
         <translation>Toevoegen aan de &apos;%1&apos; opnamegroep</translation>
     </message>
@@ -8788,14 +8401,6 @@ The frequency for this channel in</source>
         <translation>Nieuwe ingang</translation>
     </message>
     <message>
-        <source>Icon Download</source>
-        <translation type="obsolete">Icoon downloaden</translation>
-    </message>
-    <message>
-        <source>Starts the icon downloader</source>
-        <translation type="obsolete">Start de icoon downloader</translation>
-    </message>
-    <message>
         <source>as a search</source>
         <translation>als een zoekopdracht</translation>
     </message>
@@ -8872,25 +8477,12 @@ The frequency for this channel in</source>
         <translation>Gemiddelde tijdsverschuiving</translation>
     </message>
     <message>
-        <source>hours</source>
-        <translation type="obsolete">uren</translation>
-    </message>
-    <message>
         <source>Recorded File Name</source>
         <translation>Naam van het opgenomen bestand</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
         <translation>Indien ingesteld zal de bitrate die opgegeven is gebruikt worden voor 640x480.  Indien andere resoluties gebruikt worden, zal de bitrate naar verhouding geschaald worden.</translation>
-    </message>
-    <message>
-        <source>Frequency (%1)</source>
-        <translation type="obsolete">Frequentie (%1)</translation>
-    </message>
-    <message>
-        <source>Frequency (Option has no default).
-The frequency for this channel in %1.</source>
-        <translation type="obsolete">Frequentie (Optie heeft geen standaard waarde)De frequentie van deze zender in %1.</translation>
     </message>
     <message>
         <source>Symbol Rate (symbols/second).
@@ -8909,14 +8501,6 @@ De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</tra
     <message>
         <source> offset %2</source>
         <translation> offset %2</translation>
-    </message>
-    <message>
-        <source>Timeout Scanning %1 -- no tables</source>
-        <translation type="obsolete">Timeout tijdens scannen naar %1 -- no tables</translation>
-    </message>
-    <message>
-        <source>Timeout Scanning %1 -- no signal</source>
-        <translation type="obsolete">Timeout tijdens scannen naar %1 -- no signal</translation>
     </message>
     <message>
         <source>Tuning to %1 mplexid(%2)</source>
@@ -8993,10 +8577,6 @@ De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</tra
     <message>
         <source>One field (HW)</source>
         <translation>One field (HW)</translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
-        <translation>One Field (2x, HW)</translation>
     </message>
     <message>
         <source>Kernel (2x, HW)</source>
@@ -9097,10 +8677,6 @@ De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</tra
     <message>
         <source>(Hardware Accelerated)</source>
         <translation>(Hardware Accelerated)</translation>
-    </message>
-    <message>
-        <source>With workaround for broken interlaced modelines.</source>
-        <translation type="obsolete">Met workaround voor &apos;slechte&apos; interlaced modlines.</translation>
     </message>
     <message>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
@@ -9237,10 +8813,6 @@ De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</tra
     <message>
         <source>Full</source>
         <translation>Volledig</translation>
-    </message>
-    <message>
-        <source>Stretch</source>
-        <translation type="obsolete">Uitgerekt</translation>
     </message>
     <message>
         <source>[Reserved]</source>
@@ -10133,10 +9705,6 @@ naam mag niet leeg zijn.</translation>
         <translation>Diverse status applicatie</translation>
     </message>
     <message>
-        <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/misc_status_info/README</source>
-        <translation type="obsolete">Een extern programma of script dat extra informatie geeft welke in de backend status pagina getoont moet worden.  Zie contrib/misc_status_info/README</translation>
-    </message>
-    <message>
         <source>Your Local Timezone (for XMLTV)</source>
         <translation>Uw lokale tijdzone (voor XMLTV)</translation>
     </message>
@@ -10364,10 +9932,6 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
         <translation>Zender importeerder</translation>
     </message>
     <message>
-        <source>Failed to find any channels</source>
-        <translation type="obsolete">Kon geen kanalen vinden</translation>
-    </message>
-    <message>
         <source>Channels: FTA Enc Dec
 </source>
         <translation>Kanalen: FTA Enc Dec</translation>
@@ -10404,14 +9968,6 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
     <message>
         <source>Please enter either 1, 2, or 3:</source>
         <translation>Voer alstublieft hetzij 1,2 of 3 in:</translation>
-    </message>
-    <message>
-        <source>This channel was found to be in conflict with other channels</source>
-        <translation type="obsolete">Dit kanaal blijkt te conflicteren met andere kanalen</translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number:</source>
-        <translation type="obsolete">Voer alstublieft een niet conflicterend kanaalnummer in:</translation>
     </message>
     <message>
         <source>Updated Channel %1</source>
@@ -10464,10 +10020,6 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
     <message>
         <source>%1 -- Found %2 probable channels</source>
         <translation>%1 -- %2 mogelijke kanalen gevonden</translation>
-    </message>
-    <message>
-        <source>Processing NIT %1</source>
-        <translation type="obsolete">Verwerk NIT %1</translation>
     </message>
     <message>
         <source>: Found %1</source>
@@ -10557,68 +10109,6 @@ Wellicht dient u de uitwerpknop onder de lade te gebruiken.</translation>
     <message>
         <source>Rotor Progress</source>
         <translation>Rotor Voortgang</translation>
-    </message>
-    <message>
-        <source>Name of the icon file</source>
-        <translation type="obsolete">Naam van het icoonbestand</translation>
-    </message>
-    <message>
-        <source>List of possible icon files</source>
-        <translation type="obsolete">Lijst met mogelijke icoonbestanden</translation>
-    </message>
-    <message>
-        <source>Enter text here for the manual search</source>
-        <translation type="obsolete">Voeg hier tekst in voor handmatige zoekopdracht</translation>
-    </message>
-    <message>
-        <source>&amp;Search</source>
-        <translation type="obsolete">Zoek</translation>
-    </message>
-    <message>
-        <source>Manually search for the text</source>
-        <translation type="obsolete">Handmatig tekst zoeken</translation>
-    </message>
-    <message>
-        <source>S&amp;kip</source>
-        <translation type="obsolete">Overslaan</translation>
-    </message>
-    <message>
-        <source>Skip this icon</source>
-        <translation type="obsolete">Dit icoon overslaan</translation>
-    </message>
-    <message>
-        <source>S&amp;elect</source>
-        <translation type="obsolete">Selecteer</translation>
-    </message>
-    <message>
-        <source>Select this icon</source>
-        <translation type="obsolete">Dit icoon selecteren</translation>
-    </message>
-    <message>
-        <source>Error downloading</source>
-        <translation type="obsolete">Fout bij downloaden</translation>
-    </message>
-    <message>
-        <source>Failed to download the icon file</source>
-        <translation type="obsolete">Icoon bestand downloaden mislukt</translation>
-    </message>
-    <message>
-        <source>Icon is blocked</source>
-        <translation type="obsolete">Icoon is geblokkeerd</translation>
-    </message>
-    <message>
-        <source>This combination of channel and icon has been blocked by the MythTV admins. The most common reason for this is that there is a better match available.
- Are you still sure that you want to use this icon?</source>
-        <translation type="obsolete">Deze combinatie van kanaal en icoon is geblokkeerd door de MythTV beheerders. De meest voorkomende reden hiervoer is dat er een betere overeenkomst beschikbaar is.
-Weet u zeker dat u dit icoon wilt gebruiken?</translation>
-    </message>
-    <message>
-        <source>Submit information</source>
-        <translation type="obsolete">Dien informatie in</translation>
-    </message>
-    <message>
-        <source>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</source>
-        <translation type="obsolete">U heeft nu de mogelijkheid uw keuzes door te geven aan mythtv.org zodat anderen voordeel hebben van uw selectie.</translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
@@ -10937,10 +10427,6 @@ Wilt u doorgaan met kijken?</translation>
         <translation>Het menubestand %1 in incompleet.</translation>
     </message>
     <message>
-        <source>Initializing MythTV</source>
-        <translation type="obsolete">MythTV starten</translation>
-    </message>
-    <message>
         <source>master</source>
         <translation>master</translation>
     </message>
@@ -11207,52 +10693,9 @@ Wilt u doorgaan met kijken?</translation>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Found %n new non-conflicting %1 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>%n nieuwe, niet conflicterende %1 kanalen gevonden.</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n old %2 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>%n oude %2 kanalen gevonden.</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n new conflicting %2 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>%n nieuwe conflicterende %2 kanalen gevonden.</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n conflicting old %2 channel(s).</source>
-        <translation type="obsolete">
-            <numerusform>%n oude conflicterende %2 kanalen gevonden.</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Found %n transport(s):
-</source>
-        <translation type="obsolete">
-            <numerusform>%n transport(en) gevonden:</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Play</source>
         <translation>Afspelen</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n star(s), </source>
-        <translation type="obsolete">
-            <numerusform>%n ster(ren)</numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message numerus="yes">
         <source>hour(s)</source>
@@ -11526,6 +10969,30 @@ Wilt u doorgaan met kijken?</translation>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11555,97 +11022,6 @@ Wilt u doorgaan met kijken?</translation>
     <message>
         <source>Enter the name of the new profile</source>
         <translation>Voer de naam van het nieuwe profiel in</translation>
-    </message>
-</context>
-<context>
-    <name>SIScan</name>
-    <message>
-        <source>Updated Channel %1</source>
-        <translation type="obsolete">Kanaal %1 bijgewerkt</translation>
-    </message>
-    <message>
-        <source>Added Channel %1</source>
-        <translation type="obsolete">Kanaal %1 toegevoegd</translation>
-    </message>
-    <message>
-        <source>Failed to add channel %1</source>
-        <translation type="obsolete">Toeveogen van kanaal %1 is mislukt</translation>
-    </message>
-    <message>
-        <source>Network %1 Processing</source>
-        <translation type="obsolete">Netwerk %1 in behandeling</translation>
-    </message>
-    <message>
-        <source>Finished processing Transport List</source>
-        <translation type="obsolete">Klaar met behandelen van transport lijst</translation>
-    </message>
-    <message>
-        <source>Updating Services</source>
-        <translation type="obsolete">Services bijwerken</translation>
-    </message>
-    <message>
-        <source>Finished processing Services</source>
-        <translation type="obsolete">Klaar met behandelen van services</translation>
-    </message>
-    <message>
-        <source>Frequency %1</source>
-        <translation type="obsolete">Frequentie %1</translation>
-    </message>
-    <message>
-        <source>as</source>
-        <translation type="obsolete">as</translation>
-    </message>
-    <message>
-        <source>Skipping %1, not in imported channel map</source>
-        <translation type="obsolete">%1 overslaan, niet aanwezig in geimporteerde kanaal map</translation>
-    </message>
-    <message>
-        <source>%1%2%3 on %4 (%5)</source>
-        <translation type="obsolete">%1%2%3 op %4 (%5)</translation>
-    </message>
-    <message>
-        <source>Adding %1</source>
-        <translation type="obsolete">%1 toevoegen</translation>
-    </message>
-    <message>
-        <source>Updating %1</source>
-        <translation type="obsolete">%1 bijwerken</translation>
-    </message>
-    <message>
-        <source>Skipping %1</source>
-        <translation type="obsolete">%1 overslaan</translation>
-    </message>
-    <message>
-        <source>on %1</source>
-        <translation type="obsolete">op %1</translation>
-    </message>
-    <message>
-        <source>Data Only Channel (off-air?)</source>
-        <translation type="obsolete">Alleen data kanaal (uit de lucht?)</translation>
-    </message>
-    <message>
-        <source>Empty Channel (off-air?)</source>
-        <translation type="obsolete">Leeg kanaal (uit de lucht?)</translation>
-    </message>
-    <message>
-        <source>Audio Only Channel</source>
-        <translation type="obsolete">Alleen geluidskanaal</translation>
-    </message>
-    <message>
-        <source>Encrypted Channel</source>
-        <translation type="obsolete">Gecodeerd kanaal</translation>
-    </message>
-    <message>
-        <source>%1 %2-%3 as %4 on %5 (%6)</source>
-        <translation type="obsolete">%1 %2-%3 als %4 op %5 (%6)</translation>
-    </message>
-    <message>
-        <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
-        <translation type="obsolete">Kanaal gevonden maar deze correspondeerd niet met de bestaande tsid. U kunt het beste de bestaande kanalen wissen en een volledige scan doen.</translation>
-    </message>
-    <message>
-        <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation type="obsolete">%1 overslaan - is al aanwezig in de DB en er is geen betere data.</translation>
     </message>
 </context>
 <context>
@@ -11720,14 +11096,6 @@ Wilt u doorgaan met kijken?</translation>
         <translation>Channels.conf importeren</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Volledige scan van bestaande transports</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Scan van bestaande transports</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation>M3U Importeren</translation>
     </message>
@@ -11760,33 +11128,6 @@ Wilt u doorgaan met kijken?</translation>
     <message>
         <source>Scan Configuration</source>
         <translation>Scan instellingen</translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Scanhulp</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Fout tijdens afstemmen op transport</translation>
-    </message>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Scannen</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Openen van &apos;%1&apos; mislukt</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Behandelen van &apos;%1&apos; mislukt</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Fout tijdens starten met scannen</translation>
     </message>
 </context>
 <context>
@@ -11925,24 +11266,8 @@ No other details</source>
 Geen verdere details</translation>
     </message>
     <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%1 opnames die %2 gebruiken worden toegestaan te vervallen</translation>
-    </message>
-    <message>
-        <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="obsolete">%1 hiervan zijn LiveTV en gebruiken %2</translation>
-    </message>
-    <message>
         <source>is unavailable</source>
         <translation>is niet beschikbaar</translation>
-    </message>
-    <message>
-        <source>standard rules are defined</source>
-        <translation type="obsolete">standaard regels zijn gedefinieerd</translation>
-    </message>
-    <message>
-        <source>search rules are defined</source>
-        <translation type="obsolete">Zoekregels zijn gedefinieerd</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
@@ -11959,10 +11284,6 @@ Geen verdere details</translation>
     <message>
         <source>on input</source>
         <translation>op ingang</translation>
-    </message>
-    <message>
-        <source>%1 of these are Deleted and consume %2</source>
-        <translation type="obsolete">%1 hiervan is verwijderd en gebruikt %2</translation>
     </message>
     <message>
         <source>Listings Status</source>
@@ -12091,14 +11412,6 @@ Geen verdere details</translation>
     <message>
         <source>There is guide data until %1</source>
         <translation>Er zijn programmagids-data aanwezig tot %1</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dag</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">dagen</translation>
     </message>
     <message>
         <source>WARNING: is mythfilldatabase running?</source>
@@ -12245,27 +11558,25 @@ Geen verdere details</translation>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation>
-            <numerusform>%1 is LiveTV en gebruikt %2
-</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation>
-            <numerusform>%1 is verwijderd en gebruikt %2
-</numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12549,10 +11860,6 @@ map uit de opslag groep?</translation>
     <message>
         <source>Manual Zoom Mode</source>
         <translation>Handmatige zoom</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuten</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
@@ -13201,10 +12508,6 @@ Selecteer een huidige opname</translation>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13640,6 +12943,14 @@ Selecteer een huidige opname</translation>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Annuleren</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

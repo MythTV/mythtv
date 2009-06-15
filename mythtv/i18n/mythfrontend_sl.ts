@@ -195,10 +195,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Channels</source>
-        <translation type="obsolete">Kanali</translation>
-    </message>
-    <message>
         <source>Are you sure you would like to delete this channel?</source>
         <translation>Ali ste prepričani, da želite odstraniti ta kanal?</translation>
     </message>
@@ -209,26 +205,6 @@
     <message>
         <source>No, don&apos;t</source>
         <translation>Ne odstrani</translation>
-    </message>
-    <message>
-        <source>Channel Menu</source>
-        <translation type="obsolete">Izbira kanalov</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Spremeni..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Odstrani..</translation>
-    </message>
-    <message>
-        <source>Delete Channels</source>
-        <translation type="obsolete">Odstrani kanale</translation>
-    </message>
-    <message>
-        <source>Delete all channels on currently selected source[s].</source>
-        <translation type="obsolete">Odstrani vse kanale na izbranem viru.</translation>
     </message>
     <message>
         <source>Yes, delete the channels</source>
@@ -723,17 +699,6 @@
     <message>
         <source>Could not get card info for card %1</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DVBUtilsImportPane</name>
-    <message>
-        <source>File location</source>
-        <translation type="obsolete">Mesto datoteke</translation>
-    </message>
-    <message>
-        <source>Location of the channels.conf file.</source>
-        <translation type="obsolete">Mesto channels.conf datoteke.</translation>
     </message>
 </context>
 <context>
@@ -1249,14 +1214,6 @@
         <translation type="unfinished">Priljubljene so nastavljene</translation>
     </message>
     <message>
-        <source>Recording is in use</source>
-        <translation type="unfinished">Posnetek je v uporabi</translation>
-    </message>
-    <message>
-        <source>Recording has been transcoded</source>
-        <translation type="unfinished">Posnetek je bil dekodiran</translation>
-    </message>
-    <message>
         <source>Recording is in Mono</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1295,10 +1252,6 @@
     <message>
         <source>Recording has been watched</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording is preserved</source>
-        <translation type="unfinished">Posnetek je ohranjen</translation>
     </message>
 </context>
 <context>
@@ -1534,13 +1487,6 @@
     <message>
         <source>Select a CD writer</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MultiplexSetting</name>
-    <message>
-        <source>Transport</source>
-        <translation type="obsolete">Transport</translation>
     </message>
 </context>
 <context>
@@ -2250,6 +2196,10 @@ Are you sure you want to delete:</source>
         <source>Scheduling Options</source>
         <translation type="unfinished">Nastavitve poljubnega snemanja</translation>
     </message>
+    <message>
+        <source>Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2406,10 +2356,6 @@ Are you sure you want to delete:</source>
         <translation>Za to iskanje ni na voljo nobenega programa. Prosim, izberite drugo iskanje.</translation>
     </message>
     <message>
-        <source>       !! No Programs !!</source>
-        <translation type="obsolete">       !! Ni programov !!</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2460,6 +2406,18 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
         <translation type="unfinished">Izberite naslov programa, ki ga iščete. Ko ste končali se vrnite z levo smero tipko. Za nastavitev plana snemanja pritisnite IZBERI.</translation>
+    </message>
+    <message>
+        <source>Starts With</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Times</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2708,6 +2666,10 @@ Are you sure you want to delete:</source>
         <source>%1 of %2</source>
         <translation type="unfinished">%1 od %2</translation>
     </message>
+    <message>
+        <source>Program List</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgListerQt</name>
@@ -2931,56 +2893,8 @@ Are you sure you want to delete:</source>
 <context>
     <name>ProgramRecPriority</name>
     <message>
-        <source>Recording just this showing</source>
-        <translation type="obsolete">Posnami le to predvajanje</translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="obsolete">Snemanje vsak teden</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="obsolete">Snemanje vseh predvajanj</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="obsolete">Ne snemam tega predvajanja</translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="obsolete">Napaka!</translation>
-    </message>
-    <message>
         <source>^(The |A |An )</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="obsolete">Snemanje z možnostjo prepisa</translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="obsolete">Snemanje v tem času</translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="obsolete">Snemanje na tem kanalu</translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="obsolete">Snemanje ene oddaje</translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="obsolete">Te oddaje ni dovoljeno posneti</translation>
-    </message>
-    <message>
-        <source>Recording a showing daily</source>
-        <translation type="obsolete">Dnevno snemanje oddaje</translation>
-    </message>
-    <message>
-        <source>Recording a showing weekly</source>
-        <translation type="obsolete">Tedensko snemanje oddaje</translation>
     </message>
     <message>
         <source>Recording %1 of %2</source>
@@ -3066,6 +2980,10 @@ Are you sure you want to delete:</source>
         <source>Sort By Average Delay</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Schedule Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -3096,22 +3014,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Video Source</source>
         <translation>Video vir</translation>
-    </message>
-    <message>
-        <source>(All)</source>
-        <translation type="obsolete">(Vsi)</translation>
-    </message>
-    <message>
-        <source>(Unassigned)</source>
-        <translation type="obsolete">(Nedoločen)</translation>
-    </message>
-    <message>
-        <source>Sort Mode</source>
-        <translation type="obsolete">Način razvrščanja</translation>
-    </message>
-    <message>
-        <source>Hide channels without channel number.</source>
-        <translation type="obsolete">Ne prikaži kanalov brez številk.</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -3238,10 +3140,6 @@ Are you sure you want to delete:</source>
         <translation>Modulacija</translation>
     </message>
     <message>
-        <source>Constellation</source>
-        <translation type="obsolete">Sestava</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Noben</translation>
     </message>
@@ -3304,30 +3202,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>0.5 seconds</source>
         <translation>0.5 sekunde</translation>
-    </message>
-    <message>
-        <source>1 second</source>
-        <translation type="obsolete">1 sekunda</translation>
-    </message>
-    <message>
-        <source>5 seconds</source>
-        <translation type="obsolete">5 sekund</translation>
-    </message>
-    <message>
-        <source>20 seconds</source>
-        <translation type="obsolete">20 sekund</translation>
-    </message>
-    <message>
-        <source>1 minute</source>
-        <translation type="obsolete">1 minuta</translation>
-    </message>
-    <message>
-        <source>5 minutes</source>
-        <translation type="obsolete">5 minut</translation>
-    </message>
-    <message>
-        <source>10 minutes</source>
-        <translation type="obsolete">10 minut</translation>
     </message>
     <message>
         <source>error</source>
@@ -3403,16 +3277,8 @@ Are you sure you want to delete:</source>
         <translation>GB</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minut</translation>
-    </message>
-    <message>
         <source>Repeat</source>
         <translation>Ponovi</translation>
-    </message>
-    <message>
-        <source>stars</source>
-        <translation type="obsolete">zvezdice</translation>
     </message>
     <message>
         <source>Override Recording</source>
@@ -4825,34 +4691,6 @@ Are you sure you want to delete:</source>
         <translation>Privzeta velikost je 12.</translation>
     </message>
     <message>
-        <source>Floating Program Guide Selector</source>
-        <translation type="obsolete">Lebdeči vodič programov</translation>
-    </message>
-    <message>
-        <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation type="obsolete">Če omogočeno, bo lebdeči vodič programov prosto gibljiv, drugače bo ves čas ostal na sredini vodiča.</translation>
-    </message>
-    <message>
-        <source>Guide Shading Method</source>
-        <translation type="obsolete">Način senčenja vodiča</translation>
-    </message>
-    <message>
-        <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="obsolete">Alfa - transparentno (poraba CPU - visoka)</translation>
-    </message>
-    <message>
-        <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="obsolete">Prekrivanje - transparentno (poraba CPU - srednja)</translation>
-    </message>
-    <message>
-        <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="obsolete">Eko - transparentno (poraba CPU - nizka)</translation>
-    </message>
-    <message>
-        <source>Solid (CPU Usage - Middle)</source>
-        <translation type="obsolete">Solidno (poraba CPU - srednja)</translation>
-    </message>
-    <message>
         <source>Display Genre Colors</source>
         <translation>Prikaži osnovne barve</translation>
     </message>
@@ -4867,22 +4705,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>(Not available for all grabbers.)</source>
         <translation>(Ni na voljo pri vseh &apos;grabber&apos;-jih.)</translation>
-    </message>
-    <message>
-        <source>Only display &apos;favorite&apos; channels</source>
-        <translation type="obsolete">Prikaži samo &apos;priljubljene&apos; kanale</translation>
-    </message>
-    <message>
-        <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation type="obsolete">EPG bo prikazal samo kanale, kateri so označeni kot priljubljeni. Pritisk na tipko &apos;4&apos; bo menjal med priljubljenimi in vsemi programi.</translation>
-    </message>
-    <message>
-        <source>Channels to Display</source>
-        <translation type="obsolete">Kanali, ki bodo prikazani</translation>
-    </message>
-    <message>
-        <source>Time Blocks (30 mins) to Display</source>
-        <translation type="obsolete">Časovni blok (30 min) za prikaz</translation>
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
@@ -5253,14 +5075,6 @@ Are you sure you want to delete:</source>
         <translation>Režiser</translation>
     </message>
     <message>
-        <source>days</source>
-        <translation type="obsolete">dni</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="obsolete">dan</translation>
-    </message>
-    <message>
         <source>Enter the IP address of this machine.  Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one.</source>
         <translation>Vnesite IP naslov tega računalnika. Uporabite zunanji naslov (npr. ne 127.0.0.1), če želite zaganjati frontend še na katerem drugem računalniku.</translation>
     </message>
@@ -5315,10 +5129,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Wake Command</source>
         <translation>Ukaz vzbujanja</translation>
-    </message>
-    <message>
-        <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="obsolete">Ta ukaz je uporabljena za vzbuditev šuženjskih backend-ov. Za onemogočitev pusti prazno.</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
@@ -5443,14 +5253,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Job Queue (Global)</source>
         <translation>Čakalna vrsta opravila (globalno)</translation>
-    </message>
-    <message>
-        <source>(New Channel)</source>
-        <translation type="obsolete">(Novi kanal)</translation>
-    </message>
-    <message>
-        <source>star</source>
-        <translation type="obsolete">zvezdica</translation>
     </message>
     <message>
         <source>Title</source>
@@ -5977,20 +5779,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo delovalo.</translation>
     </message>
     <message>
-        <source>Bandwidth (Default: Auto)
-</source>
-        <translation type="obsolete">Pasovna širina (Privzeto: Avto)
-</translation>
-    </message>
-    <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="obsolete">Modulacija (Privzeto: Avto)</translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="obsolete">Sozvezdje (Privzeto: Avto)</translation>
-    </message>
-    <message>
         <source>Forward Error Correction (Default: Auto)</source>
         <translation>Napredno odpravljanje napak (Privzeto: Avto)</translation>
     </message>
@@ -6061,10 +5849,6 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
     <message>
         <source>TV audio through PVR-350 only</source>
         <translation>TV zvok samo čez PVR-350</translation>
-    </message>
-    <message>
-        <source>Terrestrial</source>
-        <translation type="obsolete">Zemeljski</translation>
     </message>
     <message>
         <source>Cable</source>
@@ -6255,10 +6039,6 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
     <message>
         <source>Germany</source>
         <translation>Nemčija</translation>
-    </message>
-    <message>
-        <source>Scan Type</source>
-        <translation type="obsolete">Tip iskanja</translation>
     </message>
     <message>
         <source>Channel Change Error</source>
@@ -6466,10 +6246,6 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>je bila označena, naj se nikoli ne posname.</translation>
     </message>
     <message>
-        <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="obsolete">Želi uporabiti ločene ATSC višje in nižje kanale.</translation>
-    </message>
-    <message>
         <source>DBOX2 Streaming Port</source>
         <translation>DBOX2 vrata predvajanja</translation>
     </message>
@@ -6660,44 +6436,8 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Spreminjanje obstoječih vhodov pri karticah, brisanje katerihkoli nastavitev ali iskanje kanalov, verjetno ne bo delovalo.</translation>
     </message>
     <message>
-        <source>Channel Scanner</source>
-        <translation type="obsolete">Iskalec kanalov</translation>
-    </message>
-    <message>
-        <source>Starts the channel scanner.</source>
-        <translation type="obsolete">Zažene iskalca kanalov.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Urejanje transporta</translation>
-    </message>
-    <message>
-        <source>Allows you to edit the transports directly</source>
-        <translation type="obsolete">Omogoča neposredno urejanje transporta</translation>
-    </message>
-    <message>
-        <source>This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="obsolete">Potrebno v zelo malo primerih. Razen, če uporabljate satelitski krožnik in morate, za začetek iskanja kanalov, vnesti začetno frekvenco.</translation>
-    </message>
-    <message>
-        <source>(5_1) Underscore</source>
-        <translation type="obsolete">(5_1) Podocena</translation>
-    </message>
-    <message>
-        <source>(5-1) Minus</source>
-        <translation type="obsolete">(5_1) Minus</translation>
-    </message>
-    <message>
-        <source>(5.1) Period</source>
-        <translation type="obsolete">(5.1) Perioda</translation>
-    </message>
-    <message>
-        <source>(501) Zero</source>
-        <translation type="obsolete">(501) Nula</translation>
-    </message>
-    <message>
-        <source>(51) None</source>
-        <translation type="obsolete">(51) Noben</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6736,24 +6476,8 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Na LCD zaslonu prikaže informacijo o glasnosti.</translation>
     </message>
     <message>
-        <source>Minimal Updates</source>
-        <translation type="obsolete">Najmanjše posodobitve</translation>
-    </message>
-    <message>
-        <source>Rename to Match</source>
-        <translation type="obsolete">Preimenuj za ujemanje</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Odstrani</translation>
-    </message>
-    <message>
-        <source>Existing Channel Treatment</source>
-        <translation type="obsolete">Ravnanje z obstoječimi kanali</translation>
-    </message>
-    <message>
-        <source>How to treat existing channels.</source>
-        <translation type="obsolete">Kako ravnam z obstoječimi kanali.</translation>
     </message>
     <message>
         <source>Analog V4L capture card</source>
@@ -6838,10 +6562,6 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
     <message>
         <source>Frequency table to use.</source>
         <translation>Uporabljena frekvenčna tabela.</translation>
-    </message>
-    <message>
-        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="obsolete">Za kanale &apos;preko-zraka&apos;, večina kabeljskih sistemov v USA uporablja QAM-256 ali QAM-64, nekateri pa lahko uporabljajo 8-VSB.</translation>
     </message>
     <message>
         <source>Subtype</source>
@@ -6946,14 +6666,6 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
     <message>
         <source>and generally provides data only for the next few days.</source>
         <translation>in v splošnem ponuja le podatke za nekja dni naprej.</translation>
-    </message>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="obsolete">Prezri čakanje na signal</translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="obsolete">Ta možnost vam omogoča upočasnitev iskanja signalov. Uporabno pri nepravilno delujočih DVB gonilnikih za kartice, kot je Leadtek LR6650 DVB kartica.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
@@ -7160,14 +6872,6 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
         <translation>Pri virih, kjer se uporablja DTS zapis zvoka (ponavadi DVD-ji), bo DTS zvok usmerjen neposredno na SPDIF izhod zvočne kartice.  Potrebuje primerne nastavitve zvočne kartice.</translation>
     </message>
     <message>
-        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
-        <translation type="obsolete">Med uporabo sita &quot;Vsi programi&quot;, pokaži posnetke &quot;ŽivaTV&quot;</translation>
-    </message>
-    <message>
-        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="obsolete">Če onemogočite, bodo posnetki na voljo le preko posebne snemalne skupine  &quot;ŽivaTV&quot;.</translation>
-    </message>
-    <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
         <translation>Uporabljena metoda za odkrivanje, kateri posnetki se bodo prvi izbrisali.  Posnetki ŽiveTV, se bodo vedno izbrisali pred normalnimi posnetki.</translation>
     </message>
@@ -7190,18 +6894,6 @@ Večina kartic te nastavitve zazna samodejno, pustite na Avto, drugače ne bo de
     <message>
         <source>, using your %1 rate of %2 Kb/sec</source>
         <translation>, vaša ocena %1 pri %2 Kb/sek</translation>
-    </message>
-    <message>
-        <source>%1 hours left</source>
-        <translation type="obsolete">Preostanek %1 ur</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left</source>
-        <translation type="obsolete">Preostanek %1 ur in %2 minut</translation>
-    </message>
-    <message>
-        <source>%1 minutes left</source>
-        <translation type="obsolete">Preostanek %1 minut</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
@@ -8326,14 +8018,6 @@ Frekvenca kanala v</translation>
         <translation>Višina slike uporabljena pri kodirnaju. Opozorilo: Pri PVR-x50 karticah, če nimate nastavljeno pri NTSC ali PAL na 480 ali 576, se lahko pojavi dvojna slika.</translation>
     </message>
     <message>
-        <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation type="obsolete">Modulacija, 8-VSB, QAM-256, itd.</translation>
-    </message>
-    <message>
-        <source>ATSC Channel Separator</source>
-        <translation type="obsolete">Ločilec ATSC kanalov</translation>
-    </message>
-    <message>
         <source>Include in the &quot;%1&quot; recording group</source>
         <translation>vključi v snemalno skupino &quot;%1&quot;</translation>
     </message>
@@ -8832,10 +8516,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>One Field (2x, HW)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11256,6 +10936,30 @@ Do you wish to continue watching?</source>
         <source>The command used to wake up this slave from sleep.  This setting is not used on the master backend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to configure plugin %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The plugin %1 has failed to run for some reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to switch video renderer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11359,14 +11063,6 @@ Do you wish to continue watching?</source>
         <translation>Uvoz channels.conf</translation>
     </message>
     <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Popolno iskanje po obstoječih povezavah</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Iskanje po obstoječih povezavah</translation>
-    </message>
-    <message>
         <source>M3U Import</source>
         <translation>Popolno iskanje (Uglašeno)</translation>
     </message>
@@ -11399,33 +11095,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Scan Configuration</source>
         <translation>Nastavitve iskanja</translation>
-    </message>
-</context>
-<context>
-    <name>ScanWizardScanner</name>
-    <message>
-        <source>Scanning</source>
-        <translation type="obsolete">Iskanje</translation>
-    </message>
-    <message>
-        <source>ScanWizard</source>
-        <translation type="obsolete">Čarovnik za iskanje</translation>
-    </message>
-    <message>
-        <source>Error tuning to transport</source>
-        <translation type="obsolete">Napaka pri uglaševanju k povezavam</translation>
-    </message>
-    <message>
-        <source>Failed to open &apos;%1&apos;</source>
-        <translation type="obsolete">Ne morem odpreti &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Failed to parse &apos;%1&apos;</source>
-        <translation type="obsolete">Ne morem pridobiti &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Error starting scan</source>
-        <translation type="obsolete">Napaka pri zagonu iskanja</translation>
     </message>
 </context>
 <context>
@@ -11560,24 +11229,8 @@ No other details</source>
 Ni ostalih podatkov</translation>
     </message>
     <message>
-        <source>%1 recordings consuming %2 are allowed to expire</source>
-        <translation type="obsolete">%1 posnetkom, ki uporabljajo %2, je dovoljeno brisanje</translation>
-    </message>
-    <message>
-        <source>%1 of these are LiveTV and consume %2</source>
-        <translation type="obsolete">%1 jih je ŽivaTV in uporabljajo %2</translation>
-    </message>
-    <message>
         <source>is unavailable</source>
         <translation>ni na voljo</translation>
-    </message>
-    <message>
-        <source>standard rules are defined</source>
-        <translation type="obsolete">standardna pravila so definirana</translation>
-    </message>
-    <message>
-        <source>search rules are defined</source>
-        <translation type="obsolete">pravila iskanja so definirana</translation>
     </message>
     <message>
         <source>Scheduled Run Time:</source>
@@ -11724,14 +11377,6 @@ Ni ostalih podatkov</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>day</source>
-        <translation type="obsolete">dan</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="obsolete">dni</translation>
-    </message>
-    <message>
         <source>WARNING: is mythfilldatabase running?</source>
         <translation type="unfinished">OPOZORILO: ali je mythfilldatabase zagnan?</translation>
     </message>
@@ -11870,23 +11515,23 @@ Ni ostalih podatkov</translation>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>%n (is) LiveTV and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 (is) Deleted and consume(s) %2
-</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>is asleep</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) LiveTV and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n (is) Deleted and consume(s) %1
+</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12073,10 +11718,6 @@ Directory From Storage Group?</source>
     <message>
         <source>Skip</source>
         <translation>Izpusti</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minut</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
@@ -12820,10 +12461,6 @@ Izberite trenutno snemanje</translation>
         </translation>
     </message>
     <message>
-        <source>Recovered from video error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>DVD Title Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13259,6 +12896,14 @@ Izberite trenutno snemanje</translation>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
