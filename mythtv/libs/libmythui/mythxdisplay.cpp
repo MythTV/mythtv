@@ -173,11 +173,15 @@ bool MythXDisplay::CreateGC(Window win)
 
 void MythXDisplay::SetForeground(unsigned long color)
 {
+    if (!m_gc)
+        return;
     XLOCK(this, XSetForeground(m_disp, m_gc, color));
 }
 
 void MythXDisplay::FillRectangle(Window win, const QRect rect)
 {
+    if (!m_gc)
+        return;
     XLOCK(this, XFillRectangle(m_disp, win, m_gc,
                               rect.left(), rect.top(),
                               rect.width(), rect.height()));
