@@ -12,7 +12,7 @@ extern "C" {
 #include "compat.h"
 #include "mythverbose.h"
 
-#if defined(USING_XVMC) || defined(USING_VDPAU)
+#ifdef USING_XVMC
 #include "videoout_xv.h" // for xvmc stuff
 #endif
 

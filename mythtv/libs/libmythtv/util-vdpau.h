@@ -7,6 +7,9 @@ extern "C" {
 
 #include "videobuffers.h"
 #include "mythxdisplay.h"
+#include "mythcodecid.h"
+#include "videoouttypes.h"
+
 #define MAX_VDPAU_ERRORS 10
 
 struct vdpauPIP
