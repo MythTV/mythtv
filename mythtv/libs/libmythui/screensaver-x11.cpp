@@ -7,7 +7,7 @@
 #include "mythdb.h"
 
 #include "screensaver-x11.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 
 #include <X11/Xlib.h>
 
@@ -48,12 +48,12 @@ class ScreenSaverX11Private
                 VERBOSE(VB_GENERAL, LOC + "Gnome screen saver support enabled");
         }
 
-        m_display = MythXOpenDisplay();
-
+        m_display = OpenMythXDisplay();
         if (m_display)
         {
             int dummy0, dummy1;
-            m_dpmsaware = DPMSQueryExtension(m_display, &dummy0, &dummy1);
+            m_dpmsaware = DPMSQueryExtension(m_display->GetDisplay(),
+                                            &dummy0, &dummy1);
         }
         else
         {
@@ -70,7 +70,7 @@ class ScreenSaverX11Private
              * manually initialize dpmsenabled to false.
              */
 
-            DPMSInfo(m_display, &power_level, &m_dpmsenabled);
+            DPMSInfo(m_display->GetDisplay(), &power_level, &m_dpmsenabled);
 
             if (m_dpmsenabled)
                 VERBOSE(VB_GENERAL, "DPMS is active.");
@@ -87,7 +87,7 @@ class ScreenSaverX11Private
     {
         // m_resetTimer deleted by ScreenSaverX11 QObject dtor
         if (m_display)
-            XCloseDisplay(m_display);
+            delete m_display;
     }
 
     bool IsScreenSaverRunning(void) const
@@ -140,9 +140,10 @@ class ScreenSaverX11Private
         if (IsDPMSEnabled() && m_display)
         {
             m_dpmsdeactivated = true;
-            Status status = DPMSDisable(m_display);
-            XSync(m_display, FALSE);
-            VERBOSE(VB_GENERAL, LOC + QString("DPMS Deactivated %1").arg(status));
+            Status status = DPMSDisable(m_display->GetDisplay());
+            m_display->Sync();
+            VERBOSE(VB_GENERAL, LOC +
+                QString("DPMS Deactivated %1").arg(status));
         }
     }
 
@@ -151,9 +152,10 @@ class ScreenSaverX11Private
         if (m_dpmsdeactivated && m_display)
         {
             m_dpmsdeactivated = false;
-            Status status = DPMSEnable(m_display);
-            XSync(m_display, FALSE);
-            VERBOSE(VB_GENERAL, LOC + QString("DPMS Reactivated %1").arg(status));
+            Status status = DPMSEnable(m_display->GetDisplay());
+            m_display->Sync();
+            VERBOSE(VB_GENERAL, LOC +
+                QString("DPMS Reactivated %1").arg(status));
         }
     }
 
@@ -161,8 +163,9 @@ class ScreenSaverX11Private
     {
         if (!m_state.saved && m_display)
         {
-            XGetScreenSaver(m_display, &m_state.timeout, &m_state.interval,
-                            &m_state.preferblank, &m_state.allowexposure);
+            XGetScreenSaver(m_display->GetDisplay(), &m_state.timeout,
+                            &m_state.interval, &m_state.preferblank,
+                            &m_state.allowexposure);
             m_state.saved = true;
         }
     }
@@ -171,9 +174,10 @@ class ScreenSaverX11Private
     {
         if (m_state.saved && m_display)
         {
-            XSetScreenSaver(m_display, m_state.timeout, m_state.interval,
-                            m_state.preferblank, m_state.allowexposure);
-            XSync(m_display, FALSE);
+            XSetScreenSaver(m_display->GetDisplay(), m_state.timeout,
+                            m_state.interval, m_state.preferblank,
+                            m_state.allowexposure);
+            m_display->Sync();
             m_state.saved = false;
         }
     }
@@ -228,7 +232,7 @@ class ScreenSaverX11Private
     QDateTime m_last_deactivated;
 
     ScreenSaverState m_state;
-    Display *m_display;
+    MythXDisplay *m_display;
 };
 
 ScreenSaverX11::ScreenSaverX11() :
@@ -251,9 +255,9 @@ void ScreenSaverX11::Disable(void)
 
     if (d->m_display)
     {
-        XResetScreenSaver(d->m_display);
-        XSetScreenSaver(d->m_display, 0, 0, 0, 0);
-        XSync(d->m_display, FALSE);
+        XResetScreenSaver(d->m_display->GetDisplay());
+        XSetScreenSaver(d->m_display->GetDisplay(), 0, 0, 0, 0);
+        d->m_display->Sync();
     }
 
     d->DisableDPMS();
@@ -270,8 +274,8 @@ void ScreenSaverX11::Restore(void)
     // One must reset after the restore
     if (d->m_display)
     {
-        XResetScreenSaver(d->m_display);
-        XSync(d->m_display, FALSE);
+        XResetScreenSaver(d->m_display->GetDisplay());
+        d->m_display->Sync();
     }
 
     if (d->IsScreenSaverRunning())
@@ -281,23 +285,27 @@ void ScreenSaverX11::Restore(void)
 void ScreenSaverX11::Reset(void)
 {
     bool need_xsync = false;
+    Display *dsp = NULL;
     if (d->m_display)
+        dsp = d->m_display->GetDisplay();
+
+    if (dsp)
     {
-        XResetScreenSaver(d->m_display);
+        XResetScreenSaver(dsp);
         need_xsync = true;
     }
 
     if (d->IsScreenSaverRunning())
         resetSlot();
 
-    if (Asleep() && d->m_display)
+    if (Asleep() && dsp)
     {
-        DPMSForceLevel(d->m_display, DPMSModeOn);
+        DPMSForceLevel(dsp, DPMSModeOn);
         need_xsync = true;
     }
 
-    if (need_xsync)
-        XSync(d->m_display, FALSE);
+    if (need_xsync && d->m_display)
+        d->m_display->Sync();
 }
 
 bool ScreenSaverX11::Asleep(void)
@@ -312,7 +320,7 @@ bool ScreenSaverX11::Asleep(void)
     CARD16 power_level = DPMSModeOn;
 
     if (d->m_display)
-        DPMSInfo(d->m_display, &power_level, &on);
+        DPMSInfo(d->m_display->GetDisplay(), &power_level, &on);
 
     return (power_level != DPMSModeOn);
 }
