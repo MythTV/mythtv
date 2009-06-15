@@ -11,7 +11,7 @@ using namespace std;
 
 #ifdef USING_X11
 // MythTV headers
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
 #endif
@@ -184,10 +184,9 @@ class OpenGLContextGLX : public OpenGLContext
     OpenGLContextGLX(QMutex *lock);
     ~OpenGLContextGLX();
 
-    bool Create(Display *display, Window window, uint screen_num,
-                const QRect &display_visible, bool colour_control = false,
-                bool map_window = true);
-    static bool IsGLXSupported(Display *display, uint major, uint minor);
+    bool Create(MythXDisplay *display, Window window, const QRect &display_visible,
+                bool colour_control = false, bool map_window = true);
+    static bool IsGLXSupported(MythXDisplay *display, uint major, uint minor);
 
     bool Create(WId window, const QRect &display_visible, bool colour_control = false);
     void Show(void);
@@ -196,11 +195,11 @@ class OpenGLContextGLX : public OpenGLContext
     void UnmapWindow(void);
     bool MakeContextCurrent(bool current);
     void SwapBuffers(void);
-    uint GetScreenNum(void)  const { return m_screen_num;   }
+    uint GetScreenNum(void)  const { return m_display->GetScreen(); }
     int  GetRefreshRate(void);
     void SetSwapInterval(int interval);
     void GetDisplayDimensions(QSize &dimensions);
-    int  GetNumberOfScreens(void) { return GetNumberOfXineramaScreens(); }
+    int  GetNumberOfScreens(void) { return GetNumberXineramaScreens(); }
     void GetDisplaySize(QSize &size);
     void MoveResizeWindow(QRect rect);
 
@@ -212,17 +211,16 @@ class OpenGLContextGLX : public OpenGLContext
             ((m_major_ver == major) && (m_minor_ver >= minor));
     }
 
-    Display     *m_display;
-    bool         m_created_display;
-    uint         m_screen_num;
-    uint         m_major_ver;
-    uint         m_minor_ver;
-    GLXFBConfig  m_glx_fbconfig;
-    Window       m_gl_window;
-    GLXWindow    m_glx_window;
-    GLXContext   m_glx_context;
-    XVisualInfo *m_vis_info;
-    int const   *m_attr_list;
+    MythXDisplay *m_display;
+    bool          m_created_display;
+    uint          m_major_ver;
+    uint          m_minor_ver;
+    GLXFBConfig   m_glx_fbconfig;
+    Window        m_gl_window;
+    GLXWindow     m_glx_window;
+    GLXContext    m_glx_context;
+    XVisualInfo  *m_vis_info;
+    int const    *m_attr_list;
 };
 #endif // USING_X11
 

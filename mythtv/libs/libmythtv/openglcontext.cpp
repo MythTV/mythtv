@@ -1256,7 +1256,7 @@ bool OpenGLContext::OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
 
 OpenGLContextGLX::OpenGLContextGLX(QMutex *lock)
     : OpenGLContext(lock),
-      m_display(NULL),     m_created_display(false), m_screen_num(0),
+      m_display(NULL),     m_created_display(false),
       m_major_ver(1),      m_minor_ver(1),
       m_glx_fbconfig(0),   m_gl_window(0),   m_glx_window(0),
       m_glx_context(NULL), m_vis_info(NULL), m_attr_list(NULL)
@@ -1279,7 +1279,7 @@ void OpenGLContextGLX::Show(void)
 void OpenGLContextGLX::MapWindow(void)
 {
     if (m_display && m_priv && m_gl_window)
-        X11S(XMapWindow(m_display, m_gl_window));
+        XLOCK(m_display, XMapWindow(m_display->GetDisplay(), m_gl_window));
 }
 
 void OpenGLContextGLX::Hide(void)
@@ -1292,42 +1292,42 @@ void OpenGLContextGLX::Hide(void)
 void OpenGLContextGLX::UnmapWindow(void)
 {
     if (m_display && m_priv && m_gl_window)
-        X11S(XUnmapWindow(m_display, m_gl_window));
+        XLOCK(m_display, XUnmapWindow(m_display->GetDisplay(), m_gl_window));
 }
 
 bool OpenGLContextGLX::Create(WId window, const QRect &display_visible,
                               bool colour_control)
 {
-    m_display = MythXOpenDisplay();
+    m_display = OpenMythXDisplay();
     if (!m_display)
         return false;
     m_created_display = true;
-    X11S(m_screen_num = DefaultScreen(m_display));
 
     bool show_window = true;
 
     if (!window)
     {
-        X11S(window = DefaultRootWindow(m_display));
+        window = m_display->GetRoot();
         show_window = false;
     }
 
     if (!window)
         return false;
 
-    return Create(m_display, window, m_screen_num,
-                  display_visible, colour_control, show_window);
+    return Create(m_display, window, display_visible,
+                  colour_control, show_window);
 }
 
-bool OpenGLContextGLX::Create(Display *XJ_disp, Window XJ_curwin,
-                              uint screen_num, const QRect &display_visible,
+bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
+                              const QRect &display_visible,
                               bool colour_control, bool map_window)
 {
-    m_display = XJ_disp;
-    m_screen_num = screen_num;
+    m_display = disp;
     uint major, minor;
+    MythXLocker lock(m_display);
+    Display *d = m_display->GetDisplay();
 
-    if (!get_glx_version(XJ_disp, major, minor))
+    if (!get_glx_version(m_display, major, minor))
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + "GLX extension not present.");
         return false;
@@ -1347,73 +1347,64 @@ bool OpenGLContextGLX::Create(Display *XJ_disp, Window XJ_curwin,
     else if ((1 == major) && (minor == 2))
     {
         m_attr_list = get_attr_cfg(kRenderRGBA);
-        X11S(m_vis_info = glXChooseVisual(
-                 m_display, m_screen_num, (int*) m_attr_list));
+        m_vis_info = glXChooseVisual(d, disp->GetScreen(), (int*) m_attr_list);
         if (!m_vis_info)
         {
             m_attr_list = get_attr_cfg(kSimpleRGBA);
-            X11S(m_vis_info = glXChooseVisual(
-                     m_display, m_screen_num, (int*) m_attr_list));
+            m_vis_info = glXChooseVisual(d, disp->GetScreen(), (int*) m_attr_list);
         }
         if (!m_vis_info)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "No appropriate visual found");
             return false;
         }
-        X11S(m_glx_context = glXCreateContext(
-                 XJ_disp, m_vis_info, None, GL_TRUE));
+        m_glx_context = glXCreateContext(d, m_vis_info, None, GL_TRUE);
     }
     else
     {
         m_attr_list = get_attr_cfg(kRenderRGBA);
-        m_glx_fbconfig = get_fbuffer_cfg(
-            XJ_disp, m_screen_num, m_attr_list);
+        m_glx_fbconfig = get_fbuffer_cfg(m_display, m_attr_list);
 
         if (!m_glx_fbconfig)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "No framebuffer "
                     "with needed OpenGL attributes.");
-
             return false;
         }
 
 
-        X11S(m_glx_context = glXCreateNewContext(
-                 m_display, m_glx_fbconfig,
-                 GLX_RGBA_TYPE, NULL, GL_TRUE));
+        m_glx_context = glXCreateNewContext(
+                 d, m_glx_fbconfig,
+                 GLX_RGBA_TYPE, NULL, GL_TRUE);
     }
 
     if (!m_glx_context)
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + "Failed to create GLX context");
-
         return false;
     }
 
     if ((1 == major) && (minor > 2))
     {
-        X11S(m_vis_info = glXGetVisualFromFBConfig(XJ_disp, m_glx_fbconfig));
+        m_vis_info = glXGetVisualFromFBConfig(d, m_glx_fbconfig);
     }
 
-    m_gl_window = get_gl_window(XJ_disp, XJ_curwin,
+    m_gl_window = get_gl_window(m_display, XJ_curwin,
                                 m_vis_info, display_visible, map_window);
 
     if (!m_gl_window)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't create OpenGL Window");
-
         return false;
     }
 
     if ((1 == major) && (minor > 2))
     {
-        X11S(m_glx_window = glXCreateWindow(
-                 m_display, m_glx_fbconfig, m_gl_window, NULL));
+        m_glx_window = glXCreateWindow(d, m_glx_fbconfig, m_gl_window, NULL);
 
         if (!m_glx_window)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't create GLX Window");
-
             return false;
         }
     }
@@ -1426,8 +1417,7 @@ bool OpenGLContextGLX::Create(Display *XJ_disp, Window XJ_curwin,
         debugged = true;
 
         bool direct = false; 
-        X11S(direct = glXIsDirect(m_display, m_glx_context));
-
+        direct = glXIsDirect(d, m_glx_context);
         VERBOSE(VB_PLAYBACK, LOC + QString("GLX Version: %1.%2")
                 .arg(major).arg(minor));
         VERBOSE(VB_PLAYBACK, LOC + QString("Direct rendering: %1")
@@ -1435,7 +1425,7 @@ bool OpenGLContextGLX::Create(Display *XJ_disp, Window XJ_curwin,
     }
 
     const char *xt = NULL;
-    X11S(xt = glXQueryExtensionsString(m_display, m_screen_num));
+    xt = glXQueryExtensionsString(d, disp->GetScreen());
     const QString glx_ext = xt;
     m_ext_supported = ((minor >= 3) ? kGLXPBuffer : 0) |
         (has_glx_swapinterval_support(glx_ext) ? kGLGLXSwap : 0);
@@ -1449,34 +1439,25 @@ bool OpenGLContextGLX::Create(Display *XJ_disp, Window XJ_curwin,
 bool OpenGLContextGLX::MakeContextCurrent(bool current)
 {
     bool ok = true;
+    m_display->Lock();
+    Display *d = m_display->GetDisplay();
     if (current)
     {
+
         if (IsGLXSupported(1,3))
-        {
-            X11S(ok = glXMakeContextCurrent(m_display,
-                                            m_glx_window,
-                                            m_glx_window,
-                                            m_glx_context));
-        }
+            ok = glXMakeContextCurrent(d, m_glx_window,
+                                       m_glx_window, m_glx_context);
         else
-        {
-            X11S(ok = glXMakeCurrent(m_display,
-                                     m_gl_window,
-                                     m_glx_context));
-        }
+            ok = glXMakeCurrent(d, m_gl_window, m_glx_context);
     }
     else
     {
         if (IsGLXSupported(1,3))
-        {
-            X11S(ok = glXMakeContextCurrent(m_display, None, None, NULL));
-        }
+            ok = glXMakeContextCurrent(d, None, None, NULL);
         else
-        {
-            X11S(ok = glXMakeCurrent(m_display, None, NULL));
-        }
+            ok = glXMakeCurrent(d, None, NULL);
     }
-
+    m_display->Unlock();
     return ok;
 }
 
@@ -1487,20 +1468,24 @@ void OpenGLContextGLX::SwapBuffers(void)
     if (m_ext_used & kGLFinish)
         glFinish();
 
+    m_display->Lock();
     if (IsGLXSupported(1,3))
-        X11S(glXSwapBuffers(m_display, m_glx_window));
+        glXSwapBuffers(m_display->GetDisplay(), m_glx_window);
     else
-        X11S(glXSwapBuffers(m_display, m_gl_window));
+        glXSwapBuffers(m_display->GetDisplay(), m_gl_window);
+    m_display->Unlock();
 
     MakeCurrent(false);
 }
 
 void OpenGLContextGLX::DeleteWindowResources(void)
 {
+    m_display->Lock();
+    Display *d = m_display->GetDisplay();
     if (m_glx_window)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Destroying glx window");
-        X11S(glXDestroyWindow(m_display, m_glx_window));
+        glXDestroyWindow(d, m_glx_window);
         m_glx_window = 0;
     }
 
@@ -1509,33 +1494,31 @@ void OpenGLContextGLX::DeleteWindowResources(void)
         VERBOSE(VB_PLAYBACK, LOC + "Unmapping gl window");
         UnmapWindow(); // needed for nvidia driver bug
         VERBOSE(VB_PLAYBACK, LOC + "Destroying gl window");
-        X11S(XDestroyWindow(m_display, m_gl_window));
+        XDestroyWindow(d, m_gl_window);
         m_gl_window = 0;
     }
-
-    X11L;
 
     if (m_glx_context)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Destroying glx context");
-        glXDestroyContext(m_display, m_glx_context);
+        glXDestroyContext(d, m_glx_context);
         m_glx_context = 0;
     }
 
-    XSync(m_display, false);
+    m_display->Sync();
+    m_display->Unlock();
 
     if (m_created_display && m_display)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Closing display");
-        XCloseDisplay(m_display);
+        delete m_display;
         m_display = NULL;
         m_created_display = false;
     }
 
-    X11U;
 }
 
-bool OpenGLContextGLX::IsGLXSupported(Display *display, uint min_major,
+bool OpenGLContextGLX::IsGLXSupported(MythXDisplay *display, uint min_major,
                                       uint min_minor)
 {
     uint major, minor;
@@ -1550,7 +1533,7 @@ bool OpenGLContextGLX::IsGLXSupported(Display *display, uint min_major,
 
 int OpenGLContextGLX::GetRefreshRate(void)
 {
-    return MythXGetRefreshRate(m_display, m_screen_num);
+    return m_display->GetRefreshRate();
 }
 
 void OpenGLContextGLX::SetSwapInterval(int interval)
@@ -1560,7 +1543,7 @@ void OpenGLContextGLX::SetSwapInterval(int interval)
 
     MakeCurrent(true);
 
-    X11S(gMythGLXSwapIntervalSGI(interval));
+    XLOCK(m_display, gMythGLXSwapIntervalSGI(interval));
 
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Swap interval set to %1.").arg(interval));
@@ -1570,19 +1553,17 @@ void OpenGLContextGLX::SetSwapInterval(int interval)
 
 void OpenGLContextGLX::GetDisplayDimensions(QSize &dimensions)
 {
-    dimensions = MythXGetDisplayDimensions(m_display, m_screen_num);
+    dimensions = m_display->GetDisplayDimensions();
 }
 
 void OpenGLContextGLX::GetDisplaySize(QSize &size)
 {
-    size = MythXGetDisplaySize(m_display, m_screen_num);
+    size = m_display->GetDisplaySize();
 }
 
 void OpenGLContextGLX::MoveResizeWindow(QRect rect)
 {
-    X11S(XMoveResizeWindow(m_display, m_gl_window,
-                           rect.left(), rect.top(),
-                           rect.width(), rect.height()));
+    m_display->MoveResizeWin(m_gl_window, rect);
     m_window_rect = rect;
 }
 #endif // USING_X11

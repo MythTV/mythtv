@@ -61,6 +61,10 @@ bool init_opengl(void)
     if (is_initialized)
         return is_valid;
 
+#ifdef USING_X11
+    LockMythXDisplays(true);
+#endif
+
     is_initialized = true;
 
     gMythGLActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
@@ -149,11 +153,14 @@ bool init_opengl(void)
     gMythGLFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
         get_gl_proc_address("glFinishFenceAPPLE");
 
+#ifdef USING_X11
+    LockMythXDisplays(false);
+#endif
     return is_valid;
 }
 
 #ifdef USING_X11
-bool get_glx_version(Display *XJ_disp, uint &major, uint &minor)
+bool get_glx_version(MythXDisplay *disp, uint &major, uint &minor)
 {
     // Crashes Unichrome-based system if it is run more than once. -- Tegue
     static bool has_run = false;
@@ -175,7 +182,9 @@ bool get_glx_version(Display *XJ_disp, uint &major, uint &minor)
     major = minor = 0;
     has_run = true;
 
-    X11S(ret = glXQueryExtension(XJ_disp, &errbase, &eventbase));
+    XLOCK(disp,
+        ret = glXQueryExtension(disp->GetDisplay(), &errbase, &eventbase));
+
     if (!ret)
         return false;
 
@@ -185,11 +194,12 @@ bool get_glx_version(Display *XJ_disp, uint &major, uint &minor)
     // display pointer and then use that display pointer for
     // something other than OpenGL. So we open a separate
     // connection to the X server here just to query the GLX version.
-    Display *tmp_disp = MythXOpenDisplay();
-    X11L;
-    ret = glXQueryVersion(tmp_disp, &gl_major, &gl_minor);
-    XCloseDisplay(tmp_disp);
-    X11U;
+    MythXDisplay *tmp_disp = OpenMythXDisplay();
+    if (tmp_disp)
+    {
+        ret = glXQueryVersion(tmp_disp->GetDisplay(), &gl_major, &gl_minor);
+        delete tmp_disp;
+    }
 
     if (!ret)
         return false;
@@ -245,8 +255,7 @@ int const *get_attr_cfg(FrameBufferType type)
 }
 
 
-GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
-                            const int *attr_fbconfig)
+GLXFBConfig get_fbuffer_cfg(MythXDisplay *disp, const int *attr_fbconfig)
 {
 
 
@@ -254,9 +263,10 @@ GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
     GLXFBConfig *cfgs = NULL;
     int          num  = 0;
 
-    X11L;
+    MythXLocker lock(disp);
 
-    cfgs = glXChooseFBConfig(XJ_disp, XJ_screen_num, attr_fbconfig, &num);
+    cfgs = glXChooseFBConfig(disp->GetDisplay(), disp->GetScreen(),
+                             attr_fbconfig, &num);
 
     if (num)
     {
@@ -266,7 +276,8 @@ GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
         for (int i = 0; i < num; i++)
         {
             int value;
-            glXGetFBConfigAttrib(XJ_disp, cfgs[i], GLX_DEPTH_SIZE, &value);
+            glXGetFBConfigAttrib(disp->GetDisplay(), cfgs[i],
+                                 GLX_DEPTH_SIZE, &value);
             if (!value)
             {
                 cfg = cfgs[i];
@@ -276,15 +287,12 @@ GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
     }
 
     XFree(cfgs);
-
-    X11U;
-
     return cfg;
 }
 
-GLXPbuffer get_pbuffer(Display     *XJ_disp,
-                       GLXFBConfig  glx_fbconfig,
-                       const QSize &video_dim)
+GLXPbuffer get_pbuffer(MythXDisplay *disp,
+                       GLXFBConfig   glx_fbconfig,
+                       const QSize  &video_dim)
 {
     int attrib_pbuffer[16];
     bzero(attrib_pbuffer, sizeof(int) * 16);
@@ -298,49 +306,47 @@ GLXPbuffer get_pbuffer(Display     *XJ_disp,
     GLXPbuffer tmp = 0;
 
 #ifdef GLX_VERSION_1_3
-    X11S(tmp = glXCreatePbuffer(XJ_disp, glx_fbconfig, attrib_pbuffer));
+    XLOCK(disp, tmp = glXCreatePbuffer(disp->GetDisplay(),
+                                glx_fbconfig, attrib_pbuffer));
 #endif // GLX_VERSION_1_3
 
     return tmp;
 }
 
-Window get_gl_window(Display     *XJ_disp,
-                     Window       XJ_curwin,
+Window get_gl_window(MythXDisplay *disp,
+                     Window        XJ_curwin,
                      XVisualInfo  *visInfo,
-                     const QRect &window_rect,
-                     bool         map_window)
+                     const QRect  &window_rect,
+                     bool          map_window)
 {
-    X11L;
+    MythXLocker lock(disp);
 
     XSetWindowAttributes attributes;
     attributes.colormap = XCreateColormap(
-        XJ_disp, XJ_curwin, visInfo->visual, AllocNone);
+        disp->GetDisplay(), XJ_curwin, visInfo->visual, AllocNone);
 
     Window gl_window = XCreateWindow(
-        XJ_disp, XJ_curwin, window_rect.x(), window_rect.y(), 
+        disp->GetDisplay(), XJ_curwin, window_rect.x(), window_rect.y(),
         window_rect.width(), window_rect.height(), 0,
         visInfo->depth, InputOutput, visInfo->visual, CWColormap, &attributes);
 
     if (map_window)
-        XMapWindow(XJ_disp, gl_window);
+        XMapWindow(disp->GetDisplay(), gl_window);
 
     XFree(visInfo);
-
-    X11U;
-
     return gl_window;
 }
 
-GLXWindow get_glx_window(Display    *XJ_disp,     GLXFBConfig  glx_fbconfig,
-                         Window      gl_window,   GLXContext   glx_context,
-                         GLXPbuffer  glx_pbuffer, const QSize &window_size)
+GLXWindow get_glx_window(MythXDisplay *disp,        GLXFBConfig  glx_fbconfig,
+                         Window        gl_window,   GLXContext   glx_context,
+                         GLXPbuffer    glx_pbuffer, const QSize &window_size)
 {
-    X11L;
-
+    MythXLocker lock(disp);
     GLXWindow glx_window = glXCreateWindow(
-        XJ_disp, glx_fbconfig, gl_window, NULL);
+        disp->GetDisplay(), glx_fbconfig, gl_window, NULL);
 
-    glXMakeContextCurrent(XJ_disp, glx_window, glx_pbuffer, glx_context);
+    glXMakeContextCurrent(disp->GetDisplay(), glx_window,
+                          glx_pbuffer, glx_context);
 
     glDrawBuffer(GL_BACK_LEFT);
     glReadBuffer(GL_FRONT_LEFT);
@@ -358,10 +364,7 @@ GLXWindow get_glx_window(Display    *XJ_disp,     GLXFBConfig  glx_fbconfig,
 
     glFinish();
 
-    glXMakeContextCurrent(XJ_disp, None, None, NULL);
-
-    X11U;
-
+    glXMakeContextCurrent(disp->GetDisplay(), None, None, NULL);
     return glx_window;
 }                       
 #endif // USING_X11
@@ -374,13 +377,13 @@ void *get_gl_proc_address(const QString &procName)
     const GLubyte *procedureName = (const GLubyte*) tmp.constData();
 
 #if USING_GLX_PROC_ADDR_ARB
-    X11S(ret = (void*)glXGetProcAddressARB(procedureName));
+    ret = (void*)glXGetProcAddressARB(procedureName);
 #elif GLX_VERSION_1_4
-    X11S(ret = (void*)glXGetProcAddress(procedureName));
+    ret = (void*)glXGetProcAddress(procedureName);
 #elif GLX_ARB_get_proc_address
-    X11S(ret = (void*)glXGetProcAddressARB(procedureName));
+    ret = (void*)glXGetProcAddressARB(procedureName);
 #elif GLX_EXT_get_proc_address
-    X11S(ret = (void*)glXGetProcAddressEXT(procedureName));
+    ret = (void*)glXGetProcAddressEXT(procedureName);
 #elif USING_MINGW
     ret = (void*)wglGetProcAddress((const char*)procedureName);
     if (ret)

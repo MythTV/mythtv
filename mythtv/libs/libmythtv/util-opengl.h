@@ -13,7 +13,7 @@
 // GLX headers
 #define GLX_GLXEXT_PROTOTYPES
 #ifdef USING_X11
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include <GL/glx.h>
 #endif // USING_X11
 
@@ -123,31 +123,30 @@
 typedef XID GLXPbuffer;
 #endif // GLX_VERSION_1_3
 
-bool get_glx_version(Display *XJ_disp, uint &major, uint &minor);
+bool get_glx_version(MythXDisplay *disp, uint &major, uint &minor);
 
 typedef enum { kRenderRGBA, kSimpleRGBA } FrameBufferType;
 int const *get_attr_cfg(FrameBufferType type);
 
 // Requires GLX 1.3 or later
-GLXFBConfig get_fbuffer_cfg(Display *XJ_disp, int XJ_screen_num,
-                            const int*);
+GLXFBConfig get_fbuffer_cfg(MythXDisplay *disp, const int*);
 
-GLXPbuffer get_pbuffer(Display     *XJ_disp,
-                       GLXFBConfig  glx_fbconfig,
-                       const QSize &video_dim);
+GLXPbuffer get_pbuffer(MythXDisplay *disp,
+                       GLXFBConfig   glx_fbconfig,
+                       const QSize  &video_dim);
 
-Window get_gl_window(Display     *XJ_disp,
-                     Window       XJ_curwin,
+Window get_gl_window(MythXDisplay *disp,
+                     Window        XJ_curwin,
                      XVisualInfo  *visinfo,
-                     const QRect &window_rect,
-                     bool         map_window = true);
+                     const QRect  &window_rect,
+                     bool          map_window = true);
 
-GLXWindow get_glx_window(Display     *XJ_disp,
-                         GLXFBConfig  glx_fbconfig,
-                         Window       gl_window,
-                         GLXContext   glx_context,
-                         GLXPbuffer   glx_pbuffer,
-                         const QSize &window_size);
+GLXWindow get_glx_window(MythXDisplay *disp,
+                         GLXFBConfig   glx_fbconfig,
+                         Window        gl_window,
+                         GLXContext    glx_context,
+                         GLXPbuffer    glx_pbuffer,
+                         const QSize  &window_size);
 #endif // USING_X11
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
