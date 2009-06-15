@@ -16,7 +16,7 @@ HEADERS += hdhomerun_pkt.h          hdhomerun_channels.h  hdhomerun_device.h
 HEADERS += hdhomerun.h              hdhomerun_types.h     hdhomerun_control.h
 HEADERS += hdhomerun_dhcp.h         hdhomerun_os.h        hdhomerun_video.h
 
-SOURCES += hdhomerun_channels.c     hdhomerun_config.c    hdhomerun_debug.c
+SOURCES += hdhomerun_channels.c     hdhomerun_debug.c
 SOURCES += hdhomerun_dhcp.c         hdhomerun_pkt.c       hdhomerun_channelscan.c
 SOURCES += hdhomerun_control.c      hdhomerun_device.c    hdhomerun_discover.c
 SOURCES += hdhomerun_video.c
