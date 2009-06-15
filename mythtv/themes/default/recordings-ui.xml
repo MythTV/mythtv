@@ -481,6 +481,11 @@
                                 <filename>hd.png</filename>
                             </imagetype>
                         </state>
+                        <state name="avchd">
+                            <imagetype name="statusimage">
+                                <filename>avchd.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="widescreen">
                             <imagetype name="statusimage">
                                 <filename>wide.png</filename>

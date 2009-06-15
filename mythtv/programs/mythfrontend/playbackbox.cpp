@@ -714,6 +714,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap.clear();
     iconMap["hdtv"] = VID_HDTV;
     iconMap["widescreen"] = VID_WIDESCREEN;
+    iconMap["avchd"] = VID_AVC;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
     if (pginfo && iconState)
@@ -4486,7 +4487,8 @@ bool HelpPopup::Create()
     addItem("onscreensub", tr("Recording is Subtitled"));
 
     addItem("hdtv",        tr("Recording is in High Definition"));
-    addItem("widescreen",  tr("Recording is in WideScreen"));
+    addItem("widescreen",  tr("Recording is Widescreen"));
+    addItem("avchd",       tr("Recording uses H.264 codec"));
 
     addItem("watched",     tr("Recording has been watched"));
 //    addItem("preserved",   tr("Recording is preserved"));
