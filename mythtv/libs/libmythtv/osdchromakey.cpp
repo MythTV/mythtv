@@ -14,7 +14,7 @@
 
 #include "mythcontext.h"
 #include "videoout_xv.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 
 #define LOC QString("OSDChroma: ")
 #define LOC_ERR QString("OSDChroma Error: ")

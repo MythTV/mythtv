@@ -31,7 +31,7 @@
 #include "globalsettings.h"
 #include "libmythtv/recordingprofile.h"
 #include "libmythtv/scheduledrecording.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "DisplayRes.h"
 #include "uitypes.h"
 #include "libmythtv/cardutil.h"
@@ -2371,7 +2371,7 @@ static HostCheckBox *SetupPinCodeRequired()
 static HostComboBox *XineramaScreen()
 {
     HostComboBox *gc = new HostComboBox("XineramaScreen", false);
-    int num = GetNumberOfXineramaScreens();
+    int num = GetNumberXineramaScreens();
     for (int i=0; i<num; ++i)
         gc->addSelection(QString::number(i), QString::number(i));
     gc->addSelection(QObject::tr("All"), QString::number(-1));
@@ -5045,7 +5045,7 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Screen settings"));
 
-    if (GetNumberOfXineramaScreens() > 1)
+    if (GetNumberXineramaScreens() > 1)
     {
         screen->addChild(XineramaScreen());
         screen->addChild(XineramaMonitorAspectRatio());

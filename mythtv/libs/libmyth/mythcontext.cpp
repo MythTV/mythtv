@@ -24,7 +24,7 @@
 #include "backendselect.h"
 #include "dbsettings.h"
 #include "langsettings.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "mythsocket.h"
 #include "themeinfo.h"
 #include "dbutil.h"

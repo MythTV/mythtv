@@ -42,7 +42,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "exitcodes.h"
 #include "util.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "mythmediamonitor.h"
 #include "mythverbose.h"
 #include "msocketdevice.h"

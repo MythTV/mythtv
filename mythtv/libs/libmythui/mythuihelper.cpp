@@ -21,7 +21,7 @@
 #include "mythdb.h"
 #include "themeinfo.h"
 #include "x11colors.h"
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "DisplayRes.h"
 #include "mythprogressdialog.h"
 #include "mythimage.h"
@@ -194,7 +194,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     }
 
     QDesktopWidget * desktop = QApplication::desktop();
-    bool             hasXinerama = GetNumberOfXineramaScreens() > 1;
+    bool             hasXinerama = GetNumberXineramaScreens() > 1;
     int              numScreens  = desktop->numScreens();
     int              screen;
 
