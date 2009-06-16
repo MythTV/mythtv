@@ -5180,7 +5180,7 @@ void TV::PxPTeardownView(PlayerContext *actx)
                 tr("Stopping all PIPs") : tr("Stopping all PBPs");
         }
 
-        for (int i = player.size() - 1; i > 0; i--)
+        for (uint i = player.size() - 1; i > 0; i--)
             ForceNextStateNone(GetPlayer(actx,i));
     }
 
