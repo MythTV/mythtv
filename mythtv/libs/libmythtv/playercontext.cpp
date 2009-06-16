@@ -468,10 +468,9 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
     _nvp->SetLength(playingLen);
 
     if (useNullVideo)
-    {
         _nvp->SetNullVideo();
-        _nvp->SetVideoFilters("onefield");
-    }
+
+    _nvp->SetVideoFilters((useNullVideo) ? "onefield" : "");
 
     if (!IsAudioNeeded())
         _nvp->SetNoAudio();
@@ -804,6 +803,9 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
 {
     QString filters     = baseFilters;
     QString chanFilters = QString::null;
+
+    if (gContext->IsDatabaseIgnored())
+        return baseFilters;
 
     LockPlayingInfo(__FILE__, __LINE__);
     if (playingInfo) // Recordings have this info already.

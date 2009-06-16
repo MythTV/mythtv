@@ -619,14 +619,10 @@ void NuppelVideoPlayer::SetPlayingInfo(const ProgramInfo &pginfo)
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     player_ctx->SetPlayingInfo(&pginfo);
-
-    videoFiltersForProgram = QString::null;
-    if (!gContext->IsDatabaseIgnored())
-    {
-        videoFiltersForProgram = player_ctx->playingInfo->chanOutputFilters;
-        videoFiltersForProgram.detach();
-    }
     player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+    SetVideoFilters("");
+    InitFilters();
 }
 
 void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
@@ -1303,6 +1299,9 @@ void NuppelVideoPlayer::SetVideoFilters(const QString &override)
 {
     videoFiltersOverride = override;
     videoFiltersOverride.detach();
+
+    videoFiltersForProgram = player_ctx->GetFilters(
+                             (using_null_videoout) ? "onefield" : "");
 }
 
 void NuppelVideoPlayer::InitFilters(void)
