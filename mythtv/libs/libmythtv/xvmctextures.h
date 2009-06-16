@@ -22,10 +22,10 @@ class XvMCTextures
     ~XvMCTextures() {}
 
     static XvMCTextures *Create(
-        Display*, Window, int, const QSize&, const QSize&)
+        MythXDisplay*, Window, int, const QSize&, const QSize&)
         { return NULL; }
 
-    bool Init(Display*, Window, int, const QSize&, const QSize&)
+    bool Init(MythXDisplay*, Window, int, const QSize&, const QSize&)
         { return false; }
 
     void PrepareFrame(XvMCSurface*, const QRect&, int) {}
@@ -42,7 +42,7 @@ class XvMCTextures
 {
   public:
     XvMCTextures() :
-        XJ_disp(NULL),          last_video_rect(0,0,0,0),
+        disp(NULL),             last_video_rect(0,0,0,0),
         gl_video_size(0,0),     gl_display_size(0,0),
         gl_vid_tex_index(0),    gl_osd_tex_index(0),
         gl_osd_revision(-1),
@@ -58,12 +58,12 @@ class XvMCTextures
             delete [] gl_osd_tmp_buf;
     }
 
-    static XvMCTextures *Create(Display *XJ_disp, Window XJ_curwin,
+    static XvMCTextures *Create(MythXDisplay *disp, Window XJ_curwin,
                                 int XJ_screen_num,
                                 const QSize &video_dim,
                                 const QSize &window_size);
 
-    bool Init(Display *XJ_disp, Window XJ_curwin, int XJ_screen_num,
+    bool Init(MythXDisplay *disp, Window XJ_curwin, int XJ_screen_num,
               const QSize &video_dim, const QSize &window_size);
 
     void DeInit(void);
@@ -78,7 +78,7 @@ class XvMCTextures
     void CompositeFrameAndOSD(int scan);
 
   private:
-    Display             *XJ_disp;
+    MythXDisplay        *disp;
     QRect                last_video_rect;
     QSize                gl_video_size;
     QSize                gl_display_size;

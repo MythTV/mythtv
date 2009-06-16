@@ -10,18 +10,18 @@
 #define LOC_ERR QString("XvMCTex, Error: ")
 
 static vector<GLuint> create_textures(
-    Display     *XJ_disp,
-    GLXWindow    glx_window,   GLXContext  glx_context,
-    GLXPbuffer   glx_pbuffer,  const QSize &tex_size,   
-    uint         num_of_textures);
+    MythXDisplay *disp,
+    GLXWindow     glx_window,   GLXContext  glx_context,
+    GLXPbuffer    glx_pbuffer,  const QSize &tex_size,
+    uint          num_of_textures);
 
-XvMCTextures *XvMCTextures::Create(Display *XJ_disp, Window XJ_curwin,
+XvMCTextures *XvMCTextures::Create(MythXDisplay *disp, Window XJ_curwin,
                                    int XJ_screen_num,
                                    const QSize &video_dim,
                                    const QSize &window_size)
 {
     XvMCTextures *tmp = new XvMCTextures();
-    if (tmp && tmp->Init(XJ_disp, XJ_curwin, XJ_screen_num,
+    if (tmp && tmp->Init(disp, XJ_curwin, XJ_screen_num,
                          video_dim, window_size))
     {
         return tmp;
@@ -33,7 +33,7 @@ XvMCTextures *XvMCTextures::Create(Display *XJ_disp, Window XJ_curwin,
     return NULL;
 }
 
-bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
+bool XvMCTextures::Init(MythXDisplay *dsp, Window XJ_curwin,
                         int XJ_screen_num,
                         const QSize &video_dim,
                         const QSize &window_size)
@@ -46,7 +46,7 @@ bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
         return false;
     }
 
-    XJ_disp = disp;
+    disp = dsp;
 
     if (!init_opengl())
     {
@@ -75,18 +75,18 @@ bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
     if (!glx_fbconfig)
     {
         glx_fbconfig = get_fbuffer_cfg(
-            XJ_disp, XJ_screen_num, get_attr_cfg(kRenderRGBA));
+            disp, XJ_screen_num, get_attr_cfg(kRenderRGBA));
     }
 
     if (glx_fbconfig)
-        glx_pbuffer = get_pbuffer(XJ_disp, glx_fbconfig, video_dim);
+        glx_pbuffer = get_pbuffer(disp, glx_fbconfig, video_dim);
 
     if (!glx_context)
-        X11S(glx_context = glXCreateNewContext(XJ_disp, glx_fbconfig,
+        X11S(glx_context = glXCreateNewContext(disp->GetDisplay(), glx_fbconfig,
                                                GLX_RGBA_TYPE, NULL, 1));
 
     XVisualInfo *vis_info;
-    vis_info = glXGetVisualFromFBConfig(XJ_disp, glx_fbconfig);
+    vis_info = glXGetVisualFromFBConfig(disp->GetDisplay(), glx_fbconfig);
     gl_window = get_gl_window(XJ_disp, XJ_curwin, vis_info,
                               QRect(QPoint(0,0), window_size));
 

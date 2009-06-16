@@ -26,18 +26,19 @@ void ChromaKeyOSD::AllocImage(int i)
     const QRect display_visible_rect =
         videoOutput->windows[0].GetDisplayVisibleRect();
 
-    X11L;
+    MythXDisplay *disp = videoOutput->disp;
+    MythXLocker lock(disp);
+    Display *d         = disp->GetDisplay();
+    int screen_num     = disp->GetScreen();
+
     XImage *shm_img =
-        XShmCreateImage(videoOutput->XJ_disp,
-                        DefaultVisual(videoOutput->XJ_disp,
-                                      videoOutput->XJ_screen_num),
-                        videoOutput->XJ_depth, ZPixmap, 0,
+        XShmCreateImage(d, DefaultVisual(d,screen_num),
+                        disp->GetDepth(), ZPixmap, 0,
                         &shm_infos[i],
                         display_visible_rect.width(),
                         display_visible_rect.height());
     if (shm_img)
         size = shm_img->bytes_per_line * (shm_img->height+1) + 128;
-    X11U;
 
     shm_infos[i].shmid   = 0;
     shm_infos[i].shmaddr = NULL;
@@ -51,10 +52,8 @@ void ChromaKeyOSD::AllocImage(int i)
             shm_img->data = shm_infos[i].shmaddr;
             shm_infos[i].readOnly = False;
 
-            X11L;
-            XShmAttach(videoOutput->XJ_disp, &shm_infos[i]);
-            XSync(videoOutput->XJ_disp, False); // needed for FreeBSD?
-            X11U;
+            XShmAttach(d, &shm_infos[i]);
+            disp->Sync(); // needed for FreeBSD?
 
             // Mark for delete immediately.
             // It won't actually be removed until after we detach it.
@@ -76,11 +75,12 @@ void ChromaKeyOSD::FreeImage(int i)
     if (!img[i])
         return;
 
-    X11L;
-    XShmDetach(videoOutput->XJ_disp, &(shm_infos[i]));
+    MythXDisplay *disp = videoOutput->disp;
+    disp->Lock();
+    XShmDetach(disp->GetDisplay(), &(shm_infos[i]));
     XFree(img[i]);
     img[i] = NULL;
-    X11U;
+    disp->Unlock();
 
     if (shm_infos[i].shmaddr)
         shmdt(shm_infos[i].shmaddr);

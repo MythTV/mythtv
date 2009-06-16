@@ -1237,7 +1237,7 @@ void VideoBuffers::Add(int width, int height, VDPAUContext *ctx, int num)
 
 #ifdef USING_XVMC
 bool VideoBuffers::CreateBuffers(int width, int height,
-                                 Display *disp, 
+                                 MythXDisplay *disp, 
                                  void *p_xvmc_ctx,
                                  void *p_xvmc_surf_info,
                                  vector<void*> surfs)
@@ -1277,7 +1277,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         render->state           = 0;
 
         // from videoout_xv
-        render->disp            = disp;
+        render->disp            = disp->GetDisplay();
         render->ctx             = &xvmc_ctx;
 
         // from xvmv block and surface arrays

@@ -21,6 +21,10 @@ extern "C" {
 class VDPAUContext;
 #endif
 
+#ifdef USING_X11
+class MythXDisplay;
+#endif
+
 typedef MythDeque<VideoFrame*>                frame_queue_t;
 typedef vector<VideoFrame>                    frame_vector_t;
 typedef map<const VideoFrame*, frame_queue_t> frame_map_t;
@@ -157,7 +161,7 @@ class VideoBuffers
     void SetOSDFrame(VideoFrame *frame, VideoFrame *osd);
     VideoFrame* GetOSDParent(const VideoFrame *osd);
     bool CreateBuffers(int width, int height,
-                       Display *disp,
+                       MythXDisplay *disp,
                        void* xvmc_ctx,
                        void* xvmc_surf_info,
                        vector<void*> surfs);

@@ -3,9 +3,9 @@
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
-static inline Display* createXvMCDisplay() 
+static inline MythXDisplay* createXvMCDisplay()
 {
-    Display *disp = MythXOpenDisplay();
+    MythXDisplay *disp = OpenMythXDisplay();
     if (!disp) 
         return NULL;
 
@@ -13,27 +13,30 @@ static inline Display* createXvMCDisplay()
                  p_error_base;
 
     int ret = Success;
-    X11S(ret = XvQueryExtension(disp, &p_version, &p_release, 
-                                &p_request_base, &p_event_base,
-                                &p_error_base));
+    XLOCK(disp, ret = XvQueryExtension(disp->GetDisplay(),
+                                      &p_version, &p_release, &p_request_base,
+                                      &p_event_base, &p_error_base));
     if (ret != Success) 
     {
         VERBOSE(VB_IMPORTANT, "XvQueryExtension failed");
-        X11S(XCloseDisplay(disp));
+        delete disp;
         return 0;
     }
 
     int mc_eventBase = 0, mc_errorBase = 0;
-    X11S(ret = XvMCQueryExtension(disp, &mc_eventBase, &mc_errorBase));
+    XLOCK(disp, ret = XvMCQueryExtension(disp->GetDisplay(),
+                                        &mc_eventBase, &mc_errorBase));
+
     if (True != ret)
     {
         VERBOSE(VB_IMPORTANT, "XvMC extension not found");
-        X11S(XCloseDisplay(disp));
+        delete disp;
         return 0;
     }
 
     int mc_version, mc_release;
-    X11S(ret = XvMCQueryVersion(disp, &mc_version, &mc_release));
+    XLOCK(disp, ret = XvMCQueryVersion(disp->GetDisplay(),
+                                      &mc_version, &mc_release));
     if (Success == ret)
         VERBOSE(VB_PLAYBACK, QString("Using XvMC version: %1.%2").
                 arg(mc_version).arg(mc_release));
@@ -87,7 +90,7 @@ void XvMCSurfaceTypes::find(int minWidth, int minHeight,
                             int chroma, bool vld, bool idct, int mpeg,
                             int minSubpictureWidth, 
                             int minSubpictureHeight,
-                            Display *dpy, XvPortID portMin, 
+                            MythXDisplay *dpy, XvPortID portMin,
                             XvPortID portMax, XvPortID& port, 
                             int& surfNum) 
 {
@@ -119,38 +122,40 @@ void XvMCSurfaceTypes::find(int minWidth, int minHeight,
     }
 }
 
-bool XvMCSurfaceTypes::has(Display *pdisp,
+bool XvMCSurfaceTypes::has(MythXDisplay *pdisp,
                            XvMCAccelID accel_type,
                            uint stream_type,
                            int chroma,
                            uint width,       uint height,
                            uint osd_width,   uint osd_height)
 {
-    Display* disp = pdisp;
+    MythXDisplay* disp = pdisp;
     if (!pdisp)
         disp = createXvMCDisplay();
+    if (!disp)
+        return false;
 
     //VERBOSE(VB_IMPORTANT, "\n\n\n" << XvMCDescription(disp) << "\n\n\n");
 
     XvAdaptorInfo *ai = 0;
     unsigned int p_num_adaptors = 0;
 
-    Window root = DefaultRootWindow(disp);
     int ret = Success;
-    X11S(ret = XvQueryAdaptors(disp, root, &p_num_adaptors, &ai));
+    XLOCK(disp, ret = XvQueryAdaptors(disp->GetDisplay(), disp->GetRoot(),
+                                     &p_num_adaptors, &ai));
 
     if (ret != Success) 
     {
         VERBOSE(VB_IMPORTANT, "XvQueryAdaptors failed.");
         if (!pdisp)
-            X11S(XCloseDisplay(disp));
+            delete disp;
         return false;
     }
 
     if (!ai) 
     {
         if (!pdisp)
-            X11S(XCloseDisplay(disp));
+            delete disp;
         return false; // huh? no xv capable video adaptors?
     }
 
@@ -168,22 +173,18 @@ bool XvMCSurfaceTypes::has(Display *pdisp,
                                p, s);
         if (0 != p) 
         {
-            X11L;
             if (p_num_adaptors > 0)
-                XvFreeAdaptorInfo(ai);
+                XLOCK(disp, XvFreeAdaptorInfo(ai));
             if (!pdisp)
-                XCloseDisplay(disp);
-            X11U;
+                delete disp;
             return true;
         }
     }
 
-    X11L;
     if (p_num_adaptors > 0)
-        XvFreeAdaptorInfo(ai);
+        XLOCK(disp, XvFreeAdaptorInfo(ai));
     if (!pdisp)
-        XCloseDisplay(disp);
-    X11U;
+        delete disp;
 
     return false;
 }
@@ -244,7 +245,7 @@ QString XvImageFormatToString(const XvImageFormatValues &fmt)
 }
 
 
-QString XvMCSurfaceTypes::toString(Display *pdisp, XvPortID p) const
+QString XvMCSurfaceTypes::toString(MythXDisplay *pdisp, XvPortID p) const
 {
     ostringstream os;
     for (int j = 0; j < size(); j++)
@@ -293,16 +294,15 @@ QString XvMCSurfaceTypes::toString(Display *pdisp, XvPortID p) const
         {
             int num = 0;
             XvImageFormatValues *xvfmv = NULL;
-            X11S(xvfmv = XvMCListSubpictureTypes(pdisp, p,
-                                                 surfaceTypeID(j),
-                                                 &num));
+            XLOCK(pdisp, xvfmv = XvMCListSubpictureTypes(pdisp->GetDisplay(),
+                                        p,surfaceTypeID(j), &num));
             for (int k = (xvfmv) ? 0 : num; k < num; k++)
                 os << "\t\t\t"
                    << XvImageFormatToString(xvfmv[k]).toLocal8Bit().constData()
                    << endl;
 
             if (xvfmv)
-                X11S(XFree(xvfmv));
+                XLOCK(pdisp, XFree(xvfmv));
         }
     }
     if (size())
@@ -311,30 +311,33 @@ QString XvMCSurfaceTypes::toString(Display *pdisp, XvPortID p) const
     return QString(os.str().c_str());
 }
 
-QString XvMCSurfaceTypes::XvMCDescription(Display *pdisp)
+QString XvMCSurfaceTypes::XvMCDescription(MythXDisplay *pdisp)
 {
-    Display* disp = pdisp;
+    MythXDisplay* disp = pdisp;
     if (!pdisp)
         disp = createXvMCDisplay();
+    if (!disp)
+        return QString::null;
 
+    Display *d = disp->GetDisplay();
     XvAdaptorInfo *ai = 0;
     unsigned int p_num_adaptors = 0;
 
-    Window root = DefaultRootWindow(disp);
     int ret = Success;
-    X11S(ret = XvQueryAdaptors(disp, root, &p_num_adaptors, &ai));
+    XLOCK(disp, ret = XvQueryAdaptors(d, disp->GetRoot(),
+                                     &p_num_adaptors, &ai));
 
     if (ret != Success) 
     {
         if (!pdisp)
-            X11S(XCloseDisplay(disp));
+            delete disp;
         return "XvQueryAdaptors failed.";
     }
 
     if (!ai) 
     {
         if (!pdisp)
-            X11S(XCloseDisplay(disp));
+            delete disp;
         return "No XVideo Capable Adaptors.";
     }
 
@@ -375,12 +378,10 @@ QString XvMCSurfaceTypes::XvMCDescription(Display *pdisp)
         os<<endl<<endl;
     }
 
-    X11L;
     if (p_num_adaptors > 0)
-        XvFreeAdaptorInfo(ai);
+        XLOCK(disp, XvFreeAdaptorInfo(ai));
     if (!pdisp)
-        XCloseDisplay(disp);
-    X11U;
+        delete disp;
 
     return QString(os.str().c_str());
 }

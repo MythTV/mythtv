@@ -16,7 +16,7 @@
 class XvMCOSD
 {
   public:
-    XvMCOSD(Display *XJ_disp, int xv_port,
+    XvMCOSD(MythXDisplay *XJ_disp, int xv_port,
             int surface_type_id, int xvmc_surf_flags);
 
     void CreateBuffer(XvMCContext &xvmc_ctx, int XJ_width, int XJ_height);
@@ -42,7 +42,7 @@ class XvMCOSD
 
   public:
     // XvMC OSD info
-    Display             *XJ_disp;
+    MythXDisplay        *disp;
     int                  XJ_width, XJ_height;
     int                  xv_port;
     XShmSegmentInfo      XJ_osd_shm_info;

@@ -7,7 +7,7 @@
 using namespace std;
 
 // MythTH headers
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "util-xv.h"
 
 // X11 headers
@@ -26,12 +26,12 @@ void close_all_xv_ports_signal_handler(int sig)
     for (it = open_xv_ports.begin(); it != open_xv_ports.end(); ++it)
     {
         cerr<<"Ungrabbing XVideo port: "<<(*it).port<<endl;
-        XvUngrabPort((*it).disp, (*it).port, CurrentTime);
+        XvUngrabPort((*it).disp->GetDisplay(), (*it).port, CurrentTime);
     }
     exit(GENERIC_EXIT_NOT_OK);
 }
 
-void add_open_xv_port(Display *disp, int port)
+void add_open_xv_port(MythXDisplay *disp, int port)
 {
     if (port >= 0)
     {
@@ -83,7 +83,7 @@ QString xvflags2str(int flags)
 }
 
 bool xv_is_attrib_supported(
-    Display *disp, int port, const char *name,
+    MythXDisplay *disp, int port, const char *name,
     int *current_value, int *min_value, int *max_value)
 {
     Atom xv_atom;
@@ -94,7 +94,9 @@ bool xv_is_attrib_supported(
     int dummy;
     int *xv_val = (current_value) ? current_value : &dummy;
 
-    X11S(attributes = XvQueryPortAttributes(disp, port, &attrib_count));
+    MythXLocker lock(disp);
+    attributes = XvQueryPortAttributes(disp->GetDisplay(),
+                                       port, &attrib_count);
     for (int i = (attributes) ? 0 : attrib_count; i < attrib_count; i++)
     {
         if (strcmp(attributes[i].name, name))
@@ -106,48 +108,50 @@ bool xv_is_attrib_supported(
         if (max_value)
             *max_value = attributes[i].max_value;
 
-        X11S(xv_atom = XInternAtom(disp, name, False));
+        xv_atom = XInternAtom(disp->GetDisplay(), name, False);
         if (None == xv_atom)
             continue;
 
-        X11S(ret = XvGetPortAttribute(disp, port, xv_atom, xv_val));
+        ret = XvGetPortAttribute(disp->GetDisplay(), port, xv_atom, xv_val);
         if (Success == ret)
         {
-            X11S(XFree(attributes));
+            XFree(attributes);
             return true;
         }
     }
 
     if (attributes)
-        X11S(XFree(attributes));
+        XFree(attributes);
 
     return false;
 }
 
-bool xv_set_attrib(Display *disp, int port, const char *name, int val)
+bool xv_set_attrib(MythXDisplay *disp, int port, const char *name, int val)
 {
     Atom xv_atom;
-    X11S(xv_atom = XInternAtom(disp, name, False));
+    XLOCK(disp, xv_atom = XInternAtom(disp->GetDisplay(), name, False));
     if (xv_atom == None)
         return false;
 
     int ret;
-    X11S(ret = XvSetPortAttribute(disp, port, xv_atom, val));
+    XLOCK(disp, ret = XvSetPortAttribute(disp->GetDisplay(),
+                                         port, xv_atom, val));
     if (Success != ret)
         return false;
 
     return true;
 }
 
-bool xv_get_attrib(Display *disp, int port, const char *name, int &val)
+bool xv_get_attrib(MythXDisplay *disp, int port, const char *name, int &val)
 {
     Atom xv_atom;
-    X11S(xv_atom = XInternAtom(disp, name, False));
+    XLOCK(disp, xv_atom = XInternAtom(disp->GetDisplay(), name, False));
     if (xv_atom == None)
         return false;
 
     int ret;
-    X11S(ret = XvGetPortAttribute(disp, port, xv_atom, &val));
+    XLOCK(disp, ret = XvGetPortAttribute(disp->GetDisplay(),
+                                         port, xv_atom, &val));
     if (Success != ret)
         return false;
 

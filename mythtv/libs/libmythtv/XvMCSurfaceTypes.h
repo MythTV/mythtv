@@ -9,7 +9,7 @@
 #include <qwindowdefs.h>
 #include "mythcontext.h"
 #include <X11/extensions/XvMC.h>
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include "fourcc.h"
 
 extern "C" {
@@ -25,7 +25,7 @@ extern "C" {
 extern "C" {
 Status
 XvMCCopySurfaceToGLXPbuffer (
-  Display *display,
+  MythXDisplay *display,
   XvMCSurface *surface,
   XID pbuffer_id,
   short src_x, // in X11 coords
@@ -46,14 +46,15 @@ QString XvImageFormatToString(const XvImageFormatValues &fmt);
 class XvMCSurfaceTypes 
 {
   public:
-    XvMCSurfaceTypes(Display *dpy, XvPortID port) : num(0) 
+    XvMCSurfaceTypes(MythXDisplay *dpy, XvPortID port) : num(0), disp(dpy)
     {
-        X11S(surfaces = XvMCListSurfaceTypes(dpy, port, &num));
+        XLOCK(disp, surfaces = XvMCListSurfaceTypes(disp->GetDisplay(),
+                                                    port, &num));
     }
         
     ~XvMCSurfaceTypes() 
     {
-        X11S(XFree(surfaces));
+        XLOCK(disp, XFree(surfaces));
     }
 
     /// Find an appropriate surface on the current port.
@@ -179,24 +180,25 @@ class XvMCSurfaceTypes
     /// Find an appropriate surface on the current display.
     static void find(int minWidth, int minHeight, int chroma, bool vld,
                      bool idct, int mpeg, int minSubpictureWidth, 
-                     int minSubpictureHeight, Display *dpy, 
+                     int minSubpictureHeight, MythXDisplay *dpy,
                      XvPortID portMin, XvPortID portMax,
                      XvPortID& port, int& surfNum);
 
     /// Find out if there is a surface on any port capable of a
     /// specific acceleration type.
-    static bool has(Display *pdisp,
+    static bool has(MythXDisplay *pdisp,
                     XvMCAccelID accel_type, uint stream_type, int chroma,
                     uint width, uint height, uint osd_width, uint osd_height);
 
-    static QString XvMCDescription(Display *pdisp = NULL);
-    QString toString(Display *pdisp = NULL, XvPortID p = 0) const;
+    static QString XvMCDescription(MythXDisplay *pdisp = NULL);
+    QString toString(MythXDisplay *pdisp = NULL, XvPortID p = 0) const;
     ostream& operator<<(ostream& os) const
         { return os << toString().toLocal8Bit().constData(); }
 
   private:
     int num;
     XvMCSurfaceInfo *surfaces;
+    MythXDisplay *disp;
 };
 
 #endif // USING_XVMC

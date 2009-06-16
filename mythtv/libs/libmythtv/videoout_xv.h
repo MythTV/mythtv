@@ -7,7 +7,7 @@
 #include "DisplayRes.h"
 #include "videooutbase.h"
 
-#include "util-x11.h"
+#include "mythxdisplay.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/Xvlib.h>
@@ -116,17 +116,17 @@ class VideoOutputXv : public VideoOutput
                                              uint stream_type, int xvmc_chroma,
                                              bool test_surface, bool force_xv);
 
-    static int GrabSuitableXvPort(Display* disp, Window root,
+    static int GrabSuitableXvPort(MythXDisplay* disp, Window root,
                                   MythCodecID type,
                                   uint width, uint height,
                                   int xvmc_chroma = 0,
                                   XvMCSurfaceInfo* si = NULL,
                                   QString *adaptor_name = NULL);
 
-    static XvMCContext* CreateXvMCContext(Display* disp, int port,
+    static XvMCContext* CreateXvMCContext(MythXDisplay* disp, int port,
                                           int surf_type,
                                           int width, int height);
-    static void DeleteXvMCContext(Display* disp, XvMCContext*& ctx);
+    static void DeleteXvMCContext(MythXDisplay* disp, XvMCContext*& ctx);
 
 
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
@@ -208,17 +208,10 @@ class VideoOutputXv : public VideoOutput
     QMutex               global_lock;
 
     // Basic X11 info
-    Window               XJ_root;
     Window               XJ_win;
     Window               XJ_curwin;
-    GC                   XJ_gc;
-    Screen              *XJ_screen;
-    Display             *XJ_disp;
-    int                  XJ_screen_num;
-    unsigned long        XJ_white;
-    unsigned long        XJ_black;
+    MythXDisplay        *disp;
     unsigned long        XJ_letterbox_colour;
-    int                  XJ_depth;
     bool                 XJ_started;
     QSize                XJ_monitor_sz;
     QSize                XJ_monitor_dim;
