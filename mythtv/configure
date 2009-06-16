@@ -3733,13 +3733,14 @@ if enabled dvb; then
 fi
 
 if enabled x11; then
+  echo "CONFIG_X11_LIBS=-lXinerama -lX11 -lXext -lXxf86vm" >> $MYTH_CONFIG_MAK
   if [ -d $x11_include_path ] ; then
     append CONFIG_INCLUDEPATH "$x11_include_path"
   fi
 fi
 
 if enabled xv; then
-  echo "CONFIG_XV_LIBS=-lXinerama -lXv -lX11 -lXext -lXxf86vm" >> $MYTH_CONFIG_MAK
+  echo "CONFIG_XV_LIBS=-lXv" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled xrandr; then
