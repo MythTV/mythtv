@@ -3438,6 +3438,15 @@ void NuppelVideoPlayer::JumpToProgram(void)
     player_ctx->SetNVPChangingBuffers(false);
 }
 
+void NuppelVideoPlayer::RefreshPauseFrame(void)
+{
+    GetFrame(audioOutput == NULL || !normal_speed);
+
+    resetvideo = true;
+    while (resetvideo)
+        usleep(2000);
+}
+
 bool NuppelVideoPlayer::StartPlaying(bool openfile)
 {
     assert(player_ctx);
@@ -3693,11 +3702,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
                 if (rewindtime > 0)
                 {
                     DoRewind();
-
-                    GetFrame(audioOutput == NULL || !normal_speed);
-                    resetvideo = true;
-                    while (resetvideo)
-                        usleep(1000);
+                    RefreshPauseFrame();
                 }
                 rewindtime = 0;
             }
@@ -3707,31 +3712,20 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
                 if (fftime > 0)
                 {
                     DoFastForward();
-
-                    GetFrame(audioOutput == NULL || !normal_speed);
-                    resetvideo = true;
-                    while (resetvideo)
-                        usleep(1000);
+                    RefreshPauseFrame();
                 }
                 fftime = 0;
             }
             else if (need_change_dvd_track)
             {
                 DoChangeDVDTrack();
-                GetFrame(audioOutput == NULL || !normal_speed);
-                resetvideo = true;
-                while (resetvideo)
-                    usleep(1000);
+                RefreshPauseFrame();
                 need_change_dvd_track = 0;
             }
             else if (player_ctx->tvchain && player_ctx->tvchain->NeedsToJump())
             {
                 JumpToProgram();
-
-                GetFrame(audioOutput == NULL || !normal_speed);
-                resetvideo = true;
-                while (resetvideo)
-                    usleep(1000);
+                RefreshPauseFrame();
             }
             else
             {
@@ -3751,6 +3745,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
                 PauseVideo(true);
                 DoRewind();
+                RefreshPauseFrame();
                 UnpauseVideo(true);
             }
             rewindtime = 0;

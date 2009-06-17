@@ -484,6 +484,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void ClearAfterSeek(bool clearvideobuffers = true);
     bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
+    void RefreshPauseFrame(void);
 
     // Private commercial skipping
     void SkipCommercialsByBlanks(void);
