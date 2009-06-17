@@ -1082,6 +1082,7 @@ void VideoOutput::DoVideoResize(const QSize &inDim, const QSize &outDim)
 
     ShutdownVideoResize();
 
+    vsz_enabled      = true;
     vsz_video_size   = inDim;
     vsz_display_size = outDim;
 
