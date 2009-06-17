@@ -19,9 +19,7 @@ using namespace std;
 #ifdef Q_WS_MACX
 #include "util-osx.h"
 #import <agl.h>
-#if CONFIG_DARWIN
-#include "util-x11.h"
-#endif
+#include "mythxdisplay.h"  // For GetNumberXineramaScreens()
 #endif
 
 #include "frame.h"
@@ -272,8 +270,7 @@ class OpenGLContextAGL : public OpenGLContext
     void SetSwapInterval(int interval);
     void GetDisplayDimensions(QSize &dimensions);
     void GetDisplaySize(QSize &size);
-    int  GetNumberOfScreens(void)
-        { return GetNumberOfXineramaScreens(); }
+    int  GetNumberOfScreens(void) { return GetNumberXineramaScreens(); }
     void MoveResizeWindow(QRect rect);    
     void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
