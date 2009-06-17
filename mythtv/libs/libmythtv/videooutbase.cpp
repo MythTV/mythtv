@@ -724,6 +724,16 @@ QRect VideoOutput::GetTotalOSDBounds(void) const
     return QRect(QPoint(0,0), dvr2);
 }
 
+QRect VideoOutput::GetMHEGBounds(void)
+{
+    if (!hasFullScreenOSD())
+        return windows[0].GetTotalOSDBounds();
+
+    QRect dvr = windows[0].GetDisplayVideoRect();
+    return QRect(QPoint(dvr.left() & ~0x1, dvr.top()  & ~0x1),
+                 QSize(dvr.width() & ~0x1, dvr.height() & ~0x1));
+}
+
 bool VideoOutput::AllowPreviewEPG(void) const
 {
     return windows[0].IsPreviewEPGAllowed();

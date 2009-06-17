@@ -95,8 +95,6 @@ class OpenGLVideo
     QString GetProgramString(OpenGLFilterType filter,
                              QString deint = QString::null,
                              FrameScanType field = kScan_Progressive);
-    void CalculateResize(float &left,  float &top,
-                         float &right, float &bottom);
     static QString FilterToString(OpenGLFilterType filter);
     static OpenGLFilterType StringToFilter(const QString &filter);
     void ShutDownYUV2RGB(void);

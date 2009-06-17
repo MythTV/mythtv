@@ -92,7 +92,7 @@ class VideoOutput
     virtual void GetOSDBounds(QRect &total, QRect &visible,
                               float &visibleAspect, float &fontScale,
                               float themeAspect) const;
-
+    QRect        GetMHEGBounds(void);
     /// \brief Returns current display's frame refresh period in microseconds.
     ///        e.g. 1000000 / frame_rate_in_Hz
     virtual int GetRefreshRate(void) = 0;

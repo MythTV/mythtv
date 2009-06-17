@@ -681,7 +681,7 @@ int MHIContext::GetChannelIndex(const QString &str)
     else if (str.startsWith("rec://"))
     {
     }
-    return -1;
+    return 1080;
 }
 
 // Get netId etc from the channel index.  This is the inverse of GetChannelIndex.

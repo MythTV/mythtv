@@ -886,13 +886,13 @@ void OpenGLVideo::SetVideoResize(const QRect &rect)
 {
     OpenGLContextLocker ctx_lock(gl_context);
 
-    bool abort = ((rect.right()  > video_dim.width())  ||
-                  (rect.bottom() > video_dim.height()) ||
-                  (rect.width()  > video_dim.width())  ||
-                  (rect.height() > video_dim.height()));
+    bool abort = ((rect.right()  > display_video_rect.width())  ||
+                  (rect.bottom() > display_video_rect.height()) ||
+                  (rect.width()  > display_video_rect.width())  ||
+                  (rect.height() > display_video_rect.height()));
 
     // if resize == existing frame, no need to carry on
-    abort |= !rect.left() && !rect.top() && (rect.size() == video_dim);
+    abort |= !rect.left() && !rect.top() && (rect == display_video_rect);
 
     if (!abort)
     {
@@ -910,38 +910,6 @@ void OpenGLVideo::DisableVideoResize(void)
 
     videoResize     = false;
     videoResizeRect = QRect(0, 0, 0, 0);
-}
-
-/**
- * \fn OpenGLVideo::CalculateResize(float &left,  float &top,
-                                    float &right, float &bottom)
- *  Calculate the appropriate output coordinates for video resizing
- *  given the current video and window size.
- *  \bug the aspect ratio of the resulting video is set to the aspect ratio
- *  of the display.
- */
-
-void OpenGLVideo::CalculateResize(float &left,  float &top,
-                                  float &right, float &bottom)
-{
-    // FIXME video aspect == display aspect
-
-    if ((video_dim.height() <= 0) || (video_dim.width() <= 0))
-        return;
-
-    float height     = display_visible_rect.height();
-    float new_top    = height - ((float)videoResizeRect.bottom() /
-                                 (float)video_dim.height()) * height;
-    float new_bottom = height - ((float)videoResizeRect.top() /
-                                 (float)video_dim.height()) * height;
-
-    left   = (((float) videoResizeRect.left() / (float) video_dim.width()) *
-              display_visible_rect.width());
-    right  = (((float) videoResizeRect.right() / (float) video_dim.width()) *
-              display_visible_rect.width());
-
-    top    = new_top;
-    bottom = new_bottom;
 }
 
 void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
@@ -1065,14 +1033,14 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
                          filter->outputBuffer == kDefaultBuffer) ?
                          display_visible_rect : frameBufferRect;
 
+        // resize for interactive tv
+        if (videoResize && filter->outputBuffer == kDefaultBuffer)
+            display = videoResizeRect;
+
         float vleft  = display.left();
         float vright = display.right();
         float vtop   = display.top();
         float vbot   = display.bottom();
-
-        // resize for interactive tv
-        if (videoResize && filter->outputBuffer == kDefaultBuffer)
-            CalculateResize(vleft, vtop, vright, vbot);
 
         // invert horizontally if last filter 
         if (it == filters.begin())

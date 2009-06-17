@@ -787,13 +787,15 @@ void NuppelVideoPlayer::ReinitOSD(void)
         float aspect, scaling;
         if (osd)
         {
-            videoOutput->GetOSDBounds(total, visible, aspect, scaling, osd->GetThemeAspect());
+            videoOutput->GetOSDBounds(total, visible, aspect,
+                                      scaling, osd->GetThemeAspect());
             osd->Reinit(total, frame_interval, visible, aspect, scaling);
         }
 
 #ifdef USING_MHEG
         if (GetInteractiveTV())
         {
+            total = videoOutput->GetMHEGBounds();
             GetInteractiveTV()->Reinit(total);
             itvVisible = false;
         }
@@ -3501,7 +3503,10 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
 #ifdef USING_MHEG
         if (GetInteractiveTV())
+        {
+            total = videoOutput->GetMHEGBounds();
             GetInteractiveTV()->Reinit(total);
+        }
 #endif // USING_MHEG
     }
 
