@@ -287,7 +287,9 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
         return;
 
     m_ctx->PrepareVideo(
-        frame, windows[0].GetVideoRect(), windows[0].GetDisplayVideoRect(),
+        frame, windows[0].GetVideoRect(), 
+        vsz_enabled ? vsz_desired_display_rect :
+                      windows[0].GetDisplayVideoRect(),
         windows[0].GetDisplayVisibleRect().size(), scan);
 
     if (!frame)
