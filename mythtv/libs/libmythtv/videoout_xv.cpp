@@ -2637,7 +2637,9 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
 
     // calculate bobbing params
     const QRect video_rect         = windows[0].GetVideoRect();
-    const QRect display_video_rect = windows[0].GetDisplayVideoRect();
+    const QRect display_video_rect = (vsz_enabled && chroma_osd) ?
+                                      vsz_desired_display_rect :
+                                      windows[0].GetDisplayVideoRect();
     int field = 3, src_y = video_rect.top(), dest_y = display_video_rect.top();
     int xv_src_y_incr = 0, xv_dest_y_incr = 0;
     if (m_deinterlacing)
@@ -2711,7 +2713,9 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
     }
 
     const QRect video_rect         = windows[0].GetVideoRect();
-    const QRect display_video_rect = windows[0].GetDisplayVideoRect();
+    const QRect display_video_rect = (vsz_enabled && chroma_osd) ?
+                                      vsz_desired_display_rect :
+                                      windows[0].GetDisplayVideoRect();
     int field = 3, src_y = video_rect.top(), dest_y = display_video_rect.top(),
         xv_src_y_incr = 0, xv_dest_y_incr = 0;
     if (m_deinterlacing && (m_deintfiltername == "bobdeint"))
