@@ -85,7 +85,6 @@ OpenGLVideo::OpenGLVideo() :
     textureRects(false),      textureType(GL_TEXTURE_2D),
     helperTexture(0),         defaultUpsize(kGLFilterResize),
     convertSize(0,0),         convertBuf(NULL),
-    videoResize(false),       videoResizeRect(0,0,0,0),
     gl_features(0),
     gl_letterbox_colour(kLetterBoxColour_Black)
 {
@@ -167,8 +166,6 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
     viewportControl       = viewport_control;
     inputTextureSize      = QSize(0,0);
     convertSize           = QSize(0,0);
-    videoResize           = false;
-    videoResizeRect       = QRect(0,0,0,0);
     currentFrameNum       = -1;
     inputUpdated          = false;
     gl_letterbox_colour   = letterbox_colour;
@@ -876,42 +873,6 @@ void OpenGLVideo::ShutDownYUV2RGB(void)
     convertSize = QSize(0,0);
 }
 
-/**
- * \fn OpenGLVideo::SetVideoResize(const QRect &rect)
- *  Start resizing the output video to the rectangle bounded by rect.
- *  This functionality is used by some MHEG5 implementations.
- */
-
-void OpenGLVideo::SetVideoResize(const QRect &rect)
-{
-    OpenGLContextLocker ctx_lock(gl_context);
-
-    bool abort = ((rect.right()  > display_video_rect.width())  ||
-                  (rect.bottom() > display_video_rect.height()) ||
-                  (rect.width()  > display_video_rect.width())  ||
-                  (rect.height() > display_video_rect.height()));
-
-    // if resize == existing frame, no need to carry on
-    abort |= !rect.left() && !rect.top() && (rect == display_video_rect);
-
-    if (!abort)
-    {
-        videoResize     = true;
-        videoResizeRect = rect;
-        return;
-    }
-
-    DisableVideoResize();
-}
-
-void OpenGLVideo::DisableVideoResize(void)
-{
-    OpenGLContextLocker ctx_lock(gl_context);
-
-    videoResize     = false;
-    videoResizeRect = QRect(0, 0, 0, 0);
-}
-
 void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
 {
     if (deinterlacing == hardwareDeinterlacing)
@@ -1032,10 +993,6 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         QRect visible = (filter->frameBuffers.empty() ||
                          filter->outputBuffer == kDefaultBuffer) ?
                          display_visible_rect : frameBufferRect;
-
-        // resize for interactive tv
-        if (videoResize && filter->outputBuffer == kDefaultBuffer)
-            display = videoResizeRect;
 
         float vleft  = display.left();
         float vright = display.right();

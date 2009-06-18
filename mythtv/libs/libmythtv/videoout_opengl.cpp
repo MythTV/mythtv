@@ -362,8 +362,10 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     if (buffer->codec != FMT_YV12)
         return;
 
-    gl_videochain->SetVideoRect(windows[0].GetDisplayVideoRect(),
-                                windows[0].GetVideoRect());
+    gl_videochain->SetVideoRect((vsz_enabled && gl_osd) ?
+                                 vsz_desired_display_rect :
+                                 windows[0].GetDisplayVideoRect(),
+                                 windows[0].GetVideoRect());
     gl_videochain->PrepareFrame(buffer->top_field_first, t,
                                 m_deinterlacing, framesPlayed);
 
@@ -582,9 +584,6 @@ int VideoOutputOpenGL::DisplayOSD(VideoFrame *frame, OSD *osd,
 
     if (!osd || !gl_osdchain)
         return -1;
-
-    if (vsz_enabled && gl_videochain)
-        gl_videochain->SetVideoResize(vsz_desired_display_rect);
 
     OSDSurface *surface = osd->Display();
     if (!surface)
@@ -883,19 +882,6 @@ void VideoOutputOpenGL::StopEmbedding(void)
     MoveResize();
 }
 
-void VideoOutputOpenGL::ShutdownVideoResize(void)
-{
-    if (!gl_osdchain)
-    {
-        VideoOutput::ShutdownVideoResize();
-        return;
-    }
-
-    if (gl_videochain)
-        gl_videochain->DisableVideoResize();
-
-    vsz_enabled = false;
-}
 
 bool VideoOutputOpenGL::ApproveDeintFilter(const QString& filtername) const
 {

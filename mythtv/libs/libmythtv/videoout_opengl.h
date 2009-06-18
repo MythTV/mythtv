@@ -49,7 +49,6 @@ class VideoOutputOpenGL : public VideoOutput
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
     virtual bool hasOpenGLAcceleration(void) const { return true; }
     virtual bool hasFullScreenOSD(void) const { return gl_osd; }
-    virtual void ShutdownVideoResize(void);
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 
   private:

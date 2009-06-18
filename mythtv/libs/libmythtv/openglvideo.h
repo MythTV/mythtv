@@ -75,8 +75,6 @@ class OpenGLVideo
     void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
                       { display_video_rect = dispvidrect; video_rect = vidrect;}
     QSize GetVideoSize(void)        const { return actual_video_dim;}
-    void SetVideoResize(const QRect &rect);
-    void DisableVideoResize(void);
 
   private:
     void Teardown(void);
@@ -136,9 +134,6 @@ class OpenGLVideo
     QSize          convertSize;
     unsigned char *convertBuf;
 
-    bool           videoResize;
-    QRect          videoResizeRect;
- 
     uint           gl_features;
     LetterBoxColour gl_letterbox_colour;
 };
