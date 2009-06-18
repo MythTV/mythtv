@@ -165,7 +165,8 @@ class MHIContext : public MHContext
     bool             m_updated;
     int              m_displayWidth;
     int              m_displayHeight;
-
+    float            m_xScale;
+    float            m_yScale;
 
     list<MHIImageData*> m_display; // List of items to display
 
