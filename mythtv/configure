@@ -192,7 +192,6 @@ BLOCK_QUOTE
   echo "                           (use --xvmc-lib if autodetection fails)"
   echo "  --enable-xvmc-pro        enable XvMC for the Unichrome Pro chipset"
   echo "                           (NOT Unichrome chipset)"
-  echo "  --enable-xvmc-opengl     enable nVidia XvMC OpenGL texture method"
   echo "  --enable-vdpau           enable NVidia VDPAU hardware acceleration."
   echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
   #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
@@ -1034,7 +1033,6 @@ MYTHTV_CONFIG_LIST='
     xrandr
     xv
     xvmc
-    xvmc_opengl
     xvmc_vld
     xvmcw
 '
@@ -1227,7 +1225,6 @@ vdpau_deps="x11 vdpau_vdpau_h"
 xrandr_deps="x11"
 xv_deps="x11"
 xvmc_deps="xv X11_extensions_XvMClib_h"
-xvmc_opengl_deps="opengl xvmc"
 xvmc_pro_deps="xvmc X11_extensions_vldXvMC_h"
 xvmc_vld_deps="xvmc X11_extensions_vldXvMC_h"
 xvmcw_deps="xvmc"
@@ -3058,14 +3055,6 @@ else
     disable xvmc xvmcw
 fi
 
-if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
-    enable xvmc_opengl
-    disable xvmc_vld xvmc_pro
-elif enabled xvmc_opengl ; then
-    disable xvmc_opengl
-    echo "Disabling XvMC-opengl. It is only available when linking against libXvMCNVIDIA"
-fi
-
 enabled xvmc_pro && enable xvmc_vld
 
 check_header vdpau/vdpau.h
@@ -3365,7 +3354,6 @@ if enabled x11 ; then
   echo "XvMC support              ${xvmc-no}"
   echo "XvMC VLD support          ${xvmc_vld-no}"
   echo "XvMC pro support          ${xvmc_pro-no}"
-  echo "XvMC OpenGL sup.          ${xvmc_opengl-no}"
 if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs                 $VENDOR_XVMC_LIBS"
 fi
@@ -3749,9 +3737,6 @@ fi
 
 if enabled xvmc; then
   echo "CONFIG_XVMC_LIBS=$VENDOR_XVMC_LIBS -lXvMC" >> $MYTH_CONFIG_MAK
-  if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
-      append CCONFIG "using_xvmc_pbuffer"
-  fi
 fi
 
 if enabled directfb; then

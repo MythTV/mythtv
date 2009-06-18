@@ -1172,14 +1172,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "XVideo hardware assist for scaling, color conversion and "
             "when available offers XVideo picture controls.");
 
-    if (renderer == "xvmc-opengl")
-        msg = QObject::tr(
-            "This video renderer for XvMC on nVidia cards uses XVideo "
-            "for color conversion and OpenGL for scaling. The main benefit "
-            "of this renderer is that it allows OpenGL OSD rendering, "
-            "which frees two XvMC buffers for decoding. It requires a "
-            "reasonably fast nVidia card.");
-
     if (renderer == "directfb")
         msg = QObject::tr(
             "This video renderer uses DirectFB for scaling and color "
@@ -1505,7 +1497,6 @@ QString VideoDisplayProfile::toString(void) const
 "xshm"
 "xv-blit"
 "xvmc-blit"
-"xvmc-opengl"
 "directfb"
 "directx"
 "quartz-blit"
@@ -1588,7 +1579,6 @@ void VideoDisplayProfile::init_statics(void)
     QStringList tmp;
     tmp += "xv-blit";
     tmp += "xvmc-blit";
-    tmp += "xvmc-opengl";
 
     QStringList::const_iterator it2;
     for (it2 = tmp.begin(); it2 != tmp.end(); ++it2)
@@ -1622,7 +1612,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_osd["xv-blit"]     += "softblend";
     safe_osd["xvmc-blit"]   += "chromakey";
     safe_osd["xvmc-blit"]   += "ia44blend";
-    safe_osd["xvmc-opengl"] += "opengl";
     safe_osd["ivtv"]        += "ivtv";
     safe_osd["opengl"]      += "opengl2";
     safe_osd["quartz-accel"]+= "opengl3";
@@ -1653,8 +1642,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer["dummy"]    += "xvmc-blit";
     safe_renderer["xvmc"]     += "xvmc-blit";
     safe_renderer["xvmc-vld"] += "xvmc-blit";
-    safe_renderer["dummy"]    += "xvmc-opengl";
-    safe_renderer["xvmc"]     += "xvmc-opengl";
     safe_renderer["ffmpeg"]   += "vdpau";
 
     safe_renderer["dummy"]    += "quartz-accel";
@@ -1668,7 +1655,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer_priority["xshm"]         =  30;
     safe_renderer_priority["xv-blit"]      =  90;
     safe_renderer_priority["xvmc-blit"]    = 110;
-    safe_renderer_priority["xvmc-opengl"]  = 100;
     safe_renderer_priority["vdpau"]        = 120;
     safe_renderer_priority["directfb"]     =  60;
     safe_renderer_priority["directx"]      =  50;
@@ -1693,7 +1679,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer_group["x11"] += "xshm";
     safe_renderer_group["x11"] += "xv-blit";
     safe_renderer_group["x11"] += "xvmc-blit";
-    safe_renderer_group["x11"] += "xvmc-opengl";
     safe_renderer_group["quartz"] += "quartz-blit";
     safe_renderer_group["quartz"] += "quartz-accel";
 }

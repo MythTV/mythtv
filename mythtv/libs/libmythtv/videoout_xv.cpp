@@ -40,7 +40,6 @@ using namespace std;
 #include "mythxdisplay.h"
 #include "util-xv.h"
 #include "util-xvmc.h"
-#include "xvmctextures.h"
 
 // MythTV General headers
 #include "mythcontext.h"
@@ -125,7 +124,6 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xvmc_buf_attr(new XvMCBufferSettings()),
       xvmc_chroma(XVMC_CHROMA_FORMAT_420), xvmc_ctx(NULL),
       xvmc_osd_lock(),
-      xvmc_tex(NULL),
 
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
@@ -1286,25 +1284,6 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 
 bool VideoOutputXv::InitOSD(const QString &osd_renderer)
 {
-    if (osd_renderer == "opengl")
-    {
-        xvmc_tex = XvMCTextures::Create(
-            disp, XJ_curwin, disp->GetScreen(),
-            windows[0].GetVideoDim(), GetTotalOSDBounds().size());
-
-        if (xvmc_tex)
-        {
-            VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init succeeded");
-            xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, LOC + "XvMCTex: Init failed");
-        }
-
-        return xvmc_tex;
-    }
-
     if (osd_renderer == "chromakey")
     {
         // TODO Make sure that we are using chroma-keying
@@ -1449,7 +1428,7 @@ bool VideoOutputXv::InitSetupBuffers(void)
     InitOSD(osdrenderer);
 
     // Initialize chromakeying, if we need to
-    if (!xvmc_tex && video_output_subtype >= XVideo)
+    if (video_output_subtype >= XVideo)
         InitColorKey(true);
 
     // Check if we can actually use the OSD we want to use...
@@ -2073,12 +2052,6 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
     }
     xvmc_osd_available.clear();
     xvmc_osd_lock.unlock();
-
-    if (xvmc_tex)
-    {
-        delete xvmc_tex;
-        xvmc_tex = NULL;
-    }
 #endif // USING_XVMC
 
     vbuffers.DeleteBuffers();
@@ -2325,7 +2298,7 @@ void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
  */
 void VideoOutputXv::DoneDisplayingFrame(void)
 {
-    if (VideoOutputSubType() <= XVideo || xvmc_tex)
+    if (VideoOutputSubType() <= XVideo)
     {
         vbuffers.DoneDisplayingFrame();
         return;
@@ -2371,12 +2344,7 @@ void VideoOutputXv::PrepareFrameXvMC(VideoFrame *frame, FrameScanType scan)
         SyncSurface(frame);
         render = GetRender(frame);
         render->state |= MP_XVMC_STATE_DISPLAY_PENDING;
-        if (xvmc_tex)
-        {
-            xvmc_tex->PrepareFrame(
-                render->p_surface, windows[0].GetDisplayVideoRect(),scan);
-        }
-        else if (xvmc_buf_attr->GetOSDNum())
+        if (xvmc_buf_attr->GetOSDNum())
             osdframe = vbuffers.GetOSDFrame(frame);
         vbuffers.UnlockFrame(frame, "PrepareFrameXvMC");
     }
@@ -2644,15 +2612,6 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
 #ifdef USING_XVMC
     VideoFrame *frame = NULL;
     bool using_pause_frame = false;
-
-    if (xvmc_tex)
-    {
-        xvmc_tex->Show(scan);
-
-        // clear any displayed frames not on screen
-        CheckFrameStates();
-        return;
-    }
 
     vbuffers.begin_lock(kVideoBuffer_pause);
     if (vbuffers.size(kVideoBuffer_pause))
@@ -3017,32 +2976,13 @@ void VideoOutputXv::VideoAspectRatioChanged(float aspect)
     VideoOutput::VideoAspectRatioChanged(aspect);
 }
 
-// documented in videooutbase.cpp
-void VideoOutputXv::CopyFrame(VideoFrame *to, const VideoFrame *from)
-{
-    if (VideoOutputSubType() <= XVideo)
-        VideoOutput::CopyFrame(to, from);
-    else if (xvmc_tex)
-    {
-        global_lock.lock();
-        int tmp = framesPlayed;
-        global_lock.unlock();
-
-        PrepareFrameXvMC((VideoFrame*)from, kScan_Interlaced);
-
-        global_lock.lock();
-        framesPlayed = tmp;
-        global_lock.unlock();
-    }
-}
-
 void VideoOutputXv::UpdatePauseFrame(void)
 {
     QMutexLocker locker(&global_lock);
 
     VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame() " + vbuffers.GetStatus());
 
-    if ((VideoOutputSubType() <= XVideo) || xvmc_tex)
+    if (VideoOutputSubType() <= XVideo)
     {
         // Try used frame first, then fall back to scratch frame.
         vbuffers.LockFrame(&av_pause_frame, "UpdatePauseFrame -- pause");
@@ -3062,7 +3002,7 @@ void VideoOutputXv::UpdatePauseFrame(void)
         }
         vbuffers.end_lock();
 
-        if (!used_frame && !xvmc_tex &&
+        if (!used_frame &&
             vbuffers.TryLockFrame(vbuffers.GetScratchFrame(),
                                   "UpdatePauseFrame -- scratch"))
         {
@@ -3131,12 +3071,6 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
     (void)frame;
     (void)osd;
 #ifdef USING_XVMC
-    if (xvmc_tex)
-    {
-        xvmc_tex->ProcessOSD(osd);
-        return;
-    }
-
     // Handle Pause frame
     if (frame)
     {

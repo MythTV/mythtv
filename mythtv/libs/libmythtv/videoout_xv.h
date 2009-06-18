@@ -179,7 +179,6 @@ class VideoOutputXv : public VideoOutput
     vector<void*> CreateXvMCSurfaces(uint num, bool surface_has_vld);
     vector<unsigned char*> CreateShmImages(uint num, bool use_xv);
     void CreatePauseFrame(VOSType subtype);
-    void CopyFrame(VideoFrame *to, const VideoFrame *from);
 
     void DeleteBuffers(VOSType subtype, bool delete_pause_frame);
 
@@ -239,9 +238,6 @@ class VideoOutputXv : public VideoOutput
 #ifdef USING_XVMC 
     XvMCSurfaceInfo      xvmc_surf_info;
 #endif // USING_XVMC
-
-    // Support for nVidia XvMC copy to texture feature
-    XvMCTextures        *xvmc_tex;
 
     // Basic Xv drawing info
     int                  xv_port;

@@ -290,29 +290,6 @@ GLXFBConfig get_fbuffer_cfg(MythXDisplay *disp, const int *attr_fbconfig)
     return cfg;
 }
 
-GLXPbuffer get_pbuffer(MythXDisplay *disp,
-                       GLXFBConfig   glx_fbconfig,
-                       const QSize  &video_dim)
-{
-    int attrib_pbuffer[16];
-    bzero(attrib_pbuffer, sizeof(int) * 16);
-    attrib_pbuffer[0] = GLX_PBUFFER_WIDTH;
-    attrib_pbuffer[1] = video_dim.width();
-    attrib_pbuffer[2] = GLX_PBUFFER_HEIGHT;
-    attrib_pbuffer[3] = video_dim.height();
-    attrib_pbuffer[4] = GLX_PRESERVED_CONTENTS;
-    attrib_pbuffer[5] = 0;
-
-    GLXPbuffer tmp = 0;
-
-#ifdef GLX_VERSION_1_3
-    XLOCK(disp, tmp = glXCreatePbuffer(disp->GetDisplay(),
-                                glx_fbconfig, attrib_pbuffer));
-#endif // GLX_VERSION_1_3
-
-    return tmp;
-}
-
 Window get_gl_window(MythXDisplay *disp,
                      Window        XJ_curwin,
                      XVisualInfo  *visInfo,
@@ -336,37 +313,6 @@ Window get_gl_window(MythXDisplay *disp,
     XFree(visInfo);
     return gl_window;
 }
-
-GLXWindow get_glx_window(MythXDisplay *disp,        GLXFBConfig  glx_fbconfig,
-                         Window        gl_window,   GLXContext   glx_context,
-                         GLXPbuffer    glx_pbuffer, const QSize &window_size)
-{
-    MythXLocker lock(disp);
-    GLXWindow glx_window = glXCreateWindow(
-        disp->GetDisplay(), glx_fbconfig, gl_window, NULL);
-
-    glXMakeContextCurrent(disp->GetDisplay(), glx_window,
-                          glx_pbuffer, glx_context);
-
-    glDrawBuffer(GL_BACK_LEFT);
-    glReadBuffer(GL_FRONT_LEFT);
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glShadeModel(GL_FLAT);
-    glEnable(GL_TEXTURE_RECTANGLE_NV);
-    
-    glViewport(0, 0, window_size.width(), window_size.height());
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    // left, right, botton, top, near, far
-    glOrtho(0, window_size.width(), 0, window_size.height(), -2, 2);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glFinish();
-
-    glXMakeContextCurrent(disp->GetDisplay(), None, None, NULL);
-    return glx_window;
-}                       
 #endif // USING_X11
 
 void *get_gl_proc_address(const QString &procName)

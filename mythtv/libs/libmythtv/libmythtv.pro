@@ -331,19 +331,16 @@ using_frontend {
 
     using_xv:HEADERS += videoout_xv.h   XvMCSurfaceTypes.h
     using_xv:HEADERS += osdxvmc.h       osdchromakey.h
-    using_xv:HEADERS += xvmctextures.h  util-xvmc.h
-    using_xv:HEADERS += util-xv.h
-    using_xv:SOURCES += videoout_xv.cpp  XvMCSurfaceTypes.cpp
-    using_xv:SOURCES += osdxvmc.cpp      osdchromakey.cpp
-    using_xv:SOURCES += xvmctextures.cpp util-xvmc.cpp
-    using_xv:SOURCES += util-xv.cpp
+    using_xv:HEADERS += util-xvmc.h     util-xv.h
+    using_xv:SOURCES += videoout_xv.cpp XvMCSurfaceTypes.cpp
+    using_xv:SOURCES += osdxvmc.cpp     osdchromakey.cpp
+    using_xv:SOURCES += util-xvmc.cpp   util-xv.cpp
 
     using_xv:DEFINES += USING_XV
 
     using_xvmc:DEFINES += USING_XVMC
     using_xvmcw:DEFINES += USING_XVMCW
     using_xvmc_vld:DEFINES += USING_XVMC_VLD
-    using_xvmc_pbuffer:DEFINES += USING_XVMC_PBUFFER
 
     using_vdpau {
         DEFINES += USING_VDPAU
@@ -358,7 +355,6 @@ using_frontend {
         HEADERS += util-opengl.h        openglcontext.h
         SOURCES += util-opengl.cpp      openglcontext.cpp
     }
-    using_xvmc_opengl:DEFINES += USING_XVMC_OPENGL
     using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 
     using_opengl_video:DEFINES += USING_OPENGL_VIDEO

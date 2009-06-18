@@ -130,23 +130,11 @@ int const *get_attr_cfg(FrameBufferType type);
 
 // Requires GLX 1.3 or later
 GLXFBConfig get_fbuffer_cfg(MythXDisplay *disp, const int*);
-
-GLXPbuffer get_pbuffer(MythXDisplay *disp,
-                       GLXFBConfig   glx_fbconfig,
-                       const QSize  &video_dim);
-
 Window get_gl_window(MythXDisplay *disp,
                      Window        XJ_curwin,
                      XVisualInfo  *visinfo,
                      const QRect  &window_rect,
                      bool          map_window = true);
-
-GLXWindow get_glx_window(MythXDisplay *disp,
-                         GLXFBConfig   glx_fbconfig,
-                         Window        gl_window,
-                         GLXContext    glx_context,
-                         GLXPbuffer    glx_pbuffer,
-                         const QSize  &window_size);
 #endif // USING_X11
 
 static inline int __glCheck__(const QString &loc, const char* fileName, int n)
