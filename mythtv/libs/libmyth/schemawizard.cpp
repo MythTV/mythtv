@@ -10,6 +10,7 @@
 #include "mythverbose.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "mythdb.h"
 
 
 static SchemaUpgradeWizard * c_wizard = 0;
@@ -373,6 +374,10 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (message.contains("%1"))
         message = message.arg(name).arg(DBver).arg(m_newSchemaVer);
 
+
+    DatabaseParams dbParam = MythDB::getMythDB()->GetDatabaseParams();
+    message += "\n\n" + tr("Database Host: %1\nDatabase Name: %2")
+                        .arg(dbParam.dbHostName).arg(dbParam.dbName);
 
     if (gui)
     {
