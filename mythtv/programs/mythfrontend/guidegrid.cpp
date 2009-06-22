@@ -1362,7 +1362,12 @@ void GuideGrid::updateChannels(void)
         MythUIButtonListItem *item = new MythUIButtonListItem(
                 m_channelList, chinfo->GetFormatted(m_channelFormat));
 
-        QString state = "";
+        QString state;
+        if (unavailable)
+            state = (m_changrpid == -1) ? "unavailable" : "favunavailable";
+        else
+            state = (m_changrpid == -1) ? "" : "favourite";
+
         item->SetText(chinfo->GetFormatted(m_channelFormat), "buttontext", state);
 
         if (showChannelIcon && !chinfo->icon.isEmpty())
