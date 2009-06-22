@@ -867,7 +867,6 @@
             <value>Program Listings</value>
         </textarea>
 
-
         <imagetype name="overviewbackground">
             <position>680,123</position>
             <filename>recordings/overviewbackground.png</filename>
@@ -958,6 +957,141 @@
 
         <textarea name="heading" from="baseheading">
             <value>Program Details</value>
+        </textarea>
+
+    </window>
+
+    <window name="programguide">
+
+        <imagetype name="backdrop" from="basebackdrop" />
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Program Guide</value>
+        </textarea>
+
+        <buttonlist name="channellist">
+            <area>0,99,240,700</area>
+            <layout>vertical</layout>
+            <spacing>2</spacing>
+            <buttonarea>0,0,240,700</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,250,70</area>
+                    <shape name="background">
+                        <area>0,0,250,70</area>
+                        <fill color="#767662" alpha="180" />
+                    </shape>
+                    <imagetype name="channelicon">
+                        <area>0,1,86,70</area>
+                        <mask>guide/icon_mask.png</mask>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>85,0,160,70</area>
+                        <font>basesmall</font>
+                        <font state="favourite">basesmallyellow</font>
+                        <font state="unavailable">basesmallblue</font>
+                        <font state="favunavailable">basesmallpurple</font>
+                        <align>allcenter</align>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+                <state name="selected" from="active" />
+                <state name="inactive" from="active" />
+            </statetype>
+        </buttonlist>
+
+        <guidegrid name="guidegrid">
+            <area>252,99,1040,357</area>
+            <layout>horizontal</layout>
+            <channels>5</channels>
+            <timeslots>4</timeslots>
+            <solidcolor>#003256</solidcolor>
+            <selector type="roundbox" linecolor="#a7ac93" />
+            <showcategories>yes</showcategories>
+            <categoryalpha>150</categoryalpha>
+            <recordingcolor>#00aa00</recordingcolor>
+            <conflictingcolor>#ff6600</conflictingcolor>
+            <cutdown>no</cutdown>
+            <multiline>yes</multiline>
+            <textoffset>9,6</textoffset>
+            <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
+            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
+            <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
+            <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
+            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
+            <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
+            <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
+            <arrow direction="left" image="guide/guide_arrow_left.png"></arrow>
+            <arrow direction="right" image="guide/guide_arrow_right.png"></arrow>
+            <font>basesmall</font>
+        </guidegrid>
+
+        <imagetype name="channelframe">
+            <position>0,55</position>
+            <filename>guide/guide_frame.png</filename>
+        </imagetype>
+
+        <buttonlist name="timelist">
+            <area>250,57,1030,30</area>
+            <layout>horizontal</layout>
+            <spacing>2</spacing>
+            <buttonarea>0,0,1030,30</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,255,30</area>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>10,10,200,30</area>
+                        <font>basesmall</font>
+                    </textarea>
+                    <imagetype name="arrow">
+                        <position>240,14</position>
+                        <filename>shared/list_right_arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active"/>
+                <state name="inactive" from="active"/>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="datetext" from="basetextarea">
+            <area>10,67,220,30</area>
+            <align>hcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <imagetype name="textbackground">
+            <position>30,475</position>
+            <filename>guide/guide_description_background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>48,480,980,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <statetype name="ratingstate" from="baserating">
+            <position>1193,507</position>
+        </statetype>
+
+        <textarea name="description" from="basetextarea">
+            <area>48,529,1190,100</area>
+            <multiline>yes</multiline>
+            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>48,642,290,30</area>
+        </textarea>
+
+        <textarea name="lentime" from="basetextarea">
+            <area>830,642,400,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="recordingstatus" from="basetextarea">
+            <area>490,642,300,30</area>
+            <align>hcenter</align>
         </textarea>
 
     </window>
