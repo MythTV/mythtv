@@ -2766,14 +2766,14 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
 
 void NuppelVideoPlayer::DisplayNormalFrame(void)
 {
-    SetVideoActuallyPaused(false);
+    SetVideoActuallyPaused(paused);
     resetvideo = false;
 
     if (!player_ctx->buffer->InDVDMenuOrStillFrame() ||
         (player_ctx->buffer->DVD()->NumMenuButtons() > 0 &&
         player_ctx->buffer->DVD()->GetChapterLength() > 3))
     {
-        if (!PrebufferEnoughFrames())
+        if (paused || !PrebufferEnoughFrames())
         {
             // When going to switch channels
             if (paused)
