@@ -11,7 +11,7 @@
 #include "osdxvmc.h"
 #include "videoout_xv.h"
 
-extern "C" XvImage *XvShmCreateImage(MythXDisplay*, XvPortID, int, char*,
+extern "C" XvImage *XvShmCreateImage(Display*, XvPortID, int, char*,
                                      int, int, XShmSegmentInfo*);
 
 #define NO_SUBPICTURE      0
@@ -97,7 +97,7 @@ void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)
     XvMCClearSubpicture(d, &osd_subpict, 0, 0, XJ_width,
                         XJ_height, osd_subpict_clear_color);
 
-    osd_xv_image = XvShmCreateImage(disp, xv_port,
+    osd_xv_image = XvShmCreateImage(d, xv_port,
                                     osd_subpict_info.id, NULL,
                                     XJ_width, XJ_height,
                                     &XJ_osd_shm_info);
