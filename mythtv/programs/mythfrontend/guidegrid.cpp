@@ -1988,6 +1988,7 @@ void GuideGrid::GoTo(int start, int cur_row)
     m_currentRow = cur_row % m_channelCount;
     updateChannels();
     fillProgramInfos();
+    updateInfo();
     updateJumpToChannel();
 }
 
