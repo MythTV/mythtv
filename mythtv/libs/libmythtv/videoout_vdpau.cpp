@@ -293,7 +293,11 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
         windows[0].GetDisplayVisibleRect().size(), scan);
 
     if (!frame)
-        vbuffers.SetLastShownFrameToScratch();
+    {
+        VideoFrame *buf = GetLastShownFrame();
+        if (buf)
+            buf->timecode = 0;
+    }
 }
 
 void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
