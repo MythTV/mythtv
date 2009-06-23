@@ -144,7 +144,6 @@ class VDPAUContext
     bool              osdReady;
     QSize             osdSize;
 
-    bool              deintAvail;
     QString           deinterlacer;
     bool              deinterlacing;
     long long         currentFrameNum;

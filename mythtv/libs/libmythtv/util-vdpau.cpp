@@ -73,7 +73,7 @@ VDPAUContext::VDPAUContext()
     outputSize(QSize(0,0)), decoder(0),        maxReferences(2),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
     osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
-    osdReady(false),        osdSize(QSize(0,0)) ,deintAvail(false),
+    osdReady(false),        osdSize(QSize(0,0)),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
     needDeintRefs(false),   deintLock(QMutex::Recursive),
     useColorControl(false), pipOutputSurface(0),
@@ -185,7 +185,6 @@ bool VDPAUContext::InitProcs(MythXDisplay *disp)
     bool ok = true;
     vdp_get_error_string = &dummy_get_error_string;
 
-    
     XLOCK(disp, vdp_st = vdp_device_create_x11(
         disp->GetDisplay(),
         disp->GetScreen(),
@@ -639,34 +638,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
 
     VdpStatus vdp_st;
     bool ok = true;
-
     int i;
-
-    VdpBool supported;
-    vdp_st = vdp_video_surface_query_capabilities(
-        vdp_device,
-        vdp_chroma_type,
-        &supported,
-        &maxVideoWidth,
-        &maxVideoHeight
-        );
-    CHECK_ST
-
-    if (!supported || !ok)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("Video surface -chroma type not supported."));
-        return false;
-    }
-    else if (maxVideoWidth  < (uint)width ||
-             maxVideoHeight < (uint)height)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("Video surface - too large (%1x%2 > %3x%4).")
-            .arg(width).arg(height)
-            .arg(maxVideoWidth).arg(maxVideoHeight));
-        return false;
-    }
 
     for (i = 0; i < num_bufs; i++)
     {
@@ -682,39 +654,26 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
     pause_surface = videoSurfaces[0].surface;
 
     // clear video surfaces to black
-    vdp_st = vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(
-                vdp_device,
-                vdp_chroma_type,
-                VDP_YCBCR_FORMAT_YV12,
-                &supported);
-
-    if (supported && (vdp_st == VDP_STATUS_OK))
+    unsigned char *tmp =
+        new unsigned char[(width * height * 3)>>1];
+    if (tmp)
     {
-        unsigned char *tmp =
-            new unsigned char[(width * height * 3)>>1];
-        if (tmp)
+        bzero(tmp, width * height);
+        memset(tmp + (width * height), 127, (width * height)>>1);
+        uint32_t pitches[3] = {width, width, width>>1};
+        void* const planes[3] =
+                    {tmp, tmp + (width * height), tmp + (width * height)};
+        for (i = 0; i < num_bufs; i++)
         {
-            bzero(tmp, width * height);
-            memset(tmp + (width * height), 127, (width * height)>>1);
-            uint32_t pitches[3] = {width, width, width>>1};
-            void* const planes[3] = 
-                        {tmp, tmp + (width * height), tmp + (width * height)};
-            for (i = 0; i < num_bufs; i++)
-            {
-                vdp_video_surface_put_bits_y_cb_cr(
-                    videoSurfaces[i].surface,
-                    VDP_YCBCR_FORMAT_YV12,
-                    planes,
-                    pitches
-                );
-            }
-            delete [] tmp;
+            vdp_video_surface_put_bits_y_cb_cr(
+                videoSurfaces[i].surface,
+                VDP_YCBCR_FORMAT_YV12,
+                planes,
+                pitches
+            );
         }
-
+        delete [] tmp;
     }
-
-    // TODO video capability/parameter check 
-    // but should just fail gracefully anyway
 
     uint32_t num_layers = 2; // PiP and OSD
     VdpVideoMixerParameter parameters[] = {
@@ -731,22 +690,6 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
         &num_layers
     };
 
-    // check deinterlacers available
-    vdp_st = vdp_video_mixer_query_parameter_support(
-        vdp_device,
-        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
-        &supported
-    );
-    CHECK_ST
-    deintAvail = (ok && supported);
-    vdp_st = vdp_video_mixer_query_parameter_support(
-        vdp_device,
-        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
-        &supported
-    );
-    CHECK_ST
-    deintAvail &= (ok && supported);
-
     VdpVideoMixerFeature features[] = {
         VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
         VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
@@ -754,8 +697,8 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
 
     vdp_st = vdp_video_mixer_create(
         vdp_device,
-        deintAvail ? ARSIZE(features) : 0,
-        deintAvail ? features : NULL,
+        ARSIZE(features),
+        features,
         ARSIZE(parameters),
         parameters,
         parameter_values,
@@ -836,36 +779,8 @@ bool VDPAUContext::InitOutput(QSize size)
 {
     VdpStatus vdp_st;
     bool ok = true;
-    int i;
 
-    VdpBool supported;
-    uint max_width, max_height;
-    vdp_st = vdp_output_surface_query_capabilities(
-        vdp_device,
-        VDP_RGBA_FORMAT_B8G8R8A8,
-        &supported,
-        &max_width,
-        &max_height
-    );
-    CHECK_ST
-
-    if (!supported || !ok)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("Output surface chroma format not supported."));
-        return false;
-    }
-    else if (max_width  < (uint)size.width() ||
-             max_height < (uint)size.height())
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("Output surface - too large (%1x%2 > %3x%4).")
-            .arg(size.width()).arg(size.height())
-            .arg(max_width).arg(max_height));
-        return false;
-    }
-    
-    for (i = 0; i < MIN_OUTPUT_SURFACES; i++)
+    for (int i = 0; i < MIN_OUTPUT_SURFACES; i++)
     {
         VdpOutputSurface tmp;
         vdp_st = vdp_output_surface_create(
@@ -1414,55 +1329,7 @@ bool VDPAUContext::InitOSD(QSize size)
 
     uint width = size.width();
     uint height = size.height();
-    VdpBool supported = false;
 
-    vdp_st = vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities(
-        vdp_device,
-        vdp_chroma_type,
-        VDP_YCBCR_FORMAT_YV12,
-        &supported
-    );
-    CHECK_ST
-    if (!supported || !ok)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-                    QString("YV12 upload to video surface not supported."));
-        return false;
-    }
-
-    uint32_t max_width, max_height;
-    vdp_st = vdp_bitmap_surface_query_capabilities(
-        vdp_device,
-        VDP_RGBA_FORMAT_A8,
-        &supported,
-        &max_width,
-        &max_height
-    );
-    CHECK_ST
-    if (!supported || !ok)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-                    QString("Alpha transparency bitmaps not supported."));
-        return false;
-    }
-    else if (max_width  < width ||
-             max_height < height)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-                    QString("Alpha bitmap too large (%1x%2 > %3x%4).")
-                    .arg(width).arg(height).arg(max_width).arg(max_height));
-        return false;
-    }
-
-    if (maxVideoWidth  < width ||
-        maxVideoHeight < height)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("OSD size too large for video surface."));
-        return false;
-    }
-
-    // capability already checked in InitOutput
     vdp_st = vdp_output_surface_create(
         vdp_device,
         VDP_RGBA_FORMAT_B8G8R8A8,
@@ -1682,9 +1549,6 @@ bool VDPAUContext::SetDeinterlacer(const QString &deint)
 bool VDPAUContext::SetDeinterlacing(bool interlaced)
 {
     QMutexLocker locker(&deintLock);
-
-    if (!deintAvail)
-        return false;
 
     if (!deinterlacer.contains("vdpau"))
         interlaced = false;
