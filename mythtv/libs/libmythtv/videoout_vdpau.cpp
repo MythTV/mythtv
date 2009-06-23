@@ -95,7 +95,7 @@ bool VideoOutputVDPAU::InitContext(void)
     ok = ok ? m_ctx->Init(m_disp, m_win,
                           display_visible_rect.size(),
                           db_use_picture_controls,
-                          m_colorkey, m_codec_id): ok;
+                          m_colorkey, m_codec_id, GetFilters()): ok;
     if (!ok)
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to initialise VDPAU"));
     return ok;

@@ -12,6 +12,16 @@ extern "C" {
 
 #define MAX_VDPAU_ERRORS 10
 
+enum VDPAUFeatures
+{
+    kVDP_FEAT_NONE      = 0x00,
+    kVDP_FEAT_TEMPORAL  = 0x01,
+    kVDP_FEAT_SPATIAL   = 0x02,
+    kVDP_FEAT_IVTC      = 0x04,
+    kVDP_FEAT_DENOISE   = 0x08,
+    kVDP_FEAT_SHARPNESS = 0x10,
+};
+
 struct vdpauPIP
 {
     QSize           videoSize;
@@ -35,7 +45,8 @@ class VDPAUContext
 
     bool Init(MythXDisplay *disp, Window win,
               QSize screen_size, bool color_control,
-              int color_key, MythCodecID mcodecid);
+              int color_key, MythCodecID mcodecid,
+              QString options);
     void Deinit(void);
     VideoErrorState GetError(void) { return errorState; }
     bool IsErrored(void)
@@ -97,6 +108,9 @@ class VDPAUContext
     bool InitProcs(MythXDisplay *disp);
     void DeinitProcs(void);
     void ClearScreen(void);
+    VdpVideoMixer CreateMasterMixer(int width, int height);
+    VdpVideoMixer CreateMixer(int width, int height,  uint32_t layers = 0,
+                              int feats = 0);
 
     bool InitFlipQueue(Window win, int color_key);
     void DeinitFlipQueue(void);
@@ -105,7 +119,6 @@ class VDPAUContext
     bool UpdateReferenceFrames(VideoFrame *frame);
     bool InitColorControl(void);
     bool SetPictureAttributes(void);
-
     
     void DeinitPIPLayer(void);
     bool InitPIP(NuppelVideoPlayer *pipplayer, QSize vid_size);
@@ -115,8 +128,6 @@ class VDPAUContext
 
     int pix_fmt;
 
-    uint maxVideoWidth;
-    uint maxVideoHeight;
     vector<video_surface> videoSurfaces;
     int checkVideoSurfaces;
     VdpVideoSurface pause_surface;
@@ -126,9 +137,12 @@ class VDPAUContext
     bool             checkOutputSurfaces;
     QSize            outputSize;
 
-    VdpDecoder decoder;
-    uint32_t   maxReferences;
+    VdpDecoder    decoder;
+    uint32_t      maxReferences;
     VdpVideoMixer videoMixer;
+    int           mixerFeatures;
+    QSize         videoSize;
+    LetterBoxColour letterboxColour;
 
     VdpRect outRect;
     VdpRect outRectVid;

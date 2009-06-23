@@ -1576,6 +1576,9 @@ void VideoDisplayProfile::init_statics(void)
         safe_osd[*it]   += "softblend";
     }
 
+    // allow vdpau filters
+    safe_custom += "vdpau";
+
     QStringList tmp;
     tmp += "xv-blit";
     tmp += "xvmc-blit";

@@ -67,13 +67,13 @@ static void vdpau_preemption_callback(VdpDevice device, void *vdpau_ctx)
 
 VDPAUContext::VDPAUContext()
   : nextframedelay(0),      lastframetime(0),
-    pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
-    checkVideoSurfaces(8),  pause_surface(0),
+    pix_fmt(-1),            checkVideoSurfaces(8), pause_surface(0),
     outputSurface(0),       checkOutputSurfaces(false),
     outputSize(QSize(0,0)), decoder(0),        maxReferences(2),
-    videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
-    osdOutputSurface(0),    osdVideoMixer(0),  osdAlpha(0),
-    osdReady(false),        osdSize(QSize(0,0)),
+    videoMixer(0),          mixerFeatures(0),  videoSize(QSize(0,0)),
+    letterboxColour(kLetterBoxColour_Black),      surfaceNum(0),
+    osdVideoSurface(0),     osdOutputSurface(0),  osdVideoMixer(0),
+    osdAlpha(0),            osdReady(false),      osdSize(QSize(0,0)),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
     needDeintRefs(false),   deintLock(QMutex::Recursive),
     useColorControl(false), pipOutputSurface(0),
@@ -127,9 +127,16 @@ VDPAUContext::~VDPAUContext()
 
 bool VDPAUContext::Init(MythXDisplay *disp, Window win, QSize screen_size,
                         bool color_control, int color_key,
-                        MythCodecID mcodecid)
+                        MythCodecID mcodecid, QString options)
 {
     outputSize = screen_size;
+
+    if (options.contains("vdpauivtc"))
+    {
+        VERBOSE(VB_PLAYBACK, LOC + QString("Enabling VDPAU inverse telecine - "
+                                "requires Basic or Advanced deinterlacer."));
+        mixerFeatures |= kVDP_FEAT_IVTC;
+    }
 
     if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END))
         vdpauDecode = true;
@@ -636,10 +643,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
     if (!vdpauDecode)
         num_bufs = NUM_REFERENCE_FRAMES;
 
-    VdpStatus vdp_st;
-    bool ok = true;
     int i;
-
     for (i = 0; i < num_bufs; i++)
     {
         int tmp = AddBuffer(width, height);
@@ -675,50 +679,24 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
         delete [] tmp;
     }
 
-    uint32_t num_layers = 2; // PiP and OSD
-    VdpVideoMixerParameter parameters[] = {
-        VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_WIDTH,
-        VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_HEIGHT,
-        VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE,
-        VDP_VIDEO_MIXER_PARAMETER_LAYERS,
-    };
-
-    void const * parameter_values[] = {
-        &width,
-        &height,
-        &vdp_chroma_type,
-        &num_layers
-    };
-
-    VdpVideoMixerFeature features[] = {
-        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
-        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
-    };
-
-    vdp_st = vdp_video_mixer_create(
-        vdp_device,
-        ARSIZE(features),
-        features,
-        ARSIZE(parameters),
-        parameters,
-        parameter_values,
-        &videoMixer
-    );
-    CHECK_ST
-
-    if (!ok && videoMixer)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("Create video mixer - errored but returned handle."));
-    }
+    letterboxColour = letterbox_colour;
+    videoMixer = CreateMasterMixer(width, height);
 
     // minimise green screen
-    if (ok)
+    if (videoMixer)
         ClearScreen();
+    return videoMixer;
+}
 
-    // set letterbox colour
-    if (ok && (letterbox_colour == kLetterBoxColour_Gray25))
+VdpVideoMixer VDPAUContext::CreateMasterMixer(int width, int height)
+{
+    videoSize = QSize(width, height);
+    VdpVideoMixer ret = CreateMixer(width, height, 2, mixerFeatures);
+
+    if (ret && (letterboxColour == kLetterBoxColour_Gray25))
     {
+        VdpStatus vdp_st;
+        bool ok = true;
         VdpColor gray;
         gray.red = 0.5f;
         gray.green = 0.5f;
@@ -738,8 +716,81 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs,
         );
         CHECK_ST
     }
+    return ret;
+}
 
-    return ok;
+VdpVideoMixer VDPAUContext::CreateMixer(int width, int height, uint32_t layers,
+                                        int feats)
+{
+    VdpVideoMixerParameter parameters[] = {
+        VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_WIDTH,
+        VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_HEIGHT,
+        VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE,
+        VDP_VIDEO_MIXER_PARAMETER_LAYERS,
+    };
+
+    void const * parameter_values[] = {
+        &width,
+        &height,
+        &vdp_chroma_type,
+        &layers
+    };
+
+    int i = 0;
+    VdpVideoMixerFeature feat[5];
+    VdpBool enable = true;
+    const VdpBool enables[5] = { enable, enable, enable, enable, enable };
+    bool temporal = (feats & kVDP_FEAT_TEMPORAL) || (feats & kVDP_FEAT_SPATIAL);
+
+    if (temporal)
+    {
+        feat[i] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL;
+        i++;
+    }
+
+    if (feats & kVDP_FEAT_SPATIAL)
+    {
+        feat[i] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL;
+        i++;
+    }
+
+    if ((feats & kVDP_FEAT_IVTC) && temporal)
+    {
+        feat[i] = VDP_VIDEO_MIXER_FEATURE_INVERSE_TELECINE;
+        i++;
+    }
+
+    if (feats & kVDP_FEAT_DENOISE)
+    {
+        feat[i] = VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION;
+        i++;
+    }
+
+    if (feats & kVDP_FEAT_SHARPNESS)
+    {
+        feat[i] = VDP_VIDEO_MIXER_FEATURE_SHARPNESS;
+        i++;
+    }
+
+    VdpStatus vdp_st;
+    bool ok = true;
+    VdpVideoMixer tmp;
+    vdp_st = vdp_video_mixer_create(
+        vdp_device, i, i ? feat : NULL, 4, parameters,
+        parameter_values, &tmp
+    );
+    CHECK_ST
+
+    if (!ok || !tmp)
+        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to create video mixer."));
+    else
+    {
+        vdp_st = vdp_video_mixer_set_feature_enables(
+            tmp, i, i ? feat : NULL, i ? enables : NULL);
+        CHECK_ST
+    }
+
+    return tmp;
 }
 
 void VDPAUContext::FreeBuffers(void)
@@ -751,9 +802,7 @@ void VDPAUContext::FreeBuffers(void)
 
     if (videoMixer)
     {
-        vdp_st = vdp_video_mixer_destroy(
-            videoMixer
-        );
+        vdp_st = vdp_video_mixer_destroy(videoMixer);
         videoMixer = 0;
         CHECK_ST
     }
@@ -1374,18 +1423,6 @@ bool VDPAUContext::InitOSD(QSize size)
         CHECK_ST
     }
 
-    VdpVideoMixerParameter parameters[] = {
-        VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_WIDTH,
-        VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_HEIGHT,
-        VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE
-    };
-
-    void const * parameter_values[] = {
-        &width,
-        &height,
-        &vdp_chroma_type
-    };
-
     if (!ok)
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR +
@@ -1393,24 +1430,11 @@ bool VDPAUContext::InitOSD(QSize size)
     }
     else
     {
-        vdp_st = vdp_video_mixer_create(
-            vdp_device,
-            0,
-            0,
-            ARSIZE(parameters),
-            parameters,
-            parameter_values,
-            &osdVideoMixer
-        );
-        CHECK_ST
+        osdVideoMixer = CreateMixer(width, height);
+        ok = osdVideoMixer;
     }
 
-    if (!ok)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-            QString("Failed to create video mixer."));
-    }
-    else
+    if (ok)
     {
         osdSize = size;
         osdRect.x0 = 0;
@@ -1553,53 +1577,40 @@ bool VDPAUContext::SetDeinterlacing(bool interlaced)
     if (!deinterlacer.contains("vdpau"))
         interlaced = false;
 
-    VdpStatus vdp_st;
-    bool ok = interlaced;
+    bool spatial  = deinterlacer.contains("advanced");
+    bool temporal = deinterlacer.contains("basic") || spatial;
+    int features  = mixerFeatures;
+    needDeintRefs = spatial || temporal;
 
-    VdpVideoMixerFeature features[] = {
-        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
-        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
-    };
-
-    VdpBool temporal = false;
-    VdpBool spatial  = false;
-    if (deinterlacer.contains("basic"))
+    if (temporal)
     {
-        temporal = interlaced;
+        features = interlaced ?
+            features |  kVDP_FEAT_TEMPORAL :
+            features & ~kVDP_FEAT_TEMPORAL;
     }
-    else if (deinterlacer.contains("advanced"))
+
+    if (spatial)
     {
-        temporal = interlaced;
-        spatial  = interlaced;
+        features = interlaced ?
+            features |  kVDP_FEAT_SPATIAL :
+            features & ~kVDP_FEAT_SPATIAL;
     }
-    
-    const VdpBool feature_values[] = {
-        temporal,
-        spatial,
-    };
 
-    // the following call generates a VDPAU error when both temporal
-    // and spatial are false (i.e. when disabling deinterlacing)
-    vdp_st = vdp_video_mixer_set_feature_enables(
-        videoMixer,
-        ARSIZE(features),
-        features,
-        feature_values
-    );
-    CHECK_ST
+    if (features == mixerFeatures)
+    {
+        deinterlacing = interlaced;
+        return deinterlacing;
+    }
 
-    deinterlacing = (interlaced & ok);
-    needDeintRefs = false;
+    vdp_video_mixer_destroy(videoMixer);
+    mixerFeatures = features;
+    videoMixer = CreateMasterMixer(videoSize.width(), videoSize.height());
+    SetPictureAttributes();
+    deinterlacing = interlaced && videoMixer;
+
     if (!deinterlacing)
-    {
         ClearReferenceFrames();
-    }
-    else
-    {
-        if (deinterlacer.contains("advanced") ||
-            deinterlacer.contains("basic"))
-            needDeintRefs = true;
-    }
+
     return deinterlacing;
 }
 
@@ -2123,32 +2134,7 @@ bool VDPAUContext::InitPIP(NuppelVideoPlayer *pipplayer,
     CHECK_ST
 
     if (ok)
-    {
-        int width = vid_size.width();
-        int height = vid_size.height();
-        VdpVideoMixerParameter parameters[] = {
-            VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_WIDTH,
-            VDP_VIDEO_MIXER_PARAMETER_VIDEO_SURFACE_HEIGHT,
-            VDP_VIDEO_MIXER_PARAMETER_CHROMA_TYPE
-        };
-
-        void const * parameter_values[] = {
-            &width,
-            &height,
-            &vdp_chroma_type
-        };
-
-        vdp_st = vdp_video_mixer_create(
-            vdp_device,
-            0,
-            0,
-            ARSIZE(parameters),
-            parameters,
-            parameter_values,
-            &tmp_mixer
-        );
-        CHECK_ST
-    }
+        tmp_mixer = CreateMixer(vid_size.width(), vid_size.height());
 
     if (ok && tmp_mixer && tmp_surface)
     {
@@ -2276,4 +2262,3 @@ bool VDPAUContext::ShowPIP(NuppelVideoPlayer *pipplayer,
 
     return ok;
 }
-
