@@ -756,11 +756,13 @@ bool NuppelVideoPlayer::InitVideo(void)
         // We need to tell it this for automatic deinterlacer settings
         videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
 
-        if (videoOutput->hasMCAcceleration() && !decode_extra_audio)
+        if ((videoOutput->hasMCAcceleration() ||
+             videoOutput->hasVDPAUAcceleration()) &&
+            !decode_extra_audio)
         {
             VERBOSE(VB_IMPORTANT, LOC +
                     "Forcing decode extra audio option on. "
-                    "\n\t\t\tXvMC playback requires it.");
+                    "\n\t\t\tXvMC/VDPAU playback requires it.");
             decode_extra_audio = true;
             if (GetDecoder())
                 GetDecoder()->SetLowBuffers(decode_extra_audio);
