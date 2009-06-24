@@ -75,7 +75,8 @@ VDPAUContext::VDPAUContext()
     osdVideoSurface(0),     osdOutputSurface(0),  osdVideoMixer(0),
     osdAlpha(0),            osdReady(false),      osdSize(QSize(0,0)),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
-    needDeintRefs(false),   deintLock(QMutex::Recursive),
+    needDeintRefs(false),   deintLock(QMutex::Recursive), skipChroma(0),
+    denoise(0.0f),          sharpen(0.0f),
     useColorControl(false), pipOutputSurface(0),
     pipAlpha(0),            pipBorder(0),
     pipClear(0),            pipReady(0),       pipNeedsClear(false),
@@ -130,13 +131,7 @@ bool VDPAUContext::Init(MythXDisplay *disp, Window win, QSize screen_size,
                         MythCodecID mcodecid, QString options)
 {
     outputSize = screen_size;
-
-    if (options.contains("vdpauivtc"))
-    {
-        VERBOSE(VB_PLAYBACK, LOC + QString("Enabling VDPAU inverse telecine - "
-                                "requires Basic or Advanced deinterlacer."));
-        mixerFeatures |= kVDP_FEAT_IVTC;
-    }
+    ParseOptions(options);
 
     if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END))
         vdpauDecode = true;
@@ -693,29 +688,60 @@ VdpVideoMixer VDPAUContext::CreateMasterMixer(int width, int height)
     videoSize = QSize(width, height);
     VdpVideoMixer ret = CreateMixer(width, height, 2, mixerFeatures);
 
-    if (ret && (letterboxColour == kLetterBoxColour_Gray25))
+    if (!ret)
+        return ret;
+
+    int count = 0;
+    VdpVideoMixerAttribute attributes[4];
+    void const *values[4];
+
+    VdpColor gray;
+    gray.red = 0.5f;
+    gray.green = 0.5f;
+    gray.blue = 0.5f;
+    gray.alpha = 1.0f;
+
+    if (letterboxColour == kLetterBoxColour_Gray25)
+    {
+        attributes[count] =
+            VDP_VIDEO_MIXER_ATTRIBUTE_BACKGROUND_COLOR;
+        values[count] = &gray;
+        count++;
+    }
+
+    if (skipChroma)
+    {
+        attributes[count] =
+            VDP_VIDEO_MIXER_ATTRIBUTE_SKIP_CHROMA_DEINTERLACE;
+        values[count] = &skipChroma;
+        count++;
+    }
+
+    if ((denoise != 0.0f) && (mixerFeatures & kVDP_FEAT_DENOISE))
+    {
+        attributes[count] =
+            VDP_VIDEO_MIXER_ATTRIBUTE_NOISE_REDUCTION_LEVEL;
+        values[count] = &denoise;
+        count++;
+    }
+
+    if ((sharpen != 0.0f) && (mixerFeatures & kVDP_FEAT_SHARPNESS))
+    {
+        attributes[count] =
+            VDP_VIDEO_MIXER_ATTRIBUTE_SHARPNESS_LEVEL;
+        values[count] = &sharpen;
+        count++;
+    }
+
+    if (count)
     {
         VdpStatus vdp_st;
         bool ok = true;
-        VdpColor gray;
-        gray.red = 0.5f;
-        gray.green = 0.5f;
-        gray.blue = 0.5f;
-        gray.alpha = 1.0f;
-
-        VdpVideoMixerAttribute attributes[] = {
-            VDP_VIDEO_MIXER_ATTRIBUTE_BACKGROUND_COLOR,
-        };
-        void const * attribute_values[] = { &gray };
-
         vdp_st = vdp_video_mixer_set_attribute_values(
-           videoMixer,
-           ARSIZE(attributes),
-           attributes,
-           attribute_values
-        );
+                    ret, count, attributes, values);
         CHECK_ST
     }
+
     return ret;
 }
 
@@ -736,7 +762,7 @@ VdpVideoMixer VDPAUContext::CreateMixer(int width, int height, uint32_t layers,
         &layers
     };
 
-    int i = 0;
+    int count = 0;
     VdpVideoMixerFeature feat[5];
     VdpBool enable = true;
     const VdpBool enables[5] = { enable, enable, enable, enable, enable };
@@ -744,39 +770,39 @@ VdpVideoMixer VDPAUContext::CreateMixer(int width, int height, uint32_t layers,
 
     if (temporal)
     {
-        feat[i] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL;
-        i++;
+        feat[count] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL;
+        count++;
     }
 
     if (feats & kVDP_FEAT_SPATIAL)
     {
-        feat[i] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL;
-        i++;
+        feat[count] = VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL;
+        count++;
     }
 
     if ((feats & kVDP_FEAT_IVTC) && temporal)
     {
-        feat[i] = VDP_VIDEO_MIXER_FEATURE_INVERSE_TELECINE;
-        i++;
+        feat[count] = VDP_VIDEO_MIXER_FEATURE_INVERSE_TELECINE;
+        count++;
     }
 
     if (feats & kVDP_FEAT_DENOISE)
     {
-        feat[i] = VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION;
-        i++;
+        feat[count] = VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION;
+        count++;
     }
 
     if (feats & kVDP_FEAT_SHARPNESS)
     {
-        feat[i] = VDP_VIDEO_MIXER_FEATURE_SHARPNESS;
-        i++;
+        feat[count] = VDP_VIDEO_MIXER_FEATURE_SHARPNESS;
+        count++;
     }
 
     VdpStatus vdp_st;
     bool ok = true;
     VdpVideoMixer tmp;
     vdp_st = vdp_video_mixer_create(
-        vdp_device, i, i ? feat : NULL, 4, parameters,
+        vdp_device, count, count ? feat : NULL, 4, parameters,
         parameter_values, &tmp
     );
     CHECK_ST
@@ -786,7 +812,7 @@ VdpVideoMixer VDPAUContext::CreateMixer(int width, int height, uint32_t layers,
     else
     {
         vdp_st = vdp_video_mixer_set_feature_enables(
-            tmp, i, i ? feat : NULL, i ? enables : NULL);
+            tmp, count, count ? feat : NULL, count ? enables : NULL);
         CHECK_ST
     }
 
@@ -2261,4 +2287,56 @@ bool VDPAUContext::ShowPIP(NuppelVideoPlayer *pipplayer,
         pipReady = 2; // for double rate deint
 
     return ok;
+}
+
+void VDPAUContext::ParseOptions(QString options)
+{
+    QStringList list = options.split(",");
+    if (list.empty())
+        return;
+
+    for (QStringList::Iterator i = list.begin(); i != list.end(); ++i)
+    {
+        QString name = (*i).section('=', 0, 0);
+        QString opts = (*i).section('=', 1);
+
+        if (name.contains("vdpauivtc"))
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Enabling VDPAU inverse telecine - "
+                            "requires Basic or Advanced deinterlacer."));
+            mixerFeatures |= kVDP_FEAT_IVTC;
+        }
+
+        if (name.contains("vdpauskipchroma"))
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Enabling SkipChromaDeinterlace."));
+            skipChroma = 1;
+        }
+
+        if (name.contains("vdpaudenoise"))
+        {
+            float tmp = MAX(0.0f, MIN(1.0f, opts.toFloat()));
+            if (tmp != 0.0)
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("VDPAU Denoise %1").arg(tmp,4,'f',2,'0'));
+                denoise = tmp;
+                mixerFeatures |= kVDP_FEAT_DENOISE;
+            }
+        }
+
+        if (name.contains("vdpausharpen"))
+        {
+            float tmp = MAX(-1.0f, MIN(1.0f, opts.toFloat()));
+            if (tmp != 0.0)
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("VDPAU Sharpen %1").arg(tmp,4,'f',2,'0'));
+                sharpen = tmp;
+                mixerFeatures |= kVDP_FEAT_SHARPNESS;
+            }
+        }
+    }
 }

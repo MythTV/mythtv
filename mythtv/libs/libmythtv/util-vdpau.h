@@ -111,17 +111,15 @@ class VDPAUContext
     VdpVideoMixer CreateMasterMixer(int width, int height);
     VdpVideoMixer CreateMixer(int width, int height,  uint32_t layers = 0,
                               int feats = 0);
-
     bool InitFlipQueue(Window win, int color_key);
     void DeinitFlipQueue(void);
-
     void AddOutputSurfaces(void);
     bool UpdateReferenceFrames(VideoFrame *frame);
     bool InitColorControl(void);
     bool SetPictureAttributes(void);
-    
     void DeinitPIPLayer(void);
     bool InitPIP(NuppelVideoPlayer *pipplayer, QSize vid_size);
+    void ParseOptions(QString options);
 
     int nextframedelay;
     VdpTime lastframetime;
@@ -164,6 +162,9 @@ class VDPAUContext
     frame_queue_t     referenceFrames;
     bool              needDeintRefs;
     QMutex            deintLock;
+    uint8_t           skipChroma;
+    float             denoise;
+    float             sharpen;
 
     bool              useColorControl;
     VdpCSCMatrix      cscMatrix;
