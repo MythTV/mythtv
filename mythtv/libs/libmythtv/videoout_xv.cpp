@@ -297,16 +297,6 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
 }
 
 /**
- *\brief Returns total visible window space.
- */
-QRect VideoOutputXv::GetTotalVisibleRect(void) const
-{
-    const QRect tvr = windows[0].GetDisplayVisibleRect();
-    QString osdrenderer = db_vdisp_profile->GetOSDRenderer();
-    return tvr;
-}
-
-/**
  * \fn VideoOutputXv::GetRefreshRate(void)
  *
  * This uses the XFree86 xf86vmode extension to query the mode line

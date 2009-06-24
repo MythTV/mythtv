@@ -133,12 +133,9 @@ class VideoOutputXv : public VideoOutput
                                            const QSize &video_dim);
 
     VOSType VideoOutputSubType() const { return video_output_subtype; }
-    void SetNextFrameDisplayTimeOffset(int delayus);
 
   private:
     virtual bool hasFullScreenOSD(void) const { return chroma_osd; }
-    QRect GetTotalVisibleRect(void) const;
-
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);
     void DiscardFrame(VideoFrame*);
     void DiscardFrames(bool next_frame_keyframe);
@@ -194,11 +191,6 @@ class VideoOutputXv : public VideoOutput
     XvMCOSD* GetAvailableOSD();
     void ReturnAvailableOSD(XvMCOSD*);
 #endif // USING_XVMC
-
-    // OpenGL specific helper functions
-    bool SetDeinterlacingEnabledOpenGL(bool enable);
-    bool SetupDeinterlaceOpenGL(
-        bool interlaced, const QString &overridefilter);
 
     // Misc.
     MythCodecID          myth_codec_id;
