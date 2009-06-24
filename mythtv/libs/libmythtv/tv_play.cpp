@@ -8609,9 +8609,6 @@ void TV::customEvent(QEvent *e)
 
         isEmbedded = false;
         ignoreKeyPresses = false;
-
-        // ensure the player is visible
-        qApp->postEvent(gContext->GetMainWindow(), new QEvent(QEvent::Paint));
     }
 
     if (message.left(14) == "COMMFLAG_START")

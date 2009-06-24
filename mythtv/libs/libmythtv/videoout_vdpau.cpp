@@ -470,6 +470,9 @@ void VideoOutputVDPAU::DrawUnusedRects(bool sync)
         m_disp->FillRectangle(m_win, display_visible_rect);
         windows[0].SetNeedRepaint(false);
     }
+
+    if (sync)
+        m_disp->Sync();
 }
 
 void VideoOutputVDPAU::UpdatePauseFrame(void)
