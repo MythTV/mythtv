@@ -359,30 +359,32 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     bool cid_changed = (m_codec_id != av_codec_id);
     bool res_changed = input_size  != windows[0].GetVideoDispDim();
     bool asp_changed = aspect      != windows[0].GetVideoAspect();
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
     if (!res_changed && !cid_changed)
     {
         if (asp_changed)
+        {
+            VideoAspectRatioChanged(aspect);
             MoveResize();
+        }
         return true;
     }
 
     m_codec_id = av_codec_id;
     TearDown();
+    QRect disp = windows[0].GetDisplayVisibleRect();
     if (Init(input_size.width(), input_size.height(),
-             aspect, m_win,
-             windows[0].GetVideoRect().left(),
-             windows[0].GetVideoRect().top(),
-             windows[0].GetDisplayVisibleRect().width(),
-             windows[0].GetDisplayVisibleRect().height(),
-             0))
+             aspect, m_win, disp.left(), disp.top(),
+             disp.width(), disp.height(), 0))
     {
         BestDeint();
         return true;
     }
 
-    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to recreate context."));
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+        QString("Failed to re-initialise video output."));
+    errorState = kError_Unknown;
+
     return false;
 }
 

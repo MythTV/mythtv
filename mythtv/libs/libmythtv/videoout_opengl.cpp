@@ -148,37 +148,31 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
         return false;
     }
 
-    bool size_changed = (input_size != windows[0].GetVideoDim());
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
-
-    if (!size_changed)
+    if (input_size != windows[0].GetVideoDim())
     {
         if (windows[0].GetVideoAspect() != aspect)
+        {
+            VideoAspectRatioChanged(aspect);
             MoveResize();
+        }
         return true;
     }
 
     TearDown();
-
-    bool ok = Init(input_size.width(), input_size.height(),
-                   aspect, gl_parent_win,
-                   windows[0].GetVideoRect().left(),
-                   windows[0].GetVideoRect().top(),
-                   windows[0].GetDisplayVisibleRect().width(),
-                   windows[0].GetDisplayVisibleRect().height(),
-                   gl_embed_win);
-
-    if (ok)
+    QRect disp = windows[0].GetDisplayVisibleRect();
+    if (Init(input_size.width(), input_size.height(),
+             aspect, gl_parent_win, disp.left(),  disp.top(),
+             disp.width(), disp.height(), gl_embed_win))
     {
         BestDeint();
+        return true;
     }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("Failed to re-initialise video output."));
-        errorState = kError_Unknown;
-    }
-    return ok;
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+        QString("Failed to re-initialise video output."));
+    errorState = kError_Unknown;
+
+    return false;
 }
 
 bool VideoOutputOpenGL::SetupContext(void)
