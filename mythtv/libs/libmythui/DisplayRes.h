@@ -20,8 +20,19 @@ typedef enum { GUI = 0, VIDEO = 1, CUSTOM_GUI = 2, CUSTOM_VIDEO = 3 } tmode;
 
 class MPUBLIC DisplayRes {
   public:
-    /** \brief Factory method that returns a DisplayRes singleton */
-    static DisplayRes *GetDisplayRes(void);
+    /** \brief Factory method that returns a DisplayRes singleton
+     *
+     *  \param lock prevent other objects that also request a lock
+     *              from altering the display resolution
+     *  \sa Unlock(void)
+     */
+
+    static DisplayRes *GetDisplayRes(bool lock = false);
+
+    /** \brief Release any access restrictions
+     *  \sa GetDisplayRes(bool)
+     */
+    static void Unlock(void);
 
     /** \brief Initialize DisplayRes, normally called automatically.
      *
@@ -129,6 +140,7 @@ class MPUBLIC DisplayRes {
     int max_width, max_height;
 
     static DisplayRes *instance;
+    static bool        locked;
 };
 
 /** \fn GetVideoModes(void)

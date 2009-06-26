@@ -4,7 +4,6 @@
 // MythTV headers
 #include "videooutbase.h"
 #include "util-vdpau.h"
-#include "DisplayRes.h"
 #include "mythxdisplay.h"
 
 class VDPAUContext;
@@ -34,8 +33,7 @@ class VideoOutputVDPAU : public VideoOutput
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
-    void ResizeForGui(void);
-    void ResizeForVideo(void);
+    void MoveResizeWindow(QRect new_rect);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
@@ -61,7 +59,6 @@ class VideoOutputVDPAU : public VideoOutput
     void DiscardFrames(bool next_frame_keyframe);
     void DoneDisplayingFrame(void);
     void CheckFrameStates(void);
-    void ResizeForVideo(uint width, uint height);
     void InitDisplayMeasurements(uint width, uint height);
     virtual int DisplayOSD(VideoFrame *frame, OSD *osd,
                            int stride = -1, int revision = -1);
@@ -71,7 +68,6 @@ class VideoOutputVDPAU : public VideoOutput
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
 
     MythCodecID          m_codec_id;
-    DisplayRes          *m_display_res;
     Window               m_win;
     MythXDisplay        *m_disp;
     VDPAUContext        *m_ctx;

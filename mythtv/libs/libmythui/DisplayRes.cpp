@@ -11,9 +11,13 @@
 #endif
 
 DisplayRes * DisplayRes::instance = NULL;
+bool         DisplayRes::locked   = false;
 
-DisplayRes * DisplayRes::GetDisplayRes(void)
+DisplayRes * DisplayRes::GetDisplayRes(bool lock)
 {
+    if (lock && locked)
+        return NULL;
+
     if (!instance)
     {
 #ifdef USING_XRANDR
@@ -22,7 +26,16 @@ DisplayRes * DisplayRes::GetDisplayRes(void)
         instance = new DisplayResOSX();
 #endif
     }
+
+    if (instance && lock)
+        locked = true;
+
     return instance;
+}
+
+void DisplayRes::Unlock(void)
+{
+    locked = false;
 }
 
 bool DisplayRes::Initialize(void)

@@ -19,20 +19,18 @@
 
 VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
   : VideoOutput(),
-    m_codec_id(codec_id), m_display_res(NULL), m_win(0),
+    m_codec_id(codec_id), m_win(0),
     m_disp(NULL), m_ctx(NULL), m_colorkey(0x020202),
     m_lock(QMutex::Recursive), m_osd_avail(false), m_pip_avail(true)
 {
     if (gContext->GetNumSetting("UseVideoModes", 0))
-        m_display_res = DisplayRes::GetDisplayRes();
+        display_res = DisplayRes::GetDisplayRes(true);
 }
 
 VideoOutputVDPAU::~VideoOutputVDPAU()
 {
     QMutexLocker locker(&m_lock);
     TearDown();
-    if (m_display_res)
-        m_display_res->SwitchToGUI();
 }
 
 void VideoOutputVDPAU::TearDown(void)
@@ -418,46 +416,10 @@ void VideoOutputVDPAU::StopEmbedding(void)
     MoveResize();
 }
 
-void VideoOutputVDPAU::ResizeForGui(void)
+void VideoOutputVDPAU::MoveResizeWindow(QRect new_rect)
 {
-    if (m_display_res)
-        m_display_res->SwitchToGUI();
-}
-
-void VideoOutputVDPAU::ResizeForVideo(void)
-{
-    const QSize video_disp_dim = windows[0].GetVideoDispDim();
-    ResizeForVideo(video_disp_dim.width(), video_disp_dim.height());
-}
-
-void VideoOutputVDPAU::ResizeForVideo(uint width, uint height)
-{
-    if ((width == 1920 || width == 1440) && height == 1088)
-        height = 1080;
-
-    if (m_display_res && m_display_res->SwitchToVideo(width, height))
-    {
-        windows[0].SetDisplayDim(QSize(m_display_res->GetPhysicalWidth(),
-                                       m_display_res->GetPhysicalHeight()));
-        windows[0].SetDisplayAspect(m_display_res->GetAspectRatio());
-
-        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        if (!fullscreen)
-        {
-            int gui_width = 0, gui_height = 0;
-            gContext->GetResolutionSetting("Gui", gui_width, gui_height);
-            fullscreen |= (0 == gui_width && 0 == gui_height);
-        }
-
-        if (fullscreen)
-        {
-            QSize sz(m_display_res->GetWidth(), m_display_res->GetHeight());
-            const QRect display_visible_rect =
-                    QRect(gContext->GetMainWindow()->geometry().topLeft(), sz);
-            windows[0].SetDisplayVisibleRect(display_visible_rect);
-            m_disp->MoveResizeWin(m_win, display_visible_rect);
-        }
-    }
+    if (m_disp)
+        m_disp->MoveResizeWin(m_win, new_rect);
 }
 
 void VideoOutputVDPAU::DrawUnusedRects(bool sync)
@@ -693,7 +655,7 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
 
     bool useGuiSize = gContext->GetNumSetting("GuiSizeForTV", 0);
 
-    if (m_display_res)
+    if (display_res)
     {
         // The very first Resize needs to be the maximum possible
         // desired res, because X will mask off anything outside
@@ -701,8 +663,8 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
         m_disp->MoveResizeWin(m_win,
                     QRect(gContext->GetMainWindow()->geometry().x(),
                           gContext->GetMainWindow()->geometry().y(),
-                          m_display_res->GetMaxWidth(),
-                          m_display_res->GetMaxHeight()));
+                          display_res->GetMaxWidth(),
+                          display_res->GetMaxHeight()));
         ResizeForVideo(width, height);
     }
     else
@@ -815,9 +777,9 @@ void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
 
     // If we are using XRandR, use the aspect ratio from it, otherwise
     // calculate the display aspect ratio pretty using physical monitor size
-    if (m_display_res)
+    if (display_res)
     {
-        windows[0].SetDisplayAspect(m_display_res->GetAspectRatio());
+        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
     }
     else
     {

@@ -4,7 +4,6 @@
 #include <set>
 #include <qwindowdefs.h>
 
-#include "DisplayRes.h"
 #include "videooutbase.h"
 
 #include "mythxdisplay.h"
@@ -84,8 +83,7 @@ class VideoOutputXv : public VideoOutput
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
-    void ResizeForGui(void); 
-    void ResizeForVideo(void);
+    void MoveResizeWindow(QRect new_rect);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
@@ -158,7 +156,6 @@ class VideoOutputXv : public VideoOutput
                          NuppelVideoPlayer *pipplayer,
                          PIPLocation        loc);
 
-    void ResizeForVideo(uint width, uint height);
     void InitDisplayMeasurements(uint width, uint height);
     void InitColorKey(bool turnoffautopaint);
 
@@ -195,7 +192,6 @@ class VideoOutputXv : public VideoOutput
     // Misc.
     MythCodecID          myth_codec_id;
     VOSType              video_output_subtype;
-    DisplayRes          *display_res;
     QMutex               global_lock;
 
     // Basic X11 info

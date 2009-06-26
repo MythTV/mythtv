@@ -21,13 +21,13 @@ VideoOutputOpenGL::VideoOutputOpenGL(void)
     gl_context(NULL), gl_videochain(NULL),
     gl_osdchain(NULL), gl_pipchain_active(NULL),
     gl_osd(false), gl_osd_ready(false),
-    gl_parent_win(0), gl_embed_win(0), display_res(NULL)
+    gl_parent_win(0), gl_embed_win(0)
 {
     bzero(&av_pause_frame, sizeof(av_pause_frame));
     av_pause_frame.buf = NULL;
 
     if (gContext->GetNumSetting("UseVideoModes", 0))
-        display_res = DisplayRes::GetDisplayRes();
+        display_res = DisplayRes::GetDisplayRes(true);
 }
 
 VideoOutputOpenGL::~VideoOutputOpenGL()
@@ -40,9 +40,6 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
         delete gl_context;
         gl_context = NULL;
     }
-
-    if (display_res)
-        display_res->SwitchToGUI();
 }
 
 void VideoOutputOpenGL::TearDown(void)
@@ -813,45 +810,10 @@ void VideoOutputOpenGL::InitDisplayMeasurements(void)
             .arg(windows[0].GetDisplayAspect()));
 }
 
-
-void VideoOutputOpenGL::ResizeForGui(void)
+void VideoOutputOpenGL::MoveResizeWindow(QRect new_rect)
 {
-    if (display_res)
-        display_res->SwitchToGUI();
-}
-
-void VideoOutputOpenGL::ResizeForVideo(void)
-{
-    uint width  = windows[0].GetVideoDispDim().width();
-    uint height = windows[0].GetVideoDispDim().height();
-
-    if ((width == 1920 || width == 1440) && height == 1088)
-        height = 1080;
-
-    if (display_res && display_res->SwitchToVideo(width, height))
-    {
-        windows[0].SetDisplayDim(QSize(display_res->GetPhysicalWidth(),
-                            display_res->GetPhysicalHeight()));
-        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
-
-        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-
-        // if width && height are zero users expect fullscreen playback
-        if (!fullscreen)
-        {
-            int gui_width = 0, gui_height = 0;
-            gContext->GetResolutionSetting("Gui", gui_width, gui_height);
-            fullscreen |= (0 == gui_width && 0 == gui_height);
-        }
-
-        if (fullscreen)
-        {
-            QSize sz(display_res->GetWidth(), display_res->GetHeight());
-            windows[0].SetDisplayVisibleRect(QRect(QPoint(0,0), sz));
-            if (gl_context)
-                gl_context->MoveResizeWindow(windows[0].GetDisplayVisibleRect());
-        }
-    }
+    if (gl_context)
+        gl_context->MoveResizeWindow(new_rect);
 }
 
 void VideoOutputOpenGL::EmbedInWidget(int x, int y, int w, int h)

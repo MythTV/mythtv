@@ -113,7 +113,7 @@ const char *vr_str[] =
 VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
       myth_codec_id(codec_id), video_output_subtype(XVUnknown),
-      display_res(NULL), global_lock(QMutex::Recursive),
+      global_lock(QMutex::Recursive),
 
       XJ_win(0), XJ_curwin(0), disp(NULL), XJ_letterbox_colour(0),
       XJ_started(false), XJ_monitor_sz(640,480), XJ_monitor_dim(400,300),
@@ -134,10 +134,8 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
 
-    // If using custom display resolutions, display_res will point
-    // to a singleton instance of the DisplayRes class
     if (gContext->GetNumSetting("UseVideoModes", 0))
-        display_res = DisplayRes::GetDisplayRes();
+        display_res = DisplayRes::GetDisplayRes(true);
 }
 
 VideoOutputXv::~VideoOutputXv()
@@ -184,10 +182,6 @@ VideoOutputXv::~VideoOutputXv()
 
     if (xvmc_buf_attr)
         delete xvmc_buf_attr;
-
-    // Switch back to desired resolution for GUI
-    if (display_res)
-        display_res->SwitchToGUI();
 }
 
 // this is documented in videooutbase.cpp
@@ -316,65 +310,11 @@ int VideoOutputXv::GetRefreshRate(void)
     return disp->GetRefreshRate();
 }
 
-void VideoOutputXv::ResizeForVideo(void) 
+void VideoOutputXv::MoveResizeWindow(QRect new_rect)
 {
-    const QSize video_disp_dim = windows[0].GetVideoDispDim();
-    ResizeForVideo(video_disp_dim.width(), video_disp_dim.height());
+    if (disp)
+        disp->MoveResizeWin(XJ_win, new_rect);
 }
-
-void VideoOutputXv::ResizeForGui(void)
-{
-    if (display_res)
-        display_res->SwitchToGUI();
-}
-
-/**
- * \fn VideoOutputXv::ResizeForVideo(uint width, uint height)
- * Sets display parameters based on video resolution.
- *
- * If we are using DisplayRes support we use the video size to
- * determine the desired screen size and refresh rate.
- * If we are also not using "GuiSizeForTV" we also resize
- * the video output window.
- *
- * \param width,height Resolution of the video we will be playing
- */
-void VideoOutputXv::ResizeForVideo(uint width, uint height)
-{
-    if ((width == 1920 || width == 1440) && height == 1088)
-        height = 1080; // ATSC 1920x1080
-
-    if (display_res && display_res->SwitchToVideo(width, height))
-    {
-        // Switching to custom display resolution succeeded
-        // Make a note of the new size
-        windows[0].SetDisplayDim(QSize(display_res->GetPhysicalWidth(),
-                                       display_res->GetPhysicalHeight()));
-        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
-
-        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-
-        // if width && height are zero users expect fullscreen playback
-        if (!fullscreen)
-        {
-            int gui_width = 0, gui_height = 0;
-            gContext->GetResolutionSetting("Gui", gui_width, gui_height);
-            fullscreen |= (0 == gui_width && 0 == gui_height);
-        }
-
-        if (fullscreen)
-        {
-            QSize sz(display_res->GetWidth(), display_res->GetHeight());
-            const QRect display_visible_rect = 
-                    QRect(gContext->GetMainWindow()->geometry().topLeft(), sz);
-            windows[0].SetDisplayVisibleRect(display_visible_rect);
-
-            // Resize X window to fill new resolution
-            disp->MoveResizeWin(XJ_win, display_visible_rect);
-        }
-    }
-}
-
 /**
  * \fn VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
  * \brief Init display measurements based on database settings and

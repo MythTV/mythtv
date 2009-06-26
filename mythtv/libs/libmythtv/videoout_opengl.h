@@ -5,7 +5,6 @@
 #include "videooutbase.h"
 #include "openglvideo.h"
 #include "openglcontext.h"
-#include "DisplayRes.h"
 
 class VideoOutputOpenGL : public VideoOutput
 {
@@ -43,8 +42,7 @@ class VideoOutputOpenGL : public VideoOutput
     void ShowPIP(VideoFrame        *frame,
                  NuppelVideoPlayer *pipplayer,
                  PIPLocation        loc);
-    void ResizeForGui(void);
-    void ResizeForVideo(void);
+    void MoveResizeWindow(QRect new_rect);
 
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
     virtual bool hasOpenGLAcceleration(void) const { return true; }
@@ -69,7 +67,6 @@ class VideoOutputOpenGL : public VideoOutput
     bool           gl_osd_ready;
     WId            gl_parent_win;
     WId            gl_embed_win;
-    DisplayRes    *display_res;
     VideoFrame     av_pause_frame;
 };
 

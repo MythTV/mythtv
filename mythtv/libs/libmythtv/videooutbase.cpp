@@ -8,6 +8,7 @@
 
 #include "mythcontext.h"
 #include "mythverbose.h"
+#include "mythmainwindow.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"
@@ -309,7 +310,10 @@ VideoOutput::VideoOutput() :
     // Various state variables
     errorState(kError_None),
     framesPlayed(0),
-    supported_attributes(kPictureAttributeSupported_None)
+    supported_attributes(kPictureAttributeSupported_None),
+
+    // Custom display resolutions
+    display_res(NULL)
 {
     bzero(&pip_tmp_image, sizeof(pip_tmp_image));
     db_display_dim = QSize(gContext->GetNumSetting("DisplaySizeWidth",  0),
@@ -355,6 +359,10 @@ VideoOutput::~VideoOutput()
         delete m_deintFiltMan;
     if (db_vdisp_profile)
         delete db_vdisp_profile;
+
+    ResizeForGui();
+    if (display_res)
+        display_res->Unlock();
 }
 
 /**
@@ -1459,4 +1467,73 @@ bool VideoOutput::IsEmbedding(void)
 void VideoOutput::ExposeEvent(void)
 {
     windows[0].SetNeedRepaint(true);
+}
+
+/**
+ * \fn VideoOutput::ResizeForGui(void)
+ * If we are using DisplayRes support, return the screen size and
+ * refresh rate to those used for the GUI.
+ */
+void VideoOutput::ResizeForGui(void)
+{
+    if (display_res)
+        display_res->SwitchToGUI();
+}
+
+/**
+ * \fn VideoOutput::ResizeForVideo(uint width, uint height)
+ * Sets display parameters based on video resolution.
+ *
+ * If we are using DisplayRes support we use the video size to
+ * determine the desired screen size and refresh rate.
+ * If we are also not using "GuiSizeForTV" we also resize
+ * the video output window.
+ *
+ * \param width,height Resolution of the video we will be playing
+ */
+void VideoOutput::ResizeForVideo(uint width, uint height)
+{
+    if (!display_res)
+        return;
+
+    if (!width || !height)
+    {
+        width  = windows[0].GetVideoDispDim().width();
+        height = windows[0].GetVideoDispDim().height();
+        if (!width || !height)
+            return;
+    }
+
+    if ((width == 1920 || width == 1440) && height == 1088)
+        height = 1080; // ATSC 1920x1080
+
+    if (display_res && display_res->SwitchToVideo(width, height))
+    {
+        // Switching to custom display resolution succeeded
+        // Make a note of the new size
+        windows[0].SetDisplayDim(QSize(display_res->GetPhysicalWidth(),
+                                       display_res->GetPhysicalHeight()));
+        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
+
+        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
+
+        // if width && height are zero users expect fullscreen playback
+        if (!fullscreen)
+        {
+            int gui_width = 0, gui_height = 0;
+            gContext->GetResolutionSetting("Gui", gui_width, gui_height);
+            fullscreen |= (0 == gui_width && 0 == gui_height);
+        }
+
+        if (fullscreen)
+        {
+            QSize sz(display_res->GetWidth(), display_res->GetHeight());
+            const QRect display_visible_rect =
+                    QRect(gContext->GetMainWindow()->geometry().topLeft(), sz);
+            windows[0].SetDisplayVisibleRect(display_visible_rect);
+
+            // Resize X window to fill new resolution
+            MoveResizeWindow(display_visible_rect);
+        }
+    }
 }

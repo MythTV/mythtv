@@ -19,6 +19,7 @@ extern "C" {
 #include "mythcodecid.h"
 #include "videoouttypes.h"
 #include "videooutwindow.h"
+#include "DisplayRes.h"
 
 using namespace std;
 
@@ -83,8 +84,9 @@ class VideoOutput
     void         SetVisibility(WindowVisibility visibility);
     virtual void EmbedInWidget(int x, int y, int w, int h);
     virtual void StopEmbedding(void);
-    virtual void ResizeForGui(void) {;} 
-    virtual void ResizeForVideo(void) {;}
+    void         ResizeForGui(void);
+    void         ResizeForVideo(uint width = 0, uint height = 0);
+    virtual void MoveResizeWindow(QRect new_rect) {;}
 
     virtual void MoveResize(void);
     virtual void Zoom(ZoomDirection direction);
@@ -339,6 +341,9 @@ class VideoOutput
 
     // PIP
     PictureAttributeSupported supported_attributes;
+
+    // Custom display resolutions
+    DisplayRes *display_res;
 };
 
 #endif
