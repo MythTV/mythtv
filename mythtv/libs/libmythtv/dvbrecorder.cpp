@@ -219,7 +219,7 @@ void DVBRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 
     uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
 
-    if (posB[0] + posB[1] * TSPacket::SIZE > 
+    if (posB[0] + posB[1] * TSPacket::SIZE >
         posA[0] + posA[1] * TSPacket::SIZE)
     {
         VERBOSE(VB_RECORD, LOC + "Wrote PMT @"
@@ -230,7 +230,6 @@ void DVBRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
         VERBOSE(VB_RECORD, LOC + "Saw PMT but did not write to disk yet");
     }
 }
-
 
 void DVBRecorder::HandlePAT(const ProgramAssociationTable *_pat)
 {
@@ -314,8 +313,8 @@ bool DVBRecorder::Open(void)
     if (videodevice.isEmpty())
         return false;
 
-    bzero(_stream_id,  sizeof(_stream_id));
-    bzero(_pid_status, sizeof(_pid_status));
+    memset(_stream_id,  0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 
     _stream_handler = DVBStreamHandler::Get(videodevice);
@@ -432,8 +431,8 @@ void DVBRecorder::ResetForNewFile(void)
 {
     DTVRecorder::ResetForNewFile();
 
-    bzero(_stream_id,  sizeof(_stream_id));
-    bzero(_pid_status, sizeof(_pid_status));
+    memset(_stream_id,  0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 }
 
