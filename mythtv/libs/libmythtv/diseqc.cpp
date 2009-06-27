@@ -334,20 +334,26 @@ bool DiSEqCDevTree::Load(uint cardid)
     // lookup configuration for this card
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT diseqcid "
+        "SELECT diseqcid, cardtype "
         "FROM capturecard "
         "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("DiSEqCDevTree::Load", query);
     }
-    else if (query.next() && query.value(0).toUInt())
+    else if (!query.next())
     {
-        m_root = DiSEqCDevDevice::CreateById(*this, query.value(0).toUInt());
+        return m_root;
     }
-    else
+
+    if (query.value(0).toUInt())
+    {
+        m_root = DiSEqCDevDevice::CreateById(
+            *this, query.value(0).toUInt());
+    }
+    else if (query.value(1).toString().toUpper() == "DVB")
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 QString("No device tree for cardid %1").arg(cardid));
