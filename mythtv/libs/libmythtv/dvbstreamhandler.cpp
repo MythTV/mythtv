@@ -1,7 +1,5 @@
 // -*- Mode: c++ -*-
 
-#include <cassert> // remove when everything is filled in...
-
 // POSIX headers
 #include <pthread.h>
 #include <fcntl.h>
@@ -10,7 +8,7 @@
 #include <sys/ioctl.h>
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // MythTV headers
 #include "dvbstreamhandler.h"
@@ -33,51 +31,60 @@ QMap<QString,DVBStreamHandler*> DVBStreamHandler::_handlers;
 QMap<QString,uint>              DVBStreamHandler::_handlers_refcnt;
 QMutex                          DVBStreamHandler::_handlers_lock;
 
-DVBStreamHandler *DVBStreamHandler::Get(const QString &dvb_device)
+//#define DEBUG_PID_FILTERS
+
+DVBStreamHandler *DVBStreamHandler::Get(const QString &devname)
 {
     QMutexLocker locker(&_handlers_lock);
 
     QMap<QString,DVBStreamHandler*>::iterator it =
-        _handlers.find(dvb_device);
+        _handlers.find(devname);
 
     if (it == _handlers.end())
     {
-        _handlers[dvb_device] = new DVBStreamHandler(dvb_device);
-        _handlers_refcnt[dvb_device] = 1;
+        _handlers[devname] = new DVBStreamHandler(devname);
+        _handlers_refcnt[devname] = 1;
     }
     else
     {
-        _handlers_refcnt[dvb_device]++;
+        _handlers_refcnt[devname]++;
     }
 
-    return _handlers[dvb_device];
+    return _handlers[devname];
 }
 
 void DVBStreamHandler::Return(DVBStreamHandler * & ref)
 {
     QMutexLocker locker(&_handlers_lock);
 
-    QString dvb_dev = ref->_dvb_dev;
+    QString devname = ref->_dvb_dev;
 
-    QMap<QString,uint>::iterator rit = _handlers_refcnt.find(dvb_dev);
+    QMap<QString,uint>::iterator rit = _handlers_refcnt.find(devname);
     if (rit == _handlers_refcnt.end())
         return;
 
     if (*rit > 1)
     {
+        ref = NULL;
         *rit--;
         return;
     }
 
-    QMap<QString,DVBStreamHandler*>::iterator it = _handlers.find(dvb_dev);
+    QMap<QString,DVBStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
-        ref = NULL;
         delete *it;
         _handlers.erase(it);
     }
+    else
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("DVBSH Error: Couldn't find handler for %1")
+                .arg(devname));
+    }
 
     _handlers_refcnt.erase(rit);
+    ref = NULL;
 }
 
 DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
@@ -104,7 +111,10 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
 
 DVBStreamHandler::~DVBStreamHandler()
 {
-    assert(_stream_data_list.empty());
+    if (!_stream_data_list.empty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "dtor & _stream_data_list not empty");
+    }
 }
 
 void DVBStreamHandler::AddListener(MPEGStreamData *data,
@@ -112,7 +122,12 @@ void DVBStreamHandler::AddListener(MPEGStreamData *data,
                                    bool needs_buffering)
 {
     VERBOSE(VB_RECORD, LOC + "AddListener("<<data<<") -- begin");
-    assert(data);
+    if (!data)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "AddListener("<<data<<") -- null data");
+        return;
+    }
 
     _listener_lock.lock();
 
@@ -141,7 +156,12 @@ void DVBStreamHandler::AddListener(MPEGStreamData *data,
 void DVBStreamHandler::RemoveListener(MPEGStreamData *data)
 {
     VERBOSE(VB_RECORD, LOC + "RemoveListener("<<data<<") -- begin");
-    assert(data);
+    if (!data)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "RemoveListener("<<data<<") -- null data");
+        return;
+    }
 
     _listener_lock.lock();
 
@@ -441,9 +461,11 @@ void DVBStreamHandler::RunSR(void)
 }
 
 bool DVBStreamHandler::AddPIDFilter(PIDInfo *info)
-{ 
+{
+#ifdef DEBUG_PID_FILTERS
     VERBOSE(VB_RECORD, LOC + QString("AddPIDFilter(0x%1) priority %2")
             .arg(info->_pid, 0, 16).arg(GetPIDPriority(info->_pid)));
+#endif // DEBUG_PID_FILTERS
 
     QMutexLocker writing_locker(&_pid_lock);
     _pid_info[info->_pid] = info;
@@ -591,8 +613,10 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
 bool DVBStreamHandler::RemovePIDFilter(uint pid)
 {
+#ifdef DEBUG_PID_FILTERS
     VERBOSE(VB_RECORD, LOC +
             QString("RemovePIDFilter(0x%1)").arg(pid, 0, 16));
+#endif // DEBUG_PID_FILTERS
 
     QMutexLocker write_locker(&_pid_lock);
 
@@ -620,6 +644,10 @@ bool DVBStreamHandler::RemovePIDFilter(uint pid)
 bool DVBStreamHandler::RemoveAllPIDFilters(void)
 {
     QMutexLocker write_locker(&_pid_lock);
+
+#ifdef DEBUG_PID_FILTERS
+    VERBOSE(VB_RECORD, LOC + "RemoveAllPIDFilters()");
+#endif // DEBUG_PID_FILTERS
 
     vector<int> del_pids;
     PIDInfoMap::iterator it = _pid_info.begin();

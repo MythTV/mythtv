@@ -6,8 +6,8 @@
 #include <vector>
 using namespace std;
 
-#include <qmap.h>
-#include <qmutex.h>
+#include <QMap>
+#include <QMutex>
 
 #include "util.h"
 #include "DeviceReadBuffer.h"
