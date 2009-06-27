@@ -62,6 +62,7 @@ class DVBRecorder :
     bool IsOpen(void) const { return _stream_fd >= 0; }
     void Close(void);
 
+    // MPEG Stream Listener
     void HandlePAT(const ProgramAssociationTable*);
     void HandleCAT(const ConditionalAccessTable*) {}
     void HandlePMT(uint pid, const ProgramMapTable*);
@@ -69,7 +70,7 @@ class DVBRecorder :
 
     // MPEG Single Program Stream Listener
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
-    void HandleSingleProgramPMT(ProgramMapTable*);
+    void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
     // ATSC Main
     void HandleSTT(const SystemTimeTable*);
@@ -82,7 +83,7 @@ class DVBRecorder :
     void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) {}
 
     // TSPacketListener
-    bool ProcessTSPacket(const TSPacket& tspacket);
+    bool ProcessTSPacket(const TSPacket &tspacket);
 
     // TSPacketListenerAV
     bool ProcessVideoTSPacket(const TSPacket& tspacket);
@@ -106,25 +107,25 @@ class DVBRecorder :
 
   private:
     // DVB stuff
-    DVBChannel       *dvbchannel;
-    DVBStreamHandler *_stream_handler;
+    DVBChannel              *dvbchannel;
+    DVBStreamHandler        *_stream_handler;
 
     // general recorder stuff
-    MPEGStreamData *_stream_data;
-    mutable QMutex  _pid_lock;
+    MPEGStreamData          *_stream_data;
+    mutable QMutex           _pid_lock;
     ProgramAssociationTable *_input_pat; ///< PAT on input side
     ProgramMapTable         *_input_pmt; ///< PMT on input side
     bool                     _has_no_av;
 
     // TS recorder stuff
-    unsigned char   _stream_id[0x1fff + 1];
-    unsigned char   _pid_status[0x1fff + 1];
-    unsigned char   _continuity_counter[0x1fff + 1];
+    unsigned char _stream_id[0x1fff + 1];
+    unsigned char _pid_status[0x1fff + 1];
+    unsigned char _continuity_counter[0x1fff + 1];
 
     // Statistics
-    mutable uint        _continuity_error_count;
-    mutable uint        _stream_overflow_count;
-    mutable uint        _bad_packet_count;
+    mutable uint  _continuity_error_count;
+    mutable uint  _stream_overflow_count;
+    mutable uint  _bad_packet_count;
 
     // Constants
     static const int TSPACKETS_BETWEEN_PSIP_SYNC;
