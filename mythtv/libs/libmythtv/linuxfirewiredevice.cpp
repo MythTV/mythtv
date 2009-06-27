@@ -873,7 +873,8 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
     item.handle = raw1394_new_handle();
     if (!item.handle)
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't get handle" + ENO);
+        VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: ") +
+                "Couldn't get handle" + ENO);
         return false;
     }
 
@@ -890,7 +891,8 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
     {
         if (raw1394_set_port(item.handle, port) < 0)
         {
-            VERBOSE(VB_IMPORTANT, "Couldn't set port to " << port);
+            VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: ") +
+                    "Couldn't set port to " << port);
             continue;
         }
 
@@ -922,7 +924,8 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
         item.handle = raw1394_new_handle();
         if (!item.handle)
         {
-            VERBOSE(VB_IMPORTANT, "Couldn't get handle "
+            VERBOSE(VB_IMPORTANT, QString("LinuxFirewireDevice: ") +
+                    "Couldn't get handle "
                     "(after setting port "<<port<<")" + ENO);
             item.handle = NULL;
             break;
