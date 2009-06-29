@@ -484,7 +484,7 @@ bool Ripper::Create(void)
 
     if (!m_artistEdit || !m_scanButton || !m_ripButton || !m_switchTitleArtist
         || !m_trackList || !m_compilationCheck || !m_searchGenreButton
-        || !m_yearEdit || !m_genreEdit || !m_artistEdit || !m_searchArtistButton
+        || !m_yearEdit || !m_genreEdit || !m_searchArtistButton
         || !m_albumEdit || !m_searchAlbumButton || !m_qualityList)
     {
         VERBOSE(VB_IMPORTANT, "Missing theme elements for screen 'cdripper'");
