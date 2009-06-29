@@ -54,7 +54,7 @@ bool DisplayRes::Initialize(void)
     cur_mode = GUI;
 
     // Initialise DESKTOP mode
-    GetDisplayInfo(tW, tH, tW_mm, tH_mm, tRate))
+    GetDisplayInfo(tW, tH, tW_mm, tH_mm, tRate);
     mode[DESKTOP].Init();
     mode[DESKTOP] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
     VERBOSE(VB_GENERAL, QString("Desktop video mode: %1x%2 %3 Hz")
