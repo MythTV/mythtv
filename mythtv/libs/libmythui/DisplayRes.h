@@ -16,7 +16,15 @@
  *  works for X (Linux/BSD/UNIX) and Mac OS X.
  */
 
-typedef enum { GUI = 0, VIDEO = 1, CUSTOM_GUI = 2, CUSTOM_VIDEO = 3 } tmode;
+typedef enum
+{
+    GUI          = 0,
+    VIDEO        = 1,
+    CUSTOM_GUI   = 2,
+    CUSTOM_VIDEO = 3,
+    DESKTOP      = 4,
+    MAX_MODES    = 5,
+} tmode;
 
 class MPUBLIC DisplayRes {
   public:
@@ -33,6 +41,10 @@ class MPUBLIC DisplayRes {
      *  \sa GetDisplayRes(bool)
      */
     static void Unlock(void);
+
+    /** \brief Return the screen to the original desktop settings
+     */
+    static void SwitchToDesktop(void);
 
     /** \brief Initialize DisplayRes, normally called automatically.
      *
@@ -124,14 +136,15 @@ class MPUBLIC DisplayRes {
     virtual ~DisplayRes(void) {;}
     
     // These methods are implemented by the subclasses
-    virtual bool GetDisplaySize(int &width_mm, int &height_mm) const = 0;
+    virtual bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
+                                int &h_mm, short &rate) const = 0;
     virtual bool SwitchToVideoMode(int width, int height, short framerate) = 0;
 
   private:
     DisplayRes(const DisplayRes & rhs); // disable copy constructor;
 
     tmode cur_mode;           // current mode
-    DisplayResScreen mode[4]; // GUI, default video, custom GUI, custom video
+    DisplayResScreen mode[MAX_MODES];
     DisplayResScreen last;    // mirror of mode[current_mode]
 
     /// maps input video parameters to output video modes

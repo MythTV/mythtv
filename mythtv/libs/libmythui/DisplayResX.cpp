@@ -20,17 +20,31 @@ DisplayResX::~DisplayResX(void)
 {
 }
 
-bool DisplayResX::GetDisplaySize(int &width_mm, int &height_mm) const
+bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
+                                 int &h_mm, short &rate) const
 {
-    QSize dim = MythXGetDisplayDimensions();
-    if ((dim.width() > 0) && (dim.height() > 0))
+    bool success = false;
+    MythXDisplay *d = OpenMythXDisplay();
+    if (!d)
+        return success;
+
+    QSize mm  = d->GetDisplayDimensions();
+    QSize pix = d->GetDisplaySize();
+    short  rr = 1000000 / d->GetRefreshRate();
+
+    if (mm.width() > 0 && mm.height() > 0 &&
+        pix.width() > 0 && pix.height() > 0 && rr > 0)
     {
-        width_mm  = dim.width();
-        height_mm = dim.height();
-        return true;
+        rate = rr;
+        w_mm = mm.width();
+        h_mm = mm.height();
+        w_pix = pix.width();
+        h_pix = pix.height();
+        success = true;
     }
 
-    return false;
+    delete d;
+    return success;
 }
 
 bool DisplayResX::SwitchToVideoMode(int width, int height, short desired_rate)

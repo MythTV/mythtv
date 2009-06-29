@@ -38,6 +38,12 @@ void DisplayRes::Unlock(void)
     locked = false;
 }
 
+void DisplayRes::SwitchToDesktop()
+{
+    if (instance)
+        instance->SwitchToGUI(DESKTOP);
+}
+
 bool DisplayRes::Initialize(void)
 {
     int tW = 0, tH = 0, tW_mm = 0, tH_mm = 0;
@@ -47,14 +53,19 @@ bool DisplayRes::Initialize(void)
     last.Init();
     cur_mode = GUI;
 
+    // Initialise DESKTOP mode
+    GetDisplayInfo(tW, tH, tW_mm, tH_mm, tRate))
+    mode[DESKTOP].Init();
+    mode[DESKTOP] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
+    VERBOSE(VB_GENERAL, QString("Desktop video mode: %1x%2 %3 Hz")
+            .arg(tW).arg(tH).arg(tRate));
 
     // Initialize GUI mode
     mode[GUI].Init();
     tW = tH = 0;
     GetMythDB()->GetResolutionSetting("GuiVidMode", tW, tH);
-    GetDisplaySize(tW_mm, tH_mm);
     GetMythDB()->GetResolutionSetting("DisplaySize", tW_mm, tH_mm);
-    mode[GUI] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, 0);
+    mode[GUI] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
 
 
     // Initialize default VIDEO mode
@@ -142,25 +153,26 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     DisplayResScreen next = mode[next_mode];
 
     // need to change video mode?
-    short target_rate = 0;
+    short target_rate = next.RefreshRate();
     DisplayResScreen::FindBestMatch(GetVideoModes(), next, target_rate);
     bool chg = !(next == last) || !(last.RefreshRate() == target_rate);
 
-    VERBOSE(VB_PLAYBACK, QString("Trying %1x%2 %3 Hz")
+    VERBOSE(VB_GENERAL, QString("Trying %1x%2 %3 Hz")
             .arg(next.Width()).arg(next.Height()).arg(target_rate));
 
     if (chg && !SwitchToVideoMode(next.Width(), next.Height(), target_rate))
     {
-        VERBOSE(VB_IMPORTANT, QString("SwitchToGUI: xrandr failed for %1 x %2")
-                .arg(next.Width()).arg(next.Height()));
+        VERBOSE(VB_IMPORTANT,
+                QString("SwitchToGUI: xrandr failed for %1x%2 %3  Hz")
+                .arg(next.Width()).arg(next.Height()).arg(next.RefreshRate()));
         return false;
     }
 
     cur_mode = next_mode;
     last = next;
 
-    VERBOSE(VB_PLAYBACK, QString("SwitchToGUI: Switched to %1 x %2")
-            .arg(GetWidth()).arg(GetHeight()));
+    VERBOSE(VB_GENERAL, QString("SwitchToGUI: Switched to %1x%2 %3 Hz")
+            .arg(GetWidth()).arg(GetHeight()).arg(GetRefreshRate()));
 
     return chg;
 }

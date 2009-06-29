@@ -11,7 +11,8 @@ class DisplayResOSX : public DisplayRes {
     const std::vector<DisplayResScreen>& GetVideoModes() const;
 
   protected:
-    bool GetDisplaySize(int &width_mm, int &height_mm) const;
+    bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
+                        int &h_mm, short &rate) const;
     bool SwitchToVideoMode(int width, int height, short framerate);
     
   private:

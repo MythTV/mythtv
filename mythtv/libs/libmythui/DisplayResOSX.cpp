@@ -18,7 +18,8 @@ DisplayResOSX::~DisplayResOSX(void)
 {
 }
 
-bool DisplayResOSX::GetDisplaySize(int &width_mm, int &height_mm) const
+bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
+                                   int &h_mm, short &rate) const
 {
     CGDirectDisplayID d = mythtv_display();
 
@@ -26,12 +27,17 @@ bool DisplayResOSX::GetDisplaySize(int &width_mm, int &height_mm) const
     if (port == MACH_PORT_NULL )
         return false;
 
-    CFDictionaryRef dict = IODisplayCreateInfoDictionary(port, 0);
-    if (!dict)
+    CFDictionaryRef disp_dict = IODisplayCreateInfoDictionary(port, 0);
+    CFDictionaryRef mode_dict = CGDisplayCurrentMode(d);
+    if (!disp_dict || !mode_dict)
         return false;
 
-    width_mm  = get_int_CF(dict, CFSTR(kDisplayHorizontalImageSize));
-    height_mm = get_int_CF(dict, CFSTR(kDisplayVerticalImageSize));
+    w_mm   = get_int_CF(disp_dict, CFSTR(kDisplayHorizontalImageSize));
+    h_mm   = get_int_CF(disp_dict, CFSTR(kDisplayVerticalImageSize));
+    w_pix  = get_int_CF(mode_dict, kCGDisplayWidth);
+    h_pix  = get_int_CF(mode_dict, kCGDisplayHeight);
+    rate   = get_int_CF(mode_dict, kCGDisplayRefreshRate);
+
     //CFRelease(dict); // this release causes a segfault
     
     return true;

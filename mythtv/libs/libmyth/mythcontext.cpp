@@ -28,6 +28,7 @@
 #include "mythsocket.h"
 #include "themeinfo.h"
 #include "dbutil.h"
+#include "DisplayRes.h"
 
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -236,6 +237,7 @@ MythContextPrivate::~MythContextPrivate()
         DestroyMythDB();
     if (m_ui)
         DestroyMythUI();
+    DisplayRes::SwitchToDesktop();
 }
 
 /**
