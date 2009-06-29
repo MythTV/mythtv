@@ -1,34 +1,6 @@
 <mythmenu name="MAIN">
 
     <button>
-        <type>TV_WATCH_TV</type>
-        <text>Watch TV</text>
-        <text lang="IT">Guarda la TV</text>
-        <text lang="ES">Ver la TV</text>
-        <text lang="CS">Veure la TV</text>
-        <text lang="NL">TV Kijken</text>
-        <text lang="FR">Regarder la TV</text>
-        <text lang="DE">Fernsehen</text>
-        <text lang="DA">Se TV</text>
-        <text lang="IS">Horfa á sjónvarp</text>
-        <text lang="PT">Ver Televisão</text>
-        <text lang="SV">Se på TV</text>
-        <text lang="JA">TV放送</text>
-        <text lang="FI">Katso Televisiota</text>
-        <text lang="ZH_TW">觀看電視</text>
-        <text lang="SL">Glej TV</text>
-        <text lang="ET">Vaata telerit</text>
-        <text lang="NB">Se på TV</text>
-        <text lang="CS">Sledovat TV</text>
-        <text lang="RU">Смотреть ТВ</text>
-        <text lang="AR">شاهد التلفاز</text>
-        <text lang="PL">Oglądanie TV</text>
-        <text lang="HE">צפיה בטלויזיה</text>
-        <description>Watch live television</description>
-        <action>TV_WATCH_LIVE</action>
-    </button>
-
-    <button>
         <type>MENU_MEDIA_LIBRARY</type>
         <text>Media Library</text>
         <text lang="IT">Multimedia</text>
@@ -159,6 +131,34 @@
         <description>Play or import audio or video CDs or DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
+    </button>
+
+    <button>
+        <type>TV_WATCH_TV</type>
+        <text>Watch TV</text>
+        <text lang="IT">Guarda la TV</text>
+        <text lang="ES">Ver la TV</text>
+        <text lang="CS">Veure la TV</text>
+        <text lang="NL">TV Kijken</text>
+        <text lang="FR">Regarder la TV</text>
+        <text lang="DE">Fernsehen</text>
+        <text lang="DA">Se TV</text>
+        <text lang="IS">Horfa á sjónvarp</text>
+        <text lang="PT">Ver Televisão</text>
+        <text lang="SV">Se på TV</text>
+        <text lang="JA">TV放送</text>
+        <text lang="FI">Katso Televisiota</text>
+        <text lang="ZH_TW">觀看電視</text>
+        <text lang="SL">Glej TV</text>
+        <text lang="ET">Vaata telerit</text>
+        <text lang="NB">Se på TV</text>
+        <text lang="CS">Sledovat TV</text>
+        <text lang="RU">Смотреть ТВ</text>
+        <text lang="AR">شاهد التلفاز</text>
+        <text lang="PL">Oglądanie TV</text>
+        <text lang="HE">צפיה בטלויזיה</text>
+        <description>Watch live television</description>
+        <action>TV_WATCH_LIVE</action>
     </button>
 
     <button>
