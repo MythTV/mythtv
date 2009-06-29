@@ -701,14 +701,15 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (pginfo && pginfo->audioproperties & (*it))
+            if (pginfo->audioproperties & (*it))
             {
                 iconState->DisplayState(it.key());
                 break;
             }
         }
     }
-    else if (iconState)
+
+    if (iconState && (!pginfo || it == iconMap.end()))
         iconState->DisplayState("default");
 
     iconMap.clear();
@@ -721,14 +722,15 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (pginfo && pginfo->videoproperties & (*it))
+            if (pginfo->videoproperties & (*it))
             {
                 iconState->DisplayState(it.key());
                 break;
             }
         }
     }
-    else if (iconState)
+
+    if (iconState && (!pginfo || it == iconMap.end()))
         iconState->DisplayState("default");
 
     iconMap.clear();
@@ -749,7 +751,8 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             }
         }
     }
-    else if (iconState)
+
+    if (iconState && (!pginfo || it == iconMap.end()))
         iconState->DisplayState("default");
 }
 
