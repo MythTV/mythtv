@@ -871,24 +871,27 @@ bool TV::Init(bool createWindow)
         }
 
         // main window sizing
-        DisplayRes *display_res = DisplayRes::GetDisplayRes();
         int maxWidth = 1920, maxHeight = 1440;
-        if (switchMode && display_res)
+        if (switchMode)
         {
-            // The very first Resize needs to be the maximum possible
-            // desired res, because X will mask off anything outside
-            // the initial dimensions
-            maxWidth = display_res->GetMaxWidth();
-            maxHeight = display_res->GetMaxHeight();
-
-            // bit of a hack, but it's ok if the window is too
-            // big in fullscreen mode
-            if (fullscreen)
+            DisplayRes *display_res = DisplayRes::GetDisplayRes();
+            if(display_res)
             {
-                player_bounds.setSize(QSize(maxWidth, maxHeight));
+                // The very first Resize needs to be the maximum possible
+                // desired res, because X will mask off anything outside
+                // the initial dimensions
+                maxWidth = display_res->GetMaxWidth();
+                maxHeight = display_res->GetMaxHeight();
 
-                // resize possibly avoids a bug on some systems
-                GetMythMainWindow()->resize(player_bounds.size());
+                // bit of a hack, but it's ok if the window is too
+                // big in fullscreen mode
+                if (fullscreen)
+                {
+                    player_bounds.setSize(QSize(maxWidth, maxHeight));
+
+                    // resize possibly avoids a bug on some systems
+                    GetMythMainWindow()->resize(player_bounds.size());
+                }
             }
         }
 

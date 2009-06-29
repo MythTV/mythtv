@@ -164,6 +164,8 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
         delete m_qtThemeSettings;
     if (screensaver)
         delete screensaver;
+    if(display_res)
+        DisplayRes::SwitchToDesktop();
 }
 
 void MythUIHelperPrivate::Init(void)
@@ -369,15 +371,17 @@ void MythUIHelper::LoadQtConfig(void)
     d->language.clear();
     d->themecachedir.clear();
 
-    DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
-    if (dispRes && GetMythDB()->GetNumSetting("UseVideoModes", 0))
+    if (GetMythDB()->GetNumSetting("UseVideoModes", 0))
     {
-        d->display_res = dispRes;
-        // Make sure DisplayRes has current context info
-        d->display_res->Initialize();
-
-        // Switch to desired GUI resolution
-        d->display_res->SwitchToGUI();
+        DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
+        if (dispRes)
+        {
+            d->display_res = dispRes;
+            // Make sure DisplayRes has current context info
+            d->display_res->Initialize();
+            // Switch to desired GUI resolution
+            d->display_res->SwitchToGUI();
+        }
     }
 
     // Note the possibly changed screen settings

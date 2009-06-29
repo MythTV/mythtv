@@ -237,7 +237,6 @@ MythContextPrivate::~MythContextPrivate()
         DestroyMythDB();
     if (m_ui)
         DestroyMythUI();
-    DisplayRes::SwitchToDesktop();
 }
 
 /**
