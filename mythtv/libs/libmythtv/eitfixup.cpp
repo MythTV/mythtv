@@ -152,7 +152,7 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixPremiere & event.fixup)
         FixPremiere(event);
-        
+
     if (kFixNL & event.fixup)
         FixNL(event);
 
@@ -174,7 +174,7 @@ void EITFixUp::Fix(DBEventEIT &event) const
 }
 
 /**
- *  This adds a DVB EIT default authority to series id or program id if 
+ *  This adds a DVB EIT default authority to series id or program id if
  *  one exists in the DB for that channel, otherwise it returns a blank
  *  id instead of the id passed in.
  *
@@ -268,7 +268,7 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
         uint y = event.description.mid(position + 1, 4).toUInt(&ok);
         if (ok)
             event.originalairdate = QDate(y, 1, 1);
-            
+
         // Get the actors if they exist
         if (position > 3)
         {
@@ -824,7 +824,7 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle) const
     {
         DBPerson::Role role;
         QStringList list = tmpPersons.capturedTexts();
-        
+
         QRegExp tmpDirector = m_comHemDirector;
         QRegExp tmpActor = m_comHemActor;
         QRegExp tmpHost = m_comHemHost;
@@ -1109,7 +1109,7 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
         event.description =
             event.description.remove(0, tmpExpSubtitle1.matchedLength());
     }
-    // episode number subtitle 
+    // episode number subtitle
     else if (tmpExpSubtitle2.indexIn(event.description) != -1)
     {
         event.syndicatedepisodenumber = tmpExpSubtitle2.cap(1);
@@ -1117,7 +1117,7 @@ void EITFixUp::FixRTL(DBEventEIT &event) const
         event.description =
             event.description.remove(0, tmpExpSubtitle2.matchedLength());
     }
-    // episode number subtitle 
+    // episode number subtitle
     else if (tmpExpSubtitle3.indexIn(event.description) != -1)
     {
         event.syndicatedepisodenumber = tmpExpSubtitle3.cap(1);
@@ -1338,7 +1338,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.audioProps |= AUD_STEREO;
         fullinfo = fullinfo.replace("stereo", ".");
     }
-    
+
     //Get widescreen info
     if ((position = fullinfo.indexOf(m_nlWide)) != -1)
     {
@@ -1357,7 +1357,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.subtitleType |= SUB_NORMAL;
         fullinfo = fullinfo.replace("txt", ".");
     }
-    
+
     // Get HDTV information
     if ((position = event.title.indexOf(m_nlHD)) != -1)
     {
@@ -1375,7 +1375,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.subtitle = tmpSubString.left(tmpSubString.length() -1);
         fullinfo = fullinfo.replace(tmpSub.cap(0), "");
     }
-    
+
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
     if (((position = event.title.indexOf(":")) != -1) &&
@@ -1386,7 +1386,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         event.title = event.title.left(position);
     }
 
-    
+
     // Get the actors
     QRegExp tmpActors = m_nlActors;
     if (tmpActors.indexIn(fullinfo) != -1)
@@ -1427,7 +1427,7 @@ void EITFixUp::FixNL(DBEventEIT &event) const
         if (ok)
             event.originalairdate = QDate(y, 1, 1);
     }
-    
+
     if ((position = tmpYear2.indexIn(fullinfo)) != -1)
     {
         bool ok;
@@ -1450,13 +1450,13 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     {
         fullinfo = fullinfo.replace(m_nlRub, "");
     }
-    
+
     // Strip category info from description
     if ((position = fullinfo.indexOf(m_nlCat)) != -1)
     {
         fullinfo = fullinfo.replace(m_nlCat, "");
     }
-    
+
     // Remove omroep from title
     if ((position = event.title.indexOf(m_nlOmroep)) != -1)
     {
