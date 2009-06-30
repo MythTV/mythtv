@@ -225,8 +225,7 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
             ";");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
-    query.exec();
-    if (query.size() <= 0 || !query.next())
+    if (!query.exec() || !query.next())
     {
         MythDB::DBError("Error in CommDetector2::CommDetector2", query);
         return "";

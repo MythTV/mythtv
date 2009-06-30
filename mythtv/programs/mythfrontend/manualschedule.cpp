@@ -207,11 +207,8 @@ void ManualSchedule::recordClicked(void)
                   "FROM channel WHERE chanid=:CHANID");
     query.bindValue(":CHANID", p.chanid);
 
-    query.exec();
-
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
         p.chanstr = query.value(1).toString();
         p.chansign = query.value(2).toString();
         p.channame = query.value(3).toString();

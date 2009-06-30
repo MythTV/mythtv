@@ -19,6 +19,7 @@ using namespace std;
 
 #include "mythdirs.h"
 #include "mythcontext.h"
+#include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "programinfo.h"
@@ -4186,7 +4187,9 @@ void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
                            "WHERE recgroup = :RECGROUP ;");
         query.bindValue(":RECGROUP", m_recGroup);
 
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("PlaybackBox::SetRecGroupPassword -- delete",
+                            query);
 
         if (!newPassword.isEmpty())
         {
@@ -4196,7 +4199,9 @@ void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
             query.bindValue(":RECGROUP", m_recGroup);
             query.bindValue(":PASSWD", newPassword);
 
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("PlaybackBox::SetRecGroupPassword -- insert",
+                                query);
         }
     }
 

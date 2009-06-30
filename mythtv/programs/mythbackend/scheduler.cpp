@@ -392,9 +392,9 @@ void Scheduler::FillRecordListFromDB(int recordid)
 
     query.prepare(thequery);
     recordmatchLock.lock();
-    query.exec();
+    bool ok = query.exec();
     recordmatchLock.unlock();
-    if (!query.isActive())
+    if (!ok)
     {
         MythDB::DBError("FillRecordListFromDB", query);
         return;
@@ -402,8 +402,7 @@ void Scheduler::FillRecordListFromDB(int recordid)
 
     thequery = "ALTER TABLE recordmatch ADD INDEX (recordid);";
     query.prepare(thequery);
-    query.exec();
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("FillRecordListFromDB", query);
         return;
@@ -423,8 +422,7 @@ void Scheduler::FillRecordListFromDB(int recordid)
 
     MSqlQuery queryDrop(dbConn);
     queryDrop.prepare("DROP TABLE recordmatch;");
-    queryDrop.exec();
-    if (!queryDrop.isActive())
+    if (!queryDrop.exec())
     {
         MythDB::DBError("FillRecordListFromDB", queryDrop);
         return;
@@ -1351,8 +1349,7 @@ void Scheduler::UpdateNextRecord(void)
                 subquery.bindValue(":RECORDID", recid);
                 subquery.bindValue(":NEXTREC", nextRecMap[recid]);
             }
-            subquery.exec();
-            if (!subquery.isActive())
+            if (!subquery.exec())
                 MythDB::DBError("Update next_record", subquery);
             else
                 VERBOSE(VB_SCHEDULE, LOC +
@@ -1566,8 +1563,7 @@ void Scheduler::RunScheduler(void)
                   "  WHERE recstatus = :RSRECORDING");
     query.bindValue(":RSABORTED", rsAborted);
     query.bindValue(":RSRECORDING", rsRecording);
-    query.exec();
-    if (!query.isActive())
+    if (!query.exec())
         MythDB::DBError("UpdateAborted", query);
 
     // wait for slaves to connect
@@ -2294,7 +2290,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     query.prepare("SELECT DISTINCT hostname, recusage FROM inuseprograms "
                     "WHERE lastupdatetime > :ONEHOURAGO ;");
     query.bindValue(":ONEHOURAGO", oneHourAgo);
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.size() > 0)
     {
         while(query.next()) {
             SlavesInUse << query.value(0).toString();
@@ -2468,8 +2464,7 @@ void Scheduler::UpdateManuals(int recordid)
                   " enddate,endtime "
                   "FROM %1 WHERE recordid = :RECORDID").arg(recordTable));
     query.bindValue(":RECORDID", recordid);
-    query.exec();
-    if (!query.isActive() || query.size() != 1)
+    if (!query.exec() || query.size() != 1)
     {
         MythDB::DBError("UpdateManuals", query);
         return;
@@ -2487,8 +2482,7 @@ void Scheduler::UpdateManuals(int recordid)
     query.prepare("SELECT chanid from channel "
                   "WHERE callsign = :STATION");
     query.bindValue(":STATION", station);
-    query.exec();
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("UpdateManuals", query);
         return;
@@ -2551,8 +2545,7 @@ void Scheduler::UpdateManuals(int recordid)
             query.bindValue(":TITLE", title);
             query.bindValue(":SUBTITLE", startdt.toString());
             query.bindValue(":RECORDID", recordid);
-            query.exec();
-            if (!query.isActive())
+            if (!query.exec())
             {
                 MythDB::DBError("UpdateManuals", query);
                 return;
@@ -2703,8 +2696,7 @@ void Scheduler::UpdateMatches(int recordid) {
         query.bindValue(":RECORDID", recordid);
     }
 
-    query.exec();
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("UpdateMatches", query);
         return;
@@ -2717,8 +2709,7 @@ void Scheduler::UpdateMatches(int recordid) {
         query.prepare("DELETE FROM program WHERE manualid = :RECORDID");
         query.bindValue(":RECORDID", recordid);
     }
-    query.exec();
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("UpdateMatches", query);
         return;
@@ -2728,8 +2719,7 @@ void Scheduler::UpdateMatches(int recordid) {
     query.prepare("SELECT NULL from record "
                   "WHERE type = :FINDONE AND findid <= 0;");
     query.bindValue(":FINDONE", kFindOneRecord);
-    query.exec();
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("UpdateMatches", query);
         return;
@@ -2742,7 +2732,8 @@ void Scheduler::UpdateMatches(int recordid) {
                       "WHERE type = :FINDONE AND findid <= 0;");
         query.bindValue(":FINDID", findtoday);
         query.bindValue(":FINDONE", kFindOneRecord);
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("UpdateMatches", query);
     }
 
     int clause;
@@ -2831,10 +2822,10 @@ void Scheduler::UpdateMatches(int recordid) {
                 result.bindValue(it.key(), it.value());
         }
 
-        result.exec();
+        bool ok = result.exec();
         gettimeofday(&dbend, NULL);
 
-        if (!result.isActive())
+        if (!ok)
         {
             MythDB::DBError("UpdateMatches3", result);
             continue;
@@ -2873,9 +2864,7 @@ void Scheduler::AddNewRecords(void)
     MSqlQuery rlist(dbConn);
     rlist.prepare(QString("SELECT recordid,title,maxepisodes,maxnewest FROM %1;").arg(recordTable));
 
-    rlist.exec();
-
-    if (!rlist.isActive())
+    if (!rlist.exec())
     {
         MythDB::DBError("CheckTooMany", rlist);
         return;
@@ -2941,9 +2930,8 @@ void Scheduler::AddNewRecords(void)
         schedTmpRecord = "sched_temp_record";
 
         result.prepare("DROP TABLE IF EXISTS sched_temp_record;");
-        result.exec();
 
-        if (!result.isActive())
+        if (!result.exec())
         {
             MythDB::DBError("Dropping sched_temp_record table", result);
             return;
@@ -2951,9 +2939,8 @@ void Scheduler::AddNewRecords(void)
 
         result.prepare("CREATE TEMPORARY TABLE sched_temp_record "
                            "LIKE record;");
-        result.exec();
 
-        if (!result.isActive())
+        if (!result.exec())
         {
             MythDB::DBError("Creating sched_temp_record table",
                                  result);
@@ -2961,9 +2948,8 @@ void Scheduler::AddNewRecords(void)
         }
 
         result.prepare("INSERT sched_temp_record SELECT * from record;");
-        result.exec();
 
-        if (!result.isActive())
+        if (!result.exec())
         {
             MythDB::DBError("Populating sched_temp_record table",
                                  result);
@@ -2972,9 +2958,8 @@ void Scheduler::AddNewRecords(void)
     }
 
     result.prepare("DROP TABLE IF EXISTS sched_temp_recorded;");
-    result.exec();
 
-    if (!result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("Dropping sched_temp_recorded table", result);
         return;
@@ -2982,18 +2967,16 @@ void Scheduler::AddNewRecords(void)
 
     result.prepare("CREATE TEMPORARY TABLE sched_temp_recorded "
                        "LIKE recorded;");
-    result.exec();
 
-    if (!result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("Creating sched_temp_recorded table", result);
         return;
     }
 
     result.prepare("INSERT sched_temp_recorded SELECT * from recorded;");
-    result.exec();
 
-    if (!result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("Populating sched_temp_recorded table", result);
         return;
@@ -3001,9 +2984,8 @@ void Scheduler::AddNewRecords(void)
 
     result.prepare(QString("SELECT recpriority, selectclause FROM %1;")
                            .arg(priorityTable));
-    result.exec();
 
-    if (!result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("Power Priority", result);
         return;
@@ -3164,15 +3146,13 @@ void Scheduler::AddNewRecords(void)
 
     gettimeofday(&dbstart, NULL);
     result.prepare(rmquery);
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("AddNewRecords recordmatch", result);
         return;
     }
     result.prepare(query);
-    result.exec();
-    if (!result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("AddNewRecords", result);
         return;
@@ -3353,11 +3333,13 @@ void Scheduler::AddNewRecords(void)
     if (schedTmpRecord == "sched_temp_record")
     {
         result.prepare("DROP TABLE IF EXISTS sched_temp_record;");
-        result.exec();
+        if (!result.exec())
+            MythDB::DBError("AddNewRecords sched_temp_record", query);
     }
 
     result.prepare("DROP TABLE IF EXISTS sched_temp_recorded;");
-    result.exec();
+    if (!result.exec())
+        MythDB::DBError("AddNewRecords drop table", query);
 }
 
 void Scheduler::AddNotListed(void) {
@@ -3393,10 +3375,10 @@ void Scheduler::AddNotListed(void) {
     gettimeofday(&dbstart, NULL);
     MSqlQuery result(dbConn);
     result.prepare(query);
-    result.exec();
+    bool ok = result.exec();
     gettimeofday(&dbend, NULL);
 
-    if (!result.isActive())
+    if (!ok)
     {
         MythDB::DBError("AddNotListed", result);
         return;
@@ -3511,9 +3493,8 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
-    result.exec();
 
-    if (!result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("findAllScheduledPrograms", result);
         return;

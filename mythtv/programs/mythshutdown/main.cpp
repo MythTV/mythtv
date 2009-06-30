@@ -57,12 +57,8 @@ QString getGlobalSetting(const QString &key, const QString &defaultval)
         query.prepare("SELECT data FROM settings WHERE value = :KEY AND "
                       "hostname IS NULL;");
         query.bindValue(":KEY", key);
-        query.exec();
-        if (query.isActive() && query.size() > 0)
-        {
-            query.next();
+        if (query.exec() && query.next())
             value = query.value(0).toString();
-        }
     }
     else
     {
@@ -96,24 +92,32 @@ int lockShutdown()
     }
 
     // does the setting already exist?
-    query.exec("SELECT * FROM settings "
-               "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+    query.prepare("SELECT * FROM settings "
+                  "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+    if (!query.exec())
+        MythDB::DBError("lockShutdown -- select", query);
 
     if (query.size() < 1)
     {
         // add the lock setting
-        query.exec("INSERT INTO settings (value, data) "
-                   "VALUES ('MythShutdownLock', '1');");
+        query.prepare("INSERT INTO settings (value, data) "
+                      "VALUES ('MythShutdownLock', '1');");
+        if (!query.exec())
+            MythDB::DBError("lockShutdown -- insert", query);
     }
     else
     {
         // update the lock setting
-        query.exec("UPDATE settings SET data = data + 1 "
-                   "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+        query.prepare("UPDATE settings SET data = data + 1 "
+                      "WHERE value = 'MythShutdownLock' "
+                      "AND hostname IS NULL;");
+        if (!query.exec())
+            MythDB::DBError("lockShutdown -- update", query);
     }
 
     // unlock settings table
-    query.exec("UNLOCK TABLES;");
+    if (!query.exec("UNLOCK TABLES;"))
+        MythDB::DBError("lockShutdown -- unlock", query);
 
     return 0;
 }
@@ -140,24 +144,32 @@ int unlockShutdown()
     }
 
     // does the setting exist?
-    query.exec("SELECT * FROM settings "
-               "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+    query.prepare("SELECT * FROM settings "
+                  "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+    if (!query.exec())
+        MythDB::DBError("unlockShutdown -- select", query);
 
     if (query.size() < 1)
     {
         // add the lock setting
-        query.exec("INSERT INTO settings (value, data) "
-                   "VALUES ('MythShutdownLock', '0');");
+        query.prepare("INSERT INTO settings (value, data) "
+                      "VALUES ('MythShutdownLock', '0');");
+        if (!query.exec())
+            MythDB::DBError("unlockShutdown -- insert", query);
     }
     else
     {
         // update lock setting
-        query.exec("UPDATE settings SET data = GREATEST(0,  data - 1) "
-                   "WHERE value = 'MythShutdownLock' AND hostname IS NULL;");
+        query.prepare("UPDATE settings SET data = GREATEST(0,  data - 1) "
+                      "WHERE value = 'MythShutdownLock' "
+                      "AND hostname IS NULL;");
+        if (!query.exec())
+            MythDB::DBError("unlockShutdown -- update", query);
     }
 
     // unlock table
-    query.exec("UNLOCK TABLES;");
+    if (!query.exec("UNLOCK TABLES;"))
+        MythDB::DBError("unlockShutdown -- unlock", query);
 
     // tell the master BE to reset its idle time
     RemoteSendMessage("RESET_IDLETIME");

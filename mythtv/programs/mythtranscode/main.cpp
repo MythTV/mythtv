@@ -979,9 +979,8 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                           "AND starttime = :STARTTIME ");
             query.bindValue(":CHANID", pginfo->chanid);
             query.bindValue(":STARTTIME", pginfo->recstartts);
-            query.exec();
 
-            if (!query.isActive())
+            if (!query.exec())
                 MythDB::DBError("Error in mythtranscode", query);
 
             query.prepare("UPDATE recorded "
@@ -993,9 +992,8 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             query.bindValue(":WATCHED", "0");
             query.bindValue(":CHANID", pginfo->chanid);
             query.bindValue(":STARTTIME", pginfo->recstartts);
-            query.exec();
 
-            if (!query.isActive())
+            if (!query.exec())
                 MythDB::DBError("Error in mythtranscode", query);
 
             pginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
@@ -1015,9 +1013,8 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             query.bindValue(":BOOKMARK", MARK_BOOKMARK);
             query.bindValue(":CUTLIST_START", MARK_CUT_START);
             query.bindValue(":CUTLIST_END", MARK_CUT_END);
-            query.exec();
 
-            if (!query.isActive())
+            if (!query.exec())
                 MythDB::DBError("Error in mythtranscode", query);
         }
 

@@ -288,10 +288,8 @@ void IconData::ImportIconMap(const QString &filename)
                         qc.prepare("SELECT COUNT(*) FROM settings "
                                 "WHERE value = :STUBNAME");
                         qc.bindValue(":STUBNAME", st);
-                        qc.exec();
-                        if (qc.isActive() && qc.size() > 0)
+                        if (qc.exec() && qc.next())
                         {
-                            qc.first();
                             if (qc.value(0).toInt() != 0)
                             {
                                 qr = &su_query;
@@ -350,9 +348,9 @@ void IconData::ExportIconMap(const QString &filename)
         QDomElement roote = iconmap.createElement(IM_DOC_TAG);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("SELECT * FROM callsignnetworkmap ORDER BY callsign;");
-
-        if (query.isActive() && query.size() > 0)
+        
+        query.prepare("SELECT * FROM callsignnetworkmap ORDER BY callsign;");
+        if (query.exec())
         {
             while (query.next())
             {
@@ -374,8 +372,8 @@ void IconData::ExportIconMap(const QString &filename)
             }
         }
 
-        query.exec("SELECT * FROM networkiconmap ORDER BY network;");
-        if (query.isActive() && query.size() > 0)
+        query.prepare("SELECT * FROM networkiconmap ORDER BY network;");
+        if (query.exec())
         {
             while (query.next())
             {
@@ -401,8 +399,7 @@ void IconData::ExportIconMap(const QString &filename)
         query.prepare("SELECT value,data FROM settings WHERE value "
                 "LIKE :URLMAP");
         query.bindValue(":URLMAP", QString(BASEURLMAP_START) + "%");
-        query.exec();
-        if (query.isActive() && query.size() > 0)
+        if (query.exec())
         {
             QRegExp baseax("\\.([^\\.]+)$");
             while (query.next())

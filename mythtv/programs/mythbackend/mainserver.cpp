@@ -1709,9 +1709,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
     query.bindValue(":STARTTIME", ds->recstartts);
-    query.exec();
 
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedmarkup", query);
         gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
@@ -1723,9 +1722,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
     query.bindValue(":STARTTIME", ds->recstartts);
-    query.exec();
 
-    if (!query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("Recorded program delete recordedseek", query);
         gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
@@ -2563,7 +2561,9 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
                 }
                 query.prepare("DELETE FROM program WHERE manualid = :RECID;");
                 query.bindValue(":RECID", recordid);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("MainServer::HandleGetPendingRecordings "
+                                    "- delete", query);
             }
         }
     }

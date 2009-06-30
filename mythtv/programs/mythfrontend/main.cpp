@@ -63,6 +63,7 @@ using namespace std;
 #include "mythdirs.h"
 #include "mythosdmenueditor.h"
 #include "audiopulseutil.h"
+#include "mythdb.h"
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -982,7 +983,8 @@ void CleanupMyOldInUsePrograms(void)
     query.prepare("DELETE FROM inuseprograms "
                   "WHERE hostname = :HOSTNAME and recusage = 'player' ;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("CleanupMyOldInUsePrograms", query);
 }
 
 void ShowUsage(const MythCommandLineParser &cmdlineparser)
@@ -1293,7 +1295,8 @@ int main(int argc, char **argv)
         query.prepare("update settings set data='EN' "
                       "WHERE hostname = :HOSTNAME and value='Language' ;");
         query.bindValue(":HOSTNAME", gContext->GetHostName());
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("Updating language", query);
 
         return FRONTEND_EXIT_OK;
     }

@@ -387,7 +387,8 @@ void StatusBox::customEvent(QEvent *event)
                 query.prepare("UPDATE mythlog SET acknowledged = 1 "
                             "WHERE logid = :LOGID ;");
                 query.bindValue(":LOGID", sql);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("StatusBox::customEvent -- LogAck", query);
                 doLogEntries();
             }
         }
@@ -399,7 +400,9 @@ void StatusBox::customEvent(QEvent *event)
                 query.prepare("UPDATE mythlog SET acknowledged = 1 "
                                 "WHERE priority <= :PRIORITY ;");
                 query.bindValue(":PRIORITY", m_minLevel);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("StatusBox::customEvent -- LogAckAll",
+                                    query);
                 doLogEntries();
             }
         }

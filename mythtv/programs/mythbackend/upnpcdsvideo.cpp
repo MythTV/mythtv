@@ -203,11 +203,9 @@ int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
                     "AND parentid = :ROOTID");
 
     query.bindValue(":ROOTID", STARTING_VIDEO_OBJECTID);
-    query.exec();
 
-    if (query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         nCount = query.value(0).toInt();
     }
 
@@ -252,15 +250,11 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRe
             if (query.isConnected())                                                           
             {
                 BuildItemQuery( query, mapParams );
-                query.exec();
-    
-                if (query.isActive() && query.size() > 0)
+
+                if (query.exec() && query.next())
                 {
-                    if ( query.next() )
-                    {
                         AddItem( pRequest->m_sParentId, pResults, false, query );
                         pResults->m_nTotalMatches = 1;
-                    }
                 }
             }
 
@@ -366,9 +360,8 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
         //VERBOSE(VB_UPNP, QString("sSQL = %1").arg(sSQL));
         if ( sKey.length() )
             query.bindValue(":KEY", sKey );
-        query.exec();
 
-        if (query.isActive() && query.size() > 0)
+        if (query.exec())
         {
             while(query.next()) 
                 AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );

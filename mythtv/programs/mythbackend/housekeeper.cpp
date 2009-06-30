@@ -100,7 +100,8 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
             result.prepare("INSERT INTO housekeeping(tag,lastrun) "
                            "values(:TAG ,now());");
             result.bindValue(":TAG", dbTag);
-            result.exec();
+            if (!result.exec())
+                MythDB::DBError("HouseKeeper::wantToRun -- insert", result);
 
             runOK = true;
         }
@@ -116,12 +117,14 @@ void HouseKeeper::updateLastrun(const QString &dbTag)
     {
         result.prepare("DELETE FROM housekeeping WHERE tag = :TAG ;");
         result.bindValue(":TAG", dbTag);
-        result.exec();
+        if (!result.exec())
+            MythDB::DBError("HouseKeeper::updateLastrun -- delete", result);
 
         result.prepare("INSERT INTO housekeeping(tag,lastrun) "
                        "values(:TAG ,now()) ;");
         result.bindValue(":TAG", dbTag);
-        result.exec();
+        if (!result.exec())
+            MythDB::DBError("HouseKeeper::updateLastrun -- insert", result);
     }
 }
 
@@ -285,11 +288,15 @@ void HouseKeeper::flushLogs()
         result.prepare("DELETE FROM mythlog WHERE "
                        "acknowledged=1 and logdate < :DAYS ;");
         result.bindValue(":DAYS", days);
-        result.exec();
+        if (!result.exec())
+            MythDB::DBError("HouseKeeper::flushLogs -- delete acknowledged",
+                            result);
 
         result.prepare("DELETE FROM mythlog WHERE logdate< :MAX ;");
         result.bindValue(":MAX", max);
-        result.exec();
+        if (!result.exec())
+            MythDB::DBError("HouseKeeper::flushLogs -- delete old",
+                            result);
     }
 }
 
@@ -369,7 +376,8 @@ void HouseKeeper::CleanupMyOldRecordings(void)
                   "WHERE hostname = :HOSTNAME AND "
                     "( recusage = 'recorder' OR recusage LIKE 'Unknown %' );");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper::CleanupMyOldRecordings", query);
 }
 
 void HouseKeeper::CleanupAllOldInUsePrograms(void)
@@ -380,7 +388,8 @@ void HouseKeeper::CleanupAllOldInUsePrograms(void)
     query.prepare("DELETE FROM inuseprograms "
                   "WHERE lastupdatetime < :FOURHOURSAGO ;");
     query.bindValue(":FOURHOURSAGO", fourHoursAgo);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper::CleanupAllOldInUsePrograms", query);
 }
 
 void HouseKeeper::CleanupOrphanedLivetvChains(void)
@@ -416,7 +425,8 @@ void HouseKeeper::CleanupOrphanedLivetvChains(void)
                       .arg(keepChains);
     }
     deleteQuery.prepare(msg);
-    deleteQuery.exec();
+    if (!deleteQuery.exec())
+        MythDB::DBError("HouseKeeper Cleaning TVChain Table", deleteQuery);
 }
 
 void HouseKeeper::CleanupRecordedTables(void)
@@ -494,7 +504,9 @@ void HouseKeeper::CleanupRecordedTables(void)
         {
             deleteQuery.bindValue(":CHANID", query.value(0).toString());
             deleteQuery.bindValue(":STARTTIME", query.value(1).toString());
-            deleteQuery.exec();
+            if (!deleteQuery.exec())
+                MythDB::DBError("HouseKeeper Cleaning Recorded Tables",
+                                deleteQuery);
         }
 
         tableIndex++;
@@ -517,33 +529,39 @@ void HouseKeeper::CleanupProgramListings(void)
 
     query.prepare("DELETE FROM oldprogram WHERE airdate < "
                   "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     query.prepare("REPLACE INTO oldprogram (oldtitle,airdate) "
                   "SELECT title,starttime FROM program "
                   "WHERE starttime < NOW() AND manualid = 0 "
                   "GROUP BY title;");
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     query.prepare("DELETE FROM program WHERE starttime <= "
                   "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
     query.bindValue(":OFFSET", offset);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     query.prepare("DELETE FROM programrating WHERE starttime <= "
                   "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
     query.bindValue(":OFFSET", offset);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     query.prepare("DELETE FROM programgenres WHERE starttime <= "
                   "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
     query.bindValue(":OFFSET", offset);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     query.prepare("DELETE FROM credits WHERE starttime <= "
                   "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
     query.bindValue(":OFFSET", offset);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     query.prepare("DELETE FROM record WHERE (type = :SINGLE "
                   "OR type = :OVERRIDE OR type = :DONTRECORD) "
@@ -551,26 +569,28 @@ void HouseKeeper::CleanupProgramListings(void)
     query.bindValue(":SINGLE", kSingleRecord);
     query.bindValue(":OVERRIDE", kOverrideRecord);
     query.bindValue(":DONTRECORD", kDontRecord);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     MSqlQuery findq(MSqlQuery::InitCon());
     findq.prepare("SELECT record.recordid FROM record "
                   "LEFT JOIN oldfind ON oldfind.recordid = record.recordid "
                   "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
     findq.bindValue(":FINDONE", kFindOneRecord);
-    findq.exec();
 
-    if (findq.isActive() && findq.size() > 0)
+    if (findq.exec() && findq.size() > 0)
     {
         while (findq.next())
         {
             query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
             query.bindValue(":RECORDID", findq.value(0).toInt());
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
         }
     }
     query.prepare("DELETE FROM oldfind WHERE findid < TO_DAYS(NOW()) - 14;");
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
     int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 10);
 
@@ -579,7 +599,8 @@ void HouseKeeper::CleanupProgramListings(void)
                   "endtime < DATE_SUB(CURRENT_DATE, INTERVAL :CLEAN DAY);");
     query.bindValue(":RECORDED", rsRecorded);
     query.bindValue(":CLEAN", cleanOldRecorded);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("HouseKeeper Cleaning Program Listings", query);
 
 }
 

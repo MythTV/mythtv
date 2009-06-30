@@ -19,6 +19,7 @@ using namespace std;
 #include "channelutil.h"
 
 // mythdb
+#include "libmythdb/mythdb.h"
 #include "libmythdb/mythdbcon.h"
 #include "libmythdb/mythverbose.h"
 
@@ -385,7 +386,9 @@ void ProgLister::updateKeywordInDB(const QString &text, const QString &oldValue)
                           "WHERE phrase = :PHRASE AND searchtype = :TYPE;");
             query.bindValue(":PHRASE", qphrase);
             query.bindValue(":TYPE", m_searchType);
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("ProgLister::updateKeywordInDB -- delete",
+                                query);
 
             m_viewList.removeAll(qphrase);
             m_viewTextList.removeAll(qphrase);
@@ -399,7 +402,9 @@ void ProgLister::updateKeywordInDB(const QString &text, const QString &oldValue)
                           "VALUES(:PHRASE, :TYPE );");
             query.bindValue(":PHRASE", qphrase);
             query.bindValue(":TYPE", m_searchType);
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("ProgLister::updateKeywordInDB -- replace",
+                                query);
 
             m_viewList.append(qphrase);
             m_viewTextList.append(qphrase);
@@ -739,7 +744,8 @@ void ProgLister::doDeleteOldRecorded()
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", pi->chanid);
     query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("ProgLister::doDeleteOldRecorded", query);
     ScheduledRecording::signalChange(0);
 }
 
@@ -807,9 +813,8 @@ void ProgLister::fillViewList(const QString &view)
                       "WHERE program.endtime > :PGILSTART "
                       "GROUP BY g1.genre, g2.genre;");
         query.bindValue(":PGILSTART", startstr);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec() && query.size())
         {
             QString lastGenre1;
 
@@ -843,9 +848,8 @@ void ProgLister::fillViewList(const QString &view)
                           "WHERE program.endtime > :PGILSTART "
                           "GROUP BY category;");
             query.bindValue(":PGILSTART", startstr);
-            query.exec();
 
-            if (query.isActive() && query.size())
+            if (query.exec() && query.size())
             {
                 while (query.next())
                 {
@@ -871,9 +875,8 @@ void ProgLister::fillViewList(const QString &view)
         query.prepare("SELECT phrase FROM keyword "
                       "WHERE searchtype = :SEARCHTYPE;");
         query.bindValue(":SEARCHTYPE", m_searchType);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec() && query.size())
         {
             while (query.next())
             {
@@ -898,7 +901,9 @@ void ProgLister::fillViewList(const QString &view)
                               "VALUES(:VIEW, :SEARCHTYPE );");
                 query.bindValue(":VIEW", qphrase);
                 query.bindValue(":SEARCHTYPE", m_searchType);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("ProgLister::fillViewList -- "
+                                    "replace keyword", query);
 
                 m_viewList << qphrase;
                 m_viewTextList << qphrase;
@@ -1000,17 +1005,13 @@ void ProgLister::fillViewList(const QString &view)
         query.prepare("SELECT title FROM record "
                       "WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", view);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec() && query.next())
         {
-            if (query.next())
-            {
                 QString title = query.value(0).toString();
                 title = query.value(0).toString();
                 m_viewList << view;
                 m_viewTextList << title;
-            }
         }
     }
     else if (m_type == plStoredSearch) // stored searches
@@ -1018,9 +1019,8 @@ void ProgLister::fillViewList(const QString &view)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT rulename FROM customexample "
                       "WHERE search > 0 ORDER BY rulename;");
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec())
         {
             while (query.next())
             {
@@ -1317,11 +1317,9 @@ void ProgLister::fillItemList(bool restorePosition)
         query.prepare("SELECT fromclause, whereclause FROM customexample "
                       "WHERE rulename = :RULENAME;");
         query.bindValue(":RULENAME", qphrase);
-        query.exec();
 
-        if (query.isActive() && query.size())
+        if (query.exec() && query.next())
         {
-            query.next();
             fromc  = query.value(0).toString();
             wherec = query.value(1).toString();
 
@@ -1609,7 +1607,9 @@ void ProgLister::customEvent(QEvent *event)
                     MSqlQuery query(MSqlQuery::InitCon());
                     query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE ;");
                     query.bindValue(":TITLE", pi->title);
-                    query.exec();
+                    if (!query.exec())
+                        MythDB::DBError("ProgLister::customEvent -- delete",
+                                        query);
 
                     ScheduledRecording::signalChange(0);
                     fillItemList(false);
@@ -1778,7 +1778,8 @@ void PhrasePopup::deleteClicked(void)
                   "WHERE phrase = :PHRASE AND searchtype = :TYPE;");
     query.bindValue(":PHRASE", qphrase);
     query.bindValue(":TYPE", m_searchType);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("PhrasePopup::deleteClicked", query);
 
     m_phraseList->RemoveItem(m_phraseList->GetItemCurrent());
 
@@ -2053,7 +2054,8 @@ void PowerSearchPopup::deleteClicked(void)
                   "WHERE phrase = :PHRASE AND searchtype = :TYPE;");
     query.bindValue(":PHRASE", qphrase);
     query.bindValue(":TYPE", m_searchType);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("PowerSearchPopup::deleteClicked", query);
 
     m_phraseList->RemoveItem(m_phraseList->GetItemCurrent());
 
@@ -2236,9 +2238,8 @@ void EditPowerSearchPopup::initLists(void)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT genre FROM programgenres GROUP BY genre;");
-    query.exec();
 
-    if (query.isActive() && query.size())
+    if (query.exec() && query.size())
     {
         while (query.next())
         {

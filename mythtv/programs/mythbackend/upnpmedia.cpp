@@ -100,9 +100,8 @@ void UPnpMedia::FillMetaMaps(void)
     QString sSQL = "SELECT filename, title, coverfile FROM videometadata";
 
     query.prepare  ( sSQL );
-    query.exec();
 
-    if (query.isActive() && query.size() > 0)
+    if (query.exec() && query.size() > 0)
     {
         while(query.next())
         {
@@ -166,7 +165,8 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
             query.bindValue(":TITLE", GetTitleName(fPath,fName));
             query.bindValue(":COVERART", GetCoverArt(fPath));
 
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("UPnpMedia::buildFileList", query);
 
             itemID = buildFileList(Info.filePath(), 0, itemID, query);
             continue;
@@ -209,7 +209,8 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
             query.bindValue(":TITLE", GetTitleName(fPath,fName));
             query.bindValue(":COVERART", GetCoverArt(fPath));
 
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("UPnpMedia::buildFileList", query);
 
         }
     }

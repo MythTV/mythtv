@@ -16,6 +16,7 @@
 #include "remoteutil.h"
 
 #include "mythcontext.h"
+#include "mythdb.h"
 #include "mythdbcon.h"
 #include "util.h"
 #include "decodeencode.h"
@@ -92,7 +93,8 @@ void BackendQueryDiskSpace(QStringList &strlist,
                           "WHERE groupname = :GROUP "
                           "GROUP BY dirname;");
             query.bindValue(":GROUP", "Default");
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("BackendQueryDiskSpace", query);
         }
 
         QDir checkDir("");

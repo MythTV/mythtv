@@ -728,11 +728,10 @@ int main(int argc, char *argv[])
                 "with multiple parts.");
 
         MSqlQuery sel(MSqlQuery::InitCon());
-        sel.exec("SELECT DISTINCT programid, partnumber, parttotal "
-                 "FROM program WHERE partnumber > 0 AND parttotal > 0 AND "
-                 "programid LIKE '%0000'");
-
-        if (sel.isActive() && sel.size() > 0)
+        sel.prepare("SELECT DISTINCT programid, partnumber, parttotal "
+                    "FROM program WHERE partnumber > 0 AND parttotal > 0 AND "
+                    "programid LIKE '%0000'");
+        if (sel.exec())
         {
             MSqlQuery repl(MSqlQuery::InitCon());
 
@@ -814,15 +813,16 @@ int main(int argc, char *argv[])
     if (grab_data)
     {
         MSqlQuery updt(MSqlQuery::InitCon());
-        updt.exec("UPDATE program SET first = 0, last = 0;");
+        updt.prepare("UPDATE program SET first = 0, last = 0;");
+        if (!updt.exec())
+            MythDB::DBError("Clearing first and last showings", updt);
 
         VERBOSE(VB_GENERAL, "Marking episode first showings.");
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("SELECT MIN(starttime),programid FROM program "
-                   "WHERE programid > '' GROUP BY programid;");
-
-        if (query.isActive() && query.size() > 0)
+        query.prepare("SELECT MIN(starttime),programid FROM program "
+                      "WHERE programid > '' GROUP BY programid;");
+        if (query.exec())
         {
             while(query.next())
             {
@@ -831,16 +831,15 @@ int main(int argc, char *argv[])
                              "  AND programid = :PROGRAMID;");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":PROGRAMID", query.value(1).toString());
-                updt.exec();
+                if (!updt.exec())
+                    MythDB::DBError("Marking first showings by id", updt);
             }
         }
         int found = query.size();
-
-        query.exec("SELECT MIN(starttime),title,subtitle,description "
-                   "FROM program WHERE programid = '' "
-                   "GROUP BY title,subtitle,description;");
-
-        if (query.isActive() && query.size() > 0)
+        query.prepare("SELECT MIN(starttime),title,subtitle,description "
+                      "FROM program WHERE programid = '' "
+                      "GROUP BY title,subtitle,description;");
+        if (query.exec())
         {
             while(query.next())
             {
@@ -853,18 +852,17 @@ int main(int argc, char *argv[])
                 updt.bindValue(":TITLE", query.value(1).toString());
                 updt.bindValue(":SUBTITLE", query.value(2).toString());
                 updt.bindValue(":DESCRIPTION", query.value(3).toString());
-                updt.exec();
+                if (!updt.exec())
+                    MythDB::DBError("Marking first showings", updt);
             }
         }
         found += query.size();
         VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
 
         VERBOSE(VB_GENERAL, "Marking episode last showings.");
-
-        query.exec("SELECT MAX(starttime),programid FROM program "
-                   "WHERE programid > '' GROUP BY programid;");
-
-        if (query.isActive() && query.size() > 0)
+        query.prepare("SELECT MAX(starttime),programid FROM program "
+                      "WHERE programid > '' GROUP BY programid;");
+        if (query.exec())
         {
             while(query.next())
             {
@@ -873,16 +871,15 @@ int main(int argc, char *argv[])
                              "  AND programid = :PROGRAMID;");
                 updt.bindValue(":STARTTIME", query.value(0).toDateTime());
                 updt.bindValue(":PROGRAMID", query.value(1).toString());
-                updt.exec();
+                if (!updt.exec())
+                    MythDB::DBError("Marking last showings by id", updt);
             }
         }
         found = query.size();
-
-        query.exec("SELECT MAX(starttime),title,subtitle,description "
-                   "FROM program WHERE programid = '' "
-                   "GROUP BY title,subtitle,description;");
-
-        if (query.isActive() && query.size() > 0)
+        query.prepare("SELECT MAX(starttime),title,subtitle,description "
+                      "FROM program WHERE programid = '' "
+                      "GROUP BY title,subtitle,description;");
+        if (query.exec())
         {
             while(query.next())
             {
@@ -895,7 +892,8 @@ int main(int argc, char *argv[])
                 updt.bindValue(":TITLE", query.value(1).toString());
                 updt.bindValue(":SUBTITLE", query.value(2).toString());
                 updt.bindValue(":DESCRIPTION", query.value(3).toString());
-                updt.exec();
+                if (!updt.exec())
+                    MythDB::DBError("Marking last showings", updt);
             }
         }
         found += query.size();
@@ -905,14 +903,24 @@ int main(int argc, char *argv[])
     if (1) // limit MSqlQuery's lifetime
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
-        if (query.isActive() && query.size() > 0)
+        query.prepare("SELECT count(previouslyshown) "
+                      "FROM program WHERE previouslyshown = 1;");
+        if (query.exec() && query.next())
         {
-            query.next();
             if (query.value(0).toInt() != 0)
-                query.exec("UPDATE settings SET data = '1' WHERE value = 'HaveRepeats';");
+            {
+                query.prepare("UPDATE settings SET data = '1' "
+                              "WHERE value = 'HaveRepeats';");
+                if (!query.exec())
+                    MythDB::DBError("Setting HaveRepeats", query);
+            }
             else
-                query.exec("UPDATE settings SET data = '0' WHERE value = 'HaveRepeats';");
+            {
+                query.prepare("UPDATE settings SET data = '0' "
+                              "WHERE value = 'HaveRepeats';");
+                if (!query.exec())
+                    MythDB::DBError("Clearing HaveRepeats", query);
+            }
         }
     }
 
