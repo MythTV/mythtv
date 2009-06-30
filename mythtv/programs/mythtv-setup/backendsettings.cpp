@@ -721,8 +721,11 @@ BackendSettings::BackendSettings() {
     localServer->addChild(localPin);
     VerticalConfigurationGroup* masterServer = new VerticalConfigurationGroup();
     masterServer->setLabel(QObject::tr("Master Backend"));
-    masterServer->addChild(MasterServerIP());
-    masterServer->addChild(MasterServerPort());
+    HorizontalConfigurationGroup* master =
+              new HorizontalConfigurationGroup(false, false, true, true);
+    master->addChild(MasterServerIP());
+    master->addChild(MasterServerPort());
+    masterServer->addChild(master);
     server->addChild(localServer);
     server->addChild(masterServer);
     addChild(server);
