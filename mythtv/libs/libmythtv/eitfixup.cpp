@@ -26,8 +26,7 @@ EITFixUp::EITFixUp()
       m_ukSpaceColonStart("^[ |:]*"),
       m_ukSpaceStart("^ "),
       m_ukSeries("\\s*\\(?\\s*(?:Episode|Part|Pt)?\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", false),
-      m_ukCC("\\[(AD)(,(S)){,1}(,SL){,1}\\]|\\[(S)(,AD){,1}(,SL){,1}\\]|"
-             "\\[(SL)(,AD){,1}(,(S)){,1}\\]"),
+      m_ukCC("\\[(?:(AD|SL|S|W),?)+\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
       m_uk24ep("^\\d{1,2}:00[ap]m to \\d{1,2}:00[ap]m: "),
       m_ukStarring("(?:Western\\s)?[Ss]tarring ([\\w\\s\\-']+)[Aa]nd\\s([\\w\\s\\-']+)[\\.|,](?:\\s)*(\\d{4})?(?:\\.\\s)?"),
@@ -438,7 +437,20 @@ void EITFixUp::FixUK(DBEvent &event) const
     event.description = event.description.remove(m_ukBBC7rpt);
 
     // Remove [AD,S] etc.
-    event.description = event.description.remove(m_ukCC);
+    QRegExp tmpCC = m_ukCC;
+    if ((position1 = tmpCC.search(event.description)) != -1)
+    {
+        QStringList tmpCCitems = QStringList::split(",",tmpCC.cap(0).remove("[").remove("]"));
+        if (tmpCCitems.contains("AD"))
+            event.audioProps |= AUD_VISUALIMPAIR;
+        if (tmpCCitems.contains("S"))
+            event.subtitleType |= SUB_NORMAL;
+        if (tmpCCitems.contains("SL"))
+            event.subtitleType |= SUB_SIGNED;
+        if (tmpCCitems.contains("W"))
+            event.videoProps |= VID_WIDESCREEN;
+        event.description = event.description.remove(m_ukCC);
+    }
 
     event.title = event.title.stripWhiteSpace();
     event.description = event.description.stripWhiteSpace();
