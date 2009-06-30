@@ -394,11 +394,6 @@ bool VideoOutputIvtv::InputChanged(const QSize &input_size,
     return true;
 }
 
-int VideoOutputIvtv::GetRefreshRate(void)
-{
-    return 0;
-}
-
 int VideoOutputIvtv::ValidVideoFrames(void) const
 {
     return 131; // approximation for when output buffer is full...

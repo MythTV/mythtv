@@ -24,7 +24,7 @@ class VideoOutputOpenGL : public VideoOutput
     void Show(FrameScanType );
     bool InputChanged(const QSize &input_size, float aspect,
                       MythCodecID  av_codec_id, void *codec_private);
-    int  GetRefreshRate(void);
+    DisplayInfo GetDisplayInfo(void);
     void UpdatePauseFrame(void);
     void DrawUnusedRects(bool) { }
     void Zoom(ZoomDirection direction);
@@ -54,7 +54,6 @@ class VideoOutputOpenGL : public VideoOutput
     bool SetupContext(void);
     bool SetupOpenGL(void);
     void InitOSD(void);
-    void InitDisplayMeasurements(void);
 
     QMutex         gl_context_lock;
     OpenGLContext *gl_context;

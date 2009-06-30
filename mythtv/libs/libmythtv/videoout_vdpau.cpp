@@ -56,7 +56,7 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("vdpau");
     ok = ok ? InitXDisplay(winid) : ok;
-    InitDisplayMeasurements(width, height);
+    InitDisplayMeasurements(width, height, true);
     ok = ok ? InitContext()       : ok;
     ok = ok ? InitBuffers()       : ok;
     if (!ok)
@@ -505,9 +505,18 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
     return test_cid;
 }
 
-int VideoOutputVDPAU::GetRefreshRate(void)
+DisplayInfo VideoOutputVDPAU::GetDisplayInfo(void)
 {
-    return MythXGetRefreshRate();
+    DisplayInfo ret;
+    MythXDisplay *d = OpenMythXDisplay();
+    if (d)
+    {
+        ret.rate = d->GetRefreshRate();
+        ret.res  = d->GetDisplaySize();
+        ret.size = d->GetDisplayDimensions();
+        delete d;
+    }
+    return ret;
 }
 
 void VideoOutputVDPAU::SetNextFrameDisplayTimeOffset(int delayus)
@@ -647,149 +656,3 @@ void VideoOutputVDPAU::RemovePIP(NuppelVideoPlayer *pipplayer)
     if (m_ctx)
         m_ctx->DeinitPIP(pipplayer);
 }
-
-void VideoOutputVDPAU::InitDisplayMeasurements(uint width, uint height)
-{
-    if (!m_disp)
-        return;
-
-    bool useGuiSize = gContext->GetNumSetting("GuiSizeForTV", 0);
-
-    if (display_res)
-    {
-        // The very first Resize needs to be the maximum possible
-        // desired res, because X will mask off anything outside
-        // the initial dimensions
-        m_disp->MoveResizeWin(m_win,
-                    QRect(gContext->GetMainWindow()->geometry().x(),
-                          gContext->GetMainWindow()->geometry().y(),
-                          display_res->GetMaxWidth(),
-                          display_res->GetMaxHeight()));
-        ResizeForVideo(width, height);
-    }
-    else
-    {
-        // The very first Resize needs to be the maximum possible
-        // desired res, because X will mask off anything outside
-        // the initial dimensions
-        QSize sz1 = m_disp->GetDisplaySize();
-        QSize sz2 = qApp->desktop()->
-            availableGeometry(gContext->GetMainWindow()).size();
-        int max_w = max(sz1.width(),  sz2.width());
-        int max_h = max(sz1.height(), sz2.height());
-
-        // no need to resize if we are using the same window size as the GUI
-        if (useGuiSize)
-        {
-            max_w = gContext->GetMainWindow()->geometry().width();
-            max_h = gContext->GetMainWindow()->geometry().height();
-        }
-
-        m_disp->MoveResizeWin(m_win,
-                        QRect(gContext->GetMainWindow()->geometry().x(),
-                              gContext->GetMainWindow()->geometry().y(),
-                              max_w, max_h));
-
-        if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
-        {
-            windows[0].SetDisplayDim(db_display_dim);
-        }
-        else
-        {
-            windows[0].SetDisplayDim(m_disp->GetDisplayDimensions());
-        }
-    }
-    QDesktopWidget * desktop = QApplication::desktop();
-    bool             usingXinerama = (GetNumberXineramaScreens() > 1);
-    int              screen = desktop->primaryScreen();
-    int              w, h;
-
-    if (usingXinerama)
-    {
-        screen = gContext->GetNumSetting("XineramaScreen", screen);
-        if (screen >= desktop->numScreens())
-            screen = 0;
-    }
-
-    if (screen == -1)
-    {
-        w = desktop->width();
-        h = desktop->height();
-    }
-    else
-    {
-        w = desktop->screenGeometry(screen).width();
-        h = desktop->screenGeometry(screen).height();
-    }
-
-    // Determine window dimensions in pixels
-    int window_w = windows[0].GetDisplayVisibleRect().size().width();
-    int window_h = windows[0].GetDisplayVisibleRect().size().height();
-    if (useGuiSize)
-        gContext->GetResolutionSetting("Gui", window_w,  window_h);
-    window_w = (window_w) ? window_w : w;
-    window_h = (window_h) ? window_h : h;
-    float pixel_aspect = ((float)w) / ((float)h);
-
-    VERBOSE(VB_PLAYBACK, LOC + QString(
-                "Pixel dimensions: Screen %1x%2, window %3x%4")
-            .arg(w).arg(h).arg(window_w).arg(window_h));
-
-    // If the dimensions are invalid, assume square pixels and 17" screen.
-    // Only print warning if this isn't Xinerama, we will fix Xinerama later.
-    QSize display_dim = windows[0].GetDisplayDim();
-    if (((display_dim.width() <= 0) || (display_dim.height() <= 0)) &&
-        !usingXinerama)
-    {
-        VERBOSE(VB_GENERAL, LOC + "Physical size of display unknown."
-                "\n\t\t\tAssuming 17\" monitor with square pixels.");
-        display_dim.setHeight(300);
-        display_dim.setWidth((int) round(300 * pixel_aspect));
-    }
-
-    // If we are using Xinerama the display dimensions can not be trusted.
-    // We need to use the Xinerama monitor aspect ratio from the DB to set
-    // the physical screen width. This assumes the height is correct, which
-    // is more or less true in the typical side-by-side monitor setup.
-    if (usingXinerama)
-    {
-        float displayAspect = gContext->GetFloatSettingOnHost(
-            "XineramaMonitorAspectRatio",
-            gContext->GetHostName(), pixel_aspect);
-        int displayHeight = display_dim.height();
-        if (displayHeight <= 0)
-            display_dim.setHeight(displayHeight = 300);
-        display_dim.setWidth((int) round(displayHeight * displayAspect));
-    }
-
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Estimated display dimensions: %1x%2 mm  Aspect: %3")
-            .arg(display_dim.width()).arg(display_dim.height())
-            .arg(((float) display_dim.width()) / display_dim.height()));
-
-    // We must now scale the display measurements to our window size.
-    // If we are running fullscreen this is a no-op.
-    display_dim = QSize((display_dim.width()  * window_w) / w,
-                        (display_dim.height() * window_h) / h);
-
-    // Now make these changes stick
-    windows[0].SetDisplayDim(display_dim);
-
-    // If we are using XRandR, use the aspect ratio from it, otherwise
-    // calculate the display aspect ratio pretty using physical monitor size
-    if (display_res)
-    {
-        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
-    }
-    else
-    {
-        windows[0].SetDisplayAspect(
-            ((float)display_dim.width()) / display_dim.height());
-    }
-
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
-            .arg(display_dim.width()).arg(display_dim.height())
-            .arg(windows[0].GetDisplayAspect()));
-}
-

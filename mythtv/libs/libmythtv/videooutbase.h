@@ -86,7 +86,7 @@ class VideoOutput
     virtual void StopEmbedding(void);
     void         ResizeForGui(void);
     void         ResizeForVideo(uint width = 0, uint height = 0);
-    virtual void MoveResizeWindow(QRect new_rect) {;}
+    virtual void MoveResizeWindow(QRect new_rect) = 0;
 
     virtual void MoveResize(void);
     virtual void Zoom(ZoomDirection direction);
@@ -95,10 +95,8 @@ class VideoOutput
                               float &visibleAspect, float &fontScale,
                               float themeAspect) const;
     QRect        GetMHEGBounds(void);
-    /// \brief Returns current display's frame refresh period in microseconds.
-    ///        e.g. 1000000 / frame_rate_in_Hz
-    virtual int GetRefreshRate(void) = 0;
-
+    /// \brief Returns information about the current display
+    virtual DisplayInfo GetDisplayInfo(void) = 0;
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
     /// \brief Draws non-video portions of the screen
@@ -258,7 +256,7 @@ class VideoOutput
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
                      int keepprebuffer);
-
+    void InitDisplayMeasurements(uint width, uint height, bool resize);
     virtual void ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers);
     virtual void ShowPIP(VideoFrame        *frame,
                          NuppelVideoPlayer *pipplayer,
@@ -344,6 +342,10 @@ class VideoOutput
 
     // Custom display resolutions
     DisplayRes *display_res;
+
+    // Display information
+    QSize monitor_sz;
+    QSize monitor_dim;
 };
 
 #endif

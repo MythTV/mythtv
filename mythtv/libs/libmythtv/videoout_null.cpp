@@ -123,11 +123,6 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
     return ok;
 }
 
-int VideoOutputNull::GetRefreshRate(void)
-{
-    return 0;
-}
-
 bool VideoOutputNull::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)

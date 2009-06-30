@@ -42,7 +42,7 @@ class VideoOutputVDPAU : public VideoOutput
                                     const QSize &video_dim);
     static MythCodecID GetBestSupportedCodec(uint width,        uint height,
                                       uint stream_type,  bool no_acceleration);
-    int  GetRefreshRate(void);
+    DisplayInfo GetDisplayInfo(void);
     virtual bool hasVDPAUAcceleration(void) const { return true; }
     void SetNextFrameDisplayTimeOffset(int delayus);
 
@@ -59,7 +59,6 @@ class VideoOutputVDPAU : public VideoOutput
     void DiscardFrames(bool next_frame_keyframe);
     void DoneDisplayingFrame(void);
     void CheckFrameStates(void);
-    void InitDisplayMeasurements(uint width, uint height);
     virtual int DisplayOSD(VideoFrame *frame, OSD *osd,
                            int stride = -1, int revision = -1);
     virtual void ShowPIP(VideoFrame        *frame,

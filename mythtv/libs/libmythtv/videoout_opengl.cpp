@@ -109,7 +109,7 @@ bool VideoOutputOpenGL::Init(int width, int height, float aspect,
         db_vdisp_profile->SetVideoRenderer("opengl");
 
     success &= SetupContext();
-    InitDisplayMeasurements();
+    InitDisplayMeasurements(width, height, false);
     success &= CreateBuffers();
     success &= SetupOpenGL();
 
@@ -433,12 +433,11 @@ void VideoOutputOpenGL::UpdatePauseFrame(void)
     CopyFrame(&av_pause_frame, used_frame);
 }
 
-int VideoOutputOpenGL::GetRefreshRate(void)
+DisplayInfo VideoOutputOpenGL::GetDisplayInfo(void)
 {
     if (gl_context)
-        return gl_context->GetRefreshRate();
-
-    return -1;
+        return gl_context->GetDisplayInfo();
+    return DisplayInfo();
 }
 
 void VideoOutputOpenGL::InitPictureAttributes(void)
@@ -699,115 +698,6 @@ void VideoOutputOpenGL::RemovePIP(NuppelVideoPlayer *pipplayer)
         delete gl_pipchain;
     gl_pip_ready.remove(pipplayer);
     gl_pipchains.remove(pipplayer);
-}
-
-void VideoOutputOpenGL::InitDisplayMeasurements(void)
-{
-    if (!gl_context)
-        return;
-
-    QString source = "Actual";
-    QSize screen_size;
-    QRect window_rect;
-
-    QSize disp_dim;
-    gl_context->GetDisplayDimensions(disp_dim);
-    windows[0].SetDisplayDim(disp_dim);
-
-    gl_context->GetDisplaySize(screen_size);
-    gl_context->GetWindowRect(window_rect);
-
-    if (display_res)
-        ResizeForVideo();
-
-    if (db_display_dim.width() > 0 && db_display_dim.height() > 0)
-    {
-        windows[0].SetDisplayDim(db_display_dim);
-        source = "Database";
-    }
-
-    QDesktopWidget * desktop = QApplication::desktop();
-    bool             usingXinerama = (gl_context->GetNumberOfScreens() > 1);
-    int              screen = desktop->primaryScreen();
- 
-    if (usingXinerama)
-    {
-        screen = gContext->GetNumSetting("XineramaScreen", screen);
-        if (screen >= desktop->numScreens())
-            screen = 0;
-    }
- 
-    if (screen == -1)
-        screen_size = desktop->size();
-    else
-        screen_size = desktop->screenGeometry(screen).size();
-
-    gl_context->GetWindowRect(window_rect);
-
-    int xbase, ybase;
-    int w = screen_size.width();
-    int h = screen_size.height();
-    int window_w = window_rect.width();
-    int window_h = window_rect.height();
-
-    if (w < 1 || h < 1)
-    {
-        GetMythUI()->GetScreenBounds(xbase, ybase, w, h);
-        if (w < 1 || h < 1)
-        {
-            w = 1024;
-            h = 768;
-        }
-    }
-
-    if (gContext->GetNumSetting("GuiSizeForTV", 0))
-        gContext->GetResolutionSetting("Gui", window_w,  window_h);
-
-    window_w = (window_w > 1) ? window_w : w;
-    window_h = (window_h > 1) ? window_h : h;
-    float pixel_aspect = ((float)w) / ((float)h);
-
-    VERBOSE(VB_PLAYBACK, LOC + QString(
-            "Pixel dimensions: Screen %1x%2, window %3x%4")
-            .arg(w).arg(h).arg(window_w).arg(window_h));
-
-    if (gl_context->OverrideDisplayDim(disp_dim, pixel_aspect))
-    {
-        source = "Overridden";
-        windows[0].SetDisplayDim(disp_dim);
-    }
-
-    if (windows[0].GetDisplayDim().width() < 1 ||
-        windows[0].GetDisplayDim().height() < 1)
-    {
-        windows[0].SetDisplayDim(QSize(300, (int)((300.0 * pixel_aspect) + 0.5)));
-        source = "Guessed";
-    }
-
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("%1 display dimensions: %2x%3mm : Aspect %4")
-           .arg(source)
-           .arg(windows[0].GetDisplayDim().width())
-           .arg(windows[0].GetDisplayDim().height())
-           .arg(((float) windows[0].GetDisplayDim().width()) /
-                         windows[0].GetDisplayDim().height()));
-
-    windows[0].SetDisplayDim(
-            QSize((windows[0].GetDisplayDim().width()  * window_w) / w,
-                  (windows[0].GetDisplayDim().height() * window_h) / h));
-
-    windows[0].SetDisplayAspect(
-            ((float)windows[0].GetDisplayDim().width()) /
-                    windows[0].GetDisplayDim().height());
-
-    if (display_res)
-        windows[0].SetDisplayAspect(display_res->GetAspectRatio());
-
-    VERBOSE(VB_PLAYBACK, LOC +
-            QString("Estimated window dimensions: %1x%2 mm  Aspect: %3")
-            .arg(windows[0].GetDisplayDim().width())
-            .arg(windows[0].GetDisplayDim().height())
-            .arg(windows[0].GetDisplayAspect()));
 }
 
 void VideoOutputOpenGL::MoveResizeWindow(QRect new_rect)

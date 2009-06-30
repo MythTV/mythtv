@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QObject>
+#include <QSize>
 
 typedef enum PIPState
 {
@@ -112,6 +113,17 @@ typedef enum WindowVisibility
     kVisibility_Hidden,
     kVisibility_Embedded,
 } WindowVisibility;
+
+class DisplayInfo
+{
+  public:
+    DisplayInfo(void)  : size(QSize(0,0)), res(QSize(0,0)), rate(-1) {}
+    DisplayInfo(int r) : size(QSize(0,0)), res(QSize(0,0)), rate(r)  {}
+
+    QSize size;
+    QSize res;
+    int   rate;
+};
 
 inline bool is_interlaced(FrameScanType scan)
 {

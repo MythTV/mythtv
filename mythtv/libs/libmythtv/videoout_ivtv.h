@@ -19,43 +19,32 @@ class VideoOutputIvtv: public VideoOutput
               int winx, int winy, int winw, int winh, WId embedid = 0);
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
-
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private);
-
-    int GetRefreshRate(void);
-
     void DrawUnusedRects(bool sync = true);
-
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
                       const PIPMap &pipPlayers,
                       FrameScanType scan);
-
     uint WriteBuffer(unsigned char *buf, int count);
-    int Poll(int delay);
+    int  Poll(int delay);
     void Pause(void);
     void Start(int skip, int mute);
     void Stop(bool hide);
-
     void Open(void);
     void Close(void);
-
     void SetFPS(float lfps) { fps = lfps; }
-
     void ClearOSD(void);
-
     bool Play(float speed, bool normal, int mask);
-    bool Play(void) { return Play(last_speed, last_normal, last_mask); };
+    bool Play(void) { return Play(last_speed, last_normal, last_mask); }
     void NextPlay(float speed, bool normal, int mask)
-        { last_speed = speed; last_normal = normal; last_mask = mask; };
+        { last_speed = speed; last_normal = normal; last_mask = mask; }
     void Flush(void);
     void Step(void);
     long long GetFramesPlayed(void);
-
     VideoFrame *GetNextFreeFrame(bool with_lock = false,
                                  bool allow_unsafe = false)
     {
@@ -63,11 +52,11 @@ class VideoOutputIvtv: public VideoOutput
         (void) allow_unsafe;
         return NULL;
     }
-
     int ValidVideoFrames(void) const;
-
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
+    void MoveResizeWindow(QRect ) {;}
+    DisplayInfo GetDisplayInfo(void) { return DisplayInfo(); }
 
   private:
     typedef enum

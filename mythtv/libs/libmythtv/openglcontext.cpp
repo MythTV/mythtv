@@ -1236,22 +1236,6 @@ void OpenGLContext::SetFence(void)
     }
     MakeCurrent(false);
 }
-
-bool OpenGLContext::OverrideDisplayDim(QSize &disp_dim, float pixel_aspect)
-{
-    bool ret = (GetNumberOfScreens() > 1);
-    if (ret)
-    {
-        float displayAspect = gContext->GetFloatSettingOnHost(
-            "XineramaMonitorAspectRatio",
-            gContext->GetHostName(), pixel_aspect);
-        if (disp_dim.height() <= 0)
-            disp_dim.setHeight(300);
-        disp_dim.setWidth((int)((float)disp_dim.height() * displayAspect));
-    }
-
-    return ret;
-}
 #ifdef USING_X11
 
 OpenGLContextGLX::OpenGLContextGLX(QMutex *lock)
@@ -1531,9 +1515,16 @@ bool OpenGLContextGLX::IsGLXSupported(MythXDisplay *display, uint min_major,
     return false;
 }
 
-int OpenGLContextGLX::GetRefreshRate(void)
+DisplayInfo OpenGLContextGLX::GetDisplayInfo(void)
 {
-    return m_display->GetRefreshRate();
+    DisplayInfo ret;
+    if (m_display)
+    {
+        ret.rate = m_display->GetRefreshRate();
+        ret.res  = m_display->GetDisplaySize();
+        ret.size = m_display->GetDisplayDimensions();
+    }
+    return ret;
 }
 
 void OpenGLContextGLX::SetSwapInterval(int interval)
@@ -1549,16 +1540,6 @@ void OpenGLContextGLX::SetSwapInterval(int interval)
             QString("Swap interval set to %1.").arg(interval));
 
     MakeCurrent(false);
-}
-
-void OpenGLContextGLX::GetDisplayDimensions(QSize &dimensions)
-{
-    dimensions = m_display->GetDisplayDimensions();
-}
-
-void OpenGLContextGLX::GetDisplaySize(QSize &size)
-{
-    size = m_display->GetDisplaySize();
 }
 
 void OpenGLContextGLX::MoveResizeWindow(QRect rect)
@@ -1677,14 +1658,22 @@ void OpenGLContextWGL::DeleteWindowResources(void)
     }
 }
 
-int OpenGLContextWGL::GetRefreshRate(void)
+DisplayInfo OpenGLContextWGL::GetDisplayInfo(void)
 {
-    int result = GetDeviceCaps(hDC, VREFRESH);
-
-    if (result > 20 && result < 200)
-        return 1000000 / result;
-
-    return -1;
+    DisplayInfo ret;
+    if (hDC)
+    {
+        int rate = GetDeviceCaps(hDC, VREFRESH);
+        if (rate > 20 && rate < 200)
+            ret.rate     =  1000000 / rate;
+        int width  = GetDeviceCaps(hDC, HORZSIZE);
+        int height = GetDeviceCaps(hDC, VERTSIZE);
+        ret.size   = QSize((uint)width, (uint)height);
+        width      = GetDeviceCaps(hDC, HORZRES);
+        height     = GetDeviceCaps(hDC, VERTRES);
+        ret.res    = QSize((uint)width, (uint)height);
+    }
+    return ret;
 }
 
 void OpenGLContextWGL::SetSwapInterval(int interval)
@@ -1697,26 +1686,6 @@ void OpenGLContextWGL::SetSwapInterval(int interval)
     VERBOSE(VB_PLAYBACK, LOC +
         QString("Swap interval set to %1.").arg(interval));
     MakeCurrent(false);
-}
-
-void OpenGLContextWGL::GetDisplayDimensions(QSize &dimensions)
-{
-    if (!hDC)
-        return;
-
-    int width  = GetDeviceCaps(hDC, HORZSIZE);
-    int height = GetDeviceCaps(hDC, VERTSIZE);
-    dimensions = QSize((uint)width, (uint)height);
-}
-
-void OpenGLContextWGL::GetDisplaySize(QSize &size)
-{
-    if (!hDC)
-        return;
-
-    int width  = GetDeviceCaps(hDC, HORZRES);
-    int height = GetDeviceCaps(hDC, VERTRES);
-    size = QSize((uint)width, (uint)height);
 }
 #endif // USING_MINGW
 
@@ -1860,10 +1829,9 @@ void OpenGLContextAGL::DeleteWindowResources(void)
     }
 }
 
-int OpenGLContextAGL::GetRefreshRate(void)
+DisplayInfo OpenGLContextAGL::GetDisplayInfo(void)
 {
-    int ret = -1;
-
+    DisplayInfo ret;
     if (m_screen)
     {
         CFDictionaryRef ref = CGDisplayCurrentMode(m_screen);
@@ -1871,8 +1839,13 @@ int OpenGLContextAGL::GetRefreshRate(void)
         {
             int rate = get_float_CF(ref, kCGDisplayRefreshRate);
             if (rate > 20 && rate < 200)
-                ret = 1000000 / rate;
+                ret.rate = 1000000 / rate;
         }
+        CGSize size_in_mm = CGDisplayScreenSize(m_screen);
+        ret.size    = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
+        uint width  = (uint)CGDisplayPixelsWide(m_screen);
+        uint height = (uint)CGDisplayPixelsHigh(m_screen);
+        ret.res     = QSize(width, height);
     }
     return ret;
 }
@@ -1884,25 +1857,6 @@ void OpenGLContextAGL::SetSwapInterval(int interval)
     aglSetInteger(m_context, AGL_SWAP_INTERVAL, &swap);
     VERBOSE(VB_PLAYBACK, LOC + QString("Swap interval set to %1.").arg(swap));
     MakeCurrent(false);
-}
-
-void OpenGLContextAGL::GetDisplayDimensions(QSize &dimensions)
-{
-    if (!m_screen)
-        return;
-
-    CGSize size_in_mm = CGDisplayScreenSize(m_screen);
-    dimensions = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
-}
-
-void OpenGLContextAGL::GetDisplaySize(QSize &size)
-{
-    if (!m_screen)
-        return;
-
-    uint width  = (uint)CGDisplayPixelsWide(m_screen);
-    uint height = (uint)CGDisplayPixelsHigh(m_screen);
-    size = QSize(width, height);
 }
 
 void OpenGLContextAGL::MoveResizeWindow(QRect rect)

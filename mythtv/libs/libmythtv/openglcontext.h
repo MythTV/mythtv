@@ -87,18 +87,12 @@ class OpenGLContext
     virtual void UnmapWindow(void) = 0;
     /// \brief Swap the front and back OpenGL framebuffers.
     virtual void SwapBuffers(void) = 0;
-    /// \brief Return the refresh rate of the current screen.
-    virtual int  GetRefreshRate(void) = 0;
+    /// \brief Return current display information
+    virtual DisplayInfo GetDisplayInfo(void) = 0;
     /// \brief Set the number of screen refreshes between buffer swaps.
     virtual void SetSwapInterval(int interval) = 0;
-    /// \brief Return the physical size of the current display.
-    virtual void GetDisplayDimensions(QSize &dimensions) = 0;
     /// \brief Return the total number of screens available.
     virtual int  GetNumberOfScreens(void) { return 1; }
-    /// \brief Provide an alternative display size (typically for Xinerama)
-    virtual bool OverrideDisplayDim(QSize &disp_dim, float pixel_aspect);
-    /// \brief Return the resolution of the current display.
-    virtual void GetDisplaySize(QSize &size) = 0;
     virtual void MoveResizeWindow(QRect rect) { }
     virtual void EmbedInWidget(int x, int y, int w, int h) { }
     virtual void StopEmbedding(void) { }
@@ -194,11 +188,9 @@ class OpenGLContextGLX : public OpenGLContext
     bool MakeContextCurrent(bool current);
     void SwapBuffers(void);
     uint GetScreenNum(void)  const { return m_display->GetScreen(); }
-    int  GetRefreshRate(void);
+    DisplayInfo GetDisplayInfo(void);
     void SetSwapInterval(int interval);
-    void GetDisplayDimensions(QSize &dimensions);
     int  GetNumberOfScreens(void) { return GetNumberXineramaScreens(); }
-    void GetDisplaySize(QSize &size);
     void MoveResizeWindow(QRect rect);
 
   private:
@@ -236,10 +228,8 @@ class OpenGLContextWGL : public OpenGLContext
     void UnmapWindow(void) { }
     bool MakeContextCurrent(bool current);
     void SwapBuffers(void);
-    int  GetRefreshRate(void);
+    DisplayInfo GetDisplayInfo(void);
     void SetSwapInterval(int interval);
-    void GetDisplayDimensions(QSize &dimensions);
-    void GetDisplaySize(QSize &size);
 
   private:
     void DeleteWindowResources(void);
@@ -266,10 +256,8 @@ class OpenGLContextAGL : public OpenGLContext
     void UnmapWindow(void) { }
     bool MakeContextCurrent(bool current);
     void SwapBuffers(void);
-    int  GetRefreshRate(void);
+    DisplayInfo GetDisplayInfo(void);
     void SetSwapInterval(int interval);
-    void GetDisplayDimensions(QSize &dimensions);
-    void GetDisplaySize(QSize &size);
     int  GetNumberOfScreens(void) { return GetNumberXineramaScreens(); }
     void MoveResizeWindow(QRect rect);    
     void EmbedInWidget(int x, int y, int w, int h);

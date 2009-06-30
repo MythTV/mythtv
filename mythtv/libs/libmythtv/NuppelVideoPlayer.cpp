@@ -2373,7 +2373,7 @@ void NuppelVideoPlayer::InitAVSync(void)
         warpfactor = warpfactor_avg;
     }
 
-    refreshrate = videoOutput ? videoOutput->GetRefreshRate() : 0;
+    refreshrate = videoOutput ? videoOutput->GetDisplayInfo().rate : 0;
     if (refreshrate <= 0)
         refreshrate = frame_interval;
     vsynctol = refreshrate / 4;
@@ -2938,7 +2938,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     uint fr_int = (int)(1000000.0 / video_frame_rate / temp_speed);
     uint rf_int = 0;
     if (videoOutput)
-        rf_int = videoOutput->GetRefreshRate();
+        rf_int = videoOutput->GetDisplayInfo().rate;
 
     // Default to Interlaced playback to allocate the deinterlacer structures
     // Enable autodetection of interlaced/progressive from video stream

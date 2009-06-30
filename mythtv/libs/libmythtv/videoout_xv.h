@@ -88,9 +88,7 @@ class VideoOutputXv : public VideoOutput
     void UpdatePauseFrame(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);
     void InitPictureAttributes(void);
-
-    /// Monitor refresh time in microseconds
-    int  GetRefreshRate(void);
+    DisplayInfo GetDisplayInfo(void);
 
     virtual bool hasMCAcceleration(void) const
         { return XVideoMC <= VideoOutputSubType(); }
@@ -156,7 +154,6 @@ class VideoOutputXv : public VideoOutput
                          NuppelVideoPlayer *pipplayer,
                          PIPLocation        loc);
 
-    void InitDisplayMeasurements(uint width, uint height);
     void InitColorKey(bool turnoffautopaint);
 
     bool InitVideoBuffers(MythCodecID, bool use_xv, bool use_shm);
@@ -200,8 +197,6 @@ class VideoOutputXv : public VideoOutput
     MythXDisplay        *disp;
     unsigned long        XJ_letterbox_colour;
     bool                 XJ_started;
-    QSize                XJ_monitor_sz;
-    QSize                XJ_monitor_dim;
 
     // Used for all non-XvMC drawing
     VideoFrame           av_pause_frame;

@@ -463,9 +463,9 @@ bool VideoOutputD3D::InitD3D()
     return true;
 }
 
-int VideoOutputD3D::GetRefreshRate(void)
+DisplayInfo VideoOutputD3D::GetDisplayInfo(void)
 {
-    return 1000000 / m_RefreshRate;
+    return DisplayInfo(1000000 / m_RefreshRate);
 }
 
 bool VideoOutputD3D::Init(int width, int height, float aspect,

@@ -297,7 +297,7 @@ VideoOutputDirectfb::~VideoOutputDirectfb()
     data = NULL;
 }
 
-int VideoOutputDirectfb::GetRefreshRate(void)
+DisplayInfo VideoOutputDirectfb::GetDisplayInfo(void)
 {
     int fh, v;
     struct fb_var_screeninfo si;
@@ -312,12 +312,12 @@ int VideoOutputDirectfb::GetRefreshRate(void)
 
     fh = open(fb_dev_name, O_RDONLY);
     if (-1 == fh) {
-        return -1;
+        return DisplayInfo();
     }
 
     if (ioctl(fh, FBIOGET_VSCREENINFO, &si)) {
         close(fh);
-        return -1;
+        return DisplayInfo();
     }
 
     htotal = si.left_margin + si.xres + si.right_margin + si.hsync_len;
@@ -342,7 +342,7 @@ int VideoOutputDirectfb::GetRefreshRate(void)
     /* h = hrate / 1E3; */
 
     close(fh);
-    return v;
+    return DisplayInfo(v);
 }
 
 /// Correct for underalignment

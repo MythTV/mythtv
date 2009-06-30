@@ -35,7 +35,8 @@ class VideoOutputD3D : public VideoOutput
                       float        aspect,
                       MythCodecID  av_codec_id,
                       void        *codec_private);
-    int GetRefreshRate(void);
+    DisplayInfo GetDisplayInfo(void);
+    void MoveResizeWindow(QRect new_rect) {;}
     void UpdatePauseFrame(void);
     void DrawUnusedRects(bool);
     void Zoom(ZoomDirection direction);

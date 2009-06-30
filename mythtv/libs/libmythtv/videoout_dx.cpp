@@ -147,18 +147,15 @@ bool VideoOutputDX::InputChanged(const QSize &input_size,
     return ok;
 }
 
-int VideoOutputDX::GetRefreshRate(void)
+DisplayInfo VideoOutputDX::GetDisplayInfo(void)
 {
     if (ddobject)
     {
         DWORD rate;
-        
         IDirectDraw_GetMonitorFrequency(ddobject, &rate);
-        
-        return 1000000 / rate;
+        return DisplayInfo(1000000 / rate);
     }
-
-    return 0;
+    return DisplayInfo();
 }
 
 void VideoOutputDX::WaitForVSync(void)

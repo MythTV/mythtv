@@ -39,8 +39,8 @@ class VideoOutputDX : public VideoOutput
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
 
-    int GetRefreshRate(void);
-
+    DisplayInfo GetDisplayInfo(void);
+    void MoveResizeWindow(QRect new_rect) {;}
     void DrawUnusedRects(bool sync = true);
 
     void UpdatePauseFrame(void);
