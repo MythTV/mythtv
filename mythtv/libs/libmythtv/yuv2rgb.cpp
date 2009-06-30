@@ -423,9 +423,9 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
 #define B_OI  3
 #define A_OI  0
 #else
-#define R_OI  0
+#define R_OI  2
 #define G_OI  1
-#define B_OI  2
+#define B_OI  0
 #define A_OI  3
 #endif
 
