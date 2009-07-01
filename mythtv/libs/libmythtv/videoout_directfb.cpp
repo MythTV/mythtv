@@ -142,7 +142,7 @@ bool DirectfbData::CreateBuffers(VideoBuffers &vbuffers,
         if (DFB_OK != fberr)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to lock buffer" + ENOFB);
-            fberr = bufferSurface->Release(bufferSurface);
+            fberr = (DFBResult)bufferSurface->Release(bufferSurface);
             if (DFB_OK != fberr)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -199,7 +199,7 @@ bool DirectfbData::CreateBuffers(VideoBuffers &vbuffers,
                             "Failed to unlock buffer" + ENOFB);
                 }
 
-                fberr = surf->Release(surf);
+                fberr = (DFBResult)surf->Release(surf);
                 if (DFB_OK != fberr)
                 {
                     VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -245,7 +245,7 @@ void DirectfbData::DeleteBuffers(VideoBuffers &vbuffers)
                         "Failed to unlock buffer" + ENOFB);
             }
 
-            fberr = surf->Release(surf);
+            fberr = (DFBResult)surf->Release(surf);
             if (DFB_OK != fberr)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -1144,7 +1144,7 @@ DFBEnumerationResult layer_cb(
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Failed to test config" + ENOFB);
 
-        fberr = vodata->videoLayer->Release(vodata->videoLayer);
+        fberr = (DFBResult)vodata->videoLayer->Release(vodata->videoLayer);
         if (DFB_OK != fberr)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
