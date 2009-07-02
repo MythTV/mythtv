@@ -137,6 +137,9 @@ class VideoOutput
 
     bool AllowPreviewEPG(void) const;
 
+    virtual bool IsPIPSupported(void) const { return false; }
+    virtual bool IsPBPSupported(void) const { return false; }
+
     /// \brief Returns true if Motion Compensation acceleration is available.
     virtual bool hasMCAcceleration(void) const { return false; }
     /// \brief Returns true if Inverse Discrete Cosine Transform acceleration
@@ -144,14 +147,11 @@ class VideoOutput
     virtual bool hasIDCTAcceleration(void) const { return false; }
     /// \brief Returns true if VLD acceleration is available.
     virtual bool hasVLDAcceleration(void) const { return false; }
-    /// \brief Returns true if XV Acceleration is running
-    virtual bool hasXVAcceleration(void) const { return false; } 
-    /// \brief Returns true if OpenGL acceleration is running
-    virtual bool hasOpenGLAcceleration(void) const { return false; }
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
     /// \brief Return true if VDPAU Acceleration is running
     virtual bool hasVDPAUAcceleration(void) const { return false; }
+
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
     /// \brief Returns the number of frames played

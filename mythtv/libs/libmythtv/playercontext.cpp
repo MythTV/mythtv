@@ -131,13 +131,8 @@ bool PlayerContext::IsPIPSupported(void) const
     if (nvp)
     {
         const VideoOutput *vid = nvp->getVideoOutput();
-        if (vid &&
-            (vid->hasXVAcceleration() ||
-             vid->hasOpenGLAcceleration() ||
-             vid->hasVDPAUAcceleration()))
-        {
-            supported = true;
-        }
+        if (vid)
+            supported = vid->IsPIPSupported();
     }
     return supported;
 }
@@ -154,12 +149,8 @@ bool PlayerContext::IsPBPSupported(void) const
     if (nvp)
     {
         const VideoOutput *vid = nvp->getVideoOutput();
-        if (vid &&
-            (vid->hasXVAcceleration() ||
-             vid->hasOpenGLAcceleration()))
-        {
-            supported = true;
-        }
+        if (vid)
+            supported = vid->IsPBPSupported();
     }
     return supported;
 }

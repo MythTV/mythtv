@@ -243,6 +243,7 @@ class MPUBLIC TV : public QThread
     bool IsSameProgram(int player_idx, const ProgramInfo *p) const;
     bool IsBookmarkAllowed(const PlayerContext*) const;
     bool IsDeleteAllowed(const PlayerContext*) const;
+    bool IsPBPSupported(const PlayerContext *ctx = NULL) const;
     bool IsPIPSupported(const PlayerContext *ctx = NULL) const;
 
     // Other queries

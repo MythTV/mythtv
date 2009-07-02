@@ -4384,7 +4384,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
 
 bool TV::PxPHandleAction(PlayerContext *ctx, const QStringList &actions)
 {
-    if (!IsPIPSupported(ctx))
+    if (!IsPIPSupported(ctx) && !IsPBPSupported(ctx))
         return false;
 
     bool handled = true;
@@ -4828,11 +4828,11 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     }
 
     PlayerContext *mctx = GetPlayer(ctx, 0);
-    if (!mctx->IsPBPSupported())
+    if (!IsPBPSupported(mctx))
     {
         VERBOSE(VB_IMPORTANT, LOC + "CreatePBP() -- end : "
-                "PBP only allowed for OpenGL and XV");
-        return false; // PBP only allowed for OpenGL and XV
+                "PBP not supported by video method.");
+        return false;
     }
 
     if (!mctx->nvp)
@@ -4919,23 +4919,10 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
         return false;
     }
 
-    bool has_vo = false, using_xvmc = false;
-
-    mctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (mctx->nvp && mctx->nvp->getVideoOutput())
-    {
-        has_vo = true;
-        using_xvmc = mctx->nvp->getVideoOutput()->hasMCAcceleration();
-    }
-    mctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    if (!has_vo)
-        return false;
-
     /* TODO implement PIP solution for Xvmc playback */
-    if (using_xvmc)
+    if (!IsPIPSupported(mctx))
     {
-        VERBOSE(VB_IMPORTANT, LOC + "PiP is not supported for XvMC");
+        VERBOSE(VB_IMPORTANT, LOC + "PiP not supported by video method.");
         return false;
     }
 
@@ -5093,7 +5080,7 @@ bool TV::PIPRemovePlayer(PlayerContext *mctx, PlayerContext *pipctx)
 /// \brief start/stop PIP/PBP
 void TV::PxPToggleView(PlayerContext *actx, bool wantPBP)
 {
-    if (wantPBP && !actx->IsPBPSupported())
+    if (wantPBP && !IsPBPSupported(actx))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "PxPToggleView() -- end: PBP not supported by video method.");
@@ -5201,7 +5188,9 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
     const QString before = (mctx->IsPBP()) ? "PBP" : "PIP";
     const QString after  = (wantPBP)       ? "PBP" : "PIP";
 
-    if (wantPBP && !mctx->IsPBPSupported())
+    // TODO renderer may change depending on display profile
+    //      check for support in new renderer
+    if (wantPBP && !IsPBPSupported(mctx))
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "PxPToggleType() -- end: PBP not supported by video method.");
@@ -5315,6 +5304,22 @@ bool TV::ResizePIPWindow(PlayerContext *ctx)
     }
     VERBOSE(VB_PLAYBACK, LOC + "ResizePIPWindow -- end : !ok");
     return false;
+}
+
+bool TV::IsPBPSupported(const PlayerContext *ctx) const
+{
+    const PlayerContext *mctx = NULL;
+    if (ctx)
+        mctx = GetPlayer(ctx, 0);
+    else
+        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+
+    bool yes = mctx->IsPBPSupported();
+
+    if (!ctx)
+        ReturnPlayerLock(mctx);
+
+    return yes;
 }
 
 bool TV::IsPIPSupported(const PlayerContext *ctx) const
@@ -10105,26 +10110,28 @@ void TV::FillMenuPlaying(
 /// \brief Constructs Picture-X-Picture portion of menu
 void TV::FillMenuPxP(
     const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+
 {
-    if (!IsPIPSupported(ctx))
+    bool allowPIP = IsPIPSupported(ctx);
+    bool allowPBP = IsPBPSupported(ctx);
+    if (!(allowPIP || allowPBP))
         return;
 
     OSDGenericTree *item =
         new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
 
-    bool allowPBP = ctx->IsPBPSupported();
     bool hasPBP = (player.size()>1) && GetPlayer(ctx,1)->IsPBP();
     bool hasPIP = (player.size()>1) && GetPlayer(ctx,1)->IsPIP();
 
     if (RemoteGetFreeRecorderCount())
     {
-        if (player.size() <= kMaxPIPCount && !hasPBP)
+        if (player.size() <= kMaxPIPCount && !hasPBP && allowPIP)
             new OSDGenericTree(item, tr("Open Live TV PIP"), "CREATEPIPVIEW");
         if (player.size() < kMaxPBPCount && !hasPIP && allowPBP)
             new OSDGenericTree(item, tr("Open Live TV PBP"), "CREATEPBPVIEW");
     }
 
-    if (player.size() <= kMaxPIPCount && !hasPBP)
+    if (player.size() <= kMaxPIPCount && !hasPBP && allowPIP)
         new OSDGenericTree(item, tr("Open Recording PIP"), "JUMPRECPIP");
     if (player.size() < kMaxPBPCount && !hasPIP && allowPBP)
         new OSDGenericTree(item, tr("Open Recording PBP"), "JUMPRECPBP");
@@ -10157,7 +10164,9 @@ void TV::FillMenuPxP(
     }
 
     uint max_cnt = min(kMaxPBPCount, kMaxPIPCount+1);
-    if (player.size() <= max_cnt && !(hasPIP && !allowPBP))
+    if (player.size() <= max_cnt &&
+        !(hasPIP && !allowPBP) &&
+        !(hasPBP && !allowPIP))
     {
         QString switchTo = (isPBP) ? tr("Switch to PIP") : tr("Switch to PBP");
         new OSDGenericTree(item, switchTo, "TOGGLEPIPSTATE");

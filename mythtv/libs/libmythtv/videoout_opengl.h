@@ -45,7 +45,8 @@ class VideoOutputOpenGL : public VideoOutput
     void MoveResizeWindow(QRect new_rect);
 
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
-    virtual bool hasOpenGLAcceleration(void) const { return true; }
+    virtual bool IsPIPSupported(void) const { return true; }
+    virtual bool IsPBPSupported(void) const { return true; }
     virtual bool hasFullScreenOSD(void) const { return gl_osd; }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 

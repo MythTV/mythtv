@@ -2522,10 +2522,9 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
     if (m_player)
     {
         if (!sameProgram && m_player->IsPIPSupported())
-        {
             m_popupMenu->AddButton(tr("Start As PIP"), SLOT(doPIPPlay()));
+        if (!sameProgram && m_player->IsPBPSupported())
             m_popupMenu->AddButton(tr("Start As PBP"), SLOT(doPBPPlay()));
-        }
 
         tvstate = m_player->GetState(0);
     }

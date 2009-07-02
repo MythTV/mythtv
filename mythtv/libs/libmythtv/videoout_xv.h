@@ -90,14 +90,17 @@ class VideoOutputXv : public VideoOutput
     void InitPictureAttributes(void);
     DisplayInfo GetDisplayInfo(void);
 
+    virtual bool IsPIPSupported(void) const
+        { return XVideo == VideoOutputSubType(); }
+    virtual bool IsPBPSupported(void) const
+        { return XVideo == VideoOutputSubType(); }
+
     virtual bool hasMCAcceleration(void) const
         { return XVideoMC <= VideoOutputSubType(); }
     virtual bool hasIDCTAcceleration(void) const
         { return XVideoIDCT <= VideoOutputSubType(); }
     virtual bool hasVLDAcceleration(void) const
         { return XVideoVLD == VideoOutputSubType(); }
-    virtual bool hasXVAcceleration(void) const
-        { return XVideo == VideoOutputSubType(); }
     virtual bool hasHWAcceleration(void) const
         { return XVideo <= VideoOutputSubType(); }
 
