@@ -3527,10 +3527,13 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 #endif // USING_MHEG
     }
 
-    SetPlaying(true);
-
     rewindtime = fftime = 0;
     skipcommercials = 0;
+
+    if (bookmarkseek > 30)
+        fftime = bookmarkseek;
+
+    SetPlaying(true);
 
     ClearAfterSeek();
 
@@ -3565,7 +3568,6 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
         GetDecoder()->setExactSeeks(false);
 
-        fftime = bookmarkseek;
         if (player_ctx->buffer->isDVD())
             GetDVDBookmark();
         DoFastForward();
