@@ -3640,8 +3640,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
             GetDecoder()->SyncPositionMap();
         }
 
-        if (IsErrored() ||
-            (player_ctx->recorder && player_ctx->recorder->GetErrorStatus()))
+        if (IsErrored() || player_ctx->IsRecorderErrored())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Unknown recorder error, exiting decoder");
