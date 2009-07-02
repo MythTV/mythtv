@@ -7,13 +7,17 @@
 #ifndef HDHOMERUNRECORDER_H_
 #define HDHOMERUNRECORDER_H_
 
-#include <qmutex.h>
+// Qt includes
+#include <QMutex>
+
 #include "dtvrecorder.h"
 #include "streamlisteners.h"
 #include "eitscanner.h"
 
 class HDHRChannel;
 class ProgramMapTable;
+class MPEGStreamData;
+class HDHRStreamHandler;
 
 typedef vector<uint>        uint_vec_t;
 
@@ -21,7 +25,9 @@ class HDHRRecorder : public DTVRecorder,
                      public DVBMainStreamListener,
                      public ATSCMainStreamListener,
                      public MPEGStreamListener,
-                     public MPEGSingleProgramStreamListener
+                     public MPEGSingleProgramStreamListener,
+                     public TSPacketListener,
+                     public TSPacketListenerAV
 {
   public:
     HDHRRecorder(TVRec *rec, HDHRChannel *channel);
@@ -32,15 +38,13 @@ class HDHRRecorder : public DTVRecorder,
                                const QString &audiodev,
                                const QString &vbidev);
 
-    bool Open(void);
-    bool StartData(void);
-    void Close(void);
-
     void StartRecording(void);
+    void ResetForNewFile(void);
+    void StopRecording(void);
 
-    void SetStreamData(MPEGStreamData*);
-    MPEGStreamData *GetStreamData(void) { return _stream_data; }
-    ATSCStreamData *GetATSCStreamData(void);
+    bool Open(void);
+    bool IsOpen(void) const { return _stream_handler; }
+    void Close(void);
 
     // MPEG Stream Listener
     void HandlePAT(const ProgramAssociationTable*);
@@ -52,34 +56,60 @@ class HDHRRecorder : public DTVRecorder,
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
-    // ATSC
+    // ATSC Main
     void HandleSTT(const SystemTimeTable*) {}
-    void HandleMGT(const MasterGuideTable *) {};
-    void HandleVCT(uint, const VirtualChannelTable*) {}
+    void HandleVCT(uint /*tsid*/, const VirtualChannelTable*) {}
+    void HandleMGT(const MasterGuideTable*) {}
 
-    // DVB
+    // DVBMainStreamListener
     void HandleTDT(const TimeDateTable*) {}
     void HandleNIT(const NetworkInformationTable*) {}
     void HandleSDT(uint /*tsid*/, const ServiceDescriptionTable*) {}
 
-  private:
-    bool AdjustFilters(void);
-    bool AdjustEITPIDs(void);
+    // TSPacketListener
+    bool ProcessTSPacket(const TSPacket &tspacket);
 
-    void ProcessTSData(const unsigned char *buffer, int len);
-    bool ProcessTSPacket(const TSPacket& tspacket);
+    // TSPacketListenerAV
+    bool ProcessVideoTSPacket(const TSPacket& tspacket);
+    bool ProcessAudioTSPacket(const TSPacket& tspacket);
+
+    // Common audio/visual processing
+    bool ProcessAVTSPacket(const TSPacket &tspacket);
+
+    void SetStreamData(MPEGStreamData*);
+    MPEGStreamData *GetStreamData(void) { return _stream_data; }
+    ATSCStreamData *GetATSCStreamData(void);
+
+    void BufferedWrite(const TSPacket &tspacket);
+
+  private:
     void TeardownAll(void);
-    
-  private:
-    HDHRChannel                   *_channel;
-    struct hdhomerun_video_sock_t *_video_socket;
-    MPEGStreamData                *_stream_data;
 
-    ProgramAssociationTable       *_input_pat;
-    ProgramMapTable               *_input_pmt;
-    bool                           _reset_pid_filters;
-    uint_vec_t                     _eit_pids;
-    mutable QMutex                 _pid_lock;
+    void ReaderPaused(int fd);
+    bool PauseAndWait(int timeout = 100);
+
+  private:
+    HDHRChannel              *_channel;
+    HDHRStreamHandler        *_stream_handler;
+
+    // general recorder stuff
+    MPEGStreamData          *_stream_data;
+    mutable QMutex           _pid_lock;
+    ProgramAssociationTable *_input_pat; ///< PAT on input side
+    ProgramMapTable         *_input_pmt; ///< PMT on input side
+    bool                     _has_no_av;
+
+    // TS recorder stuff
+    unsigned char _stream_id[0x1fff + 1];
+    unsigned char _pid_status[0x1fff + 1];
+    unsigned char _continuity_counter[0x1fff + 1];
+
+    // Constants
+    static const int TSPACKETS_BETWEEN_PSIP_SYNC;
+    static const int POLL_INTERVAL;
+    static const int POLL_WARNING_TIMEOUT;
+
+    static const unsigned char kPayloadStartSeen = 0x2;
 };
 
 #endif

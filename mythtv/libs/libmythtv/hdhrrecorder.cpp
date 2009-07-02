@@ -5,8 +5,9 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-// C includes
+// POSIX includes
 #include <pthread.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,7 +15,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/time.h>
-#include <fcntl.h>
 
 // C++ includes
 #include <iostream>
@@ -23,24 +23,30 @@ using namespace std;
 
 // MythTV includes
 #include "RingBuffer.h"
-#include "hdhrchannel.h"
-#include "hdhrrecorder.h"
 #include "atsctables.h"
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
 #include "eithelper.h"
 #include "tv_rec.h"
 
+// MythTV HDHR includes
+#include "hdhrchannel.h"
+#include "hdhrrecorder.h"
+#include "hdhrstreamhandler.h"
+
 #define LOC QString("HDHRRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC_WARN QString("HDHRRec(%1), Warning: ") \
+                     .arg(tvrec->GetCaptureCardNum())
 #define LOC_ERR QString("HDHRRec(%1), Error: ") \
                     .arg(tvrec->GetCaptureCardNum())
 
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec),
-      _channel(channel),        _video_socket(NULL),
+      _channel(channel),        _stream_handler(NULL),
       _stream_data(NULL),
+      _pid_lock(QMutex::Recursive),
       _input_pat(NULL),         _input_pmt(NULL),
-      _reset_pid_filters(false),_pid_lock(QMutex::Recursive)
+      _has_no_av(false)
 {
 }
 
@@ -91,107 +97,77 @@ void HDHRRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     // HACK -- end
 }
 
-bool HDHRRecorder::Open(void)
+void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
 {
-    VERBOSE(VB_RECORD, LOC + "Open()");
-    if (_video_socket)
+    if (!pat)
     {
-        VERBOSE(VB_RECORD, LOC + "Card already open (recorder)");
-        return true;
+        VERBOSE(VB_RECORD, LOC + "HandleSingleProgramPAT(NULL)");
+        return;
     }
 
-    /* Calculate buffer size */
-    uint buffersize = gContext->GetNumSetting(
-        "HDRingbufferSize", 50 * TSPacket::SIZE) * 1024;
-    buffersize /= VIDEO_DATA_PACKET_SIZE;
-    buffersize *= VIDEO_DATA_PACKET_SIZE;
-
-    // Buffer should be at least about 1MB..
-    buffersize = max(49 * TSPacket::SIZE * 128, buffersize);
-
-    /* Create TS socket. */
-    _video_socket = hdhomerun_video_create(0, buffersize);
-    if (!_video_socket)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");
-        return false;
-    }
-
-    /* Success. */
-    return true;
-}
-
-/** \fn HDHRRecorder::StartData(void)
- *  \brief Configure device to send video.
- */
-bool HDHRRecorder::StartData(void)
-{
-    VERBOSE(VB_RECORD, LOC + "StartData()");
-    uint localPort = hdhomerun_video_get_local_port(_video_socket);
-    return _channel->DeviceSetTarget(localPort);
-}
-
-void HDHRRecorder::Close(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Close()");
-    if (_video_socket)
-    {
-        hdhomerun_video_destroy(_video_socket);
-        _video_socket = NULL;
-    }
-}
-
-void HDHRRecorder::ProcessTSData(const uint8_t *buffer, int len)
-{
-    QMutexLocker locker(&_pid_lock);
-    const uint8_t *data = buffer;
-    const uint8_t *end = buffer + len;
-
-    while (data + 188 <= end)
-    {
-        if (data[0] != 0x47)
-        {
-            return;
-        }
-
-        const TSPacket *tspacket = reinterpret_cast<const TSPacket*>(data);
-        ProcessTSPacket(*tspacket);
-
-        data += 188;
-    }
-}
-
-void HDHRRecorder::SetStreamData(MPEGStreamData *data)
-{
-    if (data == _stream_data)
+    if (!ringBuffer)
         return;
 
-    MPEGStreamData *old_data = _stream_data;
-    _stream_data = data;
-    if (old_data)
-        delete old_data;
+    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
 
-    if (data)
+    if (pat)
     {
-        data->AddMPEGSPListener(this);
-        data->AddMPEGListener(this);
+        uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
+        pat->tsheader()->SetContinuityCounter(next_cc);
+        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
+    }
 
-        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
-        DVBStreamData  *dvb  = dynamic_cast<DVBStreamData*>(data);
+    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
 
-        if (atsc && atsc->DesiredMinorChannel())
-            atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
-                                    atsc->DesiredMinorChannel());
-        else if (dvb)
-            dvb->AddDVBMainListener(this);
-        else if (data->DesiredProgram() >= 0)
-            data->SetDesiredProgram(data->DesiredProgram());
+    if (posB[0] + posB[1] * TSPacket::SIZE > 
+        posA[0] + posA[1] * TSPacket::SIZE)
+    {
+        VERBOSE(VB_RECORD, LOC + "Wrote PAT @"
+                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
+    }
+    else
+    {
+        VERBOSE(VB_RECORD, LOC + "Saw PAT but did not write to disk yet");
     }
 }
 
-ATSCStreamData *HDHRRecorder::GetATSCStreamData(void)
+void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 {
-    return dynamic_cast<ATSCStreamData*>(_stream_data);
+    if (!pmt)
+    {
+        VERBOSE(VB_RECORD, LOC + "HandleSingleProgramPMT(NULL)");
+        return;
+    }
+
+    // collect stream types for H.264 (MPEG-4 AVC) keyframe detection
+    for (uint i = 0; i < pmt->StreamCount(); i++)
+        _stream_id[pmt->StreamPID(i)] = pmt->StreamType(i);
+
+    if (!ringBuffer)
+        return;
+
+    unsigned char buf[8 * 1024];
+    uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
+    pmt->tsheader()->SetContinuityCounter(next_cc);
+    uint size = pmt->WriteAsTSPackets(buf, next_cc);
+
+    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
+
+    for (uint i = 0; i < size ; i += TSPacket::SIZE)
+        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
+
+    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
+
+    if (posB[0] + posB[1] * TSPacket::SIZE >
+        posA[0] + posA[1] * TSPacket::SIZE)
+    {
+        VERBOSE(VB_RECORD, LOC + "Wrote PMT @"
+                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
+    }
+    else
+    {
+        VERBOSE(VB_RECORD, LOC + "Saw PMT but did not write to disk yet");
+    }
 }
 
 void HDHRRecorder::HandlePAT(const ProgramAssociationTable *_pat)
@@ -221,7 +197,13 @@ void HDHRRecorder::HandlePAT(const ProgramAssociationTable *_pat)
     _input_pat = new ProgramAssociationTable(*_pat);
     delete oldpat;
 
-    _reset_pid_filters = true;
+    // Listen for the other PMTs for faster channel switching
+    for (uint i = 0; _input_pat && (i < _input_pat->ProgramCount()); i++)
+    {
+        uint pmt_pid = _input_pat->ProgramPID(i);
+        if (!_stream_data->IsListeningPID(pmt_pid))
+            _stream_data->AddListeningPID(pmt_pid);
+    }
 }
 
 void HDHRRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
@@ -233,34 +215,19 @@ void HDHRRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
         VERBOSE(VB_RECORD, LOC + "SetPMT("<<progNum<<")");
         ProgramMapTable *oldpmt = _input_pmt;
         _input_pmt = new ProgramMapTable(*_pmt);
+
+        QString sistandard = _channel->GetSIStandard();
+
+        bool has_no_av = true;
+        for (uint i = 0; i < _input_pmt->StreamCount() && has_no_av; i++)
+        {
+            has_no_av &= !_input_pmt->IsVideo(i, sistandard);
+            has_no_av &= !_input_pmt->IsAudio(i, sistandard);
+        }
+        _has_no_av = has_no_av;
+
         delete oldpmt;
-
-        _reset_pid_filters = true;
     }
-}
-
-void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
-{
-    if (!pat)
-        return;
-
-    int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
-    pat->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
-}
-
-void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
-{
-    if (!pmt)
-        return;
-
-    unsigned char buf[8 * 1024];
-    uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
-    pmt->tsheader()->SetContinuityCounter(next_cc);
-    uint size = pmt->WriteAsTSPackets(buf, next_cc);
-
-    for (uint i = 0; i < size ; i += TSPacket::SIZE)
-        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
 }
 
 /** \fn HDHRRecorder::HandleMGT(const MasterGuideTable*)
@@ -280,46 +247,67 @@ void HDHRRecorder::HandleMGT(const MasterGuideTable *mgt)
 }
 */
 
-bool HDHRRecorder::ProcessTSPacket(const TSPacket& tspacket)
+bool HDHRRecorder::Open(void)
 {
-    bool ok = !tspacket.TransportError();
-    if (ok && !tspacket.ScramplingControl())
+    if (IsOpen())
     {
-        if (tspacket.HasAdaptationField())
-            GetStreamData()->HandleAdaptationFieldControl(&tspacket);
-        if (tspacket.HasPayload())
-        {
-            const unsigned int lpid = tspacket.PID();
-
-            if ((GetStreamData()->VideoPIDSingleProgram() > 0x1fff) &&
-                _wait_for_keyframe_option)
-            {
-                _wait_for_keyframe_option = false;
-            }
-
-            // Pass or reject frames based on PID, and parse info from them
-            if (lpid == GetStreamData()->VideoPIDSingleProgram())
-            {
-                //cerr<<"v";
-                _buffer_packets = !FindMPEG2Keyframes(&tspacket);
-                BufferedWrite(tspacket);
-            }
-            else if (GetStreamData()->IsAudioPID(lpid))
-            {
-                //cerr<<"a";
-                _buffer_packets = !FindAudioKeyframes(&tspacket);
-                BufferedWrite(tspacket);
-            }
-            else if (GetStreamData()->IsListeningPID(lpid))
-            {
-                //cerr<<"t";
-                GetStreamData()->HandleTSTables(&tspacket);
-            }
-            else if (GetStreamData()->IsWritingPID(lpid))
-                BufferedWrite(tspacket);
-        }
+        VERBOSE(VB_GENERAL, LOC_WARN + "Card already open");
+        return true;
     }
-    return ok;
+
+    memset(_stream_id,  0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
+    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+
+    _stream_handler = HDHRStreamHandler::Get(_channel->GetDevice());
+
+    VERBOSE(VB_RECORD, LOC + "HDHR opened successfully");
+
+    return true;
+}
+
+void HDHRRecorder::Close(void)
+{
+    VERBOSE(VB_RECORD, LOC + "Close() -- begin");
+
+    if (IsOpen())
+        HDHRStreamHandler::Return(_stream_handler); 
+
+    VERBOSE(VB_RECORD, LOC + "Close() -- end");
+}
+
+void HDHRRecorder::SetStreamData(MPEGStreamData *data)
+{
+    if (data == _stream_data)
+        return;
+
+    MPEGStreamData *old_data = _stream_data;
+    _stream_data = data;
+    if (old_data)
+        delete old_data;
+
+    if (data)
+    {
+        data->AddMPEGSPListener(this);
+        data->AddMPEGListener(this);
+
+        DVBStreamData *dvb = dynamic_cast<DVBStreamData*>(data);
+        if (dvb)
+            dvb->AddDVBMainListener(this);
+
+        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
+
+        if (atsc && atsc->DesiredMinorChannel())
+            atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
+                                    atsc->DesiredMinorChannel());
+        else if (data->DesiredProgram() >= 0)
+            data->SetDesiredProgram(data->DesiredProgram());
+    }
+}
+
+ATSCStreamData *HDHRRecorder::GetATSCStreamData(void)
+{
+    return dynamic_cast<ATSCStreamData*>(_stream_data);
 }
 
 void HDHRRecorder::StartRecording(void)
@@ -337,160 +325,202 @@ void HDHRRecorder::StartRecording(void)
     _request_recording = true;
     _recording = true;
 
-    if (!StartData())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Starting recording "
-                "(set target failed). Aborting.");
-        Close();
-        _error = true;
-        VERBOSE(VB_RECORD, LOC + "StartRecording -- end 2");
-        return;
-    }
+    // Make sure the first things in the file are a PAT & PMT
+    bool tmp = _wait_for_keyframe_option;
+    _wait_for_keyframe_option = false;
+    HandleSingleProgramPAT(_stream_data->PATSingleProgram());
+    HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
+    _wait_for_keyframe_option = tmp;
 
-    hdhomerun_video_flush(_video_socket);
+    _stream_data->AddAVListener(this);
+    _stream_data->AddWritingListener(this);
+    _stream_handler->AddListener(_stream_data);
+    
     while (_request_recording && !_error)
     {
+        usleep(50000);
+
         if (PauseAndWait())
             continue;
 
-        if (_stream_data)
+        if (!_input_pmt)
         {
-            QMutexLocker read_lock(&_pid_lock);
-            _reset_pid_filters |= _stream_data->HasEITPIDChanges(_eit_pids);
-        }
-
-        if (_reset_pid_filters)
-        {
-            _reset_pid_filters = false;
-            VERBOSE(VB_RECORD, LOC + "Resetting Demux Filters");
-            AdjustFilters();
-        }
-
-        size_t read_size = 64 * 1024; // read about 64KB
-        read_size /= VIDEO_DATA_PACKET_SIZE;
-        read_size *= VIDEO_DATA_PACKET_SIZE;
-
-        size_t data_length;
-        unsigned char *data_buffer =
-            hdhomerun_video_recv(_video_socket, read_size, &data_length);
-        if (!data_buffer)
-        {
+            VERBOSE(VB_GENERAL, LOC_WARN +
+                    "Recording will not commence until a PMT is set.");
             usleep(5000);
-	    continue;
-	}
+            continue;
+        }
 
-        ProcessTSData(data_buffer, data_length);
+        if (!_stream_handler->IsRunning())
+        {
+            _error = true;
+
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Stream handler died unexpectedly.");
+        }
     }
 
     VERBOSE(VB_RECORD, LOC + "StartRecording -- ending...");
 
-    _channel->DeviceClearTarget();
+    _stream_handler->RemoveListener(_stream_data);
+    _stream_data->RemoveWritingListener(this);
+    _stream_data->RemoveAVListener(this);
+
     Close();
 
     FinishRecording();
+
     _recording = false;
 
     VERBOSE(VB_RECORD, LOC + "StartRecording -- end");
 }
 
-bool HDHRRecorder::AdjustFilters(void)
+void HDHRRecorder::ResetForNewFile(void)
 {
-    QMutexLocker change_lock(&_pid_lock);
+    DTVRecorder::ResetForNewFile();
 
-    if (!_channel)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "AdjustFilters() no channel");
-        return false;
-    }
-
-    if (!_input_pat || !_input_pmt)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "AdjustFilters() no pmt or no pat");
-        return false;
-    }
-
-    uint_vec_t add_pid;
-
-    add_pid.push_back(MPEG_PAT_PID);
-    _stream_data->AddListeningPID(MPEG_PAT_PID);
-
-    for (uint i = 0; i < _input_pat->ProgramCount(); i++)
-    {
-        add_pid.push_back(_input_pat->ProgramPID(i));
-        _stream_data->AddListeningPID(_input_pat->ProgramPID(i));
-    }
-
-    // Record the streams in the PMT...
-    bool need_pcr_pid = true;
-    for (uint i = 0; i < _input_pmt->StreamCount(); i++)
-    {
-        add_pid.push_back(_input_pmt->StreamPID(i));
-        need_pcr_pid &= (_input_pmt->StreamPID(i) != _input_pmt->PCRPID());
-        _stream_data->AddWritingPID(_input_pmt->StreamPID(i));
-    }
-
-    if (need_pcr_pid && (_input_pmt->PCRPID()))
-    {
-        add_pid.push_back(_input_pmt->PCRPID());
-        _stream_data->AddWritingPID(_input_pmt->PCRPID());
-    }
-
-    // Adjust for EIT
-    AdjustEITPIDs();
-    for (uint i = 0; i < _eit_pids.size(); i++)
-    {
-        add_pid.push_back(_eit_pids[i]);
-        _stream_data->AddListeningPID(_eit_pids[i]);
-    }
-
-    // Delete filters for pids we no longer wish to monitor
-    vector<uint>::const_iterator it;
-    vector<uint> pids = _channel->GetPIDs();
-    for (it = pids.begin(); it != pids.end(); ++it)
-    {
-        if (find(add_pid.begin(), add_pid.end(), *it) == add_pid.end())
-        {
-            _stream_data->RemoveListeningPID(*it);
-            _stream_data->RemoveWritingPID(*it);
-            _channel->DelPID(*it, false);
-        }
-    }
-
-    for (it = add_pid.begin(); it != add_pid.end(); ++it)
-        _channel->AddPID(*it, false);
-
-    _channel->UpdateFilters();
-
-    return add_pid.size();
+    memset(_stream_id,  0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
+    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 }
 
-/** \fn HDHRRecorder::AdjustEITPIDs(void)
- *  \brief Adjusts EIT PID monitoring to monitor the right number of EIT PIDs.
- */
-bool HDHRRecorder::AdjustEITPIDs(void)
+void HDHRRecorder::StopRecording(void)
 {
-    bool changes = false;
-    uint_vec_t add, del;
+    _request_recording = false;
+    while (_recording)
+        usleep(2000);
+}
 
-    QMutexLocker change_lock(&_pid_lock);
-
-    if (GetStreamData()->HasEITPIDChanges(_eit_pids))
-        changes = GetStreamData()->GetEITPIDChanges(_eit_pids, add, del);
-
-    if (!changes)
-        return false;
-
-    for (uint i = 0; i < del.size(); i++)
+bool HDHRRecorder::PauseAndWait(int timeout)
+{
+    if (request_pause)
     {
-        uint_vec_t::iterator it;
-        it = find(_eit_pids.begin(), _eit_pids.end(), del[i]);
-        if (it != _eit_pids.end())
-            _eit_pids.erase(it);
+        QMutex waitlock;
+        if (!paused)
+        {
+            assert(_stream_handler);
+            assert(_stream_data);
+
+            _stream_handler->RemoveListener(_stream_data);
+
+            paused = true;
+            pauseWait.wakeAll();
+            if (tvrec)
+                tvrec->RecorderPaused();
+        }
+        waitlock.lock();
+        unpauseWait.wait(&waitlock, timeout);
     }
 
-    for (uint i = 0; i < add.size(); i++)
-        _eit_pids.push_back(add[i]);
+    if (!request_pause && paused)
+    {
+        paused = false;
+
+        assert(_stream_handler);
+        assert(_stream_data);
+
+        _stream_handler->AddListener(_stream_data);
+    }
+
+    return paused;
+}
+
+bool HDHRRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
+{
+    uint streamType = _stream_id[tspacket.PID()];
+
+    // Check for keyframes and count frames
+    if (streamType == StreamID::H264Video)
+    {
+        _buffer_packets = !FindH264Keyframes(&tspacket);
+        if (!_seen_sps)
+            return true;
+    }
+    else
+    {
+        _buffer_packets = !FindMPEG2Keyframes(&tspacket);
+    }
+
+    return ProcessAVTSPacket(tspacket);
+}
+
+bool HDHRRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
+{
+    _buffer_packets = !FindAudioKeyframes(&tspacket);
+    return ProcessAVTSPacket(tspacket);
+}
+
+/// Common code for processing either audio or video packets
+bool HDHRRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
+{
+    const uint pid = tspacket.PID();
+    // Sync recording start to first keyframe
+    if (_wait_for_keyframe_option && _first_keyframe < 0)
+        return true;
+
+    // Sync streams to the first Payload Unit Start Indicator
+    // _after_ first keyframe iff _wait_for_keyframe_option is true
+    if (!(_pid_status[pid] & kPayloadStartSeen) && tspacket.HasPayload())
+    {
+        if (!tspacket.PayloadStart())
+            return true; // not payload start - drop packet
+
+        VERBOSE(VB_RECORD,
+                QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
+
+        _pid_status[pid] |= kPayloadStartSeen;
+    }
+
+    BufferedWrite(tspacket);
 
     return true;
 }
 
+bool HDHRRecorder::ProcessTSPacket(const TSPacket &tspacket)
+{
+    // Only create fake keyframe[s] if there are no audio/video streams
+    if (_input_pmt && _has_no_av)
+    {
+        _buffer_packets = !FindOtherKeyframes(&tspacket);
+    }
+    else
+    {
+        // There are audio/video streams. Only write the packet
+        // if audio/video key-frames have been found
+        if (_wait_for_keyframe_option && _first_keyframe < 0)
+            return true;
+
+        _buffer_packets = true;
+    }
+
+    BufferedWrite(tspacket);
+
+    return true;
+}
+
+void HDHRRecorder::BufferedWrite(const TSPacket &tspacket)
+{
+    // Care must be taken to make sure that the packet actually gets written
+    // as the decision to actually write it has already been made
+
+    // Do we have to buffer the packet for exact keyframe detection?
+    if (_buffer_packets)
+    {
+        int idx = _payload_buffer.size();
+        _payload_buffer.resize(idx + TSPacket::SIZE);
+        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::SIZE);
+        return;
+    }
+
+    // We are free to write the packet, but if we have buffered packet[s]
+    // we have to write them first...
+    if (!_payload_buffer.empty())
+    {
+        if (ringBuffer)
+            ringBuffer->Write(&_payload_buffer[0], _payload_buffer.size());
+        _payload_buffer.clear();
+    }
+
+    if (ringBuffer)
+        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+}

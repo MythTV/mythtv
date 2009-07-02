@@ -1,3 +1,5 @@
+#ifndef __HDHOMERUN_INCLUDES__
+#define __HDHOMERUN_INCLUDES__
 /*
  * hdhomerun_device.h
  *
@@ -27,3 +29,6 @@
 #include "hdhomerun_channels.h"
 #include "hdhomerun_channelscan.h"
 #include "hdhomerun_device.h"
+
+#endif /* __HDHOMERUN_INCLUDES__ */
+

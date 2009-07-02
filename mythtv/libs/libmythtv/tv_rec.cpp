@@ -181,7 +181,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
     else if (genOpt.cardtype == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
-        channel = new HDHRChannel(this, genOpt.videodev, dboxOpt.port);
+        channel = new HDHRChannel(this, genOpt.videodev);
         if (!channel->Open())
             return false;
         InitChannel(genOpt.defaultinput, startchannel);
@@ -3501,15 +3501,6 @@ void TVRec::HandleTuning(void)
             return;
 
         ClearFlags(kFlagWaitingForRecPause);
-#ifdef USING_HDHOMERUN
-        if (GetHDHRRecorder())
-        {
-            // We currently need to close the file descriptor for
-            // HDHomeRun signal monitoring to work.
-            GetHDHRRecorder()->Close();
-            GetHDHRRecorder()->SetRingBuffer(NULL);
-        }
-#endif // USING_HDHOMERUN
         VERBOSE(VB_RECORD, LOC + "Recorder paused, calling TuningFrequency");
         TuningFrequency(lastTuningRequest);
     }
@@ -4147,17 +4138,6 @@ void TVRec::TuningRestartRecorder(void)
         delete progInfo;
     }
     recorder->Reset();
-
-#ifdef USING_HDHOMERUN
-    if (GetHDHRRecorder())
-    {
-        pauseNotify = false;
-        GetHDHRRecorder()->Close();
-        pauseNotify = true;
-        GetHDHRRecorder()->Open();
-        GetHDHRRecorder()->StartData();
-    }
-#endif // USING_HDHOMERUN
 
     // Set file descriptor of channel from recorder for V4L
     channel->SetFd(recorder->GetVideoFd());

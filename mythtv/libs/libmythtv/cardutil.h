@@ -116,7 +116,7 @@ class MPUBLIC CardUtil
 
     static bool         IsTunerSharingCapable(const QString &rawtype)
     {
-        return (rawtype == "DVB");
+        return (rawtype == "DVB")   || (rawtype == "HDHOMERUN");
     }
 
     static bool         IsTunerShared(uint cardidA, uint cardidB);

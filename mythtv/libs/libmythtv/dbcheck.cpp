@@ -18,7 +18,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1235";
+const QString currentDatabaseVersion = "1236";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4543,6 +4543,51 @@ NULL
             return false;
     }
 
+    if (dbver == "1235")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT cardid, videodevice, dbox2_port "
+                      "FROM capturecard "
+                      "WHERE cardtype = 'HDHOMERUN' "
+                      "ORDER BY cardid");
+        bool ok = query.exec();
+
+        while (ok && query.next())
+        {
+            uint    cardid   = query.value(0).toUInt();
+            QString device   = query.value(1).toString();
+            uint    tunernum = query.value(2).toUInt();
+
+            if (device.contains("-"))
+                continue; // already in newstyle..
+
+            device = device + "-" + QString::number(tunernum);
+
+            MSqlQuery update(MSqlQuery::InitCon());
+            update.prepare(
+                "UPDATE capturecard "
+                "SET videodevice = :DEVICE "
+                "WHERE cardid = :CARDID");
+            update.bindValue(":DEVICE", device);
+            update.bindValue(":CARDID", cardid);
+
+            if (!update.exec())
+            {
+                MythDB::DBError(
+                    "Could not perform an update for '1236'", update);
+                ok = false;
+            }
+            
+        }
+
+        if (!ok)
+            return false;
+
+        const char * updates[] = { NULL };
+
+        if (!performActualUpdate(updates, "1236", dbver))
+            return false;
+    }
 
     return true;
 }

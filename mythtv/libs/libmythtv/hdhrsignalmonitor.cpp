@@ -18,6 +18,7 @@
 
 #include "hdhrchannel.h"
 #include "hdhrrecorder.h"
+#include "hdhrstreamhandler.h"
 
 #define LOC QString("HDHRSM(%1): ").arg(channel->GetDevice())
 #define LOC_ERR QString("HDHRSM(%1), Error: ").arg(channel->GetDevice())
@@ -39,15 +40,15 @@
 HDHRSignalMonitor::HDHRSignalMonitor(
     int db_cardnum, HDHRChannel* _channel, uint64_t _flags) :
     DTVSignalMonitor(db_cardnum, _channel, _flags),
-    dtvMonitorRunning(false)
+    streamHandlerStarted(false), streamHandler(NULL)
 {
     VERBOSE(VB_CHANNEL, LOC + "ctor");
-
-    _channel->DelAllPIDs();
 
     signalStrength.SetThreshold(45);
 
     AddFlags(kSigMon_WaitForSig);
+
+    streamHandler = HDHRStreamHandler::Get(_channel->GetDevice());
 }
 
 /** \fn HDHRSignalMonitor::~HDHRSignalMonitor()
@@ -57,6 +58,7 @@ HDHRSignalMonitor::~HDHRSignalMonitor()
 {
     VERBOSE(VB_CHANNEL, LOC + "dtor");
     Stop();
+    HDHRStreamHandler::Return(streamHandler);
 }
 
 /** \fn HDHRSignalMonitor::Stop(void)
@@ -66,132 +68,20 @@ void HDHRSignalMonitor::Stop(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Stop() -- begin");
     SignalMonitor::Stop();
-    if (dtvMonitorRunning)
-    {
-        dtvMonitorRunning = false;
-        pthread_join(table_monitor_thread, NULL);
-    }
+    if (GetStreamData())
+        streamHandler->RemoveListener(GetStreamData());
+    streamHandlerStarted = false;
+
     VERBOSE(VB_CHANNEL, LOC + "Stop() -- end");
 }
 
-void *HDHRSignalMonitor::TableMonitorThread(void *param)
+HDHRChannel *HDHRSignalMonitor::GetHDHRChannel(void)
 {
-    HDHRSignalMonitor *mon = (HDHRSignalMonitor*) param;
-    mon->RunTableMonitor();
-    return NULL;
+    return dynamic_cast<HDHRChannel*>(channel);
 }
 
-bool HDHRSignalMonitor::UpdateFiltersFromStreamData(void)
-{
-    vector<int> add_pids;
-    vector<int> del_pids;
-
-    if (!GetStreamData())
-        return false;
-
-    UpdateListeningForEIT();
-
-    const pid_map_t &listening = GetStreamData()->ListeningPIDs();
-
-    // PIDs that need to be added..
-    pid_map_t::const_iterator lit = listening.constBegin();
-    for (; lit != listening.constEnd(); ++lit)
-        if (*lit && (filters.find(lit.key()) == filters.end()))
-            add_pids.push_back(lit.key());
-
-    // PIDs that need to be removed..
-    FilterMap::const_iterator fit = filters.constBegin();
-    for (; fit != filters.constEnd(); ++fit)
-        if (listening.find(fit.key()) == listening.end())
-            del_pids.push_back(fit.key());
-
-    HDHRChannel *hdhr = dynamic_cast<HDHRChannel*>(channel);
-    if (!hdhr)
-        return false;
-
-    // Remove PIDs
-    bool ok = true;
-    vector<int>::iterator dit = del_pids.begin();
-    for (; dit != del_pids.end(); ++dit)
-    {
-        ok &= hdhr->DelPID(*dit);
-        filters.erase(filters.find(*dit));
-    }
-
-    // Add PIDs
-    vector<int>::iterator ait = add_pids.begin();
-    for (; ait != add_pids.end(); ++ait)
-    {
-        ok &= hdhr->AddPID(*ait);
-        filters[*ait] = 1;
-    }
-
-    return ok;
-}
-
-void HDHRSignalMonitor::RunTableMonitor(void)
-{
-    dtvMonitorRunning = true;
-
-    struct hdhomerun_video_sock_t *_video_socket;
-    _video_socket = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S);
-    if (!_video_socket)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get video socket");
-        return;
-    }
-
-    HDHRChannel *hdrc = dynamic_cast<HDHRChannel*>(channel);
-    if (!hdrc)
-        return;
-
-    uint localPort = hdhomerun_video_get_local_port(_video_socket);
-    if (!hdrc->DeviceSetTarget(localPort))
-    {
-        hdhomerun_video_destroy(_video_socket);
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set target");
-        return;
-    }
-
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): " +
-            QString("begin (# of pids %1)")
-            .arg(GetStreamData()->ListeningPIDs().size()));
-
-    while (dtvMonitorRunning && GetStreamData())
-    {
-        UpdateFiltersFromStreamData();
-
-        size_t data_length;
-        unsigned char *data_buffer =
-            hdhomerun_video_recv(_video_socket,
-                                         VIDEO_DATA_BUFFER_SIZE_1S / 5,
-                                         &data_length);
-
-        if (data_buffer)
-        {
-            GetStreamData()->ProcessData(data_buffer, data_length);
-            continue;
-        }
-
-        usleep(2500);
-    }
-
-    hdrc->DeviceClearTarget();
-    hdhomerun_video_destroy(_video_socket);
-
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- shutdown");
-
-    // TODO teardown PID filters here
-
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- end");
-}
-
-/** \fn HDHRSignalMonitor::UpdateValues()
+/** \fn HDHRSignalMonitor::UpdateValues(void)
  *  \brief Fills in frontend stats and emits status Qt signals.
- *
- *   This function uses five ioctl's FE_READ_SNR, FE_READ_SIGNAL_STRENGTH
- *   FE_READ_BER, FE_READ_UNCORRECTED_BLOCKS, and FE_READ_STATUS to obtain
- *   statistics from the frontend.
  *
  *   This is automatically called by MonitorLoop(), after Start()
  *   has been used to start the signal monitoring thread.
@@ -201,18 +91,19 @@ void HDHRSignalMonitor::UpdateValues(void)
     if (!running || exit)
         return;
 
-    if (dtvMonitorRunning)
+    if (streamHandlerStarted)
     {
         EmitStatus();
         if (IsAllGood())
             SendMessageAllGood();
+
         // TODO dtv signals...
 
         update_done = true;
         return;
     }
 
-    QString msg = ((HDHRChannel*)channel)->TunerGet("status");
+    QString msg = streamHandler->GetTunerStatus();
     //ss  = signal strength,        [0,100]
     //snq = signal to noise quality [0,100]
     //seq = signal error quality    [0,100]
@@ -250,17 +141,8 @@ void HDHRSignalMonitor::UpdateValues(void)
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                    kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        pthread_create(&table_monitor_thread, NULL,
-                       TableMonitorThread, this);
-
-        VERBOSE(VB_CHANNEL, LOC + "UpdateValues() -- "
-                "Waiting for table monitor to start");
-
-        while (!dtvMonitorRunning)
-            usleep(50);
-
-        VERBOSE(VB_CHANNEL, LOC + "UpdateValues() -- "
-                "Table monitor started");
+        streamHandler->AddListener(GetStreamData());
+        streamHandlerStarted = true;
     }
 
     update_done = true;

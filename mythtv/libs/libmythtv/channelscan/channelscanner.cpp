@@ -332,8 +332,7 @@ void ChannelScanner::PreScanCommon(
 #ifdef USING_HDHOMERUN
     if ("HDHOMERUN" == card_type)
     {
-        uint tuner = CardUtil::GetHDHRTuner(cardid);
-        channel = new HDHRChannel(NULL, device, tuner);
+        channel = new HDHRChannel(NULL, device);
     }
 #endif // USING_HDHOMERUN
 

@@ -214,6 +214,47 @@ QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
                 devs.push_back(subit->filePath());
         }
     }
+#ifdef USING_HDHOMERUN
+    else if (rawtype.toUpper() == "HDHOMERUN")
+    {
+        uint32_t  target_ip   = 0;
+        uint32_t  device_type = HDHOMERUN_DEVICE_TYPE_TUNER;
+        uint32_t  device_id   = HDHOMERUN_DEVICE_ID_WILDCARD;
+        const int max_count   = 50;
+        hdhomerun_discover_device_t result_list[max_count];
+
+        int result = hdhomerun_discover_find_devices_custom(
+            target_ip, device_type, device_id, result_list, max_count);
+
+        if (result == -1)
+        {
+            VERBOSE(VB_IMPORTANT, "CardUtil::ProbeVideoDevices: "
+                    "Error finding HDHomerun devices");
+            return devs;
+        }
+
+        if (result == 50)
+        {
+            VERBOSE(VB_IMPORTANT, "CardUtil::ProbeVideoDevices: "
+                    "Warning: may be > 50 HDHomerun devices");
+        }
+
+        // Return "deviceid ipaddress" pairs
+        for (int i = 0; i < result; i++)
+        {
+            QString id = QString("%1").arg(result_list[i].device_id, 0, 16);
+            QString ip = QString("%1.%2.%3.%4")
+                                 .arg((result_list[i].ip_addr>>24) & 0xFF)
+                                 .arg((result_list[i].ip_addr>>16) & 0xFF)
+                                 .arg((result_list[i].ip_addr>> 8) & 0xFF)
+                                 .arg((result_list[i].ip_addr>> 0) & 0xFF);
+
+            QString hdhrdev = id.toUpper() + " " + ip;
+
+            devs.push_back(hdhrdev);
+        }
+    }
+#endif // USING_HDHOMERUN
     else
     {
         VERBOSE(VB_IMPORTANT, QString("CardUtil::ProbeVideoDevices: ") +
@@ -226,7 +267,9 @@ QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
 QString CardUtil::ProbeDVBType(const QString &device)
 {
     QString ret = "ERROR_UNKNOWN";
-    (void) device;
+
+    if (device.isEmpty())
+        return ret;
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
@@ -234,7 +277,8 @@ QString CardUtil::ProbeDVBType(const QString &device)
     int fd_frontend = open(dev.constData(), O_RDONLY | O_NONBLOCK);
     if (fd_frontend < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Can't open DVB frontend (" + dvbdev + ").");
+        VERBOSE(VB_IMPORTANT, QString("Can't open DVB frontend (%1) for %2.")
+                .arg(dvbdev).arg(device));
         return ret;
     }
 
@@ -1150,7 +1194,10 @@ bool CardUtil::CreateInputGroupIfNeeded(uint cardid)
         uint id = 0;
         for (uint i = 0; !id && (i < 100); i++)
         {
-            name = QString("DVB%1").arg(dev.toUInt());
+            bool ok;
+            name = QString("DVB%1").arg(dev.toUInt(&ok));
+            if (!ok)
+                name = QString("HDHR_%1").arg(dev);
             name += (i) ? QString(":%1").arg(i) : QString("");
             id = CardUtil::CreateInputGroup(name);
         }
@@ -1753,18 +1800,7 @@ QString CardUtil::GetDeviceLabel(uint cardid,
     }
     else if (cardtype == "HDHOMERUN")
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-            "SELECT dbox2_port "
-            "FROM capturecard "
-            "WHERE cardid = :CARDID");
-        query.bindValue(":CARDID", cardid);
-
-        if (!query.exec() || !query.isActive() || !query.next())
-            label = "[ DB ERROR ]";
-        else
-            label = QString("[ HDHomeRun : ID %1 Port %2 ]")
-                .arg(videodevice).arg(query.value(0).toString());
+        label = QString("[ HDHomeRun : %1 ]").arg(videodevice);
     }
     else
     {

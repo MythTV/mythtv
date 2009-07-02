@@ -442,19 +442,47 @@ public:
     static void fillSelections(SelectSetting* setting);
 };
 
+class HDHomeRunDevice
+{
+  public:
+    QString mythdeviceid;
+    QString deviceid;
+    QString cardip;
+    QString cardtuner;
+    bool    inuse;
+    bool    discovered;
+};
+
+typedef QMap<QString, HDHomeRunDevice> HDHomeRunDeviceList;
+ 
+class HDHomeRunDeviceIDList;
+class HDHomeRunDeviceID;
+class HDHomeRunIP;
+class HDHomeRunTunerIndex;
 class HDHomeRunConfigurationGroup : public VerticalConfigurationGroup
 {
     Q_OBJECT
+
+    friend class HDHomeRunExtra;
 
   public:
     HDHomeRunConfigurationGroup(CaptureCard &parent);
 
   public slots:
-    void probeCard(const QString &device);
+    void HDHomeRunExtraPanel(void);
 
   private:
-    CaptureCard       &parent;
-    TransLabelSetting *desc;
+    void FillDeviceList(void);
+    bool ProbeCard(HDHomeRunDevice&);
+
+  private:
+    CaptureCard           &parent;
+    TransLabelSetting     *desc;
+    HDHomeRunDeviceIDList *deviceidlist;
+    HDHomeRunDeviceID     *deviceid;
+    HDHomeRunIP           *cardip;
+    HDHomeRunTunerIndex   *cardtuner;
+    HDHomeRunDeviceList    devicelist;
 };
 
 class V4LConfigurationGroup : public VerticalConfigurationGroup
@@ -592,6 +620,7 @@ public:
     CaptureCard(bool use_card_group = true);
 
     int  getCardID(void) const { return id->intValue(); }
+    QString GetRawCardType(void) const;
 
     void loadByID(int id);
 
@@ -775,6 +804,98 @@ class CardInput : public QObject, public ConfigurationWizard
     DiSEqCDevSettings  *externalInputSettings;
     InputGroup         *inputgrp0;
     InputGroup         *inputgrp1;
+};
+
+class HDHomeRunDeviceID;
+class HDHomeRunTunerIndex;
+
+class HDHomeRunIP : public TransLineEditSetting
+{
+    Q_OBJECT
+
+  public:
+    HDHomeRunIP();
+
+    virtual void setEnabled(bool e);
+    void SetOldValue(const QString &s)
+        { _oldValue = s; _oldValue.detach(); };
+
+  signals:
+    void NewIP(const QString&);
+
+  public slots:
+    void UpdateDevices(const QString&);
+
+  private:
+    QString _oldValue;
+};
+
+class HDHomeRunTunerIndex : public TransComboBoxSetting
+{
+    Q_OBJECT
+
+  public:
+    HDHomeRunTunerIndex();
+
+    virtual void setEnabled(bool e);
+    void SetOldValue(const QString &s)
+        { _oldValue = s; _oldValue.detach(); };
+
+  signals:
+    void NewTuner(const QString&);
+
+  public slots:
+    void UpdateDevices(const QString&);
+
+  private:
+    QString _oldValue;
+};
+
+
+class HDHomeRunDeviceIDList : public TransComboBoxSetting
+{
+    Q_OBJECT
+
+  public:
+    HDHomeRunDeviceIDList(HDHomeRunDeviceID *deviceid,
+                          HDHomeRunIP *cardip,
+                          HDHomeRunTunerIndex *cardtuner,
+                          HDHomeRunDeviceList *devicelist);
+
+    void fillSelections(const QString &current);
+
+    virtual void Load(void);
+
+  public slots:
+    void UpdateDevices(const QString&);
+
+  private:
+    HDHomeRunDeviceID   *_deviceid;
+    HDHomeRunIP         *_cardip;
+    HDHomeRunTunerIndex *_cardtuner;
+    HDHomeRunDeviceList *_devicelist;
+
+    QString              _oldValue;
+};
+
+class HDHomeRunDeviceID : public LabelSetting, public CaptureCardDBStorage
+{
+    Q_OBJECT
+
+  public:
+    HDHomeRunDeviceID(const CaptureCard &parent);
+
+    virtual void Load(void);
+
+  public slots:
+    void SetIP(const QString&);
+    void SetTuner(const QString&);
+    void SetOverrideDeviceID(const QString&);
+
+  private:
+    QString _ip;
+    QString _tuner;
+    QString _overridedeviceid;
 };
 
 #endif

@@ -524,10 +524,10 @@ using_backend {
     using_hdhomerun {
         # MythTV HDHomeRun glue
         HEADERS += hdhrsignalmonitor.h   hdhrchannel.h
-        HEADERS += hdhrrecorder.h
+        HEADERS += hdhrrecorder.h        hdhrstreamhandler.h
 
         SOURCES += hdhrsignalmonitor.cpp hdhrchannel.cpp
-        SOURCES += hdhrrecorder.cpp
+        SOURCES += hdhrrecorder.cpp      hdhrstreamhandler.cpp
 
         DEFINES += USING_HDHOMERUN
     }
