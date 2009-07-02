@@ -1018,11 +1018,13 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 
         if (nCount > 1)
         {
-            m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
+            //m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
+	    m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 0, 0).trimmed();
 
             // Process any Query String Parameters
 
-            QString sQueryStr = tokens[1].section( '?', 1, 1   );
+            //QString sQueryStr = tokens[1].section( '?', 1, 1   );
+	    QString sQueryStr = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 1, 1 );
 
             if (sQueryStr.length() > 0)
                 GetParameters( sQueryStr, m_mapParams );
