@@ -141,13 +141,6 @@ class VideoOutput
     virtual bool IsPBPSupported(void) const { return false; }
     virtual bool NeedExtraAudioDecode(void) const { return false; }
 
-    /// \brief Returns true if Motion Compensation acceleration is available.
-    virtual bool hasMCAcceleration(void) const { return false; }
-    /// \brief Returns true if Inverse Discrete Cosine Transform acceleration
-    ///        is available.
-    virtual bool hasIDCTAcceleration(void) const { return false; }
-    /// \brief Returns true if VLD acceleration is available.
-    virtual bool hasVLDAcceleration(void) const { return false; }
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
 

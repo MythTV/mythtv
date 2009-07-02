@@ -2422,7 +2422,7 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
                  frame->height, frame->top_field_first,
                  field, src_y, dest_y, xv_src_y_incr, xv_dest_y_incr);
     }
-    if (hasVLDAcceleration())
+    if (XVideoVLD == VideoOutputSubType())
     {   // don't do bob-adjustment for VLD drivers
         src_y  = video_rect.top();
         dest_y = display_video_rect.top();
@@ -2690,7 +2690,7 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     vbuffers.AddInheritence(frame);
 
     Status status;
-    if (hasVLDAcceleration())
+    if (XVideoVLD == VideoOutputSubType())
     {
         vbuffers.LockFrame(frame, "DrawSlice -- VLD");
         XLOCK(disp, status = XvMCPutSlice2(disp->GetDisplay(), xvmc_ctx,

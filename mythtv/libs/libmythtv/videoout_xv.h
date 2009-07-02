@@ -96,14 +96,8 @@ class VideoOutputXv : public VideoOutput
         { return XVideo == VideoOutputSubType(); }
     virtual bool NeedExtraAudioDecode(void) const
         { return XVideoMC <= VideoOutputSubType(); }
-    virtual bool hasMCAcceleration(void) const
-        { return XVideoMC <= VideoOutputSubType(); }
-    virtual bool hasIDCTAcceleration(void) const
-        { return XVideoIDCT <= VideoOutputSubType(); }
-    virtual bool hasVLDAcceleration(void) const
-        { return XVideoVLD == VideoOutputSubType(); }
     virtual bool hasHWAcceleration(void) const
-        { return XVideo <= VideoOutputSubType(); }
+        { return XVideoMC <= VideoOutputSubType(); }
 
     void CheckFrameStates(void);
 

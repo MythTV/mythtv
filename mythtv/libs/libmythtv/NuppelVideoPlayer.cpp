@@ -1492,10 +1492,8 @@ void NuppelVideoPlayer::CheckPrebuffering(void)
     if (IsIVTVDecoder())
         return;
 
-    if ((videoOutput->hasMCAcceleration()   ||
-         videoOutput->hasIDCTAcceleration() ||
-         videoOutput->hasVLDAcceleration()) &&
-        (videoOutput->EnoughPrebufferedFrames()))
+    if (videoOutput->hasHWAcceleration() &&
+        videoOutput->EnoughPrebufferedFrames())
     {
         SetPrebuffering(false);
     }
@@ -2455,12 +2453,12 @@ void NuppelVideoPlayer::AVSync(void)
         lastsync = true;
 
         if (buffer && !using_null_videoout &&
-            (videoOutput->hasMCAcceleration()   ||
-             videoOutput->hasIDCTAcceleration() ||
-             videoOutput->hasVLDAcceleration()))
+            videoOutput->hasHWAcceleration())
         {
-            // If we are using hardware decoding, so we've already done the
-            // decoding; display the frame, but don't wait for A/V Sync.
+            // If we are using certain hardware decoders, so we've already done
+            // the decoding; display the frame, but don't wait for A/V Sync.
+            // Excludes HW decoder/render methods that are locked to
+            // the vertical sync (e.g. VDPAU)
             videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
             videoOutput->Show(kScan_Intr2ndField);
             VERBOSE(VB_PLAYBACK, LOC + dbg + "skipping A/V wait.");
