@@ -4434,7 +4434,8 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     if (oldinfo)
     {
         FinishedRecording(oldinfo);
-        (new PreviewGenerator(oldinfo, PreviewGenerator::kLocal))->Start();
+        if (tvchain->GetCardType(-1) != "DUMMY")
+            (new PreviewGenerator(oldinfo, PreviewGenerator::kLocal))->Start();
         delete oldinfo;
     }
 
