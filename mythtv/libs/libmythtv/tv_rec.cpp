@@ -3349,8 +3349,6 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
 {
     VERBOSE(VB_IMPORTANT, LOC + "RingBufferChanged()");
 
-    SetRingBuffer(rb);
-
     if (pginfo)
     {
         if (curRecording)
@@ -3362,6 +3360,8 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
         curRecording = new ProgramInfo(*pginfo);
         curRecording->MarkAsInUse(true, "recorder");
     }
+
+    SetRingBuffer(rb);
 }
 
 QString TVRec::TuningGetChanNum(const TuningRequest &request,
