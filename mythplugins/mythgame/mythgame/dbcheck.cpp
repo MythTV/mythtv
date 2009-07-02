@@ -12,7 +12,7 @@ using namespace std;
 
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1014";
+const QString currentDatabaseVersion = "1015";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -384,6 +384,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             return false;
     }
 
+    if (dbver == "1014")
+    {
+        const QString updates[] = {
+
+"ALTER TABLE gamemetadata ADD fanart VARCHAR(255) NOT NULL AFTER rompath,"
+"ADD boxart VARCHAR( 255 ) NOT NULL AFTER fanart;",
+""
+};
+
+        if (!performActualUpdate(updates, "1015", dbver))
+            return false;
+    }
 
     return true;
 }

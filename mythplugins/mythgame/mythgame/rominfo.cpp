@@ -1,6 +1,7 @@
 #include <qfile.h>
 
 #include <mythtv/mythdb.h>
+#include <mythtv/mythcontext.h>
 
 #include "rominfo.h"
 #include "romedit.h"
@@ -15,63 +16,70 @@ bool operator==(const RomInfo& a, const RomInfo& b)
     return false;
 }
 
-
-void RomInfo::edit_rominfo()
+void RomInfo::UpdateDatabase()
 {
-    QString rom_ver = Version();
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT gamename,genre,year,country,publisher,favorite,"
+                  "fanart,boxart "
+                  "FROM gamemetadata "
+                  "WHERE gametype = :GAMETYPE "
+                  "AND romname = :ROMNAME");
 
-    GameEditDialog romeditdlg(Romname());
+    query.bindValue(":GAMETYPE", GameType());
+    query.bindValue(":ROMNAME", Romname());
 
-    DialogCode res = romeditdlg.exec();
+    if (!query.exec())
+    {
+        MythDB::DBError("RomInfo::UpdateDatabase", query);
+        return;
+    }
 
-    if (kDialogCodeRejected == res)
+    if (!query.next())
         return;
 
-    if (res)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT gamename,genre,year,country,publisher,favorite "
-                      "FROM gamemetadata "
-                      "WHERE gametype = :GAMETYPE "
-                      "AND romname = :ROMNAME");
+    QString t_gamename  = query.value(0).toString();
+    QString t_genre     = query.value(1).toString();
+    QString t_year      = query.value(2).toString();
+    QString t_country   = query.value(3).toString();
+    QString t_publisher = query.value(4).toString();
+    bool    t_favourite = query.value(5).toBool();
+    QString t_fanart = query.value(6).toString();
+    QString t_boxart = query.value(7).toString();
 
+    if ((t_gamename  != Gamename())  || (t_genre     != Genre())   ||
+        (t_year      != Year())      || (t_country   != Country()) ||
+        (t_publisher != Publisher()) || (t_favourite != Favorite()) ||
+        (t_fanart    != Fanart())    || (t_boxart    != Boxart()))
+    {
+        query.prepare("UPDATE gamemetadata "
+                      "SET version = 'CUSTOM', "
+                      "    gamename = :GAMENAME,"
+                      "    genre = :GENRE,"
+                      "    year = :YEAR,"
+                      "    country = :COUNTRY,"
+                      "    publisher = :PUBLISHER,"
+                      "    favorite = :FAVORITE,"
+                      "    fanart = :FANART,"
+                      "    boxart = :BOXART "
+                      "WHERE gametype = :GAMETYPE AND "
+                      "      romname  = :ROMNAME");
+        query.bindValue(":GAMENAME", Gamename());
+        query.bindValue(":GENRE", Genre());
+        query.bindValue(":YEAR", Year());
+        query.bindValue(":COUNTRY", Country());
+        query.bindValue(":PUBLISHER", Publisher());
+        query.bindValue(":FAVORITE", Favorite());
+        query.bindValue(":FANART", Fanart());
+        query.bindValue(":BOXART", Boxart());
         query.bindValue(":GAMETYPE", GameType());
         query.bindValue(":ROMNAME", Romname());
 
         if (!query.exec())
         {
-            MythDB::DBError("RomInfo::edit_rominfo", query);
+            MythDB::DBError("RomInfo::UpdateDatabase", query);
             return;
         }
-
-        if (!query.next())
-            return;
-
-        QString t_gamename  = query.value(0).toString();
-        QString t_genre     = query.value(1).toString();
-        QString t_year      = query.value(2).toString();
-        QString t_country   = query.value(3).toString();
-        QString t_publisher = query.value(4).toString();
-        bool    t_favourite = query.value(5).toBool();
-
-        if ((t_gamename  != Gamename())  || (t_genre     != Genre())   ||
-            (t_year      != Year())      || (t_country   != Country()) ||
-            (t_publisher != Publisher()) || (t_favourite != Favorite()))
-        {
-            query.prepare("UPDATE gamemetadata "
-                          "SET version = 'CUSTOM' "
-                          "WHERE gametype = :GAMETYPE AND "
-                          "      romname  = :ROMNAME");
-            query.bindValue(":GAMETYPE", GameType());
-            query.bindValue(":ROMNAME",  Romname());
-
-            if (!query.exec())
-            {
-                MythDB::DBError("RomInfo::edit_rominfo", query);
-                return;
-            }
-        }
-   }
+    }
 }
 
 // Return the count of how many times this appears in the db already
@@ -147,6 +155,10 @@ void RomInfo::setField(QString field, QString data)
         favorite = data.toInt();
     else if (field == "rompath")
         rompath = data;
+    else if (field == "fanart")
+        fanart = data;
+    else if (field == "boxart")
+        boxart = data;
     else if (field == "country")
         country = data;
     else if (field == "publisher")
@@ -164,21 +176,24 @@ void RomInfo::setField(QString field, QString data)
 
 }
 
-void RomInfo::setFavorite()
+void RomInfo::setFavorite(bool updateDatabase)
 {
     favorite = 1 - favorite;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("UPDATE gamemetadata SET favorite = :FAV "
-                  "WHERE romname = :ROMNAME");
-
-    query.bindValue(":FAV", favorite);
-    query.bindValue(":ROMNAME",romname);
-
-    if (!query.exec())
+    if (updateDatabase)
     {
-        MythDB::DBError("RomInfo::setFavorite", query);
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("UPDATE gamemetadata SET favorite = :FAV "
+                      "WHERE romname = :ROMNAME");
+
+        query.bindValue(":FAV", favorite);
+        query.bindValue(":ROMNAME",romname);
+
+        if (!query.exec())
+        {
+            MythDB::DBError("RomInfo::setFavorite", query);
+        }
     }
 }
 
@@ -211,7 +226,7 @@ void RomInfo::fillData()
 
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
                        "rompath,country,crc_value,diskcount,gametype,publisher,"
-                       "version FROM gamemetadata WHERE gamename = :GAMENAME "
+                       "version,fanart,boxart FROM gamemetadata WHERE gamename = :GAMENAME "
                        + systemtype + " ORDER BY diskcount DESC";
 
     query.prepare(thequery);
@@ -234,6 +249,8 @@ void RomInfo::fillData()
         setGameType(query.value(10).toString());
         setPublisher(query.value(11).toString());
         setVersion(query.value(12).toString());
+        setFanart(query.value(13).toString());
+        setBoxart(query.value(14).toString());
     }
 
     query.prepare("SELECT screenshots FROM gameplayers "

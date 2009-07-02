@@ -1,0 +1,109 @@
+<mythuitheme>
+
+  <window name="gameui">
+
+    <imagetype name="fanart" from="basebackdrop" />
+    <imagetype name="topbar" from="basetopbar" />
+
+    <textarea name="heading" from="baseheading">
+        <value>Play Games</value>
+    </textarea>
+
+    <buttontree name="gametreelist">
+        <area>8,52,1264,375</area>
+        <numlists>3</numlists>
+        <spacing>10</spacing>
+        <buttonlist name="listtemplate">
+            <area>0,0,1264,375</area>
+            <layout>vertical</layout>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,100%,30</area>
+                    <imagetype name="buttonbackground">
+                        <gradient start="#4b4b3e" end="#4b4b3e" alpha="255"/>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>5,0,85%,30</area>
+                        <font>basesmall</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#8a916f" end="#8a916f" alpha="255"/>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>5,0,85%,30</area>
+                        <font>basesmallbrown</font>
+                        <cutdown>yes</cutdown>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+        </buttonlist>
+    </buttontree>
+
+    <textarea name="gametitle">
+        <area>296,440,752,60</area>
+        <font>baseextralarge</font>
+    </textarea>
+
+    <textarea name="system">
+        <area>296,510,140,35</area>
+        <font>basemedium</font>
+        <value>System:</value>
+    </textarea>
+
+    <textarea name="systemname">
+        <area>436,510,580,35</area>
+        <font>basemedium</font>
+    </textarea>
+
+    <textarea name="year">
+        <area>296,545,140,35</area>
+        <font>basemedium</font>
+        <value>Year:</value>
+    </textarea>
+
+    <textarea name="yearname">
+        <area>436,545,580,35</area>
+        <font>basemedium</font>
+    </textarea>
+
+    <textarea name="genre">
+        <area>296,580,140,35</area>
+        <font>basemedium</font>
+        <value>Genre:</value>
+    </textarea>
+
+    <textarea name="genrename">
+        <area>436,580,580,35</area>
+        <font>basemedium</font>
+    </textarea>
+
+    <textarea name="favorite">
+        <area>296,615,140,35</area>
+        <font>basemedium</font>
+        <value>Favorite:</value>
+    </textarea>
+
+    <textarea name="showfavorite">
+        <area>436,615,580,35</area>
+        <font>basemedium</font>
+    </textarea>
+
+    <imagetype name="gameimage">
+          <area>880,448,300,196</area>
+    </imagetype>
+
+    <imagetype name="boxart">
+          <area>25,448,300,196</area>
+          <preserveaspect>true</preserveaspect>
+    </imagetype>
+
+  </window>
+
+</mythuitheme>

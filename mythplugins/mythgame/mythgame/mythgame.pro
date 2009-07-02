@@ -9,11 +9,12 @@ target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 # Input
-HEADERS += gamehandler.h rominfo.h unzip.h gamesettings.h gametree.h
-HEADERS += rom_metadata.h romedit.h
+HEADERS += gamehandler.h rominfo.h unzip.h gamesettings.h gameui.h
+HEADERS += rom_metadata.h romedit.h gamedetails.h
 
-SOURCES += main.cpp gamehandler.cpp rominfo.cpp gametree.cpp unzip.c
+SOURCES += main.cpp gamehandler.cpp rominfo.cpp gameui.cpp unzip.c
 SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
+SOURCES += gamedetails.cpp
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

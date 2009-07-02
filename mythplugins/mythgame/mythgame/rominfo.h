@@ -12,7 +12,8 @@ class RomInfo
             QString lgenre = "", QString lyear = "", bool lfavorite = FALSE, 
             QString lrompath = "", QString lcountry ="", QString lcrc_value = "",
             int ldiskcount = 0, QString lgametype = "", int lromcount = 0,
-            QString lallsystems = "", QString lpublisher = "", QString lversion = "")
+            QString lallsystems = "", QString lpublisher = "", QString lversion = "",
+            QString lfanart = "", QString lboxart = "")
             {
                 romname = lromname;
                 system = lsystem;
@@ -21,6 +22,8 @@ class RomInfo
                 year = lyear;
                 favorite = lfavorite;
                 rompath = lrompath;
+                fanart = lfanart;
+                boxart = lboxart;
                 country = lcountry;
                 crc_value = lcrc_value;
                 diskcount = ldiskcount;
@@ -37,9 +40,12 @@ class RomInfo
                 system = lhs.system;
                 gamename = lhs.gamename;
                 genre = lhs.genre;
+                imagepath = lhs.imagepath;
                 year = lhs.year;
                 favorite = lhs.favorite;
                 rompath = lhs.rompath;
+                fanart = lhs.fanart;
+                boxart = lhs.boxart;
                 country = lhs.country;
                 crc_value = lhs.crc_value;
                 diskcount = lhs.diskcount;
@@ -50,64 +56,69 @@ class RomInfo
                 version = lhs.version;
             }
 
-    virtual ~RomInfo() {}
+    ~RomInfo() {}
 
     bool FindImage(QString BaseFileName, QString *result);
 
     QString Rompath() const { return rompath; }
     void setRompath(const QString &lrompath) { rompath = lrompath; }
 
+    QString Fanart() const { return fanart; }
+    void setFanart(const QString &lfanart) { fanart = lfanart; }
+
+    QString Boxart() const { return boxart; }
+    void setBoxart(const QString &lboxart) { boxart = lboxart; }
+
     QString Romname() const { return romname; }
     void setRomname(const QString &lromname) { romname = lromname; }
 
-    QString System() { return system; }
+    QString System() const { return system; }
     void setSystem(const QString &lsystem) { system = lsystem; }
 
-    QString Gamename() { return gamename; }
+    QString Gamename() const { return gamename; }
     void setGamename(const QString &lgamename) { gamename = lgamename; }
 
-    QString Genre() { return genre; }
+    QString Genre() const { return genre; }
     void setGenre(const QString &lgenre) { genre = lgenre; }
     
-    QString Country() { return country; }
+    QString Country() const { return country; }
     void setCountry(const QString &lcountry) { country = lcountry; }
 
-    QString GameType() { return gametype; }
+    QString GameType() const { return gametype; }
     void setGameType(const QString &lgametype) { gametype = lgametype; }
 
-    int RomCount() { return romcount; }
+    int RomCount() const { return romcount; }
     void setRomCount(const int &lromcount) { romcount = lromcount; }
 
-    QString AllSystems() { return allsystems; }
+    QString AllSystems() const { return allsystems; }
     void setAllSystems(const QString &lallsystems) { allsystems = lallsystems; }
 
-    int DiskCount() { return diskcount; }
+    int DiskCount() const { return diskcount; }
     void setDiskCount(const int &ldiskcount) { diskcount = ldiskcount; }
 
-    QString CRC_VALUE() { return crc_value; }
+    QString CRC_VALUE() const { return crc_value; }
     void setCRC_VALUE(const QString &lcrc_value) { crc_value = lcrc_value; }
 
-    QString ImagePath() { return imagepath; }
+    QString ImagePath() const { return imagepath; }
     void setImagePath(const QString &limagepath) { imagepath = limagepath; } 
 
-    QString Publisher() { return publisher; }
+    QString Publisher() const { return publisher; }
     void setPublisher(const QString &lpublisher) { publisher = lpublisher; }
 
-    QString Version() { return version; }
+    QString Version() const { return version; }
     void setVersion(const QString &lversion) { version = lversion; }
 
-
-    QString Year() { return year; }
+    QString Year() const { return year; }
     void setYear(const QString &lyear) { year = lyear; }
 
-    int Favorite() { return favorite; }
-     virtual void setFavorite();
+    int Favorite() const { return favorite; }
+    void setFavorite(bool updateDatabase = false);
 
     QString getExtension();
 
-    virtual void setField(QString field, QString data);
-    virtual void fillData();
-    virtual void edit_rominfo();
+    void setField(QString field, QString data);
+    void fillData();
+    void UpdateDatabase();
 
   protected:
     QString romname;
@@ -126,8 +137,12 @@ class RomInfo
     QString year;
     bool favorite;
     QString rompath;
+    QString fanart;
+    QString boxart;
 };
 
 bool operator==(const RomInfo& a, const RomInfo& b);
+
+Q_DECLARE_METATYPE(RomInfo *)
 
 #endif

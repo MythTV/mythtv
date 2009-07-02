@@ -149,7 +149,8 @@ void GameHandler::InitMetaDataMap(QString GameType)
 
 void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre, QString* Year,
                               QString* Country, QString* CRC32, QString* GameName,
-                              QString *Publisher, QString *Version)
+                              QString *Publisher, QString *Version, QString* Fanart,
+                              QString* Boxart)
 {
     QString key;
     QString tmpcrc;
@@ -165,6 +166,8 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
     *Genre = QObject::tr("Unknown");
     *Publisher = QObject::tr("Unknown");
     *Version = QObject::tr("0");
+    *Fanart = QObject::tr("");
+    *Boxart = QObject::tr("");
 
     if (*CRC32 != "")
     {
@@ -411,6 +414,8 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     QString Year;
     QString Publisher;
     QString Version;
+    QString Fanart;
+    QString Boxart;
 
     int removalprompt = gContext->GetSetting("GameRemovalPrompt").toInt();
     int indepth = gContext->GetSetting("GameDeepScan").toInt();
@@ -423,7 +428,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             if (indepth)
             {
                 GetMetadata(handler, iter.data().RomFullPath(), &Genre, &Year, &Country, &CRC32, &GameName,
-                            &Publisher, &Version);
+                            &Publisher, &Version, &Fanart, &Boxart);
             }
             else
             {
@@ -434,6 +439,8 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 GameName = QObject::tr("Unknown");
                 Publisher = QObject::tr("Unknown");
                 Version = QObject::tr("0");
+                Fanart = QObject::tr("");
+                Boxart = QObject::tr("");
             }
 
             if (GameName == QObject::tr("Unknown")) 
@@ -446,9 +453,10 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             query.prepare("INSERT INTO gamemetadata "
                           "(system, romname, gamename, genre, year, gametype, " 
 		          "rompath, country, crc_value, diskcount, display, "
-			  "publisher, version) "
+			  "publisher, version, fanart, boxart) "
 		          "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
-			  ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PUBLISHER, :VERSION)");
+			  ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PUBLISHER, :VERSION, "
+                          ":FANART, BOXART)");
 
 
 
@@ -463,7 +471,9 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 	    query.bindValue(":CRC32", CRC32);
 	    query.bindValue(":PUBLISHER", Publisher);
 	    query.bindValue(":VERSION", Version);
-	    	    
+            query.bindValue(":FANART", Fanart);
+            query.bindValue(":BOXART", Boxart);
+
             query.exec();
         } 
         else if ((iter.data().FoundLoc() == inDatabase) && (removalprompt))

@@ -1,99 +1,234 @@
-#include <qstring.h>
+#include <QImageReader>
+#include <QApplication>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdirs.h>
+
+#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
 
 #include "romedit.h"
+#include "rominfo.h"
 
-class Gamename : public LineEditSetting, public GenericDBStorage
+EditRomInfoDialog::EditRomInfoDialog(MythScreenStack *parent,
+        QString name, RomInfo *romInfo) : MythScreenType(parent, name),
+    m_id(""), m_retObject(0), m_gamenameEdit(0), m_genreEdit(0),
+    m_yearEdit(0), m_countryEdit(0), m_publisherEdit(0), m_favoriteCheck(0),
+    m_fanartButton(0), m_fanartText(0), m_boxartButton(0), m_boxartText(0),
+    m_doneButton(0)
 {
-  public:
-    Gamename(const QString &romname) :
-        LineEditSetting(this), GenericDBStorage(
-            this, "gamemetadata", "gamename", "romname", romname)
-    {
-        setLabel(QObject::tr("Game Name"));
-        setHelpText(QObject::tr("Friendly name of this Game."));
-    }
-};
-
-class Genre : public LineEditSetting, public GenericDBStorage
-{
-  public:
-    Genre(const QString &romname) :
-        LineEditSetting(this), GenericDBStorage(
-            this, "gamemetadata", "genre", "romname", romname)
-    {
-        setLabel(QObject::tr("Genre"));
-        setHelpText(QObject::tr("Genre/Category this game falls under."));
-    }
-};
-
-class Year : public LineEditSetting, public GenericDBStorage
-{
-  public:
-    Year(const QString &romname) :
-        LineEditSetting(this), GenericDBStorage(
-            this, "gamemetadata", "year", "romname", romname)
-    {
-        setLabel(QObject::tr("Year"));
-        setHelpText(QObject::tr("The Year the game was released."));
-    }
-};
-
-class Country : public LineEditSetting, public GenericDBStorage
-{
-  public:
-    Country(const QString &romname) :
-        LineEditSetting(this), GenericDBStorage(
-            this, "gamemetadata", "country", "romname", romname)
-    {
-        setLabel(QObject::tr("Country"));
-        setHelpText(QObject::tr("The Country this game was "
-                                "originally distributed in."));
-    }
-};
-
-class Publisher : public LineEditSetting, public GenericDBStorage
-{
-  public:
-    Publisher(const QString &romname) :
-        LineEditSetting(this), GenericDBStorage(
-            this, "gamemetadata", "publisher", "romname", romname)
-    {
-        setLabel(QObject::tr("Publisher"));
-        setHelpText(QObject::tr("The Company that made and "
-                                "published this game."));
-    }
-};
-
-
-class Favourite : public CheckBoxSetting, public GenericDBStorage
-{
-  public:
-    Favourite(const QString &romname) :
-        CheckBoxSetting(this), GenericDBStorage(
-            this, "gamemetadata", "favorite", "romname", romname)
-    {
-        setLabel(QObject::tr("Favorite"));
-        setHelpText(QObject::tr("ROM status as a Favorite"));
-    }
-};
-
-GameEditDialog::GameEditDialog(const QString &romname)
-{
-    QString title = QObject::tr("Editing Metadata - ") + romname;
-
-    VerticalConfigurationGroup *group =
-        new VerticalConfigurationGroup(false);
-
-    group->setLabel(title);
-    group->addChild(new Gamename(romname));
-    group->addChild(new Genre(romname));
-    group->addChild(new Year(romname));
-    group->addChild(new Country(romname));
-    group->addChild(new Publisher(romname));
-    group->addChild(new Favourite(romname));
-    addChild(group);
+    m_workingRomInfo = new RomInfo(*romInfo);
 }
 
+EditRomInfoDialog::~EditRomInfoDialog()
+{
+    delete m_workingRomInfo;
+}
 
+bool EditRomInfoDialog::Create()
+{
+    if (!LoadWindowFromXML("game-ui.xml", "edit_metadata", this))
+        return false;
+
+    bool err = false;
+    UIUtilE::Assign(this, m_gamenameEdit, "gamename_edit", &err);
+    UIUtilE::Assign(this, m_genreEdit, "genre_edit", &err);
+    UIUtilE::Assign(this, m_yearEdit, "year_edit", &err);
+    UIUtilE::Assign(this, m_countryEdit, "country_edit", &err);
+    UIUtilE::Assign(this, m_publisherEdit, "publisher_edit", &err);
+
+    UIUtilE::Assign(this, m_favoriteCheck, "favorite_check", &err);
+
+    UIUtilE::Assign(this, m_fanartButton, "fanart_button", &err);
+    UIUtilE::Assign(this, m_fanartText, "fanart_text", &err);
+    UIUtilE::Assign(this, m_boxartButton, "boxart_button", &err);
+    UIUtilE::Assign(this, m_boxartText, "boxart_text", &err);
+
+    UIUtilE::Assign(this, m_doneButton, "done_button", &err);
+
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
+        return false;
+    }
+
+    fillWidgets();
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    connect(m_gamenameEdit, SIGNAL(valueChanged()), SLOT(SetGamename()));
+    connect(m_genreEdit, SIGNAL(valueChanged()), SLOT(SetGenre()));
+    connect(m_yearEdit, SIGNAL(valueChanged()), SLOT(SetYear()));
+    connect(m_countryEdit, SIGNAL(valueChanged()), SLOT(SetCountry()));
+    connect(m_publisherEdit, SIGNAL(valueChanged()), SLOT(SetPublisher()));
+
+    connect(m_favoriteCheck, SIGNAL(valueChanged()), SLOT(ToggleFavorite()));
+
+    connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
+    connect(m_boxartButton, SIGNAL(Clicked()), SLOT(FindBoxart()));
+
+    connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
+ 
+    return true;
+}
+
+namespace
+{
+    QStringList GetSupportedImageExtensionFilter()
+    {
+        QStringList ret;
+
+        QList<QByteArray> exts = QImageReader::supportedImageFormats();
+        for (QList<QByteArray>::iterator p = exts.begin(); p != exts.end(); ++p)
+        {
+            ret.append(QString("*.").append(*p));
+        }
+
+        return ret;
+    }
+
+    void FindImagePopup(const QString &prefix, const QString &prefixAlt,
+            QObject &inst, const QString &returnEvent)
+    {
+        QString fp = prefix.isEmpty() ? prefixAlt : prefix;
+
+        MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+
+        MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, fp);
+        fb->SetNameFilter(GetSupportedImageExtensionFilter());
+        if (fb->Create())
+        {
+            fb->SetReturnEvent(&inst, returnEvent);
+            popupStack->AddScreen(fb);
+        }
+        else
+            delete fb;
+    }
+
+    const QString CEID_FANARTFILE = "fanartfile";
+    const QString CEID_BOXARTFILE = "boxartfile";
+}
+
+void EditRomInfoDialog::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                dynamic_cast<DialogCompletionEvent*>(event);
+
+        if (!dce)
+            return;
+
+        const QString resultid = dce->GetId();
+
+        if (resultid == CEID_FANARTFILE)
+            SetFanart(dce->GetResultText());
+        else if (resultid == CEID_BOXARTFILE)
+            SetBoxart(dce->GetResultText());
+    }
+}
+
+void EditRomInfoDialog::fillWidgets()
+{
+    m_gamenameEdit->SetText(m_workingRomInfo->Gamename());
+    m_genreEdit->SetText(m_workingRomInfo->Genre());
+    m_yearEdit->SetText(m_workingRomInfo->Year());
+    m_countryEdit->SetText(m_workingRomInfo->Country());
+    m_publisherEdit->SetText(m_workingRomInfo->Publisher());
+
+    if (m_workingRomInfo->Favorite())
+        m_favoriteCheck->SetCheckState(MythUIStateType::Full);
+ 
+    m_fanartText->SetText(m_workingRomInfo->Fanart());
+    m_boxartText->SetText(m_workingRomInfo->Boxart());
+}
+
+void EditRomInfoDialog::SetReturnEvent(QObject *retobject,
+                                       const QString &resultid)
+{
+    m_retObject = retobject;
+    m_id = resultid;
+}
+
+void EditRomInfoDialog::SaveAndExit()
+{
+    if (m_retObject)
+    {
+        RomInfo *romInfo = new RomInfo(*m_workingRomInfo);
+        DialogCompletionEvent *dce =
+            new DialogCompletionEvent(m_id, 0, "",
+                                      qVariantFromValue(romInfo));
+
+        QApplication::postEvent(m_retObject, dce);
+    }
+    Close();
+}
+
+void EditRomInfoDialog::SetGamename()
+{
+    m_workingRomInfo->setGamename(m_gamenameEdit->GetText());
+}
+
+void EditRomInfoDialog::SetGenre()
+{
+    m_workingRomInfo->setGenre(m_genreEdit->GetText());
+}
+
+void EditRomInfoDialog::SetYear()
+{
+    m_workingRomInfo->setYear(m_yearEdit->GetText());
+}
+
+void EditRomInfoDialog::SetCountry()
+{
+    m_workingRomInfo->setCountry(m_countryEdit->GetText());
+}
+
+void EditRomInfoDialog::SetPublisher()
+{
+    m_workingRomInfo->setPublisher(m_publisherEdit->GetText());
+}
+
+void EditRomInfoDialog::ToggleFavorite()
+{
+    m_workingRomInfo->setFavorite();
+}
+
+void EditRomInfoDialog::FindFanart()
+{
+    FindImagePopup(gContext->GetSetting("mythgame.fanartDir"),
+            GetConfDir() + "/MythGame/Fanart",
+            *this, CEID_FANARTFILE);
+}
+
+void EditRomInfoDialog::FindBoxart()
+{
+    FindImagePopup(gContext->GetSetting("mythgame.boxartDir"),
+            GetConfDir() + "/MythGame/Boxart",
+            *this, CEID_BOXARTFILE);
+}
+
+void EditRomInfoDialog::SetFanart(QString file)
+{
+    if (file.isEmpty())
+        return;
+
+    m_workingRomInfo->setFanart(file);
+    m_fanartText->SetText(file);
+}
+
+void EditRomInfoDialog::SetBoxart(QString file)
+{
+    if (file.isEmpty())
+        return;
+
+    m_workingRomInfo->setBoxart(file);
+    m_boxartText->SetText(file);
+}

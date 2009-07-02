@@ -6,10 +6,10 @@ using namespace std;
 #include <QDir>
 #include <QApplication>
 
+#include "gameui.h"
 #include "gamehandler.h"
 #include "rominfo.h"
 #include "gamesettings.h"
-#include "gametree.h"
 #include "dbcheck.h"
 
 #include <mythtv/mythcontext.h>
@@ -60,33 +60,33 @@ int runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
-    MythThemedMenu *diag = new MythThemedMenu(
+    MythThemedMenu *menu = new MythThemedMenu(
         themedir, which_menu, GetMythMainWindow()->GetMainStack(), "game menu");
 
     GameData data;
 
-    diag->setCallback(GameCallback, &data);
-    diag->setKillable();
+    menu->setCallback(GameCallback, &data);
+    menu->setKillable();
 
-    if (diag->foundTheme())
+    if (menu->foundTheme())
     {
-        if (class LCD * lcd = LCD::Get())
-        {
+        if (LCD * lcd = LCD::Get())
             lcd->switchToTime();
-        }
-        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
+
+        GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return 0;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
                               .arg(which_menu).arg(themedir));
-        delete diag;
+        delete menu;
         return -1;
     }
 }
 
 void runGames(void);
+int  RunGames(void);
 
 void setupKeys(void)
 {
@@ -105,8 +105,11 @@ int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythgame", libversion,
                                     MYTH_BINARY_VERSION))
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("libmythgame.so/main.o: binary version mismatch"));
         return -1;
-
+    }
 
     gContext->ActivateSettingsCache(false);
     if (!UpgradeGameDatabaseSchema())
@@ -126,18 +129,31 @@ int mythplugin_init(const char *libversion)
     return 0;
 }
 
-void runGames(void)
+void runGames()
 {
-    gContext->addCurrentLocation("mythgame");
-    GameTree gametree(gContext->GetMainWindow(), "gametree", "game-");
-    gametree.exec();
-    gContext->removeCurrentLocation();
+    RunGames();
+}
+
+int RunGames(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    GameUI *game = new GameUI(mainStack);
+
+    if (game->Create())
+    {
+        mainStack->AddScreen(game);
+        return 0;
+    }
+    else
+    {
+        delete game;
+        return -1;
+    } 
 }
 
 int mythplugin_run(void)
 {
-    runGames();
-    return 0;
+    return RunGames();
 }
 
 int mythplugin_config(void)
