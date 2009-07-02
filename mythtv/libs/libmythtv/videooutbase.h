@@ -139,6 +139,7 @@ class VideoOutput
 
     virtual bool IsPIPSupported(void) const { return false; }
     virtual bool IsPBPSupported(void) const { return false; }
+    virtual bool NeedExtraAudioDecode(void) const { return false; }
 
     /// \brief Returns true if Motion Compensation acceleration is available.
     virtual bool hasMCAcceleration(void) const { return false; }
@@ -149,8 +150,6 @@ class VideoOutput
     virtual bool hasVLDAcceleration(void) const { return false; }
     /// \brief Return true if HW Acceleration is running
     virtual bool hasHWAcceleration(void) const { return false; }
-    /// \brief Return true if VDPAU Acceleration is running
-    virtual bool hasVDPAUAcceleration(void) const { return false; }
 
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };

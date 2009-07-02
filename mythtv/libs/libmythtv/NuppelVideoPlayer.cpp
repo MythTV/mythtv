@@ -755,18 +755,7 @@ bool NuppelVideoPlayer::InitVideo(void)
 
         // We need to tell it this for automatic deinterlacer settings
         videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
-
-        if ((videoOutput->hasMCAcceleration() ||
-             videoOutput->hasVDPAUAcceleration()) &&
-            !decode_extra_audio)
-        {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    "Forcing decode extra audio option on. "
-                    "\n\t\t\tXvMC/VDPAU playback requires it.");
-            decode_extra_audio = true;
-            if (GetDecoder())
-                GetDecoder()->SetLowBuffers(decode_extra_audio);
-        }
+        CheckExtraAudioDecode();
     }
 
     if (embedid > 0 && pipState == kPIPOff)
@@ -779,6 +768,24 @@ bool NuppelVideoPlayer::InitVideo(void)
     InitFilters();
 
     return true;
+}
+
+void NuppelVideoPlayer::CheckExtraAudioDecode(void)
+{
+    if (using_null_videoout)
+        return;
+
+    bool force = false;
+    if (videoOutput && videoOutput->NeedExtraAudioDecode())
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "Forcing decode extra audio option on"
+                " (Video method requires it).");
+        force = true;
+    }
+
+    if (GetDecoder())
+        GetDecoder()->SetLowBuffers(decode_extra_audio || force);
 }
 
 void NuppelVideoPlayer::ReinitOSD(void)
@@ -839,6 +846,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
     {
         // We need to tell it this for automatic deinterlacer settings
         videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
+        CheckExtraAudioDecode();
         ReinitOSD();
     }
 
@@ -1256,7 +1264,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     GetDecoder()->setLiveTVMode(livetv);
     GetDecoder()->setWatchingRecording(watchingrecording);
     GetDecoder()->setTranscoding(transcoding);
-    GetDecoder()->SetLowBuffers(decode_extra_audio && !using_null_videoout);
+    CheckExtraAudioDecode();
 
     eof = false;
 

@@ -520,6 +520,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void  AVSync(void);
     void  ShutdownAVSync(void);
     void  FallbackDeint(void);
+    void  CheckExtraAudioDecode(void);
 
     // Private closed caption and teletext stuff
     int   tbuffer_numvalid(void); // number of valid slots in the text buffer
