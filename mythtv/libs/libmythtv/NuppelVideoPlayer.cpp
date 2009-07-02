@@ -3591,7 +3591,10 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
     {
         QMutexLocker locker(&commBreakMapLock);
         if (player_ctx->playingInfo)
+        {
+            player_ctx->playingInfo->setIgnoreBookmark(false);
             player_ctx->playingInfo->GetCommBreakList(commBreakMap);
+        }
         if (!commBreakMap.isEmpty())
         {
             hascommbreaktable = true;
