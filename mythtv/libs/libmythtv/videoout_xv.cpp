@@ -277,6 +277,9 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
         ok = CreateBuffers(VideoOutputSubType());
     }
 
+    InitColorKey(true);
+    InitOSD();
+
     MoveResize();
 
     if (!ok)
@@ -1054,66 +1057,34 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 #endif // defined(USING_XVMC)
 }
 
-bool VideoOutputXv::InitOSD(const QString &osd_renderer)
+bool VideoOutputXv::InitOSD(void)
 {
-    if (osd_renderer == "chromakey")
-    {
-        // TODO Make sure that we are using chroma-keying
-        //      before allowing chromakey OSD rendering.
+    QString osdrenderer = db_vdisp_profile->GetOSDRenderer();
 
-        // create chroma key osd structure if needed
-        if ((32 == disp->GetDepth()) || (24 == disp->GetDepth()))
+    if (osdrenderer == "chromakey")
+    {
+        if ((xv_colorkey == (int)XJ_letterbox_colour) ||
+            (video_output_subtype < XVideo))
         {
-            chroma_osd = new ChromaKeyOSD(this);
-            xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
+            VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Disabling ChromaKeyOSD as"
+                    " colorkeying will not work."));
         }
-        else
+        else if (!((32 == disp->GetDepth()) || (24 == disp->GetDepth())))
         {
             VERBOSE(VB_IMPORTANT, LOC + QString(
                         "Number of bits per pixel is %1, \n\t\t\t"
                         "but we only support ARGB 32 bbp for ChromaKeyOSD.")
                     .arg(disp->GetDepth()));
         }
+        else
+        {
+            chroma_osd = new ChromaKeyOSD(this);
+            xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
+        }
         return chroma_osd;
     }
 
     // Other OSD's don't require initialization here...
-    return true;
-}
-
-bool VideoOutputXv::CheckOSDInit(void)
-{
-    // Deal with the nVidia 6xxx & 7xxx cards which do
-    // not support chromakeying with the latest drivers
-    if (((xv_colorkey != (int)XJ_letterbox_colour) && chroma_osd) || !chroma_osd)
-        return true;
-
-    VERBOSE(VB_IMPORTANT, LOC + "Ack! Disabling ChromaKey OSD"
-            "\n\t\t\tWe can't use ChromaKey OSD "
-            "if chromakeying is not supported!");
-
-    // Get rid of the chromakey osd..
-    delete chroma_osd;
-    chroma_osd = NULL;
-
-    if (VideoOutputSubType() >= XVideoMC)
-    {
-        // Delete the buffers we allocated before
-        DeleteBuffers(VideoOutputSubType(), true);
-        if (xv_port >= 0)
-        {
-            VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
-            disp->Lock();
-            XvUngrabPort(disp->GetDisplay(), xv_port, CurrentTime);
-            del_open_xv_port(xv_port);
-            disp->Unlock();
-            xv_port = -1;
-        }
-
-        xvmc_buf_attr->SetOSDNum(1);
-        return false;
-    }
-
     return true;
 }
 
@@ -1194,21 +1165,6 @@ bool VideoOutputXv::InitSetupBuffers(void)
     }
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
 
-    QString osdrenderer = db_vdisp_profile->GetOSDRenderer();
-    // Initialize the OSD, if we need to
-    InitOSD(osdrenderer);
-
-    // Initialize chromakeying, if we need to
-    if (video_output_subtype >= XVideo)
-        InitColorKey(true);
-
-    // Check if we can actually use the OSD we want to use...
-    if (!CheckOSDInit())
-    {
-        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm);
-        XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
-    }
-
     // Initialize the picture controls if we need to..
     if (db_use_picture_controls)
         InitPictureAttributes();
@@ -1279,6 +1235,9 @@ bool VideoOutputXv::Init(
     if (!InitSetupBuffers())
         return false;
 
+    InitColorKey(true);
+    InitOSD();
+
     MoveResize();
 
     return true;
@@ -1293,6 +1252,9 @@ bool VideoOutputXv::Init(
  */
 void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 {
+    if (video_output_subtype < XVideo)
+        return;
+
     static const char *attr_autopaint = "XV_AUTOPAINT_COLORKEY";
     int xv_val=0;
 

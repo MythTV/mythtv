@@ -160,8 +160,7 @@ class VideoOutputXv : public VideoOutput
     bool InitXVideo(void);
     bool InitXShm(void);
     bool InitXlib(void);
-    bool InitOSD(const QString&);
-    bool CheckOSDInit(void);
+    bool InitOSD(void);
 
     bool CreateXvMCBuffers(void);
     bool CreateBuffers(VOSType subtype);
