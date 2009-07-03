@@ -12,6 +12,7 @@
 #include "mythverbose.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "mythxdisplay.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"
