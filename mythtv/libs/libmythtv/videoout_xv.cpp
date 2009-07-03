@@ -1085,7 +1085,7 @@ bool VideoOutputXv::CheckOSDInit(void)
 {
     // Deal with the nVidia 6xxx & 7xxx cards which do
     // not support chromakeying with the latest drivers
-    if (xv_colorkey || !chroma_osd)
+    if (((xv_colorkey != (int)XJ_letterbox_colour) && chroma_osd) || !chroma_osd)
         return true;
 
     VERBOSE(VB_IMPORTANT, LOC + "Ack! Disabling ChromaKey OSD"
@@ -1331,7 +1331,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     // the same color as the MythTV letterboxing (currently Black).
     // This avoids avoid bob-deint actually bobbing the borders of
     // the video up and down..
-    int letterbox_color = 0;
+    int letterbox_color = XJ_letterbox_colour; 
     static const char *attr_chroma = "XV_COLORKEY";
     if (!xv_is_attrib_supported(disp, xv_port, attr_chroma, &xv_colorkey))
     {
