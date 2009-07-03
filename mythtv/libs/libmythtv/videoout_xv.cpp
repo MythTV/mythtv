@@ -1106,7 +1106,7 @@ bool VideoOutputXv::CheckOSDInit(void)
             disp->Lock();
             XvUngrabPort(disp->GetDisplay(), xv_port, CurrentTime);
             del_open_xv_port(xv_port);
-            disp->Lock();
+            disp->Unlock();
             xv_port = -1;
         }
 
