@@ -1195,7 +1195,6 @@ bool VideoOutputXv::InitSetupBuffers(void)
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
 
     QString osdrenderer = db_vdisp_profile->GetOSDRenderer();
-
     // Initialize the OSD, if we need to
     InitOSD(osdrenderer);
 
@@ -1794,6 +1793,13 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 {
     (void) subtype;
     DiscardFrames(true);
+
+    if (chroma_osd)
+    {
+        delete chroma_osd;
+        chroma_osd = NULL;
+        xvmc_buf_attr->SetOSDNum(1);
+    }
 
     Display *d = disp->GetDisplay();
 #ifdef USING_XVMC
