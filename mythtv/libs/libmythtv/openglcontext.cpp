@@ -1412,7 +1412,8 @@ bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
     xt = glXQueryExtensionsString(d, disp->GetScreen());
     const QString glx_ext = xt;
     m_ext_supported = ((minor >= 3) ? kGLXPBuffer : 0) |
-        (has_glx_swapinterval_support(glx_ext) ? kGLGLXSwap : 0);
+        (has_glx_swapinterval_support(glx_ext) ? kGLGLXSwap : 0) |
+        (has_glx_video_sync_support(glx_ext) ?  kGLGLXVSync : 0);
 
     if (map_window)
         Show();

@@ -46,18 +46,19 @@ class PrivateContext;
 
 typedef enum
 {
-    kGLExtRect     = 0x001,
-    kGLExtFragProg = 0x002,
-    kGLExtFBufObj  = 0x004,
-    kGLXPBuffer    = 0x008,
-    kGLExtPBufObj  = 0x010,
-    kGLNVFence     = 0x020,
-    kGLAppleFence  = 0x040,
-    kGLFinish      = 0x080,
-    kGLGLXSwap     = 0x100,
-    kGLWGLSwap     = 0x200,
-    kGLAGLSwap     = 0x400,
-    kGLMaxFeat     = 0x800,
+    kGLExtRect     = 0x0001,
+    kGLExtFragProg = 0x0002,
+    kGLExtFBufObj  = 0x0004,
+    kGLXPBuffer    = 0x0008,
+    kGLExtPBufObj  = 0x0010,
+    kGLNVFence     = 0x0020,
+    kGLAppleFence  = 0x0040,
+    kGLFinish      = 0x0080,
+    kGLGLXSwap     = 0x0100,
+    kGLGLXVSync    = 0x0200,
+    kGLWGLSwap     = 0x0400,
+    kGLAGLSwap     = 0x0800,
+    kGLMaxFeat     = 0x1000,
 } GLFeatures;
 
 class OpenGLContext;

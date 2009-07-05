@@ -407,7 +407,13 @@ bool OpenGLVideoSync::TryInit(void)
     QMutexLocker locker(&m_context_lock);
     m_context = OpenGLContext::Create(&m_context_lock);
     if (m_context && m_context->Create(0, window_rect, false))
-        return true;
+    {
+        if (m_context->GetFeatures() & kGLGLXVSync)
+            return true;
+
+        VERBOSE(VB_IMPORTANT, "OpenGLVideoSync: GLX_SGI_video_sync extension "
+                              "not supported by driver.");
+    }
 
     VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: "
             "Failed to Initialize OpenGL V-Sync");
