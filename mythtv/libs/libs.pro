@@ -15,12 +15,13 @@ using_hdhomerun:SUBDIRS += libmythhdhomerun
 contains( CONFIG_SWSCALE, yes ) { SUBDIRS += libswscale }
 
 # Libraries with dependencies
-SUBDIRS += libmythui libmyth libmythupnp libmythtv libavcodec libavformat
+SUBDIRS += libmythui libmyth libmythupnp libmythtv libavcodec libavformat libswscale
 libmythui.depends = libmythdb
 libmythupnp.depends = libmythdb
 libmyth.depends = libavcodec libmythdb libmythui libmythupnp
 libavcodec.depends = libavutil
 libavformat.depends = libavcodec libavutil
+libswscale.depends = libavutil
 
 LIBMYTHTVDEPS = $$SUBDIRS
 LIBMYTHTVDEPS -= libmythtv

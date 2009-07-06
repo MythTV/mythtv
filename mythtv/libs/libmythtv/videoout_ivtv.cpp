@@ -727,12 +727,8 @@ void VideoOutputIvtv::ShowPIP(VideoFrame        *frame,
             avpicture_fill(&img_in, (uint8_t*) pipimage->buf, PIX_FMT_YUV420P,
                            pipw, piph);
 
-#if ENABLE_SWSCALE
             sws_scale(pip_scaling_context, img_in.data, img_in.linesize, 0,
                       piph, img_out.data, img_out.linesize);
-#else
-            img_resample(pip_scaling_context, &img_out, &img_in);
-#endif
 
             pipw = pip_display_size.width();
             piph = pip_display_size.height();

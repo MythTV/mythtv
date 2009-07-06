@@ -6,7 +6,7 @@
 #ifdef USING_XRANDR
 #include "DisplayResX.h"
 #endif
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #include "DisplayResOSX.h"
 #endif
 
@@ -22,7 +22,7 @@ DisplayRes * DisplayRes::GetDisplayRes(bool lock)
     {
 #ifdef USING_XRANDR
         instance = new DisplayResX();
-#elif defined(CONFIG_DARWIN)
+#elif CONFIG_DARWIN
         instance = new DisplayResOSX();
 #endif
     }

@@ -12,7 +12,7 @@ using namespace std;
 extern "C" {
 #include "mythconfig.h"
 #include "dsputil.h"
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 }
 
 #endif
@@ -62,7 +62,7 @@ OSDSurface::OSDSurface(int w, int h)
     blendcolorfunc = &blendcolor;
     blendconstfunc = &blendconst;
 #if defined(MMX)
-    usemmx = (mm_support() & MM_MMX);
+    usemmx = (mm_support() & FF_MM_MMX);
     if (usemmx)
     {
         rec_lut[0] = 0;

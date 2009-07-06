@@ -5,7 +5,7 @@
 
 #ifdef MMX
 extern "C" {
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 }
 #endif
 

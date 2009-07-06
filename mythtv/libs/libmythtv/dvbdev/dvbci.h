@@ -27,7 +27,7 @@
 #ifndef __CI_H
 #define __CI_H
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif 
 

@@ -1,7 +1,7 @@
 /*
  * Flash Compatible Streaming Format common header.
- * Copyright (c) 2000 Fabrice Bellard.
- * Copyright (c) 2003 Tinic Uro.
+ * Copyright (c) 2000 Fabrice Bellard
+ * Copyright (c) 2003 Tinic Uro
  *
  * This file is part of FFmpeg.
  *
@@ -65,17 +65,16 @@
 #include <assert.h>
 
 typedef struct {
-    int audio_stream_index;
-    offset_t duration_pos;
-    offset_t tag_pos;
-    offset_t vframes_pos;
+    int64_t duration_pos;
+    int64_t tag_pos;
+    int64_t vframes_pos;
     int samples_per_frame;
     int sound_samples;
     int swf_frame_number;
     int video_frame_number;
     int frame_rate;
     int tag;
-    AVFifoBuffer audio_fifo;
+    AVFifoBuffer *audio_fifo;
     AVCodecContext *audio_enc, *video_enc;
 } SWFContext;
 

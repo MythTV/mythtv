@@ -51,59 +51,9 @@ extern const int16_t ff_acelp_interp_filter[61];
  * See ff_acelp_interp_filter for an example.
  *
  */
-void ff_acelp_interpolate(
-        int16_t* out,
-        const int16_t* in,
-        const int16_t* filter_coeffs,
-        int precision,
-        int frac_pos,
-        int filter_length,
-        int length);
-
-/**
- * Circularly convolve fixed vector with a phase dispersion impulse
- *        response filter (D.6.2 of G.729 and 6.1.5 of AMR).
- * @param fc_out vector with filter applied
- * @param fc_in source vector
- * @param filter phase filter coefficients
- *
- *  fc_out[n] = sum(i,0,len-1){ fc_in[i] * filter[(len + n - i)%len] }
- *
- * \note fc_in and fc_out should not overlap!
- */
-void ff_acelp_convolve_circ(
-        int16_t* fc_out,
-        const int16_t* fc_in,
-        const int16_t* filter,
-        int len);
-
-/**
- * LP synthesis filter.
- * @param out [out] pointer to output buffer
- * @param filter_coeffs filter coefficients (-0x8000 <= (3.12) < 0x8000)
- * @param in input signal
- * @param buffer_length amount of data to process
- * @param filter_length filter length (10 for 10th order LP filter)
- * @param stop_on_overflow   1 - return immediately if overflow occurs
- *                           0 - ignore overflows
- * @param rounder the amount to add for rounding (usually 0x800 or 0xfff)
- *
- * @return 1 if overflow occurred, 0 - otherwise
- *
- * @note Output buffer must contain 10 samples of past
- *       speech data before pointer.
- *
- * Routine applies 1/A(z) filter to given speech data.
- */
-int ff_acelp_lp_synthesis_filter(
-        int16_t *out,
-        const int16_t* filter_coeffs,
-        const int16_t* in,
-        int buffer_length,
-        int filter_length,
-        int stop_on_overflow,
-        int rounder);
-
+void ff_acelp_interpolate(int16_t* out, const int16_t* in,
+                          const int16_t* filter_coeffs, int precision,
+                          int frac_pos, int filter_length, int length);
 
 /**
  * high-pass filtering and upscaling (4.2.5 of G.729).
@@ -128,10 +78,7 @@ int ff_acelp_lp_synthesis_filter(
  *         fixed-point all coefficients are the same as in G.729. Thus this
  *         routine can be used for the fixed-point AMR decoder, too.
  */
-void ff_acelp_high_pass_filter(
-        int16_t* out,
-        int hpf_f[2],
-        const int16_t* in,
-        int length);
+void ff_acelp_high_pass_filter(int16_t* out, int hpf_f[2],
+                               const int16_t* in, int length);
 
 #endif /* AVCODEC_ACELP_FILTERS_H */

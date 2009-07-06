@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
@@ -25,7 +25,7 @@
 #include "dsputil.h"
 
 #ifdef MMX
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 #endif
 
 //Regular filter
@@ -233,22 +233,22 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
       capable processor before using them. -- dtk
     */
 
-    asm volatile("emms\n\t");
+    __asm__ volatile("emms\n\t");
 
-    asm volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
+    __asm__ volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
 
     for (i = 0; i < 3; i++)
     {
         int sz = (height[i] * frame->pitches[i]) >> 3;
 
         if (0 == i)
-            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
         else
-            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
 
         for (y = 0; y < sz; y++)
         {
-            asm volatile(
+            __asm__ volatile(
             "movq (%0), %%mm0     \n\t" // avg[i]
             "movq (%1), %%mm1     \n\t" // buf[i]
             "movq %%mm0, %%mm2    \n\t"
@@ -278,7 +278,7 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame, int field)
         }
     }
 
-    asm volatile("emms\n\t");
+    __asm__ volatile("emms\n\t");
 
     // filter the leftovers from the mmx rutine
     for (i = 0; i < 3; i++)
@@ -328,25 +328,25 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
 
     init_vars(tf, frame, thr1, thr2, height, (uint8_t**) avg, (uint8_t**) buf);
 
-    asm volatile("emms\n\t");
+    __asm__ volatile("emms\n\t");
 
-    asm volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
+    __asm__ volatile("movq (%0), %%mm4" : : "r" (&sign_convert));
 
     for (i = 0; i < 3; i++)
     {
         int sz = (height[i] * frame->pitches[i]) >> 3;
 
         if (0 == i)
-            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Luma_threshold_mask1));
         else
-            asm volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
+            __asm__ volatile("movq (%0), %%mm5" : : "r" (&tf->Chroma_threshold_mask1));
 
         for (y = 0; y < sz; y++)
         {
             uint64_t *mask2 = (0 == i) ?
                 &tf->Luma_threshold_mask2 : &tf->Chroma_threshold_mask2;
 
-            asm volatile(
+            __asm__ volatile(
                 "movq (%0), %%mm0     \n\t" // avg[i]
                 "movq (%1), %%mm1     \n\t" // buf[i]
                 "movq %%mm0, %%mm2    \n\t"
@@ -401,7 +401,7 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame, int field)
         }
     }
 
-    asm volatile("emms\n\t");
+    __asm__ volatile("emms\n\t");
 
     // filter the leftovers from the mmx rutine
     for (i = 0; i < 3; i++)
@@ -519,7 +519,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->vf.filter  = (double_threshold) ? &quickdnr2 : &quickdnr;
 
 #ifdef MMX
-    if (mm_support() > MM_MMXEXT)
+    if (mm_support() > FF_MM_MMXEXT)
     {
         filter->vf.filter = (double_threshold) ? &quickdnr2MMX : &quickdnrMMX;
         for (i = 0; i < 8; i++)

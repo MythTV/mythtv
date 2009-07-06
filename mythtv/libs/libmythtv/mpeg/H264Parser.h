@@ -26,9 +26,12 @@
 #include <stdint.h>
 #include "compat.h" // for uint on Darwin, MinGW
 
+#ifndef INT_BIT
+#define INT_BIT (CHAR_BIT * sizeof(int))
+#endif
+
 extern "C" {
-#include <limits.h> // golomb.h should include this...
-#include "golomb.h"
+#include "libavcodec/get_bits.h"
 }
 
 class H264Parser {

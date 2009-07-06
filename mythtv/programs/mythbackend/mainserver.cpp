@@ -10,11 +10,7 @@ using namespace std;
 #include <unistd.h>
 #include <fcntl.h>
 #include "../../config.h"
-#ifdef HAVE_SYS_SOUNDCARD_H
-    #include <sys/soundcard.h>
-#elif HAVE_SOUNDCARD_H
-    #include <soundcard.h>
-#endif
+
 #ifndef USING_MINGW
 #include <sys/ioctl.h>
 #endif

@@ -20,7 +20,7 @@
  */
 
 /**
- * @file rv30data.h
+ * @file libavcodec/rv30data.h
  * miscellaneous RV30 tables
  */
 
@@ -170,5 +170,12 @@ static const uint8_t rv30_itype_from_context[900] = {
     2, 1, 6, 0, 8, 4, 5, 7, 3,
     2, 7, 8, 4, 0, 6, 1, 5, 3,
     2, 8, 3, 0, 7, 4, 1, 6, 5,
+};
+
+/**
+ * Loop filter limits are taken from this table.
+ */
+static const uint8_t rv30_loop_filt_lim[32] = {
+     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5
 };
 #endif /* AVCODEC_RV30DATA_H */

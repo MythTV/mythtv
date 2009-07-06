@@ -24,7 +24,7 @@
  */
 
 /**
- * @file cyuv.c
+ * @file libavcodec/cyuv.c
  * Creative YUV (CYUV) Video Decoder.
  */
 
@@ -60,8 +60,10 @@ static av_cold int cyuv_decode_init(AVCodecContext *avctx)
 
 static int cyuv_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             const uint8_t *buf, int buf_size)
+                             AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     CyuvDecodeContext *s=avctx->priv_data;
 
     unsigned char *y_plane;
@@ -163,13 +165,6 @@ static int cyuv_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static av_cold int cyuv_decode_end(AVCodecContext *avctx)
-{
-/*    CyuvDecodeContext *s = avctx->priv_data;*/
-
-    return 0;
-}
-
 AVCodec cyuv_decoder = {
     "cyuv",
     CODEC_TYPE_VIDEO,
@@ -177,7 +172,7 @@ AVCodec cyuv_decoder = {
     sizeof(CyuvDecodeContext),
     cyuv_decode_init,
     NULL,
-    cyuv_decode_end,
+    NULL,
     cyuv_decode_frame,
     CODEC_CAP_DR1,
     NULL,

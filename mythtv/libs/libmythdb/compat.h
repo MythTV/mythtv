@@ -242,7 +242,7 @@ inline const char *dlerror(void)
 #endif
 
 #include "mythconfig.h"
-#if defined(CONFIG_DARWIN) && ! defined (_SUSECONDS_T)
+#if CONFIG_DARWIN && ! defined (_SUSECONDS_T)
     typedef int32_t suseconds_t;   // 10.3 or earlier don't have this
 #endif
 

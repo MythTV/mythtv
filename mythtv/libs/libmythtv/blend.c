@@ -2,7 +2,7 @@
 
 #ifdef MMX
 
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 
 static const mmx_t mm_cpool[] =
 {

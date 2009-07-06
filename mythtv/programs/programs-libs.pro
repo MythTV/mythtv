@@ -6,12 +6,14 @@ INCLUDEPATH += ../../libs/libmythdvdnav
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat
+LIBS += -L../../libs/libswscale
 LIBS += -L../../libs/libmythdb
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION
+LIBS += -lmythswscale-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
@@ -19,9 +21,6 @@ LIBS += -lmythdb-$$LIBVERSION
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -L../../libs/libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
-contains( CONFIG_SWSCALE, yes) {
-    LIBS += -L../../libs/libswscale -lmythswscale-$$LIBVERSION
-}
 
 mingw {
     LIBS += -lpthread
@@ -34,13 +33,11 @@ TARGETDEPS += ../../libs/libmythtv/libmythtv-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
+TARGETDEPS += ../../libs/libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmythupnp/libmythupnp-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../../libs/libmythdb/libmythdb-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../../libs/libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../../libs/libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
-contains( CONFIG_SWSCALE, yes) {
-    TARGETDEPS += ../../libs/libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
-}
 
 DEPENDPATH += ../.. ../../libs ../../libs/libmyth ../../libs/libmythtv
 DEPENDPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec

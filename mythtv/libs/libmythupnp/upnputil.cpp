@@ -40,7 +40,7 @@
 #include <net/if.h>
 #include <sys/ioctl.h>
 #endif // USING_MINGW
-#ifdef HAVE_GETIFADDRS
+#if HAVE_GETIFADDRS
 #include <ifaddrs.h>
 #endif
 
@@ -83,7 +83,7 @@ QString LookupUDN( QString sDeviceType )
 
 /////////////////////////////////////////////////////////////////////////////
 
-#ifdef HAVE_GETIFADDRS
+#if HAVE_GETIFADDRS
 
 long GetIPAddressList(QStringList &sStrList)
 {

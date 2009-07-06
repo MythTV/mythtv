@@ -23,9 +23,9 @@
 
 #include "mpeg2config.h"
 
-#ifdef ARCH_PPC
+#if ARCH_PPC
 
-#ifdef HAVE_ALTIVEC_H
+#if HAVE_ALTIVEC_H
 #include <altivec.h>
 #endif
 #include <inttypes.h>

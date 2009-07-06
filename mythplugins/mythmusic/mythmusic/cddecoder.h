@@ -5,7 +5,7 @@
 
 #include <mythtv/mythconfig.h>
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #include <vector>
 #endif
 
@@ -54,7 +54,7 @@ class CdDecoder : public Decoder
 
     QString            devicename;
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     void CdDecoder::lookupCDDB(const QString &hexID, uint tracks);
 
     uint32_t           m_diskID;        ///< For CDDB1/FreeDB lookup

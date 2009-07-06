@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #include "config.h"
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
@@ -15,10 +15,10 @@
 #include "filter.h"
 #include "frame.h"
 
-#ifdef MMX
+#ifdef HAVE_MMX
 
 #include "dsputil.h"
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 
 static const mmx_t mm_cpool[] = {
     { w: {1, 1, 1, 1} },
@@ -28,13 +28,13 @@ static const mmx_t mm_cpool[] = {
     { ub: {15, 15, 15, 15, 15, 15, 15, 15} }
 };
     
-#endif /* MMX */
+#endif /* HAVE_MMX */
 
 typedef struct ThisFilter
 {
     VideoFilter vf;
 
-#ifdef MMX
+#ifdef HAVE_MMX
     int yfilt;
     int cfilt;
 
@@ -45,7 +45,7 @@ typedef struct ThisFilter
     mmx_t cscale;
     mmx_t cshift;
     mmx_t cmin;
-#endif /* MMX */
+#endif /* HAVE_MMX */
 
     uint8_t ytable[256];
     uint8_t ctable[256];
@@ -62,7 +62,7 @@ void adjustRegion(uint8_t *buf, uint8_t *end, const uint8_t *table)
     }
 }
 
-#ifdef MMX
+#if HAVE_MMX
 void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
                      const mmx_t *shift, const mmx_t *scale, const mmx_t *min,
                      const mmx_t *clamp1, const mmx_t *clamp2)
@@ -133,7 +133,7 @@ void adjustRegionMMX(uint8_t *buf, uint8_t *end, const uint8_t *table,
         buf++;
     }
 }
-#endif /* MMX */
+#endif /* HAVE_MMX */
 
 int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
 {
@@ -152,7 +152,7 @@ int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
         unsigned char *vbeg = frame->buf + frame->offsets[2];
         unsigned char *vend = ubeg + (frame->pitches[2] * cheight);
 
-#ifdef MMX
+#if HAVE_MMX
         if (filter->yfilt)
             adjustRegionMMX(ybeg, yend, filter->ytable,
                             &(filter->yshift), &(filter->yscale),
@@ -178,11 +178,11 @@ int adjustFilter (VideoFilter *vf, VideoFrame *frame, int field)
         if (filter->yfilt || filter->cfilt)
             emms();
 
-#else /* MMX */
+#else /* HAVE_MMX */
         adjustRegion(ybeg, yend, filter->ytable);
         adjustRegion(ubeg, uend, filter->ctable);
         adjustRegion(vbeg, vend, filter->ctable);
-#endif /* MMX */
+#endif /* HAVE_MMX */
     }
     TF_END(filter, "Adjust: ");
     return 0;
@@ -203,7 +203,7 @@ void fillTable(uint8_t *table, int in_min, int in_max, int out_min,
     }
 }
 
-#ifdef MMX
+#if HAVE_MMX
 int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
                    int in_min, int in_max, int out_min, int out_max,
                    float gamma)
@@ -212,7 +212,7 @@ int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
 
     fillTable(table, in_min, in_max, out_min, out_max, gamma);
     scalec = ((out_max - out_min) << 15)/(in_max - in_min);
-    if ((mm_support() & MM_MMX) == 0 || gamma < 0.9999 || gamma > 1.00001
+    if ((mm_support() & FF_MM_MMX) == 0 || gamma < 0.9999 || gamma > 1.00001
         || scalec > 32767 << 7)
         return 0;
     shiftc = 2;
@@ -232,7 +232,7 @@ int fillTableMMX(uint8_t *table, mmx_t *shift, mmx_t *scale, mmx_t *min,
     shift->q = shiftc;
     return 1;
 }
-#endif /* MMX */
+#endif /* HAVE_MMX */
 
 VideoFilter *
 newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt, 
@@ -282,7 +282,7 @@ newAdjustFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         return (VideoFilter *) filter;
     }
 
-#ifdef MMX
+#if HAVE_MMX
     filter->yfilt = fillTableMMX (filter->ytable, &(filter->yshift),
                                     &(filter->yscale), &(filter->ymin),
                                     ymin, ymax, 16, 235, ygamma);

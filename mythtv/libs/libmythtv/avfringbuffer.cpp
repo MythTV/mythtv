@@ -29,7 +29,7 @@ int AVF_Write(URLContext *h, uint8_t *buf, int buf_size)
     return avfr->GetRingBuffer()->Write(buf, buf_size);
 }
 
-offset_t AVF_Seek(URLContext *h, offset_t offset, int whence)
+int64_t AVF_Seek(URLContext *h, int64_t offset, int whence)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
 
@@ -77,7 +77,7 @@ int AVF_Read_Packet(void *opaque, uint8_t *buf, int buf_size)
     return url_read((URLContext *)opaque, buf, buf_size);
 }
 
-offset_t AVF_Seek_Packet(void *opaque, int64_t offset, int whence)
+int64_t AVF_Seek_Packet(void *opaque, int64_t offset, int whence)
 {
     if (!opaque)
         return 0;

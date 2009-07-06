@@ -21,7 +21,7 @@
  */
 
 /**
- * @file aactab.h
+ * @file libavcodec/aactab.h
  * AAC data declarations
  * @author Oded Shimon  ( ods15 ods15 dyndns org )
  * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
@@ -54,19 +54,27 @@ extern const uint8_t ff_aac_num_swb_1024[];
 extern const uint8_t ff_aac_num_swb_128 [];
 // @}
 
+extern const uint8_t ff_aac_pred_sfb_max [];
+
 extern const uint32_t ff_aac_scalefactor_code[121];
 extern const uint8_t  ff_aac_scalefactor_bits[121];
 
-extern const uint16_t *ff_aac_spectral_codes[11];
-extern const uint8_t  *ff_aac_spectral_bits [11];
+extern const uint16_t * const ff_aac_spectral_codes[11];
+extern const uint8_t  * const ff_aac_spectral_bits [11];
 extern const uint16_t  ff_aac_spectral_sizes[11];
 
 extern const float *ff_aac_codebook_vectors[];
 
-#ifdef CONFIG_HARDCODED_TABLES
-extern const float ff_aac_pow2sf_tab[316];
+extern const uint16_t *ff_swb_offset_1024[13];
+extern const uint16_t *ff_swb_offset_128 [13];
+
+extern const uint8_t ff_tns_max_bands_1024[13];
+extern const uint8_t ff_tns_max_bands_128 [13];
+
+#if CONFIG_HARDCODED_TABLES
+extern const float ff_aac_pow2sf_tab[428];
 #else
-extern       float ff_aac_pow2sf_tab[316];
+extern       float ff_aac_pow2sf_tab[428];
 #endif /* CONFIG_HARDCODED_TABLES */
 
 #endif /* AVCODEC_AACTAB_H */

@@ -13,7 +13,7 @@
 #include "tv_rec.h"
 
 extern "C" {
-#include "mpegvideo.h"
+extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 }
 
 #define LOC QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())

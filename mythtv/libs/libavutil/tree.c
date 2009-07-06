@@ -119,15 +119,20 @@ void *av_tree_insert(AVTreeNode **tp, void *key, int (*cmp)(void *key, const voi
         return ret;
     }else{
         *tp= *next; *next= NULL;
-        (*tp)->elem= key;
-        return NULL;
+        if(*tp){
+            (*tp)->elem= key;
+            return NULL;
+        }else
+            return key;
     }
 }
 
 void av_tree_destroy(AVTreeNode *t){
-    av_tree_destroy(t->child[0]);
-    av_tree_destroy(t->child[1]);
-    av_free(t);
+    if(t){
+        av_tree_destroy(t->child[0]);
+        av_tree_destroy(t->child[1]);
+        av_free(t);
+    }
 }
 
 #if 0
@@ -139,7 +144,9 @@ void av_tree_enumerate(AVTreeNode *t, void *opaque, int (*f)(void *opaque, void 
 #endif
 
 #ifdef TEST
-#undef random
+
+#include "lfg.h"
+
 static int check(AVTreeNode *t){
     if(t){
         int left= check(t->child[0]);
@@ -160,23 +167,27 @@ static void print(AVTreeNode *t, int depth){
     int i;
     for(i=0; i<depth*4; i++) av_log(NULL, AV_LOG_ERROR, " ");
     if(t){
-        av_log(NULL, AV_LOG_ERROR, "Node %p %2d %4d\n", t, t->state, t->elem);
+        av_log(NULL, AV_LOG_ERROR, "Node %p %2d %p\n", t, t->state, t->elem);
         print(t->child[0], depth+1);
         print(t->child[1], depth+1);
     }else
         av_log(NULL, AV_LOG_ERROR, "NULL\n");
 }
 
-int cmp(const void *a, const void *b){
-    return a-b;
+static int cmp(void *a, const void *b){
+    return (uint8_t*)a-(const uint8_t*)b;
 }
 
 int main(void){
-    int i,k;
+    int i;
+    void *k;
     AVTreeNode *root= NULL, *node=NULL;
+    AVLFG prng;
+
+    av_lfg_init(&prng, 1);
 
     for(i=0; i<10000; i++){
-        int j= (random()%86294);
+        int j = av_lfg_get(&prng) % 86294;
         if(check(root) > 999){
             av_log(NULL, AV_LOG_ERROR, "FATAL error %d\n", i);
         print(root, 0);
@@ -187,15 +198,14 @@ int main(void){
             node= av_mallocz(av_tree_node_size);
         av_tree_insert(&root, (void*)(j+1), cmp, &node);
 
-        j= (random()%86294);
-        k= av_tree_find(root, (void*)(j+1), cmp, NULL);
-        if(k){
+        j = av_lfg_get(&prng) % 86294;
+        {
             AVTreeNode *node2=NULL;
             av_log(NULL, AV_LOG_ERROR, "removing %4d\n", j);
             av_tree_insert(&root, (void*)(j+1), cmp, &node2);
             k= av_tree_find(root, (void*)(j+1), cmp, NULL);
             if(k)
-                av_log(NULL, AV_LOG_ERROR, "removial failure %d\n", i);
+                av_log(NULL, AV_LOG_ERROR, "removal failure %d\n", i);
         }
     }
     return 0;

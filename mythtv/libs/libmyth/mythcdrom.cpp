@@ -7,7 +7,7 @@
 #include "mythcdrom-linux.h"
 #elif defined(__FreeBSD__)
 #include "mythcdrom-freebsd.h"
-#elif defined(CONFIG_DARWIN)
+#elif CONFIG_DARWIN
 #include "mythcdrom-darwin.h"
 #endif
 #include "mythverbose.h"
@@ -35,7 +35,7 @@ MythCDROM* MythCDROM::get(QObject* par, const char* devicePath,
     return GetMythCDROMLinux(par, devicePath, SuperMount, AllowEject);
 #elif defined(__FreeBSD__)
     return GetMythCDROMFreeBSD(par, devicePath, SuperMount, AllowEject);
-#elif defined(CONFIG_DARWIN)
+#elif CONFIG_DARWIN
     return GetMythCDROMDarwin(par, devicePath, SuperMount, AllowEject);
 #else
     return NULL;

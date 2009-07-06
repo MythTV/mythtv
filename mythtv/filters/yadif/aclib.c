@@ -15,7 +15,7 @@
 #define CONFUSION_FACTOR 0
 //Feel free to fine-tune the above 2, it might be possible to get some speedup with them :)
 
-#ifdef ARCH_X86_64
+#if ARCH_X86_64
 #  define REG_a "rax"
 #  define REG_b "rbx"
 #  define MOVX  "movq"

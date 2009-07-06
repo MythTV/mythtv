@@ -21,22 +21,12 @@
  */
 
 /**
- * @file eval.h
+ * @file libavcodec/eval.h
  * eval header.
  */
 
 #ifndef AVCODEC_EVAL_H
 #define AVCODEC_EVAL_H
-
-#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
-/**
- * @deprecated Use ff_eval2 instead
- */
-double ff_eval(char *s, double *const_value, const char **const_name,
-               double (**func1)(void *, double), const char **func1_name,
-               double (**func2)(void *, double, double), char **func2_name,
-               void *opaque);
-#endif
 
 /**
  * Parses and evaluates an expression.
@@ -52,9 +42,9 @@ double ff_eval(char *s, double *const_value, const char **const_name,
  * @param opaque a pointer which will be passed to all functions from func1 and func2
  * @return the value of the expression
  */
-double ff_eval2(const char *s, double *const_value, const char **const_name,
+double ff_eval2(const char *s, const double *const_value, const char * const *const_name,
                double (**func1)(void *, double), const char **func1_name,
-               double (**func2)(void *, double, double), char **func2_name,
+               double (**func2)(void *, double, double), const char **func2_name,
                void *opaque, const char **error);
 
 typedef struct ff_expr_s AVEvalExpr;
@@ -71,9 +61,9 @@ typedef struct ff_expr_s AVEvalExpr;
  * @return AVEvalExpr which must be freed with ff_eval_free by the user when it is not needed anymore
  *         NULL if anything went wrong
  */
-AVEvalExpr * ff_parse(const char *s, const char **const_name,
+AVEvalExpr * ff_parse(const char *s, const char * const *const_name,
                double (**func1)(void *, double), const char **func1_name,
-               double (**func2)(void *, double, double), char **func2_name,
+               double (**func2)(void *, double, double), const char **func2_name,
                const char **error);
 /**
  * Evaluates a previously parsed expression.
@@ -81,7 +71,26 @@ AVEvalExpr * ff_parse(const char *s, const char **const_name,
  * @param opaque a pointer which will be passed to all functions from func1 and func2
  * @return the value of the expression
  */
-double ff_parse_eval(AVEvalExpr * e, double *const_value, void *opaque);
+double ff_parse_eval(AVEvalExpr * e, const double *const_value, void *opaque);
 void ff_eval_free(AVEvalExpr * e);
+
+/**
+ * Parses the string in numstr and returns its value as a double. If
+ * the string is empty, contains only whitespaces, or does not contain
+ * an initial substring that has the expected syntax for a
+ * floating-point number, no conversion is performed. In this case,
+ * returns a value of zero and the value returned in tail is the value
+ * of numstr.
+ *
+ * @param numstr a string representing a number, may contain one of
+ * the International System number postfixes, for example 'K', 'M',
+ * 'G'. If 'i' is appended after the postfix, powers of 2 are used
+ * instead of powers of 10. The 'B' postfix multiplies the value for
+ * 8, and can be appended after another postfix or used alone. This
+ * allows using for example 'KB', 'MiB', 'G' and 'B' as postfix.
+ * @param tail if non-NULL puts here the pointer to the char next
+ * after the last parsed character
+ */
+double av_strtod(const char *numstr, char **tail);
 
 #endif /* AVCODEC_EVAL_H */

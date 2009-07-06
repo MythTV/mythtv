@@ -355,8 +355,9 @@ void avfDecoder::run()
             // data_size is the size in bytes of the frame
             // ptr is the input buffer
             // len is the size of the input buffer
-            dec_len = avcodec_decode_audio(m_audioDec, m_samples, &data_size,
-                                           ptr, len);
+            data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+            dec_len = avcodec_decode_audio2(m_audioDec, m_samples, &data_size,
+                                            ptr, len);
             if (dec_len < 0)
             {
                 unlock();

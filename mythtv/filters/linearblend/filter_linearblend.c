@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
 #include "config.h"
 #include "../mm_arch.h"
-#ifdef HAVE_ALTIVEC_H
+#if HAVE_ALTIVEC_H
     #include <altivec.h>
 #endif
 
@@ -29,12 +29,16 @@ typedef struct LBFilter
     TF_STRUCT;
 } LBFilter;
 
+void linearBlendMMX(unsigned char *src, int stride);
+void linearBlend3DNow(unsigned char *src, int stride);
+int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame, int field);
+
 #ifdef MMX
 
 void linearBlendMMX(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
-    asm volatile(
+    __asm__ volatile(
        "lea (%0, %1), %%"REG_a"                        \n\t"
        "lea (%%"REG_a", %1, 4), %%"REG_d"              \n\t"
 
@@ -81,7 +85,7 @@ void linearBlendMMX(unsigned char *src, int stride)
 void linearBlend3DNow(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
-    asm volatile(
+    __asm__ volatile(
        "lea (%0, %1), %%"REG_a"                           \n\t"
        "lea (%%"REG_a", %1, 4), %%"REG_d"                     \n\t"
 
@@ -127,7 +131,7 @@ void linearBlend3DNow(unsigned char *src, int stride)
 
 #endif
 
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
 
 // we fall back to the default routines in some situations
 void linearBlend(unsigned char *src, int stride);
@@ -314,8 +318,8 @@ int linearBlendFilter(VideoFilter *f, VideoFrame *frame, int  field)
         }
     }
 
-#ifdef MMX
-    if ((vf->mm_flags & MM_MMXEXT) || (vf->mm_flags & MM_3DNOW))
+#if HAVE_MMX
+    if ((vf->mm_flags & FF_MM_MMXEXT) || (vf->mm_flags & FF_MM_3DNOW))
         emms();
 #endif
 
@@ -345,16 +349,12 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->vf.filter = &linearBlendFilter;
     filter->subfilter = &linearBlend;    /* Default, non accellerated */
     filter->mm_flags = mm_support();
-#ifdef MMX
-    if (filter->mm_flags & MM_MMXEXT)
+    if (HAVE_MMX && filter->mm_flags & FF_MM_MMXEXT)
         filter->subfilter = &linearBlendMMX;
-    else if (filter->mm_flags & MM_3DNOW)
+    else if (HAVE_AMD3DNOW && filter->mm_flags & FF_MM_3DNOW)
         filter->subfilter = &linearBlend3DNow;
-#endif
-#ifdef HAVE_ALTIVEC
-    if (filter->mm_flags & MM_ALTIVEC)
+    else if (HAVE_ALTIVEC && filter->mm_flags & FF_MM_ALTIVEC)
         filter->vf.filter = &linearBlendFilterAltivec;
-#endif
 
     filter->vf.cleanup = NULL;
     TF_INIT(filter);

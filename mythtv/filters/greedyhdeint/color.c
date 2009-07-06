@@ -23,7 +23,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 #include <math.h>
@@ -32,8 +32,8 @@
 #include "config.h"
 #include "dsputil.h"
 
-#ifdef MMX
-#include "i386/mmx.h"
+#if HAVE_MMX
+#include "x86/mmx.h"
 #endif
 
 void (*yv12_to_yuy2)
@@ -188,7 +188,7 @@ static void yv12_to_yuy2_c
 }
 
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
 
 #define MMXEXT_YUV420_YUYV( )                                                      \
     do {                                                                               \
@@ -233,7 +233,7 @@ static void yv12_to_yuy2_mmxext
  unsigned char *yuy2_map, int yuy2_pitch,
  int width, int height, int progressive ) 
 {
-#ifdef HAVE_MMX
+#if HAVE_MMX
     uint8_t *p_line1, *p_line2 = yuy2_map;
     const uint8_t *p_y1, *p_y2 = y_src;
     const uint8_t *p_u = u_src;
@@ -418,7 +418,7 @@ static void yuy2_to_yv12_c
 }
 
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
 
 /* yuy2->yv12 with subsampling (some ideas from mplayer's yuy2toyv12) */
 #define MMXEXT_YUYV_YUV420( )                                                      \
@@ -474,7 +474,7 @@ static void yuy2_to_yv12_mmxext
  unsigned char *v_dst, int v_dst_pitch, 
  int width, int height) 
 {
-#ifdef HAVE_MMX
+#if HAVE_MMX
     const uint8_t *p_line1, *p_line2 = yuy2_map;
     uint8_t *p_y1, *p_y2 = y_dst;
     uint8_t *p_u = u_dst;
@@ -516,7 +516,7 @@ static void yuy2_to_yv12_mmxext
 #endif
 }
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
 static void vfilter_chroma_332_packed422_scanline_mmx( uint8_t *output, int width,
         uint8_t *m, uint8_t *t, uint8_t *b )
 {
@@ -606,7 +606,7 @@ void init_yuv_conversion(void)
     /* determine best YV12 -> YUY2 converter to use */
 
 #ifdef MMX
-    if (mm_support() & MM_MMXEXT)
+    if (mm_support() & FF_MM_MMXEXT)
     {
         yv12_to_yuy2 = yv12_to_yuy2_mmxext;
         yuy2_to_yv12 = yuy2_to_yv12_mmxext;

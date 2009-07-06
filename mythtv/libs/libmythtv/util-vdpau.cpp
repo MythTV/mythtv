@@ -7,7 +7,7 @@
 extern "C" {
 #include "frame.h"
 #include "avutil.h"
-#include "vdpau_render.h"
+#include "libavcodec/vdpau.h"
 }
 
 #include "videoouttypes.h"
@@ -616,9 +616,8 @@ int VDPAUContext::AddBuffer(int width, int height)
 
     if (vdpauDecode)
     {
-        vdpau_render_state_t new_rend;
-        memset(&new_rend, 0, sizeof(vdpau_render_state_t));
-        new_rend.magic = MP_VDPAU_RENDER_MAGIC;
+        struct vdpau_render_state new_rend;
+        memset(&new_rend, 0, sizeof(struct vdpau_render_state));
         new_rend.state = 0;
         new_rend.surface = tmp.surface;
         tmp.render = new_rend;
@@ -918,7 +917,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
 
     VdpStatus vdp_st;
     bool ok = true;
-    vdpau_render_state_t *render = (vdpau_render_state_t *)frame->buf;
+    struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
 
     if (!render)
     {
@@ -938,8 +937,7 @@ void VDPAUContext::Decode(VideoFrame *frame)
             return;
         }
 
-        if (frame->pix_fmt == PIX_FMT_VDPAU_H264_MAIN ||
-            frame->pix_fmt == PIX_FMT_VDPAU_H264_HIGH)
+        if (frame->pix_fmt == PIX_FMT_VDPAU_H264)
         {
             maxReferences = render->info.h264.num_ref_frames;
             if (maxReferences < 1 || maxReferences > 16)
@@ -959,29 +957,16 @@ void VDPAUContext::Decode(VideoFrame *frame)
             case PIX_FMT_VDPAU_MPEG1:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG1;
                 break;
-            case PIX_FMT_VDPAU_MPEG2_SIMPLE:
-                vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_SIMPLE;
-                break;
-            case PIX_FMT_VDPAU_MPEG2_MAIN:
+            case PIX_FMT_VDPAU_MPEG2:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_MAIN;
                 break;
-            case PIX_FMT_VDPAU_H264_BASELINE:
-                VERBOSE(VB_IMPORTANT, LOC +
-                    QString("Forcing H.264 baseline profile to main -"
-                            " decoding may fail."));
-            case PIX_FMT_VDPAU_H264_MAIN:
-                vdp_decoder_profile = VDP_DECODER_PROFILE_H264_MAIN;
-                break;
-            case PIX_FMT_VDPAU_H264_HIGH:
+            case PIX_FMT_VDPAU_H264:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_H264_HIGH;
                 break;
-            case PIX_FMT_VDPAU_VC1_SIMPLE:
-                vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_SIMPLE;
-                break;
-            case PIX_FMT_VDPAU_VC1_MAIN:
+            case PIX_FMT_VDPAU_WMV3:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_MAIN;
                 break;
-            case PIX_FMT_VDPAU_VC1_ADVANCED:
+            case PIX_FMT_VDPAU_VC1:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
                 break;
             default:
@@ -1028,8 +1013,8 @@ void VDPAUContext::Decode(VideoFrame *frame)
         decoder,
         render->surface,
         (VdpPictureInfo const *)&(render->info),
-        render->bitstreamBuffersUsed,
-        render->bitstreamBuffers
+        render->bitstream_buffers_used,
+        render->bitstream_buffers
     );
     CHECK_ST
 
@@ -1045,7 +1030,7 @@ void VDPAUContext::UpdatePauseFrame(VideoFrame *frame)
 {
     if (vdpauDecode)
     {
-        vdpau_render_state_t *render = (vdpau_render_state_t *)frame->buf;
+        struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
         if (render)
         {
             pause_surface = render->surface;
@@ -1096,7 +1081,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     VdpStatus vdp_st;
     bool ok = true;
     VdpTime dummy;
-    vdpau_render_state_t *render;
+    struct vdpau_render_state *render;
     VdpVideoSurface video_surface = 0;
 
     bool new_frame = true;
@@ -1111,7 +1096,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
 
     if (vdpauDecode && frame)
     {
-        render = (vdpau_render_state_t *)frame->buf;
+        render = (struct vdpau_render_state *)frame->buf;
         if (!render)
             return;
 
@@ -1237,7 +1222,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
             if (vdpauDecode)
             {
                 refs[i] = VDP_INVALID_HANDLE;
-                render = (vdpau_render_state_t *)referenceFrames[i]->buf;
+                render = (struct vdpau_render_state *)referenceFrames[i]->buf;
                 if (render && render->surface)
                     refs[i] = render->surface;
             }

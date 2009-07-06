@@ -46,7 +46,7 @@ static const AVCodecTag codec_aiff_tags[] = {
 #define AIFF                    0
 #define AIFF_C_VERSION1         0xA2805140
 
-static int aiff_codec_get_id(int bps)
+static enum CodecID aiff_codec_get_id(int bps)
 {
     if (bps <= 8)
         return CODEC_ID_PCM_S8;
@@ -58,7 +58,7 @@ static int aiff_codec_get_id(int bps)
         return CODEC_ID_PCM_S32BE;
 
     /* bigger than 32 isn't allowed  */
-    return 0;
+    return CODEC_ID_NONE;
 }
 
 /* returns the size of the found tag */
@@ -79,15 +79,10 @@ static int get_tag(ByteIOContext *pb, uint32_t * tag)
 }
 
 /* Metadata string read */
-static void get_meta(ByteIOContext *pb, char * str, int strsize, int size)
+static void get_meta(AVFormatContext *s, const char *key, int size)
 {
-    int res;
-
-    if (size > strsize-1)
-        res = get_buffer(pb, (uint8_t*)str, strsize-1);
-    else
-        res = get_buffer(pb, (uint8_t*)str, size);
-
+    uint8_t str[1024];
+    int res = get_buffer(s->pb, str, FFMIN(sizeof(str)-1, size));
     if (res < 0)
         return;
 
@@ -96,7 +91,9 @@ static void get_meta(ByteIOContext *pb, char * str, int strsize, int size)
         size++;
     size -= res;
     if (size)
-        url_fskip(pb, size);
+        url_fskip(s->pb, size);
+
+    av_metadata_set(&s->metadata, key, str);
 }
 
 /* Returns the number of sound data frames or negative on error */
@@ -112,7 +109,7 @@ static unsigned int get_aiff_header(ByteIOContext *pb, AVCodecContext *codec,
     codec->codec_type = CODEC_TYPE_AUDIO;
     codec->channels = get_be16(pb);
     num_frames = get_be32(pb);
-    codec->bits_per_sample = get_be16(pb);
+    codec->bits_per_coded_sample = get_be16(pb);
 
     get_buffer(pb, (uint8_t*)&ext, sizeof(ext));/* Sample rate is in */
     sample_rate = av_ext2dbl(ext);          /* 80 bits BE IEEE extended float */
@@ -122,12 +119,12 @@ static unsigned int get_aiff_header(ByteIOContext *pb, AVCodecContext *codec,
     /* Got an AIFF-C? */
     if (version == AIFF_C_VERSION1) {
         codec->codec_tag = get_le32(pb);
-        codec->codec_id  = codec_get_id(codec_aiff_tags, codec->codec_tag);
+        codec->codec_id  = ff_codec_get_id(codec_aiff_tags, codec->codec_tag);
 
         switch (codec->codec_id) {
         case CODEC_ID_PCM_S16BE:
-            codec->codec_id = aiff_codec_get_id(codec->bits_per_sample);
-            codec->bits_per_sample = av_get_bits_per_sample(codec->codec_id);
+            codec->codec_id = aiff_codec_get_id(codec->bits_per_coded_sample);
+            codec->bits_per_coded_sample = av_get_bits_per_sample(codec->codec_id);
             break;
         case CODEC_ID_ADPCM_IMA_QT:
             codec->block_align = 34*codec->channels;
@@ -151,14 +148,14 @@ static unsigned int get_aiff_header(ByteIOContext *pb, AVCodecContext *codec,
         size -= 4;
     } else {
         /* Need the codec type */
-        codec->codec_id = aiff_codec_get_id(codec->bits_per_sample);
-        codec->bits_per_sample = av_get_bits_per_sample(codec->codec_id);
+        codec->codec_id = aiff_codec_get_id(codec->bits_per_coded_sample);
+        codec->bits_per_coded_sample = av_get_bits_per_sample(codec->codec_id);
     }
 
     /* Block align needs to be computed in all cases, as the definition
      * is specific to applications -> here we use the WAVE format definition */
     if (!codec->block_align)
-        codec->block_align = (codec->bits_per_sample * codec->channels) >> 3;
+        codec->block_align = (codec->bits_per_coded_sample * codec->channels) >> 3;
 
     codec->bit_rate = (codec->frame_size ? codec->sample_rate/codec->frame_size :
                        codec->sample_rate) * (codec->block_align << 3);
@@ -170,11 +167,11 @@ static unsigned int get_aiff_header(ByteIOContext *pb, AVCodecContext *codec,
     return num_frames;
 }
 
-#ifdef CONFIG_AIFF_MUXER
+#if CONFIG_AIFF_MUXER
 typedef struct {
-    offset_t form;
-    offset_t frames;
-    offset_t ssnd;
+    int64_t form;
+    int64_t frames;
+    int64_t ssnd;
 } AIFFOutputContext;
 
 static int aiff_write_header(AVFormatContext *s)
@@ -198,7 +195,7 @@ static int aiff_write_header(AVFormatContext *s)
     put_tag(pb, aifc ? "AIFC" : "AIFF");
 
     if (aifc) { // compressed audio
-        enc->bits_per_sample = 16;
+        enc->bits_per_coded_sample = 16;
         if (!enc->block_align) {
             av_log(s, AV_LOG_ERROR, "block align not set\n");
             return -1;
@@ -217,16 +214,16 @@ static int aiff_write_header(AVFormatContext *s)
     aiff->frames = url_ftell(pb);
     put_be32(pb, 0);              /* Number of frames */
 
-    if (!enc->bits_per_sample)
-        enc->bits_per_sample = av_get_bits_per_sample(enc->codec_id);
-    if (!enc->bits_per_sample) {
+    if (!enc->bits_per_coded_sample)
+        enc->bits_per_coded_sample = av_get_bits_per_sample(enc->codec_id);
+    if (!enc->bits_per_coded_sample) {
         av_log(s, AV_LOG_ERROR, "could not compute bits per sample\n");
         return -1;
     }
     if (!enc->block_align)
-        enc->block_align = (enc->bits_per_sample * enc->channels) >> 3;
+        enc->block_align = (enc->bits_per_coded_sample * enc->channels) >> 3;
 
-    put_be16(pb, enc->bits_per_sample); /* Sample size */
+    put_be16(pb, enc->bits_per_coded_sample); /* Sample size */
 
     sample_rate = av_dbl2ext((double)enc->sample_rate);
     put_buffer(pb, (uint8_t*)&sample_rate, sizeof(sample_rate));
@@ -265,7 +262,7 @@ static int aiff_write_trailer(AVFormatContext *s)
     AVCodecContext *enc = s->streams[0]->codec;
 
     /* Chunks sizes must be even */
-    offset_t file_size, end_size;
+    int64_t file_size, end_size;
     end_size = file_size = url_ftell(pb);
     if (file_size & 1) {
         put_byte(pb, 0);
@@ -312,11 +309,11 @@ static int aiff_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
     int size, filesize;
-    offset_t offset = 0;
+    int64_t offset = 0;
     uint32_t tag;
     unsigned version = AIFF_C_VERSION1;
     ByteIOContext *pb = s->pb;
-    AVStream * st = s->streams[0];
+    AVStream * st;
 
     /* check FORM header */
     filesize = get_tag(pb, &tag);
@@ -357,16 +354,16 @@ static int aiff_read_header(AVFormatContext *s,
             version = get_be32(pb);
             break;
         case MKTAG('N', 'A', 'M', 'E'):     /* Sample name chunk */
-            get_meta(pb, s->title, sizeof(s->title), size);
+            get_meta(s, "title"    , size);
             break;
         case MKTAG('A', 'U', 'T', 'H'):     /* Author chunk */
-            get_meta(pb, s->author, sizeof(s->author), size);
+            get_meta(s, "author"   , size);
             break;
         case MKTAG('(', 'c', ')', ' '):     /* Copyright chunk */
-            get_meta(pb, s->copyright, sizeof(s->copyright), size);
+            get_meta(s, "copyright", size);
             break;
         case MKTAG('A', 'N', 'N', 'O'):     /* Annotation chunk */
-            get_meta(pb, s->comment, sizeof(s->comment), size);
+            get_meta(s, "comment"  , size);
             break;
         case MKTAG('S', 'S', 'N', 'D'):     /* Sampled sound chunk */
             offset = get_be32(pb);      /* Offset of sound data */
@@ -439,7 +436,7 @@ static int aiff_read_packet(AVFormatContext *s,
     return 0;
 }
 
-#ifdef CONFIG_AIFF_DEMUXER
+#if CONFIG_AIFF_DEMUXER
 AVInputFormat aiff_demuxer = {
     "aiff",
     NULL_IF_CONFIG_SMALL("Audio IFF"),
@@ -453,7 +450,7 @@ AVInputFormat aiff_demuxer = {
 };
 #endif
 
-#ifdef CONFIG_AIFF_MUXER
+#if CONFIG_AIFF_MUXER
 AVOutputFormat aiff_muxer = {
     "aiff",
     NULL_IF_CONFIG_SMALL("Audio IFF"),

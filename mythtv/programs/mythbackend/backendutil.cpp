@@ -1,7 +1,7 @@
 #include <cstdlib> // for llabs
 
 #include "mythconfig.h"
-#if defined(CONFIG_DARWIN) || defined(__FreeBSD__)
+#if CONFIG_DARWIN || defined(__FreeBSD__)
 #include <sys/param.h>
 #include <sys/mount.h>
 #elif __linux__
@@ -117,7 +117,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
                     bzero(&statbuf, sizeof(statbuf));
                     localStr = "1"; // Assume local
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
                     if ((statfs(currentDir.toLocal8Bit().constData(),
                                 &statbuf) == 0) &&
                         ((!strcmp(statbuf.f_fstypename, "nfs")) ||   // NFS|FTP

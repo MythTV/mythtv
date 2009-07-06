@@ -29,7 +29,7 @@
 #include "attributes.h"
 #include "mpeg2_internal.h"
 
-#ifdef ARCH_X86
+#if ARCH_X86
 static inline uint32_t arch_accel (uint32_t accel)
 {
     if (accel & (MPEG2_ACCEL_X86_3DNOW | MPEG2_ACCEL_X86_MMXEXT))
@@ -146,10 +146,10 @@ static RETSIGTYPE sigill_handler (int sig)
 }
 #endif /* ACCEL_DETECT && (ARCH_PPC || ARCH_SPARC) */
 
-#ifdef ARCH_PPC
+#if ARCH_PPC
 static uint32_t arch_accel (uint32_t accel)
 {
-#if defined(ACCEL_DETECT) && defined(HAVE_ALTIVEC)
+#if defined(ACCEL_DETECT) && HAVE_ALTIVEC
     if ((accel & (MPEG2_ACCEL_PPC_ALTIVEC | MPEG2_ACCEL_DETECT)) ==
 	MPEG2_ACCEL_DETECT) {
 	static RETSIGTYPE (* oldsig) (int);
@@ -162,12 +162,12 @@ static uint32_t arch_accel (uint32_t accel)
 
 	canjump = 1;
 
-#if defined(HAVE_ALTIVEC_H) && !defined(__APPLE__)	/* gnu */
+#if HAVE_ALTIVEC_H && !defined(__APPLE__) /* gnu */
 #define VAND(a,b,c) "vand " #a "," #b "," #c "\n\t"
 #else			/* apple */
 #define VAND(a,b,c) "vand v" #a ",v" #b ",v" #c "\n\t"
 #endif
-	asm volatile ("mtspr 256, %0\n\t"
+        __asm__ volatile ("mtspr 256, %0\n\t"
 		      VAND (0, 0, 0)
 		      :
 		      : "r" (-1));
@@ -183,7 +183,7 @@ static uint32_t arch_accel (uint32_t accel)
 }
 #endif /* ARCH_PPC */
 
-#ifdef ARCH_SPARC
+#if ARCH_SPARC
 static uint32_t arch_accel (uint32_t accel)
 {
     if (accel & MPEG2_ACCEL_SPARC_VIS2)
@@ -229,7 +229,7 @@ static uint32_t arch_accel (uint32_t accel)
 }
 #endif /* ARCH_SPARC */
 
-#ifdef ARCH_ALPHA
+#if ARCH_ALPHA
 static inline uint32_t arch_accel (uint32_t accel)
 {
     if (accel & MPEG2_ACCEL_ALPHA_MVI)
@@ -253,7 +253,7 @@ static inline uint32_t arch_accel (uint32_t accel)
 
 uint32_t mpeg2_detect_accel (uint32_t accel)
 {
-#if defined (ARCH_X86) || defined (ARCH_PPC) || defined (ARCH_ALPHA) || defined (ARCH_SPARC)
+#if ARCH_X86 || ARCH_PPC || ARCH_ALPHA || ARCH_SPARC
     accel = arch_accel (accel);
 #endif
     return accel;

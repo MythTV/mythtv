@@ -48,33 +48,31 @@ extern void (*rgb32tobgr32)(const uint8_t *src, uint8_t *dst, long src_size);
 extern void (*rgb32tobgr16)(const uint8_t *src, uint8_t *dst, long src_size);
 extern void (*rgb32tobgr15)(const uint8_t *src, uint8_t *dst, long src_size);
 
-extern void rgb24to32   (const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb32to24   (const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb16tobgr32(const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb16to24   (const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb16tobgr16(const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb16tobgr15(const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb15tobgr32(const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb15to24   (const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb15tobgr16(const uint8_t *src, uint8_t *dst, long src_size);
-extern void rgb15tobgr15(const uint8_t *src, uint8_t *dst, long src_size);
-extern void bgr8torgb8  (const uint8_t *src, uint8_t *dst, long src_size);
+void rgb24to32   (const uint8_t *src, uint8_t *dst, long src_size);
+void rgb32to24   (const uint8_t *src, uint8_t *dst, long src_size);
+void rgb16tobgr32(const uint8_t *src, uint8_t *dst, long src_size);
+void rgb16to24   (const uint8_t *src, uint8_t *dst, long src_size);
+void rgb16tobgr16(const uint8_t *src, uint8_t *dst, long src_size);
+void rgb16tobgr15(const uint8_t *src, uint8_t *dst, long src_size);
+void rgb15tobgr32(const uint8_t *src, uint8_t *dst, long src_size);
+void rgb15to24   (const uint8_t *src, uint8_t *dst, long src_size);
+void rgb15tobgr16(const uint8_t *src, uint8_t *dst, long src_size);
+void rgb15tobgr15(const uint8_t *src, uint8_t *dst, long src_size);
+void bgr8torgb8  (const uint8_t *src, uint8_t *dst, long src_size);
 
 
-extern void palette8torgb32(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
-extern void palette8tobgr32(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
-extern void palette8torgb24(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
-extern void palette8tobgr24(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
-extern void palette8torgb16(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
-extern void palette8tobgr16(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
-extern void palette8torgb15(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
-extern void palette8tobgr15(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+void palette8topacked32(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+void palette8topacked24(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+void palette8torgb16(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+void palette8tobgr16(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+void palette8torgb15(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+void palette8tobgr15(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
 
 /**
  * Height should be a multiple of 2 and width should be a multiple of 16.
  * (If this is a problem for anyone then tell me, and I will fix it.)
  * Chrominance data is only taken from every second line, others are ignored.
- * FIXME: Write HQ version.
+ * FIXME: Write high quality version.
  */
 //void uyvytoyv12(const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
 
@@ -110,8 +108,7 @@ extern void (*yv12touyvy)(const uint8_t *ysrc, const uint8_t *usrc, const uint8_
                           long lumStride, long chromStride, long dstStride);
 
 /**
- *
- * width should be a multiple of 16
+ * Width should be a multiple of 16.
  */
 extern void (*yuv422ptouyvy)(const uint8_t *ysrc, const uint8_t *usrc, const uint8_t *vsrc, uint8_t *dst,
                              long width, long height,
@@ -121,7 +118,7 @@ extern void (*yuv422ptouyvy)(const uint8_t *ysrc, const uint8_t *usrc, const uin
  * Height should be a multiple of 2 and width should be a multiple of 2.
  * (If this is a problem for anyone then tell me, and I will fix it.)
  * Chrominance data is only taken from every second line, others are ignored.
- * FIXME: Write HQ version.
+ * FIXME: Write high quality version.
  */
 extern void (*rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                            long width, long height,
@@ -144,6 +141,20 @@ extern void (*yvu9_to_yuy2)(const uint8_t *src1, const uint8_t *src2, const uint
                             long width, long height,
                             long srcStride1, long srcStride2,
                             long srcStride3, long dstStride);
+
+
+extern void (*uyvytoyuv420)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, const uint8_t *src,
+                                      long width, long height,
+                                      long lumStride, long chromStride, long srcStride);
+extern void (*uyvytoyuv422)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, const uint8_t *src,
+                                      long width, long height,
+                                      long lumStride, long chromStride, long srcStride);
+extern void (*yuyvtoyuv420)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, const uint8_t *src,
+                                      long width, long height,
+                                      long lumStride, long chromStride, long srcStride);
+extern void (*yuyvtoyuv422)(uint8_t *ydst, uint8_t *udst, uint8_t *vdst, const uint8_t *src,
+                                      long width, long height,
+                                      long lumStride, long chromStride, long srcStride);
 
 void sws_rgb2rgb_init(int flags);
 

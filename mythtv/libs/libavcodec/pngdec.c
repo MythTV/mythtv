@@ -1,6 +1,6 @@
 /*
  * PNG image format
- * Copyright (c) 2003 Fabrice Bellard.
+ * Copyright (c) 2003 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -37,7 +37,8 @@ typedef struct PNGDecContext {
     const uint8_t *bytestream;
     const uint8_t *bytestream_start;
     const uint8_t *bytestream_end;
-    AVFrame picture;
+    AVFrame picture1, picture2;
+    AVFrame *current_picture, *last_picture;
 
     int state;
     int width, height;
@@ -180,6 +181,13 @@ void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top, int w
     else if(bpp == 2) UNROLL1(2, op)\
     else if(bpp == 3) UNROLL1(3, op)\
     else if(bpp == 4) UNROLL1(4, op)\
+    else {\
+        for (; i < size; i += bpp) {\
+            int j;\
+            for (j = 0; j < bpp; j++)\
+                dst[i+j] = op(dst[i+j-bpp], src[i+j], last[i+j]);\
+        }\
+    }
 
 /* NOTE: 'dst' can be equal to 'last' */
 static void png_filter_row(DSPContext *dsp, uint8_t *dst, int filter_type,
@@ -379,13 +387,20 @@ static int png_decode_idat(PNGDecContext *s, int length)
 
 static int decode_frame(AVCodecContext *avctx,
                         void *data, int *data_size,
-                        const uint8_t *buf, int buf_size)
+                        AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     PNGDecContext * const s = avctx->priv_data;
     AVFrame *picture = data;
-    AVFrame * const p= &s->picture;
+    AVFrame *p;
+    uint8_t *crow_buf_base = NULL;
     uint32_t tag, length;
     int ret, crc;
+
+    FFSWAP(AVFrame *, s->current_picture, s->last_picture);
+    avctx->coded_frame= s->current_picture;
+    p = s->current_picture;
 
     s->bytestream_start=
     s->bytestream= buf;
@@ -470,6 +485,9 @@ static int decode_frame(AVCodecContext *avctx,
                 } else if (s->bit_depth == 16 &&
                            s->color_type == PNG_COLOR_TYPE_GRAY) {
                     avctx->pix_fmt = PIX_FMT_GRAY16BE;
+                } else if (s->bit_depth == 16 &&
+                           s->color_type == PNG_COLOR_TYPE_RGB) {
+                    avctx->pix_fmt = PIX_FMT_RGB48BE;
                 } else if (s->bit_depth == 1 &&
                            s->color_type == PNG_COLOR_TYPE_GRAY) {
                     avctx->pix_fmt = PIX_FMT_MONOBLACK;
@@ -520,9 +538,12 @@ static int decode_frame(AVCodecContext *avctx,
                         goto fail;
                 }
                 /* compressed row */
-                s->crow_buf = av_malloc(s->row_size + 1);
-                if (!s->crow_buf)
+                crow_buf_base = av_malloc(s->row_size + 16);
+                if (!crow_buf_base)
                     goto fail;
+
+                /* we want crow_buf+1 to be 16-byte aligned */
+                s->crow_buf = crow_buf_base + 15;
                 s->zstream.avail_out = s->crow_size;
                 s->zstream.next_out = s->crow_buf;
             }
@@ -582,13 +603,31 @@ static int decode_frame(AVCodecContext *avctx,
         }
     }
  exit_loop:
-    *picture= s->picture;
+     /* handle p-frames only if a predecessor frame is available */
+     if(s->last_picture->data[0] != NULL) {
+         if(!(avpkt->flags & PKT_FLAG_KEY)) {
+            int i, j;
+            uint8_t *pd = s->current_picture->data[0];
+            uint8_t *pd_last = s->last_picture->data[0];
+
+            for(j=0; j < s->height; j++) {
+                for(i=0; i < s->width * s->bpp; i++) {
+                    pd[i] += pd_last[i];
+                }
+                pd += s->image_linesize;
+                pd_last += s->image_linesize;
+            }
+        }
+    }
+
+    *picture= *s->current_picture;
     *data_size = sizeof(AVFrame);
 
     ret = s->bytestream - s->bytestream_start;
  the_end:
     inflateEnd(&s->zstream);
-    av_freep(&s->crow_buf);
+    av_free(crow_buf_base);
+    s->crow_buf = NULL;
     av_freep(&s->last_row);
     av_freep(&s->tmp_row);
     return ret;
@@ -600,8 +639,10 @@ static int decode_frame(AVCodecContext *avctx,
 static av_cold int png_dec_init(AVCodecContext *avctx){
     PNGDecContext *s = avctx->priv_data;
 
-    avcodec_get_frame_defaults(&s->picture);
-    avctx->coded_frame= &s->picture;
+    s->current_picture = &s->picture1;
+    s->last_picture = &s->picture2;
+    avcodec_get_frame_defaults(&s->picture1);
+    avcodec_get_frame_defaults(&s->picture2);
     dsputil_init(&s->dsp, avctx);
 
     return 0;
@@ -616,7 +657,7 @@ AVCodec png_decoder = {
     NULL,
     NULL, //decode_end,
     decode_frame,
-    0 /*CODEC_CAP_DR1*/ /*| CODEC_CAP_DRAW_HORIZ_BAND*/,
+    CODEC_CAP_DR1 /*| CODEC_CAP_DRAW_HORIZ_BAND*/,
     NULL,
     .long_name = NULL_IF_CONFIG_SMALL("PNG image"),
 };

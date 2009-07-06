@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
@@ -22,7 +22,7 @@
 #include "dsputil.h"
 
 #ifdef MMX
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 #endif
 
 //static const char FILTER_NAME[] = "crop";
@@ -148,9 +148,9 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     if (frame->pitches[1] != frame->pitches[2])
         return -1;
 
-    asm volatile("emms\n\t");
+    __asm__ volatile("emms\n\t");
 
-    asm volatile("movq (%1),%%mm0    \n\t"	       
+    __asm__ volatile("movq (%1),%%mm0    \n\t"
                  "movq (%0),%%mm1    \n\t"
                  : : "r" (&UV_black), "r"(&Y_black));
   
@@ -158,7 +158,7 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     sz = (frame->pitches[0] * frame->height) >> 3; // div 8 bytes
     for (y = 0; (y < tf->yp1 * frame->pitches[0] << 1) && (y < sz); y += 2)
     {
-        asm volatile("movq %%mm0, (%0)     \n\t"
+        __asm__ volatile("movq %%mm0, (%0)     \n\t"
                      "movq %%mm0, 8(%0)    \n\t"
                      : : "r" (ybuf + y));
     }
@@ -167,7 +167,7 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     for (y = ((frame->height >> 4) - tf->yp2) * frame->pitches[0] << 1;
          y < sz; y += 2)
     {
-        asm volatile("movq %%mm0, (%0)     \n\t"
+        __asm__ volatile("movq %%mm0, (%0)     \n\t"
                      "movq %%mm0, 8(%0)    \n\t"
                      : : "r" (ybuf + y));
     }
@@ -176,7 +176,7 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     sz = (frame->pitches[1] * (frame->height >> 1)) >> 3; // div 8 bytes
     for (y = 0; (y < tf->yp1 * frame->pitches[1]) && (y < sz); y++)
     {
-        asm volatile("movq %%mm1, (%0)    \n\t"
+        __asm__ volatile("movq %%mm1, (%0)    \n\t"
                      "movq %%mm1, (%1)    \n\t"
                      : : "r" (ubuf + y), "r" (vbuf + y));
     }
@@ -184,7 +184,7 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     // Chroma bottom
     for (y = ((frame->height >> 4) - tf->yp2) * frame->pitches[1]; y < sz; y++)
     {
-        asm volatile("movq %%mm1, (%0)    \n\t"
+        __asm__ volatile("movq %%mm1, (%0)    \n\t"
                      "movq %%mm1, (%1)    \n\t"
                      : : "r" (ubuf + y), "r" (vbuf + y));
     }
@@ -198,14 +198,14 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     {
         for (x = 0; (x < (tf->xp1 << 1)) && (x < t1); x += 2)
         {
-            asm volatile("movq %%mm0, (%0)     \n\t"
+            __asm__ volatile("movq %%mm0, (%0)     \n\t"
                          "movq %%mm0, 8(%0)    \n\t"
                          : : "r" (ybuf + y + x));
         }
 
         for (x = t2 - (tf->xp2 << 1); (x < t2) && (x < t1); x += 2)
         {
-            asm volatile("movq %%mm0, (%0)     \n\t"
+            __asm__ volatile("movq %%mm0, (%0)     \n\t"
                          "movq %%mm0, 8(%0)    \n\t"
                          : : "r" (ybuf + y + x));
         }
@@ -219,20 +219,20 @@ int cropMMX(VideoFilter *f, VideoFrame *frame, int field)
     {
         for (x = 0; x < tf->xp1; x++)
         {
-            asm volatile("movq %%mm1, (%0)    \n\t"
+            __asm__ volatile("movq %%mm1, (%0)    \n\t"
                          "movq %%mm1, (%1)    \n\t"
                          : : "r" (ubuf + y + x), "r" (vbuf + y + x));
         }
 
         for (x = t2 - tf->xp2; x < t2; x++)
         {
-            asm volatile("movq %%mm1, (%0)    \n\t"
+            __asm__ volatile("movq %%mm1, (%0)    \n\t"
                          "movq %%mm1, (%1)    \n\t"
                          : : "r" (ubuf + y + x), "r" (vbuf + y + x));
         }
     }
 
-    asm volatile("emms\n\t");
+    __asm__ volatile("emms\n\t");
 
     TF_END(tf, "CropMMX: ");
     return 0;
@@ -282,7 +282,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->vf.filter  = &crop;
 
 #ifdef MMX
-    if (mm_support() & MM_MMX)
+    if (mm_support() & FF_MM_MMX)
         filter->vf.filter = &cropMMX;
 #endif
 

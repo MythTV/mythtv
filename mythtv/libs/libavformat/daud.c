@@ -31,7 +31,7 @@ static int daud_header(AVFormatContext *s, AVFormatParameters *ap) {
     st->codec->sample_rate = 96000;
     st->codec->bit_rate = 3 * 6 * 96000 * 8;
     st->codec->block_align = 3 * 6;
-    st->codec->bits_per_sample = 24;
+    st->codec->bits_per_coded_sample = 24;
     return 0;
 }
 
@@ -78,7 +78,7 @@ AVInputFormat daud_demuxer = {
 };
 #endif
 
-#ifdef CONFIG_DAUD_MUXER
+#if CONFIG_DAUD_MUXER
 AVOutputFormat daud_muxer =
 {
     "daud",

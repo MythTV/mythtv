@@ -20,13 +20,14 @@
  */
 
 /**
- * @file iff.c
+ * @file libavformat/iff.c
  * IFF file demuxer
  * by Jaikrishnan Menon
  * for more information on the .iff file format, visit:
  * http://wiki.multimedia.cx/index.php?title=IFF
  */
 
+#include "libavutil/intreadwrite.h"
 #include "avformat.h"
 
 #define ID_8SVX       MKTAG('8','S','V','X')
@@ -52,7 +53,7 @@
 
 #define PACKET_SIZE 1024
 
-typedef enum {COMP_NONE, COMP_FIB, COMP_EXP} svx8_compression_t;
+typedef enum {COMP_NONE, COMP_FIB, COMP_EXP} svx8_compression_type;
 
 typedef struct {
     uint32_t  body_size;
@@ -149,9 +150,9 @@ static int iff_read_header(AVFormatContext *s,
         return -1;
     }
 
-    st->codec->bits_per_sample = 8;
-    st->codec->bit_rate = st->codec->channels * st->codec->sample_rate * st->codec->bits_per_sample;
-    st->codec->block_align = st->codec->channels * st->codec->bits_per_sample;
+    st->codec->bits_per_coded_sample = 8;
+    st->codec->bit_rate = st->codec->channels * st->codec->sample_rate * st->codec->bits_per_coded_sample;
+    st->codec->block_align = st->codec->channels * st->codec->bits_per_coded_sample;
 
     return 0;
 }

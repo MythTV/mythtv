@@ -19,8 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavcodec/bitstream.h"
+#include "libavcodec/get_bits.h"
 #include "avformat.h"
+#include "id3v2.h"
 
 #define MPC_FRAMESIZE  1152
 #define DELAY_FRAMES   32
@@ -43,10 +44,12 @@ typedef struct {
 static int mpc_probe(AVProbeData *p)
 {
     const uint8_t *d = p->buf;
+    if (ff_id3v2_match(d)) {
+        d += ff_id3v2_tag_len(d);
+    }
+    if (d+3 < p->buf+p->buf_size)
     if (d[0] == 'M' && d[1] == 'P' && d[2] == '+' && (d[3] == 0x17 || d[3] == 0x7))
         return AVPROBE_SCORE_MAX;
-    if (d[0] == 'I' && d[1] == 'D' && d[2] == '3')
-        return AVPROBE_SCORE_MAX / 2;
     return 0;
 }
 
@@ -97,7 +100,7 @@ static int mpc_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec->codec_type = CODEC_TYPE_AUDIO;
     st->codec->codec_id = CODEC_ID_MUSEPACK7;
     st->codec->channels = 2;
-    st->codec->bits_per_sample = 16;
+    st->codec->bits_per_coded_sample = 16;
 
     st->codec->extradata_size = 16;
     st->codec->extradata = av_mallocz(st->codec->extradata_size+FF_INPUT_BUFFER_PADDING_SIZE);

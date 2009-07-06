@@ -20,7 +20,7 @@
  */
 
 /**
- * @file qtrle.c
+ * @file libavcodec/qtrle.c
  * QT RLE Video Decoder by Mike Melanson (melanson@pcisys.net)
  * For more information about the QT RLE format, visit:
  *   http://www.pcisys.net/~melanson/codecs/
@@ -36,6 +36,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
 typedef struct QtrleContext {
@@ -383,7 +384,7 @@ static av_cold int qtrle_decode_init(AVCodecContext *avctx)
     QtrleContext *s = avctx->priv_data;
 
     s->avctx = avctx;
-    switch (avctx->bits_per_sample) {
+    switch (avctx->bits_per_coded_sample) {
     case 1:
     case 33:
         avctx->pix_fmt = PIX_FMT_MONOWHITE;
@@ -412,7 +413,7 @@ static av_cold int qtrle_decode_init(AVCodecContext *avctx)
 
     default:
         av_log (avctx, AV_LOG_ERROR, "Unsupported colorspace: %d bits/sample?\n",
-            avctx->bits_per_sample);
+            avctx->bits_per_coded_sample);
         break;
     }
 
@@ -423,8 +424,10 @@ static av_cold int qtrle_decode_init(AVCodecContext *avctx)
 
 static int qtrle_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              const uint8_t *buf, int buf_size)
+                              AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     QtrleContext *s = avctx->priv_data;
     int header, start_line;
     int stream_ptr, height, row_ptr;
@@ -466,7 +469,7 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
     }
     row_ptr = s->frame.linesize[0] * start_line;
 
-    switch (avctx->bits_per_sample) {
+    switch (avctx->bits_per_coded_sample) {
     case 1:
     case 33:
         qtrle_decode_1bpp(s, stream_ptr, row_ptr, height);
@@ -504,7 +507,7 @@ static int qtrle_decode_frame(AVCodecContext *avctx,
 
     default:
         av_log (s->avctx, AV_LOG_ERROR, "Unsupported colorspace: %d bits/sample?\n",
-            avctx->bits_per_sample);
+            avctx->bits_per_coded_sample);
         break;
     }
 

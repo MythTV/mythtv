@@ -1,4 +1,4 @@
-/* Rewrite of neuron2's GreedyHDeint filter for Avisynth 
+/* Rewrite of neuron2's GreedyHDeint filter for Avisynth
  *
  * converted for myth by Markus Schulz <msc@antzsystem.de>
  * */
@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
@@ -21,7 +21,7 @@
 
 #include "color.h"
 
-#if defined (ARCH_X86)
+#if ARCH_X86
 
 #include "greedyhmacros.h"
 
@@ -63,7 +63,7 @@ static unsigned int GreedyMotionSense = MOTIONSENSE_DEFAULT;
 
 
 #ifdef MMX
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 
 static const mmx_t mm_cpool[] =
 {
@@ -96,7 +96,7 @@ static void AllocFilter(ThisFilter* filter, int width, int height)
     if ((width != filter->width) || height != filter->height)
     {
         printf("greedyhdeint: size changed from %d x %d -> %d x %d\n", filter->width, filter->height, width, height);
-        if (filter->frames[0]) 
+        if (filter->frames[0])
         {
             free(filter->frames[0]);
             free(filter->frames[1]);
@@ -175,21 +175,21 @@ static int GreedyHDeint (VideoFilter * f, VideoFrame * frame, int field)
 
 #ifdef MMX
     /* SSE Version has best quality. 3DNOW and MMX a litte bit impure */
-    if (filter->mm_flags & MM_SSE) 
+    if (filter->mm_flags & FF_MM_SSE)
     {
         greedyh_filter_sse(
             filter->deint_frame, 2 * frame->width,
             filter->frames[cur_frame], filter->frames[last_frame],
             bottom_field, field, frame->width, frame->height);
     }
-    else if (filter->mm_flags & MM_3DNOW)
+    else if (filter->mm_flags & FF_MM_3DNOW)
     {
         greedyh_filter_3dnow(
             filter->deint_frame, 2 * frame->width,
             filter->frames[cur_frame], filter->frames[last_frame],
             bottom_field, field, frame->width, frame->height);
     }
-    else if (filter->mm_flags & MM_MMX) 
+    else if (filter->mm_flags & FF_MM_MMX)
     {
         greedyh_filter_mmx(
             filter->deint_frame, 2 * frame->width,

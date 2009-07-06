@@ -22,10 +22,10 @@ static QString ErrorStringXvMC(int val)
     return str;
 }
 
-static xvmc_render_state_t *GetRender(VideoFrame *frame)
+static struct xvmc_pix_fmt *GetRender(VideoFrame *frame)
 {
     if (frame)
-        return (xvmc_render_state_t*) frame->buf;
+        return (struct xvmc_pix_fmt*) frame->buf;
     return NULL;
 }
 

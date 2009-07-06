@@ -8,8 +8,11 @@
 // libav headers
 extern "C" {
 #include "libavcodec/avcodec.h"
-#ifdef ENABLE_AC3_DECODER
+#if CONFIG_AC3_DECODER
 #include "libavcodec/ac3.h"
+#ifndef INT_BIT
+#define INT_BIT (CHAR_BIT * sizeof(int))
+#endif
 #include "libavcodec/ac3_parser.h"
 #else
 #include <a52dec/a52.h>
@@ -279,9 +282,8 @@ static int encode_frame(
         nr_samples = nblks * 32;
         block_len = nr_samples * 2 * 2;
     }
-    else
+    else if (CONFIG_AC3_DECODER)
     {
-#ifdef ENABLE_AC3_DECODER
         int err;
         AC3HeaderInfo hdr;
         GetBitContext gbc;
@@ -298,11 +300,6 @@ static int encode_frame(
             enc_len     = hdr.frame_size;
             block_len   = AC3_FRAME_SIZE * 4;
         }
-
-#elif ENABLE_LIBA52_DECODER
-        enc_len = a52_syncinfo(payload, &flags, &sample_rate, &bit_rate);
-        block_len = MAX_AC3_FRAME_SIZE;
-#endif
     }
 
     if (enc_len == 0 || enc_len > len)

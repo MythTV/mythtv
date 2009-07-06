@@ -21,7 +21,7 @@
  */
 
 /**
- * @file aactab.c
+ * @file libavcodec/aactab.c
  * AAC data
  * @author Oded Shimon  ( ods15 ods15 dyndns org )
  * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
@@ -36,11 +36,15 @@ DECLARE_ALIGNED(16, float,  ff_aac_kbd_long_1024[1024]);
 DECLARE_ALIGNED(16, float,  ff_aac_kbd_short_128[128]);
 
 const uint8_t ff_aac_num_swb_1024[] = {
-    41, 41, 47, 49, 49, 51, 47, 47, 43, 43, 43, 40
+    41, 41, 47, 49, 49, 51, 47, 47, 43, 43, 43, 40, 40
 };
 
 const uint8_t ff_aac_num_swb_128[] = {
-    12, 12, 12, 14, 14, 14, 15, 15, 15, 15, 15, 15
+    12, 12, 12, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15
+};
+
+const uint8_t ff_aac_pred_sfb_max[] = {
+    33, 33, 38, 40, 40, 40, 41, 41, 37, 37, 37, 34, 34
 };
 
 const uint32_t ff_aac_scalefactor_code[121] = {
@@ -387,12 +391,12 @@ static const uint8_t bits11[289] = {
      5,
 };
 
-const uint16_t *ff_aac_spectral_codes[11] = {
+const uint16_t * const ff_aac_spectral_codes[11] = {
     codes1,  codes2,  codes3, codes4, codes5, codes6, codes7, codes8,
     codes9, codes10, codes11,
 };
 
-const uint8_t *ff_aac_spectral_bits[11] = {
+const uint8_t * const ff_aac_spectral_bits[11] = {
     bits1,  bits2,  bits3, bits4, bits5, bits6, bits7, bits8,
     bits9, bits10, bits11,
 };
@@ -888,14 +892,154 @@ static const float codebook_vector10[578] = {
       64.0f,      64.0f,
 };
 
-const float *ff_aac_codebook_vectors[] = {
+const float * const ff_aac_codebook_vectors[] = {
     codebook_vector0, codebook_vector0, codebook_vector2,
     codebook_vector2, codebook_vector4, codebook_vector4,
     codebook_vector6, codebook_vector6, codebook_vector8,
     codebook_vector8, codebook_vector10,
 };
 
-#ifdef CONFIG_HARDCODED_TABLES
+/* @name swb_offsets
+ * Sample offset into the window indicating the beginning of a scalefactor
+ * window band
+ *
+ * scalefactor window band - term for scalefactor bands within a window,
+ * given in Table 4.110 to Table 4.128.
+ *
+ * scalefactor band - a set of spectral coefficients which are scaled by one
+ * scalefactor. In case of EIGHT_SHORT_SEQUENCE and grouping a scalefactor band
+ * may contain several scalefactor window bands of corresponding frequency. For
+ * all other window_sequences scalefactor bands and scalefactor window bands are
+ * identical.
+ * @{
+ */
+
+static const uint16_t swb_offset_1024_96[] = {
+      0,   4,   8,  12,  16,  20,  24,  28,
+     32,  36,  40,  44,  48,  52,  56,  64,
+     72,  80,  88,  96, 108, 120, 132, 144,
+    156, 172, 188, 212, 240, 276, 320, 384,
+    448, 512, 576, 640, 704, 768, 832, 896,
+    960, 1024
+};
+
+static const uint16_t swb_offset_128_96[] = {
+    0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 92, 128
+};
+
+static const uint16_t swb_offset_1024_64[] = {
+      0,   4,   8,  12,  16,  20,  24,  28,
+     32,  36,  40,  44,  48,  52,  56,  64,
+     72,  80,  88, 100, 112, 124, 140, 156,
+    172, 192, 216, 240, 268, 304, 344, 384,
+    424, 464, 504, 544, 584, 624, 664, 704,
+    744, 784, 824, 864, 904, 944, 984, 1024
+};
+
+static const uint16_t swb_offset_1024_48[] = {
+      0,   4,   8,  12,  16,  20,  24,  28,
+     32,  36,  40,  48,  56,  64,  72,  80,
+     88,  96, 108, 120, 132, 144, 160, 176,
+    196, 216, 240, 264, 292, 320, 352, 384,
+    416, 448, 480, 512, 544, 576, 608, 640,
+    672, 704, 736, 768, 800, 832, 864, 896,
+    928, 1024
+};
+
+static const uint16_t swb_offset_128_48[] = {
+     0,   4,   8,  12,  16,  20,  28,  36,
+    44,  56,  68,  80,  96, 112, 128
+};
+
+static const uint16_t swb_offset_1024_32[] = {
+      0,   4,   8,  12,  16,  20,  24,  28,
+     32,  36,  40,  48,  56,  64,  72,  80,
+     88,  96, 108, 120, 132, 144, 160, 176,
+    196, 216, 240, 264, 292, 320, 352, 384,
+    416, 448, 480, 512, 544, 576, 608, 640,
+    672, 704, 736, 768, 800, 832, 864, 896,
+    928, 960, 992, 1024
+};
+
+static const uint16_t swb_offset_1024_24[] = {
+      0,   4,   8,  12,  16,  20,  24,  28,
+     32,  36,  40,  44,  52,  60,  68,  76,
+     84,  92, 100, 108, 116, 124, 136, 148,
+    160, 172, 188, 204, 220, 240, 260, 284,
+    308, 336, 364, 396, 432, 468, 508, 552,
+    600, 652, 704, 768, 832, 896, 960, 1024
+};
+
+static const uint16_t swb_offset_128_24[] = {
+     0,   4,   8,  12,  16,  20,  24,  28,
+    36,  44,  52,  64,  76,  92, 108, 128
+};
+
+static const uint16_t swb_offset_1024_16[] = {
+      0,   8,  16,  24,  32,  40,  48,  56,
+     64,  72,  80,  88, 100, 112, 124, 136,
+    148, 160, 172, 184, 196, 212, 228, 244,
+    260, 280, 300, 320, 344, 368, 396, 424,
+    456, 492, 532, 572, 616, 664, 716, 772,
+    832, 896, 960, 1024
+};
+
+static const uint16_t swb_offset_128_16[] = {
+     0,   4,   8,  12,  16,  20,  24,  28,
+    32,  40,  48,  60,  72,  88, 108, 128
+};
+
+static const uint16_t swb_offset_1024_8[] = {
+      0,  12,  24,  36,  48,  60,  72,  84,
+     96, 108, 120, 132, 144, 156, 172, 188,
+    204, 220, 236, 252, 268, 288, 308, 328,
+    348, 372, 396, 420, 448, 476, 508, 544,
+    580, 620, 664, 712, 764, 820, 880, 944,
+    1024
+};
+
+static const uint16_t swb_offset_128_8[] = {
+     0,   4,   8,  12,  16,  20,  24,  28,
+    36,  44,  52,  60,  72,  88, 108, 128
+};
+
+const uint16_t *ff_swb_offset_1024[] = {
+    swb_offset_1024_96, swb_offset_1024_96, swb_offset_1024_64,
+    swb_offset_1024_48, swb_offset_1024_48, swb_offset_1024_32,
+    swb_offset_1024_24, swb_offset_1024_24, swb_offset_1024_16,
+    swb_offset_1024_16, swb_offset_1024_16, swb_offset_1024_8,
+    swb_offset_1024_8
+};
+
+const uint16_t *ff_swb_offset_128[] = {
+    /* The last entry on the following row is swb_offset_128_64 but is a
+       duplicate of swb_offset_128_96. */
+    swb_offset_128_96, swb_offset_128_96, swb_offset_128_96,
+    swb_offset_128_48, swb_offset_128_48, swb_offset_128_48,
+    swb_offset_128_24, swb_offset_128_24, swb_offset_128_16,
+    swb_offset_128_16, swb_offset_128_16, swb_offset_128_8,
+    swb_offset_128_8
+};
+
+// @}
+
+/* @name ff_tns_max_bands
+ * The maximum number of scalefactor bands on which TNS can operate for the long
+ * and short transforms respectively. The index to these tables is related to
+ * the sample rate of the audio.
+ * @{
+ */
+const uint8_t ff_tns_max_bands_1024[] = {
+    31, 31, 34, 40, 42, 51, 46, 46, 42, 42, 42, 39, 39
+};
+
+const uint8_t ff_tns_max_bands_128[] = {
+    9, 9, 10, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14
+};
+// @}
+
+
+#if CONFIG_HARDCODED_TABLES
 
 /**
  * Table of pow(2, (i - 200)/4.) used for different purposes depending on the
@@ -904,7 +1048,7 @@ const float *ff_aac_codebook_vectors[] = {
  * [60, 315] scale factor decoding when using SIMD dsp.float_to_int16
  * [45, 300] intensity stereo position decoding mapped in reverse order i.e. 0->300, 1->299, ..., 254->46, 255->45
  */
-const float ff_aac_pow2sf_tab[316] = {
+const float ff_aac_pow2sf_tab[428] = {
     8.88178420e-16, 1.05622810e-15, 1.25607397e-15, 1.49373210e-15,
     1.77635684e-15, 2.11245619e-15, 2.51214793e-15, 2.98746420e-15,
     3.55271368e-15, 4.22491238e-15, 5.02429587e-15, 5.97492839e-15,
@@ -984,10 +1128,38 @@ const float ff_aac_pow2sf_tab[316] = {
     6.71088640e+07, 7.98063385e+07, 9.49062656e+07, 1.12863206e+08,
     1.34217728e+08, 1.59612677e+08, 1.89812531e+08, 2.25726413e+08,
     2.68435456e+08, 3.19225354e+08, 3.79625062e+08, 4.51452825e+08,
+    5.36870912e+08, 6.38450708e+08, 7.59250125e+08, 9.02905651e+08,
+    1.07374182e+09, 1.27690142e+09, 1.51850025e+09, 1.80581130e+09,
+    2.14748365e+09, 2.55380283e+09, 3.03700050e+09, 3.61162260e+09,
+    4.29496730e+09, 5.10760567e+09, 6.07400100e+09, 7.22324521e+09,
+    8.58993459e+09, 1.02152113e+10, 1.21480020e+10, 1.44464904e+10,
+    1.71798692e+10, 2.04304227e+10, 2.42960040e+10, 2.88929808e+10,
+    3.43597384e+10, 4.08608453e+10, 4.85920080e+10, 5.77859616e+10,
+    6.87194767e+10, 8.17216907e+10, 9.71840160e+10, 1.15571923e+11,
+    1.37438953e+11, 1.63443381e+11, 1.94368032e+11, 2.31143847e+11,
+    2.74877907e+11, 3.26886763e+11, 3.88736064e+11, 4.62287693e+11,
+    5.49755814e+11, 6.53773525e+11, 7.77472128e+11, 9.24575386e+11,
+    1.09951163e+12, 1.30754705e+12, 1.55494426e+12, 1.84915077e+12,
+    2.19902326e+12, 2.61509410e+12, 3.10988851e+12, 3.69830155e+12,
+    4.39804651e+12, 5.23018820e+12, 6.21977702e+12, 7.39660309e+12,
+    8.79609302e+12, 1.04603764e+13, 1.24395540e+13, 1.47932062e+13,
+    1.75921860e+13, 2.09207528e+13, 2.48791081e+13, 2.95864124e+13,
+    3.51843721e+13, 4.18415056e+13, 4.97582162e+13, 5.91728247e+13,
+    7.03687442e+13, 8.36830112e+13, 9.95164324e+13, 1.18345649e+14,
+    1.40737488e+14, 1.67366022e+14, 1.99032865e+14, 2.36691299e+14,
+    2.81474977e+14, 3.34732045e+14, 3.98065730e+14, 4.73382598e+14,
+    5.62949953e+14, 6.69464090e+14, 7.96131459e+14, 9.46765196e+14,
+    1.12589991e+15, 1.33892818e+15, 1.59226292e+15, 1.89353039e+15,
+    2.25179981e+15, 2.67785636e+15, 3.18452584e+15, 3.78706078e+15,
+    4.50359963e+15, 5.35571272e+15, 6.36905167e+15, 7.57412156e+15,
+    9.00719925e+15, 1.07114254e+16, 1.27381033e+16, 1.51482431e+16,
+    1.80143985e+16, 2.14228509e+16, 2.54762067e+16, 3.02964863e+16,
+    3.60287970e+16, 4.28457018e+16, 5.09524134e+16, 6.05929725e+16,
+    7.20575940e+16, 8.56914035e+16, 1.01904827e+17, 1.21185945e+17,
 };
 
 #else
 
-float ff_aac_pow2sf_tab[316];
+float ff_aac_pow2sf_tab[428];
 
 #endif /* CONFIG_HARDCODED_TABLES */

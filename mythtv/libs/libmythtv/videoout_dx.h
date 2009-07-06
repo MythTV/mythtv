@@ -9,7 +9,7 @@
 #include <ddraw.h>   // HACK HACK HACK
 
 // MythTV headers
-#ifdef CONFIG_CYGWIN
+#if CONFIG_CYGWIN
 #undef max
 #endif
 #include "videooutbase.h"

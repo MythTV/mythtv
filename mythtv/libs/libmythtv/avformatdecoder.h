@@ -22,12 +22,10 @@ extern "C" {
 #define CODEC_IS_MPEG(c)     (c == CODEC_ID_MPEG1VIDEO      || \
                               c == CODEC_ID_MPEG2VIDEO      || \
                               c == CODEC_ID_MPEG2VIDEO_DVDV || \
-                              c == CODEC_ID_MPEGVIDEO_VDPAU || \
                               c == CODEC_ID_MPEG2VIDEO_XVMC || \
                               c == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
 
 #define CODEC_IS_HW_ACCEL(c) (c == CODEC_ID_MPEG2VIDEO_DVDV || \
-                              c == CODEC_ID_MPEGVIDEO_VDPAU || \
                               c == CODEC_ID_MPEG2VIDEO_XVMC || \
                               c == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
 
@@ -179,7 +177,7 @@ class AvFormatDecoder : public DecoderBase
     friend int open_avf(URLContext *h, const char *filename, int flags);
     friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);
     friend int write_avf(URLContext *h, uint8_t *buf, int buf_size);
-    friend offset_t seek_avf(URLContext *h, offset_t offset, int whence);
+    friend int64_t seek_avf(URLContext *h, int64_t offset, int whence);
     friend int close_avf(URLContext *h);
 
     void DecodeDTVCC(const uint8_t *buf);

@@ -12,11 +12,11 @@
 
 
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
 static int diff_y_mmx(unsigned char *a, unsigned char *b, int s)
 {
 	int ret;
-	asm volatile (
+        __asm__ volatile (
 		"movl $4, %%ecx \n\t"
 		"pxor %%mm4, %%mm4 \n\t"
 		"pxor %%mm7, %%mm7 \n\t"
@@ -64,7 +64,7 @@ static int diff_y_mmx(unsigned char *a, unsigned char *b, int s)
 static int licomb_y_mmx(unsigned char *a, unsigned char *b, int s)
 {
 	int ret;
-	asm volatile (
+        __asm__ volatile (
 		"movl $4, %%ecx \n\t"
 		"pxor %%mm6, %%mm6 \n\t"
 		"pxor %%mm7, %%mm7 \n\t"
@@ -155,7 +155,7 @@ static int var_y_mmx(unsigned char *a, unsigned char *b, int s)
 {
     (void) b;
 	int ret;
-	asm volatile (
+        __asm__ volatile (
 		"movl $3, %%ecx \n\t"
 		"pxor %%mm4, %%mm4 \n\t"
 		"pxor %%mm7, %%mm7 \n\t"
@@ -781,7 +781,7 @@ void pullup_init_context(struct pullup_context *c)
 		c->diff = diff_y;
 		c->comb = licomb_y;
 		c->var = var_y;
-#ifdef HAVE_MMX
+#if HAVE_MMX
 		if (c->cpu & PULLUP_CPU_MMX) {
 			c->diff = diff_y_mmx;
 			c->comb = licomb_y_mmx;

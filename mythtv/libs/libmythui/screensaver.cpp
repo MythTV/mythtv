@@ -6,7 +6,7 @@
 #include "screensaver-x11.h"
 #endif // USING_X11
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #include "screensaver-osx.h"
 #endif
 
@@ -20,7 +20,7 @@ ScreenSaverControl* ScreenSaverControl::get(void)
   
 #if defined(USING_X11)
         ScreenSaverSingleton = new ScreenSaverX11();
-#elif defined(CONFIG_DARWIN)
+#elif CONFIG_DARWIN
         ScreenSaverSingleton = new ScreenSaverOSX();
 #else
         ScreenSaverSingleton = new ScreenSaverNull();

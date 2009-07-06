@@ -201,7 +201,7 @@ using_directx {
 }
 
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
+    HEADERS += ../../libs/libavcodec/x86/mmx.h ../../libs/libavcodec/dsputil.h
 }
 
 use_hidesyms {

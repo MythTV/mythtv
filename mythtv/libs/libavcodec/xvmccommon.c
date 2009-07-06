@@ -1,12 +1,12 @@
 
 static XvMCSurface* findPastSurface(MpegEncContext *s, 
-                                    xvmc_render_state_t *render) 
+                                    struct xvmc_pix_fmt *render)
 {
     Picture *lastp = s->last_picture_ptr;
-    xvmc_render_state_t *last = NULL;
+    struct xvmc_pix_fmt *last = NULL;
 
     if (NULL!=lastp) {
-        last = (xvmc_render_state_t*)(lastp->data[2]);
+        last = (struct xvmc_pix_fmt*)(lastp->data[2]);
         if (FF_B_TYPE==last->pict_type)
         {
             last = NULL;
@@ -21,19 +21,19 @@ static XvMCSurface* findPastSurface(MpegEncContext *s,
         else
             return 0;
 
-    if (last->magic != MP_XVMC_RENDER_MAGIC)
+    if (last->xvmc_id != AV_XVMC_ID)
         return 0;
 
-    return (last->state & MP_XVMC_STATE_PREDICTION) ? last->p_surface : 0;
+    return (last->state & AV_XVMC_STATE_PREDICTION) ? last->p_surface : 0;
 }
 
 static XvMCSurface* findFutureSurface(MpegEncContext *s) 
 {
     Picture *nextp = s->next_picture_ptr;
-    xvmc_render_state_t *next = NULL;
+    struct xvmc_pix_fmt *next = NULL;
 
     if (NULL!=nextp) {
-        next = (xvmc_render_state_t*)(nextp->data[2]);
+        next = (struct xvmc_pix_fmt*)(nextp->data[2]);
         if (FF_B_TYPE==next->pict_type)
         {
             next = NULL;
@@ -47,9 +47,9 @@ static XvMCSurface* findFutureSurface(MpegEncContext *s)
 
     //assert(NULL!=next);
 
-    if (next->magic != MP_XVMC_RENDER_MAGIC)
+    if (next->xvmc_id != AV_XVMC_ID)
         return 0;
 
-    return (next->state & MP_XVMC_STATE_PREDICTION) ? next->p_surface : 0;
+    return (next->state & AV_XVMC_STATE_PREDICTION) ? next->p_surface : 0;
 }
 

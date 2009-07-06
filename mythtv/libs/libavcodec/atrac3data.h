@@ -21,7 +21,7 @@
  */
 
 /**
- * @file atrac3data.h
+ * @file libavcodec/atrac3data.h
  * Atrac 3 AKA RealAudio 8 compatible decoder data
  */
 
@@ -103,6 +103,10 @@ static const uint8_t* const huff_codes[7] = {
 
 static const uint8_t* const huff_bits[7] = {
   huffbits1,huffbits2,huffbits3,huffbits4,huffbits5,huffbits6,huffbits7,
+};
+
+static const uint16_t atrac3_vlc_offs[] = {
+    0,512,1024,1536,2048,2560,3072,3584,4096
 };
 
 /* selector tables */

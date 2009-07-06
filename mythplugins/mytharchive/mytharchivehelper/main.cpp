@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 #include <mythtv/mythconfig.h>
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #include <sys/param.h>
 #include <sys/mount.h>
 #elif __linux__
@@ -1882,18 +1882,14 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
                             filename = filename.arg(thumbCount);
 
                         avpicture_fill(&retbuf, outputbuf,
-                                       PIX_FMT_RGBA32, width, height);
+                                       PIX_FMT_RGB32, width, height);
 
                         avpicture_deinterlace((AVPicture*)frame,
                                               (AVPicture*)frame,
                                               codecCtx->pix_fmt, width, height);
 
-#if ENABLE_SWSCALE
                         myth_sws_img_convert(
-#else
-                        img_convert(
-#endif
-                                    &retbuf, PIX_FMT_RGBA32,
+                                    &retbuf, PIX_FMT_RGB32,
                                     (AVPicture*) frame,
                                     codecCtx->pix_fmt, width, height);
 
@@ -2382,7 +2378,7 @@ int isRemote(QString filename)
     struct statfs statbuf;
     bzero(&statbuf, sizeof(statbuf));
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
             (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr

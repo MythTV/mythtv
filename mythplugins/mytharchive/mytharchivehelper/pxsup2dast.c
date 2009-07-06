@@ -75,9 +75,7 @@ typedef int_fast32_t fi32;	typedef uint_fast32_t fu32;
 #define cast2signed(t, v) \
   __builtin_choose_expr (__builtin_types_compatible_p \
 			 (typeof (v), unsigned t), /**/ ((t)(v)), (void)0)
-#define cast2unsigned_array(t, v) \
-  __builtin_choose_expr (__builtin_types_compatible_p (typeof (v), t []), \
-			 ((unsigned t *)(v)), (void)0)
+#define cast2unsigned_array(t, v) ( __builtin_choose_expr ( __builtin_types_compatible_p ( __typeof (v), t []), (unsigned t *)(v), (void)0 ) )
 #define cast2signed_array(t, v) \
   __builtin_choose_expr (__builtin_types_compatible_p \
 			 (typeof (v), unsigned t []), /**/ ((t *)(v)), (void)0)

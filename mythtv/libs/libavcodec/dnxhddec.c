@@ -1,6 +1,6 @@
 /*
  * VC3/DNxHD decoder.
- * Copyright (c) 2007 SmartJog S.A., Baptiste Coudurier <baptiste dot coudurier at smartjog dot com>.
+ * Copyright (c) 2007 SmartJog S.A., Baptiste Coudurier <baptiste dot coudurier at smartjog dot com>
  *
  * This file is part of FFmpeg.
  *
@@ -23,7 +23,7 @@
 //#define DEBUG
 
 #include "avcodec.h"
-#include "bitstream.h"
+#include "get_bits.h"
 #include "dnxhddata.h"
 #include "dsputil.h"
 
@@ -219,14 +219,12 @@ static int dnxhd_decode_macroblock(DNXHDContext *ctx, int x, int y)
     int dct_offset;
     int qscale, i;
 
-    ctx->dsp.clear_blocks(ctx->blocks[0]);
-    ctx->dsp.clear_blocks(ctx->blocks[2]); // FIXME change clear blocks to take block amount
-
     qscale = get_bits(&ctx->gb, 11);
     skip_bits1(&ctx->gb);
     //av_log(ctx->avctx, AV_LOG_DEBUG, "qscale %d\n", qscale);
 
     for (i = 0; i < 8; i++) {
+        ctx->dsp.clear_block(ctx->blocks[i]);
         dnxhd_decode_dct_block(ctx, ctx->blocks[i], i, qscale);
     }
 
@@ -280,8 +278,10 @@ static int dnxhd_decode_macroblocks(DNXHDContext *ctx, const uint8_t *buf, int b
 }
 
 static int dnxhd_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
-                              const uint8_t *buf, int buf_size)
+                              AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     DNXHDContext *ctx = avctx->priv_data;
     AVFrame *picture = data;
     int first_field = 1;

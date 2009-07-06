@@ -23,15 +23,46 @@ debug:contains(ARCH_X86_32, yes) {
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-SOURCES += adler32.c mathematics.c integer.c lfg.c lls.c log.c mem.c utils.c
-SOURCES += rational.c intfloat_readwrite.c crc.c des.c md5.c fifo.c
-SOURCES += aes.c tree.c lzo.c base64.c random.c rc4.c sha1.c string.c
+SOURCES += adler32.c
+SOURCES += aes.c
+SOURCES += avstring.c
+SOURCES += base64.c
+SOURCES += crc.c
+SOURCES += des.c
+SOURCES += fifo.c
+SOURCES += integer.c
+SOURCES += intfloat_readwrite.c
+SOURCES += lfg.c
+SOURCES += lls.c
+SOURCES += log.c
+SOURCES += lzo.c
+SOURCES += mathematics.c
+SOURCES += md5.c
+SOURCES += mem.c
+SOURCES += random_seed.c
+SOURCES += rational.c
+SOURCES += rc4.c
+SOURCES += sha1.c
+SOURCES += tree.c
+SOURCES += utils.c
 
 inc.path = $${PREFIX}/include/mythtv/libavutil/
-inc.files  = adler32.h avutil.h common.h crc.h mathematics.h internal.h
-inc.files += lls.h log.h rational.h intfloat_readwrite.h crc.h md5.h x86_cpu.h
-inc.files += softfloat.h fifo.h aes.h tree.h lzo.h base64.h random.h mem.h
-inc.files += sha1.h avstring.h
+inc.files  = adler32.h
+inc.files += avstring.h
+inc.files += avutil.h
+inc.files += base64.h
+inc.files += common.h
+inc.files += crc.h
+inc.files += fifo.h
+inc.files += intfloat_readwrite.h
+inc.files += log.h
+inc.files += lzo.h
+inc.files += mathematics.h
+inc.files += md5.h
+inc.files += mem.h
+inc.files += pixfmt.h
+inc.files += rational.h
+inc.files += sha1.h
 
 INSTALLS += inc
 

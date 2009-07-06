@@ -663,8 +663,8 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     mpa_vidctx->codec_id = (enum CodecID)codec;
     mpa_vidctx->width = video_width;
     mpa_vidctx->height = video_height;
-    mpa_vidctx->error_resilience = 2;
-    mpa_vidctx->bits_per_sample = 12;
+    mpa_vidctx->error_recognition = 2;
+    mpa_vidctx->bits_per_coded_sample = 12;
 
     if (directrendering)
     {
@@ -909,11 +909,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         avpicture_fill(&tmppicture, outbuf, PIX_FMT_YUV420P, video_width,
                        video_height);
 
-#if ENABLE_SWSCALE
         myth_sws_img_convert(
-#else
-        img_convert(
-#endif
             &tmppicture, PIX_FMT_YUV420P, (AVPicture *)&mpa_pic,
                     mpa_vidctx->pix_fmt, video_width, video_height);
     }
@@ -1219,17 +1215,16 @@ bool NuppelDecoder::GetFrame(int avignore)
 
                 int packetlen = frameheader.packetlength;
                 int ret = 0;
-                int data_size = 0;
+                int data_size;
                 unsigned char *ptr = strm;
 
                 QMutexLocker locker(&avcodeclock);
 
                 while (packetlen > 0)
                 {
-                    data_size = 0;
-
-                    ret = avcodec_decode_audio(mpa_audctx,
-                        audioSamples, &data_size, ptr, packetlen);
+                    data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                    ret = avcodec_decode_audio2(mpa_audctx, audioSamples,
+                                                &data_size, ptr, packetlen);
 
                     if (data_size)
                         GetNVP()->AddAudioData((char *)audioSamples, data_size,

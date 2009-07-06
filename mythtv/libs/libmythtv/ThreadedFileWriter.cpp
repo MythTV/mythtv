@@ -21,7 +21,9 @@
 #include "mythconfig.h"
 
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
-#define HAVE_FDATASYNC
+#define HAVE_FDATASYNC 1
+#else
+#define HAVE_FDATASYNC 0
 #endif
 
 #define LOC QString("TFW: ")
@@ -347,26 +349,26 @@ void ThreadedFileWriter::Sync(void)
 {
     if (fd >= 0)
     {
-#ifdef HAVE_SYNC_FILE_RANGE
-        uint64_t write_position;
-
-        buflock.lock();
-        write_position = m_file_wpos;
-        buflock.unlock();
-
-        if ((write_position - m_file_sync) > TFW_MAX_WRITE_SIZE ||
-            (write_position && m_file_sync < (uint64_t)tfw_min_write_size))
+        if (HAVE_SYNC_FILE_RANGE)
         {
-            sync_file_range(fd, m_file_sync, write_position - m_file_sync,
-                            SYNC_FILE_RANGE_WRITE);
-            m_file_sync = write_position;
-        }
+            uint64_t write_position;
 
-#elif defined(HAVE_FDATASYNC)
-        fdatasync(fd);
-#else
-        fsync(fd);
-#endif
+            buflock.lock();
+            write_position = m_file_wpos;
+            buflock.unlock();
+
+            if ((write_position - m_file_sync) > TFW_MAX_WRITE_SIZE ||
+                (write_position && m_file_sync < (uint64_t)tfw_min_write_size))
+            {
+                sync_file_range(fd, m_file_sync, write_position - m_file_sync,
+                                SYNC_FILE_RANGE_WRITE);
+                m_file_sync = write_position;
+            }
+        }
+        else if (HAVE_FDATASYNC)
+            fdatasync(fd);
+        else
+            fsync(fd);
     }
 }
 

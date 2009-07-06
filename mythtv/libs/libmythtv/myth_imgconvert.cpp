@@ -31,8 +31,8 @@ extern "C" {
 #include "mythverbose.h"
 #include "myth_imgconvert.h"
 
-int myth_sws_img_convert(AVPicture *dst, int dst_pix_fmt, AVPicture *src,
-                int pix_fmt, int width, int height)
+int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,
+                PixelFormat pix_fmt, int width, int height)
 {
 
     static struct SwsContext *convert_ctx;

@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "libavutil/crc.h"
+#include "libavutil/intreadwrite.h"
 #include "mlp.h"
 
 const uint8_t ff_mlp_huffman_tables[3][18][2] = {
@@ -43,26 +44,14 @@ const uint8_t ff_mlp_huffman_tables[3][18][2] = {
 static int crc_init = 0;
 static AVCRC crc_63[1024];
 static AVCRC crc_1D[1024];
-
-
-static int crc_init_2D = 0;
 static AVCRC crc_2D[1024];
 
-int av_cold ff_mlp_init_crc2D(AVCodecParserContext *s)
-{
-    if (!crc_init_2D) {
-        av_crc_init(crc_2D, 0, 16, 0x002D, sizeof(crc_2D));
-        crc_init_2D = 1;
-    }
-
-    return 0;
-}
-
-void av_cold ff_mlp_init_crc()
+av_cold void ff_mlp_init_crc(void)
 {
     if (!crc_init) {
         av_crc_init(crc_63, 0,  8,   0x63, sizeof(crc_63));
         av_crc_init(crc_1D, 0,  8,   0x1D, sizeof(crc_1D));
+        av_crc_init(crc_2D, 0, 16, 0x002D, sizeof(crc_2D));
         crc_init = 1;
     }
 }
@@ -107,6 +96,8 @@ uint8_t ff_mlp_calculate_parity(const uint8_t *buf, unsigned int buf_size)
     uint32_t scratch = 0;
     const uint8_t *buf_end = buf + buf_size;
 
+    for (; ((intptr_t) buf & 3) && buf < buf_end; buf++)
+        scratch ^= *buf;
     for (; buf < buf_end - 3; buf += 4)
         scratch ^= *((const uint32_t*)buf);
 

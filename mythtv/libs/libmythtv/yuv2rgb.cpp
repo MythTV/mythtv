@@ -30,17 +30,17 @@
 #include <limits.h>
 #include "mythconfig.h"
 
-#ifdef MMX
+#if HAVE_MMX
 extern "C" {
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 }
 #define CPU_MMXEXT 0
 #define CPU_MMX 1
 #endif
 
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
 extern "C" int has_altivec(void);    // in libavcodec/ppc/check_altivec.c
-#ifdef HAVE_ALTIVEC_H
+#if HAVE_ALTIVEC_H
 #include <altivec.h>
 #else
 #include <Accelerate/Accelerate.h>
@@ -69,7 +69,7 @@ do {                            \
         movq_r2m (src, dest);   \
 } while (0)
 
-#ifdef MMX
+#if HAVE_MMX
 static inline void mmx_yuv2rgb (uint8_t * py, uint8_t * pu, uint8_t * pv)
 {
     static mmx_t mmx_80w = {0x0080008000800080LL};
@@ -348,15 +348,13 @@ static void mmx_argb32 (uint8_t * image,
  */
 yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 {
-#ifdef MMX
-    if ((bpp == 16) && (mode == MODE_RGB))
+    if (HAVE_MMX && (bpp == 16) && (mode == MODE_RGB))
         return mmxext_rgb16;
-    else if ((bpp == 32) && (mode == MODE_RGB))
+    else if (HAVE_MMX && (bpp == 32) && (mode == MODE_RGB))
         return mmxext_argb32;
-#else
+
     (void)bpp;
     (void)mode;
-#endif
 
     return NULL; /* Fallback to C */
 }
@@ -372,15 +370,12 @@ yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
  */
 yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 {
-#ifdef MMX
-    if ((bpp == 16) && (mode == MODE_RGB))
+    if (HAVE_MMX && (bpp == 16) && (mode == MODE_RGB))
         return mmx_rgb16;
-    else if ((bpp == 32) && (mode == MODE_RGB))
+    else if (HAVE_MMX && (bpp == 32) && (mode == MODE_RGB))
         return mmx_argb32;
-#else
     if ((bpp == 32) && (mode == MODE_RGB))
         return yuv420_argb32_non_mmx;
-#endif
 
     return NULL;
 }
@@ -758,7 +753,7 @@ static void non_vec_i420_2vuy(
     }
 }
 
-#ifdef MMX
+#if HAVE_MMX
 /** \brief MMX I420 to 2VUY conversion function.
  *
  *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
@@ -864,9 +859,9 @@ static void mmx_i420_2vuy(
     emms();
 }
 
-#endif // MMX
+#endif // HAVE_MMX
 
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
 
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
@@ -1007,16 +1002,15 @@ static void altivec_i420_2vuy(
  */
 conv_i420_2vuy_fun get_i420_2vuy_conv(void)
 {
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
     if (has_altivec())
         return altivec_i420_2vuy;
+    else
 #endif
-
-#ifdef MMX
-    return mmx_i420_2vuy;
-#endif
-
-    return non_vec_i420_2vuy; /* Fallback to C */
+    if (HAVE_MMX)
+        return mmx_i420_2vuy;
+    else
+        return non_vec_i420_2vuy; /* Fallback to C */
 }
 
 /** \brief Plain C 2VUY to I420 conversion routine
@@ -1060,7 +1054,7 @@ static void non_vec_2vuy_i420(
     }
 }
 
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
 
 // Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
 
@@ -1201,7 +1195,7 @@ static void altivec_2vuy_i420(
  */
 conv_2vuy_i420_fun get_2vuy_i420_conv(void)
 {
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
     if (has_altivec())
         return altivec_2vuy_i420;
 #endif

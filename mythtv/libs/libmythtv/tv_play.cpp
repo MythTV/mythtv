@@ -57,7 +57,7 @@ using namespace std;
 #include "tvosdmenuentry.h"
 #include "tv_play_win.h"
 
-#ifndef HAVE_ROUND
+#if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
 

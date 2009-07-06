@@ -25,7 +25,7 @@ void InitializeMythDirs(void)
     if (tmp_installprefix)
         installprefix = tmp_installprefix;
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     // Work around bug in OS X where applicationDirPath() can crash
     // (if binary is not in a bundle, and is daemon()ized)
 
@@ -78,7 +78,7 @@ QString GetFiltersDir(void) { return filtersdir; }
 
 // These defines provide portability for different
 // plugin file names.
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 static const QString kPluginLibPrefix = "lib";
 static const QString kPluginLibSuffix = ".dylib";
 #elif USING_MINGW

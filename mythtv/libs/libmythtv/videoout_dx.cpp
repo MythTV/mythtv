@@ -320,11 +320,7 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
             avpicture_fill(&image_in, buffer->buf, PIX_FMT_YUV420P, XJ_width, XJ_height);
 
-#if ENABLE_SWSCALE
             myth_sws_img_convert(
-#else
-            img_convert(
-#endif
                 &image_out, av_format, &image_in, PIX_FMT_YUV420P,
                 XJ_width, XJ_height);
 

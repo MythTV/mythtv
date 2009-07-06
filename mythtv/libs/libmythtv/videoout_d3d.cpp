@@ -543,11 +543,7 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     avpicture_fill(&image_in, buffer->buf,
                    PIX_FMT_YUV420P, m_InputCX, m_InputCY);
 
-#if ENABLE_SWSCALE
     myth_sws_img_convert(
-#else
-    img_convert(
-#endif
         &image_out, PIX_FMT_RGBA32, &image_in,
                 PIX_FMT_YUV420P, m_InputCX, m_InputCY);
 

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
@@ -24,8 +24,8 @@
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 #define CLAMP(A,L,U) ((A)>(U)?(U):((A)<(L)?(L):(A)))
 
-#ifdef MMX
-#include "i386/mmx.h"
+#if HAVE_MMX
+#include "x86/mmx.h"
 #define THRESHOLD 12
 static const mmx_t mm_lthr = { w:{ -THRESHOLD, -THRESHOLD,
                                    -THRESHOLD, -THRESHOLD} };
@@ -109,7 +109,7 @@ static void line_filter_c(uint8_t *dst, int width, int start_width,
     }
 }
 
-#ifdef MMX
+#if HAVE_MMX
 static inline void mmx_start(uint8_t *src1, uint8_t *src2,
                              uint8_t *src3, uint8_t *src4,
                              int X)
@@ -411,8 +411,8 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
                 p->line_filter_fast(dest, w, 0, src1, src3, src4, src5, src5);
         }
     }
-#ifdef MMX
-    if (p->mm_flags & MM_MMX)
+#if HAVE_MMX
+    if (p->mm_flags & FF_MM_MMX)
         emms();
 #endif
 }
@@ -560,9 +560,9 @@ VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
     filter->mm_flags = 0;
     filter->line_filter = &line_filter_c;
     filter->line_filter_fast = &line_filter_c_fast;
-#ifdef MMX
+#if HAVE_MMX
     filter->mm_flags = mm_support();
-    if (filter->mm_flags & MM_MMX)
+    if (filter->mm_flags & FF_MM_MMX)
     {
         filter->line_filter = &line_filter_mmx;
         filter->line_filter_fast = &line_filter_mmx_fast;

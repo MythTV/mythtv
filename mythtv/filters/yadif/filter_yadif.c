@@ -1,6 +1,6 @@
 /*
- * Yadif 
- * 
+ * Yadif
+ *
  * Original taken from mplayer (vf_yadif.c)
     Copyright (C) 2006 Michael Niedermayer <michaelni@gmx.at>
 
@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "config.h"
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 #include <inttypes.h>
@@ -44,8 +44,8 @@
 #define MAX3(a,b,c) MAX(MAX(a,b),c)
 
 #include "../mm_arch.h"
-#ifdef MMX
-#include "i386/mmx.h"
+#if HAVE_MMX
+#include "x86/mmx.h"
 #endif
 
 #include "aclib.h"
@@ -109,7 +109,7 @@ static void AllocFilter(ThisFilter* filter, int width, int height)
             int h= ((height+6+ 31) & (~31))>>is_chroma;
 
             filter->stride[i]= w;
-            for (j=0; j<3; j++) 
+            for (j=0; j<3; j++)
                 filter->ref[j][i]= (uint8_t*)calloc(w*h*sizeof(uint8_t),1)+3*w;
         }
         filter->width = width;
@@ -127,7 +127,7 @@ static inline void * memcpy_pic2(void * dst, const void * src,
 
     if (!limit2width && dstStride == srcStride)
     {
-        if (srcStride < 0) 
+        if (srcStride < 0)
         {
             src = (const uint8_t*)src + (height-1)*srcStride;
             dst = (uint8_t*)dst + (height-1)*dstStride;
@@ -170,7 +170,7 @@ static void store_ref(struct ThisFilter *p, uint8_t *src, int src_offsets[3],
 }
 
 
-#if defined(MMX)
+#if HAVE_MMX
 
 #define LOAD4(mem,dst) \
             "movd      "mem", "#dst" \n\t"\
@@ -241,7 +241,7 @@ static void filter_line_mmx2(struct ThisFilter *p, uint8_t *dst,
 
 #define FILTER\
     for (x=0; x<w; x+=4){\
-        asm volatile(\
+        __asm__ volatile(\
             "pxor      %%mm7, %%mm7 \n\t"\
             LOAD4("(%[cur],%[mrefs])", %%mm0) /* c = cur[x-refs] */\
             LOAD4("(%[cur],%[prefs])", %%mm1) /* e = cur[x+refs] */\
@@ -358,7 +358,7 @@ static void filter_line_mmx2(struct ThisFilter *p, uint8_t *dst,
              [pb1]  "m"(pb_1),\
              [mode] "g"(mode)\
         );\
-        asm volatile("movd %%mm1, %0" :"=m"(*dst));\
+        __asm__ volatile("movd %%mm1, %0" :"=m"(*dst));\
         dst += 4;\
         prev+= 4;\
         cur += 4;\
@@ -389,7 +389,7 @@ static void filter_line_mmx2(struct ThisFilter *p, uint8_t *dst,
 #undef CHECK2
 #undef FILTER
 
-#endif /* defined(MMX) && defined(NAMED_ASM_ARGS) */
+#endif /* HAVE_MMX && defined(NAMED_ASM_ARGS) */
 
 static void filter_line_c(struct ThisFilter *p, uint8_t *dst,
                           uint8_t *prev, uint8_t *cur, uint8_t *next,
@@ -488,7 +488,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst, int dst_offsets[3],
             }
         }
     }
-#ifdef MMX
+#if HAVE_MMX
     emms();
 #endif
 }
@@ -615,7 +615,7 @@ VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt,
 
     AllocFilter(filter, *width, *height);
 
-#ifdef MMX
+#if HAVE_MMX
     filter->mm_flags = mm_support();
     TF_INIT(filter);
 #else
@@ -623,23 +623,23 @@ VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt,
 #endif
 
     filter->filter_line = filter_line_c;
-#ifdef MMX
-    if (filter->mm_flags & MM_MMX) 
+#if HAVE_MMX
+    if (filter->mm_flags & FF_MM_MMX)
     {
         filter->filter_line = filter_line_mmx2;
-    }	
-    
-    if (filter->mm_flags & MM_SSE2)
-		  fast_memcpy=fast_memcpy_SSE;
-	  else if (filter->mm_flags & MM_MMXEXT)
-		  fast_memcpy=fast_memcpy_MMX2;
-	  else if (filter->mm_flags & MM_3DNOW)
-  		fast_memcpy=fast_memcpy_3DNow;
-    else if (filter->mm_flags & MM_MMX)
-		  fast_memcpy=fast_memcpy_MMX;
-  	else
+    }
+
+    if (filter->mm_flags & FF_MM_SSE2)
+        fast_memcpy=fast_memcpy_SSE;
+    else if (filter->mm_flags & FF_MM_MMXEXT)
+        fast_memcpy=fast_memcpy_MMX2;
+    else if (filter->mm_flags & FF_MM_3DNOW)
+        fast_memcpy=fast_memcpy_3DNow;
+    else if (filter->mm_flags & FF_MM_MMX)
+        fast_memcpy=fast_memcpy_MMX;
+    else
 #endif
-		  fast_memcpy=memcpy;
+        fast_memcpy=memcpy;
 
     filter->vf.filter = &YadifDeint;
     filter->vf.cleanup = &CleanupYadifDeintFilter;
@@ -650,7 +650,7 @@ VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt,
     filter->kill_threads = 0;
     filter->actual_threads  = 0;
     filter->requested_threads  = threads;
-    filter->threads = NULL; 
+    filter->threads = NULL;
 
     if (filter->requested_threads > 1)
     {

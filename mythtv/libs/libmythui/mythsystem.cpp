@@ -17,7 +17,7 @@
 #   ifdef __FreeBSD__
 #     include <sys/mount.h>
 #   endif
-#   ifdef CONFIG_CYGWIN
+#   if CONFIG_CYGWIN
 #     include <sys/statfs.h>
 #   endif
 #   ifndef _WIN32

@@ -1,6 +1,6 @@
 /*
  * MPEG2 transport stream defines
- * Copyright (c) 2003 Fabrice Bellard.
+ * Copyright (c) 2003 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -39,7 +39,6 @@
 #define PMT_TID   0x02
 #define SDT_TID   0x42
 
-/* descriptor ids */
 #define DVB_CAROUSEL_ID             0x13
 #define DVB_VBI_DATA_ID             0x45
 #define DVB_VBI_TELETEXT_ID         0x46
@@ -47,7 +46,6 @@
 #define DVB_SUBT_DESCID             0x59
 #define DVB_BROADCAST_ID            0x66
 #define DVB_DATA_STREAM             0x52
-
 #define STREAM_TYPE_VIDEO_MPEG1     0x01
 #define STREAM_TYPE_VIDEO_MPEG2     0x02
 #define STREAM_TYPE_AUDIO_MPEG1     0x03

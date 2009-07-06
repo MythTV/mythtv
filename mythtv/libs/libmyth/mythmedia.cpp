@@ -272,7 +272,7 @@ MediaError MythMediaDevice::eject(bool open_close)
 {
     (void) open_close;
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     // Backgrounding this is a bit naughty, but it can take up to five
     // seconds to execute, and freezing the frontend for that long is bad
 

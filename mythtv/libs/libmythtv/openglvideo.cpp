@@ -811,11 +811,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
         avpicture_fill(&img_in, (uint8_t *)frame->buf, PIX_FMT_YUV420P,
                        convertSize.width(), convertSize.height());
 
-#if ENABLE_SWSCALE
     myth_sws_img_convert(
-#else
-    img_convert(
-#endif
                     &img_out, PIX_FMT_BGRA,
                     &img_in,  PIX_FMT_YUV420P,
                     convertSize.width(), convertSize.height());

@@ -29,22 +29,22 @@
 #include "mpeg2.h"
 #include "attributes.h"
 #include "mpeg2_internal.h"
-#ifdef ARCH_X86
-#include "i386/mmx.h"
+#if ARCH_X86
+#include "x86/mmx.h"
 #endif
 
 void (* mpeg2_cpu_state_save) (cpu_state_t * state) = NULL;
 void (* mpeg2_cpu_state_restore) (cpu_state_t * state) = NULL;
 
-#ifdef ARCH_X86
+#if ARCH_X86
 static void state_restore_mmx (cpu_state_t * state)
 {
     emms ();
 }
 #endif
 
-#ifdef HAVE_ALTIVEC
-#if defined(HAVE_ALTIVEC_H) && !defined(CONFIG_DARWIN)	/* gnu */
+#if HAVE_ALTIVEC
+#if HAVE_ALTIVEC_H && !CONFIG_DARWIN /* gnu */
 #define LI(a,b) "li " #a "," #b "\n\t"
 #define STVX0(a,b,c) "stvx " #a ",0," #c "\n\t"
 #define STVX(a,b,c) "stvx " #a "," #b "," #c "\n\t"
@@ -115,12 +115,11 @@ static void state_restore_altivec (cpu_state_t * state)
 
 void mpeg2_cpu_state_init (uint32_t accel)
 {
-#ifdef ARCH_X86
+#if ARCH_X86
     if (accel & MPEG2_ACCEL_X86_MMX) {
 	mpeg2_cpu_state_restore = state_restore_mmx;
     }
-#endif
-#ifdef HAVE_ALTIVEC
+#elif HAVE_ALTIVEC
     if (accel & MPEG2_ACCEL_PPC_ALTIVEC) {
 	mpeg2_cpu_state_save = state_save_altivec;
 	mpeg2_cpu_state_restore = state_restore_altivec;

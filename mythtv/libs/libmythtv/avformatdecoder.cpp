@@ -35,21 +35,21 @@ using namespace std;
 #ifdef USING_XVMC
 #include "videoout_xv.h"
 extern "C" {
-#include "xvmc_render.h"
+#include "libavcodec/xvmc.h"
 }
 #endif // USING_XVMC
 
 #ifdef USING_VDPAU
 #include "videoout_vdpau.h"
 extern "C" {
-#include "vdpau_render.h"
+#include "vdpau.h"
 }
 #endif // USING_VDPAU
 
 extern "C" {
 #include "avutil.h"
 #include "ac3_parser.h"
-#include "mpegvideo.h"
+extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 #include "avio.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
@@ -88,6 +88,20 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
                         int offset[4], int y, int type, int height);
+
+static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
+{
+    AVCodec *codec = c;
+    while (codec)
+    {
+        if (codec->id == id && codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
+            return codec;
+
+        codec = codec->next;
+    }
+
+    return c;
+}
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
@@ -1050,7 +1064,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
 static float normalized_fps(AVStream *stream, AVCodecContext *enc)
 {
-    float fps = 1.0f / av_q2d(enc->time_base);
+    float fps = 1.0f / av_q2d(enc->time_base) / enc->ticks_per_frame;
 
     // Some formats report fps waaay too high. (wrong time_base)
     if (fps > 121.0f && (enc->time_base.den > 10000) &&
@@ -1071,6 +1085,47 @@ static float normalized_fps(AVStream *stream, AVCodecContext *enc)
     // If it is still out of range, just assume NTSC...
     fps = (fps > 121.0f) ? (30000.0f / 1001.0f) : fps;
     return fps;
+}
+
+static bool IS_XVMC_PIX_FMT(enum PixelFormat fmt)
+{
+    return
+        fmt == PIX_FMT_XVMC_MPEG2_MC ||
+        fmt == PIX_FMT_XVMC_MPEG2_IDCT;
+}
+
+static bool IS_VDPAU_PIX_FMT(enum PixelFormat fmt)
+{
+    return
+        fmt == PIX_FMT_VDPAU_H264  ||
+        fmt == PIX_FMT_VDPAU_MPEG1 ||
+        fmt == PIX_FMT_VDPAU_MPEG2 ||
+        fmt == PIX_FMT_VDPAU_WMV3  ||
+        fmt == PIX_FMT_VDPAU_VC1;
+}
+
+static enum PixelFormat get_format_xvmc(struct AVCodecContext *avctx,
+                                        const enum PixelFormat *fmt)
+{
+    int i = 0;
+
+    for(i=0; fmt[i]!=PIX_FMT_NONE; i++)
+        if (IS_XVMC_PIX_FMT(fmt[i]))
+            break;
+
+    return fmt[i];
+}
+
+static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
+                                         const enum PixelFormat *fmt)
+{
+    int i = 0;
+
+    for(i=0; fmt[i]!=PIX_FMT_NONE; i++)
+        if (IS_VDPAU_PIX_FMT(fmt[i]))
+            break;
+
+    return fmt[i];
 }
 
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
@@ -1111,7 +1166,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     enc->draw_horiz_band = NULL;
     enc->slice_flags = 0;
 
-    enc->error_resilience = FF_ER_COMPLIANT;
+    enc->error_recognition = FF_ER_COMPLIANT;
     enc->workaround_bugs = FF_BUG_AUTODETECT;
     enc->error_concealment = FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
     enc->idct_algo = FF_IDCT_AUTO;
@@ -1120,6 +1175,11 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     enc->error_rate = 0;
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
+    // look for a vdpau capable codec
+    if (codec && video_codec_id > kCodec_VDPAU_BEGIN &&
+        video_codec_id < kCodec_VDPAU_END &&
+        !(codec->capabilities & CODEC_CAP_HWACCEL_VDPAU))
+        codec = find_vdpau_decoder(codec, enc->codec_id);
 
     if (selectedStream &&
         !gContext->GetNumSetting("DecodeExtraAudio", 0) &&
@@ -1133,6 +1193,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         enc->flags |= CODEC_FLAG_EMU_EDGE;
         enc->get_buffer = get_avf_buffer_xvmc;
+        enc->get_format = get_format_xvmc;
         enc->release_buffer = release_avf_buffer_xvmc;
         enc->draw_horiz_band = render_slice_xvmc;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER |
@@ -1151,12 +1212,10 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band  = NULL;
         directrendering      |= selectedStream;
     }
-    else if (codec && (codec->id == CODEC_ID_MPEGVIDEO_VDPAU ||
-                       codec->id == CODEC_ID_H264_VDPAU ||
-                       codec->id == CODEC_ID_VC1_VDPAU ||
-                       codec->id == CODEC_ID_WMV3_VDPAU))
+    else if (codec && codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
     {
         enc->get_buffer      = get_avf_buffer_vdpau;
+        enc->get_format      = get_format_vdpau;
         enc->release_buffer  = release_avf_buffer_vdpau;
         enc->draw_horiz_band = render_slice_vdpau;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
@@ -1203,20 +1262,16 @@ static int mpeg_version(int codec_id)
         case CODEC_ID_MPEG2VIDEO_XVMC:
         case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
         case CODEC_ID_MPEG2VIDEO_DVDV:
-        case CODEC_ID_MPEGVIDEO_VDPAU:
             return 2;
         case CODEC_ID_H263:
             return 3;
         case CODEC_ID_MPEG4:
             return 4;
         case CODEC_ID_H264:
-        case CODEC_ID_H264_VDPAU:
             return 5;
         case CODEC_ID_VC1:
-        case CODEC_ID_VC1_VDPAU:
             return 6;
         case CODEC_ID_WMV3:
-        case CODEC_ID_WMV3_VDPAU:
             return 7;
         default:
             break;
@@ -1660,9 +1715,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     thread_count = 1;
 
                 VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
-                        .arg(ENABLE_THREADS ? thread_count : 1));
+                        .arg(HAVE_THREADS ? thread_count : 1));
 
-                if (ENABLE_THREADS && thread_count > 1)
+                if (HAVE_THREADS && thread_count > 1)
                 {
                     avcodec_thread_init(enc, thread_count);
                     enc->thread_count = thread_count;
@@ -1800,7 +1855,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             // only caused by build problems, where libavcodec needs a rebuild
             if (print_verbose_messages & VB_LIBAV)
             {
-                AVCodec *p = first_avcodec;
+                AVCodec *p = av_codec_next(NULL);
                 int      i = 1;
                 while (p)
                 {
@@ -1812,12 +1867,20 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     {   codec = p; break;    }
 
                     printf("Codec %d != %d\n", p->id, enc->codec_id);
-                    p = p->next;
+                    p = av_codec_next(p);
                     ++i;
                 }
             }
             if (!codec)
                 continue;
+        }
+        // select vdpau capable decoder if needed
+        else if (enc->codec_type == CODEC_TYPE_VIDEO &&
+                 video_codec_id > kCodec_VDPAU_BEGIN &&
+                 video_codec_id < kCodec_VDPAU_END &&
+                 !(codec->capabilities & CODEC_CAP_HWACCEL_VDPAU))
+        {
+            codec = find_vdpau_decoder(codec, enc->codec_id);
         }
 
         if (!enc->codec)
@@ -2137,9 +2200,9 @@ int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
     pic->age = 256 * 256 * 256 * 64;
 
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = (xvmc_render_state_t *)frame->buf;
+    struct xvmc_pix_fmt *render = (struct xvmc_pix_fmt *)frame->buf;
 
-    render->state = MP_XVMC_STATE_PREDICTION;
+    render->state = AV_XVMC_STATE_PREDICTION;
     render->picture_structure = 0;
     render->flags = 0;
     render->start_mv_blocks_num = 0;
@@ -2155,8 +2218,8 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = (xvmc_render_state_t *)pic->data[2];
-    render->state &= ~MP_XVMC_STATE_PREDICTION;
+    struct xvmc_pix_fmt *render = (struct xvmc_pix_fmt *)pic->data[2];
+    render->state &= ~AV_XVMC_STATE_PREDICTION;
 #endif
 
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
@@ -2198,9 +2261,9 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
     VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(false);
 
-    pic->data[0] = frame->priv[0];
-    pic->data[1] = frame->priv[1];
-    pic->data[2] = frame->buf;
+    pic->data[0] = frame->buf;
+    pic->data[1] = frame->priv[0];
+    pic->data[2] = frame->priv[1];
 
     pic->linesize[0] = 0;
     pic->linesize[1] = 0;
@@ -2214,8 +2277,8 @@ int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
     frame->pix_fmt = c->pix_fmt;
 
 #ifdef USING_VDPAU
-    vdpau_render_state_t *render = (vdpau_render_state_t *)frame->buf;
-    render->state |= MP_VDPAU_STATE_USED_FOR_REFERENCE;
+    struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
+    render->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE;
 #endif
 
     return 0;
@@ -2226,8 +2289,8 @@ void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
 #ifdef USING_VDPAU
-    vdpau_render_state_t *render = (vdpau_render_state_t *)pic->data[2];
-    render->state &= ~MP_VDPAU_STATE_USED_FOR_REFERENCE;
+    struct vdpau_render_state *render = (struct vdpau_render_state *)pic->data[0];
+    render->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE;
 #endif
 
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
@@ -3413,14 +3476,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD ||
-                context->codec_id == CODEC_ID_MPEGVIDEO_VDPAU)
+                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
             {
                 if (!ringBuffer->isDVD())
                     MpegPreProcessPkt(curstream, pkt);
             }
-            else if (context->codec_id == CODEC_ID_H264 ||
-                     context->codec_id == CODEC_ID_H264_VDPAU)
+            else if (context->codec_id == CODEC_ID_H264)
             {
                 H264PreProcessPkt(curstream, pkt);
             }
@@ -3864,11 +3925,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         tmppicture.linesize[1] = picframe->pitches[1];
                         tmppicture.linesize[2] = picframe->pitches[2];
 
-#if ENABLE_SWSCALE
                         myth_sws_img_convert(
-#else
-                        img_convert(
-#endif
                             &tmppicture, PIX_FMT_YUV420P,
                                     (AVPicture *)&mpa_pic,
                                     context->pix_fmt,

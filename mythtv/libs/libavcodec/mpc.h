@@ -20,7 +20,7 @@
  */
 
 /**
- * @file mpc.h Musepack decoder
+ * @file libavcodec/mpc.h Musepack decoder
  * MPEG Audio Layer 1/2 -like codec with frames of 1152 samples
  * divided into 32 subbands.
  */
@@ -28,14 +28,10 @@
 #ifndef AVCODEC_MPC_H
 #define AVCODEC_MPC_H
 
-#include "libavutil/random.h"
+#include "libavutil/lfg.h"
 #include "avcodec.h"
-#include "bitstream.h"
+#include "get_bits.h"
 #include "dsputil.h"
-
-#ifdef CONFIG_MPEGAUDIO_HP
-#define USE_HIGHPRECISION
-#endif
 #include "mpegaudio.h"
 
 #include "mpcdata.h"
@@ -66,7 +62,7 @@ typedef struct {
     int cur_frame, frames;
     uint8_t *bits;
     int buf_size;
-    AVRandomState rnd;
+    AVLFG rnd;
     int frames_to_skip;
     /* for synthesis */
     DECLARE_ALIGNED_16(MPA_INT, synth_buf[MPA_MAX_CHANNELS][512*2]);
@@ -74,7 +70,7 @@ typedef struct {
     DECLARE_ALIGNED_16(int32_t, sb_samples[MPA_MAX_CHANNELS][36][SBLIMIT]);
 } MPCContext;
 
-extern void ff_mpc_init();
-extern void ff_mpc_dequantize_and_synth(MPCContext *c, int maxband, void *dst);
+void ff_mpc_init(void);
+void ff_mpc_dequantize_and_synth(MPCContext *c, int maxband, void *dst);
 
 #endif /* AVCODEC_MPC_H */

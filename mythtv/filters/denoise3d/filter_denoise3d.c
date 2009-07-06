@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
@@ -29,7 +29,7 @@
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
 
 #ifdef MMX
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 static const mmx_t mz = { 0x0LL };
 #endif
 
@@ -344,7 +344,7 @@ static int denoise3DFilter(VideoFilter *f, VideoFrame *frame, int field)
     TF_START;
 
 #ifdef MMX
-    if (filter->mm_flags & MM_MMX)
+    if (filter->mm_flags & FF_MM_MMX)
         emms();
 #endif
 
@@ -366,7 +366,7 @@ static int denoise3DFilter(VideoFilter *f, VideoFrame *frame, int field)
                        filter->coefs[2] + 256,
                        filter->coefs[3] + 256);
 #ifdef MMX
-    if (filter->mm_flags & MM_MMX)
+    if (filter->mm_flags & FF_MM_MMX)
         emms();
 #endif
 
@@ -417,7 +417,7 @@ VideoFilter *NewDenoise3DFilter(VideoFrameType inpixfmt, VideoFrameType outpixfm
 
 #ifdef MMX
     filter->mm_flags = mm_support();
-    if (filter->mm_flags & MM_MMX)
+    if (filter->mm_flags & FF_MM_MMX)
         filter->filtfunc = &denoiseMMX;
 #endif
 

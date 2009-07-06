@@ -1017,18 +1017,18 @@ bool VideoBuffers::HasChildren(const VideoFrame *frame)
 
 #ifdef USING_XVMC
 
-inline xvmc_render_state_t *GetRender(VideoFrame *frame)
+inline struct xvmc_pix_fmt *GetRender(VideoFrame *frame)
 {
     if (frame)
-        return (xvmc_render_state_t*) frame->buf;
+        return (struct xvmc_pix_fmt*) frame->buf;
     else
         return NULL;
 }
 
-inline const xvmc_render_state_t *GetRender(const VideoFrame *frame)
+inline const struct xvmc_pix_fmt *GetRender(const VideoFrame *frame)
 {
     if (frame)
-        return (const xvmc_render_state_t*) frame->buf;
+        return (const struct xvmc_pix_fmt*) frame->buf;
     else
         return NULL;
 }
@@ -1036,7 +1036,7 @@ inline const xvmc_render_state_t *GetRender(const VideoFrame *frame)
 VideoFrame* VideoBuffers::PastFrame(const VideoFrame *frame)
 {
     LockFrame(frame, "PastFrame");
-    const xvmc_render_state_t* r = GetRender(frame);
+    const struct xvmc_pix_fmt* r = GetRender(frame);
     VideoFrame* f = NULL;
     if (r)
         f = xvmc_surf_to_frame[r->p_past_surface];
@@ -1047,7 +1047,7 @@ VideoFrame* VideoBuffers::PastFrame(const VideoFrame *frame)
 VideoFrame* VideoBuffers::FutureFrame(const VideoFrame *frame)
 {
     LockFrame(frame, "FutureFrame");
-    const xvmc_render_state_t* r = GetRender(frame);
+    const struct xvmc_pix_fmt* r = GetRender(frame);
     VideoFrame* f = NULL;
     if (r)
         f = xvmc_surf_to_frame[r->p_future_surface];
@@ -1058,7 +1058,7 @@ VideoFrame* VideoBuffers::FutureFrame(const VideoFrame *frame)
 VideoFrame* VideoBuffers::GetOSDFrame(const VideoFrame *frame)
 {
     LockFrame(frame, "GetOSDFrame");
-    const xvmc_render_state_t* r = GetRender(frame);
+    const struct xvmc_pix_fmt* r = GetRender(frame);
     VideoFrame* f = NULL;
     if (r)
         f = (VideoFrame*) (r->p_osd_target_surface_render);
@@ -1083,7 +1083,7 @@ void VideoBuffers::SetOSDFrame(VideoFrame *frame, VideoFrame *osd)
     }
 
     LockFrame(frame, "SetOSDFrame");
-    xvmc_render_state_t* r = GetRender(frame);
+    struct xvmc_pix_fmt* r = GetRender(frame);
     if (r)
     {
         QMutexLocker locker(&global_lock);
@@ -1268,12 +1268,12 @@ bool VideoBuffers::CreateBuffers(int width, int height,
     for (uint i = 0; i < allocSize(); i++)
     {
         xvmc_vo_surf_t *surf    = (xvmc_vo_surf_t*) surfs[i];
-        xvmc_render_state_t *render = new xvmc_render_state_t;
+        struct xvmc_pix_fmt *render = new struct xvmc_pix_fmt;
         allocated_structs.push_back((unsigned char*)render);
-        memset(render, 0, sizeof(xvmc_render_state_t));
+        memset(render, 0, sizeof(struct xvmc_pix_fmt));
 
         // constants
-        render->magic           = MP_XVMC_RENDER_MAGIC;
+        render->xvmc_id         = AV_XVMC_ID;
         render->state           = 0;
 
         // from videoout_xv
@@ -1283,8 +1283,8 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         // from xvmv block and surface arrays
         render->p_surface       = &surf->surface;
 
-        render->total_number_of_data_blocks = surf->blocks.num_blocks;
-        render->total_number_of_mv_blocks   = surf->macro_blocks.num_blocks;
+        render->allocated_data_blocks = surf->blocks.num_blocks;
+        render->allocated_mv_blocks   = surf->macro_blocks.num_blocks;
 
         init(&buffers[i],
              FMT_XVMC_IDCT_MPEG2, (unsigned char*) render,
@@ -1303,9 +1303,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
         }
 
         // from surface info
-        render->mc_type         = xvmc_surf_info.mc_type;
         render->idct = (xvmc_surf_info.mc_type & XVMC_IDCT) == XVMC_IDCT;
-        render->chroma_format   = xvmc_surf_info.chroma_format;
         render->unsigned_intra  = (xvmc_surf_info.flags & 
                                   XVMC_INTRA_UNSIGNED) == XVMC_INTRA_UNSIGNED;
 

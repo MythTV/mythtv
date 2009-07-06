@@ -20,13 +20,14 @@
  */
 
 /**
- * @file xa.c
+ * @file libavformat/xa.c
  * Maxis XA File Demuxer
  * by Robert Marston (rmarston@gmail.com)
  * for more information on the XA audio format see
  *   http://wiki.multimedia.cx/index.php?title=Maxis_XA
  */
 
+#include "libavutil/intreadwrite.h"
 #include "avformat.h"
 
 #define XA00_TAG MKTAG('X', 'A', 0, 0)
@@ -72,7 +73,7 @@ static int xa_read_header(AVFormatContext *s,
     /* Value in file is average byte rate*/
     st->codec->bit_rate     = get_le32(pb) * 8;
     st->codec->block_align  = get_le16(pb);
-    st->codec->bits_per_sample = get_le16(pb);
+    st->codec->bits_per_coded_sample = get_le16(pb);
 
     av_set_pts_info(st, 64, 1, st->codec->sample_rate);
 

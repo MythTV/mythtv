@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/intreadwrite.h"
 #include "voc.h"
 
 
@@ -38,7 +39,7 @@ static int voc_probe(AVProbeData *p)
 
 static int voc_read_header(AVFormatContext *s, AVFormatParameters *ap)
 {
-    voc_dec_context_t *voc = s->priv_data;
+    VocDecContext *voc = s->priv_data;
     ByteIOContext *pb = s->pb;
     int header_size;
     AVStream *st;
@@ -62,10 +63,10 @@ static int voc_read_header(AVFormatContext *s, AVFormatParameters *ap)
 int
 voc_get_packet(AVFormatContext *s, AVPacket *pkt, AVStream *st, int max_size)
 {
-    voc_dec_context_t *voc = s->priv_data;
+    VocDecContext *voc = s->priv_data;
     AVCodecContext *dec = st->codec;
     ByteIOContext *pb = s->pb;
-    voc_type_t type;
+    VocType type;
     int size;
     int sample_rate = 0;
     int channels = 1;
@@ -83,8 +84,8 @@ voc_get_packet(AVFormatContext *s, AVPacket *pkt, AVStream *st, int max_size)
             if (sample_rate)
                 dec->sample_rate = sample_rate;
             dec->channels = channels;
-            dec->codec_id = codec_get_id(ff_voc_codec_tags, get_byte(pb));
-            dec->bits_per_sample = av_get_bits_per_sample(dec->codec_id);
+            dec->codec_id = ff_codec_get_id(ff_voc_codec_tags, get_byte(pb));
+            dec->bits_per_coded_sample = av_get_bits_per_sample(dec->codec_id);
             voc->remaining_size -= 2;
             max_size -= 2;
             channels = 1;
@@ -104,9 +105,9 @@ voc_get_packet(AVFormatContext *s, AVPacket *pkt, AVStream *st, int max_size)
 
         case VOC_TYPE_NEW_VOICE_DATA:
             dec->sample_rate = get_le32(pb);
-            dec->bits_per_sample = get_byte(pb);
+            dec->bits_per_coded_sample = get_byte(pb);
             dec->channels = get_byte(pb);
-            dec->codec_id = codec_get_id(ff_voc_codec_tags, get_le16(pb));
+            dec->codec_id = ff_codec_get_id(ff_voc_codec_tags, get_le16(pb));
             url_fskip(pb, 4);
             voc->remaining_size -= 12;
             max_size -= 12;
@@ -120,7 +121,7 @@ voc_get_packet(AVFormatContext *s, AVPacket *pkt, AVStream *st, int max_size)
         }
     }
 
-    dec->bit_rate = dec->sample_rate * dec->bits_per_sample;
+    dec->bit_rate = dec->sample_rate * dec->bits_per_coded_sample;
 
     if (max_size <= 0)
         max_size = 2048;
@@ -137,7 +138,7 @@ static int voc_read_packet(AVFormatContext *s, AVPacket *pkt)
 AVInputFormat voc_demuxer = {
     "voc",
     NULL_IF_CONFIG_SMALL("Creative Voice file format"),
-    sizeof(voc_dec_context_t),
+    sizeof(VocDecContext),
     voc_probe,
     voc_read_header,
     voc_read_packet,

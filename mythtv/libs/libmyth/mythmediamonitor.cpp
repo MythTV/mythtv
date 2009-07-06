@@ -26,7 +26,7 @@ using namespace std;
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h" 
 #endif
-#if defined(CONFIG_CYGWIN) || defined(_WIN32)
+#if CONFIG_CYGWIN || defined(_WIN32)
 #include "mediamonitor-windows.h" 
 #else
 #include "mediamonitor-unix.h" 
@@ -65,7 +65,7 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
 #ifdef USING_DARWIN_DA
     c_monitor = new MediaMonitorDarwin(NULL, 500, true); 
 #else
-  #if defined(CONFIG_CYGWIN) || defined(_WIN32)
+  #if CONFIG_CYGWIN || defined(_WIN32)
     c_monitor = new MediaMonitorWindows(NULL, 500, true); 
   #else
     c_monitor = new MediaMonitorUnix(NULL, 500, true);

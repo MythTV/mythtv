@@ -18,7 +18,7 @@ using namespace std;
 #include <sys/sysinfo.h>
 #endif
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #include <mach/mach.h>
 #endif
 
@@ -659,7 +659,7 @@ bool getUptime(time_t &uptime)
     else
         uptime = sinfo.uptime;
 
-#elif defined(__FreeBSD__) || defined(CONFIG_DARWIN)
+#elif defined(__FreeBSD__) || CONFIG_DARWIN
 
     int            mib[2];
     struct timeval bootTime;
@@ -747,7 +747,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
         totalVM = (int)((sinfo.totalswap * sinfo.mem_unit)/MB),
         freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
 
-#elif defined(CONFIG_DARWIN)
+#elif CONFIG_DARWIN
     mach_port_t             mp;
     mach_msg_type_number_t  count, pageSize;
     vm_statistics_data_t    s;
@@ -806,7 +806,7 @@ void myth_eject()
 #ifdef __linux__
         VERBOSE(VB_MEDIA, "Trying Linux 'eject -T' command");
         myth_system("eject -T");
-#elif defined(CONFIG_DARWIN)
+#elif CONFIG_DARWIN
         VERBOSE(VB_MEDIA, "Trying 'disktool -e disk1");
         myth_system("disktool -e disk1");
 #endif
@@ -1364,7 +1364,7 @@ bool IsPulseAudioRunning(void)
     return false;
 #endif
 
-#if defined(CONFIG_DARWIN) || (__FreeBSD__) || defined(__OpenBSD__)
+#if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -ax | grep -i pulseaudio | grep -v grep > /dev/null";
 #else
     const char *command = "ps -ae | grep pulseaudio > /dev/null";

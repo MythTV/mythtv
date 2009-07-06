@@ -19,7 +19,7 @@
 #ifndef COMMON_H_INCLUDED
 #define COMMON_H_INCLUDED
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #elif (SIZEOF_INT == 4)
 typedef	int	int32_t ;

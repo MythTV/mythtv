@@ -20,7 +20,7 @@
  */
 
 /**
- * @file 8bps.c
+ * @file libavcodec/8bps.c
  * QT 8BPS Video Decoder by Roberto Togni
  * For more information about the 8BPS format, visit:
  *   http://www.pcisys.net/~melanson/codecs/
@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
 
@@ -57,8 +58,10 @@ typedef struct EightBpsContext {
  * Decode a frame
  *
  */
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size)
+static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt)
 {
+        const uint8_t *buf = avpkt->data;
+        int buf_size = avpkt->size;
         EightBpsContext * const c = avctx->priv_data;
         const unsigned char *encoded = buf;
         unsigned char *pixptr, *pixptr_end;
@@ -160,7 +163,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
         return 1;
     }
 
-        switch (avctx->bits_per_sample) {
+        switch (avctx->bits_per_coded_sample) {
                 case 8:
                         avctx->pix_fmt = PIX_FMT_PAL8;
                         c->planes = 1;
@@ -193,7 +196,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
 #endif
                         break;
                 default:
-                        av_log(avctx, AV_LOG_ERROR, "Error: Unsupported color depth: %u.\n", avctx->bits_per_sample);
+                        av_log(avctx, AV_LOG_ERROR, "Error: Unsupported color depth: %u.\n", avctx->bits_per_coded_sample);
                         return -1;
         }
 

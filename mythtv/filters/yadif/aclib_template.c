@@ -149,7 +149,7 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 			for(i=0; i<32; i++)
 				printf("freq < %8d %4d\n", 1<<i, freq[i]);
 	}
-#endif 
+#endif
 
 #ifndef HAVE_ONLY_MMX1
         /* PREFETCH has effect even for MOVSB instruction ;) */
@@ -199,7 +199,7 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 		"movntps %%xmm2, 32(%1)\n"
 		"movntps %%xmm3, 48(%1)\n"
 		: /*no outputs*/
-    : "r" (from), "r" (to) 
+    : "r" (from), "r" (to)
     : "memory"
     );
 		from=((const unsigned char *) from)+64;
@@ -259,7 +259,7 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 //	printf(" %d %d\n", (int)from&1023, (int)to&1023);
 	// Pure Assembly cuz gcc is a bit unpredictable ;)
 	if (i>=BLOCK_SIZE/64)
-		asm volatile(
+            __asm__ volatile(
       // save ebx (-fPIC)
 	    MOVX" %%"REG_b", %6\n\t"
 			"xor %%"REG_a", %%"REG_a"	\n\t"

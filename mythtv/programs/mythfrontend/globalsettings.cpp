@@ -848,7 +848,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     width[1]  = new TransSpinBoxSetting(0, 1920, 64, true);
     height[1] = new TransSpinBoxSetting(0, 1088, 64, true);
     decoder   = new TransComboBoxSetting();
-    max_cpus  = new TransSpinBoxSetting(1, ENABLE_THREADS ? 4 : 1, 1, true);
+    max_cpus  = new TransSpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
     vidrend   = new TransComboBoxSetting();
     osdrend   = new TransComboBoxSetting();
     osdfade   = new TransCheckBoxSetting();
@@ -889,7 +889,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
 
     max_cpus->setHelpText(
         tr("Maximum number of CPU cores used for video decoding and filtering.") +
-        (ENABLE_THREADS ? "" :
+        (HAVE_THREADS ? "" :
          tr(" Multithreaded decoding disabled-only one CPU "
             "will be used, please recompile with "
             "--enable-ffmpeg-pthreads to enable.")));
@@ -2514,7 +2514,7 @@ static HostCheckBox *GuiSizeForTV()
     return gc;
 }
 
-#if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
+#if defined(USING_XRANDR) || CONFIG_DARWIN
 static HostCheckBox *UseVideoModes()
 {
     HostCheckBox *gc = new HostCheckBox("UseVideoModes");
@@ -4388,7 +4388,7 @@ class LcdSettings : public TriggeredConfigurationGroup
 };
 
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 static HostCheckBox *MacGammaCorrect()
 {
     HostCheckBox *gc = new HostCheckBox("MacGammaCorrect");
@@ -4695,7 +4695,7 @@ PlaybackSettings::PlaybackSettings()
 #ifdef USING_IVTV
     total += 1;
 #endif // USING_IVTV
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     total += 2;
 #endif // USING_DARWIN
 
@@ -4827,7 +4827,7 @@ PlaybackSettings::PlaybackSettings()
     addChild(new PVR350HWDecoderSettings(tmp2));
 #endif // USING_IVTV
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);
     mac1->setLabel(QObject::tr("Mac OS X video settings") +
                    QString(" (%1/%2)").arg(++i).arg(total));
@@ -4886,7 +4886,7 @@ OSDSettings::OSDSettings()
     addChild(OSDCC708Fonts());
     addChild(ExternalSubtitleSettings());
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     // Any Mac OS-specific OSD stuff would go here.
     // Note that this define should be Q_WS_MACX
 #endif
@@ -5080,7 +5080,7 @@ AppearanceSettings::AppearanceSettings()
 
     addChild(screen);
 
-#if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
+#if defined(USING_XRANDR) || CONFIG_DARWIN
     const vector<DisplayResScreen> scr = GetVideoModes();
     if (scr.size())
         addChild(new VideoModeSettings());

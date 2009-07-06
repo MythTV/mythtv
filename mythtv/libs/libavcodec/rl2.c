@@ -21,7 +21,7 @@
 
 /**
  * RL2 Video Decoder
- * @file rl2.c
+ * @file libavcodec/rl2.c
  * @author Sascha Sommer (saschasommer@freenet.de)
  * For more information about the RL2 format, visit:
  *   http://wiki.multimedia.cx/index.php?title=RL2
@@ -32,6 +32,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
 
@@ -180,8 +181,10 @@ static av_cold int rl2_decode_init(AVCodecContext *avctx)
  */
 static int rl2_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              const uint8_t *buf, int buf_size)
+                              AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     Rl2Context *s = avctx->priv_data;
 
     if(s->frame.data[0])

@@ -20,7 +20,7 @@
  */
 
 /**
- * @file 8svx.c
+ * @file libavcodec/8svx.c
  * 8svx audio decoder
  * @author Jaikrishnan Menon
  * supports: fibonacci delta encoding
@@ -32,18 +32,20 @@
 /** decoder context */
 typedef struct EightSvxContext {
     int16_t fib_acc;
-    int16_t *table;
+    const int16_t *table;
 } EightSvxContext;
 
-const static int16_t fibonacci[16]   = { -34<<8, -21<<8, -13<<8,  -8<<8, -5<<8, -3<<8, -2<<8, -1<<8,
+static const int16_t fibonacci[16]   = { -34<<8, -21<<8, -13<<8,  -8<<8, -5<<8, -3<<8, -2<<8, -1<<8,
                                           0, 1<<8, 2<<8, 3<<8, 5<<8, 8<<8, 13<<8, 21<<8 };
-const static int16_t exponential[16] = { -128<<8, -64<<8, -32<<8, -16<<8, -8<<8, -4<<8, -2<<8, -1<<8,
+static const int16_t exponential[16] = { -128<<8, -64<<8, -32<<8, -16<<8, -8<<8, -4<<8, -2<<8, -1<<8,
                                           0, 1<<8, 2<<8, 4<<8, 8<<8, 16<<8, 32<<8, 64<<8 };
 
 /** decode a frame */
 static int eightsvx_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
-                                 const uint8_t *buf, int buf_size)
+                                 AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     EightSvxContext *esc = avctx->priv_data;
     int16_t *out_data = data;
     int consumed = buf_size;

@@ -21,11 +21,13 @@
 #ifndef AVCODEC_PPC_DSPUTIL_PPC_H
 #define AVCODEC_PPC_DSPUTIL_PPC_H
 
-#ifdef CONFIG_POWERPC_PERF
+#include "config.h"
+
+#if CONFIG_POWERPC_PERF
 void powerpc_display_perf_report(void);
 /* the 604* have 2, the G3* have 4, the G4s have 6,
    and the G5 are completely different (they MUST use
-   HAVE_PPC64, and let's hope all future 64 bis PPC
+   ARCH_PPC64, and let's hope all future 64 bis PPC
    will use the same PMCs... */
 #define POWERPC_NUM_PMC_ENABLED 6
 /* if you add to the enum below, also add to the perfname array
@@ -68,43 +70,43 @@ enum powerpc_data_index {
 };
 extern unsigned long long perfdata[POWERPC_NUM_PMC_ENABLED][powerpc_perf_total][powerpc_data_total];
 
-#ifndef HAVE_PPC64
+#if !ARCH_PPC64
 #define POWERP_PMC_DATATYPE unsigned long
-#define POWERPC_GET_PMC1(a) asm volatile("mfspr %0, 937" : "=r" (a))
-#define POWERPC_GET_PMC2(a) asm volatile("mfspr %0, 938" : "=r" (a))
+#define POWERPC_GET_PMC1(a) __asm__ volatile("mfspr %0, 937" : "=r" (a))
+#define POWERPC_GET_PMC2(a) __asm__ volatile("mfspr %0, 938" : "=r" (a))
 #if (POWERPC_NUM_PMC_ENABLED > 2)
-#define POWERPC_GET_PMC3(a) asm volatile("mfspr %0, 941" : "=r" (a))
-#define POWERPC_GET_PMC4(a) asm volatile("mfspr %0, 942" : "=r" (a))
+#define POWERPC_GET_PMC3(a) __asm__ volatile("mfspr %0, 941" : "=r" (a))
+#define POWERPC_GET_PMC4(a) __asm__ volatile("mfspr %0, 942" : "=r" (a))
 #else
 #define POWERPC_GET_PMC3(a) do {} while (0)
 #define POWERPC_GET_PMC4(a) do {} while (0)
 #endif
 #if (POWERPC_NUM_PMC_ENABLED > 4)
-#define POWERPC_GET_PMC5(a) asm volatile("mfspr %0, 929" : "=r" (a))
-#define POWERPC_GET_PMC6(a) asm volatile("mfspr %0, 930" : "=r" (a))
+#define POWERPC_GET_PMC5(a) __asm__ volatile("mfspr %0, 929" : "=r" (a))
+#define POWERPC_GET_PMC6(a) __asm__ volatile("mfspr %0, 930" : "=r" (a))
 #else
 #define POWERPC_GET_PMC5(a) do {} while (0)
 #define POWERPC_GET_PMC6(a) do {} while (0)
 #endif
-#else /* HAVE_PPC64 */
+#else /* ARCH_PPC64 */
 #define POWERP_PMC_DATATYPE unsigned long long
-#define POWERPC_GET_PMC1(a) asm volatile("mfspr %0, 771" : "=r" (a))
-#define POWERPC_GET_PMC2(a) asm volatile("mfspr %0, 772" : "=r" (a))
+#define POWERPC_GET_PMC1(a) __asm__ volatile("mfspr %0, 771" : "=r" (a))
+#define POWERPC_GET_PMC2(a) __asm__ volatile("mfspr %0, 772" : "=r" (a))
 #if (POWERPC_NUM_PMC_ENABLED > 2)
-#define POWERPC_GET_PMC3(a) asm volatile("mfspr %0, 773" : "=r" (a))
-#define POWERPC_GET_PMC4(a) asm volatile("mfspr %0, 774" : "=r" (a))
+#define POWERPC_GET_PMC3(a) __asm__ volatile("mfspr %0, 773" : "=r" (a))
+#define POWERPC_GET_PMC4(a) __asm__ volatile("mfspr %0, 774" : "=r" (a))
 #else
 #define POWERPC_GET_PMC3(a) do {} while (0)
 #define POWERPC_GET_PMC4(a) do {} while (0)
 #endif
 #if (POWERPC_NUM_PMC_ENABLED > 4)
-#define POWERPC_GET_PMC5(a) asm volatile("mfspr %0, 775" : "=r" (a))
-#define POWERPC_GET_PMC6(a) asm volatile("mfspr %0, 776" : "=r" (a))
+#define POWERPC_GET_PMC5(a) __asm__ volatile("mfspr %0, 775" : "=r" (a))
+#define POWERPC_GET_PMC6(a) __asm__ volatile("mfspr %0, 776" : "=r" (a))
 #else
 #define POWERPC_GET_PMC5(a) do {} while (0)
 #define POWERPC_GET_PMC6(a) do {} while (0)
 #endif
-#endif /* HAVE_PPC64 */
+#endif /* ARCH_PPC64 */
 #define POWERPC_PERF_DECLARE(a, cond)       \
     POWERP_PMC_DATATYPE                     \
         pmc_start[POWERPC_NUM_PMC_ENABLED], \

@@ -45,12 +45,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define RTJPEG_SWAP_HALFWORD(a) (a)
 #endif
 
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
 #ifdef MMX
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 #endif
 
 /* Format definitions */

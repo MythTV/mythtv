@@ -29,7 +29,7 @@
 #include <QStringList>
 
 #include "mythconfig.h"
-#if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
+#if CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
 #include "darwin-sendfile.h"
 #else
 #define USE_SETSOCKOPT

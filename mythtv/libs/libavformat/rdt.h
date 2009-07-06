@@ -22,6 +22,28 @@
 #ifndef AVFORMAT_RDT_H
 #define AVFORMAT_RDT_H
 
+#include <stdint.h>
+#include "avformat.h"
+#include "rtpdec.h"
+
+typedef struct RDTDemuxContext RDTDemuxContext;
+
+/**
+ * Allocate and init the RDT parsing context.
+ * @param ic the containing RTSP demuxer context
+ * @param first_stream_of_set_idx index to the first AVStream in the RTSP
+ *              demuxer context's ic->streams array that is part of this
+ *              particular stream's set of streams (with identical content)
+ * @param priv_data private data of the payload data handler context
+ * @param handler pointer to the parse_packet() payload parsing function
+ * @return a newly allocated RDTDemuxContext. Free with ff_rdt_parse_close().
+ */
+RDTDemuxContext *ff_rdt_parse_open(AVFormatContext *ic,
+                                   int first_stream_of_set_idx,
+                                   void *priv_data,
+                                   RTPDynamicProtocolHandler *handler);
+void ff_rdt_parse_close(RDTDemuxContext *s);
+
 /**
  * Calculate the response (RealChallenge2 in the RTSP header) to the
  * challenge (RealChallenge1 in the RTSP header from the Real/Helix
@@ -45,20 +67,46 @@ void av_register_rdt_dynamic_payload_handlers(void);
 /**
  * Add subscription information to Subscribe parameter string.
  *
- * @param s RDT context
  * @param cmd string to write the subscription information into.
  * @param size size of cmd.
  * @param stream_nr stream number.
  * @param rule_nr rule number to conform to.
  */
-void ff_rdt_subscribe_rule(RTPDemuxContext *s, char *cmd, int size,
+void ff_rdt_subscribe_rule(char *cmd, int size,
                            int stream_nr, int rule_nr);
+
+/**
+ * Parse RDT-style packet header.
+ *
+ * @param buf input buffer
+ * @param len length of input buffer
+ * @param set_id will be set to the set ID this packet belongs to
+ * @param seq_no will be set to the sequence number of the packet
+ * @param stream_id will be set to the stream ID this packet belongs to
+ * @param is_keyframe will be whether this packet belongs to a keyframe
+ * @param timestamp will be set to the timestamp of the packet
+ * @return the amount of bytes consumed, or <0 on error
+ */
+int ff_rdt_parse_header(const uint8_t *buf, int len,
+                        int *set_id, int *seq_no, int *stream_id,
+                        int *is_keyframe, uint32_t *timestamp);
 
 /**
  * Parse RDT-style packet data (header + media data).
  * Usage similar to rtp_parse_packet().
  */
-int ff_rdt_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
+int ff_rdt_parse_packet(RDTDemuxContext *s, AVPacket *pkt,
                         const uint8_t *buf, int len);
+
+/**
+ * Parse a server-related SDP line.
+ *
+ * @param s the RTSP AVFormatContext
+ * @param stream_index the index of the first stream in the set represented
+ *               by the SDP m= line (in s->streams)
+ * @param buf the SDP line
+ */
+void ff_real_parse_sdp_a_line(AVFormatContext *s, int stream_index,
+                              const char *buf);
 
 #endif /* AVFORMAT_RDT_H */

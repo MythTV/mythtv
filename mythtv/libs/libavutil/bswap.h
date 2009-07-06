@@ -19,7 +19,7 @@
  */
 
 /**
- * @file bswap.h
+ * @file libavutil/bswap.h
  * byte swapping routines
  */
 
@@ -30,72 +30,40 @@
 #include "config.h"
 #include "common.h"
 
-#ifdef HAVE_BYTESWAP_H
-#include <byteswap.h>
-#else
+#if   ARCH_ARM
+#   include "arm/bswap.h"
+#elif ARCH_BFIN
+#   include "bfin/bswap.h"
+#elif ARCH_SH4
+#   include "sh4/bswap.h"
+#elif ARCH_X86
+#   include "x86/bswap.h"
+#endif
 
+#ifndef bswap_16
 static av_always_inline av_const uint16_t bswap_16(uint16_t x)
 {
-#if defined(ARCH_X86)
-    asm("rorw $8, %0" : "+r"(x));
-#elif defined(ARCH_SH4)
-    asm("swap.b %0,%0" : "=r"(x) : "0"(x));
-#elif defined(HAVE_ARMV6)
-    asm("rev16 %0, %0" : "+r"(x));
-#else
     x= (x>>8) | (x<<8);
-#endif
     return x;
 }
+#endif
 
+#ifndef bswap_32
 static av_always_inline av_const uint32_t bswap_32(uint32_t x)
 {
-#if defined(ARCH_X86)
-#ifdef HAVE_BSWAP
-    asm("bswap   %0" : "+r" (x));
-#else
-    asm("rorw    $8,  %w0 \n\t"
-        "rorl    $16, %0  \n\t"
-        "rorw    $8,  %w0"
-        : "+r"(x));
-#endif
-#elif defined(ARCH_SH4)
-    asm("swap.b %0,%0\n"
-        "swap.w %0,%0\n"
-        "swap.b %0,%0\n"
-        : "=r"(x) : "0"(x));
-#elif defined(HAVE_ARMV6)
-    asm("rev %0, %0" : "+r"(x));
-#elif defined(ARCH_ARMV4L)
-    uint32_t t;
-    asm ("eor %1, %0, %0, ror #16 \n\t"
-         "bic %1, %1, #0xFF0000   \n\t"
-         "mov %0, %0, ror #8      \n\t"
-         "eor %0, %0, %1, lsr #8  \n\t"
-         : "+r"(x), "+r"(t));
-#elif defined(ARCH_BFIN)
-    unsigned tmp;
-    asm("%1 = %0 >> 8 (V);      \n\t"
-        "%0 = %0 << 8 (V);      \n\t"
-        "%0 = %0 | %1;          \n\t"
-        "%0 = PACK(%0.L, %0.H); \n\t"
-        : "+d"(x), "=&d"(tmp));
-#else
     x= ((x<<8)&0xFF00FF00) | ((x>>8)&0x00FF00FF);
     x= (x>>16) | (x<<16);
-#endif
     return x;
 }
+#endif
 
+#ifndef bswap_64
 static inline uint64_t av_const bswap_64(uint64_t x)
 {
 #if 0
     x= ((x<< 8)&0xFF00FF00FF00FF00ULL) | ((x>> 8)&0x00FF00FF00FF00FFULL);
     x= ((x<<16)&0xFFFF0000FFFF0000ULL) | ((x>>16)&0x0000FFFF0000FFFFULL);
     return (x>>32) | (x<<32);
-#elif defined(ARCH_X86_64)
-  asm("bswap  %0": "=r" (x) : "0" (x));
-  return x;
 #else
     union {
         uint64_t ll;
@@ -107,8 +75,7 @@ static inline uint64_t av_const bswap_64(uint64_t x)
     return r.ll;
 #endif
 }
-
-#endif  /* !HAVE_BYTESWAP_H */
+#endif
 
 static inline double bswap_dbl(double x)
 {
@@ -123,8 +90,8 @@ static inline double bswap_dbl(double x)
 }
 
 
-// be2me ... BigEndian to MachineEndian
-// le2me ... LittleEndian to MachineEndian
+// be2me ... big-endian to machine-endian
+// le2me ... little-endian to machine-endian
 
 #ifdef WORDS_BIGENDIAN
 #define be2me_16(x) (x)

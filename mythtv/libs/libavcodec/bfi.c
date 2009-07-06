@@ -20,7 +20,7 @@
  */
 
 /**
- * @file bfi.c
+ * @file libavcodec/bfi.c
  * @brief Brute Force & Ignorance (.bfi) video decoder
  * @author Sisir Koppaka ( sisir.koppaka at gmail dot com )
  * @sa http://wiki.multimedia.cx/index.php?title=BFI
@@ -36,7 +36,7 @@ typedef struct BFIContext {
     uint8_t *dst;
 } BFIContext;
 
-static int bfi_decode_init(AVCodecContext * avctx)
+static av_cold int bfi_decode_init(AVCodecContext * avctx)
 {
     BFIContext *bfi = avctx->priv_data;
     avctx->pix_fmt = PIX_FMT_PAL8;
@@ -45,9 +45,10 @@ static int bfi_decode_init(AVCodecContext * avctx)
 }
 
 static int bfi_decode_frame(AVCodecContext * avctx, void *data,
-                            int *data_size, const uint8_t * buf,
-                            int buf_size)
+                            int *data_size, AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     BFIContext *bfi = avctx->priv_data;
     uint8_t *dst = bfi->dst;
     uint8_t *src, *dst_offset, colour1, colour2;
@@ -94,7 +95,7 @@ static int bfi_decode_frame(AVCodecContext * avctx, void *data,
 
     while (dst != frame_end) {
         static const uint8_t lentab[4]={0,2,0,1};
-        unsigned int byte = *buf++, offset;
+        unsigned int byte = *buf++, av_uninit(offset);
         unsigned int code = byte >> 6;
         unsigned int length = byte & ~0xC0;
 
@@ -161,7 +162,7 @@ static int bfi_decode_frame(AVCodecContext * avctx, void *data,
     return buf_size;
 }
 
-static int bfi_decode_close(AVCodecContext * avctx)
+static av_cold int bfi_decode_close(AVCodecContext * avctx)
 {
     BFIContext *bfi = avctx->priv_data;
     if (bfi->frame.data[0])
@@ -178,5 +179,6 @@ AVCodec bfi_decoder = {
     .init = bfi_decode_init,
     .close = bfi_decode_close,
     .decode = bfi_decode_frame,
+    .capabilities = CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("Brute Force & Ignorance"),
 };

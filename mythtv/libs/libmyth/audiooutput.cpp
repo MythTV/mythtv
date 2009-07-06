@@ -23,7 +23,7 @@ using namespace std;
 #ifdef USE_ARTS
 #include "audiooutputarts.h"
 #endif
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #include "audiooutputca.h"
 #endif
 #ifdef USE_JACK
@@ -104,7 +104,7 @@ AudioOutput *AudioOutput::OpenAudio(
 #if defined(USING_OSS)
     else
         return new AudioOutputOSS(settings);
-#elif defined(CONFIG_DARWIN)
+#elif CONFIG_DARWIN
     else
         return new AudioOutputCA(settings);
 #endif

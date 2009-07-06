@@ -1,6 +1,6 @@
 /*
  * MPEG1/2 demuxer
- * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2000, 2001, 2002 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -54,10 +54,8 @@ static int check_pes(uint8_t *p, uint8_t *end){
     if((*p&0xC0) == 0x40) p+=2;
     if((*p&0xF0) == 0x20){
         pes1= p[0]&p[2]&p[4]&1;
-        p+=5;
     }else if((*p&0xF0) == 0x30){
         pes1= p[0]&p[2]&p[4]&p[5]&p[7]&p[9]&1;
-        p+=10;
     }else
         pes1 = *p == 0x0F;
 
@@ -95,12 +93,13 @@ static int mpegps_probe(AVProbeData *p)
         return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
     if(priv1 + vid + audio > invalid && (priv1+vid+audio)*9 <= pspack*10)
         return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
-    if((!!vid ^ !!audio) && (audio+vid > 1) && !sys && !pspack && p->buf_size>2048) /* PES stream */
+    if((!!vid ^ !!audio) && (audio > 4 || vid > 1) && !sys && !pspack && p->buf_size>2048) /* PES stream */
         return AVPROBE_SCORE_MAX/2+2;
 
     //02-Penguin.flac has sys:0 priv1:0 pspack:0 vid:0 audio:1
     return score;
 }
+
 
 typedef struct MpegDemuxContext {
     int32_t header_state;
@@ -131,17 +130,12 @@ static int mpegps_read_header(AVFormatContext *s,
 
 static int64_t get_pts(ByteIOContext *pb, int c)
 {
-    int64_t pts;
-    int val;
+    uint8_t buf[5];
 
-    if (c < 0)
-        c = get_byte(pb);
-    pts = (int64_t)((c >> 1) & 0x07) << 30;
-    val = get_be16(pb);
-    pts |= (int64_t)(val >> 1) << 15;
-    val = get_be16(pb);
-    pts |= (int64_t)(val >> 1);
-    return pts;
+    buf[0] = c<0 ? get_byte(pb) : c;
+    get_buffer(pb, buf+1, 4);
+
+    return ff_parse_pes_pts(buf);
 }
 
 static int find_next_start_code(ByteIOContext *pb, int *size_ptr,
@@ -406,7 +400,9 @@ static int mpegps_read_pes_header(AVFormatContext *s,
     if(dts != AV_NOPTS_VALUE && ppos){
         int i;
         for(i=0; i<s->nb_streams; i++){
-            if(startcode == s->streams[i]->id) {
+            if(startcode == s->streams[i]->id &&
+               !url_is_streamed(s->pb) /* index useless on streams anyway */) {
+                ff_reduce_index(s, i);
                 av_add_index_entry(s->streams[i], *ppos, dts, 0, 0, AVINDEX_KEYFRAME /* FIXME keyframe? */);
             }
         }
@@ -423,13 +419,22 @@ static int mpegps_read_packet(AVFormatContext *s,
 {
     MpegDemuxContext *m = s->priv_data;
     AVStream *st;
-    int len, startcode, i, type, codec_id = 0, es_type;
-    int64_t pts, dts, dummy_pos = 0; //dummy_pos is needed for the index building to work
+    int len, startcode, i, es_type;
+    enum CodecID codec_id = CODEC_ID_NONE;
+    enum CodecType type;
+    int64_t pts, dts, dummy_pos; //dummy_pos is needed for the index building to work
+    uint8_t av_uninit(dvdaudio_substream_type);
 
  redo:
     len = mpegps_read_pes_header(s, &dummy_pos, &startcode, &pts, &dts);
     if (len < 0)
         return len;
+
+    if(startcode == 0x1bd) {
+        dvdaudio_substream_type = get_byte(s->pb);
+        url_fskip(s->pb, 3);
+        len -= 4;
+    }
 
     /* now find stream */
     for(i=0;i<s->nb_streams;i++) {
@@ -439,7 +444,7 @@ static int mpegps_read_packet(AVFormatContext *s,
     }
 
     es_type = m->psm_es_type[startcode & 0xff];
-    if(es_type > 0){
+    if(es_type > 0 && es_type != STREAM_TYPE_PRIVATE_DATA){
         if(es_type == STREAM_TYPE_VIDEO_MPEG1){
             codec_id = CODEC_ID_MPEG2VIDEO;
             type = CODEC_TYPE_VIDEO;
@@ -492,7 +497,7 @@ static int mpegps_read_packet(AVFormatContext *s,
         codec_id = CODEC_ID_PCM_DVD;
     } else if (startcode >= 0xb0 && startcode <= 0xbf) {
         type = CODEC_TYPE_AUDIO;
-        codec_id = CODEC_ID_MLP;
+        codec_id = CODEC_ID_TRUEHD;
     } else if (startcode >= 0xc0 && startcode <= 0xcf) {
         /* Used for both AC-3 and E-AC-3 in EVOB files */
         type = CODEC_TYPE_AUDIO;
@@ -506,6 +511,19 @@ static int mpegps_read_packet(AVFormatContext *s,
     } else if (startcode >= 0xfd55 && startcode <= 0xfd5f) {
         type = CODEC_TYPE_VIDEO;
         codec_id = CODEC_ID_VC1;
+    } else if (startcode == 0x1bd) {
+        // check dvd audio substream type
+        type = CODEC_TYPE_AUDIO;
+        switch(dvdaudio_substream_type & 0xe0) {
+        case 0xa0:  codec_id = CODEC_ID_PCM_DVD;
+                    break;
+        case 0x80:  if((dvdaudio_substream_type & 0xf8) == 0x88)
+                         codec_id = CODEC_ID_DTS;
+                    else codec_id = CODEC_ID_AC3;
+                    break;
+        default:    av_log(s, AV_LOG_ERROR, "Unknown 0x1bd sub-stream\n");
+                    goto skip;
+        }
     } else {
     skip:
         /* skip packet */
@@ -529,7 +547,8 @@ static int mpegps_read_packet(AVFormatContext *s,
  found:
     if(st->discard >= AVDISCARD_ALL)
         goto skip;
-    if (startcode >= 0xa0 && startcode <= 0xaf) {
+    if ((startcode >= 0xa0 && startcode <= 0xaf) ||
+        (startcode == 0x1bd && ((dvdaudio_substream_type & 0xe0) == 0xa0))) {
         int b1, freq;
 
         /* for LPCM, we just skip the header and consider it is raw
@@ -543,13 +562,13 @@ static int mpegps_read_packet(AVFormatContext *s,
         freq = (b1 >> 4) & 3;
         st->codec->sample_rate = lpcm_freq_tab[freq];
         st->codec->channels = 1 + (b1 & 7);
-        st->codec->bits_per_sample = 16 + ((b1 >> 6) & 3) * 4;
+        st->codec->bits_per_coded_sample = 16 + ((b1 >> 6) & 3) * 4;
         st->codec->bit_rate = st->codec->channels *
                               st->codec->sample_rate *
-                              st->codec->bits_per_sample;
-        if (st->codec->bits_per_sample == 16)
+                              st->codec->bits_per_coded_sample;
+        if (st->codec->bits_per_coded_sample == 16)
             st->codec->codec_id = CODEC_ID_PCM_S16BE;
-        else if (st->codec->bits_per_sample == 28)
+        else if (st->codec->bits_per_coded_sample == 28)
             return AVERROR(EINVAL);
     }
     av_new_packet(pkt, len);
@@ -557,7 +576,6 @@ static int mpegps_read_packet(AVFormatContext *s,
     pkt->pts = pts;
     pkt->dts = dts;
     pkt->stream_index = st->index;
-    pkt->pos = dummy_pos;
 #if 0
     av_log(s, AV_LOG_DEBUG, "%d: pts=%0.3f dts=%0.3f size=%d\n",
            pkt->stream_index, pkt->pts / 90000.0, pkt->dts / 90000.0, pkt->size);

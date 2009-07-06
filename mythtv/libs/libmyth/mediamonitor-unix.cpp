@@ -42,7 +42,7 @@ using namespace std;
 #ifndef MNTTYPE_ISO9660
 #ifdef linux
 #define MNTTYPE_ISO9660 "iso9660"
-#elif defined(__FreeBSD__) || defined(CONFIG_DARWIN) || defined(__OpenBSD__)
+#elif defined(__FreeBSD__) || CONFIG_DARWIN || defined(__OpenBSD__)
 #define MNTTYPE_ISO9660 "cd9660"
 #endif
 #endif

@@ -1,7 +1,7 @@
 /*
  * LZW decoder
- * Copyright (c) 2003 Fabrice Bellard.
- * Copyright (c) 2006 Konstantin Shishkov.
+ * Copyright (c) 2003 Fabrice Bellard
+ * Copyright (c) 2006 Konstantin Shishkov
  *
  * This file is part of FFmpeg.
  *
@@ -21,7 +21,7 @@
  */
 
 /**
- * @file lzw.h
+ * @file libavcodec/lzw.h
  * @brief LZW decoding routines
  * @author Fabrice Bellard
  * Modified for use in TIFF by Konstantin Shishkov
@@ -30,7 +30,7 @@
 #ifndef AVCODEC_LZW_H
 #define AVCODEC_LZW_H
 
-#include "bitstream.h"
+#include "get_bits.h"
 
 enum FF_LZW_MODES{
     FF_LZW_GIF,

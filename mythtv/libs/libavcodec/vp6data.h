@@ -1,5 +1,5 @@
 /**
- * @file vp6data.h
+ * @file libavcodec/vp6data.h
  * VP6 compatible video decoder
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
@@ -283,7 +283,7 @@ static const int16_t vp6_block_copy_filter[17][8][4] = {
     {  -2,  16, 118,  -4  } },
 };
 
-static const vp56_tree_t vp6_pcr_tree[] = {
+static const VP56Tree vp6_pcr_tree[] = {
     { 8, 0},
     { 4, 1},
     { 2, 2}, {-1}, {-2},

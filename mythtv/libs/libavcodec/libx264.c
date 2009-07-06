@@ -30,6 +30,8 @@ typedef struct X264Context {
     x264_param_t params;
     x264_t *enc;
     x264_picture_t pic;
+    uint8_t *sei;
+    int sei_size;
     AVFrame out_pic;
 } X264Context;
 
@@ -51,13 +53,30 @@ X264_log(void *p, int level, const char *fmt, va_list args)
 
 
 static int
-encode_nals(uint8_t *buf, int size, x264_nal_t *nals, int nnal)
+encode_nals(AVCodecContext *ctx, uint8_t *buf, int size, x264_nal_t *nals, int nnal, int skip_sei)
 {
+    X264Context *x4 = ctx->priv_data;
     uint8_t *p = buf;
-    int i;
+    int i, s;
+
+    /* Write the SEI as part of the first frame. */
+    if(x4->sei_size > 0 && nnal > 0)
+    {
+        memcpy(p, x4->sei, x4->sei_size);
+        p += x4->sei_size;
+        x4->sei_size = 0;
+    }
 
     for(i = 0; i < nnal; i++){
-        int s = x264_nal_encode(p, &size, 1, nals + i);
+        /* Don't put the SEI in extradata. */
+        if(skip_sei && nals[i].i_type == NAL_SEI)
+        {
+            x4->sei = av_malloc( 5 + nals[i].i_payload * 4 / 3 );
+            if(x264_nal_encode(x4->sei, &x4->sei_size, 1, nals + i) < 0)
+                return -1;
+            continue;
+        }
+        s = x264_nal_encode(p, &size, 1, nals + i);
         if(s < 0)
             return -1;
         p += s;
@@ -92,7 +111,7 @@ X264_frame(AVCodecContext *ctx, uint8_t *buf, int bufsize, void *data)
                            &pic_out))
         return -1;
 
-    bufsize = encode_nals(buf, bufsize, nal, nnal);
+    bufsize = encode_nals(ctx, buf, bufsize, nal, nnal, 0);
     if(bufsize < 0)
         return -1;
 
@@ -124,6 +143,9 @@ X264_close(AVCodecContext *avctx)
 {
     X264Context *x4 = avctx->priv_data;
 
+    av_freep(&avctx->extradata);
+    av_free(x4->sei);
+
     if(x4->enc)
         x264_encoder_close(x4->enc);
 
@@ -135,6 +157,7 @@ X264_init(AVCodecContext *avctx)
 {
     X264Context *x4 = avctx->priv_data;
 
+    x4->sei_size = 0;
     x264_param_default(&x4->params);
 
     x4->params.pf_log = X264_log;
@@ -162,7 +185,7 @@ X264_init(AVCodecContext *avctx)
 
     x4->params.i_bframe = avctx->max_b_frames;
     x4->params.b_cabac = avctx->coder_type == FF_CODER_TYPE_AC;
-    x4->params.b_bframe_adaptive = avctx->b_frame_strategy;
+    x4->params.i_bframe_adaptive = avctx->b_frame_strategy;
     x4->params.i_bframe_bias = avctx->bframebias;
     x4->params.b_bframe_pyramid = avctx->flags2 & CODEC_FLAG2_BPYRAMID;
     avctx->has_b_frames= avctx->flags2 & CODEC_FLAG2_BPYRAMID ? 2 : !!avctx->max_b_frames;
@@ -227,8 +250,6 @@ X264_init(AVCodecContext *avctx)
     x4->params.analyse.i_me_range = avctx->me_range;
     x4->params.analyse.i_subpel_refine = avctx->me_subpel_quality;
 
-    x4->params.analyse.b_bidir_me = avctx->bidir_refine > 0;
-    x4->params.analyse.b_bframe_rdo = avctx->flags2 & CODEC_FLAG2_BRDO;
     x4->params.analyse.b_mixed_references =
         avctx->flags2 & CODEC_FLAG2_MIXED_REFS;
     x4->params.analyse.b_chroma_me = avctx->me_cmp & FF_CMP_CHROMA;
@@ -284,7 +305,7 @@ X264_init(AVCodecContext *avctx)
             s += 5 + nal[i].i_payload * 4 / 3;
 
         avctx->extradata = av_malloc(s);
-        avctx->extradata_size = encode_nals(avctx->extradata, s, nal, nnal);
+        avctx->extradata_size = encode_nals(avctx, avctx->extradata, s, nal, nnal, 1);
     }
 
     return 0;

@@ -21,7 +21,7 @@
  */
 
 /**
- * @file aac.h
+ * @file libavcodec/aac.h
  * AAC definitions and structures
  * @author Oded Shimon  ( ods15 ods15 dyndns org )
  * @author Maxim Gavrilov ( maxim.gavrilov gmail com )
@@ -46,37 +46,6 @@
 #define MAX_ELEM_ID 16
 
 #define TNS_MAX_ORDER 20
-#define PNS_MEAN_ENERGY 3719550720.0f // sqrt(3.0) * 1<<31
-
-enum AudioObjectType {
-    AOT_NULL,
-                               // Support?                Name
-    AOT_AAC_MAIN,              ///< Y                       Main
-    AOT_AAC_LC,                ///< Y                       Low Complexity
-    AOT_AAC_SSR,               ///< N (code in SoC repo)    Scalable Sample Rate
-    AOT_AAC_LTP,               ///< N (code in SoC repo)    Long Term Prediction
-    AOT_SBR,                   ///< N (in progress)         Spectral Band Replication
-    AOT_AAC_SCALABLE,          ///< N                       Scalable
-    AOT_TWINVQ,                ///< N                       Twin Vector Quantizer
-    AOT_CELP,                  ///< N                       Code Excited Linear Prediction
-    AOT_HVXC,                  ///< N                       Harmonic Vector eXcitation Coding
-    AOT_TTSI             = 12, ///< N                       Text-To-Speech Interface
-    AOT_MAINSYNTH,             ///< N                       Main Synthesis
-    AOT_WAVESYNTH,             ///< N                       Wavetable Synthesis
-    AOT_MIDI,                  ///< N                       General MIDI
-    AOT_SAFX,                  ///< N                       Algorithmic Synthesis and Audio Effects
-    AOT_ER_AAC_LC,             ///< N                       Error Resilient Low Complexity
-    AOT_ER_AAC_LTP       = 19, ///< N                       Error Resilient Long Term Prediction
-    AOT_ER_AAC_SCALABLE,       ///< N                       Error Resilient Scalable
-    AOT_ER_TWINVQ,             ///< N                       Error Resilient Twin Vector Quantizer
-    AOT_ER_BSAC,               ///< N                       Error Resilient Bit-Sliced Arithmetic Coding
-    AOT_ER_AAC_LD,             ///< N                       Error Resilient Low Delay
-    AOT_ER_CELP,               ///< N                       Error Resilient Code Excited Linear Prediction
-    AOT_ER_HVXC,               ///< N                       Error Resilient Harmonic Vector eXcitation Coding
-    AOT_ER_HILN,               ///< N                       Error Resilient Harmonic and Individual Lines plus Noise
-    AOT_ER_PARAM,              ///< N                       Error Resilient Parametric
-    AOT_SSC,                   ///< N                       SinuSoidal Coding
-};
 
 enum RawDataBlockType {
     TYPE_SCE,
@@ -134,6 +103,20 @@ enum CouplingPoint {
 };
 
 /**
+ * Predictor State
+ */
+typedef struct {
+    float cor0;
+    float cor1;
+    float var0;
+    float var1;
+    float r0;
+    float r1;
+} PredictorState;
+
+#define MAX_PREDICTORS 672
+
+/**
  * Individual Channel Stream
  */
 typedef struct {
@@ -146,6 +129,10 @@ typedef struct {
     int num_swb;                ///< number of scalefactor window bands
     int num_windows;
     int tns_max_bands;
+    int predictor_present;
+    int predictor_initialized;
+    int predictor_reset_group;
+    uint8_t prediction_used[41];
 } IndividualChannelStream;
 
 /**
@@ -190,8 +177,8 @@ typedef struct {
     int num_coupled;       ///< number of target elements
     enum RawDataBlockType type[8];   ///< Type of channel element to be coupled - SCE or CPE.
     int id_select[8];      ///< element id
-    int ch_select[8];      /**< [0] shared list of gains; [1] list of gains for left channel;
-                            *   [2] list of gains for right channel; [3] lists of gains for both channels
+    int ch_select[8];      /**< [0] shared list of gains; [1] list of gains for right channel;
+                            *   [2] list of gains for left channel; [3] lists of gains for both channels
                             */
     float gain[16][120];
 } ChannelCoupling;
@@ -208,6 +195,7 @@ typedef struct {
     DECLARE_ALIGNED_16(float, coeffs[1024]);  ///< coefficients for IMDCT
     DECLARE_ALIGNED_16(float, saved[512]);    ///< overlap
     DECLARE_ALIGNED_16(float, ret[1024]);     ///< PCM output
+    PredictorState predictor_state[MAX_PREDICTORS];
 } SingleChannelElement;
 
 /**
@@ -234,13 +222,15 @@ typedef struct {
     DynamicRangeControl che_drc;
 
     /**
-     * @defgroup elements
+     * @defgroup elements Channel element related data.
      * @{
      */
     enum ChannelPosition che_pos[4][MAX_ELEM_ID]; /**< channel element channel mapping with the
                                                    *   first index as the first 4 raw data block types
                                                    */
     ChannelElement * che[4][MAX_ELEM_ID];
+    ChannelElement * tag_che_map[4][MAX_ELEM_ID];
+    int tags_mapped;
     /** @} */
 
     /**
@@ -270,6 +260,7 @@ typedef struct {
     int sf_offset;                                    ///< offset into pow2sf_tab as appropriate for dsp.float_to_int16
     /** @} */
 
+    DECLARE_ALIGNED(16, float, temp[128]);
 } AACContext;
 
 #endif /* AVCODEC_AAC_H */

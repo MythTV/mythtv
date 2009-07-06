@@ -303,10 +303,9 @@ static void FUNCT_NAME(uint8_t *output, int outstride,
                "m"(oldbx)
 
              : XAX, XCX, XDX, XSI, XDI,
-#ifdef ARCH_X86_32
+#if ARCH_X86_32
                "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)",
-#endif
-#ifdef ARCH_X86_64
+#elif ARCH_X86_64
 /* the following clobber list causes trouble for gcc 2.95. it shouldn't be
  * an issue as, afaik, mmx registers map to the existing fp registers.
  */
@@ -331,7 +330,7 @@ static void FUNCT_NAME(uint8_t *output, int outstride,
     }
 
     // clear out the MMX registers ready for doing floating point again
-#ifdef HAVE_MMX
+#if HAVE_MMX
     __asm__ __volatile__ ("emms\n\t");
 #endif
 }

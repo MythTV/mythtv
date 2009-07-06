@@ -20,7 +20,7 @@
  */
 
 /**
- * @file eatgv.c
+ * @file libavcodec/eatgv.c
  * Electronic Arts TGV Video Decoder
  * by Peter Ross (suxen_drol at hotmail dot com)
  *
@@ -30,8 +30,8 @@
 
 #include "avcodec.h"
 #define ALT_BITSTREAM_READER_LE
-#include "bitstream.h"
-#include <libavutil/lzo.h>
+#include "get_bits.h"
+#include "libavutil/lzo.h"
 
 #define EA_PREAMBLE_SIZE    8
 #define kVGT_TAG MKTAG('k', 'V', 'G', 'T')
@@ -63,7 +63,7 @@ static av_cold int tgv_decode_init(AVCodecContext *avctx){
  */
 static int unpack(const uint8_t *src, const uint8_t *src_end, unsigned char *dst, int width, int height) {
     unsigned char *dst_end = dst + width*height;
-    int size,size1,size2,offset,run;
+    int size, size1, size2, av_uninit(offset), run;
     unsigned char *dst_start = dst;
 
     if (src[0] & 0x01)
@@ -237,8 +237,10 @@ static void cond_release_buffer(AVFrame *pic)
 
 static int tgv_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            const uint8_t *buf, int buf_size)
+                            AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     TgvContext *s = avctx->priv_data;
     const uint8_t *buf_end = buf + buf_size;
     int chunk_type;
@@ -336,5 +338,5 @@ AVCodec eatgv_decoder = {
     NULL,
     tgv_decode_end,
     tgv_decode_frame,
-    .long_name = NULL_IF_CONFIG_SMALL("Electronic Arts TGV Video"),
+    .long_name = NULL_IF_CONFIG_SMALL("Electronic Arts TGV video"),
 };

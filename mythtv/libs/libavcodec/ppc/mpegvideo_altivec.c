@@ -26,8 +26,6 @@
 #include "libavcodec/dsputil.h"
 #include "libavcodec/mpegvideo.h"
 
-#include "gcc_fixes.h"
-
 #include "dsputil_ppc.h"
 #include "util_altivec.h"
 // Swaps two variables (used for altivec registers)
@@ -585,12 +583,12 @@ POWERPC_PERF_STOP_COUNT(altivec_dct_unquantize_h263_num, nCoeffs == 63);
 }
 
 
-extern void idct_put_altivec(uint8_t *dest, int line_size, int16_t *block);
-extern void idct_add_altivec(uint8_t *dest, int line_size, int16_t *block);
+void idct_put_altivec(uint8_t *dest, int line_size, int16_t *block);
+void idct_add_altivec(uint8_t *dest, int line_size, int16_t *block);
 
 void MPV_common_init_altivec(MpegEncContext *s)
 {
-    if ((mm_flags & MM_ALTIVEC) == 0) return;
+    if ((mm_flags & FF_MM_ALTIVEC) == 0) return;
 
     if (s->avctx->lowres==0) {
         if ((s->avctx->idct_algo == FF_IDCT_AUTO) ||

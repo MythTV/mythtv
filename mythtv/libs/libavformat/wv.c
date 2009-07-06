@@ -1,6 +1,6 @@
 /*
  * WavPack demuxer
- * Copyright (c) 2006 Konstantin Shishkov.
+ * Copyright (c) 2006 Konstantin Shishkov
  *
  * This file is part of FFmpeg.
  *
@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/bswap.h"
+#include "libavutil/intreadwrite.h"
 #include "avformat.h"
 
 // specs say that maximum block size is 1Mb
@@ -96,15 +96,6 @@ static int wv_read_block_header(AVFormatContext *ctx, ByteIOContext *pb)
     get_buffer(pb, wc->extra, WV_EXTRA_SIZE);
     wc->flags = AV_RL32(wc->extra + 4);
     //parse flags
-    if(wc->flags & WV_FLOAT){
-        av_log(ctx, AV_LOG_ERROR, "Floating point data is not supported\n");
-        return -1;
-    }
-    if(wc->flags & WV_HYBRID){
-        av_log(ctx, AV_LOG_ERROR, "Hybrid coding mode is not supported\n");
-        return -1;
-    }
-
     bpp = ((wc->flags & 3) + 1) << 3;
     chan = 1 + !(wc->flags & WV_MONO);
     rate = wv_rates[(wc->flags >> 23) & 0xF];
@@ -151,7 +142,7 @@ static int wv_read_header(AVFormatContext *s,
     st->codec->codec_id = CODEC_ID_WAVPACK;
     st->codec->channels = wc->chan;
     st->codec->sample_rate = wc->rate;
-    st->codec->bits_per_sample = wc->bpp;
+    st->codec->bits_per_coded_sample = wc->bpp;
     av_set_pts_info(st, 64, 1, wc->rate);
     s->start_time = 0;
     s->duration = (int64_t)wc->samples * AV_TIME_BASE / st->codec->sample_rate;

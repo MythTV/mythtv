@@ -1,6 +1,6 @@
 /*
  * AU muxer and demuxer
- * Copyright (c) 2001 Fabrice Bellard.
+ * Copyright (c) 2001 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -47,7 +47,7 @@ static const AVCodecTag codec_au_tags[] = {
     { 0, 0 },
 };
 
-#ifdef CONFIG_AU_MUXER
+#if CONFIG_AU_MUXER
 /* AUDIO_FILE header */
 static int put_au_header(ByteIOContext *pb, AVCodecContext *enc)
 {
@@ -88,7 +88,7 @@ static int au_write_packet(AVFormatContext *s, AVPacket *pkt)
 static int au_write_trailer(AVFormatContext *s)
 {
     ByteIOContext *pb = s->pb;
-    offset_t file_size;
+    int64_t file_size;
 
     if (!url_is_streamed(s->pb)) {
 
@@ -122,7 +122,8 @@ static int au_read_header(AVFormatContext *s,
     int size;
     unsigned int tag;
     ByteIOContext *pb = s->pb;
-    unsigned int id, codec, channels, rate;
+    unsigned int id, channels, rate;
+    enum CodecID codec;
     AVStream *st;
 
     /* check ".snd" header */
@@ -136,7 +137,7 @@ static int au_read_header(AVFormatContext *s,
     rate = get_be32(pb);
     channels = get_be32(pb);
 
-    codec = codec_get_id(codec_au_tags, id);
+    codec = ff_codec_get_id(codec_au_tags, id);
 
     if (size >= 24) {
         /* skip unused data */
@@ -176,7 +177,7 @@ static int au_read_packet(AVFormatContext *s,
     return 0;
 }
 
-#ifdef CONFIG_AU_DEMUXER
+#if CONFIG_AU_DEMUXER
 AVInputFormat au_demuxer = {
     "au",
     NULL_IF_CONFIG_SMALL("SUN AU format"),
@@ -190,7 +191,7 @@ AVInputFormat au_demuxer = {
 };
 #endif
 
-#ifdef CONFIG_AU_MUXER
+#if CONFIG_AU_MUXER
 AVOutputFormat au_muxer = {
     "au",
     NULL_IF_CONFIG_SMALL("SUN AU format"),

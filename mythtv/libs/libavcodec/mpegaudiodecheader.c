@@ -1,6 +1,6 @@
 /*
  * MPEG Audio header decoder
- * Copyright (c) 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2001, 2002 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -20,7 +20,7 @@
  */
 
 /**
- * @file mpegaudiodecheader.c
+ * @file libavcodec/mpegaudiodecheader.c
  * MPEG Audio header decoder.
  */
 
@@ -30,7 +30,7 @@
 #include "mpegaudiodata.h"
 
 
-int ff_mpegaudio_decode_header(MPADecodeContext *s, uint32_t header)
+int ff_mpegaudio_decode_header(MPADecodeHeader *s, uint32_t header)
 {
     int sample_rate, frame_size, mpeg25, padding;
     int sample_rate_index, bitrate_index;
@@ -90,20 +90,20 @@ int ff_mpegaudio_decode_header(MPADecodeContext *s, uint32_t header)
     }
 
 #if defined(DEBUG)
-    dprintf(s->avctx, "layer%d, %d Hz, %d kbits/s, ",
+    dprintf(NULL, "layer%d, %d Hz, %d kbits/s, ",
            s->layer, s->sample_rate, s->bit_rate);
     if (s->nb_channels == 2) {
         if (s->layer == 3) {
             if (s->mode_ext & MODE_EXT_MS_STEREO)
-                dprintf(s->avctx, "ms-");
+                dprintf(NULL, "ms-");
             if (s->mode_ext & MODE_EXT_I_STEREO)
-                dprintf(s->avctx, "i-");
+                dprintf(NULL, "i-");
         }
-        dprintf(s->avctx, "stereo");
+        dprintf(NULL, "stereo");
     } else {
-        dprintf(s->avctx, "mono");
+        dprintf(NULL, "mono");
     }
-    dprintf(s->avctx, "\n");
+    dprintf(NULL, "\n");
 #endif
     return 0;
 }

@@ -580,7 +580,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
     m_codecCtx->skip_frame = AVDISCARD_DEFAULT;
     m_codecCtx->skip_idct = AVDISCARD_DEFAULT;
     m_codecCtx->skip_loop_filter = AVDISCARD_DEFAULT;
-    m_codecCtx->error_resilience = FF_ER_CAREFUL;
+    m_codecCtx->error_recognition = FF_ER_CAREFUL;
     m_codecCtx->error_concealment = 3;
 
     // get decoder for video stream
@@ -786,17 +786,13 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
 
     if (frameFinished)
     {
-        avpicture_fill(&retbuf, m_outputbuf, PIX_FMT_RGBA32, m_frameWidth, m_frameHeight);
+        avpicture_fill(&retbuf, m_outputbuf, PIX_FMT_RGB32, m_frameWidth, m_frameHeight);
 
         avpicture_deinterlace((AVPicture*)m_frame, (AVPicture*)m_frame,
                                 m_codecCtx->pix_fmt, m_frameWidth, m_frameHeight);
 
-#if ENABLE_SWSCALE
         myth_sws_img_convert(
-#else
-        img_convert(
-#endif
-                    &retbuf, PIX_FMT_RGBA32, 
+                    &retbuf, PIX_FMT_RGB32,
                         (AVPicture*) m_frame, m_codecCtx->pix_fmt, m_frameWidth, m_frameHeight);
 
         QImage img(m_outputbuf, m_frameWidth, m_frameHeight,

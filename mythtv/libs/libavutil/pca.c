@@ -1,5 +1,5 @@
 /*
- * Principal component analysis
+ * principal component analysis (PCA)
  * Copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
@@ -20,8 +20,8 @@
  */
 
 /**
- * @file pca.c
- * Principal component analysis
+ * @file libavutil/pca.c
+ * principal component analysis (PCA)
  */
 
 #include "common.h"
@@ -67,7 +67,8 @@ void ff_pca_add(PCA *pca, double *v){
 }
 
 int ff_pca(PCA *pca, double *eigenvector, double *eigenvalue){
-    int i, j, k, pass;
+    int i, j, pass;
+    int k=0;
     const int n= pca->n;
     double z[n];
 
@@ -119,7 +120,7 @@ int ff_pca(PCA *pca, double *eigenvector, double *eigenvalue){
 
                 if(pass < 3 && fabs(covar) < sum / (5*n*n)) //FIXME why pass < 3
                     continue;
-                if(fabs(covar) == 0.0) //FIXME shouldnt be needed
+                if(fabs(covar) == 0.0) //FIXME should not be needed
                     continue;
                 if(pass >=3 && fabs((eigenvalue[j]+z[j])/covar) > (1LL<<32) && fabs((eigenvalue[i]+z[i])/covar) > (1LL<<32)){
                     pca->covariance[j + i*n]=0.0;
@@ -163,25 +164,28 @@ int ff_pca(PCA *pca, double *eigenvector, double *eigenvalue){
 #ifdef TEST
 
 #undef printf
-#undef random
 #include <stdio.h>
 #include <stdlib.h>
+#include "lfg.h"
 
-int main(){
+int main(void){
     PCA *pca;
     int i, j, k;
 #define LEN 8
     double eigenvector[LEN*LEN];
     double eigenvalue[LEN];
+    AVLFG prng;
+
+    av_lfg_init(&prng, 1);
 
     pca= ff_pca_init(LEN);
 
     for(i=0; i<9000000; i++){
         double v[2*LEN+100];
         double sum=0;
-        int pos= random()%LEN;
-        int v2= (random()%101) - 50;
-        v[0]= (random()%101) - 50;
+        int pos = av_lfg_get(&prng) % LEN;
+        int v2  = av_lfg_get(&prng) % 101 - 50;
+        v[0]    = av_lfg_get(&prng) % 101 - 50;
         for(j=1; j<8; j++){
             if(j<=pos) v[j]= v[0];
             else       v[j]= v2;
@@ -190,7 +194,7 @@ int main(){
 /*        for(j=0; j<LEN; j++){
             v[j] -= v[pos];
         }*/
-//        sum += random()%10;
+//        sum += av_lfg_get(&prng) % 10;
 /*        for(j=0; j<LEN; j++){
             v[j] -= sum/LEN;
         }*/

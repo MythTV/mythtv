@@ -297,11 +297,7 @@ class VideoOutput
     QSize   pip_video_size;
     unsigned char      *pip_tmp_buf;
     unsigned char      *pip_tmp_buf2;
-#if ENABLE_SWSCALE
     struct SwsContext  *pip_scaling_context;
-#else
-    ImgReSampleContext *pip_scaling_context;
-#endif
     VideoFrame pip_tmp_image;
 
     // Video resizing (for ITV)
@@ -310,11 +306,7 @@ class VideoOutput
     QSize   vsz_display_size;
     QSize   vsz_video_size;
     unsigned char      *vsz_tmp_buf;
-#if ENABLE_SWSCALE
     struct SwsContext  *vsz_scale_context;
-#else
-    ImgReSampleContext *vsz_scale_context;
-#endif
 
     // Deinterlacing
     bool           m_deinterlacing;

@@ -1,6 +1,6 @@
 /*
  * MJPEG decoder
- * Copyright (c) 2000, 2001 Fabrice Bellard.
+ * Copyright (c) 2000, 2001 Fabrice Bellard
  * Copyright (c) 2003 Alex Beregszaszi
  * Copyright (c) 2003-2004 Michael Niedermayer
  *
@@ -22,7 +22,7 @@
  */
 
 /**
- * @file mjpegdec.h
+ * @file libavcodec/mjpegdec.h
  * MJPEG decoder.
  */
 
@@ -30,7 +30,7 @@
 #define AVCODEC_MJPEGDEC_H
 
 #include "avcodec.h"
-#include "bitstream.h"
+#include "get_bits.h"
 #include "dsputil.h"
 
 #define MAX_COMPONENTS 4
@@ -67,6 +67,7 @@ typedef struct MJpegDecodeContext {
     int width, height;
     int mb_width, mb_height;
     int nb_components;
+    int block_stride[MAX_COMPONENTS];
     int component_id[MAX_COMPONENTS];
     int h_count[MAX_COMPONENTS]; /* horizontal and vertical count for each component */
     int v_count[MAX_COMPONENTS];
@@ -80,9 +81,13 @@ typedef struct MJpegDecodeContext {
     int quant_index[4];   /* quant table index for each component */
     int last_dc[MAX_COMPONENTS]; /* last DEQUANTIZED dc (XXX: am I right to do that ?) */
     AVFrame picture; /* picture structure */
+    int got_picture;                                ///< we found a SOF and picture is valid, too.
     int linesize[MAX_COMPONENTS];                   ///< linesize << interlaced
     int8_t *qscale_table;
     DECLARE_ALIGNED_16(DCTELEM, block[64]);
+    DCTELEM (*blocks[MAX_COMPONENTS])[64]; ///< intermediate sums (progressive mode)
+    uint8_t *last_nnz[MAX_COMPONENTS];
+    uint64_t coefs_finished[MAX_COMPONENTS]; ///< bitmask of which coefs have been completely decoded (progressive mode)
     ScanTable scantable;
     DSPContext dsp;
 
@@ -102,7 +107,7 @@ int ff_mjpeg_decode_init(AVCodecContext *avctx);
 int ff_mjpeg_decode_end(AVCodecContext *avctx);
 int ff_mjpeg_decode_frame(AVCodecContext *avctx,
                           void *data, int *data_size,
-                          const uint8_t *buf, int buf_size);
+                          AVPacket *avpkt);
 int ff_mjpeg_decode_dqt(MJpegDecodeContext *s);
 int ff_mjpeg_decode_dht(MJpegDecodeContext *s);
 int ff_mjpeg_decode_sof(MJpegDecodeContext *s);

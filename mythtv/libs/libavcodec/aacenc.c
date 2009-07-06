@@ -20,7 +20,7 @@
  */
 
 /**
- * @file aacenc.c
+ * @file libavcodec/aacenc.c
  * AAC encoder
  */
 
@@ -32,7 +32,7 @@
  ***********************************/
 
 #include "avcodec.h"
-#include "bitstream.h"
+#include "get_bits.h"
 #include "dsputil.h"
 #include "mpeg4audio.h"
 
@@ -83,7 +83,7 @@ static const uint8_t swb_size_1024_8[] = {
     32, 36, 36, 40, 44, 48, 52, 56, 60, 64, 80
 };
 
-static const uint8_t *swb_size_1024[] = {
+static const uint8_t * const swb_size_1024[] = {
     swb_size_1024_96, swb_size_1024_96, swb_size_1024_64,
     swb_size_1024_48, swb_size_1024_48, swb_size_1024_32,
     swb_size_1024_24, swb_size_1024_24, swb_size_1024_16,
@@ -110,7 +110,7 @@ static const uint8_t swb_size_128_8[] = {
     4, 4, 4, 4, 4, 4, 4, 8, 8, 8, 8, 12, 16, 20, 20
 };
 
-static const uint8_t *swb_size_128[] = {
+static const uint8_t * const swb_size_128[] = {
     /* the last entry on the following row is swb_size_128_64 but is a
        duplicate of swb_size_128_96 */
     swb_size_128_96, swb_size_128_96, swb_size_128_96,
@@ -132,7 +132,7 @@ static const uint8_t run_value_bits_short[16] = {
     3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 9
 };
 
-static const uint8_t* run_value_bits[2] = {
+static const uint8_t* const run_value_bits[2] = {
     run_value_bits_long, run_value_bits_short
 };
 
@@ -214,8 +214,8 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
     s->samplerate_index = i;
 
     dsputil_init(&s->dsp, avctx);
-    ff_mdct_init(&s->mdct1024, 11, 0);
-    ff_mdct_init(&s->mdct128,   8, 0);
+    ff_mdct_init(&s->mdct1024, 11, 0, 1.0);
+    ff_mdct_init(&s->mdct128,   8, 0, 1.0);
     // window init
     ff_kbd_window_init(ff_aac_kbd_long_1024, 4.0, 1024);
     ff_kbd_window_init(ff_aac_kbd_short_128, 6.0, 128);

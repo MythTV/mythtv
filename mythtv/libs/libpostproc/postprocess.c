@@ -21,7 +21,7 @@
  */
 
 /**
- * @file postprocess.c
+ * @file libpostproc/postprocess.c
  * postprocessing.
  */
 
@@ -79,11 +79,8 @@ try to unroll inner for(x=0 ... loop to avoid these damn if(x ... checks
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
 //#undef HAVE_MMX2
-//#define HAVE_3DNOW
+//#define HAVE_AMD3DNOW
 //#undef HAVE_MMX
 //#undef ARCH_X86
 //#define DEBUG_BRIGHTNESS
@@ -95,7 +92,7 @@ unsigned postproc_version(void)
     return LIBPOSTPROC_VERSION_INT;
 }
 
-#ifdef HAVE_ALTIVEC_H
+#if HAVE_ALTIVEC_H
 #include <altivec.h>
 #endif
 
@@ -105,7 +102,7 @@ unsigned postproc_version(void)
 #define TEMP_STRIDE 8
 //#define NUM_BLOCKS_AT_ONCE 16 //not used yet
 
-#if defined(ARCH_X86)
+#if ARCH_X86
 DECLARE_ASM_CONST(8, uint64_t, w05)= 0x0005000500050005LL;
 DECLARE_ASM_CONST(8, uint64_t, w04)= 0x0004000400040004LL;
 DECLARE_ASM_CONST(8, uint64_t, w20)= 0x0020002000200020LL;
@@ -153,31 +150,31 @@ static const char *replaceTable[]=
 };
 
 
-#if defined(ARCH_X86)
+#if ARCH_X86
 static inline void prefetchnta(void *p)
 {
-    asm volatile(   "prefetchnta (%0)\n\t"
+    __asm__ volatile(   "prefetchnta (%0)\n\t"
         : : "r" (p)
     );
 }
 
 static inline void prefetcht0(void *p)
 {
-    asm volatile(   "prefetcht0 (%0)\n\t"
+    __asm__ volatile(   "prefetcht0 (%0)\n\t"
         : : "r" (p)
     );
 }
 
 static inline void prefetcht1(void *p)
 {
-    asm volatile(   "prefetcht1 (%0)\n\t"
+    __asm__ volatile(   "prefetcht1 (%0)\n\t"
         : : "r" (p)
     );
 }
 
 static inline void prefetcht2(void *p)
 {
-    asm volatile(   "prefetcht2 (%0)\n\t"
+    __asm__ volatile(   "prefetcht2 (%0)\n\t"
         : : "r" (p)
     );
 }
@@ -557,45 +554,47 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 
 //Note: we have C, MMX, MMX2, 3DNOW version there is no 3DNOW+MMX2 one
 //Plain C versions
-#if !defined (HAVE_MMX) || defined (RUNTIME_CPUDETECT)
+#if !(HAVE_MMX || HAVE_ALTIVEC) || CONFIG_RUNTIME_CPUDETECT
 #define COMPILE_C
 #endif
 
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
 #define COMPILE_ALTIVEC
 #endif //HAVE_ALTIVEC
 
-#if defined(ARCH_X86)
+#if ARCH_X86
 
-#if (defined (HAVE_MMX) && !defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
+#if (HAVE_MMX && !HAVE_AMD3DNOW && !HAVE_MMX2) || CONFIG_RUNTIME_CPUDETECT
 #define COMPILE_MMX
 #endif
 
-#if defined (HAVE_MMX2) || defined (RUNTIME_CPUDETECT)
+#if HAVE_MMX2 || CONFIG_RUNTIME_CPUDETECT
 #define COMPILE_MMX2
 #endif
 
-#if (defined (HAVE_3DNOW) && !defined (HAVE_MMX2)) || defined (RUNTIME_CPUDETECT)
+#if (HAVE_AMD3DNOW && !HAVE_MMX2) || CONFIG_RUNTIME_CPUDETECT
 #define COMPILE_3DNOW
 #endif
-#endif /* defined(ARCH_X86) */
+#endif /* ARCH_X86 */
 
 #undef HAVE_MMX
+#define HAVE_MMX 0
 #undef HAVE_MMX2
-#undef HAVE_3DNOW
+#define HAVE_MMX2 0
+#undef HAVE_AMD3DNOW
+#define HAVE_AMD3DNOW 0
 #undef HAVE_ALTIVEC
+#define HAVE_ALTIVEC 0
 
 #ifdef COMPILE_C
-#undef HAVE_MMX
-#undef HAVE_MMX2
-#undef HAVE_3DNOW
 #define RENAME(a) a ## _C
 #include "postprocess_template.c"
 #endif
 
 #ifdef COMPILE_ALTIVEC
 #undef RENAME
-#define HAVE_ALTIVEC
+#undef HAVE_ALTIVEC
+#define HAVE_ALTIVEC 1
 #define RENAME(a) a ## _altivec
 #include "postprocess_altivec_template.c"
 #include "postprocess_template.c"
@@ -604,9 +603,8 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 //MMX versions
 #ifdef COMPILE_MMX
 #undef RENAME
-#define HAVE_MMX
-#undef HAVE_MMX2
-#undef HAVE_3DNOW
+#undef HAVE_MMX
+#define HAVE_MMX 1
 #define RENAME(a) a ## _MMX
 #include "postprocess_template.c"
 #endif
@@ -614,9 +612,10 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 //MMX2 versions
 #ifdef COMPILE_MMX2
 #undef RENAME
-#define HAVE_MMX
-#define HAVE_MMX2
-#undef HAVE_3DNOW
+#undef HAVE_MMX
+#undef HAVE_MMX2
+#define HAVE_MMX 1
+#define HAVE_MMX2 1
 #define RENAME(a) a ## _MMX2
 #include "postprocess_template.c"
 #endif
@@ -624,9 +623,12 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 //3DNOW versions
 #ifdef COMPILE_3DNOW
 #undef RENAME
-#define HAVE_MMX
+#undef HAVE_MMX
 #undef HAVE_MMX2
-#define HAVE_3DNOW
+#undef HAVE_AMD3DNOW
+#define HAVE_MMX 1
+#define HAVE_MMX2 0
+#define HAVE_AMD3DNOW 1
 #define RENAME(a) a ## _3DNow
 #include "postprocess_template.c"
 #endif
@@ -634,7 +636,7 @@ static av_always_inline void do_a_deblock_C(uint8_t *src, int step, int stride, 
 // minor note: the HAVE_xyz is messed up after that line so do not use it.
 
 static inline void postProcess(const uint8_t src[], int srcStride, uint8_t dst[], int dstStride, int width, int height,
-        const QP_STORE_T QPs[], int QPStride, int isColor, pp_mode_t *vm, pp_context_t *vc)
+        const QP_STORE_T QPs[], int QPStride, int isColor, pp_mode *vm, pp_context *vc)
 {
     PPContext *c= (PPContext *)vc;
     PPMode *ppMode= (PPMode *)vm;
@@ -643,8 +645,8 @@ static inline void postProcess(const uint8_t src[], int srcStride, uint8_t dst[]
     // Using ifs here as they are faster than function pointers although the
     // difference would not be measurable here but it is much better because
     // someone might exchange the CPU whithout restarting MPlayer ;)
-#ifdef RUNTIME_CPUDETECT
-#if defined(ARCH_X86)
+#if CONFIG_RUNTIME_CPUDETECT
+#if ARCH_X86
     // ordered per speed fastest first
     if(c->cpuCaps & PP_CPU_CAPS_MMX2)
         postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
@@ -655,26 +657,26 @@ static inline void postProcess(const uint8_t src[], int srcStride, uint8_t dst[]
     else
         postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #else
-#ifdef HAVE_ALTIVEC
+#if HAVE_ALTIVEC
     if(c->cpuCaps & PP_CPU_CAPS_ALTIVEC)
             postProcess_altivec(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
     else
 #endif
             postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #endif
-#else //RUNTIME_CPUDETECT
-#ifdef HAVE_MMX2
+#else //CONFIG_RUNTIME_CPUDETECT
+#if   HAVE_MMX2
             postProcess_MMX2(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
-#elif defined (HAVE_3DNOW)
+#elif HAVE_AMD3DNOW
             postProcess_3DNow(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
-#elif defined (HAVE_MMX)
+#elif HAVE_MMX
             postProcess_MMX(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
-#elif defined (HAVE_ALTIVEC)
+#elif HAVE_ALTIVEC
             postProcess_altivec(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #else
             postProcess_C(src, srcStride, dst, dstStride, width, height, QPs, QPStride, isColor, c);
 #endif
-#endif //!RUNTIME_CPUDETECT
+#endif //!CONFIG_RUNTIME_CPUDETECT
 }
 
 //static void postProcess(uint8_t src[], int srcStride, uint8_t dst[], int dstStride, int width, int height,
@@ -730,7 +732,7 @@ const char pp_help[] =
 "\n"
 ;
 
-pp_mode_t *pp_get_mode_by_name_and_quality(const char *name, int quality)
+pp_mode *pp_get_mode_by_name_and_quality(const char *name, int quality)
 {
     char temp[GET_MODE_BUFFER_SIZE];
     char *p= temp;
@@ -905,7 +907,7 @@ pp_mode_t *pp_get_mode_by_name_and_quality(const char *name, int quality)
     return ppMode;
 }
 
-void pp_free_mode(pp_mode_t *mode){
+void pp_free_mode(pp_mode *mode){
     av_free(mode);
 }
 
@@ -947,9 +949,9 @@ static const char * context_to_name(void * ptr) {
 
 static const AVClass av_codec_context_class = { "Postproc", context_to_name, NULL };
 
-pp_context_t *pp_get_context(int width, int height, int cpuCaps){
+pp_context *pp_get_context(int width, int height, int cpuCaps){
     PPContext *c= av_malloc(sizeof(PPContext));
-    int stride= (width+15)&(~15);    //assumed / will realloc if needed
+    int stride= FFALIGN(width, 16);  //assumed / will realloc if needed
     int qpStride= (width+15)/16 + 2; //assumed / will realloc if needed
 
     memset(c, 0, sizeof(PPContext));
@@ -995,7 +997,7 @@ void  pp_postprocess(const uint8_t * src[3], const int srcStride[3],
                      uint8_t * dst[3], const int dstStride[3],
                      int width, int height,
                      const QP_STORE_T *QP_store,  int QPStride,
-                     pp_mode_t *vm,  void *vc, int pict_type)
+                     pp_mode *vm,  void *vc, int pict_type)
 {
     int mbWidth = (width+15)>>4;
     int mbHeight= (height+15)>>4;

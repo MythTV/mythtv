@@ -197,12 +197,15 @@ int myth2av_codecid(MythCodecID codec_id,
             VERBOSE(VB_IMPORTANT, "Error: DVDV MPEG4 not supported by ffmpeg");
             break;
         case kCodec_H264_DVDV:
-            VERBOSE(VB_IMPORTANT, "Error: DVDV H.265 not supported by ffmpeg");
+            VERBOSE(VB_IMPORTANT, "Error: DVDV H.264 not supported by ffmpeg");
             break;
 
         case kCodec_MPEG1_VDPAU:
+            ret = CODEC_ID_MPEG1VIDEO;
+            vdpau = true;
+            break;
         case kCodec_MPEG2_VDPAU:
-            ret = CODEC_ID_MPEGVIDEO_VDPAU;
+            ret = CODEC_ID_MPEG2VIDEO;
             vdpau = true;
             break;
         case kCodec_H263_VDPAU:
@@ -213,15 +216,15 @@ int myth2av_codecid(MythCodecID codec_id,
             break;
 
         case kCodec_H264_VDPAU:
-            ret = CODEC_ID_H264_VDPAU;
+            ret = CODEC_ID_H264;
             vdpau = true;
             break;
         case kCodec_VC1_VDPAU:
-            ret = CODEC_ID_VC1_VDPAU;
+            ret = CODEC_ID_VC1;
             vdpau = true;
             break;
         case kCodec_WMV3_VDPAU:
-            ret = CODEC_ID_WMV3_VDPAU;
+            ret = CODEC_ID_WMV3;
             vdpau = true;
             break;
 

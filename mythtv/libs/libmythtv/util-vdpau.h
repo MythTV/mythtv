@@ -2,7 +2,7 @@
 #define UTIL_VDPAU_H_
 
 extern "C" {
-#include "vdpau_render.h"
+#include "libavcodec/vdpau.h"
 }
 
 #include "videobuffers.h"
@@ -32,7 +32,7 @@ struct vdpauPIP
 struct video_surface
 {
     VdpVideoSurface      surface;
-    vdpau_render_state_t render;
+    struct vdpau_render_state render;
 };
 
 class NuppelVideoPlayer;

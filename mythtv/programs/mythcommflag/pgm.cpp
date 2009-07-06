@@ -45,11 +45,7 @@ pgm_fill(AVPicture *dst, const VideoFrame *frame)
         return -1;
     }
 
-#if ENABLE_SWSCALE
     if (myth_sws_img_convert(
-#else
-    if (img_convert(
-#endif
             dst, PIX_FMT_GRAY8, &src, srcfmt, frame->width,
                 frame->height))
     {
@@ -228,7 +224,7 @@ pgm_overlay(AVPicture *dst, const AVPicture *s1, int s1height,
         return -1;
     }
 
-    img_copy(dst, s1, PIX_FMT_GRAY8, s1width, s1height);
+    av_picture_copy(dst, s1, PIX_FMT_GRAY8, s1width, s1height);
 
     /* Overwrite overlay area of "dst" with "s2". */
     for (rr = 0; rr < s2height; rr++)
@@ -268,8 +264,8 @@ pgm_convolve_radial(AVPicture *dst, AVPicture *s1, AVPicture *s2,
         return -1;
 
     /* copy s1 to s2 and dst */
-    img_copy(s2, s1, PIX_FMT_GRAY8, newwidth, newheight);
-    img_copy(dst, s1, PIX_FMT_GRAY8, newwidth, newheight);
+    av_picture_copy(s2, s1, PIX_FMT_GRAY8, newwidth, newheight);
+    av_picture_copy(dst, s1, PIX_FMT_GRAY8, newwidth, newheight);
 
     /* "s1" convolve with column vector => "s2" */
     rr2 = mask_radius + srcheight;

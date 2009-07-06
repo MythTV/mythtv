@@ -21,7 +21,7 @@
  */
 
 /**
- * @file error_resilience.c
+ * @file libavcodec/error_resilience.c
  * Error resilience / concealment.
  */
 
@@ -344,7 +344,7 @@ static void guess_mv(MpegEncContext *s){
                 if(IS_INTRA(s->current_picture.mb_type[mb_xy]))  continue;
                 if(!(s->error_status_table[mb_xy]&MV_ERROR)) continue;
 
-                s->mv_dir = MV_DIR_FORWARD;
+                s->mv_dir = s->last_picture.data[0] ? MV_DIR_FORWARD : MV_DIR_BACKWARD;
                 s->mb_intra=0;
                 s->mv_type = MV_TYPE_16X16;
                 s->mb_skipped=0;
@@ -551,7 +551,7 @@ score_sum+= best_score;
 static int is_intra_more_likely(MpegEncContext *s){
     int is_intra_likely, i, j, undamaged_count, skip_amount, mb_x, mb_y;
 
-    if(s->last_picture_ptr==NULL) return 1; //no previous frame available -> use spatial prediction
+    if(!s->last_picture_ptr || !s->last_picture_ptr->data[0]) return 1; //no previous frame available -> use spatial prediction
 
     undamaged_count=0;
     for(i=0; i<s->mb_num; i++){
@@ -563,10 +563,9 @@ static int is_intra_more_likely(MpegEncContext *s){
 
     if(undamaged_count < 5) return 0; //almost all MBs damaged -> use temporal prediction
 
-#ifdef HAVE_XVMC
     //prevent dsp.sad() check, that requires access to the image
-    if(s->avctx->xvmc_acceleration && s->pict_type==FF_I_TYPE) return 1;
-#endif
+    if(CONFIG_MPEG_XVMC_DECODER && s->avctx->xvmc_acceleration && s->pict_type == FF_I_TYPE)
+        return 1;
 
     skip_amount= FFMAX(undamaged_count/50, 1); //check only upto 50 MBs
     is_intra_likely=0;
@@ -603,7 +602,7 @@ static int is_intra_more_likely(MpegEncContext *s){
 }
 
 void ff_er_frame_start(MpegEncContext *s){
-    if(!s->error_resilience) return;
+    if(!s->error_recognition) return;
 
     memset(s->error_status_table, MV_ERROR|AC_ERROR|DC_ERROR|VP_START|AC_END|DC_END|MV_END, s->mb_stride*s->mb_height*sizeof(uint8_t));
     s->error_count= 3*s->mb_num;
@@ -622,12 +621,15 @@ void ff_er_add_slice(MpegEncContext *s, int startx, int starty, int endx, int en
     const int end_xy  = s->mb_index2xy[end_i];
     int mask= -1;
 
+    if(s->avctx->hwaccel)
+        return;
+
     if(start_i > end_i || start_xy > end_xy){
         av_log(s->avctx, AV_LOG_ERROR, "internal error, slice end before start\n");
         return;
     }
 
-    if(!s->error_resilience) return;
+    if(!s->error_recognition) return;
 
     mask &= ~VP_START;
     if(status & (AC_ERROR|AC_END)){
@@ -680,7 +682,9 @@ void ff_er_frame_end(MpegEncContext *s){
     int size = s->b8_stride * 2 * s->mb_height;
     Picture *pic= s->current_picture_ptr;
 
-    if(!s->error_resilience || s->error_count==0 ||
+    if(!s->error_recognition || s->error_count==0 || s->avctx->lowres ||
+       s->avctx->hwaccel ||
+       s->avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU ||
        s->error_count==3*s->mb_width*(s->avctx->skip_top + s->avctx->skip_bottom)) return;
 
     if(s->current_picture.motion_val[0] == NULL){
@@ -756,7 +760,7 @@ void ff_er_frame_end(MpegEncContext *s){
     }
 #endif
     /* handle missing slices */
-    if(s->error_resilience>=4){
+    if(s->error_recognition>=4){
         int end_ok=1;
 
         for(i=s->mb_num-2; i>=s->mb_width+100; i--){ //FIXME +100 hack
@@ -856,18 +860,27 @@ void ff_er_frame_end(MpegEncContext *s){
             s->current_picture.mb_type[mb_xy]= MB_TYPE_16x16 | MB_TYPE_L0;
     }
 
+    // change inter to intra blocks if no reference frames are available
+    if (!s->last_picture.data[0] && !s->next_picture.data[0])
+        for(i=0; i<s->mb_num; i++){
+            const int mb_xy= s->mb_index2xy[i];
+            if(!IS_INTRA(s->current_picture.mb_type[mb_xy]))
+                s->current_picture.mb_type[mb_xy]= MB_TYPE_INTRA4x4;
+        }
+
     /* handle inter blocks with damaged AC */
     for(mb_y=0; mb_y<s->mb_height; mb_y++){
         for(mb_x=0; mb_x<s->mb_width; mb_x++){
             const int mb_xy= mb_x + mb_y * s->mb_stride;
             const int mb_type= s->current_picture.mb_type[mb_xy];
+            int dir = !s->last_picture.data[0];
             error= s->error_status_table[mb_xy];
 
             if(IS_INTRA(mb_type)) continue; //intra
             if(error&MV_ERROR) continue;              //inter with damaged MV
             if(!(error&AC_ERROR)) continue;           //undamaged inter
 
-            s->mv_dir = MV_DIR_FORWARD;
+            s->mv_dir = dir ? MV_DIR_BACKWARD : MV_DIR_FORWARD;
             s->mb_intra=0;
             s->mb_skipped=0;
             if(IS_8X8(mb_type)){
@@ -875,13 +888,13 @@ void ff_er_frame_end(MpegEncContext *s){
                 int j;
                 s->mv_type = MV_TYPE_8X8;
                 for(j=0; j<4; j++){
-                    s->mv[0][j][0] = s->current_picture.motion_val[0][ mb_index + (j&1) + (j>>1)*s->b8_stride ][0];
-                    s->mv[0][j][1] = s->current_picture.motion_val[0][ mb_index + (j&1) + (j>>1)*s->b8_stride ][1];
+                    s->mv[0][j][0] = s->current_picture.motion_val[dir][ mb_index + (j&1) + (j>>1)*s->b8_stride ][0];
+                    s->mv[0][j][1] = s->current_picture.motion_val[dir][ mb_index + (j&1) + (j>>1)*s->b8_stride ][1];
                 }
             }else{
                 s->mv_type = MV_TYPE_16X16;
-                s->mv[0][0][0] = s->current_picture.motion_val[0][ mb_x*2 + mb_y*2*s->b8_stride ][0];
-                s->mv[0][0][1] = s->current_picture.motion_val[0][ mb_x*2 + mb_y*2*s->b8_stride ][1];
+                s->mv[0][0][0] = s->current_picture.motion_val[dir][ mb_x*2 + mb_y*2*s->b8_stride ][0];
+                s->mv[0][0][1] = s->current_picture.motion_val[dir][ mb_x*2 + mb_y*2*s->b8_stride ][1];
             }
 
             s->dsp.clear_blocks(s->block[0]);
@@ -906,6 +919,8 @@ void ff_er_frame_end(MpegEncContext *s){
                 if(!(error&AC_ERROR)) continue;           //undamaged inter
 
                 s->mv_dir = MV_DIR_FORWARD|MV_DIR_BACKWARD;
+                if(!s->last_picture.data[0]) s->mv_dir &= ~MV_DIR_FORWARD;
+                if(!s->next_picture.data[0]) s->mv_dir &= ~MV_DIR_BACKWARD;
                 s->mb_intra=0;
                 s->mv_type = MV_TYPE_16X16;
                 s->mb_skipped=0;
@@ -934,10 +949,9 @@ void ff_er_frame_end(MpegEncContext *s){
     }else
         guess_mv(s);
 
-#ifdef HAVE_XVMC
     /* the filters below are not XvMC compatible, skip them */
-    if(s->avctx->xvmc_acceleration) goto ec_clean;
-#endif
+    if(CONFIG_MPEG_XVMC_DECODER && s->avctx->xvmc_acceleration)
+        goto ec_clean;
     /* fill DC for inter blocks */
     for(mb_y=0; mb_y<s->mb_height; mb_y++){
         for(mb_x=0; mb_x<s->mb_width; mb_x++){
@@ -1023,9 +1037,7 @@ void ff_er_frame_end(MpegEncContext *s){
         v_block_filter(s, s->current_picture.data[2], s->mb_width  , s->mb_height  , s->uvlinesize, 0);
     }
 
-#ifdef HAVE_XVMC
 ec_clean:
-#endif
     /* clean a few tables */
     for(i=0; i<s->mb_num; i++){
         const int mb_xy= s->mb_index2xy[i];

@@ -22,23 +22,26 @@
  *
  ******************************************************************************
 */
+
+#include <X11/extensions/vldXvMC.h>
+
 #include "avcodec.h"
 #include "dsputil.h"
 #include "mpegvideo.h"
-#include "xvmc_render.h"
+#include "xvmc.h"
 
 #include "xvmccommon.c"
 
 int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
 {
-    xvmc_render_state_t *render;
+    struct xvmc_pix_fmt *render;
     XvMCMpegControl      binfo;
     XvMCQMatrix          qmatrix;
     int                  i;
 
-    XVMC_field_start(s, avctx);
+    ff_xvmc_field_start(s, avctx);
 
-    render = (xvmc_render_state_t*) s->current_picture.data[2];
+    render = (struct xvmc_pix_fmt*) s->current_picture.data[2];
     bzero(&binfo, sizeof(binfo));
     bzero(&qmatrix, sizeof(qmatrix));
 
@@ -149,9 +152,9 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
 
 void XVMC_VLD_field_end(MpegEncContext* s)
 {
-    xvmc_render_state_t*    render;
+    struct xvmc_pix_fmt*    render;
 
-    render = (xvmc_render_state_t *)s->current_picture.data[2];
+    render = (struct xvmc_pix_fmt *)s->current_picture.data[2];
     assert(render != NULL);
 
     XvMCFlushSurface(render->disp, render->p_surface);
@@ -185,7 +188,7 @@ int XVMC_VLD_decode_slice(MpegEncContext* s, int mb_y,
                           uint8_t* buffer, int buf_size)
 {
     int slicelen = length_to_next_start(buffer, buf_size);
-    xvmc_render_state_t*    render;
+    struct xvmc_pix_fmt*    render;
 
     if (slicelen < 0)
     {
@@ -196,7 +199,7 @@ int XVMC_VLD_decode_slice(MpegEncContext* s, int mb_y,
             return -1;
     }
 
-    render = (xvmc_render_state_t*)s->current_picture.data[2];
+    render = (struct xvmc_pix_fmt*)s->current_picture.data[2];
     render->slice_code = SLICE_MIN_START_CODE + mb_y;
     render->slice_data = buffer;
     render->slice_datalen = slicelen;

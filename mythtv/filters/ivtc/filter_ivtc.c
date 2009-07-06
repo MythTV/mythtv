@@ -232,7 +232,7 @@ NewIvtcFilter (VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     int pitches[3] = { *width, *width >> 1, *width >> 1 };
     SetupFilter(filter, *width, *height, pitches);
 
-#ifdef HAVE_MMX
+#if HAVE_MMX
     c->cpu      |= PULLUP_CPU_MMX;
 #endif
 

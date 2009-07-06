@@ -1,6 +1,6 @@
 /*
  * RTP H264 Protocol (RFC3984)
- * Copyright (c) 2006 Ryan Martell.
+ * Copyright (c) 2006 Ryan Martell
  *
  * This file is part of FFmpeg.
  *
@@ -20,7 +20,7 @@
  */
 
 /**
-* @file rtp_h264.c
+* @file libavformat/rtp_h264.c
  * @brief H.264 / RTP Code (RFC3984)
  * @author Ryan Martell <rdm4@martellventures.com>
  *
@@ -38,7 +38,7 @@
 
 #include "libavutil/base64.h"
 #include "libavutil/avstring.h"
-#include "libavcodec/bitstream.h"
+#include "libavcodec/get_bits.h"
 #include "avformat.h"
 #include "mpegts.h"
 
@@ -46,13 +46,13 @@
 #include "network.h"
 #include <assert.h>
 
-#include "rtp_internal.h"
+#include "rtpdec.h"
 #include "rtp_h264.h"
 
 /**
     RTP/H264 specific private data.
 */
-typedef struct h264_rtp_extra_data {
+struct PayloadContext {
     unsigned long cookie;       ///< sanity check, to make sure we get the pointer we're expecting.
 
     //sdp setup parameters
@@ -63,14 +63,14 @@ typedef struct h264_rtp_extra_data {
 #ifdef DEBUG
     int packet_types_received[32];
 #endif
-} h264_rtp_extra_data;
+};
 
 #define MAGIC_COOKIE (0xdeadbeef)       ///< Cookie for the extradata; to verify we are what we think we are, and that we haven't been freed.
 #define DEAD_COOKIE (0xdeaddead)        ///< Cookie for the extradata; once it is freed.
 
 /* ---------------- private code */
 static void sdp_parse_fmtp_config_h264(AVStream * stream,
-                                       h264_rtp_extra_data * h264_data,
+                                       PayloadContext * h264_data,
                                        char *attr, char *value)
 {
     AVCodecContext *codec = stream->codec;
@@ -78,7 +78,7 @@ static void sdp_parse_fmtp_config_h264(AVStream * stream,
     assert(h264_data != NULL);
 
     if (!strcmp(attr, "packetization-mode")) {
-        av_log(NULL, AV_LOG_DEBUG, "H.264/RTP Packetization Mode: %d\n", atoi(value));
+        av_log(codec, AV_LOG_DEBUG, "RTP Packetization Mode: %d\n", atoi(value));
         h264_data->packetization_mode = atoi(value);
         /*
            Packetization Mode:
@@ -87,8 +87,8 @@ static void sdp_parse_fmtp_config_h264(AVStream * stream,
            2: Interleaved Mode: 25 (STAP-B), 26 (MTAP16), 27 (MTAP24), 28 (FU-A), and 29 (FU-B) are allowed.
          */
         if (h264_data->packetization_mode > 1)
-            av_log(stream, AV_LOG_ERROR,
-                   "H.264/RTP Interleaved RTP mode is not supported yet.");
+            av_log(codec, AV_LOG_ERROR,
+                   "Interleaved RTP mode is not supported yet.");
     } else if (!strcmp(attr, "profile-level-id")) {
         if (strlen(value) == 6) {
             char buffer[3];
@@ -105,8 +105,8 @@ static void sdp_parse_fmtp_config_h264(AVStream * stream,
             level_idc = strtol(buffer, NULL, 16);
 
             // set the parameters...
-            av_log(NULL, AV_LOG_DEBUG,
-                   "H.264/RTP Profile IDC: %x Profile IOP: %x Level: %x\n",
+            av_log(codec, AV_LOG_DEBUG,
+                   "RTP Profile IDC: %x Profile IOP: %x Level: %x\n",
                    profile_idc, profile_iop, level_idc);
             h264_data->profile_idc = profile_idc;
             h264_data->profile_iop = profile_iop;
@@ -150,24 +150,23 @@ static void sdp_parse_fmtp_config_h264(AVStream * stream,
                     codec->extradata= dest;
                     codec->extradata_size+= sizeof(start_sequence)+packet_size;
                 } else {
-                    av_log(NULL, AV_LOG_ERROR, "H.264/RTP Unable to allocate memory for extradata!");
+                    av_log(codec, AV_LOG_ERROR, "Unable to allocate memory for extradata!");
                 }
             }
         }
-        av_log(NULL, AV_LOG_DEBUG, "H.264/RTP Extradata set to %p (size: %d)!", codec->extradata, codec->extradata_size);
+        av_log(codec, AV_LOG_DEBUG, "Extradata set to %p (size: %d)!", codec->extradata, codec->extradata_size);
     }
 }
 
 // return 0 on packet, no more left, 1 on packet, 1 on partial packet...
-static int h264_handle_packet(RTPDemuxContext * s,
+static int h264_handle_packet(AVFormatContext *ctx,
+                              PayloadContext *data,
+                              AVStream *st,
                               AVPacket * pkt,
                               uint32_t * timestamp,
                               const uint8_t * buf,
                               int len, int flags)
 {
-#ifdef DEBUG
-    h264_rtp_extra_data *data = s->dynamic_protocol_context;
-#endif
     uint8_t nal = buf[0];
     uint8_t type = (nal & 0x1f);
     int result= 0;
@@ -232,7 +231,7 @@ static int h264_handle_packet(RTPDemuxContext * s,
                             dst+= nal_size;
                         }
                     } else {
-                        av_log(NULL, AV_LOG_ERROR,
+                        av_log(ctx, AV_LOG_ERROR,
                                "nal size exceeds length: %d %d\n", nal_size, src_len);
                     }
 
@@ -241,7 +240,7 @@ static int h264_handle_packet(RTPDemuxContext * s,
                     src_len -= nal_size;
 
                     if (src_len < 0)
-                        av_log(NULL, AV_LOG_ERROR,
+                        av_log(ctx, AV_LOG_ERROR,
                                "Consumed more bytes than we got! (%d)\n", src_len);
                 } while (src_len > 2);      // because there could be rtp padding..
 
@@ -260,7 +259,7 @@ static int h264_handle_packet(RTPDemuxContext * s,
     case 26:                   // MTAP-16
     case 27:                   // MTAP-24
     case 29:                   // FU-B
-        av_log(NULL, AV_LOG_ERROR,
+        av_log(ctx, AV_LOG_ERROR,
                "Unhandled type (%d) (See RFC for implementation details\n",
                type);
         result= -1;
@@ -306,19 +305,21 @@ static int h264_handle_packet(RTPDemuxContext * s,
     case 30:                   // undefined
     case 31:                   // undefined
     default:
-        av_log(NULL, AV_LOG_ERROR, "Undefined type (%d)", type);
+        av_log(ctx, AV_LOG_ERROR, "Undefined type (%d)", type);
         result= -1;
         break;
     }
+
+    pkt->stream_index = st->index;
 
     return result;
 }
 
 /* ---------------- public code */
-static void *h264_new_extradata(void)
+static PayloadContext *h264_new_extradata(void)
 {
-    h264_rtp_extra_data *data =
-        av_mallocz(sizeof(h264_rtp_extra_data) +
+    PayloadContext *data =
+        av_mallocz(sizeof(PayloadContext) +
                    FF_INPUT_BUFFER_PADDING_SIZE);
 
     if (data) {
@@ -328,9 +329,8 @@ static void *h264_new_extradata(void)
     return data;
 }
 
-static void h264_free_extradata(void *d)
+static void h264_free_extradata(PayloadContext *data)
 {
-    h264_rtp_extra_data *data = (h264_rtp_extra_data *) d;
 #ifdef DEBUG
     int ii;
 
@@ -351,11 +351,11 @@ static void h264_free_extradata(void *d)
     av_free(data);
 }
 
-static int parse_h264_sdp_line(AVStream * stream, void *data,
-                               const char *line)
+static int parse_h264_sdp_line(AVFormatContext *s, int st_index,
+                               PayloadContext *h264_data, const char *line)
 {
+    AVStream *stream = s->streams[st_index];
     AVCodecContext *codec = stream->codec;
-    h264_rtp_extra_data *h264_data = (h264_rtp_extra_data *) data;
     const char *p = line;
 
     assert(h264_data->cookie == MAGIC_COOKIE);

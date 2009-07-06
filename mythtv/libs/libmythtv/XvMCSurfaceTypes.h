@@ -8,12 +8,14 @@
 
 #include <qwindowdefs.h>
 #include "mythcontext.h"
+#include <X11/Xlib.h>
 #include <X11/extensions/XvMC.h>
+#include <X11/extensions/XvMClib.h>
 #include "mythxdisplay.h"
 #include "fourcc.h"
 
 extern "C" {
-#include "xvmc_render.h"
+#include "libavcodec/xvmc.h"
 }
 
 #ifndef XVMC_VLD

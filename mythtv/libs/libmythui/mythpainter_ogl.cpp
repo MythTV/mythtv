@@ -7,7 +7,7 @@
 #include <QGLWidget>
 
 #include "config.h"
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #include <OpenGL/glext.h>
 #endif
 

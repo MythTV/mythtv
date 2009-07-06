@@ -9,7 +9,7 @@
 #include <ctime>
 #include <cerrno>
 
-#ifdef HAVE_MALLOC_H
+#if HAVE_MALLOC_H
 #include <malloc.h>
 #endif
 #include <fcntl.h>
@@ -73,7 +73,7 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
-#ifndef HAVE_ROUND
+#if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
 
@@ -1729,7 +1729,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         {   // only allow these three output formats for non-xv videout
             case 16: non_xv_av_format = PIX_FMT_RGB565; break;
             case 24: non_xv_av_format = PIX_FMT_RGB24;  break;
-            case 32: non_xv_av_format = PIX_FMT_RGBA32; break;
+            case 32: non_xv_av_format = PIX_FMT_RGB32; break;
             default: non_xv_av_format = PIX_FMT_NB;
         }
         if (PIX_FMT_NB == non_xv_av_format)
@@ -2070,7 +2070,7 @@ void VideoOutputXv::PrepareFrameXvMC(VideoFrame *frame, FrameScanType scan)
     (void)frame;
     (void)scan;
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = NULL, *osdrender = NULL;
+    struct xvmc_pix_fmt *render = NULL, *osdrender = NULL;
     VideoFrame *osdframe = NULL;
 
     if (frame)
@@ -2082,7 +2082,7 @@ void VideoOutputXv::PrepareFrameXvMC(VideoFrame *frame, FrameScanType scan)
         vbuffers.LockFrame(frame, "PrepareFrameXvMC");
         SyncSurface(frame);
         render = GetRender(frame);
-        render->state |= MP_XVMC_STATE_DISPLAY_PENDING;
+        render->state |= AV_XVMC_STATE_DISPLAY_PENDING;
         if (xvmc_buf_attr->GetOSDNum())
             osdframe = vbuffers.GetOSDFrame(frame);
         vbuffers.UnlockFrame(frame, "PrepareFrameXvMC");
@@ -2093,7 +2093,7 @@ void VideoOutputXv::PrepareFrameXvMC(VideoFrame *frame, FrameScanType scan)
         vbuffers.LockFrame(osdframe, "PrepareFrameXvMC -- osd");
         SyncSurface(osdframe);
         osdrender = GetRender(osdframe);
-        osdrender->state |= MP_XVMC_STATE_DISPLAY_PENDING;
+        osdrender->state |= AV_XVMC_STATE_DISPLAY_PENDING;
         vbuffers.UnlockFrame(osdframe, "PrepareFrameXvMC -- osd");
     }
 #endif // USING_XVMC
@@ -2179,11 +2179,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     unsigned char *sbuf = new unsigned char[
         display_visible_rect.width() * display_visible_rect.height() * 3 / 2];
     AVPicture image_in, image_out;
-#if ENABLE_SWSCALE
     static struct SwsContext  *scontext;
-#else
-    ImgReSampleContext *scontext;
-#endif
 
     avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
                    display_visible_rect.width(),
@@ -2199,7 +2195,6 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     {
         avpicture_fill(&image_in, buffer->buf, PIX_FMT_YUV420P,
                        width, height);
-#if ENABLE_SWSCALE
         scontext = sws_getCachedContext(scontext, width, height,
                        PIX_FMT_YUV420P, display_visible_rect.width(),
                        display_visible_rect.height(), PIX_FMT_YUV420P,
@@ -2207,14 +2202,6 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
         sws_scale(scontext, image_in.data, image_in.linesize, 0, height,
                   image_out.data, image_out.linesize);
-#else
-        scontext = img_resample_init(display_visible_rect.width(),
-                                     display_visible_rect.height(),
-                                     width, height);
-        img_resample(scontext, &image_out, &image_in);
-
-        img_resample_close(scontext);
-#endif
     }
     vbuffers.UnlockFrame(buffer, "PrepareFrameMem");
 
@@ -2223,12 +2210,8 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
                    display_visible_rect.height());
 
 
-#if ENABLE_SWSCALE
     // XXX TODO: join with the scaling after removing img_convert, img_resample
     myth_sws_img_convert(
-#else
-    img_convert(
-#endif
         &image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
                 display_visible_rect.width(), display_visible_rect.height());
 
@@ -2405,7 +2388,7 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
     }
 
     // set showing surface, depending on existance of osd
-    xvmc_render_state_t *showingsurface = (osdframe) ?
+    struct xvmc_pix_fmt *showingsurface = (osdframe) ?
         GetRender(osdframe) : GetRender(frame);
     XvMCSurface *surf = showingsurface->p_surface;
 
@@ -2650,7 +2633,7 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         return;
 
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = GetRender(frame);
+    struct xvmc_pix_fmt *render = GetRender(frame);
     // disable questionable ffmpeg surface munging
     if (render->p_past_surface == render->p_surface)
         render->p_past_surface = NULL;
@@ -3279,7 +3262,7 @@ bool VideoOutputXv::IsDisplaying(VideoFrame* frame)
         return false;
 
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = GetRender(frame);
+    struct xvmc_pix_fmt *render = GetRender(frame);
     if (render)
     {
         Display *dsp        = render->disp;
@@ -3305,7 +3288,7 @@ bool VideoOutputXv::IsRendering(VideoFrame* frame)
 {
     (void)frame;
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = GetRender(frame);
+    struct xvmc_pix_fmt *render = GetRender(frame);
     if (render)
     {
         Display *dsp        = render->disp;
@@ -3332,7 +3315,7 @@ void VideoOutputXv::SyncSurface(VideoFrame* frame, int past_future)
     (void)frame;
     (void)past_future;
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = GetRender(frame);
+    struct xvmc_pix_fmt *render = GetRender(frame);
     if (render)
     {
         Display *dsp      = render->disp;
@@ -3368,7 +3351,7 @@ void VideoOutputXv::FlushSurface(VideoFrame* frame)
 {
     (void)frame;
 #ifdef USING_XVMC
-    xvmc_render_state_t *render = GetRender(frame);
+    struct xvmc_pix_fmt *render = GetRender(frame);
     if (render)
     {
         Display *dsp      = render->disp;

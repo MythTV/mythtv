@@ -1,7 +1,7 @@
 /*
  * RTP packetization for MPEG video
- * Copyright (c) 2002 Fabrice Bellard.
- * Copyright (c) 2007 Luca Abeni.
+ * Copyright (c) 2002 Fabrice Bellard
+ * Copyright (c) 2007 Luca Abeni
  *
  * This file is part of FFmpeg.
  *
@@ -22,15 +22,16 @@
 
 #include "libavcodec/mpegvideo.h"
 #include "avformat.h"
-#include "rtp_internal.h"
+#include "rtpenc.h"
 
 /* NOTE: a single frame must be passed with sequence header if
    needed. XXX: use slices. */
 void ff_rtp_send_mpegvideo(AVFormatContext *s1, const uint8_t *buf1, int size)
 {
-    RTPDemuxContext *s = s1->priv_data;
+    RTPMuxContext *s = s1->priv_data;
     int len, h, max_packet_size;
     uint8_t *q;
+    const uint8_t *end = buf1 + size;
     int begin_of_slice, end_of_slice, frame_type, temporal_reference;
 
     max_packet_size = s->max_payload_size;
@@ -55,7 +56,7 @@ void ff_rtp_send_mpegvideo(AVFormatContext *s1, const uint8_t *buf1, int size)
             r1 = buf1;
             while (1) {
                 start_code = -1;
-                r = ff_find_start_code(r1, buf1 + size, &start_code);
+                r = ff_find_start_code(r1, end, &start_code);
                 if((start_code & 0xFFFFFF00) == 0x100) {
                     /* New start code found */
                     if (start_code == 0x100) {
@@ -104,7 +105,7 @@ void ff_rtp_send_mpegvideo(AVFormatContext *s1, const uint8_t *buf1, int size)
         memcpy(q, buf1, len);
         q += len;
 
-        /* 90 KHz time stamp */
+        /* 90kHz time stamp */
         s->timestamp = s->cur_timestamp;
         ff_rtp_send_data(s1, s->buf, q - s->buf, (len == size));
 

@@ -1,6 +1,6 @@
 /*
  * MPEG1/2 encoder
- * Copyright (c) 2000,2001 Fabrice Bellard.
+ * Copyright (c) 2000,2001 Fabrice Bellard
  * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This file is part of FFmpeg.
@@ -21,7 +21,7 @@
  */
 
 /**
- * @file mpeg12enc.c
+ * @file libavcodec/mpeg12enc.c
  * MPEG1/2 encoder
  */
 
@@ -666,19 +666,17 @@ void mpeg1_encode_mb(MpegEncContext *s, DCTELEM block[6][64], int motion_x, int 
 // RAL: Parameter added: f_or_b_code
 static void mpeg1_encode_motion(MpegEncContext *s, int val, int f_or_b_code)
 {
-    int code, bit_size, l, bits, range, sign;
-
     if (val == 0) {
         /* zero vector */
-        code = 0;
         put_bits(&s->pb,
                  ff_mpeg12_mbMotionVectorTable[0][1],
                  ff_mpeg12_mbMotionVectorTable[0][0]);
     } else {
-        bit_size = f_or_b_code - 1;
-        range = 1 << bit_size;
+        int code, sign, bits;
+        int bit_size = f_or_b_code - 1;
+        int range = 1 << bit_size;
         /* modulo encoding */
-        l= INT_BIT - 5 - bit_size;
+        int l= INT_BIT - 5 - bit_size;
         val= (val<<l)>>l;
 
         if (val >= 0) {

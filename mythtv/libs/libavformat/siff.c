@@ -1,6 +1,6 @@
 /*
  * Beam Software SIFF demuxer
- * Copyright (c) 2007 Konstantin Shishkov.
+ * Copyright (c) 2007 Konstantin Shishkov
  *
  * This file is part of FFmpeg.
  *
@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/intreadwrite.h"
 #include "avformat.h"
 
 enum SIFFTags{
@@ -75,7 +76,7 @@ static int create_audio_stream(AVFormatContext *s, SIFFContext *c)
     ast->codec->codec_type      = CODEC_TYPE_AUDIO;
     ast->codec->codec_id        = CODEC_ID_PCM_U8;
     ast->codec->channels        = 1;
-    ast->codec->bits_per_sample = c->bits;
+    ast->codec->bits_per_coded_sample = c->bits;
     ast->codec->sample_rate     = c->rate;
     ast->codec->frame_size      = c->block_align;
     av_set_pts_info(ast, 16, 1, c->rate);

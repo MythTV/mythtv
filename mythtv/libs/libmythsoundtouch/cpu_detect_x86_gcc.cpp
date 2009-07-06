@@ -69,9 +69,9 @@ void disableExtensions(uint dwDisableMask)
     _dwDisabledISA = dwDisableMask;
 }
 
-#ifdef ARCH_X86
+#if ARCH_X86
 
-#ifdef ARCH_X86_64
+#if ARCH_X86_64
 #  define REG_b "rbx"
 #  define REG_S "rsi"
 #else
@@ -191,7 +191,7 @@ static int mm_support(void)
 /// Checks which instruction set extensions are supported by the CPU.
 uint detectCPUextensions(void)
 {
-#ifndef ARCH_X86
+#if !ARCH_X86
     return 0; // always disable extensions on non-x86 platforms.
 #else
     return mm_support() & ~_dwDisabledISA;

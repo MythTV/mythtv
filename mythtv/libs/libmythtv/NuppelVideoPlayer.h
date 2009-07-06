@@ -1,9 +1,6 @@
 #ifndef NUPPELVIDEOPLAYER
 #define NUPPELVIDEOPLAYER
 
-
-
-
 #include <sys/time.h>
 
 #include "playercontext.h"
@@ -736,11 +733,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     yuv2rgb_fun         yuv2argb_conv;
     bool                yuv_need_copy;
     QSize               yuv_desired_size;
-#if ENABLE_SWSCALE
     struct SwsContext  *yuv_scaler;
-#else
-    ImgReSampleContext *yuv_scaler;
-#endif
     unsigned char      *yuv_frame_scaled;
     QSize               yuv_scaler_in_size;
     QSize               yuv_scaler_out_size;

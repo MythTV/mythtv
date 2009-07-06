@@ -23,8 +23,8 @@
 #include "riff.h"
 
 typedef struct {
-    offset_t atrpos, atsqpos, awapos;
-    offset_t data_size;
+    int64_t atrpos, atsqpos, awapos;
+    int64_t data_size;
 } MMFContext;
 
 static const int mmf_rates[] = { 4000, 8000, 11025, 22050, 44100 };
@@ -36,7 +36,7 @@ static int mmf_rate(int code)
     return mmf_rates[code];
 }
 
-#ifdef CONFIG_MMF_MUXER
+#if CONFIG_MMF_MUXER
 static int mmf_rate_code(int rate)
 {
     int i;
@@ -47,9 +47,9 @@ static int mmf_rate_code(int rate)
 }
 
 /* Copy of end_tag() from avienc.c, but for big-endian chunk size */
-static void end_tag_be(ByteIOContext *pb, offset_t start)
+static void end_tag_be(ByteIOContext *pb, int64_t start)
 {
-    offset_t pos;
+    int64_t pos;
 
     pos = url_ftell(pb);
     url_fseek(pb, start - 4, SEEK_SET);
@@ -61,7 +61,7 @@ static int mmf_write_header(AVFormatContext *s)
 {
     MMFContext *mmf = s->priv_data;
     ByteIOContext *pb = s->pb;
-    offset_t pos;
+    int64_t pos;
     int rate;
 
     rate = mmf_rate_code(s->streams[0]->codec->sample_rate);
@@ -72,7 +72,7 @@ static int mmf_write_header(AVFormatContext *s)
 
     put_tag(pb, "MMMD");
     put_be32(pb, 0);
-    pos = start_tag(pb, "CNTI");
+    pos = ff_start_tag(pb, "CNTI");
     put_byte(pb, 0); /* class */
     put_byte(pb, 0); /* type */
     put_byte(pb, 0); /* code type */
@@ -97,7 +97,7 @@ static int mmf_write_header(AVFormatContext *s)
     /* Will be filled on close */
     put_buffer(pb, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", 16);
 
-    mmf->awapos = start_tag(pb, "Awa\x01");
+    mmf->awapos = ff_start_tag(pb, "Awa\x01");
 
     av_set_pts_info(s->streams[0], 64, 1, s->streams[0]->codec->sample_rate);
 
@@ -129,7 +129,7 @@ static int mmf_write_trailer(AVFormatContext *s)
 {
     ByteIOContext *pb = s->pb;
     MMFContext *mmf = s->priv_data;
-    offset_t pos, size;
+    int64_t pos, size;
     int gatetime;
 
     if (!url_is_streamed(s->pb)) {
@@ -185,7 +185,7 @@ static int mmf_read_header(AVFormatContext *s,
     unsigned int tag;
     ByteIOContext *pb = s->pb;
     AVStream *st;
-    offset_t file_size, size;
+    int64_t file_size, size;
     int rate, params;
 
     tag = get_le32(pb);
@@ -248,8 +248,8 @@ static int mmf_read_header(AVFormatContext *s,
     st->codec->codec_id = CODEC_ID_ADPCM_YAMAHA;
     st->codec->sample_rate = rate;
     st->codec->channels = 1;
-    st->codec->bits_per_sample = 4;
-    st->codec->bit_rate = st->codec->sample_rate * st->codec->bits_per_sample;
+    st->codec->bits_per_coded_sample = 4;
+    st->codec->bit_rate = st->codec->sample_rate * st->codec->bits_per_coded_sample;
 
     av_set_pts_info(st, 64, 1, st->codec->sample_rate);
 
@@ -290,10 +290,10 @@ static int mmf_read_packet(AVFormatContext *s,
     return ret;
 }
 
-#ifdef CONFIG_MMF_DEMUXER
+#if CONFIG_MMF_DEMUXER
 AVInputFormat mmf_demuxer = {
     "mmf",
-    NULL_IF_CONFIG_SMALL("mmf format"),
+    NULL_IF_CONFIG_SMALL("Yamaha SMAF"),
     sizeof(MMFContext),
     mmf_probe,
     mmf_read_header,
@@ -302,10 +302,10 @@ AVInputFormat mmf_demuxer = {
     pcm_read_seek,
 };
 #endif
-#ifdef CONFIG_MMF_MUXER
+#if CONFIG_MMF_MUXER
 AVOutputFormat mmf_muxer = {
     "mmf",
-    NULL_IF_CONFIG_SMALL("mmf format"),
+    NULL_IF_CONFIG_SMALL("Yamaha SMAF"),
     "application/vnd.smaf",
     "mmf",
     sizeof(MMFContext),

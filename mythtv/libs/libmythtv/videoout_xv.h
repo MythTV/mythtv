@@ -27,7 +27,7 @@ class XvMCOSD;
 
 #ifdef USING_XVMC
 #   include "XvMCSurfaceTypes.h"
-#   include "../libavcodec/xvmc_render.h"
+#   include "libavcodec/xvmc.h"
     typedef struct
     {
         XvMCSurface         surface;
@@ -205,7 +205,7 @@ class VideoOutputXv : public VideoOutput
     long long            non_xv_frames_shown;
     int                  non_xv_show_frame;
     int                  non_xv_fps;
-    int                  non_xv_av_format;
+    PixelFormat          non_xv_av_format;
     time_t               non_xv_stop_time;
 
     // Basic XvMC drawing info

@@ -190,7 +190,7 @@ class MPUBLIC DVDRingBufferPriv
     int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
                     const uint8_t *buf, int nibble_offset, int buf_size);
     void guess_palette(uint32_t *rgba_palette,uint8_t *palette,
-                        uint8_t *alpha);
+                       uint8_t *alpha);
     int is_transp(const uint8_t *buf, int pitch, int n,
                   const uint8_t *transp_color);
     int find_smallest_bounding_rectangle(AVSubtitle *s);

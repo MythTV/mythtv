@@ -20,7 +20,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     Decoder(d, i, o),
     inited(false),   user_stop(false),
     devicename(""),
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     m_diskID(0),     m_firstTrack(0),
     m_lastTrack(0),  m_leadout(0),
     m_lengthInSecs(0.0)

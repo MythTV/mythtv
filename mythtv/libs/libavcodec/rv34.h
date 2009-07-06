@@ -20,7 +20,7 @@
  */
 
 /**
- * @file rv34.h
+ * @file libavcodec/rv34.h
  * RV30 and RV40 decoder common data declarations
  */
 
@@ -32,6 +32,9 @@
 #include "mpegvideo.h"
 
 #include "h264pred.h"
+
+#define MB_TYPE_SEPARATE_DC 0x01000000
+#define IS_SEPARATE_DC(a)   ((a) & MB_TYPE_SEPARATE_DC)
 
 /**
  * RV30 and RV40 Macroblock types
@@ -82,6 +85,7 @@ typedef struct RV34DecContext{
     MpegEncContext s;
     int8_t *intra_types_hist;///< old block types, used for prediction
     int8_t *intra_types;     ///< block types
+    int    intra_types_stride;///< block types array stride
     const uint8_t *luma_dc_quant_i;///< luma subblock DC quantizer for intraframes
     const uint8_t *luma_dc_quant_p;///< luma subblock DC quantizer for interframes
 
@@ -104,6 +108,7 @@ typedef struct RV34DecContext{
 
     uint16_t *cbp_luma;      ///< CBP values for luma subblocks
     uint8_t  *cbp_chroma;    ///< CBP values for chroma subblocks
+    int      *deblock_coefs; ///< deblock coefficients for each macroblock
 
     /** 8x8 block available flags (for MV prediction) */
     DECLARE_ALIGNED_8(uint32_t, avail_cache[3*4]);
@@ -111,7 +116,7 @@ typedef struct RV34DecContext{
     int (*parse_slice_header)(struct RV34DecContext *r, GetBitContext *gb, SliceInfo *si);
     int (*decode_mb_info)(struct RV34DecContext *r);
     int (*decode_intra_types)(struct RV34DecContext *r, GetBitContext *gb, int8_t *dst);
-    void (*loop_filter)(struct RV34DecContext *r);
+    void (*loop_filter)(struct RV34DecContext *r, int row);
 }RV34DecContext;
 
 /**
@@ -119,7 +124,7 @@ typedef struct RV34DecContext{
  */
 int ff_rv34_get_start_offset(GetBitContext *gb, int blocks);
 int ff_rv34_decode_init(AVCodecContext *avctx);
-int ff_rv34_decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size);
+int ff_rv34_decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPacket *avpkt);
 int ff_rv34_decode_end(AVCodecContext *avctx);
 
 #endif /* AVCODEC_RV34_H */

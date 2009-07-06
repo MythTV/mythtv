@@ -8,7 +8,7 @@
 #   include <QMutex>
 #   include <iostream>
 #else
-# ifdef HAVE_GETTIMEOFDAY
+# if HAVE_GETTIMEOFDAY
 #   include <sys/time.h>
 #   include <time.h> // for localtime()
 # endif
@@ -135,7 +135,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
             }                                                \
        } while (0)
     #else
-        #ifdef HAVE_GETTIMEOFDAY
+        #if HAVE_GETTIMEOFDAY
             #define VERBOSEDATE                              \
             {                                                \
                 struct tm      *tp;                          \

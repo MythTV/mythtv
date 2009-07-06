@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #include "config.h"
-#ifdef HAVE_STDINT_H
+#if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 #include <inttypes.h>

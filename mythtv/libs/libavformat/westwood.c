@@ -20,7 +20,7 @@
  */
 
 /**
- * @file westwood.c
+ * @file libavformat/westwood.c
  * Westwood Studios VQA & AUD file demuxers
  * by Mike Melanson (melanson@pcisys.net)
  * for more information on the Westwood file formats, visit:
@@ -33,6 +33,7 @@
  * qualify a file. Refer to wsaud_probe() for the precise parameters.
  */
 
+#include "libavutil/intreadwrite.h"
 #include "avformat.h"
 
 #define AUD_HEADER_SIZE 12
@@ -59,14 +60,13 @@
 
 #define VQA_HEADER_SIZE 0x2A
 #define VQA_FRAMERATE 15
-#define VQA_VIDEO_PTS_INC (90000 / VQA_FRAMERATE)
 #define VQA_PREAMBLE_SIZE 8
 
 typedef struct WsAudDemuxContext {
     int audio_samplerate;
     int audio_channels;
     int audio_bits;
-    int audio_type;
+    enum CodecID audio_type;
     int audio_stream_index;
     int64_t audio_frame_counter;
 } WsAudDemuxContext;
@@ -80,7 +80,6 @@ typedef struct WsVqaDemuxContext {
     int video_stream_index;
 
     int64_t audio_frame_counter;
-    int64_t video_pts;
 } WsVqaDemuxContext;
 
 static int wsaud_probe(AVProbeData *p)
@@ -154,10 +153,10 @@ static int wsaud_read_header(AVFormatContext *s,
     st->codec->codec_tag = 0;  /* no tag */
     st->codec->channels = wsaud->audio_channels;
     st->codec->sample_rate = wsaud->audio_samplerate;
-    st->codec->bits_per_sample = wsaud->audio_bits;
+    st->codec->bits_per_coded_sample = wsaud->audio_bits;
     st->codec->bit_rate = st->codec->channels * st->codec->sample_rate *
-        st->codec->bits_per_sample / 4;
-    st->codec->block_align = st->codec->channels * st->codec->bits_per_sample;
+        st->codec->bits_per_coded_sample / 4;
+    st->codec->block_align = st->codec->channels * st->codec->bits_per_coded_sample;
 
     wsaud->audio_stream_index = st->index;
     wsaud->audio_frame_counter = 0;
@@ -264,10 +263,10 @@ static int wsvqa_read_header(AVFormatContext *s,
         st->codec->channels = header[26];
         if (!st->codec->channels)
             st->codec->channels = 1;
-        st->codec->bits_per_sample = 16;
+        st->codec->bits_per_coded_sample = 16;
         st->codec->bit_rate = st->codec->channels * st->codec->sample_rate *
-            st->codec->bits_per_sample / 4;
-        st->codec->block_align = st->codec->channels * st->codec->bits_per_sample;
+            st->codec->bits_per_coded_sample / 4;
+        st->codec->block_align = st->codec->channels * st->codec->bits_per_coded_sample;
 
         wsvqa->audio_stream_index = st->index;
         wsvqa->audio_samplerate = st->codec->sample_rate;
@@ -306,8 +305,6 @@ static int wsvqa_read_header(AVFormatContext *s,
 
         url_fseek(pb, chunk_size, SEEK_CUR);
     } while (chunk_tag != FINF_TAG);
-
-    wsvqa->video_pts = wsvqa->audio_frame_counter = 0;
 
     return 0;
 }
@@ -348,7 +345,6 @@ static int wsvqa_read_packet(AVFormatContext *s,
                 wsvqa->audio_frame_counter += AV_RL16(pkt->data) / wsvqa->audio_channels;
             } else {
                 pkt->stream_index = wsvqa->video_stream_index;
-                wsvqa->video_pts += VQA_VIDEO_PTS_INC;
             }
             /* stay on 16-bit alignment */
             if (skip_byte)
@@ -370,7 +366,7 @@ static int wsvqa_read_packet(AVFormatContext *s,
     return ret;
 }
 
-#ifdef CONFIG_WSAUD_DEMUXER
+#if CONFIG_WSAUD_DEMUXER
 AVInputFormat wsaud_demuxer = {
     "wsaud",
     NULL_IF_CONFIG_SMALL("Westwood Studios audio format"),
@@ -380,7 +376,7 @@ AVInputFormat wsaud_demuxer = {
     wsaud_read_packet,
 };
 #endif
-#ifdef CONFIG_WSVQA_DEMUXER
+#if CONFIG_WSVQA_DEMUXER
 AVInputFormat wsvqa_demuxer = {
     "wsvqa",
     NULL_IF_CONFIG_SMALL("Westwood Studios VQA format"),

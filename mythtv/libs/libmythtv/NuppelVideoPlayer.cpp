@@ -1,5 +1,7 @@
 // -*- Mode: c++ -*-
 
+#undef HAVE_AV_CONFIG_H
+
 // Std C headers
 #include <cstdio>
 #include <cstdlib>
@@ -58,6 +60,7 @@ using namespace std;
 extern "C" {
 #include "vbitext/vbi.h"
 #include "vsync.h"
+#include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 }
 
@@ -74,16 +77,16 @@ extern "C" {
 #include "videoout_dx.h"
 #undef GetFreeSpace
 #undef GetFileSize
-#ifdef CONFIG_CYGWIN
+#if CONFIG_CYGWIN
 #undef DialogBox
 #endif
 #endif
 
-#ifndef HAVE_ROUND
+#if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 extern "C" {
 int isnan(double);
 }
@@ -1643,11 +1646,7 @@ void NuppelVideoPlayer::ShutdownYUVResize(void)
 
     if (yuv_scaler)
     {
-#if ENABLE_SWSCALE
         sws_freeContext(yuv_scaler);
-#else
-        img_resample_close(yuv_scaler);
-#endif
         yuv_scaler = NULL;
     }
 
@@ -2814,18 +2813,12 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             yuv_scaler_in_size  = vsize;
             yuv_scaler_out_size = yuv_desired_size;
 
-#if ENABLE_SWSCALE
             yuv_scaler = sws_getCachedContext(yuv_scaler,
                 yuv_scaler_in_size.width(),  yuv_scaler_in_size.height(),
                 PIX_FMT_YUV420P,
                 yuv_scaler_out_size.width(), yuv_scaler_out_size.height(),
                 PIX_FMT_YUV420P,
                 SWS_FAST_BILINEAR, NULL, NULL, NULL);
-#else
-            yuv_scaler = img_resample_init(
-                yuv_scaler_out_size.width(), yuv_scaler_out_size.height(),
-                yuv_scaler_in_size.width(),  yuv_scaler_in_size.height());
-#endif
         }
 
         AVPicture img_out, img_in;
@@ -2836,13 +2829,9 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
                        yuv_scaler_in_size.width(),
                        yuv_scaler_in_size.height());
 
-#if ENABLE_SWSCALE
         sws_scale(yuv_scaler, img_in.data, img_in.linesize, 0,
                   yuv_scaler_in_size.height(),
                   img_out.data, img_out.linesize);
-#else
-        img_resample(yuv_scaler, &img_out, &img_in);
-#endif
         yuv_need_copy = false;
         yuv_wait.wakeAll();
     }
@@ -3552,7 +3541,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
     {
         // Request that the video output thread run with realtime priority.
         // If mythyv/mythfrontend was installed SUID root, this will work.
-#ifndef CONFIG_DARWIN
+#if !CONFIG_DARWIN
         gContext->addPrivRequest(MythPrivRequest::MythRealtime, &output_video);
 #endif
 
@@ -5980,15 +5969,11 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
     bufflen = video_dim.width() * video_dim.height() * 4;
     outputbuf = new unsigned char[bufflen];
 
-    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32,
+    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGB32,
                    video_dim.width(), video_dim.height());
 
-#if ENABLE_SWSCALE
     myth_sws_img_convert(
-#else
-    img_convert(
-#endif
-        &retbuf, PIX_FMT_RGBA32, &orig, PIX_FMT_YUV420P,
+        &retbuf, PIX_FMT_RGB32, &orig, PIX_FMT_YUV420P,
                 video_dim.width(), video_dim.height());
 
     vw = video_dim.width();
@@ -6425,7 +6410,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
     if (player_ctx->buffer->isDVD())
     {
         if (!player_ctx->buffer->DVD()->IsInMenu())
-#ifndef CONFIG_CYGWIN
+#if !CONFIG_CYGWIN
             secsplayed = player_ctx->buffer->DVD()->GetCurrentTime();
 #else
             // DVD playing non-functional under windows for now
@@ -7157,7 +7142,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
         // draw the subtitle bitmap(s) to the OSD
         for (std::size_t i = 0; i < subtitlePage.num_rects; ++i)
         {
-            AVSubtitleRect* rect = &subtitlePage.rects[i];
+            AVSubtitleRect* rect = subtitlePage.rects[i];
 
             bool displaysub = true;
             if (nonDisplayedAVSubtitles.size() > 0 &&
@@ -7167,7 +7152,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                 displaysub = false;
             }
 
-            if (displaysub)
+            if (displaysub && rect->type == SUBTITLE_BITMAP)
             {
                 // AVSubtitleRect's image data's not guaranteed to be 4 byte
                 // aligned.
@@ -7176,8 +7161,8 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                 {
                     for (int x = 0; x < rect->w; ++x)
                     {
-                        const uint8_t color = rect->bitmap[y*rect->linesize + x];
-                        const uint32_t pixel = rect->rgba_palette[color];
+                        const uint8_t color = rect->pict.data[0][y*rect->pict.linesize[0] + x];
+                        const uint32_t pixel = rect->pict.data[1][color];
                         qImage.setPixel(x, y, pixel);
                     }
                 }
@@ -7222,8 +7207,9 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                 osdHasSubtitles = true;
             }
 
-            av_free(rect->rgba_palette);
-            av_free(rect->bitmap);
+            av_free(rect->pict.data[0]);
+            av_free(rect->pict.data[1]);
+            av_free(rect);
         }
 
         if (subtitlePage.num_rects > 0)
@@ -7319,9 +7305,10 @@ void NuppelVideoPlayer::ExpireSubtitles(void)
 
         for (std::size_t i = 0; i < subtitlePage.num_rects; ++i)
         {
-            AVSubtitleRect* rect = &subtitlePage.rects[i];
-            av_free(rect->rgba_palette);
-            av_free(rect->bitmap);
+            AVSubtitleRect* rect = subtitlePage.rects[i];
+            av_free(rect->pict.data[0]);
+            av_free(rect->pict.data[1]);
+            av_free(rect);
         }
 
         if (subtitlePage.num_rects > 0)
@@ -7345,9 +7332,9 @@ void NuppelVideoPlayer::ClearSubtitles(void)
         // the dynamic buffers here
         for (std::size_t i = 0; i < subtitle.num_rects; ++i)
         {
-             AVSubtitleRect* rect = &subtitle.rects[i];
-             av_free(rect->rgba_palette);
-             av_free(rect->bitmap);
+             AVSubtitleRect* rect = subtitle.rects[i];
+             av_free(rect->pict.data[0]);
+             av_free(rect->pict.data[1]);
         }
 
         if (subtitle.num_rects > 0)
@@ -7478,17 +7465,17 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
 
     if (dvdSubtitle && subtitleOSD)
     {
-        hl_button = &(dvdSubtitle->rects[0]);
+        hl_button = dvdSubtitle->rects[0];
         osd->HideSet("subtitles");
         osd->ClearAll("subtitles");
         uint h = hl_button->h;
         uint w  = hl_button->w;
-        int linesize = hl_button->linesize;
+        int linesize = hl_button->pict.linesize[0];
         QPoint topleft = QPoint(hl_button->x, hl_button->y);
         QRect buttonPos = player_ctx->buffer->DVD()->GetButtonCoords();
         QImage hl_image(w, h, QImage::Format_ARGB32);
         uint8_t color;
-        uint32_t pixel;
+        uint32_t pixel, *palette;
         QPoint currentPos = QPoint(0,0);
         for (uint y = 2; y < h; y++)
         {
@@ -7496,13 +7483,14 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
             {
                 currentPos.setY(y);
                 currentPos.setX(x);
-                color = hl_button->bitmap[(y)*linesize+(x)];
+                color = hl_button->pict.data[0][(y)*linesize+(x)];
                 // use rgba palette from dvd nav for drawing
                 // highlighted button
                 if (buttonPos.contains(currentPos))
-                    pixel = dvdSubtitle->rects[1].rgba_palette[color];
+                    palette = (uint32_t *)(dvdSubtitle->rects[1]->pict.data[1]);
                 else
-                    pixel = hl_button->rgba_palette[color];
+                    palette = (uint32_t *)(hl_button->pict.data[1]);
+                pixel = palette[color];
                 hl_image.setPixel(x, y, pixel);
             }
         }

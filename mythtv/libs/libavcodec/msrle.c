@@ -20,7 +20,7 @@
  */
 
 /**
- * @file msrle.c
+ * @file libavcodec/msrle.c
  * MS RLE Video Decoder by Mike Melanson (melanson@pcisys.net)
  * For more information about the MS RLE format, visit:
  *   http://www.pcisys.net/~melanson/codecs/
@@ -38,6 +38,7 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
+#include "msrledec.h"
 
 typedef struct MsrleContext {
     AVCodecContext *avctx;
@@ -48,201 +49,25 @@ typedef struct MsrleContext {
 
 } MsrleContext;
 
-#define FETCH_NEXT_STREAM_BYTE() \
-    if (stream_ptr >= s->size) \
-    { \
-      av_log(s->avctx, AV_LOG_ERROR, " MS RLE: stream ptr just went out of bounds (1)\n"); \
-      return; \
-    } \
-    stream_byte = s->buf[stream_ptr++];
-
-static void msrle_decode_pal4(MsrleContext *s)
-{
-    int stream_ptr = 0;
-    unsigned char rle_code;
-    unsigned char extra_byte, odd_pixel;
-    unsigned char stream_byte;
-    int pixel_ptr = 0;
-    int row_dec = s->frame.linesize[0];
-    int row_ptr = (s->avctx->height - 1) * row_dec;
-    int frame_size = row_dec * s->avctx->height;
-    int i;
-
-    /* make the palette available */
-    memcpy(s->frame.data[1], s->avctx->palctrl->palette, AVPALETTE_SIZE);
-    if (s->avctx->palctrl->palette_changed) {
-        s->frame.palette_has_changed = 1;
-        s->avctx->palctrl->palette_changed = 0;
-    }
-
-    while (row_ptr >= 0) {
-        FETCH_NEXT_STREAM_BYTE();
-        rle_code = stream_byte;
-        if (rle_code == 0) {
-            /* fetch the next byte to see how to handle escape code */
-            FETCH_NEXT_STREAM_BYTE();
-            if (stream_byte == 0) {
-                /* line is done, goto the next one */
-                row_ptr -= row_dec;
-                pixel_ptr = 0;
-            } else if (stream_byte == 1) {
-                /* decode is done */
-                return;
-            } else if (stream_byte == 2) {
-                /* reposition frame decode coordinates */
-                FETCH_NEXT_STREAM_BYTE();
-                pixel_ptr += stream_byte;
-                FETCH_NEXT_STREAM_BYTE();
-                row_ptr -= stream_byte * row_dec;
-        } else {
-            // copy pixels from encoded stream
-            odd_pixel =  stream_byte & 1;
-            rle_code = (stream_byte + 1) / 2;
-            extra_byte = rle_code & 0x01;
-            if ((row_ptr + pixel_ptr + stream_byte > frame_size) ||
-                (row_ptr < 0)) {
-                av_log(s->avctx, AV_LOG_ERROR, " MS RLE: frame ptr just went out of bounds (1)\n");
-                return;
-            }
-
-            for (i = 0; i < rle_code; i++) {
-                if (pixel_ptr >= s->avctx->width)
-                    break;
-                FETCH_NEXT_STREAM_BYTE();
-                s->frame.data[0][row_ptr + pixel_ptr] = stream_byte >> 4;
-                pixel_ptr++;
-                if (i + 1 == rle_code && odd_pixel)
-                    break;
-                if (pixel_ptr >= s->avctx->width)
-                    break;
-                s->frame.data[0][row_ptr + pixel_ptr] = stream_byte & 0x0F;
-                pixel_ptr++;
-            }
-
-            // if the RLE code is odd, skip a byte in the stream
-            if (extra_byte)
-              stream_ptr++;
-            }
-        } else {
-            // decode a run of data
-            if ((row_ptr + pixel_ptr + stream_byte > frame_size) ||
-                (row_ptr < 0)) {
-                av_log(s->avctx, AV_LOG_ERROR, " MS RLE: frame ptr just went out of bounds (1)\n");
-                return;
-            }
-            FETCH_NEXT_STREAM_BYTE();
-            for (i = 0; i < rle_code; i++) {
-                if (pixel_ptr >= s->avctx->width)
-                    break;
-                if ((i & 1) == 0)
-                    s->frame.data[0][row_ptr + pixel_ptr] = stream_byte >> 4;
-                else
-                    s->frame.data[0][row_ptr + pixel_ptr] = stream_byte & 0x0F;
-                pixel_ptr++;
-            }
-        }
-    }
-
-    /* one last sanity check on the way out */
-    if (stream_ptr < s->size)
-        av_log(s->avctx, AV_LOG_ERROR, " MS RLE: ended frame decode with bytes left over (%d < %d)\n",
-            stream_ptr, s->size);
-}
-
-
-
-static void msrle_decode_pal8(MsrleContext *s)
-{
-    int stream_ptr = 0;
-    unsigned char rle_code;
-    unsigned char extra_byte;
-    unsigned char stream_byte;
-    int pixel_ptr = 0;
-    int row_dec = s->frame.linesize[0];
-    int row_ptr = (s->avctx->height - 1) * row_dec;
-    int frame_size = row_dec * s->avctx->height;
-
-    /* make the palette available */
-    memcpy(s->frame.data[1], s->avctx->palctrl->palette, AVPALETTE_SIZE);
-    if (s->avctx->palctrl->palette_changed) {
-        s->frame.palette_has_changed = 1;
-        s->avctx->palctrl->palette_changed = 0;
-    }
-
-    while (row_ptr >= 0) {
-        FETCH_NEXT_STREAM_BYTE();
-        rle_code = stream_byte;
-        if (rle_code == 0) {
-            /* fetch the next byte to see how to handle escape code */
-            FETCH_NEXT_STREAM_BYTE();
-            if (stream_byte == 0) {
-                /* line is done, goto the next one */
-                row_ptr -= row_dec;
-                pixel_ptr = 0;
-            } else if (stream_byte == 1) {
-                /* decode is done */
-                return;
-            } else if (stream_byte == 2) {
-                /* reposition frame decode coordinates */
-                FETCH_NEXT_STREAM_BYTE();
-                pixel_ptr += stream_byte;
-                FETCH_NEXT_STREAM_BYTE();
-                row_ptr -= stream_byte * row_dec;
-            } else {
-                /* copy pixels from encoded stream */
-                if ((row_ptr + pixel_ptr + stream_byte > frame_size) ||
-                    (row_ptr < 0)) {
-                    av_log(s->avctx, AV_LOG_ERROR, " MS RLE: frame ptr just went out of bounds (1)\n");
-                    return;
-                }
-
-                rle_code = stream_byte;
-                extra_byte = stream_byte & 0x01;
-                if (stream_ptr + rle_code + extra_byte > s->size) {
-                    av_log(s->avctx, AV_LOG_ERROR, " MS RLE: stream ptr just went out of bounds (2)\n");
-                    return;
-                }
-
-                while (rle_code--) {
-                    FETCH_NEXT_STREAM_BYTE();
-                    s->frame.data[0][row_ptr + pixel_ptr] = stream_byte;
-                    pixel_ptr++;
-                }
-
-                /* if the RLE code is odd, skip a byte in the stream */
-                if (extra_byte)
-                    stream_ptr++;
-            }
-        } else {
-            /* decode a run of data */
-            if ((row_ptr + pixel_ptr + stream_byte > frame_size) ||
-                (row_ptr < 0)) {
-                av_log(s->avctx, AV_LOG_ERROR, " MS RLE: frame ptr just went out of bounds (2)\n");
-                return;
-            }
-
-            FETCH_NEXT_STREAM_BYTE();
-
-            while(rle_code--) {
-                s->frame.data[0][row_ptr + pixel_ptr] = stream_byte;
-                pixel_ptr++;
-            }
-        }
-    }
-
-    /* one last sanity check on the way out */
-    if (stream_ptr < s->size)
-        av_log(s->avctx, AV_LOG_ERROR, " MS RLE: ended frame decode with bytes left over (%d < %d)\n",
-            stream_ptr, s->size);
-}
-
 static av_cold int msrle_decode_init(AVCodecContext *avctx)
 {
     MsrleContext *s = avctx->priv_data;
 
     s->avctx = avctx;
 
-    avctx->pix_fmt = PIX_FMT_PAL8;
+    switch (avctx->bits_per_coded_sample) {
+    case 4:
+    case 8:
+        avctx->pix_fmt = PIX_FMT_PAL8;
+        break;
+    case 24:
+        avctx->pix_fmt = PIX_FMT_BGR24;
+        break;
+    default:
+        av_log(avctx, AV_LOG_ERROR, "unsupported bits per sample\n");
+        return -1;
+    }
+
     s->frame.data[0] = NULL;
 
     return 0;
@@ -250,9 +75,12 @@ static av_cold int msrle_decode_init(AVCodecContext *avctx)
 
 static int msrle_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              const uint8_t *buf, int buf_size)
+                              AVPacket *avpkt)
 {
+    const uint8_t *buf = avpkt->data;
+    int buf_size = avpkt->size;
     MsrleContext *s = avctx->priv_data;
+    int istride = FFALIGN(avctx->width*avctx->bits_per_coded_sample, 32) / 8;
 
     s->buf = buf;
     s->size = buf_size;
@@ -264,16 +92,38 @@ static int msrle_decode_frame(AVCodecContext *avctx,
         return -1;
     }
 
-    switch (avctx->bits_per_sample) {
-        case 8:
-            msrle_decode_pal8(s);
-            break;
-        case 4:
-            msrle_decode_pal4(s);
-            break;
-        default:
-            av_log(avctx, AV_LOG_ERROR, "Don't know how to decode depth %u.\n",
-                   avctx->bits_per_sample);
+    if (s->avctx->palctrl) {
+        /* make the palette available */
+        memcpy(s->frame.data[1], s->avctx->palctrl->palette, AVPALETTE_SIZE);
+        if (s->avctx->palctrl->palette_changed) {
+            s->frame.palette_has_changed = 1;
+            s->avctx->palctrl->palette_changed = 0;
+        }
+    }
+
+    /* FIXME how to correctly detect RLE ??? */
+    if (avctx->height * istride == avpkt->size) { /* assume uncompressed */
+        int linesize = avctx->width * avctx->bits_per_coded_sample / 8;
+        uint8_t *ptr = s->frame.data[0];
+        uint8_t *buf = avpkt->data + (avctx->height-1)*istride;
+        int i, j;
+
+        for (i = 0; i < avctx->height; i++) {
+            if (avctx->bits_per_coded_sample == 4) {
+                for (j = 0; j < avctx->width - 1; j += 2) {
+                    ptr[j+0] = buf[j>>1] >> 4;
+                    ptr[j+1] = buf[j>>1] & 0xF;
+                }
+                if (avctx->width & 1)
+                    ptr[j+0] = buf[j>>1] >> 4;
+            } else {
+                memcpy(ptr, buf, linesize);
+            }
+            buf -= istride;
+            ptr += s->frame.linesize[0];
+        }
+    } else {
+        ff_msrle_decode(avctx, (AVPicture*)&s->frame, avctx->bits_per_coded_sample, buf, buf_size);
     }
 
     *data_size = sizeof(AVFrame);

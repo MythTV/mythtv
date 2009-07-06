@@ -62,12 +62,12 @@ static inline uint64_t WORD_VEC(uint64_t x)
 
 #ifdef __GNUC__
 #define ldq(p)                                                  \
-    (((union {                                                  \
+    (((const union {                                            \
         uint64_t __l;                                           \
         __typeof__(*(p)) __s[sizeof (uint64_t) / sizeof *(p)];  \
     } *) (p))->__l)
 #define ldl(p)                                                  \
-    (((union {                                                  \
+    (((const union {                                            \
         int32_t __l;                                            \
         __typeof__(*(p)) __s[sizeof (int32_t) / sizeof *(p)];   \
     } *) (p))->__l)
@@ -105,21 +105,21 @@ struct unaligned_long { uint64_t l; } __attribute__((packed));
 #define implver         __builtin_alpha_implver
 #define rpcc            __builtin_alpha_rpcc
 #else
-#define prefetch(p)     asm volatile("ldl $31,%0"  : : "m"(*(const char *) (p)) : "memory")
-#define prefetch_en(p)  asm volatile("ldq $31,%0"  : : "m"(*(const char *) (p)) : "memory")
-#define prefetch_m(p)   asm volatile("lds $f31,%0" : : "m"(*(const char *) (p)) : "memory")
-#define prefetch_men(p) asm volatile("ldt $f31,%0" : : "m"(*(const char *) (p)) : "memory")
-#define cmpbge(a, b) ({ uint64_t __r; asm ("cmpbge  %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
-#define extql(a, b)  ({ uint64_t __r; asm ("extql   %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
-#define extwl(a, b)  ({ uint64_t __r; asm ("extwl   %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
-#define extqh(a, b)  ({ uint64_t __r; asm ("extqh   %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
-#define zap(a, b)    ({ uint64_t __r; asm ("zap     %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
-#define zapnot(a, b) ({ uint64_t __r; asm ("zapnot  %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
-#define amask(a)     ({ uint64_t __r; asm ("amask   %1,%0"      : "=r" (__r) : "rI"  (a));           __r; })
-#define implver()    ({ uint64_t __r; asm ("implver %0"         : "=r" (__r));                       __r; })
-#define rpcc()       ({ uint64_t __r; asm volatile ("rpcc %0"   : "=r" (__r));                       __r; })
+#define prefetch(p)     __asm__ volatile("ldl $31,%0"  : : "m"(*(const char *) (p)) : "memory")
+#define prefetch_en(p)  __asm__ volatile("ldq $31,%0"  : : "m"(*(const char *) (p)) : "memory")
+#define prefetch_m(p)   __asm__ volatile("lds $f31,%0" : : "m"(*(const char *) (p)) : "memory")
+#define prefetch_men(p) __asm__ volatile("ldt $f31,%0" : : "m"(*(const char *) (p)) : "memory")
+#define cmpbge(a, b) ({ uint64_t __r; __asm__ ("cmpbge  %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
+#define extql(a, b)  ({ uint64_t __r; __asm__ ("extql   %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
+#define extwl(a, b)  ({ uint64_t __r; __asm__ ("extwl   %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
+#define extqh(a, b)  ({ uint64_t __r; __asm__ ("extqh   %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
+#define zap(a, b)    ({ uint64_t __r; __asm__ ("zap     %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
+#define zapnot(a, b) ({ uint64_t __r; __asm__ ("zapnot  %r1,%2,%0"  : "=r" (__r) : "rJ"  (a), "rI" (b)); __r; })
+#define amask(a)     ({ uint64_t __r; __asm__ ("amask   %1,%0"      : "=r" (__r) : "rI"  (a));           __r; })
+#define implver()    ({ uint64_t __r; __asm__ ("implver %0"         : "=r" (__r));                       __r; })
+#define rpcc()       ({ uint64_t __r; __asm__ volatile ("rpcc %0"   : "=r" (__r));                       __r; })
 #endif
-#define wh64(p) asm volatile("wh64 (%0)" : : "r"(p) : "memory")
+#define wh64(p) __asm__ volatile("wh64 (%0)" : : "r"(p) : "memory")
 
 #if GNUC_PREREQ(3,3) && defined(__alpha_max__)
 #define minub8  __builtin_alpha_minub8
@@ -136,19 +136,19 @@ struct unaligned_long { uint64_t l; } __attribute__((packed));
 #define unpkbl  __builtin_alpha_unpkbl
 #define unpkbw  __builtin_alpha_unpkbw
 #else
-#define minub8(a, b) ({ uint64_t __r; asm (".arch ev6; minub8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define minsb8(a, b) ({ uint64_t __r; asm (".arch ev6; minsb8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define minuw4(a, b) ({ uint64_t __r; asm (".arch ev6; minuw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define minsw4(a, b) ({ uint64_t __r; asm (".arch ev6; minsw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define maxub8(a, b) ({ uint64_t __r; asm (".arch ev6; maxub8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define maxsb8(a, b) ({ uint64_t __r; asm (".arch ev6; maxsb8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define maxuw4(a, b) ({ uint64_t __r; asm (".arch ev6; maxuw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define maxsw4(a, b) ({ uint64_t __r; asm (".arch ev6; maxsw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
-#define perr(a, b)   ({ uint64_t __r; asm (".arch ev6; perr    %r1,%r2,%0" : "=r" (__r) : "%rJ" (a), "rJ" (b)); __r; })
-#define pklb(a)      ({ uint64_t __r; asm (".arch ev6; pklb    %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
-#define pkwb(a)      ({ uint64_t __r; asm (".arch ev6; pkwb    %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
-#define unpkbl(a)    ({ uint64_t __r; asm (".arch ev6; unpkbl  %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
-#define unpkbw(a)    ({ uint64_t __r; asm (".arch ev6; unpkbw  %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
+#define minub8(a, b) ({ uint64_t __r; __asm__ (".arch ev6; minub8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define minsb8(a, b) ({ uint64_t __r; __asm__ (".arch ev6; minsb8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define minuw4(a, b) ({ uint64_t __r; __asm__ (".arch ev6; minuw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define minsw4(a, b) ({ uint64_t __r; __asm__ (".arch ev6; minsw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define maxub8(a, b) ({ uint64_t __r; __asm__ (".arch ev6; maxub8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define maxsb8(a, b) ({ uint64_t __r; __asm__ (".arch ev6; maxsb8  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define maxuw4(a, b) ({ uint64_t __r; __asm__ (".arch ev6; maxuw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define maxsw4(a, b) ({ uint64_t __r; __asm__ (".arch ev6; maxsw4  %r1,%2,%0"  : "=r" (__r) : "%rJ" (a), "rI" (b)); __r; })
+#define perr(a, b)   ({ uint64_t __r; __asm__ (".arch ev6; perr    %r1,%r2,%0" : "=r" (__r) : "%rJ" (a), "rJ" (b)); __r; })
+#define pklb(a)      ({ uint64_t __r; __asm__ (".arch ev6; pklb    %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
+#define pkwb(a)      ({ uint64_t __r; __asm__ (".arch ev6; pkwb    %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
+#define unpkbl(a)    ({ uint64_t __r; __asm__ (".arch ev6; unpkbl  %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
+#define unpkbw(a)    ({ uint64_t __r; __asm__ (".arch ev6; unpkbw  %r1,%0"     : "=r" (__r) : "rJ"  (a));           __r; })
 #endif
 
 #elif defined(__DECC)           /* Digital/Compaq/hp "ccc" compiler */

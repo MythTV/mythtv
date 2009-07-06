@@ -11,7 +11,7 @@ extern URLProtocol AVF_RingBuffer_Protocol;
 
 extern int AVF_Write_Packet(void *opaque, uint8_t *buf, int buf_size);
 extern int AVF_Read_Packet(void *opaque, uint8_t *buf, int buf_size);
-extern offset_t AVF_Seek_Packet(void *opaque, int64_t offset, int whence);
+extern int64_t AVF_Seek_Packet(void *opaque, int64_t offset, int whence);
 
 class AVFRingBuffer
 {

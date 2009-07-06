@@ -129,10 +129,9 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         if (m_Name.Equal("GCD")) { // GetCurrentDate - returns local time.
             if (args.Size() == 2) {
                 struct timeb timebuffer;
-#ifdef HAVE_FTIME
+#if HAVE_FTIME
                 ftime(&timebuffer);
-#else
-    #ifdef HAVE_GETTIMEOFDAY
+#elif HAVE_GETTIMEOFDAY
 		struct timeval   time;
                 struct timezone  zone;
 
@@ -141,9 +140,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 timebuffer.time     = time.tv_sec;
                 timebuffer.timezone = zone.tz_minuteswest;
                 timebuffer.dstflag  = zone.tz_dsttime;
-    #else
+#else
         #error Configuration error? No ftime() or gettimeofday()?
-    #endif
 #endif
                 // Adjust the time to local.  TODO: Check this.
                 timebuffer.time -= timebuffer.timezone * 60;

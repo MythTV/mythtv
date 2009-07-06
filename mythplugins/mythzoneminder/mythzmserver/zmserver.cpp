@@ -32,7 +32,7 @@
 #else
 #  include <sys/param.h>
 #  include <sys/mount.h>
-#  ifdef CONFIG_CYGWIN
+#  if CONFIG_CYGWIN
 #    include <sys/statfs.h>
 #  else // if !CONFIG_CYGWIN
 #    include <sys/sysctl.h>
@@ -41,7 +41,7 @@
 
 #include "mythtv/mythconfig.h"
 
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
 #define MSG_NOSIGNAL 0  // Apple also has SO_NOSIGPIPE?
 #endif
 

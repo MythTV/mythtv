@@ -36,7 +36,7 @@ typedef CRITICAL_SECTION pthread_mutex_t;
 #define pthread_mutex_unlock(a)  LeaveCriticalSection(a)
 #define pthread_mutex_destroy(a)
 
-#ifndef HAVE_GETTIMEOFDAY
+#if HAVE_GETTIMEOFDAY == 0
 /* replacement gettimeofday implementation */
 #include <sys/timeb.h>
 static inline int _private_gettimeofday( struct timeval *tv, void *tz )

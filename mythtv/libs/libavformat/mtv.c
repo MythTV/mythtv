@@ -20,7 +20,7 @@
  */
 
 /**
- * @file mtv.c
+ * @file libavformat/mtv.c
  * MTV demuxer.
  */
 
@@ -36,24 +36,23 @@
 
 typedef struct MTVDemuxContext {
 
-    unsigned int        file_size;         ///< filesize, not always right
-    unsigned int        segments;          ///< number of 512 byte segments
-    unsigned int        audio_identifier;  ///< 'MP3' on all files I have seen
-    unsigned int        audio_br;          ///< bitrate of audio chanel (mp3)
-    unsigned int        img_colorfmt;      ///< frame colorfmt rgb 565/555
-    unsigned int        img_bpp;           ///< frame bits per pixel
-    unsigned int        img_width;         //
-    unsigned int        img_height;        //
-    unsigned int        img_segment_size;  ///< size of image segment
-    unsigned int        video_fps;         //
-    unsigned int        full_segment_size;
+    unsigned int file_size;         ///< filesize, not always right
+    unsigned int segments;          ///< number of 512 byte segments
+    unsigned int audio_identifier;  ///< 'MP3' on all files I have seen
+    unsigned int audio_br;          ///< bitrate of audio chanel (mp3)
+    unsigned int img_colorfmt;      ///< frame colorfmt rgb 565/555
+    unsigned int img_bpp;           ///< frame bits per pixel
+    unsigned int img_width;         //
+    unsigned int img_height;        //
+    unsigned int img_segment_size;  ///< size of image segment
+    unsigned int video_fps;         //
+    unsigned int full_segment_size;
 
 } MTVDemuxContext;
 
 static int mtv_probe(AVProbeData *p)
 {
     /* Magic is 'AMV' */
-
     if(*(p->buf) != 'A' || *(p->buf+1) != 'M' || *(p->buf+2) != 'V')
         return 0;
 
@@ -62,11 +61,10 @@ static int mtv_probe(AVProbeData *p)
 
 static int mtv_read_header(AVFormatContext *s, AVFormatParameters *ap)
 {
-    MTVDemuxContext    *mtv = s->priv_data;
-    ByteIOContext      *pb  = s->pb;
-    AVStream           *st;
-    unsigned int        audio_subsegments;
-
+    MTVDemuxContext *mtv = s->priv_data;
+    ByteIOContext   *pb  = s->pb;
+    AVStream        *st;
+    unsigned int    audio_subsegments;
 
     url_fskip(pb, 3);
     mtv->file_size         = get_le32(pb);
@@ -86,11 +84,11 @@ static int mtv_read_header(AVFormatContext *s, AVFormatParameters *ap)
         mtv->img_segment_size;
     mtv->video_fps         = (mtv->audio_br / 4) / audio_subsegments;
 
-    /* FIXME Add sanity check here */
+    // FIXME Add sanity check here
 
-    /* all systems go! init decoders */
+    // all systems go! init decoders
 
-    /* video - raw rgb565 */
+    // video - raw rgb565
 
     st = av_new_stream(s, VIDEO_SID);
     if(!st)
@@ -102,10 +100,10 @@ static int mtv_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec->codec_tag       = MKTAG('R', 'G', 'B', mtv->img_bpp);
     st->codec->width           = mtv->img_width;
     st->codec->height          = mtv->img_height;
-    st->codec->bits_per_sample = mtv->img_bpp;
+    st->codec->bits_per_coded_sample = mtv->img_bpp;
     st->codec->sample_rate     = mtv->video_fps;
 
-    /* audio - mp3 */
+    // audio - mp3
 
     st = av_new_stream(s, AUDIO_SID);
     if(!st)
@@ -117,7 +115,7 @@ static int mtv_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec->bit_rate        = mtv->audio_br;
     st->need_parsing           = AVSTREAM_PARSE_FULL;
 
-    /* Jump over header */
+    // Jump over header
 
     if(url_fseek(pb, MTV_HEADER_SIZE, SEEK_SET) != MTV_HEADER_SIZE)
         return AVERROR(EIO);
@@ -134,8 +132,6 @@ static int mtv_read_packet(AVFormatContext *s, AVPacket *pkt)
 #ifndef WORDS_BIGENDIAN
     int i;
 #endif
-
-    ret = 0;
 
     if((url_ftell(pb) - s->data_offset + mtv->img_segment_size) % mtv->full_segment_size)
     {

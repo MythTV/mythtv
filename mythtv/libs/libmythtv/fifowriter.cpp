@@ -15,7 +15,7 @@
 #include "mythverbose.h"
 
 #include "mythconfig.h"
-#ifdef CONFIG_DARWIN
+#if CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif
 

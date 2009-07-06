@@ -19,7 +19,7 @@ extern "C" XvImage *XvShmCreateImage(Display*, XvPortID, int, char*,
 #define BLEND_SUBPICTURE   2
 #define BACKEND_SUBPICTURE 3
 
-static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
+static inline struct xvmc_pix_fmt *GetRender(VideoFrame *frame);
 
 XvMCOSD::XvMCOSD(MythXDisplay *display, int port, int surface_type_id,
                  int xvmc_surf_flags) :
@@ -186,8 +186,8 @@ void XvMCOSD::CompositeOSD(VideoFrame* frame, VideoFrame* osdframe)
 
     if (osd_subpict_mode == BLEND_SUBPICTURE && osdframe)
     {
-        xvmc_render_state_t *render = GetRender(frame);
-        xvmc_render_state_t *osdren = GetRender(osdframe);
+        struct xvmc_pix_fmt *render = GetRender(frame);
+        struct xvmc_pix_fmt *osdren = GetRender(osdframe);
 
         XvMCSyncSubpicture(d, &osd_subpict);
         VideoOutputXv::SyncSurface(frame);
@@ -220,10 +220,10 @@ bool XvMCOSD::IsValid()
         osd_subpict_mode != OVERLAY_SUBPICTURE;
 }
 
-static inline xvmc_render_state_t *GetRender(VideoFrame *frame)
+static inline struct xvmc_pix_fmt *GetRender(VideoFrame *frame)
 {
     if (frame)
-        return (xvmc_render_state_t*) frame->buf;
+        return (struct xvmc_pix_fmt*) frame->buf;
     else
         return NULL;
 }

@@ -10,6 +10,13 @@ INSTALLS = target
 
 QMAKE_LFLAGS += $$LDFLAGS
 
+debug:contains(ARCH_X86_32, yes) {
+        QMAKE_CFLAGS_SHLIB =
+        QMAKE_CFLAGS_DEBUG += -fomit-frame-pointer
+}
+
+!profile:QMAKE_CFLAGS_DEBUG += -O
+
 INCLUDEPATH = .. ../..
 
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
@@ -17,30 +24,32 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-SOURCES += rgb2rgb.c swscale.c swscale_avoption.c
+SOURCES += options.c rgb2rgb.c swscale.c yuv2rgb.c
 
 contains( ARCH_BFIN, yes ) {
-        SOURCES +=  swscale_bfin.c yuv2rgb_bfin.c internal_bfin.S
-}
-
-contains( CONFIG_GPL, yes ) {
-        SOURCES +=  yuv2rgb.c
+        SOURCES += bfin/internal_bfin.S
+        SOURCES += bfin/swscale_bfin.c
+        SOURCES += bfin/yuv2rgb_bfin.c
 }
 
 contains( CONFIG_MLIB, yes )  {
-        SOURCES +=  yuv2rgb_mlib.c
+        SOURCES += mlib/yuv2rgb_mlib.c
 }
 
 contains( HAVE_ALTIVEC, yes ) {
-        SOURCES +=  yuv2rgb_altivec.c
+        SOURCES += ppc/yuv2rgb_altivec.c
 }
 
 contains( HAVE_VIS, yes )  {
-        SOURCES +=  yuv2rgb_vis.c
+        SOURCES += sparc/yuv2rgb_vis.c
+}
+
+contains( HAVE_MMX, yes ):contains( CONFIG_GPL, yes )  {
+        SOURCES += x86/yuv2rgb_mmx.c
 }
 
 inc.path = $${PREFIX}/include/mythtv/libswscale/
-inc.files  = swscale.h rgb2rgb.h
+inc.files  = swscale.h
 
 INSTALLS += inc
 

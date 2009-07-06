@@ -22,7 +22,7 @@
 #ifndef AVCODEC_ROQVIDEO_H
 #define AVCODEC_ROQVIDEO_H
 
-#include "libavutil/random.h"
+#include "libavutil/lfg.h"
 #include "avcodec.h"
 #include "dsputil.h"
 
@@ -38,6 +38,8 @@ typedef struct {
 typedef struct {
     int d[2];
 } motion_vect;
+
+struct RoqTempData;
 
 typedef struct RoqContext {
 
@@ -56,7 +58,7 @@ typedef struct RoqContext {
     int width, height;
 
     /* Encoder only data */
-    AVRandomState randctx;
+    AVLFG randctx;
     uint64_t lambda;
 
     motion_vect *this_motion4;
@@ -69,6 +71,7 @@ typedef struct RoqContext {
 
     AVFrame *frame_to_enc;
     uint8_t *out_buf;
+    struct RoqTempData *tmpData;
 } RoqContext;
 
 #define RoQ_INFO              0x1001

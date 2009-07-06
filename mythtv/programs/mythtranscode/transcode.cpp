@@ -805,11 +805,7 @@ int Transcode::TranscodeFile(
 
     frame.buf = newFrame;
     AVPicture imageIn, imageOut;
-#if ENABLE_SWSCALE
     struct SwsContext  *scontext;
-#else
-    ImgReSampleContext *scontext;
-#endif
 
     if (fifow)
         VERBOSE(VB_GENERAL, "Dumping Video and Audio data to fifos");
@@ -1005,7 +1001,6 @@ int Transcode::TranscodeFile(
                                    newWidth, newHeight);
 
                     int bottomBand = (video_height == 1088) ? 8 : 0;
-#if ENABLE_SWSCALE
                     scontext = sws_getCachedContext(scontext, video_width,
                                    video_height, PIX_FMT_YUV420P, newWidth,
                                    newHeight, PIX_FMT_YUV420P,
@@ -1014,14 +1009,6 @@ int Transcode::TranscodeFile(
                     sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
                               video_height - bottomBand,
                               imageOut.data, imageOut.linesize);
-#else
-                    scontext = img_resample_full_init(newWidth, newHeight,
-                                   video_width, video_height,
-                                   0, bottomBand, 0, 0, 0, 0, 0, 0);
-
-                    img_resample(scontext, &imageOut, &imageIn);
-                    img_resample_close(scontext);
-#endif
                 }
 
                 nvr->WriteVideo(&frame, true, writekeyframe);
@@ -1071,7 +1058,6 @@ int Transcode::TranscodeFile(
                                newWidth, newHeight);
 
                 int bottomBand = (video_height == 1088) ? 8 : 0;
-#if ENABLE_SWSCALE
                 scontext = sws_getCachedContext(scontext, video_width,
                                video_height, PIX_FMT_YUV420P, newWidth,
                                newHeight, PIX_FMT_YUV420P,
@@ -1080,14 +1066,6 @@ int Transcode::TranscodeFile(
                 sws_scale(scontext, imageIn.data, imageIn.linesize, 0,
                           video_height - bottomBand,
                           imageOut.data, imageOut.linesize);
-#else
-                scontext = img_resample_full_init(newWidth, newHeight,
-                                   video_width, video_height,
-                                   0, bottomBand, 0, 0, 0, 0, 0, 0);
-
-                img_resample(scontext, &imageOut, &imageIn);
-                img_resample_close(scontext);
-#endif
             }
 
             // audio is fully decoded, so we need to reencode it
@@ -1181,9 +1159,7 @@ int Transcode::TranscodeFile(
         frame.frameNumber = 1 + (curFrameNum << 1);
     }
 
-#if ENABLE_SWSCALE
     sws_freeContext(scontext);
-#endif
 
     if (! fifow)
     {

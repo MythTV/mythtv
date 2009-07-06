@@ -22,7 +22,7 @@
 
 #include "mpeg2config.h"
 
-#ifdef ARCH_SPARC
+#if ARCH_SPARC
 
 #include <inttypes.h>
 

@@ -1,6 +1,6 @@
 /*
  * Raw Video Codec
- * Copyright (c) 2001 Fabrice Bellard.
+ * Copyright (c) 2001 Fabrice Bellard
  *
  * This file is part of FFmpeg.
  *
@@ -20,7 +20,7 @@
  */
 
 /**
- * @file raw.h
+ * @file libavcodec/raw.h
  * Raw Video Codec
  */
 
@@ -30,7 +30,7 @@
 #include "avcodec.h"
 
 typedef struct PixelFormatTag {
-    int pix_fmt;
+    enum PixelFormat pix_fmt;
     unsigned int fourcc;
 } PixelFormatTag;
 

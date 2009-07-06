@@ -28,7 +28,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <sys/types.h>
-#ifdef HAVE_GETOPT_H
+#if HAVE_GETOPT_H
 # include <getopt.h>
 #endif
 

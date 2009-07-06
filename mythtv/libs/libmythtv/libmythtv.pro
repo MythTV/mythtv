@@ -41,20 +41,19 @@ INCLUDEPATH += $$DEPENDPATH
 INCLUDEPATH += $$POSTINC
 
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat
+LIBS += -L../libswscale
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
 LIBS += -L../libmythdb
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
+LIBS += -lmythswscale-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
-contains( CONFIG_SWSCALE, yes) {
-    LIBS += -L../libswscale -lmythswscale-$$LIBVERSION
-}
 using_backend: LIBS += -lmp3lame
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
@@ -67,9 +66,7 @@ TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
-contains( CONFIG_SWSCALE, yes) {
-    TARGETDEPS += ../libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
-}
+TARGETDEPS += ../libswscale/libmythswscale-$${MYTH_SHLIB_EXT}
 
 DEFINES += _LARGEFILE_SOURCE
 QMAKE_CXXFLAGS += $${FREETYPE_CFLAGS}
@@ -126,7 +123,7 @@ using_valgrind:DEFINES += USING_VALGRIND
 
 # mmx macros from avlib
 contains( HAVE_MMX, yes ) {
-    HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
+    HEADERS += ../../libs/libavcodec/x86/mmx.h ../../libs/libavcodec/dsputil.h
 }
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
@@ -188,10 +185,7 @@ SOURCES += progdetails.cpp
 SOURCES += channelsettings.cpp      previewgenerator.cpp
 SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp         channelgroupsettings.cpp
-
-contains( CONFIG_SWSCALE, yes ) {
-    SOURCES += myth_imgconvert.cpp
-}
+SOURCES += myth_imgconvert.cpp
 
 # Remove when everything is switched to MythUI
 SOURCES += proglist_qt.cpp

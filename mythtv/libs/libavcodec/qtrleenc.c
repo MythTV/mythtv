@@ -78,7 +78,7 @@ static av_cold int qtrle_encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Unsupported colorspace.\n");
         break;
     }
-    avctx->bits_per_sample = s->pixel_size*8;
+    avctx->bits_per_coded_sample = s->pixel_size*8;
 
     s->rlecode_table = av_mallocz(s->avctx->width);
     s->skip_table    = av_mallocz(s->avctx->width);
@@ -116,7 +116,7 @@ static void qtrle_encode_line(QtrleEncContext *s, AVFrame *p, int line, uint8_t 
     unsigned int skipcount;
     /* This will be the number of consecutive equal pixels in the current
      * frame, starting from the ith one also */
-    unsigned int repeatcount;
+    unsigned int av_uninit(repeatcount);
 
     /* The cost of the three different possibilities */
     int total_bulk_cost;
@@ -126,8 +126,10 @@ static void qtrle_encode_line(QtrleEncContext *s, AVFrame *p, int line, uint8_t 
     int temp_cost;
     int j;
 
-    uint8_t *this_line = p->               data[0] + line*p->linesize[0] + (width - 1)*s->pixel_size;
-    uint8_t *prev_line = s->previous_frame.data[0] + line*p->linesize[0] + (width - 1)*s->pixel_size;
+    uint8_t *this_line = p->               data[0] + line*p->               linesize[0] +
+        (width - 1)*s->pixel_size;
+    uint8_t *prev_line = s->previous_frame.data[0] + line*s->previous_frame.linesize[0] +
+        (width - 1)*s->pixel_size;
 
     s->length_table[width] = 0;
     skipcount = 0;
@@ -200,7 +202,6 @@ static void qtrle_encode_line(QtrleEncContext *s, AVFrame *p, int line, uint8_t 
 
     i=0;
     this_line = p->               data[0] + line*p->linesize[0];
-    prev_line = s->previous_frame.data[0] + line*p->linesize[0];
 
     if (s->rlecode_table[0] == 0) {
         bytestream_put_byte(buf, s->skip_table[0] + 1);
@@ -240,16 +241,17 @@ static int encode_frame(QtrleEncContext *s, AVFrame *p, uint8_t *buf)
     uint8_t *orig_buf = buf;
 
     if (!s->frame.key_frame) {
+        unsigned line_size = s->avctx->width * s->pixel_size;
         for (start_line = 0; start_line < s->avctx->height; start_line++)
             if (memcmp(p->data[0] + start_line*p->linesize[0],
-                       s->previous_frame.data[0] + start_line*p->linesize[0],
-                       p->linesize[0]))
+                       s->previous_frame.data[0] + start_line*s->previous_frame.linesize[0],
+                       line_size))
                 break;
 
         for (end_line=s->avctx->height; end_line > start_line; end_line--)
             if (memcmp(p->data[0] + (end_line - 1)*p->linesize[0],
-                       s->previous_frame.data[0] + (end_line - 1)*p->linesize[0],
-                       p->linesize[0]))
+                       s->previous_frame.data[0] + (end_line - 1)*s->previous_frame.linesize[0],
+                       line_size))
                 break;
     }
 

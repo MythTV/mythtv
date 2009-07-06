@@ -23,14 +23,14 @@
 
 #include "mpeg2config.h"
 
-#ifdef ARCH_X86
+#if ARCH_X86
 
 #include <inttypes.h>
 
 #include "mpeg2.h"
 #include "attributes.h"
 #include "mpeg2_internal.h"
-#include "i386/mmx.h"
+#include "x86/mmx.h"
 
 #define ROW_SHIFT 15
 #define COL_SHIFT 6
