@@ -365,7 +365,7 @@ void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
     SetItemCurrent(newIndex);
 }
 
-void MythUIButtonList::SetItemCurrent(int current)
+void MythUIButtonList::SetItemCurrent(int current, int topPosition)
 {
     if (!m_initialized)
         Init();
@@ -373,14 +373,17 @@ void MythUIButtonList::SetItemCurrent(int current)
     if (current == -1 || current >= m_itemList.size())
         return;
 
-    if (current == m_selPosition)
+    if (current == m_selPosition && 
+        (topPosition == -1 || topPosition == m_topPosition))
         return;
+
+    m_topPosition = topPosition;
+    if (topPosition > 0 && m_layout == LayoutGrid)
+        m_topPosition -= (topPosition % m_columns);
 
     m_selPosition = current;
     if (m_itemsVisible == 0)
         return;
-
-    m_topPosition = -1;
 
     Update();
 

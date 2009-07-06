@@ -133,7 +133,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     QString  GetValue();
 
     void SetItemCurrent(MythUIButtonListItem* item);
-    void SetItemCurrent(int pos);
+    void SetItemCurrent(int pos, int topPos = -1);
     MythUIButtonListItem* GetItemCurrent() const;
     MythUIButtonListItem* GetItemFirst() const;
     MythUIButtonListItem* GetItemNext(MythUIButtonListItem *item) const;
