@@ -147,7 +147,7 @@ static uint insert_dtv_multiplex(
 
     QString updateStr =
         "UPDATE dtv_multiplex "
-        "SET frequency    = :FREQUENCY, ";
+        "SET frequency    = :FREQUENCY1, ";
 
     updateStr += (!modulation.isNull()) ?
         "modulation       = :MODULATION, " : "";
@@ -173,15 +173,17 @@ static uint insert_dtv_multiplex(
         "lp_code_rate     = :LP_CODE_RATE, " : "";
     updateStr += (!guard_interval.isNull()) ?
         "guard_interval   = :GUARD_INTERVAL, " : "";
+    updateStr += (transport_id && !isDVB) ?
+        "transportid      = :TRANSPORTID, " : "";
 
     updateStr = updateStr.left(updateStr.length()-2) + " ";
 
     updateStr +=
-        "WHERE sourceid    = :SOURCEID2     AND "
-        "      sistandard  = :SISTANDARD2   AND ";
+        "WHERE sourceid    = :SOURCEID      AND "
+        "      sistandard  = :SISTANDARD    AND ";
 
     updateStr += (isDVB) ?
-        " transportid = :TRANSPORTID2 AND networkid = :NETWORKID2 " :
+        " transportid = :TRANSPORTID AND networkid = :NETWORKID " :
         " frequency = :FREQUENCY2 ";
 
     QString insertStr =
@@ -206,7 +208,7 @@ static uint insert_dtv_multiplex(
 
     insertStr +=
         "VALUES "
-        "  (:SOURCEID,       :SISTANDARD,       :FREQUENCY, ";
+        "  (:SOURCEID,      :SISTANDARD,       :FREQUENCY1, ";
     insertStr += (!modulation.isNull())     ? ":MODULATION, "       : "";
     insertStr += (transport_id || isDVB)    ? ":TRANSPORTID, "      : "";
     insertStr += (isDVB)                    ? ":NETWORKID, "        : "";
@@ -230,20 +232,33 @@ static uint insert_dtv_multiplex(
             <<endl<<((mplex) ? updateStr : insertStr)<<endl);
 
     query.bindValue(":SOURCEID",          db_source_id);
-    query.bindValue(":SOURCEID2",         db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
-    query.bindValue(":SISTANDARD2",       sistandard);
-    query.bindValue(":FREQUENCY",         QString::number(frequency));
-    query.bindValue(":FREQUENCY2",        QString::number(frequency));
+    query.bindValue(":FREQUENCY1",        QString::number(frequency));
+
+    if (mplex)
+    {
+        if (isDVB)
+        {
+            query.bindValue(":TRANSPORTID",   transport_id);
+            query.bindValue(":NETWORKID ",    network_id);
+        }
+        else
+        {
+            query.bindValue(":FREQUENCY2",    QString::number(frequency));
+            if (transport_id)
+                query.bindValue(":TRANSPORTID", transport_id);
+        }
+    }
+    else
+    {
+        if (transport_id || isDVB)
+            query.bindValue(":TRANSPORTID",   transport_id);
+        if (isDVB)
+            query.bindValue(":NETWORKID ",    network_id);
+    }
 
     if (!modulation.isNull())
         query.bindValue(":MODULATION",    modulation);
-
-    query.bindValue(":TRANSPORTID",   transport_id);
-    query.bindValue(":TRANSPORTID2",  transport_id);
-
-    query.bindValue(":NETWORKID",     network_id);
-    query.bindValue(":NETWORKID2",    network_id);
 
     if (symbol_rate >= 0)
         query.bindValue(":SYMBOLRATE",    symbol_rate);
