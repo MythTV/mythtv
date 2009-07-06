@@ -44,7 +44,7 @@ MetaIOOggVorbisComment::~MetaIOOggVorbisComment(void)
  * \param mdata A pointer to a Metadata object
  * \returns A vorbis_comment pointer or NULL on error
  */
-vorbis_comment* 
+vorbis_comment*
 MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
                                             vorbis_comment* pComment)
 {
@@ -58,12 +58,12 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
         return NULL;
 
     vorbis_comment_init(p_comment);
-    
+
     if (pComment)
     {
         // We leave most comments alone, but we
         // need to clear out the ones we're using to prevent doublers.
-        
+
         // This seems a little pointless but is the easiest thing to do.
         QString tmp;
         for (int i=0; i<pComment->comments; ++i)
@@ -86,7 +86,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
                 }
             }
         }
-        
+
         // Now need to copy our modified comment back to the one passed in.
         vorbis_comment_clear(pComment);
         vorbis_comment_init(pComment);
@@ -97,7 +97,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
                 vorbis_comment_add(pComment, p_comment->user_comments[i]);
             }
         }
-        
+
         // Clean up and Set the pointer to use for the rest of the program
         vorbis_comment_clear(p_comment);
         delete p_comment;
@@ -112,7 +112,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
             const_cast<char*>(MYTH_VORBISCOMMENT_ARTIST),
             const_cast<char*>(utf8str.constData()));
     }
-    
+
     if (mdata->Compilation())
     {
         // We use the MusicBrainz Identifier to indicate a compilation
@@ -130,7 +130,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
                 const_cast<char*>(utf8str.constData()));
         }
     }
-        
+
     if (!mdata->Title().isEmpty())
     {
         QByteArray utf8str = mdata->Title().toUtf8();
@@ -139,7 +139,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
             const_cast<char*>(MYTH_VORBISCOMMENT_TITLE),
             const_cast<char*>(utf8str.constData()));
     }
-    
+
     if (!mdata->Album().isEmpty())
     {
         QByteArray utf8str = mdata->Album().toUtf8();
@@ -148,7 +148,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
             const_cast<char*>(MYTH_VORBISCOMMENT_ALBUM),
             const_cast<char*>(utf8str.constData()));
     }
-    
+
     if (!mdata->Genre().isEmpty())
     {
         QByteArray utf8str = mdata->Genre().toUtf8();
@@ -157,7 +157,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
             const_cast<char*>(MYTH_VORBISCOMMENT_GENRE),
             const_cast<char*>(utf8str.constData()));
     }
-    
+
     if (0 != mdata->Track())
     {
         QByteArray utf8str = QString::number(mdata->Track()).toUtf8();
@@ -166,7 +166,7 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
             const_cast<char*>(MYTH_VORBISCOMMENT_TRACK),
             const_cast<char*>(utf8str.constData()));
     }
-    
+
     if (0 != mdata->Year())
     {
         QByteArray utf8str = QString::number(mdata->Year()).toUtf8();
@@ -175,8 +175,8 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
             const_cast<char*>(MYTH_VORBISCOMMENT_DATE),
             const_cast<char*>(utf8str.constData()));
     }
-    
-    
+
+
     return p_comment;
 }
 
@@ -202,7 +202,7 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
     FILE *p_input = fopen(l8bit.constData(), "rb");
     if (!p_input)
         p_input = fopen(ascii.constData(), "rb");
-    
+
     if (!p_input)
         return false;
 
@@ -226,11 +226,11 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
         fclose(p_output);
         return false;
     }
-    
+
     // grab and clear the exisiting comments
     vorbis_comment* p_comment = vcedit_comments(p_state);
 
-    if (exclusive) 
+    if (exclusive)
     {
         vorbis_comment_clear(p_comment);
         vorbis_comment_init(p_comment);
@@ -244,7 +244,7 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
         return false;
     }
 
-   
+
     // write out the modified stream
     if (vcedit_write(p_state, p_output) < 0)
     {
@@ -253,7 +253,7 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
         fclose(p_output);
         return false;
     }
-    
+
     // done
     vcedit_clear(p_state);
     fclose(p_input);
@@ -292,7 +292,7 @@ Metadata* MetaIOOggVorbisComment::read(QString filename)
     FILE *p_input = fopen(l8bit.constData(), "rb");
     if (!p_input)
         p_input = fopen(ascii.constData(), "rb");
-    
+
     if (p_input)
     {
         OggVorbis_File vf;
@@ -305,19 +305,21 @@ Metadata* MetaIOOggVorbisComment::read(QString filename)
         else
         {
             comment = ov_comment(&vf, -1);
-        
+
             //
             //  Try and fill metadata info from tags in the ogg file
             //
-        
+
             artist = getComment(comment, MYTH_VORBISCOMMENT_ARTIST);
             compilation_artist = getComment(comment, MYTH_VORBISCOMMENT_COMPILATIONARTIST);
             album = getComment(comment, MYTH_VORBISCOMMENT_ALBUM);
             title = getComment(comment, MYTH_VORBISCOMMENT_TITLE);
             genre = getComment(comment, MYTH_VORBISCOMMENT_GENRE);
-            tracknum = getComment(comment, MYTH_VORBISCOMMENT_TRACK).toUInt(); 
-            year = getComment(comment, MYTH_VORBISCOMMENT_DATE).toInt();
-            
+            tracknum = getComment(comment, MYTH_VORBISCOMMENT_TRACK).toUInt();
+            // The date comment may be in the YYYY-MM-DD format so we should
+            // only retrieve the first four characters
+            year = getComment(comment, MYTH_VORBISCOMMENT_DATE).left(4).toInt();
+
             QString tmp = getComment(comment, MYTH_VORBISCOMMENT_MUSICBRAINZ_ALBUMARTISTID);
             compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID == tmp);
 
@@ -327,23 +329,23 @@ Metadata* MetaIOOggVorbisComment::read(QString filename)
             ov_clear(&vf);
         }
     }
-    
+
     //
     //  If the user has elected to get metadata from file names or if the
     //  above did not find a title tag
     //
-    
+
     if (title.isEmpty())
     {
         year = 0;
         readFromFilename(filename, artist, album, title, genre, tracknum);
     }
-        
+
     Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
 
     retdata->setCompilation(compilation);
-    
+
     return retdata;
 }
 
@@ -378,23 +380,23 @@ int MetaIOOggVorbisComment::getTrackLength(QString filename)
     FILE *p_input = fopen(l8bit.constData(), "rb");
     if (!p_input)
         p_input = fopen(ascii.constData(), "rb");
-    
+
     if (!p_input)
         return 0;
 
     OggVorbis_File vf;
-    
+
     if (ov_open(p_input, &vf, NULL, 0))
     {
         fclose(p_input);
         return 0;
     }
-    
+
     int rv = getTrackLength(&vf);
-    
+
     // Do not call fclose as ov_clear takes care of things for us.
     ov_clear(&vf);
-    
+
     return rv;
 }
 
@@ -407,7 +409,7 @@ int MetaIOOggVorbisComment::getTrackLength(QString filename)
  * \param pLabel The label of the comment you want
  * \returns QString containing the contents of the comment you want
  */
-QString MetaIOOggVorbisComment::getComment(vorbis_comment* pComment, 
+QString MetaIOOggVorbisComment::getComment(vorbis_comment* pComment,
                                            const char* pLabel)
 {
     QString ret = "";

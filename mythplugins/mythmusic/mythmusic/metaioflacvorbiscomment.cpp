@@ -32,7 +32,7 @@ MetaIOFLACVorbisComment::~MetaIOFLACVorbisComment(void)
 bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
 {
     exclusive = exclusive; // -Wall annoyance
-    
+
     // Sanity check.
     if (!mdata)
         return false;
@@ -58,7 +58,7 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
         if (block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
             found_vc_block = true;
     } while (!found_vc_block && FLAC__metadata_iterator_next(iterator));
-    
+
     if (!found_vc_block)
     {
         block = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
@@ -98,7 +98,7 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
             setComment(block, MYTH_VORBISCOMMENT_COMPILATIONARTIST,
                        mdata->CompilationArtist());
         }
-        
+
     }
 
     setComment(block, MYTH_VORBISCOMMENT_ALBUM, mdata->Album());
@@ -146,14 +146,14 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
     if (!FLAC__metadata_chain_read(chain, l8bit.constData()) &&
         !FLAC__metadata_chain_read(chain, ascii.constData()))
     {
-        FLAC__metadata_chain_delete(chain); 
+        FLAC__metadata_chain_delete(chain);
         return NULL;
     }
 
     bool found_vc_block = false;
     FLAC__StreamMetadata *block = 0;
     FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
-    
+
     FLAC__metadata_iterator_init(iterator, chain);
 
     block = FLAC__metadata_iterator_get_block(iterator);
@@ -188,23 +188,26 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
     else
     {
         artist = getComment(block, MYTH_VORBISCOMMENT_ARTIST);
-        compilation_artist = getComment(block, 
+        compilation_artist = getComment(block,
                                         MYTH_VORBISCOMMENT_COMPILATIONARTIST);
         album = getComment(block, MYTH_VORBISCOMMENT_ALBUM);
         genre = getComment(block, MYTH_VORBISCOMMENT_GENRE);
-        tracknum = getComment(block, MYTH_VORBISCOMMENT_TRACK).toInt(); 
+        tracknum = getComment(block, MYTH_VORBISCOMMENT_TRACK).toInt();
         year = getComment(block, MYTH_VORBISCOMMENT_DATE).toInt();
-        
-        QString tmp = getComment(block, 
+        // The date comment may be in the YYYY-MM-DD format so we should
+        // only retrieve the first four characters
+        year = getComment(block, MYTH_VORBISCOMMENT_DATE).left(4).toInt();
+
+        QString tmp = getComment(block,
                                  MYTH_VORBISCOMMENT_MUSICBRAINZ_ALBUMARTISTID);
         compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID == tmp);
-        
+
     }
 
     FLAC__metadata_chain_delete(chain);
     FLAC__metadata_iterator_delete(iterator);
 
-    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album, 
+    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
 
     retdata->setCompilation(compilation);
@@ -228,13 +231,13 @@ int MetaIOFLACVorbisComment::getTrackLength(QString filename)
     if (!FLAC__metadata_chain_read(chain, l8bit.constData()) &&
         !FLAC__metadata_chain_read(chain, ascii.constData()))
     {
-        FLAC__metadata_chain_delete(chain); 
+        FLAC__metadata_chain_delete(chain);
         return 0;
     }
- 
+
     FLAC__StreamMetadata *block = 0;
     FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
-    
+
     FLAC__metadata_iterator_init(iterator, chain);
 
     block = FLAC__metadata_iterator_get_block(iterator);
@@ -257,7 +260,7 @@ int MetaIOFLACVorbisComment::getTrackLength(QString filename)
  *
  * \note The FLAC StreamMetadata block must be asserted FLAC__METADATA_TYPE_STREAMINFO
  *
- * \param pBlock Pointer to a FLAC Metadata block 
+ * \param pBlock Pointer to a FLAC Metadata block
  * \returns An integer (signed!) to represent the length in seconds.
  */
 inline int MetaIOFLACVorbisComment::getTrackLength(FLAC__StreamMetadata* pBlock)
@@ -265,7 +268,7 @@ inline int MetaIOFLACVorbisComment::getTrackLength(FLAC__StreamMetadata* pBlock)
     if (!pBlock)
         return 0;
 
-    return pBlock->data.stream_info.total_samples / 
+    return pBlock->data.stream_info.total_samples /
           (pBlock->data.stream_info.sample_rate / 1000);
 }
 
@@ -277,7 +280,7 @@ inline int MetaIOFLACVorbisComment::getTrackLength(FLAC__StreamMetadata* pBlock)
  * \param pLabel The label of the comment you want
  * \returns QString containing the contents of the comment you want
  */
-QString MetaIOFLACVorbisComment::getComment(FLAC__StreamMetadata* pBlock, 
+QString MetaIOFLACVorbisComment::getComment(FLAC__StreamMetadata* pBlock,
                                             const char* pLabel)
 {
     FLAC__StreamMetadata_VorbisComment_Entry *entry;
@@ -296,8 +299,8 @@ QString MetaIOFLACVorbisComment::getComment(FLAC__StreamMetadata* pBlock,
 
         // we need to make sure the '=' comes immediately after
         // the desired label
-        if ((loc = entrytext.indexOf("=")) && 
-            (loc == (int)qlabel.length()) && 
+        if ((loc = entrytext.indexOf("=")) &&
+            (loc == (int)qlabel.length()) &&
             entrytext.toLower().left(qlabel.length()) == qlabel.toLower())
         {
             return QString::fromUtf8(entrytext.right(entrytext.length() - loc - 1));
@@ -318,7 +321,7 @@ QString MetaIOFLACVorbisComment::getComment(FLAC__StreamMetadata* pBlock,
  * \returns Nothing
  */
 void MetaIOFLACVorbisComment::setComment(FLAC__StreamMetadata* pBlock,
-                                         const char* pLabel, 
+                                         const char* pLabel,
                                          const QString& rData)
 {
     if (rData.length() < 1)
@@ -335,7 +338,7 @@ void MetaIOFLACVorbisComment::setComment(FLAC__StreamMetadata* pBlock,
     entry.entry  = (FLAC__byte*) utf8str.data();
 
     FLAC__metadata_object_vorbiscomment_insert_comment(
-        pBlock, 
-        pBlock->data.vorbis_comment.num_comments, 
+        pBlock,
+        pBlock->data.vorbis_comment.num_comments,
         entry, true);
 }
