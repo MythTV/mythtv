@@ -13,6 +13,7 @@
 #include "mpegstreamdata.h" // for kEncDecrypted
 #include "channelutil.h"
 #include "mythdialogs.h"
+#include "mythwidgets.h"
 
 #define LOC QString("ChanImport: ")
 #define LOC_ERR QString("ChanImport, Error: ")
@@ -224,6 +225,8 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
 
     ScanDTVTransportList next_list;
 
+    bool ignore_rest = false;
+
     // insert all channels with non-conflicting channum
     // and complete tuning information.
     for (uint i = 0; i < transports.size(); i++)
@@ -248,9 +251,26 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 handle = true;
             }
 
-            if (kInsertManual == action)
+            if (ignore_rest)
             {
-                QueryUserResolve(info, transports[i], chan);
+                cout<<QString("Skipping Insert: %1")
+                    .arg(FormatChannel(transports[i], chan))
+                    .toAscii().constData()<<endl;
+                handle = false;
+            }
+
+            if (handle && kInsertManual == action)
+            {
+                OkCancelType rc = QueryUserInsert(info, transports[i], chan);
+                if (kOCTCancelAll == rc)
+                {
+                    ignore_rest = true;
+                    handle = false;
+                }
+                else if (kOCTCancel == rc)
+                {
+                    handle = false;
+                }
             }
 
             if (handle)
@@ -279,17 +299,21 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                 if (is_interactive &&
                     (conflicting || (kChannelTypeConflictingFirst <= type)))
                 {
-                    conflicting = !QueryUserResolve(
-                        info, transports[i], chan) ||
-                        ChannelUtil::IsConflicting(
-                            chan.chan_num, chan.source_id);
+                    OkCancelType rc =
+                        QueryUserResolve(info, transports[i], chan);
+
+                    conflicting = true;
+                    if (kOCTCancelAll == rc)
+                        ignore_rest = true;
+                    else if (kOCTOk == rc)
+                        conflicting = false;
                 }
 
                 if (conflicting)
                 {
-                    cout<<"Skipping Insert("
-                        <<chan.si_standard.toAscii().constData()<<"): "
-                        <<chan.chan_num.toAscii().constData()<<endl;
+                    cout<<QString("Skipping Insert: %1")
+                        .arg(FormatChannel(transports[i], chan))
+                        .toAscii().constData()<<endl;
                     handle = false;
                 }
             }
@@ -798,8 +822,6 @@ QString ChannelImporter::FormatChannel(
         }
     }
 
-    ssMsg << endl;
-
     return msg;
 }
 
@@ -813,7 +835,7 @@ QString ChannelImporter::FormatChannels(
     for (uint i = 0; i < transports.size(); i++)
         for (uint j = 0; j < transports[i].channels.size(); j++)
             msg += FormatChannel(transports[i], transports[i].channels[j],
-                                 &info);
+                                 &info) + "\n";
 
     return msg;
 }
@@ -923,6 +945,38 @@ void ChannelImporter::CountChannels(
             }
         }
     }
+}
+
+QString ChannelImporter::ComputeSuggestedChannelNum(
+    const ChannelImporterBasicStats &info,
+    const ScanDTVTransport          &transport,
+    const ChannelInsertInfo         &chan)
+{
+    static QMutex          last_free_lock;
+    static QMap<uint,uint> last_free_chan_num_map;
+
+    QString channelFormat = "%1_%2";
+    QString chan_num = channelFormat
+        .arg(chan.atsc_major_channel)
+        .arg(chan.atsc_minor_channel);
+
+    if (!chan.atsc_minor_channel)
+        chan_num = QString("%1").arg(chan.service_id);
+    
+    if (!ChannelUtil::IsConflicting(chan_num, chan.source_id))
+        return chan_num;
+
+    QMutexLocker locker(&last_free_lock);
+    uint last_free_chan_num = last_free_chan_num_map[chan.source_id];
+    for (last_free_chan_num++; ; last_free_chan_num++)
+    {
+        chan_num = QString::number(last_free_chan_num);
+        if (!ChannelUtil::IsConflicting(chan_num, chan.source_id))
+            break;
+    }
+    last_free_chan_num_map[chan.source_id] = last_free_chan_num;
+
+    return chan_num;
 }
 
 ChannelImporter::InsertAction
@@ -1045,7 +1099,62 @@ ChannelImporter::QueryUserUpdate(const QString &msg)
     return action;
 }
 
-bool ChannelImporter::QueryUserResolve(
+OkCancelType ChannelImporter::ShowManualChannelPopup(
+    MythMainWindow *parent, QString title,
+    QString message, QString &text)
+{
+    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
+
+    popup->addLabel(message, MythPopupBox::Medium, true);
+
+    MythLineEdit *textEdit = new MythLineEdit(popup);
+
+    QString orig_text = text;
+    text = "";
+    textEdit->setText(text);
+    popup->addWidget(textEdit);
+
+    popup->addButton(QObject::tr("OK"),     popup, SLOT(accept()));
+    popup->addButton(QObject::tr("Suggest"));
+    popup->addButton(QObject::tr("Cancel"), popup, SLOT(reject()));
+    popup->addButton(QObject::tr("Cancel All"));
+
+    textEdit->setFocus();
+
+    DialogCode dc = popup->ExecPopup();
+    if (kDialogCodeButton1 == dc)
+    {
+        popup->hide();
+        popup->deleteLater();
+
+        popup = new MythPopupBox(parent, title.toAscii().constData());
+        popup->addLabel(message, MythPopupBox::Medium, true);
+
+        textEdit = new MythLineEdit(popup);
+
+        text = orig_text;
+        textEdit->setText(text);
+        popup->addWidget(textEdit);
+
+        popup->addButton(QObject::tr("OK"), popup, SLOT(accept()))->setFocus();
+        popup->addButton(QObject::tr("Cancel"), popup, SLOT(reject()));
+        popup->addButton(QObject::tr("Cancel All"));
+
+        dc = popup->ExecPopup();
+    }
+
+    bool ok = (kDialogCodeAccepted == dc);
+    if (ok)
+        text = textEdit->text();
+
+    popup->hide();
+    popup->deleteLater();
+
+    return (ok) ? kOCTOk :
+        ((kDialogCodeRejected == dc) ? kOCTCancel : kOCTCancelAll);
+}
+
+OkCancelType ChannelImporter::QueryUserResolve(
     const ChannelImporterBasicStats &info,
     const ScanDTVTransport          &transport,
     ChannelInsertInfo               &chan)
@@ -1054,21 +1163,21 @@ bool ChannelImporter::QueryUserResolve(
         "This channel '%1' was found to be in conflict with other channels. ")
         .arg(FormatChannel(transport, chan));
 
-    bool ok = false;
+    OkCancelType ret = kOCTCancel;
 
     if (use_gui)
     {
-        do
+        while (true)
         {
             QString msg2 = msg;
             msg2 += QObject::tr("Please enter a unique channel number. ");
 
-            QString val = "";
-            ok = MythPopupBox::showGetTextPopup(
+            QString val = ComputeSuggestedChannelNum(info, transport, chan);
+            ret = ShowManualChannelPopup(
                 gContext->GetMainWindow(), QObject::tr("Channel Importer"),
                 msg2, val);
 
-            if (!ok)
+            if (kOCTOk != ret)
                 break; // user canceled..
 
             bool ok = (val.length() >= 1);
@@ -1077,39 +1186,56 @@ bool ChannelImporter::QueryUserResolve(
                 val, chan.source_id, chan.channel_id);
 
             chan.chan_num = (ok) ? val : chan.chan_num;
-        } while (!ok);
+            if (ok)
+                break;
+        }
     }
     else if (is_interactive)
     {
         cout << msg.toAscii().constData() << endl;
 
         QString cancelStr = QObject::tr("Cancel").toLower();
+        QString cancelAllStr = QObject::tr("Cancel All").toLower();
         QString msg2 = QObject::tr(
             "Please enter a non-conflicting channel number "
-            "(or type %1 to skip): ").arg(cancelStr);
+            "(or type %1 to skip, %2 to skip all): ")
+            .arg(cancelStr).arg(cancelAllStr);
 
-        do
+        while (true)
         {
             cout << msg2.toAscii().constData() << endl;
-            string ret;
-            cin >> ret;
-            QString val = QString(ret.c_str());
+            string sret;
+            cin >> sret;
+            QString val = QString(sret.c_str());
             if (val.toLower() == cancelStr)
+            {
+                ret = kOCTCancel;
                 break; // user canceled..
+            }
+            if (val.toLower() == cancelAllStr)
+            {
+                ret = kOCTCancelAll;
+                break; // user canceled..
+            }
 
-            ok = (val.length() >= 1);
+            bool ok = (val.length() >= 1);
             ok = ok && ((val[0] >= '0') && (val[0] <= '9'));
             ok = ok && !ChannelUtil::IsConflicting(
                 val, chan.source_id, chan.channel_id);
 
             chan.chan_num = (ok) ? val : chan.chan_num;
-        } while (!ok);
+            if (ok)
+            {
+                ret = kOCTOk;
+                break;
+            }
+        }
     }
 
-    return ok;
+    return ret;
 }
 
-bool ChannelImporter::QueryUserInsert(
+OkCancelType ChannelImporter::QueryUserInsert(
     const ChannelImporterBasicStats &info,
     const ScanDTVTransport          &transport,
     ChannelInsertInfo               &chan)
@@ -1118,21 +1244,21 @@ bool ChannelImporter::QueryUserInsert(
         "You chose to manually insert this channel '%1'.")
         .arg(FormatChannel(transport, chan));
 
-    bool ok = false;
+    OkCancelType ret = kOCTCancel;
 
     if (use_gui)
     {
-        do
+        while (true)
         {
             QString msg2 = msg;
             msg2 += QObject::tr("Please enter a unique channel number. ");
 
-            QString val = "";
-            ok = MythPopupBox::showGetTextPopup(
+            QString val = ComputeSuggestedChannelNum(info, transport, chan);
+            ret = ShowManualChannelPopup(
                 gContext->GetMainWindow(), QObject::tr("Channel Importer"),
                 msg2, val);
 
-            if (!ok)
+            if (kOCTOk != ret)
                 break; // user canceled..
 
             bool ok = (val.length() >= 1);
@@ -1141,34 +1267,54 @@ bool ChannelImporter::QueryUserInsert(
                 val, chan.source_id, chan.channel_id);
 
             chan.chan_num = (ok) ? val : chan.chan_num;
-        } while (!ok);
+            if (ok)
+            {
+                ret = kOCTOk;
+                break;
+            }
+        }
     }
     else if (is_interactive)
     {
         cout << msg.toAscii().constData() << endl;
 
-        QString cancelStr = QObject::tr("Cancel").toLower();
+        QString cancelStr    = QObject::tr("Cancel").toLower();
+        QString cancelAllStr = QObject::tr("Cancel All").toLower();
         QString msg2 = QObject::tr(
             "Please enter a non-conflicting channel number "
-            "(or type %1 to skip): ").arg(cancelStr);
+            "(or type %1 to skip, %2 to skip all): ")
+            .arg(cancelStr).arg(cancelAllStr);
 
-        do
+        while (true)
         {
             cout << msg2.toAscii().constData() << endl;
-            string ret;
-            cin >> ret;
-            QString val = QString(ret.c_str());
+            string sret;
+            cin >> sret;
+            QString val = QString(sret.c_str());
             if (val.toLower() == cancelStr)
+            {
+                ret = kOCTCancel;
                 break; // user canceled..
+            }
+            if (val.toLower() == cancelAllStr)
+            {
+                ret = kOCTCancelAll;
+                break; // user canceled..
+            }
 
-            ok = (val.length() >= 1);
+            bool ok = (val.length() >= 1);
             ok = ok && ((val[0] >= '0') && (val[0] <= '9'));
             ok = ok && !ChannelUtil::IsConflicting(
                 val, chan.source_id, chan.channel_id);
 
             chan.chan_num = (ok) ? val : chan.chan_num;
-        } while (!ok);
+            if (ok)
+            {
+                ret = kOCTOk;
+                break;
+            }
+        }
     }
 
-    return ok;
+    return ret;
 }

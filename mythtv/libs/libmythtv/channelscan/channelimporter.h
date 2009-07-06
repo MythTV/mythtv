@@ -20,6 +20,12 @@
 #include "mythexp.h"
 #include "scaninfo.h"
 
+typedef enum {
+    kOCTCancelAll = -1,
+    kOCTCancel    = +0,
+    kOCTOk        = +1,
+} OkCancelType;
+
 class ChannelImporterBasicStats
 {
   public:
@@ -138,16 +144,25 @@ class MPUBLIC ChannelImporter
     UpdateAction QueryUserUpdate(const QString &msg);
 
     /// For a single channel
-    bool QueryUserResolve(
+    OkCancelType QueryUserResolve(
         const ChannelImporterBasicStats &info,
         const ScanDTVTransport          &transport,
         ChannelInsertInfo               &chan);
 
     /// For a single channel
-    bool QueryUserInsert(
+    OkCancelType QueryUserInsert(
         const ChannelImporterBasicStats &info,
         const ScanDTVTransport          &transport,
         ChannelInsertInfo               &chan);
+
+    static QString ComputeSuggestedChannelNum(
+        const ChannelImporterBasicStats &info,
+        const ScanDTVTransport          &transport,
+        const ChannelInsertInfo         &chan);
+
+    static OkCancelType ShowManualChannelPopup(
+        MythMainWindow *parent, QString title,
+        QString message, QString &text);
 
     static void FixUpOpenCable(ScanDTVTransportList &transports);
 
