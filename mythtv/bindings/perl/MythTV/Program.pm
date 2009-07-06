@@ -86,7 +86,7 @@ package MythTV::Program;
         $self->{'audio_props'}     = $_[43]; # Audio properties
         $self->{'video_props'}     = $_[44]; # Video properties
         $self->{'subtitle_type'}   = $_[45]; # Subtitle type
-        $self->{'year'}            = $_[46];
+        $self->{'year'}            = $_[46]; # Production year
 
     # Load the channel data
         if ($self->{'chanid'}) {
@@ -179,6 +179,7 @@ package MythTV::Program;
                     $self->{'audio_props'}    , # 43 audio properties
                     $self->{'video_props'}    , # 44 video properties
                     $self->{'subtitle_type'}  , # 45 subtitle type
+                    $self->{'year'}           , # 46 production year
                     ''                          # trailing separator
                    );
     }

@@ -18,8 +18,8 @@ typedef QMap<long long, int> frm_dir_map_t;
 
 /* If NUMPROGRAMLINES gets updated following files need
    updates and code changes:
-   mythplugins/mythweb/includes/mythbackend.php
-   mythplugins/mythweb/objects/MythTV.php
+   mythplugins/mythweb/classes/MythTV.php
+   mythplugins/mythweb/modules/tv/classes/Program.php
    mythtv/bindings/perl/MythTV.pm
    mythtv/bindings/perl/MythTV/Program.pm
    mythtv/bindings/python/MythTV/MythTV.py
