@@ -4495,9 +4495,11 @@ bool HelpPopup::Create()
     addItem("subtitles",   tr("Recording has Subtitles Available"));
     addItem("onscreensub", tr("Recording is Subtitled"));
 
+    addItem("hd1080",      tr("Recording is in 1080i/p High Definition"));
+    addItem("hd720",       tr("Recording is in 720p High Definition"));
     addItem("hdtv",        tr("Recording is in High Definition"));
     addItem("widescreen",  tr("Recording is Widescreen"));
-    addItem("avchd",       tr("Recording uses H.264 codec"));
+//    addItem("avchd",       tr("Recording uses H.264 codec"));
 
     addItem("watched",     tr("Recording has been watched"));
 //    addItem("preserved",   tr("Recording is preserved"));
