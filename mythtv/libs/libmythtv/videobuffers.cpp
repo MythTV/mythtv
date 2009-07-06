@@ -384,17 +384,17 @@ void VideoBuffers::StartDisplayingFrame(void)
 }
 
 /**
- * \fn VideoBuffers::DoneDisplayingFrame(void)
+ * \fn VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
  *  Removes frame from used queue and adds it to the available list.
  */
-void VideoBuffers::DoneDisplayingFrame(void)
+void VideoBuffers::DoneDisplayingFrame(VideoFrame *frame)
 {
     QMutexLocker locker(&global_lock);
 
-    VideoFrame *buf = used.dequeue();
-    if (buf)
+    if(used.contains(frame))
     {
-        available.enqueue(buf);
+        remove(kVideoBuffer_used, frame);
+        enqueue(kVideoBuffer_avail, frame);
         if (EnoughFreeFrames())
             available_wait.wakeAll();
     }

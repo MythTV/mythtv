@@ -93,7 +93,7 @@ class VideoBuffers
     void ReleaseFrame(VideoFrame *frame);
     void DeLimboFrame(VideoFrame *frame);
     void StartDisplayingFrame(void);
-    void DoneDisplayingFrame(void);
+    void DoneDisplayingFrame(VideoFrame *frame);
     void DiscardFrame(VideoFrame *frame);
 
     VideoFrame *at(uint i) { return &buffers[i]; }

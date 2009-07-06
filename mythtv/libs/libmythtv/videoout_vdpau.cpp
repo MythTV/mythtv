@@ -550,13 +550,10 @@ void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
             .arg(vbuffers.GetStatus()));
 }
 
-void VideoOutputVDPAU::DoneDisplayingFrame(void)
+void VideoOutputVDPAU::DoneDisplayingFrame(VideoFrame *frame)
 {
-    if (vbuffers.size(kVideoBuffer_used))
-    {
-        VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+    if (vbuffers.contains(kVideoBuffer_used, frame))
         DiscardFrame(frame);
-    }
     CheckFrameStates();
 }
 

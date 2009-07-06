@@ -198,7 +198,8 @@ class VideoOutput
     virtual void StartDisplayingFrame(void) { vbuffers.StartDisplayingFrame(); }
     /// \brief Releases frame returned from GetLastShownFrame() onto the 
     ///        queue of frames ready for decoding onto.
-    virtual void DoneDisplayingFrame(void) { vbuffers.DoneDisplayingFrame(); }
+    virtual void DoneDisplayingFrame(VideoFrame *frame)
+        { vbuffers.DoneDisplayingFrame(frame); }
     /// \brief Releases frame from any queue onto the 
     ///        queue of frames ready for decoding onto.
     virtual void DiscardFrame(VideoFrame *frame) { vbuffers.DiscardFrame(frame); }

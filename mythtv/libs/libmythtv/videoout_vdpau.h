@@ -60,7 +60,7 @@ class VideoOutputVDPAU : public VideoOutput
     void DeleteXDisplay(void);
     void DiscardFrame(VideoFrame*);
     void DiscardFrames(bool next_frame_keyframe);
-    void DoneDisplayingFrame(void);
+    void DoneDisplayingFrame(VideoFrame *frame);
     void CheckFrameStates(void);
     virtual int DisplayOSD(VideoFrame *frame, OSD *osd,
                            int stride = -1, int revision = -1);

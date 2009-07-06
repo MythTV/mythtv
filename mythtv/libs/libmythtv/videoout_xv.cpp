@@ -2022,7 +2022,7 @@ void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
 #undef DQ_COPY
 
 /**
- * \fn VideoOutputXv::DoneDisplayingFrame(void)
+ * \fn VideoOutputXv::DoneDisplayingFrame(VideoFrame *frame)
  *  This is used to tell this class that the NPV will not
  *  call Show() on this frame again.
  *
@@ -2036,18 +2036,17 @@ void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
  *  list.
  *
  */
-void VideoOutputXv::DoneDisplayingFrame(void)
+void VideoOutputXv::DoneDisplayingFrame(VideoFrame *frame)
 {
     if (VideoOutputSubType() <= XVideo)
     {
-        vbuffers.DoneDisplayingFrame();
+        VideoOutput::DoneDisplayingFrame(frame);
         return;
     }
 
 #ifdef USING_XVMC
-    if (vbuffers.size(kVideoBuffer_used))
+    if (vbuffers.contains(kVideoBuffer_used, frame))
     {
-        VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
         DiscardFrame(frame);
 
         VideoFrame *osdframe = NULL;

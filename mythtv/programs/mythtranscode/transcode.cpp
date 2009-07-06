@@ -908,7 +908,7 @@ int Transcode::TranscodeFile(
                     dropvideo--;
                 }
             }
-            videoOutput->DoneDisplayingFrame();
+            videoOutput->DoneDisplayingFrame(lastDecode);
             audioOutput->Reset();
             nvp->FlushTxtBuffers();
             lasttimecode = frame.timecode;

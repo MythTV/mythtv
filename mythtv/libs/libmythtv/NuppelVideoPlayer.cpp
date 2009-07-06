@@ -2919,7 +2919,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
     AVSync();
 
-    videoOutput->DoneDisplayingFrame();
+    videoOutput->DoneDisplayingFrame(frame);
 }
 
 void NuppelVideoPlayer::OutputVideoLoop(void)
