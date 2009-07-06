@@ -2186,6 +2186,7 @@ MMX disabled to allow libavcodec to build.
 Playback of HD videos may be very poor.
 EOF
             disable mmx
+            enable disable_mmx_for_debugging   # prevent later call to die
         fi
         disable opengl_vsync
         enable  proc_opt
