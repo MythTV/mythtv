@@ -321,8 +321,9 @@ class MPUBLIC ProgramInfo
 
     // Resolution Set/Get
     void SetResolution(uint width, uint height, long long frame);
+    int GetWidth(void);
     int GetHeight(void);
-    void SetVidpropHeight(int height);
+    void SetVidpropHeight(int width);
 
     // GUI stuff
     void showDetails(void) const;
@@ -359,6 +360,7 @@ class MPUBLIC ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
+    uint m_videoWidth;
     uint m_videoHeight;
 
     int recpriority;

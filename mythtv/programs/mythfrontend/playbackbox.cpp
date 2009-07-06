@@ -704,8 +704,8 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         {
             if (pginfo->audioproperties & (*it))
             {
-                iconState->DisplayState(it.key());
-                break;
+                if (iconState->DisplayState(it.key()))
+                    break;
             }
         }
     }
@@ -714,9 +714,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->DisplayState("default");
 
     iconMap.clear();
+    iconMap["hd1080"] = VID_1080;
+    iconMap["hd720"] = VID_720;
     iconMap["hdtv"] = VID_HDTV;
     iconMap["widescreen"] = VID_WIDESCREEN;
-    iconMap["avchd"] = VID_AVC;
+    //iconMap["avchd"] = VID_AVC;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
     if (pginfo && iconState)
@@ -725,8 +727,8 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         {
             if (pginfo->videoproperties & (*it))
             {
-                iconState->DisplayState(it.key());
-                break;
+                if (iconState->DisplayState(it.key()))
+                    break;
             }
         }
     }
@@ -735,10 +737,10 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->DisplayState("default");
 
     iconMap.clear();
+    iconMap["deafsigned"] = SUB_SIGNED;
     iconMap["onscreensub"] = SUB_ONSCREEN;
     iconMap["subtitles"] = SUB_NORMAL;
     iconMap["cc"] = SUB_HARDHEAR;
-    iconMap["deafsigned"] = SUB_SIGNED;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("subtitletypes"));
     if (pginfo && iconState)
@@ -747,8 +749,8 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         {
             if (pginfo->subtitleType & (*it))
             {
-                iconState->DisplayState(it.key());
-                break;
+                if (iconState->DisplayState(it.key()))
+                    break;
             }
         }
     }

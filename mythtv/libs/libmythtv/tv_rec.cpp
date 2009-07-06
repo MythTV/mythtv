@@ -1086,13 +1086,13 @@ void TVRec::TeardownRecorder(bool killFile)
 {
     pauseNotify = false;
     ispip = false;
-    int recHeight;
+    int recWidth;
 
     if (recorder && HasFlags(kFlagRecorderRunning))
     {
-        // Get the height and set the videoprops
-        recHeight = curRecording->GetHeight(); 
-        curRecording->SetVidpropHeight(recHeight);
+        // Get the width and set the videoprops
+        recWidth = curRecording->GetWidth();
+        curRecording->SetVidpropHeight(recWidth);
 
         int secsSince = curRecording->recstartts
             .secsTo(QDateTime::currentDateTime());

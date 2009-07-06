@@ -160,6 +160,7 @@ ProgramInfo::ProgramInfo(void) :
 
     record = NULL;
 
+    m_videoWidth = 0;
     m_videoHeight = 0;
 }
 
@@ -265,6 +266,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     lastInUseTime = other.lastInUseTime;
     record = NULL;
 
+    m_videoWidth = other.m_videoWidth;
     m_videoHeight = other.m_videoHeight;
 
     positionMapDBReplacement = other.positionMapDBReplacement;
@@ -3097,10 +3099,42 @@ int ProgramInfo::GetHeight(void)
     return m_videoHeight;
 }
 
-/** \fn ProgramInfo::SetVidpropHeight(int height)
+/** \fn ProgramInfo::GetWidth(void) 
+ *  \brief Gets overall average width. 
+ */ 
+int ProgramInfo::GetWidth(void) 
+{ 
+    MSqlQuery query(MSqlQuery::InitCon()); 
+ 
+    query.prepare("SELECT recordedmarkup.DATA FROM recordedmarkup" 
+                  " WHERE recordedmarkup.chanid = :CHANID" 
+                  " AND recordedmarkup.starttime = :STARTTIME" 
+                  " AND recordedmarkup.type = 30" 
+                  " GROUP BY recordedmarkup.data ORDER BY" 
+                  " SUM((SELECT IFNULL(rm.mark, recordedmarkup.mark)" 
+                  " FROM recordedmarkup AS rm WHERE rm.chanid = recordedmarkup.chanid" 
+                  " AND rm.starttime = recordedmarkup.starttime AND" 
+                  " rm.type = recordedmarkup.type AND" 
+                  " rm.mark > recordedmarkup.mark" 
+                  " ORDER BY rm.mark ASC LIMIT 1)" 
+                  " - recordedmarkup.mark) DESC LIMIT 1;"); 
+    query.bindValue(":CHANID", chanid); 
+    query.bindValue(":STARTTIME", recstartts); 
+ 
+    if (query.exec() && query.next()) 
+    { 
+        m_videoWidth = query.value(0).toInt(); 
+    } 
+    else 
+        m_videoWidth = 0; 
+
+    return m_videoWidth; 
+} 
+
+/** \fn ProgramInfo::SetVidpropHeight(int width)
  *  \brief Sets overall average height flag in videoprops.
  */
-void ProgramInfo::SetVidpropHeight(int height)
+void ProgramInfo::SetVidpropHeight(int width)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -3108,22 +3142,9 @@ void ProgramInfo::SetVidpropHeight(int height)
     " CONCAT_WS(',', IF(videoprop = '', NULL, videoprop), :VALUE)"
     " WHERE chanid = :CHANID AND starttime = :STARTTIME;");
 
-    if (height > 700 && height < 800)
+    if (width > 1300)
     {
-        VERBOSE(VB_IMPORTANT, QString("Recording designated 720p because height was %1").arg(height));
-        videoproperties |= VID_720;
-
-        query.bindValue(":VALUE", "720");
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts);
-
-        if (!query.exec())
-            MythDB::DBError("UpdateRes", query);
-
-    }
-    else if (height > 1000 && height < 1100)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Recording designated 1080i/p because height was %1").arg(height));
+        VERBOSE(VB_IMPORTANT, QString("Recording designated 1080i/p because width was %1").arg(width));
         videoproperties |= VID_1080;
 
         query.bindValue(":VALUE", "1080");
@@ -3133,13 +3154,25 @@ void ProgramInfo::SetVidpropHeight(int height)
         if (!query.exec())
             MythDB::DBError("UpdateRes", query);
     }
+    else if (width > 800)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Recording designated 720p because width was %1").arg(width));
+        videoproperties |= VID_720;
+
+        query.bindValue(":VALUE", "720");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts);
+
+        if (!query.exec())
+            MythDB::DBError("UpdateRes", query);
+    }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Unknown type, recording height was %1").arg(height));
+        VERBOSE(VB_IMPORTANT, QString("Unknown type, recording width was %1").arg(width));
         return;
     }
 
-    m_videoHeight = height;
+    m_videoWidth = width;
 }
 
 
