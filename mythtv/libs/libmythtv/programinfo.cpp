@@ -627,11 +627,11 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     else
         progMap["lentime"] = minstring;
 
-    progMap["rec_type"] = RecTypeChar();
-    progMap["rec_str"] = RecTypeText();
+    progMap["rectypechar"] = RecTypeChar();
+    progMap["rectype"] = RecTypeText();
+    QString tmp_rec = progMap["rectype"];
     if (rectype != kNotRecording)
     {
-        QString tmp_rec;
         if (((recendts > timeNow) && (recstatus <= rsWillRecord)) ||
             (recstatus == rsConflict) || (recstatus == rsLaterShowing))
         {
@@ -644,14 +644,12 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
         {
             tmp_rec += " -- ";
         }
-        if (showrerecord && recstatus == rsRecorded && !duplicate)
+        if (showrerecord && (recstatus == rsRecorded) && !duplicate)
             tmp_rec += QObject::tr("Re-Record");
         else
             tmp_rec += RecStatusText();
-        progMap["rec_str"] += tmp_rec;
     }
-    progMap["recordingstatus"] = progMap["rec_str"];
-    progMap["type"] = progMap["rec_str"];
+    progMap["rectypestatus"] = tmp_rec;
 
     progMap["card"] = RecStatusChar();
 
