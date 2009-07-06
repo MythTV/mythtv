@@ -224,7 +224,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             if (m_titleSort == true)
             {
                 m_titleSort = false;
-                m_reverseSort = false;
+                m_reverseSort = (m_type == plPreviouslyRecorded);
             }
             else
             {
@@ -619,7 +619,10 @@ void ProgLister::select()
     if (!pi)
         return;
 
-    pi->EditRecording();
+    if (m_type == plPreviouslyRecorded)
+        deleteOldRecorded();
+    else
+        pi->EditRecording();
 }
 
 void ProgLister::edit()
@@ -1080,6 +1083,23 @@ class plTitleSort
         }
 };
 
+class plPrevTitleSort
+{
+    public:
+        plPrevTitleSort(void) {;}
+
+        bool operator()(const ProgramInfo *a, const ProgramInfo *b)
+        {
+            if (a->sortTitle != b->sortTitle)
+                    return (a->sortTitle < b->sortTitle);
+
+            if (a->programid != b->programid)
+                return a->programid < b->programid;
+
+            return a->startts < b->startts;
+        }
+};
+
 class plTimeSort
 {
     public:
@@ -1122,6 +1142,8 @@ void ProgLister::fillItemList(bool restorePosition)
     if (currentItem)
         selected = new ProgramInfo(*(qVariantValue<ProgramInfo*>
                                         (currentItem->GetData())));
+    int selectedOffset = 
+        m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
     if (m_curviewText && m_curView >= 0)
         m_curviewText->SetText(m_viewTextList[m_curView]);
@@ -1370,23 +1392,28 @@ void ProgLister::fillItemList(bool restorePosition)
 
     if (m_type == plNewListings || m_titleSort)
     {
-        // Prune to one per title
-        sort(sortedList.begin(), sortedList.end(), plTitleSort());
-
-        QString curtitle = "";
-        vector<ProgramInfo *>::iterator i = sortedList.begin();
-        while (i != sortedList.end())
+        if (m_type == plPreviouslyRecorded)
+            sort(sortedList.begin(), sortedList.end(), plPrevTitleSort());
+        else
         {
-            ProgramInfo *p = *i;
-            if (p->sortTitle != curtitle)
+            // Prune to one per title
+            sort(sortedList.begin(), sortedList.end(), plTitleSort());
+
+            QString curtitle = "";
+            vector<ProgramInfo *>::iterator i = sortedList.begin();
+            while (i != sortedList.end())
             {
-                curtitle = p->sortTitle;
-                i++;
-            }
-            else
-            {
-                delete p;
-                i = sortedList.erase(i);
+                ProgramInfo *p = *i;
+                if (p->sortTitle != curtitle)
+                {
+                    curtitle = p->sortTitle;
+                    i++;
+                }
+                else
+                {
+                    delete p;
+                    i = sortedList.erase(i);
+                }
             }
         }
     }
@@ -1422,20 +1449,35 @@ void ProgLister::fillItemList(bool restorePosition)
     // Restore position after a list update
     if (restorePosition && selected)
     {
-        int listPos = m_itemList.count() - 1;
         int i;
-        for (i = listPos; i >= 0; i--)
+        for (i = m_itemList.count() - 2; i >= 0; i--)
         {
-            if (selected->chansign == m_itemList[i]->chansign &&
-                selected->startts == m_itemList[i]->startts)
+            bool dobreak;
+
+            if (!m_titleSort)
             {
-                listPos = i;
-                break;
+                plTimeSort comp;
+                dobreak = comp(m_itemList[i], selected);
             }
-            else if (selected->recstartts <= m_itemList[i]->recstartts)
-                listPos = i;
+            else if (m_type == plPreviouslyRecorded)
+            {
+                plPrevTitleSort comp;
+                dobreak = comp(m_itemList[i], selected);
+            }
+            else
+            {
+                plTitleSort comp;
+                dobreak = comp(m_itemList[i], selected);
+            }
+
+            if (m_reverseSort)
+                dobreak = !dobreak;
+
+            if (dobreak)
+                break;
         }
-        m_progList->SetItemCurrent(listPos);
+
+        m_progList->SetItemCurrent(i + 1, i + 1 - selectedOffset);
     }
 
     if (selected)
@@ -1460,7 +1502,8 @@ void ProgLister::updateButtonList(void)
                     pginfo->recstatus == rsOffLine ||
                     pginfo->recstatus == rsAborted)
             state = "error";
-        else if (pginfo->recstatus == rsWillRecord)
+        else if (pginfo->recstatus == rsWillRecord ||
+                 pginfo->recstatus == rsRecorded)
                 state = "normal";
         else if (pginfo->recstatus == rsRepeat ||
                     pginfo->recstatus == rsOtherShowing ||
@@ -1573,11 +1616,13 @@ void ProgLister::customEvent(QEvent *event)
             else if (resulttext == tr("Sort By Title"))
             {
                 m_titleSort = true;
+                m_reverseSort = false;
                 needUpdate = true;
             }
             else if (resulttext == tr("Sort By Time"))
             {
                 m_titleSort = false;
+                m_reverseSort = (m_type == plPreviouslyRecorded);
                 needUpdate = true;
             }
         }
@@ -1612,7 +1657,6 @@ void ProgLister::customEvent(QEvent *event)
                                         query);
 
                     ScheduledRecording::signalChange(0);
-                    fillItemList(false);
                 }
             }
         }
