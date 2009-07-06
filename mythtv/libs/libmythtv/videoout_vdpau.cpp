@@ -446,6 +446,9 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
     vbuffers.begin_lock(kVideoBuffer_used);
     if (vbuffers.size(kVideoBuffer_used) && m_ctx)
         m_ctx->UpdatePauseFrame(vbuffers.head(kVideoBuffer_used));
+    else
+        VERBOSE(VB_PLAYBACK,LOC_ERR +
+            QString("Failed to update the pause frame."));
     vbuffers.end_lock();
 }
 
