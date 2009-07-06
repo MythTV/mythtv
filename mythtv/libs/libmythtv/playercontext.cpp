@@ -488,7 +488,7 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
 
     if (pipState == kPIPOff || pipState == kPBPLeft)
     {
-        int ret = 1;
+        //int ret = 1;
         if (nvp->HasAudioOut() ||
             (nvp->IsIVTVDecoder() &&
             !gContext->GetNumSetting("PVR350InternalAudioOnly")))
