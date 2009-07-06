@@ -264,6 +264,8 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 #ifdef Q_WS_MACX
     // Myth looks horrible in default Mac style for Qt
     m_database->SetSetting("Style", "Windows");
+    // Qt 4.4 has window-focus problems
+    m_database->SetSetting("RunFrontendInWindow", "1");
 #endif
     GetMythUI()->LoadQtConfig();
 
@@ -795,7 +797,7 @@ QString MythContextPrivate::TestDBconnection(void)
     if (doPing)
     {
         VERBOSE(VB_GENERAL,
-                QString("Testing network connectivity to %1").arg(host));
+                QString("Testing network connectivity to '%1'").arg(host));
     }
 
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
