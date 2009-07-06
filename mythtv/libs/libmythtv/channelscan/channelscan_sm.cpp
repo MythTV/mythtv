@@ -408,7 +408,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
     {
         uint pnum = 0;
         QMap<uint, uint>::const_iterator it = currentEncryptionStatus.begin();
-        cerr << currentEncryptionStatusChecked.size() << "/" << currentEncryptionStatus.size() << " checked" << endl;
+        //cerr << currentEncryptionStatusChecked.size() << "/" << currentEncryptionStatus.size() << " checked" << endl;
         while (it != currentEncryptionStatus.end())
         {
             if (!currentEncryptionStatusChecked[it.key()])
