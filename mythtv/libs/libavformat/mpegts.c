@@ -588,7 +588,9 @@ static int mpegts_parse_pcrpid(MpegTSContext *mpegts_ctx,
         return -1;
     pcr_pid &= 0x1fff;
     mpegts_ctx->pcr_pid = pcr_pid;
+#ifdef DEBUG
     av_log(NULL, AV_LOG_DEBUG, "pcr_pid=0x%x\n", pcr_pid);
+#endif
     return pcr_pid;
 }
 
@@ -612,8 +614,10 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
 
     mpegts_cleanup_streams(mpegts_ctx); /* in case someone else removed streams.. */
 
+#ifdef DEBUG
     av_log(mpegts_ctx->stream, AV_LOG_DEBUG, "PMT: len %i\n", section_len);
     av_hex_dump_log(mpegts_ctx->stream, AV_LOG_DEBUG, (uint8_t *)section, section_len);
+#endif
 
     if (parse_section_header(&header, &p, p_end) < 0)
         HANDLE_PMT_PARSE_ERROR("section header");
