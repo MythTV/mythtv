@@ -7162,7 +7162,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                     for (int x = 0; x < rect->w; ++x)
                     {
                         const uint8_t color = rect->pict.data[0][y*rect->pict.linesize[0] + x];
-                        const uint32_t pixel = rect->pict.data[1][color];
+                        const uint32_t pixel = *((uint32_t*)rect->pict.data[1]+color);
                         qImage.setPixel(x, y, pixel);
                     }
                 }
