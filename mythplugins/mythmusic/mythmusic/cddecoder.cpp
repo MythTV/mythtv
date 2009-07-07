@@ -61,23 +61,34 @@ void CdDecoder::flush(bool final)
 {
     ulong min = final ? 0 : bks;
 
-    while ((! done && ! finish) && output_bytes > min) {
+    while ((! done && ! finish) && output_bytes > min)
+    {
 
-        if (user_stop || finish) {
+        if (user_stop || finish)
+        {
             inited = FALSE;
             done = TRUE;
-        } else {
+        }
+        else
+        {
             ulong sz = output_bytes < bks ? output_bytes : bks;
 
             int samples = (sz*8)/(chan*16);
-            if (output()->AddSamples(output_buf, samples, -1))
+            // Never buffer more than 500ms of audio since this slows down
+            // actions such as seeking or track changes made after decoding is
+            // complete but audio remains in the buffer
+            bool ok = (output()->GetAudioBufferedTime() <= 500);
+            if (ok) ok = output()->AddSamples(output_buf, samples, -1);
+            if (ok)
             {
                 output_bytes -= sz;
                 memmove(output_buf, output_buf + sz, output_bytes);
                 output_at = output_bytes;
-            } else {
+            }
+            else
+            {
                 unlock();
-                usleep(500);
+                usleep(5000);
                 lock();
                 done = user_stop;
             }

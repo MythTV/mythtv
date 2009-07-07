@@ -132,19 +132,26 @@ void aacDecoder::flush(bool final)
         {
             ulong sz = output_bytes < bks ? output_bytes : bks;
 
-	    int samples = (sz * 8) / (channels * 16);
-	    if (output()->AddSamples(output_buf, samples, -1))
-	      {
-		output_bytes -= sz;
-		memmove(output_buf, output_buf + sz, output_bytes);
-		output_at = output_bytes;
-	      } else {
-		unlock();
-		usleep(500);
-		lock();
-		done = user_stop;
-	      }
+            int samples = (sz * 8) / (channels * 16);
 
+            // Never buffer more than 500ms of audio since this slows down
+            // actions such as seeking or track changes made after decoding is
+            // complete but audio remains in the buffer
+            bool ok = (output()->GetAudioBufferedTime() <= 500);
+            if (ok) ok = output()->AddSamples(output_buf, samples, -1);
+            if (ok)
+            {
+                output_bytes -= sz;
+                memmove(output_buf, output_buf + sz, output_bytes);
+                output_at = output_bytes;
+            }
+            else
+            {
+                unlock();
+                usleep(5000);
+                lock();
+                done = user_stop;
+            }
         }
     }
 }
