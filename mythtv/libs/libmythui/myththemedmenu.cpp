@@ -178,7 +178,7 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
  */
 void MythThemedMenu::ReloadExitKey(void)
 {
-    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown", 0);
+    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown", 4);
 
     if (allowsd == 1)
         m_exitModifier = Qt::ControlModifier;
