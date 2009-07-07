@@ -11297,6 +11297,8 @@ bool TV::IsSameProgram(int player_idx, const ProgramInfo *rcinfo) const
 
 bool TV::PromptRecGroupPassword(PlayerContext *ctx)
 {
+    QMutexLocker locker(&lastProgramLock);
+
     if (!lastProgram)
         return false;
 
