@@ -932,7 +932,7 @@
         </textarea>
 
         <textarea name="year_label" from="quality_label">
-            <area>385,235,120,30</area>
+            <area>235,240,120,30</area>
             <value>Year:</value>
         </textarea>
 
@@ -976,22 +976,22 @@
         </button>
 
         <textedit name="year" from="basetextedit">
-            <position>520,230</position>
+            <position>370,230</position>
         </textedit>
 
         <textarea name="track_label" from="basetextarea">
-            <area>70,275,50,30</area>
+            <area>50,275,50,30</area>
             <value>Track</value>
             <align>allcenter</align>
         </textarea>
 
         <textarea name="title_label" from="track_label">
-            <area>95,275,320,30</area>
+            <area>-7,275,300,30</area>
             <value>Title</value>
         </textarea>
 
         <textarea name="list_artist_label" from="track_label">
-            <area>435,275,220,30</area>
+            <area>350,275,220,30</area>
             <value>Artist</value>
         </textarea>
 
@@ -1069,7 +1069,7 @@
         </imagetype>
 
         <textarea name="overall_label" from="basetextarea">
-            <area>50,110,700,40</area>
+            <area>80,110,700,40</area>
             <value>Importing CD</value>
         </textarea>
 
@@ -1079,12 +1079,12 @@
         </textarea>
 
         <textarea name="track_label" from="overall_label">
-            <position>50,320</position>
+            <position>80,320</position>
             <value>Encoding Track</value>
         </textarea>
 
         <textarea name="track" from="overall">
-            <position>50,355</position>
+            <position>80,350</position>
         </textarea>
 
         <textarea name="status" from="overall">
@@ -1096,7 +1096,7 @@
         </progressbar>
 
         <textarea name="overallpct" from="basetextarea">
-            <area>350,220,100,30</area>
+            <area>350,230,100,30</area>
             <align>hcenter</align>
         </textarea>
 
@@ -1105,7 +1105,7 @@
         </progressbar>
 
         <textarea name="trackpct" from="basetextarea">
-            <area>350,430,100,30</area>
+            <area>350,440,100,30</area>
             <align>hcenter</align>
         </textarea>
 
