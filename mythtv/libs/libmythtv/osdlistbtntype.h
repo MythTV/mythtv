@@ -240,6 +240,7 @@ class OSDListBtnType : public OSDType
 
     // General Gets
     bool  IsVisible() const { return m_visible; }
+    int   GetShiftLeftOffset() const { return -m_contentsRect.width() - 10; }
 
     // General Sets
     void  SetFontActive(TTFFont *font)   { m_fontActive   = font;    }

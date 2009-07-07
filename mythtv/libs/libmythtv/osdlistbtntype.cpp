@@ -224,6 +224,7 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
         GetLevel(m_levelnum)->SetVisible(false);
 
         m_levelnum--;
+        GetLevel(m_levelnum)->SetVisible(true);
         EnterItem();
     }
     else if ((has_action("LEFT", actions) && m_arrowAccel) ||
@@ -238,6 +239,8 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
              (currentpos->childCount() > 0))
     {
         GetLevel(m_levelnum)->SetActive(false);
+        if (m_levelnum - 1 >= 0)
+            GetLevel(m_levelnum - 1)->SetVisible(false);
         m_levelnum++;
 
         FillLevelFromTree(currentpos, m_levelnum);
@@ -260,9 +263,19 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
 void OSDListTreeType::Draw(OSDSurface *surface, int fade, int maxfade, 
                            int xoff, int yoff)
 {
+    bool previousWasVisible = true;
+
     OSDListBtnList::iterator it = listLevels.begin();
     for (; it != listLevels.end(); ++it)
-        (*it)->Draw(surface, fade, maxfade, xoff, yoff);
+    {
+        // Only display two levels, shift to the left if needed.
+        int leftoff = (m_levelnum > 1 || !previousWasVisible) ?
+                      (*it)->GetShiftLeftOffset() * max(m_levelnum - 1, 1) : 0;
+
+        (*it)->Draw(surface, fade, maxfade, xoff + leftoff, yoff);
+
+        previousWasVisible = (*it)->IsVisible();
+    }
 }
 
 void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item, 
