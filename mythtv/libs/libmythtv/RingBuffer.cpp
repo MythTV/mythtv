@@ -11,6 +11,10 @@
 #include <fcntl.h>
 #include <pthread.h>
 
+#if !HAVE_POSIX_FADVISE
+extern int posix_fadvise(int fd, off_t offset, off_t len, int advice);
+#endif
+
 // Qt headers
 #include <QFile>
 #include <QApplication>

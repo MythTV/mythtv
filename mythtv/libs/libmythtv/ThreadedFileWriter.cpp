@@ -24,6 +24,12 @@
 #define HAVE_FDATASYNC 1
 #else
 #define HAVE_FDATASYNC 0
+extern int fdatasync(int fd);
+#endif
+
+#if !HAVE_SYNC_FILE_RANGE
+extern int sync_file_range(int fd, off64_t offset, off64_t nbytes,
+                           unsigned int flags);
 #endif
 
 #define LOC QString("TFW: ")
