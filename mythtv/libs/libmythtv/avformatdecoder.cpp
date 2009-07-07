@@ -1571,8 +1571,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         AVCodecContext *enc = ic->streams[i]->codec;
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Stream #%1, has id 0x%2 codec id %3, "
-                        "type %4, bitrate %5 at 0x")
-                .arg(i).arg((int)ic->streams[i]->id)
+                        "type %4, bitrate %5 at ")
+                .arg(i).arg((int)ic->streams[i]->id, 0, 16)
                 .arg(codec_id_string(enc->codec_id))
                 .arg(codec_type_string(enc->codec_type))
                 .arg(enc->bit_rate)

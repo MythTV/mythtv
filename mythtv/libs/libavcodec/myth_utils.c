@@ -194,6 +194,9 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_WESTWOOD_SND1:    return "WESTWOOD_SND1";
         case CODEC_ID_GSM:              return "GSM";
         case CODEC_ID_QDM2:             return "QDM2";
+        case CODEC_ID_MLP:              return "MLP";
+        case CODEC_ID_TRUEHD:           return "TRUEHD";
+        case CODEC_ID_EAC3:             return "E-AC3";
 
             /* subtitle codecs */
         case CODEC_ID_DVD_SUBTITLE:     return "DVD_SUBTITLE";
