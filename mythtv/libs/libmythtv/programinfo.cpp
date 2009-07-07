@@ -84,84 +84,95 @@ static QString StripHTMLTags(const QString& src)
  *  \brief Null constructor.
  */
 ProgramInfo::ProgramInfo(void) :
-    regExpLock(QMutex::NonRecursive), regExpSeries("0000$"),
+    title(""),
+    subtitle(""),
+    description(""),
+    category(""),
+
+    chanid(""),
+    chanstr(""),
+    chansign(""),
+    channame(""),
+    m_videoHeight(0),
+
+    recpriority(0),
+    recgroup(QString("Default")),
+    playgroup(QString("Default")),
+    chancommfree(0),
+    
+    pathname(""),
+    filesize(0),
+    hostname(""),
+    storagegroup(QString("Default")),
+
+    startts(mythCurrentDateTime()),
+    endts(startts),
+    recstartts(startts),
+    recendts(startts),
+
+    availableStatus(asAvailable),
+    isVideo(false),
+    lenMins(0),
+
+    year(""),
+    stars(0),
+
+    originalAirDate(QDate(0, 1, 1)),
+    lastmodified(startts),
+    lastInUseTime(startts.addSecs(-4 * 60 * 60)),
+
+    hasAirDate(false),
+    repeat(false),
+
+    spread(-1),
+    startCol(-1),
+
+    recstatus(rsUnknown),
+    oldrecstatus(rsUnknown),
+    savedrecstatus(rsUnknown),
+
+    prefinput(0),
+    recpriority2(0),
+    reactivate(false),
+    recordid(0),
+    parentid(0),
+
+    rectype(kNotRecording),
+    dupin(kDupsInAll),
+    dupmethod(kDupCheckSubDesc),
+
+    sourceid(0),
+    inputid(0),
+    cardid(0),
+    shareable(false),
+    duplicate(false),
+
+    schedulerid(""),
+    findid(0),
+
+    programflags(0),
+    subtitleType(0),
+    videoproperties(0),
+    audioproperties(0),
+    transcoder(0),
+    chanOutputFilters(""),
+
+    seriesid(""),
+    programid(""),
+    catType(""),
+
+    sortTitle(""),
+
+    // Private
+    ignoreBookmark(false),
+    record(NULL),
+
+    regExpLock(QMutex::NonRecursive),
+    regExpSeries("0000$"),
+
+    inUseForWhat(""),
     positionMapDBReplacement(NULL)
 {
-    spread = -1;
-    startCol = -1;
-    isVideo = false;
-    lenMins = 0;
-
-    title = "";
-    subtitle = "";
-    description = "";
-    category = "";
-    chanstr = "";
-    chansign = "";
-    channame = "";
-    chancommfree = 0;
-    chanOutputFilters = "";
-    year = "";
-    stars = 0;
-    availableStatus = asAvailable;
-
-    pathname = "";
-    storagegroup = QString("Default");
-    filesize = 0;
-    hostname = "";
-    programflags = 0;
-    transcoder = 0;
-    audioproperties = 0;
-    videoproperties = 0;
-    subtitleType = 0;
-
-    startts = mythCurrentDateTime();
-    endts = startts;
-    recstartts = startts;
-    recendts = startts;
-    originalAirDate = QDate (0, 1, 1);
-    lastmodified = startts;
-    lastInUseTime = startts.addSecs(-4 * 60 * 60);
-
-    recstatus = rsUnknown;
-    oldrecstatus = rsUnknown;
-    savedrecstatus = rsUnknown;
-    prefinput = 0;
-    recpriority2 = 0;
-    reactivate = false;
-    recordid = 0;
-    parentid = 0;
-    rectype = kNotRecording;
-    dupin = kDupsInAll;
-    dupmethod = kDupCheckSubDesc;
-
-    sourceid = 0;
-    inputid = 0;
-    cardid = 0;
-    shareable = false;
-    duplicate = false;
-    schedulerid = "";
-    findid = 0;
-    recpriority = 0;
-    recgroup = QString("Default");
-    playgroup = QString("Default");
-
-    hasAirDate = false;
-    repeat = false;
-
-    seriesid = "";
-    programid = "";
-    ignoreBookmark = false;
-    catType = "";
-
-    sortTitle = "";
-
-    inUseForWhat = "";
-
-    record = NULL;
-
-    m_videoWidth = 0;
-    m_videoHeight = 0;
 }
 
 /** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other)
