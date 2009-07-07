@@ -436,8 +436,17 @@ bool DDStructureParser::characters(const QString& pchars)
             QString ExtractDateFromMessage = pchars.right(20);
             QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage,
                                                    Qt::ISODate);
+            QString SDDateFormat = GetMythDB()->GetSetting("DateFormat",
+                                                           "ddd d MMMM");
+            // Ensure we show the year when it's important, regardless of
+            // specified DateFormat
+            if ((!SDDateFormat.contains('y')) &&
+                (EDFM.date().year() != QDate::currentDate().year()))
+            {
+                SDDateFormat.append(" (yyyy)");
+            }
             QString dateFormat = QString("%1 %2")
-                    .arg(GetMythDB()->GetSetting("DateFormat", "ddd d MMMM"))
+                    .arg(SDDateFormat)
                     .arg(GetMythDB()->GetSetting("TimeFormat", "hh:mm"));
             QString ExpirationDate = EDFM.toString(dateFormat);
 
