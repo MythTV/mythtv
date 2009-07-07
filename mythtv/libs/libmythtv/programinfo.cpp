@@ -179,9 +179,94 @@ ProgramInfo::ProgramInfo(void) :
  *  \brief Copy constructor.
  */
 ProgramInfo::ProgramInfo(const ProgramInfo &other) :
-    record(NULL), regExpLock(QMutex::NonRecursive), regExpSeries("0000$")
+    title(other.title),
+    subtitle(other.subtitle),
+    description(other.description),
+    category(other.category),
+
+    chanid(other.chanid),
+    chanstr(other.chanstr),
+    chansign(other.chansign),
+    channame(other.channame),
+    m_videoHeight(other.m_videoHeight),
+
+    recpriority(other.recpriority),
+    recgroup(other.recgroup),
+    playgroup(other.playgroup),
+    chancommfree(other.chancommfree),
+
+    pathname(other.pathname),
+    filesize(other.filesize),
+    hostname(other.hostname),
+    storagegroup(other.storagegroup),
+
+    startts(other.startts),
+    endts(other.endts),
+    recstartts(other.recstartts),
+    recendts(other.recendts),
+
+    availableStatus(other.availableStatus),
+    isVideo(other.isVideo),
+    lenMins(other.lenMins),
+
+    year(other.year),
+    stars(other.stars),
+
+    originalAirDate(other.originalAirDate),
+    lastmodified(other.lastmodified),
+    lastInUseTime(other.lastInUseTime),
+
+    hasAirDate(other.hasAirDate),
+    repeat(other.repeat),
+
+    spread(other.spread),
+    startCol(other.startCol),
+
+    recstatus(other.recstatus),
+    oldrecstatus(other.oldrecstatus),
+    savedrecstatus(other.savedrecstatus),
+
+    prefinput(other.prefinput),
+    recpriority2(other.recpriority2),
+    reactivate(other.reactivate),
+    recordid(other.recordid),
+    parentid(other.parentid),
+
+    rectype(other.rectype),
+    dupin(other.dupin),
+    dupmethod(other.dupmethod),
+
+    sourceid(other.sourceid),
+    inputid(other.inputid),
+    cardid(other.cardid),
+    shareable(other.shareable),
+    duplicate(other.duplicate),
+
+    schedulerid(other.schedulerid),
+    findid(other.findid),
+    programflags(other.programflags),
+    subtitleType(other.subtitleType),
+    videoproperties(other.videoproperties),
+    audioproperties(other.audioproperties),
+    transcoder(other.transcoder),
+    chanOutputFilters(other.chanOutputFilters),
+
+    seriesid(other.seriesid),
+    programid(other.programid),
+    catType(other.catType),
+
+    sortTitle(other.sortTitle),
+
+    // Private
+    ignoreBookmark(other.ignoreBookmark),
+    record(NULL),
+
+    regExpLock(QMutex::NonRecursive),
+    regExpSeries("0000$"),
+
+    inUseForWhat(other.inUseForWhat),
+    positionMapDBReplacement(other.positionMapDBReplacement)
 {
-    clone(other);
 }
 
 /** \fn ProgramInfo::operator=(const ProgramInfo &other)
