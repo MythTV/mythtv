@@ -280,27 +280,22 @@ bool MythDB::SaveSettingOnHost(const QString &key,
 
 QString MythDB::GetSetting(const QString &key, const QString &defaultval)
 {
-    bool found = false;
-    QString value;
+    d->settingsCacheLock.lock();
 
-    if (d->overriddenSettings.contains(key)) {
+    QString value = d->settingsCache.value(key, "_cold_");
+
+    d->settingsCacheLock.unlock();
+
+    if (value != "_cold_" && d->useSettingsCache)
+        return value;
+
+    if (d->overriddenSettings.contains(key))
+    {
         value = d->overriddenSettings[key];
         return value;
     }
 
-    if (d->useSettingsCache)
-    {
-        d->settingsCacheLock.lock();
-        if (d->settingsCache.contains(key))
-        {
-            value = d->settingsCache[key];
-            d->settingsCacheLock.unlock();
-            return value;
-        }
-        d->settingsCacheLock.unlock();
-    }
-
-
+    bool found = false;
     if (!d->ignoreDatabase)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -311,11 +306,9 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
             query.bindValue(":KEY", key);
             query.bindValue(":HOSTNAME", d->m_localhostname);
 
-            if (query.exec() && query.size() > 0)
+            if (query.exec() && query.next())
             {
-                query.next();
                 value = query.value(0).toString();
-                found = true;
             }
             else
             {
@@ -324,13 +317,16 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
                               "hostname IS NULL;");
                 query.bindValue(":KEY", key);
 
-                if (query.exec() && query.size() > 0)
+                if (query.exec() && query.next())
                 {
-                    query.next();
                     value = query.value(0).toString();
-                    found = true;
+                }
+                else
+                {
+                    value = defaultval;
                 }
             }
+            found = true;
         }
         else
         {
@@ -344,8 +340,8 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
     if (!found)
         return d->m_settings->GetSetting(key, defaultval);
 
-    // Store the value (only if we have actually found it in the database)
-    if (!value.isNull() && d->useSettingsCache)
+    // Store the value
+    if (d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
         d->settingsCache[key] = value;
