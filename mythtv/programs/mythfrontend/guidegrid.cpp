@@ -181,7 +181,7 @@ void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
 GuideGrid::GuideGrid(MythScreenStack *parent,
                      uint chanid, QString channum,
                      TV *player, bool embedVideo,
-                     bool allowFinder, int changrpid) 
+                     bool allowFinder, int changrpid)
          : MythScreenType(parent, "guidegrid"),
     m_allowFinder(allowFinder),
     m_player(player),
@@ -342,7 +342,7 @@ GuideGrid::~GuideGrid()
         qApp->postEvent(m_player, new MythEvent(message));
     }
 
-    // maybe the user selected a different channel group, 
+    // maybe the user selected a different channel group,
     // tell the player to update its channel list just in case
     if (m_player)
         m_player->UpdateChannelList(m_changrpid);
@@ -486,7 +486,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "TOGGLEFAV")
         {
             if (m_changrpid == -1)
-                ChannelGroupMenu(0); 
+                ChannelGroupMenu(0);
             else
                 toggleChannelFavorite();
         }
@@ -1241,7 +1241,7 @@ void GuideGrid::customEvent(QEvent *event)
             else if (resulttext == tr("Add To Channel Group"))
             {
                 if (m_changrpid == -1)
-                    ChannelGroupMenu(0); 
+                    ChannelGroupMenu(0);
             }
             else if (resulttext == tr("Remove from Channel Group"))
             {
@@ -1516,7 +1516,7 @@ void GuideGrid::toggleChannelFavorite(int grpid)
     {
       if (m_changrpid == -1)
           return;
-      else 
+      else
           grpid = m_changrpid;
     }
 
@@ -1805,7 +1805,8 @@ void GuideGrid::enter()
 
     channelUpdate();
 
-    Close();
+    // Don't perform transition effects when guide is being used during playback
+    GetScreenStack()->PopScreen(this, false);
 
     epgIsVisibleCond.wakeAll();
 }
