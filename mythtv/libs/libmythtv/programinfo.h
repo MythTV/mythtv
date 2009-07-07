@@ -434,8 +434,6 @@ class MPUBLIC ProgramInfo
   private:
     bool ignoreBookmark;
     mutable class ScheduledRecording* record;
-    mutable QMutex regExpLock;
-    QRegExp regExpSeries;
 
     QString inUseForWhat;
     PMapDBReplacement *positionMapDBReplacement;

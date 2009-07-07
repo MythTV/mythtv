@@ -167,9 +167,6 @@ ProgramInfo::ProgramInfo(void) :
     ignoreBookmark(false),
     record(NULL),
 
-    regExpLock(QMutex::NonRecursive),
-    regExpSeries("0000$"),
-
     inUseForWhat(""),
     positionMapDBReplacement(NULL)
 {
@@ -260,9 +257,6 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     // Private
     ignoreBookmark(other.ignoreBookmark),
     record(NULL),
-
-    regExpLock(QMutex::NonRecursive),
-    regExpSeries("0000$"),
 
     inUseForWhat(other.inUseForWhat),
     positionMapDBReplacement(other.positionMapDBReplacement)
@@ -1594,8 +1588,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 
     if (catType == "series")
     {
-        QMutexLocker locker(&regExpLock);
-        if (programid.contains(regExpSeries))
+        if (programid.endsWith("0000"))
             return false;
     }
 
