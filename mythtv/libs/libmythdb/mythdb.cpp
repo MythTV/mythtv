@@ -1,4 +1,5 @@
 #include <QMutex>
+#include <QHash>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
@@ -58,15 +59,18 @@ class MythDBPrivate
     bool ignoreDatabase;
     bool useSettingsCache;
     QMutex settingsCacheLock;
-    QMap <QString, QString> settingsCache;      // permanent settings in the DB
-    QMap <QString, QString> overriddenSettings; // overridden this session only
+    QHash <QString, QString> settingsCache;      // permanent settings in the DB
+    QHash <QString, QString> overriddenSettings; // overridden this session only
 };
+
+static const int settings_reserve = 61;
 
 MythDBPrivate::MythDBPrivate()
     : m_settings(new Settings()),
       ignoreDatabase(false), useSettingsCache(false)
 {
     m_localhostname.clear();
+    settingsCache.reserve(settings_reserve);
 }
 
 MythDBPrivate::~MythDBPrivate()
@@ -553,6 +557,7 @@ void MythDB::ClearSettingsCache(QString myKey, QString newVal)
     {
         VERBOSE(VB_DATABASE, "Clearing Settings Cache.");
         d->settingsCache.clear();
+        d->settingsCache.reserve(settings_reserve);
     }
     d->settingsCacheLock.unlock();
 }
