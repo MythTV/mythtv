@@ -563,7 +563,7 @@ class MPUBLIC TV : public QThread
     void IdleDialogTimeout(void);
 
     // Program jumping stuff
-    void SetLastProgram(ProgramInfo *rcinfo);
+    void SetLastProgram(const ProgramInfo *rcinfo);
     ProgramInfo *GetLastProgram(void) const;
 
     static bool LoadExternalSubtitles(NuppelVideoPlayer *nvp,

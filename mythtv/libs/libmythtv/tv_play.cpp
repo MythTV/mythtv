@@ -11241,7 +11241,7 @@ bool TV::IsVideoExitDialog(const QString &dialogname)
             dialogname == kOSDDialogExitOptions);
 }
 
-void TV::SetLastProgram(ProgramInfo *rcinfo)
+void TV::SetLastProgram(const ProgramInfo *rcinfo)
 {
     QMutexLocker locker(&lastProgramLock);
 
@@ -11357,24 +11357,37 @@ void TV::DoDisplayJumpMenu(void)
     progLists.clear();
     vector<ProgramInfo*> *infoList = RemoteGetRecordedList(false);
 
-    //bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
+    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
     if (infoList)
     {
+        QList<QString> titles_seen;
+
         actx->LockPlayingInfo(__FILE__, __LINE__);
+        QString currecgroup = actx->playingInfo->recgroup;
+        actx->UnlockPlayingInfo(__FILE__, __LINE__);
+
         vector<ProgramInfo *>::const_iterator it = infoList->begin();
         for ( ; it != infoList->end(); it++)
         {
-            //if (p->recgroup != "LiveTV" || LiveTVInAllPrograms)
-            if ((*it)->recgroup == actx->playingInfo->recgroup)
-                progLists[(*it)->title].push_front(new ProgramInfo(*(*it)));
+            if ((*it)->recgroup != "LiveTV" || LiveTVInAllPrograms ||
+                (*it)->recgroup == currecgroup)
+                progLists[(*it)->recgroup].push_front(new ProgramInfo(*(*it)));
         }
-        actx->UnlockPlayingInfo(__FILE__, __LINE__);
 
+        ProgramInfo *lastprog = GetLastProgram();
         QMap<QString,ProgramList>::const_iterator Iprog;
         for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
         {
             const ProgramList &plist = *Iprog;
             int progIndex = plist.count();
+
+            if (plist[0]->recgroup != currecgroup)
+            {
+                SetLastProgram(plist[0]);
+                if (!PromptRecGroupPassword(actx))
+                    continue;
+            }
+
             if (progIndex == 1)
             {
                 new OSDGenericTree(
@@ -11386,18 +11399,33 @@ void TV::DoDisplayJumpMenu(void)
                 OSDGenericTree *j_item =
                     new OSDGenericTree(treeMenu, Iprog.key());
 
-                for (int i = 0; i < progIndex; i++)
+                for (int i = 0; i < progIndex; ++i)
                 {
                     const ProgramInfo *p = plist[i];
-                    if (!p->subtitle.isEmpty())
-                        new OSDGenericTree(j_item, p->subtitle,
-                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
-                    else
-                        new OSDGenericTree(j_item, p->title,
-                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
+
+                    if (titles_seen.contains(p->title))
+                        continue;
+                    titles_seen.push_back(p->title);
+
+                    OSDGenericTree *jsub_item =
+                        new OSDGenericTree(j_item, p->title);
+                    for (int j = 0; j < progIndex; ++j)
+                    {
+                        const ProgramInfo *q = plist[j];
+
+                        if (q->title != p->title)
+                            continue;
+
+                        new OSDGenericTree(jsub_item, q->subtitle.isEmpty() ?
+                            q->title : q->subtitle, QString("JUMPPROG %1 %2")
+                            .arg(Iprog.key()).arg(j));
+                    }
                 }
             }
         }
+        SetLastProgram(lastprog);
+        if (lastprog)
+            delete lastprog;
 
         while (!infoList->empty())
         {
