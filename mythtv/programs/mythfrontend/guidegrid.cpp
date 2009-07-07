@@ -449,7 +449,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             showProgFinder();
         else if (action == "MENU")
             showMenu();
-        else if (action == "ESCAPE")
+        else if (action == "ESCAPE" || action == "GUIDE")
             escape();
         else if (action == "SELECT")
         {

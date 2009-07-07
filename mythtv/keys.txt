@@ -47,7 +47,7 @@ Watching TV or a recording
       Use the arrow keys to make adjustment.
 - W   Cycle through zoom modes: Half, Full, Stretch
 - Ctrl-W Force aspect ratio of video to be treated as either 4:3 or 16:9
-- S   Display the Program Guide (EPG).
+- S   Toggle display of the Program Guide (EPG).
 - F6  Display the Program Finder.
 - F8  Cycle through sleep timer settings Off->30m->1hr->1hr30m->2hr->Off
 - Left arrow  Skip back
@@ -196,7 +196,6 @@ EPG
 ---
 
 - Arrow keys are used to move the highlighted program point around.
-- The keys A, D, S, W perform the same as left, right, down and up.
 - PageUp and PageDown move the channel list up or down a page.
 - Home and End move the highlight left or right by one day.
 - Control-Left and Control Right, <, >, period and comma keys move the
