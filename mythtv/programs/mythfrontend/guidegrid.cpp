@@ -609,23 +609,27 @@ ProgramList GuideGrid::GetProgramList(uint chanid) const
 uint GuideGrid::GetAlternateChannelIndex(
     uint chan_idx, bool with_same_channum) const
 {
-    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
-
     uint si = m_channelInfoIdx[chan_idx];
     const PixmapChannel *chinfo = GetChannelInfo(chan_idx, si);
 
-    for (uint i = 0; (i < m_channelInfos[chan_idx].size()); i++)
+    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+
+    const uint cnt = (ctx && chinfo) ? m_channelInfos[chan_idx].size() : 0;
+    for (uint i = 0; i < cnt; ++i)
     {
         if (i == si)
             continue;
 
         const PixmapChannel *ciinfo = GetChannelInfo(chan_idx, i);
+        if (!ciinfo)
+            continue;
+
         bool same_channum = ciinfo->channum == chinfo->channum;
 
         if (with_same_channum != same_channum)
             continue;
 
-        if (!ciinfo || !m_player->IsTunable(ctx, ciinfo->chanid, true))
+        if (!m_player->IsTunable(ctx, ciinfo->chanid, true))
             continue;
 
         if (with_same_channum ||
