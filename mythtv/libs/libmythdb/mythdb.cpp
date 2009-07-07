@@ -308,6 +308,7 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
 
             if (query.exec() && query.next())
             {
+                found = true;
                 value = query.value(0).toString();
             }
             else
@@ -319,6 +320,7 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
 
                 if (query.exec() && query.next())
                 {
+                    found = true;
                     value = query.value(0).toString();
                 }
                 else
@@ -326,7 +328,6 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
                     value = defaultval;
                 }
             }
-            found = true;
         }
         else
         {
@@ -340,8 +341,8 @@ QString MythDB::GetSetting(const QString &key, const QString &defaultval)
     if (!found)
         return d->m_settings->GetSetting(key, defaultval);
 
-    // Store the value
-    if (d->useSettingsCache)
+    // Do not store default values since they may not have been specified.
+    if (!value.isNull() && d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
         d->settingsCache[key] = value;
