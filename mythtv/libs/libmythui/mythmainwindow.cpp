@@ -749,7 +749,7 @@ void MythMainWindow::Init(void)
     if (!d->paintwin)
         GetMythUI()->ThemeWidget(this);
     Show();
- 
+
     // Set cursor call must come after Show() to work on some systems.
     setCursor((hideCursor) ? (Qt::BlankCursor) : (Qt::ArrowCursor));
 
@@ -1422,6 +1422,15 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                          --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
+
+                        // A focusable screen should be a rare event but there
+                        // but may be desirable in a couple of scenarios
+                        if (screen && screen->CanTakeFocus())
+                        {
+                            screen->gestureEvent(screen, ge);
+                            break;
+                        }
+
                         if (screen && (clicked = screen->GetChildAt(p)) != NULL)
                         {
                             screen->SetFocusWidget(clicked);

@@ -357,7 +357,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->getRequestDelete();
-    
+
     tv->SaveChannelGroup();
 
     delete tv;
@@ -896,12 +896,12 @@ bool TV::Init(bool createWindow)
         }
 
         // player window sizing
-        MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        myWindow = new TvPlayWindow(popupStack, "video playback window");
+        myWindow = new TvPlayWindow(mainStack, "video playback window");
 
         if (myWindow->Create())
-            popupStack->AddScreen(myWindow, false);
+            mainStack->AddScreen(myWindow, false);
         else
         {
             delete myWindow;
@@ -909,9 +909,9 @@ bool TV::Init(bool createWindow)
         }
 
         MythMainWindow *mainWindow = GetMythMainWindow();
-        QPalette p = mainWindow->palette(); 
-        p.setColor(mainWindow->backgroundRole(), Qt::black); 
-        mainWindow->setPalette(p); 
+        //QPalette p = mainWindow->palette();
+        //p.setColor(mainWindow->backgroundRole(), Qt::black);
+        //mainWindow->setPalette(p);
         mainWindow->installEventFilter(this);
         qApp->processEvents();
     }
@@ -935,6 +935,13 @@ TV::~TV(void)
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
 
+    if (myWindow)
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        mainStack->PopScreen(myWindow, false);
+        myWindow = NULL;
+    }
+
     TV::exit(0);
     TV::wait();
 
@@ -947,12 +954,6 @@ TV::~TV(void)
     mwnd->show();
     if (!db_use_gui_size_for_tv)
         mwnd->move(saved_gui_bounds.topLeft());
-
-    if (myWindow)
-    {
-        myWindow->Close();
-        myWindow = NULL;
-    }
 
     if (treeMenu)
         delete treeMenu;
@@ -976,7 +977,7 @@ TV::~TV(void)
             pthread_detach(ddMapLoader);
         }
     }
-    
+
     if (osdMenuEntries)
         delete osdMenuEntries;
 
@@ -987,7 +988,7 @@ TV::~TV(void)
         player.pop_back();
     }
     ReturnPlayerLock(mctx);
-    
+
     GetMythMainWindow()->GetPaintWindow()->show();
 
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- end");
@@ -1001,7 +1002,7 @@ void TV::SaveChannelGroup(void)
     int remember_last_changrp = gContext->GetNumSetting("ChannelGroupRememberLast", 0);
 
     if (remember_last_changrp)
-       gContext->SaveSetting("ChannelGroupDefault", channel_group_id); 
+       gContext->SaveSetting("ChannelGroupDefault", channel_group_id);
 }
 
 /**
@@ -1439,6 +1440,9 @@ void TV::UpdateOSDAskAllowDialog(PlayerContext *ctx)
 
     if (kAskAllowCancel != askAllowType)
     {
+        BrowseEnd(ctx, false);
+        osd->DialogAbortAndHideAll();
+        osd->HideTreeMenu();
         osd->NewDialogBox(
             kOSDDialogAllowRecording, message, options, timeuntil, sel);
     }
@@ -2000,13 +2004,6 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             (db_use_fixed_size) ? player_bounds.size() :
             QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
         mainWindow->setGeometry(player_bounds);
-
-        // playback has started close the player startup screen
-        if (myWindow)
-        {
-            myWindow->Close();
-            myWindow = NULL;
-        }
 
         // hide the GUI paint window
         GetMythMainWindow()->GetPaintWindow()->hide();
@@ -2731,7 +2728,7 @@ void TV::timerEvent(QTimerEvent *te)
                 for (uint i = 0; i < player.size(); i++)
                     player[i]->SetNoHardwareDecoders();
                 RestartMainNVP(mctx);
-            }                
+            }
         }
 
         if (mctx->IsRecorderErrored() ||
@@ -5197,7 +5194,7 @@ void TV::PxPToggleType(PlayerContext *mctx, bool wantPBP)
         return;
     }
 
-    
+
     VERBOSE(VB_PLAYBACK, LOC +
             QString("PxPToggleType() converting from %1 to %2 -- begin")
             .arg(before).arg(after));
@@ -6591,7 +6588,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 {
     bool muted = false;
 
-    if ((browse_changrp || (direction == CHANNEL_DIRECTION_FAVORITE)) && 
+    if ((browse_changrp || (direction == CHANNEL_DIRECTION_FAVORITE)) &&
         (channel_group_id > -1))
     {
        uint    chanid;
@@ -6615,7 +6612,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 
        ChangeChannel(ctx, chanid, "");
        return;
-    } 
+    }
     else if (direction == CHANNEL_DIRECTION_FAVORITE)
         direction = CHANNEL_DIRECTION_UP;
 
@@ -8775,7 +8772,7 @@ void TV::BrowseDispInfo(PlayerContext *ctx, int direction)
 
     // if browsing channel groups is enabled or direction if BROWSE_FAVORITES
     // Then pick the next channel in the channel group list to browse
-    // If channel group is ALL CHANNELS (-1), then bypass picking from 
+    // If channel group is ALL CHANNELS (-1), then bypass picking from
     // the channel group list
     if ((browse_changrp || (direction == BROWSE_FAVORITE)) &&
         (channel_group_id > -1) && (direction != BROWSE_SAME) &&
@@ -9867,7 +9864,7 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
 void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
 {
     int osdMenuCount = osdMenuEntries->GetCount();
-    
+
     if (treeMenu)
     {
         for (uint i = 0; i < player.size(); i++)
@@ -10009,7 +10006,7 @@ void TV::FillMenuChanGroups(
     if (!browse_changrp)
         return;
 
-    OSDGenericTree *cg_item = new OSDGenericTree(treeMenu, tr("Channel Groups"), 
+    OSDGenericTree *cg_item = new OSDGenericTree(treeMenu, tr("Channel Groups"),
                                                  "CHANGROUP");
     new OSDGenericTree(cg_item, tr("All Channels"), "CHANGROUP_ALL_CHANNELS",
                                 (channel_group_id == -1) ? 1 : 0,
@@ -10020,7 +10017,7 @@ void TV::FillMenuChanGroups(
     for (it = m_changrplist.begin(); it != m_changrplist.end(); ++it)
     {
         QString name = QString("CHANGROUP_%1").arg(it->grpid);
-        new OSDGenericTree(cg_item, it->name, name, 
+        new OSDGenericTree(cg_item, it->name, name,
                            ((int)(it->grpid) == channel_group_id) ? 1 : 0,
                            NULL, "CHANNELGROUP");
     }

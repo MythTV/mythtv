@@ -12,6 +12,7 @@
 TvPlayWindow::TvPlayWindow(MythScreenStack *parent, const char *name)
             : MythScreenType(parent, name)
 {
+    SetCanTakeFocus(true);
 }
 
 TvPlayWindow::~TvPlayWindow()
@@ -34,3 +35,16 @@ bool TvPlayWindow::Create()
     return true;
 }
 
+/** \brief Mouse click/movement handler, recieves mouse gesture events from the
+ *         QApplication event loop. Should not be used directly.
+ *
+ *  \param uitype The mythuitype receiving the event
+ *  \param event Mouse event
+ */
+void TvPlayWindow::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
+{
+    if (event->gesture() == MythGestureEvent::Click)
+    {
+
+    }
+}
