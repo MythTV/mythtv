@@ -367,8 +367,8 @@ void ThreadedFileWriter::Sync(void)
             fdatasync(fd);
 #else
             fsync(fd);
-    }
 #endif
+    }
 }
 
 /** \fn ThreadedFileWriter::SetWriteBufferSize(uint)
