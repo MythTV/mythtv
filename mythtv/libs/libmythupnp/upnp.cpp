@@ -128,7 +128,8 @@ bool UPnp::Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *p
     // Register any HttpServerExtensions
     // ----------------------------------------------------------------------
 
-    m_pHttpServer->RegisterExtension( new SSDPExtension( m_nServicePort ));
+    m_pHttpServer->RegisterExtension(
+            new SSDPExtension( m_nServicePort, m_pHttpServer->m_sSharePath));
 
     // ----------------------------------------------------------------------
     // Add Task to keep SSDPCache purged of stale entries.  

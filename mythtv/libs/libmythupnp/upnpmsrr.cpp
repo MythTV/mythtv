@@ -17,7 +17,7 @@
 
 UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice, 
 		const QString &sSharePath ) 
-               : Eventing( "UPnpMSRR", "MSRR_Event" )
+               : Eventing( "UPnpMSRR", "MSRR_Event", sSharePath)
 {
     AddVariable( new StateVariable< unsigned short >( "AuthorizationGrantedUpdateID", true ) );
     AddVariable( new StateVariable< unsigned short >( "AuthorizationDeniedUpdateID" , true ) );
@@ -29,9 +29,9 @@ UPnpMSRR::UPnpMSRR( UPnpDevice *pDevice,
     SetValue< unsigned short >( "ValidationSucceededUpdateID" , 0 );
     SetValue< unsigned short >( "ValidationRevokedUpdateID"   , 0 );
 
-    QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", sSharePath );
+    QString sUPnpDescPath =
+        UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
 
-    m_sSharePath           = sSharePath;
     m_sServiceDescFileName = sUPnpDescPath + "MSRR_scpd.xml";
     m_sControlUrl          = "/MSRR_Control";
 

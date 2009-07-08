@@ -45,7 +45,7 @@ class MythFEXML : public Eventing
 	void    GetScreenShot    ( HTTPRequest *pRequest );
 
     public:
-                 MythFEXML( UPnpDevice *pDevice );
+                 MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);
         virtual ~MythFEXML();
 
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );

@@ -288,7 +288,9 @@ class Eventing : public HttpServerExtension,
         virtual QString GetServiceEventURL  () { return m_sEventMethodName; }
 
     public:
-                 Eventing      ( const QString &sExtensionName, const QString &sEventMethodName ); 
+                 Eventing      ( const QString &sExtensionName,
+                                 const QString &sEventMethodName,
+                                 const QString sSharePath );
         virtual ~Eventing      ( );
 
         virtual bool ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );

@@ -26,7 +26,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MythFEXML::MythFEXML( UPnpDevice *pDevice ) : Eventing( "MythFEXML", "MYTHTV_Event" )
+MythFEXML::MythFEXML( UPnpDevice *pDevice , const QString sSharePath)
+  : Eventing( "MythFEXML", "MYTHTV_Event", sSharePath)
 {
 
     QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );

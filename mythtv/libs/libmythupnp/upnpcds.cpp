@@ -59,7 +59,8 @@ QString UPnpCDSExtensionResults::GetResultXML(FilterMap &filter)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath ) : Eventing( "UPnpCDS", "CDS_Event" )
+UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath )
+  : Eventing( "UPnpCDS", "CDS_Event", sSharePath )
 {
     m_root.m_eType      = OT_Container;
     m_root.m_sId        = "0";
@@ -77,7 +78,6 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath ) : Eventing( "
 
     QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", sSharePath );
 
-    m_sSharePath           = sSharePath;
     m_sServiceDescFileName = sUPnpDescPath + "CDS_scpd.xml";
     m_sControlUrl          = "/CDS_Control";
 

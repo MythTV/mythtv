@@ -68,8 +68,9 @@ uint StateVariables::BuildNotifyBody(
 /////////////////////////////////////////////////////////////////////////////
 
 Eventing::Eventing(const QString &sExtensionName,
-                   const QString &sEventMethodName) :
-    HttpServerExtension(sExtensionName),
+                   const QString &sEventMethodName,
+                   const QString sSharePath) :
+    HttpServerExtension(sExtensionName, sSharePath),
     m_sEventMethodName(sEventMethodName),
     m_nSubscriptionDuration(
         UPnp::g_pConfig->GetValue("UPnP/SubscriptionDuration", 1800)),

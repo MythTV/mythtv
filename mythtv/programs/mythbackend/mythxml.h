@@ -122,7 +122,7 @@ class MythXML : public Eventing
         void    GetFile        ( HTTPRequest *pRequest, QString sFileName );
 
     public:
-                 MythXML( UPnpDevice *pDevice );
+                 MythXML( UPnpDevice *pDevice , const QString sSharePath);
         virtual ~MythXML();
 
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );

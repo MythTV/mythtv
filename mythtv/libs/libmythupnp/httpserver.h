@@ -66,7 +66,8 @@ class HttpServerExtension
 
     public:
 
-        HttpServerExtension( const QString &sName ):m_sName( sName ) {};
+        HttpServerExtension( const QString &sName, const  QString &sSharePath )
+           :m_sName( sName ), m_sSharePath( sSharePath ) {};
 
         virtual ~HttpServerExtension() {};
 

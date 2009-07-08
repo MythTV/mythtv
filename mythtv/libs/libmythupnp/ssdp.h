@@ -142,7 +142,7 @@ class SSDPExtension : public HttpServerExtension
         void       GetDeviceList( HTTPRequest *pRequest );
 
     public:
-                 SSDPExtension( int nServicePort );
+                 SSDPExtension( int nServicePort, const QString sSharePath);
         virtual ~SSDPExtension( );
 
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );

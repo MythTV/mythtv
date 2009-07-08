@@ -32,7 +32,7 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
                      const QString &sSharePath,
                      const QString &sSourceProtocols, 
                      const QString &sSinkProtocols ) 
-         : Eventing( "UPnpCMGR", "CMGR_Event" )
+         : Eventing( "UPnpCMGR", "CMGR_Event", sSharePath)
 {
     AddVariable( new StateVariable< QString >( "SourceProtocolInfo"  , true ) );
     AddVariable( new StateVariable< QString >( "SinkProtocolInfo"    , true ) );
@@ -43,8 +43,7 @@ UPnpCMGR::UPnpCMGR ( UPnpDevice *pDevice,
     SetValue< QString >( "SinkProtocolInfo"    , sSinkProtocols   );
 
     QString sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath",
-                                                       sSharePath );
-    m_sSharePath           = sSharePath;
+                                                       m_sSharePath );
     m_sServiceDescFileName = sUPnpDescPath + "CMGR_scpd.xml";
     m_sControlUrl          = "/CMGR_Control";
 

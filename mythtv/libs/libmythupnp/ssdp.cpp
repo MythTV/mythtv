@@ -549,11 +549,12 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDPExtension::SSDPExtension( int nServicePort ) : HttpServerExtension( "SSDP" )
+SSDPExtension::SSDPExtension( int nServicePort , const QString sSharePath)
+  : HttpServerExtension( "SSDP" , sSharePath),
+    m_nServicePort(nServicePort)
 {
     m_sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath",
                                                  m_sSharePath );
-    m_nServicePort  = nServicePort;
 }
 
 /////////////////////////////////////////////////////////////////////////////

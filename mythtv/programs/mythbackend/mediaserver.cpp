@@ -100,7 +100,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 
     VERBOSE(VB_UPNP, "MediaServer::Registering MythXML Service." );
 
-    m_pHttpServer->RegisterExtension( new MythXML( pMythDevice ));
+    m_pHttpServer->RegisterExtension( new MythXML( pMythDevice , m_sSharePath));
 
     if (sIP == "localhost" || sIP.startsWith("127."))
     {

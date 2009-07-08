@@ -55,7 +55,8 @@ static QString extract_id(const QString &raw_request)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MythXML::MythXML( UPnpDevice *pDevice ) : Eventing( "MythXML", "MYTHTV_Event" )
+MythXML::MythXML( UPnpDevice *pDevice , const QString sSharePath)
+  : Eventing( "MythXML", "MYTHTV_Event", sSharePath)
 {
     m_pEncoders = &tvList;
     m_pSched    = sched;

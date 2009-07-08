@@ -37,7 +37,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster )
-          : HttpServerExtension( "HttpStatus" )
+          : HttpServerExtension( "HttpStatus" , QString::null)
 {
     m_pEncoders = tvList;
     m_pSched    = sched;

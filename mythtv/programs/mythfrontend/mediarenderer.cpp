@@ -95,14 +95,18 @@ MediaRenderer::MediaRenderer()
         // Register the MythFEXML protocol... 
         // ------------------------------------------------------------------
         VERBOSE(VB_UPNP, "MediaRenderer::Registering MythFEXML Service." );
-        m_pHttpServer->RegisterExtension( new MythFEXML( RootDevice() ));
+        m_pHttpServer->RegisterExtension( new MythFEXML( RootDevice(),
+                                          m_pHttpServer->m_sSharePath));
 
         // VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering AVTransport Service." ));
         // m_pHttpServer->RegisterExtension( m_pUPnpAVT = new UPnpAVTransport( RootDevice() ));
 
         VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering CMGR Service." ));
         // HttpServer will be responsible for deleting UPnpCMGR
-        m_pHttpServer->RegisterExtension( m_pUPnpCMGR= new UPnpCMGR( RootDevice(), "", "", sSinkProtocols ));
+        m_pHttpServer->RegisterExtension( m_pUPnpCMGR = new UPnpCMGR(
+                                                RootDevice(),
+                                                m_pHttpServer->m_sSharePath,
+                                                "", sSinkProtocols ));
 
         // VERBOSE(VB_UPNP, QString( "MediaRenderer::Registering RenderingControl Service." ));
         // m_pHttpServer->RegisterExtension( m_pUPnpRCTL= new UPnpRCTL( RootDevice() ));
