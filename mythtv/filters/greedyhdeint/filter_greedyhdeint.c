@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "config.h"
+
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -16,7 +18,6 @@
 #include "filter.h"
 #include "frame.h"
 
-#include "config.h"
 #include "../mm_arch.h"
 
 #include "color.h"

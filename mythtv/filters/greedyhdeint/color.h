@@ -1,14 +1,14 @@
 #ifndef _COLOR_H_
 #define _COLOR_H_
 
-void (*yv12_to_yuy2)
+extern void (*yv12_to_yuy2)
   (const unsigned char *y_src, int y_src_pitch, 
    const unsigned char *u_src, int u_src_pitch, 
    const unsigned char *v_src, int v_src_pitch, 
    unsigned char *yuy2_map, int yuy2_pitch,
    int width, int height, int progressive);
 
-void (*yuy2_to_yv12)
+extern void (*yuy2_to_yv12)
   (const unsigned char *yuy2_map, int yuy2_pitch,
    unsigned char *y_dst, int y_dst_pitch, 
    unsigned char *u_dst, int u_dst_pitch, 
