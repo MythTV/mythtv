@@ -6,6 +6,7 @@ INCLUDEPATH += $${PREFIX}/include/mythtv/libmyth
 LIBS += -L$${LIBDIR} $$EXTRA_LIBS -lmythdb-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION -lmythupnp-$$LIBVERSION
+LIBS += -lmythswscale-$$LIBVERSION
 
 mac:using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 
