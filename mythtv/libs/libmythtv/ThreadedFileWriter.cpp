@@ -30,6 +30,7 @@ extern int fdatasync(int fd);
 #if !HAVE_SYNC_FILE_RANGE
 extern int sync_file_range(int fd, off64_t offset, off64_t nbytes,
                            unsigned int flags);
+#define SYNC_FILE_RANGE_WRITE
 #endif
 
 #define LOC QString("TFW: ")
