@@ -187,8 +187,10 @@ for opt do
   --disable-libvisual) visual="no"
   ;;
   --enable-fftw) fftw_lib="yes"
+                 fftw_lib3="yes"
   ;;
   --disable-fftw) fftw_lib="no"
+                  fftw_lib3="no"
   ;;
   --enable-sdl) sdl="yes"
   ;;
@@ -225,6 +227,7 @@ for opt do
                  opengl="yes";
                  visual="yes";
                  fftw_lib="yes";
+                 fftw_lib3="yes";
                  aac="yes";
                  exif="yes";
                  festival="yes";
@@ -244,6 +247,7 @@ for opt do
                  opengl="no";
                  visual="no";
                  fftw_lib="no";
+                 fftw_lib3="no";
                  aac="no";
                  exif="no";
                  festival="no";
