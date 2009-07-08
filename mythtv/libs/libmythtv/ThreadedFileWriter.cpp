@@ -24,13 +24,6 @@
 #define HAVE_FDATASYNC 1
 #else
 #define HAVE_FDATASYNC 0
-extern int fdatasync(int fd);
-#endif
-
-#if !HAVE_SYNC_FILE_RANGE
-extern int sync_file_range(int fd, off64_t offset, off64_t nbytes,
-                           unsigned int flags);
-#define SYNC_FILE_RANGE_WRITE
 #endif
 
 #define LOC QString("TFW: ")
@@ -356,8 +349,7 @@ void ThreadedFileWriter::Sync(void)
 {
     if (fd >= 0)
     {
-        if (HAVE_SYNC_FILE_RANGE)
-        {
+#if HAVE_SYNC_FILE_RANGE
             uint64_t write_position;
 
             buflock.lock();
@@ -371,12 +363,12 @@ void ThreadedFileWriter::Sync(void)
                                 SYNC_FILE_RANGE_WRITE);
                 m_file_sync = write_position;
             }
-        }
-        else if (HAVE_FDATASYNC)
+#elseif HAVE_FDATASYNC
             fdatasync(fd);
-        else
+#else
             fsync(fd);
     }
+#endif
 }
 
 /** \fn ThreadedFileWriter::SetWriteBufferSize(uint)

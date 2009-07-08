@@ -11,10 +11,6 @@
 #include <fcntl.h>
 #include <pthread.h>
 
-#if !HAVE_POSIX_FADVISE
-extern int posix_fadvise(int fd, off_t offset, off_t len, int advice);
-#endif
-
 // Qt headers
 #include <QFile>
 #include <QApplication>
@@ -259,9 +255,9 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
                 else
                 {
                     lseek(fd2, 0, SEEK_SET);
-                    if (HAVE_POSIX_FADVISE)
-                        posix_fadvise(fd2, 0, 0, POSIX_FADV_SEQUENTIAL);
-
+#if HAVE_POSIX_FADVISE
+                    posix_fadvise(fd2, 0, 0, POSIX_FADV_SEQUENTIAL);
+#endif
                     openAttempts = 0;
                     break;
                 }
