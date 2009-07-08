@@ -363,7 +363,7 @@ void ThreadedFileWriter::Sync(void)
                                 SYNC_FILE_RANGE_WRITE);
                 m_file_sync = write_position;
             }
-#elseif HAVE_FDATASYNC
+#elif HAVE_FDATASYNC
             fdatasync(fd);
 #else
             fsync(fd);
