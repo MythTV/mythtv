@@ -665,12 +665,7 @@ contains( HAVE_VIS, yes ) {
 
 
 macx {
-    QMAKE_LFLAGS_SHLIB += -single_module
-    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC3000000
     QMAKE_LFLAGS_SHLIB += -read_only_relocs warning
-
-    # Prevent GCC running out of registers in libavcodec/x86/cavsdsp_mmx.c
-    contains( HAVE_MMX, yes ) : QMAKE_CFLAGS += -mdynamic-no-pic
 }
 
 
