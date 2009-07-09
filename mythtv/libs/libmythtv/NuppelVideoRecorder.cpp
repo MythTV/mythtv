@@ -674,8 +674,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
     if (!skipdevice)
     {
-        if (HAVE_SYS_SOUNDCARD_H + HAVE_SOUNDCARD_H == 0)
-        {
+#if !HAVE_SYS_SOUNDCARD_H && !HAVE_SOUNDCARD_H
         (void) afmt;
         (void) afd;
         (void) frag;
@@ -684,9 +683,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
                 "This Unix doesn't support device files for audio access.");
 
         return 1;
-        }
-        else
-        {
+#else
         QByteArray adevice = audiodevice.toAscii();
         if (-1 == (afd = open(adevice.constData(), O_RDONLY | O_NONBLOCK)))
         {
@@ -733,7 +730,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         }
 
         close(afd);
-        }
+#endif
     }
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
@@ -2249,15 +2246,12 @@ void *NuppelVideoRecorder::VbiThread(void *param)
 
 void NuppelVideoRecorder::doAudioThread(void)
 {
-    if (HAVE_SYS_SOUNDCARD_H + HAVE_SOUNDCARD_H == 0)
-    {
+#if !HAVE_SYS_SOUNDCARD_H && !HAVE_SOUNDCARD_H
     VERBOSE(VB_IMPORTANT, LOC +
             QString("doAudioThread() This Unix doesn't support"
                     " device files for audio access. Skipping"));
     return;
-    }
-    else
-    {
+#else
     int afmt = 0, trigger = 0;
     int afd = 0, act = 0, lastread = 0;
     int frag = 0, blocksize = 0;
@@ -2402,7 +2396,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     delete [] buffer;
     close(afd);
-    }
+#endif
 }
 
 struct VBIData
