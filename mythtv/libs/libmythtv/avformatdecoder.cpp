@@ -3746,14 +3746,20 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                     avcodeclock.unlock();
 
-                    // BEGIN Is this really safe? -- dtk
+                    if (ret < 0)
+                    {
+                        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                                "Unknown audio decoding error");
+                        have_err = true;
+                        continue;
+                    }
+
                     if (data_size <= 0)
                     {
                         ptr += ret;
                         len -= ret;
                         continue;
                     }
-                    // END Is this really safe? -- dtk
 
                     long long temppts = lastapts;
 
