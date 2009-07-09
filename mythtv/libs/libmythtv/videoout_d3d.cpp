@@ -538,13 +538,13 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     }
 
     avpicture_fill(&image_out, (uint8_t*) d3drect.pBits,
-                   PIX_FMT_RGBA32, m_InputCX, m_InputCY);
+                   PIX_FMT_RGB32, m_InputCX, m_InputCY);
     image_out.linesize[0] = d3drect.Pitch;
     avpicture_fill(&image_in, buffer->buf,
                    PIX_FMT_YUV420P, m_InputCX, m_InputCY);
 
     myth_sws_img_convert(
-        &image_out, PIX_FMT_RGBA32, &image_in,
+        &image_out, PIX_FMT_RGB32, &image_in,
                 PIX_FMT_YUV420P, m_InputCX, m_InputCY);
 
     hr = m_pSurface->UnlockRect();

@@ -298,17 +298,17 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         } else {
         
             AVPicture image_in, image_out;
-            int av_format;
+            PixelFormat av_format;
 
             switch (chroma)
             {
                 case FOURCC_YUY2:
                 case FOURCC_YUYV:
-                case FOURCC_YUNV: av_format = PIX_FMT_YUV422; break;
+                case FOURCC_YUNV: av_format = PIX_FMT_YUYV422; break;
                 case FOURCC_RV15: av_format = PIX_FMT_RGB555; break;
                 case FOURCC_RV16: av_format = PIX_FMT_RGB565; break;
                 case FOURCC_RV24: av_format = PIX_FMT_RGB24;  break;
-                case FOURCC_RV32: av_format = PIX_FMT_RGBA32; break;
+                case FOURCC_RV32: av_format = PIX_FMT_RGB32;  break;
                 default: 
                     VERBOSE(VB_IMPORTANT, "VODX: Non Xv mode only supports 16, 24, and 32 bpp displays");
                     errorState = kError_Unknown;
