@@ -383,7 +383,7 @@ void GameUI::showMenu()
                 showMenuPopup->AddButton(tr("Remove Favorite"));
             else
                 showMenuPopup->AddButton(tr("Make Favorite"));
-            showMenuPopup->AddButton(tr("Edit"));
+            showMenuPopup->AddButton(tr("Edit Metadata"));
             popupStack->AddScreen(showMenuPopup);
         }
         else
@@ -447,7 +447,7 @@ void GameUI::customEvent(QEvent *event)
 
         if (resultid == "showMenuPopup")
         {
-            if (resulttext == tr("Edit")) {
+            if (resulttext == tr("Edit Metadata")) {
                 edit();
             }
             else if (resulttext == tr("Show Information"))

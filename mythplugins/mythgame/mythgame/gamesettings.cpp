@@ -1,5 +1,6 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdb.h>
+#include <mythtv/mythdirs.h>
 
 #include "gamesettings.h"
 #include <qfile.h>
@@ -85,6 +86,26 @@ static HostCheckBox *GameTreeView()
     return gc;
 }
 
+HostLineEdit *GetFanartDir()
+{
+    HostLineEdit *gc = new HostLineEdit("mythgame.fanartdir");
+    gc->setLabel(QObject::tr("Directory where Game Fanart is stored"));
+    gc->setValue(GetConfDir() + "/MythGame/Fanart");
+    gc->setHelpText(QObject::tr("This directory will be the default browse "
+                    "location when assigning fanart."));
+    return gc;
+}
+
+HostLineEdit *GetBoxartDir()
+{
+    HostLineEdit *gc = new HostLineEdit("mythgame.boxartdir");
+    gc->setLabel(QObject::tr("Directory where Game Boxart is stored"));
+    gc->setValue(GetConfDir() + "/MythGame/Boxart");
+    gc->setHelpText(QObject::tr("This directory will be the default browse "
+                    "location when assigning boxart."));
+    return gc;
+}
+
 MythGameGeneralSettings::MythGameGeneralSettings()
 {
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
@@ -95,6 +116,8 @@ MythGameGeneralSettings::MythGameGeneralSettings()
     general->addChild(GameRemovalPrompt());
     general->addChild(GameShowFileNames());
     general->addChild(GameTreeView());
+    general->addChild(GetFanartDir());
+    general->addChild(GetBoxartDir());
     addChild(general);
 }
 
