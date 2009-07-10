@@ -353,7 +353,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 }
                 else if (pginfo->category.isEmpty())
                 {
-                    pginfo->category = "";
+                    pginfo->category = cat;
                 }
 
                 if (cat == "film")
