@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 #ifdef __cplusplus
 extern "C" {
@@ -27,6 +40,7 @@ struct hdhomerun_video_stats_t {
 	uint32_t network_error_count;
 	uint32_t transport_error_count;
 	uint32_t sequence_error_count;
+	uint32_t overflow_error_count;
 };
 
 #define TS_PACKET_SIZE 188
@@ -40,12 +54,13 @@ struct hdhomerun_video_stats_t {
  *
  * uint16_t listen_port: Port number to listen on. Set to 0 to auto-select.
  * size_t buffer_size: Size of receive buffer. For 1 second of buffer use VIDEO_DATA_BUFFER_SIZE_1S. 
+ * struct hdhomerun_debug_t *dbg: Pointer to debug logging object. May be NULL.
  *
  * Returns a pointer to the newly created control socket.
  *
  * When no longer needed, the socket should be destroyed by calling hdhomerun_control_destroy.
  */
-extern LIBTYPE struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, size_t buffer_size);
+extern LIBTYPE struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, size_t buffer_size, struct hdhomerun_debug_t *dbg);
 extern LIBTYPE void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
 
 /*
@@ -82,9 +97,7 @@ extern LIBTYPE void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs);
 /*
  * Debug print internal stats.
  */
-extern LIBTYPE void hdhomerun_video_set_debug(struct hdhomerun_video_sock_t *vs, struct hdhomerun_debug_t *dbg);
 extern LIBTYPE void hdhomerun_video_debug_print_stats(struct hdhomerun_video_sock_t *vs);
-
 extern LIBTYPE void hdhomerun_video_get_stats(struct hdhomerun_video_sock_t *vs, struct hdhomerun_video_stats_t *stats);
 
 #ifdef __cplusplus

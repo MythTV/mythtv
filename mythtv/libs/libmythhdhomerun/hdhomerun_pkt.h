@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 #ifdef __cplusplus
 extern "C" {
@@ -109,6 +122,9 @@ extern "C" {
 #define HDHOMERUN_DISCOVER_UDP_PORT 65001
 #define HDHOMERUN_CONTROL_TCP_PORT 65001
 
+#define HDHOMERUN_MAX_PACKET_SIZE 1460
+#define HDHOMERUN_MAX_PAYLOAD_SIZE 1452
+
 #define HDHOMERUN_TYPE_DISCOVER_REQ 0x0002
 #define HDHOMERUN_TYPE_DISCOVER_RPY 0x0003
 #define HDHOMERUN_TYPE_GETSET_REQ 0x0004
@@ -120,6 +136,7 @@ extern "C" {
 #define HDHOMERUN_TAG_DEVICE_ID 0x02
 #define HDHOMERUN_TAG_GETSET_NAME 0x03
 #define HDHOMERUN_TAG_GETSET_VALUE 0x04
+#define HDHOMERUN_TAG_GETSET_LOCKKEY 0x15
 #define HDHOMERUN_TAG_ERROR_MESSAGE 0x05
 
 #define HDHOMERUN_DEVICE_TYPE_WILDCARD 0xFFFFFFFF

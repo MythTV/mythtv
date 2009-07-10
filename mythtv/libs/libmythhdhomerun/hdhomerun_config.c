@@ -15,9 +15,32 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
 #include "hdhomerun.h"
+
+/*
+ * The console output format should be set to UTF-8, however in XP and Vista this breaks batch file processing.
+ * Attempting to restore on exit fails to restore if the program is terminated by the user.
+ * Solution - set the output format each printf.
+ */
+#if defined(__WINDOWS__)
+#define printf console_printf
+#define vprintf console_vprintf
+#endif
 
 static const char *appname;
 
@@ -131,7 +154,7 @@ static int cmd_get(const char *item)
 	return 1;
 }
 
-static int cmd_set(const char *item, const char *value)
+static int cmd_set_internal(const char *item, const char *value)
 {
 	char *ret_error;
 	if (hdhomerun_device_set_var(hd, item, value, NULL, &ret_error) < 0) {
@@ -145,6 +168,38 @@ static int cmd_set(const char *item, const char *value)
 	}
 
 	return 1;
+}
+
+static int cmd_set(const char *item, const char *value)
+{
+	if (strcmp(value, "-") == 0) {
+		char *buffer = NULL;
+		size_t pos = 0;
+
+		while (1) {
+			buffer = (char *)realloc(buffer, pos + 1024);
+			if (!buffer) {
+				fprintf(stderr, "out of memory\n");
+				return -1;
+			}
+
+			size_t size = fread(buffer + pos, 1, 1024, stdin);
+			pos += size;
+
+			if (size < 1024) {
+				break;
+			}
+		}
+
+		buffer[pos] = 0;
+
+		int ret = cmd_set_internal(item, buffer);
+
+		free(buffer);
+		return ret;
+	}
+
+	return cmd_set_internal(item, value);
 }
 
 static void cmd_scan_printf(FILE *fp, const char *fmt, ...)
@@ -175,13 +230,19 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		return -1;
 	}
 
-	uint32_t channel_map = hdhomerun_device_model_channel_map_all(hd);
-	if (channel_map == 0) {
-		fprintf(stderr, "failed to detect channel_map set\n");
+	char *channelmap;
+	if (hdhomerun_device_get_tuner_channelmap(hd, &channelmap) <= 0) {
+		fprintf(stderr, "failed to query channelmap from device\n");
 		return -1;
 	}
 
-	if (hdhomerun_device_channelscan_init(hd, channel_map, 0) <= 0) {
+	const char *channelmap_scan_group = hdhomerun_channelmap_get_channelmap_scan_group(channelmap);
+	if (!channelmap_scan_group) {
+		fprintf(stderr, "unknown channelmap '%s'\n", channelmap);
+		return -1;
+	}
+
+	if (hdhomerun_device_channelscan_init(hd, channelmap_scan_group) <= 0) {
 		fprintf(stderr, "failed to initialize channel scan\n");
 		return -1;
 	}
@@ -233,21 +294,11 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 	return ret;
 }
 
-static void cmd_save_abort(int junk)
+static bool_t cmd_saving = FALSE;
+
+static void cmd_save_abort(int arg)
 {
-	struct hdhomerun_video_stats_t stats;
-	hdhomerun_device_get_video_stats(hd, &stats);
-	hdhomerun_device_stream_stop(hd);
-
-	fprintf(stderr, "\n");
-	fprintf(stderr, "-- Video statistics --\n");
-	fprintf(stderr, "%u packets received, %u network errors, %u transport errors, %u sequence errors\n",
-		(unsigned)stats.packet_count, 
-		(unsigned)stats.network_error_count, 
-		(unsigned)stats.transport_error_count, 
-		(unsigned)stats.sequence_error_count);
-
-	exit(0);
+	cmd_saving = FALSE;
 }
 
 static int cmd_save(const char *tuner_str, const char *filename)
@@ -257,53 +308,62 @@ static int cmd_save(const char *tuner_str, const char *filename)
 		return -1;
 	}
 
-	FILE *fp = NULL;
-
-	if (strcmp(filename, "-") == 0) {
+	FILE *fp;
+	if (strcmp(filename, "null") == 0) {
+		fp = NULL;
+	} else if (strcmp(filename, "-") == 0) {
 		fp = stdout;
-	} else if (strcmp(filename, "null") != 0) {
+	} else {
 		fp = fopen(filename, "wb");
-
 		if (!fp) {
 			fprintf(stderr, "unable to create file %s\n", filename);
 			return -1;
 		}
 	}
 
-	signal(SIGINT, cmd_save_abort);
-	signal(SIGPIPE, cmd_save_abort);
-
 	int ret = hdhomerun_device_stream_start(hd);
 	if (ret <= 0) {
 		fprintf(stderr, "unable to start stream\n");
-		fclose(fp);
 		return ret;
 	}
+
+	signal(SIGINT, cmd_save_abort);
+	signal(SIGPIPE, cmd_save_abort);
 
 	struct hdhomerun_video_stats_t stats_old, stats_cur;
 	hdhomerun_device_get_video_stats(hd, &stats_old);
 
 	uint64_t next_progress = getcurrenttime() + 1000;
-	while (1) {
-		usleep(64000);
+
+	cmd_saving = TRUE;
+	while (cmd_saving) {
+		uint64_t loop_start_time = getcurrenttime();
 
 		size_t actual_size;
 		uint8_t *ptr = hdhomerun_device_stream_recv(hd, VIDEO_DATA_BUFFER_SIZE_1S, &actual_size);
 		if (!ptr) {
+			msleep(64);
 			continue;
 		}
 
 		if (fp) {
-			fwrite(ptr, 1, actual_size, fp);
+			if (fwrite(ptr, 1, actual_size, fp) != actual_size) {
+				fprintf(stderr, "error writing output\n");
+				return -1;
+			}
 		}
 
-		uint64_t current_time = getcurrenttime();
-		if (current_time >= next_progress) {
-			next_progress = current_time + 1000;
+		if (loop_start_time >= next_progress) {
+			next_progress += 1000;
+			if (loop_start_time >= next_progress) {
+				next_progress = loop_start_time + 1000;
+			}
 
 			hdhomerun_device_get_video_stats(hd, &stats_cur);
 
-			if (stats_cur.network_error_count > stats_old.network_error_count) {
+			if (stats_cur.overflow_error_count > stats_old.overflow_error_count) {
+				fprintf(stderr, "o");
+			} else if (stats_cur.network_error_count > stats_old.network_error_count) {
 				fprintf(stderr, "n");
 			} else if (stats_cur.transport_error_count > stats_old.transport_error_count) {
 				fprintf(stderr, "t");
@@ -316,7 +376,32 @@ static int cmd_save(const char *tuner_str, const char *filename)
 			stats_old = stats_cur;
 			fflush(stderr);
 		}
+
+		int32_t delay = 64 - (int32_t)(getcurrenttime() - loop_start_time);
+		if (delay <= 0) {
+			continue;
+		}
+
+		msleep(delay);
 	}
+
+	if (fp) {
+		fclose(fp);
+	}
+
+	hdhomerun_device_stream_stop(hd);
+	hdhomerun_device_get_video_stats(hd, &stats_cur);
+
+	fprintf(stderr, "\n");
+	fprintf(stderr, "-- Video statistics --\n");
+	fprintf(stderr, "%u packets received, %u overflow errors, %u network errors, %u transport errors, %u sequence errors\n",
+		(unsigned int)stats_cur.packet_count, 
+		(unsigned int)stats_cur.overflow_error_count,
+		(unsigned int)stats_cur.network_error_count, 
+		(unsigned int)stats_cur.transport_error_count, 
+		(unsigned int)stats_cur.sequence_error_count);
+
+	return 0;
 }
 
 static int cmd_upgrade(const char *filename)
@@ -360,6 +445,62 @@ static int cmd_upgrade(const char *filename)
 	return 0;
 }
 
+static int cmd_execute(void)
+{
+	char *ret_value;
+	char *ret_error;
+	if (hdhomerun_device_get_var(hd, "/sys/boot", &ret_value, &ret_error) < 0) {
+		fprintf(stderr, "communication error sending request to hdhomerun device\n");
+		return -1;
+	}
+
+	if (ret_error) {
+		printf("%s\n", ret_error);
+		return 0;
+	}
+
+	char *end = ret_value + strlen(ret_value);
+	char *pos = ret_value;
+
+	while (1) {
+		if (pos >= end) {
+			break;
+		}
+
+		char *eol_r = strchr(pos, '\r');
+		if (!eol_r) {
+			eol_r = end;
+		}
+
+		char *eol_n = strchr(pos, '\n');
+		if (!eol_n) {
+			eol_n = end;
+		}
+
+		char *eol = min(eol_r, eol_n);
+
+		char *sep = strchr(pos, ' ');
+		if (!sep || sep > eol) {
+			pos = eol + 1;
+			continue;
+		}
+
+		*sep = 0;
+		*eol = 0;
+
+		char *item = pos;
+		char *value = sep + 1;
+
+		printf("set %s \"%s\"\n", item, value);
+
+		cmd_set_internal(item, value);
+
+		pos = eol + 1;
+	}
+
+	return 1;
+}
+
 static int main_cmd(int argc, char *argv[])
 {
 	if (argc < 1) {
@@ -367,6 +508,17 @@ static int main_cmd(int argc, char *argv[])
 	}
 
 	char *cmd = *argv++; argc--;
+
+	if (contains(cmd, "key")) {
+		if (argc < 2) {
+			return help();
+		}
+		uint32_t lockkey = strtoul(argv[0], NULL, 0);
+		hdhomerun_device_tuner_lockkey_use_value(hd, lockkey);
+
+		cmd = argv[1];
+		argv+=2; argc-=2;
+	}
 
 	if (contains(cmd, "get")) {
 		if (argc < 1) {
@@ -407,12 +559,17 @@ static int main_cmd(int argc, char *argv[])
 		return cmd_upgrade(argv[0]);
 	}
 
+	if (contains(cmd, "execute")) {
+		return cmd_execute();
+	}
+
 	return help();
 }
 
 static int main_internal(int argc, char *argv[])
 {
 #if defined(__WINDOWS__)
+	/* Initialize network socket support. */
 	WORD wVersionRequested = MAKEWORD(2, 0);
 	WSADATA wsaData;
 	WSAStartup(wVersionRequested, &wsaData);
@@ -439,7 +596,7 @@ static int main_internal(int argc, char *argv[])
 	}
 
 	/* Device object. */
-	hd = hdhomerun_device_create_from_str(id_str);
+	hd = hdhomerun_device_create_from_str(id_str, NULL);
 	if (!hd) {
 		fprintf(stderr, "invalid device id: %s\n", id_str);
 		return -1;

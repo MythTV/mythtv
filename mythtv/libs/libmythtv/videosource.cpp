@@ -1836,7 +1836,7 @@ bool HDHomeRunConfigurationGroup::ProbeCard(HDHomeRunDevice &tmpdevice)
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t *thisdevice =
         hdhomerun_device_create_from_str(
-            tmpdevice.mythdeviceid.toLocal8Bit().constData());
+            tmpdevice.mythdeviceid.toLocal8Bit().constData(), NULL);
 
     if (thisdevice)
     {

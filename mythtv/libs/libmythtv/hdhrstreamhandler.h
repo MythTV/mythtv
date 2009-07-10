@@ -22,6 +22,8 @@ class DeviceReadBuffer;
 // HDHomeRun headers
 #ifdef USING_HDHOMERUN
 #include "hdhomerun.h"
+#undef max
+#undef min
 #else
 struct hdhomerun_control_sock_t { int dummy; };
 #endif
@@ -68,14 +70,18 @@ class HDHRStreamHandler : public ReaderPausedCB
     bool Connect(void);
 
     QString DeviceGet(const QString &name,
-                      bool report_error_return = true) const;
+                      bool report_error_return = true,
+                      bool print_error = true) const;
     QString DeviceSet(const QString &name, const QString &value,
-                      bool report_error_return = true);
+                      bool report_error_return = true,
+                      bool print_error = true);
 
     QString TunerGet(const QString &name,
-                     bool report_error_return = true) const;
+                     bool report_error_return = true,
+                     bool print_error = true) const;
     QString TunerSet(const QString &name, const QString &value,
-                     bool report_error_return = true);
+                     bool report_error_return = true,
+                     bool print_error = true);
 
     bool DeviceSetTarget(short unsigned int);
     bool DeviceClearTarget(void);

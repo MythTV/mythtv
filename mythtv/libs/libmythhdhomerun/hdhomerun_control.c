@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
 #include "hdhomerun.h"
@@ -54,13 +67,15 @@ void hdhomerun_control_set_device(struct hdhomerun_control_sock_t *cs, uint32_t 
 	cs->actual_device_ip = 0;
 }
 
-struct hdhomerun_control_sock_t *hdhomerun_control_create(uint32_t device_id, uint32_t device_ip)
+struct hdhomerun_control_sock_t *hdhomerun_control_create(uint32_t device_id, uint32_t device_ip, struct hdhomerun_debug_t *dbg)
 {
 	struct hdhomerun_control_sock_t *cs = (struct hdhomerun_control_sock_t *)calloc(1, sizeof(struct hdhomerun_control_sock_t));
 	if (!cs) {
+		hdhomerun_debug_printf(dbg, "hdhomerun_control_create: failed to allocate control object\n");
 		return NULL;
 	}
 
+	cs->dbg = dbg;
 	cs->sock = -1;
 	hdhomerun_control_set_device(cs, device_id, device_ip);
 
@@ -71,11 +86,6 @@ void hdhomerun_control_destroy(struct hdhomerun_control_sock_t *cs)
 {
 	hdhomerun_control_close_sock(cs);
 	free(cs);
-}
-
-void hdhomerun_control_set_debug(struct hdhomerun_control_sock_t *cs, struct hdhomerun_debug_t *dbg)
-{
-	cs->dbg = dbg;
 }
 
 static bool_t hdhomerun_control_connect_sock(struct hdhomerun_control_sock_t *cs)
@@ -276,7 +286,7 @@ int hdhomerun_control_send_recv(struct hdhomerun_control_sock_t *cs, struct hdho
 	return hdhomerun_control_send_recv_internal(cs, tx_pkt, rx_pkt, type, HDHOMERUN_CONTROL_RECV_TIMEOUT);
 }
 
-static int hdhomerun_control_get_set(struct hdhomerun_control_sock_t *cs, const char *name, const char *value, char **pvalue, char **perror)
+static int hdhomerun_control_get_set(struct hdhomerun_control_sock_t *cs, const char *name, const char *value, uint32_t lockkey, char **pvalue, char **perror)
 {
 	struct hdhomerun_pkt_t *tx_pkt = &cs->tx_pkt;
 	struct hdhomerun_pkt_t *rx_pkt = &cs->rx_pkt;
@@ -285,19 +295,38 @@ static int hdhomerun_control_get_set(struct hdhomerun_control_sock_t *cs, const 
 	hdhomerun_pkt_reset(tx_pkt);
 
 	int name_len = (int)strlen(name) + 1;
+	if (tx_pkt->end + 3 + name_len > tx_pkt->limit) {
+		hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_get_set: request too long\n");
+		return -1;
+	}
 	hdhomerun_pkt_write_u8(tx_pkt, HDHOMERUN_TAG_GETSET_NAME);
 	hdhomerun_pkt_write_var_length(tx_pkt, name_len);
-	hdhomerun_pkt_write_mem(tx_pkt, (const void *)name, name_len);
+	hdhomerun_pkt_write_mem(tx_pkt, (void *)name, name_len);
 
 	if (value) {
 		int value_len = (int)strlen(value) + 1;
+		if (tx_pkt->end + 3 + value_len > tx_pkt->limit) {
+			hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_get_set: request too long\n");
+			return -1;
+		}
 		hdhomerun_pkt_write_u8(tx_pkt, HDHOMERUN_TAG_GETSET_VALUE);
 		hdhomerun_pkt_write_var_length(tx_pkt, value_len);
-		hdhomerun_pkt_write_mem(tx_pkt, (const void *)value, value_len);
+		hdhomerun_pkt_write_mem(tx_pkt, (void *)value, value_len);
+	}
+
+	if (lockkey != 0) {
+		if (tx_pkt->end + 6 > tx_pkt->limit) {
+			hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_get_set: request too long\n");
+			return -1;
+		}
+		hdhomerun_pkt_write_u8(tx_pkt, HDHOMERUN_TAG_GETSET_LOCKKEY);
+		hdhomerun_pkt_write_var_length(tx_pkt, 4);
+		hdhomerun_pkt_write_u32(tx_pkt, lockkey);
 	}
 
 	/* Send/Recv. */
 	if (hdhomerun_control_send_recv_internal(cs, tx_pkt, rx_pkt, HDHOMERUN_TYPE_GETSET_REQ, HDHOMERUN_CONTROL_RECV_TIMEOUT) < 0) {
+		hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_get_set: send/recv error\n");
 		return -1;
 	}
 
@@ -322,13 +351,16 @@ static int hdhomerun_control_get_set(struct hdhomerun_control_sock_t *cs, const 
 			return 1;
 
 		case HDHOMERUN_TAG_ERROR_MESSAGE:
+			rx_pkt->pos[len] = 0;
+			hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_get_set: %s\n", rx_pkt->pos);
+
 			if (pvalue) {
 				*pvalue = NULL;
 			}
 			if (perror) {
 				*perror = (char *)rx_pkt->pos;
-				rx_pkt->pos[len] = 0;
 			}
+
 			return 0;
 		}
 
@@ -341,12 +373,17 @@ static int hdhomerun_control_get_set(struct hdhomerun_control_sock_t *cs, const 
 
 int hdhomerun_control_get(struct hdhomerun_control_sock_t *cs, const char *name, char **pvalue, char **perror)
 {
-	return hdhomerun_control_get_set(cs, name, NULL, pvalue, perror);
+	return hdhomerun_control_get_set(cs, name, NULL, 0, pvalue, perror);
 }
 
 int hdhomerun_control_set(struct hdhomerun_control_sock_t *cs, const char *name, const char *value, char **pvalue, char **perror)
 {
-	return hdhomerun_control_get_set(cs, name, value, pvalue, perror);
+	return hdhomerun_control_get_set(cs, name, value, 0, pvalue, perror);
+}
+
+int hdhomerun_control_set_with_lockkey(struct hdhomerun_control_sock_t *cs, const char *name, const char *value, uint32_t lockkey, char **pvalue, char **perror)
+{
+	return hdhomerun_control_get_set(cs, name, value, lockkey, pvalue, perror);
 }
 
 int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade_file)
@@ -368,6 +405,7 @@ int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade
 		hdhomerun_pkt_write_mem(tx_pkt, data, length);
 
 		if (hdhomerun_control_send_recv_internal(cs, tx_pkt, NULL, HDHOMERUN_TYPE_UPGRADE_REQ, 0) < 0) {
+			hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_upgrade: send/recv failed\n");
 			return -1;
 		}
 
@@ -376,6 +414,7 @@ int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade
 
 	if (sequence == 0) {
 		/* No data in file. Error, but no need to close connection. */
+		hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_upgrade: zero length file\n");
 		return 0;
 	}
 
@@ -384,6 +423,7 @@ int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade
 	hdhomerun_pkt_write_u32(tx_pkt, 0xFFFFFFFF);
 
 	if (hdhomerun_control_send_recv_internal(cs, tx_pkt, rx_pkt, HDHOMERUN_TYPE_UPGRADE_REQ, HDHOMERUN_CONTROL_UPGRADE_TIMEOUT) < 0) {
+		hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_upgrade: send/recv failed\n");
 		return -1;
 	}
 
@@ -398,6 +438,8 @@ int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade
 
 		switch (tag) {
 		case HDHOMERUN_TAG_ERROR_MESSAGE:
+			rx_pkt->pos[len] = 0;
+			hdhomerun_debug_printf(cs->dbg, "hdhomerun_control_upgrade: %s\n", (char *)rx_pkt->pos);
 			return 0;
 
 		default:

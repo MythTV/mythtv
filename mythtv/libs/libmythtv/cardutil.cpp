@@ -2013,7 +2013,7 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
 
 #ifdef USING_HDHOMERUN
     hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toAscii());
+    hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);
     if (!hdhr)
         return false;
 
@@ -2054,7 +2054,7 @@ QString CardUtil::GetHDHRdesc(const QString &device)
                         + device + ") - trying to locate device");
 
     hdhomerun_device_t  *hdhr;
-    hdhr = hdhomerun_device_create_from_str(device.toAscii());
+    hdhr = hdhomerun_device_create_from_str(device.toAscii(), NULL);
     if (!hdhr)
         return QObject::tr("Invalid Device ID or address.");
 

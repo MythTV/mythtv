@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
 /*
@@ -210,7 +223,7 @@ void hdhomerun_debug_flush(struct hdhomerun_debug_t *dbg, uint64_t timeout)
 			return;
 		}
 
-		usleep(10*1000);
+		msleep(10);
 	}
 }
 
@@ -240,26 +253,59 @@ void hdhomerun_debug_vprintf(struct hdhomerun_debug_t *dbg, const char *fmt, va_
 	char *end = message->buffer + sizeof(message->buffer) - 2;
 	*end = 0;
 
-	time_t t = time(NULL);
-	strftime(ptr, end - ptr, "%Y%m%d-%H:%M:%S ", localtime(&t));
-	ptr = strchr(ptr, 0);
+	/*
+	 * Timestamp.
+	 */
+	time_t current_time = time(NULL);
+	ptr += strftime(ptr, end - ptr, "%Y%m%d-%H:%M:%S ", localtime(&current_time));
+	if (ptr > end) {
+		ptr = end;
+	}
 
+	/*
+	 * Debug prefix.
+	 */
 	pthread_mutex_lock(&dbg->print_lock);
 
 	if (dbg->prefix) {
-		snprintf(ptr, end - ptr, "%s ", dbg->prefix);
-		ptr = strchr(ptr, 0);
+		int len = snprintf(ptr, end - ptr, "%s ", dbg->prefix);
+		len = (len <= 0) ? 0 : len;
+		ptr += len;
+		if (ptr > end) {
+			ptr = end;
+		}
 	}
 
 	pthread_mutex_unlock(&dbg->print_lock);
 
-	vsnprintf(ptr, end - ptr, fmt, args);
-
-	ptr = strchr(ptr, 0) - 1;
-	if (*ptr++ != '\n') {
-		strcpy(ptr, "\n");
+	/*
+	 * Message text.
+	 */
+	int len = vsnprintf(ptr, end - ptr, fmt, args);
+	len = (len < 0) ? 0 : len; /* len does not include null */
+	ptr += len;
+	if (ptr > end) {
+		ptr = end;
 	}
 
+	/*
+	 * Force newline.
+	 */
+	if ((ptr[-1] != '\n') && (ptr + 1 <= end)) {
+		*ptr++ = '\n';
+	}
+
+	/*
+	 * Force NULL.
+	 */
+	if (ptr + 1 > end) {
+		ptr = end - 1;
+	}
+	*ptr++ = 0;
+
+	/*
+	 * Enqueue.
+	 */
 	pthread_mutex_lock(&dbg->queue_lock);
 
 	message->prev = NULL;
@@ -283,7 +329,7 @@ static bool_t hdhomerun_debug_output_message_file(struct hdhomerun_debug_t *dbg,
 		if (current_time < dbg->connect_delay) {
 			return FALSE;
 		}
-		dbg->connect_delay = current_time + 60*1000;
+		dbg->connect_delay = current_time + 30*1000;
 
 		dbg->file_fp = fopen(dbg->file_name, "a");
 		if (!dbg->file_fp) {
@@ -311,7 +357,7 @@ static bool_t hdhomerun_debug_output_message_sock(struct hdhomerun_debug_t *dbg,
 		if (current_time < dbg->connect_delay) {
 			return FALSE;
 		}
-		dbg->connect_delay = current_time + 60*1000;
+		dbg->connect_delay = current_time + 30*1000;
 
 		dbg->sock = (int)socket(AF_INET, SOCK_STREAM, 0);
 		if (dbg->sock == -1) {
@@ -397,7 +443,7 @@ static THREAD_FUNC_PREFIX hdhomerun_debug_thread_execute(void *arg)
 		pthread_mutex_unlock(&dbg->queue_lock);
 
 		if (!message) {
-			sleep(1);
+			msleep(250);
 			continue;
 		}
 
@@ -407,7 +453,7 @@ static THREAD_FUNC_PREFIX hdhomerun_debug_thread_execute(void *arg)
 		}
 
 		if (!hdhomerun_debug_output_message(dbg, message)) {
-			sleep(1);
+			msleep(250);
 			continue;
 		}
 

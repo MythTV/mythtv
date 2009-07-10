@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
 #include "hdhomerun.h"
@@ -23,21 +36,27 @@
 #include <windows.h>
 #include <iphlpapi.h>
 #define USE_IPHLPAPI 1
+#else
+#include <net/if.h>
+#include <sys/ioctl.h>
+#ifndef _SIZEOF_ADDR_IFREQ
+#define _SIZEOF_ADDR_IFREQ(x) sizeof(x)
+#endif
 #endif
 
 #include <sys/param.h>  // Defines BSD on FreeBSD and Mac OS X
-
 #if defined(__linux__) || defined(__APPLE__) || defined(BSD)
-#include <ifaddrs.h>
-#define USE_IFADDRS 1
-#include <sys/select.h>
+#  include <ifaddrs.h>
+#  define USE_IFADDRS 1
+#  include <sys/select.h>
 #endif
 
 #define HDHOMERUN_DISOCVER_MAX_SOCK_COUNT 16
 
 struct hdhomerun_discover_sock_t {
 	int sock;
-	uint32_t broadcast_ip;
+	uint32_t local_ip;
+	uint32_t subnet_mask;
 };
 
 struct hdhomerun_discover_t {
@@ -47,16 +66,16 @@ struct hdhomerun_discover_t {
 	struct hdhomerun_pkt_t rx_pkt;
 };
 
-static void hdhomerun_discover_sock_create(struct hdhomerun_discover_t *ds, uint32_t local_ip, uint32_t mask)
+static bool_t hdhomerun_discover_sock_create(struct hdhomerun_discover_t *ds, uint32_t local_ip, uint32_t subnet_mask)
 {
 	if (ds->sock_count >= HDHOMERUN_DISOCVER_MAX_SOCK_COUNT) {
-		return;
+		return FALSE;
 	}
 
 	/* Create socket. */
 	int sock = (int)socket(AF_INET, SOCK_DGRAM, 0);
 	if (sock == -1) {
-		return;
+		return FALSE;
 	}
 
 	/* Set timeouts. */
@@ -75,13 +94,16 @@ static void hdhomerun_discover_sock_create(struct hdhomerun_discover_t *ds, uint
 	sock_addr.sin_port = htons(0);
 	if (bind(sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) != 0) {
 		close(sock);
-		return;
+		return FALSE;
 	}
 
 	/* Write sock entry. */
 	struct hdhomerun_discover_sock_t *dss = &ds->socks[ds->sock_count++];
 	dss->sock = sock;
-	dss->broadcast_ip = local_ip | ~mask;
+	dss->local_ip = local_ip;
+	dss->subnet_mask = subnet_mask;
+
+	return TRUE;
 }
 
 #if defined(USE_IPHLPAPI)
@@ -125,45 +147,52 @@ static void hdhomerun_discover_sock_detect(struct hdhomerun_discover_t *ds)
 
 	free(pAdapterInfo);
 }
-#endif
 
-#if defined(USE_IFADDRS)
+#else
+
 static void hdhomerun_discover_sock_detect(struct hdhomerun_discover_t *ds)
 {
-	struct ifaddrs *ifap;
-	if (getifaddrs(&ifap) < 0) {
+	int fd = socket(AF_INET, SOCK_DGRAM, 0);
+	if (fd == -1) {
 		return;
 	}
 
-	struct ifaddrs *p = ifap;
-	while (p) {
-		struct sockaddr_in *addr_in = (struct sockaddr_in *)p->ifa_addr;
-		struct sockaddr_in *mask_in = (struct sockaddr_in *)p->ifa_netmask;
-		if (!addr_in || !mask_in) {
-			p = p->ifa_next;
-			continue;
-		}
+	struct ifconf ifc;
+	uint8_t buf[8192];
+	ifc.ifc_len = sizeof(buf);
+	ifc.ifc_buf = (char *)buf;
 
-		uint32_t local_ip = ntohl(addr_in->sin_addr.s_addr);
-		uint32_t mask = ntohl(mask_in->sin_addr.s_addr);
-		if (local_ip == 0) {
-			p = p->ifa_next;
-			continue;
-		}
+	memset(buf, 0, sizeof(buf));
 
-		hdhomerun_discover_sock_create(ds, local_ip, mask);
-		p = p->ifa_next;
+	if (ioctl(fd, SIOCGIFCONF, &ifc) != 0) {
+		close(fd);
+		return;
 	}
 
-	freeifaddrs(ifap);
-}
-#endif
+	uint8_t *ptr = (uint8_t *)ifc.ifc_req;
+	uint8_t	*end = (uint8_t *)&ifc.ifc_buf[ifc.ifc_len];
 
+	while (ptr <= end) {
+		struct ifreq *ifr = (struct ifreq *)ptr;
+		ptr += _SIZEOF_ADDR_IFREQ(*ifr);
 
-#if !defined(USE_IPHLPAPI) && !defined(USE_IFADDRS)
-static void hdhomerun_discover_sock_detect(struct hdhomerun_discover_t *ds)
-{
-	/* do nothing */
+		if (ioctl(fd, SIOCGIFADDR, ifr) != 0) {
+			continue;
+		}
+		struct sockaddr_in *addr_in = (struct sockaddr_in *)&(ifr->ifr_addr);
+		uint32_t local_ip = ntohl(addr_in->sin_addr.s_addr);
+		if (local_ip == 0) {
+			continue;
+		}
+
+		if (ioctl(fd, SIOCGIFNETMASK, ifr) != 0) {
+			continue;
+		}
+		struct sockaddr_in *mask_in = (struct sockaddr_in *)&(ifr->ifr_addr);
+		uint32_t mask = ntohl(mask_in->sin_addr.s_addr);
+
+		hdhomerun_discover_sock_create(ds, local_ip, mask);
+	}
 }
 #endif
 
@@ -174,15 +203,14 @@ static struct hdhomerun_discover_t *hdhomerun_discover_create(void)
 		return NULL;
 	}
 
-	/* Detect & create sockets. */
-	hdhomerun_discover_sock_detect(ds);
-	if (ds->sock_count == 0) {
-		hdhomerun_discover_sock_create(ds, 0, 0);
-		if (ds->sock_count == 0) {
-			free(ds);
-			return NULL;
-		}
+	/* Create a routable socket. */
+	if (!hdhomerun_discover_sock_create(ds, 0, 0)) {
+		free(ds);
+		return NULL;
 	}
+
+	/* Detect & create local sockets. */
+	hdhomerun_discover_sock_detect(ds);
 
 	/* Success. */
 	return ds;
@@ -201,10 +229,6 @@ static void hdhomerun_discover_destroy(struct hdhomerun_discover_t *ds)
 
 static bool_t hdhomerun_discover_send_internal(struct hdhomerun_discover_t *ds, struct hdhomerun_discover_sock_t *dss, uint32_t target_ip, uint32_t device_type, uint32_t device_id)
 {
-	if (target_ip == 0) {
-		target_ip = dss->broadcast_ip;
-	}
-
 	struct hdhomerun_pkt_t *tx_pkt = &ds->tx_pkt;
 	hdhomerun_pkt_reset(tx_pkt);
 
@@ -230,17 +254,68 @@ static bool_t hdhomerun_discover_send_internal(struct hdhomerun_discover_t *ds, 
 	return TRUE;
 }
 
-static bool_t hdhomerun_discover_send(struct hdhomerun_discover_t *ds, uint32_t target_ip, uint32_t device_type, uint32_t device_id)
+static bool_t hdhomerun_discover_send_wildcard_ip(struct hdhomerun_discover_t *ds, uint32_t device_type, uint32_t device_id)
 {
 	bool_t result = FALSE;
 
+	/*
+	 * Send subnet broadcast using each local ip socket.
+	 * This will work with multiple separate 169.254.x.x interfaces.
+	 */
 	unsigned int i;
-	for (i = 0; i < ds->sock_count; i++) {
+	for (i = 1; i < ds->sock_count; i++) {
 		struct hdhomerun_discover_sock_t *dss = &ds->socks[i];
+		uint32_t target_ip = dss->local_ip | ~dss->subnet_mask;
 		result |= hdhomerun_discover_send_internal(ds, dss, target_ip, device_type, device_id);
 	}
 
+	/*
+	 * If no local ip sockets then fall back to sending a global broadcast letting the OS choose the interface.
+	 */
+	if (!result) {
+		struct hdhomerun_discover_sock_t *dss = &ds->socks[0];
+		result = hdhomerun_discover_send_internal(ds, dss, 0xFFFFFFFF, device_type, device_id);
+	}
+
 	return result;
+}
+
+static bool_t hdhomerun_discover_send_target_ip(struct hdhomerun_discover_t *ds, uint32_t target_ip, uint32_t device_type, uint32_t device_id)
+{
+	bool_t result = FALSE;
+
+	/*
+	 * Send targeted packet from any local ip that is in the same subnet.
+	 * This will work with multiple separate 169.254.x.x interfaces.
+	 */
+	unsigned int i;
+	for (i = 1; i < ds->sock_count; i++) {
+		struct hdhomerun_discover_sock_t *dss = &ds->socks[i];
+		if ((target_ip & dss->subnet_mask) != (dss->local_ip & dss->subnet_mask)) {
+			continue;
+		}
+
+		result |= hdhomerun_discover_send_internal(ds, dss, target_ip, device_type, device_id);
+	}
+
+	/*
+	 * If target IP does not match a local subnet then fall back to letting the OS choose the gateway interface.
+	 */
+	if (!result) {
+		struct hdhomerun_discover_sock_t *dss = &ds->socks[0];
+		result = hdhomerun_discover_send_internal(ds, dss, target_ip, device_type, device_id);
+	}
+
+	return result;
+}
+
+static bool_t hdhomerun_discover_send(struct hdhomerun_discover_t *ds, uint32_t target_ip, uint32_t device_type, uint32_t device_id)
+{
+	if (target_ip != 0) {
+		return hdhomerun_discover_send_target_ip(ds, target_ip, device_type, device_id);
+	}
+
+	return hdhomerun_discover_send_wildcard_ip(ds, device_type, device_id);
 }
 
 static int hdhomerun_discover_recv_internal(struct hdhomerun_discover_t *ds, struct hdhomerun_discover_sock_t *dss, struct hdhomerun_discover_device_t *result)

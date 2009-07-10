@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
 #include "hdhomerun.h"
@@ -25,6 +38,7 @@ struct hdhomerun_device_t {
 	struct hdhomerun_debug_t *dbg;
 	struct hdhomerun_channelscan_t *scan;
 	unsigned int tuner;
+	uint32_t lockkey;
 	char name[32];
 	char model[32];
 };
@@ -50,15 +64,19 @@ void hdhomerun_device_set_tuner(struct hdhomerun_device_t *hd, unsigned int tune
 	hdhomerun_device_set_update(hd);
 }
 
-struct hdhomerun_device_t *hdhomerun_device_create(uint32_t device_id, uint32_t device_ip, unsigned int tuner)
+struct hdhomerun_device_t *hdhomerun_device_create(uint32_t device_id, uint32_t device_ip, unsigned int tuner, struct hdhomerun_debug_t *dbg)
 {
 	struct hdhomerun_device_t *hd = (struct hdhomerun_device_t *)calloc(1, sizeof(struct hdhomerun_device_t));
 	if (!hd) {
+		hdhomerun_debug_printf(dbg, "hdhomerun_device_create: failed to allocate device object\n");
 		return NULL;
 	}
 
-	hd->cs = hdhomerun_control_create(0, 0);
+	hd->dbg = dbg;
+
+	hd->cs = hdhomerun_control_create(0, 0, hd->dbg);
 	if (!hd->cs) {
+		hdhomerun_debug_printf(hd->dbg, "hdhomerun_device_create: failed to create control object\n");
 		free(hd);
 		return NULL;
 	}
@@ -98,7 +116,7 @@ static bool_t is_hex_char(char c)
 	return FALSE;
 }
 
-static struct hdhomerun_device_t *hdhomerun_device_create_from_str_device_id(const char *device_str)
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_device_id(const char *device_str, struct hdhomerun_debug_t *dbg)
 {
 	int i;
 	const char *ptr = device_str;
@@ -113,7 +131,7 @@ static struct hdhomerun_device_t *hdhomerun_device_create_from_str_device_id(con
 		if (sscanf(device_str, "%lx", &device_id) != 1) {
 			return NULL;
 		}
-		return hdhomerun_device_create((uint32_t)device_id, 0, 0);
+		return hdhomerun_device_create((uint32_t)device_id, 0, 0, dbg);
 	}
 
 	if (*ptr == '-') {
@@ -122,13 +140,13 @@ static struct hdhomerun_device_t *hdhomerun_device_create_from_str_device_id(con
 		if (sscanf(device_str, "%lx-%u", &device_id, &tuner) != 2) {
 			return NULL;
 		}
-		return hdhomerun_device_create((uint32_t)device_id, 0, tuner);
+		return hdhomerun_device_create((uint32_t)device_id, 0, tuner, dbg);
 	}
 
 	return NULL;
 }
 
-static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char *device_str)
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char *device_str, struct hdhomerun_debug_t *dbg)
 {
 	unsigned long a[4];
 	unsigned int tuner;
@@ -141,10 +159,10 @@ static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char
 	}
 
 	unsigned long device_ip = (a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0);
-	return hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, tuner);
+	return hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, tuner, dbg);
 }
 
-static struct hdhomerun_device_t *hdhomerun_device_create_from_str_dns(const char *device_str)
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_dns(const char *device_str, struct hdhomerun_debug_t *dbg)
 {
 #if defined(__CYGWIN__)
 	return NULL;
@@ -168,23 +186,23 @@ static struct hdhomerun_device_t *hdhomerun_device_create_from_str_dns(const cha
 		return NULL;
 	}
 
-	return hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, 0);
+	return hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, 0, dbg);
 #endif
 }
 
-struct hdhomerun_device_t *hdhomerun_device_create_from_str(const char *device_str)
+struct hdhomerun_device_t *hdhomerun_device_create_from_str(const char *device_str, struct hdhomerun_debug_t *dbg)
 {
-	struct hdhomerun_device_t *device = hdhomerun_device_create_from_str_device_id(device_str);
+	struct hdhomerun_device_t *device = hdhomerun_device_create_from_str_device_id(device_str, dbg);
 	if (device) {
 		return device;
 	}
 
-	device = hdhomerun_device_create_from_str_ip(device_str);
+	device = hdhomerun_device_create_from_str_ip(device_str, dbg);
 	if (device) {
 		return device;
 	}
 
-	device = hdhomerun_device_create_from_str_dns(device_str);
+	device = hdhomerun_device_create_from_str_dns(device_str, dbg);
 	if (device) {
 		return device;
 	}
@@ -205,16 +223,6 @@ int hdhomerun_device_set_tuner_from_str(struct hdhomerun_device_t *hd, const cha
 	}
 
 	return -1;
-}
-
-void hdhomerun_device_set_debug(struct hdhomerun_device_t *hd, struct hdhomerun_debug_t *dbg)
-{
-	hd->dbg = dbg;
-	hdhomerun_control_set_debug(hd->cs, dbg);
-
-	if (hd->vs) {
-		hdhomerun_video_set_debug(hd->vs, dbg);
-	}
 }
 
 uint32_t hdhomerun_device_get_device_id(struct hdhomerun_device_t *hd)
@@ -253,12 +261,12 @@ struct hdhomerun_video_sock_t *hdhomerun_device_get_video_sock(struct hdhomerun_
 		return hd->vs;
 	}
 
-	hd->vs = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S * 2);
+	hd->vs = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S * 2, hd->dbg);
 	if (!hd->vs) {
+		hdhomerun_debug_printf(hd->dbg, "hdhomerun_device_get_video_sock: failed to create video object\n");
 		return NULL;
 	}
 
-	hdhomerun_video_set_debug(hd->vs, hd->dbg);
 	return hd->vs;
 }
 
@@ -280,22 +288,39 @@ static uint32_t hdhomerun_device_get_status_parse(const char *status_str, const 
 	return (uint32_t)value;
 }
 
+static bool_t hdhomerun_device_get_tuner_status_lock_is_bcast(struct hdhomerun_tuner_status_t *status)
+{
+	if (strcmp(status->lock_str, "8vsb") == 0) {
+		return TRUE;
+	}
+	if (strncmp(status->lock_str, "t8", 2) == 0) {
+		return TRUE;
+	}
+	if (strncmp(status->lock_str, "t7", 2) == 0) {
+		return TRUE;
+	}
+	if (strncmp(status->lock_str, "t6", 2) == 0) {
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 uint32_t hdhomerun_device_get_tuner_status_ss_color(struct hdhomerun_tuner_status_t *status)
 {
 	unsigned int ss_yellow_min;
 	unsigned int ss_green_min;
 
-	if (strstr(status->lock_str, "8vsb")) {
+	if (!status->lock_supported) {
+		return HDHOMERUN_STATUS_COLOR_NEUTRAL;
+	}
+
+	if (hdhomerun_device_get_tuner_status_lock_is_bcast(status)) {
 		ss_yellow_min = 50;	/* -30dBmV */
 		ss_green_min = 75;	/* -15dBmV */
-	} else if (strstr(status->lock_str, "qam64")) {
-		ss_yellow_min = 80;	/* -12dBmV */
-		ss_green_min = 90;	/* -6dBmV */
-	} else if (strstr(status->lock_str, "qam256")) {
-		ss_yellow_min = 80;	/* -12dBmV */
-		ss_green_min = 90;	/* -6dBmV */
 	} else {
-		return HDHOMERUN_STATUS_COLOR_NEUTRAL;
+		ss_yellow_min = 80;	/* -12dBmV */
+		ss_green_min = 90;	/* -6dBmV */
 	}
 
 	if (status->signal_strength >= ss_green_min) {
@@ -310,10 +335,10 @@ uint32_t hdhomerun_device_get_tuner_status_ss_color(struct hdhomerun_tuner_statu
 
 uint32_t hdhomerun_device_get_tuner_status_snq_color(struct hdhomerun_tuner_status_t *status)
 {
-	if (status->signal_to_noise_quality >= 60) {
+	if (status->signal_to_noise_quality >= 70) {
 		return HDHOMERUN_STATUS_COLOR_GREEN;
 	}
-	if (status->signal_to_noise_quality >= 40) {
+	if (status->signal_to_noise_quality >= 50) {
 		return HDHOMERUN_STATUS_COLOR_YELLOW;
 	}
 
@@ -466,6 +491,13 @@ int hdhomerun_device_get_tuner_plotsample(struct hdhomerun_device_t *hd, struct 
 	return 1;
 }
 
+int hdhomerun_device_get_tuner_lockkey_owner(struct hdhomerun_device_t *hd, char **powner)
+{
+	char name[32];
+	sprintf(name, "/tuner%u/lockkey", hd->tuner);
+	return hdhomerun_control_get(hd->cs, name, powner, NULL);
+}
+
 int hdhomerun_device_get_ir_target(struct hdhomerun_device_t *hd, char **ptarget)
 {
 	return hdhomerun_control_get(hd->cs, "/ir/target", ptarget, NULL);
@@ -504,21 +536,21 @@ int hdhomerun_device_set_tuner_channel(struct hdhomerun_device_t *hd, const char
 {
 	char name[32];
 	sprintf(name, "/tuner%u/channel", hd->tuner);
-	return hdhomerun_control_set(hd->cs, name, channel, NULL, NULL);
+	return hdhomerun_control_set_with_lockkey(hd->cs, name, channel, hd->lockkey, NULL, NULL);
 }
 
 int hdhomerun_device_set_tuner_channelmap(struct hdhomerun_device_t *hd, const char *channelmap)
 {
 	char name[32];
 	sprintf(name, "/tuner%u/channelmap", hd->tuner);
-	return hdhomerun_control_set(hd->cs, name, channelmap, NULL, NULL);
+	return hdhomerun_control_set_with_lockkey(hd->cs, name, channelmap, hd->lockkey, NULL, NULL);
 }
 
 int hdhomerun_device_set_tuner_filter(struct hdhomerun_device_t *hd, const char *filter)
 {
 	char name[32];
 	sprintf(name, "/tuner%u/filter", hd->tuner);
-	return hdhomerun_control_set(hd->cs, name, filter, NULL, NULL);
+	return hdhomerun_control_set_with_lockkey(hd->cs, name, filter, hd->lockkey, NULL, NULL);
 }
 
 static int hdhomerun_device_set_tuner_filter_by_array_append(char **pptr, char *end, uint16_t range_begin, uint16_t range_end)
@@ -583,8 +615,8 @@ int hdhomerun_device_set_tuner_filter_by_array(struct hdhomerun_device_t *hd, un
 	/* Remove trailing space. */
 	if (ptr > filter) {
 		ptr--;
-		*ptr = 0;
 	}
+	*ptr = 0;
 
 	return hdhomerun_device_set_tuner_filter(hd, filter);
 }
@@ -593,14 +625,14 @@ int hdhomerun_device_set_tuner_program(struct hdhomerun_device_t *hd, const char
 {
 	char name[32];
 	sprintf(name, "/tuner%u/program", hd->tuner);
-	return hdhomerun_control_set(hd->cs, name, program, NULL, NULL);
+	return hdhomerun_control_set_with_lockkey(hd->cs, name, program, hd->lockkey, NULL, NULL);
 }
 
 int hdhomerun_device_set_tuner_target(struct hdhomerun_device_t *hd, const char *target)
 {
 	char name[32];
 	sprintf(name, "/tuner%u/target", hd->tuner);
-	return hdhomerun_control_set(hd->cs, name, target, NULL, NULL);
+	return hdhomerun_control_set_with_lockkey(hd->cs, name, target, hd->lockkey, NULL, NULL);
 }
 
 int hdhomerun_device_set_tuner_target_to_local_protocol(struct hdhomerun_device_t *hd, const char *protocol)
@@ -647,16 +679,66 @@ int hdhomerun_device_get_var(struct hdhomerun_device_t *hd, const char *name, ch
 
 int hdhomerun_device_set_var(struct hdhomerun_device_t *hd, const char *name, const char *value, char **pvalue, char **perror)
 {
-	return hdhomerun_control_set(hd->cs, name, value, pvalue, perror);
+	return hdhomerun_control_set_with_lockkey(hd->cs, name, value, hd->lockkey, pvalue, perror);
+}
+
+int hdhomerun_device_tuner_lockkey_request(struct hdhomerun_device_t *hd, char **perror)
+{
+	uint32_t new_lockkey = (uint32_t)getcurrenttime();
+
+	char name[32];
+	sprintf(name, "/tuner%u/lockkey", hd->tuner);
+
+	char new_lockkey_str[64];
+	sprintf(new_lockkey_str, "%u", (unsigned int)new_lockkey);
+
+	int ret = hdhomerun_control_set_with_lockkey(hd->cs, name, new_lockkey_str, hd->lockkey, NULL, perror);
+	if (ret <= 0) {
+		hd->lockkey = 0;
+		return ret;
+	}
+
+	hd->lockkey = new_lockkey;
+	return ret;
+}
+
+int hdhomerun_device_tuner_lockkey_release(struct hdhomerun_device_t *hd)
+{
+	if (hd->lockkey == 0) {
+		return 1;
+	}
+
+	char name[32];
+	sprintf(name, "/tuner%u/lockkey", hd->tuner);
+	int ret = hdhomerun_control_set_with_lockkey(hd->cs, name, "none", hd->lockkey, NULL, NULL);
+
+	hd->lockkey = 0;
+	return ret;
+}
+
+int hdhomerun_device_tuner_lockkey_force(struct hdhomerun_device_t *hd)
+{
+	char name[32];
+	sprintf(name, "/tuner%u/lockkey", hd->tuner);
+	int ret = hdhomerun_control_set(hd->cs, name, "force", NULL, NULL);
+
+	hd->lockkey = 0;
+	return ret;
+}
+
+void hdhomerun_device_tuner_lockkey_use_value(struct hdhomerun_device_t *hd, uint32_t lockkey)
+{
+	hd->lockkey = lockkey;
 }
 
 int hdhomerun_device_wait_for_lock(struct hdhomerun_device_t *hd, struct hdhomerun_tuner_status_t *status)
 {
-	/* Wait for up to 2.5 seconds for lock. */
-	int i;
-	for (i = 0; i < 10; i++) {
-		usleep(250000);
+	/* Delay for SS reading to be valid (signal present). */
+	msleep(250);
 
+	/* Wait for up to 2.5 seconds for lock. */
+	uint64_t timeout = getcurrenttime() + 2500;
+	while (1) {
 		/* Get status to check for lock. Quality numbers will not be valid yet. */
 		int ret = hdhomerun_device_get_tuner_status(hd, NULL, status);
 		if (ret <= 0) {
@@ -669,9 +751,13 @@ int hdhomerun_device_wait_for_lock(struct hdhomerun_device_t *hd, struct hdhomer
 		if (status->lock_supported || status->lock_unsupported) {
 			return 1;
 		}
-	}
 
-	return 1;
+		if (getcurrenttime() >= timeout) {
+			return 1;
+		}
+
+		msleep(250);
+	}
 }
 
 int hdhomerun_device_stream_start(struct hdhomerun_device_t *hd)
@@ -683,7 +769,7 @@ int hdhomerun_device_stream_start(struct hdhomerun_device_t *hd)
 	}
 
 	/* Flush video buffer. */
-	usleep(64000);
+	msleep(64);
 	hdhomerun_video_flush(hd->vs);
 
 	/* Success. */
@@ -692,7 +778,10 @@ int hdhomerun_device_stream_start(struct hdhomerun_device_t *hd)
 
 int hdhomerun_device_stream_refresh_target(struct hdhomerun_device_t *hd)
 {
-	return hdhomerun_device_set_tuner_target_to_local_protocol(hd, HDHOMERUN_TARGET_PROTOCOL_RTP);
+	int ret = hdhomerun_device_set_tuner_target_to_local_protocol(hd, HDHOMERUN_TARGET_PROTOCOL_RTP);
+	if (ret <= 0)
+		ret = hdhomerun_device_set_tuner_target_to_local_protocol(hd, HDHOMERUN_TARGET_PROTOCOL_UDP);
+	return ret;
 }
 
 uint8_t *hdhomerun_device_stream_recv(struct hdhomerun_device_t *hd, size_t max_size, size_t *pactual_size)
@@ -713,13 +802,13 @@ void hdhomerun_device_stream_stop(struct hdhomerun_device_t *hd)
 	hdhomerun_device_set_tuner_target(hd, "none");
 }
 
-int hdhomerun_device_channelscan_init(struct hdhomerun_device_t *hd, uint32_t channel_map, uint32_t options)
+int hdhomerun_device_channelscan_init(struct hdhomerun_device_t *hd, const char *channelmap)
 {
 	if (hd->scan) {
 		channelscan_destroy(hd->scan);
 	}
 
-	hd->scan = channelscan_create(hd, channel_map, options);
+	hd->scan = channelscan_create(hd, channelmap);
 	if (!hd->scan) {
 		return -1;
 	}
@@ -792,55 +881,23 @@ const char *hdhomerun_device_get_model_str(struct hdhomerun_device_t *hd)
 		return NULL;
 	}
 	if (ret == 0) {
-		strcpy(hd->model, "hdhomerun_atsc");
-		return hd->model;
+		model_str = "hdhomerun_atsc";
 	}
 
-	strcpy(hd->model, model_str);
+	strncpy(hd->model, model_str, sizeof(hd->model) - 1);
+	hd->model[sizeof(hd->model) - 1] = 0;
+
 	return hd->model;
-}
-
-uint32_t hdhomerun_device_model_channel_map_all(struct hdhomerun_device_t *hd)
-{
-	return hdhomerun_device_model_channel_map_antenna(hd) | hdhomerun_device_model_channel_map_cable(hd);
-}
-
-uint32_t hdhomerun_device_model_channel_map_antenna(struct hdhomerun_device_t *hd)
-{
-	const char *model = hdhomerun_device_get_model_str(hd);
-	if (!model) {
-		return 0;
-	}
-
-	if (strstr(model, "atsc")) {
-		return CHANNEL_MAP_US_BCAST;
-	}
-
-	if (strstr(model, "dvbt")) {
-		return CHANNEL_MAP_UK_BCAST | CHANNEL_MAP_NZ_BCAST;
-	}
-
-	return 0;
-}
-
-uint32_t hdhomerun_device_model_channel_map_cable(struct hdhomerun_device_t *hd)
-{
-	const char *model = hdhomerun_device_get_model_str(hd);
-	if (!model) {
-		return 0;
-	}
-
-	if (strstr(model, "atsc")) {
-		return CHANNEL_MAP_US_CABLE | CHANNEL_MAP_US_HRC | CHANNEL_MAP_US_IRC;
-	}
-
-	return 0;
 }
 
 int hdhomerun_device_upgrade(struct hdhomerun_device_t *hd, FILE *upgrade_file)
 {
+	hdhomerun_control_set(hd->cs, "/tuner0/lockkey", "force", NULL, NULL);
 	hdhomerun_control_set(hd->cs, "/tuner0/channel", "none", NULL, NULL);
+
+	hdhomerun_control_set(hd->cs, "/tuner1/lockkey", "force", NULL, NULL);
 	hdhomerun_control_set(hd->cs, "/tuner1/channel", "none", NULL, NULL);
+
 	return hdhomerun_control_upgrade(hd->cs, upgrade_file);
 }
 

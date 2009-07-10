@@ -282,7 +282,7 @@ void HDHRStreamHandler::RunTS(void)
     buffersize = max(49 * TSPacket::SIZE * 128, buffersize);
 
     /* Create TS socket. */
-    _video_socket = hdhomerun_video_create(0, buffersize);
+    _video_socket = hdhomerun_video_create(0, buffersize, NULL);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");
@@ -628,7 +628,7 @@ void HDHRStreamHandler::Close(void)
 
 bool HDHRStreamHandler::Connect(void)
 {
-    _control_socket = hdhomerun_control_create(_device_id, _device_ip);
+    _control_socket = hdhomerun_control_create(_device_id, _device_ip, NULL);
 
     if (!_control_socket)
     {
@@ -649,7 +649,7 @@ bool HDHRStreamHandler::Connect(void)
 void HDHRStreamHandler::FindDevice(const QString & _devicename, hdhr_id_data &device_data)
 {
     hdhomerun_device_t* thisdevice = hdhomerun_device_create_from_str(
-        _devicename.toLocal8Bit().constData());
+        _devicename.toLocal8Bit().constData(), NULL);
 
     if (thisdevice)
     {
@@ -703,7 +703,7 @@ bool HDHRStreamHandler::EnterPowerSavingMode(void)
 }
 
 QString HDHRStreamHandler::DeviceGet(
-    const QString &name, bool report_error_return) const
+    const QString &name, bool report_error_return, bool print_error) const
 {
     QMutexLocker locker(&_hdhr_lock);
 
@@ -725,8 +725,11 @@ QString HDHRStreamHandler::DeviceGet(
 
     if (report_error_return && error)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("DeviceGet(%1): %2").arg(name).arg(error));
+        if (print_error)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("DeviceGet(%1): %2").arg(name).arg(error));
+        }
 
         return QString::null;
     }
@@ -735,7 +738,8 @@ QString HDHRStreamHandler::DeviceGet(
 }
 
 QString HDHRStreamHandler::DeviceSet(
-    const QString &name, const QString &val, bool report_error_return)
+    const QString &name, const QString &val,
+    bool report_error_return, bool print_error)
 {
     QMutexLocker locker(&_hdhr_lock);
 
@@ -758,8 +762,12 @@ QString HDHRStreamHandler::DeviceSet(
 
     if (report_error_return && error)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("DeviceSet(%1 %2): %3").arg(name).arg(val).arg(error));
+        if (print_error)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("DeviceSet(%1 %2): %3")
+                    .arg(name).arg(val).arg(error));
+        }
 
         return QString::null;
     }
@@ -768,17 +776,18 @@ QString HDHRStreamHandler::DeviceSet(
 }
 
 QString HDHRStreamHandler::TunerGet(
-    const QString &name, bool report_error_return) const
+    const QString &name, bool report_error_return, bool print_error) const
 {
     return DeviceGet(QString("/tuner%1/%2").arg(_tuner).arg(name),
-                     report_error_return);
+                     report_error_return, print_error);
 }
 
 QString HDHRStreamHandler::TunerSet(
-    const QString &name, const QString &value, bool report_error_return)
+    const QString &name, const QString &value,
+    bool report_error_return, bool print_error)
 {
     QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
-    return DeviceSet(valname, value, report_error_return);
+    return DeviceSet(valname, value, report_error_return, print_error);
 }
 
 bool HDHRStreamHandler::DeviceSetTarget(unsigned short localPort)
@@ -799,7 +808,7 @@ bool HDHRStreamHandler::DeviceSetTarget(unsigned short localPort)
         .arg((localIP >>  8) & 0xFF).arg((localIP >>  0) & 0xFF)
         .arg(localPort);
 
-    QString err = TunerSet("target", rtpValue, true);
+    QString err = TunerSet("target", rtpValue, true, false);
 
     if (err.isEmpty())
     {

@@ -15,30 +15,49 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
-#define CHANNEL_MAP_US_BCAST (1 << 0)
-#define CHANNEL_MAP_US_CABLE (1 << 1)
-#define CHANNEL_MAP_US_HRC (1 << 2)
-#define CHANNEL_MAP_US_IRC (1 << 3)
-#define CHANNEL_MAP_US_ALL (CHANNEL_MAP_US_BCAST | CHANNEL_MAP_US_CABLE | CHANNEL_MAP_US_HRC | CHANNEL_MAP_US_IRC)
-
-#define CHANNEL_MAP_UK_BCAST (1 << 4)
-#define CHANNEL_MAP_NZ_BCAST (1 << 5)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct hdhomerun_channel_entry_t;
+struct hdhomerun_channel_list_t;
 
-extern LIBTYPE uint32_t hdhomerun_channel_entry_channel_map(struct hdhomerun_channel_entry_t *entry);
+extern LIBTYPE const char *hdhomerun_channelmap_convert_countrycode_to_channelmap_prefix(const char *countrycode);
+extern LIBTYPE const char *hdhomerun_channelmap_get_channelmap_scan_group(const char *channelmap);
+
 extern LIBTYPE uint8_t hdhomerun_channel_entry_channel_number(struct hdhomerun_channel_entry_t *entry);
 extern LIBTYPE uint32_t hdhomerun_channel_entry_frequency(struct hdhomerun_channel_entry_t *entry);
 extern LIBTYPE const char *hdhomerun_channel_entry_name(struct hdhomerun_channel_entry_t *entry);
 
-extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_first(uint32_t channel_map);
-extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_last(uint32_t channel_map);
-extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_next(uint32_t channel_map, struct hdhomerun_channel_entry_t *entry);
-extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_prev(uint32_t channel_map, struct hdhomerun_channel_entry_t *entry);
-extern LIBTYPE uint32_t hdhomerun_channel_list_total_count(uint32_t channel_map);
-extern LIBTYPE uint32_t hdhomerun_channel_list_frequency_count(uint32_t channel_map);
+extern LIBTYPE struct hdhomerun_channel_list_t *hdhomerun_channel_list_create(const char *channelmap);
+extern LIBTYPE void hdhomerun_channel_list_destroy(struct hdhomerun_channel_list_t *channel_list);
 
-extern LIBTYPE uint32_t hdhomerun_channel_number_to_frequency(uint32_t channel_map, uint8_t channel_number);
-extern LIBTYPE uint8_t hdhomerun_channel_frequency_to_number(uint32_t channel_map, uint32_t frequency);
+extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_first(struct hdhomerun_channel_list_t *channel_list);
+extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_last(struct hdhomerun_channel_list_t *channel_list);
+extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_next(struct hdhomerun_channel_list_t *channel_list, struct hdhomerun_channel_entry_t *entry);
+extern LIBTYPE struct hdhomerun_channel_entry_t *hdhomerun_channel_list_prev(struct hdhomerun_channel_list_t *channel_list, struct hdhomerun_channel_entry_t *entry);
+extern LIBTYPE uint32_t hdhomerun_channel_list_total_count(struct hdhomerun_channel_list_t *channel_list);
+extern LIBTYPE uint32_t hdhomerun_channel_list_frequency_count(struct hdhomerun_channel_list_t *channel_list);
+
+extern LIBTYPE uint32_t hdhomerun_channel_frequency_truncate(uint32_t frequency);
+extern LIBTYPE uint32_t hdhomerun_channel_number_to_frequency(struct hdhomerun_channel_list_t *channel_list, uint8_t channel_number);
+extern LIBTYPE uint8_t hdhomerun_channel_frequency_to_number(struct hdhomerun_channel_list_t *channel_list, uint32_t frequency);
+
+#ifdef __cplusplus
+}
+#endif

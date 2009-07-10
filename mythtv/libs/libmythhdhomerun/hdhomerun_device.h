@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
 #ifdef __cplusplus
@@ -28,7 +41,7 @@ extern "C" {
 #define HDHOMERUN_STATUS_COLOR_NEUTRAL	0xFFFFFFFF
 #define HDHOMERUN_STATUS_COLOR_RED		0xFFFF0000
 #define HDHOMERUN_STATUS_COLOR_YELLOW	0xFFFFFF00
-#define HDHOMERUN_STATUS_COLOR_GREEN	0xFF008000
+#define HDHOMERUN_STATUS_COLOR_GREEN	0xFF00C000
 
 #define HDHOMERUN_TARGET_PROTOCOL_UDP "udp"
 #define HDHOMERUN_TARGET_PROTOCOL_RTP "rtp"
@@ -49,6 +62,7 @@ extern "C" {
  * uint32_t device_id = 32-bit device id of device. Set to HDHOMERUN_DEVICE_ID_WILDCARD to match any device ID.
  * uint32_t device_ip = IP address of device. Set to 0 to auto-detect.
  * unsigned int tuner = tuner index (0 or 1). Can be changed later by calling hdhomerun_device_set_tuner.
+ * struct hdhomerun_debug_t *dbg: Pointer to debug logging object. May be NULL.
  *
  * Returns a pointer to the newly created device object.
  *
@@ -67,8 +81,8 @@ extern "C" {
  *     <tuner index>
  *     /tuner<tuner index>
  */
-extern LIBTYPE struct hdhomerun_device_t *hdhomerun_device_create(uint32_t device_id, uint32_t device_ip, unsigned int tuner);
-extern LIBTYPE struct hdhomerun_device_t *hdhomerun_device_create_from_str(const char *device_str);
+extern LIBTYPE struct hdhomerun_device_t *hdhomerun_device_create(uint32_t device_id, uint32_t device_ip, unsigned int tuner, struct hdhomerun_debug_t *dbg);
+extern LIBTYPE struct hdhomerun_device_t *hdhomerun_device_create_from_str(const char *device_str, struct hdhomerun_debug_t *dbg);
 extern LIBTYPE void hdhomerun_device_destroy(struct hdhomerun_device_t *hd);
 
 /*
@@ -112,6 +126,7 @@ extern LIBTYPE int hdhomerun_device_get_tuner_filter(struct hdhomerun_device_t *
 extern LIBTYPE int hdhomerun_device_get_tuner_program(struct hdhomerun_device_t *hd, char **pprogram);
 extern LIBTYPE int hdhomerun_device_get_tuner_target(struct hdhomerun_device_t *hd, char **ptarget);
 extern LIBTYPE int hdhomerun_device_get_tuner_plotsample(struct hdhomerun_device_t *hd, struct hdhomerun_plotsample_t **psamples, size_t *pcount);
+extern LIBTYPE int hdhomerun_device_get_tuner_lockkey_owner(struct hdhomerun_device_t *hd, char **powner);
 extern LIBTYPE int hdhomerun_device_get_ir_target(struct hdhomerun_device_t *hd, char **ptarget);
 extern LIBTYPE int hdhomerun_device_get_lineup_location(struct hdhomerun_device_t *hd, char **plocation);
 extern LIBTYPE int hdhomerun_device_get_version(struct hdhomerun_device_t *hd, char **pversion_str, uint32_t *pversion_num);
@@ -121,9 +136,6 @@ extern LIBTYPE uint32_t hdhomerun_device_get_tuner_status_snq_color(struct hdhom
 extern LIBTYPE uint32_t hdhomerun_device_get_tuner_status_seq_color(struct hdhomerun_tuner_status_t *status);
 
 extern LIBTYPE const char *hdhomerun_device_get_model_str(struct hdhomerun_device_t *hd);
-extern LIBTYPE uint32_t hdhomerun_device_model_channel_map_all(struct hdhomerun_device_t *hd);
-extern LIBTYPE uint32_t hdhomerun_device_model_channel_map_antenna(struct hdhomerun_device_t *hd);
-extern LIBTYPE uint32_t hdhomerun_device_model_channel_map_cable(struct hdhomerun_device_t *hd);
 
 /*
  * Set operations.
@@ -166,6 +178,28 @@ extern LIBTYPE int hdhomerun_device_get_var(struct hdhomerun_device_t *hd, const
 extern LIBTYPE int hdhomerun_device_set_var(struct hdhomerun_device_t *hd, const char *name, const char *value, char **pvalue, char **perror);
 
 /*
+ * Tuner locking.
+ *
+ * The hdhomerun_device_tuner_lockkey_request function is used to obtain a lock
+ * or to verify that the hdhomerun_device object still holds the lock.
+ * Returns 1 if the lock request was successful and the lock was obtained.
+ * Returns 0 if the lock request was rejected.
+ * Returns -1 if a communication error occurs.
+ *
+ * The hdhomerun_device_tuner_lockkey_release function is used to release a
+ * previously held lock. If locking is used then this function must be called
+ * before destroying the hdhomerun_device object.
+ */
+extern LIBTYPE int hdhomerun_device_tuner_lockkey_request(struct hdhomerun_device_t *hd, char **perror);
+extern LIBTYPE int hdhomerun_device_tuner_lockkey_release(struct hdhomerun_device_t *hd);
+extern LIBTYPE int hdhomerun_device_tuner_lockkey_force(struct hdhomerun_device_t *hd);
+
+/*
+ * Intended only for non persistent connections; eg, hdhomerun_config.
+ */
+extern LIBTYPE void hdhomerun_device_tuner_lockkey_use_value(struct hdhomerun_device_t *hd, uint32_t lockkey);
+
+/*
  * Wait for tuner lock after channel change.
  *
  * The hdhomerun_device_wait_for_lock function is used to detect/wait for a lock vs no lock indication
@@ -202,7 +236,7 @@ extern LIBTYPE void hdhomerun_device_stream_stop(struct hdhomerun_device_t *hd);
 /*
  * Channel scan API.
  */
-extern LIBTYPE int hdhomerun_device_channelscan_init(struct hdhomerun_device_t *hd, uint32_t channel_map, uint32_t options);
+extern LIBTYPE int hdhomerun_device_channelscan_init(struct hdhomerun_device_t *hd, const char *channelmap);
 extern LIBTYPE int hdhomerun_device_channelscan_advance(struct hdhomerun_device_t *hd, struct hdhomerun_channelscan_result_t *result);
 extern LIBTYPE int hdhomerun_device_channelscan_detect(struct hdhomerun_device_t *hd, struct hdhomerun_channelscan_result_t *result);
 extern LIBTYPE uint8_t hdhomerun_device_channelscan_get_progress(struct hdhomerun_device_t *hd);
@@ -238,9 +272,7 @@ extern LIBTYPE struct hdhomerun_video_sock_t *hdhomerun_device_get_video_sock(st
 /*
  * Debug print internal stats.
  */
-extern LIBTYPE void hdhomerun_device_set_debug(struct hdhomerun_device_t *hd, struct hdhomerun_debug_t *dbg);
 extern LIBTYPE void hdhomerun_device_debug_print_video_stats(struct hdhomerun_device_t *hd);
-
 extern LIBTYPE void hdhomerun_device_get_video_stats(struct hdhomerun_device_t *hd, struct hdhomerun_video_stats_t *stats);
 
 #ifdef __cplusplus

@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 #ifdef __cplusplus
 extern "C" {
@@ -30,12 +43,13 @@ struct hdhomerun_control_sock_t;
  *
  * uint32_t device_id = 32-bit device id of device. Set to HDHOMERUN_DEVICE_ID_WILDCARD to match any device ID.
  * uint32_t device_ip = IP address of device. Set to 0 to auto-detect.
+ * struct hdhomerun_debug_t *dbg: Pointer to debug logging object. May be NULL.
  *
  * Returns a pointer to the newly created control socket.
  *
  * When no longer needed, the socket should be destroyed by calling hdhomerun_control_destroy.
  */
-extern LIBTYPE struct hdhomerun_control_sock_t *hdhomerun_control_create(uint32_t device_id, uint32_t device_ip);
+extern LIBTYPE struct hdhomerun_control_sock_t *hdhomerun_control_create(uint32_t device_id, uint32_t device_ip, struct hdhomerun_debug_t *dbg);
 extern LIBTYPE void hdhomerun_control_destroy(struct hdhomerun_control_sock_t *cs);
 
 /*
@@ -83,6 +97,7 @@ extern LIBTYPE int hdhomerun_control_send_recv(struct hdhomerun_control_sock_t *
  */
 extern LIBTYPE int hdhomerun_control_get(struct hdhomerun_control_sock_t *cs, const char *name, char **pvalue, char **perror);
 extern LIBTYPE int hdhomerun_control_set(struct hdhomerun_control_sock_t *cs, const char *name, const char *value, char **pvalue, char **perror);
+extern LIBTYPE int hdhomerun_control_set_with_lockkey(struct hdhomerun_control_sock_t *cs, const char *name, const char *value, uint32_t lockkey, char **pvalue, char **perror);
 
 /*
  * Upload new firmware to the device.
@@ -94,11 +109,6 @@ extern LIBTYPE int hdhomerun_control_set(struct hdhomerun_control_sock_t *cs, co
  * Returns -1 if an error occurs.
  */
 extern LIBTYPE int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade_file);
-
-/*
- * Debug logging.
- */
-extern LIBTYPE void hdhomerun_control_set_debug(struct hdhomerun_control_sock_t *cs, struct hdhomerun_debug_t *dbg);
 
 #ifdef __cplusplus
 }

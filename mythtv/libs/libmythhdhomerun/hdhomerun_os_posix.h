@@ -1,7 +1,7 @@
 /*
- * hdhomerun_debug.h
+ * hdhomerun_os_posix.h
  *
- * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -30,34 +30,55 @@
  * conditions defined in the GNU Lesser General Public License.
  */
 
-/*
- * The debug logging includes optional support for connecting to the
- * Silicondust support server. This option should not be used without
- * being explicitly enabled by the user. Debug information should be
- * limited to information useful to diagnosing a problem.
- *  - Silicondust.
- */
+#define _FILE_OFFSET_BITS 64
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/timeb.h>
+#include <sys/wait.h>
+#include <sys/signal.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <pthread.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef int bool_t;
 
-struct hdhomerun_debug_t;
+#define LIBTYPE
+#define sock_getlasterror errno
+#define sock_getlasterror_socktimeout (errno == EAGAIN)
+#define console_vprintf vprintf
+#define console_printf printf
+#define THREAD_FUNC_PREFIX void *
 
-extern LIBTYPE struct hdhomerun_debug_t *hdhomerun_debug_create(void);
-extern LIBTYPE void hdhomerun_debug_destroy(struct hdhomerun_debug_t *dbg);
-
-extern LIBTYPE void hdhomerun_debug_set_prefix(struct hdhomerun_debug_t *dbg, const char *prefix);
-extern LIBTYPE void hdhomerun_debug_set_filename(struct hdhomerun_debug_t *dbg, const char *filename);
-extern LIBTYPE void hdhomerun_debug_enable(struct hdhomerun_debug_t *dbg);
-extern LIBTYPE void hdhomerun_debug_disable(struct hdhomerun_debug_t *dbg);
-extern LIBTYPE bool_t hdhomerun_debug_enabled(struct hdhomerun_debug_t *dbg);
-
-extern LIBTYPE void hdhomerun_debug_flush(struct hdhomerun_debug_t *dbg, uint64_t timeout);
-
-extern LIBTYPE void hdhomerun_debug_printf(struct hdhomerun_debug_t *dbg, const char *fmt, ...);
-extern LIBTYPE void hdhomerun_debug_vprintf(struct hdhomerun_debug_t *dbg, const char *fmt, va_list args);
-
-#ifdef __cplusplus
+static inline int msleep(unsigned int ms)
+{
+	usleep(ms * 1000);
+	return 0;
 }
-#endif
+
+static inline uint64_t getcurrenttime(void)
+{
+	struct timeval t;
+	gettimeofday(&t, NULL);
+	return ((uint64_t)t.tv_sec * 1000) + (t.tv_usec / 1000);
+}
+
+static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout)
+{
+	struct timeval t;
+	t.tv_sec = timeout / 1000;
+	t.tv_usec = (timeout % 1000) * 1000;
+	return setsockopt(s, level, optname, (char *)&t, sizeof(t));
+}
+
+#define min(a,b) (((a)<(b))?(a):(b))
+#define max(a,b) (((a)>(b))?(a):(b))
+

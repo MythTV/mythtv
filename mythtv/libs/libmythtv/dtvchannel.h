@@ -15,8 +15,8 @@
 using namespace std;
 
 // Qt headers
-#include <qmutex.h>
-#include <qstring.h>
+#include <QMutex>
+#include <QString>
 
 // MythTV headers
 #include "channelbase.h"

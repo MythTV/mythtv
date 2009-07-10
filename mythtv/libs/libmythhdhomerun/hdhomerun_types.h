@@ -15,6 +15,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
 struct hdhomerun_device_t;
@@ -38,18 +51,19 @@ struct hdhomerun_channelscan_program_t {
 	uint16_t virtual_major;
 	uint16_t virtual_minor;
 	uint16_t type;
-	char name[8];
+	char name[32];
 };
 
 #define HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT 64
 
 struct hdhomerun_channelscan_result_t {
 	char channel_str[64];
-	uint32_t channel_map;
+	uint32_t channelmap;
 	uint32_t frequency;
 	struct hdhomerun_tuner_status_t status;
 	int program_count;
 	struct hdhomerun_channelscan_program_t programs[HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT];
+	uint32_t pat_crc;
 };
 
 struct hdhomerun_plotsample_t {
