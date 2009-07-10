@@ -1875,8 +1875,8 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
         if (metadata)
         {
-            if ((metadata->IsHostSet() 
-               && !metadata->GetCoverFile().startsWith("/")) 
+            if ((metadata->IsHostSet()
+               && !metadata->GetCoverFile().startsWith("/"))
                && (metadata->GetCoverFile() != "No Cover"))
             {
                 icon_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
@@ -2404,12 +2404,13 @@ bool VideoDialog::DoItemDetailShow()
 
     if (metadata)
     {
-        ItemDetailPopup *idp = new ItemDetailPopup(m_popupStack, metadata,
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        ItemDetailPopup *idp = new ItemDetailPopup(mainStack, metadata,
                 m_d->m_videoList->getListCache());
 
         if (idp->Create())
         {
-            m_popupStack->AddScreen(idp);
+            mainStack->AddScreen(idp);
             return true;
         }
     }
