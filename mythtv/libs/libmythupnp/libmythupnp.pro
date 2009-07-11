@@ -1,7 +1,6 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
-include ( ../../version.pro )
- 
+
 TEMPLATE = lib
 TARGET = mythupnp-$$LIBVERSION
 CONFIG += thread dll
@@ -17,7 +16,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 
-HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h  
+HEADERS += httprequest.h upnp.h ssdp.h taskqueue.h
 HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.h
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
@@ -57,8 +56,8 @@ INSTALLS += inc
 cygwin:HEADERS += darwin-sendfile.h
 cygwin:SOURCES += darwin-sendfile.c
 
-freebsd:HEADERS += darwin-sendfile.h 
-freebsd:SOURCES += darwin-sendfile.c 
+freebsd:HEADERS += darwin-sendfile.h
+freebsd:SOURCES += darwin-sendfile.c
 
 macx {
     HEADERS += darwin-sendfile.h

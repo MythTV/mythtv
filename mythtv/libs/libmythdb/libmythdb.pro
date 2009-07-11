@@ -1,5 +1,6 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
+include ( ../../version.pro )
 
 TEMPLATE = lib
 TARGET = mythdb-$$LIBVERSION

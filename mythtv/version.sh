@@ -22,9 +22,10 @@ BINARY_VERSION=$(grep MYTH_BINARY_VERSION \
     "${SVNTREEDIR}/libs/libmythdb/mythversion.h" \
     | sed -e 's/.*MYTH_BINARY_VERSION //')
 
-echo "const char *myth_source_version = \"${SOURCE_VERSION}\";" > .vers.new
-echo "const char *myth_source_path = \"${SVNREPOPATH}\";" >> .vers.new
-echo "const char *myth_binary_version = ${BINARY_VERSION};" >> .vers.new
+echo "#include \"mythexp.h\"" > .vers.new
+echo "const MPUBLIC char *myth_source_version = \"${SOURCE_VERSION}\";" >> .vers.new
+echo "const MPUBLIC char *myth_source_path = \"${SVNREPOPATH}\";" >> .vers.new
+echo "const MPUBLIC char *myth_binary_version = ${BINARY_VERSION};" >> .vers.new
 
 # check if the version strings are changed and update version.pro if necessary
 diff .vers.new version.cpp > .vers.diff 2>&1
