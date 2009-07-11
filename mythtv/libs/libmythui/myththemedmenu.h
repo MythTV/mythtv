@@ -2,6 +2,7 @@
 #define MYTHTHEMEDMENU_H_
 
 #include "mythscreentype.h"
+#include "mythdialogbox.h"
 #include "mythuistatetype.h"
 #include "mythuibuttonlist.h"
 #include "xmlparsebase.h"
@@ -78,6 +79,11 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
 
     void ReloadExitKey(void);
     virtual void aboutToShow(void);
+
+    void doMenu();
+    void aboutScreen();
+    MythDialogBox* m_menuPopup;
+    void customEvent(QEvent *event);
 
   protected:
     virtual bool keyPressEvent(QKeyEvent *e);

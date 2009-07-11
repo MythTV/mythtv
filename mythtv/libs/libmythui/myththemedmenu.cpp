@@ -88,6 +88,8 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
       m_state(state), m_allocedstate(false), m_foundtheme(false),
       m_exitModifier(0), m_ignorekeys(false), m_wantpop(false)
 {
+    m_menuPopup = NULL;
+
     if (!m_state)
     {
         m_state = new MythThemedMenuState(parent, "themedmenustate");
@@ -267,6 +269,10 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                 }
             }
         }
+        else if (action == "MENU")
+        {
+            doMenu();
+        }
         else
             handled = false;
     }
@@ -285,6 +291,164 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
 void MythThemedMenu::aboutToShow()
 {
     MythScreenType::aboutToShow();
+}
+
+void MythThemedMenu::doMenu()
+{
+    if( m_menuPopup != NULL )
+        return;
+
+    int allowsd =  GetMythDB()->GetNumSetting("AllowQuitShutdown");
+    int override_menu = GetMythDB()->GetNumSetting("OverrideExitMenu");
+    QString label = tr("System Menu");
+    MythScreenStack* mainStack = GetMythMainWindow()->GetMainStack();
+    m_menuPopup = new MythDialogBox(label, mainStack, "menuPopup");
+
+    if (m_menuPopup->Create())
+        mainStack->AddScreen(m_menuPopup);
+
+    switch (override_menu)
+    {
+        case 0:
+            if ( (allowsd != 0) && (allowsd != 4)  )
+            {
+                m_menuPopup->SetReturnEvent(this,"popmenu_exit");
+                m_menuPopup->AddButton("Shutdown");
+                m_menuPopup->AddButton("Reboot");
+            }
+            else
+            {
+                m_menuPopup->SetReturnEvent(this,"popmenu_noexit");
+            }
+            break;
+        case 2:
+        case 4:
+            // shutdown
+            m_menuPopup->SetReturnEvent(this,"popmenu_shutdown");
+            m_menuPopup->AddButton("Shutdown");
+            break;
+        case 5:
+            // reboot
+            m_menuPopup->SetReturnEvent(this,"popmenu_reboot");
+            m_menuPopup->AddButton("Reboot");
+            break;
+        case 3:
+        case 6:
+            // both
+            m_menuPopup->SetReturnEvent(this,"popmenu_exit");
+            m_menuPopup->AddButton("Shutdown");
+            m_menuPopup->AddButton("Reboot");
+            break;
+        default:
+            m_menuPopup->SetReturnEvent(this,"popmenu_noexit");
+            break;
+    }
+
+    m_menuPopup->AddButton("About");
+    m_menuPopup->AddButton("Cancel");
+
+}
+
+extern const char *myth_source_version;
+extern const char *myth_source_path;
+
+void MythThemedMenu::aboutScreen()
+{
+    QString distro_line;
+
+    QFile file("/etc/os_myth_release");
+    if (file.open(QFile::ReadOnly))
+    {
+        QTextStream t( &file );        // use a text stream
+        distro_line = t.readLine();
+        file.close();
+    }
+
+    QString label = tr("Revision: %1\n Branch: %2\n %3")
+                        .arg(myth_source_version)
+                        .arg(myth_source_path)
+                        .arg(distro_line);
+
+    MythScreenStack* mainStack = GetMythMainWindow()->GetMainStack();
+    m_menuPopup = new MythDialogBox(label, mainStack, "version_dialog");
+    if (m_menuPopup->Create())
+        mainStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "version");
+    m_menuPopup->AddButton("OK!");
+
+}
+
+void MythThemedMenu::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid = dce->GetId();
+        int buttonnum = dce->GetResult();
+        QString halt_cmd = GetMythDB()->GetSetting("HaltCommand");
+        QString reboot_cmd = GetMythDB()->GetSetting("RebootCommand");
+
+        VERBOSE(VB_IMPORTANT, QString("Result ID: %1").arg(resultid));
+
+        if (resultid == "popmenu_exit")
+        {
+            VERBOSE(VB_IMPORTANT, QString("Button Number: %1").arg(buttonnum));
+            switch (buttonnum)
+            {
+                case 0:
+                    if (!halt_cmd.isEmpty())
+                        system(halt_cmd.toAscii());
+                    break;
+                case 1:
+                    if (!reboot_cmd.isEmpty())
+                        system(reboot_cmd.toAscii());
+                    break;
+                case 2:
+                    aboutScreen();
+                    VERBOSE(VB_IMPORTANT, "About Screen");
+                    break;
+            }
+        }
+
+        if (resultid == "popmenu_noexit")
+        {
+            if (buttonnum == 0)
+                aboutScreen();
+        }
+
+        if (resultid == "popmenu_reboot")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    if (!reboot_cmd.isEmpty())
+                        system(reboot_cmd.toAscii());
+                    break;
+                case 1:
+                    aboutScreen();
+                    break;
+            }
+        }
+
+        if (resultid == "popmenu_shutdown")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    if (!halt_cmd.isEmpty())
+                        system(halt_cmd.toAscii());
+                    break;
+                case 1:
+                    aboutScreen();
+                    break;
+            }
+        }
+
+        m_menuPopup = NULL;
+    }
 }
 
 /** \brief Parses the element's tags and set the ThemeButton's type,
