@@ -75,10 +75,11 @@ bool GameDetailsPopup::Create(void)
     handleText("year", m_romInfo->Year());
     handleText("country", m_romInfo->Country());
     handleText("publisher", m_romInfo->Publisher());
+    handleText("plot", m_romInfo->Plot());
     handleText("allsystems", m_romInfo->AllSystems());
     handleImage("fanart", m_romInfo->Fanart());
     handleImage("boxart", m_romInfo->Boxart());
-    handleImage("gameimage", m_romInfo->ImagePath());
+    handleImage("gameimage", m_romInfo->Screenshot());
 
     return true;
 }

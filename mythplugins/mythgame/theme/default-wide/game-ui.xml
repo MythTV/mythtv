@@ -76,6 +76,11 @@
         <font>infofont</font>
     </textarea>
 
+    <textarea name="plot">
+        <area>236,665,580,35</area>
+        <font>infofont</font>
+    </textarea>
+
     <imagetype name="boxart">
         <area>610,500,180,150</area>
         <preserveaspect>true</preserveaspect>
@@ -200,6 +205,10 @@
         <area>190,520,400,40</area>
     </textarea>
 
+    <textarea name="plot" from="basetextarea">
+        <area>190,560,400,40</area>
+    </textarea>
+
     <imagetype name="boxart">
         <area>800,200,415,320</area>
         <preserveaspect>true</preserveaspect>
@@ -258,20 +267,32 @@
         <align>right,top</align>
     </textarea>
 
-    <textarea name="favorite_label" from="basetextarea">
+    <textarea name="plot_label" from="basetextarea">
         <area>250,335,250,40</area>
+        <value>Plot:</value>
+        <align>right,top</align>
+    </textarea>
+
+    <textarea name="fav_label" from="basetextarea">
+        <area>250,400,250,40</area>
         <value>Favorite:</value>
         <align>right,top</align>
     </textarea>
 
+    <textarea name="screenshot_label" from="basetextarea">
+        <area>250,445,250,40</area>
+        <value>Screenshot:</value>
+        <align>right,top</align>
+    </textarea>
+
     <textarea name="fanart_label" from="basetextarea">
-        <area>250,380,250,40</area>
+        <area>250,490,250,40</area>
         <value>Fanart:</value>
         <align>right,top</align>
     </textarea>
 
     <textarea name="boxart_label" from="basetextarea">
-        <area>250,425,250,40</area>
+        <area>250,535,250,40</area>
         <value>Boxart:</value>
         <align>right,top</align>
     </textarea>
@@ -298,30 +319,43 @@
         <position>510,280</position>
     </textedit>
 
+    <textedit name="plot_edit" from="basetextedit">
+        <position>510,325</position>
+    </textedit>
+
     <checkbox name="favorite_check" from="basecheckbox">
-        <position>510,330</position>
+        <position>510,400</position>
     </checkbox>
 
+    <button name="screenshot_button" from="basesearchbutton">
+        <position>510,445</position>
+    </button>
+
+    <textarea name="screenshot_text" from="basetextarea">
+        <area>550,440,750,40</area>
+        <value>/path/to/the/thing.jpg</value>
+    </textarea>
+
     <button name="fanart_button" from="basesearchbutton">
-        <position>510,370</position>
+        <position>510,480</position>
     </button>
 
     <textarea name="fanart_text" from="basetextarea">
-        <area>550,375,750,40</area>
+        <area>550,485,750,40</area>
         <value>/path/to/the/thing.jpg</value>
     </textarea>
 
     <button name="boxart_button" from="basesearchbutton">
-        <position>510,415</position>
+        <position>510,525</position>
     </button>
 
     <textarea name="boxart_text" from="basetextarea">
-        <area>550,420,750,40</area>
+        <area>550,530,750,40</area>
         <value>/path/to/the/thing.jpg</value>
     </textarea>
 
     <button name="done_button" from="basebutton">
-        <position>510,565</position>
+        <position>510,615</position>
         <value>Done</value>
     </button>
 

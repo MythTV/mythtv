@@ -36,6 +36,7 @@ class GameDetailsPopup : public MythScreenType
     MythUIText  *m_genre;
     MythUIText  *m_year;
     MythUIText  *m_country;
+    MythUIText  *m_plot;
     MythUIText  *m_publisher;
     MythUIText  *m_allSystems;
     MythUIImage *m_fanartImage;

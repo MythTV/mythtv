@@ -12,8 +12,9 @@ class RomInfo
             QString lgenre = "", QString lyear = "", bool lfavorite = FALSE, 
             QString lrompath = "", QString lcountry ="", QString lcrc_value = "",
             int ldiskcount = 0, QString lgametype = "", int lromcount = 0,
-            QString lallsystems = "", QString lpublisher = "", QString lversion = "",
-            QString lfanart = "", QString lboxart = "")
+            QString lallsystems = "", QString lplot = "", QString lpublisher = "", 
+            QString lversion = "", QString lscreenshot = "", QString lfanart = "", 
+            QString lboxart = "")
             {
                 romname = lromname;
                 system = lsystem;
@@ -22,6 +23,7 @@ class RomInfo
                 year = lyear;
                 favorite = lfavorite;
                 rompath = lrompath;
+                screenshot = lscreenshot;
                 fanart = lfanart;
                 boxart = lboxart;
                 country = lcountry;
@@ -30,6 +32,7 @@ class RomInfo
                 gametype = lgametype;
                 romcount = lromcount;
                 allsystems = lallsystems;
+                plot = lplot;
                 publisher = lpublisher;
                 version = lversion;
             }
@@ -44,6 +47,7 @@ class RomInfo
                 year = lhs.year;
                 favorite = lhs.favorite;
                 rompath = lhs.rompath;
+                screenshot = lhs.screenshot;
                 fanart = lhs.fanart;
                 boxart = lhs.boxart;
                 country = lhs.country;
@@ -52,6 +56,7 @@ class RomInfo
                 gametype = lhs.gametype;
                 romcount = lhs.romcount;
                 allsystems = lhs.allsystems;
+                plot = lhs.plot;
                 publisher = lhs.publisher;
                 version = lhs.version;
             }
@@ -62,6 +67,9 @@ class RomInfo
 
     QString Rompath() const { return rompath; }
     void setRompath(const QString &lrompath) { rompath = lrompath; }
+
+    QString Screenshot() const { return screenshot; }
+    void setScreenshot(const QString &lscreenshot) { screenshot = lscreenshot; }
 
     QString Fanart() const { return fanart; }
     void setFanart(const QString &lfanart) { fanart = lfanart; }
@@ -102,6 +110,9 @@ class RomInfo
     QString ImagePath() const { return imagepath; }
     void setImagePath(const QString &limagepath) { imagepath = limagepath; } 
 
+    QString Plot() const { return plot; }
+    void setPlot(const QString &lplot) { plot = lplot; }
+
     QString Publisher() const { return publisher; }
     void setPublisher(const QString &lpublisher) { publisher = lpublisher; }
 
@@ -130,6 +141,7 @@ class RomInfo
     QString crc_value;
     QString gametype;
     QString allsystems;
+    QString plot;
     QString publisher;
     QString version;
     int romcount;
@@ -137,6 +149,7 @@ class RomInfo
     QString year;
     bool favorite;
     QString rompath;
+    QString screenshot;
     QString fanart;
     QString boxart;
 };

@@ -114,7 +114,7 @@ void GameHandler::InitMetaDataMap(QString GameType)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT crc, category, year, country, name, "
-                  "description, publisher, platform, version, "
+                  "description, plot, publisher, platform, version, "
                   "binfile FROM romdb WHERE platform = :GAMETYPE;");
                               
     query.bindValue(":GAMETYPE",GameType);
@@ -149,8 +149,8 @@ void GameHandler::InitMetaDataMap(QString GameType)
 
 void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre, QString* Year,
                               QString* Country, QString* CRC32, QString* GameName,
-                              QString *Publisher, QString *Version, QString* Fanart,
-                              QString* Boxart)
+                              QString *Plot, QString *Publisher, QString *Version, 
+                              QString* Fanart, QString* Boxart)
 {
     QString key;
     QString tmpcrc;
@@ -164,6 +164,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
     *Country = QObject::tr("Unknown");
     *GameName = QObject::tr("Unknown");
     *Genre = QObject::tr("Unknown");
+    *Plot = QObject::tr("Unknown");
     *Publisher = QObject::tr("Unknown");
     *Version = QObject::tr("0");
     *Fanart = QObject::tr("");
@@ -412,6 +413,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     QString thequery;
     QString queryvalues;
     QString Year;
+    QString Plot;
     QString Publisher;
     QString Version;
     QString Fanart;
@@ -428,7 +430,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             if (indepth)
             {
                 GetMetadata(handler, iter.data().RomFullPath(), &Genre, &Year, &Country, &CRC32, &GameName,
-                            &Publisher, &Version, &Fanart, &Boxart);
+                            &Plot, &Publisher, &Version, &Fanart, &Boxart);
             }
             else
             {
@@ -437,6 +439,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 CRC32 = "";
                 Year = QObject::tr("19xx");
                 GameName = QObject::tr("Unknown");
+                Plot = QObject::tr("Unknown");
                 Publisher = QObject::tr("Unknown");
                 Version = QObject::tr("0");
                 Fanart = QObject::tr("");
@@ -452,10 +455,10 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 	    VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
             query.prepare("INSERT INTO gamemetadata "
                           "(system, romname, gamename, genre, year, gametype, " 
-		          "rompath, country, crc_value, diskcount, display, "
+		          "rompath, country, crc_value, diskcount, display, plot, "
 			  "publisher, version, fanart, boxart) "
 		          "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
-			  ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PUBLISHER, :VERSION, "
+			  ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PLOT, :PUBLISHER, :VERSION, "
                           ":FANART, BOXART)");
 
 
@@ -469,6 +472,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 	    query.bindValue(":ROMPATH",iter.data().RomPath());
 	    query.bindValue(":COUNTRY",Country);
 	    query.bindValue(":CRC32", CRC32);
+            query.bindValue(":PLOT", Plot);
 	    query.bindValue(":PUBLISHER", Publisher);
 	    query.bindValue(":VERSION", Version);
             query.bindValue(":FANART", Fanart);

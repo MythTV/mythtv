@@ -25,14 +25,17 @@ class EditRomInfoDialog : public MythScreenType
     void SetGenre();
     void SetYear();
     void SetCountry();
+    void SetPlot();
     void SetPublisher();
     void ToggleFavorite();
+    void FindScreenshot();
     void FindFanart();
     void FindBoxart();
     void SaveAndExit();
 
   private:
     void fillWidgets();
+    void SetScreenshot(QString file);
     void SetFanart(QString file);
     void SetBoxart(QString file);
 
@@ -45,8 +48,11 @@ class EditRomInfoDialog : public MythScreenType
     MythUITextEdit      *m_genreEdit;
     MythUITextEdit      *m_yearEdit;
     MythUITextEdit      *m_countryEdit;
+    MythUITextEdit      *m_plotEdit;
     MythUITextEdit      *m_publisherEdit;
     MythUICheckBox      *m_favoriteCheck; 
+    MythUIButton        *m_screenshotButton;
+    MythUIText          *m_screenshotText;
     MythUIButton        *m_fanartButton;
     MythUIText          *m_fanartText;
     MythUIButton        *m_boxartButton;

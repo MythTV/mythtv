@@ -53,6 +53,7 @@ bool GameUI::Create()
     UIUtilE::Assign(this, m_gameYear, "yearname", &err);
     UIUtilE::Assign(this, m_gameGenre, "genrename", &err);
     UIUtilE::Assign(this, m_gameFavourite, "showfavorite", &err);
+    UIUtilE::Assign(this, m_gamePlot, "plot", &err);
     UIUtilE::Assign(this, m_gameImage, "gameimage", &err);
     UIUtilE::Assign(this, m_fanartImage, "fanart", &err);
     UIUtilE::Assign(this, m_boxImage, "boxart", &err);
@@ -294,13 +295,14 @@ void GameUI::updateRomInfo(RomInfo *rom)
     m_gameSystem->SetText(rom->System());
     m_gameYear->SetText(rom->Year());
     m_gameGenre->SetText(rom->Genre());
+    m_gamePlot->SetText(rom->Plot());
 
     if (rom->Favorite())
         m_gameFavourite->SetText("Yes");
     else
         m_gameFavourite->SetText("No");
 
-    m_gameImage->SetFilename(rom->ImagePath());
+    m_gameImage->SetFilename(rom->Screenshot());
     m_fanartImage->SetFilename(rom->Fanart());
     m_boxImage->SetFilename(rom->Boxart());
 }
@@ -310,6 +312,7 @@ void GameUI::clearRomInfo(void) {
     m_gameSystem->SetText("");
     m_gameYear->SetText("");
     m_gameGenre->SetText("");
+    m_gamePlot->SetText("");
     m_gameFavourite->SetText("");
 
     if (m_gameImage->IsVisible())
@@ -553,12 +556,16 @@ QString GameUI::getFillSql(MythGenericTree *node) const
             filter += conj + "trim(genre)=:GENRE";
             conj = " and ";
         }
+        if (!romInfo->Plot().isEmpty())
+        {
+            filter += conj + "plot=:PLOT";
+            conj = " and ";
+        }
         if (!romInfo->Publisher().isEmpty())
         {
             filter += conj + "publisher=:PUBLISHER";
             conj = " and ";
         }
-
         if (!romInfo->Gamename().isEmpty())
         {
             filter += conj + "trim(gamename)=:GAMENAME";
@@ -650,6 +657,8 @@ void GameUI::fillNode(MythGenericTree *node)
             query.bindValue(":YEAR", romInfo->Year());
         if (!romInfo->Genre().isEmpty())
             query.bindValue(":GENRE", romInfo->Genre());
+        if (!romInfo->Plot().isEmpty())
+            query.bindValue(":PLOT", romInfo->Plot());
         if (!romInfo->Publisher().isEmpty())
             query.bindValue(":PUBLISHER", romInfo->Publisher());
         if (!romInfo->Gamename().isEmpty())

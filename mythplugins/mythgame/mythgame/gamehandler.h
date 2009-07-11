@@ -67,7 +67,7 @@ class GameHandler
     void GetMetadata(GameHandler *handler, QString rom, 
                              QString* Genre, QString* Year, QString* Country,
                              QString* CRC32, QString* GameName,
-                             QString* Publisher, QString* Version,
+                             QString* Plot, QString* Publisher, QString* Version,
                              QString* Fanart, QString* Boxart);
 
     void promptForRemoval(QString filename, QString RomPath );

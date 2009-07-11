@@ -19,8 +19,8 @@ bool operator==(const RomInfo& a, const RomInfo& b)
 void RomInfo::UpdateDatabase()
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT gamename,genre,year,country,publisher,favorite,"
-                  "fanart,boxart "
+    query.prepare("SELECT gamename,genre,year,country,plot,publisher, "
+                  "favorite,screenshot,fanart,boxart "
                   "FROM gamemetadata "
                   "WHERE gametype = :GAMETYPE "
                   "AND romname = :ROMNAME");
@@ -41,14 +41,17 @@ void RomInfo::UpdateDatabase()
     QString t_genre     = query.value(1).toString();
     QString t_year      = query.value(2).toString();
     QString t_country   = query.value(3).toString();
-    QString t_publisher = query.value(4).toString();
-    bool    t_favourite = query.value(5).toBool();
-    QString t_fanart = query.value(6).toString();
-    QString t_boxart = query.value(7).toString();
+    QString t_plot      = query.value(4).toString();
+    QString t_publisher = query.value(5).toString();
+    bool    t_favourite = query.value(6).toBool();
+    QString t_screenshot = query.value(7).toString();
+    QString t_fanart = query.value(8).toString();
+    QString t_boxart = query.value(9).toString();
 
     if ((t_gamename  != Gamename())  || (t_genre     != Genre())   ||
         (t_year      != Year())      || (t_country   != Country()) ||
-        (t_publisher != Publisher()) || (t_favourite != Favorite()) ||
+        (t_plot      != Plot())      || (t_publisher != Publisher()) || 
+        (t_favourite != Favorite())  || (t_screenshot != Screenshot()) || 
         (t_fanart    != Fanart())    || (t_boxart    != Boxart()))
     {
         query.prepare("UPDATE gamemetadata "
@@ -57,8 +60,10 @@ void RomInfo::UpdateDatabase()
                       "    genre = :GENRE,"
                       "    year = :YEAR,"
                       "    country = :COUNTRY,"
+                      "    plot = :PLOT,"
                       "    publisher = :PUBLISHER,"
                       "    favorite = :FAVORITE,"
+                      "    screenshot = :SCREENSHOT,"
                       "    fanart = :FANART,"
                       "    boxart = :BOXART "
                       "WHERE gametype = :GAMETYPE AND "
@@ -67,8 +72,10 @@ void RomInfo::UpdateDatabase()
         query.bindValue(":GENRE", Genre());
         query.bindValue(":YEAR", Year());
         query.bindValue(":COUNTRY", Country());
+        query.bindValue(":PLOT", Plot());
         query.bindValue(":PUBLISHER", Publisher());
         query.bindValue(":FAVORITE", Favorite());
+        query.bindValue(":SCREENSHOT", Screenshot());
         query.bindValue(":FANART", Fanart());
         query.bindValue(":BOXART", Boxart());
         query.bindValue(":GAMETYPE", GameType());
@@ -155,12 +162,16 @@ void RomInfo::setField(QString field, QString data)
         favorite = data.toInt();
     else if (field == "rompath")
         rompath = data;
+    else if (field == "screenshot")
+        screenshot = data;
     else if (field == "fanart")
         fanart = data;
     else if (field == "boxart")
         boxart = data;
     else if (field == "country")
         country = data;
+    else if (field == "plot")
+        plot = data;
     else if (field == "publisher")
         publisher = data;
     else if (field == "crc_value")
@@ -225,8 +236,9 @@ void RomInfo::fillData()
     }
 
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
-                       "rompath,country,crc_value,diskcount,gametype,publisher,"
-                       "version,fanart,boxart FROM gamemetadata WHERE gamename = :GAMENAME "
+                       "rompath,country,crc_value,diskcount,gametype,plot,publisher,"
+                       "version,screenshot,fanart,boxart FROM gamemetadata "
+                       "WHERE gamename = :GAMENAME "
                        + systemtype + " ORDER BY diskcount DESC";
 
     query.prepare(thequery);
@@ -247,10 +259,12 @@ void RomInfo::fillData()
         setCRC_VALUE(query.value(8).toString());
         setDiskCount(query.value(9).toInt());
         setGameType(query.value(10).toString());
-        setPublisher(query.value(11).toString());
-        setVersion(query.value(12).toString());
-        setFanart(query.value(13).toString());
-        setBoxart(query.value(14).toString());
+        setPlot(query.value(11).toString());
+        setPublisher(query.value(12).toString());
+        setVersion(query.value(13).toString());
+        setScreenshot(query.value(14).toString());
+        setFanart(query.value(15).toString());
+        setBoxart(query.value(16).toString());
     }
 
     query.prepare("SELECT screenshots FROM gameplayers "

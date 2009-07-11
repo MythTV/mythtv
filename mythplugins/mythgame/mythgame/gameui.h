@@ -59,6 +59,7 @@ class GameUI : public MythScreenType
     MythUIText       *m_gameSystem;
     MythUIText       *m_gameYear;
     MythUIText       *m_gameGenre;
+    MythUIText       *m_gamePlot;
     MythUIText       *m_gameFavourite;
     MythUIImage      *m_gameImage; 
     MythUIImage      *m_fanartImage;

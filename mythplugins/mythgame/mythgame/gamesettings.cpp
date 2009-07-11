@@ -86,6 +86,16 @@ static HostCheckBox *GameTreeView()
     return gc;
 }
 
+HostLineEdit *GetScreenshotDir()
+{
+    HostLineEdit *gc = new HostLineEdit("mythgame.screenshotdir");
+    gc->setLabel(QObject::tr("Directory where Game Screenshot is stored"));
+    gc->setValue(GetConfDir() + "/MythGame/Screenshots");
+    gc->setHelpText(QObject::tr("This directory will be the default browse "
+                    "location when assigning screenshots."));
+    return gc;
+}
+
 HostLineEdit *GetFanartDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.fanartdir");
@@ -116,6 +126,7 @@ MythGameGeneralSettings::MythGameGeneralSettings()
     general->addChild(GameRemovalPrompt());
     general->addChild(GameShowFileNames());
     general->addChild(GameTreeView());
+    general->addChild(GetScreenshotDir());
     general->addChild(GetFanartDir());
     general->addChild(GetBoxartDir());
     addChild(general);
