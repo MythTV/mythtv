@@ -313,8 +313,8 @@ void MythThemedMenu::doMenu()
             if ( (allowsd != 0) && (allowsd != 4)  )
             {
                 m_menuPopup->SetReturnEvent(this,"popmenu_exit");
-                m_menuPopup->AddButton("Shutdown");
-                m_menuPopup->AddButton("Reboot");
+                m_menuPopup->AddButton(tr("Shutdown"));
+                m_menuPopup->AddButton(tr("Reboot"));
             }
             else
             {
@@ -325,27 +325,27 @@ void MythThemedMenu::doMenu()
         case 4:
             // shutdown
             m_menuPopup->SetReturnEvent(this,"popmenu_shutdown");
-            m_menuPopup->AddButton("Shutdown");
+            m_menuPopup->AddButton(tr("Shutdown"));
             break;
         case 5:
             // reboot
             m_menuPopup->SetReturnEvent(this,"popmenu_reboot");
-            m_menuPopup->AddButton("Reboot");
+            m_menuPopup->AddButton(tr("Reboot"));
             break;
         case 3:
         case 6:
             // both
             m_menuPopup->SetReturnEvent(this,"popmenu_exit");
-            m_menuPopup->AddButton("Shutdown");
-            m_menuPopup->AddButton("Reboot");
+            m_menuPopup->AddButton(tr("Shutdown"));
+            m_menuPopup->AddButton(tr("Reboot"));
             break;
         default:
             m_menuPopup->SetReturnEvent(this,"popmenu_noexit");
             break;
     }
 
-    m_menuPopup->AddButton("About");
-    m_menuPopup->AddButton("Cancel");
+    m_menuPopup->AddButton(tr("About"));
+    m_menuPopup->AddButton(tr("Cancel"));
 
 }
 
@@ -375,7 +375,7 @@ void MythThemedMenu::aboutScreen()
         mainStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "version");
-    m_menuPopup->AddButton("OK!");
+    m_menuPopup->AddButton(tr("Ok"));
 
 }
 
@@ -391,11 +391,8 @@ void MythThemedMenu::customEvent(QEvent *event)
         QString halt_cmd = GetMythDB()->GetSetting("HaltCommand");
         QString reboot_cmd = GetMythDB()->GetSetting("RebootCommand");
 
-        VERBOSE(VB_IMPORTANT, QString("Result ID: %1").arg(resultid));
-
         if (resultid == "popmenu_exit")
         {
-            VERBOSE(VB_IMPORTANT, QString("Button Number: %1").arg(buttonnum));
             switch (buttonnum)
             {
                 case 0:
@@ -408,7 +405,6 @@ void MythThemedMenu::customEvent(QEvent *event)
                     break;
                 case 2:
                     aboutScreen();
-                    VERBOSE(VB_IMPORTANT, "About Screen");
                     break;
             }
         }
