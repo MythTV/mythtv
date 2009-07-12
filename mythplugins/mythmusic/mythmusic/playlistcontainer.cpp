@@ -41,7 +41,7 @@ void PlaylistContainer::removeCDTrack(int track)
 
 bool PlaylistContainer::checkCDTrack(int track)
 {
-    list<int>::const_iterator it = 
+    list<int>::const_iterator it =
         find(cd_playlist.begin(), cd_playlist.end(), track);
     return it != cd_playlist.end();
 }
@@ -115,7 +115,7 @@ void PlaylistContainer::load()
                   "WHERE playlist_name != :DEFAULT"
                   " AND playlist_name != :BACKUP "
                   " AND (hostname = '' OR hostname = :HOST) "
-                  "ORDER BY playlist_id;");
+                  "ORDER BY playlist_name;");
     query.bindValue(":DEFAULT", "default_playlist_storage");
     query.bindValue(":BACKUP", "backup_playlist_storage");
     query.bindValue(":HOST", my_host);
