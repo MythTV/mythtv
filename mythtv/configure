@@ -2602,6 +2602,12 @@ if test $target_os = darwin; then
     if test $cpu == "core2"; then
         cpu="nocona"
     fi
+    # Core Duo might be identified as march=pentium3, which errors:
+    # ...MachineExceptions.h:... error: '__m128i' does not name a type
+    # ...MachineExceptions.h:... error: '__m128i' does not name a type
+    if test $cpu == "pentium3"; then
+        cpu=prescott
+    fi
 fi
 
 check_optflags -fomit-frame-pointer
