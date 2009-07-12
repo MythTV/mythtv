@@ -3404,14 +3404,11 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
 
 bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
 {
-    if ((request.flags & kFlagAntennaAdjust) || !GetDTVRecorder() ||
-        signalMonitor || !channel || !channel->IsOpen())
+    if ((request.flags & kFlagAntennaAdjust) || request.input.isEmpty() ||
+        !GetDTVRecorder() || signalMonitor || !channel || !channel->IsOpen())
     {
         return false;
     }
-
-    if (!request.input.isEmpty())
-        return false;
 
     uint    sourceid   = channel->GetCurrentSourceID();
     QString oldchannum = channel->GetCurrentName();
