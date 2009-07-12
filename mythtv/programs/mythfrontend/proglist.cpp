@@ -101,7 +101,7 @@ ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
     m_useGenres = false;
 
     m_curView = -1;
-    fillViewList("time");
+    fillViewList("reverse time");
 
     gContext->addCurrentLocation("PreviousList");
 }
