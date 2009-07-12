@@ -1488,8 +1488,6 @@ void ProgLister::updateButtonList(void)
 {
     m_progList->Reset();
 
-    QString tmptitle;
-
     ProgramList::const_iterator it = m_itemList.begin();
     for (; it != m_itemList.end(); ++it)
     {
@@ -1498,25 +1496,25 @@ void ProgLister::updateButtonList(void)
 
         if (pginfo->recstatus == rsRecording)
             state = "running";
-        else if (pginfo->recstatus == rsConflict ||
-                    pginfo->recstatus == rsOffLine ||
-                    pginfo->recstatus == rsAborted)
+        else if (pginfo->recstatus == rsConflict     ||
+                 pginfo->recstatus == rsOffLine      ||
+                 pginfo->recstatus == rsAborted)
             state = "error";
-        else if (pginfo->recstatus == rsWillRecord ||
+        else if (pginfo->recstatus == rsWillRecord   ||
                  pginfo->recstatus == rsRecorded)
-                state = "normal";
-        else if (pginfo->recstatus == rsRepeat ||
-                    pginfo->recstatus == rsOtherShowing ||
-                    pginfo->recstatus == rsNeverRecord ||
-                    pginfo->recstatus == rsDontRecord ||
-                    (pginfo->recstatus != rsDontRecord &&
-                    pginfo->recstatus <= rsEarlierShowing))
+            state = "normal";
+        else if (pginfo->recstatus == rsRepeat       ||
+                 pginfo->recstatus == rsOtherShowing ||
+                 pginfo->recstatus == rsNeverRecord  ||
+                 pginfo->recstatus == rsDontRecord   ||
+                 (pginfo->recstatus != rsDontRecord &&
+                  pginfo->recstatus <= rsEarlierShowing))
             state = "disabled";
         else
             state = "warning";
 
         MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_progList, "", qVariantFromValue(pginfo));
+            new MythUIButtonListItem(m_progList, "", qVariantFromValue(pginfo));
 
         QMap<QString, QString> infoMap;
         pginfo->ToMap(infoMap);
@@ -1531,8 +1529,8 @@ void ProgLister::updateButtonList(void)
     if (m_positionText)
     {
         m_positionText->SetText(tr("%1 of %2")
-                .arg(m_progList->GetCurrentPos())
-                .arg(m_progList->GetCount()));
+            .arg(m_progList->GetCurrentPos())
+            .arg(m_progList->GetCount()));
     }
 }
 
