@@ -1488,21 +1488,23 @@ void ProgLister::updateButtonList(void)
 {
     m_progList->Reset();
 
+    QString state;
+    InfoMap infoMap;
+
     ProgramList::const_iterator it = m_itemList.begin();
     for (; it != m_itemList.end(); ++it)
     {
         ProgramInfo *pginfo = *it;
-        QString state;
 
-        if (pginfo->recstatus == rsRecording)
+        if (pginfo->recstatus == rsRecorded          ||
+            pginfo->recstatus == rsWillRecord)
+            state = "normal";
+        else if (pginfo->recstatus == rsRecording)
             state = "running";
         else if (pginfo->recstatus == rsConflict     ||
                  pginfo->recstatus == rsOffLine      ||
                  pginfo->recstatus == rsAborted)
             state = "error";
-        else if (pginfo->recstatus == rsWillRecord   ||
-                 pginfo->recstatus == rsRecorded)
-            state = "normal";
         else if (pginfo->recstatus == rsRepeat       ||
                  pginfo->recstatus == rsOtherShowing ||
                  pginfo->recstatus == rsNeverRecord  ||
@@ -1516,7 +1518,6 @@ void ProgLister::updateButtonList(void)
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_progList, "", qVariantFromValue(pginfo));
 
-        QMap<QString, QString> infoMap;
         pginfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
