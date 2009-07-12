@@ -283,9 +283,6 @@ using_xvmc:LIBS += $$CONFIG_XVMC_LIBS
 macx {
     QMAKE_LFLAGS_SHLIB += -single_module
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC4000000
-    SOURCES            -= audio.c
 }
-
-mingw:SOURCES -= audio.c
 
 include ( ../libs-targetfix.pro )
