@@ -293,6 +293,7 @@ void MythUIWebBrowser::SetBackgroundColor(QColor color)
 
     QPalette palette = m_browser->page()->palette();
     palette.setBrush(QPalette::Window, QBrush(color));
+    palette.setBrush(QPalette::Base, QBrush(color));
     m_browser->page()->setPalette(palette);
 
     UpdateBuffer();
