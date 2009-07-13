@@ -1,15 +1,19 @@
 // qt
 #include <QDomDocument>
+#include <QPainter>
 
 // myth
 #include "mythverbose.h"
 #include "mythpainter.h"
+#include "mythimage.h"
+#include "mythmainwindow.h"
 
 #include "mythuishape.h"
 
 MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
           : MythUIType(parent, name)
 {
+    m_image = NULL;
     m_type = "box";
     m_fillColor = QColor();
     m_lineColor = QColor();
@@ -21,30 +25,117 @@ MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
 
 MythUIShape::~MythUIShape()
 {
+    if (m_image)
+    {
+        m_image->DownRef();
+        m_image = NULL;
+    }
 }
 
 void MythUIShape::Reset()
 {
+    if (m_image)
+    {
+        m_image->DownRef();
+        m_image = NULL;
+    }
+    
     MythUIType::Reset();
 }
 
 void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
-    QRect area = m_Area.toQRect();
+    QRect area = m_Area;
     area.translate(xoffset, yoffset);
 
-    QColor fillColor(m_fillColor);
-    fillColor.setAlpha((int)(m_fillColor.alpha() * (alphaMod / 255.0)));
-    QColor lineColor(m_lineColor);
-    lineColor.setAlpha((int)(m_lineColor.alpha() * (alphaMod / 255.0)));
+    if (!m_image || m_image->isNull())
+    {
+        if (m_type == "box")
+            DrawRect(area, m_drawFill, m_fillColor,
+                     m_drawLine, m_lineWidth, m_lineColor);
+        else if (m_type == "roundbox")
+            DrawRoundRect(area, m_cornerRadius, m_drawFill, m_fillColor,
+                          m_drawLine, m_lineWidth, m_lineColor);
+    }
 
-    if (m_type == "box")
-        p->DrawRect(area, m_drawFill, fillColor,
-                    m_drawLine, m_lineWidth, lineColor);
-    else if (m_type == "roundbox")
-        p->DrawRoundRect(area, m_cornerRadius, m_drawFill, fillColor,
-                         m_drawLine, m_lineWidth, lineColor);
+    p->DrawImage(area.x(), area.y(), m_image, alphaMod);
+}
+
+void MythUIShape::DrawRect(const QRect &area,
+                           bool drawFill, const QColor &fillColor,
+                           bool drawLine, int lineWidth, const QColor &lineColor)
+{
+    if (m_image)
+    {
+        m_image->DownRef();
+        m_image = NULL;
+    }
+
+    QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
+    image.fill(0x00000000);
+    QPainter painter(&image);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    if (drawLine)
+        painter.setPen(QPen(lineColor, lineWidth));
+    else
+        painter.setPen(QPen(Qt::NoPen));
+
+    if (drawFill)
+        painter.setBrush(QBrush(fillColor));
+    else
+        painter.setBrush(QBrush(Qt::NoBrush));
+
+    QRect r(lineWidth / 2, lineWidth / 2, area.width() - lineWidth, area.height() - lineWidth);
+    painter.drawRect(r);
+
+    painter.end();
+
+    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image->Assign(image);
+}
+
+void MythUIShape::DrawRoundRect(const QRect &area, int radius,
+                                bool drawFill, const QColor &fillColor,
+                                bool drawLine, int lineWidth, const QColor &lineColor)
+{
+    if (m_image)
+    {
+        m_image->DownRef();
+        m_image = NULL;
+    }
+
+    QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
+    image.fill(0x00000000);
+    QPainter painter(&image);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    if (drawLine)
+        painter.setPen(QPen(lineColor, lineWidth));
+    else
+        painter.setPen(QPen(Qt::NoPen));
+
+    if (drawFill)
+        painter.setBrush(QBrush(fillColor));
+    else
+        painter.setBrush(QBrush(Qt::NoBrush));
+
+    if ((area.width() / 2) < radius)
+        radius = area.width() / 2;
+
+    if ((area.height() / 2) < radius)
+        radius = area.height() / 2;
+
+    QRect r(lineWidth / 2, lineWidth / 2, area.width() - lineWidth, area.height() - lineWidth);
+    painter.drawRoundedRect(r, (qreal)radius, qreal(radius));
+
+    painter.end();
+
+    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image->Assign(image);
 }
 
 bool MythUIShape::ParseElement(QDomElement &element)
@@ -108,6 +199,7 @@ void MythUIShape::CopyFrom(MythUIType *base)
         return;
     }
 
+    m_image = shape->m_image;
     m_type = shape->m_type;
     m_fillColor = shape->m_fillColor;
     m_lineColor = shape->m_lineColor;
