@@ -1097,6 +1097,8 @@ HAVE_LIST="
     closesocket
     cmov
     conio_h
+    cpu_clips_negative
+    cpu_clips_positive
     dcbzl
     dev_bktr_ioctl_bt848_h
     dev_bktr_ioctl_meteor_h
@@ -1542,7 +1544,7 @@ processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
 
-if test -f /proc/cpuinfo ; then
+if disabled cross_compile && test -f /proc/cpuinfo ; then
     if test x"$processor" = x"" -o x"$processor" = x"$arch_raw" -o \
             x"$processor" = x"unknown" ; then
         processor=`cat /proc/cpuinfo | grep "model name" | head -n 1`
@@ -1551,7 +1553,7 @@ if test -f /proc/cpuinfo ; then
 fi
 
 # Mac OS X equivalent
-if test -f /usr/bin/hostinfo ; then
+if disabled cross_compile && test -f /usr/bin/hostinfo ; then
     arch=`arch`
     if test x"$arch" = x"ppc" -o x"$arch" = x"ppc64" ; then
         processor=`/usr/bin/hostinfo | grep "Processor type:"`
@@ -2880,7 +2882,7 @@ fi
 
 # "CPU_CLIP" test for SRC / libsamplerate
 # test positive wrap
-cat > $TMPC << EOF
+check_exec << EOF && enable cpuclipspositive
 int main(){
     float f = (1<<(sizeof(short)*8))>>1;
     short s = (short)f;
@@ -2890,12 +2892,8 @@ int main(){
 }
 EOF
 
-if $cc $CFLAGS $ECFLAGS -o $TMPE $TMPC 2>/dev/null ; then
-$TMPE && cpuclipspositive="yes"
-fi
-
 # test negative wrap
-cat > $TMPC << EOF
+check_exec << EOF && enable cpuclipsnegative
 int main(){
     float f = -((1<<(sizeof(short)*8))>>1) - 1;
     short s = (short)f;
@@ -2904,10 +2902,6 @@ int main(){
     return(1);
 }
 EOF
-
-if $cc $CFLAGS $ECFLAGS -o $TMPE $TMPC 2>/dev/null ; then
-$TMPE && cpuclipsnegative="yes"
-fi
 
 # test for distcc
 enabled distcc && check_cmd distcc --version || disable distcc
@@ -3892,16 +3886,6 @@ if enabled bigendian; then
     echo "#define WORDS_BIGENDIAN 1" >> $TMPH
 fi
 
-if enabled cpuclipspositive; then
-    echo "#define CPU_CLIPS_POSITIVE 1" >> $TMPH
-else
-    echo "#define CPU_CLIPS_POSITIVE 0" >> $TMPH
-fi
-if enabled cpuclipsnegative; then
-    echo "#define CPU_CLIPS_NEGATIVE 1" >> $TMPH
-else
-   echo "#define CPU_CLIPS_NEGATIVE 0" >> $TMPH
-fi
 if enabled freetype2; then
     echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
     echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK

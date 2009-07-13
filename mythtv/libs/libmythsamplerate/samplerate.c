@@ -452,11 +452,11 @@ src_float_to_short_array (const float *in, short *out, int len)
 	{	len -- ;
 
 		scaled_value = in [len] * (8.0 * 0x10000000) ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+		if (!HAVE_CPU_CLIPS_POSITIVE && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	out [len] = 32767 ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+		if (!HAVE_CPU_CLIPS_NEGATIVE && scaled_value <= (-8.0 * 0x10000000))
 		{	out [len] = -32768 ;
 			continue ;
 			} ;
