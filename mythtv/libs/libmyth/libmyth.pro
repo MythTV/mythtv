@@ -156,8 +156,6 @@ macx {
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/$${FC}.framework/Frameworks
     LIBS           += -framework $$join(FWKS," -framework ")
-
-    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC6000000
 }
 
 linux {

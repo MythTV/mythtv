@@ -102,8 +102,6 @@ macx {
         # DVDUtils uses Objective-C++, activated by .mm suffix
         QMAKE_EXT_CPP += .mm
     }
-
-    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
 
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
