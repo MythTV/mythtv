@@ -93,7 +93,7 @@ macx {
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
-    LIBS           += -framework Carbon -framework OpenGL
+    LIBS           += -framework IOKit
 
     using_appleremote {
         HEADERS += AppleRemote.h   AppleRemoteListener.h
@@ -101,8 +101,6 @@ macx {
         !using_lirc: HEADERS += lircevent.h
         !using_lirc: SOURCES += lircevent.cpp
     }
-
-    QMAKE_LFLAGS_SHLIB += -flat_namespace
 }
 
 using_joystick_menu {
