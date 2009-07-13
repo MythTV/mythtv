@@ -1,8 +1,6 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
 
-QMAKE_LFLAGS += $$LDFLAGS
-
 TEMPLATE = lib
 TARGET = mythavcodec-$$LIBVERSION
 CONFIG += thread dll warn_off
@@ -69,7 +67,7 @@ INSTALLS += inc
 
 LIBS += $$LOCAL_LIBDIR_X11
 LIBS += -L../libavutil -lmythavutil-$$LIBVERSION $$EXTRALIBS
-LIBS += -lz
+#LIBS += -lz
 
 
 # parts needed for many different codecs

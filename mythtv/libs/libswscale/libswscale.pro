@@ -66,7 +66,6 @@ contains( HAVE_ALTIVEC, yes ) {
 }
 
 macx {
-    LIBS               += -lz
     QMAKE_LFLAGS_SHLIB += -read_only_relocs warning
 }
 

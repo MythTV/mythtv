@@ -277,12 +277,6 @@ inc.files = avformat.h avio.h rtp.h rtsp.h rtspcodes.h
 INSTALLS += inc
 
 LIBS += -L../libavcodec -lmythavcodec-$$LIBVERSION -L../libavutil -lmythavutil-$$LIBVERSION
-LIBS += -lz
 using_xvmc:LIBS += $$CONFIG_XVMC_LIBS
-
-macx {
-    QMAKE_LFLAGS_SHLIB += -single_module
-    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC4000000
-}
 
 include ( ../libs-targetfix.pro )

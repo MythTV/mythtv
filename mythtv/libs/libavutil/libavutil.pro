@@ -80,10 +80,4 @@ contains( HAVE_ALTIVEC, yes ) {
   }
 }
 
-macx {
-    LIBS               += -lz
-    QMAKE_LFLAGS_SHLIB += -single_module
-    QMAKE_LFLAGS_SHLIB += -seg1addr 0xC2000000
-}
-
 include ( ../libs-targetfix.pro )
