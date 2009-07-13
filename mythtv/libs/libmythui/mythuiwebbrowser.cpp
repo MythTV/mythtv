@@ -228,6 +228,7 @@ void MythUIWebBrowser::Init(void)
     m_image->Assign(image);
 
     SetBackgroundColor(m_bgColor);
+    SetZoom(m_zoom);
 
     if (!m_widgetUrl.isEmpty() && m_widgetUrl.isValid())
         LoadPage(m_widgetUrl);
