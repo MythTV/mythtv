@@ -1272,6 +1272,7 @@ CMDLINE_SET="
     host_os
     logfile
     nm
+    qmake
     source_path
     sysinclude
     sysroot
@@ -1524,7 +1525,7 @@ distcc="yes"
 nm_default="nm"
 objformat="elf"
 ranlib="ranlib"
-qmake="qmake"
+qmake_default="qmake"
 strip="strip"
 yasmexe="yasm"
 
@@ -1771,8 +1772,6 @@ for opt do
     ;;
     --cxx=*) cxx=$optval
     ;;
-    --qmake=*) qmake=$optval
-    ;;
     --extra-cflags=*) check_ecflags $optval
     ;;
     --extra-cxxflags=*) check_cppflags $optval
@@ -1913,6 +1912,7 @@ strip="${cross_prefix}${strip}"
 sysinclude_default="${sysroot}/usr/include"
 
 set_default cc nm sysinclude
+set_default qmake
 as_default=$cc
 enabled cross_compile || host_cc_default=$cc
 set_default host_cc
