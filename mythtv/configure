@@ -2869,14 +2869,17 @@ enabled vis && add_cflags "-mcpu=ultrasparc -mtune=ultrasparc"
 enabled vis && check_mtune_mcpu "ultrasparc"
 
 # if architecture specific flags don't work blank them
-echo "int main( void ) { return 0; }" > $TMPC
-TMP_ARCHFLAGS=$ARCHFLAGS
-$cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null || ARCHFLAGS=""
-if test x"$ARCHFLAGS" = x""; then
-    if enabled cpu_override || enabled proc_opt || test x"$tune" != x"generic"; then
-        echo "ERROR: CPU specific ./configure options failed compile test"
-        echo "       Removing CPU specific compilation options. ($TMP_ARCHFLAGS)"
-        echo ""
+if test -n "$ARCHFLAGS"; then
+    TMP_ARCHFLAGS="$ARCH_FLAGS"
+    check_cc "$ARCHFLAGS" <<EOF || ARCHFLAGS=""
+int main( void ) { return 0; }
+EOF
+    if test -n "$ARCHFLAGS"; then
+        if enabled cpu_override || enabled proc_opt || test x"$tune" != x"generic"; then
+            echo "ERROR: CPU specific ./configure options failed compile test"
+            echo "       Removing CPU specific compilation options. ($TMP_ARCHFLAGS)"
+            echo ""
+        fi
     fi
 fi
 
