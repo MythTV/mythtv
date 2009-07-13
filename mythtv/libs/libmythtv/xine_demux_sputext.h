@@ -1,12 +1,7 @@
 #ifndef XINE_DEMUX_SPUTEXT_H
 #define XINE_DEMUX_SPUTEXT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <ctype.h>
-#include <stdio.h>
+#include "RingBuffer.h"
 
 #define SUB_BUFSIZE   1024
 #define SUB_MAX_TEXT  5
@@ -26,12 +21,13 @@ typedef struct {
 
 typedef struct {
 
-  FILE*              file_ptr;
+  RingBuffer*        rbuffer;
 
   int                status;
 
   char               buf[SUB_BUFSIZE];
   off_t              buflen;
+  off_t              emptyReads;
 
   float              mpsub_position;  
 
@@ -47,9 +43,5 @@ typedef struct {
 
 
 subtitle_t *sub_read_file (demux_sputext_t*);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

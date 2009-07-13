@@ -32,6 +32,7 @@
 #include "config.h"
 #endif
 
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -97,16 +98,23 @@ static char *read_line_from_input(demux_sputext_t *demuxstr, char *line, off_t l
   off_t nread = 0;
   char *s;
   int linelen;
-  
-  if ((len - demuxstr->buflen) > 512) {
-    if((nread = fread(
-	    &demuxstr->buf[demuxstr->buflen], 1, 
-	    len - demuxstr->buflen, demuxstr->file_ptr)) < 0) {
+
+  // Since our RemoteFile code sleeps 200ms whenever we get back less data
+  // than requested, but this code just keeps trying to read until it gets
+  // an error back, we check for empty reads so that we can stop reading
+  // when there is no more data to read
+  if (demuxstr->emptyReads == 0 && (len - demuxstr->buflen) > 512) {
+    nread = demuxstr->rbuffer->Read(
+        &demuxstr->buf[demuxstr->buflen], len - demuxstr->buflen);
+    if (nread < 0) {
       printf("read failed.\n");
       return NULL;
     }
   }
-  
+ 
+  if (!nread)
+    demuxstr->emptyReads++;
+
   demuxstr->buflen += nread;
   demuxstr->buf[demuxstr->buflen] = '\0';
 
@@ -1099,11 +1107,12 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   };
 
   /* Rewind (sub_autodetect() needs to read input from the beginning) */
-  if(fseek(demuxstr->file_ptr, 0, SEEK_SET) == -1) {
+  if(demuxstr->rbuffer->Seek(0, SEEK_SET) == -1) {
     printf("seek failed.\n");
     return NULL;
   }
   demuxstr->buflen = 0;
+  demuxstr->emptyReads = 0;
 
   demuxstr->format=sub_autodetect (demuxstr);
   if (demuxstr->format==FORMAT_UNKNOWN) {
@@ -1113,11 +1122,12 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
   /*printf("Detected subtitle file format: %d\n", demuxstr->format);*/
     
   /* Rewind */
-  if(fseek(demuxstr->file_ptr, 0, SEEK_SET) == -1) {
+  if(demuxstr->rbuffer->Seek(0, SEEK_SET) == -1) {
     printf("seek failed.\n");
     return NULL;
   }
   demuxstr->buflen = 0;
+  demuxstr->emptyReads = 0;
 
   demuxstr->num=0;n_max=32;
   first = (subtitle_t *) malloc(n_max*sizeof(subtitle_t));

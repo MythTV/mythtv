@@ -1,8 +1,8 @@
 #ifndef REMOTEFILE_H_
 #define REMOTEFILE_H_
 
-#include <qstring.h>
-#include <qmutex.h>
+#include <QStringList>
+#include <QMutex>
 
 #include "mythexp.h"
 
@@ -12,7 +12,10 @@ class MythSocket;
 class MPUBLIC RemoteFile
 {
   public:
-    RemoteFile(const QString &url, bool usereadahead = true, int retries = -1);
+    RemoteFile(const QString &url,
+               bool usereadahead = true,
+               int retries = -1,
+               const QStringList *possibleAuxiliaryFiles = NULL);
    ~RemoteFile();
 
     bool Open();
@@ -37,6 +40,9 @@ class MPUBLIC RemoteFile
     MythSocket *getSocket(void)
         { return sock; }
 
+    QStringList GetAuxiliaryFiles(void) const
+        { return auxfiles; }
+
   private:
     MythSocket     *openSocket(bool control);
 
@@ -52,6 +58,9 @@ class MPUBLIC RemoteFile
     MythSocket     *controlSock;
     MythSocket     *sock;
     QString         query;
+
+    QStringList     possibleauxfiles;
+    QStringList     auxfiles;
 };
 
 #endif

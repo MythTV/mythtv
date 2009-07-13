@@ -1,6 +1,8 @@
-#include <math.h>
-#include <qtimer.h>
-#include <qpainter.h>
+#include <cmath>
+
+#include <QDir>
+#include <QTimer>
+#include <QPainter>
 
 #include "playercontext.h"
 #include "NuppelVideoPlayer.h"
@@ -11,6 +13,7 @@
 #include "dialogbox.h"
 #include "util-osx-cocoa.h"
 #include "videoouttypes.h"
+#include "storagegroup.h"
 
 #define LOC QString("playCtx: ")
 #define LOC_ERR QString("playCtx, Error: ")
@@ -467,8 +470,9 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
         _nvp->SetNoAudio();
     else
     {
-// FIXME: This causes startup to take *forever*
-//        _nvp->LoadExternalSubtitles(buffer->GetFilename());
+        QString subfn = buffer->GetSubtitleFilename();
+        if (!subfn.isEmpty())
+            _nvp->LoadExternalSubtitles(subfn);
     }
 
     if ((embedwinid > 0) && embedbounds)

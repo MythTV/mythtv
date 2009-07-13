@@ -54,6 +54,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "storagegroup.h"
 #include "compat.h"
+#include "RingBuffer.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -1070,9 +1071,13 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce FileTransfer");
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a remote file transfer")
                                .arg(commands[2]));
-        QUrl qurl = slist[1];
-        QString wantgroup = slist[2];
+        QStringList::const_iterator it = slist.begin();
+        QUrl qurl = *(++it);
+        QString wantgroup = *(++it);
         QString filename = LocalFilePath(qurl, wantgroup);
+        QStringList checkfiles;
+        for (++it; it != slist.end(); ++it)
+            checkfiles += *it;
 
         FileTransfer *ft = NULL;
         bool usereadahead = true;
@@ -1096,6 +1101,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         ft->UpRef();
         encodeLongLong(retlist, ft->GetFileSize());
         ft->DownRef();
+
+        if (checkfiles.size())
+        {
+            QFileInfo fi(filename);
+            QDir dir = fi.absoluteDir();
+            for (it = checkfiles.begin(); it != checkfiles.end(); ++it)
+            {
+                if (dir.exists(*it) &&
+                    QFileInfo(dir, *it).size() >= RingBuffer::kReadTestSize)
+                {
+                    retlist<<*it;
+                }
+            }
+        }
     }
 
     socket->writeStringList(retlist);

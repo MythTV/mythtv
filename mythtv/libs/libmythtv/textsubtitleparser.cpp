@@ -11,6 +11,7 @@
 #include <qtextcodec.h>
 
 #include "mythcontext.h"
+#include "RingBuffer.h"
 
 using std::lower_bound;
 
@@ -110,15 +111,15 @@ void TextSubtitles::Clear(void)
 bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
 {
     demux_sputext_t sub_data;
-    sub_data.file_ptr = fopen(fileName.toLocal8Bit().constData(), "r");
+    sub_data.rbuffer = new RingBuffer(fileName, 0, false);
     
-    if (!sub_data.file_ptr)
+    if (!sub_data.rbuffer)
         return false;
     
     subtitle_t *loaded_subs = sub_read_file(&sub_data);
     if (!loaded_subs)
     {
-        fclose(sub_data.file_ptr);
+        delete sub_data.rbuffer;
         return false;
     }
 
@@ -131,7 +132,10 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
     if (!textCodec)
         textCodec = QTextCodec::codecForName("utf-8");
     if (!textCodec)
+    {
+        delete sub_data.rbuffer;
         return false;
+    }
 
     QTextDecoder *dec = textCodec->makeDecoder();
 
@@ -162,7 +166,7 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
     // textCodec object is managed by Qt, do not delete...
 
     free(loaded_subs);
-    fclose(sub_data.file_ptr);
+    delete sub_data.rbuffer;
 
     return true;
 }

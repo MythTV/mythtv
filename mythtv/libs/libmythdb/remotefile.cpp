@@ -12,7 +12,8 @@ using namespace std;
 #include "compat.h"
 #include "mythverbose.h"
 
-RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries) :
+RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries,
+                       const QStringList *possibleAuxiliaryFiles) :
     path(_path),
     usereadahead(useRA),  retries(_retries),
     filesize(-1),         timeoutisfast(false),
@@ -21,6 +22,8 @@ RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries) :
     controlSock(NULL),    sock(NULL),
     query("QUERY_FILETRANSFER %1")
 {
+    if (possibleAuxiliaryFiles)
+        possibleauxfiles = *possibleAuxiliaryFiles;
     Open();
     VERBOSE(VB_GENERAL,QString("RemoteFile(%1)").arg(path));
 }
@@ -88,6 +91,10 @@ MythSocket *RemoteFile::openSocket(bool control)
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 
+        QStringList::const_iterator it = possibleauxfiles.begin();
+        for (; it != possibleauxfiles.end(); ++it)
+            strlist << *it;
+
         lsock->writeStringList(strlist);
         lsock->readStringList(strlist, true);
 
@@ -101,8 +108,11 @@ MythSocket *RemoteFile::openSocket(bool control)
             return NULL;
         }
 
-        recordernum = strlist[1].toInt();
-        filesize = decodeLongLong(strlist, 2);
+        it = strlist.begin(); ++it;
+        recordernum = (*it).toInt(); ++it;
+        filesize = decodeLongLong(strlist, it);
+        for (; it != strlist.end(); ++it)
+            auxfiles << *it;
     }
     
     return lsock;

@@ -36,6 +36,7 @@ class MPUBLIC RingBuffer
     // Gets
     /// Returns name of file used by this RingBuffer
     QString   GetFilename(void)      const { return filename; }
+    QString   GetSubtitleFilename(void) const { return subtitlefilename; }
     /// Returns ReadBufAvail(void)
     int       DataInReadAhead(void)  const { return ReadBufAvail(); }
     /// Returns value of stopreads
@@ -117,6 +118,7 @@ class MPUBLIC RingBuffer
 
   private:
     QString filename;
+    QString subtitlefilename;
 
     ThreadedFileWriter *tfw;
     int fd2;
@@ -181,8 +183,14 @@ class MPUBLIC RingBuffer
     /// Condition to signal that the read ahead thread is running
     QWaitCondition readAheadRunningCond;
     QMutex readAheadRunningCondLock;
+
+  public:
+    static QMutex subExtLock;
+    static QStringList subExt;
+    static QStringList subExtNoCheck;
  
     // constants
+  public:
     static const uint kBufferSize;
     static const uint kReadTestSize;
 };

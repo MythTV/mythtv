@@ -16,6 +16,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QFileInfo>
+#include <QDir>
 
 using namespace std;
 
@@ -46,16 +47,20 @@ const uint RingBuffer::kBufferSize = 3 * 1024 * 1024;
 
 #define CHUNK 32768 /* readblocksize increments */
 
-#define PNG_MIN_SIZE   20 /* header plus one empty chunk */
-#define NUV_MIN_SIZE  204 /* header size? */
-#define MPEG_MIN_SIZE 376 /* 2 TS packets */
-
 #define LOC      QString("RingBuf(%1): ").arg(filename)
 #define LOC_WARN QString("RingBuf(%1) Warning: ").arg(filename)
 #define LOC_ERR  QString("RingBuf(%1) Error: ").arg(filename)
 
+#define PNG_MIN_SIZE   20 /* header plus one empty chunk */
+#define NUV_MIN_SIZE  204 /* header size? */
+#define MPEG_MIN_SIZE 376 /* 2 TS packets */
+
 /* should be minimum of the above test sizes */
 const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
+
+QMutex      RingBuffer::subExtLock;
+QStringList RingBuffer::subExt;
+QStringList RingBuffer::subExtNoCheck;
 
 /*
   Locking relations:
@@ -107,7 +112,7 @@ const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
 RingBuffer::RingBuffer(const QString &lfilename,
                        bool write, bool readahead,
                        uint read_retries)
-    : filename(lfilename),
+    : filename(lfilename),      subtitlefilename(QString::null),
       tfw(NULL),                fd2(-1),
       writemode(false),
       readpos(0),               writepos(0),
@@ -129,6 +134,22 @@ RingBuffer::RingBuffer(const QString &lfilename,
 {
     filename.detach();
     pthread_rwlock_init(&rwlock, NULL);
+
+    {
+        QMutexLocker locker(&subExtLock);
+        if (!subExt.size())
+        {
+            // Possible subtitle file extensions '.srt', '.sub', '.txt'
+            subExt += ".srt";
+            subExt += ".sub";
+            subExt += ".txt";
+
+            // Extensions for which a subtitle file should not exist
+            subExtNoCheck = subExt;
+            subExtNoCheck += ".gif";
+            subExtNoCheck += ".png";
+        }
+    }
 
     if (write)
     {
@@ -162,6 +183,66 @@ bool check_permissions(const QString &filename)
         return false;
     }
     return true;
+}
+
+static bool is_subtitle_possible(const QString &extension)
+{
+    QMutexLocker locker(&RingBuffer::subExtLock);
+    bool no_subtitle = false;
+    for (uint i = 0; i < (uint)RingBuffer::subExtNoCheck.size(); i++)
+    {
+        if (extension.contains(RingBuffer::subExtNoCheck[i].right(3)))
+        {
+            no_subtitle = true;
+            break;
+        }
+    }
+    return !no_subtitle;
+}
+
+static QString local_sub_filename(QFileInfo &fileInfo)
+{
+    // Subtitle handling
+    QString vidFileName = fileInfo.baseName();
+    QString dirName = fileInfo.absolutePath();
+
+    QString baseName = vidFileName;
+    int suffixPos = vidFileName.lastIndexOf(QChar('.'));
+    if (suffixPos > 0)
+        baseName = vidFileName.left(suffixPos);
+
+    QStringList el;
+    {
+        // The dir listing does not work if the filename has the
+        // following chars "[]()" so we convert them to the wildcard '?'
+        const QString findBaseName = baseName
+            .replace("[", "?")
+            .replace("]", "?")
+            .replace("(", "?")
+            .replace(")", "?");
+
+        QMutexLocker locker(&RingBuffer::subExtLock);
+        QStringList::const_iterator eit = RingBuffer::subExt.begin();
+        for (; eit != RingBuffer::subExt.end(); eit++)
+            el += findBaseName + *eit;
+    }
+
+    // Some Qt versions do not accept paths in the search string of
+    // entryList() so we have to set the dir first
+    QDir dir;
+    dir.setPath(dirName);
+
+    const QStringList candidates = dir.entryList(el);
+
+    QStringList::const_iterator cit = candidates.begin();
+    for (; cit != candidates.end(); ++cit)
+    {
+        QFileInfo fi(dirName + "/" + baseName + (*cit).right(4));
+        if (fi.exists() && (fi.size() >= RingBuffer::kReadTestSize))
+            return fi.absoluteFilePath();
+    }
+
+    return QString::null;
 }
 
 /** \fn RingBuffer::OpenFile(const QString&, uint)
@@ -286,6 +367,10 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         {
             oldfile = true;
         }
+
+        QString extension = fileInfo.completeSuffix().toLower();
+        if (is_subtitle_possible(extension))
+            subtitlefilename = local_sub_filename(fileInfo);
     }
 #ifdef USING_FRONTEND
     else if (is_dvd)
@@ -298,7 +383,35 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 #endif // USING_FRONTEND
     else
     {
-        remotefile = new RemoteFile(filename);
+        QString tmpSubName = filename;
+        QString dirName  = ".";
+
+        int dirPos = filename.lastIndexOf(QChar('/'));
+        if (dirPos > 0)
+        {
+            tmpSubName = filename.mid(dirPos + 1);
+            dirName = filename.left(dirPos);
+        }
+
+        QString baseName  = tmpSubName;
+        QString extension = tmpSubName;
+        QStringList auxFiles;
+
+        int suffixPos = tmpSubName.lastIndexOf(QChar('.'));
+        if (suffixPos > 0)
+        {
+            baseName = tmpSubName.left(suffixPos);
+            extension = tmpSubName.right(suffixPos-1);
+            if (is_subtitle_possible(extension))
+            {
+                QMutexLocker locker(&subExtLock);
+                QStringList::const_iterator eit = subExt.begin();
+                for (; eit != subExt.end(); eit++)
+                    auxFiles += baseName + *eit;
+            }
+        }
+
+        remotefile = new RemoteFile(filename, true, -1, &auxFiles);
         if (!remotefile->isOpen())
         {
             VERBOSE(VB_IMPORTANT,
@@ -307,6 +420,10 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             delete remotefile;
             remotefile = NULL;
         }
+
+        QStringList aux = remotefile->GetAuxiliaryFiles();
+        if (aux.size())
+            subtitlefilename = dirName + "/" + aux[0];
     }
 
     setswitchtonext = false;
