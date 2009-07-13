@@ -110,7 +110,7 @@ class DeviceRepeatSetting : public SpinBoxSetting, public Storage
 {
   public:
     DeviceRepeatSetting(DiSEqCDevDevice &device) :
-        SpinBoxSetting(this, 1, 5, 1), m_device(device)
+        SpinBoxSetting(this, 0, 5, 1), m_device(device)
     {
         setLabel(DeviceTree::tr("Repeat Count"));
         QString help = DeviceTree::tr(
