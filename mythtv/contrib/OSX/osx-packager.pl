@@ -514,6 +514,7 @@ This script can probably only build branch release-0-21-fixes.
 To build SVN HEAD, please try the latest version instead. e.g.
 http://svn.mythtv.org/svn/trunk/packaging/OSX/build/osx-packager.pl
 END
+    die;
 }
 
 our $WORKDIR = "$SCRIPTDIR/.osx-packager";
