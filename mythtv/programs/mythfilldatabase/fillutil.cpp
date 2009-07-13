@@ -26,7 +26,7 @@ bool dash_open(QFile &file, const QString &filename, int m, FILE *handle)
     }
     else
     {
-        file.setName(filename);
+        file.setFileName(filename);
         retval = file.open( (QIODevice::OpenMode)m );
     }
 

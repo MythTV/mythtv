@@ -4,8 +4,7 @@
 #include <QDateTime>
 #include <QUrl>
 #include <QDomDocument>
-
-#include <q3url.h>
+#include <QUrl>
 
 // C++ headers
 #include <iostream>
@@ -85,9 +84,13 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                Q3Url iconUrl(Q3Url(baseUrl.toString()),
-                              info.attribute("src", ""), true);
-                chaninfo->iconpath = iconUrl.toString();
+                QString path = info.attribute("src", "");
+                if (!path.isEmpty())
+                {
+                    QString base = baseUrl.toString(QUrl::StripTrailingSlash);
+                    chaninfo->iconpath = base +
+                        ((path.left(1) == "/") ? path : QString("/") + path);
+                }
             }
             else if (info.tagName() == "display-name")
             {

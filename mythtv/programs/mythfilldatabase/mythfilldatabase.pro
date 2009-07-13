@@ -2,7 +2,7 @@ include ( ../../config.mak )
 include ( ../../settings.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql qt3support
+QT += network xml sql
 
 TEMPLATE = app
 CONFIG += thread

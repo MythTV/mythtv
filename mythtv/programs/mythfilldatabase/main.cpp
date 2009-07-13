@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
             }
 
             fill_data.chan_data.cardtype =
-                QString(a.argv()[++argpos]).stripWhiteSpace().upper();
+                QString(a.argv()[++argpos]).trimmed().toUpper();
         }
         else if (!strcmp(a.argv()[argpos], "--max-days"))
         {
@@ -451,10 +451,12 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--export-icon-map [<filename>]\n";
             cout << "   Exports your current icon map to <filename> (default: "
-                    << (const char *)export_icon_data_filename << ")\n";
+                 << export_icon_data_filename.toLocal8Bit().constData()
+                 << ")\n";
             cout << "--import-icon-map [<filename>]\n";
-            cout << "   Imports an icon map from <filename> (default: " <<
-                    (const char *)import_icon_data_filename << ")\n";
+            cout << "   Imports an icon map from <filename> (default: "
+                 << import_icon_data_filename.toLocal8Bit().constData()
+                 << ")\n";
             cout << "--update-icon-map\n";
             cout << "   Updates icon map icons only\n";
             cout << "--reset-icon-map [all]\n";
@@ -746,9 +748,9 @@ int main(int argc, char *argv[])
                 parttotal = sel.value(2).toInt();
 
                 part.setNum(parttotal);
-                new_programid.append(part.rightJustify(2, '0'));
+                new_programid.append(part.rightJustified(2, '0'));
                 part.setNum(partnum);
-                new_programid.append(part.rightJustify(2, '0'));
+                new_programid.append(part.rightJustified(2, '0'));
 
                 VERBOSE(VB_GENERAL,
                         QString("    %1 -> %2 (part %3 of %4)")
