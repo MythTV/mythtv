@@ -904,8 +904,19 @@ if (! $OPT{'nohead'})
   # Empty subdirectory 'config' sometimes causes checkout problems
   &Syscall(['rm', '-fr', $SVNDIR . '/mythtv/config']);
   Verbose("Checking out source code");
-  &Syscall([ $svn, 'co', @svnrevision,
-            map($svnrepository . $_, @comps), $SVNDIR ]) or die;
+
+  if ($#comps == 0)
+  { 
+    # Single repository needs explicit directory for checkout:
+    &Syscall([ $svn, 'co', @svnrevision,
+               "$svnrepository/@comps", "$SVNDIR/@comps"]) or die;
+  }
+  else
+  {
+    # Multiple repositories are checked out by name under SVNDIR
+    &Syscall([ $svn, 'co', @svnrevision,
+              map($svnrepository . $_, @comps), $SVNDIR ]) or die;
+  }
 }
 else
 {
