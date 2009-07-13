@@ -139,19 +139,17 @@ void HDHRSignalMonitor::RunTableMonitor(void)
 {
     dtvMonitorRunning = true;
 
-    struct hdhomerun_video_sock_t *_video_socket;
-    _video_socket = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S);
-    if (!_video_socket)
+    HDHRChannel *hdrc = dynamic_cast<HDHRChannel*>(channel);
+    struct hdhomerun_device_t *_hdhomerun_device = hdrc->GetHDHRDevice();
+
+    if (!_hdhomerun_device)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to get video socket");
+        VERBOSE(VB_IMPORTANT, "Failed to get HDHomeRun device handle");
         return;
     }
 
-    HDHRChannel *hdrc = dynamic_cast<HDHRChannel*>(channel);
-    uint localPort = hdhomerun_video_get_local_port(_video_socket);
-    if (!hdrc->DeviceSetTarget(localPort))
+    if (!hdhomerun_device_stream_start(_hdhomerun_device))
     {
-        hdhomerun_video_destroy(_video_socket);
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set target");
         return;
     }
@@ -166,7 +164,7 @@ void HDHRSignalMonitor::RunTableMonitor(void)
 
         size_t data_length;
         unsigned char *data_buffer =
-            hdhomerun_video_recv(_video_socket,
+            hdhomerun_device_stream_recv(_hdhomerun_device,
                                          VIDEO_DATA_BUFFER_SIZE_1S / 5,
                                          &data_length);
 
@@ -179,8 +177,7 @@ void HDHRSignalMonitor::RunTableMonitor(void)
         usleep(2500);
     }
 
-    hdrc->DeviceClearTarget();
-    hdhomerun_video_destroy(_video_socket);
+    hdhomerun_device_stream_stop(_hdhomerun_device);
 
     VERBOSE(VB_CHANNEL, LOC + "RunTableMonitor(): -- shutdown");
 
@@ -215,16 +212,15 @@ void HDHRSignalMonitor::UpdateValues(void)
         return;
     }
 
-    QString msg = ((HDHRChannel*)channel)->TunerGet("status");
-    //ss  = signal strength,        [0,100]
-    //snq = signal to noise quality [0,100]
-    //seq = signal error quality    [0,100]
-    int loc_sig = msg.find("ss="),  loc_snq = msg.find("snq=");
-    int loc_seq = msg.find("seq="), loc_end = msg.length();
-    bool ok0, ok1, ok2;
-    uint sig = msg.mid(loc_sig + 3, loc_snq - loc_sig - 4).toUInt(&ok0);
-    uint snq = msg.mid(loc_snq + 4, loc_seq - loc_snq - 5).toUInt(&ok1);
-    uint seq = msg.mid(loc_seq + 4, loc_end - loc_seq - 4).toUInt(&ok2);
+    HDHRChannel *hdrc = dynamic_cast<HDHRChannel*>(channel);
+    struct hdhomerun_device_t *_hdhomerun_device = hdrc->GetHDHRDevice();
+    struct hdhomerun_tuner_status_t status;
+    hdhomerun_device_get_tuner_status(_hdhomerun_device, NULL, &status);
+
+    uint sig = status.signal_strength;
+    uint snq = status.signal_to_noise_quality;
+    uint seq = status.symbol_error_quality;
+
     (void) snq; // TODO should convert to S/N
     (void) seq; // TODO should report this...
 
@@ -236,9 +232,8 @@ void HDHRSignalMonitor::UpdateValues(void)
     bool isLocked = false;
     {
         QMutexLocker locker(&statusLock);
-        if (loc_sig > 0 && loc_snq > 0 && ok0)
-            signalStrength.SetValue(sig);
-        signalLock.SetValue(signalStrength.IsGood() ? 1 : 0);
+        signalStrength.SetValue(sig);
+        signalLock.SetValue(status.lock_supported);
         isLocked = signalLock.IsGood();
     }
 

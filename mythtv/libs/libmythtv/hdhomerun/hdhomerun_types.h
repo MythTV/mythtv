@@ -1,9 +1,7 @@
-#ifndef __HDHOMERUN_INCLUDES__
-#define __HDHOMERUN_INCLUDES__
 /*
- * hdhomerun.h
+ * hdhomerun_types.h
  *
- * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright © 2008-2009 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -32,17 +30,50 @@
  * conditions defined in the GNU Lesser General Public License.
  */
 
-#include "hdhomerun_os.h"
-#include "hdhomerun_types.h"
-#include "hdhomerun_pkt.h"
-#include "hdhomerun_debug.h"
-#include "hdhomerun_discover.h"
-#include "hdhomerun_control.h"
-#include "hdhomerun_video.h"
-#include "hdhomerun_channels.h"
-#include "hdhomerun_channelscan.h"
-#include "hdhomerun_device.h"
-#include "hdhomerun_device_selector.h"
+#define HDHOMERUN_STATUS_COLOR_NEUTRAL	0xFFFFFFFF
+#define HDHOMERUN_STATUS_COLOR_RED		0xFFFF0000
+#define HDHOMERUN_STATUS_COLOR_YELLOW	0xFFFFFF00
+#define HDHOMERUN_STATUS_COLOR_GREEN	0xFF00C000
 
-#endif /* __HDHOMERUN_INCLUDES__ */
+struct hdhomerun_device_t;
+struct hdhomerun_device_allocation_t;
 
+struct hdhomerun_tuner_status_t {
+	char channel[32];
+	char lock_str[32];
+	bool_t signal_present;
+	bool_t lock_supported;
+	bool_t lock_unsupported;
+	unsigned int signal_strength;
+	unsigned int signal_to_noise_quality;
+	unsigned int symbol_error_quality;
+	uint32_t raw_bits_per_second;
+	uint32_t packets_per_second;
+};
+
+struct hdhomerun_channelscan_program_t {
+	char program_str[64];
+	uint16_t program_number;
+	uint16_t virtual_major;
+	uint16_t virtual_minor;
+	uint16_t type;
+	char name[32];
+};
+
+#define HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT 64
+
+struct hdhomerun_channelscan_result_t {
+	char channel_str[64];
+	uint32_t channelmap;
+	uint32_t frequency;
+	struct hdhomerun_tuner_status_t status;
+	int program_count;
+	struct hdhomerun_channelscan_program_t programs[HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT];
+	bool_t transport_stream_id_detected;
+	uint16_t transport_stream_id;
+};
+
+struct hdhomerun_plotsample_t {
+	int16_t real;
+	int16_t imag;
+};

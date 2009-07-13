@@ -31,7 +31,7 @@ using namespace std;
 #define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
-    : DTVChannel(parent),       _control_socket(NULL),
+    : DTVChannel(parent),       _hdhomerun_device(NULL),
       _device_id(0),            _device_ip(0),
       _tuner(tuner),            _lock(true)
 {
@@ -40,6 +40,8 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
 
     if (valid && hdhomerun_discover_validate_device_id(_device_id))
 	return;
+
+    _device_id = HDHOMERUN_DEVICE_ID_WILDCARD;
 
     /* Otherwise, is it a valid IP address? */
     struct in_addr address;
@@ -53,7 +55,6 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
     VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Invalid DeviceID '%1'")
 	    .arg(device));
 
-    _device_id = HDHOMERUN_DEVICE_ID_WILDCARD;
 }
 
 HDHRChannel::~HDHRChannel(void)
@@ -66,77 +67,38 @@ bool HDHRChannel::Open(void)
     if (IsOpen())
         return true;
 
-    if (!FindDevice())
-        return false;
-
     if (!InitializeInputs())
         return false;
 
-    return (_device_ip != 0) && Connect();
+    return Connect();
 }
 
 void HDHRChannel::Close(void)
 {
-    if (_control_socket)
+    if (_hdhomerun_device)
     {
-        hdhomerun_control_destroy(_control_socket);
-        _control_socket = NULL;
+        hdhomerun_device_destroy(_hdhomerun_device);
+        _hdhomerun_device = NULL;
     }
 }
 
 bool HDHRChannel::EnterPowerSavingMode(void)
 {
-    return QString::null != TunerSet("channel", "none", false);
-}
-
-bool HDHRChannel::FindDevice(void)
-{
-    if (!_device_id)
-        return _device_ip;
-
-    _device_ip = 0;
-
-    /* Discover. */
-    struct hdhomerun_discover_device_t result;
-    int ret = hdhomerun_discover_find_device(_device_id, &result);
-    if (ret < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to send discovery request" + ENO);
-        return false;
-    }
-    if (ret == 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("device not found"));
-        return false;
-    }
-
-    /* Found. */
-    _device_ip = result.ip_addr;
-
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("device found at address %1.%2.%3.%4")
-            .arg((_device_ip>>24) & 0xFF).arg((_device_ip>>16) & 0xFF)
-            .arg((_device_ip>> 8) & 0xFF).arg((_device_ip>> 0) & 0xFF));
-
-    return true;
+    return hdhomerun_device_set_tuner_channel(_hdhomerun_device, "none") > 0;
 }
 
 bool HDHRChannel::Connect(void)
 {
-    _control_socket = hdhomerun_control_create(_device_id, _device_ip);
-    if (!_control_socket)
+    _hdhomerun_device = hdhomerun_device_create(
+        _device_id, _device_ip, _tuner, NULL);
+
+    if (!_hdhomerun_device)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create control socket");
+        VERBOSE(VB_IMPORTANT,
+                LOC_ERR + "Unable to create hdhomerun device object");
         return false;
     }
 
-    if (hdhomerun_control_get_local_addr(_control_socket) == 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to connect to device");
-        return false;
-    }
-
-    VERBOSE(VB_CHANNEL, LOC + "Successfully connected to device");
     return true;
 }
 
@@ -144,7 +106,7 @@ QString HDHRChannel::DeviceGet(const QString &name, bool report_error_return)
 {
     QMutexLocker locker(&_lock);
 
-    if (!_control_socket)
+    if (!_hdhomerun_device)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed (not connected)");
         return QString::null;
@@ -152,7 +114,7 @@ QString HDHRChannel::DeviceGet(const QString &name, bool report_error_return)
 
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_control_get(_control_socket, name, &value, &error) < 0)
+    if (hdhomerun_device_get_var(_hdhomerun_device, name, &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed" + ENO);
         return QString::null;
@@ -174,7 +136,7 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val,
 {
     QMutexLocker locker(&_lock);
 
-    if (!_control_socket)
+    if (!_hdhomerun_device)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed (not connected)");
         return QString::null;
@@ -182,7 +144,8 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val,
 
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_control_set(_control_socket, name, val, &value, &error) < 0)
+    if (hdhomerun_device_set_var(
+            _hdhomerun_device, name, val, &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
 
@@ -198,6 +161,11 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val,
     }
 
     return QString(value);
+}
+
+struct hdhomerun_device_t *HDHRChannel::GetHDHRDevice(void)
+{
+	return _hdhomerun_device;
 }
 
 QString HDHRChannel::TunerGet(const QString &name, bool report_error_return)
@@ -220,7 +188,8 @@ bool HDHRChannel::DeviceSetTarget(unsigned short localPort)
         return false;
     }
 
-    unsigned long localIP = hdhomerun_control_get_local_addr(_control_socket);
+    unsigned long localIP = hdhomerun_device_get_local_machine_addr(
+        _hdhomerun_device);
     if (localIP == 0)
     {
         return false;
@@ -231,7 +200,7 @@ bool HDHRChannel::DeviceSetTarget(unsigned short localPort)
         .arg((localIP >>  8) & 0xFF).arg((localIP >>  0) & 0xFF)
         .arg(localPort);
 
-    if (!TunerSet("target", configValue))
+    if (hdhomerun_device_set_tuner_target(_hdhomerun_device, configValue) <= 0) 
     {
         return false;
     }
@@ -239,9 +208,9 @@ bool HDHRChannel::DeviceSetTarget(unsigned short localPort)
     return true;
 }
 
-bool HDHRChannel::DeviceClearTarget()
+bool HDHRChannel::DeviceClearTarget(void)
 {
-    return TunerSet("target", "0.0.0.0:0");
+    return hdhomerun_device_set_tuner_target(_hdhomerun_device, "none") > 0;
 }
 
 bool HDHRChannel::SetChannelByString(const QString &channum)
@@ -347,7 +316,8 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     if (mpeg_prog_num && (GetTuningMode() == "mpeg"))
     {
         QString pnum = QString::number(mpeg_prog_num);
-        _ignore_filters = QString::null != TunerSet("program", pnum, false);
+        _ignore_filters = (hdhomerun_device_set_tuner_program(
+                               _hdhomerun_device, pnum) > 0);
     }
 
     return true;
@@ -404,7 +374,7 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
 
     VERBOSE(VB_CHANNEL, LOC + "Tune()ing to " + chan);
 
-    if (TunerSet("channel", chan).length())
+    if (hdhomerun_device_set_tuner_channel(_hdhomerun_device, chan) > 0)
     {
         SetSIStandard(si_std);
         return true;

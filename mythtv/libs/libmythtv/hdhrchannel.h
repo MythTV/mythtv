@@ -39,7 +39,7 @@ class HDHRChannel : public DTVChannel
     bool SetChannelByString(const QString &chan);
 
     // Gets
-    bool IsOpen(void) const { return (_control_socket != NULL); }
+    bool IsOpen(void) const { return (_hdhomerun_device != NULL); }
     QString GetDevice(void) const
         { return QString("%1/%2").arg(_device_id, 8, 16).arg(_tuner); }
     vector<uint> GetPIDs(void) const
@@ -57,10 +57,12 @@ class HDHRChannel : public DTVChannel
     bool Tune(const DTVMultiplex &tuning, QString inputname);
 
   private:
-    bool FindDevice(void);
     bool Connect(void);
     bool Tune(uint frequency, QString inputname,
               QString modulation, QString si_std);
+
+
+    struct hdhomerun_device_t *GetHDHRDevice(void);
 
     bool DeviceSetTarget(unsigned short localPort);
     bool DeviceClearTarget(void);
@@ -74,7 +76,7 @@ class HDHRChannel : public DTVChannel
                      bool report_error_return = true);
 
   private:
-    hdhr_socket_t  *_control_socket;
+    struct hdhomerun_device_t *_hdhomerun_device;
     uint            _device_id;
     uint            _device_ip;
     uint            _tuner;

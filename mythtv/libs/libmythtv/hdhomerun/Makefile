@@ -1,21 +1,52 @@
+LIBSRCS += hdhomerun_pkt.c
+LIBSRCS += hdhomerun_debug.c
+LIBSRCS += hdhomerun_discover.c
+LIBSRCS += hdhomerun_channels.c
+LIBSRCS += hdhomerun_channelscan.c
+LIBSRCS += hdhomerun_control.c
+LIBSRCS += hdhomerun_video.c
+LIBSRCS += hdhomerun_device.c
+LIBSRCS += hdhomerun_device_selector.c
 
-SRCS += hdhomerun_pkt.c
-SRCS += hdhomerun_discover.c
-SRCS += hdhomerun_control.c
-SRCS += hdhomerun_video.c
-SRCS += hdhomerun_device.c
-SRCS += hdhomerun_config.c
+CC    := $(CROSS_COMPILE)gcc
+STRIP := $(CROSS_COMPILE)strip
 
 CFLAGS += -Wall -O2 -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith
+LDFLAGS += -lpthread
+SHARED = -shared -Wl,-soname,libhdhomerun$(LIBEXT)
 
-hdhomerun_config : $(SRCS)
-	gcc $(CFLAGS) $(SRCS) -lpthread -o $@
-	strip $@
+ifeq ($(OS),Windows_NT)
+  BINEXT := .exe
+  LIBEXT := .dll
+  LDFLAGS += -liphlpapi
+else
+  LIBEXT := .so
+  ifneq ($(findstring solaris,$(shell echo $$OSTYPE)),)
+    LDFLAGS += -lns -lsocket
+  endif
+  ifneq ($(findstring darwin,$(shell echo $$OSTYPE)),)
+    CFLAGS += -arch i386 -arch ppc
+    LIBEXT := .dylib
+    SHARED := -dynamiclib -install_name libhdhomerun$(LIBEXT)
+  endif
+endif
 
-hdhomerun_config.exe : $(SRCS)
-	gcc $(CFLAGS) $(SRCS) -lpthread -liphlpapi -o $@
-	strip $@
+all : hdhomerun_config$(BINEXT) libhdhomerun$(LIBEXT)
+
+hdhomerun_config$(BINEXT) : hdhomerun_config.c $(LIBSRCS)
+	$(CC) $(CFLAGS) $+ $(LDFLAGS) -o $@
+	$(STRIP) $@
+
+libhdhomerun$(LIBEXT) : $(LIBSRCS)
+	$(CC) $(CFLAGS) -fPIC -DDLL_EXPORT $(SHARED) $+ $(LDFLAGS) -o $@
 
 clean :
-	rm -f hdhomerun_config
-	rm -f hdhomerun_config.exe
+	-rm -f hdhomerun_config$(BINEXT)
+	-rm -f libhdhomerun$(LIBEXT)
+
+distclean : clean
+
+%:
+	@echo "(ignoring request to make $@)"
+
+.PHONY: all list clean distclean

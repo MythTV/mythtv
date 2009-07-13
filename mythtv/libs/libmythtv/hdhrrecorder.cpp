@@ -110,7 +110,7 @@ bool HDHRRecorder::Open(void)
     buffersize = max(49 * TSPacket::SIZE * 128, buffersize);
 
     /* Create TS socket. */
-    _video_socket = hdhomerun_video_create(0, buffersize);
+    _video_socket = hdhomerun_video_create(0, buffersize, NULL);
     if (!_video_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");

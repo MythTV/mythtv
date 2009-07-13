@@ -1,9 +1,7 @@
-#ifndef __HDHOMERUN_INCLUDES__
-#define __HDHOMERUN_INCLUDES__
 /*
- * hdhomerun.h
+ * hdhomerun_channelscan.h
  *
- * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright © 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -32,17 +30,24 @@
  * conditions defined in the GNU Lesser General Public License.
  */
 
-#include "hdhomerun_os.h"
-#include "hdhomerun_types.h"
-#include "hdhomerun_pkt.h"
-#include "hdhomerun_debug.h"
-#include "hdhomerun_discover.h"
-#include "hdhomerun_control.h"
-#include "hdhomerun_video.h"
-#include "hdhomerun_channels.h"
-#include "hdhomerun_channelscan.h"
-#include "hdhomerun_device.h"
-#include "hdhomerun_device_selector.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif /* __HDHOMERUN_INCLUDES__ */
+#define HDHOMERUN_CHANNELSCAN_PROGRAM_NORMAL 0
+#define HDHOMERUN_CHANNELSCAN_PROGRAM_NODATA 1
+#define HDHOMERUN_CHANNELSCAN_PROGRAM_CONTROL 2
+#define HDHOMERUN_CHANNELSCAN_PROGRAM_ENCRYPTED 3
 
+struct hdhomerun_channelscan_t;
+
+extern LIBTYPE struct hdhomerun_channelscan_t *channelscan_create(struct hdhomerun_device_t *hd, const char *channelmap);
+extern LIBTYPE void channelscan_destroy(struct hdhomerun_channelscan_t *scan);
+
+extern LIBTYPE int channelscan_advance(struct hdhomerun_channelscan_t *scan, struct hdhomerun_channelscan_result_t *result);
+extern LIBTYPE int channelscan_detect(struct hdhomerun_channelscan_t *scan, struct hdhomerun_channelscan_result_t *result);
+extern LIBTYPE uint8_t channelscan_get_progress(struct hdhomerun_channelscan_t *scan);
+
+#ifdef __cplusplus
+}
+#endif
