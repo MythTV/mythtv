@@ -160,13 +160,20 @@ float RemoteEncoder::GetFrameRate(void)
     float retval = 30.0f;
 
     if (SendReceiveStringList(strlist, 1))
+    {
         retval = strlist[0].toFloat(&ok);
 
-    if (!ok)
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("GetFrameRate() failed to parse response '%1'")
+                    .arg(strlist[0]));
+        }
+    }
+    else
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("GetFrameRate() failed to parse response '%1'")
-                .arg(strlist[0]));
+                QString("GetFrameRate(): SendReceiveStringList() failed"));
     }
 
     return (ok) ? retval : 30.0f;
