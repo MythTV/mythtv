@@ -379,6 +379,15 @@ void MythUIWebBrowser::SetZoom(float zoom)
     UpdateBuffer();
 }
 
+/** \fn MythUIWebBrowser::GetZoom()
+ *  \brief Get the current zoom level
+ *  \return the zoom level 
+ */
+float MythUIWebBrowser::GetZoom(void)
+{
+    return m_zoom;
+}
+
 /** \fn MythUIWebBrowser::CanGoForward(void)
  *  \brief Can go forward in page history
  *  \return Return true if it is possible to go
@@ -948,6 +957,11 @@ void MythUIWebBrowser::ZoomOut(void)
 void MythUIWebBrowser::SetZoom(float zoom)
 {
     (void) zoom;
+}
+
+float MythUIWebBrowser::GetZoom(void)
+{
+    return 1.0;
 }
 
 bool MythUIWebBrowser::CanGoForward(void)

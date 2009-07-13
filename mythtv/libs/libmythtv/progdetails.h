@@ -28,6 +28,8 @@ class ProgDetails : public MythScreenType
     bool loadHTML(void);
     void addItem(const QString &key, const QString &title, const QString &data);
     void removeItem(const QString &key);
+    void showMenu(void);
+    void customEvent(QEvent *event);
 
     ProgramInfo        m_progInfo;
     MythUIWebBrowser  *m_browser;

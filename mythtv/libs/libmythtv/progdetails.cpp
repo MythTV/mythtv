@@ -60,6 +60,9 @@ bool ProgDetails::Create(void)
 
     SetFocusWidget(m_browser);
 
+    float zoom = gContext->GetSetting("ProgDetailsZoom", "1.0").toFloat();
+    m_browser->SetZoom(zoom);
+
     return true;
 }
 
@@ -125,6 +128,8 @@ void ProgDetails::Init()
 
 ProgDetails::~ProgDetails(void)
 {
+    float zoom = m_browser->GetZoom();
+    gContext->SaveSetting("ProgDetailsZoom", QString().setNum(zoom));
 }
 
 bool ProgDetails::keyPressEvent(QKeyEvent *event)
@@ -149,6 +154,8 @@ bool ProgDetails::keyPressEvent(QKeyEvent *event)
 
             updatePage();
         }
+        else if (action == "MENU")
+            showMenu();
         else
             handled = false;
     }
@@ -707,4 +714,56 @@ bool ProgDetails::loadHTML(void)
         return false;
 
     return true;
+}
+
+void ProgDetails::showMenu(void)
+{
+    QString label = tr("Options");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack, "menuPopup");
+
+    if (menuPopup->Create())
+    {
+        menuPopup->SetReturnEvent(this, "menu");
+
+        menuPopup->AddButton(tr("Zoom In"));
+        menuPopup->AddButton(tr("Zoom Out"));
+        menuPopup->AddButton(tr("Switch Page"));
+        menuPopup->AddButton(tr("Cancel"));
+
+        popupStack->AddScreen(menuPopup);
+    }
+    else
+    {
+        delete menuPopup;
+    }
+}
+
+void ProgDetails::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+            dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        QString resulttext  = dce->GetResultText();
+
+        if (resultid == "menu")
+        {
+            if (resulttext == tr("Zoom Out"))
+                m_browser->ZoomOut();
+            else if (resulttext == tr("Zoom In"))
+                m_browser->ZoomIn();
+            else if (resulttext == tr("Switch Page"))
+            {
+                m_currentPage++;
+                if (m_currentPage >= LASTPAGE)
+                    m_currentPage = 0;
+
+                updatePage();
+            }
+        }
+    }
 }

@@ -59,7 +59,8 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void SetActive(bool active);
     bool IsActive(void) { return m_active; }
 
-    void SetZoom(float zoom);
+    void  SetZoom(float zoom);
+    float GetZoom(void);
 
     bool CanGoForward(void);
     bool CanGoBack(void);
