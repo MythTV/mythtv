@@ -608,7 +608,7 @@ add_archflags(){
     append ARCHFLAGS "$@"
 }
 
-add_cppflags(){
+add_cxxflags(){
     append ECXXFLAGS "$@"
 }
 
@@ -634,6 +634,13 @@ check_cc(){
 
 check_cpp(){
     log check_cpp "$@"
+    cat > $TMPC
+    log_file $TMPC
+    check_cmd $cc $CFLAGS $ECFLAGS $OPTFLAGS "$@" -E -o $TMPO $TMPC
+}
+
+check_cxx(){
+    log check_cxx "$@"
     cat > $TMPCXX
     log_file $TMPCXX
     check_cmd $cxx $CFLAGS $ECXXFLAGS "$@" -E -o $TMPO $TMPCXX
@@ -710,9 +717,9 @@ check_mtune_mcpu(){
     check_archflags "-mtune=$cpu_type" "$@" || check_archflags "-mcpu=$cpu_type" "$@"
 }
 
-check_cppflags(){
-    log check_cppflags "$@"
-    check_cpp $@ <<EOF && add_cppflags "$@" || echolog "WARNING! An unknown C++ compiler flag in: \"$@\". Option(s) will be ignored."
+check_cxxflags(){
+    log check_cxxflags "$@"
+    check_cxx $@ <<EOF && add_cxxflags "$@" || echolog "WARNING! An unknown C++ compiler flag in: \"$@\". Option(s) will be ignored."
 class X {};
 int x;
 EOF
@@ -1774,7 +1781,7 @@ for opt do
     ;;
     --extra-cflags=*) check_ecflags $optval
     ;;
-    --extra-cxxflags=*) check_cppflags $optval
+    --extra-cxxflags=*) check_cxxflags $optval
     ;;
     --extra-ldflags=*) add_ldflags $optval
     ;;
@@ -2831,9 +2838,9 @@ if enabled altivec; then
     check_cflags -maltivec -mabi=altivec &&
         { check_header altivec.h && inc_altivec_h="#include <altivec.h>" ; } ||
         check_cflags -faltivec
-    check_cppflags -maltivec -mabi=altivec &&
+    check_cxxflags -maltivec -mabi=altivec &&
         { check_header altivec.h && inc_altivec_h="#include <altivec.h>" ; } ||
-        check_cppflags -faltivec
+        check_cxxflags -faltivec
 
     # check if our compiler supports Motorola AltiVec C API
     check_cc <<EOF || disable altivec
@@ -3277,7 +3284,7 @@ check_func XOpenDisplay -lX11           &&
 check_func XShmCreateImage -lX11 -lXext
 
 enabled debug && add_cflags -g"$debuglevel"
-enabled debug && add_cppflags -g"$debuglevel"
+enabled debug && add_cxxflags -g"$debuglevel"
 
 # add some useful compiler flags if supported
 #check_cflags -Wdeclaration-after-statement
@@ -3293,14 +3300,14 @@ check_cflags -Wtype-limits
 check_cflags -Wundef
 enabled extra_warnings && check_cflags -Winline
 # C++ Flags
-check_cppflags -Wall
-check_cppflags -Wno-switch
-check_cppflags -Wpointer-arith
-check_cppflags -Wredundant-decls
-check_cppflags -Wno-non-virtual-dtor
-check_cppflags -funit-at-a-time
+check_cxxflags -Wall
+check_cxxflags -Wno-switch
+check_cxxflags -Wpointer-arith
+check_cxxflags -Wredundant-decls
+check_cxxflags -Wno-non-virtual-dtor
+check_cxxflags -funit-at-a-time
 #needed for INT64_C in libs/libavformat under g++
-check_cppflags -D__STDC_CONSTANT_MACROS
+check_cxxflags -D__STDC_CONSTANT_MACROS
 
 # add some linker flags
 check_ldflags -Wl,--warn-common
@@ -3315,7 +3322,7 @@ GCC_MINOR=$(echo ${gcc_version} | cut -s -d'.' -f2)
 
 if enabled symbol_visibility; then
     if test x"$GCC_MAJOR" = x"4" ; then
-        check_cppflags -fvisibility-inlines-hidden
+        check_cxxflags -fvisibility-inlines-hidden
         append CCONFIG "use_hidesyms"
     else
         echo "Warning: --enable-symbol-visibility requires gcc 4.x"
@@ -3365,7 +3372,7 @@ else
     # Sadly, this requires some guesses about Qt's install location:
     qt_inc="-I/usr/local/include/Qt -I/usr/include/Qt -I${prefix}/include/Qt -I${QTDIR}/include"
 
-    check_cpp ${qt_inc} <<EOF && enable qtwebkit
+    check_cxx ${qt_inc} <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
 #if QT_VERSION < 0x040400
 die
