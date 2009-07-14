@@ -208,13 +208,16 @@ BLOCK_QUOTE
   echo "  --target-path=DIR        path to view of build directory on target"
   echo "  --nm=NM                  use nm tool"
   echo "  --as=AS                  use assembler AS [$as_default]"
+BLOCK_QUOTE
   echo "  --cc=CC                  use C compiler CC [$cc_default]"
+  echo "  --cxx=CXX                use C++ compiler CXX [$cxx_default]"
+  echo "  --qmake=QMAKE            use specified qmake [$qmake_default]"
+<<BLOCK_QUOTE
   echo "  --host-cc=HOSTCC         use host C compiler HOSTCC"
   echo "  --host-cflags=HCFLAGS    use HCFLAGS when compiling for host"
-BLOCK_QUOTE
-  echo "  --qmake=QMAKE            use specified qmake [$qmake]"
   echo "  --host-ldflags=HLDFLAGS  use HLDFLAGS when linking for host"
   echo "  --host-libs=HLIBS        use libs HLIBS when linking for host"
+BLOCK_QUOTE
   echo "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
   echo "  --extra-cxxflags=ECXFLAGS add ECXXFLAGS to list of flags for C++ compile"
   echo "  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]"
@@ -240,8 +243,8 @@ BLOCK_QUOTE
   echo "  --disable-mmx2           disable MMX2 optimizations"
   echo "  --disable-sse            disable SSE optimizations"
   echo "  --disable-ssse3          disable SSSE3 optimizations"
-  echo "  --disable-armv5te        disable armv5te optimizations"
 <<BLOCK_QUOTE
+  echo "  --disable-armv5te        disable armv5te optimizations"
   echo "  --disable-armv6          disable armv6 optimizations"
   echo "  --disable-armv6t2        disable armv6t2 optimizations"
   echo "  --disable-armvfp         disable ARM VFP optimizations"
@@ -249,8 +252,8 @@ BLOCK_QUOTE
   echo "  --disable-mmi            disable MMI optimizations"
   echo "  --disable-neon           disable neon optimizations"
   echo "  --disable-vis            disable VIS optimizations"
-  echo "  --disable-yasm           disable use of yasm assembler"
 BLOCK_QUOTE
+  echo "  --disable-yasm           disable use of yasm assembler"
   echo ""
   echo "  --disable-audio-oss      disable OSS audio support"
   echo "  --disable-audio-alsa     disable ALSA audio support"
@@ -1527,6 +1530,7 @@ cc_default="gcc"
 host_cc_default="gcc"
 ln_s="ln -sf"
 cxx="g++"
+cxx_default="g++"
 ccache="yes"
 distcc="yes"
 nm_default="nm"
