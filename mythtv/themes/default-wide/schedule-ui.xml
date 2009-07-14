@@ -204,7 +204,7 @@
             <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
         </textarea>
 
-        <textarea name="recordingstatus" from="basetextarea">
+        <textarea name="rectypestatus" from="basetextarea">
             <area>710,80,530,30</area>
             <align>right,vcenter</align>
             <font>basesmallyellow</font>
@@ -427,7 +427,7 @@
             <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
         </textarea>
 
-        <textarea name="recordingstatus" from="basetextarea">
+        <textarea name="rectypestatus" from="basetextarea">
             <area>550,80,360,30</area>
             <align>right,vcenter</align>
             <font>basesmallyellow</font>
@@ -595,7 +595,7 @@
             <value>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</value>
         </textarea>
 
-        <textarea name="recordingstatus" from="basetextarea">
+        <textarea name="rectypestatus" from="basetextarea">
             <area>830,430,420,30</area>
             <align>right</align>
         </textarea>
@@ -1410,7 +1410,7 @@
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"%\n%LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
-        <textarea name="recordingstatus" from="basetextarea">
+        <textarea name="rectypestatus" from="basetextarea">
             <area>90,290,650,35</area>
             <font>basesmallyellow</font>
         </textarea>

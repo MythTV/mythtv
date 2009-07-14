@@ -322,7 +322,7 @@
             <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
         </textarea>
 
-        <textarea name="recordingstatus" from="basetextarea">
+        <textarea name="rectypestatus" from="basetextarea">
             <area>700,640,420,30</area>
         </textarea>
 
@@ -929,7 +929,7 @@
             <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
         </textarea>
 
-        <textarea name="recordingstatus" from="basetextarea">
+        <textarea name="rectypestatus" from="basetextarea">
             <area>700,640,420,30</area>
         </textarea>
 
@@ -1071,7 +1071,7 @@
         </textarea>
 
         <statetype name="ratingstate" from="baserating">
-            <position>1193,507</position>
+            <position>1195,477</position>
         </statetype>
 
         <textarea name="description" from="basetextarea">
@@ -1089,7 +1089,7 @@
             <align>right</align>
         </textarea>
 
-        <textarea name="recordingstatus" from="basetextarea">
+        <textarea name="rectypestatus" from="basetextarea">
             <area>490,642,300,30</area>
             <align>hcenter</align>
         </textarea>
