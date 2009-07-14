@@ -3520,13 +3520,11 @@ if test -d /usr/share/nvidia/include/GL; then
     CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/nvidia/include"
 fi
 
+check_foo_config directfb directfb directfb.h DirectFBInit
+
 if enabled directfb; then
-    directfb="no"
-    if test x`which directfb-config 2> /dev/null` != x"" ; then
-        directfb="yes"
-        CONFIG_DIRECTFB_LIBS=`directfb-config --libs`
-        CONFIG_DIRECTFB_CXXFLAGS=`directfb-config --cflags`
-    fi
+    CONFIG_DIRECTFB_LIBS=`directfb-config --libs`
+    CONFIG_DIRECTFB_CXXFLAGS=`directfb-config --cflags`
 fi
 
 if test $target_os = darwin; then
