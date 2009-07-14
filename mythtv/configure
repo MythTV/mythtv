@@ -2747,7 +2747,7 @@ if test $tune != "generic"; then
             enable fast_unaligned
         ;;
         armv[67]*)
-            add_cflags -march=$cpu
+            check_mtune_mcpu "$tune"
             enable fast_unaligned
         ;;
         armv*)
@@ -2757,13 +2757,13 @@ if test $tune != "generic"; then
             check_mtune_mcpu "$tune"
         ;;
         ev4|ev45|ev5|ev56|pca56|ev6|ev67)
-            enabled ccc && add_cflags -arch $cpu || add_cflags -mcpu=$cpu
+            enabled ccc && add_cflags -arch "$tune" || check_mtune_mcpu "$tune"
         ;;
         bf*)
-            add_cflags -mcpu=$cpu
+            check_mtune_mcpu "$tune"
         ;;
         mips*|[45]k*|[237]4k*|m4k|r*000|loongson2[ef])
-            add_cflags -march=$cpu
+            check_mtune_mcpu "$tune"
         ;;
         *)
             echo "WARNING: Unknown CPU \"$cpu\", ignored."
