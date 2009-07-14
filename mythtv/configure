@@ -653,7 +653,7 @@ check_as(){
     log check_as "$@"
     cat > $TMPC
     log_file $TMPC
-    check_cmd $as $CFLAGS "$@" -c -o $TMPO $TMPC
+    check_cmd $as $CFLAGS $ECFLAGS $OPTFLAGS "$@" -c -o $TMPO $TMPC
 }
 
 check_asm(){
