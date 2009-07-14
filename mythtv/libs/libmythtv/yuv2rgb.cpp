@@ -348,10 +348,12 @@ static void mmx_argb32 (uint8_t * image,
  */
 yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 {
-    if (HAVE_MMX && (bpp == 16) && (mode == MODE_RGB))
+#if HAVE_MMX
+    if ((bpp == 16) && (mode == MODE_RGB))
         return mmxext_rgb16;
-    else if (HAVE_MMX && (bpp == 32) && (mode == MODE_RGB))
+    else if ((bpp == 32) && (mode == MODE_RGB))
         return mmxext_argb32;
+#endif
 
     (void)bpp;
     (void)mode;
@@ -370,10 +372,12 @@ yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
  */
 yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 {
-    if (HAVE_MMX && (bpp == 16) && (mode == MODE_RGB))
+#if HAVE_MMX
+    if ((bpp == 16) && (mode == MODE_RGB))
         return mmx_rgb16;
-    else if (HAVE_MMX && (bpp == 32) && (mode == MODE_RGB))
+    else if ((bpp == 32) && (mode == MODE_RGB))
         return mmx_argb32;
+#endif
     if ((bpp == 32) && (mode == MODE_RGB))
         return yuv420_argb32_non_mmx;
 
@@ -1005,12 +1009,12 @@ conv_i420_2vuy_fun get_i420_2vuy_conv(void)
 #if HAVE_ALTIVEC
     if (has_altivec())
         return altivec_i420_2vuy;
-    else
 #endif
-    if (HAVE_MMX)
+#if HAVE_MMX
         return mmx_i420_2vuy;
-    else
+#else
         return non_vec_i420_2vuy; /* Fallback to C */
+#endif
 }
 
 /** \brief Plain C 2VUY to I420 conversion routine
