@@ -345,9 +345,9 @@
                         <state name="TV_WATCH_TV" from="TV" />
                         <state name="TV_SCHEDULE_RECORDINGS" from="TV_PROGRAM_GUIDE" />
                         <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/play.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/watchrec.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_DELETE" from="DEFAULT">
                             <!--                            <imagetype name="icon">
@@ -691,9 +691,9 @@
                         <state name="TV_WATCH_TV" from="TV" />
                         <state name="TV_SCHEDULE_RECORDINGS" from="TV_PROGRAM_GUIDE" />
                         <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/play.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/watchrec.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_DELETE" from="DEFAULT">
                             <!--                            <imagetype name="icon">
