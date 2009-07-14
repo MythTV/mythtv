@@ -1674,8 +1674,38 @@
     </item>
 
     <item>
-        <title>BBC News - Sport</title>
-<url>http://newsrss.bbc.co.uk/rss/sportonline_world_edition/front_page/rss.xml</url>
+        <title>BBC Sport - Cricket</title>
+        <url>http://newsrss.bbc.co.uk/rss/sportonline_uk_edition/cricket/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC Sport - Headlines</title>
+        <url>http://newsrss.bbc.co.uk/rss/sportonline_world_edition/front_page/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC Sport - Football</title>
+        <url>http://newsrss.bbc.co.uk/rss/sportonline_uk_edition/football/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC Sport - Formula One</title>
+        <url>http://newsrss.bbc.co.uk/rss/sportonline_uk_edition/motorsport/formula_one/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC Sport - Olympic Games</title>
+        <url>http://newsrss.bbc.co.uk/rss/sportonline_uk_edition/olympic_games/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC Sport - Rugby Union</title>
+        <url>http://newsrss.bbc.co.uk/rss/sportonline_uk_edition/rugby_union/rss.xml</url>
+    </item>
+
+    <item>
+        <title>BBC Sport - Rugby League</title>
+        <url>http://newsrss.bbc.co.uk/rss/sportonline_uk_edition/rugby_league/rss.xml</url>
     </item>
 
     <item>
