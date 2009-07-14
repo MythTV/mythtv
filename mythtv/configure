@@ -2672,13 +2672,13 @@ fi
 
 # set generic archflags
 if test x"$ARCHFLAGS" = x""; then
-    if test x"$arch" = x"x86_32"; then
+    if enabled x86_32; then
         if ! enabled cmov; then
             check_archflags "-march=i586"
         else
             check_archflags "-march=pentiumpro"
         fi
-    elif test x"$arch" = x"x86_64"; then
+    elif enabled x86_64; then
         check_archflags "-march=k8"
     fi
 fi
@@ -3631,10 +3631,6 @@ fi
 
 echo "# Basic Settings"
 echo "Compile type              $compile_type"
-if test x"$compile_type" = x"debug" -a $arch = "x86_32" -a \
-        x"$GCC_MAJOR" != x"" -a $GCC_MAJOR -lt "4"; then
-    echo "WARNING: backtraces involving libavcodec are not supported for gcc < 4.0"
-fi
 echo "Compiler cache            $ccache$ccache_txt"
 echo "DistCC                    $distcc$distcc_txt"
 echo "qmake                     $(which $qmake)"
@@ -3647,13 +3643,13 @@ echo ".align is power-of-two    $asmalign_pot"
 echo "ARCH                      $arch ($cpu)"
 BLOCK_QUOTE
 if enabled cpu_override && test x"$cpu" != x"generic"; then
-    echo "CPU                       $arch ($cpu)"
+    echo "CPU                       $arch $subarch ($cpu)"
 elif test x"$processor" != x"" ; then
-    echo "CPU                       $arch ($processor)"
+    echo "CPU                       $arch $subarch ($processor)"
 elif test x"$arch_raw" != x"" ; then
-    echo "CPU                       $arch ($arch_raw)"
+    echo "CPU                       $arch $subarch ($arch_raw)"
 else
-    echo "CPU                       $arch"
+    echo "CPU                       $arch $subarch"
 fi
 <<BLOCK_QUOTE
 if test "$build_suffix" != ""; then
@@ -3981,8 +3977,6 @@ if enabled pthreads; then
 fi
 echo "" >> $MYTH_CONFIG_MAK
 
-echo "ARCH=$arch" >> $MYTH_CONFIG_MAK
-
 if enabled audio_oss; then
     append CCONFIG "using_oss"
 fi
@@ -4151,7 +4145,7 @@ echo # add a newline after any warnings.
 
 if enabled mmx; then
   CONFIG_DEFINES="$CONFIG_DEFINES MMX"
-  if test x"$arch" != x"x86_64" ; then
+  if enabled x86_32 ; then
     CONFIG_DEFINES="$CONFIG_DEFINES i386"
   fi
 fi
