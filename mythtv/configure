@@ -646,7 +646,7 @@ check_cxx(){
     log check_cxx "$@"
     cat > $TMPCXX
     log_file $TMPCXX
-    check_cmd $cxx $CFLAGS $ECXXFLAGS "$@" -E -o $TMPO $TMPCXX
+    check_cmd $cxx $ECXXFLAGS "$@" -c -o $TMPO $TMPCXX
 }
 
 check_as(){
@@ -683,6 +683,17 @@ check_ld(){
         test "${f}" = "${f#-l}" && flags="$flags $f" || libs="$libs $f"
     done
     check_cmd $cc $LDFLAGS $flags -o $TMPE $TMPO $extralibs $libs
+}
+
+check_ld_cxx(){
+    log check_ld_cxx "$@"
+    check_cxx || return
+    flags=''
+    libs=''
+    for f; do
+        test "${f}" = "${f#-l}" && flags="$flags $f" || libs="$libs $f"
+    done
+    check_cmd $cxx $LDFLAGS $flags -o $TMPE $TMPO $extralibs $libs
 }
 
 check_cflags(){
@@ -815,6 +826,10 @@ check_lib2(){
 
 check_exec(){
     check_ld "$@" && { enabled cross_compile || $TMPE >> $logfile 2>&1; }
+}
+
+check_exec_cxx(){
+    check_ld_cxx "$@" && { enabled cross_compile || $TMPE >> $logfile 2>&1; }
 }
 
 check_exec_crash(){
@@ -1273,6 +1288,7 @@ CMDLINE_SET="
     cc
     cpu
     cross_prefix
+    cxx
     logging
     extra_version
     host_cc
@@ -1529,7 +1545,6 @@ ar="ar"
 cc_default="gcc"
 host_cc_default="gcc"
 ln_s="ln -sf"
-cxx="g++"
 cxx_default="g++"
 ccache="yes"
 distcc="yes"
@@ -1539,14 +1554,6 @@ ranlib="ranlib"
 qmake_default="qmake"
 strip="strip"
 yasmexe="yasm"
-
-if test x"$CC" != x"" ; then
-    cc="$CC"
-fi
-
-if test x"$CXX" != x"" ; then
-    cxx="$CXX"
-fi
 
 # machine
 arch=$(uname -m)
@@ -1781,11 +1788,9 @@ for opt do
     ;;
     --libdir-name=*) libdir_name=$optval
     ;;
-    --cxx=*) cxx=$optval
+    --extra-cflags=*) add_ecflags $optval
     ;;
-    --extra-cflags=*) check_ecflags $optval
-    ;;
-    --extra-cxxflags=*) check_cxxflags $optval
+    --extra-cxxflags=*) add_cxxflags $optval
     ;;
     --extra-ldflags=*) add_ldflags $optval
     ;;
@@ -1916,6 +1921,7 @@ test -n "$cross_prefix" && enable cross_compile
 
 ar="${cross_prefix}${ar}"
 cc_default="${cross_prefix}${cc_default}"
+cxx_default="${cross_prefix}${cxx_default}"
 nm_default="${cross_prefix}${nm_default}"
 ranlib="${cross_prefix}${ranlib}"
 strip="${cross_prefix}${strip}"
@@ -1923,7 +1929,7 @@ strip="${cross_prefix}${strip}"
 sysinclude_default="${sysroot}/usr/include"
 
 set_default cc nm sysinclude
-set_default qmake
+set_default cxx qmake
 as_default=$cc
 enabled cross_compile || host_cc_default=$cc
 set_default host_cc
@@ -2026,11 +2032,26 @@ int main(void){ return 0; }
 EOF
 if test "$?" != 0; then
     echo "$cc is unable to create an executable file."
+    echo "Check your ECFLAGS: [$ECFLAGS]"
     if test -z "$cross_prefix" && ! enabled cross_compile ; then
         echo "If $cc is a cross-compiler, use the --enable-cross-compile option."
         echo "Only do this if you know what cross compiling means."
     fi
     die "C compiler test failed."
+fi
+
+# C++ compiler sanity check
+check_exec_cxx <<EOF
+int main(void){ return 0; }
+EOF
+if test "$?" != 0; then
+    echo "$cxx is unable to create an executable file."
+    echo "Check your ECXXFLAGS: [$ECXXFLAGS]"
+    if test -z "$cross_prefix" && ! enabled cross_compile ; then
+        echo "If $cxx is a cross-compiler, use the --enable-cross-compile option."
+        echo "Only do this if you know what cross compiling means."
+    fi
+    die "C++ compiler test failed."
 fi
 
 check_cflags -std=c99
