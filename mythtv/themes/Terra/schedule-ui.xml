@@ -303,7 +303,7 @@
             <font>baselarge</font>
         </textarea>
 
-        <statetype name="userratingstate" from="baserating">
+        <statetype name="ratingstate" from="baserating">
             <position>1195,312</position>
         </statetype>
 
@@ -1001,6 +1001,7 @@
             </statetype>
         </buttonlist>
 
+        <!-- Temporary Guide Widget for 0.22 -->
         <guidegrid name="guidegrid">
             <area>252,99,1040,357</area>
             <layout>horizontal</layout>
@@ -1015,15 +1016,15 @@
             <cutdown>no</cutdown>
             <multiline>yes</multiline>
             <textoffset>9,6</textoffset>
-            <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
-            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
-            <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
-            <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
-            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
-            <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
-            <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
-            <arrow direction="left" image="guide/guide_arrow_left.png"></arrow>
-            <arrow direction="right" image="guide/guide_arrow_right.png"></arrow>
+            <recordstatus type="SingleRecord" image="gg-rs-single.png" />
+            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png" />
+            <recordstatus type="ChannelRecord" image="gg-rs-channel.png" />
+            <recordstatus type="AllRecord" image="gg-rs-all.png" />
+            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png" />
+            <recordstatus type="FindOneRecord" image="gg-rs-findone.png" />
+            <recordstatus type="OverrideRecord" image="gg-rs-override.png" />
+            <arrow direction="left" image="guide/guide_arrow_left.png" />
+            <arrow direction="right" image="guide/guide_arrow_right.png" />
             <font>basesmall</font>
         </guidegrid>
 
