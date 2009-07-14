@@ -3405,6 +3405,8 @@ enabled freetype2 ||
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
+require libXxf86vm X11/extensions/xf86vmode.h XF86VidModeSetClientVersion -lXxf86vm
+
 if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
     enable qtwebkit
 else
