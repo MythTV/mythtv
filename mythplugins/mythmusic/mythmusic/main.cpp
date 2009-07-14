@@ -531,20 +531,20 @@ void mythplugin_destroy(void)
 
 void runMusicPlayback(void)
 {
-    gContext->addCurrentLocation("playmusic");
+    GetMythUI()->AddCurrentLocation("playmusic");
     preMusic();
     startPlayback();
     postMusic();
-    gContext->removeCurrentLocation();
+    GetMythUI()->RemoveCurrentLocation();
 }
 
 void runMusicSelection(void)
 {
-    gContext->addCurrentLocation("musicplaylists");
+    GetMythUI()->AddCurrentLocation("musicplaylists");
     preMusic();
     startDatabaseTree();
     postMusic();
-    gContext->removeCurrentLocation();
+    GetMythUI()->RemoveCurrentLocation();
 }
 
 void runRipCD(void)

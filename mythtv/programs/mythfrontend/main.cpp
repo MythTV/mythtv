@@ -411,7 +411,7 @@ void TVMenuCallback(void *data, QString &selection)
 
     if (sel.left(9) == "settings ")
     {
-        gContext->addCurrentLocation("Setup");
+        GetMythUI()->AddCurrentLocation("Setup");
         gContext->ActivateSettingsCache(false);
     }
 
@@ -559,7 +559,7 @@ void TVMenuCallback(void *data, QString &selection)
 
     if (sel.left(9) == "settings ")
     {
-        gContext->removeCurrentLocation();
+        GetMythUI()->RemoveCurrentLocation();
 
         gContext->ActivateSettingsCache(true);
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
@@ -899,7 +899,6 @@ void signal_USR1_handler(int){
       gContext->ActivateSettingsCache(false);
       qApp->processEvents();
       GetMythMainWindow()->JumpTo("Reload Theme");
-      gContext->removeCurrentLocation();
       gContext->ActivateSettingsCache(true);
 }
 
@@ -1446,9 +1445,6 @@ int main(int argc, char **argv)
                     QString("NetworkControl failed to bind to port %1.")
                     .arg(networkPort));
     }
-
-    gContext->addCurrentLocation("MainMenu");
-
 
     themename = gContext->GetSetting("Theme", "blue");
     themedir = GetMythUI()->FindThemeDir(themename);

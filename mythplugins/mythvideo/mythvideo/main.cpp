@@ -107,7 +107,7 @@ namespace
         //
         QString command_string = gContext->GetSetting("VCDPlayerCommand");
 
-        gContext->addCurrentLocation("playvcd");
+        GetMythUI()->AddCurrentLocation("playvcd");
 
         if(command_string.length() < 1)
         {
@@ -126,7 +126,7 @@ namespace
 
             okPopup->AddButton(QObject::tr("OK, I'll go run Setup"));
 
-            gContext->removeCurrentLocation();
+            GetMythUI()->RemoveCurrentLocation();
             return;
         }
         else
@@ -147,7 +147,7 @@ namespace
             if (gContext->GetMainWindow()->currentWidget())
                 gContext->GetMainWindow()->currentWidget()->setFocus();
         }
-        gContext->removeCurrentLocation();
+        GetMythUI()->RemoveCurrentLocation();
     }
 
     void playDVD()
@@ -164,7 +164,7 @@ namespace
         if (dvd_device.isEmpty())
             dvd_device = MediaMonitor::defaultDVDdevice();
 
-        gContext->addCurrentLocation("playdvd");
+        GetMythUI()->AddCurrentLocation("playdvd");
 
         if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
             (command_string.length() < 1))
@@ -181,7 +181,7 @@ namespace
 
             command_string = "Internal";
             gContext->GetMainWindow()->HandleMedia(command_string, filename);
-            gContext->removeCurrentLocation();
+            GetMythUI()->RemoveCurrentLocation();
 
             return;
         }
@@ -206,7 +206,7 @@ namespace
                     gContext->GetMainWindow()->currentWidget()->setFocus();
             }
         }
-        gContext->removeCurrentLocation();
+        GetMythUI()->RemoveCurrentLocation();
     }
 
     /////////////////////////////////////////////////

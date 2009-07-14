@@ -1390,3 +1390,30 @@ QString MythUIHelper::GetX11Display(void)
     ret.detach();
     return ret;
 }
+
+void MythUIHelper::AddCurrentLocation(QString location)
+{
+    QMutexLocker locker(&m_locationLock);
+    if (m_currentLocation.isEmpty() || m_currentLocation.last() != location)
+        m_currentLocation.push_back(location);
+}
+
+QString MythUIHelper::RemoveCurrentLocation(void)
+{
+    QMutexLocker locker(&m_locationLock);
+
+    if (m_currentLocation.isEmpty())
+        return QString("UNKNOWN");
+
+    return m_currentLocation.takeLast();
+}
+
+QString MythUIHelper::GetCurrentLocation(void)
+{
+    QMutexLocker locker(&m_locationLock);
+
+    if (m_currentLocation.isEmpty())
+        return QString("UNKNOWN");
+
+    return m_currentLocation.last();
+}

@@ -1,6 +1,7 @@
 #ifndef MYTHUIHELPERS_H_
 #define MYTHUIHELPERS_H_
 
+#include <QStringList>
 #include <QString>
 #include <QFont>
 #include <QMutex>
@@ -110,6 +111,10 @@ class MPUBLIC MythUIHelper
     static MythUIHelper *getMythUI(void);
     static void destroyMythUI(void);
 
+    void AddCurrentLocation(QString location);
+    QString RemoveCurrentLocation(void);
+    QString GetCurrentLocation(void);
+
   protected:
     MythUIHelper();
    ~MythUIHelper();
@@ -124,6 +129,9 @@ class MPUBLIC MythUIHelper
     MythUIHelperPrivate *d;
 
     size_t m_cacheSize;
+
+    QMutex m_locationLock;
+    QStringList m_currentLocation;
 };
 
 MPUBLIC MythUIHelper *GetMythUI();

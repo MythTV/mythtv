@@ -36,8 +36,8 @@
 
 const int FRAME_UPDATE_TIME = 1000 / 10;  // try to update the frame 10 times a second
 
-ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent, const char *name)
-             :MythScreenType(parent, name)
+ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent)
+             :MythScreenType(parent, "zmliveview")
 {
     m_paused = false;
 
@@ -52,8 +52,6 @@ ZMLivePlayer::ZMLivePlayer(MythScreenStack *parent, const char *name)
             SLOT(updateFrame()));
 
     getMonitorList();
-
-    gContext->addCurrentLocation("zoneminderliveview");
 }
 
 bool ZMLivePlayer::Create(void)
@@ -160,8 +158,6 @@ ZMLivePlayer::~ZMLivePlayer()
         delete m_monitors;
 
     delete m_frameTimer;
-
-    gContext->removeCurrentLocation();
 }
 
 bool ZMLivePlayer::keyPressEvent(QKeyEvent *event)

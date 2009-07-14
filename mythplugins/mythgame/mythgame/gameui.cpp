@@ -33,12 +33,10 @@ Q_DECLARE_METATYPE(GameTreeInfo *)
 GameUI::GameUI(MythScreenStack *parent)
         : MythScreenType(parent, "GameUI")
 {
-    gContext->addCurrentLocation("mythgame");
 }
 
 GameUI::~GameUI()
 {
-    gContext->removeCurrentLocation();
 }
 
 bool GameUI::Create()

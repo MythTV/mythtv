@@ -4,6 +4,7 @@
 
 #include "config.h" // for CONFIG_DARWIN
 #include "mythverbose.h"
+#include "mythuihelper.h"
 
 #ifdef USING_X11
 #include "mythxdisplay.h"
@@ -25,7 +26,7 @@ std::map<Display*, MythXDisplay*>      xdisplays;
 #endif // USING_X11
 
 #include <QMutex>
-#include "mythuihelper.h"
+
 
 /** \fn GetNumberXineramaScreens(void)
  *  \brief Returns number of Xinerama screens if Xinerama

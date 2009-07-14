@@ -65,7 +65,7 @@ class ZMLivePlayer : public MythScreenType
     Q_OBJECT
 
   public:
-    ZMLivePlayer(MythScreenStack *parent, const char *name);
+    ZMLivePlayer(MythScreenStack *parent);
     ~ZMLivePlayer();
 
     bool Create(void);

@@ -140,13 +140,10 @@ MoviesUI::MoviesUI(MythScreenStack *parent)
         : MythScreenType(parent, "MoviesUI")
 {
     m_currentMode = "Undefined";
-
-    gContext->addCurrentLocation("mythmovies");
 }
 
 MoviesUI::~MoviesUI()
 {
-    gContext->removeCurrentLocation();
 }
 
 bool MoviesUI::Create()

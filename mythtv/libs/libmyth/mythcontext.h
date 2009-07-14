@@ -180,10 +180,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void waitPrivRequest() const;
     MythPrivRequest popPrivRequest();
 
-    void addCurrentLocation(QString location);
-    QString removeCurrentLocation(void);
-    QString getCurrentLocation(void);
-
     void dispatch(MythEvent &event);
     void dispatchNow(MythEvent &event);
 
@@ -201,10 +197,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     MythContextPrivate *d;
     QString app_binary_version;
-
-    QMutex locationLock;
-    QStringList currentLocation;
-
 };
 
 /// This global variable contains the MythContext instance for the application

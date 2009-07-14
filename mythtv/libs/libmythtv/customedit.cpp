@@ -443,7 +443,6 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
     gContext->addListener(this);
-    gContext->addCurrentLocation("CustomEdit");
 
     if (titlematch >= 0)
     {
@@ -469,7 +468,6 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 CustomEdit::~CustomEdit(void)
 {
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
 }
 
 void CustomEdit::ruleChanged(void)

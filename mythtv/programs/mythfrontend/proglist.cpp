@@ -67,13 +67,11 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
 
     m_curView = -1;
     fillViewList(view);
-
-    gContext->addCurrentLocation("ProgLister");
 }
 
 // previously recorded ctor
 ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
-          : MythScreenType(parent, "ProgLister")
+          : MythScreenType(parent, "PreviousList")
 {
     m_type = plPreviouslyRecorded;
     m_recid = recid;
@@ -102,15 +100,12 @@ ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
 
     m_curView = -1;
     fillViewList("reverse time");
-
-    gContext->addCurrentLocation("PreviousList");
 }
 
 ProgLister::~ProgLister()
 {
     m_itemList.clear();
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
 }
 
 bool ProgLister::Create()

@@ -2076,10 +2076,14 @@ void GuideGrid::aboutToHide(void)
 {
     if (m_player)
         HideTVWindow();
+
+    MythScreenType::aboutToHide();
 }
 
 void GuideGrid::aboutToShow(void)
 {
     if (m_player && m_player->IsRunning())
         EmbedTVWindow();
+
+    MythScreenType::aboutToShow();
 }

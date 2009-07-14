@@ -29,6 +29,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "remoteutil.h"
 #include "mythdb.h"
+#include "mythuihelper.h"
 
 PreviousList::PreviousList(MythMainWindow *parent, const char *name,
                          int recid, QString ltitle)
@@ -110,7 +111,7 @@ PreviousList::PreviousList(MythMainWindow *parent, const char *name,
     setNoErase();
 
     gContext->addListener(this);
-    gContext->addCurrentLocation("PreviousList");
+    GetMythUI()->AddCurrentLocation("PreviousList");
 }
 
 PreviousList::~PreviousList()
@@ -118,7 +119,7 @@ PreviousList::~PreviousList()
     itemList.clear();
 
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
+    GetMythUI()->RemoveCurrentLocation();
     delete theme;
 }
 

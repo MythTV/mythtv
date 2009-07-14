@@ -7,6 +7,7 @@
 #include "mythscreentype.h"
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
+#include "mythuihelper.h"
 
 MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
                                bool fullscreen)
@@ -194,6 +195,8 @@ void MythScreenType::aboutToHide(void)
                 GetMythMainWindow()->GetPaintWindow()->setMask(m_SavedMask);
         }
     }
+
+    GetMythUI()->RemoveCurrentLocation();
 }
 
 void MythScreenType::aboutToShow(void)
@@ -210,6 +213,8 @@ void MythScreenType::aboutToShow(void)
             GetMythMainWindow()->GetPaintWindow()->setMask(region);
         }
     }
+
+    GetMythUI()->AddCurrentLocation(objectName());
 }
 
 bool MythScreenType::IsDeleting(void) const

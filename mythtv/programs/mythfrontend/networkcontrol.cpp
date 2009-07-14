@@ -404,7 +404,7 @@ QString NetworkControl::processJump(QStringList tokens)
     QTime timer;
     timer.start();
     while ((timer.elapsed() < 2000) &&
-           (gContext->getCurrentLocation().toLower() != tokens[1]))
+           (GetMythUI()->GetCurrentLocation().toLower() != tokens[1]))
         usleep(10000);
 
     return result;
@@ -524,7 +524,7 @@ QString NetworkControl::processPlay(QStringList tokens)
         (tokens[3].contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
     {
-        if (gContext->getCurrentLocation() == "Playback")
+        if (GetMythUI()->GetCurrentLocation() == "Playback")
         {
             QString message = QString("NETWORK_CONTROL STOP");
             MythEvent me(message);
@@ -533,22 +533,22 @@ QString NetworkControl::processPlay(QStringList tokens)
             QTime timer;
             timer.start();
             while ((timer.elapsed() < 10000) &&
-                   (gContext->getCurrentLocation() == "Playback"))
+                   (GetMythUI()->GetCurrentLocation() == "Playback"))
                 usleep(10000);
         }
 
-        if (gContext->getCurrentLocation() != "PlaybackBox")
+        if (GetMythUI()->GetCurrentLocation() != "PlaybackBox")
         {
             gContext->GetMainWindow()->JumpTo(jumpMap["playbackbox"]);
 
             QTime timer;
             timer.start();
             while ((timer.elapsed() < 10000) &&
-                   (gContext->getCurrentLocation() != "PlaybackBox"))
+                   (GetMythUI()->GetCurrentLocation() != "PlaybackBox"))
                 usleep(10000);
         }
 
-        if (gContext->getCurrentLocation() == "PlaybackBox")
+        if (GetMythUI()->GetCurrentLocation() == "PlaybackBox")
         {
             QString action = "PLAY";
             if (tokens.size() == 5 && tokens[4] == "resume")
@@ -566,16 +566,16 @@ QString NetworkControl::processPlay(QStringList tokens)
         {
             result = QString("ERROR: Unable to change to PlaybackBox from "
                              "%1, can not play requested file.")
-                             .arg(gContext->getCurrentLocation());
+                             .arg(GetMythUI()->GetCurrentLocation());
         }
     }
     // Everything below here requires us to be in playback mode so check to
     // see if we are
-    else if (gContext->getCurrentLocation().toLower() != "playback")
+    else if (GetMythUI()->GetCurrentLocation().toLower() != "playback")
     {
         return QString("ERROR: You are in %1 mode and this command is only "
                        "for playback mode")
-                       .arg(gContext->getCurrentLocation());
+                       .arg(GetMythUI()->GetCurrentLocation());
     }
     else if (is_abbrev("chanid", tokens[1], 5))
     {
@@ -674,7 +674,7 @@ QString NetworkControl::processQuery(QStringList tokens)
 
     if (is_abbrev("location", tokens[1]))
     {
-        QString location = gContext->getCurrentLocation();
+        QString location = GetMythUI()->GetCurrentLocation();
         result = location;
 
         // if we're playing something, then find out what
@@ -1039,7 +1039,7 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
     int height = -1;
     long long frameNumber = 150;
 
-    QString location = gContext->getCurrentLocation();
+    QString location = GetMythUI()->GetCurrentLocation();
 
     if (location != "Playback")
     {

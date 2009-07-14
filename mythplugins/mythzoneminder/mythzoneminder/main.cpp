@@ -73,7 +73,7 @@ void runZMConsole(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMConsole *console = new ZMConsole(mainStack, "ZMConsole");
+    ZMConsole *console = new ZMConsole(mainStack);
 
     if (console->Create())
         mainStack->AddScreen(console);
@@ -87,7 +87,7 @@ void runZMLiveView(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMLivePlayer *player = new ZMLivePlayer(mainStack, "ZMLivePlayer");
+    ZMLivePlayer *player = new ZMLivePlayer(mainStack);
 
     if (player->Create())
         mainStack->AddScreen(player);
@@ -100,7 +100,7 @@ void runZMEventView(void)
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMEvents *events = new ZMEvents(mainStack, "ZMEvents");
+    ZMEvents *events = new ZMEvents(mainStack);
 
     if (events->Create())
         mainStack->AddScreen(events);

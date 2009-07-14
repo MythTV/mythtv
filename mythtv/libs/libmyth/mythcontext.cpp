@@ -2149,33 +2149,6 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     return ret;
 }
 
-void MythContext::addCurrentLocation(QString location)
-{
-    QMutexLocker locker(&locationLock);
-    if (currentLocation.isEmpty() || currentLocation.last() != location)
-        currentLocation.push_back(location);
-}
-
-QString MythContext::removeCurrentLocation(void)
-{
-    QMutexLocker locker(&locationLock);
-
-    if (currentLocation.isEmpty())
-        return QString("UNKNOWN");
-
-    return currentLocation.takeLast();
-}
-
-QString MythContext::getCurrentLocation(void)
-{
-    QMutexLocker locker(&locationLock);
-
-    if (currentLocation.isEmpty())
-        return QString("UNKNOWN");
-
-    return currentLocation.last();
-}
-
 void MythContext::dispatch(MythEvent &event)
 {
     VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));

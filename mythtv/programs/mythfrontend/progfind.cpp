@@ -63,7 +63,6 @@ ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG,
     m_allowEPG(allowEPG),        m_allowKeypress(false),
     m_dateFormat(QString::null), m_timeFormat(QString::null)
 {
-    gContext->addCurrentLocation("ProgFinder");
 }
 
 bool ProgFinder::Create()
@@ -128,7 +127,6 @@ void ProgFinder::Init(void)
 ProgFinder::~ProgFinder()
 {
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
 
     // if we have a player and we are returning to it we need
     // to tell it to stop embedding and return to fullscreen

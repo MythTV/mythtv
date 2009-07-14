@@ -216,9 +216,8 @@ bool MythPluginManager::run_plugin(const QString &plugname)
         return true;
     }
 
-    gContext->addCurrentLocation(newname);
     bool res = m_dict[newname]->run();
-    gContext->removeCurrentLocation();
+
     return res;
 }
 
@@ -235,9 +234,8 @@ bool MythPluginManager::config_plugin(const QString &plugname)
         return true;
     }
 
-    gContext->addCurrentLocation(newname + "setup");
     bool res = m_dict[newname]->config();
-    gContext->removeCurrentLocation();
+
     return res;
 }
 

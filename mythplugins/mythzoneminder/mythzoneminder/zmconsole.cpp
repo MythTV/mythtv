@@ -108,11 +108,9 @@ void FunctionDialog::setMonitorFunction(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ZMConsole::ZMConsole(MythScreenStack *parent, const char *name)
-          :MythScreenType(parent, name)
+ZMConsole::ZMConsole(MythScreenStack *parent)
+          :MythScreenType(parent, "zmconsole")
 {
-    gContext->addCurrentLocation("zoneminderconsole");
-
     m_monitorListSize = 0;
     m_currentMonitor = 0;
 
@@ -138,8 +136,6 @@ ZMConsole::~ZMConsole()
 
     if (m_monitorList)
         delete m_monitorList;
-
-    gContext->removeCurrentLocation();
 }
 
 bool ZMConsole::Create(void)

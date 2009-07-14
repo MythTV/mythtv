@@ -28,6 +28,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "channelutil.h"
 #include "mythdb.h"
+#include "mythuihelper.h"
 
 ProgListerQt::ProgListerQt(ProgListTypeQt pltype,
                        const QString &view, const QString &from,
@@ -133,14 +134,14 @@ ProgListerQt::ProgListerQt(ProgListTypeQt pltype,
     setNoErase();
 
     gContext->addListener(this);
-    gContext->addCurrentLocation("ProgListerQt");
+    GetMythUI()->AddCurrentLocation("ProgListerQt");
 }
 
 ProgListerQt::~ProgListerQt()
 {
     itemList.clear();
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
+    GetMythUI()->RemoveCurrentLocation();
     delete theme;
 }
 

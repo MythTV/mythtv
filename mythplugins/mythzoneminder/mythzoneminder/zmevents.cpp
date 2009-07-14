@@ -28,11 +28,9 @@
 #include "zmplayer.h"
 #include "zmclient.h"
 
-ZMEvents::ZMEvents(MythScreenStack *parent, const char *name)
-         :MythScreenType(parent, name)
+ZMEvents::ZMEvents(MythScreenStack *parent)
+         :MythScreenType(parent, "zmevents")
 {
-    gContext->addCurrentLocation("zoneminderevents");
-
     m_eventList = new vector<Event*>;
     m_eventGrid = NULL;
 
@@ -49,8 +47,6 @@ ZMEvents::~ZMEvents()
     // remember how the user wants to display the event list
     gContext->SaveSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
     gContext->SaveSetting("ZoneMinderGridLayout",  m_layout);
-
-    gContext->removeCurrentLocation();
 }
 
 bool ZMEvents::Create(void)

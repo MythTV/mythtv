@@ -771,7 +771,6 @@ TV::TV(void)
     osdMenuEntries = new TVOSDMenuEntryList();
 
     gContext->addListener(this);
-    gContext->addCurrentLocation("Playback");
 
     playerLock.lockForWrite();
     player.push_back(new PlayerContext("player"));
@@ -898,7 +897,7 @@ bool TV::Init(bool createWindow)
         // player window sizing
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        myWindow = new TvPlayWindow(mainStack, "video playback window");
+        myWindow = new TvPlayWindow(mainStack, "Playback");
 
         if (myWindow->Create())
             mainStack->AddScreen(myWindow, false);
@@ -933,7 +932,6 @@ TV::~TV(void)
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- begin");
 
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
 
     if (myWindow)
     {
