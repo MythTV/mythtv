@@ -1424,6 +1424,14 @@ void GuideGrid::updateInfo(void)
 
     pginfo->ToMap(infoMap);
     SetTextFromMap(infoMap);
+
+    MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>
+                                                (GetChild("ratingstate"));
+    if (ratingState)
+    {
+        QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+        ratingState->DisplayState(rating);
+    }
 }
 
 void GuideGrid::toggleGuideListing()

@@ -472,6 +472,14 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
         QMap<QString, QString> infoMap;
         pginfo->ToMap(infoMap);
         SetTextFromMap(infoMap);
+
+        MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>
+                                                    (GetChild("ratingstate"));
+        if (ratingState)
+        {
+            QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+            ratingState->DisplayState(rating);
+        }
     }
 }
 

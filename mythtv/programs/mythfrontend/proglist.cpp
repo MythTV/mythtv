@@ -40,7 +40,6 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
 
     m_dayFormat = gContext->GetSetting("DateFormat");
     m_hourFormat = gContext->GetSetting("TimeFormat");
-    m_timeFormat = gContext->GetSetting("ShortDateFormat") + " " + m_hourFormat;
     m_fullDateFormat = m_dayFormat + " " + m_hourFormat;
     m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
@@ -1137,7 +1136,7 @@ void ProgLister::fillItemList(bool restorePosition)
     if (currentItem)
         selected = new ProgramInfo(*(qVariantValue<ProgramInfo*>
                                         (currentItem->GetData())));
-    int selectedOffset = 
+    int selectedOffset =
         m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 
     if (m_curviewText && m_curView >= 0)
@@ -1362,7 +1361,7 @@ void ProgLister::fillItemList(bool restorePosition)
     }
 
     if (m_type == plPreviouslyRecorded)
-        m_itemList.FromOldRecorded(where, bindings); 
+        m_itemList.FromOldRecorded(where, bindings);
     else
     {
         m_schedList.FromScheduler();
@@ -1373,7 +1372,7 @@ void ProgLister::fillItemList(bool restorePosition)
     vector<ProgramInfo *> sortedList;
     const QRegExp prefixes("^(The |A |An )");
 
-    while (!m_itemList.empty()) 
+    while (!m_itemList.empty())
     {
         s = m_itemList.take(0);
         if (m_type == plTitle)
@@ -1546,6 +1545,13 @@ void ProgLister::updateInfo(MythUIButtonListItem *item)
             m_positionText->SetText(tr("%1 of %2")
                    .arg(m_progList->GetCurrentPos())
                    .arg(m_progList->GetCount()));
+        }
+        MythUIStateType *ratingState = dynamic_cast<MythUIStateType*>
+                                                    (GetChild("ratingstate"));
+        if (ratingState)
+        {
+            QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
+            ratingState->DisplayState(rating);
         }
     }
 }
