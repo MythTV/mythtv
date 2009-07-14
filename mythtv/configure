@@ -3382,13 +3382,8 @@ fi
 enabled freetype2 ||
     die "ERROR! You must have FreeType installed to compile MythTV."
 
-#has_library libmysqlclient || has_library mysql/libmysqlclient ||
-#    die "ERROR! You must have a MySQL library installed to run MythTV."
-#
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
-
-require libXxf86vm X11/extensions/xf86vmode.h XF86VidModeSetClientVersion -lXxf86vm
 
 if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
     enable qtwebkit
@@ -3442,9 +3437,15 @@ fi
 enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3 ||
     disable libfftw3
 
-enabled x11 && has_library libX11 || disable x11
-enabled xrandr && check_header X11/extensions/Xrandr.h || disable xrandr
-enabled xv && has_library libXv || disable xv
+enabled x11 && check_lib X11/Xlib.h XQueryExtension -lX11 || disable x11
+enabled xrandr && check_lib X11/extensions/Xrandr.h XRRSelectInput -lXrandr || disable xrandr
+enabled xv && check_lib X11/extensions/Xv.h XvPutStill -lXv || disable xv
+
+if enabled x11; then
+    require libXxf86vm X11/extensions/xf86vmode.h XF86VidModeSetClientVersion -lXxf86vm
+    require libXinerama X11/extensions/Xinerama.h XineramaQueryExtension -lXinerama
+    require libXext X11/extensions/Xext.h XMissingExtension -lXext
+fi
 
 check_header GL/gl.h
 if ! enabled windows; then
@@ -3453,7 +3454,7 @@ fi
 
 VENDOR_XVMC_LIBS=""
 check_header X11/extensions/XvMClib.h
-has_library libXvMCW || disable xvmcw
+check_lib XvMCQueryExtension XvMCQueryVersion -lXvMCW || disable xvmcw
 check_header X11/extensions/vldXvMC.h
 
 if test x"$xvmc_lib" != x""; then
