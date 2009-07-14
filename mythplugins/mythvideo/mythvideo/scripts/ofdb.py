@@ -25,9 +25,14 @@ import codecs
 from optparse import OptionParser
 
 # This is done for Ubuntu, they are removing PyXML.
-alt_path = '/usr/lib/python%s/site-packages/oldxml' % sys.version[:3]
-if os.path.exists(alt_path):
-	sys.path.append(alt_path)
+alt_paths = (
+		'/usr/lib/python%s/site-packages/oldxml' % sys.version[:3],
+		'/usr/lib/python%s/dist-packages/oldxml' % sys.version[:3]
+		)
+
+for path in alt_paths:
+	if os.path.exists(path):
+		sys.path.append(path)
 
 from xml.dom.ext.reader import HtmlLib
 from xml.dom import EMPTY_NAMESPACE
