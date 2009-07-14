@@ -1563,7 +1563,7 @@ processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
 
-if disabled cross_compile && test -f /proc/cpuinfo ; then
+if test -f /proc/cpuinfo ; then
     if test x"$processor" = x"" -o x"$processor" = x"$arch_raw" -o \
             x"$processor" = x"unknown" ; then
         processor=`cat /proc/cpuinfo | grep "model name" | head -n 1`
@@ -1572,7 +1572,7 @@ if disabled cross_compile && test -f /proc/cpuinfo ; then
 fi
 
 # Mac OS X equivalent
-if disabled cross_compile && test -f /usr/bin/hostinfo ; then
+if test -f /usr/bin/hostinfo ; then
     arch=`arch`
     if test x"$arch" = x"ppc" -o x"$arch" = x"ppc64" ; then
         processor=`/usr/bin/hostinfo | grep "Processor type:"`
@@ -2421,7 +2421,7 @@ enabled version3 && { enabled gpl && enable gplv3 || enable lgplv3; }
 check_deps $ARCH_EXT_LIST
 
 # if no tune setting and we know cpu class look at $processor
-if ! enabled cpu_override && enabled proc_opt; then
+if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
 # first try to tune based on processor info
 # EM64T era Intel Xeon
    if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*51[1-6][08]" > /dev/null ; then
