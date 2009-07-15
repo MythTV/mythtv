@@ -387,59 +387,67 @@
             <value>Change Displayed Groups</value>
             <multiline>yes</multiline>
         </textarea>
-
         <checkbox name="titles" from="basecheckbox">
-            <position>940,238</position>
+            <position>940,228</position>
         </checkbox>
 
         <textarea name="titlelabel" from="basetextarea">
-            <area>990,242,300,30</area>
+            <area>990,232,300,30</area>
             <value>Show Titles</value>
         </textarea>
 
         <checkbox name="categories" from="basecheckbox">
-            <position>940,283</position>
+            <position>940,268</position>
         </checkbox>
 
         <textarea name="catlabel" from="titlelabel">
-            <position>990,288</position>
+            <position>990,273</position>
             <value>Show Categories</value>
         </textarea>
 
         <checkbox name="recgroups" from="basecheckbox">
-            <position>940,328</position>
+            <position>940,308</position>
         </checkbox>
 
         <textarea name="grouplabel" from="titlelabel">
-            <position>990,335</position>
+            <position>990,315</position>
             <value>Show Recording Groups</value>
         </textarea>
 
         <checkbox name="watchlist" from="basecheckbox">
-            <position>940,373</position>
+            <position>940,348</position>
         </checkbox>
 
         <textarea name="watchlabel" from="titlelabel">
-            <position>990,378</position>
+            <position>990,353</position>
             <value>Show Watch List</value>
         </textarea>
 
         <checkbox name="searches" from="basecheckbox">
-            <position>940,418</position>
+            <position>940,388</position>
         </checkbox>
 
         <textarea name="searchlabel" from="titlelabel">
-            <position>990,423</position>
+            <position>990,393</position>
             <value>Show Searches</value>
         </textarea>
 
         <checkbox name="livetv" from="basecheckbox">
-            <position>940,463</position>
+            <position>940,428</position>
         </checkbox>
 
         <textarea name="livelabel" from="titlelabel">
-            <position>990,468</position>
+            <position>990,433</position>
             <value>Show LiveTV</value>
+        </textarea>
+
+        <checkbox name="watched" from="basecheckbox">
+            <position>940,468</position>
+        </checkbox>
+
+        <textarea name="watchedlabel" from="titlelabel">
+            <position>990,473</position>
+            <value>Show Watched Recordings</value>
         </textarea>
 
         <button name="save" from="basebutton">

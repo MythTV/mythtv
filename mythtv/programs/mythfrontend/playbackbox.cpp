@@ -1099,6 +1099,10 @@ bool PlaybackBox::FillList(bool useCachedData)
                   ((p->category.isEmpty()) && (m_recGroup == tr("Unknown")))) &&
                  ( !m_recGroupPwCache.contains(p->recgroup))))
             {
+                if ((!(m_viewMask & VIEW_WATCHED)) &&
+                    (p->programflags & FL_WATCHED))
+                    continue;
+
                 if (m_viewMask != VIEW_NONE &&
                     (p->recgroup != "LiveTV" || m_recGroup == "LiveTV"))
                     m_progLists[""].prepend(p);
@@ -3697,7 +3701,9 @@ void PlaybackBox::showGroupFilter(void)
 
     // Find each recording group, and the number of recordings in each
     query.prepare("SELECT recgroup, COUNT(title) FROM recorded "
-                  "WHERE deletepending = 0 GROUP BY recgroup");
+                  "WHERE deletepending = 0 AND watched <= :WATCHED "
+                  "GROUP BY recgroup");
+    query.bindValue(":WATCHED", (m_viewMask & VIEW_WATCHED));
     if (query.exec())
     {
         while (query.next())
@@ -3733,7 +3739,9 @@ void PlaybackBox::showGroupFilter(void)
 
     // Find each category, and the number of recordings in each
     query.prepare("SELECT DISTINCT category, COUNT(title) FROM recorded "
-                  "WHERE deletepending = 0 GROUP BY category");
+                  "WHERE deletepending = 0 AND watched <= :WATCHED "
+                  "GROUP BY category");
+    query.bindValue(":WATCHED", (m_viewMask & VIEW_WATCHED));
     if (query.exec())
     {
         int unknownCount = 0;
@@ -4294,36 +4302,52 @@ bool ChangeView::Create()
     MythUICheckBox *checkBox;
 
     checkBox = dynamic_cast<MythUICheckBox*>(GetChild("titles"));
-    if (m_viewMask & PlaybackBox::VIEW_TITLES)
-        checkBox->SetCheckState(MythUIStateType::Full);
-    connect(checkBox, SIGNAL(toggled(bool)),
-            m_parentScreen, SLOT(toggleTitleView(bool)));
+    if (checkBox)
+    {
+        if (m_viewMask & PlaybackBox::VIEW_TITLES)
+            checkBox->SetCheckState(MythUIStateType::Full);
+        connect(checkBox, SIGNAL(toggled(bool)),
+                m_parentScreen, SLOT(toggleTitleView(bool)));
+    }
 
     checkBox = dynamic_cast<MythUICheckBox*>(GetChild("categories"));
-    if (m_viewMask & PlaybackBox::VIEW_CATEGORIES)
-        checkBox->SetCheckState(MythUIStateType::Full);
-    connect(checkBox, SIGNAL(toggled(bool)),
-            m_parentScreen, SLOT(toggleCategoryView(bool)));
+    if (checkBox)
+    {
+        if (m_viewMask & PlaybackBox::VIEW_CATEGORIES)
+            checkBox->SetCheckState(MythUIStateType::Full);
+        connect(checkBox, SIGNAL(toggled(bool)),
+                m_parentScreen, SLOT(toggleCategoryView(bool)));
+    }
 
     checkBox = dynamic_cast<MythUICheckBox*>(GetChild("recgroups"));
-    if (m_viewMask & PlaybackBox::VIEW_RECGROUPS)
-        checkBox->SetCheckState(MythUIStateType::Full);
-    connect(checkBox, SIGNAL(toggled(bool)),
-            m_parentScreen, SLOT(toggleRecGroupView(bool)));
+    if (checkBox)
+    {
+        if (m_viewMask & PlaybackBox::VIEW_RECGROUPS)
+            checkBox->SetCheckState(MythUIStateType::Full);
+        connect(checkBox, SIGNAL(toggled(bool)),
+                m_parentScreen, SLOT(toggleRecGroupView(bool)));
+    }
 
     // TODO Do we need two separate settings to determine whether the watchlist
     //      is shown? The filter setting be enough?
-    checkBox = dynamic_cast<MythUICheckBox*>(GetChild("watchlist"));
-    if (m_viewMask & PlaybackBox::VIEW_WATCHLIST)
-        checkBox->SetCheckState(MythUIStateType::Full);
-    connect(checkBox, SIGNAL(toggled(bool)),
-            m_parentScreen, SLOT(toggleWatchListView(bool)));
+        checkBox = dynamic_cast<MythUICheckBox*>(GetChild("watchlist"));
+        if (checkBox)
+        {
+            if (m_viewMask & PlaybackBox::VIEW_WATCHLIST)
+                checkBox->SetCheckState(MythUIStateType::Full);
+            connect(checkBox, SIGNAL(toggled(bool)),
+                    m_parentScreen, SLOT(toggleWatchListView(bool)));
+        }
+    //
 
     checkBox = dynamic_cast<MythUICheckBox*>(GetChild("searches"));
-    if (m_viewMask & PlaybackBox::VIEW_SEARCHES)
-        checkBox->SetCheckState(MythUIStateType::Full);
-    connect(checkBox, SIGNAL(toggled(bool)),
-            m_parentScreen, SLOT(toggleSearchView(bool)));
+    if (checkBox)
+    {
+        if (m_viewMask & PlaybackBox::VIEW_SEARCHES)
+            checkBox->SetCheckState(MythUIStateType::Full);
+        connect(checkBox, SIGNAL(toggled(bool)),
+                m_parentScreen, SLOT(toggleSearchView(bool)));
+    }
 
     // TODO Do we need two separate settings to determine whether livetv
     //      recordings are shown? Same issue as the watchlist above
@@ -4335,6 +4359,16 @@ bool ChangeView::Create()
             connect(checkBox, SIGNAL(toggled(bool)),
                     m_parentScreen, SLOT(toggleLiveTVView(bool)));
         }
+    //
+
+    checkBox = dynamic_cast<MythUICheckBox*>(GetChild("watched"));
+    if (checkBox)
+    {
+        if (m_viewMask & PlaybackBox::VIEW_WATCHED)
+            checkBox->SetCheckState(MythUIStateType::Full);
+        connect(checkBox, SIGNAL(toggled(bool)),
+                m_parentScreen, SLOT(toggleWatchedView(bool)));
+    }
 
     MythUIButton *savebutton = dynamic_cast<MythUIButton*>(GetChild("save"));
     connect(savebutton, SIGNAL(Clicked()), SLOT(SaveChanges()));

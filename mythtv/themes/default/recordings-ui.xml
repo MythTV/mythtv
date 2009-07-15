@@ -252,48 +252,57 @@
         </textarea>
 
         <checkbox name="categories" from="basecheckbox">
-            <position>90,150</position>
+            <position>90,140</position>
         </checkbox>
 
         <textarea name="catlabel" from="titlelabel">
-            <position>140,150</position>
+            <position>140,140</position>
             <value>Show Categories</value>
         </textarea>
 
         <checkbox name="recgroups" from="basecheckbox">
-            <position>90,200</position>
+            <position>90,190</position>
         </checkbox>
 
         <textarea name="grouplabel" from="titlelabel">
-            <position>140,200</position>
+            <position>140,190</position>
             <value>Show Recording Groups</value>
         </textarea>
 
         <checkbox name="watchlist" from="basecheckbox">
-            <position>90,250</position>
+            <position>90,240</position>
         </checkbox>
 
         <textarea name="watchlabel" from="titlelabel">
-            <position>140,250</position>
+            <position>140,240</position>
             <value>Show Watch List</value>
         </textarea>
 
         <checkbox name="searches" from="basecheckbox">
-            <position>90,300</position>
+            <position>90,290</position>
         </checkbox>
 
         <textarea name="searchlabel" from="titlelabel">
-            <position>140,300</position>
+            <position>140,290</position>
             <value>Show Searches</value>
         </textarea>
 
         <checkbox name="livetv" from="basecheckbox">
-            <position>90,350</position>
+            <position>90,340</position>
         </checkbox>
 
         <textarea name="livelabel" from="titlelabel">
-            <position>140,350</position>
+            <position>140,340</position>
             <value>Show LiveTV</value>
+        </textarea>
+
+        <checkbox name="watched" from="basecheckbox">
+            <position>90,390</position>
+        </checkbox>
+
+        <textarea name="watchedlabel" from="titlelabel">
+            <position>140,390</position>
+            <value>Show Watched Programs</value>
         </textarea>
 
         <button name="save" from="basebutton">
