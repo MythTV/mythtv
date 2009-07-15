@@ -111,7 +111,7 @@
         </buttonlist>
 
         <textarea name="label">
-            <area>45,200,130,30</area>
+            <area>40,200,130,30</area>
             <font>basesmallyellow</font>
             <value>[x]</value>
         </textarea>
@@ -122,7 +122,7 @@
         </textarea>
 
         <textarea name="urllabel" from="label">
-            <area>335,200,130,30</area>
+            <area>435,200,130,30</area>
             <value>URL</value>
         </textarea>
 
@@ -136,11 +136,11 @@
 
 
         <buttonlist name="bookmarklist" from="basebuttonlist2">
-            <area>40,260,1200,400</area>
+            <area>40,260,1200,420</area>
             <spacing>4</spacing>
             <layout>vertical</layout>
             <showarrow>no</showarrow>
-            <buttonarea>0,0,1180,400</buttonarea>
+            <buttonarea>0,0,1180,420</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <statetype name="buttoncheck">

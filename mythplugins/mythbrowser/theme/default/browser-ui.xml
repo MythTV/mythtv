@@ -43,47 +43,42 @@
             <font>baselarge</font>
         </textarea>
 
-        <imagetype name="topbgimage">
-            <area>25,75,760,110</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
-
         <textarea name="categorylabel">
-            <area>60,90,130,30</area>
+            <area>60,70,130,30</area>
             <font>basesmallyellow</font>
             <value>Category</value>
         </textarea>
 
         <buttonlist name="grouplist">
-            <area>75,120,660,40</area>
+            <area>15,100,770,30</area>
             <layout>horizontal</layout>
-            <spacing>10</spacing>
-            <buttonarea>0,0,630,100%</buttonarea>
+            <spacing>6</spacing>
+            <buttonarea>15,0,740,40</buttonarea>
             <statetype name="buttonitem">
+                <area>0,0,180,40</area>
                 <state name="active">
-                    <area>0,0,150,40</area>
                     <imagetype name="buttonbackground">
-                        <gradient start="#505050" end="#000000" alpha="200" />
+                        <filename>horiz_selector.png</filename>
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>5,5,130,30</area>
-                        <cutdown>yes</cutdown>
+                        <area>0,0,180,40</area>
+                        <font>basesmall</font>
                         <align>allcenter</align>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                        <filename>horiz_selector_selected.png</filename>
                     </imagetype>
                 </state>
                 <state name="inactive" from="active">
                     <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                        <filename>horiz_selector_inactive.png</filename>
                     </imagetype>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>640,2</position>
+                <position>756,10</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>lb-rtarrow-reg.png</filename>
@@ -96,7 +91,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>640,21</position>
+                <position>0,10</position>
                 <state type="off">
                     <imagetype name="upon">
                         <filename>lb-ltarrow-reg.png</filename>
@@ -111,71 +106,55 @@
         </buttonlist>
 
         <textarea name="label">
-            <area>45,200,130,30</area>
+            <area>45,160,130,30</area>
             <font>basesmallyellow</font>
             <value>[x]</value>
         </textarea>
 
         <textarea name="namelabel" from="label">
-            <area>80,200,130,30</area>
+            <area>80,160,130,30</area>
             <value>Name</value>
         </textarea>
 
         <textarea name="urllabel" from="label">
-            <area>335,200,130,30</area>
+            <area>335,160,130,30</area>
             <value>URL</value>
         </textarea>
 
-        <imagetype name="bgimage">
-            <area>25,220,760,360</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground">
+            <area>25,190,750,380</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="120" />
+            <line color="#FFFFFF" alpha="255" width="2" />
+            <cornerradius>12</cornerradius>
+        </shape>
 
-        <imagetype name="showinglines">
-            <filename>rk-lines.png</filename>
-            <area>25,220,760,335</area>
-        </imagetype>
-
-        <buttonlist name="bookmarklist" from="basebuttonlist">
-            <area>40,230,720,280</area>
+        <buttonlist name="bookmarklist" from="basebuttonlist2">
+            <area>40,200,720,400</area>
             <spacing>4</spacing>
             <layout>vertical</layout>
             <showarrow>no</showarrow>
-            <buttonarea>0,0,720,280</buttonarea>
+            <buttonarea>0,0,720,360</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <statetype name="buttoncheck">
                         <position>5,5</position>
-                    </statetype>
-                    <textarea name="name">
-                        <area>40,0,250,30</area>
-                        <font>basesmall</font>
-                        <align>left,vcenter</align>
-                    </textarea>
-                    <textarea name="url">
-                        <area>295,0,315,30</area>
-                        <align>left,vcenter</align>
-                    </textarea>
-                </state>
-                <state name="selected">
-                    <statetype name="buttoncheck">
-                        <position>5,5</position>
-                    </statetype>
-                    <textarea name="name">
-                        <area>40,0,250,30</area>
-                        <font>basesmall</font>
-                        <align>left,vcenter</align>
-                    </textarea>
-                    <textarea name="url">
-                        <area>295,0,400,30</area>
-                        <font>basesmall</font>
-                        <align>left,vcenter</align>
-                    </textarea>
-                </state>
-                <state name="inactive">
-                    <statetype name="buttoncheck">
-                        <position>5,5</position>
-                    </statetype>
+                        <state type="off">
+                            <imagetype name="checkoff">
+                                <filename>lb-check-empty.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="half">
+                            <imagetype name="checkhalf">
+                                <filename>lb-check-half.png</filename>
+                            </imagetype>
+                        </state>
+                        <state type="full">
+                            <imagetype name="checkfull">
+                                <filename>lb-check-full.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype> 
                     <textarea name="name">
                         <area>40,0,250,30</area>
                         <font>basesmall</font>
@@ -183,10 +162,29 @@
                     </textarea>
                     <textarea name="url">
                         <area>295,0,400,30</area>
-                        <font>basesmall</font>
                         <align>left,vcenter</align>
+                        <font>basesmall</font>
                     </textarea>
                 </state>
+                <state name="selected" from="active">
+                    <shape name="selectbar">
+                        <area>30,0,690,30</area>
+                    </shape>
+                </state>
+                <state name="inactive" from="active">
+                    <textarea name="name">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                    <textarea name="url">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>650,345</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>690,345</position>
             </statetype>
         </buttonlist>
 
