@@ -2900,7 +2900,7 @@ enabled vis && check_mtune_mcpu "ultrasparc"
 
 # if architecture specific flags don't work blank them
 if test -n "$ARCHFLAGS"; then
-    TMP_ARCHFLAGS="$ARCH_FLAGS"
+    TMP_ARCHFLAGS="$ARCHFLAGS"
     check_cc "$ARCHFLAGS" <<EOF || ARCHFLAGS=""
 int main( void ) { return 0; }
 EOF
