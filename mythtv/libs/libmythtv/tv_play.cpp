@@ -8416,6 +8416,7 @@ void TV::customEvent(QEvent *e)
                         StopStuff(mctx, ctx, true, true, true);
                     }
                 }
+                SetLastProgram(NULL);
                 jumpToProgram = true;
                 SetExitPlayer(true, false);
             }
