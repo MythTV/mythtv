@@ -31,6 +31,8 @@ class MPUBLIC MythScreenStack : public QObject
     void DisableEffects(void) { m_DoTransitions = false; }
     void EnableEffects(void);
 
+    QString GetLocation(bool fullPath);
+
   private slots:
     void doInit(void);
 

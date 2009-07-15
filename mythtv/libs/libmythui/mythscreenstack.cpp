@@ -318,3 +318,30 @@ void MythScreenStack::CheckDeletes(void)
         RecalculateDrawOrder();
     }
 }
+
+QString MythScreenStack::GetLocation(bool fullPath)
+{
+    if (fullPath)
+    {
+        QString path;
+        QVector<MythScreenType *>::Iterator it;
+        for (it = m_Children.begin(); it != m_Children.end(); ++it)
+        {
+            if (!(*it)->IsDeleting())
+            {
+                if (path.isEmpty())
+                    path = (*it)->objectName();
+                else
+                    path += "/" + (*it)->objectName();
+            }
+        }
+        return path;
+    }
+    else
+    {
+        if (m_topScreen)
+            return m_topScreen->objectName();
+    }
+
+    return QString();
+}

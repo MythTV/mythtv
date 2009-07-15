@@ -1408,12 +1408,53 @@ QString MythUIHelper::RemoveCurrentLocation(void)
     return m_currentLocation.takeLast();
 }
 
-QString MythUIHelper::GetCurrentLocation(void)
+QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
 {
+    QString result;
     QMutexLocker locker(&m_locationLock);
 
-    if (m_currentLocation.isEmpty())
-        return QString("UNKNOWN");
+    if (fullPath)
+    {
+        // get main stack top screen 
+        MythScreenStack *stack = GetMythMainWindow()->GetMainStack();
+        result = stack->GetLocation(true);
 
-    return m_currentLocation.last();
+        if (!mainStackOnly)
+        {
+            // get popup stack main screen
+            stack = GetMythMainWindow()->GetStack("popup stack");
+            if (!stack->GetLocation(true).isEmpty())
+                result += "/" + stack->GetLocation(false);
+        }
+
+        // if there's a location in the stringlist add that (non mythui screen or external app running)
+        if (!m_currentLocation.isEmpty())
+        {
+            for (int x = 0; x < m_currentLocation.count(); x++)
+                result += "/" + m_currentLocation[x];
+        }
+    }
+    else
+    {
+        // get main stack top screen 
+        MythScreenStack *stack = GetMythMainWindow()->GetMainStack();
+        result = stack->GetLocation(false);
+
+        if (!mainStackOnly)
+        {
+            // get popup stack top screen
+            stack = GetMythMainWindow()->GetStack("popup stack");
+            if (!stack->GetLocation(false).isEmpty())
+                result = stack->GetLocation(false);
+        }
+
+        // if there's a location in the stringlist use that (non mythui screen or external app running)
+        if (!m_currentLocation.isEmpty())
+            result = m_currentLocation.last();
+    }
+
+    if (result.isEmpty())
+        result = "UNKNOWN";
+
+    return result;
 }

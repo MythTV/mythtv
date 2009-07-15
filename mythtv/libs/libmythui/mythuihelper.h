@@ -113,7 +113,7 @@ class MPUBLIC MythUIHelper
 
     void AddCurrentLocation(QString location);
     QString RemoveCurrentLocation(void);
-    QString GetCurrentLocation(void);
+    QString GetCurrentLocation(bool fullPath = false, bool mainStackOnly = true);
 
   protected:
     MythUIHelper();

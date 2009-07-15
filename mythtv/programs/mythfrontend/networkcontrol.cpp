@@ -674,7 +674,15 @@ QString NetworkControl::processQuery(QStringList tokens)
 
     if (is_abbrev("location", tokens[1]))
     {
-        QString location = GetMythUI()->GetCurrentLocation();
+        bool fullPath = false;
+        bool mainStackOnly = true;
+
+        if (tokens.size() > 2)
+            fullPath = (tokens[2].toLower() == "true" || tokens[2] == "1");
+        if (tokens.size() > 3)
+            mainStackOnly = (tokens[3].toLower() == "true" || tokens[3] == "1");
+
+        QString location = GetMythUI()->GetCurrentLocation(fullPath, mainStackOnly);
         result = location;
 
         // if we're playing something, then find out what
