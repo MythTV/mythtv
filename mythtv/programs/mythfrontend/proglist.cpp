@@ -1497,6 +1497,8 @@ void ProgLister::updateButtonList(void)
             state = "running";
         else if (pginfo->recstatus == rsConflict     ||
                  pginfo->recstatus == rsOffLine      ||
+                 pginfo->recstatus == rsTunerBusy    ||
+                 pginfo->recstatus == rsFailed       ||
                  pginfo->recstatus == rsAborted)
             state = "error";
         else if (pginfo->recstatus == rsRepeat       ||

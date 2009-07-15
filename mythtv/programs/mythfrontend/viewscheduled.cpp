@@ -383,9 +383,11 @@ void ViewScheduled::FillList()
 
         if (pginfo->recstatus == rsRecording)
             state = "running";
-        else if (pginfo->recstatus == rsConflict ||
-                    pginfo->recstatus == rsOffLine ||
-                    pginfo->recstatus == rsAborted)
+        else if (pginfo->recstatus == rsConflict  ||
+                 pginfo->recstatus == rsOffLine   ||
+                 pginfo->recstatus == rsTunerBusy ||
+                 pginfo->recstatus == rsFailed    ||
+                 pginfo->recstatus == rsAborted)
             state = "error";
         else if (pginfo->recstatus == rsWillRecord)
         {
