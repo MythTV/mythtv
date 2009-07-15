@@ -10,6 +10,7 @@ using namespace std;
 #include <QImage>
 #include <QFile>
 #include <QReadWriteLock>
+#include <QHash>
 
 #include "channelutil.h"
 #include "mythdb.h"
@@ -1185,42 +1186,58 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
 QString ChannelUtil::GetIcon(uint chanid)
 {
     static QReadWriteLock channel_icon_map_lock;
-    static QMap<uint,QString> channel_icon_map;
+    static QHash<uint,QString> channel_icon_map;
     static bool run_init = true;
 
     channel_icon_map_lock.lockForRead();
 
+    QString ret(channel_icon_map.value(chanid, "_cold_"));
+
+    channel_icon_map_lock.unlock();
+    
+    if (ret != "_cold_")
+        return ret;
+
+    channel_icon_map_lock.lockForWrite();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString iconquery = "SELECT chanid, icon FROM channel";
+
     if (run_init)
+        iconquery += " WHERE visible = 1";
+    else
+        iconquery += " WHERE chanid = :CHANID";
+
+    query.prepare(iconquery);
+
+    if (!run_init)
+        query.bindValue(":CHANID", chanid);
+
+    if (query.exec())
     {
-        channel_icon_map_lock.unlock();
-        channel_icon_map_lock.lockForWrite();
         if (run_init)
         {
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT chanid, icon FROM channel");
-            if (query.exec())
+            channel_icon_map.reserve(query.size());
+            while (query.next())
             {
-                while (query.next())
-                {
-                    channel_icon_map[query.value(0).toUInt()] =
-                        query.value(1).toString();
-                }
-                run_init = false;
+                channel_icon_map[query.value(0).toUInt()] =
+                    query.value(1).toString();
             }
-            else
-            {
-                MythDB::DBError("GetIcon", query);
-            }
+            run_init = false;
+        }
+        else
+        {
+            channel_icon_map[chanid] = (query.next()) ?
+                query.value(1).toString() : "";
         }
     }
-
-    QMap<uint,QString>::iterator it = channel_icon_map.find(chanid);
-    QString ret = QString::null;
-    if (it != channel_icon_map.end())
+    else
     {
-        ret = *it;
-        ret.detach();
+        MythDB::DBError("GetIcon", query);
     }
+
+    ret = channel_icon_map.value(chanid, "");
+
     channel_icon_map_lock.unlock();
 
     return ret;
