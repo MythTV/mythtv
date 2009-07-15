@@ -87,13 +87,15 @@ class PlaybackBox : public MythScreenType
     } ViewTitleSort;
 
     typedef enum {
-        VIEW_NONE       =  0x00,
-        VIEW_TITLES     =  0x01,
-        VIEW_CATEGORIES =  0x02,
-        VIEW_RECGROUPS  =  0x04,
-        VIEW_WATCHLIST  =  0x08,
-        VIEW_SEARCHES   =  0x10,
-        VIEW_LIVETVGRP  =  0x20,
+        VIEW_NONE       =  0x0000,
+        VIEW_TITLES     =  0x0001,
+        VIEW_CATEGORIES =  0x0002,
+        VIEW_RECGROUPS  =  0x0004,
+        VIEW_WATCHLIST  =  0x0008,
+        VIEW_SEARCHES   =  0x0010,
+        VIEW_LIVETVGRP  =  0x0020,
+        // insert new entries above here
+        VIEW_WATCHED    =  0x8000
     } ViewMask;
 
     typedef enum
@@ -199,6 +201,7 @@ class PlaybackBox : public MythScreenType
     void toggleWatchListView(bool setOn) { toggleView(VIEW_WATCHLIST, setOn); }
     void toggleSearchView(bool setOn)    { toggleView(VIEW_SEARCHES, setOn); }
     void toggleLiveTVView(bool setOn)    { toggleView(VIEW_LIVETVGRP, setOn); }
+    void toggleWatchedView(bool setOn)   { toggleView(VIEW_WATCHED, setOn); }
 
     void listChanged(void);
     void setUpdateFreeSpace() { m_freeSpaceNeedsUpdate = true; }
