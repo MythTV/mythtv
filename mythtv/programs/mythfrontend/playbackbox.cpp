@@ -311,7 +311,8 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
     m_viewMask = (ViewMask)gContext->GetNumSetting(
-                                    "DisplayGroupDefaultViewMask", VIEW_TITLES);
+                                    "DisplayGroupDefaultViewMask",
+                                    VIEW_TITLES | VIEW_WATCHED);
 
     // Translate these external settings into mask values
     if (gContext->GetNumSetting("PlaybackWatchList", 1) &&

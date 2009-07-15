@@ -18,7 +18,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1236";
+const QString currentDatabaseVersion = "1237";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -500,7 +500,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
                             " CHARACTER SET utf8 COLLATE utf8_general_ci;")
                     .arg(gContext->GetDatabaseParams().dbName)))
         MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
-        
+
 
     VERBOSE(VB_IMPORTANT, "Newest Schema Version : " + currentDatabaseVersion);
 
@@ -4460,15 +4460,15 @@ NULL
         if (!performActualUpdate(updates, "1231", dbver))
             return false;
     }
-    if (dbver == "1231")  
-    {  
-        const char *updates[] = {  
-"ALTER TABLE recordedprogram CHANGE COLUMN videoprop videoprop "  
-"    SET('HDTV', 'WIDESCREEN', 'AVC', '720', '1080') NOT NULL; ",  
-NULL  
-};  	          
-        if (!performActualUpdate(updates, "1232", dbver))  
-            return false;  
+    if (dbver == "1231")
+    {
+        const char *updates[] = {
+"ALTER TABLE recordedprogram CHANGE COLUMN videoprop videoprop "
+"    SET('HDTV', 'WIDESCREEN', 'AVC', '720', '1080') NOT NULL; ",
+NULL
+};
+        if (!performActualUpdate(updates, "1232", dbver))
+            return false;
     }
 
     if (dbver == "1232")
@@ -4498,7 +4498,7 @@ NULL
 "CREATE TABLE IF NOT EXISTS channelgroup ("
 "  id int(10) unsigned NOT NULL auto_increment,"
 "  chanid int(11) unsigned NOT NULL default '0',"
-"  grpid int(11) NOT NULL default '1', PRIMARY KEY (id));", 
+"  grpid int(11) NOT NULL default '1', PRIMARY KEY (id));",
 "CREATE TABLE IF NOT EXISTS channelgroupnames ("
 "  grpid int(10) unsigned NOT NULL auto_increment,"
 "  name varchar(64) NOT NULL default '0',"
@@ -4577,7 +4577,7 @@ NULL
                     "Could not perform an update for '1236'", update);
                 ok = false;
             }
-            
+
         }
 
         if (!ok)
@@ -4586,6 +4586,16 @@ NULL
         const char * updates[] = { NULL };
 
         if (!performActualUpdate(updates, "1236", dbver))
+            return false;
+    }
+
+    if (dbver == "1236")
+    {
+       const char *updates[] = {
+"UPDATE settings SET data= data | 0x8000 WHERE value='DisplayGroupDefaultViewMask';",
+NULL
+};
+        if (!performActualUpdate(updates, "1237", dbver))
             return false;
     }
 
@@ -4728,7 +4738,7 @@ tmp.constData(),
 "  id int(10) unsigned NOT NULL auto_increment,"
 "  chanid int(11) unsigned NOT NULL default '0',"
 "  grpid int(11) NOT NULL default '1', PRIMARY KEY (id)"
-");", 
+");",
 "CREATE TABLE channelgroupnames ("
 "  grpid int(10) unsigned NOT NULL auto_increment,"
 "  name varchar(64) NOT NULL default '0',"
