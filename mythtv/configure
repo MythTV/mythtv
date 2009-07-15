@@ -2671,15 +2671,15 @@ if test $cpu != "generic"; then
 fi
 
 # set generic archflags
-if test x"$ARCHFLAGS" = x""; then
+if test -z $ARCHFLAGS; then
     if enabled x86_32; then
         if ! enabled cmov; then
-            check_archflags "-march=i586"
+            check_archflags -march=i586
         else
-            check_archflags "-march=pentiumpro"
+            check_archflags -march=pentiumpro
         fi
     elif enabled x86_64; then
-        check_archflags "-march=k8"
+        check_archflags -march=k8
     fi
 fi
 
@@ -2895,16 +2895,16 @@ enabled vis     && check_asm vis     '"pdist %f0, %f0, %f0"' -mcpu=ultrasparc
 
 enabled vis && add_cflags "-mcpu=ultrasparc -mtune=ultrasparc"
 
-
 enabled vis && check_mtune_mcpu "ultrasparc"
+
 
 # if architecture specific flags don't work blank them
 if test -n "$ARCHFLAGS"; then
     TMP_ARCHFLAGS="$ARCHFLAGS"
-    check_cc "$ARCHFLAGS" <<EOF || ARCHFLAGS=""
+    check_cc $ARCHFLAGS <<EOF || ARCHFLAGS=""
 int main( void ) { return 0; }
 EOF
-    if test -n "$ARCHFLAGS"; then
+    if test -z "$ARCHFLAGS"; then
         if enabled cpu_override || enabled proc_opt || test x"$tune" != x"generic"; then
             echo "ERROR: CPU specific ./configure options failed compile test"
             echo "       Removing CPU specific compilation options. ($TMP_ARCHFLAGS)"
