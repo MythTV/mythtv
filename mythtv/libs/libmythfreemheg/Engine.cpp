@@ -78,7 +78,7 @@ int MHEngine::RunAll()
         m_LinkTable.clear();
 
         // UK MHEG applications boot from ~//a or ~//startup.  Actually the initial
-        // object can also be explicitly given in the 
+        // object can also be explicitly given in the
         MHObjectRef startObj;
         startObj.m_nObjectNo = 0;
         startObj.m_GroupId.Copy(MHOctetString("~//a"));
@@ -195,6 +195,9 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
     // This may block if we cannot be sure whether the object is present.
     if (! m_Context->GetCarouselData(csPath, text)) return false;
 
+    // Clear the action queue of anything pending.
+    m_ActionStack.clear();
+
     m_fInTransition = true; // Starting a transition
     try {
         if (CurrentApp()) {
@@ -270,7 +273,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
 {
     int i;
     if (m_fInTransition) {
-        // TransitionTo is not allowed in OnStartUp or OnCloseDown actions. 
+        // TransitionTo is not allowed in OnStartUp or OnCloseDown actions.
         MHLOG(MHLogWarning, "TransitionTo during transition - ignoring");
         return;
     }
@@ -358,7 +361,7 @@ QString MHEngine::GetPathName(const MHOctetString &str)
 
     if (csPath.left(1) == "~") csPath = csPath.mid(1); // Remove ~
     // Ignore "CI://"
-    if (csPath.left(2) != "//") { // 
+    if (csPath.left(2) != "//") { //
         // Add the current application's path name
         if (CurrentApp()) csPath = CurrentApp()->m_Path + csPath;
     }
@@ -763,7 +766,7 @@ bool MHEngine::GetEngineSupport(const MHOctetString &feature)
 
     if (strings[0] == "ApplicationStacking" || strings[0] == "ASt") return true;
     // We're required to support cloning for Text, Bitmap and Rectangle.
-    if (strings[0] == "Cloning" || strings[0] == "Clo") return true; 
+    if (strings[0] == "Cloning" || strings[0] == "Clo") return true;
     if (strings[0] == "SceneCoordinateSystem" || strings[0] == "SCS") {
         if (strings.count() >= 3 && strings[1] == "720" && strings[2] == "576")
             return true;
@@ -918,7 +921,7 @@ FILE *__mhlogStream = NULL;
 void __mhlog(QString logtext)
 {
     QByteArray tmp = logtext.toAscii();
-    fprintf(__mhlogStream, "%s\n", tmp.constData()); 
+    fprintf(__mhlogStream, "%s\n", tmp.constData());
 }
 
 // Called from the user of the library to set the logging.
