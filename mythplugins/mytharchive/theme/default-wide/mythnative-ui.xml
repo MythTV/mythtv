@@ -55,10 +55,9 @@ MythTV Archive GUI theme
             <bold>no</bold>
         </font>
 
-        <imagetype name="topbgimage">
-            <area>25,55,1230,340</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,60,1220,300</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>0,10,1280,50</area>
@@ -86,10 +85,9 @@ MythTV Archive GUI theme
             <position>800,290</position>
         </button>
 
-        <imagetype name="bottombgimage">
-            <area>25,380,1130,240</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,380,1100,240</area>
+        </shape>
 
         <textarea name="progtitle" from="basetextarea">
             <area>60,400,440,30</area>
@@ -231,10 +229,9 @@ MythTV Archive GUI theme
             </statetype>
         </buttonlist>
 
-        <imagetype name="image">
-            <area>20,480,1250,150</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>35,485,1210,140</area>
+        </shape>
 
         <textarea name="label1" from="basetextarea">
             <area>50,495,160,40</area>
@@ -302,10 +299,9 @@ MythTV Archive GUI theme
             archived file channel
         -->
 
-        <imagetype name="midbgimage">
-            <area>25,60,1230,270</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,60,1220,250</area>
+        </shape>
 
         <textarea name="progtitle" from="basetextarea">
             <area>60,70,640,30</area>
@@ -328,10 +324,9 @@ MythTV Archive GUI theme
             <filename>blank.png</filename>
         </imagetype>
 
-        <imagetype name="botombgimage">
-            <area>25,325,1230,160</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="middlebackground" from="basebackground">
+            <area>30,330,1220,135</area>
+        </shape>
 
         <textarea name="label1" from="basetextarea">
             <area>60,330,1170,50</area>
@@ -382,10 +377,9 @@ MythTV Archive GUI theme
             local file channel 
          -->
 
-        <imagetype name="bottombgimage">
-            <area>25,480,1230,170</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,485,1220,140</area>
+        </shape>
 
         <textarea name="label6" from="label1">
             <area>60,485,1170,50</area>

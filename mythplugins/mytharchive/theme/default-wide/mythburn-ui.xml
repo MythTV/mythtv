@@ -76,10 +76,9 @@ MythArchive GUI theme
             <value>DVD Menu Theme</value>
         </textarea>
 
-        <imagetype name="topbgimage">
-            <area>25,80,1230,180</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,70,1220,170</area>
+        </shape>
 
         <textarea name="themetitle" from="basetextarea">
             <area>60,95,500,50</area>
@@ -99,10 +98,9 @@ MythArchive GUI theme
             theme preview images
         -->
 
-        <imagetype name="middlebgimage">
-            <area>25,250,1230,270</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="middlebackground" from="basebackground">
+            <area>30,260,1220,220</area>
+        </shape>
 
         <imagetype name="intro_image">
             <area>100,275,195,162</area>
@@ -145,10 +143,9 @@ MythArchive GUI theme
             theme description
         -->
 
-        <imagetype name="bottombgimage">
-            <area>25,500,1230,120</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,500,1220,120</area>
+        </shape>
 
         <textarea name="themedescription" from="basetextarea">
             <area>60,515,1170,90</area>
@@ -196,10 +193,9 @@ MythArchive GUI theme
             <size>10</size>
         </font>
 
-        <imagetype name="topbgimage">
-            <area>25,50,1230,590</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,70,1220,500</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>0,10,1280,50</area>

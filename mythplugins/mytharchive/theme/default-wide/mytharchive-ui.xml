@@ -42,10 +42,9 @@ Common MythArchive window definitions
         <!--
             destination selector
         -->
-        <imagetype name="topbgimage">
-            <area>25,55,1230,320</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,55,1220,300</area>
+        </shape>
 
         <textarea name="title1" from="basetextarea">
             <area>0,10,1280,50</area>
@@ -91,10 +90,9 @@ Common MythArchive window definitions
             <value>0.00Gb</value>
         </textarea>
 
-        <imagetype name="bottombgimage">
-            <area>25,360,1230,220</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,370,1220,200</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>95,390,500,50</area>
@@ -153,11 +151,9 @@ Common MythArchive window definitions
             <bold>yes</bold>
         </font>
 
-
-        <imagetype name="topbgimage">
-            <area>25,60,1230,340</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,60,1220,300</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>0,10,1280,50</area>
@@ -204,10 +200,9 @@ Common MythArchive window definitions
             </statetype>
         </buttonlist>
 
-        <imagetype name="bottombgimage">
-            <area>25,370,1230,300</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,380,1220,250</area>
+        </shape>
 
         <textarea name="progtitle" from="basetextarea">
             <area>60,395,640,30</area>
@@ -345,12 +340,9 @@ Common MythArchive window definitions
             <bold>yes</bold>
         </font>
 
-
-        <imagetype name="topbgimage">
-            <area>25,60,1230,380</area>
-            <filename>trans-cr-background.png</filename>
-            <staticsize></staticsize>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,60,1220,340</area>
+        </shape>
 
         <textarea name="title1" from="basetextarea">
             <area>0,10,1280,50</area>
@@ -397,10 +389,9 @@ Common MythArchive window definitions
             </statetype>
         </buttonlist>
 
-        <imagetype name="bottombgimage">
-            <area>30,410,1050,260</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,420,1030,210</area>
+        </shape>
 
         <textarea name="videotitle">
             <area>60,430,640,30</area>
@@ -475,10 +466,9 @@ Common MythArchive window definitions
             <value>Log Viewer</value>
         </textarea>
 
-        <imagetype name="logbgimage">
-            <area>20,55,1240,510</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="logbackground" from="basebackground">
+            <area>30,60,1220,440</area>
+        </shape>
 
         <buttonlist name="loglist" from="basebuttonlist">
             <area>50,80,1165,400</area>
@@ -507,10 +497,9 @@ Common MythArchive window definitions
             </statetype>
         </buttonlist>
 
-        <imagetype name="itembgimage">
-            <area>20,510,1240,130</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,510,1220,130</area>
+        </shape>
 
         <textarea name="logitem_text" from="basetextarea">
             <area>45,515,1190,120</area>
