@@ -84,7 +84,7 @@
             <font>basemedium</font>
         </textarea>
 
-        <textarea name="helptext">
+        <textarea name="helptext" from="basetextarea">
             <area>40,530,1200,150</area>
             <value>This screen displays the status of various system components</value>
             <multiline>yes</multiline>
