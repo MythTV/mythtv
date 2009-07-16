@@ -1247,6 +1247,7 @@ CMDLINE_SELECT="
     debug
     extra_warnings
     logging
+    opengl
     optimizations
     stripping
     yasm
@@ -1494,8 +1495,7 @@ ivtv_deps="backend v4l"
 hdpvr_deps="backend v4l"
 hdhomerun_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
-opengl_deps_any="agl_h GL_gl_h"
-opengl_deps_any="darwin windows x11"
+opengl_deps_any="agl_h GL_gl_h odarwin windows x11"
 opengl_video_deps="opengl"
 opengl_vsync_deps="opengl"
 v4l_deps="backend"
@@ -1802,10 +1802,6 @@ for opt do
     --enable-mac-accel) enabble dvdv
     ;;
     --disable-mac-accel) disable dvdv
-    ;;
-    --enable-opengl-video) enable opengl_video
-    ;;
-    --disable-opengl-video) disable opengl_video
     ;;
 # disabled due to abuse in Gentoo ebuild
     --disable-frontend)
@@ -4205,10 +4201,8 @@ if enabled directx; then
   append CONFIG_DEFINES "USING_DIRECTX"
 fi
 
-if ! enabled darwin; then
-  if enabled opengl; then
-    echo "CONFIG_OPENGL_LIBS=-lGL -lGLU" >> $MYTH_CONFIG_MAK
-  fi
+if ! enabled darwin && enabled opengl; then
+  echo "CONFIG_OPENGL_LIBS=-lGL -lGLU" >> $MYTH_CONFIG_MAK
 fi
 
 if test x"$CCONFIG" != x"" ; then
