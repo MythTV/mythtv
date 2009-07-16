@@ -8,12 +8,8 @@
             <value>System Status</value>
         </textarea>
 
-        <shape name="list_background">
+        <shape name="list_background" from="basebackground">
             <area>20,100,760,275</area>
-            <type>roundbox</type>
-            <fill color="#000000" alpha="120" />
-            <line color="#FFFFFF" alpha="255" width="2" />
-            <cornerradius>12</cornerradius>
         </shape>
 
         <buttonlist name="category">
