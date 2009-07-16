@@ -585,6 +585,7 @@ contains( HAVE_ARMV6, yes ) {
 
 contains( HAVE_ARMVFP, yes ) {
     SOURCES += arm/float_arm_vfp.c
+    SOURCES += arm/dsputil_vfp.S
 }
 
 contains( HAVE_IWMMXT, yes ) {
