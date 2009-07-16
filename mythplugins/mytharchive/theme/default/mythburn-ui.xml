@@ -57,51 +57,40 @@ MythArchive GUI theme
 
     <window name="themeselector">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <!--
          theme selector
         -->
-        <textarea name="title" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>DVD Menu Theme</value>
         </textarea>
 
-        <imagetype name="topbgimage">
-            <area>25,80,750,150</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,55,740,140</area>
+        </shape>
 
         <textarea name="themetitle" from="basetextarea">
-            <area>45,95,500,50</area>
+            <area>45,75,500,50</area>
             <font>basesmallyellow</font>
             <value>Select a theme</value>
         </textarea>
 
         <buttonlist name="theme_selector" from="basewideselector">
-            <position>45,160</position>
+            <position>45,140</position>
         </buttonlist>
 
         <imagetype name="theme_image" >
-            <area>620,95,125,105</area>
+            <area>620,75,125,105</area>
         </imagetype>
 
         <!--
             theme preview images
         -->
 
-        <imagetype name="middlebgimage">
-            <area>25,220,750,210</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="middlebackground" from="basebackground">
+            <area>30,220,740,180</area>
+        </shape>
 
         <imagetype name="intro_image">
             <area>52,235,165,132</area>
@@ -144,10 +133,9 @@ MythArchive GUI theme
             theme description
         -->
 
-        <imagetype name="bottombgimage">
-            <area>25,420,750,120</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,420,740,110</area>
+        </shape>
 
         <textarea name="themedescription" from="basetextarea">
             <area>45,435,710,90</area>
@@ -177,14 +165,6 @@ MythArchive GUI theme
 
     <window name="mythburn">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <font name="smallstatsfont" from="basesmall">
             <color>#ffffff</color>
             <size>10</size>
@@ -195,19 +175,17 @@ MythArchive GUI theme
             <size>10</size>
         </font>
 
-        <imagetype name="topbgimage">
-            <area>25,50,750,480</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,55,740,410</area>
+        </shape>
 
-        <textarea name="title" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>center</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Select Archive Items</value>
         </textarea>
 
-        <buttonlist name="archivelist">
+         <buttonlist name="archivelist">
             <area>50,70,695,310</area>
             <layout>vertical</layout>
             <spacing>5</spacing>

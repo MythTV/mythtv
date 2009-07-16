@@ -11,14 +11,6 @@ MythTV Archive GUI theme
 
     <window name="exportnative">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <font name="description" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
@@ -55,41 +47,38 @@ MythTV Archive GUI theme
             <bold>no</bold>
         </font>
 
-        <imagetype name="topbgimage">
-            <area>25,60,750,300</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>30,55,740,260</area>
+        </shape>
 
-        <textarea name="title" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Select Archive Items</value>
         </textarea>
 
         <buttonlist name="archivelist" from="basebuttonlist">
-            <area>50,80,695,180</area>
+            <area>50,70,700,180</area>
         </buttonlist>
 
         <textarea name="nofiles" from="basetextarea">
-            <area>50,80,695,175</area>
+            <area>50,70,695,175</area>
             <align>allcenter</align>
             <font>description</font>
             <value>No files are selected for archive</value>
         </textarea>
 
         <button name="addrecording_button" from="basebutton">
-            <position>150,270</position>
+            <position>150,260</position>
         </button>
 
         <button name="addvideo_button" from="basebutton">
-            <position>490,270</position>
+            <position>490,260</position>
         </button>
 
-        <imagetype name="bottombgimage">
-            <area>25,330,650,240</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,330,630,210</area>
+        </shape>
 
         <textarea name="progtitle" from="basetextarea">
             <area>40,340,440,30</area>
@@ -177,18 +166,10 @@ MythTV Archive GUI theme
     -->
 
     <window name="archivefile_selector">
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
 
-        <textarea name="title" from="basetextarea">
-            <area>0,0,800,45</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>File Finder To Import</value>
         </textarea>
 
@@ -234,10 +215,9 @@ MythTV Archive GUI theme
             </statetype>
         </buttonlist>
 
-        <imagetype name="image">
-            <area>10,400,780,150</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>20,410,760,120</area>
+        </shape>
 
         <textarea name="label1" from="basetextarea">
             <area>30,415,160,40</area>
@@ -286,18 +266,10 @@ MythTV Archive GUI theme
    -->
 
   <window name="importnative">
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
 
-        <textarea name="title1" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Select Associated Channel</value>
         </textarea>
 
@@ -305,10 +277,9 @@ MythTV Archive GUI theme
             archived file channel
         -->
 
-        <imagetype name="midbgimage">
-            <area>25,60,750,170</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>25,60,750,140</area>
+        </shape>
 
         <textarea name="progtitle" from="basetextarea">
             <area>40,70,440,30</area>
@@ -329,10 +300,9 @@ MythTV Archive GUI theme
             <filename>blank.png</filename>
         </imagetype>
 
-        <imagetype name="botombgimage">
-            <area>25,225,750,160</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="middlebackground" from="basebackground">
+            <area>25,225,750,130</area>
+        </shape>
 
         <textarea name="label1" from="basetextarea">
             <area>50,230,690,50</area>
@@ -383,10 +353,9 @@ MythTV Archive GUI theme
             local file channel 
          -->
 
-        <imagetype name="bottombgimage">
-            <area>25,380,750,170</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>25,380,750,140</area>
+        </shape>
 
         <textarea name="label6" from="label1">
             <area>50,385,690,50</area>

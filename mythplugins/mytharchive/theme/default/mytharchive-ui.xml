@@ -7,14 +7,6 @@ Common MythArchive window definitions
 
     <window name="selectdestination">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <font name="description" from="basesmall">
             <color>#ffffff</color>
             <size>18</size>
@@ -42,15 +34,14 @@ Common MythArchive window definitions
         <!--
             destination selector
         -->
-        <imagetype name="topbgimage">
-            <area>25,55,750,310</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
 
-        <textarea name="title1" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>center</align>
+        <shape name="topbackground" from="basebackground">
+            <area>30,55,740,270</area>
+        </shape>
+
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Select Destination</value>
         </textarea>
 
@@ -91,10 +82,9 @@ Common MythArchive window definitions
             <value>0.00Gb</value>
         </textarea>
 
-        <imagetype name="bottombgimage">
-            <area>25,360,750,190</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,360,740,150</area>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>80,375,500,50</area>
@@ -145,47 +135,36 @@ Common MythArchive window definitions
   -->
   <window name="recording_selector">
 
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
+        <shape name="topbackground" from="basebackground">
+            <area>30,55,740,270</area>
+        </shape>
 
-
-        <imagetype name="topbgimage">
-            <area>25,60,750,310</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
-
-        <textarea name="title" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Select Recordings</value>
         </textarea>
 
         <textarea name="title2" from="basetextarea">
-            <area>45,85,200,50</area>
+            <area>45,75,200,50</area>
             <font>basesmallyellow</font>
             <align>right</align>
             <value>Show Recordings</value>
         </textarea>
 
         <buttonlist name="category_selector" from="basewideselector">
-            <area>265,80,480,40</area>
+            <area>265,70,480,40</area>
         </buttonlist>
 
         <buttonlist name="recordinglist" from="basebuttonlist">
-            <area>50,130,690,180</area>
+            <area>50,120,700,180</area>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
-                        <area>5,0,650,30</area>
+                        <area>5,0,660,30</area>
                     </textarea>
                     <statetype name="buttoncheck">
-                        <position>660,5</position>
+                        <position>670,5</position>
                     </statetype>
                 </state>
                 <state name="selected" from="active">
@@ -204,10 +183,9 @@ Common MythArchive window definitions
             </statetype>
         </buttonlist>
 
-        <imagetype name="bottombgimage">
-            <area>25,330,750,240</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,335,740,200</area>
+        </shape>
 
         <textarea name="progtitle" from="basetextarea">
             <area>40,340,440,30</area>
@@ -261,18 +239,10 @@ Common MythArchive window definitions
   -->
 
     <window name="file_selector">
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
 
-        <textarea name="title_text" from="basetextarea">
-            <area>0,0,800,45</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>File Finder</value>
         </textarea>
 
@@ -337,48 +307,36 @@ Common MythArchive window definitions
   -->
   <window name="video_selector">
 
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
+        <shape name="topbackground" from="basebackground">
+            <area>30,55,740,270</area>
+        </shape>
 
-
-        <imagetype name="topbgimage">
-            <area>25,60,750,310</area>
-            <filename>trans-cr-background.png</filename>
-            <staticsize></staticsize>
-        </imagetype>
-
-        <textarea name="title1" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Select Videos</value>
         </textarea>
 
         <textarea name="title2" from="basetextarea">
-            <area>45,85,200,50</area>
+            <area>45,75,200,50</area>
             <font>basesmallyellow</font>
             <align>right</align>
             <value>Video Category</value>
         </textarea>
 
         <buttonlist name="category_selector" from="basewideselector">
-            <area>265,80,480,40</area>
+            <area>265,70,480,40</area>
         </buttonlist>
 
         <buttonlist name="videolist" from="basebuttonlist">
-            <area>50,130,690,180</area>
+            <area>50,120,700,180</area>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
-                        <area>5,0,650,30</area>
+                        <area>5,0,660,30</area>
                     </textarea>
                     <statetype name="buttoncheck">
-                        <position>660,5</position>
+                        <position>670,5</position>
                     </statetype>
                 </state>
                 <state name="selected" from="active">
@@ -397,10 +355,9 @@ Common MythArchive window definitions
             </statetype>
         </buttonlist>
 
-        <imagetype name="bottombgimage">
-            <area>25,330,600,240</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>30,335,580,200</area>
+        </shape>
 
         <textarea name="videotitle">
             <area>40,340,440,30</area>
@@ -431,14 +388,14 @@ Common MythArchive window definitions
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>660,305,60,40</area>
+            <area>660,295,60,40</area>
             <font>basesmallyellow</font>
             <align>right</align>
             <value>PL:</value>
         </textarea>
 
         <textarea name="parentallevel_text" from="basetextarea">
-            <area>725,305,20,40</area>
+            <area>725,295,20,40</area>
             <value>1</value>
         </textarea>
 
@@ -460,37 +417,26 @@ Common MythArchive window definitions
 
     <window name="logviewer">
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
-        <textarea name="title1" from="basetextarea">
-            <area>0,10,800,50</area>
-            <font>title</font>
-            <align>center</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Log Viewer</value>
         </textarea>
 
-        <imagetype name="logbgimage">
-            <area>20,55,770,450</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="logbackground" from="basebackground">
+            <area>20,55,760,395</area>
+        </shape>
 
         <buttonlist name="loglist" from="basebuttonlist">
             <area>35,70,730,370</area>
         </buttonlist>
 
-        <imagetype name="itembgimage">
-            <area>20,450,770,100</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="itembackground" from="basebackground">
+            <area>20,460,760,80</area>
+        </shape>
 
         <textarea name="logitem_text" from="basetextarea">
-            <area>35,455,730,90</area>
+            <area>35,465,730,80</area>
             <value></value>
             <multiline>yes</multiline>
         </textarea>
