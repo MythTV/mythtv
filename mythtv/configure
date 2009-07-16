@@ -2653,7 +2653,7 @@ if test $cpu != "generic"; then
             disable fast_cmov
         ;;
         arm11*|cortex*)
-            check_archflags "-march=$cpu"
+            check_archflags -mcpu=$cpu
             enable fast_unaligned
         ;;
         armv[67]*)
@@ -2664,7 +2664,7 @@ if test $cpu != "generic"; then
             check_archflags "-march=$cpu"
         ;;
         arm*)
-            check_archflags "-march=$cpu"
+            check_archflags -mcpu=$cpu
         ;;
 
     esac
