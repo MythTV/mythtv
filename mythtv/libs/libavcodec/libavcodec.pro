@@ -575,7 +575,7 @@ contains( ARCH_ARM, yes ) {
 }
 
 contains( HAVE_ARMV5TE, yes ) {
-    SOURCES += arm/mpegvideo_armv5te.S
+    SOURCES += arm/mpegvideo_armv5te_s.S
     SOURCES += arm/mpegvideo_armv5te.c
     SOURCES += arm/simple_idct_armv5te.S
 }
