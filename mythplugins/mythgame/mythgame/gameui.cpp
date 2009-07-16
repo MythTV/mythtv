@@ -187,6 +187,9 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
 
 void GameUI::nodeChanged(MythGenericTree* node)
 {
+    if (!node)
+        return;
+
     if (!isLeaf(node))
     {
         if (node->childCount() == 0 || node == m_favouriteNode)
@@ -201,6 +204,8 @@ void GameUI::nodeChanged(MythGenericTree* node)
     else
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (!romInfo)
+            return;
         if (romInfo->Romname().isEmpty())
             romInfo->fillData();
         updateRomInfo(romInfo);
