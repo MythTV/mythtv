@@ -9,9 +9,12 @@ using namespace std;
 #include <QDateTime>
 #include <QRegExp>
 #include <QMap>
+#include <QHash>
 
 #include "recordingtypes.h"
 #include "mythdbcon.h"
+
+typedef QHash<QString,QString> InfoMap;
 
 typedef QMap<long long, long long> frm_pos_map_t;
 typedef QMap<long long, int> frm_dir_map_t;
@@ -199,7 +202,7 @@ class MPUBLIC ProgramInfo
     // Serializers
     void Save() const;
     void ToStringList(QStringList &list) const;
-    void ToMap(QMap<QString, QString> &progMap,
+    void ToMap(QHash<QString, QString> &progMap,
                bool showrerecord = false) const;
 
     // Used for scheduling recordings

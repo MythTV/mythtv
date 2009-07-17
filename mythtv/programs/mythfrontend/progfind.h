@@ -76,7 +76,7 @@ class ProgFinder : public MythScreenType
     QString m_dateFormat;
     QString m_timeFormat;
 
-    QMap<QString, QString> m_infoMap;
+    InfoMap m_infoMap;
 
     MythUIButtonList *m_alphabetList;
     MythUIButtonList *m_showList;

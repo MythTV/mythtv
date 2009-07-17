@@ -13,6 +13,7 @@ using namespace std;
 #include <QString>
 #include <QVector>
 #include <QMap>
+#include <QHash>
 
 #include "mythdeque.h"
 #include "tv.h"
@@ -35,7 +36,7 @@ typedef enum
 } PseudoState;
 
 typedef deque<QString>         StringDeque;
-typedef QMap<QString,QString>  InfoMap;
+typedef QHash<QString,QString> InfoMap;
 
 class MPUBLIC PlayerContext
 {

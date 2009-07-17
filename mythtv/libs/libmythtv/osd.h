@@ -84,9 +84,9 @@ class OSD : public QObject
 
     void ClearAll(const QString &name);
     void ClearAllText(const QString &name);
-    void SetText(const QString &name, QMap<QString, QString> &infoMap,
+    void SetText(const QString &name, QHash<QString, QString> &infoMap,
                          int length);
-    void SetInfoText(QMap<QString, QString> infoMap, int length);
+    void SetInfoText(QHash<QString, QString> infoMap, int length);
     void SetInfoText(const QString &text, const QString &subtitle, 
                      const QString &desc, const QString &category,
                      const QString &start, const QString &end, 

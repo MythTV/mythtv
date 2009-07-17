@@ -676,7 +676,7 @@ void PreviousList::updateInfo(QPainter *p)
         container = theme->GetSet("program_info");
         if (container)
         {  
-            QMap<QString, QString> infoMap;
+            InfoMap infoMap;
             pi->ToMap(infoMap, true);
             container->ClearAllText();
             container->SetText(infoMap);

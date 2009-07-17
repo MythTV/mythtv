@@ -261,7 +261,7 @@ void OSDSet::ClearAllText(void)
     }
 }
 
-void OSDSet::SetText(const QMap<QString, QString> &infoMap)
+void OSDSet::SetText(const InfoMap &infoMap)
 {
     vector<OSDType *>::iterator it = allTypes->begin();
     for (; it != allTypes->end(); it++)
@@ -270,7 +270,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
         if (!item)
             continue;
 
-        QMap<QString, QString>::const_iterator riter = infoMap.begin();
+        InfoMap::const_iterator riter = infoMap.begin();
         QString new_text = item->GetDefaultText();
 
         if (new_text.isEmpty() && (infoMap.contains(item->Name())))
@@ -311,7 +311,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
     m_needsupdate = true;
 }
 
-void OSDSet::GetText(QMap<QString, QString> &infoMap) const
+void OSDSet::GetText(InfoMap &infoMap) const
 {
     vector<OSDType*>::const_iterator it = allTypes->begin();
     for (; it != allTypes->end(); it++)

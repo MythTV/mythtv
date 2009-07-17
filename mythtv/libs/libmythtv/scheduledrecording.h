@@ -176,7 +176,7 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     void setFindIdObj(SRFindId* val) {findid = val;}
     void setParentIdObj(SRParentId* val) {parentid = val;}
 
-    void ToMap(QMap<QString, QString>& infoMap);
+    void ToMap(QHash<QString, QString>& infoMap);
 
     QString ChannelText(QString format);
 

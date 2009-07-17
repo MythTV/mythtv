@@ -635,7 +635,7 @@ void ViewScheduleDiff::updateInfo(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
 
     LayerSet *container = theme->GetSet("program_info");
     if (container)
@@ -671,7 +671,7 @@ void ViewScheduleDiff::updateRecStatus(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
 
     LayerSet *container = theme->GetSet("status_info");
     if (container)

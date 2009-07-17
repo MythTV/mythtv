@@ -5,6 +5,8 @@
 #include "mythuitext.h"
 #include "mythuiutils.h"
 
+#include <QHash>
+
 class MythScreenStack;
 
 /**
@@ -40,8 +42,8 @@ class MPUBLIC MythScreenType : public MythUIType
     bool IsDeleting(void) const;
     void SetDeleting(bool deleting);
 
-    void SetTextFromMap(QMap<QString, QString> &infoMap);
-    void ResetMap(QMap<QString, QString> &infoMap);
+    void SetTextFromMap(QHash<QString, QString> &infoMap);
+    void ResetMap(QHash<QString, QString> &infoMap);
 
   public slots:
     void Close();

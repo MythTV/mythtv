@@ -121,7 +121,7 @@ void LayerSet::ClearAllText(void)
     }
 }
 
-void LayerSet::SetText(QMap<QString, QString> &infoMap)
+void LayerSet::SetText(QHash<QString, QString> &infoMap)
 {
     vector<UIType *>::iterator i = allTypes->begin();
     for (; i != allTypes->end(); i++)
@@ -129,7 +129,7 @@ void LayerSet::SetText(QMap<QString, QString> &infoMap)
         UIType *type = (*i);
         if (UITextType *item = dynamic_cast<UITextType *>(type))
         {
-            QMap<QString, QString>::Iterator riter = infoMap.begin();
+            QHash<QString, QString>::Iterator riter = infoMap.begin();
             QString new_text = item->GetDefaultText();
             QString full_regex;
 

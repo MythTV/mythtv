@@ -12,6 +12,7 @@ using namespace std;
 #include <QList>
 #include <QRect>
 #include <QMap>
+#include <QHash>
 
 #include "mythdeque.h"
 #include "mythwidgets.h"
@@ -61,7 +62,7 @@ class MPUBLIC LayerSet
     vector<UIType *> *getAllTypes(){return allTypes;}
 
     void    ClearAllText(void);
-    void    SetText(QMap<QString, QString> &infoMap);
+    void    SetText(QHash<QString, QString> &infoMap);
 
     void    SetDrawFontShadow(bool state);
 

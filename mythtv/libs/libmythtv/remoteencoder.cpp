@@ -693,8 +693,7 @@ void RemoteEncoder::GetNextProgram(int direction,
     programid   = cleanup(strlist[11]);
 }
 
-void RemoteEncoder::GetChannelInfo(QMap<QString, QString> &infoMap,
-                                   uint chanid)
+void RemoteEncoder::GetChannelInfo(InfoMap &infoMap, uint chanid)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_CHANNEL_INFO";
@@ -713,7 +712,7 @@ void RemoteEncoder::GetChannelInfo(QMap<QString, QString> &infoMap,
     infoMap["oldchannum"] =  infoMap["channum"];
 }
 
-bool RemoteEncoder::SetChannelInfo(const QMap<QString, QString> &infoMap)
+bool RemoteEncoder::SetChannelInfo(const InfoMap &infoMap)
 {
     QStringList strlist( "SET_CHANNEL_INFO" );
     strlist << make_safe(infoMap["chanid"]);

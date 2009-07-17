@@ -1311,7 +1311,7 @@ void ProgramRecPriority::UpdateList()
         else if (m_recMatch[progInfo->recordid] > 0)
             state = "normal";
 
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
         progInfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
@@ -1370,7 +1370,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     pgRecInfo->ToMap(infoMap);
     SetTextFromMap(infoMap);
 

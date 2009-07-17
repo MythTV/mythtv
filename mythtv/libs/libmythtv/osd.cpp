@@ -1696,8 +1696,7 @@ void OSD::ClearAllText(const QString &name)
         container->ClearAllText();
 }
 
-void OSD::SetText(const QString &name,
-                          QMap<QString, QString> &infoMap, int length)
+void OSD::SetText(const QString &name, InfoMap &infoMap, int length)
 {
     HideAllExcept(name);
 
@@ -1726,7 +1725,7 @@ void OSD::SetText(const QString &name,
     }
 }
 
-void OSD::SetInfoText(QMap<QString, QString> infoMap, int length)
+void OSD::SetInfoText(InfoMap infoMap, int length)
 {
     QMutexLocker locker(&osdlock);
 

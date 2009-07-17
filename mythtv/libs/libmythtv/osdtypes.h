@@ -28,8 +28,8 @@ class OSDTypeText;
 class OSDSurface;
 class TV;
 
-typedef QMap<QString,QString> InfoMap;
-typedef QMap<int,uint>        HotKeyMap;
+typedef QHash<QString,QString> InfoMap;
+typedef QMap<int,uint>         HotKeyMap;
 
 static inline QRect unbias(QRect rect, float wmult, float hmult)
 {

@@ -1214,10 +1214,10 @@ void MythUIButtonListItem::SetText(const QString &text, const QString &name,
         m_parent->Update();
 }
 
-void MythUIButtonListItem::SetTextFromMap(QMap<QString, QString> &infoMap,
+void MythUIButtonListItem::SetTextFromMap(QHash<QString, QString> &infoMap,
                                    const QString &state)
 {
-    QMap<QString, QString>::iterator map_it = infoMap.begin();
+    QHash<QString, QString>::iterator map_it = infoMap.begin();
     while (map_it != infoMap.end())
     {
         TextProperties textprop;

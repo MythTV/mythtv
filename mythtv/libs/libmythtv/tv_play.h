@@ -5,6 +5,7 @@
 
 #include <qstring.h>
 #include <qmap.h>
+#include <QHash>
 #include <qdatetime.h>
 #include <QKeyEvent>
 #include <QEvent>
@@ -50,7 +51,6 @@ class TV;
 class OSDListTreeItemEnteredEvent;
 class OSDListTreeItemSelectedEvent;
 
-typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);

@@ -11223,7 +11223,7 @@ void TV::PromptDeleteRecording(PlayerContext *ctx, QString title)
     if (!has_dialog)
     {
         ctx->LockPlayingInfo(__FILE__, __LINE__);
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
         ctx->playingInfo->ToMap(infoMap);
         QString message = QString("%1\n%2\n%3")
             .arg(title).arg(infoMap["title"]).arg(infoMap["timedate"]);

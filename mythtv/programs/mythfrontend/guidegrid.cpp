@@ -1394,7 +1394,7 @@ void GuideGrid::updateInfo(void)
     if (!pginfo)
         return;
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
 
     int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= (int)m_channelInfos.size())

@@ -328,7 +328,7 @@ class PlaybackBox : public MythScreenType
     MythUIImage *m_banner;
     MythUIImage *m_coverart;
 
-    QMap<QString, QString> m_currentMap;
+    InfoMap m_currentMap;
 
     // Settings ///////////////////////////////////////////////////////////////
     /// If "Play"  this is a recording playback selection UI,

@@ -1431,7 +1431,7 @@ void ProgLister::fillItemList(bool restorePosition)
     if (m_messageText)
         m_messageText->SetVisible((m_itemList.count() == 0));
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     ProgramInfo pginfo;
     pginfo.ToMap(infoMap);
     ResetMap(infoMap);
@@ -1539,7 +1539,7 @@ void ProgLister::updateInfo(MythUIButtonListItem *item)
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*> (item->GetData());
     if (pginfo)
     {
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
         pginfo->ToMap(infoMap);
         SetTextFromMap(infoMap);
         if (m_positionText)

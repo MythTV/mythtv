@@ -1941,7 +1941,7 @@ void ProgListerQt::updateInfo(QPainter *p)
         container = theme->GetSet("program_info");
         if (container)
         {  
-            QMap<QString, QString> infoMap;
+            InfoMap infoMap;
             pi->ToMap(infoMap);
             container->ClearAllText();
             container->SetText(infoMap);

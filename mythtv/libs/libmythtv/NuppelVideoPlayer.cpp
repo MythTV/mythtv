@@ -5002,7 +5002,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
 
     dialogname = "";
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     player_ctx->playingInfo->ToMap(infoMap);
     infoMap.detach();
@@ -5340,7 +5340,7 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
         default: text = QObject::tr("error"); seekamount = (int)roundf(video_frame_rate); break;
     }
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     infoMap["seekamount"] = text;
     osd->SetText("editmode", infoMap, -1);
 }
@@ -5368,7 +5368,7 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
     if (IsInDelete(framesPlayed))
         cutmarker = QObject::tr("cut");
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     infoMap["timedisplay"] = timestr;
     infoMap["framedisplay"] = framestr;
     infoMap["cutindicator"] = cutmarker;

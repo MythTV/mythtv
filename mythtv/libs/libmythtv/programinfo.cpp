@@ -601,12 +601,11 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     return true;
 }
 
-/** \fn ProgramInfo::ToMap(QMap<QString,QString>&,bool) const
- *  \brief Converts ProgramInfo into QString QMap containing each field
+/** \fn ProgramInfo::ToMap(InfoMap&, bool) const
+ *  \brief Converts ProgramInfo into QString QHash containing each field
  *         in ProgramInfo converted into localized strings.
  */
-void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
-                        bool showrerecord) const
+void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");

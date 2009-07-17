@@ -409,7 +409,7 @@ void ViewScheduled::FillList()
                                 new MythUIButtonListItem(m_schedulesList,"",
                                                     qVariantFromValue(pginfo));
 
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
         pginfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
@@ -471,7 +471,7 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*> (item->GetData());
     if (pginfo)
     {
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
         pginfo->ToMap(infoMap);
         SetTextFromMap(infoMap);
 

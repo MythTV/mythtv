@@ -381,7 +381,7 @@ void ProgFinder::updateInfo(void)
         }
         else
         {
-            QMap<QString, QString> infoMap;
+            InfoMap infoMap;
             m_showData[m_timesList->GetCurrentPos()]->ToMap(infoMap);
             SetTextFromMap(infoMap);
             m_infoMap = infoMap;

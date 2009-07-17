@@ -237,7 +237,7 @@ void MythScreenType::Close(void)
     GetScreenStack()->PopScreen(this);
 }
 
-void MythScreenType::SetTextFromMap(QMap<QString, QString> &infoMap)
+void MythScreenType::SetTextFromMap(QHash<QString, QString> &infoMap)
 {
     QList<MythUIType *> *children = GetAllChildren();
 
@@ -285,7 +285,7 @@ void MythScreenType::SetTextFromMap(QMap<QString, QString> &infoMap)
     }
 }
 
-void MythScreenType::ResetMap(QMap<QString, QString> &infoMap)
+void MythScreenType::ResetMap(QHash<QString, QString> &infoMap)
 {
     if (infoMap.isEmpty())
         return;

@@ -499,7 +499,7 @@ void PlaybackBox::checkPassword(const QString &password)
 void PlaybackBox::updateGroupInfo(const QString &groupname,
                                   const QString &grouplabel)
 {
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     int countInGroup;
 
     if (groupname.isEmpty())
@@ -598,7 +598,7 @@ void PlaybackBox::UpdateProgramInfo(
 
     if ((GetFocusWidget() == m_recordingList) && is_sel)
     {
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
 
         pginfo->ToMap(infoMap);
         ResetMap(m_currentMap);
@@ -927,7 +927,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             state = "disabled";
         }
 
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
         (*it)->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 

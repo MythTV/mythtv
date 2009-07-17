@@ -285,7 +285,7 @@ QString ScheduledRecording::ChannelText(QString format)
 }
 
 
-void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
+void ScheduledRecording::ToMap(QHash<QString, QString>& progMap)
 {
     QString searchtitle = "";
 
