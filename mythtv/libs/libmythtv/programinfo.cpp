@@ -622,6 +622,8 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 
     int hours, minutes, seconds;
 
+    progMap.reserve(NUMPROGRAMLINES);
+
     progMap["title"] = title;
     progMap["subtitle"] = subtitle;
 
