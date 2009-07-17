@@ -132,9 +132,9 @@
         <text lang="RU">Настройки браузера</text>
         <text lang="PL">Ustaw zakładki WWW</text>
         <text lang="HE">הגדרות אינטרנט</text>
-        <action>CONFIGPLUGIN mythbookmarkmanager</action>
+        <action>CONFIGPLUGIN mythbrowser</action>
         <description>Manage web bookmarks</description>
-        <depends>mythbookmarkmanager</depends>
+        <depends>mythbrowser</depends>
     </button>
 
     <button>

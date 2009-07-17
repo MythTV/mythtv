@@ -5,7 +5,7 @@
 // mythbrowser
 #include "browserdbutil.h"
 
-const QString currentDatabaseVersion = "1000";
+const QString currentDatabaseVersion = "1001";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -80,6 +80,17 @@ bool UpgradeBrowserDatabaseSchema(void)
             ""
         };
         if (!performActualUpdate(updates, "1000", dbver))
+            return false;
+    }
+
+    if (dbver == "1000") 
+    { 
+        const QString updates[] =
+        {
+            "UPDATE settings SET data = 'Internal' WHERE data LIKE '%mythbrowser' AND value = 'WebBrowserCommand';", 
+            "" 
+        };
+        if (!performActualUpdate(updates, "1001", dbver))
             return false;
     }
 

@@ -18,7 +18,7 @@ class MythBrowser : public MythScreenType
   Q_OBJECT
 
   public:
-    MythBrowser(MythScreenStack *parent, const char *name,
+    MythBrowser(MythScreenStack *parent,
            QStringList &urlList, float zoom);
     ~MythBrowser();
 
@@ -40,7 +40,6 @@ class MythBrowser : public MythScreenType
     void slotAddTab(const QString &url = "", bool doSwitch = true);
     void slotDeleteTab(void);
 
-    void slotShowBookmarks(void);
     void slotAddBookmark(void);
 
     void slotLoadStarted(void);

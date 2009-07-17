@@ -74,16 +74,13 @@ class BookmarkManager : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-#ifdef MYTHBROWSER_STANDALONE
-    void SetBrowser(MythBrowser *browser) { m_browser = browser; }
-#endif
-
   private slots:
     void slotGroupSelected(MythUIButtonListItem *item);
     void slotBookmarkClicked(MythUIButtonListItem *item);
     void slotEditDialogExited(void);
     void slotDoDeleteCurrent(bool doDelete);
     void slotDoDeleteMarked(bool doDelete);
+    void slotBrowserClosed(void);
 
     void slotAddBookmark(void);
     void slotEditBookmark(void);
@@ -99,10 +96,6 @@ class BookmarkManager : public MythScreenType
     void UpdateURLList(void);
     void ShowEditDialog(bool edit);
     void ReloadBookmarks(void);
-
-#ifdef MYTHBROWSER_STANDALONE
-    MythBrowser      *m_browser;
-#endif
 
     QList<Bookmark*>  m_siteList;
 

@@ -11,15 +11,14 @@
 
 // mythbrowser
 #include "webpage.h"
-
 #include "bookmarkeditor.h"
 #include "mythbrowser.h"
 
 using namespace std;
 
-MythBrowser::MythBrowser (MythScreenStack *parent, const char *name,
-                  QStringList &urlList, float zoom)
-    : MythScreenType (parent, name),
+MythBrowser::MythBrowser(MythScreenStack *parent,
+                         QStringList &urlList, float zoom)
+    : MythScreenType (parent, "mythbrowser"),
       m_urlList(urlList),  m_pageList(NULL),
       m_progressBar(NULL), m_titleText(NULL),
       m_statusText(NULL),  m_currentBrowser(-1),
@@ -216,22 +215,6 @@ void MythBrowser::slotForward()
     activeBrowser()->Forward();
 }
 
-void MythBrowser::slotShowBookmarks()
-{
-    activeBrowser()->SetActive(false);
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    BookmarkManager *manager = new BookmarkManager(mainStack, "bookmarkmanager");
-
-    if (manager->Create())
-        mainStack->AddScreen(manager);
-
-    manager->SetBrowser(this);
-
-    connect(manager, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
-}
-
 void MythBrowser::slotAddBookmark()
 {
     activeBrowser()->SetActive(false);
@@ -388,7 +371,6 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
             if (m_browserList.size() > 1)
                 m_menuPopup->AddButton(tr("Delete Tab"), SLOT(slotDeleteTab()));
 
-            m_menuPopup->AddButton(tr("Edit Bookmarks"), SLOT(slotShowBookmarks()));
             m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
 
             m_menuPopup->AddButton(tr("Cancel"));

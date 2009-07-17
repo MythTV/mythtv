@@ -4,10 +4,10 @@ include (../../programs-libs.pro )
 
 QT += network xml sql opengl webkit
 
-TEMPLATE = app
-CONFIG += thread opengl
+TEMPLATE = lib
+CONFIG += thread opengl plugin warn_on
 TARGET = mythbrowser
-target.path = $${PREFIX}/bin
+target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 installimages.path = $${PREFIX}/share/mythtv/themes/default
@@ -15,12 +15,8 @@ installimages.files = images/*.png
 
 INSTALLS += installimages
 
-INCLUDEPATH += ../mythbookmarkmanager
-
-DEFINES += MYTHBROWSER_STANDALONE
-
 # Input
-HEADERS += mythbrowser.h webpage.h ../mythbookmarkmanager/bookmarkeditor.h
-HEADERS += ../mythbookmarkmanager/bookmarkmanager.h ../mythbookmarkmanager/browserdbutil.h
-SOURCES += main.cpp mythbrowser.cpp webpage.cpp ../mythbookmarkmanager/bookmarkeditor.cpp
-SOURCES += ../mythbookmarkmanager/bookmarkmanager.cpp ../mythbookmarkmanager/browserdbutil.cpp
+HEADERS += mythbrowser.h webpage.h 
+HEADERS += bookmarkmanager.h bookmarkeditor.h browserdbutil.h
+SOURCES += main.cpp mythbrowser.cpp webpage.cpp
+SOURCES += bookmarkmanager.cpp bookmarkeditor.cpp browserdbutil.cpp

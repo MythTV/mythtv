@@ -152,8 +152,8 @@
         <text lang="PL">Internet WWW</text>
         <text lang="HE">אינטרנט</text>
         <description>Browse the web</description>
-        <action>PLUGIN mythbookmarkmanager</action>
-        <depends>mythbookmarkmanager</depends>
+        <action>PLUGIN mythbrowser</action>
+        <depends>mythbrowser</depends>
     </button>
 
     <button>

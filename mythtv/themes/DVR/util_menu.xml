@@ -167,8 +167,8 @@
         <text lang="ES">Web</text>
         <text lang="NL">Internet</text>
         <text lang="RU">WWW</text>
-        <action>PLUGIN mythbookmarkmanager</action>
-        <depends>mythbookmarkmanager</depends>
+        <action>PLUGIN mythbrowser</action>
+        <depends>mythbrowser</depends>
     </button>
 
     <button>

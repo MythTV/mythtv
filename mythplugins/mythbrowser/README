@@ -47,8 +47,6 @@ make install
 3. Usage
 ========
 
-Start mythbrowser from the command like this:
-$ mythbrowser --zoom 1.4 www.mythtv.org
 
 Use the arrow keys and PAGEUP, PAGEDOWN, PAGELEFT, PAGERIGHT to scroll around
 the webpage.
@@ -77,19 +75,6 @@ MythBrowser will remember the pages visited and allow you to return to them by
 pressing HISTORYBACK/HISTORYFORWARD.
 
 Most actions can be accessed from the popup menu (Press MENU).
-
-
-Command line options
---------------------
-Valid options are:
--v or --verbose debug-level    Use '-v help' for level info
--z or --zoom                   Zoom factor 0.2-5 (default: 1)
--l or --logfile filename       Writes STDERR and STDOUT messages to filename
-+file                          URLs to display
-
-For example:
-
-mythbrowser --zoom 1.4 www.mythtv.org www.google.com
 
 
 Default key bindings :

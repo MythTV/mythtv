@@ -315,8 +315,8 @@
         <text lang="PL">Konfiguracja przegladarki WWW</text>
         <text lang="HE">הגדרות אינטרנט</text>
         <description>Manage web bookmarks</description>
-        <action>CONFIGPLUGIN mythbookmarkmanager</action>
-        <depends>mythbookmarkmanager</depends>
+        <action>CONFIGPLUGIN mythbrowser</action>
+        <depends>mythbrowser</depends>
     </button>
 
     <!-- Keep this in synch with mythtv/themes/defaultmenu/info_settings.xml -->
