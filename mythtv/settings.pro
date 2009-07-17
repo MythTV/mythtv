@@ -69,8 +69,7 @@ contains(CONFIG_DARWIN, yes) {
     }
 }
 
-INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH += $$CONFIG_INCLUDEPATH
+INCLUDEPATH += $$unique($$CONFIG_INCLUDEPATH)
 
 # remove warn_{on|off} from CONFIG since we set it in our CFLAGS
 CONFIG -= warn_on warn_off
