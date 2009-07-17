@@ -108,11 +108,29 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
     static QString full_line("");
     static const int msg_len = 255;
     static QMutex string_lock;
+    uint verbose_level = 0;
 
     // determine mythtv debug level from av log level
-    uint verbose_level = (level < AV_LOG_WARNING) ? VB_IMPORTANT : VB_LIBAV;
+    switch (level)
+    {
+        case AV_LOG_PANIC:
+        case AV_LOG_FATAL:
+            verbose_level = VB_IMPORTANT;
+            break;
+        case AV_LOG_ERROR:
+            verbose_level = VB_GENERAL;
+            break;
+        case AV_LOG_VERBOSE:
+        case AV_LOG_INFO:
+            verbose_level = VB_EXTRA;
+        case AV_LOG_WARNING:
+            verbose_level |= VB_LIBAV;
+            break;
+        default:
+            return;
+    }       
 
-    if (!(print_verbose_messages & verbose_level))
+    if ((print_verbose_messages & verbose_level) != verbose_level)
         return;
 
     string_lock.lock();
