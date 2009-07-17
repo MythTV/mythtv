@@ -90,6 +90,38 @@
     </textarea>
   </container>
 
+  <container name="program_info_video">
+    <image name="background">
+        <filename>osd-mid.png</filename>
+        <position>0,360</position>
+    </image>
+    <textarea name="title">
+        <area>40,398,440,27</area>
+        <font>infofont</font>
+    </textarea>
+    <textarea name="description">
+        <multiline>no</multiline>
+        <area>45,423,560,27</area>
+        <font>infofont</font>
+        <value>%DESCRIPTION%</value>
+    </textarea>
+
+    <textarea name="year">
+        <area>20,368,142,27</area>
+        <font>infofont</font>
+        <value>%STARTDATE%</value>
+    </textarea> 
+    <image name="coverart">
+        <position>20,20</position>
+        <staticsize>64,94</staticsize>
+    </image>
+
+    <textarea name="time">
+        <area>365,25,240,90</area>
+        <font>timefont</font>
+    </textarea>
+  </container>
+
   <container name="channel_editor">
     <image name="background">
         <filename>osd-channel-edit.png</filename>

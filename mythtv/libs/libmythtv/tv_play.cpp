@@ -6917,6 +6917,11 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     bool is_prog_info_small_disp = osd->IsSetDisplaying("program_info_small");
     bool has_prog_info           = osd->HasSet("program_info");
     bool is_prog_info_disp       = osd->IsSetDisplaying("program_info");
+    bool has_prog_video          = osd->HasSet("program_info_video");
+    bool has_prog_small_video    = osd->HasSet("program_info_small_video");
+    bool has_prog_rec            = osd->HasSet("program_info_recording");
+    bool has_prog_small_rec      = osd->HasSet("program_info_small_recording");
+    
     ReturnOSDLock(ctx, osd);
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -6924,7 +6929,10 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     QString title = ctx->playingInfo->title;
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    bool isDVD = (ctx->buffer && ctx->buffer->isDVD());
+    bool isDVD = (ctx->buffer && ctx->buffer->isDVD());        
+    bool is_video                = ctx->playingInfo->isVideo;
+    bool is_recording            = StateIsPlaying(ctx->GetState()) && !is_video;
+    
     if (isDVD && desc.isEmpty() && title.isEmpty())
     {
         // DVD toggles between status and nothing
@@ -6935,7 +6943,15 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     }
     else if (is_status_disp)
     {
-        if (has_prog_info_small)
+        if (is_video && has_prog_small_video)
+            UpdateOSDProgInfo(ctx, "program_info_small_video");  
+        else if (is_video && has_prog_video)
+            UpdateOSDProgInfo(ctx, "program_info_video");  
+        else if (is_recording && has_prog_small_rec)
+            UpdateOSDProgInfo(ctx, "program_info_small_recording");  
+        else if (is_recording && has_prog_rec)
+            UpdateOSDProgInfo(ctx, "program_info_recording");                    
+        else if (has_prog_info_small)
             UpdateOSDProgInfo(ctx, "program_info_small");
         else
             UpdateOSDProgInfo(ctx, "program_info");
@@ -6943,7 +6959,11 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     else if (is_prog_info_small_disp)
     {
         // If small is displaying, show long if we have it, else hide info
-        if (has_prog_info)
+        if (is_video && has_prog_video)
+            UpdateOSDProgInfo(ctx, "program_info_video");
+        if (is_recording && has_prog_rec)
+            UpdateOSDProgInfo(ctx, "program_info_recording");                    
+        else if (has_prog_info)
             UpdateOSDProgInfo(ctx, "program_info");
         else
             hideAll = true;
@@ -6962,7 +6982,15 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     {
         // No status desired? Nothing is up, Display small if we have,
         // else display long
-        if (has_prog_info_small)
+        if (is_video && has_prog_small_video)
+            UpdateOSDProgInfo(ctx, "program_info_small_video");
+        if (is_video && has_prog_video)
+            UpdateOSDProgInfo(ctx, "program_info_video"); 
+        if (is_recording && has_prog_small_rec)
+            UpdateOSDProgInfo(ctx, "program_info_small_recording"); 
+        if (is_recording && has_prog_rec)
+            UpdateOSDProgInfo(ctx, "program_info_recording");            
+        else if (has_prog_info_small)
             UpdateOSDProgInfo(ctx, "program_info_small");
         else
             UpdateOSDProgInfo(ctx, "program_info");
