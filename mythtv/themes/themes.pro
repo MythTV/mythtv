@@ -1,4 +1,3 @@
-include ( ../config.mak )
 include ( ../settings.pro )
 
 QMAKE_STRIP = echo

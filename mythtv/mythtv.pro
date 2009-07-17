@@ -8,7 +8,6 @@ CONFIG += ordered
 !exists(config.mak) {
     error(Please run the configure script first)
 }
-include ( config.mak )
 include ( settings.pro )
 
 # Directories

@@ -1,3 +1,5 @@
+include ( config.mak )
+
 CONFIG += $$CCONFIG
 
 #check QT major version

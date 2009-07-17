@@ -1,4 +1,3 @@
-include ( ../../config.mak )
 include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
