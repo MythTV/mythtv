@@ -992,7 +992,6 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     pkt->dts = st->parser->dts;
                     pkt->pos = st->parser->pos;
                     pkt->destruct = NULL;
-                    pkt->pos = st->cur_frame_startpos;
                     compute_pkt_fields(s, st, st->parser, pkt);
                     st->got_frame = 0;
 

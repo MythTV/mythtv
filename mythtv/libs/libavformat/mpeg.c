@@ -564,6 +564,7 @@ static int mpegps_read_packet(AVFormatContext *s,
     pkt->pts = pts;
     pkt->dts = dts;
     pkt->stream_index = st->index;
+    pkt->pos = dummy_pos;
 #if 0
     av_log(s, AV_LOG_DEBUG, "%d: pts=%0.3f dts=%0.3f size=%d\n",
            pkt->stream_index, pkt->pts / 90000.0, pkt->dts / 90000.0, pkt->size);

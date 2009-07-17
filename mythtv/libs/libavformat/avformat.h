@@ -452,7 +452,6 @@ typedef struct AVStream {
     int probe_packets;
 
     int got_frame;
-    int64_t cur_frame_startpos;
 
     int component_tag; ///< Component tag given in PMT, for MythTV MHEG
 
