@@ -45,7 +45,6 @@ DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
       detectedNetworkID(0), detectedTransportID(0),
       programNumber(-1),
       last_pat_crc(-1),
-      error(""),
       ignore_encrypted(false)
 {
 }

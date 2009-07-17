@@ -1414,7 +1414,24 @@ void TVRec::RunTV(void)
             curRecording->UpdateInUseMark();
 
             if (recorder)
+            {
                 recorder->SavePositionMap();
+
+                // Check for recorder errors
+                if (recorder->IsErrored())
+                {
+                    curRecording->recstatus = rsFailed;
+
+                    if (GetState() == kState_WatchingLiveTV)
+                    {
+                        QString message = QString("QUIT_LIVETV %1").arg(cardid);
+                        MythEvent me(message);
+                        gContext->dispatch(me);
+                    }
+                    else
+                        ChangeState(kState_None);
+                }
+            }
         }
 
         // Check for the end of the current program..
@@ -3851,10 +3868,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
  */
 MPEGStreamData *TVRec::TuningSignalCheck(void)
 {
-    if (!signalMonitor->IsAllGood())
+    if (signalMonitor->IsAllGood())
+        VERBOSE(VB_RECORD, LOC + "Got good signal");
+    else if (!signalMonitor->IsErrored())
         return NULL;
-
-    VERBOSE(VB_RECORD, LOC + "Got good signal");
 
     // grab useful data from DTV signal monitor before we kill it...
     MPEGStreamData *streamData = NULL;

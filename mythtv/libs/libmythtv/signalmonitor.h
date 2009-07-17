@@ -72,6 +72,7 @@ class SignalMonitor
     }
 
     virtual bool IsAllGood(void) const { return HasSignalLock(); }
+    bool         IsErrored(void) const { return !error.isEmpty(); }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Sets  // // // // // // // // // // // // // // // // // // // // //
@@ -192,6 +193,7 @@ class SignalMonitor
     bool         exit;
     bool         update_done;
     bool         notify_frontend;
+    QString      error;
 
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;

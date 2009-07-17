@@ -213,6 +213,13 @@ void DVBSignalMonitor::UpdateValues(void)
 
     if (streamHandlerStarted)
     {
+        if (!streamHandler->IsRunning())
+        {
+            error = QObject::tr("Error: stream handler died");
+            update_done = true;
+            return;
+        }
+
         EmitStatus();
         if (IsAllGood())
             SendMessageAllGood();
