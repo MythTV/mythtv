@@ -55,9 +55,11 @@ bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
     UserTextIdentificationFrame *musicbrainz = NULL;
     musicbrainz = find(taglib->ID3v2Tag(), "MusicBrainz Album Artist Id");
 
-    // Compilation Artist (TPE4)
+    // Compilation Artist (TPE4/2)
     TextIdentificationFrame *tpeframe = NULL;
     TagLib::ID3v2::FrameList tpelist = taglib->ID3v2Tag()->frameListMap()["TPE4"];
+    if (tpelist.isEmpty())
+        tpelist = taglib->ID3v2Tag()->frameListMap()["TPE2"];
     if (!tpelist.isEmpty())
         tpeframe = (TextIdentificationFrame *)tpelist.front();
 
