@@ -276,9 +276,9 @@ BLOCK_QUOTE
   echo "  --disable-dvb            disable DVB support"
   echo "  --dvb-path=HDRLOC        location of directory containing"
   echo "                           'linux/dvb/frontend.h', not the"
-  echo "                           directory with frontend.h [$dvb_path]"
+  echo "                           directory with frontend.h [$dvb_path_default]"
   echo "  --disable-x11            disable X11 support"
-  echo "  --x11-path=X11LOC        location of X11 include files [$x11_include_path-path]"
+  echo "  --x11-path=X11LOC        location of X11 include files [$x11_path_default]"
 #  echo "  --enable-glx-procaddrarb use glXGetProcAddressARB() instead of glXGetProcAddress()"
   echo "  --disable-xrandr         disable X11 resolution switching"
   echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
@@ -1256,12 +1256,14 @@ CMDLINE_SELECT="
 PATHS_LIST='
     bindir
     datadir
+    dvb_path
     incdir
     libdir
     mandir
     prefix
     runprefix
     shlibdir
+    x11_path
 '
 
 CMDLINE_SET="
@@ -1619,8 +1621,8 @@ enable xvmc_vld
 enable xvmcw
 
 # mythtv paths
-dvb_path="/usr/include"
-x11_include_path="/usr/X11R6/include"
+dvb_path_default="${sysroot}/usr/include"
+x11_path_default="${sysroot}/usr/X11R6/include"
 xvmc_lib=""
 
 # configurable options
@@ -1788,10 +1790,6 @@ for opt do
     --disable-ccache) disable ccache
     ;;
     --disable-distcc) disable distcc
-    ;;
-    --dvb-path=*) dvb_path=$optval
-    ;;
-    --x11-path=*) x11_include_path=$optval
     ;;
     --xvmc-lib=*) xvmc_lib=$optval
     ;;
@@ -3349,26 +3347,25 @@ if enabled symbol_visibility; then
 fi
 
 if enabled dvb; then
-    dvb="no"
     if test -f "$dvb_path"/linux/dvb/frontend.h ; then
         if test -f "$dvb_path"/../MAINTAINERS ; then
             echo "Warning: DVB location in kernel. May not compile."
         fi
-        dvb="yes"
     else
-        dvb_path="/usr/src/linux/include"
         KERNEL_RELEASE=`uname -r 2>/dev/null`
         if test x"$KERNEL_RELEASE" != x"" ; then
-            dvb_path="/usr/src/linux-$KERNEL_RELEASE/include"
+            dvb_path="${sysroot}/usr/src/linux-$KERNEL_RELEASE/include"
+        else
+            dvb_path="${sysroot}/usr/src/linux/include"
         fi
 
         if test -f "$dvb_path"/linux/dvb/frontend.h ; then
             if test -f "$dvb_path"/../MAINTAINERS ; then
                 echo "Warning: DVB location in kernel. May not compile."
             fi
-            dvb="yes"
         else
             echo "DVB location needs to have linux/dvb/frontend.h [$dvb_path]"
+            disable dvb
         fi
     fi
 fi
@@ -3511,13 +3508,13 @@ fi
 # Ubuntu Dapper installs NVIDIA GL headers to a weird location in order
 # not to overwrite the headers installed from Mesa, etc. We need to
 # add that path to include paths if that's the case.
-if test -d /usr/share/doc/nvidia-glx-dev/include; then
-    CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/doc/nvidia-glx-dev/include"
+if test -d ${sysroot}/usr/share/doc/nvidia-glx-dev/include; then
+    append CONFIG_INCLUDEPATH "${sysroot}/usr/share/doc/nvidia-glx-dev/include"
 fi
 
 # Same for Debian Sid.
-if test -d /usr/share/nvidia/include/GL; then
-    CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/nvidia/include"
+if test -d ${sysroot}/usr/share/nvidia/include/GL; then
+    append CONFIG_INCLUDEPATH "${sysroot}/usr/share/nvidia/include"
 fi
 
 check_foo_config directfb directfb directfb.h DirectFBInit
@@ -4179,8 +4176,8 @@ fi
 
 if enabled x11; then
   echo "CONFIG_X11_LIBS=-lXinerama -lX11 -lXext -lXxf86vm" >> $MYTH_CONFIG_MAK
-  if [ -d $x11_include_path ] ; then
-    append CONFIG_INCLUDEPATH "$x11_include_path"
+  if [ -d $x11_path ] ; then
+    append CONFIG_INCLUDEPATH "$x11_path"
   fi
 fi
 
