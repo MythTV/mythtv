@@ -5,7 +5,7 @@ include ( ../programs-libs.pro )
 QT += network xml sql
 
 TEMPLATE = app
-CONFIG += thread opengl
+CONFIG += thread
 TARGET = mythtv-setup
 target.path = $${PREFIX}/bin
 
@@ -35,4 +35,3 @@ macx {
 }
 
 using_x11:DEFINES += USING_X11
-

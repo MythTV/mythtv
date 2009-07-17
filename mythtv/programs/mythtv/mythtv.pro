@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql opengl
+QT += network xml sql
 
 TEMPLATE = app
 CONFIG += thread
@@ -28,6 +28,7 @@ using_ivtv:DEFINES += USING_IVTV
 using_xvmc:DEFINES += USING_XVMC
 using_xvmc_vld:DEFINES += USING_XVMC_VLD
 using_xrandr:DEFINES += USING_XRANDR
+using_opengl:QT += opengl
 using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
 using_opengl_video:DEFINES += USING_OPENGL_VIDEO
 using_vdpau:DEFINES += USING_VDPAU

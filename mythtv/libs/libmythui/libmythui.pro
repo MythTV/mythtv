@@ -65,14 +65,6 @@ INSTALLS += inc
 #	level settings.pro)
 #
 
-using_x11:using_opengl {
-    DEFINES += USE_OPENGL_PAINTER
-    SOURCES += mythpainter_ogl.cpp
-    HEADERS += mythpainter_ogl.h
-    inc.files += mythpainter_ogl.h
-    LIBS += $$EXTRA_LIBS
-}
-
 using_vdpau {
     DEFINES += USING_VDPAU
     HEADERS += mythpainter_vdpau.h
@@ -123,18 +115,19 @@ using_xrandr {
 
 cygwin:DEFINES += _WIN32
 
-mingw {
-    using_opengl {
-        LIBS += -lopengl32
-        DEFINES += USE_OPENGL_PAINTER
-        SOURCES += mythpainter_ogl.cpp
-        HEADERS += mythpainter_ogl.h
-        inc.files += mythpainter_ogl.h
-    }
+using_opengl {
+    DEFINES += USE_OPENGL_PAINTER
+    SOURCES += mythpainter_ogl.cpp
+    HEADERS += mythpainter_ogl.h
+    inc.files += mythpainter_ogl.h
+    QT += opengl
+
+    using_x11:LIBS += $$EXTRA_LIBS
+    mingw:LIBS += -lopengl32
 }
 
 #The following line was inserted by qt3to4
-QT += xml sql opengl network
+QT += xml sql network
 
 using_qtwebkit {
         QT += webkit

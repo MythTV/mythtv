@@ -45,7 +45,7 @@ DEPENDPATH += ../../libs/libswscale
 DEPENDPATH += ../../libs/libmythupnp ../../libs/libmythui
 DEPENDPATH += ../../libs/libmythlivemedia ../../libmythdb ../../libmythhdhomerun
 
-CONFIG += opengl
+using_opengl:CONFIG += opengl
 
 macx:using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 macx:using_dvdv:LIBS += -lobjc
