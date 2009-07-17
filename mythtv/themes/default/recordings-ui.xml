@@ -218,13 +218,14 @@
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,35,470,30</area>
+            <area>12,5,470,90</area>
+            <multiline>yes</multiline>
             <align>allcenter</align>
-            <font>basemedium</font>
+            <font>basesmall</font>
         </textarea>
 
         <buttonlist name="groups" from="basebuttonlist">
-            <area>12,80,470,400</area>
+            <area>12,110,470,370</area>
             <showarrow>no</showarrow>
         </buttonlist>
     </window>
