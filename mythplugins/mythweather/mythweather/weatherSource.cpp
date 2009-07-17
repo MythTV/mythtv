@@ -524,8 +524,7 @@ void WeatherSource::startUpdate()
                "WHERE sourceid = :ID AND "
                "TIMESTAMPADD(SECOND,update_timeout,updated) > NOW()");
     db.bindValue(":ID", getId());
-    db.exec();
-    if (db.size() > 0)
+    if (db.exec() && db.size() > 0)
     {
         VERBOSE(VB_IMPORTANT, QString("%1 recently updated, skipping.")
                                     .arg(m_info->name));

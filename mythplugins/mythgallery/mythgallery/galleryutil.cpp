@@ -24,6 +24,7 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/util.h>
 #include <mythtv/mythdirs.h>
+#include <mythtv/mythdb.h>
 
 // mythgallery
 #include "config.h"
@@ -636,7 +637,9 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
                         "WHERE image = :IMAGEOLD");
             subquery.bindValue(":IMAGENEW", newImage);
             subquery.bindValue(":IMAGEOLD", oldImage);
-            subquery.exec();
+            if (!subquery.exec())
+                MythDB::DBError("GalleryUtil::RenameDirectory - update image",
+                                subquery);
         }
     }
 

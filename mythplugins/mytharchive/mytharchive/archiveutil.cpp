@@ -135,10 +135,8 @@ bool extractDetailsFromFilename(const QString &inFile,
             "WHERE basename = :BASENAME");
     query.bindValue(":BASENAME", baseName);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.first();
         chanID = query.value(0).toString();
         startTime= query.value(1).toString();
     }

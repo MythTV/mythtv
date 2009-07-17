@@ -587,15 +587,13 @@ void MetadataImp::saveToDatabase()
     {
         // Must make sure we have 'id' filled before we call updateGenres or
         // updateCountries
-        query.exec("SELECT LAST_INSERT_ID()");
 
-        if (!query.isActive() || query.size() < 1)
+        if (!query.exec("SELECT LAST_INSERT_ID()") || !query.next())
         {
             MythDB::DBError("metadata id get", query);
             return;
         }
 
-        query.next();
         m_id = query.value(0).toUInt();
 
         if (0 == m_id)

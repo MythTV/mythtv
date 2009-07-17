@@ -9,6 +9,7 @@
 // MythTV headers
 #include <mythcontext.h>
 #include <mythdbcon.h>
+#include <mythdb.h>
 #include <mythprogressdialog.h>
 #include <mythdirs.h>
 
@@ -102,7 +103,8 @@ bool SourceManager::findScripts()
     db.prepare("SELECT sourceid, path FROM weathersourcesettings "
                "WHERE hostname = :HOST;");
     db.bindValue(":HOST", gContext->GetHostName());
-    db.exec();
+    if (!db.exec())
+        MythDB::DBError("SourceManager::findScripts - select", db);
     QStringList toRemove;
     while (db.next())
     {

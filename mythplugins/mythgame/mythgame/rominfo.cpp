@@ -244,9 +244,8 @@ void RomInfo::fillData()
     query.prepare(thequery);
     query.bindValue(":SYSTEM", system);
     query.bindValue(":GAMENAME", gamename);
-    query.exec();
 
-    if (query.next())
+    if (query.exec() && query.next())
     {
         setSystem(query.value(0).toString());
         setGamename(query.value(1).toString());
@@ -270,9 +269,8 @@ void RomInfo::fillData()
     query.prepare("SELECT screenshots FROM gameplayers "
                   "WHERE playername = :SYSTEM");
     query.bindValue(":SYSTEM",system);
-    query.exec();
 
-    if (query.next())
+    if (query.exec() && query.next())
     {
         if (!query.value(0).toString().isEmpty())
         {
@@ -293,7 +291,8 @@ void RomInfo::fillData()
         query.prepare("SELECT DISTINCT system FROM gamemetadata "
                       "WHERE romname = :ROMNAME");
         query.bindValue(":ROMNAME", Romname());
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("RomInfo::fillData - selecting systems", query);
 
         while (query.next())
         {

@@ -397,8 +397,8 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     CategoryMap categoryMap;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, category FROM videocategory");
-    query.exec();
-    if (query.isActive() && query.size())
+
+    if (query.exec())
     {
         while (query.next())
         {
@@ -413,8 +413,8 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
     query.prepare("SELECT intid, title, plot, length, filename, coverfile, "
                   "category, showlevel "
                   "FROM videometadata ORDER BY title");
-    query.exec();
-    if (query.isActive() && query.size())
+
+    if (query.exec() && query.size())
     {
         QString artist, genre;
         while (query.next())

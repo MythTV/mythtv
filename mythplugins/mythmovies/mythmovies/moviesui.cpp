@@ -19,6 +19,7 @@
 #include <mythgenerictree.h>
 #include <mythdialogbox.h>
 #include <mythmainwindow.h>
+#include <mythdb.h>
 
 // MythMovies headers
 #include "moviesui.h"
@@ -197,9 +198,12 @@ void MoviesUI::updateMovieTimes()
     QString currentDate = QDate::currentDate().toString();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("truncate table movies_showtimes");
-    query.exec("truncate table movies_movies");
-    query.exec("truncate table movies_theaters");
+    if (!query.exec("truncate table movies_showtimes"))
+        MythDB::DBError("truncating movies_showtimes", query);
+    if (!query.exec("truncate table movies_movies"))
+        MythDB::DBError("truncating movies_movies", query);
+    if (!query.exec("truncate table movies_theaters"))
+        MythDB::DBError("truncating movies_theaters", query);
 
     QString grabber = gContext->GetSetting("MythMovies.Grabber");
     grabber.replace("%z", gContext->GetSetting("MythMovies.ZipCode"));

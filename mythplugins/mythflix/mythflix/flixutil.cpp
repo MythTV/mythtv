@@ -17,9 +17,7 @@ QString chooseQueue(MythScreenType *screen, QString excludedQueue)
     if (!excludedQueue.isEmpty())
         sql += QString(" WHERE queue <> '%1'").arg(excludedQueue);
 
-    query.exec(sql);
-
-    if (!query.isActive())
+    if (!query.exec(sql))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("MythFlixQueue: Error in loading queue from DB"));

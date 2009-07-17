@@ -482,11 +482,9 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
     query.bindValue(":NAME", name);
     query.bindValue(":CALLSIGN", callsign);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
         // got match
-        query.first();
         m_localChanID_text->SetText(query.value(0).toString());
         m_localChanNo_text->SetText(query.value(1).toString());
         m_localChanName_text->SetText(query.value(2).toString());
@@ -499,11 +497,9 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
             "WHERE callsign = :CALLSIGN;");
     query.bindValue(":CALLSIGN", callsign);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
         // got match
-        query.first();
         m_localChanID_text->SetText(query.value(0).toString());
         m_localChanNo_text->SetText(query.value(1).toString());
         m_localChanName_text->SetText(query.value(2).toString());
@@ -516,11 +512,9 @@ void ImportNative::findChannelMatch(const QString &chanID, const QString &chanNo
             "WHERE name = :NAME;");
     query.bindValue(":NAME", callsign);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
         // got match
-        query.first();
         m_localChanID_text->SetText(query.value(0).toString());
         m_localChanNo_text->SetText(query.value(1).toString());
         m_localChanName_text->SetText(query.value(2).toString());
@@ -564,9 +558,8 @@ void ImportNative::fillSearchList(const QString &field)
     querystr = QString("SELECT %1 FROM channel ORDER BY %2").arg(field).arg(field);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(querystr);
 
-    if (query.isActive() && query.size())
+    if (query.exec(querystr))
     {
         while (query.next())
         {
@@ -591,11 +584,9 @@ void ImportNative::gotChanID(QString value)
     query.prepare("SELECT chanid, channum, name, callsign "
             "FROM channel WHERE chanid = :CHANID;");
     query.bindValue(":CHANID", value);
-    query.exec();
 
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
         m_localChanID_text->SetText(query.value(0).toString());
         m_localChanNo_text->SetText(query.value(1).toString());
         m_localChanName_text->SetText(query.value(2).toString());
@@ -619,11 +610,9 @@ void ImportNative::gotChanNo(QString value)
     query.prepare("SELECT chanid, channum, name, callsign "
             "FROM channel WHERE channum = :CHANNUM;");
     query.bindValue(":CHANNUM", value);
-    query.exec();
 
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
         m_localChanID_text->SetText(query.value(0).toString());
         m_localChanNo_text->SetText(query.value(1).toString());
         m_localChanName_text->SetText(query.value(2).toString());
@@ -647,11 +636,9 @@ void ImportNative::gotName(QString value)
     query.prepare("SELECT chanid, channum, name, callsign "
             "FROM channel WHERE name = :NAME;");
     query.bindValue(":NAME", value);
-    query.exec();
 
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
         m_localChanID_text->SetText(query.value(0).toString());
         m_localChanNo_text->SetText(query.value(1).toString());
         m_localChanName_text->SetText(query.value(2).toString());
@@ -675,11 +662,9 @@ void ImportNative::gotCallsign(QString value)
     query.prepare("SELECT chanid, channum, name, callsign "
             "FROM channel WHERE callsign = :CALLSIGN;");
     query.bindValue(":CALLSIGN", value);
-    query.exec();
 
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.next();
         m_localChanID_text->SetText(query.value(0).toString());
         m_localChanNo_text->SetText(query.value(1).toString());
         m_localChanName_text->SetText(query.value(2).toString());

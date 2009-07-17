@@ -1727,9 +1727,8 @@ void SmartPLResultViewer::setSQL(QString sql)
     listView->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(sql);
 
-    if (query.last())
+    if (query.exec(sql) && query.last())
     {
         do
         {

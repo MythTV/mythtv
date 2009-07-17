@@ -50,11 +50,13 @@ namespace
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
-        query.exec(QString("DELETE FROM settings WHERE value='%1';")
-                   .arg(field_name));
-        query.exec(QString("INSERT INTO settings (value, data, hostname) "
-                           "VALUES ('%1', %2, NULL);")
-                   .arg(field_name).arg(newnumber));
+        if (!query.exec(QString("DELETE FROM settings WHERE value='%1';")
+                        .arg(field_name)))
+            MythDB::DBError("UpdateDBVersionNumber - delete", query);
+        if (!query.exec(QString("INSERT INTO settings (value, data, hostname) "
+                                "VALUES ('%1', %2, NULL);")
+                        .arg(field_name).arg(newnumber)))
+            MythDB::DBError("UpdateDBVersionNumber - insert", query);
 
         VERBOSE(VB_IMPORTANT,
                 QString("Upgraded to MythVideo schema version %1")
@@ -73,7 +75,8 @@ namespace
         for (QStringList::const_iterator p = updates.begin();
              p != updates.end(); ++p)
         {
-            query.exec(*p);
+            if (!query.exec(*p))
+                MythDB::DBError("performActualUpdate", query);
         }
 
         UpdateDBVersionNumber(field_name, version);
@@ -131,9 +134,8 @@ namespace
         performActualUpdate(updates, "1000", dbver, OldMythVideoVersionName);
 
         MSqlQuery qQuery(MSqlQuery::InitCon());
-        qQuery.exec("SELECT * FROM videotypes;");
 
-        if (!qQuery.isActive() || qQuery.size() <= 0)
+        if (!qQuery.exec("SELECT * FROM videotypes;") || qQuery.size() <= 0)
         {
             const QString updates2[] = {
     "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default)"
@@ -292,9 +294,8 @@ namespace
             QStringList updates;
 
             MSqlQuery query(MSqlQuery::InitCon());
-            query.exec("SELECT intid FROM videocategory;");
 
-            if (query.isActive() && query.size())
+            if (query.exec("SELECT intid FROM videocategory;") && query.size())
             {
                 QString categoryIDs = "'0'";
                 while (query.next())
@@ -317,12 +318,11 @@ namespace
         if (dbver == "1009")
         {
             MSqlQuery query(MSqlQuery::InitCon());
-            query.exec("SELECT extension, playcommand FROM videotypes");
 
             QRegExp extChange("^(img|vob|mpeg|mpg|iso|VIDEO_TS)$",
                               Qt::CaseInsensitive);
             QStringList updates;
-            if (query.isActive() && query.size())
+            if (query.exec("SELECT extension, playcommand FROM videotypes"))
             {
                 while (query.next())
                 {
@@ -355,9 +355,8 @@ namespace
                 "Inserting MythDVD initial database information.");
 
         MSqlQuery qQuery(MSqlQuery::InitCon());
-        qQuery.exec("SELECT * FROM dvdinput;");
 
-        if (!qQuery.isActive() || qQuery.size() <= 0)
+        if (!qQuery.exec("SELECT * FROM dvdinput;") || qQuery.size() <= 0)
         {
             const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS dvdinput ("
@@ -416,8 +415,7 @@ namespace
             performActualUpdate(updates, "1000", dbver, OldMythDVDVersionName);
         }
 
-        qQuery.exec("SELECT * FROM dvdtranscode;");
-        if (!qQuery.isActive() || qQuery.size() <= 0)
+        if (!qQuery.exec("SELECT * FROM dvdtranscode;") || qQuery.size() <= 0)
         {
             const QString updates[] = {
 "CREATE TABLE IF NOT EXISTS dvdtranscode ("

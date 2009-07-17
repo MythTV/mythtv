@@ -116,16 +116,15 @@ void MythFlix::loadData()
     // Load sites from database
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=0 ORDER BY name");
-
-    if (!query.isActive()) {
+    if (!query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=0 ORDER BY name"))
         VERBOSE(VB_IMPORTANT, QString("MythFlix: Error in loading sites from DB"));
-    }
-    else {
+    else 
+    {
         QString name;
         QString url;
         QDateTime time;
-        while ( query.next() ) {
+        while ( query.next() ) 
+        {
             name = query.value(0).toString();
             url  = query.value(1).toString();
             time.setTime_t(query.value(2).toUInt());
@@ -148,7 +147,6 @@ void MythFlix::loadData()
     }
 
     slotRetrieveNews();
-
 }
 
 

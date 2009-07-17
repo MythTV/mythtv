@@ -204,10 +204,9 @@ int GetSiteList(QList<Bookmark*>  &siteList)
         delete siteList.takeFirst();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT category, name, url FROM websites "
-               "ORDER BY category, name");
 
-    if (!query.isActive())
+    if (!query.exec("SELECT category, name, url FROM websites "
+               "ORDER BY category, name"))
     {
         VERBOSE(VB_IMPORTANT, "BookmarkManager: Error in loading from DB");
     }

@@ -14,6 +14,7 @@
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythmediamonitor.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/mythversion.h>
 #include <mythtv/libmythui/myththemedmenu.h>
@@ -111,7 +112,9 @@ void SavePending(int pending)
         query.bindValue(":DATA", pending);
         query.bindValue(":HOST", gContext->GetHostName());
 
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("SavePending - inserting LastMusicPlaylistPush",
+                            query);
     }
     else if (query.size() == 1)
     {
@@ -123,7 +126,9 @@ void SavePending(int pending)
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
         query.bindValue(":HOST", gContext->GetHostName());
 
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("SavePending - updating LastMusicPlaylistPush",
+                            query);
     }
     else
     {
@@ -135,7 +140,9 @@ void SavePending(int pending)
                          "AND hostname = :HOST ;");
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
         query.bindValue(":HOST", gContext->GetHostName());
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("SavePending - deleting LastMusicPlaylistPush",
+                            query);
 
         query.prepare("INSERT INTO settings (value,data,hostname) VALUES "
                          "(:LASTPUSH, :DATA, :HOST );");
@@ -143,7 +150,9 @@ void SavePending(int pending)
         query.bindValue(":DATA", pending);
         query.bindValue(":HOST", gContext->GetHostName());
 
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("SavePending - inserting LastMusicPlaylistPush (2)",
+                            query);
     }
 }
 
@@ -428,10 +437,9 @@ static void preMusic()
     CheckFreeDBServerFile();
 
     MSqlQuery count_query(MSqlQuery::InitCon());
-    count_query.exec("SELECT COUNT(*) FROM music_songs;");
 
     bool musicdata_exists = false;
-    if (count_query.isActive())
+    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
     {
         if(count_query.next() &&
            0 != count_query.value(0).toInt())

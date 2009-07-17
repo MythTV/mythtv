@@ -439,10 +439,8 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.first();
         QDomElement elem;
         QDomText text;
 
@@ -628,10 +626,8 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
             "FROM channel WHERE chanid = :CHANID;");
     query.bindValue(":CHANID", chanID);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.first();
         QDomElement channel = doc.createElement("channel");
         channel.setAttribute("chanid", query.value(0).toString());
         channel.setAttribute("channum", query.value(1).toString());
@@ -662,8 +658,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.size())
     {
         QDomElement credits = doc.createElement("credits");
         while (query.next())
@@ -684,10 +679,8 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.first();
         QDomElement rating = doc.createElement("rating");
         rating.setAttribute("system", query.value(0).toString());
         rating.setAttribute("rating", query.value(1).toString());
@@ -702,8 +695,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
             "WHERE chanid = :CHANID and starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.size())
     {
         while (query.next())
         {
@@ -724,8 +716,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
             "WHERE chanid = :CHANID and starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.size())
     {
         while (query.next())
         {
@@ -821,10 +812,8 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
             "FROM videometadata WHERE filename = :FILENAME;");
     query.bindValue(":FILENAME", filename);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.first();
         QDomElement elem;
         QDomText text;
 
@@ -924,10 +913,8 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
             "FROM videocategory WHERE intid = :INTID;");
     query.bindValue(":INTID", categoryID);
 
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.next())
     {
-        query.first();
         QDomElement category = doc.createElement("category");
         category.setAttribute("intid", query.value(0).toString());
         category.setAttribute("category", query.value(1).toString());
@@ -1436,9 +1423,8 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     int intid;
     query.prepare("SELECT intid FROM videometadata WHERE filename = :FILENAME;");
     query.bindValue(":FILENAME", path + "/" + basename);
-    if (query.exec())
+    if (query.exec() && query.next())
     {
-        query.first();
         intid = query.value(0).toInt();
     }
     else
@@ -1480,10 +1466,8 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                 query.prepare("SELECT intid FROM videogenre "
                         "WHERE genre = :GENRE");
                 query.bindValue(":GENRE", genre);
-                query.exec();
-                if (query.isActive() && query.size())
+                if (query.exec() && query.next())
                 {
-                    query.first();
                     genreID = query.value(0).toInt();
                 }
                 else
@@ -1491,16 +1475,16 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                     // genre doesn't exist so add it
                     query.prepare("INSERT INTO videogenre (genre) VALUES(:GENRE);");
                     query.bindValue(":GENRE", genre);
-                    query.exec();
+                    if (!query.exec())
+                        MythDB::DBError("NativeArchive::importVideo - "
+                                        "insert videogenre", query);
 
                     // get new intid of genre
                     query.prepare("SELECT intid FROM videogenre "
                             "WHERE genre = :GENRE");
                     query.bindValue(":GENRE", genre);
-                    query.exec();
-                    if (query.isActive() && query.size())
+                    if (query.exec() && query.next())
                     {
-                        query.first();
                         genreID = query.value(0).toInt();
                     }
                     else
@@ -1515,7 +1499,9 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                         "VALUES (:IDVIDEO, :IDGENRE);");
                 query.bindValue(":IDVIDEO", intid);
                 query.bindValue(":IDGENRE", genreID);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("NativeArchive::importVideo - "
+                                    "insert videometadatagenre", query);
             }
 
             VERBOSE(VB_JOBQUEUE, "Inserted genre details into database");
@@ -1551,10 +1537,8 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                 query.prepare("SELECT intid FROM videocountry "
                         "WHERE country = :COUNTRY");
                 query.bindValue(":COUNTRY", country);
-                query.exec();
-                if (query.isActive() && query.size())
+                if (query.exec() && query.next())
                 {
-                    query.first();
                     countryID = query.value(0).toInt();
                 }
                 else
@@ -1562,16 +1546,16 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                     // country doesn't exist so add it
                     query.prepare("INSERT INTO videocountry (country) VALUES(:COUNTRY);");
                     query.bindValue(":COUNTRY", country);
-                    query.exec();
+                    if (!query.exec())
+                        MythDB::DBError("NativeArchive::importVideo - "
+                                        "insert videocountry", query);
 
                     // get new intid of country
                     query.prepare("SELECT intid FROM videocountry "
                             "WHERE country = :COUNTRY");
                     query.bindValue(":COUNTRY", country);
-                    query.exec();
-                    if (query.isActive() && query.size())
+                    if (query.exec() && query.next())
                     {
-                        query.first();
                         countryID = query.value(0).toInt();
                     }
                     else
@@ -1586,7 +1570,9 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                         "VALUES (:IDVIDEO, :IDCOUNTRY);");
                 query.bindValue(":IDVIDEO", intid);
                 query.bindValue(":IDCOUNTRY", countryID);
-                query.exec();
+                if (!query.exec())
+                    MythDB::DBError("NativeArchive::importVideo - "
+                                    "insert videometadatacountry", query);
             }
 
             VERBOSE(VB_JOBQUEUE, "Inserted country details into database");
@@ -1609,10 +1595,8 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         query.prepare("SELECT intid FROM videocategory "
                 "WHERE category = :CATEGORY");
         query.bindValue(":CATEGORY", category);
-        query.exec();
-        if (query.isActive() && query.size())
+        if (query.exec() && query.next())
         {
-            query.first();
             categoryID = query.value(0).toInt();
         }
         else
@@ -1620,16 +1604,16 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
             // category doesn't exist so add it
             query.prepare("INSERT INTO videocategory (category) VALUES(:CATEGORY);");
             query.bindValue(":CATEGORY", category);
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("NativeArchive::importVideo - "
+                                "insert videocategory", query);
 
             // get new intid of category
             query.prepare("SELECT intid FROM videocategory "
                     "WHERE category = :CATEGORY");
             query.bindValue(":CATEGORY", category);
-            query.exec();
-            if (query.isActive() && query.size())
+            if (query.exec() && query.next())
             {
-                query.first();
                 categoryID = query.value(0).toInt();
             }
             else
@@ -1645,7 +1629,9 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
                 "WHERE intid = :INTID;");
         query.bindValue(":CATEGORY", categoryID);
         query.bindValue(":INTID", intid);
-        query.exec();
+        if (!query.exec())
+            MythDB::DBError("NativeArchive::importVideo - "
+                            "update category", query);
 
         VERBOSE(VB_JOBQUEUE, "Fixed the category in the database");
     }

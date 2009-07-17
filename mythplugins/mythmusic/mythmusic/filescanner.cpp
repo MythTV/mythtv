@@ -351,56 +351,70 @@ void FileScanner::cleanDB()
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deletequery(MSqlQuery::InitCon());
 
-    query.exec("SELECT g.genre_id FROM music_genres g LEFT JOIN music_songs s "
-               "ON g.genre_id=s.genre_id WHERE s.genre_id IS NULL;");
+    if (!query.exec("SELECT g.genre_id FROM music_genres g "
+                    "LEFT JOIN music_songs s ON g.genre_id=s.genre_id "
+                    "WHERE s.genre_id IS NULL;"))
+        MythDB::DBError("FileScanner::cleanDB - select music_genres", query);
     while (query.next())
     {
         int genreid = query.value(0).toInt();
         deletequery.prepare("DELETE FROM music_genres WHERE genre_id=:GENREID");
         deletequery.bindValue(":GENREID", genreid);
-        deletequery.exec();
+        if (!deletequery.exec())
+            MythDB::DBError("FileScanner::cleanDB - delete music_genres",
+                            deletequery);
     }
 
     if (clean_progress)
         clean_progress->SetProgress(++counter);
 
-    query.exec("SELECT a.album_id FROM music_albums a LEFT JOIN music_songs s "
-               "ON a.album_id=s.album_id WHERE s.album_id IS NULL;");
+    if (!query.exec("SELECT a.album_id FROM music_albums a "
+                    "LEFT JOIN music_songs s ON a.album_id=s.album_id "
+                    "WHERE s.album_id IS NULL;"))
+        MythDB::DBError("FileScanner::cleanDB - select music_albums", query);
     while (query.next())
     {
         int albumid = query.value(0).toInt();
         deletequery.prepare("DELETE FROM music_albums WHERE album_id=:ALBUMID");
         deletequery.bindValue(":ALBUMID", albumid);
-        deletequery.exec();
+        if (!deletequery.exec())
+            MythDB::DBError("FileScanner::cleanDB - delete music_albums",
+                            deletequery);
     }
 
     if (clean_progress)
         clean_progress->SetProgress(++counter);
 
-    query.exec("SELECT a.artist_id FROM music_artists a "
-               "LEFT JOIN music_songs s ON a.artist_id=s.artist_id "
-               "LEFT JOIN music_albums l ON a.artist_id=l.artist_id "
-               "WHERE s.artist_id IS NULL AND l.artist_id IS NULL");
+    if (!query.exec("SELECT a.artist_id FROM music_artists a "
+                    "LEFT JOIN music_songs s ON a.artist_id=s.artist_id "
+                    "LEFT JOIN music_albums l ON a.artist_id=l.artist_id "
+                    "WHERE s.artist_id IS NULL AND l.artist_id IS NULL"))
+        MythDB::DBError("FileScanner::cleanDB - select music_artists", query);
     while (query.next())
     {
         int artistid = query.value(0).toInt();
         deletequery.prepare("DELETE FROM music_artists WHERE artist_id=:ARTISTID");
         deletequery.bindValue(":ARTISTID", artistid);
-        deletequery.exec();
+        if (!deletequery.exec())
+            MythDB::DBError("FileScanner::cleanDB - delete music_artists",
+                            deletequery);
     }
 
     if (clean_progress)
         clean_progress->SetProgress(++counter);
 
-    query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
-               "music_songs s ON a.song_id=s.song_id WHERE "
-               "embedded='1' AND s.song_id IS NULL;");
+    if (!query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
+                    "music_songs s ON a.song_id=s.song_id WHERE "
+                    "embedded='1' AND s.song_id IS NULL;"))
+        MythDB::DBError("FileScanner::cleanDB - select music_albumart", query);
     while (query.next())
     {
         int albumartid = query.value(0).toInt();
         deletequery.prepare("DELETE FROM music_albumart WHERE albumart_id=:ALBUMARTID");
         deletequery.bindValue(":ALBUMARTID", albumartid);
-        deletequery.exec();
+        if (!deletequery.exec())
+            MythDB::DBError("FileScanner::cleanDB - delete music_albumart",
+                            deletequery);
     }
 
     if (clean_progress)
@@ -449,7 +463,9 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM music_songs WHERE filename = :NAME ;");
     query.bindValue(":NAME", sqlfilename);
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("FileScanner::RemoveFileFromDB - deleting music_songs",
+                        query);
 }
 
 /*!
@@ -622,10 +638,11 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
     MusicLoadedMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT CONCAT_WS('/', path, filename), date_modified "
-               "FROM music_songs LEFT JOIN music_directories "
-               "ON music_songs.directory_id=music_directories.directory_id "
-               "WHERE filename NOT LIKE ('%://%')");
+    if (!query.exec("SELECT CONCAT_WS('/', path, filename), date_modified "
+                    "FROM music_songs LEFT JOIN music_directories ON "
+                    "music_songs.directory_id=music_directories.directory_id "
+                    "WHERE filename NOT LIKE ('%://%')"))
+        MythDB::DBError("FileScanner::ScanMusic", query);
 
     uint counter = 0;
 
@@ -693,10 +710,11 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
     MusicLoadedMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT CONCAT_WS('/', path, filename) "
-               "FROM music_albumart LEFT JOIN music_directories "
-               "ON music_albumart.directory_id=music_directories.directory_id "
-               "WHERE music_albumart.embedded=0");
+    if (!query.exec("SELECT CONCAT_WS('/', path, filename) "
+                    "FROM music_albumart LEFT JOIN music_directories ON "
+                    "music_albumart.directory_id=music_directories.directory_id"
+                    " WHERE music_albumart.embedded=0"))
+        MythDB::DBError("FileScanner::ScanArtwork", query);
 
     uint counter = 0;
 

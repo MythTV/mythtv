@@ -13,6 +13,7 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/util.h>
+#include <mythtv/mythdb.h>
 
 #define LOC_ERR QString("MythGame:GAMEHANDLER Error: ")
 #define LOC QString("MythGame:GAMEHANDLER: ")
@@ -50,7 +51,9 @@ static void checkHandlers(void)
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT DISTINCT playername FROM gameplayers WHERE playername <> '';");
+    if (!query.exec("SELECT DISTINCT playername FROM gameplayers "
+                    "WHERE playername <> '';"))
+        MythDB::DBError("checkHandlers - selecting playername", query);
 
     while (query.next()) 
     {   
@@ -75,17 +78,18 @@ void GameHandler::updateSettings(GameHandler *handler)
 
     query.bindValue(":SYSTEM", handler->SystemName());
 
-    query.exec();
-
-    query.next();
-    handler->rompath = query.value(0).toString();
-    handler->workingpath = query.value(1).toString();
-    handler->commandline = query.value(2).toString();
-    handler->screenshots = query.value(3).toString();
-    handler->gameplayerid = query.value(4).toInt();
-    handler->gametype = query.value(5).toString();
-    handler->validextensions = QStringList::split(",", query.value(6).toString().stripWhiteSpace().remove(" "));
-    handler->spandisks = query.value(7).toInt();
+    if (query.exec() && query.next())
+    {
+        handler->rompath = query.value(0).toString();
+        handler->workingpath = query.value(1).toString();
+        handler->commandline = query.value(2).toString();
+        handler->screenshots = query.value(3).toString();
+        handler->gameplayerid = query.value(4).toInt();
+        handler->gametype = query.value(5).toString();
+        handler->validextensions = QStringList::split(",",
+                     query.value(6).toString().stripWhiteSpace().remove(" "));
+        handler->spandisks = query.value(7).toInt();
+    }
 
 }
 
@@ -118,9 +122,8 @@ void GameHandler::InitMetaDataMap(QString GameType)
                   "binfile FROM romdb WHERE platform = :GAMETYPE;");
                               
     query.bindValue(":GAMETYPE",GameType);
-    query.exec();
 
-    if (query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         while (query.next())
         {
@@ -211,7 +214,8 @@ void purgeGameDB(QString filename, QString RomPath)
     query.bindValue(":ROMNAME",filename);
     query.bindValue(":ROMPATH",RomPath);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("purgeGameDB", query);
 
 }
 
@@ -267,7 +271,8 @@ void updateDisplayRom(QString romname, int display, QString Systemname)
     query.bindValue(":ROMNAME", romname);
     query.bindValue(":SYSTEM", Systemname);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("updateDisplayRom", query);
 
 }
 
@@ -281,7 +286,8 @@ void updateDiskCount(QString romname, int diskcount, QString GameType)
     query.bindValue(":ROMNAME", romname);
     query.bindValue(":GAMETYPE",GameType);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("updateDiskCount", query);
 
 }
 
@@ -295,7 +301,8 @@ void updateGameName(QString romname, QString GameName, QString Systemname)
     query.bindValue(":ROMNAME", romname);
     query.bindValue(":SYSTEM", Systemname);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("updateGameName", query);
 
 }
 
@@ -325,9 +332,7 @@ static void UpdateGameCounts(QStringList updatelist)
 
 	query.bindValue(":GAMETYPE",GameType);
 
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
+        if (query.exec())
         {   
             while (query.next())
             {   
@@ -452,33 +457,33 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 // Put the game into the database.
                 // Had to break the values up into 2 pieces since QString only allows 9 arguments and we had 10
 
-	    VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
+            VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
             query.prepare("INSERT INTO gamemetadata "
                           "(system, romname, gamename, genre, year, gametype, " 
-		          "rompath, country, crc_value, diskcount, display, plot, "
-			  "publisher, version, fanart, boxart) "
-		          "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
-			  ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PLOT, :PUBLISHER, :VERSION, "
+                          "rompath, country, crc_value, diskcount, display, plot, "
+                          "publisher, version, fanart, boxart) "
+                          "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
+                          ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PLOT, :PUBLISHER, :VERSION, "
                           ":FANART, BOXART)");
 
-
-
-	    query.bindValue(":SYSTEM",handler->SystemName());
+            query.bindValue(":SYSTEM",handler->SystemName());
             query.bindValue(":ROMNAME",iter.data().Rom());
             query.bindValue(":GAMENAME",GameName);
             query.bindValue(":GENRE",Genre);
             query.bindValue(":YEAR",Year);
             query.bindValue(":GAMETYPE",handler->GameType());
-	    query.bindValue(":ROMPATH",iter.data().RomPath());
-	    query.bindValue(":COUNTRY",Country);
-	    query.bindValue(":CRC32", CRC32);
+            query.bindValue(":ROMPATH",iter.data().RomPath());
+            query.bindValue(":COUNTRY",Country);
+            query.bindValue(":CRC32", CRC32);
             query.bindValue(":PLOT", Plot);
-	    query.bindValue(":PUBLISHER", Publisher);
-	    query.bindValue(":VERSION", Version);
+            query.bindValue(":PUBLISHER", Publisher);
+            query.bindValue(":VERSION", Version);
             query.bindValue(":FANART", Fanart);
             query.bindValue(":BOXART", Boxart);
 
-            query.exec();
+            if (!query.exec()) 
+                MythDB::DBError("GameHandler::UpdateGameDB - " 
+                                "insert gamemetadata", query); 
         } 
         else if ((iter.data().FoundLoc() == inDatabase) && (removalprompt))
         {
@@ -504,7 +509,9 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
 
     query.bindValue(":SYSTEM",handler->SystemName());
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("GameHandler::VerifyGameDB - "
+                        "select", query);
 
     MythProgressDialog *progressDlg = new MythProgressDialog(
         QObject::tr("Verifying %1 files").arg(handler->SystemName()),
@@ -613,7 +620,9 @@ void GameHandler::clearAllGameData(void)
             break;
         case kDialogCodeButton1:
             MSqlQuery query(MSqlQuery::InitCon());
-            query.exec("DELETE FROM gamemetadata;");
+            if (!query.exec("DELETE FROM gamemetadata;"))
+                MythDB::DBError("GameHandler::clearAllGameData - "
+                                "delete gamemetadata", query);
             break;
     };
 }

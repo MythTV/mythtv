@@ -121,9 +121,9 @@ void MythFlixQueue::loadData()
         query.bindValue(":QUEUENAME", "");
     else
         query.bindValue(":QUEUENAME", m_queueName);
-    query.exec();
 
-    if (!query.isActive()) {
+    if (!query.exec())
+    {
         VERBOSE(VB_IMPORTANT,
                 QString("MythFlixQueue: Error in loading queue from DB"));
     }

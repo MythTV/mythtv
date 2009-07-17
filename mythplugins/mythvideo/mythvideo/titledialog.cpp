@@ -156,9 +156,8 @@ void TitleDialog::showCurrentTitle()
                                     .arg(m_currentTitle->getInputID());
 
         MSqlQuery a_query(MSqlQuery::InitCon());
-        a_query.exec(q_string);
 
-        if(a_query.isActive() && a_query.size() > 0)
+        if(a_query.exec(q_string))
         {
             while(a_query.next())
             {

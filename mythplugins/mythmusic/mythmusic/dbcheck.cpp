@@ -115,10 +115,8 @@ bool UpgradeMusicDatabaseSchema(void)
 
         MSqlQuery query(MSqlQuery::InitCon());
         // urls as filenames are NOT officially supported yet
-        query.exec("SELECT filename, intid FROM musicmetadata WHERE "
-                        "filename NOT LIKE ('%://%');");
-
-        if (query.isActive() && query.size() > 0)
+        if (query.exec("SELECT filename, intid FROM musicmetadata WHERE "
+                       "filename NOT LIKE ('%://%');"))
         {
             int i = 0;
             QString intid, name, newname;
@@ -133,11 +131,10 @@ bool UpgradeMusicDatabaseSchema(void)
                 if (newname.startsWith(startdir))
                 {
                     newname.remove(0, startdir.length());
-                    modify.exec(QString("UPDATE musicmetadata SET "
-                                "filename = \"%1\" "
-                                "WHERE filename = \"%2\" AND intid = %3;")
-                                .arg(newname).arg(name).arg(intid));
-                    if (modify.isActive())
+                    if (modify.exec(QString("UPDATE musicmetadata SET "
+                                    "filename = \"%1\" "
+                                    "WHERE filename = \"%2\" AND intid = %3;")
+                                    .arg(newname).arg(name).arg(intid)))
                         i += modify.numRowsAffected();
                 }
             }

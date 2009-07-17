@@ -495,8 +495,7 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT title FROM recorded WHERE basename = :FILENAME");
         query.bindValue(":FILENAME", baseName);
-        query.exec();
-        if (query.isActive() && query.size())
+        if (query.exec() && query.size())
             return true;
         else
         {
@@ -511,8 +510,7 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
         query.prepare("SELECT title FROM videometadata"
                       " WHERE filename = :FILENAME");
         query.bindValue(":FILENAME", filename);
-        query.exec();
-        if (query.isActive() && query.size())
+        if (query.exec() && query.size())
             return true;
         else
         {
@@ -739,7 +737,9 @@ void MythBurn::saveConfiguration(void)
     // remove all old archive items from DB
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM archiveitems;");
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("MythBurn::saveConfiguration - deleting archiveitems",
+                        query);
 
     // save new list of archive items to DB
     ArchiveItem *a;
@@ -992,8 +992,7 @@ void MythBurn::handleAddVideo()
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title FROM videometadata");
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.size())
     {
     }
     else

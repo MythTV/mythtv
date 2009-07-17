@@ -5,6 +5,7 @@
 // MythTV headers
 #include <mythdbcon.h>
 #include <mythprogressdialog.h>
+#include <mythtv/mythdb.h>
 
 // MythWeather headers
 #include "weatherScreen.h"
@@ -406,7 +407,8 @@ void ScreenSetup::saveData()
     QString query = "DELETE FROM weatherscreens WHERE hostname=:HOST";
     db.prepare(query);
     db.bindValue(":HOST", gContext->GetHostName());
-    db.exec();
+    if (!db.exec())
+        MythDB::DBError("ScreenSetup::saveData - delete weatherscreens", db);
 
     query = "INSERT into weatherscreens (draworder, container, units, hostname) "
             "VALUES (:DRAW, :CONT, :UNITS, :HOST);";

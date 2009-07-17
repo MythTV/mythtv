@@ -66,12 +66,10 @@ class SingleValueImp
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare(m_insert_sql);
             query.bindValue(":NAME", name);
-            if (query.exec() && query.isActive())
+            if (query.exec())
             {
-                query.exec("SELECT LAST_INSERT_ID()");
-                if (query.isActive() && query.size() > 0)
+                if (query.exec("SELECT LAST_INSERT_ID()") && query.next())
                 {
-                    query.next();
                     id = query.value(0).toInt();
                     m_entries.insert(entry_map::value_type(id, name));
                     m_dirty = true;
@@ -178,9 +176,8 @@ class SingleValueImp
         m_entries.clear();
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec(m_fill_sql);
 
-        if (query.isActive() && query.size() > 0)
+        if (query.exec(m_fill_sql))
         {
             while (query.next())
             {
@@ -406,9 +403,8 @@ class MultiValueImp
         m_val_map.clear();
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec(m_fill_sql);
 
-        if (query.isActive() && query.size() > 0)
+        if (query.exec(m_fill_sql) && query.size() > 0)
         {
             id_map::iterator p = m_val_map.end();
             while (query.next())
@@ -664,10 +660,8 @@ class FileAssociationsImp
         {
             if (!existing_fa)
             {
-                query.exec("SELECT LAST_INSERT_ID()");
-                if (query.isActive() && query.size() > 0)
+                if (query.exec("SELECT LAST_INSERT_ID()") && query.next())
                 {
-                    query.next();
                     ret_fa.id = query.value(0).toUInt();
                     m_file_associations.push_back(ret_fa);
                 }
@@ -756,9 +750,8 @@ class FileAssociationsImp
     void fill_from_db()
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("SELECT intid, extension, playcommand, f_ignore, "
-                   "use_default FROM videotypes");
-        if (query.isActive() && query.size() > 0)
+        if (query.exec("SELECT intid, extension, playcommand, f_ignore, "
+                       "use_default FROM videotypes"))
         {
             while (query.next())
             {

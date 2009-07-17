@@ -410,7 +410,9 @@ void Metadata::dumpToDatabase()
     else
         query.bindValue(":ID", m_id);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("Metadata::dumpToDatabase - updating music_songs",
+                        query);
 
     if (m_id < 1 && query.isActive() && 1 == query.numRowsAffected())
         m_id = query.lastInsertId().toInt();
@@ -424,9 +426,8 @@ void Metadata::dumpToDatabase()
                           "song_id=:SONGID AND imagetype=:TYPE;");
             query.bindValue(":TYPE", (*it).imageType);
             query.bindValue(":SONGID", m_id);
-            query.exec();
 
-            if (query.next())
+            if (query.exec() && query.next())
             {
                 int artid = query.value(0).toInt();
 
@@ -449,7 +450,9 @@ void Metadata::dumpToDatabase()
             query.bindValue(":SONGID", m_id);
             query.bindValue(":EMBED", 1);
 
-            query.exec();
+            if (!query.exec())
+                MythDB::DBError("Metadata::dumpToDatabase - "
+                                "inserting music_albumart", query);
         }
     }
 
@@ -821,11 +824,9 @@ Metadata *Metadata::getMetadataFromID(int id)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(aquery);
     query.bindValue(":TRACKID", id);
-    query.exec();
 
-    if (query.isActive() && query.size() > 0)
+    if (query.exec() && query.next())
     {
-        query.next();
         filename = query.value(9).toString();
         if (!filename.contains("://"))
             filename = m_startdir + filename;
@@ -985,7 +986,8 @@ void AllMusic::resync()
     QString filename, artist, album, title;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(aquery);
+    if (!query.exec(aquery))
+        MythDB::DBError("AllMusic::resync", query);
 
     m_root_node->clear();
     m_all_music.clear();

@@ -440,7 +440,8 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
     query.bindValue(":ID", id);
     query.bindValue(":HOST", a_host);
 
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("Playlist::loadPlaylistByID", query);
 
     while (query.next())
     {
@@ -697,8 +698,7 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
                   "FROM music_smartplaylist_items "
                   "WHERE smartplaylistid = :ID;");
     query.bindValue(":ID", ID);
-    query.exec();
-    if (query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         bool bFirst = true;
         while (query.next())
@@ -773,11 +773,9 @@ void Playlist::savePlaylist(QString a_name, QString a_host)
                     "WHERE playlist_id = :ID ;");
                 an_int *= -1;
                 query.bindValue(":ID", an_int);
-                query.exec();
 
-                if (query.size() > 0)
+                if (query.exec() && query.next())
                 {
-                    query.next();
                     length = query.value(0).toInt();
                 }
             }

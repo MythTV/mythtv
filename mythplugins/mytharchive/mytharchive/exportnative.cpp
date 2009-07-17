@@ -286,8 +286,8 @@ void ExportNative::getArchiveListFromDB(void)
                   "startdate, starttime, filename, hascutlist "
                   "FROM archiveitems WHERE type = 'Recording' OR type = 'Video' "
                   "ORDER BY title, subtitle");
-    query.exec();
-    if (query.isActive() && query.size())
+
+    if (query.exec())
     {
         while (query.next())
         {
@@ -330,7 +330,9 @@ void ExportNative::saveConfiguration(void)
     // remove all old archive items from DB
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM archiveitems;");
-    query.exec();
+    if (!query.exec())
+        MythDB::DBError("ExportNative::saveConfiguration - "
+                        "deleting archiveitems", query);
 
     // save new list of archive items to DB
     ArchiveItem *a;
@@ -394,8 +396,7 @@ void ExportNative::removeItem()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM archiveitems WHERE filename = :FILENAME;");
     query.bindValue(":FILENAME", curItem->filename);
-    query.exec();
-    if (query.isActive() && query.numRowsAffected())
+    if (query.exec() && query.numRowsAffected())
     {
         getArchiveList();
     }
@@ -508,8 +509,7 @@ void ExportNative::handleAddVideo()
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title FROM videometadata");
-    query.exec();
-    if (query.isActive() && query.size())
+    if (query.exec() && query.size())
     {
     }
     else
