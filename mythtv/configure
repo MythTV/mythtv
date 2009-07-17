@@ -3449,8 +3449,8 @@ if ! enabled windows; then
 fi
 
 VENDOR_XVMC_LIBS=""
-check_header X11/extensions/XvMClib.h
-check_lib XvMCQueryExtension XvMCQueryVersion -lXvMCW || disable xvmcw
+enabled xvmcw && check_lib X11/extensions/XvMClib.h XvMCQueryExtension -lXvMCW || disable xvmcw
+enabled xvmcw && check_lib X11/extensions/XvMClib.h XvMCQueryVersion -lXvMCW || disable xvmcw
 check_header X11/extensions/vldXvMC.h
 
 if test x"$xvmc_lib" != x""; then
@@ -3484,6 +3484,10 @@ fi
 
 if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
     disable xvmc_vld xvmc_pro
+fi
+
+if test x"$VENDOR_XVMC_LIBS" = x"" ; then
+    disable xvmc xvmcw xvmc_vld xvmc_pro
 fi
 
 enabled xvmc_pro && enable xvmc_vld
