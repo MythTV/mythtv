@@ -2404,8 +2404,11 @@ check_deps $ARCH_EXT_LIST
 # if no tune setting and we know cpu class look at $processor
 if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
 # first try to tune based on processor info
+# Intel i7 processors (EMT64T capable)
+   if expr "$processor" : ".*Intel(R).*Core(TM) i7 CPU.*" > /dev/null ; then
+       cpu="core2"
 # EM64T era Intel Xeon
-   if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*51[1-6][08]" > /dev/null ; then
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*51[1-6][08]" > /dev/null ; then
        cpu="core2"
    elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*54[0-9][025]" > /dev/null ; then
        cpu="core2"
@@ -2501,6 +2504,9 @@ if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
 # AMD Opteron
    elif expr "$processor" : ".*AMD Opteron(tm)" >/dev/null ; then
        cpu="k8"
+# Athlon MP
+   elif expr "$processor" : ".*AMD Athlon(tm) MP.*" > /dev/null ; then
+       cpu="athlon-mp"
 # Athlon XP
    elif expr "$processor" : "athlon-xp" > /dev/null ; then
        cpu="athlon-xp"
@@ -2555,6 +2561,8 @@ if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
        proc_error_msg="yes"
    elif test x"$arch_raw" = x"i386"; then
        cpu="i386"
+       proc_error_msg="yes"
+   else
        proc_error_msg="yes"
    fi
 fi
