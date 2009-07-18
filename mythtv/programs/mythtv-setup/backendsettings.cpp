@@ -692,9 +692,9 @@ static GlobalComboBox *UPNPWmpSource()
     gc->addSelection(QObject::tr("Recordings"),"0");
     gc->addSelection(QObject::tr("Videos"),"1");
     gc->setValue("0");
-    gc->setHelpText(QObject::tr("This lets decided to map a WMP "
-                    " client to the Recordings tree or to the Video tree when "
-                    " it requests a list of videos "));
+    gc->setHelpText(QObject::tr("This forces us to show WMP clients "
+                    " either the Recordings tree or the Video tree when "
+                    " they request a list of videos "));
     return gc;
 };
 
