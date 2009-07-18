@@ -805,7 +805,7 @@ int Transcode::TranscodeFile(
 
     frame.buf = newFrame;
     AVPicture imageIn, imageOut;
-    struct SwsContext  *scontext;
+    struct SwsContext  *scontext = NULL;
 
     if (fifow)
         VERBOSE(VB_GENERAL, "Dumping Video and Audio data to fifos");
