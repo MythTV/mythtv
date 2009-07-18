@@ -420,10 +420,12 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             delete remotefile;
             remotefile = NULL;
         }
-
-        QStringList aux = remotefile->GetAuxiliaryFiles();
-        if (aux.size())
-            subtitlefilename = dirName + "/" + aux[0];
+        else
+        {
+            QStringList aux = remotefile->GetAuxiliaryFiles();
+            if (aux.size())
+                subtitlefilename = dirName + "/" + aux[0];
+        }
     }
 
     setswitchtonext = false;
