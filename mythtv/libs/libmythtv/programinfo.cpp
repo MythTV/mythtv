@@ -748,6 +748,7 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     progMap["recpriority2"] = recpriority2;
     progMap["recgroup"] = recgroup;
     progMap["playgroup"] = playgroup;
+    progMap["storagegroup"] = storagegroup;
     progMap["programflags"] = programflags;
 
     progMap["audioproperties"] = audioproperties;
