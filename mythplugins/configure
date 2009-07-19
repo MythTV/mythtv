@@ -30,7 +30,6 @@ visual="yes"
 fftw_lib="yes"
 fftw_lib3="yes"
 sdl="yes"
-aac="no"          # compile fails w/libfaad v2.0
 exif="yes"
 newexif="yes"
 festival="no"     # no config detection/setup routine
@@ -75,7 +74,6 @@ MythMusic related options:
   --enable-libvisual       enable libvisual visualizers [$visual]
   --enable-fftw            enable fftw visualizers [$fftw_lib]
   --enable-sdl             use SDL for the synaesthesia output [$sdl]
-  --enable-aac             enable AAC/MP4 audio file decompression [$aac]
 
 MythNews related options:
   --enable-mythnews        build the mythnews plugin [$news]
@@ -196,10 +194,6 @@ for opt do
   ;;
   --disable-sdl) sdl="no"
   ;;
-  --enable-aac) aac="yes"
-  ;;
-  --disable-aac) aac="no"
-  ;;
   --enable-exif) exif="yes"
   ;;
   --enable-new-exif)  newexif="yes"
@@ -228,7 +222,6 @@ for opt do
                  visual="yes";
                  fftw_lib="yes";
                  fftw_lib3="yes";
-                 aac="yes";
                  exif="yes";
                  festival="yes";
                  archive="yes";
@@ -248,7 +241,6 @@ for opt do
                  visual="no";
                  fftw_lib="no";
                  fftw_lib3="no";
-                 aac="no";
                  exif="no";
                  festival="no";
                  archive="no";
@@ -375,17 +367,6 @@ if test "$sdl" != "no" ; then
     sdl="no"
     if test x`which sdl-config` != x ; then
         sdl="yes"
-    fi
-fi
-
-if test "$aac" != "no" ; then
-    aac="no"
-    if has_library libfaad ; then
-        if has_library libmp4ff ; then
-            if has_header faad.h ; then
-                aac="yes"
-            fi
-        fi
     fi
 fi
 
@@ -735,18 +716,6 @@ if test "$music" = "yes" ; then
     fi
     if test "$sdl" = "no" ; then
         echo "        SDL            support will not be included in MythMusic"
-    fi
-
-    if test "$aac" = "yes" ; then
-        echo "        AAC            support will be included in MythMusic"
-        echo "#define AAC_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
-        echo "LIBS += -lfaad -lmp4ff" >> ./mythmusic/mythmusic/config.pro
-        echo "HEADERS += metaiomp4.h aacdecoder.h" >> ./mythmusic/mythmusic/config.pro
-        echo "SOURCES += metaiomp4.cpp aacdecoder.cpp" >> ./mythmusic/mythmusic/config.pro
-    fi
-
-    if test "$aac" = "no" ; then
-        echo "        AAC            support will not be included in MythMusic"
     fi
 
     if test "$taglib" = "yes" ; then

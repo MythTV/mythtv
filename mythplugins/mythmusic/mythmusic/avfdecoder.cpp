@@ -39,7 +39,7 @@ using namespace std;
 #include "metaiotaglib.h"
 #include "metaioflacvorbiscomment.h"
 #include "metaiooggvorbiscomment.h"
-
+#include "metaiomp4.h"
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                        AudioOutput *o) :
@@ -444,6 +444,8 @@ MetaIO* avfDecoder::doCreateTagger(void)
         return new MetaIOOggVorbisComment();
     else if (extension == "flac")
         return new MetaIOFLACVorbisComment();
+    else if (extension == "mp4")
+        return new MetaIOMP4();
     else
         return new MetaIOAVFComment();
 }

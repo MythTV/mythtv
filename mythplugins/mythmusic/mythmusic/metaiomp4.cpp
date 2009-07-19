@@ -1,71 +1,31 @@
-// faad2 library headers
-#define USE_TAGGING /* enables mp4 metadata portion of mp4ff.h */
-#include <mp4ff.h>
-#include <faad.h>
-
-// POSIX headers
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-// ANSI C headers
-#include <cstdlib>
-
-// C++ headers
+#include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
+#include <sys/stat.h>
 using namespace std;
 
-// MythTV headers
+#include <mythtv/mythverbose.h>
 #include <mythtv/mythcontext.h>
 
-// MythMusic headers
 #include "metaiomp4.h"
 #include "metadata.h"
 
+extern "C" {
+#include <mythtv/libavformat/avformat.h>
+#include <mythtv/libavcodec/avcodec.h>
+}
 
 MetaIOMP4::MetaIOMP4(void)
     : MetaIO(".mp4")
 {
+    QMutexLocker locker(&avcodeclock);
+    av_register_all();
 }
 
 MetaIOMP4::~MetaIOMP4(void)
 {
 }
 
-//
-//  Extern C callbacks for metadata reading 
-//
-
-
-uint32_t md_read_callback(void *user_data, void *buffer, uint32_t length)
-{
-  mp4callback_data_t *file_data = (mp4callback_data_t*)user_data;
-  return fread(buffer, 1, length, file_data->file);
-}
-
-uint32_t md_write_callback(void *user_data, void *buffer, uint32_t length)
-{
-  mp4callback_data_t *file_data = (mp4callback_data_t*)user_data;
-  return fwrite(buffer, 1, length, file_data->file);
-}
-
-uint32_t md_truncate_callback(void *user_data) 
-{
-  mp4callback_data_t *file_data = (mp4callback_data_t*)user_data;
-  ftruncate(file_data->fd, ftello(file_data->file));
-  return 0;
-}
-
-uint32_t md_seek_callback(void *user_data, uint64_t position)
-{
-  mp4callback_data_t *file_data = (mp4callback_data_t*)user_data;
-  return fseek(file_data->file, position, SEEK_SET);
-}
-
-
-
-//==========================================================================
 /*!
  * \brief Writes metadata back to a file
  *
@@ -77,118 +37,54 @@ uint32_t md_seek_callback(void *user_data, uint64_t position)
  */
 bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
 {
-    exclusive = exclusive; // -Wall annoyance
-    
-    // Sanity check.
     if (!mdata)
         return false;
 
-    QByteArray filename = mdata->Filename().toLocal8Bit();
-    mp4callback_data_t callback_data;
-    callback_data.fd = open(filename.constData(), O_RDWR);
-    if (callback_data.fd < 0)
-    {
-        return false;
-    }
-     
-    callback_data.file = fdopen(callback_data.fd, "r+");
-    if (!callback_data.file)
-    {
-        close(callback_data.fd);
-        return false;
-    }
+    exclusive = exclusive;
+    mdata = mdata;
 
-    //
-    //  Create the callback structure
-    //
+// Disabled because it doesn't actually work.
 
-    mp4ff_callback_t *mp4_cb = (mp4ff_callback_t*) malloc(sizeof(mp4ff_callback_t));
-    if (!mp4_cb) {
-      close(callback_data.fd);
-      fclose(callback_data.file);
-      return false;
-    }
-    mp4_cb->read = md_read_callback;
-    mp4_cb->seek = md_seek_callback;
-    mp4_cb->write = md_write_callback;
-    mp4_cb->truncate = md_truncate_callback;
-    mp4_cb->user_data = &callback_data;
-
-    mp4ff_metadata_t *mp4ff_mdata = (mp4ff_metadata_t*)malloc(sizeof(mp4ff_metadata_t));
-    if (!mp4ff_mdata) {
-      free(mp4_cb);
-      close(callback_data.fd);
-      fclose(callback_data.file);
-      return false;
-    }
-    mp4ff_mdata->tags = (mp4ff_tag_t*)malloc(7 * sizeof(mp4ff_tag_t));
-    if (!mp4ff_mdata) {
-      free(mp4_cb);
-      free(mp4ff_mdata);
-      close(callback_data.fd);
-      fclose(callback_data.file);
-      return false;
-    }
-
-    //
-    //  Open the mp4 input file  
-    //                   
-
-    mp4ff_t *mp4_ifile = mp4ff_open_read(mp4_cb);
-    if (!mp4_ifile)
-    {
-        free(mp4_cb);
-        free(mp4ff_mdata);
-        close(callback_data.fd);
-        fclose(callback_data.file);
-        return false;
-    }
-
-    QByteArray artist = mdata->Artist().toAscii();
-    QByteArray album  = mdata->Album().toAscii();
-    QByteArray title  = mdata->Title().toAscii();
-    QByteArray genre  = mdata->Genre().toAscii();
-    QByteArray date   = QString::number(mdata->Year()).toAscii();
-    QByteArray track  = QString::number(mdata->Track()).toAscii();
-    QByteArray comp   = QString(mdata->Compilation() ? "1" : "0").toAscii();
-
-    mp4ff_mdata->tags[0].item  = const_cast<char*>("artist");
-    mp4ff_mdata->tags[0].value = const_cast<char*>(artist.constData());
-
-    mp4ff_mdata->tags[1].item  = const_cast<char*>("album");
-    mp4ff_mdata->tags[1].value = const_cast<char*>(album.constData());
-
-    mp4ff_mdata->tags[2].item  = const_cast<char*>("title");
-    mp4ff_mdata->tags[2].value = const_cast<char*>(title.constData());
-
-    mp4ff_mdata->tags[3].item  = const_cast<char*>("genre");
-    mp4ff_mdata->tags[3].value = const_cast<char*>(genre.constData());
-
-    mp4ff_mdata->tags[4].item  = const_cast<char*>("date");
-    mp4ff_mdata->tags[4].value = const_cast<char*>(date.constData());
-
-    mp4ff_mdata->tags[5].item  = const_cast<char*>("track");
-    mp4ff_mdata->tags[5].value = const_cast<char*>(track.constData());
-
-    mp4ff_mdata->tags[6].item  = const_cast<char*>("compilation");
-    mp4ff_mdata->tags[6].value = const_cast<char*>(comp.constData());
-
-    mp4ff_mdata->count = 7;
-
-    mp4ff_meta_update(mp4_cb, mp4ff_mdata);
-
-    mp4ff_close(mp4_ifile);
-    free(mp4_cb);
-    close(callback_data.fd);
-    fclose(callback_data.file);
-    free(mp4ff_mdata->tags);
-    free(mp4ff_mdata);
+//     AVFormatContext* p_context = NULL;
+//     AVFormatParameters* p_params = NULL;
+//     AVInputFormat* p_inputformat = NULL;
+//
+//     QString filename = mdata->Filename();
+//
+//     QByteArray local8bit = filename.toLocal8Bit();
+//     QByteArray ascii     = filename.toAscii();
+//     if ((av_open_input_file(&p_context, local8bit.constData(),
+//                             p_inputformat, 0, p_params) < 0))
+//     {
+//         return NULL;
+//     }
+//
+//     if (av_find_stream_info(p_context) < 0)
+//         return NULL;
+//
+//     QByteArray artist = mdata->Artist().toUtf8();
+//     QByteArray album  = mdata->Album().toUtf8();
+//     QByteArray title  = mdata->Title().toUtf8();
+//     QByteArray genre  = mdata->Genre().toUtf8();
+//     QByteArray date   = QString::number(mdata->Year()).toUtf8();
+//     QByteArray track  = QString::number(mdata->Track()).toUtf8();
+//     QByteArray comp   = QString(mdata->Compilation() ? "1" : "0").toUtf8();
+//
+//     AVMetadata* avmetadata = p_context->metadata;
+//
+//     av_metadata_set(&avmetadata, "author", artist.constData());
+//     av_metadata_set(&avmetadata, "album", album.constData());
+//     av_metadata_set(&avmetadata, "title", title.constData());
+//     av_metadata_set(&avmetadata, "genre", genre.constData());
+//     av_metadata_set(&avmetadata, "year", date.constData());
+//     av_metadata_set(&avmetadata, "track", track.constData());
+//     av_metadata_set(&avmetadata, "compilation", comp.constData());
+//
+//     av_close_input_file(p_context);
 
     return true;
 }
 
-
-//==========================================================================
 /*!
  * \brief Reads Metadata from a file.
  *
@@ -197,183 +93,98 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOMP4::read(QString filename)
 {
-    QString artist = "", album = "", title = "", genre = "";
-    QString writer = "", comment = "";
+    QString title, artist, album, genre;
     int year = 0, tracknum = 0, length = 0;
     bool compilation = false;
 
-    QByteArray fname = filename.toLocal8Bit();
-    mp4callback_data_t callback_data;
-    callback_data.fd = 0;
-    callback_data.file = fopen(fname.constData(), "r");
-    if (!callback_data.file)
+    AVFormatContext* p_context = NULL;
+    AVFormatParameters* p_params = NULL;
+    AVInputFormat* p_inputformat = NULL;
+
+    QByteArray local8bit = filename.toLocal8Bit();
+    QByteArray ascii     = filename.toAscii();
+    if ((av_open_input_file(&p_context, local8bit.constData(),
+                           p_inputformat, 0, p_params) < 0) &&
+        (av_open_input_file(&p_context, ascii.constData(),
+                            p_inputformat, 0, p_params) < 0))
     {
         return NULL;
     }
-    
 
-    //
-    //  Create the callback structure
-    //
-
-    mp4ff_callback_t *mp4_cb = (mp4ff_callback_t*) malloc(sizeof(mp4ff_callback_t));
-    mp4_cb->read = md_read_callback;
-    mp4_cb->seek = md_seek_callback;
-    mp4_cb->user_data = &callback_data;
-
-
-    //
-    //  Open the mp4 input file  
-    //                   
-
-    mp4ff_t *mp4_ifile = mp4ff_open_read(mp4_cb);
-    if (!mp4_ifile)
-    {
-        free(mp4_cb);
-        fclose(callback_data.file);
+    if (av_find_stream_info(p_context) < 0)
         return NULL;
-    }
 
-    //
-    //  Look for metadata
-    //
+//### Debugging, enable to dump a list of all field names/values found
+//
+//     AVMetadataTag *tag = av_metadata_get(p_context->metadata, "\0", NULL, AV_METADATA_IGNORE_SUFFIX);
+//     while (tag != NULL)
+//     {
+//         VERBOSE(VB_IMPORTANT, QString("Tag: %1 Value: %2")
+//                                             .arg(tag->key)
+//                                             .arg(QString::fromUtf8(tag->value)));
+//         tag = av_metadata_get(p_context->metadata, "\0", tag, AV_METADATA_IGNORE_SUFFIX);
+//     }
+//####
 
-    char *char_storage = NULL;
-
-    if (mp4ff_meta_get_title(mp4_ifile, &char_storage))
+    title = getFieldValue(p_context, "title");
+    if (title.isEmpty())
     {
-        title = QString::fromUtf8(char_storage);
-        free(char_storage);
+        readFromFilename(filename, artist, album, title, genre, tracknum);
     }
-
-    if (mp4ff_meta_get_artist(mp4_ifile, &char_storage))
+    else
     {
-        artist = QString::fromUtf8(char_storage);
-        free(char_storage);
+        title = getFieldValue(p_context, "title");
+        artist = getFieldValue(p_context, "author");
+        // Author is the correct fieldname, but
+        // we've been saving to artist for years
+        if (artist.isEmpty())
+            artist = getFieldValue(p_context, "artist");
+        album = getFieldValue(p_context, "album");
+        year = getFieldValue(p_context, "year").toInt();
+        genre = getFieldValue(p_context, "genre");
+        tracknum = getFieldValue(p_context, "track").toInt();
+        compilation = getFieldValue(p_context, "").toInt();
+        length = getTrackLength(p_context);
     }
-
-    if (mp4ff_meta_get_writer(mp4_ifile, &char_storage))
-    {
-        writer = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_album(mp4_ifile, &char_storage))
-    {
-        album = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_date(mp4_ifile, &char_storage))
-    {
-        year = QString(char_storage).toUInt();
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_comment(mp4_ifile, &char_storage))
-    {
-        comment = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_genre(mp4_ifile, &char_storage))
-    {
-        genre = QString::fromUtf8(char_storage);
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_track(mp4_ifile, &char_storage))
-    {
-        tracknum = QString(char_storage).toUInt();
-        free(char_storage);
-    }
-
-    if (mp4ff_meta_get_compilation(mp4_ifile, &char_storage))
-    {
-        compilation = (1 == char_storage[0]);
-        free(char_storage);
-    }
-
-    //
-    //  Find the AAC track inside this mp4 which we need to do to find the
-    //  length
-    //
-
-    int track_num;
-    if ( (track_num = getAACTrack(mp4_ifile)) < 0)
-    {
-        mp4ff_close(mp4_ifile);
-        free(mp4_cb);
-        fclose(callback_data.file);
-        return NULL;
-    }
-
-    unsigned char *buffer = NULL;
-    uint buffer_size;
-
-    mp4ff_get_decoder_config(
-                                mp4_ifile, 
-                                track_num, 
-                                &buffer, 
-                                &buffer_size
-                            );    
-    
-    if (!buffer)
-    {
-        mp4ff_close(mp4_ifile);
-        free(mp4_cb);
-        fclose(callback_data.file);
-        return NULL;
-    }
-   
-    mp4AudioSpecificConfig mp4ASC;
-    if (AudioSpecificConfig(buffer, buffer_size, &mp4ASC) < 0)
-    {
-        mp4ff_close(mp4_ifile);
-        free(mp4_cb);
-        fclose(callback_data.file);
-        return NULL;
-    }
-    
-    long samples = mp4ff_num_samples(mp4_ifile, track_num);
-    float f = 1024.0;
-
-    if (mp4ASC.sbr_present_flag == 1)
-    {
-        f = f * 2.0;
-    }
-    
-    float numb_seconds = (float)samples*(float)(f-1.0)/(float)mp4ASC.samplingFrequency;
-
-    length = (int) (numb_seconds * 1000);
-
-    mp4ff_close(mp4_ifile);
-    free(mp4_cb);
-    fclose(callback_data.file);
 
     metadataSanityCheck(&artist, &album, &title, &genre);
 
-    Metadata *retdata = new Metadata(filename, 
+    Metadata *retdata = new Metadata(filename,
                                      artist,
                                      compilation ? artist : "",
-                                     album, 
-                                     title, 
+                                     album,
+                                     title,
                                      genre,
-                                     year, 
-                                     tracknum, 
+                                     year,
+                                     tracknum,
                                      length);
-    
+
     retdata->setCompilation(compilation);
 
-    //retdata->setComposer(writer);
-    //retdata->setComment(comment);
-    //retdata->setBitrate(mp4ASC.samplingFrequency);
+    av_close_input_file(p_context);
 
     return retdata;
 }
 
+/*!
+ * \brief Retrieve the value of a named metadata field
+ *
+ * \param context AVFormatContext of the file
+ * \param tagname The name of the field
+ * \returns A string containing the requested value
+ */
+QString MetaIOMP4::getFieldValue(AVFormatContext* context, const char* tagname)
+{
+    AVMetadataTag *tag = av_metadata_get(context->metadata, tagname, NULL, 0);
 
-//==========================================================================
+    QString value;
+
+    if (tag)
+        value = QString::fromUtf8(tag->value);
+
+    return value;
+}
+
 /*!
  * \brief Find the length of the track (in seconds)
  *
@@ -382,158 +193,67 @@ Metadata* MetaIOMP4::read(QString filename)
  */
 int MetaIOMP4::getTrackLength(QString filename)
 {
-    QByteArray fname = filename.toLocal8Bit();
-    mp4callback_data_t callback_data;
-    callback_data.fd = 0;
-    callback_data.file = fopen(fname.constData(), "r");
-    if (!callback_data.file)
+    AVFormatContext* p_context = NULL;
+    AVFormatParameters* p_params = NULL;
+    AVInputFormat* p_inputformat = NULL;
+
+    // Open the specified file and populate the metadata info
+    QByteArray local8bit = filename.toLocal8Bit();
+    QByteArray ascii     = filename.toAscii();
+    if ((av_open_input_file(&p_context, local8bit.constData(),
+                           p_inputformat, 0, p_params) < 0) &&
+        (av_open_input_file(&p_context, ascii.constData(),
+                            p_inputformat, 0, p_params) < 0))
     {
         return 0;
     }
 
-    //
-    //  Create the callback structure
-    //
-
-    mp4ff_callback_t *mp4_cb = (mp4ff_callback_t*) malloc(sizeof(mp4ff_callback_t));
-    mp4_cb->read = md_read_callback;
-    mp4_cb->seek = md_seek_callback;
-    mp4_cb->user_data = &callback_data;
-
-
-    //
-    //  Open the mp4 input file  
-    //                   
-
-    mp4ff_t *mp4_ifile = mp4ff_open_read(mp4_cb);
-    if (!mp4_ifile)
-    {
-        free(mp4_cb);
-        fclose(callback_data.file);
+    if (av_find_stream_info(p_context) < 0)
         return 0;
-    }
 
-    //
-    //  Find the AAC track inside this mp4 which we need to do to find the
-    //  length
-    //
+    int rv = getTrackLength(p_context);
 
-    int track_num;
-    if ( (track_num = getAACTrack(mp4_ifile)) < 0)
-    {
-        mp4ff_close(mp4_ifile);
-        free(mp4_cb);
-        fclose(callback_data.file);
-        return 0;
-    }
+    av_close_input_file(p_context);
 
-    unsigned char *buffer = NULL;
-    uint buffer_size;
-
-    mp4ff_get_decoder_config(
-                                mp4_ifile, 
-                                track_num, 
-                                &buffer, 
-                                &buffer_size
-                            );    
-    
-    if (!buffer)
-    {
-        mp4ff_close(mp4_ifile);
-        free(mp4_cb);
-        fclose(callback_data.file);
-        return 0;
-    }
-   
-
-    mp4AudioSpecificConfig mp4ASC;
-    if (AudioSpecificConfig(buffer, buffer_size, &mp4ASC) < 0)
-    {
-        mp4ff_close(mp4_ifile);
-        free(mp4_cb);
-        fclose(callback_data.file);
-        return 0;
-    }
-    
-    long samples = mp4ff_num_samples(mp4_ifile, track_num);
-    float f = 1024.0;
-
-    if (mp4ASC.sbr_present_flag == 1)
-    {
-        f = f * 2.0;
-    }
-    
-    float numb_seconds = (float)samples*(float)(f-1.0)/(float)mp4ASC.samplingFrequency;
-
-    int seconds = (int) (numb_seconds * 1000);
-
-    mp4ff_close(mp4_ifile);
-    free(mp4_cb);
-    fclose(callback_data.file);
-
-    return seconds;
+    return rv;
 }
 
-
-int MetaIOMP4::getAACTrack(mp4ff_t *infile)
+/*!
+ * \brief Find the length of the track (in seconds)
+ *
+ * \param pContext The AV Format Context.
+ * \returns An integer (signed!) to represent the length in seconds.
+ */
+int MetaIOMP4::getTrackLength(AVFormatContext* pContext)
 {
-        //
-        //  Find an AAC track inside an mp4 container
-        //
+    if (!pContext)
+        return 0;
 
-        int i, rc;
-        int numTracks = mp4ff_total_tracks(infile);
+    av_estimate_timings(pContext, 0);
 
-        for (i = 0; i < numTracks; i++)
-        {
-                unsigned char *buff = NULL;
-                uint buff_size = 0;
-                mp4AudioSpecificConfig mp4ASC;
-
-                mp4ff_get_decoder_config(infile, i, &buff, &buff_size);
-
-                if (buff)
-                {
-                    rc = AudioSpecificConfig(buff, buff_size, &mp4ASC);
-                    free(buff);
-
-                    if (rc < 0)
-                        continue;
-                    return i;
-                }
-         }
-
-         //
-         //  No AAC tracks
-         // 
-
-         return -1;
+    return (pContext->duration / AV_TIME_BASE) * 1000;
 }
 
-
-//==========================================================================
+/*!
+ * \brief Replace any empty strings in extracted metadata with sane defaults
+ *
+ * \param artist Artist
+ * \param album Album
+ * \param title Title
+ * \param genre Genre
+ */
 void MetaIOMP4::metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre)
 {
-    if (artist->length() < 1)
-    {
+    if (artist->isEmpty())
         artist->append("Unknown Artist");
-    }
-    
-    if (album->length() < 1)
-    {
-        album->append("Unknown Album");
-    }
-    
-    if (title->length() < 1)
-    {
-        title->append("Unknown Title");
-    }
-    
-    if (genre->length() < 1)
-    {
-        genre->append("Unknown Genre");
-    }
-    
-}
 
+    if (album->isEmpty())
+        album->append("Unknown Album");
+
+    if (title->isEmpty())
+        title->append("Unknown Title");
+
+    if (genre->isEmpty())
+        genre->append("Unknown Genre");
+}
 

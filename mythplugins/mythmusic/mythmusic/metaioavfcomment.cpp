@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 using namespace std;
 
+#include <mythtv/mythcontext.h>
+
 #include "metaioavfcomment.h"
 #include "metadata.h"
 
@@ -16,6 +18,7 @@ extern "C" {
 MetaIOAVFComment::MetaIOAVFComment(void)
     : MetaIO(".wma")
 {
+    QMutexLocker locker(&avcodeclock);
     av_register_all();
 }
 
@@ -55,25 +58,25 @@ Metadata* MetaIOAVFComment::read(QString filename)
 {
     QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
-    
+
     AVFormatContext* p_context = NULL;
     AVFormatParameters* p_params = NULL;
     AVInputFormat* p_inputformat = NULL;
 
     QByteArray local8bit = filename.toLocal8Bit();
     QByteArray ascii     = filename.toAscii();
-    if ((av_open_input_file(&p_context, local8bit.constData(), 
+    if ((av_open_input_file(&p_context, local8bit.constData(),
                            p_inputformat, 0, p_params) < 0) &&
-        (av_open_input_file(&p_context, ascii.constData(), 
+        (av_open_input_file(&p_context, ascii.constData(),
                             p_inputformat, 0, p_params) < 0))
     {
         return NULL;
     }
-        
+
     if (av_find_stream_info(p_context) < 0)
         return NULL;
 
-    
+
     title += (char *)p_context->title;
     if (title.isEmpty())
     {
@@ -88,16 +91,16 @@ Metadata* MetaIOAVFComment::read(QString filename)
         year = p_context->year;
         tracknum = p_context->track;
     }
-    
+
     length = getTrackLength(p_context);
 
-    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album, 
+    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
 
     retdata->determineIfCompilation();
 
     av_close_input_file(p_context);
-    
+
     return retdata;
 }
 
@@ -114,25 +117,25 @@ int MetaIOAVFComment::getTrackLength(QString filename)
     AVFormatContext* p_context = NULL;
     AVFormatParameters* p_params = NULL;
     AVInputFormat* p_inputformat = NULL;
-    
+
     // Open the specified file and populate the metadata info
     QByteArray local8bit = filename.toLocal8Bit();
     QByteArray ascii     = filename.toAscii();
-    if ((av_open_input_file(&p_context, local8bit.constData(), 
+    if ((av_open_input_file(&p_context, local8bit.constData(),
                            p_inputformat, 0, p_params) < 0) &&
-        (av_open_input_file(&p_context, ascii.constData(), 
+        (av_open_input_file(&p_context, ascii.constData(),
                             p_inputformat, 0, p_params) < 0))
     {
         return 0;
     }
-        
+
     if (av_find_stream_info(p_context) < 0)
         return 0;
 
     int rv = getTrackLength(p_context);
-    
+
     av_close_input_file(p_context);
-    
+
     return rv;
 }
 
@@ -148,8 +151,8 @@ int MetaIOAVFComment::getTrackLength(AVFormatContext* pContext)
 {
     if (!pContext)
         return 0;
-        
+
     av_estimate_timings(pContext, 0);
-    
+
     return (pContext->duration / AV_TIME_BASE) * 1000;
 }

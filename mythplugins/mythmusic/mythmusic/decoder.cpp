@@ -133,7 +133,7 @@ Metadata* Decoder::getMetadata(void)
  *  that the decoder supports cannot be indexed using metadata in
  *  the file.
  *
- *  e.g. the mp3 decoder (\p MadDecoder) implements this, whereas
+ *  e.g. the avf decoder (\p AvfDecoder) implements this, whereas
  *  the audio CD decoder (\p CdDecoder) does not.
  *
  *  \returns an instance of \p MetaIO owned by the caller
@@ -191,9 +191,6 @@ static void checkFactories()
         Decoder::registerFactory(new CdDecoderFactory);
 #endif // USING_MINGW
         Decoder::registerFactory(new avfDecoderFactory);
-#ifdef AAC_SUPPORT
-        Decoder::registerFactory(new aacDecoderFactory);
-#endif
     }
 }
 

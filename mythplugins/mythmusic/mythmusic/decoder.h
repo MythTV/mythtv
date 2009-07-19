@@ -143,15 +143,4 @@ public:
     Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
 };
 
-#ifdef AAC_SUPPORT
-class aacDecoderFactory : public DecoderFactory
-{
-public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
-};
-#endif
-
 #endif
