@@ -238,8 +238,8 @@ void ZMEvents::eventChanged(MythUIButtonListItem *item)
     }
 
     // update the images for all the visible items
-    for (int x = m_eventGrid->GetTopItemPos();
-         x < m_eventGrid->GetTopItemPos() + (int)m_eventGrid->GetVisibleCount(); x++)
+    for (int x = m_eventGrid->GetCurrentPos() - m_eventGrid->GetVisibleCount();
+         x < m_eventGrid->GetCurrentPos() + (int)m_eventGrid->GetVisibleCount(); x++)
     {
         if (x < 0 || x > (int)m_eventGrid->GetCount() - 1)
             continue;
