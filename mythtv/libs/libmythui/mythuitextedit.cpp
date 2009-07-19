@@ -371,7 +371,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
         {
             RemoveCharacter();
         }
-        else if (action == "SELECT"
+        else if (action == "SELECT" && e->key() != Qt::Key_Space
                  && GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
         {
             MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
