@@ -118,7 +118,7 @@ void GameHandler::InitMetaDataMap(QString GameType)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT crc, category, year, country, name, "
-                  "description, plot, publisher, platform, version, "
+                  "description, publisher, platform, version, "
                   "binfile FROM romdb WHERE platform = :GAMETYPE;");
                               
     query.bindValue(":GAMETYPE",GameType);
@@ -143,7 +143,7 @@ void GameHandler::InitMetaDataMap(QString GameType)
     }
 
     if (romDB.count() == 0)
-	VERBOSE(VB_GENERAL, LOC_ERR + QString("No romDB data read from database. Not imported?"));
+	VERBOSE(VB_GENERAL, LOC_ERR + QString("No romDB data read from database for gametype %1 . Not imported?").arg(GameType));
     else
 	VERBOSE(VB_GENERAL, LOC + QString("Loaded %1 items from romDB Database")
 			          .arg(romDB.count()));
@@ -187,7 +187,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
             *GameName = romDB[key].GameName();
             *Version = romDB[key].Version();
         }
-        else VERBOSE(VB_GENERAL, LOC + QString("NO ROMDB FOUND for %1").arg(rom));
+        else VERBOSE(VB_GENERAL, LOC + QString("NO ROMDB FOUND for %1 (%2)").arg(rom).arg(*CRC32));
 
     };
 
