@@ -1139,7 +1139,7 @@
         </textarea>
 
         <buttonlist name="proglist" from="basebuttonlist2">
-            <area>30,57,1200,380</area>
+            <area>30,57,1220,380</area>
             <buttonarea>0,0,1200,380</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,1200,25</area>
