@@ -90,8 +90,8 @@ static void mpegts_add_stream(MpegTSContext *ts, pmt_entry_t* item);
 static int is_pmt_same(MpegTSContext *mpegts_ctx, pmt_entry_t* items,
                        int item_cnt);
 
-typedef void PESCallback(void *opaque, const uint8_t *buf, int len, 
-                         int is_start, int64_t startpos);
+typedef int PESCallback(void *opaque, const uint8_t *buf, int len, 
+                        int is_start, int64_t startpos);
 
 typedef struct MpegTSPESFilter {
     PESCallback *pes_cb;
@@ -222,6 +222,7 @@ enum MpegTSState {
 };
 
 /* enough for PES header + length */
+#define PES_START_SIZE  6
 #define PES_HEADER_SIZE 9
 #define MAX_PES_HEADER_SIZE (9 + 255)
 
@@ -249,6 +250,7 @@ extern AVInputFormat mpegts_demuxer;
 struct SectionContext {
     int pid;
     int stream_type;
+    int new_packet;
     MpegTSContext *ts;
     AVFormatContext *stream;
     AVStream *st;
@@ -266,6 +268,7 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
                                const uint8_t *buf, int buf_size, int is_start)
 {
     MpegTSSectionFilter *tss = &tss1->u.section_filter;
+    SectionContext *sect = tss->opaque;
     int len;
 
     if (is_start) {
@@ -283,19 +286,22 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
         tss->section_index += len;
     }
 
-    while (1) { /* There may be several tables in this data. */
+    sect->new_packet = 1;
+    while (!tss->end_of_section_reached) {
         /* compute section length if possible */
         if (tss->section_h_size == -1 && tss->section_index >= 3) {
-            len = (((tss->section_buf[1] & 0xf) << 8) | tss->section_buf[2]) + 3;
+            len = (AV_RB16(tss->section_buf + 1) & 0xfff) + 3;
             if (len > 4096)
-                break;
+                return;
             tss->section_h_size = len;
         }
 
         if (tss->section_h_size == -1 || tss->section_index < tss->section_h_size)
             break;
 
-        if (!tss->check_crc || av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1, tss->section_buf, tss->section_h_size) == 0)
+        if (!tss->check_crc ||
+            av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1,
+                   tss->section_buf, tss->section_h_size) == 0)
             tss->section_cb(tss->opaque, tss->section_buf, tss->section_h_size);
 
         if (tss->section_index > tss->section_h_size) {
@@ -305,7 +311,6 @@ static void write_section_data(AVFormatContext *s, MpegTSFilter *tss1,
             tss->section_h_size = -1;
         } else {
             tss->end_of_section_reached = 1;
-            break;
         }
     }
 }
@@ -1545,14 +1550,14 @@ static int mpegts_push_data(void *opaque,
     while (buf_size > 0) {
         switch(pes->state) {
         case MPEGTS_HEADER:
-            len = PES_HEADER_SIZE - pes->data_index;
+            len = PES_START_SIZE - pes->data_index;
             if (len > buf_size)
                 len = buf_size;
             memcpy(pes->header + pes->data_index, p, len);
             pes->data_index += len;
             p += len;
             buf_size -= len;
-            if (pes->data_index == PES_HEADER_SIZE) {
+            if (pes->data_index == PES_START_SIZE) {
                 /* we got all the PES or section header. We can now
                    decide */
 #if 0
@@ -1578,7 +1583,6 @@ static int mpegts_push_data(void *opaque,
                     if (!pes->st)
                         return AVERROR(ENOMEM);
 
-                    pes->state = MPEGTS_PESHEADER_FILL;
                     pes->total_size = AV_RB16(pes->header + 4);
                     /* NOTE: a zero total size means the PES size is
                        unbounded */
@@ -1733,12 +1737,23 @@ static void mpegts_push_section(void *opaque, const uint8_t *section, int sectio
     SectionHeader header;
     AVPacket *pkt = ts->pkt;
     const uint8_t *p = section, *p_end = section + section_len - 4;
+
     if (parse_section_header(&header, &p, p_end) < 0)
     {
         av_log(NULL, AV_LOG_DEBUG, "Unable to parse header\n");
         return;
     }
-    if (pkt->data) { /* We've already added at least one table. */
+
+    if (sect->new_packet && pkt && sect->st) {
+        int pktLen = section_len + 184; /* Add enough for a complete TS payload. */
+        sect->new_packet = 0;
+        if (av_new_packet(pkt, pktLen) == 0) {
+            memcpy(pkt->data, section, section_len);
+            memset(pkt->data+section_len, 0xff, pktLen-section_len);
+            pkt->stream_index = sect->st->index;
+            ts->stop_parse = 1;
+        }
+    } else if (pkt->data) { /* We've already added at least one table. */
         uint8_t *data = pkt->data;
         int space = pkt->size;
         int table_size = 0;
@@ -1754,17 +1769,6 @@ static void mpegts_push_section(void *opaque, const uint8_t *section, int sectio
             return;
         }
         memcpy(data, section, section_len);
-    } else if (pkt && sect->st) {
-        int pktLen = section_len + 184; /* Add enough for a complete TS payload. */
-        if (av_new_packet(pkt, pktLen) == 0) {
-            memcpy(pkt->data, section, section_len);
-            memset(pkt->data+section_len, 0xff, pktLen-section_len);
-            pkt->stream_index = sect->st->index;
-            pkt->pts = AV_NOPTS_VALUE;
-            pkt->dts = AV_NOPTS_VALUE;
-            pkt->pos = 0;
-            ts->stop_parse = 1;
-        }
    }
 }
 
@@ -1804,8 +1808,7 @@ static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream
 
 
 /* handle one TS packet */
-static void handle_packet(MpegTSContext *ts, const uint8_t *packet,
-                          int64_t position)
+static int handle_packet(MpegTSContext *ts, const uint8_t *packet)
 {
     AVFormatContext *s = ts->stream;
     MpegTSFilter *tss;
@@ -1813,12 +1816,13 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet,
     const uint8_t *p, *p_end;
     int64_t pos;
 
+    pid = AV_RB16(packet + 1) & 0x1fff;
+
     if (!ts->pids[0]) {
         /* make sure we're always scanning for new PAT's */
         ts->pat_filter = mpegts_open_section_filter(ts, PAT_PID, pat_cb, ts, 1);
     }
 
-    pid = ((packet[1] & 0x1f) << 8) | packet[2];
     is_start = packet[1] & 0x40;
     tss = ts->pids[pid];
     if (ts->auto_guess && tss == NULL && is_start) {
@@ -1826,7 +1830,7 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet,
         tss = ts->pids[pid];
     }
     if (!tss)
-        return;
+        return 0;
 
     /* continuity check (currently not used) */
     cc = (packet[3] & 0xf);
@@ -1837,9 +1841,9 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet,
     afc = (packet[3] >> 4) & 3;
     p = packet + 4;
     if (afc == 0) /* reserved value */
-        return;
+        return 0;
     if (afc == 2) /* adaptation field only */
-        return;
+        return 0;
     if (afc == 3) {
         /* skip adapation field */
         p += p[0] + 1;
@@ -1847,7 +1851,7 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet,
     /* if past the end of packet, ignore */
     p_end = packet + TS_PACKET_SIZE;
     if (p >= p_end)
-        return;
+        return 0;
 
     pos = url_ftell(ts->stream->pb);
     ts->pos47= pos % ts->raw_packet_size;
@@ -1857,14 +1861,14 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet,
             /* pointer field present */
             len = *p++;
             if (p + len > p_end)
-                return;
+                return 0;
             if (len && cc_ok) {
                 /* write remaining section bytes */
                 write_section_data(s, tss,
                                    p, len, 0);
                 /* check whether filter has been closed */
                 if (!ts->pids[pid])
-                    return;
+                    return 0;
             }
             p += len;
             if (p < p_end) {
@@ -1878,11 +1882,15 @@ static void handle_packet(MpegTSContext *ts, const uint8_t *packet,
             }
         }
     } else {
+        int ret;
         // Note: The position here points actually behind the current packet.
-        tss->u.pes_filter.pes_cb(tss->u.pes_filter.opaque, 
-                                 p, p_end - p, is_start,
-                                 pos - ts->raw_packet_size);
+        if ((ret = tss->u.pes_filter.pes_cb(tss->u.pes_filter.opaque, 
+                                            p, p_end - p, is_start,
+                                            pos - ts->raw_packet_size)) < 0)
+            return ret;
     }
+
+    return 0;
 }
 
 /* XXX: try to find a better synchro over several packets (use
@@ -1952,7 +1960,7 @@ static int handle_packets(MpegTSContext *ts, int nb_packets)
         ret = read_packet(pb, packet, ts->raw_packet_size, &pos);
         if (ret != 0)
             return ret;
-        handle_packet(ts, packet, pos);
+        handle_packet(ts, packet);
     }
     return 0;
 }
@@ -2389,7 +2397,7 @@ int mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
             buf++;
             len--;
         } else {
-            handle_packet(ts, buf, position);
+            handle_packet(ts, buf);
             buf += TS_PACKET_SIZE;
             len -= TS_PACKET_SIZE;
         }
