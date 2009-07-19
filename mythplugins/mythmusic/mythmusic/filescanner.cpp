@@ -25,7 +25,7 @@ FileScanner::FileScanner ()
 
     // Cache the directory ids from the database
     query.prepare("SELECT directory_id, LOWER(path) FROM music_directories");
-    if (query.exec() || query.isActive())
+    if (query.exec())
     {
         while(query.next())
         {
@@ -35,7 +35,7 @@ FileScanner::FileScanner ()
 
     // Cache the genre ids from the database
     query.prepare("SELECT genre_id, LOWER(genre) FROM music_genres");
-    if (query.exec() || query.isActive())
+    if (query.exec())
     {
         while(query.next())
         {
@@ -55,7 +55,7 @@ FileScanner::FileScanner ()
 
     // Cache the album ids from the database
     query.prepare("SELECT album_id, artist_id, LOWER(album_name) FROM music_albums");
-    if (query.exec() || query.isActive())
+    if (query.exec())
     {
         while(query.next())
         {
@@ -169,27 +169,24 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
                 "WHERE path = :DIRECTORY ;");
     query.bindValue(":DIRECTORY", directory);
 
-    if (query.exec() || query.isActive())
+    if (query.exec() && query.next())
     {
-        if (query.next())
-        {
             return query.value(0).toInt();
-        }
-        else
-        {
-            query.prepare("INSERT INTO music_directories (path, parent_id) "
-                        "VALUES (:DIRECTORY, :PARENTID);");
-            query.bindValue(":DIRECTORY", directory);
-            query.bindValue(":PARENTID", parentid);
+    }
+    else
+    {
+        query.prepare("INSERT INTO music_directories (path, parent_id) "
+                    "VALUES (:DIRECTORY, :PARENTID);");
+        query.bindValue(":DIRECTORY", directory);
+        query.bindValue(":PARENTID", parentid);
 
-            if (!query.exec() || !query.isActive()
-            || query.numRowsAffected() <= 0)
-            {
-                MythDB::DBError("music insert directory", query);
-                return -1;
-            }
-            return query.lastInsertId().toInt();
+        if (!query.exec() || !query.isActive()
+        || query.numRowsAffected() <= 0)
+        {
+            MythDB::DBError("music insert directory", query);
+            return -1;
         }
+        return query.lastInsertId().toInt();
     }
 
     MythDB::DBError("music select directory id", query);
