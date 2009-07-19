@@ -701,6 +701,7 @@
         </imagetype>
         <textarea name="message" from="basetextarea">
             <area>20,20,540,60</area>
+            <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
         <progressbar name="progressbar" from="baseprogressbar">
