@@ -7,7 +7,7 @@
             <bold>yes</bold>
         </font>
 
-        <area>193,87,413,426</area>
+        <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mz_function_popup.png</filename>
@@ -46,11 +46,6 @@
 
 
     <window name="zmconsole">
-
-        <font name="title" from="baselarge">
-            <color>#ffff00</color>
-            <bold>yes</bold>
-        </font>
 
         <font name="heading" from="basesmall">
             <color>#ffff00</color>
@@ -93,17 +88,15 @@
             <bold>no</bold>
         </font>
 
-        <textarea name="title" from="basetextarea">
-            <area>20,30,1240,50</area>
-            <font>title</font>
-            <align>allcenter</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Zone Minder Console</value>
         </textarea>
 
-        <imagetype name="topimage">
-            <area>25,95,1230,110</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>40,95,1200,100</area>
+        </shape>
 
         <textarea name="date_text" from="basetextarea">
             <area>60,100,300,80</area>
@@ -113,7 +106,7 @@
         </textarea>
 
         <textarea name="time_text" from="basetextarea">
-            <area>910,100,300,40</area>
+            <area>920,100,300,40</area>
             <font>date</font>
             <align>right</align>
         </textarea>
@@ -142,7 +135,7 @@
         </textarea>
 
         <textarea name="disk_text" from="basetextarea">
-            <area>910,165,300,40</area>
+            <area>920,165,300,40</area>
             <align>right</align>
             <font>info</font>
             <multiline>no</multiline>
@@ -168,31 +161,30 @@
         </textarea>
 
         <textarea name="label4" from="basetextarea">
-            <area>1090,220,100,30</area>
+            <area>1110,220,100,30</area>
             <font>basesmallyellow</font>
             <align>right</align>
             <value>Events</value>
         </textarea>
 
-        <imagetype name="bottomimage">
-            <area>25,240,1230,460</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="bottombackground" from="basebackground">
+            <area>40,250,1200,400</area>
+        </shape>
 
         <buttonlist name="monitor_list">
-            <area>40,270,1160,380</area>
+            <area>40,270,1180,380</area>
             <layout>vertical</layout>
             <spacing>5</spacing>
-            <buttonarea>0,0,1120,350</buttonarea>
+            <buttonarea>0,0,1180,350</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,1100,25</area>
+                <area>0,0,1180,25</area>
                 <state name="active">
                     <imagetype name="buttonimage">
                         <area>0,2,25,25</area>
                         <preserveaspect>yes</preserveaspect>
                     </imagetype>
                     <imagetype name="buttonbackground">
-                        <area>15,0,1170,25</area>
+                        <area>15,0,1180,25</area>
                         <gradient start="#505050" end="#000000" alpha="200" />
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
@@ -253,11 +245,6 @@
             </statetype>
         </buttonlist>
 
-        <imagetype name="showinglines">
-            <area>25,240,1230,420</area>
-            <filename>rk-lines.png</filename>
-        </imagetype>
-
         <textarea name="label">
             <area>340,650,600,40</area>
             <align>allcenter</align>
@@ -286,14 +273,6 @@
         <font name="selected" from="basesmall">
             <color>#00ff00</color>
             <size>18</size>
-            <bold>yes</bold>
-        </font>
-
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
             <bold>yes</bold>
         </font>
 
@@ -344,40 +323,38 @@
             <bold>no</bold>
         </font>
 
-        <textarea name="title" from="basetextarea">
-            <area>20,30,1240,50</area>
-            <font>title</font>
-            <align>hcenter,top</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Zone Minder Events</value>
         </textarea>
 
-        <imagetype name="image">
-            <area>25,85,1230,100</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>40,70,1200,95</area>
+        </shape>
 
         <textarea name="label1" from="basetextarea">
-            <area>60,95,200,50</area>
+            <area>60,85,200,50</area>
             <font>listlabel</font>
             <value>Select Camera</value>
         </textarea>
 
         <textarea name="label2" from="basetextarea">
-            <area>500,95,200,50</area>
+            <area>500,85,200,50</area>
             <font>listlabel</font>
             <value>Select Date</value>
         </textarea>
 
         <buttonlist name="camera_selector" from="basewideselector">
-            <position>62,120</position>
+            <position>62,110</position>
         </buttonlist>
 
         <buttonlist name="date_selector" from="basewideselector">
-            <position>500,120</position>
+            <position>500,110</position>
         </buttonlist>
 
         <textarea name="eventno_text" from="basetextarea">
-            <area>1080,135,120,50</area>
+            <area>1080,125,120,50</area>
             <font>label</font>
             <align>right</align>
             <value>0/0</value>
@@ -388,45 +365,44 @@
 
         <textarea name="layout1_title1" from="basetextarea">
             <context>1</context>
-            <area>70,185,130,30</area>
+            <area>70,175,130,30</area>
             <font>listlabel</font>
             <value>Event Name</value>
         </textarea>
 
         <textarea name="layout1_title2" from="basetextarea">
-            <area>415,185,130,30</area>
+            <area>415,175,130,30</area>
             <font>listlabel</font>
             <value>Camera</value>
         </textarea>
 
         <textarea name="layout1_title3" from="basetextarea">
-            <area>725,185,130,30</area>
+            <area>725,175,130,30</area>
             <font>listlabel</font>
             <value>Date/Time</value>
         </textarea>
 
         <textarea name="layout1_title4" from="basetextarea">
-            <area>1065,185,130,30</area>
+            <area>1075,175,130,30</area>
             <align>right</align>
             <font>listlabel</font>
             <value>Length</value>
         </textarea>
 
-        <imagetype name="layout1_image2">
-            <area>25,195,1230,485</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="layout1_image2" from="basebackground">
+            <area>40,200,1200,425</area>
+        </shape>
 
         <buttonlist name="layout1_eventlist">
-            <area>45,220,1160,400</area>
+            <area>45,220,1170,400</area>
             <layout>vertical</layout>
             <spacing>5</spacing>
-            <buttonarea>0,0,1160,400</buttonarea>
+            <buttonarea>0,0,1170,400</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,740,25</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
-                        <area>15,0,1145,30</area>
+                        <area>15,0,1155,30</area>
                         <gradient start="#505050" end="#000000" alpha="200" />
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
@@ -440,7 +416,7 @@
                         <area>680,4,300,25</area>
                     </textarea>
                     <textarea name="length" from="buttontext">
-                        <area>1020,4,130,25</area>
+                        <area>1030,4,130,25</area>
                         <align>right</align>
                     </textarea>
                 </state>
@@ -502,13 +478,12 @@
 
 <!--+++++++++++++++++++ layout 2 - 1 row +++++++++++++++++++++++++-->
 
-        <imagetype name="layout2_image2">
-            <area>25,175,1225,510</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="layout2_image2" from="basebackground">
+            <area>40,175,1200,450</area>
+        </shape>
 
         <buttonlist name="layout2_eventlist">
-            <area>220,200,800,440</area>
+            <area>220,200,800,410</area>
             <layout>grid</layout>
             <spacing>10</spacing>
             <buttonarea>0,0,800,400</buttonarea>
@@ -598,13 +573,12 @@
 
         <!--+++++++++++++++++++ layout 3 - grid view 6x2 +++++++++++++++++++++++++-->
 
-        <imagetype name="layout3_image2">
-            <area>25,175,1230,510</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="layout3_image2" from="basebackground">
+            <area>40,175,1200,450</area>
+        </shape>
 
         <buttonlist name="layout3_eventlist">
-            <area>60,200,1225,410</area>
+            <area>65,200,1225,410</area>
             <layout>grid</layout>
             <spacing>10</spacing>
             <buttonarea>0,0,1225,410</buttonarea>
@@ -688,32 +662,21 @@
             <bold>yes</bold>
         </font>
 
-        <font name="title" from="basesmall">
-            <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
-
         <font name="buttons" from="basesmall">
             <color>#ffffff</color>
             <size>12</size>
             <bold>yes</bold>
         </font>
 
-        <textarea name="title">
-            <context>1</context>
-            <area>20,30,1240,50</area>
-            <font>title</font>
-            <align>hcenter,top</align>
+        <textarea name="pagetitle" from="basetextarea">
+            <area>30,10,570,40</area>
+            <font>baselarge</font>
             <value>Zone Minder Event Player</value>
         </textarea>
 
-        <imagetype name="topimage">
-            <area>25,85,1230,90</area>
-            <filename>trans-cr-background.png</filename>
-        </imagetype>
+        <shape name="topbackground" from="basebackground">
+            <area>40,90,1200,80</area>
+        </shape>
 
         <textarea name="label1">
             <area>60,95,160,40</area>
