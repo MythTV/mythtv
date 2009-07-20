@@ -52,7 +52,6 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
 //     QString filename = mdata->Filename();
 //
 //     QByteArray local8bit = filename.toLocal8Bit();
-//     QByteArray ascii     = filename.toAscii();
 //     if ((av_open_input_file(&p_context, local8bit.constData(),
 //                             p_inputformat, 0, p_params) < 0))
 //     {
@@ -102,11 +101,8 @@ Metadata* MetaIOMP4::read(QString filename)
     AVInputFormat* p_inputformat = NULL;
 
     QByteArray local8bit = filename.toLocal8Bit();
-    QByteArray ascii     = filename.toAscii();
     if ((av_open_input_file(&p_context, local8bit.constData(),
-                           p_inputformat, 0, p_params) < 0) &&
-        (av_open_input_file(&p_context, ascii.constData(),
-                            p_inputformat, 0, p_params) < 0))
+                           p_inputformat, 0, p_params) < 0))
     {
         return NULL;
     }
@@ -199,11 +195,8 @@ int MetaIOMP4::getTrackLength(QString filename)
 
     // Open the specified file and populate the metadata info
     QByteArray local8bit = filename.toLocal8Bit();
-    QByteArray ascii     = filename.toAscii();
     if ((av_open_input_file(&p_context, local8bit.constData(),
-                           p_inputformat, 0, p_params) < 0) &&
-        (av_open_input_file(&p_context, ascii.constData(),
-                            p_inputformat, 0, p_params) < 0))
+                           p_inputformat, 0, p_params) < 0))
     {
         return 0;
     }
