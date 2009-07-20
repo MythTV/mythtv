@@ -2722,6 +2722,9 @@ void TV::timerEvent(QTimerEvent *te)
 
             if (mctx->IsNVPDecoderErrored())
             {
+                VERBOSE(VB_IMPORTANT, LOC +
+                    QString("Serious hardware decoder error detected. "
+                            "Disabling hardware decoders."));
                 noHardwareDecoders = true;
                 for (uint i = 0; i < player.size(); i++)
                     player[i]->SetNoHardwareDecoders();
