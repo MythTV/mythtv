@@ -22,10 +22,11 @@ using_backend {
 }
 
 # Input
-HEADERS += backendsettings.h   checksetup.h   exitprompt.h importicons.h
-HEADERS += channeleditor.h
-SOURCES += backendsettings.cpp checksetup.cpp exitprompt.cpp main.cpp
-SOURCES += importicons.cpp channeleditor.cpp
+HEADERS += backendsettings.h   channeleditor.h   checksetup.h
+HEADERS += exitprompt.h        importicons.h     startprompt.h
+SOURCES += backendsettings.cpp channeleditor.cpp checksetup.cpp
+SOURCES += exitprompt.cpp      importicons.cpp   startprompt.cpp
+SOURCES += main.cpp
 
 macx {
     mac_bundle {

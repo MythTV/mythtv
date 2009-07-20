@@ -8,6 +8,7 @@
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
 #include "remoteutil.h"
+#include "mythsystem.h"
 
 #include "checksetup.h"
 #include "exitprompt.h"
@@ -94,8 +95,24 @@ void ExitPrompter::handleExit()
 
 void ExitPrompter::quit()
 {
-    if (gContext->BackendIsRunning())
-        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+    // If the backend was stopped restart it here
+    if (gContext->GetSetting("AutoRestartBackend") == "1")
+    {
+        QString commandString = gContext->GetSetting("BackendStartCommand");
+        if (!commandString.isEmpty())
+        {
+            VERBOSE(VB_IMPORTANT, "backendrestart"+commandString);
+            myth_system(commandString);
+        }
+    }
+    else
+    {
+        // No need to run this if the backend has just restarted
+        if (gContext->BackendIsRunning())
+        {
+            RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+        }
+    }
 
     qApp->exit(GENERIC_EXIT_OK);
 }

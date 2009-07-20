@@ -31,10 +31,12 @@
 #include "libmythtv/remoteutil.h"
 #include "backendsettings.h"
 #include "checksetup.h"
+#include "startprompt.h"
 
 using namespace std;
 
-ExitPrompter   *exitPrompt = NULL;
+ExitPrompter   *exitPrompt  = NULL;
+StartPrompter  *startPrompt = NULL;
 
 void SetupMenuCallback(void* data, QString& selection)
 {
@@ -508,26 +510,9 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
-    QString warn =
-        QObject::tr("WARNING") + ": " +
-        QObject::tr("MythTV has detected that the backend is running.")+"\n\n"+
-        QObject::tr("Changing existing card inputs, deleting anything, "
-                    "or scanning for channels may not work.");
-
-    bool backendIsRunning = gContext->BackendIsRunning();
-
-    if (backendIsRunning)
-    {
-        DialogCode val = MythPopupBox::Show2ButtonPopup(
-            mainWindow, QObject::tr("WARNING"), warn,
-            QObject::tr("Continue"),
-            QObject::tr("Exit"), kDialogCodeButton0);
-
-        if (kDialogCodeButton1 == val)
-        {
-            return GENERIC_EXIT_OK;
-        }
-    }
+    if (!startPrompt)
+        startPrompt = new StartPrompter();
+    startPrompt->handleStart();
 
     REG_KEY("qt", "DELETE", "Delete", "D");
     REG_KEY("qt", "EDIT", "Edit", "E");

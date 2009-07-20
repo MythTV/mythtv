@@ -391,6 +391,28 @@ static HostLineEdit *WakeUpCommand()
     return gc;
 };
 
+static GlobalLineEdit *BackendStopCommand()
+{
+    GlobalLineEdit *gc = new GlobalLineEdit("BackendStopCommand");
+    gc->setLabel(QObject::tr("Backend Stop Command"));
+    gc->setValue("killall mythbackend");
+    gc->setHelpText(QObject::tr("The command used to stop the backend"
+                    " when running on the master backend server\n"
+                    "(e.g. sudo /etc/init.d/mythtv-backend stop)"));
+    return gc;
+};
+
+static GlobalLineEdit *BackendStartCommand()
+{
+    GlobalLineEdit *gc = new GlobalLineEdit("BackendStartCommand");
+    gc->setLabel(QObject::tr("Backend Start Command"));
+    gc->setValue("mythbackend");
+    gc->setHelpText(QObject::tr("The command used to start the backend"
+                    " when running on the master backend server\n"
+                    "(e.g. sudo /etc/init.d/mythtv-backend start)."));
+    return gc;
+};
+
 static GlobalSpinBox *idleTimeoutSecs()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("idleTimeoutSecs", 0, 1200, 5);
@@ -793,6 +815,12 @@ BackendSettings::BackendSettings() {
     group4->addChild(slaveBackend);
     addChild(group4);
 
+    VerticalConfigurationGroup* backendControl = new VerticalConfigurationGroup();
+    backendControl->setLabel(QObject::tr("Backend Control"));
+    backendControl->addChild(BackendStopCommand());
+    backendControl->addChild(BackendStartCommand());
+    addChild(backendControl);
+    
     VerticalConfigurationGroup* group5 = new VerticalConfigurationGroup(false);
     group5->setLabel(QObject::tr("Job Queue (Backend-Specific)"));
     group5->addChild(JobQueueMaxSimultaneousJobs());
