@@ -465,7 +465,7 @@ bool avfDecoderFactory::supports(const QString &source) const
 const QString &avfDecoderFactory::extension() const
 {
     static QString ext(".mp3|.mp2|.ogg|.flac|.wma|.wav|.ac3|.oma|.omg|.atp|"
-                       ".ra|.dts");
+                       ".ra|.dts|.aac|.m4a");
     return ext;
 }
 
