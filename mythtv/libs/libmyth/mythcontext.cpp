@@ -1549,7 +1549,7 @@ bool MythContext::IsMasterBackend(void)
 bool MythContext::BackendIsRunning(void)
 {
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
-    const char *command = "ps -ax | grep -i mythbackend | grep -v grep > /dev/null";
+    const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
 #else
     const char *command = "ps -ae | grep mythbackend > /dev/null";
 #endif
