@@ -39,7 +39,7 @@ using namespace std;
 
 bool updateLastRunEnd(MSqlQuery &query)
 {
-    QDateTime qdtNow = QDateTime::currentDateTime();                                     
+    QDateTime qdtNow = QDateTime::currentDateTime();
     query.prepare("UPDATE settings SET data = :ENDTIME "
                   "WHERE value='mythfilldatabaseLastRunEnd'");
 
@@ -55,7 +55,7 @@ bool updateLastRunEnd(MSqlQuery &query)
 
 bool updateLastRunStart(MSqlQuery &query)
 {
-    QDateTime qdtNow = QDateTime::currentDateTime();                                     
+    QDateTime qdtNow = QDateTime::currentDateTime();
     query.prepare("UPDATE settings SET data = :STARTTIME "
                   "WHERE value='mythfilldatabaseLastRunStart'");
 
@@ -70,7 +70,7 @@ bool updateLastRunStart(MSqlQuery &query)
 }
 
 bool updateLastRunStatus(MSqlQuery &query, QString &status)
-{                               
+{
     query.prepare("UPDATE settings SET data = :STATUS "
                   "WHERE value='mythfilldatabaseLastRunStatus'");
 
@@ -390,8 +390,26 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     QString filename = QString(tempfilename);
 
     QString home = QDir::homePath();
-    QString configfile = QString("%1/%2.xmltv").arg(GetConfDir())
-                                               .arg(source.name);
+
+    QString configfile;
+
+    MSqlQuery query1(MSqlQuery::InitCon());
+    query1.prepare("SELECT configpath FROM videosource"
+                   " WHERE sourceid = :ID AND configpath IS NOT NULL");
+    query1.bindValue(":ID", source.id);
+    if (!query1.exec())
+    {
+        MythDB::DBError("FillData::grabData", query1);
+        return false;
+    }
+
+    if (query1.next())
+        configfile = query1.value(0).toString();
+    else
+        configfile = QString("%1/%2.xmltv").arg(GetConfDir())
+                                           .arg(source.name);
+
+    VERBOSE(VB_GENERAL, QString("XMLTV config file is: %1").arg(configfile));
 
     QString command = QString("nice %1 --config-file '%2' --output %3")
         .arg(xmltv_grabber).arg(configfile).arg(filename);
@@ -640,7 +658,7 @@ bool FillData::Run(SourceList &sourcelist)
             {
                 bool ok = grabber_capabilities_proc.waitForFinished(15*1000);
 
-                if (ok && 
+                if (ok &&
                     QProcess::NormalExit ==
                     grabber_capabilities_proc.exitStatus())
                 {
@@ -700,7 +718,7 @@ bool FillData::Run(SourceList &sourcelist)
             {
                 bool ok = grabber_method_proc.waitForFinished(15*1000);
 
-                if (ok && 
+                if (ok &&
                     QProcess::NormalExit == grabber_method_proc.exitStatus())
                 {
                     grabber_method_proc

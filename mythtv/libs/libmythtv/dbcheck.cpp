@@ -18,7 +18,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1237";
+const QString currentDatabaseVersion = "1238";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4596,6 +4596,68 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1237", dbver))
+            return false;
+    }
+
+    if (dbver == "1237")
+    {
+        const char *updates[] = {
+"ALTER TABLE videosource ADD COLUMN configpath VARCHAR(4096) DEFAULT NULL;", NULL
+};
+
+        if (!performActualUpdate(updates, "1238", dbver))
+            return false;
+
+        bool ok = true;
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT name, sourceid FROM videosource");
+
+        if (!query.exec())
+        {
+            MythDB::DBError(
+                "Could not perform select for update to '1238'", query);
+            ok = false;
+        }
+        else
+        {
+            MSqlQuery query2(MSqlQuery::InitCon());
+            while (query.next())
+            {
+                QString videosource = query.value(0).toString();
+                QString configpath =
+                                gContext->GetSetting(QString("XMLTVConfig.%1")
+                                .arg(videosource));
+
+                if (!configpath.isEmpty())
+                {
+                    query2.prepare(
+                        "UPDATE videosource "
+                        "SET configpath = :PATH "
+                        "WHERE sourceid = :SOURCEID ");
+                    query2.bindValue(":PATH", configpath);
+                    query2.bindValue(":SOURCEID", query.value(1).toString());
+                    if (!query2.exec())
+                    {
+                         MythDB::DBError(
+                            "Could not perform update for '1238'", query2);
+                         ok = false;
+                    }
+                }
+            }
+        }
+        if (!ok)
+            return false;
+
+        MSqlQuery query3(MSqlQuery::InitCon());
+        query3.prepare("DELETE FROM settings WHERE value LIKE 'XMLTVConfig.%'");
+        if (!query3.exec())
+        {
+            MythDB::DBError(
+                "Could not perform update for '1238'", query3);
+            ok = false;
+        }
+
+        if (!ok)
             return false;
     }
 
