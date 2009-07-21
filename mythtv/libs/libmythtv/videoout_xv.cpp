@@ -633,8 +633,7 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
 
     // If use_xvmc try to create XvMC buffers
 #ifdef USING_XVMC
-    if (!done && (kCodec_STD_XVMC_BEGIN < mcodecid) &&
-        (mcodecid < kCodec_VLD_END))
+    if (!done && codec_is_xvmc(mcodecid))
     {
         // Create ffmpeg VideoFrames
         bool vld, idct, mc, dummy;
@@ -656,7 +655,7 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     }
 #endif // USING_XVMC
 
-    if (!done && mcodecid >= kCodec_NORMAL_END)
+    if (!done && !codec_is_std(mcodecid))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Failed to initialize buffers for codec %1")
@@ -1009,7 +1008,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     }
 
     bool ok = true;
-    if (disp && test_surface && ret > kCodec_NORMAL_END)
+    if (disp && test_surface && !codec_is_std(ret))
     {
         XvMCSurfaceInfo info;
 
@@ -3562,7 +3561,7 @@ static QStringList allowed_video_renderers(
     idct &= mc;
 
     QStringList list;
-    if (myth_codec_id < kCodec_NORMAL_END)
+    if (codec_is_std(myth_codec_id))
     {
         if (xv)
             list += "xv-blit";

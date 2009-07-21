@@ -137,7 +137,7 @@ bool VideoOutputOpenGL::InputChanged(const QSize &input_size,
 
     QMutexLocker locker(&gl_context_lock);
 
-    if (av_codec_id >= kCodec_NORMAL_END)
+    if (!codec_is_std(av_codec_id))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("New video codec is not supported."));
@@ -401,8 +401,7 @@ QStringList VideoOutputOpenGL::GetAllowedRenderers(
 
     QStringList list;
 
-    if (myth_codec_id < kCodec_NORMAL_END &&
-        !getenv("NO_OPENGL"))
+    if (codec_is_std(myth_codec_id) && !getenv("NO_OPENGL"))
     {
         list += "opengl";
     }

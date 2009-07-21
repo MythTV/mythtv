@@ -236,3 +236,107 @@ int myth2av_codecid(MythCodecID codec_id,
     } // switch(codec_id)
     return ret;
 }
+
+int mpeg_version(int codec_id)
+{
+    switch (codec_id)
+    {
+        case CODEC_ID_MPEG1VIDEO:
+            return 1;
+        case CODEC_ID_MPEG2VIDEO:
+        case CODEC_ID_MPEG2VIDEO_XVMC:
+        case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
+        case CODEC_ID_MPEG2VIDEO_DVDV:
+            return 2;
+        case CODEC_ID_H263:
+            return 3;
+        case CODEC_ID_MPEG4:
+            return 4;
+        case CODEC_ID_H264:
+            return 5;
+        case CODEC_ID_VC1:
+            return 6;
+        case CODEC_ID_WMV3:
+            return 7;
+        default:
+            break;
+    }
+    return 0;
+}
+
+QString get_encoding_type(MythCodecID codecid)
+{
+    switch (codecid)
+    {
+        case kCodec_NUV_RTjpeg:
+            return "RTjpeg";
+
+        case kCodec_MPEG1:
+        case kCodec_MPEG1_XVMC:
+        case kCodec_MPEG1_IDCT:
+        case kCodec_MPEG1_VLD:
+        case kCodec_MPEG1_DVDV:
+        case kCodec_MPEG1_VDPAU:
+        case kCodec_MPEG2:
+        case kCodec_MPEG2_XVMC:
+        case kCodec_MPEG2_IDCT:
+        case kCodec_MPEG2_VLD:
+        case kCodec_MPEG2_DVDV:
+        case kCodec_MPEG2_VDPAU:
+            return "MPEG-2";
+
+        case kCodec_H263:
+        case kCodec_H263_XVMC:
+        case kCodec_H263_IDCT:
+        case kCodec_H263_VLD:
+        case kCodec_H263_DVDV:
+        case kCodec_H263_VDPAU:
+            return "H.263";
+
+        case kCodec_NUV_MPEG4:
+        case kCodec_MPEG4:
+        case kCodec_MPEG4_IDCT:
+        case kCodec_MPEG4_XVMC:
+        case kCodec_MPEG4_VLD:
+        case kCodec_MPEG4_DVDV:
+        case kCodec_MPEG4_VDPAU:
+            return "MPEG-4";
+
+        case kCodec_H264:
+        case kCodec_H264_XVMC:
+        case kCodec_H264_IDCT:
+        case kCodec_H264_VLD:
+        case kCodec_H264_DVDV:
+        case kCodec_H264_VDPAU:
+            return "H.264";
+
+        case kCodec_NONE:
+        case kCodec_NORMAL_END:
+        case kCodec_STD_XVMC_END:
+        case kCodec_VLD_END:
+        case kCodec_DVDV_END:
+            return QString::null;
+    }
+
+    return QString::null;
+}
+
+QString get_decoder_name(MythCodecID codec_id, bool libmpeg2)
+{
+    if (libmpeg2)
+        return "libmpeg2";
+
+    if (codec_is_dvdv(codec_id))
+        return "macaccel";
+
+    if (codec_is_xvmc_std(codec_id))
+        return "xvmc";
+
+    if (codec_is_xvmc_vld(codec_id))
+        return "xvmc-vld";
+
+    if (codec_is_vdpau(codec_id))
+        return "vdpau";
+
+    return "ffmpeg";
+}

@@ -133,7 +133,7 @@ bool VDPAUContext::Init(MythXDisplay *disp, Window win, QSize screen_size,
     outputSize = screen_size;
     ParseOptions(options);
 
-    if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END))
+    if (codec_is_vdpau(mcodecid))
         vdpauDecode = true;
 
     bool ok;

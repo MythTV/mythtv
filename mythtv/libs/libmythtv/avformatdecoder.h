@@ -19,16 +19,6 @@ extern "C" {
 
 #include "avfringbuffer.h"
 
-#define CODEC_IS_MPEG(c)     (c == CODEC_ID_MPEG1VIDEO      || \
-                              c == CODEC_ID_MPEG2VIDEO      || \
-                              c == CODEC_ID_MPEG2VIDEO_DVDV || \
-                              c == CODEC_ID_MPEG2VIDEO_XVMC || \
-                              c == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
-
-#define CODEC_IS_HW_ACCEL(c) (c == CODEC_ID_MPEG2VIDEO_DVDV || \
-                              c == CODEC_ID_MPEG2VIDEO_XVMC || \
-                              c == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
-
 class TeletextDecoder;
 class CC608Decoder;
 class CC708Decoder;

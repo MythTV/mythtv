@@ -1071,7 +1071,7 @@ QStringList VideoOutputDirectfb::GetAllowedRenderers(
 
     QStringList list;
 
-    if (myth_codec_id < kCodec_NORMAL_END)
+    if (codec_is_std(myth_codec_id))
     {
         list += "directfb";
     }

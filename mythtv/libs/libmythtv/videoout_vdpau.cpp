@@ -70,7 +70,7 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     MoveResize();
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Created VDPAU context (%1 decode)")
-            .arg((m_codec_id < kCodec_NORMAL_END) ? "software" : "GPU"));
+            .arg(codec_is_std(m_codec_id) ? "software" : "GPU"));
 
     if (m_ctx->InitOSD(GetTotalOSDBounds().size()))
         m_osd_avail = true;
@@ -121,13 +121,12 @@ bool VideoOutputVDPAU::InitBuffers(void)
     bool ok = m_ctx->InitBuffers(video_dim.width(), video_dim.height(),
                                  NUM_VDPAU_BUFFERS, db_letterbox_colour);
 
-    if ((m_codec_id > kCodec_VDPAU_BEGIN) &&
-        (m_codec_id < kCodec_VDPAU_END) && ok)
+    if (codec_is_vdpau(m_codec_id) && ok)
     {
         ok = vbuffers.CreateBuffers(video_dim.width(),
                                     video_dim.height(), m_ctx);
     }
-    else if ((m_codec_id < kCodec_NORMAL_END) && ok)
+    else if (codec_is_std(m_codec_id) && ok)
     {
         ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
     }
@@ -482,7 +481,7 @@ QStringList VideoOutputVDPAU::GetAllowedRenderers(
     (void) video_dim;
     QStringList list;
 
-    if (((myth_codec_id < kCodec_NORMAL_END) ||
+    if ((codec_is_std(myth_codec_id) ||
          VDPAUContext::CheckCodecSupported(myth_codec_id)) &&
          !getenv("NO_VDPAU"))
     {

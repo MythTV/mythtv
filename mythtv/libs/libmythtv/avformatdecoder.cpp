@@ -1194,20 +1194,17 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
     // look for a vdpau capable codec
-    if (codec && video_codec_id > kCodec_VDPAU_BEGIN &&
-        video_codec_id < kCodec_VDPAU_END &&
-        !(codec->capabilities & CODEC_CAP_HWACCEL_VDPAU))
+    if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
         codec = find_vdpau_decoder(codec, enc->codec_id);
 
     if (selectedStream &&
         !gContext->GetNumSetting("DecodeExtraAudio", 0) &&
-        codec && !CODEC_IS_HW_ACCEL(codec->id))
+        !CODEC_IS_HWACCEL(codec))
     {
         SetLowBuffers(false);
     }
 
-    if (codec && (codec->id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                  codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
+    if (CODEC_IS_XVMC(codec))
     {
         enc->flags |= CODEC_FLAG_EMU_EDGE;
         enc->get_buffer = get_avf_buffer_xvmc;
@@ -1219,7 +1216,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         if (selectedStream)
             directrendering = true;
     }
-    else if (codec && codec->id == CODEC_ID_MPEG2VIDEO_DVDV)
+    else if (CODEC_IS_DVDV(codec))
     {
         enc->flags           |= (CODEC_FLAG_EMU_EDGE  |
 //                                 CODEC_FLAG_TRUNCATED |
@@ -1230,7 +1227,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band  = NULL;
         directrendering      |= selectedStream;
     }
-    else if (codec && codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
+    else if (CODEC_IS_VDPAU(codec))
     {
         enc->get_buffer      = get_avf_buffer_vdpau;
         enc->get_format      = get_format_vdpau;
@@ -1268,33 +1265,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                  keyframedist, aspect_ratio, kScan_Detect,
                                  dvd_video_codec_changed);
     }
-}
-
-static int mpeg_version(int codec_id)
-{
-    switch (codec_id)
-    {
-        case CODEC_ID_MPEG1VIDEO:
-            return 1;
-        case CODEC_ID_MPEG2VIDEO:
-        case CODEC_ID_MPEG2VIDEO_XVMC:
-        case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
-        case CODEC_ID_MPEG2VIDEO_DVDV:
-            return 2;
-        case CODEC_ID_H263:
-            return 3;
-        case CODEC_ID_MPEG4:
-            return 4;
-        case CODEC_ID_H264:
-            return 5;
-        case CODEC_ID_VC1:
-            return 6;
-        case CODEC_ID_WMV3:
-            return 7;
-        default:
-            break;
-    }
-    return 0;
 }
 
 #ifdef USING_XVMC
@@ -1683,7 +1653,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* osd dim      */ /*enc->width*/ 0, /*enc->height*/ 0,
                         /* mpeg type    */ mpeg_version(enc->codec_id),
                         /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
-                        /* test surface */ kCodec_NORMAL_END > video_codec_id,
+                        /* test surface */ codec_is_std(video_codec_id),
                         /* force_xv     */ force_xv);
 
                     if (mcid >= video_codec_id)
@@ -1701,8 +1671,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         }
 
                         video_codec_id = mcid;
-                        if (!force_xv && (kCodec_NORMAL_END < mcid) &&
-                            (kCodec_STD_XVMC_END > mcid))
+                        if (!force_xv && codec_is_xvmc_std(mcid))
                         {
                             enc->pix_fmt = (idct) ?
                                 PIX_FMT_XVMC_MPEG2_IDCT :
@@ -1720,7 +1689,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* pixel format */
                         (PIX_FMT_YUV420P == enc->pix_fmt) ? FOURCC_I420 : 0);
 
-                    if (quartx_mcid >= video_codec_id)
+                    if (quartz_mcid >= video_codec_id)
                     {
                         enc->codec_id = (CodecID) myth2av_codecid(quartz_mcid);
                         video_codec_id = quartz_mcid;
@@ -1729,7 +1698,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #endif // USING_DVDV
                 }
 
-                if (video_codec_id > kCodec_NORMAL_END)
+                if (codec_is_std(video_codec_id))
                     thread_count = 1;
 
                 VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
@@ -3442,8 +3411,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 if (dvd_xvmc_enabled && GetNVP() && GetNVP()->getVideoOutput())
                 {
                     bool dvd_xvmc_active = false;
-                    if (video_codec_id > kCodec_NORMAL_END &&
-                        video_codec_id < kCodec_VLD_END)
+                    if (codec_is_xvmc(video_codec_id))
                     {
                         dvd_xvmc_active = true;
                     }
@@ -3491,15 +3459,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         {
             AVCodecContext *context = curstream->codec;
 
-            if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
-                context->codec_id == CODEC_ID_MPEG2VIDEO ||
-                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
+            if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
             {
                 if (!ringBuffer->isDVD())
                     MpegPreProcessPkt(curstream, pkt);
             }
-            else if (context->codec_id == CODEC_ID_H264)
+            else if (CODEC_IS_H264(context->codec_id))
             {
                 H264PreProcessPkt(curstream, pkt);
             }
@@ -4173,26 +4138,7 @@ bool AvFormatDecoder::GenerateDummyVideoFrame(void)
 
 QString AvFormatDecoder::GetCodecDecoderName(void) const
 {
-    if (d && d->HasMPEG2Dec())
-        return "libmpeg2";
-
-    if ((video_codec_id > kCodec_VLD_END) &&
-        (video_codec_id < kCodec_DVDV_END))
-        return "macaccel";
-
-    if ((video_codec_id > kCodec_NORMAL_END) &&
-        (video_codec_id < kCodec_STD_XVMC_END))
-        return "xvmc";
-
-    if ((video_codec_id > kCodec_STD_XVMC_END) &&
-        (video_codec_id < kCodec_VLD_END))
-        return "xvmc-vld";
-
-    if ((video_codec_id > kCodec_DVDV_END) &&
-        (video_codec_id < kCodec_VDPAU_END))
-        return "vdpau";
-
-    return "ffmpeg";
+    return get_decoder_name(video_codec_id, (d && d->HasMPEG2Dec()));
 }
 
 void *AvFormatDecoder::GetVideoCodecPrivate(void)

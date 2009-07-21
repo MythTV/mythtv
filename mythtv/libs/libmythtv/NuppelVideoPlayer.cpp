@@ -6039,61 +6039,7 @@ VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
 
 QString NuppelVideoPlayer::GetEncodingType(void) const
 {
-    MythCodecID codecid = GetDecoder()->GetVideoCodecID();
-
-    switch (codecid)
-    {
-        case kCodec_NUV_RTjpeg:
-            return "RTjpeg";
-
-        case kCodec_MPEG1:
-        case kCodec_MPEG1_XVMC:
-        case kCodec_MPEG1_IDCT:
-        case kCodec_MPEG1_VLD:
-        case kCodec_MPEG1_DVDV:
-        case kCodec_MPEG1_VDPAU:
-        case kCodec_MPEG2:
-        case kCodec_MPEG2_XVMC:
-        case kCodec_MPEG2_IDCT:
-        case kCodec_MPEG2_VLD:
-        case kCodec_MPEG2_DVDV:
-        case kCodec_MPEG2_VDPAU:
-            return "MPEG-2";
-
-        case kCodec_H263:
-        case kCodec_H263_XVMC:
-        case kCodec_H263_IDCT:
-        case kCodec_H263_VLD:
-        case kCodec_H263_DVDV:
-        case kCodec_H263_VDPAU:
-            return "H.263";
-
-        case kCodec_NUV_MPEG4:
-        case kCodec_MPEG4:
-        case kCodec_MPEG4_IDCT:
-        case kCodec_MPEG4_XVMC:
-        case kCodec_MPEG4_VLD:
-        case kCodec_MPEG4_DVDV:
-        case kCodec_MPEG4_VDPAU:
-            return "MPEG-4";
-
-        case kCodec_H264:
-        case kCodec_H264_XVMC:
-        case kCodec_H264_IDCT:
-        case kCodec_H264_VLD:
-        case kCodec_H264_DVDV:
-        case kCodec_H264_VDPAU:
-            return "H.264";
-
-        case kCodec_NONE:
-        case kCodec_NORMAL_END:
-        case kCodec_STD_XVMC_END:
-        case kCodec_VLD_END:
-        case kCodec_DVDV_END:
-            return QString::null;
-    }
-
-    return QString::null;
+    return get_encoding_type(GetDecoder()->GetVideoCodecID());
 }
 
 bool NuppelVideoPlayer::GetRawAudioState(void) const

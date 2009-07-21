@@ -2,11 +2,15 @@
 #define _MYTH_CODEC_ID_H_
 
 #include <QString>
+extern "C"
+{
+#include "libs/libavcodec/avcodec.h"
+}
 
 typedef enum
 {
 // if you add anything to this list please update
-// myth2av_codecid, and NuppelVideoPlayer::GetEncodingType()
+// myth2av_codecid and get_encoding_type
     kCodec_NONE = 0,
 
     kCodec_NORMAL_BEGIN = kCodec_NONE,
@@ -74,6 +78,21 @@ typedef enum
 
 } MythCodecID;
 
+// MythCodecID convenience functions
+#define codec_is_std(id)      (id && (id < kCodec_NORMAL_END))
+#define codec_is_xvmc_std(id) (id && (id > kCodec_STD_XVMC_BEGIN) &&\
+                              (id < kCodec_STD_XVMC_END))
+#define codec_is_xvmc_vld(id) (id && (id > kCodec_VLD_BEGIN) &&\
+                              (id < kCodec_VLD_END))
+#define codec_is_xvmc(id)     (id && (id > kCodec_STD_XVMC_BEGIN) &&\
+                              (id < kCodec_VLD_END))
+#define codec_is_dvdv(id)     (id && (id > kCodec_DVDV_BEGIN) &&\
+                              (id < kCodec_DVDV_END))
+#define codec_is_vdpau(id)    (id && (id > kCodec_VDPAU_BEGIN) &&\
+                              (id < kCodec_VDPAU_END))
+
+QString get_encoding_type(MythCodecID codecid);
+QString get_decoder_name(MythCodecID codec_id, bool libmpeg2);
 QString toString(MythCodecID codecid);
 int myth2av_codecid(MythCodecID codec_id, bool &vld, bool &idct, bool &mc,
                     bool &vdpau);
@@ -82,5 +101,20 @@ inline int myth2av_codecid(MythCodecID codec_id)
     bool vld, idct, mc, vdpau;
     return myth2av_codecid(codec_id, vld, idct, mc, vdpau);
 }
+
+// AV codec id convenience functions
+int mpeg_version(int codec_id);
+#define CODEC_IS_H264(id)     (mpeg_version(id) == 5)
+#define CODEC_IS_MPEG(id)     (mpeg_version(id) <= 2)
+#define CODEC_IS_FFMPEG_MPEG(id) (CODEC_IS_MPEG(id) &&\
+                                 (id != CODEC_ID_MPEG2VIDEO_DVDV))
+#define CODEC_IS_XVMC(codec) (codec && (codec->id == CODEC_ID_MPEG2VIDEO_XVMC ||\
+                              codec->id == CODEC_ID_MPEG2VIDEO_XVMC_VLD))
+#define CODEC_IS_DVDV(codec) (codec && (codec->id == CODEC_ID_MPEG2VIDEO_DVDV))
+#define CODEC_IS_VDPAU(codec) (codec &&\
+                               codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
+#define CODEC_IS_HWACCEL(codec)  (CODEC_IS_XVMC(codec)  ||\
+                                  CODEC_IS_VDPAU(codec) ||\
+                                  CODEC_IS_DVDV(codec))
 
 #endif // _MYTH_CODEC_ID_H_

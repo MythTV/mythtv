@@ -77,7 +77,7 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
             .arg(input_size.width())
             .arg(input_size.height()).arg(aspect));
 
-    if (av_codec_id >= kCodec_NORMAL_END)
+    if (!codec_is_std(av_codec_id))
     {
         VERBOSE(VB_IMPORTANT, QString("VideoOutputNull::InputChanged(): "
                                       "new video codec is not supported."));

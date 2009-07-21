@@ -1175,7 +1175,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
         data->dvdv    = (DVDV*) codec_private;
 
         if ((data->dvdv && (kCodec_MPEG2_DVDV != myth_codec_id)) ||
-            (!data->dvdv && (kCodec_NORMAL_END <= myth_codec_id)))
+            (!data->dvdv && !codec_is_std(myth_codec_id)))
         {
             return false;
         }
@@ -1225,7 +1225,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
             .arg(winx).arg(winy).arg(winw).arg(winh).arg(embedid));
 
     if ((data->dvdv && (kCodec_MPEG2_DVDV != myth_codec_id)) ||
-        (!data->dvdv && (kCodec_NORMAL_END <= myth_codec_id)))
+        (!data->dvdv && !codec_is_std(myth_codec_id)))
     {
         return false;
     }
@@ -1770,7 +1770,7 @@ QStringList VideoOutputQuartz::GetAllowedRenderers(
     {
         list += "quartz-accel";
     }
-    else if (kCodec_MPEG2_DVDV != myth_codec_id)
+    else if (codec_is_std(myth_codec_id))
     {
         list += "quartz-blit";
     }
