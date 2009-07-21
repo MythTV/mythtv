@@ -94,7 +94,7 @@ static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
     AVCodec *codec = c;
     while (codec)
     {
-        if (codec->id == id && codec->capabilities & CODEC_CAP_HWACCEL_VDPAU)
+        if (codec->id == id && CODEC_IS_VDPAU(codec))
             return codec;
 
         codec = codec->next;
@@ -1581,7 +1581,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 // HACK -- begin
                 // ffmpeg is unable to compute H.264 bitrates in mpegts?
-                if (CODEC_ID_H264 == enc->codec_id && enc->bit_rate == 0)
+                if (CODEC_IS_H264(enc->codec_id) && enc->bit_rate == 0)
                     enc->bit_rate = 500000;
                 // HACK -- end
 
@@ -1698,7 +1698,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #endif // USING_DVDV
                 }
 
-                if (codec_is_std(video_codec_id))
+                if (!codec_is_std(video_codec_id))
                     thread_count = 1;
 
                 VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
@@ -1712,7 +1712,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
                 if (!handled)
                 {
-                    if (CODEC_ID_H264 == enc->codec_id)
+                    if (CODEC_IS_H264(enc->codec_id))
                         video_codec_id = kCodec_H264;
                     else
                         video_codec_id = kCodec_MPEG2; // default to MPEG2
@@ -1728,10 +1728,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 }
 
                 // Initialize alternate decoders when needed...
-                if (((dec == "libmpeg2") &&
-                     (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
-                      CODEC_ID_MPEG2VIDEO == enc->codec_id)) ||
-                    (CODEC_ID_MPEG2VIDEO_DVDV == enc->codec_id))
+                if ((dec == "libmpeg2") &&
+                    (CODEC_IS_MPEG(enc->codec_id)))
                 {
                     d->InitMPEG2(dec);
 
@@ -1863,9 +1861,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
         // select vdpau capable decoder if needed
         else if (enc->codec_type == CODEC_TYPE_VIDEO &&
-                 video_codec_id > kCodec_VDPAU_BEGIN &&
-                 video_codec_id < kCodec_VDPAU_END &&
-                 !(codec->capabilities & CODEC_CAP_HWACCEL_VDPAU))
+                 codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
         {
             codec = find_vdpau_decoder(codec, enc->codec_id);
         }
