@@ -50,10 +50,6 @@ using namespace std;
 #include "fourcc.h"
 #include "mythmainwindow.h"
 #include "myth_imgconvert.h"
-
-// MythTV OpenGL headers
-#include "openglcontext.h"
-
 #include "mythuihelper.h"
 
 #define LOC      QString("VideoOutputXv: ")
@@ -87,8 +83,7 @@ static QStringList allowed_video_renderers(
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
                        bool &useXV, bool &useShm);
 static void SetFromHW(MythXDisplay *d, Window curwin,
-                      bool &useXvMC, bool &useXV,
-                      bool &useShm, bool &useXvMCOpenGL);
+                      bool &useXvMC, bool &useXV, bool &useShm);
 static int calc_hue_base(const QString &adaptor_name);
 
 const char *vr_str[] =
@@ -976,14 +971,13 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv, use_shm);
 
     // Disable features based on hardware capabilities.
-    bool use_xvmc_opengl = use_xvmc;
     MythXDisplay *disp = OpenMythXDisplay();
     Window root;
     if (disp)
     {
         MythXLocker lock(disp);
         root = DefaultRootWindow(disp->GetDisplay());
-        SetFromHW(disp, root, use_xvmc, use_xv, use_shm, use_xvmc_opengl);
+        SetFromHW(disp, root, use_xvmc, use_xv, use_shm);
     }
 
     MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
@@ -3478,7 +3472,7 @@ static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
 
 static void SetFromHW(MythXDisplay *d,    Window  curwin,
                       bool    &useXvMC,   bool   &useXVideo,
-                      bool    &useShm,    bool   &useXvMCOpenGL)
+                      bool    &useShm)
 {
     (void)d;
     (void)curwin;
@@ -3532,15 +3526,6 @@ static void SetFromHW(MythXDisplay *d,    Window  curwin,
         if ((dispname) && (*dispname == ':'))
             useShm = (bool) XShmQueryExtension(d->GetDisplay());
     }
-
-    if (useXvMCOpenGL)
-    {
-        useXvMCOpenGL = false;
-#ifdef USING_XVMC_OPENGL
-        bool glx_1_3 = OpenGLContextGLX::IsGLXSupported(d, 1, 3);
-        useXvMCOpenGL = (useXvMC && glx_1_3);
-#endif // USING_XVMC_OPENGL
-    }
 }
 
 static QStringList allowed_video_renderers(
@@ -3549,15 +3534,14 @@ static QStringList allowed_video_renderers(
     if (!curwin)
         curwin = display->GetRoot();
 
-    bool vld, idct, mc, xv, shm, xvmc_opengl, dummy;
+    bool vld, idct, mc, xv, shm,  dummy;
 
     myth2av_codecid(myth_codec_id, vld, idct, mc, dummy);
 
     xv = shm = !vld && !idct;
-    xvmc_opengl = vld || idct || mc;
 
     SetFromEnv(vld, idct, mc, xv, shm);
-    SetFromHW(display, curwin, mc, xv, shm, xvmc_opengl);
+    SetFromHW(display, curwin, mc, xv, shm);
     idct &= mc;
 
     QStringList list;
@@ -3573,8 +3557,6 @@ static QStringList allowed_video_renderers(
     {
         if (vld || idct || mc)
             list += "xvmc-blit";
-        if ((vld || idct || mc) && xvmc_opengl)
-            list += "xvmc-opengl";
     }
     return list;
 }
