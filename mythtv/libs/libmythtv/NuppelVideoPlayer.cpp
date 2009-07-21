@@ -220,7 +220,7 @@ NuppelVideoPlayer::NuppelVideoPlayer()
       audio_passthru_device(QString::null),
       audio_channels(2),            audio_bits(-1),
       audio_samplerate(44100),      audio_stretchfactor(1.0f),
-      audio_codec(NULL),
+      audio_codec(NULL),            audio_lock(QMutex::Recursive),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
       // Preview window support
@@ -306,6 +306,7 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 {
     QMutexLocker lk1(&vidExitLock);
     QMutexLocker lk2(&videofiltersLock);
+    QMutexLocker lk3(&audio_lock);
 
     if (audioOutput)
     {
@@ -408,8 +409,9 @@ void NuppelVideoPlayer::SetAudioInfo(const QString &main_device,
     audio_samplerate      = (int)samplerate;
 }
 
-uint NuppelVideoPlayer::GetVolume(void) const
+uint NuppelVideoPlayer::GetVolume(void)
 {
+    QMutexLocker lock(&audio_lock);
     if (audioOutput)
         return audioOutput->GetCurrentVolume();
     return 0;
@@ -417,6 +419,7 @@ uint NuppelVideoPlayer::GetVolume(void) const
 
 bool NuppelVideoPlayer::SetMuted(bool mute)
 {
+    QMutexLocker lock(&audio_lock);
     bool is_muted = IsMuted();
 
     if (audioOutput && !is_muted && mute &&
@@ -439,6 +442,7 @@ bool NuppelVideoPlayer::SetMuted(bool mute)
 
 MuteState NuppelVideoPlayer::SetMuteState(MuteState mstate)
 {
+    QMutexLocker lock(&audio_lock);
     if (audioOutput)
         return audioOutput->SetMuteState(mstate);
     return kMuteAll;
@@ -446,14 +450,16 @@ MuteState NuppelVideoPlayer::SetMuteState(MuteState mstate)
 
 MuteState NuppelVideoPlayer::IncrMuteState(void)
 {
+    QMutexLocker lock(&audio_lock);
     MuteState mstate = kMuteAll;
     if (audioOutput)
         mstate = SetMuteState(VolumeBase::NextMuteState(GetMuteState()));
     return mstate;
 }
 
-MuteState NuppelVideoPlayer::GetMuteState(void) const
+MuteState NuppelVideoPlayer::GetMuteState(void)
 {
+    QMutexLocker lock(&audio_lock);
     if (audioOutput)
         return audioOutput->GetMuteState();
     return kMuteAll;
@@ -461,6 +467,7 @@ MuteState NuppelVideoPlayer::GetMuteState(void) const
 
 uint NuppelVideoPlayer::AdjustVolume(int change)
 {
+    QMutexLocker lock(&audio_lock);
     if (audioOutput)
         audioOutput->AdjustCurrentVolume(change);
     return GetVolume();
@@ -497,11 +504,13 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     PauseVideo(waitvideo);
     internalPauseLock.unlock();
 
+    audio_lock.lock();
     if (audioOutput)
     {
         audio_paused = true;
         audioOutput->Pause(true);
     }
+    audio_lock.unlock();
     if (player_ctx->buffer)
         player_ctx->buffer->Pause();
 
@@ -533,8 +542,10 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     UnpauseVideo();
     internalPauseLock.unlock();
 
+    audio_lock.lock();
     if (audioOutput && unpauseaudio)
         audio_paused = false;
+    audio_lock.unlock();
     if (player_ctx->buffer)
         player_ctx->buffer->Unpause();
 
@@ -545,10 +556,12 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     return true;
 }
 
-bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible) const
+bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible)
 {
     bool rbf_playing = player_ctx->buffer && !player_ctx->buffer->isPaused();
+    audio_lock.lock();
     bool aud_playing = audioOutput && !audioOutput->IsPaused();
+    audio_lock.unlock();
     if (is_pause_still_possible)
     {
         bool decoder_pausing = (0.0f == next_play_speed) && !next_normal_speed;
@@ -635,12 +648,14 @@ void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
     if (prebuffer != prebuffering)
     {
         prebuffering = prebuffer;
+        audio_lock.lock();
         if (audioOutput && !paused)
         {
             if (prebuffering)
                 audioOutput->Pause(prebuffering);
             audio_paused = prebuffering;
         }
+        audio_lock.unlock();
     }
 
     if (!prebuffering)
@@ -875,6 +890,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
 
 QString NuppelVideoPlayer::ReinitAudio(void)
 {
+    QMutexLocker lock(&audio_lock);
     QString errMsg = QString::null;
 
     if ((audio_bits <= 0) || (audio_channels <= 0) || (audio_samplerate <= 0))
@@ -2685,6 +2701,7 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
             return true;
         }
 
+        audio_lock.lock();
         if (!player_ctx->buffer->InDVDMenuOrStillFrame() &&
             !audio_paused && audioOutput)
         {
@@ -2692,6 +2709,7 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
                 audioOutput->Pause(prebuffering);
             audio_paused = prebuffering;
         }
+        audio_lock.unlock();
 
         VERBOSE(VB_PLAYBACK, LOC + QString("Waiting for prebuffer.. %1 %2")
                 .arg(prebuffer_tries_total + prebuffer_tries, 2)
@@ -2903,6 +2921,8 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     }
     videofiltersLock.unlock();
 
+    // NB This should probably be locked via audio_lock but doing so
+    //    here causes significant playback problems
     if (audioOutput && !audio_paused && audioOutput->IsPaused())
         audioOutput->Pause(false);
 
@@ -3460,6 +3480,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
     if (player_ctx->buffer->isDVD())
         player_ctx->buffer->DVD()->SetParent(this);
 
+    audio_lock.lock();
     if (audioOutput)
     {
         audio_paused = true;
@@ -3482,6 +3503,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
         return false;
     }
+    audio_lock.unlock();
 
     if (!using_null_videoout && !player_ctx->IsPIP())
     {
@@ -3843,9 +3865,11 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
     pthread_join(output_video, NULL);
 
     // need to make sure video has exited first.
+    audio_lock.lock();
     if (audioOutput)
         delete audioOutput;
     audioOutput = NULL;
+    audio_lock.unlock();
 
     if (player_ctx->buffer->isDVD())
         player_ctx->buffer->DVD()->SetParent(NULL);
@@ -4498,6 +4522,7 @@ void NuppelVideoPlayer::DoPlay(void)
                     .arg((disable) ? "disable" : "allow"));
             decoder->SetDisablePassThrough(disable);
         }
+        audio_lock.lock();
         if (audioOutput)
         {
             audioOutput->SetStretchFactor(play_speed);
@@ -4505,6 +4530,7 @@ void NuppelVideoPlayer::DoPlay(void)
             audioOutput->Reset();
 #endif
         }
+        audio_lock.unlock();
     }
 
     VERBOSE(VB_PLAYBACK, LOC + "DoPlay() -- setting unpaused");
@@ -4846,8 +4872,10 @@ void NuppelVideoPlayer::ClearAfterSeek(bool clearvideobuffers)
     }
 
     SetPrebuffering(true);
+    audio_lock.lock();
     if (audioOutput)
         audioOutput->Reset();
+    audio_lock.unlock();
 
     if (osd)
     {

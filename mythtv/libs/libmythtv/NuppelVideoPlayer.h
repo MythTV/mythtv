@@ -186,11 +186,11 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float   GetVideoAspect(void) const        { return video_aspect; }
     float   GetFrameRate(void) const          { return video_frame_rate; }
 
-    uint    GetVolume(void) const;
+    uint    GetVolume(void);
     int     GetSecondsBehind(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
-    MuteState          GetMuteState(void) const;
+    MuteState          GetMuteState(void);
     CommSkipMode       GetAutoCommercialSkip(void) const;
 
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
@@ -226,7 +226,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool    HasAudioOut(void) const           { return !no_audio_out; }
     bool    IsPIPActive(void) const           { return pip_active; }
     bool    IsPIPVisible(void) const          { return pip_visible; }
-    bool    IsMuted(void) const        { return GetMuteState() == kMuteAll; }
+    bool    IsMuted(void)              { return GetMuteState() == kMuteAll; }
     bool    IsIVTVDecoder(void) const;
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
@@ -256,7 +256,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void Pause(bool waitvideo = true);
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
-    bool IsPaused(bool *is_pause_still_possible = NULL) const;
+    bool IsPaused(bool *is_pause_still_possible = NULL);
 
     // Seek stuff
     bool FastForward(float seconds);
@@ -716,6 +716,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float    audio_stretchfactor;
     void    *audio_codec;
     bool     audio_passthru;
+    QMutex   audio_lock;
 
     // Picture-in-Picture
     mutable QMutex pip_players_lock;
