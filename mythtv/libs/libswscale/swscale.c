@@ -439,6 +439,8 @@ const char *sws_format_name(enum PixelFormat format)
             return "xvmc_mpeg2_mc";
         case PIX_FMT_XVMC_MPEG2_IDCT:
             return "xvmc_mpeg2_idct";
+        case PIX_FMT_XVMC_MPEG2_VLD:
+            return "xvmc_mpeg2_vld";
         case PIX_FMT_UYVY422:
             return "uyvy422";
         case PIX_FMT_UYYVYY411:

@@ -1105,6 +1105,12 @@ static float normalized_fps(AVStream *stream, AVCodecContext *enc)
     return fps;
 }
 
+static bool IS_XVMC_VLD_PIX_FMT(enum PixelFormat fmt)
+{
+    return
+        fmt == PIX_FMT_XVMC_MPEG2_VLD;
+}
+
 static bool IS_XVMC_PIX_FMT(enum PixelFormat fmt)
 {
     return
@@ -1120,6 +1126,18 @@ static bool IS_VDPAU_PIX_FMT(enum PixelFormat fmt)
         fmt == PIX_FMT_VDPAU_MPEG2 ||
         fmt == PIX_FMT_VDPAU_WMV3  ||
         fmt == PIX_FMT_VDPAU_VC1;
+}
+
+static enum PixelFormat get_format_xvmc_vld(struct AVCodecContext *avctx,
+                                            const enum PixelFormat *fmt)
+{
+    int i = 0;
+
+    for(i=0; fmt[i]!=PIX_FMT_NONE; i++)
+        if (IS_XVMC_VLD_PIX_FMT(fmt[i]))
+            break;
+
+    return fmt[i];
 }
 
 static enum PixelFormat get_format_xvmc(struct AVCodecContext *avctx,
@@ -1208,7 +1226,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     {
         enc->flags |= CODEC_FLAG_EMU_EDGE;
         enc->get_buffer = get_avf_buffer_xvmc;
-        enc->get_format = get_format_xvmc;
+        enc->get_format = (codec->id == CODEC_ID_MPEG2VIDEO_XVMC) ? get_format_xvmc : get_format_xvmc_vld;
         enc->release_buffer = release_avf_buffer_xvmc;
         enc->draw_horiz_band = render_slice_xvmc;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER |

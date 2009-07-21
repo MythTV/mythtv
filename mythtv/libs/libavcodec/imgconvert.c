@@ -351,6 +351,10 @@ static const PixFmtInfo pix_fmt_info[PIX_FMT_NB] = {
         .name = "xvmcidct",
         .is_hwaccel = 1,
     },
+    [PIX_FMT_XVMC_MPEG2_VLD] = {
+        .name = "xvmc-vld",
+        .is_hwaccel = 1,
+    },
     [PIX_FMT_VDPAU_MPEG1] = {
         .name = "vdpau_mpeg1",
         .is_hwaccel = 1,

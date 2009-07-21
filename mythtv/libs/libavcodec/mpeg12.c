@@ -80,6 +80,7 @@ extern void DVDV_decode_mb(MpegEncContext *s);
 static const enum PixelFormat pixfmt_xvmc_mpg2_420[] = {
                                            PIX_FMT_XVMC_MPEG2_IDCT,
                                            PIX_FMT_XVMC_MPEG2_MC,
+                                           PIX_FMT_XVMC_MPEG2_VLD,
                                            PIX_FMT_NONE};
 
 uint8_t ff_mpeg12_static_rl_table_store[2][2][2*MAX_RUN + MAX_LEVEL + 3];
@@ -1351,7 +1352,7 @@ static enum PixelFormat mpeg_get_pixelformat(AVCodecContext *avctx){
     Mpeg1Context *s1 = avctx->priv_data;
     MpegEncContext *s = &s1->mpeg_enc_ctx;
 
-    if(avctx->xvmc_acceleration)
+    if(avctx->xvmc_acceleration || avctx->xvmc_vld_hwslice)
         return avctx->get_format(avctx,pixfmt_xvmc_mpg2_420);
     else if(avctx->codec->capabilities&CODEC_CAP_HWACCEL_VDPAU){
         if(avctx->codec_id == CODEC_ID_MPEG1VIDEO)
@@ -2791,6 +2792,7 @@ static int mpeg_xvmc_vld_decode_init(AVCodecContext *avctx){
     mpeg_decode_init(avctx);
     s = avctx->priv_data;
 
+    avctx->pix_fmt = PIX_FMT_XVMC_MPEG2_VLD;
     avctx->xvmc_vld_hwslice = 1;
 
     return 0;
