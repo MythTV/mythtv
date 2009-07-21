@@ -46,7 +46,6 @@ typedef struct PESContext PESContext;
 typedef struct SectionContext SectionContext;
 
 static PESContext* add_pes_stream(MpegTSContext *ts, int pid, int pcr_pid, int stream_type);
-static AVStream* new_pes_av_stream(PESContext *pes, uint32_t prog_reg_desc, uint32_t code);
 static AVStream *new_section_av_stream(SectionContext *sect, uint32_t code);
 static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream_type);
 static void mpegts_cleanup_streams(MpegTSContext *ts);
@@ -581,6 +580,8 @@ static const StreamType HDMV_types[] = {
 static const StreamType MISC_types[] = {
     { 0x81, CODEC_TYPE_AUDIO,   CODEC_ID_AC3 },
     { 0x8a, CODEC_TYPE_AUDIO,   CODEC_ID_DTS },
+    { 0x100, CODEC_TYPE_SUBTITLE, CODEC_ID_DVB_SUBTITLE },
+    { 0x101, CODEC_TYPE_DATA,     CODEC_ID_DVB_VBI },
     { 0 },
 };
 
@@ -625,12 +626,10 @@ static AVStream *new_pes_av_stream(PESContext *pes, uint32_t prog_reg_desc, uint
     st->need_parsing = AVSTREAM_PARSE_FULL;
     pes->st = st;
 
-#define DEBUG
     dprintf(pes->stream, "stream_type=%x pid=%x prog_reg_desc=%.4s\n",
             pes->stream_type, pes->pid, (char*)&prog_reg_desc);
 
     st->codec->codec_tag = pes->stream_type;
-#undef DEBUG
 
     mpegts_find_stream_type(st, pes->stream_type, ISO_types);
     if (prog_reg_desc == AV_RL32("HDMV") &&
@@ -1174,7 +1173,7 @@ static void mpegts_add_stream(MpegTSContext *ts, pmt_entry_t* item, uint32_t pro
             }
 
             /* Pretend it's audio if we have a language. */
-            st = new_pes_av_stream(pes, prog_reg_desc, item->dvbci.language[0] ? 0x1c0 : 0);
+            st = new_pes_av_stream(pes, prog_reg_desc, 0);
             if (!st)
             {
                 av_log(NULL, AV_LOG_ERROR, "mpegts_add_stream: "
