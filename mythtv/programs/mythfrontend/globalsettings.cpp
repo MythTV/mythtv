@@ -2126,17 +2126,6 @@ static HostCheckBox *AutomaticSetWatched()
     return gc;
 }
 
-static HostCheckBox *GeneratePreviewPixmaps()
-{
-    HostCheckBox *gc = new HostCheckBox("GeneratePreviewPixmaps");
-    gc->setLabel(QObject::tr("Display thumbnail preview images of "
-                 "recordings"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, a static image of the recording will "
-                    "be displayed on the \"Watch a Recording\" menu."));
-    return gc;
-}
-
 static GlobalSpinBox *PreviewPixmapOffset()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("PreviewPixmapOffset", 0, 600, 1);
@@ -4774,7 +4763,6 @@ PlaybackSettings::PlaybackSettings()
                    QString(" (%1/%2)").arg(++i).arg(total));
     pbox->addChild(PlayBoxOrdering());
     pbox->addChild(PlayBoxEpisodeSort());
-    pbox->addChild(GeneratePreviewPixmaps());
     pbox->addChild(GeneratePreviewRemotely());
     pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PreviewFromBookmark());
@@ -4965,7 +4953,7 @@ GeneralSettings::GeneralSettings()
     general2->addChild(RecordOverTime());
     general2->addChild(CategoryOverTimeSettings());
     addChild(general2);
-    
+
     VerticalConfigurationGroup* changrp = new VerticalConfigurationGroup(false);
     changrp->setLabel(QObject::tr("General (Channel Groups)"));
     ChannelGroupSettings *changroupsettings = new ChannelGroupSettings();
