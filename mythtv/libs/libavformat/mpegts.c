@@ -573,6 +573,10 @@ static const StreamType ISO_types[] = {
 static const StreamType HDMV_types[] = {
     { 0x81, CODEC_TYPE_AUDIO, CODEC_ID_AC3 },
     { 0x82, CODEC_TYPE_AUDIO, CODEC_ID_DTS },
+    { 0x83, CODEC_TYPE_AUDIO, CODEC_ID_AC3 },
+    { 0x84, CODEC_TYPE_AUDIO, CODEC_ID_AC3 },
+    { 0x85, CODEC_TYPE_AUDIO, CODEC_ID_DTS },
+    { 0x86, CODEC_TYPE_AUDIO, CODEC_ID_DTS },
     { 0 },
 };
 
@@ -997,6 +1001,11 @@ static int is_desired_stream(int stream_type)
         case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
+        case STREAM_TYPE_AUDIO_HDMV_AC3_PLUS:
+        case STREAM_TYPE_AUDIO_HDMV_AC3_TRUE_HD:
+        case STREAM_TYPE_AUDIO_HDMV_DTS:
+        case STREAM_TYPE_AUDIO_HDMV_DTS_HD:
+        case STREAM_TYPE_AUDIO_HDMV_DTS_HD_MASTER:
             //case STREAM_TYPE_PRIVATE_DATA:
         case STREAM_TYPE_VBI_DVB:
         case STREAM_TYPE_SUBTITLE_DVB:
