@@ -55,11 +55,8 @@ MythNews::MythNews(MythScreenStack *parent, QString name) :
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    m_zoom = QString("-z %1")
-           .arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
-    m_browser = gContext->GetSetting("WebBrowserCommand",
-                                     GetInstallPrefix() +
-                                     "/bin/mythbrowser");
+    m_zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4");
+    m_browser = gContext->GetSetting("WebBrowserCommand", "");
 
     // Initialize variables
 
@@ -776,16 +773,33 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
     if (article.enclosure().isEmpty())
     {
         QString cmdUrl(article.articleURL());
-        cmdUrl.replace('\'', "%27");
 
-        QString cmd = QString("%1 %2 '%3'")
-            .arg(m_browser)
-            .arg(m_zoom)
-            .arg(cmdUrl);
-        gContext->GetMainWindow()->AllowInput(false);
-        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
-        return;
+        if (m_browser.isEmpty())
+        {
+            ShowOkPopup(tr("No browser command set! MythNews needs MythBrowser to be installed."));
+            return;
+        }
+
+        // display the web page
+        if (m_browser.toLower() == "internal")
+        {
+            GetMythMainWindow()->HandleMedia("WebBrowser", cmdUrl);
+            return;
+        }
+        else
+        {
+            QString cmd = m_browser;
+            cmd.replace("%ZOOM%", m_zoom);
+            cmd.replace("%URL%", cmdUrl);
+            cmd.replace('\'', "%27");
+            cmd.replace("&","\\&");
+            cmd.replace(";","\\;");
+
+            GetMythMainWindow()->AllowInput(false);
+            myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+            gContext->GetMainWindow()->AllowInput(true);
+            return;
+        }
     }
 
     QString cmdURL(article.enclosure());
