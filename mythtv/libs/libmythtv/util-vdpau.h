@@ -93,8 +93,6 @@ class VDPAUContext
             { return deinterlacer; }
     bool IsBeingUsed(VideoFrame * frame);
     void ClearReferenceFrames(void) { referenceFrames.clear(); }
-
-    static bool CheckCodecSupported(MythCodecID myth_codec_id);
     PictureAttributeSupported  GetSupportedPictureAttributes(void) const;
     int SetPictureAttribute(PictureAttribute attributeType, int newValue);
 

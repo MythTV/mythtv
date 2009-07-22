@@ -480,9 +480,7 @@ QStringList VideoOutputVDPAU::GetAllowedRenderers(
 {
     (void) video_dim;
     QStringList list;
-
-    if ((codec_is_std(myth_codec_id) ||
-         VDPAUContext::CheckCodecSupported(myth_codec_id)) &&
+    if ((codec_is_std(myth_codec_id) || codec_is_vdpau_hw(myth_codec_id)) &&
          !getenv("NO_VDPAU"))
     {
         list += "vdpau";
@@ -495,13 +493,14 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
     uint width,       uint height,
     uint stream_type, bool no_acceleration)
 {
+    bool use_cpu = no_acceleration;
     VideoDisplayProfile vdp;
     vdp.SetInput(QSize(width, height));
     QString dec = vdp.GetDecoder();
 
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1));
-    if ((dec != "vdpau") || getenv("NO_VDPAU") || no_acceleration ||
-        !VDPAUContext::CheckCodecSupported(test_cid))
+    use_cpu |= !codec_is_vdpau_hw(test_cid);
+    if ((dec != "vdpau") || getenv("NO_VDPAU") || use_cpu)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 
     return test_cid;
