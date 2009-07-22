@@ -47,6 +47,7 @@ using namespace std;
 #include "uitypes.h"
 #include "mythcontext.h"
 #include "filtermanager.h"
+#define AVCODEC_AVCODEC_H   // prevent clash with QuickTime CodecType
 #include "videoout_quartz.h"
 
 #include "util-osx.h"
