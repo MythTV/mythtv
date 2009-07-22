@@ -15,14 +15,34 @@
 // mythbrowser
 #include "bookmarkmanager.h"
 #include "browserdbutil.h"
+#include "mythbrowser.h"
 
 using namespace std;
+
+int handleMedia(const QString &url, const QString &, const QString &, const QString &, int, const QString &)
+{
+    QStringList urls = url.split(" ", QString::SkipEmptyParts);
+    float zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    MythBrowser *mythbrowser = new MythBrowser(mainStack, urls, zoom);
+
+    if (mythbrowser->Create())
+        mainStack->AddScreen(mythbrowser);
+    else
+        delete mythbrowser;
+
+    return 0;
+}
 
 void setupKeys(void)
 {
     REG_KEY("Browser", "NEXTTAB",   "Move to next browser tab",       "P");
     REG_KEY("Browser", "PREVTAB",   "Move to previous browser tab",   "");
     REG_KEY("Browser", "DELETETAB", "Delete the current browser tab", "D");
+
+    REG_MEDIAPLAYER("WebBrowser", "Internal Web Browser", handleMedia);
 }
 
 int mythplugin_init(const char *libversion)
