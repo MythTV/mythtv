@@ -55,11 +55,11 @@ MythNews::MythNews(MythScreenStack *parent, QString name) :
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    zoom = QString("-z %1")
+    m_zoom = QString("-z %1")
            .arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
-    browser = gContext->GetSetting("WebBrowserCommand",
-                                   GetInstallPrefix() +
-                                      "/bin/mythbrowser");
+    m_browser = gContext->GetSetting("WebBrowserCommand",
+                                     GetInstallPrefix() +
+                                     "/bin/mythbrowser");
 
     // Initialize variables
 
@@ -70,10 +70,10 @@ MythNews::MythNews(MythScreenStack *parent, QString name) :
     m_progressPopup = NULL;
 
     m_TimerTimeout = 10*60*1000;
-    httpGrabber = NULL;
+    m_httpGrabber = NULL;
 
-    timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
 
     // Now do the actual work
     m_RetrieveTimer = new QTimer(this);
@@ -434,25 +434,26 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
         }
     }
 
-    if (m_updatedText) {
+    if (m_updatedText) 
+    {
 
         if (site)
         {
             QString text(tr("Updated") + " - ");
             QDateTime updated(site->lastUpdated());
             if (updated.toTime_t() != 0) {
-                text += site->lastUpdated().toString(dateFormat) + " ";
-                text += site->lastUpdated().toString(timeFormat);
+                text += site->lastUpdated().toString(m_dateFormat) + " ";
+                text += site->lastUpdated().toString(m_timeFormat);
             }
             else
                 text += tr("Unknown");
             m_updatedText->SetText(text);
         }
 
-        if (httpGrabber != NULL)
+        if (m_httpGrabber != NULL)
         {
-            int progress = httpGrabber->getProgress();
-            int total = httpGrabber->getTotal();
+            int progress = m_httpGrabber->getProgress();
+            int total = m_httpGrabber->getTotal();
             if ((progress > 0) && (total > 0) && (progress < total))
             {
                 float fProgress = (float)progress/total;
@@ -522,8 +523,8 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
 
                 m_RetrieveTimer->stop();
 
-                if (httpGrabber)
-                    abortHttp = true;
+                if (m_httpGrabber)
+                    m_abortHttp = true;
             }
 
             Close();
@@ -647,7 +648,7 @@ void MythNews::slotProgressCancelled(void)
 {
     QMutexLocker locker(&m_lock);
 
-    abortHttp = true;
+    m_abortHttp = true;
 }
 
 void MythNews::createProgress(QString title)
@@ -676,7 +677,7 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
     int timeoutCount = 0;
     QByteArray data(0);
     bool res = false;
-    httpGrabber = NULL;
+    m_httpGrabber = NULL;
     QString hostname = "";
 
     createProgress(QObject::tr("Downloading media..."));
@@ -689,19 +690,19 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
         if (qurl.host().isEmpty()) // can occur on redirects to partial paths
             qurl.setHost(hostname);
 
-        if (httpGrabber != NULL)
-            delete httpGrabber;
+        if (m_httpGrabber != NULL)
+            delete m_httpGrabber;
 
-        httpGrabber = new HttpComms;
-        abortHttp = false;
+        m_httpGrabber = new HttpComms;
+        m_abortHttp = false;
 
-        httpGrabber->request(qurl, -1, true);
+        m_httpGrabber->request(qurl, -1, true);
 
-        while ((!httpGrabber->isDone()) && (!abortHttp))
+        while ((!m_httpGrabber->isDone()) && (!m_abortHttp))
         {
-            int total = httpGrabber->getTotal();
+            int total = m_httpGrabber->getTotal();
             m_progressPopup->SetTotal(total);
-            int progress = httpGrabber->getProgress();
+            int progress = m_httpGrabber->getProgress();
             m_progressPopup->SetProgress(progress);
             if ((progress > 0) && (total > 0) && (progress < total))
             {
@@ -716,21 +717,21 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
             usleep(100000);
         }
 
-        if (abortHttp)
+        if (m_abortHttp)
             break;
 
         // Check for redirection
-        if (!httpGrabber->getRedirectedURL().isEmpty())
+        if (!m_httpGrabber->getRedirectedURL().isEmpty())
         {
             if (redirectCount++ < 3)
-                cmdURL = httpGrabber->getRedirectedURL();
+                cmdURL = m_httpGrabber->getRedirectedURL();
 
             // Try again
             timeoutCount = 0;
             continue;
         }
 
-        data = httpGrabber->getRawData();
+        data = m_httpGrabber->getRawData();
 
         if (data.size() > 0)
         {
@@ -751,8 +752,8 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
         m_progressPopup = NULL;
     }
 
-    delete httpGrabber;
-    httpGrabber = NULL;
+    delete m_httpGrabber;
+    m_httpGrabber = NULL;
     return res;
 
 }
@@ -778,8 +779,8 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
         cmdUrl.replace('\'', "%27");
 
         QString cmd = QString("%1 %2 '%3'")
-            .arg(browser)
-            .arg(zoom)
+            .arg(m_browser)
+            .arg(m_zoom)
             .arg(cmdUrl);
         gContext->GetMainWindow()->AllowInput(false);
         myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
@@ -855,7 +856,6 @@ void MythNews::ShowEditDialog(bool edit)
 
         site = qVariantValue<NewsSite*>(siteListItem->GetData());
     }
-
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
