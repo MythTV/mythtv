@@ -36,10 +36,12 @@ static int run(MythMediaDevice *dev = NULL)
     }
     else
     {
-        ShowOkPopup(QObject::tr("MythGallery cannot find its start directory.\n"
+        ShowOkPopup(QObject::tr("MythGallery cannot find its start directory."
+                                "\n%1\n"
                                 "Check the directory exists, is readable and "
                                 "the setting is correct on MythGallery's "
-                                "settings page."));
+                                "settings page.")
+                    .arg(startdir.absolutePath()));
     }
 
     return -1;
