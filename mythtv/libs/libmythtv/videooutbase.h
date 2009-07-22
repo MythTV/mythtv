@@ -274,11 +274,6 @@ class VideoOutput
 
     void SetVideoAspectRatio(float aspect);
 
-    // OpenGL
-    virtual OpenGLContextGLX *GetGLContext(void) { return NULL; }
-    virtual OpenGLContextGLX *CreateGLContext(const QSize &display_size) 
-        { (void)display_size; return NULL; }
-
     vector<VideoOutWindow> windows;
     QSize   db_display_dim;   ///< Screen dimensions in millimeters from DB
     typedef QMap<PictureAttribute,int> PictureSettingMap;
