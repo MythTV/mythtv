@@ -82,6 +82,13 @@ namespace
 
     void startDVDRipper()
     {
+        // MTD could check this and log an error,
+        // but informing the user here/now is probably better
+        QString ripDir = gContext->GetSetting("DVDRipLocation");
+        if (ripDir.length() && !QDir(ripDir).exists())
+            ShowOkPopup(QObject::tr("No directory %1 - DVD importing will fail")
+                        .arg(ripDir));
+
         QString dvd_device = gDVDdevice;
 
         if (dvd_device.isEmpty())
@@ -498,13 +505,6 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run()
 {
-    // MTD could check this and log an error,
-    // but informing the user here/now is probably better
-    QString ripDir = gContext->GetSetting("DVDRipLocation");
-    if (ripDir.length() && !QDir(ripDir).exists())
-        ShowOkPopup(QObject::tr("No directory %1 - DVD importing will fail")
-                    .arg(ripDir));
-
     return runMenu("videomenu.xml");
 }
 
