@@ -45,7 +45,8 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_isLive(false),      m_currentCard(0),
       m_audioTag(-1),       m_videoTag(-1),
       m_tuningTo(-1),       m_lastNbiVersion(NBI_VERSION_UNSET),
-      m_videoRect(0, 0, StdDisplayWidth, StdDisplayHeight)
+      m_videoRect(0, 0, StdDisplayWidth, StdDisplayHeight),
+      m_displayRect(0, 0, StdDisplayWidth, StdDisplayHeight)
 {
     m_xScale = (float)m_displayWidth / (float)MHIContext::StdDisplayWidth;
     m_yScale = (float)m_displayHeight / (float)MHIContext::StdDisplayHeight;
@@ -442,7 +443,8 @@ void MHIContext::Reinit(const QRect &display)
     m_displayHeight = display.height();
     m_xScale = (float)m_displayWidth / (float)MHIContext::StdDisplayWidth;
     m_yScale = (float)m_displayHeight / (float)MHIContext::StdDisplayHeight;
-    m_videoRect = display; // Assume full screen at this stage.
+    m_videoRect   = QRect(QPoint(0,0), display.size());
+    m_displayRect = display;
 }
 
 void MHIContext::SetInputRegister(int num)
@@ -494,13 +496,16 @@ void MHIContext::RequireRedraw(const QRegion &)
 void MHIContext::AddToDisplay(const QImage &image, int x, int y)
 {
     MHIImageData *data = new MHIImageData;
+    int dispx = x + m_displayRect.left();
+    int dispy = y + m_displayRect.top();
+
     // It seems that OSDTypeImage::Load doesn't deal well with images
     // located on odd pixel boundaries and the resulting display contains
     // transparent lines.  To avoid this we create a new image if either
     // the x or y offset would be odd and set the extra pixels to transparent.
     QImage img = image;
-    int xboundary = x & 1;
-    int yboundary = y & 1;
+    int xboundary = dispx & 1;
+    int yboundary = dispx & 1;
     
     if (xboundary || yboundary)
     {
@@ -508,12 +513,12 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
         if (xboundary)
         {
             width++;
-            x--;
+            dispx--;
         }
         if (yboundary)
         {
             height++;
-            y--;
+            dispy--;
         }
         img = QImage(width, height, QImage::Format_ARGB32);
         QRgb qTransparent = qRgba(0,0,0,0);
@@ -538,8 +543,8 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
         }
     }
     data->m_image = img;
-    data->m_x = x;
-    data->m_y = y;
+    data->m_x = dispx;
+    data->m_y = dispy;
     QMutexLocker locker(&m_display_lock);
     m_display.push_back(data);
 }
@@ -562,7 +567,7 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
                       SCALED_Y(videoRect.height()));
         if (m_videoRect != vidRect)
         {
-            m_parent->GetNVP()->SetVideoResize(vidRect);
+            m_parent->GetNVP()->SetVideoResize(vidRect.translated(m_displayRect.topLeft()));
             m_videoRect = vidRect;
         }
     }

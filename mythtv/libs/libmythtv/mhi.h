@@ -187,6 +187,7 @@ class MHIContext : public MHContext
     vector<unsigned char> m_nbiData;
 
     QRect            m_videoRect;
+    QRect            m_displayRect;
 };
 
 // Object for drawing text.
