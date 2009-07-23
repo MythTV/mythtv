@@ -241,7 +241,7 @@ static uint insert_dtv_multiplex(
         if (isDVB)
         {
             query.bindValue(":TRANSPORTID",   transport_id);
-            query.bindValue(":NETWORKID ",    network_id);
+            query.bindValue(":NETWORKID",    network_id);
         }
         else
         {
@@ -255,7 +255,7 @@ static uint insert_dtv_multiplex(
         if (transport_id || isDVB)
             query.bindValue(":TRANSPORTID",   transport_id);
         if (isDVB)
-            query.bindValue(":NETWORKID ",    network_id);
+            query.bindValue(":NETWORKID",    network_id);
     }
 
     if (!modulation.isNull())
@@ -626,7 +626,7 @@ uint ChannelUtil::GetMplexID(uint chanid)
  */
 
 // current_mplexid always exists in scanner, see ScanTranport()
-// 
+//
 int ChannelUtil::GetBetterMplexID(int current_mplexid,
                                   int transport_id,
                                   int network_id)
@@ -1110,7 +1110,7 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     return query.exec();
 }
 
-/** Returns the DVB default authority for the chanid given. */ 
+/** Returns the DVB default authority for the chanid given. */
 QString ChannelUtil::GetDefaultAuthority(uint chanid)
 {
     static QReadWriteLock channel_default_authority_map_lock;
@@ -1194,7 +1194,7 @@ QString ChannelUtil::GetIcon(uint chanid)
     QString ret(channel_icon_map.value(chanid, "_cold_"));
 
     channel_icon_map_lock.unlock();
-    
+
     if (ret != "_cold_")
         return ret;
 
@@ -1741,7 +1741,7 @@ bool ChannelUtil::GetChannelSettings(int chanid, bool &useonairguide,
 DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp, int changrpid)
 {
     DBChanList list;
-    
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString qstr =
