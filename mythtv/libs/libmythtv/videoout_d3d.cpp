@@ -49,13 +49,15 @@ const int kKeepPrebuffer = 2;
 #define LOC_ERR  QString("VideoOutputD3D Error: ")
 
 VideoOutputD3D::VideoOutputD3D(void)
-    : VideoOutput(), m_InputCX(0), m_InputCY(0),
-      m_lock(QMutex::Recursive), m_RefreshRate(60),
-      m_hWnd(NULL), m_hEmbedWnd(NULL),
-      m_ddFormat(D3DFMT_UNKNOWN), m_pD3D(NULL), m_pd3dDevice(NULL),
-      m_pSurface(NULL), m_pTexture(NULL), m_pVertexBuffer(NULL)
+    : VideoOutput(),
+      m_InputCX(0),               m_InputCY(0),
+      m_lock(QMutex::Recursive),  m_RefreshRate(60),
+      m_hWnd(NULL),               m_hEmbedWnd(NULL),
+      m_ddFormat(D3DFMT_UNKNOWN), m_surfaceFormat(D3DFMT_UNKNOWN),
+      m_pD3D(NULL),               m_pd3dDevice(NULL),
+      m_pSurface(NULL),           m_pTexture(NULL),
+      m_pVertexBuffer(NULL)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ctor");
     m_pauseFrame.buf = NULL;
 }
 
@@ -66,7 +68,6 @@ VideoOutputD3D::~VideoOutputD3D()
 
 void VideoOutputD3D::Exit(void)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "Exit()");
     QMutexLocker locker(&m_lock);
     vbuffers.DeleteBuffers();
     if (m_pauseFrame.buf)
@@ -128,6 +129,18 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
                                   MythCodecID  av_codec_id,
                                   void        *codec_private)
 {
+    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'")
+            .arg(input_size.width()).arg(input_size.height()).arg(aspect)
+            .arg(toString(av_codec_id)));
+
+    if (!codec_is_std(av_codec_id))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("New video codec is not supported."));
+        errorState = kError_Unknown;
+        return false;
+    }
+
     QMutexLocker locker(&m_lock);
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
     db_vdisp_profile->SetVideoRenderer("direct3d");
@@ -141,8 +154,6 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
 
     m_InputCX = video_dim.width();
     m_InputCY = video_dim.height();
-    VERBOSE(VB_PLAYBACK, LOC + "InputChanged, x="<< m_InputCX
-            << ", y=" << m_InputCY);
 
     vbuffers.DeleteBuffers();
 
@@ -188,9 +199,11 @@ bool VideoOutputD3D::InitD3D()
     QMutexLocker locker(&m_lock);
     D3DCAPS9 d3dCaps;
 
+    UnInitD3D();
+
     typedef LPDIRECT3D9 (WINAPI *LPFND3DC)(UINT SDKVersion);
     static LPFND3DC OurDirect3DCreate9 = NULL;
-    static HINSTANCE hD3DLib = NULL;
+    static HINSTANCE hD3DLib           = NULL;
 
     if (!hD3DLib)
     {
@@ -258,7 +271,7 @@ bool VideoOutputD3D::InitD3D()
     d3dpp.hDeviceWindow          = m_hWnd;
     d3dpp.Windowed               = TRUE;
     d3dpp.BackBufferWidth        = m_InputCX;
-    d3dpp.BackBufferHeight       = m_InputCX;
+    d3dpp.BackBufferHeight       = m_InputCY;
     d3dpp.BackBufferCount        = 1;
     d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
     d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
@@ -275,48 +288,37 @@ bool VideoOutputD3D::InitD3D()
         return false;
     }
 
-    //input seems to always be PIX_FMT_YUV420P
-    //MAKEFOURCC('I','4','2','0');
-    //IYUV I420
+    m_surfaceFormat = (D3DFORMAT)MAKEFOURCC('Y','V','1','2');
 
-    D3DFORMAT format = D3DFMT_X8R8G8B8;
-    /* test whether device can create a surface of that format */
     HRESULT hr = m_pD3D->CheckDeviceFormat(
         D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_ddFormat, 0,
-        D3DRTYPE_SURFACE, format);
+        D3DRTYPE_SURFACE, m_surfaceFormat);
 
     if (SUCCEEDED(hr))
     {
-        /* test whether device can perform color-conversion
-        ** from that format to target format
-        */
         hr = m_pD3D->CheckDeviceFormatConversion(
             D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
-            format, m_ddFormat);
+            m_surfaceFormat, m_ddFormat);
 
         if (FAILED(hr))
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Device does not support conversion to RGB format");
+            m_surfaceFormat = D3DFMT_X8R8G8B8;
 
-            return false;
-        }
+        VERBOSE(VB_PLAYBACK, LOC +
+                   QString("Hardware YV12 to RGB conversion conversion %1.")
+                  .arg(FAILED(hr) ? "unavailable" : "enabled"));
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Device does not support surfaces in RGB format");
-
-        return false;
+        VERBOSE(VB_PLAYBACK, LOC + "Device does not support YV12 surfaces.");
+        m_surfaceFormat = D3DFMT_X8R8G8B8;
     }
 
+    if (m_surfaceFormat == D3DFMT_X8R8G8B8)
+        VERBOSE(VB_PLAYBACK, LOC + "Falling back to software YV12->RGB.");
+
     hr = m_pd3dDevice->CreateOffscreenPlainSurface(
-        m_InputCX,
-        m_InputCY,
-        format,
-        D3DPOOL_DEFAULT,
-        &m_pSurface,
-        NULL);
+            m_InputCX,        m_InputCY,  m_surfaceFormat,
+            D3DPOOL_DEFAULT, &m_pSurface, NULL);
 
     if (FAILED(hr))
     {
@@ -333,14 +335,8 @@ bool VideoOutputD3D::InitD3D()
     ** which would usually be a RGB format
     */
     hr = m_pd3dDevice->CreateTexture(
-        m_InputCX,
-        m_InputCY,
-        1,
-        D3DUSAGE_RENDERTARGET,
-        m_ddFormat,
-        D3DPOOL_DEFAULT,
-        &m_pTexture,
-        NULL);
+            m_InputCX,  m_InputCY, 1, D3DUSAGE_RENDERTARGET,
+            m_ddFormat, D3DPOOL_DEFAULT, &m_pTexture, NULL);
 
     if (FAILED(hr))
     {
@@ -358,6 +354,7 @@ bool VideoOutputD3D::InitD3D()
         D3DPOOL_DEFAULT,
         &m_pVertexBuffer,
         NULL);
+
     if (FAILED(hr))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create vertex buffer");
@@ -375,32 +372,32 @@ bool VideoOutputD3D::InitD3D()
     }
 
     /* Setup vertices */
-    p_vertices[0].x       = 0.0f;       // left
-    p_vertices[0].y       = 0.0f;       // top
+    p_vertices[0].x       = 0.0f;             // left
+    p_vertices[0].y       = 0.0f;             // top
     p_vertices[0].z       = 0.0f;
     p_vertices[0].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[0].rhw     = 1.0f;
     p_vertices[0].tu      = 0.0f;
     p_vertices[0].tv      = 0.0f;
 
-    p_vertices[1].x       = (float)m_InputCX;    // right
-    p_vertices[1].y       = 0.0f;       // top
+    p_vertices[1].x       = (float)m_InputCX; // right
+    p_vertices[1].y       = 0.0f;             // top
     p_vertices[1].z       = 0.0f;
     p_vertices[1].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[1].rhw     = 1.0f;
     p_vertices[1].tu      = 1.0f;
     p_vertices[1].tv      = 0.0f;
 
-    p_vertices[2].x       = (float)m_InputCX;    // right
-    p_vertices[2].y       = (float)m_InputCY;   // bottom
+    p_vertices[2].x       = (float)m_InputCX; // right
+    p_vertices[2].y       = (float)m_InputCY; // bottom
     p_vertices[2].z       = 0.0f;
     p_vertices[2].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[2].rhw     = 1.0f;
     p_vertices[2].tu      = 1.0f;
     p_vertices[2].tv      = 1.0f;
 
-    p_vertices[3].x       = 0.0f;       // left
-    p_vertices[3].y       = (float)m_InputCY;   // bottom
+    p_vertices[3].x       = 0.0f;             // left
+    p_vertices[3].y       = (float)m_InputCY; // bottom
     p_vertices[3].z       = 0.0f;
     p_vertices[3].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[3].rhw     = 1.0f;
@@ -457,7 +454,7 @@ bool VideoOutputD3D::InitD3D()
     // turn off alpha operation
     m_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
-    VERBOSE(VB_GENERAL, LOC +
+    VERBOSE(VB_PLAYBACK, LOC +
             "Direct3D device adapter successfully initialized");
 
     return true;
@@ -472,9 +469,6 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
                           WId winid, int winx, int winy, int winw,
                           int winh, WId embedid)
 {
-    VERBOSE(VB_PLAYBACK, LOC +
-            "Init w=" << width << " h=" << height);
-
     db_vdisp_profile->SetVideoRenderer("direct3d");
 
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
@@ -486,11 +480,10 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
 
     m_hWnd = winid;
 
-    const QSize video_dim = windows[0].GetVideoDim();
-    m_InputCX = video_dim.width();
-    m_InputCY = video_dim.height();
+    m_InputCX = windows[0].GetVideoDim().width();
+    m_InputCY = windows[0].GetVideoDim().height();
 
-    if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
+    if (!vbuffers.CreateBuffers(m_InputCX, m_InputCY))
         return false;
 
     if (!InitD3D())
@@ -507,7 +500,6 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     m_pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
 
     windows[0].SetDisplayAspect((float)winw / winh);
-
     MoveResize();
 
     return true;
@@ -519,6 +511,12 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "PrepareFrame() called while IsErrored is true.");
+        return;
+    }
+
+    if (!m_pSurface)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Picture surface not initialized");
         return;
     }
 
@@ -537,15 +535,53 @@ void VideoOutputD3D::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         return;
     }
 
-    avpicture_fill(&image_out, (uint8_t*) d3drect.pBits,
-                   PIX_FMT_RGB32, m_InputCX, m_InputCY);
-    image_out.linesize[0] = d3drect.Pitch;
-    avpicture_fill(&image_in, buffer->buf,
-                   PIX_FMT_YUV420P, m_InputCX, m_InputCY);
+    if (m_surfaceFormat == (D3DFORMAT)MAKEFOURCC('Y','V','1','2'))
+    {
+        int i;
+        uint8_t *dst      = (uint8_t*)d3drect.pBits;
+        uint8_t *src      = buffer->buf;
+        int chroma_width  = m_InputCX >> 1;
+        int chroma_height = m_InputCY >> 1;
+        int chroma_pitch  = d3drect.Pitch >> 1;
 
-    myth_sws_img_convert(
-        &image_out, PIX_FMT_RGB32, &image_in,
-                PIX_FMT_YUV420P, m_InputCX, m_InputCY);
+        for (i = 0; i < m_InputCY; i++)
+        {
+            memcpy(dst, src, m_InputCX);
+            dst += d3drect.Pitch;
+            src += m_InputCX;
+        }
+
+        dst = (uint8_t*)d3drect.pBits +  (m_InputCY * d3drect.Pitch);
+        src = buffer->buf + (m_InputCY * m_InputCX * 5/4);
+
+        for (i = 0; i < chroma_height; i++)
+        {
+            memcpy(dst, src, chroma_width);
+            dst += chroma_pitch;
+            src += chroma_width;
+        }
+
+        dst = (uint8_t*)d3drect.pBits + (m_InputCY * d3drect.Pitch * 5/4);
+        src = buffer->buf + (m_InputCY * m_InputCX);
+
+        for (i = 0; i < chroma_height; i++)
+        {
+            memcpy(dst, src, chroma_width);
+            dst += chroma_pitch;
+            src += chroma_width;
+        }
+    }
+    else
+    {
+        avpicture_fill(&image_out, (uint8_t*) d3drect.pBits,
+                       PIX_FMT_RGB32, m_InputCX, m_InputCY);
+        image_out.linesize[0] = d3drect.Pitch;
+        avpicture_fill(&image_in, buffer->buf,
+                       PIX_FMT_YUV420P, m_InputCX, m_InputCY);
+
+        myth_sws_img_convert(&image_out, PIX_FMT_RGB32, &image_in,
+                             PIX_FMT_YUV420P, m_InputCX, m_InputCY);
+    }
 
     hr = m_pSurface->UnlockRect();
     if (FAILED(hr))
@@ -577,22 +613,23 @@ void VideoOutputD3D::Show(FrameScanType )
             switch (hr)
             {
                 case D3DERR_DEVICENOTRESET:
-                    VERBOSE(VB_IMPORTANT, LOC_ERR +
-                            "The device has been lost but can be reset "
-                            "at this time. TODO: implement device reset");
-                    // TODO: instead of goto renderError, reset the device
-                    //m_pd3dDevice->Reset(...
+                    VERBOSE(VB_PLAYBACK, LOC +
+                            "The device was lost and will be reset now.");
+                    InitD3D();
                     goto RenderError;
+
                 case D3DERR_DEVICELOST:
-                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    VERBOSE(VB_PLAYBACK, LOC +
                             "The device has been lost and cannot be reset "
                             "at this time.");
                     goto RenderError;
+
                 case D3DERR_DRIVERINTERNALERROR:
                     VERBOSE(VB_IMPORTANT, LOC_ERR +
                             "Internal driver error. "
                             "Please shut down the application.");
                     goto RenderError;
+
                 default:
                     VERBOSE(VB_IMPORTANT, LOC_ERR +
                             "TestCooperativeLevel() failed.");
@@ -834,7 +871,10 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
     MythCodecID myth_codec_id, const QSize &video_dim)
 {
     QStringList list;
-    list += "direct3d";
+
+    if (codec_is_std(myth_codec_id))
+	    list += "direct3d";
+
     return list;
 }
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

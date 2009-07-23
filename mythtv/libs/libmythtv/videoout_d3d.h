@@ -62,6 +62,7 @@ class VideoOutputD3D : public VideoOutput
     HWND                    m_hWnd;
     HWND                    m_hEmbedWnd;
     D3DFORMAT               m_ddFormat;
+    D3DFORMAT               m_surfaceFormat;
     IDirect3D9             *m_pD3D;
     IDirect3DDevice9       *m_pd3dDevice;
     IDirect3DSurface9      *m_pSurface;
