@@ -47,6 +47,9 @@ class VideoOutputVDPAU : public VideoOutput
     virtual bool IsPBPSupported(void) const { return false; }
     virtual bool NeedExtraAudioDecode(void) const
         { return codec_is_vdpau(m_codec_id); }
+    virtual bool hasHWAcceleration(void) const
+        { return codec_is_vdpau(m_codec_id); }
+    virtual bool IsSyncLocked(void) const { return true; }
     void SetNextFrameDisplayTimeOffset(int delayus);
 
   private:

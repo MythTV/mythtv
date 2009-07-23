@@ -2468,7 +2468,8 @@ void NuppelVideoPlayer::AVSync(void)
         lastsync = true;
 
         if (buffer && !using_null_videoout &&
-            videoOutput->hasHWAcceleration())
+            videoOutput->hasHWAcceleration() &&
+           !videoOutput->IsSyncLocked())
         {
             // If we are using certain hardware decoders, so we've already done
             // the decoding; display the frame, but don't wait for A/V Sync.
