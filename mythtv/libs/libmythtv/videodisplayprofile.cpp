@@ -1564,6 +1564,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_list_t::const_iterator it;
     for (it = safe_custom.begin(); it != safe_custom.end(); ++it)
     {
+        safe_deint[*it] += "onefield";
         safe_deint[*it] += "linearblend";
         safe_deint[*it] += "kerneldeint";
         safe_deint[*it] += "kerneldoubleprocessdeint";
@@ -1579,18 +1580,12 @@ void VideoDisplayProfile::init_statics(void)
     // allow vdpau filters
     safe_custom += "vdpau";
 
-    QStringList tmp;
-    tmp += "xv-blit";
-    tmp += "xvmc-blit";
-
-    QStringList::const_iterator it2;
-    for (it2 = tmp.begin(); it2 != tmp.end(); ++it2)
-    {
-        safe_deint[*it2] += "bobdeint";
-        safe_deint[*it2] += "onefield";
-        safe_deint[*it2] += "none";
-        safe_osd[*it2]   += "chromakey";
-    }
+    safe_deint["xv-blit"]   += "bobdeint";
+    safe_deint["xvmc-blit"] += "bobdeint";
+    safe_deint["xvmc-blit"] += "onefield";
+    safe_deint["xvmc-blit"] += "none";
+    safe_osd["xv-blit"]     += "chromakey";
+    safe_osd["xvmc-blit"]   += "chromakey";
 
     safe_deint["opengl"] += "opengllinearblend";
     safe_deint["opengl"] += "openglonefield";
@@ -1602,7 +1597,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_deint["opengl"] += "opengldoubleratefieldorder";
     safe_deint["opengl"] += "opengldoublerateyadif";
     safe_deint["opengl"] += "openglyadif";
-
 
     safe_deint["vdpau"] += "none";
     safe_deint["vdpau"] += "vdpauonefield";
@@ -1624,11 +1618,12 @@ void VideoDisplayProfile::init_statics(void)
     safe_deint["quartz-accel"] += "none";
     safe_deint["ivtv"]         += "none";
 
-    tmp.clear();
+    QStringList tmp;
     tmp += "dummy";
     tmp += "nuppel";
     tmp += "ffmpeg";
     tmp += "libmpeg2";
+    QStringList::const_iterator it2;
     for (it2 = tmp.begin(); it2 != tmp.end(); ++it2)
     {
         safe_renderer[*it2] += "null";
