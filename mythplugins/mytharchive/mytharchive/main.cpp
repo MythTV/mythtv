@@ -293,6 +293,13 @@ void initKeys(void)
 {
     REG_KEY("Archive", "TOGGLECUT", "Toggle use cut list state for selected program", "C");
     REG_KEY("Archive", "DELETEITEM", "Delete current item in list", "D");
+
+    REG_JUMP("Create DVD",       "", "", runCreateDVD);
+    REG_JUMP("Create Archive",   "", "", runCreateArchive);
+    REG_JUMP("Import Archive",   "", "", runImportVideo);
+    REG_JUMP("View Archive Log", "", "", runShowLog);
+    REG_JUMP("Play Created DVD", "", "", runTestDVD);
+    REG_JUMP("Burn DVD",         "", "", runBurnDVD);
 }
 
 int mythplugin_init(const char *libversion)
