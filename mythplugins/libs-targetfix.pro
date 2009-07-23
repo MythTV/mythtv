@@ -12,10 +12,6 @@ mingw {
     }
 }
 
-macx {
-    QMAKE_LFLAGS += -flat_namespace -undefined suppress
-}
-
 # Trigger rebuilds if installed MythTV includes have changed
 DEPENDPATH = $${INCLUDEPATH}
 

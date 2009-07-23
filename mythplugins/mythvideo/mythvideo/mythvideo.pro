@@ -40,12 +40,6 @@ SOURCES += parentalcontrols.cpp playercommand.cpp
 #MythDVD
 SOURCES += dvdripbox.cpp dvdinfo.cpp titledialog.cpp
 
-macx {
-    QMAKE_LFLAGS += -flat_namespace -undefined suppress
-    # need C99 flag for isnan() to work
-    DEFINES += _GLIBCPP_USE_C99
-}
-
 mingw:DEFINES += USING_MINGW
 
 QT += sql xml network
