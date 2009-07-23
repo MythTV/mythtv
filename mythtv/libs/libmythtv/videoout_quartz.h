@@ -50,6 +50,8 @@ class VideoOutputQuartz : public VideoOutput
         uint width, uint height,
         uint osd_width, uint osd_height,
         uint stream_type, uint fourcc);
+    virtual bool NeedExtraAudioDecode(void) const
+        { return !codec_is_std(myth_codec_id); }
 
   private:
     void Exit(void);
