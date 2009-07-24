@@ -6,7 +6,7 @@
 #include "mythverbose.h"
 #include "mythversion.h"
 
-MythCommandLineParser::MythCommandLineParser(uint64_t things_to_parse) :
+MythCommandLineParser::MythCommandLineParser(int things_to_parse) :
     parseTypes(things_to_parse),
     display(QString::null), geometry(QString::null),
     wantsToExit(false)
@@ -72,7 +72,7 @@ bool MythCommandLineParser::PreParse(
         return true;
     }
     else if ((parseTypes & kCLPVerbose) &&
-             (!strcmp(argv[argpos],"-verbose") ||
+             (!strcmp(argv[argpos],"-v") ||
               !strcmp(argv[argpos],"--verbose")))
     {
         if ((argc - 1) > argpos)
@@ -81,17 +81,15 @@ bool MythCommandLineParser::PreParse(
                 GENERIC_EXIT_INVALID_CMDLINE)
             {
                 err = true;
-                return true;
             }
-
             ++argpos;
         }
         else
         {
             cerr << "Missing argument to -v/--verbose option";
             err = true;
-            return true;
         }
+        return true;
     }
     else if ((parseTypes & kCLPHelp) &&
              (!strcmp(argv[argpos],"-h") ||
@@ -102,6 +100,7 @@ bool MythCommandLineParser::PreParse(
         QByteArray ahelp = help.toLocal8Bit();
         cerr << ahelp.constData();
         wantsToExit = true;
+        return true;
     }
     else if ((parseTypes & kCLPQueryVersion) &&
              !strcmp(argv[argpos],"--version"))
@@ -121,6 +120,9 @@ bool MythCommandLineParser::PreParse(
         wantsToExit = true;
         return true;
     }
+    else if ((parseTypes & kCLPExtra) &&
+             argv[argpos][0] != '-')
+        return true;
 
     return false;
 }
@@ -264,21 +266,9 @@ bool MythCommandLineParser::Parse(
         ++argpos;
         return true;
     }
-    if ((parseTypes & kCLPDisplay) &&
-             (!strcmp(argv[argpos],"-display") ||
-              !strcmp(argv[argpos],"--display")))
-    {
-        return PreParse(argc, argv, argpos, err);
-    }
-    else if ((parseTypes & kCLPGeometry) &&
-             (!strcmp(argv[argpos],"-geometry") ||
-              !strcmp(argv[argpos],"--geometry")))
-    {
-        return PreParse(argc, argv, argpos, err);
-    }
     else
     {
-        return false;
+        return PreParse(argc, argv, argpos, err);
     }
 }
 
@@ -328,7 +318,9 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     {
         msg << "--override-settings-file <file> " << endl
             << "                               "
-            << "File containing KEY=VALUE pairs for settings" << endl;
+            << "File containing KEY=VALUE pairs for settings" << endl
+            << "                               Use a comma seperated list to return multiple values"
+            << endl;
     }
 
     if (parseTypes & kCLPGetSettings)
@@ -341,6 +333,11 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     if (parseTypes & kCLPQueryVersion)
     {
         msg << "--version                      Version information" << endl;
+    }
+
+    if (parseTypes & kCLPVerbose)
+    {
+        msg << "-v or --verbose debug-level    Use '-v help' for level info" << endl;
     }
 
     msg.flush();

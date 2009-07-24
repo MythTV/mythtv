@@ -18,12 +18,13 @@ typedef enum {
     kCLPGeometry             = 0x00000080,
     kCLPVerbose              = 0x00000100,
     kCLPHelp                 = 0x00000200,
+    kCLPExtra                = 0x00000400,
 } ParseType;
 
 class MPUBLIC MythCommandLineParser
 {
   public:
-    MythCommandLineParser(uint64_t things_to_parse);
+    MythCommandLineParser(int things_to_parse);
 
     bool PreParse(int argc, const char * const * argv, int &argpos, bool &err);
     bool Parse(int argc, const char * const * argv, int &argpos, bool &err);
@@ -39,7 +40,7 @@ class MPUBLIC MythCommandLineParser
     bool    WantsToExit(void) const { return wantsToExit; }
 
   private:
-    uint64_t              parseTypes;
+    int                   parseTypes;
 
     QMap<QString,QString> settingsOverride;
     QStringList           settingsQuery;

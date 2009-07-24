@@ -995,8 +995,6 @@ void ShowUsage(const MythCommandLineParser &cmdlineparser)
             "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
             "-r or --reset                  Resets frontend appearance settings and language" << endl <<
             ahelp.constData() <<
-            "                               Use a comma seperated list to return multiple values" << endl <<
-            "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
             "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
             "-d or --disable-autodiscovery  Never prompt for Mythbackend selection." << endl <<
 
@@ -1060,9 +1058,10 @@ int main(int argc, char **argv)
 #ifdef USING_X11
         kCLPDisplay              |
 #endif // USING_X11
+        kCLPExtra                |
         kCLPGeometry);
 
-    for (int argpos = 0; argpos < argc; ++argpos)
+    for (int argpos = 1; argpos < argc; ++argpos)
     {
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
@@ -1117,22 +1116,6 @@ int main(int argc, char **argv)
                  !strcmp(a.argv()[argpos],"-d" ))
         {
             bBypassAutoDiscovery = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"--verbose") ||
-                 !strcmp(a.argv()[argpos],"-v"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-
-                ++argpos;
-            } else
-            {
-                cerr << "Missing argument to -v/--verbose option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile"))

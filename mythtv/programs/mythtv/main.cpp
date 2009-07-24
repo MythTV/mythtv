@@ -88,9 +88,12 @@ int main(int argc, char *argv[])
 #endif // USING_X11
         kCLPGeometry             |
         kCLPVerbose              |
+        kCLPExtra                |
         kCLPHelp);
 
-    for (int argpos = 0; argpos < argc; ++argpos)
+    print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;
+
+    for (int argpos = 1; argpos < argc; ++argpos)
     {
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
         {
@@ -99,21 +102,19 @@ int main(int argc, char *argv[])
             if (cmdline.WantsToExit())
                 return FRONTEND_EXIT_OK;
         }
-        else
-        {
-            argpos++;
-        }
     }
 
     QApplication a(argc, argv);
-
-    print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
 
     int argpos = 1;
     QString filename = "";
 
     while (argpos < a.argc())
     {
+        if (a.argv()[argpos][0] != '-')
+        {
+            filename = a.argv()[argpos];
+        }
         if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
@@ -121,15 +122,8 @@ int main(int argc, char *argv[])
             if (cmdline.WantsToExit())
                 return GENERIC_EXIT_OK;
         }
-        else if (a.argv()[argpos][0] != '-')
-        {
-            filename = a.argv()[argpos];
-        }
         else
         {
-            QString help = cmdline.GetHelpString(true);
-            QByteArray ahelp = help.toLocal8Bit();
-            cerr << ahelp.constData();
             return GENERIC_EXIT_INVALID_CMDLINE;
         }
 
