@@ -56,6 +56,12 @@ class H264Parser {
         AUXILIARY_SLICE = 19
     };
 
+    enum SEI_type {
+        SEI_TYPE_PIC_TIMING             = 1,
+        SEI_TYPE_USER_DATA_UNREGISTERED = 5,
+        SEI_TYPE_RECOVERY_POINT         = 6
+    };
+
     /*
       slice_type values in the range 5..9 specify, in addition to the
       coding type of the current slice, that all other slices of the
@@ -93,9 +99,7 @@ class H264Parser {
 
     bool stateChanged(void) const { return state_changed; }
 
-    // seenIDR implies that a SPS has also been seen
-    bool seenIDR(void) const { return seen_IDR; }
-    uint8_t lastNALtype(void) const { return NAL_type; }
+    uint8_t lastNALtype(void) const { return nal_unit_type; }
 
     frame_type FieldType(void) const
         {
@@ -133,28 +137,35 @@ class H264Parser {
                     nal_type == SLICE_IDR);
         }
 
-    void waitForIDR(bool wait) { wait_for_IDR = wait; }
+    void use_I_forKeyframes(bool val) { I_is_keyframe = val; }
 
   private:
     enum constants {EXTENDED_SAR = 255};
 
-    bool is_first_VCL_NAL_unit(void);
+    inline void set_AU_pending(const uint64_t & stream_offset)
+        {
+            if (!AU_pending)
+            {
+                AU_pending = true;
+                AU_offset = stream_offset;
+            }
+        }
+
     bool new_AU(void);
     bool decode_Header(GetBitContext *gb);
     void decode_SPS(GetBitContext *gb);
     void decode_PPS(GetBitContext * gb);
+    void decode_SEI(GetBitContext * gb, int len);
     void vui_parameters(GetBitContext * gb);
 
-    bool       find_AU;
     bool       AU_pending;
     bool       state_changed;
     bool       seen_sps;
-    bool       seen_IDR;
+    bool       is_keyframe;
+    bool       I_is_keyframe;
 
     uint32_t   sync_accumulator;
     GetBitContext gb;
-
-    uint8_t    NAL_type;
 
     int        prev_frame_num, frame_num;
     uint       slice_type;
@@ -191,8 +202,6 @@ class H264Parser {
 
     uint64_t   AU_offset, frame_start_offset, keyframe_start_offset;
     bool       on_frame, on_key_frame;
-
-    bool       wait_for_IDR;
 };
 
 #endif /* H264PARSER_H */

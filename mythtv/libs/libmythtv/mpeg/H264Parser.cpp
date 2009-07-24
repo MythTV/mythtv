@@ -3,7 +3,9 @@
 
 extern "C" {
 // from libavcodec
-    extern const uint8_t *ff_find_start_code(const uint8_t * p, const uint8_t *end, uint32_t * state);
+    extern const uint8_t *ff_find_start_code(const uint8_t * p,
+                                             const uint8_t *end,
+                                             uint32_t * state);
 #include "avcodec.h"
 #include "libavutil/internal.h"
 #include "libavcodec/golomb.h"
@@ -90,18 +92,17 @@ static const float eps = 1E-5;
 H264Parser::H264Parser(void)
 {
     Reset();
+    I_is_keyframe = true;
 }
 
 void H264Parser::Reset(void)
 {
     state_changed = false;
-    seen_sps = seen_IDR = false;
+    seen_sps = false;
+    is_keyframe = false;
 
     sync_accumulator = 0xffffffff;
-    find_AU = false;
     AU_pending = false;
-
-    NAL_type = UNKNOWN;
 
     frame_num = prev_frame_num = -1;
     slice_type = SLICE_UNDEF;
@@ -114,7 +115,7 @@ void H264Parser::Reset(void)
     prev_delta_pic_order_cnt_bottom = delta_pic_order_cnt_bottom = 0;
     prev_delta_pic_order_cnt[0] = delta_pic_order_cnt[0] = 0;
     prev_delta_pic_order_cnt[1] = delta_pic_order_cnt[1] = 0;
-    prev_nal_unit_type = nal_unit_type = 0;
+    prev_nal_unit_type = nal_unit_type = UNKNOWN;
     prev_idr_pic_id = idr_pic_id = 0;
 
     log2_max_frame_num = log2_max_pic_order_cnt_lsb = 0;
@@ -138,8 +139,6 @@ void H264Parser::Reset(void)
 
     AU_offset = frame_start_offset = keyframe_start_offset = 0;
     on_frame = on_key_frame = false;
-
-    wait_for_IDR = false;
 }
 
 
@@ -216,13 +215,7 @@ bool H264Parser::new_AU(void)
     {
         // Need previous slice information for comparison
 
-        if (NAL_type == AU_DELIMITER ||
-            NAL_type == SPS ||
-            NAL_type == PPS ||
-            NAL_type == SEI ||
-            (NAL_type > SPS_EXT && NAL_type < AUXILIARY_SLICE))
-            result = true;
-        else if (NAL_type != SLICE_IDR && frame_num != prev_frame_num)
+        if (nal_unit_type != SLICE_IDR && frame_num != prev_frame_num)
             result = true;
         else if (prev_pic_parameter_set_id != -1 &&
                  pic_parameter_set_id != prev_pic_parameter_set_id)
@@ -231,9 +224,6 @@ bool H264Parser::new_AU(void)
             result = true;
         else if ((bottom_field_flag != -1 && prev_bottom_field_flag != -1) &&
                  bottom_field_flag != prev_bottom_field_flag)
-            result = true;
-        else if ((nal_ref_idc == 0 || prev_nal_ref_idc == 0) &&
-                 nal_ref_idc != prev_nal_ref_idc)
             result = true;
         else if ((pic_order_cnt_type == 0 && prev_pic_order_cnt_type == 0) &&
                  (pic_order_cnt_lsb != prev_pic_order_cnt_lsb ||
@@ -258,7 +248,6 @@ bool H264Parser::new_AU(void)
     prev_pic_parameter_set_id = pic_parameter_set_id;
     prev_field_pic_flag = field_pic_flag;
     prev_bottom_field_flag = bottom_field_flag;
-    prev_nal_ref_idc = nal_ref_idc;
     prev_pic_order_cnt_lsb = pic_order_cnt_lsb;
     prev_delta_pic_order_cnt_bottom = delta_pic_order_cnt_bottom;
     prev_delta_pic_order_cnt[0] = delta_pic_order_cnt[0];
@@ -275,10 +264,10 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 {
     const uint8_t *byteP = bytes;
     const uint8_t *endP = bytes + byte_count;
-
+    const uint8_t *nalP;
     uint8_t        first_byte;
 
-    state_changed = false;
+    state_changed = is_keyframe = false;
 
     while (byteP < endP)
     {
@@ -307,10 +296,11 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
   11 End of stream end_of_stream_rbsp( )
 */
             first_byte = *(byteP - 1);
-            NAL_type = first_byte & 0x1f;
+            nal_unit_type = first_byte & 0x1f;
             nal_ref_idc = (first_byte >> 5) & 0x3;
 
-            if (NALisSlice(NAL_type) || NAL_type == SPS || NAL_type == PPS)
+            if (nal_unit_type == SPS || nal_unit_type == PPS ||
+                nal_unit_type == SEI || NALisSlice(nal_unit_type))
             {
                 /*
                   bitstream buffer, must be FF_INPUT_BUFFER_PADDING_SIZE
@@ -320,27 +310,51 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                 {
                     init_get_bits(&gb, byteP, 8 * (endP - byteP));
 
-                    if (NAL_type == SPS)
+                    if (nal_unit_type == SEI)
+                    {
+                        nalP = ff_find_start_code(byteP+1, endP,
+                                                  &sync_accumulator) - 8;
+                        decode_SEI(&gb, (nalP - byteP) * 8);
+                        set_AU_pending(stream_offset);
+                    }
+                    else if (nal_unit_type == SPS)
+                    {
                         decode_SPS(&gb);
-                    else if (NAL_type == PPS)
+                        set_AU_pending(stream_offset);
+                    }
+                    else if (nal_unit_type == PPS)
+                    {
                         decode_PPS(&gb);
+                        set_AU_pending(stream_offset);
+                    }
                     else
-                        find_AU = decode_Header(&gb);
+                    {
+                        decode_Header(&gb);
+                        if (new_AU())
+                            set_AU_pending(stream_offset);
+                    }
 
                     byteP += (get_bits_count(&gb) / 8);
                 }
             }
-
-            if (find_AU && new_AU())
+            else if (!AU_pending)
             {
-                /* After finding a new AU, don't look for another one
-                   until we decode a SLICE */
-                find_AU = false;
-                AU_pending = true;
-                AU_offset = stream_offset;
+                if (nal_unit_type == AU_DELIMITER ||
+                    (nal_unit_type > SPS_EXT &&
+                     nal_unit_type < AUXILIARY_SLICE))
+                {
+                    AU_pending = true;
+                    AU_offset = stream_offset;
+                }
+                else if ((nal_ref_idc == 0 || prev_nal_ref_idc == 0) &&
+                         nal_ref_idc != prev_nal_ref_idc)
+                {
+                    AU_pending = true;
+                    AU_offset = stream_offset;
+                }
             }
-            
-            if (AU_pending && NALisSlice(NAL_type))
+
+            if (AU_pending && NALisSlice(nal_unit_type))
             {
                 /* Once we know the slice type of a new AU, we can
                  * determine if it is a keyframe or just a frame */
@@ -351,7 +365,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                 on_frame = true;
                 frame_start_offset = AU_offset;
 
-                if (isKeySlice(slice_type) && (!wait_for_IDR || seen_IDR))
+                if (is_keyframe)
                 {
                     on_key_frame = true;
                     keyframe_start_offset = AU_offset;
@@ -361,6 +375,8 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
             }
             else
                 on_frame = on_key_frame = false;
+
+            prev_nal_ref_idc = nal_ref_idc;
 
             return byteP - bytes;
         }
@@ -442,8 +458,6 @@ bool H264Parser::decode_Header(GetBitContext *gb)
     */
 
     frame_num = get_bits(gb, log2_max_frame_num);
-    if (NAL_type == SLICE_IDR || frame_num == 0)
-        seen_IDR = true;
 
     /*
       field_pic_flag equal to 1 specifies that the slice is a slice of a
@@ -477,9 +491,14 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       second such IDR access unit. The value of idr_pic_id shall be in
       the range of 0 to 65535, inclusive.
      */
-    if (nal_unit_type == SLICE_IDR)
-        idr_pic_id = get_ue_golomb(gb);
 
+    if (nal_unit_type == SLICE_IDR)
+    {
+        idr_pic_id = get_ue_golomb(gb);
+        is_keyframe = true;
+    }
+    else
+        is_keyframe |= I_is_keyframe && isKeySlice(slice_type);
     /*
       pic_order_cnt_lsb specifies the picture order count modulo
       MaxPicOrderCntLsb for the top field of a coded frame or for a coded
@@ -806,6 +825,44 @@ void H264Parser::decode_PPS(GetBitContext * gb)
     get_bits1(gb);     // constrained_intra_pref_flag
     redundant_pic_cnt_present_flag = get_bits1(gb);
 #endif
+}
+
+void H264Parser::decode_SEI(GetBitContext * gb, int bitlen)
+{
+    int   recovery_frame_cnt = -1;
+    bool  exact_match_flag = false;
+    bool  broken_link_flag = false;
+    int   changing_group_slice_idc = -1;
+
+    while (get_bits_count(gb) < bitlen)
+    {
+        int type = 0, size = 0;
+
+        do {
+            type += show_bits(gb, 8);
+        } while (get_bits(gb, 8) == 255);
+
+        do {
+            size += show_bits(gb, 8);
+        } while (get_bits(gb, 8) == 255);
+
+        switch (type)
+        {
+          case SEI_TYPE_RECOVERY_POINT:
+            recovery_frame_cnt = get_ue_golomb(gb);
+            exact_match_flag = get_bits1(gb);
+            broken_link_flag = get_bits1(gb);
+            changing_group_slice_idc = get_bits(gb, 2);
+            is_keyframe |= (recovery_frame_cnt >= 0);
+            return;
+
+          default:
+            skip_bits(gb, size * 8);
+            break;
+        }
+
+        align_get_bits(gb);
+    }
 }
 
 void H264Parser::vui_parameters(GetBitContext * gb)
