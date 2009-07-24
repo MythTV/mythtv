@@ -119,7 +119,7 @@ void SavePending(int pending)
     else if (query.size() == 1)
     {
         //  ah, just right
-        query.prepare("UPDATE settings SET data = :DATA WHERE "
+        query.prepare("UPDATE settings SET data = :DATA "
                          "WHERE value = :LASTPUSH "
                          "AND hostname = :HOST ;");
         query.bindValue(":DATA", pending);
