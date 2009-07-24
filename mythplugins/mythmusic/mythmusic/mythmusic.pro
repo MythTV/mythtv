@@ -9,7 +9,7 @@ QT += xml sql opengl qt3support network
    error(Missing config.pro: please run the configure script)
 }
 
-INCLUDEPATH *= /usr/include/cdda
+INCLUDEPATH *= $${SYSROOT}/usr/include/cdda
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythmusic

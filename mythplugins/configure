@@ -9,6 +9,7 @@
 
 prefix="/usr/local"
 libdir_name="lib"
+sysroot=""
 
 music="yes"
 video="yes"
@@ -45,6 +46,7 @@ NB:      all --enable-* options can be reversed with --disable-*
 
 Generic options:
   --prefix=PREFIX          MythTV install location PREFIX [$prefix]
+  --sysroot=SYSROOT        MythTV sysroot location SYSROOT [$sysroot]
   --qmake=QMAKE            use specified qmake [$qmake]
   --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]
   --help                   print this message
@@ -127,6 +129,8 @@ echo "   $0$CONFIGURATION_OPTS" >> config.log
 for opt do
   case "$opt" in
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --sysroot=*) sysroot=$(echo $opt | cut -d '=' -f 2)
   ;;
   --qmake=*) qmake=`echo $opt | cut -d '=' -f 2`
   ;;
@@ -282,7 +286,7 @@ has_library()
         done
     fi
 
-    LIBPATHS="`echo $LIBPATHS $prefix/$libdir_name /$libdir_name /usr/$libdir_name /usr/local/$libdir_name /usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
+    LIBPATHS="`echo $LIBPATHS $sysroot$prefix/$libdir_name $sysroot/$libdir_name $sysroot/usr/$libdir_name $sysroot/usr/local/$libdir_name $sysroot/usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
 
     HAS_IT="no"
     for LIBPATH in $LIBPATHS ; do
@@ -295,7 +299,7 @@ has_library()
 
 has_header()
 {
-    HPATHS="$prefix/include /usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include /"
+    HPATHS="$sysroot$prefix/include $sysroot/usr/local/include $sysroot/usr/include $sysroot/usr/include/g++-v3 $sysroot/usr/X11R6/include $sysroot/"
     INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
     HPATHS="$HPATHS `echo $INCL | sed s/$libdir_name/include/g` "
 
@@ -327,7 +331,7 @@ if test "$opengl" != "no" ; then
     if has_library libGL ; then
         opengl="yes"
     fi
-    if test -f /System/Library/Frameworks/AGL.framework/Versions/A/AGL ; then
+    if test -f $sysroot/System/Library/Frameworks/AGL.framework/Versions/A/AGL ; then
         opengl="yes"
     fi
 fi
@@ -474,13 +478,13 @@ rm -f $TMPC $TMPE
 ###########################################################
 
 # bring in mythtv config
-if [ -e $prefix/include/mythtv/mythconfig.mak ] ; then
+if [ -e $sysroot$prefix/include/mythtv/mythconfig.mak ] ; then
   rm mythconfig.mak 2> /dev/null
-  ln -s $prefix/include/mythtv/mythconfig.mak mythconfig.mak
+  ln -s $sysroot$prefix/include/mythtv/mythconfig.mak mythconfig.mak
 else
-  echo "ERROR: mythconfig.mak not found at $prefix/include/mythtv/mythconfig.mak"
+  echo "ERROR: mythconfig.mak not found at $sysroot$prefix/include/mythtv/mythconfig.mak"
   echo "Did you make AND install MythTV first?"
-  echo "Are you using the correct prefix ($prefix)?"
+  echo "Are you using the correct prefix ($prefix) and sysroot ($sysroot)?"
   echo "Bailing out!!"
   exit
 fi

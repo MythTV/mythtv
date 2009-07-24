@@ -1,7 +1,7 @@
-INCLUDEPATH += $${PREFIX}/include/mythtv
-INCLUDEPATH += $${PREFIX}/include/mythtv/libmythdb
-INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
-INCLUDEPATH += $${PREFIX}/include/mythtv/libmyth
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythdb
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythui
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmyth
 
 LIBS += -L$${LIBDIR} $$EXTRA_LIBS -lmythdb-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION
@@ -13,7 +13,7 @@ mac:using_firewire:using_backend:{
 }
 
 # On Windows, libs are stored with the binaries:
-mingw:LIBS += -L$${PREFIX}/bin
+mingw:LIBS += -L$${SYSROOT}$${PREFIX}/bin
 
 # Trigger rebuilds if installed MythTV libs have changed
 include (../../targetdep.pro)

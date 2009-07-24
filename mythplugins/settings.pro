@@ -2,11 +2,11 @@ CONFIG += $$CCONFIG
 
 LIBVERSION = 0.22
 
-INCLUDEPATH += $${PREFIX}/include
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include
 #INCLUDEPATH += /usr/include/cdda
 #INCLUDEPATH += /usr/include/FLAC
 
-LIBS *= -L$${PREFIX}/$${LIBDIRNAME}
+LIBS *= -L$${SYSROOT}$${PREFIX}/$${LIBDIRNAME}
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
@@ -20,7 +20,6 @@ isEmpty(TARGET_OS) : win32 {
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
 
-INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH += $$CONFIG_INCLUDEPATH
 
 # Prevent building .app bundles everywhere.
