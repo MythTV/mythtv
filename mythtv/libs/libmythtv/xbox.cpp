@@ -2,6 +2,7 @@
 
 #include "mythcontext.h"
 #include "remoteutil.h"
+#include "mythsystem.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -54,8 +55,7 @@ void XBox::CheckRec(void)
     if (color != PhaseCache)
     {
         QString tmp = BlinkBIN + " " + color;
-        system(tmp.toAscii().constData());
+        myth_system(tmp.toAscii().constData());
         PhaseCache = color;
     }
 }
-

@@ -1897,7 +1897,7 @@ void JobQueue::DoTranscodeThread(void)
     }
 
     if (jobQueueCPU < 2)
-        nice(17);
+        myth_nice(17);
 
     QString transcoderName;
     if (transcoder == RecordingProfile::TranscoderAutodetect)
@@ -2230,9 +2230,9 @@ void JobQueue::DoUserJobThread(void)
 
     switch (jobQueueCPU)
     {
-        case  0: nice(17);
+        case  0: myth_nice(17);
                  break;
-        case  1: nice(10);
+        case  1: myth_nice(10);
                  break;
         case  2:
         default: break;

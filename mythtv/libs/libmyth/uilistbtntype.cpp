@@ -1615,15 +1615,16 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
 
 
             // move back up the list a little
-            uint count = 0, i;
-            for (int i = m_selPosition;
+            uint count = 0;
+            int i;
+            for (i = m_selPosition;
                  (i >= 0) && (count < lcddev->getLCDHeight()); --i, ++count);
 
             i = (i < 0) ? 0 : i;
             count = 0;
 
             QList<LCDMenuItem> menuItems;
-            for (; (i < (uint)m_itemList.size()) &&
+            for (; ((uint)i < (uint)m_itemList.size()) &&
                      (count < lcddev->getLCDHeight() * 2); ++i, ++count)
             {
                 UIListBtnTypeItem *curItem = m_itemList[i];

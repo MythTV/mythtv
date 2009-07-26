@@ -88,6 +88,8 @@ MPUBLIC bool WakeOnLAN(QString MAC);
 /// Is A/V Sync destruction daemon is running on this host?
 MPUBLIC bool IsPulseAudioRunning(void);
 
+MPUBLIC bool myth_nice(int val);
+
 // CPU Tick timing function
 #ifdef MMX
 #ifdef _WIN32

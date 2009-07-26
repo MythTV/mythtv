@@ -20,6 +20,7 @@
 #include <iostream>
 using namespace std;
 
+#include "util.h"
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "NuppelVideoRecorder.h"
@@ -1050,7 +1051,7 @@ void NuppelVideoRecorder::StartRecording(void)
     gettimeofday(&stm, &tzone);
 
     // try to get run at higher scheduling priority, ignore failure
-    int err = nice(-10); (void) err;
+    myth_nice(-10);
 
     if (!Open())
     {

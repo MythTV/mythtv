@@ -2415,7 +2415,7 @@ void NuppelVideoPlayer::InitAVSync(void)
         VERBOSE(VB_PLAYBACK, msg);
 
         // try to get preferential scheduling, but ignore if we fail to.
-        int err = nice(-19); (void) err;
+        myth_nice(-19);
     }
 }
 

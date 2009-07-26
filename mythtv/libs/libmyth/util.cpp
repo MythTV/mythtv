@@ -1375,4 +1375,18 @@ bool IsPulseAudioRunning(void)
     return !res;
 }
 
+bool myth_nice(int val)
+{
+    errno = 0;
+    int ret = nice(val);
+
+    if ((-1 == ret) && (0 != errno) && (val >= 0))
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to nice process" + ENO);
+        return false;
+    }
+
+    return true;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
