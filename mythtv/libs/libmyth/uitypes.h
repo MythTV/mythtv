@@ -152,47 +152,6 @@ class MPUBLIC UIType : public QObject
     bool     hidden;        // Is this "widget" seen or hidden ?
 };
 
-class MPUBLIC UIBarType : public UIType
-{
-  public:
-    UIBarType(const QString &name, QString, int, QRect);
-    ~UIBarType();
-
-    void SetIcon(int, QPixmap);
-    void SetText(int, QString);
-    void SetIcon(int, QString);
-
-    void Draw(QPainter *, int, int);
-
-    void SetJustification(int jst) { m_justification = jst; }
-    void SetSize(int size) { m_size = size; LoadImage(); }
-    int GetNums(void) { return m_size; }
-    void SetScreen(double w, double h) { m_wmult = w; m_hmult = h; }
-    void SetFont(fontProp *font) { m_font = font; }
-    void SetOrientation(int ori) { m_orientation = ori; }
-    void SetTextOffset(QPoint to) { m_textoffset = to; }
-    void SetIconOffset(QPoint ic) { m_iconoffset = ic; }
-    void SetIconSize(QPoint is) { m_iconsize = is; }
-    void ResetImage(int loc) { iconData[loc] = QPixmap(0,0); }
-    int GetSize() { return m_iconsize.x(); }
-
-  private:
-    void LoadImage(int loc = -1, QString dat = "");
-    QRect m_displaysize;
-    QPoint m_iconsize;
-    QPoint m_textoffset;
-    QPoint m_iconoffset;
-    int m_justification;
-    int m_orientation;
-    int m_size;
-    fontProp *m_font;
-    QString m_filename;
-    QPixmap m_image;
-    QMap<int, QString> textData;
-    QMap<int, QPixmap> iconData;
-
-};
-
 class ImageGridItem
 {
     public:
@@ -887,8 +846,6 @@ class MPUBLIC UITextButtonType : public UIType
     QTimer   push_timer;
 
 };
-
-
 
 class MPUBLIC UICheckBoxType : public UIType
 {
