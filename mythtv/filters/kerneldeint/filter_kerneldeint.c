@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "mythconfig.h"
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -12,11 +13,10 @@
 #include <math.h>
 #include <pthread.h>
 
-#include "libmythtv/filter.h"
-#include "libmythtv/frame.h"
+#include "filter.h"
+#include "frame.h"
 
-#include "libmythdb/mythconfig.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 #include "../mm_arch.h"
 

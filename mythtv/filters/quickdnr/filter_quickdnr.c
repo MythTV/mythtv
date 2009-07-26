@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 
+#include "config.h"
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -19,7 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
 #include "filter.h"
 #include "frame.h"
 #include "dsputil.h"

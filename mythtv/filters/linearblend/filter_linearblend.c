@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "mythconfig.h"
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
-#include "config.h"
 #include "../mm_arch.h"
 #if HAVE_ALTIVEC_H
     #include <altivec.h>

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "mythconfig.h"
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -14,7 +15,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "config.h"
 #include "filter.h"
 #include "frame.h"
 #include "../mm_arch.h"
