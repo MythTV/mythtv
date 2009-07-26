@@ -58,20 +58,25 @@ typedef int bool_t;
 #define console_printf printf
 #define THREAD_FUNC_PREFIX void *
 
-static inline int msleep(unsigned int ms)
+#ifndef __GNUC__
+#define __inline__ inline
+#endif
+
+
+static __inline__ int msleep(unsigned int ms)
 {
 	usleep(ms * 1000);
 	return 0;
 }
 
-static inline uint64_t getcurrenttime(void)
+static __inline__ uint64_t getcurrenttime(void)
 {
 	struct timeval t;
 	gettimeofday(&t, NULL);
 	return ((uint64_t)t.tv_sec * 1000) + (t.tv_usec / 1000);
 }
 
-static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout)
+static __inline__ int setsocktimeout(int s, int level, int optname, uint64_t timeout)
 {
 	struct timeval t;
 	t.tv_sec = timeout / 1000;

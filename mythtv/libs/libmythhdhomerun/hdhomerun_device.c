@@ -881,11 +881,14 @@ const char *hdhomerun_device_get_model_str(struct hdhomerun_device_t *hd)
 		return NULL;
 	}
 	if (ret == 0) {
-		model_str = "hdhomerun_atsc";
+		strncpy(hd->model, "hdhomerun_atsc", sizeof(hd->model) - 1);
+		hd->model[sizeof(hd->model) - 1] = 0;
 	}
-
-	strncpy(hd->model, model_str, sizeof(hd->model) - 1);
-	hd->model[sizeof(hd->model) - 1] = 0;
+	else
+	{
+		strncpy(hd->model, model_str, sizeof(hd->model) - 1);
+		hd->model[sizeof(hd->model) - 1] = 0;
+	}
 
 	return hd->model;
 }

@@ -9,7 +9,7 @@ SRCS += hdhomerun_debug.c
 SRCS += hdhomerun_channels.c
 SRCS += hdhomerun_channelscan.c
 
-CFLAGS += -Wall -O2 -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith
+CFLAGS += -Wall -O2 -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -std=c99 -pedantic
 
 hdhomerun_config : $(SRCS)
 	gcc $(CFLAGS) $(SRCS) -lpthread -o $@
