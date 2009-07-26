@@ -2413,7 +2413,9 @@ void NuppelVideoPlayer::InitAVSync(void)
         msg = QString("Refresh rate: %1, frame interval: %2")
                        .arg(refreshrate).arg(frame_interval);
         VERBOSE(VB_PLAYBACK, msg);
-        nice(-19);
+
+        // try to get preferential scheduling, but ignore if we fail to.
+        int err = nice(-19); (void) err;
     }
 }
 

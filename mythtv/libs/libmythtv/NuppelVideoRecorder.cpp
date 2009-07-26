@@ -1049,8 +1049,8 @@ void NuppelVideoRecorder::StartRecording(void)
     // save the start time
     gettimeofday(&stm, &tzone);
 
-    if (getuid() == 0)
-        nice(-10);
+    // try to get run at higher scheduling priority, ignore failure
+    int err = nice(-10); (void) err;
 
     if (!Open())
     {
