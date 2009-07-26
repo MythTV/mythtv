@@ -65,6 +65,9 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
 
     CleanupDuplicates(transports);
 
+    if (m_fta_only)
+        CleanupEncrypted(transports);
+
     // Pull in DB info
     uint sourceid = transports[0].channels[0].source_id;
     ScanDTVTransportList db_trans = GetDBTransports(sourceid, transports);
@@ -569,6 +572,21 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
     }
 
     transports = no_dups;
+}
+
+void ChannelImporter::CleanupEncrypted(ScanDTVTransportList &transports) const
+{
+    for (uint i = 0; i < transports.size(); i++)
+    {
+        ChannelInsertInfoList fta_only;
+        for (uint k = 0; k < transports[i].channels.size(); k++)
+        {
+            if (!transports[i].channels[k].is_encrypted ||
+                transports[i].channels[k].decryption_status == kEncDecrypted)
+                fta_only.push_back(transports[i].channels[k]);
+        }
+        transports[i].channels = fta_only;
+    }
 }
 
 /** \fn ChannelImporter::GetDBTransports(uint,ScanDTVTransportList&) const

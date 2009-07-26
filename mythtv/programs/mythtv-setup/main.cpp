@@ -482,10 +482,29 @@ int main(int argc, char *argv[])
 
     if (scanImport)
     {
+        bool fta_only = false;
+        vector<ScanInfo> scans = LoadScanList();
+        for (uint i = 0; i < scans.size(); i++)
+        {
+            if (scans[i].scanid == scanImport)
+            {
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare("SELECT freetoaironly "
+                              "FROM cardinput "
+                              "WHERE sourceid = :SOURCEID AND "
+                              "      cardid   = :CARDID");
+                query.bindValue(":CARDID",   scans[i].cardid);
+                query.bindValue(":SOURCEID", scans[i].sourceid);
+
+                if (query.exec() && query.next())
+                    fta_only = query.value(0).toBool();
+                break;
+            }
+        }
         cout<<"*** SCAN IMPORT START ***"<<endl;
         {
             ScanDTVTransportList list = LoadScan(scanImport);
-            ChannelImporter ci(false, true, true, false);
+            ChannelImporter ci(false, true, true, false, fta_only);
             ci.Process(list);
         }
         cout<<"*** SCAN IMPORT END ***"<<endl;

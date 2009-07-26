@@ -136,6 +136,7 @@ ChannelScanSM::ChannelScanSM(
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
       inputname(_inputname),
+      trust_encryption_si(false),
       // State
       scanning(false),
       threadExit(false),
@@ -423,6 +424,12 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
             break;
 
         currentEncryptionStatusChecked[pnum] = true;
+
+        if (trust_encryption_si)
+        {
+            currentEncryptionStatus[pnum] = kEncEncrypted;
+            continue;
+        }
 
         const ProgramMapTable *pmt = NULL;
         for (uint i = 0; !pmt && (i < info->pmts.size()); i++)

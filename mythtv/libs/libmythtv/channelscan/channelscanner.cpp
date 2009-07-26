@@ -44,7 +44,7 @@
 #define LOC_ERR QString("ChScan, Error: ")
 
 ChannelScanner::ChannelScanner() :
-    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), freeboxScanner(NULL)
+    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), freeboxScanner(NULL), m_fta_only(false)
 {
 }
 
@@ -117,6 +117,17 @@ void ChannelScanner::Scan(
                 "scanner does not exist...");
         return;
     }
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT freetoaironly "
+                  "FROM cardinput "
+                  "WHERE sourceid = :SOURCEID AND "
+                  "      cardid   = :CARDID");
+    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":SOURCEID", sourceid);
+    
+    if (query.exec() && query.next())
+        m_fta_only = query.value(0).toBool();
 
     sigmonScanner->StartScanner();
     scanMonitor->ScanUpdateStatusText("");

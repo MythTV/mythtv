@@ -92,6 +92,9 @@ class MPUBLIC ChannelScanner
 
     /// imported channels
     DTVChannelList      channels;
+
+    /// import/update only fta channels
+    bool                m_fta_only;
 };
 
 #endif // _CHANNEL_SCANNER_H_
