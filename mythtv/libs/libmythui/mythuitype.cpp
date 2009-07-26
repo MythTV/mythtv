@@ -57,11 +57,12 @@ MythUIType::~MythUIType()
     delete m_Fonts;
 }
 
+/**
+ *  \brief Reset the widget to it's original state, should not reset changes
+ *         made by the theme
+ */
 void MythUIType::Reset()
 {
-    // Reset the widget to it's original state, should not reset changes made
-    // by the theme
-
     // Reset all children
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
     while (it.hasNext())
@@ -72,6 +73,9 @@ void MythUIType::Reset()
     }
 }
 
+/**
+ *  \brief Add a child UIType
+ */
 void MythUIType::AddChild(MythUIType *child)
 {
     if (!child)
@@ -108,6 +112,12 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
     return 0;
 }
 
+/**
+ *  \brief Get a named child of this UIType
+ *
+ *  \param Name of child
+ *  \return Pointer to child if found, or NULL
+ */
 MythUIType *MythUIType::GetChild(const QString &name)
 {
     QObject *ret = qChildHelper(name.toAscii().constData(), NULL, false, children());
@@ -117,6 +127,11 @@ MythUIType *MythUIType::GetChild(const QString &name)
     return NULL;
 }
 
+/**
+ *  \brief Delete a named child of this UIType
+ *
+ *  \param Name of child
+ */
 void MythUIType::DeleteChild(const QString &name)
 {
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
@@ -133,6 +148,12 @@ void MythUIType::DeleteChild(const QString &name)
     }
 }
 
+/**
+ *  \brief Delete the given UIType if it is a child of this UIType.
+ *
+ *  Will not delete the object if it is not a child. Pointer will be set to
+ *  NULL if successful.
+ */
 void MythUIType::DeleteChild(MythUIType *child)
 {
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
@@ -144,6 +165,7 @@ void MythUIType::DeleteChild(MythUIType *child)
         {
             type->deleteLater();
             it.remove();
+            child = NULL;
             return;
         }
     }
@@ -776,6 +798,11 @@ bool MythUIType::IsDeferredLoading(bool recurse)
      return false;
 }
 
+/**
+ *  \brief Cause images in this and child widgets to be loaded. Used only in
+ *         conjunction with delayed loading in some large statetypes to
+ *         conserve memory.
+ */
 void MythUIType::LoadNow(void)
 {
     QList<MythUIType *>::Iterator it;

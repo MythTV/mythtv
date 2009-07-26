@@ -156,8 +156,8 @@ void MythUIImage::SetDelay(int delayms)
 }
 
 /**
- *  \brief Assign a MythImage to the widget. Discouraged, use SetFilename()
- *         instead.
+ *  \brief Assign a MythImage to the widget. Use is strongly discouraged, use
+ *         SetFilename() instead.
  */
 void MythUIImage::SetImage(MythImage *img)
 {
@@ -197,7 +197,8 @@ void MythUIImage::SetImage(MythImage *img)
 
 /**
  *  \brief Assign a set of MythImages to the widget for animation.
- *         Discouraged, use SetFilePattern() instead.
+ *         Use is strongly discouraged, use SetFilePattern() instead.
+ *
  */
 void MythUIImage::SetImages(QVector<MythImage *> &images)
 {
@@ -312,6 +313,10 @@ void MythUIImage::SetCropRect(const MythRect &rect)
     SetRedraw();
 }
 
+/**
+ *  \brief Generates a unique identifying string for this image which is used
+ *         as a key in the image cache.
+ */
 QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
 {
     QString imagelabel;
@@ -336,6 +341,10 @@ QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
     return imagelabel;
 }
 
+/**
+ *  \brief Generates a unique identifying string for this image which is used
+ *         as a key in the image cache.
+ */
 QString MythUIImage::GenImageLabel(int w, int h)
 {
     return GenImageLabel(m_Filename, w, h);
@@ -590,9 +599,9 @@ bool MythUIImage::ParseElement(QDomElement &element)
             QStringList imageList = imageDir.entryList();
             srand(time(NULL));
             QString randFile = QString("%1%2").arg(m_Filename)
-                           .arg(imageList.takeAt(rand() % imageList.size())); 
+                           .arg(imageList.takeAt(rand() % imageList.size()));
             m_OrigFilename = m_Filename = randFile;
-        }     
+        }
     }
     else if (element.tagName() == "filepattern")
     {
@@ -764,6 +773,9 @@ void MythUIImage::Finalize(void)
     MythUIType::Finalize();
 }
 
+/**
+ *  \copydoc MythUIType::LoadNow()
+ */
 void MythUIImage::LoadNow(void)
 {
     if (m_NeedLoad)

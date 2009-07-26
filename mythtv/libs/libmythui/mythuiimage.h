@@ -22,18 +22,25 @@ class MPUBLIC MythUIImage : public MythUIType
     MythUIImage(MythUIType *parent, const QString &name);
    ~MythUIImage();
 
-    // Must be followed by a call to Load() to load the image.
+    /** Must be followed by a call to Load() to load the image. */
     void SetFilename(const QString &filename);
+
+    /** Must be followed by a call to Load() to load the image. */
     void SetFilepattern(const QString &filepattern, int low, int high);
 
     void SetImageCount(int low, int high);
-    void SetImage(MythImage *img) __attribute__ ((deprecated));
-    void SetImages(QVector<MythImage *> &images) __attribute__ ((deprecated));
+
+    /** Should not be used unless absolutely necessary since it bypasses the
+     *   image caching and threaded loaded mechanisms.
+     */
+    void SetImage(MythImage *img);
+
+    /** Should not be used unless absolutely necessary since it bypasses the
+     *   image caching and threaded loaded mechanisms.
+     */
+    void SetImages(QVector<MythImage *> &images);
 
     void SetDelay(int delayms);
-
-    QString GenImageLabel(const QString &filename, int w, int h);
-    QString GenImageLabel(int w, int h);
 
     void Reset(void);
     bool Load(void);
@@ -62,6 +69,9 @@ class MPUBLIC MythUIImage : public MythUIType
 
     void SetCropRect(int x, int y, int width, int height);
     void SetCropRect(const MythRect &rect);
+
+    QString GenImageLabel(const QString &filename, int w, int h);
+    QString GenImageLabel(int w, int h);
 
     QString m_Filename;
     QString m_OrigFilename;
