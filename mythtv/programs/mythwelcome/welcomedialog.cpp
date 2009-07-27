@@ -201,10 +201,7 @@ void WelcomeDialog::customEvent(QEvent *e)
                      VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
                      QString poweroff_cmd = gContext->GetSetting("MythShutdownPowerOff", "");
                      if (!poweroff_cmd.isEmpty())
-                     {
-                         QByteArray tmp = poweroff_cmd.toAscii();
-                         system(tmp.constData());
-                     }
+                         myth_system(poweroff_cmd);
                 }
             }
         }
@@ -273,13 +270,11 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
             // is shutdown locked by a user
             if (statusCode & 16)
             {
-                tmp = mythshutdown_unlock.toAscii();
-                system(tmp.constData());
+                myth_system(mythshutdown_unlock);
             }
             else
             {
-                tmp = mythshutdown_lock.toAscii();
-                system(tmp.constData());
+                myth_system(mythshutdown_lock);
             }
 
             updateStatusMessage();
@@ -289,16 +284,12 @@ bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
         {
             QString cmd = gContext->GetSetting("MythShutdownXTermCmd", "");
             if (!cmd.isEmpty())
-            {
-                QByteArray tmp = cmd.toAscii();
-                system(tmp);
-            }
+                myth_system(cmd);
         }
         else if (action == "STARTSETUP")
         {
             QString mythtv_setup = m_installDir + "/bin/mythtv-setup";
-            QByteArray tmp = mythtv_setup.toAscii();
-            system(tmp);
+            myth_system(mythtv_setup);
         }
         else
             handled = false;
@@ -642,7 +633,7 @@ void WelcomeDialog::showMenu(void)
 void WelcomeDialog::lockShutdown(void)
 {
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --lock";
-    system(mythshutdown_exe.toLocal8Bit().constData());
+    myth_system(mythshutdown_exe);
     updateStatusMessage();
     updateScreen();
 }
@@ -650,7 +641,7 @@ void WelcomeDialog::lockShutdown(void)
 void WelcomeDialog::unlockShutdown(void)
 {
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --unlock";
-    system(mythshutdown_exe.toLocal8Bit().constData());
+    myth_system(mythshutdown_exe);
     updateStatusMessage();
     updateScreen();
 }
@@ -671,10 +662,7 @@ void WelcomeDialog::shutdownNow(void)
         VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
         QString poweroff_cmd = gContext->GetSetting("MythShutdownPowerOff", "");
         if (!poweroff_cmd.isEmpty())
-        {
-            QByteArray tmp = poweroff_cmd.toAscii();
-            system(tmp);
-        }
+            myth_system(poweroff_cmd);
         return;
     }
 
@@ -741,14 +729,13 @@ void WelcomeDialog::shutdownNow(void)
 
         if (!setwakeup_cmd.isEmpty())
         {
-            QByteArray tmp = setwakeup_cmd.toAscii();
-            system(tmp.constData());
+            myth_system(setwakeup_cmd);
         }
     }
 
     // run command to set wakeuptime in bios and shutdown the system
     QString mythshutdown_exe =
         "sudo " + m_installDir + "/bin/mythshutdown --startup";
-    system(mythshutdown_exe.toLocal8Bit().constData());
+    myth_system(mythshutdown_exe);
 }
 
