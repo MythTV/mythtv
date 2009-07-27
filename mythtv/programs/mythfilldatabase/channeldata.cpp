@@ -7,6 +7,9 @@
 #include <QDir>
 #include <QFile>
 
+// libmythdb headers
+#include "httpcomms.h"
+
 // libmyth headers
 #include "mythverbose.h"
 #include "mythdb.h"
@@ -137,17 +140,19 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
     {
         QString localfile = "";
 
-        if ((*i).iconpath != "")
+        if (!(*i).iconpath.isEmpty())
         {
             QDir remotefile = QDir((*i).iconpath);
             QString filename = remotefile.dirName();
 
             localfile = fileprefix + filename;
             QFile actualfile(localfile);
-            if (!actualfile.exists())
+            if (!actualfile.exists() &&
+                !HttpComms::getHttpFile(localfile, (*i).iconpath))
             {
-                QString command = QString("wget ") + (*i).iconpath;
-                system(command.toLocal8Bit().constData());
+                VERBOSE(VB_IMPORTANT,
+                        QString("Failed to fetch icon from '%1'")
+                        .arg((*i).iconpath));
             }
         }
 
