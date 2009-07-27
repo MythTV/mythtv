@@ -670,11 +670,13 @@ qint64 MSocketDevice::bytesAvailable() const
       sure all bits are set to zero, preventing underflow with the
       FreeBSD/Linux/Solaris ioctls.
     */
-    size_t nbytes = 0;
+    union { size_t st; int i; } nbytes;
+    nbytes.st = 0;
+
     // gives shorter than true amounts on Unix domain sockets.
-    if ( ::ioctl(fd, FIONREAD, (char*)&nbytes) < 0 )
+    if ( ::ioctl(fd, FIONREAD, (char*)&nbytes.i) < 0 )
 	return -1;
-    return (qint64) *((int *)&nbytes) + QIODevice::bytesAvailable();
+    return (qint64) nbytes.i + QIODevice::bytesAvailable();
 }
 
 
