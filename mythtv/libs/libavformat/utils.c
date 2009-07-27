@@ -589,7 +589,7 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
         st= s->streams[pkt->stream_index];
         
         if (!st)
-            return ret;
+            return -1;
 
         switch(st->codec->codec_type){
         case CODEC_TYPE_VIDEO:
