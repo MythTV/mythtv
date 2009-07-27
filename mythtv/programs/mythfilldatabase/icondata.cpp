@@ -1,23 +1,32 @@
+// C++ headers
+#include <iostream>
+using namespace std;
+
+// C headers
+#include <cstdlib>
+
 // POSIX headers
 #include <unistd.h>
 #include <signal.h>
 
 // Qt headers
-#include <qdom.h>
-#include <qfile.h>
-#include <qfileinfo.h>
+#include <QApplication>
+#include <QDomElement>
+#include <QFileInfo>
+#include <QFile>
 
-#include <iostream>
-#include <cstdlib>
-using namespace std;
-
-// libmyth headers
+// MythTV headers
 #include "mythcontext.h"
+#include "mythtimer.h"
 #include "mythdb.h"
 
 // filldata headers
 #include "fillutil.h"
 #include "icondata.h"
+
+#define LOC      QString("IconData: ")
+#define LOC_WARN QString("IconData, Warning: ")
+#define LOC_ERR  QString("IconData, Error: ")
 
 const char * const IM_DOC_TAG = "iconmappings";
 
@@ -146,82 +155,188 @@ void RunSimpleQuery(const QString &query)
         MythDB::DBError("RunSimpleQuery ", q);
 }
 
-void IconData::UpdateSourceIcons(int sourceid)
+
+IconData::~IconData()
 {
-    VERBOSE(VB_GENERAL,
+    MythHttpPool::GetSingleton()->RemoveListener(this);
+}
+
+void IconData::UpdateSourceIcons(uint sourceid)
+{
+    VERBOSE(VB_GENERAL, LOC +
             QString("Updating icons for sourceid: %1").arg(sourceid));
 
     QString fileprefix = SetupIconCacheDirectory();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT ch.chanid, nim.url "
-            "FROM (channel ch, callsignnetworkmap csm) "
-            "RIGHT JOIN networkiconmap nim ON csm.network = nim.network "
-            "WHERE ch.callsign = csm.callsign AND "
-            "(icon = :NOICON OR icon = '') AND ch.sourceid = :SOURCEID");
+    query.prepare(
+        "SELECT ch.chanid, nim.url "
+        "FROM (channel ch, callsignnetworkmap csm) "
+        "RIGHT JOIN networkiconmap nim ON csm.network = nim.network "
+        "WHERE ch.callsign = csm.callsign AND "
+        "      (icon = :NOICON OR icon = '') AND "
+        "      ch.sourceid = :SOURCEID");
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":NOICON", "none");
 
     if (!query.exec())
-        MythDB::DBError("Looking for icons to fetch", query);
-
-    if (query.isActive() && query.size() > 0)
     {
-        while (query.next())
+        MythDB::DBError("Looking for icons to fetch", query);
+        return;
+    }
+
+    bool count = 0;
+    while (query.next())
+    {
+        count++;
+
+        QString icon_url = expandURLString(query.value(1).toString());
+        QFileInfo qfi(icon_url);
+        QFile localfile(fileprefix + "/" + qfi.fileName());
+
+        if (!localfile.exists() || 0 == localfile.size())
         {
-            QString icon_url = expandURLString(query.value(1).toString());
-            QFileInfo qfi(icon_url);
-            QFile localfile(fileprefix + "/" + qfi.fileName());
-            if (!localfile.exists())
+            VERBOSE(VB_GENERAL, LOC +
+                    QString("Attempting to fetch icon at '%1'")
+                    .arg(icon_url));
+
+            FI fi;
+            fi.filename = localfile.fileName();
+            fi.chanid = query.value(0).toUInt();
+
+            bool add_request = false;
             {
-                QString icon_get_command =
-                    QString("wget --timestamping --directory-prefix=%1 '%2'")
-                            .arg(fileprefix).arg(icon_url);
-
-                if ((print_verbose_messages & VB_GENERAL) == 0)
-                    icon_get_command += " > /dev/null 2> /dev/null";
-                VERBOSE(VB_GENERAL,
-                        QString("Attempting to fetch icon with: %1")
-                                .arg(icon_get_command));
-
-                system(icon_get_command.toLocal8Bit().constData());
+                QMutexLocker locker(&m_u2fl_lock);
+                add_request = m_u2fl[icon_url].empty();
+                m_u2fl[icon_url].push_back(fi);
             }
 
-            if (localfile.exists())
-            {
-                int chanid = query.value(0).toInt();
+            if (add_request)
+                MythHttpPool::GetSingleton()->AddUrlRequest(icon_url, this);
 
-                VERBOSE(VB_GENERAL, QString("Updating channel icon for "
-                                            "chanid: %1")
-                                            .arg(chanid));
-
-                MSqlQuery icon_update_query(MSqlQuery::InitCon());
-                icon_update_query.prepare("UPDATE channel SET icon = :ICON "
-                        "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
-                icon_update_query.bindValue(":ICON", localfile.fileName());
-                icon_update_query.bindValue(":CHANID", query.value(0).toInt());
-                icon_update_query.bindValue(":SOURCEID", sourceid);
-
-                if (!icon_update_query.exec())
-                    MythDB::DBError("Setting the icon file name",
-                            icon_update_query);
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, QString(
-                        "Error retrieving icon from '%1' to file '%2'")
-                        .arg(icon_url)
-                        .arg(localfile.fileName()));
-            }
+            // HACK -- begin
+            // This hack is needed because we don't enter the event loop
+            // before running this code via qApp->exec()
+            qApp->processEvents();
+            // HACK -- end
         }
     }
+
+    MythTimer tm; tm.start();
+    while (true)
+    {
+        // HACK -- begin
+        // This hack is needed because we don't enter the event loop
+        // before running this code via qApp->exec()
+        qApp->processEvents();
+        // HACK -- end
+
+        QMutexLocker locker(&m_u2fl_lock);
+        if (m_u2fl.empty())
+            break;
+
+        if (tm.elapsed() > (count * 500) + 2000)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Timed out waiting for some icons to download, "
+                    "you may wish to try again later.");
+            break;
+        }
+    }
+}
+
+void IconData::Update(
+    QHttp::Error      error,
+    const QString    &error_str,
+    const QUrl       &url,
+    uint              http_status_id,
+    const QString    &http_status_str,
+    const QByteArray &data)
+{
+    bool http_error = false;
+    if (QHttp::NoError != error)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("fetching '%1'\n\t\t\t%2")
+                .arg(url.toString()).arg(error_str));
+        http_error = true;
+    }
+
+    if (!data.size())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Did not get any data from '%1'")
+                .arg((url.toString())));
+        http_error = true;
+    }
+
+    FIL fil;
+    {
+        QMutexLocker locker(&m_u2fl_lock);
+        Url2FIL::iterator it = m_u2fl.find(url);
+        if (it == m_u2fl.end())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Programmer Error, got data for '%1',"
+                            "but have no record of requesting it.")
+                    .arg(url.toString()));
+            return;
+        }
+
+        fil = *it;
+        m_u2fl.erase(it);
+    }
+
+    while (!http_error && !fil.empty())
+    {            
+        Save(fil.back(), data);
+        fil.pop_back();
+    }
+}
+
+bool IconData::Save(const FI &fi, const QByteArray &data)
+{
+    QFile file(fi.filename);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to open '%1' for writing")
+                .arg(fi.filename));
+        return false;
+    }
+
+    if (file.write(data) < data.size())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to write icon data to '%1'")
+                .arg(fi.filename));
+        file.remove();
+        return false;
+    }
+
+    file.flush();
+
+    VERBOSE(VB_GENERAL, LOC +
+            QString("Updating channel icon for chanid: %1").arg(fi.chanid));
+
+    MSqlQuery update(MSqlQuery::InitCon());
+    update.prepare(
+        "UPDATE channel SET icon = :ICON "
+        "WHERE chanid = :CHANID");
+
+    update.bindValue(":ICON",     fi.filename);
+    update.bindValue(":CHANID",   fi.chanid);
+
+    if (!update.exec())
+    {
+        MythDB::DBError("Setting the icon file name", update);
+        return false;
+    }
+
+    return true;
 }
 
 void IconData::ImportIconMap(const QString &filename)
 {
 
-    VERBOSE(VB_GENERAL, QString("Importing icon mapping from %1...")
-                                .arg(filename));
+    VERBOSE(VB_GENERAL, LOC +
+            QString("Importing icon mapping from %1...").arg(filename));
 
     QFile xml_file;
 
@@ -306,36 +421,32 @@ void IconData::ImportIconMap(const QString &filename)
                 }
                 catch (DOMException &e)
                 {
-                    VERBOSE( VB_IMPORTANT, QString("Error while processing "
-                                                   "%1: %2")
-                                                   .arg(node.nodeName())
-                                                   .arg(e.getMessage()));
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            QString("while processing %1: %2")
+                            .arg(node.nodeName()).arg(e.getMessage()));
                 }
                 node = node.nextSibling();
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, QString("Error unable to set document "
-                                          "content: %1:%2c%3 %4")
-                                          .arg(filename)
-                                          .arg(de_ln)
-                                          .arg(de_column)
-                                          .arg(de_msg));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("unable to set document content: %1:%2c%3 %4")
+                    .arg(filename).arg(de_ln).arg(de_column).arg(de_msg));
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Error unable to open '%1' for reading.")
-                .arg(filename));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("unable to open '%1' for reading.").arg(filename));
     }
 }
 
 void IconData::ExportIconMap(const QString &filename)
 {
 
-    VERBOSE(VB_GENERAL, QString("Exporting icon mapping to %1...")
-                                .arg(filename));
+    VERBOSE(VB_GENERAL, LOC +
+            QString("Exporting icon mapping to '%1'").arg(filename));
 
     QFile xml_file(filename);
     if (dash_open(xml_file, filename, QIODevice::WriteOnly))
@@ -433,7 +544,8 @@ void IconData::ExportIconMap(const QString &filename)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Error unable to open '%1' for writing."));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("unable to open '%1' for writing.").arg(filename));
     }
 }
 

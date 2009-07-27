@@ -683,14 +683,15 @@ int main(int argc, char *argv[])
     if (update_icon_data)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT sourceid FROM videosource ORDER BY sourceid;");
-        if (query.exec() && query.size() > 0)
+        query.prepare("SELECT sourceid FROM videosource ORDER BY sourceid");
+        if (!query.exec())
         {
-            while (query.next())
-            {
-                fill_data.icon_data.UpdateSourceIcons(query.value(0).toInt());
-            }
+            MythDB::DBError("Querying sources", query);
+            return FILLDB_EXIT_DB_ERROR;
         }
+
+        while (query.next())
+            fill_data.icon_data.UpdateSourceIcons(query.value(0).toInt());
     }
 
     if (grab_data)
