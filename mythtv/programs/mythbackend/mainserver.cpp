@@ -605,7 +605,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
                 VERBOSE(VB_IMPORTANT,
                         "Going down now as of Mainserver request!");
                 QByteArray tmp = halt_cmd.toAscii();
-                system(tmp.constData());
+                myth_system(tmp.constData());
             }
             else
                 VERBOSE(VB_IMPORTANT,
