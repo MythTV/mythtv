@@ -80,14 +80,14 @@ bool MythCommandLineParser::PreParse(
             if (parse_verbose_arg(argv[argpos+1]) ==
                 GENERIC_EXIT_INVALID_CMDLINE)
             {
-                err = true;
+                wantsToExit = err = true;
             }
             ++argpos;
         }
         else
         {
             cerr << "Missing argument to -v/--verbose option";
-            err = true;
+            wantsToExit = err = true;
         }
         return true;
     }

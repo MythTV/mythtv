@@ -1055,6 +1055,7 @@ int main(int argc, char **argv)
         kCLPNoWindowed           |
         kCLPGetSettings          |
         kCLPQueryVersion         |
+        kCLPVerbose              |
 #ifdef USING_X11
         kCLPDisplay              |
 #endif // USING_X11

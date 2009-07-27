@@ -98,6 +98,7 @@ int parse_verbose_arg(QString arg)
             {
                 qDebug() << "Unknown argument for -v/--verbose: "
                          << option << endl;;
+                return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
     }
