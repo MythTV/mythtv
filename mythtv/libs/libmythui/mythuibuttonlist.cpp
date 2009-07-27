@@ -373,7 +373,7 @@ void MythUIButtonList::SetItemCurrent(int current, int topPosition)
     if (current == -1 || current >= m_itemList.size())
         return;
 
-    if (current == m_selPosition && 
+    if (current == m_selPosition &&
         (topPosition == -1 || topPosition == m_topPosition))
         return;
 
@@ -1183,18 +1183,6 @@ MythUIButtonListItem::~MythUIButtonListItem()
         it.next();
         it.value()->DownRef();
     }
-}
-
-void MythUIButtonListItem::setText(const QString &text, const QString &name,
-                                   const QString &state)
-{
-    SetText(text,name,state);
-}
-
-
-QString MythUIButtonListItem::text() const
-{
-    return GetText();
 }
 
 void MythUIButtonListItem::SetText(const QString &text, const QString &name,

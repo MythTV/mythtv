@@ -39,16 +39,6 @@ class MPUBLIC MythUIButtonListItem
 
     MythUIButtonList *parent() const;
 
-    /** Deprecated in favour of SetText(const QString &, const QString &,
-     *  const QString &)
-     */
-    void setText(const QString &text, const QString &name="",
-                 const QString &state="") __attribute__ ((deprecated));
-
-    /** Deprecated in favour of GetText(void)
-     */
-    QString text() const __attribute__ ((deprecated));
-
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
     void SetTextFromMap(QHash<QString, QString> &infoMap, const QString &state="");
