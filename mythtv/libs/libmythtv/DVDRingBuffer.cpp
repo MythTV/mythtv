@@ -951,12 +951,14 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
                 sub->rects[0]->pict.data[0] = bitmap;
                 sub->rects[0]->x = x1;
                 sub->rects[0]->y = y1;
-                sub->rects[0]->w  = w;
+                sub->rects[0]->w = w;
                 sub->rects[0]->h = h;
+                sub->rects[0]->type = SUBTITLE_BITMAP;
                 sub->rects[0]->nb_colors = 4;
                 sub->rects[0]->pict.linesize[0] = w;
                 if (NumMenuButtons() > 0)
                 {
+                    sub->rects[1]->type = SUBTITLE_BITMAP;
                     sub->rects[1]->pict.data[1] = (uint8_t*)av_malloc(4 *4);
                     guess_palette((uint32_t*)sub->rects[1]->pict.data[1],
                                 m_button_color, m_button_alpha);
