@@ -139,7 +139,14 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     {
         // we need to start the mythlcdserver
         VERBOSE(VB_GENERAL, "Starting mythlcdserver");
-        system(qPrintable(GetInstallPrefix() + "/bin/mythlcdserver -v none&"));
+
+        res = system(qPrintable(GetInstallPrefix() + "/bin/mythlcdserver -v none&"));
+        if (!WIFEXITED(res))
+        {
+            VERBOSE(VB_IMPORTANT, "Failed start MythTV LCD Server");
+            return bConnected;
+        }
+
         usleep(500000);
     }
 

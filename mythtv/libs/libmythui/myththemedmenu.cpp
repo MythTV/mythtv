@@ -11,6 +11,7 @@
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "xmlparsebase.h"
+#include "mythsystem.h"
 
 #include "mythverbose.h"
 #include "mythuihelper.h"
@@ -397,11 +398,11 @@ void MythThemedMenu::customEvent(QEvent *event)
             {
                 case 0:
                     if (!halt_cmd.isEmpty())
-                        system(halt_cmd.toAscii());
+                        myth_system(halt_cmd);
                     break;
                 case 1:
                     if (!reboot_cmd.isEmpty())
-                        system(reboot_cmd.toAscii());
+                        myth_system(reboot_cmd);
                     break;
                 case 2:
                     aboutScreen();
@@ -421,7 +422,7 @@ void MythThemedMenu::customEvent(QEvent *event)
             {
                 case 0:
                     if (!reboot_cmd.isEmpty())
-                        system(reboot_cmd.toAscii());
+                        myth_system(reboot_cmd);
                     break;
                 case 1:
                     aboutScreen();
@@ -435,7 +436,7 @@ void MythThemedMenu::customEvent(QEvent *event)
             {
                 case 0:
                     if (!halt_cmd.isEmpty())
-                        system(halt_cmd.toAscii());
+                        myth_system(halt_cmd);
                     break;
                 case 1:
                     aboutScreen();
