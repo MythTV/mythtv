@@ -48,14 +48,19 @@ void MythHttpHandler::TeardownAll(void)
 bool MythHttpHandler::HasPendingRequests(void) const
 {
     QMutexLocker locker(&m_lock);
-    return m_qhttp->hasPendingRequests() || !m_urls.empty();
+    return (m_qhttp->hasPendingRequests() ||
+            m_qhttp->currentRequest().isValid() ||
+            !m_urls.empty());
 }
 
 void MythHttpHandler::AddUrlRequest(const QUrl &url)
 {
     QMutexLocker locker(&m_lock);
 
-    if (!m_qhttp->hasPendingRequests())
+    VERBOSE(VB_NETWORK, LOC +
+            QString("AddUrlRequest(%1)").arg(url.toString()));
+
+    if (!m_qhttp->hasPendingRequests() && !m_qhttp->currentRequest().isValid())
         Get(url);
     else
         m_urls.push_back(url);
@@ -63,6 +68,9 @@ void MythHttpHandler::AddUrlRequest(const QUrl &url)
 
 void MythHttpHandler::Get(const QUrl &url)
 {
+    VERBOSE(VB_NETWORK, LOC +
+            QString("Get(%1)").arg(url.toString()));
+
     m_cur_url          = url;
     m_cur_status_id    = 0;
     m_cur_status_str   = QString::null;
