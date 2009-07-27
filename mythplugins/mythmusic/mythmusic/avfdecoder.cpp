@@ -444,7 +444,7 @@ MetaIO* avfDecoder::doCreateTagger(void)
         return new MetaIOOggVorbisComment();
     else if (extension == "flac")
         return new MetaIOFLACVorbisComment();
-    else if (extension == "mp4")
+    else if (extension == "m4a")
         return new MetaIOMP4();
     else
         return new MetaIOAVFComment();
