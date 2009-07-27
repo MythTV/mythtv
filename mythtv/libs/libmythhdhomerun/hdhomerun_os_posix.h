@@ -60,6 +60,8 @@ typedef int bool_t;
 
 #ifndef __GNUC__
 #define __inline__ inline
+#else
+#define __inline__ __always_inline
 #endif
 
 
