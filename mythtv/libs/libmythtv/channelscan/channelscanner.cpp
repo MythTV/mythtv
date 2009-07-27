@@ -27,6 +27,8 @@
  *
  */
 
+#include <algorithm>
+
 #include "channelscanner.h"
 #include "cardutil.h"
 #include "iptvchannelfetcher.h"
@@ -325,9 +327,10 @@ void ChannelScanner::PreScanCommon(
                 channel_timeout * 10 : signal_timeout;
         }
 
-        // Since we the NIT is only sent every 10 seconds, we add an
-        // extra 20 + 2 seconds to the scan time for DVB countries.
-        channel_timeout += (need_nit) ? 22 * 1000 : 0;
+        // Make sure that channel_timeout is at least 7 seconds to catch
+        // at least one SDT section. kDVBTableTimeout in ChannelScanSM
+        // ensures that we catch the NIT then.
+        channel_timeout = max(channel_timeout, need_nit * 7 * 1000U);
     }
 
 #ifdef USING_DVB

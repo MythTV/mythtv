@@ -31,6 +31,8 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#include <algorithm>
+
 // Qt includes
 #include <QMutex>
 
@@ -141,6 +143,10 @@ ChannelScanSM::ChannelScanSM(
       scanning(false),
       threadExit(false),
       waitingForTables(false),
+      // table wait state
+      wait_for_mpeg(false),
+      wait_for_atsc(false),
+      wait_for_dvb(false),
       // Transports List
       transportsScanned(0),
       currentTestingDecryption(false),
@@ -323,6 +329,7 @@ void ChannelScanSM::HandlePAT(const ProgramAssociationTable *pat)
         if (pat->ProgramPID(i)) // don't add NIT "program", MPEG/ATSC safe.
             sd->AddListeningPID(pat->ProgramPID(i));
     }
+    wait_for_mpeg = true;
 }
 
 void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
@@ -333,6 +340,7 @@ void ChannelScanSM::HandlePMT(uint, const ProgramMapTable *pmt)
 
     if (!currentTestingDecryption && pmt->IsEncrypted())
         currentEncryptionStatus[pmt->ProgramNumber()] = kEncUnknown;
+    wait_for_mpeg = true;
 }
 
 void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
@@ -348,6 +356,7 @@ void ChannelScanSM::HandleVCT(uint, const VirtualChannelTable *vct)
         }
     }
 
+    wait_for_atsc = true;
     UpdateChannelInfo(true);
 }
 
@@ -356,6 +365,7 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
     VERBOSE(VB_CHANSCAN, LOC + QString("Got the Master Guide for %1")
             .arg((*current).FriendlyName) + "\n" + mgt->toString());
 
+    wait_for_atsc = true;
     UpdateChannelInfo(true);
 }
 
@@ -373,6 +383,7 @@ void ChannelScanSM::HandleSDT(uint, const ServiceDescriptionTable *sdt)
         }
     }
 
+    wait_for_dvb = true;
     UpdateChannelInfo(true);
 }
 
@@ -382,6 +393,7 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
             QString("Got a Network Information Table for %1")
             .arg((*current).FriendlyName) + "\n" + nit->toString());
 
+    wait_for_dvb = true;
     UpdateChannelInfo(true);
 }
 
@@ -680,6 +692,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
         currentEncryptionStatus.clear();
         currentEncryptionStatusChecked.clear();
+
+        wait_for_mpeg = wait_for_atsc = wait_for_dvb = false;
 
         if (scanning)
         {
@@ -1187,14 +1201,18 @@ bool ChannelScanSM::HasTimedOut(void)
         if (!sd)
             return true;
 
-        if (sd->HasCachedAnyNIT() || sd->HasCachedAnySDTs())
-            return timer.elapsed() > (int) kDVBTableTimeout;
-        if (sd->HasCachedMGT() || sd->HasCachedAnyVCTs())
-            return timer.elapsed() > (int) kATSCTableTimeout;
-        if (sd->HasCachedAnyPAT() || sd->HasCachedAnyPMTs())
-            return timer.elapsed() > (int) kMPEGTableTimeout;
+        int max_timeout = 0;
 
-        return true;
+        if (wait_for_dvb  && !sd->HasCachedAllNIT() && !sd->HasCachedAllSDTs())
+            max_timeout = max(max_timeout, (int) kDVBTableTimeout);
+
+        if (wait_for_atsc && !sd->HasCachedMGT()    && !sd->HasCachedAllVCTs())
+            max_timeout = max(max_timeout, (int) kATSCTableTimeout);
+
+        if (wait_for_mpeg && !sd->HasCachedAllPAT() && !sd->HasCachedAllPMTs())
+             max_timeout = max(max_timeout, (int) kMPEGTableTimeout);
+
+        return timer.elapsed() > max_timeout;
     }
 
     // ok the tables haven't timed out, but have we hit the signal timeout?

@@ -204,6 +204,11 @@ class ChannelScanSM : public MPEGStreamListener,
     bool              waitingForTables;
     QTime             timer;
 
+    // table wait state
+    bool              wait_for_mpeg;
+    bool              wait_for_atsc;
+    bool              wait_for_dvb;
+
     // Transports List
     int                         transportsScanned;
     transport_scan_items_t      scanTransports;
