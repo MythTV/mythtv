@@ -972,12 +972,10 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 
     // Disable features based on hardware capabilities.
     MythXDisplay *disp = OpenMythXDisplay();
-    Window root;
     if (disp)
     {
         MythXLocker lock(disp);
-        root = DefaultRootWindow(disp->GetDisplay());
-        SetFromHW(disp, root, use_xvmc, use_xv, use_shm);
+        SetFromHW(disp, disp->GetRoot(), use_xvmc, use_xv, use_shm);
     }
 
     MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
@@ -1007,7 +1005,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
         XvMCSurfaceInfo info;
 
         ok = false;
-        int port = GrabSuitableXvPort(disp, root, ret, width, height,
+        int port = GrabSuitableXvPort(disp, disp->GetRoot(), ret, width, height,
                                       xvmc_chroma, &info);
         if (port >= 0)
         {
