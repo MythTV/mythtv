@@ -455,14 +455,6 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle,
         return err;
     }
 
-    /* align all transfers to 1 sample */
-    if ((err = snd_pcm_sw_params_set_xfer_align(handle, swparams, 1)) < 0)
-    {
-        Error(QString("Unable to set transfer align for playback: %1")
-              .arg(snd_strerror(err)));
-        return err;
-    }
-
     /* write the parameters to the playback device */
     if ((err = snd_pcm_sw_params(handle, swparams)) < 0)
     {
