@@ -6626,7 +6626,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
     }
 
     if ((direction == (0 - lastCommSkipDirection)) &&
-        ((time(NULL) - lastCommSkipTime) <= 3))
+        ((time(NULL) - lastCommSkipTime) <= 5))
     {
         if (osd)
         {
