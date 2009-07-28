@@ -147,19 +147,22 @@ bool MSqlDatabase::KickDatabase()
     QString query("SELECT NULL;");
     for (unsigned int i = 0 ; i < 2 ; ++i, usleep(50000))
     {
-        QSqlQuery result = m_db.exec(query); // don't convert to MSqlQuery
-        if (result.isActive())
         {
-            m_lastDBKick = QDateTime::currentDateTime();
-            return true;
+            QSqlQuery result = m_db.exec(query); // don't convert to MSqlQuery
+            if (result.isActive())
+            {
+                m_lastDBKick = QDateTime::currentDateTime();
+                return true;
+            }
         }
-        else if (i == 0)
+
+        if (i == 0)
         {
             m_db.close();
             m_db.open();
         }
         else
-            MythDB::DBError("KickDatabase", result);
+            VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(m_db.lastError()));
     }
 
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
