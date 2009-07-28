@@ -6483,14 +6483,17 @@ void NuppelVideoPlayer::MergeShortCommercials(void)
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
-    if (((time(NULL) - lastSkipTime) <= 2) ||
-        ((time(NULL) - lastCommSkipTime) <= 2))
-        return;
-
     QMutexLocker locker(&commBreakMapLock);
 
     if (!hascommbreaktable)
         return;
+
+    if (((time(NULL) - lastSkipTime) <= 2) ||
+        ((time(NULL) - lastCommSkipTime) <= 2))
+    {
+        SetCommBreakIter();
+        return;
+    }
 
     if (commBreakIter == commBreakMap.end())
         return;
@@ -6576,6 +6579,10 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                                            "auto-skipping to frame %1")
                 .arg(commBreakIter.key() -
                      (int)(commrewindamount * video_frame_rate)));
+
+        lastCommSkipDirection = 1;
+        lastCommSkipStart = framesPlayed;
+        lastCommSkipTime = time(NULL);
 
         long long jump_to = commBreakIter.key() -
             (int)(commrewindamount * video_frame_rate);
