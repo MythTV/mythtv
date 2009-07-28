@@ -372,20 +372,20 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             query.prepare("SELECT SUM(filesize) FROM recorded "
                           " WHERE recgroup = :RECGROUP;");
 
-            query.bindValue("RECGROUP", "LiveTV");
-            if (query.exec() && (query.size() > 0) && query.next())
+            query.bindValue(":RECGROUP", "LiveTV");
+            if (query.exec() && query.next())
             {
                 iLiveTV = query.value(0).toLongLong();
             }
-            query.bindValue("RECGROUP", "Deleted");
-            if (query.exec() && (query.size() > 0) && query.next())
+            query.bindValue(":RECGROUP", "Deleted");
+            if (query.exec() && query.next())
             {
                 iDeleted = query.value(0).toLongLong();
             }
             query.prepare("SELECT SUM(filesize) FROM recorded "
                           " WHERE autoexpire = 1 "
                           "   AND recgroup NOT IN ('LiveTV', 'Deleted');");
-            if (query.exec() && (query.size() > 0) && query.next())
+            if (query.exec() && query.next())
             {
                 iExpirable = query.value(0).toLongLong();
             }
