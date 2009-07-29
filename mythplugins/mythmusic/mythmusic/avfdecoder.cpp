@@ -159,8 +159,8 @@ bool avfDecoder::initialize()
     // open the media file
     // this should populate the input context
     int error;
-    error = av_open_input_file(&m_inputContext, filename, m_inputFormat, 0,
-                               &m_params);
+    error = av_open_input_file(&m_inputContext, filename.toLocal8Bit().constData(),
+                               m_inputFormat, 0, &m_params);
 
     if (error < 0)
     {
