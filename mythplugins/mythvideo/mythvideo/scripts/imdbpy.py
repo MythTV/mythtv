@@ -19,8 +19,8 @@ import socket
 try:
 	import imdb
 except ImportError:
-	print "You need to install the IMDbPy library "\
-		"from (http://imdbpy.sourceforge.net/?page=download)"
+	sys.stderr.write("You need to install the IMDbPy library "\
+		"from (http://imdbpy.sourceforge.net/?page=download)\n")
 	sys.exit(1)
 
 try:
@@ -328,8 +328,11 @@ def fetch_metadata(imdb_id):
 		#print "%d plots found" % len(plots)
 		for plot in plots:
 			text = plot.split("::")[1]
-			if shortest_found == None or len(text) < len(shortest_found):
-				shortest_found = text
+			if text.find('@') != -1 or len(text.split(' ')) < 10: # Skip plots of less than 5 words
+				continue
+			# Use word count as the method to identify the smallest plot
+			if shortest_found == None or len(text.split(' ')) < len(shortest_found.split(' ')):
+					shortest_found = text
 		metadata.plot = shortest_found
 
 	cast = movie.get('cast') 
