@@ -98,7 +98,7 @@ class MythDB:
 			raise MythError('Unable to find MythTV configuration file')
 
 		try:
-			self.db = MySQLdb.connect(user=dbconn['user'], host=dbconn['host'], passwd=dbconn['pass'], db=dbconn['name'])
+			self.db = MySQLdb.connect(user=dbconn['user'], host=dbconn['host'], passwd=dbconn['pass'], db=dbconn['name'], use_unicode=True, charset='utf8')
 			log.Msg(INFO, 'DB Connection info (host:%s, name:%s, user:%s, pass:%s)', dbconn['host'], dbconn['name'], dbconn['user'], dbconn['pass'])
 		except:
 			raise MythError('Connection failed for \'%s\'@\'%s\' to database %s using password %s' % (dbconn['user'], dbconn['host'], dbconn['name'], dbconn['pass']))
