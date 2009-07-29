@@ -685,7 +685,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
         return 0;
 
     os << "  <div class=\"content\">\r\n"
-       << "    <h2>Encoder status</h2>\r\n";
+       << "    <h2>Encoder Status</h2>\r\n";
 
     QDomNode node = encoders.firstChild();
 
@@ -1095,7 +1095,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
         return( 0 );
 
     os << "<div class=\"content\">\r\n"
-       << "    <h2>Machine information</h2>\r\n";
+       << "    <h2>Machine Information</h2>\r\n";
 
     // load average ---------------------
 
