@@ -130,6 +130,50 @@ class MythVideo:
 		else:
 			return None
 
+	def getTitleId(self, title, subtitle=None, season=None, episode=None, array=False):
+		"""
+		Finds the MythVideo metadata id for the given Title from the MythDB, if any.
+		Searches can be more specific if additional fields are supplied.
+		If array is True return an array of intid's for the record(s) matching the search criteria.
+		Without the array option a search with multiple matches will return a random result if more
+		than one match was found. Non-array	return results are only supported for backward compatibilty
+		with older scripts.
+		
+		Returns None if no metadata was found.
+		"""
+		tablenames = self.getTableFieldNames('videometadata')
+
+		mysqlcommand = u"SELECT intid FROM videometadata WHERE title = %s"
+
+		# Adjust the specificity of the title search according to the supplied criteria
+		# Make sure all the additional query fields are actually in the videometadata schema
+		if subtitle and 'subtitle' in tablenames: 
+			mysqlcommand+=u" AND subtitle=%s" % subtitle
+		if not season == None and 'season' in tablenames: 
+			mysqlcommand+=u" AND season=%d" % int(season)
+		if not episode == None and 'episode' in tablenames: 
+			mysqlcommand+=u" AND episode=%d" % int(episode)
+
+		c = self.db.cursor()
+		c.execute(mysqlcommand, (title,))
+		intids=[]
+		while True:
+			row = c.fetchone()
+			if not row:
+				break
+			intids.append(row[0])
+			if not array:
+				break
+		c.close()
+
+		if len(intids):
+			if not array: # To be backward compatible just return the first matching video intid found
+				return intids[0] # but it could easily be one of many matching video intids 
+			else:
+				return intids
+		else:
+			return None
+
 	def hasMetadata(self, videopath):
 		"""
 		Determines if the given videopath has any metadata in the DB
@@ -171,6 +215,47 @@ class MythVideo:
 			return row
 		else:
 			return None
+
+	def getTableFieldNames(self, tablename):
+		"""Finds the table field names
+		return array of field names in the order they are in the table
+		return None if the table does not exist
+		"""
+		table_names=[]
+		c = self.db.cursor()
+		try:
+			c.execute("DESC %s" % (tablename,))
+		except:
+			return None
+
+		while True: # Add field names until a break (no more fields)
+			name = c.fetchone()
+			if name != None:
+				table_names.append(name[0])
+				continue
+			break
+		c.close()
+		return table_names
+
+
+	def getMetadataDictionary(self, id):
+		"""
+		Finds the MythVideo metadata for the given id from the MythDB, if any and returns the meta data
+		as a dictionary of field names and meta data
+
+		Returns None if no metadata was found.
+		"""
+		field_names = self.getTableFieldNames('videometadata')
+		metadata = self.getMetadata(id)
+		if not metadata or not field_names:
+			return None
+
+		# Build a dictionary of the existing meta data
+		meta_dict={}
+		for i in range(len(field_names)):
+			meta_dict[field_names[i]] = metadata[i]
+		
+		return meta_dict
 
 	def setMetadata(self, data, id=None):
 		"""
