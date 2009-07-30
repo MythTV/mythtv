@@ -440,7 +440,7 @@ MetaIO* avfDecoder::doCreateTagger(void)
 
     if (extension == "mp3")
         return new MetaIOTagLib();
-    else if (extension == "ogg")
+    else if (extension == "ogg" || extension == "oga")
         return new MetaIOOggVorbisComment();
     else if (extension == "flac")
         return new MetaIOFLACVorbisComment();
@@ -464,8 +464,8 @@ bool avfDecoderFactory::supports(const QString &source) const
 
 const QString &avfDecoderFactory::extension() const
 {
-    static QString ext(".mp3|.mp2|.ogg|.flac|.wma|.wav|.ac3|.oma|.omg|.atp|"
-                       ".ra|.dts|.aac|.m4a");
+    static QString ext(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
+                       ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa");
     return ext;
 }
 
