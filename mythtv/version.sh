@@ -10,6 +10,17 @@ if test $# -ne 2; then
     exit 1
 fi
 
+TESTFN=$1/.can-version.sh-write
+rm -f $TESTFN 2> /dev/null
+touch $TESTFN 2> /dev/null
+if test -r $TESTFN ; then
+    echo "$0: Successfully wrote to destination. $TESTFN"
+    rm -f $TESTFN
+else
+    echo "$0: Can not write to destination, skipping.."
+    exit 1
+fi
+
 SVNTREEDIR=$1
 SVNREPOPATH=$(echo $2 | sed -e 's,.*/svn/,,' \
                             -e 's,/mythtv/version\.pro.*,,' \
