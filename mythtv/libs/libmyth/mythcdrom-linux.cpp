@@ -16,7 +16,7 @@
 #include "mythverbose.h"
 
 #define LOC     QString("MythCDROMLinux:")
-#define LOC_ERR QString("mythcdrom-linux, Error: ")
+#define LOC_ERR QString("MythCDROMLinux, Error: ")
 
 // On a mixed-mode disc (audio+data), set this to 0 to mount the data portion:
 #define ASSUME_WANT_AUDIO 1
@@ -445,15 +445,42 @@ MediaStatus MythCDROMLinux::checkMedia()
         {
             case CDS_DATA_1:
             case CDS_DATA_2:
+            {
                 m_MediaType = MEDIATYPE_DATA;
                 VERBOSE(VB_MEDIA, "Found a data disk");
+
                 //grab information from iso9660 (& udf)
+                off_t sr = lseek(m_DeviceHandle,
+                                 (off_t) 2048*16, SEEK_SET);
+
                 struct iso_primary_descriptor buf;
-                lseek(this->m_DeviceHandle,(off_t) 2048*16,SEEK_SET);
-                read(this->m_DeviceHandle, &buf,2048);
-                this->m_VolumeID = QString(buf.volume_id).trimmed();
-                this->m_KeyID = QString("%1%2").arg(this->m_VolumeID)
-                                .arg(QString(buf.creation_date).left(16));
+                ssize_t readin = 0;
+                while ((sr != (off_t) -1) && (readin < 2048))
+                {
+                    ssize_t rr = read(
+                        m_DeviceHandle, ((char*)&buf) + readin, 2048 - readin);
+                    if ((rr < 0) && ((EAGAIN == errno) || (EINTR == errno)))
+                        continue;
+                    else if (rr < 0)
+                        break;
+                    readin += rr;
+                }
+
+                if (readin == 2048)
+                {
+                    m_VolumeID = QString(buf.volume_id).trimmed();
+                    m_KeyID = QString("%1%2")
+                        .arg(m_VolumeID)
+                        .arg(QString(buf.creation_date).left(16));
+                }
+                else
+                {
+                    m_VolumeID = "UNKNOWN";
+                    m_KeyID = m_VolumeID +
+                        QDateTime::currentDateTime().toString(Qt::ISODate);
+                }
+
+                VERBOSE(VB_MEDIA, QString("Volume ID: %1").arg(m_VolumeID));
 
                 // the base class's onDeviceMounted will do fine
                 // grained detection of the type of data on this disc
@@ -480,6 +507,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                 else
                     return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
                 break;
+            }
             case CDS_AUDIO:
                 VERBOSE(VB_MEDIA, "found an audio disk");
                 m_MediaType = MEDIATYPE_AUDIO;
