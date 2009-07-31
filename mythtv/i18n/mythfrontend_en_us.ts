@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="en_GB">
 <context>
     <name></name>
     <message>
@@ -1749,8 +1749,9 @@
     <message numerus="yes">
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2169"/>
         <source>%n commercial break(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n commercial break</numerusform>
+            <numerusform>%n commercial breaks</numerusform>
         </translation>
     </message>
     <message>
@@ -1916,8 +1917,9 @@
     <message numerus="yes">
         <location filename="../programs/mythfrontend/mythappearance.cpp" line="260"/>
         <source>Change amount: %n pixel(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Change amount: %n pixel</numerusform>
+            <numerusform>Change amount: %n pixels</numerusform>
         </translation>
     </message>
     <message>
@@ -2207,8 +2209,9 @@ Returning to the previous menu.</source>
         <location filename="../libs/libmythui/mythdialogbox.cpp" line="486"/>
         <location filename="../libs/libmythui/mythdialogbox.cpp" line="547"/>
         <source>%n match(es)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n match</numerusform>
+            <numerusform>%n matches</numerusform>
         </translation>
     </message>
 </context>
@@ -6691,8 +6694,9 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/scheduledrecording.cpp" line="345"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="985"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n hour</numerusform>
+            <numerusform>%n hours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6705,8 +6709,9 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/scheduledrecording.cpp" line="340"/>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="986"/>
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n minute</numerusform>
+            <numerusform>%n minutes</numerusform>
         </translation>
     </message>
     <message>
@@ -6719,8 +6724,9 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmythtv/programinfo.cpp" line="800"/>
         <location filename="../libs/libmythtv/programinfo.cpp" line="807"/>
         <source>%n star(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n star</numerusform>
+            <numerusform>%n stars</numerusform>
         </translation>
     </message>
     <message>
@@ -9876,22 +9882,25 @@ Do you wish to continue watching?</source>
     <message numerus="yes">
         <location filename="../programs/mythbackend/httpstatus.cpp" line="892"/>
         <source> %n day(s),</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n day,</numerusform>
+            <numerusform> %n days,</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythbackend/httpstatus.cpp" line="893"/>
         <source> %n hour(s) and</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n hour and</numerusform>
+            <numerusform> %n hours and</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythbackend/httpstatus.cpp" line="894"/>
         <source> %n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n minute</numerusform>
+            <numerusform> %n minutes</numerusform>
         </translation>
     </message>
     <message>
@@ -14046,8 +14055,9 @@ Check if the video exists</source>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5366"/>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5367"/>
         <source>%n second(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n second</numerusform>
+            <numerusform>%n seconds</numerusform>
         </translation>
     </message>
     <message>
@@ -14083,8 +14093,9 @@ Check if the video exists</source>
     <message numerus="yes">
         <location filename="../programs/mythcommflag/main.cpp" line="761"/>
         <source>Finished, %n break(s) found.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Finished, %n break found.</numerusform>
+            <numerusform>Finished, %n breaks found.</numerusform>
         </translation>
     </message>
     <message>
@@ -14117,8 +14128,9 @@ Check if the video exists</source>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1018"/>
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n day</numerusform>
+            <numerusform>%n days</numerusform>
         </translation>
     </message>
     <message>
@@ -15000,52 +15012,65 @@ No other details</source>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1309"/>
         <source>%n (is) LiveTV and consume(s) %1
 </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n is LiveTV and consumes %1
+</numerusform>
+            <numerusform>%n are LiveTV and consume %1
+</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1313"/>
         <source>%n (is) Deleted and consume(s) %1
 </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n is Deleted and consumes %1
+</numerusform>
+            <numerusform>%n are Deleted and consume %1
+</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="532"/>
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n day</numerusform>
+            <numerusform>%n days</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="560"/>
         <source>%n standard rule(s) (is) defined</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n standard rule is defined</numerusform>
+            <numerusform>%n standard rules are defined</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="573"/>
         <source>%n search rule(s) are defined</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n search rule is defined</numerusform>
+            <numerusform>%n search rules are defined</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="633"/>
         <source>%n matching showing(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n matching showing</numerusform>
+            <numerusform>%n matching showings</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1305"/>
         <source>%n recording(s) consuming %1 (is) allowed to expire
 </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n recording consuming %1 is allowed to expire
+</numerusform>
+            <numerusform>%n recordings consuming %1 are allowed to expire
+</numerusform>
         </translation>
     </message>
 </context>
@@ -16246,8 +16271,9 @@ Select a Current Recording</source>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10443"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10444"/>
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n minute</numerusform>
+            <numerusform>%n minutes</numerusform>
         </translation>
     </message>
 </context>

@@ -84,7 +84,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="141"/>
         <source>Shall I attempt to connect to this host with default database parameters?</source>
-        <translation type="unfinished"></translation>
+        <translation>Shall I attempt to connect to this host with default database parameters?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="191"/>
@@ -374,37 +374,37 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="134"/>
         <source>Channel Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel Groups</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="148"/>
         <source>Create New Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Create New Channel Group</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="149"/>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished">Enter group name or press SELECT to enter text via the On Screen Keyboard</translation>
+        <translation>Enter group name or press SELECT to enter text via the On Screen Keyboard</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="176"/>
         <source>Delete &apos;%1&apos; Channel group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete &apos;%1&apos; Channel group?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="181"/>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Yes, delete group</translation>
+        <translation>Yes, delete group</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="182"/>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">No, Don&apos;t delete group</translation>
+        <translation>No, Don&apos;t delete group</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="228"/>
         <source>(Create new group)</source>
-        <translation type="unfinished">(Create new group)</translation>
+        <translation>(Create new group)</translation>
     </message>
 </context>
 <context>
@@ -1058,7 +1058,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="484"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>None</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="488"/>
@@ -4379,7 +4379,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1659"/>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2209"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>None</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="595"/>
@@ -13122,7 +13122,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1696"/>
         <source>as</source>
-        <translation type="unfinished"></translation>
+        <translation>as</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscan_sm.cpp" line="1701"/>
@@ -13678,25 +13678,25 @@ Do you wish to continue watching?</source>
     <message numerus="yes">
         <location filename="../programs/mythbackend/httpstatus.cpp" line="892"/>
         <source> %n day(s),</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n day,</numerusform>
+            <numerusform> %n days,</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythbackend/httpstatus.cpp" line="893"/>
         <source> %n hour(s) and</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n hour and</numerusform>
+            <numerusform> %n hours and</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythbackend/httpstatus.cpp" line="894"/>
         <source> %n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n minute</numerusform>
+            <numerusform> %n minutes</numerusform>
         </translation>
     </message>
     <message>
@@ -16143,7 +16143,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10041"/>
         <source>Channel Groups</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Channel Groups</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10043"/>
