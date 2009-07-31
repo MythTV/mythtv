@@ -1172,7 +1172,25 @@
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
-        <source>Badly formatted Device ID</source>
+        <source>Recording Options</source>
+        <translation type="unfinished">Options d&apos;enregistrement</translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceID</name>
+    <message>
+        <source>Device ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deviced ID of HDHomeRun device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceIDList</name>
+    <message>
+        <source>Manually Enter IP Address</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1246,11 +1264,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording is in WideScreen</source>
+        <source>Recording has been watched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording has been watched</source>
+        <source>Recording is in 1080i/p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in 720p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Widescreen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1674,6 +1700,39 @@ Returning to the previous menu.</source>
         <translation>Je ne puis trouver &apos;%1&apos; dans le thème &apos;%2&apos;.
 
 Je reviens au menu précédent.</translation>
+    </message>
+</context>
+<context>
+    <name>MythThemedMenu</name>
+    <message>
+        <source>System Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Revision: %1
+ Branch: %2
+ %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2343,6 +2402,26 @@ Are you sure you want to delete:</source>
     <message>
         <source>Sorry, this screen requires Qt 4.4 or greater</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
     </message>
 </context>
 <context>
@@ -3636,14 +3715,6 @@ Are you sure you want to delete:</source>
         <translation>Active le contrôle des lecteurs de CD/DVD pour détecter l&apos;insertion de nouveaux disques et démarrer le plugin associé.</translation>
     </message>
     <message>
-        <source>Go Back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
-        <source>No Change</source>
-        <translation>Pas de changement</translation>
-    </message>
-    <message>
         <source>Default</source>
         <translation>Défaut</translation>
     </message>
@@ -4620,10 +4691,6 @@ Are you sure you want to delete:</source>
         <translation>Durant la lecture, MythTV est à l&apos;affût des connections des programmes &quot;mythtvosd&quot; et &quot;mythudprelay&quot; sur ce port.  Voir le fichier README dans contrib/mythnotify/ pour plus d&apos;informations.</translation>
     </message>
     <message>
-        <source>Display thumbnail preview images of recordings</source>
-        <translation type="unfinished">Générer des vignettes de pré-visualisation des enregistrements</translation>
-    </message>
-    <message>
         <source>Time offset for thumbnail preview images</source>
         <translation>Instant du film des images de pré-visualisation</translation>
     </message>
@@ -5180,18 +5247,6 @@ Are you sure you want to delete:</source>
         <translation>Terminer l&apos;enregistrement %1 minute plus tard</translation>
     </message>
     <message>
-        <source>Reduce priority by %1</source>
-        <translation>Réduire la priorité d&apos;enregistrement de %1</translation>
-    </message>
-    <message>
-        <source>Normal recording priority</source>
-        <translation>Priorité d&apos;enregistrement normale</translation>
-    </message>
-    <message>
-        <source>Raise priority by %1</source>
-        <translation>Augmenter la priorité d&apos;enregistrement de %1</translation>
-    </message>
-    <message>
         <source>(None)</source>
         <translation>(Aucun)</translation>
     </message>
@@ -5406,10 +5461,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
         <translation>Si activé, les sous titres seront toujours affichés lors de la lecture d&apos;enregistrements ou de la TV.  Les sous titres peuvent êtres (dés)activé en utilisant la touche &apos;T&apos; durant la lecture.</translation>
-    </message>
-    <message>
-        <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Si activé, des images statiques des enregistrements seront affichées dans le menu &quot;Voir un enregistrement&quot;.</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
@@ -6464,18 +6515,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
         <translation>Garder les fichiers originaux après transcodage (globalement)</translation>
     </message>
     <message>
-        <source>WARNING</source>
-        <translation>ATTENTION</translation>
-    </message>
-    <message>
-        <source>MythTV has detected that the backend is running.</source>
-        <translation>MythTV a déterminé que le backend était en cours d&apos;exécution.</translation>
-    </message>
-    <message>
-        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation>La modification des cartes d&apos;entrée, quelque destruction que ce soit ou la recherche de chaînes pourraient ne pas fonctionner.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Editeur de transport</translation>
     </message>
@@ -6498,14 +6537,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>16:10</source>
         <translation>16:10</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Continuer</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Quitter</translation>
     </message>
     <message>
         <source>(Delete all video sources)</source>
@@ -7628,10 +7659,6 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8111,10 +8138,6 @@ The frequency for this channel in</source>
         <translation type="unfinished">800Mbps</translation>
     </message>
     <message>
-        <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>M3U URL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8589,10 +8612,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10627,10 +10646,6 @@ Do you wish to continue watching?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This lets decided to map a WMP  client to the Recordings tree or to the Video tree when  it requests a list of videos </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Local Backend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10663,12 +10678,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Play</source>
         <translation type="unfinished">Visionner</translation>
-    </message>
-    <message numerus="yes">
-        <source>hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>PBP</source>
@@ -10803,10 +10812,6 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Please enter a unique channel number. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number (or type %1 to skip): </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10957,6 +10962,92 @@ Do you wish to continue watching?</source>
         <source>ATSC Data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Suggest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: stream handler died</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DevicedID and Tuner Number of available HDHomeRun devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source> %n day(s),</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n hour(s) and</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>within one minute</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>soon</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Stop Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to stop the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend stop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Start Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to start the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend start).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This forces us to show WMP clients  either the Recordings tree or the Video tree when  they request a list of videos </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11095,6 +11186,65 @@ Do you wish to continue watching?</source>
     </message>
 </context>
 <context>
+    <name>ScheduleRecording</name>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished">Ne pas enregistrer cette émission</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">Enregistrer seulement cette diffusion</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished">Enregistrer une diffusion de cette émission</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">Enregistrer à cette heure chaque semaine</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished">Enregistrer une diffusion de cette émission chaque semaine</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">Enregistrer à cette heure chaque jour</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished">Enregistrer une diffusion de cette émission chaque jour</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">En registrer à n&apos;importe quelle heure sur cette chaîne</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">Enregistrer ce programme à n&apos;importe quelle heure sur n&apos;importe quelle chaîne</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">Enregistrer cette diffusion avec les options normales</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">Enregistre cette émission avec les options de remplacement</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">Ne pas autoriser cette diffusion à être enregistrée</translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
@@ -11178,6 +11328,46 @@ is located in %2</source>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Host: %1
+Database Name: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StartPrompter</name>
+    <message>
+        <source>WARNING: The backend is currently running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
+        <translation type="unfinished">La modification des cartes d&apos;entrée, quelque destruction que ce soit ou la recherche de chaînes pourraient ne pas fonctionner.</translation>
+    </message>
+    <message>
+        <source>Recording Status: RECORDING.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you stop the backend now these recordings will be stopped!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Status: None.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Backend and Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished">Continuer</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Quitter</translation>
     </message>
 </context>
 <context>
@@ -12817,10 +13007,6 @@ Select a Current Recording</source>
     <message>
         <source>All</source>
         <translation>Tout</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
     </message>
 </context>
 <context>

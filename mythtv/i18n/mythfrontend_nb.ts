@@ -1172,7 +1172,25 @@
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
-        <source>Badly formatted Device ID</source>
+        <source>Recording Options</source>
+        <translation type="unfinished">Opptaksinnstillinger</translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceID</name>
+    <message>
+        <source>Device ID</source>
+        <translation type="unfinished">Enhet-ID</translation>
+    </message>
+    <message>
+        <source>Deviced ID of HDHomeRun device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceIDList</name>
+    <message>
+        <source>Manually Enter IP Address</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1246,12 +1264,20 @@
         <translation type="unfinished">Opptaket er i høy kvalitet</translation>
     </message>
     <message>
-        <source>Recording is in WideScreen</source>
-        <translation type="unfinished">Opptaket er i bredformat</translation>
-    </message>
-    <message>
         <source>Recording has been watched</source>
         <translation type="unfinished">Opptaket har blitt sett</translation>
+    </message>
+    <message>
+        <source>Recording is in 1080i/p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in 720p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Widescreen</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1674,6 +1700,39 @@ Returning to the previous menu.</source>
         <translation>Kunne ikke lokalisere «%1» i temaet «%2». 
 
 Går tilbake til forrige meny.</translation>
+    </message>
+</context>
+<context>
+    <name>MythThemedMenu</name>
+    <message>
+        <source>System Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Avbryt</translation>
+    </message>
+    <message>
+        <source>Revision: %1
+ Branch: %2
+ %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2343,6 +2402,26 @@ Are you sure you want to delete:</source>
     <message>
         <source>Sorry, this screen requires Qt 4.4 or greater</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Avbryt</translation>
     </message>
 </context>
 <context>
@@ -3062,14 +3141,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select your preferred language</source>
         <translation>Velg ønsket språk</translation>
-    </message>
-    <message>
-        <source>Go Back</source>
-        <translation>Gå tilbake</translation>
-    </message>
-    <message>
-        <source>No Change</source>
-        <translation>Ingen forandringer</translation>
     </message>
     <message>
         <source>Default</source>
@@ -4322,18 +4393,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Behold minst %1 episoder</translation>
     </message>
     <message>
-        <source>Reduce priority by %1</source>
-        <translation>Reduser prioritet med %1</translation>
-    </message>
-    <message>
-        <source>Normal recording priority</source>
-        <translation>Normal opptaksprioritet</translation>
-    </message>
-    <message>
-        <source>Raise priority by %1</source>
-        <translation>Hev prioritet med %1</translation>
-    </message>
-    <message>
         <source>Select Recording Group</source>
         <translation>Velg opptaksgruppe</translation>
     </message>
@@ -4880,14 +4939,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>If set, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
         <translation>Er dette på vil en meny med valg om å slette opptaket vises når opptaket har blitt sett ferdig.</translation>
-    </message>
-    <message>
-        <source>Display thumbnail preview images of recordings</source>
-        <translation>Lag et bilde som forhåndsvisning av opptak</translation>
-    </message>
-    <message>
-        <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Dette fører til at et bilde vises i «Se på opptak»-menyen.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
@@ -6459,18 +6510,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation>Lagre originale filer etter konvertering (globalt)</translation>
     </message>
     <message>
-        <source>WARNING</source>
-        <translation>ADVARSEL</translation>
-    </message>
-    <message>
-        <source>MythTV has detected that the backend is running.</source>
-        <translation>MythTV har oppdaget at tjeneren kjører.</translation>
-    </message>
-    <message>
-        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation>Det er ikke sikkert at det virker å endre eksisterende kortinndatakilder, slette hva som helst eller søke etter kanaler.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Transportredigerer</translation>
     </message>
@@ -6493,14 +6532,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <source>16:10</source>
         <translation>16:10</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Fortsett</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Avslutt</translation>
     </message>
     <message>
         <source>(Delete all video sources)</source>
@@ -7607,10 +7638,6 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID</source>
-        <translation>Enhet-ID</translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation>Opptaker</translation>
     </message>
@@ -8091,10 +8118,6 @@ Frekvensen for denne kanalen i</translation>
     <message>
         <source>800Mbps</source>
         <translation>800 Mbps</translation>
-    </message>
-    <message>
-        <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation>IP-adresse eller ID fra bunnen av HDHomeRun-boksen. Du kan bruke FFFFFFFF hvis det bare er én slik boks på nettverket.</translation>
     </message>
     <message>
         <source>M3U URL</source>
@@ -8589,10 +8612,6 @@ De fleste DVB-S-sendere bruker 27,5 millioner symboler per sekund.</translation>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
         <translation>Dette er standard videodriver for XvMC-dekodere. Den bruker maskinvareakselerert XVideo for å endre videostørrelse, konvertere farger og tilbyr bildekontrollere hvis tilgjengelig.</translation>
-    </message>
-    <message>
-        <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
@@ -10630,10 +10649,6 @@ Do you wish to continue watching?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This lets decided to map a WMP  client to the Recordings tree or to the Video tree when  it requests a list of videos </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Local Backend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10666,12 +10681,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Play</source>
         <translation type="unfinished">Spill av</translation>
-    </message>
-    <message numerus="yes">
-        <source>hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>PBP</source>
@@ -10806,10 +10815,6 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Please enter a unique channel number. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number (or type %1 to skip): </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10960,6 +10965,92 @@ Do you wish to continue watching?</source>
         <source>ATSC Data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Suggest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: stream handler died</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DevicedID and Tuner Number of available HDHomeRun devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source> %n day(s),</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n hour(s) and</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>within one minute</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>soon</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Stop Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to stop the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend stop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Start Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to start the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend start).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This forces us to show WMP clients  either the Recordings tree or the Video tree when  they request a list of videos </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11098,6 +11189,65 @@ Do you wish to continue watching?</source>
     </message>
 </context>
 <context>
+    <name>ScheduleRecording</name>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished">Ikke ta opp dette programmet</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">Ta kun opp denne sendingen</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished">Ta opp én sending av denne tittelen</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">Ta opp i denne tidsperioden hver uke</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished">Ta opp én sending av denne tittelen hver uke</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">Ta opp i denne tidsperioden hver dag</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished">Ta opp én sending av denne tittelen hver dag</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">Ta opp når som helst på denne kanalen</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">Ta opp når som helst på enhver kanal</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">Ta opp denne sendingen med normale innstillinger</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">Ta opp denne sendingen med overstyringsinnstillinger</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">Ikke tillat dette programmet å bli tatt opp</translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished">Foretrekk inndatakilde %1</translation>
+    </message>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished">Bruk enhver tilgjengelig inndatakilde</translation>
+    </message>
+</context>
+<context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
@@ -11183,6 +11333,46 @@ is located in %2</source>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
         <translation type="unfinished">Dette kan ikke gjøres om, så det kan være lurt å ta en sikkerhetskopi av databasen.</translation>
+    </message>
+    <message>
+        <source>Database Host: %1
+Database Name: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StartPrompter</name>
+    <message>
+        <source>WARNING: The backend is currently running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
+        <translation type="unfinished">Det er ikke sikkert at det virker å endre eksisterende kortinndatakilder, slette hva som helst eller søke etter kanaler.</translation>
+    </message>
+    <message>
+        <source>Recording Status: RECORDING.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you stop the backend now these recordings will be stopped!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Status: None.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Backend and Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished">Fortsett</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Avslutt</translation>
     </message>
 </context>
 <context>
@@ -12824,10 +13014,6 @@ Velg et (pågående) opptak i stedet</translation>
     <message>
         <source>All</source>
         <translation>Alle</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
     </message>
 </context>
 <context>

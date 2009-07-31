@@ -1172,7 +1172,25 @@
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
-        <source>Badly formatted Device ID</source>
+        <source>Recording Options</source>
+        <translation type="unfinished">Опции записи</translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceID</name>
+    <message>
+        <source>Device ID</source>
+        <translation type="unfinished">Идентификатор устройства</translation>
+    </message>
+    <message>
+        <source>Deviced ID of HDHomeRun device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceIDList</name>
+    <message>
+        <source>Manually Enter IP Address</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1246,11 +1264,19 @@
         <translation type="unfinished">Запись Высокой Четкости</translation>
     </message>
     <message>
-        <source>Recording is in WideScreen</source>
+        <source>Recording has been watched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording has been watched</source>
+        <source>Recording is in 1080i/p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in 720p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Widescreen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1674,6 +1700,39 @@ Returning to the previous menu.</translation>
     <message>
         <source>Missing UI Element</source>
         <translation>Отсутствует элемент интерфейса</translation>
+    </message>
+</context>
+<context>
+    <name>MythThemedMenu</name>
+    <message>
+        <source>System Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Revision: %1
+ Branch: %2
+ %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2342,6 +2401,26 @@ Are you sure you want to delete:</source>
     <name>ProgDetails</name>
     <message>
         <source>Sorry, this screen requires Qt 4.4 or greater</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3062,14 +3141,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Select your preferred language</source>
         <translation>Выберите Ваш предпочитаемый язык</translation>
-    </message>
-    <message>
-        <source>Go Back</source>
-        <translation>Назад</translation>
-    </message>
-    <message>
-        <source>No Change</source>
-        <translation>Не изменять</translation>
     </message>
     <message>
         <source>Default</source>
@@ -4608,18 +4679,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Сохранять %1 серий</translation>
     </message>
     <message>
-        <source>Reduce priority by %1</source>
-        <translation>Уменьшить приоритет на %1</translation>
-    </message>
-    <message>
-        <source>Normal recording priority</source>
-        <translation>Нормальный приоритет записи</translation>
-    </message>
-    <message>
-        <source>Raise priority by %1</source>
-        <translation>Увеличить приоритет на %1</translation>
-    </message>
-    <message>
         <source>Select Recording Group</source>
         <translation>Выбрать Группу записи</translation>
     </message>
@@ -5474,10 +5533,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>If set, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
         <translation>Если установлено, по окончании записи будет показано меню позволяющее удалить запись.</translation>
-    </message>
-    <message>
-        <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Если разрешено, статическое изображение записи будет показано в меню &quot;Просмотр записей&quot;.</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
@@ -6864,26 +6919,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Очередь заданий (Команды заданий)</translation>
     </message>
     <message>
-        <source>WARNING</source>
-        <translation>ВНИМАНИЕ</translation>
-    </message>
-    <message>
-        <source>MythTV has detected that the backend is running.</source>
-        <translation>MythTV определил, что сервер запущен.</translation>
-    </message>
-    <message>
-        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation>Смена текущего ввода карт, удаление чего либо, или сканирование каналов могу не работать.</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Продолжить</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Выход</translation>
-    </message>
-    <message>
         <source>Title Pronounce</source>
         <translation>Объявленный заголовок</translation>
     </message>
@@ -7561,10 +7596,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>Выберите модель, которая имеет наибольшее сходство с Вашей. В зависимости от версии прошивки SA4200HD может работать лучше с SA3250HD.</translation>
     </message>
     <message>
-        <source>Device ID</source>
-        <translation>Идентификатор устройства</translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation>Тюнер</translation>
     </message>
@@ -7699,10 +7730,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>If enabled, interactive TV applications (MHEG) will be activated.  This is used for teletext and logos for radio and channels that are currently off-air.</source>
         <translation>Если разрешено, интерактивные приложения для ТВ (MHEG) будут доступны. Это используется для телетекста и логотипов для радио и каналов, которые в настоящее время не передаются.</translation>
-    </message>
-    <message>
-        <source>Display thumbnail preview images of recordings</source>
-        <translation>Показывать эскизы изображений предпросмотра записей</translation>
     </message>
     <message>
         <source>Paint Engine</source>
@@ -8095,10 +8122,6 @@ The frequency for this channel in</source>
     <message>
         <source>800Mbps</source>
         <translation type="unfinished">800Мбитс</translation>
-    </message>
-    <message>
-        <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>M3U URL</source>
@@ -8591,10 +8614,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10629,10 +10648,6 @@ Do you wish to continue watching?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This lets decided to map a WMP  client to the Recordings tree or to the Video tree when  it requests a list of videos </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Local Backend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10665,12 +10680,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Play</source>
         <translation type="unfinished">Просмотреть</translation>
-    </message>
-    <message numerus="yes">
-        <source>hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>PBP</source>
@@ -10805,10 +10814,6 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Please enter a unique channel number. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number (or type %1 to skip): </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10959,6 +10964,92 @@ Do you wish to continue watching?</source>
         <source>ATSC Data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Suggest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: stream handler died</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DevicedID and Tuner Number of available HDHomeRun devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source> %n day(s),</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n hour(s) and</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>within one minute</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>soon</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Stop Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to stop the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend stop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Start Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to start the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend start).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This forces us to show WMP clients  either the Recordings tree or the Video tree when  they request a list of videos </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11097,6 +11188,65 @@ Do you wish to continue watching?</source>
     </message>
 </context>
 <context>
+    <name>ScheduleRecording</name>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished">Не записывать эту программу</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">Записывать только этот показ</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished">Записывать один показ этого заголовка</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">Записывать в это время каждую неделю</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished">Записывать один показ этого заголовка каждую неделю</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">Записывать в это время каждый день</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished">Записывать показ этого заголовка каждый день</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">Записывать в любое время на этом канале</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">Записывать в любое время на любом канале</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">Записывать этот показ с нормальными опциями</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">Записывать этот показ с перезаписью опций</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">Не разрешать записывать этот показ</translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished">Предпочитаемый вход %1</translation>
+    </message>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished">Использовать любой доступный вход</translation>
+    </message>
+</context>
+<context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
@@ -11179,6 +11329,46 @@ is located in %2</source>
     </message>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Host: %1
+Database Name: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StartPrompter</name>
+    <message>
+        <source>WARNING: The backend is currently running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
+        <translation type="unfinished">Смена текущего ввода карт, удаление чего либо, или сканирование каналов могу не работать.</translation>
+    </message>
+    <message>
+        <source>Recording Status: RECORDING.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you stop the backend now these recordings will be stopped!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Status: None.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Backend and Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished">Продолжить</translation>
+    </message>
+    <message>
+        <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -12816,10 +13006,6 @@ Select a Current Recording</source>
 </context>
 <context>
     <name>ViewScheduleDiff</name>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
     <message>
         <source>All</source>
         <translation>Все</translation>

@@ -1172,7 +1172,25 @@
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
-        <source>Badly formatted Device ID</source>
+        <source>Recording Options</source>
+        <translation type="unfinished">Nauhoitusasetukset</translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceID</name>
+    <message>
+        <source>Device ID</source>
+        <translation type="unfinished">Laitetunnus</translation>
+    </message>
+    <message>
+        <source>Deviced ID of HDHomeRun device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceIDList</name>
+    <message>
+        <source>Manually Enter IP Address</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1246,12 +1264,20 @@
         <translation>Nauhoitus on HD-lähetys</translation>
     </message>
     <message>
-        <source>Recording is in WideScreen</source>
-        <translation>Nauhoitus on laajakuvalähetys</translation>
-    </message>
-    <message>
         <source>Recording has been watched</source>
         <translation>Nauhoitus on katsottu</translation>
+    </message>
+    <message>
+        <source>Recording is in 1080i/p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in 720p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Widescreen</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1676,6 +1702,39 @@ Returning to the previous menu.</source>
         <translation>Teemasta &apos;%2&apos; puuttuu käyttöliittymäelementti &apos;%1&apos;.
 
 Palataan edelliseen valikkoon.</translation>
+    </message>
+</context>
+<context>
+    <name>MythThemedMenu</name>
+    <message>
+        <source>System Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Revision: %1
+ Branch: %2
+ %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -2349,6 +2408,26 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>Sorry, this screen requires Qt 4.4 or greater</source>
         <translation>Tämä näyttö vaatii Qt 4.4 tai uudemman</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished">Asetukset</translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
     </message>
 </context>
 <context>
@@ -4901,14 +4980,6 @@ Haluatko varmasti poistaa:</translation>
         <translation>Toiston aikana MythTV kuuntelee tässä portissa yhteyksiä &quot;mythtvosd&quot;- ja &quot;mythudprelay&quot;-ohjelmilta. Katso README-tiedostoa contrib/mythnotify/-hakemistossa saadaksesi lisätietoja.</translation>
     </message>
     <message>
-        <source>Display thumbnail preview images of recordings</source>
-        <translation>Tee nauhoituksista esikatselukuvat</translation>
-    </message>
-    <message>
-        <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Jos valittuna, näytetään esikatselukuvat nauhoitukset-valikossa.</translation>
-    </message>
-    <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
         <translation>Jos valittuna, näytetään esikatselua nauhoitukset-valikossa.</translation>
     </message>
@@ -5039,14 +5110,6 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>Directed By</source>
         <translation>Ohjannut</translation>
-    </message>
-    <message>
-        <source>Go Back</source>
-        <translation>Takaisin</translation>
-    </message>
-    <message>
-        <source>No Change</source>
-        <translation>Ei muutoksia</translation>
     </message>
     <message>
         <source>Stop recording</source>
@@ -5215,18 +5278,6 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>Keep at most %1 episodes</source>
         <translation>Säilytä korkeintaan %1 jaksoa</translation>
-    </message>
-    <message>
-        <source>Reduce priority by %1</source>
-        <translation>Vähennä tärkeysjärjestystä numerolla %1</translation>
-    </message>
-    <message>
-        <source>Normal recording priority</source>
-        <translation>Normaali tärkeysjärjestys</translation>
-    </message>
-    <message>
-        <source>Raise priority by %1</source>
-        <translation>Kasvata tärkeysjärjestystä numerolla %1</translation>
     </message>
     <message>
         <source>Default size is 12.</source>
@@ -6196,18 +6247,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Tallenna alkuperäiset tiedostot jälkikäsittelyn jälkeen (yleisesti)</translation>
     </message>
     <message>
-        <source>WARNING</source>
-        <translation>Varoitus</translation>
-    </message>
-    <message>
-        <source>MythTV has detected that the backend is running.</source>
-        <translation>MythTV huomasi, että taustaohjelma on ajossa.</translation>
-    </message>
-    <message>
-        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation>Olemassaolevien sisääntulojen muuttaminen ja kanavien etsiminen ei luultavasti onnistu.</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>Lähetysvirtojen muokkain</translation>
     </message>
@@ -6230,14 +6269,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>16:10</source>
         <translation>16:10</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>Jatka</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Poistu</translation>
     </message>
     <message>
         <source>(Delete all video sources)</source>
@@ -7076,10 +7107,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>DVB Tuning Delay (msec)</source>
         <translation>DVB-viritysviive (msec)</translation>
-    </message>
-    <message>
-        <source>Device ID</source>
-        <translation>Laitetunnus</translation>
     </message>
     <message>
         <source>Tuner</source>
@@ -8428,10 +8455,6 @@ Taajuus tälle kanavalle %1:ssa</translation>
         <translation>Tämä on staandardi videorenderoija XvMC -purkajille. Se käyttää XVideo -laitteistoa skaalaukseen, värienmuokkaukseen ja, kun mahdollista, tarjoaa XVideo -kuvakontolleja.</translation>
     </message>
     <message>
-        <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
-        <translation>Tämä nVidia -korttien videorenderoija XvMC -järjestelmälle käyttää XVideota värienmuokkaukseen ja OpenGL:ää skaalaukseen. Tämän renderoijan suurin etu on OpenGL OSD -renderointi, joka vapauttaa kaksi XvMC -puskuria koodinpurusta. Se vaatii suhteellisen nopean nVidia -kortin.</translation>
-    </message>
-    <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
         <translation>Tämä videorenderoija käyttää DirectFB:tä skaalaukseen ja värienmuokkaukseen. Sillä ei ole yhtä laajat ominaisuudet kuin standardi videorenderoijalla, mutta se voi käyttää Linux -ohjelmistoa ilman X11 -palvelinta.</translation>
     </message>
@@ -8606,10 +8629,6 @@ Taajuus tälle kanavalle %1:ssa</translation>
     <message>
         <source>DBOX2 Host IP is the remote device.</source>
         <translation>DBOX2-isäntäkoneen IP etälaitteessa.</translation>
-    </message>
-    <message>
-        <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation>IP-osoite tai laitekoodi HDHomeRunin pohjasta.  Voit käyttää &apos;FFFFFFFF&apos; jos verkossasi on vain yksi laite.</translation>
     </message>
     <message>
         <source>M3U URL</source>
@@ -9859,10 +9878,6 @@ Taajuus tälle kanavalle %1:ssa</translation>
         <translation>Videot</translation>
     </message>
     <message>
-        <source>This lets decided to map a WMP  client to the Recordings tree or to the Video tree when  it requests a list of videos </source>
-        <translation>Tämä antaa sinun lisätä WMP -soittimen Nauhoitus puuhun ja video puuhun, kun videolistaa kysytään</translation>
-    </message>
-    <message>
         <source>Local Backend</source>
         <translation>Paikallinen järjestelmä</translation>
     </message>
@@ -10725,13 +10740,6 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <translation>Resoluutio 1080i/p</translation>
     </message>
     <message numerus="yes">
-        <source>hour(s)</source>
-        <translation type="unfinished">
-            <numerusform>tuntia
-        </numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n hour(s)</source>
         <translation type="unfinished">
             <numerusform>%n tuntia
@@ -10852,10 +10860,6 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Please enter a unique channel number. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number (or type %1 to skip): </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10984,6 +10988,92 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>ATSC Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Suggest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: stream handler died</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DevicedID and Tuner Number of available HDHomeRun devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source> %n day(s),</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n hour(s) and</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>within one minute</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>soon</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Stop Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to stop the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend stop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Start Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to start the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend start).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This forces us to show WMP clients  either the Recordings tree or the Video tree when  they request a list of videos </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV Grabber Configuration</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11124,6 +11214,65 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
 </context>
 <context>
+    <name>ScheduleRecording</name>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished">Älä nauhoita tätä ohjelmaa</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">Nauhoita vain tämä esitys</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished">Nauhoita vain yksi jakso ohjelmasta</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">Nauhoita joka viikko tähän aikaan</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished">Nauhoita vain yksi jakso ohjelmasta joka viikko</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">Nauhoita joka päivä tähän aikaan</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished">Nauhoita vain yksi jakso ohjelmasta joka päivä</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">Nauhoita tällä kanavalla mihin aikaan tahansa</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">Nauhoita tällä kanavalla mihin aikaan tahansa</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">Nauhoita kyseinen ohjelma tavallisin valinnoin</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">Nauhoita kyseinen ohjelma syrjäytys-valinnoin</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">Älä nauhoita tätä jaksoa</translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished">Ensisijaisesti sisääntulo %1</translation>
+    </message>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished">Mikä tahansa sisääntulo</translation>
+    </message>
+</context>
+<context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
@@ -11211,6 +11360,46 @@ löytyy %2</translation>
     <message>
         <source>Database schema is old. Waiting to see if DB is being upgraded.</source>
         <translation>Tietokantakaavio on vanha.Tarkistaaaa jos tietokannan voisi päivittää.</translation>
+    </message>
+    <message>
+        <source>Database Host: %1
+Database Name: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StartPrompter</name>
+    <message>
+        <source>WARNING: The backend is currently running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
+        <translation type="unfinished">Olemassaolevien sisääntulojen muuttaminen ja kanavien etsiminen ei luultavasti onnistu.</translation>
+    </message>
+    <message>
+        <source>Recording Status: RECORDING.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you stop the backend now these recordings will be stopped!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Status: None.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Backend and Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished">Jatka</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Poistu</translation>
     </message>
 </context>
 <context>
@@ -12859,10 +13048,6 @@ Valitse nykyinen nauhoitus</translation>
     <message>
         <source>All</source>
         <translation>Kaikki</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>Ok</translation>
     </message>
 </context>
 <context>

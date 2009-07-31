@@ -1172,7 +1172,25 @@
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
-        <source>Badly formatted Device ID</source>
+        <source>Recording Options</source>
+        <translation type="unfinished">録画オプション</translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceID</name>
+    <message>
+        <source>Device ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deviced ID of HDHomeRun device</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HDHomeRunDeviceIDList</name>
+    <message>
+        <source>Manually Enter IP Address</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1246,11 +1264,19 @@
         <translation type="unfinished">High Definition で録画されました</translation>
     </message>
     <message>
-        <source>Recording is in WideScreen</source>
+        <source>Recording has been watched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Recording has been watched</source>
+        <source>Recording is in 1080i/p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is in 720p High Definition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording is Widescreen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1674,6 +1700,39 @@ Returning to the previous menu.</source>
         <translation>使用中のテーマ&apos;%2&apos;では&apos;%1&apos;を配置できません
 
 直前のメニューに戻ります。</translation>
+    </message>
+</context>
+<context>
+    <name>MythThemedMenu</name>
+    <message>
+        <source>System Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Revision: %1
+ Branch: %2
+ %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2343,6 +2402,26 @@ Are you sure you want to delete:</source>
     <message>
         <source>Sorry, this screen requires Qt 4.4 or greater</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
     </message>
 </context>
 <context>
@@ -4887,14 +4966,6 @@ Are you sure you want to delete:</source>
         <translation>再生時、このポートを経由する&quot;mythtvosd&quot;あるいは&quot;mythudprelay&quot;からの接続を監視します。README(contrib/mythnotify/)参照。</translation>
     </message>
     <message>
-        <source>Display thumbnail preview images of recordings</source>
-        <translation>サムネイルのプレビューイメージを作成する</translation>
-    </message>
-    <message>
-        <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>&quot;録画再生&quot;メニューでサムネイル(静止画像)を表示します。</translation>
-    </message>
-    <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
         <translation>&quot;録画再生&quot;メニューで録画のプレビュー動画再生(小ウインドウ)を行います。</translation>
     </message>
@@ -5025,14 +5096,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Directed By</source>
         <translation>監督 </translation>
-    </message>
-    <message>
-        <source>Go Back</source>
-        <translation>戻る</translation>
-    </message>
-    <message>
-        <source>No Change</source>
-        <translation>変更無し</translation>
     </message>
     <message>
         <source>Do not record this program</source>
@@ -5173,18 +5236,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>Keep at most %1 episodes</source>
         <translation>%1番組を保持する</translation>
-    </message>
-    <message>
-        <source>Reduce priority by %1</source>
-        <translation>%1優先順位を下げる</translation>
-    </message>
-    <message>
-        <source>Normal recording priority</source>
-        <translation>通常の録画優先順位</translation>
-    </message>
-    <message>
-        <source>Raise priority by %1</source>
-        <translation>%1優先順位を上げる</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
@@ -6460,18 +6511,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation>トランスコード後に元のファイルを保存する（全般）</translation>
     </message>
     <message>
-        <source>WARNING</source>
-        <translation>警告</translation>
-    </message>
-    <message>
-        <source>MythTV has detected that the backend is running.</source>
-        <translation>mythbackendが実行されています。</translation>
-    </message>
-    <message>
-        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation>既存のカード変更、削除、チャンネルスキャンなどはたぶん動作しません。</translation>
-    </message>
-    <message>
         <source>Transport Editor</source>
         <translation>トランスポート編集</translation>
     </message>
@@ -6494,14 +6533,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>16:10</source>
         <translation>16:10</translation>
-    </message>
-    <message>
-        <source>Continue</source>
-        <translation>続行</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>終了</translation>
     </message>
     <message>
         <source>(Delete all video sources)</source>
@@ -7608,10 +7639,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Tuner</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8088,10 +8115,6 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>800Mbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8585,10 +8608,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10627,10 +10646,6 @@ Do you wish to continue watching?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This lets decided to map a WMP  client to the Recordings tree or to the Video tree when  it requests a list of videos </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Local Backend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10663,12 +10678,6 @@ Do you wish to continue watching?</source>
     <message>
         <source>Play</source>
         <translation type="unfinished">再生</translation>
-    </message>
-    <message numerus="yes">
-        <source>hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>PBP</source>
@@ -10803,10 +10812,6 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Please enter a unique channel number. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enter a non-conflicting channel number (or type %1 to skip): </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10957,6 +10962,92 @@ Do you wish to continue watching?</source>
         <source>ATSC Data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Suggest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number (or type %1 to skip, %2 to skip all): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: stream handler died</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Available Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DevicedID and Tuner Number of available HDHomeRun devices.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source> %n day(s),</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n hour(s) and</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source> %n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>within one minute</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>soon</source>
+        <comment>Recording starting</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Stop Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to stop the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend stop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Start Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command used to start the backend when running on the master backend server
+(e.g. sudo /etc/init.d/mythtv-backend start).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This forces us to show WMP clients  either the Recordings tree or the Video tree when  they request a list of videos </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backend Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -11095,6 +11186,65 @@ Do you wish to continue watching?</source>
     </message>
 </context>
 <context>
+    <name>ScheduleRecording</name>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished">録画しない</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">この番組のみ録画する</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished">このタイトルの番組を一回録画する</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">毎週この時間帯を録画する</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished">このタイトルの番組を毎週一回録画する</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">毎日この時間帯を録画する</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished">このタイトルの番組を毎日一回録画する</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">このチャンネルでいつでも録画する</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">いつでもどのチャンネルでも録画する</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">ノーマルオプションでこの番組を録画します</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">個別設定オプションでこの番組を録画します</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">この番組を録画しない</translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished">%1を使用する</translation>
+    </message>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished">利用できる入力を使用する</translation>
+    </message>
+</context>
+<context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
@@ -11178,6 +11328,46 @@ is located in %2</source>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Host: %1
+Database Name: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StartPrompter</name>
+    <message>
+        <source>WARNING: The backend is currently running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
+        <translation type="unfinished">既存のカード変更、削除、チャンネルスキャンなどはたぶん動作しません。</translation>
+    </message>
+    <message>
+        <source>Recording Status: RECORDING.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you stop the backend now these recordings will be stopped!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Status: None.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Backend and Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished">続行</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">終了</translation>
     </message>
 </context>
 <context>
@@ -12817,10 +13007,6 @@ Select a Current Recording</source>
     <message>
         <source>All</source>
         <translation>全て</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>はい</translation>
     </message>
 </context>
 <context>
