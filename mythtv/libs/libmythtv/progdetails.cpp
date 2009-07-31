@@ -592,8 +592,8 @@ void ProgDetails::loadPage(void)
             if (query.value(1).toDateTime().isValid())
                 nextRecording = query.value(1).toDateTime().toString(fullDateFormat);
             if (query.value(2).toInt() > 0)
-                averageTimeShift = QString("%1 %2").arg(query.value(2).toInt())
-                                        .arg(QObject::tr("hour(s)", "", query.value(2).toInt()));
+                averageTimeShift = QObject::tr("%n hour(s)", "",
+                                                query.value(2).toInt());
         }
         if (recorded)
         {
