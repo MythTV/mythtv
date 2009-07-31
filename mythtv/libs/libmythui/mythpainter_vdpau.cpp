@@ -17,7 +17,7 @@ extern "C" {
 }
 
 #define MAX_GL_ITEMS 256
-#define MAX_STRING_ITEMS 256 
+#define MAX_STRING_ITEMS 256
 
 #define LOC_ERR QString("VDPAU Painter: ")
 
@@ -209,7 +209,7 @@ bool MythVDPAUPrivate::InitProcs(QWidget *parent)
         (void **)&vdp_bitmap_surface_destroy);
     CHECK_ST
 
-    return ok;    
+    return ok;
 }
 
 bool MythVDPAUPrivate::InitVDPAU(QWidget *parent)
@@ -283,7 +283,7 @@ void MythVDPAUPrivate::CloseVDPAU(void)
             CHECK_ST
         }
     }
-    
+
     if (vdpFlipQueue)
     {
         vdp_st = vdp_presentation_queue_destroy(
@@ -332,7 +332,7 @@ void MythVDPAUPrivate::Begin(QWidget *parent)
 
     assert(parent);
 
-    if (initialized && 
+    if (initialized &&
         (parent->width() != (int)outRect.x1 || parent->height() != (int)outRect.y1))
     {
         CloseVDPAU();
@@ -424,7 +424,7 @@ void MythVDPAUPrivate::BindTextureFromCache(MythImage *im)
 
     vdp_st = vdp_bitmap_surface_create(
         vdp_device,
-        VDP_RGBA_FORMAT_B8G8R8A8, 
+        VDP_RGBA_FORMAT_B8G8R8A8,
         im->width(),
         im->height(),
         1,
@@ -442,7 +442,7 @@ void MythVDPAUPrivate::BindTextureFromCache(MythImage *im)
         NULL
     );
     CHECK_ST
-       
+
     m_ImageBitmapMap[im] = newsurf;
     m_ImageExpireList.push_back(im);
 
@@ -503,7 +503,7 @@ void MythVDPAUPrivate::DrawImage(const QRect &r, MythImage *im,
         &vsrc,
         &color,
         &vdpblend,
-        VDP_OUTPUT_SURFACE_RENDER_ROTATE_0 
+        VDP_OUTPUT_SURFACE_RENDER_ROTATE_0
     );
     CHECK_ST
 }
@@ -702,13 +702,13 @@ void MythVDPAUPainter::DrawText(const QRect &r, const QString &msg,
 }
 
 void MythVDPAUPainter::DrawRect(const QRect &area,
-                                bool drawFill, const QColor &fillColor, 
+                                bool drawFill, const QColor &fillColor,
                                 bool drawLine, int lineWidth, const QColor &lineColor)
 {
 }
 
-void MythVDPAUPainter::DrawRoundRect(const QRect &area, int radius, 
-                                     bool drawFill, const QColor &fillColor, 
+void MythVDPAUPainter::DrawRoundRect(const QRect &area, int radius,
+                                     bool drawFill, const QColor &fillColor,
                                      bool drawLine, int lineWidth, const QColor &lineColor)
 {
 }

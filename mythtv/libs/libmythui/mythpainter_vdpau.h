@@ -28,10 +28,10 @@ class MythVDPAUPainter : public MythPainter
                           const MythFontProperties &font, int alpha,
                           const QRect &boundRect);
     virtual void DrawRect(const QRect &area,
-                          bool drawFill, const QColor &fillColor, 
+                          bool drawFill, const QColor &fillColor,
                           bool drawLine, int lineWidth, const QColor &lineColor);
-    virtual void DrawRoundRect(const QRect &area, int radius, 
-                               bool drawFill, const QColor &fillColor, 
+    virtual void DrawRoundRect(const QRect &area, int radius,
+                               bool drawFill, const QColor &fillColor,
                                bool drawLine, int lineWidth, const QColor &lineColor);
 
     virtual MythImage *GetFormatImage();
