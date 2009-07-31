@@ -299,6 +299,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     // Split out sort order modes, wacky order for backward compatibility
     m_listOrder = (pbOrder >> 1) ^ (m_allOrder = pbOrder & 1);
     m_watchListStart     = gContext->GetNumSetting("PlaybackWLStart", 0);
+
     m_watchListAutoExpire= gContext->GetNumSetting("PlaybackWLAutoExpire", 0);
     m_watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
     m_watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
@@ -327,6 +328,11 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
         m_viewMask = (ViewMask)(m_viewMask & ~VIEW_WATCHLIST);
         gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
+
+    // If user wants to start in watchlist and watchlist is displayed, then
+    // make it the current group
+    if (m_watchListStart && (m_viewMask & VIEW_WATCHLIST))
+        m_currentGroup = m_watchGroupLabel;
 
     // This setting is deprecated in favour of viewmask, this just ensures the
     // that it is converted over when upgrading from earlier versions
@@ -1077,9 +1083,6 @@ bool PlaybackBox::FillList(bool useCachedData)
                 }
             }
         }
-
-        if (!(m_viewMask & VIEW_WATCHLIST))
-            m_watchListStart = 0;
 
         vector<ProgramInfo *>::iterator i = m_progCache->begin();
         for ( ; i != m_progCache->end(); i++)
