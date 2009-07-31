@@ -14,7 +14,7 @@ using namespace std;
 #define LOC QString("PlaybackSock: ")
 #define LOC_ERR QString("PlaybackSock, Error: ")
 
-PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock, 
+PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock,
                            QString lhostname, bool wantevents)
 {
     m_parent = parent;
@@ -289,17 +289,23 @@ bool PlaybackSock::IsBusy(
                 " gave us no response.");
     }
 
-    QStringList::const_iterator it = strlist.begin();
-    bool state = (*it).toInt();
-    if (busy_input)
+    bool state = false;
+
+    if (!strlist.isEmpty())
     {
-        it++;
-        if (!busy_input->FromStringList(it, strlist.end()))
+        QStringList::const_iterator it = strlist.begin();
+        state = (*it).toInt();
+
+        if (busy_input)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusy: "
-                    "Failed to parse response to " +
-                    QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
-            state = false; // pretend it's not busy if we can't parse response
+            it++;
+            if (!busy_input->FromStringList(it, strlist.end()))
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusy: "
+                        "Failed to parse response to " +
+                        QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
+                state = false; // pretend it's not busy if we can't parse response
+            }
         }
     }
 
@@ -376,7 +382,7 @@ bool PlaybackSock::EncoderIsRecording(int capturecardnum, const ProgramInfo *pgi
     return false;
 }
 
-RecStatusType PlaybackSock::StartRecording(int capturecardnum, 
+RecStatusType PlaybackSock::StartRecording(int capturecardnum,
                                            const ProgramInfo *pginfo)
 {
     QStringList strlist( QString("QUERY_REMOTEENCODER %1").arg(capturecardnum) );
@@ -386,7 +392,7 @@ RecStatusType PlaybackSock::StartRecording(int capturecardnum,
     if (SendReceiveStringList(strlist, 1))
         return RecStatusType(strlist[0].toInt());
 
-    return rsUnknown; 
+    return rsUnknown;
 }
 
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
