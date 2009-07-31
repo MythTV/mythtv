@@ -742,19 +742,8 @@ void MythSocketThread::WakeReadyReadThread(void)
 #else
     if (m_readyread_pipe[1] >= 0)
     {
-        VERBOSE(VB_IMPORTANT, "REMOVE_ME: In WakeReadyReadThread");
         char buf[1] = { '0' };
-        ssize_t wret = 0;
-        while (wret <= 0)
-        {
-            wret = ::write(m_readyread_pipe[1], &buf, 1);
-            if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
-            {
-                VERBOSE(VB_IMPORTANT, "MythSocketThread, Error: "
-                        "Irrecoverable WakeReadyReadThread event");
-                break;
-            }
-        }
+        ::write(m_readyread_pipe[1], &buf, 1);
     }
 #endif
 }
@@ -960,26 +949,8 @@ void MythSocketThread::run(void)
 
             if (FD_ISSET(m_readyread_pipe[0], &rfds))
             {
-                static const ssize_t buf_size = 128;
-                char buf[buf_size];
-                ssize_t readin = 0;
-                while (readin < buf_size)
-                {
-                    ssize_t rr = ::read(m_readyread_pipe[0],
-                                        buf + readin, buf_size - readin);
-                    if ((rr < 0) && ((EAGAIN == errno) || (EINTR == errno)))
-                        continue;
-                    else if (rr < 0)
-                        break;
-                    readin += rr;
-                }
-
-                if (readin != buf_size)
-                {
-                    VERBOSE(VB_IMPORTANT, "MythSocketThread, Error: "
-                            "Encountered irrecoverable error when "
-                            "checking if socket still alive.");
-                }
+                char buf[128];
+                ::read(m_readyread_pipe[0], buf, 128);
             }
         }
         else
