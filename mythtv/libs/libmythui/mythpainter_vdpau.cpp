@@ -401,7 +401,7 @@ void MythVDPAUPrivate::BindTextureFromCache(MythImage *im)
 {
     if (m_ImageBitmapMap.contains(im))
     {
-        VdpBitmapSurface val = m_ImageBitmapMap[im];
+        //VdpBitmapSurface val = m_ImageBitmapMap[im];
 
         if (!im->IsChanged())
         {
