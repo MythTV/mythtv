@@ -163,6 +163,8 @@ class MythMainWindowPrivate
 
     QWidget *oldpaintwin;
     MythPainter *oldpainter;
+
+    bool m_drawEnabled;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -402,6 +404,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->AllowInput = true;
 
     d->repaintRegion = QRegion(QRect(0,0,0,0));
+
+    d->m_drawEnabled = true;
 }
 
 MythMainWindow::~MythMainWindow()
@@ -494,7 +498,7 @@ MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
 void MythMainWindow::animate(void)
 {
     /* FIXME: remove */
-    if (currentWidget())
+    if (currentWidget() || !d->m_drawEnabled)
         return;
 
     if (!d->paintwin)
@@ -537,7 +541,7 @@ void MythMainWindow::animate(void)
 void MythMainWindow::drawScreen(void)
 {
     /* FIXME: remove */
-    if (currentWidget())
+    if (currentWidget() || !d->m_drawEnabled)
         return;
 
     if (!d->painter->SupportsClipping())
@@ -888,6 +892,12 @@ QWidget *MythMainWindow::currentWidget(void)
         return d->widgetList.back();
     return NULL;
 }
+
+void MythMainWindow::SetDrawEnabled(bool enable)
+{
+    d->m_drawEnabled = enable;
+}
+
 /* FIXME: end compatability */
 
 bool MythMainWindow::IsExitingToMain(void) const
