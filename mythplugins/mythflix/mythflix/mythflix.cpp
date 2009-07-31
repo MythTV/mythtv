@@ -250,7 +250,7 @@ void MythFlix::updateInfoView(MythUIButtonListItem* selected)
 
 bool MythFlix::keyPressEvent(QKeyEvent *event)
 {
-    if (GetFocusWidget()->keyPressEvent(event))
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
     bool handled = false;
@@ -413,15 +413,18 @@ void MythFlix::displayOptions()
     m_menuPopup = new MythDialogBox(label, popupStack, "mythflixmenupopup");
 
     if (m_menuPopup->Create())
+    {
         popupStack->AddScreen(m_menuPopup);
 
-    m_menuPopup->SetReturnEvent(this, "options");
+        m_menuPopup->SetReturnEvent(this, "options");
 
-    m_menuPopup->AddButton(tr("Add to Top of Queue"));
-    m_menuPopup->AddButton(tr("Add to Bottom of Queue"));
-    m_menuPopup->AddButton(tr("Show NetFlix Page"));
-    m_menuPopup->AddButton(tr("Cancel"));
-
+        m_menuPopup->AddButton(tr("Add to Top of Queue"));
+        m_menuPopup->AddButton(tr("Add to Bottom of Queue"));
+        m_menuPopup->AddButton(tr("Show NetFlix Page"));
+        m_menuPopup->AddButton(tr("Cancel"));
+    }
+    else
+        delete m_menuPopup;
 }
 
 // Execute an external command and return results in string
