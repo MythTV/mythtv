@@ -102,7 +102,7 @@ bool MythUIGuideGrid::ParseElement(QDomElement &element)
         QString lineColor = element.attribute("linecolor", "");
         QString fillColor = element.attribute("fillcolor", "");
 
-        if (lineColor != "")
+        if (!lineColor.isEmpty())
         {
             m_selLineColor = QColor(lineColor);
             m_drawSelLine = true;
@@ -112,7 +112,7 @@ bool MythUIGuideGrid::ParseElement(QDomElement &element)
             m_drawSelLine = false;
         }
 
-        if (fillColor != "")
+        if (!fillColor.isEmpty())
         {
             m_selFillColor = QColor(fillColor);
             m_drawSelFill = true;
@@ -159,11 +159,9 @@ bool MythUIGuideGrid::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "recordstatus")
     {
-        QString typ = "";
-        QString img = "";
         int inttype = 0;
-        typ = element.attribute("type");
-        img = element.attribute("image");
+        QString typ = element.attribute("type");
+        QString img = element.attribute("image");
 
         if (typ == "SingleRecord")
             inttype = 1;
@@ -184,10 +182,8 @@ bool MythUIGuideGrid::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "arrow")
     {
-        QString dir = "";
-        QString image = "";
-        dir = element.attribute("direction");
-        image = element.attribute("image");
+        QString dir = element.attribute("direction");
+        QString image = element.attribute("image");
 
         if (dir == "left")
             SetArrow(0, image);
@@ -580,10 +576,8 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
         QDomElement info = child.toElement();
         if (!info.isNull() && info.tagName() == "catcolor")
         {
-            QString cat = "";
-            QString col = "";
-            cat = info.attribute("category");
-            col = info.attribute("color");
+            QString cat = info.attribute("category");
+            QString col = info.attribute("color");
 
             catColors[cat.toLower()] = col;
         }
