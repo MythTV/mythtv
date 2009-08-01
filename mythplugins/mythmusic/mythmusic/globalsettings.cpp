@@ -876,13 +876,13 @@ void VisualizationsEditor::downClicked(void)
 
 QString VisualizationsEditor::getSelectedModes(void)
 {
-    QString res = "";
+    QString res;
 
     Q3ListViewItem *item = selectedList->firstChild();
 
     while (item)
     {
-        if (res != "")
+        if (!res.isEmpty())
             res += ";";
 
         if (item->text(1) == "MythMusic")

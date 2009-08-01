@@ -49,7 +49,7 @@ class Metadata
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QString llastplay = "",
-             bool lcompilation = false, QString lformat="")
+             bool lcompilation = false, QString lformat = "")
                 : m_artist(lartist),
                    m_compilation_artist(lcompilation_artist),
                    m_album(lalbum),
@@ -90,20 +90,20 @@ class Metadata
     QString Artist() const { return m_artist; }
     void setArtist(const QString &lartist)
     {
-        m_artist = lartist; m_formattedartist = m_formattedtitle = "";
+        m_artist = lartist; m_formattedartist.clear(); m_formattedtitle.clear();
     }
 
     QString CompilationArtist() const { return m_compilation_artist; }
     void setCompilationArtist(const QString &lcompilation_artist)
     {
         m_compilation_artist = lcompilation_artist;
-        m_formattedartist = m_formattedtitle = "";
+        m_formattedartist.clear(); m_formattedtitle.clear();
     }
 
     QString Album() const { return m_album; }
     void setAlbum(const QString &lalbum)
     {
-        m_album = lalbum; m_formattedartist = m_formattedtitle = "";
+        m_album = lalbum; m_formattedartist.clear(); m_formattedtitle.clear();
     }
 
     QString Title() const { return m_title; }
@@ -167,7 +167,9 @@ class Metadata
     bool Compilation() const { return m_compilation; }
     void setCompilation(bool state)
     {
-        m_compilation = state; m_formattedartist = m_formattedtitle = "";
+        m_compilation = state;
+        m_formattedartist.clear();
+        m_formattedtitle.clear();
     }
     bool determineIfCompilation(bool cd = false);
 
@@ -257,7 +259,6 @@ class MusicNode
    ~MusicNode();
 
     QString     getTitle(void) const { return my_title; }
-    void        printYourself(int indent_amount) const;   // debugging
     void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
     void        writeTree(GenericTree *tree_to_write_to, int a_counter);
     void        sort();
@@ -339,7 +340,6 @@ class AllMusic
     QString     getCDTitle(){return m_cd_title;}
     void        setCDTitle(const QString &a_title){m_cd_title = a_title;}
     void        buildTree();
-    void        printTree();    // debugging
     void        sortTree();
     inline void clearTree() { m_root_node-> clear(); }
     void        writeTree(GenericTree *tree_to_write_to);

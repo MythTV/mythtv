@@ -80,7 +80,7 @@ Metadata& Metadata::operator=(Metadata *rhs)
     return *this;
 }
 
-QString Metadata::m_startdir = "";
+QString Metadata::m_startdir;
 
 void Metadata::SetStartdir(const QString &dir)
 {
@@ -540,15 +540,15 @@ inline QString Metadata::formatReplaceSymbols(const QString &format)
 
 void Metadata::checkEmptyFields()
 {
-    if (m_artist == "")
+    if (m_artist.isEmpty())
         m_artist = QObject::tr("Unknown Artist");
-    if (m_compilation_artist == "")
+    if (m_compilation_artist.isEmpty())
         m_compilation_artist = m_artist; // This should be the same as Artist if blank.
-    if (m_album == "")
+    if (m_album.isEmpty())
         m_album = QObject::tr("Unknown Album");
-    if (m_title == "")
+    if (m_title.isEmpty())
         m_title = m_filename;
-    if (m_genre == "")
+    if (m_genre.isEmpty())
         m_genre = QObject::tr("Unknown Genre");
 
 }
@@ -1071,23 +1071,13 @@ void AllMusic::resync()
     //  the metadata. Once built, sort it.
 
     buildTree();
-    //printTree();
     sortTree();
-    //printTree();
     m_done_loading = true;
 }
 
 void AllMusic::sortTree()
 {
     m_root_node->sort();
-}
-
-void AllMusic::printTree()
-{
-    //  debugging
-
-    VERBOSE(VB_IMPORTANT, "Whole Music Tree");
-    m_root_node->printYourself(0);
 }
 
 void AllMusic::buildTree()
@@ -1133,7 +1123,7 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
     ValueMetadata::iterator anit;
     for(anit = m_cd_data.begin(); anit != m_cd_data.end(); ++anit)
     {
-        QString title_string = "";
+        QString title_string;
         if((*anit).Title().length() > 0)
         {
             title_string = (*anit).FormatTitle();
@@ -1152,7 +1142,7 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
 
 QString AllMusic::getLabel(int an_id, bool *error_flag)
 {
-    QString a_label = "";
+    QString a_label;
     if(an_id > 0)
     {
 
@@ -1194,7 +1184,7 @@ QString AllMusic::getLabel(int an_id, bool *error_flag)
         }
     }
 
-    a_label = "";
+    a_label.clear();
     *error_flag = true;
     return a_label;
 }
@@ -1340,8 +1330,8 @@ MusicNode::~MusicNode()
 
 // static member vars
 
-QString MusicNode::m_startdir = "";
-QString MusicNode::m_paths = "";
+QString MusicNode::m_startdir;
+QString MusicNode::m_paths;
 int MusicNode::m_RatingWeight = 2;
 int MusicNode::m_PlayCountWeight = 2;
 int MusicNode::m_LastPlayWeight = 2;
@@ -1478,30 +1468,6 @@ void MusicNode::sort()
     MusicNodePtrList::const_iterator sit = my_subnodes.begin();
     for (; sit != my_subnodes.end(); ++sit)
         (*sit)->sort();
-}
-
-
-void MusicNode::printYourself(int indent_level) const
-{
-    QString tmp = "";
-    for (int i = 0; i < indent_level; ++i)
-        tmp += "    ";
-    tmp += my_title;
-    VERBOSE(VB_GENERAL, tmp);
-
-    MetadataPtrList::const_iterator it = my_tracks.begin();
-    for (; it != my_tracks.end(); ++it)
-    {
-        QString tmp = "";
-        for (int i = 0; i < indent_level + 1; ++i)
-            tmp += "    ";
-        tmp += (*it)->Title();
-        VERBOSE(VB_GENERAL, tmp);
-    }
-
-    MusicNodePtrList::const_iterator sit = my_subnodes.begin();
-    for (; sit != my_subnodes.end(); ++sit)
-        (*sit)->printYourself(indent_level + 1);
 }
 
 /**************************************************************************/
@@ -1652,8 +1618,6 @@ ImageType AlbumArtImages::guessImageType(const QString &filename)
 
 MusicData::MusicData(void)
 {
-    paths = "";
-    startdir = "";
     all_playlists = NULL;
     all_music = NULL;
     runPost = false;

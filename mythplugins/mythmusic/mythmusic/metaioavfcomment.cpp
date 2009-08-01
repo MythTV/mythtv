@@ -56,7 +56,7 @@ bool MetaIOAVFComment::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOAVFComment::read(QString filename)
 {
-    QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
+    QString artist, compilation_artist, album, title, genre;
     int year = 0, tracknum = 0, length = 0;
 
     AVFormatContext* p_context = NULL;

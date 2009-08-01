@@ -55,7 +55,7 @@ LibVisualPlugin::LibVisualPlugin(
         m_pluginList << plugin;
 
     m_currentPlugin = 0;
-    if (pluginName != "" &&
+    if (!pluginName.isEmpty() &&
             (m_pluginList.find(pluginName) != m_pluginList.end()))
         switchToPlugin(pluginName);
     else
@@ -122,7 +122,7 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
     m_pVisVideo = visual_video_new();
     if (!m_pVisVideo)
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_IMPORTANT,
                 "Error allocating LibVisualPlugin 'Video' object");
         return;
     }
@@ -144,8 +144,8 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
     }
 
     // Work around visualisers that don't initialise their buffer:
-    QSize size(100, 100); 
-    visual_video_set_dimension(m_pVisVideo, size.width(), size.height()); 
+    QSize size(100, 100);
+    visual_video_set_dimension(m_pVisVideo, size.width(), size.height());
     createScreen(size.width(), size.height());
 
     if (visual_input_set_callback(

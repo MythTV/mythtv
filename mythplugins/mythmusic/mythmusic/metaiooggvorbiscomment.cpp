@@ -283,7 +283,7 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOOggVorbisComment::read(QString filename)
 {
-    QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
+    QString artist, compilation_artist, album, title, genre;
     int year = 0, tracknum = 0, length = 0;
     bool compilation = false;
 
@@ -412,7 +412,7 @@ int MetaIOOggVorbisComment::getTrackLength(QString filename)
 QString MetaIOOggVorbisComment::getComment(vorbis_comment* pComment,
                                            const char* pLabel)
 {
-    QString ret = "";
+    QString ret;
 
     if (pComment)
     {

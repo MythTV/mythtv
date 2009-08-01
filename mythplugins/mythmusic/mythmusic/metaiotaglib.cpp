@@ -131,8 +131,7 @@ bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOTagLib::read(QString filename)
 {
-    QString artist = "", compilation_artist = "", album = "", title = "",
-            genre = "";
+    QString artist, compilation_artist, album, title, genre;
     int year = 0, tracknum = 0, length = 0, playcount = 0, rating = 0, id = 0;
     bool compilation = false;
     QList<struct AlbumArtImage> albumart;
@@ -264,7 +263,7 @@ QImage MetaIOTagLib::getAlbumArt(QString filename, ImageType type)
 {
     QImage picture;
 
-    AttachedPictureFrame::Type apicType 
+    AttachedPictureFrame::Type apicType
         = AttachedPictureFrame::FrontCover;
 
     switch (type)
@@ -355,7 +354,7 @@ AlbumArtList MetaIOTagLib::readAlbumArt(TagLib::ID3v2::Tag *tag)
 
             if (frame->description().isEmpty())
             {
-                art.description = "";
+                art.description.clear();
             }
             else {
                 art.description = TStringToQString(frame->description());

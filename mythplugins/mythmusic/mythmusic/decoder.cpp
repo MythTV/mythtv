@@ -165,7 +165,7 @@ void Decoder::commitMetadata(Metadata *mdata)
 // static methods
 
 int Decoder::ignore_id3 = 0;
-QString Decoder::musiclocation = "";
+QString Decoder::musiclocation;
 
 void Decoder::SetLocationFormatUseTags(void)
 {

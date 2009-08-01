@@ -29,7 +29,7 @@ void StreamInput::Setup(void)
     QString path = url.path();
     int port = url.port();
 
-    if (protocol != "mqp" || host.isNull())
+    if (protocol != "mqp" || host.isEmpty())
         return;
 
     port = (port < 0) ? 42666 : port;
@@ -46,7 +46,7 @@ void StreamInput::Setup(void)
 
     sock->connectToHost(host, port, QIODevice::ReadWrite);
 
-    while (stage != -1 && stage < 4) 
+    while (stage != -1 && stage < 4)
     {
         VERBOSE(VB_GENERAL, LOC +
                 QString("Processing one event: stage %1 %2 %3")
@@ -63,7 +63,7 @@ void StreamInput::Setup(void)
     disconnect(sock, SIGNAL(connected()), this, SLOT(Connected()));
     disconnect(sock, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
 
-    if (stage == -1) 
+    if (stage == -1)
     {
         // some sort of error
         delete sock;
@@ -97,36 +97,36 @@ void StreamInput::Connected(void)
 
 void StreamInput::ReadyRead(void)
 {
-    if (stage == 2) 
+    if (stage == 2)
     {
         VERBOSE(VB_GENERAL, LOC + "ReadyRead... checking response");
-        
-        if (! sock->canReadLine()) 
+
+        if (! sock->canReadLine())
         {
             stage = -1;
             VERBOSE(VB_IMPORTANT, LOC_ERR + "ReadyRead... can't read line");
             return;
         }
-        
+
         QString line = sock->readLine();
-        if (line.isEmpty()) 
+        if (line.isEmpty())
         {
             stage = -1;
             VERBOSE(VB_IMPORTANT, LOC_ERR + "ReadyRead... line is empty");
             return;
         }
 
-        if (line.left(5) != "*GOOD") 
+        if (line.left(5) != "*GOOD")
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Server error response: %1").arg(line));
             stage = -1;
             return;
         }
-        
+
         stage = 3;
-    } 
-    else if (sock->bytesAvailable() > 65536 || sock->atEnd()) 
+    }
+    else if (sock->bytesAvailable() > 65536 || sock->atEnd())
     {
         stage = 4;
     }

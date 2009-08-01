@@ -571,7 +571,7 @@ void MusicPlayer::customEvent(QEvent *event)
 
 QString MusicPlayer::getFilenameFromID(int id)
 {
-    QString filename = "";
+    QString filename;
 
     if (id > 0)
     {
@@ -612,7 +612,7 @@ QString MusicPlayer::getFilenameFromID(int id)
 
 GenericTree *MusicPlayer::constructPlaylist(void)
 {
-    QString position = "";
+    QString position;
 
     if (m_playlistTree)
     {
@@ -630,7 +630,7 @@ GenericTree *MusicPlayer::constructPlaylist(void)
     GenericTree *active_playlist_node =
             gMusicData->all_playlists->writeTree(m_playlistTree);
 
-    if (position != "" ) //|| m_currentNode == NULL)
+    if (!position.isEmpty()) //|| m_currentNode == NULL)
         restorePosition(position);
 
     return active_playlist_node;
@@ -667,7 +667,7 @@ void MusicPlayer::restorePosition(const QString &position)
 {
     QList<int> branches_to_current_node;
 
-    if (position != "")
+    if (!position.isEmpty())
     {
         QStringList list = position.split(",", QString::SkipEmptyParts);
 
@@ -693,7 +693,7 @@ void MusicPlayer::restorePosition(const QString &position)
         if (m_currentNode)
         {
             m_currentFile = getFilenameFromID(m_currentNode->getInt());
-            if (m_currentFile != "")
+            if (!m_currentFile.isEmpty())
                 play();
         }
     }

@@ -22,7 +22,7 @@ MetaIO::MetaIO(QString fileExtension)
  * \brief Destructor
  */
 MetaIO::~MetaIO()
-{ 
+{
 }
 
 
@@ -34,11 +34,14 @@ MetaIO::~MetaIO()
  * \returns Metadata Pointer, or NULL on error.
  */
 void MetaIO::readFromFilename(QString filename,
-                              QString &artist, QString &album, QString &title, 
+                              QString &artist, QString &album, QString &title,
                               QString &genre, int &tracknum)
 {
     // Clear
-    artist = album = title = genre = "";
+    artist.clear();
+    album.clear();
+    title.clear();
+    genre.clear();
     tracknum = 0;
 
     static QString regext = mFileExtension + "$";
@@ -61,11 +64,11 @@ void MetaIO::readFromFilename(QString filename,
             genre = part_str;
         else if ( *fmt_it == "ARTIST" )
             artist = part_str;
-        else if ( *fmt_it == "ALBUM" ) 
+        else if ( *fmt_it == "ALBUM" )
             album = part_str;
         else if ( *fmt_it == "TITLE" )
             title = part_str;
-        else if ( *fmt_it == "TRACK_TITLE" ) 
+        else if ( *fmt_it == "TRACK_TITLE" )
         {
             QStringList tracktitle_list = part_str.split("-");
             if (tracktitle_list.size() > 1)
@@ -76,7 +79,7 @@ void MetaIO::readFromFilename(QString filename,
             else
                 title = part_str;
         }
-        else if ( *fmt_it == "ARTIST_TITLE" ) 
+        else if ( *fmt_it == "ARTIST_TITLE" )
         {
             QStringList artisttitle_list = part_str.split("-");
             if (artisttitle_list.size() > 1)
@@ -107,7 +110,7 @@ void MetaIO::readFromFilename(QString filename,
  */
 Metadata* MetaIO::readFromFilename(QString filename, bool blnLength)
 {
-    QString artist = "", album = "", title = "", genre = "";
+    QString artist, album, title, genre;
     int tracknum = 0, length = 0;
 
     readFromFilename(filename, artist, album, title, genre, tracknum);

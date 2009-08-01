@@ -76,10 +76,6 @@ ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
     m_popupMenu = NULL;
 
     m_defaultCompilation = false;
-    m_defaultCompArtist = "";
-    m_defaultArtist = "";
-    m_defaultAlbum = "";
-    m_defaultGenre = "";
     m_defaultYear = 0;
     m_defaultRating = 0;
     m_haveDefaults = false;

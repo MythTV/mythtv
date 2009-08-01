@@ -20,8 +20,8 @@ using namespace std;
 #include <mythtv/mythversion.h>
 #include <mythtv/httpcomms.h>
 
-CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
-                     AudioOutput *o) 
+CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
+                     AudioOutput *o)
          : Decoder(d, i, o)
 {
     filename = file;
@@ -56,7 +56,7 @@ QString fileForTrack(QString path, uint track)
     disc.setNameFilter(QString("%1*.aiff").arg(track));
     filename = disc.entryList()[0];  // Fortunately, this seems to sort nicely
 
-    if (filename.isNull())
+    if (filename.isEmpty())
         filename = QString("%1.aiff").arg(track);
 
     return filename;
@@ -189,7 +189,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     QString queryID = "cddb+query+";
     uint    trk;
 
-    if (helloID.isNull())
+    if (helloID.isEmpty())
         helloID = "anon";
     helloID += QString("+%1+MythTV+%2+")
                .arg(gContext->GetHostName()).arg(MYTH_BINARY_VERSION);
@@ -250,7 +250,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
         {
             // Lines should be of the form "FIELD=value\r\n"
 
-            QString art   = "";
+            QString art;
             QString line  = cddb.section(QRegExp("(\r|\n)+"), 0, 0);
             QString value = line.section('=', 1, 1);
 
@@ -328,13 +328,13 @@ double CdDecoder::lengthInSeconds()
 }
 
 void CdDecoder::seek(double pos)
-{   
+{
     (void)pos;
 }
 
 void CdDecoder::stop()
-{   
-}   
+{
+}
 
 void CdDecoder::run()
 {
@@ -400,7 +400,7 @@ Metadata *CdDecoder::getLastMetadata()
 Metadata *CdDecoder::getMetadata()
 {
     return NULL;
-}    
+}
 
 void CdDecoder::commitMetadata(Metadata *mdata)
 {
@@ -425,7 +425,7 @@ const QString &CdDecoderFactory::description() const
     return desc;
 }
 
-Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input, 
+Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input,
                                   AudioOutput *output, bool deletable)
 {
     if (deletable)

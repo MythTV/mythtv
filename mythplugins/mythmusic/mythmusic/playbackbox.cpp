@@ -67,8 +67,6 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     visualizer_status = 0;
     curMeta = NULL;
-    curSmartPlaylistCategory = "";
-    curSmartPlaylistName = "";
 
     menufilters = gContext->GetNumSetting("MusicMenuFilters", 0);
 
@@ -811,7 +809,7 @@ void PlaybackBoxMusic::doUpdatePlaylist(QString whereClause)
 
     visual_mode_timer->stop();
 
-    if (whereClause != "")
+    if (!whereClause.isEmpty())
     {
         // update playlist from quick playlist
         if (menufilters)
@@ -1731,7 +1729,7 @@ void PlaybackBoxMusic::savePosition(uint position)
         position = 0;
     }
 
-    QString s = "";
+    QString s;
     QList<int>::const_iterator it = branches_to_current_node.begin();
     for (; it != branches_to_current_node.end(); ++it)
         s += "," + QString::number(*it);
@@ -1746,7 +1744,7 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
 {
     Q3ValueList <int> branches_to_current_node;
 
-    if (position != "")
+    if (!position.isEmpty())
     {
         QStringList list = position.split(",", QString::SkipEmptyParts);
 

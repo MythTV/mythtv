@@ -69,7 +69,7 @@ void EditMetadataDialog::fillWidgets()
         s = s.setNum(m_metadata->Year());
         year_edit->setText(s);
     }
-    
+
     if (track_edit)
     {
         QString s;
@@ -180,7 +180,7 @@ QPixmap *EditMetadataDialog::createScaledPixmap(QString filename,
 {
     QPixmap *pixmap = NULL;
 
-    if (filename != "")
+    if (!filename.isEmpty())
     {
         QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
@@ -190,7 +190,7 @@ QPixmap *EditMetadataDialog::createScaledPixmap(QString filename,
         }
         else
         {
-            pixmap = new QPixmap(img->scaled(width, height, 
+            pixmap = new QPixmap(img->scaled(width, height,
                                     mode, Qt::SmoothTransformation));
             delete img;
         }
@@ -462,7 +462,7 @@ void EditMetadataDialog::switchToDBStats()
 void EditMetadataDialog::editLostFocus()
 {
     UIRemoteEditType *whichEditor = (UIRemoteEditType *) getCurrentFocusWidget();
-    
+
     if (whichEditor == album_edit)
     {
         m_metadata->setAlbum(album_edit->getText());
@@ -500,7 +500,7 @@ void EditMetadataDialog::checkClicked(bool state)
     if (!state)
     {
         m_metadata->setCompilationArtist("");
-        
+
         if (compilation_artist_edit)
         {
             compilation_artist_edit->setText("");
@@ -510,20 +510,20 @@ void EditMetadataDialog::checkClicked(bool state)
     {
         if (m_metadata->CompilationArtist().isEmpty())
         {
-            m_metadata->setCompilationArtist(tr("Various Artists")); 
-            
+            m_metadata->setCompilationArtist(tr("Various Artists"));
+
             if (compilation_artist_edit)
             {
                 compilation_artist_edit->setText(tr("Various Artists"));
             }
-        } 
+        }
     }
 }
 
 bool EditMetadataDialog::showList(QString caption, QString &value)
 {
     bool res = false;
-    
+
     MythSearchDialog *searchDialog = new MythSearchDialog(gContext->GetMainWindow(), "");
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
@@ -602,7 +602,7 @@ void EditMetadataDialog::searchGenre()
         m_metadata->setGenre(s);
         fillWidgets();
     }
-   
+
 }
 
 void EditMetadataDialog::closeDialog()
@@ -677,16 +677,16 @@ void EditMetadataDialog::saveToDatabase()
 void EditMetadataDialog::saveToFile()
 {
     cancelPopup();
-   
-    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
+
+    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
                                          "Save To File",
                                          tr("Are you sure you want to save the "
-                                         "modified metadata to the file?"), 
+                                         "modified metadata to the file?"),
                                          false))
     {
         return;
-    }    
-   
+    }
+
     Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
     if (decoder)
     {

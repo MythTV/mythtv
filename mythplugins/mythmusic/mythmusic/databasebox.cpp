@@ -423,7 +423,7 @@ void DatabaseBox::BlankCDRW()
     }
 
     QString scsidev = MediaMonitor::defaultCDWriter();
-    if (scsidev.isEmpty() || scsidev.isNull())
+    if (scsidev.isEmpty())
     {
         VERBOSE(VB_GENERAL, "No CD Writer device defined.");
         return;
@@ -715,7 +715,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
 
     int linelen = 0;
     int dispat = 0;
-    QString data = "";
+    QString data;
 
     for (QStringList::Iterator it = pathto.begin();
          it != pathto.end(); ++it)
@@ -723,7 +723,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
         if (it == pathto.begin())
             continue;
 
-        if (data != "")
+        if (!data.isEmpty())
             data += "  /  ";
 
         data += *it;
@@ -735,7 +735,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
                 m_lines.at(dispat)->SetText(data);
             }
 
-            data = "";
+            data.clear();
             linelen = 0;
             dispat++;
         }
@@ -868,7 +868,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
     if (gContext->GetNumSetting("CDWriterEnabled"))
     {
         QString scsidev = MediaMonitor::defaultCDWriter();
-        if (!scsidev.isEmpty() && !scsidev.isNull())
+        if (!scsidev.isEmpty())
             cdwriter = true;
     }
 

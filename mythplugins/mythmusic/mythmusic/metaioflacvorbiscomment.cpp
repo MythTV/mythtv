@@ -136,7 +136,7 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOFLACVorbisComment::read(QString filename)
 {
-    QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
+    QString artist, compilation_artist, album, title, genre;
     int year = 0, tracknum = 0, length = 0;
     bool compilation = false;
 
@@ -287,14 +287,14 @@ QString MetaIOFLACVorbisComment::getComment(FLAC__StreamMetadata* pBlock,
     entry = pBlock->data.vorbis_comment.comments;
 
     QString qlabel = pLabel;
-    QString retstr = "";
+    QString retstr;
     for (unsigned int i = 0; i < pBlock->data.vorbis_comment.num_comments; i++)
     {
         char *fieldname = new char[(entry + i)->length + 1];
         fieldname[(entry + i)->length] = 0;
         strncpy(fieldname, (char *)((entry + i)->entry), (entry + i)->length);
         QString entrytext = fieldname;
-	    delete [] fieldname;
+        delete [] fieldname;
         int loc;
 
         // we need to make sure the '=' comes immediately after

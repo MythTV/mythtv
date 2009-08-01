@@ -357,7 +357,7 @@ Metadata *CdDecoder::getLastMetadata()
 Metadata *CdDecoder::getMetadata()
 {
 
-    QString artist = "", album = "", compilation_artist = "", title = "", genre = "";
+    QString artist, album, compilation_artist, title, genre;
     int year = 0, tracknum = 0, length = 0;
 
     QByteArray devname = devicename.toAscii();
@@ -441,7 +441,7 @@ Metadata *CdDecoder::getMetadata()
     if (artist.length() < 1)
     {
       artist = compilation_artist;
-      compilation_artist = "";
+      compilation_artist.clear();
     }
 
     if (title.length() < 1)

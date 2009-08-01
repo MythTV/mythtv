@@ -39,7 +39,7 @@ static bool performActualUpdate(const QString updates[], QString version,
     int counter = 0;
     QString thequery = updates[counter];
 
-    while (thequery != "")
+    while (!thequery.isEmpty())
     {
         if (!query.exec(thequery))
         {
@@ -71,7 +71,7 @@ bool UpgradeMusicDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
-    if (dbver == "")
+    if (dbver.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Inserting MythMusic initial database information.");
 

@@ -147,8 +147,8 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
 {
     QString result;
 
-    if (fieldName == "")
-        return "";
+    if (fieldName.isEmpty())
+        return result;
 
     SmartPLField *Field;
     Field = lookupField(fieldName);
@@ -163,7 +163,7 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     Operator = lookupOperator(operatorName);
     if (!Operator)
     {
-        return "";
+        return QString();
     }
 
     // convert boolean and date values
@@ -218,7 +218,7 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
     }
     else
     {
-        result = "";
+        result.clear();
         VERBOSE(VB_IMPORTANT, QString("getCriteriaSQL(): invalid operator '%1'")
                 .arg(Operator->name));
     }
@@ -228,11 +228,11 @@ QString getCriteriaSQL(QString fieldName, QString operatorName,
 
 QString getOrderBySQL(QString orderByFields)
 {
-    if (orderByFields == "")
-        return "";
+    if (orderByFields.isEmpty())
+        return QString();
 
     QStringList list = QStringList::split(",", orderByFields);
-    QString fieldName, result = "", order;
+    QString fieldName, result, order;
     bool bFirst = true;
 
     for (int x = 0; x < list.count(); x++)
@@ -391,7 +391,7 @@ void SmartPLCriteriaRow::fieldChanged(void)
 {
     bUpdating = true; // flag to prevent lots of criteria changed events
 
-    if (fieldCombo->currentText() == "")
+    if (fieldCombo->currentText().isEmpty())
     {
         operatorCombo->setEnabled(false);
         value1Edit->setEnabled(false);
@@ -726,10 +726,10 @@ void SmartPLCriteriaRow::searchTitle(MythRemoteLineEdit *editor)
 
 QString SmartPLCriteriaRow::getSQL(void)
 {
-    if (fieldCombo->currentText() == "")
+    if (fieldCombo->currentText().isEmpty())
         return QString::null;
 
-    QString result = "";
+    QString result;
 
 
     SmartPLField *Field;
@@ -767,7 +767,7 @@ bool SmartPLCriteriaRow::saveToDatabase(int smartPlaylistID)
 {
     // save playlistitem to database
 
-    if (fieldCombo->currentText() == "")
+    if (fieldCombo->currentText().isEmpty())
         return true;
 
     QString Field = fieldCombo->currentText();
@@ -1221,7 +1221,7 @@ void SmartPlaylistEditor::newSmartPlaylist(QString category)
     categoryCombo->setCurrentText(category);
     titleEdit->setText("");
     originalCategory = category;
-    originalName = "";
+    originalName.clear();
 
     bNewPlaylist = true;
 }
@@ -1361,9 +1361,9 @@ void SmartPlaylistEditor::categoryEditChanged(void)
     }
     else
     {
-        newCategoryButton->setEnabled( (categoryEdit->text() != "") );
+        newCategoryButton->setEnabled(!categoryEdit->text().isEmpty());
         deleteCategoryButton->setEnabled(false);
-        renameCategoryButton->setEnabled( (categoryEdit->text() != "") );
+        renameCategoryButton->setEnabled(!categoryEdit->text().isEmpty());
     }
 }
 
@@ -1404,7 +1404,7 @@ void SmartPlaylistEditor::deleteCategory(void)
 
     closeCategoryPopup();
 
-    if (category.isNull() || category == "")
+    if (category.isEmpty())
         return;
 
     if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),

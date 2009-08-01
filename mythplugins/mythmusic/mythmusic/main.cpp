@@ -60,7 +60,7 @@ void CheckFreeDBServerFile(void)
 {
     QString homeDir = QDir::home().path();
 
-    if (homeDir == "")
+    if (homeDir.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "main.o: You don't have a HOME environment variable. CD lookup will almost certainly not work.");
         return;
@@ -462,7 +462,7 @@ static void preMusic()
     // Only search music files if a directory was specified & there
     // is no data in the database yet (first run).  Otherwise, user
     // can choose "Setup" option from the menu to force it.
-    if (startdir != "" && !musicdata_exists)
+    if (!startdir.isEmpty() && !musicdata_exists)
     {
         FileScanner *fscan = new FileScanner();
         fscan->SearchDir(startdir);

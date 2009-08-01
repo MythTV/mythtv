@@ -306,7 +306,6 @@ Playlist::Playlist(AllMusic *all_music_ptr)
     //  fallback values
     playlistid = 0;
     name = QObject::tr("oops");
-    raw_songlist = "";
     all_available_music = all_music_ptr;
     changed = false;
 }
@@ -367,7 +366,7 @@ void Playlist::describeYourself(void) const
     cout << "     songlist(raw) is \"" << raw_songlist << "\"" << endl;
     cout << "     songlist list is ";
 */
-    QString msg = "";
+    QString msg;
     SongList::const_iterator it = songs.begin();
     for (; it != songs.end(); ++it)
         msg += (*it)->getValue() + ",";
@@ -424,7 +423,7 @@ void Playlist::loadPlaylist(QString a_name, QString a_host)
         // Asked me to load a playlist I can't find so let's create a new one :)
         playlistid = 0; // Be safe just in case we call load over the top
                         // of an existing playlist
-        raw_songlist = "";
+        raw_songlist.clear();
         savePlaylist(a_name, a_host);
         changed = true;
     }
@@ -510,7 +509,7 @@ void Playlist::fillSongsFromSonglist(bool filter)
 
 void Playlist::fillSonglistFromSongs(void)
 {
-    QString a_list = "";
+    QString a_list;
     SongList::const_iterator it = songs.begin();
     for (; it != songs.end(); ++it)
     {
@@ -518,7 +517,7 @@ void Playlist::fillSonglistFromSongs(void)
             a_list += QString(",%1").arg((*it)->getValue());
     }
 
-    raw_songlist = "";
+    raw_songlist.clear();
     if (!a_list.isEmpty())
         raw_songlist = a_list.remove(0, 1);
 }
@@ -554,11 +553,11 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
     if (!query.exec(theQuery))
     {
         MythDB::DBError("Load songlist from query", query);
-        raw_songlist = "";
+        raw_songlist.clear();
         return;
     }
 
-    QString new_songlist = "";
+    QString new_songlist;
     while (query.next())
     {
         new_songlist += "," + query.value(0).toString();
@@ -588,7 +587,7 @@ void Playlist::fillSonglistFromQuery(QString whereClause,
         {
             QStringList list = raw_songlist.split(",", QString::SkipEmptyParts);
             QStringList::iterator it = list.begin();
-            raw_songlist = "";
+            raw_songlist.clear();
             bool bFound = false;
 
             for (; it != list.end(); it++)
@@ -837,7 +836,7 @@ QString Playlist::removeDuplicateTracks(const QString &new_songlist)
     QStringList curList = raw_songlist.split(",", QString::SkipEmptyParts);
     QStringList newList = new_songlist.split(",", QString::SkipEmptyParts);
     QStringList::iterator it = newList.begin();
-    QString songlist = "";
+    QString songlist;
 
     for (; it != newList.end(); it++)
     {
@@ -1180,7 +1179,7 @@ int Playlist::CreateCDMP3(void)
     }
 
     QString scsidev = MediaMonitor::defaultCDWriter();
-    if (scsidev.isEmpty() || scsidev.isNull())
+    if (scsidev.isEmpty())
     {
         VERBOSE(VB_GENERAL, "No CD Writer device defined.");
         return 1;

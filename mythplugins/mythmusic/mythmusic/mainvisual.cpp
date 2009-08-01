@@ -143,7 +143,7 @@ void MainVisual::setVisual(const QString &name)
     else
     {
         visName = name;
-        pluginName = "";
+        pluginName.clear();
     }
 
     if (vis)

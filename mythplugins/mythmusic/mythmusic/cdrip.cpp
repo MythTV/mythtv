@@ -576,10 +576,10 @@ void Ripper::startScanCD(void)
         QString label;
         Metadata *metadata;
 
-        m_artistName = "";
-        m_albumName = "";
-        m_genreName = "";
-        m_year = "";
+        m_artistName.clear();
+        m_albumName.clear();
+        m_genreName.clear();
+        m_year.clear();
         bool yesToAll = false;
         bool noToAll = false;
 

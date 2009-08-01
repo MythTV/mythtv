@@ -10,7 +10,7 @@
 // MythMusic includes
 #include "search.h"
 
-SearchDialog::SearchDialog(MythMainWindow *parent, const char *name) 
+SearchDialog::SearchDialog(MythMainWindow *parent, const char *name)
     : MythPopupBox(parent, name)
 {
     // Create the widgets
@@ -36,7 +36,7 @@ SearchDialog::SearchDialog(MythMainWindow *parent, const char *name)
     searchText->setPopupPosition(VKQT_POSBOTTOMDIALOG);
     connect(searchText, SIGNAL(textChanged(const QString &)),
             this, SLOT(searchTextChanged(const QString &)));
-    addWidget(searchText); 
+    addWidget(searchText);
 
     // Listbox for search results
     listbox = new Q3MythListBox(this);
@@ -114,7 +114,7 @@ void SearchDialog::runQuery(QString searchText)
                         " ON music_songs.album_id=music_albums.album_id ");
 
     QStringList list = QStringList::split(QRegExp("[>,]"), searchText);
-    whereClause = "";
+    whereClause.clear();
     if (!searchText.isEmpty())
     {
         if (substringSearch) // alpha
@@ -269,18 +269,18 @@ void SearchListBoxItem::paint(QPainter *p)
         else
         {
             sNormal = sText.mid(index, 0xffffffff);
-            sHighlight = "";
+            sHighlight.clear();
             index = sText.length();
         }
 
-        if (sNormal != "")
+        if (!sNormal.isEmpty())
         {
             p->setPen(normalColor);
             p->drawText(xPos, yPos, sNormal);
             xPos += fm.width(sNormal);
         }
 
-        if (sHighlight != "")
+        if (!sHighlight.isEmpty())
         {
             p->setPen(highlightColor);
             p->drawText(xPos, yPos, sHighlight);
