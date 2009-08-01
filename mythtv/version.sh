@@ -10,8 +10,8 @@ if test $# -ne 2; then
     exit 1
 fi
 
-TESTFN=`mktemp $1/.test-write-XXXXXX`
-if test -r $TESTFN ; then
+TESTFN=`mktemp $1/.test-write-XXXXXX` 2> /dev/null
+if test x$TESTFN != x"" ; then
     rm -f $TESTFN
 else
     echo "$0: Can not write to destination, skipping.."
