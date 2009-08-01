@@ -129,7 +129,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     newFont->Freeze();
 
     QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
+    if (name.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Font needs a name");
         return NULL;
@@ -170,11 +170,12 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     size = sizeSmall = sizeBig = -1;
 
     QString face = element.attribute("face", "");
-    if (face.isNull() || face.isEmpty())
+    if (face.isEmpty())
     {
         if (!fromBase)
         {
             VERBOSE(VB_IMPORTANT, "Font needs a face");
+            delete newFont;
             return NULL;
         }
     }
@@ -190,7 +191,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     }
 
     QString hint = element.attribute("stylehint", "");
-    if (!hint.isNull() && !hint.isEmpty())
+    if (!hint.isEmpty())
     {
         newFont->m_face.setStyleHint((QFont::StyleHint)hint.toInt());
     }
