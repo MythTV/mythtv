@@ -7,7 +7,7 @@
        qemacs team for their av support which I used to understand the libraries
        getid3.sourceforget.net project for the ASF information used here
 
-    This library decodes Windows Media (WMA/ASF) files into PCM data
+    This library decodes various media files into PCM data
     returned to the MythMusic output buffer.
 
     Revision History
@@ -40,6 +40,7 @@ using namespace std;
 #include "metaioflacvorbiscomment.h"
 #include "metaiooggvorbiscomment.h"
 #include "metaiomp4.h"
+#include "metaiowavpack.h"
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                        AudioOutput *o) :
@@ -446,6 +447,8 @@ MetaIO* avfDecoder::doCreateTagger(void)
         return new MetaIOFLACVorbisComment();
     else if (extension == "m4a")
         return new MetaIOMP4();
+    else if (extension == "wv")
+        return new MetaIOWavPack();
     else
         return new MetaIOAVFComment();
 }
@@ -465,7 +468,7 @@ bool avfDecoderFactory::supports(const QString &source) const
 const QString &avfDecoderFactory::extension() const
 {
     static QString ext(".mp3|.mp2|.ogg|.oga|.flac|.wma|.wav|.ac3|.oma|.omg|"
-                       ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa");
+                       ".atp|.ra|.dts|.aac|.m4a|.aa3|.tta|.mka|.aiff|.swa|.wv");
     return ext;
 }
 
