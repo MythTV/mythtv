@@ -10,15 +10,12 @@ if test $# -ne 2; then
     exit 1
 fi
 
-TESTFN=$1/.can-version.sh-write
-rm -f $TESTFN 2> /dev/null
-touch $TESTFN 2> /dev/null
+TESTFN=`mktemp $1/.test-write-XXXXXX`
 if test -r $TESTFN ; then
-    echo "$0: Successfully wrote to destination. $TESTFN"
     rm -f $TESTFN
 else
     echo "$0: Can not write to destination, skipping.."
-    exit 1
+    exit 0
 fi
 
 SVNTREEDIR=$1
