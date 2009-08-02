@@ -598,29 +598,33 @@ void ScreenSetup::customEvent(QEvent *event)
 
         if (resultid == "options")
         {
-            MythUIButtonListItem *item = qVariantValue<MythUIButtonListItem *>(dce->GetData());
-            ScreenListInfo *si = qVariantValue<ScreenListInfo *>(item->GetData());
+            if (buttonnum > -1)
+            {
+                MythUIButtonListItem *item = qVariantValue<MythUIButtonListItem *>(dce->GetData());
+                        
+                ScreenListInfo *si = qVariantValue<ScreenListInfo *>(item->GetData());
 
-            if (buttonnum == 0)
-            {
-                m_activeList->MoveItemUpDown(item, true);
-            }
-            else if (buttonnum == 1)
-            {
-                m_activeList->MoveItemUpDown(item, false);
-            }
-            else if (buttonnum == 2)
-            {
-                deleteScreen();
-            }
-            else if (buttonnum == 3)
-            {
-                doLocationDialog(si);
-            }
-            else if (si->hasUnits && buttonnum == 4)
-            {
-                showUnitsPopup(item->GetText(), si);
-                updateHelpText();
+                if (buttonnum == 0)
+                {
+                    m_activeList->MoveItemUpDown(item, true);
+                }
+                else if (buttonnum == 1)
+                {
+                    m_activeList->MoveItemUpDown(item, false);
+                }
+                else if (buttonnum == 2)
+                {
+                    deleteScreen();
+                }
+                else if (buttonnum == 3)
+                {
+                    doLocationDialog(si);
+                }
+                else if (si->hasUnits && buttonnum == 4)
+                {
+                    showUnitsPopup(item->GetText(), si);
+                    updateHelpText();
+                }
             }
         }
         else if (resultid == "units")
