@@ -460,7 +460,8 @@
         </textarea>
 
         <textarea name="alerts" from="basetextarea">
-            <area>100,230,1080,300</area>
+            <area>55,144,1170,480</area>
+            <multiline>yes</multiline>
             <value>Weather Alerts</value>
         </textarea>
     </window>
