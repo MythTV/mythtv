@@ -916,10 +916,11 @@ int Transcode::TranscodeFile(
             if (!nvp->GetRawAudioState()) 
             {
                 // The Raw state changed during decode.  This is not good
-                unlink(outputname.toLocal8Bit().constData());
-                delete newFrame;
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, NuppelVideoPlayer "
-                                      "is not in raw audio mode.");
+                        "is not in raw audio mode.");
+
+                unlink(outputname.toLocal8Bit().constData());
+                delete [] newFrame;
                 if (player_ctx)
                     delete player_ctx;
                 return REENCODE_ERROR;
@@ -1078,10 +1079,12 @@ int Transcode::TranscodeFile(
                     nvr->WriteAudio(arb->audiobuffer + arb->ab_offset[loop],
                                     audioFrame++,
                                     arb->ab_time[loop] - timecodeOffset);
-                    if (nvr->IsErrored()) {
+                    if (nvr->IsErrored())
+                    {
                         VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
                                 "irrecoverable error in NVR::WriteAudio");
-                        delete newFrame;
+
+                        delete [] newFrame;
                         if (player_ctx)
                             delete player_ctx;
                         return REENCODE_ERROR;
@@ -1114,9 +1117,10 @@ int Transcode::TranscodeFile(
             if (honorCutList && m_proginfo &&
                 m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT))
             {
-                unlink(outputname.toLocal8Bit().constData());
-                delete newFrame;
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist updated");
+
+                unlink(outputname.toLocal8Bit().constData());
+                delete [] newFrame;
                 if (player_ctx)
                     delete player_ctx;
                 return REENCODE_CUTLIST_CHANGE;
@@ -1126,9 +1130,10 @@ int Transcode::TranscodeFile(
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {
-                    unlink(outputname.toLocal8Bit().constData());
-                    delete newFrame;
                     VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
+
+                    unlink(outputname.toLocal8Bit().constData());
+                    delete [] newFrame;
                     if (player_ctx)
                         delete player_ctx;
                     return REENCODE_STOPPED;
@@ -1176,7 +1181,8 @@ int Transcode::TranscodeFile(
     } else {
         fifow->FIFODrain();
     }
-    delete newFrame;
+
+    delete [] newFrame;
     if (player_ctx)
         delete player_ctx;
     return REENCODE_OK;
