@@ -949,15 +949,17 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     (void)width, (void)height, (void)osd_width, (void)osd_height;
     (void)stream_type, (void)xvmc_chroma, (void)test_surface;
 
-    if (force_xv)
-        return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
+    MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 
-#if defined(USING_XVMC)
+    if (force_xv)
+        return ret;
+
+#ifdef USING_XVMC
     VideoDisplayProfile vdp;
     vdp.SetInput(QSize(width, height));
     QString dec = vdp.GetDecoder();
     if ((dec == "libmpeg2") || (dec == "ffmpeg"))
-        return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
+        return ret;
 
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
@@ -978,8 +980,6 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
         SetFromHW(disp, disp->GetRoot(), use_xvmc, use_xv, use_shm);
     }
 
-    MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
-#ifdef USING_XVMC
     if (use_xvmc_vld &&
         XvMCSurfaceTypes::has(disp, XvVLD, stream_type, xvmc_chroma,
                               width, height, osd_width, osd_height))
@@ -1039,13 +1039,12 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 #endif // USING_XVMCW
         VERBOSE(VB_IMPORTANT, msg);
     }
-#endif // USING_XVMC
 
     if (disp)
         delete disp;
+#endif // USING_XVMC
 
     return ret;
-#endif // defined(USING_XVMC)
 }
 
 bool VideoOutputXv::InitOSD(void)
