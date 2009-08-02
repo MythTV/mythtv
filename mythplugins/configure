@@ -431,10 +431,10 @@ if test "$music" != "no" ; then
 
     taglib="no"
     taglib_minor=`taglib-config --version | cut -d. -f2`
-    if has_library libtag && has_header taglib/fileref.h && test $taglib_minor -ge 4 ; then
+    if has_library libtag && has_header taglib/fileref.h && test $taglib_minor -ge 5 ; then
         taglib="yes"
     else
-        echo "MythMusic requires taglib 1.4 or later."
+        echo "MythMusic requires taglib 1.5 or later."
     fi
 
     if test "$targetos" != "Darwin" -a "`echo ${targetos} | cut -c1-5`" != "MINGW" ; then
