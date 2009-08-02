@@ -1613,6 +1613,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_osd["opengl"]      += "opengl2";
     safe_osd["quartz-accel"]+= "opengl3";
     safe_osd["vdpau"]       += "vdpau";
+    safe_osd["direct3d"]    += "direct3d";
 
     // These video renderers do not support deinterlacing in MythTV
     safe_deint["quartz-accel"] += "none";
