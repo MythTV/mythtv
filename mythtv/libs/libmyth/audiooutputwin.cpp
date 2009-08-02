@@ -1,5 +1,4 @@
 #include <iostream>
-//#include <stdlib.h>
 
 using namespace std;
 
@@ -9,6 +8,39 @@ using namespace std;
 #include <windows.h>
 #include <mmsystem.h>
 
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#   define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#endif
+
+#ifndef WAVE_FORMAT_DOLBY_AC3_SPDIF
+#   define WAVE_FORMAT_DOLBY_AC3_SPDIF 0x0092
+#endif
+
+#ifndef WAVE_FORMAT_EXTENSIBLE
+#define  WAVE_FORMAT_EXTENSIBLE   0xFFFE
+#endif
+
+#ifndef _WAVEFORMATEXTENSIBLE_
+typedef struct {
+    WAVEFORMATEX    Format;
+    union {
+        WORD wValidBitsPerSample;       /* bits of precision  */
+        WORD wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
+        WORD wReserved;                 /* If neither applies, set to zero. */
+    } Samples;
+    DWORD           dwChannelMask;      /* which channels are */
+                                        /* present in stream  */
+    GUID            SubFormat;
+} WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
+#endif
+
+DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000,
+            0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80,
+            0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
+            0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+
 // even number, 42 ~= 1.008 sec @ 48000 with 1152 samples per packet
 const uint AudioOutputWin::kPacketCnt = 16;
 
@@ -16,7 +48,7 @@ class AudioOutputWinPrivate
 {
   public:
     AudioOutputWinPrivate() :
-        m_WaveHdrs(NULL), m_hEvent(NULL)
+        m_hWaveOut(NULL), m_WaveHdrs(NULL), m_hEvent(NULL)
     {
         m_WaveHdrs = new WAVEHDR[AudioOutputWin::kPacketCnt];
         memset(m_WaveHdrs, 0, sizeof(WAVEHDR) * AudioOutputWin::kPacketCnt);
@@ -76,7 +108,8 @@ AudioOutputWin::AudioOutputWin(const AudioSettings &settings) :
     m_priv(new AudioOutputWinPrivate()),
     m_nPkts(0),
     m_CurrentPkt(0),
-    m_OutPkts(NULL)
+    m_OutPkts(NULL),
+    m_UseSPDIF(settings.use_passthru)
 {
     Reconfigure(settings);
 
@@ -111,20 +144,41 @@ bool AudioOutputWin::OpenDevice(void)
     // Set everything up
     SetBlocking(true);
     fragment_size = (AUDIOOUTPUT_TELEPHONY == source) ? 320 : 6144;
+    soundcard_buffer_size = kPacketCnt * fragment_size;
 
-    WAVEFORMATEX wf;
-    wf.wFormatTag = WAVE_FORMAT_PCM;
-    wf.nChannels = audio_channels;
-    wf.nSamplesPerSec = audio_samplerate;
-    wf.wBitsPerSample = audio_bits;
-    wf.nBlockAlign = wf.wBitsPerSample / 8 * wf.nChannels;
-    wf.nAvgBytesPerSec = wf.nBlockAlign * wf.nSamplesPerSec;
-    wf.cbSize = 0;
+    WAVEFORMATEXTENSIBLE wf;
+    wf.Format.wFormatTag =
+        (m_UseSPDIF) ? WAVE_FORMAT_DOLBY_AC3_SPDIF : WAVE_FORMAT_PCM;
+    wf.Format.nChannels = audio_channels;
+    wf.Format.nSamplesPerSec = audio_samplerate;
+    wf.Format.nBlockAlign = audio_bytes_per_sample;
+    wf.Format.nAvgBytesPerSec = 
+        wf.Format.nSamplesPerSec * wf.Format.nBlockAlign;
+    wf.Format.wBitsPerSample = audio_bits;
+    wf.Samples.wValidBitsPerSample = wf.Format.wBitsPerSample;
+    wf.SubFormat = 
+        (m_UseSPDIF) ? _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF : _KSDATAFORMAT_SUBTYPE_PCM;
+
+    VERBOSE(VB_AUDIO, QString("New format: %1bits, %2ch, %3Hz")
+                .arg(audio_bits).arg(audio_channels).arg(audio_samplerate));
+
+    /* Only use the new WAVE_FORMAT_EXTENSIBLE format for multichannel audio */
+    if (audio_channels <= 2)
+    {
+        wf.Format.cbSize = 0;
+    }
+    else
+    {
+        wf.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+        wf.dwChannelMask = 0x003F; // 0x003F = 5.1 channels
+        wf.Format.cbSize =
+            sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+    }
 
     MMRESULT mmr = waveOutOpen(
         &m_priv->m_hWaveOut,
         WAVE_MAPPER,
-        &wf,
+        (WAVEFORMATEX *)&wf,
         (DWORD) AudioOutputWinPrivate::waveOutProc,
         (DWORD) this,
         CALLBACK_FUNCTION);
@@ -132,7 +186,7 @@ bool AudioOutputWin::OpenDevice(void)
     if (mmr == WAVERR_BADFORMAT)
     {
         Error(QString("Unable to set audio output parameters %1")
-              .arg(wf.nSamplesPerSec));
+              .arg(wf.Format.nSamplesPerSec));
         return false;
     }
 
@@ -149,9 +203,31 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
     if (size == 0)
         return;
 
-    if (InterlockedIncrement(&m_nPkts) >= kPacketCnt)
+    if (audio_channels == 6)
     {
-        while (m_nPkts >= kPacketCnt)
+        // Linux and Windows have different 5.1 channel order conventions
+        const uint kReorder[6] = {0,1,4,5,2,3};
+        int abytes = audio_bits / 8;
+        unsigned char p_tmp[24];
+        unsigned char *obuf = buffer;
+        for(int i = 0; i < size / audio_channels / abytes; i++)
+        {
+            for(int j = 0; j < audio_channels; j++)
+            {
+                for(int k = 0; k < abytes; k++)
+                {
+                    p_tmp[abytes * kReorder[j] + k] = buffer[abytes * j + k];
+                }
+            }
+            memcpy(buffer, p_tmp, abytes * audio_channels);
+            buffer += abytes * audio_channels;
+        }
+        buffer = obuf;
+    }
+
+    if (InterlockedIncrement(&m_nPkts) > kPacketCnt)
+    {
+        while (m_nPkts > kPacketCnt)
             WaitForSingleObject(m_priv->m_hEvent, INFINITE);
     }
 
@@ -187,12 +263,12 @@ void AudioOutputWin::WriteAudio(unsigned char * buffer, int size)
 
 int AudioOutputWin::GetSpaceOnSoundcard(void) const
 {
-    return (kPacketCnt - m_nPkts) * 1536 * 4;
+    return soundcard_buffer_size - GetBufferedOnSoundcard();
 }
 
 int AudioOutputWin::GetBufferedOnSoundcard(void) const
 {
-    return m_nPkts * 1536 * 4;
+    return m_nPkts * fragment_size;
 }
 
 int AudioOutputWin::GetVolumeChannel(int channel) const
@@ -235,8 +311,7 @@ void AudioOutputWin::SetVolumeChannel(int channel, int volume)
         dwVolume |= (dwVolume << 16);
     }
 
-    VERBOSE(VB_AUDIO, "SetVolume(" << channel << ") "
-            << volume << "(" << dwVolume << ")");
-
+    VERBOSE(VB_AUDIO, QString("SetVolume(%1) %2(%3)")
+            .arg(channel).arg(volume).arg(dwVolume));
     waveOutSetVolume((HWAVEOUT)WAVE_MAPPER, dwVolume);
 }

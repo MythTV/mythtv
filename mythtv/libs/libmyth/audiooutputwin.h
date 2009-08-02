@@ -29,6 +29,7 @@ class AudioOutputWin : public AudioOutputBase
     long                   m_nPkts;
     int                    m_CurrentPkt;
     unsigned char        **m_OutPkts;
+    bool                   m_UseSPDIF;
 
     static const uint      kPacketCnt;
 };
