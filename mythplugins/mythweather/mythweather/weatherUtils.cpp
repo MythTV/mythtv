@@ -68,6 +68,7 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
             if ( (e.tagName() == "screen") && !screens.contains(e.attribute("name")) )
             {
                 ScreenListInfo *screendef = new ScreenListInfo();
+                screendef->multiLoc = false;
                 screendef->name = e.attribute("name");
                 QString hasUnits = e.attribute("hasunits");
                 if (hasUnits.toLower() == "no")
