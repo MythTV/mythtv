@@ -245,6 +245,23 @@ bool D3D9Context::Create(QSize size, HWND window)
                .arg(m_videosurface_fmt != (D3DFORMAT)MAKEFOURCC('Y','V','1','2') ?
                  "unavailable" : "enabled"));
 
+    static bool debugged = false;
+    if (!debugged)
+    {
+        debugged = true;
+        D3DADAPTER_IDENTIFIER9 ident;
+        if (D3D_OK == m_d3d->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &ident))
+        {
+            VERBOSE(VB_PLAYBACK, D3DLOC + QString("Device: %1")
+                    .arg(ident.Description));
+            VERBOSE(VB_PLAYBACK, D3DLOC + QString("Driver: %1.%2.%3.%4")
+                    .arg(HIWORD(ident.DriverVersion.HighPart))
+                    .arg(LOWORD(ident.DriverVersion.HighPart))
+                    .arg(HIWORD(ident.DriverVersion.LowPart))
+                    .arg(LOWORD(ident.DriverVersion.LowPart)));
+        }
+    }
+
     Init2DState();
     return true;
 }
