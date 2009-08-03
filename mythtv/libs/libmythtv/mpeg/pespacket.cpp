@@ -97,10 +97,10 @@ bool PESPacket::AddTSPacket(const TSPacket* packet, bool &broken)
     return false;
 }
 
-/** \fn PESPacket::WriteAsTSPackets(unsigned char*, uint&) const
- *  \brief Writes payload only PESPacket as series of TSPacket data
+/** \fn PESPacket::GetAsTSPackets(vector<TSPacket>&,uint) const
+ *  \brief Returns payload only PESPacket as series of TSPackets
  */
-uint PESPacket::WriteAsTSPackets(unsigned char *buf, uint &cc) const
+void PESPacket::GetAsTSPackets(vector<TSPacket> &output, uint cc) const
 {
 #define INCR_CC(_CC_) do { _CC_ = (_CC_ + 1) & 0xf; } while (0)
     uint last_byte_of_pesdata = Length() + 4 - 1;
@@ -109,13 +109,15 @@ uint PESPacket::WriteAsTSPackets(unsigned char *buf, uint &cc) const
     if (_pesdata == _fullbuffer)
     {
         VERBOSE(VB_IMPORTANT, "WriteAsTSPackets _pesdata == _fullbuffer");
-        return 0;
+        output.resize(0);
+        return;
     }
 
-    memcpy(buf, _fullbuffer, TSPacket::SIZE);
-    INCR_CC(cc);  buf[3] = (buf[3] & 0xf0) | cc;
+    output.resize(1);
+    memcpy(output.data(), _fullbuffer, TSPacket::SIZE);
+    output[1].data()[3] = (output[1].data()[3] & 0xf0) | cc;
     if (size <= TSPacket::SIZE)
-        return TSPacket::SIZE;
+        return;
 
     TSHeader header;
     header.data()[1] = 0x00;
@@ -123,33 +125,21 @@ uint PESPacket::WriteAsTSPackets(unsigned char *buf, uint &cc) const
     header.data()[3] = 0x10; // adaptation field control == payload only
     header.SetPID(tsheader()->PID());
 
-    uint ret                  = TSPacket::SIZE;
-    unsigned char       *out  = buf + TSPacket::SIZE;
+    output.reserve(44);
+
     const unsigned char *data = _fullbuffer + TSPacket::SIZE;
     size -= TSPacket::SIZE;
-    while (size > TSPacket::PAYLOAD_SIZE)
+    while (size > 0)
     {
         INCR_CC(cc);
         header.SetContinuityCounter(cc);
-        memcpy(out, header.data(), TSPacket::HEADER_SIZE);
-        memcpy(out + 4, data, TSPacket::PAYLOAD_SIZE);
-        data += TSPacket::PAYLOAD_SIZE;
-        size -= TSPacket::PAYLOAD_SIZE;
-        out  += TSPacket::SIZE;
-        ret  += TSPacket::SIZE;
+        output.resize(output.size()+1);
+        output[output.size()-1].InitHeader(header.data());
+        uint write_size = min(size, TSPacket::PAYLOAD_SIZE);
+        output[output.size()-1].InitPayload(data, write_size);
+        data += write_size;
+        size -= write_size;
     }
-
-    if (size)
-    {
-        INCR_CC(cc);
-        header.SetContinuityCounter(cc);
-        memcpy(out, header.data(), TSPacket::HEADER_SIZE);
-        memcpy(out + 4, data, size);
-        memset(out + 4 + size, 0xff, TSPacket::PAYLOAD_SIZE - size);
-        ret += TSPacket::SIZE;
-    }
-
-    return ret;
 #undef INCR_CC
 }
 

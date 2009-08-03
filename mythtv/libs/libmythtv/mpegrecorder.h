@@ -147,6 +147,7 @@ class MpegRecorder : public DTVRecorder,
     unsigned char   _pid_status[0x1fff + 1];
     unsigned char   _continuity_counter[0x1fff + 1];
     static const unsigned char kPayloadStartSeen = 0x2;
+    vector<TSPacket> _scratch;
 
     // Statistics
     mutable uint        _continuity_error_count;
