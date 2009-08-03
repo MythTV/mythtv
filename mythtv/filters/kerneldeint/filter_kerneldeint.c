@@ -447,6 +447,7 @@ void *KernelThread(void *args)
         }
     }
     pthread_exit(NULL);
+    return NULL;
 }
 
 static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)

@@ -588,6 +588,7 @@ void *YadifThread(void *args)
         }
     }
     pthread_exit(NULL);
+    return NULL;
 }
 
 VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt,
