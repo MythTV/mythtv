@@ -4529,9 +4529,6 @@ void NuppelVideoPlayer::DoPlay(void)
         if (audioOutput)
         {
             audioOutput->SetStretchFactor(play_speed);
-#ifdef USING_DIRECTX
-            audioOutput->Reset();
-#endif
         }
         audio_lock.unlock();
     }
