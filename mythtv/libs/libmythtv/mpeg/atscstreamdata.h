@@ -25,7 +25,7 @@ class ATSCStreamData : virtual public MPEGStreamData
     ATSCStreamData(int desiredMajorChannel,
                    int desiredMinorChannel,
                    bool cacheTables = false);
-   ~ATSCStreamData();
+    virtual ~ATSCStreamData();
 
     void Reset(void) { Reset(-1, -1); }
     void Reset(int desiredProgram);

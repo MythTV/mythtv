@@ -25,7 +25,7 @@ class DTVRecorder: public RecorderBase
 {
   public:
     DTVRecorder(TVRec *rec);
-    ~DTVRecorder();
+    virtual ~DTVRecorder();
 
     virtual void SetOption(const QString &opt, const QString &value);
     virtual void SetOption(const QString &name, int value);

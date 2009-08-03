@@ -25,7 +25,7 @@ class DVBStreamData : virtual public MPEGStreamData
   public:
     DVBStreamData(uint desired_netid, uint desired_tsid,
                   int desired_program, bool cacheTables = false);
-    ~DVBStreamData();
+    virtual ~DVBStreamData();
 
     void Reset(void) { Reset(0, 0, -1); }
     void Reset(uint desired_netid, uint desired_tsid, int desired_sid);
