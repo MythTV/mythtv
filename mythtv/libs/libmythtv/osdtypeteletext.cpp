@@ -932,8 +932,8 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
     bool endbox;
     bool startbox;
 
-    char last_ch = ' ';
-    char ch;
+    unsigned char last_ch = ' ';
+    unsigned char ch;
 
     uint fgcolor = kTTColorWhite;
     uint bgcolor = kTTColorBlack;
