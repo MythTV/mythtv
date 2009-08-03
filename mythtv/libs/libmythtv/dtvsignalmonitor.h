@@ -22,7 +22,7 @@ class DTVSignalMonitor : public SignalMonitor,
     DTVSignalMonitor(int db_cardnum,
                      DTVChannel *_channel,
                      uint64_t wait_for_mask);
-    ~DTVSignalMonitor();
+    virtual ~DTVSignalMonitor();
 
   public:
     virtual QStringList GetStatusList(bool kick = true);
