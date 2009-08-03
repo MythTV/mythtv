@@ -570,7 +570,7 @@ void *YadifThread(void *args)
 
     while (!filter->kill_threads)
     {
-        usleep(100);
+        usleep(1000);
         if (filter->ready &&
             filter->frame != NULL &&
             filter->threads[num].ready)
@@ -699,7 +699,7 @@ VideoFilter * YadifDeintFilter (VideoFrameType inpixfmt,
                            "- continuing.\n");
                     break;
                 }
-                usleep(100);
+                usleep(1000);
             }
             printf("yadifdeint: Created %d threads (%d requested)\n",
                    filter->actual_threads, filter->requested_threads);

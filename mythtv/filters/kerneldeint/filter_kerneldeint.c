@@ -428,7 +428,7 @@ void *KernelThread(void *args)
 
     while (!filter->kill_threads)
     {
-        usleep(100);
+        usleep(1000);
         if (filter->ready &&
             filter->frame != NULL &&
             filter->threads[num].ready)
@@ -491,7 +491,7 @@ static int KernelDeint(VideoFilter *f, VideoFrame *frame, int field)
         i = 0;
         while (filter->ready > 0 && i < 1000)
         {
-            usleep(100);
+            usleep(1000);
             i++;
         }
     }
@@ -642,7 +642,7 @@ VideoFilter *NewKernelDeintFilter(VideoFrameType inpixfmt,
                             " threads to start.- continuing.");
                     break;
                 }
-                usleep(100);
+                usleep(1000);
             }
             VERBOSE(VB_PLAYBACK, "KernelDeint: Created threads.");
         }
