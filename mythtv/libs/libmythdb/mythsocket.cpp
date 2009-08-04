@@ -960,7 +960,10 @@ void MythSocketThread::run(void)
             if (FD_ISSET(m_readyread_pipe[0], &rfds))
             {
                 char buf[128];
-                ::read(m_readyread_pipe[0], buf, 128);
+                ssize_t rr;
+
+                do rr = ::read(m_readyread_pipe[0], buf, 128);
+                while ((rr < 0) && (EINTR == errno));
             }
         }
         else
