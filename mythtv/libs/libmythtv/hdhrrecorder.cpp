@@ -108,27 +108,11 @@ void HDHRRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
     if (!ringBuffer)
         return;
 
-    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
-
-    if (pat)
-    {
-        uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
-        pat->tsheader()->SetContinuityCounter(next_cc);
-        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
-    }
-
-    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
-
-    if (posB[0] + posB[1] * TSPacket::SIZE > 
-        posA[0] + posA[1] * TSPacket::SIZE)
-    {
-        VERBOSE(VB_RECORD, LOC + "Wrote PAT @"
-                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
-    }
-    else
-    {
-        VERBOSE(VB_RECORD, LOC + "Saw PAT but did not write to disk yet");
-    }
+    uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
+    pat->tsheader()->SetContinuityCounter(next_cc);
+    pat->GetAsTSPackets(_scratch, next_cc);
+    for (uint i = 0; i < _scratch.size(); i++)
+        DTVRecorder::BufferedWrite(_scratch[i]);
 }
 
 void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
@@ -146,28 +130,12 @@ void HDHRRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
     if (!ringBuffer)
         return;
 
-    unsigned char buf[8 * 1024];
     uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
     pmt->tsheader()->SetContinuityCounter(next_cc);
-    uint size = pmt->WriteAsTSPackets(buf, next_cc);
+    pmt->GetAsTSPackets(_scratch, next_cc);
 
-    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
-
-    for (uint i = 0; i < size ; i += TSPacket::SIZE)
-        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
-
-    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
-
-    if (posB[0] + posB[1] * TSPacket::SIZE >
-        posA[0] + posA[1] * TSPacket::SIZE)
-    {
-        VERBOSE(VB_RECORD, LOC + "Wrote PMT @"
-                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
-    }
-    else
-    {
-        VERBOSE(VB_RECORD, LOC + "Saw PMT but did not write to disk yet");
-    }
+    for (uint i = 0; i < _scratch.size(); i++)
+        DTVRecorder::BufferedWrite(_scratch[i]);
 }
 
 void HDHRRecorder::HandlePAT(const ProgramAssociationTable *_pat)
