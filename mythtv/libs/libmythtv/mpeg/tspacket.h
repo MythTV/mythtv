@@ -145,21 +145,10 @@ class TSPacket : public TSHeader
         return pkt;
     }
 
-    void InitPayload(const unsigned char *payload)
+    void InitPayload(const unsigned char* payload)
     {
         if (payload)
             memcpy(_tspayload, payload, PAYLOAD_SIZE);
-    }
-
-    void InitPayload(const unsigned char *payload, uint size)
-    {
-        if (payload)
-            memcpy(_tspayload, payload, size);
-        else
-            size = 0;
-
-        if (size < TSPacket::PAYLOAD_SIZE)
-            memset(_tspayload + size, 0xff, TSPacket::PAYLOAD_SIZE - size);
     }
 
     // This points outside the TSHeader data, but is declared here because

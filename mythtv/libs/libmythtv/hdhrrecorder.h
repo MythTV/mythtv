@@ -103,7 +103,6 @@ class HDHRRecorder : public DTVRecorder,
     unsigned char _stream_id[0x1fff + 1];
     unsigned char _pid_status[0x1fff + 1];
     unsigned char _continuity_counter[0x1fff + 1];
-    vector<TSPacket> _scratch;
 
     // Constants
     static const int TSPACKETS_BETWEEN_PSIP_SYNC;

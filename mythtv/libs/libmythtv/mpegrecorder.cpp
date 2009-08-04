@@ -1569,13 +1569,26 @@ void MpegRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
     if (!ringBuffer)
         return;
 
+//    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
 
     uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
     pat->tsheader()->SetContinuityCounter(next_cc);
-    pat->GetAsTSPackets(_scratch, next_cc);
+    DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
 
-    for (uint i = 0; i < _scratch.size(); i++)
-        DTVRecorder::BufferedWrite(_scratch[i]);
+//    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
+
+#if 0
+    if (posB[0] + posB[1] * TSPacket::SIZE > 
+        posA[0] + posA[1] * TSPacket::SIZE)
+    {
+        VERBOSE(VB_RECORD, LOC + "Wrote PAT @"
+                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
+    }
+    else
+    {
+        VERBOSE(VB_RECORD, LOC + "Saw PAT but did not write to disk yet");
+    }
+#endif
 }
 
 void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
@@ -1592,12 +1605,13 @@ void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
     if (!ringBuffer)
         return;
 
+    unsigned char buf[8 * 1024];
     uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
     pmt->tsheader()->SetContinuityCounter(next_cc);
-    pmt->GetAsTSPackets(_scratch, next_cc);
+    uint size = pmt->WriteAsTSPackets(buf, next_cc);
 
-    for (uint i = 0; i < _scratch.size(); i++)
-        DTVRecorder::BufferedWrite(_scratch[i]);
+    for (uint i = 0; i < size ; i += TSPacket::SIZE)
+        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
 }
 
 /// After a resolution change, it can take the HD-PVR a few
