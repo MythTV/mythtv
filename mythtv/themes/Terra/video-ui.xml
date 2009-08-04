@@ -565,7 +565,13 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>48,78,980,35</area>
+            <area>48,78,590,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="subtitle" from="basetextarea">
+            <area>600,78,590,35</area>
+            <align>right</align>
             <font>baselarge</font>
         </textarea>
 
@@ -581,6 +587,11 @@
 
         <textarea name="year" from="basetextarea">
             <area>48,284,290,30</area>
+        </textarea>
+
+        <textarea name="##x##" from="basetextarea">
+            <area>540,284,200,30</area>
+            <align>center</align>
         </textarea>
 
         <textarea name="director" from="basetextarea">
@@ -885,70 +896,119 @@
         <!-- Labels  -->
 
         <textarea name="title_text" from="basetextarea">
-            <area>50,135,250,40</area>
-            <value>Name:</value>
+            <area>150,80,250,40</area>
+            <value>Title:</value>
+            <align>right,top</align>
+        </textarea>
+
+        <textarea name="subtitle_text" from="basetextarea">
+            <area>150,138,250,40</area>
+            <value>Subtitle:</value>
+            <align>right,top</align>
+        </textarea>
+
+        <textarea name="season_text" from="basetextarea">
+            <area>200,185,250,40</area>
+            <value>Season:</value>
+            <align>right,top</align>
+        </textarea>
+
+        <textarea name="episode_text" from="basetextarea">
+            <area>520,185,150,40</area>
+            <value>Episode:</value>
             <align>right,top</align>
         </textarea>
 
         <textarea name="category_text" from="title_text">
-            <position>50,197</position>
+            <area>520,232,150,40</area>
+            <align>right</align>
             <value>Category:</value>
         </textarea>
 
         <textarea name="level_text" from="title_text">
-            <position>50,247</position>
+            <area>120,232,200,40</area>
+            <align>right</align>
             <value>Parental Control:</value>
         </textarea>
 
         <textarea name="child_text" from="title_text">
-            <position>50,292</position>
+            <area>120,277,200,40</area>
+            <align>right</align>
             <value>File to Always Play Next:</value>
         </textarea>
 
         <textarea name="browse_text" from="title_text">
-            <position>50,337</position>
+            <area>570,277,280,40</area>
+            <align>left</align>
             <value>Include while Browsing:</value>
         </textarea>
 
         <textarea name="coverart_text_label" from="title_text">
-            <position>50,375</position>
+            <position>200,328</position>
             <value>Cover Art:</value>
         </textarea>
 
+        <textarea name="screenshot_text_label" from="title_text">
+            <position>200,357</position>
+            <value>Screenshot:</value>
+        </textarea>
+
+        <textarea name="banner_text_label" from="title_text">
+            <position>200,386</position>
+            <value>Banner:</value>
+        </textarea>
+
+        <textarea name="fanart_text_label" from="title_text">
+            <position>200,415</position>
+            <value>Fanart:</value>
+        </textarea>
+
         <textarea name="trailer_text_label" from="title_text">
-            <position>50,405</position>
+            <position>200,447</position>
             <value>Trailer:</value>
         </textarea>
 
         <textarea name="player_text" from="title_text">
-            <position>50,445</position>
+            <position>150,487</position>
             <value>Unique Player Command:</value>
         </textarea>
 
         <!-- Widgets -->
 
         <textedit name="title_edit" from="basetextedit">
-            <position>310,125</position>
+            <position>410,70</position>
         </textedit>
 
-        <buttonlist name="category_select" from="baseselector">
-            <position>310,190</position>
-        </buttonlist>
+        <textedit name="subtitle_edit" from="basetextedit">
+            <position>410,126</position>
+        </textedit>
+
+        <spinbox name="season" from="basespinbox">
+            <position>460,181</position>
+        </spinbox>
+
+        <spinbox name="episode" from="basespinbox">
+            <position>680,181</position>
+        </spinbox>
 
         <buttonlist name="level_select" from="baseselector">
-            <position>310,240</position>
+            <position>330,225</position>
+        </buttonlist>
+
+        <buttonlist name="category_select" from="baseselector">
+            <position>680,225</position>
         </buttonlist>
 
         <buttonlist name="child_select" from="baseselector">
-            <position>310,285</position>
+            <position>330,270</position>
         </buttonlist>
 
         <checkbox name="browse_check" from="basecheckbox">
-            <position>310,335</position>
+            <position>835,275</position>
         </checkbox>
 
         <button name="coverart_button">
-            <area>310,370,32,32</area>
+            <area>460,323,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -970,12 +1030,93 @@
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
-            <area>350,375,250,40</area>
+            <area>500,328,250,40</area>
+            <value>/path/to/the/thing.jpg</value>
+        </textarea>
+
+        <button name="screenshot_button">
+            <area>460,352,32,32</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <textarea name="screenshot_text" from="basetextarea">
+            <area>500,357,250,40</area>
+            <value>/path/to/the/thing.jpg</value>
+        </textarea>
+
+        <button name="banner_button">
+            <area>460,381,32,32</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <textarea name="banner_text" from="basetextarea">
+            <area>500,386,250,40</area>
+            <value>/path/to/the/thing.jpg</value>
+        </textarea>
+
+        <button name="fanart_button">
+            <area>460,412,32,32</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <textarea name="fanart_text" from="basetextarea">
+            <area>500,415,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="trailer_button">
-            <area>310,400,32,32</area>
+            <area>460,442,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -997,16 +1138,18 @@
         </button>
 
         <textarea name="trailer_text" from="basetextarea">
-            <area>350,405,250,40</area>
+            <area>500,447,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
+
         <textedit name="player_edit" from="basetextedit">
-            <position>310,435</position>
+            <position>410,477</position>
         </textedit>
 
         <button name="done_button" from="basebutton">
-            <position>310,505</position>
+            <position>510,537</position>
+            <value>Done</value>
         </button>
 
     </window>

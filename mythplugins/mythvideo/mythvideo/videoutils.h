@@ -33,6 +33,7 @@ class Metadata;
 
 QString GetDisplayUserRating(float userrating);
 QString GetDisplayLength(int length);
+QString GetDisplaySeasonEpisode(int seasEp, int digits);
 QString GetDisplayBrowse(bool browse);
 QString GetDisplayYear(int year);
 QString GetDisplayRating(const QString &rating);

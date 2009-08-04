@@ -267,11 +267,14 @@ class VideoScannerThread : public QThread
                                  VIDEO_SCREENSHOT_DEFAULT,
                                  VIDEO_BANNER_DEFAULT,
                                  VIDEO_FANART_DEFAULT,
-                                 Metadata::FilenameToTitle(p->first),
+                                 Metadata::FilenameToMeta(p->first, 1),
+                                 Metadata::FilenameToMeta(p->first, 4),
                                  VIDEO_YEAR_DEFAULT,
                                  VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
-                                 VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT,
-                                 0, 0, ParentalLevel::plLowest);
+                                 VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT, 0,
+                                 Metadata::FilenameToMeta(p->first, 2).toInt(), 
+                                 Metadata::FilenameToMeta(p->first, 3).toInt(), 
+                                 0, ParentalLevel::plLowest);
 
                 VERBOSE(VB_GENERAL, QString("Adding : %1 : %2")
                         .arg(newFile.GetHost()).arg(newFile.GetFilename()));

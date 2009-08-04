@@ -1308,7 +1308,9 @@ void MythMainWindow::RegisterMediaPlugin(const QString &name,
 
 bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
                                  const QString &plot, const QString &title,
-                                 const QString &director, int lenMins,
+                                 const QString &subtitle, 
+                                 const QString &director, int season,
+                                 int episode, int lenMins,
                                  const QString &year)
 {
     QString lhandler(handler);
@@ -1318,8 +1320,9 @@ bool MythMainWindow::HandleMedia(const QString &handler, const QString &mrl,
     // Let's see if we have a plugin that matches the handler name...
     if (d->mediaPluginMap.count(lhandler))
     {
-        d->mediaPluginMap[lhandler].playFn(mrl, plot, title,
-                                          director, lenMins, year);
+        d->mediaPluginMap[lhandler].playFn(mrl, plot, title, subtitle,
+                                          director, season, episode, lenMins, 
+                                          year);
         return true;
     }
 

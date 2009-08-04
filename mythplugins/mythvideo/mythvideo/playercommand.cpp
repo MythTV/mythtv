@@ -75,26 +75,31 @@ class VideoPlayHandleMedia : public VideoPlayProc
 {
   private:
     VideoPlayHandleMedia(const QString &handler, const QString &mrl,
-            const QString &plot, const QString &title,
-            const QString &director, int length, const QString &year) :
+            const QString &plot, const QString &title, const QString &subtitle,
+            const QString &director, int season, int episode,
+            int length, const QString &year) :
         m_handler(handler), m_mrl(mrl), m_plot(plot), m_title(title),
-        m_director(director), m_length(length), m_year(year)
+        m_subtitle(subtitle), m_director(director), m_season(season),
+        m_episode(episode), m_length(length), m_year(year)
     {
     }
 
   public:
     static VideoPlayHandleMedia *Create(const QString &handler,
             const QString &mrl, const QString &plot, const QString &title,
-            const QString &director, int length, const QString &year)
+            const QString &subtitle, const QString &director,
+            int season, int episode, 
+            int length, const QString &year)
     {
-        return new VideoPlayHandleMedia(handler, mrl, plot, title,
-                director, length, year);
+        return new VideoPlayHandleMedia(handler, mrl, plot, title, subtitle,
+                director, season, episode, length, year);
     }
 
     bool Play() const
     {
         return gContext->GetMainWindow()->HandleMedia(m_handler, m_mrl,
-                m_plot, m_title, m_director, m_length, m_year);
+                m_plot, m_title, m_subtitle, m_director, m_season,
+                m_episode, m_length, m_year);
     }
 
     QString GetCommandDisplayName() const
@@ -112,7 +117,10 @@ class VideoPlayHandleMedia : public VideoPlayProc
     QString m_mrl;
     QString m_plot;
     QString m_title;
+    QString m_subtitle;
     QString m_director;
+    int m_season;
+    int m_episode;
     int m_length;
     QString m_year;
 };
@@ -200,8 +208,9 @@ class VideoPlayerCommandPrivate
             if (play_command.length())
             {
                 AddPlayer(play_command, filename, item->GetPlot(),
-                        item->GetTitle(), item->GetDirector(),
-                        item->GetLength(),
+                        item->GetTitle(), item->GetSubtitle(),
+                        item->GetDirector(), item->GetSeason(),
+                        item->GetEpisode(), item->GetLength(),
                         QString::number(item->GetYear()));
             }
             else
@@ -237,8 +246,11 @@ class VideoPlayerCommandPrivate
             play_command = "Internal";
 
         QString plot;
-        QString title = Metadata::FilenameToTitle(filename);
+        QString title = Metadata::FilenameToMeta(filename, 1);
+        QString subtitle = Metadata::FilenameToMeta(filename, 4);
         QString director;
+        int season = 0;
+        int episode = 0;
         int length = 0;
         QString year = QString::number(VIDEO_YEAR_DEFAULT);
 
@@ -246,12 +258,16 @@ class VideoPlayerCommandPrivate
         {
             plot = extraData->GetPlot();
             title = extraData->GetTitle();
+            subtitle = extraData->GetSubtitle();
             director = extraData->GetDirector();
+            season = extraData->GetSeason();
+            episode = extraData->GetEpisode();
             length = extraData->GetLength();
             year = QString::number(extraData->GetYear());
         }
 
-        AddPlayer(play_command, filename, plot, title, director, length, year);
+        AddPlayer(play_command, filename, plot, title, subtitle, director, 
+                                season, episode, length, year);
     }
 
     void ClearPlayerList()
@@ -282,11 +298,13 @@ class VideoPlayerCommandPrivate
 
   private:
     void AddPlayer(const QString &player, const QString &filename,
-            const QString &plot, const QString &title, const QString &director,
-            int length, const QString &year)
+            const QString &plot, const QString &title, const QString &subtitle, 
+            const QString &director, int season, int episode, int length, 
+            const QString &year)
     {
         m_player_procs.push_back(VideoPlayHandleMedia::Create(player, filename,
-                        plot, title, director, length, year));
+                        plot, title, subtitle, director, season, episode, 
+                        length, year));
         m_player_procs.push_back(VideoPlayMythSystem::Create(player, filename));
     }
 

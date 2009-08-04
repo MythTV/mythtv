@@ -28,6 +28,7 @@ typedef QMap<QString, QString> SearchListResults;
 
 enum CoverDownloadErrorState { esOK, esError, esTimeout };
 enum FanartDownloadErrorState { fesOK, fesError, fesTimeout };
+enum BannerDownloadErrorState { besOK, besError, besTimeout };
 
 class VideoDialog : public MythScreenType
 {
@@ -51,6 +52,12 @@ class VideoDialog : public MythScreenType
     bool Create();
     bool keyPressEvent(QKeyEvent *levent);
 
+  private:
+    void searchStart();
+
+  public slots:
+    void searchComplete(QString string);
+
   private slots:
     void UpdatePosition();
     void UpdateText(MythUIButtonListItem *);
@@ -68,6 +75,8 @@ class VideoDialog : public MythScreenType
 
     void EditMetadata();
     void VideoSearch();
+    void TitleSubtitleSearch();
+    void ImageOnlyDownload();
     void ManualVideoUID();
     void ManualVideoTitle();
     void ResetMetadata();
@@ -93,6 +102,7 @@ class VideoDialog : public MythScreenType
 
     // Called when the underlying data for an item changes
     void OnVideoSearchListSelection(QString video_uid);
+    void OnVideoImgSearchListSelection(QString video_uid);
 
     void OnManualVideoUID(QString video_uid);
     void OnManualVideoTitle(QString title);
@@ -140,6 +150,7 @@ class VideoDialog : public MythScreenType
     // OnVideoPosterSetDone() stop wait background
     void StartVideoPosterSet(Metadata *metadata);
     void StartVideoFanartSet(Metadata *metadata);
+    void StartVideoBannerSet(Metadata *metadata);
 
     // StartVideoSearchByUID() start wait background
     //   OnVideoSearchByUIDDone() stop wait background
@@ -150,6 +161,8 @@ class VideoDialog : public MythScreenType
     //   OnVideoSearchByTitleDone()
     void StartVideoSearchByTitle(QString video_uid, QString title,
             Metadata *metadata);
+    void StartVideoSearchByTitleSubtitle(QString title,
+            QString subtitle, Metadata *metadata);
 
   private slots:
     // called during StartVideoPosterSet
@@ -159,9 +172,18 @@ class VideoDialog : public MythScreenType
     void OnFanartURL(QString uri, Metadata *metadata);
     void OnFanartCopyFinished(FanartDownloadErrorState error, QString errorMsg,
                               Metadata *metadata);
+    void OnBannerURL(QString uri, Metadata *metadata);
+    void OnBannerCopyFinished(BannerDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata);
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,
+                                  const SearchListResults &results,
+                                  Metadata *metadata);
+    void OnVideoSearchByTitleSubtitleDone(bool normal_exit,
+                                  QStringList result,
+                                  Metadata *metadata);
+    void OnVideoImageOnlyDone(bool normal_exit,
                                   const SearchListResults &results,
                                   Metadata *metadata);
 
@@ -170,6 +192,7 @@ class VideoDialog : public MythScreenType
     // StartVideoPosterSet end
     void OnVideoPosterSetDone(Metadata *metadata);
     void OnVideoFanartSetDone(Metadata *metadata);
+    void OnVideoBannerSetDone(Metadata *metadata);
 
     // StartVideoSearchByUID end
     void OnVideoSearchByUIDDone(bool normal_exit,

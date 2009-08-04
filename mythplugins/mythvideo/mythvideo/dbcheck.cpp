@@ -38,7 +38,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1023";
+    const QString currentDatabaseVersion = "1024";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -832,6 +832,17 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             performActualUpdate(updates, "1023", dbver, MythVideoVersionName);
         }
 
+        if (dbver == "1023")
+        {
+            QStringList updates;
+            updates += "ALTER TABLE videometadata ADD `subtitle` TEXT "
+                       "NOT NULL AFTER `title`;";
+            updates += "ALTER TABLE videometadata ADD `season` SMALLINT "
+                       "UNSIGNED NOT NULL DEFAULT '0' AFTER `length`;";
+            updates += "ALTER TABLE videometadata ADD `episode` SMALLINT "
+                       "UNSIGNED NOT NULL DEFAULT '0' AFTER `season`;";
+            performActualUpdate(updates, "1024", dbver, MythVideoVersionName);
+        }
 
     }
 }

@@ -672,7 +672,8 @@ QString RandTheme(QString &themename)
 }
 
 int internal_play_media(const QString &mrl, const QString &plot,
-                        const QString &title, const QString &director,
+                        const QString &title, const QString &subtitle,
+                        const QString &director, int season, int episode,
                         int lenMins, const QString &year)
 {
     int res = -1;
@@ -711,11 +712,25 @@ int internal_play_media(const QString &mrl, const QString &plot,
         pginfo->pathname = QString("dvd:%1").arg(mrl);
     }
 
-    pginfo->description = plot;
-
     if (director.length())
-        pginfo->subtitle = QString( "%1: %2" )
+        pginfo->description = QString( "%1: %2.  " )
                            .arg(QObject::tr("Directed By")).arg(director);
+
+    pginfo->description += plot;
+
+    if (subtitle.length())
+        pginfo->subtitle = subtitle;
+
+    if ((season > 0) || (episode > 0))
+    {
+        QString seas, ep;
+        seas = QString::number(season);
+        ep = QString::number(episode);
+        if (ep.size() < 2)
+            ep.prepend("0");
+        QString SeasEpTitle =  QString("%1x%2").arg(seas).arg(ep);
+        pginfo->chanstr = SeasEpTitle;
+    }
 
     pginfo->title = title;
 

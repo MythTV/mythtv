@@ -353,6 +353,38 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
             ret = lhs_key < rhs_key;
             break;
         }
+        case kOrderBySeasonEp:
+        {
+            if ((lhs.GetSeason() == rhs.GetSeason())
+                && (lhs.GetEpisode() == rhs.GetEpisode())
+                && (lhs.GetSeason() == 0)
+                && (rhs.GetSeason() == 0)
+                && (lhs.GetEpisode() == 0)
+                && (rhs.GetEpisode() == 0))
+            {
+                Metadata::SortKey lhs_key;
+                Metadata::SortKey rhs_key;
+                if (lhs.HasSortKey() && rhs.HasSortKey())
+                {
+                    lhs_key = lhs.GetSortKey();
+                    rhs_key = rhs.GetSortKey();
+                }
+                else
+                {
+                    lhs_key = Metadata::GenerateDefaultSortKey(lhs,
+                                                               sort_ignores_case);
+                    rhs_key = Metadata::GenerateDefaultSortKey(rhs,
+                                                               sort_ignores_case);
+                }
+                ret = lhs_key < rhs_key;
+            }
+            else if (lhs.GetSeason() == rhs.GetSeason()
+                     && lhs.GetTitle() == rhs.GetTitle())
+                ret = lhs.GetEpisode() < rhs.GetEpisode();
+            else
+                ret = lhs.GetSeason() < rhs.GetSeason();
+            break;
+        }
         case kOrderByYearDescending:
         {
             ret = lhs.GetYear() > rhs.GetYear();
@@ -649,6 +681,8 @@ void VideoFilterDialog::fillWidgets()
     // Order by
     new MythUIButtonListItem(m_orderbyList, QObject::tr("Title"),
                            VideoFilterSettings::kOrderByTitle);
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("Season/Episode"),
+                           VideoFilterSettings::kOrderBySeasonEp);
     new MythUIButtonListItem(m_orderbyList, QObject::tr("Year"),
                            VideoFilterSettings::kOrderByYearDescending);
     new MythUIButtonListItem(m_orderbyList, QObject::tr("User Rating"),

@@ -235,6 +235,66 @@ HostLineEdit *GetDataCommand()
     return gc;
 }
 
+HostLineEdit *SearchTVListingsCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TVListCommandLine");
+    gc->setLabel(QObject::tr("Command to search for TV shows in MythVideo"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -M");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
+HostLineEdit *GetTVPostersCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TVPosterCommandLine");
+    gc->setLabel(QObject::tr("Command to search for TV Season posters"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -mP");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
+HostLineEdit *GetTVFanartCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TVFanartCommandLine");
+    gc->setLabel(QObject::tr("Command to search for TV fanart"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -tF");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
+HostLineEdit *GetTVBannerCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TVBannerCommandLine");
+    gc->setLabel(QObject::tr("Command to search for TV banners"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -tB");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
+HostLineEdit *GetTVDataCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TVDataCommandLine");
+    gc->setLabel(QObject::tr("Command to extract data for TV Episodes"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -D");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
+HostLineEdit *GetTVTitleSubCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TVTitleSubCommandLine");
+    gc->setLabel(QObject::tr("Command to search for TV by Title/Subtitle"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -N");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
 HostLineEdit *VideoStartupDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoStartupDir");
@@ -779,6 +839,20 @@ VideoGeneralSettings::VideoGeneralSettings()
     trlr->addChild(new RandomTrailers());
     VConfigPage page7(pages, false);
     page7->addChild(trlr);
+
+    // page 8
+    VerticalConfigurationGroup *tvman =
+            new VerticalConfigurationGroup(true, false);
+    tvman->setLabel(QObject::tr("Television in MythVideo"));
+    tvman->addChild(SearchTVListingsCommand());
+    tvman->addChild(GetTVPostersCommand());
+    tvman->addChild(GetTVFanartCommand());
+    tvman->addChild(GetTVBannerCommand());
+    tvman->addChild(GetTVDataCommand());
+    tvman->addChild(GetTVTitleSubCommand());
+
+    VConfigPage page8(pages, false);
+    page8->addChild(tvman);
 
     int page_num = 1;
     for (ConfigPage::PageList::const_iterator p = pages.begin();

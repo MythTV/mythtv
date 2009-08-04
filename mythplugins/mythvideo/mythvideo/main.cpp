@@ -322,6 +322,10 @@ namespace
         REG_KEY("Video","INCPARENT","Increase Parental Level","],},F11");
         REG_KEY("Video","DECPARENT","Decrease Parental Level","[,{,F10");
 
+        REG_KEY("Video","INCSEARCH","Show Incremental Search Dialog","Ctrl+S");
+        REG_KEY("Video","DOWNLOADDATA","Download metadata for current item","W");
+        REG_KEY("Video","ITEMDETAIL","Display Item Detail Popup", "");
+
         REG_KEY("Video","HOME","Go to the first video","Home");
         REG_KEY("Video","END","Go to the last video","End");
 

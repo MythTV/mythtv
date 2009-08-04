@@ -826,7 +826,27 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
     for (meta_dir_node::const_entry_iterator entry = src->entries_begin();
          entry != src->entries_end(); ++entry)
     {
-        AddFileNode(dst, (*entry)->getData()->GetTitle(), (*entry)->getData());
+        if (((*entry)->getData()->GetSeason() > 0) ||
+                 ((*entry)->getData()->GetEpisode() > 0))
+        {
+            QString seas = QString::number((*entry)->getData()->GetSeason());
+            QString ep = QString::number((*entry)->getData()->GetEpisode());
+            QString tit = (*entry)->getData()->GetTitle();
+            QString sub = (*entry)->getData()->GetSubtitle();
+            if (ep.size() < 2)
+                ep.prepend("0");
+            QString TitSeasEpSub = QString("%1 %2x%3 - %4").arg(tit).arg(seas)
+                                                           .arg(ep).arg(sub);
+            AddFileNode(dst, TitSeasEpSub, (*entry)->getData());
+        }
+        else if ((*entry)->getData()->GetSubtitle().isEmpty())
+            AddFileNode(dst, (*entry)->getData()->GetTitle(), (*entry)->getData());
+        else
+        {
+            QString TitleSub = QString("%1 - %2").arg((*entry)->getData()->GetTitle())
+                                                 .arg((*entry)->getData()->GetSubtitle());
+            AddFileNode(dst, TitleSub, (*entry)->getData());
+        }
     }
 }
 
@@ -1267,7 +1287,7 @@ namespace fake_unnamed
             QString title = qfi.completeBaseName();
             if (m_infer_title)
             {
-                QString tmptitle(Metadata::FilenameToTitle(file_string));
+                QString tmptitle(Metadata::FilenameToMeta(file_string, 1));
                 if (tmptitle.length())
                     title = tmptitle;
             }

@@ -10,6 +10,7 @@ class MythUIButtonListItem;
 class MythUIText;
 class MythUITextEdit;
 class MythUIButton;
+class MythUISpinBox;
 class MythUICheckBox;
 
 class EditMetadataDialog : public MythScreenType
@@ -34,8 +35,11 @@ class EditMetadataDialog : public MythScreenType
   public slots:
     void SaveAndExit();
     void SetTitle();
+    void SetSubtitle();
     void SetCategory(MythUIButtonListItem*);
     void SetPlayer();
+    void SetSeason();
+    void SetEpisode();
     void SetLevel(MythUIButtonListItem*);
     void SetChild(MythUIButtonListItem*);
     void ToggleBrowse();
@@ -60,7 +64,10 @@ class EditMetadataDialog : public MythScreenType
     //
 
     MythUITextEdit      *m_titleEdit;
+    MythUITextEdit      *m_subtitleEdit;
     MythUITextEdit      *m_playerEdit;
+    MythUISpinBox       *m_seasonSpin;
+    MythUISpinBox       *m_episodeSpin;
     MythUIButtonList      *m_categoryList;
     MythUIButtonList      *m_levelList;
     MythUIButtonList      *m_childList;

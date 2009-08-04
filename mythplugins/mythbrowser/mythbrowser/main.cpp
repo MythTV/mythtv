@@ -19,7 +19,7 @@
 
 using namespace std;
 
-int handleMedia(const QString &url, const QString &, const QString &, const QString &, int, const QString &)
+int handleMedia(const QString &url, const QString &, const QString &, const QString &, const QString &, int, int, int, const QString &)
 {
     QStringList urls = url.split(" ", QString::SkipEmptyParts);
     float zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();

@@ -12,6 +12,7 @@
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuicheckbox.h>
+#include <mythtv/libmythui/mythuispinbox.h>
 
 #include "globals.h"
 #include "dbaccess.h"
@@ -22,9 +23,10 @@
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, Metadata *source_metadata,
         const MetadataListManager &cache) : MythScreenType(lparent, lname),
-    m_origMetadata(source_metadata), m_titleEdit(0), m_playerEdit(0),
-    m_categoryList(0), m_levelList(0), m_childList(0), m_browseCheck(0),
-    m_coverartButton(0), m_coverartText(0),
+    m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
+    m_playerEdit(0), m_seasonSpin(0), m_episodeSpin(0),
+    m_categoryList(0), m_levelList(0), m_childList(0), 
+    m_browseCheck(0), m_coverartButton(0), m_coverartText(0),
     m_screenshotButton(0), m_screenshotText(0),
     m_bannerButton(0), m_bannerText(0),
     m_fanartButton(0), m_fanartText(0),
@@ -47,7 +49,11 @@ bool EditMetadataDialog::Create()
 
     bool err = false;
     UIUtilE::Assign(this, m_titleEdit, "title_edit", &err);
+    UIUtilE::Assign(this, m_subtitleEdit, "subtitle_edit", &err);
     UIUtilE::Assign(this, m_playerEdit, "player_edit", &err);
+
+    UIUtilE::Assign(this, m_seasonSpin, "season", &err);
+    UIUtilE::Assign(this, m_episodeSpin, "episode", &err);
 
     UIUtilE::Assign(this, m_coverartText, "coverart_text", &err);
     UIUtilE::Assign(this, m_screenshotText, "screenshot_text", &err);
@@ -79,7 +85,11 @@ bool EditMetadataDialog::Create()
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 
     connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(SetTitle()));
+    connect(m_subtitleEdit, SIGNAL(valueChanged()), SLOT(SetSubtitle()));
     connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(SetPlayer()));
+
+    connect(m_seasonSpin, SIGNAL(LosingFocus()), SLOT(SetSeason()));
+    connect(m_episodeSpin, SIGNAL(LosingFocus()), SLOT(SetEpisode()));
 
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
     connect(m_coverartButton, SIGNAL(Clicked()), SLOT(FindCoverArt()));
@@ -154,6 +164,12 @@ namespace
 void EditMetadataDialog::fillWidgets()
 {
     m_titleEdit->SetText(m_workingMetadata->GetTitle());
+    m_subtitleEdit->SetText(m_workingMetadata->GetSubtitle());
+
+    m_seasonSpin->SetRange(0,100,1);
+    m_seasonSpin->SetValue(m_workingMetadata->GetSeason());
+    m_episodeSpin->SetRange(0,999,1);
+    m_episodeSpin->SetValue(m_workingMetadata->GetEpisode());
 
     MythUIButtonListItem *button =
         new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
@@ -312,9 +328,24 @@ void EditMetadataDialog::SetTitle()
     m_workingMetadata->SetTitle(m_titleEdit->GetText());
 }
 
+void EditMetadataDialog::SetSubtitle()
+{
+    m_workingMetadata->SetSubtitle(m_subtitleEdit->GetText());
+}
+
 void EditMetadataDialog::SetCategory(MythUIButtonListItem *item)
 {
     m_workingMetadata->SetCategoryID(item->GetData().toInt());
+}
+
+void EditMetadataDialog::SetSeason()
+{
+    m_workingMetadata->SetSeason(m_seasonSpin->GetIntValue());
+}
+
+void EditMetadataDialog::SetEpisode()
+{
+    m_workingMetadata->SetEpisode(m_episodeSpin->GetIntValue());
 }
 
 void EditMetadataDialog::SetPlayer()

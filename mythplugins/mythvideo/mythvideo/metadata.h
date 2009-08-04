@@ -13,6 +13,8 @@ class MetadataListManager;
 
 enum { VIDEO_YEAR_DEFAULT = 1895 };
 
+const QString VIDEO_SUBTITLE_DEFAULT = "";
+
 struct SortData;
 
 class Metadata
@@ -44,7 +46,7 @@ class Metadata
 
   public:
     static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
-    static QString FilenameToTitle(const QString &file_name);
+    static QString FilenameToMeta(const QString &file_name, int position);
     static QString TrimTitle(const QString &title, bool ignore_case);
 
   public:
@@ -55,6 +57,7 @@ class Metadata
              const QString &banner = QString(),
              const QString &fanart = QString(),
              const QString &title = QString(),
+             const QString &subtitle = QString(),
              int year = VIDEO_YEAR_DEFAULT,
              const QString &inetref = QString(),
              const QString &director = QString(),
@@ -62,6 +65,8 @@ class Metadata
              float userrating = 0.0,
              const QString &rating = QString(),
              int length = 0,
+             int season = 0,
+             int episode = 0, 
              int id = 0,
              ParentalLevel::Level showlevel = ParentalLevel::plLowest,
              int categoryID = 0,
@@ -89,6 +94,9 @@ class Metadata
     const QString &GetTitle() const;
     void SetTitle(const QString& title);
 
+    const QString &GetSubtitle() const;
+    void SetSubtitle(const QString &subtitle);
+
     int GetYear() const;
     void SetYear(int year);
 
@@ -109,6 +117,12 @@ class Metadata
 
     int GetLength() const;
     void SetLength(int length);
+
+    int GetSeason() const;
+    void SetSeason(int season);
+
+    int GetEpisode() const;
+    void SetEpisode(int episode);
 
     unsigned int GetID() const;
     void SetID(int id);
