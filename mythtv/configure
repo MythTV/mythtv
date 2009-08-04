@@ -2074,6 +2074,8 @@ if disabled cpu_override && enabled proc_opt; then
    elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
 # P4
+   elif expr "$processor" : ".*Xeon(R) CPU" > /dev/null ; then
+       ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Xeon(TM) CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*XEON(TM) CPU" > /dev/null ; then
