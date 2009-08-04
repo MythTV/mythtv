@@ -648,8 +648,8 @@ void GenericTree::reOrderAsSorted()
     m_subnodes->clear(); // don't delete the children here...
     m_current_ordering_index = -1;
 
-    vector<GenericTree*>::iterator it = m_subnodes->begin();
-    for (; it != m_subnodes->end(); ++it)
+    vector<GenericTree*>::iterator it = m_ordered_subnodes->begin();
+    for (; it != m_ordered_subnodes->end(); ++it)
     {
         m_subnodes->push_back(*it);
         (*it)->reOrderAsSorted();
