@@ -24,7 +24,7 @@ class GameUI : public MythScreenType
   public slots:
     void nodeChanged(MythGenericTree* node);
     void itemClicked(MythUIButtonListItem* item);
-    void showImageTimeout(void);
+    void showImages(void);
     void searchComplete(QString);
 
   private:

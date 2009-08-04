@@ -266,22 +266,6 @@ void RomInfo::fillData()
         setBoxart(query.value(16).toString());
     }
 
-    query.prepare("SELECT screenshots FROM gameplayers "
-                  "WHERE playername = :SYSTEM");
-    query.bindValue(":SYSTEM",system);
-
-    if (query.exec() && query.next())
-    {
-        if (!query.value(0).toString().isEmpty())
-        {
-            QString Image = query.value(0).toString() + "/" + romname;
-            if (FindImage(query.value(0).toString() + "/" + romname, &Image))
-                setImagePath(Image);
-            else
-                setImagePath("");
-        }
-    }
-
     setRomCount(romInDB(romname,gametype));
 
     // If we have more than one instance of this rom in the DB fill in all

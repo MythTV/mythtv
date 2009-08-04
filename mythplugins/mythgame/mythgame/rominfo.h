@@ -43,7 +43,6 @@ class RomInfo
                 system = lhs.system;
                 gamename = lhs.gamename;
                 genre = lhs.genre;
-                imagepath = lhs.imagepath;
                 year = lhs.year;
                 favorite = lhs.favorite;
                 rompath = lhs.rompath;
@@ -107,9 +106,6 @@ class RomInfo
     QString CRC_VALUE() const { return crc_value; }
     void setCRC_VALUE(const QString &lcrc_value) { crc_value = lcrc_value; }
 
-    QString ImagePath() const { return imagepath; }
-    void setImagePath(const QString &limagepath) { imagepath = limagepath; } 
-
     QString Plot() const { return plot; }
     void setPlot(const QString &lplot) { plot = lplot; }
 
@@ -136,7 +132,6 @@ class RomInfo
     QString system;
     QString gamename;
     QString genre;
-    QString imagepath; 
     QString country;
     QString crc_value;
     QString gametype;

@@ -423,9 +423,11 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     QString Version;
     QString Fanart;
     QString Boxart;
+    QString ScreenShot;
 
     int removalprompt = gContext->GetSetting("GameRemovalPrompt").toInt();
     int indepth = gContext->GetSetting("GameDeepScan").toInt();
+    QString screenShotPath = gContext->GetSetting("mythgame.screenshotdir");
 
     for (iter = m_GameMap.begin(); iter != m_GameMap.end(); iter++)
     {
@@ -454,17 +456,33 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             if (GameName == QObject::tr("Unknown")) 
                 GameName = iter.data().GameName();
 
-                // Put the game into the database.
-                // Had to break the values up into 2 pieces since QString only allows 9 arguments and we had 10
+	    int suffixPos = iter.data().Rom().lastIndexOf(QChar('.'));
+	    QString baseName = iter.data().Rom();
 
-            VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
+            if (suffixPos > 0) 
+                baseName = iter.data().Rom().left(suffixPos); 
+
+	    baseName = screenShotPath + "/" + baseName;
+
+	    if (QFile(baseName + ".png").exists())
+                ScreenShot = baseName + ".png";
+            else if (QFile(baseName + ".jpg").exists())
+                ScreenShot = baseName + ".jpg";
+            else if (QFile(baseName + ".gif").exists())
+                ScreenShot = baseName + ".gif";
+            else
+                ScreenShot = "";
+
+            //VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
+            //VERBOSE(VB_GENERAL, QString("screenshot %1").arg(ScreenShot));
+
             query.prepare("INSERT INTO gamemetadata "
                           "(system, romname, gamename, genre, year, gametype, " 
                           "rompath, country, crc_value, diskcount, display, plot, "
-                          "publisher, version, fanart, boxart) "
+                          "publisher, version, fanart, boxart, screenshot) "
                           "VALUES (:SYSTEM, :ROMNAME, :GAMENAME, :GENRE, :YEAR, "
                           ":GAMETYPE, :ROMPATH, :COUNTRY, :CRC32, '1', '1', :PLOT, :PUBLISHER, :VERSION, "
-                          ":FANART, BOXART)");
+                          ":FANART, :BOXART, :SCREENSHOT)");
 
             query.bindValue(":SYSTEM",handler->SystemName());
             query.bindValue(":ROMNAME",iter.data().Rom());
@@ -480,6 +498,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             query.bindValue(":VERSION", Version);
             query.bindValue(":FANART", Fanart);
             query.bindValue(":BOXART", Boxart);
+	    query.bindValue(":SCREENSHOT", ScreenShot);
 
             if (!query.exec()) 
                 MythDB::DBError("GameHandler::UpdateGameDB - " 

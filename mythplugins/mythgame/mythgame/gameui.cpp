@@ -72,9 +72,6 @@ bool GameUI::Create()
 
     m_gameTree = new MythGenericTree("game root", 0, false);
 
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), SLOT(showImageTimeout()));
-
     //  create system filter to only select games where handlers are present
     QString systemFilter;
 
@@ -197,8 +194,6 @@ void GameUI::nodeChanged(MythGenericTree* node)
             node->deleteAllChildren();
             fillNode(node);
         }
-        if (timer->isActive())
-            timer->stop();
         clearRomInfo();
     }
     else
@@ -209,14 +204,9 @@ void GameUI::nodeChanged(MythGenericTree* node)
         if (romInfo->Romname().isEmpty())
             romInfo->fillData();
         updateRomInfo(romInfo);
-        if (!romInfo->ImagePath().isEmpty() || !romInfo->Fanart().isEmpty() ||
+        if (!romInfo->Screenshot().isEmpty() || !romInfo->Fanart().isEmpty() ||
             !romInfo->Boxart().isEmpty())
-        {
-            if (timer->isActive())
-                timer->changeInterval(330);
-            else
-                timer->start(330, true);
-        }
+            showImages();
         else
         {
             if (m_gameImage->IsVisible())
@@ -267,7 +257,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
     }
 }
 
-void GameUI::showImageTimeout(void)
+void GameUI::showImages(void)
 {
     m_gameImage->Load();
     if (!m_gameImage->IsVisible())

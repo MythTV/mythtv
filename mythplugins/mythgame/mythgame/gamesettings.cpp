@@ -89,7 +89,7 @@ static HostCheckBox *GameTreeView()
 HostLineEdit *GetScreenshotDir()
 {
     HostLineEdit *gc = new HostLineEdit("mythgame.screenshotdir");
-    gc->setLabel(QObject::tr("Directory where Game Screenshot is stored"));
+    gc->setLabel(QObject::tr("Directory where Game Screenshots are stored"));
     gc->setValue(GetConfDir() + "/MythGame/Screenshots");
     gc->setHelpText(QObject::tr("This directory will be the default browse "
                     "location when assigning screenshots."));
@@ -228,18 +228,6 @@ class Extensions : public LineEditSetting, public GameDBStorage
     };
 };
 
-
-class ScreenPath : public LineEditSetting, public GameDBStorage
-{
-  public:
-    ScreenPath(const MythGamePlayerSettings &parent) :
-        LineEditSetting(this), GameDBStorage(this, parent, "screenshots")
-    {
-        setLabel(QObject::tr("ScreenShots"));
-        setHelpText(QObject::tr("Path to any screenshots for this player"));
-    };
-};
-
 MythGamePlayerSettings::MythGamePlayerSettings()
 {
     // must be first
@@ -251,7 +239,6 @@ MythGamePlayerSettings::MythGamePlayerSettings()
     group->addChild(new GameType(*this));
     group->addChild(new Command(*this));
     group->addChild(new RomPath(*this));
-    group->addChild(new ScreenPath(*this));
     group->addChild(new WorkingDirPath(*this));
     group->addChild(new Extensions(*this));
     group->addChild(new AllowMultipleRoms(*this));
