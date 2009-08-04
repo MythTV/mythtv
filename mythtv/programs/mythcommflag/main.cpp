@@ -531,15 +531,16 @@ int DoFlagCommercials(
     if (useDB)
         program_info->SetCommFlagged(COMM_FLAG_PROCESSING);
 
-    CustomEventRelayer cer(incomingCustomEvent);
-    SlotRelayer a(commDetectorBreathe);
-    SlotRelayer b(commDetectorStatusUpdate);
-    SlotRelayer c(commDetectorGotNewCommercialBreakList);
-    QObject::connect(commDetector, SIGNAL(breathe()), &a, SLOT(relay()));
-    QObject::connect(commDetector, SIGNAL(statusUpdate(const QString&)), &b,
-                     SLOT(relay(const QString&)));
-    QObject::connect(commDetector, SIGNAL(gotNewCommercialBreakList()), &c,
-                     SLOT(relay()));
+    CustomEventRelayer *cer = new CustomEventRelayer(incomingCustomEvent);
+    SlotRelayer *a = new SlotRelayer(commDetectorBreathe);
+    SlotRelayer *b = new SlotRelayer(commDetectorStatusUpdate);
+    SlotRelayer *c = new SlotRelayer(commDetectorGotNewCommercialBreakList);
+    QObject::connect(commDetector, SIGNAL(breathe()),
+                     a,            SLOT(relay()));
+    QObject::connect(commDetector, SIGNAL(statusUpdate(const QString&)),
+                     b,            SLOT(relay(const QString&)));
+    QObject::connect(commDetector, SIGNAL(gotNewCommercialBreakList()),
+                     c,            SLOT(relay()));
 
     if (useDB)
     {
@@ -581,6 +582,11 @@ int DoFlagCommercials(
     commDetector = NULL;
     sleep(1);
     tmp->deleteLater();
+
+    cer->deleteLater();
+    c->deleteLater();
+    b->deleteLater();
+    a->deleteLater();
 
     return comms_found;
 }

@@ -44,7 +44,8 @@ class ClassicCommDetector : public CommDetectorBase
                             const QDateTime& stopsAt_in,
                             const QDateTime& recordingStartedAt_in,
                             const QDateTime& recordingStopsAt_in);
-        virtual ~ClassicCommDetector();
+        virtual void deleteLater(void);
+
         bool go();
         void getCommercialBreakList(comm_map_t &comms);
         void recordingFinished(long long totalFileSize);
@@ -56,6 +57,10 @@ class ClassicCommDetector : public CommDetectorBase
         void logoDetectorBreathe();
 
         friend class ClassicLogoDetector;
+
+    protected:
+        virtual ~ClassicCommDetector() {}
+
     private:
         typedef struct frameblock
         {

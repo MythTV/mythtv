@@ -7,15 +7,18 @@ class Histogram;
 
 class ClassicSceneChangeDetector : public SceneChangeDetectorBase
 {
-public:
+  public:
     ClassicSceneChangeDetector(unsigned int width, unsigned int height,
         unsigned int commdetectborder, unsigned int xspacing,
         unsigned int yspacing);
-    ~ClassicSceneChangeDetector();
+    virtual void deleteLater(void);
 
     void processFrame(unsigned char* frame);
 
-private:
+  private:
+    ~ClassicSceneChangeDetector() {}
+
+  private:
     Histogram* histogram;
     Histogram* previousHistogram;
     unsigned int frameNumber;

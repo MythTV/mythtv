@@ -9,11 +9,11 @@ class ClassicCommDetector;
 
 class ClassicLogoDetector : public LogoDetectorBase
 {
-public:
+  public:
     ClassicLogoDetector(ClassicCommDetector* commDetector,unsigned int width,
         unsigned int height, unsigned int commdetectborder,
         unsigned int xspacing, unsigned int yspacing);
-    ~ClassicLogoDetector();
+    virtual void deleteLater(void);
 
     bool searchForLogo(NuppelVideoPlayer* nvp);
     bool doesThisFrameContainTheFoundLogo(unsigned char* frame);
@@ -21,7 +21,10 @@ public:
 
     unsigned int getRequiredAvailableBufferForSearch();
 
-private:
+  protected:
+    virtual ~ClassicLogoDetector() {}
+
+  private:
     void SetLogoMaskArea();
     void SetLogoMask(unsigned char *mask);
     void DumpLogo(bool fromCurrentFrame,unsigned char* framePtr);

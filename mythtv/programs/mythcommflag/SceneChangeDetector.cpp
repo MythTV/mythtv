@@ -125,7 +125,7 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
     }
 }
 
-SceneChangeDetector::~SceneChangeDetector(void)
+void SceneChangeDetector::deleteLater(void)
 {
     if (scdata)
         delete []scdata;

@@ -5,21 +5,23 @@
 
 class SceneChangeDetectorBase : public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
 
-public:
-        SceneChangeDetectorBase(unsigned int w, unsigned int h) :
-            width(w), height(h) {}
-        ~SceneChangeDetectorBase() {};
+  public:
+    SceneChangeDetectorBase(unsigned int w, unsigned int h) :
+        width(w), height(h) {}
 
-        virtual void processFrame(unsigned char* frame) = 0;
+    virtual void processFrame(unsigned char *frame) = 0;
 
-signals:
-        void haveNewInformation(unsigned int framenum, bool scenechange,
-                                float debugValue = 0.0);
+  signals:
+    void haveNewInformation(unsigned int framenum, bool scenechange,
+                            float debugValue = 0.0);
 
-protected:
-       unsigned int width, height;
+  protected:
+    virtual ~SceneChangeDetectorBase() {}
+
+  protected:
+    unsigned int width, height;
 };
 
 #endif

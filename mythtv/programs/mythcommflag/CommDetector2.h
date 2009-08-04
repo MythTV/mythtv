@@ -36,7 +36,7 @@ typedef vector<FrameAnalyzerItem> FrameAnalyzerList;
 
 class CommDetector2 : public CommDetectorBase
 {
-public:
+  public:
     CommDetector2(
         SkipType commDetectMethod,
         bool showProgress, bool fullSpeed, NuppelVideoPlayer* nvp,
@@ -49,12 +49,14 @@ public:
     virtual void PrintFullMap(
         ostream &out, const comm_break_t *comm_breaks, bool verbose) const;
 
-private:
+  private:
+    virtual ~CommDetector2() {}
 
     void reportState(int elapsed_sec, long long frameno, long long nframes,
             unsigned int passno, unsigned int npasses);
     int computeBreaks(long long nframes);
 
+  private:
     enum SkipTypes          commDetectMethod;
     bool                    showProgress;
     bool                    fullSpeed;

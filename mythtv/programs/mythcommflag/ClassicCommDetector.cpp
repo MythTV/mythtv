@@ -280,13 +280,15 @@ void ClassicCommDetector::Init()
     }
 }
 
-ClassicCommDetector::~ClassicCommDetector()
+void ClassicCommDetector::deleteLater(void)
 {
     if (sceneChangeDetector)
-        delete sceneChangeDetector;
+        sceneChangeDetector->deleteLater();
 
     if (logoDetector)
-        delete logoDetector;
+        logoDetector->deleteLater();
+
+    CommDetectorBase::deleteLater();
 }
 
 bool ClassicCommDetector::go()

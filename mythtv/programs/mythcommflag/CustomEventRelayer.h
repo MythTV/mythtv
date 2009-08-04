@@ -15,25 +15,30 @@
 class CustomEventRelayer : public QObject
 {
     Q_OBJECT
-public:
+
+  public:
     CustomEventRelayer(void (*fp_in)(QEvent*)) : fp(fp_in)
     {
         gContext->addListener(this);
-    };
+    }
 
     CustomEventRelayer()
     {
         gContext->addListener(this);
-    };
+    }
 
-    ~CustomEventRelayer()
+    virtual void deleteLater(void)
     {
         gContext->removeListener(this);
-    };
+        QObject::deleteLater();
+    }
 
-    void customEvent(QEvent *e) { fp(e);}
-       
-private:
+    void customEvent(QEvent *e) { fp(e); }
+
+  protected:
+    virtual ~CustomEventRelayer() {}
+
+  private:
     void (*fp)(QEvent*);
 };
 

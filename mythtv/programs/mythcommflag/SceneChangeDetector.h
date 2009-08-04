@@ -15,9 +15,8 @@ class HistogramAnalyzer;
 class SceneChangeDetector : public FrameAnalyzer
 {
 public:
-    /* Ctor/dtor. */
     SceneChangeDetector(HistogramAnalyzer *ha, QString debugdir);
-    ~SceneChangeDetector(void);
+    virtual void deleteLater(void);
 
     /* FrameAnalyzer interface. */
     const char *name(void) const { return "SceneChangeDetector"; }
@@ -37,7 +36,10 @@ public:
         unsigned char   frequency;
     } SceneChangeData[UCHAR_MAX + 1];
 
-private:
+  protected:
+    virtual ~SceneChangeDetector(void) {}
+
+  private:
     HistogramAnalyzer       *histogramAnalyzer;
     float                   fps;
 

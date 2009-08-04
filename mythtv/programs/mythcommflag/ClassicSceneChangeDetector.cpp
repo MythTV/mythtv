@@ -18,10 +18,11 @@ ClassicSceneChangeDetector::ClassicSceneChangeDetector(unsigned int width,
     previousHistogram = new Histogram;
 }
 
-ClassicSceneChangeDetector::~ClassicSceneChangeDetector()
+void ClassicSceneChangeDetector::deleteLater(void)
 {
     delete histogram;
     delete previousHistogram;
+    SceneChangeDetectorBase::deleteLater();
 }
 
 void ClassicSceneChangeDetector::processFrame(unsigned char* frame)

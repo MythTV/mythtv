@@ -60,7 +60,7 @@ unsigned int ClassicLogoDetector::getRequiredAvailableBufferForSearch()
     return commDetectLogoSecondsNeeded;
 }
 
-ClassicLogoDetector::~ClassicLogoDetector()
+void ClassicLogoDetector::deleteLater(void)
 {
     commDetector = 0;
     if (edgeMask)
@@ -77,6 +77,8 @@ ClassicLogoDetector::~ClassicLogoDetector()
         delete [] logoMinValues;
     if (tmpBuf)
         delete [] tmpBuf;
+
+    LogoDetectorBase::deleteLater();
 }
 
 bool ClassicLogoDetector::searchForLogo(NuppelVideoPlayer* nvp)
