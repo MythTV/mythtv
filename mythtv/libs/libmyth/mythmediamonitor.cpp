@@ -330,9 +330,15 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     }
 }
 
-MediaMonitor::~MediaMonitor()
+void MediaMonitor::deleteLater(void)
 {
-    delete m_Thread;
+    if (m_Thread)
+    {
+        StopMonitoring();
+        delete m_Thread;
+        m_Thread = NULL;
+    }
+    QObject::deleteLater();
 }
 
 /** \fn MediaMonitor::RemoveDevice(const QString&)

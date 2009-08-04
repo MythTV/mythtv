@@ -94,13 +94,15 @@ MediaMonitorUnix::MediaMonitorUnix(QObject* par,
 }
 
 
-MediaMonitorUnix::~MediaMonitorUnix()
+void MediaMonitorUnix::deleteLater(void)
 {
-    if (m_fifo > 0)
+    if (m_fifo >= 0)
     {
         close(m_fifo);
+        m_fifo = -1;
         unlink(kUDEV_FIFO);
     }
+    MediaMonitor::deleteLater();
 }
 
 

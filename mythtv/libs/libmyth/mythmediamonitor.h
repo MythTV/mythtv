@@ -56,12 +56,8 @@ class MPUBLIC MediaMonitor : public QObject
     friend class MonitorThread;
     friend class MonitorThreadDarwin;
 
-  protected:
-    MediaMonitor(QObject* par, unsigned long interval, bool allowEject);
-
   public:
-    ~MediaMonitor();
-
+    virtual void deleteLater(void);
     bool IsActive(void) const { return m_Active; }
 
     virtual void StartMonitoring(void);
@@ -104,6 +100,9 @@ class MPUBLIC MediaMonitor : public QObject
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
 
   protected:
+    MediaMonitor(QObject *par, unsigned long interval, bool allowEject);
+    virtual ~MediaMonitor() {}
+
     void AttemptEject(MythMediaDevice *device);
     void CheckDevices(void);
     virtual void CheckDeviceNotifications(void) {};

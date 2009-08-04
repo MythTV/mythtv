@@ -4,10 +4,12 @@
 class MediaMonitorUnix : public MediaMonitor
 {
   public:
-    MediaMonitorUnix(QObject* par, unsigned long interval, bool allowEject);
-    ~MediaMonitorUnix();
+    MediaMonitorUnix(QObject *par, unsigned long interval, bool allowEject);
+    virtual void deleteLater(void);
 
   protected:
+    ~MediaMonitorUnix() {}
+
     void CheckDevices(void);
     void CheckDeviceNotifications(void);
     bool CheckFileSystemTable(void);

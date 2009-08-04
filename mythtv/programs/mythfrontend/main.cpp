@@ -1452,10 +1452,7 @@ int main(int argc, char **argv)
     pmanager->DestroyAllPlugins();
 
     if (mon)
-    {
-        mon->StopMonitoring();
-        delete mon;
-    }
+        mon->deleteLater();
 
     if (priv_thread_created)
     {
