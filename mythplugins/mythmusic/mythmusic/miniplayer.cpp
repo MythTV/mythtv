@@ -44,7 +44,7 @@ MiniPlayer::~MiniPlayer(void)
     m_displayTimer->disconnect();
     m_displayTimer = NULL;
 
-    m_displayTimer->disconnect();
+    m_infoTimer->disconnect();
     m_infoTimer = NULL;
 
     if (class LCD *lcd = LCD::Get())
@@ -115,7 +115,10 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "SELECT")
+        {
+            if (m_displayTimer)
                 m_displayTimer->stop();
+        }
         else if (action == "NEXTTRACK")
             gPlayer->next();
         else if (action == "PREVTRACK")
@@ -197,8 +200,11 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
                     else
                         m_infoText->SetText(tr("Mute: Off"));
 
-                    m_infoTimer->setSingleShot(true);
-                    m_infoTimer->start(5000);
+                    if (m_infoTimer)
+                    {
+                        m_infoTimer->setSingleShot(true);
+                        m_infoTimer->start(5000);
+                    }
                 }
 
                 if (m_volText)
@@ -248,7 +254,7 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     // restart the display timer on any keypress if it is active
-    if (m_displayTimer->isActive())
+    if (m_displayTimer && m_displayTimer->isActive())
         m_displayTimer->start();
 
     return handled;
