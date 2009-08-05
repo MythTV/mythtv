@@ -28,6 +28,7 @@
 #include <mythtv/util.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/compat.h>
+#include <mythtv/util.h>
 
 // MythTranscodeDaemon headers
 #include "mtd.h"
@@ -124,7 +125,7 @@ MythTranscodeDaemon::MythTranscodeDaemon(int port, bool log_stdout) :
     max_concurrent_transcodings(
         gContext->GetNumSetting("MTDConcurrentTranscodings", 1))
 {
-    nice(nice_level);
+    myth_nice(nice_level);
 
     connect(server_socket, SIGNAL(newConnection()),
             this,          SLOT(  newConnection()));

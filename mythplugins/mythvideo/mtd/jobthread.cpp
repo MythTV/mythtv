@@ -25,6 +25,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/compat.h>
+#include <mythtv/util.h>
 
 #include "jobthread.h"
 #include "mtd.h"
@@ -646,7 +647,7 @@ DVDISOCopyThread::DVDISOCopyThread(
 
 void DVDISOCopyThread::run(void)
 {
-    nice(nice_level);
+    myth_nice(nice_level);
     SetJobName(QString(QObject::tr("ISO copy of %1")).arg(rip_name));
     if (!IsCancelled())
     {
@@ -793,7 +794,7 @@ DVDPerfectThread::DVDPerfectThread(
 
 void DVDPerfectThread::run(void)
 {
-    nice(nice_level);
+    myth_nice(nice_level);
 
     SetJobName(QString(QObject::tr("Perfect DVD Rip of %1")).arg(rip_name));
 
@@ -847,7 +848,7 @@ DVDTranscodeThread::DVDTranscodeThread(
 
 void DVDTranscodeThread::run(void)
 {
-    nice(nice_level);
+    myth_nice(nice_level);
 
     // Make working directory
     if (IsCancelled() || !makeWorkingDirectory())

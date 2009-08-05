@@ -1180,7 +1180,7 @@ namespace
 
         void handleImage(const QString &name, const QString &filename)
         {
-            MythUIImage *image;
+            MythUIImage *image = NULL;
             UIUtilW::Assign(m_screen, image, name);
             if (image)
             {

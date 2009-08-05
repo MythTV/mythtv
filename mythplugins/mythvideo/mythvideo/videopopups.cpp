@@ -20,8 +20,8 @@ bool CastDialog::Create()
     if (!LoadWindowFromXML("video-ui.xml", "castpopup", this))
         return false;
 
-    MythUIButtonList *castList;
-    MythUIButton *okButton;
+    MythUIButtonList *castList = NULL;
+    MythUIButton     *okButton = NULL;
 
     bool err = false;
     UIUtilE::Assign(this, castList, "cast", &err);
@@ -62,8 +62,8 @@ bool PlotDialog::Create()
     if (!LoadWindowFromXML("video-ui.xml", "plotpopup", this))
         return false;
 
-    MythUIText *plotText;
-    MythUIButton *okButton;
+    MythUIText   *plotText = NULL;
+    MythUIButton *okButton = NULL;
 
     bool err = false;
     UIUtilE::Assign(this, plotText, "plot", &err);
