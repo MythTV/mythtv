@@ -313,6 +313,7 @@
 
       <container name="enterimdb">
          <area>224,229,367,200</area>
+         <context>3</context>
 
          <image name="box" draworder="7">
             <!-- 367x156 black box (6, 6, 341, 130) -->
