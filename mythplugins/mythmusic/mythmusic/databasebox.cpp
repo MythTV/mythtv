@@ -441,11 +441,16 @@ void DatabaseBox::BlankCDRW()
     QString cmd = QString("cdrecord -v  dev= %1 -blank=%2")
         .arg(scsidev).arg(blanktype);
 
-    VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
+    VERBOSE(VB_GENERAL, QString("DatabaseBox::BlankCDRW()") +
             QString(" cmd: '%1'").arg(cmd));
 
     QByteArray command = cmd.toAscii();
-    system(command.constData());
+    errno = 0;
+    if (system(command.constData()) < 0 && errno)
+    {
+        VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
+                QString(" cmd: '%1' Failed!").arg(cmd));
+    }
 
     record_progress->Close();
     record_progress->deleteLater();

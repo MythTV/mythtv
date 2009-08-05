@@ -44,7 +44,7 @@ vcedit_state *vcedit_new_state(void)
 	return state;
 }
 
-char *vcedit_error(vcedit_state *state)
+const char *vcedit_error(vcedit_state *state)
 {
 	return state->lasterror;
 }
@@ -56,7 +56,7 @@ vorbis_comment *vcedit_comments(vcedit_state *state)
 
 static void vcedit_clear_internals(vcedit_state *state)
 {
-    char *tmp;
+    const char *tmp;
 	if(state->vc)
 	{
 		vorbis_comment_clear(state->vc);
