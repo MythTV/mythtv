@@ -1170,7 +1170,10 @@ void ZMServer::handleDeleteEvent(vector<string> tokens)
 
     // run zmaudit.pl to clean everything up
     string command(g_binPath + "/zmaudit.pl &");
-    system(command.c_str());
+    errno = 0;
+    if (system(command.c_str()) < 0 && errno)
+        cerr << "Failed to run '" << command << "'" << endl;
+
     send(outStr);
 }
 
@@ -1218,7 +1221,9 @@ void ZMServer::handleRunZMAudit(void)
     if (m_debug)
         cout << "Running command: " << command << endl;
 
-    system(command.c_str());
+    errno = 0;
+    if (system(command.c_str()) < 0 && errno)
+        cerr << "Failed to run '" << command << "'" << endl;
 
     ADD_STR(outStr, "OK")
     send(outStr);
