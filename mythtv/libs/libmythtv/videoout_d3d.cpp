@@ -227,7 +227,7 @@ bool D3D9Context::Create(QSize size, HWND window)
     d3dpp.BackBufferHeight       = size.height();
     d3dpp.BackBufferCount        = 1;
     d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
-    d3dpp.SwapEffect             = D3DSWAPEFFECT_FLIP;
+    d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
     d3dpp.Flags                  = D3DPRESENTFLAG_VIDEO;
     d3dpp.PresentationInterval   = D3DPRESENT_INTERVAL_ONE;
 
@@ -278,8 +278,8 @@ bool D3D9Context::Test(bool &reset)
                 case D3DERR_DEVICENOTRESET:
                     VERBOSE(VB_IMPORTANT, D3DLOC +
                             "The device was lost and needs to be reset.");
-                    result = false;
-                    reset  = true;
+                    result  = false;
+                    reset  |= true;
                     break;
 
                 case D3DERR_DEVICELOST:
@@ -327,7 +327,6 @@ bool D3D9Context::Begin(void)
         VERBOSE(VB_IMPORTANT, D3DERR + "BeginScene() failed.");
         return false;
     }
-    m_lock.lock();
     return true;
 }
 
@@ -340,7 +339,6 @@ bool D3D9Context::End(void)
         VERBOSE(VB_IMPORTANT, D3DERR + "EndScene() failed.");
         return false;
     }
-    m_lock.unlock();
     return true;
 }
 
@@ -999,7 +997,6 @@ void VideoOutputD3D::DestroyContext(void)
 void VideoOutputD3D::WindowResized(const QSize &new_size)
 {
     QMutexLocker locker(&m_lock);
-
     windows[0].SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
     windows[0].SetDisplayAspect(
         ((float)new_size.width()) / new_size.height());
@@ -1304,7 +1301,7 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     if (m_ctx)
     {
-        m_ctx_valid = m_ctx->Test(m_ctx_reset);
+        m_ctx_valid |= m_ctx->Test(m_ctx_reset);
         if (m_ctx_reset)
             SetupContext();
         if (m_ctx_valid)

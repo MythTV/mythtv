@@ -3,12 +3,8 @@
 #ifndef VIDEOOUT_D3D_H_
 #define VIDEOOUT_D3D_H_
 
-/* ACK! <windows.h> and <d3d3.h> should only be in cpp's compiled in
- * windows only. Some of the variables in VideoOutputDX need to be
- * moved to a private class before removing these includes though.
- */
-#include <windows.h> // HACK HACK HACK
-#include <d3d9.h>    // HACK HACK HACK
+#include <windows.h>
+#include <d3d9.h>
 
 // MythTV headers
 #include "videooutbase.h"
