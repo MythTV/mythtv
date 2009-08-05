@@ -23,7 +23,7 @@ GameDetailsPopup::~GameDetailsPopup(void)
 
 void GameDetailsPopup::handleText(const QString &name, const QString &value)
 {
-    MythUIText *textarea;
+    MythUIText *textarea = NULL;
     UIUtilE::Assign(this, textarea, name);
     if (textarea)
     {
@@ -33,7 +33,7 @@ void GameDetailsPopup::handleText(const QString &name, const QString &value)
 
 void GameDetailsPopup::handleImage(const QString &name, const QString &filename)
 {
-    MythUIImage *image;
+    MythUIImage *image = NULL;
     UIUtilW::Assign(this, image, name);
     if (image)
     {
