@@ -13,7 +13,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     readthreadlive(true), readsLocked(false),
     rbuffer(new RingBuffer(filename, false, usereadahead, retries)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    refLock(QMutex::NonRecursive), refCount(0)
+    refLock(QMutex::NonRecursive), refCount(0), writemode(false)
 {
     QFileInfo finfo = QFileInfo(filename);
     pginfo =
@@ -26,11 +26,11 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     }
 }
 
-FileTransfer::FileTransfer(QString &filename, MythSocket *remote) :
+FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     readthreadlive(true), readsLocked(false),
-    rbuffer(new RingBuffer(filename, false)),
+    rbuffer(new RingBuffer(filename, write)),
     sock(remote), ateof(false), lock(QMutex::NonRecursive),
-    refLock(QMutex::NonRecursive), refCount(0)
+    refLock(QMutex::NonRecursive), refCount(0), writemode(write)
 {
     QFileInfo finfo = QFileInfo(filename);
     pginfo =
@@ -97,6 +97,9 @@ void FileTransfer::Stop(void)
         readsLocked = true;
     }
 
+    if (writemode)
+        rbuffer->WriterFlush();
+
     if (pginfo)
         pginfo->UpdateInUseMark();
 }
@@ -156,6 +159,39 @@ int FileTransfer::RequestBlock(int size)
         tot += ret;
         if (ret < request)
             break; // we hit eof
+    }
+
+    if (pginfo)
+        pginfo->UpdateInUseMark();
+
+    return (ret < 0) ? -1 : tot;
+}
+
+int FileTransfer::WriteBlock(int size)
+{
+    if (!writemode || !rbuffer)
+        return -1;
+
+    int tot = 0;
+    int ret = 0;
+
+    QMutexLocker locker(&lock);
+
+    requestBuffer.resize(max((size_t)max(size,0) + 128, requestBuffer.size()));
+    char *buf = &requestBuffer[0];
+    while (tot < size)
+    {
+        int request = size - tot;
+
+        if (!sock->readData(buf, (uint)request))
+            break;
+
+        ret = rbuffer->Write(buf, request);
+        
+        if (ret <= 0)
+            break;
+
+        tot += request;
     }
 
     if (pginfo)

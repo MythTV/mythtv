@@ -12,7 +12,8 @@ using namespace std;
 #include "compat.h"
 #include "mythverbose.h"
 
-RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries,
+RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
+                       int _retries,
                        const QStringList *possibleAuxiliaryFiles) :
     path(_path),
     usereadahead(useRA),  retries(_retries),
@@ -20,8 +21,15 @@ RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries,
     readposition(0),      recordernum(0),
     lock(QMutex::NonRecursive),
     controlSock(NULL),    sock(NULL),
-    query("QUERY_FILETRANSFER %1")
+    query("QUERY_FILETRANSFER %1"),
+    writemode(write)
 {
+    if (writemode)
+    {
+        usereadahead = false;
+        retries = -1;
+    }
+
     if (possibleAuxiliaryFiles)
         possibleauxfiles = *possibleAuxiliaryFiles;
     Open();
@@ -86,8 +94,8 @@ MythSocket *RemoteFile::openSocket(bool control)
     }
     else
     {
-        strlist.append( QString("ANN FileTransfer %1 %2 %3")
-            .arg(hostname).arg(usereadahead).arg(retries) );
+        strlist.append( QString("ANN FileTransfer %1 %2 %3 %4")
+            .arg(hostname).arg(writemode).arg(usereadahead).arg(retries) );
         strlist << QString("%1").arg(dir);
         strlist << sgroup;
 
@@ -214,6 +222,92 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     Reset();
 
     return retval;
+}
+
+int RemoteFile::Write(const void *data, int size)
+{
+    int recv = 0;
+    int sent = 0;
+    unsigned zerocnt = 0;
+    bool error = false;
+    bool response = false;
+
+    if (!writemode)
+    {
+        VERBOSE(VB_NETWORK,
+                "RemoteFile::Write(): Called when not in write mode");
+        return -1;
+    }
+
+    if (!sock)
+    {
+        VERBOSE(VB_NETWORK, "RemoteFile::Read(): Called with no socket");
+        return -1;
+    }
+
+    if (!sock->isOpen() || sock->error())
+        return -1;
+   
+    if (!controlSock->isOpen() || controlSock->error())
+        return -1;
+    
+    lock.lock();
+    
+    QStringList strlist( QString(query).arg(recordernum) );
+    strlist << "WRITE_BLOCK";
+    strlist << QString::number(size);
+    controlSock->writeStringList(strlist);
+
+    recv = size;
+    while (sent < recv && !error && zerocnt++ < 50)
+    {
+        int ret = sock->writeBlock((char *)data + sent, recv - sent);
+        if (ret > 0)
+        {
+            sent += ret;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "RemoteFile::Read(): socket error");
+            error = true;
+            break;
+        }
+
+        if (controlSock->bytesAvailable() > 0)
+        {
+            controlSock->readStringList(strlist, true);
+            recv = strlist[0].toInt(); // -1 on backend error
+            response = true;
+        }
+    }
+
+    if (!error && !response)
+    {
+        if (controlSock->readStringList(strlist, true))
+        {
+            recv = strlist[0].toInt(); // -1 on backend error
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "RemoteFile::Write(): No response from control socket.");
+            recv = -1;
+        }
+    }
+
+    lock.unlock();
+
+    VERBOSE(VB_NETWORK,
+            QString("RemoteFile::Write(): reqd=%1, sent=%2, rept=%3, error=%4")
+                    .arg(size).arg(sent).arg(recv).arg(error));
+
+    if (recv < 0)
+        return recv;
+
+    if (error || recv != sent)
+        sent = -1;
+
+    return sent;
 }
 
 int RemoteFile::Read(void *data, int size)
@@ -359,3 +453,4 @@ void RemoteFile::SetTimeout(bool fast)
     timeoutisfast = fast;
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

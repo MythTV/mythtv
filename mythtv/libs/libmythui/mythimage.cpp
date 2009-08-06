@@ -244,7 +244,7 @@ bool MythImage::Load(const QString &filename, bool scale)
         if (filename.startsWith("myth://"))
         {
             im = new QImage();
-            RemoteFile *rf = new RemoteFile(filename, false, 0);
+            RemoteFile *rf = new RemoteFile(filename, false, false, 0);
 
             QByteArray data;
             bool ret = rf->SaveAs(data);

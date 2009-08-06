@@ -22,9 +22,9 @@ class FileTransfer
     friend class QObject; // quiet OSX gcc warning
 
   public:
-    FileTransfer(QString &filename, MythSocket *remote);
     FileTransfer(QString &filename, MythSocket *remote,
                  bool usereadahead, int retries);
+    FileTransfer(QString &filename, MythSocket *remote, bool write);
 
     MythSocket *getSocket() { return sock; }
 
@@ -38,6 +38,7 @@ class FileTransfer
     void Pause(void);
     void Unpause(void);
     int RequestBlock(int size);
+    int WriteBlock(int size);
 
     long long Seek(long long curpos, long long pos, int whence);
 
@@ -62,6 +63,8 @@ class FileTransfer
     QMutex lock;
     QMutex refLock;
     int refCount;
+
+    bool writemode;
 };
 
 #endif

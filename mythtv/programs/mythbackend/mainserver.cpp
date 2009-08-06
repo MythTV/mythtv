@@ -949,7 +949,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 {
     QStringList retlist( "OK" );
 
-    if (commands.size() < 3 || commands.size() > 5)
+    if (commands.size() < 3 || commands.size() > 6)
     {
         QString info = "";
         if (commands.size() == 2)
@@ -1073,24 +1073,67 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         QStringList::const_iterator it = slist.begin();
         QUrl qurl = *(++it);
         QString wantgroup = *(++it);
-        QString filename = LocalFilePath(qurl, wantgroup);
+        QString filename;
         QStringList checkfiles;
         for (++it; it != slist.end(); ++it)
             checkfiles += *it;
 
         FileTransfer *ft = NULL;
+        bool writemode = false;
         bool usereadahead = true;
         int retries = -1;
-        if (commands.size() >= 5)
+        if (commands.size() >= 6)
         {
-            usereadahead = commands[3].toInt();
-            retries = commands[4].toInt();
+            writemode = commands[3].toInt();
+            usereadahead = commands[4].toInt();
+            retries = commands[5].toInt();
         }
 
-        if (retries >= 0)
+        if (writemode)
+        {
+            if (wantgroup.isEmpty())
+                wantgroup = "Default";
+
+            StorageGroup sgroup(wantgroup, gContext->GetHostName());
+            QString dir = sgroup.FindNextDirMostFree();
+            if (dir.isEmpty())
+            {
+                VERBOSE(VB_IMPORTANT, "Unable to determine directory "
+                        "to write to in FileTransfer write command");
+                return;
+            }
+
+            QString basename = qurl.path();
+            if (basename.isEmpty())
+            {
+                VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
+                        "filename is empty in url '%1'.")
+                        .arg(qurl.toString()));
+                return;
+            }
+
+            if (basename.contains("/../"))
+            {
+                VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
+                        "filename '%1' does not pass sanity checks.")
+                        .arg(basename));
+                return;
+            }
+
+            filename = dir + "/" + basename;
+        }
+        else
+            filename = LocalFilePath(qurl, wantgroup);
+
+        if (writemode)
+        {
+            socket->setCallbacks(NULL);
+            ft = new FileTransfer(filename, socket, true);
+        }
+        else if (retries >= 0)
             ft = new FileTransfer(filename, socket, usereadahead, retries);
         else
-            ft = new FileTransfer(filename, socket);
+            ft = new FileTransfer(filename, socket, false);
 
         sockListLock.lock();
         fileTransferList.push_back(ft);
@@ -3868,6 +3911,12 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         int size = slist[2].toInt();
 
         retlist << QString::number(ft->RequestBlock(size));
+    }
+    else if (command == "WRITE_BLOCK")
+    {
+        int size = slist[2].toInt();
+
+        retlist << QString::number(ft->WriteBlock(size));
     }
     else if (command == "SEEK")
     {

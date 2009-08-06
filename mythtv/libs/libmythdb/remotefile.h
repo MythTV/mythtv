@@ -13,6 +13,7 @@ class MPUBLIC RemoteFile
 {
   public:
     RemoteFile(const QString &url,
+               bool write = false,
                bool usereadahead = true,
                int retries = -1,
                const QStringList *possibleAuxiliaryFiles = NULL);
@@ -23,6 +24,7 @@ class MPUBLIC RemoteFile
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 
+    int Write(const void *data, int size);
     int Read(void *data, int size);
     void Reset(void);
 
@@ -58,6 +60,8 @@ class MPUBLIC RemoteFile
     MythSocket     *controlSock;
     MythSocket     *sock;
     QString         query;
+
+    bool            writemode;
 
     QStringList     possibleauxfiles;
     QStringList     auxfiles;

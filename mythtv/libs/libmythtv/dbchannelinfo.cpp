@@ -109,7 +109,7 @@ bool PixmapChannel::CacheChannelIcon(void)
     if (qurl.host().isEmpty())
         return false;
 
-    RemoteFile *rf = new RemoteFile(url, false, 0);
+    RemoteFile *rf = new RemoteFile(url, false, false, 0);
 
     QByteArray data;
     bool ret = rf->SaveAs(data);

@@ -339,6 +339,62 @@ bool MythSocket::writeStringList(QStringList &list)
 }
 
 /**
+ *  \brief Read len bytes to data from socket
+ *  \return true if desired len of data is read
+ */
+bool MythSocket::readData(char *data, quint64 len)
+{
+    if (state() != Connected)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "readData: Error, called with unconnected socket.");
+        return false;
+    }
+
+    quint64 bytes_read = 0;
+    uint zerocnt = 0;
+
+    while (bytes_read < len)
+    {
+        qint64 btw = len - bytes_read >= kSocketBufferSize ?
+                                       kSocketBufferSize : len - bytes_read;
+        qint64 sret = readBlock((char *)data + bytes_read, btw);
+        if (sret > 0)
+        {
+            zerocnt = 0;
+            bytes_read += sret;
+        }
+        else if (!isValid())
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "readData: Error, socket went unconnected");
+            close();
+            return false;
+        }
+        else if (sret < 0 && error() != MSocketDevice::NoError)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    QString("readData: Error, readBlock: %1")
+                    .arg(errorToString()));
+            close();
+            return false;
+        }
+        else
+        {
+            zerocnt++;
+            if (zerocnt > 5000)
+            {
+                VERBOSE(VB_IMPORTANT, LOC +
+                        "readData: Error, zerocnt timeout");
+                return false;
+            }
+            usleep(1000);
+         }
+    }
+    return true;
+}
+
+/**
  *  \brief Write len bytes to data to socket
  *  \return true if entire len of data is written
  */

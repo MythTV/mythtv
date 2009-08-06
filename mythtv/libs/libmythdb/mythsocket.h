@@ -92,6 +92,7 @@ class MPUBLIC MythSocket : public MSocketDevice
 
     bool readStringList(QStringList &list, bool quickTimeout = false);
     bool writeStringList(QStringList &list);
+    bool readData(char *data, quint64 len);
     bool writeData(const char *data, quint64 len);
 
     bool connect(const QHostAddress &addr, quint16 port);

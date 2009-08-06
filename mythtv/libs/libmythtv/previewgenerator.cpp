@@ -388,7 +388,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     {
         data.resize(0);
         url = *it;
-        RemoteFile *rf = new RemoteFile(url, false, 0);
+        RemoteFile *rf = new RemoteFile(url, false, false, 0);
         ok = rf->SaveAs(data);
         delete rf;
     }

@@ -1107,7 +1107,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
 
     if (filename.startsWith("myth://"))
     {
-        RemoteFile *rf = new RemoteFile(filename, false, 0);
+        RemoteFile *rf = new RemoteFile(filename, false, false, 0);
 
         QByteArray data;
         bool loaded = rf->SaveAs(data);
@@ -1174,7 +1174,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     GetScreenSettings(width, wmult, height, hmult);
     if (filename.startsWith("myth://"))
     {
-        RemoteFile *rf = new RemoteFile(filename, false, 0);
+        RemoteFile *rf = new RemoteFile(filename, false, false, 0);
 
         QByteArray data;
         bool loaded = rf->SaveAs(data);

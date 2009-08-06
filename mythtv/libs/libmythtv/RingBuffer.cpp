@@ -153,15 +153,33 @@ RingBuffer::RingBuffer(const QString &lfilename,
 
     if (write)
     {
-        tfw = new ThreadedFileWriter(
-            filename, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
-
-        if (!tfw->Open())
+        if (filename.startsWith("myth://"))
         {
-            delete tfw;
-            tfw = NULL;
+            remotefile = new RemoteFile(filename, true);
+            if (!remotefile->isOpen())
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("RingBuffer::RingBuffer(): Failed to open "
+                                "remote file (%1) for write").arg(filename));
+                delete remotefile;
+                remotefile = NULL;
+            }
+            else
+                writemode = true;
         }
-        writemode = true;
+        else
+        {
+            tfw = new ThreadedFileWriter(
+                filename, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+
+            if (!tfw->Open())
+            {
+                delete tfw;
+                tfw = NULL;
+            }
+            else
+                writemode = true;
+        }
         return;
     }
 
@@ -411,7 +429,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             }
         }
 
-        remotefile = new RemoteFile(filename, true, -1, &auxFiles);
+        remotefile = new RemoteFile(filename, false, true, -1, &auxFiles);
         if (!remotefile->isOpen())
         {
             VERBOSE(VB_IMPORTANT,
@@ -460,6 +478,7 @@ RingBuffer::~RingBuffer(void)
     if (remotefile)
     {
         delete remotefile;
+        remotefile = NULL;
     }
 
     if (tfw)
@@ -1361,12 +1380,15 @@ int RingBuffer::Write(const void *buf, uint count)
         return ret;
     }
 
-    if (!tfw)
+    if (!tfw && !remotefile)
         return ret;
 
     pthread_rwlock_rdlock(&rwlock);
 
-    ret = tfw->Write(buf, count);
+    if (tfw)
+        ret = tfw->Write(buf, count);
+    else
+        ret = remotefile->Write(buf, count);
     writepos += ret;
 
     pthread_rwlock_unlock(&rwlock);
@@ -1387,6 +1409,9 @@ void RingBuffer::Sync(void)
  */
 long long RingBuffer::Seek(long long pos, int whence)
 {
+    if (writemode)
+        return WriterSeek(pos, whence);
+
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
     wantseek = false;
@@ -1476,7 +1501,8 @@ void RingBuffer::WriterFlush(void)
  */
 void RingBuffer::SetWriteBufferSize(int newSize)
 {
-    tfw->SetWriteBufferSize(newSize);
+    if (tfw)
+        tfw->SetWriteBufferSize(newSize);
 }
 
 /** \fn RingBuffer::SetWriteBufferMinWriteSize(int)
@@ -1484,7 +1510,8 @@ void RingBuffer::SetWriteBufferSize(int newSize)
  */
 void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
 {
-    tfw->SetWriteBufferMinWriteSize(newMinSize);
+    if (tfw)
+        tfw->SetWriteBufferMinWriteSize(newMinSize);
 }
 
 /** \fn RingBuffer::GetReadPosition(void) const
