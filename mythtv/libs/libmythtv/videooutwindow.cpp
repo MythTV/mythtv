@@ -91,7 +91,10 @@ VideoOutWindow::VideoOutWindow() :
                      gContext->GetNumSetting("yScanDisplacement", 0));
     db_use_gui_size = gContext->GetNumSetting("GuiSizeForTV", 0);
 
-    QDesktopWidget *desktop = QApplication::desktop();
+    QDesktopWidget *desktop = NULL;
+    if (QApplication::type() == QApplication::GuiClient)
+        desktop = QApplication::desktop();
+
     if (desktop)
     {
         screen_num = desktop->primaryScreen();
