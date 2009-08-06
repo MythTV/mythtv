@@ -20,15 +20,15 @@ MetaIOWavPack::~MetaIOWavPack(void)
 TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
-    TagLib::WavPack::File *mpegfile = new TagLib::WavPack::File(fname.constData());
+    TagLib::WavPack::File *wpfile = new TagLib::WavPack::File(fname.constData());
     
-    if (!mpegfile->isOpen())
+    if (!wpfile->isOpen())
     {
-        delete mpegfile;
-        mpegfile = NULL;
+        delete wpfile;
+        wpfile = NULL;
     }
     
-    return mpegfile;
+    return wpfile;
 }
 
 /*!
@@ -68,10 +68,10 @@ bool MetaIOWavPack::write(Metadata* mdata, bool exclusive)
         TagLib::String key = "Album artist";
         TagLib::APE::Item item = TagLib::APE::Item(key,
             QStringToTString(mdata->CompilationArtist()));
-        wpfile->APETag()->setItem(key, item);
+        tag->setItem(key, item);
     }
     else
-        wpfile->APETag()->removeItem("Album artist");
+        tag->removeItem("Album artist");
 
     bool result = wpfile->save();
 

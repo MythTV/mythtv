@@ -1,6 +1,7 @@
 /*
-    MythTV WMA Decoder
-    Written by Kevin Kuphal
+    MythMusic libav* Decoder
+    Originally written by Kevin Kuphal with contributions and updates from
+    many others
 
     Special thanks to
        ffmpeg team for libavcodec and libavformat
@@ -13,6 +14,7 @@
     Revision History
         - Initial release
         - 1/9/2004 - Improved seek support
+        - ?/?/2009 - Extended to support many more filetypes and bug fixes
 */
 
 // C++ headers
@@ -38,7 +40,7 @@ using namespace std;
 #include "metaioavfcomment.h"
 #include "metaioid3.h"
 #include "metaioflacvorbiscomment.h"
-#include "metaiooggvorbiscomment.h"
+#include "metaiooggvorbis.h"
 #include "metaiomp4.h"
 #include "metaiowavpack.h"
 
@@ -165,8 +167,8 @@ bool avfDecoder::initialize()
 
     if (error < 0)
     {
-        VERBOSE(VB_GENERAL, QString("Could open file with the AV decoder. "
-                                    "Error: %1").arg(error));
+        VERBOSE(VB_IMPORTANT, QString("Could not open file (%1)").arg(filename));
+        VERBOSE(VB_IMPORTANT, QString("AV decoder. Error: %1").arg(error));
         deinit();
         return FALSE;
     }
@@ -442,7 +444,7 @@ MetaIO* avfDecoder::doCreateTagger(void)
     if (extension == "mp3")
         return new MetaIOID3();
     else if (extension == "ogg" || extension == "oga")
-        return new MetaIOOggVorbisComment();
+        return new MetaIOOggVorbis();
     else if (extension == "flac")
         return new MetaIOFLACVorbisComment();
     else if (extension == "m4a")

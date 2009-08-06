@@ -4,7 +4,7 @@
 #include "metadata.h"
 #include "encoder.h"
 #include "vorbisencoder.h"
-#include "metaiooggvorbiscomment.h"
+#include "metaiooggvorbis.h"
 
 #include <vorbis/vorbisfile.h>
 
@@ -24,12 +24,11 @@ int write_page(ogg_page *page, FILE *fp)
 
 VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
                              Metadata *metadata)
-             : Encoder(outfile, qualitylevel, metadata)
+              : Encoder(outfile, qualitylevel, metadata), m_metadata(metadata)
 {
     int result;
 
     vorbis_comment_init(&vc);
-    MetaIOOggVorbisComment::getRawVorbisComment(metadata, &vc);
 
     packetsdone = 0;
     bytes_written = 0;
@@ -90,6 +89,15 @@ VorbisEncoder::~VorbisEncoder()
     vorbis_dsp_clear(&vd);
     vorbis_comment_clear(&vc);
     vorbis_info_clear(&vi);
+
+    // Now write the Metadata
+    if (m_metadata)
+    {
+        QString filename = m_metadata->Filename();
+        m_metadata->setFilename(m_outfile);
+        MetaIOOggVorbis().write(m_metadata);
+        m_metadata->setFilename(filename);
+    }
 }
 
 int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)

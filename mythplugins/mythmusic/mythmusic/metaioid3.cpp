@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include "metaioid3.h"
 #include "metadata.h"
 
@@ -145,7 +143,7 @@ Metadata *MetaIOID3::read(QString filename)
     if (!tpelist.isEmpty())
         tpeframe = (TextIdentificationFrame *)tpelist.front();
     
-    if(tpeframe && !tpeframe->toString().isEmpty())
+    if (tpeframe && !tpeframe->toString().isEmpty())
     {
         QString compilation_artist = TStringToQString(tpeframe->toString())
                                                                     .trimmed();
@@ -170,14 +168,14 @@ Metadata *MetaIOID3::read(QString filename)
     }
 
     // Length
-    if(!mpegfile->ID3v2Tag()->frameListMap()["TLEN"].isEmpty())
+    if (!mpegfile->ID3v2Tag()->frameListMap()["TLEN"].isEmpty())
     {
         int length = tag->frameListMap()["TLEN"].front()->toString().toInt();
         metadata->setLength(length);
     }
 
     // Album Art
-    if(!tag->frameListMap()["APIC"].isEmpty())
+    if (!tag->frameListMap()["APIC"].isEmpty())
     {
         QList<struct AlbumArtImage> albumart;
         albumart = readAlbumArt(tag);
@@ -251,7 +249,7 @@ QImage MetaIOID3::getAlbumArt(QString filename, ImageType type)
             {
                 AttachedPictureFrame *frame =
                                     static_cast<AttachedPictureFrame *>(*it);
-                if(frame && frame->type() == apicType)
+                if (frame && frame->type() == apicType)
                 {
                     QImage picture;
                     picture.loadFromData((const uchar *)frame->picture().data(),
@@ -358,7 +356,7 @@ UserTextIdentificationFrame* MetaIOID3::find(TagLib::ID3v2::Tag *tag,
   {
     UserTextIdentificationFrame *f =
                                 static_cast<UserTextIdentificationFrame *>(*it);
-    if(f && f->description() == description)
+    if (f && f->description() == description)
       return f;
   }
   return 0;

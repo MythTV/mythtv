@@ -27,6 +27,8 @@ class VorbisEncoder : public Encoder
     vorbis_dsp_state vd;
     vorbis_block vb;
     vorbis_info vi;
+
+    Metadata *m_metadata;
 };
 
 #endif
