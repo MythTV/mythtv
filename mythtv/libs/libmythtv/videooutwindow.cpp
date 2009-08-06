@@ -58,6 +58,8 @@ VideoOutWindow::VideoOutWindow() :
     db_pip_size(26),
     db_scaling_allowed(true),
 
+    using_xinerama(false), screen_num(0), screen_geom(0, 0, 1024, 768),
+
     // Manual Zoom
     mz_scale_v(1.0f), mz_scale_h(1.0f), mz_move(0, 0),
 
@@ -90,20 +92,21 @@ VideoOutWindow::VideoOutWindow() :
     db_use_gui_size = gContext->GetNumSetting("GuiSizeForTV", 0);
 
     QDesktopWidget *desktop = QApplication::desktop();
-    screen_num = desktop->primaryScreen();
-    using_xinerama  = (GetNumberXineramaScreens() > 1);
-    if (using_xinerama)
+    if (desktop)
     {
-        screen_num = gContext->GetNumSetting("XineramaScreen", screen_num);
-        if (screen_num >= desktop->numScreens())
-            screen_num = 0;
+        screen_num = desktop->primaryScreen();
+        using_xinerama  = (GetNumberXineramaScreens() > 1);
+        if (using_xinerama)
+        {
+            screen_num = gContext->GetNumSetting("XineramaScreen", screen_num);
+            if (screen_num >= desktop->numScreens())
+                screen_num = 0;
+        }
+    
+        screen_geom = desktop->geometry();
+        if (screen_num >= 0)
+            screen_geom = desktop->screenGeometry(screen_num);
     }
-
-    screen_geom = desktop->geometry();
-    if (screen_num >= 0)
-        screen_geom = desktop->screenGeometry(screen_num);
-    if (screen_geom.isNull())
-        screen_geom = QRect(QPoint(0,0), QSize(1024,768));
 }
 
 /**

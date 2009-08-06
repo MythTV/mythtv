@@ -46,7 +46,8 @@ int GetNumberXineramaScreens(void)
 #else // if !USING_X11
 #if CONFIG_DARWIN
     // Mac OS X when not using X11 server supports Xinerama.
-    nr_xinerama_screens = QApplication::desktop()->numScreens();
+    if (QApplication::desktop())
+        nr_xinerama_screens = QApplication::desktop()->numScreens();
 #endif // CONFIG_DARWIN
 #endif // !USING_X11
     return nr_xinerama_screens;
