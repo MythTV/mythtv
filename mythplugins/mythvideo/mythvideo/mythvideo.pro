@@ -11,10 +11,13 @@ target.path = $${LIBDIR}/mythtv/plugins
 installscripts.path = $${PREFIX}/share/mythtv/mythvideo/scripts
 installscripts.files = scripts/*.pl scripts/*.py scripts/README
 
+installscriptsttvdb.path = $${PREFIX}/share/mythtv/mythvideo/scripts/ttvdb
+installscriptsttvdb.files = scripts/ttvdb/*.py scripts/ttvdb/*.conf
+
 installscriptmodules.path = $${PREFIX}/share/mythtv/mythvideo/scripts/MythTV
 installscriptmodules.files = scripts/MythTV/MythVideoCommon.pm
 
-INSTALLS += installscripts installscriptmodules target
+INSTALLS += installscripts installscriptsttvdb installscriptmodules target
 
 # Input
 
