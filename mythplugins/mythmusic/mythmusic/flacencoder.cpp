@@ -7,7 +7,7 @@ using namespace std;
 
 #include "metadata.h"
 #include "flacencoder.h"
-#include "metaioflacvorbiscomment.h"
+#include "metaioflacvorbis.h"
 
 #include <FLAC/export.h>
 #if !defined(NEWFLAC)
@@ -90,7 +90,7 @@ FlacEncoder::~FlacEncoder()
     {
         QString filename = m_metadata->Filename();
         m_metadata->setFilename(m_outfile);
-        MetaIOFLACVorbisComment().write(m_metadata);
+        MetaIOFLACVorbis().write(m_metadata);
         m_metadata->setFilename(filename);
     }
 }

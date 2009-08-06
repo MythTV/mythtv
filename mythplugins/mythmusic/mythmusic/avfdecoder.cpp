@@ -39,7 +39,7 @@ using namespace std;
 #include "metadata.h"
 #include "metaioavfcomment.h"
 #include "metaioid3.h"
-#include "metaioflacvorbiscomment.h"
+#include "metaioflacvorbis.h"
 #include "metaiooggvorbis.h"
 #include "metaiomp4.h"
 #include "metaiowavpack.h"
@@ -446,7 +446,7 @@ MetaIO* avfDecoder::doCreateTagger(void)
     else if (extension == "ogg" || extension == "oga")
         return new MetaIOOggVorbis();
     else if (extension == "flac")
-        return new MetaIOFLACVorbisComment();
+        return new MetaIOFLACVorbis();
     else if (extension == "m4a")
         return new MetaIOMP4();
     else if (extension == "wv")
