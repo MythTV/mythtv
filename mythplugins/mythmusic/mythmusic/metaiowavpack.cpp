@@ -8,18 +8,27 @@
 
 #include <mythtv/mythcontext.h>
 
-#undef QStringToTString
-#define QStringToTString(s) TagLib::String(s.toUtf8().data(), TagLib::String::UTF8)
-#undef TStringToQString
-#define TStringToQString(s) QString::fromUtf8(s.toCString(true))
-
 MetaIOWavPack::MetaIOWavPack(void)
-    : MetaIO(".wv")
+    : MetaIOTagLib(".wv")
 {
 }
 
 MetaIOWavPack::~MetaIOWavPack(void)
 {
+}
+
+TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
+{
+    QByteArray fname = filename.toLocal8Bit();
+    TagLib::WavPack::File *mpegfile = new TagLib::WavPack::File(fname.constData());
+    
+    if (!mpegfile->isOpen())
+    {
+        delete mpegfile;
+        mpegfile = NULL;
+    }
+    
+    return mpegfile;
 }
 
 /*!
@@ -38,59 +47,39 @@ bool MetaIOWavPack::write(Metadata* mdata, bool exclusive)
     if (!mdata)
         return false;
 
-    QByteArray fname = mdata->Filename().toLocal8Bit();
-    TagLib::WavPack::File *taglib = new TagLib::WavPack::File(fname.constData());
-
-    Tag *tag = taglib->tag();
-
+    TagLib::WavPack::File *wpfile = OpenFile(mdata->Filename());
+    
+    if (!wpfile)
+        return false;
+    
+    TagLib::APE::Tag *tag = wpfile->APETag();
+    
     if (!tag)
     {
-        if (taglib)
-            delete taglib;
+        delete wpfile;
         return false;
     }
+    
+    WriteGenericMetadata(tag, mdata);
 
-    if (!mdata->Artist().isEmpty())
-        tag->setArtist(QStringToTString(mdata->Artist()));
-
-    // APE Only Tags
-    if (taglib->APETag())
+    // Compilation Artist ("Album artist")
+    if (mdata->Compilation())
     {
-        // Compilation Artist ("Album artist")
-        if (mdata->Compilation())
-        {
-            TagLib::String key="Album artist";
-            TagLib::APE::Item item=TagLib::APE::Item(key,
-                QStringToTString(mdata->CompilationArtist()));
-               taglib->APETag()->setItem(key, item);
-        }
-        else
-            taglib->APETag()->removeItem("Album artist");
+        TagLib::String key = "Album artist";
+        TagLib::APE::Item item = TagLib::APE::Item(key,
+            QStringToTString(mdata->CompilationArtist()));
+        wpfile->APETag()->setItem(key, item);
     }
+    else
+        wpfile->APETag()->removeItem("Album artist");
 
-    if (!mdata->Title().isEmpty())
-        tag->setTitle(QStringToTString(mdata->Title()));
+    bool result = wpfile->save();
 
-    if (!mdata->Album().isEmpty())
-        tag->setAlbum(QStringToTString(mdata->Album()));
-
-    if (mdata->Year() > 999 && mdata->Year() < 10000) // 4 digit year.
-        tag->setYear(mdata->Year());
-
-    if (!mdata->Genre().isEmpty())
-        tag->setGenre(QStringToTString(mdata->Genre()));
-
-    if (0 != mdata->Track())
-        tag->setTrack(mdata->Track());
-
-    bool result = taglib->save();
-
-    if (taglib)
-        delete taglib;
+    if (wpfile)
+        delete wpfile;
 
     return (result);
 }
-
 
 /*!
  * \brief Reads Metadata from a file.
@@ -100,100 +89,46 @@ bool MetaIOWavPack::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOWavPack::read(QString filename)
 {
-    QString artist, compilation_artist, album, title, genre;
-    int year = 0, tracknum = 0, length = 0, playcount = 0, rating = 0, id = 0;
-    bool compilation = false;
-    QList<struct AlbumArtImage> albumart;
-
-    QString extension = filename.section( '.', -1 ) ;
-
-    QByteArray fname = filename.toLocal8Bit();
-    TagLib::WavPack::File *taglib = new TagLib::WavPack::File(fname.constData());
-
-    Tag *tag = taglib->tag();
-
+    TagLib::WavPack::File *wpfile = OpenFile(filename);
+    
+    if (!wpfile)
+        return NULL;
+    
+    TagLib::APE::Tag *tag = wpfile->APETag();
+    
     if (!tag)
     {
-        if (taglib)
-            delete taglib;
+        delete wpfile;
         return NULL;
     }
+    
+    Metadata *metadata = new Metadata(filename);
+    
+    ReadGenericMetadata(tag, metadata);
+    
+    bool compilation = false;
 
-    // Basic Tags
-    if (! tag->isEmpty())
+    // Compilation Artist ("Album artist")
+    if(tag->itemListMap().contains("Album artist"))
     {
-        title = TStringToQString(tag->title()).trimmed();
-        artist = TStringToQString(tag->artist()).trimmed();
-        album = TStringToQString(tag->album()).trimmed();
-        tracknum = tag->track();
-        year = tag->year();
-        genre = TStringToQString(tag->genre()).trimmed();
+        compilation = true;
+        QString compilation_artist = TStringToQString(
+                    tag->itemListMap()["Album artist"].toString()).trimmed();
+        metadata->setCompilationArtist(compilation_artist);
     }
 
-    // APE Only Tags
-    if (taglib->APETag())
+    metadata->setCompilation(compilation);
+
+    if (metadata->Length() <= 0)
     {
-        // Compilation Artist ("Album artist")
-        if(taglib->APETag()->itemListMap().contains("Album artist"))
-        {
-            compilation = true;
-            compilation_artist = TStringToQString(
-            taglib->APETag()->itemListMap()["Album artist"].toString())
-            .trimmed();
-        }
-
+        TagLib::FileRef *fileref = new TagLib::FileRef(wpfile);
+        metadata->setLength(getTrackLength(fileref));
+        // FileRef takes ownership of wpfile, and is responsible for it's
+        // deletion. Messy.
+        delete fileref;
     }
-
-    // Fallback to filename reading
-    if (title.isEmpty())
-        readFromFilename(filename, artist, album, title, genre, tracknum);
-
-    if (length <= 0 && taglib->audioProperties())
-        length = taglib->audioProperties()->length() * 1000;
-
-    if (taglib)
-        delete taglib;
-
-    // If we didn't get a valid length, add the metadata but show warning.
-    if (length <= 0)
-        VERBOSE(VB_GENERAL, QString("MetaIOWavPack: Failed to read length "
-                "from '%1'. It may be corrupt.").arg(filename));
-
-    // If we don't have title and artist or don't have the length return NULL
-    if (title.isEmpty() && artist.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("MetaIOWavPack: Failed to read metadata from '%1'")
-                .arg(filename));
-        return NULL;
-    }
-
-    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
-                                     title, genre, year, tracknum, length,
-                                     id, rating, playcount);
-
-    retdata->setCompilation(compilation);
-
-    return retdata;
-}
-
-/*!
- * \brief Find the length of the track (in seconds)
- *
- * \param filename The filename for which we want to find the length.
- * \returns An integer (signed!) to represent the length in seconds.
- */
-int MetaIOWavPack::getTrackLength(QString filename)
-{
-    int seconds = 0;
-    QByteArray fname = filename.toLocal8Bit();
-    TagLib::WavPack::File *taglib = new TagLib::WavPack::File(fname.constData());
-
-    if (taglib)
-    {
-        seconds = taglib->audioProperties()->length();
-        delete taglib;
-    }
-
-    return seconds;
+    else
+        delete wpfile;
+    
+    return metadata;
 }

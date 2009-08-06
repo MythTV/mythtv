@@ -11,7 +11,7 @@
 
 // mythmusic
 #include "metadata.h"
-#include "metaiotaglib.h"
+#include "metaioid3.h"
 #include "treebuilders.h"
 #include "playlist.h"
 #include "playlistcontainer.h"
@@ -773,7 +773,7 @@ QImage Metadata::getAlbumArt(void)
     if (albumart_image)
     {
         if (albumart_image->embedded)
-            image = QImage(MetaIOTagLib::getAlbumArt(m_filename, type));
+            image = QImage(MetaIOID3::getAlbumArt(m_filename, type));
         else
             image = QImage(albumart_image->filename);
     }
@@ -791,7 +791,7 @@ QImage Metadata::getAlbumArt(ImageType type)
     if (albumart_image)
     {
         if (albumart_image->embedded)
-            image = QImage(MetaIOTagLib::getAlbumArt(m_filename, type));
+            image = QImage(MetaIOID3::getAlbumArt(m_filename, type));
         else
             image = QImage(albumart_image->filename);
     }

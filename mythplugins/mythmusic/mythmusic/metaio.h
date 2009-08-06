@@ -10,7 +10,7 @@ class Metadata;
 
 class MetaIO
 {
-public:
+  public:
     MetaIO(QString fileExtension);
     virtual ~MetaIO(void);
     
@@ -22,15 +22,13 @@ public:
 
     Metadata* readFromFilename(QString filename, bool blnLength = false);
 
-protected:
+  protected:
 
-private:
+  private:
     virtual int getTrackLength(QString filename) = 0;
 
     QString mFilename;
-
     QString mFileExtension;
-
     QString mFilenameFormat;
 };
 

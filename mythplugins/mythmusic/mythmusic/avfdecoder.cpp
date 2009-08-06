@@ -36,7 +36,7 @@ using namespace std;
 #include "constants.h"
 #include "metadata.h"
 #include "metaioavfcomment.h"
-#include "metaiotaglib.h"
+#include "metaioid3.h"
 #include "metaioflacvorbiscomment.h"
 #include "metaiooggvorbiscomment.h"
 #include "metaiomp4.h"
@@ -440,7 +440,7 @@ MetaIO* avfDecoder::doCreateTagger(void)
     QString extension = filename.section('.', -1);
 
     if (extension == "mp3")
-        return new MetaIOTagLib();
+        return new MetaIOID3();
     else if (extension == "ogg" || extension == "oga")
         return new MetaIOOggVorbisComment();
     else if (extension == "flac")

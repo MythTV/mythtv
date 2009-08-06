@@ -1,44 +1,35 @@
 #ifndef METAIOTAGLIB_H_
 #define METAIOTAGLIB_H_
 
-#include <id3v2tag.h>
-#include <textidentificationframe.h>
-#include <attachedpictureframe.h>
-#include <mpegfile.h>
-#include <mpegproperties.h>
-
-#include <QList>
-
 #include "metaio.h"
 #include "metadata.h"
 
-using TagLib::MPEG::File;
+// Taglib
+#include <tfile.h>
+#include <fileref.h>
+
+#include <QList>
+
+using TagLib::File;
 using TagLib::Tag;
-using TagLib::ID3v2::UserTextIdentificationFrame;
-using TagLib::ID3v2::TextIdentificationFrame;
-using TagLib::ID3v2::AttachedPictureFrame;
 using TagLib::String;
-using TagLib::MPEG::Properties;
 
 typedef QList<struct AlbumArtImage> AlbumArtList;
 
 class MetaIOTagLib : public MetaIO
 {
-public:
-    MetaIOTagLib(void);
+  public:
+    MetaIOTagLib(QString fileExtension);
     virtual ~MetaIOTagLib(void);
 
-    bool write(Metadata* mdata, bool exclusive = false);
-    Metadata* read(QString filename);
-
-    static QImage getAlbumArt(QString filename, ImageType type);
-
-private:
-
+    virtual bool write(Metadata* mdata, bool exclusive = false);
+    virtual Metadata* read(QString filename);
+    
+  protected:
+    int getTrackLength(TagLib::FileRef *file);
     int getTrackLength(QString filename);
-
-    AlbumArtList readAlbumArt(TagLib::ID3v2::Tag *tag);
-    UserTextIdentificationFrame* find(TagLib::ID3v2::Tag *tag, const String &description);
+    void ReadGenericMetadata(TagLib::Tag *tag, Metadata *metadata);
+    void WriteGenericMetadata(TagLib::Tag *tag, Metadata *metadata);
 };
 
 #endif

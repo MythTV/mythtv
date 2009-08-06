@@ -1,20 +1,19 @@
 #ifndef METAIOWAVPACK_H_
 #define METAIOWAVPACK_H_
 
-#include "metaio.h"
+#include "metaiotaglib.h"
 #include "metadata.h"
 
 #include <wavpackfile.h>
 
 #include <QList>
 
-//using TagLib::WavPack::File;
 using TagLib::Tag;
 using TagLib::String;
 
 typedef QList<struct AlbumArtImage> AlbumArtList;
 
-class MetaIOWavPack : public MetaIO
+class MetaIOWavPack : public MetaIOTagLib
 {
 public:
     MetaIOWavPack(void);
@@ -24,8 +23,7 @@ public:
     Metadata* read(QString filename);
 
 private:
-
-    int getTrackLength(QString filename);
+    TagLib::WavPack::File *OpenFile(const QString &filename);
 };
 
 #endif

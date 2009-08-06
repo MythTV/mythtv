@@ -28,7 +28,7 @@
 
 #include "metadata.h"
 #include "lameencoder.h"
-#include "metaiotaglib.h"
+#include "metaioid3.h"
 
 #include <iostream>
 
@@ -146,7 +146,7 @@ LameEncoder::~LameEncoder()
     {
         QString filename = m_metadata->Filename();
         m_metadata->setFilename(m_outfile);
-        MetaIOTagLib().write(m_metadata);
+        MetaIOID3().write(m_metadata);
         m_metadata->setFilename(filename);
     }
 }
