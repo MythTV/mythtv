@@ -1494,7 +1494,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
                                        display_res->GetPhysicalHeight()));
         windows[0].SetDisplayAspect(display_res->GetAspectRatio());
 
-        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
+        bool fullscreen = !windows[0].UsingGuiSize();
 
         // if width && height are zero users expect fullscreen playback
         if (!fullscreen)
@@ -1510,7 +1510,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
             const QRect display_visible_rect =
                     QRect(gContext->GetMainWindow()->geometry().topLeft(), sz);
             windows[0].SetDisplayVisibleRect(display_visible_rect);
-
+            MoveResize();
             // Resize X window to fill new resolution
             MoveResizeWindow(display_visible_rect);
         }
@@ -1522,31 +1522,19 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
  * \brief Init display measurements based on database settings and
  *        actual screen parameters.
  */
-void VideoOutput::InitDisplayMeasurements(uint width, uint height,  bool resize)
+void VideoOutput::InitDisplayMeasurements(uint width, uint height, bool resize)
 {
-    DisplayInfo         disp = GetDisplayInfo();
-    QString           source = "Actual";
-    QDesktopWidget * desktop = QApplication::desktop();
-    bool          useGuiSize = gContext->GetNumSetting("GuiSizeForTV", 0);
-    bool       usingXinerama = (GetNumberXineramaScreens() > 1);
-    int               screen = desktop->primaryScreen();
-
-    if (usingXinerama)
-    {
-        screen = gContext->GetNumSetting("XineramaScreen", screen);
-        if (screen >= desktop->numScreens())
-            screen = 0;
-    }
+    DisplayInfo disp = GetDisplayInfo();
+    QString     source = "Actual";
 
     // The very first Resize needs to be the maximum possible
     // desired res, because X will mask off anything outside
     // the initial dimensions
     QSize sz1 = disp.res;
-    QSize sz2 =
-        qApp->desktop()->availableGeometry(gContext->GetMainWindow()).size();
+    QSize sz2 = windows[0].GetScreenGeometry().size();
     QSize max_size = sz1.expandedTo(sz2);
 
-    if (useGuiSize)
+    if (windows[0].UsingGuiSize())
         max_size = gContext->GetMainWindow()->geometry().size();
 
     if (display_res)
@@ -1579,26 +1567,8 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height,  bool resize)
         ResizeForVideo(width, height);
 
     // Determine window and screen dimensions in pixels
+    QSize screen_size = windows[0].GetScreenGeometry().size();
     QSize window_size = windows[0].GetDisplayVisibleRect().size();
-    QSize screen_size = desktop->size();
-    if (screen >= 0)
-        screen_size = desktop->screenGeometry(screen).size();
-
-    if (screen_size.isEmpty())
-    {
-        int tmp1, tmp2;
-        GetMythUI()->GetScreenBounds(tmp1, tmp2,
-                screen_size.rwidth(), screen_size.rheight());
-        if (screen_size.isEmpty())
-            screen_size = QSize(1024, 768);
-    }
-
-    if (useGuiSize)
-        gContext->GetResolutionSetting("Gui",
-                                       window_size.rwidth(),
-                                       window_size.rheight());
-    if (window_size.isEmpty())
-        window_size = screen_size;
 
     float pixel_aspect = (float)screen_size.width() /
                          (float)screen_size.height();
@@ -1616,7 +1586,7 @@ void VideoOutput::InitDisplayMeasurements(uint width, uint height,  bool resize)
     // We need to use the Xinerama monitor aspect ratio from the DB to set
     // the physical screen width. This assumes the height is correct, which
     // is more or less true in the typical side-by-side monitor setup.
-    if (usingXinerama)
+    if (windows[0].UsingXinerama())
     {
         source = "Xinerama";
         disp_aspect = gContext->GetFloatSettingOnHost(

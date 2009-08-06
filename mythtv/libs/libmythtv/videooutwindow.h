@@ -78,8 +78,11 @@ class VideoOutWindow
     QSize  GetVideoDispDim(void)         const { return video_disp_dim;  }
     float  GetOverridenVideoAspect(void) const { return overriden_video_aspect;}
     QRect  GetDisplayVisibleRect(void)   const { return display_visible_rect; }
+    QRect  GetScreenGeometry(void)       const { return screen_geom; }
     QRect  GetVideoRect(void)            const { return video_rect;      }
     QRect  GetDisplayVideoRect(void)     const { return display_video_rect; }
+    bool   UsingXinerama(void)           const { return using_xinerama; }
+    bool   UsingGuiSize(void)            const { return db_use_gui_size; }
 
     /// \brief Returns current aspect override mode
     /// \sa ToggleAspectOverride(AspectOverrideMode)
@@ -117,6 +120,11 @@ class VideoOutWindow
     float   db_scale_vert;    ///< Vertical Overscan/Underscan percentage
     int     db_pip_size;      ///< percentage of full window to use for PiP
     bool    db_scaling_allowed;///< disable this to prevent overscan/underscan
+    bool    db_use_gui_size;  ///< Use the gui size for video window
+
+    bool    using_xinerama;   ///< Display is using multiple screens
+    int     screen_num;       ///< Screen that contains playback window
+    QRect   screen_geom;      ///< Full screen geometry
 
     // Manual Zoom
     float   mz_scale_v;       ///< Manually applied vertical scaling.

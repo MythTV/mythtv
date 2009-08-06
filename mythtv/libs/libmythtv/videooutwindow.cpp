@@ -22,15 +22,16 @@
 
 #include <cmath>
 
+#include <QDesktopWidget>
+
 #include "videooutwindow.h"
 #include "osd.h"
 #include "osdsurface.h"
 #include "NuppelVideoPlayer.h"
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
-
+#include "mythxdisplay.h"
 #include "mythcontext.h"
-
 #include "dithertable.h"
 
 extern "C"
@@ -86,6 +87,23 @@ VideoOutWindow::VideoOutWindow() :
 
     db_move = QPoint(gContext->GetNumSetting("xScanDisplacement", 0),
                      gContext->GetNumSetting("yScanDisplacement", 0));
+    db_use_gui_size = gContext->GetNumSetting("GuiSizeForTV", 0);
+
+    QDesktopWidget *desktop = QApplication::desktop();
+    screen_num = desktop->primaryScreen();
+    using_xinerama  = (GetNumberXineramaScreens() > 1);
+    if (using_xinerama)
+    {
+        screen_num = gContext->GetNumSetting("XineramaScreen", screen_num);
+        if (screen_num >= desktop->numScreens())
+            screen_num = 0;
+    }
+
+    screen_geom = desktop->geometry();
+    if (screen_num >= 0)
+        screen_geom = desktop->screenGeometry(screen_num);
+    if (screen_geom.isNull())
+        screen_geom = QRect(QPoint(0,0), QSize(1024,768));
 }
 
 /**
@@ -428,10 +446,12 @@ bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
                           AspectOverrideMode new_aspectoverride,
                           AdjustFillMode new_adjustfill)
 {
-    display_visible_rect = new_display_visible_rect;
+    display_visible_rect = db_use_gui_size ? new_display_visible_rect :
+                                             screen_geom;
+
     video_disp_dim = fix_1080i(new_video_dim);
     video_dim = fix_alignment(new_video_dim);
-    video_rect = QRect(new_display_visible_rect.topLeft(), video_disp_dim);
+    video_rect = QRect(display_visible_rect.topLeft(), video_disp_dim);
 
     if (pip_state > kPIPOff)
     {
