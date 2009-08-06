@@ -417,26 +417,26 @@ Metadata *CdDecoder::getMetadata()
         return NULL;
     }
 
-    compilation_artist = M_QSTRING_UNICODE(discdata.data_artist);
+    compilation_artist = QString(M_QSTRING_UNICODE(discdata.data_artist))
+                                                                    .trimmed();
 
     if (compilation_artist.toLower().left(7) == "various")
-    {
         compilation_artist = QObject::tr("Various Artists");
-    }
 
-
-    album = M_QSTRING_UNICODE(discdata.data_title);
+    album = QString(M_QSTRING_UNICODE(discdata.data_title)).trimmed();
     genre = cddb_genre(discdata.data_genre);
 
     if (!genre.isEmpty())
     {
         QString flet = genre.toUpper().left(1);
         QString rt = genre.right(genre.length()-1).toLower();
-        genre = flet + rt;
+        genre = QString("%1%2").arg(flet).arg(rt).trimmed();
     }
 
-    title  = M_QSTRING_UNICODE(discdata.data_track[tracknum - 1].track_name);
-    artist = M_QSTRING_UNICODE(discdata.data_track[tracknum - 1].track_artist);
+    title  = QString(M_QSTRING_UNICODE(discdata.data_track[tracknum - 1].track_name))
+                                                                    .trimmed();
+    artist = QString(M_QSTRING_UNICODE(discdata.data_track[tracknum - 1].track_artist))
+                                                                    .trimmed();
 
     if (artist.length() < 1)
     {
@@ -445,7 +445,7 @@ Metadata *CdDecoder::getMetadata()
     }
 
     if (title.length() < 1)
-        title = QString(QObject::tr("Track %1")).arg(tracknum);
+        title = QObject::tr("Track %1").arg(tracknum);
 
     cddb_write_data(cd, &discdata);
 
