@@ -23,7 +23,10 @@ SOURCES += msocketdevice.cpp mythsocket.cpp lcddevice.cpp mythstorage.cpp
 SOURCES += remotefile.cpp decodeencode.cpp
 
 win32:SOURCES += msocketdevice_win.cpp
-unix:SOURCES  += msocketdevice_unix.cpp
+unix {
+    SOURCES += msocketdevice_unix.cpp
+    QMAKE_CXXFLAGS += -fno-strict-aliasing
+}
 
 # Install headers to same location as libmyth to make things easier
 inc.path = $${PREFIX}/include/mythtv/
