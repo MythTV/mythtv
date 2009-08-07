@@ -1,6 +1,7 @@
 #ifndef METAIOTAGLIB_H_
 #define METAIOTAGLIB_H_
 
+// MythMusic
 #include "metaio.h"
 #include "metadata.h"
 
@@ -8,22 +9,23 @@
 #include <tfile.h>
 #include <fileref.h>
 
-#include <QList>
-
 using TagLib::File;
 using TagLib::Tag;
 using TagLib::String;
 
-typedef QList<struct AlbumArtImage> AlbumArtList;
-
+/*!
+ * \class MetaIOTagLib
+ *
+ * \brief Base for Taglib metadata classes
+ */
 class MetaIOTagLib : public MetaIO
 {
   public:
     MetaIOTagLib(QString fileExtension);
     virtual ~MetaIOTagLib(void);
 
-    virtual bool write(Metadata* mdata, bool exclusive = false);
-    virtual Metadata* read(QString filename);
+    virtual bool write(Metadata* mdata) = 0;
+    virtual Metadata* read(QString filename) = 0;
     
   protected:
     int getTrackLength(TagLib::FileRef *file);

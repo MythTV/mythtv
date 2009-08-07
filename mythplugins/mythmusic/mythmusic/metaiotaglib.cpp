@@ -1,15 +1,20 @@
-#include <cmath>
 
+// Mythmusic
 #include "metaiotaglib.h"
 #include "metadata.h"
 
-//Taglib
+// Std
+#include <cmath>
+
+// Libmyth
+#include <mythverbose.h>
+
+// Taglib
 #include <audioproperties.h>
 #include <tag.h>
 #include <tstring.h>
 
-#include <mythverbose.h>
-
+/* Redefine the TString conversion macros */
 #undef QStringToTString
 #define QStringToTString(s) TagLib::String(s.toUtf8().data(), TagLib::String::UTF8)
 #undef TStringToQString
@@ -26,22 +31,11 @@ MetaIOTagLib::~MetaIOTagLib(void)
 }
 
 /*!
- * \brief Writes metadata back to a file
- *
- * \param mdata A pointer to a Metadata object
- * \param exclusive Flag to indicate if only the data in mdata should be
- *                  in the file. If false, any unrecognised tags already
- *                  in the file will be maintained.
- * \returns Boolean to indicate success/failure.
- */
-bool MetaIOTagLib::write(Metadata* metadata, bool exclusive)
-{
-    (void) exclusive;
-    (void) metadata;
-    //Pure Virtual
-    return false;
-}
-
+* \brief Writes metadata common to all tag formats to the tag
+*
+* \param tag A pointer to the tag
+* \param metadata Pointer to the metadata
+*/
 void MetaIOTagLib::WriteGenericMetadata(Tag *tag, Metadata *metadata)
 {
     if (!tag || !metadata)
@@ -67,20 +61,13 @@ void MetaIOTagLib::WriteGenericMetadata(Tag *tag, Metadata *metadata)
 }
 
 /*!
- * \brief Reads Metadata from a file.
- *
- * \param filename The filename to read metadata from.
- * \returns Metadata pointer or NULL on error
- */
-Metadata* MetaIOTagLib::read(QString filename)
-{
-    // Pure Virtual
-    return NULL;
-}
-
+* \brief Writes metadata common to all tag formats to the tag
+*
+* \param tag A pointer to the tag
+* \param metadata Pointer to the metadata
+*/
 void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
 {
-
     // Basic Tags
     if (metadata && tag && !tag->isEmpty())
     {

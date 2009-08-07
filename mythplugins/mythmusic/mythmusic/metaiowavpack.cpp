@@ -17,6 +17,12 @@ MetaIOWavPack::~MetaIOWavPack(void)
 {
 }
 
+/*!
+* \brief Open the file to read the tag
+*
+* \param filename The filename
+* \returns A taglib file object for this format
+*/
 TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
@@ -32,18 +38,10 @@ TagLib::WavPack::File *MetaIOWavPack::OpenFile(const QString &filename)
 }
 
 /*!
- * \brief Writes metadata back to a file
- *
- * \param mdata A pointer to a Metadata object
- * \param exclusive Flag to indicate if only the data in mdata should be
- *                  in the file. If false, any unrecognised tags already
- *                  in the file will be maintained.
- * \returns Boolean to indicate success/failure.
- */
-bool MetaIOWavPack::write(Metadata* mdata, bool exclusive)
+* \copydoc MetaIO::write()
+*/
+bool MetaIOWavPack::write(Metadata* mdata)
 {
-    (void) exclusive;
-
     if (!mdata)
         return false;
 
@@ -82,11 +80,8 @@ bool MetaIOWavPack::write(Metadata* mdata, bool exclusive)
 }
 
 /*!
- * \brief Reads Metadata from a file.
- *
- * \param filename The filename to read metadata from.
- * \returns Metadata pointer or NULL on error
- */
+* \copydoc MetaIO::read()
+*/
 Metadata* MetaIOWavPack::read(QString filename)
 {
     TagLib::WavPack::File *wpfile = OpenFile(filename);

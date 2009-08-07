@@ -1,28 +1,33 @@
 #ifndef METAIOOGGVORBIS_H_
 #define METAIOOGGVORBIS_H_
 
+// Mythmusic
 #include "metaiotaglib.h"
 #include "metadata.h"
 
+// Taglib
 #include <vorbisfile.h>
-
-#include <QList>
 
 using TagLib::Tag;
 using TagLib::String;
 
-typedef QList<struct AlbumArtImage> AlbumArtList;
-
+/*!
+* \class MetaIOOggVorbis
+*
+* \brief Read Vorbis (Xiph) tags in an Ogg container
+*
+* \copydetails MetaIO
+*/
 class MetaIOOggVorbis : public MetaIOTagLib
 {
-public:
+  public:
     MetaIOOggVorbis(void);
-    virtual ~MetaIOOggVorbis(void);
+    ~MetaIOOggVorbis(void);
 
-    bool write(Metadata* mdata, bool exclusive = false);
+    bool write(Metadata* mdata);
     Metadata* read(QString filename);
 
-private:
+  private:
     TagLib::Ogg::Vorbis::File *OpenFile(const QString &filename);
 };
 

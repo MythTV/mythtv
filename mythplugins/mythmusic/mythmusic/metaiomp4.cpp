@@ -1,15 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <sys/stat.h>
-using namespace std;
 
-#include <mythtv/mythverbose.h>
-#include <mythtv/mythcontext.h>
-
+// MythMusic
 #include "metaiomp4.h"
 #include "metadata.h"
 
+// Libmyth
+#include <mythtv/mythverbose.h>
+#include <mythtv/mythcontext.h>
+
+// Libav*
 extern "C" {
 #include <mythtv/libavformat/avformat.h>
 #include <mythtv/libavcodec/avcodec.h>
@@ -27,23 +25,17 @@ MetaIOMP4::~MetaIOMP4(void)
 }
 
 /*!
- * \brief Writes metadata back to a file
- *
- * \param mdata A pointer to a Metadata object
- * \param exclusive Flag to indicate if only the data in mdata should be
- *                  in the file. If false, any unrecognised tags already
- *                  in the file will be maintained.
- * \returns Boolean to indicate success/failure.
+ * \copydoc MetaIO::write()
  */
-bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
+bool MetaIOMP4::write(Metadata* mdata)
 {
     if (!mdata)
         return false;
 
-    exclusive = exclusive;
     mdata = mdata;
 
-// Disabled because it doesn't actually work.
+// Disabled because it doesn't actually work. Better implemented with Taglib
+// when we formally move to 1.6
 
 //     AVFormatContext* p_context = NULL;
 //     AVFormatParameters* p_params = NULL;
@@ -85,10 +77,7 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
 }
 
 /*!
- * \brief Reads Metadata from a file.
- *
- * \param filename The filename to read metadata from.
- * \returns Metadata pointer or NULL on error
+ * \copydoc MetaIO::read()
  */
 Metadata* MetaIOMP4::read(QString filename)
 {
@@ -249,4 +238,3 @@ void MetaIOMP4::metadataSanityCheck(QString *artist, QString *album, QString *ti
     if (genre->isEmpty())
         genre->append("Unknown Genre");
 }
-

@@ -1,20 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <sys/stat.h>
-using namespace std;
 
-#include <mythtv/mythcontext.h>
-
+// Mythmusic
 #include "metaioavfcomment.h"
 #include "metadata.h"
+
+// libmyth
+#include <mythtv/mythcontext.h>
 
 extern "C" {
 #include <mythtv/libavformat/avformat.h>
 #include <mythtv/libavcodec/avcodec.h>
 }
 
-//==========================================================================
 MetaIOAVFComment::MetaIOAVFComment(void)
     : MetaIO(".wma")
 {
@@ -22,38 +18,23 @@ MetaIOAVFComment::MetaIOAVFComment(void)
     av_register_all();
 }
 
-//==========================================================================
 MetaIOAVFComment::~MetaIOAVFComment(void)
 {
 }
 
-
-//==========================================================================
 /*!
- * \brief Writes metadata back to a file
- *
- * \param mdata A pointer to a Metadata object
- * \param exclusive Flag to indicate if only the data in mdata should be
- *                  in the file. If false, any unrecognised tags already
- *                  in the file will be maintained.
- * \returns Boolean to indicate success/failure.
+ * \copydoc MetaIO::write()
  */
-bool MetaIOAVFComment::write(Metadata* mdata, bool exclusive)
+bool MetaIOAVFComment::write(Metadata* mdata)
 {
     // Wont implement....
     mdata = mdata; // -Wall annoyance
-    exclusive = exclusive; // -Wall annoyance
     return false;
 }
 
-
-//==========================================================================
 /*!
- * \brief Reads Metadata from a file.
- *
- * \param filename The filename to read metadata from.
- * \returns Metadata pointer or NULL on error
- */
+* \copydoc MetaIO::read()
+*/
 Metadata* MetaIOAVFComment::read(QString filename)
 {
     QString artist, compilation_artist, album, title, genre;
@@ -101,8 +82,6 @@ Metadata* MetaIOAVFComment::read(QString filename)
     return retdata;
 }
 
-
-//==========================================================================
 /*!
  * \brief Find the length of the track (in seconds)
  *
@@ -133,8 +112,6 @@ int MetaIOAVFComment::getTrackLength(QString filename)
     return rv;
 }
 
-
-//==========================================================================
 /*!
  * \brief Find the length of the track (in seconds)
  *

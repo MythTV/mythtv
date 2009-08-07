@@ -1,25 +1,32 @@
 #ifndef METAIOWAVPACK_H_
 #define METAIOWAVPACK_H_
 
+// Mythmusic
 #include "metaiotaglib.h"
 #include "metadata.h"
 
+// Taglib
 #include <wavpackfile.h>
-
-#include <QList>
 
 using TagLib::Tag;
 using TagLib::String;
 
-typedef QList<struct AlbumArtImage> AlbumArtList;
-
+/*!
+* \class MetaIOWavPack
+*
+* \brief Read and write metadata in Wavpack APE tags
+*
+* N.B. No write support
+*
+* \copydetails MetaIO
+*/
 class MetaIOWavPack : public MetaIOTagLib
 {
 public:
     MetaIOWavPack(void);
     virtual ~MetaIOWavPack(void);
 
-    bool write(Metadata* mdata, bool exclusive = false);
+    bool write(Metadata* mdata);
     Metadata* read(QString filename);
 
 private:

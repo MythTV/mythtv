@@ -1,6 +1,8 @@
+// MythMusic
 #include "metaioid3.h"
 #include "metadata.h"
 
+// Libmyth
 #include <mythverbose.h>
 
 MetaIOID3::MetaIOID3(void)
@@ -12,6 +14,12 @@ MetaIOID3::~MetaIOID3(void)
 {
 }
 
+/*!
+* \brief Open the file to read the tag
+*
+* \param filename The filename
+* \returns A taglib file object for this format
+*/
 TagLib::MPEG::File *MetaIOID3::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
@@ -26,10 +34,11 @@ TagLib::MPEG::File *MetaIOID3::OpenFile(const QString &filename)
     return mpegfile;
 }
 
-bool MetaIOID3::write(Metadata* mdata, bool exclusive)
+/*!
+ * \copydoc MetaIO::write()
+ */
+bool MetaIOID3::write(Metadata* mdata)
 {
-    (void) exclusive;
-    
     TagLib::MPEG::File *mpegfile = OpenFile(mdata->Filename());
 
     if (!mpegfile)
@@ -114,6 +123,9 @@ bool MetaIOID3::write(Metadata* mdata, bool exclusive)
     return result;
 }
 
+/*!
+ * \copydoc MetaIO::read()
+ */
 Metadata *MetaIOID3::read(QString filename)
 {
     TagLib::MPEG::File *mpegfile = OpenFile(filename);
