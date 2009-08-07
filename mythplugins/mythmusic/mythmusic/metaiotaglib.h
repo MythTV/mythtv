@@ -21,7 +21,7 @@ using TagLib::String;
 class MetaIOTagLib : public MetaIO
 {
   public:
-    MetaIOTagLib(QString fileExtension);
+    MetaIOTagLib(void);
     virtual ~MetaIOTagLib(void);
 
     virtual bool write(Metadata* mdata) = 0;

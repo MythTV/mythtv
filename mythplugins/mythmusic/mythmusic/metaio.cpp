@@ -1,23 +1,19 @@
-#include <iostream>
 
+// Mythmusic
 #include "metaio.h"
 #include "metadata.h"
+
+// Libmyth
 #include <mythtv/mythcontext.h>
 
-//==========================================================================
 /*!
  * \brief Constructor
- *
- * \param fileExtension The extension of the files the derived class uses.
  */
-MetaIO::MetaIO(QString fileExtension)
-    : mFileExtension(fileExtension)
+MetaIO::MetaIO()
 {
     mFilenameFormat = gContext->GetSetting("NonID3FileNameFormat").toUpper();
 }
 
-
-//==========================================================================
 /*!
  * \brief Destructor
  */
@@ -25,8 +21,6 @@ MetaIO::~MetaIO()
 {
 }
 
-
-//==========================================================================
 /*!
  * \brief Reads Metadata based on the folder/filename.
  *
@@ -43,11 +37,11 @@ void MetaIO::readFromFilename(QString filename,
     title.clear();
     genre.clear();
     tracknum = 0;
-
-    static QString regext = mFileExtension + "$";
+    
     int part_num = 0;
-    filename.replace(QRegExp(QString("_")), QString(" "));
-    filename.replace(QRegExp(regext, Qt::CaseInsensitive), QString(""));
+    // Replace 
+    filename.replace('_', ' ');
+    filename.section('.', 0, -2);
     QStringList fmt_list = mFilenameFormat.split("/");
     QStringList::iterator fmt_it = fmt_list.begin();
 
@@ -98,14 +92,12 @@ void MetaIO::readFromFilename(QString filename,
     }
 }
 
-
-//==========================================================================
 /*!
  * \brief Reads Metadata based on the folder/filename.
  *
  * \note Just an overloaded wrapper around the other method above.
  *
- * \param filename The filename to try and determin metadata for.
+ * \param filename The filename to try and determine metadata for.
  * \returns Metadata Pointer, or NULL on error.
  */
 Metadata* MetaIO::readFromFilename(QString filename, bool blnLength)
@@ -122,4 +114,37 @@ Metadata* MetaIO::readFromFilename(QString filename, bool blnLength)
                                      0, tracknum, length);
 
     return retdata;
+}
+
+/*!
+* \brief Reads Metadata based on the folder/filename.
+*
+* \param metadata Metadata Pointer
+*/
+void MetaIO::readFromFilename(Metadata* metadata)
+{
+    QString artist, album, title, genre;
+    int tracknum = 0;
+
+    const QString filename = metadata->Filename();
+
+    if (filename.isEmpty())
+        return;
+    
+    readFromFilename(filename, artist, album, title, genre, tracknum);
+
+    if (metadata->Artist().isEmpty())
+        metadata->setArtist(artist);
+    
+    if (metadata->Album().isEmpty())
+        metadata->setAlbum(album);
+    
+    if (metadata->Title().isEmpty())
+        metadata->setTitle(title);
+    
+    if (metadata->Genre().isEmpty())
+        metadata->setGenre(genre);
+    
+    if (metadata->Track() <= 0)
+        metadata->setTrack(tracknum);
 }

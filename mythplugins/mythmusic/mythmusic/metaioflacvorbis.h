@@ -14,7 +14,7 @@ using TagLib::String;
 /*!
 * \class MetaIOFLACVorbis
 *
-* \brief Read Vorbis (Xiph) tags in a FLAC file
+* \brief Read and write Vorbis (Xiph) tags in a FLAC file
 *
 * \copydetails MetaIO
 */

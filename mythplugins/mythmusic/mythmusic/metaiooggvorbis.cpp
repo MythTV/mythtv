@@ -7,7 +7,7 @@
 #include <mythtv/mythcontext.h>
 
 MetaIOOggVorbis::MetaIOOggVorbis(void)
-    : MetaIOTagLib(".ogg")
+    : MetaIOTagLib()
 {
 }
 

@@ -1,7 +1,7 @@
 #ifndef METAIO_H_
 #define METAIO_H_
 
-#include <QRegExp>
+// QT
 #include <QString>
 
 #define MYTH_MUSICBRAINZ_ALBUMARTIST_UUID "89ad4ac3-39f7-470e-963a-56509c546377"
@@ -12,7 +12,7 @@ class Metadata;
 class MetaIO
 {
   public:
-    MetaIO(QString fileExtension);
+    MetaIO(void);
     virtual ~MetaIO(void);
 
     /*!
@@ -35,6 +35,8 @@ class MetaIO
                           QString &title, QString &genre, int &tracknum);
 
     Metadata* readFromFilename(QString filename, bool blnLength = false);
+
+    void readFromFilename(Metadata *metadata);
     
   protected:
 
@@ -42,7 +44,6 @@ class MetaIO
     virtual int getTrackLength(QString filename) = 0;
 
     QString mFilename;
-    QString mFileExtension;
     QString mFilenameFormat;
 };
 

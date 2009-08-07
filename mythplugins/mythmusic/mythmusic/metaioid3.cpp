@@ -6,7 +6,7 @@
 #include <mythverbose.h>
 
 MetaIOID3::MetaIOID3(void)
-    : MetaIOTagLib(".mp3")
+    : MetaIOTagLib()
 {
 }
 

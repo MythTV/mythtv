@@ -21,8 +21,8 @@
 #define TStringToQString(s) QString::fromUtf8(s.toCString(true))
 
 
-MetaIOTagLib::MetaIOTagLib(QString fileExtension)
-    : MetaIO(fileExtension)
+MetaIOTagLib::MetaIOTagLib()
+    : MetaIO()
 {
 }
 
@@ -79,9 +79,9 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
         metadata->setGenre(TStringToQString(tag->genre()).trimmed());
     }
 
-     // Fallback to filename reading
-//    if (metadata->Title().isEmpty())
-//        readFromFilename(filename, artist, album, title, genre, tracknum);
+    // Fallback to filename reading
+    if (metadata->Title().isEmpty())
+        readFromFilename(metadata);
 
     // If we don't have title and artist or don't have the length return NULL
     if (metadata->Title().isEmpty() && metadata->Artist().isEmpty())

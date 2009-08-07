@@ -9,7 +9,7 @@
 #include <mythtv/mythcontext.h>
 
 MetaIOWavPack::MetaIOWavPack(void)
-    : MetaIOTagLib(".wv")
+    : MetaIOTagLib()
 {
 }
 

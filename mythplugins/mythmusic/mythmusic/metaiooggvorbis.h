@@ -14,7 +14,7 @@ using TagLib::String;
 /*!
 * \class MetaIOOggVorbis
 *
-* \brief Read Vorbis (Xiph) tags in an Ogg container
+* \brief Read and write Vorbis (Xiph) tags in an Ogg container
 *
 * \copydetails MetaIO
 */

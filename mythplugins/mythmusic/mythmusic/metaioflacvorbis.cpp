@@ -10,7 +10,7 @@
 #include <xiphcomment.h>
 
 MetaIOFLACVorbis::MetaIOFLACVorbis(void)
-    : MetaIOTagLib(".flac")
+    : MetaIOTagLib()
 {
 }
 

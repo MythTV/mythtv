@@ -12,7 +12,7 @@ extern "C" {
 }
 
 MetaIOAVFComment::MetaIOAVFComment(void)
-    : MetaIO(".wma")
+    : MetaIO()
 {
     QMutexLocker locker(&avcodeclock);
     av_register_all();
