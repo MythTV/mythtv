@@ -197,7 +197,7 @@ void MythUIImage::SetImage(MythImage *img)
 
 /**
  *  \brief Assign a set of MythImages to the widget for animation.
- *         Use is strongly discouraged, use SetFilePattern() instead.
+ *         Use is strongly discouraged, use SetFilepattern() instead.
  *
  */
 void MythUIImage::SetImages(QVector<MythImage *> &images)
