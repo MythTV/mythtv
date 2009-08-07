@@ -661,10 +661,8 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
 
     if (decoder == "libmpeg2")
         msg +=  QObject::tr(
-            "libmpeg2 will use mpeg2 library; "
-            "this is faster on some 32 bit AMD processors.") + "\n" +
-            QObject::tr("Note: Closed caption decoding will "
-                        "not work with libmpeg2.");
+            "libmpeg2 is slower on almost all processors than ffmpeg "
+            "and breaks caption decoding. Use at your own risk!");
 
     if (decoder == "xvmc")
         msg += QObject::tr(
