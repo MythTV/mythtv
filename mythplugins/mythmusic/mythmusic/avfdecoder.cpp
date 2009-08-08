@@ -345,6 +345,7 @@ void avfDecoder::run()
         if (av_read_frame(m_inputContext, m_pkt) < 0)
         {
             VERBOSE(VB_IMPORTANT, "Read frame failed");
+            VERBOSE(VB_FILE, ("... for file '" + filename) + "'");
             unlock();
             finish = TRUE;
             break;
