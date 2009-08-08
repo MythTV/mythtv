@@ -339,6 +339,8 @@ int preview_helper(const QString &chanid, const QString &starttime,
                 {
                     pginfo->pathname = QString("dvd:%1").arg(infile);
                 }
+                else
+                    pginfo->pathname = infile;
             }
 
         }
