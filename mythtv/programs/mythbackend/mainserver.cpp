@@ -1119,7 +1119,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 return;
             }
 
-            if (basename.contains("/../"))
+            if ((basename.contains("/../")) ||
+                (basename.startsWith("../")))
             {
                 VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
                         "filename '%1' does not pass sanity checks.")
@@ -3710,7 +3711,9 @@ void MainServer::HandleDeleteFile(QString filename, PlaybackSock *pbs)
     QStringList retlist;
     StorageGroup sgroup;
 
-    if (filename.isEmpty() || filename.contains("/../"))
+    if ((filename.isEmpty()) ||
+        (filename.contains("/../")) ||
+        (filename.startsWith("../")))
     {
         VERBOSE(VB_IMPORTANT, QString("ERROR deleting file, filename '%1' "
                 "fails sanity checks").arg(filename));
