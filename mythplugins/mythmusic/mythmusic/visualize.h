@@ -32,8 +32,6 @@ extern "C" {
 #define myth_fftw_complex_cast fftw_complex
 #elif (myth_fftw_float == float)
 #define myth_fftw_complex_cast fftwf_complex
-#elif (myth_fftw_float == long double)
-#define myth_fftw_complex_cast fftwl_complex
 #endif
 #elif	FFTW2_SUPPORT
 #include <rfftw.h>
