@@ -3,7 +3,7 @@
 #define _shiftamt 16
 //16.16 fixed point representation,
 
-#if BigEndian_
+#ifdef BigEndian_
 #define iexp_				0
 #define iman_				1
 #else
