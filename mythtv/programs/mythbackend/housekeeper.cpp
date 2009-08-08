@@ -409,9 +409,9 @@ void HouseKeeper::CleanupOrphanedLivetvChains(void)
         return;
     }
 
-    QString msg, keepChains = "";
+    QString msg, keepChains;
     while (query.next())
-        if (keepChains == "")
+        if (keepChains.isEmpty())
             keepChains = "'" + query.value(0).toString() + "'";
         else
             keepChains += ", '" + query.value(0).toString() + "'";
@@ -463,7 +463,7 @@ void HouseKeeper::CleanupRecordedTables(void)
         return;
     }
 
-    while (table != "")
+    while (!table.isEmpty())
     {
         query.prepare(QString("TRUNCATE TABLE temprecordedcleanup;"));
         if (!query.exec() || !query.isActive())

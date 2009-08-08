@@ -1349,7 +1349,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->pathname = query.value(28).toString();
 
-            if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
+            if (proginfo->hostname.isEmpty())
                 proginfo->hostname = gContext->GetHostName();
 
             if (!query.value(7).toString().isEmpty())
@@ -1440,7 +1440,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 {
                     QString tmpURL = GetPlaybackURL(proginfo);
                     QFile checkFile(tmpURL);
-                    if (tmpURL != "" && checkFile.exists())
+                    if (!tmpURL.isEmpty() && checkFile.exists())
                     {
                         proginfo->filesize = checkFile.size();
                         if (proginfo->recendts < QDateTime::currentDateTime())
@@ -1451,7 +1451,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             else if (!slave)
             {
                 proginfo->pathname = GetPlaybackURL(proginfo);
-                if (proginfo->pathname == "")
+                if (proginfo->pathname.isEmpty())
                 {
                     VERBOSE(VB_IMPORTANT,
                             "MainServer::HandleQueryRecordings()"
@@ -2131,7 +2131,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
             (pginfo->recgroup != "Deleted") && (pginfo->recgroup != "LiveTV"));
 
     QString filename = GetPlaybackURL(pginfo, false);
-    if (filename == "")
+    if (filename.isEmpty())
     {
         VERBOSE(VB_IMPORTANT,
                 QString("ERROR when trying to delete file for %1 @ %2.  Unable "
@@ -2603,7 +2603,7 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
 
     if (m_sched)
     {
-        if (tmptable == "")
+        if (tmptable.isEmpty())
             m_sched->getAllPending(strList);
         else
         {

@@ -737,7 +737,7 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_INVALID_CMDLINE;
     }
 
-    if (logfile != "" )
+    if (!logfile.isEmpty())
     {
         if (log_rotate(1) < 0)
         {
@@ -922,7 +922,7 @@ int main(int argc, char **argv)
         return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
     }
 
-    if (printexpire != "")
+    if (!printexpire.isEmpty())
     {
         expirer = new AutoExpire();
         expirer->PrintExpireList(printexpire);
@@ -941,7 +941,7 @@ int main(int argc, char **argv)
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
 
     QString myip = gContext->GetSetting("BackendServerIP");
-    if (myip.isNull() || myip.isEmpty())
+    if (myip.isEmpty())
     {
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
