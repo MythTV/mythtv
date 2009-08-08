@@ -1321,20 +1321,23 @@ QString MythUIHelper::GetLanguageAndVariant(void)
 
 void MythUIHelper::DisableScreensaver(void)
 {
-    QApplication::postEvent(GetMythMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetDisable));
+    if (QApplication::type() == QApplication::GuiClient)
+        QApplication::postEvent(GetMythMainWindow(),
+                new ScreenSaverEvent(ScreenSaverEvent::ssetDisable));
 }
 
 void MythUIHelper::RestoreScreensaver(void)
 {
-    QApplication::postEvent(GetMythMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetRestore));
+    if (QApplication::type() == QApplication::GuiClient)
+        QApplication::postEvent(GetMythMainWindow(),
+                new ScreenSaverEvent(ScreenSaverEvent::ssetRestore));
 }
 
 void MythUIHelper::ResetScreensaver(void)
 {
-    QApplication::postEvent(GetMythMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetReset));
+    if (QApplication::type() == QApplication::GuiClient)
+        QApplication::postEvent(GetMythMainWindow(),
+                new ScreenSaverEvent(ScreenSaverEvent::ssetReset));
 }
 
 void MythUIHelper::DoDisableScreensaver(void)
