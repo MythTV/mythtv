@@ -53,6 +53,10 @@ QString chooseCD(void)
     if (gCDdevice.length())
         return gCDdevice;
 
+#ifdef Q_OS_MAC
+    return MediaMonitor::GetMountPath(MediaMonitor::defaultCDdevice());
+#endif
+
     return MediaMonitor::defaultCDdevice();
 }
 
