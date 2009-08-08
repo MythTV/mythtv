@@ -809,7 +809,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
     if (cmdURL.contains("youtube.com"))
     {
         cmdURL = QString(article.mediaURL());
-        QString mediaPage = HttpComms::getHttp(cmdURL);
+        QString mediaPage = HttpComms::getHttp(cmdURL, 0, 1, 2);
         if (!mediaPage.isEmpty())
         {
             // If this breaks in the future, we are building the URL
