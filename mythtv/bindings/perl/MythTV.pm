@@ -827,6 +827,15 @@ EOF
         return \@recdirs;
     }
 
+# Delete the specified file in the specified Storage Group
+    sub delete_file {
+        my $self = shift;
+        my $filename = shift;
+        my $sgroup = shift;
+
+        return $self->backend_command(join($MythTV::BACKEND_SEP, 'DELETE_FILE', $filename, $sgroup));
+    }
+
 # Return true
 1;
 

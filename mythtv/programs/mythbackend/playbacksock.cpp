@@ -148,10 +148,11 @@ int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)
     return 0;
 }
 
-int PlaybackSock::DeleteFile(const QString filename)
+int PlaybackSock::DeleteFile(const QString filename, const QString sgroup)
 {
-    QStringList strlist( QString("DELETE_FILE"));
+    QStringList strlist("DELETE_FILE");
     strlist << filename;
+    strlist << sgroup;
 
     if (SendReceiveStringList(strlist, 1))
         return strlist[0].toInt();

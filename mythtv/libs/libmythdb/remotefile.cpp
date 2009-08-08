@@ -181,14 +181,15 @@ bool RemoteFile::DeleteFile(const QString &url)
 
 bool RemoteFile::DeleteFile(void)
 {
-    bool result = false;
+    bool result      = false;
     QUrl qurl(path);
     QString filename = qurl.path();
+    QString sgroup   = qurl.userName();
 
     if (filename.left(1) == "/")
         filename = filename.right(filename.length()-1);
 
-    if (filename.isEmpty())
+    if (filename.isEmpty() || sgroup.isEmpty())
         return false;
 
     sock = openSocket(true);
@@ -196,7 +197,10 @@ bool RemoteFile::DeleteFile(void)
     if (!sock)
         return false;
 
-    QStringList strlist(QString("DELETE_FILE %1").arg(filename));
+    QStringList strlist("DELETE_FILE");
+    strlist << filename;
+    strlist << sgroup;
+
     sock->writeStringList(strlist);
     if (!sock->readStringList(strlist, false))
     {

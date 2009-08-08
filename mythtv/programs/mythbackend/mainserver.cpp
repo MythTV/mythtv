@@ -382,10 +382,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "DELETE_FILE")
     {
-        if (tokens.size() < 2)
+        if (listline.size() < 3)
             VERBOSE(VB_IMPORTANT, "Bad DELETE_FILE command");
         else
-            HandleDeleteFile(tokens[1], pbs);
+            HandleDeleteFile(listline, pbs);
     }
     else if (command == "STOP_RECORDING")
     {
@@ -3708,10 +3708,11 @@ void MainServer::DoTruncateThread(const DeleteStruct *ds)
     TruncateAndClose(NULL, ds->fd, ds->filename, ds->size);
 }
 
-void MainServer::HandleDeleteFile(QString filename, PlaybackSock *pbs)
+void MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
 {
+    QString filename = slist[1];
     QStringList retlist;
-    StorageGroup sgroup;
+    StorageGroup sgroup(slist[2], "", false);
 
     if ((filename.isEmpty()) ||
         (filename.contains("/../")) ||
