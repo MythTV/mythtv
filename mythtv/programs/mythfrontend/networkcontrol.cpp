@@ -278,7 +278,7 @@ void NetworkControl::processNetworkControlCommand(QString command)
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(tokens[0]);
 
-    if (result != "")
+    if (!result.isEmpty())
     {
         nrLock.lock();
         networkControlReplies.push_back(result);
@@ -655,7 +655,7 @@ QString NetworkControl::processPlay(QStringList tokens)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
 
-    if (message != "")
+    if (!message.isEmpty())
     {
         MythEvent me(message);
         gContext->dispatch(me);
@@ -747,8 +747,7 @@ QString NetworkControl::processQuery(QStringList tokens)
 
 QString NetworkControl::processHelp(QStringList tokens)
 {
-    QString command = "";
-    QString helpText = "";
+    QString command, helpText;
 
     if (tokens.size() >= 1)
     {
@@ -849,10 +848,10 @@ QString NetworkControl::processHelp(QStringList tokens)
             "exit                  - Terminates session\r\n\r\n";
     }
 
-    if (helpText != "")
+    if (!helpText.isEmpty())
         return helpText;
 
-    if (command != "")
+    if (!command.isEmpty())
             helpText += QString("Unknown command '%1'\r\n\r\n").arg(command);
 
     helpText +=
@@ -947,7 +946,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
                          "FROM program "
                          "WHERE starttime < :START AND endtime > :END ");
 
-    if(chanID != "")
+    if (!chanID.isEmpty())
     {
         queryStr += " AND chanid = :CHANID";
         appendCRLF = false;
@@ -1001,7 +1000,7 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     queryStr = "SELECT chanid, starttime, title, subtitle "
                "FROM recorded WHERE deletepending = 0 ";
 
-    if ((chanid != "") && (starttime != ""))
+    if ((!chanid.isEmpty()) && (!starttime.isEmpty()))
     {
         queryStr += "AND chanid = " + chanid + " "
                     "AND starttime = '" + starttime + "' ";

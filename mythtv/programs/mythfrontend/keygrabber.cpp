@@ -89,9 +89,9 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
         m_keyReleaseSeen       = true;
 
         QString key_name = QString(QKeySequence(event->key()));
-        if (!key_name.isEmpty() && !key_name.isNull())
+        if (!key_name.isEmpty())
         {
-            QString modifiers = "";
+            QString modifiers;
 
             /* key modifier strings as defined by the QT docs */
             if (event->modifiers() & Qt::ShiftModifier)

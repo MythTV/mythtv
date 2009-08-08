@@ -394,7 +394,7 @@ void ProgFinder::showGuide()
     if (m_allowEPG)
     {
         QString startchannel = gContext->GetSetting("DefaultTVChannel");
-        if (startchannel == "")
+        if (startchannel.isEmpty())
             startchannel = "3";
         uint startchanid = 0;
         GuideGrid::RunProgramGuide(startchanid, startchannel, m_player, m_embedVideo, false);

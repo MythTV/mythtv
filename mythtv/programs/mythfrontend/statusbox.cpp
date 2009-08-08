@@ -812,7 +812,7 @@ void StatusBox::doLogEntries(void)
         {
             line = QString("%1").arg(query.value(5).toString());
 
-            if (query.value(6).toString() != "")
+            if (!query.value(6).toString().isEmpty())
                 detail = tr("On %1 %2 from %3.%4\n%5\n%6")
                                .arg(query.value(3).toDateTime()
                                          .toString(m_dateFormat))
@@ -1334,7 +1334,7 @@ void StatusBox::doAutoExpireList()
 
         detailInfo += "\n" + pginfo->title;
 
-        if (pginfo->subtitle != "")
+        if (!pginfo->subtitle.isEmpty())
             detailInfo += " - " + pginfo->subtitle + "";
 
         AddLogLine(contentLine, detailInfo);

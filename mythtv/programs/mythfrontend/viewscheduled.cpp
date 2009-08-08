@@ -306,7 +306,7 @@ void ViewScheduled::LoadList(void)
     FillList();
 
     // Restore position after a list update
-    if (!callsign.isNull())
+    if (!callsign.isEmpty())
     {
         ProgramList plist;
 

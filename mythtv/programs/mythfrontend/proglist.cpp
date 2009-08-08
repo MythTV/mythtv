@@ -697,10 +697,10 @@ void ProgLister::deleteOldRecorded()
 
     QString message = pi->title;
 
-    if (pi->subtitle != "")
+    if (!pi->subtitle.isEmpty())
         message += QString(" - \"%1\"").arg(pi->subtitle);
 
-    if (pi->description != "")
+    if (!pi->description.isEmpty())
         message += "\n\n" + pi->description;
 
     message += "\n\n\n" + tr("NOTE: removing items from this list will not "
@@ -851,7 +851,7 @@ void ProgLister::fillViewList(const QString &view)
                 while (query.next())
                 {
                     QString category = query.value(0).toString();
-                    if (category <= " " || category.isNull())
+                    if (category.isEmpty())
                         continue;
                     category = query.value(0).toString();
                     m_viewList << category;
@@ -862,7 +862,7 @@ void ProgLister::fillViewList(const QString &view)
             m_useGenres = false;
         }
 
-        if (view != "")
+        if (!view.isEmpty())
             m_curView = m_viewList.indexOf(view);
     }
     else if (m_type == plTitleSearch || m_type == plKeywordSearch ||
@@ -885,7 +885,7 @@ void ProgLister::fillViewList(const QString &view)
                 m_viewTextList << phrase;
             }
         }
-        if (view != "")
+        if (!view.isEmpty())
         {
             m_curView = m_viewList.indexOf(view);
 
@@ -913,7 +913,7 @@ void ProgLister::fillViewList(const QString &view)
     }
     else if (m_type == plTitle)
     {
-        if (view != "")
+        if (!view.isEmpty())
         {
             m_viewList << view;
             m_viewTextList << view;
@@ -1029,7 +1029,7 @@ void ProgLister::fillViewList(const QString &view)
                 m_viewTextList << rulename;
             }
         }
-        if (view != "")
+        if (!view.isEmpty())
             m_curView = m_viewList.indexOf(view);
     }
     else if (m_type == plPreviouslyRecorded) // previously recorded
@@ -1046,7 +1046,7 @@ void ProgLister::fillViewList(const QString &view)
         m_viewList << "reverse title";
         m_viewTextList << tr("Reverse Title");
 
-        if (view != "")
+        if (!view.isEmpty())
             m_curView = m_viewList.indexOf(view);
     }
 
@@ -1232,7 +1232,7 @@ void ProgLister::fillItemList(bool restorePosition)
 
         bool genreflag = powerStringToSQL(qphrase, powerWhere, powerBindings);
 
-        if (powerWhere != "")
+        if (!powerWhere.isEmpty())
         {
             if (genreflag)
                 where = QString("LEFT JOIN programgenres ON "
@@ -1845,14 +1845,12 @@ void PhrasePopup::deleteClicked(void)
 
 void PhrasePopup::recordClicked(void)
 {
-    QString text = "";
+    QString text = m_phraseEdit->GetText();
     bool genreflag = false;
-
-    text = m_phraseEdit->GetText();
 
     QString what = text;
 
-    if (text.trimmed().length() == 0)
+    if (text.trimmed().isEmpty())
         return;
 
     if (m_searchType == kNoSearch)
@@ -1863,13 +1861,13 @@ void PhrasePopup::recordClicked(void)
 
     if (m_searchType == kPowerSearch)
     {
-        if (text == "" || text == ":::::")
+        if (text == ":::::")
             return;
 
         MSqlBindings bindings;
         genreflag = m_parent->powerStringToSQL(text, what, bindings);
 
-        if (what == "")
+        if (what.isEmpty())
             return;
 
         MSqlEscapeAsAQuery(what, bindings);
@@ -2121,14 +2119,12 @@ void PowerSearchPopup::deleteClicked(void)
 
 void PowerSearchPopup::recordClicked(void)
 {
-    QString text = "";
+    QString text = m_phraseEdit->GetText();
     bool genreflag = false;
-
-    text = m_phraseEdit->GetText();
 
     QString what = text;
 
-    if (text.trimmed().length() == 0)
+    if (text.trimmed().isEmpty())
         return;
 
     if (m_searchType == kNoSearch)
@@ -2139,13 +2135,13 @@ void PowerSearchPopup::recordClicked(void)
 
     if (m_searchType == kPowerSearch)
     {
-        if (text == "" || text == ":::::")
+        if (text == ":::::")
             return;
 
         MSqlBindings bindings;
         genreflag = m_parent->powerStringToSQL(text, what, bindings);
 
-        if (what == "")
+        if (what.isEmpty())
             return;
 
         MSqlEscapeAsAQuery(what, bindings);
