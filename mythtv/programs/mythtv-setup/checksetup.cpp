@@ -124,7 +124,7 @@ bool checkChannelPresets(QStringList &probs)
         QString startchan = query.value(1).toString();
         int sourceid  = query.value(2).toInt();
 
-        if (query.value(1).toString() == "")    // Logic from tv_rec.cpp
+        if (query.value(1).toString().isEmpty())    // Logic from tv_rec.cpp
             startchan = "3";
 
         MSqlQuery channelExists(MSqlQuery::InitCon());

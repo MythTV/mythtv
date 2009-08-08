@@ -596,9 +596,9 @@ bool FillData::Run(SourceList &sourcelist)
             updateLastRunEnd(query);
             continue;
         }
-        else if (xmltv_grabber == "/bin/true" ||
-                 xmltv_grabber == "none" ||
-                 xmltv_grabber == "")
+        else if (xmltv_grabber.trimmed().isEmpty() ||
+                 xmltv_grabber == "/bin/true" ||
+                 xmltv_grabber == "none")
         {
             VERBOSE(VB_GENERAL,
                     QString("Source %1 configured with no grabber. "
@@ -1101,7 +1101,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
             {
                 if ((nSplitPoint = strLine.find(']')) > 1)
                 {
-                    if ((xawid != "") && (channel != ""))
+                    if (!xawid.isEmpty() && !channel.isEmpty())
                     {
                         ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
                         chanlist.push_back(*chinfo);
@@ -1130,7 +1130,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
         }
     }
 
-    if ((xawid != "") && (channel != ""))
+    if (!xawid.isEmpty() && !channel.isEmpty())
     {
         ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
         chanlist.push_back(*chinfo);

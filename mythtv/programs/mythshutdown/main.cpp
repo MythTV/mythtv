@@ -508,7 +508,7 @@ int shutdown()
     // get next scheduled wake up for a recording if any
     QDateTime dtNextRecordingStart = QDateTime();
     QString s = getGlobalSetting("MythShutdownNextScheduled", "");
-    if (s != "")
+    if (!s.isEmpty())
         dtNextRecordingStart = QDateTime::fromString(s, Qt::ISODate);
 
     if (!dtNextRecordingStart.isValid())
@@ -630,7 +630,7 @@ int shutdown()
 
             // we don't trust the return code from nvram-wakeup so only reboot
             // if the user has set a restart command
-            if (nvramRestartCmd == "")
+            if (nvramRestartCmd.isEmpty())
                 shutdownmode = 0;
             else
                 shutdownmode = 1;
@@ -695,7 +695,7 @@ int startup()
     int res = 0;
     QDateTime startupTime = QDateTime();
     QString s = getGlobalSetting("MythshutdownWakeupTime", "");
-    if (s != "")
+    if (!s.isEmpty())
         startupTime = QDateTime::fromString(s, Qt::ISODate);
 
     // if we don't have a valid startup time assume we were started manually

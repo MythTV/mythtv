@@ -138,7 +138,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
     QList<ChanInfo>::iterator i = chanlist->begin();
     for (; i != chanlist->end(); i++)
     {
-        QString localfile = "";
+        QString localfile;
 
         if (!(*i).iconpath.isEmpty())
         {
@@ -250,7 +250,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
                 promptForChannelUpdates(i, chanid.toUInt());
 
-                if ((*i).callsign == "")
+                if ((*i).callsign.isEmpty())
                     (*i).callsign = chanid;
 
                 if (name     != (*i).name ||
@@ -300,7 +300,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
             }
             else
             {
-                if (!non_us_updating && localfile != "")
+                if (!non_us_updating && !localfile.isEmpty())
                 {
                     MSqlQuery subquery(MSqlQuery::InitCon());
                     subquery.prepare("UPDATE channel SET icon = :ICON WHERE "
@@ -345,7 +345,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
                 uint chanid = promptForChannelUpdates(i,0);
 
-                if ((*i).callsign == "")
+                if ((*i).callsign.isEmpty())
                     (*i).callsign = QString::number(chanid);
 
                 int mplexid = 0;

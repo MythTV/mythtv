@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 
     QString themename = gContext->GetSetting("Theme");
     QString themedir = GetMythUI()->FindThemeDir(themename);
-    if (themedir == "")
+    if (themedir.isEmpty())
     {   
         QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
             .arg(themename);
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
     // Mac OS X doesn't define the AudioOutputDevice setting
 #else
     QString auddevice = gContext->GetSetting("AudioOutputDevice");
-    if (auddevice == "" || auddevice == QString::null)
+    if (auddevice.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Fatal Error: Audio not configured, you need "
                 "to run 'mythfrontend', not 'mythtv'.");
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
 
     ProgramInfo *pginfo = NULL;
 
-    if ((filename != "") &&
+    if (!filename.isEmpty() &&
         ((pginfo = ProgramInfo::GetProgramFromBasename(filename)) == NULL))
     {
         pginfo = new ProgramInfo();

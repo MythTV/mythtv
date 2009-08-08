@@ -306,7 +306,7 @@ void ChannelEditor::fillList(void)
             if (!visible)
                 state = "disabled";
 
-            if (!query.value(6).toString().isNull())
+            if (!query.value(6).toString().isEmpty())
             {
                 sourceid = query.value(6).toString();
                 if (fAllSources && m_sourceFilter == FILTER_UNASSIGNED)
