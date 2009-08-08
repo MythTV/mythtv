@@ -1089,12 +1089,14 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         bool writemode = false;
         bool usereadahead = true;
         int retries = -1;
-        if (commands.size() >= 6)
-        {
+        if (commands.size() > 3)
             writemode = commands[3].toInt();
+
+        if (commands.size() > 4)
             usereadahead = commands[4].toInt();
+
+        if (commands.size() > 5)
             retries = commands[5].toInt();
-        }
 
         if (writemode)
         {
