@@ -12,7 +12,7 @@ class MythSocket;
 class MPUBLIC RemoteFile
 {
   public:
-    RemoteFile(const QString &url,
+    RemoteFile(const QString &url = "",
                bool write = false,
                bool usereadahead = true,
                int retries = -1,
@@ -24,12 +24,15 @@ class MPUBLIC RemoteFile
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 
+    static bool DeleteFile(const QString &url);
+    bool DeleteFile(void);
     int Write(const void *data, int size);
     int Read(void *data, int size);
     void Reset(void);
 
     bool SaveAs(QByteArray &data);
 
+    void SetURL(const QString &url) { path = url; }
     void SetTimeout(bool fast);
 
     bool isOpen(void) const

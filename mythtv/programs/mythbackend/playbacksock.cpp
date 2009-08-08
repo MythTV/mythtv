@@ -148,6 +148,17 @@ int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)
     return 0;
 }
 
+int PlaybackSock::DeleteFile(const QString filename)
+{
+    QStringList strlist( QString("DELETE_FILE"));
+    strlist << filename;
+
+    if (SendReceiveStringList(strlist, 1))
+        return strlist[0].toInt();
+
+    return 0;
+}
+
 int PlaybackSock::StopRecording(const ProgramInfo *pginfo)
 {
     QStringList strlist( QString("STOP_RECORDING"));

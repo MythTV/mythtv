@@ -44,6 +44,7 @@ class PlaybackSock
 
     bool GoToSleep(void);
     void GetDiskSpace(QStringList &o_strlist);
+    int DeleteFile(const QString filename);
     int StopRecording(const ProgramInfo *pginfo);
     int CheckRecordingActive(const ProgramInfo *pginfo);
     int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);

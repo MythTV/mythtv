@@ -380,6 +380,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleQueryGuideDataThrough(pbs);
     }
+    else if (command == "DELETE_FILE")
+    {
+        if (tokens.size() < 2)
+            VERBOSE(VB_IMPORTANT, "Bad DELETE_FILE command");
+        else
+            HandleDeleteFile(tokens[1], pbs);
+    }
     else if (command == "STOP_RECORDING")
     {
         HandleStopRecording(listline, pbs);
@@ -1883,8 +1890,11 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
 {
     QMutexLocker locker(&truncate_and_close_lock);
 
-    pginfo->pathname = filename;
-    pginfo->MarkAsInUse(true, "truncatingdelete");
+    if (pginfo)
+    {
+        pginfo->pathname = filename;
+        pginfo->MarkAsInUse(true, "truncatingdelete");
+    }
 
     int cards = 5;
 
@@ -1918,13 +1928,14 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
         {
             VERBOSE(VB_IMPORTANT, QString("Error truncating '%1'")
                     .arg(filename) + ENO);
-            pginfo->MarkAsInUse(false);
+            if (pginfo)
+                pginfo->MarkAsInUse(false);
             return 0 == close(fd);
         }
 
         fsize -= increment;
 
-        if ((count % 100) == 0)
+        if (pginfo && ((count % 100) == 0))
             pginfo->UpdateInUseMark(true);
 
         count++;
@@ -1934,7 +1945,8 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
 
     bool ok = (0 == close(fd));
 
-    pginfo->MarkAsInUse(false);
+    if (pginfo)
+        pginfo->MarkAsInUse(false);
 
     VERBOSE(VB_FILE, QString("Finished truncating '%1'").arg(filename));
 
@@ -3672,6 +3684,106 @@ void MainServer::HandleIsActiveBackendQuery(QStringList &slist,
         retlist << "TRUE";
 
     SendResponse(pbs->getSocket(), retlist);
+}
+
+void *MainServer::SpawnTruncateThread(void *param)
+{
+    DeleteStruct *ds = (DeleteStruct *)param;
+
+    MainServer *ms = ds->ms;
+    ms->DoTruncateThread(ds);
+
+    delete ds;
+
+    return NULL;
+}
+
+void MainServer::DoTruncateThread(const DeleteStruct *ds)
+{
+    QMutexLocker dl(&deletelock);
+
+    TruncateAndClose(NULL, ds->fd, ds->filename, ds->size);
+}
+
+void MainServer::HandleDeleteFile(QString filename, PlaybackSock *pbs)
+{
+    QStringList retlist;
+    StorageGroup sgroup;
+
+    if (filename.isEmpty() || filename.contains("/../"))
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR deleting file, filename '%1' "
+                "fails sanity checks").arg(filename));
+        retlist << "0";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    QString fullfile = sgroup.FindRecordingFile(filename);
+
+    if (fullfile.isEmpty()) {
+        VERBOSE(VB_IMPORTANT, QString("Unable to find %1 in HandleDeleteFile()")
+                .arg(filename));
+        retlist << "0";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    QFile checkFile(fullfile);
+    bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
+    bool slowDeletes = gContext->GetNumSetting("TruncateDeletesSlowly", 0);
+    int fd = -1;
+    off_t size = 0;
+    bool errmsg = false;
+
+    /* Delete recording. */
+    if (slowDeletes)
+    {
+        // Since stat fails after unlinking on some filesystems,
+        // get the filesize first
+        const QFileInfo info(fullfile);
+        size = info.size();
+        fd = DeleteFile(fullfile, followLinks);
+
+        if (fd < 0)
+            errmsg = true;
+    }
+    else
+    {
+        delete_file_immediately(fullfile, followLinks, false);
+        sleep(2);
+        if (checkFile.exists())
+            errmsg = true;
+    }
+
+    if (errmsg)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error deleting file: %1.")
+                .arg(fullfile));
+        retlist << "0";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    retlist << "1";
+
+    SendResponse(pbs->getSocket(), retlist);
+
+    if (slowDeletes && fd != -1)
+    {
+        DeleteStruct *ds = new DeleteStruct;
+        ds->ms = this;
+        ds->filename = fullfile;
+        ds->fd = fd;
+        ds->size = size;
+
+        pthread_t truncateThread;
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        pthread_create(&truncateThread, &attr, SpawnTruncateThread, ds);
+        pthread_attr_destroy(&attr);
+    }
 }
 
 // Helper function for the guts of HandleCommBreakQuery + HandleCutListQuery

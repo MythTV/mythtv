@@ -67,6 +67,8 @@ class MainServer : public QObject, public MythSocketCBs
         QDateTime recstartts;
         QDateTime recendts;
         QString filename;
+        int fd;
+        off_t size;
         QString title;
         bool forceMetadataDelete;
     } DeleteStruct;
@@ -77,6 +79,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleDone(MythSocket *socket);
 
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
+    void HandleDeleteFile(QString filename, PlaybackSock *pbs);
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
@@ -155,6 +158,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     QString LocalFilePath(const QUrl &url, const QString wantgroup);
 
+    static void *SpawnTruncateThread(void *param);
+    void DoTruncateThread(const DeleteStruct *ds);
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(const DeleteStruct *ds);
     void DoDeleteInDB(const DeleteStruct *ds);

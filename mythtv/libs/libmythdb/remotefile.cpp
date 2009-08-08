@@ -29,11 +29,13 @@ RemoteFile::RemoteFile(const QString &_path, bool write, bool useRA,
         usereadahead = false;
         retries = -1;
     }
-
-    if (possibleAuxiliaryFiles)
+    else if (possibleAuxiliaryFiles)
         possibleauxfiles = *possibleAuxiliaryFiles;
-    Open();
-    VERBOSE(VB_GENERAL,QString("RemoteFile(%1)").arg(path));
+
+    if (!path.isEmpty())
+        Open();
+
+    VERBOSE(VB_FILE,QString("RemoteFile(%1)").arg(path));
 }
 
 RemoteFile::~RemoteFile()
@@ -160,6 +162,53 @@ void RemoteFile::Close(void)
     } 
 
     lock.unlock();   
+}
+
+bool RemoteFile::DeleteFile(const QString &url)
+{
+    RemoteFile *rf = new RemoteFile();
+
+    if (!rf)
+        return false;
+
+    rf->SetURL(url);
+    bool ret = rf->DeleteFile();
+
+    delete rf;
+
+    return ret;
+}
+
+bool RemoteFile::DeleteFile(void)
+{
+    bool result = false;
+    QUrl qurl(path);
+    QString filename = qurl.path();
+
+    if (filename.left(1) == "/")
+        filename = filename.right(filename.length()-1);
+
+    if (filename.isEmpty())
+        return false;
+
+    sock = openSocket(true);
+
+    if (!sock)
+        return false;
+
+    QStringList strlist(QString("DELETE_FILE %1").arg(filename));
+    sock->writeStringList(strlist);
+    if (!sock->readStringList(strlist, false))
+    {
+        VERBOSE(VB_IMPORTANT, "Remote file delete timeout.");
+    }
+    else if (strlist[0] == "1")
+        result = true;
+
+    sock->DownRef();
+    sock = NULL;
+
+    return result;
 }
 
 void RemoteFile::Reset(void)
