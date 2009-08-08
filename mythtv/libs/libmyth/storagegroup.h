@@ -9,10 +9,12 @@
 class MPUBLIC StorageGroup: public ConfigurationWizard
 {
   public:
-    StorageGroup(const QString group = "", const QString hostname = "");
+    StorageGroup(const QString group = "", const QString hostname = "",
+                 const bool allowFallback = true);
 
     void    Init(const QString group = "Default",
-                 const QString hostname = "");
+                 const QString hostname = "",
+                 const bool allowFallback = true);
 
     QString getName(void) const
         { QString tmp = m_groupname; tmp.detach(); return tmp; }
@@ -43,6 +45,7 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
 
     QString      m_groupname;
     QString      m_hostname;
+    bool         m_allowFallback;
     QStringList  m_dirlist;
 };
 

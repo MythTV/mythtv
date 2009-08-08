@@ -34,14 +34,15 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
  *                  directories, but only in local directory structure.
  *                  This is parameter is ignored if group is an empty string.
  */
-StorageGroup::StorageGroup(const QString group, const QString hostname) :
-    m_groupname(group), m_hostname(hostname)
+StorageGroup::StorageGroup(const QString group, const QString hostname,
+                           bool allowFallback) :
+    m_groupname(group), m_hostname(hostname), m_allowFallback(allowFallback)
 {
     m_groupname.detach();
     m_hostname.detach();
     m_dirlist.clear();
 
-    Init(m_groupname, m_hostname);
+    Init(m_groupname, m_hostname, m_allowFallback);
 }
 
 /** \fn StorageGroup::Init(const QString, const QString)
@@ -56,15 +57,17 @@ StorageGroup::StorageGroup(const QString group, const QString hostname) :
  *  \param group    The name of the Storage Group
  *  \param hostname The host whose Storage Group definition is desired
  */
-void StorageGroup::Init(const QString group, const QString hostname)
+void StorageGroup::Init(const QString group, const QString hostname,
+                        const bool allowFallback)
 {
     bool found = false;
     m_groupname = group;    m_groupname.detach();
     m_hostname  = hostname; m_hostname.detach();
+    m_allowFallback = allowFallback;
     m_dirlist.clear();
 
     found = FindDirs(m_groupname, m_hostname);
-    if ((!found) && (!hostname.isEmpty()))
+    if ((!found) && m_allowFallback && (!hostname.isEmpty()))
     {
         VERBOSE(VB_FILE, LOC +
                 QString("Unable to find any directories for the local "
@@ -77,7 +80,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
             m_hostname.detach();
         }
     }
-    if ((!found) && (group != "Default"))
+    if ((!found) && m_allowFallback && (group != "Default"))
     {
         VERBOSE(VB_FILE, LOC +
                 QString("Unable to find storage group '%1', trying "
@@ -107,7 +110,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
 
     if (!m_dirlist.size())
     {
-        QString msg = "Directory value for Default Storage Group is empty.  ";
+        QString msg = "Unable to find any Storage Group Directories.  ";
         QString tmpDir = gContext->GetSetting("RecordFilePrefix");
         if (tmpDir != "")
         {
@@ -322,7 +325,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
         curDir++;
     }
 
-    if (m_groupname.isEmpty())
+    if (m_groupname.isEmpty() || (m_allowFallback == false))
     {
         // Not found in any dir, so try RecordFilePrefix if it exists
         QString tmpFile =
