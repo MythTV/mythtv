@@ -5910,8 +5910,21 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
 
     if (player_ctx->buffer->isDVD())
     {
-        GoToDVDMenu("menu");
-        GoToDVDProgram(1);
+        if (GoToDVDMenu("menu"))
+        {
+            if (player_ctx->buffer->DVD()->IsInMenu() &&
+                !player_ctx->buffer->DVD()->InStillFrame())
+                GoToDVDProgram(1);
+        }
+        else if (player_ctx->buffer->DVD()->GetTotalTimeOfTitle() < 60)
+        {
+            GoToDVDProgram(1);
+            GetFrame(1);
+
+            number = frameNum;
+            if (number >= totalFrames)
+                number = totalFrames / 2;
+        }
     }
     else
     {
@@ -7523,15 +7536,23 @@ void NuppelVideoPlayer::ActivateDVDButton(void)
     player_ctx->buffer->DVD()->ActivateButton();
 }
 
-void NuppelVideoPlayer::GoToDVDMenu(QString str)
+bool NuppelVideoPlayer::GoToDVDMenu(QString str)
 {
     if (!player_ctx->buffer->isDVD())
-        return;
-
+        return false;
+    
     textDisplayMode = kDisplayNone;
     bool ret = player_ctx->buffer->DVD()->GoToMenu(str);
-    if (!ret && osd)
-        osd->SetSettingsText(QObject::tr("DVD Menu Not Available"), 1);
+    
+    if (!ret)
+    {
+        if (osd)
+            osd->SetSettingsText(QObject::tr("DVD Menu Not Available"), 1);
+        VERBOSE(VB_GENERAL, "No DVD Menu available.");
+        return false;
+    }
+    
+    return true;
 }
 
 /** \fn NuppelVideoPlayer::GoToDVDProgram(bool direction)

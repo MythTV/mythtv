@@ -412,7 +412,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // DVD public stuff
     void ChangeDVDTrack(bool ffw);
     void ActivateDVDButton(void);
-    void GoToDVDMenu(QString str);
+    bool GoToDVDMenu(QString str);
     void GoToDVDProgram(bool direction);
     void HideDVDButton(bool hide) 
     {
