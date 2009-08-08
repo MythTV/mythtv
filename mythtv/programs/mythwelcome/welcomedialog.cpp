@@ -401,7 +401,7 @@ void WelcomeDialog::updateScreen(void)
             //                               .arg(m_scheduledList.size());
             status = prog.channame + "\n";
             status += prog.title;
-            if (prog.subtitle != "")
+            if (!prog.subtitle.isEmpty())
                 status += "\n(" + prog.subtitle + ")";
 
             QString dateFormat = gContext->GetSetting(
@@ -457,7 +457,7 @@ void WelcomeDialog::runMythFillDatabase()
     QString mflog = gContext->GetSetting("MythFillDatabaseLog",
                                          "/var/log/mythfilldatabase.log");
 
-    if (mflog == "")
+    if (mflog.isEmpty())
         command = QString("%1 %2").arg(mfpath).arg(mfarg);
     else
         command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg).arg(mflog);

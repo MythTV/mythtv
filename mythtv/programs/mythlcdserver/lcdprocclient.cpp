@@ -500,7 +500,7 @@ void LCDProcClient::init()
     updateRecordingList();
 
     // do we need to show the startup message
-    if (startup_message != "")
+    if (!startup_message.isEmpty())
         showStartupMessage();
 
     // send buffer if there's anything in there
@@ -557,7 +557,7 @@ void LCDProcClient::loadSettings()
     lcd_bigclock = (gContext->GetSetting("LCDBigClock", "1")=="1");
     lcd_keystring = gContext->GetSetting("LCDKeyString", "ABCDEF");
 
-    if (old_keystring != "")
+    if (!old_keystring.isEmpty())
     {
         aString = "client_del_key " + expandString(old_keystring);
         sendToServer(aString);
@@ -1984,7 +1984,7 @@ void LCDProcClient::outputRecStatus(void)
     {
         status = tr("RECORDING|");
         status += tuner.title;
-        if (tuner.subtitle != "") 
+        if (!tuner.subtitle.isEmpty()) 
             status += "|(" + tuner.subtitle + ")";
 
         status += "|" + tuner.startTime.toString("hh:mm") + " to " + 

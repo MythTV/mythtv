@@ -200,7 +200,7 @@ int main(int argc, char **argv)
     // set up log file
     int logfd = -1;
 
-    if (logfile != "")
+    if (!logfile.isEmpty())
     {
         QByteArray tmp = logfile.toAscii();
         logfd = open(tmp.constData(), O_WRONLY|O_CREAT|O_APPEND, 0664);

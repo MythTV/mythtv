@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (templatearg == "")
+    if (templatearg.isEmpty())
     {
         cerr << "--template=<value> argument is required\n"
              << "  <value> can be 'alert', 'cid', 'scroller', or a "

@@ -169,7 +169,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (logfile != "")
+    if (!logfile.isEmpty())
     {
         if (!log_rotate(true))
             cerr << "cannot open logfile; using stdout/stderr" << endl;
