@@ -304,7 +304,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
 
                 bool exists = QFile::exists(sFilename);
                 if (!exists)
-                    HttpComms::getHttpFile(sFilename, url, 20000);
+                    HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
 
                 if (m_thumbnailImage)
                 {
@@ -341,7 +341,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
 
                     bool exists = QFile::exists(sFilename);
                     if (!exists)
-                        HttpComms::getHttpFile(sFilename, url, 20000);
+                        HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
 
                     if (m_thumbnailImage)
                     {
@@ -417,7 +417,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
 
                 bool exists = QFile::exists(sFilename);
                 if (!exists)
-                    HttpComms::getHttpFile(sFilename, url, 20000);
+                    HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
 
                 if (m_thumbnailImage)
                 {
