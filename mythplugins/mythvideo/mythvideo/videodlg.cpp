@@ -181,6 +181,113 @@ namespace
         CoverDownloadErrorState m_error_state;
     };
 
+    class ScreenshotDownloadProxy : public QObject
+    {
+        Q_OBJECT
+
+      signals:
+        void SigFinished(ScreenshotDownloadErrorState reason, QString errorMsg,
+                         Metadata *item);
+      public:
+        static ScreenshotDownloadProxy *Create(const QUrl &url, const QString &dest,
+                                          Metadata *item)
+        {
+            return new ScreenshotDownloadProxy(url, dest, item);
+        }
+
+      public:
+        void StartCopy()
+        {
+            m_id = m_http.get(m_url.toString(), &m_data_buffer);
+
+            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 30)
+                          * 1000);
+        }
+
+        void Stop()
+        {
+            if (m_timer.isActive())
+                m_timer.stop();
+
+            VERBOSE(VB_GENERAL, tr("Screenshot download stopped."));
+            m_http.abort();
+        } 
+    
+      private:
+        ScreenshotDownloadProxy(const QUrl &url, const QString &dest,
+                           Metadata *item) : m_item(item), m_dest_file(dest),
+            m_id(0), m_url(url), m_error_state(ssesOK)
+        {
+            connect(&m_http, SIGNAL(requestFinished(int, bool)),
+                    SLOT(OnFinished(int, bool)));
+
+            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
+            m_timer.setSingleShot(true);
+            m_http.setHost(m_url.host());
+        }
+
+        ~ScreenshotDownloadProxy() {}
+
+      private slots:
+        void OnDownloadTimeout()
+        {
+            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
+                    .arg(m_url.toString()));
+            m_error_state = ssesTimeout;
+            Stop();
+        }
+
+        void OnFinished(int id, bool error)
+        {
+            QString errorMsg;
+            if (error)
+                errorMsg = m_http.errorString();
+
+            if (id == m_id)
+            {
+                if (m_timer.isActive())
+                    m_timer.stop();
+
+                if (!error)
+                {
+                    QFile dest_file(m_dest_file);
+                    if (dest_file.exists())
+                        dest_file.remove();
+
+                    if (dest_file.open(QIODevice::WriteOnly))
+                    {
+                        const QByteArray &data = m_data_buffer.data();
+                        qint64 size = dest_file.write(data);
+                        if (size != data.size())
+                        {
+                            errorMsg = tr("Error writing data to file %1.")
+                                    .arg(m_dest_file);
+                            m_error_state = ssesError;
+                        }
+                    }
+                    else
+                    {
+                        errorMsg = tr("Error: file error '%1' for file %2").
+                                arg(dest_file.errorString()).arg(m_dest_file);
+                        m_error_state = ssesError;
+                    }
+                }
+
+                emit SigFinished(m_error_state, errorMsg, m_item);
+            }
+        }
+
+      private:
+        Metadata *m_item;
+        QHttp m_http;
+        QBuffer m_data_buffer;
+        QString m_dest_file;
+        int m_id;
+        QTimer m_timer;
+        QUrl m_url;
+        ScreenshotDownloadErrorState m_error_state;
+    };
+
     class FanartDownloadProxy : public QObject
     {
         Q_OBJECT
@@ -1076,7 +1183,7 @@ namespace
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
-                             QString title, int season)
+                             QString title, int season, int episode = 0)
     {
         QStringList search_dirs(in_dirs);
 
@@ -1107,9 +1214,18 @@ namespace
             {
                 QStringList sfn;
                 if (season > 0)
-                    sfn += fntm.arg(*dir).arg(QString("%1 Season %2")
+                {
+                    if (episode > 0)
+                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3")
+                                 .arg(title).arg(QString::number(season)))
+                                 .arg(QString::number(episode))
+                                 .arg(*ext);
+                    else
+                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2") 
                                  .arg(title).arg(QString::number(season)))
                                  .arg(*ext);
+
+                }
                 sfn += fntm.arg(*dir).arg(base_name).arg(*ext);
                 sfn += fntm.arg(*dir).arg(video_uid).arg(*ext);
 
@@ -1565,6 +1681,7 @@ class VideoDialogPrivate
         m_isFileBrowser = gContext->GetNumSetting("VideoDialogNoDB", 0);
 
         m_artDir = gContext->GetSetting("VideoArtworkDir");
+        m_sshotDir = gContext->GetSetting("mythvideo.screenshotDir");
         m_fanDir = gContext->GetSetting("mythvideo.fanartDir");
         m_banDir = gContext->GetSetting("mythvideo.bannerDir");
     }
@@ -1619,6 +1736,22 @@ class VideoDialogPrivate
         }
     }
 
+    void AddScreenshotDownload(ScreenshotDownloadProxy *download)
+    {   
+        m_running_ssdownloads.insert(download);
+    }
+
+    void RemoveScreenshotDownload(ScreenshotDownloadProxy *download)
+    {   
+        if (download)
+        {   
+            screenshot_download_list::iterator p =
+                    m_running_ssdownloads.find(download);
+            if (p != m_running_ssdownloads.end())
+                m_running_ssdownloads.erase(p);
+        }
+    }
+
     void AddFanartDownload(FanartDownloadProxy *download)
     {
         m_running_fdownloads.insert(download);
@@ -1658,6 +1791,13 @@ class VideoDialogPrivate
             (*p)->Stop();
     }
 
+    void StopAllRunningScreenshotDownloads()
+    {   
+        screenshot_download_list tmp(m_running_ssdownloads);
+        for (screenshot_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
+            (*p)->Stop();
+    }
+
     void StopAllRunningFanartDownloads()
     {
         fanart_download_list tmp(m_running_fdownloads);
@@ -1675,6 +1815,8 @@ class VideoDialogPrivate
   public:
     typedef std::set<CoverDownloadProxy *> cover_download_list;
     cover_download_list m_running_downloads;
+    typedef std::set<ScreenshotDownloadProxy *> screenshot_download_list;
+    screenshot_download_list m_running_ssdownloads;
     typedef std::set<FanartDownloadProxy *> fanart_download_list;
     fanart_download_list m_running_fdownloads;
     typedef std::set<BannerDownloadProxy *> banner_download_list;
@@ -1700,6 +1842,7 @@ class VideoDialogPrivate
     VideoDialog::DialogType m_type;
 
     QString m_artDir;
+    QString m_sshotDir;
     QString m_fanDir;
     QString m_banDir;
     VideoScanner *m_scanner;
@@ -3213,6 +3356,15 @@ void VideoDialog::ResetMetadata()
             metadata->SetCoverFile(cover_file);
         }
 
+        QString screenshot_file;
+        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+                        QStringList(m_d->m_artDir), screenshot_file,
+                        metadata->GetTitle(), metadata->GetSeason(), metadata->GetEpisode()))
+        {   
+            metadata->SetScreenshot(screenshot_file);
+        }
+
+
         QString fanart_file;
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_fanDir), fanart_file,
@@ -3525,6 +3677,114 @@ void VideoDialog::OnVideoFanartSetDone(Metadata *metadata)
     UpdateItem(GetItemCurrent());
 }
 
+void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
+{
+    if (metadata)
+    {
+        if (uri.length())
+        {
+            QString fileprefix = m_d->m_sshotDir;
+
+            QDir dir;
+
+            // If the fanart setting hasn't been set default to
+            // using ~/.mythtv/MythVideo/Screenshot
+            if (fileprefix.length() == 0)
+            {
+                fileprefix = GetConfDir();
+
+                dir.setPath(fileprefix);
+                if (!dir.exists())
+                    dir.mkdir(fileprefix);
+
+                fileprefix += "/MythVideo/Screenshot";
+            }
+
+            dir.setPath(fileprefix);
+            if (!dir.exists())
+                dir.mkdir(fileprefix);
+
+            QUrl url(uri);
+
+            QString ext = QFileInfo(url.path()).suffix();
+            QString dest_file;
+
+            if (metadata->GetSeason() > 0 ||
+                metadata->GetEpisode() > 0)
+            {
+                // Name TV downloads so that they already work with the PBB
+                QString title = QString("%1 Season %2x%3").arg(metadata->GetTitle())
+                        .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
+                dest_file = QString("%1/%2.%3").arg(fileprefix)
+                        .arg(title).arg(ext);
+            }
+            else
+                dest_file = QString("%1/%2.%3").arg(fileprefix)
+                        .arg(metadata->GetInetRef()).arg(ext);
+
+            VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
+                    .arg(url.toString()).arg(dest_file));
+
+            ScreenshotDownloadProxy *d =
+                    ScreenshotDownloadProxy::Create(url, dest_file, metadata);
+            metadata->SetScreenshot(dest_file);
+
+            connect(d, SIGNAL(SigFinished(ScreenshotDownloadErrorState,
+                                          QString, Metadata *)),
+                    SLOT(OnScreenshotCopyFinished(ScreenshotDownloadErrorState,
+                                              QString, Metadata *)));
+
+            d->StartCopy();
+            m_d->AddScreenshotDownload(d);
+        }
+        else
+        {
+            metadata->SetScreenshot("");
+            OnVideoScreenshotSetDone(metadata);
+        }
+    }
+    else
+        OnVideoScreenshotSetDone(metadata);
+}
+
+void VideoDialog::OnScreenshotCopyFinished(ScreenshotDownloadErrorState error,
+                                       QString errorMsg, Metadata *item)
+{
+    QObject *src = sender();
+    if (src)
+        m_d->RemoveScreenshotDownload(dynamic_cast<ScreenshotDownloadProxy *>
+                                       (src));
+
+    if (error != ssesOK && item)
+        item->SetScreenshot("");
+
+    VERBOSE(VB_IMPORTANT, tr("Screenshot download finished: %1 %2")
+            .arg(errorMsg).arg(error));
+
+    if (error == ssesTimeout)
+    {
+        createOkDialog(tr("Screenshot exists for this item but could not be "
+                            "retrieved within the timeout period.\n"));
+    }
+
+    OnVideoScreenshotSetDone(item);
+}
+
+// This is the final call as part of a StartVideoScreenshotSet
+void VideoDialog::OnVideoScreenshotSetDone(Metadata *metadata)
+{   
+    // The metadata has some fanart set
+    if (m_busyPopup)
+    {
+        m_busyPopup->Close();
+        m_busyPopup = NULL;
+    }
+
+    metadata->UpdateDatabase();
+    UpdateItem(GetItemCurrent());
+}
+
+
 void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
 {
     if (metadata)
@@ -3740,7 +4000,17 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         metadata->SetCountries(video_countries);
 
         metadata->SetInetRef(video_uid);
+
         StartVideoPosterSet(metadata);
+
+	VERBOSE(VB_GENERAL,QString("EPISODE IMAGE %1 ").arg(data["Episode Image"]));
+	if (!data["Episode Image"].isEmpty())
+	{
+           data["Episode Image"] = data["Episode Image"].replace(QRegExp("http://www.thetvdb.com"),"http://images.thetvdb.com");
+	   OnScreenshotURL(data["Episode Image"], metadata);
+	}
+
+
     }
     else
     {

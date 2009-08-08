@@ -27,6 +27,7 @@ class QUrl;
 typedef QMap<QString, QString> SearchListResults;
 
 enum CoverDownloadErrorState { esOK, esError, esTimeout };
+enum ScreenshotDownloadErrorState { ssesOK, ssesError, ssesTimeout };
 enum FanartDownloadErrorState { fesOK, fesError, fesTimeout };
 enum BannerDownloadErrorState { besOK, besError, besTimeout };
 
@@ -172,6 +173,9 @@ class VideoDialog : public MythScreenType
     void OnFanartURL(QString uri, Metadata *metadata);
     void OnFanartCopyFinished(FanartDownloadErrorState error, QString errorMsg,
                               Metadata *metadata);
+    void OnScreenshotURL(QString uri, Metadata *metadata);
+    void OnScreenshotCopyFinished(ScreenshotDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata);
     void OnBannerURL(QString uri, Metadata *metadata);
     void OnBannerCopyFinished(BannerDownloadErrorState error, QString errorMsg,
                               Metadata *metadata);
@@ -192,6 +196,7 @@ class VideoDialog : public MythScreenType
     // StartVideoPosterSet end
     void OnVideoPosterSetDone(Metadata *metadata);
     void OnVideoFanartSetDone(Metadata *metadata);
+    void OnVideoScreenshotSetDone(Metadata *metadata); 
     void OnVideoBannerSetDone(Metadata *metadata);
 
     // StartVideoSearchByUID end
