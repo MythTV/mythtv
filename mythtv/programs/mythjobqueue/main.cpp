@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
-    if (logfile != "" )
+    if (!logfile.isEmpty())
     {
         if (log_rotate(1) < 0)
         {

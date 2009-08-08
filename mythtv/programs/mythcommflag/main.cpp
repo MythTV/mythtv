@@ -284,7 +284,7 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
         if ((*it == MARK_COMM_START) ||
             (*it == MARK_CUT_START))
         {
-            if (result != "")
+            if (!result.isEmpty())
                 result += ",";
             result += QString("%1-").arg(it.key());
         }
@@ -1232,7 +1232,7 @@ int main(int argc, char *argv[])
     if (clearCutlist)
         return SetCutList(chanid, starttime, "");
 
-    if (!newCutList.isNull())
+    if (!newCutList.isEmpty())
         return SetCutList(chanid, starttime, newCutList);
 
     if (getCutlist)

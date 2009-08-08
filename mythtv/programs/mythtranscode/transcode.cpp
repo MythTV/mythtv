@@ -434,7 +434,7 @@ int Transcode::TranscodeFile(
 
         QMap<long long, int> delMap;
         QMap<long long, int>::Iterator it;
-        QString cutStr = "";
+        QString cutStr;
         long long lastStart = 0;
 
         if (deleteMap.size() > 0)
@@ -446,7 +446,7 @@ int Transcode::TranscodeFile(
         {
             if (*it)
             {
-                if (cutStr != "")
+                if (!cutStr.isEmpty())
                     cutStr += ",";
                 cutStr += QString("%1-").arg((long)it.key());
                 lastStart = it.key();
@@ -457,7 +457,7 @@ int Transcode::TranscodeFile(
                 new_frame_count -= (it.key() - lastStart);
             }
         }
-        if (cutStr == "")
+        if (cutStr.isEmpty())
             cutStr = "Is Empty";
         VERBOSE(VB_GENERAL, QString("Cutlist        : %1").arg(cutStr));
         VERBOSE(VB_GENERAL, QString("Original Length: %1 frames")
@@ -512,7 +512,7 @@ int Transcode::TranscodeFile(
 
         // For overriding settings on the command line
         QMap<QString, QString> recorderOptionsMap;
-        if (recorderOptions != "")
+        if (!recorderOptions.isEmpty())
         {
             QStringList options = recorderOptions
                 .split(",", QString::SkipEmptyParts);
@@ -631,7 +631,7 @@ int Transcode::TranscodeFile(
             nvr->SetIntOption(&profile, "rtjpegchromafilter");
             nvr->SetIntOption(&profile, "rtjpeglumafilter");
         }
-        else if (vidsetting == "")
+        else if (vidsetting.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, "No video information found!");
             VERBOSE(VB_IMPORTANT, "Please ensure that recording profiles "

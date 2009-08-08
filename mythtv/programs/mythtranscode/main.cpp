@@ -580,7 +580,7 @@ int main(int argc, char *argv[])
 
     if (showprogress)
         transcode->ShowProgress(true);
-    if (recorderOptions != "")
+    if (!recorderOptions.isEmpty())
         transcode->SetRecorderOptions(recorderOptions);
     int result = 0;
     if (!mpeg2)
