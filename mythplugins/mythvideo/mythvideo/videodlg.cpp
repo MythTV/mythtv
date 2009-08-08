@@ -4003,8 +4003,8 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
 
         StartVideoPosterSet(metadata);
 
-	VERBOSE(VB_GENERAL,QString("EPISODE IMAGE %1 ").arg(data["Episode Image"]));
-	if (!data["Episode Image"].isEmpty())
+	//VERBOSE(VB_GENERAL,QString("EPISODE IMAGE %1 ").arg(data["Episode Image"]));
+	if (!data["Episode Image"].isEmpty() && metadata->GetScreenshot().isEmpty())
 	{
            data["Episode Image"] = data["Episode Image"].replace(QRegExp("http://www.thetvdb.com"),"http://images.thetvdb.com");
 	   OnScreenshotURL(data["Episode Image"], metadata);
