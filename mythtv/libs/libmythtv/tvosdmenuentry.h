@@ -66,7 +66,6 @@ class MPUBLIC TVOSDMenuEntryList
         void GetEntriesFromDB(void);
         void InitDefaultEntries(void);
 
-    private:
         QList<TVOSDMenuEntry*> curMenuEntries;
 };
 
