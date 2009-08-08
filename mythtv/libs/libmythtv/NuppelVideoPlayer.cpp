@@ -5861,7 +5861,7 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
         return NULL;
     }
 
-    if (!hasFullPositionMap)
+    if (!hasFullPositionMap && !player_ctx->buffer->isDVD())
     {
         VERBOSE(VB_IMPORTANT, LOC + "GetScreenGrabAtFrame: Recording does not "
                 "have position map so we will be unable to grab the desired "
@@ -5908,58 +5908,66 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
 
     ClearAfterSeek();
 
-    number = frameNum;
-
-    if (number >= totalFrames)
+    if (player_ctx->buffer->isDVD())
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR +
-                "Screen grab requested for frame number beyond end of file.");
-
-        number = totalFrames / 2;
+        GoToDVDMenu("menu");
+        GoToDVDProgram(1);
     }
-
-    if (!absolute && hasFullPositionMap)
+    else
     {
-        bookmarkseek = 0;
-        previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
-        if (previewFromBookmark != 0)
-            bookmarkseek = GetBookmark();
+        number = frameNum;
 
-        // Use the bookmark if we should, otherwise make sure we aren't in the
-        // cutlist or a commercial break
-        if (bookmarkseek > 30)
+        if (number >= totalFrames)
         {
-            number = bookmarkseek;
+            VERBOSE(VB_PLAYBACK, LOC_ERR +
+                    "Screen grab requested for frame number beyond end of file.");
+
+            number = totalFrames / 2;
         }
-        else
+
+        if (!absolute && hasFullPositionMap)
         {
-            oldnumber = number;
-            LoadCutList();
+            bookmarkseek = 0;
+            previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
+            if (previewFromBookmark != 0)
+                bookmarkseek = GetBookmark();
 
-            player_ctx->LockPlayingInfo(__FILE__, __LINE__);
-            commBreakMapLock.lock();
-
-            if (player_ctx->playingInfo)
-                player_ctx->playingInfo->GetCommBreakList(commBreakMap);
-
-            while ((FrameIsInMap(number, commBreakMap) ||
-                    (FrameIsInMap(number, deleteMap))))
+            // Use the bookmark if we should, otherwise make sure we aren't
+            // in the cutlist or a commercial break
+            if (bookmarkseek > 30)
             {
-                number += (long long) (30 * video_frame_rate);
-                if (number >= totalFrames)
-                {
-                    number = oldnumber;
-                    break;
-                }
+                number = bookmarkseek;
             }
+            else
+            {
+                oldnumber = number;
+                LoadCutList();
 
-            commBreakMapLock.unlock();
-            player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+                player_ctx->LockPlayingInfo(__FILE__, __LINE__);
+                commBreakMapLock.lock();
+
+                if (player_ctx->playingInfo)
+                    player_ctx->playingInfo->GetCommBreakList(commBreakMap);
+
+                while ((FrameIsInMap(number, commBreakMap) ||
+                        (FrameIsInMap(number, deleteMap))))
+                {
+                    number += (long long) (30 * video_frame_rate);
+                    if (number >= totalFrames)
+                    {
+                        number = oldnumber;
+                        break;
+                    }
+                }
+
+                commBreakMapLock.unlock();
+                player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+            }
         }
     }
 
     // Only do seek if we have position map
-    if (hasFullPositionMap)
+    if (hasFullPositionMap && !player_ctx->buffer->isDVD())
     {
         GetFrame(1);
         DiscardVideoFrame(videoOutput->GetLastDecodedFrame());

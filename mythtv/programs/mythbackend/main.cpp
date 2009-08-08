@@ -21,6 +21,8 @@ using namespace std;
 
 #include <QApplication>
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <QMap>
 #include <QRegExp>
 
@@ -319,10 +321,28 @@ int preview_helper(const QString &chanid, const QString &starttime,
         pginfo = ProgramInfo::GetProgramFromBasename(infile);
         if (!pginfo)
         {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Can not locate recording '%1'").arg(infile));
-            return GENERIC_EXIT_NOT_OK;
+            if (!QFileInfo(infile).exists())
+            {
+                VERBOSE(VB_IMPORTANT, QString(
+                            "Can not locate recording '%1'").arg(infile));
+                return GENERIC_EXIT_NOT_OK;
+            }
+            else
+            {
+                pginfo = new ProgramInfo();
+                pginfo->isVideo = true;
+
+                QDir d(infile + "/VIDEO_TS");
+                if ((infile.section('.', -1) == "iso") ||
+                    (infile.section('.', -1) == "img") ||
+                    d.exists())
+                {
+                    pginfo->pathname = QString("dvd:%1").arg(infile);
+                }
+            }
+
         }
+
     }
     else
     {

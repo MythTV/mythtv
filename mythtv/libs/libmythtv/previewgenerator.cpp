@@ -79,21 +79,26 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
     if (IsLocal() && !(mode & kRemote))
         return;
 
-    // Try to find a local means to access file...
-    QString localFN  = programInfo.GetPlaybackURL(false, true);
-    QString localFNdir = QFileInfo(localFN).path();
-    if (!(localFN.left(1) == "/" &&
-          QFileInfo(localFN).exists() &&
-          QFileInfo(localFNdir).isWritable()))
-        return; // didn't find file locally, must use remote backend
+     if (!programInfo.isVideo)
+     {
+         // Try to find a local means to access file...
+         QString localFN  = programInfo.GetPlaybackURL(false, true);
+         QString localFNdir = QFileInfo(localFN).path();
+         if (!(localFN.left(1) == "/" &&
+             QFileInfo(localFN).exists() &&
+             QFileInfo(localFNdir).isWritable()))
+             return; // didn't find file locally, must use remote backend
 
-    // Found file locally, so set the new pathname..
-    QString msg = QString(
-        "'%1' is not local, "
-        "\n\t\t\treplacing with '%2', which is local.")
-        .arg(pathname).arg(localFN);
-    VERBOSE(VB_RECORD, LOC + msg);
-    pathname = localFN;
+         // Found file locally, so set the new pathname..
+         QString msg = QString(
+             "'%1' is not local, \n\t\t\treplacing with '%2', which is local.")
+             .arg(pathname).arg(localFN);
+         VERBOSE(VB_RECORD, LOC + msg);
+
+         pathname = localFN;
+     }
+     else
+         pathname = programInfo.pathname;
 }
 
 PreviewGenerator::~PreviewGenerator()
@@ -231,6 +236,7 @@ bool PreviewGenerator::Run(void)
         command += QString("--chanid %1 ").arg(programInfo.chanid);
         command += QString("--starttime %1 ")
             .arg(programInfo.recstartts.toString("yyyyMMddhhmmss"));
+
         if (!outFileName.isEmpty())
             command += QString("--outfile \"%1\" ").arg(outFileName);
 
@@ -578,8 +584,14 @@ QString PreviewGenerator::CreateAccessibleFilename(
 
 bool PreviewGenerator::IsLocal(void) const
 {
-    QString pathdir = QFileInfo(pathname).path();
-    return (QFileInfo(pathname).exists() && QFileInfo(pathdir).isWritable());
+    QString tmppathname = pathname;
+
+    if (tmppathname.left(4) == "dvd:")
+        tmppathname = tmppathname.section(":", 1, 1);
+
+    QString pathdir = QFileInfo(tmppathname).path();
+
+    return (QFileInfo(tmppathname).exists() && QFileInfo(pathdir).isWritable());
 }
 
 /**
@@ -624,7 +636,7 @@ char *PreviewGenerator::GetScreenGrab(
     {
         QFileInfo info(filename);
         bool invalid = (!info.exists() || !info.isReadable() ||
-                        !info.isFile() || (info.size() < 8*1024));
+                        (info.isFile() && (info.size() < 8*1024)));
         if (invalid)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer file " +
