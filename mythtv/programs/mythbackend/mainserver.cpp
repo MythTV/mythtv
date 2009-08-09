@@ -55,6 +55,7 @@ using namespace std;
 #include "storagegroup.h"
 #include "compat.h"
 #include "RingBuffer.h"
+#include "remotefile.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -1731,6 +1732,8 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         delete_file_immediately( sFileName, followLinks, true);
     }
 
+    DeleteRecordedFiles(ds);
+
     DoDeleteInDB(ds);
 
     if (pginfo->recgroup != "LiveTV")
@@ -1738,6 +1741,83 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
 
     if (slowDeletes && fd != -1)
         TruncateAndClose(pginfo.get(), fd, ds->filename, size);
+}
+
+void MainServer::DeleteRecordedFiles(const DeleteStruct *ds)
+{
+    QString logInfo = QString("chanid %1 at %2")
+        .arg(ds->chanid).arg(ds->recstartts.toString());
+
+    MSqlQuery update(MSqlQuery::InitCon());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT basename, hostname, storagegroup FROM recordedfile "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
+    query.bindValue(":CHANID", ds->chanid);
+    query.bindValue(":STARTTIME", ds->recstartts);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("RecordedFiles deletion", query);
+        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording Files",
+                           QString("Error querying recordedfiles for %1.")
+                                   .arg(logInfo));
+    }
+
+    QString basename;
+    QString hostname;
+    QString storagegroup;
+    bool deleteInDB;
+    while (query.next()) {
+        basename = query.value(0).toString();
+        hostname = query.value(1).toString();
+        storagegroup = query.value(2).toString();
+        deleteInDB = false;
+
+        if (basename == ds->filename)
+            deleteInDB = true;
+        else
+        {
+            VERBOSE(VB_FILE, QString("DeleteRecordedFiles(%1), deleting '%2'")
+                    .arg(logInfo).arg(query.value(0).toString()));
+
+            StorageGroup sgroup(storagegroup);
+            QString localFile = sgroup.FindRecordingFile(basename);
+            QString url = QString("myth://%1@%2:%3/%4").arg(storagegroup)
+                .arg(gContext->GetSettingOnHost("BackendServerIP", hostname))
+                .arg(gContext->GetSettingOnHost("BackendServerPort", hostname))
+                .arg(basename);
+
+            if ((((hostname == gContext->GetHostName()) ||
+                  (!localFile.isEmpty())) &&
+                 (HandleDeleteFile(basename, storagegroup))) ||
+                (((hostname != gContext->GetHostName()) ||
+                  (localFile.isEmpty())) &&
+                 (RemoteFile::DeleteFile(url))))
+            {
+                deleteInDB = true;
+            }
+        }
+
+        if (deleteInDB)
+        {
+            update.prepare("DELETE FROM recordedfile "
+                           "WHERE chanid = :CHANID "
+                               "AND starttime = :STARTTIME "
+                               "AND basename = :BASENAME ;");
+            update.bindValue(":CHANID", ds->chanid);
+            update.bindValue(":STARTTIME", ds->recstartts);
+            update.bindValue(":BASENAME", basename);
+            if (!update.exec())
+            {
+                MythDB::DBError("RecordedFiles deletion", update);
+                gContext->LogEntry("mythbackend", LP_ERROR,
+                       "Delete Recording Files",
+                       QString("Error querying recordedfile (%1) for %2.")
+                               .arg(query.value(1).toString())
+                               .arg(logInfo));
+            }
+        }
+    }
 }
 
 void MainServer::DoDeleteInDB(const DeleteStruct *ds)
@@ -3708,11 +3788,16 @@ void MainServer::DoTruncateThread(const DeleteStruct *ds)
     TruncateAndClose(NULL, ds->fd, ds->filename, ds->size);
 }
 
-void MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
+bool MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
 {
-    QString filename = slist[1];
+    return HandleDeleteFile(slist[1], slist[2], pbs);
+}
+
+bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
+                                  PlaybackSock *pbs)
+{
+    StorageGroup sgroup(storagegroup, "", false);
     QStringList retlist;
-    StorageGroup sgroup(slist[2], "", false);
 
     if ((filename.isEmpty()) ||
         (filename.contains("/../")) ||
@@ -3720,9 +3805,12 @@ void MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
     {
         VERBOSE(VB_IMPORTANT, QString("ERROR deleting file, filename '%1' "
                 "fails sanity checks").arg(filename));
-        retlist << "0";
-        SendResponse(pbs->getSocket(), retlist);
-        return;
+        if (pbs)
+        {
+            retlist << "0";
+            SendResponse(pbs->getSocket(), retlist);
+        }
+        return false;
     }
 
     QString fullfile = sgroup.FindRecordingFile(filename);
@@ -3730,9 +3818,12 @@ void MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
     if (fullfile.isEmpty()) {
         VERBOSE(VB_IMPORTANT, QString("Unable to find %1 in HandleDeleteFile()")
                 .arg(filename));
-        retlist << "0";
-        SendResponse(pbs->getSocket(), retlist);
-        return;
+        if (pbs)
+        {
+            retlist << "0";
+            SendResponse(pbs->getSocket(), retlist);
+        }
+        return false;
     }
 
     QFile checkFile(fullfile);
@@ -3766,14 +3857,19 @@ void MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
     {
         VERBOSE(VB_IMPORTANT, QString("Error deleting file: %1.")
                 .arg(fullfile));
-        retlist << "0";
-        SendResponse(pbs->getSocket(), retlist);
-        return;
+        if (pbs)
+        {
+            retlist << "0";
+            SendResponse(pbs->getSocket(), retlist);
+        }
+        return false;
     }
 
-    retlist << "1";
-
-    SendResponse(pbs->getSocket(), retlist);
+    if (pbs)
+    {
+        retlist << "1";
+        SendResponse(pbs->getSocket(), retlist);
+    }
 
     if (slowDeletes && fd != -1)
     {
@@ -3790,6 +3886,8 @@ void MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
         pthread_create(&truncateThread, &attr, SpawnTruncateThread, ds);
         pthread_attr_destroy(&attr);
     }
+
+    return true;
 }
 
 // Helper function for the guts of HandleCommBreakQuery + HandleCutListQuery

@@ -79,7 +79,9 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleDone(MythSocket *socket);
 
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);
-    void HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
+    bool HandleDeleteFile(QStringList &slist, PlaybackSock *pbs);
+    bool HandleDeleteFile(QString filename, QString storagegroup,
+                          PlaybackSock *pbs = NULL);
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
@@ -162,6 +164,7 @@ class MainServer : public QObject, public MythSocketCBs
     void DoTruncateThread(const DeleteStruct *ds);
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(const DeleteStruct *ds);
+    void DeleteRecordedFiles(const DeleteStruct *ds);
     void DoDeleteInDB(const DeleteStruct *ds);
 
     LiveTVChain *GetExistingChain(const QString &id);
