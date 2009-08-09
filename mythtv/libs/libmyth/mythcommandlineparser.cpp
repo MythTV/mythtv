@@ -110,8 +110,8 @@ bool MythCommandLineParser::PreParse(
         cout << "Please include all output in bug reports." << endl;
         cout << "MythTV Version   : " << myth_source_version << endl;
         cout << "MythTV Branch    : " << myth_source_path << endl;
-        cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
         cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
+        cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
         cout << "QT Version       : " << QT_VERSION_STR << endl;
 #ifdef MYTH_BUILD_CONFIG
         cout << "Options compiled in:" <<endl;
