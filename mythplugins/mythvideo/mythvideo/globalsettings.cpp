@@ -367,7 +367,7 @@ HostLineEdit *VideoDefaultPlayer()
 {
     HostLineEdit *gc = new HostLineEdit("VideoDefaultPlayer");
     gc->setLabel(QObject::tr("Default Video Player"));
-    gc->setValue("mplayer -fs -zoom -quiet -vo xv %s");
+    gc->setValue("Internal");
     gc->setHelpText(QObject::tr("This is the command used for any file "
                     "that the extension is not specifically defined. "
                     "You may also enter the name of one of the playback "
