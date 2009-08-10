@@ -187,7 +187,7 @@ class StateVariables
         // ------------------------------------------------------------------
 
         StateVariables() { }     
-        ~StateVariables()
+        virtual ~StateVariables()
         {
             SVMap::iterator it = m_map.begin();
             for (; it != m_map.end(); ++it)

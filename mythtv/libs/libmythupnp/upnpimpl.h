@@ -39,6 +39,7 @@ class UPnpServiceImpl
     public:
 
         UPnpServiceImpl() {}
+        virtual ~UPnpServiceImpl() {}
 
         void RegisterService( UPnpDevice  *pDevice )
         {
