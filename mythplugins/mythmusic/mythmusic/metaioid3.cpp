@@ -64,17 +64,6 @@ bool MetaIOID3::write(Metadata* mdata)
     UserTextIdentificationFrame *musicbrainz = NULL;
     musicbrainz = find(tag, "MusicBrainz Album Artist Id");
 
-    // Compilation Artist Frame (TPE4/2)
-    TextIdentificationFrame *tpe4frame = NULL;
-    TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
-    if (!tpelist.isEmpty())
-        tpe4frame = (TextIdentificationFrame *)tpelist.front();
-    
-    TextIdentificationFrame *tpe2frame = NULL;
-    tpelist = tag->frameListMap()["TPE2"];
-    if (!tpelist.isEmpty())
-        tpe2frame = (TextIdentificationFrame *)tpelist.front();
-
     if (mdata->Compilation())
     {
         
@@ -86,34 +75,39 @@ bool MetaIOID3::write(Metadata* mdata)
         }
         
         musicbrainz->setText(MYTH_MUSICBRAINZ_ALBUMARTIST_UUID);
-        
-        if (!mdata->CompilationArtist().isEmpty())
-        {
-            if (!tpe4frame)
-            {
-                tpe4frame = new TextIdentificationFrame(TagLib::ByteVector("TPE4"),
-                                                       TagLib::String::UTF8);
-                tag->addFrame(tpe4frame);
-            }
-            tpe4frame->setText(QStringToTString(mdata->CompilationArtist()));
-            
-            if (!tpe2frame)
-            {
-                tpe2frame = new TextIdentificationFrame(TagLib::ByteVector("TPE2"),
-                                                        TagLib::String::UTF8);
-                tag->addFrame(tpe2frame);
-            }
-            tpe2frame->setText(QStringToTString(mdata->CompilationArtist()));
-        }
     }
-    else
+    else if (musicbrainz)
+        tag->removeFrame(musicbrainz);
+
+    // Compilation Artist Frame (TPE4/2)
+    if (!mdata->CompilationArtist().isEmpty())
     {
-        if (tpe4frame)
-            tag->removeFrame(tpe4frame);
-        if (tpe2frame)
-            tag->removeFrame(tpe2frame);
-        if (musicbrainz)
-            tag->removeFrame(musicbrainz);
+        TextIdentificationFrame *tpe4frame = NULL;
+        TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
+        if (!tpelist.isEmpty())
+            tpe4frame = (TextIdentificationFrame *)tpelist.front();
+        
+        if (!tpe4frame)
+        {
+            tpe4frame = new TextIdentificationFrame(TagLib::ByteVector("TPE4"),
+                                                    TagLib::String::UTF8);
+                                                    tag->addFrame(tpe4frame);
+        }
+        tpe4frame->setText(QStringToTString(mdata->CompilationArtist()));
+
+        
+        TextIdentificationFrame *tpe2frame = NULL;
+        tpelist = tag->frameListMap()["TPE2"];
+        if (!tpelist.isEmpty())
+            tpe2frame = (TextIdentificationFrame *)tpelist.front();
+
+        if (!tpe2frame)
+        {
+            tpe2frame = new TextIdentificationFrame(TagLib::ByteVector("TPE2"),
+                                                    TagLib::String::UTF8);
+                                                    tag->addFrame(tpe2frame);
+        }
+        tpe2frame->setText(QStringToTString(mdata->CompilationArtist()));
     }
     
     bool result = mpegfile->save();
@@ -147,7 +141,10 @@ Metadata *MetaIOID3::read(QString filename)
 
     bool compilation = false;
 
-    // Compilation Artist (TPE4) or fallback to (TPE2)
+    // Compilation Artist (TPE4 Remix) or fallback to (TPE2 Band)
+    // N.B. The existance of a either frame is NOT an indication that this
+    // is a compilation, but if it is then one of them will probably hold
+    // the compilation artist.
     TextIdentificationFrame *tpeframe = NULL;
     TagLib::ID3v2::FrameList tpelist = tag->frameListMap()["TPE4"];
     if (tpelist.isEmpty() || tpelist.front()->toString().isEmpty())
@@ -160,23 +157,19 @@ Metadata *MetaIOID3::read(QString filename)
         QString compilation_artist = TStringToQString(tpeframe->toString())
                                                                     .trimmed();
         metadata->setCompilationArtist(compilation_artist);
-        compilation = true;
     }
 
-    if (!compilation)
-    {
-        // Look for MusicBrainz Album+Artist ID in TXXX Frame
-        UserTextIdentificationFrame *musicbrainz = find(tag,
-                                                "MusicBrainz Album Artist Id");
+    // Look for MusicBrainz Album+Artist ID in TXXX Frame
+    UserTextIdentificationFrame *musicbrainz = find(tag,
+                                            "MusicBrainz Album Artist Id");
 
-        if (musicbrainz)
-        {
-            // If the MusicBrainz ID is the special "Various Artists" ID
-            // then compilation is TRUE
-            if (!compilation && !musicbrainz->fieldList().isEmpty())
-                compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID
-                == TStringToQString(musicbrainz->fieldList().front()));
-        }
+    if (musicbrainz)
+    {
+        // If the MusicBrainz ID is the special "Various Artists" ID
+        // then compilation is TRUE
+        if (!compilation && !musicbrainz->fieldList().isEmpty())
+            compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID
+            == TStringToQString(musicbrainz->fieldList().front()));
     }
 
     // Length
