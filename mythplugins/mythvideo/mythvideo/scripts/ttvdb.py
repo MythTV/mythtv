@@ -101,7 +101,7 @@ __version__="v0.9.8"        # Version .1 Initial development
 							# Version .9.7 Account for TVDB increasing the number of digits in their
 							#              SID number (now greater then 5 
 							#              e,g, "Defying Gravity" is SID 104581)
-							# Version .9.8 Added a (-S) option for requesting an 
+							# Version .9.8 Added a (-S) option for requesting a thetvdb  
 							#              episode screen shot
 
 usage_txt='''
@@ -585,7 +585,7 @@ def make_db_ready(text):
 
 # Get Series Episode data by season
 def Getseries_episode_data(t, opts, series_season_ep, language = None):
-	global screenshot_request
+	global screenshot_request, http_find, http_replace
 
 	args = len(series_season_ep)
 	series_name=''
@@ -637,7 +637,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 			available_keys=search_for_series(t, series_name)[season][episode].keys()
 			if screenshot_request:
 				if u'filename' in available_keys:
-					print search_for_series(t, series_name)[season][episode][u'filename']
+					print search_for_series(t, series_name)[season][episode][u'filename'].replace(http_find, http_replace)
 					return
 				else:
 					return

@@ -149,9 +149,7 @@ class VideoDialog : public MythScreenType
     //       OnVideoPosterSetDone()
     //       OnPosterCopyFinished()
     // OnVideoPosterSetDone() stop wait background
-    void StartVideoPosterSet(Metadata *metadata);
-    void StartVideoFanartSet(Metadata *metadata);
-    void StartVideoBannerSet(Metadata *metadata);
+    void StartVideoImageSet(Metadata *metadata);
 
     // StartVideoSearchByUID() start wait background
     //   OnVideoSearchByUIDDone() stop wait background

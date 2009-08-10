@@ -1067,6 +1067,68 @@ namespace
         Metadata *m_item;
     };
 
+    /** \class VideoScreenshotSearch
+     *
+     * \brief Execute external video screenshot command.
+     *
+     */
+    class VideoScreenshotSearch : public ExecuteExternalCommand
+    {
+        Q_OBJECT
+                
+      signals:
+        void SigScreenshotURL(QString url, Metadata *item);
+                                        
+      public:
+        VideoScreenshotSearch(QObject *oparent) :
+            ExecuteExternalCommand(oparent), m_item(0) {}
+             
+        void Run(QString video_uid, Metadata *item)
+        {
+            m_item = item;
+            int m_season, m_episode;
+            m_season = m_item->GetSeason();
+            m_episode = m_item->GetEpisode();
+         
+            const QString def_cmd = QDir::cleanPath(QString("%1/%2")
+                    .arg(GetShareDir())                               
+                    .arg("mythvideo/scripts/ttvdb.py -S"));
+            const QString cmd = gContext->GetSetting("mythvideo.TVScreenshotCommandLine",
+                                                        def_cmd);
+            QStringList args;
+            args << video_uid << QString::number(m_season)
+                                  << QString::number(m_episode);
+            StartRun(cmd, args, "Screenshot Query");
+        }
+
+      private:
+        ~VideoScreenshotSearch() {}
+
+        void OnExecDone(bool normal_exit, QStringList out, QStringList err)
+        {
+            (void) err;
+            QString url;
+            if (normal_exit && out.size())
+            {
+                for (QStringList::const_iterator p = out.begin();
+                        p != out.end(); ++p)
+                {
+                    if ((*p).length())
+                    {
+                        url = *p;                        
+                        break;
+                    }
+                }
+            }
+
+            emit SigScreenshotURL(url, m_item);
+            deleteLater();
+        }
+
+      private:
+        Metadata *m_item;
+    };
+
     class ParentalLevelNotifyContainer : public QObject
     {
         Q_OBJECT
@@ -3204,7 +3266,7 @@ void VideoDialog::ImageOnlyDownload()
     QString title = metadata->GetTitle();
 
     if (metadata->GetInetRef() != VIDEO_INETREF_DEFAULT)
-        StartVideoPosterSet(metadata);
+        StartVideoImageSet(metadata);
     else
     {
         createBusyDialog(title);
@@ -3269,7 +3331,7 @@ void VideoDialog::OnVideoImgSearchListSelection(QString video_uid)
         metadata->SetInetRef(video_uid);
         metadata->UpdateDatabase();
         UpdateItem(GetItemCurrent());
-        StartVideoPosterSet(metadata);
+        StartVideoImageSet(metadata);
     }
 }
 
@@ -3444,10 +3506,10 @@ void VideoDialog::ResetMetadata()
     }
 }
 
-// Copy video poster to appropriate directory and set the item's cover file.
+// Copy video images to appropriate directory and set the item's image files.
 // This is the start of an async operation that needs to always complete
-// to OnVideoPosterSetDone.
-void VideoDialog::StartVideoPosterSet(Metadata *metadata)
+// to OnVideo*SetDone.
+void VideoDialog::StartVideoImageSet(Metadata *metadata)
 {
     //createBusyDialog(QObject::tr("Fetching poster for %1 (%2)")
     //                    .arg(metadata->InetRef())
@@ -3528,6 +3590,33 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
             vbs->Run(metadata->GetInetRef(), metadata);
         }
     }
+
+    QStringList screenshot_dirs;
+    screenshot_dirs += m_d->m_sshotDir;
+
+    QString screenshot_file;
+
+    if (metadata->GetScreenshot().isEmpty())
+    {
+        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+                                screenshot_dirs, screenshot_file, metadata->GetTitle(),
+                                metadata->GetSeason()))
+        {
+            metadata->SetScreenshot(banner_file);
+            OnVideoScreenshotSetDone(metadata);
+        }
+
+        if (metadata->GetScreenshot().isEmpty() &&
+           (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0))
+        {
+            // Obtain video screenshot (only for TV)
+            VideoScreenshotSearch *vsss = new VideoScreenshotSearch(this);
+            connect(vsss, SIGNAL(SigScreenshotURL(QString, Metadata *)),
+                    SLOT(OnScreenshotURL(QString, Metadata *)));
+            vsss->Run(metadata->GetInetRef(), metadata);
+        }
+    }
+
 }
 
 void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
@@ -3623,7 +3712,7 @@ void VideoDialog::OnPosterCopyFinished(CoverDownloadErrorState error,
     OnVideoPosterSetDone(item);
 }
 
-// This is the final call as part of a StartVideoPosterSet
+// This is the final call as part of a StartVideoImageSet
 void VideoDialog::OnVideoPosterSetDone(Metadata *metadata)
 {
     // The metadata has some cover file set
@@ -3730,7 +3819,6 @@ void VideoDialog::OnFanartCopyFinished(FanartDownloadErrorState error,
     OnVideoFanartSetDone(item);
 }
 
-// This is the final call as part of a StartVideoFanartSet
 void VideoDialog::OnVideoFanartSetDone(Metadata *metadata)
 {
     // The metadata has some fanart set
@@ -3837,7 +3925,6 @@ void VideoDialog::OnScreenshotCopyFinished(ScreenshotDownloadErrorState error,
     OnVideoScreenshotSetDone(item);
 }
 
-// This is the final call as part of a StartVideoScreenshotSet
 void VideoDialog::OnVideoScreenshotSetDone(Metadata *metadata)
 {   
     // The metadata has some fanart set
@@ -3945,7 +4032,6 @@ void VideoDialog::OnBannerCopyFinished(BannerDownloadErrorState error,
     OnVideoBannerSetDone(item);
 }
 
-// This is the final call as part of a StartVideoBannerSet
 void VideoDialog::OnVideoBannerSetDone(Metadata *metadata)
 {
     // The metadata has a banner set
@@ -4068,15 +4154,7 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
 
         metadata->SetInetRef(video_uid);
 
-        StartVideoPosterSet(metadata);
-
-	//VERBOSE(VB_GENERAL,QString("EPISODE IMAGE %1 ").arg(data["Episode Image"]));
-	if (!data["Episode Image"].isEmpty() && metadata->GetScreenshot().isEmpty())
-	{
-           data["Episode Image"] = data["Episode Image"].replace(QRegExp("http://www.thetvdb.com"),"http://images.thetvdb.com");
-	   OnScreenshotURL(data["Episode Image"], metadata);
-	}
-
+        StartVideoImageSet(metadata);
 
     }
     else
@@ -4177,7 +4255,7 @@ void VideoDialog::OnVideoImageOnlyDone(bool normal_exit,
             metadata->SetInetRef(results.begin().key());
             metadata->UpdateDatabase();
             UpdateItem(GetItemCurrent());
-            StartVideoPosterSet(metadata);
+            StartVideoImageSet(metadata);
         }
     }
     else if (results.size() < 1)

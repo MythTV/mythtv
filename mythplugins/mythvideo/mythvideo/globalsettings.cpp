@@ -275,6 +275,16 @@ HostLineEdit *GetTVBannerCommand()
     return gc;
 }
 
+HostLineEdit *GetTVScreenshotCommand()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TVScreenshotCommandLine");
+    gc->setLabel(QObject::tr("Command to search for TV Screenshots"));
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -S");
+    gc->setHelpText(QObject::tr("This command must be "
+                    "executable by the user running MythVideo."));
+    return gc;
+}
+
 HostLineEdit *GetTVDataCommand()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TVDataCommandLine");
@@ -850,6 +860,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     tvman->addChild(GetTVBannerCommand());
     tvman->addChild(GetTVDataCommand());
     tvman->addChild(GetTVTitleSubCommand());
+    tvman->addChild(GetTVScreenshotCommand());
 
     VConfigPage page8(pages, false);
     page8->addChild(tvman);
