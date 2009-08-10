@@ -95,36 +95,36 @@ void MetaIOTagLib::ReadGenericMetadata(Tag *tag, Metadata *metadata)
 * \brief Find the length of the track (in seconds)
 *
 * \param file Pointer to file object
-* \returns An integer (signed!) to represent the length in seconds.
+* \returns An integer (signed!) to represent the length in milliseconds.
 */
 int MetaIOTagLib::getTrackLength(TagLib::FileRef *file)
 {
-    int seconds = 0;
+    int milliseconds = 0;
 
     if (file && file->audioProperties())
-        seconds = file->audioProperties()->length();
+        milliseconds = file->audioProperties()->length() * 1000;
     
-    return seconds;
+    return milliseconds;
 }
 
 /*!
 * \brief Find the length of the track (in seconds)
 *
 * \param filename The filename for which we want to find the length.
-* \returns An integer (signed!) to represent the length in seconds.
+* \returns An integer (signed!) to represent the length in milliseconds.
 */
 int MetaIOTagLib::getTrackLength(QString filename)
 {
-    int seconds = 0;
+    int milliseconds = 0;
     QByteArray fname = filename.toLocal8Bit();
     TagLib::FileRef *file = new TagLib::FileRef(fname.constData());
     
-    seconds = getTrackLength(file);
+    milliseconds = getTrackLength(file);
 
     // If we didn't get a valid length, add the metadata but show warning.
     if (seconds <= 0)
         VERBOSE(VB_GENERAL, QString("MetaIOTagLib: Failed to read length "
         "from '%1'. It may be corrupt.").arg(filename));
     
-    return seconds;
+    return milliseconds;
 }
