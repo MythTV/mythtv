@@ -2331,6 +2331,48 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 fList = vidDir.entryList();
             }
 
+            // Take the Coverfile for the first valid node in the dir, if it exists.
+            if (icon_file.isEmpty())
+            {
+                int list_count = node->childCount();
+                if (list_count > 0)
+                {
+                    for (int i = 0; i < list_count; i++)
+                    {
+                        MythGenericTree *subnode = node->getChildAt(i);
+                        if (subnode)
+                        {
+                            Metadata *metadata = GetMetadataPtrFromNode(subnode);
+                            if (metadata)
+                            {
+                                if (!metadata->GetHost().isEmpty() && 
+                                    !metadata->GetCoverFile().startsWith("/"))
+                                {
+                                    QString test_file = GenRemoteFileURL("Coverart",
+                                                metadata->GetHost(), metadata->GetCoverFile());
+                                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                                        !test_file.endsWith(VIDEO_COVERFILE_DEFAULT))
+                                    {
+                                        icon_file = test_file;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    QString test_file = metadata->GetCoverFile();
+                                    if (!test_file.isEmpty() && 
+                                         test_file != VIDEO_COVERFILE_DEFAULT)
+                                    {
+                                        icon_file = test_file;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (!fList.isEmpty())
             {
                 if (host.isEmpty())
