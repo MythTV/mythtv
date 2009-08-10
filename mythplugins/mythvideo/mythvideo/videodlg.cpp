@@ -1764,6 +1764,9 @@ class VideoDialogPrivate
     {
         delete m_scanner;
         StopAllRunningCoverDownloads();
+        StopAllRunningFanartDownloads();
+        StopAllRunningBannerDownloads();
+        StopAllRunningScreenshotDownloads();
 
         if (m_rememberPosition && m_lastTreeNodePath.length())
         {
