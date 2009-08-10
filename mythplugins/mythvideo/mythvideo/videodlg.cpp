@@ -3400,21 +3400,25 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
 
     QString cover_file;
 
-    if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                            cover_dirs, cover_file, metadata->GetTitle(),
-                            metadata->GetSeason()))
+    if (metadata->GetCoverFile().isEmpty() || 
+        IsDefaultCoverFile(metadata->GetCoverFile()))
     {
-        metadata->SetCoverFile(cover_file);
-        OnVideoPosterSetDone(metadata);
-    }
+        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+                                cover_dirs, cover_file, metadata->GetTitle(),
+                                metadata->GetSeason()))
+        {
+            metadata->SetCoverFile(cover_file);
+            OnVideoPosterSetDone(metadata);
+        }
 
-    if (cover_file.isEmpty() || IsDefaultCoverFile(cover_file))
-    {
-        // Obtain video poster
-        VideoPosterSearch *vps = new VideoPosterSearch(this);
-        connect(vps, SIGNAL(SigPosterURL(QString, Metadata *)),
-                SLOT(OnPosterURL(QString, Metadata *)));
-        vps->Run(metadata->GetInetRef(), metadata);
+        if (cover_file.isEmpty() || IsDefaultCoverFile(cover_file))
+        {
+            // Obtain video poster
+            VideoPosterSearch *vps = new VideoPosterSearch(this);
+            connect(vps, SIGNAL(SigPosterURL(QString, Metadata *)),
+                    SLOT(OnPosterURL(QString, Metadata *)));
+            vps->Run(metadata->GetInetRef(), metadata);
+        }
     }
 
     QStringList fanart_dirs;
@@ -3422,21 +3426,24 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
 
     QString fanart_file;
 
-    if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                            fanart_dirs, fanart_file, metadata->GetTitle(),
-                            metadata->GetSeason()))
-    {
-        metadata->SetFanart(fanart_file);
-        OnVideoFanartSetDone(metadata);
-    }
-
     if (metadata->GetFanart().isEmpty())
     {
-        // Obtain video fanart
-        VideoFanartSearch *vfs = new VideoFanartSearch(this);
-        connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
-                SLOT(OnFanartURL(QString, Metadata *)));
-        vfs->Run(metadata->GetInetRef(), metadata);
+        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+                                fanart_dirs, fanart_file, metadata->GetTitle(),
+                                metadata->GetSeason()))
+        {
+            metadata->SetFanart(fanart_file);
+            OnVideoFanartSetDone(metadata);
+        }
+
+        if (metadata->GetFanart().isEmpty())
+        {
+            // Obtain video fanart
+            VideoFanartSearch *vfs = new VideoFanartSearch(this);
+            connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
+                    SLOT(OnFanartURL(QString, Metadata *)));
+            vfs->Run(metadata->GetInetRef(), metadata);
+        }
     }
 
     QStringList banner_dirs;
@@ -3444,22 +3451,25 @@ void VideoDialog::StartVideoPosterSet(Metadata *metadata)
         
     QString banner_file;
         
-    if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                            banner_dirs, banner_file, metadata->GetTitle(),
-                            metadata->GetSeason()))
+    if (metadata->GetBanner().isEmpty())
     {
-        metadata->SetBanner(banner_file);
-        OnVideoBannerSetDone(metadata);
-    }
+        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+                                banner_dirs, banner_file, metadata->GetTitle(),
+                                metadata->GetSeason()))
+        {
+            metadata->SetBanner(banner_file);
+            OnVideoBannerSetDone(metadata);
+        }
 
-    if (metadata->GetBanner().isEmpty() &&
-       (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0))
-    {
-        // Obtain video banner (only for TV)
-        VideoBannerSearch *vbs = new VideoBannerSearch(this);
-        connect(vbs, SIGNAL(SigBannerURL(QString, Metadata *)),
-                SLOT(OnBannerURL(QString, Metadata *)));
-        vbs->Run(metadata->GetInetRef(), metadata);
+        if (metadata->GetBanner().isEmpty() &&
+           (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0))
+        {
+            // Obtain video banner (only for TV)
+            VideoBannerSearch *vbs = new VideoBannerSearch(this);
+            connect(vbs, SIGNAL(SigBannerURL(QString, Metadata *)),
+                    SLOT(OnBannerURL(QString, Metadata *)));
+            vbs->Run(metadata->GetInetRef(), metadata);
+        }
     }
 }
 
