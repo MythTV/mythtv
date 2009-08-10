@@ -1,5 +1,5 @@
 """
-Provides the MythVideo class with convinience methods to access the MythTV
+Provides the MythVideo class with convenient methods to access the MythTV
 MythVideo database.
 """
 
@@ -36,6 +36,12 @@ class MythVideo:
 				c2 = self.db.cursor()
 				c2.execute("""DELETE FROM videometadata WHERE intid = %s""", (intid,))
 				c2.close()
+				#Some additional cleanup
+				#Remove cross-references in cast, country, genres
+				self.cleanGenres(intid)
+				self.cleanCountry(intid)
+				self.cleanCast(intid)
+				
 			row = c.fetchone()
 		c.close()
 
@@ -43,7 +49,8 @@ class MythVideo:
 		"""
 		Find the id of the given genre from MythDB.
 
-		If the genre does not exist, insert it and return its id.
+		If the category does not exist, insert it and return its id.
+		This function should have been called getCategoryId
 		"""
 		c = self.db.cursor()
 		c.execute("SELECT intid FROM videocategory WHERE lower(category) = %s", (genre_name,))
@@ -67,28 +74,7 @@ class MythVideo:
 
 		If the cast does not exist, insert it and return its id.
 		"""
-		c = self.db.cursor()
-		# print "SELECT intid FROM videocast WHERE lower(cast) = '%s'" % (cast_name,)
-		c.execute("SELECT intid FROM videocast WHERE lower(cast) = %s", (cast_name,))
-		row = c.fetchone()
-		c.close()
-
-		if row is not None:
-			# print "getCastId %s %s" % (cast_name, row[0])
-			return row[0]
-
-		# Insert a new cast.
-		c = self.db.cursor()
-		c.execute("INSERT INTO videocast(cast) VALUES (%s)", (cast_name,))
-		#print "INSERT INTO videocast(cast) VALUES ('%s')" % (cast_name,)
-		c.close()
-
-		c = self.db.cursor()
-		c.execute("SELECT intid FROM videocast WHERE lower(cast) = %s", (cast_name,))
-		row = c.fetchone()
-		c.close()
-
-		return row[0]
+		return self.setFieldId('cast', cast_name)
 
 	def setCast(self, cast_name, idvideo):
 		"""
@@ -97,25 +83,12 @@ class MythVideo:
 		If the cast does not exist, insert it and return its id.
 		"""
 
-		idcast = self.getCastId(cast_name);
-
-		c = self.db.cursor()
-		c.execute("SELECT * FROM videometadatacast WHERE idvideo = %s AND idcast = %s", (idvideo,idcast))
-		row = c.fetchone()
-		c.close()
-
-		if row is None:
-			# Insert a new cast.
-			c = self.db.cursor()
-			c.execute("INSERT INTO videometadatacast VALUES (%s,%s)", (idvideo,idcast))
-			#print "INSERT INTO videometadatacast VALUES (%s,%s)" % (idvideo,idcast)
-			c.close()
+		return self.setField('cast', cast_name, idvideo)
 
 	def getMetadataId(self, videopath):
 		"""
-		Finds the MythVideo metadata id for the given video path from the MythDB, if any.
-
-		Returns None if no metadata was found.
+		Insert the idvideo file in given cast list if it does already exist.
+		Cast will be created if it doesn't exist return its id.
 		"""
 		c = self.db.cursor()
 		c.execute("""
@@ -279,4 +252,134 @@ class MythVideo:
 			c.execute(sql, sql_values)
 			c.close()
 
+	def getCategoryId(self, category_name):
+		"""
+		Find the id of the given category from MythDB.
+
+		If the category does not exist, insert it and return its id.
+		"""
+		c = self.db.cursor()
+		c.execute("SELECT intid FROM videocategory WHERE lower(category) = %s", (category_name,))
+		row = c.fetchone()
+		c.close()
+
+		if row is not None:
+			return row[0]
+
+		# Insert a new genre.
+		c = self.db.cursor()
+		c.execute("INSERT INTO videocategory(category) VALUES (%s)", (category_name.capitalize(),))
+		newid = c.lastrowid
+		c.close()
+
+		return newid
+
+	def getFieldId(self, field, name):
+		"""
+		Find the id of the given name from MythDB.
+
+		If the name does not exist, insert it and return its id.
+		"""
+		c = self.db.cursor()
+		# print ""SELECT intid FROM video%s WHERE lower(%s) = %%s" % (field, field), (name,)
+		c.execute("SELECT intid FROM video%s WHERE lower(%s) = %%s" % (field, field), (name,))
+		row = c.fetchone()
+		c.close()
+
+		if row is not None:
+			return row[0]
+
+		# Insert a new cast.
+		c = self.db.cursor()
+		c.execute("INSERT INTO video%s(%s) VALUES (%%s)" % (field, field), (name,))
+		#print "INSERT INTO video%s(%s) VALUES (%%s)" % (field, field), (name,)
+		c.close()
+
+		c = self.db.cursor()
+		c.execute("SELECT intid FROM video%s WHERE lower(%s) = %%s" % (field, field), (name,))
+		row = c.fetchone()
+		c.close()
+
+		return row[0]
+	
+	def setField(self, field, name, idvideo):
+		"""
+		Insert the name into videometadata"field" if it does already exist.
+
+		If the name does not exist, insert it.
+		"""
+
+		id = self.getFieldId(field, name);
+
+		c = self.db.cursor()
+		c.execute("SELECT * FROM videometadata%s WHERE idvideo = %%s AND id%s = %%s" % (field,field), (idvideo, id))
+		row = c.fetchone()
+		c.close()
+
+		if row is None:
+			# Insert a new cast.
+			c = self.db.cursor()
+			c.execute("INSERT INTO videometadata%s VALUES (%%s,%%s)" % field, (idvideo,id))
+			#print "INSERT INTO videometadata%s VALUES (%s,%s)" % field, (idvideo, id)
+			c.close()
+		
+		return id
+	
+
+	def getGenresId(self, genre_name):
+		"""
+		Find the id of the given cast from MythDB.
+
+		If the genre does not exist, insert it and return its id.
+		"""
+		return self.getFieldId('genre', genre_name.capitalize())
+
+	def setGenres(self, genre_name, idvideo):
+		"""
+		Insert the idvideo file in given genre list if it does already exist.
+		Genre will be created if it doesn't exist return its id.
+		"""
+
+		return self.setField('genre', genre_name.capitalize(), idvideo)
+
+	def getCountryId(self, country_name):
+		"""
+		Find the id of the given country from MythDB.
+
+		If the country does not exist, insert it and return its id.
+		"""
+		return self.getFieldId('country', country_name)
+
+	def setCountry(self, country_name, idvideo):
+		"""
+		Insert the idvideo file in given country list if it does already exist.
+		Country will be created if it doesn't exist return its id.
+		"""
+
+		return self.setField('country', country_name, idvideo)
+		
+	def cleanGenres(self, idvideo):
+		"""
+		Remove all cross-references of video from genres list.
+		"""
+		c = self.db.cursor()
+		c.execute("""DELETE FROM videometadatagenre WHERE idvideo = %s""", (idvideo,))
+		c.close()
+
+	def cleanCountry(self, idvideo):
+		"""
+		Remove all cross-references of video from country list.
+		"""
+		c = self.db.cursor()
+		c.execute("""DELETE FROM videometadatacountry WHERE idvideo = %s""", (idvideo,))
+		c.close()
+
+	def cleanCast(self, idvideo):
+		"""
+		Remove all cross-references of video from cast list.
+		"""
+		c = self.db.cursor()
+		c.execute("""DELETE FROM videometadatacast WHERE idvideo = %s""", (idvideo,))
+		c.close()
+		
 # vim: ts=4 sw=4:
