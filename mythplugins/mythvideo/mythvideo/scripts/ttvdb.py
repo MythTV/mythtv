@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query Engine";
 __author__="R.D.Vaughan"
-__version__="v0.9.7"        # Version .1 Initial development
+__version__="v0.9.8"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -101,17 +101,20 @@ __version__="v0.9.7"        # Version .1 Initial development
 							# Version .9.7 Account for TVDB increasing the number of digits in their
 							#              SID number (now greater then 5 
 							#              e,g, "Defying Gravity" is SID 104581)
+							# Version .9.8 Added a (-S) option for requesting an 
+							#              episode screen shot
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
 query engines for Movie Data standards.
 NOTE: In the case of multiple queries the display order will always be:
-    Numbers         - Used as a single option not valid as a multi-option parameter
-    List            - Used as a single option not valid as a multi-option parameter
-    Data            - The initial line of an episode's data starts with 'Series:'
-    Poster URL(s)   - The initial line is 'poster:' then the URL(s) follow on the next line(s)
-    Fan art URL(s)  - The initial line is 'fanart:' then the URL(s) follow on the next line(s)
-    Banner URL(s)   - The initial line is 'banner:' then the URL(s) follow on the next line(s)
+    Numbers            - Used as a single option not valid as a multi-option parameter
+    List               - Used as a single option not valid as a multi-option parameter
+    Data               - The initial line of an episode's data starts with 'Series:'
+    Poster URL(s)      - The initial line is 'poster:' then the URL(s) follow on the next line(s)
+    Fan art URL(s)     - The initial line is 'fanart:' then the URL(s) follow on the next line(s)
+    Banner URL(s)      - The initial line is 'banner:' then the URL(s) follow on the next line(s)
+    Screenshot URL(s)  - The initial line is 'screenshot:' then the URL(s) follow on the next line(s)
 NOTE: Queries with no results have no output but have a return code of "True".
 NOTE: All errors starts with a '! ' and a return code of "False".
 
@@ -137,6 +140,7 @@ Options:
   -P, --poster          Get Series Poster URL(s)
   -F, --fanart          Get Series fan art URL(s)
   -B, --backdrop        Get Series banner/backdrop URL(s)
+  -S, --screenshot      Get a Season's Episode screen shot
   -D, --data            Get Series episode data
   -N, --numbers         Get Season and Episode numbers
     NOTE: There are no identifiers for URLs output if ONLY one type has been selected (e.g -B versus -BF)
@@ -152,6 +156,10 @@ http://www.thetvdb.com/banners/seasons/80159-1-3.jpg
 (Return the banner graphics for a Series specific to a season)
 > ttvdb -B "SG-1" 1
 http://www.thetvdb.com/banners/seasonswide/72449-1.jpg
+
+(Return the screen shot graphic for a Series Episode)
+> ttvdb -S "SG-1" 1 10
+http://www.thetvdb.com/banners/episodes/72449/85759.jpg
 
 (Return the banner graphics for a SID (series ID) specific to a season)
 (SID "72449" is specific for the series "SG-1")
@@ -332,6 +340,7 @@ banner_season_key='seasonwide'
 poster_type='Poster'
 fanart_type='Fanart'
 banner_type='Banner'
+screenshot_request = False
 
 # Cache directory name specific to the user. This avoids permission denied error with a common cache dirs
 cache_dir="/tmp/tvdb_api_%s/" % os.geteuid()
@@ -576,6 +585,8 @@ def make_db_ready(text):
 
 # Get Series Episode data by season
 def Getseries_episode_data(t, opts, series_season_ep, language = None):
+	global screenshot_request
+
 	args = len(series_season_ep)
 	series_name=''
 	if opts.configure != "" and override.has_key(series_season_ep[0].lower()):
@@ -624,6 +635,12 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 					continue
 			extra_ep_data=[]
 			available_keys=search_for_series(t, series_name)[season][episode].keys()
+			if screenshot_request:
+				if u'filename' in available_keys:
+					print search_for_series(t, series_name)[season][episode][u'filename']
+					return
+				else:
+					return
 			key_values=[]
 			for values in data_keys: # Initialize an array for each possible data element for
 				key_values.append('') # each episode within a season
@@ -790,7 +807,7 @@ def initialize_override_dictionary(useroptions):
 # END initialize_override_dictionary
 
 def main():
-	parser = OptionParser(usage=u"%prog usage: ttvdb -hdruviomMPFBD [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using ttvdb with Mythvideo see the ttvdb wiki page at:\nhttp://www.mythtv.org/wiki/Ttvdb.py")
+	parser = OptionParser(usage=u"%prog usage: ttvdb -hdruviomMPFBDS [parameters]\n <series name or 'series and season number' or 'series and season number and episode number'>\n\nFor details on using ttvdb with Mythvideo see the ttvdb wiki page at:\nhttp://www.mythtv.org/wiki/Ttvdb.py")
 
 	parser.add_option(  "-d", "--debug", action="store_true", default=False, dest="debug",
                         help=u"Show debugging info")
@@ -820,6 +837,8 @@ def main():
                         help=u"Get Series fan art URL(s)")
 	parser.add_option(  "-B", "--backdrop", action="store_true", default=False, dest="banner",
                         help=u"Get Series banner/backdrop URL(s)")
+	parser.add_option(  "-S", "--screenshot", action="store_true", default=False, dest="screenshot",
+                        help=u"Get Series episode screenshot URL")
 	parser.add_option(  "-D", "--data", action="store_true", default=False, dest="data",
                         help=u"Get Series episode data")
 	parser.add_option(  "-N", "--numbers", action="store_true", default=False, dest="numbers",
@@ -859,16 +878,16 @@ fan art and banners. The richer the source the more valuable the script.\n\n"
 		sys.exit(False)
 
 	# Default output format of season and episode numbers
-	global season_and_episode_num
+	global season_and_episode_num, screenshot_request
 	season_and_episode_num='S%02dE%02d' # Format output example "S04E12"
 
 	if opts.numbers == False:
 		if len(series_season_ep) > 1:
-			if series_season_ep[1].lstrip('0123456789') != "":
+			if not _can_int(series_season_ep[1]):
 				parser.error("! Season is not numeric")
 				sys.exit(False)
 		if len(series_season_ep) > 2:
-			if series_season_ep[2].lstrip('0123456789') != "":
+			if not _can_int(series_season_ep[2]):
 				parser.error("! Episode is not numeric")
 				sys.exit(False)
 	else:
@@ -877,6 +896,20 @@ fan art and banners. The richer the source the more valuable the script.\n\n"
 			sys.exit(False)
 		if len(series_season_ep) == 3:
 			season_and_episode_num = series_season_ep[2] # Override default output format
+
+	if opts.screenshot:
+		if len(series_season_ep) > 1:
+			if not _can_int(series_season_ep[1]):
+				parser.error("! Season is not numeric")
+				sys.exit(False)
+		if len(series_season_ep) > 2:
+			if not _can_int(series_season_ep[2]):
+				parser.error("! Episode is not numeric")
+				sys.exit(False)
+		if not len(series_season_ep) > 2:
+			parser.error("! Option (-S), episode screenshot search requires Season and Episode numbers")
+			sys.exit(False)
+		screenshot_request = True
 
 	if opts.debug == True:
 		print series_season_ep
@@ -906,7 +939,7 @@ fan art and banners. The richer the source the more valuable the script.\n\n"
 			sys.stdout.write("! Specified language(%s) must match one of the following languages supported by thetvdb.com wiki:\n (%s)\n" % (opts.language, valid_langs))
 			sys.exit(False)
 
-	# Access thetvdb.com API with banners (Posters, Fanart, banners) data retrieval enabled
+	# Access thetvdb.com API with banners (Posters, Fanart, banners, screenshots) data retrieval enabled
 	if opts.list ==True:
 		t = tvdb_api.Tvdb(banners=False, debug = opts.debug, cache = cache_dir, custom_ui=returnAllSeriesUI, language = opts.language, apikey="0BB856A59C51D607")  # thetvdb.com API key requested by MythTV)
 	elif opts.interactive == True:
@@ -929,7 +962,7 @@ fan art and banners. The richer the source the more valuable the script.\n\n"
 
 	global override
 	override={} # Initialize series name override dictionary
-	# If the use wants Series name overrides and a override file exists then create an overide dictionary
+	# If the user wants Series name overrides and a override file exists then create an overide dictionary
 	if opts.configure != '':
 		if opts.configure[0]=='~':
 			opts.configure=os.path.expanduser("~")+opts.configure[1:]
@@ -1013,7 +1046,7 @@ fan art and banners. The richer the source the more valuable the script.\n\n"
 		Getseries_episode_numbers(t, opts, series_season_ep)
 		sys.exit(True) # The Numbers option (-N) is the only option honoured when used
 
-	if opts.data == True: # Fetch and output episode data
+	if opts.data or screenshot_request: # Fetch and output episode data
 		if opts.mythvideo:
 			if len(series_season_ep) != 3:
 				print u"Season and Episode numbers required."
