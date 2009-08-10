@@ -119,6 +119,11 @@ sub getMovieData {
     my ($rc, $response) =
         TMDBAPIRequest('Movie.imdbLookup', {'imdb_id' => "tt$movieid"});
 
+    if (!defined $response) {
+        die "Unable to contact themoviedb.org while retrieving ".
+            "movie data, stopped";
+    }
+
     my $xs = new XML::Simple(SuppressEmpty => '', ForceArray => ['movie'],
         KeyAttr => []);
     my $xml = $xs->XMLin($response);
@@ -129,6 +134,11 @@ sub getMovieData {
         my $tmdbid = $xml->{moviematches}->{movie}->[0]->{id};
         my ($rc, $response) =
             TMDBAPIRequest('Movie.getInfo', {'id' => $tmdbid});
+
+        if (!defined $response) {
+            die "Unable to contact themoviedb.org while retrieving ".
+                "movie data, stopped";
+        }
 
         $xml = $xs->XMLin($response,
             ForceArray => ['category', 'production_countries', 'person'],
@@ -235,6 +245,11 @@ sub getMoviePoster {
     my ($rc, $response) =
         TMDBAPIRequest('Movie.imdbLookup', {'imdb_id' => "tt$movieid"});
 
+    if (!defined $response) {
+        die "Unable to contact themoviedb.org while retrieving ".
+            "movie poster, stopped";
+    }
+
     my $xml = XMLin($response, ForceArray => ['movie', 'poster', 'backdrop'],
         KeyAttr => {poster => 'size'});
 
@@ -258,6 +273,11 @@ sub getMovieBackdrop {
     my ($rc, $response) =
         TMDBAPIRequest('Movie.imdbLookup', {'imdb_id' => "tt$movieid"});
 
+    if (!defined $response) {
+        die "Unable to contact themoviedb.org while retrieving ".
+            "movie backdrop, stopped";
+    }
+
     my $xs = new XML::Simple(SuppressEmpty => '', ForceArray => ['movie'],
         KeyAttr => []);
     my $xml = $xs->XMLin($response);
@@ -269,6 +289,11 @@ sub getMovieBackdrop {
 
         my ($rc, $response) =
             TMDBAPIRequest('Movie.getInfo', {'id' => $tmdbid});
+
+        if (!defined $response) {
+            die "Unable to contact themoviedb.org while retrieving ".
+                "movie backdrop, stopped";
+        }
 
         $xml = XMLin($response, ForceArray=> ['backdrop'], KeyAttr => ['key', 'id']);
 
@@ -298,6 +323,11 @@ sub getMovieList {
     # get the search results  page
     my ($rc, $response) =
         TMDBAPIRequest('Movie.search', {'title' => $query});
+
+    if (!defined $response) {
+        die "Unable to contact themoviedb.org while retrieving ".
+            "movie list, stopped";
+    }
 
     my $xs = new XML::Simple(SuppressEmpty => '', ForceArray => ['movie'],
         KeyAttr => []);
