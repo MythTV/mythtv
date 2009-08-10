@@ -152,6 +152,16 @@
         <statetype name="videoprops">
             <position>716,540</position>
             <showempty>yes</showempty>
+            <state name="hd1080">
+                <imagetype name="hd1080">
+                    <filename>hd1080.png</filename>
+                </imagetype>
+            </state>
+            <state name="hd720">
+                <imagetype name="hd720">
+                    <filename>hd720.png</filename>
+                </imagetype>
+            </state>
             <state name="hdtv">
                 <imagetype name="hdtv">
                     <filename>hd.png</filename>
