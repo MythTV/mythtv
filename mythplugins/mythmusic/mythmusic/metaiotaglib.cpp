@@ -122,7 +122,7 @@ int MetaIOTagLib::getTrackLength(QString filename)
     milliseconds = getTrackLength(file);
 
     // If we didn't get a valid length, add the metadata but show warning.
-    if (seconds <= 0)
+    if (milliseconds <= 1000)
         VERBOSE(VB_GENERAL, QString("MetaIOTagLib: Failed to read length "
         "from '%1'. It may be corrupt.").arg(filename));
     
