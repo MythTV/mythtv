@@ -74,6 +74,16 @@ namespace
         return ret;
     }
 
+    QString TrailerToState(const QString &trailerFile)
+    {
+        QString ret;
+        if (!trailerFile.isEmpty())
+            ret = "hasTrailer";
+        else
+            ret = "None";
+        return ret;
+    }
+
     class CoverDownloadProxy : public QObject
     {
         Q_OBJECT
@@ -1449,6 +1459,7 @@ namespace
             else
                 tmp["s##e##"] = tmp["##x##"] = "";
 
+            tmp["trailerstate"] = TrailerToState(metadata->GetTrailer());
             tmp["userratingstate"] =
                     QString::number((int)(metadata->GetUserRating()));
             tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
@@ -1518,6 +1529,7 @@ namespace
         h.handleText("browseable");
         h.handleText("category");
 
+        h.handleState("trailerstate");
         h.handleState("userratingstate");
         h.handleState("videolevel");
     }
@@ -1904,7 +1916,8 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     MythScreenType(lparent, lname), m_menuPopup(0), m_busyPopup(0),
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
-    m_screenshot(0), m_banner(0), m_fanart(0), m_parentalLevelState(0)
+    m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0), 
+    m_parentalLevelState(0)
 {
     m_d = new VideoDialogPrivate(video_list, type);
 
@@ -1986,6 +1999,7 @@ bool VideoDialog::Create()
     UIUtilW::Assign(this, m_banner, "banner");
     UIUtilW::Assign(this, m_fanart, "fanart");
 
+    UIUtilW::Assign(this, m_trailerState, "trailerstate");
     UIUtilW::Assign(this, m_parentalLevelState, "parentallevel");
 
     if (err)
@@ -1996,6 +2010,7 @@ bool VideoDialog::Create()
 
     CheckedSet(m_novideoText, tr("No Videos Available"));
 
+    CheckedSet(m_trailerState, "None");
     CheckedSet(m_parentalLevelState, "None");
 
     if (!BuildFocusList())

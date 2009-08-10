@@ -225,6 +225,7 @@ class VideoDialog : public MythScreenType
     MythUIImage      *m_banner;
     MythUIImage      *m_fanart;
 
+    MythUIStateType  *m_trailerState;
     MythUIStateType  *m_parentalLevelState;
     MythUIStateType  *m_videoLevelState;
     MythUIStateType  *m_userRatingState;
