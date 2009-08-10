@@ -169,8 +169,9 @@ sub getMovieData {
         my $genres;
         my @lgenres;
         if (exists $xml->{moviematches}->{movie}->{categories}) {
-            my @catlist =
-                @{$xml->{moviematches}->{movie}->{categories}->{category}};
+            my @catlist;
+            @catlist = @{$xml->{moviematches}->{movie}->{categories}->{category}}
+                if ref $xml->{moviematches}->{movie}->{categories};
             if (@catlist > 0) {
                 my $j = 0;
                 for (my $i = 0; $i < @catlist; $i++)
