@@ -5,7 +5,7 @@ Provides a class giving access to the MythTV database.
 """
 import os
 import sys
-import shlex
+import xml.dom.minidom as minidom
 import code
 import getopt
 from datetime import datetime
@@ -32,26 +32,20 @@ class MythDB:
 				'host' : None,
 				'name' : None,
 				'user' : None,
-				'pass' : None
+				'pass' : None,
+				'USN'  : None,
+				'PIN'  : None
 				}
 
-		# Try to read the mysql.txt file used by MythTV.
-		# Order taken from libs/libmyth/mythcontext.cpp
-		config_files = [
-				'/usr/local/share/mythtv/mysql.txt',
-				'/usr/share/mythtv/mysql.txt',
-				'/usr/local/etc/mythtv/mysql.txt',
-				'/etc/mythtv/mysql.txt',
-				os.path.expanduser('~/.mythtv/mysql.txt'),
-				]
+		# Try to read the config.xml file used by MythTV.
+		config_files = [ os.path.expanduser('~/.mythtv/config.xml') ]
 		if 'MYTHCONFDIR' in os.environ:
-			config_locations.append('%s/mysql.txt' % os.environ['MYTHCONFDIR'])
+			config_locations.append('%s/config.xml' % os.environ['MYTHCONFDIR'])
 
 		found_config = False
 		for config_file in config_files:
 			try:
-				config = shlex.shlex(open(config_file))
-				config.wordchars += "."
+				config = minidom.parse(config_file)
 			except:
 				continue
 
@@ -59,21 +53,25 @@ class MythDB:
 			dbconn['name'] = None
 			dbconn['user'] = None
 			dbconn['pass'] = None
-			token = config.get_token()
-			while token != config.eof and not found_config:
-				if token == "DBHostName":
-					if config.get_token() == "=":
-						dbconn['host'] = config.get_token()
-				elif token == "DBName":
-					if config.get_token() == "=":
-						dbconn['name'] = config.get_token()
-				elif token == "DBUserName":
-					if config.get_token() == "=":
-						dbconn['user'] = config.get_token()
-				elif token == "DBPassword":
-					if config.get_token() == "=":
-						dbconn['pass'] = config.get_token()
-				token = config.get_token()
+			for token in config.getElementsByTagName('Configuration')[0].getElementsByTagName('UPnP')[0].getElementsByTagName('MythFrontend')[0].getElementsByTagName('DefaultBackend')[0].childNodes:
+				if token.nodeType == token.TEXT_NODE:
+					continue
+				try:
+					if token.tagName == "DBHostName":
+						dbconn['host'] = token.childNodes[0].data
+					elif token.tagName == "DBName":
+						dbconn['name'] = token.childNodes[0].data
+					elif token.tagName == "DBUserName":
+						dbconn['user'] = token.childNodes[0].data
+					elif token.tagName == "DBPassword":
+						dbconn['pass'] = token.childNodes[0].data
+					elif token.tagName == "USN":
+						dbconn['USN'] = token.childNodes[0].data
+					elif token.tagName == "SecurityPin":
+						dbconn['PIN'] = token.childNodes[0].data
+				except:
+					pass
+
 			if dbconn['host'] != None and dbconn['name'] != None and dbconn['user'] != None and dbconn['pass'] != None:
 				log.Msg(INFO, 'Using config %s', config_file)
 				found_config = True
@@ -160,8 +158,136 @@ class MythDB:
 		else:
 			return None
 
+	def setSetting(self, value, data, hostname=None):
+		"""
+		Sets the value for the given MythTV setting.
+		"""
+		log.Msg(DEBUG, 'Setting %s for host %s to %s', value, hostname, data)
+		c = self.db.cursor()
+		ws = None
+		ss = None
+
+		if hostname is None:
+			ws = "WHERE value LIKE ('%s') AND hostname IS NULL" % (value)
+			ss = "(value,data) VALUES ('%s','%s')" % (value, data)
+		else:
+			ws = "WHERE value LIKE ('%s') AND hostname LIKE ('%s%%')" % (value, hostname)
+			ss = "(value,data,hostname) VALUES ('%s','%s','%s')" % (value, data, hostname)
+
+		if c.execute("""UPDATE settings SET data %s LIMIT 1""" % ws) == 0:
+			c.execute("""INSERT INTO settings %s""" % ss)
+		c.close()
+
+	def getCast(self, chanid, starttime, roles=None):
+		"""
+		Returns cast members for a recording
+		A string for 'roles' will return a tuple of members for that role
+		A tuple of strings will return a touple containing all listed roles
+		No 'roles' will return a dictionary of tuples
+		"""
+		if roles is None:
+			c = self.db.cursor()
+			length = c.execute("SELECT name,role FROM people,credits WHERE people.person=credits.person AND chanid=%d AND starttime=%d ORDER BY role" % (chanid, starttime))
+			if length == 0:
+				return ()
+			crole = None
+			clist = []
+			dict = {}
+			for name,role in c.fetchall():
+				if crole is None:
+					crole = role
+				if crole == role:
+					clist.append(name)
+				else:
+					dict[crole] = tuple(clist)
+					clist = []
+					clist.append(name)
+					crole = role
+			dict[crole] = tuple(clist)
+			c.close()
+			return dict
+		elif isinstance(roles,str):
+			c = self.db.cursor()
+			length = c.execute("SELECT name FROM people,credits WHERE people.person=credits.person AND chanid=%d AND starttime=%d AND role='%s'" % (chanid, starttime, roles))
+			if length == 0:
+				return ()
+			names = []
+			for name in c.fetchall():
+				names.append(name[0])
+			return tuple(names)
+		elif isinstance(roles,tuple):
+			c = self.db.cursor()
+			length = c.execute("SELECT name FROM people,credits WHERE people.person=credits.person AND chanid=%d AND starttime=%d AND role IN %s" % (chanid, starttime, roles))
+			if length == 0:
+				return ()
+			names = []
+			for name in c.fetchall():
+				names.append(name[0])
+			return tuple(names)
+
 	def cursor(self):
 		return self.db.cursor()
+
+class Job:
+	jobid = None
+	chanid = None
+	starttime = None
+	host = None
+	mythdb = None
+	def __init__(self, *inp):
+		if len(inp) == 1:
+			self.jobid = inp[0]
+			self.getProgram()
+		elif len(inp) == 2:
+			self.chanid = inp[0]
+			self.starttime = inp[1]
+			self.getJobID()
+		else:
+			print("improper input length")
+			return None
+		self.getHost()
+
+	def getProgram(self):
+		if self.mythdb is None:
+			self.mythdb = MythDB()
+		c = self.mythdb.cursor()
+		c.execute("SELECT chanid,starttime FROM jobqueue WHERE id=%d" % self.jobid)
+		self.chanid, self.starttime = c.fetchone()
+		c.close()
+
+	def getJobID(self):
+		if self.mythdb is None:
+			self.mythdb = MythDB()
+		if self.jobid is None:
+			c = self.mythdb.cursor()
+			c.execute("SELECT id FROM jobqueue WHERE chanid=%d AND starttime=%d" % (self.chanid, self.starttime))
+			self.jobid = c.fetchone()[0]
+			c.close()
+		return self.jobid
+
+	def getHost(self):
+		if self.mythdb is None:
+			self.mythdb = MythDB()
+		if self.host is None:
+			c = self.mythdb.cursor()
+			c.execute("SELECT hostname FROM jobqueue WHERE id=%d" % self.jobid)
+			self.host = c.fetchone()[0]
+			c.close()
+		return self.host
+
+	def setComment(self,comment):
+		if self.mythdb is None:
+			self.mythdb = MythDB()
+		c = self.mythdb.cursor()
+		c.execute("UPDATE jobqueue SET comment='%s' WHERE id=%d" % (comment,self.jobid))
+		c.close()
+
+	def setStatus(self,status):
+		if self.mythdb is None:
+			self.mythdb = MythDB()
+		c = self.mythdb.cursor()
+		c.execute("UPDATE jobqueue SET status=%d WHERE id=%d" % (status,self.jobid))
+		c.close()
 
 if __name__ == '__main__':
 	banner = "'mdb' is a MythDB instance."
