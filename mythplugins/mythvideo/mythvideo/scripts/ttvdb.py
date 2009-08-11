@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query Engine";
 __author__="R.D.Vaughan"
-__version__="v0.9.8"        # Version .1 Initial development
+__version__="v0.9.9"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -103,6 +103,7 @@ __version__="v0.9.8"        # Version .1 Initial development
 							#              e,g, "Defying Gravity" is SID 104581)
 							# Version .9.8 Added a (-S) option for requesting a thetvdb  
 							#              episode screen shot
+							# Version .9.9 Fixed the -S option when NO episode image exists
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -637,7 +638,9 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 			available_keys=search_for_series(t, series_name)[season][episode].keys()
 			if screenshot_request:
 				if u'filename' in available_keys:
-					print search_for_series(t, series_name)[season][episode][u'filename'].replace(http_find, http_replace)
+					screenshot = search_for_series(t, series_name)[season][episode][u'filename']
+					if screenshot:
+						print screenshot.replace(http_find, http_replace)
 					return
 				else:
 					return
