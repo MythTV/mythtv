@@ -37,6 +37,7 @@ typedef unsigned int uint;
 #undef DrawText
 #undef CreateDialog
 #undef CreateFont
+#undef DeleteFile
 #endif
 
 // Dealing with Microsoft min/max mess:
