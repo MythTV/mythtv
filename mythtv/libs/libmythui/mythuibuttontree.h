@@ -9,7 +9,7 @@ class MythUIButtonListItem;
 
 /** \class MythUIButtonTree
  *
- * \brief A tree widget
+ * \brief A tree widget for displaying and navigating a MythGenericTree()
  *
  */
 class MPUBLIC MythUIButtonTree : public MythUIType
@@ -32,6 +32,8 @@ class MPUBLIC MythUIButtonTree : public MythUIType
     void SetActive(bool active);
 
     MythUIButtonListItem* GetItemCurrent(void) const;
+    void RemoveItem(MythUIButtonListItem *item, bool deleteNode = false);
+    void RemoveCurrentItem(bool deleteNode = false);
 
   public slots:
     void handleSelect(MythUIButtonListItem* item);

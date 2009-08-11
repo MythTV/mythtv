@@ -1,7 +1,7 @@
 // Qt headers
 #include <QDomDocument>
-#include <QDomDocument>
 
+// Mythdb headers
 #include "mythverbose.h"
 
 // Mythui Headers
@@ -31,6 +31,10 @@ MythUIButtonTree::~MythUIButtonTree()
 {
 }
 
+/*!
+ * \brief Initialise the tree having loaded the formatting options from the 
+ *        theme
+ */
 void MythUIButtonTree::Init()
 {
     if (!m_listTemplate)
@@ -69,6 +73,9 @@ void MythUIButtonTree::Init()
     m_initialized = true;
 }
 
+/*!
+ * \brief Update the widget following a change
+ */
 void MythUIButtonTree::SetTreeState()
 {
     if (!m_initialized)
@@ -136,6 +143,14 @@ void MythUIButtonTree::SetTreeState()
     }
 }
 
+/*!
+ * \brief Update a list with children of the tree node
+ *
+ * \param list List to refill
+ * \param node Parent node whose children will appear in the list
+ *
+ * \return True if successful, False if the node had no children or was invalid
+ */
 bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
 {
     disconnect(list, 0, 0, 0);
@@ -182,6 +197,20 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
     return true;
 }
 
+/*!
+ * \brief Assign the root node of the tree to be displayed
+ *
+ * MythUIButtonTree() is merely responsible for the display and navigation of a
+ * tree, the structure of that tree and the data it contains are the
+ * responsibility of MythGenericTree(). Generally MythUIButtonTree() will not
+ * modify the tree, for technical reason RemoteItem() is an exception to the rule.
+ *
+ * You should operate directly on MythGenericTree() to change it's content.
+ *
+ * \param tree The node to make the root of the displayed tree
+ *
+ * \return True if successful
+ */
 bool MythUIButtonTree::AssignTree(MythGenericTree *tree)
 {
     if (!tree)
@@ -197,6 +226,9 @@ bool MythUIButtonTree::AssignTree(MythGenericTree *tree)
     return true;
 }
 
+/*!
+ * \copydoc MythUIType::Reset()
+ */
 void MythUIButtonTree::Reset(void)
 {
     m_rootNode = m_currentNode = NULL;
@@ -211,6 +243,14 @@ void MythUIButtonTree::Reset(void)
     MythUIType::Reset();
 }
 
+/*!
+ * \brief Using a path based on the node IDs, set the currently
+ *        selected node
+ *
+ * \param route List defining the path using node IDs starting at the root node
+ *
+ * \return True if successful
+ */
 bool MythUIButtonTree::SetNodeById(QList<int> route)
 {
     MythGenericTree *node = m_rootNode->findNode(route);
@@ -223,6 +263,14 @@ bool MythUIButtonTree::SetNodeById(QList<int> route)
     return false;
 }
 
+/*!
+ * \brief Using a path based on the node string, set the currently
+ *        selected node
+ *
+ * \param route List defining the path using node strings starting at the root node
+ *
+ * \return True if successful
+ */
 bool MythUIButtonTree::SetNodeByString(QStringList route)
 {
     if (!m_rootNode)
@@ -262,6 +310,14 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
     return foundit;
 }
 
+/*!
+ * \brief Set the currently selected node
+ *
+ * \param node The node, which must appear in this tree or behaviour is
+ *             undefined
+ *
+ * \return True if successful
+ */
 bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
 {
     if (node)
@@ -282,6 +338,47 @@ bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
     return false;
 }
 
+/*!
+ * \brief Remove the item from the tree
+ *
+ * \param item Item to be removed
+ * \param deleteNode Also delete the node from the tree? Modifies the tree.
+ *
+ * \return True if successful
+ */
+void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
+{
+    if (!item || !m_rootNode)
+        return;
+
+    if (deleteNode)
+    {
+        MythGenericTree *node = qVariantValue<MythGenericTree*>
+                                                            (item->GetData());
+        if (node)
+            m_rootNode->removeNode(node);
+    }
+
+    m_activeList->RemoveItem(item);
+}
+
+/*!
+ * \brief Remove the currently selected item from the tree
+ *
+ * \param deleteNode Also delete the node from the tree? Modifies the tree.
+ *
+ * \return True if successful
+ */
+void MythUIButtonTree::RemoveCurrentItem(bool deleteNode)
+{
+    RemoveItem(GetItemCurrent(), deleteNode);
+}
+
+/*!
+ * \brief Set the widget active/inactive
+ *
+ * \param active
+ */
 void MythUIButtonTree::SetActive(bool active)
 {
     m_active = active;
@@ -289,6 +386,12 @@ void MythUIButtonTree::SetActive(bool active)
         SetTreeState();
 }
 
+/*!
+ * \brief Move from list, or one level of the tree, to another
+ *
+ * \param right If true move to the right or away from the root, if false move to
+ *              the left or towards the root
+ */
 void MythUIButtonTree::SwitchList(bool right)
 {
     bool doUpdate = false;
@@ -328,6 +431,11 @@ void MythUIButtonTree::SwitchList(bool right)
     }
 }
 
+/*!
+ * \brief Handle a list item receiving focus
+ *
+ * \param item The list item
+ */
 void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
 {
     if (!item)
@@ -346,6 +454,11 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
     SetTreeState();
 }
 
+/*!
+ * \brief Handle a list item being clicked
+ *
+ * \param item The list item
+ */
 void MythUIButtonTree::handleClick(MythUIButtonListItem *item)
 {
     if (!item)
@@ -356,6 +469,11 @@ void MythUIButtonTree::handleClick(MythUIButtonListItem *item)
         emit itemClicked(item);
 }
 
+/*!
+ * \brief Return the currently selected list item
+ *
+ * \return The list item
+ */
 MythUIButtonListItem* MythUIButtonTree::GetItemCurrent() const
 {
     if (m_activeList)
@@ -364,6 +482,9 @@ MythUIButtonListItem* MythUIButtonTree::GetItemCurrent() const
     return NULL;
 }
 
+/*!
+ * \copydoc MythUIType::keyPressEvent()
+ */
 bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
@@ -393,12 +514,9 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
- *         QApplication event loop. Should not be used directly.
- *
- *  \param uitype The mythuitype receiving the event
- *  \param event Mouse event
- */
+// /*!
+// * \copydoc MythUIType::gestureEvent()
+// */
 // void MythUIButtonTree::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 // {
 //     if (event->gesture() == MythGestureEvent::Click)
@@ -410,6 +528,9 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
 //     }
 // }
 
+/*!
+ * \copydoc MythUIType::ParseElement()
+ */
 bool MythUIButtonTree::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "spacing")
@@ -426,12 +547,18 @@ bool MythUIButtonTree::ParseElement(QDomElement &element)
     return true;
 }
 
+/*!
+ * \copydoc MythUIType::CreatCopy()
+ */
 void MythUIButtonTree::CreateCopy(MythUIType *parent)
 {
     MythUIButtonTree *bt = new MythUIButtonTree(parent, objectName());
     bt->CopyFrom(this);
 }
 
+/*!
+ * \copydoc MythUIType::CopyFrom()
+ */
 void MythUIButtonTree::CopyFrom(MythUIType *base)
 {
     MythUIButtonTree *bt = dynamic_cast<MythUIButtonTree *>(base);
