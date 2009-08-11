@@ -6924,7 +6924,7 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     bool has_prog_small_video    = osd->HasSet("program_info_small_video");
     bool has_prog_rec            = osd->HasSet("program_info_recording");
     bool has_prog_small_rec      = osd->HasSet("program_info_small_recording");
-    
+
     ReturnOSDLock(ctx, osd);
 
     ctx->LockPlayingInfo(__FILE__, __LINE__);
@@ -6932,10 +6932,10 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     QString title = ctx->playingInfo->title;
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    bool isDVD = (ctx->buffer && ctx->buffer->isDVD());        
+    bool isDVD = (ctx->buffer && ctx->buffer->isDVD());
     bool is_video                = ctx->playingInfo->isVideo;
     bool is_recording            = StateIsPlaying(ctx->GetState()) && !is_video;
-    
+
     if (isDVD && desc.isEmpty() && title.isEmpty())
     {
         // DVD toggles between status and nothing
@@ -6947,13 +6947,13 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
     else if (is_status_disp)
     {
         if (is_video && has_prog_small_video)
-            UpdateOSDProgInfo(ctx, "program_info_small_video");  
+            UpdateOSDProgInfo(ctx, "program_info_small_video");
         else if (is_video && has_prog_video)
-            UpdateOSDProgInfo(ctx, "program_info_video");  
+            UpdateOSDProgInfo(ctx, "program_info_video");
         else if (is_recording && has_prog_small_rec)
-            UpdateOSDProgInfo(ctx, "program_info_small_recording");  
+            UpdateOSDProgInfo(ctx, "program_info_small_recording");
         else if (is_recording && has_prog_rec)
-            UpdateOSDProgInfo(ctx, "program_info_recording");                    
+            UpdateOSDProgInfo(ctx, "program_info_recording");
         else if (has_prog_info_small)
             UpdateOSDProgInfo(ctx, "program_info_small");
         else
@@ -6965,7 +6965,7 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
         if (is_video && has_prog_video)
             UpdateOSDProgInfo(ctx, "program_info_video");
         if (is_recording && has_prog_rec)
-            UpdateOSDProgInfo(ctx, "program_info_recording");                    
+            UpdateOSDProgInfo(ctx, "program_info_recording");
         else if (has_prog_info)
             UpdateOSDProgInfo(ctx, "program_info");
         else
@@ -6988,11 +6988,11 @@ void TV::ToggleOSD(const PlayerContext *ctx, bool includeStatusOSD)
         if (is_video && has_prog_small_video)
             UpdateOSDProgInfo(ctx, "program_info_small_video");
         if (is_video && has_prog_video)
-            UpdateOSDProgInfo(ctx, "program_info_video"); 
+            UpdateOSDProgInfo(ctx, "program_info_video");
         if (is_recording && has_prog_small_rec)
-            UpdateOSDProgInfo(ctx, "program_info_small_recording"); 
+            UpdateOSDProgInfo(ctx, "program_info_small_recording");
         if (is_recording && has_prog_rec)
-            UpdateOSDProgInfo(ctx, "program_info_recording");            
+            UpdateOSDProgInfo(ctx, "program_info_recording");
         else if (has_prog_info_small)
             UpdateOSDProgInfo(ctx, "program_info_small");
         else
