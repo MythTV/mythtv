@@ -803,7 +803,9 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 {
                     pt = ct;
                     sptsstr[0] = '\r';
-                    write(1, sptsstr, strlen(sptsstr)); 
+                    uint len = write(1, sptsstr, strlen(sptsstr));
+                    if (len != strlen(sptsstr))
+                        printf("ERROR: write failed");
                 }
 
                 fprintf(ofh, "  <spu start=\"%s\" end=\"%s\" image=\"%s\""
@@ -821,7 +823,9 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
     }
     exc_catch (EOFIndicator) 
     {
-        write(1, sptsstr, strlen(sptsstr));
+        uint len = write(1, sptsstr, strlen(sptsstr));
+        if (len != strlen(sptsstr))
+            printf("ERROR: write failed");
         return;
     }
     exc_end;
@@ -865,7 +869,9 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
         memset(yuvpalette, 0, sizeof(yuvpalette));
         memset(rgbpalette, 0, sizeof(rgbpalette));
 
-        write(1, "\n", 1);
+        if (write(1, "\n", 1) != 1)
+            printf("ERROR: write failed");
+
         if (sizeof (char) != 1 || sizeof (int) < 2) /* very unlikely */
             exc_throw(MiscError, "Incompatible variable sizes.");
 
@@ -908,7 +914,9 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
         xxfwriteCS(fh, "<subpictures>\n <stream>\n");
         pxsubtitle(supfile, fh, rgbpalette, createpics, delay_ms, fnbuf, p);
 
-        write(1, "\n", 1);
+        if (write(1, "\n", 1) != 1)
+            printf("ERROR: write failed");
+
         xxfwriteCS(fh, " </stream>\n</subpictures>\n");
         fclose(fh);
 
@@ -949,7 +957,12 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 
     exc_catchall 
     {
-        write(2, EXC.msgbuf, EXC.buflen); write(2, "\n", 1);
+        if (write(2, EXC.msgbuf, EXC.buflen) != EXC.buflen)
+            printf("ERROR: write failed");
+
+        if (write(2, "\n", 1) != 1)
+            printf("ERROR: write failed");
+
         exit(1);
     }
     exc_endall;
