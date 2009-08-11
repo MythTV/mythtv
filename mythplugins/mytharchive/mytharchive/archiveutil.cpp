@@ -116,7 +116,6 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(configDir);
-        system(qPrintable("chmod 777 " + configDir));
         int res = system(qPrintable("chmod 777 " + configDir));
         if (!WIFEXITED(res) || WEXITSTATUS(res))
             VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive config directory");
