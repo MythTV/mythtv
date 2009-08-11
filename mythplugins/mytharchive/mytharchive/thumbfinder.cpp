@@ -320,22 +320,26 @@ QString ThumbFinder::createThumbDir(void)
     if (!dir.exists())
     {
         dir.mkdir(thumbDir);
-        system(qPrintable("chmod 777 " + thumbDir));
+        int res = system(qPrintable("chmod 777 " + thumbDir));
+        if (!WIFEXITED(res) || WEXITSTATUS(res))
+            VERBOSE(VB_IMPORTANT, "ThumbFinder: Failed to change permissions on thumb directory");
     }
 
     int x = 0;
-    QString res;
+    QString path;
     do
     {
         x++;
-        res = QString(thumbDir + "/%1").arg(x);
-        dir.setPath(res);
+        path = QString(thumbDir + "/%1").arg(x);
+        dir.setPath(path);
     } while (dir.exists());
 
-    dir.mkdir(res);
-    system(qPrintable("chmod 777 " + res));
+    dir.mkdir(path);
+    int res = system(qPrintable("chmod 777 " + path));
+    if (!WIFEXITED(res) || WEXITSTATUS(res))
+        VERBOSE(VB_IMPORTANT, "ThumbFinder: Failed to change permissions on thumb directory");
 
-    return  res;
+    return path;
 }
 
 void ThumbFinder::updateThumb(void)

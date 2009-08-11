@@ -65,7 +65,9 @@ NativeArchive::NativeArchive(void)
     QString tempDir = getTempDirectory();
     QString command = QString("echo %1 > " + tempDir +
                       "/logs/mythburn.lck").arg(getpid());
-    system(qPrintable(command));
+    int res = system(qPrintable(command));
+    if (WIFEXITED(res) == 0)
+        VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to create lock file");
 }
 
 NativeArchive::~NativeArchive(void)
@@ -317,7 +319,10 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
             saveDirectory += "/";
 
         saveDirectory += "work/";
-        system(qPrintable("rm -fr " + saveDirectory + "*"));
+
+        int res = system(qPrintable("rm -fr " + saveDirectory + "*"));
+        if (!WIFEXITED(res) || WEXITSTATUS(res))
+            VERBOSE(VB_IMPORTANT, "NativeArchive: Failed to clear work directory");
     }
 
     VERBOSE(VB_JOBQUEUE, QString("Saving files to : %1").arg(saveDirectory));
@@ -2469,7 +2474,7 @@ int main(int argc, char **argv)
     QString logFile;
     QString ifoFile;
     int lenMethod = 0;
-    int chanID;
+    int chanID = -1;
     int frameCount = 1;
     int delay = 0;
 

@@ -50,7 +50,11 @@ MythBurn::MythBurn(MythScreenStack   *parent,
     QString thumbDir = getTempDirectory() + "/config/thumbs";
     QDir dir(thumbDir);
     if (dir.exists())
-        system(qPrintable("rm -rf " + thumbDir));
+    {
+        int res = system(qPrintable("rm -rf " + thumbDir));
+        if (!WIFEXITED(res) || WEXITSTATUS(res))
+            VERBOSE(VB_IMPORTANT, "MythBurn: Failed to clear thumb directory");
+    }
 
     m_bCreateISO = false;
     m_bDoBurn = false;

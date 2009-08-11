@@ -89,27 +89,37 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(tempDir);
-        system(qPrintable("chmod 777 " + tempDir));
+        int res = system(qPrintable("chmod 777 " + tempDir));
+        if (!WIFEXITED(res) || WEXITSTATUS(res))
+            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive directory");
     }
 
     dir = QDir(workDir);
     if (!dir.exists())
     {
         dir.mkdir(workDir);
-        system(qPrintable("chmod 777 " + workDir));
+        int res = system(qPrintable("chmod 777 " + workDir));
+        if (!WIFEXITED(res) || WEXITSTATUS(res))
+            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive work directory");
     }
 
     dir = QDir(logDir);
     if (!dir.exists())
     {
         dir.mkdir(logDir);
-        system(qPrintable("chmod 777 " + logDir));
+        int res = system(qPrintable("chmod 777 " + logDir));
+        if (!WIFEXITED(res) || WEXITSTATUS(res))
+            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive log directory");
+
     }
     dir = QDir(configDir);
     if (!dir.exists())
     {
         dir.mkdir(configDir);
         system(qPrintable("chmod 777 " + configDir));
+        int res = system(qPrintable("chmod 777 " + configDir));
+        if (!WIFEXITED(res) || WEXITSTATUS(res))
+            VERBOSE(VB_IMPORTANT, "Failed to change permissions on archive config directory");
     }
 }
 

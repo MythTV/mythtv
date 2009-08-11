@@ -161,7 +161,9 @@ void LogViewer::cancelClicked(void)
     QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
 
     QString command("echo Cancel > " + tempDir + "/logs/mythburncancel.lck");
-    system(qPrintable(command));
+    int res = system(qPrintable(command));
+    if (WIFEXITED(res) == 0)
+        VERBOSE(VB_IMPORTANT, "LogViewer: Failed to create mythburncancel.lck file");
 
     ShowOkPopup(QObject::tr("Background creation has been asked to stop.\n" 
                             "This may take a few minutes."));
