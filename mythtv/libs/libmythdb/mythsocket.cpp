@@ -936,8 +936,7 @@ void MythSocketThread::run(void)
 
         if (rval == WAIT_FAILED)
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    "WaitForMultipleObjects returned error");
+            VERBOSE(VB_IMPORTANT, "WaitForMultipleObjects returned error");
             delete[] idx;
         }
         else if (rval >= WAIT_OBJECT_0 && rval < (WAIT_OBJECT_0 + n))
