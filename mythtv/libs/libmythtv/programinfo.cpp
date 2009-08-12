@@ -2244,7 +2244,7 @@ void ProgramInfo::SetDVDBookmark(QStringList fields) const
         MythDB::DBError("SetDVDBookmark updating", query);
 }
 /** \fn ProgramInfo::SetWatchedFlag(bool) const
- *  \brief Set "watched" field in "recorded" table to "watchedFlag".
+ *  \brief Set "watched" field in recorded/videometadata to "watchedFlag".
  *  \param watchedFlag value to set watched field to.
  */
 void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
@@ -2270,6 +2270,36 @@ void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
             MythDB::DBError("Set watched flag", query);
         else
             UpdateLastDelete(watchedFlag);
+    }
+    else if (isVideo && !pathname.startsWith("dvd:"))
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("UPDATE videometadata"
+                    " SET watched = :WATCHEDFLAG"
+                    " WHERE title = :TITLE"
+                    " AND subtitle = :SUBTITLE"
+                    " AND filename = :FILENAME ;");
+        query.bindValue(":TITLE", title);
+        query.bindValue(":SUBTITLE", subtitle); 
+
+        QString url = pathname;
+        if (url.startsWith("myth://"))
+        {
+            url = QUrl(url).path();
+            url.remove(0,1);
+            query.bindValue(":FILENAME", url);
+        }
+        else
+            query.bindValue(":FILENAME", url);
+
+        if (watchedFlag)
+            query.bindValue(":WATCHEDFLAG", 1);
+        else
+            query.bindValue(":WATCHEDFLAG", 0);
+                           
+        if (!query.exec() || !query.isActive())
+            MythDB::DBError("Set watched flag", query);
     }
 }
 

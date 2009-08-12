@@ -72,6 +72,7 @@ class Metadata
              int categoryID = 0,
              int childID = -1,
              bool browse = true,
+             bool watched = false,
              const QString &playcommand = QString(),
              const QString &category = QString(),
              const genre_list &genres = genre_list(),
@@ -132,6 +133,9 @@ class Metadata
 
     bool GetBrowse() const;
     void SetBrowse(bool browse);
+
+    bool GetWatched() const;
+    void SetWatched(bool watched);
 
     const QString &GetPlayCommand() const;
     void SetPlayCommand(const QString &playCommand);

@@ -43,6 +43,7 @@ class EditMetadataDialog : public MythScreenType
     void SetLevel(MythUIButtonListItem*);
     void SetChild(MythUIButtonListItem*);
     void ToggleBrowse();
+    void ToggleWatched();
     void FindCoverArt();
     void FindBanner();
     void FindFanart();
@@ -72,6 +73,7 @@ class EditMetadataDialog : public MythScreenType
     MythUIButtonList      *m_levelList;
     MythUIButtonList      *m_childList;
     MythUICheckBox      *m_browseCheck;
+    MythUICheckBox      *m_watchedCheck;
     MythUIButton        *m_coverartButton;
     MythUIText          *m_coverartText;
     MythUIButton        *m_screenshotButton;

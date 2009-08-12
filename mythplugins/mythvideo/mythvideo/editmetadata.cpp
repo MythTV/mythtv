@@ -26,8 +26,8 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
     m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
     m_playerEdit(0), m_seasonSpin(0), m_episodeSpin(0),
     m_categoryList(0), m_levelList(0), m_childList(0), 
-    m_browseCheck(0), m_coverartButton(0), m_coverartText(0),
-    m_screenshotButton(0), m_screenshotText(0),
+    m_browseCheck(0), m_watchedCheck(0), m_coverartButton(0), 
+    m_coverartText(0), m_screenshotButton(0), m_screenshotText(0),
     m_bannerButton(0), m_bannerText(0),
     m_fanartButton(0), m_fanartText(0),
     m_trailerButton(0), m_trailerText(0),
@@ -66,6 +66,7 @@ bool EditMetadataDialog::Create()
     UIUtilE::Assign(this, m_childList, "child_select", &err);
 
     UIUtilE::Assign(this, m_browseCheck, "browse_check", &err);
+    UIUtilE::Assign(this, m_watchedCheck, "watched_check", &err);
 
     UIUtilE::Assign(this, m_coverartButton, "coverart_button", &err);
     UIUtilE::Assign(this, m_bannerButton, "banner_button", &err);
@@ -98,6 +99,7 @@ bool EditMetadataDialog::Create()
     connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
 
     connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(ToggleBrowse()));
+    connect(m_watchedCheck, SIGNAL(valueChanged()), SLOT(ToggleWatched()));
 
     connect(m_childList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(SetChild(MythUIButtonListItem*)));
@@ -281,6 +283,8 @@ void EditMetadataDialog::fillWidgets()
 
     if (m_workingMetadata->GetBrowse())
         m_browseCheck->SetCheckState(MythUIStateType::Full);
+    if (m_workingMetadata->GetWatched())
+        m_watchedCheck->SetCheckState(MythUIStateType::Full);
     m_coverartText->SetText(m_workingMetadata->GetCoverFile());
     m_screenshotText->SetText(m_workingMetadata->GetScreenshot());
     m_bannerText->SetText(m_workingMetadata->GetBanner());
@@ -369,6 +373,12 @@ void EditMetadataDialog::ToggleBrowse()
 {
     m_workingMetadata->
             SetBrowse(m_browseCheck->GetBooleanCheckState());
+}
+
+void EditMetadataDialog::ToggleWatched()
+{
+    m_workingMetadata->
+            SetWatched(m_watchedCheck->GetBooleanCheckState());
 }
 
 void EditMetadataDialog::FindCoverArt()

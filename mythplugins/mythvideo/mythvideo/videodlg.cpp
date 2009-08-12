@@ -1529,6 +1529,7 @@ namespace
             tmp["inetref"] = metadata->GetInetRef();
             tmp["child_id"] = QString::number(metadata->GetChildID());
             tmp["browseable"] = GetDisplayBrowse(metadata->GetBrowse());
+            tmp["watched"] = GetDisplayWatched(metadata->GetWatched());
             tmp["category"] = metadata->GetCategory();
         }
 
@@ -1589,6 +1590,7 @@ namespace
         h.handleText("inetref");
         h.handleText("child_id");
         h.handleText("browseable");
+        h.handleText("watched");
         h.handleText("category");
 
         h.handleState("trailerstate");
@@ -2953,6 +2955,7 @@ void VideoDialog::ManageMenu()
             SLOT(ManualVideoTitle()));
     m_menuPopup->AddButton(tr("Reset Metadata"), SLOT(ResetMetadata()));
     m_menuPopup->AddButton(tr("Toggle Browseable"), SLOT(ToggleBrowseable()));
+    m_menuPopup->AddButton(tr("Toggle Watched"), SLOT(ToggleWatched()));
     m_menuPopup->AddButton(tr("Remove Video"), SLOT(RemoveVideo()));
 
     m_menuPopup->AddButton(tr("Cancel"));
@@ -3289,6 +3292,18 @@ void VideoDialog::ToggleBrowseable()
     if (metadata)
     {
         metadata->SetBrowse(!metadata->GetBrowse());
+        metadata->UpdateDatabase();
+
+        refreshData();
+    }
+}
+
+void VideoDialog::ToggleWatched()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    if (metadata)
+    {
+        metadata->SetWatched(!metadata->GetWatched());
         metadata->UpdateDatabase();
 
         refreshData();

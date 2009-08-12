@@ -932,33 +932,39 @@
             <value>Include while Browsing:</value>
         </textarea>
 
+        <textarea name="watched_text" from="title_text">
+            <area>470,317,280,40</area>
+            <align>left</align>
+            <value>Item has been watched:</value>
+        </textarea>
+
         <textarea name="coverart_text_label" from="title_text">
-            <position>50,328</position>
+            <position>50,358</position>
             <value>Cover Art:</value>
         </textarea>
 
         <textarea name="screenshot_text_label" from="title_text">
-            <position>50,357</position>
+            <position>50,387</position>
             <value>Screenshot:</value>
         </textarea>
 
         <textarea name="banner_text_label" from="title_text">
-            <position>50,386</position>
+            <position>50,416</position>
             <value>Banner:</value>
         </textarea>
 
         <textarea name="fanart_text_label" from="title_text">
-            <position>50,415</position>
+            <position>50,445</position>
             <value>Fanart:</value>
         </textarea>
 
         <textarea name="trailer_text_label" from="title_text">
-            <position>50,447</position>
+            <position>50,477</position>
             <value>Trailer:</value>
         </textarea>
 
         <textarea name="player_text" from="title_text">
-            <position>50,487</position>
+            <position>50,517</position>
             <value>Unique Player Command:</value>
         </textarea>
 
@@ -993,11 +999,15 @@
         </buttonlist>
 
         <checkbox name="browse_check" from="basecheckbox">
-            <position>735,275</position>
+            <position>745,275</position>
+        </checkbox>
+
+        <checkbox name="watched_check" from="basecheckbox">
+            <position>745,315</position>
         </checkbox>
 
         <button name="coverart_button">
-            <area>310,323,32,32</area>
+            <area>310,353,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1019,12 +1029,12 @@
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
-            <area>350,328,250,40</area>
+            <area>350,358,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="screenshot_button">
-            <area>310,352,32,32</area>
+            <area>310,382,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1046,12 +1056,12 @@
         </button>
 
         <textarea name="screenshot_text" from="basetextarea">
-            <area>350,357,250,40</area>
+            <area>350,387,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="banner_button">
-            <area>310,381,32,32</area>
+            <area>310,411,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -1073,38 +1083,11 @@
         </button>
 
         <textarea name="banner_text" from="basetextarea">
-            <area>350,386,250,40</area>
+            <area>350,416,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="fanart_button">
-            <area>310,412,32,32</area>
-            <statetype name="buttonstate">
-                <state name="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_off.png</filename>
-                    </imagetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_on.png</filename>
-                    </imagetype>
-                </state>
-                <state name="disabled" from="active" />
-                <state name="pushed" from="active">
-                    <imagetype name="background">
-                        <filename>blankbutton_pushed.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-        </button>
-
-        <textarea name="fanart_text" from="basetextarea">
-            <area>350,415,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
-        </textarea>
-
-        <button name="trailer_button">
             <area>310,442,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
@@ -1126,18 +1109,45 @@
             </statetype>
         </button>
 
+        <textarea name="fanart_text" from="basetextarea">
+            <area>350,445,250,40</area>
+            <value>/path/to/the/thing.jpg</value>
+        </textarea>
+
+        <button name="trailer_button">
+            <area>310,472,32,32</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
         <textarea name="trailer_text" from="basetextarea">
-            <area>350,447,250,40</area>
+            <area>350,477,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
 
         <textedit name="player_edit" from="basetextedit">
-            <position>310,477</position>
+            <position>310,507</position>
         </textedit>
 
         <button name="done_button" from="basebutton">
-            <position>310,537</position>
+            <position>310,567</position>
             <value>Done</value>
         </button>
 
@@ -1224,6 +1234,11 @@
             <value>Sort by :</value>
         </textarea>
 
+        <textarea name="watched_text" from="category_text">
+            <position>400,349</position>
+            <value>Watched :</value>
+        </textarea>
+
         <!-- Widgets -->
 
         <buttonlist name="category_select" from="baseselector">
@@ -1268,6 +1283,10 @@
 
         <buttonlist name="orderby_select" from="baseselector">
             <position>550,296</position>
+        </buttonlist>
+
+        <buttonlist name="watched_select" from="baseselector">
+            <position>550,340</position>
         </buttonlist>
 
         <textarea name="numvideos_text" from="basetextarea">

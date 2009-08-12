@@ -95,7 +95,7 @@ class MetadataImp
              const QString &rating, int length,
              int season, int episode,
              int id, ParentalLevel::Level showlevel, int categoryID,
-             int childID, bool browse,
+             int childID, bool browse, bool watched,
              const QString &playcommand, const QString &category,
              const genre_list &genres,
              const country_list &countries,
@@ -110,7 +110,8 @@ class MetadataImp
         m_host(host), m_categoryID(categoryID), m_childID(childID),
         m_year(year), m_length(length), m_season(season),
         m_episode(episode), m_showlevel(showlevel),
-        m_browse(browse), m_id(id), m_userrating(userrating)
+        m_browse(browse), m_watched(watched), m_id(id), 
+        m_userrating(userrating)
     {
         VideoCategory::GetCategory().get(m_categoryID, m_category);
     }
@@ -155,6 +156,7 @@ class MetadataImp
             m_episode = rhs.m_episode;
             m_showlevel = rhs.m_showlevel;
             m_browse = rhs.m_browse;
+            m_watched = rhs.m_watched;
             m_id = rhs.m_id;
             m_userrating = rhs.m_userrating;
             m_host = rhs.m_host;
@@ -272,6 +274,9 @@ class MetadataImp
     bool GetBrowse() const { return m_browse; }
     void SetBrowse(bool browse) { m_browse = browse; }
 
+    bool GetWatched() const { return m_watched; }
+    void SetWatched(bool watched) { m_watched = watched; }
+
     unsigned int GetID() const { return m_id; }
     void SetID(int id) { m_id = id; }
 
@@ -329,6 +334,7 @@ class MetadataImp
     int m_episode;
     ParentalLevel::Level m_showlevel;
     bool m_browse;
+    bool m_watched;
     unsigned int m_id;  // videometadata.intid
     float m_userrating;
 
@@ -407,7 +413,7 @@ void MetadataImp::Reset()
                     VIDEO_RATING_DEFAULT, 0, 
                     Metadata::FilenameToMeta(m_filename, 2).toInt(), 
                     Metadata::FilenameToMeta(m_filename, 3).toInt(), m_id,
-                    ParentalLevel::plLowest, 0, -1, true, "", "",
+                    ParentalLevel::plLowest, 0, -1, true, false, "", "",
                     Metadata::genre_list(), Metadata::country_list(),
                     Metadata::cast_list(), m_host);
     tmp.m_prefix = m_prefix;
@@ -497,17 +503,18 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_inetref = query.value(10).toString();
     m_childID = query.value(11).toUInt();
     m_browse = query.value(12).toBool();
-    m_playcommand = query.value(13).toString();
-    m_categoryID = query.value(14).toInt();
-    m_id = query.value(15).toInt();
-    m_trailer = query.value(16).toString();
-    m_screenshot = query.value(17).toString();
-    m_banner = query.value(18).toString();
-    m_fanart = query.value(19).toString();
-    m_subtitle = query.value(20).toString();
-    m_season = query.value(21).toInt();
-    m_episode = query.value(22).toInt();
-    m_host = query.value(23).toString();
+    m_watched = query.value(13).toBool();
+    m_playcommand = query.value(14).toString();
+    m_categoryID = query.value(15).toInt();
+    m_id = query.value(16).toInt();
+    m_trailer = query.value(17).toString();
+    m_screenshot = query.value(18).toString();
+    m_banner = query.value(19).toString();
+    m_fanart = query.value(20).toString();
+    m_subtitle = query.value(21).toString();
+    m_season = query.value(22).toInt();
+    m_episode = query.value(23).toInt();
+    m_host = query.value(24).toString();
 
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
@@ -562,13 +569,16 @@ void MetadataImp::saveToDatabase()
     {
         m_browse = gContext->GetNumSetting("VideoNewBrowsable", 1);
 
+        m_watched = 0;
+
         query.prepare("INSERT INTO videometadata (title,subtitle,director,plot,"
                       "rating,year,userrating,length,season,episode,filename,"
-                      "showlevel,coverfile,inetref,browse,trailer,screenshot,banner,"
-                      "fanart,host) VALUES (:TITLE, :SUBTITLE, :DIRECTOR, :PLOT, "
-                      ":RATING, :YEAR, :USERRATING, :LENGTH, :SEASON, :EPISODE, "
-                      ":FILENAME, :SHOWLEVEL, :COVERFILE, :INETREF, :BROWSE, "
-                      ":TRAILER, :SCREENSHOT, :BANNER, :FANART, :HOST)");
+                      "showlevel,coverfile,inetref,browse,watched,trailer,"
+                      "screenshot,banner,fanart,host) VALUES (:TITLE, :SUBTITLE, "
+                      ":DIRECTOR, :PLOT, :RATING, :YEAR, :USERRATING, :LENGTH, "
+                      ":SEASON, :EPISODE, :FILENAME, :SHOWLEVEL, :COVERFILE, "
+                      ":INETREF, :BROWSE, :WATCHED, :TRAILER, :SCREENSHOT, "
+                      ":BANNER, :FANART, :HOST)");
     }
     else
     {
@@ -579,8 +589,8 @@ void MetadataImp::saveToDatabase()
                       "filename = :FILENAME, trailer = :TRAILER, "
                       "showlevel = :SHOWLEVEL, coverfile = :COVERFILE, "
                       "screenshot = :SCREENSHOT, banner = :BANNER, fanart = :FANART, "
-                      "inetref = :INETREF, browse = :BROWSE, host = :HOST, "
-                      "playcommand = :PLAYCOMMAND, childid = :CHILDID, "
+                      "inetref = :INETREF, browse = :BROWSE, watched = :WATCHED, "
+                      "host = :HOST, playcommand = :PLAYCOMMAND, childid = :CHILDID, "
                       "category = :CATEGORY WHERE intid = :INTID");
 
         query.bindValue(":PLAYCOMMAND", m_playcommand);
@@ -608,6 +618,7 @@ void MetadataImp::saveToDatabase()
     query.bindValue(":FANART", m_fanart);
     query.bindValue(":INETREF", m_inetref);
     query.bindValue(":BROWSE", m_browse);
+    query.bindValue(":WATCHED", m_watched);
     query.bindValue(":HOST", m_host);
 
     if (!query.exec() || !query.isActive())
@@ -902,7 +913,7 @@ Metadata::Metadata(const QString &filename, const QString &trailer,
              const QString &rating, int length,
              int season, int episode,
              int id, ParentalLevel::Level showlevel, int categoryID,
-             int childID, bool browse,
+             int childID, bool browse, bool watched,
              const QString &playcommand, const QString &category,
              const genre_list &genres,
              const country_list &countries,
@@ -912,8 +923,8 @@ Metadata::Metadata(const QString &filename, const QString &trailer,
     m_imp = new MetadataImp(filename, trailer, coverfile, screenshot, banner,
                             fanart, title, subtitle, year, inetref, director, plot,
                             userrating, rating, length, season, episode, id, 
-                            showlevel, categoryID, childID, browse, playcommand,
-                            category, genres, countries, cast, host);
+                            showlevel, categoryID, childID, browse, watched, 
+                            playcommand, category, genres, countries, cast, host);
 }
 
 Metadata::~Metadata()
@@ -1104,6 +1115,16 @@ bool Metadata::GetBrowse() const
 void Metadata::SetBrowse(bool browse)
 {
     m_imp->SetBrowse(browse);
+}
+
+bool Metadata::GetWatched() const
+{
+    return m_imp->GetWatched();
+}
+
+void Metadata::SetWatched(bool watched)
+{
+    m_imp->SetWatched(watched);
 }
 
 const QString &Metadata::GetPlayCommand() const

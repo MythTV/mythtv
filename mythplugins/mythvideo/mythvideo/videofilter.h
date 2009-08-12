@@ -30,7 +30,8 @@ class VideoFilterSettings
         kFilterInetRefChanged = (1 << 8),
         kFilterCoverFileChanged = (1 << 9),
         kFilterParentalLevelChanged = (1 << 10),
-        kFilterCastChanged = (1 << 11)
+        kFilterCastChanged = (1 << 11),
+        kFilterWatchedChanged = (1 << 12)
     };
 
   public:
@@ -114,6 +115,13 @@ class VideoFilterSettings
         browse = lbrowse;
     }
 
+    int GetWatched() const {return watched; }
+    void SetWatched(int lwatched)
+    {
+        m_changed_state |= kFilterWatchedChanged;
+        watched = lwatched;
+    }
+
     ordering getOrderby() const { return orderby; }
     void setOrderby(ordering lorderby)
     {
@@ -158,6 +166,7 @@ class VideoFilterSettings
     int runtime;
     int userrating;
     int browse;
+    int watched;
     int m_inetref;
     int m_coverfile;
     ordering orderby;
@@ -220,6 +229,7 @@ class VideoFilterDialog : public MythScreenType
     void SetCast(MythUIButtonListItem *item);
     void setRunTime(MythUIButtonListItem *item);
     void SetBrowse(MythUIButtonListItem *item);
+    void SetWatched(MythUIButtonListItem *item);
     void SetInetRef(MythUIButtonListItem *item);
     void SetCoverFile(MythUIButtonListItem *item);
     void setOrderby(MythUIButtonListItem *item);
@@ -230,6 +240,7 @@ class VideoFilterDialog : public MythScreenType
     VideoFilterSettings m_settings;
 
     MythUIButtonList  *m_browseList;
+    MythUIButtonList  *m_watchedList;
     MythUIButtonList  *m_orderbyList;
     MythUIButtonList  *m_yearList;
     MythUIButtonList  *m_userratingList;

@@ -156,6 +156,11 @@ QString GetDisplayBrowse(bool browse)
     return browse ? QObject::tr("Yes") : QObject::tr("No");
 }
 
+QString GetDisplayWatched(bool watched)
+{
+    return watched ? QObject::tr("Yes") : QObject::tr("No");
+}
+
 QString GetDisplayYear(int year)
 {
     return year == VIDEO_YEAR_DEFAULT ? "?" : QString::number(year);

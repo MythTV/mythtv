@@ -51,6 +51,10 @@ enum BrowseFilter {
     kBrowseFilterAll = -1
 };
 
+enum WatchedFilter {
+    kWatchedFilterAll = -1
+};       
+
 enum InetRefFilter {
     kInetRefFilterAll = -1,
     kInetRefFilterUnknown = 0
@@ -70,9 +74,9 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
     country(kCountryFilterAll), cast(kCastFilterAll),
     year(kYearFilterAll), runtime(kRuntimeFilterAll),
     userrating(kUserRatingFilterAll), browse(kBrowseFilterAll),
-    m_inetref(kInetRefFilterAll), m_coverfile(kCoverFileFilterAll),
-    orderby(kOrderByTitle), m_parental_level(ParentalLevel::plNone),
-    m_changed_state(0)
+    watched(kWatchedFilterAll), m_inetref(kInetRefFilterAll), 
+    m_coverfile(kCoverFileFilterAll), orderby(kOrderByTitle), 
+    m_parental_level(ParentalLevel::plNone), m_changed_state(0)
 {
     if (_prefix.isEmpty())
         prefix = "VideoDefault";
@@ -99,6 +103,8 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
                                         kUserRatingFilterAll);
         browse = gContext->GetNumSetting(QString("%1Browse").arg(prefix),
                                          kBrowseFilterAll);
+        watched = gContext->GetNumSetting(QString("%1Watched").arg(prefix),
+                                         kWatchedFilterAll);
         m_inetref = gContext->GetNumSetting(QString("%1InetRef").arg(prefix),
                 kInetRefFilterAll);
         m_coverfile = gContext->GetNumSetting(QString("%1CoverFile")
@@ -168,6 +174,12 @@ VideoFilterSettings::operator=(const VideoFilterSettings &rhs)
         browse = rhs.browse;
     }
 
+    if (watched != rhs.watched)
+    {
+        m_changed_state |= kFilterWatchedChanged;
+        watched = rhs.watched;
+    }
+
     if (m_inetref != rhs.m_inetref)
     {
         m_changed_state |= kFilterInetRefChanged;
@@ -205,6 +217,7 @@ void VideoFilterSettings::saveAsDefault()
     gContext->SaveSetting(QString("%1Runtime").arg(prefix), runtime);
     gContext->SaveSetting(QString("%1Userrating").arg(prefix), userrating);
     gContext->SaveSetting(QString("%1Browse").arg(prefix), browse);
+    gContext->SaveSetting(QString("%1Watched").arg(prefix), watched);
     gContext->SaveSetting(QString("%1InetRef").arg(prefix), m_inetref);
     gContext->SaveSetting(QString("%1CoverFile").arg(prefix), m_coverfile);
     gContext->SaveSetting(QString("%1Orderby").arg(prefix), orderby);
@@ -305,6 +318,11 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
     if (matches && browse != kBrowseFilterAll)
     {
         matches = mdata.GetBrowse() == browse;
+    }
+
+    if (matches && watched != kWatchedFilterAll)
+    {
+        matches = mdata.GetWatched() == watched;
     }
 
     if (matches && m_inetref != kInetRefFilterAll)
@@ -429,10 +447,10 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
 /////////////////////////////////
 VideoFilterDialog::VideoFilterDialog(MythScreenStack *lparent, QString lname,
         VideoList *video_list) : MythScreenType(lparent, lname),
-    m_browseList(0), m_orderbyList(0), m_yearList(0), m_userratingList(0),
-    m_categoryList(0), m_countryList(0), m_genreList(0), m_castList(0),
-    m_runtimeList(0), m_inetrefList(0), m_coverfileList(0), m_saveButton(0),
-    m_doneButton(0), m_numvideosText(0), m_videoList(*video_list)
+    m_browseList(0), m_watchedList(0), m_orderbyList(0), m_yearList(0),
+    m_userratingList(0), m_categoryList(0), m_countryList(0), m_genreList(0),
+    m_castList(0), m_runtimeList(0), m_inetrefList(0), m_coverfileList(0),
+    m_saveButton(0), m_doneButton(0), m_numvideosText(0), m_videoList(*video_list)
 {
     m_fsp = new BasicFilterSettingsProxy<VideoList>(*video_list);
     m_settings = m_fsp->getSettings();
@@ -457,6 +475,7 @@ bool VideoFilterDialog::Create()
     UIUtilE::Assign(this, m_castList, "cast_select", &err);
     UIUtilE::Assign(this, m_runtimeList, "runtime_select", &err);
     UIUtilE::Assign(this, m_browseList, "browse_select", &err);
+    UIUtilE::Assign(this, m_watchedList, "watched_select", &err);
     UIUtilE::Assign(this, m_inetrefList, "inetref_select", &err);
     UIUtilE::Assign(this, m_coverfileList, "coverfile_select", &err);
     UIUtilE::Assign(this, m_orderbyList, "orderby_select", &err);
@@ -494,6 +513,8 @@ bool VideoFilterDialog::Create()
             SLOT(setRunTime(MythUIButtonListItem*)));
     connect(m_browseList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(SetBrowse(MythUIButtonListItem*)));
+    connect(m_watchedList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(SetWatched(MythUIButtonListItem*)));
     connect(m_inetrefList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(SetInetRef(MythUIButtonListItem*)));
     connect(m_coverfileList, SIGNAL(itemSelected(MythUIButtonListItem*)),
@@ -664,6 +685,14 @@ void VideoFilterDialog::fillWidgets()
                                 qVariantFromValue(0));
     m_browseList->SetValueByData(m_settings.GetBrowse());
 
+    // Watched
+    new MythUIButtonListItem(m_watchedList, QObject::tr("All"), kWatchedFilterAll);
+    new MythUIButtonListItem(m_watchedList, QObject::tr("Yes"),
+                                qVariantFromValue(1));
+    new MythUIButtonListItem(m_watchedList, QObject::tr("No"),
+                                qVariantFromValue(0));
+    m_watchedList->SetValueByData(m_settings.GetWatched());
+
     // Inet Reference
     new MythUIButtonListItem(m_inetrefList, QObject::tr("All"),
                            kInetRefFilterAll);
@@ -757,6 +786,12 @@ void VideoFilterDialog::setRunTime(MythUIButtonListItem *item)
 void VideoFilterDialog::SetBrowse(MythUIButtonListItem *item)
 {
     m_settings.SetBrowse(item->GetData().toInt());
+    update_numvideo();
+}
+
+void VideoFilterDialog::SetWatched(MythUIButtonListItem *item)
+{
+    m_settings.SetWatched(item->GetData().toInt());
     update_numvideo();
 }
 
