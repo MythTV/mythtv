@@ -175,7 +175,8 @@ static GlobalComboBox *StorageScheduler()
     gc->setValue("BalancedFreeSpace");
     gc->setHelpText(QObject::tr("This setting controls how the Storage Group "
                     "scheduling code will balance new recordings across "
-                    "directories." ));
+                    "directories.  'Balanced Free Space' is the recommended "
+					"method for most users." ));
     return gc;
 };
 
