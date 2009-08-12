@@ -3568,8 +3568,12 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
     }
 }
 
-// Sort mode-preferred to least-preferred
-static bool comp_dirpreference(FileSystemInfo *a, FileSystemInfo *b)
+/////////////////////////////////////////////////////////////////////////////
+// Storage Scheduler sort order routines
+// Sort mode-preferred to least-preferred (true == a more preferred than b)
+//
+// Prefer local over remote and to balance Disk I/O (weight), then free space
+static bool comp_storage_combination(FileSystemInfo *a, FileSystemInfo *b)
 {
     // local over remote
     if (a->isLocal && !b->isLocal)
@@ -3604,6 +3608,26 @@ static bool comp_dirpreference(FileSystemInfo *a, FileSystemInfo *b)
 
     return false;
 }
+
+// prefer dirs with more free space over dirs with less
+static bool comp_storage_free_space(FileSystemInfo *a, FileSystemInfo *b)
+{
+    if (a->freeSpaceKB > b->freeSpaceKB)
+        return true;
+
+    return false;
+}
+
+// prefer dirs with less weight (disk I/O) over dirs with more weight
+static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
+{
+    if (a->weight < b->weight)
+        return true;
+
+    return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 
 void Scheduler::GetNextLiveTVDir(int cardid)
 {
@@ -3682,9 +3706,15 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
             gContext->GetNumSetting("SGweightPerCommFlag", 5);
     int weightPerTranscode =
             gContext->GetNumSetting("SGweightPerTranscode", 5);
+
+    QString storageScheduler =
+            gContext->GetSetting("StorageScheduler", "Combination");
     int localStartingWeight =
-            gContext->GetNumSetting("SGweightLocalStarting",
-                                    (int)(-1.99 * weightPerRecording));
+            gContext->GetNumSetting("SGweightLocalStarting", 
+                                    (storageScheduler != "Combination") ? 0
+                                        : (int)(-1.99 * weightPerRecording));
+    int remoteStartingWeight =
+            gContext->GetNumSetting("SGweightRemoteStarting", 0);
     int maxOverlap = gContext->GetNumSetting("SGmaxRecOverlapMins", 3) * 60;
 
     FillDirectoryInfoCache();
@@ -3699,7 +3729,6 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
 
         QString msg = QString("  %1:%2").arg(fs->hostname)
                               .arg(fs->directory);
-        // allow local dives to have 2 recordings before we prefer remote
         if (fs->isLocal)
         {
             tmpWeight = localStartingWeight;
@@ -3707,7 +3736,7 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
         }
         else
         {
-            tmpWeight = 0;
+            tmpWeight = remoteStartingWeight;
             msg += " is remote (+" + QString::number(tmpWeight) + ")";
         }
 
@@ -3868,7 +3897,15 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
         }
     }
 
-    fsInfoList.sort(comp_dirpreference);
+    VERBOSE(VB_FILE|VB_SCHEDULE, QString("Using '%1' Storage Scheduler "
+            "directory sorting algorithm.").arg(storageScheduler));
+
+    if (storageScheduler == "BalancedFreeSpace")
+        fsInfoList.sort(comp_storage_free_space);
+    else if (storageScheduler == "BalancedDiskIO")
+        fsInfoList.sort(comp_storage_disk_io);
+    else 
+        fsInfoList.sort(comp_storage_combination);
 
     if (print_verbose_messages & (VB_FILE|VB_SCHEDULE))
     {

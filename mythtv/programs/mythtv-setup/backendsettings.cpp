@@ -165,6 +165,20 @@ static GlobalSpinBox *HDRingbufferSize()
     return bs;
 }
 
+static GlobalComboBox *StorageScheduler()
+{
+    GlobalComboBox *gc = new GlobalComboBox("StorageScheduler");
+    gc->setLabel(QObject::tr("Storage Group Disk Scheduler"));
+    gc->addSelection(QObject::tr("Combination"), "Combination");
+    gc->addSelection(QObject::tr("Balanced Free Space"), "BalancedFreeSpace");
+    gc->addSelection(QObject::tr("Balanced Disk I/O"), "BalancedDiskIO");
+    gc->setValue("Combination");
+    gc->setHelpText(QObject::tr("This setting controls how the Storage Group "
+                    "scheduling code will balance new recordings across "
+                    "directories." ));
+    return gc;
+};
+
 static GlobalCheckBox *DisableAutomaticBackup()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("DisableAutomaticBackup");
@@ -771,6 +785,7 @@ BackendSettings::BackendSettings() {
     fmh1->addChild(TruncateDeletes());
     fm->addChild(fmh1);
     fm->addChild(HDRingbufferSize());
+    fm->addChild(StorageScheduler());
     group2->addChild(fm);
     group2->addChild(MiscStatusScript());
     group2->addChild(DisableAutomaticBackup());
