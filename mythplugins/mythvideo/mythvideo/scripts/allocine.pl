@@ -16,8 +16,12 @@
 #   Made -u option a dummy for this release, it is deprecated and will be
 #   removed
 
+#   18-06-2009: Geoffroy Geerseau ( http://www.soslinux.net : jamdess AT soslinux DOT net )
+#   Add regex to new html code
+   
 use File::Basename;
 use lib dirname($0);
+use Encode;
 
 use MythTV::MythVideoCommon;
 
@@ -25,7 +29,7 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_origina
 use Getopt::Long;
 
 $title = "Allocine Query"; 
-$version = "v2.03";
+$version = "v2.04";
 $author = "Xavier Hervy";
 push(@MythTV::MythVideoCommon::URL_get_extras, ($title, $version));
 
@@ -63,6 +67,7 @@ sub help {
    usage();
 }
 
+#print encode('iso-8859-1','DurÃ©e');
 # returns text within 'data' without tag
 sub removeTag {
    my ($data)=@_; # grab parameters
@@ -102,10 +107,12 @@ sub getMovieData {
    
    #print "titre = $title\n";
    $title = removeTag($title);
-   my $year = parseBetween($response,">Année de production : ","</h");
+   my $year = parseBetween($response,"e de production : ","</h");
 
    # parse director 
-   my $director = parseBetween($response,">Réalisé par ","</h");
+   my $tempresponse = $response;
+   $tempresponse =~ s/>R.alis.\spar/>Ralispar/gm;
+   my $director = parseBetween($tempresponse,">Ralispar ","</h");
    $director = removeTag($director);
 
    # parse plot
@@ -137,7 +144,10 @@ sub getMovieData {
    
 
    # parse movie length
-   my $runtime = parseBetween($response,"Durée : ",".&nbsp;</h");
+
+   $tempresponse = $response;
+   $tempresponse =~ s/>Dur.e\s:/>Durae\ :/gm;
+   my $runtime = parseBetween($tempresponse,"Durae : ",".&nbsp;</h");
    my $heure;
    my $minutes;
    ($heure,$minutes)=($runtime=~/[^\d]*(\d+)[^\d]*(\d*)/);
