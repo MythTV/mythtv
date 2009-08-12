@@ -46,6 +46,7 @@ class AutoExpire : public QObject
 
     void GetAllExpiring(QStringList &strList);
     void GetAllExpiring(pginfolist_t &list);
+    void ClearExpireList(pginfolist_t &expireList, bool deleteProg = true);
 
     static void Update(int encoder, int fsID, bool immediately);
     static void Update(bool immediately) { Update(0, -1, immediately); }
@@ -67,7 +68,6 @@ class AutoExpire : public QObject
     void FillExpireList(pginfolist_t &expireList);
     void FillDBOrdered(pginfolist_t &expireList, int expMethod);
     void SendDeleteMessages(pginfolist_t &deleteList);
-    void ClearExpireList(pginfolist_t &expireList, bool deleteProg = true);
     void Sleep(int sleepTime);
 
     void UpdateDontExpireSet(void);
