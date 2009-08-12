@@ -882,8 +882,8 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
     {
         video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
                         kRootNode, false));
-        AddDirNode(video_tree_root.get(), QString(),
-                QObject::tr("No files found"), include_updirs, "");
+        video_tree_root.get()->addNode(QObject::tr("No files found"),
+                        kNoFilesFound, false);
     }
 
     return video_tree_root.get();

@@ -5,7 +5,8 @@
 enum TreeNodeType {
     kSubFolder = -1,
     kUpFolder = -2,
-    kRootNode = -3
+    kRootNode = -3,
+    kNoFilesFound = -4
 };
 
 // Tree node attribute index
