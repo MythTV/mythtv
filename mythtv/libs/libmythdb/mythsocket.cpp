@@ -894,7 +894,7 @@ void MythSocketThread::run(void)
         unsigned *idx = new unsigned[n];
         n = 0;
 
-        for (unsigned i = 0; i < m_readyread_list.count(); i++)
+        for (unsigned i = 0; i < (uint) m_readyread_list.count(); i++)
         {
             sock = m_readyread_list.at(i);
             if (sock->state() == MythSocket::Connected
@@ -903,7 +903,7 @@ void MythSocketThread::run(void)
                 HANDLE hEvent = ::CreateEvent(NULL, false, false, NULL);
                 if (!hEvent)
                 {
-                    VERBOSE(VB_IMPORTANT, LOC + "CreateEvent failed");
+                    VERBOSE(VB_IMPORTANT, "CreateEvent failed");
                 }
                 else
                 {
@@ -916,7 +916,7 @@ void MythSocketThread::run(void)
                     }
                     else
                     {
-                        VERBOSE(VB_IMPORTANT, LOC + QString(
+                        VERBOSE(VB_IMPORTANT, QString(
                                     "CreateEvent, "
                                     "WSAEventSelect(%1, %2) failed")
                                 .arg(sock->socket()));
@@ -965,11 +965,11 @@ void MythSocketThread::run(void)
         }
         else if (rval >= WAIT_ABANDONED_0 && rval < (WAIT_ABANDONED_0 + n))
         {
-            VERBOSE(VB_SOCKET, LOC + "abandoned");
+            VERBOSE(VB_SOCKET, "abandoned");
         }
         else
         {
-            VERBOSE(VB_SOCKET|VB_EXTRA, LOC + "select timeout");
+            VERBOSE(VB_SOCKET|VB_EXTRA, "select timeout");
         }
 
 #else /* if !USING_MINGW */
