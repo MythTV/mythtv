@@ -207,9 +207,9 @@ void SSDP::run()
 
         FD_ZERO( &read_set );
 
-        for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
+        for (uint nIdx = 0; nIdx < NumberOfSockets; nIdx++ )
         {
-            if (m_Sockets[ nIdx ] != NULL)
+            if (m_Sockets[nIdx] != NULL && m_Sockets[nIdx]->socket() >= 0)
             {
                 FD_SET( m_Sockets[ nIdx ]->socket(), &read_set );
                 nMaxSocket = max( m_Sockets[ nIdx ]->socket(), nMaxSocket );
@@ -232,7 +232,7 @@ void SSDP::run()
         {
             for (int nIdx = 0; nIdx < (int)NumberOfSockets; nIdx++ )
             {
-                if (m_Sockets[ nIdx ] != NULL)
+                if (m_Sockets[nIdx] != NULL && m_Sockets[nIdx]->socket() >= 0)
                 {
                     if (FD_ISSET( m_Sockets[ nIdx ]->socket(), &read_set ))
                     {
