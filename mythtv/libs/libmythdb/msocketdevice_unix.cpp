@@ -42,6 +42,7 @@
 ****************************************************************************/
 
 #include "qplatformdefs.h"
+#include "mythverbose.h"
 
 // Almost always the same. If not, specify in qplatformdefs.h.
 #if !defined(QT_SOCKOPTLEN_T)
@@ -96,9 +97,6 @@ static inline void qt_socket_getportaddr( struct sockaddr *sa,
     *addr = QHostAddress( ntohl( sa4->sin_addr.s_addr ) );
     return;
 }
-
-
-//#define QSOCKETDEVICE_DEBUG
 
 // internal
 void MSocketDevice::init()
@@ -204,9 +202,8 @@ void MSocketDevice::close()
 	return;
     setOpenMode(NotOpen);
     ::close( fd );
-#if defined(QSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice::close: Closed socket %x", fd );
-#endif
+    VERBOSE(VB_SOCKET|VB_EXTRA,
+            QString("MSocketDevice::close: Closed socket %1").arg(fd));
     fd = -1;
     fetchConnectionParameters();
     QIODevice::close();
@@ -249,9 +246,10 @@ bool MSocketDevice::blocking() const
 */
 void MSocketDevice::setBlocking( bool enable )
 {
-#if defined(QSOCKETDEVICE_DEBUG)
-    qDebug( "MSocketDevice::setBlocking( %d )", enable );
-#endif
+    VERBOSE(VB_SOCKET|VB_EXTRA,
+            QString("MSocketDevice::setBlocking(%1)")
+            .arg((enable) ? "true":"false"));
+
     if ( !isValid() )
 	return;
     int tmp = ::fcntl(fd, F_GETFL, 0);
@@ -736,25 +734,26 @@ qint64 MSocketDevice::waitForMore( int msecs, bool *timeout ) const
 */
 qint64 MSocketDevice::readData( char *data, qint64 maxlen )
 {
-#if defined(QT_CHECK_NULL)
     if ( data == 0 && maxlen != 0 ) {
-	qWarning( "MSocketDevice::readBlock: Null pointer error" );
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::readBlock: Null pointer error");
     }
-#endif
-#if defined(QT_CHECK_STATE)
     if ( !isValid() ) {
-	qWarning( "MSocketDevice::readBlock: Invalid socket" );
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::readBlock: Invalid socket");
+        return -1;
     }
     if ( !isOpen() ) {
-	qWarning( "MSocketDevice::readBlock: Device is not open" );
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::readBlock: Device is not open");
+        return -1;
     }
     if ( !isReadable() ) {
-	qWarning( "MSocketDevice::readBlock: Read operation not permitted" );
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::readBlock: Read operation not permitted");
+        return -1;
     }
-#endif
+
     bool done = false;
     int r = 0;
     while ( done == false ) {
@@ -828,28 +827,24 @@ qint64 MSocketDevice::readData( char *data, qint64 maxlen )
 qint64 MSocketDevice::writeData( const char *data, qint64 len )
 {
     if ( data == 0 && len != 0 ) {
-#if defined(QT_CHECK_NULL) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::writeBlock: Null pointer error" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::writeBlock: Null pointer error");
+        return -1;
     }
     if ( !isValid() ) {
-#if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::writeBlock: Invalid socket" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::writeBlock: Invalid socket");
+        return -1;
     }
     if ( !isOpen() ) {
-#if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::writeBlock: Device is not open" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::writeBlock: Device is not open");
+        return -1;
     }
     if ( !isWritable() ) {
-#if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::writeBlock: Write operation not permitted" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::writeBlock: Write operation not permitted");
+        return -1;
     }
     bool done = false;
     int r = 0;
@@ -916,35 +911,30 @@ qint64 MSocketDevice::writeBlock( const char * data, quint64 len,
 			       const QHostAddress & host, quint16 port )
 {
     if ( t != Datagram ) {
-#if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::sendBlock: Not datagram" );
-#endif
-	return -1; // for now - later we can do t/tcp
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::sendBlock: Not datagram");
+        return -1; // for now - later we can do t/tcp
     }
 
     if ( data == 0 && len != 0 ) {
-#if defined(QT_CHECK_NULL) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::sendBlock: Null pointer error" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::sendBlock: Null pointer error");
+        return -1;
     }
     if ( !isValid() ) {
-#if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::sendBlock: Invalid socket" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::sendBlock: Invalid socket");
+        return -1;
     }
     if ( !isOpen() ) {
-#if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::sendBlock: Device is not open" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::sendBlock: Device is not open");
+        return -1;
     }
     if ( !isWritable() ) {
-#if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
-	qWarning( "MSocketDevice::sendBlock: Write operation not permitted" );
-#endif
-	return -1;
+        VERBOSE(VB_SOCKET|VB_EXTRA,
+                "MSocketDevice::sendBlock: Write operation not permitted");
+        return -1;
     }
     struct sockaddr_in a4;
     struct sockaddr *aa;

@@ -25,8 +25,8 @@
 #include <sys/select.h>
 #endif
 
-#define SLOC(a) QString("MythSocket(%1:%2): ").arg((unsigned long)a, 0, 16)\
-                    .arg(a->socket())
+#define SLOC(a) QString("MythSocket(%1:%2): ")\
+                    .arg((quint64)a, 0, 16).arg(a->socket())
 #define LOC SLOC(this)
 
 const uint MythSocket::kSocketBufferSize = 128000;
@@ -199,7 +199,9 @@ void MythSocket::close(void)
 
 qint64 MythSocket::readBlock(char *data, quint64 len)
 {
-    // VERBOSE(VB_SOCKET, LOC + "readBlock called");
+    VERBOSE(VB_SOCKET|VB_EXTRA, LOC + QString("readBlock(0x%1, %2) called")
+            .arg((quint64)data).arg(len));
+
     if (state() != Connected)
     {
         VERBOSE(VB_SOCKET, LOC + "readBlock called while not in "
@@ -215,8 +217,8 @@ qint64 MythSocket::readBlock(char *data, quint64 len)
         close();
         if (m_cb)
         {
+            VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
             m_cb->connectionClosed(this);
-            VERBOSE(VB_SOCKET, LOC + "calling cb->connectionClosed()");
         }
     }
     return rval;
@@ -228,7 +230,9 @@ qint64 MythSocket::readBlock(char *data, quint64 len)
  */
 qint64 MythSocket::writeBlock(const char *data, quint64 len)
 {
-    //VERBOSE(VB_SOCKET, LOC + "writeBlock called");
+    VERBOSE(VB_SOCKET|VB_EXTRA, LOC + QString("writeBlock(0x%1, %2)")
+            .arg((quint64)data).arg(len));
+
     if (state() != Connected)
     {
         VERBOSE(VB_SOCKET, LOC + "writeBlock called while not in "
@@ -244,7 +248,7 @@ qint64 MythSocket::writeBlock(const char *data, quint64 len)
         close();
         if (m_cb)
         {
-            VERBOSE(VB_SOCKET, LOC + "cb->connectionClosed()");
+            VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
             m_cb->connectionClosed(this);
         }
         return -1;
@@ -290,14 +294,14 @@ bool MythSocket::writeStringList(QStringList &list)
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
         QString msg = QString("write -> %1 %2")
-            .arg(socket(), 2).arg((const char *)payload);
+            .arg(socket(), 2).arg(payload.data());
 
         if (((print_verbose_messages & VB_EXTRA) == 0) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
         }
-        VERBOSE(VB_NETWORK, msg);
+        VERBOSE(VB_NETWORK, LOC + msg);
     }
 
     unsigned int errorcount = 0;
@@ -358,7 +362,7 @@ bool MythSocket::readData(char *data, quint64 len)
     {
         qint64 btw = len - bytes_read >= kSocketBufferSize ?
                                        kSocketBufferSize : len - bytes_read;
-        qint64 sret = readBlock((char *)data + bytes_read, btw);
+        qint64 sret = readBlock(data + bytes_read, btw);
         if (sret > 0)
         {
             zerocnt = 0;
@@ -474,8 +478,8 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
             close();
             if (m_cb)
             {
+                VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
                 m_cb->connectionClosed(this);
-                VERBOSE(VB_SOCKET, LOC + "calling cb->connectionClosed()");
             }
             return false;
         }
@@ -486,8 +490,8 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
             close();
             if (m_cb)
             {
+                VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
                 m_cb->connectionClosed(this);
-                VERBOSE(VB_SOCKET, LOC + "calling cb->connectionClosed()");
             }
             return false;
         }
@@ -618,14 +622,14 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
         QString msg = QString("read  <- %1 %2").arg(socket(), 2)
-                                               .arg((const char *)payload);
+            .arg(payload.data());
 
         if (((print_verbose_messages & VB_EXTRA) == 0) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
         }
-        VERBOSE(VB_NETWORK, msg);
+        VERBOSE(VB_NETWORK, LOC + msg);
     }
 
     list = str.split("[]:[]");
@@ -703,7 +707,7 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
         setState(Connected);
         if (m_cb)
         {
-            VERBOSE(VB_SOCKET, LOC + "cb->connected()");
+            VERBOSE(VB_SOCKET, LOC + "calling m_cb->connected()");
             m_cb->connected(this);
             m_readyread_thread.WakeReadyReadThread();
         }
@@ -766,7 +770,7 @@ void MythSocketThread::AddToReadyRead(MythSocket *sock)
 {
     if (sock->socket() == -1)
     {
-        VERBOSE(VB_SOCKET, "MythSocket: attempted to insert invalid socket to ReadyRead");
+        VERBOSE(VB_SOCKET, SLOC(sock) + "attempted to insert invalid socket to ReadyRead");
         return;
     }
     StartReadyReadThread();
@@ -810,6 +814,8 @@ void MythSocketThread::WakeReadyReadThread(void)
                 break;
             }
         }
+        // dtk note: add this aft dbg for correctness..
+        //::flush(m_readyread_pipe[1]);
     }
 #endif
 }
@@ -824,14 +830,14 @@ void MythSocketThread::iffound(MythSocket *sock)
 
         if (sock->m_cb)
         {
-            VERBOSE(VB_SOCKET, SLOC(sock) + "cb->connectionClosed()");
+            VERBOSE(VB_SOCKET, SLOC(sock) + "calling m_cb->connectionClosed()");
             sock->m_cb->connectionClosed(sock);
         }
     }
     else if (sock->m_cb)
     {
         sock->m_notifyread = true;
-        VERBOSE(VB_SOCKET, SLOC(sock) + "cb->readyRead()");
+        VERBOSE(VB_SOCKET, SLOC(sock) + "calling m_cb->readyRead()");
         sock->m_cb->readyRead(sock);
     }
 }
@@ -849,7 +855,7 @@ bool MythSocketThread::isLocked(QMutex &mutex)
 
 void MythSocketThread::run(void)
 {
-    VERBOSE(VB_SOCKET, "MythSocket: readyread thread start");
+    VERBOSE(VB_SOCKET, "MythSocketThread: readyread thread start");
 
     fd_set rfds;
     MythSocket *sock;
@@ -897,7 +903,7 @@ void MythSocketThread::run(void)
                 HANDLE hEvent = ::CreateEvent(NULL, false, false, NULL);
                 if (!hEvent)
                 {
-                    VERBOSE(VB_IMPORTANT, "MythSocket: CreateEvent failed");
+                    VERBOSE(VB_IMPORTANT, LOC + "CreateEvent failed");
                 }
                 else
                 {
@@ -910,8 +916,8 @@ void MythSocketThread::run(void)
                     }
                     else
                     {
-                        VERBOSE(VB_IMPORTANT, QString(
-                                    "MythSocket: CreateEvent, "
+                        VERBOSE(VB_IMPORTANT, LOC + QString(
+                                    "CreateEvent, "
                                     "WSAEventSelect(%1, %2) failed")
                                 .arg(sock->socket()));
                         ::CloseHandle(hEvent);
@@ -930,8 +936,8 @@ void MythSocketThread::run(void)
 
         if (rval == WAIT_FAILED)
         {
-            VERBOSE(VB_IMPORTANT,
-                    "MythSocket: WaitForMultipleObjects returned error");
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "WaitForMultipleObjects returned error");
             delete[] idx;
         }
         else if (rval >= WAIT_OBJECT_0 && rval < (WAIT_OBJECT_0 + n))
@@ -959,11 +965,11 @@ void MythSocketThread::run(void)
         }
         else if (rval >= WAIT_ABANDONED_0 && rval < (WAIT_ABANDONED_0 + n))
         {
-            VERBOSE(VB_SOCKET, "MythSocket: abandoned");
+            VERBOSE(VB_SOCKET, LOC + "abandoned");
         }
         else
         {
-//          VERBOSE(VB_SOCKET, SLOC + "select timeout");
+            VERBOSE(VB_SOCKET|VB_EXTRA, LOC + "select timeout");
         }
 
 #else /* if !USING_MINGW */
@@ -991,7 +997,7 @@ void MythSocketThread::run(void)
         int rval = select(maxfd + 1, &rfds, NULL, NULL, NULL);
         if (rval == -1)
         {
-            VERBOSE(VB_SOCKET, "MythSocket: select returned error");
+            VERBOSE(VB_SOCKET, "MythSocketThread: select returned error");
         }
         else if (rval)
         {
@@ -1024,13 +1030,13 @@ void MythSocketThread::run(void)
         }
         else
         {
-//          VERBOSE(VB_SOCKET, SLOC + "select timeout");
+            VERBOSE(VB_SOCKET|VB_EXTRA, "MythSocketThread: select timeout");
         }
 
 #endif /* !USING_MINGW */
 
     }
 
-    VERBOSE(VB_SOCKET, "MythSocket: readyread thread exit");
+    VERBOSE(VB_SOCKET, "MythSocketThread: readyread thread exit");
 }
 
