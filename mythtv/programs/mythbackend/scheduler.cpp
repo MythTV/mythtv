@@ -4,6 +4,7 @@
 #include <qregexp.h>
 #include <qstring.h>
 #include <qdatetime.h>
+#include <qfile.h>
 
 #include <iostream>
 #include <algorithm>
@@ -3904,7 +3905,7 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
         fsInfoList.sort(comp_storage_free_space);
     else if (storageScheduler == "BalancedDiskIO")
         fsInfoList.sort(comp_storage_disk_io);
-    else 
+    else // default to using original method
         fsInfoList.sort(comp_storage_combination);
 
     if (print_verbose_messages & (VB_FILE|VB_SCHEDULE))
@@ -3930,55 +3931,183 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
 
     // This code could probably be expanded to check the actual bitrate the
     // recording will record at for analog broadcasts that are encoded locally.
+    // maxSizeKB is 1/3 larger than required as this is what the auto expire
+    // uses
     EncoderLink *nexttv = (*m_tvList)[pginfo->cardid];
     long long maxByterate = nexttv->GetMaxBitrate() / 8;
-    long long maxSizeKB = maxByterate *
+    long long maxSizeKB = (maxByterate + maxByterate/3) *
                           pginfo->recstartts.secsTo(pginfo->recendts) / 1024;
+
+    bool simulateAutoExpire =
+        ((gContext->GetSetting("StorageScheduler") == "BalancedFreeSpace") &&
+         (expirer) &&
+         (fsInfoList.size() > 1));
 
     // Loop though looking for a directory to put the file in.  The first time
     // through we look for directories with enough free space in them.  If we
     // can't find a directory that way we loop through and pick the first good
     // one from the list no matter how much free space it has.  We assume that
     // something will have to be expired for us to finish the recording.
-    for (unsigned int pass = 1; pass <= 2; pass++)
+    // pass 1: try to fit onto an existing file system with enought free space
+    // pass 2: fit onto the file system with the lowest priority files to be
+    //         expired this is used only with multiple file systems 
+    //         Estimates are made by simulating each expiry until one of
+    //         the file  systems has enough sapce to fit the new file.
+    // pass 3: fit onto the first file system that will take it with lowest
+    //         priority files on this file system expired
+    for (unsigned int pass = 1; pass <= 3; pass++)
     {
         bool foundDir = false;
-        for (fslistit = fsInfoList.begin();
-            fslistit != fsInfoList.end(); fslistit++)
+
+        if ((pass == 2) && simulateAutoExpire)
         {
-            long long desiredSpaceKB = 0;
-            FileSystemInfo *fs = *fslistit;
-            if (expirer)
-                desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
-
-            if ((fs->hostname == pginfo->hostname) &&
-                (dirlist.contains(fs->directory)) &&
-                ((pass == 2) ||
-                 (fs->freeSpaceKB > (desiredSpaceKB + maxSizeKB))))
+            // setup a container of remaing space for all the file systems
+            QMap <int , long long> remainingSpaceKB;
+            for (fslistit = fsInfoList.begin();
+                fslistit != fsInfoList.end(); fslistit++)
             {
-                pginfo->pathname = fs->directory;
-                fsID = fs->fsID;
+                remainingSpaceKB[(*fslistit)->fsID] = (*fslistit)->freeSpaceKB;
+            }
 
-                if (pass == 1)
-                    VERBOSE(VB_FILE, QString("'%1' will record in '%2' which "
-                            "has %3 MiB free. This recording could use a max "
-                            "of %4 MiB and the AutoExpirer wants to keep %5 "
-                            "MiB free.")
-                            .arg(pginfo->title).arg(pginfo->pathname)
-                            .arg(fs->freeSpaceKB / 1024).arg(maxSizeKB / 1024)
-                            .arg(desiredSpaceKB / 1024));
-                else
-                    VERBOSE(VB_FILE, QString("'%1' will record in '%2' "
+            // get list of expirable programs
+            pginfolist_t expiring;
+            expirer->GetAllExpiring(expiring);
+
+            for(pginfolist_t::iterator it=expiring.begin(); 
+                it != expiring.end(); it++)
+            {
+                // find the filesystem its on
+                FileSystemInfo *fs=NULL;
+                for (fslistit = fsInfoList.begin();
+                    fslistit != fsInfoList.end(); fslistit++)
+                {
+                    // recording is not on this filesystem's host
+                    if ((*it)->hostname != (*fslistit)->hostname)
+                        continue;
+
+                    // directory is not in the Storage Group dir list
+                    if (!dirlist.contains((*fslistit)->directory))
+                        continue;
+
+                    QString filename =
+                        (*fslistit)->directory + "/" + (*it)->pathname;
+
+                    // recording is local
+                    if ((*it)->hostname == gContext->GetHostName())
+                    {
+                        QFile checkFile(filename);
+
+                        if (checkFile.exists())
+                        {
+                            fs = *fslistit;
+                            break;
+                        }
+                    }
+                    else // recording is remote
+                    {
+                        QString backuppath = (*it)->pathname;
+                        ProgramInfo *pginfo = *it;
+                        bool foundSlave = false;
+
+                        QMap<int, EncoderLink *>::Iterator enciter =
+                            m_tvList->begin();
+                        for (; enciter != m_tvList->end(); ++enciter)
+                        {
+                            if ((*enciter)->GetHostName() == pginfo->hostname)
+                            {
+                                (*enciter)->CheckFile(pginfo);
+                                foundSlave = true;
+                                break;
+                            }
+                        }
+                        if (foundSlave && pginfo->pathname == filename)
+                        {
+                            fs = *fslistit;
+                            pginfo->pathname = backuppath;
+                            break;
+                        }
+                        pginfo->pathname = backuppath;
+                    }
+                }   
+
+                if (!fs)
+                {
+                    VERBOSE(VB_IMPORTANT, QString("Unable to match '%1' "
+                            "to any file system.  Ignoring it.")
+                            .arg((*it)->GetRecordBasename()));
+                    continue;
+                }
+
+                // add this files size to the remaing free space
+                remainingSpaceKB[fs->fsID] += (*it)->filesize / 1024;
+                
+                // check if we have enough space for new file
+                long long desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
+
+                if (remainingSpaceKB[fs->fsID] > (desiredSpaceKB + maxSizeKB))
+                {
+                    pginfo->pathname = fs->directory;
+                    fsID = fs->fsID;
+
+                    VERBOSE(VB_FILE, QString("pass 2: '%1' will record in '%2' "
                             "although there is only %3 MiB free and the "
-                            "AutoExpirer wants at least %4 MiB.  Something "
-                            "will have to be deleted or expired in order for "
-                            "this recording to complete successfully.")
+                            "AutoExpirer wants at least %4 MiB.  This "
+                            "directory has the highest priority files to be "
+                            "expired from the AutoExpire list and there are "
+                            "enough that the Expirer should be able to free "
+                            "up space for thos recording.")
                             .arg(pginfo->title).arg(pginfo->pathname)
                             .arg(fs->freeSpaceKB / 1024)
                             .arg(desiredSpaceKB / 1024));
 
-                foundDir = true;
-                break;
+                    foundDir = true;
+                    break;
+                }
+            }
+
+            expirer->ClearExpireList(expiring);
+        }
+        else // passes 1 & 3 (or 1 & 2 if !simulateAutoExpire)
+        {
+            for (fslistit = fsInfoList.begin();
+                fslistit != fsInfoList.end(); fslistit++)
+            {
+                long long desiredSpaceKB = 0;
+                FileSystemInfo *fs = *fslistit;
+                if (expirer)
+                    desiredSpaceKB = expirer->GetDesiredSpace(fs->fsID);
+
+                if ((fs->hostname == pginfo->hostname) &&
+                    (dirlist.contains(fs->directory)) &&
+                    ((pass > 1) ||
+                     (fs->freeSpaceKB > (desiredSpaceKB + maxSizeKB))))
+                {
+                    pginfo->pathname = fs->directory;
+                    fsID = fs->fsID;
+
+                    if (pass == 1)
+                        VERBOSE(VB_FILE, QString("pass 1: '%1' will record in "
+                                "'%2' which has %3 MB free. This recording "
+                                "could use a max of %4 MB and the AutoExpirer "
+                                "wants to keep %5 MiB free.")
+                                .arg(pginfo->title).arg(pginfo->pathname)
+                                .arg(fs->freeSpaceKB / 1024)
+                                .arg(maxSizeKB / 1024)
+                                .arg(desiredSpaceKB / 1024));
+                    else
+                        VERBOSE(VB_FILE, QString("pass %1: '%2' will record in "
+                                "'%3' although there is only %4 MB free and "
+                                "the AutoExpirer wants at least %5 MB.  "
+                                "Something will have to be deleted or expired "
+                                "in order for this recording to complete "
+                                "successfully.").arg(pass).arg(pginfo->title)
+                                .arg(pginfo->pathname)
+                                .arg(fs->freeSpaceKB / 1024)
+                                .arg(desiredSpaceKB / 1024));
+
+                    foundDir = true;
+                    break;
+                }
             }
         }
 

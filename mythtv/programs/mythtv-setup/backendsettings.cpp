@@ -169,10 +169,10 @@ static GlobalComboBox *StorageScheduler()
 {
     GlobalComboBox *gc = new GlobalComboBox("StorageScheduler");
     gc->setLabel(QObject::tr("Storage Group Disk Scheduler"));
-    gc->addSelection(QObject::tr("Combination"), "Combination");
     gc->addSelection(QObject::tr("Balanced Free Space"), "BalancedFreeSpace");
     gc->addSelection(QObject::tr("Balanced Disk I/O"), "BalancedDiskIO");
-    gc->setValue("Combination");
+    gc->addSelection(QObject::tr("Combination"), "Combination");
+    gc->setValue("BalancedFreeSpace");
     gc->setHelpText(QObject::tr("This setting controls how the Storage Group "
                     "scheduling code will balance new recordings across "
                     "directories." ));
