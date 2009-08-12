@@ -1126,7 +1126,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
 
     if (use_yv12)
     {
-        tc_arguments.push_back("-V");
+        tc_arguments.push_back("-1");
     }
 
     //  The order of these is defined by transcode
@@ -1230,8 +1230,6 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         (two_pass && which_run == 1) ?
         QString("/dev/null") : QString("%1.avi").arg(destination_file_string));
 
-    tc_arguments.push_back("--print_status");
-    tc_arguments.push_back("20");
     tc_arguments.push_back("--color");
     tc_arguments.push_back("0");
 
