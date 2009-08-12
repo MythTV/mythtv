@@ -97,7 +97,7 @@ void LanguageSettings::load(QString module_name)
             qApp->installTranslator(trans);
             d.m_translators[module_name] = trans;
         }
-        else
+        else if (lang != "en_us" && module_name != "mythfrontend")
         {
             VERBOSE(VB_IMPORTANT, "Cannot load language " + lang
                                   + " for module " + module_name);
