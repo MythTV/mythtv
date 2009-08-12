@@ -46,6 +46,10 @@
 #include "compat.h"
 #endif
 
+#define LOC      QString("MythContext: ")
+#define LOC_WARN QString("MythContext, Warning: ")
+#define LOC_ERR  QString("MythContext, Error: ")
+
 MythContext *gContext = NULL;
 QMutex avcodeclock(QMutex::Recursive);
 
@@ -1046,7 +1050,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     SSDPCacheEntries *backends = NULL;
     int               count;
-    QString           LOC = "UPnPautoconf() - ";
+    QString           loc = "UPnPautoconf() - ";
     QTime             timer;
 
     m_UPnP->PerformSearch(gBackendURI);
@@ -1064,7 +1068,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     if (!backends)
     {
-        VERBOSE(VB_GENERAL, LOC + "No UPnP backends found");
+        VERBOSE(VB_GENERAL, loc + "No UPnP backends found");
         return 0;
     }
 
@@ -1078,14 +1082,14 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
     {
         case 0:
             VERBOSE(VB_IMPORTANT,
-                    LOC + "No UPnP backends found, but SSDP::Find() not NULL!");
+                    loc + "No UPnP backends found, but SSDP::Find() not NULL!");
             break;
         case 1:
-            VERBOSE(VB_GENERAL, LOC + "Found one UPnP backend");
+            VERBOSE(VB_GENERAL, loc + "Found one UPnP backend");
             break;
         default:
             VERBOSE(VB_GENERAL,
-                    (LOC + "More than one UPnP backend found (%1)").arg(count));
+                    (loc + "More than one UPnP backend found (%1)").arg(count));
     }
 
     if (count != 1)
@@ -1172,28 +1176,28 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
                                      const QString        &PIN)
 {
     QString        error;
-    QString        LOC = "UPnPconnect() - ";
+    QString        loc = "UPnPconnect() - ";
     QString        URL = backend->m_sLocation;
     MythXMLClient  XML(URL);
 
-    VERBOSE(VB_UPNP, LOC + QString("Trying host at %1").arg(URL));
+    VERBOSE(VB_UPNP, loc + QString("Trying host at %1").arg(URL));
     switch (XML.GetConnectionInfo(PIN, &m_DBparams, error))
     {
         case UPnPResult_Success:
             m_database->SetDatabaseParams(m_DBparams);
             VERBOSE(VB_UPNP,
-                    LOC + "Got database hostname: " + m_DBparams.dbHostName);
+                    loc + "Got database hostname: " + m_DBparams.dbHostName);
             return true;
 
         case UPnPResult_ActionNotAuthorized:
             // The stored PIN is probably not correct.
             // We could prompt for the PIN and try again, but that needs a UI.
             // Easier to fail for now, and put up the full UI selector later
-            VERBOSE(VB_UPNP, LOC + error + ". Wrong PIN?");
+            VERBOSE(VB_UPNP, loc + error + ". Wrong PIN?");
             break;
 
         default:
-            VERBOSE(VB_UPNP, LOC + error);
+            VERBOSE(VB_UPNP, loc + error);
             break;
     }
 
