@@ -7,10 +7,13 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdb.h>
+#include <mythtv/libmyth/remotefile.h>
+#include <mythtv/libmythdb/mythverbose.h>
 
 #include "globals.h"
 #include "dbaccess.h"
 #include "metadatalistmanager.h"
+#include "videoutils.h"
 
 struct SortData
 {
@@ -382,21 +385,30 @@ bool MetadataImp::removeDir(const QString &dirName)
 bool MetadataImp::DeleteFile(class VideoList &dummy)
 {
     (void) dummy;
-
     bool isremoved = false;
-    QFileInfo fi(m_filename);
-    if (fi.isDir())
+
+    if (!m_host.isEmpty())
     {
-        isremoved = removeDir(m_filename);
+        QString url = GenRemoteFileURL("Videos", m_host, m_filename);
+        isremoved = RemoteFile::DeleteFile(url);
     }
     else
     {
-        isremoved = QFile::remove(m_filename);
+        QFileInfo fi(m_filename);
+        if (fi.isDir())
+        {
+            isremoved = removeDir(m_filename);
+        }
+        else
+        {
+            isremoved = QFile::remove(m_filename);
+        }
     }
 
     if (!isremoved)
     {
-        VERBOSE(VB_IMPORTANT, QString("impossible de supprimer le fichier"));
+        VERBOSE(VB_IMPORTANT, QString("Could not delete file: %1")
+                                                            .arg(m_filename));
     }
 
     return isremoved;

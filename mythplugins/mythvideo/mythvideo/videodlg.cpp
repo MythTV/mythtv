@@ -2644,8 +2644,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
         if (action == "INFO")
         {
-            if (!m_menuPopup && GetMetadata(GetItemCurrent()))
-                InfoMenu();
+                DisplayMenu();
         }
         else if (action == "INCPARENT")
             shiftParental(1);
@@ -2670,6 +2669,11 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
             searchStart();
         else if (action == "ITEMDETAIL")
             DoItemDetailShow();
+        else if (action == "DELETE")
+        {
+            if (!m_menuPopup && GetMetadata(GetItemCurrent()))
+                RemoveVideo();
+        }
         else if (action == "ESCAPE")
         {
             if (m_d->m_type != DLG_TREE
@@ -2859,7 +2863,13 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
 void VideoDialog::VideoMenu()
 {
-    QString label = tr("Select action");
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    QString label;
+
+    if (metadata)
+        label = tr("Video Options\n%1").arg(metadata->GetTitle());
+    else
+        label = tr("Video Options");
 
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
@@ -2872,35 +2882,88 @@ void VideoDialog::VideoMenu()
     MythGenericTree *node = GetNodePtrFromButton(item);
     if (node && node->getInt() >= 0)
     {
-        m_menuPopup->AddButton(tr("Watch This Video"), SLOT(playVideo()));
-
-        if (gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
-        {
-             m_menuPopup->AddButton(tr("Watch With Trailers"),
-                  SLOT(playVideoWithTrailers()));
-        }
-
-        Metadata *metadata = GetMetadata(item);
-        if (metadata)
-        {
-            QString trailerFile = metadata->GetTrailer();
-            if (QFile::exists(trailerFile))
-            {
-                 m_menuPopup->AddButton(tr("Watch Trailer"),
-                         SLOT(playTrailer()));
-            }
-        }
-
+        if (!metadata->GetTrailer().isEmpty() ||
+            gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
+            m_menuPopup->AddButton(tr("Play..."), SLOT(PlayMenu()));
+        else
+            m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
+        if (metadata->GetWatched())
+            m_menuPopup->AddButton(tr("Mark as Unwatched"), SLOT(ToggleWatched()));
+        else
+            m_menuPopup->AddButton(tr("Mark as Watched"), SLOT(ToggleWatched()));
         m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()), true);
-        m_menuPopup->AddButton(tr("Manage Video"), SLOT(ManageMenu()), true);
+        m_menuPopup->AddButton(tr("Metadata Options"), SLOT(ManageMenu()), true);
+        m_menuPopup->AddButton(tr("Video Options"), SLOT(VideoOptionMenu()), true);
     }
+    m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
+}
+
+void VideoDialog::PlayMenu()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    QString label;
+
+    if (metadata)
+        label = tr("Playback Options\n%1").arg(metadata->GetTitle());
+    else
+        return;
+
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "play");
+
+    if (m_menuPopup->Create())
+        m_popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "actions");
+
+    m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
+    if (gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
+    {
+         m_menuPopup->AddButton(tr("Play With Trailers"),
+              SLOT(playVideoWithTrailers()));
+    }
+
+    QString trailerFile = metadata->GetTrailer();
+    if (QFile::exists(trailerFile) ||
+        (!metadata->GetHost().isEmpty() && !trailerFile.isEmpty()))
+    {
+        m_menuPopup->AddButton(tr("Play Trailer"),
+                        SLOT(playTrailer()));
+    }
+}
+
+void VideoDialog::DisplayMenu()
+{
+    QString label = tr("Video Display Menu");
+
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
+
+    if (m_menuPopup->Create())
+        m_popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "display");
+
     m_menuPopup->AddButton(tr("Scan For Changes"), SLOT(doVideoScan()));
-    m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
-    if (m_d->m_isGroupList)
-        m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
     m_menuPopup->AddButton(tr("Filter Display"), SLOT(ChangeFilter()));
 
-    m_menuPopup->AddButton(tr("Cancel"));
+    if (m_d->m_isGroupList)
+        m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
+
+    if (m_d->m_isGroupList)
+        m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
+
+    if (m_d->m_isFileBrowser)
+        m_menuPopup->AddButton(tr("Disable File Browse Mode"),
+                                                    SLOT(ToggleBrowseMode()));
+    else
+        m_menuPopup->AddButton(tr("Enable File Browse Mode"),
+                                                    SLOT(ToggleBrowseMode()));
+
+    if (m_d->m_isFlatList)
+        m_menuPopup->AddButton(tr("Disable Flat View"),
+                                                    SLOT(ToggleFlatView()));
+    else
+        m_menuPopup->AddButton(tr("Enable Flat View"),
+                                                    SLOT(ToggleFlatView()));
 }
 
 void VideoDialog::ViewMenu()
@@ -2928,22 +2991,6 @@ void VideoDialog::ViewMenu()
     if (!(m_d->m_type & DLG_MANAGER))
         m_menuPopup->AddButton(tr("Switch to Manage View"),
                 SLOT(SwitchManager()));
-
-    if (m_d->m_isFileBrowser)
-        m_menuPopup->AddButton(tr("Disable File Browse Mode"),
-                                                    SLOT(ToggleBrowseMode()));
-    else
-        m_menuPopup->AddButton(tr("Enable File Browse Mode"),
-                                                    SLOT(ToggleBrowseMode()));
-
-    if (m_d->m_isFlatList)
-        m_menuPopup->AddButton(tr("Disable Flat View"),
-                                                    SLOT(ToggleFlatView()));
-    else
-        m_menuPopup->AddButton(tr("Enable Flat View"),
-                                                    SLOT(ToggleFlatView()));
-
-    m_menuPopup->AddButton(tr("Cancel"));
 }
 
 void VideoDialog::MetadataBrowseMenu()
@@ -2955,7 +3002,7 @@ void VideoDialog::MetadataBrowseMenu()
     if (m_menuPopup->Create())
         m_popupStack->AddScreen(m_menuPopup);
 
-    m_menuPopup->SetReturnEvent(this, "view");
+    m_menuPopup->SetReturnEvent(this, "metadata");
 
     if (m_d->m_isGroupList)
     {
@@ -2987,13 +3034,11 @@ void VideoDialog::MetadataBrowseMenu()
            m_menuPopup->AddButton(tr("User Rating"),
                      SLOT(SwitchVideoUserRatingGroup()));
     }
-
-    m_menuPopup->AddButton(tr("Cancel"));
 }
 
 void VideoDialog::InfoMenu()
 {
-    QString label = tr("Select action");
+    QString label = tr("Video Info");
 
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
@@ -3010,13 +3055,35 @@ void VideoDialog::InfoMenu()
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata && metadata->GetCast().size())
         m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
+}
 
-    m_menuPopup->AddButton(tr("Cancel"));
+void VideoDialog::VideoOptionMenu()
+{
+    QString label = tr("Video Options");
+
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
+
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+
+    if (m_menuPopup->Create())
+        m_popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "option");
+
+    if (metadata->GetWatched())
+        m_menuPopup->AddButton(tr("Mark as Unwatched"), SLOT(ToggleWatched()));
+    else
+        m_menuPopup->AddButton(tr("Mark as Watched"), SLOT(ToggleWatched()));
+
+    if (metadata->GetBrowse())
+        m_menuPopup->AddButton(tr("Mark as Non-Browseable"), SLOT(ToggleBrowseable()));
+    else
+        m_menuPopup->AddButton(tr("Mark as Browseable"), SLOT(ToggleBrowseable()));
 }
 
 void VideoDialog::ManageMenu()
 {
-    QString label = tr("Select action");
+    QString label = tr("Manage Metadata");
 
     m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
 
@@ -3036,11 +3103,6 @@ void VideoDialog::ManageMenu()
     m_menuPopup->AddButton(tr("Manually Enter Video Title"),
             SLOT(ManualVideoTitle()));
     m_menuPopup->AddButton(tr("Reset Metadata"), SLOT(ResetMetadata()));
-    m_menuPopup->AddButton(tr("Toggle Browseable"), SLOT(ToggleBrowseable()));
-    m_menuPopup->AddButton(tr("Toggle Watched"), SLOT(ToggleWatched()));
-    m_menuPopup->AddButton(tr("Remove Video"), SLOT(RemoveVideo()));
-
-    m_menuPopup->AddButton(tr("Cancel"));
 }
 
 void VideoDialog::ToggleBrowseMode()
@@ -3300,8 +3362,15 @@ void VideoDialog::playTrailer()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (!metadata) return;
+    QString url;
 
-    VideoPlayerCommand::PlayerFor(metadata->GetTrailer()).Play();
+    if (metadata->IsHostSet() && !metadata->GetTrailer().startsWith("/"))
+        url = GenRemoteFileURL("Trailers", metadata->GetHost(),
+                        metadata->GetTrailer());
+    else
+        url = metadata->GetTrailer();
+
+    VideoPlayerCommand::PlayerFor(url).Play();
 }
 
 void VideoDialog::setParentalLevel(const ParentalLevel::Level &level)
@@ -3557,7 +3626,8 @@ void VideoDialog::RemoveVideo()
     if (!metadata)
         return;
 
-    QString message = tr("Delete this file?");
+    QString message = tr("Are you sure you want to delete:\n%1")
+                          .arg(metadata->GetTitle());
 
     MythConfirmationDialog *confirmdialog =
             new MythConfirmationDialog(m_popupStack,message);
@@ -3581,39 +3651,12 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
     if (!metadata)
         return;
 
-    if (!metadata->GetHost().isEmpty())
-    {
-        QString url = GenRemoteFileURL("Videos", metadata->GetHost(),
-                                       metadata->GetFilename());
-        bool deleted = RemoteFile::DeleteFile(url);
-        if (deleted)
-        {
-            metadata->DeleteFromDatabase();
-            if (m_videoButtonTree)
-                m_videoButtonTree->RemoveItem(item);
-            else
-                m_videoButtonList->RemoveItem(item);
-        }
-        else
-        {
-            QString message = tr("Failed to delete file");
-
-            MythConfirmationDialog *confirmdialog =
-                            new MythConfirmationDialog(m_popupStack,message,false);
-
-            if (confirmdialog->Create())
-                m_popupStack->AddScreen(confirmdialog);
-        }
-    }
-    else if (m_d->m_videoList->Delete(metadata->GetID()))
+    if (m_d->m_videoList->Delete(metadata->GetID()))
     {
         if (m_videoButtonTree)
-            m_videoButtonTree->RemoveItem(item);
+            m_videoButtonTree->RemoveItem(item, false); // FIXME Segfault when true
         else
             m_videoButtonList->RemoveItem(item);
-
-        // FIXME: Frontend segfaults on local delete unless reloadData
-        reloadData();
     }
     else
     {

@@ -100,7 +100,10 @@ class VideoDialog : public MythScreenType
 
     void VideoMenu();
     void InfoMenu();
+    void VideoOptionMenu();
     void ManageMenu();
+    void PlayMenu();
+    void DisplayMenu();
     void ViewMenu();
     void MetadataBrowseMenu();
 
