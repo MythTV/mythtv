@@ -3831,7 +3831,6 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
 
     QFile checkFile(fullfile);
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
-    bool slowDeletes = gContext->GetNumSetting("TruncateDeletesSlowly", 0);
     int fd = -1;
     off_t size = 0;
     bool errmsg = false;
