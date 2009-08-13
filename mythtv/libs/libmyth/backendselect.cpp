@@ -137,21 +137,14 @@ bool BackendSelect::Connect(DeviceLocation *dev)
             VERBOSE(VB_UPNP, error);
             MythPopupBox::showOkPopup(m_parent, "",
                                       tr(message.toLatin1().constData()));
-            if (MythPopupBox::showOkCancelPopup(m_parent, "",
-                    tr("Shall I attempt to connect to this"
-                       " host with default database parameters?"), false))
-            {
-                QString  URL = dev->m_sLocation;
-
-                URL.remove("http://");
-                URL.remove(QRegExp("[:/].*"));
-                m_DBparams->dbHostName = URL;
+            if (TryDBfromURL("", dev->m_sLocation))
                 return true;
-            }
             break;
 
         case UPnPResult_ActionNotAuthorized:
             VERBOSE(VB_UPNP, "Access denied for " + error + ". Wrong PIN?");
+            if (TryDBfromURL(tr("Backend uses a PIN. "), dev->m_sLocation))
+                return true;
             message = "Please enter the backend access PIN";
             do
             {
@@ -355,3 +348,19 @@ void BackendSelect::Search(void)
     UPnp::PerformSearch(gBackendURI);
 }
 #endif
+
+bool BackendSelect::TryDBfromURL(const QString &error, QString URL)
+{
+    if (MythPopupBox::showOkCancelPopup(m_parent, "",
+            error + tr("Shall I attempt to connect to this"
+                       " host with default database parameters?"), true))
+    {
+        URL.remove("http://");
+        URL.remove(QRegExp("[:/].*"));
+        m_DBparams->dbHostName = URL;
+        return true;
+    }
+
+    return false;
+}
+
