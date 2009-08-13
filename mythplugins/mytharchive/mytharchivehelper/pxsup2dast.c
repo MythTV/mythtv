@@ -803,7 +803,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
                 {
                     pt = ct;
                     sptsstr[0] = '\r';
-                    uint len = write(1, sptsstr, strlen(sptsstr));
+                    size_t len = write(1, sptsstr, strlen(sptsstr));
                     if (len != strlen(sptsstr))
                         printf("ERROR: write failed");
                 }
@@ -823,7 +823,7 @@ static void pxsubtitle(const char * supfile, FILE * ofh, eu8 palette[16][3],
     }
     exc_catch (EOFIndicator) 
     {
-        uint len = write(1, sptsstr, strlen(sptsstr));
+        size_t len = write(1, sptsstr, strlen(sptsstr));
         if (len != strlen(sptsstr))
             printf("ERROR: write failed");
         return;
