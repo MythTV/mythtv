@@ -373,7 +373,7 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
 
     if (list->IsEmpty())
     {
-        if (m_currentDepth() > 1)
+        if (m_currentDepth > 1)
             m_currentDepth--;
         SwitchList(false);
         SetTreeState(true);
