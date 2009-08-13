@@ -46,6 +46,39 @@ In Debian/Ubuntu it is packaged as 'python-imaging'.
 http://www.pythonware.com/products/pil/"""
 	imaging_library = False
 
+#Number of default IMDb retry
+import time
+defaultretries=3
+
+def functionretry(func, arg1, arg2=None, retries=None):
+	global defaultretries
+	
+	if retries == None:
+		retries = defaultretries
+	
+	attempts = 0
+	stop = False
+	while (not stop):
+		try:
+			if arg2:
+				result = func(arg1, arg2)
+			else:
+				result = func(arg1)				
+			stop = True
+		except:
+			result = None
+		if not stop:
+			attempts += 1
+			if attempts > retries:
+				stop = True
+			if attempts <= retries:
+				print 'Failed to retrieve data, retry in 5s'
+				time.sleep(5)
+			
+	if attempts > retries:
+		print 'Error retrieving data : No more attempts'
+	return result
+
 class PosterImage:
 	"""
 	Holds a single poster image.
@@ -104,13 +137,14 @@ class MoviePosterPosterFetcher(PosterFetcher):
 		max_results = 4
 		images = []
 		
-		for url in poster_urls:
-			image_url = self.find_poster_image_url(url)
-			if image_url is not None:
-				images.append(self.download_image(image_url, ".jpg"))
-				results += 1
-			if results >= max_results:
-				break
+		if poster_urls:
+			for url in poster_urls:
+				image_url = self.find_poster_image_url(url)
+				if image_url is not None:
+					images.append(self.download_image(image_url, ".jpg"))
+					results += 1
+				if results >= max_results:
+					break
 		return images
 				
 	def find_poster_image_url(self, poster_page_url):
@@ -196,7 +230,7 @@ class IMDbPosterFetcher(PosterFetcher):
 			return [self.download_image(poster_url, extension)]
 		return []
 			
-def find_best_posters(title, count=1, accept_horizontal=False, imdb_id=None):
+def find_best_posters(title, count=1, accept_horizontal=False, imdb_id=None, retries=None):
 		
 	fetchers = [MoviePosterPosterFetcher(), IMDbPosterFetcher()]
 	#fetchers = [IMDbPosterFetcher()]	
@@ -218,12 +252,13 @@ def find_best_posters(title, count=1, accept_horizontal=False, imdb_id=None):
 			break
 		
 	for fetcher in fetchers:
-		new_posters = fetcher.fetch(title, imdb_id)
-		for poster in new_posters:
-			if not accept_horizontal and not poster.is_vertical():
-				os.remove(poster.file_name)
-				continue
-			posters.append(poster)
+		new_posters = functionretry(fetcher.fetch, title, arg2=imdb_id, retries=retries)
+		if new_posters:
+			for poster in new_posters:
+				if not accept_horizontal and not poster.is_vertical():
+					os.remove(poster.file_name)
+					continue
+				posters.append(poster)
 		
 	def size_cmp(a, b):
 		return cmp(a.pixels(), b.pixels())
@@ -237,7 +272,7 @@ def find_best_posters(title, count=1, accept_horizontal=False, imdb_id=None):
 	return posters[0:count]
 		
 def main():
-	
+	global defaultretries
 	
 	p = optparse.OptionParser()
 	p.add_option('--number', '-n', action="store", type="int", default=1,
@@ -247,15 +282,23 @@ def main():
 	p.add_option('--poster_search', '-P', metavar='IMDB_ID', default=None, dest="imdb_id",
 		help="Displays a list of URL's to movie posters.  The lines are "\
 		"ranked by descending value. For MythVideo.")		
+	p.add_option('--retry', '-t', action="store", type="int", dest="retries",default=3,
+		help="Number of retries, 0 means no retry [default 3]")
 		
 	options, arguments = p.parse_args()
 	
+	defaultretries = options.retries
+
 	title = ""
 	if len(arguments) != 1:
 		if options.imdb_id:
 			# TODO: Fetch the title from IMDb.
-			metadata = imdbpy.metadata_search(options.imdb_id)
-			title = imdbpy.parse_meta(metadata, "Title")
+			metadata = functionretry(imdbpy.metadata_search,options.imdb_id)
+			if metadata:
+				title = imdbpy.parse_meta(metadata, "Title")
+			else:
+				print "Error can't retrieve title from IMDb"
+				sys.exit(1)				
 		else:
 			print "Please give a video title as argument."
 			sys.exit(1)				
@@ -263,7 +306,7 @@ def main():
 		title = arguments[0]
 		
 	posters = find_best_posters(title, options.number, options.all,
-				imdb_id=options.imdb_id)	
+				imdb_id=options.imdb_id, retries=defaultretries)	
 	
 	if options.imdb_id is not None:
 		for poster in posters:
@@ -276,4 +319,4 @@ def main():
 		
 if __name__ == '__main__':
 	main()		
-	
+

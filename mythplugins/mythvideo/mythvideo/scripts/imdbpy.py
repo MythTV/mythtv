@@ -159,10 +159,10 @@ def title_search(search_string):
 	movies = []
 	for m in sorted_movies:
 		try:
-			movies.append([imdb_access.get_imdbID(m), m['title'], int(m['year'])])
+			item = [imdb_access.get_imdbID(m), m['title'], int(m['year'])]
 		except KeyError:
-			movies.append([imdb_access.get_imdbID(m), m['title'], 1901])
-		movies.append([imdb_access.get_imdbID(m), m['title'], int(m['year'])])
+			item = [imdb_access.get_imdbID(m), m['title'], 1901]
+		movies.append(item)
 	return movies
 
 def find_poster_url(imdb_id):
@@ -327,6 +327,13 @@ def fetch_metadata(imdb_id):
 		shortest_found = None
 		#print "%d plots found" % len(plots)
 		for plot in plots:
+			text = None
+			#IMDbPY 3.9 and later use 'author::plot_content'
+			#  earlier versions are 'plot_content::author'
+			if float(imdb.__version__) > 3.8:
+				text = plot.split("::")[1]
+			else:
+				text = plot.split("::")[0]
 			text = plot.split("::")[1]
 			if text.find('@') != -1 or len(text.split(' ')) < 10: # Skip plots of less than 5 words
 				continue
@@ -400,8 +407,9 @@ episodes."""
 
 	if options.movie_search is not None:
 		results = title_search(options.movie_search.decode("utf8"))
-		for result in results:
-			print "%s:%s (%d)" % (result[0], result[1], result[2])
+		if results:
+			for result in results:
+				print "%s:%s (%d)" % (result[0], result[1], result[2])
 	elif options.poster_search is not None:
 		poster_search(options.poster_search)
 	elif options.metadata_search is not None:

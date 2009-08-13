@@ -102,6 +102,39 @@ skipDirs = ["/Sample", "/Sub", "/VIDEO_TS"]
 # MythTV settings table).
 poster_dir = "./"
 
+#Number of default IMDb retry
+import time
+defaultretries=3
+
+def functionretry(func, arg1, arg2=None, retries=None):
+	global defaultretries
+	
+	if retries == None:
+		retries = defaultretries
+	
+	attempts = 0
+	stop = False
+	while (not stop):
+		try:
+			if arg2:
+				result = func(arg1, arg2)
+			else:
+				result = func(arg1)				
+			stop = True
+		except:
+			result = None
+		if not stop:
+			attempts += 1
+			if attempts > retries:
+				stop = True
+			if attempts <= retries:
+				print_verbose ('Failed to retrieve data, retry in 5s')
+				time.sleep(5)
+			
+	if attempts > retries:
+		print_verbose ('Error retrieving data : No more attempts')
+	return result
+
 def print_verbose(string):
 	global verbose
 	if verbose:
@@ -153,6 +186,11 @@ def cleanup_title(title):
 			lowest_cutpoint = pos
 
 	title = title[0:lowest_cutpoint]
+	# Remove trailing year in the form of "name [year]" or "name (year)" if any
+	m = re.compile(r"(.*)([\(\[]([0-9]+)[\]\)])$")
+	found = m.match(title.strip())
+	if found:
+		title = found.group(1)
 	return title.strip()
 
 def parse_meta(variable, oldvalue, emptyvalue="", meta=""):
@@ -347,6 +385,17 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 					title = aka_title + " (" + title + ")"
 					print_verbose("Found AKA: %s" % title)
 				break
+			# For IMDbPY >= 3.9
+			# Grill Point::(International: English title)
+			# Catastrofi d'amore::(Italy) [it]
+			akaRegexp = ".+::\(.+\) \[%s\].*" % aka_language
+			m = re.match(akaRegexp, aka)
+			if m is not None:
+				aka_title = aka.split("::")[0]
+				if aka_title != title:
+					title = aka_title + " (" + title + ")"
+					print_verbose("Found AKA: %s" % title)
+				break
 
 	if disc is not None:
 		title += " [disc" + unicode(disc) + "]"
@@ -395,17 +444,52 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 
 	filename = videopath
 
+	## Process genres
 	genrestring = parse_metadata('Genres', "", "")
 	genres = []
 	if genrestring is not None and len(genrestring) > 0:
 		genres = genrestring.split(",")
 
+	#Always set category to "Unknown", until we can identify what it really is
+	category = mythvideo.getGenreId("Unknown")
 	if len(genres) < 1:
 		print_verbose("No genres.")
-		category = mythvideo.getGenreId("Unknown")
 	else:
-		# Only one genre supported?
-		category = mythvideo.getGenreId(genres[0])
+		#Remove previous genres
+		mythvideo.cleanGenres(intid)
+		#Set all the genres
+		for genre in genres:
+			mythvideo.setGenres(genre.strip(), intid)
+
+	## Process countries
+	countrystring = parse_metadata('Countries', "", "")
+	countries = []
+	if countrystring is not None and len(countrystring) > 0:
+		countries = countrystring.split(",")
+
+	if len(countries) < 1:
+		print_verbose("No countries.")
+	else:
+		#Remove previous countries
+		mythvideo.cleanCountry(intid)
+		#Set all the countries
+		for country in countries:
+			mythvideo.setCountry(country.strip(), intid)
+
+	## Process cast
+	caststring = parse_metadata('Cast', "", "")
+	cast = []
+	if caststring is not None and len(caststring) > 0:
+		cast = caststring.split(",")
+
+	if len(cast) < 1:
+		print_verbose("No cast.")
+	else:
+		#Remove previous cast
+		mythvideo.cleanCast(intid)
+		#Set all the cast
+		for actor in cast:
+			mythvideo.setCast(actor.strip(), intid)
 
 	if coverfile == None:
 		coverfile = "No cover"
@@ -427,6 +511,7 @@ def find_poster_image(title, imdb_id):
 	otherwise returns the base name of the poster image file.
 	"""
 	global poster_dir,overwrite
+	global defaultretries
 	image_extensions = ["png", "jpg", "bmp"]
 
 	poster_files = []
@@ -436,7 +521,7 @@ def find_poster_image(title, imdb_id):
 	if len(poster_files) == 0 or overwrite:
 		# Try to fetch the poster image from the web.
 		posters = fetch_poster.find_best_posters(\
-			title, count=1, accept_horizontal=True, imdb_id=imdb_id)
+			title, count=1, accept_horizontal=True, imdb_id=imdb_id,retries=defaultretries)
 
 		if len(posters) == 0:
 			return None
@@ -528,7 +613,8 @@ def find_metadata_for_video_path(pathName):
 
 		print_verbose("Title search '%s'" % title)
 
-		candidates = imdbpy.title_search(title)
+		candidates = functionretry(imdbpy.title_search, title)
+			
 		if candidates is None or len(candidates) == 0:
 			# TODO: Try with the dirname
 			pass
@@ -560,7 +646,7 @@ def find_metadata_for_video_path(pathName):
 
 	print_verbose("Querying IMDb for meta data for ID %s..." % imdb_id)
 	try:
-		meta = imdbpy.fetch_metadata(imdb_id)
+		meta = functionretry(imdbpy.fetch_metadata,imdb_id)
 		if meta is not None:
 			if meta.series_episode:
 				title, season, episode = imdbpy.detect_series_title(title)
@@ -708,7 +794,7 @@ def scan_file(pathName, imdb_id = None):
 		metadata = load_metadata_file(metadata_target)
 
 	if imdb_id is not None:
-		meta = imdbpy.fetch_metadata(imdb_id)
+		meta = functionretry(imdbpy.fetch_metadata,imdb_id)
 		if meta.series_episode:
 			fileName = os.path.basename(pathName)
 			t, season, episode = imdbpy.detect_series_title(fileName)
@@ -734,7 +820,8 @@ def scan_directory(dirName, imdb_id = None):
 		return
 
 	if imdb_id is not None:
-		metadata = imdbpy.metadata_search(imdb_id)
+		metadata = functionretry(imdbpy.metadata_search,imdb_id)
+
 		if metadata is not None:
 			metadata += "IMDb:%s" % imdb_id + "\n"
 			save_metadata(dirName, dirName + "/video.metadata", metadata)
@@ -815,6 +902,7 @@ def main():
 	global verbose, overwrite, interactive, recursive, dbimport
 	global import_from_files, metafiles, poster_dir, poster_search
 	global aka_language
+	global defaultretries
 
 	usage = "usage: %prog [options] videopath1 [videopath2 videopath3...]"
 
@@ -848,6 +936,8 @@ def main():
 		default=None,
 		help="Add the title name in the given country (two letter code, e.g., 'fi') "\
 		"to the movie title.")
+	p.add_option('--retry', '-t', action="store", type="int", dest="retries",default=3,
+		help="Number of retries, 0 means no retry [default 3]")
 
 	options, arguments = p.parse_args()
 
@@ -865,6 +955,8 @@ def main():
 	prune = options.prune
 	poster_search = not options.skip_poster_search
 	aka_language = options.lang_code
+	
+	defaultretries = options.retries
 
 	if not (metafiles or dbimport):
 		print "You must define writing to either MythDB import (-d) or metadata files (-m)."
