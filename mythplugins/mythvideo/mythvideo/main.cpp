@@ -51,12 +51,37 @@ namespace
                 video_list = saved->GetSaved();
             }
         }
+    
+        int browseNum = gContext->GetNumSetting("mythvideo.db_group_type", 0);
+        VideoDialog::BrowseType browse;
+
+        switch (browseNum)
+        {
+            case 0:
+                browse = VideoDialog::BRS_FOLDER;
+                break;
+            case 1:
+                browse = VideoDialog::BRS_GENRE;
+                break;
+            case 2:
+                browse = VideoDialog::BRS_CATEGORY;
+                break;
+            case 3:
+                browse = VideoDialog::BRS_YEAR;
+                break;
+            case 4:
+                browse = VideoDialog::BRS_DIRECTOR;
+                break;
+            default:
+                browse = VideoDialog::BRS_FOLDER;
+                break;
+        }
 
         if (!video_list)
             video_list = new VideoList;
 
         VideoDialog *mythvideo =
-                new VideoDialog(mainStack, "mythvideo", video_list, type);
+                new VideoDialog(mainStack, "mythvideo", video_list, type, browse);
 
         if (mythvideo->Create())
         {

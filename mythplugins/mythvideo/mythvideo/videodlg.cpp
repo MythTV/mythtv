@@ -1724,11 +1724,12 @@ class VideoDialogPrivate
     typedef VideoDialog::VideoListPtr VideoListPtr;
 
   public:
-    VideoDialogPrivate(VideoListPtr videoList, VideoDialog::DialogType type) :
+    VideoDialogPrivate(VideoListPtr videoList, VideoDialog::DialogType type,
+                       VideoDialog::BrowseType browse) :
         m_switchingLayout(false), m_firstLoadPass(true),
         m_rememberPosition(false), m_videoList(videoList), m_rootNode(0),
         m_currentNode(0), m_treeLoaded(false), m_isFlatList(false),
-        m_type(type), m_scanner(0)
+        m_type(type), m_browse(browse), m_scanner(0)
     {
         if (gContext->GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
         {
@@ -1755,6 +1756,8 @@ class VideoDialogPrivate
                 gContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
 
         m_isFileBrowser = gContext->GetNumSetting("VideoDialogNoDB", 0);
+        m_isGroupList = gContext->GetNumSetting("mythvideo.db_group_view", 1);
+        m_groupType = gContext->GetNumSetting("mythvideo.db_group_type", 0); 
 
         m_artDir = gContext->GetSetting("VideoArtworkDir");
         m_sshotDir = gContext->GetSetting("mythvideo.screenshotDir");
@@ -1917,8 +1920,11 @@ class VideoDialogPrivate
     bool m_treeLoaded;
 
     bool m_isFileBrowser;
+    bool m_isGroupList;
+    int  m_groupType;
     bool m_isFlatList;
     VideoDialog::DialogType m_type;
+    VideoDialog::BrowseType m_browse;
 
     QString m_artDir;
     QString m_sshotDir;
@@ -1979,14 +1985,14 @@ VideoDialog::VideoListDeathDelayPtr &VideoDialog::GetSavedVideoList()
 }
 
 VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
-        VideoListPtr video_list, DialogType type) :
+        VideoListPtr video_list, DialogType type, BrowseType browse) :
     MythScreenType(lparent, lname), m_menuPopup(0), m_busyPopup(0),
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
     m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0), 
     m_parentalLevelState(0)
 {
-    m_d = new VideoDialogPrivate(video_list, type);
+    m_d = new VideoDialogPrivate(video_list, type, browse);
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -2040,6 +2046,26 @@ bool VideoDialog::Create()
             break;
         case DLG_DEFAULT:
         default:
+            break;
+    }
+
+    switch (m_d->m_browse)
+    {
+        case BRS_GENRE:
+            m_d->m_groupType = 1;
+            break;
+        case BRS_CATEGORY:
+            m_d->m_groupType = 2;
+            break;
+        case BRS_YEAR:
+            m_d->m_groupType = 3;
+            break;
+        case BRS_DIRECTOR:
+            m_d->m_groupType = 4;
+            break;
+        case BRS_FOLDER:
+        default:
+            m_d->m_groupType = 0;
             break;
     }
 
@@ -2222,12 +2248,14 @@ void VideoDialog::fetchVideos()
     if (!m_d->m_treeLoaded)
     {
         m_d->m_rootNode = m_d->m_videoList->buildVideoList(m_d->m_isFileBrowser,
-                m_d->m_isFlatList, m_d->m_parentalLevel.GetLevel(), true);
+                m_d->m_isGroupList, m_d->m_groupType,
+                m_d->m_parentalLevel.GetLevel(), true);
     }
     else
     {
         m_d->m_videoList->refreshList(m_d->m_isFileBrowser,
-                m_d->m_parentalLevel.GetLevel(), m_d->m_isFlatList);
+                m_d->m_parentalLevel.GetLevel(),
+                m_d->m_isGroupList, m_d->m_groupType);
         m_d->m_rootNode = m_d->m_videoList->GetTreeRoot();
     }
 
@@ -2861,6 +2889,8 @@ void VideoDialog::VideoMenu()
     }
     m_menuPopup->AddButton(tr("Scan For Changes"), SLOT(doVideoScan()));
     m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
+    if (m_d->m_isGroupList)
+        m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
     m_menuPopup->AddButton(tr("Filter Display"), SLOT(ChangeFilter()));
 
     m_menuPopup->AddButton(tr("Cancel"));
@@ -2905,6 +2935,43 @@ void VideoDialog::ViewMenu()
     else
         m_menuPopup->AddButton(tr("Enable Flat View"),
                                                     SLOT(ToggleFlatView()));
+
+    m_menuPopup->AddButton(tr("Cancel"));
+}
+
+void VideoDialog::MetadataBrowseMenu()
+{
+    QString label = tr("Browse By");
+
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "videomenupopup");
+
+    if (m_menuPopup->Create())
+        m_popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "view");
+
+    if (m_d->m_isGroupList)
+    {
+       if (m_d->m_groupType != 0)
+           m_menuPopup->AddButton(tr("Folder"),
+                    SLOT(SwitchVideoFolderGroup()));
+
+       if (m_d->m_groupType != 1)
+           m_menuPopup->AddButton(tr("Genre"),
+                     SLOT(SwitchVideoGenreGroup()));
+
+       if (m_d->m_groupType != 2)
+           m_menuPopup->AddButton(tr("Category"),
+                     SLOT(SwitchVideoCategoryGroup()));
+
+       if (m_d->m_groupType != 3)
+           m_menuPopup->AddButton(tr("Year"),
+                     SLOT(SwitchVideoYearGroup()));
+
+       if (m_d->m_groupType != 4)
+           m_menuPopup->AddButton(tr("Director"),
+                     SLOT(SwitchVideoDirectorGroup()));
+    }
 
     m_menuPopup->AddButton(tr("Cancel"));
 }
@@ -3015,25 +3082,50 @@ void VideoDialog::handleSelect(MythUIButtonListItem *item)
 
 void VideoDialog::SwitchTree()
 {
-    SwitchLayout(DLG_TREE);
+    SwitchLayout(DLG_TREE, m_d->m_browse);
 }
 
 void VideoDialog::SwitchGallery()
 {
-    SwitchLayout(DLG_GALLERY);
+    SwitchLayout(DLG_GALLERY, m_d->m_browse);
 }
 
 void VideoDialog::SwitchBrowse()
 {
-    SwitchLayout(DLG_BROWSER);
+    SwitchLayout(DLG_BROWSER, m_d->m_browse);
 }
 
 void VideoDialog::SwitchManager()
 {
-    SwitchLayout(DLG_MANAGER);
+    SwitchLayout(DLG_MANAGER, m_d->m_browse);
 }
 
-void VideoDialog::SwitchLayout(DialogType type)
+void VideoDialog::SwitchVideoFolderGroup() 
+{ 
+    SwitchLayout(m_d->m_type, BRS_FOLDER);
+} 
+
+void VideoDialog::SwitchVideoGenreGroup() 
+{
+    SwitchLayout(m_d->m_type, BRS_GENRE);
+} 
+
+void VideoDialog::SwitchVideoCategoryGroup() 
+{ 
+   SwitchLayout(m_d->m_type, BRS_CATEGORY);
+}
+
+void VideoDialog::SwitchVideoYearGroup()
+{
+   SwitchLayout(m_d->m_type, BRS_YEAR);
+}
+
+void VideoDialog::SwitchVideoDirectorGroup()
+{
+   SwitchLayout(m_d->m_type, BRS_DIRECTOR);
+}
+
+void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
 {
     m_d->m_switchingLayout = true;
 
@@ -3048,7 +3140,7 @@ void VideoDialog::SwitchLayout(DialogType type)
 
     VideoDialog *mythvideo =
             new VideoDialog(GetMythMainWindow()->GetMainStack(), "mythvideo",
-                    m_d->m_videoList, type);
+                    m_d->m_videoList, type, browse);
 
     if (mythvideo->Create())
     {

@@ -39,6 +39,9 @@ class VideoDialog : public MythScreenType
     enum DialogType { DLG_DEFAULT = 0, DLG_BROWSER = 0x1, DLG_GALLERY = 0x2,
                       DLG_TREE = 0x4, DLG_MANAGER = 0x8, dtLast };
 
+    enum BrowseType { BRS_FOLDER = 0, BRS_GENRE = 0x1, BRS_CATEGORY = 0x2,
+                      BRS_YEAR = 0x4, BRS_DIRECTOR = 0x8, btLast };
+
     typedef simple_ref_ptr<class VideoList> VideoListPtr;
 
     typedef QPointer<class VideoListDeathDelay> VideoListDeathDelayPtr;
@@ -47,7 +50,8 @@ class VideoDialog : public MythScreenType
 
   public:
     VideoDialog(MythScreenStack *lparent, QString lname,
-            VideoListPtr video_list, DialogType type);
+            VideoListPtr video_list, DialogType type,
+            BrowseType browse);
     ~VideoDialog();
 
     bool Create();
@@ -73,6 +77,11 @@ class VideoDialog : public MythScreenType
     void SwitchGallery();
     void SwitchBrowse();
     void SwitchManager();
+    void SwitchVideoFolderGroup();
+    void SwitchVideoGenreGroup();
+    void SwitchVideoCategoryGroup();
+    void SwitchVideoYearGroup();
+    void SwitchVideoDirectorGroup();
 
     void EditMetadata();
     void VideoSearch();
@@ -90,6 +99,7 @@ class VideoDialog : public MythScreenType
     void InfoMenu();
     void ManageMenu();
     void ViewMenu();
+    void MetadataBrowseMenu();
 
     void ChangeFilter();
 
@@ -139,7 +149,7 @@ class VideoDialog : public MythScreenType
     void createBusyDialog(QString title);
     void createOkDialog(QString title);
 
-    void SwitchLayout(DialogType type);
+    void SwitchLayout(DialogType type, BrowseType browse);
 
 // Start asynchronous functions.
 

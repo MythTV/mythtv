@@ -174,16 +174,29 @@ HostCheckBox *VideoSortIgnoresCase()
     return hcb;
 }
 
-HostCheckBox *VideoDBFolderView()
+HostCheckBox *VideoDBGroupView()
 {
-    HostCheckBox *hcb = new HostCheckBox("mythvideo.db_folder_view");
-    hcb->setLabel(QObject::tr("Show folders for database views"));
+    HostCheckBox *hcb = new HostCheckBox("mythvideo.db_group_view");
+    hcb->setLabel(QObject::tr("Show groups for database views"));
     hcb->setValue(true);
-    hcb->setHelpText(QObject::tr("If set, sub folders of your video "
+    hcb->setHelpText(QObject::tr("If set, metadata groupings of your video "
                                  "directory will be shown in supported "
-                                 "views."));
+                                 "views.  Default group is set below."));
     return hcb;
 }
+
+HostComboBox *VideoTreeGroup() 
+{ 
+    HostComboBox *gc = new HostComboBox("mythvideo.db_group_type"); 
+    gc->setLabel(QObject::tr("Group based on")); 
+    gc->addSelection(QObject::tr("Folder"),"0"); 
+    gc->addSelection(QObject::tr("Genres"),"1"); 
+    gc->addSelection(QObject::tr("Category"),"2");
+    gc->addSelection(QObject::tr("Year"),"3");
+    gc->addSelection(QObject::tr("Director"),"4");
+    gc->setHelpText(QObject::tr("Group videos in the tree")); 
+    return gc; 
+} 
 
 HostCheckBox *VideoTreeRemember()
 {
@@ -806,8 +819,9 @@ VideoGeneralSettings::VideoGeneralSettings()
     page2->addChild(VideoTreeNoMetaData());
     page2->addChild(VideoNewBrowsable());
     page2->addChild(VideoSortIgnoresCase());
-    page2->addChild(VideoDBFolderView());
+    page2->addChild(VideoDBGroupView());
     page2->addChild(VideoTreeRemember());
+    page2->addChild(VideoTreeGroup());
 
     VConfigPage page3(pages, false);
     page3->addChild(SetDVDDevice());
