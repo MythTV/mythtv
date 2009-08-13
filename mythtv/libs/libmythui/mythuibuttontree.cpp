@@ -363,6 +363,8 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
         SetCurrentNode(node->getParent());
         if (deleteNode)
             node->getParent()->deleteNode(node);
+        else
+            node->SetVisible(false);
     }
 
     MythUIButtonList *list = item->parent();
