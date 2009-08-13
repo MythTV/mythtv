@@ -67,7 +67,8 @@ void StorageGroup::Init(const QString group, const QString hostname,
     m_dirlist.clear();
 
     found = FindDirs(m_groupname, m_hostname);
-    if ((!found) && m_allowFallback && (!hostname.isEmpty()))
+    if ((!found) && m_allowFallback && (m_groupname != "LiveTV") &&
+        (!hostname.isEmpty()))
     {
         VERBOSE(VB_FILE, LOC +
                 QString("Unable to find any directories for the local "
