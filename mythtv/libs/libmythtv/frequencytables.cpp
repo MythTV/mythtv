@@ -314,13 +314,13 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // Australia
     fmap["dvbt_ofdm_au0"] = new FrequencyTable(
-        177500000, 226500000, 7000000, "Channel %1", 6,
+        177500000, 226500000, 7000000, "Channel %1", 5,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAM64,
         DTVTransmitMode::kTransmissionMode8K,
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
-        DTVModulation::kModulationQAMAuto, 125000, 0); // VHF 6-12
+        DTVModulation::kModulationQAMAuto, 125000, 0); // VHF 5-12
     fmap["dvbt_ofdm_au1"] = new FrequencyTable(
         529500000, 816500000, 7000000, "Channel %1", 28,
         DTVInversion::kInversionOff,
@@ -332,13 +332,13 @@ static void init_freq_tables(freq_table_map_t &fmap)
 
     // Germany (Deuschland)
     fmap["dvbt_ofdm_de0"] = new FrequencyTable(
-        177500000, 226500000, 7000000, "Channel %1", 6,
+        177500000, 226500000, 7000000, "Channel %1", 5,
         DTVInversion::kInversionOff,
         DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionMode8K,
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
-        DTVModulation::kModulationQAMAuto, 0, 0); // VHF 6-12
+        DTVModulation::kModulationQAMAuto, 0, 0); // VHF 5-12, deprecated
     fmap["dvbt_ofdm_de1"] = new FrequencyTable(
         474000000, 826000000, 8000000, "Channel %1", 21,
         DTVInversion::kInversionOff,
