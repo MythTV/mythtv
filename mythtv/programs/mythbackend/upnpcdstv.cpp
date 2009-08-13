@@ -379,14 +379,15 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     pRes->AddAttribute( "duration"  , sDur      );
     pRes->AddAttribute( "size"      , longLongToString( nFileSize) );
 */
+
     // ----------------------------------------------------------------------
-    // Add Thumbnail Resource
+    // Add Preview URI as albumArt
     // ----------------------------------------------------------------------
 
-    //sURI = QString( "%1GetPreviewImage%2").arg( sURIBase   )
-    //                                      .arg( sURIParams ); 
+    sURI = QString( "%1GetPreviewImage%2").arg( sURIBase   )
+                                          .arg( sURIParams ); 
 
-    //pItem->AddResource( "http-get:*:image/png:*" , sURI );
+    pItem->SetPropValue( "albumArtURI", sURI );
 
 }
 
