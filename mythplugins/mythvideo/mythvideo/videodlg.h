@@ -40,7 +40,8 @@ class VideoDialog : public MythScreenType
                       DLG_TREE = 0x4, DLG_MANAGER = 0x8, dtLast };
 
     enum BrowseType { BRS_FOLDER = 0, BRS_GENRE = 0x1, BRS_CATEGORY = 0x2,
-                      BRS_YEAR = 0x4, BRS_DIRECTOR = 0x8, btLast };
+                      BRS_YEAR = 0x4, BRS_DIRECTOR = 0x8, BRS_CAST = 0x10,
+                      btLast };
 
     typedef simple_ref_ptr<class VideoList> VideoListPtr;
 
@@ -82,6 +83,7 @@ class VideoDialog : public MythScreenType
     void SwitchVideoCategoryGroup();
     void SwitchVideoYearGroup();
     void SwitchVideoDirectorGroup();
+    void SwitchVideoCastGroup();
 
     void EditMetadata();
     void VideoSearch();

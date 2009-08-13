@@ -632,7 +632,8 @@ class VideoListImp
   private:
     enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
                               ltDBGenreGroup, ltDBCategoryGroup,
-                              ltDBYearGroup, ltDBDirectorGroup};
+                              ltDBYearGroup, ltDBDirectorGroup,
+                              ltDBCastGroup};
     typedef MetadataListManager::metadata_list metadata_list;
     typedef MetadataListManager::MetadataPtr MetadataPtr;
 
@@ -934,6 +935,10 @@ void VideoListImp::refreshList(bool filebrowser,
                     fillMetadata(ltDBDirectorGroup);
                     VERBOSE(VB_IMPORTANT,QString("Using Director mode"));
                     break;
+                case 5:
+                    fillMetadata(ltDBCastGroup);
+                    VERBOSE(VB_IMPORTANT,QString("Using Cast Mode"));
+                    break;
             } 
         } 
         else 
@@ -981,7 +986,8 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
             case ltDBGenreGroup: 
             case ltDBCategoryGroup:
             case ltDBYearGroup:
-            case ltDBDirectorGroup: 
+            case ltDBDirectorGroup:
+            case ltDBCastGroup: 
                 buildGroupList(whence); 
                 break; 
             case ltNone: 
@@ -1049,6 +1055,18 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             case ltDBDirectorGroup:
             {
                 groups.push_back(data->GetDirector());
+                break;
+            }
+            case ltDBCastGroup:
+            {
+                std::vector <std::pair <int, QString> > genres = data->GetCast();
+
+                for (std::vector <std::pair <int, QString> >::iterator i =
+                                         genres.begin(); i != genres.end(); i++)
+                {
+                    std::pair <int, QString> item = *i;
+                    groups.push_back(item.second);
+                }
                 break;
             }
             default: 

@@ -2063,6 +2063,9 @@ bool VideoDialog::Create()
         case BRS_DIRECTOR:
             m_d->m_groupType = 4;
             break;
+        case BRS_CAST:
+            m_d->m_groupType = 5;
+            break;
         case BRS_FOLDER:
         default:
             m_d->m_groupType = 0;
@@ -2971,6 +2974,10 @@ void VideoDialog::MetadataBrowseMenu()
        if (m_d->m_groupType != 4)
            m_menuPopup->AddButton(tr("Director"),
                      SLOT(SwitchVideoDirectorGroup()));
+
+       if (m_d->m_groupType != 5)
+           m_menuPopup->AddButton(tr("Cast"),
+                     SLOT(SwitchVideoCastGroup()));
     }
 
     m_menuPopup->AddButton(tr("Cancel"));
@@ -3123,6 +3130,11 @@ void VideoDialog::SwitchVideoYearGroup()
 void VideoDialog::SwitchVideoDirectorGroup()
 {
    SwitchLayout(m_d->m_type, BRS_DIRECTOR);
+}
+
+void VideoDialog::SwitchVideoCastGroup()
+{
+   SwitchLayout(m_d->m_type, BRS_CAST);
 }
 
 void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
