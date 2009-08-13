@@ -152,8 +152,8 @@ bool BackendSelect::Connect(DeviceLocation *dev)
                     m_parent, "Backend PIN entry",
                     tr(message.toLatin1().constData()));
 
-                // Use might have cancelled?
-                if (m_PIN.isNull())
+                // User might have cancelled?
+                if (m_PIN.isEmpty())
                     break;
 
                 stat = xml->GetConnectionInfo(m_PIN, m_DBparams, message);
