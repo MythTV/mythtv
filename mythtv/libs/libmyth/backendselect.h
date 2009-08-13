@@ -65,6 +65,7 @@ class BackendSelect : public MythDialog
     void FillListBox(void);
     void RemoveItem (QString URN);
     bool eventFilter(QObject *obj, QEvent *event);
+    bool TryDBfromURL(const QString &error, QString URL);
 
     DatabaseParams *m_DBparams;
     ItemMap         m_devices;
