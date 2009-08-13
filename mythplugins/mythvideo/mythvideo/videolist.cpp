@@ -633,7 +633,7 @@ class VideoListImp
     enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
                               ltDBGenreGroup, ltDBCategoryGroup,
                               ltDBYearGroup, ltDBDirectorGroup,
-                              ltDBCastGroup};
+                              ltDBCastGroup, ltDBUserRatingGroup};
     typedef MetadataListManager::metadata_list metadata_list;
     typedef MetadataListManager::MetadataPtr MetadataPtr;
 
@@ -939,6 +939,10 @@ void VideoListImp::refreshList(bool filebrowser,
                     fillMetadata(ltDBCastGroup);
                     VERBOSE(VB_IMPORTANT,QString("Using Cast Mode"));
                     break;
+                case 6:
+                    fillMetadata(ltDBUserRatingGroup);
+                    VERBOSE(VB_IMPORTANT,QString("Using User Rating Mode"));
+                    break;
             } 
         } 
         else 
@@ -987,7 +991,8 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
             case ltDBCategoryGroup:
             case ltDBYearGroup:
             case ltDBDirectorGroup:
-            case ltDBCastGroup: 
+            case ltDBCastGroup:
+            case ltDBUserRatingGroup:
                 buildGroupList(whence); 
                 break; 
             case ltNone: 
@@ -1059,15 +1064,20 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             }
             case ltDBCastGroup:
             {
-                std::vector <std::pair <int, QString> > genres = data->GetCast();
+                std::vector <std::pair <int, QString> > cast = data->GetCast();
 
                 for (std::vector <std::pair <int, QString> >::iterator i =
-                                         genres.begin(); i != genres.end(); i++)
+                                         cast.begin(); i != cast.end(); i++)
                 {
                     std::pair <int, QString> item = *i;
                     groups.push_back(item.second);
                 }
                 break;
+            }
+            case ltDBUserRatingGroup:
+            {
+                int i = data->GetUserRating();
+                groups.push_back(QString::number(i));
             }
             default: 
             { 

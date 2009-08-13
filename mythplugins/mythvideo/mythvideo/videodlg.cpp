@@ -2066,6 +2066,9 @@ bool VideoDialog::Create()
         case BRS_CAST:
             m_d->m_groupType = 5;
             break;
+        case BRS_USERRATING:
+            m_d->m_groupType = 6;
+            break;
         case BRS_FOLDER:
         default:
             m_d->m_groupType = 0;
@@ -2978,6 +2981,10 @@ void VideoDialog::MetadataBrowseMenu()
        if (m_d->m_groupType != 5)
            m_menuPopup->AddButton(tr("Cast"),
                      SLOT(SwitchVideoCastGroup()));
+
+       if (m_d->m_groupType != 6)
+           m_menuPopup->AddButton(tr("User Rating"),
+                     SLOT(SwitchVideoUserRatingGroup()));
     }
 
     m_menuPopup->AddButton(tr("Cancel"));
@@ -3135,6 +3142,11 @@ void VideoDialog::SwitchVideoDirectorGroup()
 void VideoDialog::SwitchVideoCastGroup()
 {
    SwitchLayout(m_d->m_type, BRS_CAST);
+}
+
+void VideoDialog::SwitchVideoUserRatingGroup()
+{
+   SwitchLayout(m_d->m_type, BRS_USERRATING);
 }
 
 void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
