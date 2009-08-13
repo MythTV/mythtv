@@ -41,7 +41,7 @@ class PaneDVBC : public HorizontalConfigurationGroup
         VerticalConfigurationGroup *right =
             new VerticalConfigurationGroup(false,true);
         left->addChild(pfrequency   = new ScanFrequency());
-        left->addChild(psymbolrate  = new ScanSymbolRate());
+        left->addChild(psymbolrate  = new ScanSymbolRateDVBC());
         left->addChild(pinversion   = new ScanInversion());
         right->addChild(pmodulation = new ScanModulation());
         right->addChild(pfec        = new ScanFec());
@@ -57,7 +57,7 @@ class PaneDVBC : public HorizontalConfigurationGroup
 
   protected:
     ScanFrequency  *pfrequency;
-    ScanSymbolRate *psymbolrate;
+    ScanSymbolRateDVBC *psymbolrate;
     ScanInversion  *pinversion;
     ScanModulation *pmodulation;
     ScanFec        *pfec;

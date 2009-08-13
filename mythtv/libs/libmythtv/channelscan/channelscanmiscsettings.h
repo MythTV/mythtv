@@ -72,16 +72,16 @@ class ScanFrequency: public LineEditSetting, public TransientStorage
     };
 };
 
-class ScanSymbolRate: public ComboBoxSetting, public TransientStorage
+class ScanSymbolRateDVBS: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanSymbolRate() : ComboBoxSetting(this, true)
+    ScanSymbolRateDVBS() : ComboBoxSetting(this, true)
     {
         setLabel(QObject::tr("Symbol Rate"));
         setHelpText(
              QObject::tr(
                 "Symbol Rate (symbols/second).\n"
-                "Most dvb-s transponders transmit at 27.5 "
+                "Most DVB-S transponders transmit at 27.5 "
                 "million symbols per second."));
         addSelection("3333000");
         addSelection("22000000");
@@ -89,6 +89,26 @@ class ScanSymbolRate: public ComboBoxSetting, public TransientStorage
         addSelection("28000000");
         addSelection("28500000");
         addSelection("29900000");
+    }
+};
+
+class ScanSymbolRateDVBC: public ComboBoxSetting, public TransientStorage
+{
+  public:
+    ScanSymbolRateDVBC() : ComboBoxSetting(this, true)
+    {
+        setLabel(QObject::tr("Symbol Rate"));
+        setHelpText(
+             QObject::tr(
+                "Symbol Rate (symbols/second).\n"
+                "Most DVB-C transports transmit at 6.9 or 6.875 "
+                "million symbols per second."));
+        addSelection("3450000");
+        addSelection("5000000");
+        addSelection("5900000");
+        addSelection("6875000");
+        addSelection("6900000", "6900000", true);
+        addSelection("6950000");
     }
 };
 
