@@ -3585,6 +3585,94 @@ NULL
 
     if (dbver == "1215")
     {
+        // Check for corruption before performing the DB charset conversion
+        // (Some system configurations have been converting the UTF8 data Myth
+        // writes to latin1)
+        MSqlQuery query(MSqlQuery::InitCon());
+        int tableIndex      = 0;
+        QString tables[][2] = {
+            { "people",      "name"        },
+            { "oldprogram",  "oldtitle"    },
+            { "oldrecorded", "title"       },
+            { "oldrecorded", "subtitle"    },
+            { "oldrecorded", "description" },
+            { "recorded",    "title"       },
+            { "recorded",    "subtitle"    },
+            { "recorded",    "description" },
+            { "",            ""        } // This blank entry must exist, do not remove.
+        };
+
+        while (tables[tableIndex][0] != "")
+        {
+            bool    ok       = true;
+            QString table    = tables[tableIndex][0];
+            QString column   = tables[tableIndex][1];
+            QString thequery = QString("CREATE TEMPORARY TABLE temp_%1 "
+                                       " SELECT * FROM %2;")
+                                       .arg(table).arg(table);
+            ok &= query.exec(thequery);
+            if (ok)
+            {
+                thequery = QString("ALTER TABLE temp_%1 "
+                                   " MODIFY %2 varbinary(128) "
+                                   "           NOT NULL default '';")
+                                   .arg(table).arg(column);
+                ok &= query.exec(thequery);
+            }
+            if (ok)
+            {
+                thequery = QString("ALTER TABLE temp_%1 "
+                                   "  MODIFY %2 char(128) CHARACTER SET utf8 "
+                                   "            COLLATE utf8_bin "
+                                   "            NOT NULL default '';")
+                                   .arg(table).arg(column);
+                ok &= query.exec(thequery);
+            }
+            if (!ok)
+            {
+                MythDB::DBError(QString("Unable to perform test for database "
+                                "corruption before character set conversion."),
+                                thequery);
+                return false;
+            }
+            // If the conversion to utf8 resulted in warnings, the data in the
+            // database is not in utf8 format/is corrupt
+            thequery = "SHOW COUNT(*) WARNINGS;";
+            if (query.exec(thequery) && query.isActive() &&
+                query.size() > 0 && query.next())
+            {
+                int warnings = query.value(0).toInt();
+                if (warnings)
+                {
+                    QString msg = QString("Database corruption detected. "
+                                          "Unable to proceed with database "
+                                          "upgrade. (Table: %1, Warnings: %2)")
+                                          .arg(table).arg(warnings);
+                    VERBOSE(VB_IMPORTANT, msg);
+                    VERBOSE(VB_IMPORTANT, "Your database must be fixed before "
+                            "you can upgrade beyond 0.21-fixes. Please see"
+                            "http://www.mythtv.org/wiki/index.php/"
+                            "Fixing_Corrupt_Database_Encoding for information "
+                            "on fixing your database.");
+                    return false;
+                }
+            }
+            else
+            {
+                MythDB::DBError(QString("Error getting database warnings for "
+                                "database corruption test."),
+                                thequery);
+                return false;
+            }
+            thequery = QString("DROP TEMPORARY TABLE temp_%1;").arg(table);
+            if (!query.exec(thequery))
+                MythDB::DBError(QString("Error dropping temporary table %1.")
+                                .arg(table), thequery);
+
+            tableIndex++;
+        }
+
+        // Perform the actual upgrade
         QString qtmp = QString(
             "ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
             .arg(gContext->GetDatabaseParams().dbName);
