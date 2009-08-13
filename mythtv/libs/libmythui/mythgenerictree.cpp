@@ -117,6 +117,7 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
 
     m_selectable = selectable_flag;
     m_visible = true;
+    m_visibleCount = 0;
 }
 
 MythGenericTree::~MythGenericTree()
@@ -144,6 +145,8 @@ MythGenericTree *MythGenericTree::addNode(MythGenericTree *child)
     child->setParent(this);
     m_subnodes->append(child);
     m_ordered_subnodes->append(child);
+    if (child->IsVisible())
+        IncVisibleCount();
 
     return child;
 }
@@ -156,6 +159,18 @@ void MythGenericTree::removeNode(MythGenericTree *child)
     m_ordered_subnodes->removeAll(child);
     m_flatenedSubnodes->removeAll(child);
     m_subnodes->removeAll(child);
+
+    if (child->IsVisible())
+        DecVisibleCount();
+}
+
+void MythGenericTree::deleteNode(MythGenericTree *child)
+{
+    if (!child)
+        return;
+
+    removeNode(child);
+    delete child;
 }
 
 int MythGenericTree::calculateDepth(int start)
@@ -694,3 +709,20 @@ void MythGenericTree::MoveItemUpDown(MythGenericTree *item, bool flag)
     m_subnodes->removeAt(num);
     m_subnodes->insert(insertat, item);
 }
+
+void MythGenericTree::SetVisible(bool visible)
+{
+    if (m_visible == visible)
+        return;
+    
+    m_visible = visible;
+
+    if (!m_parent)
+        return;
+    
+    if (visible)
+        m_parent->IncVisibleCount();
+    else
+        m_parent->DecVisibleCount();
+}
+

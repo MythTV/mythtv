@@ -15,7 +15,9 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
 
     m_numLists = 1;
     m_visibleLists = 0;
-    m_currentDepth = m_oldDepth = 0;
+    // Depth starts at one, not zero because we count from the root node which
+    // is never displayed itself
+    m_currentDepth = m_oldDepth = 1;
     m_rootNode = m_currentNode = NULL;
     m_listSpacing = 0;
     m_activeList = NULL;
@@ -76,7 +78,7 @@ void MythUIButtonTree::Init()
 /*!
  * \brief Update the widget following a change
  */
-void MythUIButtonTree::SetTreeState()
+void MythUIButtonTree::SetTreeState(bool refreshAll)
 {
     if (!m_initialized)
         Init();
@@ -89,15 +91,12 @@ void MythUIButtonTree::SetTreeState()
 
     MythGenericTree *node = m_rootNode;
 
-    bool refreshAll = false;
-    if (m_currentDepth > 0)
+    if (m_currentDepth > 1)
     {
         QList<MythGenericTree*> route = m_currentNode->getRoute();
         if ((int)m_currentDepth > route.size())
-        {
-            VERBOSE(VB_IMPORTANT, "Requested depth is greater than currentNode");
-            return;
-        }
+            m_currentDepth = 1;
+
         node = route.at(m_currentDepth);
         if (m_currentDepth != m_oldDepth)
             refreshAll = true;
@@ -108,7 +107,7 @@ void MythUIButtonTree::SetTreeState()
     m_visibleLists = 0;
     uint listid = 0;
 
-    while ( listid < m_numLists )
+    while (listid < m_numLists)
     {
         MythUIButtonList *list = m_buttonlists.at(listid);
 
@@ -123,7 +122,10 @@ void MythUIButtonTree::SetTreeState()
         if (refreshAll || m_activeListID <= listid)
         {
             if (!UpdateList(list, node))
-                break;
+            {
+                listid++;
+                continue;
+            }
 
             if (m_active && (listid == m_activeListID))
             {
@@ -179,12 +181,15 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
                                                         childnode->getString());
         item->SetData(qVariantFromValue(childnode));
 
-        if (childnode->childCount() > 0)
+        if (childnode->visibleChildCount() > 0)
             item->setDrawArrow(true);
 
         if (childnode == selectedNode)
             selectedItem = item;
     }
+
+    if (list->IsEmpty())
+        return false;
 
     if (selectedItem)
         list->SetItemCurrent(selectedItem);
@@ -233,7 +238,7 @@ void MythUIButtonTree::Reset(void)
 {
     m_rootNode = m_currentNode = NULL;
     m_visibleLists = 0;
-    m_currentDepth = m_oldDepth = 0;
+    m_currentDepth = m_oldDepth = 1;
     m_activeList = NULL;
     m_activeListID = 0;
     m_active = true;
@@ -351,15 +356,26 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
     if (!item || !m_rootNode)
         return;
 
-    if (deleteNode)
+    MythGenericTree *node = qVariantValue<MythGenericTree*>(item->GetData());
+    
+    if (node && node->getParent())
     {
-        MythGenericTree *node = qVariantValue<MythGenericTree*>
-                                                            (item->GetData());
-        if (node)
-            m_rootNode->removeNode(node);
+        SetCurrentNode(node->getParent());
+        if (deleteNode)
+            node->getParent()->deleteNode(node);
     }
 
-    m_activeList->RemoveItem(item);
+    MythUIButtonList *list = item->parent();
+
+    list->RemoveItem(item);
+
+    if (list->IsEmpty())
+    {
+        if (m_currentDepth() > 1)
+            m_currentDepth--;
+        SwitchList(false);
+        SetTreeState(true);
+    }
 }
 
 /*!
@@ -399,7 +415,7 @@ void MythUIButtonTree::SwitchList(bool right)
     {
         if (m_activeListID < m_visibleLists-1)
             m_activeListID++;
-        else if (m_currentNode->childCount() > 0)
+        else if (m_currentNode->visibleChildCount() > 0)
         {
             m_currentDepth++;
             doUpdate = true;
@@ -411,7 +427,7 @@ void MythUIButtonTree::SwitchList(bool right)
     {
         if (m_activeListID > 0)
             m_activeListID--;
-        else if (m_currentDepth > 0)
+        else if (m_currentDepth > 1)
         {
             m_currentDepth--;
             doUpdate = true;

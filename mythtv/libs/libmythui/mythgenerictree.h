@@ -26,6 +26,7 @@ class MPUBLIC MythGenericTree
     MythGenericTree *addNode(MythGenericTree *child);
 
     void removeNode(MythGenericTree *child);
+    void deleteNode(MythGenericTree *child);
 
     MythGenericTree *findLeaf();
     MythGenericTree* findNode(QList<int> route_of_branches, int depth=-1);
@@ -65,13 +66,17 @@ class MPUBLIC MythGenericTree
     int calculateDepth(int start=0);
 
     int childCount(void) const;
+    uint visibleChildCount() const { return m_visibleCount; }
     int siblingCount(void) const;
 
     void setSelectable(bool flag) { m_selectable = flag; }
     bool isSelectable() const { return m_selectable; }
 
-    void SetVisible(bool visible) { m_visible = visible; }
+    void SetVisible(bool visible);
     bool IsVisible() const { return m_visible; }
+
+    void IncVisibleCount() { m_visibleCount++; }
+    void DecVisibleCount() { m_visibleCount--; }
 
     void setAttribute(uint attribute_position, int value_of_attribute);
     int getAttribute(uint which_one) const;
@@ -104,6 +109,7 @@ class MPUBLIC MythGenericTree
     QString m_string;
     int m_int;
     QVariant m_data;
+    uint m_visibleCount;
 
     SortableMythGenericTreeList *m_subnodes;
     SortableMythGenericTreeList *m_ordered_subnodes;
