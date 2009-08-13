@@ -27,6 +27,7 @@
 #include <mythtv/libmythui/mythdialogbox.h>
 #include <mythtv/libmythui/mythgenerictree.h>
 #include <mythtv/libmythui/mythsystem.h>
+#include <mythtv/libmyth/remotefile.h>
 
 #include "videoscan.h"
 #include "globals.h"
@@ -3573,13 +3574,47 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
     if (!dodelete)
         return;
 
-    Metadata *metadata = GetMetadata(GetItemCurrent());
+    MythUIButtonListItem *item = GetItemCurrent();
+
+    Metadata *metadata = GetMetadata(item);
 
     if (!metadata)
         return;
 
-    if (m_d->m_videoList->Delete(metadata->GetID()))
-        refreshData();
+    if (!metadata->GetHost().isEmpty())
+    {
+        QString url = GenRemoteFileURL("Videos", metadata->GetHost(),
+                                       metadata->GetFilename());
+        bool deleted = RemoteFile::DeleteFile(url);
+        if (deleted)
+        {
+            metadata->DeleteFromDatabase();
+            if (m_videoButtonTree)
+                m_videoButtonTree->RemoveItem(item);
+            else
+                m_videoButtonList->RemoveItem(item);
+        }
+        else
+        {
+            QString message = tr("Failed to delete file");
+
+            MythConfirmationDialog *confirmdialog =
+                            new MythConfirmationDialog(m_popupStack,message,false);
+
+            if (confirmdialog->Create())
+                m_popupStack->AddScreen(confirmdialog);
+        }
+    }
+    else if (m_d->m_videoList->Delete(metadata->GetID()))
+    {
+        if (m_videoButtonTree)
+            m_videoButtonTree->RemoveItem(item);
+        else
+            m_videoButtonList->RemoveItem(item);
+
+        // FIXME: Frontend segfaults on local delete unless reloadData
+        reloadData();
+    }
     else
     {
         QString message = tr("Failed to delete file");
