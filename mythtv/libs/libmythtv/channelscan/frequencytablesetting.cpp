@@ -86,3 +86,19 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("France"),         "fr", country == "fr");
 }
 
+
+ScanNetwork::ScanNetwork() : ComboBoxSetting(this)
+{
+    QString country = "de";
+    QLocale locale = QLocale::system();
+    QLocale::Country qtcountry = locale.country();
+    if (qtcountry == QLocale::Germany)
+        country = "de";
+    else if (qtcountry == QLocale::UnitedKingdom)
+        country = "uk";
+    
+    setLabel(tr("Country"));
+    addSelection(QObject::tr("United Kingdom"), "uk", country == "uk");
+    addSelection(QObject::tr("Germany"),        "de", country == "de");
+}
+

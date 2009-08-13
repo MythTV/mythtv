@@ -19,4 +19,10 @@ class ScanCountry : public ComboBoxSetting, public TransientStorage
     ScanCountry();
 };
 
+class ScanNetwork : public ComboBoxSetting, public TransientStorage
+{
+  public:
+    ScanNetwork();
+};
+
 #endif // _FREQUENCY_TABLE_SETTING_H_

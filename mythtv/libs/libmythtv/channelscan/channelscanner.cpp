@@ -137,6 +137,7 @@ void ChannelScanner::Scan(
     bool ok = false;
 
     if ((ScanTypeSetting::FullScan_ATSC   == scantype) ||
+        (ScanTypeSetting::FullScan_DVBC   == scantype) ||
         (ScanTypeSetting::FullScan_DVBT   == scantype) ||
         (ScanTypeSetting::FullScan_Analog == scantype))
     {

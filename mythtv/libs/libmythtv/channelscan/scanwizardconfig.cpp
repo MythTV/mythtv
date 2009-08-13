@@ -143,6 +143,8 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
         case CardUtil::QAM:
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBC));
+            addSelection(tr("Full Scan"),
+                         QString::number(FullScan_DVBC));
             addSelection(tr("Import channels.conf"),
                          QString::number(DVBUtilsImport));
             addSelection(tr("Import existing scan"),
@@ -200,6 +202,7 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
                                 false, false, true, true),
     scanType(_scan_type),
     country(new ScanCountry()),
+    network(new ScanNetwork()),
     ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
     paneDVBT(new PaneDVBT()),     paneDVBS(new PaneDVBS()),
     paneDVBS2(new PaneDVBS2()),   paneATSC(new PaneATSC()),
@@ -229,6 +232,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
               paneDVBT);
     addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),
               paneATSC);
+    addTarget(QString::number(ScanTypeSetting::FullScan_DVBC),
+              network);
     addTarget(QString::number(ScanTypeSetting::FullScan_DVBT),
               country);
     addTarget(QString::number(ScanTypeSetting::FullScan_Analog),
@@ -261,42 +266,57 @@ QString ScanOptionalConfig::GetFrequencyStandard(void) const
 {
     int     st =  scanType->getValue().toInt();
 
-    bool    ts0 = (ScanTypeSetting::FullScan_ATSC   == st);
-    bool    ts1 = (ScanTypeSetting::FullScan_Analog == st);
-
-    return (ts0) ? "atsc" : ((ts1) ? "analog" : "dvbt");
+    switch (st)
+    {
+        case ScanTypeSetting::FullScan_ATSC:
+            return "atsc";
+        case ScanTypeSetting::FullScan_DVBC:
+            return "dvbc";
+        case ScanTypeSetting::FullScan_DVBT:
+            return "dvbt";
+        case ScanTypeSetting::FullScan_Analog:
+            return "analog";
+        default:
+            return "unknown";
+    }
 }
 
 QString ScanOptionalConfig::GetModulation(void) const
 {
     int     st =  scanType->getValue().toInt();
 
-    bool    ts0 = (ScanTypeSetting::FullScan_ATSC == st);
-    QString vl0 = paneATSC->GetModulation();
-
-    bool    ts1 = (ScanTypeSetting::FullScan_DVBT == st);
-    QString vl1 = "ofdm";
-
-    bool    ts2 = (ScanTypeSetting::FullScan_Analog == st);
-    QString vl2 = "analog";
-
-    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : "unknown");
+    switch (st)
+    {
+        case ScanTypeSetting::FullScan_ATSC:
+            return paneATSC->GetModulation();
+        case ScanTypeSetting::FullScan_DVBC:
+            return "qam";
+        case ScanTypeSetting::FullScan_DVBT:
+            return "ofdm";
+        case ScanTypeSetting::FullScan_Analog:
+            return "analog";
+        default:
+            return "unknown";
+    }
 }
 
 QString ScanOptionalConfig::GetFrequencyTable(void) const
 {
-    int     st =  scanType->getValue().toInt();
+    int st =  scanType->getValue().toInt();
 
-    bool    ts0 = (ScanTypeSetting::FullScan_ATSC == st);
-    QString vl0 = paneATSC->GetFrequencyTable();
-
-    bool    ts1 = (ScanTypeSetting::FullScan_DVBT == st);
-    QString vl1 = country->getValue();
-
-    bool    ts2 = (ScanTypeSetting::FullScan_Analog == st);
-    QString vl2 = paneAnalog->GetFrequencyTable();
-
-    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : "unknown");
+    switch (st)
+    {
+        case ScanTypeSetting::FullScan_ATSC:
+            return paneATSC->GetFrequencyTable();
+        case ScanTypeSetting::FullScan_DVBC:
+            return network->getValue();
+        case ScanTypeSetting::FullScan_DVBT:
+            return country->getValue();
+        case ScanTypeSetting::FullScan_Analog:
+            return paneAnalog->GetFrequencyTable();
+        default:
+            return "unknown";
+    }
 }
 
 bool ScanOptionalConfig::GetFrequencyTableRange(

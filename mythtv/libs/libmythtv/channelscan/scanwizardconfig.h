@@ -38,6 +38,7 @@ class ScanWizard;
 class VideoSourceSelector;
 class ScanTypeSetting;
 class ScanCountry;
+class ScanNetwork;
 class IgnoreSignalTimeout;
 
 class PaneATSC;
@@ -61,6 +62,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         // Scans that check each frequency in a predefined list
         FullScan_Analog,
         FullScan_ATSC,
+        FullScan_DVBC,
         FullScan_DVBT,
         // Scans starting on one frequency that adds each transport
         // seen in the Network Information Tables to the scan.
@@ -113,6 +115,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
   private:
     ScanTypeSetting      *scanType;
     ScanCountry          *country;
+    ScanNetwork          *network;
     IgnoreSignalTimeout  *ignoreSignalTimeoutAll;
     PaneDVBT             *paneDVBT;
     PaneDVBS             *paneDVBS;
