@@ -151,11 +151,17 @@ bool BackendSelect::Connect(DeviceLocation *dev)
                 m_PIN = MythPopupBox::showPasswordPopup(
                     m_parent, "Backend PIN entry",
                     tr(message.toLatin1().constData()));
+
+                // Use might have cancelled?
+                if (m_PIN.isNull())
+                    break;
+
                 stat = xml->GetConnectionInfo(m_PIN, m_DBparams, message);
             }
             while (stat == UPnPResult_ActionNotAuthorized);
             if (stat == UPnPResult_Success)
                 return true;
+            break;
 
         default:
             VERBOSE(VB_UPNP, "GetConnectionInfo() failed for " + error);
@@ -288,7 +294,7 @@ void BackendSelect::FillListBox(void)
     EntryMap::Iterator  it;
     EntryMap            ourMap;
     DeviceLocation     *pDevLoc;
-    
+
 
     SSDPCacheEntries *pEntries = UPnp::g_SSDPCache.Find(gBackendURI);
 
