@@ -5,6 +5,7 @@ MythVideo database.
 
 from MythDB import *
 from MythLog import *
+from socket import gethostname
 
 log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythVideo')
 
@@ -18,32 +19,100 @@ class MythVideo:
 		"""
 		self.db = MythDB()
 
+	def rtnVideoStorageGroup(self, host=None):
+		'''Get the storage group 'Videos' directory for the suppied host name or default to the localhost.
+		return None if no Videos Storage Group found
+		return dirname field
+		'''
+		if not host: # If a hostname was not supplied then use the local host name
+			host = gethostname()
+
+		# Get storagegroup table field names
+		table_names = self.getTableFieldNames(u'storagegroup')
+
+		cur = self.db.cursor()
+		# Check is there are storage groups for the supplied host or default to the local host
+		try:
+			cur.execute(u"select * from storagegroup")
+		except MySQLdb.Error, e:
+			log.Msg(INFO, u"! Error: Reading storagegroup MythTV table: %d: %s\n" % (e.args[0], e.args[1]))
+			return None
+
+		videos_dir = []
+		while True:
+			data_id = cur.fetchone()
+			if not data_id:
+				break
+			record = {}
+			i = 0
+			for elem in data_id:
+				if table_names[i] == 'groupname' or table_names[i] == 'hostname' or table_names[i] == 'dirname': 
+					record[table_names[i]] = elem
+				i+=1
+			if record['hostname'].lower() == host.lower() and record['groupname'] == u'Videos':
+				# Add a slash if mussing to any storage group dirname
+				if record['dirname'][-1:] == '/': 
+					videos_dir.append(record['dirname'])
+				else:
+					videos_dir.append(record['dirname']+u'/')
+			continue
+		cur.close()
+
+		if not len(videos_dir):
+			return None
+
+		return videos_dir
+	# end getStorageGroups
+
 	def pruneMetadata(self):
 		"""
-		Removes metadata from the database for files that no longer exist.
+		Removes metadata from the database for files that no longer exist. 
+		Respects 'Videos' storage groups and relative paths.
 		"""
+		host = gethostname() # Pruning can only be done for local files therefore the local host forced
+		host = host.lower() # Required as videometadata stores lowercase hostname unlike other db tables
+		vid_sg = self.rtnVideoStorageGroup(host) # Get the 'Videos' storage groups directory for a host
+
 		c = self.db.cursor()
-		c.execute("""
-				SELECT intid, filename
+		c.execute(u"""
+				SELECT intid, filename, host
 				FROM videometadata""")
 
-		row = c.fetchone()
-		while row is not None:
+		while True:
+			row = c.fetchone()
+			if not row:
+				break
 			intid = row[0]
 			filename = row[1]
-			if not os.path.exists(filename):
-				log.Msg(INFO, '%s not exist, removing metadata...', filename)
+			hostname = row[2]
+			filename_array = []
+			if vid_sg == None: # If no 'Videos' storagegroups process only filenames with an absolute path
+				if filename[0] != u'/':  # Skip any video filenames with relative path
+					continue
+				filename_array.append(filename)
+			else:   # If this localhost has a 'Videos' storagegroup process only filenames
+					# with a relative path and belongs to this localhost
+				if filename[0] == u'/': 
+					continue
+				if hostname != host: 
+					continue
+				for sg in vid_sg: # Handle multiple Videos SGs for one backend
+					filename_array.append(sg+filename) # Make an absolute path from a SG and relative path
+			for filename in filename_array:
+				if os.path.exists(filename): # Handle multiple Videos SGs for one backend
+					break
+			else:
+				log.Msg(INFO, u'%s not exist, removing metadata...', filename)
 				c2 = self.db.cursor()
-				c2.execute("""DELETE FROM videometadata WHERE intid = %s""", (intid,))
+				c2.execute(u"""DELETE FROM videometadata WHERE intid = %s""", (intid,))
 				c2.close()
 				#Some additional cleanup
 				#Remove cross-references in cast, country, genres
 				self.cleanGenres(intid)
 				self.cleanCountry(intid)
 				self.cleanCast(intid)
-				
-			row = c.fetchone()
 		c.close()
+
 
 	def getGenreId(self, genre_name):
 		"""
@@ -74,7 +143,7 @@ class MythVideo:
 
 		If the cast does not exist, insert it and return its id.
 		"""
-		return self.setFieldId('cast', cast_name)
+		return self.getFieldId('cast', cast_name)
 
 	def setCast(self, cast_name, idvideo):
 		"""
@@ -85,16 +154,21 @@ class MythVideo:
 
 		return self.setField('cast', cast_name, idvideo)
 
-	def getMetadataId(self, videopath):
+	def getMetadataId(self, videopath, host=None):
 		"""
-		Insert the idvideo file in given cast list if it does already exist.
-		Cast will be created if it doesn't exist return its id.
+		Finds the MythVideo metadata id for the given video path from the MythDB, if any. 
+		Returns None if no metadata was found.
 		"""
+		mysqlcommand = u'SELECT intid FROM videometadata WHERE filename=%s'
+		if host != None and videopath[0] != '/': 
+			mysqlcommand+=u' AND host=%s'
+		else:
+			host = None
 		c = self.db.cursor()
-		c.execute("""
-				SELECT intid
-				FROM videometadata
-				WHERE filename = %s""", (videopath,))
+		if host:
+			c.execute(mysqlcommand, (videopath, host))
+		else:
+			c.execute(mysqlcommand, (videopath,))
 		row = c.fetchone()
 		c.close()
 
@@ -103,10 +177,11 @@ class MythVideo:
 		else:
 			return None
 
-	def getTitleId(self, title, subtitle=None, season=None, episode=None, array=False):
+	def getTitleId(self, title, subtitle=None, season=None, episode=None, array=False, host=None):
 		"""
 		Finds the MythVideo metadata id for the given Title from the MythDB, if any.
-		Searches can be more specific if additional fields are supplied.
+		Searches consider storage groups if a host is supplied
+		Searches can be more specific if additional fields supplied.
 		If array is True return an array of intid's for the record(s) matching the search criteria.
 		Without the array option a search with multiple matches will return a random result if more
 		than one match was found. Non-array	return results are only supported for backward compatibilty
@@ -114,6 +189,15 @@ class MythVideo:
 		
 		Returns None if no metadata was found.
 		"""
+		if host: # Get the 'Videos' storage groups directory for a host
+			if self.rtnVideoStorageGroup(host):
+				# Required as videometadata stores lowercase hostname unlike other db tables
+				host2 = host.lower() 
+			else:
+				host2 = None # If there is no storage group for a specific host then host is irrelevant
+		else:
+			host2 = None
+
 		tablenames = self.getTableFieldNames('videometadata')
 
 		mysqlcommand = u"SELECT intid FROM videometadata WHERE title = %s"
@@ -122,13 +206,18 @@ class MythVideo:
 		# Make sure all the additional query fields are actually in the videometadata schema
 		if subtitle and 'subtitle' in tablenames: 
 			mysqlcommand+=u" AND subtitle=%s" % subtitle
-		if not season == None and 'season' in tablenames: 
+		if season != None and 'season' in tablenames: 
 			mysqlcommand+=u" AND season=%d" % int(season)
-		if not episode == None and 'episode' in tablenames: 
+		if episode != None and 'episode' in tablenames: 
 			mysqlcommand+=u" AND episode=%d" % int(episode)
+		if host2 != None and 'host' in tablenames:
+			mysqlcommand+=u" AND host=%s"
 
 		c = self.db.cursor()
-		c.execute(mysqlcommand, (title,))
+		if host2 != None:
+			c.execute(mysqlcommand, (title, host2))
+		else:
+			c.execute(mysqlcommand, (title,))
 		intids=[]
 		while True:
 			row = c.fetchone()
@@ -147,28 +236,24 @@ class MythVideo:
 		else:
 			return None
 
-	def hasMetadata(self, videopath):
+	def hasMetadata(self, videopath, host=None):
 		"""
 		Determines if the given videopath has any metadata in the DB
 
 		Returns False if no metadata was found.
 		"""
-		c = self.db.cursor()
-		c.execute("""
-				SELECT category, year
-				FROM videometadata
-				WHERE filename = %s""", (videopath,))
-		row = c.fetchone()
-		c.close()
-
-		if row is not None:
-			# If category is 0 and year is 1895, we can safely assume no metadata
-			if (row[0] == 0) and (row[1] == 1895):
-				return False
-			else:
-				return True
-		else:
+		intid = self.getMetadataId(videopath, host)
+		if not intid:
 			return False
+		metadata = self.getMetadataDictionary(intid)
+		if not metadata:
+			return False
+
+		if (metadata['category'] == 0) and (metadata['year'] == 1895):
+			return False
+		else:
+			return True
+
 
 	def getMetadata(self, id):
 		"""
