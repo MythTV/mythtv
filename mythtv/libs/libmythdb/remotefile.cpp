@@ -186,6 +186,9 @@ bool RemoteFile::DeleteFile(void)
     QString filename = qurl.path();
     QString sgroup   = qurl.userName();
 
+    if (!qurl.fragment().isEmpty() || path.right(1) == "#")
+        filename = filename + "#" + qurl.fragment();
+
     if (filename.left(1) == "/")
         filename = filename.right(filename.length()-1);
 
