@@ -38,7 +38,7 @@ MythCDROM* MythCDROM::get(QObject* par, const char* devicePath,
 #elif CONFIG_DARWIN
     return GetMythCDROMDarwin(par, devicePath, SuperMount, AllowEject);
 #else
-    return NULL;
+    return new MythCDROM(par, devicePath, SuperMount, AllowEject);
 #endif
 }
 
