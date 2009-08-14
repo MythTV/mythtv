@@ -2657,7 +2657,9 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
             ChangeFilter();
         else if (action == "MENU")
         {
-            if (!m_menuPopup)
+            MythUIButtonListItem *item = GetItemCurrent();
+            MythGenericTree *node = GetNodePtrFromButton(item);
+            if (!m_menuPopup && node && node->getInt() >= 0)
                 VideoMenu();
         }
         else if (action == "DOWNLOADDATA")
