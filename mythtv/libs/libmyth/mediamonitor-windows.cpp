@@ -52,15 +52,11 @@ MediaMonitorWindows::MediaMonitorWindows(QObject* par,
 
         // We store the volume name to improve
         // user activities like ChooseAndEjectMedia().
-        char volumeName[256];
-        if (GetVolumeNameForVolumeMountPoint(
-                driveName, volumeName, sizeof(volumeName)))
+        char volumeName[MAX_PATH];
+        if (GetVolumeInformation(driveName, volumeName, MAX_PATH,
+                                 NULL, NULL, NULL, NULL, NULL))
         {
             media->setVolumeID(volumeName);
-        }
-        else
-        {
-            media->setVolumeID(driveName);
         }
 
         AddDevice(media);
