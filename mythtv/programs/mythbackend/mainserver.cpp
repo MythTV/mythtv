@@ -3833,7 +3833,6 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
     int fd = -1;
     off_t size = 0;
-    bool errmsg = false;
 
     // This will open the file and unlink the dir entry.  The actual file
     // data will be deleted in the truncate thread spawned below.
