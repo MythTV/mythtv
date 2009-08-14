@@ -375,7 +375,8 @@ void MythUIButtonTree::RemoveItem(MythUIButtonListItem *item, bool deleteNode)
     {
         if (m_currentDepth > 1)
             m_currentDepth--;
-        SwitchList(false);
+        else if (m_activeListID > 1)
+            m_activeListID--;
         SetTreeState(true);
     }
 }
@@ -462,6 +463,8 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
     MythUIButtonList *list = item->parent();
     QString name = list->objectName();
 
+    // New list is automatically selected so we just need to deselect the old
+    // list
     if (m_activeList)
         m_activeList->Deselect();
     m_activeListID = name.section(' ',2,2).toInt();
