@@ -647,7 +647,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
         m_titleState->DisplayState(m_menumode);
     }
 
-    m_selection = "";
+    m_selection.clear();
     return true;
 }
 

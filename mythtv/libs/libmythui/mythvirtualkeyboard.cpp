@@ -249,12 +249,11 @@ void MythUIVirtualKeyboard::loadKeyDefinitions(const QString &lang)
 
 void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
 {
-    QString name = "", type = "";
-    QString left = "", right = "", up = "", down = "";
-    QString normal = "", shift = "", alt = "", altshift = "";
+    QString left, right, up, down;
+    QString normal, shift, alt, altshift;
 
-    name = element.attribute("name");
-    type = element.attribute("type");
+    QString name = element.attribute("name");
+    QString type = element.attribute("type");
 
     QDomNode n = element.firstChild();
     while(!n.isNull()) 
