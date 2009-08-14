@@ -1739,7 +1739,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     if (pginfo->recgroup != "LiveTV")
         ScheduledRecording::signalChange(0);
 
-    if (slowDeletes && fd != -1)
+    if (slowDeletes && fd >= 0)
         TruncateAndClose(pginfo.get(), fd, ds->filename, size);
 }
 
@@ -1886,7 +1886,7 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
  *  large file and then eventually delete the file by closing the file
  *  descriptor.
  *
- *  \return fd for success, negative number for error.
+ *  \return fd for success, -1 for error, -2 for only a symlink deleted.
  */
 int MainServer::DeleteFile(const QString &filename, bool followLinks)
 {
@@ -1920,7 +1920,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
     {
         err = unlink(fname.constData());
         if (err == 0)
-            return -1; // no error
+            return -2; // valid result, not an error condition
     }
 
     if (fd < 0)
@@ -3842,10 +3842,7 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
     size = info.size();
     fd = DeleteFile(fullfile, followLinks);
 
-    if (fd < 0)
-        errmsg = true;
-
-    if (errmsg)
+    if ((fd < 0) && checkFile.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("Error deleting file: %1.")
                 .arg(fullfile));
@@ -3863,19 +3860,23 @@ bool MainServer::HandleDeleteFile(QString filename, QString storagegroup,
         SendResponse(pbs->getSocket(), retlist);
     }
 
-    // Thread off the actual file delete
-    DeleteStruct *ds = new DeleteStruct;
-    ds->ms = this;
-    ds->filename = fullfile;
-    ds->fd = fd;
-    ds->size = size;
+    // DeleteFile() opened up a file for us to delete
+    if (fd >= 0)
+    {
+        // Thread off the actual file delete
+        DeleteStruct *ds = new DeleteStruct;
+        ds->ms = this;
+        ds->filename = fullfile;
+        ds->fd = fd;
+        ds->size = size;
 
-    pthread_t truncateThread;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&truncateThread, &attr, SpawnTruncateThread, ds);
-    pthread_attr_destroy(&attr);
+        pthread_t truncateThread;
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+        pthread_create(&truncateThread, &attr, SpawnTruncateThread, ds);
+        pthread_attr_destroy(&attr);
+    }
 
     return true;
 }
