@@ -352,6 +352,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     }
 
     // recording group stuff
+    m_recGroupIdx = -1;
     m_recGroupType.clear();
     m_recGroupType[m_recGroup] = (displayCat) ? "category" : "recgroup";
     if (m_groupnameAsAllProg)
@@ -1454,6 +1455,39 @@ bool PlaybackBox::FillList(bool useCachedData)
     if (m_progLists["livetv"].size() > 0)
         m_titleList << tr("LiveTV");
     m_titleList << sortedList.values();
+
+    // Populate list of recording groups
+    if (m_progCache)
+    {
+        QMutexLocker locker(&m_recGroupsLock);
+        QString name;
+
+        m_recGroups.clear();
+        m_recGroupIdx = -1;
+
+        m_recGroups.append("All Programs");
+
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("SELECT distinct recgroup from recorded WHERE "
+                      "deletepending = 0 ORDER BY recgroup");
+        if (query.exec())
+        {
+            while (query.next())
+            {
+                name = query.value(0).toString();
+                if (name != "Deleted" && name != "LiveTV")
+                {
+                    m_recGroups.append(name);
+                    m_recGroupType[name] = "recgroup";
+                }
+            }
+
+            m_recGroupIdx = m_recGroups.indexOf(m_recGroup);
+            if (m_recGroupIdx < 0)
+                m_recGroupIdx = 0;
+        }
+    }
 
     updateGroupList();
     updateUsage();
@@ -3238,6 +3272,36 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         {
             m_viewMask = m_viewMaskToggle(m_viewMask, VIEW_TITLES);
             m_connected = FillList(true);
+        }
+        else if (action == "PAGERIGHT")
+        {
+            QString nextGroup;
+            m_recGroupsLock.lock();
+            if (m_recGroupIdx >= 0 && !m_recGroups.empty())
+            {
+                if (++m_recGroupIdx >= m_recGroups.size())
+                    m_recGroupIdx = 0;
+                nextGroup = m_recGroups[m_recGroupIdx];
+            }
+            m_recGroupsLock.unlock();
+
+            if (!nextGroup.isEmpty())
+                displayRecGroup(nextGroup);
+        }
+        else if (action == "PAGELEFT")
+        {
+            QString nextGroup;
+            m_recGroupsLock.lock();
+            if (m_recGroupIdx >= 0 && !m_recGroups.empty())
+            {
+                if (--m_recGroupIdx < 0)
+                    m_recGroupIdx = m_recGroups.size() - 1;
+                nextGroup = m_recGroups[m_recGroupIdx];
+            }
+            m_recGroupsLock.unlock();
+
+            if (!nextGroup.isEmpty())
+                displayRecGroup(nextGroup);
         }
         else if (action == "CHANGERECGROUP")
             showGroupFilter();

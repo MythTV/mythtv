@@ -390,6 +390,10 @@ class PlaybackBox : public MythScreenType
     int                 m_progsInDB;  ///< total number of recordings in DB
     bool                m_isFilling;
 
+    QStringList         m_recGroups;
+    mutable QMutex      m_recGroupsLock;
+    int                 m_recGroupIdx;
+
     // Other state
     /// Program currently selected for deletion
     ProgramInfo *m_delItem;
