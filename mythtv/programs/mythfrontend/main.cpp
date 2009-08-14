@@ -1455,7 +1455,11 @@ int main(int argc, char **argv)
     }
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
+    {
+        if (networkControl)
+            delete networkControl;
         return FRONTEND_EXIT_NO_THEME;
+    }
 
     // Setup handler for USR1 signals to reload theme
     signal(SIGUSR1, &signal_USR1_handler);

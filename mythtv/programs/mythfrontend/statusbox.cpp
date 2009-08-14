@@ -783,6 +783,7 @@ void StatusBox::doTunerStatus()
             status += "\n";
             status += proginfo->subtitle;
             longtuner = tun.arg(cardid).arg(devlabel).arg(status);
+            delete proginfo;
         }
 
         AddLogLine(shorttuner, longtuner, fontstate);
