@@ -78,6 +78,9 @@ namespace
             case 6:
                 browse = VideoDialog::BRS_USERRATING;
                 break;
+            case 7:
+                browse = VideoDialog::BRS_INSERTDATE;
+                break;
             default:
                 browse = VideoDialog::BRS_FOLDER;
                 break;

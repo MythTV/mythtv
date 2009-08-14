@@ -67,6 +67,7 @@ class Metadata
              int length = 0,
              int season = 0,
              int episode = 0, 
+             const QDate &insertdate = QDate(),
              int id = 0,
              ParentalLevel::Level showlevel = ParentalLevel::plLowest,
              int categoryID = 0,
@@ -124,6 +125,9 @@ class Metadata
 
     int GetEpisode() const;
     void SetEpisode(int episode);
+
+    QDate GetInsertdate() const;
+    void SetInsertdate(QDate date);
 
     unsigned int GetID() const;
     void SetID(int id);

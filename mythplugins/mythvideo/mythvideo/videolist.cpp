@@ -633,7 +633,8 @@ class VideoListImp
     enum metadata_list_type { ltNone, ltFileSystem, ltDBMetadata,
                               ltDBGenreGroup, ltDBCategoryGroup,
                               ltDBYearGroup, ltDBDirectorGroup,
-                              ltDBCastGroup, ltDBUserRatingGroup};
+                              ltDBCastGroup, ltDBUserRatingGroup,
+                              ltDBInsertDateGroup};
     typedef MetadataListManager::metadata_list metadata_list;
     typedef MetadataListManager::MetadataPtr MetadataPtr;
 
@@ -943,6 +944,10 @@ void VideoListImp::refreshList(bool filebrowser,
                     fillMetadata(ltDBUserRatingGroup);
                     VERBOSE(VB_IMPORTANT,QString("Using User Rating Mode"));
                     break;
+                case 7:
+                    fillMetadata(ltDBInsertDateGroup);
+                    VERBOSE(VB_IMPORTANT,QString("Using Insert Date Mode"));
+                    break;
             } 
         } 
         else 
@@ -993,6 +998,7 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
             case ltDBDirectorGroup:
             case ltDBCastGroup:
             case ltDBUserRatingGroup:
+            case ltDBInsertDateGroup:
                 buildGroupList(whence); 
                 break; 
             case ltNone: 
@@ -1078,6 +1084,11 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             {
                 int i = data->GetUserRating();
                 groups.push_back(QString::number(i));
+            }
+            case ltDBInsertDateGroup:
+            {
+                QDate date = data->GetInsertdate();
+                groups.push_back(date.toString(gContext->GetSetting("DateFormat")));
             }
             default: 
             { 

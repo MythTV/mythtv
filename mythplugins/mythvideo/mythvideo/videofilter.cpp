@@ -5,6 +5,7 @@
 #include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuitextedit.h>
 
 #include "globals.h"
 #include "videolist.h"
@@ -76,7 +77,10 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
     userrating(kUserRatingFilterAll), browse(kBrowseFilterAll),
     watched(kWatchedFilterAll), m_inetref(kInetRefFilterAll), 
     m_coverfile(kCoverFileFilterAll), orderby(kOrderByTitle), 
-    m_parental_level(ParentalLevel::plNone), m_changed_state(0)
+    m_parental_level(ParentalLevel::plNone), textfilter(""),
+    season(-1), episode(-1), insertdate(QDate()),
+    re_season("(\\d+)[xX](\\d*)"), re_date("-(\\d+)([dmw])"),
+    m_changed_state(0)
 {
     if (_prefix.isEmpty())
         prefix = "VideoDefault";
@@ -204,6 +208,23 @@ VideoFilterSettings::operator=(const VideoFilterSettings &rhs)
         m_parental_level = rhs.m_parental_level;
     }
 
+    if (textfilter != rhs.textfilter)
+    {
+    	textfilter = rhs.textfilter;
+    	m_changed_state |= kFilterTextFilterChanged;
+    }
+    if (season != rhs.season || episode != rhs.episode)
+    {
+    	season = rhs.season;
+    	episode = rhs.episode;
+    	m_changed_state |= kFilterTextFilterChanged;
+    }
+    if (insertdate != rhs.insertdate)
+    {
+    	insertdate = rhs.insertdate;
+    	m_changed_state |= kFilterTextFilterChanged;
+    }
+
     return *this;
 }
 
@@ -221,13 +242,30 @@ void VideoFilterSettings::saveAsDefault()
     gContext->SaveSetting(QString("%1InetRef").arg(prefix), m_inetref);
     gContext->SaveSetting(QString("%1CoverFile").arg(prefix), m_coverfile);
     gContext->SaveSetting(QString("%1Orderby").arg(prefix), orderby);
+    gContext->SaveSetting(QString("%1Filter").arg(prefix), textfilter);
 }
 
 bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 {
     bool matches = true;
 
-    if (genre != kGenreFilterAll)
+    //textfilter
+    if (!textfilter.isEmpty())
+    {
+    	matches = false;
+    	matches = matches || mdata.GetTitle().contains(textfilter, Qt::CaseInsensitive);
+    	matches = matches || mdata.GetSubtitle().contains(textfilter, Qt::CaseInsensitive);
+    	matches = matches || mdata.GetPlot().contains(textfilter, Qt::CaseInsensitive);
+    }
+    //search for season with optionally episode nr.
+    if (matches && season != -1) {
+    	matches = season == mdata.GetSeason();
+    	matches = matches && (episode == -1 || episode == mdata.GetEpisode());
+    }
+    if (matches && insertdate.isValid()) {
+    	matches = mdata.GetInsertdate().isValid() && mdata.GetInsertdate() >= insertdate;
+    }
+    if (matches && genre != kGenreFilterAll)
     {
         matches = false;
 
@@ -442,6 +480,57 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
     return ret;
 }
 
+void VideoFilterSettings::setTextFilter(QString val)
+{
+	m_changed_state |= kFilterTextFilterChanged;
+	if (re_season.indexIn(val) != -1)
+	{
+		bool res;
+		QStringList list = re_season.capturedTexts();
+		season = list[1].toInt(&res);
+		if (!res)
+			season = -1;
+		if (list.size() > 2) {
+			episode = list[2].toInt(&res);
+			if (!res)
+				episode = -1;
+		}
+		else {
+			episode = -1;
+		}
+		//clear \dX\d from string for string-search in plot/title/subtitle
+		textfilter = val;
+		textfilter.replace(re_season, "");
+		textfilter = textfilter.simplified ();
+	}
+	else
+	{
+		textfilter = val;
+		season = -1;
+		episode = -1;
+	}
+	if (re_date.indexIn(textfilter) != -1)
+	{
+		QStringList list = re_date.capturedTexts();
+		int modnr = list[1].toInt();
+		QDate testdate = QDate::currentDate();
+		switch(list[2].at(0).toAscii())
+		{
+			case 'm': testdate = testdate.addMonths(-modnr);break;
+			case 'd': testdate = testdate.addDays(-modnr);break;
+			case 'w': testdate = testdate.addDays(-modnr * 7);break;
+		}
+		insertdate = testdate;
+		textfilter.replace(re_date, "");
+		textfilter = textfilter.simplified ();
+	}
+	else
+	{
+		//reset testdate
+		insertdate = QDate();
+	}
+}
+
 /////////////////////////////////
 // VideoFilterDialog
 /////////////////////////////////
@@ -450,7 +539,8 @@ VideoFilterDialog::VideoFilterDialog(MythScreenStack *lparent, QString lname,
     m_browseList(0), m_watchedList(0), m_orderbyList(0), m_yearList(0),
     m_userratingList(0), m_categoryList(0), m_countryList(0), m_genreList(0),
     m_castList(0), m_runtimeList(0), m_inetrefList(0), m_coverfileList(0),
-    m_saveButton(0), m_doneButton(0), m_numvideosText(0), m_videoList(*video_list)
+    m_saveButton(0), m_doneButton(0), m_numvideosText(0), m_textfilter(0),
+    m_videoList(*video_list)
 {
     m_fsp = new BasicFilterSettingsProxy<VideoList>(*video_list);
     m_settings = m_fsp->getSettings();
@@ -467,6 +557,7 @@ bool VideoFilterDialog::Create()
         return false;
 
     bool err = false;
+    UIUtilE::Assign(this, m_textfilter, "textfilter_input", &err);
     UIUtilE::Assign(this, m_yearList, "year_select", &err);
     UIUtilE::Assign(this, m_userratingList, "userrating_select", &err);
     UIUtilE::Assign(this, m_categoryList, "category_select", &err);
@@ -521,6 +612,8 @@ bool VideoFilterDialog::Create()
             SLOT(SetCoverFile(MythUIButtonListItem*)));
     connect(m_orderbyList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(setOrderby(MythUIButtonListItem*)));
+    connect(m_textfilter, SIGNAL(valueChanged()),
+    		SLOT(setTextFilter()));
 
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(saveAsDefault()));
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(saveAndExit()));
@@ -723,6 +816,9 @@ void VideoFilterDialog::fillWidgets()
     new MythUIButtonListItem(m_orderbyList, QObject::tr("Video ID"),
                            VideoFilterSettings::kOrderByID);
     m_orderbyList->SetValueByData(m_settings.getOrderby());
+
+    // Text Filter
+    m_textfilter->SetText(m_settings.getTextFilter());
 }
 
 void VideoFilterDialog::saveAsDefault()
@@ -812,4 +908,10 @@ void VideoFilterDialog::setOrderby(MythUIButtonListItem *item)
     m_settings
             .setOrderby((VideoFilterSettings::ordering)item->GetData().toInt());
     update_numvideo();
+}
+
+void VideoFilterDialog::setTextFilter()
+{
+	m_settings.setTextFilter(m_textfilter->GetText());
+	update_numvideo();
 }

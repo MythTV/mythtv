@@ -31,7 +31,8 @@ class VideoFilterSettings
         kFilterCoverFileChanged = (1 << 9),
         kFilterParentalLevelChanged = (1 << 10),
         kFilterCastChanged = (1 << 11),
-        kFilterWatchedChanged = (1 << 12)
+        kFilterWatchedChanged = (1 << 12),
+        kFilterTextFilterChanged = (1 << 13)
     };
 
   public:
@@ -129,6 +130,9 @@ class VideoFilterSettings
         orderby = lorderby;
     }
 
+    QString getTextFilter() const { return textfilter; }
+    void setTextFilter(QString val);
+
     ParentalLevel::Level getParentalLevel() const { return m_parental_level; }
     void setParentalLevel(ParentalLevel::Level parental_level)
     {
@@ -172,6 +176,13 @@ class VideoFilterSettings
     ordering orderby;
     ParentalLevel::Level m_parental_level;
     QString prefix;
+    QString textfilter;
+    int season;
+    int episode;
+    QDate insertdate;
+    QRegExp re_season;
+    QRegExp re_date;
+
 
     unsigned int m_changed_state;
 };
@@ -233,6 +244,7 @@ class VideoFilterDialog : public MythScreenType
     void SetInetRef(MythUIButtonListItem *item);
     void SetCoverFile(MythUIButtonListItem *item);
     void setOrderby(MythUIButtonListItem *item);
+    void setTextFilter();
 
  private:
     void fillWidgets();
@@ -254,6 +266,7 @@ class VideoFilterDialog : public MythScreenType
     MythUIButton    *m_saveButton;
     MythUIButton    *m_doneButton;
     MythUIText      *m_numvideosText;
+    MythUITextEdit	*m_textfilter;
 
     const VideoList &m_videoList;
     FilterSettingsProxy *m_fsp;

@@ -274,6 +274,7 @@ class VideoScannerThread : public QThread
                                  VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT, 0,
                                  Metadata::FilenameToMeta(p->first, 2).toInt(), 
                                  Metadata::FilenameToMeta(p->first, 3).toInt(), 
+                                 QDate::currentDate(),
                                  0, ParentalLevel::plLowest);
 
                 VERBOSE(VB_GENERAL, QString("Adding : %1 : %2")

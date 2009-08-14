@@ -1527,6 +1527,8 @@ namespace
                     QString::number((int)(metadata->GetUserRating()));
             tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
 
+            tmp["insertdate"] = metadata->GetInsertdate()
+                                     .toString(gContext->GetSetting("DateFormat"));
             tmp["inetref"] = metadata->GetInetRef();
             tmp["child_id"] = QString::number(metadata->GetChildID());
             tmp["browseable"] = GetDisplayBrowse(metadata->GetBrowse());
@@ -1588,6 +1590,7 @@ namespace
         h.handleText("year");
         h.handleText("userrating");
 
+        h.handleText("insertdate");
         h.handleText("inetref");
         h.handleText("child_id");
         h.handleText("browseable");
@@ -2070,6 +2073,9 @@ bool VideoDialog::Create()
         case BRS_USERRATING:
             m_d->m_groupType = 6;
             break;
+        case BRS_INSERTDATE:
+            m_d->m_groupType = 7;
+            break; 
         case BRS_FOLDER:
         default:
             m_d->m_groupType = 0;
@@ -3008,6 +3014,22 @@ void VideoDialog::MetadataBrowseMenu()
 
     if (m_d->m_isGroupList)
     {
+       if (m_d->m_groupType != 5)
+           m_menuPopup->AddButton(tr("Cast"),
+                     SLOT(SwitchVideoCastGroup()));
+
+       if (m_d->m_groupType != 2)
+           m_menuPopup->AddButton(tr("Category"),
+                     SLOT(SwitchVideoCategoryGroup()));
+
+       if (m_d->m_groupType != 7)
+           m_menuPopup->AddButton(tr("Date Added"),
+                     SLOT(SwitchVideoInsertDateGroup()));
+
+       if (m_d->m_groupType != 4)  
+           m_menuPopup->AddButton(tr("Director"),
+                     SLOT(SwitchVideoDirectorGroup()));
+
        if (m_d->m_groupType != 0)
            m_menuPopup->AddButton(tr("Folder"),
                     SLOT(SwitchVideoFolderGroup()));
@@ -3016,25 +3038,13 @@ void VideoDialog::MetadataBrowseMenu()
            m_menuPopup->AddButton(tr("Genre"),
                      SLOT(SwitchVideoGenreGroup()));
 
-       if (m_d->m_groupType != 2)
-           m_menuPopup->AddButton(tr("Category"),
-                     SLOT(SwitchVideoCategoryGroup()));
+       if (m_d->m_groupType != 6)
+           m_menuPopup->AddButton(tr("User Rating"),
+                     SLOT(SwitchVideoUserRatingGroup()));
 
        if (m_d->m_groupType != 3)
            m_menuPopup->AddButton(tr("Year"),
                      SLOT(SwitchVideoYearGroup()));
-
-       if (m_d->m_groupType != 4)
-           m_menuPopup->AddButton(tr("Director"),
-                     SLOT(SwitchVideoDirectorGroup()));
-
-       if (m_d->m_groupType != 5)
-           m_menuPopup->AddButton(tr("Cast"),
-                     SLOT(SwitchVideoCastGroup()));
-
-       if (m_d->m_groupType != 6)
-           m_menuPopup->AddButton(tr("User Rating"),
-                     SLOT(SwitchVideoUserRatingGroup()));
     }
 }
 
@@ -3212,6 +3222,11 @@ void VideoDialog::SwitchVideoCastGroup()
 void VideoDialog::SwitchVideoUserRatingGroup()
 {
    SwitchLayout(m_d->m_type, BRS_USERRATING);
+}
+
+void VideoDialog::SwitchVideoInsertDateGroup()
+{
+   SwitchLayout(m_d->m_type, BRS_INSERTDATE);
 }
 
 void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)

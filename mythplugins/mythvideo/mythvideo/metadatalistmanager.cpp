@@ -116,7 +116,7 @@ void MetadataListManager::loadAllFromDatabase(metadata_list &items)
         "userrating, length, filename, showlevel, "
         "coverfile, inetref, childid, browse, watched, playcommand, "
         "category, intid, trailer, screenshot, banner, fanart, "
-        "subtitle, season, episode, host FROM videometadata");
+        "subtitle, season, episode, host, insertdate FROM videometadata");
 
     query.prepare(BaseMetadataQuery);
 

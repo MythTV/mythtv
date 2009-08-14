@@ -96,7 +96,7 @@ class MetadataImp
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
              const QString &rating, int length,
-             int season, int episode,
+             int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
              int childID, bool browse, bool watched,
              const QString &playcommand, const QString &category,
@@ -112,7 +112,7 @@ class MetadataImp
         m_screenshot(screenshot), m_banner(banner), m_fanart(fanart),
         m_host(host), m_categoryID(categoryID), m_childID(childID),
         m_year(year), m_length(length), m_season(season),
-        m_episode(episode), m_showlevel(showlevel),
+        m_episode(episode), m_insertdate(insertdate), m_showlevel(showlevel),
         m_browse(browse), m_watched(watched), m_id(id), 
         m_userrating(userrating)
     {
@@ -157,6 +157,7 @@ class MetadataImp
             m_length = rhs.m_length;
             m_season = rhs.m_season;
             m_episode = rhs.m_episode;
+            m_insertdate = rhs.m_insertdate;
             m_showlevel = rhs.m_showlevel;
             m_browse = rhs.m_browse;
             m_watched = rhs.m_watched;
@@ -268,6 +269,9 @@ class MetadataImp
     int GetEpisode() const { return m_episode; }
     void SetEpisode(int episode) { m_episode = episode; }
 
+    QDate GetInsertdate() const { return m_insertdate;}
+    void SetInsertdate(QDate date) { m_insertdate = date;}
+
     ParentalLevel::Level GetShowLevel() const { return m_showlevel; }
     void SetShowLevel(ParentalLevel::Level showLevel)
     {
@@ -335,6 +339,7 @@ class MetadataImp
     int m_length;
     int m_season;
     int m_episode;
+    QDate m_insertdate;
     ParentalLevel::Level m_showlevel;
     bool m_browse;
     bool m_watched;
@@ -424,7 +429,7 @@ void MetadataImp::Reset()
                     VIDEO_PLOT_DEFAULT, 0.0,
                     VIDEO_RATING_DEFAULT, 0, 
                     Metadata::FilenameToMeta(m_filename, 2).toInt(), 
-                    Metadata::FilenameToMeta(m_filename, 3).toInt(), m_id,
+                    Metadata::FilenameToMeta(m_filename, 3).toInt(), QDate(), m_id,
                     ParentalLevel::plLowest, 0, -1, true, false, "", "",
                     Metadata::genre_list(), Metadata::country_list(),
                     Metadata::cast_list(), m_host);
@@ -527,6 +532,7 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_season = query.value(22).toInt();
     m_episode = query.value(23).toInt();
     m_host = query.value(24).toString();
+    m_insertdate = query.value(25).toDate();
 
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
@@ -923,7 +929,7 @@ Metadata::Metadata(const QString &filename, const QString &trailer,
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
              const QString &rating, int length,
-             int season, int episode,
+             int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
              int childID, bool browse, bool watched,
              const QString &playcommand, const QString &category,
@@ -934,7 +940,7 @@ Metadata::Metadata(const QString &filename, const QString &trailer,
 {
     m_imp = new MetadataImp(filename, trailer, coverfile, screenshot, banner,
                             fanart, title, subtitle, year, inetref, director, plot,
-                            userrating, rating, length, season, episode, id, 
+                            userrating, rating, length, season, episode, insertdate, id, 
                             showlevel, categoryID, childID, browse, watched, 
                             playcommand, category, genres, countries, cast, host);
 }
@@ -1097,6 +1103,16 @@ int Metadata::GetEpisode() const
 void Metadata::SetEpisode(int episode)
 {
     m_imp->SetEpisode(episode);
+}
+
+QDate Metadata::GetInsertdate() const
+{
+	return m_imp->GetInsertdate();
+}
+
+void Metadata::SetInsertdate(QDate date)
+{
+	m_imp->SetInsertdate(date);
 }
 
 unsigned int Metadata::GetID() const
