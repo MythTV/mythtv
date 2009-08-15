@@ -508,7 +508,7 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
             ShowMenu();
         else if (action == "EDIT")
-            ShowEditDialog();
+            ShowEditDialog(true);
         else if (action == "DELETE")
             deleteNewsSite();
         else if (action == "ESCAPE")
