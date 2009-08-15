@@ -886,7 +886,12 @@ bool MythThemedMenu::checkPinCode(const QString &password_setting)
     QString timestamp_setting = QString("%1Time").arg(password_setting);
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = GetMythDB()->GetSetting(timestamp_setting);
+    QString password = GetMythDB()->GetSetting(password_setting);
 
+    // Password empty? Then skip asking for it
+    if (password.isEmpty())
+        return true;
+    
     if (last_time_stamp.length() < 1)
     {
         VERBOSE(VB_IMPORTANT,
