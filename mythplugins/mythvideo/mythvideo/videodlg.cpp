@@ -2155,6 +2155,10 @@ bool VideoDialog::Create()
     return true;
 }
 
+/** \fn VideoDialog::refreshData()
+ *  \brief Reloads the tree without invalidating the data.
+ *  \return void.
+ */
 void VideoDialog::refreshData()
 {
     fetchVideos();
@@ -2167,12 +2171,20 @@ void VideoDialog::refreshData()
         m_novideoText->SetVisible(!m_d->m_treeLoaded);
 }
 
+/** \fn VideoDialog::reloadData()
+ *  \brief Reloads the tree after having invalidated the data.
+ *  \return void.                   
+ */
 void VideoDialog::reloadData()
 {
     m_d->m_treeLoaded = false;
     refreshData();
 }
 
+/** \fn VideoDialog::loadData()
+ *  \brief load the data used to build the ButtonTree/List for MythVideo.
+ *  \return void.                   
+ */
 void VideoDialog::loadData()
 {
     if (m_d->m_type == DLG_TREE)
@@ -2222,6 +2234,10 @@ void VideoDialog::loadData()
     UpdatePosition();
 }
 
+/** \fn VideoDialog::UpdateItem(MythUIButtonListItem *item)
+ *  \brief Update the visible representation of a MythUIButtonListItem.
+ *  \return void.                   
+ */
 void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 {
     if (!item)
@@ -2263,6 +2279,10 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         UpdateText(item);
 }
 
+/** \fn VideoDialog::fetchVideos()
+ *  \brief Build the buttonlist/tree.
+ *  \return void.
+ */
 void VideoDialog::fetchVideos()
 {
     MythGenericTree *oldroot = m_d->m_rootNode;
@@ -2300,6 +2320,10 @@ void VideoDialog::fetchVideos()
         SetCurrentNode(m_d->m_rootNode);
 }
 
+/** \fn VideoDialog::RemoteImageCheck(QString host, QString filename)
+ *  \brief Search for a given (image) filename in the Video SG. 
+ *  \return A QString of the full myth:// URL to a matching image.
+ */
 QString VideoDialog::RemoteImageCheck(QString host, QString filename)
 {
     QString result = "";
@@ -2347,6 +2371,10 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
     return result;
 }
 
+/** \fn VideoDialog::GetImageFromFolder(Metadata *metadata)
+ *  \brief Attempt to find/fallback a cover image for a given metadata item.
+ *  \return QString local or myth:// for the first found cover file.
+ */
 QString VideoDialog::GetImageFromFolder(Metadata *metadata)
 {
     QString icon_file;
@@ -2479,6 +2507,10 @@ QString VideoDialog::GetImageFromFolder(Metadata *metadata)
     return icon_file;
 }
 
+/** \fn VideoDialog::GetCoverImage(MythGenericTree *node)
+ *  \brief A "hunt" for cover art to apply for a folder item..
+ *  \return QString local or myth:// for the first found cover file.
+ */
 QString VideoDialog::GetCoverImage(MythGenericTree *node)
 {
     int nodeInt = node->getInt();
@@ -2681,6 +2713,10 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
     return icon_file;
 }
 
+/** \fn VideoDialog::GetScreenshot(MythGenericTree *node)
+ *  \brief Find the Screenshot for a given node.
+ *  \return QString local or myth:// for the screenshot.
+ */
 QString VideoDialog::GetScreenshot(MythGenericTree *node)
 {
     const int nodeInt = node->getInt();
@@ -2716,6 +2752,10 @@ QString VideoDialog::GetScreenshot(MythGenericTree *node)
     return icon_file;
 }
 
+/** \fn VideoDialog::GetBanner(MythGenericTree *node)
+ *  \brief Find the Banner for a given node.
+ *  \return QString local or myth:// for the banner.
+ */
 QString VideoDialog::GetBanner(MythGenericTree *node)
 {
     const int nodeInt = node->getInt();
@@ -2745,6 +2785,10 @@ QString VideoDialog::GetBanner(MythGenericTree *node)
     return icon_file;
 }
 
+/** \fn VideoDialog::GetFanart(MythGenericTree *node)
+ *  \brief Find the Fanart for a given node.
+ *  \return QString local or myth:// for the fanart.
+ */
 QString VideoDialog::GetFanart(MythGenericTree *node)
 {
     const int nodeInt = node->getInt();
@@ -2774,6 +2818,10 @@ QString VideoDialog::GetFanart(MythGenericTree *node)
     return icon_file;
 }
 
+/** \fn VideoDialog::keyPressEvent(QKeyEvent *levent)
+ *  \brief Handle keypresses and keybindings.
+ *  \return true if the keypress was successfully handled.
+ */
 bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 {
     if (GetFocusWidget()->keyPressEvent(levent))
@@ -2858,6 +2906,10 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
     return handled;
 }
 
+/** \fn VideoDialog::createBusyDialog(QString title)
+ *  \brief Create a busy dialog, used during metadata search, etc.
+ *  \return void.
+ */
 void VideoDialog::createBusyDialog(QString title)
 {
     if (m_busyPopup)
@@ -2872,6 +2924,10 @@ void VideoDialog::createBusyDialog(QString title)
         m_popupStack->AddScreen(m_busyPopup);
 }
 
+/** \fn VideoDialog::createOkDialog(QString title)
+ *  \brief Create a MythUI "OK" Dialog.
+ *  \return void.
+ */
 void VideoDialog::createOkDialog(QString title)
 {
     QString message = title;
@@ -2883,6 +2939,10 @@ void VideoDialog::createOkDialog(QString title)
         m_popupStack->AddScreen(okPopup);
 }
 
+/** \fn VideoDialog::searchComplet(QString string)
+ *  \brief After using incremental search, move to the selected item.
+ *  \return void.
+ */
 void VideoDialog::searchComplete(QString string)
 {
     VERBOSE(VB_GENERAL | VB_EXTRA,
@@ -2905,6 +2965,10 @@ void VideoDialog::searchComplete(QString string)
     }
 }
 
+/** \fn VideoDialog::searchStart(void)
+ *  \brief Create an incremental search dialog for the current tree level.
+ *  \return void.
+ */
 void VideoDialog::searchStart(void)
 {
     MythGenericTree *parent = m_d->m_currentNode->getParent();
@@ -2939,6 +3003,10 @@ void VideoDialog::searchStart(void)
         delete searchDialog;
 }
 
+/** \fn VideoDialog::goBack()
+ *  \brief Move one level up in the tree.
+ *  \return true if successfully moved upwards.
+ */
 bool VideoDialog::goBack()
 {
     bool handled = false;
@@ -2959,6 +3027,10 @@ bool VideoDialog::goBack()
     return handled;
 }
 
+/** \fn VideoDialog::SetCurrentNode(MythGenericTree *node)
+ *  \brief Switch to a given MythGenericTree node.
+ *  \return void.
+ */
 void VideoDialog::SetCurrentNode(MythGenericTree *node)
 {
     if (!node)
@@ -2967,6 +3039,10 @@ void VideoDialog::SetCurrentNode(MythGenericTree *node)
     m_d->m_currentNode = node;
 }
 
+/** \fn VideoDialog::UpdatePosition()
+ *  \brief Update the "x of y" textarea to curent position.
+ *  \return void.
+ */
 void VideoDialog::UpdatePosition()
 {
     MythUIButtonListItem *ci = GetItemCurrent();
@@ -2980,6 +3056,10 @@ void VideoDialog::UpdatePosition()
             .arg(currentList->GetCount()));
 }
 
+/** \fn VideoDialog::UpdateText(MythUIButtonListItem *item)
+ *  \brief Update the visible text values for a given ButtonListItem.
+ *  \return void.
+ */
 void VideoDialog::UpdateText(MythUIButtonListItem *item)
 {
     if (!item)
@@ -3011,6 +3091,10 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
         node->becomeSelectedChild();
 }
 
+/** \fn VideoDialog::VideoMenu()
+ *  \brief Pop up a MythUI "Main Menu" for MythVideo.  Bound to MENU.
+ *  \return void.
+ */
 void VideoDialog::VideoMenu()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3048,6 +3132,11 @@ void VideoDialog::VideoMenu()
     m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
 }
 
+/** \fn VideoDialog::PlayMenu()
+ *  \brief Pop up a MythUI "Play Menu" for MythVideo.  Appears if multiple play 
+ *         options exist.
+ *  \return void.
+ */
 void VideoDialog::PlayMenu()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3081,6 +3170,10 @@ void VideoDialog::PlayMenu()
     }
 }
 
+/** \fn VideoDialog::DisplayMenu()
+ *  \brief Pop up a MythUI Menu for MythVideo Global Functions.  Bound to INFO.
+ *  \return void.
+ */
 void VideoDialog::DisplayMenu()
 {
     QString label = tr("Video Display Menu");
@@ -3116,6 +3209,10 @@ void VideoDialog::DisplayMenu()
                                                     SLOT(ToggleFlatView()));
 }
 
+/** \fn VideoDialog::ViewMenu()
+ *  \brief Pop up a MythUI Menu for MythVideo Views.
+ *  \return void.
+ */
 void VideoDialog::ViewMenu()
 {
     QString label = tr("Change View");
@@ -3143,6 +3240,10 @@ void VideoDialog::ViewMenu()
                 SLOT(SwitchManager()));
 }
 
+/** \fn VideoDialog::MetadataBrowseMenu()
+ *  \brief Pop up a MythUI Menu for MythVideo Metadata Browse modes.
+ *  \return void.
+ */
 void VideoDialog::MetadataBrowseMenu()
 {
     QString label = tr("Browse By");
@@ -3190,6 +3291,10 @@ void VideoDialog::MetadataBrowseMenu()
     }
 }
 
+/** \fn VideoDialog::InfoMenu()
+ *  \brief Pop up a MythUI Menu for Info pertaining to the selected item.
+ *  \return void.
+ */
 void VideoDialog::InfoMenu()
 {
     QString label = tr("Video Info");
@@ -3211,6 +3316,10 @@ void VideoDialog::InfoMenu()
         m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
 }
 
+/** \fn VideoDialog::VideoOptionMenu()
+ *  \brief Pop up a MythUI Menu to toggle watched/browseable.
+ *  \return void.
+ */
 void VideoDialog::VideoOptionMenu()
 {
     QString label = tr("Video Options");
@@ -3235,6 +3344,10 @@ void VideoDialog::VideoOptionMenu()
         m_menuPopup->AddButton(tr("Mark as Browseable"), SLOT(ToggleBrowseable()));
 }
 
+/** \fn VideoDialog::ManageMenu()
+ *  \brief Pop up a MythUI Menu for metadata management.
+ *  \return void.
+ */
 void VideoDialog::ManageMenu()
 {
     QString label = tr("Manage Metadata");
@@ -3259,6 +3372,10 @@ void VideoDialog::ManageMenu()
     m_menuPopup->AddButton(tr("Reset Metadata"), SLOT(ResetMetadata()));
 }
 
+/** \fn VideoDialog::ToggleBrowseMode()
+ *  \brief Toggle the browseable status for the selected item.
+ *  \return void.
+ */
 void VideoDialog::ToggleBrowseMode()
 {
     m_d->m_isFileBrowser = !m_d->m_isFileBrowser;
@@ -3267,6 +3384,10 @@ void VideoDialog::ToggleBrowseMode()
     reloadData();
 }
 
+/** \fn VideoDialog::ToggleFlatView()
+ *  \brief Toggle Flat View.
+ *  \return void.
+ */
 void VideoDialog::ToggleFlatView()
 {
     m_d->m_isFlatList = !m_d->m_isFlatList;
@@ -3278,12 +3399,20 @@ void VideoDialog::ToggleFlatView()
     reloadData();
 }
 
+/** \fn VideoDialog::handleDirSelect(MythGenericTree *node)
+ *  \brief Descend into a selected folder.
+ *  \return void.
+ */
 void VideoDialog::handleDirSelect(MythGenericTree *node)
 {
     SetCurrentNode(node);
     loadData();
 }
 
+/** \fn VideoDialog::handleSelect(MythUIButtonListItem *item)
+ *  \brief Handle SELECT action for a given MythUIButtonListItem.
+ *  \return void.
+ */
 void VideoDialog::handleSelect(MythUIButtonListItem *item)
 {
     MythGenericTree *node = GetNodePtrFromButton(item);
@@ -3311,66 +3440,118 @@ void VideoDialog::handleSelect(MythUIButtonListItem *item)
     };
 }
 
+/** \fn VideoDialog::SwitchTree()
+ *  \brief Switch to Tree (List) View.
+ *  \return void.
+ */
 void VideoDialog::SwitchTree()
 {
     SwitchLayout(DLG_TREE, m_d->m_browse);
 }
 
+/** \fn VideoDialog::SwitchGallery()
+ *  \brief Switch to Gallery View.
+ *  \return void.
+ */
 void VideoDialog::SwitchGallery()
 {
     SwitchLayout(DLG_GALLERY, m_d->m_browse);
 }
 
+/** \fn VideoDialog::SwitchBrowse()
+ *  \brief Switch to Browser View.
+ *  \return void.
+ */
 void VideoDialog::SwitchBrowse()
 {
     SwitchLayout(DLG_BROWSER, m_d->m_browse);
 }
 
+/** \fn VideoDialog::SwitchManager()
+ *  \brief Switch to Video Manager View.
+ *  \return void.
+ */
 void VideoDialog::SwitchManager()
 {
     SwitchLayout(DLG_MANAGER, m_d->m_browse);
 }
 
+/** \fn VideoDialog::SwitchVideoFolderGroup()
+ *  \brief Switch to Folder (filesystem) browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoFolderGroup() 
 { 
     SwitchLayout(m_d->m_type, BRS_FOLDER);
 } 
 
+/** \fn VideoDialog::SwitchVideoGenreGroup()
+ *  \brief Switch to Genre browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoGenreGroup() 
 {
     SwitchLayout(m_d->m_type, BRS_GENRE);
 } 
 
+/** \fn VideoDialog::SwitchVideoCategoryGroup()
+ *  \brief Switch to Category browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoCategoryGroup() 
 { 
    SwitchLayout(m_d->m_type, BRS_CATEGORY);
 }
 
+/** \fn VideoDialog::SwitchVideoYearGroup()
+ *  \brief Switch to Year browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoYearGroup()
 {
    SwitchLayout(m_d->m_type, BRS_YEAR);
 }
 
+/** \fn VideoDialog::SwitchVideoDirectoryGroup()
+ *  \brief Switch to Director browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoDirectorGroup()
 {
    SwitchLayout(m_d->m_type, BRS_DIRECTOR);
 }
 
+/** \fn VideoDialog::SwitchVideoCastGroup()
+ *  \brief Switch to Cast browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoCastGroup()
 {
    SwitchLayout(m_d->m_type, BRS_CAST);
 }
 
+/** \fn VideoDialog::SwitchVideoUserRatingGroup()
+ *  \brief Switch to User Rating browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoUserRatingGroup()
 {
    SwitchLayout(m_d->m_type, BRS_USERRATING);
 }
 
+/** \fn VideoDialog::SwitchVideoInsertDateGroup()
+ *  \brief Switch to Insert Date browse mode.
+ *  \return void.
+ */
 void VideoDialog::SwitchVideoInsertDateGroup()
 {
    SwitchLayout(m_d->m_type, BRS_INSERTDATE);
 }
 
+/** \fn VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
+ *  \brief Handle a layout or browse mode switch.
+ *  \return void.
+ */
 void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
 {
     m_d->m_switchingLayout = true;
@@ -3401,6 +3582,10 @@ void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
     }
 }
 
+/** \fn VideoDialog::ViewPlot()
+ *  \brief Display a MythUI Popup with the selected item's plot.
+ *  \return void.
+ */
 void VideoDialog::ViewPlot()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3411,6 +3596,10 @@ void VideoDialog::ViewPlot()
         m_popupStack->AddScreen(plotdialog);
 }
 
+/** \fn VideoDialog::DoItemDetailShow()
+ *  \brief Display the Item Detail Popup.
+ *  \return true if popup was created
+ */
 bool VideoDialog::DoItemDetailShow()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3431,6 +3620,10 @@ bool VideoDialog::DoItemDetailShow()
     return false;
 }
 
+/** \fn VideoDialog::ShowCastDialog()
+ *  \brief Display the Cast if the selected item.
+ *  \return void.
+ */
 void VideoDialog::ShowCastDialog()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3441,6 +3634,10 @@ void VideoDialog::ShowCastDialog()
         m_popupStack->AddScreen(castdialog);
 }
 
+/** \fn VideoDialog::playVideo()
+ *  \brief Play the selected item.
+ *  \return void.
+ */
 void VideoDialog::playVideo()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3488,6 +3685,10 @@ namespace
     }
 }
 
+/** \fn VideoDialog::playVideoWithTrailers()
+ *  \brief Play the selected item w/ a User selectable # of trailers.
+ *  \return void.
+ */
 void VideoDialog::playVideoWithTrailers()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3517,6 +3718,10 @@ void VideoDialog::playVideoWithTrailers()
     PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
 }
 
+/** \fn VideoDialog::playTrailer()
+ *  \brief Play the trailer associated with the selected item.
+ *  \return void.
+ */
 void VideoDialog::playTrailer()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
@@ -3532,17 +3737,29 @@ void VideoDialog::playTrailer()
     VideoPlayerCommand::PlayerFor(url).Play();
 }
 
+/** \fn VideoDialog::setParentalLevel(const ParentalLevel::Level &level)
+ *  \brief Set the parental level for the library.
+ *  \return void.                    
+ */
 void VideoDialog::setParentalLevel(const ParentalLevel::Level &level)
 {
     m_d->m_parentalLevel.SetLevel(level);
 }
 
+/** \fn VideoDialog::shiftParental(int amount)
+ *  \brief Shift the parental level for the library by an integer amount.
+ *  \return void.
+ */
 void VideoDialog::shiftParental(int amount)
 {
     setParentalLevel(ParentalLevel(m_d->m_parentalLevel.GetLevel()
                     .GetLevel() + amount).GetLevel());
 }
 
+/** \fn VideoDialog::ChangeFilter()
+ *  \brief Change the filtering of the library.
+ *  \return void.
+ */
 void VideoDialog::ChangeFilter()
 {
     MythScreenStack *mainStack = GetScreenStack();
@@ -3556,6 +3773,10 @@ void VideoDialog::ChangeFilter()
     connect(filterdialog, SIGNAL(filterChanged()), SLOT(reloadData()));
 }
 
+/** \fn VideoDialog::GetMetadata(MythUIButtonListItem *item)
+ *  \brief Retrieve the Database Metadata for a given MythUIButtonListItem.
+ *  \return a Metadata object containing the item's videometadata record.
+ */
 Metadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
 {
     Metadata *metadata = NULL;
