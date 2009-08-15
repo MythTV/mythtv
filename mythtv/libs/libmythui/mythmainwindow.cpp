@@ -351,6 +351,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
     RegisterKey("Global", "ESCAPE", "Escape", "Esc");
     RegisterKey("Global", "MENU", "Pop-up menu", "M");
     RegisterKey("Global", "INFO", "More information", "I");
+    RegisterKey("Global", "DELETE", "Delete", "D");
+    RegisterKey("Global", "EDIT", "Edit", "E");
 
     RegisterKey("Global", "PAGEUP", "Page Up", "PgUp");
     RegisterKey("Global", "PAGEDOWN", "Page Down", "PgDown");
