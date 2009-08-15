@@ -219,6 +219,7 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     void outputLEDs();
 
   private:
+    bool startLCDServer(void);
     void sendToServer(const QString &someText);
     void init();
     void handleKeyPress(QString key);
