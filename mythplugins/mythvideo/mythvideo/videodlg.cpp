@@ -2241,6 +2241,14 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     if (!imgFilename.isEmpty() &&
        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
         item->SetImage(imgFilename);
+    else if (metadata)
+    {
+        imgFilename = GetImageFromFolder(metadata);
+
+        if (!imgFilename.isEmpty() &&
+           (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+            item->SetImage(imgFilename);
+    }
 
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
@@ -2337,6 +2345,133 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
     }
 
     return result;
+}
+
+QString VideoDialog::GetImageFromFolder(Metadata *metadata)
+{
+    QString icon_file;
+    QString host = metadata->GetHost();
+    QFileInfo fullpath(metadata->GetFilename());
+    QDir dir = fullpath.dir();
+    QString prefix = QDir::cleanPath(dir.path());
+
+    QString filename = QString("%1/folder").arg(prefix);
+
+    QStringList test_files;
+    test_files.append(filename + ".png");
+    test_files.append(filename + ".jpg");
+    test_files.append(filename + ".gif");
+    bool foundCover;
+
+    for (QStringList::const_iterator tfp = test_files.begin();
+            tfp != test_files.end(); ++tfp)
+    {
+        QString imagePath = *tfp;
+        foundCover = false;
+        if (!host.isEmpty())
+        {
+            // Strip out any extra /'s
+            imagePath.replace("//", "/");
+            prefix.replace("//","/");
+            imagePath = imagePath.right(imagePath.length() - (prefix.length() + 1));
+            QString tmpCover = RemoteImageCheck(host, imagePath);
+
+            if (!tmpCover.isEmpty())
+            {
+                foundCover = true;
+                imagePath = tmpCover;
+            }
+        }
+        else
+            foundCover = QFile::exists(imagePath);
+
+        if (foundCover)
+        {
+            icon_file = imagePath;
+            return icon_file;
+        }
+    }
+
+    // If we found nothing, load the first image we find
+    if (icon_file.isEmpty())
+    {
+        QStringList imageTypes;
+        imageTypes.append("*.png");
+        imageTypes.append("*.jpg");
+        imageTypes.append("*.gif");
+
+        QStringList fList;
+
+        if (!host.isEmpty())
+        {
+            // TODO: This can likely get a little cleaner
+
+            QStringList dirs = GetVideoDirsByHost(host);
+
+            if (dirs.size() > 0)
+            {
+                for (QStringList::const_iterator iter = dirs.begin();
+                     iter != dirs.end(); ++iter)
+                {
+                    QUrl sgurl = *iter;
+                    QString path = sgurl.path();
+
+                    QString subdir = prefix;
+
+                    path = path + "/" + subdir;
+                    QStringList tmpList;
+                    bool ok = GetRemoteFileList(host, path, &tmpList, "Videos");
+
+                    if (ok)
+                    {
+                        for (QStringList::const_iterator pattern = imageTypes.begin();
+                             pattern != imageTypes.end(); ++pattern)
+                        {
+                            QRegExp rx(*pattern);
+                            rx.setPatternSyntax(QRegExp::Wildcard);
+                            QStringList matches = tmpList.filter(rx);
+                            if (matches.size() > 0)
+                            {
+                                fList.clear();
+                                fList.append(subdir + "/" + matches.at(0).split("::").at(1));
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            QDir vidDir(prefix);
+            vidDir.setNameFilters(imageTypes);
+            fList = vidDir.entryList();
+        }
+        if (!fList.isEmpty())
+        {
+            if (host.isEmpty())
+                icon_file = QString("%1/%2")
+                                .arg(prefix)
+                                .arg(fList.at(0));
+            else
+                icon_file = GenRemoteFileURL("Videos", host, fList.at(0));
+        }
+    }
+
+    if (!icon_file.isEmpty())
+        VERBOSE(VB_GENERAL, QString("Found Image : %1 :")
+                                    .arg(icon_file));
+    else
+        VERBOSE(VB_GENERAL,
+                QString("Could not find cover Image : %1 ")
+                    .arg(prefix));
+
+    if (IsDefaultCoverFile(icon_file))
+        icon_file.clear();
+
+    return icon_file;
 }
 
 QString VideoDialog::GetCoverImage(MythGenericTree *node)
