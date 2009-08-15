@@ -379,7 +379,6 @@ void setupKeys(void)
     REG_JUMP("Scan music",             "", "", runScan);
     REG_JUMPEX("Show Music Miniplayer","", "", showMiniPlayer, false);
 
-    REG_KEY("Music", "DELETE",     "Delete track from playlist", "D");
     REG_KEY("Music", "NEXTTRACK",  "Move to the next track",     ">,.,Z,End");
     REG_KEY("Music", "PREVTRACK",  "Move to the previous track", ",,<,Q,Home");
     REG_KEY("Music", "FFWD",       "Fast forward",               "PgDown");

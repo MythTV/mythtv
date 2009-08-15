@@ -33,7 +33,6 @@ void setupKeys()
     REG_KEY("Weather", "SEARCH", "Search List", "/");
     REG_KEY("Weather", "NEXTSEARCH", "Search List", "n");
     REG_KEY("Weather", "UPDATE", "Search List", "u");
-    REG_KEY("Weather", "DELETE", "Delete screen from list", "D");
 }
 
 int mythplugin_init(const char *libversion)

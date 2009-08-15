@@ -107,7 +107,6 @@ void setupKeys(void)
     REG_JUMP("Netflix History", "View Netflix History", "", history);
 
     REG_KEY("NetFlix", "MOVETOTOP", "Moves movie to top of queue", "1");
-    REG_KEY("NetFlix", "REMOVE", "Removes movie from queue", "D");
 
     //REG_JUMP("MythFlix", "NetFlix", "", runNews);
 

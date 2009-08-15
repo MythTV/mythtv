@@ -251,7 +251,7 @@ bool MythFlixQueue::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "REMOVE")
+        if (action == "DELETE")
              slotRemoveFromQueue();
         else if (action == "MOVETOTOP")
              slotMoveToTop();
