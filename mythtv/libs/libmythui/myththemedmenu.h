@@ -107,7 +107,7 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
     bool findDepends(const QString &fileList);
     QString findMenuFile(const QString &menuname);
 
-    void checkPinCode(const QString &password_setting);
+    bool checkPinCode(const QString &password_setting);
 
     MythThemedMenu *m_parent;
 

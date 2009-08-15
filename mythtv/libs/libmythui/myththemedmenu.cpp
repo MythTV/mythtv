@@ -771,15 +771,13 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
 bool MythThemedMenu::handleAction(const QString &action, const QString &password)
 {
     MythUIMenuCallbacks *cbs = GetMythUI()->GetMenuCBs();
-
-    VERBOSE(VB_IMPORTANT, QString("Password: %1").arg(password));
     
     if (!password.isEmpty() ||
         ((password == "SetupPinCode") &&
          GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0)))
     {
-        checkPinCode(password);
-        return true;
+        if (!checkPinCode(password))
+            return true;
     }
 
     if (action.left(5) == "EXEC ")
@@ -883,12 +881,11 @@ bool MythThemedMenu::findDepends(const QString &fileList)
  *  \param text              the message text to be displayed
  *  \return true if password checks out or is not needed.
  */
-void MythThemedMenu::checkPinCode(const QString &password_setting)
+bool MythThemedMenu::checkPinCode(const QString &password_setting)
 {
     QString timestamp_setting = QString("%1Time").arg(password_setting);
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = GetMythDB()->GetSetting(timestamp_setting);
-    QString password = GetMythDB()->GetSetting(password_setting);
 
     if (last_time_stamp.length() < 1)
     {
@@ -905,9 +902,11 @@ void MythThemedMenu::checkPinCode(const QString &password_setting)
             last_time_stamp = curr_time.toString(Qt::TextDate);
             GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
             GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
-            return;
+            return true;
         }
     }
+    
+    VERBOSE(VB_GENERAL, QString("Using Password: %1").arg(password_setting));
 
     QString text = tr("Enter password:");
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
@@ -921,4 +920,6 @@ void MythThemedMenu::checkPinCode(const QString &password_setting)
     }
     else
         delete dialog;
+
+    return false;
 }
