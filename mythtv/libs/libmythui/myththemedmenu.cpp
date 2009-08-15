@@ -772,9 +772,9 @@ bool MythThemedMenu::handleAction(const QString &action, const QString &password
 {
     MythUIMenuCallbacks *cbs = GetMythUI()->GetMenuCBs();
     
-    if (!password.isEmpty() ||
-        ((password == "SetupPinCode") &&
-         GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0)))
+    if (((password == "SetupPinCode") &&
+         GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0)) ||
+         (!password.isEmpty() && password != "SetupPinCode"))
     {
         if (!checkPinCode(password))
             return true;
