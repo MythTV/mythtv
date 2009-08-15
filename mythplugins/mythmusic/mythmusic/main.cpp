@@ -20,6 +20,7 @@
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/compat.h>
 #include <mythtv/libmythui/mythuihelper.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
 
 // MythMusic headers
 #include "decoder.h"
@@ -214,10 +215,17 @@ void RebuildMusicTree(void)
     if (!gMusicData->all_music || !gMusicData->all_playlists)
         return;
 
-    MythBusyDialog *busy = new MythBusyDialog(
-        QObject::tr("Rebuilding music tree"));
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    QString message = QObject::tr("Rebuilding music tree");
+    
+    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
+                                                  "musicscanbusydialog");
+                                                  
+    if (busy->Create())
+        popupStack->AddScreen(busy, false);
+    else
+        busy = NULL;
 
-    busy->start();
     gMusicData->all_music->startLoading();
     while (!gMusicData->all_music->doneLoading())
     {
@@ -225,8 +233,9 @@ void RebuildMusicTree(void)
         usleep(50000);
     }
     gMusicData->all_playlists->postLoad();
-    busy->Close();
-    busy->deleteLater();
+    
+    if (busy)
+        busy->Close();
 }
 
 static void postMusic(void);
@@ -255,6 +264,7 @@ void MusicCallback(void *data, QString &selection)
             FileScanner *fscan = new FileScanner();
             fscan->SearchDir(gMusicData->startdir);
             RebuildMusicTree();
+            delete fscan;
         }
     }
     else if (sel == "music_set_general")
@@ -470,6 +480,7 @@ static void preMusic()
     {
         FileScanner *fscan = new FileScanner();
         fscan->SearchDir(startdir);
+        delete fscan;
     }
 
     QString paths = gContext->GetSetting("TreeLevels");
@@ -587,6 +598,7 @@ void runScan(void)
         FileScanner *fscan = new FileScanner();
         fscan->SearchDir(gMusicData->startdir);
         RebuildMusicTree();
+        delete fscan;
     }
 
     postMusic();
