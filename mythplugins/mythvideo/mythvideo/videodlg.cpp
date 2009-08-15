@@ -2392,10 +2392,14 @@ QString VideoDialog::GetImageFromFolder(Metadata *metadata)
         }
     }
 
-    // If we found nothing, load the first image we find
+    // If we found nothing, load something that matches the title.
+    // If that fails, load anything we find.
     if (icon_file.isEmpty())
     {
         QStringList imageTypes;
+        imageTypes.append(metadata->GetTitle() + ".png");
+        imageTypes.append(metadata->GetTitle() + ".jpg");
+        imageTypes.append(metadata->GetTitle() + ".gif");
         imageTypes.append("*.png");
         imageTypes.append("*.jpg");
         imageTypes.append("*.gif");
@@ -2449,6 +2453,7 @@ QString VideoDialog::GetImageFromFolder(Metadata *metadata)
             vidDir.setNameFilters(imageTypes);
             fList = vidDir.entryList();
         }
+
         if (!fList.isEmpty())
         {
             if (host.isEmpty())
