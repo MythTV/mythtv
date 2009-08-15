@@ -409,14 +409,12 @@ void MythThemedMenu::customEvent(QEvent *event)
                     break;
             }
         }
-
-        if (resultid == "popmenu_noexit")
+        else if (resultid == "popmenu_noexit")
         {
             if (buttonnum == 0)
                 aboutScreen();
         }
-
-        if (resultid == "popmenu_reboot")
+        else if (resultid == "popmenu_reboot")
         {
             switch (buttonnum)
             {
@@ -429,8 +427,7 @@ void MythThemedMenu::customEvent(QEvent *event)
                     break;
             }
         }
-
-        if (resultid == "popmenu_shutdown")
+        else if (resultid == "popmenu_shutdown")
         {
             switch (buttonnum)
             {
@@ -441,6 +438,22 @@ void MythThemedMenu::customEvent(QEvent *event)
                 case 1:
                     aboutScreen();
                     break;
+            }
+        }
+        else if (resultid == "password")
+        {
+            QString text = dce->GetResultText();
+            MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+            ThemedButton button = item->GetData().value<ThemedButton>();
+            QString password = GetMythDB()->GetSetting(button.password);
+            if (text == password)
+            {
+                QString timestamp_setting = QString("%1Time").arg(button.password);
+                QDateTime curr_time = QDateTime::currentDateTime();
+                QString last_time_stamp = curr_time.toString(Qt::TextDate);
+                GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
+                GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
+                buttonAction(item, true);
             }
         }
 
@@ -460,6 +473,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
     QStringList action;
     QString alttext;
     QString description;
+    QString password;
 
     bool addit = true;
 
@@ -532,6 +546,10 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             {
                 description = getFirstText(info);
             }
+            else if (info.tagName() == "password")
+            {
+                password = getFirstText(info);
+            }
             else
             {
                 VERBOSE(VB_GENERAL, QString("MythThemedMenu: Unknown tag %1 "
@@ -553,7 +571,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
     }
 
     if (addit)
-        addButton(type, text, alttext, action, description);
+        addButton(type, text, alttext, action, description, password);
 }
 
 /** \brief Parse the themebuttons to be added based on the name of
@@ -661,15 +679,17 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
  *  \param action  actions to be associated with button
  */
 void MythThemedMenu::addButton(const QString &type, const QString &text,
-                                      const QString &alttext,
-                                      const QStringList &action,
-                                      const QString &description)
+                                const QString &alttext,
+                                const QStringList &action,
+                                const QString &description,
+                                const QString &password)
 {
     ThemedButton newbutton;
     newbutton.type = type;
     newbutton.action = action;
     newbutton.text = text;
     newbutton.description = description;
+    newbutton.password = password;
 
     if (m_watermarkState)
         m_watermarkState->EnsureStateLoaded(type);
@@ -682,14 +702,18 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
     listbuttonitem->SetText(description, "description");
 }
 
-void MythThemedMenu::buttonAction(MythUIButtonListItem *item)
+void MythThemedMenu::buttonAction(MythUIButtonListItem *item, bool skipPass)
 {
     ThemedButton button = item->GetData().value<ThemedButton>();
+
+    QString password;
+    if (!skipPass)
+        password = button.password;
 
     QStringList::Iterator it = button.action.begin();
     for (; it != button.action.end(); it++)
     {
-        if (handleAction(*it))
+        if (handleAction(*it, password))
             break;
     }
 }
@@ -744,9 +768,19 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
  *  \param action single action to be handled
  *  \return true if the action is not to EXEC another program
  */
-bool MythThemedMenu::handleAction(const QString &action)
+bool MythThemedMenu::handleAction(const QString &action, const QString &password)
 {
     MythUIMenuCallbacks *cbs = GetMythUI()->GetMenuCBs();
+
+    VERBOSE(VB_IMPORTANT, QString("Password: %1").arg(password));
+    
+    if (!password.isEmpty() ||
+        ((password == "SetupPinCode") &&
+         GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0)))
+    {
+        checkPinCode(password);
+        return true;
+    }
 
     if (action.left(5) == "EXEC ")
     {
@@ -765,13 +799,6 @@ bool MythThemedMenu::handleAction(const QString &action)
     else if (action.left(5) == "MENU ")
     {
         QString menu = action.right(action.length() - 5);
-
-        if (menu == "main_settings.xml" &&
-            GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0) &&
-            !checkPinCode("SetupPinCodeTime", "SetupPinCode", "Setup Pin:"))
-        {
-            return true;
-        }
 
         MythScreenStack *stack = GetScreenStack();
 
@@ -856,16 +883,12 @@ bool MythThemedMenu::findDepends(const QString &fileList)
  *  \param text              the message text to be displayed
  *  \return true if password checks out or is not needed.
  */
-bool MythThemedMenu::checkPinCode(const QString &timestamp_setting,
-                                  const QString &password_setting,
-                                  const QString &text)
+void MythThemedMenu::checkPinCode(const QString &password_setting)
 {
+    QString timestamp_setting = QString("%1Time").arg(password_setting);
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = GetMythDB()->GetSetting(timestamp_setting);
     QString password = GetMythDB()->GetSetting(password_setting);
-
-    if (password.length() < 1)
-        return true;
 
     if (last_time_stamp.length() < 1)
     {
@@ -882,28 +905,20 @@ bool MythThemedMenu::checkPinCode(const QString &timestamp_setting,
             last_time_stamp = curr_time.toString(Qt::TextDate);
             GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
             GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
-            return true;
+            return;
         }
     }
 
-    if (password.length() > 0)
+    QString text = tr("Enter password:");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythTextInputDialog *dialog =
+            new MythTextInputDialog(popupStack, text, FilterNone, true);
+
+    if (dialog->Create())
     {
-        bool ok = false;
-        MythUIMenuCallbacks *cbs;
-
-        if ((cbs = GetMythUI()->GetMenuCBs()) && cbs->password_dialog)
-            ok = cbs->password_dialog(text, password);
-
-        if (ok)
-        {
-            last_time_stamp = curr_time.toString(Qt::TextDate);
-            GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
-            GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
-            return true;
-        }
+        dialog->SetReturnEvent(this, "password");
+        popupStack->AddScreen(dialog);
     }
     else
-        return true;
-
-    return false;
+        delete dialog;
 }

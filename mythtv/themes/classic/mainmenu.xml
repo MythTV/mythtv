@@ -306,6 +306,7 @@
         <text lang="RU">Настройки</text>
         <description>Settings for TV, Images, Music, Video, Weather, et c.</description>
         <action>MENU main_settings.xml</action>
+        <password>SetupPinCode</password>
     </button>
 
     <!-- <button>

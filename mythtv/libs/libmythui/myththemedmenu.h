@@ -20,6 +20,7 @@ struct ThemedButton
     QString description;
     MythImage *icon;
     bool active;
+    QString password;
 };
 
 Q_DECLARE_METATYPE(ThemedButton);
@@ -90,7 +91,7 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
 
   private slots:
     void setButtonActive(MythUIButtonListItem* item);
-    void buttonAction(MythUIButtonListItem* item);
+    void buttonAction(MythUIButtonListItem* item, bool skipPass = false);
 
   private:
     void Init(const QString &menufile);
@@ -100,15 +101,13 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
 
     void addButton(const QString &type, const QString &text,
                    const QString &alttext, const QStringList &action,
-                   const QString &description);
+                   const QString &description, const QString &password);
 
-    bool handleAction(const QString &action);
+    bool handleAction(const QString &action, const QString &password = QString());
     bool findDepends(const QString &fileList);
     QString findMenuFile(const QString &menuname);
 
-    bool checkPinCode(const QString &timestamp_setting,
-                      const QString &password_setting,
-                      const QString &text);
+    void checkPinCode(const QString &password_setting);
 
     MythThemedMenu *m_parent;
 

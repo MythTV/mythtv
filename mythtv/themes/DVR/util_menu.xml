@@ -301,6 +301,7 @@
         <text lang="ET">Sätted</text>
         <text lang="RU">Настройки</text>
         <action>MENU main_settings.xml</action>
+        <password>SetupPinCode</password>
     </button>
 
     <!-- <button>
