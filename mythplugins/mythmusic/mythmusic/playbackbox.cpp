@@ -380,6 +380,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 bannerToggle(curMeta);
             else
                 showEditMetadataDialog();
+        else if (action == "EDIT")
+            showEditMetadataDialog();
         else if (action == "ESCAPE" && visualizer_status != 2)
         {
             if (!gPlayer->isPlaying() || m_parent->IsExitingToMain())
