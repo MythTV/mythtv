@@ -132,7 +132,7 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
         {
             showMenu();
         }
-        else if (action == "DELETEITEM")
+        else if (action == "DELETE")
         {
             removeItem();
         }

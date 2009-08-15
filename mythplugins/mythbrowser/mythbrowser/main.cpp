@@ -40,7 +40,6 @@ void setupKeys(void)
 {
     REG_KEY("Browser", "NEXTTAB",   "Move to next browser tab",       "P");
     REG_KEY("Browser", "PREVTAB",   "Move to previous browser tab",   "");
-    REG_KEY("Browser", "DELETETAB", "Delete the current browser tab", "D");
 
     REG_MEDIAPLAYER("WebBrowser", "Internal Web Browser", handleMedia);
 }

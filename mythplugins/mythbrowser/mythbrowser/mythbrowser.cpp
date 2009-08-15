@@ -399,7 +399,7 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
             if (pos < m_pageList->GetCount() - 1)
                m_pageList->SetItemCurrent(++pos);
         }
-        else if (action == "DELETETAB")
+        else if (action == "DELETE")
         {
             slotDeleteTab();
         }

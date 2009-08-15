@@ -83,7 +83,6 @@ void setupKeys(void)
             "PgUp");
     REG_KEY("Gallery", "LOWRIGHT", "Go to the lower-right corner of the image",
             "PgDown");
-    REG_KEY("Gallery", "DELETE", "Delete marked images or current image if none are marked", "D");
     REG_KEY("Gallery", "MARK", "Mark image", "T");
     REG_KEY("Gallery", "FULLSCREEN", "Toggle scale to fullscreen/scale to fit", "W");
     REG_MEDIA_HANDLER("MythGallery Media Handler 1/2", "", "", handleMedia,
