@@ -1,12 +1,14 @@
-#include <qsqldatabase.h>
+
+#include "channeleditor.h"
+
 #include "settings.h"
 #include "mythcontext.h"
 #include "mythdb.h"
-#include "channeleditor.h"
 
+#include <QSqlDatabase>
 #include <QApplication>
 
-#include <mythdialogs.h>
+// #include <mythdialogs.h>
 #include <mythwizard.h>
 
 // MythUI
@@ -48,7 +50,8 @@ ChannelWizard::ChannelWizard(int id, int default_sourceid)
     // add v4l options if no dvb or if dvb and some other card type
     // present
     QString cardtype = getCardtype();
-    if (!hasDVB || cardtypes > 1 || id == 0) {
+    if (!hasDVB || cardtypes > 1 || id == 0)
+    {
         ChannelOptionsV4L* v4l = new ChannelOptionsV4L(*cid);
         addChild(v4l);
     }
@@ -72,7 +75,8 @@ QString ChannelWizard::getCardtype()
     return "";
 }
 
-bool ChannelWizard::cardTypesInclude(const QString& thecardtype) {
+bool ChannelWizard::cardTypesInclude(const QString& thecardtype)
+{
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT count(cardtype)"
         " FROM capturecard, cardinput, channel"
@@ -231,13 +235,9 @@ bool ChannelEditor::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
-        {
             menu();
-        }
         else if (action == "DELETE")
-        {
             del();
-        }
         else
             handled = false;
     }
@@ -341,7 +341,7 @@ void ChannelEditor::fillList(void)
 
             bool sel = (chanid == currentValue);
             selidx = (sel) ? idx : selidx;
-            item = new MythUIButtonListItem(m_channelList, "",
+            item = new MythUIButtonListItem(m_channelList, name,
                                                      qVariantFromValue(chanid));
             item->SetText(compoundname, "compoundname");
             item->SetText(name, "name");
@@ -399,6 +399,29 @@ void ChannelEditor::setHideMode(bool hide)
     }
 }
 
+void ChannelEditor::del()
+{
+    MythUIButtonListItem *item = m_channelList->GetItemCurrent();
+    
+    if (!item)
+        return;
+    
+    QString message = tr("Delete channel '%1'?").arg(item->GetText());
+    
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
+    
+    if (dialog->Create())
+    {
+        dialog->SetData(qVariantFromValue(item));
+        dialog->SetReturnEvent(this, "delsingle");
+        popupStack->AddScreen(dialog);
+    }
+    else
+        delete dialog;
+    
+}
+
 void ChannelEditor::deleteChannels(void)
 {
     const QString currentLabel = m_sourceList->GetValue();
@@ -406,64 +429,21 @@ void ChannelEditor::deleteChannels(void)
     bool del_all = m_sourceFilter == FILTER_ALL;
     bool del_nul = m_sourceFilter == FILTER_UNASSIGNED;
 
-    QString chan_msg =
-        (del_all) ? tr("Are you sure you would like to delete ALL channels?") :
-        ((del_nul) ?
-         tr("Are you sure you would like to delete all unassigned channels?") :
-         tr("Are you sure you would like to delete the channels on %1?")
-         .arg(currentLabel));
-
-    DialogCode val = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), "", chan_msg,
-        tr("Yes, delete the channels"),
-        tr("No, don't"), kDialogCodeButton1);
-
-    if (kDialogCodeButton0 != val)
-        return;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (del_all)
+    QString message =
+        (del_all) ? tr("Delete ALL channels?") :
+        ((del_nul) ? tr("Delete all unassigned channels?") :
+            tr("Delete all channels on %1?").arg(currentLabel));
+    
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
+    
+    if (dialog->Create())
     {
-        query.prepare("TRUNCATE TABLE channel");
-    }
-    else if (del_nul)
-    {
-        query.prepare("SELECT sourceid "
-                      "FROM videosource "
-                      "GROUP BY sourceid");
-
-        if (!query.exec() || !query.isActive())
-        {
-            MythDB::DBError("ChannelEditor Delete Channels", query);
-            return;
-        }
-
-        QString tmp = "";
-        while (query.next())
-            tmp += "'" + query.value(0).toString() + "',";
-
-        if (tmp.isEmpty())
-        {
-            query.prepare("TRUNCATE TABLE channel");
-        }
-        else
-        {
-            tmp = tmp.left(tmp.length() - 1);
-            query.prepare(QString("DELETE FROM channel "
-                                  "WHERE sourceid NOT IN (%1)").arg(tmp));
-        }
+        dialog->SetReturnEvent(this, "delall");
+        popupStack->AddScreen(dialog);
     }
     else
-    {
-        query.prepare("DELETE FROM channel "
-                      "WHERE sourceid = :SOURCEID");
-        query.bindValue(":SOURCEID", m_sourceFilter);
-    }
-
-    if (!query.exec())
-        MythDB::DBError("ChannelEditor Delete Channels", query);
-
-    fillList();
+        delete dialog;
 }
 
 void ChannelEditor::edit(MythUIButtonListItem *item)
@@ -471,38 +451,11 @@ void ChannelEditor::edit(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    m_id = item->GetData().toInt();
-    ChannelWizard cw(m_id, m_sourceFilter);
+    int chanid = item->GetData().toInt();
+    ChannelWizard cw(chanid, m_sourceFilter);
     cw.exec();
 
     fillList();
-}
-
-void ChannelEditor::del()
-{
-    MythUIButtonListItem *item = m_channelList->GetItemCurrent();
-
-    if (!item)
-        return;
-
-    m_id = item->GetData().toInt();
-
-    DialogCode val = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(),
-        "", tr("Are you sure you would like to delete this channel?"),
-        tr("Yes, delete the channel"),
-        tr("No, don't"), kDialogCodeButton1);
-
-    if (kDialogCodeButton0 == val)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM channel WHERE chanid = :CHID ;");
-        query.bindValue(":CHID", m_id);
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError("ChannelEditor Delete Channel", query);
-
-        fillList();
-    }
 }
 
 void ChannelEditor::menu()
@@ -512,8 +465,8 @@ void ChannelEditor::menu()
     if (!item)
         return;
 
-    m_id = item->GetData().toInt();
-    if (m_id == 0)
+    int chanid = item->GetData().toInt();
+    if (chanid == 0)
        edit(item);
     else
     {
@@ -528,6 +481,10 @@ void ChannelEditor::menu()
             menu->SetReturnEvent(this, "channelopts");
 
             menu->AddButton(tr("Edit"));
+//             if ()
+//                 menu->AddButton(tr("Set Hidden"));
+//             else
+//                 menu->AddButton(tr("Set Visible"));
             menu->AddButton(tr("Delete"));
 
             popupStack->AddScreen(menu);
@@ -642,6 +599,74 @@ void ChannelEditor::customEvent(QEvent *event)
                     del();
                     break;
             }
+        }
+        else if (resultid == "delsingle" && buttonnum == 1)
+        {
+            MythUIButtonListItem *item =
+                    qVariantValue<MythUIButtonListItem *>(dce->GetData());
+            if (!item)
+                return;
+            int chanid = item->GetData().toInt();
+            if (chanid > 0)
+            {
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare("DELETE FROM channel WHERE chanid = :CHID ;");
+                query.bindValue(":CHID", chanid);
+                if (!query.exec() || !query.isActive())
+                    MythDB::DBError("ChannelEditor Delete Channel", query);
+
+                m_channelList->RemoveItem(item);
+            }
+            //fillList();
+        }
+        else if (resultid == "delall" && buttonnum == 1)
+        {
+            bool del_all = m_sourceFilter == FILTER_ALL;
+            bool del_nul = m_sourceFilter == FILTER_UNASSIGNED;
+            
+            MSqlQuery query(MSqlQuery::InitCon());
+            if (del_all)
+            {
+                query.prepare("TRUNCATE TABLE channel");
+            }
+            else if (del_nul)
+            {
+                query.prepare("SELECT sourceid "
+                "FROM videosource "
+                "GROUP BY sourceid");
+                
+                if (!query.exec() || !query.isActive())
+                {
+                    MythDB::DBError("ChannelEditor Delete Channels", query);
+                    return;
+                }
+                
+                QString tmp = "";
+                while (query.next())
+                    tmp += "'" + query.value(0).toString() + "',";
+                
+                if (tmp.isEmpty())
+                {
+                    query.prepare("TRUNCATE TABLE channel");
+                }
+                else
+                {
+                    tmp = tmp.left(tmp.length() - 1);
+                    query.prepare(QString("DELETE FROM channel "
+                    "WHERE sourceid NOT IN (%1)").arg(tmp));
+                }
+            }
+            else
+            {
+                query.prepare("DELETE FROM channel "
+                "WHERE sourceid = :SOURCEID");
+                query.bindValue(":SOURCEID", m_sourceFilter);
+            }
+            
+            if (!query.exec())
+                MythDB::DBError("ChannelEditor Delete Channels", query);
+            
+            fillList();
         }
     }
 }

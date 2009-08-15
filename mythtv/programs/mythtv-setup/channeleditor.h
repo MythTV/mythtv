@@ -39,7 +39,6 @@ class MPUBLIC ChannelEditor : public MythScreenType
         FILTER_UNASSIGNED = 0
     };
 
-    int m_id;
     int m_sourceFilter;
     QString m_sourceFilterName;
     QString m_currentSortMode;
