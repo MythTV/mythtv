@@ -22,7 +22,6 @@ struct MPUBLIC MythUIMenuCallbacks
     void (*configplugin)(const QString &cmd);
     void (*plugin)(const QString &cmd);
     void (*eject)(void);
-    bool (*password_dialog)(const QString &text, const QString &pwd);
 };
 
 class MPUBLIC MythUIHelper

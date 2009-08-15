@@ -201,17 +201,6 @@ static void eject_cb(void)
     myth_eject();
 }
 
-static bool password_dialog_cb(const QString &text, const QString &password)
-{
-    bool ok = false;
-    MythPasswordDialog *pd = new MythPasswordDialog(text, &ok, password,
-                                                    gContext->GetMainWindow());
-    pd->exec();
-    pd->deleteLater();
-
-    return ok;
-}
-
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_gui(false), m_backend(false),
@@ -326,7 +315,6 @@ bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
         cbs.configplugin = configplugin_cb;
         cbs.plugin = plugin_cb;
         cbs.eject = eject_cb;
-        cbs.password_dialog = password_dialog_cb;
 
         m_ui->Init(cbs);
     }
