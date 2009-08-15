@@ -102,7 +102,7 @@ HISTORYFORWARD  Go forward to previous page",         F
 
 NEXTTAB         Move to next browser tab              P
 PREVTAB         Move to previous browser tab          <NO DEFAULT>
-DELETETAB       Delete the current browser tab        D
+DELETE          Delete the current browser tab        D
 
 ESCAPE          Exit                                  Escape
 MENU            Show poup menu                        M
