@@ -49,10 +49,10 @@
 
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
-static struct dvb_fe_params dtvmultiplex_to_dvbparams(
+static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     DTVTunerType, const DTVMultiplex&);
 static DTVMultiplex dvbparams_to_dtvmultiplex(
-    DTVTunerType, const dvb_fe_params&);
+    DTVTunerType, const dvb_frontend_parameters&);
 
 #define LOC QString("DVBChan(%1:%2): ").arg(GetCardID()).arg(device)
 #define LOC_WARN QString("DVBChan(%1:%2) Warning: ") \
@@ -209,49 +209,6 @@ bool DVBChannel::Open(DVBChannel *who)
         fd_frontend = -1;
         return false;
     }
-
-#ifdef FE_GET_EXTENDED_INFO
-    if (info.caps & FE_HAS_EXTENDED_INFO)
-    {
-        bool ok = true;
-        dvb_fe_caps_extended extinfo;
-        bzero(&extinfo, sizeof(extinfo));
-        if (ioctl(fd_frontend, FE_GET_EXTENDED_INFO, &extinfo) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to get frontend extended information." + ENO);
-
-            ok = false;
-        }
-
-        if (ok && (extinfo.modulations & MOD_8PSK))
-        {
-            if (ioctl(fd_frontend, FE_SET_STANDARD, FE_DVB_S2) < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to set frontend standard to DVB-S2." + ENO);
-
-                ok = false;
-            }
-            else if (ioctl(fd_frontend, FE_GET_INFO, &info) < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Failed to get frontend information." + ENO);
-
-                ok = false;
-            }
-        }
-
-        if (!ok)
-        {
-            close(fd_frontend);
-            fd_frontend = -1;
-            return false;
-        }
-
-        ext_modulations   = extinfo.modulations;
-    }
-#endif
 
     frontend_name       = info.name;
     card_type           = info.type;
@@ -596,15 +553,6 @@ bool DVBChannel::CheckModulation(DTVModulation modulation) const
     const DTVModulation m = modulation;
     const uint64_t      c = capabilities;
 
-#ifdef FE_GET_EXTENDED_INFO
-    if ((c & FE_HAS_EXTENDED_INFO)            &&
-        (DTVModulation::kModulation8PSK == m) &&
-        (ext_modulations & DTVModulation::kModulation8PSK))
-    {
-        return true;
-    }
-#endif // FE_GET_EXTENDED_INFO
-
     return
         ((DTVModulation::kModulationQPSK    == m) && (c & FE_CAN_QPSK))     ||
         ((DTVModulation::kModulationQAM16   == m) && (c & FE_CAN_QAM_16))   ||
@@ -680,7 +628,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     }
 
     bool reset = (force_reset || first_tune);
-    struct dvb_fe_params params = dtvmultiplex_to_dvbparams(card_type, tuning);
+    struct dvb_frontend_parameters params = dtvmultiplex_to_dvbparams(card_type, tuning);
 
     bool is_dvbs = (DTVTunerType::kTunerTypeQPSK   == card_type ||
                     DTVTunerType::kTunerTypeDVB_S2 == card_type);
@@ -760,18 +708,6 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         VERBOSE(VB_CHANNEL, LOC + QString("Tune(): Tuning to %1%2")
                 .arg(params.frequency).arg(suffix));
 
-#ifdef FE_GET_EXTENDED_INFO
-        if (card_type == DTVTunerType::kTunerTypeDVB_S2)
-        {
-            if (ioctl(fd_frontend, FE_SET_FRONTEND2, &params) < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
-                        "Setting Frontend(2) tuning parameters failed." + ENO);
-                return false;
-            }
-        }
-        else
-#endif // FE_GET_EXTENDED_INFO
         {
             if (ioctl(fd_frontend, FE_SET_FRONTEND, &params) < 0)
             {
@@ -835,7 +771,7 @@ bool DVBChannel::IsTuningParamsProbeSupported(void) const
         return false;
     }
 
-    dvb_fe_params params;
+    dvb_frontend_parameters params;
     return ioctl(fd_frontend, FE_GET_FRONTEND, &params) >= 0;
 }
 
@@ -868,7 +804,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         return false;
     }
 
-    dvb_fe_params params;
+    dvb_frontend_parameters params;
     if (ioctl(fd_frontend, FE_GET_FRONTEND, &params) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -1094,10 +1030,10 @@ static bool wait_for_backend(int fd, int timeout_ms)
     return true;
 }
 
-static struct dvb_fe_params dtvmultiplex_to_dvbparams(
+static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     DTVTunerType tuner_type, const DTVMultiplex &tuning)
 {
-    dvb_fe_params params;
+    dvb_frontend_parameters params;
     bzero(&params, sizeof(params));
 
     params.frequency = tuning.frequency;
@@ -1111,14 +1047,8 @@ static struct dvb_fe_params dtvmultiplex_to_dvbparams(
 
     if (DTVTunerType::kTunerTypeDVB_S2 == tuner_type)
     {
-#ifdef FE_GET_EXTENDED_INFO
-        params.u.qpsk2.symbol_rate = tuning.symbolrate;
-        params.u.qpsk2.fec_inner   = (fe_code_rate_t) (int) tuning.fec;
-        params.u.qpsk2.modulation  = (fe_modulation_t) (int) tuning.modulation;
-#else // if !FE_GET_EXTENDED_INFO
         VERBOSE(VB_IMPORTANT, "DVBChan Error, MythTV was compiled without "
                 "DVB-S2 headers being present so DVB-S2 tuning will fail.");
-#endif // !FE_GET_EXTENDED_INFO
     }
 
     if (DTVTunerType::kTunerTypeQAM  == tuner_type)
@@ -1158,7 +1088,7 @@ static struct dvb_fe_params dtvmultiplex_to_dvbparams(
 }
 
 static DTVMultiplex dvbparams_to_dtvmultiplex(
-    DTVTunerType tuner_type, const dvb_fe_params &params)
+    DTVTunerType tuner_type, const dvb_frontend_parameters &params)
 {
     DTVMultiplex tuning;
 

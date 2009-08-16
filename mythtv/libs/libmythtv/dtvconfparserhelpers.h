@@ -78,9 +78,6 @@ class DTVTunerType : public DTVParamHelper
         kTunerTypeQAM     = 1,
         kTunerTypeOFDM    = 2,
         kTunerTypeATSC    = 3,
-        kTunerTypeDVB_S   = (1 << 2), // same as QPSK but for new API
-        kTunerTypeDVB_C   = (1 << 3), // same as QAM  but for new API
-        kTunerTypeDVB_T   = (1 << 4), // same as OFDM but for new API
         kTunerTypeDVB_S2  = (1 << 5),
         kTunerTypeUnknown = (1 << 31),
     };
@@ -95,8 +92,6 @@ class DTVTunerType : public DTVParamHelper
     {
         return ((kTunerTypeQPSK   == value) ||
                 (kTunerTypeQAM    == value) ||
-                (kTunerTypeDVB_S  == value) ||
-                (kTunerTypeDVB_C  == value) ||
                 (kTunerTypeDVB_S2 == value));
     }
 

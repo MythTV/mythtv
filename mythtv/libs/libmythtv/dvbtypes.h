@@ -39,12 +39,6 @@
 #    define VSB_16        (fe_modulation)(QAM_AUTO+2)
 #endif
 
-#ifdef FE_GET_EXTENDED_INFO
-  #define dvb_fe_params dvb_frontend_parameters_new
-#else
-  #define dvb_fe_params dvb_frontend_parameters
-#endif
-
 class QString;
 QString toString(fe_status);
 

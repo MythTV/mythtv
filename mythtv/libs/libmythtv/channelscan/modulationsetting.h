@@ -58,9 +58,6 @@ class ScanModulationSetting: public ComboBoxSetting
     {
         addSelection(QObject::tr("Auto"),"auto",true);
         addSelection("QPSK","qpsk");
-#ifdef FE_GET_EXTENDED_INFO
-        addSelection("8PSK","8psk");
-#endif
         addSelection("QAM 16","qam_16");
         addSelection("QAM 32","qam_32");
         addSelection("QAM 64","qam_64");

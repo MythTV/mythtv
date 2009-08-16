@@ -47,9 +47,6 @@ void DTVTunerType::initStr(void)
     dtv_tt_canonical_str[kTunerTypeQAM]     = "QAM";
     dtv_tt_canonical_str[kTunerTypeOFDM]    = "OFDM";
     dtv_tt_canonical_str[kTunerTypeATSC]    = "ATSC";
-    dtv_tt_canonical_str[kTunerTypeDVB_S]   = "DVB_S";
-    dtv_tt_canonical_str[kTunerTypeDVB_C]   = "DVB_C";
-    dtv_tt_canonical_str[kTunerTypeDVB_T]   = "DVB_T";
     dtv_tt_canonical_str[kTunerTypeDVB_S2]  = "DVB_S2";
     dtv_tt_canonical_str[kTunerTypeUnknown] = "UNKNOWN";
 }
@@ -69,9 +66,6 @@ const DTVParamHelperStruct DTVTunerType::parseTable[] =
     { "QAM",     kTunerTypeQAM     },
     { "OFDM",    kTunerTypeOFDM    },
     { "ATSC",    kTunerTypeATSC    },
-    { "DVB_S",   kTunerTypeDVB_S   },
-    { "DVB_C",   kTunerTypeDVB_C   },
-    { "DVB_T",   kTunerTypeDVB_T   },
     { "DVB_S2",  kTunerTypeDVB_S2  },
     { "UNKNOWN", kTunerTypeUnknown },
     { NULL,      kTunerTypeUnknown },

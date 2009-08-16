@@ -530,7 +530,6 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 
     bool is_dvbs =
         (DTVTunerType::kTunerTypeQPSK   == tuner_type) ||
-        (DTVTunerType::kTunerTypeDVB_S  == tuner_type) ||
         (DTVTunerType::kTunerTypeDVB_S2 == tuner_type);
 
     uint freq_mult = (is_dvbs) ? 1 : 1000;
@@ -604,7 +603,6 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
     bool is_dvbs =
         (DTVTunerType::kTunerTypeQPSK   == tuner_type) ||
-        (DTVTunerType::kTunerTypeDVB_S  == tuner_type) ||
         (DTVTunerType::kTunerTypeDVB_S2 == tuner_type);
 
     uint freq_mult = (is_dvbs) ? 1 : 1000;
