@@ -189,15 +189,14 @@ HostComboBox *VideoTreeGroup()
 { 
     HostComboBox *gc = new HostComboBox("mythvideo.db_group_type"); 
     gc->setLabel(QObject::tr("Group based on"));
-    gc->addSelection(QObject::tr("Cast"),"5");
-    gc->addSelection(QObject::tr("Category"),"2");
-    gc->addSelection(QObject::tr("Date Added"),"7");
-    gc->addSelection(QObject::tr("Director"),"4");
     gc->addSelection(QObject::tr("Folder"),"0");
-    gc->addSelection(QObject::tr("Genres"),"1"); 
-    gc->addSelection(QObject::tr("User Rating"),"6");
+    gc->addSelection(QObject::tr("Genres"),"1");
+    gc->addSelection(QObject::tr("Category"),"2");
     gc->addSelection(QObject::tr("Year"),"3");
-    gc->setValue(0);
+    gc->addSelection(QObject::tr("Director"),"4");
+    gc->addSelection(QObject::tr("Cast"),"5");
+    gc->addSelection(QObject::tr("User Rating"),"6");
+    gc->addSelection(QObject::tr("Date Added"),"7");
     gc->setHelpText(QObject::tr("Group videos in the tree")); 
     return gc; 
 } 
