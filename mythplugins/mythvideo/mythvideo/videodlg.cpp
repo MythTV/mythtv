@@ -2853,7 +2853,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
         {
             MythUIButtonListItem *item = GetItemCurrent();
             MythGenericTree *node = GetNodePtrFromButton(item);
-            if (!m_menuPopup && node && node->getInt() >= 0)
+            if (!m_menuPopup && node->getInt() != kUpFolder)
                 VideoMenu();
         }
         else if (action == "DOWNLOADDATA")
@@ -3117,7 +3117,7 @@ void VideoDialog::VideoMenu()
     if (node && node->getInt() >= 0)
     {
         if (!metadata->GetTrailer().isEmpty() ||
-            gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
+                gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
             m_menuPopup->AddButton(tr("Play..."), SLOT(PlayMenu()));
         else
             m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
@@ -3128,8 +3128,10 @@ void VideoDialog::VideoMenu()
         m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()), true);
         m_menuPopup->AddButton(tr("Metadata Options"), SLOT(ManageMenu()), true);
         m_menuPopup->AddButton(tr("Video Options"), SLOT(VideoOptionMenu()), true);
+        m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
     }
-    m_menuPopup->AddButton(tr("Delete"), SLOT(RemoveVideo()));
+    if (node && !(node->getInt() >= 0) && node->getInt() != kUpFolder)
+        m_menuPopup->AddButton(tr("Play Folder"), SLOT(playFolder()));
 }
 
 /** \fn VideoDialog::PlayMenu()
@@ -3643,6 +3645,39 @@ void VideoDialog::playVideo()
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
         PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
+}
+
+/** \fn VideoDialog::playFolder()
+ *  \brief Play all the items in the selected folder.
+ *  \return void.
+ */
+void VideoDialog::playFolder()
+{
+    MythUIButtonListItem *item = GetItemCurrent();
+    MythGenericTree *node = GetNodePtrFromButton(item);
+    int list_count;
+
+    if (node && !(node->getInt() >= 0))
+        list_count = node->childCount();
+    else
+        return;
+
+    if (list_count > 0)
+    {
+        for (int i = 0; i < list_count; i++)
+        {
+            MythGenericTree *subnode = node->getChildAt(i);
+            if (subnode)
+            {
+                Metadata *metadata = GetMetadataPtrFromNode(subnode);
+                if (metadata)
+                {
+                    PlayVideo(metadata->GetFilename(), 
+                                       m_d->m_videoList->getListCache());
+                }
+            }
+        }
+    }
 }
 
 namespace
