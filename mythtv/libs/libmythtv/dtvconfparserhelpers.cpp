@@ -149,6 +149,8 @@ const DTVParamHelperStruct DTVCodeRate::confTable[] =
     { "FEC_7_8",  kFEC_7_8  },
     { "FEC_8_9",  kFEC_8_9  },
     { "FEC_NONE", kFECNone },
+    { "FEC_3_5",  kFEC_3_5  },
+    { "FEC_9_10", kFEC_9_10 },
     { NULL,       kFECAuto },
 };
 
@@ -164,6 +166,8 @@ const DTVParamHelperStruct DTVCodeRate::vdrTable[] =
     { "78",  kFEC_7_8 },
     { "89",  kFEC_8_9 },
     { "0",   kFECNone },
+    { "35",  kFEC_3_5 },
+    { "910", kFEC_9_10 },
     { NULL,  kFECAuto }
 };
 
@@ -193,7 +197,9 @@ const char *DTVCodeRate::dbStr[DTVCodeRate::kDBStrCnt] =
      "6/7",  ///< kFEC_6_7
      "7/8",  ///< kFEC_7_8
      "8/9",  ///< kFEC_8_9
-     "auto"  ///< kFECAuto
+     "auto", ///< kFECAuto
+     "3/5",  ///< KFEC_3_5
+     "9/10",  ///< KFEC_9_10
 };
 
 const DTVParamHelperStruct DTVModulation::confTable[] =
@@ -207,26 +213,32 @@ const DTVParamHelperStruct DTVModulation::confTable[] =
    { "QPSK",     kModulationQPSK    },
    { "8VSB",     kModulation8VSB    },
    { "16VSB",    kModulation16VSB   },
-   { "2VSB",     kModulation2VSB    },
-   { "4VSB",     kModulation4VSB    },
-   { "BPSK",     kModulationBPSK    },
+   { "8PSK",     kModulation8PSK    },
    { "16APSK",   kModulation16APSK  },
    { "32APSK",   kModulation32APSK  },
-   { "8PSK",     kModulation8PSK    },
-   { "16PSK",    kModulation16PSK   },
+   { "DQPSK",    kModulationDQPSK   },
+   { "16PSK",    kModulationInvalid },
+   { "2VSB",     kModulationInvalid },
+   { "4VSB",     kModulationInvalid },
+   { "BPSK",     kModulationInvalid },
    { "analog",   kModulationAnalog  },
    { NULL,       kModulationQAMAuto },
 };
 
 const DTVParamHelperStruct DTVModulation::vdrTable[] =
 {
-   { "999", kModulationQAMAuto },
+   { "998", kModulationQAMAuto },
    { "16",  kModulationQAM16   },
    { "32",  kModulationQAM32   },
    { "64",  kModulationQAM64   },
    { "128", kModulationQAM128  },
    { "256", kModulationQAM256  },
-   { "0",   kModulationQPSK    },
+   { "2",   kModulationQPSK    },
+   { "5",   kModulation8PSK    },
+   { "6",   kModulation16APSK  },
+   { "7",   kModulation32APSK  },
+   { "10",  kModulation8VSB    },
+   { "11",  kModulation16VSB   },
    { NULL,  kModulationQAMAuto },
 };
 
@@ -241,13 +253,10 @@ const DTVParamHelperStruct DTVModulation::parseTable[] =
    { "qpsk",     kModulationQPSK    },
    { "8vsb",     kModulation8VSB    },
    { "16vsb",    kModulation16VSB   },
-   { "2vsb",     kModulation2VSB    },
-   { "4vsb",     kModulation4VSB    },
-   { "bpsk",     kModulationBPSK    },
+   { "8psk",     kModulation8PSK    },
    { "16apsk",   kModulation16APSK  },
    { "32apsk",   kModulation32APSK  },
-   { "8psk",     kModulation8PSK    },
-   { "16psk",    kModulation16PSK   },
+   { "dqpsk",    kModulationDQPSK   },
    // alternates
    { "a",        kModulationQAMAuto },
    { "qam_auto", kModulationQAMAuto },
@@ -259,13 +268,18 @@ const DTVParamHelperStruct DTVModulation::parseTable[] =
    // qpsk, no alternative
    { "8-vsb",    kModulation8VSB    },
    { "16-vsb",   kModulation16VSB   },
-   { "2-vsb",    kModulation2VSB    },
-   { "4-vsb",    kModulation4VSB    },
    // bpsk, no alternative
    { "16-apsk",  kModulation16APSK  },
    { "32-apsk",  kModulation32APSK  },
    { "8-psk",    kModulation8PSK    },
-   { "16-psk",   kModulation16PSK   },
+   // removed modulations and alternatives
+   { "bpsk",     kModulationInvalid },
+   { "2vsb",     kModulationInvalid },
+   { "2-vsb",    kModulationInvalid },
+   { "4vsb",     kModulationInvalid },
+   { "4-vsb",    kModulationInvalid },
+   { "16psk",    kModulationInvalid },
+   { "16-psk",   kModulationInvalid },
    { NULL,       kModulationQAMAuto },
 };
 
@@ -280,13 +294,10 @@ const char *DTVModulation::dbStr[DTVModulation::kDBStrCnt] =
     "auto",    ///< kModulationQAMAuto
     "8vsb",    ///< kModulation8VSB
     "16vsb",   ///< kModulation16VSB
-    "2vsb",    ///< kModulation2VSB
-    "4vsb",    ///< kModulation4VSB
-    "bpsk",    ///< kModulationBPSK
+    "8psk",    ///< kModulation8PSK
     "16apsk",  ///< kModulation16APSK
     "32apsk",  ///< kModulation32APSK
-    "8psk",    ///< kModulation8PSK
-    "16psk",   ///< kModulation16PSK
+    "dqpsk"    ///< kModulationDQPSK
 };
 
 const DTVParamHelperStruct DTVTransmitMode::confTable[] =
@@ -413,4 +424,107 @@ const char *DTVPolarity::dbStr[DTVPolarity::kDBStrCnt] =
    "h", ///< kPolarityHorizontal
    "r", ///< kPolarityRight
    "l"  ///< kPolarityLeft
+};
+
+const DTVParamHelperStruct DTVModulationSystem::confTable[] =
+{
+    { "SYS_UNDEFINED",     kModulationSystem_UNDEFINED     },
+    { "SYS_DVBC_ANNEX_AC", kModulationSystem_DVBC_ANNEX_AC },
+    { "SYS_DVBC_ANNEX_B",  kModulationSystem_DVBC_ANNEX_B  },
+    { "SYS_DVBT",          kModulationSystem_DVBT          },
+    { "SYS_DSS",           kModulationSystem_DSS           },
+    { "SYS_DVBS",          kModulationSystem_DVBS          },
+    { "SYS_DVBS2",         kModulationSystem_DVBS2         },
+    { "SYS_DVBH",          kModulationSystem_DVBH          },
+    { "SYS_ISDBT",         kModulationSystem_ISDBT         },
+    { "SYS_ISDBS",         kModulationSystem_ISDBS         },
+    { "SYS_ISDBC",         kModulationSystem_ISDBC         },
+    { "SYS_ATSC",          kModulationSystem_ATSC          },
+    { "SYS_ATSCMH",        kModulationSystem_ATSCMH        },
+    { "SYS_DMBTH",         kModulationSystem_DMBTH         },
+    { "SYS_CMMB",          kModulationSystem_CMMB          },
+    { "SYS_DAB",           kModulationSystem_DAB           },
+    { NULL,                kModulationSystem_UNDEFINED     },
+};
+
+const DTVParamHelperStruct DTVModulationSystem::vdrTable[] =
+{
+    { "0",  kModulationSystem_DVBS      },
+    { "1",  kModulationSystem_DVBS2     },
+    { NULL, kModulationSystem_UNDEFINED },
+};
+
+const DTVParamHelperStruct DTVModulationSystem::parseTable[] =
+{
+    { "UNDEFINED", kModulationSystem_UNDEFINED     },
+    { "DVBC_AC",   kModulationSystem_DVBC_ANNEX_AC },
+    { "DVBC_B",    kModulationSystem_DVBC_ANNEX_B  },
+    { "DVBT",      kModulationSystem_DVBT          },
+    { "DSS",       kModulationSystem_DSS           },
+    { "DVB-S",     kModulationSystem_DVBS          },
+    { "DVB-S2",    kModulationSystem_DVBS2         },
+    { "DVBH",      kModulationSystem_DVBH          },
+    { "ISDBT",     kModulationSystem_ISDBT         },
+    { "ISDBS",     kModulationSystem_ISDBS         },
+    { "ISDBC",     kModulationSystem_ISDBC         },
+    { "ATSC",      kModulationSystem_ATSC          },
+    { "ATSCMH",    kModulationSystem_ATSCMH        },
+    { "DMBTH",     kModulationSystem_DMBTH         },
+    { "CMMB",      kModulationSystem_CMMB          },
+    { "DAB",       kModulationSystem_DAB           },
+    { NULL,        kModulationSystem_UNDEFINED    },
+};
+
+const char *DTVModulationSystem::dbStr[DTVModulationSystem::kDBStrCnt] =
+{
+    "UNDEFINED", ///< kModulationSystem_UNDEFINED
+    "DVBCAC",    ///< kModulationSystem_DVBC_ANNEX_AC
+    "DVBC_B",    ///< kModulationSystem_DVBC_ANNEX_B
+    "DVBT",      ///< kModulationSystem_DVBT
+    "DSS",       ///< kModulationSystem_DSS
+    "DVB-S",     ///< kModulationSystem_DVBS
+    "DVB-S2",    ///< kModulationSystem_DVBS2
+    "DVBH",      ///< kModulationSystem_DVBH
+    "ISDBT",     ///< kModulationSystem_ISDBT
+    "ISDBS",     ///< kModulationSystem_ISDBS
+    "ISDBC",     ///< kModulationSystem_ISDBC
+    "ATSC",      ///< kModulationSystem_ATSC
+    "ATSCMH",    ///< kModulationSystem_ATSCMH
+    "DMBTH",     ///< kModulationSystem_DMBTH
+    "CMMB",      ///< kModulationSystem_CMMB
+    "DAB",       ///< kModulationSystem_DAB
+};
+
+const DTVParamHelperStruct DTVRollOff::confTable[] =
+{
+   { "ROLLOFF_35",   kRollOff_35   },
+   { "ROLLOFF_20",   kRollOff_20   },
+   { "ROLLOFF_25",   kRollOff_25   },
+   { "ROLLOFF_AUTO", kRollOff_Auto },
+   { NULL,           kRollOff_35 },
+};
+
+const DTVParamHelperStruct DTVRollOff::vdrTable[] =
+{
+   { "35",   kRollOff_35   },
+   { "20",   kRollOff_20   },
+   { "25",   kRollOff_25   },
+   { "0",    kRollOff_Auto },
+   { NULL,   kRollOff_35   },
+};
+const DTVParamHelperStruct DTVRollOff::parseTable[] =
+{
+   { "0.35", kRollOff_35   },
+   { "0.20", kRollOff_20   },
+   { "0.25", kRollOff_25   },
+   { "auto", kRollOff_Auto },
+   { NULL,   kRollOff_35   },
+};
+
+const char *DTVRollOff::dbStr[DTVRollOff::kDBStrCnt] =
+{
+   "0.35",   ///< kRollOff_35
+   "0.20",   ///< kRollOff_20
+   "0.25",   ///< kRollOff_25
+   "auto", ///< kRollOff_Auto
 };
