@@ -921,7 +921,7 @@ void MythNews::ShowMenu(void)
     else
     {
         delete m_menuPopup;
-        m_menuPopup = NUll;
+        m_menuPopup = NULL;
     }
 }
 

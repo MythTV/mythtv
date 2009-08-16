@@ -24,13 +24,12 @@ class MythNewsEditor : public MythScreenType
   public:
     MythNewsEditor(NewsSite *site, bool edit, MythScreenStack *parent,
                    const QString name = "MythNewsEditor");
+   ~MythNewsEditor();
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent*);
 
   private:
-    ~MythNewsEditor();
-
     mutable QMutex  m_lock;
     NewsSite       *m_site;
     QString         m_siteName;
