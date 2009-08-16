@@ -1084,11 +1084,13 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             {
                 int i = data->GetUserRating();
                 groups.push_back(QString::number(i));
+                break;
             }
             case ltDBInsertDateGroup:
             {
                 QDate date = data->GetInsertdate();
                 groups.push_back(date.toString(gContext->GetSetting("DateFormat")));
+                break;
             }
             default: 
             { 
