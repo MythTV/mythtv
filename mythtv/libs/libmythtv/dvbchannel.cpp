@@ -51,7 +51,7 @@
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
-    DTVTunerType, const DTVMultiplex&);
+    DTVTunerType, const DTVMultiplex&, int intermediate_freq, bool can_fec_auto);
 static DTVMultiplex dvbparams_to_dtvmultiplex(
     DTVTunerType, const dvb_frontend_parameters&);
 
@@ -561,6 +561,9 @@ bool DVBChannel::CheckModulation(DTVModulation modulation) const
 
     return
         ((DTVModulation::kModulationQPSK    == m) && (c & FE_CAN_QPSK))     ||
+#if HAVE_FE_CAN_2G_MODULATION
+        ((DTVModulation::kModulation8PSK    == m) && (c & FE_CAN_2G_MODULATION)) ||
+#endif //HAVE_FE_CAN_2G_MODULATION
         ((DTVModulation::kModulationQAM16   == m) && (c & FE_CAN_QAM_16))   ||
         ((DTVModulation::kModulationQAM32   == m) && (c & FE_CAN_QAM_32))   ||
         ((DTVModulation::kModulationQAM64   == m) && (c & FE_CAN_QAM_64))   ||
@@ -603,6 +606,100 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
     return Tune(tuning, inputid, false, false);
 }
 
+#if DVB_API_VERSION >= 5
+static struct dtv_properties *dtvmultiplex_to_dtvproperties(
+    DTVTunerType tuner_type, const DTVMultiplex &tuning, int intermediate_freq,
+    bool can_fec_auto, bool do_tune = true)
+{
+    uint c = 0;
+    struct dtv_properties *cmdseq;
+
+    if (tuner_type != DTVTunerType::kTunerTypeDVB_S2 &&
+        tuner_type != DTVTunerType::kTunerTypeOFDM   &&
+        tuner_type != DTVTunerType::kTunerTypeQAM    &&
+        tuner_type != DTVTunerType::kTunerTypeQPSK)
+    {
+        VERBOSE(VB_IMPORTANT, "Unsupported tuner type " + tuner_type.toString());
+        return NULL;
+    }
+
+    cmdseq = (struct dtv_properties*) calloc(1, sizeof(*cmdseq));
+    if (!cmdseq)
+        return NULL;
+
+    cmdseq->props = (struct dtv_property*) calloc(11, sizeof(*(cmdseq->props)));
+    if (!(cmdseq->props))
+    {
+        free(cmdseq);
+        return NULL;
+    }
+
+    // The cx24116 DVB-S2 demod anounce FE_CAN_FEC_AUTO but has apparently
+    // trouble with FEC_AUTO on DVB-S2 transponders
+    if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
+        can_fec_auto = false;
+
+    if (tuner_type == DTVTunerType::kTunerTypeDVB_S2)
+    {
+        cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
+        cmdseq->props[c++].u.data = tuning.mod_sys;
+    }
+
+    cmdseq->props[c].cmd      = DTV_FREQUENCY;
+    cmdseq->props[c++].u.data = intermediate_freq ? intermediate_freq : tuning.frequency;
+    cmdseq->props[c].cmd      = DTV_MODULATION;
+    cmdseq->props[c++].u.data = tuning.modulation;
+    cmdseq->props[c].cmd      = DTV_INVERSION;
+    cmdseq->props[c++].u.data = tuning.inversion;
+
+    if (tuner_type == DTVTunerType::kTunerTypeQPSK   ||
+        tuner_type == DTVTunerType::kTunerTypeDVB_S2 ||
+        tuner_type == DTVTunerType::kTunerTypeQAM)
+    {
+        cmdseq->props[c].cmd      = DTV_SYMBOL_RATE;
+        cmdseq->props[c++].u.data = tuning.symbolrate;
+    }
+
+    if (tuner_type.IsFECVariable())
+    {
+        cmdseq->props[c].cmd      = DTV_INNER_FEC;
+        cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO : tuning.fec;
+    }
+
+    if (tuner_type == DTVTunerType::kTunerTypeOFDM)
+    {
+        cmdseq->props[c].cmd      = DTV_BANDWIDTH_HZ;
+        cmdseq->props[c++].u.data = (8-tuning.bandwidth) * 1000000;
+        cmdseq->props[c].cmd      = DTV_CODE_RATE_HP;
+        cmdseq->props[c++].u.data = tuning.hp_code_rate;
+        cmdseq->props[c].cmd      = DTV_CODE_RATE_LP;
+        cmdseq->props[c++].u.data = tuning.lp_code_rate;
+        cmdseq->props[c].cmd      = DTV_TRANSMISSION_MODE;
+        cmdseq->props[c++].u.data = tuning.trans_mode;
+        cmdseq->props[c].cmd      = DTV_GUARD_INTERVAL;
+        cmdseq->props[c++].u.data = tuning.guard_interval;
+        cmdseq->props[c].cmd      = DTV_HIERARCHY;
+        cmdseq->props[c++].u.data = tuning.hierarchy;
+    }
+
+    if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
+    {
+        cmdseq->props[c].cmd      = DTV_PILOT;
+        cmdseq->props[c++].u.data = PILOT_AUTO;
+        cmdseq->props[c].cmd      = DTV_ROLLOFF;
+        cmdseq->props[c++].u.data = tuning.rolloff;
+    }
+
+    if (do_tune)
+        cmdseq->props[c++].cmd    = DTV_TUNE;
+
+    cmdseq->num = c;
+
+    return cmdseq;
+}
+#endif
+
+
 /*****************************************************************************
            Tuning functions for each of the four types of cards.
  *****************************************************************************/
@@ -633,8 +730,9 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         return master->Tune(tuning, inputid, force_reset, false);
     }
 
+    int intermediate_freq = 0;
+    bool can_fec_auto = false;
     bool reset = (force_reset || first_tune);
-    struct dvb_frontend_parameters params = dtvmultiplex_to_dvbparams(card_type, tuning);
 
     bool is_dvbs = (DTVTunerType::kTunerTypeQPSK   == card_type ||
                     DTVTunerType::kTunerTypeDVB_S2 == card_type);
@@ -692,12 +790,12 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             reset = first_tune = true;
         }
         
-        params.frequency = lnb->GetIntermediateFrequency(
+        intermediate_freq = lnb->GetIntermediateFrequency(
             diseqc_settings, tuning);
 
         // if card can auto-FEC, use it -- sometimes NITs are inaccurate
         if (capabilities & FE_CAN_FEC_AUTO)
-            params.u.qpsk.fec_inner = FEC_AUTO;
+            can_fec_auto = true;
     }
 
     VERBOSE(VB_CHANNEL, LOC + "Old Params: " +
@@ -712,9 +810,64 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     if (reset || !prev_tuning.IsEqual(card_type, tuning, 500 * freq_mult))
     {
         VERBOSE(VB_CHANNEL, LOC + QString("Tune(): Tuning to %1%2")
-                .arg(params.frequency).arg(suffix));
+                .arg(intermediate_freq ? intermediate_freq : tuning.frequency)
+                .arg(suffix));
 
+#if DVB_API_VERSION >=5
+        if (DTVTunerType::kTunerTypeDVB_S2 == card_type)
         {
+            struct dtv_property p_clear;
+            struct dtv_properties cmdseq_clear;
+
+            p_clear.cmd        = DTV_CLEAR;
+            cmdseq_clear.num   = 1;
+            cmdseq_clear.props = &p_clear;
+
+            if ((ioctl(fd_frontend, FE_SET_PROPERTY, &cmdseq_clear)) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
+                        "Clearing DTV properties cache failed." + ENO);
+                return false;
+            }
+
+            struct dtv_properties *cmds = dtvmultiplex_to_dtvproperties(
+                card_type, tuning, intermediate_freq, can_fec_auto);
+
+            if (!cmds) {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to convert "
+                        "DTVMultiplex to DTV_PROPERTY sequence");
+                return false;
+            }
+
+            if (print_verbose_messages & (VB_CHANNEL | VB_EXTRA) == (VB_CHANNEL | VB_EXTRA))
+            {
+                for (int i = 0; i < cmds->num; i++)
+                {
+                    VERBOSE(VB_CHANNEL, QString("prop %1: cmd = %2, data %3")
+                            .arg(i).arg(cmds->props[i].cmd)
+                            .arg(cmds->props[i].u.data));
+                }
+            }
+
+            int res = ioctl(fd_frontend, FE_SET_PROPERTY, cmds);
+
+            free(cmds->props);
+            free(cmds);
+
+            if (res < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
+                        "Setting Frontend tuning parameters failed." + ENO);
+                return false;
+            }
+        }
+        else
+#endif
+        {
+            struct dvb_frontend_parameters params = dtvmultiplex_to_dvbparams(card_type, tuning,
+                                                                              intermediate_freq,
+                                                                              can_fec_auto);
+
             if (ioctl(fd_frontend, FE_SET_FRONTEND, &params) < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Tune(): " +
@@ -807,6 +960,12 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         // TODO We need to implement the inverse of
         // lnb->GetIntermediateFrequency() for ProbeTuningParams()
         // to accurately reflect the frequency before LNB transform.
+        return false;
+    }
+
+    if (card_type == DTVTunerType::kTunerTypeDVB_S2)
+    {
+        // TODO implement probing of tuning parameters with FE_GET_PROPERTY
         return false;
     }
 
@@ -1037,7 +1196,8 @@ static bool wait_for_backend(int fd, int timeout_ms)
 }
 
 static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
-    DTVTunerType tuner_type, const DTVMultiplex &tuning)
+    DTVTunerType tuner_type, const DTVMultiplex &tuning,
+    int intermediate_freq, bool can_fec_auto)
 {
     dvb_frontend_parameters params;
     bzero(&params, sizeof(params));
@@ -1047,8 +1207,14 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
 
     if (DTVTunerType::kTunerTypeQPSK == tuner_type)
     {
+        if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
+            VERBOSE(VB_IMPORTANT, "DVBChan Error, Tuning of a DVB-S2 transport "
+                    "with a DVB-S card will fail.");
+
+        params.frequency = intermediate_freq;
         params.u.qpsk.symbol_rate = tuning.symbolrate;
-        params.u.qpsk.fec_inner   = (fe_code_rate_t) (int) tuning.fec;
+        params.u.qpsk.fec_inner   = can_fec_auto ? FEC_AUTO
+            : (fe_code_rate_t) (int) tuning.fec;
     }
 
     if (DTVTunerType::kTunerTypeDVB_S2 == tuner_type)
