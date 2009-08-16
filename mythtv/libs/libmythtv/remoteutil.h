@@ -25,9 +25,9 @@ class MPUBLIC FileSystemInfo
     bool isLocal;
     int fsID;
     int dirID;
+    int blocksize;
     long long totalSpaceKB;
     long long usedSpaceKB;
-    long long liveTVSpaceKB;
     long long freeSpaceKB;
     int weight;
 };

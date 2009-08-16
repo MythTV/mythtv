@@ -100,6 +100,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
         QDir checkDir("");
         QString dirID;
         QString currentDir;
+        int bSize;
         while (query.next())
         {
             dirID = query.value(0).toString();
@@ -116,27 +117,32 @@ void BackendQueryDiskSpace(QStringList &strlist,
                     getDiskSpace(cdir.constData(), totalKB, usedKB);
                     bzero(&statbuf, sizeof(statbuf));
                     localStr = "1"; // Assume local
+                    bSize = 0;
 
+                    if (!statfs(currentDir.toLocal8Bit().constData(), &statbuf))
+                    {
 #if CONFIG_DARWIN
-                    if ((statfs(currentDir.toLocal8Bit().constData(),
-                                &statbuf) == 0) &&
-                        ((!strcmp(statbuf.f_fstypename, "nfs")) ||   // NFS|FTP
-                         (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
-                         (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
-                        localStr = "0";
+                        char *fstypename = statbuf.f_fstypename;
+                        if ((!strcmp(fstypename, "nfs")) ||   // NFS|FTP
+                            (!strcmp(fstypename, "afpfs")) || // ApplShr
+                            (!strcmp(fstypename, "smbfs")))   // SMB
+                            localStr = "0";
 #elif __linux__
-                    if ((statfs(currentDir.toLocal8Bit().constData(),
-                                &statbuf) == 0) &&
-                        ((statbuf.f_type == 0x6969) ||     // NFS
-                         (statbuf.f_type == 0x517B) ||     // SMB
-                         (statbuf.f_type == (long)0xFF534D42)))  // CIFS
-                        localStr = "0";
+                        long fstype = statbuf.f_type;
+                        if ((fstype == 0x6969) ||             // NFS
+                            (fstype == 0x517B) ||             // SMB
+                            (fstype == (long)0xFF534D42))     // CIFS
+                            localStr = "0";
 #endif
+                        bSize = statbuf.f_bsize;
+                    }
+
                     strlist << gContext->GetHostName();
                     strlist << currentDir;
                     strlist << localStr;
                     strlist << "-1"; // Ignore fsID
                     strlist << dirID;
+                    strlist << QString::number(bSize);
                     encodeLongLong(strlist, totalKB);
                     encodeLongLong(strlist, usedKB);
 
@@ -184,6 +190,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
         fsInfo.isLocal = (*(it++)).toInt();
         fsInfo.fsID = (*(it++)).toInt();
         fsInfo.dirID = (*(it++)).toInt();
+        fsInfo.blocksize = (*(it++)).toInt();
         fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
         fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
         fsInfo.freeSpaceKB = fsInfo.totalSpaceKB - fsInfo.usedSpaceKB;
@@ -195,6 +202,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(encoderList)/12 /*5 seconds*/;
     maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
+    int bSize = 32;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
         if (it1->fsID == -1)
@@ -207,10 +215,11 @@ void BackendQueryDiskSpace(QStringList &strlist,
         it2 = it1;
         for (it2++; it2 != fsInfos.end(); it2++)
         {
-            // Sometimes the space reported for an NFS mounted dir is slightly
-            // different than when it is locally mounted because of block sizes
+            // our fuzzy comparison uses the maximum of the two block sizes
+            // or 32, whichever is greater
+            bSize = max(32, max(it1->blocksize, it2->blocksize) / 1024);
             if (it2->fsID == -1 &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= bSize) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
             {
@@ -234,6 +243,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
         strlist << QString::number(it1->isLocal);
         strlist << QString::number(it1->fsID);
         strlist << QString::number(it1->dirID);
+        strlist << QString::number(it1->blocksize);
         encodeLongLong(strlist, it1->totalSpaceKB);
         encodeLongLong(strlist, it1->usedSpaceKB);
 
@@ -248,6 +258,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
         strlist << "0";
         strlist << "-2";
         strlist << "-2";
+        strlist << "0";
         encodeLongLong(strlist, totalKB);
         encodeLongLong(strlist, usedKB);
     }
@@ -272,8 +283,8 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         fsInfo.fsID = -1;
         it++;
         fsInfo.dirID = (*(it++)).toInt();
+        fsInfo.blocksize = (*(it++)).toInt();
         fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
-        fsInfo.liveTVSpaceKB = 0; // FIXME, placeholder
         fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
         fsInfo.freeSpaceKB = fsInfo.totalSpaceKB - fsInfo.usedSpaceKB;
         fsInfo.weight = 0;
@@ -284,6 +295,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(tvList)/12  /*5 seconds*/;
     maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
+    int bSize = 32;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
         if (it1->fsID == -1)
@@ -300,22 +312,24 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         it2 = it1;
         for (it2++; it2 != fsInfos.end(); it2++)
         {
+            // our fuzzy comparison uses the maximum of the two block sizes
+            // or 32, whichever is greater
+            bSize = max(32, max(it1->blocksize, it2->blocksize) / 1024);
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("    Checking %1:%2 (dirID %3) using %4 of %5 KB")
                         .arg(it2->hostname).arg(it2->directory).arg(it2->dirID)
                         .arg(it2->usedSpaceKB).arg(it2->totalSpaceKB));
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
-                QString("        Total KB Diff: %1 (want <= 32)") 
-                .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB)));
+                QString("        Total KB Diff: %1 (want <= %2)") 
+                .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB))
+                .arg(bSize));
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("        Used  KB Diff: %1 (want <= %2)")
                 .arg((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB))
                 .arg(maxWriteFiveSec));
 
-            // Sometimes the space reported for an NFS mounted dir is slightly
-            // different than when it is locally mounted because of block sizes
             if (it2->fsID == -1 &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= bSize) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
             {
@@ -345,6 +359,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
             cout << endl;
             cout << "     fsID    : " << it1->fsID << endl;
             cout << "     dirID   : " << it1->dirID << endl;
+            cout << "     BlkSize : " << it1->blocksize << endl;
             cout << "     TotalKB : " << it1->totalSpaceKB << endl;
             cout << "     UsedKB  : " << it1->usedSpaceKB << endl;
             cout << "     FreeKB  : " << it1->freeSpaceKB << endl;

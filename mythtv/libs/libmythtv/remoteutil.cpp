@@ -85,6 +85,7 @@ vector<FileSystemInfo> RemoteGetFreeSpace()
             fsInfo.isLocal = (*(it++)).toInt();
             fsInfo.fsID = (*(it++)).toInt();
             fsInfo.dirID = (*(it++)).toInt();
+            fsInfo.blocksize = (*(it++)).toInt();
             fsInfo.totalSpaceKB = decodeLongLong(strlist, it);
             fsInfo.usedSpaceKB = decodeLongLong(strlist, it);
             fsInfos.push_back(fsInfo);
