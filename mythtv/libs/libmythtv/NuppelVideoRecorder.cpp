@@ -496,6 +496,8 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     }
 
     mpa_vidctx = avcodec_alloc_context();
+
+    avcodec_get_frame_defaults(&mpa_picture);
  
     switch (picture_format)
     {
@@ -3054,7 +3056,6 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         mpa_picture.linesize[0] = frame->width;
         mpa_picture.linesize[1] = frame->width / 2;
         mpa_picture.linesize[2] = frame->width / 2;
-        mpa_picture.pts = frame->frameNumber;
         mpa_picture.type = FF_BUFFER_TYPE_SHARED;
 
         if (wantkeyframe)

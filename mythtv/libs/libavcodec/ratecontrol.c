@@ -707,14 +707,10 @@ float ff_rate_estimate_qscale(MpegEncContext *s, int dry_run)
 //if(dts_pic)
 //            av_log(NULL, AV_LOG_ERROR, "%Ld %Ld %Ld %d\n", s->current_picture_ptr->pts, s->user_specified_pts, dts_pic->pts, picture_number);
 
-        // XXX HACK begin: disable ffmpeg changeset 10477 until we set
-        //                 correct pts in NuppelVideoRecorder
-/*         if(!dts_pic || dts_pic->pts == AV_NOPTS_VALUE) */
-/*             wanted_bits= (uint64_t)(s->bit_rate*(double)picture_number/fps); */
-/*         else */
-/*             wanted_bits= (uint64_t)(s->bit_rate*(double)dts_pic->pts/fps); */
-        wanted_bits= (uint64_t)(s->bit_rate*(double)picture_number/fps);
-        /// XXX HACK end
+        if(!dts_pic || dts_pic->pts == AV_NOPTS_VALUE)
+            wanted_bits= (uint64_t)(s->bit_rate*(double)picture_number/fps);
+        else
+            wanted_bits= (uint64_t)(s->bit_rate*(double)dts_pic->pts/fps);
     }
 
     diff= s->total_bits - wanted_bits;
