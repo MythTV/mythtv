@@ -367,7 +367,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
             if (!MoveCursor(MoveRight))
                 handled = false;
         }
-        else if (action == "BACKSPACE" || action == "DELETE")
+        else if (action == "BACKSPACE")
         {
             RemoveCharacter();
         }
