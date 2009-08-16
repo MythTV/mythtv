@@ -169,7 +169,7 @@
         <text lang="PL">Ustaw Filmy</text>
         <text lang="HE">הגדרות וידאו</text>
         <description>Configure playback and DVD ripping</description>
-        <action>MENU video_settings.xml</action>
+        <action>CONFIGPLUGIN mythvideo</action>
     </button>
 
 </mythmenu>

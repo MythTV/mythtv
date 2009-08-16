@@ -133,7 +133,7 @@
      <text lang="PL">Konfiguracja Muzyki</text>
      <text lang="HE">הגדרות מוסיקה</text>
      <description>Configure playback and CD ripping</description>
-     <action>MENU music_settings.xml</action>
+     <action>CONFIGPLUGIN mythmusic</action>
    </button>
 
 </mythmenu>
