@@ -324,7 +324,17 @@
                                 <filename>hd.png</filename>
                             </imagetype>
                         </state>
-                        <state name="avchd">
+                        <state name="hd720">
+                            <imagetype name="statusimage">
+                                <filename>hd720.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="hd1080">
+                            <imagetype name="statusimage">
+                                <filename>hd1080.png</filename>
+                            </imagetype>
+                        </state>
+                         <state name="avchd">
                             <imagetype name="statusimage">
                                 <filename>avchd.png</filename>
                             </imagetype>
