@@ -668,6 +668,11 @@ void MythNews::createProgress(QString title)
 
     if (m_progressPopup->Create())
         popupStack->AddScreen(m_progressPopup, false);
+    else
+    {
+        delete m_progressPopup;
+        m_progressPopup = NULL;
+    }
 }
 
 bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
@@ -880,10 +885,13 @@ void MythNews::ShowEditDialog(bool edit)
     MythNewsEditor *mythnewseditor = new MythNewsEditor(site, edit, mainStack,
                                                         "mythnewseditor");
 
-    connect(mythnewseditor, SIGNAL(Exiting()), this, SLOT(loadSites()));
-
     if (mythnewseditor->Create())
+    {
+        connect(mythnewseditor, SIGNAL(Exiting()), SLOT(loadSites()));
         mainStack->AddScreen(mythnewseditor);
+    }
+    else
+        delete mythnewseditor;
 }
 
 void MythNews::ShowMenu(void)
@@ -898,16 +906,23 @@ void MythNews::ShowMenu(void)
     m_menuPopup = new MythDialogBox(label, popupStack, "mythnewsmenupopup");
 
     if (m_menuPopup->Create())
+    {
         popupStack->AddScreen(m_menuPopup);
 
-    m_menuPopup->SetReturnEvent(this, "options");
+        m_menuPopup->SetReturnEvent(this, "options");
 
-    if (m_NewsSites.size() > 0)
-        m_menuPopup->AddButton(tr("Edit News Site"));
-    m_menuPopup->AddButton(tr("Add News Site"));
-    if (m_NewsSites.size() > 0)
-        m_menuPopup->AddButton(tr("Delete News Site"));
-    m_menuPopup->AddButton(tr("Cancel"));
+        if (m_NewsSites.size() > 0)
+            m_menuPopup->AddButton(tr("Edit News Site"));
+        m_menuPopup->AddButton(tr("Add News Site"));
+        if (m_NewsSites.size() > 0)
+            m_menuPopup->AddButton(tr("Delete News Site"));
+        m_menuPopup->AddButton(tr("Cancel"));
+    }
+    else
+    {
+        delete m_menuPopup;
+        m_menuPopup = NUll;
+    }
 }
 
 void MythNews::deleteNewsSite(void)
