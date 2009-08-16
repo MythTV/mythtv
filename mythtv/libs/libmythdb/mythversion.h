@@ -27,7 +27,7 @@
  *       mythtv/bindings/python/MythTV/MythTV.py (version number)
  *       mythtv/bindings/python/MythTV/MythTV.py (layout)
  */
-#define MYTH_PROTO_VERSION "46"
+#define MYTH_PROTO_VERSION "47"
 
 #endif
 

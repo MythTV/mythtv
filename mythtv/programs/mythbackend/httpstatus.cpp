@@ -350,6 +350,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         isLocalstr = *(sit++);
         fsID       = *(sit++);
         sit++; // ignore dirID
+        sit++; // ignore blocksize
         iTotal     = decodeLongLong(strlist, sit);
         iUsed      = decodeLongLong(strlist, sit);
         iAvail     = iTotal - iUsed;
