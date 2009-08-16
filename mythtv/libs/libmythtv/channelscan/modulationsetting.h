@@ -87,5 +87,23 @@ class ScanConstellation: public ScanModulationSetting,
     };
 };
 
+class ScanDVBSModulation: public ComboBoxSetting, public TransientStorage
+{
+  public:
+    ScanDVBSModulation() : ComboBoxSetting(this)
+    {
+
+        addSelection("QPSK",  "qpsk", true);
+        addSelection("8PSK",  "8psk");
+        addSelection("QAM 16","qam_16");
+
+        setLabel(QObject::tr("Modulation"));
+        setHelpText(
+            QObject::tr("Modulation, QPSK, 8PSK, QAM-16") + " " +
+            QObject::tr("Most DVB-S transponders use QPSK, DVB-S2 8PSK "
+                        "QAM-16 is not available for DVB-S2 transports."));
+    }
+};
+
 #endif // _MODULATION_SETTING_H_
 

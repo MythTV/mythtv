@@ -1123,6 +1123,7 @@ HAVE_LIST="
     fast_64bit
     fast_cmov
     fast_unaligned
+    fe_can_2g_modulation
     fork
     freetype2
     ftime
@@ -3382,6 +3383,16 @@ if enabled dvb; then
     fi
 fi
 
+
+enabled dvb && check_cc -I"$dvb_path" <<EOF && enable fe_can_2g_modulation
+#include <linux/dvb/frontend.h>
+int main(void) {
+    if (FE_CAN_2G_MODULATION != 0x10000000)
+        return 1;
+    return 0;
+}
+EOF
+
 # Check that all MythTV build "requirements" are met:
 
 enabled freetype2 ||
@@ -3789,6 +3800,7 @@ if enabled backend; then
   echo "HR-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
+  echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
 #  echo "DBox2 support             ${dbox2-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "IPTV support              ${iptv-no}"

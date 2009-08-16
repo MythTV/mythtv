@@ -127,7 +127,8 @@ static uint insert_dtv_multiplex(
     signed char trans_mode,
     QString     inner_FEC,     QString      constellation,
     signed char hierarchy,     QString      hp_code_rate,
-    QString     lp_code_rate,  QString      guard_interval)
+    QString     lp_code_rate,  QString      guard_interval,
+    QString     mod_sys,       QString      rolloff)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -174,6 +175,10 @@ static uint insert_dtv_multiplex(
         "lp_code_rate     = :LP_CODE_RATE, " : "";
     updateStr += (!guard_interval.isNull()) ?
         "guard_interval   = :GUARD_INTERVAL, " : "";
+    updateStr += (!mod_sys.isNull()) ?
+        "mod_sys          = :MOD_SYS, " : "";
+    updateStr += (symbol_rate >= 0) ?
+        "rolloff          = :ROLLOFF, " : "";
     updateStr += (transport_id && !isDVB) ?
         "transportid      = :TRANSPORTID, " : "";
 
@@ -205,6 +210,8 @@ static uint insert_dtv_multiplex(
     insertStr += (!hp_code_rate.isNull())   ? "hp_code_rate, "      : "";
     insertStr += (!lp_code_rate.isNull())   ? "lp_code_rate, "      : "";
     insertStr += (!guard_interval.isNull()) ? "guard_interval, "    : "";
+    insertStr += (!mod_sys.isNull())        ? "mod_sys, "           : "";
+    insertStr += (!rolloff.isNull())        ? "rolloff, "           : "";
     insertStr = insertStr.left(insertStr.length()-2) + ") ";
 
     insertStr +=
@@ -224,6 +231,8 @@ static uint insert_dtv_multiplex(
     insertStr += (!hp_code_rate.isNull())   ? ":HP_CODE_RATE, "     : "";
     insertStr += (!lp_code_rate.isNull())   ? ":LP_CODE_RATE, "     : "";
     insertStr += (!guard_interval.isNull()) ? ":GUARD_INTERVAL, "   : "";
+    insertStr += (!mod_sys.isNull())        ? ":MOD_SYS, "          : "";
+    insertStr += (!rolloff.isNull())        ? ":ROLLOFF, "          : "";
     insertStr = insertStr.left(insertStr.length()-2) + ");";
 
     query.prepare((mplex) ? updateStr : insertStr);
@@ -284,6 +293,10 @@ static uint insert_dtv_multiplex(
         query.bindValue(":LP_CODE_RATE",  lp_code_rate);
     if (!guard_interval.isNull())
         query.bindValue(":GUARD_INTERVAL",guard_interval);
+    if (!mod_sys.isNull())
+        query.bindValue(":MOD_SYS",       mod_sys);
+    if (!rolloff.isNull())
+        query.bindValue(":ROLLOFF",       rolloff);
 
     if (!query.exec() || !query.isActive())
     {
@@ -337,7 +350,8 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
             cd.TransmissionModeString()[0].toAscii(),
             QString(),                         cd.ConstellationString(),
             cd.HierarchyString()[0].toAscii(), cd.CodeRateHPString(),
-            cd.CodeRateLPString(),             cd.GuardIntervalString());
+            cd.CodeRateLPString(),             cd.GuardIntervalString(),
+            QString(),                         QString());
 
         if (mux)
             muxes.push_back(mux);
@@ -364,7 +378,8 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
             -1,
             cd.FECInnerString(),  QString(),
             -1,                   QString(),
-            QString(),            QString());
+            QString(),            QString(),
+            cd.ModulationSystemString(), cd.RollOffString());
 
         if (mux)
             muxes.push_back(mux);
@@ -387,6 +402,7 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
             -1,
             cd.FECInnerString(),  QString::null,
             -1,                   QString::null,
+            QString::null,        QString::null,
             QString::null,        QString::null);
 
         if (mux)
@@ -407,6 +423,7 @@ uint ChannelUtil::CreateMultiplex(int  sourceid,      QString sistandard,
         -1,
         QString::null,      QString::null,
         -1,                 QString::null,
+        QString::null,      QString::null,
         QString::null,      QString::null);
 }
 
@@ -420,7 +437,8 @@ uint ChannelUtil::CreateMultiplex(
     signed char trans_mode,
     QString     inner_FEC,    QString     constellation,
     signed char hierarchy,    QString     hp_code_rate,
-    QString     lp_code_rate, QString     guard_interval)
+    QString     lp_code_rate, QString     guard_interval,
+    QString     mod_sys,      QString     rolloff)
 {
     return insert_dtv_multiplex(
         sourceid,           sistandard,
@@ -432,7 +450,8 @@ uint ChannelUtil::CreateMultiplex(
         trans_mode,
         inner_FEC,          constellation,
         hierarchy,          hp_code_rate,
-        lp_code_rate,       guard_interval);
+        lp_code_rate,       guard_interval,
+        mod_sys,            rolloff);
 }
 
 uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
@@ -448,7 +467,8 @@ uint ChannelUtil::CreateMultiplex(uint sourceid, const DTVMultiplex &mux,
         mux.trans_mode.toChar().toAscii(),
         mux.fec.toString(),               mux.modulation.toString(),
         mux.hierarchy.toChar().toAscii(), mux.hp_code_rate.toString(),
-        mux.lp_code_rate.toString(),      mux.guard_interval.toString());
+        mux.lp_code_rate.toString(),      mux.guard_interval.toString(),
+        mux.mod_sys.toString(),           mux.rolloff.toString());
 }
 
 

@@ -1506,15 +1506,13 @@ bool ChannelScanSM::ScanTransportsStartingOn(
     QMap<QString,QString>::const_iterator it;
 
     if (startChan.find("std")        == startChan.end() ||
-        startChan.find("modulation") == startChan.end())
+        startChan.find("type")       == startChan.end())
     {
         return false;
     }
 
     QString std    = *startChan.find("std");
-    QString mod    = (*(startChan.find("modulation"))).toUpper();
     QString si_std = (std.toLower() != "atsc") ? "dvb" : "atsc";
-    QString name   = "";
     bool    ok     = false;
 
     if (scanning)
@@ -1526,16 +1524,7 @@ bool ChannelScanSM::ScanTransportsStartingOn(
     DTVMultiplex tuning;
 
     DTVTunerType type;
-
-    if (std == "dvb") 
-    {
-        ok = type.Parse(mod);
-    }
-    else if (std == "atsc")
-    {
-        type = DTVTunerType::kTunerTypeATSC;
-        ok = true;
-    }
+    ok = type.Parse(startChan["type"]);
 
     if (ok)
     {
@@ -1547,7 +1536,8 @@ bool ChannelScanSM::ScanTransportsStartingOn(
             startChan["coderate_hp"],    startChan["coderate_lp"],
             startChan["constellation"],  startChan["trans_mode"],
             startChan["guard_interval"], startChan["hierarchy"],
-            startChan["modulation"],     startChan["bandwidth"]);
+            startChan["modulation"],     startChan["bandwidth"],
+            startChan["mod_sys"],        startChan["rolloff"]);
     }
 
     if (ok)

@@ -72,7 +72,8 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
         _tuning.lp_code_rate.toString(),     _tuning.modulation.toString(),
         _tuning.trans_mode.toString(),       _tuning.guard_interval.toString(),
         _tuning.hierarchy.toString(),        _tuning.modulation.toString(),
-        _tuning.bandwidth.toString());
+        _tuning.bandwidth.toString(),        _tuning.mod_sys.toString(),
+        _tuning.rolloff.toString());
 }
 
 TransportScanItem::TransportScanItem(uint sourceid,

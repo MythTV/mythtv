@@ -112,7 +112,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
         {
             if ((type == OFDM) && (str == "T"))
                 ok &= ParseVDR(list, channelNo);
-            else if ((type == QPSK) && (str == "S"))
+            else if ((type == QPSK || type == DVBS2) && (str == "S"))
                 ok &= ParseVDR(list, channelNo);
             else if ((type == QAM) && (str == "C"))
                 ok &= ParseVDR(list, channelNo);
@@ -121,7 +121,7 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
             ok &= ParseConfOFDM(list);
         else if (type == ATSC)
             ok &= ParseConfATSC(list);
-        else if (type == QPSK)
+        else if (type == QPSK || type == DVBS2)
             ok &= ParseConfQPSK(list);
         else if (type == QAM)
             ok &= ParseConfQAM(list);
@@ -274,6 +274,12 @@ bool DTVConfParser::ParseVDR(const QStringList &tokens, int channelNo)
             case 'R':
             case 'L':
                 mux.polarity.ParseVDR(ori);
+                break;
+            case 'S':
+                mux.mod_sys.ParseVDR(params);
+                break;
+            case 'O':
+                mux.rolloff.ParseVDR(params);
                 break;
             default:
                 return false;

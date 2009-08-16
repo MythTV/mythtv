@@ -80,7 +80,7 @@ class DTVConfParser
 {
   public:
     enum return_t   { ERROR_CARDTYPE, ERROR_OPEN, ERROR_PARSE, OK };
-    enum cardtype_t { ATSC, OFDM, QPSK, QAM, UNKNOWN };
+    enum cardtype_t { ATSC, OFDM, QPSK, QAM, DVBS2, UNKNOWN };
 
     DTVConfParser(enum cardtype_t _type, uint sourceid, const QString &_file);
     virtual ~DTVConfParser() { }

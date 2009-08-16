@@ -12,7 +12,7 @@ bool DTVParamHelper::ParseParam(const QString &symbol, int &value,
 
     while (!p->symbol.isEmpty())
     {
-        if (p->symbol == symbol.left(p->symbol.length()))
+        if (p->symbol == symbol) //.left(p->symbol.length()))
         {
             //symbol = symbol.mid(p->symbol.length());
             value = p->value;

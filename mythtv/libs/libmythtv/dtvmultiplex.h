@@ -49,13 +49,20 @@ class DTVMultiplex
         const QString &symbol_rate,  const QString &fec_inner,
         const QString &modulation,   const QString &polarity);
 
+    bool ParseDVB_S2(
+        const QString &frequency,    const QString &inversion,
+        const QString &symbol_rate,  const QString &fec_inner,
+        const QString &modulation,   const QString &polarity,
+        const QString &mod_sys,      const QString &rolloff);
+
     bool ParseTuningParams(
         DTVTunerType type,
         QString frequency,    QString inversion,      QString symbolrate,
         QString fec,          QString polarity,
         QString hp_code_rate, QString lp_code_rate,   QString constellation,
         QString trans_mode,   QString guard_interval, QString hierarchy,
-        QString modulation,   QString bandwidth);
+        QString modulation,   QString bandwidth,      QString mod_sys,
+        QString rolloff);
 
     QString toString() const;
 
@@ -74,6 +81,8 @@ class DTVMultiplex
     DTVHierarchy     hierarchy;
     DTVPolarity      polarity;
     DTVCodeRate      fec; ///< Inner Forward Error Correction rate
+    DTVModulationSystem mod_sys; ///< modulation system (only DVB-S or DVB-S2 atm)
+    DTVRollOff       rolloff;
 
     // Optional additional info
     uint             mplex;
@@ -99,7 +108,8 @@ class ScanDTVTransport : public DTVMultiplex
         QString fec,          QString polarity,
         QString hp_code_rate, QString lp_code_rate,   QString constellation,
         QString trans_mode,   QString guard_interval, QString hierarchy,
-        QString modulation,   QString bandwidth);
+        QString modulation,   QString bandwidth,
+        QString mod_sys,      QString rolloff);
 
   public:
     DTVTunerType          tuner_type;

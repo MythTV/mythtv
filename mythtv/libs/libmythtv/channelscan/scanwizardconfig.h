@@ -68,6 +68,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         // seen in the Network Information Tables to the scan.
         NITAddScan_DVBT,
         NITAddScan_DVBS,
+        NITAddScan_DVBS2,
         NITAddScan_DVBC,
         // Scan of all transports already in the database
         FullTransportScan,

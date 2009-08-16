@@ -140,6 +140,14 @@ void ScanTypeSetting::SetInput(const QString &cardids_inputname)
             addSelection(tr("Import existing scan"),
                          QString::number(ExistingScanImport));
             break;
+        case CardUtil::DVBS2:
+            addSelection(tr("Full Scan (Tuned)"),
+                         QString::number(NITAddScan_DVBS2));
+            addSelection(tr("Import channels.conf"),
+                         QString::number(DVBUtilsImport));
+            addSelection(tr("Import existing scan"),
+                         QString::number(ExistingScanImport));
+            break;
         case CardUtil::QAM:
             addSelection(tr("Full Scan (Tuned)"),
                          QString::number(NITAddScan_DVBC));
@@ -228,6 +236,8 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
               paneDVBC);
     addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBS),
               paneDVBS);
+    addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBS2),
+              paneDVBS2);
     addTarget(QString::number(ScanTypeSetting::NITAddScan_DVBT),
               paneDVBT);
     addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),
@@ -373,10 +383,10 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
         const PaneDVBT *pane = paneDVBT;
 
         startChan["std"]            = "dvb";
+        startChan["type"]           = "OFDM";
         startChan["frequency"]      = pane->frequency();
         startChan["inversion"]      = pane->inversion();
         startChan["bandwidth"]      = pane->bandwidth();
-        startChan["modulation"]     = "ofdm";
         startChan["coderate_hp"]    = pane->coderate_hp();
         startChan["coderate_lp"]    = pane->coderate_lp();
         startChan["constellation"]  = pane->constellation();
@@ -389,11 +399,11 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
         const PaneDVBS *pane = paneDVBS;
 
         startChan["std"]        = "dvb";
+        startChan["type"]       = "QPSK";
         startChan["frequency"]  = pane->frequency();
         startChan["inversion"]  = pane->inversion();
         startChan["symbolrate"] = pane->symbolrate();
         startChan["fec"]        = pane->fec();
-        startChan["modulation"] = "qpsk";
         startChan["polarity"]   = pane->polarity();
     }
     else if (ScanTypeSetting::NITAddScan_DVBC == st)
@@ -401,11 +411,27 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
         const PaneDVBC *pane = paneDVBC;
 
         startChan["std"]        = "dvb";
+        startChan["type"]       = "QAM";
         startChan["frequency"]  = pane->frequency();
         startChan["inversion"]  = pane->inversion();
         startChan["symbolrate"] = pane->symbolrate();
         startChan["fec"]        = pane->fec();
         startChan["modulation"] = pane->modulation();
+    }
+    else if (ScanTypeSetting::NITAddScan_DVBS2 == st)
+    {
+        const PaneDVBS2 *pane = paneDVBS2;
+
+        startChan["std"]        = "dvb";
+        startChan["type"]       = "DVB_S2";
+        startChan["frequency"]  = pane->frequency();
+        startChan["inversion"]  = pane->inversion();
+        startChan["symbolrate"] = pane->symbolrate();
+        startChan["fec"]        = pane->fec();
+        startChan["modulation"] = pane->modulation();
+        startChan["polarity"]   = pane->polarity();
+        startChan["mod_sys"]    = pane->mod_sys();
+        startChan["rolloff"]    = pane->rolloff();
     }
 
     return startChan;

@@ -100,6 +100,11 @@ void ScanWizard::SetPage(const QString &pageTitle)
         start_chan = configPane->GetStartChan();
         parse_type = DTVTunerType::kTunerTypeQPSK;
     }
+    else if (scantype == ScanTypeSetting::NITAddScan_DVBS2)
+    {
+        start_chan = configPane->GetStartChan();
+        parse_type = DTVTunerType::kTunerTypeDVB_S2;
+    }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBC)
     {
         start_chan = configPane->GetStartChan();
@@ -163,7 +168,8 @@ void ScanWizard::SetPage(const QString &pageTitle)
             start_chan["coderate_hp"],    start_chan["coderate_lp"],
             start_chan["constellation"],  start_chan["trans_mode"],
             start_chan["guard_interval"], start_chan["hierarchy"],
-            start_chan["modulation"],     start_chan["bandwidth"]))
+            start_chan["modulation"],     start_chan["bandwidth"],
+            start_chan["mod_sys"],        start_chan["rolloff"]))
     {
         MythPopupBox::showOkPopup(
             gContext->GetMainWindow(), tr("ScanWizard"),

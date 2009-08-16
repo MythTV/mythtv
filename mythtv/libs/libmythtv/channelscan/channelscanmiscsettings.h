@@ -248,6 +248,32 @@ class ScanHierarchy: public ComboBoxSetting, public TransientStorage
     };
 };
 
+class ScanModSys: public ComboBoxSetting, public TransientStorage
+{
+    public:
+    ScanModSys() : ComboBoxSetting(this)
+    {
+        setLabel(QObject::tr("Mod Sys"));
+        setHelpText(QObject::tr("Modulation system (Default: DVB-S)"));
+        addSelection("DVB-S");
+        addSelection("DVB-S2");
+    };
+};
+
+class ScanRollOff: public ComboBoxSetting, public TransientStorage
+{
+    public:
+    ScanRollOff() : ComboBoxSetting(this)
+    {
+        setLabel(QObject::tr("Rolloff"));
+        setHelpText(QObject::tr("Roll Off factor (Default: 0.35)"));
+        addSelection("0.35");
+        addSelection("0.20");
+        addSelection("0.25");
+        addSelection(QObject::tr("Auto"),"auto");
+    };
+};
+
 class PaneError : public HorizontalConfigurationGroup
 {
   public:

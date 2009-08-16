@@ -158,9 +158,10 @@ void ChannelScanner::Scan(
         ok = sigmonScanner->ScanTransports(
             sourceid, freq_std, mod, tbl, tbl_start, tbl_end);
     }
-    else if ((ScanTypeSetting::NITAddScan_DVBT == scantype) ||
-             (ScanTypeSetting::NITAddScan_DVBS == scantype) ||
-             (ScanTypeSetting::NITAddScan_DVBC == scantype))
+    else if ((ScanTypeSetting::NITAddScan_DVBT  == scantype) ||
+             (ScanTypeSetting::NITAddScan_DVBS  == scantype) ||
+             (ScanTypeSetting::NITAddScan_DVBS2 == scantype) ||
+             (ScanTypeSetting::NITAddScan_DVBC  == scantype))
     {
         VERBOSE(VB_CHANSCAN, LOC + "ScanTransports()");
 

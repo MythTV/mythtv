@@ -55,6 +55,7 @@ class MPUBLIC CardUtil
         HDHOMERUN = 10,
         FREEBOX   = 11,
         HDPVR     = 12,
+        DVBS2     = 13,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -85,6 +86,8 @@ class MPUBLIC CardUtil
             return FREEBOX;
         if ("HDPVR" == name)
             return HDPVR;
+        if ("DVB_S2" == name)
+            return DVBS2;
         return ERROR_UNKNOWN;
     }
 

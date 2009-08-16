@@ -40,6 +40,7 @@
 #include <sys/types.h>
 
 // MythTV headers
+#include "mythconfig.h"
 #include "mythdb.h"
 #include "cardutil.h"
 #include "channelutil.h"
@@ -212,6 +213,11 @@ bool DVBChannel::Open(DVBChannel *who)
 
     frontend_name       = info.name;
     card_type           = info.type;
+#if HAVE_FE_CAN_2G_MODULATION
+    if (card_type == DTVTunerType::kTunerTypeQPSK &&
+        (info.caps & FE_CAN_2G_MODULATION))
+        card_type = DTVTunerType::kTunerTypeDVB_S2;
+#endif // HAVE_FE_CAN_2G_MODULATION
     capabilities        = info.caps;
     frequency_minimum   = info.frequency_min;
     frequency_maximum   = info.frequency_max;

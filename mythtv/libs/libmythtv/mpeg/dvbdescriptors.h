@@ -770,19 +770,40 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     bool IsLinearPolarization()   const { return !((_data[8]>>6)&0x1); }
     bool IsHorizontalLeftPolarization() const { return (_data[8]>>5)&0x1; }
     bool IsVerticalRightPolarization() const { return !((_data[8]>>5)&0x1); }
-    // modulation               5   8.3
+    // roll off                 2   8.3
+    enum
+    {
+        kRollOff_35,
+        kRollOff_20,
+        kRollOff_25,
+        kRollOff_Auto,
+    };
+    uint RollOff() const { return (_data[8]>>3)&0x3; }
+    QString RollOffString() const
+    {
+        static QString ro[] = { "0.35", "0.20", "0.25", "auto" };
+        return ro[RollOff()];
+    }
+    // modulation system        1   8.5
+    uint ModulationSystem() const { return (_data[8]>>2)&0x1; }
+    QString ModulationSystemString() const
+    {
+        return ModulationSystem() ? "DVB-S2" : "DVB-S";
+    }
+    // modulation               2   8.6
     enum
     {
         kModulationQPSK_NS = 0x0, // Non standard QPSK for Bell ExpressVu
+        // should be "auto" according to DVB SI standard
         kModulationQPSK   = 0x1,
         kModulation8PSK   = 0x2,
         kModulationQAM16  = 0x3,
     };
-    uint Modulation() const { return _data[8]&0x1f; }
+    uint Modulation() const { return _data[8]&0x03; }
     QString ModulationString() const
     {
         static QString ms[] = { "qpsk", "qpsk", "8psk", "qam_16" };
-        return (Modulation() <= kModulationQAM16) ? ms[Modulation()] : "auto";
+        return ms[Modulation()];
     }
     // symbol_rate             28   9.0
     uint SymbolRate() const

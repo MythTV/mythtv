@@ -67,7 +67,8 @@ class MPUBLIC ChannelUtil
         signed char trans_mode,
         QString     inner_FEC,    QString     constellation,
         signed char hierarchy,    QString     hp_code_rate,
-        QString     lp_code_rate, QString     guard_interval);
+        QString     lp_code_rate, QString     guard_interval,
+        QString     mod_sys,      QString     rolloff);
 
     static uint    CreateMultiplex(uint sourceid, const DTVMultiplex&,
                                    int transport_id, int network_id);

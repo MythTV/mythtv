@@ -13,6 +13,7 @@
 #include <QDir>
 
 // MythTV headers
+#include "mythconfig.h"
 #include "cardutil.h"
 #include "videosource.h"
 #include "dvbchannel.h"
@@ -293,6 +294,11 @@ QString CardUtil::ProbeDVBType(const QString &device)
     close(fd_frontend);
 
     DTVTunerType type(info.type);
+#if HAVE_FE_CAN_2G_MODULATION
+    if (type == DTVTunerType::kTunerTypeQPSK &&
+        (info.caps & FE_CAN_2G_MODULATION))
+        type = DTVTunerType::kTunerTypeDVB_S2;
+#endif // HAVE_FE_CAN_2G_MODULATION
     ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
 #endif // USING_DVB
 
@@ -385,7 +391,7 @@ bool CardUtil::IsDVBCardType(const QString card_type)
 {
     QString ct = card_type.toUpper();
     return (ct == "DVB") || (ct == "QAM") || (ct == "QPSK") ||
-        (ct == "OFDM") || (ct == "ATSC");
+        (ct == "OFDM") || (ct == "ATSC") || (ct == "DVB_S2");
 }
 
 QString get_on_cardid(const QString &to_get, uint cardid)
