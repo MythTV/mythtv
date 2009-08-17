@@ -16,21 +16,23 @@ class DummyChannel : public ChannelBase
 {
   public:
     DummyChannel(TVRec *parent): ChannelBase(parent)
-        { (void)parent; curchannelname = ""; curinputname = ""; return; }
+        { (void)parent; curchannelname.clear(); curinputname.clear(); return; }
     ~DummyChannel(void) { return; }
 
-    bool Open(void) { return InitializeInputs(); }
-    void Close(void) { return; }
+    bool Open(void)     { return InitializeInputs(); }
+    void Close(void)    { return; }
 
     // Sets
     bool SetChannelByString(const QString &chan)
            { curchannelname = chan; return true; }
     void SetExternalChanger(void) { return; }
-    QString GetCurrentInput(void) const { return curinputname; }
 
     // Gets
-    bool IsOpen(void) const { return true; }
-    QString GetDevice(void) const { return "/dev/dummy"; }
+    bool    IsOpen(void)             const { return true; }
+    QString GetDevice(void)          const { return "/dev/dummy"; }
+    QString GetCurrentInput(void)    const { return curinputname; }
+    uint    GetCurrentSourceID(void) const { return 0; }
+
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan)
