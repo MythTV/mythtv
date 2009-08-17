@@ -421,22 +421,22 @@ void EditMetadataDialog::SetCategory(MythUIButtonListItem *item)
 
 void EditMetadataDialog::SetRating()
 {
-    m_workingMetadata->SetRating(m_subtitleEdit->GetText());
+    m_workingMetadata->SetRating(m_ratingEdit->GetText());
 }
 
 void EditMetadataDialog::SetDirector()
 {
-    m_workingMetadata->SetDirector(m_subtitleEdit->GetText());
+    m_workingMetadata->SetDirector(m_directorEdit->GetText());
 }
 
 void EditMetadataDialog::SetInetRef()
 {
-    m_workingMetadata->SetInetRef(m_subtitleEdit->GetText());
+    m_workingMetadata->SetInetRef(m_inetrefEdit->GetText());
 }
 
 void EditMetadataDialog::SetPlot()
 {
-    m_workingMetadata->SetPlot(m_subtitleEdit->GetText());
+    m_workingMetadata->SetPlot(m_plotEdit->GetText());
 }
 
 void EditMetadataDialog::SetSeason()
