@@ -839,9 +839,9 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                 return false;
             }
 
-            if (print_verbose_messages & (VB_CHANNEL | VB_EXTRA) == (VB_CHANNEL | VB_EXTRA))
+            if ((print_verbose_messages & (VB_CHANNEL | VB_EXTRA)) == (VB_CHANNEL | VB_EXTRA))
             {
-                for (int i = 0; i < cmds->num; i++)
+                for (uint i = 0; i < cmds->num; i++)
                 {
                     VERBOSE(VB_CHANNEL, QString("prop %1: cmd = %2, data %3")
                             .arg(i).arg(cmds->props[i].cmd)
