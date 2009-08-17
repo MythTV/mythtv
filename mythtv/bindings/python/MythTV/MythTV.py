@@ -288,29 +288,31 @@ class MythTV:
 
 	def getFreeSpace(self,all=False):
 		"""
-		Returns a tuple of tuples, in the form:
-			str   hostname
-			str   path
-			bool  is_local
-			int   drive number
-			int   storage group ID
-			int   total space (in KB)
-			int   used space (in KB)
+		Returns a tuple of dictionaries, with the fields:
+			str   host		- hostname
+			str   path		- file system path
+			bool  islocal		- is FS local to queried backend
+			int   dnr		- drive number
+			int   sgid		- storage group ID
+			int   bsize		- block size (in bytes)
+			int   tspace		- total space (in KB)
+			int   uspace		- used space (in KB)
 		"""
 		command = 'QUERY_FREE_SPACE'
 		if all:
 			command = 'QUERY_FREE_SPACE_LIST'
 		res = self.backendCommand(command).split(BACKEND_SEP)
 		dirs = []
-		for i in range(0,len(res)/9):
-			line = [res[i*9]]
-			line.append(res[i*9+1])
-			line.append(bool(int(res[i*9+2])))
-			line.append(int(res[i*9+3]))
-			line.append(int(res[i*9+4]))
-			line.append(self.joinInt(int(res[i*9+5]),int(res[i*9+6])))
-			line.append(self.joinInt(int(res[i*9+7]),int(res[i*9+8])))
-			dirs.append(tuple(line))
+		for i in range(0,len(res)/10):
+			line = {'hostname':res[i*10]}
+			line['path'] = res[i*10+1]
+			line['islocal'] = bool(int(res[i*10+2]))
+			line['dnr'] = int(res[i*10+3])
+			line['sgid'] = int(res[i*10+4])
+			line['bsize'] = int(res[i*10+5])
+			line['tspace'] = self.joinInt(int(res[i*10+6]),int(res[i*10+7]))
+			line['uspace'] = self.joinInt(int(res[i*10+8]),int(res[i*10+9]))
+			dirs.append(line)
 		return tuple(dirs)
 
 	def getFreeSpaceSummary(self):
