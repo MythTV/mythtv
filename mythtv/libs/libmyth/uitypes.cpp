@@ -1922,12 +1922,17 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
             {
                 cerr << "   +UIStatusBarType::Draw() <- within Layer\n";
             }
+            
+            // Width or height of 0 will draw the full image, not what we want for 0%
+            if (m_used < 1)
+                m_used = 1;
+                
             int width = (int)((double)((double)m_container.width() - (double)(2*m_fillerSpace))
                     * (double)((double)m_used / (double)m_total));
 
             int height = (int)((double)((double)m_container.height() - (double)(2*m_fillerSpace))
                     * (double)((double)m_used / (double)m_total));
-
+            
             if (m_debug == true)
             {
                 cerr << "       -Width  = " << width << "\n";
