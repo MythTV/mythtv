@@ -1206,8 +1206,9 @@ void PlaybackBoxMusic::showProgressBar()
 {
     if (progress_bar && visualizer_status != 2)
     {
-        progress_bar->SetTotal(maxTime);
-        progress_bar->SetUsed(currentTime);
+        int percentplayed = currentTime / maxTime * 100;
+        progress_bar->SetTotal(100);
+        progress_bar->SetUsed(percentplayed);
     }
 }
 
