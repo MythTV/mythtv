@@ -423,6 +423,8 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
             bzero(_stream_id,  sizeof(_stream_id));
             bzero(_pid_status, sizeof(_pid_status));
             memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+
+            m_h264_parser.use_I_forKeyframes(false);
         }
         else
         {
