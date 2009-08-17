@@ -28,15 +28,19 @@ extern "C" {
 #include "libswscale/swscale.h"
 }
 
+#include <QMutex>
+#include <QMutexLocker>
+
 #include "mythverbose.h"
 #include "myth_imgconvert.h"
 
 int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,
                 PixelFormat pix_fmt, int width, int height)
 {
-
+    static QMutex ctx_lock;
     static struct SwsContext *convert_ctx;
 
+    QMutexLocker locker(&ctx_lock);
     convert_ctx = sws_getCachedContext(convert_ctx, width, height, pix_fmt,
                                        width, height, dst_pix_fmt,
                                        SWS_FAST_BILINEAR, NULL, NULL, NULL);
