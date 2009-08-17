@@ -36,6 +36,13 @@ class EditMetadataDialog : public MythScreenType
     void SaveAndExit();
     void SetTitle();
     void SetSubtitle();
+    void SetRating();
+    void SetDirector();
+    void SetInetRef();
+    void SetPlot();
+    void SetYear();
+    void SetUserRating();
+    void SetLength();
     void SetCategory(MythUIButtonListItem*);
     void SetPlayer();
     void SetSeason();
@@ -67,8 +74,16 @@ class EditMetadataDialog : public MythScreenType
     MythUITextEdit      *m_titleEdit;
     MythUITextEdit      *m_subtitleEdit;
     MythUITextEdit      *m_playerEdit;
+    MythUITextEdit      *m_ratingEdit;
+    MythUITextEdit      *m_directorEdit;
+    MythUITextEdit      *m_inetrefEdit;
+    MythUITextEdit      *m_plotEdit;
+
     MythUISpinBox       *m_seasonSpin;
     MythUISpinBox       *m_episodeSpin;
+    MythUISpinBox       *m_yearSpin;
+    MythUISpinBox       *m_userRatingSpin;
+    MythUISpinBox       *m_lengthSpin;
     MythUIButtonList      *m_categoryList;
     MythUIButtonList      *m_levelList;
     MythUIButtonList      *m_childList;
@@ -84,6 +99,10 @@ class EditMetadataDialog : public MythScreenType
     MythUIText          *m_fanartText;
     MythUIButton        *m_trailerButton;
     MythUIText          *m_trailerText;
+    MythUIImage         *m_coverart;
+    MythUIImage         *m_screenshot;
+    MythUIImage         *m_banner;
+    MythUIImage         *m_fanart;
     MythUIButton        *m_doneButton;
 
     //

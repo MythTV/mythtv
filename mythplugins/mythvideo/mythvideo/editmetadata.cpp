@@ -24,14 +24,18 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, Metadata *source_metadata,
         const MetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
-    m_playerEdit(0), m_seasonSpin(0), m_episodeSpin(0),
-    m_categoryList(0), m_levelList(0), m_childList(0), 
-    m_browseCheck(0), m_watchedCheck(0), m_coverartButton(0), 
+    m_playerEdit(0), m_ratingEdit(0), m_directorEdit(0), m_inetrefEdit(0),
+    m_plotEdit(0), m_seasonSpin(0), m_episodeSpin(0), m_yearSpin(0),
+    m_userRatingSpin(0), m_lengthSpin(0), m_categoryList(0), m_levelList(0),
+    m_childList(0), m_browseCheck(0), m_watchedCheck(0), m_coverartButton(0), 
     m_coverartText(0), m_screenshotButton(0), m_screenshotText(0),
     m_bannerButton(0), m_bannerText(0),
     m_fanartButton(0), m_fanartText(0),
     m_trailerButton(0), m_trailerText(0),
-    m_doneButton(0), cachedChildSelection(0),
+    m_coverart(0), m_screenshot(0),
+    m_banner(0), m_fanart(0),
+    m_doneButton(0),
+    cachedChildSelection(0),
     m_metaCache(cache)
 {
     m_workingMetadata = new Metadata(*m_origMetadata);
@@ -80,6 +84,21 @@ bool EditMetadataDialog::Create()
         return false;
     }
 
+    // FIXME: Make the following widgets non-optional once 
+    //        defaults have made the switch.
+    UIUtilW::Assign(this, m_ratingEdit, "rating_edit");
+    UIUtilW::Assign(this, m_directorEdit, "director_edit");
+    UIUtilW::Assign(this, m_inetrefEdit, "inetref_edit");
+    UIUtilW::Assign(this, m_plotEdit, "plot_edit");
+    UIUtilW::Assign(this, m_yearSpin, "year_spin");
+    UIUtilW::Assign(this, m_userRatingSpin, "userrating_spin");
+    UIUtilW::Assign(this, m_lengthSpin, "length_spin");
+
+    UIUtilW::Assign(this, m_coverart, "coverart");
+    UIUtilW::Assign(this, m_screenshot, "screenshot");
+    UIUtilW::Assign(this, m_banner, "banner");
+    UIUtilW::Assign(this, m_fanart, "fanart");
+
     fillWidgets();
 
     if (!BuildFocusList())
@@ -88,9 +107,23 @@ bool EditMetadataDialog::Create()
     connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(SetTitle()));
     connect(m_subtitleEdit, SIGNAL(valueChanged()), SLOT(SetSubtitle()));
     connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(SetPlayer()));
+    if (m_ratingEdit)
+        connect(m_ratingEdit, SIGNAL(valueChanged()), SLOT(SetRating()));
+    if (m_directorEdit)
+        connect(m_directorEdit, SIGNAL(valueChanged()), SLOT(SetDirector()));
+    if (m_inetrefEdit)
+        connect(m_inetrefEdit, SIGNAL(valueChanged()), SLOT(SetInetRef()));
+    if (m_plotEdit)
+        connect(m_plotEdit, SIGNAL(valueChanged()), SLOT(SetPlot()));
 
     connect(m_seasonSpin, SIGNAL(LosingFocus()), SLOT(SetSeason()));
     connect(m_episodeSpin, SIGNAL(LosingFocus()), SLOT(SetEpisode()));
+    if (m_yearSpin)
+        connect(m_yearSpin, SIGNAL(LosingFocus()), SLOT(SetYear()));
+    if (m_userRatingSpin)
+        connect(m_userRatingSpin, SIGNAL(LosingFocus()), SLOT(SetUserRating()));
+    if (m_lengthSpin)
+        connect(m_lengthSpin, SIGNAL(LosingFocus()), SLOT(SetLength()));
 
     connect(m_doneButton, SIGNAL(Clicked()), SLOT(SaveAndExit()));
     connect(m_coverartButton, SIGNAL(Clicked()), SLOT(FindCoverArt()));
@@ -172,6 +205,21 @@ void EditMetadataDialog::fillWidgets()
     m_seasonSpin->SetValue(m_workingMetadata->GetSeason());
     m_episodeSpin->SetRange(0,999,1);
     m_episodeSpin->SetValue(m_workingMetadata->GetEpisode());
+    if (m_yearSpin)
+    {
+        m_yearSpin->SetRange(0,9999,1);
+        m_yearSpin->SetValue(m_workingMetadata->GetYear());
+    }
+    if (m_userRatingSpin)
+    {
+        m_userRatingSpin->SetRange(0,10,1);
+        m_userRatingSpin->SetValue(m_workingMetadata->GetUserRating());
+    }
+    if (m_lengthSpin)
+    {
+        m_lengthSpin->SetRange(0,999,1);
+        m_lengthSpin->SetValue(m_workingMetadata->GetLength());
+    }
 
     MythUIButtonListItem *button =
         new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
@@ -291,6 +339,35 @@ void EditMetadataDialog::fillWidgets()
     m_fanartText->SetText(m_workingMetadata->GetFanart());
     m_trailerText->SetText(m_workingMetadata->GetTrailer());
     m_playerEdit->SetText(m_workingMetadata->GetPlayCommand());
+    if (m_ratingEdit)
+        m_ratingEdit->SetText(m_workingMetadata->GetRating());
+    if (m_directorEdit)
+        m_directorEdit->SetText(m_workingMetadata->GetDirector());
+    if (m_inetrefEdit)
+        m_inetrefEdit->SetText(m_workingMetadata->GetInetRef());
+    if (m_plotEdit)
+        m_plotEdit->SetText(m_workingMetadata->GetPlot());
+
+    if (m_coverart)
+    {
+        m_coverart->SetFilename(m_workingMetadata->GetCoverFile());
+        m_coverart->Load();
+    }
+    if (m_screenshot)
+    {
+        m_screenshot->SetFilename(m_workingMetadata->GetScreenshot());
+        m_screenshot->Load();
+    }
+    if (m_banner)
+    {
+        m_banner->SetFilename(m_workingMetadata->GetBanner());
+        m_banner->Load();
+    }
+    if (m_fanart)
+    {
+        m_fanart->SetFilename(m_workingMetadata->GetFanart());
+        m_fanart->Load();
+    }
 }
 
 void EditMetadataDialog::NewCategoryPopup()
@@ -342,6 +419,26 @@ void EditMetadataDialog::SetCategory(MythUIButtonListItem *item)
     m_workingMetadata->SetCategoryID(item->GetData().toInt());
 }
 
+void EditMetadataDialog::SetRating()
+{
+    m_workingMetadata->SetRating(m_subtitleEdit->GetText());
+}
+
+void EditMetadataDialog::SetDirector()
+{
+    m_workingMetadata->SetDirector(m_subtitleEdit->GetText());
+}
+
+void EditMetadataDialog::SetInetRef()
+{
+    m_workingMetadata->SetInetRef(m_subtitleEdit->GetText());
+}
+
+void EditMetadataDialog::SetPlot()
+{
+    m_workingMetadata->SetPlot(m_subtitleEdit->GetText());
+}
+
 void EditMetadataDialog::SetSeason()
 {
     m_workingMetadata->SetSeason(m_seasonSpin->GetIntValue());
@@ -350,6 +447,21 @@ void EditMetadataDialog::SetSeason()
 void EditMetadataDialog::SetEpisode()
 {
     m_workingMetadata->SetEpisode(m_episodeSpin->GetIntValue());
+}
+
+void EditMetadataDialog::SetYear()
+{
+    m_workingMetadata->SetYear(m_yearSpin->GetIntValue());
+}
+
+void EditMetadataDialog::SetUserRating()
+{
+    m_workingMetadata->SetUserRating(m_userRatingSpin->GetIntValue());
+}
+
+void EditMetadataDialog::SetLength()
+{
+    m_workingMetadata->SetLength(m_lengthSpin->GetIntValue());
 }
 
 void EditMetadataDialog::SetPlayer()
