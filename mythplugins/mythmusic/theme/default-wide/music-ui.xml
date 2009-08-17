@@ -22,10 +22,10 @@
         </font>
 
         <container name="musictree">
-            <area>64,36,1152,440</area>
+            <area>20,36,1260,440</area>
 
             <listtreearea name="musictree" draworder="0">
-                <area>0,0,1152,440</area>
+                <area>0,0,1240,440</area>
                 <listsize>0,0,372,440</listsize>
                 <leveloffset>12</leveloffset>
                 <gradient type="unselected" start="#505050" end="#000000" alpha="100">
@@ -38,11 +38,12 @@
         </container>
 
         <container name="info">
-            <area>64,484,1152,200</area>
+            <area>0,480,1280,240</area>
 
             <image name="background" draworder="0" fleximage="no">
                 <filename>music-sel-bg.png</filename>
-                <position>0,0</position>
+                <position>10,0</position>
+                <staticsize>1260,230</staticsize>
             </image>
 
             <textarea name="line1" draworder="1">
@@ -133,14 +134,14 @@
         <!--= The (unchanging) background -->
 
         <container name="background">
-            <image name="filler" draworder="0" fleximage="yes">
-                <filename>background.png</filename>
+            <image name="filler" draworder="0" fleximage="no">
+                <filename>music-sel-bg.png</filename>
                 <position>5,20</position>
             </image>
-            <image name="titlelines" draworder="0" fleximage="no">
-                <filename>trans-titles.png</filename>
+          <!--  <image name="titlelines" draworder="0" fleximage="no">
+                <filename>mm-titlelines.png</filename>
                 <position>0,16</position>
-            </image>
+            </image> -->
             <image name="track_info_background" draworder="0" fleximage="no">
                 <filename>track_info_background.png</filename>
                 <position>0,340</position>
@@ -148,13 +149,13 @@
             <image name="mm_blackhole_border" draworder="0" fleximage="no">
                 <filename>mm_blackhole_border.png</filename>
                 <position>203,359</position>
-                <staticsize>163,160</staticsize>
+                <staticsize>160,162</staticsize>
             </image>
         </container>
 
         <!-- The view of playlists; tracks at the top -->
         <container name="musicselector">
-            <area>8,20,1264,310</area> <!-- mm_waiting.png -->
+            <area>8,10,1264,340</area> <!-- mm_waiting.png -->
             <!-- First appearance of a managedtreelist
                  I'll explain as we go
 
@@ -181,19 +182,19 @@
                      NB: bins number 1 to # of bins inclusive
                      not 0 to #-1 -->
                 <bin number="1">
-                    <area>56,28,288,250</area>
+                    <area>5,10,288,300</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                 </bin>
                 <bin number="2">
-                    <area>384,10,208,296</area>
+                    <area>350,10,208,300</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                 </bin>
                 <bin number="3">
-                    <area>619,10,618,296</area>
+                    <area>600,15,618,300</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
@@ -202,16 +203,17 @@
 
             <!-- An image that go "on top" of the list bins -->
 
-            <image name="showinglines" draworder="2" fleximage="yes">
+            <image name="showinglines" draworder="2" fleximage="no">
                 <context>1</context>
-                <filename>showings.png</filename>
-                <position>0,0</position>
+                <filename>mm-titlelines.png</filename>
+                <position>5,10</position>
+              <!--  <staticsize>1230,310</staticsize> -->
             </image>
 
             <!--    An image for when we're waiting for data  -->
             <image name="mm_waiting" draworder="0" fleximage="no">
                 <context>0</context>
-                <filename>mm_waiting.png</filename>
+                <filename>music-sel-bg.png</filename>
                 <position>0,0</position>
             </image>
             <textarea name="waiting_text" draworder="1" align="allcenter">
@@ -226,7 +228,7 @@
 
             <image name="mm_waiting" draworder="0" fleximage="no">
                 <context>2</context>
-                <filename>mm_waiting.png</filename> <!-- 1264x305 -->
+                <filename>music-sel-bg.png</filename> <!-- 1264x305 -->
                 <position>0,0</position>
             </image>
         </container>
@@ -234,56 +236,61 @@
         <!-- An area to hold info about the playing track -->
 
         <container name="trackinfo">
-            <area>0,340,1136,210</area>
-
-            <blackhole name="visual_blackhole">
-                <area>206,23,158,154</area>
-            </blackhole>
+            <area>190,350,900,210</area>
 
             <textarea name="title_text" draworder="1">
                 <font>currenttitle</font>
-                <area>386,20,684,34</area>
+                <area>175,5,720,34</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="artist_text" draworder="1">
                 <font>currentartist</font>
-                <area>386,60,684,30</area>
+                <area>175,40,720,34</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <textarea name="album_text" draworder="1">
                 <font>currentartist</font>
-                <area>386,95,684,30</area>
+                <area>175,75,720,34</area>
                 <cutdown>yes</cutdown>
             </textarea>
 
             <repeatedimage name="ratings_image" draworder="1" fleximage="no">
                 <filename>mm_rating.png</filename>
-                <position>386,133</position>
+                <position>585,139</position>
                 <orientation>LeftToRight</orientation>
             </repeatedimage>
 
             <textarea name="current_visualization_text" draworder="1" align="right">
                 <font>currentartist</font>
-                <area>885,60,185,30</area>
-                <cutdown>yes</cutdown>
+                <area>375,120,200,35</area>
+                <cutdown>no</cutdown>
             </textarea>
 
-            <textarea name="info_text" draworder="1" align="right">
+            <textarea name="info_text" draworder="1">
                 <font>infotext</font>
-                <area>571,105,499,30</area>
+                <area>590,149,250,35</area>
             </textarea>
 
-            <textarea name="time_text" draworder="1" align="right">
+            <textarea name="volume_text" draworder="5">
+                <font>infotext</font>
+                <area>500,95,250,25</area>
+            </textarea>
+
+            <textarea name="time_text" draworder="1">
                 <font>currentartist</font>
-                <area>885,153,185,30</area>
+                <area>175,120,185,35</area>
             </textarea>
 
-            <statusbar name="progress_bar" draworder="5" whitespace="5">
+            <blackhole name="visual_blackhole">
+                <area>17,13,155,155</area>
+            </blackhole>
+
+            <statusbar name="progress_bar" draworder="2" whitespace="5">
                 <container fleximage="no">mm_progress-bg.png</container>
                 <fill>mm_progress-fg.png</fill>
-                <position>386,160</position>
+                <position>175,153</position>
                 <orientation>LeftToRight</orientation>
             </statusbar>
 
@@ -308,33 +315,33 @@
 
             <textbutton name="shuffle_button" draworder="0">
                 <position>32,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
+                <image function="on" filename="button_selected_background.png"></image>
+                <image function="off" filename="button_background.png"></image>
+                <image function="pushed" filename="button_pushed_background.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="repeat_button" draworder="0">
                 <position>312,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
+                <image function="on" filename="button_selected_background.png"></image>
+                <image function="off" filename="button_background.png"></image>
+                <image function="pushed" filename="button_pushed_background.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="pledit_button" draworder="0">
                 <position>592,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
+                <image function="on" filename="button_selected_background.png"></image>
+                <image function="off" filename="button_background.png"></image>
+                <image function="pushed" filename="button_pushed_background.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="vis_button" draworder="0">
                 <position>872,0</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
+                <image function="on" filename="button_selected_background.png"></image>
+                <image function="off" filename="button_background.png"></image>
+                <image function="pushed" filename="button_pushed_background.png"></image>
                 <font>buttons</font>
             </textbutton>
 
@@ -1143,12 +1150,12 @@
         </textarea>
 
         <textarea name="artist" from="basetextarea">
-            <area>170,50,415,27</area>
+            <area>170,50,415,35</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="album" from="basetextarea">
-            <area>170,77,415,27</area>
+            <area>170,80,415,35</area>
             <font>basemedium</font>
         </textarea>
 
@@ -1156,7 +1163,7 @@
         </statetype>
 
         <textarea name="info" from="basetextarea">
-            <area>170,129,250,25</area>
+            <area>170,125,250,25</area>
         </textarea>
 
         <textarea name="time" from="basetextarea">
@@ -1169,9 +1176,17 @@
             <area>22,22,144,144</area>
         </imagetype>
 
-        <progressbar name="progress" from="baseprogressbar">
-            <position>170,150</position>
-        </progressbar>
-    </window>
+    <progressbar name="progress">
+        <area>170,150,10,10</area>
+        <layout>horizontal</layout>
+        <style>reveal</style>
+        <imagetype name="background">
+            <filename>mm_progress-bg.png</filename>
+        </imagetype>
+        <imagetype name="progressimage">
+            <filename>mm_progress-fg.png</filename>
+        </imagetype>
+    </progressbar>
+</window>
 
 </mythuitheme>
