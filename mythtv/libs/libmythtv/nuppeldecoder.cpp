@@ -786,7 +786,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                                 unsigned char *lstrm, VideoFrame *frame)
 {
     int r;
-    unsigned int out_len;
+    lzo_uint out_len;
     int compoff = 0;
 
     unsigned char *outbuf = frame->buf;
