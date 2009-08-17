@@ -169,6 +169,36 @@ static QString findZoneinfoFile(QString zoneinfo_file_path,
 }
 #endif
 
+/* helper fuction to find the zone ID in a configuration string
+   allows NIS-format /etc/timezone , which contains extra information:
+   <time zone ID> <host or NIS domain name> # optional comments
+*/
+static bool parse_zone_id_config_string(QString& zone_id)
+{
+    bool found = false;
+    QString zoneinfo_dir_path("/usr/share/zoneinfo/");
+    QRegExp sep("\\s+");
+    QFileInfo file_info;
+
+    while (!found)
+    {
+        QString temp_zone_id = zone_id;
+        temp_zone_id.replace(' ', '_');
+        file_info.setFile(zoneinfo_dir_path + temp_zone_id);
+        if (file_info.exists())
+        {
+            found = true;
+        }
+        else
+        {
+            zone_id = zone_id.section(sep, 0, -2);
+            if (zone_id.isEmpty())
+                break;
+        }
+    }
+    return found;
+}
+
 /* helper fuction to read time zone id from a file
    Debian's /etc/timezone or Red Hat's /etc/sysconfig/clock */
 static bool read_time_zone_id(QString filename, QString& zone_id)
@@ -183,7 +213,7 @@ static bool read_time_zone_id(QString filename, QString& zone_id)
             QString line;
             QTextStream in(&file);
             // Handle whitespace and quotes
-            QRegExp re("^(?:ZONE\\s*=)?\\s*(['\"]?)([\\w\\s/-\\+]+)\\1\\s*$");
+            QRegExp re("^(?:ZONE\\s*=)?\\s*(['\"]?)([\\w\\s/-\\+]+)\\1\\s*(?:#.*)?$");
             re.setPatternSyntax(QRegExp::RegExp2);
             while (!in.atEnd())
             {
@@ -191,7 +221,8 @@ static bool read_time_zone_id(QString filename, QString& zone_id)
                 if (re.indexIn(line) != -1)
                 {
                     zone_id = re.cap(2);
-                    found = true;
+                    if (parse_zone_id_config_string(zone_id))
+                        found = true;
                     break;
                 }
             }
