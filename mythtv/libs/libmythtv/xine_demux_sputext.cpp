@@ -875,7 +875,8 @@ static subtitle_t *sub_read_line_jacobsub(demux_sputext_t *demuxstr, subtitle_t 
 			return NULL;
 		    trail_space(directive);
 		    strncat(line2, directive,
-			    (LINE_LEN > 511) ? LINE_LEN : 511);
+                            ((LINE_LEN > 511) ? LINE_LEN-1 : 511)
+                            - strlen(line2));
 		    break;
 		}
 	    default:
