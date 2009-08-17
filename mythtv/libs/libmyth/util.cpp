@@ -79,6 +79,54 @@ int calc_utc_offset(void)
     return utc_offset;
 }
 
+static bool compare_zone_files(QFileInfo first_file_info,
+                               QFileInfo second_file_info)
+{
+    if (!first_file_info.isFile() || !second_file_info.isFile() ||
+        !first_file_info.isReadable() || !second_file_info.isReadable())
+        return false;
+
+    qint64 first_file_size = first_file_info.size();
+    // sanity check - zoneinfo files should typically be less than
+    // about 4kB, but leave room for growth
+    if ((first_file_size > 200 * 1024) ||
+        (second_file_info.size() != first_file_size))
+        return false;
+
+    QFile first_file(first_file_info.absoluteFilePath());
+    QByteArray first_file_data;
+    first_file_data.resize(first_file_size);
+    QFile second_file(second_file_info.absoluteFilePath());
+    QByteArray second_file_data;
+    second_file_data.resize(first_file_size);
+    if (first_file.open(QIODevice::ReadOnly))
+    {
+        QDataStream in(&first_file);
+        if (in.readRawData(first_file_data.data(),
+                           first_file_size) != first_file_size)
+        {
+            first_file.close();
+            return false;
+        }
+        first_file.close();
+    }
+    if (second_file.open(QIODevice::ReadOnly))
+    {
+        QDataStream in(&second_file);
+        if (in.readRawData(second_file_data.data(),
+                           first_file_size) != first_file_size)
+        {
+            second_file.close();
+            return false;
+        }
+        second_file.close();
+    }
+    if (first_file_data == second_file_data)
+        return true;
+
+    return false;
+}
+
 #ifndef USING_MINGW
 /* Helper function for getSystemTimeZoneID() that compares the
    zoneinfo_file_path (regular) file with files in the zoneinfo_dir_path until
@@ -92,8 +140,7 @@ static QString findZoneinfoFile(QString zoneinfo_file_path,
     QFileInfoList dirlist = zoneinfo_dir.entryInfoList();
     QFileInfo info;
     QString basename;
-    QFile zoneinfo_file(zoneinfo_file_path);
-    qint64 zoneinfo_file_size = zoneinfo_file.size();
+    QFileInfo zoneinfo_file_info(zoneinfo_file_path);
 
     for (QFileInfoList::const_iterator it = dirlist.begin();
          it != dirlist.end(); it++)
@@ -112,45 +159,10 @@ static QString findZoneinfoFile(QString zoneinfo_file_path,
             if (zone_id != "UNDEF")
                 return zone_id;
         }
-        else if (info.isFile() && (info.size() == zoneinfo_file_size) &&
-                 info.isReadable())
+        else if (compare_zone_files(zoneinfo_file_info, info))
         {
-            // sanity check - zoneinfo files should typically be less than
-            // about 4kB, but leave room for growth
-            if (zoneinfo_file_size > 200 * 1024)
-                continue;
-            QFile this_file(info.absoluteFilePath());
-            QByteArray zoneinfo_file_data;
-            zoneinfo_file_data.resize(zoneinfo_file_size);
-            QByteArray this_file_data;
-            this_file_data.resize(zoneinfo_file_size);
-            if (zoneinfo_file.open(QIODevice::ReadOnly))
-            {
-                QDataStream in(&zoneinfo_file);
-                if (in.readRawData(zoneinfo_file_data.data(),
-                                   zoneinfo_file_size) != zoneinfo_file_size)
-                {
-                    zoneinfo_file.close();
-                    return zone_id;
-                }
-                zoneinfo_file.close();
-            }
-            if (this_file.open(QIODevice::ReadOnly))
-            {
-                QDataStream in(&this_file);
-                if (in.readRawData(this_file_data.data(),
-                                   zoneinfo_file_size) != zoneinfo_file_size)
-                {
-                    this_file.close();
-                    return zone_id;
-                }
-                this_file.close();
-            }
-            if (zoneinfo_file_data == this_file_data)
-            {
-                zone_id = info.absoluteFilePath();
-                break;
-            }
+            zone_id = info.absoluteFilePath();
+            break;
         }
     }
     return zone_id;
@@ -312,6 +324,29 @@ QString getTimeZoneID(void)
     return zone_id;
 }
 
+/* Helper function for checkTimeZone() that compares zone ID's.
+   In the event that the zone ID's differ, checks to see if the local
+   zoneinfo database has both zone ID's and if they're equivalent. */
+static bool compare_zone_IDs(QString firstZoneID, QString secondZoneID)
+{
+    // Some distros use spaces rather than underscores in the zone ID, so
+    // allow matches where the only difference is space vs. underscore.
+    firstZoneID.replace(' ', '_');
+    secondZoneID.replace(' ', '_');
+    if (firstZoneID == secondZoneID)
+        return true;
+
+    // Although the zone ID names don't match, they may refer to equivalent
+    // rules, so compare the files
+    QString zoneinfo_dir_path("/usr/share/zoneinfo");
+    QFileInfo firstInfo(zoneinfo_dir_path + "/" + firstZoneID);
+    QFileInfo secondInfo(zoneinfo_dir_path + "/" + secondZoneID);
+    if (compare_zone_files(firstInfo, secondInfo))
+        return true;
+
+    return false;
+}
+
 static void print_timezone_info(QString master_zone_id, QString local_zone_id,
                                 int master_utc_offset, int local_utc_offset,
                                 QString master_time, QString local_time)
@@ -376,16 +411,8 @@ bool checkTimeZone(const QStringList &master_settings)
         have_zone_IDs = false;
     }
 
-    // Some distros use spaces rather than underscores in the zone ID, so
-    // allow matches where the only difference is space vs. underscore.
-    // Rather than modify the original zone ID's, modify a copy for the
-    // comparison so the error message will show a difference in zone ID
-    // as well as offset/current time in case the definitions differ.
-    QString master_zone_compare = master_time_zone_ID;
-    QString local_zone_compare = local_time_zone_ID;
-    master_zone_compare.replace(' ', '_');
-    local_zone_compare.replace(' ', '_');
-    if (have_zone_IDs && (master_zone_compare != local_zone_compare))
+    if (have_zone_IDs &&
+        !compare_zone_IDs(master_time_zone_ID, local_time_zone_ID))
     {
         VERBOSE(VB_IMPORTANT, "Time zone settings on the master backend "
                               "differ from those on this system.");
