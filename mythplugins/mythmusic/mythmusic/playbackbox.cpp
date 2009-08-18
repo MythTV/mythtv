@@ -1205,12 +1205,10 @@ void PlaybackBoxMusic::toggleMute()
 void PlaybackBoxMusic::showProgressBar()
 {
     if (progress_bar && visualizer_status != 2)
-    {
-    	int percentplayed;
-        if (maxTime > 0) 
-            percentplayed = currentTime / maxTime * 100;
-        else
-            percentplayed = 0;
+    {       
+        int percentplayed = 1;
+        if (maxTime)
+            percentplayed = (int)(((double)currentTime / (double)maxTime)*100);
         progress_bar->SetTotal(100);
         progress_bar->SetUsed(percentplayed);
     }
