@@ -823,11 +823,16 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
     {
         if ((*dir)->has_entries())
         {
+            bool incUpDir = include_updirs;
+            // Only include upnodes when there is a parent to move up to
+            if (!dst->getParent())
+                incUpDir = false;
+
             MythGenericTree *t = AddDirNode(dst, (*dir)->getName(),
-                    (*dir)->getFQPath(), include_updirs, (*dir)->GetHost(),
+                    (*dir)->getFQPath(), incUpDir, (*dir)->GetHost(),
                     (*dir)->GetPrefix());
 
-            build_generic_tree(t, dir->get(), include_updirs);
+            build_generic_tree(t, dir->get(), incUpDir);
         }
     }
 
