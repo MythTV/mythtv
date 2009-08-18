@@ -53,7 +53,7 @@ bool HDHRChannel::Open(void)
     VERBOSE(VB_CHANNEL, LOC + "Opening HDHR channel");
 
     QMutexLocker locker(&hw_lock);
-    
+
     if (IsOpen())
         return true;
 
@@ -72,7 +72,7 @@ void HDHRChannel::Close(void)
 {
     VERBOSE(VB_CHANNEL, LOC + "Closing HDHR channel");
 
-        if (!IsOpen())
+    if (!IsOpen())
         return; // this caller didn't have it open in the first place..
 
     HDHRStreamHandler::Return(_stream_handler);
@@ -249,7 +249,7 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
         modulation = "qam";             // "auto" works just as well?
 #endif
 
-    if (modulation.isEmpty()) 
+    if (modulation.isEmpty())
         modulation = "auto";
 
     QString chan = modulation + ':' + QString::number(frequency);
