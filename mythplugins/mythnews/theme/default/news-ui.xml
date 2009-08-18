@@ -96,21 +96,22 @@
             <position>235,340</position>
         </textedit>
 
-        <checkbox name="podcast_check" from="basecheckbox">
-            <position>340,465</position>
-        </checkbox>
-
-        <textarea name="podcast_text" from="basetextarea">
-            <area>380,465,500,50</area>
+        <textarea name="podcastlabel" from="basetextarea">
+            <area>120,450,100,30</area>
+            <align>right,vcenter</align>
         </textarea>
 
+        <checkbox name="podcast_check" from="basecheckbox">
+            <position>235,450</position>
+        </checkbox>
+
         <button name="cancel" from="basebutton">
-            <position>60,480</position>
+            <position>60,510</position>
             <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
-            <position>590,480</position>
+            <position>590,510</position>
             <value>Ok</value>
         </button>
 

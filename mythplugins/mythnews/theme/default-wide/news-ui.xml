@@ -88,7 +88,7 @@
         </textedit>
 
         <textarea name="iconlabel" from="basetextarea">
-            <area>345,350,100,30</area>
+            <area>335,350,100,30</area>
             <align>right,vcenter</align>
         </textarea>
 
