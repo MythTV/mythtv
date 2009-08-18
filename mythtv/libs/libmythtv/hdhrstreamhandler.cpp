@@ -37,8 +37,7 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname)
 
     QString devkey = devname.toUpper();
 
-    QMap<QString,HDHRStreamHandler*>::iterator it =
-        _handlers.find(devkey);
+    QMap<QString,HDHRStreamHandler*>::iterator it = _handlers.find(devkey);
 
     hdhr_id_data device_data;
 
@@ -63,12 +62,14 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname)
 
     if (it == _handlers.end())
     {
-        HDHRStreamHandler *newhandler = new HDHRStreamHandler(devkey, device_data);
+        HDHRStreamHandler *newhandler = new HDHRStreamHandler(devkey,
+                                                              device_data);
         newhandler->Open();
         _handlers[devkey] = newhandler;
         _handlers_refcnt[devkey] = 1;
 
-        // If we are adding a "NOTFOUND" device, up its refcount so we never delete it.
+        // If we are adding a "NOTFOUND" device,
+        // up its refcount so we never delete it.
         if (device_data.device_id == 0)
             _handlers_refcnt[devkey]++;
 
@@ -82,7 +83,8 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname)
         uint rcount = _handlers_refcnt[devkey];
         VERBOSE(VB_RECORD,
                 QString("HDHRSH: Using existing stream handler %1 for %2")
-                .arg(devkey).arg(devname) + QString(" (%1 in use)").arg(rcount));
+                .arg(devkey)
+                .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
     return _handlers[devkey];
@@ -108,9 +110,8 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
     QMap<QString,HDHRStreamHandler*>::iterator it = _handlers.find(devname);
     if ((it != _handlers.end()) && (*it == ref))
     {
-        VERBOSE(VB_RECORD,
-                QString("HDHRSH: Closing handler for %1")
-                .arg(devname));
+        VERBOSE(VB_RECORD, QString("HDHRSH: Closing handler for %1")
+                           .arg(devname));
         ref->Close();
         delete *it;
         _handlers.erase(it);
@@ -126,7 +127,8 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
     ref = NULL;
 }
 
-HDHRStreamHandler::HDHRStreamHandler(const QString &devicename, hdhr_id_data & device_data) :
+HDHRStreamHandler::HDHRStreamHandler(const QString &devicename,
+                                     hdhr_id_data  &device_data) :
     _control_socket(NULL),
     _video_socket(NULL),
     _device_id(device_data.device_id),
@@ -218,7 +220,7 @@ void HDHRStreamHandler::Start(void)
 {
     QMutexLocker locker(&_start_stop_lock);
 
-    _eit_pids.clear(); 
+    _eit_pids.clear();
 
     if (!IsRunning())
     {
@@ -262,8 +264,8 @@ void HDHRStreamHandler::Run(void)
  *  \brief Uses TS filtering devices to read a DVB device for tables & data
  *
  *  This supports all types of MPEG based stream data, but is extreemely
- *  slow with DVB over USB 1.0 devices which for efficiency reasons buffer 
- *  a stream until a full block transfer buffer full of the requested 
+ *  slow with DVB over USB 1.0 devices which for efficiency reasons buffer
+ *  a stream until a full block transfer buffer full of the requested
  *  tables is available. This takes a very long time when you are just
  *  waiting for a PAT or PMT table, and the buffer is hundreds of packets
  *  in size.
@@ -335,7 +337,7 @@ void HDHRStreamHandler::RunTS(void)
             remainder = _stream_data_list[i]->ProcessData(
                 data_buffer, data_length);
         }
-       
+
         _listener_lock.unlock();
         if (remainder != 0)
         {
@@ -357,7 +359,7 @@ void HDHRStreamHandler::RunTS(void)
         tmp_video_socket = _video_socket;
         _video_socket=NULL;
     }
-     
+
     hdhomerun_video_destroy(tmp_video_socket);
 
     VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
@@ -646,7 +648,8 @@ bool HDHRStreamHandler::Connect(void)
     return true;
 }
 
-void HDHRStreamHandler::FindDevice(const QString & _devicename, hdhr_id_data &device_data)
+void HDHRStreamHandler::FindDevice(const QString &_devicename,
+                                   hdhr_id_data  &device_data)
 {
     hdhomerun_device_t* thisdevice = hdhomerun_device_create_from_str(
         _devicename.toLocal8Bit().constData(), NULL);
@@ -660,8 +663,9 @@ void HDHRStreamHandler::FindDevice(const QString & _devicename, hdhr_id_data &de
 
         if (device_data.device_ip != 0)
         {
-            VERBOSE(VB_IMPORTANT, 
-                    QString("HDHRSH: device %1 found at address %2.%3.%4.%5 tuner %6")
+            VERBOSE(VB_IMPORTANT,
+                    QString("HDHRSH: device %1 found at "
+                            "address %2.%3.%4.%5 tuner %6")
                     .arg(_devicename)
                     .arg((device_data.device_ip>>24) & 0xFF)
                     .arg((device_data.device_ip>>16) & 0xFF)
@@ -671,17 +675,16 @@ void HDHRStreamHandler::FindDevice(const QString & _devicename, hdhr_id_data &de
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("HDHRSH: hdhomerun device %1 not found").arg(_devicename));
+            VERBOSE(VB_IMPORTANT, LOC + "device not found");
             device_data.device_id = 0;
-            device_data.device_ip = hdhomerun_device_get_device_ip_requested(thisdevice);
+            device_data.device_ip = hdhomerun_device_get_device_ip_requested(
+                                        thisdevice);
             device_data.tuner     = 0;
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("HDHRSH: hdhomerun device %1 not found").arg(_devicename));
+        VERBOSE(VB_IMPORTANT, LOC + "device not found");
         device_data.device_id = 0;
         device_data.device_ip = 0;
         device_data.tuner     = 0;

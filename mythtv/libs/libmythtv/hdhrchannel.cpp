@@ -199,6 +199,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
     QString tmpX = curchannelname; tmpX.detach();
     inputs[currentInputID]->startChanNum = tmpX;
 
+    // Turn on the program filtering if tuning to MPEG stream
     if (mpeg_prog_num && (GetTuningMode() == "mpeg"))
         _stream_handler->TuneProgram(mpeg_prog_num);
 
