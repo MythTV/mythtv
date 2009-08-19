@@ -38,6 +38,7 @@
 #include <qmap.h>
 #include <qmutex.h>
 #include <QList>
+#include <QPair>
 #include <qdatetime.h>
 
 // MythTV includes
@@ -61,7 +62,8 @@ class DVBSignalMonitor;
 typedef vector<const ProgramMapTable*>  pmt_vec_t;
 typedef QMap<uint, pmt_vec_t>           pmt_map_t;
 class ScannedChannelInfo;
-typedef QMap<transport_scan_items_it_t,ScannedChannelInfo*> ChannelMap;
+typedef QPair<transport_scan_items_it_t, ScannedChannelInfo*> ChannelListItem;
+typedef QList<ChannelListItem> ChannelList;
 
 class ChannelScanSM;
 class AnalogSignalHandler : public SignalMonitorListener
@@ -121,7 +123,8 @@ class ChannelScanSM : public MPEGStreamListener,
     DVBSignalMonitor *GetDVBSignalMonitor(void);
 
     typedef QMap<uint,ChannelInsertInfo> chan_info_map_t;
-    chan_info_map_t GetChannelList(ChannelMap::const_iterator it) const;
+    chan_info_map_t GetChannelList(transport_scan_items_it_t trans_info,
+                                   ScannedChannelInfo *scan_info) const;
     uint GetCurrentTransportInfo(QString &chan, QString &chan_tr) const;
     ScanDTVTransportList GetChannelList(void) const;
 
@@ -219,8 +222,9 @@ class ChannelScanSM : public MPEGStreamListener,
     QMap<uint, bool>            currentEncryptionStatusChecked;
 
     /// Found Channel Info
-    ChannelMap        channelMap;
+    ChannelList       channelList;
     uint              channelsFound;
+    ScannedChannelInfo *currentInfo;
 
     // Analog Info
     AnalogSignalHandler *analogSignalHandler;
