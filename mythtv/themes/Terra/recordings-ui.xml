@@ -58,12 +58,12 @@
         </buttonlist>
 
         <imagetype name="recbackground">
-            <position>0,120</position>
+            <position>0,132</position>
             <filename>recordings/recordingsbackground.png</filename>
         </imagetype>
 
         <buttonlist name="recordings">
-            <area>0,120,1280,300</area>
+            <area>0,116,1280,300</area>
             <buttonarea>0,0,1280,300</buttonarea>
             <wrapstyle>items</wrapstyle>
             <scrollstyle>center</scrollstyle>
@@ -71,10 +71,11 @@
             <spacing>0</spacing>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,14,256,262</area>
+                    <area>0,18,256,262</area>
+                    <imagetype name="frame" />
                     <imagetype name="preview">
-                        <area>0,2,256,144</area>
-                        <filename></filename>
+                        <area>0,1,256,144</area>
+                        <mask>recordings/previewmask_unselected.png</mask>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="jobstate">
@@ -133,35 +134,42 @@
                     </textarea>
                 </state>
                 <state name="selected" from="active">
-                    <area>-16,0,288,280</area>
+                    <area>-17,0,291,307</area>
+                    <imagetype name="frame">
+                        <filename>recordings/selected_recording_background.png</filename>
+                    </imagetype>
                     <imagetype name="preview">
-                        <area>0,3,288,162</area>
+                        <area>2,4,288,162</area>
                         <mask>recordings/previewmask.png</mask>
                     </imagetype>
                     <statetype name="status">
-                        <position>236,120</position>
+                        <position>236,124</position>
                     </statetype>
                     <textarea name="title">
-                        <area>8,165,272,73</area>
+                        <area>8,169,272,73</area>
                         <font>baselarge</font>
                     </textarea>
                     <textarea name="subtitle">
-                        <area>8,239,272,25</area>
+                        <area>8,243,272,25</area>
                     </textarea>
                     <textarea name="starttime">
-                        <area>20,270,100,25</area>
+                        <area>20,274,100,25</area>
                     </textarea>
                     <textarea name="startdate">
-                        <area>130,270,138,25</area>
+                        <area>130,274,138,25</area>
                     </textarea>
                     <statetype name="jobstate">
-                        <position>240,120</position>
+                        <position>240,124</position>
                     </statetype>
                     <statetype name="watched">
-                        <position>13,120</position>
+                        <position>13,124</position>
                     </statetype>
                 </state>
-                <state name="inactive" from="selected" />
+                <state name="inactive" from="active">
+                    <imagetype name="preview">
+                        <grayscale>true</grayscale>
+                    </imagetype>
+                </state>
             </statetype>
             <statetype name="downscrollarrow">
                 <position>700,400</position>
@@ -170,11 +178,6 @@
                 <position>728,400</position>
             </statetype>
         </buttonlist>
-
-        <imagetype name="recframe">
-            <position>0,118</position>
-            <filename>recordings/recordingsframe.png</filename>
-        </imagetype>
 
 <!--
         <imagetype name="autoexpire">

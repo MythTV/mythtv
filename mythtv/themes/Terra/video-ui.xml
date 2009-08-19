@@ -101,7 +101,7 @@
         </imagetype>
 
         <imagetype name="backimg">
-            <position>236,78</position>
+            <position>236,40</position>
             <filename>video/filters_background.png</filename>
         </imagetype>
 
@@ -123,9 +123,9 @@
         <textarea name="textfilter_text">
             <area>419,236,180,30</area>
             <value>Text Filter:</value>
-      	    <font>basemedium</font>
+            <font>basemedium</font>
         </textarea>
-	
+
         <textarea name="category_text">
             <area>269,272,220,30</area>
             <value>Category</value>
@@ -189,9 +189,9 @@
         </textarea>
 
         <!-- Widgets -->
-      	<textedit name="textfilter_input" from="baseshorttextedit">
+        <textedit name="textfilter_input" from="baseshorttextedit">
             <position>545,225</position>
-  	</textedit>
+        </textedit>
 
         <buttonlist name="category_select" from="baseselector">
             <position>269,299</position>
@@ -306,16 +306,17 @@
                     </textarea>
                 </state>
                 <state name="selected" from="active">
+                    <area>0,-24,92,137</area>
                     <imagetype name="buttonimage">
-                        <area>0,-24,92,137</area>
+                        <area>0,0,92,137</area>
                         <filename>mv_browse_nocover.png</filename>
                         <mask>video/managerpostermask.png</mask>
                     </imagetype>
                     <textarea name="buttontext">
-                        <position>100,8</position>
+                        <position>100,32</position>
                     </textarea>
                     <textarea name="director">
-                        <position>100,61</position>
+                        <position>100,85</position>
                     </textarea>
                 </state>
             </statetype>
@@ -537,37 +538,65 @@
             <buttonarea>0,0,1282,299</buttonarea>
             <spacing>0</spacing>
             <statetype name="buttonitem">
-                <state name="active">
-                    <area>0,0,183,299</area>
+                <state name="selected">
+                    <area>-13,0,209,332</area>
                     <imagetype name="buttonimage">
-                        <area>0,25,183,275</area>
-                        <filename>mv_browse_nocover.png</filename>
-                    </imagetype>
-
-                    <statetype name="nodetype">
-                        <position>60,140</position>
-                        <state name="subfolder">
-                            <imagetype name="icon">
-                                <area>0,0,70,70</area>
-                                <filename>mv_gallery_dir.png</filename>
-                                <preserveaspect>yes</preserveaspect>
-                            </imagetype>
-                        </state>
-                        <state name="upfolder">
-                            <imagetype name="icon">
-                                <area>0,0,70,70</area>
-                                <filename>mv_gallery_dir_up.png</filename>
-                                <preserveaspect>yes</preserveaspect>
-                            </imagetype>
-                        </state>
-                    </statetype>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="buttonimage">
-                        <area>-13,3,210,325</area>
+                        <area>1,3,209,325</area>
                         <filename>mv_browse_nocover.png</filename>
                         <mask>video/postermask.png</mask>
                     </imagetype>
+
+                    <shape name="titlebackground" />
+                    <textarea name="buttontext" />
+
+                    <statetype name="nodetype">
+                        <position>134,255</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <filename>shared/directory.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder" from="subfolder">
+                            <imagetype name="arrow">
+                                <position>38,33</position>
+                                <filename>shared/updirectory.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+
+                    <textarea name="childcount" from="basetextarea">
+                        <area>160,290,35,20</area>
+                        <font>basesmallbrown</font>
+                        <align>hcenter</align>
+                    </textarea>
+
+                </state>
+                <state name="active" from="selected">
+                    <area>0,0,183,332</area>
+                    <imagetype name="buttonimage">
+                        <area>0,25,183,275</area>
+                    </imagetype>
+
+                    <shape name="titlebackground">
+                        <area>0,0,183,25</area>
+                        <fill color="#767662" alpha="180" />
+                        <cornerradius>10</cornerradius>
+                    </shape>
+
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,2,173,20</area>
+                        <align>hcenter</align>
+                    </textarea>
+
+                    <statetype name="nodetype">
+                        <position>108,230</position>
+                    </statetype>
+
+
+                    <textarea name="childcount">
+                        <position>135,265</position>
+                    </textarea>
+                    
                 </state>
             </statetype>
         </buttonlist>
@@ -598,9 +627,9 @@
         </statetype>
 
         <textarea name="plot" from="basetextarea">
-            <area>48,164,1182,145</area>
+            <area>48,124,1182,145</area>
             <multiline>yes</multiline>
-<!--            <align>vcenter</align>-->
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="year" from="basetextarea">
@@ -621,71 +650,65 @@
 
     <window name="gallery">
 
+<!--        <imagetype name="fanart" from="basebackdrop" />-->
+
         <imagetype name="topbar" from="basetopbar" />
 
         <textarea name="heading" from="baseheading">
             <value>Videos - Gallery</value>
         </textarea>
 
-        <textarea name="title" from="basetextarea">
-            <area>70,15,800,50</area>
-            <cutdown>yes</cutdown>
-            <font>baselarge</font>
-        </textarea>
-
         <buttonlist name="videos">
-            <area>12,0,1260,785</area>
+            <area>17,55,1250,520</area>
             <layout>grid</layout>
-            <spacing>5</spacing>
-            <buttonarea>0,55,1260,720</buttonarea>
+            <spacing>10</spacing>
+            <buttonarea>0,0,1250,450</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,175,160</area>
+                    <area>0,0,200,209</area>
                     <imagetype name="buttonbackground">
-                        <filename>mv_gallery_back_reg.png</filename>
+                        <filename>video/video_gallery_background.png</filename>
                     </imagetype>
+
                     <imagetype name="buttonimage">
-                        <area>10,8,155,125</area>
-                        <filename>mv_browse_nocover.png</filename>
+                        <area>6,5,187,145</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
+                    
                     <statetype name="nodetype">
-                        <position>90,70</position>
+                        <position>118,83</position>
                         <state name="subfolder">
                             <imagetype name="icon">
-                                <area>0,0,70,70</area>
-                                <filename>mv_gallery_dir.png</filename>
+                                <filename>shared/directory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
-                        <state name="upfolder">
-                            <imagetype name="icon">
-                                <area>0,0,70,70</area>
-                                <filename>mv_gallery_dir_up.png</filename>
-                                <preserveaspect>yes</preserveaspect>
+                        <state name="upfolder" from="subfolder">
+                            <imagetype name="upnode">
+                                <position>37,34</position>
+                                <filename>shared/updirectory.png</filename>
                             </imagetype>
                         </state>
                     </statetype>
-                    <textarea name="buttontext">
-                        <area>5,133,165,25</area>
-                        <font>menufont</font>
-                        <align>hcenter,bottom</align>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>8,155,183,50</area>
+                        <align>hcenter,vcenter</align>
+                        <multiline>true</multiline>
                     </textarea>
                     <textarea name="childcount" from="basetextarea">
-                        <area>60,95,80,25</area>
-                        <font>basesmallblack</font>
-                        <align>right</align>
+                        <area>144,118,35,20</area>
+                        <font>basesmallbrown</font>
+                        <align>hcenter</align>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
-                        <filename>mv_gallery_back_sel.png</filename>
+                        <filename>video/video_gallery_background_selected.png</filename>
                     </imagetype>
                 </state>
             </statetype>
-            <statetype name="upscrollarrow">
+<!--            <statetype name="upscrollarrow">
                 <position>1100,15</position>
-                <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
                         <filename>up_arrow.png</filename>
@@ -694,20 +717,19 @@
             </statetype>
             <statetype name="downscrollarrow">
                 <position>1160,15</position>
-                <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="dnon">
                         <filename>down_arrow.png</filename>
                     </imagetype>
                 </state>
-            </statetype>
+            </statetype>-->
         </buttonlist>
 
-        <textarea name="position" from="basetextarea">
-            <area>890,15,200,40</area>
+<!--        <textarea name="position" from="basetextarea">
+            <area>580,680,200,40</area>
             <align>hcenter,vcenter</align>
             <font>basemedium</font>
-        </textarea>
+        </textarea>-->
 
         <textarea name="novideos" from="basetextarea">
             <area>50,50,700,50</area>
@@ -715,40 +737,53 @@
             <align>hcenter,vcenter</align>
         </textarea>
 
+        <imagetype name="textbackground">
+            <position>30,490</position>
+            <filename>video/video_gallery_text_background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>48,497,590,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="subtitle" from="basetextarea">
+            <area>600,497,590,35</area>
+            <align>right</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <statetype name="userratingstate" from="baserating">
+            <position>1193,492</position>
+        </statetype>
+
+        <textarea name="plot" from="basetextarea">
+            <area>48,535,1182,110</area>
+            <multiline>yes</multiline>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>48,650,290,30</area>
+        </textarea>
+
+        <textarea name="runtime" from="basetextarea">
+            <area>540,650,200,30</area>
+            <align>left</align>
+        </textarea>
+
+        <textarea name="director" from="basetextarea">
+            <area>430,650,800,30</area>
+            <align>right</align>
+        </textarea>
+
+
         <!-- <textarea name="breadcrumbs" from="basetextarea">
             <area>500,20,280,30</area>
             <font>basemedium</font>
             <align>right,vcenter</align>
         </textarea> -->
 
-        <statetype name="parentallevel">
-            <position>20,10</position>
-            <state name="None">
-                <imagetype name="icon">
-                    <filename>mv_level_none.png</filename>
-                </imagetype>
-            </state>
-            <state name="Lowest">
-                <imagetype name="icon">
-                    <filename>mv_level_lowest.png</filename>
-                </imagetype>
-            </state>
-            <state name="Low">
-                <imagetype name="icon">
-                    <filename>mv_level_low.png</filename>
-                </imagetype>
-            </state>
-            <state name="Medium">
-                <imagetype name="icon">
-                    <filename>mv_level_medium.png</filename>
-                </imagetype>
-            </state>
-            <state name="High">
-                <imagetype name="icon">
-                    <filename>mv_level_high.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
     </window>
 
     <window name="tree">
@@ -1189,7 +1224,7 @@
         </imagetype>
 
         <imagetype name="backimg">
-            <position>236,78</position>
+            <position>236,58</position>
             <filename>video/filters_background.png</filename>
         </imagetype>
 

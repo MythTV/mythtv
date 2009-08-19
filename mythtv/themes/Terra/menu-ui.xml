@@ -129,7 +129,9 @@
                         </state>
 
                         <state name="TV" from="DEFAULT">
-                            <imagetype name="icon"><filename>watermarks/tv.png</filename></imagetype>
+                            <imagetype name="icon">
+                                <filename>watermarks/tv.png</filename>
+                            </imagetype>
                         </state>
                         <state name="MUSIC" from="DEFAULT">
                             <imagetype name="icon">
@@ -274,7 +276,7 @@
 
                         <state name="TV_PROGRAM_GUIDE" from="DEFAULT">
                             <imagetype name="icon">
-                                <filename>watermarks/clock.png</filename>
+                                <filename>watermarks/guide.png</filename>
                             </imagetype>
                         </state>
                         <state name="TV_PROGFIND" from="DEFAULT">
@@ -293,7 +295,11 @@
                                 <filename>watermarks/record.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="TV_MANUAL_SCHEDULE" from="TV_PROGRAM_GUIDE" />
+                        <state name="TV_MANUAL_SCHEDULE" from="DEFAULT">
+                            <imagetype name="icon">
+                                <filename>watermarks/clock.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="TV_RECPRIORITIES" from="DEFAULT">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
@@ -350,9 +356,9 @@
                             </imagetype>
                         </state>
                         <state name="TV_DELETE" from="DEFAULT">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/error.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/delete.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_PREVIOUS" from="DEFAULT">
                             <!--                            <imagetype name="icon">
@@ -620,7 +626,7 @@
 
                         <state name="TV_PROGRAM_GUIDE" from="DEFAULT">
                             <imagetype name="icon">
-                                <filename>watermarks/clock.png</filename>
+                                <filename>watermarks/guide.png</filename>
                             </imagetype>
                         </state>
                         <state name="TV_PROGFIND" from="DEFAULT">
@@ -639,7 +645,11 @@
                                 <filename>watermarks/record.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="TV_MANUAL_SCHEDULE" from="TV_PROGRAM_GUIDE" />
+                        <state name="TV_MANUAL_SCHEDULE" from="DEFAULT">
+                            <imagetype name="icon">
+                                <filename>watermarks/clock.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="TV_RECPRIORITIES" from="DEFAULT">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
@@ -689,7 +699,7 @@
                         <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
 
                         <state name="TV_WATCH_TV" from="TV" />
-                        <state name="TV_SCHEDULE_RECORDINGS" from="TV_PROGRAM_GUIDE" />
+                        <state name="TV_SCHEDULE_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
                         <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
                             <imagetype name="icon">
                                 <filename>watermarks/watchrec.png</filename>
@@ -720,7 +730,7 @@
                         <state name="VIDEO_LIST" from="SETTINGS_VIDEO" />
                         <state name="VIDEO_MANAGER" from="SETTINGS_VIDEO" />
 
-                        <state name="TV_UPCOMING_RECORDINGS" from="TV_PROGRAM_GUIDE" />
+                        <state name="TV_UPCOMING_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
                         <state name="SETTINGS_MEDIA" from="DEFAULT">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/multimedia.png</filename>

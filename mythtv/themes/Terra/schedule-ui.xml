@@ -851,21 +851,132 @@
 
         <imagetype name="backdrop" from="basebackdrop" />
 
-        <textarea name="curview" from="basetextarea">
-            <area>800,100,440,40</area>
-            <align>right,bottom</align>
-        </textarea>
-
-        <buttonlist name="proglist" from="basebuttonlist2">
-            <area>64,30,600,680</area>
-            <buttonarea>0,0,580,680</buttonarea>
-        </buttonlist>
-
         <imagetype name="topbar" from="basetopbar" />
 
         <textarea name="sched" from="baseheading">
             <value>Program Listings</value>
         </textarea>
+
+        <textarea name="curview" from="basetextarea">
+            <area>800,100,440,40</area>
+            <align>right,bottom</align>
+        </textarea>
+
+        <buttonlist name="proglist" focusorder="0">
+            <area>64,97,600,610</area>
+            <layout>vertical</layout>
+            <spacing>0</spacing>
+            <buttonarea>0,0,580,610</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,580,84</area>
+                <state name="active">
+                    <area>0,0,580,84</area>
+                    <statetype name="status">
+                        <position>4,4</position>
+                        <state name="disabled">
+                            <imagetype name="statusimage">
+                                <area>0,0,20,80</area>
+                                <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
+                            </imagetype>
+                        </state>
+                        <state name="error" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#e43e3e" end="#e43e3e" alpha="255" />
+                            </imagetype>
+                        </state>
+                        <state name="warning" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#ff9147" end="#ff9147" alpha="255" />
+                            </imagetype>
+                        </state>
+                        <state name="normal" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#066aff" end="#066aff" alpha="255" />
+                            </imagetype>
+                        </state>
+                        <state name="running" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#33bf33" end="#33bd33" alpha="255" />
+                            </imagetype>
+                        </state>
+                    </statetype>
+
+                    <imagetype name="frame">
+                        <filename>recordings/generallistbackground.png</filename>
+                    </imagetype>
+                    <textarea name="title" from="basetextarea">
+                        <area>35,10,515,42</area>
+                        <font>baselarge</font>
+                        <align>vcenter</align>
+                    </textarea>
+                    <textarea name="subtitle" from="basetextarea">
+                        <area>35,58,250,30</area>
+                        <font>basesmallbrown</font>
+                        <align>vcenter</align>
+                    </textarea>
+                    <textarea name="lentime" from="subtitle">
+                        <area>305,58,250,30</area>
+                        <align>right,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="frame">
+                        <position>-19,0</position>
+                        <filename>recordings/generallistselectedframe.png</filename>
+                    </imagetype>
+                    <statetype name="status">
+                        <position>-13,1</position>
+                        <state name="disabled">
+                            <imagetype name="statusimage">
+                                <area>0,0,40,86</area>
+                                <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
+                                <mask>shared/selected_state_mask.png</mask>
+                            </imagetype>
+                        </state>
+                        <state name="error" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#e43e3e" end="#e43e3e" alpha="255" />
+                            </imagetype>
+                        </state>
+                        <state name="warning" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#ff9147" end="#ff9147" alpha="255" />
+                            </imagetype>
+                        </state>
+                        <state name="normal" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#066aff" end="#066aff" alpha="255" />
+                            </imagetype>
+                        </state>
+                        <state name="running" from="disabled">
+                            <imagetype name="statusimage">
+                                <gradient start="#33bf33" end="#33bd33" alpha="255" />
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="title">
+                        <area>37,10,555,42</area>
+                    </textarea>
+                    <textarea name="subtitles">
+                        <position>37,58</position>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active">
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>240,270</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>456,270</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                </state>
+            </statetype>
+        </buttonlist>
 
         <imagetype name="overviewbackground">
             <position>680,123</position>
@@ -910,7 +1021,7 @@
             <font>baselarge</font>
         </textarea>
 
-        <statetype name="userratingstate" from="baserating">
+        <statetype name="ratingstate" from="baserating">
             <position>1195,312</position>
         </statetype>
 
