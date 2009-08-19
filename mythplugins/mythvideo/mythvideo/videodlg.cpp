@@ -2256,7 +2256,10 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     if (!imgFilename.isEmpty() &&
        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+    {
         item->SetImage(imgFilename);
+        item->SetImage(imgFilename, "coverimage");
+    }
     else if (metadata)
     {
         imgFilename = GetImageFromFolder(metadata);
@@ -2265,6 +2268,24 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
            (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
             item->SetImage(imgFilename);
     }
+
+    imgFilename = GetScreenshot(node);
+
+    if (!imgFilename.isEmpty() &&
+        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+        item->SetImage(imgFilename, "screenshot");
+
+    imgFilename = GetBanner(node);
+
+    if (!imgFilename.isEmpty() &&
+        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+        item->SetImage(imgFilename, "banner");
+
+    imgFilename = GetFanart(node);
+    
+    if (!imgFilename.isEmpty() &&
+        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+        item->SetImage(imgFilename, "fanart");
 
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
