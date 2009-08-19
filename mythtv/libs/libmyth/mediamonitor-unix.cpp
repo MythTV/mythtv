@@ -75,7 +75,7 @@ static void fstabError(const QString &methodName)
 
 static void statError(const QString &methodName, const QString devPath)
 {
-    VERBOSE(VB_IMPORTANT, LOC + methodName + " Error: failed to stat "
+    VERBOSE(VB_MEDIA, LOC + methodName + " Error: failed to stat "
                           + devPath + ", " + ENO);
 }
 
@@ -231,14 +231,14 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 
     if (!udevinfo->waitForStarted(2000 /*ms*/))
     {
-        VERBOSE(VB_IMPORTANT, msg + ", Error - udevinfo failed to start!");
+        VERBOSE(VB_MEDIA, msg + ", Error - udevinfo failed to start!");
         udevinfo->deleteLater();
         return ret;
     }
 
     if (!udevinfo->waitForFinished(2000 /*ms*/))
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(VB_MEDIA,
                 msg + ", Error - udevinfo failed to end! Terminating");
         udevinfo->kill();
         udevinfo->deleteLater();
