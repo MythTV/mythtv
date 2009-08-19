@@ -4,6 +4,7 @@
 #define FREQUENCY_TABLE_H
 
 // C++ includes
+#include <list>
 #include <vector>
 using namespace std;
 
@@ -11,7 +12,6 @@ using namespace std;
 #include <qmap.h>
 #include <qstring.h>
 #include <qmutex.h>
-#include <QList>
 
 // MythTV includes
 #include "dtvchannel.h"
@@ -185,7 +185,7 @@ class transport_scan_items_it_t
 {
   public:
     transport_scan_items_it_t() : _offset(0) {}
-    transport_scan_items_it_t(const QList<TransportScanItem>::iterator it)
+    transport_scan_items_it_t(const list<TransportScanItem>::iterator it)
     {
         _it = it;
         _offset = 0;
@@ -226,28 +226,26 @@ class transport_scan_items_it_t
     const TransportScanItem& operator*() const { return *_it; }
     TransportScanItem&       operator*()       { return *_it; }
 
-    QList<TransportScanItem>::iterator iter() { return _it; }
-    QList<TransportScanItem>::const_iterator iter() const { return _it; }
+    list<TransportScanItem>::iterator iter() { return _it; }
+    list<TransportScanItem>::const_iterator iter() const { return _it; }
     uint offset() const { return (uint) _offset; }
     transport_scan_items_it_t nextTransport() const
     {
-        QList<TransportScanItem>::iterator tmp = _it;
+        list<TransportScanItem>::iterator tmp = _it;
         return transport_scan_items_it_t(++tmp);
     }
 
   private:
-    QList<TransportScanItem>::iterator _it;
+    list<TransportScanItem>::iterator _it;
     int _offset;
 
     friend bool operator==(const transport_scan_items_it_t&,
                            const transport_scan_items_it_t&);
     friend bool operator!=(const transport_scan_items_it_t&,
                            const transport_scan_items_it_t&);
-    friend bool operator<( const transport_scan_items_it_t&,
-                           const transport_scan_items_it_t&);
 
     friend bool operator==(const transport_scan_items_it_t&,
-                           const QList<TransportScanItem>::iterator&);
+                           const list<TransportScanItem>::iterator&);
 };
 
 inline bool operator==(const transport_scan_items_it_t& A,
@@ -262,18 +260,12 @@ inline bool operator!=(const transport_scan_items_it_t &A,
     return (A._it != B._it) || (A._offset != B._offset);
 }
 
-inline bool operator<(const transport_scan_items_it_t &A,
-                      const transport_scan_items_it_t &B)
-{
-    return (A._it == B._it) ? A._offset < B._offset : A._it < B._it;
-}
-
 inline bool operator==(const transport_scan_items_it_t& A,
-                       const QList<TransportScanItem>::iterator& B)
+                       const list<TransportScanItem>::iterator& B)
 {
     return (A._it == B) && (0 == A.offset());
 }
 
-typedef QList<TransportScanItem> transport_scan_items_t;
+typedef list<TransportScanItem> transport_scan_items_t;
 
 #endif // FREQUENCY_TABLE_H
