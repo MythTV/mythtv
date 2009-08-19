@@ -813,6 +813,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             AddFileType("flv");
 
             UpdateDBVersionNumber(MythVideoVersionName, "1021");
+            dbver = "1021";
         }
 
         if (dbver == "1021")
