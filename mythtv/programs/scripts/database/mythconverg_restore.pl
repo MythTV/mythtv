@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.4';
+    $VERSION        = '1.0.5';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -1366,6 +1366,8 @@ EOF
                                            'capturecard',
                                            'cardinput',
                                            'channel',
+                                           'channelgroup',
+                                           'channelgroupnames',
                                            'channelscan',
                                            'channelscan_channel',
                                            'channelscan_dtv_multiplex',
@@ -1421,6 +1423,7 @@ EOF
                                            'storagegroup',
                                            'transcoding',           # historic
                                            'tvchain',
+                                           'tvosdmenu',
                                            'upnpmedia',
                                            'videobookmarks',        # historic
                                            'videosource',
