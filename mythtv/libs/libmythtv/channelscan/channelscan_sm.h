@@ -178,6 +178,7 @@ class ChannelScanSM : public MPEGStreamListener,
     void IgnoreEncryptedMsg(const QString &name, int aux_num);
 
     bool TestNextProgramEncryption(void);
+    void UpdateScanTransports(const NetworkInformationTable *nit);
     bool UpdateChannelInfo(bool wait_until_complete);
 
     void HandleAllGood(void); // used for analog scanner
@@ -200,6 +201,7 @@ class ChannelScanSM : public MPEGStreamListener,
     uint              channelTimeout;
     QString           inputname;
     bool              trust_encryption_si;
+    bool              extend_scan_list;
 
     // State
     bool              scanning;
@@ -214,6 +216,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // Transports List
     int                         transportsScanned;
+    QSet<uint>                  freq_scanned;
     transport_scan_items_t      scanTransports;
     transport_scan_items_it_t   current;
     transport_scan_items_it_t   nextIt;

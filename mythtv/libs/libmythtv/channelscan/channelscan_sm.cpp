@@ -139,6 +139,7 @@ ChannelScanSM::ChannelScanSM(
       channelTimeout(channel_timeout),
       inputname(_inputname),
       trust_encryption_si(false),
+      extend_scan_list(false),
       // State
       scanning(false),
       threadExit(false),
@@ -487,6 +488,72 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
     return false;
 }
 
+void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
+{
+    for (uint i = 0; i < nit->TransportStreamCount(); ++i)
+    {
+        const desc_list_t& list =
+            MPEGDescriptor::Parse(nit->TransportDescriptors(i),
+                                  nit->TransportDescriptorsLength(i));
+
+        uint tsid  = nit->TSID(i);
+        uint netid = nit->OriginalNetworkID(i);
+        for (uint j = 0; j < list.size(); ++j)
+        {
+            int mplexid = -1;
+            uint64_t frequency = 0;
+            const MPEGDescriptor desc(list[j]);
+            uint tag = desc.DescriptorTag();
+
+            switch (tag)
+            {
+            case DescriptorID::terrestrial_delivery_system:
+            {
+                const TerrestrialDeliverySystemDescriptor cd(desc);
+                frequency = cd.FrequencyHz();
+                break;
+            }
+            case DescriptorID::satellite_delivery_system:
+            {
+                const SatelliteDeliverySystemDescriptor cd(desc);
+                frequency = cd.FrequencyHz()/1000;
+                break;
+            }
+            case DescriptorID::cable_delivery_system:
+            {
+                const CableDeliverySystemDescriptor cd(desc);
+                frequency = cd.FrequencyHz();
+                break;
+            }
+            default:
+                VERBOSE(VB_CHANSCAN, LOC + "unknown delivery system descriptor");
+                continue;
+            }
+
+            if (freq_scanned.contains(frequency))
+                continue;
+            freq_scanned.insert(frequency);
+
+            mplexid = ChannelUtil::GetMplexID(sourceID, frequency, tsid, netid);
+
+            DTVMultiplex tuning;
+            if (mplexid > 0)
+            {
+                if (!tuning.FillFromDB(GetDVBChannel()->GetCardType(), mplexid))
+                    continue;
+            }
+            else if (!tuning.FillFromDeliverySystemDesc(GetDVBChannel()->GetCardType(), desc))
+                continue;
+
+            QString name = QString("TransportID %1").arg(tsid);
+            TransportScanItem item(sourceID, name, tuning, signalTimeout);
+            VERBOSE(VB_CHANSCAN, LOC + "Adding " + name + " - " +
+                                 tuning.toString());
+            scanTransports.push_back(item);
+        }
+    }
+}
+
 bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 {
     if (current == scanTransports.end())
@@ -645,6 +712,18 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
 
             scan_monitor->ScanAppendTextToLog(msg_tr);
             VERBOSE(VB_CHANSCAN, msg);
+        }
+    }
+
+    // append transports from the NIT to the scan list
+    if (transport_tune_complete && extend_scan_list)
+    {
+        // append delivery system descriptos to scan list
+        nit_vec_t::const_iterator it = currentInfo->nits.begin();
+        while (it != currentInfo->nits.end())
+        {
+            UpdateScanTransports(*it);
+            ++it;
         }
     }
 
@@ -1433,6 +1512,7 @@ bool ChannelScanSM::ScanTransports(
             {
                 start = QString::null;
 
+                freq_scanned.insert(freq);
                 TransportScanItem item(SourceID, std, name, name_num,
                                        freq, ft, signalTimeout);
                 scanTransports.push_back(item);
@@ -1482,6 +1562,7 @@ bool ChannelScanSM::ScanForChannels(uint sourceid,
     {
         DTVTransport tmp = *it;
         tmp.sistandard = std;
+        freq_scanned.insert(tmp.frequency);
         TransportScanItem item(sourceid, QString::number(i),
                                tunertype, tmp, signalTimeout);
 
@@ -1553,6 +1634,7 @@ bool ChannelScanSM::ScanTransportsStartingOn(
     if (ok)
     {
         tuning.sistandard = si_std;
+        freq_scanned.insert(tuning.frequency);
         TransportScanItem item(
             sourceid, QObject::tr("Frequency %1").arg(startChan["frequency"]),
             tuning, signalTimeout);
@@ -1561,6 +1643,8 @@ bool ChannelScanSM::ScanTransportsStartingOn(
 
     if (!ok)
         return false;
+
+    extend_scan_list = true;
 
     timer.start();
     waitingForTables = false;
@@ -1627,6 +1711,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
     if (ok)
     {
         VERBOSE(VB_CHANSCAN, LOC + "Adding " + fn);
+        freq_scanned.insert(item.tuning.frequency);
         scanTransports.push_back(item);
     }
     else
