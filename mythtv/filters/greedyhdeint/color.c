@@ -30,6 +30,7 @@
 #endif
 #include <math.h>
 
+#include "libavutil/declare_aligned.h"
 #include "dsputil.h"
 
 #include "color.h"

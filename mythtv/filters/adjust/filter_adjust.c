@@ -17,6 +17,7 @@
 
 #ifdef HAVE_MMX
 
+#include "libavutil/declare_aligned.h"
 #include "dsputil.h"
 #include "x86/mmx.h"
 

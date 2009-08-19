@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "fftw3.h"
 #else
 extern "C" {
+#include "libavutil/declare_aligned.h"
 #include "dsputil.h"
 };
 typedef FFTSample FFTComplexArray[2];

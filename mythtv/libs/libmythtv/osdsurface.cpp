@@ -11,6 +11,7 @@ using namespace std;
 
 extern "C" {
 #include "mythconfig.h"
+#include "libavutil/declare_aligned.h"
 #include "dsputil.h"
 #include "x86/mmx.h"
 }
