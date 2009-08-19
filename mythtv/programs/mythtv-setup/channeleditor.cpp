@@ -8,7 +8,6 @@
 #include <QSqlDatabase>
 #include <QApplication>
 
-// #include <mythdialogs.h>
 #include <mythwizard.h>
 
 // MythUI
@@ -341,7 +340,7 @@ void ChannelEditor::fillList(void)
 
             bool sel = (chanid == currentValue);
             selidx = (sel) ? idx : selidx;
-            item = new MythUIButtonListItem(m_channelList, name,
+            item = new MythUIButtonListItem(m_channelList, "",
                                                      qVariantFromValue(chanid));
             item->SetText(compoundname, "compoundname");
             item->SetText(name, "name");
