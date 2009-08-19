@@ -7,7 +7,7 @@
 
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1003";
+const QString currentDatabaseVersion = "1004";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -180,6 +180,16 @@ bool InitializeDatabase()
             "  MODIFY types mediumtext CHARACTER SET utf8;";
 
         if (!performActualUpdate(updates, "1003", dbver))
+            return false;
+    }
+
+    if (dbver == "1003")
+    {
+        QStringList updates;
+        updates << "DELETE FROM keybindings "
+                   " WHERE action = 'DELETE' AND context = 'Weather';";
+
+        if (!performActualUpdate(updates, "1004", dbver))
             return false;
     }
 

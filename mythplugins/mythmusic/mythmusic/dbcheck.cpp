@@ -11,7 +11,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdb.h"
 
-const QString currentDatabaseVersion = "1016";
+const QString currentDatabaseVersion = "1017";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -726,6 +726,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1016", dbver))
+            return false;
+    }
+
+    if (dbver == "1016")
+    {
+        const QString updates[] = {
+"DELETE FROM keybindings "
+" WHERE action = 'DELETE' AND context = 'Music';",
+""
+};
+
+        if (!performActualUpdate(updates, "1017", dbver))
             return false;
     }
 

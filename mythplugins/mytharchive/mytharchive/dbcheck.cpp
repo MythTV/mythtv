@@ -14,7 +14,7 @@
 #include "dbcheck.h"
 
 
-const QString currentDatabaseVersion = "1004";
+const QString currentDatabaseVersion = "1005";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -175,6 +175,19 @@ bool UpgradeArchiveDatabaseSchema(void)
         };
 
         if (!performActualUpdate(updates, "1004", dbver))
+            return false;
+    }
+
+    if (dbver == "1004")
+    {
+        const QString updates[] =
+        {
+            "DELETE FROM keybindings "
+            " WHERE action = 'DELETEITEM' AND context = 'Archive';",
+            ""
+        };
+
+        if (!performActualUpdate(updates, "1005", dbver))
             return false;
     }
 

@@ -5,7 +5,7 @@
 // mythbrowser
 #include "browserdbutil.h"
 
-const QString currentDatabaseVersion = "1001";
+const QString currentDatabaseVersion = "1002";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -91,6 +91,18 @@ bool UpgradeBrowserDatabaseSchema(void)
             "" 
         };
         if (!performActualUpdate(updates, "1001", dbver))
+            return false;
+    }
+
+    if (dbver == "1001")
+    {
+        const QString updates[] =
+        {
+            "DELETE FROM keybindings "
+            " WHERE action = 'DELETETAB' AND context = 'Browser';",
+            ""
+        };
+        if (!performActualUpdate(updates, "1002", dbver))
             return false;
     }
 

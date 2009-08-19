@@ -11,7 +11,7 @@ using namespace std;
 // mythgallery
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1002";
+const QString currentDatabaseVersion = "1003";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -117,6 +117,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
         if (!performActualUpdate(updates, "1002", dbver))
+            return false;
+    }
+
+    if (dbver == "1002")
+    {
+        const QString updates[] = {
+"DELETE FROM keybindings "
+" WHERE action = 'DELETE' AND context = 'Gallery';",
+""
+};
+
+        if (!performActualUpdate(updates, "1003", dbver))
             return false;
     }
 
