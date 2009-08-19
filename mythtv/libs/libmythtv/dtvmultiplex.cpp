@@ -2,6 +2,7 @@
 #include "dtvmultiplex.h"
 #include "mythdb.h"
 #include "mythverbose.h"
+#include "mpeg/dvbdescriptors.h"
 
 #define LOC QString("DTVMux: ")
 #define LOC_ERR QString("DTVMux, Error: ")
@@ -337,6 +338,77 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
         query.value(12).toString(), query.value(14).toString(),
         query.value(15).toString());
 }
+
+
+bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
+                                              const MPEGDescriptor &desc)
+{
+    uint tag = desc.DescriptorTag();
+
+    switch (tag)
+    {
+    case DescriptorID::terrestrial_delivery_system:
+        {
+            if (type != DTVTunerType::kTunerTypeOFDM)
+                break;
+
+            const TerrestrialDeliverySystemDescriptor cd(desc);
+
+            return ParseDVB_T(
+                    QString().number(cd.FrequencyHz()), "auto",
+                    cd.BandwidthString(),               cd.CodeRateHPString(),
+                    cd.CodeRateLPString(),              cd.ConstellationString(),
+                    cd.TransmissionModeString(),        cd.GuardIntervalString(),
+                    cd.HierarchyString());
+        }
+    case DescriptorID::satellite_delivery_system:
+        {
+            const SatelliteDeliverySystemDescriptor cd(desc);
+
+            if (type == DTVTunerType::kTunerTypeQPSK)
+            {
+                if (cd.ModulationSystem())
+                {
+                    VERBOSE(VB_CHANSCAN, "Ignoring DVB-S2 transponder withj DVB-S card");
+                    return false;
+                }
+                return ParseDVB_S_and_C(
+                        QString().number(cd.FrequencyHz()/1000), "auto",
+                        QString().number(cd.SymbolRateHz()),     cd.FECInnerString(),
+                        cd.ModulationString(),                   cd.PolarizationString());
+            }
+            if (type == DTVTunerType::kTunerTypeDVB_S2)
+            {
+                return ParseDVB_S2(
+                        QString().number(cd.FrequencyHz()/1000), "auto",
+                        QString().number(cd.SymbolRateHz()),     cd.FECInnerString(),
+                        cd.ModulationString(),                   cd.PolarizationString(),
+                        cd.ModulationSystemString(),             cd.RollOffString());
+            }
+            break;
+        }
+    case DescriptorID::cable_delivery_system:
+        {
+            if (type != DTVTunerType::kTunerTypeQAM)
+                break;
+
+            const CableDeliverySystemDescriptor cd(desc);
+
+            return ParseDVB_S_and_C(
+                    QString().number(cd.FrequencyHz()),  "auto",
+                    QString().number(cd.SymbolRateHz()), cd.FECInnerString(),
+                    cd.ModulationString(),               QString());
+        }
+    default:
+        VERBOSE(VB_CHANSCAN, "unknown delivery system descriptor");
+        return false;
+    }
+
+    VERBOSE(VB_CHANSCAN, QString("Tuner type %1 does not match delivery system")
+            .arg(type.toString()));
+    return false;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////

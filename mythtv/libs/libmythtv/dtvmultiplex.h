@@ -17,6 +17,8 @@
 #include "dtvconfparserhelpers.h"
 #include "dbchannelinfo.h"
 
+class MPEGDescriptor;
+
 class DTVMultiplex
 {
   public:
@@ -31,6 +33,8 @@ class DTVMultiplex
     void Clear(void) { DTVMultiplex mux; (*this) = mux; }
 
     virtual bool FillFromDB(DTVTunerType type, uint mplexid);
+
+    bool FillFromDeliverySystemDesc(DTVTunerType type, const MPEGDescriptor &desc);
 
     bool IsEqual(DTVTunerType type, const DTVMultiplex& other,
                  uint freq_range = 0, bool fuzzy = false) const;
