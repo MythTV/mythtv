@@ -2290,7 +2290,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
     {
-        item->SetText(QString("%1").arg(node->childCount() - 1), "childcount");
+        item->SetText(QString("%1").arg(node->visibleChildCount()), "childcount");
         item->DisplayState("subfolder", "nodetype");
     }
     else if (nodeInt == kUpFolder)
@@ -3106,7 +3106,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     if (node && node->getInt() == kSubFolder)
         CheckedSet(this, "childcount",
-                QString("%1").arg(node->childCount() - 1));
+                   QString("%1").arg(node->visibleChildCount()));
 
     if (node)
         node->becomeSelectedChild();
