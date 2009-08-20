@@ -80,62 +80,47 @@ void JobQueue::customEvent(QEvent *e)
 
         if (message.left(9) == "LOCAL_JOB")
         {
+            // LOCAL_JOB action ID jobID
             // LOCAL_JOB action type chanid starttime hostname
             QString msg;
             message = message.simplified();
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
             QString action = tokens[1];
-            int jobType = JOB_UNKNOWN;
             int jobID = -1;
-            QString chanid;
-
-            QDateTime starttime;
-            QString detectionHost = "";
 
             if (tokens[2] == "ID")
-            {
                 jobID = tokens[3].toInt();
-                GetJobInfoFromID(jobID, jobType, chanid, starttime);
-            }
             else
-            {
-                jobType = tokens[2].toInt();
-                chanid = tokens[3];
-                starttime = QDateTime::fromString(tokens[4], Qt::ISODate);
-                detectionHost = tokens[5];
-            }
+                jobID = GetJobID(tokens[2].toInt(), tokens[3],
+                                 QDateTime::fromString(tokens[4], Qt::ISODate));
 
-            if (jobType == JOB_UNKNOWN)
+            if (!runningJobs.contains(jobID))
             {
-                msg = QString("Unable to determine job info for message: "
+                msg = QString("Unable to determine jobID for message: "
                               "%1.  Program will not be flagged.")
                               .arg(message);
                 VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
                 return;
             }
 
-            QString key = GetJobQueueKey(chanid, starttime);
-
             msg = QString("Received message '%1'").arg(message);
             VERBOSE(VB_JOBQUEUE, LOC + msg);
 
-            if (((action == "STOP") ||
-                 (action == "PAUSE") ||
-                 (action == "RESTART") ||
-                 (action == "RESUME" )) &&
-                (runningJobs.contains(key)) &&
-                (runningJobs[key].type == jobType))
+            if ((action == "STOP") ||
+                (action == "PAUSE") ||
+                (action == "RESTART") ||
+                (action == "RESUME" ))
             {
                 runningJobsLock->lock();
 
                 if (action == "STOP")
-                    runningJobs[key].flag = JOB_STOP;
+                    runningJobs[jobID].flag = JOB_STOP;
                 else if (action == "PAUSE")
-                    runningJobs[key].flag = JOB_PAUSE;
+                    runningJobs[jobID].flag = JOB_PAUSE;
                 else if (action == "RESUME")
-                    runningJobs[key].flag = JOB_RUN;
+                    runningJobs[jobID].flag = JOB_RUN;
                 else if (action == "RESTART")
-                    runningJobs[key].flag = JOB_RESTART;
+                    runningJobs[jobID].flag = JOB_RESTART;
 
                 runningJobsLock->unlock();
             }
@@ -168,26 +153,22 @@ void JobQueue::ProcessQueue(void)
 {
     VERBOSE(VB_JOBQUEUE, LOC + "ProcessQueue() started");
 
-    QString chanid;
-    QDateTime starttime;
-    QDateTime schedruntime;
-    QString startts;
-    int type;
-    int id;
+    QString logInfo;
+    int jobID;
     int cmds;
     int flags;
     int status;
     QString hostname;
     int sleepTime;
 
-    QMap<QString, int> jobStatus;
+    QMap<int, int> jobStatus;
     int maxJobs;
     QString message;
     QMap<int, JobQueueEntry> jobs;
     bool atMax = false;
     bool inTimeWindow = true;
     bool startedJobAlready = false;
-    QMap<QString, RunningJobInfo>::Iterator rjiter;
+    QMap<int, RunningJobInfo>::Iterator rjiter;
 
     for (;;)
     {
@@ -206,7 +187,8 @@ void JobQueue::ProcessQueue(void)
         for (rjiter = runningJobs.begin(); rjiter != runningJobs.end();
             ++rjiter)
         {
-            (*rjiter).pginfo->UpdateInUseMark();
+            if ((*rjiter).pginfo)
+                (*rjiter).pginfo->UpdateInUseMark();
         }
         runningJobsLock->unlock();
 
@@ -257,33 +239,31 @@ void JobQueue::ProcessQueue(void)
             for ( int x = 0;
                  (x < jobs.size()) && (jobsRunning < maxJobs); x++)
             {
-                id = jobs[x].id;
-                chanid = jobs[x].chanid;
-                startts = jobs[x].startts;
-                starttime = jobs[x].starttime;
-                schedruntime = jobs[x].schedruntime;
-                type = jobs[x].type;
+                jobID = jobs[x].id;
                 cmds = jobs[x].cmds;
                 flags = jobs[x].flags;
                 status = jobs[x].status;
                 hostname = jobs[x].hostname;
 
-                QString key = GetJobQueueKey(chanid, startts);
+                if (jobs[x].chanid.isEmpty())
+                    logInfo = QString("jobID #%1").arg(jobID);
+                else
+                    logInfo = QString("chanid %1 @ %2").arg(jobs[x].chanid)
+                                      .arg(jobs[x].startts);
 
                 // Should we even be looking at this job?
                 if ((inTimeWindow) &&
-                    (hostname != "") &&
+                    (!hostname.isEmpty()) &&
                     (hostname != m_hostname))
                 {
                     // Setting the status here will prevent us from processing
                     // any other jobs for this recording until this one is
                     // completed on the remote host.
-                    jobStatus[key] = status;
+                    jobStatus[jobID] = status;
 
-                    message = QString("Skipping '%1' job for chanid "
-                                      "%2 @ %3, should run on '%4' instead")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts)
+                    message = QString("Skipping '%1' job for %2, "
+                                      "should run on '%3' instead")
+                                      .arg(JobText(jobs[x].type)).arg(logInfo)
                                       .arg(hostname);
                     VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
@@ -291,42 +271,38 @@ void JobQueue::ProcessQueue(void)
 
                 // Check to see if there was a previous job that is not done
                 if ((inTimeWindow) &&
-                    (jobStatus.contains(key)) &&
-                    (!(jobStatus[key] & JOB_DONE)))
+                    (jobStatus.contains(jobID)) &&
+                    (!(jobStatus[jobID] & JOB_DONE)))
                 {
-                    message = QString("Skipping '%1' job for chanid "
-                                      "%2 @ %3, there is another job for "
-                                      "this recording with a status of '%4'")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts)
-                                      .arg(StatusText(jobStatus[key]));
+                    message = QString("Skipping '%1' job for %2, "
+                                      "there is another job for "
+                                      "this recording with a status of '%3'")
+                                      .arg(JobText(jobs[x].type)).arg(logInfo)
+                                      .arg(StatusText(jobStatus[jobID]));
                     VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
 
-                jobStatus[key] = status;
+                jobStatus[jobID] = status;
 
                 // Are we allowed to run this job?
                 if ((inTimeWindow) && (!AllowedToRun(jobs[x])))
                 {
-                    message = QString("Skipping '%1' job for chanid "
-                                      "%2 @ %3, not allowed to run on this "
-                                      "backend.")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts);
+                    message = QString("Skipping '%1' job for %2, "
+                                      "not allowed to run on this backend.")
+                                      .arg(JobText(jobs[x].type)).arg(logInfo);
                     VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
 
                 // Is this job scheduled for the future
-                if (schedruntime > QDateTime::currentDateTime())
+                if (jobs[x].schedruntime > QDateTime::currentDateTime())
                 {
-                    message = QString("Skipping '%1' job for chanid "
-                                      "%2 @ %3, this job is not scheduled to "
-                                      "run until %4.")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts)
-                                      .arg(schedruntime.toString(Qt::ISODate));
+                    message = QString("Skipping '%1' job for %2, this job is "
+                                      "not scheduled to run until %3.")
+                                      .arg(JobText(jobs[x].type)).arg(logInfo)
+                                      .arg(jobs[x].schedruntime
+                                           .toString(Qt::ISODate));
                     VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
@@ -336,104 +312,98 @@ void JobQueue::ProcessQueue(void)
                     // if we're trying to stop a job and it's not queued
                     //  then lets send a STOP command
                     if (status != JOB_QUEUED) {
-                        message = QString("Stopping '%1' job for "
-                                              "chanid %2 @ %3")
-                                          .arg(JobText(type))
-                                          .arg(chanid).arg(startts);
+                        message = QString("Stopping '%1' job for %2")
+                                          .arg(JobText(jobs[x].type))
+                                          .arg(logInfo);
                         VERBOSE(VB_JOBQUEUE, LOC + message);
 
                         runningJobsLock->lock();
-                        if (runningJobs.contains(key))
-                            runningJobs[key].flag = JOB_STOP;
+                        if (runningJobs.contains(jobID))
+                            runningJobs[jobID].flag = JOB_STOP;
                         runningJobsLock->unlock();
 
-                        // ChangeJobCmds(m_db, id, JOB_RUN);
+                        // ChangeJobCmds(m_db, jobID, JOB_RUN);
                         continue;
 
                     // if we're trying to stop a job and it's still queued
                     //  then let's just change the status to cancelled so
                     //  we don't try to run it from the queue
                     } else {
-                        message = QString("Cancelling '%1' job for "
-                                          "chanid %2 @ %3")
-                                          .arg(JobText(type))
-                                          .arg(chanid).arg(startts);
+                        message = QString("Cancelling '%1' job for %2")
+                                          .arg(JobText(jobs[x].type))
+                                          .arg(logInfo);
                         VERBOSE(VB_JOBQUEUE, LOC + message);
 
                         // at the bottom of this loop we requeue any jobs that
                         //  are not currently queued and also not associated
                         //  with a hostname so we must claim this job before we
                         //  can cancel it
-                        if (!ChangeJobHost(id, m_hostname))
+                        if (!ChangeJobHost(jobID, m_hostname))
                         {
-                            message = QString("Unable to clain '%1' job "
-                                              "for chanid %2 @ %3.")
-                                              .arg(JobText(type))
-                                              .arg(chanid).arg(startts);
+                            message = QString("Unable to claim '%1' job for %2")
+                                              .arg(JobText(jobs[x].type))
+                                              .arg(logInfo);
                             VERBOSE(VB_JOBQUEUE, LOC_ERR + message);
                             continue;
                         }
 
-                        ChangeJobStatus(id, JOB_CANCELLED, "");
-                        ChangeJobCmds(id, JOB_RUN);
+                        ChangeJobStatus(jobID, JOB_CANCELLED, "");
+                        ChangeJobCmds(jobID, JOB_RUN);
                         continue;
                     }
                 }
 
                 if ((cmds & JOB_PAUSE) && (status != JOB_QUEUED))
                 {
-                    message = QString("Pausing '%1' job for chanid %2 @ %3")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts);
+                    message = QString("Pausing '%1' job for %2")
+                                      .arg(JobText(jobs[x].type)).arg(logInfo);
                     VERBOSE(VB_JOBQUEUE, LOC + message);
 
                     runningJobsLock->lock();
-                    if (runningJobs.contains(key))
-                        runningJobs[key].flag = JOB_PAUSE;
+                    if (runningJobs.contains(jobID))
+                        runningJobs[jobID].flag = JOB_PAUSE;
                     runningJobsLock->unlock();
 
-                    ChangeJobCmds(id, JOB_RUN);
+                    ChangeJobCmds(jobID, JOB_RUN);
                     continue;
                 }
 
                 if ((cmds & JOB_RESTART) && (status != JOB_QUEUED))
                 {
-                    message = QString("Restart '%1' job for chanid %2 @ %3")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts);
+                    message = QString("Restart '%1' job for %2")
+                                      .arg(JobText(jobs[x].type)).arg(logInfo);
                     VERBOSE(VB_JOBQUEUE, LOC + message);
 
                     runningJobsLock->lock();
-                    if (runningJobs.contains(key))
-                        runningJobs[key].flag = JOB_RUN;
+                    if (runningJobs.contains(jobID))
+                        runningJobs[jobID].flag = JOB_RUN;
                     runningJobsLock->unlock();
 
-                    ChangeJobCmds(id, JOB_RUN);
+                    ChangeJobCmds(jobID, JOB_RUN);
                     continue;
                 }
 
                 if (status != JOB_QUEUED)
                 {
 
-                    if (hostname == "")
+                    if (hostname.isEmpty())
                     {
-                        message = QString("Resetting '%1' job for "
-                                          "chanid %2 @ %3 to %4 status, "
-                                          "because no hostname is set.")
-                                          .arg(JobText(type))
-                                          .arg(chanid).arg(startts)
+                        message = QString("Resetting '%1' job for %2 to %3 "
+                                          "status, because no hostname is set.")
+                                          .arg(JobText(jobs[x].type))
+                                          .arg(logInfo)
                                           .arg(StatusText(JOB_QUEUED));
                         VERBOSE(VB_JOBQUEUE, LOC + message);
 
-                        ChangeJobStatus(id, JOB_QUEUED, "");
-                        ChangeJobCmds(id, JOB_RUN);
+                        ChangeJobStatus(jobID, JOB_QUEUED, "");
+                        ChangeJobCmds(jobID, JOB_RUN);
                     }
                     else if (inTimeWindow)
                     {
-                        message = QString("Skipping '%1' job for chanid %2 @ "
-                                          "%3, current job status is '%4'")
-                                          .arg(JobText(type))
-                                          .arg(chanid).arg(startts)
+                        message = QString("Skipping '%1' job for %2, "
+                                          "current job status is '%3'")
+                                          .arg(JobText(jobs[x].type))
+                                          .arg(logInfo)
                                           .arg(StatusText(status));
                         VERBOSE(VB_JOBQUEUE, LOC + message);
                     }
@@ -445,36 +415,32 @@ void JobQueue::ProcessQueue(void)
                     continue;
 
                 if ((inTimeWindow) &&
-                    (hostname == "") &&
-                    (!ChangeJobHost(id, m_hostname)))
+                    (hostname.isEmpty()) &&
+                    (!ChangeJobHost(jobID, m_hostname)))
                 {
-                    message = QString("Unable to claim '%1' job "
-                                      "for chanid %2 @ %3.")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts);
+                    message = QString("Unable to claim '%1' job for %2")
+                                      .arg(JobText(jobs[x].type)).arg(logInfo);
                     VERBOSE(VB_JOBQUEUE, LOC_ERR + message);
                     continue;
                 }
 
                 if (!inTimeWindow)
                 {
-                    message = QString("Skipping '%1' job for chanid "
-                                      "%2 @ %3, Current time is outside of the "
+                    message = QString("Skipping '%1' job for %2, "
+                                      "current time is outside of the "
                                       "Job Queue processing window.")
-                                      .arg(JobText(type))
-                                      .arg(chanid).arg(startts);
+                                      .arg(JobText(jobs[x].type)).arg(logInfo);
                     VERBOSE(VB_JOBQUEUE, LOC + message);
                     continue;
                 }
 
-                message = QString("Processing '%1' job for chanid "
-                                  "%2 @ %3, current status is '%4'")
-                                  .arg(JobText(type))
-                                  .arg(chanid).arg(startts)
+                message = QString("Processing '%1' job for %2, "
+                                  "current status is '%3'")
+                                  .arg(JobText(jobs[x].type)).arg(logInfo)
                                   .arg(StatusText(status));
                 VERBOSE(VB_JOBQUEUE, LOC + message);
 
-                ProcessJob(id, type, chanid, starttime);
+                ProcessJob(jobs[x]);
 
                 startedJobAlready = true;
             }
@@ -500,7 +466,7 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
 
     if (jobTypes != JOB_NONE)
     {
-        QString jobHost = "";
+        QString jobHost;
 
         if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = pinfo->hostname;
@@ -521,50 +487,57 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     int tmpStatus = JOB_UNKNOWN;
     int tmpCmd = JOB_UNKNOWN;
     int jobID = -1;
+    int chanidInt = -1;
 
     if(!schedruntime.isValid())
         schedruntime = QDateTime::currentDateTime();
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT status, id, cmds FROM jobqueue "
-                  "WHERE chanid = :CHANID AND starttime = :STARTTIME "
-                  "AND type = :JOBTYPE;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", starttime);
-    query.bindValue(":JOBTYPE", jobType);
+    // In order to replace a job, we must have a chanid/starttime combo
+    if (!chanid.isEmpty())
+    {
+        query.prepare("SELECT status, id, cmds FROM jobqueue "
+                      "WHERE chanid = :CHANID AND starttime = :STARTTIME "
+                      "AND type = :JOBTYPE;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", starttime);
+        query.bindValue(":JOBTYPE", jobType);
 
-    if (!query.exec())
-    {
-        MythDB::DBError("Error in JobQueue::QueueJob()", query);
-        return false;
-    }
-    else
-    {
-        if (query.next())
+        if (!query.exec())
         {
-            tmpStatus = query.value(0).toInt();
-            jobID = query.value(1).toInt();
-            tmpCmd = query.value(2).toInt();
+            MythDB::DBError("Error in JobQueue::QueueJob()", query);
+            return false;
         }
+        else
+        {
+            if (query.next())
+            {
+                tmpStatus = query.value(0).toInt();
+                jobID = query.value(1).toInt();
+                tmpCmd = query.value(2).toInt();
+            }
+        }
+        switch (tmpStatus)
+        {
+            case JOB_UNKNOWN:
+                     break;
+            case JOB_STARTING:
+            case JOB_RUNNING:
+            case JOB_PAUSED:
+            case JOB_STOPPING:
+            case JOB_ERRORING:
+            case JOB_ABORTING:
+                     return false;
+            default:
+                     DeleteJob(jobID);
+                     break;
+        }
+        if (! (tmpStatus & JOB_DONE) && (tmpCmd & JOB_STOP))
+            return false;
+
+        chanidInt = chanid.toInt();
     }
-    switch (tmpStatus)
-    {
-        case JOB_UNKNOWN:
-                 break;
-        case JOB_STARTING:
-        case JOB_RUNNING:
-        case JOB_PAUSED:
-        case JOB_STOPPING:
-        case JOB_ERRORING:
-        case JOB_ABORTING:
-                 return false;
-        default:
-                 DeleteJob(jobID);
-                 break;
-    }
-    if (! (tmpStatus & JOB_DONE) && (tmpCmd & JOB_STOP))
-        return false;
 
     query.prepare("INSERT INTO jobqueue (chanid, starttime, inserttime, type, "
                   "status, statustime, schedruntime, hostname, args, comment, "
@@ -572,7 +545,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
                   "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
                   "now(), :SCHEDRUNTIME, :HOST, :ARGS, :COMMENT, :FLAGS);");
 
-    query.bindValue(":CHANID", chanid);
+    query.bindValue(":CHANID", chanidInt);
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":JOBTYPE", jobType);
     query.bindValue(":STATUS", status);
@@ -670,7 +643,7 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
 
     if (!query.exec())
     {
-        MythDB::DBError("Error in JobQueue::GetJobID()", query);
+        MythDB::DBError("Error in JobQueue::GetJobInfoFromID()", query);
         return false;
     }
     else
@@ -678,8 +651,12 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
         if (query.next())
         {
             jobType = query.value(0).toInt();
-            chanid = query.value(1).toString();
             starttime = query.value(2).toDateTime();
+
+            if (query.value(1).toInt() >= 0)
+                chanid = query.value(1).toString();
+            else
+                chanid = "";
             return true;
         }
     }
@@ -737,7 +714,6 @@ bool JobQueue::StopJob(int jobID)
 
 bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 {
-    QString key = GetJobQueueKey(chanid, starttime);
     MSqlQuery query(MSqlQuery::InitCon());
     QString message;
 
@@ -1082,22 +1058,6 @@ QString JobQueue::StatusText(int status)
     return tr("Undefined");
 }
 
-QString JobQueue::GetJobQueueKey(QString chanid, QString startts)
-{
-    return QString("%1_%2").arg(chanid).arg(startts);
-}
-
-QString JobQueue::GetJobQueueKey(QString chanid, QDateTime starttime)
-{
-    return JobQueue::GetJobQueueKey(chanid,
-                                    starttime.toString("yyyyMMddhhmmss"));
-}
-
-QString JobQueue::GetJobQueueKey(ProgramInfo *pginfo)
-{
-    return JobQueue::GetJobQueueKey(pginfo->chanid, pginfo->recstartts);
-}
-
 bool JobQueue::InJobRunWindow(int orStartsWithinMins)
 {
     QString queueStartTimeStr;
@@ -1234,6 +1194,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     JobQueueEntry thisJob;
     MSqlQuery query(MSqlQuery::InitCon());
     QDateTime recentDate = QDateTime::currentDateTime().addSecs(-4 * 3600);
+    QString logInfo;
     int jobCount = 0;
     bool commflagWhileRecording =
              gContext->GetNumSetting("AutoCommflagWhileRecording", 0);
@@ -1243,8 +1204,9 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     query.prepare("SELECT j.id, j.chanid, j.starttime, j.inserttime, j.type, "
                       "j.cmds, j.flags, j.status, j.statustime, j.hostname, "
                       "j.args, j.comment, r.endtime, j.schedruntime "
-                  "FROM jobqueue j, recorded r "
-                  "WHERE j.chanid = r.chanid AND j.starttime = r.starttime "
+                  "FROM jobqueue j "
+                  "LEFT JOIN recorded r "
+                  "  ON j.chanid = r.chanid AND j.starttime = r.starttime "
                   "ORDER BY j.schedruntime, j.id;");
 
     if (!query.exec())
@@ -1263,7 +1225,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
     {
         bool wantThisJob = false;
 
-        thisJob.chanid = query.value(1).toString();
+        thisJob.id = query.value(0).toInt();
         thisJob.starttime = query.value(2).toDateTime();
         thisJob.schedruntime = query.value(13).toDateTime();
         thisJob.type = query.value(4).toInt();
@@ -1271,17 +1233,27 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
         thisJob.statustime = query.value(8).toDateTime();
         thisJob.startts = thisJob.starttime.toString("yyyyMMddhhmmss");
 
+        // -1 indicates the chanid is empty
+        if (query.value(1).toInt() == -1)
+        {
+            logInfo = QString("jobID #%1").arg(thisJob.id);
+        }
+        else
+        {
+            thisJob.chanid = query.value(1).toString();
+            logInfo = QString("chanid %1 @ %2").arg(thisJob.chanid)
+                              .arg(thisJob.startts);
+        }
+
         if ((query.value(12).toDateTime() > QDateTime::currentDateTime()) &&
             ((!commflagWhileRecording) ||
              (thisJob.type != JOB_COMMFLAG)))
         {
             VERBOSE(VB_JOBQUEUE, LOC +
                     QString("GetJobsInQueue: Ignoring '%1' Job "
-                            "for %2 @ %3 in %4 state.  Endtime in future.")
+                            "for %2 in %3 state.  Endtime in future.")
                             .arg(JobText(thisJob.type))
-                            .arg(thisJob.chanid)
-                            .arg(thisJob.startts)
-                            .arg(StatusText(thisJob.status)));
+                            .arg(logInfo).arg(StatusText(thisJob.status)));
             continue;
         }
 
@@ -1300,23 +1272,18 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
         {
             VERBOSE(VB_JOBQUEUE, LOC +
                     QString("GetJobsInQueue: Ignore '%1' Job for "
-                            "%2 @ %3 in %4 state.")
+                            "%2 in %3 state.")
                             .arg(JobText(thisJob.type))
-                            .arg(thisJob.chanid)
-                            .arg(thisJob.startts)
-                            .arg(StatusText(thisJob.status)));
+                            .arg(logInfo).arg(StatusText(thisJob.status)));
             continue;
         }
 
         VERBOSE(VB_JOBQUEUE, LOC +
                 QString("GetJobsInQueue: Found '%1' Job for "
-                        "%2 @ %3 in %4 state.")
+                        "%2 in %3 state.")
                         .arg(JobText(thisJob.type))
-                        .arg(thisJob.chanid)
-                        .arg(thisJob.startts)
-                        .arg(StatusText(thisJob.status)));
+                        .arg(logInfo).arg(StatusText(thisJob.status)));
 
-        thisJob.id = query.value(0).toInt();
         thisJob.inserttime = query.value(3).toDateTime();
         thisJob.cmds = query.value(5).toInt();
         thisJob.flags = query.value(6).toInt();
@@ -1344,7 +1311,7 @@ bool JobQueue::ChangeJobHost(int jobID, QString newHostname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (newHostname != "")
+    if (!newHostname.isEmpty())
     {
         query.prepare("UPDATE jobqueue SET hostname = :NEWHOSTNAME "
                       "WHERE hostname = :EMPTY AND id = :ID;");
@@ -1379,7 +1346,7 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
 {
     QString allowSetting;
 
-    if ((job.hostname != "") &&
+    if ((!job.hostname.isEmpty()) &&
         (job.hostname != m_hostname))
         return false;
 
@@ -1517,6 +1484,7 @@ void JobQueue::RecoverQueue(bool justOld)
 {
     QMap<int, JobQueueEntry> jobs;
     QString msg;
+    QString logInfo;
 
     msg = QString("RecoverQueue: Checking for unfinished jobs to "
                   "recover.");
@@ -1537,6 +1505,12 @@ void JobQueue::RecoverQueue(bool justOld)
             tmpCmds = (*it).cmds;
             tmpStatus = (*it).status;
 
+            if ((*it).chanid.isEmpty())
+                logInfo = QString("jobID #%1").arg((*it).id);
+            else
+                logInfo = QString("chanid %1 @ %2").arg((*it).chanid)
+                                  .arg((*it).startts);
+
             if (((tmpStatus == JOB_STARTING) ||
                  (tmpStatus == JOB_RUNNING) ||
                  (tmpStatus == JOB_PAUSED) ||
@@ -1546,12 +1520,10 @@ void JobQueue::RecoverQueue(bool justOld)
                   ((*it).hostname == hostname)) ||
                  ((*it).statustime < oldDate)))
             {
-                msg = QString("RecoverQueue: Recovering '%1' %2 @ %3 "
-                              "from '%4' state.")
+                msg = QString("RecoverQueue: Recovering '%1' for %2 "
+                              "from '%3' state.")
                               .arg(JobText((*it).type))
-                              .arg((*it).chanid)
-                              .arg((*it).startts)
-                              .arg(StatusText((*it).status));
+                              .arg(logInfo).arg(StatusText((*it).status));
                 VERBOSE(VB_JOBQUEUE, LOC + msg);
 
                 ChangeJobStatus((*it).id, JOB_QUEUED, "");
@@ -1561,12 +1533,10 @@ void JobQueue::RecoverQueue(bool justOld)
             }
             else
             {
-                msg = QString("RecoverQueue: Ignoring '%1' %2 @ %3 "
-                              "in '%4' state.")
+                msg = QString("RecoverQueue: Ignoring '%1' for %2 "
+                              "in '%3' state.")
                               .arg(JobText((*it).type))
-                              .arg((*it).chanid)
-                              .arg((*it).startts)
-                              .arg(StatusText((*it).status));
+                              .arg(logInfo).arg(StatusText((*it).status));
 
                 // VERBOSE(VB_JOBQUEUE, LOC + msg);
             }
@@ -1599,12 +1569,10 @@ void JobQueue::CleanupOldJobsInQueue()
     }
 }
 
-void JobQueue::ProcessJob(int id, int jobType, QString chanid,
-                          QDateTime starttime)
+void JobQueue::ProcessJob(JobQueueEntry job)
 {
-    QString name = QString("jobqueue%1%2").arg(id).arg(rand());
-
-    QString key = GetJobQueueKey(chanid, starttime);
+    int jobID = job.id;
+    QString name = QString("jobqueue%1%2").arg(jobID).arg(rand());
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -1613,87 +1581,88 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
         return;
     }
 
-    ChangeJobStatus(id, JOB_PENDING);
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
-                                                              starttime);
-
-    if (!pginfo)
+    ChangeJobStatus(jobID, JOB_PENDING);
+    ProgramInfo *pginfo = NULL;
+    
+    if (!job.chanid.isEmpty())
     {
-        QString message = QString("Unable to retrieve "
-                                  "program info for chanid %1, starttime %2")
-                                  .arg(chanid).arg(starttime.toString());
-        VERBOSE(VB_JOBQUEUE, LOC_ERR + message);
+        pginfo = ProgramInfo::GetProgramFromRecorded(job.chanid, job.starttime);
 
-        ChangeJobStatus(id, JOB_ERRORED,
-                        "Unable to retrieve Program Info from database");
+        if (!pginfo)
+        {
+            QString message = QString("Unable to retrieve program info for "
+                                      "chanid %1 @ %2").arg(job.chanid)
+                                      .arg(job.starttime.toString());
+            VERBOSE(VB_JOBQUEUE, LOC_ERR + message);
 
-        return;
+            ChangeJobStatus(jobID, JOB_ERRORED,
+                            "Unable to retrieve Program Info from database");
+
+            return;
+        }
+
+        pginfo->pathname = pginfo->GetPlaybackURL();
     }
 
-    pginfo->pathname = pginfo->GetPlaybackURL();
 
     runningJobsLock->lock();
 
-    ChangeJobStatus(id, JOB_STARTING);
+    ChangeJobStatus(jobID, JOB_STARTING);
     RunningJobInfo jInfo;
-    jInfo.type    = jobType;
-    jInfo.id      = id;
+    jInfo.type    = job.type;
+    jInfo.id      = jobID;
     jInfo.flag    = JOB_RUN;
-    jInfo.desc    = GetJobDescription(jobType);
-    jInfo.command = GetJobCommand(id, jobType, pginfo);
+    jInfo.desc    = GetJobDescription(job.type);
+    jInfo.command = GetJobCommand(jobID, job.type, pginfo);
     jInfo.pginfo  = pginfo;
 
-    runningJobs[key] = jInfo;
+    runningJobs[jobID] = jInfo;
 
-    pginfo->MarkAsInUse(true, "jobqueue");
+    if (pginfo)
+        pginfo->MarkAsInUse(true, "jobqueue");
 
-    if (pginfo->recgroup == "Deleted")
+    if (pginfo && pginfo->recgroup == "Deleted")
     {
-        ChangeJobStatus(id, JOB_CANCELLED,
+        ChangeJobStatus(jobID, JOB_CANCELLED,
                         "Program has been deleted");
-        RemoveRunningJob(key);
+        RemoveRunningJob(jobID);
     }
-    else if ((jobType == JOB_TRANSCODE) ||
-        (runningJobs[key].command == "mythtranscode"))
+    else if ((job.type == JOB_TRANSCODE) ||
+        (runningJobs[jobID].command == "mythtranscode"))
     {
-        StartChildJob(TranscodeThread, pginfo);
+        StartChildJob(TranscodeThread, jobID);
     }
-    else if ((jobType == JOB_COMMFLAG) ||
-             (runningJobs[key].command == "mythcommflag"))
+    else if ((job.type == JOB_COMMFLAG) ||
+             (runningJobs[jobID].command == "mythcommflag"))
     {
-        StartChildJob(FlagCommercialsThread, pginfo);
+        StartChildJob(FlagCommercialsThread, jobID);
     }
-    else if (jobType & JOB_USERJOB)
+    else if (job.type & JOB_USERJOB)
     {
-        StartChildJob(UserJobThread, pginfo);
+        StartChildJob(UserJobThread, jobID);
     }
     else
     {
-        ChangeJobStatus(id, JOB_ERRORED,
+        ChangeJobStatus(jobID, JOB_ERRORED,
                         "UNKNOWN JobType, unable to process!");
-        RemoveRunningJob(key);
+        RemoveRunningJob(jobID);
     }
 
     runningJobsLock->unlock();
 }
 
-void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *),
-                             ProgramInfo *tmpInfo)
+void JobQueue::StartChildJob(void *(*ChildThreadRoutine)(void *), int jobID)
 {
-    m_pginfo = tmpInfo;
-    childThreadStarted = false;
+    JobThreadStruct *jts = new JobThreadStruct;
+    jts->jq = this;
+    jts->jobID = jobID;
 
     pthread_t childThread;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&childThread, &attr, ChildThreadRoutine, this);
+    pthread_create(&childThread, &attr, ChildThreadRoutine, jts);
     pthread_attr_destroy(&attr);
-
-    while (!childThreadStarted)
-        usleep(50);
-
-    m_pginfo = NULL;
 }
 
 QString JobQueue::GetJobDescription(int jobType)
@@ -1713,7 +1682,7 @@ QString JobQueue::GetJobDescription(int jobType)
 
 QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
 {
-    QString command = "";
+    QString command;
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (jobType == JOB_TRANSCODE)
@@ -1740,7 +1709,12 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
                     QString("UserJob%1").arg(UserJobTypeToIndex(jobType)), "");
     }
 
-    if (command != "")
+    if (!command.isEmpty())
+    {
+        command.replace(QRegExp("%JOBID%"), QString("%1").arg(id));
+    }
+
+    if (!command.isEmpty() && tmpInfo)
     {
         QString pburl = tmpInfo->GetPlaybackURL(false, true);
         if (pburl.left(7) == "myth://")
@@ -1781,7 +1755,6 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
                         tmpInfo->endts.toString(Qt::ISODate));
         command.replace(QRegExp("%VERBOSELEVEL%"),
                         QString("%1").arg(print_verbose_messages));
-        command.replace(QRegExp("%JOBID%"), QString("%1").arg(id));
 
         QString transProf;
         if (tmpInfo->transcoder == RecordingProfile::TranscoderAutodetect)
@@ -1794,20 +1767,20 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
     return command;
 }
 
-void JobQueue::RemoveRunningJob(QString key)
+void JobQueue::RemoveRunningJob(int id)
 {
     runningJobsLock->lock();
 
-    if (runningJobs.contains(key))
+    if (runningJobs.contains(id))
     {
-        ProgramInfo *pginfo = runningJobs[key].pginfo;
+        ProgramInfo *pginfo = runningJobs[id].pginfo;
         if (pginfo)
         {
             pginfo->MarkAsInUse(false);
             delete pginfo;
         }
 
-        runningJobs.remove(key);
+        runningJobs.remove(id);
     }
 
     runningJobsLock->unlock();
@@ -1848,25 +1821,34 @@ QString JobQueue::PrettyPrint(off_t bytes)
 
 void *JobQueue::TranscodeThread(void *param)
 {
-    JobQueue *theTranscoder = (JobQueue *)param;
-    theTranscoder->DoTranscodeThread();
+    JobThreadStruct *jts = (JobThreadStruct *)param;
+    JobQueue *jq = jts->jq;
+
+    jq->DoTranscodeThread(jts->jobID);
+
+    delete jts;
 
     return NULL;
 }
 
-void JobQueue::DoTranscodeThread(void)
+void JobQueue::DoTranscodeThread(int jobID)
 {
-    if (!m_pginfo)
+    // We can't currently transcode non-recording files w/o a ProgramInfo
+    if (!runningJobs[jobID].pginfo)
+    {
+        VERBOSE(VB_JOBQUEUE, LOC_ERR +
+                "The JobQueue can not currently transcode files that do not "
+                "have a chanid/starttime in the recorded table.");
+        ChangeJobStatus(jobID, JOB_ERRORED, "ProgramInfo data not found");
+        RemoveRunningJob(jobID);
         return;
+    }
 
-    QString key = GetJobQueueKey(m_pginfo);
-    ProgramInfo *program_info = runningJobs[key].pginfo;
-    QString subtitle = program_info->subtitle.isEmpty() ? "" :
-                           QString(" \"%1\"").arg(program_info->subtitle);
-
-    int jobID = runningJobs[key].id;
-
-    childThreadStarted = true;
+    ProgramInfo *program_info = runningJobs[jobID].pginfo;
+    QString subtitle;
+    
+    if (!program_info->subtitle.isEmpty())
+        subtitle = QString(" \"%1\"").arg(program_info->subtitle);
 
     ChangeJobStatus(jobID, JOB_RUNNING);
     bool hasCutlist = !!(program_info->getProgramFlags() & FL_CUTLIST);
@@ -1880,7 +1862,7 @@ void JobQueue::DoTranscodeThread(void)
     QString path;
     QString command;
 
-    if (runningJobs[key].command == "mythtranscode")
+    if (runningJobs[jobID].command == "mythtranscode")
     {
         path = GetInstallPrefix() + "/bin/mythtranscode";
         QByteArray parg = profilearg.toAscii();
@@ -1890,10 +1872,11 @@ void JobQueue::DoTranscodeThread(void)
     }
     else
     {
-        command = runningJobs[key].command;
+        command = runningJobs[jobID].command;
 
         QStringList tokens = command.split(" ", QString::SkipEmptyParts);
-        path = (!tokens.empty()) ? tokens[0] : "";
+        if (!tokens.empty())
+            path = tokens[0];
     }
 
     if (jobQueueCPU < 2)
@@ -2061,37 +2044,46 @@ void JobQueue::DoTranscodeThread(void)
         ChangeJobStatus(jobID, JOB_ERRORED, "Retry limit exceeded");
     }
 
-    RemoveRunningJob(key);
+    RemoveRunningJob(jobID);
 }
 
 void *JobQueue::FlagCommercialsThread(void *param)
 {
-    JobQueue *theFlagger = (JobQueue *)param;
-    theFlagger->DoFlagCommercialsThread();
+    JobThreadStruct *jts = (JobThreadStruct *)param;
+    JobQueue *jq = jts->jq;
+
+    jq->DoFlagCommercialsThread(jts->jobID);
+
+    delete jts;
 
     return NULL;
 }
 
-void JobQueue::DoFlagCommercialsThread(void)
+void JobQueue::DoFlagCommercialsThread(int jobID)
 {
-    if (!m_pginfo)
+    // We can't currently commflag non-recording files w/o a ProgramInfo
+    if (!runningJobs[jobID].pginfo)
+    {
+        VERBOSE(VB_JOBQUEUE, LOC_ERR +
+                "The JobQueue can not currently commflag files that do not "
+                "have a chanid/starttime in the recorded table.");
+        ChangeJobStatus(jobID, JOB_ERRORED, "ProgramInfo data not found");
+        RemoveRunningJob(jobID);
         return;
+    }
 
-    QString key = GetJobQueueKey(m_pginfo);
-    ProgramInfo *program_info = runningJobs[key].pginfo;
-    QString subtitle = program_info->subtitle.isEmpty() ? "" :
-                           QString(" \"%1\"").arg(program_info->subtitle);
+    ProgramInfo *program_info = runningJobs[jobID].pginfo;
+    QString subtitle;
+    
+    if (!program_info->subtitle.isEmpty())
+        subtitle = QString(" \"%1\"").arg(program_info->subtitle);
+
     QString detailstr = QString("%1%2 recorded from channel %3 at %4")
                           .arg(program_info->title)
                           .arg(subtitle)
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
     QByteArray details = detailstr.toLocal8Bit();
-
-    int jobID = runningJobs[key].id;
-
-    childThreadStarted = true;
-
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -2118,7 +2110,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     QString path;
     QString command;
 
-    if (runningJobs[key].command == "mythcommflag")
+    if (runningJobs[jobID].command == "mythcommflag")
     {
         path = GetInstallPrefix() + "/bin/mythcommflag";
         command = QString("%1 -j %2 -V %3")
@@ -2126,9 +2118,10 @@ void JobQueue::DoFlagCommercialsThread(void)
     }
     else
     {
-        command = runningJobs[key].command;
+        command = runningJobs[jobID].command;
         QStringList tokens = command.split(" ", QString::SkipEmptyParts);
-        path = (!tokens.empty()) ? tokens[0] : "";
+        if (!tokens.empty())
+            path = tokens[0];
     }
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
@@ -2146,7 +2139,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         ChangeJobStatus(jobID, JOB_ERRORED, comment);
         priority = LP_WARNING;
     }
-    else if (runningJobs[key].flag == JOB_STOP)
+    else if (runningJobs[jobID].flag == JOB_STOP)
     {
         comment = tr("Aborted by user");
         ChangeJobStatus(jobID, JOB_ABORTED, comment);
@@ -2179,7 +2172,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     msg = tr("Commercial Flagging %1", "Job ID")
         .arg(StatusText(GetJobStatus(jobID)));
 
-    if (comment != "")
+    if (!comment.isEmpty())
     {
         detailstr += QString(" (%1)").arg(comment);
         details = detailstr.toLocal8Bit();
@@ -2190,38 +2183,38 @@ void JobQueue::DoFlagCommercialsThread(void)
     if (priority <= LP_WARNING)
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + details.constData());
 
-    RemoveRunningJob(key);
+    RemoveRunningJob(jobID);
     runningJobsLock->unlock();
 }
 
 void *JobQueue::UserJobThread(void *param)
 {
-    JobQueue *theUserJob = (JobQueue *)param;
-    theUserJob->DoUserJobThread();
+    JobThreadStruct *jts = (JobThreadStruct *)param;
+    JobQueue *jq = jts->jq;
+
+    jq->DoUserJobThread(jts->jobID);
+
+    delete jts;
 
     return NULL;
 }
 
-void JobQueue::DoUserJobThread(void)
+void JobQueue::DoUserJobThread(int jobID)
 {
-    if (!m_pginfo)
-        return;
-
-    QString key = GetJobQueueKey(m_pginfo);
-    ProgramInfo *program_info = runningJobs[key].pginfo;
-    int jobID = runningJobs[key].id;
-    QString jobDesc = runningJobs[key].desc;
-
-    childThreadStarted = true;
+    ProgramInfo *pginfo = runningJobs[jobID].pginfo;
+    QString jobDesc = runningJobs[jobID].desc;
 
     ChangeJobStatus(jobID, JOB_RUNNING);
 
-    QString msg = QString("Started \"%1\" for \"%2\" recorded "
-                          "from channel %3 at %4")
-      .arg(jobDesc)
-      .arg(program_info->title)
-      .arg(program_info->chanid)
-      .arg(program_info->recstartts.toString());
+    QString msg;
+    
+    if (pginfo)
+        msg = QString("Started %1 for \"%2\" recorded from channel %3 at %4")
+                      .arg(jobDesc).arg(pginfo->title).arg(pginfo->chanid)
+                      .arg(pginfo->recstartts.toString());
+    else
+        msg = QString("Started %1 for jobID %2").arg(jobDesc).arg(jobID);
+
     QByteArray amsg = msg.toLocal8Bit();
 
     VERBOSE(VB_GENERAL, LOC + QString(amsg.constData()));
@@ -2239,16 +2232,16 @@ void JobQueue::DoUserJobThread(void)
     }
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
-                                       .arg(runningJobs[key].command));
+                                       .arg(runningJobs[jobID].command));
 
-    int result = myth_system(runningJobs[key].command);
+    int result = myth_system(runningJobs[jobID].command);
 
     if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
         msg = QString("User Job '%1' failed, unable to find "
                       "executable, check your PATH and backend logs.")
-                      .arg(runningJobs[key].command);
+                      .arg(runningJobs[jobID].command);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
         VERBOSE(VB_IMPORTANT, LOC + QString("Current PATH: '%1'")
                                             .arg(getenv("PATH")));
@@ -2261,7 +2254,7 @@ void JobQueue::DoUserJobThread(void)
     }
     else if (result != 0)
     {
-        msg = QString("User Job '%1' failed.").arg(runningJobs[key].command);
+        msg = QString("User Job '%1' failed.").arg(runningJobs[jobID].command);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 
         gContext->LogEntry("jobqueue", LP_WARNING, "User Job Errored", msg);
@@ -2271,12 +2264,13 @@ void JobQueue::DoUserJobThread(void)
     }
     else
     {
-        msg = QString("Finished \"%1\" for \"%2\" recorded from "
-                      "channel %3 at %4.")
-          .arg(jobDesc)
-          .arg(program_info->title)
-          .arg(program_info->chanid)
-          .arg(program_info->recstartts.toString());
+        if (pginfo)
+            msg = QString("Finished %1 for \"%2\" recorded from channel %3 "
+                          "at %4.").arg(jobDesc).arg(pginfo->title)
+                          .arg(pginfo->chanid)
+                          .arg(pginfo->recstartts.toString());
+        else
+            msg = QString("Finished %1 for jobID %2").arg(jobDesc).arg(jobID);
 
         QByteArray amsg = msg.toLocal8Bit();
 
@@ -2291,7 +2285,7 @@ void JobQueue::DoUserJobThread(void)
         gContext->dispatch(me);
     }
 
-    RemoveRunningJob(key);
+    RemoveRunningJob(jobID);
 }
 
 int JobQueue::UserJobTypeToIndex(int jobType)

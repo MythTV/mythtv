@@ -185,35 +185,38 @@ class MPUBLIC JobQueue : public QObject
     static void CleanupOldJobsInQueue();
 
   private:
+    typedef struct jobthreadstruct
+    {
+        JobQueue *jq;
+        int jobID;
+    } JobThreadStruct;
+
     static void *QueueProcesserThread(void *param);
     void RunQueueProcesser(void);
     void ProcessQueue(void);
 
-    void ProcessJob(int id, int jobType, QString chanid, QDateTime starttime);
+    void ProcessJob(JobQueueEntry job);
 
     bool AllowedToRun(JobQueueEntry job);
 
     static bool InJobRunWindow(int orStartingWithinMins = 0);
 
-    void StartChildJob(void *(*start_routine)(void *), ProgramInfo *tmpInfo);
-
-    static QString GetJobQueueKey(QString chanid, QString startts);
-    static QString GetJobQueueKey(QString chanid, QDateTime starttime);
-    static QString GetJobQueueKey(ProgramInfo *pginfo);
+    void StartChildJob(void *(*start_routine)(void *), int jobID);
 
     QString GetJobDescription(int jobType);
     QString GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo);
-    void RemoveRunningJob(QString key);
+    void RemoveRunningJob(int id);
+
+    static QString PrettyPrint(off_t bytes);
 
     static void *TranscodeThread(void *param);
-    static QString PrettyPrint(off_t bytes);
-    void DoTranscodeThread(void);
+    void DoTranscodeThread(int jobID);
 
     static void *FlagCommercialsThread(void *param);
-    void DoFlagCommercialsThread(void);
+    void DoFlagCommercialsThread(int jobID);
 
     static void *UserJobThread(void *param);
-    void DoUserJobThread(void);
+    void DoUserJobThread(int jobID);
 
     QString m_hostname;
 
@@ -226,9 +229,8 @@ class MPUBLIC JobQueue : public QObject
     QMap<QString, int *> jobControlFlags;
 
     QMutex *runningJobsLock;
-    QMap<QString, RunningJobInfo> runningJobs;
+    QMap<int, RunningJobInfo> runningJobs;
 
-    bool childThreadStarted;
     bool isMaster;
 
     pthread_t queueThread;
