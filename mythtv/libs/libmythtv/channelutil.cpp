@@ -286,6 +286,9 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
         const TerrestrialDeliverySystemDescriptor cd(desc);
         uint64_t freq = cd.FrequencyHz();
 
+        if (!freq)
+            return;
+
         // Use the frequency we already have for this mplex
         // as it may be one of the other_frequencies for this mplex
         int mux = ChannelUtil::GetMplexID(sourceid, tsid, netid);
@@ -325,6 +328,9 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
     {
         const SatelliteDeliverySystemDescriptor cd(desc);
 
+        if (!cd.FrequencyHz())
+            return;
+
         uint mux = ChannelUtil::CreateMultiplex(
             sourceid,             "dvb",
             cd.FrequencyHz(),     cd.ModulationString(),
@@ -347,6 +353,9 @@ void handle_transport_desc(vector<uint> &muxes, const MPEGDescriptor &desc,
     else if (tag == DescriptorID::cable_delivery_system)
     {
         const CableDeliverySystemDescriptor cd(desc);
+
+        if (!cd.FrequencyHz())
+            return;
 
         uint mux = ChannelUtil::CreateMultiplex(
             sourceid,             "dvb",
