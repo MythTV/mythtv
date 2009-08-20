@@ -301,8 +301,16 @@ bool HDHRRecorder::ProcessTSPacket(const TSPacket& tspacket)
             if (lpid == GetStreamData()->VideoPIDSingleProgram())
             {
                 //cerr<<"v";
-                _buffer_packets = !FindMPEG2Keyframes(&tspacket);
-                BufferedWrite(tspacket);
+                ProgramMapTable *pmt = _stream_data->PMTSingleProgram();
+                uint video_stream_type = pmt->StreamType(pmt->FindPID(lpid));
+
+                if (video_stream_type == StreamID::H264Video)
+                        _buffer_packets = !FindH264Keyframes(&tspacket);
+                else if (StreamID::IsVideo(video_stream_type))
+                        _buffer_packets = !FindMPEG2Keyframes(&tspacket);
+
+                if ((video_stream_type != StreamID::H264Video) || _seen_sps)
+                        BufferedWrite(tspacket);
             }
             else if (GetStreamData()->IsAudioPID(lpid))
             {
