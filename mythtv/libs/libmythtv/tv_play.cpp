@@ -1599,7 +1599,7 @@ int TV::PlayFromRecorder(int recordernum)
         fileexists = RemoteCheckFile(&pginfo);
     else
     {
-        QFile checkFile(pginfo.GetPlaybackURL());
+        QFile checkFile(pginfo.GetPlaybackURL(true));
         fileexists = checkFile.exists();
     }
 
@@ -1740,7 +1740,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         else
         {
             ctx->LockPlayingInfo(__FILE__, __LINE__);
-            QString playbackURL = ctx->playingInfo->GetPlaybackURL();
+            QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
             ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
@@ -1813,8 +1813,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
             playbackURL.detach();
         }
         else
-            playbackURL = ctx->playingInfo->GetPlaybackURL(
-                              desiredNextState != kState_WatchingRecording);
+            playbackURL = ctx->playingInfo->GetPlaybackURL(true);
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
         ctx->SetRingBuffer(new RingBuffer(playbackURL, false));
@@ -6209,7 +6208,7 @@ void TV::SwitchCards(PlayerContext *ctx,
         else
         {
             ctx->LockPlayingInfo(__FILE__, __LINE__);
-            QString playbackURL = ctx->playingInfo->GetPlaybackURL();
+            QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
 
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
 
