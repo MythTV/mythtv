@@ -2250,15 +2250,39 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     MythUIButtonListItemCopyDest dest(item);
     CopyMetadataToUI(metadata, dest);
 
-    item->SetText(metadata ? metadata->GetTitle() : node->getString());
+    MythGenericTree *parent = node->getParent();    
+
+    if ((parent) && (metadata))
+    {
+        if (QString::compare(parent->getString(),
+                             metadata->GetTitle(), Qt::CaseInsensitive) == 0)
+            item->SetText(metadata->GetSubtitle());
+    }
+    else
+        item->SetText(metadata ? metadata->GetTitle() : node->getString());
 
     QString imgFilename = GetCoverImage(node);
 
     if (!imgFilename.isEmpty() &&
        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
     {
-        item->SetImage(imgFilename);
-        item->SetImage(imgFilename, "coverimage");
+        if ((parent) && (metadata) &&
+            (QString::compare(parent->getString(), 
+                              metadata->GetTitle(), Qt::CaseInsensitive) == 0) &&
+            !GetScreenshot(node).isEmpty())
+        {
+            QString screenshot = GetScreenshot(node);
+            if (!screenshot.isEmpty())
+            {
+                item->SetImage(GetScreenshot(node));
+                item->SetImage(GetScreenshot(node), "buttonitem");
+            }
+        }
+        else
+        {
+            item->SetImage(imgFilename);
+            item->SetImage(imgFilename, "coverimage");
+        }
     }
     else if (metadata)
     {
@@ -2755,7 +2779,8 @@ QString VideoDialog::GetScreenshot(MythGenericTree *node)
         if (metadata)
         {
             if (metadata->IsHostSet() &&
-                    !metadata->GetScreenshot().startsWith("/"))
+                    !metadata->GetScreenshot().startsWith("/") &&
+                    !metadata->GetScreenshot().isEmpty())
             {
                 icon_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
                         metadata->GetScreenshot());
@@ -2789,7 +2814,9 @@ QString VideoDialog::GetBanner(MythGenericTree *node)
 
     if (metadata)
     {
-        if (metadata->IsHostSet() && !metadata->GetBanner().startsWith("/"))
+        if (metadata->IsHostSet() &&
+               !metadata->GetBanner().startsWith("/") &&
+               !metadata->GetBanner().isEmpty())
         {
             icon_file = GenRemoteFileURL("Banners", metadata->GetHost(),
                     metadata->GetBanner());
@@ -2822,7 +2849,9 @@ QString VideoDialog::GetFanart(MythGenericTree *node)
 
     if (metadata)
     {
-        if (metadata->IsHostSet() && !metadata->GetFanart().startsWith("/"))
+        if (metadata->IsHostSet() &&
+                !metadata->GetFanart().startsWith("/") &&
+                !metadata->GetFanart().isEmpty())
         {
             icon_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
                     metadata->GetFanart());
