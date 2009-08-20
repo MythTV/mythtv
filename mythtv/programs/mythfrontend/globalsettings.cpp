@@ -2126,6 +2126,18 @@ static HostCheckBox *AutomaticSetWatched()
     return gc;
 }
 
+static HostSpinBox *LiveTVIdleTimeout()
+{
+    HostSpinBox *gs = new HostSpinBox("LiveTVIdleTimeout", 0, 3600, 1);
+    gs->setLabel(QObject::tr("Live TV idle timeout"));
+    gs->setValue(0);
+    gs->setHelpText(QObject::tr(
+                        "Exit LiveTV automatically if left idle for the "
+                        "specified number of minutes. "
+                        "0 disables the timeout."));
+    return gs;
+}
+
 static GlobalSpinBox *PreviewPixmapOffset()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("PreviewPixmapOffset", 0, 600, 1);
@@ -4715,6 +4727,7 @@ PlaybackSettings::PlaybackSettings()
     columns->addChild(column2);
 
     general1->addChild(columns);
+    general1->addChild(LiveTVIdleTimeout());
     general1->addChild(AlwaysStreamFiles());
 #ifdef USING_OPENGL_VSYNC
     general1->addChild(UseOpenGLVSync());
