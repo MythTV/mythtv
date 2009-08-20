@@ -2252,8 +2252,9 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     MythGenericTree *parent = node->getParent();    
 
-    if (parent && metadata && (QString::compare(parent->getString(),
-                             metadata->GetTitle(), Qt::CaseInsensitive) == 0))    
+    if (parent && metadata && ((QString::compare(parent->getString(),
+                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
+                            parent->getString().startsWith("Season", Qt::CaseInsensitive)))    
         item->SetText(metadata->GetSubtitle());
     else
         item->SetText(metadata ? metadata->GetTitle() : node->getString());
@@ -2264,8 +2265,9 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
     {
         if (parent && metadata &&
-            (QString::compare(parent->getString(), 
-                              metadata->GetTitle(), Qt::CaseInsensitive) == 0) &&
+            ((QString::compare(parent->getString(), 
+                              metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
+             parent->getString().startsWith("Season", Qt::CaseInsensitive)) &&
             !GetScreenshot(node).isEmpty())
         {
             QString screenshot = GetScreenshot(node);
