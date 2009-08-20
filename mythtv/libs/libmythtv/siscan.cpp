@@ -1599,22 +1599,22 @@ uint SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
 
     tuning.frequency = (*transport).freq_offset(transport.offset());
 
-#ifdef USING_DVB
-    if (GetDVBSignalMonitor())
+    if (GetDTVSignalMonitor())
     {
-        DVBSignalMonitor *sm = GetDVBSignalMonitor();
+        DTVSignalMonitor *sm = GetDTVSignalMonitor();
 
         tsid  = sm->GetDetectedTransportID();
         netid = sm->GetDetectedNetworkID();
 
+#ifdef USING_DVB
         // Try to read the actual values back from the card
-        if (GetDVBChannel()->IsTuningParamsProbeSupported())
+        if (GetDVBSignalMonitor() && GetDVBChannel()->IsTuningParamsProbeSupported())
             GetDVBChannel()->ProbeTuningParams(tuning);
+#endif // USING_DVB
 
         tuning.frequency = FindBestMplexFreq(
             tuning.frequency, transport, (*transport).SourceID, tsid, netid);
     }
-#endif // USING_DVB
 
 #ifdef USING_V4L
     if (GetChannel())
