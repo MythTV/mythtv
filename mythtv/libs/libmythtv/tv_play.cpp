@@ -933,6 +933,8 @@ TV::~TV(void)
 
     gContext->removeListener(this);
 
+    GetMythMainWindow()->SetDrawEnabled(true);
+    
     if (myWindow)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -1757,6 +1759,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
         VERBOSE(VB_IMPORTANT, "We have a RingBuffer");
 
         GetMythUI()->DisableScreensaver();
+        GetMythMainWindow()->SetDrawEnabled(false);
 
         if (ctx->playingInfo && StartRecorder(ctx,-1))
         {
@@ -1820,6 +1823,7 @@ void TV::HandleStateChange(PlayerContext *mctx, PlayerContext *ctx)
 
         if (ctx->buffer && ctx->buffer->IsOpen())
         {
+            GetMythMainWindow()->SetDrawEnabled(false);
             GetMythUI()->DisableScreensaver();
 
             if (desiredNextState == kState_WatchingRecording)
@@ -7923,6 +7927,7 @@ void TV::DoEditSchedule(int editType)
     else
     {
         //we are embedding in a mythui window so show the gui paint window again
+        GetMythMainWindow()->SetDrawEnabled(true);
         GetMythMainWindow()->GetPaintWindow()->show();
     }
 }
@@ -8608,6 +8613,7 @@ void TV::customEvent(QEvent *e)
 
     if (message.left(11) == "EPG_EXITING" || message.left(18) == "PROGFINDER_EXITING")
     {
+        GetMythMainWindow()->SetDrawEnabled(false);
         // Resize the window back to the MythTV Player size
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         PlayerContext *mctx;
