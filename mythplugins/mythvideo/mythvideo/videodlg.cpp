@@ -2515,10 +2515,10 @@ QString VideoDialog::GetImageFromFolder(Metadata *metadata)
     }
 
     if (!icon_file.isEmpty())
-        VERBOSE(VB_GENERAL, QString("Found Image : %1 :")
+        VERBOSE(VB_GENERAL|VB_EXTRA, QString("Found Image : %1 :")
                                     .arg(icon_file));
     else
-        VERBOSE(VB_GENERAL,
+        VERBOSE(VB_GENERAL|VB_EXTRA,
                 QString("Could not find cover Image : %1 ")
                     .arg(prefix));
 
@@ -2701,10 +2701,10 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         }
 
         if (!icon_file.isEmpty())
-            VERBOSE(VB_GENERAL, QString("Found Image : %1 :")
+            VERBOSE(VB_GENERAL|VB_EXTRA, QString("Found Image : %1 :")
                                         .arg(icon_file));
         else
-            VERBOSE(VB_GENERAL,
+            VERBOSE(VB_GENERAL|VB_EXTRA,
                     QString("Could not find folder cover Image : %1 ")
                     .arg(folder_path));
     }
