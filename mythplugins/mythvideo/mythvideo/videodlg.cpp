@@ -2252,12 +2252,9 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     MythGenericTree *parent = node->getParent();    
 
-    if ((parent) && (metadata))
-    {
-        if (QString::compare(parent->getString(),
-                             metadata->GetTitle(), Qt::CaseInsensitive) == 0)
-            item->SetText(metadata->GetSubtitle());
-    }
+    if (parent && metadata && (QString::compare(parent->getString(),
+                             metadata->GetTitle(), Qt::CaseInsensitive) == 0))    
+        item->SetText(metadata->GetSubtitle());
     else
         item->SetText(metadata ? metadata->GetTitle() : node->getString());
 
@@ -2266,7 +2263,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     if (!imgFilename.isEmpty() &&
        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
     {
-        if ((parent) && (metadata) &&
+        if (parent && metadata &&
             (QString::compare(parent->getString(), 
                               metadata->GetTitle(), Qt::CaseInsensitive) == 0) &&
             !GetScreenshot(node).isEmpty())
