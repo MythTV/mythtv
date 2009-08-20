@@ -204,7 +204,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
             if (it2->fsID == -1 &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 1024) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
             {
@@ -299,7 +299,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
                         .arg(it2->hostname).arg(it2->directory).arg(it2->dirID)
                         .arg(it2->usedSpaceKB).arg(it2->totalSpaceKB));
             VERBOSE(VB_SCHEDULE+VB_FILE,
-                QString("        Total KB Diff: %1 (want <= 32)") 
+                QString("        Total KB Diff: %1 (want <= 1024)") 
                 .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB)));
             VERBOSE(VB_SCHEDULE+VB_FILE,
                 QString("        Used  KB Diff: %1 (want <= %2)")
@@ -309,7 +309,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
             if (it2->fsID == -1 &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 1024) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
             {
