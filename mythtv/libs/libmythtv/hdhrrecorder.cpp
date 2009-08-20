@@ -176,14 +176,14 @@ void HDHRRecorder::SetStreamData(MPEGStreamData *data)
         data->AddMPEGSPListener(this);
         data->AddMPEGListener(this);
 
-        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
         DVBStreamData  *dvb  = dynamic_cast<DVBStreamData*>(data);
+        if (dvb)
+            dvb->AddDVBMainListener(this);
 
+        ATSCStreamData *atsc = dynamic_cast<ATSCStreamData*>(data);
         if (atsc && atsc->DesiredMinorChannel())
             atsc->SetDesiredChannel(atsc->DesiredMajorChannel(),
                                     atsc->DesiredMinorChannel());
-        else if (dvb)
-            dvb->AddDVBMainListener(this);
         else if (data->DesiredProgram() >= 0)
             data->SetDesiredProgram(data->DesiredProgram());
     }
