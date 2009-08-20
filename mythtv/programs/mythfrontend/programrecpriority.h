@@ -27,13 +27,14 @@ class ProgramRecPriorityInfo : public ProgramInfo
     QDateTime last_record;
     int avg_delay;
     int autoRecPriority;
+    QString profile;
 };
 
 class ProgramRecPriority : public MythScreenType
 {
     Q_OBJECT
   public:
-    ProgramRecPriority(MythScreenStack *parent);
+    ProgramRecPriority(MythScreenStack *parent, const QString &name);
    ~ProgramRecPriority();
 
     bool Create(void);
@@ -85,11 +86,26 @@ class ProgramRecPriority : public MythScreenType
 
     MythUIButtonList *m_programList;
 
+    QString m_formatShortDate;
+    QString m_formatLongDate;
+    QString m_formatTime;
+
+    MythUIText *m_categoryText;
+    MythUIText *m_descriptionText;
     MythUIText *m_schedInfoText;
     MythUIText *m_rectypePriorityText;
     MythUIText *m_recPriorityText;
     MythUIText *m_recPriorityBText;
     MythUIText *m_finalPriorityText;
+    MythUIText *m_recGroupText;
+    MythUIText *m_storageGroupText;
+    MythUIText *m_lastRecordedText;
+    MythUIText *m_lastRecordedDateText;
+    MythUIText *m_lastRecordedTimeText;
+    MythUIText *m_channameText;
+    MythUIText *m_channumText;
+    MythUIText *m_callsignText;
+    MythUIText *m_recProfileText;
 
     ProgramRecPriorityInfo *m_currentItem;
 

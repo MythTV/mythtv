@@ -1400,4 +1400,136 @@
 
     </window>
 
+    <window name="managerecrules">
+
+        <textarea name="pagetitle" from="basetextarea">
+            <area>20,5,650,40</area>
+            <font>baselarge</font>
+            <value>Manage Recording Rules</value>
+        </textarea>
+
+        <imagetype name="filler">
+            <filename>cr-background.png</filename>
+            <area>0,39,1280,420</area>
+        </imagetype>
+
+        <textarea name="callsignlabel" from="basetextarea">
+            <area>680,15,100,40</area>
+            <value>Channel</value>
+            <align>right</align>
+        </textarea>
+        <textarea name="lastrecordedlabel" from="basetextarea">
+            <area>790,15,290,40</area>
+            <value>Last Recorded</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="prioritylabel" from="basetextarea">
+            <area>1090,15,95,40</area>
+            <value>Priority</value>
+            <align>right</align>
+        </textarea>
+
+        <buttonlist name="programs" from="basebuttonlist2">
+            <area>20,59,760,370</area>
+            <buttonarea>0,0,760,340</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="rectype" from="buttontext">
+                        <area>30,1,20,24</area>
+                        <align>hcenter</align>
+                    </textarea>
+                    <textarea name="title" from="buttontext">
+                        <area>60,1,590,24</area>
+                    </textarea>
+                    <textarea name="callsign" from="buttontext">
+                        <area>660,1,100,24</area>
+                        <align>right</align>
+                    </textarea>
+                    <textarea name="lastrecorded" from="buttontext">
+                        <area>770,1,290,24</area>
+                        <align>right</align>
+                    </textarea>
+                    <textarea name="finalpriority" from="buttontext">
+                        <area>1130,1,40,24</area>
+                        <align>right</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active" />
+                <state name="inactive" from="active" />
+            </statetype>
+        </buttonlist>
+
+        <textarea name="title" from="basetextarea">
+            <area>30,450,740,40</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="recordingtype" from="basetextarea">
+            <area>30,490,430,30</area>
+        </textarea>
+
+        <textarea name="scheduleinfo" from="basetextarea">
+            <area>30,520,740,30</area>
+        </textarea>
+
+        <textarea name="finalprioritylabel" from="basetextarea">
+            <area>1110,490,90,30</area>
+            <value>Priority:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="finalpriority" from="basetextarea">
+            <area>1210,490,40,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="recordinggrouplabel" from="basetextarea">
+            <area>30,550,190,30</area>
+            <value>Recording Group:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="recordinggroup" from="basetextarea">
+            <area>230,550,160,30</area>
+        </textarea>
+
+        <textarea name="categorylabel" from="basetextarea">
+            <area>30,580,190,30</area>
+            <value>Category:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="category" from="basetextarea">
+            <area>230,580,160,30</area>
+        </textarea>
+
+        <textarea name="storagegrouplabel" from="basetextarea">
+            <area>640,550,190,30</area>
+            <value>Storage Group:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="storagegroup" from="basetextarea">
+            <area>840,550,160,30</area>
+        </textarea>
+
+        <textarea name="recordingprofilelabel" from="basetextarea">
+            <area>640,580,190,30</area>
+            <value>Recording Profile:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="recordingprofile" from="basetextarea">
+            <area>840,580,160,30</area>
+        </textarea>
+
+        <textarea name="keyinstr">
+            <area>0,660,1280,30</area>
+            <value>(1) Title (2) Priority (4) Type</value>
+            <align>allcenter</align>
+        </textarea>
+
+    </window>
+
 </mythuitheme>

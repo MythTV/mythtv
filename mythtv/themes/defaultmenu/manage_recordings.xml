@@ -33,28 +33,11 @@
     </button>
 
     <button>
-        <type>TV_RECPRIORITIES</type>
-        <text>Set Priorities</text>
-        <text lang="DE">Prioritäten</text>
-        <text lang="IS">Setja forgang</text>
-        <text lang="FR">Fixer les priorités</text>
-        <text lang="NL">Prioriteiten Instellen</text>
-        <text lang="SV">Prioriteter</text>
-        <text lang="JA">録画優先順位</text>
-        <text lang="FI">Aseta Prioriteetteja</text>
-        <text lang="ZH_TW">錄影優先次序</text>
-        <text lang="SL">Nastavitve prioritet</text>
-        <text lang="ET">Prioriteetide muutmine</text>
-        <text lang="NB">Velg prioriteringer</text>
-        <text lang="DA">Sæt prioriteter</text>
-        <text lang="ES">Fijar Prioridades</text>
-        <text lang="PT">Definir Prioridades</text>
-        <text lang="CS">Nastavit priority</text>
-        <text lang="RU">Установка приоритетов</text>
-        <text lang="PL">Ustaw priorytety</text>
-        <text lang="HE">הגדרת קדימויות</text>
-        <description>Prioritize some shows over others</description>
-        <action>TV_SET_RECPRIORITIES</action>
+        <type>TV_RECORDING_RULES</type>
+        <text>Recording Rules</text>
+        <alttext>Manage Rules</alttext>
+        <description>Edit or delete any recording rule</description>
+        <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
 
     <button>
@@ -141,6 +124,31 @@
         <alttext lang="SV">Tidigare</alttext>
         <description>See what you have recorded before</description>
         <action>TV_PREVIOUS</action>
+    </button>
+
+    <button>
+        <type>TV_RECPRIORITIES</type>
+        <text>Set Priorities</text>
+        <text lang="DE">Prioritäten</text>
+        <text lang="IS">Setja forgang</text>
+        <text lang="FR">Fixer les priorités</text>
+        <text lang="NL">Prioriteiten Instellen</text>
+        <text lang="SV">Prioriteter</text>
+        <text lang="JA">録画優先順位</text>
+        <text lang="FI">Aseta Prioriteetteja</text>
+        <text lang="ZH_TW">錄影優先次序</text>
+        <text lang="SL">Nastavitve prioritet</text>
+        <text lang="ET">Prioriteetide muutmine</text>
+        <text lang="NB">Velg prioriteringer</text>
+        <text lang="DA">Sæt prioriteter</text>
+        <text lang="ES">Fijar Prioridades</text>
+        <text lang="PT">Definir Prioridades</text>
+        <text lang="CS">Nastavit priority</text>
+        <text lang="RU">Установка приоритетов</text>
+        <text lang="PL">Ustaw priorytety</text>
+        <text lang="HE">הגדרת קדימויות</text>
+        <description>Prioritize some shows over others</description>
+        <action>TV_SET_RECPRIORITIES</action>
     </button>
 
 </mythmenu>

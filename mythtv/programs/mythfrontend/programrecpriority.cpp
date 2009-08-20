@@ -10,6 +10,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "proglist.h"
+#include "storagegroup.h"
 
 #include "mythdb.h"
 #include "mythverbose.h"
@@ -28,7 +29,8 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
     ProgramInfo(),
     recTypeRecPriority(0), recType(kNotRecording),
     matchCount(0),         recCount(0),
-    avg_delay(0),          autoRecPriority(0)
+    avg_delay(0),          autoRecPriority(0),
+    profile("")
 {
 }
 
@@ -40,7 +42,8 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(
     matchCount(other.matchCount),
     recCount(other.recCount),
     avg_delay(other.avg_delay),
-    autoRecPriority(other.autoRecPriority)
+    autoRecPriority(other.autoRecPriority),
+    profile(other.profile)
 {
     // TODO CHECK: should last_record be initialized too? -- dtk 22-12-2008
 }
@@ -61,6 +64,7 @@ ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
     last_record        = QDateTime();
     avg_delay          = 0;
     autoRecPriority    = 0;
+    profile            = "";
 #endif
 
     return *this;
@@ -317,12 +321,16 @@ class programAvgDelaySort
 
 ////////////////////////////////////////////////////////
 
-ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent)
-                   : MythScreenType(parent, "ProgramRecPriority")
+ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
+                                       const QString &name)
+                   : MythScreenType(parent, name)
 {
     m_sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
     m_reverseSort = gContext->GetNumSetting("ProgramRecPriorityReverse", 0);
+    m_formatShortDate = gContext->GetSetting("ShortDateFormat", "M/d");
+    m_formatLongDate  = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_formatTime      = gContext->GetSetting("TimeFormat", "h:mm AP");
 }
 
 ProgramRecPriority::~ProgramRecPriority()
@@ -331,17 +339,32 @@ ProgramRecPriority::~ProgramRecPriority()
 
 bool ProgramRecPriority::Create()
 {
-    if (!LoadWindowFromXML("schedule-ui.xml", "programrecpriority", this))
+    QString window_name = "programrecpriority";
+    if (objectName() == "ManageRecRules")
+        window_name = "managerecrules";
+
+    if (!LoadWindowFromXML("schedule-ui.xml", window_name, this))
         return false;
 
     m_programList = dynamic_cast<MythUIButtonList *> (GetChild("programs"));
 
+    m_descriptionText = dynamic_cast<MythUIText *> (GetChild("description"));
+    m_categoryText = dynamic_cast<MythUIText *> (GetChild("category"));
     m_schedInfoText = dynamic_cast<MythUIText *> (GetChild("scheduleinfo"));
     m_rectypePriorityText = dynamic_cast<MythUIText *>
                                                  (GetChild("rectypepriority"));
     m_recPriorityText = dynamic_cast<MythUIText *> (GetChild("recpriority"));
     m_recPriorityBText = dynamic_cast<MythUIText *> (GetChild("recpriorityb"));
     m_finalPriorityText = dynamic_cast<MythUIText *> (GetChild("finalpriority"));
+    m_recGroupText = dynamic_cast<MythUIText *> (GetChild("recordinggroup"));
+    m_storageGroupText = dynamic_cast<MythUIText *> (GetChild("storagegroup"));
+    m_lastRecordedText = dynamic_cast<MythUIText *> (GetChild("lastrecorded"));
+    m_lastRecordedDateText = dynamic_cast<MythUIText *> (GetChild("lastrecordeddate"));
+    m_lastRecordedTimeText = dynamic_cast<MythUIText *> (GetChild("lastrecordedtime"));
+    m_channameText = dynamic_cast<MythUIText *> (GetChild("channel"));
+    m_channumText = dynamic_cast<MythUIText *> (GetChild("channum"));
+    m_callsignText = dynamic_cast<MythUIText *> (GetChild("callsign"));
+    m_recProfileText = dynamic_cast<MythUIText *> (GetChild("recordingprofile"));
 
     if (!m_programList)
     {
@@ -1067,7 +1090,7 @@ void ProgramRecPriority::FillList(void)
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT recordid, title, chanid, starttime, startdate, "
-                   "type, inactive, last_record, avg_delay "
+                   "type, inactive, last_record, avg_delay, profile "
                    "FROM record;");
 
     if (!result.exec())
@@ -1088,6 +1111,7 @@ void ProgramRecPriority::FillList(void)
             int inactive = result.value(6).toInt();
             QDateTime lastrec = result.value(7).toDateTime();
             int avgd = result.value(8).toInt();
+            QString profile = result.value(9).toString();
 
             // find matching program in m_programData and set
             // recTypeRecPriority and recType
@@ -1107,6 +1131,7 @@ void ProgramRecPriority::FillList(void)
                     progInfo->recCount = m_recMatch[progInfo->recordid];
                     progInfo->last_record = lastrec;
                     progInfo->avg_delay = avgd;
+                    progInfo->profile = profile;
 
                     if (autopriority)
                         progInfo->autoRecPriority =
@@ -1315,8 +1340,56 @@ void ProgramRecPriority::UpdateList()
         progInfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
+        item->SetText(progInfo->description, "description", state);
+        item->SetText(progInfo->category, "category", state);
         item->SetText(QString::number(progRecPriority), "progpriority", state);
         item->SetText(QString::number(finalRecPriority), "finalpriority", state);
+
+        QString recgroup = progInfo->recgroup;
+        if (recgroup == "Default")
+            recgroup = tr("Default");
+        item->SetText(recgroup, "recordinggroup", state);
+        QString storagegroup = progInfo->storagegroup;
+        if (storagegroup == "Default")
+            storagegroup = tr("Default");
+        else if (StorageGroup::kSpecialGroups.contains(storagegroup))
+            storagegroup = tr(storagegroup.toLatin1().constData());
+        item->SetText(storagegroup, "storagegroup", state);
+
+        QString tempDateTime = (progInfo->last_record).toString(m_formatLongDate + ' ' + m_formatTime);
+        item->SetText(tempDateTime, "lastrecorded", state);
+        QString tempDate = (progInfo->last_record).toString(m_formatShortDate);
+        item->SetText(tempDate, "lastrecordeddate", state);
+        QString tempTime = (progInfo->last_record).toString(m_formatTime);
+        item->SetText(tempTime, "lastrecordedtime", state);
+
+        QString channame = progInfo->channame;
+        if ((progInfo->recType == kAllRecord) ||
+            (progInfo->recType == kFindOneRecord) ||
+            (progInfo->recType == kFindDailyRecord) ||
+            (progInfo->recType == kFindWeeklyRecord))
+            channame = tr("Any");
+        item->SetText(channame, "channel", state);
+        QString channum = progInfo->chanstr;
+        if ((progInfo->recType == kAllRecord) ||
+            (progInfo->recType == kFindOneRecord) ||
+            (progInfo->recType == kFindDailyRecord) ||
+            (progInfo->recType == kFindWeeklyRecord))
+            channum = tr("Any");
+        item->SetText(channum, "channum", state);
+        QString callsign = progInfo->chansign;
+        if ((progInfo->recType == kAllRecord) ||
+            (progInfo->recType == kFindOneRecord) ||
+            (progInfo->recType == kFindDailyRecord) ||
+            (progInfo->recType == kFindWeeklyRecord))
+            callsign = tr("Any");
+        item->SetText(callsign, "callsign", state);
+
+        QString profile = progInfo->profile;
+        if ((profile == "Default") || (profile == "Live TV") ||
+            (profile == "High Quality") || (profile == "Low Quality"))
+            profile = tr(profile.toLatin1().constData());
+        item->SetText(profile, "recordingprofile", state);
         item->DisplayState(state, "status");
 
         if (m_currentItem == progInfo)
@@ -1374,6 +1447,12 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     pgRecInfo->ToMap(infoMap);
     SetTextFromMap(infoMap);
 
+    if (m_descriptionText)
+        m_descriptionText->SetText(pgRecInfo->description);
+
+    if (m_categoryText)
+        m_categoryText->SetText(pgRecInfo->category);
+
     if (m_schedInfoText)
         m_schedInfoText->SetText(subtitle);
 
@@ -1396,6 +1475,84 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
 
     if (m_finalPriorityText)
         m_finalPriorityText->SetText(QString::number(finalRecPriority));
+
+    if (m_recGroupText)
+    {
+        QString recgroup = pgRecInfo->recgroup;
+        if (recgroup == "Default")
+            recgroup = tr("Default");
+        m_recGroupText->SetText(recgroup);
+    }
+
+    if (m_storageGroupText)
+    {
+        QString storagegroup = pgRecInfo->storagegroup;
+        if (storagegroup == "Default")
+                storagegroup = tr("Default");
+        else if (StorageGroup::kSpecialGroups.contains(storagegroup))
+            storagegroup = tr(storagegroup.toLatin1().constData());
+        m_storageGroupText->SetText(storagegroup);
+    }
+
+    if (m_lastRecordedText)
+    {
+        QString tempDateTime = (pgRecInfo->last_record).toString(m_formatLongDate + ' ' + m_formatTime);
+        m_lastRecordedText->SetText(tempDateTime);
+    }
+
+    if (m_lastRecordedDateText)
+    {
+        QString tempDate = (pgRecInfo->last_record).toString(m_formatShortDate);
+        m_lastRecordedDateText->SetText(tempDate);
+    }
+
+    if (m_lastRecordedTimeText)
+    {
+        QString tempTime = (pgRecInfo->last_record).toString(m_formatTime);
+        m_lastRecordedTimeText->SetText(tempTime);
+    }
+
+    if (m_channameText)
+    {
+        QString channame = pgRecInfo->channame;
+        if ((pgRecInfo->rectype == kAllRecord) ||
+            (pgRecInfo->rectype == kFindOneRecord) ||
+            (pgRecInfo->rectype == kFindDailyRecord) ||
+            (pgRecInfo->rectype == kFindWeeklyRecord))
+            channame = tr("Any");
+        m_channameText->SetText(channame);
+    }
+
+    if (m_channumText)
+    {
+        QString channum = pgRecInfo->chanstr;
+        if ((pgRecInfo->rectype == kAllRecord) ||
+            (pgRecInfo->rectype == kFindOneRecord) ||
+            (pgRecInfo->rectype == kFindDailyRecord) ||
+            (pgRecInfo->rectype == kFindWeeklyRecord))
+            channum = tr("Any");
+        m_channumText->SetText(channum);
+    }
+
+    if (m_callsignText)
+    {
+        QString callsign = pgRecInfo->chansign;
+        if ((pgRecInfo->rectype == kAllRecord) ||
+            (pgRecInfo->rectype == kFindOneRecord) ||
+            (pgRecInfo->rectype == kFindDailyRecord) ||
+            (pgRecInfo->rectype == kFindWeeklyRecord))
+            callsign = tr("Any");
+        m_callsignText->SetText(callsign);
+    }
+
+    if (m_recProfileText)
+    {
+        QString profile = pgRecInfo->profile;
+        if ((profile == "Default") || (profile == "Live TV") ||
+            (profile == "High Quality") || (profile == "Low Quality"))
+            profile = tr(profile.toLatin1().constData());
+        m_recProfileText->SetText(profile);
+    }
 
 }
 

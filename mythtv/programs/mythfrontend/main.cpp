@@ -286,7 +286,21 @@ void startProgramRecPriorities(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ProgramRecPriority *progRecPrior = new ProgramRecPriority(mainStack);
+    ProgramRecPriority *progRecPrior = new ProgramRecPriority(mainStack,
+                                                        "ProgramRecPriority");
+
+    if (progRecPrior->Create())
+        mainStack->AddScreen(progRecPrior);
+    else
+        delete progRecPrior;
+}
+
+void startManageRecordingRules(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ProgramRecPriority *progRecPrior = new ProgramRecPriority(mainStack,
+                                                            "ManageRecRules");
 
     if (progRecPrior->Create())
         mainStack->AddScreen(progRecPrior);
@@ -439,6 +453,8 @@ void TVMenuCallback(void *data, QString &selection)
         startManaged();
     else if (sel == "tv_set_recpriorities")
         startProgramRecPriorities();
+    else if (sel == "tv_manage_recording_rules")
+        startManageRecordingRules();
     else if (sel == "tv_progfind")
         startFinder();
     else if (sel == "tv_search_title")
@@ -886,6 +902,7 @@ void InitJumpPoints(void)
     REG_JUMPLOC("Manage Recordings / Fix Conflicts", "", "",
                 startManaged, "VIEWSCHEDULED");
     REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
+    REG_JUMP("Manage Recording Rules", "", "", startManageRecordingRules);
     REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
     REG_JUMP("TV Recording Playback", "", "", startPlayback);
     REG_JUMP("TV Recording Deletion", "", "", startDelete);
