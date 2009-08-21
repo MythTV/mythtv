@@ -239,8 +239,7 @@ void HouseKeeper::RunHouseKeeping(void)
                             runMythFill = true;
                     }
                     else if (wantToRun("MythFillDB", period, minhr, maxhr,
-                                       initialRun &&
-                                           sched->WasStartedAutomatically()))
+                                       initialRun))
                     {
                         runMythFill = true;
                     }
