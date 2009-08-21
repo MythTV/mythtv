@@ -54,6 +54,7 @@ class MPUBLIC ChannelScanner
               uint           sourceid,
               bool           do_ignore_signal_timeout,
               bool           do_follow_nit,
+              bool           do_test_decryption,
               // stuff needed for particular scans
               uint           mplexid,
               const QMap<QString,QString> &startChan,
@@ -75,7 +76,8 @@ class MPUBLIC ChannelScanner
     virtual void PreScanCommon(
         int scantype, uint cardid,
         const QString &inputname,
-        uint sourceid, bool do_ignore_signal_timeout);
+        uint sourceid, bool do_ignore_signal_timeout,
+        bool do_test_decryption);
 
     virtual void MonitorProgress(
         bool /*lock*/, bool /*strength*/, bool /*snr*/, bool /*rotor*/) { }

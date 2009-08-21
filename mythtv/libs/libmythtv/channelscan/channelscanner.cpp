@@ -101,6 +101,7 @@ void ChannelScanner::Scan(
     uint           sourceid,
     bool           do_ignore_signal_timeout,
     bool           do_follow_nit,
+    bool           do_test_decryption,
     // stuff needed for particular scans
     uint           mplexid /* TransportScan */,
     const QMap<QString,QString> &startChan /* NITAddScan */,
@@ -111,7 +112,7 @@ void ChannelScanner::Scan(
     const QString &tbl_end   /* FullScan optional */)
 {
     PreScanCommon(scantype, cardid, inputname,
-                  sourceid, do_ignore_signal_timeout);
+                  sourceid, do_ignore_signal_timeout, do_test_decryption);
 
     VERBOSE(VB_CHANSCAN, LOC + "Scan()");
 
@@ -300,7 +301,8 @@ void ChannelScanner::PreScanCommon(
     uint cardid,
     const QString &inputname,
     uint sourceid,
-    bool do_ignore_signal_timeout)
+    bool do_ignore_signal_timeout,
+    bool do_test_decryption)
 {
     uint signal_timeout  = 1000;
     uint channel_timeout = 40000;
@@ -379,7 +381,8 @@ void ChannelScanner::PreScanCommon(
 
     sigmonScanner = new ChannelScanSM(
         lis, card_type, channel, sourceid,
-        signal_timeout, channel_timeout, inputname);
+        signal_timeout, channel_timeout, inputname,
+        do_test_decryption);
 
     // Signal Meters are connected here
     SignalMonitor *mon = sigmonScanner->GetSignalMonitor();

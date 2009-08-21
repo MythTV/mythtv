@@ -75,6 +75,21 @@ class FollowNITSetting : public CheckBoxSetting, public TransientStorage
     }
 };
 
+class TrustEncSISetting : public CheckBoxSetting, public TransientStorage
+{
+  public:
+    TrustEncSISetting() : CheckBoxSetting(this)
+    {
+        setLabel(QObject::tr("Test decryptability"));
+        setHelpText(
+            QObject::tr("Test channels if they can be decrypted with CAM and "
+                        "smartcard. Sometimes encrypted flag is also set "
+                        "spuriously. If this option is set the data of each "
+                        "channel is checked. Attention: increases scan time "
+                        "for each encrypted by a couple of seconds."));
+    }
+};
+
 class ScanFrequency: public LineEditSetting, public TransientStorage
 {
   public:

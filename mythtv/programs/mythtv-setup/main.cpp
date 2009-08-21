@@ -455,6 +455,7 @@ int main(int argc, char *argv[])
                 /* sourceid  */ sourceid,
                 false,
                 false,
+                false,
                 // stuff needed for particular scans
                 /* mplexid   */ 0,
                 startChan, freq_std, mod, tbl);

@@ -66,7 +66,8 @@ ScanWizardConfig::ScanWizardConfig(
                     default_sourceid, card_types(), false)),
     input(new InputSelector(default_cardid, default_inputname)),
     scanType(new ScanTypeSetting()),
-    scanConfig(new ScanOptionalConfig(scanType))
+    scanConfig(new ScanOptionalConfig(scanType)),
+    trustEncSI(new TrustEncSISetting())
 {
     setLabel(tr("Scan Configuration"));
 
@@ -74,6 +75,7 @@ ScanWizardConfig::ScanWizardConfig(
     addChild(input);
     addChild(scanType);
     addChild(scanConfig);
+    addChild(trustEncSI);
 
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
             scanConfig,  SLOT(  SetSourceID( const QString&)));
@@ -91,6 +93,11 @@ ScanWizardConfig::ScanWizardConfig(
 uint ScanWizardConfig::GetSourceID(void) const
 {
     return videoSource->getValue().toUInt();
+}
+
+bool ScanWizardConfig::DoTestDecryption(void) const
+{
+    return trustEncSI->getValue().toInt();
 }
 
 ////////////////////////////////////////////////////////////////////////////

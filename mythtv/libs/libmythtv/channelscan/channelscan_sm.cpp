@@ -129,7 +129,7 @@ ChannelScanSM::ChannelScanSM(
     ScanMonitor *_scan_monitor,
     const QString &_cardtype, ChannelBase *_channel,
     int _sourceID, uint signal_timeout, uint channel_timeout,
-    const QString &_inputname)
+    const QString &_inputname, bool test_decryption)
     : // Set in constructor
       scan_monitor(_scan_monitor),
       channel(_channel),
@@ -138,7 +138,7 @@ ChannelScanSM::ChannelScanSM(
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
       inputname(_inputname),
-      trust_encryption_si(false),
+      trust_encryption_si(test_decryption),
       extend_scan_list(false),
       // State
       scanning(false),

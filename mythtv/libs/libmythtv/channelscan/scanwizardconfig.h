@@ -40,6 +40,7 @@ class ScanTypeSetting;
 class ScanCountry;
 class ScanNetwork;
 class IgnoreSignalTimeout;
+class TrustEncSISetting;
 
 class PaneAll;
 class PaneATSC;
@@ -161,6 +162,7 @@ class ScanWizardConfig: public VerticalConfigurationGroup
         { return scanConfig->DoIgnoreSignalTimeout(); }
     bool    DoFollowNIT(void) const
         { return scanConfig->DoFollowNIT(); }
+    bool    DoTestDecryption(void) const;
     uint    GetScanID(void)       const
         { return scanConfig->GetScanID(); }
 
@@ -169,6 +171,7 @@ class ScanWizardConfig: public VerticalConfigurationGroup
     InputSelector       *input;
     ScanTypeSetting     *scanType;
     ScanOptionalConfig  *scanConfig;
+    TrustEncSISetting   *trustEncSI;
 };
 
 #endif // _SCAN_WIZARD_CONFIG_H_

@@ -91,7 +91,7 @@ class ChannelScanSM : public MPEGStreamListener,
         ScanMonitor *_scan_monitor,
         const QString &_cardtype, ChannelBase* _channel, int _sourceID,
         uint signal_timeout, uint channel_timeout,
-        const QString &_inputname);
+        const QString &_inputname, bool test_decryption);
     ~ChannelScanSM();
 
     void StartScanner(void);
