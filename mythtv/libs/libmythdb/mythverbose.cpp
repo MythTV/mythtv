@@ -14,6 +14,10 @@ QMutex verbose_mutex;
 unsigned int print_verbose_messages = verboseDefaultInt;
 QString verboseString = QString(verboseDefaultStr);
 
+unsigned int userDefaultValueInt = verboseDefaultInt;
+QString      userDefaultValueStr = QString(verboseDefaultStr);
+bool         haveUserDefaultValues = false;
+
 int parse_verbose_arg(QString arg)
 {
     QString option;
@@ -80,8 +84,16 @@ int parse_verbose_arg(QString arg)
             }
             else if (option == "default")
             {
-                print_verbose_messages = verboseDefaultInt;
-                verboseString = QString(verboseDefaultStr);
+                if (haveUserDefaultValues)
+                {
+                    print_verbose_messages = userDefaultValueInt;
+                    verboseString = userDefaultValueStr;
+                }
+                else
+                {
+                    print_verbose_messages = verboseDefaultInt;
+                    verboseString = QString(verboseDefaultStr);
+                }
             }
 
 #define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
@@ -117,6 +129,13 @@ int parse_verbose_arg(QString arg)
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
+    }
+
+    if (!haveUserDefaultValues)
+    {
+        haveUserDefaultValues = true;
+        userDefaultValueInt = print_verbose_messages;
+        userDefaultValueStr = verboseString;
     }
 
     verbose_mutex.unlock();
