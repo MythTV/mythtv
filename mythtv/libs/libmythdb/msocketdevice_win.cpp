@@ -798,7 +798,10 @@ qint64 MSocketDevice::readData( char *data, qint64 maxlen )
 
 qint64 MSocketDevice::writeData( const char *data, qint64 len )
 {
-    if ( data == 0 && len != 0 ) {
+    if ( len == 0 )
+        return 0;
+
+    if ( data == 0 ) {
 #if defined(QT_CHECK_NULL) || defined(QSOCKETDEVICE_DEBUG)
 	qWarning( "MSocketDevice::writeBlock: Null pointer error" );
 #endif
@@ -884,6 +887,9 @@ qint64 MSocketDevice::writeData( const char *data, qint64 len )
 qint64 MSocketDevice::writeBlock( const char * data, quint64 len,
    			       const QHostAddress & host, quint16 port )
 {
+    if ( len == 0 )
+        return 0;
+
     if ( t != Datagram ) {
 #if defined(QT_CHECK_STATE) || defined(QSOCKETDEVICE_DEBUG)
 	qWarning( "MSocketDevice::sendBlock: Not datagram" );
@@ -891,7 +897,7 @@ qint64 MSocketDevice::writeBlock( const char * data, quint64 len,
 	return -1; // for now - later we can do t/tcp
     }
 
-    if ( data == 0 && len != 0 ) {
+    if ( data == 0 ) {
 #if defined(QT_CHECK_NULL) || defined(QSOCKETDEVICE_DEBUG)
 	qWarning( "MSocketDevice::sendBlock: Null pointer error" );
 #endif
