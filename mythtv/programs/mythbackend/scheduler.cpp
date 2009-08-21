@@ -4222,7 +4222,13 @@ bool Scheduler::WasStartedAutomatically()
                     "Close to auto-start time, AUTO-Startup assumed");
             autoStart = true;
         }
+        else
+            VERBOSE(VB_SCHEDULE+VB_EXTRA, "NOT close to auto-start time, "
+                    "USER-initiated startup assumed");
     }
+    else
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Invalid "
+                "MythShutdownWakeupTime specified in database (%1)").arg(s));
 
     return autoStart;
 }

@@ -996,16 +996,6 @@ int main(int argc, char **argv)
                            "MythBackend started as a slave backend", "");
     }
 
-    // Get any initial housekeeping done before we fire up anything else
-    if (nohousekeeper)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_WARN +
-                "****** The Housekeeper has been DISABLED with "
-                "the --nohousekeeper option ******");
-    }
-    else
-        housekeeping = new HouseKeeper(true, ismaster);
-
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
@@ -1025,6 +1015,16 @@ int main(int argc, char **argv)
         if (nosched)
             sched->DisableScheduling();
     }
+
+    // Get any initial housekeeping done before we fire up anything else
+    if (nohousekeeper)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "****** The Housekeeper has been DISABLED with "
+                "the --nohousekeeper option ******");
+    }
+    else
+        housekeeping = new HouseKeeper(true, ismaster, sched);
 
     if (ismaster)
     {

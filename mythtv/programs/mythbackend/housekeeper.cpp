@@ -27,13 +27,10 @@ using namespace std;
 
 static bool HouseKeeper_filldb_running = false;
 
-HouseKeeper::HouseKeeper(bool runthread, bool master)
+HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
+                        : threadrunning(runthread), isMaster(master),
+                          filldbRunning(false),     sched(lsched)
 {
-    isMaster = master;
-
-    threadrunning = runthread;
-    filldbRunning = false;
-
     CleanupMyOldRecordings();
 
     if (runthread)
@@ -48,7 +45,7 @@ HouseKeeper::~HouseKeeper()
 }
 
 bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
-                            int maxhour)
+                            int maxhour, bool nowIfPossible)
 {
     bool runOK = false;
     unsigned int oneday = 60 * 60 * 24;
@@ -90,13 +87,15 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
                 {
                     int minute = now.time().minute();
                     // Allow the job run if
-                    // a) we have reached the last half hour of the window, or
-                    // b) we win a random draw with a probability of 1/N.
+                    // a) we want to run now rather than at a random time
+                    // b) we have reached the last half hour of the window, or
+                    // c) we win a random draw with a probability of 1/N.
                     //
                     // N gets smaller the nearer we are to the end of the
                     // window. The "(24 + ...) % 24" makes sure the calculation
                     // is correct even for the case hour > minhour > maxhour.
-                    if ((hour == maxhour && minute > 30) ||
+                    if ((nowIfPossible) ||
+                        (hour == maxhour && minute > 30) ||
                         ((random()%((((24+maxhour-hour)%24)*12+(60-minute)/5 - 6) + 1)) == 0))
                         runOK = true;
                 }
@@ -158,6 +157,8 @@ void HouseKeeper::RunHouseKeeping(void)
 {
     int period, maxhr, minhr;
     QString dbTag;
+    bool initialRun = true;
+
     // wait a little for main server to come up and things to settle down
     sleep(10);
 
@@ -237,7 +238,9 @@ void HouseKeeper::RunHouseKeeping(void)
                             (lastRun.secsTo(now) > (3 * 60 * 60)))
                             runMythFill = true;
                     }
-                    else if (wantToRun("MythFillDB", period, minhr, maxhr))
+                    else if (wantToRun("MythFillDB", period, minhr, maxhr,
+                                       initialRun &&
+                                           sched->WasStartedAutomatically()))
                     {
                         runMythFill = true;
                     }
@@ -274,6 +277,8 @@ void HouseKeeper::RunHouseKeeping(void)
         {
             gContext->GetDBManager()->PurgeIdleConnections();
         }
+
+        initialRun = false;
 
         sleep(300 + (random()%8));
     }

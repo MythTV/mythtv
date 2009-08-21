@@ -3,10 +3,12 @@
 
 #include <QDateTime>
 
+#include "scheduler.h"
+
 class HouseKeeper
 {
   public:
-    HouseKeeper(bool runthread, bool master);
+    HouseKeeper(bool runthread, bool master, Scheduler *lsched = NULL);
    ~HouseKeeper();
 
     
@@ -19,7 +21,8 @@ class HouseKeeper
 
   private:
 
-    bool wantToRun(const QString &dbTag, int period, int minhour, int maxhour);
+    bool wantToRun(const QString &dbTag, int period, int minhour, int maxhour,
+                   bool nowIfPossible = false);
     void updateLastrun(const QString &dbTag);
     QDateTime getLastRun(const QString &dbTag);
     void flushLogs();
@@ -30,9 +33,12 @@ class HouseKeeper
     void CleanupRecordedTables(void);
     void CleanupProgramListings(void);
     void RunStartupTasks(void);
+
     bool threadrunning;
     bool filldbRunning;
     bool isMaster;
+
+    Scheduler *sched;
 };
 
 #endif
