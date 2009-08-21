@@ -243,11 +243,9 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 bool HDHRChannel::Tune(uint frequency, QString /*input*/,
                        QString modulation, QString si_std)
 {
-    // Convert dtv_multiplex.modulation strings to something the HDHR can use:
-    modulation.replace("qam_", "qam");  // e.g. qam_256 -> qam256
-
-    if (modulation.isEmpty())
-        modulation = "auto";
+    // dtv_multiplex.modulation is from the DB, and can be almost anything.
+    // For now, just use the HDHR device's automatic scanning:
+    modulation = "auto";
 
     QString chan = modulation + ':' + QString::number(frequency);
 
