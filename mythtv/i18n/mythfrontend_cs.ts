@@ -1358,12 +1358,12 @@
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="71"/>
-        <source>Do you want to fix these problems?</source>
+        <source>Do you want to go back and fix these problems?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="73"/>
-        <source>Do you want to fix this problem?</source>
+        <source>Do you want to go back and fix this problem?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -1087,11 +1087,11 @@ Vestara jarðarhvel</translation>
         <translation type="unfinished">Í lagi</translation>
     </message>
     <message>
-        <source>Do you want to fix these problems?</source>
+        <source>Do you want to go back and fix these problems?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do you want to fix this problem?</source>
+        <source>Do you want to go back and fix this problem?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

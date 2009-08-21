@@ -67,10 +67,10 @@ void ExitPrompter::handleExit()
     if (CheckSetup(problems))
     {
         problems.push_back(QString());
-        if (problems.size() > 1)
-            problems.push_back(tr("Do you want to fix these problems?"));
+        if (problems.size() > 2)
+            problems.push_back(tr("Do you want to go back and fix these problems?"));
         else
-            problems.push_back(tr("Do you want to fix this problem?"));
+            problems.push_back(tr("Do you want to go back and fix this problem?"));
 
         MythDialogBox *dia = new MythDialogBox(problems.join("\n"),
                 m_d->stk, "exit prompt");

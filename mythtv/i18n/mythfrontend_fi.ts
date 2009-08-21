@@ -1083,11 +1083,11 @@
         <translation>Ok</translation>
     </message>
     <message>
-        <source>Do you want to fix these problems?</source>
+        <source>Do you want to go back and fix these problems?</source>
         <translation>Haluatko korjata nämä ongelmat?</translation>
     </message>
     <message>
-        <source>Do you want to fix this problem?</source>
+        <source>Do you want to go back and fix this problem?</source>
         <translation>Haluatko korjata tämän ongelman?</translation>
     </message>
     <message>
