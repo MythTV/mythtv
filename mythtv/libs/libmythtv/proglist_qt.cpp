@@ -1742,7 +1742,7 @@ void ProgListerQt::fillItemList(void)
     ProgramInfo *s;
     vector<ProgramInfo *> sortedList;
 
-    while (itemList.count())
+    while (!itemList.empty())
     {
         s = itemList.take(0);
         if (type == plTitle)

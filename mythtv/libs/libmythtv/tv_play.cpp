@@ -11433,9 +11433,10 @@ void TV::DoDisplayJumpMenu(void)
                 OSDGenericTree *j_item =
                     new OSDGenericTree(treeMenu, Iprog.key());
 
-                for (int i = 0; i < progIndex; ++i)
+                ProgramList::const_iterator it = plist.begin();
+                for (; it != plist.end(); ++it)
                 {
-                    const ProgramInfo *p = plist[i];
+                    const ProgramInfo *p = *it;
 
                     if (titles_seen.contains(p->title))
                         continue;
@@ -11443,9 +11444,12 @@ void TV::DoDisplayJumpMenu(void)
 
                     OSDGenericTree *jsub_item =
                         new OSDGenericTree(j_item, p->title);
-                    for (int j = 0; j < progIndex; ++j)
+                    ProgramList::const_iterator it2 = plist.begin();
+                    int j = -1;
+                    for (; it2 != plist.end(); ++it2)
                     {
-                        const ProgramInfo *q = plist[j];
+                        const ProgramInfo *q = *it2;
+                        j++;
 
                         if (q->title != p->title)
                             continue;

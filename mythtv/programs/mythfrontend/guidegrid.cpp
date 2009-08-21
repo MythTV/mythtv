@@ -671,7 +671,7 @@ DBChanList GuideGrid::GetSelection(void) const
 
     ProgramList proglist = GetProgramList(selected[0].chanid);
 
-    if (proglist.count() == 0)
+    if (proglist.empty())
         return selected;
 
     for (uint i = 0; i < m_channelInfos[idx].size(); i++)
@@ -1356,7 +1356,7 @@ void GuideGrid::updateChannels(void)
             }
 
             // Try alternates with different channum if applicable
-            if (unavailable && GetProgramList(chinfo->chanid).count())
+            if (unavailable && !GetProgramList(chinfo->chanid).empty())
             {
                 alt = GetAlternateChannelIndex(chanNumber, false);
                 unavailable = (alt == m_channelInfoIdx[chanNumber]);

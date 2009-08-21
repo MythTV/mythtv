@@ -319,13 +319,14 @@ void ViewScheduled::LoadList(void)
         int i;
         for (i = listPos; i >= 0; i--)
         {
-            if (callsign == plist[i]->chansign &&
-                startts == plist[i]->startts)
+            ProgramInfo *pginfo = plist[i];
+            if (callsign == pginfo->chansign &&
+                startts == pginfo->startts)
             {
                 listPos = i;
                 break;
             }
-            else if (recstartts <= plist[i]->recstartts)
+            else if (recstartts <= pginfo->recstartts)
                 listPos = i;
         }
         m_schedulesList->SetItemCurrent(listPos);
@@ -426,9 +427,10 @@ void ViewScheduled::FillList()
         if (m_conflictBool)
         {
             // Find first conflict and store in m_conflictDate field
-            for (uint i = 0; i < plist.count(); i++)
+            ProgramList::iterator it = plist.begin();
+            for (; it != plist.end(); ++it)
             {
-                ProgramInfo *p = plist[i];
+                ProgramInfo *p = *it;
                 if (p->recstatus == rsConflict)
                 {
                     m_conflictDate = p->recstartts.date();

@@ -515,7 +515,7 @@ void PreviousList::fillItemList(void)
     itemList.FromOldRecorded(sql, bindings); 
 
     vector<ProgramInfo *> sortedList;
-    while (itemList.count())
+    while (!itemList.empty())
     {
         s = itemList.take(0);
         s->sortTitle = s->title;
