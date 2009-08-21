@@ -171,6 +171,8 @@ class ScanFecSetting: public ComboBoxSetting
         addSelection("6/7");
         addSelection("7/8");
         addSelection("8/9");
+        addSelection("3/5");
+        addSelection("9/10");
     }
 };
 
