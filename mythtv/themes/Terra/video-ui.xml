@@ -540,7 +540,7 @@
             <statetype name="buttonitem">
                 <state name="selected">
                     <area>-13,0,209,332</area>
-                    <imagetype name="buttonimage">
+                    <imagetype name="coverimage">
                         <area>1,3,209,325</area>
                         <filename>mv_browse_nocover.png</filename>
                         <mask>video/postermask.png</mask>
@@ -573,7 +573,7 @@
                 </state>
                 <state name="active" from="selected">
                     <area>0,0,183,332</area>
-                    <imagetype name="buttonimage">
+                    <imagetype name="coverimage">
                         <area>0,25,183,275</area>
                     </imagetype>
 
@@ -591,7 +591,6 @@
                     <statetype name="nodetype">
                         <position>108,230</position>
                     </statetype>
-
 
                     <textarea name="childcount">
                         <position>135,265</position>
