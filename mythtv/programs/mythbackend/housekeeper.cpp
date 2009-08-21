@@ -89,8 +89,15 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
                     ((hour >= minhour) && (hour <= maxhour)))
                 {
                     int minute = now.time().minute();
+                    // Allow the job run if
+                    // a) we have reached the last half hour of the window, or
+                    // b) we win a random draw with a probability of 1/N.
+                    //
+                    // N gets smaller the nearer we are to the end of the
+                    // window. The "(24 + ...) % 24" makes sure the calculation
+                    // is correct even for the case hour > minhour > maxhour.
                     if ((hour == maxhour && minute > 30) ||
-                        ((random()%(((maxhour-hour)*12+(60-minute)/5 - 6) + 1)) == 0))
+                        ((random()%((((24+maxhour-hour)%24)*12+(60-minute)/5 - 6) + 1)) == 0))
                         runOK = true;
                 }
             }
