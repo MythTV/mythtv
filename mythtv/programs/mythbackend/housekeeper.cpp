@@ -28,8 +28,8 @@ using namespace std;
 static bool HouseKeeper_filldb_running = false;
 
 HouseKeeper::HouseKeeper(bool runthread, bool master, Scheduler *lsched)
-                        : threadrunning(runthread), isMaster(master),
-                          filldbRunning(false),     sched(lsched)
+                        : threadrunning(runthread), filldbRunning(false),
+                          isMaster(master),         sched(lsched)
 {
     CleanupMyOldRecordings();
 
