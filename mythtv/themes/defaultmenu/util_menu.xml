@@ -107,10 +107,4 @@
         <password>SetupPinCode</password>
     </button>
 
-    <button>
-        <type>MENU_UTILITIES_SETUP</type>
-        <text>Save or Restore settings</text>
-        <description>Save or restore settings settings for MythTV</description>
-        <action>settings_profile</action>
-    </button>
 </mythmenu>
