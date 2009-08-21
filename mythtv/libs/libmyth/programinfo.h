@@ -15,7 +15,7 @@ using namespace std;
 #include "recordingtypes.h"
 #include "mythdbcon.h"
 
-extern const char *kPreviewGeneratorInUseID;
+MPUBLIC extern const char *kPreviewGeneratorInUseID;
 
 typedef QHash<QString,QString> InfoMap;
 
