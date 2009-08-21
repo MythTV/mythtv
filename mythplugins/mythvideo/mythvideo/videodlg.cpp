@@ -94,9 +94,10 @@ namespace
                          Metadata *item);
       public:
         static CoverDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                          Metadata *item)
+                                          Metadata *item,
+                                          const QString &db_value)
         {
-            return new CoverDownloadProxy(url, dest, item);
+            return new CoverDownloadProxy(url, dest, item, db_value);
         }
 
       public:
@@ -119,7 +120,8 @@ namespace
 
       private:
         CoverDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item) : m_item(item), m_dest_file(dest),
+                           Metadata *item, const QString &db_value)
+          : m_item(item), m_dest_file(dest), m_db_value(db_value),
             m_id(0), m_url(url), m_error_state(esOK)
         {
             connect(&m_http, SIGNAL(requestFinished(int, bool)),
@@ -154,27 +156,57 @@ namespace
 
                 if (!error)
                 {
-                    QFile dest_file(m_dest_file);
-                    if (dest_file.exists())
-                        dest_file.remove();
-
-                    if (dest_file.open(QIODevice::WriteOnly))
+                    if (m_dest_file.startsWith("myth://"))
                     {
-                        const QByteArray &data = m_data_buffer.data();
-                        qint64 size = dest_file.write(data);
-                        if (size != data.size())
+                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                        if (!outFile->isOpen())
                         {
-                            errorMsg = tr("Error writing data to file %1.")
-                                    .arg(m_dest_file);
+                            VERBOSE(VB_IMPORTANT,
+                                QString("RingBuffer::RingBuffer(): Failed to open "
+                                        "remote file (%1) for write.  Does Coverart "
+                                        "Storage Group Exist?").arg(m_dest_file));
+                            delete outFile;
+                            outFile = NULL;
                             m_error_state = esError;
+                        }
+                        else
+                        {
+                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                            if (written != m_data_buffer.size())
+                            {
+                                errorMsg = tr("Error writing Coverart to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = esError;
+                            }
                         }
                     }
                     else
                     {
-                        errorMsg = tr("Error: file error '%1' for file %2").
-                                arg(dest_file.errorString()).arg(m_dest_file);
-                        m_error_state = esError;
+                        QFile dest_file(m_dest_file);
+                        if (dest_file.exists())
+                            dest_file.remove();
+
+                        if (dest_file.open(QIODevice::WriteOnly))
+                        {
+                            const QByteArray &data = m_data_buffer.data();
+                            qint64 size = dest_file.write(data);
+                            if (size != data.size())
+                            {
+                                errorMsg = tr("Error writing data to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = esError;
+                            }
+                        }
+                        else
+                        {
+                            errorMsg = tr("Error: file error '%1' for file %2").
+                                    arg(dest_file.errorString()).arg(m_dest_file);
+                            m_error_state = esError;
+                        }
                     }
+
+                    if (m_error_state != esError)
+                        m_item->SetCoverFile(m_db_value);
                 }
 
                 emit SigFinished(m_error_state, errorMsg, m_item);
@@ -186,6 +218,7 @@ namespace
         QHttp m_http;
         QBuffer m_data_buffer;
         QString m_dest_file;
+        QString m_db_value;
         int m_id;
         QTimer m_timer;
         QUrl m_url;
@@ -201,9 +234,10 @@ namespace
                          Metadata *item);
       public:
         static ScreenshotDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                          Metadata *item)
+                                               Metadata *item,
+                                               const QString &db_value)
         {
-            return new ScreenshotDownloadProxy(url, dest, item);
+            return new ScreenshotDownloadProxy(url, dest, item, db_value);
         }
 
       public:
@@ -226,7 +260,8 @@ namespace
     
       private:
         ScreenshotDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item) : m_item(item), m_dest_file(dest),
+                           Metadata *item, const QString &db_value)
+          : m_item(item), m_dest_file(dest), m_db_value(db_value),
             m_id(0), m_url(url), m_error_state(ssesOK)
         {
             connect(&m_http, SIGNAL(requestFinished(int, bool)),
@@ -261,27 +296,57 @@ namespace
 
                 if (!error)
                 {
-                    QFile dest_file(m_dest_file);
-                    if (dest_file.exists())
-                        dest_file.remove();
-
-                    if (dest_file.open(QIODevice::WriteOnly))
+                    if (m_dest_file.startsWith("myth://"))
                     {
-                        const QByteArray &data = m_data_buffer.data();
-                        qint64 size = dest_file.write(data);
-                        if (size != data.size())
+                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                        if (!outFile->isOpen())
                         {
-                            errorMsg = tr("Error writing data to file %1.")
-                                    .arg(m_dest_file);
+                            VERBOSE(VB_IMPORTANT,
+                                QString("RingBuffer::RingBuffer(): Failed to open "
+                                        "remote file (%1) for write.  Does Screenshot "
+                                        "Storage Group Exist?").arg(m_dest_file));
+                            delete outFile;
+                            outFile = NULL;
                             m_error_state = ssesError;
+                        }
+                        else
+                        {
+                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                            if (written != m_data_buffer.size())
+                            {
+                                errorMsg = tr("Error writing Screenshot to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = ssesError;
+                            }
                         }
                     }
                     else
                     {
-                        errorMsg = tr("Error: file error '%1' for file %2").
-                                arg(dest_file.errorString()).arg(m_dest_file);
-                        m_error_state = ssesError;
+                        QFile dest_file(m_dest_file);
+                        if (dest_file.exists())
+                            dest_file.remove();
+
+                        if (dest_file.open(QIODevice::WriteOnly))
+                        {
+                            const QByteArray &data = m_data_buffer.data();
+                            qint64 size = dest_file.write(data);
+                            if (size != data.size())
+                            {
+                                errorMsg = tr("Error writing data to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = ssesError;
+                            }
+                        }
+                        else
+                        {
+                            errorMsg = tr("Error: file error '%1' for file %2").
+                                    arg(dest_file.errorString()).arg(m_dest_file);
+                            m_error_state = ssesError;
+                        }
                     }
+
+                    if (m_error_state != ssesError)
+                        m_item->SetScreenshot(m_db_value);
                 }
 
                 emit SigFinished(m_error_state, errorMsg, m_item);
@@ -293,6 +358,7 @@ namespace
         QHttp m_http;
         QBuffer m_data_buffer;
         QString m_dest_file;
+        QString m_db_value;
         int m_id;
         QTimer m_timer;
         QUrl m_url;
@@ -308,9 +374,10 @@ namespace
                          Metadata *item);
       public:
         static FanartDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                          Metadata *item)
+                                          Metadata *item,
+                                          const QString db_value)
         {
-            return new FanartDownloadProxy(url, dest, item);
+            return new FanartDownloadProxy(url, dest, item, db_value);
         }
 
       public:
@@ -333,7 +400,8 @@ namespace
 
       private:
         FanartDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item) : m_item(item), m_dest_file(dest),
+                           Metadata *item, const QString &db_value)
+          : m_item(item), m_dest_file(dest), m_db_value(db_value),
             m_id(0), m_url(url), m_error_state(fesOK)
         {
             connect(&m_http, SIGNAL(requestFinished(int, bool)),
@@ -368,27 +436,57 @@ namespace
 
                 if (!error)
                 {
-                    QFile dest_file(m_dest_file);
-                    if (dest_file.exists())
-                        dest_file.remove();
-
-                    if (dest_file.open(QIODevice::WriteOnly))
+                    if (m_dest_file.startsWith("myth://"))
                     {
-                        const QByteArray &data = m_data_buffer.data();
-                        qint64 size = dest_file.write(data);
-                        if (size != data.size())
+                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                        if (!outFile->isOpen())
                         {
-                            errorMsg = tr("Error writing data to file %1.")
-                                    .arg(m_dest_file);
+                            VERBOSE(VB_IMPORTANT,
+                                QString("RingBuffer::RingBuffer(): Failed to open "
+                                        "remote file (%1) for write.  Does Fanart "
+                                        "Storage Group Exist?").arg(m_dest_file));
+                            delete outFile; 
+                            outFile = NULL;
                             m_error_state = fesError;
+                        }
+                        else
+                        {
+                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                            if (written != m_data_buffer.size())
+                            {
+                                errorMsg = tr("Error writing Fanart to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = fesError;
+                            }
                         }
                     }
                     else
                     {
-                        errorMsg = tr("Error: file error '%1' for file %2").
-                                arg(dest_file.errorString()).arg(m_dest_file);
-                        m_error_state = fesError;
+                        QFile dest_file(m_dest_file);
+                        if (dest_file.exists())
+                            dest_file.remove();
+
+                        if (dest_file.open(QIODevice::WriteOnly))
+                        {
+                            const QByteArray &data = m_data_buffer.data();
+                            qint64 size = dest_file.write(data);
+                            if (size != data.size())
+                            {
+                                errorMsg = tr("Error writing data to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = fesError;
+                            }
+                        }
+                        else
+                        {
+                            errorMsg = tr("Error: file error '%1' for file %2").
+                                    arg(dest_file.errorString()).arg(m_dest_file);
+                            m_error_state = fesError;
+                        }
                     }
+
+                    if (m_error_state != fesError)
+                        m_item->SetFanart(m_db_value);
                 }
 
                 emit SigFinished(m_error_state, errorMsg, m_item);
@@ -400,6 +498,7 @@ namespace
         QHttp m_http;
         QBuffer m_data_buffer;
         QString m_dest_file;
+        QString m_db_value;
         int m_id;
         QTimer m_timer;
         QUrl m_url;
@@ -415,9 +514,10 @@ namespace
                          Metadata *item);
       public:
         static BannerDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                          Metadata *item)
+                                           Metadata *item,
+                                           const QString &db_value)
         {
-            return new BannerDownloadProxy(url, dest, item);
+            return new BannerDownloadProxy(url, dest, item, db_value);
         }
 
       public:
@@ -440,7 +540,8 @@ namespace
 
       private:
         BannerDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item) : m_item(item), m_dest_file(dest),
+                           Metadata *item, const QString &db_value)
+          : m_item(item), m_dest_file(dest), m_db_value(db_value),
             m_id(0), m_url(url), m_error_state(besOK)
         {
             connect(&m_http, SIGNAL(requestFinished(int, bool)),
@@ -475,27 +576,57 @@ namespace
 
                 if (!error)
                 {
-                    QFile dest_file(m_dest_file);
-                    if (dest_file.exists())
-                        dest_file.remove();
-
-                    if (dest_file.open(QIODevice::WriteOnly))
+                    if (m_dest_file.startsWith("myth://"))
                     {
-                        const QByteArray &data = m_data_buffer.data();
-                        qint64 size = dest_file.write(data);
-                        if (size != data.size())
-                        {
-                            errorMsg = tr("Error writing data to file %1.")
-                                    .arg(m_dest_file);
+                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                        if (!outFile->isOpen()) 
+                        { 
+                            VERBOSE(VB_IMPORTANT, 
+                                QString("RingBuffer::RingBuffer(): Failed to open " 
+                                        "remote file (%1) for write.  Does Banner "
+                                        "Storage Group Exist?").arg(m_dest_file)); 
+                            delete outFile; 
+                            outFile = NULL;
                             m_error_state = besError;
+                        } 
+                        else
+                        {
+                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                            if (written != m_data_buffer.size())
+                            {
+                                errorMsg = tr("Error writing data to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = besError;
+                            }
                         }
                     }
                     else
                     {
-                        errorMsg = tr("Error: file error '%1' for file %2").
-                                arg(dest_file.errorString()).arg(m_dest_file);
-                        m_error_state = besError;
+                        QFile dest_file(m_dest_file);
+                        if (dest_file.exists())
+                            dest_file.remove();
+
+                        if (dest_file.open(QIODevice::WriteOnly))
+                        {
+                            const QByteArray &data = m_data_buffer.data();
+                            qint64 size = dest_file.write(data);
+                            if (size != data.size())
+                            {
+                                errorMsg = tr("Error writing data to file %1.")
+                                        .arg(m_dest_file);
+                                m_error_state = besError;
+                            }
+                        }
+                        else
+                        {
+                            errorMsg = tr("Error: file error '%1' for file %2").
+                                    arg(dest_file.errorString()).arg(m_dest_file);
+                            m_error_state = besError;
+                        }
                     }
+
+                    if (m_error_state != besError)
+                        m_item->SetBanner(m_db_value);
                 }
 
                 emit SigFinished(m_error_state, errorMsg, m_item);
@@ -507,6 +638,7 @@ namespace
         QHttp m_http;
         QBuffer m_data_buffer;
         QString m_dest_file;
+        QString m_db_value;
         int m_id;
         QTimer m_timer;
         QUrl m_url;
@@ -4326,6 +4458,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
 
             QString ext = QFileInfo(url.path()).suffix();
             QString dest_file;
+            QString db_value;
 
             if (metadata->GetSeason() > 0 || 
                 metadata->GetEpisode() > 0)
@@ -4333,27 +4466,53 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
                 // Name TV downloads so that they already work with the PBB
                 QString title = QString("%1 Season %2").arg(metadata->GetTitle())
                         .arg(metadata->GetSeason());
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(title).arg(ext);
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
+                    dest_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(title).arg(ext);
+                    db_value = dest_file;
+                }
             }
             else
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(metadata->GetInetRef()).arg(ext);
+            {
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2")
+                                           .arg(metadata->GetInetRef())
+                                           .arg(ext);
+                    dest_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(metadata->GetInetRef()).arg(ext);
+                    db_value = dest_file;
+                }
+            }
 
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            CoverDownloadProxy *d =
-                    CoverDownloadProxy::Create(url, dest_file, metadata);
-            metadata->SetCoverFile(dest_file);
+            CoverDownloadProxy *cd =
+                    CoverDownloadProxy::Create(url, dest_file, metadata,
+                                               db_value);
 
-            connect(d, SIGNAL(SigFinished(CoverDownloadErrorState,
+            connect(cd, SIGNAL(SigFinished(CoverDownloadErrorState,
                                           QString, Metadata *)),
                     SLOT(OnPosterCopyFinished(CoverDownloadErrorState,
                                               QString, Metadata *)));
 
-            d->StartCopy();
-            m_d->AddCoverDownload(d);
+            cd->StartCopy();
+            m_d->AddCoverDownload(cd);
         }
         else
         {
@@ -4433,34 +4592,61 @@ void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
 
             QString ext = QFileInfo(url.path()).suffix();
             QString dest_file;
+            QString db_value;
 
             if (metadata->GetSeason() > 0 || 
                 metadata->GetEpisode() > 0)
-            { 
-                // Name TV downloads so that they already work with the PBB    
+            {
+                // Name TV downloads so that they already work with the PBB
                 QString title = QString("%1 Season %2").arg(metadata->GetTitle())
                         .arg(metadata->GetSeason());
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(title).arg(ext);
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
+                    dest_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(title).arg(ext);
+                    db_value = dest_file;
+                }
             }
             else
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(metadata->GetInetRef()).arg(ext);
+            {
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2")
+                                           .arg(metadata->GetInetRef())
+                                           .arg(ext);
+                    dest_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(metadata->GetInetRef()).arg(ext);
+                    db_value = dest_file;
+                }
+            }
 
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            FanartDownloadProxy *d =
-                    FanartDownloadProxy::Create(url, dest_file, metadata);
-            metadata->SetFanart(dest_file);
+            FanartDownloadProxy *fd =
+                    FanartDownloadProxy::Create(url, dest_file, metadata,
+                                                db_value);
 
-            connect(d, SIGNAL(SigFinished(FanartDownloadErrorState,
+            connect(fd, SIGNAL(SigFinished(FanartDownloadErrorState,
                                           QString, Metadata *)),
                     SLOT(OnFanartCopyFinished(FanartDownloadErrorState,
                                               QString, Metadata *)));
 
-            d->StartCopy();
-            m_d->AddFanartDownload(d);
+            fd->StartCopy();
+            m_d->AddFanartDownload(fd);
         }
         else
         {
@@ -4539,34 +4725,61 @@ void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
 
             QString ext = QFileInfo(url.path()).suffix();
             QString dest_file;
+            QString db_value;
 
             if (metadata->GetSeason() > 0 ||
                 metadata->GetEpisode() > 0)
             {
                 // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2x%3").arg(metadata->GetTitle())
-                        .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(title).arg(ext);
+                QString title = QString("%1 Season %2").arg(metadata->GetTitle())
+                        .arg(metadata->GetSeason());
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
+                    dest_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(title).arg(ext);
+                    db_value = dest_file;
+                }
             }
             else
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(metadata->GetInetRef()).arg(ext);
+            {
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2")
+                                           .arg(metadata->GetInetRef())
+                                           .arg(ext);
+                    dest_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(metadata->GetInetRef()).arg(ext);
+                    db_value = dest_file;
+                }
+            }
 
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            ScreenshotDownloadProxy *d =
-                    ScreenshotDownloadProxy::Create(url, dest_file, metadata);
-            metadata->SetScreenshot(dest_file);
+            ScreenshotDownloadProxy *ssd =
+                    ScreenshotDownloadProxy::Create(url, dest_file, metadata,
+                                                   db_value);
 
-            connect(d, SIGNAL(SigFinished(ScreenshotDownloadErrorState,
+            connect(ssd, SIGNAL(SigFinished(ScreenshotDownloadErrorState,
                                           QString, Metadata *)),
                     SLOT(OnScreenshotCopyFinished(ScreenshotDownloadErrorState,
                                               QString, Metadata *)));
 
-            d->StartCopy();
-            m_d->AddScreenshotDownload(d);
+            ssd->StartCopy();
+            m_d->AddScreenshotDownload(ssd);
         }
         else
         {
@@ -4646,6 +4859,7 @@ void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
 
             QString ext = QFileInfo(url.path()).suffix();
             QString dest_file;
+            QString db_value;
 
             if (metadata->GetSeason() > 0 || 
                 metadata->GetEpisode() > 0)
@@ -4653,27 +4867,53 @@ void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
                 // Name TV downloads so that they already work with the PBB    
                 QString title = QString("%1 Season %2").arg(metadata->GetTitle())
                         .arg(metadata->GetSeason());
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(title).arg(ext);
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
+                    dest_file = GenRemoteFileURL("Banners", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(title).arg(ext);
+                    db_value = dest_file;
+                }
             }
             else
-                dest_file = QString("%1/%2.%3").arg(fileprefix)
-                        .arg(metadata->GetInetRef()).arg(ext);
+            {
+                if (!metadata->GetHost().isEmpty())
+                {
+                    QString combFileName = QString("%1.%2")
+                                           .arg(metadata->GetInetRef())
+                                           .arg(ext);
+                    dest_file = GenRemoteFileURL("Banners", metadata->GetHost(),
+                        combFileName);
+                    db_value = combFileName;
+                }
+                else
+                {
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                            .arg(metadata->GetInetRef()).arg(ext);
+                    db_value = dest_file;
+                }
+            }
 
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            BannerDownloadProxy *d =
-                    BannerDownloadProxy::Create(url, dest_file, metadata);
-            metadata->SetBanner(dest_file);
+            BannerDownloadProxy *bd =
+                    BannerDownloadProxy::Create(url, dest_file, metadata,
+                                                db_value);
 
-            connect(d, SIGNAL(SigFinished(BannerDownloadErrorState,
+            connect(bd, SIGNAL(SigFinished(BannerDownloadErrorState,
                                           QString, Metadata *)),
                     SLOT(OnBannerCopyFinished(BannerDownloadErrorState,
                                               QString, Metadata *)));
 
-            d->StartCopy();
-            m_d->AddBannerDownload(d);
+            bd->StartCopy();
+            m_d->AddBannerDownload(bd);
         }
         else
         {
