@@ -10,7 +10,7 @@
 #include <QEvent>
 #include <Q3PtrList>
 
-#include "remoteutil.h"
+#include "tvremoteutil.h"
 
 class LCDServer;
 class LCDTextItem;

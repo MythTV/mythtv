@@ -22,6 +22,7 @@
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "remoteutil.h"
+#include "recordinginfo.h"
 
 ViewScheduleDiff::ViewScheduleDiff(MythMainWindow *parent, const char *name, QString altTbl, int recordidDiff, QString ltitle)
              : MythDialog(parent, name)
@@ -256,12 +257,14 @@ void ViewScheduleDiff::cursorUp(bool page)
 
 void ViewScheduleDiff::edit()
 {
-    ProgramInfo *pi = CurrentProgram();;
+    ProgramInfo *pi = CurrentProgram();
 
     if (!pi)
         return;
 
-    pi->EditScheduled();
+    RecordingInfo ri(*pi);
+    ri.EditScheduled();
+    *pi = ri;
 }
 
 void ViewScheduleDiff::upcoming()
@@ -281,7 +284,10 @@ void ViewScheduleDiff::details()
     ProgramInfo *pi = CurrentProgram();
 
     if (pi)
-        pi->showDetails();
+    {
+        const RecordingInfo ri(*pi);
+        ri.showDetails();
+    }
 }
 
 void ViewScheduleDiff::statusDialog()

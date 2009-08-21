@@ -2,12 +2,14 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libmythtv
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavformat
+INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libswscale
+DEPENDPATH *= $${INCLUDEPATH}
 
-LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
-using_live: LIBS += -lmythlivemedia-$$LIBVERSION
-using_mheg: LIBS += -lmythfreemheg-$$LIBVERSION
-using_hdhomerun: LIBS += -lmythhdhomerun-$$LIBVERSION
+LIBS += -lmythavutil-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION
+LIBS += -lmythavformat-$$LIBVERSION
+LIBS += -lmythswscale-$$LIBVERSION
 
 TEMPLATE = lib opengl
 CONFIG += plugin thread

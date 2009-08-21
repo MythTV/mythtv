@@ -1,3 +1,29 @@
+/* -*- Mode: c++ -*-
+ * vim: set expandtab tabstop=4 shiftwidth=4:
+ *
+ * Original Project
+ *      MythTV      http://www.mythtv.org
+ *
+ * Copyright (c) 2004, 2005 John Pullan <john@pullan.org>
+ * Copyright (c) 2009, Janne Grunau <janne-mythtv@grunau.be>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
+ *
+ */
+
 // c
 #include <math.h>
 #include <cstdlib>
@@ -10,24 +36,25 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QDir>
-//#include <QFileInfo>
 #include <QPainter>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/libmythtv/programinfo.h>
-#include <mythtv/libmythui/mythuihelper.h>
-#include <libmythui/mythmainwindow.h>
-#include <libmythui/mythdialogbox.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <programinfo.h>
+#include <mythuihelper.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
+#include <mythdirs.h>
 #include <mythtv/util.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuiimage.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <mythtv/mythconfig.h>
-#include <mythtv/libmythtv/myth_imgconvert.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuiimage.h>
+#include <mythuibuttonlist.h>
+#include <mythconfig.h>
+extern "C" {
+#include <swscale.h>
+}
 
 #ifndef INT64_C    // Used in ffmpeg headers to define some constants
 #define INT64_C(v)   (v ## LL)
@@ -734,6 +761,32 @@ bool ThumbFinder::seekBackward()
     seekToFrame(newFrame);
 
     return true;
+}
+
+// Note: copied this function from myth_imgconvert.cpp -- dtk 2009-08-17
+static int myth_sws_img_convert(
+    AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,
+    PixelFormat pix_fmt, int width, int height)
+{
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+
+    static struct SwsContext *convert_ctx;
+
+    convert_ctx = sws_getCachedContext(convert_ctx, width, height, pix_fmt,
+                                       width, height, dst_pix_fmt,
+                                       SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    if (!convert_ctx)
+    {
+        VERBOSE(VB_IMPORTANT, "myth_sws_img_convert: Cannot initialize "
+                "the image conversion context");
+        return -1;
+    }
+
+    sws_scale(convert_ctx, src->data, src->linesize,
+              0, height, dst->data, dst->linesize);
+
+    return 0;
 }
 
 bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)

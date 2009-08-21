@@ -26,7 +26,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "remoteutil.h"
+#include "tvremoteutil.h"
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "compat.h"

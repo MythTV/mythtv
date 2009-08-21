@@ -1,6 +1,7 @@
 #include "channelsettings.h"
 #include "cardutil.h"
 #include "channelutil.h"
+#include "programinfo.h" // for COMM_DETECT*, GetPreferredSkipTypeCombinations()
 
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {

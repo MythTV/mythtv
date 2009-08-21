@@ -5,7 +5,7 @@
 #include <QDateTime>
 
 // myth
-#include "remoteutil.h"
+#include "tvremoteutil.h"
 #include "programinfo.h"
 #include "mythscreentype.h"
 #include "mythuibutton.h"

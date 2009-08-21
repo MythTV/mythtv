@@ -9,7 +9,7 @@ using namespace std;
 #include "viewscheduled.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
-#include "programinfo.h"
+#include "recordinginfo.h"
 #include "proglist.h"
 #include "tv_play.h"
 
@@ -498,7 +498,9 @@ void ViewScheduled::edit()
     if (!pginfo)
         return;
 
-    pginfo->EditScheduled();
+    RecordingInfo ri(*pginfo);
+    ri.EditScheduled();
+    *pginfo = ri;
 }
 
 void ViewScheduled::customEdit()
@@ -583,7 +585,10 @@ void ViewScheduled::details()
 
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
     if (pginfo)
-        pginfo->showDetails();
+    {
+        const RecordingInfo ri(*pginfo);
+        ri.showDetails();
+    }
 
     EmbedTVWindow();
 }
@@ -597,7 +602,9 @@ void ViewScheduled::selected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    pginfo->EditRecording();
+    RecordingInfo ri(*pginfo);
+    ri.EditRecording();
+    *pginfo = ri;
 
     EmbedTVWindow();
 }

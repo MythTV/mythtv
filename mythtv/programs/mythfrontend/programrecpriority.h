@@ -1,7 +1,7 @@
 #ifndef PROGRAMRECPROIRITY_H_
 #define PROGRAMRECPROIRITY_H_
 
-#include "programinfo.h"
+#include "recordinginfo.h"
 #include "scheduledrecording.h"
 #include "mythscreentype.h"
 
@@ -12,13 +12,18 @@ class MythUIButtonListItem;
 class MythUIText;
 class MythUIStateType;
 
-class ProgramRecPriorityInfo : public ProgramInfo
+class ProgramRecPriorityInfo : public RecordingInfo
 {
   public:
     ProgramRecPriorityInfo();
     ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other);
-    ProgramRecPriorityInfo& operator=(const ProgramInfo&);
+    ProgramRecPriorityInfo &operator=(const ProgramRecPriorityInfo&);
+    ProgramRecPriorityInfo &operator=(const RecordingInfo&);
+    ProgramRecPriorityInfo &operator=(const ProgramInfo&);
 
+    virtual ProgramRecPriorityInfo &clone(const ProgramRecPriorityInfo &other);
+    virtual ProgramRecPriorityInfo &clone(const ProgramInfo &other);
+    virtual void clear(void);
 
     int recTypeRecPriority;
     RecordingType recType;

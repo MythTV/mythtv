@@ -34,8 +34,8 @@ using namespace std;
 #include "mythdb.h"
 #include "compat.h"
 #include "storagegroup.h"
-#include "programinfo.h"
-#include "programlist.h"
+#include "recordinginfo.h"
+#include "recordinglist.h"
 #include "scheduledrecording.h"
 #include "cardutil.h"
 #include "mythdb.h"
@@ -210,12 +210,12 @@ bool Scheduler::VerifyCards(void)
     return true;
 }
 
-static inline bool Recording(const ProgramInfo *p)
+static inline bool Recording(const RecordingInfo *p)
 {
     return (p->recstatus == rsRecording || p->recstatus == rsWillRecord);
 }
 
-static bool comp_overlap(ProgramInfo *a, ProgramInfo *b)
+static bool comp_overlap(RecordingInfo *a, RecordingInfo *b)
 {
     if (a->startts != b->startts)
         return a->startts < b->startts;
@@ -249,7 +249,7 @@ static bool comp_overlap(ProgramInfo *a, ProgramInfo *b)
     return a->recordid < b->recordid;
 }
 
-static bool comp_redundant(ProgramInfo *a, ProgramInfo *b)
+static bool comp_redundant(RecordingInfo *a, RecordingInfo *b)
 {
     if (a->startts != b->startts)
         return a->startts < b->startts;
@@ -266,7 +266,7 @@ static bool comp_redundant(ProgramInfo *a, ProgramInfo *b)
     return a->recstatus < b->recstatus;
 }
 
-static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
+static bool comp_recstart(RecordingInfo *a, RecordingInfo *b)
 {
     if (a->recstartts != b->recstartts)
         return a->recstartts < b->recstartts;
@@ -279,7 +279,7 @@ static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
 
 static QDateTime schedTime;
 
-static bool comp_priority(ProgramInfo *a, ProgramInfo *b)
+static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
 {
     int arec = (a->recstatus != rsRecording);
     int brec = (b->recstatus != rsRecording);
@@ -319,7 +319,7 @@ static bool comp_priority(ProgramInfo *a, ProgramInfo *b)
     return a->recordid < b->recordid;
 }
 
-static bool comp_timechannel(ProgramInfo *a, ProgramInfo *b)
+static bool comp_timechannel(RecordingInfo *a, RecordingInfo *b)
 {
     if (a->recstartts != b->recstartts)
         return a->recstartts < b->recstartts;
@@ -438,12 +438,12 @@ void Scheduler::FillRecordListFromDB(int recordid)
 
 void Scheduler::FillRecordListFromMaster(void)
 {
-    ProgramList schedList(false);
+    RecordingList schedList(false);
     schedList.FromScheduler();
 
     QMutexLocker lockit(reclist_lock);
 
-    ProgramList::iterator it = schedList.begin();
+    RecordingList::iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
         reclist.push_back(*it);
 }
@@ -462,7 +462,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     RecIter i = list.begin();
     for ( ; i != list.end(); i++)
     {
-        ProgramInfo *first = (*i);
+        RecordingInfo *first = (*i);
 
         if (onlyFutureRecordings &&
             ((first->recendts < now && first->endts < now) ||
@@ -475,7 +475,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     cout << "---  print list end  ---\n";
 }
 
-void Scheduler::PrintRec(const ProgramInfo *p, const char *prefix)
+void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
 {
     if ((print_verbose_messages & VB_SCHEDULE) == 0)
         return;
@@ -508,14 +508,14 @@ void Scheduler::PrintRec(const ProgramInfo *p, const char *prefix)
     cout << out.constData() << endl;
 }
 
-void Scheduler::UpdateRecStatus(ProgramInfo *pginfo)
+void Scheduler::UpdateRecStatus(RecordingInfo *pginfo)
 {
     QMutexLocker lockit(reclist_lock);
 
     RecIter dreciter = reclist.begin();
     for (; dreciter != reclist.end(); ++dreciter)
     {
-        ProgramInfo *p = *dreciter;
+        RecordingInfo *p = *dreciter;
         if (p->IsSameProgramTimeslot(*pginfo))
         {
             if (p->recstatus != pginfo->recstatus)
@@ -539,7 +539,7 @@ void Scheduler::UpdateRecStatus(int cardid, const QString &chanid,
     RecIter dreciter = reclist.begin();
     for (; dreciter != reclist.end(); ++dreciter)
     {
-        ProgramInfo *p = *dreciter;
+        RecordingInfo *p = *dreciter;
         if (p->cardid == cardid &&
             p->chanid == chanid &&
             p->startts == startts)
@@ -557,7 +557,7 @@ void Scheduler::UpdateRecStatus(int cardid, const QString &chanid,
     }
 }
 
-bool Scheduler::ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp)
+bool Scheduler::ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp)
 {
     QMutexLocker lockit(reclist_lock);
 
@@ -600,7 +600,7 @@ bool Scheduler::ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp)
         RecIter i = reclist.begin();
         for (; i != reclist.end(); i++)
         {
-            ProgramInfo *recp = *i;
+            RecordingInfo *recp = *i;
             if (recp->IsSameTimeslot(*oldp))
             {
                 *recp = *oldp;
@@ -612,20 +612,20 @@ bool Scheduler::ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp)
     return rs == rsRecording;
 }
 
-void Scheduler::SlaveConnected(ProgramList &slavelist)
+void Scheduler::SlaveConnected(RecordingList &slavelist)
 {
     QMutexLocker lockit(reclist_lock);
 
-    ProgramList::iterator it = slavelist.begin();
+    RecordingList::iterator it = slavelist.begin();
     for (; it != slavelist.end(); ++it)
     {
-        ProgramInfo *sp = *it;
+        RecordingInfo *sp = *it;
         bool found = false;
 
         RecIter ri = reclist.begin();
         for ( ; ri != reclist.end(); ri++)
         {
-            ProgramInfo *rp = *ri;
+            RecordingInfo *rp = *ri;
 
             if (sp->inputid &&
                 sp->startts == rp->startts &&
@@ -663,7 +663,7 @@ void Scheduler::SlaveConnected(ProgramList &slavelist)
 
         if (sp->inputid && !found)
         {
-            reclist.push_back(new ProgramInfo(*sp));
+            reclist.push_back(new RecordingInfo(*sp));
             reclist_changed = true;
             sp->AddHistory(false);
             VERBOSE(VB_IMPORTANT, QString("adding %1/%2/\"%3\" as recording")
@@ -679,7 +679,7 @@ void Scheduler::SlaveDisconnected(int cardid)
     RecIter ri = reclist.begin();
     for ( ; ri != reclist.end(); ri++)
     {
-        ProgramInfo *rp = *ri;
+        RecordingInfo *rp = *ri;
 
         if (rp->cardid == cardid &&
             rp->recstatus == rsRecording)
@@ -701,9 +701,9 @@ void Scheduler::BuildWorkList(void)
     RecIter i = reclist.begin();
     for (; i != reclist.end(); i++)
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         if (p->recstatus == rsRecording)
-            worklist.push_back(new ProgramInfo(*p));
+            worklist.push_back(new RecordingInfo(*p));
     }
 }
 
@@ -711,7 +711,7 @@ bool Scheduler::ClearWorkList(void)
 {
     QMutexLocker lockit(reclist_lock);
 
-    ProgramInfo *p;
+    RecordingInfo *p;
 
     if (reclist_changed)
     {
@@ -759,12 +759,12 @@ static void erase_nulls(RecList &reclist)
 
 void Scheduler::PruneOverlaps(void)
 {
-    ProgramInfo *lastp = NULL;
+    RecordingInfo *lastp = NULL;
 
     RecIter dreciter = worklist.begin();
     while (dreciter != worklist.end())
     {
-        ProgramInfo *p = *dreciter;
+        RecordingInfo *p = *dreciter;
         if (lastp == NULL || lastp->recordid == p->recordid ||
             !lastp->IsSameTimeslot(*p))
         {
@@ -786,7 +786,7 @@ void Scheduler::BuildListMaps(void)
     RecIter i = worklist.begin();
     for ( ; i != worklist.end(); i++)
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         if (p->recstatus == rsRecording ||
             p->recstatus == rsWillRecord ||
             p->recstatus == rsUnknown)
@@ -807,7 +807,7 @@ void Scheduler::ClearListMaps(void)
 }
 
 bool Scheduler::IsSameProgram(
-    const ProgramInfo *a, const ProgramInfo *b) const
+    const RecordingInfo *a, const RecordingInfo *b) const
 {
     IsSameKey X(a,b);
     IsSameCacheType::const_iterator it = cache_is_same_program.find(X);
@@ -824,7 +824,7 @@ bool Scheduler::IsSameProgram(
 
 bool Scheduler::FindNextConflict(
     const RecList     &cardlist,
-    const ProgramInfo *p,
+    const RecordingInfo *p,
     RecConstIter      &j,
     bool               openEnd) const
 {
@@ -832,7 +832,7 @@ bool Scheduler::FindNextConflict(
 
     for ( ; j != cardlist.end(); j++)
     {
-        const ProgramInfo *q = *j;
+        const RecordingInfo *q = *j;
 
         if (p == q)
             continue;
@@ -901,9 +901,9 @@ bool Scheduler::FindNextConflict(
     return false;
 }
 
-const ProgramInfo *Scheduler::FindConflict(
+const RecordingInfo *Scheduler::FindConflict(
     const QMap<int, RecList> &reclists,
-    const ProgramInfo        *p,
+    const RecordingInfo        *p,
     bool openend) const
 {
     bool is_conflict_dbg = false;
@@ -928,7 +928,7 @@ const ProgramInfo *Scheduler::FindConflict(
     return NULL;
 }
 
-void Scheduler::MarkOtherShowings(ProgramInfo *p)
+void Scheduler::MarkOtherShowings(RecordingInfo *p)
 {
     RecList *showinglist = &titlelistmap[p->title];
 
@@ -949,12 +949,12 @@ void Scheduler::MarkOtherShowings(ProgramInfo *p)
     }
 }
 
-void Scheduler::MarkShowingsList(RecList &showinglist, ProgramInfo *p)
+void Scheduler::MarkShowingsList(RecList &showinglist, RecordingInfo *p)
 {
     RecIter i = showinglist.begin();
     for ( ; i != showinglist.end(); i++)
     {
-        ProgramInfo *q = *i;
+        RecordingInfo *q = *i;
         if (q == p)
             continue;
         if (q->recstatus != rsUnknown &&
@@ -981,7 +981,7 @@ void Scheduler::BackupRecStatus(void)
     RecIter i = worklist.begin();
     for ( ; i != worklist.end(); i++)
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         p->savedrecstatus = p->recstatus;
     }
 }
@@ -991,12 +991,12 @@ void Scheduler::RestoreRecStatus(void)
     RecIter i = worklist.begin();
     for ( ; i != worklist.end(); i++)
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         p->recstatus = p->savedrecstatus;
     }
 }
 
-bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
+bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
                                    bool preserveLive)
 {
     PrintRec(p, "     >");
@@ -1019,7 +1019,7 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
     RecIter j = showinglist->begin();
     for ( ; j != showinglist->end(); j++)
     {
-        ProgramInfo *q = *j;
+        RecordingInfo *q = *j;
         if (q == p)
             continue;
 
@@ -1068,7 +1068,7 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
             }
         }
 
-        const ProgramInfo *conflict = FindConflict(cardlistmap, q);
+        const RecordingInfo *conflict = FindConflict(cardlistmap, q);
         if (conflict)
         {
             PrintRec(conflict, "        !");
@@ -1126,12 +1126,12 @@ void Scheduler::SchedNewRecords(void)
     RecIter i = worklist.begin();
     while (i != worklist.end())
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         if (p->recstatus == rsRecording)
             MarkOtherShowings(p);
         else if (p->recstatus == rsUnknown)
         {
-            const ProgramInfo *conflict = FindConflict(cardlistmap, p, openEnd);
+            const RecordingInfo *conflict = FindConflict(cardlistmap, p, openEnd);
             if (!conflict)
             {
                 p->recstatus = rsWillRecord;
@@ -1172,7 +1172,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
     RecIter i = retrylist.begin();
     for ( ; move_this && i != retrylist.end(); i++)
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         if (p->recstatus != rsUnknown)
             continue;
 
@@ -1208,7 +1208,7 @@ void Scheduler::MoveHigherRecords(bool move_this)
     i = retrylist.begin();
     for ( ; i != retrylist.end(); i++)
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         if (p->recstatus != rsUnknown)
             continue;
 
@@ -1249,12 +1249,12 @@ void Scheduler::MoveHigherRecords(bool move_this)
 
 void Scheduler::PruneRedundants(void)
 {
-    ProgramInfo *lastp = NULL;
+    RecordingInfo *lastp = NULL;
 
     RecIter i = worklist.begin();
     while (i != worklist.end())
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
 
         // Delete anything that has already passed since we can't
         // change history, can we?
@@ -1311,7 +1311,7 @@ void Scheduler::UpdateNextRecord(void)
     RecIter i = reclist.begin();
     while (i != reclist.end())
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         if (p->recstatus == rsWillRecord && nextRecMap[p->recordid].isNull())
             nextRecMap[p->recordid] = p->recstartts;
 
@@ -1359,7 +1359,7 @@ void Scheduler::UpdateNextRecord(void)
     }
 }
 
-void Scheduler::getConflicting(ProgramInfo *pginfo, QStringList &strlist)
+void Scheduler::getConflicting(RecordingInfo *pginfo, QStringList &strlist)
 {
     RecList retlist;
     getConflicting(pginfo, &retlist);
@@ -1368,22 +1368,22 @@ void Scheduler::getConflicting(ProgramInfo *pginfo, QStringList &strlist)
 
     while (retlist.size() > 0)
     {
-        ProgramInfo *p = retlist.front();
+        RecordingInfo *p = retlist.front();
         p->ToStringList(strlist);
         delete p;
         retlist.pop_front();
     }
 }
 
-void Scheduler::getConflicting(ProgramInfo *pginfo, RecList *retlist)
+void Scheduler::getConflicting(RecordingInfo *pginfo, RecList *retlist)
 {
     QMutexLocker lockit(reclist_lock);
 
     RecConstIter i = reclist.begin();
     for (; FindNextConflict(reclist, pginfo, i); i++)
     {
-        const ProgramInfo *p = *i;
-        retlist->push_back(new ProgramInfo(*p));
+        const RecordingInfo *p = *i;
+        retlist->push_back(new RecordingInfo(*p));
     }
 }
 
@@ -1396,10 +1396,10 @@ bool Scheduler::getAllPending(RecList *retList)
     RecIter i = reclist.begin();
     for (; i != reclist.end(); i++)
     {
-        ProgramInfo *p = *i;
+        RecordingInfo *p = *i;
         if (p->recstatus == rsConflict)
             hasconflicts = true;
-        retList->push_back(new ProgramInfo(*p));
+        retList->push_back(new RecordingInfo(*p));
     }
 
     SORT_RECLIST(*retList, comp_timechannel);
@@ -1417,7 +1417,7 @@ void Scheduler::getAllPending(QStringList &strList)
 
     while (retlist.size() > 0)
     {
-        ProgramInfo *p = retlist.front();
+        RecordingInfo *p = retlist.front();
         p->ToStringList(strList);
         delete p;
         retlist.pop_front();
@@ -1434,7 +1434,7 @@ void Scheduler::getAllScheduled(QStringList &strList)
 
     while (schedlist.size() > 0)
     {
-        ProgramInfo *pginfo = schedlist.front();
+        RecordingInfo *pginfo = schedlist.front();
         pginfo->ToStringList(strList);
         delete pginfo;
         schedlist.pop_front();
@@ -1454,7 +1454,7 @@ void Scheduler::Reschedule(int recordid)
     reschedWait.wakeOne();
 }
 
-void Scheduler::AddRecording(const ProgramInfo &pi)
+void Scheduler::AddRecording(const RecordingInfo &pi)
 {
     QMutexLocker lockit(reclist_lock);
 
@@ -1462,7 +1462,7 @@ void Scheduler::AddRecording(const ProgramInfo &pi)
 
     for (RecIter it = reclist.begin(); it != reclist.end(); ++it)
     {
-        ProgramInfo *p = *it;
+        RecordingInfo *p = *it;
         if (p->recstatus == rsRecording && p->IsSameProgramTimeslot(pi))
         {
             VERBOSE(VB_IMPORTANT, LOC + "Not adding recording, " +
@@ -1474,7 +1474,7 @@ void Scheduler::AddRecording(const ProgramInfo &pi)
     VERBOSE(VB_SCHEDULE, LOC +
             QString("Adding '%1' to reclist.").arg(pi.title));
 
-    ProgramInfo * new_pi = new ProgramInfo(pi);
+    RecordingInfo * new_pi = new RecordingInfo(pi);
     reclist.push_back(new_pi);
     reclist_changed = true;
 
@@ -1489,7 +1489,7 @@ void Scheduler::AddRecording(const ProgramInfo &pi)
     ScheduledRecording::signalChange(pi.recordid);
 }
 
-bool Scheduler::IsBusyRecording(const ProgramInfo *rcinfo)
+bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 {
     if (!m_tvList || !rcinfo)
     {
@@ -1538,7 +1538,7 @@ void Scheduler::RunScheduler(void)
     int secsleft;
     EncoderLink *nexttv = NULL;
 
-    ProgramInfo *nextRecording = NULL;
+    RecordingInfo *nextRecording = NULL;
     QDateTime nextrectime;
     QString schedid;
 
@@ -2146,7 +2146,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
     // set the wakeuptime if needed
     if (recIter != reclist.end())
     {
-        ProgramInfo *nextRecording = (*recIter);
+        RecordingInfo *nextRecording = (*recIter);
         QDateTime restarttime = nextRecording->recstartts.addSecs((-1) *
                                                                prerollseconds);
 
@@ -2256,7 +2256,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     QStringList SlavesInUse;
     for ( ; recIter != reclist.end(); recIter++)
     {
-        ProgramInfo *pginfo = *recIter;
+        RecordingInfo *pginfo = *recIter;
 
         if ((pginfo->recstatus != rsRecording) &&
             (pginfo->recstatus != rsWillRecord))
@@ -3167,7 +3167,7 @@ void Scheduler::AddNewRecords(void)
 
     while (result.next())
     {
-        ProgramInfo *p = new ProgramInfo;
+        RecordingInfo *p = new RecordingInfo;
         p->reactivate = result.value(38).toInt();
         p->oldrecstatus = RecStatusType(result.value(37).toInt());
         if (p->oldrecstatus == rsAborted || 
@@ -3266,7 +3266,7 @@ void Scheduler::AddNewRecords(void)
         RecIter rec = worklist.begin();
         for ( ; rec != worklist.end(); rec++)
         {
-            ProgramInfo *r = *rec;
+            RecordingInfo *r = *rec;
             if (p->IsSameTimeslot(*r))
             {
                 if (r->inputid == p->inputid &&
@@ -3394,7 +3394,7 @@ void Scheduler::AddNotListed(void) {
 
     while (result.next())
     {
-        ProgramInfo *p = new ProgramInfo;
+        RecordingInfo *p = new RecordingInfo;
         p->recstatus = rsNotListed;
         p->recordid = result.value(0).toInt();
         p->rectype = RecordingType(result.value(1).toInt());
@@ -3504,7 +3504,7 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
     {
         while (result.next())
         {
-            ProgramInfo *proginfo = new ProgramInfo;
+            RecordingInfo *proginfo = new RecordingInfo;
             proginfo->chanid = result.value(0).toString();
             proginfo->rectype = RecordingType(result.value(9).toInt());
             proginfo->recordid = result.value(11).toInt();
@@ -3634,7 +3634,7 @@ void Scheduler::GetNextLiveTVDir(int cardid)
 {
     QMutexLocker lockit(reclist_lock);
 
-    ProgramInfo *pginfo = new ProgramInfo;
+    RecordingInfo *pginfo = new RecordingInfo;
 
     if (!pginfo)
         return;
@@ -3667,7 +3667,7 @@ void Scheduler::GetNextLiveTVDir(int cardid)
     delete pginfo;
 }
 
-int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
+int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
 {
 
     VERBOSE(VB_SCHEDULE, LOC + "FillRecordingDir: Starting");
@@ -3678,7 +3678,7 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
     QMap<QString, FileSystemInfo>::Iterator fsit2;
     QString dirKey;
     QStringList strlist;
-    ProgramInfo *thispg;
+    RecordingInfo *thispg;
     RecIter recIter;
     StorageGroup mysgroup(pginfo->storagegroup, pginfo->hostname);
     QStringList dirlist = mysgroup.GetDirList();
@@ -4175,10 +4175,8 @@ void Scheduler::SchedPreserveLiveTV(void)
 
         // Get the program that will be recording on this channel
         // at record start time, if this LiveTV session continues.
-        ProgramInfo *dummy =
-            ProgramInfo::GetProgramAtDateTime(in.chanid, livetvTime, true, 4);
-        if (!dummy)
-            continue;
+        RecordingInfo *dummy = new RecordingInfo();
+        dummy->LoadProgramAtDateTime(in.chanid, livetvTime, true, 4);
 
         dummy->cardid = enc->GetCardID();
         dummy->inputid = in.inputid;
@@ -4187,14 +4185,14 @@ void Scheduler::SchedPreserveLiveTV(void)
         retrylist.push_front(dummy);
     }
 
-    if (!retrylist.size())
+    if (retrylist.empty())
         return;
 
     MoveHigherRecords(false);
 
-    while (retrylist.size() > 0)
+    while (!retrylist.empty())
     {
-        ProgramInfo *p = retrylist.back();
+        RecordingInfo *p = retrylist.back();
         delete p;
         retrylist.pop_back();
     }

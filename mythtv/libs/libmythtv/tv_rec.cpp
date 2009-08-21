@@ -33,6 +33,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "storagegroup.h"
 #include "remoteutil.h"
+#include "tvremoteutil.h"
 
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
@@ -77,8 +78,8 @@ QMutex            TVRec::cardsLock;
 QMap<uint,TVRec*> TVRec::cards;
 
 static bool is_dishnet_eit(int cardid);
-static QString load_profile(QString,void*,ProgramInfo*,RecordingProfile&);
-static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
+static QString load_profile(QString,void*,RecordingInfo*,RecordingProfile&);
+static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                      bool on_host, bool transcode_bfr_comm, bool on_line_comm);
 
 /** \class TVRec
@@ -641,7 +642,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         recordEndTime = GetRecordEndTime(rcinfo);
 
         // Tell event loop to begin recording.
-        curRecording = new ProgramInfo(*rcinfo);
+        curRecording = new RecordingInfo(*rcinfo);
         curRecording->MarkAsInUse(true, "recorder");
         StartedRecording(curRecording);
 
@@ -781,13 +782,13 @@ TVState TVRec::RemovePlaying(TVState state)
     return kState_Error;
 }
 
-/** \fn TVRec::StartedRecording(ProgramInfo *curRec)
+/** \fn TVRec::StartedRecording(RecordingInfo *curRec)
  *  \brief Inserts a "curRec" into the database, and issues a
  *         "RECORDING_LIST_CHANGE" event.
  *  \param curRec Recording to add to database.
  *  \sa ProgramInfo::StartedRecording(const QString&)
  */
-void TVRec::StartedRecording(ProgramInfo *curRec)
+void TVRec::StartedRecording(RecordingInfo *curRec)
 {
     if (!curRec)
         return;
@@ -803,14 +804,14 @@ void TVRec::StartedRecording(ProgramInfo *curRec)
     gContext->dispatch(me);
 }
 
-/** \fn TVRec::FinishedRecording(ProgramInfo *curRec)
+/** \fn TVRec::FinishedRecording(RecordingInfo *curRec)
  *  \brief If not a premature stop, adds program to history of recorded
  *         programs. If the recording type is kFindOneRecord this find
  *         is removed.
  *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
  *  \param curRec ProgramInfo or recording to mark as done
  */
-void TVRec::FinishedRecording(ProgramInfo *curRec)
+void TVRec::FinishedRecording(RecordingInfo *curRec)
 {
     if (!curRec)
         return;
@@ -1910,7 +1911,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
     }
 
     QString recording_type = "all";
-    ProgramInfo *rec = lastTuningRequest.program;
+    RecordingInfo *rec = lastTuningRequest.program;
     RecordingProfile profile;
     load_profile(genOpt.cardtype, tvchain, rec, profile);
     const Setting *setting = profile.byName("recordingtype");
@@ -2743,7 +2744,7 @@ static uint get_input_id(uint cardid, const QString &inputname)
     return 0;
 }
 
-/** \fn TVRec::NotifySchedulerOfRecording(ProgramInfo*)
+/** \fn TVRec::NotifySchedulerOfRecording(RecordingInfo*)
  *  \brief Tell scheduler about the recording.
  *
  *   This is needed if the frontend has marked the LiveTV
@@ -2752,7 +2753,7 @@ static uint get_input_id(uint cardid, const QString &inputname)
  *   can properly take overrecord into account, and to properly
  *   reschedule other recordings around to avoid this recording.
  */
-void TVRec::NotifySchedulerOfRecording(ProgramInfo *rec)
+void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
 {
     if (!channel)
         return;
@@ -3374,7 +3375,7 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
             curRecording->MarkAsInUse(false);
             delete curRecording;
         }
-        curRecording = new ProgramInfo(*pginfo);
+        curRecording = new RecordingInfo(*pginfo);
         curRecording->MarkAsInUse(true, "recorder");
     }
 
@@ -3903,7 +3904,7 @@ MPEGStreamData *TVRec::TuningSignalCheck(void)
     return streamData;
 }
 
-static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
+static int init_jobs(const RecordingInfo *rec, RecordingProfile &profile,
                       bool on_host, bool transcode_bfr_comm, bool on_line_comm)
 {
     if (!rec)
@@ -3945,7 +3946,7 @@ static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
 }
 
 static QString load_profile(QString cardtype, void *tvchain,
-                            ProgramInfo *rec, RecordingProfile &profile)
+                            RecordingInfo *rec, RecordingProfile &profile)
 {
     // Determine the correct recording profile.
     // In LiveTV mode use "Live TV" profile, otherwise use the
@@ -3983,7 +3984,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
         had_dummyrec = true;
     }
 
-    ProgramInfo *rec = lastTuningRequest.program;
+    RecordingInfo *rec = lastTuningRequest.program;
 
     RecordingProfile profile;
     QString profileName = load_profile(genOpt.cardtype, tvchain, rec, profile);
@@ -4003,7 +4004,9 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer 2");
             goto err_ret;
         }
-        rec = tvchain->GetProgramAt(-1);
+        ProgramInfo *pi = tvchain->GetProgramAt(-1);
+        rec = new RecordingInfo(*pi);
+        delete pi;
     }
 
     if (lastTuningRequest.flags & kFlagRecording)
@@ -4148,8 +4151,9 @@ void TVRec::TuningRestartRecorder(void)
     {
         recorder->SetRingBuffer(ringBuffer);
         ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
-        recorder->SetRecording(progInfo);
+        RecordingInfo recInfo(*progInfo);
         delete progInfo;
+        recorder->SetRecording(&recInfo);
     }
     recorder->Reset();
 
@@ -4310,7 +4314,7 @@ void TVRec::SetNextLiveTVDir(QString dir)
     triggerLiveTVDir.wakeAll();
 }
 
-bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
+bool TVRec::GetProgramRingBufferForLiveTV(RecordingInfo **pginfo,
                                           RingBuffer **rb)
 {
     VERBOSE(VB_RECORD, LOC + "GetProgramRingBufferForLiveTV()");
@@ -4342,12 +4346,15 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
     if (hoursMax <= 0)
         hoursMax = 8;
 
-    ProgramInfo *prog = NULL;
+    RecordingInfo *prog = NULL;
     if (pseudoLiveTVRecording)
-        prog = new ProgramInfo(*pseudoLiveTVRecording);
+        prog = new RecordingInfo(*pseudoLiveTVRecording);
     else
-        prog = ProgramInfo::GetProgramAtDateTime(
+    {
+        prog = new RecordingInfo();
+        prog->LoadProgramAtDateTime(
             chanid, mythCurrentDateTime(), true, hoursMax);
+    }
 
     prog->cardid = cardid;
 
@@ -4398,7 +4405,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
 bool TVRec::CreateLiveTVRingBuffer(void)
 {
     VERBOSE(VB_RECORD, LOC + "CreateLiveTVRingBuffer()");
-    ProgramInfo *pginfo = NULL;
+    RecordingInfo *pginfo = NULL;
     RingBuffer *rb = NULL;
 
     if (!GetProgramRingBufferForLiveTV(&pginfo, &rb))
@@ -4435,7 +4442,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     VERBOSE(VB_RECORD, LOC + "SwitchLiveTVRingBuffer(discont "
             <<discont<<", set_rec "<<set_rec<<")");
 
-    ProgramInfo *pginfo = NULL;
+    RecordingInfo *pginfo = NULL;
     RingBuffer *rb = NULL;
 
     if (!GetProgramRingBufferForLiveTV(&pginfo, &rb))
@@ -4444,9 +4451,10 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
         return false;
     }
 
-    ProgramInfo *oldinfo = tvchain->GetProgramAt(-1);
-    if (oldinfo)
+    ProgramInfo *pi = tvchain->GetProgramAt(-1);
+    if (pi)
     {
+        RecordingInfo *oldinfo = new RecordingInfo(*pi);
         FinishedRecording(oldinfo);
         if (tvchain->GetCardType(-1) != "DUMMY")
             (new PreviewGenerator(oldinfo, PreviewGenerator::kLocal))->Start();

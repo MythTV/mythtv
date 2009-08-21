@@ -22,9 +22,10 @@ using namespace std;
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
-#include "programinfo.h"
+#include "recordinginfo.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
+#include "tvremoteutil.h"
 #include "previewgenerator.h"
 #include "playgroup.h"
 #include "customedit.h"
@@ -1668,7 +1669,10 @@ void PlaybackBox::details()
     if (pginfo->availableStatus != asAvailable)
         showAvailablePopup(pginfo);
     else
-        pginfo->showDetails();
+    {
+        const RecordingInfo ri(*pginfo);
+        ri.showDetails();
+    }
 }
 
 void PlaybackBox::selected(MythUIButtonListItem *item)
@@ -2544,7 +2548,8 @@ void PlaybackBox::changeProfileAndTranscode(const QString &profile)
     if (!pginfo)
         return;
 
-    pginfo->ApplyTranscoderProfileChange(profile);
+    const RecordingInfo ri(*pginfo);
+    ri.ApplyTranscoderProfileChange(profile);
     doBeginTranscoding();
 }
 
@@ -2719,7 +2724,8 @@ void PlaybackBox::showProgramDetails()
     if (!pginfo)
         return;
 
-    pginfo->showDetails();
+    const RecordingInfo ri(*pginfo);
+    ri.showDetails();
 }
 
 void PlaybackBox::doEditScheduled()
@@ -2761,7 +2767,9 @@ void PlaybackBox::doAllowRerecord()
     if (!pginfo)
         return;
 
-    pginfo->ForgetHistory();
+    RecordingInfo ri(*pginfo);
+    ri.ForgetHistory();
+    *pginfo = ri;
 }
 
 void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
@@ -4128,7 +4136,9 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
             tempSubTitle = QString("%1 - \"%2\"")
                             .arg(tempSubTitle).arg(newSubtitle);
 
-        pginfo->ApplyRecordRecTitleChange(newTitle, newSubtitle);
+        RecordingInfo ri(*pginfo);
+        ri.ApplyRecordRecTitleChange(newTitle, newSubtitle);
+        *pginfo = ri;
         item->SetText(tempSubTitle, "titlesubtitle");
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
@@ -4181,7 +4191,10 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
                 else if ((tmpItem->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
                     tmpItem->SetAutoExpire(kLiveTVAutoExpire);
 
-                tmpItem->ApplyRecordRecGroupChange(newRecGroup);
+                RecordingInfo ri(*tmpItem);
+                ri.ApplyRecordRecGroupChange(newRecGroup);
+                *tmpItem = ri;
+                
             }
         }
         doClearPlaylist();
@@ -4193,7 +4206,9 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
         else if ((tmpItem->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
             tmpItem->SetAutoExpire(kLiveTVAutoExpire);
 
-        tmpItem->ApplyRecordRecGroupChange(newRecGroup);
+        RecordingInfo ri(*tmpItem);
+        ri.ApplyRecordRecGroupChange(newRecGroup);
+        *tmpItem = ri;
     }
 
     // TODO May not rebuild the list here, check current filter and removeitem
@@ -4219,12 +4234,20 @@ void PlaybackBox::setPlayGroup(QString newPlayGroup)
         {
             tmpItem = findMatchingProg(*it);
             if (tmpItem)
-                tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
+            {
+                RecordingInfo ri(*tmpItem);
+                ri.ApplyRecordPlayGroupChange(newPlayGroup);
+                *tmpItem = ri;
+            }
         }
         doClearPlaylist();
     }
     else if (tmpItem)
-        tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
+    {
+        RecordingInfo ri(*tmpItem);
+        ri.ApplyRecordPlayGroupChange(newPlayGroup);
+        *tmpItem = ri;
+    }
 }
 
 void PlaybackBox::showRecGroupPasswordChanger(void)

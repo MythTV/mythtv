@@ -22,7 +22,7 @@
 #include "autoexpire.h"
 #include "mythcontext.h"
 #include "jobqueue.h"
-#include "programinfo.h"
+#include "recordinginfo.h"
 
 extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire              *expirer;

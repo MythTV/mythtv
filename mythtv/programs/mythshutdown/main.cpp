@@ -18,6 +18,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "tv.h"
 #include "remoteutil.h"
+#include "tvremoteutil.h"
 #include "compat.h"
 
 void setGlobalSetting(const QString &key, const QString &value)

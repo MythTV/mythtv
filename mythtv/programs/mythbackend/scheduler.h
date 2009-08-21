@@ -15,7 +15,7 @@ using namespace std;
 
 // MythTV headers
 #include "scheduledrecording.h"
-#include "programinfo.h"
+#include "recordinginfo.h"
 #include "remoteutil.h"
 #include "inputgroupmap.h"
 #include "mythdeque.h"
@@ -23,10 +23,10 @@ using namespace std;
 class EncoderLink;
 class MainServer;
 class AutoExpire;
-class ProgramList;
+class RecordingList;
 
 #define USE_DEQUE_RECLIST 1
-typedef deque<ProgramInfo*> RecList;
+typedef deque<RecordingInfo*> RecList;
 #define SORT_RECLIST(LIST, ORDER) \
   do { stable_sort((LIST).begin(), (LIST).end(), ORDER); } while (0)
 
@@ -44,11 +44,11 @@ class Scheduler : public QObject
     void SetExpirer(AutoExpire *autoExpirer) { expirer = autoExpirer; }
 
     void Reschedule(int recordid);
-    void AddRecording(const ProgramInfo&);
+    void AddRecording(const RecordingInfo&);
     void FillRecordListFromDB(int recordid = -1);
     void FillRecordListFromMaster(void);
 
-    void UpdateRecStatus(ProgramInfo *pginfo);
+    void UpdateRecStatus(RecordingInfo *pginfo);
     void UpdateRecStatus(int cardid, const QString &chanid, 
                          const QDateTime &startts, RecStatusType recstatus, 
                          const QDateTime &recendts);
@@ -58,17 +58,17 @@ class Scheduler : public QObject
 
     void getAllScheduled(QStringList &strList);
 
-    void getConflicting(ProgramInfo *pginfo, QStringList &strlist);
-    void getConflicting(ProgramInfo *pginfo, RecList *retlist);
+    void getConflicting(RecordingInfo *pginfo, QStringList &strlist);
+    void getConflicting(RecordingInfo *pginfo, RecList *retlist);
 
     void PrintList(bool onlyFutureRecordings = false) 
         { PrintList(reclist, onlyFutureRecordings); };
     void PrintList(RecList &list, bool onlyFutureRecordings = false);
-    void PrintRec(const ProgramInfo *p, const char *prefix = NULL);
+    void PrintRec(const RecordingInfo *p, const char *prefix = NULL);
 
     void SetMainServer(MainServer *ms);
 
-    void SlaveConnected(ProgramList &slavelist);
+    void SlaveConnected(RecordingList &slavelist);
     void SlaveDisconnected(int cardid);
 
     void DisableScheduling(void) { schedulingEnabled = false; }
@@ -103,20 +103,20 @@ class Scheduler : public QObject
     void BuildListMaps(void);
     void ClearListMaps(void);
 
-    bool IsBusyRecording(const ProgramInfo *rcinfo);
+    bool IsBusyRecording(const RecordingInfo *rcinfo);
 
-    bool IsSameProgram(const ProgramInfo *a, const ProgramInfo *b) const;
+    bool IsSameProgram(const RecordingInfo *a, const RecordingInfo *b) const;
 
     bool FindNextConflict(const RecList &cardlist,
-                          const ProgramInfo *p, RecConstIter &iter,
+                          const RecordingInfo *p, RecConstIter &iter,
                           bool openEnd = false) const;
-    const ProgramInfo *FindConflict(const QMap<int, RecList> &reclists,
-                                    const ProgramInfo *p, bool openEnd = false) const;
-    void MarkOtherShowings(ProgramInfo *p);
-    void MarkShowingsList(RecList &showinglist, ProgramInfo *p);
+    const RecordingInfo *FindConflict(const QMap<int, RecList> &reclists,
+                                    const RecordingInfo *p, bool openEnd = false) const;
+    void MarkOtherShowings(RecordingInfo *p);
+    void MarkShowingsList(RecList &showinglist, RecordingInfo *p);
     void BackupRecStatus(void);
     void RestoreRecStatus(void);
-    bool TryAnotherShowing(ProgramInfo *p,  bool samePriority,
+    bool TryAnotherShowing(RecordingInfo *p,  bool samePriority,
                            bool preserveLive = false);
     void SchedNewRecords(void);
     void MoveHigherRecords(bool move_this = true);
@@ -124,7 +124,7 @@ class Scheduler : public QObject
     void PruneRedundants(void);
     void UpdateNextRecord(void);
 
-    bool ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp);
+    bool ChangeRecordingEnd(RecordingInfo *oldp, RecordingInfo *newp);
 
     void findAllScheduledPrograms(RecList &proglist);
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
@@ -134,7 +134,7 @@ class Scheduler : public QObject
     bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);
     void WakeUpSlaves(void);
 
-    int FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
+    int FillRecordingDir(RecordingInfo *pginfo, RecList& reclist);
     void FillDirectoryInfoCache(bool force = false);
 
     MythDeque<int> reschedQueue;
@@ -185,7 +185,7 @@ class Scheduler : public QObject
     QMap<QString, bool> hasLaterList;
 
     // cache IsSameProgram()
-    typedef pair<const ProgramInfo*,const ProgramInfo*> IsSameKey;
+    typedef pair<const RecordingInfo*,const RecordingInfo*> IsSameKey;
     typedef QMap<IsSameKey,bool> IsSameCacheType;
     mutable IsSameCacheType cache_is_same_program;
 };

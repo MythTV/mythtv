@@ -138,12 +138,12 @@ HEADERS += minilzo.h                RTjpegN.h
 SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
-HEADERS += programinfo.h            programlist.h
+HEADERS += recordinginfo.h          recordinglist.h
 HEADERS += RingBuffer.h             avfringbuffer.h
 HEADERS += ThreadedFileWriter.h     previouslist.h
 HEADERS += dbcheck.h                customedit.h
-HEADERS += remoteutil.h             tv.h
-HEADERS += recordingtypes.h         jobqueue.h
+HEADERS += tvremoteutil.h           tv.h
+HEADERS += jobqueue.h
 HEADERS += filtermanager.h          recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
@@ -162,12 +162,12 @@ HEADERS += channelgroup.h           channelgroupsettings.h
 # Remove when everything is switched to MythUI
 HEADERS += proglist_qt.h
 
-SOURCES += programinfo.cpp          programlist.cpp
+SOURCES += recordinginfo.cpp        recordinglist.cpp
 SOURCES += RingBuffer.cpp           avfringbuffer.cpp
 SOURCES += ThreadedFileWriter.cpp   previouslist.cpp
 SOURCES += dbcheck.cpp              customedit.cpp
-SOURCES += remoteutil.cpp           tv.cpp
-SOURCES += recordingtypes.cpp       jobqueue.cpp
+SOURCES += tvremoteutil.cpp         tv.cpp
+SOURCES += jobqueue.cpp
 SOURCES += filtermanager.cpp        recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
@@ -573,10 +573,6 @@ mingw {
 
     LIBS += -lpthread
 }
-
-# install headers required by mytharchive
-inc.path = $${PREFIX}/include/mythtv/libmythtv/
-inc.files = programinfo.h remoteutil.h recordingtypes.h myth_imgconvert.h
 
 INSTALLS += inc
 

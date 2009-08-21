@@ -15,9 +15,9 @@
 
 // myth
 #include <mythcontext.h>
-#include <libmythtv/programinfo.h>
-#include <libmythui/mythmainwindow.h>
-#include <libmythui/mythdialogbox.h>
+#include <programinfo.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
 
 // mytharchive
 #include "archiveutil.h"

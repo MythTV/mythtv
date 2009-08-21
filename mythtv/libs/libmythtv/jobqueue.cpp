@@ -21,6 +21,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "compat.h"
 #include "recordingprofile.h"
+#include "recordinginfo.h"
 
 #include "mythdb.h"
 #include "mythdirs.h"
@@ -459,7 +460,10 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
         return false;
 
     if (jobTypes == JOB_NONE)
-        jobTypes = pinfo->GetAutoRunJobs();
+    {
+        const RecordingInfo ri(*pinfo);
+        jobTypes = ri.GetAutoRunJobs();
+    }
 
     if (pinfo->chancommfree)
         jobTypes &= (~JOB_COMMFLAG);

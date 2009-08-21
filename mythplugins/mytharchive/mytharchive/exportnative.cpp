@@ -11,17 +11,17 @@
 #include <QDomDocument>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythtv/remoteutil.h>
-#include <mythtv/libmythtv/programinfo.h>
-#include <mythtv/libmythdb/mythdb.h>
-#include <libmythui/mythdialogbox.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuicheckbox.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythuiprogressbar.h>
-#include <libmythui/mythmainwindow.h>
+#include <mythcontext.h>
+#include <remoteutil.h>
+#include <programinfo.h>
+#include <mythdb.h>
+#include <mythdialogbox.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuicheckbox.h>
+#include <mythuibuttonlist.h>
+#include <mythuiprogressbar.h>
+#include <mythmainwindow.h>
 
 // mytharchive
 #include "exportnative.h"

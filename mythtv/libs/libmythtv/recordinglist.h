@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 
-#ifndef _PROGRAMLIST_H_
-#define _PROGRAMLIST_H_
+#ifndef _RECORDINGLIST_H_
+#define _RECORDINGLIST_H_
 
 // playbackbox.cpp & viewschdiff.cpp viewscheduled::filllist() can
 // be more efficient with a linked list everything else is more efficient
@@ -14,12 +14,12 @@
 // C++ headers
 #ifdef PGLIST_USE_LINKED_LIST
 #include <list>
-class ProgramInfo;
-typedef std::list<ProgramInfo*> PGList;
+class RecordingInfo;
+typedef std::list<RecordingInfo*> RIList;
 #else
 #include <deque>
-class ProgramInfo;
-typedef std::deque<ProgramInfo*> PGList;
+class RecordingInfo;
+typedef std::deque<RecordingInfo*> RIList;
 #endif
 using namespace std;
 
@@ -29,23 +29,23 @@ using namespace std;
 // MythTV headers
 #include "mythexp.h"
 #include "mythdbcon.h"
-#include "programinfo.h"
+#include "programinfo.h" // for ProgramDetailList
 
-/** \class ProgramList
- *  \brief List of ProgramInfo instances, with helper functions.
+/** \class RecordingList
+ *  \brief List of RecordingInfo instances, with helper functions.
  */
-class MPUBLIC ProgramList
+class MPUBLIC RecordingList
 {
   public:
-    ProgramList(bool auto_delete = true) : autodelete(auto_delete) {}
-    ~ProgramList();
+    RecordingList(bool auto_delete = true) : autodelete(auto_delete) {}
+    ~RecordingList();
 
-    typedef PGList::iterator iterator;
-    typedef PGList::const_iterator const_iterator;
+    typedef RIList::iterator iterator;
+    typedef RIList::const_iterator const_iterator;
 
-    ProgramInfo *operator[](uint index);
-    const ProgramInfo *operator[](uint index) const;
-    bool operator==(const ProgramList &b) const;
+    RecordingInfo *operator[](uint index);
+    const RecordingInfo *operator[](uint index) const;
+    bool operator==(const RecordingList &b) const;
 
     bool FromScheduler(bool    &hasConflicts,
                        QString  altTable = "",
@@ -58,15 +58,15 @@ class MPUBLIC ProgramList
     };
 
     bool FromProgram(const QString &sql, MSqlBindings &bindings,
-                     ProgramList &schedList, bool oneChanid = false);
+                     RecordingList &schedList, bool oneChanid = false);
 
     bool FromProgram(const QString &sql, MSqlBindings &bindings)
     {
-        ProgramList dummySched;
+        RecordingList dummySched;
         return FromProgram(sql, bindings, dummySched);
     }
 
-    bool FromRecorded( bool bDescending, ProgramList *pSchedList);
+    bool FromRecorded( bool bDescending, RecordingList *pSchedList);
 
     bool FromOldRecorded(const QString &sql, MSqlBindings &bindings);
 
@@ -75,7 +75,7 @@ class MPUBLIC ProgramList
         bool              *hasConflicts = NULL,
         ProgramDetailList *list = NULL);
 
-    ProgramInfo *take(uint i);
+    RecordingInfo *take(uint i);
     iterator erase(iterator it);
     void clear(void);
 
@@ -84,25 +84,25 @@ class MPUBLIC ProgramList
     const_iterator begin(void) const { return pglist.begin(); }
     const_iterator end(void)   const { return pglist.end();   }
 
-    void sort(bool (&f)(const ProgramInfo*, const ProgramInfo*));
+    void sort(bool (&f)(const RecordingInfo*, const RecordingInfo*));
     bool empty(void) const { return pglist.empty(); }
     size_t size(void) const { return pglist.size(); }
-    void push_front(ProgramInfo *pginfo) { pglist.push_front(pginfo); }
-    void push_back(ProgramInfo *pginfo) { pglist.push_back(pginfo); }
+    void push_front(RecordingInfo *pginfo) { pglist.push_front(pginfo); }
+    void push_back(RecordingInfo *pginfo) { pglist.push_back(pginfo); }
 
     // compatibility with old Q3PtrList
     bool isEmpty(void) const { return empty(); }
     size_t count(void) const { return size(); }
-    ProgramInfo *at(uint index) { return (*this)[index]; }
-    void prepend(ProgramInfo *pginfo) { push_front(pginfo); }
-    void append(ProgramInfo *pginfo) { push_back(pginfo); }
+    RecordingInfo *at(uint index) { return (*this)[index]; }
+    void prepend(RecordingInfo *pginfo) { push_front(pginfo); }
+    void append(RecordingInfo *pginfo) { push_back(pginfo); }
     void setAutoDelete(bool auto_delete) { autodelete = auto_delete; }
 
   protected:
-    PGList pglist;
+    RIList pglist;
     bool   autodelete;
 };
 
-#endif // _PROGRAMLIST_H_
+#endif // _RECORDINGLIST_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

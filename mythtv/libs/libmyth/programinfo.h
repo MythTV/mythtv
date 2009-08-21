@@ -1,8 +1,9 @@
-#ifndef PROGRAMINFO_H_
-#define PROGRAMINFO_H_
+#ifndef MYTHPROGRAM_H_
+#define MYTHPROGRAM_H_
 
 // C++ headers
 #include <vector>
+#include <deque>
 using namespace std;
 
 #include <QStringList>
@@ -13,6 +14,8 @@ using namespace std;
 
 #include "recordingtypes.h"
 #include "mythdbcon.h"
+
+extern const char *kPreviewGeneratorInUseID;
 
 typedef QHash<QString,QString> InfoMap;
 
@@ -59,6 +62,31 @@ enum CommFlagStatuses {
     COMM_FLAG_PROCESSING = 2,
     COMM_FLAG_COMMFREE = 3
 };
+
+// This is used as a bitmask.
+typedef enum SkipTypes {
+    COMM_DETECT_COMMFREE    = -2,
+    COMM_DETECT_UNINIT      = -1,
+    COMM_DETECT_OFF         = 0x00000000,
+    COMM_DETECT_BLANK       = 0x00000001,
+    COMM_DETECT_BLANKS      = COMM_DETECT_BLANK,
+    COMM_DETECT_SCENE       = 0x00000002,
+    COMM_DETECT_LOGO        = 0x00000004,
+    COMM_DETECT_BLANK_SCENE = (COMM_DETECT_BLANKS | COMM_DETECT_SCENE),
+    COMM_DETECT_ALL         = (COMM_DETECT_BLANKS |
+                               COMM_DETECT_SCENE |
+                               COMM_DETECT_LOGO),
+    COMM_DETECT_2           = 0x00000100,
+    COMM_DETECT_2_LOGO      = COMM_DETECT_2 | COMM_DETECT_LOGO,
+    COMM_DETECT_2_BLANK     = COMM_DETECT_2 | COMM_DETECT_BLANKS,
+    COMM_DETECT_2_SCENE     = COMM_DETECT_2 | COMM_DETECT_SCENE,
+    /* Scene detection doesn't seem to be too useful (in the USA); there *
+     * are just too many false positives from non-commercial cut scenes. */
+    COMM_DETECT_2_ALL       = (COMM_DETECT_2_LOGO | COMM_DETECT_2_BLANK),
+} SkipType;
+
+MPUBLIC QString SkipTypeToString(int);
+MPUBLIC deque<int> GetPreferredSkipTypeCombinations(void);
 
 enum TranscodingStatuses {
     TRANSCODING_NOT_TRANSCODED = 0,
@@ -161,7 +189,7 @@ enum AutoExpireType {
     kLiveTVAutoExpire = 10000
 };
 
-class PMapDBReplacement
+class MPUBLIC PMapDBReplacement
 {
   public:
     PMapDBReplacement() : lock(new QMutex()) { }
@@ -170,7 +198,15 @@ class PMapDBReplacement
     QMap<MarkTypes,frm_pos_map_t> map;
 };
 
-class ScheduledRecording;
+/** \class ProgramInfo
+ *  \brief Holds information on recordings and videos.
+ *
+ *  ProgramInfo can also contain partial information for a program we wish to
+ *  find in the schedule, and may also contain information on a video we
+ *  wish to view. This class is serializable from frontend to backend and
+ *  back and is the basic unit of information on anything we may wish to
+ *  view or record.
+ */
 
 class MPUBLIC ProgramInfo
 {
@@ -178,18 +214,30 @@ class MPUBLIC ProgramInfo
     // Constructors and bulk set methods.
     ProgramInfo(void);
     ProgramInfo(const ProgramInfo &other);
-    static ProgramInfo *GetProgramAtDateTime(const uint chanid,
-                                             const QDateTime &dtime,
-                                             bool genUnknown = false,
-                                             int clampHoursMax = 0);
+
+    typedef enum {
+        kNoProgram           = 0,
+        kFoundProgram        = 1,
+        kFakedLiveTVProgram  = 2,
+        kFakedZeroMinProgram = 3,
+    } LPADT;
+
+    LPADT LoadProgramAtDateTime(uint chanid,
+                                const QDateTime &dtime,
+                                bool genUnknown = false,
+                                int clampHoursMax = 0);
+
     static ProgramInfo *GetProgramFromBasename(const QString filename);
     static ProgramInfo *GetProgramFromRecorded(const QString &channel,
                                                const QString &starttime);
     static ProgramInfo *GetProgramFromRecorded(const QString &channel,
                                                const QDateTime &dtime);
 
-    ProgramInfo& operator=(const ProgramInfo &other);
-    ProgramInfo& clone(const ProgramInfo &other);
+    ProgramInfo &operator=(const ProgramInfo &other);
+
+    virtual ProgramInfo &clone(const ProgramInfo &other);
+    virtual void clear(void);
+
     bool FromStringList(QStringList::const_iterator &it,
                         QStringList::const_iterator  end);
     bool FromStringList(const QStringList &list, uint offset);
@@ -197,57 +245,26 @@ class MPUBLIC ProgramInfo
     bool FillInRecordInfo(const vector<ProgramInfo *> &reclist);
 
     // Destructor
-    ~ProgramInfo();
+    virtual ~ProgramInfo();
 
     // Serializers
     void Save() const;
     void ToStringList(QStringList &list) const;
-    void ToMap(QHash<QString, QString> &progMap,
-               bool showrerecord = false) const;
+    virtual void ToMap(QHash<QString, QString> &progMap,
+                       bool showrerecord = false) const;
 
     // Used for scheduling recordings
-    int IsProgramRecurring(void) const;
-    bool IsSameProgram(const ProgramInfo& other) const;
-    bool IsSameTimeslot(const ProgramInfo& other) const;
-    bool IsSameProgramTimeslot(const ProgramInfo& other) const;
-    static int GetChannelRecPriority(const QString &channel);
-    static int GetRecordingTypeRecPriority(RecordingType type);
-
-    // Used to query and set ScheduledRecording info
-    ScheduledRecording* GetScheduledRecording(void);
-    int getRecordID(void);
-    int GetAutoRunJobs(void) const;
-    RecordingType GetProgramRecordingStatus(void);
-    QString GetProgramRecordingProfile(void);
-    void ApplyRecordStateChange(RecordingType newstate);
-    void ApplyRecordRecPriorityChange(int);
-    void ToggleRecord(void);
-    void ReactivateRecording(void);
-    void AddHistory(bool resched = true, bool forcedup = false);
-    void DeleteHistory(void);
-    void ForgetHistory(void);
-    void SetDupHistory(void);
-
-    // Used to update database with recording info
-    void StartedRecording(QString ext);
-    void FinishedRecording(bool prematurestop);
-    void UpdateRecordingEnd(void);
-    void ApplyRecordRecID(void);
-    void ApplyRecordRecGroupChange(const QString &newrecgroup);
-    void ApplyRecordPlayGroupChange(const QString &newrecgroup);
-    void ApplyStorageGroupChange(const QString &newstoragegroup);
-    void ApplyRecordRecTitleChange(const QString &newTitle,
-                                   const QString &newSubtitle);
-    void ApplyTranscoderProfileChange(QString);
+    //int IsProgramRecurring(void) const; //not used...
+    bool IsSameProgram(const ProgramInfo &other) const;
+    bool IsSameTimeslot(const ProgramInfo &other) const;
+    bool IsSameProgramTimeslot(const ProgramInfo &other) const;//sched only
+    //static int GetChannelRecPriority(const QString &channel); //not used...
+    static int GetRecordingTypeRecPriority(RecordingType type);//sched only
 
     // Quick gets
-    bool SetRecordBasename(QString basename);
-    QString GetRecordBasename(bool fromDB = false) const;
-    QString GetPlaybackURL(bool checkMaster = false,
-                           bool forceCheckLocal = false);
     QString MakeUniqueKey(void) const;
     int CalculateLength(void) const;
-    int SecsTillStart() const;
+    int SecsTillStart(void) const;
     QString ChannelText(const QString&) const;
     QString RecTypeChar(void) const;
     QString RecTypeText(void) const;
@@ -256,13 +273,17 @@ class MPUBLIC ProgramInfo
     QString RecStatusDesc(void) const;
     void UpdateInUseMark(bool force = false);
     bool PathnameExists(void);
+    QString GetFileName(void) const { return pathname; }
 
     // Quick sets
     /// \brief If "ignore" is true GetBookmark() will return 0, otherwise
     ///        GetBookmark() will return the bookmark position if it exists.
     void setIgnoreBookmark(bool ignore) { ignoreBookmark = ignore; }
 
-    // DB gets
+    // Slow DB gets
+    QString GetRecordBasename(bool fromDB = false) const;
+    QString GetPlaybackURL(bool checkMaster = false,
+                           bool forceCheckLocal = false);
     long long GetFilesize(void);
     int GetMplexID(void) const;
     long long GetBookmark(void) const;
@@ -277,10 +298,9 @@ class MPUBLIC ProgramInfo
     int getProgramFlags(void) const;
     void getProgramProperties(void);
     bool GetChannel(QString &channum, QString &input) const;
-    QString GetFileName(void) const { return pathname; }
     QString toString(void) const;
 
-    // DB sets
+    // Slow DB sets
     void SetFilesize(long long fsize);
     void SetBookmark(long long pos) const;
     void SetDVDBookmark(QStringList fields) const;
@@ -291,6 +311,7 @@ class MPUBLIC ProgramInfo
     void SetCommFlagged(int flag) const; // 1 = flagged, 2 = processing
     void SetAutoExpire(int autoExpire, bool updateDelete = false) const;
     void SetPreserveEpisode(bool preserveEpisode) const;
+    bool SetRecordBasename(const QString &basename);
     void UpdateLastDelete(bool setTime) const;
 
     // Commercial/Edit flagging maps
@@ -328,11 +349,6 @@ class MPUBLIC ProgramInfo
     int GetHeight(void);
     void SetVidpropHeight(int width);
 
-    // GUI stuff
-    void showDetails(void) const;
-    void EditRecording(void);
-    void EditScheduled(void);
-
     // In-use, autodeletion prevention stuff
     void MarkAsInUse(bool inuse, QString usedFor = "");
 
@@ -343,12 +359,7 @@ class MPUBLIC ProgramInfo
     // Translations for play,recording, & storage groups +
     static QString i18n(const QString&);
 
-  private:
-    // GUI helper functions
-    bool IsFindApplicable(void) const;
-    void ShowRecordingDialog(void);
-    void ShowNotRecordingDialog(void);
-
+  protected:
     // Creates a basename from the start and end times
     QString CreateRecordBasename(const QString &ext) const;
 
@@ -434,12 +445,14 @@ class MPUBLIC ProgramInfo
 
     QString sortTitle;
 
-  private:
+  protected:
     bool ignoreBookmark;
-    mutable class ScheduledRecording* record;
 
     QString inUseForWhat;
     PMapDBReplacement *positionMapDBReplacement;
+
+    static QMutex staticDataLock;
+    static QString unknownTitle;
 };
 
 Q_DECLARE_METATYPE(ProgramInfo*)
@@ -455,6 +468,6 @@ class MPUBLIC ProgramDetail
 };
 typedef vector<ProgramDetail> ProgramDetailList;
 
-#endif // PROGRAMINFO_H_
+#endif // MYTHPROGRAM_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

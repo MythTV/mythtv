@@ -8,7 +8,7 @@
 #include "mythmainwindow.h"
 #include "mythscreenstack.h"
 #include "mythsystem.h"
-#include "remoteutil.h"
+#include "tvremoteutil.h"
 
 #include "startprompt.h"
 

@@ -27,6 +27,7 @@ using namespace std;
 #include "dialogbox.h"
 #include "remoteencoder.h"
 #include "remoteutil.h"
+#include "tvremoteutil.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "udpnotify.h"
@@ -56,6 +57,7 @@ using namespace std;
 #include "mythscreentype.h"
 #include "tvosdmenuentry.h"
 #include "tv_play_win.h"
+#include "recordinginfo.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -5953,7 +5955,8 @@ void TV::DoQueueTranscode(PlayerContext *ctx, QString profile)
         }
         else
         {
-            ctx->playingInfo->ApplyTranscoderProfileChange(profile);
+            const RecordingInfo recinfo(*ctx->playingInfo);
+            recinfo.ApplyTranscoderProfileChange(profile);
             QString jobHost = "";
 
             if (db_run_jobs_on_remote)
@@ -8887,11 +8890,9 @@ void TV::BrowseDispInfo(PlayerContext *ctx, int direction)
     }
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-    ProgramInfo *program_info =
-        ProgramInfo::GetProgramAtDateTime(browsechanid, startts);
-    if (program_info)
-        program_info->ToMap(infoMap);
-    delete program_info;
+    ProgramInfo pi;
+    pi.LoadProgramAtDateTime(browsechanid, startts);
+    pi.ToMap(infoMap);
 
     osd->ClearAllText("browse_info");
     osd->SetText("browse_info", infoMap, -1);
@@ -8919,10 +8920,13 @@ void TV::ToggleRecord(PlayerContext *ctx)
         QDateTime startts = QDateTime::fromString(
             browsestarttime, Qt::ISODate);
 
-        ProgramInfo *program_info =
-            ProgramInfo::GetProgramAtDateTime(browsechanid, startts);
-        program_info->ToggleRecord();
-        program_info->ToMap(infoMap);
+        RecordingInfo recinfo;
+        if (RecordingInfo::kNoProgram !=
+            recinfo.LoadProgramAtDateTime(browsechanid, startts))
+        {
+            recinfo.ToggleRecord();
+        }
+        recinfo.ToMap(infoMap);
 
         OSD *osd = GetOSDLock(ctx);
         if (osd)
@@ -8933,7 +8937,6 @@ void TV::ToggleRecord(PlayerContext *ctx)
             osd->SetSettingsText(tr("Record"), 3);
         }
         ReturnOSDLock(ctx, osd);
-        delete program_info;
         return;
     }
 
@@ -8948,8 +8951,11 @@ void TV::ToggleRecord(PlayerContext *ctx)
     QString cmdmsg("");
     if (ctx->playingInfo->GetAutoExpireFromRecorded() == kLiveTVAutoExpire)
     {
-        ctx->playingInfo->SetAutoExpire(db_autoexpire_default);
-        ctx->playingInfo->ApplyRecordRecGroupChange("Default");
+        RecordingInfo recInfo(*ctx->playingInfo);
+        recInfo.SetAutoExpire(db_autoexpire_default);
+        recInfo.ApplyRecordRecGroupChange("Default");
+        *ctx->playingInfo = recInfo;
+
         cmdmsg = tr("Record");
         ctx->SetPseudoLiveTV(ctx->playingInfo, kPseudoRecording);
         ctx->recorder->SetLiveRecording(true);
@@ -8957,8 +8963,11 @@ void TV::ToggleRecord(PlayerContext *ctx)
     }
     else
     {
-        ctx->playingInfo->SetAutoExpire(kLiveTVAutoExpire);
-        ctx->playingInfo->ApplyRecordRecGroupChange("LiveTV");
+        RecordingInfo recInfo(*ctx->playingInfo);
+        recInfo.SetAutoExpire(kLiveTVAutoExpire);
+        recInfo.ApplyRecordRecGroupChange("LiveTV");
+        *ctx->playingInfo = recInfo;
+
         cmdmsg = tr("Cancel Record");
         ctx->SetPseudoLiveTV(ctx->playingInfo, kPseudoNormalLiveTV);
         ctx->recorder->SetLiveRecording(false);

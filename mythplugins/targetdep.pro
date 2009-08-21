@@ -15,7 +15,6 @@ mingw : LIBDIR = $${PREFIX}/bin
 
 TARGETDEPS += $${LIBDIR}/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythdb-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythtv-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythui-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythupnp-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythavutil-$${MYTH_SHLIB_EXT}

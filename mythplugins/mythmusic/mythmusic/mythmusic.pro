@@ -16,13 +16,8 @@ TARGET = mythmusic
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
-LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+LIBS += -lmythavformat-$$LIBVERSION
 LIBS += -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
-
-# Other libs which libmythtv depends on:
-using_hdhomerun: LIBS += -lmythhdhomerun-$$LIBVERSION
-using_live:      LIBS += -lmythlivemedia-$$LIBVERSION
-using_mheg:      LIBS += -lmythfreemheg-$$LIBVERSION
 
 cdaudio: LIBS += -lcdaudio
 paranoia:LIBS += -lcdda_paranoia -lcdda_interface

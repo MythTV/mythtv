@@ -1,7 +1,7 @@
 #ifndef _COMMDETECTOR_FACTORY_H_
 #define _COMMDETECTOR_FACTORY_H_
 
-#include "channelutil.h"
+#include "programinfo.h"
 
 class CommDetectorBase;
 class NuppelVideoPlayer;

@@ -85,15 +85,15 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleQueryRecordings(QString type, PlaybackSock *pbs);
     void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
-    void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
+    void DoHandleStopRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
     void HandleDeleteRecording(QString &chanid, QString &starttime,
                                PlaybackSock *pbs, bool forceMetadataDelete);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
                                bool forceMetadataDelete);
-    void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
+    void DoHandleDeleteRecording(RecordingInfo &recinfo, PlaybackSock *pbs,
                                  bool forceMetadataDelete, bool expirer=false);
     void HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs);
-    void DoHandleUndeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
+    void DoHandleUndeleteRecording(RecordingInfo &recinfo, PlaybackSock *pbs);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
     void HandleGoToSleep(PlaybackSock *pbs);

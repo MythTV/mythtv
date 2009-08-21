@@ -15,7 +15,7 @@
 #include "inputinfo.h"
 #include "inputgroupmap.h"
 #include "mythdeque.h"
-#include "programinfo.h"
+#include "recordinginfo.h"
 #include "tv.h"
 #include "signalmonitorlistener.h"
 
@@ -117,7 +117,7 @@ class TuningRequest
     TuningRequest(uint f) :
         flags(f), program(NULL), channel(QString::null),
         input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
-    TuningRequest(uint f, ProgramInfo *p) :
+    TuningRequest(uint f, RecordingInfo *p) :
         flags(f), program(p), channel(QString::null),
         input(QString::null), majorChan(0), minorChan(0), progNum(-1) {;}
     TuningRequest(uint f, QString ch, QString in = QString::null) :
@@ -130,7 +130,7 @@ class TuningRequest
 
   public:
     uint         flags;
-    ProgramInfo *program;
+    RecordingInfo *program;
     QString      channel;
     QString      input;
     uint         majorChan;
@@ -323,15 +323,15 @@ class MPUBLIC TVRec : public SignalMonitorListener
     void HandlePendingRecordings(void);
 
     bool WaitForNextLiveTVDir(void);
-    bool GetProgramRingBufferForLiveTV(ProgramInfo **pginfo, RingBuffer **rb);
+    bool GetProgramRingBufferForLiveTV(RecordingInfo **pginfo, RingBuffer **rb);
     bool CreateLiveTVRingBuffer(void);
     bool SwitchLiveTVRingBuffer(bool discont = false, bool set_rec = true);
 
-    void StartedRecording(ProgramInfo*);
-    void FinishedRecording(ProgramInfo*);
+    void StartedRecording(RecordingInfo*);
+    void FinishedRecording(RecordingInfo*);
     QDateTime GetRecordEndTime(const ProgramInfo*) const;
     void CheckForRecGroupChange(void);
-    void NotifySchedulerOfRecording(ProgramInfo*);
+    void NotifySchedulerOfRecording(RecordingInfo*);
 
     // Various components TVRec coordinates
     RecorderBase     *recorder;
@@ -383,7 +383,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     bool           m_switchingBuffer;
 
     // Current recording info
-    ProgramInfo *curRecording;
+    RecordingInfo *curRecording;
     QDateTime    recordEndTime;
     int          autoRunJobs;
     int          overrecordseconds;

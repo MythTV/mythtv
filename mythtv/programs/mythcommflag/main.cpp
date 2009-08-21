@@ -31,6 +31,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "remoteutil.h"
+#include "tvremoteutil.h"
 #include "jobqueue.h"
 #include "remoteencoder.h"
 #include "RingBuffer.h"

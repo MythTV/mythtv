@@ -9,7 +9,7 @@ using namespace std;
 #include <QDateTime>
 
 // MythTV headers
-#include "channelutil.h"
+#include "programinfo.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"

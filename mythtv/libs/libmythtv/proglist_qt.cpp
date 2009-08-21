@@ -29,6 +29,7 @@ using namespace std;
 #include "channelutil.h"
 #include "mythdb.h"
 #include "mythuihelper.h"
+#include "recordinginfo.h"
 
 ProgListerQt::ProgListerQt(ProgListTypeQt pltype,
                        const QString &view, const QString &from,
@@ -1144,7 +1145,9 @@ void ProgListerQt::quickRecord()
     if (!pi)
         return;
 
-    pi->ToggleRecord();
+    RecordingInfo ri(*pi);
+    ri.ToggleRecord();
+    *pi = ri;
 }
 
 void ProgListerQt::select()
@@ -1154,7 +1157,9 @@ void ProgListerQt::select()
     if (!pi)
         return;
 
-    pi->EditRecording();
+    RecordingInfo ri(*pi);
+    ri.EditRecording();
+    *pi = ri;
 }
 
 void ProgListerQt::edit()
@@ -1164,7 +1169,9 @@ void ProgListerQt::edit()
     if (!pi)
         return;
 
-    pi->EditScheduled();
+    RecordingInfo ri(*pi);
+    ri.EditScheduled();
+    *pi = ri;
 }
 
 void ProgListerQt::customEdit()
@@ -1224,7 +1231,10 @@ void ProgListerQt::details()
     ProgramInfo *pi = itemList.at(curItem);
 
     if (pi)
-        pi->showDetails();
+    {
+        const RecordingInfo ri(*pi);
+        ri.showDetails();
+    }
 }
 
 void ProgListerQt::fillViewList(const QString &view)

@@ -11,18 +11,18 @@
 #include <QApplication>
 
 // mythtv
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythdb/mythdb.h>
-#include <mythtv/libmythtv/programinfo.h>
-#include <mythtv/libmythtv/remoteutil.h>
-#include <mythtv/libmythdb/mythtimer.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuiimage.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythmainwindow.h>
-#include <libmythui/mythprogressdialog.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <programinfo.h>
+#include <remoteutil.h>
+#include <mythtimer.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuiimage.h>
+#include <mythuibuttonlist.h>
+#include <mythmainwindow.h>
+#include <mythprogressdialog.h>
+#include <mythdialogbox.h>
 
 // mytharchive
 #include "recordingselector.h"

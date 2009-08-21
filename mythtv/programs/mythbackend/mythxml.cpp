@@ -1685,8 +1685,9 @@ void MythXML::FillProgramInfo(QDomDocument *pDoc,
             recording.setAttribute( "dupInType"     , pInfo->dupin       );
             recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
             recording.setAttribute( "encoderId"     , pInfo->cardid      );
+            const RecordingInfo ri(*pInfo);
             recording.setAttribute( "recProfile"    ,
-                                    pInfo->GetProgramRecordingProfile());
+                                    ri.GetProgramRecordingProfile());
             //recording.setAttribute( "preRollSeconds", m_nPreRollSeconds );
         }
     }

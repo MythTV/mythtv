@@ -8,22 +8,17 @@ using namespace std;
 #include <QApplication>
 #include <QRegExp>
 
-// myth
+// MythTV
 #include "mythcontext.h"
-
-// mythtv
 #include "proglist.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "remoteutil.h"
 #include "channelutil.h"
-
-// mythdb
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythdbcon.h"
-#include "libmythdb/mythverbose.h"
-
-// mythui
+#include "recordinginfo.h"
+#include "mythdb.h"
+#include "mythdbcon.h"
+#include "mythverbose.h"
 #include "mythuitext.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
@@ -603,7 +598,9 @@ void ProgLister::quickRecord()
     if (!pi)
         return;
 
-    pi->ToggleRecord();
+    RecordingInfo ri(*pi);
+    ri.ToggleRecord();
+    *pi = ri;
 }
 
 void ProgLister::select()
@@ -616,7 +613,11 @@ void ProgLister::select()
     if (m_type == plPreviouslyRecorded)
         deleteOldRecorded();
     else
-        pi->EditRecording();
+    {
+        RecordingInfo ri(*pi);
+        ri.EditRecording();
+        *pi = ri;
+    }
 }
 
 void ProgLister::edit()
@@ -626,7 +627,9 @@ void ProgLister::edit()
     if (!pi)
         return;
 
-    pi->EditScheduled();
+    RecordingInfo ri(*pi);
+    ri.EditScheduled();
+    *pi = ri;
 }
 
 void ProgLister::customEdit()
@@ -766,7 +769,10 @@ void ProgLister::details()
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
     if (pi)
-        pi->showDetails();
+    {
+        const RecordingInfo ri(*pi);
+        ri.showDetails();
+    }
 }
 
 void ProgLister::fillViewList(const QString &view)
@@ -1634,13 +1640,21 @@ void ProgLister::customEvent(QEvent *event)
             {
                 ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
                 if (pi)
-                    pi->ForgetHistory();
+                {
+                    RecordingInfo ri(*pi);
+                    ri.ForgetHistory();
+                    *pi = ri;
+                }
             }
             else if (resulttext == tr("Never record this episode"))
             {
                 ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
                 if (pi)
-                    pi->SetDupHistory();
+                {
+                    RecordingInfo ri(*pi);
+                    ri.SetDupHistory();
+                    *pi = ri;
+                }
             }
             else if (resulttext == tr("Remove this episode from the list"))
             {

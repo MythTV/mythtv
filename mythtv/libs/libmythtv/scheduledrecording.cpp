@@ -6,7 +6,6 @@
 #include <QSqlError>
 
 #include "scheduledrecording.h"
-#include "programinfo.h"
 #include "recordingprofile.h"
 #include "mythcontext.h"
 #include "proglist_qt.h"
@@ -18,6 +17,7 @@
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "viewschdiff.h"
+#include "recordinginfo.h"
 
 // NOTE: if this changes, you _MUST_ update the RecTypePriority function
 // in recordingtypes.cpp.
@@ -639,7 +639,10 @@ void ScheduledRecording::runPrevList(void)
 void ScheduledRecording::runShowDetails(void)
 {
     if (m_pginfo)
-        m_pginfo->showDetails();
+    {
+        const RecordingInfo ri(*m_pginfo);
+        ri.showDetails();
+    }
 }
 
 void ScheduledRecording::fillSelections(SelectSetting* setting)

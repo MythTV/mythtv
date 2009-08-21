@@ -3,6 +3,9 @@ include ( ../programs-libs.pro )
 
 QT += network xml sql
 
+INCLUDEPATH += ../../libs/libmythtv/channelscan
+DEPENDPATH += ../../libs/libmythtv/channelscan
+
 TEMPLATE = app
 CONFIG += thread
 TARGET = mythtv-setup

@@ -1,11 +1,11 @@
 #ifndef _BACKENDUTIL_H
 #define _BACKENDUTIL_H
 
-#include <qstringlist.h>
+#include <QStringList>
 
-#include "libmythtv/remoteutil.h"
+#include "remoteutil.h"
 #include "encoderlink.h"
-#include "libmythtv/programinfo.h"
+#include "programinfo.h"
 
 void BackendQueryDiskSpace(QStringList &strlist,
                            QMap <int, EncoderLink *> *encoderList,

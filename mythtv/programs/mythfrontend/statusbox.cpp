@@ -22,7 +22,7 @@ using namespace std;
 #include "tv.h"
 #include "jobqueue.h"
 #include "cardutil.h"
-#include "programinfo.h"
+#include "recordinginfo.h"
 #include "programlist.h"
 
 #include "mythuihelper.h"
@@ -460,7 +460,11 @@ void StatusBox::customEvent(QEvent *event)
                     rec->SetAutoExpire(0);
 
                     if ((rec)->recgroup == "LiveTV")
-                        rec->ApplyRecordRecGroupChange("Default");
+                    {
+                        RecordingInfo ri(*rec);
+                        ri.ApplyRecordRecGroupChange("Default");
+                        *rec = ri;
+                    }
                 }
             }
             doAutoExpireList();

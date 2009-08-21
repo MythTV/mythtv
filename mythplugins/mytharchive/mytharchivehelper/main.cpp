@@ -1,10 +1,36 @@
+/* -*- Mode: c++ -*-
+ * vim: set expandtab tabstop=4 shiftwidth=4:
+ *
+ * Original Project
+ *      MythTV      http://www.mythtv.org
+ *
+ * Copyright (c) 2004, 2005 John Pullan <john@pullan.org>
+ * Copyright (c) 2009, Janne Grunau <janne-mythtv@grunau.be>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
+ *
+ */
+
 #include <iostream>
 #include <stdint.h>
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 #include <unistd.h>
 #include <cstdlib>
 
-#include <mythtv/mythconfig.h>
+#include <mythconfig.h>
 #if CONFIG_DARWIN
 #include <sys/param.h>
 #include <sys/mount.h>
@@ -21,20 +47,22 @@ using namespace std;
 #include <QDir>
 #include <QDomElement>
 #include <QImage>
+#include <QMutex>
+#include <QMutexLocker>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/util.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/exitcodes.h>
-#include <mythtv/libmythdb/mythdb.h>
-#include <mythtv/libmythtv/programinfo.h>
-#include <mythtv/mythdirs.h>
-#include <mythtv/mythconfig.h>
-#include <mythtv/libmythtv/myth_imgconvert.h>
+#include <mythcontext.h>
+#include <util.h>
+#include <mythversion.h>
+#include <exitcodes.h>
+#include <mythdb.h>
+#include <programinfo.h>
+#include <mythdirs.h>
+#include <mythconfig.h>
 extern "C" {
-#include <mythtv/libavcodec/avcodec.h>
-#include <mythtv/libavformat/avformat.h>
+#include <avcodec.h>
+#include <avformat.h>
+#include <swscale.h>
 #include "pxsup2dast.h"
 }
 
@@ -1738,6 +1766,32 @@ int doImportArchive(const QString &inFile, int chanID)
     return na.doImportArchive(inFile, chanID);
 }
 
+// Note: copied this function from myth_imgconvert.cpp -- dtk 2009-08-17
+static int myth_sws_img_convert(
+    AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src,
+    PixelFormat pix_fmt, int width, int height)
+{
+    static QMutex lock;
+    QMutexLocker locker(&lock);
+
+    static struct SwsContext *convert_ctx;
+
+    convert_ctx = sws_getCachedContext(convert_ctx, width, height, pix_fmt,
+                                       width, height, dst_pix_fmt,
+                                       SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    if (!convert_ctx)
+    {
+        VERBOSE(VB_IMPORTANT, "myth_sws_img_convert: Cannot initialize "
+                "the image conversion context");
+        return -1;
+    }
+
+    sws_scale(convert_ctx, src->data, src->linesize,
+              0, height, dst->data, dst->linesize);
+
+    return 0;
+}
+
 int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
 {
     av_register_all();
@@ -1878,6 +1932,7 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
                         avpicture_deinterlace((AVPicture*)frame,
                                               (AVPicture*)frame,
                                               codecCtx->pix_fmt, width, height);
+
 
                         myth_sws_img_convert(
                                     &retbuf, PIX_FMT_RGB32,

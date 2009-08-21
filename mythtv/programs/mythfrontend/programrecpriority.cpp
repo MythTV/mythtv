@@ -22,11 +22,11 @@ using namespace std;
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
 
-// overloaded version of ProgramInfo with additional recording priority
+// overloaded version of RecordingInfo with additional recording priority
 // values so we can keep everything together and don't
 // have to hit the db mulitiple times
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
-    ProgramInfo(),
+    RecordingInfo(),
     recTypeRecPriority(0), recType(kNotRecording),
     matchCount(0),         recCount(0),
     avg_delay(0),          autoRecPriority(0),
@@ -36,7 +36,7 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
 
 ProgramRecPriorityInfo::ProgramRecPriorityInfo(
     const ProgramRecPriorityInfo &other) :
-    ProgramInfo::ProgramInfo(other),
+    RecordingInfo::RecordingInfo(other),
     recTypeRecPriority(other.recTypeRecPriority),
     recType(other.recType),
     matchCount(other.matchCount),
@@ -45,18 +45,47 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(
     autoRecPriority(other.autoRecPriority),
     profile(other.profile)
 {
-    // TODO CHECK: should last_record be initialized too? -- dtk 22-12-2008
 }
 
 ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
     const ProgramInfo &other)
 {
-    (*(ProgramInfo*)(this)) = other;
+    return clone(other);
+}
 
-#if 0
-    // TODO: check if these really should be initialized here..
-    //       seems like they should, but I don't want to break
-    //       anything... -- dtk 22-12-2008
+ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
+    const ProgramRecPriorityInfo &other)
+{
+    return clone(other);
+}
+
+ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
+    const RecordingInfo &other)
+{
+    return clone((ProgramInfo&)other);
+}
+
+ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(
+    const ProgramRecPriorityInfo &other)
+{
+    RecordingInfo::clone(other);
+
+    recTypeRecPriority = other.recTypeRecPriority;
+    recType            = other.recType;
+    matchCount         = other.matchCount;
+    recCount           = other.recCount;
+    last_record        = other.last_record;
+    avg_delay          = other.avg_delay;
+    autoRecPriority    = other.autoRecPriority;
+    profile            = other.profile;
+
+    return *this;
+}
+
+ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(const ProgramInfo &other)
+{
+    RecordingInfo::clone(other);
+
     recTypeRecPriority = 0;
     recType            = kNotRecording;
     matchCount         = 0;
@@ -65,11 +94,23 @@ ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
     avg_delay          = 0;
     autoRecPriority    = 0;
     profile            = "";
-#endif
 
     return *this;
 }
 
+void ProgramRecPriorityInfo::clear(void)
+{
+    RecordingInfo::clear();
+
+    recTypeRecPriority = 0;
+    recType            = kNotRecording;
+    matchCount         = 0;
+    recCount           = 0;
+    last_record        = QDateTime();
+    avg_delay          = 0;
+    autoRecPriority    = 0;
+    profile            = "";
+}
 
 typedef struct RecPriorityInfo
 {

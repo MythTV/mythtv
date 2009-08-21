@@ -11,7 +11,7 @@
 #include "mythcontext.h"
 #include "mythexp.h" // MPUBLIC - Symbol Visibility
 #include "mpegdescriptors.h"
-#include "../programinfo.h" // for subtitle types and audio and video properties
+#include "programinfo.h" // for subtitle types and audio and video properties
 
 using namespace std;
 

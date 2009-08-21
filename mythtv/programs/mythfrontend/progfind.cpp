@@ -13,7 +13,7 @@
 
 // myth
 #include "customedit.h"
-#include "programinfo.h"
+#include "recordinginfo.h"
 #include "oldsettings.h"
 #include "tv.h"
 #include "guidegrid.h"
@@ -409,10 +409,12 @@ void ProgFinder::getInfo(bool toggle)
 
         if (curPick)
         {
+            RecordingInfo ri(*curPick);
             if (toggle)
-                curPick->ToggleRecord();
+                ri.ToggleRecord();
             else
-                curPick->EditRecording();
+                ri.EditRecording();
+            *curPick = ri;
         }
         else
             return;
@@ -467,15 +469,16 @@ void ProgFinder::upcoming()
 
 void ProgFinder::details()
 {
-    if (GetFocusWidget() == m_timesList)
-    {
-        ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
+    if (GetFocusWidget() != m_timesList)
+        return;
 
-        if (!curPick)
-            return;
+    ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
 
-        curPick->showDetails();
-    }
+    if (!curPick)
+        return;
+
+    const RecordingInfo ri(*curPick);
+    ri.showDetails();
 }
 
 void ProgFinder::quickRecord()

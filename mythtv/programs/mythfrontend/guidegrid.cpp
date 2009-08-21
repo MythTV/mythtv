@@ -1847,7 +1847,9 @@ void GuideGrid::quickRecord()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    pginfo->ToggleRecord();
+    RecordingInfo ri(*pginfo);
+    ri.ToggleRecord();
+    *pginfo = ri;
 
     m_recList.FromScheduler();
     fillProgramInfos();
@@ -1864,9 +1866,10 @@ void GuideGrid::editRecording()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
-    temppginfo->EditRecording();
-    delete temppginfo;
+    RecordingInfo ri(*pginfo);
+    ri.EditRecording();
+    // we don't want to update pginfo, it will instead be updated
+    // when the scheduler is done..
 
     m_recList.FromScheduler();
     fillProgramInfos();
@@ -1883,9 +1886,10 @@ void GuideGrid::editScheduled()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    ProgramInfo *temppginfo = new ProgramInfo(*pginfo);
-    temppginfo->EditScheduled();
-    delete temppginfo;
+    RecordingInfo ri(*pginfo);
+    ri.EditScheduled();
+    // we don't want to update pginfo, it will instead be updated
+    // when the scheduler is done..
 
     m_recList.FromScheduler();
     fillProgramInfos();
@@ -1962,7 +1966,8 @@ void GuideGrid::details()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    pginfo->showDetails();
+    const RecordingInfo ri(*pginfo);
+    ri.showDetails();
 }
 
 void GuideGrid::channelUpdate(void)

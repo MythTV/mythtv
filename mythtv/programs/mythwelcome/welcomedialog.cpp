@@ -20,6 +20,7 @@
 #include "uitypes.h"
 #include "compat.h"
 #include "mythdirs.h"
+#include "remoteutil.h"
 
 #include "welcomedialog.h"
 #include "welcomesettings.h"

@@ -30,6 +30,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "mythdb.h"
 #include "mythuihelper.h"
+#include "recordinginfo.h"
 
 PreviousList::PreviousList(MythMainWindow *parent, const char *name,
                          int recid, QString ltitle)
@@ -395,7 +396,9 @@ void PreviousList::edit()
     if (!pi)
         return;
 
-    pi->EditScheduled();
+    RecordingInfo ri(*pi);
+    ri.EditScheduled();
+    *pi = ri;
 }
 
 void PreviousList::customEdit()
@@ -426,7 +429,10 @@ void PreviousList::details()
     ProgramInfo *pi = itemList.at(curItem);
 
     if (pi)
-        pi->showDetails();
+    {
+        RecordingInfo ri(*pi);
+        ri.showDetails();
+    }
 }
 
 void PreviousList::fillViewList(const QString &view)
@@ -765,9 +771,17 @@ void PreviousList::removalDialog()
         fillItemList();
     }
     else if (ret == cleardup)
-        pi->ForgetHistory();
+    {
+        RecordingInfo ri(*pi);
+        ri.ForgetHistory();
+        *pi = ri;
+    }
     else if (ret == setdup)
-        pi->SetDupHistory();
+    {
+        RecordingInfo ri(*pi);
+        ri.SetDupHistory();
+        *pi = ri;
+    }
 }
 
 void PreviousList::deleteItem()
