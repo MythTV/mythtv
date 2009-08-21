@@ -76,6 +76,8 @@ class Scheduler : public QObject
     void GetNextLiveTVDir(int cardid);
     void ResetIdleTime(void);
 
+    bool WasStartedAutomatically();
+
     int GetError(void) const { return error; }
 
   protected:
@@ -131,8 +133,6 @@ class Scheduler : public QObject
     void PutInactiveSlavesToSleep(void);
     bool WakeUpSlave(QString slaveHostname, bool setWakingStatus = true);
     void WakeUpSlaves(void);
-
-    bool WasStartedAutomatically();
 
     int FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
     void FillDirectoryInfoCache(bool force = false);
