@@ -93,8 +93,10 @@ class MPUBLIC ChannelScanner
     /// imported channels
     DTVChannelList      channels;
 
-    /// import/update only fta channels
+    /// import/update only fta channels, input connection setting
     bool                m_fta_only;
+    /// add radio services on import/update, input connection setting
+    bool                m_audio_only;
 };
 
 #endif // _CHANNEL_SCANNER_H_

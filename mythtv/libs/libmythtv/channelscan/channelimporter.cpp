@@ -65,8 +65,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
 
     CleanupDuplicates(transports);
 
-    if (m_fta_only)
-        CleanupEncrypted(transports);
+    FilterServices(transports);
 
     // Pull in DB info
     uint sourceid = transports[0].channels[0].source_id;
@@ -573,18 +572,28 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
     transports = no_dups;
 }
 
-void ChannelImporter::CleanupEncrypted(ScanDTVTransportList &transports) const
+void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 {
     for (uint i = 0; i < transports.size(); i++)
     {
-        ChannelInsertInfoList fta_only;
+        ChannelInsertInfoList filtered;
         for (uint k = 0; k < transports[i].channels.size(); k++)
         {
-            if (!transports[i].channels[k].is_encrypted ||
-                transports[i].channels[k].decryption_status == kEncDecrypted)
-                fta_only.push_back(transports[i].channels[k]);
+            if (m_fta_only &&
+                (transports[i].channels[k].is_encrypted ||
+                 transports[i].channels[k].decryption_status != kEncDecrypted))
+                continue;
+
+            if (transports[i].channels[k].is_data_service)
+                continue;
+
+            if (!m_add_radio_services &&
+                transports[i].channels[k].is_audio_service)
+                continue;
+
+            filtered.push_back(transports[i].channels[k]);
         }
-        transports[i].channels = fta_only;
+        transports[i].channels = filtered;
     }
 }
 

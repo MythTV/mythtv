@@ -127,10 +127,10 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::ExistingScanImport)
     {
         do_scan = false;
-        bool fta_only = false;
+        bool fta_only = false, radio_services = false;
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT freetoaironly "
+        query.prepare("SELECT freetoaironly, radioservices "
                       "FROM cardinput "
                       "WHERE sourceid = :SOURCEID AND "
                       "      cardid   = :CARDID");
@@ -138,11 +138,14 @@ void ScanWizard::SetPage(const QString &pageTitle)
         query.bindValue(":SOURCEID", sourceid);
 
         if (query.exec() && query.next())
-            fta_only = query.value(0).toBool();
+        {
+            fta_only       = query.value(0).toBool();
+            radio_services = query.value(1).toBool();
+        }
 
         uint scanid = configPane->GetScanID();
         ScanDTVTransportList transports = LoadScan(scanid);
-        ChannelImporter ci(true, true, true, false, fta_only);
+        ChannelImporter ci(true, true, true, false, fta_only, radio_services);
         ci.Process(transports);
     }
     else

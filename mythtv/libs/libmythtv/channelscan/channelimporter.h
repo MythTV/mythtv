@@ -74,9 +74,11 @@ class ChannelImporterUniquenessStats
 class MPUBLIC ChannelImporter
 {
   public:
-    ChannelImporter(bool gui, bool interactive, bool insert, bool save, bool only_fta) :
+    ChannelImporter(bool gui, bool interactive, bool insert, bool save,
+                    bool only_fta, bool add_radio_services) :
         use_gui(gui), is_interactive(interactive),
-        do_insert(insert), do_save(save), m_fta_only(only_fta) { }
+        do_insert(insert), do_save(save), m_fta_only(only_fta),
+        m_add_radio_services(add_radio_services) { }
 
     void Process(const ScanDTVTransportList&);
 
@@ -119,7 +121,7 @@ class MPUBLIC ChannelImporter
     QString toString(ChannelType type);
 
     void CleanupDuplicates(ScanDTVTransportList &transports) const;
-    void CleanupEncrypted(ScanDTVTransportList &transports) const;
+    void FilterServices(ScanDTVTransportList &transports) const;
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;
 
@@ -203,6 +205,7 @@ class MPUBLIC ChannelImporter
     bool do_insert;
     bool do_save;
     bool m_fta_only;
+    bool m_add_radio_services;
 };
 
 #endif // _CHANNEL_IMPORTER_H_

@@ -46,7 +46,8 @@
 #define LOC_ERR QString("ChScan, Error: ")
 
 ChannelScanner::ChannelScanner() :
-    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), freeboxScanner(NULL), m_fta_only(false)
+    scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), freeboxScanner(NULL),
+    m_fta_only(false), m_audio_only(false)
 {
 }
 
@@ -121,7 +122,7 @@ void ChannelScanner::Scan(
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT freetoaironly "
+    query.prepare("SELECT freetoaironly, radioservices"
                   "FROM cardinput "
                   "WHERE sourceid = :SOURCEID AND "
                   "      cardid   = :CARDID");
@@ -129,7 +130,10 @@ void ChannelScanner::Scan(
     query.bindValue(":SOURCEID", sourceid);
     
     if (query.exec() && query.next())
-        m_fta_only = query.value(0).toBool();
+    {
+        m_fta_only     = query.value(0).toBool();
+        m_audio_only   = query.value(1).toBool();
+    }
 
     sigmonScanner->StartScanner();
     scanMonitor->ScanUpdateStatusText("");
