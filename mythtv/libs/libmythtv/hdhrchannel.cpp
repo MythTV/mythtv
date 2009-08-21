@@ -377,7 +377,7 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
  
     VERBOSE(VB_CHANNEL, LOC + "Failed. Now trying " + chan); 
  
-    if (_stream_handler->TuneChannel(chan)) 
+    if (hdhomerun_device_set_tuner_channel(_hdhomerun_device, chan) > 0)
     { 
         SetSIStandard(si_std); 
         return true; 
