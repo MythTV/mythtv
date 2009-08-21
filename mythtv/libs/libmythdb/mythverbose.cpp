@@ -7,18 +7,27 @@
 #define GENERIC_EXIT_OK                             0
 #define GENERIC_EXIT_INVALID_CMDLINE              252
 
+const unsigned int verboseDefaultInt = VB_IMPORTANT | VB_GENERAL;
+const char        *verboseDefaultStr = " important general";
+
 QMutex verbose_mutex;
-unsigned int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
-QString verboseString = QString(" important general");
+unsigned int print_verbose_messages = verboseDefaultInt;
+QString verboseString = QString(verboseDefaultStr);
 
 int parse_verbose_arg(QString arg)
 {
     QString option;
     bool reverseOption;
 
+    verbose_mutex.lock();
+
+    print_verbose_messages = verboseDefaultInt;
+    verboseString = QString(verboseDefaultStr);
+
     if (arg.startsWith('-'))
     {
         qDebug() << "Invalid or missing argument to -v/--verbose option\n";
+        verbose_mutex.unlock();
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     else
@@ -66,7 +75,13 @@ int parse_verbose_arg(QString arg)
                   "\n" <<
                   "Some debug levels may not apply to this program.\n" <<
                   endl;
+                verbose_mutex.unlock();
                 return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+            else if (option == "default")
+            {
+                print_verbose_messages = verboseDefaultInt;
+                verboseString = QString(verboseDefaultStr);
             }
 
 #define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
@@ -98,10 +113,16 @@ int parse_verbose_arg(QString arg)
             {
                 qDebug() << "Unknown argument for -v/--verbose: "
                          << option << endl;;
+                verbose_mutex.unlock();
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
         }
     }
+
+    verbose_mutex.unlock();
+
+    VERBOSE(VB_IMPORTANT,
+            QString("Enabled verbose msgs: %1").arg(verboseString));
 
     return GENERIC_EXIT_OK;
 }

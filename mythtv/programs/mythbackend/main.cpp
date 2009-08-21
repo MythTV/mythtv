@@ -464,6 +464,8 @@ void showUsage(const MythCommandLineParser &cmdlineparser, const QString &versio
     "-p or --pidfile filename       Write PID of mythbackend to filename" << endl <<
     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
+    "--setverbose debug-level       Change debug level of running master backend" << endl <<
+
     "--printexpire                  List of auto-expire programs" << endl <<
     "--printsched                   Upcoming scheduled programs" << endl <<
     "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<
@@ -536,6 +538,8 @@ int main(int argc, char **argv)
     bool daemonize = false;
     bool printsched = false;
     bool testsched = false;
+    bool setverbose = false;
+    QString newverbose = "";
     bool resched = false;
     bool nosched = false;
     bool noupnp = false;
@@ -605,6 +609,20 @@ int main(int argc, char **argv)
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
         }
+        else if (!strcmp(a.argv()[argpos],"--setverbose"))
+        {
+            setverbose = true;
+            if (a.argc()-1 > argpos)
+            {
+                newverbose = a.argv()[argpos+1];
+                ++argpos;
+            } 
+            else
+            {
+                cerr << "Missing argument to --setverbose option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+        } 
         else if (!strcmp(a.argv()[argpos],"--printsched"))
         {
             printsched = true;
@@ -818,6 +836,27 @@ int main(int argc, char **argv)
         rebuildit->BuildMediaMap();
 
         return BACKEND_EXIT_OK;
+    }
+
+    if (setverbose)
+    {
+        gContext->SetBackend(false);
+
+        if (gContext->ConnectToMasterServer())
+        {
+            QString message = "SET_VERBOSE "; 
+            message += newverbose;
+
+            RemoteSendMessage(message);
+            VERBOSE(VB_IMPORTANT, QString("Sent '%1' message").arg(message));
+            return BACKEND_EXIT_OK;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "Unable to connect to backend, verbose level unchanged ");
+            return BACKEND_EXIT_NO_CONNECT;
+        }
     }
 
     if (clearsettingscache)

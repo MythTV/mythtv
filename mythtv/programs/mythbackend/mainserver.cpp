@@ -521,7 +521,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MESSAGE")
     {
-        HandleMessage(listline, pbs);
+        if (listline[1].left(11) == "SET_VERBOSE")
+            HandleSetVerbose(listline, pbs);
+        else
+            HandleMessage(listline, pbs);
     }
     else if (command == "FILL_PROGRAM_INFO")
     {
@@ -4250,6 +4253,29 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     gContext->dispatch(me);
 
     QStringList retlist( "OK" );
+
+    SendResponse(pbssock, retlist);
+}
+
+void MainServer::HandleSetVerbose(QStringList &slist, PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+    QStringList retlist;
+    
+    QString newverbose = slist[1];
+    int len=newverbose.length();
+    if (len > 12)
+    {
+        parse_verbose_arg(newverbose.right(len-12));
+
+        retlist << "OK";
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Invalid SET_VERBOSE string: '%1'")
+                                      .arg(newverbose));
+        retlist << "Failed";
+    }
 
     SendResponse(pbssock, retlist);
 }

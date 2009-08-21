@@ -44,6 +44,7 @@ class NetworkControl : public QTcpServer
     QString processLiveTV(QStringList tokens);
     QString processPlay(QStringList tokens);
     QString processQuery(QStringList tokens);
+    QString processSet(QStringList tokens);
     QString processHelp(QStringList tokens);
 
     void notifyDataAvailable(void);

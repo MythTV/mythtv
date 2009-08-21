@@ -269,6 +269,8 @@ void NetworkControl::processNetworkControlCommand(QString command)
         result = processPlay(tokens);
     else if (is_abbrev("query", tokens[0]))
         result = processQuery(tokens);
+    else if (is_abbrev("set", tokens[0]))
+        result = processSet(tokens);
     else if (is_abbrev("help", tokens[0]))
         result = processHelp(tokens);
     else if ((tokens[0].toLower() == "exit") || (tokens[0].toLower() == "quit"))
@@ -705,6 +707,10 @@ QString NetworkControl::processQuery(QStringList tokens)
                 result = "ERROR: Timed out waiting for reply from player";
         }
     }
+    else if (is_abbrev("verbose", tokens[1]))
+    {
+        return verboseString;
+    }
     else if (is_abbrev("liveTV", tokens[1]))
     {
         if(tokens.size() == 3) // has a channel ID
@@ -743,6 +749,38 @@ QString NetworkControl::processQuery(QStringList tokens)
                        .arg(tokens[0]);
 
     return result;
+}
+
+QString NetworkControl::processSet(QStringList tokens)
+{
+    if (tokens.size() == 1)
+        return QString("ERROR: See 'help %1' for usage information")
+                       .arg(tokens[0]);
+
+    if (tokens[1] == "verbose")
+    {
+        if (tokens.size() > 3)
+            return QString("ERROR: Separate filters with commas with no "
+                           "space: playback,audio\r\n See 'help %1' for usage "
+                           "information").arg(tokens[0]);
+
+        QString oldVerboseString = verboseString;
+        QString result = "OK";
+
+        int pva_result = parse_verbose_arg(tokens[2]);
+
+        if (pva_result != 0 /*GENERIC_EXIT_OK */)
+            result = "Failed";
+
+        result += "\r\n";
+        result += " Previous filter: " + oldVerboseString + "\r\n";
+        result += "      New Filter: " + verboseString + "\r\n";
+
+        return result;
+    }
+
+    return QString("ERROR: See 'help %1' for usage information")
+                   .arg(tokens[0]);
 }
 
 QString NetworkControl::processHelp(QStringList tokens)
@@ -840,7 +878,16 @@ QString NetworkControl::processHelp(QStringList tokens)
             "query liveTV          - List current TV schedule\r\n"
             "query liveTV CHANID   - Query current program for specified channel\r\n"
             "query time            - Query current time on server\r\n"
+            "query verbose         - Get current VERBOSE filter\r\n"
             "query version         - Query Frontend version details\r\n";
+    }
+    else if (is_abbrev("set", command))
+    {
+        helpText +=
+            "set verbose debug-level - Change the VERBOSE filter to 'debug-level'\r\n"
+            "                          (i.e. 'set verbose playback,audio')\r\n"
+            "                          use 'set verbose default' to revert\r\n"
+            "                          back to the default level of\r\n";
     }
     else if (command == "exit")
     {
@@ -861,6 +908,7 @@ QString NetworkControl::processHelp(QStringList tokens)
         "key                - Send a keypress to the program\r\n"
         "play               - Playback related commands\r\n"
         "query              - Queries\r\n"
+        "set                - Changes\r\n"
         "exit               - Exit Network Control\r\n"
         "\r\n"
         "Type 'help COMMANDNAME' for help on any specific command.\r\n";
