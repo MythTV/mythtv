@@ -300,6 +300,7 @@
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
                         </state>
+                        <state name="TV_RECORDING_RULES" from="DEFAULT" />
                         <state name="TV_RECPRIORITIES" from="DEFAULT">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
@@ -349,7 +350,7 @@
                         <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
 
                         <state name="TV_WATCH_TV" from="TV" />
-                        <state name="TV_SCHEDULE_RECORDINGS" from="TV_PROGRAM_GUIDE" />
+                        <state name="TV_SCHEDULE_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
                         <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
                             <imagetype name="icon">
                                 <filename>watermarks/watchrec.png</filename>
@@ -650,6 +651,7 @@
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
                         </state>
+                        <state name="TV_RECORDING_RULES" from="DEFAULT" />
                         <state name="TV_RECPRIORITIES" from="DEFAULT">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
@@ -730,7 +732,7 @@
                         <state name="VIDEO_LIST" from="SETTINGS_VIDEO" />
                         <state name="VIDEO_MANAGER" from="SETTINGS_VIDEO" />
 
-                        <state name="TV_UPCOMING_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
+                        <state name="TV_UPCOMING_RECORDINGS" from="TV_PROGRAM_GUIDE" />
                         <state name="SETTINGS_MEDIA" from="DEFAULT">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/multimedia.png</filename>
