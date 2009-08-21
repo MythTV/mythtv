@@ -2386,7 +2386,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     if (parent && metadata && ((QString::compare(parent->getString(),
                              metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
-                            parent->getString().startsWith("Season", Qt::CaseInsensitive)))    
+                            parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
         item->SetText(metadata->GetSubtitle());
     else
         item->SetText(metadata ? metadata->GetTitle() : node->getString());
@@ -2399,7 +2399,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         if (parent && metadata &&
             ((QString::compare(parent->getString(), 
                               metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
-             parent->getString().startsWith("Season", Qt::CaseInsensitive)) &&
+             parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)) &&
             !GetScreenshot(node).isEmpty())
         {
             QString screenshot = GetScreenshot(node);
