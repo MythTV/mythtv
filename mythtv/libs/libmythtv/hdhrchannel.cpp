@@ -245,10 +245,6 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
 {
     // Convert dtv_multiplex.modulation strings to something the HDHR can use:
     modulation.replace("qam_", "qam");  // e.g. qam_256 -> qam256
-#if 0
-    if (modulation == "qamauto")
-        modulation = "qam";             // "auto" works just as well?
-#endif
 
     if (modulation.isEmpty())
         modulation = "auto";
