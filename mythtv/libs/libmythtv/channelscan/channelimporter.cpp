@@ -579,9 +579,8 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
         ChannelInsertInfoList filtered;
         for (uint k = 0; k < transports[i].channels.size(); k++)
         {
-            if (m_fta_only &&
-                (transports[i].channels[k].is_encrypted ||
-                 transports[i].channels[k].decryption_status != kEncDecrypted))
+            if (m_fta_only && transports[i].channels[k].is_encrypted &&
+                transports[i].channels[k].decryption_status != kEncDecrypted)
                 continue;
 
             if (transports[i].channels[k].is_data_service)

@@ -122,7 +122,7 @@ void ChannelScanner::Scan(
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT freetoaironly, radioservices"
+    query.prepare("SELECT freetoaironly, radioservices "
                   "FROM cardinput "
                   "WHERE sourceid = :SOURCEID AND "
                   "      cardid   = :CARDID");
