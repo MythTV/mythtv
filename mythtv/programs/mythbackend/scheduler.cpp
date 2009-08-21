@@ -4226,7 +4226,7 @@ bool Scheduler::WasStartedAutomatically()
             VERBOSE(VB_SCHEDULE+VB_EXTRA, "NOT close to auto-start time, "
                     "USER-initiated startup assumed");
     }
-    else
+    else if (!s.isEmpty())
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Invalid "
                 "MythShutdownWakeupTime specified in database (%1)").arg(s));
 
