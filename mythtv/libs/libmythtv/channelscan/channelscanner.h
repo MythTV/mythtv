@@ -53,6 +53,7 @@ class MPUBLIC ChannelScanner
               const QString &inputname,
               uint           sourceid,
               bool           do_ignore_signal_timeout,
+              bool           do_follow_nit,
               // stuff needed for particular scans
               uint           mplexid,
               const QMap<QString,QString> &startChan,

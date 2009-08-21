@@ -61,6 +61,20 @@ class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
     }
 };
 
+class FollowNITSetting : public CheckBoxSetting, public TransientStorage
+{
+  public:
+    FollowNITSetting() : CheckBoxSetting(this)
+    {
+        setLabel(QObject::tr("Search new Transports"));
+        setHelpText(
+            QObject::tr("Digital transmissions may signal other available "
+                        "Transports. If this option is enabled the scanner "
+                        "scans all signaled transports for new/updated "
+                        "channels."));
+    }
+};
+
 class ScanFrequency: public LineEditSetting, public TransientStorage
 {
   public:

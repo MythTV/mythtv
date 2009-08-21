@@ -190,6 +190,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
             configPane->GetScanType(),       configPane->GetCardID(),
             configPane->GetInputName(),      configPane->GetSourceID(),
             /*configPane->DoDeleteChannels(),configPane->DoRenameChannels(),*/
+            configPane->DoFollowNIT(),
             configPane->DoIgnoreSignalTimeout(), configPane->GetMultiplex(),
             start_chan,
             configPane->GetFrequencyStandard(), configPane->GetModulation(),

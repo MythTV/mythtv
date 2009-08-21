@@ -103,12 +103,12 @@ class ChannelScanSM : public MPEGStreamListener,
         const QString &table_end   = QString::null);
     bool ScanTransportsStartingOn(
         int sourceid, const QMap<QString,QString> &valueMap);
-    bool ScanTransport(uint mplexid);
+    bool ScanTransport(uint mplexid, bool follow_nit);
     bool ScanForChannels(
         uint sourceid, const QString &std, const QString &cardtype,
         const DTVChannelList&);
 
-    bool ScanExistingTransports(uint sourceid);
+    bool ScanExistingTransports(uint sourceid, bool follow_nit);
 
     void SetAnalog(bool is_analog);
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }

@@ -27,41 +27,32 @@
  *
  */
 
-#ifndef _PANE_SINGLE_H_
-#define _PANE_SINGLE_H_
+#ifndef _PANE_ALL_H_
+#define _PANE_ALL_H_
 
 // MythTV headers
 #include "channelscanmiscsettings.h"
-#include "multiplexsetting.h"
 
-class PaneSingle : public VerticalConfigurationGroup
+class PaneAll : public VerticalConfigurationGroup
 {
   public:
-    PaneSingle() :
+    PaneAll() :
         VerticalConfigurationGroup(false, false, true, false),
-        transport_setting(new MultiplexSetting()),
         ignore_signal_timeout(new IgnoreSignalTimeout()),
         follow_nit(new FollowNITSetting())
     {
-        addChild(transport_setting);
         addChild(ignore_signal_timeout);
         addChild(follow_nit);
     }
 
-    int  GetMultiplex(void) const
-        { return transport_setting->getValue().toInt(); }
     bool ignoreSignalTimeout(void) const
         { return ignore_signal_timeout->getValue().toInt(); }
     bool GetFollowNIT(void) const
         { return follow_nit->getValue().toInt(); }
 
-    void SetSourceID(uint sourceid)
-        { transport_setting->SetSourceID(sourceid); }
-
   protected:
-    MultiplexSetting        *transport_setting;
     IgnoreSignalTimeout     *ignore_signal_timeout;
     FollowNITSetting        *follow_nit;
 };
 
-#endif // _PANE_SINGLE_H_
+#endif // _PANE_ALL_H_

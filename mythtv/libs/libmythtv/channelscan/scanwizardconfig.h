@@ -41,6 +41,7 @@ class ScanCountry;
 class ScanNetwork;
 class IgnoreSignalTimeout;
 
+class PaneAll;
 class PaneATSC;
 class PaneAnalog;
 class PaneDVBT;
@@ -104,6 +105,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     QString GetFrequencyTable(void)          const;
     bool    GetFrequencyTableRange(QString&,QString&) const;
     bool    DoIgnoreSignalTimeout(void)      const;
+    bool    DoFollowNIT(void)                const;
     QString GetFilename(void)                const;
     uint    GetMultiplex(void)               const;
     QMap<QString,QString> GetStartChan(void) const;
@@ -117,7 +119,6 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     ScanTypeSetting      *scanType;
     ScanCountry          *country;
     ScanNetwork          *network;
-    IgnoreSignalTimeout  *ignoreSignalTimeoutAll;
     PaneDVBT             *paneDVBT;
     PaneDVBS             *paneDVBS;
     PaneDVBS2            *paneDVBS2;
@@ -125,6 +126,7 @@ class ScanOptionalConfig : public TriggeredConfigurationGroup
     PaneDVBC             *paneDVBC;
     PaneAnalog           *paneAnalog;
     PaneSingle           *paneSingle;
+    PaneAll              *paneAll;
     PaneDVBUtilsImport   *paneDVBUtilsImport;
     PaneExistingScanImport *paneExistingScanImport;
 };
@@ -157,6 +159,8 @@ class ScanWizardConfig: public VerticalConfigurationGroup
         { return scanConfig->GetStartChan(); }
     bool    DoIgnoreSignalTimeout(void) const
         { return scanConfig->DoIgnoreSignalTimeout(); }
+    bool    DoFollowNIT(void) const
+        { return scanConfig->DoFollowNIT(); }
     uint    GetScanID(void)       const
         { return scanConfig->GetScanID(); }
 

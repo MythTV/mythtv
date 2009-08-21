@@ -15,6 +15,7 @@
 #include "paneatsc.h"
 #include "paneanalog.h"
 #include "panesingle.h"
+#include "paneall.h"
 #include "panedvbutilsimport.h"
 #include "paneexistingscanimport.h"
 
@@ -211,11 +212,10 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     scanType(_scan_type),
     country(new ScanCountry()),
     network(new ScanNetwork()),
-    ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
     paneDVBT(new PaneDVBT()),     paneDVBS(new PaneDVBS()),
     paneDVBS2(new PaneDVBS2()),   paneATSC(new PaneATSC()),
     paneDVBC(new PaneDVBC()),     paneAnalog(new PaneAnalog()),
-    paneSingle(new PaneSingle()),
+    paneSingle(new PaneSingle()), paneAll(new PaneAll()),
     paneDVBUtilsImport(new PaneDVBUtilsImport()),
     paneExistingScanImport(new PaneExistingScanImport())
 {
@@ -223,10 +223,6 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
 
     // only save settings for the selected pane
     setSaveAll(false);
-
-    VerticalConfigurationGroup *scanAllTransports =
-        new VerticalConfigurationGroup(false,false,true,true);
-    scanAllTransports->addChild(ignoreSignalTimeoutAll);
 
     addTarget(QString::number(ScanTypeSetting::Error_Open),
               new PaneError(QObject::tr("Failed to open the card")));
@@ -251,7 +247,7 @@ ScanOptionalConfig::ScanOptionalConfig(ScanTypeSetting *_scan_type) :
     addTarget(QString::number(ScanTypeSetting::TransportScan),
               paneSingle);
     addTarget(QString::number(ScanTypeSetting::FullTransportScan),
-              scanAllTransports);
+              paneAll);
     addTarget(QString::number(ScanTypeSetting::IPTVImport),
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::DVBUtilsImport),
@@ -345,16 +341,31 @@ bool ScanOptionalConfig::DoIgnoreSignalTimeout(void) const
 {
     int  st  = scanType->getValue().toInt();
 
-    bool ts0 = (ScanTypeSetting::TransportScan     == st);
-    bool vl0 = paneSingle->ignoreSignalTimeout();
+    switch (st)
+    {
+    case ScanTypeSetting::TransportScan:
+        return paneSingle->ignoreSignalTimeout();
+    case ScanTypeSetting::FullTransportScan:
+        return paneAll->ignoreSignalTimeout();
+    case ScanTypeSetting::DVBUtilsImport:
+        return paneDVBUtilsImport->DoIgnoreSignalTimeout();
+    default:
+        return false;
+    }
+}
 
-    bool ts1 = (ScanTypeSetting::FullTransportScan == st);
-    bool vl1 = (ignoreSignalTimeoutAll->getValue().toInt());
-
-    bool ts2 = (ScanTypeSetting::DVBUtilsImport    == st);
-    bool vl2 = paneDVBUtilsImport->DoIgnoreSignalTimeout();
-
-    return (ts0) ? vl0 : ((ts1) ? vl1 : (ts2) ? vl2 : false);
+bool ScanOptionalConfig::DoFollowNIT(void) const
+{
+    int  st  = scanType->getValue().toInt();
+    switch (st)
+    {
+    case ScanTypeSetting::TransportScan:
+        return paneSingle->GetFollowNIT();
+    case ScanTypeSetting::FullTransportScan:
+        return paneAll->GetFollowNIT();
+    default:
+        return false;
+    }
 }
 
 QString ScanOptionalConfig::GetFilename(void) const

@@ -278,7 +278,7 @@ void ChannelScanSM::HandleAllGood(void)
  *   channels is available on another ATSC channel, as encouraged by the
  *   ATSC specification.
  */
-bool ChannelScanSM::ScanExistingTransports(uint sourceid)
+bool ChannelScanSM::ScanExistingTransports(uint sourceid, bool follow_nit)
 {
     if (scanning)
         return false;
@@ -299,6 +299,7 @@ bool ChannelScanSM::ScanExistingTransports(uint sourceid)
     for (uint i = 0; i < multiplexes.size(); i++)
         AddToList(multiplexes[i]);
 
+    extend_scan_list = follow_nit;
     waitingForTables  = false;
     transportsScanned = 0;
     if (scanTransports.size())
@@ -1722,7 +1723,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
     return ok;
 }
 
-bool ChannelScanSM::ScanTransport(uint mplexid)
+bool ChannelScanSM::ScanTransport(uint mplexid, bool follow_nit)
 {
     scanTransports.clear();
     nextIt = scanTransports.end();
@@ -1732,6 +1733,7 @@ bool ChannelScanSM::ScanTransport(uint mplexid)
     timer.start();
     waitingForTables  = false;
 
+    extend_scan_list = follow_nit;
     transportsScanned = 0;
     if (scanTransports.size())
     {

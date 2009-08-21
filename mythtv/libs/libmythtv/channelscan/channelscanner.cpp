@@ -100,6 +100,7 @@ void ChannelScanner::Scan(
     const QString &inputname,
     uint           sourceid,
     bool           do_ignore_signal_timeout,
+    bool           do_follow_nit,
     // stuff needed for particular scans
     uint           mplexid /* TransportScan */,
     const QMap<QString,QString> &startChan /* NITAddScan */,
@@ -175,7 +176,7 @@ void ChannelScanner::Scan(
     {
         VERBOSE(VB_CHANSCAN, LOC + "ScanExistingTransports("<<sourceid<<")");
 
-        ok = sigmonScanner->ScanExistingTransports(sourceid);
+        ok = sigmonScanner->ScanExistingTransports(sourceid, do_follow_nit);
         if (ok)
         {
             scanMonitor->ScanPercentComplete(0);
@@ -222,7 +223,7 @@ void ChannelScanner::Scan(
     {
         VERBOSE(VB_CHANSCAN, LOC + "ScanTransport("<<mplexid<<")");
 
-        ok = sigmonScanner->ScanTransport(mplexid);
+        ok = sigmonScanner->ScanTransport(mplexid, do_follow_nit);
     }
     if (!ok)
     {
