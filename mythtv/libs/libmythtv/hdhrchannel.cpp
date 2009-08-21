@@ -360,10 +360,6 @@ bool HDHRChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 bool HDHRChannel::Tune(uint frequency, QString /*input*/,
                        QString modulation, QString si_std)
 {
-    // dtv_multiplex.modulation is from the DB, and can be almost anything.
-    // For now, just use the HDHR device's automatic scanning:
-    modulation = "auto";
-
     QString chan = modulation + ':' + QString::number(frequency);
 
     VERBOSE(VB_CHANNEL, LOC + "Tune()ing to " + chan);
@@ -374,6 +370,20 @@ bool HDHRChannel::Tune(uint frequency, QString /*input*/,
         return true;
     }
 
+
+    // dtv_multiplex.modulation is from the DB. Could contain almost anything. 
+    // As a fallback, use the HDHR device's automatic scanning: 
+    chan = "auto:" + QString::number(frequency); 
+ 
+    VERBOSE(VB_CHANNEL, LOC + "Failed. Now trying " + chan); 
+ 
+    if (_stream_handler->TuneChannel(chan)) 
+    { 
+        SetSIStandard(si_std); 
+        return true; 
+    } 
+ 
+ 
     return false;
 }
 
