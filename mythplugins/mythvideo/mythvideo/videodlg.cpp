@@ -4997,7 +4997,7 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         metadata->SetTitle(data["Title"]);
         metadata->SetSubtitle(data["Subtitle"]);        
 
-        if (metadata->GetYear() == 1895)
+        if (metadata->GetYear() == 1895 || metadata->GetYear() == 0)
             metadata->SetYear(data["Year"].toInt());
         if (metadata->GetDirector() == VIDEO_DIRECTOR_UNKNOWN)
             metadata->SetDirector(data["Director"]);
