@@ -197,6 +197,11 @@ enum
     PREMIERE_EIT_SPORT_PID  = 0x0b12,
 
     ATSC_PSIP_PID = 0x1ffb,
+
+    // UK Freesat PIDs: SDTo/BAT, longterm EIT, shortterm EIT
+    FREESAT_SI_PID     = 0x0f01,
+    FREESAT_EIT_PID    = 0x0f02,
+    FREESAT_ST_EIT_PID = 0x0f03,
 };
 
 /** \class TableID

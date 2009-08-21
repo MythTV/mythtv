@@ -28,8 +28,18 @@ class ScanStreamData :
 
     QString GetSIStandard(QString guess = "mpeg") const;
 
+    void SetFreesatAdditionalSI(bool freesat_si);
+
   private:
     virtual bool DeleteCachedTable(PSIPTable *psip) const;  
+    /// listen for addiotional Freesat service information
+    int dvb_uk_freesat_si;
 };
+
+inline void ScanStreamData::SetFreesatAdditionalSI(bool freesat_si)
+{
+    QMutexLocker locker(&_listener_lock);
+    dvb_uk_freesat_si = freesat_si;
+}
 
 #endif // SCANSTREAMDATA_H_

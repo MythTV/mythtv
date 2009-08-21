@@ -7,7 +7,8 @@
 ScanStreamData::ScanStreamData()
     : MPEGStreamData(-1, true),
       ATSCStreamData(-1,-1, true),
-      DVBStreamData(0, 0, -1, true)
+      DVBStreamData(0, 0, -1, true),
+      dvb_uk_freesat_si(false)
 {
 }
 
@@ -18,6 +19,11 @@ ScanStreamData::~ScanStreamData() { ; }
  */
 bool ScanStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
 {
+    // Treat BAT and SDTo as redundant unless they are on the FREESAT_SI_PID
+    if (dvb_uk_freesat_si &&
+        (psip.TableID() == TableID::BAT || psip.TableID() == TableID::SDTo))
+        return pid != FREESAT_SI_PID;
+
     return (ATSCStreamData::IsRedundant(pid,psip) ||
             DVBStreamData::IsRedundant(pid,psip));
 }
@@ -42,6 +48,8 @@ void ScanStreamData::Reset(void)
     AddListeningPID(ATSC_PSIP_PID);
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
+    if (dvb_uk_freesat_si)
+        AddListeningPID(FREESAT_SI_PID);
 }
 
 QString ScanStreamData::GetSIStandard(QString guess) const
