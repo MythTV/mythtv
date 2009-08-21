@@ -1408,10 +1408,9 @@
             <value>Manage Recording Rules</value>
         </textarea>
 
-        <imagetype name="filler">
-            <filename>cr-background.png</filename>
-            <area>0,39,1280,420</area>
-        </imagetype>
+        <shape name="list_background" from="basebackground">
+            <area>20,49,1240,360</area>
+        </shape>
 
         <textarea name="callsignlabel" from="basetextarea">
             <area>680,15,100,40</area>
