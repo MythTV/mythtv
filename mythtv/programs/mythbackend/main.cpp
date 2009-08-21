@@ -822,6 +822,8 @@ int main(int argc, char **argv)
 
     if (clearsettingscache)
     {
+        gContext->SetBackend(false);
+
         if (gContext->ConnectToMasterServer())
         {
             RemoteSendMessage("CLEAR_SETTINGS_CACHE");
