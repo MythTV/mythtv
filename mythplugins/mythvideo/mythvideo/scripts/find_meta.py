@@ -860,6 +860,9 @@ def should_be_skipped(path, meta_file = None):
 		if path.lower().endswith(skip.lower()):
 			return True
 
+	if os.path.isfile(os.path.join(path, ".mythvideo_skip_directory")):
+		print_verbose("Skipping due to .mythvideo_skip_directory")
+		return True
 
 	# Check if we are not in overwrite mode and there is existing data
 	# for the wanted targets (metadata files and/or MythDB).
