@@ -10,6 +10,7 @@
 #include <QHttp>
 #include <QBuffer>
 #include <QUrl>
+#include <QImage>
 #include <QImageReader>
 
 #include <mythtv/mythcontext.h>
@@ -171,12 +172,25 @@ namespace
                         }
                         else
                         {
-                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                            if (written != m_data_buffer.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing Coverart to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = esError;
+                            }
+                            else
+                            {
+                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                                if (written != m_data_buffer.size())
+                                {
+                                    errorMsg = tr("Error writing Coverart to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = esError;
+                                }
                             }
                         }
                     }
@@ -188,13 +202,26 @@ namespace
 
                         if (dest_file.open(QIODevice::WriteOnly))
                         {
-                            const QByteArray &data = m_data_buffer.data();
-                            qint64 size = dest_file.write(data);
-                            if (size != data.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing data to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = esError;
+                            }
+                            else
+                            {
+                                const QByteArray &data = m_data_buffer.data();
+                                qint64 size = dest_file.write(data);
+                                if (size != data.size())
+                                {
+                                    errorMsg = tr("Error writing data to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = esError;
+                                }
                             }
                         }
                         else
@@ -311,12 +338,25 @@ namespace
                         }
                         else
                         {
-                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                            if (written != m_data_buffer.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing Screenshot to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "   
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = ssesError;
+                            }
+                            else
+                            {
+                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                                if (written != m_data_buffer.size())
+                                {
+                                    errorMsg = tr("Error writing Screenshot to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = ssesError;
+                                }
                             }
                         }
                     }
@@ -328,13 +368,26 @@ namespace
 
                         if (dest_file.open(QIODevice::WriteOnly))
                         {
-                            const QByteArray &data = m_data_buffer.data();
-                            qint64 size = dest_file.write(data);
-                            if (size != data.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing data to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = ssesError;
+                            }
+                            else
+                            {
+                                const QByteArray &data = m_data_buffer.data();
+                                qint64 size = dest_file.write(data);
+                                if (size != data.size())
+                                {
+                                    errorMsg = tr("Error writing data to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = ssesError;
+                                }
                             }
                         }
                         else
@@ -451,12 +504,25 @@ namespace
                         }
                         else
                         {
-                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                            if (written != m_data_buffer.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing Fanart to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "   
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = fesError;
+                            }
+                            else
+                            {
+                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                                if (written != m_data_buffer.size())
+                                {
+                                    errorMsg = tr("Error writing Fanart to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = fesError;
+                                }
                             }
                         }
                     }
@@ -468,13 +534,26 @@ namespace
 
                         if (dest_file.open(QIODevice::WriteOnly))
                         {
-                            const QByteArray &data = m_data_buffer.data();
-                            qint64 size = dest_file.write(data);
-                            if (size != data.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing data to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = fesError;
+                            }
+                            else
+                            {
+                                const QByteArray &data = m_data_buffer.data();
+                                qint64 size = dest_file.write(data);
+                                if (size != data.size())
+                                {
+                                    errorMsg = tr("Error writing data to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = fesError;
+                                }
                             }
                         }
                         else
@@ -591,12 +670,25 @@ namespace
                         } 
                         else
                         {
-                            off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                            if (written != m_data_buffer.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing data to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "   
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = besError;
+                            }
+                            else
+                            {
+                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
+                                if (written != m_data_buffer.size())
+                                {
+                                    errorMsg = tr("Error writing Banner to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = besError;
+                                }
                             }
                         }
                     }
@@ -608,13 +700,26 @@ namespace
 
                         if (dest_file.open(QIODevice::WriteOnly))
                         {
-                            const QByteArray &data = m_data_buffer.data();
-                            qint64 size = dest_file.write(data);
-                            if (size != data.size())
+                            QImage testImage;
+                            const QByteArray &testArray = m_data_buffer.data();
+                            bool didLoad = testImage.loadFromData(testArray);
+                            if (!didLoad)
                             {
-                                errorMsg = tr("Error writing data to file %1.")
-                                        .arg(m_dest_file);
+                                errorMsg = tr("Tried to write %1, but it appears to "
+                                              "be an HTML redirect (filesize %2).")
+                                        .arg(m_dest_file).arg(m_data_buffer.size());
                                 m_error_state = besError;
+                            }
+                            else
+                            {
+                                const QByteArray &data = m_data_buffer.data();
+                                qint64 size = dest_file.write(data);
+                                if (size != data.size())
+                                {
+                                    errorMsg = tr("Error writing data to file %1.")
+                                            .arg(m_dest_file);
+                                    m_error_state = besError;
+                                }
                             }
                         }
                         else
@@ -1388,7 +1493,8 @@ namespace
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
-                             QString title, int season, int episode = 0)
+                             QString title, int season, int episode = 0,
+                             bool isScreenshot = false)
     {
         QStringList search_dirs(in_dirs);
 
@@ -1425,7 +1531,7 @@ namespace
                                  .arg(title).arg(QString::number(season)))
                                  .arg(QString::number(episode))
                                  .arg(*ext);
-                    else
+                    else if (!isScreenshot)
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2") 
                                  .arg(title).arg(QString::number(season)))
                                  .arg(*ext);
@@ -4286,7 +4392,8 @@ void VideoDialog::ResetMetadata()
         QString screenshot_file;
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_artDir), screenshot_file,
-                        metadata->GetTitle(), metadata->GetSeason(), metadata->GetEpisode()))
+                        metadata->GetTitle(), metadata->GetSeason(), metadata->GetEpisode(),
+                        true))
         {   
             metadata->SetScreenshot(screenshot_file);
         }
@@ -4408,7 +4515,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
     {
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 screenshot_dirs, screenshot_file, metadata->GetTitle(),
-                                metadata->GetSeason()))
+                                metadata->GetSeason(), true))
         {
             metadata->SetScreenshot(banner_file);
             OnVideoScreenshotSetDone(metadata);
@@ -4731,8 +4838,8 @@ void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
                 metadata->GetEpisode() > 0)
             {
                 // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2").arg(metadata->GetTitle())
-                        .arg(metadata->GetSeason());
+                QString title = QString("%1 Season %2x%3").arg(metadata->GetTitle())
+                        .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
                 if (!metadata->GetHost().isEmpty())
                 {
                     QString combFileName = QString("%1.%2").arg(title).arg(ext);
