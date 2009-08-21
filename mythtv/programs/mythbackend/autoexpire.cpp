@@ -650,7 +650,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                           "filesize, duplicate "
                       "FROM recorded "
                       "WHERE recordid = :RECID AND preserve = 0 "
-                      "AND recgroup <> 'LiveTV' "
+                      "AND recgroup NOT IN ('LiveTV', 'Deleted') "
                       "ORDER BY starttime DESC;");
         query.bindValue(":RECID", maxIter.key());
 
