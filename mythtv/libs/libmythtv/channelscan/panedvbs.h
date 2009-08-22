@@ -43,7 +43,7 @@ class PaneDVBS : public HorizontalConfigurationGroup
             new VerticalConfigurationGroup(false,true);
         VerticalConfigurationGroup *right =
             new VerticalConfigurationGroup(false,true);
-        left->addChild(pfrequency  = new ScanFrequency());
+        left->addChild(pfrequency  = new ScanFrequencykHz());
         left->addChild(ppolarity   = new ScanPolarity());
         left->addChild(psymbolrate = new ScanSymbolRateDVBS());
         right->addChild(pfec       = new ScanFec());
@@ -59,7 +59,7 @@ class PaneDVBS : public HorizontalConfigurationGroup
     QString polarity(void)   const { return ppolarity->getValue();   }
 
   protected:
-    ScanFrequency  *pfrequency;
+    ScanFrequencykHz   *pfrequency;
     ScanSymbolRateDVBS *psymbolrate;
     ScanInversion  *pinversion;
     ScanFec        *pfec;

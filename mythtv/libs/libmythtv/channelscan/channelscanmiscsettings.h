@@ -90,6 +90,17 @@ class TrustEncSISetting : public CheckBoxSetting, public TransientStorage
     }
 };
 
+class ScanFrequencykHz: public LineEditSetting, public TransientStorage
+{
+  public:
+    ScanFrequencykHz() : LineEditSetting(this)
+    {
+        setLabel(QObject::tr("Frequency"));
+        setHelpText(QObject::tr("Frequency (Option has no default)\n"
+                                "The frequency for this channel in kHz."));
+    };
+};
+
 class ScanFrequency: public LineEditSetting, public TransientStorage
 {
   public:

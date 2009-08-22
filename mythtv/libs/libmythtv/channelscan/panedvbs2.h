@@ -19,7 +19,7 @@ class PaneDVBS2 : public HorizontalConfigurationGroup
             new VerticalConfigurationGroup(false,true);
         VerticalConfigurationGroup *right =
             new VerticalConfigurationGroup(false,true);
-        left->addChild( pfrequency  = new ScanFrequency());
+        left->addChild( pfrequency  = new ScanFrequencykHz());
         left->addChild( ppolarity   = new ScanPolarity());
         left->addChild( psymbolrate = new ScanSymbolRateDVBS());
         left->addChild( pmod_sys    = new ScanModSys());
@@ -41,7 +41,7 @@ class PaneDVBS2 : public HorizontalConfigurationGroup
     QString rolloff(void)    const { return prolloff->getValue();    }
 
   protected:
-    ScanFrequency  *pfrequency;
+    ScanFrequencykHz   *pfrequency;
     ScanSymbolRateDVBS *psymbolrate;
     ScanInversion  *pinversion;
     ScanFec        *pfec;
