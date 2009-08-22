@@ -191,7 +191,7 @@ void ProgDetails::addItem(const QString &key, const QString &title, const QStrin
         if (s.contains(escapedKey))
         {
             // replace the label first
-            s.replace("%" + key + "_LABLE%", title);
+            s.replace("%" + key + "_LABEL%", title);
             // now replace the data
             s.replace(escapedKey, data);
             m_html[x] = s;
