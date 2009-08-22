@@ -349,6 +349,9 @@ namespace
         REG_JUMP(JUMP_VIDEO_GALLERY, "The MythVideo video gallery", "",
                     jumpScreenVideoGallery);
 
+        REG_KEY("Video","PLAYALT","Play selected item in alternate "
+                                  "player","ALT+P");
+
         REG_KEY("Video","FILTER","Open video filter dialog","F");
 
         REG_KEY("Video","BROWSE","Change browsable in video manager","B");

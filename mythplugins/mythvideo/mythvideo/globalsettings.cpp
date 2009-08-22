@@ -401,6 +401,46 @@ HostLineEdit *VideoDefaultPlayer()
     return gc;
 }
 
+HostCheckBox *EnableAlternatePlayer()
+{
+    HostCheckBox *gc = new HostCheckBox("mythvideo.EnableAlternatePlayer");
+    gc->setLabel(QObject::tr("Enable Alternate Video Player"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If checked, you can select an alternate "
+                                "player command for videos when the default "
+                                "choice fails."));
+    return gc;
+}
+
+HostLineEdit *VideoAlternatePlayer()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.VideoAlternatePlayer");
+    gc->setLabel(QObject::tr("Alternate Player"));
+    gc->setValue("Internal");
+    gc->setHelpText(QObject::tr("If for some reason the default player "
+                    "doesn't play a video, you can play it in an alternate "
+                    "player by selecting 'Play in Alternate Player.'"));
+    return gc;
+};
+
+class AlternatePlayerSettings : public TriggeredConfigurationGroup
+{
+    public:
+        AlternatePlayerSettings():
+            TriggeredConfigurationGroup(false, false, true, true)
+        {
+            Setting *altplayerSettings = EnableAlternatePlayer();
+            addChild(altplayerSettings);
+            setTrigger(altplayerSettings);
+
+            ConfigurationGroup *settings =
+                    new VerticalConfigurationGroup(false);
+            settings->addChild(VideoAlternatePlayer());
+            addTarget("1", settings);
+            addTarget("0", new VerticalConfigurationGroup(true));
+        }
+};
+
 ///////////////////////////////////////////////////////////
 //// DVD Settings
 ///////////////////////////////////////////////////////////
@@ -900,6 +940,7 @@ VideoPlayerSettings::VideoPlayerSettings()
     videoplayersettings->addChild(VideoDefaultPlayer());
     videoplayersettings->addChild(PlayerCommand());
     videoplayersettings->addChild(VCDPlayerCommand());
+    videoplayersettings->addChild(new AlternatePlayerSettings());
     addChild(videoplayersettings);
 }
 

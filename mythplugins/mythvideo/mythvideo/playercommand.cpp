@@ -192,6 +192,35 @@ class VideoPlayerCommandPrivate
         ClearPlayerList();
     }
 
+    void AltPlayerFor(const Metadata *item)
+    {
+        if (item)
+        {
+            QString play_command = 
+                   gContext->GetSetting("mythvideo.VideoAlternatePlayer");
+            QString filename;
+
+            if (item->IsHostSet())
+                filename = GenRemoteFileURL("Videos", item->GetHost(),
+                        item->GetFilename());
+            else
+                filename = item->GetFilename();
+
+            if (play_command.length())
+            {
+                AddPlayer(play_command, filename, item->GetPlot(),
+                        item->GetTitle(), item->GetSubtitle(),
+                        item->GetDirector(), item->GetSeason(),
+                        item->GetEpisode(), item->GetLength(),
+                        QString::number(item->GetYear()));
+            }
+            else
+            {
+                PlayerFor(filename, item);
+            }
+        }
+    }
+
     void PlayerFor(const Metadata *item)
     {
         if (item)
@@ -314,6 +343,13 @@ class VideoPlayerCommandPrivate
 };
 
 ////////////////////////////////////////////////////////////////////////
+
+VideoPlayerCommand VideoPlayerCommand::AltPlayerFor(const Metadata *item)
+{
+    VideoPlayerCommand ret;
+    ret.m_d->AltPlayerFor(item);
+    return ret;
+}
 
 VideoPlayerCommand VideoPlayerCommand::PlayerFor(const Metadata *item)
 {

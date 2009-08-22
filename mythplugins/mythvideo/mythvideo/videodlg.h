@@ -71,6 +71,7 @@ class VideoDialog : public MythScreenType
     void SetCurrentNode(MythGenericTree *);
 
     void playVideo();
+    void playVideoAlt();
     void playFolder();
     void playVideoWithTrailers();
     void playTrailer();

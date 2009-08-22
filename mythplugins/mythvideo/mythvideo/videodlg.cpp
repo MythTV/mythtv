@@ -1556,7 +1556,7 @@ namespace
     }
 
     void PlayVideo(const QString &filename,
-            const MetadataListManager &video_list)
+            const MetadataListManager &video_list, bool useAltPlayer = false)
     {
         const int WATCHED_WATERMARK = 10000; // Less than this and the chain of
                                              // videos will not be followed when
@@ -1572,7 +1572,10 @@ namespace
         {
             playing_time.start();
 
-            VideoPlayerCommand::PlayerFor(item.get()).Play();
+            if (useAltPlayer)
+                VideoPlayerCommand::AltPlayerFor(item.get()).Play();
+            else
+                VideoPlayerCommand::PlayerFor(item.get()).Play();
 
             if (item->GetChildID() > 0)
                 item = video_list.byID(item->GetChildID());
@@ -2001,6 +2004,9 @@ class VideoDialogPrivate
         m_isGroupList = gContext->GetNumSetting("mythvideo.db_group_view", 1);
         m_groupType = gContext->GetNumSetting("mythvideo.db_group_type", 0); 
 
+        m_altPlayerEnabled = 
+                    gContext->GetNumSetting("mythvideo.EnableAlternatePlayer");
+
         m_artDir = gContext->GetSetting("VideoArtworkDir");
         m_sshotDir = gContext->GetSetting("mythvideo.screenshotDir");
         m_fanDir = gContext->GetSetting("mythvideo.fanartDir");
@@ -2165,6 +2171,7 @@ class VideoDialogPrivate
     bool m_isGroupList;
     int  m_groupType;
     bool m_isFlatList;
+    bool m_altPlayerEnabled;
     VideoDialog::DialogType m_type;
     VideoDialog::BrowseType m_browse;
 
@@ -3143,6 +3150,12 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
             if (!m_menuPopup && node->getInt() != kUpFolder)
                 VideoMenu();
         }
+        else if (action == "PLAYALT")
+        {
+            if (!m_menuPopup && GetMetadata(GetItemCurrent()) &&
+                m_d->m_altPlayerEnabled)
+                playVideoAlt();
+        }
         else if (action == "DOWNLOADDATA")
         {
             if (!m_menuPopup && GetMetadata(GetItemCurrent()))
@@ -3444,6 +3457,12 @@ void VideoDialog::PlayMenu()
     m_menuPopup->SetReturnEvent(this, "actions");
 
     m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
+
+    if (m_d->m_altPlayerEnabled)
+    {
+        m_menuPopup->AddButton(tr("Play in Alternate Player"), SLOT(playVideoAlt()));
+    } 
+
     if (gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
     {
          m_menuPopup->AddButton(tr("Play With Trailers"),
@@ -3932,6 +3951,18 @@ void VideoDialog::playVideo()
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata)
         PlayVideo(metadata->GetFilename(), m_d->m_videoList->getListCache());
+}
+
+/** \fn VideoDialog::playVideoAlt()
+ *  \brief Play the selected item in an alternate player.
+ *  \return void.
+ */
+void VideoDialog::playVideoAlt()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    if (metadata)
+        PlayVideo(metadata->GetFilename(),
+                  m_d->m_videoList->getListCache(), true);
 }
 
 /** \fn VideoDialog::playFolder()

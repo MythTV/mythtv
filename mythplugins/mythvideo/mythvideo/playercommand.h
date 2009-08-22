@@ -6,6 +6,7 @@ class VideoPlayerCommand
   public:
     static VideoPlayerCommand PlayerFor(const class Metadata *item);
     static VideoPlayerCommand PlayerFor(const QString &filename);
+    static VideoPlayerCommand AltPlayerFor(const class Metadata *item);
 
   public:
     VideoPlayerCommand();
