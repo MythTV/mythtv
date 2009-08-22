@@ -776,6 +776,10 @@ QString NetworkControl::processSet(QStringList tokens)
         result += " Previous filter: " + oldVerboseString + "\r\n";
         result += "      New Filter: " + verboseString + "\r\n";
 
+        VERBOSE(VB_IMPORTANT, QString("Verbose level changed, new level is: %1")
+                                      .arg(verboseString));
+
+
         return result;
     }
 

@@ -4258,6 +4258,9 @@ void MainServer::HandleSetVerbose(QStringList &slist, PlaybackSock *pbs)
     {
         parse_verbose_arg(newverbose.right(len-12));
 
+        VERBOSE(VB_IMPORTANT, QString("Verbose level changed, new level is: %1")
+                                      .arg(verboseString));
+
         retlist << "OK";
     }
     else

@@ -140,9 +140,6 @@ int parse_verbose_arg(QString arg)
 
     verbose_mutex.unlock();
 
-    VERBOSE(VB_IMPORTANT,
-            QString("Enabled verbose msgs: %1").arg(verboseString));
-
     return GENERIC_EXIT_OK;
 }
 
