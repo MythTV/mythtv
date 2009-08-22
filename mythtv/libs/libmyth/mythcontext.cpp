@@ -144,7 +144,20 @@ static void exec_program_cb(const QString &cmd)
 static void exec_program_tv_cb(const QString &cmd)
 {
     QString s = cmd;
-    QStringList strlist("LOCK_TUNER");
+    QStringList tokens = cmd.simplified().split(" ");
+    QStringList strlist;
+   
+    bool cardidok;
+    int wantcardid = tokens[0].toInt(&cardidok, 10);
+
+    if (cardidok && wantcardid > 0)
+    {
+        strlist << QString("LOCK_TUNER %1").arg(wantcardid);
+        s = s.replace(0, tokens[0].length() + 1, "");
+    }
+    else
+        strlist << "LOCK_TUNER";
+
     gContext->SendReceiveStringList(strlist);
     int cardid = strlist[0].toInt();
 
@@ -163,19 +176,27 @@ static void exec_program_tv_cb(const QString &cmd)
     }
     else
     {
-        if (cardid == -2)
-            VERBOSE(VB_IMPORTANT, QString("exec_program_tv: Card %1 is "
-                                          "already locked").arg(cardid));
+        QString label;
 
-#if 0
-        DialogBox *error_dialog = new DialogBox(gContext->GetMainWindow(),
-            "\n\nAll tuners are currently in use. If you want to watch "
-            "TV, you can cancel one of the in-progress recordings from "
-            "the delete menu");
-        error_dialog->AddButton("OK");
-        error_dialog->exec();
-        delete error_dialog;
-#endif
+        if (cardidok)
+        {
+            if (cardid == -1)
+                label = QObject::tr("Could not find specified tuner (%1).")
+                                    .arg(wantcardid);
+            else
+                label = QObject::tr("Specified tuner (%1) is already in use.")
+                                    .arg(wantcardid);
+        }
+        else
+        {
+            label = QObject::tr("All tuners are currently in use. If you want "
+                                "to watch TV, you can cancel one of the "
+                                "in-progress recordings from the delete menu");
+        }
+
+        VERBOSE(VB_IMPORTANT, QString("exec_program_tv: ") + label);
+
+        ShowOkPopup(label);
     }
 }
 

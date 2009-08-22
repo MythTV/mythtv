@@ -533,7 +533,12 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "LOCK_TUNER")
     {
-        HandleLockTuner(pbs);
+        if (tokens.size() == 1)
+            HandleLockTuner(pbs);
+        else if (tokens.size() == 2)
+            HandleLockTuner(pbs, tokens[1].toInt());
+        else
+            VERBOSE(VB_IMPORTANT, "Bad LOCK_TUNER query");
     }
     else if (command == "FREE_TUNER")
     {
@@ -2865,7 +2870,7 @@ void MainServer::HandleSGFileQuery(QStringList &sList,
     SendResponse(pbssock, strList);
 }
 
-void MainServer::HandleLockTuner(PlaybackSock *pbs)
+void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
 {
     MythSocket *pbssock = pbs->getSocket();
     QString pbshost = pbs->getHostname();
@@ -2880,6 +2885,10 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
     for (; iter != encoderList->end(); ++iter)
     {
         EncoderLink *elink = *iter;
+
+        // we're looking for a specific card but this isn't the one we want
+        if ((cardid != -1) && (cardid != elink->GetCardID()))
+            continue;
 
         if (elink->IsLocal())
             enchost = gContext->GetHostName();
@@ -2929,10 +2938,8 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
                 return;
             }
             else
-            {
-                cerr << "mainserver.o: Failed querying the db for a videodevice"
-                     << endl;
-            }
+                VERBOSE(VB_IMPORTANT, "MainServer::LockTuner(): Could not find "
+                        "card info in database");
         }
         else
         {

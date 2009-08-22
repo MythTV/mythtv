@@ -129,7 +129,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs);
     void HandleRemoteEncoder(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
-    void HandleLockTuner(PlaybackSock *pbs);
+    void HandleLockTuner(PlaybackSock *pbs, int cardid = -1);
     void HandleFreeTuner(int cardid, PlaybackSock *pbs);
     void HandleCutMapQuery(const QString &chanid, const QString &starttime,
                            PlaybackSock *pbs, bool commbreak);
