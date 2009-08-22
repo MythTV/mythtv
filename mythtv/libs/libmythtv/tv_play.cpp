@@ -9984,7 +9984,15 @@ void TV::FillOSDTreeMenu(
         new OSDGenericTree(treeMenu, tr("Jump to Program"));
         new OSDGenericTree(jtp_item, tr("Recorded Program"), "JUMPREC");
         if (lastProgram != NULL)
-            new OSDGenericTree(jtp_item, lastProgram->title, "JUMPPREV");
+        {
+            if (lastProgram->subtitle.isEmpty())
+                new OSDGenericTree(jtp_item, lastProgram->title, "JUMPPREV");
+            else
+                new OSDGenericTree(jtp_item,
+                                   QString("%1: %2").arg(lastProgram->title)
+                                           .arg(lastProgram->subtitle),
+                                   "JUMPPREV");
+        }
     }
     else if (category == "CHANNELGROUP")
     {
