@@ -337,6 +337,24 @@ class MythVideo:
 			c.execute(sql, sql_values)
 			c.close()
 
+	def rmMetadata(self, video):
+		"""
+		Removes the metadata for a given id from the database.
+
+		Accepts either a videopath as a str, or an id as an int.
+
+		Has no effect if it does not exist.
+		"""
+		c = self.db.cursor()
+		if isinstance(video, str):
+			c.execute("DELETE FROM videometadata WHERE filename = %s", (video,))
+		elif isinstance(video, int):
+			c.execute("DELETE FROM videometadata WHERE intid = %s", (video,))
+		else:
+			log.Msg(WARNING, "Attempt to delete non-str, non-int item" +
+					"from videometadata: %s" % str(video))
+		c.close()
+
 	def getCategoryId(self, category_name):
 		"""
 		Find the id of the given category from MythDB.
