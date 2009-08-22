@@ -418,6 +418,7 @@ QMap<QString,QString> ScanOptionalConfig::GetStartChan(void) const
 
         startChan["std"]        = "dvb";
         startChan["type"]       = "QPSK";
+        startChan["modulation"] = "qpsk";
         startChan["frequency"]  = pane->frequency();
         startChan["inversion"]  = pane->inversion();
         startChan["symbolrate"] = pane->symbolrate();
