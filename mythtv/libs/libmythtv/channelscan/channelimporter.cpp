@@ -590,6 +590,15 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
                 transports[i].channels[k].is_audio_service)
                 continue;
 
+            // filter channels out only in channels.conf, i.e. not found
+            if (transports[i].channels[k].in_channels_conf &&
+                !(transports[i].channels[k].in_pat ||
+                  transports[i].channels[k].in_pmt ||
+                  transports[i].channels[k].in_vct ||
+                  transports[i].channels[k].in_nit ||
+                  transports[i].channels[k].in_sdt))
+                continue;
+
             filtered.push_back(transports[i].channels[k]);
         }
         transports[i].channels = filtered;
