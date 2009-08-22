@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 QString temp = a.argv()[++argpos];
-                print_verbose_messages = temp.toInt();
+                print_verbose_messages = temp.toUInt();
             }
             else
             {
