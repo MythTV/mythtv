@@ -689,6 +689,11 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         cmdseq->props[c].cmd      = DTV_ROLLOFF;
         cmdseq->props[c++].u.data = tuning.rolloff;
     }
+    else if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS)
+    {
+        cmdseq->props[c].cmd      = DTV_ROLLOFF;
+        cmdseq->props[c++].u.data = DTVRollOff::kRollOff_35;
+    }
 
     if (do_tune)
         cmdseq->props[c++].cmd    = DTV_TUNE;
