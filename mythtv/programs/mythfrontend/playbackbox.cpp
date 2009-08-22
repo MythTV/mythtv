@@ -1,6 +1,4 @@
 
-using namespace std;
-
 #include <QDateTime>
 #include <QDir>
 #include <QApplication>
@@ -3589,6 +3587,9 @@ void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
  */
 void PlaybackBox::previewReady(const ProgramInfo *pginfo)
 {
+    if (!pginfo)
+        return;
+    
     QString xfn = pginfo->pathname + ".png";
     QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
 
