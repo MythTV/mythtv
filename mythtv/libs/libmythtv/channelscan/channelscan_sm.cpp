@@ -971,7 +971,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
                 {
                     PCM_INFO_INIT("mpeg");
                     info.pat_tsid = (*pat_it)->TransportStreamID();
-                    info.could_be_opencable = true;
+                    info.could_be_opencable = could_be_opencable;
                     info.in_pat = true;
                 }
             }
