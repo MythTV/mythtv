@@ -259,7 +259,7 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
     bool handled = false;
     bool escape = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Controls", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Controls", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

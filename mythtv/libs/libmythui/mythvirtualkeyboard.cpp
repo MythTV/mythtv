@@ -363,7 +363,10 @@ bool MythUIVirtualKeyboard::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    GetMythMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+    if (handled)
+        return true;
 
     bool keyFound = false;
     KeyDefinition key;

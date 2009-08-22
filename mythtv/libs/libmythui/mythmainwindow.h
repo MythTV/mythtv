@@ -43,7 +43,8 @@ class MPUBLIC MythMainWindow : public QWidget
     MythScreenStack *GetStack(const QString &stackname);
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
-                           QStringList &actions, bool allowJumps = true);
+                           QStringList &actions, bool allowJumps = true) 
+                           __attribute__ ((warn_unused_result));
 
     void ClearKey(const QString &context, const QString &action);
     void BindKey(const QString &context, const QString &action,

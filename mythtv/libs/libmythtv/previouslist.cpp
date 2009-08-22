@@ -133,7 +133,7 @@ void PreviousList::keyPressEvent(QKeyEvent *e)
     bool handled = false;
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

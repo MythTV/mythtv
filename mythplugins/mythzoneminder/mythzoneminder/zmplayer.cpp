@@ -225,7 +225,7 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("TV Playback", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Playback", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

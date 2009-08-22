@@ -290,7 +290,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     m_info_show_short = false;
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
     float scrollX = 0.2f;
     float scrollY = 0.2f;

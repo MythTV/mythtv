@@ -1921,10 +1921,10 @@ class ItemDetailPopup : public MythScreenType
         if (!MythScreenType::keyPressEvent(levent))
         {
             QStringList actions;
-            gContext->GetMainWindow()->TranslateKeyPress("Video", levent,
-                    actions);
+            bool handled = GetMythMainWindow()->TranslateKeyPress("Video", levent, 
+                           actions);
 
-            if (!OnKeyAction(actions))
+            if (!handled && !OnKeyAction(actions))
             {
                 gContext->GetMainWindow()->TranslateKeyPress("TV Frontend",
                         levent, actions);
@@ -3116,7 +3116,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Video", levent, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Video", levent, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -3173,8 +3173,8 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
     if (!handled)
     {
-        gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", levent,
-                                                     actions);
+        handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", levent,
+                                                         actions);
 
         for (int i = 0; i < actions.size() && !handled; i++)
         {

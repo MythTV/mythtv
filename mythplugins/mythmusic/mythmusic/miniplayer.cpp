@@ -107,7 +107,7 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Music", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Music", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

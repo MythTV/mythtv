@@ -980,6 +980,16 @@ void MythMainWindow::ExitToMainMenu(void)
     }
 }
 
+/**
+ * \brief Get a list of actions for a keypress in the given context 
+ * \param context The context in which to lookup the keypress for actions.
+ * \param e       The keypress event to lookup.
+ * \param actions The QStringList that will contain the list of actions.
+ * \param allowJumps if true then jump points are allowed 
+ *
+ * \return true if the key event has been handled (the keypress was a jumpoint)
+           false if the caller should continue to handle keypress
+ */
 bool MythMainWindow::TranslateKeyPress(const QString &context,
                                        QKeyEvent *e, QStringList &actions,
                                        bool allowJumps)
@@ -1002,7 +1012,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     {
         void (*callback)(void) = d->jumpMap[keynum]->callback;
         callback();
-        return false;
+        return true;
     }
 
     if (allowJumps &&
@@ -1011,24 +1021,16 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
         d->exitingtomain = true;
         d->exitmenucallback = d->jumpMap[keynum]->callback;
         QApplication::postEvent(this, new ExitToMainMenuEvent());
-        return false;
+        return true;
     }
-
-    bool retval = false;
 
     if (d->keyContexts.value(context))
-    {
-        if (d->keyContexts.value(context)->GetMapping(keynum, actions))
-            retval = true;
-    }
+        d->keyContexts.value(context)->GetMapping(keynum, actions);
 
-    if (context != "Global" &&
-        d->keyContexts.value("Global")->GetMapping(keynum, actions))
-    {
-        retval = true;
-    }
+    if (context != "Global")
+        d->keyContexts.value("Global")->GetMapping(keynum, actions);
 
-    return retval;
+    return false;
 }
 
 void MythMainWindow::ClearKey(const QString &context, const QString &action)

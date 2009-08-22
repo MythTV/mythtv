@@ -228,7 +228,7 @@ bool Weather::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Weather", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Weather", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

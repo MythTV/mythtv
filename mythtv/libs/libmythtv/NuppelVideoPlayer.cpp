@@ -5102,7 +5102,10 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("TV Editing", e, actions);
+    handled = gContext->GetMainWindow()->TranslateKeyPress("TV Editing", e, actions);
+
+    if (handled)
+        return true;
 
     if (dialogname != "")
     {

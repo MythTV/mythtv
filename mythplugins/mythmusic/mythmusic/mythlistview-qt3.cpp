@@ -44,7 +44,7 @@ void Q3MythListView::keyPressEvent(QKeyEvent *e)
 
     bool handled = false;
     QStringList actions;
-    gContext->TranslateKeyPress("qt", e, actions);
+    handled = gContext->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

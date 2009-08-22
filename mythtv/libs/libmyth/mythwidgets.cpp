@@ -83,8 +83,9 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false, updated = false;
     QStringList actions;
-    if ((!popup || popup->isHidden()) &&
-        (gContext->TranslateKeyPress("qt", e, actions, !allowVirtualKeyboard)))
+    handled = gContext->TranslateKeyPress("qt", e, actions, !allowVirtualKeyboard); 
+
+    if ((!popup || popup->isHidden()) && !handled)
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -210,22 +211,22 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
-    {
-        for ( int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
 
-            if (action == "UP")
-                focusNextPrevChild(false);
-            else if (action == "DOWN")
-                focusNextPrevChild(true);
-            else if (action == "LEFT" || action == "RIGHT" || action == "SELECT")
-                toggle();
-            else
-                handled = false;
-        }
+    handled = gContext->TranslateKeyPress("qt", e, actions);
+
+    for ( int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP")
+            focusNextPrevChild(false);
+        else if (action == "DOWN")
+            focusNextPrevChild(true);
+        else if (action == "LEFT" || action == "RIGHT" || action == "SELECT")
+            toggle();
+        else
+            handled = false;
     }
 
     if (!handled)
@@ -262,22 +263,21 @@ void MythRadioButton::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    handled = gContext->TranslateKeyPress("qt", e, actions);
 
-            if (action == "UP")
-                focusNextPrevChild(false);
-            else if (action == "DOWN")
-                focusNextPrevChild(true);
-            else if (action == "LEFT" || action == "RIGHT")
-                toggle();
-            else
-                handled = false;
-        }
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP")
+            focusNextPrevChild(false);
+        else if (action == "DOWN")
+            focusNextPrevChild(true);
+        else if (action == "LEFT" || action == "RIGHT")
+            toggle();
+        else
+            handled = false;
     }
 
     if (!handled)
@@ -324,30 +324,29 @@ void MythSpinBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    handled = gContext->TranslateKeyPress("qt", e, actions);
 
-            if (action == "UP")
-                focusNextPrevChild(false);
-            else if (action == "DOWN")
-                focusNextPrevChild(true);
-            else if (action == "LEFT")
-                allowsinglestep ? setValue(value()-1) : stepDown();
-            else if (action == "RIGHT")
-                allowsinglestep ? setValue(value()+1) : stepUp();
-            else if (action == "PAGEDOWN")
-                stepDown();
-            else if (action == "PAGEUP")
-                stepUp();
-            else if (action == "SELECT")
-                handled = true;
-            else
-                handled = false;
-        }
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP")
+            focusNextPrevChild(false);
+        else if (action == "DOWN")
+            focusNextPrevChild(true);
+        else if (action == "LEFT")
+            allowsinglestep ? setValue(value()-1) : stepDown();
+        else if (action == "RIGHT")
+            allowsinglestep ? setValue(value()+1) : stepUp();
+        else if (action == "PAGEDOWN")
+            stepDown();
+        else if (action == "PAGEUP")
+            stepUp();
+        else if (action == "SELECT")
+            handled = true;
+        else
+            handled = false;
     }
 
     if (!handled)
@@ -377,26 +376,25 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    handled = gContext->TranslateKeyPress("qt", e, actions);
 
-            if (action == "UP")
-                focusNextPrevChild(false);
-            else if (action == "DOWN")
-                focusNextPrevChild(true);
-            else if (action == "LEFT")
-                setValue(value() - singleStep());
-            else if (action == "RIGHT")
-                setValue(value() + singleStep());
-            else if (action == "SELECT")
-                handled = true;
-            else
-                handled = false;
-        }
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP")
+            focusNextPrevChild(false);
+        else if (action == "DOWN")
+            focusNextPrevChild(true);
+        else if (action == "LEFT")
+            setValue(value() - singleStep());
+        else if (action == "RIGHT")
+            setValue(value() + singleStep());
+        else if (action == "SELECT")
+            handled = true;
+        else
+            handled = false;
     }
 
     if (!handled)
@@ -484,8 +482,9 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if ((!popup || popup->isHidden()) &&
-        gContext->TranslateKeyPress("qt", e, actions, false))
+    handled = gContext->TranslateKeyPress("qt", e, actions, false);
+
+    if ((!popup || popup->isHidden()) && !handled)
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -870,9 +869,9 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
+    handled = gContext->TranslateKeyPress("qt", e, actions, false);
 
-    if ((!popup || popup->isHidden()) &&
-          gContext->TranslateKeyPress("qt", e, actions, false))
+    if ((!popup || popup->isHidden()) && !handled)
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1202,7 +1201,9 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     keyPressActions.clear();
 
-    if (gContext->TranslateKeyPress("qt", (QKeyEvent *)e, actions))
+    handled = gContext->TranslateKeyPress("qt", (QKeyEvent *)e, actions);
+
+    if (!handled && !actions.isEmpty())
     {
         keyPressActions = actions;
 
@@ -1370,107 +1371,106 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
+    handled = gContext->TranslateKeyPress("qt", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        for (int i = 0; i < actions.size() && !handled; i++)
+        QString action = actions[i];
+        if (action == "UP" || action == "DOWN" || action == "PAGEUP" ||
+            action == "PAGEDOWN" || action == "LEFT" || action == "RIGHT")
         {
-            QString action = actions[i];
-            if (action == "UP" || action == "DOWN" || action == "PAGEUP" ||
-                action == "PAGEDOWN" || action == "LEFT" || action == "RIGHT")
+            int key;
+            if (action == "UP")
             {
-                int key;
-                if (action == "UP")
-                {
-                    // Qt::Key_Up at top of list allows focus to move to other widgets
-                    if (currentItem() == 0)
-                    {
-                        focusNextPrevChild(false);
-                        handled = true;
-                        continue;
-                    }
-
-                    key = Qt::Key_Up;
-                }
-                else if (action == "DOWN")
-                {
-                    // Qt::Key_down at bottom of list allows focus to move to other widgets
-                    if (currentRow() == (int) count() - 1)
-                    {
-                        focusNextPrevChild(true);
-                        handled = true;
-                        continue;
-                    }
-
-                    key = Qt::Key_Down;
-                }
-                else if (action == "LEFT")
+                // Qt::Key_Up at top of list allows focus to move to other widgets
+                if (currentItem() == 0)
                 {
                     focusNextPrevChild(false);
                     handled = true;
                     continue;
                 }
-                else if (action == "RIGHT")
+
+                key = Qt::Key_Up;
+            }
+            else if (action == "DOWN")
+            {
+                // Qt::Key_down at bottom of list allows focus to move to other widgets
+                if (currentRow() == (int) count() - 1)
                 {
                     focusNextPrevChild(true);
                     handled = true;
                     continue;
                 }
-                else if (action == "PAGEUP")
-                    key = Qt::Key_PageUp;
-                else if (action == "PAGEDOWN")
-                    key = Qt::Key_PageDown;
-                else
-                    key = Qt::Key_unknown;
 
-                QKeyEvent ev(QEvent::KeyPress, key, Qt::NoModifier);
-                QListWidget::keyPressEvent(&ev);
-                handled = true;
+                key = Qt::Key_Down;
             }
-            else if (action == "0" || action == "1" || action == "2" ||
-                     action == "3" || action == "4" || action == "5" ||
-                     action == "6" || action == "7" || action == "8" ||
-                     action == "9")
+            else if (action == "LEFT")
             {
-                int percent = action.toInt() * 10;
-                int nextItem = percent * count() / 100;
-                if (!itemVisible(nextItem))
-                    setTopRow(nextItem);
-                setCurrentRow(nextItem);
+                focusNextPrevChild(false);
                 handled = true;
+                continue;
             }
-            else if (action == "PREVVIEW")
+            else if (action == "RIGHT")
             {
-                int nextItem = currentRow();
-                if (nextItem > 0)
-                    nextItem--;
-                while (nextItem > 0 && text(nextItem)[0] == ' ')
-                    nextItem--;
-                if (!itemVisible(nextItem))
-                    setTopRow(nextItem);
-                setCurrentRow(nextItem);
+                focusNextPrevChild(true);
                 handled = true;
+                continue;
             }
-            else if (action == "NEXTVIEW")
-            {
-                int nextItem = currentRow();
-                if (nextItem < (int)count() - 1)
-                    nextItem++;
-                while (nextItem < (int)count() - 1 && text(nextItem)[0] == ' ')
-                    nextItem++;
-                if (!itemVisible(nextItem))
-                    setTopRow(nextItem);
-                setCurrentRow(nextItem);
-                handled = true;
-            }
-            else if (action == "MENU")
-                emit menuButtonPressed(currentRow());
-            else if (action == "EDIT")
-                emit editButtonPressed(currentRow());
-            else if (action == "DELETE")
-                emit deleteButtonPressed(currentRow());
-            else if (action == "SELECT")
-                emit accepted(currentRow());
+            else if (action == "PAGEUP")
+                key = Qt::Key_PageUp;
+            else if (action == "PAGEDOWN")
+                key = Qt::Key_PageDown;
+            else
+                key = Qt::Key_unknown;
+
+            QKeyEvent ev(QEvent::KeyPress, key, Qt::NoModifier);
+            QListWidget::keyPressEvent(&ev);
+            handled = true;
         }
+        else if (action == "0" || action == "1" || action == "2" ||
+                    action == "3" || action == "4" || action == "5" ||
+                    action == "6" || action == "7" || action == "8" ||
+                    action == "9")
+        {
+            int percent = action.toInt() * 10;
+            int nextItem = percent * count() / 100;
+            if (!itemVisible(nextItem))
+                setTopRow(nextItem);
+            setCurrentRow(nextItem);
+            handled = true;
+        }
+        else if (action == "PREVVIEW")
+        {
+            int nextItem = currentRow();
+            if (nextItem > 0)
+                nextItem--;
+            while (nextItem > 0 && text(nextItem)[0] == ' ')
+                nextItem--;
+            if (!itemVisible(nextItem))
+                setTopRow(nextItem);
+            setCurrentRow(nextItem);
+            handled = true;
+        }
+        else if (action == "NEXTVIEW")
+        {
+            int nextItem = currentRow();
+            if (nextItem < (int)count() - 1)
+                nextItem++;
+            while (nextItem < (int)count() - 1 && text(nextItem)[0] == ' ')
+                nextItem++;
+            if (!itemVisible(nextItem))
+                setTopRow(nextItem);
+            setCurrentRow(nextItem);
+            handled = true;
+        }
+        else if (action == "MENU")
+            emit menuButtonPressed(currentRow());
+        else if (action == "EDIT")
+            emit editButtonPressed(currentRow());
+        else if (action == "DELETE")
+            emit deleteButtonPressed(currentRow());
+        else if (action == "SELECT")
+            emit accepted(currentRow());
     }
 
     if (!handled)

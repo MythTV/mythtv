@@ -494,7 +494,7 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("News", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("News", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

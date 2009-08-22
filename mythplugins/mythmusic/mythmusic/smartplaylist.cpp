@@ -1868,64 +1868,64 @@ void SmartPlaylistDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-            {
-                handled = true;
-                reject();
-            }
-            else if (action == "LEFT")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            else if (action == "RIGHT")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
-            else if (action == "UP")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            else if (action == "DOWN")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
-            else if (action == "1")
-            {
-                handled = true;
-                selectPressed();
-            }
-            else if (action == "2")
-            {
-                handled = true;
-                newPressed();
-            }
-            else if (action == "3")
-            {
-                handled = true;
-                editPressed();
-            }
-            else if (action == "4")
-            {
-                handled = true;
-                deletePressed();
-            }
-            else if (action == "SELECT" && listbox->hasFocus())
-            {
-                handled = true;
-                selectPressed();
-            }
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        if (action == "ESCAPE")
+        {
+            handled = true;
+            reject();
         }
+        else if (action == "LEFT")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        else if (action == "RIGHT")
+        {
+            handled = true;
+            focusNextPrevChild(true);
+        }
+        else if (action == "UP")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        else if (action == "DOWN")
+        {
+            handled = true;
+            focusNextPrevChild(true);
+        }
+        else if (action == "1")
+        {
+            handled = true;
+            selectPressed();
+        }
+        else if (action == "2")
+        {
+            handled = true;
+            newPressed();
+        }
+        else if (action == "3")
+        {
+            handled = true;
+            editPressed();
+        }
+        else if (action == "4")
+        {
+            handled = true;
+            deletePressed();
+        }
+        else if (action == "SELECT" && listbox->hasFocus())
+        {
+            handled = true;
+            selectPressed();
+        }
+
     }
+
     if (!handled)
         MythPopupBox::keyPressEvent(e);
 }
@@ -2235,73 +2235,73 @@ void SmartPLOrderByDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        for (int i = 0; i < actions.size() && !handled; i++)
+        QString action = actions[i];
+        if (action == "ESCAPE")
         {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-            {
-                handled = true;
-                reject();
-            }
-            else if (action == "LEFT")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            else if (action == "RIGHT")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
-            else if (action == "UP")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            else if (action == "DOWN")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
-            else if (action == "1")
-            {
-                handled = true;
-                addPressed();
-            }
-            else if (action == "2")
-            {
-                handled = true;
-                deletePressed();
-            }
-            else if (action == "3")
-            {
-                handled = true;
-                moveUpPressed();
-            }
-            else if (action == "4")
-            {
-                handled = true;
-                moveDownPressed();
-            }
-            else if (action == "5")
-            {
-                handled = true;
-                ascendingPressed();
-            }
-            else if (action == "6")
-            {
-                handled = true;
-                descendingPressed();
-            }
-            else if (action == "7")
-            {
-                handled = true;
-                accept();
-            }
+            handled = true;
+            reject();
+        }
+        else if (action == "LEFT")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        else if (action == "RIGHT")
+        {
+            handled = true;
+            focusNextPrevChild(true);
+        }
+        else if (action == "UP")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        else if (action == "DOWN")
+        {
+            handled = true;
+            focusNextPrevChild(true);
+        }
+        else if (action == "1")
+        {
+            handled = true;
+            addPressed();
+        }
+        else if (action == "2")
+        {
+            handled = true;
+            deletePressed();
+        }
+        else if (action == "3")
+        {
+            handled = true;
+            moveUpPressed();
+        }
+        else if (action == "4")
+        {
+            handled = true;
+            moveDownPressed();
+        }
+        else if (action == "5")
+        {
+            handled = true;
+            ascendingPressed();
+        }
+        else if (action == "6")
+        {
+            handled = true;
+            descendingPressed();
+        }
+        else if (action == "7")
+        {
+            handled = true;
+            accept();
         }
     }
+
     if (!handled)
         MythPopupBox::keyPressEvent(e);
 }
@@ -2648,38 +2648,38 @@ void SmartPLDateDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        for (int i = 0; i < actions.size() && !handled; i++)
+        QString action = actions[i];
+        if (action == "ESCAPE")
         {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-            {
-                handled = true;
-                reject();
-            }
-            else if (action == "LEFT")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            else if (action == "RIGHT")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
-            else if (action == "UP")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            else if (action == "DOWN")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
+            handled = true;
+            reject();
+        }
+        else if (action == "LEFT")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        else if (action == "RIGHT")
+        {
+            handled = true;
+            focusNextPrevChild(true);
+        }
+        else if (action == "UP")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        else if (action == "DOWN")
+        {
+            handled = true;
+            focusNextPrevChild(true);
         }
     }
+
     if (!handled)
         MythPopupBox::keyPressEvent(e);
 }

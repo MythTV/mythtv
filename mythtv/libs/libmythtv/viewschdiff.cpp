@@ -116,34 +116,34 @@ void ViewScheduleDiff::keyPressEvent(QKeyEvent *e)
 
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
 
-            if (action == "ESCAPE" || action == "LEFT")
-                done(MythDialog::Accepted);
-            else if (action == "UP")
-                cursorUp();
-            else if (action == "DOWN")
-                cursorDown();
-            else if (action == "PAGEUP")
-                pageUp();
-            else if (action == "PAGEDOWN")
-                pageDown();
-            else if (action == "INFO")
-                edit();
-            else if (action == "UPCOMING")
-                upcoming();
-            else if (action == "DETAILS")
-                details();
-            else if (action == "SELECT")
-                statusDialog();
-            else
-                handled = false;
-        }
+    handled = gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "ESCAPE" || action == "LEFT")
+            done(MythDialog::Accepted);
+        else if (action == "UP")
+            cursorUp();
+        else if (action == "DOWN")
+            cursorDown();
+        else if (action == "PAGEUP")
+            pageUp();
+        else if (action == "PAGEDOWN")
+            pageDown();
+        else if (action == "INFO")
+            edit();
+        else if (action == "UPCOMING")
+            upcoming();
+        else if (action == "DETAILS")
+            details();
+        else if (action == "SELECT")
+            statusDialog();
+        else
+            handled = false;
     }
 
     if (!handled)

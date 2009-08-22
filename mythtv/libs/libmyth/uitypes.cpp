@@ -4711,34 +4711,33 @@ void UIKeyboardType::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions, false))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    handled = gContext->TranslateKeyPress("qt", e, actions, false);
 
-            if (action == "UP")
-            {
-                moveUp();
-            }
-            else if (action == "DOWN")
-            {
-                moveDown();
-            }
-            else if (action == "LEFT")
-            {
-                moveLeft();
-            }
-            else if (action == "RIGHT")
-            {
-                moveRight();
-            }
-            else if (action == "SELECT")
-                m_focusedKey->activate();
-            else
-                handled = false;
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP")
+        {
+            moveUp();
         }
+        else if (action == "DOWN")
+        {
+            moveDown();
+        }
+        else if (action == "LEFT")
+        {
+            moveLeft();
+        }
+        else if (action == "RIGHT")
+        {
+            moveRight();
+        }
+        else if (action == "SELECT")
+            m_focusedKey->activate();
+        else
+            handled = false;
     }
 
     if (!handled)

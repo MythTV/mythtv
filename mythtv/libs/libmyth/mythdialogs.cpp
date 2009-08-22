@@ -201,40 +201,39 @@ void MythDialog::keyPressEvent( QKeyEvent *e )
     bool handled = false;
     QStringList actions;
 
-    if (gContext->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    handled = gContext->TranslateKeyPress("qt", e, actions);
 
-            if (action == "ESCAPE")
-                reject();
-            else if (action == "UP" || action == "LEFT")
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "ESCAPE")
+            reject();
+        else if (action == "UP" || action == "LEFT")
+        {
+            if (focusWidget() &&
+                (focusWidget()->focusPolicy() == Qt::StrongFocus ||
+                    focusWidget()->focusPolicy() == Qt::WheelFocus))
             {
-                if (focusWidget() &&
-                    (focusWidget()->focusPolicy() == Qt::StrongFocus ||
-                     focusWidget()->focusPolicy() == Qt::WheelFocus))
-                {
-                }
-                else
-                    focusNextPrevChild(false);
             }
-            else if (action == "DOWN" || action == "RIGHT")
-            {
-                if (focusWidget() &&
-                    (focusWidget()->focusPolicy() == Qt::StrongFocus ||
-                     focusWidget()->focusPolicy() == Qt::WheelFocus))
-                {
-                }
-                else
-                    focusNextPrevChild(true);
-            }
-            else if (action == "MENU")
-                emit menuButtonPressed();
             else
-                handled = false;
+                focusNextPrevChild(false);
         }
+        else if (action == "DOWN" || action == "RIGHT")
+        {
+            if (focusWidget() &&
+                (focusWidget()->focusPolicy() == Qt::StrongFocus ||
+                    focusWidget()->focusPolicy() == Qt::WheelFocus))
+            {
+            }
+            else
+                focusNextPrevChild(true);
+        }
+        else if (action == "MENU")
+            emit menuButtonPressed();
+        else
+            handled = false;
     }
 }
 
@@ -575,7 +574,8 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->TranslateKeyPress("qt", e, actions);
+    handled = gContext->TranslateKeyPress("qt", e, actions);
+
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -960,14 +960,13 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
+    handled = gContext->TranslateKeyPress("qt", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-                handled = true;
-        }
+        QString action = actions[i];
+        if (action == "ESCAPE")
+            handled = true;
     }
 
     if (!handled)
@@ -1760,16 +1759,15 @@ void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
+    handled = gContext->TranslateKeyPress("qt", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        for (int i = 0; i < actions.size() && !handled; i++)
+        QString action = actions[i];
+        if (action == "ESCAPE")
         {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-            {
-                handled = true;
-                MythDialog::keyPressEvent(e);
-            }
+            handled = true;
+            MythDialog::keyPressEvent(e);
         }
     }
 }
@@ -1820,33 +1818,33 @@ void MythSearchDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions))
+    handled = gContext->TranslateKeyPress("qt", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        for (int i = 0; i < actions.size() && !handled; i++)
+        QString action = actions[i];
+        if (action == "ESCAPE")
         {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-            {
-                handled = true;
-                reject();
-            }
-            if (action == "LEFT")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            if (action == "RIGHT")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
-            if (action == "SELECT")
-            {
-                handled = true;
-                accept();
-            }
+            handled = true;
+            reject();
+        }
+        if (action == "LEFT")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        if (action == "RIGHT")
+        {
+            handled = true;
+            focusNextPrevChild(true);
+        }
+        if (action == "SELECT")
+        {
+            handled = true;
+            accept();
         }
     }
+
     if (!handled)
         MythPopupBox::keyPressEvent(e);
 }

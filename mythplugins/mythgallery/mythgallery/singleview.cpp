@@ -359,7 +359,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     m_info_show_short = false;
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Gallery", e, actions);
 
     int scrollX = screenwidth / 10;
     int scrollY = screenheight / 10;

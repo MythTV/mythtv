@@ -135,26 +135,25 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    if (GetMythMainWindow()->TranslateKeyPress("qt", event, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
 
-            if (action == "ESCAPE" || action == "LEFT" || action == "MENU")
-            {
-                SendEvent(-1);
-                m_ScreenStack->PopScreen();
-            }
-            else if (action == "RIGHT")
-            {
-                MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
-                Select(item);
-            }
-            else
-                handled = false;
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "ESCAPE" || action == "LEFT" || action == "MENU")
+        {
+            SendEvent(-1);
+            m_ScreenStack->PopScreen();
         }
+        else if (action == "RIGHT")
+        {
+            MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+            Select(item);
+        }
+        else
+            handled = false;
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
@@ -231,18 +230,17 @@ bool MythConfirmationDialog::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    if (GetMythMainWindow()->TranslateKeyPress("qt", event, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions);
 
-            if (action == "ESCAPE")
-                sendResult(false);
-            else
-                handled = false;
-        }
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "ESCAPE")
+            sendResult(false);
+        else
+            handled = false;
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))

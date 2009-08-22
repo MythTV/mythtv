@@ -953,22 +953,21 @@ bool VisualizationsEditor::handleKeyPress(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
-            if (action == "LEFT")
-            {
-                handled = true;
-                focusNextPrevChild(false);
-            }
-            else if (action == "RIGHT")
-            {
-                handled = true;
-                focusNextPrevChild(true);
-            }
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+
+        if (action == "LEFT")
+        {
+            handled = true;
+            focusNextPrevChild(false);
+        }
+        else if (action == "RIGHT")
+        {
+            handled = true;
+            focusNextPrevChild(true);
         }
     }
 

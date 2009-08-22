@@ -156,7 +156,7 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Game", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Game", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -176,6 +176,7 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
         else
             handled = false;
     }
+
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
 

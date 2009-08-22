@@ -352,7 +352,10 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
     bool handled = false;
-    GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+
+    if (handled)
+        return true;
 
     // We want to handle jump to channel before everything else
     // The reason is because the number keys could be mapped to

@@ -166,7 +166,8 @@ bool MythTerminalKeyFilter::eventFilter(QObject *obj, QEvent *event)
     {
         QKeyEvent *e = (QKeyEvent*)(event);
         QStringList actions;
-        if (gContext->TranslateKeyPress("qt", e, actions, false))
+        bool handled = gContext->TranslateKeyPress("qt", e, actions, false);
+        if (!handled && !actions.isEmpty())
         {
             if (actions.contains("LEFT") || actions.contains("RIGHT"))
             {

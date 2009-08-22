@@ -254,7 +254,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
     resetTimer();
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions, true);
+    handled = GetMythMainWindow()->TranslateKeyPress("Music", e, actions, true);
 
     int scrollAmt = 1;
 

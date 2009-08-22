@@ -193,10 +193,13 @@ static bool has_action(QString action, const QStringList &actions)
 bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
 {
     QStringList actions;
-    bool ok = gContext->GetMainWindow()->TranslateKeyPress(
+    bool handled = gContext->GetMainWindow()->TranslateKeyPress(
         "TV Playback", e, actions);
 
-    if (!ok || ((uint)m_levelnum >= listLevels.size()))
+    if (handled)
+        return true;
+
+    if (((uint)m_levelnum >= listLevels.size()))
         return false;
     else if (has_action("UP", actions))
     {

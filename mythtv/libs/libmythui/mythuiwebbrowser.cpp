@@ -561,7 +561,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
     bool handled = false;
-    GetMythMainWindow()->TranslateKeyPress("Browser", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Browser", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

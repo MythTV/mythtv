@@ -236,7 +236,7 @@ bool MythNewsConfig::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("News", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("News", event, actions);
 
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;

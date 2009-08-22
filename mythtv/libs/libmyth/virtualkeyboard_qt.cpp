@@ -236,17 +236,16 @@ void VirtualKeyboardQt::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->TranslateKeyPress("qt", e, actions, false))
+    handled = gContext->TranslateKeyPress("qt", e, actions, false);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
-            if (action == "ESCAPE")
-                accept();
-            else
-                handled = false;
-        }
+        QString action = actions[i];
+        handled = true;
+        if (action == "ESCAPE")
+            accept();
+        else
+            handled = false;
     }
 
     //just pass all unhandled key events for the keyboard to handle

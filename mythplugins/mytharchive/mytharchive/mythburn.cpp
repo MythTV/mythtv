@@ -152,7 +152,7 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Archive", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Archive", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

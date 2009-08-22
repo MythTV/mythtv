@@ -313,7 +313,7 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

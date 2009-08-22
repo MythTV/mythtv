@@ -105,24 +105,23 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e)
     bool handled = false;
     QStringList actions;
 
-    if (gContext->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            const QString &action = actions[i];
-            handled = true;
+    handled = gContext->TranslateKeyPress("qt", e, actions);
 
-            if (action == "SELECT")
-                accept();
-            else if (action == "ESCAPE")
-                reject();
-            else if (action == "EDIT")
-                emit editButtonPressed();
-            else if (action == "DELETE")
-                emit deleteButtonPressed();
-            else
-                handled = false;
-        }
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        const QString &action = actions[i];
+        handled = true;
+
+        if (action == "SELECT")
+            accept();
+        else if (action == "ESCAPE")
+            reject();
+        else if (action == "EDIT")
+            emit editButtonPressed();
+        else if (action == "DELETE")
+            emit deleteButtonPressed();
+        else
+            handled = false;
     }
 
     if (!handled)

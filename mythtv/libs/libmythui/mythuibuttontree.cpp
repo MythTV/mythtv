@@ -510,7 +510,7 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
 {
     QStringList actions;
     bool handled = false;
-    GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

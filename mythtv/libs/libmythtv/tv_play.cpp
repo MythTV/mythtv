@@ -3325,14 +3325,15 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     }
 
     QStringList actions;
+    bool handled = false;
 
     if (ignoreKeys)
     {
-        if (!gContext->GetMainWindow()->TranslateKeyPress(
-                "TV Playback", e, actions))
-        {
+        handled = gContext->GetMainWindow()->TranslateKeyPress(
+                  "TV Playback", e, actions);
+
+        if (handled || actions.isEmpty())
             return;
-        }
 
         bool esc   = has_action("ESCAPE", actions);
         bool pause = has_action("PAUSE",  actions);
@@ -3395,8 +3396,10 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     if (actx->nvp && (actx->nvp->GetCaptionMode() == kDisplayTeletextMenu))
     {
         QStringList tt_actions;
-        if (gContext->GetMainWindow()->TranslateKeyPress(
-                "Teletext Menu", e, tt_actions))
+        handled = gContext->GetMainWindow()->TranslateKeyPress(
+                  "Teletext Menu", e, tt_actions);
+
+        if (!handled && !tt_actions.isEmpty())
         {
             for (int i = 0; i < tt_actions.size(); i++)
             {
@@ -3413,26 +3416,30 @@ void TV::ProcessKeypress(PlayerContext *actx, QKeyEvent *e)
     if (actx->nvp && actx->nvp->GetInteractiveTV())
     {
         QStringList itv_actions;
-        if (gContext->GetMainWindow()->TranslateKeyPress(
-                "TV Playback", e, itv_actions))
-        for (int i = 0; i < itv_actions.size(); i++)
+        handled = gContext->GetMainWindow()->TranslateKeyPress(
+                  "TV Playback", e, itv_actions);
+
+        if (!handled && !itv_actions.isEmpty())
         {
-            if (actx->nvp->ITVHandleAction(itv_actions[i]))
+            for (int i = 0; i < itv_actions.size(); i++)
             {
-                actx->UnlockDeleteNVP(__FILE__, __LINE__);
-                return;
+                if (actx->nvp->ITVHandleAction(itv_actions[i]))
+                {
+                    actx->UnlockDeleteNVP(__FILE__, __LINE__);
+                    return;
+                }
             }
         }
     }
     actx->UnlockDeleteNVP(__FILE__, __LINE__);
 
-    if (!gContext->GetMainWindow()->TranslateKeyPress(
-            "TV Playback", e, actions))
-    {
-        return;
-    }
+    handled = gContext->GetMainWindow()->TranslateKeyPress(
+              "TV Playback", e, actions);
 
-    bool handled = false;
+    if (handled || actions.isEmpty())
+        return;
+
+    handled = false;
 
     bool isDVD = actx->buffer && actx->buffer->isDVD();
     bool isDVDStill = isDVD && actx->buffer->InDVDMenuOrStillFrame();

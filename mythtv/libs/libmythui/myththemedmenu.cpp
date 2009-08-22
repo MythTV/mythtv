@@ -215,13 +215,13 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
     }
 
     QStringList actions;
-    GetMythMainWindow()->TranslateKeyPress("menu", event, actions);
+    bool handled = false;
+
+    handled = GetMythMainWindow()->TranslateKeyPress("menu", event, actions);
 
     bool fullexit = false;
     if (event->modifiers() == m_exitModifier)
         fullexit = true;
-
-    bool handled = false;
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
