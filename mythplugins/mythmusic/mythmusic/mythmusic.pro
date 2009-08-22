@@ -16,6 +16,7 @@ TARGET = mythmusic
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
+LIBS += -lmythavcodec-$$LIBVERSION -lmythavutil-$$LIBVERSION
 LIBS += -lmythavformat-$$LIBVERSION
 LIBS += -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
 
