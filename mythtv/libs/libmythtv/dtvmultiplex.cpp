@@ -373,14 +373,14 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                     return false;
                 }
                 return ParseDVB_S_and_C(
-                        QString().number(cd.FrequencyHz()/1000), "auto",
+                        QString().number(cd.FrequencyHz()),      "auto",
                         QString().number(cd.SymbolRateHz()),     cd.FECInnerString(),
                         cd.ModulationString(),                   cd.PolarizationString());
             }
             if (type == DTVTunerType::kTunerTypeDVB_S2)
             {
                 return ParseDVB_S2(
-                        QString().number(cd.FrequencyHz()/1000), "auto",
+                        QString().number(cd.FrequencyHz()),      "auto",
                         QString().number(cd.SymbolRateHz()),     cd.FECInnerString(),
                         cd.ModulationString(),                   cd.PolarizationString(),
                         cd.ModulationSystemString(),             cd.RollOffString());
