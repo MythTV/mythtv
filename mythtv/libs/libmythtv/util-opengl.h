@@ -114,6 +114,13 @@
 #define GL_ALL_COMPLETED_NV               0x84F2
 #endif
 
+#ifndef GL_YCBCR_MESA
+#define GL_YCBCR_MESA                     0x8757
+#endif
+#ifndef GL_UNSIGNED_SHORT_8_8_MESA
+#define GL_UNSIGNED_SHORT_8_8_MESA        0x85BA
+#endif
+
 #ifndef APIENTRY
 #define APIENTRY
 #endif
@@ -152,18 +159,13 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 
 bool init_opengl(void);
 
-void pack_yv12alpha(const unsigned char *source,
-                 const unsigned char *dest,
-                 const int *offsets,
-                 const int *pitches,
-                 const QSize size,
-                 const unsigned char *alpha = NULL);
+void pack_yv12alpha(const unsigned char *source, const unsigned char *dest,
+                    const int *offsets, const int *pitches,
+                    const QSize size, const unsigned char *alpha = NULL);
 
-void pack_yv12interlaced(const unsigned char *source,
-                 const unsigned char *dest,
-                 const int *offsets,
-                 const int *pitches,
-                 const QSize size);
+void pack_yv12interlaced(const unsigned char *source, const unsigned char *dest,
+                         const int *offsets, const int *pitches,
+                         const QSize size);
 
 void store_bicubic_weights(float x, float *dst);
 
@@ -178,6 +180,7 @@ bool has_gl_nvfence_support(const QString &extensions);
 bool has_gl_applefence_support(const QString & extensions);
 bool has_glx_swapinterval_support(const QString &glx_extensions);
 bool has_wgl_swapinterval_support(const QString &extensions);
+bool has_gl_ycbcrmesa_support(const QString &ext);
 
 extern QString                             gMythGLExtensions;
 extern uint                                gMythGLExtSupported;

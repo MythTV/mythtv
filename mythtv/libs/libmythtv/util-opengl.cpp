@@ -464,6 +464,16 @@ bool has_wgl_swapinterval_support(const QString &ext)
     return gMythWGLSwapIntervalEXT;
 }
 
+bool has_gl_ycbcrmesa_support(const QString &ext)
+{
+    init_opengl();
+
+    if (!ext.contains("GL_MESA_ycbcr_texture"))
+        return false;
+
+    return true;
+}
+
 #ifdef MMX
 static inline void mmx_pack_alpha_high(uint8_t *a1, uint8_t *a2,
                                        uint8_t *y1, uint8_t *y2)

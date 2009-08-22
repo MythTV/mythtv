@@ -1,7 +1,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "openglcontext.h"
-
+#include "myth_imgconvert.h"
 #include "util-opengl.h"
 
 #define LOC QString("GLCtx: ")
@@ -212,7 +212,8 @@ bool OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
         ((has_gl_fbuffer_object_support(m_extensions)) ? kGLExtFBufObj : 0) |
         ((has_gl_applefence_support(m_extensions)) ? kGLAppleFence : 0) |
         ((has_wgl_swapinterval_support(m_extensions)) ? kGLWGLSwap : 0) |
-        ((has_gl_nvfence_support(m_extensions)) ? kGLNVFence : 0) | kGLFinish;
+        ((has_gl_nvfence_support(m_extensions)) ? kGLNVFence : 0) |
+        ((has_gl_ycbcrmesa_support(m_extensions)) ? kGLYCbCrTex : 0) | kGLFinish;
 
     m_ext_used = m_ext_supported;
 
@@ -411,6 +412,7 @@ void OpenGLContext::UpdateTexture(uint tex,
                                   const int *offsets,
                                   const int *pitches,
                                   VideoFrameType fmt,
+                                  bool convert,
                                   bool interlaced,
                                   const unsigned char* alpha)
 {
@@ -437,15 +439,31 @@ void OpenGLContext::UpdateTexture(uint tex,
         {
             memcpy(pboMemory, buf, tmp_tex->m_data_size);
         }
-        else if (interlaced)
+        else if (convert)
         {
-            pack_yv12interlaced(buf, (unsigned char *)pboMemory,
-                                offsets, pitches, size);
+            AVPicture img_in, img_out;
+            PixelFormat out_fmt = PIX_FMT_BGRA;
+            if (tmp_tex->m_data_type == GL_UNSIGNED_SHORT_8_8_MESA)
+                out_fmt = PIX_FMT_UYVY422;
+            avpicture_fill(&img_out, (uint8_t *)pboMemory, out_fmt,
+                           size.width(), size.height());
+            avpicture_fill(&img_in, (uint8_t *)buf, PIX_FMT_YUV420P,
+                           size.width(), size.height());
+            myth_sws_img_convert(&img_out, out_fmt, &img_in, PIX_FMT_YUV420P,
+                           size.width(), size.height());
+        }
+        else if (FMT_YV12 == fmt)
+        {
+            interlaced ?
+                pack_yv12interlaced(buf, (unsigned char *)pboMemory,
+                                    offsets, pitches, size) :
+                pack_yv12alpha(buf, (unsigned char *)pboMemory,
+                               offsets, pitches, size, alpha);
         }
         else
         {
-            pack_yv12alpha(buf, (unsigned char *)pboMemory,
-                           offsets, pitches, size, alpha);
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Frame format not supported."));
         }
 
         gMythGLUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
@@ -457,7 +475,7 @@ void OpenGLContext::UpdateTexture(uint tex,
     }
     else
     {
-        if (!tmp_tex->m_data)
+        if (!tmp_tex->m_data && FMT_BGRA != fmt)
         {
             unsigned char *scratch = new unsigned char[tmp_tex->m_data_size];
             if (scratch)
@@ -475,15 +493,29 @@ void OpenGLContext::UpdateTexture(uint tex,
             {
                 tmp = buf;
             }
-            else if (interlaced)
+            else if (convert)
             {
-                pack_yv12interlaced(buf, tmp,
-                                    offsets, pitches, size);
+                AVPicture img_in, img_out;
+                PixelFormat out_fmt = PIX_FMT_BGRA;
+                if (tmp_tex->m_data_type == GL_UNSIGNED_SHORT_8_8_MESA)
+                    out_fmt = PIX_FMT_UYVY422;
+                avpicture_fill(&img_out, (uint8_t *)tmp, out_fmt,
+                               size.width(), size.height());
+                avpicture_fill(&img_in, (uint8_t *)buf, PIX_FMT_YUV420P,
+                               size.width(), size.height());
+                myth_sws_img_convert(&img_out, out_fmt, &img_in, PIX_FMT_YUV420P,
+                               size.width(), size.height());
+            }
+            else if (FMT_YV12 == fmt)
+            {
+                interlaced ?
+                    pack_yv12interlaced(buf, tmp, offsets, pitches, size) :
+                    pack_yv12alpha(buf, tmp, offsets, pitches, size, alpha);
             }
             else
             {
-                pack_yv12alpha(buf, tmp, offsets,
-                               pitches, size, alpha);
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("Frame format not supported."));
             }
 
             glTexSubImage2D(tmp_tex->m_type, 0, 0, 0,
@@ -582,6 +614,9 @@ uint OpenGLContext::GetBufferSize(QSize size, uint fmt, uint type)
         case GL_RGBA:
             bpp = 4;
             break;
+        case GL_YCBCR_MESA:
+            bpp = 2;
+            break;
         default:
             bpp =0;
     }
@@ -590,6 +625,9 @@ uint OpenGLContext::GetBufferSize(QSize size, uint fmt, uint type)
     {
         case GL_UNSIGNED_BYTE:
             bytes = sizeof(GLubyte);
+            break;
+        case GL_UNSIGNED_SHORT_8_8_MESA:
+            bytes = sizeof(GLushort);
             break;
         case GL_FLOAT:
             bytes = sizeof(GLfloat);

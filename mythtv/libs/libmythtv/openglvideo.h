@@ -95,7 +95,6 @@ class OpenGLVideo
                              FrameScanType field = kScan_Progressive);
     static QString FilterToString(OpenGLFilterType filter);
     static OpenGLFilterType StringToFilter(const QString &filter);
-    void ShutDownYUV2RGB(void);
     QSize GetTextureSize(const QSize &size);
     void SetFiltering(void);
 
@@ -130,11 +129,8 @@ class OpenGLVideo
     uint           textureType;
     uint           helperTexture;
     OpenGLFilterType defaultUpsize;
-
-    QSize          convertSize;
-    unsigned char *convertBuf;
-
     uint           gl_features;
+    bool           using_ycbcrtex;
     LetterBoxColour gl_letterbox_colour;
 };
 #endif // _OPENGL_VIDEO_H__

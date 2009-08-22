@@ -58,7 +58,8 @@ typedef enum
     kGLGLXVSync    = 0x0200,
     kGLWGLSwap     = 0x0400,
     kGLAGLSwap     = 0x0800,
-    kGLMaxFeat     = 0x1000,
+    kGLYCbCrTex    = 0x1000,
+    kGLMaxFeat     = 0x2000,
 } GLFeatures;
 
 class OpenGLContext;
@@ -107,6 +108,7 @@ class OpenGLContext
                        const int *offsets,
                        const int *pitches,
                        VideoFrameType fmt,
+                       bool convert,
                        bool interlaced = FALSE,
                        const unsigned char* alpha = NULL);
     uint CreateTexture(QSize tot_size, QSize vid_size,
