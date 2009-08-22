@@ -1180,9 +1180,13 @@ void NuppelVideoPlayer::OpenDummy(void)
 {
     isDummy = true;
 
+    float displayAspect =
+        gContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio", 
+                                        gContext->GetHostName(), 1.3333);
+
     if (!videoOutput)
     {
-        SetVideoParams(720, 576, 25.00, 15);
+        SetVideoParams(720, 576, 25.00, 15, displayAspect);
     }
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
