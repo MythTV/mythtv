@@ -520,13 +520,36 @@ QString NetworkControl::processPlay(QStringList tokens)
         return QString("ERROR: See 'help %1' for usage information")
                        .arg(tokens[0]);
 
-    if ((tokens.size() >= 4) &&
-        (is_abbrev("program", tokens[1])) &&
-        (tokens[2].contains(QRegExp("^\\d+$"))) &&
-        (tokens[3].contains(QRegExp(
+    if ((tokens.size() >= 3) &&
+        (is_abbrev("file", tokens[1])))
+    {
+        if (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu")
+        {
+            gContext->GetMainWindow()->JumpTo(jumpMap["mainmenu"]);
+
+            QTime timer;
+            timer.start();
+            while ((timer.elapsed() < 10000) &&
+                   (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu"))
+                usleep(10000);
+        }
+
+        if (GetMythUI()->GetCurrentLocation().toLower() == "mainmenu")
+        {
+            QString msg = QString("HANDLE_MEDIA Internal %1").arg(tokens[2]);
+            MythEvent me(msg);
+            QApplication::postEvent(gContext->GetMainWindow(), me.clone());
+        }
+        else
+            return QString("Unable to change to main menu to start playback!");
+    }
+    else if ((tokens.size() >= 4) &&
+             (is_abbrev("program", tokens[1])) &&
+             (tokens[2].contains(QRegExp("^\\d+$"))) &&
+             (tokens[3].contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
     {
-        if (GetMythUI()->GetCurrentLocation() == "Playback")
+        if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
         {
             QString message = QString("NETWORK_CONTROL STOP");
             MythEvent me(message);
@@ -535,22 +558,22 @@ QString NetworkControl::processPlay(QStringList tokens)
             QTime timer;
             timer.start();
             while ((timer.elapsed() < 10000) &&
-                   (GetMythUI()->GetCurrentLocation() == "Playback"))
+                   (GetMythUI()->GetCurrentLocation().toLower() == "playback"))
                 usleep(10000);
         }
 
-        if (GetMythUI()->GetCurrentLocation() != "PlaybackBox")
+        if (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox")
         {
             gContext->GetMainWindow()->JumpTo(jumpMap["playbackbox"]);
 
             QTime timer;
             timer.start();
             while ((timer.elapsed() < 10000) &&
-                   (GetMythUI()->GetCurrentLocation() != "PlaybackBox"))
+                   (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
                 usleep(10000);
         }
 
-        if (GetMythUI()->GetCurrentLocation() == "PlaybackBox")
+        if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")
         {
             QString action = "PLAY";
             if (tokens.size() == 5 && tokens[4] == "resume")
@@ -882,6 +905,7 @@ QString NetworkControl::processHelp(QStringList tokens)
             "play channel down     - Change channel Down\r\n"
             "play channel NUMBER   - Change to a specific channel number\r\n"
             "play chanid NUMBER    - Change to a specific channel id (chanid)\r\n"
+            "play file FILENAME    - Play FILENAME (FILENAME may be a file or a myth:// URL)\r\n"
             "play program CHANID yyyy-mm-ddThh:mm:ss\r\n"
             "                      - Play program with chanid & starttime\r\n"
             "play program CHANID yyyy-mm-ddThh:mm:ss resume\r\n"

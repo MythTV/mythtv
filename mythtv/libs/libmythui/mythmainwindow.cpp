@@ -1660,6 +1660,19 @@ void MythMainWindow::customEvent(QEvent *ce)
             }
         }
     }
+    else if ((MythEvent::Type)(ce->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)ce;
+        QString message = me->Message();
+
+        if (message.left(12) == "HANDLE_MEDIA")
+        {
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            HandleMedia(tokens[1],
+                        message.mid(tokens[0].length() +
+                                    tokens[1].length() + 2));
+        }
+    }
 }
 
 QObject *MythMainWindow::getTarget(QKeyEvent &key)
