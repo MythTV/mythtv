@@ -736,6 +736,40 @@ QString NetworkControl::processQuery(QStringList tokens)
     }
     else if(is_abbrev("time", tokens[1]))
         return QDateTime::currentDateTime().toString(Qt::ISODate);
+    else if (is_abbrev("uptime", tokens[1]))
+    {
+        QString str;
+        time_t  uptime;
+
+        if (getUptime(uptime))
+            str = QString::number(uptime);
+        else
+            str = QString("Could not determine uptime.");
+        return str;
+    }
+    else if (is_abbrev("load", tokens[1]))
+    {
+        QString str;
+        double  loads[3];
+
+        if (getloadavg(loads,3) == -1)
+            str = QString("getloadavg() failed");
+        else
+            str = QString("%1 %2 %3").arg(loads[0]).arg(loads[1]).arg(loads[2]);
+        return str;
+    }
+    else if (is_abbrev("memstats",tokens[1]))
+    {
+        QString str;
+        int     totalMB, freeMB, totalVM, freeVM;
+
+        if (getMemStats(totalMB, freeMB, totalVM, freeVM))
+            str = QString("%1 %2 %3 %4")
+                          .arg(totalMB).arg(freeMB).arg(totalVM).arg(freeVM);
+        else
+            str = QString("Could not determine memory stats.");
+        return str;
+    }
     else if ((tokens.size() == 4) &&
              is_abbrev("recording", tokens[1]) &&
              (tokens[2].contains(QRegExp("^\\d+$"))) &&
@@ -881,7 +915,10 @@ QString NetworkControl::processHelp(QStringList tokens)
             "                      - List info about the specified program\r\n"
             "query liveTV          - List current TV schedule\r\n"
             "query liveTV CHANID   - Query current program for specified channel\r\n"
-            "query time            - Query current time on server\r\n"
+            "query load            - List 1/5/15 load averages\r\n"
+            "query memstats        - List free and total, physical and swap memory\r\n"
+            "query time            - Query current time on frontend\r\n"
+            "query uptime          - Query machine uptime\r\n"
             "query verbose         - Get current VERBOSE filter\r\n"
             "query version         - Query Frontend version details\r\n";
     }
