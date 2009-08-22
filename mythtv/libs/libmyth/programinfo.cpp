@@ -722,6 +722,33 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
     progMap["iconpath"] = "";
+    progMap["coverartpath"] = "";
+
+    if (isVideo && !pathname.startsWith("dvd:")) 
+    {
+        QString result;
+        QFileInfo fi(pathname); 
+        QString fn = fi.fileName(); 
+        fn.prepend("%"); 
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT coverfile FROM videometadata WHERE filename LIKE :FILENAME ;"); 
+        query.bindValue(":FILENAME", fn); 
+
+        if (query.exec() && query.next()) 
+            result = query.value(0).toString();
+
+        if (!result.startsWith("/") && pathname.startsWith("myth://"))
+        {
+            QString workURL = pathname;
+            QUrl baseURL(workURL);
+            baseURL.setUserName("Coverart");
+            QString finalURL = baseURL.toString(QUrl::RemovePath) + "/" + result;
+            progMap["coverartpath"] = finalURL;
+        }
+        else
+            progMap["coverartpath"] = result; 
+    } 
 
     QString tmpSize;
 

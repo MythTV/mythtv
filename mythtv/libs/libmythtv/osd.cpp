@@ -1720,6 +1720,15 @@ void OSD::SetText(const QString &name, InfoMap &infoMap, int length)
                 cs->Load(" ", wmult, hmult, 30, 30);
         }
 
+        OSDTypeImage *cs1 = (OSDTypeImage *)container->GetType("coverart");
+        if (cs1)
+        {
+            if ((infoMap.contains("coverartpath")) && !infoMap["coverartpath"].isEmpty())
+                cs1->Load(infoMap["coverartpath"], wmult, hmult, 30, 30);
+            else
+                cs1->Load(" ", wmult, hmult, 30, 30);
+        }
+
         m_setsvisible = true;
         changed = true;
     }
@@ -1741,6 +1750,15 @@ void OSD::SetInfoText(InfoMap infoMap, int length)
                 cs->Load(infoMap["iconpath"], wmult, hmult, 30, 30);
             else
                 cs->Load(" ", wmult, hmult, 30, 30);
+        }
+
+        OSDTypeImage *cs1 = (OSDTypeImage *)container->GetType("coverart");
+        if (cs1)
+        {
+            if ((infoMap.contains("coverartpath")) && !infoMap["coverartpath"].isEmpty())
+                cs1->Load(infoMap["coverartpath"], wmult, hmult, 30, 30);
+            else
+                cs1->Load(" ", wmult, hmult, 30, 30);
         }
 
         container->DisplayFor(length * 1000000);
