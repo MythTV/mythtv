@@ -243,6 +243,7 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
     type = (CardUtil::DVBT == cardtype) ? DTVConfParser::OFDM : type;
     type = (CardUtil::QPSK == cardtype) ? DTVConfParser::QPSK : type;
     type = (CardUtil::DVBC == cardtype) ? DTVConfParser::QAM  : type;
+    type = (CardUtil::DVBS2 == cardtype) ? DTVConfParser::DVBS2 : type;
     type = ((CardUtil::ATSC == cardtype) ||
             (CardUtil::HDHOMERUN == cardtype)) ? DTVConfParser::ATSC : type;
 
