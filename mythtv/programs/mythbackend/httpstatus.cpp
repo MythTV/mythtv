@@ -754,7 +754,7 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
 
                     if (!program.isNull())
                     {
-                        os << ": '" << program.attribute( "title", "Unknown" ) << "'";
+                        os << " '" << program.attribute( "title", "Unknown" ) << "'";
 
                         // Get Channel information
 
@@ -783,8 +783,14 @@ int HttpStatus::PrintEncoderStatus( QTextStream &os, QDomElement encoders )
                                          recording.attribute( "recEndTs", "" ),
                                          Qt::ISODate );
 
-                                os << ". This recording will end "
-                                   << "at " << endTs.toString(timeformat);
+                                os << ". This recording ";
+                                if (endTs < QDateTime::currentDateTime())
+                                    os << "was ";
+                                else
+                                    os << "is ";
+
+                                os << "scheduled to end at "
+                                   << endTs.toString(timeformat);
                             }
                         }
                     }
