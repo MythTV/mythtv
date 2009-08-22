@@ -138,7 +138,7 @@ ChannelScanSM::ChannelScanSM(
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
       inputname(_inputname),
-      trust_encryption_si(test_decryption),
+      m_test_decryption(test_decryption),
       extend_scan_list(false),
       // State
       scanning(false),
@@ -439,7 +439,7 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
 
         currentEncryptionStatusChecked[pnum] = true;
 
-        if (trust_encryption_si)
+        if (!m_test_decryption)
         {
             currentEncryptionStatus[pnum] = kEncEncrypted;
             continue;

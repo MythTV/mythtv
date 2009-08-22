@@ -200,7 +200,7 @@ class ChannelScanSM : public MPEGStreamListener,
     uint              signalTimeout;
     uint              channelTimeout;
     QString           inputname;
-    bool              trust_encryption_si;
+    bool              m_test_decryption;
     bool              extend_scan_list;
 
     // State
