@@ -62,6 +62,10 @@
         <position>37,268</position>
         <staticsize>36,36</staticsize> <!-- resize the image to these dimensions -->
     </image>
+    <image name="coverart">
+        <position>37,37</position>
+        <staticsize>40,80</staticsize>
+    </image>
     <textarea name="callsign">
         <area>78,274,112,27</area>
         <font>infofont</font>

@@ -80,6 +80,10 @@
         <position>20,20</position>
         <staticsize>64,64</staticsize> <!-- resize the image to these dimensions -->
     </image>
+    <image name="coverart">
+        <position>20,20</position>
+        <staticsize>64,128</staticsize>
+    </image>
     <textarea name="time">
         <area>365,25,240,90</area>
         <font>timefont</font>
