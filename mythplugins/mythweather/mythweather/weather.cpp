@@ -152,6 +152,10 @@ void Weather::setupScreens()
             {
                 mainStack->AddScreen(ssetup);
             }
+            else
+            {
+            	delete ssetup;
+            }
 
             m_firstSetup = false;
         }
@@ -169,11 +173,14 @@ void Weather::setupScreens()
             units_t units = db.value(2).toUInt();
             uint draworder = db.value(3).toUInt();
 
-            ScreenListInfo *screenListInfo = m_allScreens[container];
+            ScreenListInfo &screenListInfo = m_allScreens[container];
 
-            WeatherScreen *ws = WeatherScreen::loadScreen(m_weatherStack, screenListInfo, id);
+            WeatherScreen *ws = WeatherScreen::loadScreen(m_weatherStack, &screenListInfo, id);
             if (!ws->Create())
+            {
+                delete ws;
                 continue;
+            }
 
             ws->setUnits(units);
             ws->setInUse(true);
@@ -319,6 +326,10 @@ void Weather::setupPage()
         clearScreens();
         mainStack->AddScreen(ssetup);
     }
+    else
+    {
+    	delete ssetup;
+    }
 
     m_firstRun = true;
 }
@@ -351,7 +362,7 @@ void Weather::nextpage_timeout()
 {
     WeatherScreen *nxt = nextScreen();
 
-    if (nxt->canShowScreen())
+    if (nxt && nxt->canShowScreen())
     {
         hideScreen();
         showScreen(nxt);

@@ -67,16 +67,14 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
         {
             if ( (e.tagName() == "screen") && !screens.contains(e.attribute("name")) )
             {
-                ScreenListInfo *screendef = new ScreenListInfo();
-                screendef->multiLoc = false;
-                screendef->name = e.attribute("name");
+                screens[e.attribute("name")].multiLoc = false;
+                screens[e.attribute("name")].name = e.attribute("name");
                 QString hasUnits = e.attribute("hasunits");
                 if (hasUnits.toLower() == "no")
-                    screendef->hasUnits = false;
+                    screens[e.attribute("name")].hasUnits = false;
                 else
-                    screendef->hasUnits = true;
-                screendef->dataTypes = loadScreen(e);
-                screens[screendef->name] = screendef;
+                    screens[e.attribute("name")].hasUnits = true;
+                screens[e.attribute("name")].dataTypes = loadScreen(e);
             }
         }
     }

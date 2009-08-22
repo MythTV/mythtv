@@ -98,6 +98,8 @@ void WeatherCallback(void *data, QString &selection)
 
         if (gsetup->Create())
             mainStack->AddScreen(gsetup);
+        else
+            delete gsetup;
     }
     else if (selection == "SETTINGS_SCREEN")
     {
@@ -105,6 +107,8 @@ void WeatherCallback(void *data, QString &selection)
 
         if (ssetup->Create())
             mainStack->AddScreen(ssetup);
+        else
+            delete ssetup;
     }
     else if (selection == "SETTINGS_SOURCE")
     {
@@ -112,6 +116,8 @@ void WeatherCallback(void *data, QString &selection)
 
         if (srcsetup->Create())
             mainStack->AddScreen(srcsetup);
+        else
+            delete srcsetup;
 //             MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no sources",
 //                     QObject::tr("No Sources defined, Sources are defined by"
 //                                 " adding screens in Screen Setup."));

@@ -27,6 +27,11 @@ SourceManager::SourceManager()
     setupSources();
 }
 
+SourceManager::~SourceManager()
+{
+    clearSources();
+}
+
 bool SourceManager::findScriptsDB()
 {
     MSqlQuery db(MSqlQuery::InitCon());
@@ -91,7 +96,14 @@ bool SourceManager::findScripts()
                                                        "mythweatherbusydialog");
 
     if (busyPopup->Create())
+    {
         popupStack->AddScreen(busyPopup, false);
+    }
+    else
+    {
+        delete busyPopup;
+        busyPopup = NULL;
+    }
 
     qApp->processEvents();
 
@@ -211,7 +223,12 @@ QStringList SourceManager::getLocationList(ScriptInfo *si, const QString &str)
     if (!m_scripts.contains(si))
         return QStringList();
     WeatherSource *ws = new WeatherSource(si);
-    return ws->getLocationList(str);
+    
+    QStringList locationList(ws->getLocationList(str));
+    
+    delete ws;
+    
+    return locationList;
 }
 
 WeatherSource *SourceManager::needSourceFor(int id, const QString &loc,

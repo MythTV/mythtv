@@ -110,6 +110,22 @@ ScreenSetup::~ScreenSetup()
         m_sourceManager->findScriptsDB();
         m_sourceManager->setupSources();
     }
+
+    // Deallocate the ScreenListInfo objects created for the inactive screen list.
+    for (int i=0; i < m_inactiveList->GetCount(); i++)
+    {
+        MythUIButtonListItem *item = m_inactiveList->GetItemAt(i);
+        if (item->GetData().isValid())
+            delete qVariantValue<ScreenListInfo *>(item->GetData());
+    }
+
+    // Deallocate the ScreenListInfo objects created for the active screen list.
+    for (int i=0; i < m_activeList->GetCount(); i++)
+    {
+        MythUIButtonListItem *item = m_activeList->GetItemAt(i);
+        if (item->GetData().isValid())
+            delete qVariantValue<ScreenListInfo *>(item->GetData());
+    }
 }
 
 bool ScreenSetup::Create()
@@ -264,13 +280,14 @@ void ScreenSetup::loadData()
 
     QStringList types;
 
-    ScreenListMap m_ScreenListMap = loadScreens();
+    ScreenListMap screenListMap = loadScreens();
 
-    ScreenListMap::const_iterator i = m_ScreenListMap.constBegin();
-    while (i != m_ScreenListMap.constEnd())
+    // Fill the inactive screen button list.
+    ScreenListMap::const_iterator i = screenListMap.constBegin();
+    while (i != screenListMap.constEnd())
     {
 
-        si = m_ScreenListMap[i.key()];
+        si = &screenListMap[i.key()];
         types = si->dataTypes;
         si->units = ENG_UNITS;
 
@@ -295,7 +312,7 @@ void ScreenSetup::loadData()
             }
             MythUIButtonListItem *item =
                     new MythUIButtonListItem(m_inactiveList, i.key());
-            item->SetData(qVariantFromValue(si));
+            item->SetData(qVariantFromValue(new ScreenListInfo(*si)));
         }
 
         ++i;
@@ -320,6 +337,7 @@ void ScreenSetup::loadData()
         return;
     }
 
+    // Fill the active screen button list.
     while (db.next())
     {
         QString name = db.value(0).toString();
@@ -329,19 +347,21 @@ void ScreenSetup::loadData()
         QString src = db.value(4).toString();
         uint draworder = db.value(5).toUInt();
 
-        si = m_ScreenListMap[name];
-        // Clear types first as we will re-insert the values from the database
-        si->types.clear();
-        types = si->dataTypes;
+        types = screenListMap[name].dataTypes;
 
         TypeListInfo ti(dataitem, location,
                         m_sourceManager->getSourceByName(src));
 
         if (active_screens.find(draworder) == active_screens.end())
         {
+            si = new ScreenListInfo(screenListMap[name]);
+            // Clear types first as we will re-insert the values from the database
+            si->types.clear();
+            si->units = units;
+            
             MythUIButtonListItem *item =
                 new MythUIButtonListItem(m_activeList, name);
-            si->units = units;
+            
 
             // Only insert types meant for this screen
             for (QStringList::Iterator type_i = types.begin();
@@ -492,17 +512,23 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
                                                     "screensetupmenupopup");
 
         if (menuPopup->Create())
+        {
             popupStack->AddScreen(menuPopup);
 
-        menuPopup->SetReturnEvent(this, "options");
+            menuPopup->SetReturnEvent(this, "options");
 
-        menuPopup->AddButton(tr("Move Up"), qVariantFromValue(selected));
-        menuPopup->AddButton(tr("Move Down"), qVariantFromValue(selected));
-        menuPopup->AddButton(tr("Remove"), qVariantFromValue(selected));
-        menuPopup->AddButton(tr("Change Location"), qVariantFromValue(selected));
-        if (si->hasUnits)
-            menuPopup->AddButton(tr("Change Units"), qVariantFromValue(selected));
-        menuPopup->AddButton(tr("Cancel"), qVariantFromValue(selected));
+            menuPopup->AddButton(tr("Move Up"), qVariantFromValue(selected));
+            menuPopup->AddButton(tr("Move Down"), qVariantFromValue(selected));
+            menuPopup->AddButton(tr("Remove"), qVariantFromValue(selected));
+            menuPopup->AddButton(tr("Change Location"), qVariantFromValue(selected));
+            if (si->hasUnits)
+                menuPopup->AddButton(tr("Change Units"), qVariantFromValue(selected));
+            menuPopup->AddButton(tr("Cancel"), qVariantFromValue(selected));
+        }
+        else
+        {
+            delete menuPopup;
+        }
 
     }
     else if (GetFocusWidget() == m_inactiveList)
@@ -522,17 +548,15 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
         QList<ScriptInfo *> tmp;
         if (m_sourceManager->findPossibleSources(type_strs, tmp))
         {
-            ScreenListInfo *newsi = new ScreenListInfo(*si);
-
             if (!m_inactiveList->GetCount())
             {
                 m_inactiveList->SetActive(false);
                 NextPrevWidgetFocus(true);
             }
             if (hasUnits)
-                showUnitsPopup(selected->GetText(), newsi);
+                showUnitsPopup(selected->GetText(), si);
             else
-                doLocationDialog(newsi);
+                doLocationDialog(si);
         }
         else
             VERBOSE(VB_IMPORTANT, "Screen cannot be used, not all required "
@@ -550,6 +574,8 @@ void ScreenSetup::doLocationDialog(ScreenListInfo *si)
 
     if (locdialog->Create())
         mainStack->AddScreen(locdialog);
+    else
+   	    delete locdialog;
 }
 
 void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
@@ -565,25 +591,36 @@ void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
                                                 "weatherunitspopup");
 
     if (menuPopup->Create())
+    {
         popupStack->AddScreen(menuPopup);
 
-    menuPopup->SetReturnEvent(this, "units");
+        menuPopup->SetReturnEvent(this, "units");
 
-    menuPopup->AddButton(tr("English Units"), qVariantFromValue(si));
-    menuPopup->AddButton(tr("SI Units"), qVariantFromValue(si));
+        menuPopup->AddButton(tr("English Units"), qVariantFromValue(si));
+        menuPopup->AddButton(tr("SI Units"), qVariantFromValue(si));
+    }
+    else
+    {
+        delete menuPopup;
+    }
 }
 
 void ScreenSetup::deleteScreen()
 {
-    if (m_activeList->GetItemCurrent())
-        delete m_activeList->GetItemCurrent();
+    MythUIButtonListItem *item = m_activeList->GetItemCurrent();
+    if (item)
+    {
+        if (item->GetData().isValid())
+            delete qVariantValue<ScreenListInfo *>(item->GetData());
+
+        delete item;
+    }
 
     if (!m_activeList->GetCount())
     {
         NextPrevWidgetFocus(false);
         m_activeList->SetActive(false);
     }
-
 }
 
 void ScreenSetup::customEvent(QEvent *event)
@@ -632,6 +669,7 @@ void ScreenSetup::customEvent(QEvent *event)
             if (buttonnum > -1)
             {
                 ScreenListInfo *si = qVariantValue<ScreenListInfo *>(dce->GetData());
+                                
                 if (buttonnum == 0)
                 {
                     si->units = ENG_UNITS;
@@ -855,7 +893,7 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const QString &name,
                                MythScreenType *retScreen, ScreenListInfo *si,
                                SourceManager *srcman)
     : MythScreenType(parent, name),
-      m_screenListInfo(si),   m_sourceManager(srcman),
+      m_screenListInfo(new ScreenListInfo(*si)),   m_sourceManager(srcman),
       m_retScreen(retScreen), m_locationList(NULL),
       m_locationEdit(NULL),   m_searchButton(NULL),
       m_resultsText(NULL),    m_sourceText(NULL)
@@ -868,6 +906,10 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const QString &name,
 
 LocationDialog::~LocationDialog()
 {
+  if(m_locationList)
+    clearResults();
+    
+  delete m_screenListInfo;
 }
 
 bool LocationDialog::Create()
@@ -917,11 +959,19 @@ void LocationDialog::doSearch()
                                                        "mythweatherbusydialog");
 
     if (busyPopup->Create())
+    {
         popupStack->AddScreen(busyPopup, false);
+    }
+    else
+    {
+    	delete busyPopup;
+    	busyPopup = NULL;
+    }
+       
 
     QMap<ScriptInfo *, QStringList> result_cache;
     int numresults = 0;
-    m_locationList->Reset();
+    clearResults();
 
     QString searchingresults = tr("Searching ... Results: %1");
 
@@ -978,6 +1028,18 @@ void LocationDialog::doSearch()
     }
 }
 
+void LocationDialog::clearResults()
+{
+    for (int i=0; i < m_locationList->GetCount(); i++)
+    {
+        MythUIButtonListItem *item = m_locationList->GetItemAt(i);
+        if (item->GetData().isValid())
+            delete qVariantValue<ResultListInfo *>(item->GetData());
+    }
+    
+    m_locationList->Reset();
+}
+
 void LocationDialog::itemSelected(MythUIButtonListItem *item)
 {
     ResultListInfo *ri = qVariantValue<ResultListInfo *>(item->GetData());
@@ -1002,7 +1064,7 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
 
     DialogCompletionEvent *dce =
         new DialogCompletionEvent("location", 0, "",
-                                  qVariantFromValue(m_screenListInfo));
+                                  qVariantFromValue(new ScreenListInfo(*m_screenListInfo)));
     QApplication::postEvent(m_retScreen, dce);
 
     Close();

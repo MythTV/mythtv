@@ -149,6 +149,9 @@ class LocationDialog : public MythScreenType
     void itemClicked(MythUIButtonListItem *item);
 
   private:
+    void clearResults();
+
+  private:
     CacheMap m_cache;
     QStringList m_types;
     ScreenListInfo *m_screenListInfo;

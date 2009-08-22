@@ -25,15 +25,14 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
 }
 
 WeatherScreen::WeatherScreen(MythScreenStack *parent, const QString &name,
-                             ScreenListInfo *screenDefn, int id)
-    : MythScreenType (parent, name)
+                             ScreenListInfo *screenDefn, int id) : 
+    MythScreenType (parent, name), 
+    m_screenDefn(screenDefn), 
+    m_name(m_screenDefn->name),
+    m_inuse(false),
+    m_prepared(false),
+    m_id(id)
 {
-    m_screenDefn = screenDefn;
-    m_name = m_screenDefn->name;
-    m_id = id;
-    m_prepared = false;
-
-    m_inuse = false;
 
     QStringList types = m_screenDefn->dataTypes;
 

@@ -21,6 +21,7 @@ class SourceManager : public QObject
 
   public:
     SourceManager();
+    ~SourceManager();
     WeatherSource *needSourceFor(int id, const QString &loc, units_t units);
     QStringList getLocationList(ScriptInfo *si, const QString &str);
     void startTimers();

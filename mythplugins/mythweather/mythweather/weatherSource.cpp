@@ -397,38 +397,6 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     }
 }
 
-WeatherSource::WeatherSource(const QString &filename)
-    : m_ready(false),                  m_inuse(false),
-      m_info(NULL),                    m_proc(NULL),
-      m_dir(""),                       m_locale(""),
-      m_units(SI_UNITS),
-      m_scriptTimer(new QTimer(this)), m_updateTimer(new QTimer(this)),
-      m_connectCnt(0)
-{
-    connect( m_scriptTimer, SIGNAL(timeout()),
-            this, SLOT(scriptTimeout()));
-
-    connect( m_updateTimer, SIGNAL(timeout()),
-            this, SLOT(updateTimeout()));
-
-
-    const QFileInfo fi(filename);
-    m_info = ProbeScript(fi);
-
-    if (m_info)
-    {
-        m_proc = new QProcess();
-        // program = filename;
-        m_proc->setWorkingDirectory(
-            QDir(GetShareDir() + "mythweather/scripts/").absolutePath());
-        connect(this, SIGNAL(killProcess()),
-                m_proc, SLOT(kill()));
-        m_ready = true;
-    }
-    else
-        VERBOSE(VB_IMPORTANT, "Error probing script");
-}
-
 WeatherSource::~WeatherSource()
 {
     delete m_proc;

@@ -46,7 +46,6 @@ class WeatherSource : public QObject
                           struct ScriptInfo &scriptInfo);
 
     WeatherSource(ScriptInfo *info);
-    WeatherSource(const QString &filename);
     ~WeatherSource();
 
     bool isReady() { return m_ready; }
