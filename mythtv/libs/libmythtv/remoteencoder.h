@@ -18,7 +18,7 @@ class MPUBLIC RemoteEncoder
     RemoteEncoder(int num, const QString &host, short port);
    ~RemoteEncoder(void);
 
-    void Setup(void);
+    bool Setup(void);
     bool IsValidRecorder(void);
     int GetRecorderNumber(void);
 
@@ -69,7 +69,8 @@ class MPUBLIC RemoteEncoder
                                 return v; }
  
   private:
-    MythSocket *openControlSocket(const QString &host, short port);
+    MythSocket *ConnectCommandSocket(
+        const QString &host, int port, const QString &ann);
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);
 
     int recordernum;

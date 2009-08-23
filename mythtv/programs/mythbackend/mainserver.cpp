@@ -65,6 +65,10 @@ using namespace std;
 /** Number of threads in process request thread pool at startup. */
 #define PRT_STARTUP_THREAD_COUNT 5
 
+#define LOC      QString("MainServer: ")
+#define LOC_WARN QString("MainServer, Warning: ")
+#define LOC_ERR  QString("MainServer, Error: ")
+
 namespace {
 
 int delete_file_immediately(const QString &filename,
@@ -968,6 +972,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                 MythSocket *socket)
 {
     QStringList retlist( "OK" );
+    QStringList errlist( "ERROR" );
 
     if (commands.size() < 3 || commands.size() > 6)
     {
@@ -978,6 +983,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         VERBOSE(VB_IMPORTANT,
                 QString("Received malformed ANN%1 query")
                 .arg(info));
+
+        errlist << "malformed_ann_query";
+        socket->writeStringList(errlist);
         return;
     }
 
@@ -989,9 +997,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         if (pbs->getSocket() == socket)
         {
             sockListLock.unlock();
-            VERBOSE(VB_IMPORTANT, QString("Client %1 is trying to announce a socket "
-                                    "multiple times.")
-                                    .arg(commands[2]));
+            VERBOSE(VB_IMPORTANT,
+                    QString("Client %1 is trying to announce a socket "
+                            "multiple times.")
+                    .arg(commands[2]));
             socket->writeStringList(retlist);
             return;
         }
@@ -1005,6 +1014,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             VERBOSE(VB_IMPORTANT,
                     QString("Received malformed ANN %1 query")
                     .arg(commands[1]));
+
+            errlist << "malformed_ann_query";
+            socket->writeStringList(errlist);
             return;
         }
         // Monitor connections are same as Playback but they don't
@@ -1027,6 +1039,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             VERBOSE(VB_IMPORTANT, QString("Received malformed ANN %1 query")
                     .arg(commands[1]));
+            errlist << "malformed_ann_query";
+            socket->writeStringList(errlist);
             return;
         }
 
@@ -1084,6 +1098,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         if (slist.size() < 3)
         {
             VERBOSE(VB_IMPORTANT, "Received malformed FileTransfer command");
+            errlist << "malformed_filetransfer_command";
+            socket->writeStringList(errlist);
             return;
         }
 
@@ -1122,6 +1138,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             {
                 VERBOSE(VB_IMPORTANT, "Unable to determine directory "
                         "to write to in FileTransfer write command");
+                errlist << "filetransfer_directory_not_found";
+                socket->writeStringList(errlist);
                 return;
             }
 
@@ -1131,6 +1149,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
                         "filename is empty in url '%1'.")
                         .arg(qurl.toString()));
+                errlist << "filetransfer_filename_empty";
+                socket->writeStringList(errlist);
                 return;
             }
 
@@ -1140,6 +1160,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 VERBOSE(VB_IMPORTANT, QString("ERROR: FileTransfer write "
                         "filename '%1' does not pass sanity checks.")
                         .arg(basename));
+                errlist << "filetransfer_filename_dangerous";
+                socket->writeStringList(errlist);
                 return;
             }
 
@@ -4646,7 +4668,9 @@ void MainServer::connectionClosed(MythSocket *socket)
 
     sockListLock.unlock();
 
-    VERBOSE(VB_IMPORTANT, "Unknown socket closing");
+    VERBOSE(VB_IMPORTANT, LOC_WARN +
+            QString("Unknown socket closing MythSocket(0x%1)")
+            .arg((uint64_t)socket,0,16));
 }
 
 PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
@@ -4968,6 +4992,28 @@ void MainServer::reconnectTimeout(void)
 
     masterServerSock->writeStringList(strlist);
     masterServerSock->readStringList(strlist);
+    if (strlist.empty() || strlist[0] == "ERROR")
+    {
+        masterServerSock->DownRef();
+        masterServerSock->Unlock();
+        masterServerSock = NULL;
+        if (strlist.empty())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to open master server socket, timeout");
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to open master server socket" +
+                    ((strlist.size() >= 2) ?
+                     QString(", error was %1").arg(strlist[1]) :
+                     QString(", remote error")));
+        }
+        masterServerReconnect->start(1000);
+        return;
+    }
+
     masterServerSock->setCallbacks(this);
 
     masterServer = new PlaybackSock(this, masterServerSock, server, true);

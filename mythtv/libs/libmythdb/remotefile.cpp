@@ -65,6 +65,8 @@ MythSocket *RemoteFile::openSocket(bool control)
     MythSocket *lsock = new MythSocket();
     QString stype = (control) ? "control socket" : "file data socket";
 
+    QString loc_err = QString("RemoteFile::openSocket(%1), Error: ").arg(stype);
+
     if (port <= 0)
     {
         port = GetMythDB()->GetSettingOnHost("BackendServerPort", host).toInt();
@@ -76,10 +78,9 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     if (!lsock->connect(host, port))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("RemoteFile::openSocket(%1): \n"
-                        "\t\t\tCould not connect to server \"%2\" @ port %3")
-                .arg(stype).arg(host).arg(port));
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("\n\t\t\tCould not connect to server %1:%2")
+                .arg(host).arg(port));
         lsock->DownRef();
         return NULL;
     }
@@ -108,23 +109,43 @@ MythSocket *RemoteFile::openSocket(bool control)
         lsock->writeStringList(strlist);
         lsock->readStringList(strlist, true);
 
-        if (strlist.size() < 4)
+        if (strlist.size() >= 4)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("RemoteFile::openSocket(%1): "
-                            "Did not get proper response from %3:%4")
-                    .arg(stype).arg(dir).arg(host).arg(port));
-
-            return NULL;
+            it = strlist.begin(); ++it;
+            recordernum = (*it).toInt(); ++it;
+            filesize = decodeLongLong(strlist, it);
+            for (; it != strlist.end(); ++it)
+                auxfiles << *it;
         }
-
-        it = strlist.begin(); ++it;
-        recordernum = (*it).toInt(); ++it;
-        filesize = decodeLongLong(strlist, it);
-        for (; it != strlist.end(); ++it)
-            auxfiles << *it;
+        else if (0 < strlist.size() && strlist.size() < 4 &&
+                 strlist[0] != "ERROR")
+        {
+            VERBOSE(VB_IMPORTANT, loc_err +
+                    QString("Did not get proper response from %1:%2")
+                    .arg(host).arg(port));
+            strlist.clear();
+            strlist.push_back("ERROR");
+            strlist.push_back("invalid response");
+        }
     }
-    
+
+    if (strlist.empty() || strlist[0] == "ERROR")
+    {
+        lsock->DownRef();
+        lsock = NULL;
+        if (strlist.empty())
+        {
+            VERBOSE(VB_IMPORTANT, loc_err + "Failed to open socket, timeout");
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, loc_err + "Failed to open socket" +
+                    ((strlist.size() >= 2) ?
+                     QString(", error was %1").arg(strlist[1]) :
+                     QString(", remote error")));
+        }
+    }
+
     return lsock;
 }    
 

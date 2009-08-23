@@ -1452,7 +1452,20 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
             .arg(d->m_localhostname).arg(false);
         QStringList strlist(str);
         serverSock->writeStringList(strlist);
-        serverSock->readStringList(strlist, true);
+        if (!serverSock->readStringList(strlist, true) || strlist.empty() ||
+            (strlist[0] == "ERROR"))
+        {
+            if (strlist[0] == "ERROR")
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
+                        "server socket to master backend");
+            else
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
+                        "server socket to master backend");
+
+            serverSock->DownRef();
+            serverSock = NULL;
+            return NULL;
+        }
 
         if (eventSock && eventSock->state() == MythSocket::Idle)
         {

@@ -908,10 +908,32 @@ int main(int argc, char **argv)
             QStringList tempMonitorAnnounce("ANN Monitor tzcheck 0");
             tempMonitorConnection->writeStringList(tempMonitorAnnounce);
             tempMonitorConnection->readStringList(tempMonitorAnnounce);
+            if (tempMonitorAnnounce.empty() ||
+                tempMonitorAnnounce[0] == "ERROR")
+            {
+                tempMonitorConnection->DownRef();
+                tempMonitorConnection = NULL;
+                if (tempMonitorAnnounce.empty())
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            "Failed to open event socket, timeout");
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            "Failed to open event socket" +
+                        ((tempMonitorAnnounce.size() >= 2) ?
+                         QString(", error was %1").arg(tempMonitorAnnounce[1]) :
+                         QString(", remote error")));
+                }
+            }
 
             QStringList tzCheck("QUERY_TIME_ZONE");
-            tempMonitorConnection->writeStringList(tzCheck);
-            tempMonitorConnection->readStringList(tzCheck);
+            if (tempMonitorConnection)
+            {
+                tempMonitorConnection->writeStringList(tzCheck);
+                tempMonitorConnection->readStringList(tzCheck);
+            }
             if (tzCheck.size() && !checkTimeZone(tzCheck))
             {
                 // Check for different time zones, different offsets, different
@@ -933,9 +955,11 @@ int main(int argc, char **argv)
                         QString("Backend is running in %1 time zone.")
                         .arg(getTimeZoneID()));
             }
-            tempMonitorConnection->writeStringList(tempMonitorDone);
+            if (tempMonitorConnection)
+                tempMonitorConnection->writeStringList(tempMonitorDone);
         }
-        tempMonitorConnection->DownRef();
+        if (tempMonitorConnection)
+            tempMonitorConnection->DownRef();
     }
 
     if (!UpgradeTVDatabaseSchema(true, true))

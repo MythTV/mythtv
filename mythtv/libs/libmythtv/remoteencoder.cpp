@@ -31,12 +31,34 @@ RemoteEncoder::~RemoteEncoder()
         controlSock->DownRef();
 }
 
-void RemoteEncoder::Setup(void)
+bool RemoteEncoder::Setup(void)
 {
     if (!controlSock)
     {
-        controlSock = openControlSocket(remotehost, remoteport);
+        VERBOSE(VB_NETWORK|VB_EXTRA, "RemoteEncoder::Setup(): Connecting...");
+
+        QString ann = QString("ANN Playback %1 %2")
+            .arg(gContext->GetHostName()).arg(false);
+
+        controlSock = ConnectCommandSocket(
+            remotehost, remoteport, ann);
+
+        if (controlSock)
+        {
+            VERBOSE(VB_NETWORK|VB_EXTRA, "RemoteEncoder::Setup(): Connected");
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "RemoteEncoder::Setup(): Failed to connect to backend");
+        }
     }
+    else
+    {
+        VERBOSE(VB_NETWORK|VB_EXTRA,
+                "RemoteEncoder::Setup(): Already connected");
+    }
+    return controlSock;
 }
 
 bool RemoteEncoder::IsValidRecorder(void)
@@ -54,30 +76,55 @@ bool RemoteEncoder::SendReceiveStringList(
 {
     QMutexLocker locker(&lock);
     if (!controlSock)
-        return false;
+        Setup();
 
     backendError = false;
 
-    controlSock->writeStringList(strlist);
-    if (!controlSock->readStringList(strlist, true))
+    if (!controlSock)
     {
         VERBOSE(VB_IMPORTANT,
-                "RemoteEncoder::SendReceiveStringList(): No response.");
+                "RemoteEncoder::SendReceiveStringList(): "
+                "Failed to reconnect with backend.");
         backendError = true;
         return false;
     }
 
-    if (min_reply_length && ((uint)strlist.size() < min_reply_length))
+    if (!controlSock->writeStringList(strlist))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "RemoteEncoder::SendReceiveStringList(): "
+                "Failed to write data.");
+        backendError = true;
+    }
+
+    if (!backendError &&
+        !controlSock->readStringList(strlist, true))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "RemoteEncoder::SendReceiveStringList(): No response.");
+        backendError = true;
+    }
+
+    if (!backendError &&
+        min_reply_length && ((uint)strlist.size() < min_reply_length))
     {
         VERBOSE(VB_IMPORTANT,
                 "RemoteEncoder::SendReceiveStringList(): Response too short");
+        backendError = true;
+    }
+
+    if (backendError)
+    {
+        controlSock->DownRef();
+        controlSock = NULL;
         return false;
     }
 
     return true;
 }
 
-MythSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
+MythSocket *RemoteEncoder::ConnectCommandSocket(
+    const QString &host, int port, const QString &ann)
 {
     MythSocket *sock = new MythSocket();
     if (!sock->connect(host, port))
@@ -91,10 +138,16 @@ MythSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
     {
         if (gContext->CheckProtoVersion(sock))
         {
-            QString hostname = gContext->GetHostName();
-            QStringList strlist( QString("ANN Playback %1 %2").arg(hostname).arg(false) );
-            sock->writeStringList(strlist);
-            sock->readStringList(strlist, true);
+            QStringList strlist(ann);
+            if (!sock->writeStringList(strlist) ||
+                !sock->readStringList(strlist, true))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "RemoteEncoder::ConnectCommandSocket(): "
+                        "Failed to announce ourselves to server");
+                sock->DownRef();
+                sock = NULL;
+            }
         }
         else
         {
