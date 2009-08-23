@@ -966,15 +966,20 @@ class AudioDevice : public PathSetting, public CaptureCardDBStorage
 {
   public:
     AudioDevice(const CaptureCard &parent) :
-        PathSetting(this, true),
+        PathSetting(this, false),
         CaptureCardDBStorage(this, parent, "audiodevice")
     {
         setLabel(QObject::tr("Audio device"));
+#if USING_OSS
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
         dev.setPath("/dev/sound");
         fillSelectionsFromDir(dev);
-        addSelection(QObject::tr("(None)"), "/dev/null");
+#endif
+#if USING_ALSA
+        addSelection("ALSA:default", "ALSA:default");
+#endif
+        addSelection(QObject::tr("(None)"), "NULL");
     };
 };
 

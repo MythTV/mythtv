@@ -44,6 +44,7 @@ class RingBuffer;
 class ChannelBase;
 class FilterManager;
 class FilterChain;
+class AudioInput;
 
 class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
 {
@@ -153,6 +154,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     int inputchannel;
     int compression;
     int compressaudio;
+    AudioInput *audio_device;
     unsigned long long audiobytes;
     int audio_channels; 
     int audio_bits;

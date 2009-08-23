@@ -106,8 +106,6 @@ macx {
 cygwin:QMAKE_LFLAGS_SHLIB += -Wl,--noinhibit-exec
 cygwin:DEFINES += _WIN32
 
-# Enable Linux Open Sound System support
-using_oss:DEFINES += USING_OSS
 # Enable Valgrind, i.e. disable some timeouts
 using_valgrind:DEFINES += USING_VALGRIND
 
@@ -447,8 +445,18 @@ using_backend {
 
     # Simple NuppelVideo Recorder
     using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
-    HEADERS += NuppelVideoRecorder.h       fifowriter.h
-    SOURCES += NuppelVideoRecorder.cpp     fifowriter.cpp
+    HEADERS += NuppelVideoRecorder.h       fifowriter.h        audioinput.h
+    SOURCES += NuppelVideoRecorder.cpp     fifowriter.cpp      audioinput.cpp
+    using_alsa {
+        HEADERS += audioinputalsa.h
+        SOURCES += audioinputalsa.cpp
+        DEFINES += USING_ALSA
+    }
+    using_oss {
+        HEADERS += audioinputoss.h
+        SOURCES += audioinputoss.cpp
+        DEFINES += USING_OSS
+    }
 
     # Support for Video4Linux devices
     using_v4l {

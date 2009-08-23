@@ -30,6 +30,7 @@ using namespace std;
 #include "recordingprofile.h"
 #include "tv_rec.h"
 #include "tv_play.h"
+#include "audioinput.h"
 
 #ifdef WORDS_BIGENDIAN
 extern "C" {
@@ -59,7 +60,7 @@ extern "C" {
 #define LOC_ERR QString("NVR(%1) Error: ").arg(videodevice)
 
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
-    : RecorderBase(rec)
+    : RecorderBase(rec), audio_device(NULL)
 {
     channelObj = channel;
 
@@ -191,6 +192,11 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         lame_close(gf);  
     if (strm)
         delete [] strm;
+    if (audio_device)
+    {
+        delete audio_device;
+        audio_device = NULL;
+    }
     if (fd >= 0)
         close(fd);
     if (seektable)
@@ -615,7 +621,7 @@ void NuppelVideoRecorder::Initialize(void)
 {
     if (AudioInit() != 0)   
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not detect audio blocksize");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to init audio input device");
     }
  
     if (videocodec == "hardware-mjpeg")
@@ -671,8 +677,7 @@ void NuppelVideoRecorder::Initialize(void)
 
 int NuppelVideoRecorder::AudioInit(bool skipdevice)
 {
-    int afmt, afd;
-    int frag, blocksize = 4096;
+    int blocksize;
     int tmp;
 
     if (!skipdevice)
@@ -687,59 +692,38 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
         return 1;
 #else
-        QByteArray adevice = audiodevice.toAscii();
-        if (-1 == (afd = open(adevice.constData(), O_RDONLY | O_NONBLOCK)))
+        audio_device = AudioInput::CreateDevice(audiodevice.toAscii());
+        if (!audio_device)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Cannot open DSP '%1'")
-                    .arg(audiodevice));
-            perror("open");
-            return 1;
-        }
- 
-        fcntl(afd, F_SETFL, fcntl(afd, F_GETFL) & ~O_NONBLOCK);
- 
-        //ioctl(afd, SNDCTL_DSP_RESET, 0);
-   
-        frag = (8 << 16) | (10); //8 buffers, 1024 bytes each
-        ioctl(afd, SNDCTL_DSP_SETFRAGMENT, &frag);
- 
-        afmt = AFMT_S16_LE;
-        ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
-        if (afmt != AFMT_S16_LE) 
-        {
-            close(afd);
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't get 16 bit DSP");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Failed to create audio device: %1")
+                            .arg(audiodevice));
             return 1;
         }
 
-        if (ioctl(afd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
-            ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
-            ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
+        if (!audio_device->Open(audio_bits, audio_samplerate, audio_channels))
         {
-            close(afd);
-            QString msg = LOC_ERR +
-                QString("AudioInit(): %1 : error setting audio input device"
-                        " to %2kHz/%3bits/%4channel").arg(audiodevice).
-                arg(audio_samplerate).arg(audio_bits).arg(audio_channels);
-            VERBOSE(VB_IMPORTANT, msg);
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Failed to open audio device %1").arg(audiodevice));
             return 1;
         }
 
-        if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
+        if ((blocksize = audio_device->GetBlockSize()) <= 0)
         {
-            close(afd);
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "AudioInit(): Can't get DSP blocksize");
-            return(1);
+            blocksize = 1024;
+            VERBOSE(VB_GENERAL, LOC_ERR +
+                    QString("Failed to determine audio block size on %1,"
+                            "using default 1024 bytes").arg(audiodevice));
         }
 
-        close(afd);
+        audio_device->Close();
 #endif
     }
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
-    blocksize *= 4;
-
     audio_buffer_size = blocksize;
+    VERBOSE(VB_AUDIO, LOC + QString("Audio device %1 buffer size: %1 bytes")
+                                    .arg(audio_buffer_size));
 
     if (compressaudio)
     {
@@ -2249,90 +2233,37 @@ void *NuppelVideoRecorder::VbiThread(void *param)
 
 void NuppelVideoRecorder::doAudioThread(void)
 {
-#if !HAVE_SYS_SOUNDCARD_H && !HAVE_SOUNDCARD_H
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("doAudioThread() This Unix doesn't support"
-                    " device files for audio access. Skipping"));
-    return;
-#else
-    int afmt = 0, trigger = 0;
-    int afd = 0, act = 0, lastread = 0;
-    int frag = 0, blocksize = 0;
-    unsigned char *buffer;
-    audio_buf_info ispace;
+    if (!audio_device)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Invalid audio device (%1), exiting").arg(audiodevice));
+        return;
+    }
+
+    if (!audio_device->Open(audio_bits, audio_samplerate, audio_channels))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to open audio device %1").arg(audiodevice));
+        return;
+    }
+
+    if (!audio_device->Start())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to start audio capture on %1").arg(audiodevice));
+        return;
+    }
+
     struct timeval anow;
-
-    act_audio_sample = 0;
-
-    QByteArray adevice = audiodevice.toAscii();
-    if (-1 == (afd = open(adevice.constData(), O_RDONLY | O_NONBLOCK))) 
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Cannot open DSP '%1', exiting").
-                arg(audiodevice));
-        perror("open");
-        return;
-    }
-
-    fcntl(afd, F_SETFL, fcntl(afd, F_GETFL) & ~O_NONBLOCK);
-    //ioctl(afd, SNDCTL_DSP_RESET, 0);
-
-    frag = (8 << 16) | (10); //8 buffers, 1024 bytes each
-    ioctl(afd, SNDCTL_DSP_SETFRAGMENT, &frag);
-
-    afmt = AFMT_S16_LE;
-    ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
-    if (afmt != AFMT_S16_LE) 
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't get 16 bit DSP, exiting");
-        close(afd);
-        return;
-    }
-
-    if (ioctl(afd, SNDCTL_DSP_SAMPLESIZE, &audio_bits) < 0 ||
-        ioctl(afd, SNDCTL_DSP_CHANNELS, &audio_channels) < 0 ||
-        ioctl(afd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(" %1: error setting audio input device to "
-                                      "%2 kHz/%3 bits/%4 channel").
-                arg(audiodevice).arg(audio_samplerate).
-                arg(audio_bits).arg(audio_channels));
-        close(afd);
-        return;
-    }
-
+    unsigned char *buffer = new unsigned char[audio_buffer_size];
+    int act = 0, lastread = 0;
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
-
-    if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE,  &blocksize)) 
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't get DSP blocksize, exiting");
-        close(afd);
-        return;
-    }
-
-    blocksize *= 4;  // allways read 4*blocksize
-
-    if (blocksize != audio_buffer_size) 
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("Warning, audio blocksize = '%1' while audio_buffer_size='%2'").
-                arg(blocksize).arg(audio_buffer_size));
-    }
-
-    buffer = new unsigned char[audio_buffer_size];
-
-    /* trigger record */
-    trigger = 0;
-    ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
-
-    trigger = PCM_ENABLE_INPUT;
-    ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
-
+    audiopaused = false;
     // Qt4 requires a QMutex as a parameter...
     // not sure if this is the best solution.  Mutex Must be locked before wait.
     QMutex mutex;
     mutex.lock();
 
-    audiopaused = false;
     while (childrenLive) 
     {
         if (request_pause)
@@ -2348,13 +2279,13 @@ void NuppelVideoRecorder::doAudioThread(void)
         }
         audiopaused = false;
 
-        if (audio_buffer_size != (lastread = read(afd, buffer,
-                                                  audio_buffer_size))) 
+        lastread = audio_device->GetSamples(buffer, audio_buffer_size);
+        if (audio_buffer_size != lastread)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Only read %1 bytes of %2 bytes from '%3").
-                    arg(lastread).arg(audio_buffer_size).arg(audiodevice));
-            perror("read audio");
+            VERBOSE(VB_IMPORTANT, LOC_ERR
+                    + QString("Short read, %1 of %2 bytes from ")
+                              .arg(lastread).arg(audio_buffer_size)
+                    + audiodevice);
         }
 
         /* record the current time */
@@ -2362,7 +2293,7 @@ void NuppelVideoRecorder::doAudioThread(void)
            (like we used to.) Measure to see how much stuff is in there,
            and correct for it when calculating the timestamp */
         gettimeofday(&anow, &tzone);
-        ioctl( afd, SNDCTL_DSP_GETISPACE, &ispace );
+        int bytes_read = max(audio_device->GetNumReadyBytes(), 0);
 
         act = act_audio_buffer;
 
@@ -2383,7 +2314,7 @@ void NuppelVideoRecorder::doAudioThread(void)
            audio chunk. So, subtract off the length of the chunk
            and the length of audio still in the capture buffer. */
         audiobuffer[act]->timecode -= (int)( 
-                (ispace.fragments * ispace.fragsize + audio_buffer_size)
+                (bytes_read + audio_buffer_size)
                  * 1000.0 / (audio_samplerate * audio_bytes_per_sample));
 
         memcpy(audiobuffer[act]->buffer, buffer, audio_buffer_size);
@@ -2398,8 +2329,9 @@ void NuppelVideoRecorder::doAudioThread(void)
     }
 
     delete [] buffer;
-    close(afd);
-#endif
+
+    if (audio_device->IsOpen())
+        audio_device->Close();
 }
 
 struct VBIData
