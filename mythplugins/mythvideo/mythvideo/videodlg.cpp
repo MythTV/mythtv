@@ -1528,8 +1528,8 @@ namespace
                 {
                     if (episode > 0)
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3")
-                                 .arg(title).arg(QString::number(season)))
-                                 .arg(QString::number(episode))
+                                 .arg(title).arg(QString::number(season))
+                                 .arg(QString::number(episode)))
                                  .arg(*ext);
                     else if (!isScreenshot)
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2") 
