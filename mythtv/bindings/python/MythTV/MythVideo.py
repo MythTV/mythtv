@@ -103,14 +103,7 @@ class MythVideo:
 					break
 			else:
 				log.Msg(INFO, u'%s not exist, removing metadata...', filename)
-				c2 = self.db.cursor()
-				c2.execute(u"""DELETE FROM videometadata WHERE intid = %s""", (intid,))
-				c2.close()
-				#Some additional cleanup
-				#Remove cross-references in cast, country, genres
-				self.cleanGenres(intid)
-				self.cleanCountry(intid)
-				self.cleanCast(intid)
+				rmMetadata(intid)
 		c.close()
 
 
@@ -337,7 +330,7 @@ class MythVideo:
 			c.execute(sql, sql_values)
 			c.close()
 
-	def rmMetadata(self, video):
+	def rmMetadata(self, video, host=None):
 		"""
 		Removes the metadata for a given id from the database.
 
@@ -347,12 +340,26 @@ class MythVideo:
 		"""
 		c = self.db.cursor()
 		if isinstance(video, str):
-			c.execute("DELETE FROM videometadata WHERE filename = %s", (video,))
-		elif isinstance(video, int):
+			if video[0] !='/' and host == None: # Protect against accidental multiple deletions on SG's
+				log.Msg(WARNING, u"Attempting to delete a video for a storage group when the hostname is not supplied. That could potentially remove the videometadata on multiple backends " +
+						u"for videometadata: %s" % video)
+				return
+			intid = self.getMetadataId(video, host)
+			if intid == None:
+				log.Msg(WARNING, u"Attempt to delete a video that does not exist " +
+						u"for videometadata: %s" % video)
+				return
+			c.execute("DELETE FROM videometadata WHERE intid = %s", (intid,))
+			video = intid
+		elif isinstance(video, int) or isinstance(video, long):
 			c.execute("DELETE FROM videometadata WHERE intid = %s", (video,))
 		else:
 			log.Msg(WARNING, "Attempt to delete non-str, non-int item" +
 					"from videometadata: %s" % str(video))
+		# Clean up this video's relationships to Genres, Country and Cast
+		self.cleanGenres(video)
+		self.cleanCountry(video)
+		self.cleanCast(video)
 		c.close()
 
 	def getCategoryId(self, category_name):
