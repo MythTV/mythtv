@@ -28,9 +28,26 @@ bool MythUIBusyDialog::Create(void)
 
 bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)
 {
-    // We want to handle any keypresses, including Escape in the base
-    // class
-    return false;
+    QStringList actions;
+    bool handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions, false);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "ESCAPE")
+        {
+            // eat the escape keypress
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 MythUIBusyDialog  *ShowBusyPopup(const QString &message)
@@ -94,9 +111,26 @@ bool MythUIProgressDialog::Create(void)
 
 bool MythUIProgressDialog::keyPressEvent(QKeyEvent *event)
 {
-    // We want to handle any keypresses, including Escape in the base
-    // class
-    return false;
+    QStringList actions;
+    bool handled = GetMythMainWindow()->TranslateKeyPress("qt", event, actions, false);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "ESCAPE")
+        {
+            // eat the escape keypress
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 void MythUIProgressDialog::customEvent(QEvent *event)
