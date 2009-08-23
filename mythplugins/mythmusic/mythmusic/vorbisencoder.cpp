@@ -9,6 +9,8 @@
 #include <vorbis/vorbisfile.h>
 
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 
 #include <mythtv/mythcontext.h>
 
@@ -54,8 +56,10 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     vorbis_encode_setup_init(&vi);
     vorbis_analysis_init(&vd, &vi);
     vorbis_block_init(&vd, &vb);
- 
-    ogg_stream_init(&os, 0);
+
+    srand(time(NULL));
+    
+    ogg_stream_init(&os, rand());
 
     ogg_packet header_main;
     ogg_packet header_comments;
