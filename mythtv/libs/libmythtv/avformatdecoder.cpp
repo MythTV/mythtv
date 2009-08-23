@@ -63,7 +63,7 @@ extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, u
 
 static const float eps = 1E-5;
 
-static const int max_video_queue_size = 100;
+static const int max_video_queue_size = 180;
 
 static int cc608_parity(uint8_t byte);
 static int cc608_good_parity(const int *parity_table, uint16_t data);
