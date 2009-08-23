@@ -333,7 +333,7 @@ bool Transcode::GetProfile(QString profileName, QString encodingType,
         // If a bad profile is specified, there will be trouble
         if (isNum && profileID > 0)
             profile.loadByID(profileID);
-        else
+        else if (!profile.loadByGroup(profileName, "Transcoders"))
         {
             VERBOSE(VB_IMPORTANT, QString("Couldn't find profile #: %1").
                     arg(profileName));
