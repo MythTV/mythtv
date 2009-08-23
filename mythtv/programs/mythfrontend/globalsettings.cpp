@@ -53,6 +53,8 @@ static HostComboBox *AudioOutputDevice()
     gc->addSelection("ALSA:digital",       "ALSA:digital");
     gc->addSelection("ALSA:mixed-analog",  "ALSA:mixed-analog");
     gc->addSelection("ALSA:mixed-digital", "ALSA:mixed-digital");
+    gc->addSelection("ALSA:hdmi",          "ALSA:hdmi");
+    gc->addSelection("ALSA:plughw:0,3",    "ALSA:plughw:0,3");
 #endif
 #ifdef USING_OSS
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
@@ -127,6 +129,8 @@ static HostComboBox *PassThroughOutputDevice()
     gc->addSelection(QObject::tr("Default"), "Default");
 #ifndef USING_MINGW
     gc->addSelection("ALSA:iec958:{ AES0 0x02 }", "ALSA:iec958:{ AES0 0x02 }");
+    gc->addSelection("ALSA:hdmi", "ALSA:hdmi");
+    gc->addSelection("ALSA:plughw:0,3", "ALSA:plughw:0,3");
 #endif
 
     gc->setHelpText(QObject::tr("Audio output device to use for AC3 and "
