@@ -1410,6 +1410,7 @@ zmbv_encoder_select="zlib"
 
 # parsers
 h264_parser_select="golomb"
+latm_parser_deps="libfaad"
 
 # external libraries
 libamr_nb_decoder_deps="libamr_nb"
@@ -1420,6 +1421,7 @@ libdirac_decoder_deps="libdirac !libschroedinger"
 libdirac_encoder_deps="libdirac"
 libfaac_encoder_deps="libfaac"
 libfaad_decoder_deps="libfaad"
+libfaad_latm_decoder_deps="libfaad"
 libfaadbin_decoder_extralibs='$ldl'
 libgsm_decoder_deps="libgsm"
 libgsm_encoder_deps="libgsm"

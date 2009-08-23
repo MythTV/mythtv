@@ -436,6 +436,7 @@ contains( CONFIG_LIBDIRAC_DECODER, yes )        { SOURCES *= libdiracdec.c }
 contains( CONFIG_LIBDIRAC_ENCODER, yes )        { SOURCES *= libdiracenc.c libdirac_libschro.c }
 contains( CONFIG_LIBFAAC, yes )                 { SOURCES *= libfaac.c }
 contains( CONFIG_LIBFAAD, yes )                 { SOURCES *= libfaad.c }
+contains( CONFIG_LIBFAAD_LATM_DECODER, yes )    { SOURCES *= latmaac.c }
 contains( CONFIG_LIBGSM, yes )                  { SOURCES *= libgsm.c }
 contains( CONFIG_LIBMP3LAME, yes )              { SOURCES *= libmp3lame.c }
 contains( CONFIG_LIBOPENCORE_AMRNB, yes )       { SOURCES *= libopencore-amr.c }
@@ -452,6 +453,7 @@ contains( CONFIG_LIBXVID, yes )                 { SOURCES *= libxvidff.c libxvid
 # parsers
 contains( CONFIG_AAC_PARSER, yes )              { SOURCES *= aac_parser.c aac_ac3_parser.c mpeg4audio.c }
 contains( CONFIG_AC3_PARSER, yes )              { SOURCES *= ac3_parser.c ac3tab.c aac_ac3_parser.c }
+contains( CONFIG_LATM_PARSER, yes )             { SOURCES *= latmaac.c }
 contains( CONFIG_CAVSVIDEO_PARSER, yes )        { SOURCES *= cavs_parser.c }
 contains( CONFIG_DCA_PARSER, yes )              { SOURCES *= dca_parser.c }
 contains( CONFIG_DIRAC_PARSER, yes )            { SOURCES *= dirac_parser.c }

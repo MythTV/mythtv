@@ -175,6 +175,7 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_MP2:              return "MP2";
         case CODEC_ID_MP3:              return "MP3";
         case CODEC_ID_AAC:              return "AAC";
+        case CODEC_ID_AAC_LATM:         return "AAC/LATM";
         case CODEC_ID_AC3:              return "AC3";
         case CODEC_ID_DTS:              return "DTS";
         case CODEC_ID_VORBIS:           return "VORBIS";

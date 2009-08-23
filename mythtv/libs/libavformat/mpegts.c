@@ -564,6 +564,7 @@ static const StreamType ISO_types[] = {
     { 0x04, CODEC_TYPE_AUDIO,        CODEC_ID_MP3 },
     { 0x0f, CODEC_TYPE_AUDIO,        CODEC_ID_AAC },
     { 0x10, CODEC_TYPE_VIDEO,      CODEC_ID_MPEG4 },
+    { 0x11, CODEC_TYPE_AUDIO,   CODEC_ID_AAC_LATM },
     { 0x1b, CODEC_TYPE_VIDEO,       CODEC_ID_H264 },
     { 0xd1, CODEC_TYPE_VIDEO,      CODEC_ID_DIRAC },
     { 0xea, CODEC_TYPE_VIDEO,        CODEC_ID_VC1 },
@@ -999,6 +1000,7 @@ static int is_desired_stream(int stream_type)
         case STREAM_TYPE_VIDEO_H264:
         case STREAM_TYPE_VIDEO_VC1:
         case STREAM_TYPE_AUDIO_AAC:
+        case STREAM_TYPE_AUDIO_AAC_LATM:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
         case STREAM_TYPE_AUDIO_HDMV_AC3_PLUS:
@@ -1575,6 +1577,10 @@ static void init_stream(AVStream *st, int stream_type, int code)
         case STREAM_TYPE_AUDIO_AAC:
             codec_type = CODEC_TYPE_AUDIO;
             codec_id = CODEC_ID_AAC;
+            break;
+        case STREAM_TYPE_AUDIO_AAC_LATM:
+            codec_type = CODEC_TYPE_AUDIO;
+            codec_id = CODEC_ID_AAC_LATM;
             break;
         case STREAM_TYPE_AUDIO_AC3:
             codec_type = CODEC_TYPE_AUDIO;

@@ -55,6 +55,7 @@
 #define STREAM_TYPE_DSMCC_B         0x0b
 #define STREAM_TYPE_AUDIO_AAC       0x0f
 #define STREAM_TYPE_VIDEO_MPEG4     0x10
+#define STREAM_TYPE_AUDIO_AAC_LATM  0x11
 #define STREAM_TYPE_VIDEO_H264      0x1b
 #define STREAM_TYPE_VIDEO_VC1       0xea
 #define STREAM_TYPE_VIDEO_DIRAC     0xd1
