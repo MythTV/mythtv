@@ -349,7 +349,7 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     bool handled = false;
 
-    handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions, false);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
