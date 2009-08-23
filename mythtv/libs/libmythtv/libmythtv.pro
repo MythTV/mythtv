@@ -451,11 +451,13 @@ using_backend {
         HEADERS += audioinputalsa.h
         SOURCES += audioinputalsa.cpp
         DEFINES += USING_ALSA
+        LIBS += $$ALSA_LIBS
     }
     using_oss {
         HEADERS += audioinputoss.h
         SOURCES += audioinputoss.cpp
         DEFINES += USING_OSS
+        LIBS += $$OSS_LIBS
     }
 
     # Support for Video4Linux devices
