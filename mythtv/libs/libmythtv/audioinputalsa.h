@@ -22,7 +22,13 @@
 #define _AUDIOINPUTALSA_H_
 
 #include "audioinput.h"
+
+#ifdef USING_ALSA
 #include <alsa/asoundlib.h>
+#else
+typedef int snd_pcm_t;
+typedef int snd_pcm_uframes_t;
+#endif // USING_ALSA
 
 class AudioInputALSA : public AudioInput
 {
