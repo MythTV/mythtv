@@ -133,6 +133,8 @@ int XMLParseBase::parseAlignment(const QString &text)
             alignment |= Qt::AlignCenter;
             break;
         }
+        else if (align == "justify")
+            alignment |= Qt::AlignJustify;
         else if (align == "left")
             alignment |= Qt::AlignLeft;
         else if (align == "hcenter")
