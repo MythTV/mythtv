@@ -83,7 +83,7 @@ contains( CONFIG_VDPAU, yes )                   { SOURCES *= vdpau.c }
 # decoders/encoders/hardware accelerators
 contains( CONFIG_AAC_DECODER, yes )             { SOURCES *= aac.c aactab.c mpeg4audio.c aac_parser.c aac_ac3_parser.c }
 contains( CONFIG_AASC_DECODER, yes )            { SOURCES *= aasc.c msrledec.c }
-contains( CONFIG_AC3_DECODER, yes )             { SOURCES *= eac3dec.c ac3dec.c ac3tab.c ac3dec_data.c ac3.c }
+contains( CONFIG_AC3_DECODER, yes )             { SOURCES *= ac3dec.c ac3tab.c ac3dec_data.c ac3.c }
 contains( CONFIG_AC3_ENCODER, yes )             { SOURCES *= ac3enc.c ac3tab.c ac3.c }
 contains( CONFIG_ALAC_DECODER, yes )            { SOURCES *= alac.c }
 contains( CONFIG_ALAC_ENCODER, yes )            { SOURCES *= alacenc.c lpc.c }
@@ -121,7 +121,7 @@ contains( CONFIG_DVDV, yes )                    { SOURCES *= dvdv.c }
 contains( CONFIG_DVVIDEO_DECODER, yes )         { SOURCES *= dv.c }
 contains( CONFIG_DVVIDEO_ENCODER, yes )         { SOURCES *= dv.c }
 contains( CONFIG_DXA_DECODER, yes )             { SOURCES *= dxa.c }
-contains( CONFIG_EAC3_DECODER, yes )            { SOURCES *= eac3dec.c ac3dec.c ac3tab.c ac3dec_data.c ac3.c }
+contains( CONFIG_EAC3_DECODER, yes )            { SOURCES *= eac3dec.c eac3dec_data.c }
 contains( CONFIG_EACMV_DECODER, yes )           { SOURCES *= eacmv.c }
 contains( CONFIG_EAMAD_DECODER, yes )           { SOURCES *= eamad.c eaidct.c }
 contains( CONFIG_EATGQ_DECODER, yes )           { SOURCES *= eatgq.c eaidct.c }
