@@ -157,6 +157,7 @@ class StreamID
     {
         return ((StreamID::MPEG1Audio == type) ||
                 (StreamID::MPEG2Audio == type) ||
+                (StreamID::MPEG2AudioAmd1 == type) ||
                 (StreamID::AACAudio   == type) ||
                 (StreamID::AC3Audio   == type) ||
                 (StreamID::DTSAudio   == type));

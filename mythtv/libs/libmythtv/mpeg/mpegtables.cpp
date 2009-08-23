@@ -772,6 +772,8 @@ const char *StreamID::toString(uint streamID)
         return "audio-mp2-layer[1,2,3]"; // EIT, PMT
     case StreamID::MPEG1Audio:
         return "audio-mp1-layer[1,2,3]"; // EIT, PMT
+    case StreamID::MPEG2AudioAmd1:
+         return "audio-aac-latm"; // EIT, PMT
     case StreamID::AACAudio:
         return "audio-aac"; // EIT, PMT
     case StreamID::DTSAudio:
