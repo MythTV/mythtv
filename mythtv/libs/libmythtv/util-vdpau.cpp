@@ -1,5 +1,9 @@
 #include <cstdio>
 #include <cstdlib>
+
+#include <algorithm>
+using namespace std;
+
 #include <QSize>
 #include <QRect>
 
@@ -2147,7 +2151,7 @@ void VDPAUContext::ParseOptions(QString options)
 
         if (name.contains("vdpaudenoise"))
         {
-            float tmp = MAX(0.0f, MIN(1.0f, opts.toFloat()));
+            float tmp = std::max(0.0f, std::min(1.0f, opts.toFloat()));
             if (tmp != 0.0)
             {
                 VERBOSE(VB_PLAYBACK, LOC +
@@ -2159,7 +2163,7 @@ void VDPAUContext::ParseOptions(QString options)
 
         if (name.contains("vdpausharpen"))
         {
-            float tmp = MAX(-1.0f, MIN(1.0f, opts.toFloat()));
+            float tmp = std::max(-1.0f, std::min(1.0f, opts.toFloat()));
             if (tmp != 0.0)
             {
                 VERBOSE(VB_PLAYBACK, LOC +
