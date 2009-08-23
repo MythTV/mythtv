@@ -3,12 +3,13 @@ SOURCES += ../mytharchive/archiveutil.cpp
 SOURCES += ../mytharchive/editmetadata.cpp
 SOURCES += ../mytharchive/exportnative.cpp
 SOURCES += ../mytharchive/fileselector.cpp
-SOURCES += ../mytharchive/importnativewizard.cpp
+SOURCES += ../mytharchive/importnative.cpp
 SOURCES += ../mytharchive/logviewer.cpp
 SOURCES += ../mytharchive/main.cpp
-SOURCES += ../mytharchive/mythburnwizard.cpp
+SOURCES += ../mytharchive/mythburn.cpp
 SOURCES += ../mytharchive/recordingselector.cpp
 SOURCES += ../mytharchive/selectdestination.cpp
+SOURCES += ../mytharchive/themeselector.cpp
 SOURCES += ../mytharchive/thumbfinder.cpp
 SOURCES += ../mytharchive/videoselector.cpp
 
