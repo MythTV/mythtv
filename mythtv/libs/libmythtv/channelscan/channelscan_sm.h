@@ -216,7 +216,7 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // Transports List
     int                         transportsScanned;
-    QSet<uint>                  freq_scanned;
+    QSet<uint>                  ts_scanned;
     transport_scan_items_t      scanTransports;
     transport_scan_items_it_t   current;
     transport_scan_items_it_t   nextIt;
