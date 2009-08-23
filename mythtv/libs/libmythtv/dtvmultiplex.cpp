@@ -344,6 +344,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                                               const MPEGDescriptor &desc)
 {
     uint tag = desc.DescriptorTag();
+    sistandard = "dvb";
 
     switch (tag)
     {
