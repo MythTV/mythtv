@@ -832,7 +832,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                     (*dir)->getFQPath(), incUpDir, (*dir)->GetHost(),
                     (*dir)->GetPrefix());
 
-            build_generic_tree(t, dir->get(), incUpDir);
+            build_generic_tree(t, dir->get(), include_updirs);
         }
     }
 
