@@ -1522,4 +1522,123 @@
 
     </window>
 
+    <window name="customedit">
+
+        <textarea name="pagetitle" from="basetextarea">
+            <area>54,30,600,40</area>
+            <font>baselarge</font>
+            <value>Custom Record Rules</value>
+        </textarea>
+
+        <textarea name="ruleslabel" from="basetextarea">
+            <area>54,75,150,30</area>
+            <font>basemedium</font>
+            <align>right</align>
+            <value>Existing Rules:</value>
+        </textarea>
+
+        <buttonlist name="rules" from="basewideselector">
+            <position>250,75</position>
+            <wrapstyle>items</wrapstyle>
+        </buttonlist>
+
+        <textarea name="titlelabel" from="ruleslabel">
+            <position>54,125</position>
+            <value>Rule Name:</value>
+        </textarea>
+
+        <textedit name="title" from="basetextedit">
+            <position>250,130</position>
+        </textedit>
+
+        <buttonlist name="clauses" from="basewideselector">
+            <position>54,200</position>
+            <wrapstyle>items</wrapstyle>
+        </buttonlist>
+
+        <textarea name="clausetext" from="ruleslabel">
+            <area>54,240,692,40</area>
+            <align>left,vcenter</align>
+            <cutdown>yes</cutdown>
+        </textarea>
+        
+        <textedit name="description">
+            <area>54,290,692,130</area>
+            <statetype name="background">
+                <state name="active">
+                    <imagetype name="background">
+                        <area>0,0,692,130</area>
+                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <imagetype name="cursor">
+                <filename>cursor.png</filename>
+            </imagetype>
+            <textarea name="text">
+                <area>10,10,672,110</area>
+                <font>basesmallblack</font>
+                <multiline>yes</multiline>
+            </textarea>
+        </textedit>
+
+        <textarea name="subtitlelabel" from="ruleslabel">
+            <area>54,430,240,75</area>
+            <value>Additional Tables:</value>
+            <align>left</align>
+        </textarea>
+
+        <textedit name="subtitle">
+            <area>250,430,496,75</area>
+            <statetype name="background">
+                <state name="active">
+                    <imagetype name="background">
+                        <area>0,0,496,75</area>
+                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <imagetype name="cursor">
+                <filename>cursor.png</filename>
+            </imagetype>
+            <textarea name="text">
+                <area>10,10,476,65</area>
+                <font>basesmallblack</font>
+                <multiline>yes</multiline>
+            </textarea>
+        </textedit>
+
+        <button name="test" from="basebutton">
+            <position>54,510</position>
+            <value>Test</value>
+        </button>
+
+        <button name="record" from="basebutton">
+            <position>238,510</position>
+            <value>Record</value>
+        </button>
+
+        <button name="store" from="basebutton">
+            <position>422,510</position>
+            <value>Store</value>
+        </button>
+
+        <button name="cancel" from="basebutton">
+            <position>595,510</position>
+            <value>Cancel</value>
+        </button>
+
+    </window>
 </mythuitheme>

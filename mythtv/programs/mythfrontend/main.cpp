@@ -380,8 +380,13 @@ void startPrevious(void)
 
 void startCustomEdit(void)
 {
-    CustomEdit custom(gContext->GetMainWindow(), "custom record");
-    custom.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    CustomEdit *custom = new CustomEdit(mainStack);
+
+    if (custom->Create())
+        mainStack->AddScreen(custom);
+    else
+        delete custom;
 }
 
 void startManualSchedule(void)

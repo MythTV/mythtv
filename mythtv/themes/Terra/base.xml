@@ -662,6 +662,59 @@
         </buttonlist>
     </window>
 
+    <!-- Fullscreen Dialogue Box -->
+    <window name="MythDialogBox">
+        <area>0,0,1280,720</area>
+
+        <imagetype name="backimg">
+            <area>0,0,1280,720</area>
+            <filename>backgrounds/background.png</filename>
+        </imagetype>
+
+        <textarea name="messagearea">
+            <area>100,100,1080,210</area>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+            <font>basemedium</font>
+        </textarea>
+        
+        <buttonlist name="list">
+            <area>100,320,1080,350</area>
+            <layout>vertical</layout>
+            <spacing>3</spacing>
+            <scrollstyle>free</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <buttonarea>0,0,100%,97%</buttonarea>
+            <drawfrombottom>yes</drawfrombottom>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <area>0,0,1060,30</area>
+                        <filename>popups/menu_button.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>0,0,100%,30</area>
+                        <align>allcenter</align>
+                        <font>basemedium</font>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active">
+                </state>
+                <state name="selected" from="active">
+                    <textarea name="buttontext">
+                        <area>0,0,100%,30</area>
+                        <font>basemediumbrown</font>
+                    </textarea>
+                    <imagetype name="selecteditemarrow">
+                        <position>5,5</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+
+                </state>
+            </statetype>
+        </buttonlist>
+    </window>
+
     <!-- Confirmation Dialog -->
     <window name="MythConfirmationDialog">
         <area>0,42,1280,642</area>

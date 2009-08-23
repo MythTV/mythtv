@@ -514,10 +514,12 @@ void ViewScheduled::customEdit()
     if (!pginfo)
         return;
 
-    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
-                                    "customedit", pginfo);
-    ce->exec();
-    delete ce;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
+    if (ce->Create())
+        mainStack->AddScreen(ce);
+    else
+        delete ce;
 }
 
 void ViewScheduled::deleteRule()

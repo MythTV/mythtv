@@ -639,10 +639,12 @@ void ProgLister::customEdit()
     if (!pi)
         return;
 
-    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
-                                    "customedit", pi);
-    ce->exec();
-    delete ce;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    CustomEdit *ce = new CustomEdit(mainStack, pi);
+    if (ce->Create())
+        mainStack->AddScreen(ce);
+    else
+        delete ce;
 }
 
 void ProgLister::deleteItem()

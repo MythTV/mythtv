@@ -442,10 +442,12 @@ void ProgFinder::customEdit()
         if (!curPick)
             return;
 
-        CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
-                                        "customedit", curPick);
-        ce->exec();
-        delete ce;
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        CustomEdit *ce = new CustomEdit(mainStack, curPick);
+        if (ce->Create())
+            mainStack->AddScreen(ce);
+        else
+            delete ce;
     }
 }
 

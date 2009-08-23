@@ -867,10 +867,12 @@ void ProgramRecPriority::customEdit(void)
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
 
-    CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
-                                        "customedit", pgRecInfo);
-    ce->exec();
-    delete ce;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    CustomEdit *ce = new CustomEdit(mainStack, pgRecInfo);
+    if (ce->Create())
+        mainStack->AddScreen(ce);
+     else
+        delete ce;
 }
 
 void ProgramRecPriority::remove(void)

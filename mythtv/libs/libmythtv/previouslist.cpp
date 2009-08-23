@@ -22,7 +22,7 @@ using namespace std;
 #include "previouslist.h"
 #include "proglist_qt.h"
 #include "scheduledrecording.h"
-#include "customedit.h"
+//#include "customedit.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -403,6 +403,7 @@ void PreviousList::edit()
 
 void PreviousList::customEdit()
 {
+#if 0
     ProgramInfo *pi = itemList.at(curItem);
 
     if (!pi)
@@ -412,6 +413,7 @@ void PreviousList::customEdit()
                                     "customedit", pi);
     ce->exec();
     delete ce;
+#endif
 }
 
 void PreviousList::upcoming()

@@ -20,7 +20,7 @@ using namespace std;
 
 #include "proglist_qt.h"
 #include "scheduledrecording.h"
-#include "customedit.h"
+//#include "customedit.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"
@@ -1176,6 +1176,7 @@ void ProgListerQt::edit()
 
 void ProgListerQt::customEdit()
 {
+#if 0
     ProgramInfo *pi = itemList.at(curItem);
 
     if (!pi)
@@ -1185,6 +1186,7 @@ void ProgListerQt::customEdit()
                                     "customedit", pi);
     ce->exec();
     delete ce;
+#endif
 }
 
 void ProgListerQt::remove()
