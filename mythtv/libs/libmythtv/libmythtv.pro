@@ -355,6 +355,8 @@ using_frontend {
     # Misc. frontend
     HEADERS += ttfont.h
     SOURCES += ttfont.cpp
+    HEADERS += DetectLetterbox.h
+    SOURCES += DetectLetterbox.cpp
 
     using_mheg {
         # DSMCC stuff

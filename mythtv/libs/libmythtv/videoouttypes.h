@@ -56,7 +56,9 @@ typedef enum AdjustFillMode
     kAdjustFill_Full,
     kAdjustFill_HorizontalStretch,
     kAdjustFill_VerticalStretch,
-    kAdjustFill_END
+    kAdjustFill_END,
+    kAdjustFill_AutoDetect_DefaultOff,
+    kAdjustFill_AutoDetect_DefaultHalf,
 } AdjustFillMode;
 
 typedef enum LetterBoxColour
@@ -258,6 +260,12 @@ inline QString toString(AdjustFillMode aspectmode)
         case kAdjustFill_Toggle:
         case kAdjustFill_Off:
         case kAdjustFill_END: break;
+        case kAdjustFill_AutoDetect_DefaultOff:
+            ret = QObject::tr("Auto Detect (Default Off)");
+            break;
+        case kAdjustFill_AutoDetect_DefaultHalf:
+            ret = QObject::tr("Auto Detect (Default Half)");
+            break;
     }
 
     ret.detach();

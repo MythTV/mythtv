@@ -46,6 +46,7 @@ struct AVSubtitle;
 struct SwsContext;
 class InteractiveTV;
 class NSAutoreleasePool;
+class DetectLetterbox;
 
 struct TextContainer
 {
@@ -418,6 +419,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     {
         hidedvdbutton = hide;
     }
+
+    // Playback (output) zoom automation
+    DetectLetterbox *detect_letter_box;
 
     // Position Map Stuff
     bool PosMapFromEnc(unsigned long long          start,

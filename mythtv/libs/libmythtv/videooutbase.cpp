@@ -391,6 +391,15 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     if (db_vdisp_profile)
         db_vdisp_profile->SetInput(windows[0].GetVideoDim());
 
+/*
+    aspectoverride  = db_aspectoverride;
+    // If autodection is enabled. Start in the defaultmode
+    adjustfill      = db_adjustfill >= kAdjustFill_AutoDetect_DefaultOff ?
+        (AdjustFillMode) (db_adjustfill - kAdjustFill_AutoDetect_DefaultOff) : db_adjustfill;
+*/
+
+    VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
+
     return mainSuccess;
 }
 

@@ -31,6 +31,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "dialogbox.h"
 #include "NuppelVideoPlayer.h"
+#include "DetectLetterbox.h"
 #include "audiooutput.h"
 #include "recordingprofile.h"
 #include "osdtypes.h"
@@ -275,6 +276,10 @@ NuppelVideoPlayer::NuppelVideoPlayer()
       // Debugging variables
       output_jmeter(NULL)
 {
+
+    // Playback (output) zoom control
+    detect_letter_box = new DetectLetterbox(this);
+
     vbimode = VBIMode::Parse(gContext->GetSetting("VbiFormat"));
 
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
@@ -1449,6 +1454,8 @@ void NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
     buffer->timecode = timecode;
 
     videoOutput->ReleaseFrame(buffer);
+
+    detect_letter_box->Detect(buffer);
 }
 
 /** \fn NuppelVideoPlayer::DiscardVideoFrame(VideoFrame*)
@@ -2910,6 +2917,8 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
     // handle scan type changes
     AutoDeint(frame);
+
+    detect_letter_box->SwitchTo(frame);
 
     FrameScanType ps = m_scan;
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
@@ -5324,6 +5333,7 @@ void NuppelVideoPlayer::ToggleAdjustFill(AdjustFillMode adjustfillMode)
 {
     if (videoOutput)
     {
+        detect_letter_box->SetDetectLetterbox(false);
         videoOutput->ToggleAdjustFill(adjustfillMode);
         ReinitOSD();
     }

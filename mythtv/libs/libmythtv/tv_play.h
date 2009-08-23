@@ -37,6 +37,7 @@ class QDateTime;
 class OSD;
 class RemoteEncoder;
 class NuppelVideoPlayer;
+class DetectLetterbox;
 class RingBuffer;
 class ProgramInfo;
 class MythDialog;

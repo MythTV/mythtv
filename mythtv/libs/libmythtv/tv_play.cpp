@@ -29,6 +29,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "NuppelVideoPlayer.h"
+#include "DetectLetterbox.h"
 #include "programinfo.h"
 #include "udpnotify.h"
 #include "vsync.h"
@@ -9745,6 +9746,10 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
     {
         ToggleAdjustFill(actx, (AdjustFillMode) action.right(1).toInt());
     }
+    else if (action == "AUTODETECT_FILL")
+    {
+        actx->nvp->detect_letter_box->SetDetectLetterbox(!actx->nvp->detect_letter_box->GetDetectLetterbox());
+    }
     else if (action == "GUIDE")
         EditSchedule(actx, kScheduleProgramGuide);
     else if (action.left(10) == "CHANGROUP_")
@@ -10344,6 +10349,11 @@ void TV::FillMenuAdjustFill(
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     OSDGenericTree *af_item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
+    OSDGenericTree *subitem = new OSDGenericTree(af_item, tr("Auto Detect"),
+                                 "AUTODETECT_FILL",
+                                 (ctx->nvp->detect_letter_box->GetDetectLetterbox()) ? 1 : 0,
+                                 NULL, "ADJUSTFILLGROUP");
+
     for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
     {
         bool sel = (i != kAdjustFill_Off) ? (adjustfill == i) :

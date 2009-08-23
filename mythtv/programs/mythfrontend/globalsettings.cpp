@@ -2433,6 +2433,10 @@ static HostComboBox *AdjustFill()
 {
     HostComboBox *gc = new HostComboBox("AdjustFill");
     gc->setLabel(QObject::tr("Zoom"));
+    gc->addSelection(toString(kAdjustFill_AutoDetect_DefaultOff),
+                     QString::number(kAdjustFill_AutoDetect_DefaultOff));
+    gc->addSelection(toString(kAdjustFill_AutoDetect_DefaultHalf),
+                     QString::number(kAdjustFill_AutoDetect_DefaultHalf));
     for (int m = kAdjustFill_Off; m < kAdjustFill_END; m++)
         gc->addSelection(toString((AdjustFillMode)m), QString::number(m));
     gc->setHelpText(QObject::tr(
