@@ -1,7 +1,7 @@
 /*
  * hdhomerun_types.h
  *
- * Copyright © 2008 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2008-2009 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,13 @@
  * conditions defined in the GNU Lesser General Public License.
  */
 
+#define HDHOMERUN_STATUS_COLOR_NEUTRAL	0xFFFFFFFF
+#define HDHOMERUN_STATUS_COLOR_RED		0xFFFF0000
+#define HDHOMERUN_STATUS_COLOR_YELLOW	0xFFFFFF00
+#define HDHOMERUN_STATUS_COLOR_GREEN	0xFF00C000
+
 struct hdhomerun_device_t;
+struct hdhomerun_device_allocation_t;
 
 struct hdhomerun_tuner_status_t {
 	char channel[32];
@@ -63,7 +69,8 @@ struct hdhomerun_channelscan_result_t {
 	struct hdhomerun_tuner_status_t status;
 	int program_count;
 	struct hdhomerun_channelscan_program_t programs[HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT];
-	uint32_t pat_crc;
+	bool_t transport_stream_id_detected;
+	uint16_t transport_stream_id;
 };
 
 struct hdhomerun_plotsample_t {

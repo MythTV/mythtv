@@ -1,7 +1,7 @@
 /*
  * hdhomerun_channels.c
  *
- * Copyright © 2007-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public

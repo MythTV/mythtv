@@ -1,7 +1,7 @@
 /*
  * hdhomerun_device.h
  *
- * Copyright © 2006-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -38,11 +38,6 @@ extern "C" {
 #define HDHOMERUN_DEVICE_MAX_LOCK_TO_DATA_TIME 2000
 #define HDHOMERUN_DEVICE_MAX_TUNE_TO_DATA_TIME (HDHOMERUN_DEVICE_MAX_TUNE_TO_LOCK_TIME + HDHOMERUN_DEVICE_MAX_LOCK_TO_DATA_TIME)
 
-#define HDHOMERUN_STATUS_COLOR_NEUTRAL	0xFFFFFFFF
-#define HDHOMERUN_STATUS_COLOR_RED		0xFFFF0000
-#define HDHOMERUN_STATUS_COLOR_YELLOW	0xFFFFFF00
-#define HDHOMERUN_STATUS_COLOR_GREEN	0xFF00C000
-
 #define HDHOMERUN_TARGET_PROTOCOL_UDP "udp"
 #define HDHOMERUN_TARGET_PROTOCOL_RTP "rtp"
 
@@ -54,7 +49,7 @@ extern "C" {
  *
  * For example, a threaded application that streams video from 4 tuners (2 HDHomeRun devices) and has
  * GUI feedback to the user of the selected tuner might use 5 device objects: 4 for streaming video
- * (one per thread) and one for the GUI display that can just between tuners.
+ * (one per thread) and one for the GUI display that can switch between tuners.
  *
  * This function will not attempt to connect to the device.
  * The connection will be established when first used.
@@ -88,6 +83,7 @@ extern LIBTYPE void hdhomerun_device_destroy(struct hdhomerun_device_t *hd);
 /*
  * Get the device id, ip, or tuner of the device instance.
  */
+extern LIBTYPE const char *hdhomerun_device_get_name(struct hdhomerun_device_t *hd);
 extern LIBTYPE uint32_t hdhomerun_device_get_device_id(struct hdhomerun_device_t *hd);
 extern LIBTYPE uint32_t hdhomerun_device_get_device_ip(struct hdhomerun_device_t *hd);
 extern LIBTYPE uint32_t hdhomerun_device_get_device_id_requested(struct hdhomerun_device_t *hd);

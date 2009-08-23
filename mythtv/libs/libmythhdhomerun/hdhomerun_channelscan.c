@@ -1,7 +1,7 @@
 /*
  * hdhomerun_channelscan.c
  *
- * Copyright © 2007-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2007-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -149,20 +149,26 @@ static int channelscan_detect_programs(struct hdhomerun_channelscan_t *scan, str
 		return ret;
 	}
 
-	char *line = streaminfo;
+	char *next_line = streaminfo;
 	int program_count = 0;
 
 	while (1) {
-		char *end = strchr(line, '\n');
-		if (!end) {
+		char *line = next_line;
+
+		next_line = strchr(line, '\n');
+		if (!next_line) {
 			break;
 		}
+		*next_line++ = 0;
 
-		*end = 0;
+		unsigned int transport_stream_id;
+		if (sscanf(line, "tsid=0x%x", &transport_stream_id) == 1) {
+			result->transport_stream_id = transport_stream_id;
+			result->transport_stream_id_detected = TRUE;
+			continue;
+		}
 
-		unsigned long pat_crc;
-		if (sscanf(line, "crc=0x%lx", &pat_crc) == 1) {
-			result->pat_crc = pat_crc;
+		if (program_count >= HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT) {
 			continue;
 		}
 
@@ -207,11 +213,6 @@ static int channelscan_detect_programs(struct hdhomerun_channelscan_t *scan, str
 		}
 
 		program_count++;
-		if (program_count >= HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT) {
-			break;
-		}
-
-		line = end + 1;
 	}
 
 	if (program_count == 0) {
@@ -274,8 +275,15 @@ int channelscan_detect(struct hdhomerun_channelscan_t *scan, struct hdhomerun_ch
 	/* Detect programs. */
 	result->program_count = 0;
 
-	uint64_t timeout = getcurrenttime() + 10000;
-	uint64_t complete_time = getcurrenttime() + 2000;
+	uint64_t timeout;
+	if (strstr(hdhomerun_device_get_model_str(scan->hd), "atsc")) {
+		timeout = getcurrenttime() + 4000;
+	} else {
+		timeout = getcurrenttime() + 10000;
+	}
+
+	uint64_t complete_time = getcurrenttime() + 1000;
+
 	while (1) {
 		bool_t changed, incomplete;
 		ret = channelscan_detect_programs(scan, result, &changed, &incomplete);
@@ -284,19 +292,36 @@ int channelscan_detect(struct hdhomerun_channelscan_t *scan, struct hdhomerun_ch
 		}
 
 		if (changed) {
-			complete_time = getcurrenttime() + 2000;
+			complete_time = getcurrenttime() + 1000;
 		}
 
 		if (!incomplete && (getcurrenttime() >= complete_time)) {
-			return 1;
+			break;
 		}
 
 		if (getcurrenttime() >= timeout) {
-			return 1;
+			break;
 		}
 
 		msleep(250);
 	}
+
+	/* Lock => skip overlapping channels. */
+	uint32_t max_next_frequency = result->frequency - 5500000;
+	while (1) {
+		if (!scan->next_channel) {
+			break;
+		}
+
+		if (hdhomerun_channel_entry_frequency(scan->next_channel) <= max_next_frequency) {
+			break;
+		}
+
+		scan->next_channel = hdhomerun_channel_list_prev(scan->channel_list, scan->next_channel);
+	}
+
+	/* Success. */
+	return 1;
 }
 
 uint8_t channelscan_get_progress(struct hdhomerun_channelscan_t *scan)

@@ -1,7 +1,7 @@
 /*
  * hdhomerun_device.c
  *
- * Copyright © 2006-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -37,6 +37,7 @@ struct hdhomerun_device_t {
 	struct hdhomerun_video_sock_t *vs;
 	struct hdhomerun_debug_t *dbg;
 	struct hdhomerun_channelscan_t *scan;
+	uint32_t device_id;
 	unsigned int tuner;
 	uint32_t lockkey;
 	char name[32];
@@ -49,12 +50,18 @@ static void hdhomerun_device_set_update(struct hdhomerun_device_t *hd)
 	*hd->model = 0;
 
 	/* New name. */
-	sprintf(hd->name, "%08lX-%u", (unsigned long)hdhomerun_control_get_device_id(hd->cs), hd->tuner);
+	sprintf(hd->name, "%08lX-%u", (unsigned long)hd->device_id, hd->tuner);
 }
 
 void hdhomerun_device_set_device(struct hdhomerun_device_t *hd, uint32_t device_id, uint32_t device_ip)
 {
 	hdhomerun_control_set_device(hd->cs, device_id, device_ip);
+
+	if ((device_id == 0) || (device_id == HDHOMERUN_DEVICE_ID_WILDCARD)) {
+		device_id = hdhomerun_control_get_device_id(hd->cs);
+	}
+
+	hd->device_id = device_id;
 	hdhomerun_device_set_update(hd);
 }
 
@@ -223,6 +230,11 @@ int hdhomerun_device_set_tuner_from_str(struct hdhomerun_device_t *hd, const cha
 	}
 
 	return -1;
+}
+
+const char *hdhomerun_device_get_name(struct hdhomerun_device_t *hd)
+{
+	return hd->name;
 }
 
 uint32_t hdhomerun_device_get_device_id(struct hdhomerun_device_t *hd)
@@ -779,8 +791,9 @@ int hdhomerun_device_stream_start(struct hdhomerun_device_t *hd)
 int hdhomerun_device_stream_refresh_target(struct hdhomerun_device_t *hd)
 {
 	int ret = hdhomerun_device_set_tuner_target_to_local_protocol(hd, HDHOMERUN_TARGET_PROTOCOL_RTP);
-	if (ret <= 0)
+	if (ret == 0) {
 		ret = hdhomerun_device_set_tuner_target_to_local_protocol(hd, HDHOMERUN_TARGET_PROTOCOL_UDP);
+	}
 	return ret;
 }
 

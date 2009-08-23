@@ -1,7 +1,7 @@
 /*
  * hdhomerun_discover.c
  *
- * Copyright © 2006-2007 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006-2007 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -435,12 +435,12 @@ static int hdhomerun_discover_find_devices_internal(struct hdhomerun_discover_t 
 {
 	int count = 0;
 	int attempt;
-	for (attempt = 0; attempt < 4; attempt++) {
+	for (attempt = 0; attempt < 2; attempt++) {
 		if (!hdhomerun_discover_send(ds, target_ip, device_type, device_id)) {
 			return -1;
 		}
 
-		uint64_t timeout = getcurrenttime() + 250;
+		uint64_t timeout = getcurrenttime() + 200;
 		while (getcurrenttime() < timeout) {
 			struct hdhomerun_discover_device_t *result = &result_list[count];
 

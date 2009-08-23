@@ -1,7 +1,7 @@
 /*
  * hdhomerun_os_windows.h
  *
- * Copyright © 2006-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -78,23 +78,32 @@ typedef HANDLE pthread_mutex_t;
 #define THREAD_FUNC_PREFIX DWORD WINAPI
 #define SIGPIPE SIGABRT
 
-static inline int msleep(unsigned int ms)
-{
-	Sleep(ms);
-	return 0;
-}
-
-static inline int sleep(unsigned int sec)
-{
-	Sleep(sec * 1000);
-	return 0;
-}
-
 static inline uint64_t getcurrenttime(void)
 {
 	struct timeb tb;
 	ftime(&tb);
 	return ((uint64_t)tb.time * 1000) + tb.millitm;
+}
+
+static inline int msleep(unsigned int ms)
+{
+	uint64_t stop_time = getcurrenttime() + ms;
+
+	while (1) {
+		uint64_t current_time = getcurrenttime();
+		if (current_time >= stop_time) {
+			return 0;
+		}
+
+		uint64_t delay_ms = stop_time - current_time;
+		Sleep((DWORD)delay_ms);
+	}
+}
+
+static inline int sleep(unsigned int sec)
+{
+	msleep(sec * 1000);
+	return 0;
 }
 
 static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout)

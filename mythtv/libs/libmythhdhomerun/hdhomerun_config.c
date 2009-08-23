@@ -1,7 +1,7 @@
 /*
  * hdhomerun_config.c
  *
- * Copyright © 2006-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006-2008 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -202,6 +202,13 @@ static int cmd_set(const char *item, const char *value)
 	return cmd_set_internal(item, value);
 }
 
+static bool_t sigabort = FALSE;
+
+static void signal_abort(int arg)
+{
+	sigabort = TRUE;
+}
+
 static void cmd_scan_printf(FILE *fp, const char *fmt, ...)
 {
 	va_list ap;
@@ -230,6 +237,17 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		return -1;
 	}
 
+	char *ret_error;
+	if (hdhomerun_device_tuner_lockkey_request(hd, &ret_error) <= 0) {
+		fprintf(stderr, "failed to lock tuner\n");
+		if (ret_error) {
+			fprintf(stderr, "%s\n", ret_error);
+		}
+		return -1;
+	}
+
+	hdhomerun_device_set_tuner_target(hd, "none");
+
 	char *channelmap;
 	if (hdhomerun_device_get_tuner_channelmap(hd, &channelmap) <= 0) {
 		fprintf(stderr, "failed to query channelmap from device\n");
@@ -256,8 +274,11 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		}
 	}
 
-	int ret;
-	while (1) {
+	signal(SIGINT, signal_abort);
+	signal(SIGPIPE, signal_abort);
+
+	int ret = 0;
+	while (!sigabort) {
 		struct hdhomerun_channelscan_result_t result;
 		ret = hdhomerun_device_channelscan_advance(hd, &result);
 		if (ret <= 0) {
@@ -278,12 +299,18 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 			result.status.signal_to_noise_quality, result.status.symbol_error_quality
 		);
 
+		if (result.transport_stream_id_detected) {
+			cmd_scan_printf(fp, "TSID: 0x%04X\n", result.transport_stream_id);
+		}
+
 		int i;
 		for (i = 0; i < result.program_count; i++) {
 			struct hdhomerun_channelscan_program_t *program = &result.programs[i];
 			cmd_scan_printf(fp, "PROGRAM %s\n", program->program_str);
 		}
 	}
+
+	hdhomerun_device_tuner_lockkey_release(hd);
 
 	if (fp) {
 		fclose(fp);
@@ -292,13 +319,6 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		fprintf(stderr, "communication error sending request to hdhomerun device\n");
 	}
 	return ret;
-}
-
-static bool_t cmd_saving = FALSE;
-
-static void cmd_save_abort(int arg)
-{
-	cmd_saving = FALSE;
 }
 
 static int cmd_save(const char *tuner_str, const char *filename)
@@ -324,19 +344,21 @@ static int cmd_save(const char *tuner_str, const char *filename)
 	int ret = hdhomerun_device_stream_start(hd);
 	if (ret <= 0) {
 		fprintf(stderr, "unable to start stream\n");
+		if (fp && fp != stdout) {
+			fclose(fp);
+		}
 		return ret;
 	}
 
-	signal(SIGINT, cmd_save_abort);
-	signal(SIGPIPE, cmd_save_abort);
+	signal(SIGINT, signal_abort);
+	signal(SIGPIPE, signal_abort);
 
 	struct hdhomerun_video_stats_t stats_old, stats_cur;
 	hdhomerun_device_get_video_stats(hd, &stats_old);
 
 	uint64_t next_progress = getcurrenttime() + 1000;
 
-	cmd_saving = TRUE;
-	while (cmd_saving) {
+	while (!sigabort) {
 		uint64_t loop_start_time = getcurrenttime();
 
 		size_t actual_size;
@@ -477,7 +499,10 @@ static int cmd_execute(void)
 			eol_n = end;
 		}
 
-		char *eol = min(eol_r, eol_n);
+		char *eol = eol_r;
+		if (eol_n < eol) {
+			eol = eol_n;
+		}
 
 		char *sep = strchr(pos, ' ');
 		if (!sep || sep > eol) {

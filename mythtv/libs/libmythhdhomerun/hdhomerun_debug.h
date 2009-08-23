@@ -1,7 +1,7 @@
 /*
  * hdhomerun_debug.h
  *
- * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -54,6 +54,7 @@ extern LIBTYPE void hdhomerun_debug_disable(struct hdhomerun_debug_t *dbg);
 extern LIBTYPE bool_t hdhomerun_debug_enabled(struct hdhomerun_debug_t *dbg);
 
 extern LIBTYPE void hdhomerun_debug_flush(struct hdhomerun_debug_t *dbg, uint64_t timeout);
+extern LIBTYPE void hdhomerun_debug_close(struct hdhomerun_debug_t *dbg, uint64_t timeout);
 
 extern LIBTYPE void hdhomerun_debug_printf(struct hdhomerun_debug_t *dbg, const char *fmt, ...);
 extern LIBTYPE void hdhomerun_debug_vprintf(struct hdhomerun_debug_t *dbg, const char *fmt, va_list args);
