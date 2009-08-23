@@ -24,6 +24,7 @@ HEADERS += TemplateFinder.h TemplateMatcher.h
 HEADERS += HistogramAnalyzer.h
 HEADERS += BlankFrameDetector.h
 HEADERS += SceneChangeDetector.h
+HEADERS += PrePostRollFlagger.h
 
 HEADERS += LogoDetectorBase.h SceneChangeDetectorBase.h
 HEADERS += SlotRelayer.h CustomEventRelayer.h
@@ -43,6 +44,7 @@ SOURCES += TemplateFinder.cpp TemplateMatcher.cpp
 SOURCES += HistogramAnalyzer.cpp
 SOURCES += BlankFrameDetector.cpp
 SOURCES += SceneChangeDetector.cpp
+SOURCES += PrePostRollFlagger.cpp
 
 SOURCES += main.cpp
 

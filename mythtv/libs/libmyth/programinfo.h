@@ -83,6 +83,11 @@ typedef enum SkipTypes {
     /* Scene detection doesn't seem to be too useful (in the USA); there *
      * are just too many false positives from non-commercial cut scenes. */
     COMM_DETECT_2_ALL       = (COMM_DETECT_2_LOGO | COMM_DETECT_2_BLANK),
+
+    COMM_DETECT_PREPOSTROLL = 0x00000200,    
+    COMM_DETECT_PREPOSTROLL_ALL = (COMM_DETECT_PREPOSTROLL
+                                   | COMM_DETECT_BLANKS
+                                   | COMM_DETECT_SCENE)
 } SkipType;
 
 MPUBLIC QString SkipTypeToString(int);

@@ -3499,6 +3499,7 @@ QString SkipTypeToString(int flags)
     bool scene = COMM_DETECT_SCENE & flags;
     bool logo  = COMM_DETECT_LOGO  & flags;
     bool exp   = COMM_DETECT_2     & flags;
+    bool prePst= COMM_DETECT_PREPOSTROLL & flags;
 
     if (blank && scene && logo)
         ret = QObject::tr("All Available Methods");
@@ -3517,6 +3518,8 @@ QString SkipTypeToString(int flags)
 
     if (exp)
         ret = QObject::tr("Experimental") + ": " + ret;
+    else if(prePst)
+        ret = QObject::tr("Pre & Post Roll") + ": " + ret;
 
     return ret;
 }
@@ -3530,6 +3533,8 @@ deque<int> GetPreferredSkipTypeCombinations(void)
     tmp.push_back(COMM_DETECT_SCENE);
     tmp.push_back(COMM_DETECT_LOGO);
     tmp.push_back(COMM_DETECT_2 | COMM_DETECT_BLANK | COMM_DETECT_LOGO);
+    tmp.push_back(COMM_DETECT_PREPOSTROLL | COMM_DETECT_BLANK |
+                  COMM_DETECT_SCENE);
     return tmp;
 }
 

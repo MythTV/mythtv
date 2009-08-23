@@ -20,6 +20,15 @@ class NuppelVideoPlayer;
 class LogoDetectorBase;
 class SceneChangeDetectorBase;
 
+enum frameMaskValues {
+    COMM_FRAME_SKIPPED       = 0x0001,
+    COMM_FRAME_BLANK         = 0x0002,
+    COMM_FRAME_SCENE_CHANGE  = 0x0004,
+    COMM_FRAME_LOGO_PRESENT  = 0x0008,
+    COMM_FRAME_ASPECT_CHANGE = 0x0010,
+    COMM_FRAME_RATING_SYMBOL = 0x0020
+};
+
 class FrameInfoEntry
 {
   public:
@@ -82,9 +91,6 @@ class ClassicCommDetector : public CommDetectorBase
         }
         FrameBlock;
 
-        void Init();
-        void SetVideoParams(float aspect);
-        void ProcessFrame(VideoFrame *frame, long long frame_number);
         void ClearAllMaps(void);
         void GetBlankCommMap(comm_map_t &comms);
         void GetBlankCommBreakMap(comm_map_t &comms);
@@ -106,17 +112,10 @@ class ClassicCommDetector : public CommDetectorBase
         void GetLogoCommBreakMap(comm_map_t &map);
 
         enum SkipTypes commDetectMethod;
-        bool showProgress;
-        bool fullSpeed;
-        NuppelVideoPlayer *nvp;
-        QDateTime startedAt, stopsAt;
-        QDateTime recordingStartedAt, recordingStopsAt;
-        bool stillRecording;
         QMap<long long,int> lastSentCommBreakMap;
         bool commBreakMapUpdateRequested;
         bool sendCommBreakMapUpdates;
 
-        bool aggressiveDetection;
         int commDetectBorder;
         int commDetectBlankFrameMaxDiff;
         int commDetectDarkBrightness;
@@ -138,15 +137,11 @@ class ClassicCommDetector : public CommDetectorBase
         int height;
         int horizSpacing;
         int vertSpacing;
-        double fps;
         double fpm;
         bool blankFramesOnly;
         int blankFrameCount;
         int currentAspect;
 
-        long long framesProcessed;
-        long long preRoll;
-        long long postRoll;
 
         int totalMinBrightness;
 
@@ -161,7 +156,6 @@ class ClassicCommDetector : public CommDetectorBase
 
         unsigned char *framePtr;
 
-        QMap<long long, FrameInfoEntry> frameInfo;
         comm_map_t blankFrameMap;
         comm_map_t blankCommMap;
         comm_map_t blankCommBreakMap;
@@ -179,6 +173,25 @@ class ClassicCommDetector : public CommDetectorBase
         bool decoderFoundAspectChanges;
 
         SceneChangeDetectorBase* sceneChangeDetector;
+
+protected:
+        NuppelVideoPlayer *nvp;
+        QDateTime startedAt, stopsAt;
+        QDateTime recordingStartedAt, recordingStopsAt;
+        bool aggressiveDetection;
+        bool stillRecording;
+        bool fullSpeed;
+        bool showProgress;
+        double fps;
+        long long framesProcessed;
+        long long preRoll;
+        long long postRoll;
+
+
+        void Init();
+        void SetVideoParams(float aspect);
+        void ProcessFrame(VideoFrame *frame, long long frame_number);
+        QMap<long long, FrameInfoEntry> frameInfo;
 
 public slots:
         void sceneChangeDetectorHasNewInformation(unsigned int framenum, bool isSceneChange,float debugValue);

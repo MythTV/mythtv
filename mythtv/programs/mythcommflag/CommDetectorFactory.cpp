@@ -1,6 +1,7 @@
 #include "CommDetectorFactory.h"
 #include "ClassicCommDetector.h"
 #include "CommDetector2.h"
+#include "PrePostRollFlagger.h"
 
 class NuppelVideoPlayer;
 class RemoteEncoder;
@@ -17,6 +18,13 @@ CommDetectorFactory::makeCommDetector(
     const QDateTime& recordingStopsAt,
     bool useDB)
 {
+    if(commDetectMethod & COMM_DETECT_PREPOSTROLL)
+    {
+        return new PrePostRollFlagger(commDetectMethod, showProgress, fullSpeed,
+                                      nvp, startedAt, stopsAt,
+                                      recordingStartedAt, recordingStopsAt);
+    }
+
     if ((commDetectMethod & COMM_DETECT_2))
     {
         return new CommDetector2(
