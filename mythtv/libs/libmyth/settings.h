@@ -708,7 +708,7 @@ class MPUBLIC HostRefreshRateComboBox : public HostComboBox
     virtual void ChangeResolution(const QString& resolution);
 
   private:
-    static const vector<short> GetRefreshRates(const QString &resolution);
+    static const vector<double> GetRefreshRates(const QString &resolution);
 };
 
 class MPUBLIC HostTimeBox : public ComboBoxSetting, public HostDBStorage

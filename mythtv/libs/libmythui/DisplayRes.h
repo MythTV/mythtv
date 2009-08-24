@@ -59,11 +59,11 @@ class MPUBLIC DisplayRes {
      * @{
      */
 
-    /** \fn SwitchToVideo(int iwidth, int iheight, short irate = 0)
+    /** \fn SwitchToVideo(int iwidth, int iheight, double frate = 0)
      *  \brief Switches to the resolution and refresh rate defined in the
      *         database for the specified video resolution and frame rate.
      */
-    bool SwitchToVideo(int iwidth, int iheight, short irate = 0);
+    bool SwitchToVideo(int iwidth, int iheight, double frate = 0.0);
     /** \brief Switches to the GUI resolution specified.
      *
      *   If which_gui is GUI then this switches to the resolution
@@ -106,7 +106,7 @@ class MPUBLIC DisplayRes {
     int GetPhysicalHeight(void) const { return last.Height_mm(); }
 
     /** \brief Returns current screen refresh rate. */
-    int GetRefreshRate(void)    const { return last.RefreshRate(); }
+    double GetRefreshRate(void)    const { return last.RefreshRate(); }
     /** \brief Returns current screen aspect ratio.
      *
      *  If there is an aspect overide in the database that aspect
@@ -127,7 +127,7 @@ class MPUBLIC DisplayRes {
     /// \brief Returns all video modes supported by the display.
     virtual const std::vector<DisplayResScreen>& GetVideoModes() const = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
-    const std::vector<short> GetRefreshRates(int width, int height) const;
+    const std::vector<double> GetRefreshRates(int width, int height) const;
     /** @} */
 
   protected:
@@ -137,8 +137,8 @@ class MPUBLIC DisplayRes {
     
     // These methods are implemented by the subclasses
     virtual bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                                int &h_mm, short &rate) const = 0;
-    virtual bool SwitchToVideoMode(int width, int height, short framerate) = 0;
+                                int &h_mm, double &rate) const = 0;
+    virtual bool SwitchToVideoMode(int width, int height, double framerate) = 0;
 
   private:
     DisplayRes(const DisplayRes & rhs); // disable copy constructor;

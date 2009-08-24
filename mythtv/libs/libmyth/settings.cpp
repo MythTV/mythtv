@@ -1,5 +1,6 @@
 // C++ headers
 #include <algorithm>
+#include <cmath>
 using namespace std;
 
 // POSIX headers
@@ -760,15 +761,15 @@ void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
 {
     clearSelections();
     
-    const vector<short> list = GetRefreshRates(resolution);
+    const vector<double> list = GetRefreshRates(resolution);
     addSelection(QObject::tr("Any"), "0");
     int hz50 = -1, hz60 = -1;
     for (uint i=0; i<list.size(); ++i)
     {        
-        QString sel = QString::number(list[i]);
+        QString sel = QString::number((double) list[i],'f', 3);
         addSelection(sel+" Hz", sel);
-        hz50 = (50 == list[i]) ? i : hz50;
-        hz60 = (60 == list[i]) ? i : hz60;
+        hz50 = (fabs(50.0 - list[i]) < 0.01) ? i : hz50;
+        hz60 = (fabs(60.0 - list[i]) < 0.01) ? i : hz60;
     }
     
     setValue(0);
@@ -780,7 +781,7 @@ void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
     setEnabled(list.size());
 }
 
-const vector<short> HostRefreshRateComboBox::GetRefreshRates(const QString &res)
+const vector<double> HostRefreshRateComboBox::GetRefreshRates(const QString &res)
 {
     QStringList slist = res.split("x");
     int w = 0, h = 0;
@@ -795,7 +796,7 @@ const vector<short> HostRefreshRateComboBox::GetRefreshRates(const QString &res)
     if (display_res && ok0 && ok1)
         return display_res->GetRefreshRates(w, h);    
 
-    vector<short> list;
+    vector<double> list;
     return list;
 }
 

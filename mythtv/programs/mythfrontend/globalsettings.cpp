@@ -2583,7 +2583,7 @@ static HostComboBox *GuiVidModeResolution()
             (w = 640), (h = 480);
 
         DisplayResScreen dscr(w, h, -1, -1, -1.0, 0);
-        short rate = -1;
+        double rate = -1.0;
         int i = DisplayResScreen::FindBestMatch(scr, dscr, rate);
         gc->setValue((i >= 0) ? i : scr.size()-1);
     }
@@ -2621,9 +2621,11 @@ static HostComboBox *TVVidModeResolution(int idx=-1)
 static HostRefreshRateComboBox *TVVidModeRefreshRate(int idx=-1)
 {
     QString dhelp = QObject::tr("Default refresh rate "
-                                "when watching a video.");
+                                "when watching a video. "
+                                "Leave at \"Any\" to automatically use the best available");
     QString ohelp = QObject::tr("Refresh rate when watching a "
-                                "video at a specific resolution.");
+                                "video at a specific resolution. "
+                                "Leave at \"Any\" to automatically use the best available");
     QString qstr = (idx<0) ? "TVVidModeRefreshRate" :
         QString("TVVidModeRefreshRate%1").arg(idx);
     HostRefreshRateComboBox *gc = new HostRefreshRateComboBox(qstr);

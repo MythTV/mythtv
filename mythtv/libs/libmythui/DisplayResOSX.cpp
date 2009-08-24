@@ -19,7 +19,7 @@ DisplayResOSX::~DisplayResOSX(void)
 }
 
 bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                                   int &h_mm, short &rate) const
+                                   int &h_mm, double &rate) const
 {
     CGDirectDisplayID d = mythtv_display();
 
@@ -36,7 +36,7 @@ bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
     h_mm   = get_int_CF(disp_dict, CFSTR(kDisplayVerticalImageSize));
     w_pix  = get_int_CF(mode_dict, kCGDisplayWidth);
     h_pix  = get_int_CF(mode_dict, kCGDisplayHeight);
-    rate   = get_int_CF(mode_dict, kCGDisplayRefreshRate);
+    rate   = (double) get_int_CF(mode_dict, kCGDisplayRefreshRate);
 
     //CFRelease(dict); // this release causes a segfault
     
@@ -70,7 +70,7 @@ CGDirectDisplayID mythtv_display()
     return d;
 }
 
-bool DisplayResOSX::SwitchToVideoMode(int width, int height, short refreshrate)
+bool DisplayResOSX::SwitchToVideoMode(int width, int height, double refreshrate)
 {
     CGDirectDisplayID d = mythtv_display();
     CFDictionaryRef dispMode = NULL;
@@ -79,7 +79,7 @@ bool DisplayResOSX::SwitchToVideoMode(int width, int height, short refreshrate)
     // find mode that matches the desired size
     if (refreshrate)
         dispMode = CGDisplayBestModeForParametersAndRefreshRate(
-            d, 32, width, height, (CGRefreshRate)(refreshrate), &match);
+            d, 32, width, height, (CGRefreshRate)((short)refreshrate), &match);
 
     if (!match)
         dispMode = 
@@ -122,11 +122,11 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
         int height  = get_int_CF(displayMode, kCGDisplayHeight);
         int refresh = get_int_CF(displayMode, kCGDisplayRefreshRate);
 
-        uint key = DisplayResScreen::CalcKey(width, height, 0);
+        uint key = DisplayResScreen::CalcKey(width, height, 0.0);
 
 	if (screen_map.find(key)==screen_map.end())
             screen_map[key] = DisplayResScreen(width, height,
-                                               0, 0, -1.0, refresh);
+                                               0, 0, -1.0, (double) refresh);
         else
             screen_map[key].AddRefreshRate(refresh);
     }

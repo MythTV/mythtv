@@ -74,7 +74,7 @@ VideoOutput *VideoOutput::Create(
         PIPState pipState,
         const QSize   &video_dim, float        video_aspect,
         WId            win_id,    const QRect &display_rect,
-        WId            embed_id)
+        float          video_prate,     WId    embed_id)
 {
     (void) codec_priv;
 
@@ -195,6 +195,7 @@ VideoOutput *VideoOutput::Create(
         if (vo)
         {
             vo->SetPIPState(pipState);
+            vo->video_prate = video_prate;
             if (vo->Init(
                     video_dim.width(), video_dim.height(), video_aspect,
                     win_id, display_rect.x(), display_rect.y(),
@@ -429,6 +430,7 @@ bool VideoOutput::IsPreferredRenderer(QSize video_size)
 
 void VideoOutput::SetVideoFrameRate(float playback_fps)
 {
+    video_prate = playback_fps;
     if (db_vdisp_profile)
         db_vdisp_profile->SetOutput(playback_fps);
 }
@@ -1495,7 +1497,7 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
     if ((width == 1920 || width == 1440) && height == 1088)
         height = 1080; // ATSC 1920x1080
 
-    if (display_res && display_res->SwitchToVideo(width, height))
+    if (display_res && display_res->SwitchToVideo(width, height, video_prate))
     {
         // Switching to custom display resolution succeeded
         // Make a note of the new size

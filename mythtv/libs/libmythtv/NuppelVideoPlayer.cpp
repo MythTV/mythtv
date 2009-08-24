@@ -760,7 +760,8 @@ bool NuppelVideoPlayer::InitVideo(void)
             GetDecoder()->GetVideoCodecPrivate(),
             pipState,
             video_disp_dim, video_aspect,
-            widget->winId(), display_rect, 0 /*embedid*/);
+            widget->winId(), display_rect, (video_frame_rate * play_speed),
+            0 /*embedid*/);
 
         if (!videoOutput)
         {

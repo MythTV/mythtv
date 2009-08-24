@@ -141,7 +141,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     int GetNumSetting(const QString &key, int defaultval = 0);
     double GetFloatSetting(const QString &key, double defaultval = 0.0);
     void GetResolutionSetting(const QString &type, int &width, int &height,
-                              double& forced_aspect, short &refreshrate,
+                              double& forced_aspect, double &refreshrate,
                               int index=-1);
     void GetResolutionSetting(const QString &type, int &width, int &height,
                               int index=-1);

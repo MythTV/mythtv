@@ -1,0 +1,435 @@
+#include <map>
+#include <vector>
+using namespace std;
+
+#include "mythverbose.h"
+#include "mythdb.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <cmath>
+
+#include "mythxdisplay.h"
+#include "util-nvctrl.h"
+
+#include "libmythnvctrl/NVCtrl.h"
+#include "libmythnvctrl/NVCtrlLib.h"
+
+#include "DisplayResX.h"
+
+static unsigned int display_device_mask(char *str);
+static void parse_mode_string(char *modeString, char **modeName, int *mask);
+static char *find_modeline(char *modeString, char *pModeLines,
+                           int ModeLineLen);
+static int extract_id_string(char *str);
+static int modeline_is_interlaced(char *modeLine);
+
+
+int GetNvidiaRates(t_screenrate& screenmap)
+{
+    MythXDisplay *d = OpenMythXDisplay();
+    if (!d)
+    {
+        return -1;
+    }
+    Display *dpy;
+    bool ret;
+    int screen, display_devices, mask, major, minor, len, j;
+    char *str, *start;
+    int nDisplayDevice;
+    
+    char *pMetaModes, *pModeLines[8], *tmp, *modeString;
+    char *modeLine, *modeName;
+    int MetaModeLen, ModeLineLen[8];
+    int thisMask;
+    int id;
+    int twinview =  0;
+    map<int, map<int,bool> > maprate;
+
+    /*
+     * Open a display connection, and make sure the NV-CONTROL X
+     * extension is present on the screen we want to use.
+     */
+
+    dpy = d->GetDisplay();    
+    screen = d->GetScreen();
+
+    if (!XNVCTRLIsNvScreen(dpy, screen))
+    {
+        VERBOSE(VB_PLAYBACK, QString("The NV-CONTROL X extension is not available on screen %1 of '%2'.")
+                .arg(screen) .arg(XDisplayName(NULL)));
+        delete d;
+        return -1;
+    }
+
+    ret = XNVCTRLQueryVersion(dpy, &major, &minor);
+    if (ret != True)
+    {
+        VERBOSE(VB_PLAYBACK, QString("The NV-CONTROL X extension does not exist on '%1'.")
+                .arg(XDisplayName(NULL)));
+        delete d;
+        return -1;
+    }
+
+    ret = XNVCTRLQueryAttribute(dpy, screen, 0, NV_CTRL_DYNAMIC_TWINVIEW, &twinview);
+
+    if (!ret)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Failed to query if Dynamic Twinview is enabled"));
+        XCloseDisplay(dpy);
+        return -1;
+    }
+    if (!twinview)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Dynamic Twinview not enabled, ignoring"));
+        delete d;
+        return 0;
+    }
+
+    /*
+     * query the connected display devices on this X screen and print
+     * basic information about each X screen
+     */
+
+    ret = XNVCTRLQueryAttribute(dpy, screen, 0,
+                                NV_CTRL_CONNECTED_DISPLAYS, &display_devices);
+
+    if (!ret)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Failed to query the enabled Display Devices."));
+        delete d;
+        return -1;
+    }
+
+    /* first, we query the MetaModes on this X screen */
+
+    XNVCTRLQueryBinaryData(dpy, screen, 0, // n/a
+                           NV_CTRL_BINARY_DATA_METAMODES,
+                           (unsigned char **)&pMetaModes, &MetaModeLen);
+
+    /*
+     * then, we query the ModeLines for each display device on
+     * this X screen; we'll need these later
+     */
+
+    nDisplayDevice = 0;
+
+    for (mask = 1; mask < (1 << 24); mask <<= 1)
+    {
+        if (!(display_devices & mask)) continue;
+
+        XNVCTRLQueryBinaryData(dpy, screen, mask,
+                               NV_CTRL_BINARY_DATA_MODELINES,
+                               (unsigned char **)&str, &len);
+        pModeLines[nDisplayDevice] = str;
+        ModeLineLen[nDisplayDevice] = len;
+
+        nDisplayDevice++;
+    }
+
+    /* now, parse each MetaMode */
+    str = start = pMetaModes;
+
+    for (j = 0; j < MetaModeLen; j++)
+    {
+        /*
+         * if we found the end of a line, treat the string from
+         * start to str[j] as a MetaMode
+         */
+
+        if ((str[j] == '\0') && (str[j+1] != '\0'))
+        {
+            id = extract_id_string(start);
+            /*
+             * the MetaMode may be preceded with "token=value"
+             * pairs, separated by the main MetaMode with "::"; if
+             * "::" exists in the string, skip past it
+             */
+
+            tmp = strstr(start, "::");
+            if (tmp)
+            {
+                tmp += 2;
+            }
+            else
+            {
+                tmp = start;
+            }
+
+            /* split the MetaMode string by comma */
+
+            for (modeString = strtok(tmp, ",");
+                 modeString;
+                 modeString = strtok(NULL, ","))
+            {
+                /*
+                 * retrieve the modeName and display device mask
+                 * for this segment of the Metamode
+                 */
+
+                parse_mode_string(modeString, &modeName, &thisMask);
+
+                /* lookup the modeline that matches */
+                nDisplayDevice = 0;
+                if (thisMask)
+                {
+                    for (mask = 1; mask < (1 << 24); mask <<= 1)
+                    {
+                        if (!(display_devices & mask)) continue;
+                        if (thisMask & mask) break;
+                        nDisplayDevice++;
+                    }
+                }
+
+                modeLine = find_modeline(modeName,
+                                         pModeLines[nDisplayDevice],
+                                         ModeLineLen[nDisplayDevice]);
+
+                if (!modeline_is_interlaced(modeLine))
+                {
+                    int w, h, vfl, hfl, i, irate;
+                    double dcl, r;
+                    char *buf[256];
+                    uint key, key2;
+
+                    // skip name
+                    tmp = strchr(modeLine, '"');
+                    tmp = strchr(tmp+1, '"') +1 ;
+                    while (*tmp == ' ')
+                        tmp++;
+                    i = 0;
+                    for (modeString = strtok(tmp, " ");
+                         modeString;
+                         modeString = strtok(NULL, " "))
+                    {
+                        buf[i++] = modeString;
+                    }
+                    w = strtol(buf[1], NULL, 10);
+                    h = strtol(buf[5], NULL, 10);
+                    vfl = strtol(buf[8], NULL, 10);
+                    hfl = strtol(buf[4], NULL, 10);
+                    h = strtol(buf[5], NULL, 10);
+                    dcl = strtod(buf[0], NULL);
+                    r = (dcl * 1000000.0) / (vfl * hfl);
+                    irate = (int) round(r * 1000.0);
+                    key = DisplayResScreen::CalcKey(w, h, (double) id);
+                    key2 = DisplayResScreen::CalcKey(w, h, 0.0);
+                    // We need to eliminate duplicates, giving priority to the first entries found
+                    if (maprate.find(key2) == maprate.end())
+                    {
+                        // First time we see this resolution, create a map for it
+                        maprate[key2] = map<int, bool>();
+                    }
+                    if ((maprate[key2].find(irate) == maprate[key2].end()) &&
+                        (screenmap.find(key) == screenmap.end()))
+                    {
+                        screenmap[key] = r;
+                        maprate[key2][irate] = true;
+                    }
+                }
+                free(modeName);
+            }
+
+            /* move to the next MetaMode */
+            start = &str[j+1];
+        }
+    }
+    // Free Memory
+    for (j=0; j < nDisplayDevice; j++)
+    {
+        free(pModeLines[nDisplayDevice]);
+    }
+
+    delete d;
+    return 1;
+
+}
+
+/*
+ * display_device_mask() - given a display device name, translate to
+ * the display device mask
+ */
+
+static unsigned int display_device_mask(char *str)
+{
+    if (strcmp(str, "CRT-0") == 0) return (1 <<  0);
+    if (strcmp(str, "CRT-1") == 0) return (1 <<  1);
+    if (strcmp(str, "CRT-2") == 0) return (1 <<  2);
+    if (strcmp(str, "CRT-3") == 0) return (1 <<  3);
+    if (strcmp(str, "CRT-4") == 0) return (1 <<  4);
+    if (strcmp(str, "CRT-5") == 0) return (1 <<  5);
+    if (strcmp(str, "CRT-6") == 0) return (1 <<  6);
+    if (strcmp(str, "CRT-7") == 0) return (1 <<  7);
+
+    if (strcmp(str, "TV-0") == 0)  return (1 <<  8);
+    if (strcmp(str, "TV-1") == 0)  return (1 <<  9);
+    if (strcmp(str, "TV-2") == 0)  return (1 << 10);
+    if (strcmp(str, "TV-3") == 0)  return (1 << 11);
+    if (strcmp(str, "TV-4") == 0)  return (1 << 12);
+    if (strcmp(str, "TV-5") == 0)  return (1 << 13);
+    if (strcmp(str, "TV-6") == 0)  return (1 << 14);
+    if (strcmp(str, "TV-7") == 0)  return (1 << 15);
+
+    if (strcmp(str, "DFP-0") == 0) return (1 << 16);
+    if (strcmp(str, "DFP-1") == 0) return (1 << 17);
+    if (strcmp(str, "DFP-2") == 0) return (1 << 18);
+    if (strcmp(str, "DFP-3") == 0) return (1 << 19);
+    if (strcmp(str, "DFP-4") == 0) return (1 << 20);
+    if (strcmp(str, "DFP-5") == 0) return (1 << 21);
+    if (strcmp(str, "DFP-6") == 0) return (1 << 22);
+    if (strcmp(str, "DFP-7") == 0) return (1 << 23);
+
+    return 0;
+
+}
+
+
+
+/*
+ * parse_mode_string() - extract the modeName and the display device
+ * mask for the per-display device MetaMode string in 'modeString'
+ */
+
+static void parse_mode_string(char *modeString, char **modeName, int *mask)
+{
+    char *colon, *s, tmp;
+
+    // Skip space
+    while (*modeString == ' ')
+    {
+        modeString++;
+    }
+    colon = strchr(modeString, ':');
+
+    if (colon)
+    {
+        *colon = '\0';
+        *mask = display_device_mask(modeString);
+        *colon = ':';
+        modeString = colon + 1;
+    }
+    else
+    {
+        *mask = 0;
+    }
+
+    // Skip space
+    while (*modeString == ' ')
+    {
+        modeString++;
+    }
+
+    /*
+     * find the modename; trim off any panning domain or
+     * offsets
+     */
+
+    for (s = modeString; *s; s++)
+    {
+        if (*s == ' ') break;
+        if ((*s == '+') && isdigit(s[1])) break;
+        if ((*s == '-') && isdigit(s[1])) break;
+    }
+
+    tmp = *s;
+    *s = '\0';
+    *modeName = strdup(modeString);
+    *s = tmp;
+}
+
+
+/*
+ * find_modeline() - search the pModeLines list of ModeLines for the
+ * mode named 'modeName'; return a pointer to the matching ModeLine,
+ * or NULL if no match is found
+ */
+
+static char *find_modeline(char *modeName, char *pModeLines, int ModeLineLen)
+{
+    char *start, *beginQuote, *endQuote;
+    int j, match = 0;
+
+    start = pModeLines;
+
+    for (j = 0; j < ModeLineLen; j++)
+    {
+        if (pModeLines[j] == '\0')
+        {
+            /*
+             * the modeline will contain the modeName in quotes; find
+             * the begin and end of the quoted modeName, so that we
+             * can compare it to modeName
+             */
+
+            beginQuote = strchr(start, '"');
+            endQuote = beginQuote ? strchr(beginQuote+1, '"') : NULL;
+
+            if (beginQuote && endQuote)
+            {
+                *endQuote = '\0';
+                match = (strcmp(modeName, beginQuote+1) == 0);
+                *endQuote = '"';
+
+                /*
+                 * if we found a match, return a pointer to the start
+                 * of this modeLine
+                 */
+
+                if (match)
+                {
+                    char *tmp = strstr(start, "::");
+                    if (tmp)
+                    {
+                        tmp += 2;
+                    }
+                    else
+                    {
+                        tmp = start;
+                    }
+                    return tmp;
+                }
+            }
+            start = &pModeLines[j+1];
+        }
+    }
+
+    return NULL;
+
+}
+
+/*
+ * extract_id_string() - Extract the xrandr twinview id from modestr and return it as an int.
+ */
+static int extract_id_string(char *str)
+{
+    char *begin, *end;
+    int id;
+
+    begin = strstr(str, "id=");
+    if (!begin)
+    {
+        return -1;
+    }
+    if (!(begin = end = strdup(begin + 3)))
+    {
+        return -1;
+    }
+    while (isdigit(*end))
+    {
+        end++;
+    }
+    *end = '\0';
+    id = atoi(begin);
+    free(begin);
+    return id;
+}
+
+/*
+ * modeline_is_interlaced() - return true if the Modeline is Interlaced, false otherwise.
+ */
+static int modeline_is_interlaced(char *modeLine)
+{
+    return (strstr(modeLine, "Interlace") != NULL);
+}

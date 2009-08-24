@@ -14,11 +14,15 @@ class MPUBLIC DisplayResScreen
   public:
     // Constructors, initializers
     DisplayResScreen()
-        : width(0), height(0), width_mm(0), height_mm(0), aspect(-1.0) {;}
+        : width(0), height(0), width_mm(0), height_mm(0), aspect(-1.0), custom(false) {;}
     DisplayResScreen(int w, int h, int mw, int mh,
-                     double aspectRatio/* = -1.0*/, short refreshRate/* = 0*/);
+                     double aspectRatio/* = -1.0*/, double refreshRate/* = 0*/);
     DisplayResScreen(int w, int h, int mw, int mh,
-                     const std::vector<short>& refreshRates);
+                     const std::vector<double>& refreshRates);
+    DisplayResScreen(int w, int h, int mw, int mh,
+                     const std::vector<double>& refreshRates, const std::map<double, short>& realrates);
+    DisplayResScreen(int w, int h, int mw, int mh,
+                     const double* refreshRates, uint rr_length);
     DisplayResScreen(int w, int h, int mw, int mh,
                      const short* refreshRates, uint rr_length);
     DisplayResScreen(const QString &str);
@@ -29,16 +33,27 @@ class MPUBLIC DisplayResScreen
     int Height() const { return height; }
     int Width_mm() const { return width_mm; }
     int Height_mm() const { return height_mm; }
+    bool Custom() const { return custom; }
+
     inline double AspectRatio() const;
-    inline short RefreshRate() const;
-    const std::vector<short>& RefreshRates() const { return refreshRates; }
+    inline double RefreshRate() const;
+    const std::vector<double>& RefreshRates() const { return refreshRates; }
 
     // Sets, adds
     void SetAspectRatio(double a);
-    void AddRefreshRate(short rr) {
+    void AddRefreshRate(double rr) {
         refreshRates.push_back(rr);
         std::sort(refreshRates.begin(), refreshRates.end());
     }
+    void ClearRefreshRates(void) {
+    	refreshRates.clear();
+    }
+    void SetCustom(bool b) {
+    	custom = b;
+    }
+
+    // Map for matching real rates and xrandr rate;
+    std::map<double, short> realRates;
 
     // Converters & comparitors
     QString toString() const;
@@ -50,14 +65,16 @@ class MPUBLIC DisplayResScreen
     static std::vector<DisplayResScreen> Convert(const QStringList& slist);
     static int FindBestMatch(const std::vector<DisplayResScreen>& dsr,
                              const DisplayResScreen& d,
-                             short& target_rate);
-    static inline int CalcKey(int w, int h, int rate);
+                             double& target_rate);
+    static inline int CalcKey(int w, int h, double rate);
+    static bool compare_rates(double f1, double f2, double precision = 0.01);
 
   private:
     int width, height; // size in pixels
     int width_mm, height_mm; // physical size in millimeters
     double aspect; // aspect ratio, calculated or set
-    std::vector<short> refreshRates;
+    std::vector<double> refreshRates;
+    bool custom;	// Set if resolution was defined manually
 };
 
 typedef std::vector<DisplayResScreen>          DisplayResVector;
@@ -85,11 +102,11 @@ inline double DisplayResScreen::AspectRatio() const
     return aspect;
 }
 
-inline short DisplayResScreen::RefreshRate() const
+inline double DisplayResScreen::RefreshRate() const
 {
     if (refreshRates.size() >= 1)
         return refreshRates[0];
-    else return 0;
+    else return 0.0;
 }
 
 inline bool DisplayResScreen::operator < (const DisplayResScreen& b) const
@@ -106,9 +123,10 @@ inline bool DisplayResScreen::operator == (const DisplayResScreen &b) const
     return width == b.width && height == b.height;
 }  
 
-inline int DisplayResScreen::CalcKey(int w, int h, int rate)
+inline int DisplayResScreen::CalcKey(int w, int h, double rate)
 {
-    return (w << 17) | (h << 3) | rate;
+    int irate = (int) (rate * 1000.0);
+    return (w << 19) | (h << 5) | irate;
 }
 
 #endif // __DISPLAYRESCREEN_H__

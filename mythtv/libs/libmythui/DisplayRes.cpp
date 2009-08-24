@@ -10,6 +10,7 @@
 #include "DisplayResOSX.h"
 #endif
 
+
 DisplayRes * DisplayRes::instance = NULL;
 bool         DisplayRes::locked   = false;
 
@@ -48,7 +49,7 @@ bool DisplayRes::Initialize(void)
 {
     int tW = 0, tH = 0, tW_mm = 0, tH_mm = 0;
     double tAspect = 0.0;
-    short tRate = 0;
+    double tRate = 0.0;
 
     last.Init();
     cur_mode = GUI;
@@ -63,7 +64,7 @@ bool DisplayRes::Initialize(void)
     // Initialize GUI mode
     mode[GUI].Init();
     tW = tH = 0;
-    GetMythDB()->GetResolutionSetting("GuiVidMode", tW, tH);
+    GetMythDB()->GetResolutionSetting("GuiVidMode", tW, tH, tAspect, tRate);
     GetMythDB()->GetResolutionSetting("DisplaySize", tW_mm, tH_mm);
     mode[GUI] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, tRate);
 
@@ -80,7 +81,7 @@ bool DisplayRes::Initialize(void)
     {
         int iw = 0, ih = 0, ow = 0, oh = 0;
         double iaspect = 0.0, oaspect = 0.0;
-        short irate = 0, orate = 0;
+        double irate = 0.0, orate = 0.0;
 
         GetMythDB()->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
         GetMythDB()->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);
@@ -107,21 +108,28 @@ bool DisplayRes::Initialize(void)
     return true;
 }
 
-bool DisplayRes::SwitchToVideo(int iwidth, int iheight, short irate)
+bool DisplayRes::SwitchToVideo(int iwidth, int iheight, double frate)
 {
     tmode next_mode = VIDEO; // default VIDEO mode
     DisplayResScreen next = mode[next_mode];
 
+    // If requested refresh rate is 0, attempt to match video fps
+    if ((int) next.RefreshRate() == 0)
+    {
+        VERBOSE(VB_PLAYBACK, QString("*** Trying to match best refresh rate %1Hz") .arg(frate));
+        next.AddRefreshRate(frate);
+    }
+
     // try to find video override mode
-    uint key = DisplayResScreen::CalcKey(iwidth, iheight, irate);
+    uint key = DisplayResScreen::CalcKey(iwidth, iheight, frate);
     DisplayResMapCIt it = in_size_to_output_mode.find(key);
     if (it != in_size_to_output_mode.end())
         mode[next_mode = CUSTOM_VIDEO] = next = it->second;
 
     // need to change video mode?
-    short target_rate = 0;
+    double target_rate = 0.0;
     DisplayResScreen::FindBestMatch(GetVideoModes(), next, target_rate);
-    bool chg = !(next == last) || !(last.RefreshRate() == target_rate);
+    bool chg = !(next == last) || !(DisplayResScreen::compare_rates(last.RefreshRate(),target_rate));
 
     VERBOSE(VB_PLAYBACK, QString("Trying %1x%2 %3 Hz")
             .arg(next.Width()).arg(next.Height()).arg(target_rate));
@@ -153,9 +161,11 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
     DisplayResScreen next = mode[next_mode];
 
     // need to change video mode?
-    short target_rate = next.RefreshRate();
+    double target_rate = next.RefreshRate();
     DisplayResScreen::FindBestMatch(GetVideoModes(), next, target_rate);
-    bool chg = !(next == last) || !(last.RefreshRate() == target_rate);
+    // If GuiVidModeRefreshRate is 0, assume any refresh rate is good enough.
+    bool chg = (!(next == last) || (((int) next.RefreshRate()) !=0
+                && !(DisplayResScreen::compare_rates(last.RefreshRate(), target_rate)))); 
 
     VERBOSE(VB_GENERAL, QString("Trying %1x%2 %3 Hz")
             .arg(next.Width()).arg(next.Height()).arg(target_rate));
@@ -180,16 +190,15 @@ bool DisplayRes::SwitchToGUI(tmode next_mode)
 bool DisplayRes::SwitchToCustomGUI(int width, int height, short rate)
 {
     mode[CUSTOM_GUI] = DisplayResScreen(width, height, mode[GUI].Width_mm(),
-                                        mode[GUI].Height_mm(), -1.0, rate);
+                                        mode[GUI].Height_mm(), -1.0, (double)rate);
     return SwitchToGUI(CUSTOM_GUI);
 }
 
-const std::vector<short> DisplayRes::GetRefreshRates(int width,
-                                                     int height) const {
-    short tr;
-    std::vector<short> empty;
+const std::vector<double> DisplayRes::GetRefreshRates(int width, int height) const {
+    double tr;
+    std::vector<double> empty;
 
-    const DisplayResScreen drs(width, height, 0, 0, -1.0, 0);
+    const DisplayResScreen drs(width, height, 0, 0, -1.0, 0.0);
     const DisplayResVector& drv = GetVideoModes();
     int t = DisplayResScreen::FindBestMatch(drv, drs, tr);
     if (t < 0)

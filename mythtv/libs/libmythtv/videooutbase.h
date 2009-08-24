@@ -49,7 +49,7 @@ class VideoOutput
         PIPState       pipState,
         const QSize   &video_dim, float        video_aspect,
         WId            win_id,    const QRect &display_rect,
-        WId            embed_id);
+        float video_prate,        WId          embed_id);
 
     VideoOutput();
     virtual ~VideoOutput();
@@ -287,6 +287,7 @@ class VideoOutput
     bool    db_use_picture_controls;
 
     VideoDisplayProfile *db_vdisp_profile;
+    float   video_prate;  ///< Playback frame rate of video
 
     // Picture-in-Picture
     QSize   pip_desired_display_size;

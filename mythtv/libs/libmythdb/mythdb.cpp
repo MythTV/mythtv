@@ -464,7 +464,7 @@ void MythDB::SetSetting(const QString &key, const QString &newValue)
 void MythDB::GetResolutionSetting(const QString &type,
                                        int &width, int &height,
                                        double &forced_aspect,
-                                       short &refresh_rate,
+                                       double &refresh_rate,
                                        int index)
 {
     bool ok = false, ok0 = false, ok1 = false;
@@ -498,7 +498,7 @@ void MythDB::GetResolutionSetting(const QString &type,
         {
             width = w;
             height = h;
-            refresh_rate = GetNumSetting(sRR);
+            refresh_rate = GetFloatSetting(sRR);
             forced_aspect = GetFloatSetting(sAspect);
         }
     }
@@ -514,7 +514,7 @@ void MythDB::GetResolutionSetting(const QString &type,
         if (tmpHeight)
             height = tmpHeight;
 
-        refresh_rate = 0;
+        refresh_rate = 0.0;
         forced_aspect = 0.0;
         //SetSetting(sRes, QString("%1x%2").arg(width).arg(height));
     }
@@ -523,7 +523,7 @@ void MythDB::GetResolutionSetting(const QString &type,
 void MythDB::GetResolutionSetting(const QString &t, int &w, int &h, int i)
 {
     double forced_aspect = 0;
-    short refresh_rate = 0;
+    double refresh_rate = 0.0;
     GetResolutionSetting(t, w, h, forced_aspect, refresh_rate, i);
 }
 

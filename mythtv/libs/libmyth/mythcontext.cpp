@@ -1653,7 +1653,7 @@ void MythContext::RefreshBackendConfig(void)
 void MythContext::GetResolutionSetting(const QString &type,
                                        int &width, int &height,
                                        double &forced_aspect,
-                                       short &refresh_rate,
+                                       double &refresh_rate,
                                        int index)
 {
     d->m_database->GetResolutionSetting(type, width, height, forced_aspect,
