@@ -31,64 +31,30 @@
 
 #include "parser.h"
 #include "get_bits.h"
+#include "put_bits.h"
 #include "mpeg4audio.h"
 #include "neaacdec.h"
 
 /*
     Note: This decoder filter is intended to decode LATM streams transferred
-    in MPEG transport streams which are only supposed to contain one program.
+    in MPEG transport streams which only contain one program.
     To do a more complex LATM demuxing a separate LATM demuxer should be used.
 */
 
-#define AAC_NONE 0            // mode not detected (or indicated in mediatype)
-#define AAC_LATM 1            // LATM packets (ISO/IEC 14496-3  1.7.3 Multiplex layer)
-
-#define SYNC_LATM 0x2b7            // 11 bits
-
-#define MAX_SIZE 8*1024
-
-typedef struct AACConfig
-{
-    uint8_t    extra[64];            // should be way enough
-    int        extrasize;
-
-    int        audioObjectType;
-    int        samplingFrequencyIndex;
-    int        samplingFrequency;
-    int        channelConfiguration;
-    int        channels;
-} AACConfig;
-
-typedef struct AACParser
-{
-    AACConfig          config;
-    uint8_t            frameLengthType;
-    uint16_t           muxSlotLengthBytes;
-
-    uint8_t            audio_mux_version;
-    uint8_t            audio_mux_version_A;
-    int                taraFullness;
-    uint8_t            config_crc;
-    int64_t            other_data_bits;
-
-    int                mode;
-    int                offset;        // byte offset in "buf" buffer
-    int                count;         // number of bytes written in buffer
-    uint8_t            buf[MAX_SIZE+FF_INPUT_BUFFER_PADDING_SIZE]; // allocated buffer
-} AACParser;
+#define SYNC_LATM   0x2b7       // 11 bits
+#define MAX_SIZE    8*1024
 
 typedef struct AACDecoder
 {
-    AACParser          *parser;
-    faacDecHandle      aac_decoder;
-    int                open;
-    uint32_t           in_samplerate;
-    uint8_t            in_channels;
-} AACDecoder;
+    faacDecHandle   aac_decoder;
+    uint8_t         initialized;
 
-typedef struct {
-    AACDecoder*        decoder;
-} FAACContext;
+    // parser data
+    uint8_t         audio_mux_version_A;
+    uint8_t         frameLengthType;
+    uint8_t         extra[64];            // should be way enough
+    int             extrasize;
+} AACDecoder;
 
 static inline int64_t latm_get_value(GetBitContext *b)
 {
@@ -102,42 +68,38 @@ static inline int64_t latm_get_value(GetBitContext *b)
     return value;
 }
 
-static void readGASpecificConfig(struct AACConfig *cfg, GetBitContext *b, PutBitContext *o)
+static void readGASpecificConfig(int audioObjectType, GetBitContext *b, PutBitContext *o)
 {
-    int framelen_flag = get_bits(b, 1);
-    put_bits(o, 1, framelen_flag);
-    int dependsOnCoder = get_bits(b, 1);
-    put_bits(o, 1, dependsOnCoder);
+    int framelen_flag;
+    int dependsOnCoder;
     int ext_flag;
-    int delay;
-    int layerNr;
 
+    framelen_flag = get_bits(b, 1);
+    put_bits(o, 1, framelen_flag);
+    dependsOnCoder = get_bits(b, 1);
+    put_bits(o, 1, dependsOnCoder);
     if (dependsOnCoder) {
-        delay = get_bits(b, 14);
+        int delay = get_bits(b, 14);
         put_bits(o, 14, delay);
     }
     ext_flag = get_bits(b, 1);
     put_bits(o, 1, ext_flag);
-    if (!cfg->channelConfiguration) {
-        // program config element
-        // TODO:
-    }
 
-    if (cfg->audioObjectType == 6 || cfg->audioObjectType == 20) {
-        layerNr = get_bits(b, 3);
+    if (audioObjectType == 6 || audioObjectType == 20) {
+        int layerNr = get_bits(b, 3);
         put_bits(o, 3, layerNr);
     }
     if (ext_flag) {
-        if (cfg->audioObjectType == 22) {
+        if (audioObjectType == 22) {
             skip_bits(b, 5);                    // numOfSubFrame
-            skip_bits(b, 11);                    // layer_length
+            skip_bits(b, 11);                   // layer_length
 
             put_bits(o, 16, 0);
         }
-        if (cfg->audioObjectType == 17 ||
-            cfg->audioObjectType == 19 ||
-            cfg->audioObjectType == 20 ||
-            cfg->audioObjectType == 23) {
+        if (audioObjectType == 17 ||
+                audioObjectType == 19 ||
+                audioObjectType == 20 ||
+                audioObjectType == 23) {
 
             skip_bits(b, 3);                    // stuff
             put_bits(o, 3, 0);
@@ -148,101 +110,90 @@ static void readGASpecificConfig(struct AACConfig *cfg, GetBitContext *b, PutBit
     }
 }
 
-static int readAudioSpecificConfig(struct AACConfig *cfg, GetBitContext *b)
+static int readAudioSpecificConfig(struct AACDecoder *decoder, GetBitContext *b)
 {
     PutBitContext o;
-    init_put_bits(&o, cfg->extra, sizeof(cfg->extra));
-
-    // returns the number of bits read
     int ret = 0;
-    int sbr_present = -1;
+    int audioObjectType;
+    int samplingFrequencyIndex;
+    int channelConfiguration;
 
-    // object
-    cfg->audioObjectType = get_bits(b, 5);
-        put_bits(&o, 5, cfg->audioObjectType);
-    if (cfg->audioObjectType == 31) {
-        uint8_t n = get_bits(b, 6);
-        put_bits(&o, 6, n);
-        cfg->audioObjectType = 32 + n;
+    init_put_bits(&o, decoder->extra, sizeof(decoder->extra));
+
+    audioObjectType = get_bits(b, 5);
+    put_bits(&o, 5, audioObjectType);
+    if (audioObjectType == 31) {
+        uint8_t extended = get_bits(b, 6);
+        put_bits(&o, 6, extended);
+        audioObjectType = 32 + extended;
     }
 
-    cfg->samplingFrequencyIndex = get_bits(b, 4);
-    cfg->samplingFrequency = ff_mpeg4audio_sample_rates[cfg->samplingFrequencyIndex];
-    put_bits(&o, 4, cfg->samplingFrequencyIndex);
-    if (cfg->samplingFrequencyIndex == 0x0f) {
+    samplingFrequencyIndex = get_bits(b, 4);
+    put_bits(&o, 4, samplingFrequencyIndex);
+    if (samplingFrequencyIndex == 0x0f) {
         uint32_t f = get_bits_long(b, 24);
         put_bits(&o, 24, f);
-        cfg->samplingFrequency = f;
     }
-    cfg->channelConfiguration = get_bits(b, 4);
-    put_bits(&o, 4, cfg->channelConfiguration);
-    cfg->channels = ff_mpeg4audio_channels[cfg->channelConfiguration];
+    channelConfiguration = get_bits(b, 4);
+    put_bits(&o, 4, channelConfiguration);
 
-    if (cfg->audioObjectType == 5) {
-        sbr_present = 1;
-
-        // TODO: parsing !!!!!!!!!!!!!!!!
-    }
-
-    switch (cfg->audioObjectType) {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 6:
-    case 7:
-    case 17:
-    case 19:
-    case 20:
-    case 21:
-    case 22:
-    case 23:
-        readGASpecificConfig(cfg, b, &o);
-        break;
-    }
-
-    if (sbr_present == -1) {
-        if (cfg->samplingFrequency <= 24000) {
-            cfg->samplingFrequency *= 2;
+    if (audioObjectType == 1 || audioObjectType == 2 || audioObjectType == 3
+            || audioObjectType == 4 || audioObjectType == 6 || audioObjectType == 7) {
+        readGASpecificConfig(audioObjectType, b, &o);
+    } else if (audioObjectType == 5) {
+        int sbr_present = 1;
+        samplingFrequencyIndex = get_bits(b, 4);
+        if (samplingFrequencyIndex == 0x0f) {
+            uint32_t f = get_bits_long(b, 24);
+            put_bits(&o, 24, f);
         }
+        audioObjectType = get_bits(b, 5);
+        put_bits(&o, 5, audioObjectType);
+    } else if (audioObjectType >= 17) {
+        int epConfig;
+        readGASpecificConfig(audioObjectType, b, &o);
+        epConfig = get_bits(b, 2);
+        put_bits(&o, 2, epConfig);
     }
 
     // count the extradata
     ret = put_bits_count(&o);
-    align_put_bits(&o);
+    decoder->extrasize = (ret + 7) / 8;
+
     flush_put_bits(&o);
-    cfg->extrasize = (ret + 7) >> 3;
     return ret;
 }
 
-static void readStreamMuxConfig(struct AACParser *parser, GetBitContext *b)
+static void readStreamMuxConfig(struct AACDecoder *parser, GetBitContext *b)
 {
+    int audio_mux_version = get_bits(b, 1);
     parser->audio_mux_version_A = 0;
-    parser->audio_mux_version = get_bits(b, 1);
-    if (parser->audio_mux_version == 1) {                // audioMuxVersion
+    if (audio_mux_version == 1) {                // audioMuxVersion
         parser->audio_mux_version_A = get_bits(b, 1);
     }
 
     if (parser->audio_mux_version_A == 0) {
-        if (parser->audio_mux_version == 1) {
-            parser->taraFullness = latm_get_value(b);
+        int frame_length_type;
+
+        if (audio_mux_version == 1) {
+            // taraFullness
+            latm_get_value(b);
         }
         get_bits(b, 1);                    // allStreamSameTimeFraming = 1
         get_bits(b, 6);                    // numSubFrames = 0
         get_bits(b, 4);                    // numPrograms = 0
 
-        // for each program
+        // for each program (which there is only on in DVB)
         get_bits(b, 3);                    // numLayer = 0
 
-        // for each layer
-        if (parser->audio_mux_version == 0) {
-            // audio specific config.
-            readAudioSpecificConfig(&parser->config, b);
+        // for each layer (which there is only on in DVB)
+        if (audio_mux_version == 0) {
+            readAudioSpecificConfig(parser, b);
         } else {
             int ascLen = latm_get_value(b);
-            ascLen -= readAudioSpecificConfig(&parser->config, b);
+            ascLen -= readAudioSpecificConfig(parser, b);
 
-            // fill bits
+            // skip left over bits
             while (ascLen > 16) {
                 skip_bits(b, 16);
                 ascLen -= 16;
@@ -251,458 +202,177 @@ static void readStreamMuxConfig(struct AACParser *parser, GetBitContext *b)
         }
 
         // these are not needed... perhaps
-        int frame_length_type = get_bits(b, 3);
+        frame_length_type = get_bits(b, 3);
         parser->frameLengthType = frame_length_type;
         if (frame_length_type == 0) {
             get_bits(b, 8);
         } else if (frame_length_type == 1) {
             get_bits(b, 9);
-        } else if (frame_length_type == 3 ||
-            frame_length_type == 4 ||
-            frame_length_type == 5) {
-            int celp_table_index = get_bits(b, 6);
-        } else if (frame_length_type == 6 ||
-            frame_length_type == 7) {
-            int hvxc_table_index = get_bits(b, 1);
+        } else if (frame_length_type == 3 || frame_length_type == 4 || frame_length_type == 5) {
+            // celp_table_index
+            get_bits(b, 6);
+        } else if (frame_length_type == 6 || frame_length_type == 7) {
+            // hvxc_table_index
+            get_bits(b, 1);
         }
 
         // other data
-        parser->other_data_bits = 0;
         if (get_bits(b, 1)) {
             // other data present
-            if (parser->audio_mux_version == 1) {
-                parser->other_data_bits = latm_get_value(b);
+            if (audio_mux_version == 1) {
+                // other_data_bits
+                latm_get_value(b);
             } else {
-                // other data not present
-                parser->other_data_bits = 0;
                 int esc, tmp;
+                // other data bits
+                int64_t other_data_bits = 0;
                 do {
-                    parser->other_data_bits <<= 8;
                     esc = get_bits(b, 1);
                     tmp = get_bits(b, 8);
-                    parser->other_data_bits |= tmp;
+                    other_data_bits = other_data_bits << 8 | tmp;
                 } while (esc);
             }
         }
 
-        // CRC
+        // CRC if necessary
         if (get_bits(b, 1)) {
-            parser->config_crc = get_bits(b, 8);
+            // config_crc
+            get_bits(b, 8);
         }
-    } else {
-        // tbd
-    }
-}
-
-static void readPayloadLengthInfo(struct AACParser *parser, GetBitContext *b)
-{
-    uint8_t tmp;
-    if (parser->frameLengthType == 0) {
-        parser->muxSlotLengthBytes = 0;
-        do {
-            tmp = get_bits(b, 8);
-            parser->muxSlotLengthBytes += tmp;
-        } while (tmp == 255);
-    } else {
-        if (parser->frameLengthType == 5 ||
-            parser->frameLengthType == 7 ||
-            parser->frameLengthType == 3) {
-            get_bits(b, 2);
-        }
-    }
-}
-
-static void readAudioMuxElement(struct AACParser *parser, GetBitContext *b, uint8_t *payload, int *payloadsize)
-{
-    uint8_t    use_same_mux = get_bits(b, 1);
-    if (!use_same_mux) {
-        readStreamMuxConfig(parser, b);
-    }
-
-    if (parser->audio_mux_version_A == 0) {
-        int j;
-
-        readPayloadLengthInfo(parser, b);
-
-        // copy data
-        for (j=0; j<parser->muxSlotLengthBytes; j++) {
-            *payload++ = get_bits(b, 8);
-        }
-        *payloadsize = parser->muxSlotLengthBytes;
-
-        // ignore otherdata
     } else {
         // TBD
     }
 }
 
-static int readAudioSyncStream(struct AACParser *parser, GetBitContext *b, int size, uint8_t *payload, int *payloadsize)
+static int readPayloadLengthInfo(struct AACDecoder *parser, GetBitContext *b)
 {
-    // ISO/IEC 14496-3 Table 1.28 - Syntax of AudioMuxElement()
-    if (get_bits(b, 11) != 0x2b7) return -1;        // not LATM
-    int muxlength = get_bits(b, 13);
+    if (parser->frameLengthType == 0) {
+        uint8_t tmp;
+        int muxSlotLengthBytes = 0;
+        do {
+            tmp = get_bits(b, 8);
+            muxSlotLengthBytes += tmp;
+        } while (tmp == 255);
+        return muxSlotLengthBytes;
+    } else {
+        if (parser->frameLengthType == 3 ||
+                parser->frameLengthType == 5 ||
+                parser->frameLengthType == 7) {
+            get_bits(b, 2);
+        }
+        return 0;
+    }
+}
 
-    if (3+muxlength > size) return 0;            // not enough data
+static void readAudioMuxElement(struct AACDecoder *parser, GetBitContext *b, uint8_t *payload, int *payloadsize)
+{
+    uint8_t use_same_mux = get_bits(b, 1);
+    if (!use_same_mux) {
+        readStreamMuxConfig(parser, b);
+    }
+    if (parser->audio_mux_version_A == 0) {
+        int j;
+        int muxSlotLengthBytes = readPayloadLengthInfo(parser, b);
+        muxSlotLengthBytes = FFMIN(muxSlotLengthBytes, *payloadsize);
+        for (j=0; j<muxSlotLengthBytes; j++) {
+            *payload++ = get_bits(b, 8);
+        }
+        *payloadsize = muxSlotLengthBytes;
+    }
+}
+
+static int readAudioSyncStream(struct AACDecoder *parser, GetBitContext *b, int size, uint8_t *payload, int *payloadsize)
+{
+    int muxlength;
+
+    if (get_bits(b, 11) != SYNC_LATM) return -1;    // not LATM
+
+    muxlength = get_bits(b, 13);
+    if (muxlength+3 > size) return -1;          // not enough data, the parser should have sorted this
 
     readAudioMuxElement(parser, b, payload, payloadsize);
 
-    // we don't parse anything else here...
-    return (3+muxlength);
-}
-
-
-static void flush_buf(struct AACParser *parser, int offset) {
-    int bytes_to_flush = FFMIN(parser->count, offset);
-    int left = parser->count - bytes_to_flush;
-
-    if (bytes_to_flush > 0) {
-        if (left > 0) {
-            memcpy(parser->buf, parser->buf+bytes_to_flush, left);
-            parser->count = left;
-        } else {
-            parser->count = 0;
-        }
-    }
-}
-
-static struct AACParser *latm_create_parser()
-{
-    struct AACParser *parser = av_mallocz(sizeof(struct AACParser));
-    return parser;
-}
-
-static void latm_destroy_parser(struct AACParser *parser)
-{
-    av_free(parser);
-}
-
-static void latm_flush(struct AACParser *parser)
-{
-    parser->offset = 0;
-    parser->count = 0;
-}
-
-static int latm_write_data(struct AACParser *parser, uint8_t *data, int len)
-{
-    // buffer overflow check... just ignore the data before
-    if (parser->count + len > MAX_SIZE) {
-        flush_buf(parser, parser->offset);
-        parser->offset = 0;
-        if (parser->count + len > MAX_SIZE) {
-            int to_flush = (parser->count+len) - MAX_SIZE;
-            flush_buf(parser, to_flush);
-        }
-    }
-
-    len = FFMIN(len, MAX_SIZE);
-    // append data
-    memcpy(parser->buf+parser->count, data, len);
-    parser->count += len;
-    return len;
-}
-
-static int latm_parse_packet(struct AACParser *parser, uint8_t *data, int maxsize)
-{
-    /*
-        Return value is either number of bytes parsed or
-        -1 when failed.
-        0 = need more data.
-    */
-
-    uint8_t    *start = parser->buf + parser->offset;
-    int        bytes  = parser->count - parser->offset;
-
-    GetBitContext    b;
-    init_get_bits(&b, start, bytes * 8);
-
-    if (parser->mode == AAC_LATM) {
-        int outsize = 0;
-        int    ret = readAudioSyncStream(parser, &b, bytes, data, &outsize);
-
-        if (ret < 0) return -1;
-        if (ret == 0) return 0;
-
-        // update the offset
-        parser->offset += ret;
-        return outsize;
-    }
-
-    // check for syncwords
-    while (bytes > 2) {
-        if (show_bits(&b, 11) == SYNC_LATM) {
-            // we must parse config first...
-            int outsize = 0;
-
-            // check if there is a complete packet available...
-            int ret = readAudioSyncStream(parser, &b, bytes, data, &outsize);
-            if (ret < 0) return -1;
-            if (ret == 0) return 0;
-            parser->offset += ret;
-
-            parser->mode = AAC_LATM;
-            return outsize;
-        }
-        skip_bits(&b, 8);
-        parser->offset++;
-        bytes--;
-    }
     return 0;
 }
 
-static void aac_filter_close(AACDecoder *decoder)
+static void channel_setup(AVCodecContext *avctx)
 {
-    if (decoder->aac_decoder) {
-        NeAACDecClose(decoder->aac_decoder);
-        decoder->aac_decoder = NULL;
+    AACDecoder *decoder = avctx->priv_data;
+
+    if (avctx->request_channels == 2 && avctx->channels > 2) {
+        NeAACDecConfigurationPtr faac_cfg;
+        avctx->channels = 2;
+        faac_cfg = NeAACDecGetCurrentConfiguration(decoder->aac_decoder);
+        if (faac_cfg) {
+            faac_cfg->downMatrix = 1;
+            faac_cfg->defSampleRate = (!avctx->sample_rate) ? 44100 : avctx->sample_rate;
+            NeAACDecSetConfiguration(decoder->aac_decoder, faac_cfg);
+        }
     }
-    decoder->open = 0;
 }
 
-static int aac_decoder_open(AACDecoder *decoder)
+static int latm_decode_frame(AVCodecContext *avctx, void *out, int *out_size, AVPacket *avpkt)
 {
-    if (decoder->aac_decoder) return 0;
+    AACDecoder          *decoder = avctx->priv_data;
+    uint8_t             tempbuf[MAX_SIZE];
+    int                 bufsize = sizeof(tempbuf);
+    int                 max_size = *out_size;
+    NeAACDecFrameInfo   info;
+    GetBitContext       b;
 
+    init_get_bits(&b, avpkt->data, avpkt->size * 8);
+    if (readAudioSyncStream(decoder, &b, avpkt->size, tempbuf, &bufsize)) {
+        return -1;
+    }
+
+    if (!decoder->initialized) {
+        // we are going to initialize from decoder specific info when available
+        if (decoder->extrasize > 0) {
+            if (NeAACDecInit2(decoder->aac_decoder, decoder->extra, decoder->extrasize, &avctx->sample_rate, &avctx->channels)) {
+                return -1;
+            }
+            channel_setup(avctx);
+            decoder->initialized = 1;
+        } else {
+            *out_size = 0;
+            return avpkt->size;
+        }
+    }
+
+    if (!NeAACDecDecode2(decoder->aac_decoder, &info, tempbuf, bufsize, &out, max_size)) {
+        return -1;
+    }
+    *out_size = info.samples * sizeof(short);
+    return avpkt->size;
+}
+
+static int latm_decode_init(AVCodecContext *avctx)
+{
+    AACDecoder *decoder = avctx->priv_data;
+    NeAACDecConfigurationPtr faac_cfg;
+
+    avctx->bit_rate = 0;
     decoder->aac_decoder = NeAACDecOpen();
-    if (!decoder->aac_decoder) return -1;
-
-    // are we going to initialize from decoder specific info ?
-    if (decoder->parser->config.extrasize > 0) {
-        char ret = NeAACDecInit2(decoder->aac_decoder, (unsigned char*)decoder->parser->config.extra, decoder->parser->config.extrasize, &decoder->in_samplerate, &decoder->in_channels);
-        if (ret < 0) {
-            aac_filter_close(decoder);        // gone wrong ?
-            return -1;
-        }
-        decoder->open = 1;
-    } else {
-        // we'll open the decoder later...
-        decoder->open = 0;
+    if (!decoder->aac_decoder) {
+        return -1;
     }
+
+    faac_cfg = NeAACDecGetCurrentConfiguration(decoder->aac_decoder);
+    if (faac_cfg) {
+        faac_cfg->outputFormat = FAAD_FMT_16BIT;
+        faac_cfg->defSampleRate = (!avctx->sample_rate) ? 44100 : avctx->sample_rate;
+        faac_cfg->defObjectType = LC;
+        NeAACDecSetConfiguration(decoder->aac_decoder, faac_cfg);
+    }
+
+    decoder->initialized = 0;
     return 0;
 }
 
-AACDecoder *aac_filter_create()
+static int latm_decode_end(AVCodecContext *avctx)
 {
-    AACDecoder *decoder = (AACDecoder *)av_malloc(sizeof(AACDecoder));
-    decoder->parser = latm_create_parser();
-    decoder->aac_decoder = NULL;
-    decoder->open = 0;
-    return (void *)decoder;
-}
-
-void aac_filter_destroy(AACDecoder *decoder)
-{
-    aac_filter_close(decoder);
-    latm_destroy_parser(decoder->parser);
-    av_free(decoder);
-}
-
-int aac_filter_receive(AACDecoder *decoder, void *out, int *out_size, uint8_t *data, int size)
-{
-    uint8_t    tempbuf[32*1024];
-    int        ret;
-    int        consumed = 0, tempsize = 0;
-    int        decoded;
-    int        max_size = *out_size;
-
-    *out_size = 0;
-
-    //-------------------------------------------------------------------------
-    // Multiplex Parsing
-    //-------------------------------------------------------------------------
-
-    do {
-
-        consumed += latm_write_data(decoder->parser, data+consumed, size-consumed);
-
-        ret = latm_parse_packet(decoder->parser, tempbuf, sizeof(tempbuf));
-                if (ret < 0) {
-                        latm_flush(decoder->parser);
-                        return consumed;
-                }
-        if (ret == 0) return consumed;
-
-        tempsize = ret;
-
-        //-------------------------------------------------------------------------
-        // Initialize decoder (if necessary)
-        //-------------------------------------------------------------------------
-        if (!decoder->open) {
-            aac_filter_close(decoder);
-            if (decoder->parser->mode == AAC_LATM) {
-                ret = aac_decoder_open(decoder);
-                if (ret < 0) return consumed;
-            }
-
-            if(!decoder->open) return consumed;
-        }
-
-        //-------------------------------------------------------------------------
-        // Decode samples
-        //-------------------------------------------------------------------------
-        NeAACDecFrameInfo    info;
-        void *buf = NeAACDecDecode(decoder->aac_decoder, &info, tempbuf, tempsize);
-
-        if (buf) {
-            decoder->in_samplerate = info.samplerate;
-            decoder->in_channels = info.channels;
-
-            //---------------------------------------------------------------------
-            // Deliver decoded samples
-            //---------------------------------------------------------------------
-
-            // kram dekoduje 16-bit. my vypustame 16-bit. takze by to malo byt okej
-            decoded = info.samples * sizeof(short);
-
-            // napraskame tam sample
-            *out_size += decoded;
-            if(*out_size > max_size) {
-                av_log(NULL, AV_LOG_ERROR, "overflow!\n");
-            } else {
-                memcpy(out, buf, decoded);
-                out = (unsigned char *)out + decoded;
-            }
-        } else {
-            // need more data
-            break;
-        }
-
-    } while (consumed < size);    // decode all packets
-    return consumed;
-}
-
-void aac_filter_getinfo(AACDecoder *decoder, int *sample_rate, int *channels)
-{
-    if(!decoder->open) return;
-    *sample_rate = decoder->in_samplerate;
-    *channels = decoder->in_channels;
-}
-
-static int faac_decode_init(AVCodecContext *avctx)
-{
-    FAACContext *s = avctx->priv_data;
-    avctx->frame_size = 360;
-    avctx->sample_rate = 48000;
-    avctx->channels = 2;
-    avctx->bit_rate = 8192 * 8 * avctx->sample_rate / avctx->frame_size;
-    s->decoder = aac_filter_create();
-    return 0;
-}
-
-static int faac_decode_frame(AVCodecContext *avctx,
-                             void *data, int *data_size,
-                             AVPacket *avpkt)
-{
-    uint8_t *buf = avpkt->data;
-    int buf_size = avpkt->size;
-    FAACContext *s = avctx->priv_data;
-    int ret;
-
-    if (s->decoder == NULL) faac_decode_init(avctx);
-    ret = aac_filter_receive(s->decoder, data, data_size, buf, buf_size);
-    aac_filter_getinfo(s->decoder, &(avctx->sample_rate), &(avctx->channels));
-    return ret;
-}
-
-static int faac_decode_end(AVCodecContext *avctx)
-{
-    FAACContext *s = avctx->priv_data;
-    if(s->decoder != NULL) {
-        aac_filter_destroy(s->decoder);
-    }
-    return 0;
-}
-
-
-
-#define LATM_HEADER     0x56e000 // 0x2b7 (11 bits)
-#define LATM_MASK       0xFFE000 // top 11 bits
-#define LATM_SIZE_MASK  0x001FFF // bottom 13 bits
-
-typedef struct LATMParseContext{
-    ParseContext pc;
-    int count;
-} LATMParseContext;
-
-/**
- * finds the end of the current frame in the bitstream.
- * @return the position of the first byte of the next frame, or -1
- */
-static int latm_find_frame_end(AVCodecParserContext *s1, const uint8_t *buf,
-                               int buf_size) {
-    LATMParseContext *s = s1->priv_data;
-    ParseContext *pc = &s->pc;
-    int pic_found, i;
-    uint32_t state;
-
-    pic_found = pc->frame_start_found;
-    state = pc->state;
-
-    i = 0;
-    if(!pic_found){
-        for(i=0; i<buf_size; i++){
-            state = (state<<8) | buf[i];
-            if((state & LATM_MASK) == LATM_HEADER){
-                i++;
-                s->count = - i;
-                pic_found=1;
-                break;
-            }
-        }
-    }
-
-    if(pic_found){
-        /* EOF considered as end of frame */
-        if (buf_size == 0)
-            return 0;
-        if((state & LATM_SIZE_MASK) - s->count <= buf_size) {
-            pc->frame_start_found = 0;
-            pc->state = -1;
-            return (state & LATM_SIZE_MASK) - s->count;
-        }
-    }
-
-    s->count += buf_size;
-    pc->frame_start_found = pic_found;
-    pc->state = state;
-    return END_NOT_FOUND;
-}
-
-static int latm_parse(AVCodecParserContext *s1,
-                           AVCodecContext *avctx,
-                           const uint8_t **poutbuf, int *poutbuf_size,
-                           const uint8_t *buf, int buf_size)
-{
-    LATMParseContext *s = s1->priv_data;
-    ParseContext *pc = &s->pc;
-    int next;
-
-    if(s1->flags & PARSER_FLAG_COMPLETE_FRAMES){
-        next = buf_size;
-    }else{
-        next = latm_find_frame_end(s1, buf, buf_size);
-
-        if (ff_combine_frame(pc, next, &buf, &buf_size) < 0) {
-            *poutbuf = NULL;
-            *poutbuf_size = 0;
-            return buf_size;
-        }
-    }
-    *poutbuf = buf;
-    *poutbuf_size = buf_size;
-    return next;
-}
-
-static int latm_split(AVCodecContext *avctx,
-                           const uint8_t *buf, int buf_size)
-{
-    int i;
-    uint32_t state= -1;
-
-    for(i=0; i<buf_size; i++){
-        state= (state<<8) | buf[i];
-        if((state & LATM_MASK) == LATM_HEADER)
-            return i-2;
-    }
+    AACDecoder *decoder = avctx->priv_data;
+    NeAACDecClose(decoder->aac_decoder);
     return 0;
 }
 
@@ -710,18 +380,9 @@ AVCodec libfaad_latm_decoder = {
     .name = "libfaad_latm",
     .type = CODEC_TYPE_AUDIO,
     .id = CODEC_ID_AAC_LATM,
-    .priv_data_size = sizeof (FAACContext),
-    .init = faac_decode_init,
-    .close = faac_decode_end,
-    .decode = faac_decode_frame,
+    .priv_data_size = sizeof (AACDecoder),
+    .init = latm_decode_init,
+    .close = latm_decode_end,
+    .decode = latm_decode_frame,
     .long_name = NULL_IF_CONFIG_SMALL("libfaad AAC LATM (Advanced Audio Codec)"),
-};
-
-AVCodecParser latm_parser = {
-    { CODEC_ID_AAC_LATM },
-    sizeof(LATMParseContext),
-    NULL,
-    latm_parse,
-    ff_parse_close,
-    latm_split,
 };

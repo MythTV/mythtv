@@ -453,7 +453,7 @@ contains( CONFIG_LIBXVID, yes )                 { SOURCES *= libxvidff.c libxvid
 # parsers
 contains( CONFIG_AAC_PARSER, yes )              { SOURCES *= aac_parser.c aac_ac3_parser.c mpeg4audio.c }
 contains( CONFIG_AC3_PARSER, yes )              { SOURCES *= ac3_parser.c ac3tab.c aac_ac3_parser.c }
-contains( CONFIG_LATM_PARSER, yes )             { SOURCES *= latmaac.c }
+contains( CONFIG_LATM_PARSER, yes )             { SOURCES *= latm_parser.c }
 contains( CONFIG_CAVSVIDEO_PARSER, yes )        { SOURCES *= cavs_parser.c }
 contains( CONFIG_DCA_PARSER, yes )              { SOURCES *= dca_parser.c }
 contains( CONFIG_DIRAC_PARSER, yes )            { SOURCES *= dirac_parser.c }
