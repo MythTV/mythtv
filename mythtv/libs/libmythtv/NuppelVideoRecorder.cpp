@@ -682,16 +682,6 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
     if (!skipdevice)
     {
-#if !HAVE_SYS_SOUNDCARD_H && !HAVE_SOUNDCARD_H
-        (void) afmt;
-        (void) afd;
-        (void) frag;
-
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "This Unix doesn't support device files for audio access.");
-
-        return 1;
-#else
         audio_device = AudioInput::CreateDevice(audiodevice.toAscii());
         if (!audio_device)
         {
@@ -717,7 +707,6 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         }
 
         audio_device->Close();
-#endif
     }
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
