@@ -111,6 +111,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     if (filter->mode == NULL)
     {
         printf("%s", pp_help);
+        free(filter);
         return NULL;
     }
 
