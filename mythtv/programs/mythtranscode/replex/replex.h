@@ -2,8 +2,10 @@
  * replex.h
  *        
  *
- * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
+ * Copyright (C) 2003 - 2006
+ *                    Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
+ *           (C) 2006 Reel Multimedia
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,6 +38,8 @@
 #include "multiplex.h"
 
 enum { S_SEARCH, S_FOUND, S_ERROR };
+#define MIN_JUMP 100*CLOCK_MS;
+#define MAXFRAME 2000
 
 struct replex {
 #define REPLEX_TS  0
@@ -45,7 +49,7 @@ struct replex {
 	int otype;
 	int ignore_pts; 
 	int keep_pts;
-	int fix_sync;
+	uint64_t allow_jump;
 	uint64_t inflength;
 	uint64_t finread;
 	int lastper;
@@ -59,24 +63,18 @@ struct replex {
 	int analyze;
 	avi_context ac;
 	int vdr;
+	int fillzero;
+	int overflows;
+	int max_overflows;
 
 	uint64_t video_delay;
 	uint64_t audio_delay;
 
-#define VIDEO_BUF (6*1024*1024)
-#define AUDIO_BUF (VIDEO_BUF/10)
-#define AC3_BUF   (VIDEO_BUF/10)
 #define INDEX_BUF (32000*32)
+
 	int audiobuf;
 	int ac3buf;
 	int videobuf;
-
-    int ext_count;
-    int exttype[N_AUDIO];
-    int exttypcnt[N_AUDIO];
-    audio_frame_t extframe[N_AUDIO];
-    ringbuffer extrbuffer[N_AUDIO];
-    ringbuffer index_extrbuffer[N_AUDIO];
 
   //ac3 
 	int ac3n;
@@ -91,6 +89,11 @@ struct replex {
 	uint64_t first_ac3pts[N_AC3];
 	int ac3_state[N_AUDIO];
 	uint64_t last_ac3pts[N_AC3];
+	uint64_t ac3_jump[N_AUDIO];
+	uint64_t ac3pts_off[N_AC3];
+	uint8_t  ac3fillframe[N_AC3][MAXFRAME];
+	int  ac3filled[N_AC3];
+
 
 // mpeg audio
 	int apidn;
@@ -105,6 +108,10 @@ struct replex {
 	uint64_t first_apts[N_AUDIO];
 	int audio_state[N_AUDIO];
 	uint64_t last_apts[N_AUDIO];
+	uint64_t audio_jump[N_AUDIO];
+	uint64_t apts_off[N_AUDIO];
+	uint8_t  afillframe[N_AC3][MAXFRAME];
+	int  afilled[N_AC3];
 
 //mpeg video
         uint16_t vpid;
@@ -120,9 +127,13 @@ struct replex {
 	uint64_t first_vpts;
 	int video_state;
 	uint64_t last_vpts;
+	uint64_t video_jump;
+	uint64_t vjump_pts;
 
 	void *priv;
 	int scan_found;
+        char **inputFiles;
+        int inputIdx;
 };
 
 void init_index(index_unit *iu);

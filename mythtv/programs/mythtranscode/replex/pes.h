@@ -1,7 +1,31 @@
-/* 
-    Copyright (C) 2003 Marcus Metzler (mocm@metzlerbros.de)
+/*
+ * pes.h: MPEG PES functions for replex
+ *        
+ *
+ * Copyright (C) 2003 - 2006
+ *                    Marcus Metzler <mocm@metzlerbros.de>
+ *                    Metzler Brothers Systementwicklung GbR
+ *           (C) 2006 Reel Multimedia
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * General Public License for more details.
+ *
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
+ *
+ */
 
-*/
 
 #ifndef _PES_H_
 #define _PES_H_
@@ -9,7 +33,6 @@
 #include <stdint.h>
 #include "ringbuffer.h"
 
-#define TS_HEADER_MIN	4
 #define PS_HEADER_L1    14
 #define PS_HEADER_L2    (PS_HEADER_L1+24)
 #define PES_MIN         7
@@ -71,7 +94,7 @@ struct ps_packet_{
 typedef
 struct pes_in_s{
 	int type;
-	unsigned int found;
+	int found;
 	int withbuf;
 	uint8_t *buf;
 	ringbuffer *rbuf;
@@ -102,24 +125,28 @@ int ptscmp(uint64_t pts1, uint64_t pts2);
 uint64_t ptsadd(uint64_t pts1, uint64_t pts2);
 
 
-int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS, 
-		     uint8_t *obuf, int stuffing, uint8_t ptsdts);
-void write_padding_pes( int pack_size, int extcnt, 
+void write_padding_pes( int pack_size, int apidn, int ac3n, 
 			uint64_t SCR, uint64_t muxr, uint8_t *buf);
-int write_ac3_pes(  int pack_size, int extcnt, int n, uint64_t pts, 
+int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts, 
 		    uint64_t SCR, 
 		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
-		    int nframes,int ac3_off, ringbuffer *ac3rbuffer);
-int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts, 
+		    int nframes,int ac3_off, ringbuffer *ac3rbuffer, int framelength);
+int bwrite_ac3_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts, 
+		    uint64_t SCR, 
+		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
+		     int nframes,int ac3_off, uint8_t *ac3rbuffer, int bsize, int framelength);
+int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts, 
 		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
 		      uint8_t ptsdts, 	ringbuffer *arbuffer);
-int write_video_pes( int pack_size, int extcnt, uint64_t vpts, 
+int bwrite_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts, 
+		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
+		       uint8_t ptsdts, uint8_t *arbuffer, int bsize );
+int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts, 
 		     uint64_t vdts, uint64_t SCR, uint64_t muxr, 
 		     uint8_t *buf, int *vlength, 
 		     uint8_t ptsdts, ringbuffer *vrbuffer);
-int write_nav_pack(int pack_size, int extcnt, uint64_t SCR, uint32_t muxr, 
+int write_nav_pack(int pack_size, int apidn, int ac3n, uint64_t SCR, uint32_t muxr, 
 		   uint8_t *buf);
-
 
 static inline void ptsdec(uint64_t *pts1, uint64_t pts2)
 {

@@ -29,6 +29,8 @@
 #define O_LARGEFILE 0
 #endif
 
+//#define DEBUG_AUDIO 1
+
 #define ATTR_ALIGN(align) __attribute__ ((__aligned__ (align)))
 
 #define SHOW_MSG(msg) (msg & print_verbose_messages)
@@ -239,6 +241,7 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     }
 
     ext_count = 0;
+    ac3_count = 0;
     vid_id = -1;
     mpeg2_malloc_hooks(my_malloc, NULL);
     header_decoder = mpeg2_init();
@@ -448,7 +451,8 @@ int fill_buffers(void *r, int finish)
 
 MPEG2replex::MPEG2replex() :
     done(0),      otype(0),
-    ext_count(0), mplex(0)
+    ext_count(0), ac3_count(0),
+    mplex(0)
 {
     memset(&vrbuf, 0, sizeof(vrbuf));
     memset(extrbuf, 0, sizeof(extrbuf));
@@ -458,6 +462,8 @@ MPEG2replex::MPEG2replex() :
     memset(exttypcnt, 0, sizeof(exttypcnt));
     memset(extframe, 0, sizeof(extframe));
     memset(&seq_head, 0, sizeof(seq_head)); 
+    memset(&ac3extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    memset(&index_ac3extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
 }
 
 MPEG2replex::~MPEG2replex()
@@ -483,11 +489,15 @@ int MPEG2replex::WaitBuffers()
     {
         int i, ok = 1;
 
-        if (ring_avail(&index_vrbuf) < sizeof(index_unit))
+        if (ring_avail(&index_vrbuf) < (int)sizeof(index_unit))
             ok = 0;
 
         for (i = 0; i < ext_count; i++)
-            if (ring_avail(&index_extrbuf[i]) < sizeof(index_unit))
+            if (ring_avail(&index_extrbuf[i]) < (int)sizeof(index_unit))
+                ok = 0;
+
+        for (i = 0; i < ac3_count; i++)
+            if (ring_avail(&index_ac3extrbuf[i]) < (int)sizeof(index_unit))
                 ok = 0;
 
         if (ok || done)
@@ -523,6 +533,7 @@ void MPEG2replex::Start()
     // note that although only 1 stream is currently supported, multiplex.c
     // expects the size to by N_AUDIO
     int ext_ok[N_AUDIO];
+    int ac3_ok[N_AC3];
     int video_ok = 0;
 
     //seq_head should be set only for the 1st sequence header.  If a new
@@ -534,6 +545,7 @@ void MPEG2replex::Start()
 
     memset(&mx, 0, sizeof(mx));
     memset(ext_ok, 0, sizeof(ext_ok));
+    memset(ac3_ok, 0, sizeof(ac3_ok));
 
     mx.priv = (void *)this;
 
@@ -547,15 +559,24 @@ void MPEG2replex::Start()
 
     mplex = &mx;
 
-    init_multiplex(&mx, &seq_head, extframe, exttype, exttypcnt,
+    init_multiplex(&mx, &seq_head, extframe, ac3frame,
+                   ext_count /* audio pids */,
+                   ac3_count /* ac3 streams */,
                    video_delay, audio_delay, fd_out, fill_buffers,
-                   &vrbuf, &index_vrbuf, extrbuf, index_extrbuf, otype);
+                   &vrbuf, &index_vrbuf, extrbuf, index_extrbuf,
+                   ac3extrbuf, index_ac3extrbuf,
+		   otype);
+
+    VERBOSE(MPF_RPLXQUEUE, QString("  Finished:  init_multiplex "));
     setup_multiplex(&mx);
+    VERBOSE(MPF_RPLXQUEUE, QString("  Finished:  setup_multiplex "));
 
     while (1)
     {
-        check_times( &mx, &video_ok, ext_ok, &start);
-        write_out_packs( &mx, video_ok, ext_ok);
+        check_times( &mx, &video_ok, ext_ok, ac3_ok, &start);
+        VERBOSE(MPF_RPLXQUEUE, QString("  vid_ok: %1 ext_ok: %2  ac3_ok: %3  ")
+			.arg(video_ok).arg(ext_ok[0]).arg(ac3_ok[0]));
+        write_out_packs( &mx, video_ok, ext_ok, ac3_ok);
     }
 }
 
@@ -574,28 +595,29 @@ void MPEG2fixup::InitReplex()
 
     memset(rx.exttype, 0, sizeof(rx.exttype));
     memset(rx.exttypcnt, 0, sizeof(rx.exttypcnt));
-    int mp2_count = 0, ac3_count = 0;
     for (QMap<int, Q3PtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
     {
         int i = aud_map[it.key()];
-        char *lang = inputFC->streams[it.key()]->language;
-        ring_init(&rx.extrbuf[i], memsize / 5);
-        ring_init(&rx.index_extrbuf[i], INDEX_BUF);
-        rx.extframe[i].set = 1;
-        rx.extframe[i].bit_rate = getCodecContext(it.key())->bit_rate;
-        rx.extframe[i].framesize = (*it).first()->pkt.size;
-        strncpy(rx.extframe[i].language, lang, 4);
+        //char *lang = inputFC->streams[it.key()]->language;
         switch(GetStreamType(it.key()))
         {
             case CODEC_ID_MP2:
             case CODEC_ID_MP3:
-                rx.exttype[i] = 2;
-                rx.exttypcnt[i] = mp2_count++;
+                ring_init(&rx.extrbuf[i], memsize / 5);
+                ring_init(&rx.index_extrbuf[i], INDEX_BUF);
+                memset(&rx.extframe[i], 0, sizeof(audio_frame_t));
+                rx.extframe[i].set = 1;
+                rx.extframe[i].bit_rate = getCodecContext(it.key())->bit_rate;
+                rx.extframe[i].framesize = it.data().first()->pkt.size;
                 break;
             case CODEC_ID_AC3:
-                rx.exttype[i] = 1;
-                rx.exttypcnt[i] = ac3_count++;
+                ring_init(&rx.ac3extrbuf[i], memsize / 5);
+                ring_init(&rx.index_ac3extrbuf[i], INDEX_BUF);
+                memset(&rx.ac3frame[i], 0, sizeof(audio_frame_t));
+                rx.ac3frame[i].set = 1;
+                rx.ac3frame[i].bit_rate = getCodecContext(it.key())->bit_rate;
+                rx.ac3frame[i].framesize = it.data().first()->pkt.size;
                 break;
         }
     }
@@ -606,6 +628,7 @@ void MPEG2fixup::InitReplex()
                          26999999ULL) / vFrame.first()->mpeg2_seq.frame_period;
 
     rx.ext_count = ext_count;
+    rx.ac3_count = ac3_count;
 }
 
 void MPEG2fixup::FrameInfo(MPEG2frame *f)
@@ -620,6 +643,13 @@ void MPEG2fixup::FrameInfo(MPEG2frame *f)
         for (int i = 0; i < ext_count; i++)
             msg += QString(" %2")
                    .arg(ring_free(&rx.index_extrbuf[i]) / sizeof(index_unit));
+    }
+    if (ac3_count)
+    {
+        msg += " AC3:";
+        for (int i = 0; i < ac3_count; i++)
+            msg += QString(" %2")
+                   .arg(ring_free(&rx.index_ac3extrbuf[i]) / sizeof(index_unit));
     }
     VERBOSE(MPF_RPLXQUEUE, msg);
 }
@@ -645,9 +675,17 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         iu.frame_off = f->framePos - f->pkt.data;
         iu.dts = f->pkt.dts * 300;
     }
+    else if (GetStreamType(id) == CODEC_ID_AC3)
+    {
+        //VERBOSE(MPF_IMPORTANT, QString("Ringbuffer AC3 stream: %1 aud_map: %2 size: %3 "
+        //                           ).arg(id).arg(aud_map[id]).arg(f->pkt.size));
+        rb = &rx.ac3extrbuf[aud_map[id]];
+        rbi = &rx.index_ac3extrbuf[aud_map[id]];
+        iu.framesize = f->pkt.size;
+    }
     else if (GetStreamType(id) == CODEC_ID_MP2 ||
-             GetStreamType(id) == CODEC_ID_MP3 ||
-             GetStreamType(id) == CODEC_ID_AC3)
+             GetStreamType(id) == CODEC_ID_MP3 /* ||
+             GetStreamType(id) == CODEC_ID_AC3 */)
     {
         rb = &rx.extrbuf[aud_map[id]];
         rbi = &rx.index_extrbuf[aud_map[id]];
@@ -666,29 +704,34 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
     pthread_mutex_lock( &rx.mutex );
 
     FrameInfo(f);
-    while (ring_free(rb) < (unsigned int)f->pkt.size ||
-            ring_free(rbi) < sizeof(index_unit))
+    while (ring_free(rb) < f->pkt.size ||
+            ring_free(rbi) < (int)sizeof(index_unit))
     {
         int i, ok = 1;
 
         if (rbi != &rx.index_vrbuf &&
-                ring_avail(&rx.index_vrbuf) < sizeof(index_unit))
+                ring_avail(&rx.index_vrbuf) < (int)sizeof(index_unit))
             ok = 0;
 
         for (i = 0; i < ext_count; i++)
             if (rbi != &rx.index_extrbuf[i] &&
-                    ring_avail(&rx.index_extrbuf[i]) < sizeof(index_unit))
+                    ring_avail(&rx.index_extrbuf[i]) < (int)sizeof(index_unit))
                 ok = 0;
 
-        if (! ok && ring_free(rb) < (unsigned int)f->pkt.size &&
-                    ring_free(rbi) >= sizeof(index_unit))
+        for (i = 0; i < ac3_count; i++)
+            if (rbi != &rx.index_ac3extrbuf[i] &&
+                    ring_avail(&rx.index_ac3extrbuf[i]) < (int)sizeof(index_unit))
+                ok = 0;
+
+        if (! ok && ring_free(rb) < f->pkt.size &&
+                    ring_free(rbi) >= (int)sizeof(index_unit))
         {
             // increase memory to avoid deadlock
             unsigned int inc_size = 10*(unsigned int)f->pkt.size;
             VERBOSE(MPF_IMPORTANT, QString("Increasing ringbuffer size by %1 "
                                    "to avoid deadlock").arg(inc_size));
-            if (! ring_reinit(rb, rb->size + inc_size))
-                ok = 1;
+            //if (! ring_reinit(rb, rb->size + inc_size))
+            //    ok = 1;
         }
         if (! ok)
         {
@@ -782,7 +825,12 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                             "Skipping invalid audio stream: %1").arg(i));
                     break;
                 }
-                if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3 ||
+                if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3)
+	        {
+                    aud_map[i] = ac3_count++;
+                    aFrame[i] = Q3PtrList<MPEG2frame> ();
+		}
+		else if (/* inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3 || */
                     inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
                     inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
                 {
@@ -1290,8 +1338,8 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
 #ifdef DEBUG_AUDIO
         VERBOSE(MPF_DECODE, QString("Stream: %1 PTS: %2 DTS: %3 pos: %4")
               .arg(pkt->stream_index)
-              .arg((pkt->pts == AV_NOPTS_VALUE) ? "NONE" : PtsTime(pkt->pts))
-              .arg((pkt->dts == AV_NOPTS_VALUE) ? "NONE" : PtsTime(pkt->dts))
+              .arg((pkt->pts == (int64_t)AV_NOPTS_VALUE) ? "NONE" : PtsTime(pkt->pts))
+              .arg((pkt->dts == (int64_t)AV_NOPTS_VALUE) ? "NONE" : PtsTime(pkt->dts))
               .arg(pkt->pos));
 #endif
 
@@ -1424,8 +1472,14 @@ bool MPEG2fixup::FindStart()
                 }
                 if (delta < 0 && af->count() > 1)
                 {
-                    if (cmp2x33(af->next()->pkt.pts,
-                                vFrame.first()->pkt.pts) > 0)
+		    int aud_cmp = cmp2x33(af->next()->pkt.pts, vFrame.first()->pkt.pts);
+
+                    VERBOSE(MPF_PROCESS,
+                                QString("Looking for A packet from stream %1  delta %2 cmp2x33 %3")
+                                        .arg(it.key()).arg(delta).arg(aud_cmp));
+                    //if (cmp2x33(af->next()->pkt.pts,
+                    //            vFrame.first()->pkt.pts) > 0)
+		    if (aud_cmp > 0)
                     {
                         VERBOSE(MPF_PROCESS, QString("Found useful audio "
                                 "frame from stream %1").arg(it.key()));
@@ -1886,10 +1940,10 @@ int MPEG2fixup::Start()
     {
         Q3PtrList<MPEG2frame> *af = &(*it);
         deltaPTS = diff2x33(vFrame.current()->pkt.pts, af->first()->pkt.pts);
-        VERBOSE(MPF_GENERAL, QString("#%1 PTS:%2 Delta: %3ms queue: %4")
+        VERBOSE(MPF_GENERAL, QString("#%1 PTS:%2 Delta: %3ms queue: %4 initPTS: %5")
                              .arg(it.key())
                              .arg(PtsTime(af->current()->pkt.pts))
-                             .arg(1000.0*deltaPTS / 90000.0).arg(af->count()));
+                             .arg(1000.0*deltaPTS / 90000.0).arg(af->count()).arg(PtsTime(initPTS)));
 
         if (cmp2x33(af->current()->pkt.pts, initPTS) < 0)
             initPTS = af->current()->pkt.pts;
@@ -1998,9 +2052,11 @@ int MPEG2fixup::Start()
                 // beforehand
                 if (PTSdiscrep && ! file_end)
                 {
+                    VERBOSE(MPF_IMPORTANT, QString("Detected PTS Discrepency "));
+
                     int pos = vFrame.count();
                     int count = Lreorder.count();
-                    while (vFrame.count() - frame_pos - count < 20 && !file_end)
+                    while (vFrame.count() - frame_pos - count < 40 && !file_end)
                         if ((ret = GetFrame(&pkt)) < 0)
                             return ret;
                     if (! file_end)
@@ -2022,6 +2078,7 @@ int MPEG2fixup::Start()
                                            tmpPTSdiscrep, numframes, false);
                                 if (!tmpPTSdiscrep)
                                 {
+                                    VERBOSE(MPF_IMPORTANT, QString("Fixed a temporary PTS discrepency, moving on... "));
                                     //discrepancy was short-lived, continue on
                                     done = true;
                                     PTSdiscrep = 0;
@@ -2030,6 +2087,7 @@ int MPEG2fixup::Start()
                                 if (tmpPTSdiscrep != (int64_t)AV_NOPTS_VALUE &&
                                     tmpPTSdiscrep != PTSdiscrep)
                                     PTSdiscrep = tmpPTSdiscrep;
+                                    VERBOSE(MPF_IMPORTANT, QString("Severe PTS discrepency, deadlock imminent... "));
                             }
                             count += tmpReorder.count();
                         }

@@ -118,15 +118,19 @@ class MPEG2replex
     int otype;
     ringbuffer vrbuf;
     ringbuffer extrbuf[N_AUDIO];
+    ringbuffer ac3extrbuf[N_AUDIO];
     ringbuffer index_vrbuf;
     ringbuffer index_extrbuf[N_AUDIO];
+    ringbuffer index_ac3extrbuf[N_AUDIO];
     int ext_count;
+    int ac3_count;
     int exttype[N_AUDIO];
     int exttypcnt[N_AUDIO];
 
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     audio_frame_t extframe[N_AUDIO];
+    audio_frame_t ac3frame[N_AC3];
     sequence_t seq_head;
 
   private:
@@ -240,6 +244,7 @@ class MPEG2fixup
     AVFormatContext *inputFC;
     int vid_id;
     int ext_count;
+    int ac3_count;
     QMap <int, int> aud_map;
     int aud_stream_count;
     int64_t ptsIncrement;

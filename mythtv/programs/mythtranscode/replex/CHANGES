@@ -1,3 +1,20 @@
+0.1.6
+DVB wants continuous numbering of audio streams, even for MP2 AC3 mix
+added handling of too few audio PTS in some streams
+added audio frame dropping, when video cut is larger than audio cut
+add the -j option to jump over PTS discontinuities and cuts
+add -l option to set the minimum time in ms a jump has to have 
+add -g option to set video buffer size in GB
+fixed MPEG2 and AC3 multiplexing
+add version information
+add -p option for filling MPEG audio frames with zero
+add -q options to set limit for overflow errors
+
+0.1.5
+various minor fixes 
+added better audio frame recognition
+fixed AC3 PTS problem for dvdauthor
+
 0.1.4
 fixed problem with audio PTS which ruined dvdauthor
 

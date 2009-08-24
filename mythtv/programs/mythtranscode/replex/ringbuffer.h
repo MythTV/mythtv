@@ -2,7 +2,8 @@
  * ringbuffer.h
  *        
  *
- * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
+ * Copyright (C) 2003 - 2006
+ *                    Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
  *
  * This program is free software; you can redistribute it and/or
@@ -40,12 +41,12 @@ extern "C" {
 	typedef struct ringbuffer {
 		int read_pos;
 		int write_pos;
-		uint32_t size;
+		int size;
 		uint8_t *buffer;
 	} ringbuffer;
 
 
-#define DBUF_INDEX 10000
+#define DBUF_INDEX 1000
 
 	typedef struct dummy_buffer_s {
 		uint32_t size;
@@ -56,17 +57,13 @@ extern "C" {
 
 
 	int  ring_init (ringbuffer *rbuf, int size);
-	int  ring_reinit (ringbuffer *rbuf, int size);
 	void ring_clear(ringbuffer *rbuf);
 	void ring_destroy(ringbuffer *rbuf);
 	int ring_write(ringbuffer *rbuf, uint8_t *data, int count);
 	int ring_read(ringbuffer *rbuf, uint8_t *data, int count);
 	int ring_write_file(ringbuffer *rbuf, int fd, int count);
 	int ring_read_file(ringbuffer *rbuf, int fd, int count);
-	int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count,
-                      uint32_t off);
-	int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count,
-                      uint32_t off);
+	int ring_peek(ringbuffer *rbuf, uint8_t *data, int count, long off);
 	int ring_skip(ringbuffer *rbuf, int count);
 
 	static inline int ring_wpos(ringbuffer *rbuf)
@@ -95,15 +92,15 @@ extern "C" {
 		return ring_posdiff(rbuf, rbuf->read_pos,pos);
 	}
 
-	static inline unsigned int ring_free(ringbuffer *rbuf){
+	static inline int ring_free(ringbuffer *rbuf){
 		int free;
-		free = rbuf->read_pos - rbuf->write_pos;
+		free = rbuf->read_pos - rbuf->write_pos-1;
 		if (free <= 0) free += rbuf->size;
-		//Note: free is gauranteed to be >=1 from the above
-		return free - 1;
+		
+		return free;
 	}
 
-	static inline unsigned int ring_avail(ringbuffer *rbuf){
+	static inline int ring_avail(ringbuffer *rbuf){
 		int avail;
 		avail = rbuf->write_pos - rbuf->read_pos;
 		if (avail < 0) avail += rbuf->size;
@@ -121,8 +118,7 @@ extern "C" {
 	int dummy_add(dummy_buffer *dbuf, uint64_t time, uint32_t size);
 	void dummy_clear(dummy_buffer *dbuf);
 	int dummy_init(dummy_buffer *dbuf, int s);
-        void dummy_destroy(dummy_buffer *dbuf);
-	void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off);
+	void ring_show(ringbuffer *rbuf, int count, long off);
 
 #ifdef __cplusplus
 }
