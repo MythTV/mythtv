@@ -144,8 +144,8 @@ void DetectLetterbox::Detect(VideoFrame *frame)
             }
 
             Y = buf[offsets[0] + (height-y-1     ) * pitches[0] + xPos[detectionLine]];
-            U = buf[offsets[1] + (height-y-1 >> 1) * pitches[1] + (xPos[detectionLine]>>1)];
-            V = buf[offsets[2] + (height-y-1 >> 1) * pitches[2] + (xPos[detectionLine]>>1)];
+            U = buf[offsets[1] + ((height-y-1) >> 1) * pitches[1] + (xPos[detectionLine]>>1)];
+            V = buf[offsets[2] + ((height-y-1) >> 1) * pitches[2] + (xPos[detectionLine]>>1)];
             if ((!bottomHit[detectionLine]) &&
                 ( Y > averageY + THRESHOLD || Y < averageY - THRESHOLD ||
                   U < 128 - 32 || U > 128 + 32 ||

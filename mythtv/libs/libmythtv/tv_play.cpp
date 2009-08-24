@@ -937,7 +937,7 @@ TV::~TV(void)
     gContext->removeListener(this);
 
     GetMythMainWindow()->SetDrawEnabled(true);
-    
+
     if (myWindow)
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -10349,10 +10349,10 @@ void TV::FillMenuAdjustFill(
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     OSDGenericTree *af_item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
-    OSDGenericTree *subitem = new OSDGenericTree(af_item, tr("Auto Detect"),
-                                 "AUTODETECT_FILL",
-                                 (ctx->nvp->detect_letter_box->GetDetectLetterbox()) ? 1 : 0,
-                                 NULL, "ADJUSTFILLGROUP");
+    new OSDGenericTree(af_item, tr("Auto Detect"),
+                       "AUTODETECT_FILL",
+                       (ctx->nvp->detect_letter_box->GetDetectLetterbox()) ? 1 : 0,
+                       NULL, "ADJUSTFILLGROUP");
 
     for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
     {
