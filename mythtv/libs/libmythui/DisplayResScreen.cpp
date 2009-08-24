@@ -20,8 +20,10 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const std::vector<double>& rr, const std::map<double, short>& rr2)
-: width(w), height(h), width_mm(mw), height_mm(mh), refreshRates(rr), realRates(rr2), custom(true)
+                                   const std::vector<double>& rr,
+                                   const std::map<double, short>& rr2)
+: realRates(rr2),   width(w),    height(h), width_mm(mw), height_mm(mh),
+  refreshRates(rr), custom(true)
 {
     SetAspectRatio(-1.0);
 }
