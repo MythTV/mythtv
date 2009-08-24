@@ -120,43 +120,55 @@ int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
     bool end = false;
 
     // We will give priority to refresh rates that a twice what is looked for
-    if ((videorate > 24.5) && (videorate < 30.5)) {
+    if ((videorate > 24.5) && (videorate < 30.5))
+    {
         rate2x = true;
         videorate *= 2.0;
     }
    
     // Amend vector with custom list
-    for (uint i=0; i<dsr.size(); ++i) {
-        if (dsr[i].Width()==d.Width() && dsr[i].Height()==d.Height()) {
+    for (uint i=0; i<dsr.size(); ++i)
+    {
+        if (dsr[i].Width()==d.Width() && dsr[i].Height()==d.Height())
+        {
             const std::vector<double>& rates = dsr[i].RefreshRates();
-            if (rates.size() && videorate != 0) {
-                while (!end) {
-                    for (double precision = 0.001; precision < 1.0; precision *= 10.0) {
-                        for (uint j=0; j < rates.size(); ++j) {
+            if (rates.size() && videorate != 0)
+            {
+                while (!end)
+                {
+                    for (double precision = 0.001; precision < 1.0; precision *= 10.0)
+                    {
+                        for (uint j=0; j < rates.size(); ++j)
+                        {
                             // Multiple of target_rate will do
                             if (compare_rates(videorate,rates[j], precision) ||
                                 (fabs(videorate - fmod(rates[j],videorate)) <= precision) ||
-                                (fmod(rates[j],videorate) <= precision)) {
+                                (fmod(rates[j],videorate) <= precision))
+                            {
                                 target_rate = rates[j];
                                 return i;
                             }
                         }
                     }
                     // Can't find exact frame rate, so try rounding to the nearest integer, so 23.97Hz will work with 24Hz etc
-                    for (uint j=0; j < rates.size(); ++j) {
+                    for (uint j=0; j < rates.size(); ++j)
+                    {
                         double rounded = (double) ((int) (videorate + 0.5));
                         // Multiple of target_rate will do
                         if (compare_rates(rounded,rates[j]) ||
                             (fabs(rounded - fmod(rates[j],rounded)) <= 0.01) ||
-                            (fmod(rates[j],rounded) <= 0.01)) {
+                            (fmod(rates[j],rounded) <= 0.01))
+                        {
                             target_rate = rates[j];
                             return i;
                         }
                     }
-                    if (rate2x) {
+                    if (rate2x)
+                    {
                         videorate /= 2.0;
                         rate2x = false;
-                    } else
+                    }
+                    else
                         end = true;
                 }
                 target_rate = rates[rates.size() - 1];
