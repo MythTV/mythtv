@@ -4560,7 +4560,7 @@ void VideoDialog::ResetMetadata()
 
         QString screenshot_file;
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                        QStringList(m_d->m_artDir), screenshot_file,
+                        QStringList(m_d->m_sshotDir), screenshot_file,
                         metadata->GetTitle(), metadata->GetSeason(), metadata->GetEpisode(),
                         true))
         {   
