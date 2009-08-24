@@ -343,6 +343,18 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
+    rule.title = tr("Only shows with in-vision signing");
+    rule.subtitle = "";
+    rule.description = "FIND_IN_SET('SIGNED', program.subtitletypes) > 0 ";
+    new MythUIButtonListItem(m_clauseList, rule.title,
+                             qVariantFromValue(rule));
+    
+    rule.title = tr("Only shows with in-vision subtitles");
+    rule.subtitle = "";
+    rule.description = "FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0 ";
+    new MythUIButtonListItem(m_clauseList, rule.title,
+                             qVariantFromValue(rule));
+    
     rule.title = tr("Limit by category");
     rule.subtitle = "";
     if (m_pginfo->category > "")

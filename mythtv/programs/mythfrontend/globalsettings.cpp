@@ -3302,6 +3302,16 @@ static GlobalSpinBox *GRHDTVRecPriority()
     return bs;
 }
 
+static GlobalSpinBox *GRWSRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("WSRecPriority", -99, 99, 1);
+    bs->setLabel(QObject::tr("Widescreen Recording Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as widescreen in the TV listings."));
+    bs->setValue(0);
+    return bs;
+}
+
 static GlobalSpinBox *GRAutoRecPriority()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoRecPriority", -99, 99, 1);
@@ -3310,6 +3320,63 @@ static GlobalSpinBox *GRAutoRecPriority()
                     "be added for titles that are usually watched soon after "
                     "recording or subtracted for titles that are often "
                     "watched several days or weeks later."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalSpinBox *GRSignLangRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("SignLangRecPriority",
+                                            -99, 99, 1);
+    bs->setLabel(QObject::tr("Sign Language Recording Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as having in-vision sign language."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalSpinBox *GROnScrSubRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("OnScrSubRecPriority",
+                                            -99, 99, 1);
+    bs->setLabel(QObject::tr("In-vision Subtitles Recording Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as having in-vision subtitles."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalSpinBox *GRCCRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("CCRecPriority",
+                                            -99, 99, 1);
+    bs->setLabel(QObject::tr("Subtitles/CC Recording Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as having subtitles or closed captioning "
+                    "(CC) available."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalSpinBox *GRHardHearRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("HardHearRecPriority",
+                                            -99, 99, 1);
+    bs->setLabel(QObject::tr("Hard of Hearing Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as having support for viewers with impaired "
+                    "hearing."));
+    bs->setValue(0);
+    return bs;
+}
+
+static GlobalSpinBox *GRAudioDescRecPriority()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("AudioDescRecPriority",
+                                            -99, 99, 1);
+    bs->setLabel(QObject::tr("Audio Described Priority"));
+    bs->setHelpText(QObject::tr("Additional priority when a showing "
+                    "is marked as being Audio Described."));
     bs->setValue(0);
     return bs;
 }
@@ -5018,8 +5085,19 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     sched->addChild(GRComplexPriority());
     sched->addChild(GRPrefInputRecPriority());
     sched->addChild(GRHDTVRecPriority());
+    sched->addChild(GRWSRecPriority());
     sched->addChild(GRAutoRecPriority());
     addChild(sched);
+
+    VerticalConfigurationGroup* access = new VerticalConfigurationGroup(false);
+    access->setLabel(QObject::tr("Accessibility Options"));
+
+    access->addChild(GRSignLangRecPriority());
+    access->addChild(GROnScrSubRecPriority());
+    access->addChild(GRCCRecPriority());
+    access->addChild(GRHardHearRecPriority());
+    access->addChild(GRAudioDescRecPriority());
+    addChild(access);
 
     VerticalConfigurationGroup* rtype = new VerticalConfigurationGroup(false);
     rtype->setLabel(QObject::tr("Recording Type Priority Settings"));
