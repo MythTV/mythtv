@@ -3505,9 +3505,11 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     if (node && node->getInt() == kSubFolder && !metadata)
     {
+        QString cover = GetFirstImage(node, "Coverart");
         QString fanart = GetFirstImage(node, "Fanart");
         QString banner = GetFirstImage(node, "Banners");
         QString screenshot = GetFirstImage(node, "Screenshots");
+        CheckedSet(m_coverImage, cover);
         CheckedSet(m_fanart, fanart);
         CheckedSet(m_banner, banner);
         CheckedSet(m_screenshot, screenshot);
