@@ -149,7 +149,25 @@ void FIFOWriter::FIFOWriteThread(void)
             fd = open(fname.constData(), O_WRONLY| O_SYNC);
         }
         if (fd >= 0)
-            write(fd, fb_outptr[id]->data, fb_outptr[id]->blksize);
+        {
+            int written = 0;
+            while (written < fb_outptr[id]->blksize)
+            {
+                int ret = write(fd, fb_outptr[id]->data+written,
+                                fb_outptr[id]->blksize-written);
+                if (ret < 0)
+                {
+                    VERBOSE(VB_IMPORTANT, QString("FIFOW: write failed with %1")
+                            .arg(strerror(ret)));
+                    ///FIXME: proper error propagation
+                    break;
+                }
+                else
+                {
+                    written += ret;
+                }
+            }
+        }
         pthread_mutex_lock(&fifo_lock[id]);
         fb_outptr[id] = fb_outptr[id]->next;
         pthread_cond_signal(&full_cond[id]);
