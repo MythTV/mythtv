@@ -481,7 +481,9 @@ vbi_add_handler(struct vbi *vbi, void *handler, void *data)
        return -1;
     cl->handler = handler;
     cl->data = data;
-    dl_insert_last(vbi->clients, cl);
+    // cl is not leaking, the first struct element has the same address
+    // as the struct
+    dl_insert_last(vbi->clients, cl->node);
     return 0;
 }
 
