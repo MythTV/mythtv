@@ -159,27 +159,27 @@ namespace
                 {
                     if (m_dest_file.startsWith("myth://"))
                     {
-                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                        if (!outFile->isOpen())
+                        QImage testImage;
+                        const QByteArray &testArray = m_data_buffer.data();
+                        bool didLoad = testImage.loadFromData(testArray);
+                        if (!didLoad)
                         {
-                            VERBOSE(VB_IMPORTANT,
-                                QString("RingBuffer::RingBuffer(): Failed to open "
-                                        "remote file (%1) for write.  Does Coverart "
-                                        "Storage Group Exist?").arg(m_dest_file));
-                            delete outFile;
-                            outFile = NULL;
+                            errorMsg = tr("Tried to write %1, but it appears to "
+                                          "be an HTML redirect (filesize %2).")
+                                    .arg(m_dest_file).arg(m_data_buffer.size());
                             m_error_state = esError;
                         }
                         else
                         {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
+                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                            if (!outFile->isOpen())
                             {
-                                errorMsg = tr("Tried to write %1, but it appears to "
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
+                                VERBOSE(VB_IMPORTANT,
+                                    QString("RingBuffer::RingBuffer(): Failed to open "
+                                            "remote file (%1) for write.  Does Coverart "
+                                            "Storage Group Exist?").arg(m_dest_file));
+                                delete outFile;
+                                outFile = NULL;
                                 m_error_state = esError;
                             }
                             else
@@ -210,6 +210,7 @@ namespace
                                 errorMsg = tr("Tried to write %1, but it appears to "
                                               "be an HTML redirect (filesize %2).")
                                         .arg(m_dest_file).arg(m_data_buffer.size());
+                                dest_file.remove();
                                 m_error_state = esError;
                             }
                             else
@@ -325,27 +326,27 @@ namespace
                 {
                     if (m_dest_file.startsWith("myth://"))
                     {
-                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                        if (!outFile->isOpen())
+                        QImage testImage;
+                        const QByteArray &testArray = m_data_buffer.data();
+                        bool didLoad = testImage.loadFromData(testArray);
+                        if (!didLoad)
                         {
-                            VERBOSE(VB_IMPORTANT,
-                                QString("RingBuffer::RingBuffer(): Failed to open "
-                                        "remote file (%1) for write.  Does Screenshot "
-                                        "Storage Group Exist?").arg(m_dest_file));
-                            delete outFile;
-                            outFile = NULL;
+                            errorMsg = tr("Tried to write %1, but it appears to "
+                                          "be an HTML redirect (filesize %2).")
+                                    .arg(m_dest_file).arg(m_data_buffer.size());
                             m_error_state = ssesError;
                         }
                         else
                         {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
+                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                            if (!outFile->isOpen())
                             {
-                                errorMsg = tr("Tried to write %1, but it appears to "   
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
+                                VERBOSE(VB_IMPORTANT,
+                                    QString("RingBuffer::RingBuffer(): Failed to open "
+                                            "remote file (%1) for write.  Does Screenshot "
+                                            "Storage Group Exist?").arg(m_dest_file));
+                                delete outFile;
+                                outFile = NULL;
                                 m_error_state = ssesError;
                             }
                             else
@@ -376,6 +377,7 @@ namespace
                                 errorMsg = tr("Tried to write %1, but it appears to "
                                               "be an HTML redirect (filesize %2).")
                                         .arg(m_dest_file).arg(m_data_buffer.size());
+                                dest_file.remove();
                                 m_error_state = ssesError;
                             }
                             else
@@ -491,27 +493,27 @@ namespace
                 {
                     if (m_dest_file.startsWith("myth://"))
                     {
-                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                        if (!outFile->isOpen())
+                        QImage testImage;
+                        const QByteArray &testArray = m_data_buffer.data();
+                        bool didLoad = testImage.loadFromData(testArray);
+                        if (!didLoad)
                         {
-                            VERBOSE(VB_IMPORTANT,
-                                QString("RingBuffer::RingBuffer(): Failed to open "
-                                        "remote file (%1) for write.  Does Fanart "
-                                        "Storage Group Exist?").arg(m_dest_file));
-                            delete outFile; 
-                            outFile = NULL;
+                            errorMsg = tr("Tried to write %1, but it appears to "
+                                          "be an HTML redirect (filesize %2).")
+                                    .arg(m_dest_file).arg(m_data_buffer.size());
                             m_error_state = fesError;
                         }
                         else
                         {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
+                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                            if (!outFile->isOpen())
                             {
-                                errorMsg = tr("Tried to write %1, but it appears to "   
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
+                                VERBOSE(VB_IMPORTANT,
+                                    QString("RingBuffer::RingBuffer(): Failed to open "
+                                            "remote file (%1) for write.  Does Fanart "
+                                            "Storage Group Exist?").arg(m_dest_file));
+                                delete outFile; 
+                                outFile = NULL;
                                 m_error_state = fesError;
                             }
                             else
@@ -519,7 +521,7 @@ namespace
                                 off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
                                 if (written != m_data_buffer.size())
                                 {
-                                    errorMsg = tr("Error writing Fanart to file %1.")
+                                    errorMsg = tr("Error writing Banner to file %1.")
                                             .arg(m_dest_file);
                                     m_error_state = fesError;
                                 }
@@ -542,6 +544,7 @@ namespace
                                 errorMsg = tr("Tried to write %1, but it appears to "
                                               "be an HTML redirect (filesize %2).")
                                         .arg(m_dest_file).arg(m_data_buffer.size());
+                                dest_file.remove();
                                 m_error_state = fesError;
                             }
                             else
@@ -657,27 +660,27 @@ namespace
                 {
                     if (m_dest_file.startsWith("myth://"))
                     {
-                        RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                        if (!outFile->isOpen()) 
-                        { 
-                            VERBOSE(VB_IMPORTANT, 
-                                QString("RingBuffer::RingBuffer(): Failed to open " 
-                                        "remote file (%1) for write.  Does Banner "
-                                        "Storage Group Exist?").arg(m_dest_file)); 
-                            delete outFile; 
-                            outFile = NULL;
+                        QImage testImage;
+                        const QByteArray &testArray = m_data_buffer.data();
+                        bool didLoad = testImage.loadFromData(testArray);
+                        if (!didLoad)
+                        {
+                            errorMsg = tr("Tried to write %1, but it appears to "
+                                          "be an HTML redirect (filesize %2).")
+                                    .arg(m_dest_file).arg(m_data_buffer.size());
                             m_error_state = besError;
-                        } 
+                        }
                         else
                         {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
-                            {
-                                errorMsg = tr("Tried to write %1, but it appears to "   
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
+                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
+                            if (!outFile->isOpen()) 
+                            { 
+                                VERBOSE(VB_IMPORTANT, 
+                                    QString("RingBuffer::RingBuffer(): Failed to open " 
+                                            "remote file (%1) for write.  Does Banner "
+                                            "Storage Group Exist?").arg(m_dest_file)); 
+                                delete outFile; 
+                                outFile = NULL;
                                 m_error_state = besError;
                             }
                             else
@@ -708,6 +711,7 @@ namespace
                                 errorMsg = tr("Tried to write %1, but it appears to "
                                               "be an HTML redirect (filesize %2).")
                                         .arg(m_dest_file).arg(m_data_buffer.size());
+                                dest_file.remove();
                                 m_error_state = besError;
                             }
                             else
@@ -1526,7 +1530,7 @@ namespace
                 QStringList sfn;
                 if (season > 0)
                 {
-                    if (episode > 0)
+                    if (episode > 0 && isScreenshot)
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode)))
@@ -1537,8 +1541,11 @@ namespace
                                  .arg(*ext);
 
                 }
+                if (!isScreenshot)
+                {
                 sfn += fntm.arg(*dir).arg(base_name).arg(*ext);
                 sfn += fntm.arg(*dir).arg(video_uid).arg(*ext);
+                }
 
                 for (QStringList::const_iterator i = sfn.begin();
                         i != sfn.end(); ++i)
