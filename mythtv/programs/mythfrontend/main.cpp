@@ -17,6 +17,7 @@ using namespace std;
 #include <QTextCodec>
 #include <QWidget>
 #include <QApplication>
+#include <QTimer>
 
 #include "mythconfig.h"
 #include "tv.h"
@@ -64,6 +65,7 @@ using namespace std;
 #include "mythosdmenueditor.h"
 #include "audiopulseutil.h"
 #include "mythdb.h"
+#include "main.h"
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -1078,6 +1080,48 @@ void log_rotate_handler(int)
     log_rotate(0);
 }
 
+ConnectToBackend::ConnectToBackend()
+{
+    timer = new QTimer(qApp);
+
+    connect(timer, SIGNAL(timeout()),
+            this,  SLOT(  Connect()));
+
+    timer->start(1);
+}
+
+ConnectToBackend::~ConnectToBackend()
+{
+    if (timer)
+    {
+        timer->disconnect();
+        timer->stop();
+    }
+}
+
+void ConnectToBackend::Connect(void)
+{
+    if (timer)
+    {
+        timer->disconnect();
+        timer->stop();
+    }
+
+    bool blocking = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
+    if (gContext->ConnectToMasterServer(blocking) && !checkTimeZone())
+    {
+        // Check for different time zones, different offsets, different times
+        VERBOSE(VB_IMPORTANT, "The time and/or time zone settings on this "
+                "system do not match those in use on the master backend. "
+                "Please ensure all frontend and backend systems are "
+                "configured to use the same time zone and have the current "
+                "time properly set.");
+        VERBOSE(VB_IMPORTANT, "Unable to run with invalid time settings. "
+                              "Exiting.");
+        qApp->exit(FRONTEND_EXIT_INVALID_TIMEZONE);
+    }
+}
+
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
@@ -1401,24 +1445,6 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_DB_OUTOFDATE;
     }
 
-    // this direct connect is only necessary, if the user wants to use the
-    // auto shutdown/wakeup feature
-    if (gContext->GetNumSetting("idleTimeoutSecs",0) > 0)
-        gContext->ConnectToMasterServer(true);
-
-    if (!checkTimeZone())
-    {
-        // Check for different time zones, different offsets, different times
-        VERBOSE(VB_IMPORTANT, "The time and/or time zone settings on this "
-                "system do not match those in use on the master backend. "
-                "Please ensure all frontend and backend systems are "
-                "configured to use the same time zone and have the current "
-                "time properly set.");
-        VERBOSE(VB_IMPORTANT, "Unable to run with invalid time settings. "
-                              "Exiting.");
-        return FRONTEND_EXIT_INVALID_TIMEZONE;
-    }
-
     InitJumpPoints();
 
     internal_media_init();
@@ -1488,7 +1514,9 @@ int main(int argc, char **argv)
     // Setup handler for USR2 signals to restart LIRC
     signal(SIGUSR2, &signal_USR2_handler);
 
-    qApp->exec();
+    ConnectToBackend ctb;
+
+    int ret = qApp->exec();
 
     pmanager->DestroyAllPlugins();
 
@@ -1510,7 +1538,7 @@ int main(int argc, char **argv)
     if (GENERIC_EXIT_OK != pa_ret)
         return pa_ret;
 
-    return FRONTEND_EXIT_OK;
+    return ret;
 
 }
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

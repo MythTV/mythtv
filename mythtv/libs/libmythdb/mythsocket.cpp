@@ -30,6 +30,8 @@
 #define LOC SLOC(this)
 
 const uint MythSocket::kSocketBufferSize = 128000;
+const uint MythSocket::kShortTimeout = 7000;
+const uint MythSocket::kLongTimeout  = 30000;
 
 MythSocketThread MythSocket::m_readyread_thread;
 
@@ -454,7 +456,7 @@ bool MythSocket::writeData(const char *data, quint64 len)
     return true;
 }
 
-bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
+bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
 {
     list.clear();
 
@@ -472,21 +474,10 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
     while (waitForMore(5) < 8)
     {
         elapsed = timer.elapsed();
-        if (!quickTimeout && elapsed >= 30000)
+        if (elapsed >= (int)timeoutMS)
         {
-            VERBOSE(VB_GENERAL, LOC + "readStringList: Error, timeout.");
-            close();
-            if (m_cb)
-            {
-                VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
-                m_cb->connectionClosed(this);
-            }
-            return false;
-        }
-        else if (quickTimeout && elapsed >= 7000)
-        {
-            VERBOSE(VB_GENERAL, LOC +
-                    "readStringList: Error, timeout (quick).");
+            VERBOSE(VB_IMPORTANT, LOC + "readStringList: " +
+                    QString("Error, timed out after %1 ms.").arg(timeoutMS));
             close();
             if (m_cb)
             {

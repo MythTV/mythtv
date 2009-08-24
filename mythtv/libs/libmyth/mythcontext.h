@@ -67,6 +67,26 @@ class MPUBLIC MythPrivRequest
     void *m_data;
 };
 
+class MythContextPrivate;
+class MythContextSlotHandler : public QObject
+{
+    Q_OBJECT
+
+  public:
+    MythContextSlotHandler(MythContextPrivate *x) : d(x) { }
+
+  private slots:
+    void ConnectFailurePopupClosed(void);
+    void ConnectFailurePopupDone(int);
+    void VersionMismatchPopupClosed(void);
+    void VersionMismatchPopupDone(int);
+
+  private:
+    ~MythContextSlotHandler() {}
+
+    MythContextPrivate *d;
+};
+
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.
  *
@@ -77,10 +97,8 @@ class MPUBLIC MythPrivRequest
  *   It also contains support for database error printing, and
  *   database message logging.
  */
-class MPUBLIC MythContext : public QObject, public MythObservable,
-    public MythSocketCBs
+class MPUBLIC MythContext : public MythObservable, public MythSocketCBs
 {
-    Q_OBJECT
   public:
     MythContext(const QString &binversion);
     virtual ~MythContext();
@@ -100,10 +118,14 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void OverrideSettingForSession(const QString &key, const QString &newValue);
 
     bool ConnectToMasterServer(bool blockingClient = true);
-    MythSocket *ConnectServer(MythSocket *eventSocket,
-                              const QString &hostname,
-                              int port,
-                              bool blockingClient = false);
+
+    MythSocket *ConnectCommandSocket(
+        const QString &hostname, int  port, const QString &announcement,
+        bool *proto_mismatch = NULL, bool gui = true,
+        int maxConnTry = -1, int setup_timeout = -1);
+
+    MythSocket *ConnectEventSocket(const QString &hostname, int port);
+
     bool IsConnectedToMaster(void);
     void SetBackend(bool backend);
 
@@ -174,7 +196,10 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void SetPluginManager(MythPluginManager *pmanager);
     MythPluginManager *getPluginManager(void);
 
-    bool CheckProtoVersion(MythSocket* socket);
+    static bool CheckProtoVersion(
+        MythSocket *socket,
+        uint timeout_ms = MythSocket::kLongTimeout,
+        MythContextPrivate *error_dialog_desired = NULL);
 
     void addPrivRequest(MythPrivRequest::Type t, void *data);
     void waitPrivRequest() const;
@@ -185,9 +210,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     void sendPlaybackStart(void);
     void sendPlaybackEnd(void);
-
-  private slots:
-    void popupClosed(void);
 
   private:
     void connected(MythSocket *sock);

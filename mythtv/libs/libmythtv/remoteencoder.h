@@ -69,8 +69,6 @@ class MPUBLIC RemoteEncoder
                                 return v; }
  
   private:
-    MythSocket *ConnectCommandSocket(
-        const QString &host, int port, const QString &ann);
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);
 
     int recordernum;

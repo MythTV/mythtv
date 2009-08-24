@@ -40,7 +40,7 @@ bool RemoteEncoder::Setup(void)
         QString ann = QString("ANN Playback %1 %2")
             .arg(gContext->GetHostName()).arg(false);
 
-        controlSock = ConnectCommandSocket(
+        controlSock = gContext->ConnectCommandSocket(
             remotehost, remoteport, ann);
 
         if (controlSock)
@@ -98,7 +98,7 @@ bool RemoteEncoder::SendReceiveStringList(
     }
 
     if (!backendError &&
-        !controlSock->readStringList(strlist, true))
+        !controlSock->readStringList(strlist, MythSocket::kShortTimeout))
     {
         VERBOSE(VB_IMPORTANT,
                 "RemoteEncoder::SendReceiveStringList(): No response.");
@@ -121,42 +121,6 @@ bool RemoteEncoder::SendReceiveStringList(
     }
 
     return true;
-}
-
-MythSocket *RemoteEncoder::ConnectCommandSocket(
-    const QString &host, int port, const QString &ann)
-{
-    MythSocket *sock = new MythSocket();
-    if (!sock->connect(host, port))
-    {
-        VERBOSE(VB_IMPORTANT,
-                "RemoteEncoder::openControlSocket(): Connection timed out.");
-        sock->DownRef();
-        sock = NULL;
-    }
-    else
-    {
-        if (gContext->CheckProtoVersion(sock))
-        {
-            QStringList strlist(ann);
-            if (!sock->writeStringList(strlist) ||
-                !sock->readStringList(strlist, true))
-            {
-                VERBOSE(VB_IMPORTANT,
-                        "RemoteEncoder::ConnectCommandSocket(): "
-                        "Failed to announce ourselves to server");
-                sock->DownRef();
-                sock = NULL;
-            }
-        }
-        else
-        {
-            sock->DownRef();
-            sock = NULL;
-        }
-    }    
-    
-    return sock;
 }
 
 bool RemoteEncoder::IsRecording(bool *ok)

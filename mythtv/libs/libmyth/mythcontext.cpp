@@ -9,8 +9,10 @@
 #include <QDebug>
 
 #include <cmath>
+
 #include <queue>
-#include <cassert>
+#include <algorithm>
+using namespace std;
 
 #include "config.h"
 #include "mythcontext.h"
@@ -95,6 +97,11 @@ class MythContextPrivate
     bool    DefaultUPnP(QString &error);
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
 
+    bool WaitForWOL(int timeout_ms = INT_MAX);
+    void ShowConnectionFailurePopup(bool blockingClient);
+    void HideConnectionFailurePopup(void);
+    void ShowVersionMismatchPopup(uint remoteVersion);
+    void HideVersionMismatchPopup(void);
 
     MythContext *parent;
 
@@ -112,7 +119,10 @@ class MythContextPrivate
     HttpServer       *m_HTTP;
 
     QMutex serverSockLock;
-    bool attemptingToConnect;
+
+    QMutex         WOLInProgressLock;
+    QWaitCondition WOLInProgressWaitCondition;
+    bool           WOLInProgress;
 
     MythMainWindow *mainWindow;
 
@@ -121,7 +131,14 @@ class MythContextPrivate
 
     bool disablelibrarypopup;
 
-    MythConfirmationDialog  *MBEconnectPopup;
+    QMutex MBEconnectPopupLock;
+    MythPopupBox *oldMBEconnectPopup;
+    MythConfirmationDialog *MBEconnectPopup;
+
+    QMutex MBEversionPopupLock;
+    MythPopupBox *oldMBEversionPopup;
+    MythConfirmationDialog *MBEversionPopup;
+
     MythPluginManager *pluginmanager;
 
     int m_logenable, m_logmaxcount, m_logprintlevel;
@@ -134,6 +151,7 @@ class MythContextPrivate
 
     MythDB *m_database;
     MythUIHelper *m_ui;
+    MythContextSlotHandler *m_sh;
 };
 
 static void exec_program_cb(const QString &cmd)
@@ -228,14 +246,18 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_localhostname(QString::null),
       m_UPnP(NULL), m_XML(NULL), m_HTTP(NULL),
       serverSockLock(QMutex::NonRecursive),
-      attemptingToConnect(false),
+      WOLInProgress(false),
       mainWindow(NULL),
       serverSock(NULL), eventSock(NULL),
       disablelibrarypopup(false),
+      oldMBEconnectPopup(NULL),
       MBEconnectPopup(NULL),
+      oldMBEversionPopup(NULL),
+      MBEversionPopup(NULL),
       pluginmanager(NULL),
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
-      m_database(GetMythDB()), m_ui(NULL)
+      m_database(GetMythDB()), m_ui(NULL),
+      m_sh(new MythContextSlotHandler(this))
 {
     InitializeMythDirs();
 }
@@ -251,6 +273,8 @@ MythContextPrivate::~MythContextPrivate()
         DestroyMythDB();
     if (m_ui)
         DestroyMythUI();
+    if (m_sh)
+        m_sh->deleteLater();
 }
 
 /**
@@ -1224,9 +1248,174 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
     return true;
 }
 
+/// If another thread has already started WOL process, wait on them...
+///
+/// Note: Caller must be holding WOLInProgressLock.
+bool MythContextPrivate::WaitForWOL(int timeout_in_ms)
+{
+    int timeout_remaining = timeout_in_ms;
+    while (WOLInProgress && (timeout_remaining > 0))
+    {
+        VERBOSE(VB_GENERAL, LOC + "Wake-On-Lan in progress, waiting...");
+
+        int max_wait = min(1000, timeout_remaining);
+        WOLInProgressWaitCondition.wait(
+            &WOLInProgressLock, max_wait);
+        timeout_remaining -= max_wait;
+    }
+
+    return !WOLInProgress;
+}
+
+void MythContextPrivate::ShowConnectionFailurePopup(bool blockingClient)
+{
+    QMutexLocker locker(&MBEconnectPopupLock);
+    if (MBEconnectPopup || oldMBEconnectPopup)
+        return;
+
+    bool manageLock = false;
+    if (!blockingClient)
+    {
+        if (!serverSockLock.tryLock())
+            manageLock = true;
+        serverSockLock.unlock();
+    }
+
+    QString message =
+        QObject::tr(
+            "Could not connect to the master backend server -- is "
+            "it running?  Is the IP address set for it in the "
+            "setup program correct?");
+
+    if (mainWindow && mainWindow->currentWidget())
+    {
+        // HACK. TODO: Remove when all old-style widgets are gone
+        MythPopupBox *popup =
+            new MythPopupBox(mainWindow, "connection failure");
+        oldMBEconnectPopup = popup;
+
+        popup->addLabel(message, MythPopupBox::Medium, true);
+        popup->addLabel("");
+        popup->addButton(MythPopupBox::tr("Ok"))->setFocus();
+        popup->ShowPopup(m_sh, SLOT(ConnectFailurePopupDone(int)));
+    }
+    else if (!MBEconnectPopup)
+    {
+        MBEconnectPopup = ShowOkPopup(
+            message, m_sh, SLOT(ConnectFailurePopupClosed()));
+    }
+
+    if (manageLock)
+        serverSockLock.lock();
+}
+
+void MythContextPrivate::HideConnectionFailurePopup(void)
+{
+    QMutexLocker locker(&MBEconnectPopupLock);
+
+    if (MBEconnectPopup)
+    {
+        MBEconnectPopup->Close();
+        MBEconnectPopup = NULL;
+    }
+
+    if (oldMBEconnectPopup)
+    {
+        oldMBEconnectPopup->hide();
+        oldMBEconnectPopup->deleteLater();
+        oldMBEconnectPopup = NULL;
+    }
+}
+
+void MythContextSlotHandler::ConnectFailurePopupClosed(void)
+{
+    QMutexLocker locker(&d->MBEconnectPopupLock);
+
+    d->MBEconnectPopup = NULL;
+}
+
+void MythContextSlotHandler::ConnectFailurePopupDone(int)
+{
+    QMutexLocker locker(&d->MBEconnectPopupLock);
+
+    d->oldMBEconnectPopup->hide();
+    d->oldMBEconnectPopup->deleteLater();
+    d->oldMBEconnectPopup = NULL;
+}
+
+void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
+{
+    QMutexLocker locker(&MBEversionPopupLock);
+    if (MBEversionPopup || oldMBEversionPopup)
+        return;
+
+    QString message =
+        QObject::tr(
+            "The server uses network protocol version %1, "
+            "but this client only understands version %2.  "
+            "Make sure you are running compatible versions of "
+            "the backend and frontend.")
+        .arg(remote_version).arg(MYTH_PROTO_VERSION);
+
+    if (mainWindow && mainWindow->currentWidget())
+    {
+        // HACK. TODO: Remove when all old-style widgets are gone
+        MythPopupBox *popup =
+            new MythPopupBox(mainWindow, "connection failure");
+        oldMBEversionPopup = popup;
+
+        popup->addLabel(message, MythPopupBox::Medium, true);
+        popup->addLabel("");
+        popup->addButton(MythPopupBox::tr("Ok"))->setFocus();
+        popup->ShowPopup(m_sh, SLOT(VersionMismatchPopupDone(int)));
+    }
+    else if (!MBEversionPopup)
+    {
+        MBEversionPopup = ShowOkPopup(
+            message, m_sh, SLOT(VersionMismatchPopupClosed()));
+    }
+}
+
+void MythContextPrivate::HideVersionMismatchPopup(void)
+{
+    QMutexLocker locker(&MBEversionPopupLock);
+
+    if (MBEversionPopup)
+    {
+        MBEversionPopup->Close();
+        MBEversionPopup = NULL;
+    }
+
+    if (oldMBEversionPopup)
+    {
+        oldMBEversionPopup->hide();
+        oldMBEversionPopup->deleteLater();
+        oldMBEversionPopup = NULL;
+    }
+}
+
+void MythContextSlotHandler::VersionMismatchPopupClosed(void)
+{
+    QMutexLocker locker(&d->MBEversionPopupLock);
+
+    d->MBEversionPopup = NULL;
+
+    qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
+}
+
+void MythContextSlotHandler::VersionMismatchPopupDone(int)
+{
+    QMutexLocker locker(&d->MBEversionPopupLock);
+
+    d->oldMBEversionPopup->hide();
+    d->oldMBEversionPopup->deleteLater();
+    d->oldMBEversionPopup = NULL;
+
+    qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
+}
 
 MythContext::MythContext(const QString &binversion)
-    : QObject(), d(NULL), app_binary_version(binversion)
+    : d(NULL), app_binary_version(binversion)
 {
 #ifdef USING_MINGW
     static bool WSAStarted = false;
@@ -1238,7 +1427,6 @@ MythContext::MythContext(const QString &binversion)
 #endif
 
     d = new MythContextPrivate(this);
-    assert(d);
 }
 
 bool MythContext::Init(const bool gui, UPnp *UPnPclient,
@@ -1246,6 +1434,12 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
                        const bool disableAutoDiscovery,
                        const bool ignoreDB)
 {
+    if (!d)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Init() Out-of-memory");
+        return false;
+    }
+
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
         VERBOSE(VB_GENERAL, QString("Application binary version (%1) does not "
@@ -1253,9 +1447,10 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
                                     .arg(app_binary_version)
                                     .arg(MYTH_BINARY_VERSION));
 
-        QString warning = tr("This application is not compatible "
-                             "with the installed MythTV libraries. "
-                             "Please recompile after a make distclean");
+        QString warning = QObject::tr(
+            "This application is not compatible "
+            "with the installed MythTV libraries. "
+            "Please recompile after a make distclean");
         if (gui)
         {
             d->TempMainWindow(false);
@@ -1324,174 +1519,233 @@ bool MythContext::ConnectToMasterServer(bool blockingClient)
         return false;
     }
 
-    QString server = gContext->GetSetting("MasterServerIP", "localhost");
-    int port = gContext->GetNumSetting("MasterServerPort", 6543);
-
-    if (!d->eventSock)
-        d->eventSock = new MythSocket();
+    QString server = GetSetting("MasterServerIP", "localhost");
+    int     port   = GetNumSetting("MasterServerPort", 6543);
+    bool    proto_mismatch = false;
 
     if (!d->serverSock)
-        d->serverSock = ConnectServer(d->eventSock, server,
-                                      port, blockingClient);
+    {
+        QString ann = QString("ANN %1 %2 %3")
+            .arg(blockingClient ? "Playback" : "Monitor")
+            .arg(d->m_localhostname).arg(false);
+        d->serverSock = ConnectCommandSocket(
+            server, port, ann, &proto_mismatch);
+    }
 
-    if (d->serverSock)
-        d->eventSock->setCallbacks(this);
+    if (!d->serverSock)
+        return false;
 
-    return (bool) (d->serverSock);
+    d->eventSock = ConnectEventSocket(server, port);
+    if (!d->eventSock)
+    {
+        d->serverSock->DownRef();
+        d->serverSock = NULL;
+
+        // inform the gui user of any event socket failure
+        if (d->m_ui && d->m_ui->IsScreenSetup() && d->mainWindow)
+            d->ShowConnectionFailurePopup(blockingClient);
+        return false;
+    }
+
+    return true;
 }
 
-MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
-                                       const QString &hostname,
-                                       int port,
-                                       bool blockingClient)
+bool do_command_socket_setup(
+    MythSocket *serverSock, const QString &announcement, uint timeout_in_ms,
+    bool &proto_mismatch, MythContextPrivate *d)
 {
-    MythSocket *serverSock = NULL;
-    int cnt = 1;
-
-    int sleepTime = GetNumSetting("WOLbackendReconnectWaitTime", 0);
-    int maxConnTry = GetNumSetting("WOLbackendConnectRetry", 1);
-
-    do
-    {
-        VERBOSE(VB_GENERAL, QString("Connecting to backend server: "
-                                    "%1:%2 (try %3 of %4)")
-                                    .arg(hostname).arg(port).arg(cnt)
-                                    .arg(maxConnTry));
-
-        serverSock = new MythSocket();
-
-        if (!serverSock->connect(hostname, port))
-        {
-            serverSock->DownRef();
-            serverSock = NULL;
-
-            if (d->attemptingToConnect)
-                break;
-            d->attemptingToConnect = true;
-
-            // only inform the user of a failure if WOL is disabled
-            if (sleepTime <= 0)
-            {
-                VERBOSE(
-                    VB_IMPORTANT, "Connection timed out.          \n\t\t\t"
-                    "You probably should modify the Master Server \n\t\t\t"
-                    "settings in the setup program and set the    \n\t\t\t"
-                    "proper IP address.");
-                if (d->m_ui && d->m_ui->IsScreenSetup() && d->mainWindow)
-                {
-                    bool manageLock = false;
-                    if (!blockingClient)
-                    {
-                        if (!d->serverSockLock.tryLock())
-                            manageLock = true;
-                        d->serverSockLock.unlock();
-                    }
-                    // HACK. TODO: Remove when all old-style widgets are gone
-                    if (d->mainWindow->currentWidget())
-                        MythPopupBox::showOkPopup(d->mainWindow,
-                                                  "connection failure",
-                                                 tr("Could not connect to the "
-                                                    "master backend server -- is "
-                                                    "it running?  Is the IP "
-                                                    "address set for it in the "
-                                                    "setup program correct?"));
-                    else
-                    {
-                        if (!d->MBEconnectPopup)
-                            d->MBEconnectPopup = ShowOkPopup(
-                                        tr("Could not connect to the master"
-                                           " backend server -- is it running? "
-                                           "Is the IP address set for it in the "
-                                           "setup program correct?"),
-                                            this, SLOT(popupClosed()));
-                    }
-                    if (manageLock)
-                        d->serverSockLock.lock();
-                }
-
-                d->attemptingToConnect = false;
-                return false;
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, "Trying to wake up the MasterBackend "
-                                    "now.");
-                QString wol_cmd = GetSetting("WOLbackendCommand",
-                                             "echo \'would run the "
-                                             "WakeServerCommand now, if "
-                                             "set!\'");
-                myth_system(wol_cmd);
-
-                VERBOSE(VB_GENERAL, QString("Waiting for %1 seconds until I "
-                                            "try to reconnect again.")
-                                            .arg(sleepTime));
-                sleep(sleepTime);
-                ++cnt;
-            }
-            d->attemptingToConnect = false;
-        }
-        else
-            break;
-    }
-    while (cnt <= maxConnTry);
+    proto_mismatch = false;
 
 #ifndef IGNORE_PROTO_VER_MISMATCH
-    if (serverSock && !CheckProtoVersion(serverSock))
+    if (!MythContext::CheckProtoVersion(serverSock, timeout_in_ms, d))
     {
-        serverSock->DownRef();
-        serverSock = NULL;
+        proto_mismatch = true;
         return false;
     }
 #endif
 
-    if (serverSock)
+    QStringList strlist(announcement);
+
+    if (!serverSock->writeStringList(strlist))
     {
-        // called with the lock
-        QString str = QString("ANN %1 %2 %3")
-            .arg(blockingClient ? "Playback" : "Monitor")
-            .arg(d->m_localhostname).arg(false);
-        QStringList strlist(str);
-        serverSock->writeStringList(strlist);
-        if (!serverSock->readStringList(strlist, true) || strlist.empty() ||
-            (strlist[0] == "ERROR"))
-        {
-            if (strlist[0] == "ERROR")
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
-                        "server socket to master backend");
-            else
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
-                        "server socket to master backend");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Connecting server socket to "
+                "master backend, socket write failed");
+        return false;
+    }
 
-            serverSock->DownRef();
-            serverSock = NULL;
-            return NULL;
+    if (!serverSock->readStringList(strlist, true) || strlist.empty() ||
+        (strlist[0] == "ERROR"))
+    {
+        if (strlist[0] == "ERROR")
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
+                    "server socket to master backend");
+        else
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
+                    "server socket to master backend");
+        return false;
+    }
+
+    return true;
+}
+
+MythSocket *MythContext::ConnectCommandSocket(
+    const QString &hostname, int port, const QString &announce,
+    bool *p_proto_mismatch, bool gui, int maxConnTry, int setup_timeout)
+{
+    MythSocket *serverSock = NULL;
+
+    {
+        QMutexLocker locker(&d->WOLInProgressLock);
+        d->WaitForWOL();
+    }
+
+    QString WOLcmd = GetSetting("WOLbackendCommand", "");
+
+    if (maxConnTry < 1)
+        maxConnTry = max(GetNumSetting("BackendConnectRetry", 1), 1);
+
+    int WOLsleepTime = 0, WOLmaxConnTry = 0;
+    if (!WOLcmd.isEmpty())
+    {
+        WOLsleepTime  = GetNumSetting("WOLbackendReconnectWaitTime", 0);
+        WOLmaxConnTry = max(GetNumSetting("WOLbackendConnectRetry", 1), 1);
+        maxConnTry    = max(maxConnTry, WOLmaxConnTry);
+    }
+
+    bool we_attempted_wol = false;
+
+    if (setup_timeout <= 0)
+        setup_timeout = MythSocket::kShortTimeout;
+
+    bool proto_mismatch = false;
+    for (int cnt = 1; cnt <= maxConnTry; cnt++)
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                QString("Connecting to backend server: %1:%2 (try %3 of %4)")
+                .arg(hostname).arg(port).arg(cnt).arg(maxConnTry));
+
+        serverSock = new MythSocket();
+
+        int sleepms = 0;
+        if (serverSock->connect(hostname, port))
+        {
+            if (do_command_socket_setup(
+                    serverSock, announce, setup_timeout, proto_mismatch, d))
+            {
+                break;
+            }
+
+            if (proto_mismatch)
+            {
+                if (p_proto_mismatch)
+                    *p_proto_mismatch = true;
+
+                serverSock->DownRef();
+                serverSock = NULL;
+                break;
+            }
+
+            setup_timeout *= 1.5f;
+        }
+        else if (!WOLcmd.isEmpty() && (cnt < maxConnTry))
+        {
+            {
+                QMutexLocker locker(&d->WOLInProgressLock);
+                if (d->WOLInProgress)
+                {
+                    d->WaitForWOL();
+                    continue;
+                }
+
+                d->WOLInProgress = we_attempted_wol = true;
+            }
+
+            myth_system(WOLcmd);
+            sleepms = WOLsleepTime * 1000000;
         }
 
-        if (eventSock && eventSock->state() == MythSocket::Idle)
+        serverSock->DownRef();
+        serverSock = NULL;
+
+        if (!serverSock && (cnt == 1) && gui)
         {
-            // Assume that since we _just_ connected the one socket, this one
-            // will work, too.
-            eventSock->connect(hostname, port);
-
-            eventSock->Lock();
-
-            QString str = QString("ANN Monitor %1 %2")
-                                 .arg(d->m_localhostname).arg(true);
-            QStringList strlist(str);
-            eventSock->writeStringList(strlist);
-            eventSock->readStringList(strlist);
-
-            eventSock->Unlock();
+            bool blockingClient = announce.contains("Playback");
+            d->ShowConnectionFailurePopup(blockingClient);
         }
 
-        if (d->MBEconnectPopup)
-        {
-            d->MBEconnectPopup->Close();
-            d->MBEconnectPopup = NULL;
-        }
+        if (sleepms)
+            usleep(sleepms / 1000);
+    }
+
+    if (we_attempted_wol)
+    {
+        QMutexLocker locker(&d->WOLInProgressLock);
+        d->WOLInProgress = false;
+        d->WOLInProgressWaitCondition.wakeAll();
+    }
+
+    if (!serverSock && !proto_mismatch)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Connection to master server timed out.\n\t\t\t"
+                "Either the server is down or the master server settings"
+                "\n\t\t\t"
+                "in mythtv-settings does not contain the proper IP address\n");
+    }
+    else
+    {
+        d->HideConnectionFailurePopup();
     }
 
     return serverSock;
+}
+
+MythSocket *MythContext::ConnectEventSocket(const QString &hostname, int port)
+{
+    MythSocket *eventSock = new MythSocket();
+
+    while (eventSock->state() != MythSocket::Idle)
+    {
+        usleep(5000);
+    }
+
+    // Assume that since we _just_ connected the command socket,
+    // this one won't need multiple retries to work...
+    if (!eventSock->connect(hostname, port))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect event "
+                "socket to master backend");
+        eventSock->DownRef();
+        eventSock = NULL;
+        return NULL;
+    }
+
+    eventSock->Lock();
+
+    QString str = QString("ANN Monitor %1 %2")
+        .arg(d->m_localhostname).arg(true);
+    QStringList strlist(str);
+    eventSock->writeStringList(strlist);
+    if (!eventSock->readStringList(strlist) || strlist.empty() ||
+        (strlist[0] == "ERROR"))
+    {
+        if (strlist[0] == "ERROR")
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
+                    "event socket to master backend");
+        else
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Timeout connecting "
+                    "event socket to master backend");
+
+        eventSock->DownRef();
+        eventSock->Unlock();
+        eventSock = NULL;
+        return NULL;
+    }
+
+    eventSock->Unlock();
+    eventSock->setCallbacks(this);
+
+    return eventSock;
 }
 
 bool MythContext::IsConnectedToMaster(void)
@@ -1814,15 +2068,17 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                 // HACK. TODO: Remove when all old-style widgets are gone
                 if (d->mainWindow->currentWidget())
                     MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
-                             tr("The connection to the master backend "
-                                "server has gone away for some reason.. "
-                                "Is it running?"));
+                             QObject::tr(
+                                 "The connection to the master backend "
+                                 "server has gone away for some reason.. "
+                                 "Is it running?"));
                 else
                     if (!d->MBEconnectPopup)
                         d->MBEconnectPopup = ShowOkPopup(
-                            tr("The connection to the master backend "
-                               "server has gone away for some reason.. "
-                               "Is it running?"));
+                            QObject::tr(
+                                "The connection to the master backend "
+                                "server has gone away for some reason.. "
+                                "Is it running?"));
             }
 
             if (!block)
@@ -1875,37 +2131,32 @@ void MythContext::readyRead(MythSocket *sock)
     }
 }
 
-bool MythContext::CheckProtoVersion(MythSocket* socket)
+bool MythContext::CheckProtoVersion(
+    MythSocket *socket, uint timeout_ms, MythContextPrivate *d)
 {
+    if (!socket)
+        return false;
+
     QStringList strlist(QString("MYTH_PROTO_VERSION %1")
                         .arg(MYTH_PROTO_VERSION));
     socket->writeStringList(strlist);
-    socket->readStringList(strlist, true);
 
-    if (strlist.empty())
+    if (!socket->readStringList(strlist, timeout_ms) || strlist.empty())
     {
         VERBOSE(VB_IMPORTANT, "Protocol version check failure. The response "
                 "to MYTH_PROTO_VERSION was empty.");
 
         return false;
     }
-    else if (strlist[0] == "REJECT")
+    else if (strlist[0] == "REJECT" && strlist.size() >= 2)
     {
         VERBOSE(VB_GENERAL, QString("Protocol version mismatch (frontend=%1,"
                                     "backend=%2)\n")
                                     .arg(MYTH_PROTO_VERSION).arg(strlist[1]));
 
-        if (d->mainWindow && d->m_ui && d->m_ui->IsScreenSetup())
-        {
-            MythPopupBox::showOkPopup(
-                d->mainWindow,
-                "Connection failure",
-                tr("The server uses network protocol version %1, "
-                   "but this client only understands version %2.  "
-                   "Make sure you are running compatible versions of "
-                   "the backend and frontend.")
-                .arg(strlist[1]).arg(MYTH_PROTO_VERSION));
-        }
+        if (d && d->mainWindow && d->m_ui && d->m_ui->IsScreenSetup())
+            d->ShowVersionMismatchPopup(strlist[1].toUInt());
+
         return false;
     }
     else if (strlist[0] == "ACCEPT")
@@ -1982,9 +2233,10 @@ bool MythContext::TestPopupVersion(const QString &name,
     if (libversion == pluginversion)
         return true;
 
-    QString err = tr("Plugin %1 is not compatible with the installed MythTV "
-                     "libraries. Please recompile the plugin after a make "
-                     "distclean");
+    QString err = QObject::tr(
+        "Plugin %1 is not compatible with the installed MythTV "
+        "libraries. Please recompile the plugin after a make "
+        "distclean");
 
     VERBOSE(VB_GENERAL, QString("Plugin %1 (%2) binary version does not "
                                 "match libraries (%3)")
@@ -2199,12 +2451,6 @@ void MythContext::sendPlaybackEnd(void)
 {
     MythEvent me(QString("PLAYBACK_END %1").arg(GetHostName()));
     dispatchNow(me);
-}
-
-void MythContext::popupClosed(void)
-{
-    if (d)
-        d->MBEconnectPopup = NULL;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -90,7 +90,12 @@ class MPUBLIC MythSocket : public MSocketDevice
     qint64 readBlock(char *data, quint64 len);
     qint64 writeBlock(const char *data, quint64 len);
 
-    bool readStringList(QStringList &list, bool quickTimeout = false);
+    bool readStringList(QStringList &list, uint timeoutMS = kLongTimeout);
+    bool readStringList(QStringList &list, bool quickTimeout)
+    {
+        return readStringList(
+            list, quickTimeout ? kShortTimeout : kLongTimeout);
+    }
     bool writeStringList(QStringList &list);
     bool readData(char *data, quint64 len);
     bool writeData(const char *data, quint64 len);
@@ -100,6 +105,9 @@ class MPUBLIC MythSocket : public MSocketDevice
 
     void Lock();
     void Unlock();
+
+    static const uint kShortTimeout;
+    static const uint kLongTimeout;
 
   protected:
    ~MythSocket();  // force refcounting

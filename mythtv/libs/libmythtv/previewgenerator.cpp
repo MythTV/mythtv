@@ -297,9 +297,11 @@ void *PreviewGenerator::PreviewRun(void *param)
 bool PreviewGenerator::RemotePreviewSetup(void)
 {
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
-    int port       = gContext->GetNumSetting("MasterServerPort", 6543);
+    int     port   = gContext->GetNumSetting("MasterServerPort", 6543);
+    QString ann    = QString("ANN Monitor %2 %3")
+        .arg(gContext->GetHostName()).arg(false);
 
-    serverSock = gContext->ConnectServer(NULL, server, port);
+    serverSock = gContext->ConnectCommandSocket(server, port, ann);
     return serverSock;
 }
 

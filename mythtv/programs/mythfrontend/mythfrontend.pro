@@ -19,7 +19,7 @@ INSTALLS += setting
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += playbackbox.h viewscheduled.h globalsettings.h
+HEADERS += main.h playbackbox.h viewscheduled.h globalsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
 HEADERS += statusbox.h networkcontrol.h custompriority.h
 HEADERS += mediarenderer.h mythfexml.h playbackboxlistitem.h
