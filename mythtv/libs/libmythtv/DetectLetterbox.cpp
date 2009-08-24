@@ -8,7 +8,6 @@
 #include "DetectLetterbox.h"
 #include "NuppelVideoPlayer.h"
 #include "videoouttypes.h"
-#include "videoout_xv.h"
 
 DetectLetterbox::DetectLetterbox(NuppelVideoPlayer* const nvp)
 {
