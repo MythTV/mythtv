@@ -707,10 +707,10 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
         }
 
         audio_device->Close();
+        audio_buffer_size = blocksize;
     }
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
-    audio_buffer_size = blocksize;
     VERBOSE(VB_AUDIO, LOC + QString("Audio device %1 buffer size: %1 bytes")
                                     .arg(audio_buffer_size));
 
