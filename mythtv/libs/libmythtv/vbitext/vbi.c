@@ -481,7 +481,7 @@ vbi_add_handler(struct vbi *vbi, void *handler, void *data)
        return -1;
     cl->handler = handler;
     cl->data = data;
-    dl_insert_last(vbi->clients, cl->node);
+    dl_insert_last(vbi->clients, cl);
     return 0;
 }
 
