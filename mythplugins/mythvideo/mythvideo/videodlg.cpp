@@ -521,7 +521,7 @@ namespace
                                 off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
                                 if (written != m_data_buffer.size())
                                 {
-                                    errorMsg = tr("Error writing Banner to file %1.")
+                                    errorMsg = tr("Error writing Fanart to file %1.")
                                             .arg(m_dest_file);
                                     m_error_state = fesError;
                                 }
