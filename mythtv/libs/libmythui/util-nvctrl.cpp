@@ -236,6 +236,11 @@ int GetNvidiaRates(t_screenrate& screenmap)
             start = &str[j+1];
         }
     }
+    // Free Memory
+    for (j=0; j < nDisplayDevice; j++)
+    {
+        free(pModeLines[j]);
+    }
 
     delete d;
     return 1;
