@@ -1011,12 +1011,31 @@ void MPEG2fixup::WriteYUV(const char *filename, const mpeg2_info_t *info)
         return;
     }
 
-    write(fh, info->display_fbuf->buf[0],
-          info->sequence->width * info->sequence->height);
-    write(fh, info->display_fbuf->buf[1],
-          info->sequence->chroma_width * info->sequence->chroma_height);
-    write(fh, info->display_fbuf->buf[2],
-          info->sequence->chroma_width * info->sequence->chroma_height);
+    int ret = write(fh, info->display_fbuf->buf[0],
+                    info->sequence->width * info->sequence->height);
+    if (ret < 0)
+    {
+        VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
+                .arg(strerror(ret)));
+        goto closefd;
+    }
+    ret = write(fh, info->display_fbuf->buf[1],
+                info->sequence->chroma_width * info->sequence->chroma_height);
+    if (ret < 0)
+    {
+        VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
+                .arg(strerror(ret)));
+        goto closefd;
+    }
+    ret = write(fh, info->display_fbuf->buf[2],
+                info->sequence->chroma_width * info->sequence->chroma_height);
+    if (ret < 0)
+    {
+        VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
+                .arg(strerror(ret)));
+        goto closefd;
+    }
+closefd:
     close(fh);
 }
 
@@ -1028,7 +1047,10 @@ void MPEG2fixup::WriteData(const char *filename, uint8_t *data, int size)
         return;
     }
 
-    write(fh, data, size);
+    int ret = write(fh, data, size);
+    if (ret < 0)
+        VERBOSE(MPF_IMPORTANT, QString("write failed %1. %2").arg(filename)
+                .arg(strerror(ret)));
     close(fh);
 }
 
