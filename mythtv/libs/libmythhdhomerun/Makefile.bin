@@ -11,7 +11,7 @@ LIBSRCS += hdhomerun_device_selector.c
 CC    := $(CROSS_COMPILE)gcc
 STRIP := $(CROSS_COMPILE)strip
 
-CFLAGS += -Wall -O2 -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -std=c99 -pedantic
+CFLAGS += -Wall -O2 -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith
 LDFLAGS += -lpthread
 SHARED = -shared -Wl,-soname,libhdhomerun$(LIBEXT)
 
