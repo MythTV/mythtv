@@ -7,6 +7,7 @@
 #include <mythtv/libmythui/mythsystem.h>
 #include <mythtv/libmythui/mythdialogbox.h>
 #include <mythtv/libmythui/mythuistatetype.h>
+#include <mythtv/libmythui/mythuiimage.h>
 
 #include "globals.h"
 #include "metadatalistmanager.h"
@@ -51,6 +52,16 @@ void CheckedSet(MythUIType *container, const QString &itemName,
             MythUIStateType *st = dynamic_cast<MythUIStateType *>(uit);
             CheckedSet(st, value);
         }
+    }
+}
+
+void CheckedSet(MythUIImage *uiItem, const QString &filename)
+{
+    if (uiItem)
+    {
+        uiItem->Reset();
+        uiItem->SetFilename(filename);
+        uiItem->Load();
     }
 }
 

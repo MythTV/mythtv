@@ -2537,7 +2537,12 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
             item->SetImage(imgFilename);
     }
 
+    int nodeInt = node->getInt();
+
     imgFilename = GetScreenshot(node);
+
+    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
+        imgFilename = GetFirstImage(node, "Screenshots");
 
     if (!imgFilename.isEmpty() &&
         (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
@@ -2545,17 +2550,22 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     imgFilename = GetBanner(node);
 
+    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
+        imgFilename = GetFirstImage(node, "Banners");
+
     if (!imgFilename.isEmpty() &&
         (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
         item->SetImage(imgFilename, "banner");
 
     imgFilename = GetFanart(node);
-    
+
+    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
+        imgFilename = GetFirstImage(node, "Fanart");
+
     if (!imgFilename.isEmpty() &&
         (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
         item->SetImage(imgFilename, "fanart");
 
-    int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
     {
         item->SetText(QString("%1").arg(node->visibleChildCount()), "childcount");
@@ -3002,6 +3012,122 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
     return icon_file;
 }
 
+/** \fn VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
+ *  \brief Find the first image of "type" within a folder.
+ *  \return QString local or myth:// for the image.
+ */
+QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
+{
+    QString icon_file;
+
+    int list_count = node->childCount();
+    if (list_count > 0)
+    {
+        for (int i = 0; i < list_count; i++)
+        {
+            MythGenericTree *subnode = node->getChildAt(i);
+            if (subnode)
+            {
+                Metadata *metadata = GetMetadataPtrFromNode(subnode);
+                if (metadata)
+                {
+                    QString test_file;
+
+                    if (type == "Coverart" && !metadata->GetHost().isEmpty() &&
+                        !metadata->GetCoverFile().startsWith("/"))
+                    {
+                        test_file = GenRemoteFileURL("Coverart",
+                                    metadata->GetHost(), metadata->GetCoverFile());
+                        if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                            !test_file.endsWith(VIDEO_COVERFILE_DEFAULT))
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+                    else if (type == "Coverart")
+                    {
+                        test_file = metadata->GetCoverFile();
+                        if (!test_file.isEmpty() &&
+                             test_file != VIDEO_COVERFILE_DEFAULT)
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+
+                    if (type == "Fanart" && !metadata->GetHost().isEmpty() &&
+                        !metadata->GetFanart().startsWith("/"))
+                    {
+                        test_file = GenRemoteFileURL("Fanart",
+                                    metadata->GetHost(), metadata->GetFanart());
+                        if (!test_file.endsWith("/") && !test_file.isEmpty())
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+                    else if (type == "Fanart")
+                    {
+                        test_file = metadata->GetFanart();
+                        if (!test_file.isEmpty() &&
+                             test_file != VIDEO_FANART_DEFAULT)
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+
+                    if (type == "Banners" && !metadata->GetHost().isEmpty() &&
+                        !metadata->GetBanner().startsWith("/"))
+                    {
+                        test_file = GenRemoteFileURL("Banners",
+                                    metadata->GetHost(), metadata->GetBanner());
+                        if (!test_file.endsWith("/") && !test_file.isEmpty())
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+                    else if (type == "Banners")
+                    {
+                        test_file = metadata->GetBanner();
+                        if (!test_file.isEmpty() &&
+                             test_file != VIDEO_BANNER_DEFAULT)
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+
+                    if (type == "Screenshots" && !metadata->GetHost().isEmpty() &&
+                        !metadata->GetScreenshot().startsWith("/"))
+                    {
+                        test_file = GenRemoteFileURL("Screenshots",
+                                    metadata->GetHost(), metadata->GetScreenshot());
+                        if (!test_file.endsWith("/") && !test_file.isEmpty())
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+                    else if (type == "Screenshots")
+                    {
+                        test_file = metadata->GetScreenshot();
+                        if (!test_file.isEmpty() &&
+                             test_file != VIDEO_SCREENSHOT_DEFAULT)
+                        {
+                            icon_file = test_file;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return icon_file;
+}
+
 /** \fn VideoDialog::GetScreenshot(MythGenericTree *node)
  *  \brief Find the Screenshot for a given node.
  *  \return QString local or myth:// for the screenshot.
@@ -3372,16 +3498,26 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     Metadata *metadata = GetMetadata(item);
 
+    MythGenericTree *node = GetNodePtrFromButton(item);
+
     ScreenCopyDest dest(this);
     CopyMetadataToUI(metadata, dest);
+
+    if (node && node->getInt() == kSubFolder && !metadata)
+    {
+        QString fanart = GetFirstImage(node, "Fanart");
+        QString banner = GetFirstImage(node, "Banners");
+        QString screenshot = GetFirstImage(node, "Screenshots");
+        CheckedSet(m_fanart, fanart);
+        CheckedSet(m_banner, banner);
+        CheckedSet(m_screenshot, screenshot);
+    }
 
     if (!metadata)
         CheckedSet(m_titleText, item->GetText());
     UpdatePosition();
 
     CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
-
-    MythGenericTree *node = GetNodePtrFromButton(item);
 
     if (node && node->getInt() == kSubFolder)
         CheckedSet(this, "childcount",
