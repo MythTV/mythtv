@@ -144,6 +144,10 @@ MythSocket *RemoteFile::openSocket(bool control)
                      QString(", error was %1").arg(strlist[1]) :
                      QString(", remote error")));
         }
+
+        // Close the sockets if we received an error so that isOpen() will
+        // return false if the caller tries to use the RemoteFile.
+        Close();
     }
 
     return lsock;
