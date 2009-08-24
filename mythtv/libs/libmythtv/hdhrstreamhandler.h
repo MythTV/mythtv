@@ -22,8 +22,10 @@ class DeviceReadBuffer;
 // HDHomeRun headers
 #ifdef USING_HDHOMERUN
 #include "hdhomerun.h"
+#undef max
+#undef min
 #else
-struct hdhomerun_device_t { int dummy; };
+struct hdhomerun_control_sock_t { int dummy; };
 #endif
 
 typedef QMap<uint,int> FilterMap;
@@ -48,7 +50,7 @@ class HDHRStreamHandler : public ReaderPausedCB
     void RemoveListener(MPEGStreamData *data);
 
     bool IsRunning(void) const { return _running; }
-    void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
+    QString GetTunerStatus(void) const;
     bool IsConnected(void) const;
 
     // Commands
@@ -105,7 +107,8 @@ class HDHRStreamHandler : public ReaderPausedCB
     PIDPriority GetPIDPriority(uint pid) const;
 
   private:
-    hdhomerun_device_t  *_hdhomerun_device;
+    hdhomerun_control_sock_t  *_control_socket;
+    hdhomerun_video_sock_t    *_video_socket;
     uint                       _device_id;
     uint                       _device_ip;
     uint                       _tuner;

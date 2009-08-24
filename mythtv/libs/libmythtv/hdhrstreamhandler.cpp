@@ -129,7 +129,8 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
 
 HDHRStreamHandler::HDHRStreamHandler(const QString &devicename,
                                      hdhr_id_data  &device_data) :
-    _hdhomerun_device(NULL),
+    _control_socket(NULL),
+    _video_socket(NULL),
     _device_id(device_data.device_id),
     _device_ip(device_data.device_ip),
     _tuner(device_data.tuner),
@@ -283,13 +284,21 @@ void HDHRStreamHandler::RunTS(void)
     buffersize = max(49 * TSPacket::SIZE * 128, buffersize);
 
     /* Create TS socket. */
-    if (!hdhomerun_device_stream_start(_hdhomerun_device))
+    _video_socket = hdhomerun_video_create(0, buffersize, NULL);
+    if (!_video_socket)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");
+        return;
+    }
+
+    uint localPort = hdhomerun_video_get_local_port(_video_socket);
+    if (!DeviceSetTarget(localPort))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Starting recording (set target failed). Aborting.");
         return;
     }
-    hdhomerun_device_stream_flush(_hdhomerun_device);
+    hdhomerun_video_flush(_video_socket);
 
     bool _error = false;
 
@@ -304,8 +313,8 @@ void HDHRStreamHandler::RunTS(void)
         read_size *= VIDEO_DATA_PACKET_SIZE;
 
         size_t data_length;
-        unsigned char *data_buffer = hdhomerun_device_stream_recv(
-            _hdhomerun_device, read_size, &data_length);
+        unsigned char *data_buffer =
+            hdhomerun_video_recv(_video_socket, read_size, &data_length);
 
         if (!data_buffer)
         {
@@ -341,7 +350,18 @@ void HDHRStreamHandler::RunTS(void)
 
     RemoveAllPIDFilters();
 
-    hdhomerun_device_stream_stop(_hdhomerun_device);
+    DeviceClearTarget();
+    VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
+
+    hdhomerun_video_sock_t* tmp_video_socket;
+    {
+        QMutexLocker locker(&_hdhr_lock);
+        tmp_video_socket = _video_socket;
+        _video_socket=NULL;
+    }
+
+    hdhomerun_video_destroy(tmp_video_socket);
+
     VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
 
     SetRunning(false);
@@ -600,25 +620,25 @@ bool HDHRStreamHandler::Open(void)
 
 void HDHRStreamHandler::Close(void)
 {
-    if (_hdhomerun_device)
+    if (_control_socket)
     {
         TuneChannel("none");
-        hdhomerun_device_destroy(_hdhomerun_device);
-        _hdhomerun_device=NULL;
+        hdhomerun_control_destroy(_control_socket);
+        _control_socket=NULL;
     }
 }
 
 bool HDHRStreamHandler::Connect(void)
 {
-    _hdhomerun_device = hdhomerun_device_create(_device_id, _device_ip, _tuner, NULL);
+    _control_socket = hdhomerun_control_create(_device_id, _device_ip, NULL);
 
-    if (!_hdhomerun_device)
+    if (!_control_socket)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create hdhomerun object");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create control socket");
         return false;
     }
 
-    if (hdhomerun_device_get_local_machine_addr(_hdhomerun_device) == 0)
+    if (hdhomerun_control_get_local_addr(_control_socket) == 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to connect to device");
         return false;
@@ -674,7 +694,7 @@ void HDHRStreamHandler::FindDevice(const QString &_devicename,
 
 bool HDHRStreamHandler::EnterPowerSavingMode(void)
 {
-    if (!hdhomerun_device_get_video_sock(_hdhomerun_device))
+    if (_video_socket)
     {
         VERBOSE(VB_RECORD, LOC + "Ignoring request - video streaming active");
         return false;
@@ -690,7 +710,7 @@ QString HDHRStreamHandler::DeviceGet(
 {
     QMutexLocker locker(&_hdhr_lock);
 
-    if (!_hdhomerun_device)
+    if (!_control_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed (not connected)");
         return QString::null;
@@ -698,8 +718,8 @@ QString HDHRStreamHandler::DeviceGet(
 
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_device_get_var(
-            _hdhomerun_device, name.toLocal8Bit().constData(),
+    if (hdhomerun_control_get(
+            _control_socket, name.toLocal8Bit().constData(),
             &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed" + ENO);
@@ -726,7 +746,7 @@ QString HDHRStreamHandler::DeviceSet(
 {
     QMutexLocker locker(&_hdhr_lock);
 
-    if (!_hdhomerun_device)
+    if (!_control_socket)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed (not connected)");
         return QString::null;
@@ -734,8 +754,8 @@ QString HDHRStreamHandler::DeviceSet(
 
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_device_set_var(
-            _hdhomerun_device, name.toLocal8Bit().constData(),
+    if (hdhomerun_control_set(
+            _control_socket, name.toLocal8Bit().constData(),
             val.toLocal8Bit().constData(), &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
@@ -780,8 +800,7 @@ bool HDHRStreamHandler::DeviceSetTarget(unsigned short localPort)
         return false;
     }
 
-    unsigned long localIP = hdhomerun_device_get_local_machine_addr(
-        _hdhomerun_device);
+    unsigned long localIP = hdhomerun_control_get_local_addr(_control_socket);
     if (localIP == 0)
     {
         return false;
@@ -811,14 +830,14 @@ bool HDHRStreamHandler::DeviceClearTarget(void)
     return !TunerSet("target", "0.0.0.0:0").isEmpty();
 }
 
-void HDHRStreamHandler::GetTunerStatus(struct hdhomerun_tuner_status_t *status)
+QString HDHRStreamHandler::GetTunerStatus(void) const
 {
-    hdhomerun_device_get_tuner_status(_hdhomerun_device, NULL, status);
+    return TunerGet("status");
 }
 
 bool HDHRStreamHandler::IsConnected(void) const
 {
-    return (_hdhomerun_device != NULL);
+    return (_control_socket != NULL);
 }
 
 bool HDHRStreamHandler::TuneChannel(const QString &chn)
