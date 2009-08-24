@@ -1132,7 +1132,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             if (wantgroup.isEmpty())
                 wantgroup = "Default";
 
-            StorageGroup sgroup(wantgroup, gContext->GetHostName());
+            StorageGroup sgroup(wantgroup, gContext->GetHostName(), false);
             QString dir = sgroup.FindNextDirMostFree();
             if (dir.isEmpty())
             {
