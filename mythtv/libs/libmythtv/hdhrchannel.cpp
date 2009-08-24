@@ -27,9 +27,6 @@ using namespace std;
 #include "channelutil.h"
 #include "hdhrstreamhandler.h"
 
-// HDHomeRun header
-#include "hdhomerun.h"
-
 #define DEBUG_PID_FILTERS
 
 #define LOC     QString("HDHRChan(%1): ").arg(GetDevice())
