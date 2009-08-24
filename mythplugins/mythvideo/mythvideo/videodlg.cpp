@@ -1936,7 +1936,7 @@ class ItemDetailPopup : public MythScreenType
 
             if (!handled && !OnKeyAction(actions))
             {
-                gContext->GetMainWindow()->TranslateKeyPress("TV Frontend",
+                handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend",
                         levent, actions);
                 OnKeyAction(actions);
             }
