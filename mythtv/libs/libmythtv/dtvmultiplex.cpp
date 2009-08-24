@@ -4,8 +4,8 @@
 #include "mythverbose.h"
 #include "mpeg/dvbdescriptors.h"
 
-#define LOC QString("DTVMux: ")
-#define LOC_ERR QString("DTVMux, Error: ")
+#define LOC      QString("DTVMux: ")
+#define LOC_ERR  QString("DTVMux, Error: ")
 #define LOC_WARN QString("DTVMux, Warning: ")
 
 
@@ -348,7 +348,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
 
     switch (tag)
     {
-    case DescriptorID::terrestrial_delivery_system:
+        case DescriptorID::terrestrial_delivery_system:
         {
             if (type != DTVTunerType::kTunerTypeOFDM)
                 break;
@@ -356,13 +356,13 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
             const TerrestrialDeliverySystemDescriptor cd(desc);
 
             return ParseDVB_T(
-                    QString().number(cd.FrequencyHz()), "auto",
-                    cd.BandwidthString(),               cd.CodeRateHPString(),
-                    cd.CodeRateLPString(),              cd.ConstellationString(),
-                    cd.TransmissionModeString(),        cd.GuardIntervalString(),
-                    cd.HierarchyString());
+                QString().number(cd.FrequencyHz()), "auto",
+                cd.BandwidthString(),               cd.CodeRateHPString(),
+                cd.CodeRateLPString(),              cd.ConstellationString(),
+                cd.TransmissionModeString(),        cd.GuardIntervalString(),
+                cd.HierarchyString());
         }
-    case DescriptorID::satellite_delivery_system:
+        case DescriptorID::satellite_delivery_system:
         {
             const SatelliteDeliverySystemDescriptor cd(desc);
 
@@ -370,25 +370,28 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
             {
                 if (cd.ModulationSystem())
                 {
-                    VERBOSE(VB_CHANSCAN, "Ignoring DVB-S2 transponder withj DVB-S card");
+                    VERBOSE(VB_CHANSCAN,
+                            "Ignoring DVB-S2 transponder withj DVB-S card");
                     return false;
                 }
                 return ParseDVB_S_and_C(
-                        QString().number(cd.FrequencyHz()),      "auto",
-                        QString().number(cd.SymbolRateHz()),     cd.FECInnerString(),
-                        cd.ModulationString(),                   cd.PolarizationString());
+                    QString().number(cd.FrequencyHz()),  "auto",
+                    QString().number(cd.SymbolRateHz()), cd.FECInnerString(),
+                    cd.ModulationString(),
+                    cd.PolarizationString());
             }
             if (type == DTVTunerType::kTunerTypeDVB_S2)
             {
                 return ParseDVB_S2(
-                        QString().number(cd.FrequencyHz()),      "auto",
-                        QString().number(cd.SymbolRateHz()),     cd.FECInnerString(),
-                        cd.ModulationString(),                   cd.PolarizationString(),
-                        cd.ModulationSystemString(),             cd.RollOffString());
+                    QString().number(cd.FrequencyHz()),  "auto",
+                    QString().number(cd.SymbolRateHz()), cd.FECInnerString(),
+                    cd.ModulationString(),
+                    cd.PolarizationString(),
+                    cd.ModulationSystemString(),         cd.RollOffString());
             }
             break;
         }
-    case DescriptorID::cable_delivery_system:
+        case DescriptorID::cable_delivery_system:
         {
             if (type != DTVTunerType::kTunerTypeQAM)
                 break;
@@ -400,9 +403,9 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                     QString().number(cd.SymbolRateHz()), cd.FECInnerString(),
                     cd.ModulationString(),               QString());
         }
-    default:
-        VERBOSE(VB_CHANSCAN, "unknown delivery system descriptor");
-        return false;
+        default:
+            VERBOSE(VB_CHANSCAN, "unknown delivery system descriptor");
+            return false;
     }
 
     VERBOSE(VB_CHANSCAN, QString("Tuner type %1 does not match delivery system")
