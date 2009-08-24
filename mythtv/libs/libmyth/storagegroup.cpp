@@ -109,7 +109,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
         }
     }
 
-    if (!m_dirlist.size())
+    if (allowFallback && !m_dirlist.size())
     {
         QString msg = "Unable to find any Storage Group Directories.  ";
         QString tmpDir = gContext->GetSetting("RecordFilePrefix");
@@ -356,13 +356,16 @@ QString StorageGroup::FindRecordingDir(QString filename)
 
 QString StorageGroup::FindNextDirMostFree(void)
 {
-    QString nextDir = kDefaultStorageDir;
+    QString nextDir;
     long long nextDirFree = 0;
     long long thisDirTotal;
     long long thisDirUsed;
     long long thisDirFree;
 
-    VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Starting'"));
+    VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Starting"));
+
+    if (m_allowFallback)
+        nextDir = kDefaultStorageDir;
 
     if (m_dirlist.size())
         nextDir = m_dirlist[0];
@@ -396,8 +399,12 @@ QString StorageGroup::FindNextDirMostFree(void)
         curDir++;
     }
 
-    VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Using '%1'")
-                                   .arg(nextDir));
+    if (nextDir.isEmpty())
+        VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Unable to find "
+                                       "any directories to use."));
+    else
+        VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Using '%1'")
+                                       .arg(nextDir));
 
     nextDir.detach();
     return nextDir;
