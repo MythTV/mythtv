@@ -4106,20 +4106,28 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     MythSocket *pbssock = pbs->getSocket();
 
     int recnum = commands[1].toInt();
+    QString command = slist[1];
 
     QStringList retlist;
     FileTransfer *ft = getFileTransferByID(recnum);
     if (!ft)
     {
-        VERBOSE(VB_IMPORTANT, QString("Unknown file transfer socket: %1")
-                               .arg(recnum));
-        retlist << QString("ERROR: Unknown file transfer socket: %1")
-                           .arg(recnum);
+        if (command == "DONE")
+        {
+            // if there is an error opening the file, we may not have a
+            // FileTransfer instance for this connection.
+            retlist << "ok";
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("Unknown file transfer socket: %1")
+                                   .arg(recnum));
+            retlist << QString("ERROR: Unknown file transfer socket: %1")
+                               .arg(recnum);
+        }
         SendResponse(pbssock, retlist);
         return;
     }
-
-    QString command = slist[1];
 
     ft->UpRef();
 
