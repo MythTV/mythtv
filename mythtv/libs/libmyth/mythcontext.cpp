@@ -2005,6 +2005,11 @@ void MythContext::OverrideSettingForSession(const QString &key,
 bool MythContext::SendReceiveStringList(QStringList &strlist,
                                         bool quickTimeout, bool block)
 {
+    QString query_type = "UNKNOWN";
+
+    if (!strlist.isEmpty())
+        query_type = strlist[0];
+    
     d->serverSockLock.lock();
 
     if (!d->serverSock)
@@ -2088,6 +2093,26 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
 
     d->serverSockLock.unlock();
 
+    if (ok)
+    {
+        if (strlist.isEmpty())
+            ok = false;
+        else if (strlist[0] == "ERROR")
+        {
+            if (strlist.size() == 2)
+                VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
+                                            "with the error '%2'")
+                                            .arg(query_type).arg(strlist[1]));
+            else
+                VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
+                                        "with an error, but no error message.")
+                                        .arg(query_type));
+                
+            ok = false;
+        }
+
+    }
+    
     return ok;
 }
 

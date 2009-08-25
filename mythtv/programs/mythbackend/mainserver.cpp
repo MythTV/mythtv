@@ -2553,7 +2553,10 @@ void MainServer::HandleQueryLoad(PlaybackSock *pbs)
 
     double loads[3];
     if (getloadavg(loads,3) == -1)
+    {
+        strlist << "ERROR";
         strlist << "getloadavg() failed";
+    }
     else
         strlist << QString::number(loads[0])
                 << QString::number(loads[1])
@@ -2576,7 +2579,10 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
     if (getUptime(uptime))
         strlist << QString::number(uptime);
     else
+    {
+        strlist << "ERROR";
         strlist << "Could not determine uptime.";
+    }
 
     SendResponse(pbssock, strlist);
 }
@@ -2596,7 +2602,10 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
         strlist << QString::number(totalMB) << QString::number(freeMB)
                 << QString::number(totalVM) << QString::number(freeVM);
     else
+    {
+        strlist << "ERROR";
         strlist << "Could not determine memory stats.";
+    }
 
     SendResponse(pbssock, strlist);
 }
