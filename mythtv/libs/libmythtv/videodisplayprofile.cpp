@@ -1634,18 +1634,17 @@ void VideoDisplayProfile::init_statics(void)
         safe_renderer[*it2] += "quartz-blit";
         safe_renderer[*it2] += "xv-blit";
         safe_renderer[*it2] += "opengl";
+        safe_renderer[*it2] += "vdpau";
     }
 
     safe_renderer["dummy"]    += "xvmc-blit";
     safe_renderer["xvmc"]     += "xvmc-blit";
     safe_renderer["xvmc-vld"] += "xvmc-blit";
-    safe_renderer["ffmpeg"]   += "vdpau";
 
     safe_renderer["dummy"]    += "quartz-accel";
     safe_renderer["macaccel"] += "quartz-accel";
     safe_renderer["ivtv"]     += "ivtv";
     safe_renderer["vdpau"]    += "vdpau";
-    safe_renderer["dummy"]    += "vdpau";
 
     safe_renderer_priority["null"]         =  10;
     safe_renderer_priority["xlib"]         =  20;
