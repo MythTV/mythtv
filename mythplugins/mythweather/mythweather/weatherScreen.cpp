@@ -15,18 +15,18 @@ WeatherScreen *WeatherScreen::loadScreen(MythScreenStack *parent,
     QString key = screenDefn->name;
 
     if (key == "Severe Weather Alerts")
-        return new SevereWeatherScreen(parent, "Severe Weather Alerts", screenDefn, id);
+        return new SevereWeatherScreen(parent, screenDefn, id);
     if (key == "Static Map")
-        return new StaticImageScreen(parent,"Static Map" , screenDefn, id);
+        return new StaticImageScreen(parent, screenDefn, id);
     if (key == "Animated Map")
-        return new AnimatedImageScreen(parent, "Animated Map", screenDefn, id);
+        return new AnimatedImageScreen(parent, screenDefn, id);
 
-    return new WeatherScreen(parent, key, screenDefn, id);
+    return new WeatherScreen(parent, screenDefn, id);
 }
 
-WeatherScreen::WeatherScreen(MythScreenStack *parent, const QString &name,
+WeatherScreen::WeatherScreen(MythScreenStack *parent,
                              ScreenListInfo *screenDefn, int id) : 
-    MythScreenType (parent, name), 
+               MythScreenType (parent, screenDefn->title),
     m_screenDefn(screenDefn), 
     m_name(m_screenDefn->name),
     m_inuse(false),
@@ -234,15 +234,15 @@ bool WeatherScreen::keyPressEvent(QKeyEvent *event)
     return false;
 }
 
-SevereWeatherScreen::SevereWeatherScreen(MythScreenStack *parent, const QString &name,
+SevereWeatherScreen::SevereWeatherScreen(MythScreenStack *parent,
                                          ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, name, screenDefn, id)
+    : WeatherScreen(parent, screenDefn, id)
 {
 }
 
-StaticImageScreen::StaticImageScreen(MythScreenStack *parent, const QString &name,
+StaticImageScreen::StaticImageScreen(MythScreenStack *parent,
                                      ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, name, screenDefn, id)
+    : WeatherScreen(parent, screenDefn, id)
 {
 }
 
@@ -280,9 +280,9 @@ void StaticImageScreen::prepareWidget(MythUIType *widget)
     (void) widget;
 }
 
-AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent, const QString &name,
+AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent,
                                          ScreenListInfo *screenDefn, int id)
-    : WeatherScreen(parent, name, screenDefn, id)
+    : WeatherScreen(parent, screenDefn, id)
 {
 }
 

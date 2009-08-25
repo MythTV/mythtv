@@ -28,8 +28,7 @@ class WeatherScreen : public MythScreenType
     Q_OBJECT
 
   public:
-    WeatherScreen(MythScreenStack *parent, const QString &name,
-                               ScreenListInfo *screenDefn, int id);
+    WeatherScreen(MythScreenStack *parent, ScreenListInfo *screenDefn, int id);
     ~WeatherScreen();
 
     bool Create(void);
@@ -80,8 +79,8 @@ class SevereWeatherScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    SevereWeatherScreen(MythScreenStack *parent, const QString &name,
-                               ScreenListInfo *screenDefn, int id);
+    SevereWeatherScreen(MythScreenStack *parent, ScreenListInfo *screenDefn,
+                        int id);
     bool usingKeys() { return true; }
 
   private:
@@ -93,8 +92,8 @@ class StaticImageScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    StaticImageScreen(MythScreenStack *parent, const QString &name,
-                               ScreenListInfo *screenDefn, int id);
+    StaticImageScreen(MythScreenStack *parent, ScreenListInfo *screenDefn,
+                      int id);
 
   protected:
     QString prepareDataItem(const QString &key, const QString &value);
@@ -109,8 +108,8 @@ class AnimatedImageScreen : public WeatherScreen
     Q_OBJECT
 
   public:
-    AnimatedImageScreen(MythScreenStack *parent, const QString &name,
-                               ScreenListInfo *screenDefn, int id);
+    AnimatedImageScreen(MythScreenStack *parent, ScreenListInfo *screenDefn,
+                        int id);
 
   protected:
     QString prepareDataItem(const QString &key, const QString &value);

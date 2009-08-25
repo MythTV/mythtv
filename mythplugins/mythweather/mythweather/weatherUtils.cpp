@@ -9,9 +9,29 @@
 // MythWeather headers
 #include "weatherUtils.h"
 
+QString getScreenTitle(const QString &screenName)
+{
+    if (screenName == "Current Conditions")
+        return QObject::tr("Current Conditions");
+    if (screenName == "Three Day Forecast")
+        return QObject::tr("Three Day Forecast");
+    if (screenName == "18 Hour Forecast")
+        return QObject::tr("18 Hour Forecast");
+    if (screenName == "Severe Weather Alerts")
+        return QObject::tr("Severe Weather Alerts");
+    if (screenName == "Six Day Forecast")
+        return QObject::tr("Six Day Forecast");
+    if (screenName == "Static Map")
+        return QObject::tr("Static Map");
+    if (screenName == "Animated Map")
+        return QObject::tr("Animated Map");
+
+    return screenName;
+}
+
 ScreenListMap loadScreens()
 {
-    ScreenListMap screens;   
+    ScreenListMap screens;
     QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
     
     // Check the theme first if it has its own weather-screens.xml
@@ -50,7 +70,7 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
         return false;
     }
 
-    if ( !doc.setContent( &f ) ) 
+    if ( !doc.setContent( &f ) )
     {
         f.close();
         return false;
@@ -69,6 +89,8 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
             {
                 screens[e.attribute("name")].multiLoc = false;
                 screens[e.attribute("name")].name = e.attribute("name");
+                screens[e.attribute("name")].title =
+                                            getScreenTitle(e.attribute("name"));
                 QString hasUnits = e.attribute("hasunits");
                 if (hasUnits.toLower() == "no")
                     screens[e.attribute("name")].hasUnits = false;

@@ -23,12 +23,12 @@ class TypeListInfo
 {
   public:
   
-  	TypeListInfo(const TypeListInfo& info)
-  	    : name(info.name), location(info.location), src(info.src)
-  	{
-  	    name.detach();
-  	    location.detach();
-  	}
+    TypeListInfo(const TypeListInfo& info)
+        : name(info.name), location(info.location), src(info.src)
+    {
+        name.detach();
+        location.detach();
+    }
   
     TypeListInfo(const QString &_name)
         : name(_name), location(QString::null), src(NULL)
@@ -63,6 +63,7 @@ class ScreenListInfo
     
     ScreenListInfo(const ScreenListInfo& info) :
     name(info.name),
+    title(info.title),
     types(info.types),
     helptxt(info.helptxt),
     sources(info.sources),
@@ -71,12 +72,13 @@ class ScreenListInfo
     multiLoc(info.multiLoc)
     {
       types.detach();
-		}
+    }
     
     TypeListInfo GetCurrentTypeList(void) const;
 
   public:
     QString name;
+    QString title;
     TypeListMap types;
     QStringList dataTypes;
     QString helptxt;

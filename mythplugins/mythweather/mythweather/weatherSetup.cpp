@@ -231,7 +231,7 @@ void ScreenSetup::updateHelpText()
 
         text = tr("Add desired screen to the Active Screens list "
             "by pressing SELECT.") + "\n";
-        text += item->GetText() + "\n";
+        text += si->title + "\n";
         text += QString("%1: %2").arg(tr("Sources"))
                                  .arg(sources.join(", "));
     }
@@ -245,7 +245,7 @@ void ScreenSetup::updateHelpText()
         if (!si)
             return;
 
-        text += item->GetText() + "\n";
+        text += si->title + "\n";
         if (si->hasUnits)
         {
             text += tr("Units: ");
@@ -311,7 +311,7 @@ void ScreenSetup::loadData()
                 si->sources.append(script->name);
             }
             MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_inactiveList, i.key());
+                        new MythUIButtonListItem(m_inactiveList, si->title);
             item->SetData(qVariantFromValue(new ScreenListInfo(*si)));
         }
 
@@ -360,7 +360,7 @@ void ScreenSetup::loadData()
             si->units = units;
             
             MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_activeList, name);
+                new MythUIButtonListItem(m_activeList, si->title);
             
 
             // Only insert types meant for this screen
@@ -440,7 +440,7 @@ void ScreenSetup::saveData()
         MythUIButtonListItem *item = m_activeList->GetItemAt(i);
         ScreenListInfo *si = qVariantValue<ScreenListInfo *>(item->GetData());
         db.bindValue(":DRAW", draworder);
-        db.bindValue(":CONT", item->GetText());
+        db.bindValue(":CONT", si->name);
         db.bindValue(":UNITS", si->units);
         db.bindValue(":HOST", gContext->GetHostName());
         if (db.exec())
@@ -575,7 +575,7 @@ void ScreenSetup::doLocationDialog(ScreenListInfo *si)
     if (locdialog->Create())
         mainStack->AddScreen(locdialog);
     else
-   	    delete locdialog;
+           delete locdialog;
 }
 
 void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
@@ -692,7 +692,7 @@ void ScreenSetup::customEvent(QEvent *event)
                     return;
             }
 
-            QString txt = si->name; txt.detach();
+            QString txt = si->title; txt.detach();
 
             MythUIButtonListItem *item = new MythUIButtonListItem(m_activeList, txt);
             item->SetData(qVariantFromValue(si));
@@ -807,7 +807,7 @@ bool SourceSetup::loadData()
         si->version = db.value(6).toString();
 
         MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_sourceList, si->name);
+                            new MythUIButtonListItem(m_sourceList, si->name);
         item->SetData(qVariantFromValue(si));
     }
 
@@ -964,8 +964,8 @@ void LocationDialog::doSearch()
     }
     else
     {
-    	delete busyPopup;
-    	busyPopup = NULL;
+        delete busyPopup;
+        busyPopup = NULL;
     }
        
 
@@ -1004,8 +1004,9 @@ void LocationDialog::doSearch()
         for (int ii = 0; ii < results.size(); ++ii)
         {
             QStringList tmp = results[ii].split("::");
+            QString resultstring = QString("%1 (%2)").arg(tmp[1]).arg(name);
             MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_locationList, tmp[1]);
+                new MythUIButtonListItem(m_locationList, resultstring);
             ResultListInfo *ri = new ResultListInfo;
             ri->idstr = tmp[0];
             ri->src = si;

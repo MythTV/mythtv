@@ -1,4 +1,37 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Current Conditions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Three Day Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>18 Hour Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Severe Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Six Day Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animated Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>String::DayOfWeek</name>
     <message>

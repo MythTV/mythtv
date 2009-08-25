@@ -1,4 +1,37 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Current Conditions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Three Day Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>18 Hour Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Severe Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Six Day Forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Static Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Animated Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>String::DayOfWeek</name>
     <message>
@@ -646,6 +679,50 @@
         <source>CLOUD TEMPERATURE</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Wind(Gust)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wind Direction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feels Like</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds to display each page:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieve data in the background:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Retrieval Interval (minutes):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source Update Timeout (seconds):</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
@@ -882,8 +959,39 @@
         <translation type="obsolete">レーダー画像</translation>
     </message>
     <message>
-        <source>No Screens defined; Entering Screen Setup.</source>
+        <source>Paused</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WeatherScreen</name>
+    <message>
+        <source>Sunday</source>
+        <translation type="unfinished">日曜日</translation>
+    </message>
+    <message>
+        <source>Monday</source>
+        <translation type="unfinished">月曜日</translation>
+    </message>
+    <message>
+        <source>Tuesday</source>
+        <translation type="unfinished">火曜日</translation>
+    </message>
+    <message>
+        <source>Wednesday</source>
+        <translation type="unfinished">水曜日</translation>
+    </message>
+    <message>
+        <source>Thursday</source>
+        <translation type="unfinished">木曜日</translation>
+    </message>
+    <message>
+        <source>Friday</source>
+        <translation type="unfinished">金曜日</translation>
+    </message>
+    <message>
+        <source>Saturday</source>
+        <translation type="unfinished">土曜日</translation>
     </message>
 </context>
 </TS>
