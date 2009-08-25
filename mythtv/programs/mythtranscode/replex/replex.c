@@ -41,6 +41,10 @@
 #include "replex.h"
 #include "pes.h"
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 static int replex_all_set(struct replex *rx);
 
 void overflow_exit(struct replex *rx)
