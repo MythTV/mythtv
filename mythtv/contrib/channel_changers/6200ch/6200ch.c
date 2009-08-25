@@ -38,6 +38,7 @@
 #define DCH3200_VENDOR_ID3 0x00001fc4
 #define DCH3200_VENDOR_ID4 0x000023a3
 #define DCH3200_MODEL_ID1  0x0000d330
+#define DCX3200_MODEL_ID1  0x0000f740
 
 #define DCH3416_VENDOR_ID1 0x00001e46
 #define DCH3416_MODEL_ID1  0x0000b630
@@ -316,6 +317,7 @@ int main (int argc, char *argv[])
             (dir.vendor_id == PACE_VENDOR_ID1) ||
             (dir.vendor_id == PACE_VENDOR_ID2)) &&
            ((dir.model_id == DCH3200_MODEL_ID1) ||
+            (dir.model_id == DCX3200_MODEL_ID1) ||
             (dir.model_id == DCH3416_MODEL_ID1) ||
             (dir.model_id == DCT3412_MODEL_ID1) ||
             (dir.model_id == DCT3416_MODEL_ID1) ||

@@ -1253,6 +1253,7 @@ FirewireModel::FirewireModel(const CaptureCard  &parent,
     setLabel(QObject::tr("Cable box model"));
     addSelection(QObject::tr("Generic"), "GENERIC");
     addSelection("DCH-3200");
+    addSelection("DCX-3200");
     addSelection("DCT-3412");
     addSelection("DCT-3416");
     addSelection("DCT-6200");
