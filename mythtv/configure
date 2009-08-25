@@ -4283,6 +4283,13 @@ fi
 rm -f config.mak
 ln -s $MYTH_CONFIG_MAK config.mak
 
+# delete old myth config files in old location
+if [ -e libs/libmyth/mythconfig.mak ] ; then
+    rm -f libs/libmyth/mythconfig.mak
+fi
+if [ -e /libs/libmyth/mythconfig.h ] ; then
+    rm -f libs/libmyth/mythconfig.h
+fi
 
 rm -f $TMPC $TMPE $TMPH $TMPO $TMPS $TMPSH
 rm -f $TMPCXX
