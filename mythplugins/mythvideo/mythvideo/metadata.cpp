@@ -859,29 +859,55 @@ QString Metadata::FilenameToMeta(const QString &file_name, int position)
 {
     // position 1 returns title, 2 returns season,
     //          3 returns episode, 4 returns subtitle
- 
-    QString title = file_name.right(file_name.length() -
-                                    file_name.lastIndexOf('/') - 1);
 
-    title.replace(QRegExp("_"), " ");
-    title.replace(QRegExp("%20"), " ");
-    title.replace(QRegExp("-"), " ");
-    title = title.left(title.lastIndexOf('.'));
-    title.replace(QRegExp("\\."), " ");
+    QString cleanFilename = file_name.left(file_name.lastIndexOf('.'));
+    cleanFilename.replace(QRegExp("%20"), " ");
+    cleanFilename.replace(QRegExp("_"), " ");
+    cleanFilename.replace(QRegExp("\\."), " ");
 
-    QRegExp group("^(.*[^s0-9])" // title
-                  "(?:[s])?(\\d{1,3})(?:\\s|-)?(?:[ex])" //Season
-                  "(?:\\s|-)?(\\d{1,3})" // Episode
-                  "(.*)$", // subtitle
-                  Qt::CaseInsensitive);
-    int pos = group.indexIn(title);
+    QString season_translation = QObject::tr("Season");
+    QString episode_translation = QObject::tr("Episode");
+
+    // Primary Regexp
+    QString separator = "(?:\\s?(?:-|/)?\\s?)?";
+    QString regexp = QString(
+                  "^(.*[^s0-9])" // Title
+                  "%1" // optional separator
+                  "(?:s|(?:%2))?" // season marker
+                  "%1" // optional separator
+                  "(\\d{1,3})" // Season
+                  "%1" // optional separator
+                  "(?:[ex/ ]|%3)" // episode marker
+                  "%1" // optional separator
+                  "(\\d{1,3})" // Episode
+                  "%1" // optional separator
+                  "(.*)$" // Subtitle
+                  ).arg(separator)
+                   .arg(season_translation).arg(episode_translation);
+    QRegExp filename_parse(regexp,
+                  Qt::CaseInsensitive, QRegExp::RegExp2);
+
+    // Cleanup Regexp
+    QString regexp2 = QString("(%1(?:%2%1\\d*%1)*%1)$")
+                             .arg(separator).arg(season_translation);
+    QRegExp title_parse(regexp2, Qt::CaseInsensitive, QRegExp::RegExp2);
+
+    int pos = filename_parse.indexIn(cleanFilename);
     if (pos > -1)
     {
-        QString groupResult = group.cap(0);
-        QString title = group.cap(1);
-        QString season = group.cap(2);
-        QString episode = group.cap(3);
-        QString subtitle = group.cap(4);
+        QString title = filename_parse.cap(1);
+        QString season = filename_parse.cap(2);
+        QString episode = filename_parse.cap(3);
+        QString subtitle = filename_parse.cap(4);
+
+        // Clean up the title
+        int pos2 = title_parse.indexIn(title);
+        if (pos2 > -1)
+            title = title.left(pos2);
+        title = title.right(title.length() -
+                     title.lastIndexOf('/') -1);
+
+        // Return requested value
         if (position == 1 && !title.isEmpty())
             return title.trimmed();
         else if (position == 2)
@@ -892,12 +918,18 @@ QString Metadata::FilenameToMeta(const QString &file_name, int position)
             return subtitle.trimmed();
     }
     else if (position == 1)
-        {
+    {
+        QString title = cleanFilename;
+
+        // Clean up the title
+        title = title.right(title.length() -
+                     title.lastIndexOf('/') -1);
+
         title = eatBraces(title, "[", "]");
         title = eatBraces(title, "(", ")");
         title = eatBraces(title, "{", "}");
         return title.trimmed();
-        }
+    }
     else if (position == 2 || position == 3)
         return QString("0");
 
