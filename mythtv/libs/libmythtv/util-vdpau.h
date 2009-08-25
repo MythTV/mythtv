@@ -92,7 +92,7 @@ class VDPAUContext
     QString GetDeinterlacer(void) const
             { return deinterlacer; }
     bool IsBeingUsed(VideoFrame * frame);
-    void ClearReferenceFrames(void) { referenceFrames.clear(); }
+    void ClearReferenceFrames(void);
     PictureAttributeSupported  GetSupportedPictureAttributes(void) const;
     int SetPictureAttribute(PictureAttribute attributeType, int newValue);
 

@@ -1654,6 +1654,13 @@ bool VDPAUContext::IsBeingUsed(VideoFrame *frame)
     return referenceFrames.contains(frame);
 }
 
+void VDPAUContext::ClearReferenceFrames(void)
+{
+    deintLock.lock();
+    referenceFrames.clear();
+    deintLock.unlock();
+}
+
 PictureAttributeSupported 
 VDPAUContext::GetSupportedPictureAttributes(void) const
 {
