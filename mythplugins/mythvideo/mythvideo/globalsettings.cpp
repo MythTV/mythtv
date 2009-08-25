@@ -177,7 +177,7 @@ HostCheckBox *VideoSortIgnoresCase()
 HostCheckBox *VideoDBGroupView()
 {
     HostCheckBox *hcb = new HostCheckBox("mythvideo.db_group_view");
-    hcb->setLabel(QObject::tr("Show groups for database views"));
+    hcb->setLabel(QObject::tr("Enable Metadata Browse Modes"));
     hcb->setValue(true);
     hcb->setHelpText(QObject::tr("If set, metadata groupings of your video "
                                  "directory will be shown in supported "
