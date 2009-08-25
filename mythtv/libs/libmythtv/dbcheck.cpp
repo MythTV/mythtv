@@ -3909,7 +3909,15 @@ NULL
 };
 
         if (!performActualUpdate(updates, "1216", dbver))
+        {
+            VERBOSE(VB_IMPORTANT, "DB charset conversions update failed! "
+                    "Your database seems to be partially corrupted. Please "
+                    "move the backup to a safe place. Your database must be "
+                    "fixed before you can upgrade beyond 0.21-fixes. Please see"
+                    "http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
+                    "Database_Encoding for information.");
             return false;
+        }
     }
 
     if (dbver == "1216")
@@ -4211,7 +4219,15 @@ NULL
 };
 
         if (!performActualUpdate(updates, "1217", dbver))
+        {
+            VERBOSE(VB_IMPORTANT, "DB charset conversions update failed! "
+                    "Your database seems to be partially corrupted. Please "
+                    "move the backup to a safe place. Your database must be "
+                    "fixed before you can upgrade beyond 0.21-fixes. Please see"
+                    "http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
+                    "Database_Encoding for information.");
             return false;
+        }
     }
 
     if (dbver == "1217")
