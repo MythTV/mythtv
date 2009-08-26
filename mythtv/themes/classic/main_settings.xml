@@ -330,7 +330,7 @@
         <text lang="PT">Configurar Notícias</text>
         <text lang="CS">Nastavení zpráv</text>
         <text lang="RU">Настройка новостей</text>
-        <text lang="PL">Ustaw WiadomoĹci</text>
+        <text lang="PL">Ustaw Wiadomości</text>
         <text lang="HE">הגדרות חדשות</text>
         <description>Choose which news sources interest you</description>
         <action>CONFIGPLUGIN mythnews</action>
