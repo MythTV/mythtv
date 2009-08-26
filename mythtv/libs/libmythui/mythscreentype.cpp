@@ -320,13 +320,9 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "LEFT")
+        if (action == "LEFT" || action == "UP" || action == "PREVIOUS")
             NextPrevWidgetFocus(false);
-        else if (action == "RIGHT")
-            NextPrevWidgetFocus(true);
-        else if (action == "UP")
-            NextPrevWidgetFocus(false);
-        else if (action == "DOWN")
+        else if (action == "RIGHT" || action == "DOWN" || action == "NEXT")
             NextPrevWidgetFocus(true);
         else if (action == "ESCAPE")
             GetScreenStack()->PopScreen();

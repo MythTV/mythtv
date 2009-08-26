@@ -175,12 +175,17 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
     if (keynum != Qt::Key_Escape &&
         (keynum <  Qt::Key_Shift || keynum > Qt::Key_ScrollLock))
     {
+        // Ignore modifiers
+        if (keynum == Qt::Key_Backtab)
+            return keynum;
+
         Qt::KeyboardModifiers modifiers;
         // if modifiers have been pressed, rebuild keynum
         if ((modifiers = e->modifiers()) != Qt::NoModifier)
         {
             int modnum = (((modifiers & Qt::ShiftModifier) &&
-                           keynum > 0x7f) ? Qt::SHIFT : 0) |
+                            (keynum > 0x7f) &&
+                            (keynum != Qt::Key_Backtab)) ? Qt::SHIFT : 0) |
                          ((modifiers & Qt::ControlModifier) ? Qt::CTRL : 0) |
                          ((modifiers & Qt::MetaModifier) ? Qt::META : 0) |
                          ((modifiers & Qt::AltModifier) ? Qt::ALT : 0);
@@ -346,6 +351,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
     RegisterKey("Global", "DOWN", "Down Arrow", "Down");
     RegisterKey("Global", "LEFT", "Left Arrow", "Left");
     RegisterKey("Global", "RIGHT", "Right Arrow", "Right");
+    RegisterKey("Global", "NEXT", "Move to next widget", "Tab");
+    RegisterKey("Global", "PREVIOUS", "Move to preview widget", "Backtab");
     RegisterKey("Global", "SELECT", "Select", "Return,Enter,Space");
     RegisterKey("Global", "BACKSPACE", "Backspace", "Backspace");
     RegisterKey("Global", "ESCAPE", "Escape", "Esc");
