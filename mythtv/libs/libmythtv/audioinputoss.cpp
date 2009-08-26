@@ -59,7 +59,7 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     dsp_fd = open(m_device_name.constData(), O_RDONLY);
     if (dsp_fd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "open failed " + strerror(dsp_fd));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("open failed - %1").arg(strerror(dsp_fd)));
         Close();
         return false;
     }
@@ -91,8 +91,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     if ((chk = ioctl(dsp_fd, SNDCTL_DSP_SETFMT, &format) < 0))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR  +
-                QString("failed to set audio format %1").arg(tag) +
-                strerror(chk));
+                QString("failed to set audio format %1 - %2").arg(tag)
+                .arg(strerror(chk)));
         Close();
         return false;
     }
@@ -109,8 +109,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     if ((chk = ioctl(dsp_fd, SNDCTL_DSP_SAMPLESIZE, &m_audio_sample_bits)) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("failed to set audio sample bits to %1 ")
-                .arg(sample_bits) + strerror(chk));
+                QString("failed to set audio sample bits to %1 - %2")
+                .arg(sample_bits).arg(strerror(chk)));
         Close();
         return false;
     }
@@ -121,8 +121,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     m_audio_channels = choice = channels;
     if ((chk = ioctl(dsp_fd, SNDCTL_DSP_CHANNELS, &m_audio_channels)) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("failed to set audio channels to %1 ")
-                                     .arg(channels) + strerror(chk));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("failed to set audio channels to %1 - %2")
+                                     .arg(channels).arg(strerror(chk)));
         Close();
         return false;
     }
@@ -136,8 +136,8 @@ bool AudioInputOSS::Open(uint sample_bits, uint sample_rate, uint channels)
     if ((chk = ioctl(dsp_fd, SNDCTL_DSP_SPEED, &m_audio_sample_rate)) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("failed to set sample rate to %1 ")
-                .arg(sample_rate) + strerror(chk));
+                QString("failed to set sample rate to %1 - %2")
+                .arg(sample_rate).arg(strerror(chk)));
         Close();
         return false;
     }
@@ -171,7 +171,7 @@ bool AudioInputOSS::Start(void)
         trig = PCM_ENABLE_INPUT; // enable input
         if ((chk = ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig)) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Start() failed " + strerror(chk));
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Start() failed - %1").arg(strerror(chk)));
         }
         else
         {
@@ -189,7 +189,7 @@ bool AudioInputOSS::Stop(void)
     int trig = 0;
     if ((chk = ioctl(dsp_fd, SNDCTL_DSP_SETTRIGGER, &trig)) < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "stop action failed " + strerror(chk));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("stop action failed - %1").arg(strerror(chk)));
     }
     else
     {
@@ -208,8 +208,8 @@ int AudioInputOSS::GetBlockSize(void)
         if ((chk = ioctl(dsp_fd, SNDCTL_DSP_GETBLKSIZE, &frag)) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("fragment size query failed, returned %1 ")
-                    .arg(frag) + strerror(chk));
+                    QString("fragment size query failed, returned %1 - %2")
+                    .arg(frag).arg(strerror(chk)));
             frag = 0;
         }
     }
@@ -230,8 +230,8 @@ int AudioInputOSS::GetSamples(void *buffer, uint num_bytes)
             this_read = read(dsp_fd, buffer, num_bytes - bytes_read);
             if (this_read < 0)
             {
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "GetSamples read failed " +
-                        strerror(this_read));
+                VERBOSE(VB_IMPORTANT, LOC_ERR + QString("GetSamples read failed - %1")
+                        .arg(strerror(this_read)));
             }
             else
             {
@@ -258,8 +258,8 @@ int AudioInputOSS::GetNumReadyBytes(void)
         if ((chk = ioctl(dsp_fd, SNDCTL_DSP_GETISPACE, &ispace)) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("get ready bytes failed, returned %1 ")
-                    .arg(ispace.bytes) + strerror(chk));
+                    QString("get ready bytes failed, returned %1 - %2")
+                    .arg(ispace.bytes).arg(strerror(chk)));
         }
         else if ((readies = ispace.bytes) > 0)
             VERBOSE(VB_AUDIO|VB_EXTRA, LOC_DEV + QString("ready bytes %1")
