@@ -329,7 +329,6 @@ bool MythXDisplay::CheckErrors(Display *disp)
     MythXLocker(this);
     Sync();
     const std::vector<XErrorEvent>& events = xerrors[d];
-    xerrors.erase(m_disp);
 
     if (events.size() < 1)
         return true;
@@ -338,22 +337,21 @@ bool MythXDisplay::CheckErrors(Display *disp)
     {
         char buf[200];
         XGetErrorText(d, events[i].error_code, buf, sizeof(buf));
-	VERBOSE(VB_IMPORTANT, QString("\n"
+        VERBOSE(VB_IMPORTANT, QString("\n"
                   "XError type: %1\n"
-                  //"    display: %2\n"
                   "  serial no: %2\n"
                   "   err code: %3 (%4)\n"
                   "   req code: %5\n"
                   " minor code: %6\n"
                   "resource id: %7\n")
                   .arg(events[i].type)
-                  //.arg(events[i].m_disp)
                   .arg(events[i].serial)
                   .arg(events[i].error_code).arg(buf)
                   .arg(events[i].request_code)
                   .arg(events[i].minor_code)
                   .arg(events[i].resourceid));  
     }
+    xerrors.erase(d);
     return false;
 }
 
