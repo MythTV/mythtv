@@ -223,10 +223,16 @@ bool DBUtil::BackupDB(QString &filename)
                                 QDateTime::currentDateTime()
                                 .toString("yyyy-MM-dd hh:mm:ss"), NULL);
 
-    if (backupScript.isEmpty())
-        result = DoBackup(filename);
-    else
+    if (!backupScript.isEmpty())
+    {
         result = DoBackup(backupScript, filename);
+        if (!result)
+            VERBOSE(VB_IMPORTANT, "Script-based database backup failed. "
+                                  "Retrying with internal backup.");
+    }
+
+    if (!result)
+        result = DoBackup(filename);
 
     gContext->SaveSettingOnHost("BackupDBLastRunEnd",
                                 QDateTime::currentDateTime()
