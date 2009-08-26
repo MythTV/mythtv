@@ -1475,6 +1475,7 @@ void TV::HandleOSDAskAllowResponse(PlayerContext *ctx, int dialog_result)
                 break;
             case 2:
                 // return to main menu
+                PrepareToExitPlayer(ctx, __LINE__);
                 SetExitPlayer(true, true);
                 break;
             case 3:
@@ -1492,6 +1493,7 @@ void TV::HandleOSDAskAllowResponse(PlayerContext *ctx, int dialog_result)
             default:
             case 1:
                 // return to main menu
+                PrepareToExitPlayer(ctx, __LINE__);
                 SetExitPlayer(true, true);
                 break;
             case 2:
@@ -2889,6 +2891,20 @@ void TV::SetErrored(PlayerContext *ctx)
     errorRecoveryTimerId = StartTimer(1, __LINE__);
 }
 
+void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark) const
+{
+    bool bookmark_it = bookmark && IsBookmarkAllowed(ctx);
+    ctx->LockDeleteNVP(__FILE__, line);
+    if (ctx->nvp)
+    {
+        if (bookmark_it)
+            ctx->nvp->SetBookmark();
+        if (db_auto_set_watched)
+            ctx->nvp->SetWatched();
+    }
+    ctx->UnlockDeleteNVP(__FILE__, line);
+}
+
 void TV::SetExitPlayer(bool set_it, bool wants_to) const
 {
     QMutexLocker locker(&timerIdLock);
@@ -2950,10 +2966,7 @@ void TV::HandleEndOfPlaybackTimerEvent(void)
         if (mctx == ctx)
         {
             endOfRecording = true;
-            mctx->LockDeleteNVP(__FILE__, __LINE__);
-            if (db_auto_set_watched && mctx->nvp)
-                mctx->nvp->SetWatched();
-            mctx->UnlockDeleteNVP(__FILE__, __LINE__);
+            PrepareToExitPlayer(mctx, __LINE__, false);
             SetExitPlayer(true, true);
         }
     }
@@ -3047,6 +3060,7 @@ void TV::HandleVideoExitDialogTimerEvent(void)
     ReturnOSDLock(mctx, osd);
     DoTogglePause(mctx, true);
     ClearOSD(mctx);
+    PrepareToExitPlayer(mctx, __LINE__);
     ReturnPlayerLock(mctx);
 
     requestDelete = false;
@@ -3663,6 +3677,7 @@ bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
     else if (has_action("ESCAPE", actions) && isnearend)
     {
         requestDelete = false;
+        PrepareToExitPlayer(actx, __LINE__, false);
         SetExitPlayer(true, true);
     }
     else if (has_action("SELECT", actions)  ||
@@ -3727,10 +3742,7 @@ bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
                     DoTogglePause(actx, true);
                     break;
                 case 1:
-                    actx->LockDeleteNVP(__FILE__, __LINE__);
-                    if (actx->nvp)
-                        actx->nvp->SetBookmark();
-                    actx->UnlockDeleteNVP(__FILE__, __LINE__);
+                    PrepareToExitPlayer(actx, __LINE__);
                     SetExitPlayer(true, true);
                     break;
                 case 3:
@@ -3739,6 +3751,7 @@ bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
                         actx, tr("Delete this recording?"));
                     return handled;
                 default:
+                    PrepareToExitPlayer(actx, __LINE__, false);
                     SetExitPlayer(true, true);
                     break;
             }
@@ -3757,11 +3770,15 @@ bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
                     SetExitPlayer(true, true);
                     break;
                 case 3:
+                    PrepareToExitPlayer(actx, __LINE__);
                     SetExitPlayer(true, true);
                     break;
                 default:
                     if (isnearend)
+                    {
+                        PrepareToExitPlayer(actx, __LINE__, false);
                         SetExitPlayer(true, true);
+                    }
                     else
                         DoTogglePause(actx, true);
                     break;
@@ -4183,11 +4200,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     }
     else if (has_action("EXITSHOWNOPROMPTS", actions))
     {
-        ctx->LockDeleteNVP(__FILE__, __LINE__);
-        if (ctx->nvp)
-            ctx->nvp->SetBookmark();
-        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
         requestDelete = false;
+        PrepareToExitPlayer(ctx, __LINE__);
         SetExitPlayer(true, true);
     }
     else if (has_action("ESCAPE", actions))
@@ -4235,21 +4249,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
                 PromptStopWatchingRecording(ctx);
                 return handled;
             }
-            else if (ctx->HasNVP() &&
-                     (db_playback_exit_prompt == 2))
-            {
-                ctx->LockDeleteNVP(__FILE__, __LINE__);
-                if (ctx->nvp)
-                    ctx->nvp->SetBookmark();
-                ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-            }
-            if (ctx->HasNVP() && db_auto_set_watched)
-            {
-                ctx->LockDeleteNVP(__FILE__, __LINE__);
-                if (ctx->nvp)
-                    ctx->nvp->SetWatched();
-                ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-            }
+            PrepareToExitPlayer(ctx, __LINE__, db_playback_exit_prompt == 2);
             requestDelete = false;
             do_exit = true;
         }
@@ -8543,18 +8543,8 @@ void TV::customEvent(QEvent *e)
         for (uint i = 0; mctx && (i < player.size()); i++)
         {
             PlayerContext *ctx = GetPlayer(mctx, i);
-            ctx->LockDeleteNVP(__FILE__, __LINE__);
-            if (ctx->nvp)
-            {
-                if (db_playback_exit_prompt == 1 ||
-                    db_playback_exit_prompt == 2)
-                {
-                    ctx->nvp->SetBookmark();
-                }
-                if (db_auto_set_watched)
-                    ctx->nvp->SetWatched();
-            }
-            ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+            PrepareToExitPlayer(ctx, __LINE__, db_playback_exit_prompt == 1 ||
+                                               db_playback_exit_prompt == 2);
         }
 
         SetExitPlayer(true, true);
@@ -10666,9 +10656,7 @@ bool TV::HandleJumpToProgramAction(
         {
             if (mctx == ctx)
             {
-                ctx->LockDeleteNVP(__FILE__, __LINE__);
-                ctx->nvp->SetBookmark();
-                ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+                PrepareToExitPlayer(ctx, __LINE__);
                 jumpToProgram = true;
                 SetExitPlayer(true, true);
             }
@@ -10729,9 +10717,7 @@ bool TV::HandleJumpToProgramAction(
                         .arg(p->title).arg(p->subtitle));
 
                 SetLastProgram(p);
-                ctx->LockDeleteNVP(__FILE__, __LINE__);
-                ctx->nvp->SetBookmark();
-                ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+                PrepareToExitPlayer(ctx, __LINE__);
                 jumpToProgram = true;
                 SetExitPlayer(true, true);
             }

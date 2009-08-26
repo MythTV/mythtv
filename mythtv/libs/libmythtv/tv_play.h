@@ -337,6 +337,8 @@ class MPUBLIC TV : public QThread
     void ForceNextStateNone(PlayerContext*);
     void ScheduleStateChange(PlayerContext*);
     void SetErrored(PlayerContext*);
+    void PrepareToExitPlayer(PlayerContext*, int line,
+                             bool bookmark = true) const;
     void SetExitPlayer(bool set_it, bool wants_to) const;
     void SetUpdateOSDPosition(bool set_it);
 
