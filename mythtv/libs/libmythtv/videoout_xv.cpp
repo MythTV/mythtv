@@ -121,7 +121,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
-      xv_chroma(0),
+      xv_chroma(0),     xv_set_defaults(false),
 
       chroma_osd(NULL)
 {
@@ -159,11 +159,7 @@ VideoOutputXv::~VideoOutputXv()
     // ungrab port...
     if (xv_port >= 0)
     {
-        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
-        disp->Lock();
-        XvUngrabPort(disp->GetDisplay(), xv_port, CurrentTime);
-        del_open_xv_port(xv_port);
-        disp->Unlock();
+        UngrabXvPort(disp, xv_port);
         xv_port = -1;
     }
 
@@ -257,11 +253,7 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
         // ungrab port...
         if (xv_port >= 0)
         {
-            VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
-            disp->Lock();
-            XvUngrabPort(disp->GetDisplay(), xv_port, CurrentTime);
-            del_open_xv_port(xv_port);
-            disp->Unlock();
+            UngrabXvPort(disp, xv_port);
             xv_port = -1;
         }
 
@@ -328,6 +320,22 @@ class XvAttributes
 };
 
 /**
+ * Internal function used to release an XVideo port.
+ */
+void VideoOutputXv::UngrabXvPort(MythXDisplay *disp, int port)
+{
+    if (!disp)
+        return;
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("Closing XVideo port %1").arg(port));
+    disp->Lock();
+    restore_port_attributes(port);
+    XvUngrabPort(disp->GetDisplay(), port, CurrentTime);
+    del_open_xv_port(port);
+    disp->Unlock();
+}
+
+/**
  * Internal function used to grab a XVideo port with the desired properties.
  *
  * \return port number if it succeeds, else -1.
@@ -335,6 +343,7 @@ class XvAttributes
 int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                                       MythCodecID mcodecid,
                                       uint width, uint height,
+                                      bool &xvsetdefaults,
                                       int xvmc_chroma,
                                       XvMCSurfaceInfo* xvmc_surf_info,
                                       QString *adaptor_name)
@@ -523,7 +532,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                 {
                     VERBOSE(VB_PLAYBACK, LOC + "Grabbed xv port "<<p);
                     port = p;
-                    add_open_xv_port(disp, p);
+                    xvsetdefaults = add_open_xv_port(disp, p);
                 }
                 disp->Unlock();
                 if (Success != ret)
@@ -546,7 +555,7 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                     {
                         VERBOSE(VB_PLAYBACK,  LOC + "Grabbed xv port "<<p);
                         port = p;
-                        add_open_xv_port(disp, p);
+                        xvsetdefaults = add_open_xv_port(disp, p);
                     }
                     disp->Unlock();
                 }
@@ -555,6 +564,9 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
         if (port != -1)
         {
             VERBOSE(VB_PLAYBACK, LOC + req[j].description.arg(port));
+            VERBOSE(VB_PLAYBACK, LOC +
+                        QString("XV_SET_DEFAULTS is %1supported on this port")
+                        .arg(xvsetdefaults ? "" : "not "));
             break;
         }
     }
@@ -708,6 +720,7 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
     const QSize video_dim = windows[0].GetVideoDim();
     xv_port = GrabSuitableXvPort(disp, disp->GetRoot(), mcodecid,
                                  video_dim.width(), video_dim.height(),
+                                 xv_set_defaults,
                                  xvmc_chroma, &xvmc_surf_info, &adaptor_name);
     if (xv_port == -1)
     {
@@ -749,9 +762,7 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
             delete xvmc_osd_available[i];
         xvmc_osd_available.clear();
         xvmc_osd_lock.unlock();
-        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
-        XvUngrabPort(disp->GetDisplay(), xv_port, CurrentTime);
-        del_open_xv_port(xv_port);
+        UngrabXvPort(disp, xv_port);
         xv_port = -1;
     }
 
@@ -788,7 +799,7 @@ bool VideoOutputXv::InitXVideo()
     const QSize video_dim = windows[0].GetVideoDim();
     xv_port = GrabSuitableXvPort(disp, disp->GetRoot(), kCodec_MPEG2,
                                  video_dim.width(), video_dim.height(),
-                                 0, NULL, &adaptor_name);
+                                 xv_set_defaults, 0, NULL, &adaptor_name);
     if (xv_port == -1)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -840,9 +851,7 @@ bool VideoOutputXv::InitXVideo()
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Couldn't find the proper XVideo image format.");
-        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
-        XvUngrabPort(disp->GetDisplay(), xv_port, CurrentTime);
-        del_open_xv_port(xv_port);
+        UngrabXvPort(disp, xv_port);
         xv_port = -1;
     }
 
@@ -854,9 +863,7 @@ bool VideoOutputXv::InitXVideo()
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create XVideo Buffers.");
         DeleteBuffers(XVideo, false);
-        VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << xv_port);
-        XvUngrabPort(disp->GetDisplay(), xv_port, CurrentTime);
-        del_open_xv_port(xv_port);
+        UngrabXvPort(disp, xv_port);
         xv_port = -1;
         ok = false;
     }
@@ -1005,8 +1012,9 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
         XvMCSurfaceInfo info;
 
         ok = false;
+        bool dummy;
         int port = GrabSuitableXvPort(disp, disp->GetRoot(), ret, width, height,
-                                      xvmc_chroma, &info);
+                                      dummy, xvmc_chroma, &info);
         if (port >= 0)
         {
             XvMCContext *ctx =
@@ -1014,11 +1022,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
                                   width, height);
             ok = NULL != ctx;
             DeleteXvMCContext(disp, ctx);
-            VERBOSE(VB_PLAYBACK, LOC + "Closing XVideo port " << port);
-            disp->Lock();
-            XvUngrabPort(disp->GetDisplay(), port, CurrentTime);
-            del_open_xv_port(port);
-            disp->Unlock();
+            UngrabXvPort(disp, port);
         }
     }
 
@@ -1154,6 +1158,9 @@ bool VideoOutputXv::InitSetupBuffers(void)
         ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm);
     }
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
+
+    if (xv_port && (VideoOutputSubType() >= XVideo))
+        save_port_attributes(xv_port);
 
     // Initialize the picture controls if we need to..
     if (db_use_picture_controls)
@@ -3065,8 +3072,6 @@ int VideoOutputXv::SetPictureAttribute(
     QByteArray ascii_attr_name =  attrName.toAscii();
     const char *cname = ascii_attr_name.constData();
 
-    int valAdj = (kPictureAttribute_Hue == attribute) ? xv_hue_base : 0;
-
     if (attrName.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "\n\n\n attrName.isEmpty() \n\n\n");
@@ -3090,9 +3095,18 @@ int VideoOutputXv::SetPictureAttribute(
 
     int port_min = xv_attribute_min[attribute];
     int port_max = xv_attribute_max[attribute];
+    int port_def = xv_attribute_def[attribute];
     int range    = port_max - port_min;
 
-    int tmpval2 = (newValue + valAdj) % 100; 
+    int valAdj = (kPictureAttribute_Hue == attribute) ? xv_hue_base : 0;
+
+    if (xv_set_defaults && range && (kPictureAttribute_Hue == attribute))
+    {
+        float tmp = (((float)(port_def - port_min) / (float)range) * 100.0);
+        valAdj = (int)(tmp + 0.5);
+    }
+
+    int tmpval2 = (newValue + valAdj) % 100;
     int tmpval3 = (int) roundf(range * 0.01f * tmpval2); 
     int value   = min(tmpval3 + port_min, port_max); 
 
@@ -3120,6 +3134,13 @@ void VideoOutputXv::InitPictureAttributes(void)
 
     if (VideoOutputSubType() >= XVideo)
     {
+        if (xv_set_defaults)
+        {
+            QByteArray ascii_name = "XV_SET_DEFAULTS";
+            const char *name = ascii_name.constData();
+            xv_set_attrib(disp, xv_port, name, 0);
+        }
+
         int val, min_val, max_val;
         for (uint i = 0; i < kPictureAttribute_MAX; i++)
         {
@@ -3137,8 +3158,14 @@ void VideoOutputXv::InitPictureAttributes(void)
                     (supported_attributes | toMask((PictureAttribute)i));
                 xv_attribute_min[(PictureAttribute)i] = min_val;
                 xv_attribute_max[(PictureAttribute)i] = max_val;
+                xv_attribute_def[(PictureAttribute)i] = val;
+                VERBOSE(VB_PLAYBACK, LOC + QString("%1: %2:%3:%4")
+                    .arg(cname).arg(min_val).arg(val).arg(max_val));
             }
         }
+
+        if (xv_set_defaults)
+            restore_port_attributes(xv_port, false);
     }
     else
     {

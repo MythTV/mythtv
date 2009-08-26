@@ -25,21 +25,77 @@ void close_all_xv_ports_signal_handler(int sig)
     QMap<int,port_info>::iterator it;
     for (it = open_xv_ports.begin(); it != open_xv_ports.end(); ++it)
     {
+        restore_port_attributes((*it).port);
         cerr<<"Ungrabbing XVideo port: "<<(*it).port<<endl;
         XvUngrabPort((*it).disp->GetDisplay(), (*it).port, CurrentTime);
     }
     exit(GENERIC_EXIT_NOT_OK);
 }
 
-void add_open_xv_port(MythXDisplay *disp, int port)
+void save_port_attributes(int port)
 {
+    if (!open_xv_ports.count(port))
+        return;
+
+    open_xv_ports[port].attribs.clear();
+
+    int attrib_count = 0;
+
+    MythXDisplay *disp = open_xv_ports[port].disp;
+    MythXLocker lock(disp);
+    XvAttribute *attributes = XvQueryPortAttributes(disp->GetDisplay(),
+                                                    port, &attrib_count);
+    if (!attributes || !attrib_count)
+        return;
+
+    for (int i = 0; i < attrib_count; i++)
+    {
+        if (!(attributes[i].flags & XvGettable))
+            continue;
+
+        int current;
+        if (xv_get_attrib(disp, port, attributes[i].name, current))
+            open_xv_ports[port].attribs[QString(attributes[i].name)] = current;
+    }
+}
+
+void restore_port_attributes(int port, bool clear)
+{
+    if (!open_xv_ports.count(port))
+        return;
+    if (!open_xv_ports[port].attribs.size())
+        return;
+
+    MythXDisplay *disp = open_xv_ports[port].disp;
+    MythXLocker lock(disp);
+
+    QMap<QString,int>::iterator it;
+    for (it  = open_xv_ports[port].attribs.begin();
+         it != open_xv_ports[port].attribs.end(); ++it)
+    {
+        QByteArray ascii_name =  it.key().toAscii();
+        const char *cname = ascii_name.constData();
+        xv_set_attrib(disp, port, cname, it.value());
+    }
+
+    if (clear)
+        open_xv_ports[port].attribs.clear();
+}
+
+bool add_open_xv_port(MythXDisplay *disp, int port)
+{
+    bool ret = false;
     if (port >= 0)
     {
         open_xv_ports[port].disp = disp;
         open_xv_ports[port].port = port;
+        QByteArray ascii_name = "XV_SET_DEFAULTS";
+        const char *name = ascii_name.constData();
+        ret = xv_is_attrib_supported(disp, port, name);
         // TODO enable more catches after 0.19 is out -- dtk
         signal(SIGINT,  close_all_xv_ports_signal_handler);
     }
+    return ret;
 }
 
 void del_open_xv_port(int port)
@@ -107,6 +163,12 @@ bool xv_is_attrib_supported(
 
         if (max_value)
             *max_value = attributes[i].max_value;
+
+        if (!(attributes[i].flags & XvGettable))
+        {
+            XFree(attributes);
+            return true;
+        }
 
         xv_atom = XInternAtom(disp->GetDisplay(), name, False);
         if (None == xv_atom)

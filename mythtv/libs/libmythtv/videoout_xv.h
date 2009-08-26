@@ -113,9 +113,11 @@ class VideoOutputXv : public VideoOutput
     static int GrabSuitableXvPort(MythXDisplay* disp, Window root,
                                   MythCodecID type,
                                   uint width, uint height,
+                                  bool &xvsetdefaults,
                                   int xvmc_chroma = 0,
                                   XvMCSurfaceInfo* si = NULL,
                                   QString *adaptor_name = NULL);
+    static void UngrabXvPort(MythXDisplay* disp, int port);
 
     static XvMCContext* CreateXvMCContext(MythXDisplay* disp, int port,
                                           int surf_type,
@@ -225,10 +227,12 @@ class VideoOutputXv : public VideoOutput
     int                  xv_colorkey;
     bool                 xv_draw_colorkey;
     int                  xv_chroma;
+    bool                 xv_set_defaults;
     buffer_map_t         xv_buffers;
     bool                 xv_need_bobdeint_repaint;
     QMap<PictureAttribute,int> xv_attribute_min;
     QMap<PictureAttribute,int> xv_attribute_max;
+    QMap<PictureAttribute,int> xv_attribute_def;
 
     // Chromakey OSD info
     ChromaKeyOSD        *chroma_osd;
