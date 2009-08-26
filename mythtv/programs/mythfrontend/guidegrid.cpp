@@ -370,10 +370,17 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             event->text().toInt(&isNum);
             if (isNum && !m_jumpToChannel)
             {
-                m_jumpToChannel = new JumpToChannel(
-                    this, event->text(),
-                    m_currentStartChannel, m_currentRow, m_channelCount);
-                updateJumpToChannel();
+                // see if we can find a matching channel before creating the JumpToChannel otherwise
+                // JumpToChannel will delete itself in the ctor leading to a segfault
+                int i = FindChannel(0, event->text(), false);
+                if (i >= 0)
+                {
+                    m_jumpToChannel = new JumpToChannel(this, event->text(),
+                                                        m_currentStartChannel, 
+                                                        m_currentRow, m_channelCount);
+                    updateJumpToChannel();
+                }
+
                 handled = true;
             }
         }
