@@ -314,7 +314,8 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                     {
                         nalP = ff_find_start_code(byteP+1, endP,
                                                   &sync_accumulator) - 8;
-                        decode_SEI(&gb, (nalP - byteP) * 8);
+                        // Subtract 4, so we don't consume the next start code
+                        decode_SEI(&gb, (nalP - byteP - 4) * 8);
                         set_AU_pending(stream_offset);
                     }
                     else if (nal_unit_type == SPS)
