@@ -34,16 +34,27 @@
 
 int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
 {
-    struct xvmc_pix_fmt *render;
+    struct xvmc_pix_fmt *last, *next, *render;
     XvMCMpegControl      binfo;
     XvMCQMatrix          qmatrix;
     int                  i;
 
-    ff_xvmc_field_start(s, avctx);
-
     render = (struct xvmc_pix_fmt*) s->current_picture.data[2];
     bzero(&binfo, sizeof(binfo));
     bzero(&qmatrix, sizeof(qmatrix));
+
+    assert(avctx);
+    if (!render || render->xvmc_id != AV_XVMC_ID ||
+        !render->p_surface) {
+        av_log(avctx, AV_LOG_ERROR,
+               "Render token doesn't look as expected.\n");
+        return -1; // make sure that this is a render packet
+    }
+
+    render->picture_structure = s->picture_structure;
+    render->flags             = s->first_field ? 0 : XVMC_SECOND_FIELD;
+    render->p_future_surface  = NULL;
+    render->p_past_surface    = NULL;
 
     for (i = 0; i < 64; i++)
     {
@@ -107,12 +118,37 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
     binfo.picture_structure = s->picture_structure;
     switch (s->pict_type)
     {
-        case FF_I_TYPE:  binfo.picture_coding_type = XVMC_I_PICTURE;  break;
-        case FF_P_TYPE:  binfo.picture_coding_type = XVMC_P_PICTURE;  break;
-        case FF_B_TYPE:  binfo.picture_coding_type = XVMC_B_PICTURE;  break;
-        default:      av_log(avctx, AV_LOG_ERROR,
-                             "%s: Unknown picture coding type: %d\n",
-                             __FUNCTION__, s->pict_type);
+        case FF_I_TYPE:
+            binfo.picture_coding_type = XVMC_I_PICTURE;
+            break;
+        case FF_P_TYPE:
+            binfo.picture_coding_type = XVMC_P_PICTURE;
+            last = (struct xvmc_pix_fmt*)s->last_picture.data[2];
+            if (!last)
+                last = render; // predict second field from the first
+            if (last->xvmc_id != AV_XVMC_ID)
+                return -1;
+            render->p_past_surface = last->p_surface;
+            break;
+        case FF_B_TYPE:
+            binfo.picture_coding_type = XVMC_B_PICTURE;
+            last = (struct xvmc_pix_fmt*)s->last_picture.data[2];
+            if (!last)
+                last = render; // predict second field from the first
+            if (last->xvmc_id != AV_XVMC_ID)
+                return -1;
+            render->p_past_surface = last->p_surface;
+            next = (struct xvmc_pix_fmt*)s->next_picture.data[2];
+            if (!next)
+                return -1;
+            if (next->xvmc_id != AV_XVMC_ID)
+                return -1;
+            render->p_future_surface = next->p_surface;
+            break;
+        default:
+            av_log(avctx, AV_LOG_ERROR, "%s: Unknown picture coding type: %d\n",
+                   __FUNCTION__, s->pict_type);
+            return -1;
     }
 
     binfo.intra_dc_precision = s->intra_dc_precision;;
