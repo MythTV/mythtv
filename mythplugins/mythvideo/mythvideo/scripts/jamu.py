@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.1" # 0.1.0 Initial development 
+__version__=u"v0.4.2" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -144,7 +144,8 @@ __version__=u"v0.4.1" # 0.1.0 Initial development
 					 #       For all movies IMDB numbers will be used instead of converting to TMDB 
 					 #       numbers. This is done to maintain consistency with MythVideo movie inetref
 					 #       numbers.
-					 # 0.4.1 Fixed an obscure video file rename (-F option) error 
+					 # 0.4.1 Fixed an obscure video file rename (-F option) error
+					 # 0.4.2 Fixed a bug where bad data for either TMDB or TVDB would abort script 
 
 
 usage_txt=u'''
@@ -3264,11 +3265,13 @@ class MythTvMetaData(VideoFiles):
 		tmp_array=tmp_files.split('\n')
 		for element in tmp_array:
 			element = (element.rstrip('\n')).strip()
-			if element == '':
+			if element == '' or element == None:
 				continue
 			index = element.index(':')
 			key = element[:index].lower()
 			data = element[index+1:]
+			if data == None or data == '':
+				continue
 			if key == u'inetref' and len(cfile['inetref']) == 7:
 				meta_dict[key] = cfile['inetref']
 				continue
@@ -3339,6 +3342,8 @@ class MythTvMetaData(VideoFiles):
 				meta_dict[key] = cfile['inetref']
 				continue
 			data = meta_dict[key]
+			if not data:
+				continue
 			data = self._changeAmp(data)
 			data = self._changeToCommas(data)
 			if key == 'genres':
@@ -3358,13 +3363,22 @@ class MythTvMetaData(VideoFiles):
 			if key == 'trailer':
 				continue
 			if key == 'year':
-				meta_dict[key] = int(data)
+				try:
+					meta_dict[key] = int(data)
+				except:
+					pass
 				continue
 			if key == 'userrating':
-				meta_dict[key] = float(data)
+				try:
+					meta_dict[key] = float(data)
+				except:
+					pass
 				continue
 			if key == 'runtime':
-				meta_dict['length'] = long(data)
+				try:
+					meta_dict['length'] = long(data)
+				except:
+					pass
 				continue
 
 		if meta_dict.has_key('rating'):
@@ -3465,14 +3479,22 @@ class MythTvMetaData(VideoFiles):
 			index = element.index(':')
 			key = element[:index].lower()
 			data = element[index+1:]
+			if data == None:
+				continue
 			if key == 'series':
 				meta_dict['title'] = data
 				continue
 			if key == 'seasonnumber':
-				meta_dict['season'] = int(data)
+				try:
+					meta_dict['season'] = int(data)
+				except:
+					pass
 				continue
 			if key == 'episodenumber':
-				meta_dict['episode'] = int(data)
+				try:
+					meta_dict['episode'] = int(data)
+				except:
+					pass
 				continue
 			if key == 'episodename':
 				meta_dict['subtitle'] = data
@@ -3484,22 +3506,34 @@ class MythTvMetaData(VideoFiles):
 				meta_dict['director'] = ''
 				continue
 			if key == u'firstaired' and len(data) > 4:
-				meta_dict['year'] = int(data[:4])
+				try:
+					meta_dict['year'] = int(data[:4])
+				except:
+					pass
 				meta_dict['firstaired'] = data
 				continue
 			if key == 'year':
-				meta_dict['year'] = int(data)
+				try:
+					meta_dict['year'] = int(data)
+				except:
+					pass
 				continue
 			if key == 'seriesid':
 				meta_dict['inetref'] = data
 				continue
 			if key == 'rating':
-				meta_dict['userrating'] = float(data)
+				try:
+					meta_dict['userrating'] = float(data)
+				except:
+					pass
 				continue
 			if key == 'filename':# This "episodeimage URL clashed with the video file name and ep image
 				continue		#  is not used yet. So skip fixes the db video filename from being wiped.
 			if key == 'runtime':
-				meta_dict['length'] = long(data)
+				try:
+					meta_dict['length'] = long(data)
+				except:
+					pass
 				continue
 			meta_dict[key] = data
 
