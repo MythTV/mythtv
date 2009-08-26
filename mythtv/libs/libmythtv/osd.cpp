@@ -30,6 +30,7 @@ using namespace std;
 #include "compat.h"
 #include "mythverbose.h"
 #include "util.h"
+#include "channelutil.h"
 
 #include "x11colors.h"
 #include "mythdirs.h"
@@ -1699,6 +1700,14 @@ void OSD::ClearAllText(const QString &name)
 void OSD::SetText(const QString &name, InfoMap &infoMap, int length)
 {
     HideAllExcept(name);
+
+    if (infoMap.find("chanid") != infoMap.end())
+    {
+        uint chanid = infoMap["chanid"].toUInt();
+        QString iconpath = ChannelUtil::GetIcon(chanid);
+        if (!iconpath.isEmpty())
+            infoMap["iconpath"] = iconpath;
+    }
 
     QMutexLocker locker(&osdlock);
 
