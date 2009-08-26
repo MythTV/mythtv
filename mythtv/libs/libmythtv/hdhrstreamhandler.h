@@ -22,21 +22,13 @@ class DeviceReadBuffer;
 // HDHomeRun headers
 #ifdef USING_HDHOMERUN
 #include "hdhomerun.h"
-#undef max
-#undef min
 #else
-struct hdhomerun_control_sock_t { int dummy; };
+struct hdhomerun_device_t { int dummy; };
 #endif
 
 typedef QMap<uint,int> FilterMap;
 
 //#define RETUNE_TIMEOUT 5000
-
-struct hdhr_id_data {
-    uint device_id;
-    uint device_ip;
-    uint tuner;
-};
 
 class HDHRStreamHandler : public ReaderPausedCB
 {
@@ -50,7 +42,7 @@ class HDHRStreamHandler : public ReaderPausedCB
     void RemoveListener(MPEGStreamData *data);
 
     bool IsRunning(void) const { return _running; }
-    QString GetTunerStatus(void) const;
+    void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
     bool IsConnected(void) const;
 
     // Commands
@@ -63,18 +55,10 @@ class HDHRStreamHandler : public ReaderPausedCB
     virtual void ReaderPaused(int fd) { (void) fd; }
 
   private:
-    HDHRStreamHandler(const QString &, hdhr_id_data &);
+    HDHRStreamHandler(const QString &);
     ~HDHRStreamHandler();
 
-    static void FindDevice(const QString &, hdhr_id_data &);
     bool Connect(void);
-
-    QString DeviceGet(const QString &name,
-                      bool report_error_return = true,
-                      bool print_error = true) const;
-    QString DeviceSet(const QString &name, const QString &value,
-                      bool report_error_return = true,
-                      bool print_error = true);
 
     QString TunerGet(const QString &name,
                      bool report_error_return = true,
@@ -82,9 +66,6 @@ class HDHRStreamHandler : public ReaderPausedCB
     QString TunerSet(const QString &name, const QString &value,
                      bool report_error_return = true,
                      bool print_error = true);
-
-    bool DeviceSetTarget(short unsigned int);
-    bool DeviceClearTarget(void);
 
     bool Open(void);
     void Close(void);
@@ -107,12 +88,9 @@ class HDHRStreamHandler : public ReaderPausedCB
     PIDPriority GetPIDPriority(uint pid) const;
 
   private:
-    hdhomerun_control_sock_t  *_control_socket;
-    hdhomerun_video_sock_t    *_video_socket;
-    uint                       _device_id;
-    uint                       _device_ip;
-    uint                       _tuner;
-    QString                    _devicename;
+    hdhomerun_device_t *_hdhomerun_device;
+    uint                _tuner;
+    QString             _devicename;
 
     mutable QMutex    _start_stop_lock;
     bool              _running;

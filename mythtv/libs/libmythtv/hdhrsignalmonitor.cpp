@@ -103,30 +103,25 @@ void HDHRSignalMonitor::UpdateValues(void)
         return;
     }
 
-    QString msg = streamHandler->GetTunerStatus();
-    //ss  = signal strength,        [0,100]
-    //snq = signal to noise quality [0,100]
-    //seq = signal error quality    [0,100]
-    int loc_sig = msg.indexOf("ss="),  loc_snq = msg.indexOf("snq=");
-    int loc_seq = msg.indexOf("seq="), loc_end = msg.length();
-    bool ok0, ok1, ok2;
-    uint sig = msg.mid(loc_sig + 3, loc_snq - loc_sig - 4).toUInt(&ok0);
-    uint snq = msg.mid(loc_snq + 4, loc_seq - loc_snq - 5).toUInt(&ok1);
-    uint seq = msg.mid(loc_seq + 4, loc_end - loc_seq - 4).toUInt(&ok2);
+    struct hdhomerun_tuner_status_t status;
+    streamHandler->GetTunerStatus(&status);
+
+    uint sig = status.signal_strength;
+    uint snq = status.signal_to_noise_quality;
+    uint seq = status.symbol_error_quality;
+
     (void) snq; // TODO should convert to S/N
     (void) seq; // TODO should report this...
 
-    //VERBOSE(VB_RECORD, LOC + "Tuner status: " + msg);
-    //VERBOSE(VB_RECORD, LOC + QString("'%1:%2:%3'")
-    //        .arg(sig).arg(snq).arg(seq));
+    VERBOSE(VB_RECORD|VB_EXTRA, LOC + "Tuner status: " + QString("'%1:%2:%3'")
+            .arg(sig).arg(snq).arg(seq));
 
     // Set SignalMonitorValues from info from card.
     bool isLocked = false;
     {
         QMutexLocker locker(&statusLock);
-        if (loc_sig > 0 && loc_snq > 0 && ok0)
-            signalStrength.SetValue(sig);
-        signalLock.SetValue(signalStrength.IsGood() ? 1 : 0);
+        signalStrength.SetValue(sig);
+        signalLock.SetValue(status.lock_supported);
         isLocked = signalLock.IsGood();
     }
 

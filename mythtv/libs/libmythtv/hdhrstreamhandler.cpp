@@ -39,39 +39,12 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname)
 
     QMap<QString,HDHRStreamHandler*>::iterator it = _handlers.find(devkey);
 
-    hdhr_id_data device_data;
-
     if (it == _handlers.end())
     {
-        // Not found in the current _handlers
-        // Try to find the physical device and determine a unique device key
-        // Then check to see if the unique key exists
-        FindDevice(devname, device_data);
-
-        devkey = QString("%1-%2").arg(device_data.device_id, 8, 16)
-                                 .arg(device_data.tuner);
-
-        // If the physical device is not found use the key "NOTFOUND-0"
-        if (device_data.device_id == 0)
-            devkey = "NOTFOUND-0";
-
-        devkey = devkey.toUpper();
-        it = _handlers.find(devkey);
-    }
-
-
-    if (it == _handlers.end())
-    {
-        HDHRStreamHandler *newhandler = new HDHRStreamHandler(devkey,
-                                                              device_data);
+        HDHRStreamHandler *newhandler = new HDHRStreamHandler(devkey);
         newhandler->Open();
         _handlers[devkey] = newhandler;
         _handlers_refcnt[devkey] = 1;
-
-        // If we are adding a "NOTFOUND" device,
-        // up its refcount so we never delete it.
-        if (device_data.device_id == 0)
-            _handlers_refcnt[devkey]++;
 
         VERBOSE(VB_RECORD,
                 QString("HDHRSH: Creating new stream handler %1 for %2")
@@ -127,13 +100,9 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
     ref = NULL;
 }
 
-HDHRStreamHandler::HDHRStreamHandler(const QString &devicename,
-                                     hdhr_id_data  &device_data) :
-    _control_socket(NULL),
-    _video_socket(NULL),
-    _device_id(device_data.device_id),
-    _device_ip(device_data.device_ip),
-    _tuner(device_data.tuner),
+HDHRStreamHandler::HDHRStreamHandler(const QString &devicename) :
+    _hdhomerun_device(NULL),
+    _tuner(-1),
     _devicename(devicename),
 
     _start_stop_lock(QMutex::Recursive),
@@ -284,21 +253,13 @@ void HDHRStreamHandler::RunTS(void)
     buffersize = max(49 * TSPacket::SIZE * 128, buffersize);
 
     /* Create TS socket. */
-    _video_socket = hdhomerun_video_create(0, buffersize, NULL);
-    if (!_video_socket)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Open() failed to open socket");
-        return;
-    }
-
-    uint localPort = hdhomerun_video_get_local_port(_video_socket);
-    if (!DeviceSetTarget(localPort))
+    if (!hdhomerun_device_stream_start(_hdhomerun_device))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Starting recording (set target failed). Aborting.");
         return;
     }
-    hdhomerun_video_flush(_video_socket);
+    hdhomerun_device_stream_flush(_hdhomerun_device);
 
     bool _error = false;
 
@@ -313,8 +274,8 @@ void HDHRStreamHandler::RunTS(void)
         read_size *= VIDEO_DATA_PACKET_SIZE;
 
         size_t data_length;
-        unsigned char *data_buffer =
-            hdhomerun_video_recv(_video_socket, read_size, &data_length);
+        unsigned char *data_buffer = hdhomerun_device_stream_recv(
+            _hdhomerun_device, read_size, &data_length);
 
         if (!data_buffer)
         {
@@ -350,18 +311,7 @@ void HDHRStreamHandler::RunTS(void)
 
     RemoveAllPIDFilters();
 
-    DeviceClearTarget();
-    VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
-
-    hdhomerun_video_sock_t* tmp_video_socket;
-    {
-        QMutexLocker locker(&_hdhr_lock);
-        tmp_video_socket = _video_socket;
-        _video_socket=NULL;
-    }
-
-    hdhomerun_video_destroy(tmp_video_socket);
-
+    hdhomerun_device_stream_stop(_hdhomerun_device);
     VERBOSE(VB_RECORD, LOC + "RunTS(): " + "end");
 
     SetRunning(false);
@@ -610,35 +560,33 @@ PIDPriority HDHRStreamHandler::GetPIDPriority(uint pid) const
 
 bool HDHRStreamHandler::Open(void)
 {
-    // By the time we get here we have a unique device_id & device_ip pair
-    // for the hdhomerun. _device_id == 0 and _devicename == "NOTFOUND-0"
-    // denote a device which is configured but we coudn't find.
-    if (_device_id == 0)
-        return false;
     return Connect();
 }
 
 void HDHRStreamHandler::Close(void)
 {
-    if (_control_socket)
+    if (_hdhomerun_device)
     {
         TuneChannel("none");
-        hdhomerun_control_destroy(_control_socket);
-        _control_socket=NULL;
+        hdhomerun_device_destroy(_hdhomerun_device);
+        _hdhomerun_device = NULL;
     }
 }
 
 bool HDHRStreamHandler::Connect(void)
 {
-    _control_socket = hdhomerun_control_create(_device_id, _device_ip, NULL);
+    _hdhomerun_device = hdhomerun_device_create_from_str(
+        _devicename.toLocal8Bit().constData(), NULL);
 
-    if (!_control_socket)
+    if (!_hdhomerun_device)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create control socket");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create hdhomerun object");
         return false;
     }
 
-    if (hdhomerun_control_get_local_addr(_control_socket) == 0)
+    _tuner = hdhomerun_device_get_tuner(_hdhomerun_device);
+
+    if (hdhomerun_device_get_local_machine_addr(_hdhomerun_device) == 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to connect to device");
         return false;
@@ -648,53 +596,9 @@ bool HDHRStreamHandler::Connect(void)
     return true;
 }
 
-void HDHRStreamHandler::FindDevice(const QString &_devicename,
-                                   hdhr_id_data  &device_data)
-{
-    hdhomerun_device_t* thisdevice = hdhomerun_device_create_from_str(
-        _devicename.toLocal8Bit().constData(), NULL);
-
-    if (thisdevice)
-    {
-        device_data.device_id = hdhomerun_device_get_device_id(thisdevice);
-        device_data.device_ip = hdhomerun_device_get_device_ip(thisdevice);
-        device_data.tuner     = hdhomerun_device_get_tuner(thisdevice);
-        hdhomerun_device_destroy(thisdevice);
-
-        if (device_data.device_ip != 0)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("HDHRSH: device %1 found at "
-                            "address %2.%3.%4.%5 tuner %6")
-                    .arg(_devicename)
-                    .arg((device_data.device_ip>>24) & 0xFF)
-                    .arg((device_data.device_ip>>16) & 0xFF)
-                    .arg((device_data.device_ip>> 8) & 0xFF)
-                    .arg((device_data.device_ip>> 0) & 0xFF)
-                    .arg(device_data.tuner));
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, LOC + "device not found");
-            device_data.device_id = 0;
-            device_data.device_ip = hdhomerun_device_get_device_ip_requested(
-                                        thisdevice);
-            device_data.tuner     = 0;
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "device not found");
-        device_data.device_id = 0;
-        device_data.device_ip = 0;
-        device_data.tuner     = 0;
-    }
-}
-
-
 bool HDHRStreamHandler::EnterPowerSavingMode(void)
 {
-    if (_video_socket)
+    if (!hdhomerun_device_get_video_sock(_hdhomerun_device))
     {
         VERBOSE(VB_RECORD, LOC + "Ignoring request - video streaming active");
         return false;
@@ -705,21 +609,22 @@ bool HDHRStreamHandler::EnterPowerSavingMode(void)
     }
 }
 
-QString HDHRStreamHandler::DeviceGet(
+QString HDHRStreamHandler::TunerGet(
     const QString &name, bool report_error_return, bool print_error) const
 {
     QMutexLocker locker(&_hdhr_lock);
 
-    if (!_control_socket)
+    if (!_hdhomerun_device)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed (not connected)");
         return QString::null;
     }
 
+    QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_control_get(
-            _control_socket, name.toLocal8Bit().constData(),
+    if (hdhomerun_device_get_var(
+            _hdhomerun_device, valname.toLocal8Bit().constData(),
             &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed" + ENO);
@@ -740,22 +645,25 @@ QString HDHRStreamHandler::DeviceGet(
     return QString(value);
 }
 
-QString HDHRStreamHandler::DeviceSet(
+QString HDHRStreamHandler::TunerSet(
     const QString &name, const QString &val,
     bool report_error_return, bool print_error)
 {
     QMutexLocker locker(&_hdhr_lock);
 
-    if (!_control_socket)
+    if (!_hdhomerun_device)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed (not connected)");
         return QString::null;
     }
 
+
+    QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_control_set(
-            _control_socket, name.toLocal8Bit().constData(),
+
+    if (hdhomerun_device_set_var(
+            _hdhomerun_device, valname.toLocal8Bit().constData(),
             val.toLocal8Bit().constData(), &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
@@ -778,66 +686,14 @@ QString HDHRStreamHandler::DeviceSet(
     return QString(value);
 }
 
-QString HDHRStreamHandler::TunerGet(
-    const QString &name, bool report_error_return, bool print_error) const
+void HDHRStreamHandler::GetTunerStatus(struct hdhomerun_tuner_status_t *status)
 {
-    return DeviceGet(QString("/tuner%1/%2").arg(_tuner).arg(name),
-                     report_error_return, print_error);
-}
-
-QString HDHRStreamHandler::TunerSet(
-    const QString &name, const QString &value,
-    bool report_error_return, bool print_error)
-{
-    QString valname = QString("/tuner%1/%2").arg(_tuner).arg(name);
-    return DeviceSet(valname, value, report_error_return, print_error);
-}
-
-bool HDHRStreamHandler::DeviceSetTarget(unsigned short localPort)
-{
-    if (localPort == 0)
-    {
-        return false;
-    }
-
-    unsigned long localIP = hdhomerun_control_get_local_addr(_control_socket);
-    if (localIP == 0)
-    {
-        return false;
-    }
-
-    QString rtpValue = QString("rtp://%1.%2.%3.%4:%5")
-        .arg((localIP >> 24) & 0xFF).arg((localIP >> 16) & 0xFF)
-        .arg((localIP >>  8) & 0xFF).arg((localIP >>  0) & 0xFF)
-        .arg(localPort);
-
-    QString err = TunerSet("target", rtpValue, true, false);
-
-    if (err.isEmpty())
-    {
-        QString udpValue = QString("udp://%1.%2.%3.%4:%5")
-            .arg((localIP >> 24) & 0xFF).arg((localIP >> 16) & 0xFF)
-            .arg((localIP >>  8) & 0xFF).arg((localIP >>  0) & 0xFF)
-            .arg(localPort);
-        return !TunerSet("target", udpValue).isEmpty();
-    }
-
-    return true;
-}
-
-bool HDHRStreamHandler::DeviceClearTarget(void)
-{
-    return !TunerSet("target", "0.0.0.0:0").isEmpty();
-}
-
-QString HDHRStreamHandler::GetTunerStatus(void) const
-{
-    return TunerGet("status");
+    hdhomerun_device_get_tuner_status(_hdhomerun_device, NULL, status);
 }
 
 bool HDHRStreamHandler::IsConnected(void) const
 {
-    return (_control_socket != NULL);
+    return (_hdhomerun_device != NULL);
 }
 
 bool HDHRStreamHandler::TuneChannel(const QString &chn)
