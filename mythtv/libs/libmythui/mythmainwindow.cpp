@@ -175,10 +175,6 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
     if (keynum != Qt::Key_Escape &&
         (keynum <  Qt::Key_Shift || keynum > Qt::Key_ScrollLock))
     {
-        // Ignore modifiers
-        if (keynum == Qt::Key_Backtab)
-            return keynum;
-
         Qt::KeyboardModifiers modifiers;
         // if modifiers have been pressed, rebuild keynum
         if ((modifiers = e->modifiers()) != Qt::NoModifier)
