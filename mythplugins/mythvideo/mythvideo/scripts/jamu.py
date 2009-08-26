@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.2" # 0.1.0 Initial development 
+__version__=u"v0.4.3" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -146,6 +146,11 @@ __version__=u"v0.4.2" # 0.1.0 Initial development
 					 #       numbers.
 					 # 0.4.1 Fixed an obscure video file rename (-F option) error
 					 # 0.4.2 Fixed a bug where bad data for either TMDB or TVDB would abort script 
+					 # 0.4.3 Recent changes in the MythVideo UI graphic hunts (cover art and fanart) 
+                     #       have made Jamu's creation of "folder.xxx" graphics redundant. This 
+                     #       feature has been turned off in Jamu. There is a new user option 
+                     #       "folderart" that can reactivate this feature through the Jamu 
+                     #       configuration file.
 
 
 usage_txt=u'''
@@ -1127,6 +1132,7 @@ class Configuration(object):
 		self.config['min_poster_size'] = 400
 		self.config['image_library'] = False
 		self.config['ffmpeg'] = True
+		self.config['folderart'] = False
 		self.config['metadata_exclude_as_update_trigger'] = ['intid', 'season', 'episode', 'showlevel', 'filename', 'coverfile', 'childid', 'browse', 'playcommand', 'trailer', 'host', 'screenshot', 'banner', 'fanart']
 
 		# Episode data keys that you want to display or download.
@@ -5009,127 +5015,128 @@ class MythTvMetaData(VideoFiles):
 				)
 
 		# Fix all the directory cover images
-		for cfile in validFiles:
-			videopath = tv_series_format % (cfile['filepath'], cfile['filename'], cfile['ext'])
-			# Find the MythTV meta data
-			intid = mythvideo.getMetadataId(videopath, localhostname.lower())
-			if not intid:
-				intid = mythvideo.getMetadataId(self.rtnRelativePath(videopath, u'mythvideo'), localhostname.lower())
-				has_metadata = mythvideo.hasMetadata(self.rtnRelativePath(videopath, u'mythvideo'), localhostname.lower())
-			else:
-				has_metadata = mythvideo.hasMetadata(videopath, localhostname.lower())
-			if intid == None:
-				continue
-			elif not has_metadata:
-				continue
-
-			if cfile['seasno'] == 0 and cfile['epno'] == 0:
-				movie=True
-			else:
-				movie=False
-
-			# Get a dictionary of the existing meta data
-			meta_dict=mythvideo.getMetadataDictionary(intid)
-
-			# There must be an Internet reference number. Get one for new records. 
-			if _can_int(meta_dict['inetref']) and not meta_dict['inetref'] == u'00000000' and not meta_dict['inetref'] == u'':
-				if meta_dict['inetref'] == u'99999999':
-					continue
-				inetref = meta_dict['inetref']
-				cfile['inetref'] = meta_dict['inetref']
-			else:
-				continue
-
-			tmp_dir = cfile['filepath']
-			base_dir = True
-			for dirs in directories:
-				if dirs == tmp_dir:
-					break
-			else:
-				base_dir = False
-			if base_dir:	# Do not add a link for base directories, could put a randomizer here
-				self._displayMessage(
-					u"Video (%s) (%s) is in a base video directory(%s), skipping cover art process\n" % (cfile['filepath'], cfile['file_seriesname'], dirs)
-				)
-				continue
-
-			for dirs in directories:
-				sub_path = cfile['filepath'].replace(dirs, u'')
-				if sub_path != tmp_dir:
-					base_dir = dirs
-					break
-			dir_array = []
-			dir_subs = u''
-			sub_path= sub_path[1:]
-			for d in sub_path.split(u'/'):
-				dir_array.append([u"%s/%s" % (base_dir+dir_subs, d), d])
-				dir_subs+=u'/'+d
-			
-			for directory in dir_array:
-				for ext in self.image_extensions:
-					tmp_file = u"%s/%s.%s" % (directory[0], directory[1], ext)
-					folder_name = u"%s/%s.%s" % (directory[0], u'folder', ext)
-					if os.path.islink(tmp_file):
-						try:
-							os.remove(tmp_file)	# Clean up old symlinks
-						except:
-							pass
-					if os.path.islink(folder_name):
-						try:
-							os.remove(folder_name) 	# Clean up old symlinks
-						except:
-							pass
-					if os.path.isfile(tmp_file):
-						if os.path.isfile(os.path.realpath(tmp_file)): # Check for broken symbolic links
-							os.rename(tmp_file, folder_name)
-							break 
-					if os.path.isfile(folder_name):
-						if os.path.isfile(os.path.realpath(folder_name)): # Check for broken symbolic links
-							break 
+		if self.config['folderart']:
+			for cfile in validFiles:
+				videopath = tv_series_format % (cfile['filepath'], cfile['filename'], cfile['ext'])
+				# Find the MythTV meta data
+				intid = mythvideo.getMetadataId(videopath, localhostname.lower())
+				if not intid:
+					intid = mythvideo.getMetadataId(self.rtnRelativePath(videopath, u'mythvideo'), localhostname.lower())
+					has_metadata = mythvideo.hasMetadata(self.rtnRelativePath(videopath, u'mythvideo'), localhostname.lower())
 				else:
-					for pattern in self.config['season_dir_pattern']:
-						match = pattern.match(directory[1]) 
-						if match:
-							season_num = int((match.groups())[0])
+					has_metadata = mythvideo.hasMetadata(videopath, localhostname.lower())
+				if intid == None:
+					continue
+				elif not has_metadata:
+					continue
+
+				if cfile['seasno'] == 0 and cfile['epno'] == 0:
+					movie=True
+				else:
+					movie=False
+
+				# Get a dictionary of the existing meta data
+				meta_dict=mythvideo.getMetadataDictionary(intid)
+
+				# There must be an Internet reference number. Get one for new records. 
+				if _can_int(meta_dict['inetref']) and not meta_dict['inetref'] == u'00000000' and not meta_dict['inetref'] == u'':
+					if meta_dict['inetref'] == u'99999999':
+						continue
+					inetref = meta_dict['inetref']
+					cfile['inetref'] = meta_dict['inetref']
+				else:
+					continue
+
+				tmp_dir = cfile['filepath']
+				base_dir = True
+				for dirs in directories:
+					if dirs == tmp_dir:
+						break
+				else:
+					base_dir = False
+				if base_dir:	# Do not add a link for base directories, could put a randomizer here
+					self._displayMessage(
+						u"Video (%s) (%s) is in a base video directory(%s), skipping cover art process\n" % (cfile['filepath'], cfile['file_seriesname'], dirs)
+					)
+					continue
+
+				for dirs in directories:
+					sub_path = cfile['filepath'].replace(dirs, u'')
+					if sub_path != tmp_dir:
+						base_dir = dirs
+						break
+				dir_array = []
+				dir_subs = u''
+				sub_path= sub_path[1:]
+				for d in sub_path.split(u'/'):
+					dir_array.append([u"%s/%s" % (base_dir+dir_subs, d), d])
+					dir_subs+=u'/'+d
+			
+				for directory in dir_array:
+					for ext in self.image_extensions:
+						tmp_file = u"%s/%s.%s" % (directory[0], directory[1], ext)
+						folder_name = u"%s/%s.%s" % (directory[0], u'folder', ext)
+						if os.path.islink(tmp_file):
+							try:
+								os.remove(tmp_file)	# Clean up old symlinks
+							except:
+								pass
+						if os.path.islink(folder_name):
+							try:
+								os.remove(folder_name) 	# Clean up old symlinks
+							except:
+								pass
+						if os.path.isfile(tmp_file):
+							if os.path.isfile(os.path.realpath(tmp_file)): # Check for broken symbolic links
+								os.rename(tmp_file, folder_name)
+								break 
+						if os.path.isfile(folder_name):
+							if os.path.isfile(os.path.realpath(folder_name)): # Check for broken symbolic links
+								break 
+					else:
+						for pattern in self.config['season_dir_pattern']:
+							match = pattern.match(directory[1]) 
+							if match:
+								season_num = int((match.groups())[0])
+								for ext in self.image_extensions:
+									filename = self.findFileInDir(u"%s Season %d.%s" % (cfile['file_seriesname'], season_num, ext), self.config['posterdir'])
+									if filename:
+										if self.config['simulation']:
+											sys.stdout.write(
+												u"Simmulating - Creating Season directory cover art (%s)\n" % tv_series_format % (directory[0], directory[1], ext)
+											)
+										else:
+											try:
+												shutil.copy2(filename, tv_series_format % (directory[0], u'folder', ext))
+												self._displayMessage(u"Season directory cover image created for (%s)\n" % directory[0])
+												num_symlinks_created+=1
+											except OSError:
+												pass
+										break
+						else:
+							if movie:
+								name = inetref							
+							else:
+								name = cfile['file_seriesname']
 							for ext in self.image_extensions:
-								filename = self.findFileInDir(u"%s Season %d.%s" % (cfile['file_seriesname'], season_num, ext), self.config['posterdir'])
+								filename = self.findFileInDir(u"%s.%s" % (name, ext), self.config['posterdir'])
 								if filename:
 									if self.config['simulation']:
 										sys.stdout.write(
-											u"Simmulating - Creating Season directory cover art (%s)\n" % tv_series_format % (directory[0], directory[1], ext)
+											u"Stimulating - Creating Movie or TV Series directory cover art (%s)\n" % tv_series_format % (directory[0], directory[1], ext)
 										)
 									else:
-										try:
+										if not os.path.isfile(tv_series_format % (directory[0], u'folder', ext)):
+											try:
+												os.remove(tv_series_format % (directory[0], u'folder', ext))
+											except:
+												pass
 											shutil.copy2(filename, tv_series_format % (directory[0], u'folder', ext))
-											self._displayMessage(u"Season directory cover image created for (%s)\n" % directory[0])
+											self._displayMessage(
+										u"Movie or TV Series directory cover image created for (%s)\n" % directory[0]
+										)
 											num_symlinks_created+=1
-										except OSError:
-											pass
 									break
-					else:
-						if movie:
-							name = inetref							
-						else:
-							name = cfile['file_seriesname']
-						for ext in self.image_extensions:
-							filename = self.findFileInDir(u"%s.%s" % (name, ext), self.config['posterdir'])
-							if filename:
-								if self.config['simulation']:
-									sys.stdout.write(
-										u"Stimulating - Creating Movie or TV Series directory cover art (%s)\n" % tv_series_format % (directory[0], directory[1], ext)
-									)
-								else:
-									if not os.path.isfile(tv_series_format % (directory[0], u'folder', ext)):
-										try:
-											os.remove(tv_series_format % (directory[0], u'folder', ext))
-										except:
-											pass
-										shutil.copy2(filename, tv_series_format % (directory[0], u'folder', ext))
-										self._displayMessage(
-									u"Movie or TV Series directory cover image created for (%s)\n" % directory[0]
-									)
-										num_symlinks_created+=1
-								break
 
 		sys.stdout.write(u"\nMythtv video database maintenance ends at  : %s\n" % (datetime.datetime.now()).strftime("%Y-%m-%d %H:%M"))
 
