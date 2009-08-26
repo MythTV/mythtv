@@ -73,13 +73,8 @@ void DetectLetterbox::Detect(VideoFrame *frame)
             }
             break;
         default:
-            if (!firstFrameChecked)
-            {
-                firstFrameChecked = frameNumber;
-                VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is "
-                        "not a supported frame format (was %1)")
-                        .arg(frame->codec));
-            }
+            VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is not "
+                    "a supported frame format (was %1)").arg(frame->codec));
             isDetectLetterbox = false;
             return;
     }
