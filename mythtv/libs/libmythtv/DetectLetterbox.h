@@ -18,6 +18,7 @@ public:
 
 private:
     bool isDetectLetterbox;
+    int firstFrameChecked;
 
     AdjustFillMode detectLetterboxDefaultMode;
     AdjustFillMode detectLetterboxDetectedMode; // Wich mode was last detected

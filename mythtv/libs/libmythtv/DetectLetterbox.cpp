@@ -13,6 +13,7 @@ DetectLetterbox::DetectLetterbox(NuppelVideoPlayer* const nvp)
 {
     int dbAdjustFill = gContext->GetNumSetting("AdjustFill", 0);
     isDetectLetterbox = dbAdjustFill >= kAdjustFill_AutoDetect_DefaultOff;
+    firstFrameChecked = 0;
     detectLetterboxDefaultMode = (AdjustFillMode) max((int) kAdjustFill_Off,
                                  dbAdjustFill - kAdjustFill_AutoDetect_DefaultOff);
     detectLetterboxSwitchFrame = -1;
@@ -64,13 +65,21 @@ void DetectLetterbox::Detect(VideoFrame *frame)
 
     switch (frame->codec) {
         case FMT_YV12:
-            if (frameNumber == 1)
+            if (!firstFrameChecked)
+            {
+                firstFrameChecked = frameNumber;
                 VERBOSE(VB_PLAYBACK,
                         QString("Detect Letterbox: YV12 frame format detected"));
+            }
             break;
         default:
-            VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is not "
-                    "a supported frame format (was %1)").arg(frame->codec));
+            if (!firstFrameChecked)
+            {
+                firstFrameChecked = frameNumber;
+                VERBOSE(VB_PLAYBACK, QString("Detect Letterbox: The source is "
+                        "not a supported frame format (was %1)")
+                        .arg(frame->codec));
+            }
             isDetectLetterbox = false;
             return;
     }
@@ -320,6 +329,7 @@ void DetectLetterbox::SetDetectLetterbox(bool detect)
     isDetectLetterbox = detect;
     detectLetterboxSwitchFrame = -1;
     detectLetterboxDetectedMode = nupple_video_player->GetAdjustFill();
+    firstFrameChecked = 0;
 }
 
 bool DetectLetterbox::GetDetectLetterbox()
