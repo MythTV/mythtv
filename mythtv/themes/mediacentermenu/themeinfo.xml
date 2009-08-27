@@ -1,0 +1,21 @@
+<themeinfo>
+    <name>Media Center Menu Theme</name>
+    <author>
+        <name>Robert McNamara</name>
+        <email>robert.mcnamara@gmail.com</email>
+    </author>
+
+    <types>
+        <type>Menu</type>
+    </types>
+
+    <version>
+        <major>1</major>
+        <minor>1</minor>
+    </version>
+    
+    <detail>
+        <description>A "Media Center" menu theme. This menu theme is basically meant to bring the common "media player/DVR" functionality to the forefront, organize the plugins, and to make some of myth's more daunting options a little more subtle. Places the common media items on the top level (Recordings, Videos, TV, DVD, Music), places all informational plugins in "Plugins." Puts all setup and scheduling in "Advanced." The top two menu levels will seem new, the ones beneath Advanced->Setup are as in the default menu.</description>
+        <errata>This menu theme is released under the terms of the GPLv2.</errata>
+    </detail>
+</themeinfo>
