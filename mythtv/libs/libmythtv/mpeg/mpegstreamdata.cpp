@@ -1197,25 +1197,6 @@ bool MPEGStreamData::HasCachedAllPAT(uint tsid) const
     return true;
 }
 
-bool MPEGStreamData::HasCachedAllPAT(void) const
-{
-    QMutexLocker locker(&_cache_lock);
-
-    QList<uint> keys = _cached_pats.keys();
-
-    uint last_tsid = 1<<17; // tsid is only 16 bit
-    while (!keys.isEmpty())
-    {
-        uint tsid = keys.takeFirst() >> 8;
-        if (tsid == last_tsid)
-            continue;
-        if (!HasCachedAllPAT(tsid))
-            return false;
-        last_tsid = tsid;
-    }
-    return last_tsid != 1<<17;
-}
-
 bool MPEGStreamData::HasCachedAnyPAT(uint tsid) const
 {
     QMutexLocker locker(&_cache_lock);
