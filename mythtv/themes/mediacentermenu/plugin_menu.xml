@@ -1,0 +1,198 @@
+<mythmenu name="INFO">
+
+    <button>
+        <type>IMAGES</type>
+        <text>Image Gallery</text>
+        <text lang="IT">Immagini</text>
+        <text lang="ES">Fotos</text>
+        <text lang="CS">Imatges</text>
+        <text lang="NL">Foto's</text>
+        <text lang="FR">Gallerie photo</text>
+        <text lang="DE">Bilder ansehen</text>
+        <text lang="DA">Billeder</text>
+        <text lang="IS">Ljósmyndir</text>
+        <text lang="PT">Ver Fotos</text>
+        <text lang="SV">Visa bilder</text>
+        <text lang="JA">イメージ</text>
+        <text lang="FI">Kuvagalleria</text>
+        <text lang="ZH_TW">照相館</text>
+        <text lang="SL">Gledanje slik</text>
+        <text lang="ET">Pildialbum</text>
+        <text lang="NB">Bildegalleri</text>
+        <text lang="CS">Galerie fotek</text>
+        <text lang="RU">Изображения</text>
+        <text lang="PL">Galeria zdjęć</text>
+        <text lang="HE">גלרית תמונות</text>
+        <description>Look at Pictures</description>
+        <action>PLUGIN mythgallery</action>
+        <depends>mythgallery</depends>
+    </button>
+  
+    <button>
+        <type>GAME</type>
+        <text>Play Games</text>
+        <text lang="IT">Giochi</text>
+        <text lang="ES">Juegos</text>
+        <text lang="CS">Jocs</text>
+        <text lang="NL">Spelen</text>
+        <text lang="FR">Jeux</text>
+        <text lang="DE">Spielen</text>
+        <text lang="DA">Spil</text>
+        <text lang="IS">Spila leiki</text>
+        <text lang="PT">Jogar</text>
+        <text lang="SV">Spela spel</text>
+        <text lang="JA">ゲーム</text>
+        <text lang="FI">Pelit</text>
+        <text lang="ZH_TW">遊戲</text>
+        <text lang="SL">Igranje iger</text>
+        <text lang="ET">Mängud</text>
+        <text lang="NB">Spill</text>
+        <text lang="CS">Hrát hry</text>
+        <text lang="RU">Играть в игры</text>
+        <text lang="PL">Graj w gry</text>
+        <text lang="HE">לשחק משחקים</text>
+        <description>Play video games</description>
+        <action>PLUGIN mythgame</action>
+        <depends>mythgame</depends>
+    </button>
+
+    <button>
+        <type>NEWS</type>
+        <text>News Feeds</text>
+        <text lang="IT">Notizie</text>
+        <text lang="DE">Nachrichten</text>
+        <text lang="CS">Notícies</text>
+        <text lang="ES">Noticias</text>
+        <text lang="FR">Nouvelles</text>
+        <text lang="IS">Fréttir</text>
+        <text lang="NL">Nieuws</text>
+        <text lang="SV">Nyheter</text>
+        <text lang="JA">ニュース</text>
+        <text lang="FI">Uutiset</text>
+        <text lang="ZH_TW">網上新聞</text>
+        <text lang="SL">Novice</text>
+        <text lang="ET">Uudised</text>
+        <text lang="NB">Nyheter</text>
+        <text lang="DA">Nyheder</text>
+        <text lang="PT">Notícias</text>
+        <text lang="CS">Novinky</text>
+        <text lang="RU">Новости</text>
+        <text lang="PL">Wiadomości</text>
+        <text lang="HE">חדשות</text>
+        <description>Keep up with the news</description>
+        <action>PLUGIN mythnews</action>
+        <depends>mythnews</depends>
+    </button>
+
+    <button>
+        <type>MOVIETIMES</type>
+        <text>Movie Times</text>
+        <text lang="IT">Orari</text>
+        <text lang="FI">Elokuvahaku</text>
+        <text lang="SL">Kino program</text>
+        <text lang="ET">Filmide ajad</text>
+        <text lang="FR">Programme Télé</text>
+        <text lang="SV">Biotider</text>
+        <text lang="PT">Horário de Cinema</text>
+        <text lang="DE">Kinoprogramm</text>
+        <text lang="NL">Bioscoop Tijden</text>
+        <text lang="CS">Programy kin</text>
+        <text lang="JA">ムービータイム</text>
+        <text lang="RU">Афиша кино</text>
+        <text lang="PL">Repertuar kin</text>
+        <text lang="HE">זמני הקרנת סרטים</text>
+        <description>See when local movies are playing</description>
+        <action>PLUGIN mythmovies</action>
+        <depends>mythmovies</depends>
+    </button>
+  
+    <button>
+        <type>WEATHER</type>
+        <text>Weather</text>
+        <text lang="IT">Meteo</text>
+        <text lang="ES">El Tiempo</text>
+        <text lang="CS">El Temps</text>
+        <text lang="NL">Het Weer</text>
+        <text lang="FR">Météo</text>
+        <text lang="DE">Wetter</text>
+        <text lang="DA">Vejret</text>
+        <text lang="IS">Veðrið</text>
+        <text lang="PT">Meteorologia</text>
+        <text lang="SV">Väder</text>
+        <text lang="JA">天気</text>
+        <text lang="FI">Säätiedotus</text>
+        <text lang="ZH_TW">天氣報告</text>
+        <text lang="SL">Vreme</text>
+        <text lang="ET">Ilmateade</text>
+        <text lang="NB">Været</text>
+        <text lang="CS">Počasí</text>
+        <text lang="RU">Погода</text>
+        <text lang="PL">Pogoda</text>
+        <text lang="HE">מזג האויר</text>
+        <action>PLUGIN mythweather</action>
+        <description>Local weather forecast</description>
+        <depends>mythweather</depends>
+    </button>
+
+    <button>
+        <type>NETFLIX</type>
+        <text>NetFlix</text>
+        <text lang="FI">MythFlix</text>
+        <text lang="PT">Aluguer de Filmes</text>
+        <text lang="DE">MythFlix</text>
+        <text lang="NL">MythFlix</text>
+        <text lang="ET">MythFlix</text>
+        <text lang="SL">MythFlix</text>
+        <text lang="FR">Location Films</text>
+        <text lang="PL">Filmy z internetu</text>
+        <description>Manage your NetFlix queue</description>
+        <action>PLUGIN mythflix</action>
+        <depends>mythflix</depends>
+    </button>
+
+    <button>
+        <type>WEBPAGE</type>
+        <text>Web</text>
+        <text lang="IT">Web</text>
+        <text lang="DE">WWW</text>
+        <text lang="FR">Web</text>
+        <text lang="IS">Vefurinn</text>
+        <text lang="SV">Webb</text>
+        <text lang="JA">ウェブ</text>
+        <text lang="FI">Nettiselain</text>
+        <text lang="ZH_TW">互聯網</text>
+        <text lang="SL">Splet</text>
+        <text lang="ET">Veeb</text>
+        <text lang="NB">Nettleser</text>
+        <text lang="DA">Web</text>
+        <text lang="ES">Web</text>
+        <text lang="PT">Navegação Web</text>
+        <text lang="NL">Internet</text>
+        <text lang="CS">Prohlížení webu</text>
+        <text lang="RU">WWW</text>
+        <text lang="PL">Internet WWW</text>
+        <text lang="HE">אינטרנט</text>
+        <description>Browse the web</description>
+        <action>PLUGIN mythbrowser</action>
+        <depends>mythbrowser</depends>
+    </button>
+
+    <button>
+        <type>ZONEMINDER</type>
+        <text>Zone Minder</text>
+        <text lang="IT">Videosorveglianza</text>
+        <text lang="PL">Strażnik</text>
+        <text lang="FI">ZoneMinder</text>
+        <description>Home surveillance</description>
+        <action>PLUGIN mythzoneminder</action>
+        <depends>mythzoneminder</depends>
+ </button>
+
+    <button>
+        <type>SMOLT</type>
+        <text>Hardware profile</text>
+        <description>Tell us what hardware you have so we can support it</description>
+        <action>PLUGIN mythsmolt</action>
+        <depends>mythsmolt</depends>
+ </button>
+</mythmenu>

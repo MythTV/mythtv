@@ -1,0 +1,173 @@
+<mythmenu name="MAIN">
+
+    <button>
+        <type>TV_WATCH_RECORDINGS</type>
+        <text>Watch Recordings</text>
+        <text lang="IT">Guarda Registrazioni</text>
+        <text lang="ES">Ver Grabaciones</text>
+        <text lang="CS">Veure Gravacions</text>
+        <text lang="NL">Opnames Bekijken</text>
+        <text lang="FR">Voir un enregistrement</text>
+        <text lang="DE">Aufnahmen ansehen</text>
+        <text lang="DA">Afspil optagelser</text>
+        <text lang="IS">Horfa á upptökur</text>
+        <text lang="PT">Ver Gravações de TV</text>
+        <text lang="SV">Visa inspelningar</text>
+        <text lang="JA">録画再生</text>
+        <text lang="FI">Katso Nauhoitukset</text>
+        <text lang="ZH_TW">觀看預錄節目</text>
+        <text lang="SL">Gledanje snemanj</text>
+        <text lang="ET">Salvestiste vaatamine</text>
+        <text lang="NB">Se på opptak</text>
+        <text lang="CS">Sledování nahrávek</text>
+        <text lang="RU">Смотреть записи</text>
+        <text lang="PL">Oglądanie nagrań</text>
+        <text lang="HE">צפיה בהקלטות</text>
+        <alttext lang="SV">Inspelningar</alttext>
+        <alttext lang="ET">Salvestised</alttext>
+        <alttext lang="RU">Записи</alttext>
+        <alttext lang="PL">Nagrania</alttext>
+        <description>Play recordings</description>
+        <action>TV_WATCH_RECORDING</action>
+    </button>
+
+    <button>
+        <type>VIDEO_BROWSER</type>
+        <text>Watch Videos</text>
+        <text lang="IT">Guarda Video</text>
+        <text lang="ES">Ver Videos</text>
+        <text lang="CS">Veure vídeos</text>
+        <text lang="DE">Videos ansehen</text>
+        <text lang="DA">Gennemse film</text>
+        <text lang="IS">Horfa á myndir</text>
+        <text lang="PT">Ver Filmes</text>
+        <text lang="SV">Visa filmer</text>
+        <text lang="FR">Voir une vidéo</text>
+        <text lang="NL">Films Bekijken</text>
+        <text lang="JA">ビデオブラウズ</text>
+        <text lang="FI">Katso Videoita</text>
+        <text lang="ZH_TW">播放電影</text>
+        <text lang="SL">Gledanje filmov</text>
+        <text lang="ET">Video vaatamine</text>
+        <text lang="NB">Se på videoer</text>
+        <text lang="CS">Sledovat filmy</text>
+        <text lang="RU">Смотреть фильмы</text>
+        <text lang="PL">Oglądanie filmów</text>
+        <text lang="HE">צפיה בוידאו</text>
+        <alttext lang="SV">Filmer</alttext>
+        <alttext lang="ET">Video</alttext>
+        <alttext lang="RU">Фильмы</alttext>
+        <alttext lang="PL">Filmy</alttext>
+        <description>Play videos</description>
+        <action>JUMP MythVideo</action>
+        <depends>mythvideo</depends>
+    </button>
+
+    <button>
+        <type>DVD_PLAY</type>
+        <text>Watch A DVD</text>
+        <text lang="IT">Riproduci DVD</text>
+        <text lang="DA">Afspil DVD</text>
+        <text lang="PT">Ver DVD</text>
+        <text lang="IS">Spila DVD</text>
+        <text lang="DE">DVD abspielen</text>
+        <text lang="SV">Spela DVD</text>
+        <text lang="ES">Ver DVD</text>
+        <text lang="CS">Veure DVD</text>
+        <text lang="FR">Lecture DVD</text>
+        <text lang="NL">DVD Afspelen</text>
+        <text lang="JA">DVD再生</text>
+        <text lang="FI">Katso DVD</text>
+        <text lang="ZH_TW">播放DVD</text>
+        <text lang="SL">Predvajaj DVD</text>
+        <text lang="ET">Mängi DVD-d</text>
+        <text lang="NB">Se på DVD</text>
+        <text lang="CS">Přehrát DVD</text>
+        <text lang="RU">Смотреть DVD</text>
+        <text lang="PL">Oglądanie DVD</text>
+        <text lang="HE">נגן DVD</text>
+        <description>Play the video on a movie DVD</description>
+        <action>JUMP Play DVD</action>
+        <depends>mythvideo</depends>
+    </button>
+
+    <button>
+        <type>TV_WATCH_TV</type>
+        <text>Watch Live TV</text>
+        <text lang="IT">Guarda la TV</text>
+        <text lang="ES">Ver la TV</text>
+        <text lang="CS">Veure la TV</text>
+        <text lang="NL">TV Kijken</text>
+        <text lang="FR">Regarder la TV</text>
+        <text lang="DE">Fernsehen</text>
+        <text lang="DA">Se TV</text>
+        <text lang="IS">Horfa á sjónvarp</text>
+        <text lang="PT">Ver Televisão</text>
+        <text lang="SV">Se på TV</text>
+        <text lang="JA">TV放送</text>
+        <text lang="FI">Katso Televisiota</text>
+        <text lang="ZH_TW">觀看電視</text>
+        <text lang="SL">Glej TV</text>
+        <text lang="ET">Vaata telerit</text>
+        <text lang="NB">Se på TV</text>
+        <text lang="CS">Sledovat TV</text>
+        <text lang="RU">Смотреть ТВ</text>
+        <text lang="AR">شاهد التلفاز</text>
+        <text lang="PL">Oglądanie TV</text>
+        <text lang="HE">צפיה בטלויזיה</text>
+        <description>Watch live television</description>
+        <action>TV_WATCH_LIVE</action>
+    </button>
+
+    <button>
+        <type>STREAM</type>
+        <text>Watch Online Streams</text>
+        <text lang="HE">נגן מדיה מכוונת</text>
+        <description></description>
+        <action>PLUGIN mythstream</action>
+        <depends>mythstream</depends>
+    </button>
+
+    <button>
+        <type>MUSIC_PLAY</type>
+        <text>Listen to Music</text>
+        <text lang="IT">Esegui Brani Musicali</text>
+        <text lang="ES">Escuchar Música</text>
+        <text lang="CS">Escoltar Música</text>
+        <text lang="DE">Musik hören</text>
+        <text lang="DA">Afspil musik</text>
+        <text lang="IS">Spila tónlist</text>
+        <text lang="NL">Muziek Afspelen</text>
+        <text lang="PT">Tocar Músicas</text>
+        <text lang="SV">Spela musik</text>
+        <text lang="FR">Écouter de la musique</text>
+        <text lang="JA">ミュージック再生</text>
+        <text lang="FI">Kuuntele Musiikkia</text>
+        <text lang="ZH_TW">播放音樂</text>
+        <text lang="SL">Predvajanje glasbe</text>
+        <text lang="ET">Kuula muusikat</text>
+        <text lang="NB">Hør på musikk</text>
+        <text lang="CS">Poslouchat muziku</text>
+        <text lang="RU">Слушать музыку</text>
+        <text lang="PL">Odtwarzaj muzykę</text>
+        <text lang="HE">האזנה למוסיקה</text>
+        <description></description>
+        <action>JUMP Play music</action>
+        <depends>mythmusic</depends>
+    </button>
+
+    <button>
+        <type>MENU_PLUGINS</type>
+        <text>Plugins</text>
+        <description>Other Plugins</description>
+        <action>MENU plugin_menu.xml</action>
+    </button>
+
+    <button>
+        <type>MENU_ADVANCED</type>
+        <text>Advanced</text>
+        <description>Advanced Options</description>
+        <action>MENU advanced.xml</action>
+    </button>
+
+</mythmenu>
