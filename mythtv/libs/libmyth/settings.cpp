@@ -253,6 +253,8 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     widget->setObjectName(widgetName);
 
     QHBoxLayout *layout = new QHBoxLayout();
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
@@ -283,11 +285,14 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
                                           QSizePolicy::Maximum));
     }
     else
         layout = new QHBoxLayout();
+
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
@@ -305,6 +310,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         QString(QString(widgetName) + "-edit").toAscii().constData());
     edit->setHelpText(getHelpText());
     edit->setText( getValue() );
+    edit->setMinimumHeight(25);
     layout->addWidget(edit);
 
     connect(this, SIGNAL(valueChanged(const QString&)),
@@ -383,11 +389,14 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
                                           QSizePolicy::Maximum));
     }
     else
         layout = new QHBoxLayout();
+
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
@@ -453,11 +462,14 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
                                           QSizePolicy::Maximum));
     }
     else
         layout = new QHBoxLayout();
+
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
@@ -475,6 +487,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     spinbox->setHelpText(getHelpText());
     spinbox->setMinimum(min);
     spinbox->setMaximum(max);
+    spinbox->setMinimumHeight(25);
     layout->addWidget(spinbox);
 
     // only set step size if greater than default (1), otherwise
@@ -565,11 +578,14 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
                                           QSizePolicy::Maximum));
     }
     else
         layout = new QHBoxLayout();
+
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
@@ -601,11 +617,14 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
                                           QSizePolicy::Maximum));
     }
     else
         layout = new QHBoxLayout();
+
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
@@ -653,6 +672,8 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (cg)
         connect(cbwidget, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
+
+    cbwidget->setMinimumHeight(25);
 
     layout->addWidget(cbwidget);
     layout->setStretchFactor(cbwidget, 1);
@@ -998,6 +1019,9 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         layout->addWidget(label);
     }
 
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
+
     bxwidget = widget;
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
@@ -1135,11 +1159,14 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        bxwidget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+        bxwidget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, 
                                             QSizePolicy::Maximum));
     }
     else
         layout = new QHBoxLayout();
+
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
@@ -1177,6 +1204,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
  
         QPixmap tmppix = QPixmap::fromImage(temp);
         imagelabel->setPixmap(tmppix);
+        imagelabel->setMinimumHeight(tmppix.height());
     }
     else
     {
@@ -1184,6 +1212,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
         tmppix.fill(Qt::black);
 
         imagelabel->setPixmap(tmppix);
+        imagelabel->setMinimumHeight(tmppix.height());
     }
 
     connect(combo, SIGNAL(highlighted(int)), this, SLOT(setValue(int)));
@@ -1292,6 +1321,8 @@ QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
     QWidget *widget = new QWidget(parent);
     widget->setObjectName(widgetName);
     QBoxLayout *layout = new QHBoxLayout();
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     if (getLabel() != "")
     {
