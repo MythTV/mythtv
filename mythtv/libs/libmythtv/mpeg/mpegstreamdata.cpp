@@ -1275,8 +1275,11 @@ bool MPEGStreamData::HasCachedAllPMTs(void) const
             return false;
 
         for (uint i = 0; i < pat->ProgramCount(); i++)
-            if (!HasCachedAllPMT(pat->ProgramNumber(i)))
+        {
+            uint prognum = pat->ProgramNumber(i);
+            if (prognum && !HasCachedAllPMT(prognum))
                 return false;
+        }
     }
 
     return true;
