@@ -1388,7 +1388,6 @@ void ChannelScanSM::HandleActiveScan(void)
 bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
 {
     const TransportScanItem &item = *transport;
-    const uint64_t freq = item.freq_offset(transport.offset());
 
 #ifdef USING_DVB
     if (GetDVBSignalMonitor())
@@ -1402,9 +1401,10 @@ bool ChannelScanSM::Tune(const transport_scan_items_it_t transport)
     if (!GetDTVChannel())
         return false;
 
-    if (item.mplexid > 0)
+    if (item.mplexid > 0 && transport.offset() == 0)
         return GetDTVChannel()->TuneMultiplex(item.mplexid, inputname);
 
+    const uint64_t freq = item.freq_offset(transport.offset());
     DTVMultiplex tuning = item.tuning;
     tuning.frequency = freq;
     return GetDTVChannel()->Tune(tuning, inputname);
