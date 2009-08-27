@@ -193,7 +193,7 @@ class MainServer : public QObject, public MythSocketCBs
     vector<PlaybackSock *> playbackList;
     vector<FileTransfer *> fileTransferList;
 
-    QTimer *masterServerReconnect;
+    QTimer *masterServerReconnect; // audited ref #5318
     PlaybackSock *masterServer;
     
     bool ismaster;
@@ -225,6 +225,8 @@ class MainServer : public QObject, public MythSocketCBs
     static QMutex truncate_and_close_lock;
 
     int m_exitCode;
+
+    static const uint kMasterServerReconnectTimeout;
 };
 
 #endif

@@ -109,6 +109,7 @@ int delete_file_immediately(const QString &filename,
 };
 
 QMutex MainServer::truncate_and_close_lock;
+const uint MainServer::kMasterServerReconnectTimeout = 1000; //ms
 
 class ProcessRequestThread : public QThread
 {
@@ -207,7 +208,7 @@ MainServer::MainServer(bool master, int port,
         masterServerReconnect->setSingleShot(true);
         connect(masterServerReconnect, SIGNAL(timeout()), this,
                 SLOT(reconnectTimeout()));
-        masterServerReconnect->start(1000);
+        masterServerReconnect->start(kMasterServerReconnectTimeout);
     }
 
     deferredDeleteTimer = new QTimer(this);
@@ -841,6 +842,9 @@ void MainServer::customEvent(QEvent *e)
         if (me->Message().left(14) == "RESET_IDLETIME" && m_sched)
             m_sched->ResetIdleTime();
 
+        if (me->Message() == "LOCAL_RECONNECT_TO_MASTER")
+            masterServerReconnect->start(kMasterServerReconnectTimeout);
+
         if (me->Message().left(6) == "LOCAL_")
             return;
 
@@ -857,7 +861,7 @@ void MainServer::customEvent(QEvent *e)
         bool sendGlobal = false;
         if (ismaster && broadcast[1].left(7) == "GLOBAL_")
         {
-            broadcast[1].replace(QRegExp("GLOBAL_"), "LOCAL_");
+            broadcast[1].replace("GLOBAL_", "LOCAL_");
             MythEvent me(broadcast[1], broadcast[2]);
             gContext->dispatch(me);
 
@@ -4596,7 +4600,8 @@ void MainServer::connectionClosed(MythSocket *socket)
             sockListLock.unlock();
             masterServer->DownRef();
             masterServer = NULL;
-            masterServerReconnect->start(1000);
+            MythEvent me("LOCAL_RECONNECT_TO_MASTER");
+            gContext->dispatch(me);
             return;
         }
         else if (sock == socket)
@@ -4966,7 +4971,7 @@ void MainServer::reconnectTimeout(void)
     if (!masterServerSock->connect(server, port))
     {
         VERBOSE(VB_IMPORTANT, "Connection to master server timed out.");
-        masterServerReconnect->start(1000);
+        masterServerReconnect->start(kMasterServerReconnectTimeout);
         masterServerSock->DownRef();
         return;
     }
@@ -4974,7 +4979,7 @@ void MainServer::reconnectTimeout(void)
     if (masterServerSock->state() != MythSocket::Connected)
     {
         VERBOSE(VB_IMPORTANT, "Could not connect to master server.");
-        masterServerReconnect->start(1000);
+        masterServerReconnect->start(kMasterServerReconnectTimeout);
         masterServerSock->DownRef();
         return;
     }
@@ -5007,9 +5012,9 @@ void MainServer::reconnectTimeout(void)
         }
     }
 
-    masterServerSock->writeStringList(strlist);
-    masterServerSock->readStringList(strlist);
-    if (strlist.empty() || strlist[0] == "ERROR")
+    if (!masterServerSock->writeStringList(strlist) ||
+        !masterServerSock->readStringList(strlist) ||
+        strlist.empty() || strlist[0] == "ERROR")
     {
         masterServerSock->DownRef();
         masterServerSock->Unlock();
@@ -5027,7 +5032,7 @@ void MainServer::reconnectTimeout(void)
                      QString(", error was %1").arg(strlist[1]) :
                      QString(", remote error")));
         }
-        masterServerReconnect->start(1000);
+        masterServerReconnect->start(kMasterServerReconnectTimeout);
         return;
     }
 
