@@ -211,7 +211,8 @@ class ChannelScanSM : public MPEGStreamListener,
 
     // Transports List
     int                         transportsScanned;
-    QSet<uint>                  ts_scanned;
+    QSet<uint32_t>              ts_scanned;
+    QMap<uint32_t,DTVMultiplex> extend_transports;
     transport_scan_items_t      scanTransports;
     transport_scan_items_it_t   current;
     transport_scan_items_it_t   nextIt;

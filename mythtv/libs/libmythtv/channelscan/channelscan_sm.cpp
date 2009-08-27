@@ -492,13 +492,12 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 {
     for (uint i = 0; i < nit->TransportStreamCount(); ++i)
     {
-        uint tsid  = nit->TSID(i);
-        uint netid = nit->OriginalNetworkID(i);
-        uint id    = netid << 16 | tsid;
+        uint32_t tsid  = nit->TSID(i);
+        uint32_t netid = nit->OriginalNetworkID(i);
+        uint32_t id    = netid << 16 | tsid;
 
-        if (ts_scanned.contains(id))
+        if (extend_transports.contains(id))
             continue;
-        ts_scanned.insert(id);
 
         const desc_list_t& list =
             MPEGDescriptor::Parse(nit->TransportDescriptors(i),
@@ -547,11 +546,8 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             else if (!tuning.FillFromDeliverySystemDesc(GetDVBChannel()->GetCardType(), desc))
                 continue;
 
-            QString name = QString("TransportID %1").arg(tsid);
-            TransportScanItem item(sourceID, name, tuning, signalTimeout);
-            VERBOSE(VB_CHANSCAN, LOC + "Adding " + name + " - " +
-                                 tuning.toString());
-            scanTransports.push_back(item);
+            extend_transports[id] = tuning;
+            break;
         }
     }
 }
@@ -1364,6 +1360,23 @@ void ChannelScanSM::HandleActiveScan(void)
         nextIt = current;
         ++nextIt;
     }
+    else if (!extend_transports.isEmpty())
+    {
+        QMap<uint32_t,DTVMultiplex>::iterator it = extend_transports.begin();
+        while (it != extend_transports.end())
+        {
+            if (!ts_scanned.contains(it.key()))
+            {
+                QString name = QString("TransportID %1").arg(it.key() & 0xffff);
+                TransportScanItem item(sourceID, name, *it, signalTimeout);
+                VERBOSE(VB_CHANSCAN, LOC + "Adding " + name + " - " +
+                        item.tuning.toString());
+                scanTransports.push_back(item);
+            }
+            ++it;
+        }
+        extend_transports.clear();
+    }
     else
     {
         scan_monitor->ScanComplete();
@@ -1534,6 +1547,7 @@ bool ChannelScanSM::ScanTransports(
         tables.pop_back();
     }
 
+    extend_scan_list = true;
     timer.start();
     waitingForTables = false;
 
