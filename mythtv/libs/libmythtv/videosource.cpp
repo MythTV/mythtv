@@ -3363,7 +3363,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
         {
             cardtype->setValue("DVB-T");
             cardname->setValue(frontend_name);
-            signal_timeout->setValue(500);
+            signal_timeout->setValue(1000);
             channel_timeout->setValue(3000);
             if (frontend_name.toLower().indexOf("usb") >= 0)
             {
