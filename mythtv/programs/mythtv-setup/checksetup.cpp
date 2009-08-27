@@ -98,6 +98,51 @@ bool checkStoragePaths(QStringList &probs)
     return problemFound;
 }
 
+bool checkImageStoragePaths(QStringList &probs)
+{
+    bool problemFound = false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT groupname "
+                  "FROM storagegroup "
+                  "WHERE hostname = :HOSTNAME;");
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    if (!query.exec() || !query.isActive() || query.size() < 1)
+    {
+        MythDB::DBError("checkImageStoragePaths", query);
+        return false;
+    }
+
+    QStringList groups;
+    while (query.next())
+    {
+        groups += query.value(0).toString();
+    }
+
+    if (groups.contains("Videos"))
+    {
+        if (groups.contains("Fanart") &&
+                groups.contains("Coverart") &&
+                groups.contains("Screenshots") &&
+                groups.contains("Banners"))
+            problemFound = false;
+        else
+        {
+            QString trMesg =
+                QObject::tr("You have a Video Storage "
+                            "Group, but have not set up "
+                            "all Image Groups.  If you continue, "
+                            "video image downloads will fail.  Do "
+                            "you want to go back and fix this?");
+            probs.push_back(trMesg);
+            VERBOSE(VB_IMPORTANT, trMesg);
+            problemFound = true;
+        }
+    }            
+
+    return problemFound;
+}
 
 // I keep forgetting to change the preset (starting channel) when I add cards,
 // so this checks that the assigned channel (which may be the default of 3)
@@ -158,7 +203,8 @@ bool checkChannelPresets(QStringList &probs)
 bool CheckSetup(QStringList &problems)
 {
     return checkStoragePaths(problems)
-        || checkChannelPresets(problems);
+        || checkChannelPresets(problems)
+        || checkImageStoragePaths(problems);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
