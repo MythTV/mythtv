@@ -3692,8 +3692,8 @@ if enabled x86; then
     echo "SSE enabled               ${sse-no}"
     echo "SSSE3 enabled             ${ssse3-no}"
     echo "CMOV enabled              ${cmov-no}"
-    echo "CMOV is fast              ${fast_cmov-no}"
 <<BLOCK_QUOTE
+    echo "CMOV is fast              ${fast_cmov-no}"
     echo "EBX available             ${ebx_available-no}"
     echo "EBP available             ${ebp_available-no}"
     echo "10 operands supported     ${ten_operands-no}"
