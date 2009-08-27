@@ -586,8 +586,6 @@ mingw {
     LIBS += -lpthread
 }
 
-INSTALLS += inc
-
 include ( ../libs-targetfix.pro )
 
 LIBS += $$LATE_LIBS
