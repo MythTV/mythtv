@@ -1032,16 +1032,25 @@ FILE *DataDirectProcessor::DDPost(
         QMutexLocker locker(&user_agent_lock);
         command = QString(
             "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
-            "--header='Accept-Encoding:gzip' %4 "
-            "--user-agent='%5' --output-document=- ")
+            " %4 --user-agent='%5' --output-document=- ")
             .arg(userid).arg(password).arg(postFilename).arg(ddurl)
             .arg(user_agent);
     }
 
+#ifdef USING_MINGW
+    // Allow for double quotes in userid and password (shell escape)
+    command.replace("\"","^\"");
+    // Replace single quotes with double-quotes
+    command.replace("'", "\"");
+    // Unescape unix-escaped single-quotes (which just became "\"")
+    command.replace("\"\\\"\"","'");
+    // gzip on win32 complains about broken pipe, so don't use it
+#else
     // if (!SHOW_WGET_OUTPUT)
     //    command += " 2> /dev/null ";
 
-    command += " | gzip -df";
+    command += " --header='Accept-Encoding:gzip' | gzip -df";
+#endif
 
     if (SHOW_WGET_OUTPUT)
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
@@ -1108,12 +1117,22 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
             .arg(GetUserID().replace('\'', "'\\''"))
             .arg(GetPassword().replace('\'', "'\\''")).arg(postFilename)
             .arg(ddurl).arg(user_agent).arg(resultFilename);
+#ifdef USING_MINGW
+        // Allow for double quotes in userid and password (shell escape)
+        command.replace("\"","^\"");
+        // Replace single quotes with double-quotes
+        command.replace("'", "\"");
+        // Unescape unix-escaped single-quotes (which just became "\"")
+        command.replace("\"\\\"\"","'");
+#endif
     }
 
     if (SHOW_WGET_OUTPUT)
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
+#ifndef USING_MINGW
     else
         command += " 2> /dev/null ";
+#endif
 
     myth_system(command);
 
@@ -2012,6 +2031,10 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
 
     command += "--output-document=";
     command += (documentFile.isEmpty()) ? "- " : dfile;
+
+#ifdef USING_MINGW
+    command.replace("'", "\"");
+#endif
 
     if (SHOW_WGET_OUTPUT)
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
