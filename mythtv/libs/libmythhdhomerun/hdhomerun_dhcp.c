@@ -237,7 +237,11 @@ static THREAD_FUNC_PREFIX hdhomerun_dhcp_thread_execute(void *arg)
 		int rx_length = recv(dhcp->sock, (char *)pkt->end, (int)(pkt->limit - pkt->end), 0);
 		if (rx_length <= 0) {
 			if (!sock_getlasterror_socktimeout) {
-				sleep(1);
+#if defined(__WINDOWS__)
+                               msleep(1000);
+#else
+                               sleep(1);
+#endif
 			}
 			continue;
 		}

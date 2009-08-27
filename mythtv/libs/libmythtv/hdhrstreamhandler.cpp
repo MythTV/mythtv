@@ -4,8 +4,10 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <unistd.h>
+#ifndef USING_MINGW
 #include <sys/select.h>
 #include <sys/ioctl.h>
+#endif
 
 // Qt headers
 #include <QString>

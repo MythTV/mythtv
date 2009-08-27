@@ -50,7 +50,14 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
 {
     VERBOSE(VB_SOCKET, LOC + "new socket");
     if (socket > -1)
+    {
         setSocket(socket);
+#ifdef USING_MINGW
+        // Windows sockets' default buffersize is too small for streaming
+        // Could this apply to other platforms, too?
+        setSendBufferSize(kSocketBufferSize);
+#endif	
+    }
 
     if (m_cb)
         m_readyread_thread.AddToReadyRead(this);

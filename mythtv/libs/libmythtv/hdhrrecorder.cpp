@@ -10,10 +10,12 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
+#ifndef USING_MINGW
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#endif
 #include <sys/time.h>
 
 // C++ includes

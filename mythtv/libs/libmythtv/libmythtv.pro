@@ -584,6 +584,7 @@ mingw {
     SOURCES += videoout_d3d.cpp
 
     LIBS += -lpthread
+    LIBS += -lws2_32
 }
 
 include ( ../libs-targetfix.pro )

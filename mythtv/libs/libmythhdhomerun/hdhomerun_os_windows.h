@@ -31,10 +31,12 @@
  */
 
 #define _WINSOCKAPI_
+// MinGW lacks wspiapi, so remove dependency by setting minimum WINVER to WinXP
+#define WINVER 0x0501
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <wspiapi.h>
+//#include <wspiapi.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -53,6 +55,7 @@
 #endif
 
 typedef int bool_t;
+/* Use MinGW includes instead
 typedef signed __int8 int8_t;
 typedef signed __int16 int16_t;
 typedef signed __int32 int32_t;
@@ -63,12 +66,17 @@ typedef unsigned __int32 uint32_t;
 typedef unsigned __int64 uint64_t;
 typedef HANDLE pthread_t;
 typedef HANDLE pthread_mutex_t;
+*/
+#include <stdint.h>
+#include <pthread.h>
 
+// Avoid #define conflicts by limiting scope to non-c++
+#ifndef __cplusplus
 #define socklen_t int
 #define close closesocket
 #define sock_getlasterror WSAGetLastError()
 #define sock_getlasterror_socktimeout (WSAGetLastError() == WSAETIMEDOUT)
-#define va_copy(x, y) x = y
+//#define va_copy(x, y) x = y
 #define atoll _atoi64
 #define strdup _strdup
 #define strcasecmp _stricmp
@@ -77,6 +85,7 @@ typedef HANDLE pthread_mutex_t;
 #define ftello _ftelli64
 #define THREAD_FUNC_PREFIX DWORD WINAPI
 #define SIGPIPE SIGABRT
+#endif
 
 static inline uint64_t getcurrenttime(void)
 {
@@ -100,11 +109,13 @@ static inline int msleep(unsigned int ms)
 	}
 }
 
-static inline int sleep(unsigned int sec)
+// Avoid a define conflict
+/*static inline int sleep(unsigned int sec)
 {
 	msleep(sec * 1000);
 	return 0;
 }
+*/
 
 static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout)
 {
@@ -112,6 +123,7 @@ static inline int setsocktimeout(int s, int level, int optname, uint64_t timeout
 	return setsockopt(s, level, optname, (char *)&t, sizeof(t));
 }
 
+/* MythTV uses pthreads lib instead
 static inline int pthread_create(pthread_t *tid, void *attr, LPTHREAD_START_ROUTINE start, void *arg)
 {
 	*tid = CreateThread(NULL, 0, start, arg, 0, NULL);
@@ -148,6 +160,7 @@ static inline void pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
 	ReleaseMutex(*mutex);
 }
+*/
 
 /*
  * The console output format should be set to UTF-8, however in XP and Vista this breaks batch file processing.

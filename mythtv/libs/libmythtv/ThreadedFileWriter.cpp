@@ -163,6 +163,9 @@ bool ThreadedFileWriter::Open(void)
     }
     else
     {
+#ifdef USING_MINGW
+        _setmode(fd, _O_BINARY);
+#endif
         buf = new char[TFW_DEF_BUF_SIZE + 1024];
         bzero(buf, TFW_DEF_BUF_SIZE + 64);
 

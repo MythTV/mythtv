@@ -22,4 +22,9 @@ SOURCES += hdhomerun_debug.c     hdhomerun_device.c       hdhomerun_dhcp.c
 SOURCES += hdhomerun_discover.c  hdhomerun_pkt.c          hdhomerun_video.c
 SOURCES += hdhomerun_device_selector.c
 
+mingw {
+    HEADERS += hdhomerun_os_windows.h
+    LIBS += -lws2_32 -liphlpapi -lpthread
+}
+
 include ( ../libs-targetfix.pro )

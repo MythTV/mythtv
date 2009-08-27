@@ -1830,6 +1830,9 @@ bool MythContext::BackendIsRunning(void)
 {
 #if CONFIG_DARWIN || (__FreeBSD__) || defined(__OpenBSD__)
     const char *command = "ps -axc | grep -i mythbackend | grep -v grep > /dev/null";
+#elif defined USING_MINGW
+    const char *command = "%systemroot%\\system32\\tasklist.exe "
+       " | %systemroot%\\system32\\find.exe /i \"mythbackend.exe\" ";
 #else
     const char *command = "ps -ae | grep mythbackend > /dev/null";
 #endif

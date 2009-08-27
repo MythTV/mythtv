@@ -178,9 +178,14 @@ uint myth_system(const QString &command, int flags)
             VERBOSE(VB_IMPORTANT,
                     (LOC_ERR + "WaitForSingleObject() failed because %1")
                     .arg(::GetLastError()));
+        DWORD exitcode = GENERIC_EXIT_OK;
+        if (!GetExitCodeProcess(pi.hProcess, &exitcode))
+            VERBOSE(VB_IMPORTANT, (LOC_ERR + 
+                    "GetExitCodeProcess() failed because %1")
+                    .arg(::GetLastError()));
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
-        return GENERIC_EXIT_OK;
+        return exitcode;
     }
 #endif
     return GENERIC_EXIT_NOT_OK;

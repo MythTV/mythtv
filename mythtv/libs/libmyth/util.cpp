@@ -1176,7 +1176,11 @@ QString createTempFile(QString name_template, bool dir)
     if (GetTempFileNameA(temppath, "mth", 0, tempfilename))
     {
         if (dir)
+        {
+            // GetTempFileNameA creates the file, so delete it before mkdir
+            unlink(tempfilename);
             ret = mkdir(tempfilename);
+        }
         else
             ret = open(tempfilename, O_CREAT | O_RDWR, S_IREAD | S_IWRITE);
     }
