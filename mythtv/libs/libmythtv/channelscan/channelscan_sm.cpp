@@ -85,6 +85,14 @@ class ScannedChannelInfo
   public:
     ScannedChannelInfo() : mgt(NULL) {}
 
+    bool IsEmpty() const
+    {
+        return pats.empty() && pmts.empty()        &&
+               program_encryption_status.isEmpty() &&
+               !mgt         && cvcts.empty()       && tvcts.empty() &&
+               nits.empty() && sdts.empty();
+    }
+
     // MPEG
     pat_map_t         pats;
     pmt_vec_t         pmts;
@@ -710,7 +718,8 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
     // append transports from the NIT to the scan list
-    if (transport_tune_complete && extend_scan_list)
+    if (transport_tune_complete && extend_scan_list &&
+        !currentInfo->nits.empty())
     {
         // append delivery system descriptos to scan list
         nit_vec_t::const_iterator it = currentInfo->nits.begin();
@@ -732,15 +741,17 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         QString msg_tr  = "";
         QString msg     = "";
 
-        if (currentInfo)
+        if (currentInfo && !currentInfo->IsEmpty())
         {
+            VERBOSE(VB_CHANSCAN, QString("Adding %1, offset %2 to channelList.")
+                    .arg((*current).tuning.toString()).arg(current.offset()));
             channelList << ChannelListItem(current, currentInfo);
             currentInfo = NULL;
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "currentInfo is empty for " +
-                    (*current).FriendlyName + " - " + (*current).tuning.toString());
+            delete currentInfo;
+            currentInfo = NULL;
         }
 
         SignalMonitor *sm = GetSignalMonitor();
