@@ -26,7 +26,7 @@ long TDStretchSSE2::calcCrossCorrMulti(const short *mPos, const short *cPos) con
     mp += channels;
     cp += channels;
 
-    asm volatile (
+    __asm__ volatile (
         "xorps      %%xmm5, %%xmm5      \n\t"
         "movd       %4, %%xmm7          \n\t"
         "1:                             \n\t"
@@ -83,7 +83,7 @@ long TDStretchSSE2::calcCrossCorrStereo(const short *mPos, const short *cPos) co
     mp += 2;
     cp += 2;
 
-    asm volatile (
+    __asm__ volatile (
         "xorps      %%xmm5, %%xmm5      \n\t"
         "movd       %4, %%xmm7          \n\t"
         "1:                             \n\t"
@@ -133,7 +133,7 @@ void TDStretchSSE2::overlapMulti(short *output, const short *input) const
     const short *m = pMidBuffer;
     long ch = (long)channels;
 
-    asm volatile (
+    __asm__ volatile (
         "movd       %%ecx, %%xmm0       \n\t"
         "shl        %6                  \n\t"
         "punpckldq  %%xmm0, %%xmm0      \n\t"
@@ -180,7 +180,7 @@ void TDStretchSSE2::overlapStereo(short *output, const short *input) const
     const short *i = input;
     const short *m = pMidBuffer;
 
-    asm volatile (
+    __asm__ volatile (
         "movd       %%ecx, %%mm0        \n\t"
         "pxor       %%mm7, %%mm7        \n\t"
         "punpckldq  %%mm0, %%mm0        \n\t"

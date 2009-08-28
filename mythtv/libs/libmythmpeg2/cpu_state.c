@@ -60,7 +60,7 @@ static void state_restore_mmx (cpu_state_t * state)
 
 static void state_save_altivec (cpu_state_t * state)
 {
-    asm (LI (9, 16)
+    __asm__ (LI (9, 16)
 	 STVX0 (20, 0, 3)
 	 LI (11, 32)
 	 STVX (21, 9, 3)
@@ -87,7 +87,7 @@ static void state_save_altivec (cpu_state_t * state)
 
 static void state_restore_altivec (cpu_state_t * state)
 {
-    asm (LI (9, 16)
+    __asm__ (LI (9, 16)
 	 LVX0 (20, 0, 3)
 	 LI (11, 32)
 	 LVX (21, 9, 3)
