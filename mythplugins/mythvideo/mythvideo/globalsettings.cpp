@@ -98,7 +98,7 @@ HostCheckBox *VideoListUnknownFiletypes()
 {
     HostCheckBox *gc = new HostCheckBox("VideoListUnknownFiletypes");
     gc->setLabel(QObject::tr("Show Unknown File Types"));
-    gc->setValue(true);
+    gc->setValue(false);
     gc->setHelpText(QObject::tr("If set, all files below the Myth Video "
                     "directory will be displayed unless their "
                     "extension is explicitly set to be ignored. "));

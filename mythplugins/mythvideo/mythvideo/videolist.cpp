@@ -807,7 +807,7 @@ MythGenericTree *VideoList::GetTreeRoot()
 VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
     m_metadata_list_type(ltNone)
 {
-    m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
+    m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 0);
 
     m_LoadMetaData = gContext->GetNumSetting("VideoTreeLoadMetaData", 0);
 

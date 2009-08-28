@@ -3564,7 +3564,7 @@ void VideoDialog::VideoMenu()
         if (!metadata->GetTrailer().isEmpty() ||
                 gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0 ||
                 m_d->m_altPlayerEnabled))
-            m_menuPopup->AddButton(tr("Play..."), SLOT(PlayMenu()));
+            m_menuPopup->AddButton(tr("Play..."), SLOT(PlayMenu()), true);
         else
             m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
         if (metadata->GetWatched())
