@@ -9,7 +9,7 @@ TARGET = mythvideo
 target.path = $${LIBDIR}/mythtv/plugins
 
 installscripts.path = $${PREFIX}/share/mythtv/mythvideo/scripts
-installscripts.files = scripts/*.pl scripts/*.py scripts/README
+installscripts.files = scripts/*.pl scripts/*.py scripts/README scripts/jamu-example.conf scripts/jamu.README
 
 installscriptsttvdb.path = $${PREFIX}/share/mythtv/mythvideo/scripts/ttvdb
 installscriptsttvdb.files = scripts/ttvdb/*.py scripts/ttvdb/*.conf
