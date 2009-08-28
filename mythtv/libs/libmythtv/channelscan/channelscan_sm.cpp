@@ -496,7 +496,7 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
         uint32_t netid = nit->OriginalNetworkID(i);
         uint32_t id    = netid << 16 | tsid;
 
-        if (extend_transports.contains(id))
+        if (ts_scanned.contains(id) || extend_transports.contains(id))
             continue;
 
         const desc_list_t& list =
@@ -1373,6 +1373,7 @@ void ChannelScanSM::HandleActiveScan(void)
                 VERBOSE(VB_CHANSCAN, LOC + "Adding " + name + " - " +
                         item.tuning.toString());
                 scanTransports.push_back(item);
+                ts_scanned.insert(it.key());
             }
             ++it;
         }

@@ -235,7 +235,8 @@ class ChannelScanSM : public MPEGStreamListener,
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)
 {
-    int tmp = (transportsScanned * 100) / scanTransports.size();
+    int tmp = (transportsScanned * 100) /
+              (scanTransports.size() + extend_transports.size());
     scan_monitor->ScanPercentComplete(tmp);
 }
 
