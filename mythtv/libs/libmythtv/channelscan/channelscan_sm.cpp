@@ -1362,6 +1362,7 @@ void ChannelScanSM::HandleActiveScan(void)
     }
     else if (!extend_transports.isEmpty())
     {
+        --current;
         QMap<uint32_t,DTVMultiplex>::iterator it = extend_transports.begin();
         while (it != extend_transports.end())
         {
@@ -1376,6 +1377,8 @@ void ChannelScanSM::HandleActiveScan(void)
             ++it;
         }
         extend_transports.clear();
+        nextIt = current;
+        ++nextIt;
     }
     else
     {

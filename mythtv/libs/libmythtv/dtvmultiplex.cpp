@@ -371,7 +371,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                 if (cd.ModulationSystem())
                 {
                     VERBOSE(VB_CHANSCAN,
-                            "Ignoring DVB-S2 transponder withj DVB-S card");
+                            "Ignoring DVB-S2 transponder with DVB-S card");
                     return false;
                 }
                 return ParseDVB_S_and_C(
