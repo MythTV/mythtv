@@ -55,12 +55,14 @@ class EditMetadataDialog : public MythScreenType
     void FindBanner();
     void FindFanart();
     void FindScreenshot();
+    void FindTrailer();
     void NewCategoryPopup();
     void AddCategory(QString category);
     void SetCoverArt(QString file);
     void SetBanner(QString file);
     void SetFanart(QString file);
     void SetScreenshot(QString file);
+    void SetTrailer(QString file);
 
   private:
 

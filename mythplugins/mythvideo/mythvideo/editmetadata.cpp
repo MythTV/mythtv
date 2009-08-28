@@ -76,6 +76,7 @@ bool EditMetadataDialog::Create()
     UIUtilE::Assign(this, m_bannerButton, "banner_button", &err);
     UIUtilE::Assign(this, m_fanartButton, "fanart_button", &err);
     UIUtilE::Assign(this, m_screenshotButton, "screenshot_button", &err);
+    UIUtilE::Assign(this, m_trailerButton, "trailer_button", &err);
     UIUtilE::Assign(this, m_doneButton, "done_button", &err);
 
     if (err)
@@ -130,6 +131,7 @@ bool EditMetadataDialog::Create()
     connect(m_bannerButton, SIGNAL(Clicked()), SLOT(FindBanner()));
     connect(m_fanartButton, SIGNAL(Clicked()), SLOT(FindFanart()));
     connect(m_screenshotButton, SIGNAL(Clicked()), SLOT(FindScreenshot()));
+    connect(m_trailerButton, SIGNAL(Clicked()), SLOT(FindTrailer()));
 
     connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(ToggleBrowse()));
     connect(m_watchedCheck, SIGNAL(valueChanged()), SLOT(ToggleWatched()));
@@ -189,10 +191,39 @@ namespace
             delete fb;
     }
 
+    void FindVideoFilePopup(const QString &prefix, const QString &prefixAlt,
+            QObject &inst, const QString &returnEvent)
+    {
+        QString fp = prefix.isEmpty() ? prefixAlt : prefix;
+    
+        MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+        QStringList exts;
+
+        const FileAssociations::association_list fa_list =
+                FileAssociations::getFileAssociation().getList();
+        for (FileAssociations::association_list::const_iterator p = 
+                fa_list.begin(); p != fa_list.end(); ++p)
+        {
+            exts << QString("*.%1").arg(p->extension.toUpper());
+        }
+
+        MythUIFileBrowser *fb = new MythUIFileBrowser(popupStack, fp);
+        fb->SetNameFilter(exts);
+        if (fb->Create())
+        {
+            fb->SetReturnEvent(&inst, returnEvent);
+            popupStack->AddScreen(fb);
+        }
+        else
+            delete fb;
+    }
+
     const QString CEID_COVERARTFILE = "coverartfile";
     const QString CEID_BANNERFILE = "bannerfile";
     const QString CEID_FANARTFILE = "fanartfile";
     const QString CEID_SCREENSHOTFILE = "screenshotfile";
+    const QString CEID_TRAILERFILE = "trailerfile";
     const QString CEID_NEWCATEGORY = "newcategory";
 }
 
@@ -557,6 +588,22 @@ void EditMetadataDialog::SetScreenshot(QString file)
     CheckedSet(m_screenshotText, file);
 }
 
+void EditMetadataDialog::FindTrailer()
+{
+    FindVideoFilePopup(gContext->GetSetting("mythvideo.TrailersDir"),
+            GetConfDir() + "/MythVideo/Trailers",
+            *this, CEID_TRAILERFILE);
+}
+    
+void EditMetadataDialog::SetTrailer(QString file)
+{   
+    if (file.isEmpty())
+        return;
+    
+    m_workingMetadata->SetTrailer(file);
+    CheckedSet(m_trailerText, file);
+}
+
 void EditMetadataDialog::customEvent(QEvent *levent)
 {
     if (levent->type() == kMythDialogBoxCompletionEventType)
@@ -577,6 +624,8 @@ void EditMetadataDialog::customEvent(QEvent *levent)
             SetFanart(dce->GetResultText());
         else if (resultid == CEID_SCREENSHOTFILE)
             SetScreenshot(dce->GetResultText());
+        else if (resultid == CEID_TRAILERFILE)
+            SetTrailer(dce->GetResultText());
         else if (resultid == CEID_NEWCATEGORY)
             AddCategory(dce->GetResultText());
     }
