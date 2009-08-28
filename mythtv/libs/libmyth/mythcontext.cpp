@@ -1576,7 +1576,7 @@ bool do_command_socket_setup(
     if (!serverSock->readStringList(strlist, true) || strlist.empty() ||
         (strlist[0] == "ERROR"))
     {
-        if (strlist[0] == "ERROR")
+        if (!strlist.empty())
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
                     "server socket to master backend");
         else
@@ -1729,7 +1729,7 @@ MythSocket *MythContext::ConnectEventSocket(const QString &hostname, int port)
     if (!eventSock->readStringList(strlist) || strlist.empty() ||
         (strlist[0] == "ERROR"))
     {
-        if (strlist[0] == "ERROR")
+        if (!strlist.empty())
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Problem connecting "
                     "event socket to master backend");
         else
