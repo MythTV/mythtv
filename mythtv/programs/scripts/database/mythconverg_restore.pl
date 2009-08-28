@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.6';
+    $VERSION        = '1.0.7';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -274,7 +274,7 @@ options:
 
     The name of the database containing the MythTV data. See DBName, above.
 
-    Default:  $d_db_name
+    Default: $d_db_name
 
 --schemaver [MythTV database schema version]
 
@@ -311,14 +311,14 @@ options:
     The path (including filename) of the mysql client executable. See
     mysql_client in the DATABASE INFORMATION FILE description, above.
 
-    Default:  $d_mysql_client
+    Default: $d_mysql_client
 
 --uncompress [path]
 
     The command (including path, if necessary) to use to uncompress the
     backup. See uncompress in the DATABASE INFORMATION FILE description, above.
 
-    Default:  $d_uncompress
+    Default: $d_uncompress
 
 --create_database [path]
 
@@ -441,46 +441,49 @@ EOF
     sub print_configuration
     {
         verbose($verbose_level_debug,
-                "\nDatabase Information:",
-                "         DBHostName:  $mysql_conf{'db_host'}",
-                "             DBPort:  $mysql_conf{'db_port'}",
-                "         DBUserName:  $mysql_conf{'db_user'}",
-                "         DBPassword:  " .
+                '',
+                'Database Information:',
+                "         DBHostName: $mysql_conf{'db_host'}",
+                "             DBPort: $mysql_conf{'db_port'}",
+                "         DBUserName: $mysql_conf{'db_user'}",
+                '         DBPassword: ' .
                     ( $mysql_conf{'db_pass'} ? 'XXX' : '' ),
                   #  "$mysql_conf{'db_pass'}",
-                "             DBName:  $mysql_conf{'db_name'}",
-                "        DBSchemaVer:  $mysql_conf{'db_schemaver'}",
-                "  DBBackupDirectory:  $backup_conf{'directory'}",
-                "   DBBackupFilename:  $backup_conf{'filename'}",
-                "    create_database:  " . ($mc_sql ? $mc_sql : ''));
+                "             DBName: $mysql_conf{'db_name'}",
+                "        DBSchemaVer: $mysql_conf{'db_schemaver'}",
+                "  DBBackupDirectory: $backup_conf{'directory'}",
+                "   DBBackupFilename: $backup_conf{'filename'}",
+                '    create_database: '.($mc_sql ? $mc_sql : ''));
         verbose($verbose_level_debug,
-                "\nExecutables:",
-                "       mysql_client:  $mysql_client",
-                "         uncompress:  $uncompress");
+                '',
+                'Executables:',
+                "       mysql_client: $mysql_client",
+                "         uncompress: $uncompress");
         verbose($verbose_level_debug,
-                "\nMiscellaneous:",
-                "    partial_restore:  " . ($partial_restore ? 'yes' : 'no'));
+                '',
+                'Miscellaneous:',
+                '    partial_restore: '.($partial_restore ? 'yes' : 'no'));
         if ($partial_restore)
         {
             verbose($verbose_level_debug,
-                    "   with_plugin_data:  " . ($with_plugin_data ?
+                    '   with_plugin_data: '.($with_plugin_data ?
                                                 'yes' : 'no'));
         }
         verbose($verbose_level_debug,
-                "   restore_xmltvids:  " . ($restore_xmltvids ? 'yes' : 'no'),
-                "    change_hostname:  " . ($change_hostname ? 'yes' : 'no'));
+                '   restore_xmltvids: '.($restore_xmltvids ? 'yes' : 'no'),
+                '    change_hostname: '.($change_hostname ? 'yes' : 'no'));
         if ($change_hostname)
         {
             verbose($verbose_level_debug,
-                    "     - old_hostname:  " . $old_hostname,
-                    "     - new_hostname:  " . $new_hostname);
+                    '     - old_hostname: '.$old_hostname,
+                    '     - new_hostname: '.$new_hostname);
         }
     }
 
     sub configure_environment
     {
         verbose($verbose_level_debug,
-                "\nConfiguring environment:");
+                '', 'Configuring environment:');
 
     # Get the user's login and home directory, so we can look for config files
         ($username, $homedir) = (getpwuid $>)[0,7];
@@ -495,8 +498,8 @@ EOF
             }
         }
         verbose($verbose_level_debug,
-                "  -    username:  $username",
-                "  -        HOME:  $homedir");
+                "  -    username: $username",
+                "  -        HOME: $homedir");
 
     # Find the config directory
         $mythconfdir = $ENV{'MYTHCONFDIR'}
@@ -505,7 +508,7 @@ EOF
             ;
 
         verbose($verbose_level_debug,
-                "  - MYTHCONFDIR:  $mythconfdir");
+                "  - MYTHCONFDIR: $mythconfdir");
     }
 
 # Though much of the configuration file parsing could be done by the MythTV
@@ -517,12 +520,12 @@ EOF
     {
         my $file = shift;
         verbose($verbose_level_debug,
-                "  - checking:  $file");
+                "  - checking: $file");
         return 0 unless ($file && -e $file);
         verbose($verbose_level_debug,
-                "     parsing:  $file");
-        open(CONF, $file) or die("\nERROR:  Unable to read $file:  $!".
-                                 ", stopped");
+                "     parsing: $file");
+        open(CONF, $file) or die("\nERROR: Unable to read $file: $!".
+                                 ', stopped');
         while (my $line = <CONF>)
         {
         # Cleanup
@@ -630,7 +633,7 @@ EOF
     sub apply_arguments
     {
         verbose($verbose_level_debug,
-                "\nApplying command-line arguments.");
+                '', 'Applying command-line arguments.');
         if ($db_hostname)
         {
             $mysql_conf{'db_host'} = $db_hostname;
@@ -673,14 +676,14 @@ EOF
         if ($database_information_file)
         {
             verbose($verbose_level_debug,
-                    "\nDatabase Information File specified. Ignoring all".
-                    " command-line arguments");
+                    '', 'Database Information File specified. Ignoring all'.
+                    ' command-line arguments');
             verbose($verbose_level_debug,
-                    "\nDatabase Information File:".
-                    " $database_information_file");
+                    '', 'Database Information File: '.
+                    $database_information_file);
             unless (-T "$database_information_file")
             {
-                die("\nERROR:  Invalid database information file, stopped");
+                die("\nERROR: Invalid database information file, stopped");
             }
         # When using a database information file, parse the resource file first
         # so it cannot override database information file settings
@@ -691,7 +694,7 @@ EOF
 
     # No database information file, so try the MythTV configuration files.
         verbose($verbose_level_debug,
-                "\nParsing configuration files:");
+                '', 'Parsing configuration files:');
     # Prefer the config.xml file
         my $file = $mythconfdir ? "$mythconfdir/config.xml" : '';
         $result = parse_database_information($file);
@@ -713,11 +716,11 @@ EOF
     {
         return '' if (!$mysql_conf{'db_pass'});
         verbose($verbose_level_debug,
-                "\nAttempting to use supplied password for $mysql_client".
-                " command-line client.",
-                "Any [client] or [mysql] password specified in the MySQL".
-                " options file will",
-                "take precedence.");
+                '', "Attempting to use supplied password for $mysql_client".
+                ' command-line client.',
+                'Any [client] or [mysql] password specified in the MySQL'.
+                ' options file will',
+                'take precedence.');
     # Let tempfile handle unlinking on exit so we don't have to verify that the
     # file with $filename is the file we created
         my ($fh, $filename) = tempfile(UNLINK => 1);
@@ -733,7 +736,7 @@ EOF
             if (!-r "/$backup_conf{'filename'}")
             {
                 print_configuration;
-                die("\nERROR:  DBBackupDirectory not specified, stopped");
+                die("\nERROR: DBBackupDirectory not specified, stopped");
             }
         # The user must have specified an absolute path for the
         # DBBackupFilename. Though this is not how the script is meant to be
@@ -744,21 +747,21 @@ EOF
         {
             print_configuration;
             verbose($verbose_level_error,
-                    "\nERROR:  DBBackupDirectory is not a directory. Please".
-                    " specify a directory in",
-                    "        your database information file using".
-                    " DBBackupDirectory.",
-                    "        If not using a database information file," .
-                    " please specify the ",
-                    "        --directory command-line option.");
+                    '', 'ERROR: DBBackupDirectory is not a directory. Please'.
+                    ' specify a directory in',
+                    '        your database information file using'.
+                    ' DBBackupDirectory.',
+                    '        If not using a database information file,' .
+                    ' please specify the ',
+                    '        --directory command-line option.');
             die("\nInvalid backup directory, stopped");
         }
         if (!$backup_conf{'filename'})
         {
         # Look for most current backup file
             verbose($verbose_level_debug,
-                    "\nNo filename specified. Attempting to find the newest".
-                    " database backup.");
+                    '', 'No filename specified. Attempting to find the newest'.
+                    ' database backup.');
             if ($restore_xmltvids)
             {
                 $backup_conf{'filename'} = 'mythtv_xmltvid_backup';
@@ -777,8 +780,8 @@ EOF
             if ($num_files < 1)
             {
                 verbose($verbose_level_error,
-                        "ERROR:  Unable to find any backup files in".
-                        " DBBackupDir and none specified.");
+                        'ERROR: Unable to find any backup files in'.
+                        ' DBBackupDir and none specified.');
             }
             else
             {
@@ -786,7 +789,7 @@ EOF
                 $backup_conf{'filename'} = $sorted_files[0];
                 $backup_conf{'filename'} =~ s#^$backup_conf{'directory'}/?##;
                 verbose($verbose_level_debug,
-                        "Using database backup file:",
+                        'Using database backup file:',
                         "$backup_conf{'directory'}/$backup_conf{'filename'}");
             }
         }
@@ -803,7 +806,7 @@ EOF
             else
             {
                 verbose($verbose_level_error,
-                        "\nERROR:  The specified backup file does not exist.",
+                        '', 'ERROR: The specified backup file does not exist.',
                         "$backup_conf{'directory'}/$backup_conf{'filename'}");
                 die("\nInvalid backup filename, stopped");
             }
@@ -811,13 +814,13 @@ EOF
         if (!-r "$backup_conf{'directory'}/$backup_conf{'filename'}")
         {
             verbose($verbose_level_error,
-                    "\nERROR:  The specified backup file cannot be read.");
+                    '', 'ERROR: The specified backup file cannot be read.');
             die("\nInvalid backup filename, stopped");
         }
         if (!$mysql_conf{'db_name'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBName not specified. Using $d_db_name");
+                    '', "WARNING: DBName not specified. Using $d_db_name");
             $mysql_conf{'db_name'} = $d_db_name;
         }
     }
@@ -825,7 +828,7 @@ EOF
     sub check_config
     {
         verbose($verbose_level_debug,
-                "\nChecking configuration.");
+                '', 'Checking configuration.');
 
         if (!defined($change_hostname))
         {
@@ -840,23 +843,23 @@ EOF
         if (!$mysql_conf{'db_host'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBHostName not specified.",
-                    "         Assuming it's specified in the MySQL".
-                    " options file.");
+                    '', 'WARNING: DBHostName not specified.',
+                    '         Assuming it is specified in the MySQL'.
+                    ' options file.');
         }
         if (!$mysql_conf{'db_user'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBUserName not specified.",
-                    "         Assuming it's specified in the MySQL".
-                    " options file.");
+                    '', 'WARNING: DBUserName not specified.',
+                    '         Assuming it is specified in the MySQL'.
+                    ' options file.');
         }
         if (!$mysql_conf{'db_pass'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBPassword not specified.",
-                    "         Assuming it's specified in the MySQL".
-                    " options file.");
+                    '', 'WARNING: DBPassword not specified.',
+                    '         Assuming it is specified in the MySQL'.
+                    ' options file.');
         }
     }
 
@@ -872,7 +875,7 @@ EOF
         if (!defined($dbh))
         {
             verbose($verbose_level_debug,
-                    "Unable to connect to database.");
+                    'Unable to connect to database.');
             $result = 0;
         }
         return $result;
@@ -889,11 +892,11 @@ EOF
         my $user_arg = '';
         if ($defaults_extra_file)
         {
-            $defaults_arg=" --defaults-extra-file='$defaults_extra_file'";
+            $defaults_arg = " --defaults-extra-file='$defaults_extra_file'";
         }
         else
         {
-            $defaults_arg='';
+            $defaults_arg = '';
         }
         my $safe_mysql_client = $mysql_client;
         $safe_mysql_client =~ s/'/'\\''/g;
@@ -904,33 +907,33 @@ EOF
         {
             $safe_string = $mysql_conf{'db_host'};
             $safe_string =~ s/'/'\\''/g;
-            $host_arg=" --host='$safe_string'";
+            $host_arg = " --host='$safe_string'";
         }
         if ($mysql_conf{'db_port'} > 0)
         {
             $safe_string = $mysql_conf{'db_port'};
             $safe_string =~ s/'/'\\''/g;
-            $port_arg=" --port='$safe_string'";
+            $port_arg = " --port='$safe_string'";
         }
         if ($mysql_conf{'db_user'})
         {
             $safe_string = $mysql_conf{'db_user'};
             $safe_string =~ s/'/'\\''/g;
-            $user_arg=" --user='$safe_string'";
+            $user_arg = " --user='$safe_string'";
         }
         verbose($verbose_level_debug,
-                "\nAttempting to create initial database.");
+                '', 'Attempting to create initial database.');
         my $safe_mc_sql = $mc_sql;
         $safe_mc_sql =~ s/'/'\\''/g;
     # Use redirects to capture stdout and stderr (for debug)
         my $command = "'${safe_mysql_client}'${defaults_arg}${host_arg}".
                       "${port_arg}${user_arg} 2>&1 < '$safe_mc_sql'";
         verbose($verbose_level_debug,
-                "\nExecuting command:", $command);
+                '', 'Executing command:', $command);
         my $result = `$command`;
         my $exit = $? >> 8;
         verbose($verbose_level_debug,
-                "\n$mysql_client exited with status:  $exit");
+                '', "$mysql_client exited with status: $exit");
         if ($exit)
         {
             verbose($verbose_level_error,
@@ -948,13 +951,13 @@ EOF
             my $sth = $dbh->table_info('', '', '', 'TABLE');
             my $num_tables = keys %{$sth->fetchall_hashref('TABLE_NAME')};
             verbose($verbose_level_debug,
-                    "\nFound $num_tables tables in the database.");
+                    '', "Found $num_tables tables in the database.");
             if ($num_tables > 0)
             {
                 if (!defined($change_hostname) && !defined($partial_restore))
                 {
                     verbose($verbose_level_debug,
-                            "WARNING:  Database not empty.");
+                            'WARNING: Database not empty.');
                 }
                 $result = 0;
             }
@@ -975,7 +978,7 @@ EOF
             }
         }
         verbose($verbose_level_debug,
-                "\nDBI is not installed.") if (!$has_dbi);
+                '', 'DBI is not installed.') if (!$has_dbi);
     # Try to load the DBD::mysql library if available (but don't # require it)
         BEGIN
         {
@@ -987,7 +990,7 @@ EOF
             }
         }
         verbose($verbose_level_debug,
-                "\nDBD::mysql is not installed.") if (!$has_dbd);
+                '', 'DBD::mysql is not installed.') if (!$has_dbd);
         return ($has_dbi + $has_dbd);
     }
 
@@ -999,40 +1002,41 @@ EOF
             if ($mc_sql)
             {
                 verbose($verbose_level_error,
-                        "\nERROR:  Unable to create initial database without".
-                        " Perl database libraries.",
-                        "        Please ensure the Perl DBI and DBD::mysql".
-                        " modules are installed.");
+                        '',
+                        'ERROR: Unable to create initial database without'.
+                        ' Perl database libraries.',
+                        '        Please ensure the Perl DBI and DBD::mysql'.
+                        ' modules are installed.');
                 die("\nPerl database libraries missing, stopped");
             }
             if ($change_hostname)
             {
                 verbose($verbose_level_error,
-                        "\nERROR:  Unable to change hostname without Perl".
-                        " database libraries.",
-                        "        Please ensure the Perl DBI and DBD::mysql".
-                        " modules are installed.");
+                        '', 'ERROR: Unable to change hostname without Perl'.
+                        ' database libraries.',
+                        '        Please ensure the Perl DBI and DBD::mysql'.
+                        ' modules are installed.');
                 die("\nPerl database libraries missing, stopped");
             }
             else
             {
                 verbose($verbose_level_debug,
-                        "Blindly assuming your database is prepared for a".
-                        " restore. For better checking,",
-                        "please ensure the Perl DBI and DBD::mysql modules".
-                        " are installed.");
+                        'Blindly assuming your database is prepared for a'.
+                        ' restore. For better checking,',
+                        'please ensure the Perl DBI and DBD::mysql modules'.
+                        ' are installed.');
                 return 1;
             }
         }
     # DBI/DBD::mysql are available; check the DB status
         verbose($verbose_level_debug,
-                "\nChecking database.");
+                '', 'Checking database.');
         if (!database_exists)
         {
             if (create_initial_database)
             {
                 verbose($verbose_level_error,
-                        "\nERROR:  The database does not exist.");
+                        '', 'ERROR: The database does not exist.');
                 return 0;
             }
         }
@@ -1042,10 +1046,10 @@ EOF
             if ($database_empty)
             {
                 verbose($verbose_level_error,
-                        "\nERROR:  Unable to change hostname. The database".
-                        " is empty.",
-                        "        Please restore a backup, first, then re-run".
-                        " this script.");
+                        '', 'ERROR: Unable to change hostname. The database'.
+                        ' is empty.',
+                        '        Please restore a backup, first, then re-run'.
+                        ' this script.');
                 return 0;
             }
         }
@@ -1054,10 +1058,10 @@ EOF
             if ($database_empty)
             {
                 verbose($verbose_level_error,
-                        "\nERROR:  Unable to do a partial restore. The".
-                        " database is empty.",
-                        "        Please run mythtv-setup, first, then re-run".
-                        " this script.");
+                        '', 'ERROR: Unable to do a partial restore. The'.
+                        ' database is empty.',
+                        '        Please run mythtv-setup, first, then re-run'.
+                        ' this script.');
                 return 0;
             }
         }
@@ -1066,8 +1070,8 @@ EOF
             if (!$database_empty)
             {
                 verbose($verbose_level_error,
-                        "\nERROR:  Unable to do a full restore. The".
-                        " database contains data.");
+                        '', 'ERROR: Unable to do a full restore. The'.
+                        ' database contains data.');
                 return 0;
             }
         }
@@ -1102,11 +1106,11 @@ EOF
             if (!is_gzipped)
             {
                 verbose($verbose_level_debug,
-                        "\nBackup file is uncompressed.");
+                        '', 'Backup file is uncompressed.');
                 return 0;
             }
             verbose($verbose_level_debug,
-                    "\nBackup file is compressed.");
+                    '', 'Backup file is compressed.');
         # Try to load the IO::Uncompress::Gunzip library if available (but
         # don't require it)
             BEGIN
@@ -1125,13 +1129,13 @@ EOF
             if (!$has_uncompress_gunzip)
             {
                 verbose($verbose_level_debug,
-                        " - IO::Uncompress::Gunzip is not installed.");
+                        ' - IO::Uncompress::Gunzip is not installed.');
             }
             else
             {
                 verbose($verbose_level_debug,
-                        " - Uncompressing backup file with".
-                        " IO::Uncompress::Gunzip.");
+                        ' - Uncompressing backup file with'.
+                        ' IO::Uncompress::Gunzip.');
                 my ($bfh, $temp_backup_filename) = tempfile(UNLINK => 1);
                 my $result = gunzip(
                     "$backup_conf{'directory'}/$backup_conf{'filename'}" =>
@@ -1145,18 +1149,18 @@ EOF
                     $backup_conf{'filename'} = "$temp_backup_filename";
                     return 0;
                 }
-                verbose($verbose_level_always,
-                        "   Error:  $GunzipError");
+                verbose($verbose_level_error,
+                        "   ERROR: $GunzipError");
             }
         }
         else
         {
             verbose($verbose_level_debug,
-                    "\nUnrecognized uncompress program.".
-                    " Assuming backup file is compressed.",
-                    " - If the file is not compressed, please do not specify".
-                    " a custom uncompress",
-                    "   program name.");
+                    '', 'Unrecognized uncompress program.'.
+                    ' Assuming backup file is compressed.',
+                    ' - If the file is not compressed, please do not specify'.
+                    ' a custom uncompress',
+                    '   program name.');
         }
     # Try to uncompress the file with the uncompress binary.
     # With the approach, the original backup file will be uncompressed and
@@ -1165,15 +1169,15 @@ EOF
         $safe_uncompress =~ s/'/'\\''/sg;
         verbose($verbose_level_debug,
                 " - Uncompressing backup file with $uncompress.",
-                "   The original backup file will be left uncompressed.".
-                " Please recompress,",
-                "   if desired.");
+                '   The original backup file will be left uncompressed.'.
+                ' Please recompress,',
+                '   if desired.');
         my $backup_path = "$backup_conf{'directory'}/$backup_conf{'filename'}";
         $backup_path =~ s/'/'\\''/sg;
         my $output = `'$safe_uncompress' '$backup_path' 2>&1`;
         my $exit = $? >> 8;
         verbose($verbose_level_debug,
-                "\n$uncompress exited with status:  $exit");
+                '', "$uncompress exited with status: $exit");
         if ($exit)
         {
             verbose($verbose_level_debug,
@@ -1188,8 +1192,8 @@ EOF
                 if (!-r "$backup_conf{'directory'}/$backup_conf{'filename'}")
                 {
                     verbose($verbose_level_error,
-                            "\nERROR:  Unable to find uncompressed backup".
-                            " file.");
+                            '',
+                            'ERROR: Unable to find uncompressed backup file.');
                     die("\nInvalid backup filename, stopped");
                 }
             }
@@ -1204,20 +1208,20 @@ EOF
         {
             $exit++;
             verbose($verbose_level_error,
-                    "\nERROR:  Cannot change hostname without --new_hostname".
-                    " value.");
+                    '', 'ERROR: Cannot change hostname without --new_hostname'.
+                    ' value.');
         }
         if (!$old_hostname)
         {
             $exit++;
             verbose($verbose_level_error,
-                    "\nERROR:  Cannot change hostname without --old_hostname".
-                    " value.");
+                    '', 'ERROR: Cannot change hostname without --old_hostname'.
+                    ' value.');
         }
         if ($exit > 0)
         {
             die("\nInvalid --old/--new_hostname value(s) for".
-                " --change_hostname, stopped");
+                ' --change_hostname, stopped');
         }
     # Get a list of all tables in the DB.
         if (defined($dbh))
@@ -1260,7 +1264,7 @@ EOF
                         if (!defined($result))
                         {
                             verbose($verbose_level_always,
-                                    "Unable to update hostname in table: ".
+                                    'Unable to update hostname in table: '.
                                     $table_name,
                                     $sth_update->errstr);
                             $exit++;
@@ -1268,7 +1272,7 @@ EOF
                         else
                         {
                             verbose($verbose_level_debug,
-                                    "Updated ".
+                                    'Updated '.
                                     (($result == 0E0) ? '0' : $result)
                                     ." rows in table: $table_name");
                         }
@@ -1279,7 +1283,7 @@ EOF
             if ($num_tables == 0)
             {
                 verbose($verbose_level_always,
-                        "Database is empty. Cannot change hostname.");
+                        'Database is empty. Cannot change hostname.');
                 return 1;
             }
         # delete (orphaned) rows with hostname coded into chainid in tvchain
@@ -1298,7 +1302,7 @@ EOF
             else
             {
                 verbose($verbose_level_debug,
-                        "Removed ".
+                        'Removed '.
                         (($result == 0E0) ? '0' : $result)
                         ." orphaned entries in table: $table_name");
             }
@@ -1315,15 +1319,15 @@ EOF
             if (!defined($result))
             {
                 verbose($verbose_level_always,
-                        "Unable to update SGweightPerDir setting for host.",
+                        'Unable to update SGweightPerDir setting for host.',
                         $sth_update->errstr);
             }
             else
             {
                 verbose($verbose_level_debug,
-                        "Updated ".
+                        'Updated '.
                         (($result == 0E0) ? '0' : $result)
-                        ." SGweightPerDir settings.");
+                        .' SGweightPerDir settings.');
             }
         }
         return $exit;
@@ -1339,11 +1343,11 @@ EOF
         my $filter = '';
         if ($defaults_extra_file)
         {
-            $defaults_arg=" --defaults-extra-file='$defaults_extra_file'";
+            $defaults_arg = " --defaults-extra-file='$defaults_extra_file'";
         }
         else
         {
-            $defaults_arg='';
+            $defaults_arg = '';
         }
         my $safe_mysql_client = $mysql_client;
         $safe_mysql_client =~ s/'/'\\''/g;
@@ -1354,19 +1358,19 @@ EOF
         {
             $safe_string = $mysql_conf{'db_host'};
             $safe_string =~ s/'/'\\''/g;
-            $host_arg=" --host='$safe_string'";
+            $host_arg = " --host='$safe_string'";
         }
         if ($mysql_conf{'db_port'} > 0)
         {
             $safe_string = $mysql_conf{'db_port'};
             $safe_string =~ s/'/'\\''/g;
-            $port_arg=" --port='$safe_string'";
+            $port_arg = " --port='$safe_string'";
         }
         if ($mysql_conf{'db_user'})
         {
             $safe_string = $mysql_conf{'db_user'};
             $safe_string =~ s/'/'\\''/g;
-            $user_arg=" --user='$safe_string'";
+            $user_arg = " --user='$safe_string'";
         }
     # Configure a filter for a partial/new-host restore
         if ($partial_restore)
@@ -1461,7 +1465,7 @@ EOF
             if (!defined($restore_xmltvids))
             {
                 $filter = '^INSERT INTO \`?(' .
-                          join('|', @partial_restore_tables) . ')\`? ';
+                          join('|', @partial_restore_tables).')\`? ';
                 # If doing a whitelist restore, ensure we keep the character
                 # set info to prevent data corruption
                 if (!defined($with_plugin_data))
@@ -1469,7 +1473,7 @@ EOF
                     $filter = '(40101 SET NAMES |'.$filter.')';
                 }
                 verbose($verbose_level_debug,
-                        "\nRestoring partial backup with filter:", $filter);
+                        '', 'Restoring partial backup with filter:', $filter);
             }
         }
         my $safe_db_name = $mysql_conf{'db_name'};
@@ -1477,20 +1481,20 @@ EOF
         my $command = "'${safe_mysql_client}'${defaults_arg}${host_arg}".
                       "${port_arg}${user_arg} '$safe_db_name'";
         verbose($verbose_level_debug,
-                "\nExecuting command:", $command);
+                '', 'Executing command:', $command);
         my $read_status = open(BACKUP,
             "<$backup_conf{'directory'}/$backup_conf{'filename'}");
         if (!defined($read_status))
         {
             verbose($verbose_level_error,
-                    "\nERROR: Unable to read backup file.");
+                    '', 'ERROR: Unable to read backup file.');
             return 255;
         }
         my $write_status = open(COMMAND, "| $command");
         if (!defined($write_status))
         {
             verbose($verbose_level_error,
-                    "\nERROR: Unable to execute $mysql_client.");
+                    '', "ERROR: Unable to execute $mysql_client.");
             return 254;
         }
         my $lines_total = 0;
@@ -1516,15 +1520,15 @@ EOF
                 }
             }
             $lines_restored++;
-            print COMMAND or die("\nERROR:  Cannot write to ".
+            print COMMAND or die("\nERROR: Cannot write to ".
                                  "$mysql_client, stopped");
         }
         close(COMMAND);
         close(BACKUP);
         $exit = $?;
         verbose($verbose_level_debug,
-                "\n$mysql_client exited with status:  $exit",
-                "\nRestored $lines_restored of $lines_total lines.");
+                '', "$mysql_client exited with status: $exit",
+                '', "Restored $lines_restored of $lines_total lines.");
         return $exit;
     }
 
@@ -1548,12 +1552,14 @@ EOF
         if ($change_hostname)
         {
             $status = do_hostname_change;
-            print("\nSuccessfully changed hostname.\n") if (!$status);
+            verbose($verbose_level_always,
+                    '', 'Successfully changed hostname.') if (!$status);
         }
         elsif (!uncompress_backup_file)
         {
             $status = restore_backup;
-            print("\nSuccessfully restored backup.\n") if (!$status);
+            verbose($verbose_level_always,
+                    '', 'Successfully restored backup.') if (!$status);
         }
     }
 

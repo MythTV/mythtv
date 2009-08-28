@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.4';
+    $VERSION        = '1.0.5';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -60,7 +60,7 @@
     $d_mysqldump     = 'mysqldump';
     $d_compress      = 'gzip';
     $d_rotate        = 5;
-    $d_rotateglob    = $d_db_name . '-????-??????????????.sql*';
+    $d_rotateglob    = $d_db_name.'-????-??????????????.sql*';
 
 # Provide default values for GetOptions
     $mysqldump       = $d_mysqldump;
@@ -290,7 +290,7 @@ options:
 
     The name of the database containing the MythTV data. See DBName, above.
 
-    Default:  $d_db_name
+    Default: $d_db_name
 
 --schemaver [MythTV database schema version]
 
@@ -311,31 +311,31 @@ options:
     The path (including filename) of the mysqldump executable. See mysqldump
     in the DATABASE INFORMATION FILE description, above.
 
-    Default:  $d_mysqldump
+    Default: $d_mysqldump
 
 --compress [path]
 
     The command (including path, if necessary) to use to compress the backup.
     See compress in the DATABASE INFORMATION FILE description, above.
 
-    Default:  $d_compress
+    Default: $d_compress
 
 --rotate [number]
     The number of backups to keep when rotating. To disable rotation, specify
     -1. See rotate in the DATABASE INFORMATION FILE description, above.
 
-    Default:  $d_rotate
+    Default: $d_rotate
 
 --rotateglob [glob]
     The sh-like glob used to identify files within DBBackupDirectory to be
     considered for rotation. See rotateglob in the DATABASE INFORMATION FILE
     description, above.
 
-    Default:  $d_rotateglob
+    Default: $d_rotateglob
 
 --backup_xmltvids
     Rather than creating a backup of the entire database, create a backup of
-    xmltvid's. This is useful when doing a full channel scan. The resulting
+    xmltvids. This is useful when doing a full channel scan. The resulting
     backup is a series of SQL UPDATE statements that can be executed to set
     the xmltvid for channels whose callsign is the same before and after
     the scan. Note that the backup file will contain comments with additional
@@ -400,27 +400,29 @@ EOF
     sub print_configuration
     {
         verbose($verbose_level_debug,
-                "\nDatabase Information:",
-                "         DBHostName:  $mysql_conf{'db_host'}",
-                "             DBPort:  $mysql_conf{'db_port'}",
-                "         DBUserName:  $mysql_conf{'db_user'}",
-                "         DBPassword:  " .
+                '',
+                'Database Information:',
+                "         DBHostName: $mysql_conf{'db_host'}",
+                "             DBPort: $mysql_conf{'db_port'}",
+                "         DBUserName: $mysql_conf{'db_user'}",
+                '         DBPassword: ' .
                     ( $mysql_conf{'db_pass'} ? 'XXX' : '' ),
                   #  "$mysql_conf{'db_pass'}",
-                "             DBName:  $mysql_conf{'db_name'}",
-                "        DBSchemaVer:  $mysql_conf{'db_schemaver'}",
-                "  DBBackupDirectory:  $backup_conf{'directory'}",
-                "   DBBackupFilename:  $backup_conf{'filename'}");
+                "             DBName: $mysql_conf{'db_name'}",
+                "        DBSchemaVer: $mysql_conf{'db_schemaver'}",
+                "  DBBackupDirectory: $backup_conf{'directory'}",
+                "   DBBackupFilename: $backup_conf{'filename'}");
         verbose($verbose_level_debug,
-                "\nExecutables:",
-                "          mysqldump:  $mysqldump",
-                "           compress:  $compress");
+                '',
+                'Executables:',
+                "          mysqldump: $mysqldump",
+                "           compress: $compress");
     }
 
     sub configure_environment
     {
         verbose($verbose_level_debug,
-                "\nConfiguring environment:");
+                '', 'Configuring environment:');
 
     # Get the user's login and home directory, so we can look for config files
         ($username, $homedir) = (getpwuid $>)[0,7];
@@ -435,8 +437,8 @@ EOF
             }
         }
         verbose($verbose_level_debug,
-                "  -    username:  $username",
-                "  -        HOME:  $homedir");
+                "  -    username: $username",
+                "  -        HOME: $homedir");
 
     # Find the config directory
         $mythconfdir = $ENV{'MYTHCONFDIR'}
@@ -445,7 +447,7 @@ EOF
             ;
 
         verbose($verbose_level_debug,
-                "  - MYTHCONFDIR:  $mythconfdir");
+                "  - MYTHCONFDIR: $mythconfdir");
     }
 
 # Though much of the configuration file parsing could be done by the MythTV
@@ -457,12 +459,12 @@ EOF
     {
         my $file = shift;
         verbose($verbose_level_debug,
-                "  - checking:  $file");
+                "  - checking: $file");
         return 0 unless ($file && -e $file);
         verbose($verbose_level_debug,
-                "     parsing:  $file");
-        open(CONF, $file) or die("\nERROR:  Unable to read $file:  $!".
-                                 ", stopped");
+                "     parsing: $file");
+        open(CONF, $file) or die("\nERROR: Unable to read $file: $!".
+                                 ', stopped');
         while (my $line = <CONF>)
         {
         # Cleanup
@@ -566,7 +568,7 @@ EOF
     sub apply_arguments
     {
         verbose($verbose_level_debug,
-                "\nApplying command-line arguments.");
+                '', 'Applying command-line arguments.');
         if ($db_hostname)
         {
             $mysql_conf{'db_host'} = $db_hostname;
@@ -609,14 +611,14 @@ EOF
         if ($database_information_file)
         {
             verbose($verbose_level_debug,
-                    "\nDatabase Information File specified. Ignoring all".
-                    " command-line arguments");
+                    '', 'Database Information File specified. Ignoring all'.
+                    ' command-line arguments');
             verbose($verbose_level_debug,
-                    "\nDatabase Information File:".
-                    " $database_information_file");
+                    '', 'Database Information File: '.
+                    $database_information_file);
             unless (-T "$database_information_file")
             {
-                die("\nERROR:  Invalid database information file, stopped");
+                die("\nERROR: Invalid database information file, stopped");
             }
         # When using a database information file, parse the resource file first
         # so it cannot override database information file settings
@@ -627,7 +629,7 @@ EOF
 
     # No database information file, so try the MythTV configuration files.
         verbose($verbose_level_debug,
-                "\nParsing configuration files:");
+                '', 'Parsing configuration files:');
     # Prefer the config.xml file
         my $file = $mythconfdir ? "$mythconfdir/config.xml" : '';
         $result = parse_database_information($file);
@@ -658,7 +660,7 @@ EOF
             }
         }
         verbose($verbose_level_debug,
-                "\nDBI is not installed.") if (!$has_dbi);
+                '', 'DBI is not installed.') if (!$has_dbi);
     # Try to load the DBD::mysql library if available (but don't
     # require it)
         BEGIN
@@ -671,7 +673,7 @@ EOF
             }
         }
         verbose($verbose_level_debug,
-                "\nDBD::mysql is not installed.") if (!$has_dbd);
+                '', 'DBD::mysql is not installed.') if (!$has_dbd);
         return ($has_dbi + $has_dbd);
     }
 
@@ -707,7 +709,7 @@ EOF
             if (check_database)
             {
                 verbose($verbose_level_debug,
-                        "\nNo DBSchemaVer specified, querying database.");
+                        '', 'No DBSchemaVer specified, querying database.');
                 my $query = 'SELECT data FROM settings WHERE value = ?';
                 if (defined($dbh))
                 {
@@ -734,13 +736,13 @@ EOF
             else
             {
                 verbose($verbose_level_debug,
-                        "\nNo DBSchemaVer specified.",
-                        "DBI and/or DBD:mysql is not available. Unable".
-                        " to query database to determine ",
-                        "DBSchemaVer. DBSchemaVer will not be included".
-                        " in backup filename.",
-                        "Please ensure DBI and DBD::mysql are".
-                        " installed.");
+                        '', 'No DBSchemaVer specified.',
+                        'DBI and/or DBD:mysql is not available. Unable'.
+                        ' to query database to determine ',
+                        'DBSchemaVer. DBSchemaVer will not be included'.
+                        ' in backup filename.',
+                        'Please ensure DBI and DBD::mysql are'.
+                        ' installed.');
             }
         }
         if ($mysql_conf{'db_schemaver'})
@@ -760,25 +762,25 @@ EOF
     sub check_config
     {
         verbose($verbose_level_debug,
-                "\nChecking configuration.");
+                '', 'Checking configuration.');
     # Check directory/filename
         if (!$backup_conf{'directory'})
         {
             print_configuration;
-            die("\nERROR:  DBBackupDirectory not specified, stopped");
+            die("\nERROR: DBBackupDirectory not specified, stopped");
         }
         if ((!-d $backup_conf{'directory'}) ||
             (!-w $backup_conf{'directory'}))
         {
             print_configuration;
             verbose($verbose_level_error,
-                    "\nERROR:  DBBackupDirectory is not a directory or is not".
-                    " writable. Please specify",
-                    "        a directory in your database information file" .
-                    " using DBBackupDirectory.",
-                    "        If not using a database information file," .
-                    " please specify the ",
-                    "        --directory command-line option.");
+                    '', 'ERROR: DBBackupDirectory is not a directory or is '.
+                    'not writable. Please specify',
+                    '        a directory in your database information file'.
+                    ' using DBBackupDirectory.',
+                    '        If not using a database information file,'.
+                    ' please specify the ',
+                    '        --directory command-line option.');
             die("\nInvalid backup directory, stopped");
         }
         if (!$backup_conf{'filename'})
@@ -804,13 +806,13 @@ EOF
         if ( -e "$backup_conf{'directory'}/$backup_conf{'filename'}")
         {
             verbose($verbose_level_error,
-                    "\nERROR:  The specified file already exists.");
+                    '', 'ERROR: The specified file already exists.');
             die("\nInvalid backup filename, stopped");
         }
         if (!$mysql_conf{'db_name'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBName not specified. Using $d_db_name");
+                    '', "WARNING: DBName not specified. Using $d_db_name");
             $mysql_conf{'db_name'} = $d_db_name;
         }
     # Though the script will attempt a backup even if no other database
@@ -821,23 +823,23 @@ EOF
         if (!$mysql_conf{'db_host'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBHostName not specified.",
-                    "         Assuming it's specified in the MySQL".
-                    " options file.");
+                    '', 'WARNING: DBHostName not specified.',
+                    '         Assuming it is specified in the MySQL'.
+                    ' options file.');
         }
         if (!$mysql_conf{'db_user'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBUserName not specified.",
-                    "         Assuming it's specified in the MySQL".
-                    " options file.");
+                    '', 'WARNING: DBUserName not specified.',
+                    '         Assuming it is specified in the MySQL'.
+                    ' options file.');
         }
         if (!$mysql_conf{'db_pass'})
         {
             verbose($verbose_level_debug,
-                    "\nWARNING:  DBPassword not specified.",
-                    "         Assuming it's specified in the MySQL".
-                    " options file.");
+                    '', 'WARNING: DBPassword not specified.',
+                    '         Assuming it is specified in the MySQL'.
+                    ' options file.');
         }
     }
 
@@ -845,10 +847,10 @@ EOF
     {
         return '' if (!$mysql_conf{'db_pass'});
         verbose($verbose_level_debug,
-                "\nAttempting to use supplied password for $mysqldump.",
-                "Any [client] or [mysqldump] password specified in the MySQL".
-                " options file will",
-                "take precedence.");
+                '', "Attempting to use supplied password for $mysqldump.",
+                'Any [client] or [mysqldump] password specified in the MySQL'.
+                ' options file will',
+                'take precedence.');
     # Let tempfile handle unlinking on exit so we don't have to verify that the
     # file with $filename is the file we created
         my ($fh, $filename) = tempfile(UNLINK => 1);
@@ -875,10 +877,10 @@ EOF
                         "              AS SIGNED)";
             my $sth = $dbh->prepare($query);
             verbose($verbose_level_debug,
-                    "\nQuerying database for xmltvid information.");
+                    '', 'Querying database for xmltvid information.');
             my $file = "$backup_conf{'directory'}/$backup_conf{'filename'}";
-            open BACKUP, '>', $file or die("\nERROR:  Unable to open".
-                                           " $file:  $!, stopped");
+            open BACKUP, '>', $file or die("\nERROR: Unable to open".
+                                           " $file: $!, stopped");
             for ($section = 0; $section < 2; $section++)
             {
                 if ($sth->execute)
@@ -921,9 +923,9 @@ EOF
                     if ($section == 0)
                     {
                         verbose($verbose_level_debug,
-                                "\nSuccessfully backed up xmltvid".
-                                " information.".
-                                "\n\nCreating alternate format backup.");
+                                '', 'Successfully backed up xmltvid'.
+                                ' information.'.
+                                '', '', 'Creating alternate format backup.');
                         print BACKUP "\n\n/* Alternate format */\n".
                                      "/*\n";
                     }
@@ -931,16 +933,16 @@ EOF
                     {
                         print BACKUP "*/\n";
                         verbose($verbose_level_debug,
-                                "Successfully created alternate format".
-                                " backup.");
+                                'Successfully created alternate format'.
+                                ' backup.');
                     }
                     $exit = 0;
                 }
                 else
                 {
                     verbose($verbose_level_error,
-                            "\nERROR: Unable to retrieve xmltvid information".
-                            " from database.");
+                            '', 'ERROR: Unable to retrieve xmltvid information'.
+                            ' from database.');
                     die("\nError retrieving xmltvid information, stopped");
                 }
             }
@@ -949,10 +951,10 @@ EOF
         else
         {
             verbose($verbose_level_error,
-                    "\nERROR:  Unable to backup xmltvids without Perl".
-                    " database libraries.",
-                    "        Please ensure the Perl DBI and DBD::mysql".
-                    " modules are installed.");
+                    '', 'ERROR: Unable to backup xmltvids without Perl'.
+                    ' database libraries.',
+                    '        Please ensure the Perl DBI and DBD::mysql'.
+                    ' modules are installed.');
             die("\nPerl database libraries missing, stopped");
         }
         return $exit;
@@ -978,24 +980,24 @@ EOF
                     push(@allowed_paths, $path);
                 }
             }
-            verbose($verbose_level_debug + 1,
+            verbose($verbose_level_debug + 2,
                     '', 'Allowing paths:', @allowed_paths,
                     'From PATH: '.$old_env_path);
         }
 
-        verbose($verbose_level_debug + 1, '', 'Verifying command: '.$command);
+        verbose($verbose_level_debug + 2, '', 'Verifying command: '.$command);
         if ($command =~ /^\//)
         {
-            verbose($verbose_level_debug + 1, ' - Command starts with /.');
+            verbose($verbose_level_debug + 2, ' - Command starts with /.');
             if (! ($command =~ /\/\.+\//))
             {
-                verbose($verbose_level_debug + 1,
+                verbose($verbose_level_debug + 2,
                         ' - Command does not contain dir refs.');
                 if (-e "$command" && -f "$command" && -x "$command")
                 {
                 # Seems to be a valid executable specified with a path starting
                 # with / and having no current/previous directory references
-                    verbose($verbose_level_debug + 1,
+                    verbose($verbose_level_debug + 2,
                             'Unmodified command meets untaint requirements.',
                             $command);
                     $allow_untaint = 1;
@@ -1012,7 +1014,7 @@ EOF
                 # Seems to be a valid executable in a "normal" directory for
                 # binaries
                     $command = "$path/$command";
-                    verbose($verbose_level_debug + 1,
+                    verbose($verbose_level_debug + 2,
                             'Command seems to be a simple command in a'.
                             ' normal directory for binaries: '.$command);
                     $allow_untaint = 1;
@@ -1023,7 +1025,7 @@ EOF
         {
             if ($command =~ /^(.*)$/)
             {
-                verbose($verbose_level_debug,
+                verbose($verbose_level_debug + 1,
                         'Untainting command: '.$command);
                 $command = $1;
                 $ENV{'PATH'} = '';
@@ -1041,13 +1043,13 @@ EOF
     sub untaint_path
     {
         my $path = shift;
-        verbose($verbose_level_debug + 1, '', 'Verifying path: '.$path);
+        verbose($verbose_level_debug + 2, '', 'Verifying path: '.$path);
         if ($path =~ /^\//)
         {
-            verbose($verbose_level_debug + 1, ' - Path starts with /.');
+            verbose($verbose_level_debug + 2, ' - Path starts with /.');
             if (! ($path =~ /\/\.+\//))
             {
-                verbose($verbose_level_debug + 1,
+                verbose($verbose_level_debug + 2,
                         ' - Path contains no dir refs.');
                 if (-e "$path" && (-f "$path" || -d "$path"))
                 {
@@ -1055,7 +1057,7 @@ EOF
                 # having no current/previous directory references
                     if ($path =~ /^(.*)$/)
                     {
-                        verbose($verbose_level_debug,
+                        verbose($verbose_level_debug + 1,
                                 'Untainting path: '.$path);
                         $path = $1;
                     }
@@ -1074,7 +1076,7 @@ EOF
         my $value = shift;
         if ($value =~ /^(.*)$/)
         {
-            verbose($verbose_level_debug, 'Untainting data: '.$value);
+            verbose($verbose_level_debug + 1, 'Untainting data: '.$value);
             $value = $1;
         }
         return $value;
@@ -1097,11 +1099,11 @@ EOF
         my $user_arg = '';
         if ($defaults_extra_file)
         {
-            $defaults_arg=" --defaults-extra-file='$defaults_extra_file'";
+            $defaults_arg = " --defaults-extra-file='$defaults_extra_file'";
         }
         else
         {
-            $defaults_arg='';
+            $defaults_arg = '';
         }
     # For users running in environments where taint mode is activated (i.e.
     # running mythtv-setup or mythbackend as root), executing a command line
@@ -1130,19 +1132,19 @@ EOF
         {
             $safe_string = $mysql_conf{'db_host'};
             $safe_string =~ s/'/'\\''/g;
-            $host_arg=" --host='$safe_string'";
+            $host_arg = " --host='$safe_string'";
         }
         if ($mysql_conf{'db_port'} > 0)
         {
             $safe_string = $mysql_conf{'db_port'};
             $safe_string =~ s/'/'\\''/g;
-            $port_arg=" --port='$safe_string'";
+            $port_arg = " --port='$safe_string'";
         }
         if ($mysql_conf{'db_user'})
         {
             $safe_string = $mysql_conf{'db_user'};
             $safe_string =~ s/'/'\\''/g;
-            $user_arg=" --user='$safe_string'";
+            $user_arg = " --user='$safe_string'";
         }
 
     # Use redirects to capture stderr (for debug) and send stdout (the backup)
@@ -1153,11 +1155,11 @@ EOF
                       "--lock-tables --no-create-db --quick ".
                       "'$safe_db_name' 2>&1 1>'$output_file'";
         verbose($verbose_level_debug,
-                "\nExecuting command:", $command);
+                '', 'Executing command:', $command);
         my $result = `$command`;
         my $exit = $? >> 8;
         verbose($verbose_level_debug,
-                "\n$mysqldump exited with status:  $exit");
+                '', "$mysqldump exited with status: $exit");
         verbose($verbose_level_debug,
                 "$mysqldump output:", $result) if ($exit);
         reset_environment;
@@ -1169,12 +1171,12 @@ EOF
         if (!-e "$backup_conf{'directory'}/$backup_conf{'filename'}")
         {
             verbose($verbose_level_debug,
-                    "\nUnable to find backup file to compress");
+                    '', 'Unable to find backup file to compress');
             return 1;
         }
         my $result = 0;
         verbose($verbose_level_debug,
-                "\nAttempting to compress backup file.");
+                '', 'Attempting to compress backup file.');
         if ($d_compress eq $compress)
         {
         # Try to load the IO::Compress::Gzip library if available (but don't
@@ -1202,9 +1204,9 @@ EOF
                 if (-e "$backup_conf{'directory'}/$backup_conf{'filename'}.gz")
                 {
                     verbose($verbose_level_debug,
-                            "\nA file whose name is the backup filename with".
-                            " the '.gz' extension already",
-                            "exists. Leaving backup uncompressed.");
+                            '', 'A file whose name is the backup filename'.
+                            ' with the \'.gz\' extension already',
+                            'exists. Leaving backup uncompressed.');
                     return 1;
                 }
                 verbose($verbose_level_debug,
@@ -1225,18 +1227,18 @@ EOF
                                             $backup_conf{'filename'};
                     $uncompressed_file = untaint_path($uncompressed_file);
                     $uncompressed_file =~ s/'/'\\''/sg;
-                    verbose($verbose_level_debug + 1,
+                    verbose($verbose_level_debug + 2,
                             "Unlinking uncompressed file: $uncompressed_file");
                     unlink "$uncompressed_file";
                     $backup_conf{'filename'} = "$backup_conf{'filename'}.gz";
                     verbose($verbose_level_debug,
-                            "\nSuccessfully compressed backup to file:",
+                            '', 'Successfully compressed backup to file:',
                             "$backup_conf{'directory'}/".
                             "$backup_conf{'filename'}");
                     return 0;
                 }
                 verbose($verbose_level_debug,
-                        "   Error:  $GzipError");
+                        "   Error: $GzipError");
             }
         }
     # Try to compress the file with the compress binary.
@@ -1253,11 +1255,11 @@ EOF
         $backup_path =~ s/'/'\\''/sg;
         my $command = "'$compress' '$backup_path' 2>&1";
         verbose($verbose_level_debug,
-                "\nExecuting command:", $command);
+                '', 'Executing command:', $command);
         my $output = `$command`;
         my $exit = $? >> 8;
         verbose($verbose_level_debug,
-                "\n$compress exited with status:  $exit");
+                '', "$compress exited with status: $exit");
         if ($exit)
         {
             verbose($verbose_level_debug,
@@ -1276,13 +1278,13 @@ EOF
         if (($rotate < 1) || (!defined($rotateglob)) || (!$rotateglob))
         {
             verbose($verbose_level_debug,
-                    "\nBackup file rotation disabled.");
+                    '', 'Backup file rotation disabled.');
             return 0;
         }
         verbose($verbose_level_debug,
-                "\nRotating backups.");
+                '', 'Rotating backups.');
         verbose($verbose_level_debug,
-                "\nSearching for files matching pattern:",
+                '', 'Searching for files matching pattern:',
                 "$backup_conf{'directory'}/$rotateglob");
         my @files = <$backup_conf{'directory'}/$rotateglob>;
         my @sorted_files = sort { lc($a) cmp lc($b) } @files;
@@ -1292,8 +1294,8 @@ EOF
         $num_files = $num_files - $rotate;
         $num_files = 0 if ($num_files < 0);
         verbose($verbose_level_debug,
-                "\nDeleting $num_files and keeping (up to) $rotate backup".
-                " files.");
+                '', "Deleting $num_files and keeping (up to) $rotate backup".
+                ' files.');
         my $index = 0;
         foreach my $file (@sorted_files)
         {
@@ -1306,20 +1308,20 @@ EOF
                 # backups with newer schema versions may cause rotation to
                 # fail.
                     verbose($verbose_level_debug,
-                            "\nWARNING:  You seem to have reverted to an".
-                            " older database schema version.",
-                            "You should move all backups from newer schema".
-                            " versions to another directory or",
-                            "delete them to prevent your new backups from".
-                            " being deleted on rotation.\n");
+                            '', 'WARNING: You seem to have reverted to an'.
+                            ' older database schema version.',
+                            'You should move all backups from newer schema'.
+                            ' versions to another directory or',
+                            'delete them to prevent your new backups from'.
+                            ' being deleted on rotation.', '');
                     verbose($verbose_level_debug,
-                            " - Keeping backup file:  $file");
+                            " - Keeping backup file: $file");
 
                 }
                 else
                 {
                     verbose($verbose_level_debug,
-                            " - Deleting old backup file:  $file");
+                            " - Deleting old backup file: $file");
                 # For users running in environments where taint mode is
                 # activated (i.e.  running mythtv-setup or mythbackend as
                 # root), unlinking a file whose path is built with tainted data
@@ -1333,7 +1335,7 @@ EOF
             else
             {
                 verbose($verbose_level_debug,
-                        " - Keeping backup file:  $file");
+                        " - Keeping backup file: $file");
             }
         }
         return 1;
