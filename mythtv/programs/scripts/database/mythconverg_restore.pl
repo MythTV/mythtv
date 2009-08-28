@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.5';
+    $VERSION        = '1.0.6';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -435,7 +435,7 @@ EOF
         {
             return unless ($debug >= $level);
         }
-        print { $error ? STDOUT : STDERR } join("\n", @_), "\n";
+        print { $error ? STDERR : STDOUT } join("\n", @_), "\n";
     }
 
     sub print_configuration
@@ -895,28 +895,36 @@ EOF
         {
             $defaults_arg='';
         }
+        my $safe_mysql_client = $mysql_client;
+        $safe_mysql_client =~ s/'/'\\''/g;
     # Create the args for host, port, and user, shell-escaping values, as
     # necessary.
+        my $safe_string;
         if ($mysql_conf{'db_host'})
         {
-            $mysql_conf{'db_host'} =~ s/'/'\\''/g;
-            $host_arg=" --host='$mysql_conf{'db_host'}'";
+            $safe_string = $mysql_conf{'db_host'};
+            $safe_string =~ s/'/'\\''/g;
+            $host_arg=" --host='$safe_string'";
         }
         if ($mysql_conf{'db_port'} > 0)
         {
-            $mysql_conf{'db_port'} =~ s/'/'\\''/g;
-            $port_arg=" --port='$mysql_conf{'db_port'}'";
+            $safe_string = $mysql_conf{'db_port'};
+            $safe_string =~ s/'/'\\''/g;
+            $port_arg=" --port='$safe_string'";
         }
         if ($mysql_conf{'db_user'})
         {
-            $mysql_conf{'db_user'} =~ s/'/'\\''/g;
-            $user_arg=" --user='$mysql_conf{'db_user'}'";
+            $safe_string = $mysql_conf{'db_user'};
+            $safe_string =~ s/'/'\\''/g;
+            $user_arg=" --user='$safe_string'";
         }
         verbose($verbose_level_debug,
                 "\nAttempting to create initial database.");
+        my $safe_mc_sql = $mc_sql;
+        $safe_mc_sql =~ s/'/'\\''/g;
     # Use redirects to capture stdout and stderr (for debug)
-        my $command = "${mysql_client}${defaults_arg}${host_arg}${port_arg}".
-                      "${user_arg}  2>&1 < $mc_sql";
+        my $command = "'${safe_mysql_client}'${defaults_arg}${host_arg}".
+                      "${port_arg}${user_arg} 2>&1 < '$safe_mc_sql'";
         verbose($verbose_level_debug,
                 "\nExecuting command:", $command);
         my $result = `$command`;
@@ -1023,7 +1031,7 @@ EOF
         {
             if (create_initial_database)
             {
-                verbose($verbose_level_always,
+                verbose($verbose_level_error,
                         "\nERROR:  The database does not exist.");
                 return 0;
             }
@@ -1033,7 +1041,7 @@ EOF
         {
             if ($database_empty)
             {
-                verbose($verbose_level_always,
+                verbose($verbose_level_error,
                         "\nERROR:  Unable to change hostname. The database".
                         " is empty.",
                         "        Please restore a backup, first, then re-run".
@@ -1045,7 +1053,7 @@ EOF
         {
             if ($database_empty)
             {
-                verbose($verbose_level_always,
+                verbose($verbose_level_error,
                         "\nERROR:  Unable to do a partial restore. The".
                         " database is empty.",
                         "        Please run mythtv-setup, first, then re-run".
@@ -1057,7 +1065,7 @@ EOF
         {
             if (!$database_empty)
             {
-                verbose($verbose_level_always,
+                verbose($verbose_level_error,
                         "\nERROR:  Unable to do a full restore. The".
                         " database contains data.");
                 return 0;
@@ -1153,13 +1161,16 @@ EOF
     # Try to uncompress the file with the uncompress binary.
     # With the approach, the original backup file will be uncompressed and
     # left uncompressed.
+        my $safe_uncompress = $uncompress;
+        $safe_uncompress =~ s/'/'\\''/sg;
         verbose($verbose_level_debug,
                 " - Uncompressing backup file with $uncompress.",
                 "   The original backup file will be left uncompressed.".
                 " Please recompress,",
                 "   if desired.");
         my $backup_path = "$backup_conf{'directory'}/$backup_conf{'filename'}";
-        my $output = `$uncompress '$backup_path' 2>&1`;
+        $backup_path =~ s/'/'\\''/sg;
+        my $output = `'$safe_uncompress' '$backup_path' 2>&1`;
         my $exit = $? >> 8;
         verbose($verbose_level_debug,
                 "\n$uncompress exited with status:  $exit");
@@ -1192,14 +1203,14 @@ EOF
         if (!$new_hostname)
         {
             $exit++;
-            verbose($verbose_level_always,
+            verbose($verbose_level_error,
                     "\nERROR:  Cannot change hostname without --new_hostname".
                     " value.");
         }
         if (!$old_hostname)
         {
             $exit++;
-            verbose($verbose_level_always,
+            verbose($verbose_level_error,
                     "\nERROR:  Cannot change hostname without --old_hostname".
                     " value.");
         }
@@ -1334,22 +1345,28 @@ EOF
         {
             $defaults_arg='';
         }
+        my $safe_mysql_client = $mysql_client;
+        $safe_mysql_client =~ s/'/'\\''/g;
     # Create the args for host, port, and user, shell-escaping values, as
     # necessary.
+        my $safe_string;
         if ($mysql_conf{'db_host'})
         {
-            $mysql_conf{'db_host'} =~ s/'/'\\''/g;
-            $host_arg=" --host='$mysql_conf{'db_host'}'";
+            $safe_string = $mysql_conf{'db_host'};
+            $safe_string =~ s/'/'\\''/g;
+            $host_arg=" --host='$safe_string'";
         }
         if ($mysql_conf{'db_port'} > 0)
         {
-            $mysql_conf{'db_port'} =~ s/'/'\\''/g;
-            $port_arg=" --port='$mysql_conf{'db_port'}'";
+            $safe_string = $mysql_conf{'db_port'};
+            $safe_string =~ s/'/'\\''/g;
+            $port_arg=" --port='$safe_string'";
         }
         if ($mysql_conf{'db_user'})
         {
-            $mysql_conf{'db_user'} =~ s/'/'\\''/g;
-            $user_arg=" --user='$mysql_conf{'db_user'}'";
+            $safe_string = $mysql_conf{'db_user'};
+            $safe_string =~ s/'/'\\''/g;
+            $user_arg=" --user='$safe_string'";
         }
     # Configure a filter for a partial/new-host restore
         if ($partial_restore)
@@ -1455,22 +1472,24 @@ EOF
                         "\nRestoring partial backup with filter:", $filter);
             }
         }
-        my $command = "${mysql_client}${defaults_arg}${host_arg}${port_arg}".
-                      "${user_arg} $mysql_conf{'db_name'}";
+        my $safe_db_name = $mysql_conf{'db_name'};
+        $safe_db_name =~ s/'/'\\''/g;
+        my $command = "'${safe_mysql_client}'${defaults_arg}${host_arg}".
+                      "${port_arg}${user_arg} '$safe_db_name'";
         verbose($verbose_level_debug,
                 "\nExecuting command:", $command);
         my $read_status = open(BACKUP,
             "<$backup_conf{'directory'}/$backup_conf{'filename'}");
         if (!defined($read_status))
         {
-            verbose($verbose_level_always,
+            verbose($verbose_level_error,
                     "\nERROR: Unable to read backup file.");
             return 255;
         }
         my $write_status = open(COMMAND, "| $command");
         if (!defined($write_status))
         {
-            verbose($verbose_level_always,
+            verbose($verbose_level_error,
                     "\nERROR: Unable to execute $mysql_client.");
             return 254;
         }

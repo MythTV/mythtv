@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.3';
+    $VERSION        = '1.0.4';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -37,6 +37,18 @@
     our %backup_conf = ('directory'     => '',
                         'filename'      => ''
                        );
+
+# Variables used to untaint data
+    our $is_env_tainted = 1;
+    our $old_env_path = $ENV{"PATH"};
+    our @d_allowed_paths = ("/bin",
+                            "/usr/bin",
+                            "/usr/local/bin",
+                            "/sbin",
+                            "/usr/sbin",
+                            "/usr/local/sbin"
+                           );
+    our @allowed_paths;
 
 # Debug levels
     $verbose_level_always = 0;
@@ -382,7 +394,7 @@ EOF
         {
             return unless ($debug >= $level);
         }
-        print { $error ? STDOUT : STDERR } join("\n", @_), "\n";
+        print { $error ? STDERR : STDOUT } join("\n", @_), "\n";
     }
 
     sub print_configuration
@@ -946,6 +958,137 @@ EOF
         return $exit;
     }
 
+# This subroutine performs limited checking of a command and untaints the
+# command (and the environment) if the command seems to use an absolute path
+# containing no . or .. references or if it's a simple command name referencing
+# an executable in a "normal" directory for binaries.  It should only be called
+# after careful consideration of the effects of doing so and of whether it
+# makes sense to override taint-mode runtime checking of the value.
+    sub untaint_command
+    {
+        my $command = shift;
+        my $allow_untaint = 0;
+    # Only allow directories from @d_allowed_paths that exist in the PATH
+        if (!defined(@allowed_paths))
+        {
+            foreach my $path (split(/:/, $old_env_path))
+            {
+                if (grep(/^$path$/, @d_allowed_paths))
+                {
+                    push(@allowed_paths, $path);
+                }
+            }
+            verbose($verbose_level_debug + 1,
+                    '', 'Allowing paths:', @allowed_paths,
+                    'From PATH: '.$old_env_path);
+        }
+
+        verbose($verbose_level_debug + 1, '', 'Verifying command: '.$command);
+        if ($command =~ /^\//)
+        {
+            verbose($verbose_level_debug + 1, ' - Command starts with /.');
+            if (! ($command =~ /\/\.+\//))
+            {
+                verbose($verbose_level_debug + 1,
+                        ' - Command does not contain dir refs.');
+                if (-e "$command" && -f "$command" && -x "$command")
+                {
+                # Seems to be a valid executable specified with a path starting
+                # with / and having no current/previous directory references
+                    verbose($verbose_level_debug + 1,
+                            'Unmodified command meets untaint requirements.',
+                            $command);
+                    $allow_untaint = 1;
+                }
+            }
+        }
+        else
+        {
+            foreach my $path (@allowed_paths)
+            {
+                if (-e "$path/$command" && -f "$path/$command" &&
+                    -x "$path/$command")
+                {
+                # Seems to be a valid executable in a "normal" directory for
+                # binaries
+                    $command = "$path/$command";
+                    verbose($verbose_level_debug + 1,
+                            'Command seems to be a simple command in a'.
+                            ' normal directory for binaries: '.$command);
+                    $allow_untaint = 1;
+                }
+            }
+        }
+        if ($allow_untaint)
+        {
+            if ($command =~ /^(.*)$/)
+            {
+                verbose($verbose_level_debug,
+                        'Untainting command: '.$command);
+                $command = $1;
+                $ENV{'PATH'} = '';
+                $is_env_tainted = 0;
+            }
+        }
+        return $command;
+    }
+
+# This subroutine performs limited checking of file or directory paths and
+# untaints the path if it seems to be an absolute path to a normal file or
+# directory and contains no . or .. references.  It should only be called after
+# careful consideration of the effects of doing so and of whether it makes
+# sense to override taint-mode runtime checking of the value.
+    sub untaint_path
+    {
+        my $path = shift;
+        verbose($verbose_level_debug + 1, '', 'Verifying path: '.$path);
+        if ($path =~ /^\//)
+        {
+            verbose($verbose_level_debug + 1, ' - Path starts with /.');
+            if (! ($path =~ /\/\.+\//))
+            {
+                verbose($verbose_level_debug + 1,
+                        ' - Path contains no dir refs.');
+                if (-e "$path" && (-f "$path" || -d "$path"))
+                {
+                # Seems to be a file or directory path starting with / and
+                # having no current/previous directory references
+                    if ($path =~ /^(.*)$/)
+                    {
+                        verbose($verbose_level_debug,
+                                'Untainting path: '.$path);
+                        $path = $1;
+                    }
+                }
+            }
+        }
+        return $path;
+    }
+
+# This subroutine does absolutely no data checking.  It blindly accepts a
+# possibly-tainted value and "untaints" it.  It should only be called after
+# careful consideration of the effects of doing so and of whether it makes
+# sense to override taint-mode runtime checking of the value.
+    sub untaint_data
+    {
+        my $value = shift;
+        if ($value =~ /^(.*)$/)
+        {
+            verbose($verbose_level_debug, 'Untainting data: '.$value);
+            $value = $1;
+        }
+        return $value;
+    }
+
+    sub reset_environment
+    {
+        if (!$is_env_tainted)
+        {
+            $is_env_tainted = 1;
+            $ENV{'PATH'} = $old_env_path;
+        }
+    }
+
     sub do_backup
     {
         my $defaults_extra_file = create_defaults_extra_file;
@@ -960,31 +1103,55 @@ EOF
         {
             $defaults_arg='';
         }
+    # For users running in environments where taint mode is activated (i.e.
+    # running mythtv-setup or mythbackend as root), executing a command line
+    # built with tainted data will fail.  Therefore, try to untaint data if it
+    # meets certain basic requirements.
+        my $safe_mysqldump = $mysqldump;
+        $safe_mysqldump = untaint_command($safe_mysqldump);
+        $safe_mysqldump =~ s/'/'\\''/sg;
+        $mysql_conf{'db_name'} = untaint_data($mysql_conf{'db_name'});
+        $mysql_conf{'db_host'} = untaint_data($mysql_conf{'db_host'});
+        $mysql_conf{'db_port'} = untaint_data($mysql_conf{'db_port'});
+        $mysql_conf{'db_user'} = untaint_data($mysql_conf{'db_user'});
+        $backup_conf{'directory'} = untaint_path($backup_conf{'directory'});
+    # Can't use untaint_path because the filename is not a full path and the
+    # file doesn't yet exist, anyway
+        $backup_conf{'filename'} =~ s/'/'\\''/g;
+        $backup_conf{'filename'} = untaint_data($backup_conf{'filename'});
+        my $output_file = "$backup_conf{'directory'}/$backup_conf{'filename'}";
+        $output_file =~ s/'/'\\''/sg;
     # Create the args for host, port, and user, shell-escaping values, as
     # necessary.
+        my $safe_db_name = $mysql_conf{'db_name'};
+        $safe_db_name =~ s/'/'\\''/g;
+        my $safe_string;
         if ($mysql_conf{'db_host'})
         {
-            $mysql_conf{'db_host'} =~ s/'/'\\''/g;
-            $host_arg=" --host='$mysql_conf{'db_host'}'";
+            $safe_string = $mysql_conf{'db_host'};
+            $safe_string =~ s/'/'\\''/g;
+            $host_arg=" --host='$safe_string'";
         }
         if ($mysql_conf{'db_port'} > 0)
         {
-            $mysql_conf{'db_port'} =~ s/'/'\\''/g;
-            $port_arg=" --port='$mysql_conf{'db_port'}'";
+            $safe_string = $mysql_conf{'db_port'};
+            $safe_string =~ s/'/'\\''/g;
+            $port_arg=" --port='$safe_string'";
         }
         if ($mysql_conf{'db_user'})
         {
-            $mysql_conf{'db_user'} =~ s/'/'\\''/g;
-            $user_arg=" --user='$mysql_conf{'db_user'}'";
+            $safe_string = $mysql_conf{'db_user'};
+            $safe_string =~ s/'/'\\''/g;
+            $user_arg=" --user='$safe_string'";
         }
+
     # Use redirects to capture stderr (for debug) and send stdout (the backup)
     # to a file
-        my $command = "${mysqldump}${defaults_arg}${host_arg}${port_arg}".
-                      "${user_arg} --add-drop-table --add-locks ".
+        my $command = "'${safe_mysqldump}'${defaults_arg}${host_arg}".
+                      "${port_arg}${user_arg} --add-drop-table --add-locks ".
                       "--allow-keywords --complete-insert --extended-insert ".
                       "--lock-tables --no-create-db --quick ".
-                      "$mysql_conf{'db_name'} 2>&1 ".
-                      "1>$backup_conf{'directory'}/$backup_conf{'filename'}";
+                      "'$safe_db_name' 2>&1 1>'$output_file'";
         verbose($verbose_level_debug,
                 "\nExecuting command:", $command);
         my $result = `$command`;
@@ -993,6 +1160,7 @@ EOF
                 "\n$mysqldump exited with status:  $exit");
         verbose($verbose_level_debug,
                 "$mysqldump output:", $result) if ($exit);
+        reset_environment;
         return $exit;
     }
 
@@ -1048,8 +1216,18 @@ EOF
                     (-e "$backup_conf{'directory'}/".
                         "$backup_conf{'filename'}.gz"))
                 {
-                    unlink "$backup_conf{'directory'}/".
-                           "$backup_conf{'filename'}";
+                # For users running in environments where taint mode is
+                # activated (i.e.  running mythtv-setup or mythbackend as
+                # root), unlinking a file whose path is built with tainted data
+                # will fail.  Therefore, try to untaint the path if it meets
+                # certain basic requirements.
+                    my $uncompressed_file = $backup_conf{'directory'}."/".
+                                            $backup_conf{'filename'};
+                    $uncompressed_file = untaint_path($uncompressed_file);
+                    $uncompressed_file =~ s/'/'\\''/sg;
+                    verbose($verbose_level_debug + 1,
+                            "Unlinking uncompressed file: $uncompressed_file");
+                    unlink "$uncompressed_file";
                     $backup_conf{'filename'} = "$backup_conf{'filename'}.gz";
                     verbose($verbose_level_debug,
                             "\nSuccessfully compressed backup to file:",
@@ -1065,7 +1243,18 @@ EOF
         verbose($verbose_level_debug,
                 " - Compressing backup file with $compress.");
         my $backup_path = "$backup_conf{'directory'}/$backup_conf{'filename'}";
-        my $output = `$compress '$backup_path' 2>&1`;
+    # For users running in environments where taint mode is activated (i.e.
+    # running mythtv-setup or mythbackend as root), executing a command line
+    # built with tainted data will fail.  Therefore, try to untaint data if it
+    # meets certain basic requirements.
+        $compress = untaint_command($compress);
+        $compress =~ s/'/'\\''/sg;
+        $backup_path = untaint_path($backup_path);
+        $backup_path =~ s/'/'\\''/sg;
+        my $command = "'$compress' '$backup_path' 2>&1";
+        verbose($verbose_level_debug,
+                "\nExecuting command:", $command);
+        my $output = `$command`;
         my $exit = $? >> 8;
         verbose($verbose_level_debug,
                 "\n$compress exited with status:  $exit");
@@ -1078,6 +1267,7 @@ EOF
         {
             $backup_conf{'filename'} = "$backup_conf{'filename'}.gz";
         }
+        reset_environment;
         return $exit;
     }
 
@@ -1130,6 +1320,13 @@ EOF
                 {
                     verbose($verbose_level_debug,
                             " - Deleting old backup file:  $file");
+                # For users running in environments where taint mode is
+                # activated (i.e.  running mythtv-setup or mythbackend as
+                # root), unlinking a file whose path is built with tainted data
+                # will fail.  Therefore, try to untaint the path if it meets
+                # certain basic requirements.
+                    $file = untaint_path($file);
+                    $file =~ s/'/'\\''/sg;
                     unlink "$file";
                 }
             }
