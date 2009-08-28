@@ -1,6 +1,5 @@
-#include <qstring.h>
-#include <qdir.h>
-//Added by qt3to4:
+#include <QString>
+#include <QDir>
 #include <QSqlError>
 
 #include <iostream>
@@ -10,8 +9,11 @@ using namespace std;
 #include "metadata.h"
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdb.h"
+#include "mythtv/schemawizard.h"
 
 const QString currentDatabaseVersion = "1017";
+
+static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -66,11 +68,55 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool UpgradeMusicDatabaseSchema(void)
 {
-    QString dbver = gContext->GetSetting("MusicDBSchemaVer");
+    SchemaUpgradeWizard  * DBup;
 
-    if (dbver == currentDatabaseVersion)
+
+    gContext->ActivateSettingsCache(false);
+
+    DBup = SchemaUpgradeWizard::Get("MusicDBSchemaVer",
+                                    currentDatabaseVersion);
+
+    // There may be a race condition where another frontend is upgrading,
+    // so wait up to 3 seconds for a more accurate version:
+    DBup->CompareAndWait(3);
+
+    if (DBup->versionsBehind == 0)  // same schema
+    {
+        gContext->ActivateSettingsCache(true);
         return true;
+    }
 
+    bool retVal;
+
+    if (DBup->DBver.isEmpty())
+    {
+        retVal = doUpgradeMusicDatabaseSchema(DBup->DBver);
+        gContext->ActivateSettingsCache(true);
+        return retVal;
+    }
+
+
+    // Pop up messages, questions, warnings, et c.
+    switch (DBup->PromptForUpgrade("Music", true, false))
+    {
+        case MYTH_SCHEMA_USE_EXISTING:
+            gContext->ActivateSettingsCache(true);
+            return true;
+        case MYTH_SCHEMA_ERROR:
+        case MYTH_SCHEMA_EXIT:
+            return false;
+        case MYTH_SCHEMA_UPGRADE:
+            break;
+    }
+
+    retVal = doUpgradeMusicDatabaseSchema(DBup->DBver);
+    gContext->ActivateSettingsCache(true);
+    return retVal;
+}
+
+
+static bool doUpgradeMusicDatabaseSchema(QString &dbver)
+{
     if (dbver.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, "Inserting MythMusic initial database information.");
