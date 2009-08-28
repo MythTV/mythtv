@@ -2165,7 +2165,7 @@ static int mpegts_read_header(AVFormatContext *s,
         goto fail;
     }
     ts->raw_packet_size = get_packet_size(buf, sizeof(buf));
-    av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: TS packet size = %d\n", ts->raw_packet_size);
+    av_log(NULL, AV_LOG_DEBUG, "mpegts_read_header: TS packet size = %d\n", ts->raw_packet_size);
     if (ts->raw_packet_size <= 0)
     {
         av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: "
