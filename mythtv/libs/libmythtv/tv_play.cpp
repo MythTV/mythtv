@@ -420,9 +420,6 @@ void TV::InitKeys(void)
 {
     REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
     REG_KEY("TV Frontend", "PAGEDOWN", "Page Down", "9");
-    REG_KEY("TV Frontend", "PAGETOP", "Page to top of list", "");
-    REG_KEY("TV Frontend", "PAGEMIDDLE", "Page to middle of list", "");
-    REG_KEY("TV Frontend", "PAGEBOTTOM", "Page to bottom of list", "");
     REG_KEY("TV Frontend", "DELETE", "Delete Program", "D");
     REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
     REG_KEY("TV Frontend", "TOGGLERECORD", "Toggle recording status of current "

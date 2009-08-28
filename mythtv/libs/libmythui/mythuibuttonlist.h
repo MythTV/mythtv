@@ -147,7 +147,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     enum ScrollStyle  { ScrollFree, ScrollCenter };
     enum LayoutType   { LayoutVertical, LayoutHorizontal, LayoutGrid };
-    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax };
+    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax, MoveMid };
     enum WrapStyle    { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems };
 
     bool MoveDown(MovementUnit unit = MoveItem);

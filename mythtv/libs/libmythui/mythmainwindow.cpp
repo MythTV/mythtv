@@ -359,6 +359,9 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     RegisterKey("Global", "PAGEUP", "Page Up", "PgUp");
     RegisterKey("Global", "PAGEDOWN", "Page Down", "PgDown");
+    RegisterKey("Global", "PAGETOP", "Page to top of list", "");
+    RegisterKey("Global", "PAGEMIDDLE", "Page to middle of list", "");
+    RegisterKey("Global", "PAGEBOTTOM", "Page to bottom of list", "");
 
     RegisterKey("Global", "PREVVIEW", "Previous View", "Home");
     RegisterKey("Global", "NEXTVIEW", "Next View", "End");

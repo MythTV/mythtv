@@ -523,6 +523,9 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
         case MovePage:
             m_selPosition = qMax(0, m_selPosition - (int)m_itemsVisible);
             break;
+        case MoveMid:
+            m_selPosition = (int)(m_itemList.size() / 2);
+            break;
         case MoveMax:
             m_selPosition = 0;
             break;
@@ -835,6 +838,18 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         else if (action == "PAGEDOWN")
         {
             MoveDown(MovePage);
+        }
+        else if (action == "PAGETOP")
+        {
+            MoveUp(MoveMax);
+        }
+        else if (action == "PAGEMIDDLE")
+        {
+            MoveUp(MoveMid);
+        }
+        else if (action == "PAGEBOTTOM")
+        {
+            MoveDown(MoveMax);
         }
         else if (action == "SELECT")
         {
