@@ -3398,6 +3398,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         AVStream *curstream = ic->streams[pkt->stream_index];
 
+        if (!curstream)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad stream (NULL)");;
+            av_free_packet(pkt);
+            continue;
+        }
+
         if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
             pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
