@@ -105,54 +105,6 @@ HostCheckBox *VideoListUnknownFiletypes()
     return gc;
 }
 
-HostCheckBox *VideoBrowserNoDB()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoBrowserNoDB");
-    gc->setLabel(QObject::tr("Video Browser browses files"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, this will cause the Video Browser "
-                    "screen to show all relevant files below "
-                    "the MythVideo starting directory whether "
-                    "they have been scanned or not."));
-    return gc;
-}
-
-HostCheckBox *VideoGalleryNoDB()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoGalleryNoDB");
-    gc->setLabel(QObject::tr("Video Gallery browses files"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, this will cause the Video Gallery "
-                    "screen to show all relevant files below "
-                    "the MythVideo starting directory whether "
-                    "they have been scanned or not."));
-    return gc;
-}
-
-HostCheckBox *VideoTreeNoDB()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoTreeNoDB");
-    gc->setLabel(QObject::tr("Video List browses files"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, this will cause the Video List "
-                    "screen to show all relevant files below "
-                    "the MythVideo starting directory whether "
-                    "they have been scanned or not."));
-    return gc;
-}
-
-HostCheckBox *VideoTreeNoMetaData()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoTreeLoadMetaData");
-    gc->setLabel(QObject::tr("Video List Loads Video Meta Data"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set along with Browse Files, this "
-                    "will cause the Video List to load any known video meta"
-                    "data from the database. Turning this off can greatly "
-                    " speed up how long it takes to load the Video List tree"));
-    return gc;
-}
-
 HostCheckBox *VideoNewBrowsable()
 {
     HostCheckBox *gc = new HostCheckBox("VideoNewBrowsable");
@@ -856,10 +808,6 @@ VideoGeneralSettings::VideoGeneralSettings()
 
     VConfigPage page2(pages, false);
     page2->addChild(VideoListUnknownFiletypes());
-    page2->addChild(VideoBrowserNoDB());
-    page2->addChild(VideoGalleryNoDB());
-    page2->addChild(VideoTreeNoDB());
-    page2->addChild(VideoTreeNoMetaData());
     page2->addChild(VideoNewBrowsable());
     page2->addChild(VideoSortIgnoresCase());
     page2->addChild(VideoDBGroupView());

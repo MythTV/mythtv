@@ -81,7 +81,7 @@ class VideoScannerThread : public QThread
         MetadataListManager::loadAllFromDatabase(ml);
         m_dbmetadata->setList(ml);
 
-        m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 0);
+        m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     }
 
     ~VideoScannerThread()
