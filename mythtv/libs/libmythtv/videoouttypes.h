@@ -109,13 +109,6 @@ typedef enum VideoErrorState
     kError_Switch_Renderer = 0x08, // Current renderer is not preferred choice
 } VideoErrorState;
 
-typedef enum WindowVisibility
-{
-    kVisibility_Normal = 0,
-    kVisibility_Hidden,
-    kVisibility_Embedded,
-} WindowVisibility;
-
 class DisplayInfo
 {
   public:

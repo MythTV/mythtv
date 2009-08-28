@@ -318,12 +318,6 @@ void PlayerContext::ResizePIPWindow(const QRect &rect)
     pipRect = QRect(rect);
 }
 
-void PlayerContext::SetPlayerVisibility(WindowVisibility visibility)
-{
-    if (nvp && nvp->getVideoOutput())
-        nvp->getVideoOutput()->SetVisibility(visibility);
-}
-
 bool PlayerContext::StartEmbedding(WId wid, const QRect &embedRect)
 {
     embedWinID = 0;

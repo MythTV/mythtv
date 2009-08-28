@@ -81,7 +81,6 @@ class VideoOutput
     virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void ResizeDisplayWindow(const QRect&, bool);
-    void         SetVisibility(WindowVisibility visibility);
     virtual void EmbedInWidget(int x, int y, int w, int h);
     virtual void StopEmbedding(void);
     void         ResizeForGui(void);

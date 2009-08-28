@@ -82,7 +82,7 @@ VideoOutWindow::VideoOutWindow() :
     tmp_display_visible_rect(0, 0, 0, 0),
 
     // Various state variables
-    visibility(kVisibility_Normal), needrepaint(false),
+    embedding(false), needrepaint(false),
     allowpreviewepg(true), pip_state(kPIPOff)
 {
     db_pip_size = gContext->GetNumSetting("PIPSize", 26);
@@ -473,7 +473,7 @@ bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
     // apply aspect ratio and letterbox mode
     VideoAspectRatioChanged(new_video_aspect);
 
-    visibility = kVisibility_Normal;
+    embedding = false;
 
     return true;
 }
@@ -645,9 +645,9 @@ void VideoOutWindow::EmbedInWidget(const QRect &new_video_rect)
     if (!allowpreviewepg && pip_state == kPIPOff)
         return;
 
-    bool save_visible_rect = (visibility != kVisibility_Embedded);
+    bool save_visible_rect = !embedding;
 
-    visibility = kVisibility_Embedded;
+    embedding = true;
 
     display_video_rect = new_video_rect;
     ResizeDisplayWindow(display_video_rect, save_visible_rect);
@@ -664,7 +664,7 @@ void VideoOutWindow::StopEmbedding(void)
 
     MoveResize();
 
-    visibility = kVisibility_Normal;
+    embedding = false;
 }
 
 /**

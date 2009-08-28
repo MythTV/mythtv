@@ -60,7 +60,6 @@ class MPUBLIC PlayerContext
     void PIPTeardown(void);
     void DrawARGBFrame(QPainter *p);
     void SetNullVideo(bool setting) { useNullVideo = setting; }
-    void SetPlayerVisibility(WindowVisibility visibility);
     bool StartEmbedding(WId wid, const QRect&);
     void StopEmbedding(void);
     void    PushPreviousChannel(void);

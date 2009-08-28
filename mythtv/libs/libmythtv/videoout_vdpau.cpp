@@ -49,7 +49,6 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
     (void) embedid;
     QMutexLocker locker(&m_lock);
     windows[0].SetNeedRepaint(true);
-    windows[0].SetAllowPreviewEPG(false);
     bool ok = VideoOutput::Init(width, height, aspect,
                                 winid, winx, winy, winw, winh,
                                 embedid);
@@ -329,7 +328,7 @@ void VideoOutputVDPAU::Show(FrameScanType scan)
         return;
     }
 
-    if (windows[0].IsRepaintNeeded() && !windows[0].IsEmbedding())
+    if (windows[0].IsRepaintNeeded())
         DrawUnusedRects(false);
 
     m_ctx->DisplayNextFrame();
@@ -404,6 +403,7 @@ void VideoOutputVDPAU::EmbedInWidget(int x, int y,int w, int h)
     if (!windows[0].IsEmbedding())
         VideoOutput::EmbedInWidget(x, y, w, h);
     MoveResize();
+    windows[0].SetDisplayVisibleRect(windows[0].GetTmpDisplayVisibleRect());
 }
 
 void VideoOutputVDPAU::StopEmbedding(void)
@@ -423,8 +423,7 @@ void VideoOutputVDPAU::MoveResizeWindow(QRect new_rect)
 
 void VideoOutputVDPAU::DrawUnusedRects(bool sync)
 {
-    if (windows[0].IsRepaintNeeded() &&
-        windows[0].GetVisibility() == kVisibility_Normal)
+    if (windows[0].IsRepaintNeeded())
     {
         const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
         m_disp->SetForeground(m_colorkey);

@@ -654,11 +654,6 @@ void VideoOutput::ResizeDisplayWindow(const QRect &rect, bool save_visible_rect)
     windows[0].ResizeDisplayWindow(rect, save_visible_rect);
 }
 
-void VideoOutput::SetVisibility(WindowVisibility visibility)
-{
-    windows[0].SetVisibility(visibility);
-}
-
 /**
  * \brief Tells video output to embed video in an existing window.
  * \param x   X location where to locate video
