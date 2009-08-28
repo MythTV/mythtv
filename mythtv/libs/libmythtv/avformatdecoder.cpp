@@ -1185,7 +1185,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
         if (stream->sample_aspect_ratio.num)
             aspect_ratio = av_q2d(stream->sample_aspect_ratio);
-        else if (enc->sample_aspect_ratio.num == 0)
+        else if (enc->sample_aspect_ratio.num)
             aspect_ratio = av_q2d(enc->sample_aspect_ratio);
         else
             aspect_ratio = 1.0f;
