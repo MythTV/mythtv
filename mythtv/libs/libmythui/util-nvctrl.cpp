@@ -187,7 +187,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                                          pModeLines[nDisplayDevice],
                                          ModeLineLen[nDisplayDevice]);
 
-                if (!modeline_is_interlaced(modeLine))
+                if (modeLine && !modeline_is_interlaced(modeLine))
                 {
                     int w, h, vfl, hfl, i, irate;
                     double dcl, r;
@@ -294,7 +294,7 @@ static unsigned int display_device_mask(char *str)
 
 static void parse_mode_string(char *modeString, char **modeName, int *mask)
 {
-    char *colon, *s, tmp;
+    char *colon, *s_end, tmp;
 
     // Skip space
     while (*modeString == ' ')
@@ -322,21 +322,19 @@ static void parse_mode_string(char *modeString, char **modeName, int *mask)
     }
 
     /*
-     * find the modename; trim off any panning domain or
-     * offsets
+     * find the modename; stop at the last ' @' (would be easier with regex)
      */
 
-    for (s = modeString; *s; s++)
+    for (char *s = modeString; *s; s++)
     {
-        if (*s == ' ') break;
-        if ((*s == '+') && isdigit(s[1])) break;
-        if ((*s == '-') && isdigit(s[1])) break;
-    }
+        if (*s == ' ' && *(s+1) == '@')
+            s_end = s;
+    } 
 
-    tmp = *s;
-    *s = '\0';
+    tmp = *s_end;
+    *s_end = '\0';
     *modeName = strdup(modeString);
-    *s = tmp;
+    *s_end = tmp;
 }
 
 
