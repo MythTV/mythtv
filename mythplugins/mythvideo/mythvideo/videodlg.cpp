@@ -4694,7 +4694,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 screenshot_dirs, screenshot_file, metadata->GetTitle(),
                                 metadata->GetSeason(), true))
         {
-            metadata->SetScreenshot(banner_file);
+            metadata->SetScreenshot(screenshot_file);
             OnVideoScreenshotSetDone(metadata);
         }
 
