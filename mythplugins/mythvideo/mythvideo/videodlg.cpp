@@ -1497,7 +1497,8 @@ namespace
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
-                             QString title, int season, int episode = 0,
+                             QString title, int season, const QString host, 
+                             QString sgroup, int episode = 0,
                              bool isScreenshot = false)
     {
         QStringList search_dirs(in_dirs);
@@ -1515,6 +1516,55 @@ namespace
                 it != image_types.end(); ++it)
         {
             image_exts.insert(QString(*it).toLower());
+        }
+
+        if (!host.isEmpty())
+        {
+            const QString hntm("%2.%3");
+
+            for (image_type_list::const_iterator ext = image_exts.begin();
+                    ext != image_exts.end(); ++ext)
+            {
+                QStringList sfn;
+                if (season > 0)
+                {
+                    if (episode > 0 && isScreenshot)
+                        sfn += hntm.arg(QString("%1 Season %2x%3")
+                                 .arg(title).arg(QString::number(season))
+                                 .arg(QString::number(episode)))
+                                 .arg(*ext);
+                    else if (!isScreenshot)
+                        sfn += hntm.arg(QString("%1 Season %2")
+                                 .arg(title).arg(QString::number(season)))
+                                 .arg(*ext);
+
+                }
+                if (!isScreenshot)
+                {
+                sfn += hntm.arg(base_name).arg(*ext);
+                sfn += hntm.arg(video_uid).arg(*ext);
+                }
+
+                for (QStringList::const_iterator i = sfn.begin();
+                        i != sfn.end(); ++i)
+                {
+                    if (!host.isEmpty())
+                    {
+                        QString url = GenRemoteFileURL(sgroup, host, *i);
+                        RemoteFile *rf = new RemoteFile(url);
+                        if (rf->GetFileSize() > 0)
+                        {
+                            image = *i;
+                            return true;
+                        }
+                        else
+                        {
+                            delete rf;
+                            rf = NULL;
+                        }
+                    }
+                }
+            }
         }
 
         const QString fntm("%1/%2.%3");
@@ -4561,7 +4611,8 @@ void VideoDialog::ResetMetadata()
         QString cover_file;
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_artDir), cover_file,
-                        metadata->GetTitle(), metadata->GetSeason()))
+                        metadata->GetTitle(), metadata->GetSeason(),
+                        metadata->GetHost(), "Coverart"))
         {
             metadata->SetCoverFile(cover_file);
         }
@@ -4569,8 +4620,8 @@ void VideoDialog::ResetMetadata()
         QString screenshot_file;
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_sshotDir), screenshot_file,
-                        metadata->GetTitle(), metadata->GetSeason(), metadata->GetEpisode(),
-                        true))
+                        metadata->GetTitle(), metadata->GetSeason(), metadata->GetHost(),
+                        "Screenshots", metadata->GetEpisode(), true))
         {   
             metadata->SetScreenshot(screenshot_file);
         }
@@ -4579,7 +4630,8 @@ void VideoDialog::ResetMetadata()
         QString fanart_file;
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_fanDir), fanart_file,
-                        metadata->GetTitle(), metadata->GetSeason()))
+                        metadata->GetTitle(), metadata->GetSeason(),
+                        metadata->GetHost(), "Fanart"))
         {
             metadata->SetFanart(fanart_file);
         }
@@ -4587,7 +4639,8 @@ void VideoDialog::ResetMetadata()
         QString banner_file;
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_banDir), banner_file,
-                        metadata->GetTitle(), metadata->GetSeason()))
+                        metadata->GetTitle(), metadata->GetSeason(),
+                        metadata->GetHost(), "Banners"))
         {
             metadata->SetBanner(banner_file);
         }
@@ -4616,7 +4669,8 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
     {
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 cover_dirs, cover_file, metadata->GetTitle(),
-                                metadata->GetSeason()))
+                                metadata->GetSeason(), metadata->GetHost(),
+                                "Coverart"))
         {
             metadata->SetCoverFile(cover_file);
             OnVideoPosterSetDone(metadata);
@@ -4641,7 +4695,8 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
     {
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 fanart_dirs, fanart_file, metadata->GetTitle(),
-                                metadata->GetSeason()))
+                                metadata->GetSeason(), metadata->GetHost(),
+                                "Fanart"))
         {
             metadata->SetFanart(fanart_file);
             OnVideoFanartSetDone(metadata);
@@ -4666,7 +4721,8 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
     {
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 banner_dirs, banner_file, metadata->GetTitle(),
-                                metadata->GetSeason()))
+                                metadata->GetSeason(), metadata->GetHost(),
+                                "Banners"))
         {
             metadata->SetBanner(banner_file);
             OnVideoBannerSetDone(metadata);
@@ -4692,7 +4748,8 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
     {
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 screenshot_dirs, screenshot_file, metadata->GetTitle(),
-                                metadata->GetSeason(), true))
+                                metadata->GetSeason(), metadata->GetHost(), "Screenshots",
+                                metadata->GetEpisode(), true))
         {
             metadata->SetScreenshot(screenshot_file);
             OnVideoScreenshotSetDone(metadata);
