@@ -105,6 +105,18 @@ HostCheckBox *VideoListUnknownFiletypes()
     return gc;
 }
 
+HostCheckBox *VideoTreeNoMetaData() 
+{ 
+    HostCheckBox *gc = new HostCheckBox("VideoTreeLoadMetaData"); 
+    gc->setLabel(QObject::tr("Video List Loads Video Meta Data")); 
+    gc->setValue(true); 
+    gc->setHelpText(QObject::tr("If set along with Browse Files, this " 
+                    "will cause the Video List to load any known video meta" 
+                    "data from the database. Turning this off can greatly " 
+                    "speed up how long it takes to load the Video List tree")); 
+    return gc;
+}
+
 HostCheckBox *VideoNewBrowsable()
 {
     HostCheckBox *gc = new HostCheckBox("VideoNewBrowsable");
@@ -808,6 +820,7 @@ VideoGeneralSettings::VideoGeneralSettings()
 
     VConfigPage page2(pages, false);
     page2->addChild(VideoListUnknownFiletypes());
+    page2->addChild(VideoTreeNoMetaData()); 
     page2->addChild(VideoNewBrowsable());
     page2->addChild(VideoSortIgnoresCase());
     page2->addChild(VideoDBGroupView());
