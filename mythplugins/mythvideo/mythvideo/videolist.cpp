@@ -167,7 +167,10 @@ namespace fake_unnamed
             else
             {
                 QString p = getPath();
-                m_fq_path = ((p.length() && p[0] != '/') ? "/" : "") + p;
+                if (p.startsWith("myth://"))
+                    m_fq_path = p;
+                else
+                    m_fq_path = ((p.length() && p[0] != '/') ? "/" : "") + p;
             }
 
             return m_fq_path;

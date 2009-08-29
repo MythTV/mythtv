@@ -194,7 +194,7 @@ bool ScanVideoDirectory(const QString &start_path, DirectoryHandler *handler,
 
         if (!scan_dir(start_path, handler, extlookup))
         {
-            VERBOSE(VB_GENERAL, QString("MythVideo::ScanVideoDirectory failed to scan %1"));
+            VERBOSE(VB_GENERAL, QString("MythVideo::ScanVideoDirectory failed to scan %1").arg(start_path));
             pathScanned = false;
         }
     }
