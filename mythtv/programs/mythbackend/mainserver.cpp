@@ -9,7 +9,7 @@ using namespace std;
 #include <math.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "../../config.h"
+#include "mythconfig.h"
 
 #ifndef USING_MINGW
 #include <sys/ioctl.h>
@@ -247,40 +247,41 @@ void MainServer::newConnection(MythSocket *socket)
 
 void MainServer::readyRead(MythSocket *sock)
 {
-    PlaybackSock *testsock = getPlaybackBySock(sock);
-    if (testsock && testsock->isExpectingReply())
-    {
+    sockListLock.lockForRead();
+    PlaybackSock *testsock = GetPlaybackBySock(sock);
+    bool expecting_reply = testsock && testsock->isExpectingReply();
+    sockListLock.unlock();
+    if (expecting_reply)
         return;
-    }
-
-    readReadyLock.lock();
 
     ProcessRequestThread *prt = NULL;
-    threadPoolLock.lock();
-    if (threadPool.empty())
     {
-        VERBOSE(VB_IMPORTANT, "Waiting for a process request thread..");
-        threadPoolCond.wait(&threadPoolLock, PRT_TIMEOUT);
-    }
-    if (!threadPool.empty())
-    {
-        prt = threadPool.back();
-        threadPool.pop_back();
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "Adding a new process request thread");
-        prt = new ProcessRequestThread(this);
-        prt->lock.lock();
-        prt->start();
-        prt->waitCond.wait(&prt->lock);
-        prt->lock.unlock();
-    }
-    threadPoolLock.unlock();
+        QMutexLocker locker(&threadPoolLock);
 
+        if (threadPool.empty())
+        {
+            VERBOSE(VB_GENERAL, "Waiting for a process request thread.. ");
+            threadPoolCond.wait(&threadPoolLock, PRT_TIMEOUT);
+        }
+
+        if (!threadPool.empty())
+        {
+            prt = threadPool.front();
+            threadPool.pop_front();
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "Adding a new process request thread");
+            prt = new ProcessRequestThread(this);
+            prt->lock.lock();
+            prt->start();
+            prt->waitCond.wait(&prt->lock);
+            prt->lock.unlock();
+        }
+    }
+
+    QMutexLocker locker(&readReadyLock);
     prt->setup(sock);
-
-    readReadyLock.unlock();
 }
 
 void MainServer::ProcessRequest(MythSocket *sock)
@@ -326,15 +327,16 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         return;
     }
 
-    PlaybackSock *pbs = getPlaybackBySock(sock);
+    sockListLock.lockForRead();
+    PlaybackSock *pbs = GetPlaybackBySock(sock);
     if (!pbs)
     {
+        sockListLock.unlock();
         VERBOSE(VB_IMPORTANT, "ProcessRequest unknown socket");
         return;
     }
-
-    // Increase refcount while using..
     pbs->UpRef();
+    sockListLock.unlock();
 
     if (command == "QUERY_RECORDINGS")
     {
@@ -681,7 +683,6 @@ void MainServer::MarkUnused(ProcessRequestThread *prt)
 void MainServer::customEvent(QEvent *e)
 {
     QStringList broadcast;
-    bool sendstuff = false;
 
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
@@ -851,12 +852,11 @@ void MainServer::customEvent(QEvent *e)
         broadcast = QStringList( "BACKEND_MESSAGE" );
         broadcast << me->Message();
         broadcast += me->ExtraDataList();
-        sendstuff = true;
     }
 
-    if (sendstuff)
+    if (!broadcast.empty())
     {
-        readReadyLock.lock();
+        QMutexLocker locker(&readReadyLock);
 
         bool sendGlobal = false;
         if (ismaster && broadcast[1].left(7) == "GLOBAL_")
@@ -872,7 +872,7 @@ void MainServer::customEvent(QEvent *e)
 
         // Make a local copy of the list, upping the refcount as we go..
         vector<PlaybackSock *> localPBSList;
-        sockListLock.lock();
+        sockListLock.lockForRead();
         vector<PlaybackSock *>::iterator iter = playbackList.begin();
         for (; iter != playbackList.end(); iter++)
         {
@@ -911,17 +911,17 @@ void MainServer::customEvent(QEvent *e)
                 reallysendit = true;
             }
 
-            MythSocket *sock = pbs->getSocket();
-            sock->UpRef();
-
             if (reallysendit)
             {
+                MythSocket *sock = pbs->getSocket();
+                sock->UpRef();
+
                 sock->Lock();
                 sock->writeStringList(broadcast);
                 sock->Unlock();
-            }
 
-            sock->DownRef();
+                sock->DownRef();
+            }
         }
 
         // Done with the pbs list, so decrement all the instances..
@@ -930,8 +930,6 @@ void MainServer::customEvent(QEvent *e)
             PlaybackSock *pbs = *iter;
             pbs->DownRef();
         }
-
-        readReadyLock.unlock();
     }
 }
 
@@ -993,19 +991,19 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         return;
     }
 
-    sockListLock.lock();
+    sockListLock.lockForRead();
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
     for (; iter != playbackList.end(); iter++)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->getSocket() == socket)
         {
-            sockListLock.unlock();
             VERBOSE(VB_IMPORTANT,
                     QString("Client %1 is trying to announce a socket "
                             "multiple times.")
                     .arg(commands[2]));
             socket->writeStringList(retlist);
+            sockListLock.unlock();
             return;
         }
     }
@@ -1033,7 +1031,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                .arg(commands[2]).arg(wantevents));
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], wantevents);
         pbs->setBlockShutdown(commands[1] == "Playback");
-        sockListLock.lock();
+
+        sockListLock.lockForWrite();
         playbackList.push_back(pbs);
         sockListLock.unlock();
     }
@@ -1091,7 +1090,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         pbs->setBlockShutdown(false);
 
-        sockListLock.lock();
+        sockListLock.lockForWrite();
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
@@ -1184,7 +1183,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         else
             ft = new FileTransfer(filename, socket, false);
 
-        sockListLock.lock();
+        sockListLock.lockForWrite();
         fileTransferList.push_back(ft);
         sockListLock.unlock();
 
@@ -1223,7 +1222,23 @@ void MainServer::HandleDone(MythSocket *socket)
 
 void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
 {
-    if (socket && (getPlaybackBySock(socket) || getFileTransferBySock(socket)))
+    // Note: this method assumes that the playback or filetransfer
+    // handler has already been uprefed and the socket as well.
+
+    // These checks are really just to check if the socket has
+    // been remotely disconnected while we were working on the
+    // response.
+
+    bool do_write = false;
+    if (socket)
+    {
+        sockListLock.lockForRead();
+        do_write = (GetPlaybackBySock(socket) ||
+                    GetFileTransferBySock(socket));
+        sockListLock.unlock();
+    }
+
+    if (do_write)
     {
         socket->writeStringList(commands);
     }
@@ -4122,7 +4137,9 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     QString command = slist[1];
 
     QStringList retlist;
-    FileTransfer *ft = getFileTransferByID(recnum);
+
+    sockListLock.lockForRead();
+    FileTransfer *ft = GetFileTransferByID(recnum);
     if (!ft)
     {
         if (command == "DONE")
@@ -4138,11 +4155,14 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
             retlist << QString("ERROR: Unknown file transfer socket: %1")
                                .arg(recnum);
         }
+
         SendResponse(pbssock, retlist);
+        sockListLock.unlock();
         return;
     }
 
     ft->UpRef();
+    sockListLock.unlock();
 
     if (command == "IS_OPEN")
     {
@@ -4587,7 +4607,7 @@ void MainServer::DeletePBS(PlaybackSock *sock)
 
 void MainServer::connectionClosed(MythSocket *socket)
 {
-    sockListLock.lock();
+    sockListLock.lockForWrite();
 
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
@@ -4664,11 +4684,12 @@ void MainServer::connectionClosed(MythSocket *socket)
 
             pbs->SetDisconnected();
             playbackList.erase(it);
-            sockListLock.unlock();
 
-            PlaybackSock *testsock = getPlaybackBySock(socket);
+            PlaybackSock *testsock = GetPlaybackBySock(socket);
             if (testsock)
                 VERBOSE(VB_IMPORTANT, "Playback sock still exists?");
+
+            sockListLock.unlock();
 
             pbs->DownRef();
             return;
@@ -4700,14 +4721,15 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
     if (!ismaster)
         return NULL;
 
-    sockListLock.lock();
+    sockListLock.lockForRead();
 
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
     for (; iter != playbackList.end(); iter++)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->isSlaveBackend() &&
-            ((pbs->getHostname().toLower() == hostname.toLower()) || (pbs->getIP() == hostname)))
+            ((pbs->getHostname().toLower() == hostname.toLower()) ||
+             (pbs->getIP() == hostname)))
         {
             sockListLock.unlock();
             pbs->UpRef();
@@ -4720,11 +4742,10 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
     return NULL;
 }
 
-PlaybackSock *MainServer::getPlaybackBySock(MythSocket *sock)
+/// Warning you must hold a sockListLock lock before calling this
+PlaybackSock *MainServer::GetPlaybackBySock(MythSocket *sock)
 {
     PlaybackSock *retval = NULL;
-
-    sockListLock.lock();
 
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
@@ -4736,16 +4757,13 @@ PlaybackSock *MainServer::getPlaybackBySock(MythSocket *sock)
         }
     }
 
-    sockListLock.unlock();
-
     return retval;
 }
 
-FileTransfer *MainServer::getFileTransferByID(int id)
+/// Warning you must hold a sockListLock lock before calling this
+FileTransfer *MainServer::GetFileTransferByID(int id)
 {
     FileTransfer *retval = NULL;
-
-    sockListLock.lock();
 
     vector<FileTransfer *>::iterator it = fileTransferList.begin();
     for (; it != fileTransferList.end(); ++it)
@@ -4757,16 +4775,13 @@ FileTransfer *MainServer::getFileTransferByID(int id)
         }
     }
 
-    sockListLock.unlock();
-
     return retval;
 }
 
-FileTransfer *MainServer::getFileTransferBySock(MythSocket *sock)
+/// Warning you must hold a sockListLock lock before calling this
+FileTransfer *MainServer::GetFileTransferBySock(MythSocket *sock)
 {
     FileTransfer *retval = NULL;
-
-    sockListLock.lock();
 
     vector<FileTransfer *>::iterator it = fileTransferList.begin();
     for (; it != fileTransferList.end(); ++it)
@@ -4777,8 +4792,6 @@ FileTransfer *MainServer::getFileTransferBySock(MythSocket *sock)
             break;
         }
     }
-
-    sockListLock.unlock();
 
     return retval;
 }
@@ -5039,7 +5052,7 @@ void MainServer::reconnectTimeout(void)
     masterServerSock->setCallbacks(this);
 
     masterServer = new PlaybackSock(this, masterServerSock, server, true);
-    sockListLock.lock();
+    sockListLock.lockForWrite();
     playbackList.push_back(masterServer);
     sockListLock.unlock();
 
@@ -5054,20 +5067,17 @@ bool MainServer::isClientConnected()
 {
     bool foundClient = false;
 
-    sockListLock.lock();
+    sockListLock.lockForRead();
 
-    foundClient |= (fileTransferList.size() > 0);
+    foundClient |= !fileTransferList.empty();
 
-    if ((playbackList.size() > 0) && !foundClient)
+    vector<PlaybackSock *>::iterator it = playbackList.begin();
+    for (; !foundClient && (it != playbackList.end()); ++it)
     {
-        vector<PlaybackSock *>::iterator it = playbackList.begin();
-        for (; !foundClient && (it != playbackList.end()); ++it)
-        {
-            // we simply ignore slaveBackends!
-            // and clients that don't want to block shutdown
-            if (!(*it)->isSlaveBackend() && (*it)->getBlockShutdown())
-                foundClient = true;
-        }
+        // we simply ignore slaveBackends!
+        // and clients that don't want to block shutdown
+        if (!(*it)->isSlaveBackend() && (*it)->getBlockShutdown())
+            foundClient = true;
     }
 
     sockListLock.unlock();
@@ -5075,22 +5085,22 @@ bool MainServer::isClientConnected()
     return (foundClient);
 }
 
-// sends the Slavebackends the request to shut down using haltcmd
+/// Sends the Slavebackends the request to shut down using haltcmd
 void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
 {
+// TODO FIXME We should issue a MythEvent and have customEvent
+// send this with the proper syncronization and locking.
+
     QStringList bcast( "SHUTDOWN_NOW" );
     bcast << haltcmd;
 
-    sockListLock.lock();
+    sockListLock.lockForRead();
 
-    if (playbackList.size() > 0)
+    vector<PlaybackSock *>::iterator it = playbackList.begin();
+    for (; it != playbackList.end(); ++it)
     {
-        vector<PlaybackSock *>::iterator it = playbackList.begin();
-        for (; it != playbackList.end(); ++it)
-        {
-            if ((*it)->isSlaveBackend())
-                (*it)->getSocket()->writeStringList(bcast);
-        }
+        if ((*it)->isSlaveBackend())
+            (*it)->getSocket()->writeStringList(bcast);
     }
 
     sockListLock.unlock();

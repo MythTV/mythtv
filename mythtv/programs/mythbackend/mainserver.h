@@ -1,10 +1,10 @@
 #ifndef MAINSERVER_H_
 #define MAINSERVER_H_
 
-#include <qmap.h>
-#include <qtimer.h>
-#include <qmutex.h>
-#include <qdom.h>
+#include <QMap>
+#include <QTimer>
+#include <QMutex>
+#include <QReadWriteLock>
 #include <QEvent>
 
 #include <vector>
@@ -155,9 +155,9 @@ class MainServer : public QObject, public MythSocketCBs
     void getGuideDataThrough(QDateTime &GuideDataThrough);
 
     PlaybackSock *getSlaveByHostname(QString &hostname);
-    PlaybackSock *getPlaybackBySock(MythSocket *socket);
-    FileTransfer *getFileTransferByID(int id);
-    FileTransfer *getFileTransferBySock(MythSocket *socket);
+    PlaybackSock *GetPlaybackBySock(MythSocket *socket);
+    FileTransfer *GetFileTransferByID(int id);
+    FileTransfer *GetFileTransferBySock(MythSocket *socket);
 
     QString LocalFilePath(const QUrl &url, const QString wantgroup);
 
@@ -189,7 +189,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     MythServer *mythserver;
 
-    QMutex sockListLock;
+    QReadWriteLock sockListLock;
     vector<PlaybackSock *> playbackList;
     vector<FileTransfer *> fileTransferList;
 
@@ -201,7 +201,7 @@ class MainServer : public QObject, public MythSocketCBs
     QMutex deletelock;
     QMutex threadPoolLock;
     QWaitCondition threadPoolCond;
-    vector<ProcessRequestThread *> threadPool;
+    MythDeque<ProcessRequestThread *> threadPool;
 
     bool masterBackendOverride;
 
