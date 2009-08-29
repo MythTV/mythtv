@@ -1,19 +1,16 @@
+/** -*- Mode: c++ -*- */
 #ifndef MYTHSOCKET_H
 #define MYTHSOCKET_H
 
-#include <QTextStream>
-#include <QString>
 #include <QStringList>
-#include <QList>
-#include <QThread>
 #include <QMutex>
 
-#include "compat.h"   /// for HANDLE
 #include "mythexp.h"
 #include "msocketdevice.h"
 
 class QHostAddress;
 class MythSocket;
+class MythSocketThread;
 
 class MPUBLIC MythSocketCBs
 {
@@ -25,40 +22,10 @@ class MPUBLIC MythSocketCBs
     virtual void connectionClosed(MythSocket*) = 0;
 };
 
-class MPUBLIC MythSocketThread : public QThread
-{
-  public:
-    MythSocketThread();
-
-    virtual void run();
-
-    void StartReadyReadThread(void);
-    void WakeReadyReadThread(void);
-    void ShutdownReadyReadThread(void);
-
-    void AddToReadyRead(MythSocket *sock);
-    void RemoveFromReadyRead(MythSocket *sock);
-
-  private:
-    void iffound(MythSocket *sock);
-    bool isLocked(QMutex &mutex);
-
-    bool m_readyread_run;
-    QMutex m_readyread_lock;
-    QList<MythSocket*> m_readyread_list;
-    QList<MythSocket*> m_readyread_dellist;
-    QList<MythSocket*> m_readyread_addlist;
-#ifdef USING_MINGW
-    HANDLE readyreadevent;
-#else
-    int m_readyread_pipe[2];
-#endif
-};
-
-
 class MPUBLIC MythSocket : public MSocketDevice
 {
     friend class MythSocketThread;
+    friend class QList<MythSocket*>;
     friend void ShutdownRRT(void);
 
   public:
@@ -121,15 +88,11 @@ class MPUBLIC MythSocket : public MSocketDevice
     int             m_ref_count;
 
     bool            m_notifyread;
+    QMutex          m_ref_lock;
+    mutable QMutex  m_lock;
 
     static const uint kSocketBufferSize;
-
-    QMutex          m_ref_lock;
-    QMutex          m_lock;
-
-    static MythSocketThread m_readyread_thread;
-
-    friend class QList<MythSocket*>;
+    static MythSocketThread *s_readyread_thread;
 };
 
 #endif
