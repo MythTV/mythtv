@@ -41,14 +41,15 @@ bool FunctionDialog::Create()
     if (!LoadWindowFromXML("zoneminder-ui.xml", "functionpopup", this))
         return false;
 
-    m_captionText = dynamic_cast<MythUIText *> (GetChild("caption_text"));
-    m_functionList = dynamic_cast<MythUIButtonList *> (GetChild("function_list"));
-    m_enabledCheck = dynamic_cast<MythUICheckBox *> (GetChild("enable_check"));
-    m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok_button"));
+    bool err = false;
+    UIUtilE::Assign(this, m_captionText,  "caption_text", &err);
+    UIUtilE::Assign(this, m_functionList, "function_list", &err);
+    UIUtilE::Assign(this, m_enabledCheck, "enable_check", &err);
+    UIUtilE::Assign(this, m_okButton,     "ok_button", &err);
 
-    if (!m_captionText || !m_functionList || !m_enabledCheck || !m_okButton)
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'functionpopup'");
         return false;
     }
 
@@ -148,18 +149,17 @@ bool ZMConsole::Create(void)
     if (!foundtheme)
         return false;
 
-    m_monitor_list = dynamic_cast<MythUIButtonList *> (GetChild("monitor_list"));
+    bool err = false;
+    UIUtilE::Assign(this, m_monitor_list, "monitor_list", &err);
+    UIUtilE::Assign(this, m_status_text,  "status_text", &err);
+    UIUtilE::Assign(this, m_time_text,    "time_text", &err);
+    UIUtilE::Assign(this, m_date_text,    "date_text", &err);
+    UIUtilE::Assign(this, m_load_text,    "load_text", &err);
+    UIUtilE::Assign(this, m_disk_text,    "disk_text", &err);
 
-    m_status_text = dynamic_cast<MythUIText *> (GetChild("status_text"));
-    m_time_text = dynamic_cast<MythUIText *> (GetChild("time_text"));
-    m_date_text = dynamic_cast<MythUIText *> (GetChild("date_text"));
-    m_load_text = dynamic_cast<MythUIText *> (GetChild("load_text"));
-    m_disk_text = dynamic_cast<MythUIText *> (GetChild("disk_text"));
-
-    if (!m_monitor_list || !m_status_text || !m_time_text ||
-        !m_date_text || !m_load_text || !m_disk_text)
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'zmconsole'");
         return false;
     }
 

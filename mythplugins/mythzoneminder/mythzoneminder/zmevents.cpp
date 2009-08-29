@@ -59,15 +59,16 @@ bool ZMEvents::Create(void)
     if (!foundtheme)
         return false;
 
-    m_eventNoText = dynamic_cast<MythUIText *> (GetChild("eventno_text"));
-    m_playButton = dynamic_cast<MythUIButton *> (GetChild("play_button"));
-    m_deleteButton = dynamic_cast<MythUIButton *> (GetChild("delete_button"));
-    m_cameraSelector = dynamic_cast<MythUIButtonList *> (GetChild("camera_selector"));
-    m_dateSelector = dynamic_cast<MythUIButtonList *> (GetChild("date_selector"));
+    bool err = false;
+    UIUtilE::Assign(this, m_eventNoText, "eventno_text", &err);
+    UIUtilE::Assign(this, m_playButton,  "play_button", &err);
+    UIUtilE::Assign(this, m_deleteButton, "delete_button", &err);
+    UIUtilE::Assign(this, m_cameraSelector, "camera_selector", &err);
+    UIUtilE::Assign(this, m_dateSelector,   "date_selector", &err);
 
-    if (!m_playButton || !m_deleteButton || !m_eventNoText || !m_cameraSelector || !m_dateSelector)
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'zmevents'");
         return false;
     }
 

@@ -50,10 +50,6 @@ class ZMPlayer : public MythScreenType
     void getEventInfo(void);
     void getFrame(void);
 
-    MythUIImage  *GetMythUIImage(const QString &name, bool optional = false);
-    MythUIText   *GetMythUIText(const QString &name, bool optional = false);
-    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
-
     void stopPlayer(void);
 
     MythUIImage      *m_frameImage;

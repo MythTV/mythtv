@@ -65,36 +65,6 @@ void ZMPlayer::stopPlayer(void)
     m_frameTimer->stop();
 }
 
-MythUIImage* ZMPlayer::GetMythUIImage(const QString &name, bool optional)
-{
-    MythUIImage *image = dynamic_cast<MythUIImage *> (GetChild(name));
-
-    if (!optional && !image)
-        throw name;
-
-    return image;
-}
-
-MythUIText* ZMPlayer::GetMythUIText(const QString &name, bool optional)
-{
-    MythUIText *text = dynamic_cast<MythUIText *> (GetChild(name));
-
-    if (!optional && !text)
-        throw name;
-
-    return text;
-}
-
-MythUIButton* ZMPlayer::GetMythUIButton(const QString &name, bool optional)
-{
-    MythUIButton *button = dynamic_cast<MythUIButton *> (GetChild(name));
-
-    if (!optional && !button)
-        throw name;
-
-    return button;
-}
-
 bool ZMPlayer::Create(void)
 {
     bool foundtheme = false;
@@ -105,29 +75,28 @@ bool ZMPlayer::Create(void)
     if (!foundtheme)
         return false;
 
-    try
-    {
-        // hide the fullscreen image
-        m_frameImage = GetMythUIImage("framefsimage");
+    bool err = false;
+
+    // hide the fullscreen image
+    UIUtilE::Assign(this, m_frameImage,   "framefsimage", &err);
+    if (m_frameImage)
         m_frameImage->SetVisible(false);
 
-        m_frameImage = GetMythUIImage("frameimage");
+    UIUtilE::Assign(this, m_frameImage,   "frameimage", &err);
+    UIUtilE::Assign(this, m_noEventsText, "noevents_text", &err);
+    UIUtilE::Assign(this, m_eventText,    "event_text", &err);
+    UIUtilE::Assign(this, m_cameraText,   "camera_text", &err);
+    UIUtilE::Assign(this, m_frameText,    "frame_text", &err);
+    UIUtilE::Assign(this, m_dateText,     "date_text", &err);
 
-        m_noEventsText = GetMythUIText("noevents_text");
-        m_eventText = GetMythUIText("event_text");
-        m_cameraText = GetMythUIText("camera_text"); (GetChild("camera_text"));
-        m_frameText = GetMythUIText("frame_text"); (GetChild("frame_text"));
-        m_dateText = GetMythUIText("date_text");
+    UIUtilW::Assign(this, m_playButton,   "play_button");
+    UIUtilW::Assign(this, m_deleteButton, "delete_button");
+    UIUtilW::Assign(this, m_prevButton,   "prev_button");
+    UIUtilW::Assign(this, m_nextButton,   "next_button");
 
-        m_playButton = GetMythUIButton("play_button", true);
-        m_deleteButton = GetMythUIButton("delete_button", true);
-        m_prevButton = GetMythUIButton("prev_button", true);
-        m_nextButton = GetMythUIButton("next_button", true);
-    }
-    catch (const QString name)
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, QString("Theme is missing a critical theme element ('%1')")
-                                      .arg(name));
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'zmplayer'");
         return false;
     }
 
@@ -270,7 +239,7 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
             if (m_nextButton)
                 m_nextButton->Push();
         }
-        else if (action == "TOGGLEASPECT")
+        else if (action == "TOGGLEASPECT" || action == "TOGGLEFILL")
         {
             if (m_eventList->size() > 0)
             {
