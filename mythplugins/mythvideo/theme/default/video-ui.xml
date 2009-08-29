@@ -432,14 +432,14 @@
                         <state name="subfolder">
                             <imagetype name="icon">
                                 <area>0,0,50,50</area>
-                                <filename>mv_gallery_dir.png</filename>
+                                <filename>shared/directory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder">
                             <imagetype name="icon">
                                 <area>0,0,50,50</area>
-                                <filename>mv_gallery_dir_up.png</filename>
+                                <filename>shared/updirectory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
@@ -636,14 +636,14 @@
                         <state name="subfolder">
                             <imagetype name="icon">
                                 <area>0,0,50,50</area>
-                                <filename>mv_gallery_dir.png</filename>
+                                <filename>shared/directory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
                         <state name="upfolder">
                             <imagetype name="icon">
                                 <area>0,0,50,50</area>
-                                <filename>mv_gallery_dir_up.png</filename>
+                                <filename>shared/updirectory.png</filename>
                                 <preserveaspect>yes</preserveaspect>
                             </imagetype>
                         </state>
