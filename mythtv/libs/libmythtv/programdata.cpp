@@ -1,5 +1,7 @@
 // -*- Mode: c++ -*-
 
+#include <limits.h>
+
 // C++ includes
 #include <algorithm>
 using namespace std;

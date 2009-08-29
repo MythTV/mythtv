@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QApplication>
+#include <QThread>
 
 // mythtv
 #include <mythcontext.h>
