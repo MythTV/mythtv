@@ -501,10 +501,8 @@ contains( HAVE_GPROF, yes ) {
 }
 
 contains( ARCH_X86, yes ) {
-    contains( CONFIG_MLP_DECODER, yes ) {
-        SOURCES *= x86/mlpdsp_inc.c
-    }
-    contains( CONFIG_TRUEHD_DECODER, yes ) { SOURCES *= x86/mlpdsp.c }
+    contains( CONFIG_MLP_DECODER, yes )    { SOURCES *= x86/mlpdsp_inc.c }
+    contains( CONFIG_TRUEHD_DECODER, yes ) { SOURCES *= x86/mlpdsp_inc.c }
 }
 
 contains( HAVE_MMX, yes ) {
