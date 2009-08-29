@@ -70,6 +70,7 @@ class MythControls : public MythScreenType
     QString GetCurrentContext(void);
     QString GetCurrentAction(void);
     QString GetCurrentKey(void);
+    void tr(const char* arg1);
 
   protected:
     void Teardown(void);

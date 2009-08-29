@@ -29,7 +29,6 @@
 // Qt headers
 #include <QStringList>
 #include <QApplication>
-#include <QKeyEvent>
 
 // MythTV headers
 #include <mythcontext.h>
@@ -39,7 +38,6 @@
 #include <mythuitext.h>
 #include <mythuibutton.h>
 #include <mythuibuttonlist.h>
-#include <mythuiimage.h>
 #include <mythdialogbox.h>
 
 // MythControls headers
@@ -48,10 +46,6 @@
 
 #define LOC QString("MythControls: ")
 #define LOC_ERR QString("MythControls, Error: ")
-
-#define CAPTION_CONTEXT "Contexts"
-#define CAPTION_ACTION  "Actions"
-#define CAPTION_KEY     "Keys"
 
 /**
  *  \brief Creates a new MythControls wizard
@@ -762,22 +756,22 @@ void MythControls::customEvent(QEvent *event)
 
             if (buttonnum == 0)
             {
-                leftcaption = tr(CAPTION_CONTEXT);
-                rightcaption = tr(CAPTION_ACTION);
+                leftcaption = tr("Contexts");
+                rightcaption = tr("Actions");
                 m_currentView = kActionsByContext;
                 contents = m_bindings->GetContexts();
             }
             else if (buttonnum == 1)
             {
-                leftcaption = tr(CAPTION_CONTEXT);
-                rightcaption = tr(CAPTION_KEY);
+                leftcaption = tr("Contexts");
+                rightcaption = tr("Keys");
                 m_currentView = kKeysByContext;
                 contents = m_bindings->GetContexts();
             }
             else if (buttonnum == 2)
             {
-                leftcaption = tr(CAPTION_KEY);
-                rightcaption = tr(CAPTION_CONTEXT);
+                leftcaption = tr("Keys");
+                rightcaption = tr("Contexts");
                 m_currentView = kContextsByKey;
                 contents = m_bindings->GetKeys();
             }
