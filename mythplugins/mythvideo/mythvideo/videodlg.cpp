@@ -1548,21 +1548,21 @@ namespace
                 for (QStringList::const_iterator i = sfn.begin();
                         i != sfn.end(); ++i)
                 {
-                    if (!host.isEmpty())
-                    {
-                        QString url = GenRemoteFileURL(sgroup, host, *i);
-                        RemoteFile *rf = new RemoteFile(url);
-                        if (rf->GetFileSize() > 0)
-                        {
-                            image = *i;
-                            return true;
-                        }
-                        else
-                        {
-                            delete rf;
-                            rf = NULL;
-                        }
-                    }
+//                    if (!host.isEmpty())
+//                    {
+//                        QString url = GenRemoteFileURL(sgroup, host, *i);
+//                        RemoteFile *rf = new RemoteFile(url);
+//                        if (rf->GetFileSize() > 0)
+//                        {
+//                            image = *i;
+//                            return true;
+//                        }
+//                        else
+//                        {
+//                            delete rf;
+//                            rf = NULL;
+//                        }
+//                    }
                 }
             }
         }
