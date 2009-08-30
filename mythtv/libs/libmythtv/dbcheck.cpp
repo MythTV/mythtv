@@ -3590,42 +3590,64 @@ NULL
         // writes to latin1)
         MSqlQuery query(MSqlQuery::InitCon());
         int tableIndex      = 0;
-        QString tables[][2] = {
-            { "people",      "name"        },
-            { "oldprogram",  "oldtitle"    },
-            { "oldrecorded", "title"       },
-            { "oldrecorded", "subtitle"    },
-            { "oldrecorded", "description" },
-            { "recorded",    "title"       },
-            { "recorded",    "subtitle"    },
-            { "recorded",    "description" },
-            { "",            ""        } // This blank entry must exist, do not remove.
+        QString tables[][3] = {
+            { "people",  // table name
+              "name",    // columns to convert, colon-separated
+              "name"},   // columns for test index, comma-separated
+            { "oldprogram",
+              "oldtitle",
+              "oldtitle"},
+            { "oldrecorded",
+              "title:subtitle:description",
+              "station, starttime, title"},
+            { "recorded",
+              "title:subtitle:description",
+              ""},
+            { "",
+              "",
+              ""} // This blank entry must exist, do not remove.
         };
 
-        while (tables[tableIndex][0] != "")
+        while (!tables[tableIndex][0].isEmpty())
         {
-            bool    ok       = true;
-            QString table    = tables[tableIndex][0];
-            QString column   = tables[tableIndex][1];
-            QString thequery = QString("CREATE TEMPORARY TABLE temp_%1 "
-                                       " SELECT * FROM %2;")
-                                       .arg(table).arg(table);
+            bool    ok          = true;
+            QString table       = tables[tableIndex][0];
+            QStringList columns = tables[tableIndex][1].split(':');
+            QString index_cols  = tables[tableIndex][2];
+            QString thequery    = QString("CREATE TEMPORARY TABLE temp_%1 "
+                                          "SELECT * FROM %2;")
+                                          .arg(table).arg(table);
             ok &= query.exec(thequery);
             if (ok)
             {
-                thequery = QString("ALTER TABLE temp_%1 "
-                                   " MODIFY %2 varbinary(128) "
-                                   "           NOT NULL default '';")
-                                   .arg(table).arg(column);
+                thequery = QString("ALTER TABLE temp_%1 ").arg(table);
+                QStringList::const_iterator column;
+                for (column = columns.constBegin();
+                     column != columns.constEnd(); ++column)
+                {
+                    thequery.append(QString(" MODIFY %1 varbinary(255) "
+                                            "           NOT NULL default '',")
+                                            .arg(*column));
+                }
+                thequery.chop(1);
+                thequery.append(";");
                 ok &= query.exec(thequery);
             }
             if (ok)
             {
-                thequery = QString("ALTER TABLE temp_%1 "
-                                   "  MODIFY %2 char(128) CHARACTER SET utf8 "
-                                   "            COLLATE utf8_bin "
-                                   "            NOT NULL default '';")
-                                   .arg(table).arg(column);
+                thequery = QString("ALTER TABLE temp_%1 ").arg(table);
+                QStringList::const_iterator column;
+                for (column = columns.constBegin();
+                     column != columns.constEnd(); ++column)
+                {
+                    thequery.append(QString("  MODIFY %1 char(255) "
+                                            "            CHARACTER SET utf8 "
+                                            "            COLLATE utf8_bin "
+                                            "            NOT NULL default '',")
+                                            .arg(*column));
+                }
+                thequery.chop(1);
+                thequery.append(";");
                 ok &= query.exec(thequery);
             }
             if (!ok)
@@ -3663,6 +3685,28 @@ NULL
                                 "database corruption test."),
                                 thequery);
                 return false;
+            }
+            // Test creating an index to see if we had partial corruption that
+            // results in duplicates after condensing to UTF-8
+            if (!index_cols.isEmpty())
+            {
+                thequery = QString("ALTER TABLE temp_%1 "
+                                   "  ADD UNIQUE INDEX verify_unique ( %2 );")
+                                   .arg(table).arg(index_cols);
+                ok &= query.exec(thequery);
+                if (!ok)
+                {
+                    MythDB::DBError(QString("Index creation failed."),
+                                    thequery);
+                    VERBOSE(VB_IMPORTANT, "DB charset pre-conversion test "
+                            "failed! Your database seems to be partially "
+                            "corrupted. Please move the backup to a safe "
+                            "place. Your database must be fixed before you "
+                            "can upgrade beyond 0.21-fixes. Please see "
+                            "http://www.mythtv.org/wiki/index.php/Fixing_"
+                            "Corrupt_Database_Encoding for information.");
+                    return false;
+                }
             }
             thequery = QString("DROP TEMPORARY TABLE temp_%1;").arg(table);
             if (!query.exec(thequery))
