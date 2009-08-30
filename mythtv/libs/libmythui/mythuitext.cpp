@@ -60,8 +60,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 
 MythUIText::~MythUIText()
 {
-    if (m_Font)
-        delete m_Font;
+    delete m_Font;
     m_Font = NULL;
 //     QMutableMapIterator<QString, MythFontProperties> it(m_FontStates);
 //     while (it.hasNext())
@@ -77,7 +76,7 @@ void MythUIText::Reset()
     if (m_Message != m_DefaultMessage)
     {
         SetText(m_DefaultMessage);
-        m_CutMessage = "";
+        m_CutMessage.clear();
         SetRedraw();
     }
 
@@ -103,7 +102,7 @@ void MythUIText::SetText(const QString &text)
     }
 
     m_Message = newtext;
-    m_CutMessage = "";
+    m_CutMessage.clear();
     SetRedraw();
 }
 
@@ -136,7 +135,7 @@ void MythUIText::SetFontState(const QString &state)
 
 void MythUIText::UseAlternateArea(bool useAlt)
 {
-    m_CutMessage = "";
+    m_CutMessage.clear();
 
     if (useAlt && m_AltDisplayRect.width() > 1)
         MythUIType::SetArea(m_AltDisplayRect);
@@ -149,7 +148,7 @@ void MythUIText::SetJustification(int just)
     if (m_Justification != just)
     {
         m_Justification = just;
-        m_CutMessage = "";
+        m_CutMessage.clear();
         SetRedraw();
     }
 }
@@ -162,7 +161,7 @@ int MythUIText::GetJustification(void)
 void MythUIText::SetCutDown(bool cut)
 {
     m_Cutdown = cut;
-    m_CutMessage = "";
+    m_CutMessage.clear();
     SetRedraw();
 }
 
@@ -179,7 +178,7 @@ void MythUIText::SetMultiLine(bool multiline)
 void MythUIText::SetArea(const MythRect &rect)
 {
     MythUIType::SetArea(rect);
-    m_CutMessage = "";
+    m_CutMessage.clear();
 
     m_drawRect = m_Area;
     if (m_scrolling)
@@ -441,7 +440,8 @@ bool MythUIText::ParseElement(QDomElement &element)
     {
         if (element.attribute("lang","").isEmpty())
         {
-            m_Message = qApp->translate("ThemeUI", qPrintable(getFirstText(element)));
+            m_Message = qApp->translate("ThemeUI",
+                                        qPrintable(getFirstText(element)));
         }
         else if (element.attribute("lang","").toLower() ==
                  GetMythUI()->GetLanguageAndVariant())
@@ -599,6 +599,6 @@ void MythUIText::CreateCopy(MythUIType *parent)
 
 void MythUIText::Finalize(void)
 {
-    m_CutMessage = "";
+    m_CutMessage.clear();
 }
 
