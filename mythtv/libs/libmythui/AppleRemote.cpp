@@ -109,6 +109,7 @@ AppleRemote::run()
 AppleRemote::AppleRemote() : openInExclusiveMode(true),
                              hidDeviceInterface(0),
                              queue(0),
+                             remoteId(0),
                              _listener(0)
 {
     _initCookieMap();
@@ -309,7 +310,7 @@ void
 AppleRemote::QueueCallbackFunction(void* target, IOReturn result, 
                                    void* refcon, void* sender)
 {
-    AppleRemote* remote = (AppleRemote*)target;
+    AppleRemote* remote = static_cast<AppleRemote*>(target);
 
     remote->_queueCallbackFunction(result,refcon,sender);
 }

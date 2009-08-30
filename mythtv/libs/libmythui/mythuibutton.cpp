@@ -1,3 +1,4 @@
+
 // QT
 #include <QTimer>
 #include <QDomDocument>
@@ -36,7 +37,7 @@ MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
 MythUIButton::~MythUIButton()
 {
     if (m_clickTimer)
-        delete m_clickTimer;
+        m_clickTimer->deleteLater();
 }
 
 void MythUIButton::SetInitialStates()

@@ -92,8 +92,7 @@ MythXDisplay *OpenMythXDisplay(void)
         return disp;
 
     VERBOSE(VB_IMPORTANT, "MythXOpenDisplay() failed");
-    if (disp)
-        delete disp;
+    delete disp;
     return NULL;
 }
 

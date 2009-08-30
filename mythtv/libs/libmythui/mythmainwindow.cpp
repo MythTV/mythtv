@@ -219,8 +219,7 @@ MythMainWindow *MythMainWindow::getMainWindow(const bool useDB)
 
 void MythMainWindow::destroyMainWindow(void)
 {
-    if (mainWin)
-        delete mainWin;
+    delete mainWin;
     mainWin = NULL;
 }
 
@@ -1377,7 +1376,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 
             // Work around weird GCC run-time bug. Only manifest on Mac OS X
             if (!ke)
-                ke = (QKeyEvent *)e;
+                ke = static_cast<QKeyEvent *>(e);
 
             if (currentWidget())
             {
@@ -1523,19 +1522,16 @@ void MythMainWindow::customEvent(QEvent *ce)
 {
     if (ce->type() == MythGestureEventType)
     {
-        MythGestureEvent *ge = dynamic_cast<MythGestureEvent*>(ce);
-        if (ge != NULL)
+        MythGestureEvent *ge = static_cast<MythGestureEvent*>(ce);
+        MythScreenStack *toplevel = GetMainStack();
+        if (toplevel && !currentWidget())
         {
-            MythScreenStack *toplevel = GetMainStack();
-            if (toplevel && !currentWidget())
-            {
-                MythScreenType *screen = toplevel->GetTopScreen();
-                if (screen)
-                    screen->gestureEvent(NULL, ge);
-            }
-            VERBOSE(VB_IMPORTANT, QString("Gesture: %1")
-                    .arg(QString(*ge).toLocal8Bit().constData()));
+            MythScreenType *screen = toplevel->GetTopScreen();
+            if (screen)
+                screen->gestureEvent(NULL, ge);
         }
+        VERBOSE(VB_IMPORTANT, QString("Gesture: %1")
+                .arg(QString(*ge).toLocal8Bit().constData()));
     }
     else if (ce->type() == kExitToMainMenuEventType && d->exitingtomain)
     {
@@ -1543,7 +1539,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == kExternalKeycodeEventType)
     {
-        ExternalKeycodeEvent *eke = (ExternalKeycodeEvent *)ce;
+        ExternalKeycodeEvent *eke = static_cast<ExternalKeycodeEvent *>(ce);
         int keycode = eke->getKeycode();
 
         QKeyEvent key(QEvent::KeyPress, keycode, Qt::NoModifier);
@@ -1559,7 +1555,7 @@ void MythMainWindow::customEvent(QEvent *ce)
              (QEvent::Type) LircKeycodeEvent::kLIRCKeycodeEventType &&
              !d->ignore_lirc_keys)
     {
-        LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
+        LircKeycodeEvent *lke = static_cast<LircKeycodeEvent *>(ce);
 
         if (LircKeycodeEvent::kLIRCInvalidKeyCombo == lke->modifiers())
         {
@@ -1586,7 +1582,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
     else if (ce->type() == (QEvent::Type) LircMuteEvent::LircMuteEventType)
     {
-        LircMuteEvent *lme = (LircMuteEvent *)ce;
+        LircMuteEvent *lme = static_cast<LircMuteEvent *>(ce);
         d->ignore_lirc_keys = lme->eventsMuted();
     }
 #endif
@@ -1595,7 +1591,7 @@ void MythMainWindow::customEvent(QEvent *ce)
              (QEvent::Type) JoystickKeycodeEvent::JoystickKeycodeEventType &&
              !d->ignore_joystick_keys)
     {
-        JoystickKeycodeEvent *jke = (JoystickKeycodeEvent *)ce;
+        JoystickKeycodeEvent *jke = static_cast<JoystickKeycodeEvent *>(ce);
         int keycode = jke->getKeycode();
 
         if (keycode)
@@ -1635,14 +1631,14 @@ void MythMainWindow::customEvent(QEvent *ce)
     else if (ce->type() ==
              (QEvent::Type) JoystickMenuMuteEvent::JoystickMuteEventType)
     {
-        JoystickMenuMuteEvent *jme = (JoystickMenuMuteEvent *)ce;
+        JoystickMenuMuteEvent *jme = static_cast<JoystickMenuMuteEvent *>(ce);
         d->ignore_joystick_keys = jme->eventsMuted();
     }
 #endif
     else if (ce->type() ==
              (QEvent::Type) ScreenSaverEvent::ScreenSaverEventType)
     {
-        ScreenSaverEvent *sse = (ScreenSaverEvent *)ce;
+        ScreenSaverEvent *sse = static_cast<ScreenSaverEvent *>(ce);
         switch (sse->getSSEventType())
         {
             case ScreenSaverEvent::ssetDisable:

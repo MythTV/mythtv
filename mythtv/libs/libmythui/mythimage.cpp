@@ -86,7 +86,7 @@ void MythImage::Assign(const QImage &img)
 {
     if (m_ui && m_RefCount == 1 && m_cached)
         m_ui->ExcludeFromCacheSize(this);
-    *(QImage *)this = img;
+    *(static_cast<QImage *> (this)) = img;
     if (m_ui && m_RefCount == 1 && m_cached)
         m_ui->IncludeInCacheSize(this);
     SetChanged();
@@ -104,7 +104,7 @@ void MythImage::Resize(const QSize &newSize, bool preserveAspect)
 
     if (m_isGradient)
     {
-        *(QImage *)this = QImage(newSize, QImage::Format_ARGB32);
+        *(static_cast<QImage *> (this)) = QImage(newSize, QImage::Format_ARGB32);
         MakeGradient(*this, m_gradBegin, m_gradEnd, m_gradAlpha, m_gradDirection);
         SetChanged();
     }
