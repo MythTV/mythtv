@@ -1,6 +1,7 @@
 // qt
 #include <QDir>
 #include <QFontMetrics>
+#include <QApplication>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -16,13 +17,14 @@
 #include "editmetadata.h"
 #include "musicplayer.h"
 
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
+#include <mythdialogbox.h>
+#include <mythuitext.h>
+#include <mythuiimage.h>
+#include <mythuicheckbox.h>
+#include <mythuitextedit.h>
+#include <mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythprogressdialog.h>
 
 static bool copyFile(const QString &src, const QString &dst)
 {
@@ -384,7 +386,7 @@ void ImportMusicDialog::addAllNewPressed()
     while (m_currentTrack < (int) m_tracks->size())
     {
         fillWidgets();
-    //        qApp->processEvents();
+        qApp->processEvents();
 
         if (m_tracks->at(m_currentTrack)->isNewTune)
         {
@@ -392,7 +394,7 @@ void ImportMusicDialog::addAllNewPressed()
             newCount++;
         }
 
-//        qApp->processEvents();
+        qApp->processEvents();
 
         m_currentTrack++;
     }
@@ -422,16 +424,28 @@ void ImportMusicDialog::nextNewPressed()
 
 void ImportMusicDialog::startScan()
 {
-    MythBusyDialog *busy = new MythBusyDialog(QObject::tr("Searching for music files"));
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythUIBusyDialog *busy = 
+            new MythUIBusyDialog(QObject::tr("Searching for music files"),
+                                     popupStack,
+                                     "scanbusydialog");
 
+    if (busy->Create())
+    {
+        popupStack->AddScreen(busy, false);
+    }
+    else
+    {
+        delete busy;
+        busy = NULL;
+    }
     FileScannerThread *scanner = new FileScannerThread(this);
-    busy->start();
     scanner->start();
 
     while (!scanner->isFinished())
     {
         usleep(500);
-//        qApp->processEvents();
+        qApp->processEvents();
     }
 
     delete scanner;
@@ -439,8 +453,8 @@ void ImportMusicDialog::startScan()
     m_currentTrack = 0;
     fillWidgets();
 
-    busy->close();
-    busy->deleteLater();
+    if (busy)
+        busy->Close();
 }
 
 void ImportMusicDialog::doScan()
@@ -759,8 +773,6 @@ ImportCoverArtDialog::ImportCoverArtDialog(MythScreenStack *parent,
 {
     m_sourceDir = sourceDir;
     m_metadata = metadata;
-
-    scanDirectory();
 }
 
 ImportCoverArtDialog::~ImportCoverArtDialog()
@@ -805,30 +817,24 @@ bool ImportCoverArtDialog::Create()
     if (!LoadWindowFromXML("music-ui.xml", "import_coverart", this))
         return false;
 
-    m_filenameText = dynamic_cast<MythUIText *>(GetChild("file"));
-    m_currentText = dynamic_cast<MythUIText *>(GetChild("position"));
-    m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
-    m_destinationText = dynamic_cast<MythUIText *>(GetChild("destination"));
+    bool err = false;
+    UIUtilE::Assign(this, m_filenameText,    "file", &err);
+    UIUtilE::Assign(this, m_currentText,     "position", &err);
+    UIUtilE::Assign(this, m_statusText,      "status", &err);
+    UIUtilE::Assign(this, m_destinationText, "destination", &err);
+    UIUtilE::Assign(this, m_coverartImage,   "coverart", &err);
+    UIUtilE::Assign(this, m_copyButton,      "copy", &err);
+    UIUtilE::Assign(this, m_exitButton,      "exit", &err);
+    UIUtilE::Assign(this, m_prevButton,      "prev", &err);
+    UIUtilE::Assign(this, m_nextButton,      "next", &err);
+    UIUtilE::Assign(this, m_typeList,        "type", &err);
 
-    m_coverartImage = dynamic_cast<MythUIImage *>(GetChild("coverart"));
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'import_coverart'");
+        return false;
+    }
 
-    m_copyButton = dynamic_cast<MythUIButton *>(GetChild("copyButton"));
-    if (m_copyButton)
-        connect(m_copyButton, SIGNAL(Clicked()), this, SLOT(copyPressed()));
-
-    m_exitButton = dynamic_cast<MythUIButton *>(GetChild("exit"));
-    if (m_exitButton)
-        connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(reject()));
-
-    m_prevButton = dynamic_cast<MythUIButton *>(GetChild("prev"));
-    if (m_prevButton)
-        connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
-
-    m_nextButton = dynamic_cast<MythUIButton *>(GetChild("next"));
-    if (m_nextButton)
-        connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
-
-    m_typeList = dynamic_cast<MythUIButtonList *>(GetChild("type"));
     if (m_typeList)
     {
         new MythUIButtonListItem(m_typeList, tr("Front Cover"),
@@ -845,6 +851,22 @@ bool ImportCoverArtDialog::Create()
         connect(m_typeList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(selectorChanged()));
     }
+
+    if (m_copyButton)
+        connect(m_copyButton, SIGNAL(Clicked()), this, SLOT(copyPressed()));
+
+    if (m_exitButton)
+        connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
+
+    if (m_prevButton)
+        connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
+
+    if (m_nextButton)
+        connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
+
+    BuildFocusList();
+
+    scanDirectory();
 
     return true;
 }
