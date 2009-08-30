@@ -77,7 +77,7 @@ void LockMythXDisplays(bool lock)
             it->second->Unlock();
     }
 }
-    
+
 MythXDisplay *GetMythXDisplay(Display *d)
 {
     if (xdisplays.count(d))
@@ -348,7 +348,7 @@ bool MythXDisplay::CheckErrors(Display *disp)
                   .arg(events[i].error_code).arg(buf)
                   .arg(events[i].request_code)
                   .arg(events[i].minor_code)
-                  .arg(events[i].resourceid));  
+                  .arg(events[i].resourceid));
     }
     xerrors.erase(d);
     return false;
@@ -360,7 +360,7 @@ void MythXDisplay::CheckOrphanedErrors(void)
         return;
 
     std::map<Display*, XErrorVectorType>::iterator errors = xerrors.begin();
-    for (; errors != xerrors.end(); --errors)
+    for (; errors != xerrors.end(); ++errors)
         if (!xerror_handlers.count(errors->first))
             CheckErrors(errors->first);
 }
