@@ -106,7 +106,7 @@ namespace
         {
             m_id = m_http.get(m_url.toString(), &m_data_buffer);
 
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 30)
+            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 40)
                           * 1000);
         }
 
@@ -273,7 +273,7 @@ namespace
         {
             m_id = m_http.get(m_url.toString(), &m_data_buffer);
 
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 30)
+            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 40)
                           * 1000);
         }
 
@@ -440,7 +440,7 @@ namespace
         {
             m_id = m_http.get(m_url.toString(), &m_data_buffer);
 
-            m_timer.start(gContext->GetNumSetting("FanartDownloadTimeout", 30)
+            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 40)
                           * 1000);
         }
 
@@ -607,7 +607,7 @@ namespace
         {
             m_id = m_http.get(m_url.toString(), &m_data_buffer);
 
-            m_timer.start(gContext->GetNumSetting("BannerDownloadTimeout", 30)
+            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 40)
                           * 1000);
         }
 
@@ -1512,6 +1512,17 @@ namespace
         typedef std::set<QString> image_type_list;
         image_type_list image_exts;
 
+        QString suffix;
+
+        if (sgroup == "Coverart")
+            suffix = "coverart";
+        if (sgroup == "Fanart")
+            suffix = "fanart";
+        if (sgroup == "Screenshots")
+            suffix = "screenshot";
+        if (sgroup == "Banners")
+            suffix = "banner";
+
         for (QList<QByteArray>::const_iterator it = image_types.begin();
                 it != image_types.end(); ++it)
         {
@@ -1529,20 +1540,22 @@ namespace
                 if (season > 0)
                 {
                     if (episode > 0 && isScreenshot)
-                        sfn += hntm.arg(QString("%1 Season %2x%3")
+                        sfn += hntm.arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
-                                 .arg(QString::number(episode)))
+                                 .arg(QString::number(episode))
+                                 .arg(suffix))
                                  .arg(*ext);
                     else if (!isScreenshot)
-                        sfn += hntm.arg(QString("%1 Season %2")
-                                 .arg(title).arg(QString::number(season)))
+                        sfn += hntm.arg(QString("%1 Season %2_%3")
+                                 .arg(title).arg(QString::number(season))
+                                 .arg(suffix))
                                  .arg(*ext);
 
                 }
                 if (!isScreenshot)
                 {
-                sfn += hntm.arg(base_name).arg(*ext);
-                sfn += hntm.arg(video_uid).arg(*ext);
+                sfn += hntm.arg(base_name + "_%1").arg(suffix).arg(*ext);
+                sfn += hntm.arg(video_uid + "_%1").arg(suffix).arg(*ext);
                 }
 
                 for (QStringList::const_iterator i = sfn.begin();
@@ -1581,20 +1594,22 @@ namespace
                 if (season > 0)
                 {
                     if (episode > 0 && isScreenshot)
-                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3")
+                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
-                                 .arg(QString::number(episode)))
+                                 .arg(QString::number(episode))
+                                 .arg(suffix))
                                  .arg(*ext);
                     else if (!isScreenshot)
-                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2") 
-                                 .arg(title).arg(QString::number(season)))
+                        sfn += fntm.arg(*dir).arg(QString("%1 Season %2_%3") 
+                                 .arg(title).arg(QString::number(season))
+                                 .arg(suffix))
                                  .arg(*ext);
 
                 }
                 if (!isScreenshot)
                 {
-                sfn += fntm.arg(*dir).arg(base_name).arg(*ext);
-                sfn += fntm.arg(*dir).arg(video_uid).arg(*ext);
+                sfn += fntm.arg(*dir).arg(QString(base_name + "_%1").arg(suffix)).arg(*ext);
+                sfn += fntm.arg(*dir).arg(QString(video_uid + "_%1").arg(suffix)).arg(*ext);
                 }
 
                 for (QStringList::const_iterator i = sfn.begin();
@@ -2585,14 +2600,14 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
             item->SetImage(imgFilename, "coverimage");
         }
     }
-    else if (metadata)
-    {
-        imgFilename = GetImageFromFolder(metadata);
+//    else if (metadata)
+//    {
+//        imgFilename = GetImageFromFolder(metadata);
 
-        if (!imgFilename.isEmpty() &&
-           (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
-            item->SetImage(imgFilename);
-    }
+//        if (!imgFilename.isEmpty() && !imgFilename.endsWith("/") &&
+//           (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+//            item->SetImage(imgFilename);
+//    }
 
     int nodeInt = node->getInt();
 
@@ -2895,7 +2910,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 tfp != test_files.end(); ++tfp)
         {
             QString imagePath = *tfp;
-//            VERBOSE(VB_GENERAL, QString("Cover check :%1 : ").arg(*tfp));
+            //VERBOSE(VB_GENERAL, QString("Cover check :%1 : ").arg(*tfp));
 
             foundCover = false;
             if (!host.isEmpty())
@@ -4805,7 +4820,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
                 metadata->GetEpisode() > 0)
             {
                 // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2").arg(metadata->GetTitle())
+                QString title = QString("%1 Season %2_coverart").arg(metadata->GetTitle())
                         .arg(metadata->GetSeason());
                 if (!metadata->GetHost().isEmpty())
                 {
@@ -4816,7 +4831,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_coverart.%3").arg(fileprefix)
                             .arg(title).arg(ext);
                     db_value = dest_file;
                 }
@@ -4825,7 +4840,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
             {
                 if (!metadata->GetHost().isEmpty())
                 {
-                    QString combFileName = QString("%1.%2")
+                    QString combFileName = QString("%1_coverart.%2")
                                            .arg(metadata->GetInetRef())
                                            .arg(ext);
                     dest_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
@@ -4834,7 +4849,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_coverart.%3").arg(fileprefix)
                             .arg(metadata->GetInetRef()).arg(ext);
                     db_value = dest_file;
                 }
@@ -4939,7 +4954,7 @@ void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
                 metadata->GetEpisode() > 0)
             {
                 // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2").arg(metadata->GetTitle())
+                QString title = QString("%1 Season %2_fanart").arg(metadata->GetTitle())
                         .arg(metadata->GetSeason());
                 if (!metadata->GetHost().isEmpty())
                 {
@@ -4950,7 +4965,7 @@ void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_fanart.%3").arg(fileprefix)
                             .arg(title).arg(ext);
                     db_value = dest_file;
                 }
@@ -4959,7 +4974,7 @@ void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
             {
                 if (!metadata->GetHost().isEmpty())
                 {
-                    QString combFileName = QString("%1.%2")
+                    QString combFileName = QString("%1_fanart.%2")
                                            .arg(metadata->GetInetRef())
                                            .arg(ext);
                     dest_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
@@ -4968,7 +4983,7 @@ void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_fanart.%3").arg(fileprefix)
                             .arg(metadata->GetInetRef()).arg(ext);
                     db_value = dest_file;
                 }
@@ -5072,7 +5087,7 @@ void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
                 metadata->GetEpisode() > 0)
             {
                 // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2x%3").arg(metadata->GetTitle())
+                QString title = QString("%1 Season %2x%3_screenshot").arg(metadata->GetTitle())
                         .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
                 if (!metadata->GetHost().isEmpty())
                 {
@@ -5083,7 +5098,7 @@ void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_screenshot.%3").arg(fileprefix)
                             .arg(title).arg(ext);
                     db_value = dest_file;
                 }
@@ -5092,7 +5107,7 @@ void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
             {
                 if (!metadata->GetHost().isEmpty())
                 {
-                    QString combFileName = QString("%1.%2")
+                    QString combFileName = QString("%1_screenshot.%2")
                                            .arg(metadata->GetInetRef())
                                            .arg(ext);
                     dest_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
@@ -5101,7 +5116,7 @@ void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_screenshot.%3").arg(fileprefix)
                             .arg(metadata->GetInetRef()).arg(ext);
                     db_value = dest_file;
                 }
@@ -5206,7 +5221,7 @@ void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
                 metadata->GetEpisode() > 0)
             { 
                 // Name TV downloads so that they already work with the PBB    
-                QString title = QString("%1 Season %2").arg(metadata->GetTitle())
+                QString title = QString("%1 Season %2_banner").arg(metadata->GetTitle())
                         .arg(metadata->GetSeason());
                 if (!metadata->GetHost().isEmpty())
                 {
@@ -5217,7 +5232,7 @@ void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_banner.%3").arg(fileprefix)
                             .arg(title).arg(ext);
                     db_value = dest_file;
                 }
@@ -5226,7 +5241,7 @@ void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
             {
                 if (!metadata->GetHost().isEmpty())
                 {
-                    QString combFileName = QString("%1.%2")
+                    QString combFileName = QString("%1_banner.%2")
                                            .arg(metadata->GetInetRef())
                                            .arg(ext);
                     dest_file = GenRemoteFileURL("Banners", metadata->GetHost(),
@@ -5235,7 +5250,7 @@ void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
                 }
                 else
                 {
-                    dest_file = QString("%1/%2.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2_banner.%3").arg(fileprefix)
                             .arg(metadata->GetInetRef()).arg(ext);
                     db_value = dest_file;
                 }
