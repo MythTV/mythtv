@@ -209,7 +209,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
 
         /* check all children */
         QList<MythUIType *>::iterator it;
-        for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
+        for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; --it)
         {
             if (!(*it))
                 continue;

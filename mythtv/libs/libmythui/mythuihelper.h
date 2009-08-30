@@ -60,7 +60,7 @@ class MPUBLIC MythUIHelper
     void GetScreenBounds(int &xbase, int &ybase, int &width, int &height);
 
     // Parse an X11 style command line (-geometry) string
-    bool ParseGeometryOverride(const QString geometry);
+    bool ParseGeometryOverride(const QString &geometry);
     bool IsGeometryOverridden(void);
 
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);

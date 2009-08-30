@@ -195,17 +195,16 @@ void XMLParseBase::ParseChildren(QDomElement &element,
             }
             else if (type == "font")
             {
-                MythFontProperties *font;
                 bool global = (GetGlobalObjectStore() == parent);
-                font = MythFontProperties::ParseFromXml(info, parent, global);
+                MythFontProperties *font =
+                        MythFontProperties::ParseFromXml(info, parent, global);
                 if (!global && font)
                 {
                     QString name = info.attribute("name");
                     parent->AddFont(name, font);
                 }
 
-                if (font)
-                    delete font;
+                delete font;
             }
             else if (type == "imagetype" ||
                      type == "textarea" ||
@@ -368,17 +367,16 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
             }
             else if (info.tagName() == "font")
             {
-                MythFontProperties *font;
                 bool global = (GetGlobalObjectStore() == parent);
-                font = MythFontProperties::ParseFromXml(info, parent, global);
+                MythFontProperties *font =
+                        MythFontProperties::ParseFromXml(info, parent, global);
                 if (!global && font)
                 {
                     QString name = info.attribute("name");
                     uitype->AddFont(name, font);
                 }
 
-                if (font)
-                    delete font;
+                delete font;
             }
             else if (info.tagName() == "imagetype" ||
                      info.tagName() == "textarea" ||
@@ -412,7 +410,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
 {
     QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
     QList<QString>::iterator i;
-    for (i = searchpath.begin(); i != searchpath.end(); i++)
+    for (i = searchpath.begin(); i != searchpath.end(); ++i)
     {
         QString themefile = *i + xmlfile;
         if (doLoad(windowname, parent, themefile))
@@ -488,16 +486,15 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 QString type = e.tagName();
                 if (type == "font")
                 {
-                    MythFontProperties *font;
                     bool global = (GetGlobalObjectStore() == parent);
-                    font = MythFontProperties::ParseFromXml(e, parent, global);
+                    MythFontProperties *font =
+                            MythFontProperties::ParseFromXml(e, parent, global);
                     if (!global && font)
                     {
                         QString name = e.attribute("name");
                         parent->AddFont(name, font);
                     }
-                    if (font)
-                        delete font;
+                    delete font;
                 }
                 else if (type == "imagetype" ||
                          type == "textarea" ||
@@ -533,7 +530,7 @@ bool XMLParseBase::LoadBaseTheme(void)
 {
     QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
     QList<QString>::iterator i;
-    for (i = searchpath.begin(); i != searchpath.end(); i++)
+    for (i = searchpath.begin(); i != searchpath.end(); ++i)
     {
         QString themefile = *i + "base.xml";
         if (doLoad(QString::null, GetGlobalObjectStore(), themefile, false))

@@ -152,7 +152,7 @@ MythPoint MythRect::topLeft(void) const
     return point;
 }
 
-void MythRect::moveTopLeft(MythPoint point)
+void MythRect::moveTopLeft(const MythPoint &point)
 {
     moveLeft(point.getX());
     moveTop(point.getY());

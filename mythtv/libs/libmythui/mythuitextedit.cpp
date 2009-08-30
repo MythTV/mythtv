@@ -1,3 +1,4 @@
+
 #include <QApplication>
 #include <QRegExp>
 #include <QChar>
@@ -185,7 +186,7 @@ void MythUITextEdit::SetMaxLength(const int length)
     m_maxLength = length;
 }
 
-void MythUITextEdit::SetText(const QString text, bool moveCursor)
+void MythUITextEdit::SetText(const QString &text, bool moveCursor)
 {
     if (!m_Text || (m_Message == text))
         return;
@@ -207,7 +208,7 @@ void MythUITextEdit::SetText(const QString text, bool moveCursor)
     emit valueChanged();
 }
 
-bool MythUITextEdit::InsertCharacter(const QString character)
+bool MythUITextEdit::InsertCharacter(const QString &character)
 {
     if (m_maxLength != 0 && m_Message.length() == m_maxLength)
         return true;

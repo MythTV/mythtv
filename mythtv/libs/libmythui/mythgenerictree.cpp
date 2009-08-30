@@ -176,12 +176,12 @@ void MythGenericTree::deleteNode(MythGenericTree *child)
 int MythGenericTree::calculateDepth(int start)
 {
     int current_depth;
-    int found_depth;
     current_depth = start + 1;
 
     QList<MythGenericTree*> *children = getAllChildren();
     if (children && children->count() > 0)
     {
+        int found_depth;
         SortableMythGenericTreeList::Iterator it;
         MythGenericTree *child = NULL;
 

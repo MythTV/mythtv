@@ -90,8 +90,7 @@ MythGesture::MythGesture(size_t max_points, size_t min_points,
 
 MythGesture::~MythGesture()
 {
-    if (p)
-        delete p;
+    delete p;
 }
 
 /* comments in header */

@@ -48,8 +48,7 @@ MythUIHelper *MythUIHelper::getMythUI(void)
 void MythUIHelper::destroyMythUI(void)
 {
     uiLock.lock();
-    if (mythui)
-        delete mythui;
+    delete mythui;
     mythui = NULL;
     uiLock.unlock();
 }
@@ -136,7 +135,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       language(""),
       m_wmult(1.0), m_hmult(1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
-      m_baseWidth(800), m_baseHeight(600),
+      m_baseWidth(800), m_baseHeight(600), m_isWide(false),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       m_geometry_x(0), m_geometry_y(0), m_geometry_w(0), m_geometry_h(0),
       m_geometryOverridden(false),
@@ -160,10 +159,8 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
     CacheTrack.clear();
 
-    if (m_qtThemeSettings)
-        delete m_qtThemeSettings;
-    if (screensaver)
-        delete screensaver;
+    delete m_qtThemeSettings;
+    delete screensaver;
     if(display_res)
         DisplayRes::SwitchToDesktop();
 }
@@ -387,9 +384,7 @@ void MythUIHelper::LoadQtConfig(void)
     // Note the possibly changed screen settings
     d->GetScreenBounds();
 
-
-    if (d->m_qtThemeSettings)
-        delete d->m_qtThemeSettings;
+    delete d->m_qtThemeSettings;
 
     d->m_qtThemeSettings = new Settings;
 
@@ -778,7 +773,7 @@ void MythUIHelper::GetScreenSettings(int &xbase, int &width, float &wmult,
  *  -geometry 800x600+112+22
  * to override the fullscreen and user default screen dimensions
  */
-bool MythUIHelper::ParseGeometryOverride(const QString geometry)
+bool MythUIHelper::ParseGeometryOverride(const QString &geometry)
 {
     QRegExp     sre("^(\\d+)x(\\d+)$");
     QRegExp     lre("^(\\d+)x(\\d+)([+-]\\d+)([+-]\\d+)$");
@@ -1048,8 +1043,7 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
 
     d->m_themeloaded = true;
 
-    if (bgpixmap)
-        delete bgpixmap;
+    delete bgpixmap;
 }
 
 bool MythUIHelper::FindThemeFile(QString &path)

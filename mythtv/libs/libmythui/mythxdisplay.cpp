@@ -67,13 +67,13 @@ void LockMythXDisplays(bool lock)
     if (lock)
     {
         std::map<Display*, MythXDisplay*>::iterator it;
-        for (it = xdisplays.begin(); it != xdisplays.end(); it++)
+        for (it = xdisplays.begin(); it != xdisplays.end(); ++it)
             it->second->Lock();
     }
     else
     {
         std::map<Display*, MythXDisplay*>::reverse_iterator it;
-        for (it = xdisplays.rbegin(); it != xdisplays.rend(); it++)
+        for (it = xdisplays.rbegin(); it != xdisplays.rend(); ++it)
             it->second->Unlock();
     }
 }
@@ -360,7 +360,7 @@ void MythXDisplay::CheckOrphanedErrors(void)
         return;
 
     std::map<Display*, XErrorVectorType>::iterator errors = xerrors.begin();
-    for (; errors != xerrors.end(); errors++)
+    for (; errors != xerrors.end(); --errors)
         if (!xerror_handlers.count(errors->first))
             CheckErrors(errors->first);
 }

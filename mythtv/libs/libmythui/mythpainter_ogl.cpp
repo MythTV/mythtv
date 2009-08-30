@@ -251,8 +251,6 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
 void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
                                   const QRect &src, int alpha)
 {
-    double x1, y1, x2, y2;
-
     glClearDepth(1.0f);
 
     // see if we have this pixmap cached as a texture - if not cache it
@@ -268,6 +266,8 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
 
     glBegin(GL_QUADS);
     {
+        double x1, y1, x2, y2;
+        
         if (!texture_rects)
         {
             x1 = src.x() / (double)im->width();

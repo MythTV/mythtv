@@ -47,7 +47,7 @@ class MPUBLIC MythRect : public QRect
     QString getHeight(void) const;
 
     MythPoint topLeft(void) const;
-    void moveTopLeft(const MythPoint points);
+    void moveTopLeft(const MythPoint &point);
     void moveLeft(const QString &sX);
     void moveLeft(int X) { QRect::moveLeft(X); }
     void moveTop(const QString &sX);

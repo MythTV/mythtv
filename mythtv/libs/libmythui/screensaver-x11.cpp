@@ -86,8 +86,7 @@ class ScreenSaverX11Private
     ~ScreenSaverX11Private()
     {
         // m_resetTimer deleted by ScreenSaverX11 QObject dtor
-        if (m_display)
-            delete m_display;
+        delete m_display;
     }
 
     bool IsScreenSaverRunning(void) const

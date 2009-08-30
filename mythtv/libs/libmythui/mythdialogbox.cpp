@@ -567,15 +567,13 @@ MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
                     | QDir::Writable | QDir::Executable);
     m_nameFilter << "*";
 
-    m_previewTimer = new QTimer();
+    m_previewTimer = new QTimer(this);
     m_previewTimer->setSingleShot(true);
     connect(m_previewTimer, SIGNAL(timeout()), SLOT(LoadPreview()));
 }
 
 MythUIFileBrowser::~MythUIFileBrowser()
 {
-    if (m_previewTimer)
-        delete m_previewTimer;
 }
 
 bool MythUIFileBrowser::Create()

@@ -56,12 +56,12 @@ bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
 bool DisplayResX::SwitchToVideoMode(int width, int height, double desired_rate)
 {
     double rate;
-    short finalrate;
     DisplayResScreen desired_screen(width, height, 0, 0, -1.0, desired_rate);
     int idx = DisplayResScreen::FindBestMatch(m_video_modes_unsorted,
                                               desired_screen, rate);
     if (idx >= 0)
     {
+        short finalrate;
         MythXDisplay *display = NULL;
         XRRScreenConfiguration *cfg = GetScreenConfig(display);
         if (!cfg)

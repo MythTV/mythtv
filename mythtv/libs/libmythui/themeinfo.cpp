@@ -59,10 +59,7 @@ ThemeInfo::ThemeInfo(QString theme)
 
 ThemeInfo::~ThemeInfo()
 {
-
-    if (m_theme)
-        delete m_theme;
-
+    delete m_theme;
 }
 
 bool ThemeInfo::parseThemeInfo()
