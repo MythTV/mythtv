@@ -86,7 +86,8 @@ ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
 
 ImportMusicDialog::~ImportMusicDialog()
 {
-    gContext->SaveSetting("MythMusicLastImportDir", m_locationEdit->GetText());
+    if (m_locationEdit)
+        gContext->SaveSetting("MythMusicLastImportDir", m_locationEdit->GetText());
 
     delete m_tracks;
 }
@@ -224,57 +225,44 @@ bool ImportMusicDialog::Create()
     if (!LoadWindowFromXML("music-ui.xml", "import_music", this))
         return false;
 
-    m_locationEdit = dynamic_cast<MythUITextEdit *>(GetChild("location"));
+    bool err = false;
+    UIUtilE::Assign(this, m_locationEdit,    "location", &err);
+    UIUtilE::Assign(this, m_locationButton,  "directoryfinder", &err);
+    UIUtilE::Assign(this, m_scanButton,      "scan", &err);
+    UIUtilE::Assign(this, m_coverartButton,  "coverart", &err);
+    UIUtilE::Assign(this, m_filenameText,    "filename", &err);
+    UIUtilE::Assign(this, m_compartistText,  "compartist", &err);
+    UIUtilE::Assign(this, m_artistText,      "artist", &err);
+    UIUtilE::Assign(this, m_albumText,       "album", &err);
+    UIUtilE::Assign(this, m_titleText,       "title", &err);
+    UIUtilE::Assign(this, m_genreText,       "genre", &err);
+    UIUtilE::Assign(this, m_yearText,        "year", &err);
+    UIUtilE::Assign(this, m_trackText,       "track", &err);
+    UIUtilE::Assign(this, m_currentText,     "position", &err);
+    UIUtilE::Assign(this, m_statusText,      "status", &err);
+    UIUtilE::Assign(this, m_compilationCheck,"compilation", &err);
+    UIUtilE::Assign(this, m_playButton,      "play", &err);
+    UIUtilE::Assign(this, m_nextnewButton,   "nextnew", &err);
+    UIUtilE::Assign(this, m_addButton,       "add", &err);
+    UIUtilE::Assign(this, m_addallnewButton, "addallnew", &err);
+    UIUtilE::Assign(this, m_nextButton,      "next", &err);
+    UIUtilE::Assign(this, m_prevButton,      "prev", &err);
 
-    m_locationButton = dynamic_cast<MythUIButton *>(GetChild("directoryfinder"));
-    if (m_locationButton)
-        connect(m_locationButton, SIGNAL(Clicked()), SLOT(locationPressed()));
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'import_music'");
+        return false;
+    }
 
-    m_scanButton = dynamic_cast<MythUIButton *>(GetChild("scan"));
-    if (m_scanButton)
-        connect(m_scanButton, SIGNAL(Clicked()), SLOT(startScan()));
-
-    m_coverartButton = dynamic_cast<MythUIButton *>(GetChild("coverart"));
-    if (m_coverartButton)
-        connect(m_coverartButton, SIGNAL(Clicked()), SLOT(coverArtPressed()));
-
-    m_filenameText = dynamic_cast<MythUIText *>(GetChild("filename"));
-    m_compartistText = dynamic_cast<MythUIText *>(GetChild("compartist"));
-    m_artistText = dynamic_cast<MythUIText *>(GetChild("artist"));
-    m_albumText = dynamic_cast<MythUIText *>(GetChild("album"));
-    m_titleText = dynamic_cast<MythUIText *>(GetChild("title"));
-    m_genreText = dynamic_cast<MythUIText *>(GetChild("genre"));
-    m_yearText = dynamic_cast<MythUIText *>(GetChild("year"));
-    m_trackText = dynamic_cast<MythUIText *>(GetChild("track"));
-    m_currentText = dynamic_cast<MythUIText *>(GetChild("position"));
-    m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
-
-    m_compilationCheck = dynamic_cast<MythUICheckBox *>
-                                                (GetChild("compilation"));
-
-    m_playButton = dynamic_cast<MythUIButton *>(GetChild("play"));
-    if (m_playButton)
-        connect(m_playButton, SIGNAL(Clicked()), SLOT(playPressed()));
-
-    m_nextnewButton = dynamic_cast<MythUIButton *>(GetChild("nextnew"));
-    if (m_nextnewButton)
-        connect(m_nextnewButton, SIGNAL(Clicked()), SLOT(nextNewPressed()));
-
-    m_addButton = dynamic_cast<MythUIButton *>(GetChild("add"));
-    if (m_addButton)
-        connect(m_addButton, SIGNAL(Clicked()), SLOT(addPressed()));
-
-    m_addallnewButton = dynamic_cast<MythUIButton *>(GetChild("addallnew"));
-    if (m_addallnewButton)
-        connect(m_addallnewButton, SIGNAL(Clicked()), SLOT(addAllNewPressed()));
-
-    m_nextButton = dynamic_cast<MythUIButton *>(GetChild("next"));
-    if (m_nextButton)
-        connect(m_nextButton, SIGNAL(Clicked()), SLOT(nextPressed()));
-
-    m_prevButton = dynamic_cast<MythUIButton *>(GetChild("prev"));
-    if (m_prevButton)
-        connect(m_prevButton, SIGNAL(Clicked()), SLOT(prevPressed()));
+    connect(m_prevButton, SIGNAL(Clicked()), SLOT(prevPressed()));
+    connect(m_locationButton, SIGNAL(Clicked()), SLOT(locationPressed()));
+    connect(m_scanButton, SIGNAL(Clicked()), SLOT(startScan()));
+    connect(m_coverartButton, SIGNAL(Clicked()), SLOT(coverArtPressed()));
+    connect(m_playButton, SIGNAL(Clicked()), SLOT(playPressed()));
+    connect(m_nextnewButton, SIGNAL(Clicked()), SLOT(nextNewPressed()));
+    connect(m_addButton, SIGNAL(Clicked()), SLOT(addPressed()));
+    connect(m_addallnewButton, SIGNAL(Clicked()), SLOT(addAllNewPressed()));
+    connect(m_nextButton, SIGNAL(Clicked()), SLOT(nextPressed()));
 
     fillWidgets();
 
