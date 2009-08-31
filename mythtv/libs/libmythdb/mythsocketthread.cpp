@@ -16,7 +16,10 @@ using namespace std;
 
 // Microsoft
 #ifdef USING_MINGW
-#include <winsock2.h> // for select
+#include <winsock2.h> // for select & fd_set
+#endif
+#ifndef O_NONBLOCK
+#define O_NONBLOCK 0 /* not actually supported in MINGW */
 #endif
 
 // Qt
