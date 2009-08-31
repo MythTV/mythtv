@@ -1,5 +1,6 @@
 // -*- Mode: c++ -*-
 
+#include "compat.h"
 #include "util-opengl.h"
 #include "frame.h"
 

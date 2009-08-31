@@ -1,4 +1,5 @@
 // MythTV headers
+#include "compat.h"
 #include "mythcontext.h"
 #include "openglcontext.h"
 #include "myth_imgconvert.h"

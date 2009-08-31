@@ -20,6 +20,10 @@ using namespace std;
 #include "mythsocket.h"
 #include "mythdeque.h"
 
+#ifdef DeleteFile
+#undef DeleteFile
+#endif
+
 class ProcessRequestThread;
 class QUrl;
 class MythServer;

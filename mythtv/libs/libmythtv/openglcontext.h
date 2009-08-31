@@ -22,6 +22,10 @@ using namespace std;
 #include "mythxdisplay.h"  // For GetNumberXineramaScreens()
 #endif
 
+#ifdef USING_MINGW
+#include <windows.h>
+#endif
+
 #include "frame.h"
 #include "videooutbase.h"
 

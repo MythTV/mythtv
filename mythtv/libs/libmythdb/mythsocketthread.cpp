@@ -3,7 +3,9 @@
 #include <cassert>
 
 // POSIX
+#ifndef USING_MINGW
 #include <sys/select.h> // for select
+#endif
 #include <sys/types.h>  // for fnctl
 #include <unistd.h>     // for fnctl & other
 #include <fcntl.h>      // for fnctl
