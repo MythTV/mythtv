@@ -1,8 +1,8 @@
 #ifndef MYTHAPPEARANCE_H
 #define MYTHAPPEARANCE_H
 
-#include <qstringlist.h>
-#include <qstring.h>
+#include <QStringList>
+#include <QString>
 
 #include "mythscreentype.h"
 #include "mythuitext.h"

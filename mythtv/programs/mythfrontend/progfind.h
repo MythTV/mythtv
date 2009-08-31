@@ -4,8 +4,6 @@
 // qt
 #include <QDateTime>
 #include <QEvent>
-#include <QKeyEvent>
-#include <QPaintEvent>
 
 // myth
 #include "mythscreentype.h"

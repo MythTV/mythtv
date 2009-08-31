@@ -13,12 +13,11 @@
 
 #include "mythmainwindow.h"
 
-#include <qtextstream.h>
-#include <qdir.h>
-#include <qfile.h>
-#include <qregexp.h>
-#include <qbuffer.h>
-#include <math.h>
+#include <QTextStream>
+#include <QDir>
+#include <QFile>
+#include <QRegExp>
+#include <QBuffer>
 
 #include "../../config.h"
 
@@ -54,7 +53,7 @@ MythFEXML::~MythFEXML()
 
 MythFEXMLMethod MythFEXML::GetMethod( const QString &sURI )
 {
-    if (sURI == "GetScreenShot"        ) return MFEXML_GetScreenShot;
+    if (sURI == "GetScreenShot") return MFEXML_GetScreenShot;
 
     return( MFEXML_Unknown );
 }
@@ -73,12 +72,12 @@ bool MythFEXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest
                 return( false );
 
             VERBOSE(VB_UPNP, QString("MythFEXML::ProcessRequest: %1 : %2")
-			             .arg(pRequest->m_sMethod)
-				     .arg(pRequest->m_sRawRequest));
+                         .arg(pRequest->m_sMethod)
+                     .arg(pRequest->m_sRawRequest));
 
             switch( GetMethod( pRequest->m_sMethod ))
             {
-		case MFEXML_GetScreenShot      : GetScreenShot    ( pRequest ); return true;
+                case MFEXML_GetScreenShot      : GetScreenShot    ( pRequest ); return true;
 
 
                 default: 
@@ -123,7 +122,7 @@ void MythFEXML::GetScreenShot( HTTPRequest *pRequest )
     if (!gContext->GetMainWindow()->screenShot(sFileName,nWidth, nHeight))
     {
         VERBOSE(VB_GENERAL, "MythFEXML: Failed to take screenshot. Aborting");
-	return;
+        return;
     }
 
     pRequest->m_sFileName = sFileName;

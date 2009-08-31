@@ -1,6 +1,5 @@
 
-#include <iostream>
-#include <vector>
+#include <vector> // For std::vector
 using namespace std;
 
 #include <QDateTime>
