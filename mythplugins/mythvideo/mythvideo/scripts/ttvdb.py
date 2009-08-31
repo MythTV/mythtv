@@ -303,7 +303,7 @@ in the same directory as ttvdb.py. They should have been included with the distr
 
 # Global variables
 http_find="http://www.thetvdb.com"
-http_replace="http://images.thetvdb.com.nyud.net:8080"
+http_replace="http://images.thetvdb.com" #.nyud.net:8080"
 
 logfile="/home/doug/joblog/tvdb.log"
 
