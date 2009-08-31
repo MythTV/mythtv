@@ -453,7 +453,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "DETAILS", "Show program details", "U");
     REG_KEY("TV Frontend", "VIEWCARD", "Switch Capture Card view", "Y");
     REG_KEY("TV Frontend", "VIEWINPUT", "Switch Capture Card view", "C");
-    REG_KEY("TV Frontend", "CUSTOMEDIT", "Edit Custom Record Rule", "E");
+    REG_KEY("TV Frontend", "CUSTOMEDIT", "Edit Custom Record Rule", "");
     REG_KEY("TV Frontend", "CHANGERECGROUP", "Change Recording Group", "");
     REG_KEY("TV Frontend", "CHANGEGROUPVIEW", "Change Group View", "");
 
