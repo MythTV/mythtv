@@ -14,6 +14,7 @@ using namespace std;
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythversion.h"
+#include "util.h"
 
 // libmythtv headers
 #include "scheduledrecording.h"
@@ -53,6 +54,8 @@ int main(int argc, char *argv[])
     bool from_dd_file = false;
     int sourceid = -1;
     QString fromddfile_lineupid;
+
+    myth_nice(19);
 
     while (argpos < a.argc())
     {
