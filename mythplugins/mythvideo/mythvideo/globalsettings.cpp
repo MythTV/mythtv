@@ -161,6 +161,7 @@ HostComboBox *VideoTreeGroup()
     gc->addSelection(QObject::tr("Cast"),"5");
     gc->addSelection(QObject::tr("User Rating"),"6");
     gc->addSelection(QObject::tr("Date Added"),"7");
+    gc->addSelection(QObject::tr("TV/Movies"),"8");
     gc->setHelpText(QObject::tr("Group videos in the tree")); 
     return gc; 
 } 

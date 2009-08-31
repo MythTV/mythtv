@@ -637,7 +637,7 @@ class VideoListImp
                               ltDBGenreGroup, ltDBCategoryGroup,
                               ltDBYearGroup, ltDBDirectorGroup,
                               ltDBCastGroup, ltDBUserRatingGroup,
-                              ltDBInsertDateGroup};
+                              ltDBInsertDateGroup, ltTVMetadata};
     typedef MetadataListManager::metadata_list metadata_list;
     typedef MetadataListManager::MetadataPtr MetadataPtr;
 
@@ -714,6 +714,7 @@ class VideoListImp
     void buildFsysList();
     void buildGroupList(metadata_list_type whence);
     void buildDbList();
+    void buildTVList();
     void buildFileList(smart_dir_node &directory, metadata_list &metalist,
                        const QString &prefix);
 
@@ -956,6 +957,10 @@ void VideoListImp::refreshList(bool filebrowser,
                     fillMetadata(ltDBInsertDateGroup);
                     VERBOSE(VB_IMPORTANT,QString("Using Insert Date Mode"));
                     break;
+                case 8:
+                    fillMetadata(ltTVMetadata);
+                    VERBOSE(VB_IMPORTANT,QString("Using TV/Movie Mode"));
+                    break;
             } 
         } 
         else 
@@ -999,7 +1004,10 @@ void VideoListImp::fillMetadata(metadata_list_type whence)
                 break; 
             case ltDBMetadata: 
                 buildDbList(); 
-                break; 
+                break;
+            case ltTVMetadata:
+                buildTVList();
+                break;
             case ltDBGenreGroup: 
             case ltDBCategoryGroup:
             case ltDBYearGroup:
@@ -1139,7 +1147,55 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             group_node->addEntry(smart_meta_node(new meta_data_node(data))); 
         } 
     } 
-} 
+}
+
+void VideoListImp::buildTVList()
+{
+    metadata_list ml;
+    MetadataListManager::loadAllFromDatabase(ml);
+    m_metadata.setList(ml);
+
+    metadata_view_list mlist;
+    mlist.reserve(m_metadata.getList().size());
+
+    std::back_insert_iterator<metadata_view_list> mli(mlist);
+    std::transform(m_metadata.getList().begin(), m_metadata.getList().end(),
+                   mli, to_metadata_ptr());
+
+    metadata_path_sort mps(m_sort_ignores_case);
+    std::sort(mlist.begin(), mlist.end(), mps);
+
+    typedef std::map<QString, meta_dir_node *> group_to_node_map;
+    group_to_node_map gtnm;
+
+    meta_dir_node *video_root = &m_metadata_tree;
+
+    smart_dir_node sdn = video_root->addSubDir("Television");
+    meta_dir_node* television_node = sdn.get();
+
+    smart_dir_node vdn = video_root->addSubDir("Movies");
+    meta_dir_node* movie_node = vdn.get();
+
+    for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
+    {
+        Metadata *data = *p;
+
+        if (((*p)->GetSeason() > 0) || ((*p)->GetEpisode() > 0))
+        {
+            smart_dir_node sdn = television_node->addSubDir((*p)->GetTitle());
+            meta_dir_node* title_node = sdn.get();
+
+            smart_dir_node ssdn = title_node->addSubDir(QObject::tr("Season %1")
+                                                       .arg((*p)->GetSeason()));
+            meta_dir_node* season_node = ssdn.get();
+
+            season_node->addEntry(smart_meta_node(new meta_data_node(data)));
+        }
+        else
+            movie_node->addEntry(smart_meta_node(new meta_data_node(data)));
+    }
+}
+ 
 void VideoListImp::buildDbList()
 {
     metadata_list ml;

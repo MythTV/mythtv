@@ -2393,6 +2393,9 @@ bool VideoDialog::Create()
         case BRS_INSERTDATE:
             m_d->m_groupType = 7;
             break; 
+        case BRS_TVMOVIE:
+            m_d->m_groupType = 8;
+            break;
         case BRS_FOLDER:
         default:
             m_d->m_groupType = 0;
@@ -3800,6 +3803,10 @@ void VideoDialog::MetadataBrowseMenu()
            m_menuPopup->AddButton(tr("Genre"),
                      SLOT(SwitchVideoGenreGroup()));
 
+       if (m_d->m_groupType != 8)
+           m_menuPopup->AddButton(tr("TV/Movies"),
+                     SLOT(SwitchVideoTVMovieGroup()));
+
        if (m_d->m_groupType != 6)
            m_menuPopup->AddButton(tr("User Rating"),
                      SLOT(SwitchVideoUserRatingGroup()));
@@ -4065,6 +4072,15 @@ void VideoDialog::SwitchVideoUserRatingGroup()
 void VideoDialog::SwitchVideoInsertDateGroup()
 {
    SwitchLayout(m_d->m_type, BRS_INSERTDATE);
+}
+
+/** \fn VideoDialog::SwitchVideoTVMovieGroup()
+ *  \brief Switch to Television/Movie browse mode.
+ *  \return void.
+ */
+void VideoDialog::SwitchVideoTVMovieGroup()
+{
+   SwitchLayout(m_d->m_type, BRS_TVMOVIE);
 }
 
 /** \fn VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
