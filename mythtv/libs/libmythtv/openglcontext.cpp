@@ -481,7 +481,7 @@ void OpenGLContext::UpdateTexture(uint tex,
             unsigned char *scratch = new unsigned char[tmp_tex->m_data_size];
             if (scratch)
             {
-                bzero(scratch, tmp_tex->m_data_size);
+                memset(scratch, 0, tmp_tex->m_data_size);
                 tmp_tex->m_data = scratch;
             }
         }
@@ -663,7 +663,7 @@ bool OpenGLContext::ClearTexture(uint tex)
     if (!scratch)
         return false;
 
-    bzero(scratch, tmp_size);
+    memset(scratch, 0, tmp_size);
 
     GLint check;
     if (tmp->m_type == GL_TEXTURE_1D)
