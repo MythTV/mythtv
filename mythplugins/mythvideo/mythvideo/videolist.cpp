@@ -1170,10 +1170,10 @@ void VideoListImp::buildTVList()
 
     meta_dir_node *video_root = &m_metadata_tree;
 
-    smart_dir_node sdn = video_root->addSubDir("Television");
+    smart_dir_node sdn = video_root->addSubDir(QObject::tr("Television"));
     meta_dir_node* television_node = sdn.get();
 
-    smart_dir_node vdn = video_root->addSubDir("Movies");
+    smart_dir_node vdn = video_root->addSubDir(QObject::tr("Movies"));
     meta_dir_node* movie_node = vdn.get();
 
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
