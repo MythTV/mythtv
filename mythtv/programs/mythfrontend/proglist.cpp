@@ -200,6 +200,8 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             chooseView();
         else if (action == "CUSTOMEDIT")
             customEdit();
+        else if (action == "EDIT")
+            edit();
         else if (action == "DELETE")
             deleteItem();
         else if (action == "UPCOMING")

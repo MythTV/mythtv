@@ -1,8 +1,4 @@
 
-#include <unistd.h>
-#include <iostream>
-using namespace std;
-
 #include <QDateTime>
 
 #include "manualschedule.h"

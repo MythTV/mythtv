@@ -1,22 +1,21 @@
-#include <stdlib.h>
-
-#include <iostream>
-using namespace std;
-
-#include <QDateTime>
-#include <QRegExp>
 
 #include "viewscheduled.h"
+
+// Libmythtv
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "recordinginfo.h"
 #include "proglist.h"
 #include "tv_play.h"
 
-#include "mythcontext.h"
+// Libmythdb
 #include "mythverbose.h"
+
+// Libmyth
+#include "mythcontext.h"
 #include "remoteutil.h"
 
+// Libmythui
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythuibuttonlist.h"
@@ -140,8 +139,8 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "INFO")
-            edit();
+        if (action == "EDIT" || action == "INFO") // TODO: Use of INFO
+            edit();                               // is inconsistent
         else if (action == "MENU")
             showMenu();
         else if (action == "CUSTOMEDIT")

@@ -1,7 +1,3 @@
-#include <unistd.h>
-#include <time.h>
-#include <cassert>
-
 
 // qt
 #include <QDateTime>
@@ -29,9 +25,6 @@
 #include "mythuibutton.h"
 
 #include "progfind.h"
-
-using namespace std;
-
 
 #define LOC      QString("ProgFinder: ")
 #define LOC_ERR  QString("ProgFinder, Error: ")
@@ -184,6 +177,8 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
             showMenu();
+        else if (action == "EDIT")
+            edit();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "UPCOMING")
@@ -423,6 +418,23 @@ void ProgFinder::getInfo(bool toggle)
     }
 }
 
+void ProgFinder::edit()
+{
+    if (GetFocusWidget() == m_timesList)
+    {
+        ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
+
+        if (curPick)
+        {
+            RecordingInfo ri(*curPick);
+            ri.EditScheduled();
+            *curPick = ri;
+        }
+        else
+            return;
+    }
+}
+
 void ProgFinder::select()
 {
     if (GetFocusWidget() == m_timesList)
@@ -485,8 +497,7 @@ void ProgFinder::details()
 
 void ProgFinder::quickRecord()
 {
-    if (GetFocusWidget() == m_timesList)
-        getInfo(true);
+    getInfo(true);
 }
 
 void ProgFinder::updateTimesList()

@@ -481,8 +481,8 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             else
                 editRecording();
         }
-        else if (action == "INFO")
-            editScheduled();
+        else if (action == "EDIT" || action == "INFO") // TODO: Use of INFO
+            editScheduled();                           // is inconsistent
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")

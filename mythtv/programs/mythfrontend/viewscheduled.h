@@ -1,10 +1,13 @@
 #ifndef VIEWSCHEDULED_H_
 #define VIEWSCHEDULED_H_
 
+// QT
 #include <QDateTime>
 
+// libmythtv
 #include "programlist.h"
 
+// libmythui
 #include "mythscreentype.h"
 
 class TV;

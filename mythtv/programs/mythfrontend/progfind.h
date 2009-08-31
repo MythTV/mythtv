@@ -26,9 +26,7 @@ class ProgFinder : public MythScreenType
     virtual ~ProgFinder();
 
     bool Create(void);
-
     bool keyPressEvent(QKeyEvent *event);
-
 
   private slots:
     void alphabetListItemSelected(MythUIButtonListItem *item);
@@ -46,6 +44,7 @@ class ProgFinder : public MythScreenType
     void customEvent(QEvent *e);
     void updateInfo(void);
     void getInfo(bool toggle = false);
+    void edit(void);
 
   protected:
     virtual void Init(void);
