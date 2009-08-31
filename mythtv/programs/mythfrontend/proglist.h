@@ -3,7 +3,6 @@
 
 // Qt headers
 #include <QDateTime>
-#include <QKeyEvent>
 
 // MythTV headers
 #include "mythscreentype.h"

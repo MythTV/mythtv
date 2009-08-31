@@ -1,27 +1,15 @@
 #define MYTHOSDMENUEDITOR_CPP
 
 /* QT includes */
-#include <qnamespace.h>
-#include <qstringlist.h>
-#include <qapplication.h>
-#include <qdom.h>
-#include <qbuttongroup.h>
-#include <qimage.h>
-#include <qevent.h>
-#include <qdir.h>
-#include <qstring.h>
+#include <QString>
+#include <QListIterator>
 
 /* MythTV includes */
 #include "mythcontext.h"
-#include "mythdbcon.h"
-#include "mythmainwindow.h"
-#include "myththemebase.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythosdmenueditor.h"
 #include "tvosdmenuentry.h"
-
-using namespace std;
 
 /* Static data members */
 TVState MythOSDMenuEditor::WatchingLiveTV = kState_WatchingLiveTV;

@@ -1,4 +1,3 @@
-#include <stdlib.h>  // for system()
 
 #include <QApplication>
 

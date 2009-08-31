@@ -11,8 +11,8 @@
 #ifndef __MEDIARENDERER_H__
 #define __MEDIARENDERER_H__
 
-#include <qobject.h>
-#include <qmutex.h>
+#include <QObject>
+#include <QMutex>
 
 #include "upnp.h"
 #include "upnpcmgr.h"

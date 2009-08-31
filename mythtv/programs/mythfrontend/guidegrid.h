@@ -3,7 +3,7 @@
 #define GUIDEGRID_H_
 
 // c++
-#include <vector>
+#include <vector> // For std::vector
 
 // qt
 #include <QString>

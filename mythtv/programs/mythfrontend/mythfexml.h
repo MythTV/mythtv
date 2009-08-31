@@ -8,8 +8,7 @@
 #ifndef MYTHFEXML_H_
 #define MYTHFEXML_H_
 
-#include <qdom.h>
-#include <qdatetime.h> 
+#include <QDateTime>
 
 #include "upnp.h"
 #include "eventing.h"

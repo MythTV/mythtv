@@ -23,7 +23,7 @@
  */
 
 // Qt headers
-#include <qkeysequence.h>
+#include <QKeySequence>
 
 // MythControls headers
 #include "action.h"

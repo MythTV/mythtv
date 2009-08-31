@@ -1,8 +1,9 @@
 #ifndef STATUSBOX_H_
 #define STATUSBOX_H_
 
-#include <vector>
 using namespace std;
+
+#include <vector> // For std::vector
 
 #include "mythscreentype.h"
 
