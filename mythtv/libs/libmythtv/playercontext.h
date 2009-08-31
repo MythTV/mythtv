@@ -116,6 +116,8 @@ class MPUBLIC PlayerContext
         { return (kPIPonTV == pipState) || (kPIPStandAlone == pipState); }
     bool IsPBP(void) const
         { return (kPBPLeft == pipState) || (kPBPRight      == pipState); }
+    bool IsPrimaryPBP(void) const
+        { return (kPBPLeft == pipState); }
     bool IsAudioNeeded(void) const
         { return (kPIPOff  == pipState) || (kPBPLeft       == pipState); }
     bool IsNullVideoDesired(void)   const { return useNullVideo; }
