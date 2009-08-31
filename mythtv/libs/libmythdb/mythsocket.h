@@ -70,8 +70,9 @@ class MPUBLIC MythSocket : public MSocketDevice
     bool connect(const QHostAddress &addr, quint16 port);
     bool connect(const QString &host, quint16 port);
 
-    void Lock();
-    void Unlock();
+    void Lock(void) const;
+    bool TryLock(bool wakereadyread) const;
+    void Unlock(bool wakereadyread = true) const;
 
     static const uint kShortTimeout;
     static const uint kLongTimeout;
@@ -89,7 +90,7 @@ class MPUBLIC MythSocket : public MSocketDevice
 
     bool            m_notifyread;
     QMutex          m_ref_lock;
-    mutable QMutex  m_lock;
+    mutable QMutex  m_lock; // externally accessible lock
 
     static const uint kSocketBufferSize;
     static MythSocketThread *s_readyread_thread;

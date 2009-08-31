@@ -1,16 +1,16 @@
 // ANSI C
 #include <cstdlib>
 #include <cassert>
+#include <cerrno>
 
 // POSIX
 #include <unistd.h>
 
 // Qt
 #include <QApplication>
-#include <QString>
 #include <QByteArray>
-#include <QMutex>
 #include <QHostInfo>
+#include <QMap>
 
 // MythTV
 #include "mythsocketthread.h"
@@ -18,7 +18,6 @@
 #include "mythtimer.h"
 #include "mythsocket.h"
 #include "mythverbose.h"
-#include "compat.h"
 
 #define SLOC(a) QString("MythSocket(%1:%2): ")\
                     .arg((quint64)a, 0, 16).arg(a->socket())
@@ -33,7 +32,7 @@ MythSocketThread *MythSocket::s_readyread_thread = new MythSocketThread();
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
       m_state(Idle),         m_addr(),                 m_port(0),
-      m_ref_count(0),        m_notifyread(0)
+      m_ref_count(0),        m_notifyread(false)
 {
     VERBOSE(VB_SOCKET, LOC + "new socket");
     if (socket > -1)
@@ -74,9 +73,8 @@ void MythSocket::setCallbacks(MythSocketCBs *cb)
 
 void MythSocket::UpRef(void)
 {
-    m_ref_lock.lock();
+    QMutexLocker locker(&m_ref_lock);
     m_ref_count++;
-    m_ref_lock.unlock();
     VERBOSE(VB_SOCKET, LOC + QString("UpRef: %1").arg(m_ref_count));
 }
 
@@ -300,13 +298,16 @@ bool MythSocket::writeStringList(QStringList &list)
         VERBOSE(VB_NETWORK, LOC + msg);
     }
 
+    MythTimer timer; timer.start();
     unsigned int errorcount = 0;
     while (size > 0)
     {
         if (state() != Connected)
         {
             VERBOSE(VB_IMPORTANT, LOC +
-                    "writeStringList: Error, socket went unconnected.");
+                    "writeStringList: Error, socket went unconnected." +
+                    QString("\n\t\t\tWe wrote %1 of %2 bytes with %3 errors")
+                    .arg(written).arg(written+size).arg(errorcount));
             return false;
         }
 
@@ -326,15 +327,19 @@ bool MythSocket::writeStringList(QStringList &list)
         else if (temp <= 0)
         {
             errorcount++;
-            if (errorcount > 5000)
+            if (timer.elapsed() > 1000)
             {
-                VERBOSE(VB_GENERAL, LOC +
-                        "writeStringList: No data written on writeBlock");
+                VERBOSE(VB_GENERAL, LOC + "writeStringList: Error, " +
+                        QString("No data written on writeBlock (%1 errors)")
+                        .arg(errorcount));
                 return false;
             }
             usleep(1000);
         }
     }
+
+    flush();
+
     return true;
 }
 
@@ -624,16 +629,28 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
     return true;
 }
 
-void MythSocket::Lock(void)
+void MythSocket::Lock(void) const
 {
     m_lock.lock();
     s_readyread_thread->WakeReadyReadThread();
 }
 
-void MythSocket::Unlock(void)
+bool MythSocket::TryLock(bool wake_readyread) const
+{
+    if (m_lock.tryLock())
+    {
+        if (wake_readyread)
+            s_readyread_thread->WakeReadyReadThread();
+        return true;
+    }
+    return false;
+}
+
+void MythSocket::Unlock(bool wake_readyread) const
 {
     m_lock.unlock();
-    s_readyread_thread->WakeReadyReadThread();
+    if (wake_readyread)
+        s_readyread_thread->WakeReadyReadThread();
 }
 
 /**

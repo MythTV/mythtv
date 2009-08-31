@@ -1,6 +1,9 @@
 // ANSI C
 #include <cstdlib>
-#include <cassert>
+
+// C++
+#include <algorithm> // for min/max
+using namespace std;
 
 // POSIX
 #ifndef USING_MINGW
@@ -13,8 +16,11 @@
 
 // Microsoft
 #ifdef USING_MINGW
-#include <winsock2.h>
+#include <winsock2.h> // for select
 #endif
+
+// Qt
+#include <QTime>
 
 // MythTV
 #include "mythsocketthread.h"
@@ -24,12 +30,18 @@
 #define SLOC(a) QString("MythSocketThread(sock 0x%1:%2): ")\
     .arg((quint64)a, 0, 16).arg(a->socket())
 
+static void setup_pipe(int mypipe[2], long flags[2]);
+
+const uint MythSocketThread::kShortWait = 100;
+
 MythSocketThread::MythSocketThread()
     : QThread(), m_readyread_run(false)
 {
-#if !defined(USING_MINGW)
-    memset(m_readyread_pipe, 0, sizeof(m_readyread_pipe));
-#endif
+    for (int i = 0; i < 2; i++)
+    {
+        m_readyread_pipe[i] = -1;
+        m_readyread_pipe_flags[i] = 0;
+    }
 }
 
 void ShutdownRRT(void)
@@ -39,42 +51,41 @@ void ShutdownRRT(void)
 
 void MythSocketThread::ShutdownReadyReadThread(void)
 {
-    m_readyread_run = false;
-    WakeReadyReadThread();
-    wait();
-
-#ifdef USING_MINGW
-    if (readyreadevent) {
-        ::CloseHandle(readyreadevent);
-        readyreadevent = NULL;
+    {
+        QMutexLocker locker(&m_readyread_lock);
+        m_readyread_run = false;
     }
-#else
-    ::close(m_readyread_pipe[0]);
-    ::close(m_readyread_pipe[1]);
-#endif
+
+    WakeReadyReadThread();
+
+    wait(); // waits for thread to exit
+
+    CloseReadyReadPipe();
+}
+
+void MythSocketThread::CloseReadyReadPipe(void) const
+{
+    for (uint i = 0; i < 2; i++)
+    {
+        if (m_readyread_pipe[i] >= 0)
+        {
+            ::close(m_readyread_pipe[i]);
+            m_readyread_pipe[i] = -1;
+            m_readyread_pipe_flags[i] = 0;
+        }
+    }
 }
 
 void MythSocketThread::StartReadyReadThread(void)
 {
-    if (m_readyread_run == false)
+    QMutexLocker locker(&m_readyread_lock);
+    if (!m_readyread_run)
     {
-        QMutexLocker locker(&m_readyread_lock);
-        if (m_readyread_run == false)
-        {
-#ifdef USING_MINGW
-            readyreadevent = ::CreateEvent(NULL, false, false, NULL);
-            assert(readyreadevent);
-#else
-            int ret = pipe(m_readyread_pipe);
-            (void) ret;
-            assert(ret >= 0);
-#endif
-
-            m_readyread_run = true;
-            start();
-
-            atexit(ShutdownRRT);
-        }
+        atexit(ShutdownRRT);
+        setup_pipe(m_readyread_pipe, m_readyread_pipe_flags);
+        m_readyread_run = true;
+        start();
+        m_readyread_started_wait.wait(&m_readyread_lock);
     }
 }
 
@@ -89,54 +100,60 @@ void MythSocketThread::AddToReadyRead(MythSocket *sock)
     StartReadyReadThread();
 
     sock->UpRef();
-    m_readyread_lock.lock();
-    m_readyread_addlist.append(sock);
-    m_readyread_lock.unlock();
+
+    {
+        QMutexLocker locker(&m_readyread_lock);
+        m_readyread_addlist.push_back(sock);
+    }
 
     WakeReadyReadThread();
 }
 
 void MythSocketThread::RemoveFromReadyRead(MythSocket *sock)
 {
-    m_readyread_lock.lock();
-    m_readyread_dellist.append(sock);
-    m_readyread_lock.unlock();
-
+    {
+        QMutexLocker locker(&m_readyread_lock);
+        m_readyread_dellist.push_back(sock);
+    }
     WakeReadyReadThread();
 }
 
-void MythSocketThread::WakeReadyReadThread(void)
+void MythSocketThread::WakeReadyReadThread(void) const
 {
     if (!isRunning())
         return;
 
-#ifdef USING_MINGW
-    if (readyreadevent) ::SetEvent(readyreadevent);
-#else
-    if (m_readyread_pipe[1] >= 0)
+    QMutexLocker locker(&m_readyread_lock);
+    m_readyread_wait.wakeAll();
+
+    if (m_readyread_pipe[1] < 0)
+        return;
+
+    char buf[1] = { '0' };
+    ssize_t wret = 0;
+    while (wret <= 0)
     {
-        char buf[1] = { '0' };
-        ssize_t wret = 0;
-        while (wret <= 0)
+        wret = ::write(m_readyread_pipe[1], &buf, 1);
+        if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
         {
-            wret = ::write(m_readyread_pipe[1], &buf, 1);
-            if ((wret < 0) && (EAGAIN != errno) && (EINTR != errno))
-            {
-                VERBOSE(VB_IMPORTANT, "MythSocketThread, Error: "
-                        "Irrecoverable WakeReadyReadThread event");
-                break;
-            }
+            VERBOSE(VB_IMPORTANT, "MythSocketThread, Error: "
+                    "Failed to write to readyread pipe, closing pipe.");
+
+            // Closing the pipe will cause the run loop's select to exit.
+            // Then the next time through the loop we should fallback to
+            // using the code for platforms that don't support pipes..
+            CloseReadyReadPipe();
+            break;
         }
-        // dtk note: add this aft dbg for correctness..
-        //::flush(m_readyread_pipe[1]);
     }
-#endif
 }
 
-void MythSocketThread::iffound(MythSocket *sock)
+void MythSocketThread::ReadyToBeRead(MythSocket *sock)
 {
     VERBOSE(VB_SOCKET, SLOC(sock) + "socket is readable");
-    if (sock->bytesAvailable() == 0)
+    int bytesAvail = sock->bytesAvailable();
+    
+    if (bytesAvail == 0)
     {
         VERBOSE(VB_SOCKET, SLOC(sock) + "socket closed");
         sock->close();
@@ -155,199 +172,249 @@ void MythSocketThread::iffound(MythSocket *sock)
     }
 }
 
+void MythSocketThread::ProcessAddRemoveQueues(void)
+{
+    while (!m_readyread_dellist.empty())
+    {
+        MythSocket *sock = m_readyread_dellist.front();
+        m_readyread_dellist.pop_front();
+
+        if (m_readyread_list.removeAll(sock))
+            m_readyread_downref_list.push_back(sock);
+    }
+
+    while (!m_readyread_addlist.empty())
+    {
+        MythSocket *sock = m_readyread_addlist.front();
+        m_readyread_addlist.pop_front();
+        m_readyread_list.push_back(sock);
+    }
+}
+
 void MythSocketThread::run(void)
 {
     VERBOSE(VB_SOCKET, "MythSocketThread: readyread thread start");
 
-    fd_set rfds;
-    MythSocket *sock;
-    int maxfd;
-    bool found;
-
+    QMutexLocker locker(&m_readyread_lock);
+    m_readyread_started_wait.wakeAll();
     while (m_readyread_run)
     {
-        m_readyread_lock.lock();
-        while (m_readyread_dellist.size() > 0)
-        {
-            sock = m_readyread_dellist.takeFirst();
-            bool del = m_readyread_list.removeAll(sock);
+        VERBOSE(VB_SOCKET|VB_EXTRA, "ProcessAddRemoveQueues");
 
-            if (del)
-            {
-                m_readyread_lock.unlock();
-                sock->DownRef();
-                m_readyread_lock.lock();
-            }
-        }
+        ProcessAddRemoveQueues();
 
-        while (m_readyread_addlist.count() > 0)
-        {
-            sock = m_readyread_addlist.takeFirst();
-            //sock->UpRef();  Did upref in AddToReadyRead()
-            m_readyread_list.append(sock);
-        }
-        m_readyread_lock.unlock();
+        VERBOSE(VB_SOCKET|VB_EXTRA, "Construct FD_SET");
 
-#ifdef USING_MINGW
-
-        int n = m_readyread_list.count() + 1;
-        HANDLE *hEvents = new HANDLE[n];
-        memset(hEvents, 0, sizeof(HANDLE) * n);
-        unsigned *idx = new unsigned[n];
-        n = 0;
-
-        for (unsigned i = 0; i < (uint) m_readyread_list.count(); i++)
-        {
-            sock = m_readyread_list.at(i);
-            if (sock->state() == MythSocket::Connected
-                && !sock->m_notifyread && !isLocked(sock->m_lock))
-            {
-                HANDLE hEvent = ::CreateEvent(NULL, false, false, NULL);
-                if (!hEvent)
-                {
-                    VERBOSE(VB_IMPORTANT, "CreateEvent failed");
-                }
-                else
-                {
-                    if (SOCKET_ERROR != ::WSAEventSelect(
-                            sock->socket(), hEvent,
-                            FD_READ | FD_CLOSE))
-                    {
-                        hEvents[n] = hEvent;
-                        idx[n++] = i;
-                    }
-                    else
-                    {
-                        VERBOSE(VB_IMPORTANT, QString(
-                                    "CreateEvent, "
-                                    "WSAEventSelect(%1, %2) failed")
-                                .arg(sock->socket()));
-                        ::CloseHandle(hEvent);
-                    }
-                }
-            }
-        }
-
-        hEvents[n++] = readyreadevent;
-        int rval = ::WaitForMultipleObjects(n, hEvents, false, INFINITE);
-
-        for (int i = 0; i < (n - 1); i++)
-            ::CloseHandle(hEvents[i]);
-
-        delete[] hEvents;
-
-        if (rval == WAIT_FAILED)
-        {
-            VERBOSE(VB_IMPORTANT, "WaitForMultipleObjects returned error");
-            delete[] idx;
-        }
-        else if (rval >= WAIT_OBJECT_0 && rval < (WAIT_OBJECT_0 + n))
-        {
-            rval -= WAIT_OBJECT_0;
-
-            if (rval < (n - 1))
-            {
-                rval = idx[rval];
-                sock = m_readyread_list.at(rval);
-                found = (sock->state() == MythSocket::Connected)
-                            && !isLocked(sock->m_lock);
-            }
-            else
-            {
-                found = false;
-            }
-
-            delete[] idx;
-
-            if (found)
-                iffound(sock);
-
-            ::ResetEvent(readyreadevent);
-        }
-        else if (rval >= WAIT_ABANDONED_0 && rval < (WAIT_ABANDONED_0 + n))
-        {
-            VERBOSE(VB_SOCKET, "abandoned");
-        }
-        else
-        {
-            VERBOSE(VB_SOCKET|VB_EXTRA, "select timeout");
-        }
-
-#else /* if !USING_MINGW */
-
-        // add check for bad fd?
+        // construct FD_SET for all connected and unlocked sockets...
+        int maxfd = -1;
+        fd_set rfds;
         FD_ZERO(&rfds);
-        maxfd = m_readyread_pipe[0];
-
-        FD_SET(m_readyread_pipe[0], &rfds);
 
         QList<MythSocket*>::const_iterator it = m_readyread_list.begin();
-        while (it != m_readyread_list.end())
+        for (; it != m_readyread_list.end(); ++it)
         {
-            sock = *it;
-            if (sock->state() == MythSocket::Connected &&
-                sock->m_notifyread == false &&
-                !isLocked(sock->m_lock))
+            if (!(*it)->TryLock(false))
+                continue;
+
+            if ((*it)->state() == MythSocket::Connected &&
+                !(*it)->m_notifyread)
             {
-                FD_SET(sock->socket(), &rfds);
-                maxfd = std::max(sock->socket(), maxfd);
+                FD_SET((*it)->socket(), &rfds);
+                maxfd = std::max((*it)->socket(), maxfd);
             }
-            ++it;
+            (*it)->Unlock(false);
         }
 
-        int rval = select(maxfd + 1, &rfds, NULL, NULL, NULL);
-        if (rval == -1)
+        // There are no unlocked sockets, wait for event before we continue..
+        if (maxfd < 0)
         {
-            VERBOSE(VB_SOCKET, "MythSocketThread: select returned error");
+            VERBOSE(VB_SOCKET|VB_EXTRA, "Empty FD_SET, sleeping");
+            if (m_readyread_wait.wait(&m_readyread_lock))
+                VERBOSE(VB_SOCKET|VB_EXTRA, "Empty FD_SET, woken up");
+            else
+                VERBOSE(VB_SOCKET|VB_EXTRA, "Empty FD_SET, timed out");
+            continue;
         }
-        else if (rval)
+
+        int rval = 0;
+
+        if (m_readyread_pipe[0] >= 0)
         {
-            found = false;
-            QList<MythSocket*>::const_iterator it = m_readyread_list.begin();
-            while (it != m_readyread_list.end())
+            // Clear out any pending pipe reads, we have already taken care of
+            // this event above under the m_readyread_lock.
+            char dummy[128];
+            if (m_readyread_pipe_flags[0] & O_NONBLOCK)
             {
-                sock = *it;
-                if (sock->state() == MythSocket::Connected &&
-                    FD_ISSET(sock->socket(), &rfds) &&
-                    !isLocked(sock->m_lock))
+                rval = ::read(m_readyread_pipe[0], dummy, 128);
+                FD_SET(m_readyread_pipe[0], &rfds);
+                maxfd = std::max(m_readyread_pipe[0], maxfd);
+            }
+
+            // also exit select on exceptions on same descriptors
+            fd_set efds;
+            memcpy(&efds, &rfds, sizeof(fd_set));
+
+            // The select waits forever for data, so if we need to process
+            // anything else we need to write to m_readyread_pipe[1]..
+            // We unlock the ready read lock, because we don't need it
+            // and this will allow WakeReadyReadThread() to run..
+            m_readyread_lock.unlock();
+            VERBOSE(VB_SOCKET|VB_EXTRA, "Waiting on select..");
+            rval = select(maxfd + 1, &rfds, NULL, &efds, NULL);
+            VERBOSE(VB_SOCKET|VB_EXTRA, "Got data on select");
+            m_readyread_lock.lock();
+
+            if (rval > 0 && FD_ISSET(m_readyread_pipe[0], &rfds))
+            {
+                int ret = ::read(m_readyread_pipe[0], dummy, 128);
+                if (ret < 0)
                 {
-                    found = true;
-                    break;
+                    VERBOSE(VB_SOCKET|VB_EXTRA,
+                            "Strange.. failed to read event pipe");
                 }
-                ++it;
-            }
-
-            if (found)
-                iffound(sock);
-
-            if (FD_ISSET(m_readyread_pipe[0], &rfds))
-            {
-                char buf[128];
-                ssize_t rr;
-
-                do rr = ::read(m_readyread_pipe[0], buf, 128);
-                while ((rr < 0) && (EINTR == errno));
             }
         }
         else
         {
-            VERBOSE(VB_SOCKET|VB_EXTRA, "MythSocketThread: select timeout");
+            VERBOSE(VB_SOCKET|VB_EXTRA, "Waiting on select.. (no pipe)");
+
+            // also exit select on exceptions on same descriptors
+            fd_set efds;
+            memcpy(&efds, &rfds, sizeof(fd_set));
+
+            // Unfortunately, select on a pipe is not supported on all
+            // platforms. So we fallback to a loop that instead times out
+            // of select and checks for wakeAll event.
+            while (!rval)
+            {
+                struct timeval timeout;
+                timeout.tv_sec = 0;
+                timeout.tv_usec = kShortWait * 1000;
+                rval = select(maxfd + 1, &rfds, NULL, &efds, &timeout);
+                if (!rval)
+                    m_readyread_wait.wait(&m_readyread_lock, kShortWait);
+            }
+
+            VERBOSE(VB_SOCKET|VB_EXTRA, "Got data on select (no pipe)");
         }
 
-#endif /* !USING_MINGW */
+        if (rval <= 0)
+        {
+            if (rval == 0)
+            {
+                // Note: This should never occur when using pipes. When there
+                // is no error there should be data in at least one fd..
+                VERBOSE(VB_SOCKET|VB_EXTRA, "MythSocketThread: select timeout");
+            }
+            else
+                VERBOSE(VB_SOCKET,
+                        "MythSocketThread: select returned error" + ENO);
 
+            m_readyread_wait.wait(&m_readyread_lock, kShortWait);
+            continue;
+        }
+        
+        // ReadyToBeRead allows calls back into the socket so we need
+        // to release the lock for a little while.
+        // since only this loop updates m_readyread_list this is safe.
+        m_readyread_lock.unlock();
+
+        // Actually read some data! This is a form of co-operative
+        // multitasking so the ready read handlers should be quick..
+
+        uint downref_tm = 0;
+        if (!m_readyread_downref_list.empty())
+        {
+            VERBOSE(VB_SOCKET|VB_EXTRA, "Deleting stale sockets");
+
+            QTime tm = QTime::currentTime();
+            for (it = m_readyread_downref_list.begin();
+                 it != m_readyread_downref_list.end(); ++it)
+            {
+                (*it)->DownRef();
+            }
+            m_readyread_downref_list.clear();
+            downref_tm = tm.elapsed();
+        }
+
+        VERBOSE(VB_SOCKET|VB_EXTRA, "Processing ready reads");
+
+        QMap<uint,uint> timers;
+        QTime tm = QTime::currentTime();
+        it = m_readyread_list.begin();
+
+        for (; it != m_readyread_list.end() && m_readyread_run; ++it)
+        {
+            if (!(*it)->TryLock(false))
+                continue;
+            
+            int socket = (*it)->socket();
+
+            if (socket >= 0 &&
+                (*it)->state() == MythSocket::Connected &&
+                FD_ISSET(socket, &rfds))
+            {
+                QTime rrtm = QTime::currentTime();
+                ReadyToBeRead(*it);
+                timers[socket] = rrtm.elapsed();
+            }
+            (*it)->Unlock(false);
+        }
+
+        if ((print_verbose_messages & (VB_SOCKET|VB_EXTRA)) ==
+            (VB_SOCKET|VB_EXTRA))
+        {
+            QString rep = QString("Total read time: %1ms, on sockets")
+                .arg(tm.elapsed());
+            QMap<uint,uint>::const_iterator it = timers.begin();
+            for (; it != timers.end(); ++it)
+                rep += QString(" {%1,%2ms}").arg(it.key()).arg(*it);
+            if (downref_tm)
+                rep += QString(" {downref, %1ms}").arg(downref_tm);
+
+            VERBOSE(VB_SOCKET|VB_EXTRA, QString("MythSocketThread: ") + rep);
+        }
+
+        m_readyread_lock.lock();
+        VERBOSE(VB_SOCKET|VB_EXTRA, "Reacquired ready read lock");
     }
 
     VERBOSE(VB_SOCKET, "MythSocketThread: readyread thread exit");
 }
 
-bool MythSocketThread::isLocked(QMutex &mutex)
+#ifdef USING_MINGW
+static void setup_pipe(int[2], long[2]) {}
+#else
+static void setup_pipe(int mypipe[2], long myflags[2])
 {
-    bool isLocked = true;
-    if (mutex.tryLock())
+    int pipe_ret = pipe(mypipe);
+    if (pipe_ret < 0)
     {
-        mutex.unlock();
-        isLocked = false;
+        VERBOSE(VB_IMPORTANT, "Failed to open readyread pipes" + ENO);
+        mypipe[0] = mypipe[1] = -1;
     }
-    return isLocked;
+    else
+    {
+        errno = 0;
+        long flags = fcntl(mypipe[0], F_GETFL);
+        if (0 == errno)
+        {
+            int ret = fcntl(mypipe[0], F_SETFL, flags|O_NONBLOCK);
+            if (ret < 0)
+                VERBOSE(VB_IMPORTANT, QString("Set pipe flags error")+ENO);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("Get pipe flags error") + ENO);
+        }
+
+        for (uint i = 0; i < 2; i++)
+        {
+            errno = 0;
+            flags = fcntl(mypipe[i], F_GETFL);
+            if (0 == errno)
+                myflags[i] = flags;
+        }
+    }
 }
+#endif
