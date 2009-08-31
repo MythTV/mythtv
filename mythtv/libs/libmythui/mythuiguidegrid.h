@@ -3,6 +3,9 @@
 
 #include <QPixmap>
 
+#define ARROWIMAGESIZE 4
+#define RECSTATUSSIZE  8
+
 class MythFontProperties;
 
 class MPUBLIC MythUIGuideGrid : public MythUIType
@@ -89,8 +92,8 @@ class MPUBLIC MythUIGuideGrid : public MythUIType
     QList<UIGTCon*> *allData;
     UIGTCon selectedItem;
 
-    QPixmap m_recImages[8];
-    QPixmap m_arrowImages[4];
+    MythImage *m_recImages[RECSTATUSSIZE];
+    MythImage *m_arrowImages[ARROWIMAGESIZE];
 
     // themeable settings
     int  m_channelCount;

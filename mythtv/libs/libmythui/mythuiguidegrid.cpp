@@ -42,6 +42,12 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     m_drawSelLine = false;
     m_drawSelFill = false;
 
+    for (uint x = 0; x < RECSTATUSSIZE; x++)
+        m_recImages[x] = NULL;
+
+    for (uint x = 0; x < ARROWIMAGESIZE; x++)
+        m_arrowImages[x] = NULL;
+
     m_fillType = Solid;
 
     m_progPastCol = 0;
@@ -53,6 +59,7 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     QMap<QString, QString> catColors;
     parseDefaultCategoryColors(catColors);
     SetCategoryColors(catColors);
+
 }
 
 void MythUIGuideGrid::Finalize(void)
@@ -70,6 +77,18 @@ MythUIGuideGrid::~MythUIGuideGrid()
         ResetRow(i);
 
     delete [] allData;
+
+    for (uint x = 0; x < RECSTATUSSIZE; x++)
+    {
+        if (m_recImages[x])
+            m_recImages[x]->DownRef();
+    }
+
+    for (uint x = 0; x < ARROWIMAGESIZE; x++)
+    {
+        if (m_arrowImages[x])
+            m_arrowImages[x]->DownRef();
+    }
 }
 
 bool MythUIGuideGrid::ParseElement(QDomElement &element)
@@ -337,46 +356,31 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
     // draw arrows
     if (data->arrow != 0)
     {
-        QPixmap *arrowImg;
         if (data->arrow == 1 || data->arrow == 3)
         {
             if (m_verticalLayout)
             {
-                arrowImg = &m_arrowImages[2];
-                MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-                im->Assign(*arrowImg);
-                p->DrawImage(area.left() + (area.width() / 2) - (arrowImg->height() / 2), 
-                             area.top() , im, alphaMod);
+                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[2]->width() / 2), 
+                             area.top() , m_arrowImages[2], alphaMod);
             }
             else
             {
-                arrowImg = &m_arrowImages[0];
-                MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-                im->Assign(*arrowImg);
                 p->DrawImage(area.left(), area.top() + (area.height() / 2) -
-                            (arrowImg->height() / 2), im, alphaMod);
+                            (m_arrowImages[0]->height() / 2), m_arrowImages[0], alphaMod);
             }
         }
         if (data->arrow == 2 || data->arrow == 3)
         {
             if (m_verticalLayout)
             {
-                arrowImg = &m_arrowImages[3];
-                MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-                im->Assign(*arrowImg);
-                recTypeOffset = arrowImg->width();
-                p->DrawImage(area.left() + (area.width() / 2) - (arrowImg->height() / 2),
-                            area.top() + area.height() - arrowImg->height(), im, alphaMod);
+                p->DrawImage(area.left() + (area.width() / 2) - (m_arrowImages[3]->width() / 2),
+                            area.top() + area.height() - m_arrowImages[3]->height(), m_arrowImages[3], alphaMod);
             }
             else
             {
-                arrowImg = &m_arrowImages[1];
-                MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-                im->Assign(*arrowImg);
-                recTypeOffset = arrowImg->width();
-                p->DrawImage(area.right() - arrowImg->width(),
+                p->DrawImage(area.right() - m_arrowImages[1]->width(),
                             area.top() + (area.height() / 2) -
-                            (arrowImg->height() / 2), im, alphaMod);
+                            (m_arrowImages[1]->height() / 2), m_arrowImages[1], alphaMod);
             }
         }
     }
@@ -384,11 +388,9 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
     // draw recording status
     if (data->recType != 0)
     {
-        QPixmap *recImg = &m_recImages[data->recType];
-        MythImage *im = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-        im->Assign(*recImg);
-        p->DrawImage(area.right() - recImg->width(),
-                     area.bottom() - recImg->height(), im, alphaMod);
+        p->DrawImage(area.right() - m_recImages[data->recType]->width(),
+                     area.bottom() - m_recImages[data->recType]->height(), 
+                     m_recImages[data->recType], alphaMod);
     }
 }
 
@@ -496,16 +498,16 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
     if (m_verticalLayout)
     {
         if (data->arrow == 1 || data->arrow == 3)
-            area.setTop(area.top() + m_arrowImages[2].height());
+            area.setTop(area.top() + m_arrowImages[2]->height());
         if (data->arrow == 2 || data->arrow == 3)
-            area.setBottom(area.bottom() - m_arrowImages[3].height());
+            area.setBottom(area.bottom() - m_arrowImages[3]->height());
     }
     else
     {
         if (data->arrow == 1 || data->arrow == 3)
-            area.setLeft(area.left() + m_arrowImages[0].width());
+            area.setLeft(area.left() + m_arrowImages[0]->width());
         if (data->arrow == 2 || data->arrow == 3)
-            area.setRight(area.right() - m_arrowImages[1].width());
+            area.setRight(area.right() - m_arrowImages[1]->width());
     }
 
     if (area.width() <= 0 || area.height() <= 0)
@@ -604,7 +606,8 @@ void MythUIGuideGrid::LoadImage(int recType, const QString &file)
 
     if (pix)
     {
-        m_recImages[recType] = *pix;
+        m_recImages[recType] = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+        m_recImages[recType]->Assign(*pix);
         delete pix;
     }
 }
@@ -618,7 +621,8 @@ void MythUIGuideGrid::SetArrow(int direction, const QString &file)
 
     if (pix)
     {
-        m_arrowImages[direction] = *pix;
+        m_arrowImages[direction] = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+        m_arrowImages[direction]->Assign(*pix);
         delete pix;
     }
 }
