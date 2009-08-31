@@ -351,8 +351,6 @@ void MythUIGuideGrid::drawRecType(MythPainter *p, UIGTCon *data, int alphaMod)
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(breakin, breakin, -breakin, -breakin);
 
-    int recTypeOffset = 0;
-
     // draw arrows
     if (data->arrow != 0)
     {
