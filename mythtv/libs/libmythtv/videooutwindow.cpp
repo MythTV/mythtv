@@ -786,16 +786,6 @@ QRect VideoOutWindow::GetPIPRect(
 {
     QRect position;
 
-    // used by opengl PBP
-    if (pip_state == kPBPLeft)
-    {
-        position.setX(display_visible_rect.width());
-        position.setY(0);
-        position.setHeight(display_visible_rect.height());
-        position.setWidth(display_visible_rect.width());
-        return position;
-    }
-
     float pipVideoAspect = pipplayer ? (float) pipplayer->GetVideoAspect()
         : (4.0f / 3.0f);
     int tmph = (display_visible_rect.height() * db_pip_size) / 100;
