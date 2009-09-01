@@ -971,11 +971,11 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
     bool use_xv = true, use_shm = true;
-
+    bool allow_xvmc = codec_is_xvmc(ret);
     if (dec == "xvmc")
-        use_xvmc_idct = use_xvmc = true;
+        use_xvmc_idct = use_xvmc = allow_xvmc;
     else if (dec == "xvmc-vld")
-        use_xvmc_vld = use_xvmc = true;
+        use_xvmc_vld = use_xvmc = allow_xvmc;
 
     SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv, use_shm);
 
