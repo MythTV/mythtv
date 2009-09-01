@@ -507,7 +507,17 @@ END
   die;
 }
 
-if ( ! $OPT{'svnbranch'} )
+if ( $OPT{'nohead'} )
+{
+    my $SVNTOP="$SCRIPTDIR/.osx-packager/src/myth-svn/mythtv/.svn";
+
+    if ( ! -d $SVNTOP )
+    {   die "No source code to build?"   }
+  
+    if ( ! `grep 0-21-fixes $SVNTOP/entries` )
+    {   die "Source code does not match release-0-21-fixes"   }
+}
+elsif ( ! $OPT{'svnbranch'} )
 {
     &Complain(<<END);
 This script can probably only build branch release-0-21-fixes.
