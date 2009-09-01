@@ -3189,16 +3189,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         case QEvent::UpdateRequest:
         case QEvent::Enter:
         {
-            PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-            for (uint i = 0; mctx && (i < player.size()); i++)
-            {
-                PlayerContext *ctx = GetPlayer(mctx, i);
-                ctx->LockDeleteNVP(__FILE__, __LINE__);
-                if (ctx->nvp)
-                    ctx->nvp->ExposeEvent();
-                ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-            }
-            ReturnPlayerLock(mctx);
+            DrawUnusedRects();
             return false;
         }
 
@@ -7717,23 +7708,20 @@ void TV::StopEmbedding(PlayerContext *ctx)
     embedCheckTimerId = 0;
 }
 
-void TV::DrawUnusedRects(bool sync, PlayerContext *ctx)
+void TV::DrawUnusedRects(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- begin");
 
-    PlayerContext *mctx = NULL;
-    if (ctx)
-        mctx = GetPlayer(ctx, 0);
-    else
-        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-
-    mctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (mctx->nvp)
-        mctx->nvp->DrawUnusedRects(sync);
-    mctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-    if (!ctx)
-        ReturnPlayerLock(mctx);
+    PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
+    for (uint i = 0; mctx && (i < player.size()); i++)
+    {
+        PlayerContext *ctx = GetPlayer(mctx, i);
+        ctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (ctx->nvp)
+            ctx->nvp->ExposeEvent();
+        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    }
+    ReturnPlayerLock(mctx);
 
     VERBOSE(VB_PLAYBACK, LOC + "DrawUnusedRects() -- end");
 }
@@ -8631,7 +8619,7 @@ void TV::customEvent(QEvent *e)
         GetMythMainWindow()->GetPaintWindow()->clearMask();
 
         qApp->processEvents();
-        DrawUnusedRects(true, actx);
+        DrawUnusedRects();
 
         ReturnPlayerLock(actx);
 

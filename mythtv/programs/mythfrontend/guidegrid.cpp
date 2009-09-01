@@ -2079,7 +2079,7 @@ void GuideGrid::EmbedTVWindow(void)
             QRegion r1 = QRegion(m_Area);
             QRegion r2 = QRegion(m_videoRect);
             GetMythMainWindow()->GetPaintWindow()->setMask(r1.xored(r2));
-            m_player->DrawUnusedRects(false, ctx);
+            m_player->DrawUnusedRects();
         }
         else
         {

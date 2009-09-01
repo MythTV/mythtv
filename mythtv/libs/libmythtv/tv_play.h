@@ -195,7 +195,7 @@ class MPUBLIC TV : public QThread
     void ClearTunableCache(void);
     void ChangeChannel(const PlayerContext*, const DBChanList &options);
 
-    void DrawUnusedRects(bool sync, PlayerContext *ctx = NULL);
+    void DrawUnusedRects(void);
 
     // Recording commands
     int  PlayFromRecorder(int recordernum);
