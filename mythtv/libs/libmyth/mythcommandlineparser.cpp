@@ -2,6 +2,7 @@
 
 #include "mythcommandlineparser.h"
 #include "exitcodes.h"
+#include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"
