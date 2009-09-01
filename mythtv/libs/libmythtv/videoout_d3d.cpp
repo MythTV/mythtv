@@ -996,12 +996,15 @@ void VideoOutputD3D::DestroyContext(void)
 
 void VideoOutputD3D::WindowResized(const QSize &new_size)
 {
+    // FIXME this now requires the context to be re-created
+    /*
     QMutexLocker locker(&m_lock);
     windows[0].SetDisplayVisibleRect(QRect(QPoint(0, 0), new_size));
     windows[0].SetDisplayAspect(
         ((float)new_size.width()) / new_size.height());
 
     MoveResize();
+    */
 }
 
 bool VideoOutputD3D::InputChanged(const QSize &input_size,
