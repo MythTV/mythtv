@@ -1263,7 +1263,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         else if (AvFormatDecoder::CanHandle(
                      testbuf, player_ctx->buffer->GetFilename(), testreadsize))
         {
-            bool noaccel = no_hardware_decoders || !player_ctx->IsPrimaryPBP();
+            bool noaccel = no_hardware_decoders ||
+                          (player_ctx->IsPBP() && !player_ctx->IsPrimaryPBP());
             SetDecoder(new AvFormatDecoder(this, *player_ctx->playingInfo,
                                            using_null_videoout,
                                            allow_libmpeg2, noaccel));
