@@ -10,6 +10,9 @@
 #include "programlist.h"
 #include "mythdialogbox.h"
 
+// mythfrontend
+#include "schedulecommon.h"
+
 class ProgramInfo;
 class TV;
 class MythUIText;
@@ -17,7 +20,7 @@ class MythUIButtonList;
 
 MPUBLIC void RunProgramFinder(TV *player = NULL, bool embedVideo = false, bool allowEPG = true);
 
-class ProgFinder : public MythScreenType
+class ProgFinder : public ScheduleCommon
 {
     Q_OBJECT
   public:

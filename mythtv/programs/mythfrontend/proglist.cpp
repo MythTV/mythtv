@@ -26,7 +26,7 @@ using namespace std;
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
                const QString &view, const QString &from)
-          : MythScreenType(parent, "ProgLister")
+          : ScheduleCommon(parent, "ProgLister")
 {
     m_type = pltype;
     m_addTables = from;
@@ -65,7 +65,7 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
 
 // previously recorded ctor
 ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
-          : MythScreenType(parent, "PreviousList")
+          : ScheduleCommon(parent, "PreviousList")
 {
     m_type = plPreviouslyRecorded;
     m_recid = recid;
@@ -615,11 +615,7 @@ void ProgLister::select()
     if (m_type == plPreviouslyRecorded)
         deleteOldRecorded();
     else
-    {
-        RecordingInfo ri(*pi);
-        ri.EditRecording();
-        *pi = ri;
-    }
+        EditRecording(pi);
 }
 
 void ProgLister::edit()
@@ -629,9 +625,7 @@ void ProgLister::edit()
     if (!pi)
         return;
 
-    RecordingInfo ri(*pi);
-    ri.EditScheduled();
-    *pi = ri;
+    EditScheduled(pi);
 }
 
 void ProgLister::customEdit()
@@ -773,10 +767,7 @@ void ProgLister::details()
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
     if (pi)
-    {
-        const RecordingInfo ri(*pi);
-        ri.showDetails();
-    }
+        ShowDetails(pi);
 }
 
 void ProgLister::fillViewList(const QString &view)
@@ -1680,6 +1671,8 @@ void ProgLister::customEvent(QEvent *event)
                 }
             }
         }
+        else
+            ScheduleCommon::customEvent(event);
     }
     else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {

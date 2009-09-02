@@ -19,6 +19,9 @@ using namespace std;
 
 #include "mythscreentype.h"
 
+// mythfrontend
+#include "schedulecommon.h"
+
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
@@ -55,7 +58,7 @@ typedef QMap<QString,QString>           Str2StrMap;
 typedef QMap<QString,PreviewGenState>   PreviewMap;
 typedef QMap<QString,MythTimer>         LastCheckedMap;
 
-class PlaybackBox : public MythScreenType
+class PlaybackBox : public ScheduleCommon
 {
     Q_OBJECT
     friend class PlaybackBoxListItem;

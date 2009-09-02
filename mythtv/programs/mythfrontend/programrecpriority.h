@@ -5,6 +5,9 @@
 #include "scheduledrecording.h"
 #include "mythscreentype.h"
 
+// mythfrontend
+#include "schedulecommon.h"
+
 class QDateTime;
 
 class MythUIButtonList;
@@ -35,7 +38,7 @@ class ProgramRecPriorityInfo : public RecordingInfo
     QString profile;
 };
 
-class ProgramRecPriority : public MythScreenType
+class ProgramRecPriority : public ScheduleCommon
 {
     Q_OBJECT
   public:

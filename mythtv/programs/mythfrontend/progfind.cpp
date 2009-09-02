@@ -50,7 +50,7 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
 
 ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG,
                        TV *player, bool embedVideo)
-          : MythScreenType(parentStack, "ProgFinder"),
+          : ScheduleCommon(parentStack, "ProgFinder"),
     m_searchStr(QString::null),
     m_player(player),            m_embedVideo(embedVideo),
     m_allowEPG(allowEPG),        m_allowKeypress(false),
@@ -317,6 +317,8 @@ void ProgFinder::customEvent(QEvent *event)
             updateShowList();
             SetFocusWidget(m_showList);
         }
+        else
+            ScheduleCommon::customEvent(event);
     }
 }
 
@@ -404,16 +406,19 @@ void ProgFinder::getInfo(bool toggle)
 
         if (curPick)
         {
-            RecordingInfo ri(*curPick);
             if (toggle)
+            {
+                RecordingInfo ri(*curPick);
                 ri.ToggleRecord();
+                *curPick = ri;
+            }
             else
-                ri.EditRecording();
-            *curPick = ri;
+                EditRecording(curPick);
         }
         else
             return;
 
+        // TODO: When schedule editor is non-blocking, move
         selectShowData(curPick->title, m_timesList->GetCurrentPos());
     }
 }
@@ -426,12 +431,10 @@ void ProgFinder::edit()
 
         if (curPick)
         {
-            RecordingInfo ri(*curPick);
-            ri.EditScheduled();
-            *curPick = ri;
+            EditScheduled(curPick);
+            // TODO: When schedule editor is non-blocking, move
+            selectShowData(curPick->title, m_timesList->GetCurrentPos());
         }
-        else
-            return;
     }
 }
 
@@ -488,11 +491,8 @@ void ProgFinder::details()
 
     ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
 
-    if (!curPick)
-        return;
-
-    const RecordingInfo ri(*curPick);
-    ri.showDetails();
+    if (curPick)
+        ShowDetails(curPick);
 }
 
 void ProgFinder::quickRecord()

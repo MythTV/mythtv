@@ -182,7 +182,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
                      uint chanid, QString channum,
                      TV *player, bool embedVideo,
                      bool allowFinder, int changrpid)
-         : MythScreenType(parent, "guidegrid"),
+         : ScheduleCommon(parent, "guidegrid"),
     m_allowFinder(allowFinder),
     m_player(player),
     m_usingNullVideo(false), m_embedVideo(embedVideo),
@@ -471,7 +471,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 if (pginfo && (pginfo->title != m_unknownTitle) &&
                     ((pginfo->SecsTillStart() / 60) >= m_selectRecThreshold))
                 {
-                    editRecording();
+                    editRecSchedule();
                 }
                 else
                 {
@@ -479,10 +479,10 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 }
             }
             else
-                editRecording();
+                editRecSchedule();
         }
         else if (action == "EDIT" || action == "INFO") // TODO: Use of INFO
-            editScheduled();                           // is inconsistent
+            editSchedule();                           // is inconsistent
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")
@@ -1228,7 +1228,7 @@ void GuideGrid::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Edit Schedule"))
             {
-                editScheduled();
+                editSchedule();
             }
             else if (resulttext == tr("Program Details"))
             {
@@ -1266,7 +1266,7 @@ void GuideGrid::customEvent(QEvent *event)
                 ChannelGroupMenu(1);
             }
         }
-    else if (resultid == "channelgrouptogglemenu")
+        else if (resultid == "channelgrouptogglemenu")
         {
             if (resulttext != tr("Cancel"))
             {
@@ -1277,7 +1277,7 @@ void GuideGrid::customEvent(QEvent *event)
                     toggleChannelFavorite(changroupid);
             }
         }
-    else if (resultid == "channelgroupmenu")
+        else if (resultid == "channelgroupmenu")
         {
             if (resulttext != tr("Cancel"))
             {
@@ -1308,6 +1308,8 @@ void GuideGrid::customEvent(QEvent *event)
                 }
             }
         }
+        else
+            ScheduleCommon::customEvent(event);
     }
 }
 
@@ -1866,7 +1868,7 @@ void GuideGrid::quickRecord()
     updateInfo();
 }
 
-void GuideGrid::editRecording()
+void GuideGrid::editRecSchedule()
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
@@ -1876,17 +1878,10 @@ void GuideGrid::editRecording()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    RecordingInfo ri(*pginfo);
-    ri.EditRecording();
-    // we don't want to update pginfo, it will instead be updated
-    // when the scheduler is done..
-
-    m_recList.FromScheduler();
-    fillProgramInfos();
-    updateInfo();
+    EditRecording(pginfo);
 }
 
-void GuideGrid::editScheduled()
+void GuideGrid::editSchedule()
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
@@ -1896,14 +1891,7 @@ void GuideGrid::editScheduled()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    RecordingInfo ri(*pginfo);
-    ri.EditScheduled();
-    // we don't want to update pginfo, it will instead be updated
-    // when the scheduler is done..
-
-    m_recList.FromScheduler();
-    fillProgramInfos();
-    updateInfo();
+    EditScheduled(pginfo);
 }
 
 void GuideGrid::customEdit()
@@ -1978,8 +1966,7 @@ void GuideGrid::details()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    const RecordingInfo ri(*pginfo);
-    ri.showDetails();
+    ShowDetails(pginfo);
 }
 
 void GuideGrid::channelUpdate(void)

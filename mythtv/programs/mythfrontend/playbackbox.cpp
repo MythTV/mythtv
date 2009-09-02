@@ -254,7 +254,7 @@ ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 
 PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
                             TV *player, bool showTV)
-    : MythScreenType(parent, name),
+    : ScheduleCommon(parent, name),
       // Settings
       m_type(ltype),
       m_formatShortDate("M/d"),           m_formatLongDate("ddd MMMM d"),
@@ -1669,10 +1669,7 @@ void PlaybackBox::details()
     if (pginfo->availableStatus != asAvailable)
         showAvailablePopup(pginfo);
     else
-    {
-        const RecordingInfo ri(*pginfo);
-        ri.showDetails();
-    }
+        ShowDetails(pginfo);
 }
 
 void PlaybackBox::selected(MythUIButtonListItem *item)
@@ -2721,11 +2718,8 @@ void PlaybackBox::showProgramDetails()
 {
    ProgramInfo *pginfo = CurrentItem();
 
-    if (!pginfo)
-        return;
-
-    const RecordingInfo ri(*pginfo);
-    ri.showDetails();
+    if (pginfo)
+        ShowDetails(pginfo);
 }
 
 void PlaybackBox::doEditScheduled()
@@ -3443,6 +3437,8 @@ void PlaybackBox::customEvent(QEvent *event)
                 HandlePreviewEvent(evinfo);
         }
     }
+    else
+        ScheduleCommon::customEvent(event);
 }
 
 bool PlaybackBox::fileExists(ProgramInfo *pginfo)

@@ -34,7 +34,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "channelutil.h"
 #include "programlist.h"
-#include "progdetails.h"
+#include "progdetails_temp.h"
 
 #define LOC QString("RecordingInfo: ")
 #define LOC_ERR QString("RecordingInfo, Error: ")
@@ -97,7 +97,8 @@ void RecordingInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 }
 
 /** \fn RecordingInfo::IsFindApplicable(void) const
- *  \brief Returns true if a search should be employed to find a matcing program.
+ *  \brief Returns true if a search should be employed to find a matching
+ *         program.
  */
 bool RecordingInfo::IsFindApplicable(void) const
 {
@@ -187,13 +188,15 @@ void RecordingInfo::ApplyRecordRecID(void)
  *  \param newstate State to apply to "record" RecordingType.
  */
 // newstate uses same values as return of GetProgramRecordingState
-void RecordingInfo::ApplyRecordStateChange(RecordingType newstate)
+void RecordingInfo::ApplyRecordStateChange(RecordingType newstate, bool save)
 {
     GetProgramRecordingStatus();
     if (newstate == kOverrideRecord || newstate == kDontRecord)
         record->makeOverride();
     record->setRecordingType(newstate);
-    record->Save();
+
+    if (save)
+        record->Save();
 }
 
 /** \fn RecordingInfo::ApplyRecordRecPriorityChange(int)
@@ -948,7 +951,7 @@ void RecordingInfo::EditScheduled(void)
 void RecordingInfo::showDetails(void) const
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgDetails *details_dialog  = new ProgDetails(mainStack, this);
+    ProgDetailsTemp *details_dialog  = new ProgDetailsTemp(mainStack, this);
 
     if (!details_dialog->Create())
     {
@@ -1305,4 +1308,11 @@ void RecordingInfo::ShowNotRecordingDialog(void)
 
     return;
 }
+
+void RecordingInfo::makeOverride()
+{
+    GetProgramRecordingStatus();
+    record->makeOverride();
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

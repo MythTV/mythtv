@@ -17,6 +17,9 @@
 #include "channelgroup.h"
 #include "channelutil.h"
 
+// mythfrontend
+#include "schedulecommon.h"
+
 using namespace std;
 
 class ProgramInfo;
@@ -72,7 +75,7 @@ class MPUBLIC JumpToChannel : public QObject
     static const uint kJumpToChannelTimeout = 3500; // ms
 };
 
-class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
+class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
 {
     Q_OBJECT
 
@@ -128,8 +131,8 @@ class MPUBLIC GuideGrid : public MythScreenType, public JumpToChannelListener
     void infoTimeout();
 
     void quickRecord();
-    void editRecording();
-    void editScheduled();
+    void editRecSchedule();
+    void editSchedule();
     void customEdit();
     void deleteRule();
     void upcoming();

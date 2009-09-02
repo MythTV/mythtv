@@ -11,6 +11,9 @@
 
 #include "mythwidgets.h"
 
+// mythfrontend
+#include "schedulecommon.h"
+
 enum ProgListType {
     plUnknown = 0,
     plTitle = 1,
@@ -166,7 +169,7 @@ class EditPowerSearchPopup : public MythScreenType
     MythUIButton     *m_okButton;
 };
 
-class ProgLister : public MythScreenType
+class ProgLister : public ScheduleCommon
 {
   friend class PhrasePopup;
   friend class TimePopup;

@@ -46,9 +46,10 @@ class MPUBLIC RecordingInfo : public ProgramInfo
     int GetAutoRunJobs(void) const;
     RecordingType GetProgramRecordingStatus(void);
     QString GetProgramRecordingProfile(void) const;
-    void ApplyRecordStateChange(RecordingType newstate);
+    void ApplyRecordStateChange(RecordingType newstate, bool save = true);
     void ApplyRecordRecPriorityChange(int);
     void ToggleRecord(void);
+    void makeOverride(void);
 
     // these five can be moved to programinfo
     void AddHistory(bool resched = true, bool forcedup = false);//pi
@@ -74,6 +75,7 @@ class MPUBLIC RecordingInfo : public ProgramInfo
     void showDetails(void) const;
     void EditRecording(void);
     void EditScheduled(void);
+    
 
   private:
     // GUI helper functions
@@ -86,6 +88,7 @@ class MPUBLIC RecordingInfo : public ProgramInfo
 };
 
 Q_DECLARE_METATYPE(RecordingInfo*)
+Q_DECLARE_METATYPE(RecordingInfo)
 
 #endif // _RECORDING_INFO_H_
 

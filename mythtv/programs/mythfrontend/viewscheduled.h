@@ -10,6 +10,9 @@
 // libmythui
 #include "mythscreentype.h"
 
+// mythfrontend
+#include "schedulecommon.h"
+
 class TV;
 class Timer;
 
@@ -23,7 +26,7 @@ class MythUIButtonListItem;
  *
  * \brief Screen for viewing and managing upcoming and conflicted recordings
  */
-class ViewScheduled : public MythScreenType
+class ViewScheduled : public ScheduleCommon
 {
     Q_OBJECT
   public:

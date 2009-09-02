@@ -35,7 +35,7 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 }
 
 ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
-             : MythScreenType(parent, "ViewScheduled")
+             : ScheduleCommon(parent, "ViewScheduled")
 {
     m_shortdateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     m_dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -497,9 +497,7 @@ void ViewScheduled::edit()
     if (!pginfo)
         return;
 
-    RecordingInfo ri(*pginfo);
-    ri.EditScheduled();
-    *pginfo = ri;
+    EditScheduled(pginfo);
 }
 
 void ViewScheduled::customEdit()
@@ -586,10 +584,7 @@ void ViewScheduled::details()
 
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
     if (pginfo)
-    {
-        const RecordingInfo ri(*pginfo);
-        ri.showDetails();
-    }
+        ShowDetails(pginfo);
 
     EmbedTVWindow();
 }
@@ -603,11 +598,7 @@ void ViewScheduled::selected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    RecordingInfo ri(*pginfo);
-    ri.EditRecording();
-    *pginfo = ri;
-
-    EmbedTVWindow();
+    EditRecording(pginfo);
 }
 
 void ViewScheduled::setShowAll(bool all)
@@ -738,5 +729,7 @@ void ViewScheduled::customEvent(QEvent *event)
             if (m_needFill)
                 LoadList();
         }
+        else
+            ScheduleCommon::customEvent(event);
     }
 }

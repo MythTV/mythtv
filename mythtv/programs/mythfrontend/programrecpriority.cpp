@@ -363,7 +363,7 @@ class programAvgDelaySort
 
 ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
                                        const QString &name)
-                   : MythScreenType(parent, name)
+                   : ScheduleCommon(parent, name)
 {
     m_sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
@@ -766,6 +766,8 @@ void ProgramRecPriority::customEvent(QEvent *event)
                 SortList();
             }
         }
+        else
+            ScheduleCommon::customEvent(event);
     }
 }
 
@@ -1025,7 +1027,7 @@ void ProgramRecPriority::details(void)
     ProgramRecPriorityInfo *pgRecInfo = qVariantValue<ProgramRecPriorityInfo *>
                                                             (item->GetData());
 
-    pgRecInfo->showDetails();
+    ShowDetails(pgRecInfo);
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch)
