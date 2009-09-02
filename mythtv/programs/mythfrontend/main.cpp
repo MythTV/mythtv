@@ -920,9 +920,6 @@ void InitJumpPoints(void)
 
     REG_JUMPEX("ScreenShot","","",getScreenShot,false);
 
-    REG_KEY("qt", "DELETE", "Delete", "D");
-    REG_KEY("qt", "EDIT", "Edit", "E");
-
     TV::InitKeys();
 
     TV::SetFuncPtr("playbackbox", (void *)PlaybackBox::RunPlaybackBox);

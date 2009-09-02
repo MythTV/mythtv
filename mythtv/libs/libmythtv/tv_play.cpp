@@ -420,7 +420,6 @@ void TV::InitKeys(void)
 {
     REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
     REG_KEY("TV Frontend", "PAGEDOWN", "Page Down", "9");
-    REG_KEY("TV Frontend", "DELETE", "Delete Program", "D");
     REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
     REG_KEY("TV Frontend", "TOGGLERECORD", "Toggle recording status of current "
             "program", "R");
@@ -459,7 +458,6 @@ void TV::InitKeys(void)
 
     REG_KEY("TV Playback", "CLEAROSD", "Clear OSD", "Backspace");
     REG_KEY("TV Playback", "PAUSE", "Pause", "P");
-    REG_KEY("TV Playback", "DELETE", "Delete Program", "D");
     REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
     REG_KEY("TV Playback", "SEEKRWND", "Rewind", "Left");
     REG_KEY("TV Playback", "ARBSEEK", "Arbitrary Seek", "*");
@@ -554,7 +552,6 @@ void TV::InitKeys(void)
             "Recording picture adjustments for this channel",  "Ctrl+G");
     REG_KEY("TV Playback", "TOGGLERECCONTROLS",
             "Recording picture adjustments for this recorder", "G");
-    REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
     REG_KEY("TV Playback", "CYCLECOMMSKIPMODE", "Cycle Commercial Skip mode", "");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
     REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "#");
@@ -588,7 +585,6 @@ void TV::InitKeys(void)
             ",,<");
     REG_KEY("TV Editing", "BIGJUMPFWD", "Jump forward 10x the normal amount",
             ">,.");
-    REG_KEY("TV Editing", "TOGGLEEDIT", "Exit out of Edit Mode", "E");
 
     /* Teletext keys */
     REG_KEY("Teletext Menu", "NEXTPAGE",    "Next Page",             "Down");
@@ -4368,7 +4364,7 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         else
             handled = false;
     }
-    else if (has_action("TOGGLEEDIT", actions))
+    else if (has_action("EDIT", actions))
     {
         if (islivetv)
             StartChannelEditMode(ctx);
@@ -9815,7 +9811,7 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
             if (!switchToInputTimerId)
                 switchToInputTimerId = StartTimer(1, __LINE__);
         }
-        else if (action == "TOGGLEEDIT")
+        else if (action == "EDIT")
             StartChannelEditMode(actx);
         else
         {
@@ -9840,7 +9836,7 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
                 actx->nvp->GoToDVDMenu(menu);
             actx->UnlockDeleteNVP(__FILE__, __LINE__);
         }
-        else if (action == "TOGGLEEDIT")
+        else if (action == "EDIT")
             StartProgramEditMode(actx);
         else if (action == "TOGGLEAUTOEXPIRE")
             ToggleAutoExpire(actx);
@@ -9952,9 +9948,9 @@ void TV::FillOSDTreeMenu(
     else if (category == "INPUTSWITCHING")
         FillMenuInputSwitching(ctx, treeMenu);
     else if (category == "EDITCHANNEL")
-        new OSDGenericTree(treeMenu, tr("Edit Channel"), "TOGGLEEDIT");
+        new OSDGenericTree(treeMenu, tr("Edit Channel"), "EDIT");
     else if (category == "EDITRECORDING")
-        new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+        new OSDGenericTree(treeMenu, tr("Edit Recording"), "EDIT");
     else if (category == "JUMPREC")
     {
         OSDGenericTree *jtp_item =

@@ -542,9 +542,6 @@ int main(int argc, char *argv[])
         startPrompt = new StartPrompter();
     startPrompt->handleStart();
 
-    REG_KEY("qt", "DELETE", "Delete", "D");
-    REG_KEY("qt", "EDIT", "Edit", "E");
-
     {
         // Let the user select buttons, type values, scan for channels, etc.
         SetupMenu(mainWindow);

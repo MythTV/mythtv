@@ -5269,7 +5269,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
             UpdateTimeDisplay();
         }
         else if (action == "ESCAPE" || action == "MENU" ||
-                 action == "TOGGLEEDIT")
+                 action == "EDIT")
         {
             DisableEdit();
             retval = false;
