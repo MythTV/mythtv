@@ -833,8 +833,9 @@
 
     <window name="file_associations">
         <textarea name="title" from="basetextarea">
-            <area>10,10,760,50</area>
+            <area>10,10,780,50</area>
             <value>MythVideo File Associations</value>
+            <font>baselarge</font>
             <align>hcenter,vcenter</align>
         </textarea>
 
@@ -860,7 +861,7 @@
         </textarea>
 
         <buttonlist name="extension_select" from="baseselector">
-            <position>300,195</position>
+            <position>300,200</position>
         </buttonlist>
 
         <textedit name="command" from="basetextedit">
@@ -868,23 +869,23 @@
         </textedit>
 
         <checkbox name="default_check" from="basecheckbox">
-            <position>300,315</position>
+            <position>300,322</position>
         </checkbox>
 
         <checkbox name="ignore_check" from="basecheckbox">
-            <position>300,375</position>
+            <position>300,382</position>
         </checkbox>
 
         <button name="done_button" from="basebutton">
-            <position>700,550</position>
+            <position>600,520</position>
         </button>
 
         <button name="new_button" from="basebutton">
-            <position>600,550</position>
+            <position>430,520</position>
         </button>
 
         <button name="delete_button" from="basebutton">
-            <position>0,550</position>
+            <position>50,520</position>
         </button>
     </window>
 

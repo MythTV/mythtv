@@ -818,58 +818,59 @@
 
     <window name="file_associations">
         <textarea name="title" from="basetextarea">
-            <area>10,10,760,50</area>
+            <area>10,10,1260,50</area>
             <value>MythVideo File Associations</value>
+            <font>baselarge</font>
             <align>hcenter,vcenter</align>
         </textarea>
 
         <textarea name="extension_text" from="basetextarea">
-            <area>90,200,200,40</area>
+            <area>340,200,200,40</area>
             <value>Extension:</value>
             <align>right,vcenter</align>
         </textarea>
 
         <textarea name="command_text" from="extension_text">
-            <position>90,260</position>
+            <position>340,260</position>
             <value>Command:</value>
         </textarea>
 
         <textarea name="default_text" from="extension_text">
-            <position>90,320</position>
+            <position>340,320</position>
             <value>Use default player:</value>
         </textarea>
 
         <textarea name="ignore_text" from="extension_text">
-            <position>90,380</position>
+            <position>340,380</position>
             <value>Ignore:</value>
         </textarea>
 
         <buttonlist name="extension_select" from="baseselector">
-            <position>300,195</position>
+            <position>550,200</position>
         </buttonlist>
 
         <textedit name="command" from="basetextedit">
-            <position>300,255</position>
+            <position>550,255</position>
         </textedit>
 
         <checkbox name="default_check" from="basecheckbox">
-            <position>300,315</position>
+            <position>550,322</position>
         </checkbox>
 
         <checkbox name="ignore_check" from="basecheckbox">
-            <position>300,375</position>
+            <position>550,382</position>
         </checkbox>
 
         <button name="done_button" from="basebutton">
-            <position>700,550</position>
+            <position>850,600</position>
         </button>
 
         <button name="new_button" from="basebutton">
-            <position>600,550</position>
+            <position>680,600</position>
         </button>
 
         <button name="delete_button" from="basebutton">
-            <position>0,550</position>
+            <position>300,600</position>
         </button>
     </window>
 
