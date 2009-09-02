@@ -3333,6 +3333,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
         if (action == "INFO")
         {
+            if (!m_menuPopup)
                 DisplayMenu();
         }
         else if (action == "INCPARENT")
