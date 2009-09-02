@@ -1534,10 +1534,12 @@ void HDHomeRunDeviceID::Load(void)
 
 HDHomeRunDeviceIDList::HDHomeRunDeviceIDList(
     HDHomeRunDeviceID   *deviceid,
+    TransLabelSetting   *desc,
     HDHomeRunIP         *cardip,
     HDHomeRunTunerIndex *cardtuner,
     HDHomeRunDeviceList *devicelist) :
     _deviceid(deviceid),
+    _desc(desc),
     _cardip(cardip),
     _cardtuner(cardtuner),
     _devicelist(devicelist)
@@ -1650,6 +1652,7 @@ void HDHomeRunDeviceIDList::UpdateDevices(const QString &v)
         // Update _cardip and cardtuner
         _cardip->setValue((*_devicelist)[v].cardip);
         _cardtuner->setValue(QString("%1").arg((*_devicelist)[v].cardtuner));
+        _desc->setValue((*_devicelist)[v].desc);
     }
     _oldValue = v;
 };
@@ -1722,13 +1725,16 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
     FillDeviceList();
 
     deviceid     = new HDHomeRunDeviceID(parent);
+    desc         = new TransLabelSetting();
+    desc->setLabel(tr("Description"));
     cardip       = new HDHomeRunIP();
     cardtuner    = new HDHomeRunTunerIndex();
     deviceidlist = new HDHomeRunDeviceIDList(
-        deviceid, cardip, cardtuner, &devicelist);
+        deviceid, desc, cardip, cardtuner, &devicelist);
 
     addChild(deviceidlist);
     addChild(deviceid);
+    addChild(desc);
     addChild(cardip);
     addChild(cardtuner);
 
@@ -1766,6 +1772,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
 
         HDHomeRunDevice tmpdevice;
         tmpdevice.deviceid   = devid;
+        tmpdevice.desc       = CardUtil::GetHDHRdesc(devid);
         tmpdevice.cardip     = devip;
         tmpdevice.inuse      = false;
         tmpdevice.discovered = true;
@@ -1854,7 +1861,10 @@ bool HDHomeRunConfigurationGroup::ProbeCard(HDHomeRunDevice &tmpdevice)
         if (device_id == 0)
             tmpdevice.deviceid = "NOTFOUND";
         else
+        {
             tmpdevice.deviceid = QString("%1").arg(device_id, 8, 16);
+            tmpdevice.desc     = CardUtil::GetHDHRdesc(tmpdevice.deviceid);
+        }
 
         tmpdevice.deviceid = tmpdevice.deviceid.toUpper();
 

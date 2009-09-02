@@ -447,6 +447,7 @@ class HDHomeRunDevice
   public:
     QString mythdeviceid;
     QString deviceid;
+    QString desc;
     QString cardip;
     QString cardtuner;
     bool    inuse;
@@ -858,7 +859,8 @@ class HDHomeRunDeviceIDList : public TransComboBoxSetting
 
   public:
     HDHomeRunDeviceIDList(HDHomeRunDeviceID *deviceid,
-                          HDHomeRunIP *cardip,
+                          TransLabelSetting *desc,
+                          HDHomeRunIP       *cardip,
                           HDHomeRunTunerIndex *cardtuner,
                           HDHomeRunDeviceList *devicelist);
 
@@ -871,6 +873,7 @@ class HDHomeRunDeviceIDList : public TransComboBoxSetting
 
   private:
     HDHomeRunDeviceID   *_deviceid;
+    TransLabelSetting   *_desc;
     HDHomeRunIP         *_cardip;
     HDHomeRunTunerIndex *_cardtuner;
     HDHomeRunDeviceList *_devicelist;
