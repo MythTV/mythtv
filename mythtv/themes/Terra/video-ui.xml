@@ -1227,54 +1227,54 @@
             <filename>video/info_background.png</filename>
         </imagetype>
 
-            <imagetype name="coverimage">
-                <area>759,79,260,391</area>
-                <mask>video/info_poster_mask.png</mask>
-                <preserveaspect>true</preserveaspect>
-            </imagetype>
+        <imagetype name="coverimage">
+            <area>759,79,260,391</area>
+            <mask>video/info_poster_mask.png</mask>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
 
-            <textarea name="title" from="basetextarea">
-                <area>270,85,455,35</area>
-                <font>baselarge</font>
-            </textarea>
+        <textarea name="title" from="basetextarea">
+            <area>270,85,455,35</area>
+            <font>baselarge</font>
+        </textarea>
 
-            <textarea name="plot" from="basetextarea">
-                <area>270,165,455,220</area>
-                <multiline>yes</multiline>
-            </textarea>
+        <textarea name="plot" from="basetextarea">
+            <area>270,165,455,220</area>
+            <multiline>yes</multiline>
+        </textarea>
 
-            <textarea name="cast" from="basetextarea">
-                <area>270,385,455,50</area>
-                <multiline>yes</multiline>
-            </textarea>
+        <textarea name="cast" from="basetextarea">
+            <area>270,385,455,50</area>
+            <multiline>yes</multiline>
+        </textarea>
 
-            <textarea name="dirlbl" from="basetextarea">
-                <area>270,135,120,35</area>
-                <value>Directed by:</value>
-                <align>left</align>
-            </textarea>
+        <textarea name="dirlbl" from="basetextarea">
+            <area>270,135,120,35</area>
+            <value>Directed by:</value>
+            <align>left</align>
+        </textarea>
 
-            <textarea name="director" from="basetextarea">
-                <area>405,135,250,35</area>
-            </textarea>
+        <textarea name="director" from="basetextarea">
+            <area>405,135,250,35</area>
+        </textarea>
 
-            <textarea name="year" from="basetextarea">
-                <area>270,445,80,35</area>
-            </textarea>
+        <textarea name="year" from="basetextarea">
+            <area>270,445,80,35</area>
+        </textarea>
 
-            <textarea name="length" from="basetextarea">
-                <area>447,445,278,35</area>
-                <align>right</align>
-            </textarea>
+        <textarea name="length" from="basetextarea">
+            <area>447,445,278,35</area>
+            <align>right</align>
+        </textarea>
 
-            <button name="done_button" from="basebutton">
-                <position>363,495</position>
-                <value>Done</value>
-            </button>
+        <button name="done_button" from="basebutton">
+            <position>363,495</position>
+            <value>Done</value>
+        </button>
 
-            <button name="play_button" from="basebutton">
-                <position>693,495</position>
-                <value>Play</value>
+        <button name="play_button" from="basebutton">
+            <position>693,495</position>
+            <value>Play</value>
         </button>
 
     </window>
