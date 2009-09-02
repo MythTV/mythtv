@@ -3333,8 +3333,10 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
         if (action == "INFO")
         {
-            if (!m_menuPopup)
-                DisplayMenu();
+            MythUIButtonListItem *item = GetItemCurrent();
+            MythGenericTree *node = GetNodePtrFromButton(item);
+            if (!m_menuPopup && node->getInt() != kUpFolder)
+                VideoMenu();
         }
         else if (action == "INCPARENT")
             shiftParental(1);
@@ -3347,10 +3349,8 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
             ChangeFilter();
         else if (action == "MENU")
         {
-            MythUIButtonListItem *item = GetItemCurrent();
-            MythGenericTree *node = GetNodePtrFromButton(item);
-            if (!m_menuPopup && node->getInt() != kUpFolder)
-                VideoMenu();
+            if (!m_menuPopup)
+                DisplayMenu();
         }
         else if (action == "PLAYALT")
         {
@@ -3606,7 +3606,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 }
 
 /** \fn VideoDialog::VideoMenu()
- *  \brief Pop up a MythUI "Main Menu" for MythVideo.  Bound to MENU.
+ *  \brief Pop up a MythUI "Playback Menu" for MythVideo.  Bound to INFO.
  *  \return void.
  */
 void VideoDialog::VideoMenu()
@@ -3615,7 +3615,13 @@ void VideoDialog::VideoMenu()
     QString label;
 
     if (metadata)
-        label = tr("Video Options\n%1").arg(metadata->GetTitle());
+    {
+        if (!metadata->GetSubtitle().isEmpty())
+            label = tr("Video Options\n%1\n%2").arg(metadata->GetTitle())
+                                           .arg(metadata->GetSubtitle());
+        else
+            label = tr("Video Options\n%1").arg(metadata->GetTitle());
+    }
     else
         label = tr("Video Options");
 
@@ -3694,7 +3700,7 @@ void VideoDialog::PlayMenu()
 }
 
 /** \fn VideoDialog::DisplayMenu()
- *  \brief Pop up a MythUI Menu for MythVideo Global Functions.  Bound to INFO.
+ *  \brief Pop up a MythUI Menu for MythVideo Global Functions.  Bound to MENU.
  *  \return void.
  */
 void VideoDialog::DisplayMenu()
