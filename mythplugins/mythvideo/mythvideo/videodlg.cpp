@@ -5374,7 +5374,8 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
             metadata->SetYear(data["Year"].toInt());
         if (metadata->GetDirector() == VIDEO_DIRECTOR_UNKNOWN)
             metadata->SetDirector(data["Director"]);
-        if (metadata->GetPlot() == VIDEO_PLOT_DEFAULT)
+        if (metadata->GetPlot() == VIDEO_PLOT_DEFAULT ||
+            metadata->GetPlot() == "None")
             metadata->SetPlot(data["Plot"]);
         if (metadata->GetUserRating() == 0)
             metadata->SetUserRating(data["UserRating"].toFloat());
