@@ -2069,29 +2069,12 @@ QString CardUtil::GetHDHRdesc(const QString &device)
         return connectErr;
 
 
-    QString   description = QObject::tr("Model: %1").arg(model);
+    QString   description = model;
     char     *sVersion;
     uint32_t  iVersion;
 
     if (hdhomerun_device_get_version(hdhr, &sVersion, &iVersion))
-        description += QObject::tr(", Firmware: %2").arg(sVersion);
-
-    // If device is an IP address, add deviceID:
-    if (deviceIsIP)
-    {
-        dev = hdhomerun_device_get_device_id(hdhr);
-
-        QString hex = QString::number(dev, 16).toUpper();
-
-        description += QObject::tr(", ID %1").arg(hex);
-    }
-    else
-    {
-        dev = hdhomerun_device_get_device_ip(hdhr);
-        description += QObject::tr(", at address %1.%2.%3.%4")
-                       .arg((dev>>24) & 0xFF).arg((dev>>16) & 0xFF)
-                       .arg((dev>> 8) & 0xFF).arg((dev>> 0) & 0xFF);
-    }
+        description += QObject::tr(", firmware: %2").arg(sVersion);
 
     return description;
 #endif
