@@ -30,35 +30,35 @@
 #ifndef _CHANNEL_SCANNER_GUI_H_
 #define _CHANNEL_SCANNER_GUI_H_
 
-// POSIX headers
-#include <pthread.h>
-
 // Qt headers
-#include <qstring.h>
+#include <QStringList>
 
 // MythTV headers
 #include "settings.h"
 #include "channelscanner.h"
-//#include "channelimporter_helpers.h"
 
 class ScanWizard;
 class LogList;
-class ScanProgressPopup;
+class ChannelScannerGUIScanPane;
+class DeleteStage;
+class InsertStage;
 
 class Channel;
 class DVBChannel;
 class SignalMonitorValue;
 
 class ChannelScannerGUI :
-    public VerticalConfigurationGroup,
+    public StackedConfigurationGroup,
     public ChannelScanner
 {
+    Q_OBJECT
+
     friend void *spawn_popup(void*);
 
   public:
     ChannelScannerGUI(void);
     virtual void deleteLater(void)
-        { Teardown(); VerticalConfigurationGroup::deleteLater(); }
+        { Teardown(); StackedConfigurationGroup::deleteLater(); }
 
     virtual void HandleEvent(const ScannerEvent *scanEvent);
 
@@ -71,18 +71,17 @@ class ChannelScannerGUI :
 
     virtual void MonitorProgress(bool lock, bool strength,
                                  bool snr, bool rotor);
-    void RunPopup(void);
-    void StopPopup(void);
 
   public:
     static QString kTitle;
 
-  private:
-    LogList            *log;
+  protected slots:
+    void quitScanning(void);
 
-    ScanProgressPopup  *popupProgress;
-    pthread_t           popup_thread;
-    mutable QMutex      popupLock;
+  private:
+    ChannelScannerGUIScanPane *scanStage;
+    LogList                   *doneStage;
+    QStringList                messageList;
 };
 
 #endif // _CHANNEL_SCANNER_GUI_H_

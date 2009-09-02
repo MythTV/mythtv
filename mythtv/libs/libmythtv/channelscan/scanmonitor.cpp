@@ -56,11 +56,11 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
 }
 
 void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
-                ScanProgressPopup *spp)
+                Configurable *spp)
 {
     ScannerEvent *e = new ScannerEvent(type);
     e->intValue(val);
-    e->ScanProgressPopupValue(spp);
+    e->ConfigurableValue(spp);
     QApplication::postEvent(dest, e);
 }
 

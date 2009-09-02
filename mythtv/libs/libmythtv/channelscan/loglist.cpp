@@ -9,7 +9,7 @@ LogList::LogList() : ListBoxSetting(this), idx(0)
     setSelectionMode(MythListBox::NoSelection);
 }
 
-void LogList::updateText(const QString &text)
+void LogList::AppendLine(const QString &text)
 {
     addSelection(text, QString::number(idx));
     setCurrentItem(idx);

@@ -12,7 +12,7 @@ class LogList : public ListBoxSetting, public TransientStorage
   public:
     LogList();
 
-    void updateText(const QString &text);
+    void AppendLine(const QString &text);
 
   private:
     uint idx;

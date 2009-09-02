@@ -79,7 +79,7 @@ class ScanMonitor :
     ChannelScanner *channelScanner;
 };
 
-class ScanProgressPopup;
+class Configurable;
 
 class ScannerEvent : public QEvent
 {
@@ -102,7 +102,7 @@ class ScannerEvent : public QEvent
 
     ScannerEvent(TYPE t) :
         QEvent((QEvent::Type)(t + QEvent::User)),
-        str(""), intvalue(0), spp_ptr(NULL) { ; }
+        str(""), intvalue(0), cfg_ptr(NULL) { ; }
 
     QString strValue()              const { return str; }
     void    strValue(const QString& _str) { str = _str; }
@@ -110,9 +110,9 @@ class ScannerEvent : public QEvent
     int     intValue()        const { return intvalue; }
     void    intValue(int _intvalue) { intvalue = _intvalue; }
 
-    ScanProgressPopup *ScanProgressPopupValue() const { return spp_ptr; }
-    void    ScanProgressPopupValue(ScanProgressPopup *_spp_ptr)
-        { spp_ptr = _spp_ptr; }
+    Configurable *ConfigurableValue() const { return cfg_ptr; }
+    void    ConfigurableValue(Configurable *_cfg_ptr)
+        { cfg_ptr = _cfg_ptr; }
 
     TYPE    eventType()       const { return (TYPE)(type()-QEvent::User); }
 
@@ -122,12 +122,12 @@ class ScannerEvent : public QEvent
   private:
     QString str;
     int     intvalue;
-    ScanProgressPopup *spp_ptr;
+    Configurable *cfg_ptr;
 };
 
 void post_event(QObject *dest, ScannerEvent::TYPE type, int val);
 void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val);
 void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
-                ScanProgressPopup *spp);
+                Configurable *cfg);
 
 #endif // _SCAN_MONITOR_H_

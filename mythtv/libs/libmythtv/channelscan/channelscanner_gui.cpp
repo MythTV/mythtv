@@ -38,10 +38,10 @@ using namespace std;
 #include "mythcontext.h"
 #include "scanwizard.h"
 #include "channelscanner_gui.h"
+#include "channelscanner_gui_scan_pane.h"
 #include "channelimporter.h"
 #include "loglist.h"
 #include "channelscan_sm.h"
-#include "scanprogresspopup.h"
 
 #include "channelbase.h"
 #include "dtvsignalmonitor.h"
@@ -67,21 +67,24 @@ static void init_statics(void)
 }
 
 ChannelScannerGUI::ChannelScannerGUI(void)
-    : VerticalConfigurationGroup(false, true, false, false),
-      log(new LogList()), popupProgress(NULL)
+    : StackedConfigurationGroup(false, true, false, false),
+      scanStage(NULL), doneStage(new LogList())
 {
     init_statics();
 
     setLabel(kTitle);
-    addChild(log);
+
+    addChild(doneStage);
 }
 
 ChannelScannerGUI::~ChannelScannerGUI()
 {
     Teardown();
-
-    QMutexLocker locker(&popupLock);
-    StopPopup();
+    if (scanMonitor)
+    {
+        post_event(scanMonitor, ScannerEvent::ScanShutdown,
+                   MythDialog::Rejected);
+    }
 }
 
 void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
@@ -90,22 +93,18 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
     {
         case ScannerEvent::ScanComplete:
         {
-            QMutexLocker locker(&popupLock);
-            if (popupProgress)
-            {
-                popupProgress->SetScanProgress(1.0);
-                popupProgress->accept();
-            }
+            if (scanStage)
+                scanStage->SetScanProgress(1.0);
+            raise(doneStage);
         }
         break;
 
         case ScannerEvent::ScanShutdown:
         {
-            if (scanEvent->ScanProgressPopupValue())
+            if (scanEvent->ConfigurableValue())
             {
-                ScanProgressPopup *spp = scanEvent->ScanProgressPopupValue();
-                spp->DeleteDialog();
-                spp->deleteLater();
+                setLabel(scanEvent->ConfigurableValue()->getLabel());
+                raise(scanEvent->ConfigurableValue());
             }
 
             ScanDTVTransportList transports;
@@ -125,7 +124,10 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 
         case ScannerEvent::AppendTextToLog:
         {
-            log->updateText(scanEvent->strValue());
+            if (scanStage)
+                scanStage->AppendLine(scanEvent->strValue());
+            doneStage->AppendLine(scanEvent->strValue());
+            messageList += scanEvent->strValue();
         }
         break;
 
@@ -133,32 +135,31 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             break;
     }
 
-    QMutexLocker locker(&popupLock);
-    if (!popupProgress)
+    if (!scanStage)
         return;
 
     switch (scanEvent->eventType())
     {
         case ScannerEvent::SetStatusText:
-            popupProgress->SetStatusText(scanEvent->strValue());
+            scanStage->SetStatusText(scanEvent->strValue());
             break;
         case ScannerEvent::SetStatusTitleText:
-            popupProgress->SetStatusTitleText(scanEvent->strValue());
+            scanStage->SetStatusTitleText(scanEvent->strValue());
             break;
         case ScannerEvent::SetPercentComplete:
-            popupProgress->SetScanProgress(scanEvent->intValue() * 0.01);
+            scanStage->SetScanProgress(scanEvent->intValue() * 0.01);
             break;
         case ScannerEvent::SetStatusRotorPosition:
-            popupProgress->SetStatusRotorPosition(scanEvent->intValue());
+            scanStage->SetStatusRotorPosition(scanEvent->intValue());
             break;
         case ScannerEvent::SetStatusSignalLock:
-            popupProgress->SetStatusLock(scanEvent->intValue());
+            scanStage->SetStatusLock(scanEvent->intValue());
             break;
         case ScannerEvent::SetStatusSignalToNoise:
-            popupProgress->SetStatusSignalToNoise(scanEvent->intValue());
+            scanStage->SetStatusSignalToNoise(scanEvent->intValue());
             break;
         case ScannerEvent::SetStatusSignalStrength:
-            popupProgress->SetStatusSignalStrength(scanEvent->intValue());
+            scanStage->SetStatusSignalStrength(scanEvent->intValue());
             break;
         default:
             break;
@@ -178,43 +179,23 @@ void ChannelScannerGUI::InformUser(const QString &error)
                               tr("ScanWizard"), error);
 }
 
-void *spawn_popup(void *tmp)
+void ChannelScannerGUI::quitScanning(void)
 {
-    ((ChannelScannerGUI*)(tmp))->RunPopup();
-    return NULL;
-}
-
-void ChannelScannerGUI::RunPopup(void)
-{
-    DialogCode ret = popupProgress->exec();
-
-    post_event(scanMonitor, ScannerEvent::ScanShutdown, ret, popupProgress);
-    popupProgress = NULL;
-}
-
-void ChannelScannerGUI::StopPopup(void)
-{
-    if (popupProgress)
+    if (scanMonitor)
     {
-        popupProgress->reject();
-        popupLock.unlock();
-        pthread_join(popup_thread, NULL);
-        popupLock.lock();
+        post_event(scanMonitor, ScannerEvent::ScanShutdown,
+                   MythDialog::Rejected, doneStage);
     }
 }
 
 void ChannelScannerGUI::MonitorProgress(bool lock, bool strength,
                                         bool snr,  bool rotor)
 {
-    QMutexLocker locker(&popupLock);
-    StopPopup();
-    popupProgress = new ScanProgressPopup(lock, strength, snr, rotor);
-    popupProgress->CreateDialog();
-    if (pthread_create(&popup_thread, NULL, spawn_popup, this) != 0)
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to start MonitorProgress thread");
-        popupProgress->DeleteDialog();
-        popupProgress->deleteLater();
-        popupProgress = NULL;
-    }
+    scanStage = new ChannelScannerGUIScanPane(
+        lock, strength, snr, rotor, this,SLOT(quitScanning(void)));
+    for (uint i = 0; i < (uint) messageList.size(); i++)
+        scanStage->AppendLine(messageList[i]);
+
+    addChild(scanStage);
+    raise(scanStage);
 }

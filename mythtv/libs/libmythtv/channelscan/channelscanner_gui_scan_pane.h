@@ -27,34 +27,30 @@
  *
  */
 
-#ifndef _SCAN_PROGRESS_POPUP_H_
-#define _SCAN_PROGRESS_POPUP_H_
-
-// Qt headesr
-#include <qwaitcondition.h>
+#ifndef _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
+#define _CHANNEL_SCANNER_GUI_SCAN_PANE_H_
 
 // MythTV headers
 #include "settings.h"
 
-class ScanSignalMeter: public ProgressSetting, public TransientStorage
+class LogList;
+
+class TransProgressSetting: public ProgressSetting, public TransientStorage
 {
   public:
-    ScanSignalMeter(int steps): ProgressSetting(this, steps) {};
+    TransProgressSetting(int steps = 65535): ProgressSetting(this, steps) {};
 };
 
-class ScanProgressPopup : public ConfigurationPopupDialog
+class ChannelScannerGUIScanPane : public VerticalConfigurationGroup
 {
     Q_OBJECT
 
     friend class QObject; // quiet OSX gcc warning
 
   public:
-    ScanProgressPopup(bool lock, bool strength, bool snr, bool rotorpos);
-    virtual void deleteLater(void);
-
-    void CreateDialog(void);
-    virtual DialogCode exec(void);
-    void DeleteDialog(void);
+    ChannelScannerGUIScanPane(
+        bool lock, bool strength, bool snr, bool rotorpos,
+        QObject *target, const char *slot);
 
     void SetStatusRotorPosition(int value);
     void SetStatusSignalToNoise(int value);
@@ -66,22 +62,18 @@ class ScanProgressPopup : public ConfigurationPopupDialog
     void SetStatusText(const QString &value);
     void SetStatusTitleText(const QString &value);
 
-  private slots:
-    void Done(void);
+    void AppendLine(const QString &text);
+
+    LogList              *log;
 
   private:
-    ~ScanProgressPopup();
-
-    bool               done;
-    QWaitCondition     wait;
-
-    ScanSignalMeter   *ss;
-    ScanSignalMeter   *sn;
-    ScanSignalMeter   *pos;
-    ScanSignalMeter   *progressBar;
+    TransProgressSetting *ss;
+    TransProgressSetting *sn;
+    TransProgressSetting *pos;
+    TransProgressSetting *progressBar;
 
     TransLabelSetting *sl;
     TransLabelSetting *sta;
 };
 
-#endif // _SCAN_PROGRESS_POPUP_H_
+#endif // _CHANNEL_SCANNER_GUI_SCAN_PANE_H_

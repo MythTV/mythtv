@@ -395,6 +395,7 @@ using_backend {
     HEADERS += channelscan/channelscan_sm.h
     HEADERS += channelscan/channelscanner.h
     HEADERS += channelscan/channelscanner_gui.h
+    HEADERS += channelscan/channelscanner_gui_scan_pane.h
     HEADERS += channelscan/channelscanner_cli.h
     HEADERS += channelscan/frequencytablesetting.h
     HEADERS += channelscan/inputselectorsetting.h
@@ -411,12 +412,12 @@ using_backend {
     HEADERS += channelscan/panedvbutilsimport.h
     HEADERS += channelscan/panesingle.h
     HEADERS += channelscan/scanmonitor.h
-    HEADERS += channelscan/scanprogresspopup.h
     HEADERS += channelscan/scanwizardconfig.h
 
     SOURCES += channelscan/channelscan_sm.cpp
     SOURCES += channelscan/channelscanner.cpp
     SOURCES += channelscan/channelscanner_gui.cpp
+    SOURCES += channelscan/channelscanner_gui_scan_pane.cpp
     SOURCES += channelscan/channelscanner_cli.cpp
     SOURCES += channelscan/frequencytablesetting.cpp
     SOURCES += channelscan/inputselectorsetting.cpp
@@ -424,7 +425,6 @@ using_backend {
     SOURCES += channelscan/multiplexsetting.cpp
     SOURCES += channelscan/paneanalog.cpp
     SOURCES += channelscan/scanmonitor.cpp
-    SOURCES += channelscan/scanprogresspopup.cpp
     SOURCES += channelscan/scanwizardconfig.cpp
 
     # EIT stuff
