@@ -425,6 +425,9 @@ bool VideoOutput::IsPreferredRenderer(QSize video_size)
     VideoDisplayProfile vdisp;
     vdisp.SetInput(video_size);
     QString new_rend = vdisp.GetVideoRenderer();
+    if (new_rend.isEmpty())
+        return true;
+
     return db_vdisp_profile->CheckVideoRendererGroup(new_rend);
 }
 
