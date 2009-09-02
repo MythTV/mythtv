@@ -1224,88 +1224,56 @@
 
         <imagetype name="backimg">
             <position>236,58</position>
-            <filename>video/filters_background.png</filename>
+            <filename>video/info_background.png</filename>
         </imagetype>
 
-        <textarea name="title" from="basetextarea">
-            <area>251,110,774,40</area>
-            <value>Video List Filters</value>
-            <align>hcenter,vcenter</align>
-            <font>basemedium</font>
-        </textarea>
-
             <imagetype name="coverimage">
-                <area>25,100,227,350</area>
-                <filename>mv_browse_nocover_large.png</filename>
+                <area>759,79,260,391</area>
+                <mask>video/info_poster_mask.png</mask>
                 <preserveaspect>true</preserveaspect>
             </imagetype>
 
             <textarea name="title" from="basetextarea">
-                <area>25,25,682,70</area>
-                <multiline>yes</multiline>
+                <area>270,85,455,35</area>
                 <font>baselarge</font>
-                <align>center</align>
             </textarea>
 
             <textarea name="plot" from="basetextarea">
-                <area>284,100,423,140</area>
+                <area>270,165,455,220</area>
                 <multiline>yes</multiline>
             </textarea>
 
-            <textarea name="rating" from="basetextarea">
-                <area>284,245,423,90</area>
+            <textarea name="cast" from="basetextarea">
+                <area>270,385,455,50</area>
                 <multiline>yes</multiline>
             </textarea>
 
             <textarea name="dirlbl" from="basetextarea">
-                <area>284,340,140,35</area>
+                <area>270,135,120,35</area>
                 <value>Directed by:</value>
-                <align>right</align>
+                <align>left</align>
             </textarea>
 
             <textarea name="director" from="basetextarea">
-                <area>429,340,278,35</area>
-                <font>basemedium</font>
-            </textarea>
-
-            <textarea name="yrlbl" from="basetextarea">
-                <area>284,380,80,35</area>
-                <value>Year:</value>
-                <align>right</align>
+                <area>405,135,250,35</area>
             </textarea>
 
             <textarea name="year" from="basetextarea">
-                <area>369,380,80,35</area>
-            </textarea>
-
-            <textarea name="userratinglbl" from="basetextarea">
-                <area>454,380,150,35</area>
-                <align>right,top</align>
-                <value>User Rating:</value>
-            </textarea>
-
-            <textarea name="userrating" from="basetextarea">
-                <area>609,380,98,35</area>
-                <align>left,top</align>
-            </textarea>
-
-            <textarea name="lenlbl" from="basetextarea">
-                <area>284,420,140,35</area>
-                <value>Runtime:</value>
-                <align>right</align>
+                <area>270,445,80,35</area>
             </textarea>
 
             <textarea name="length" from="basetextarea">
-                <area>429,420,278,35</area>
+                <area>447,445,278,35</area>
+                <align>right</align>
             </textarea>
 
             <button name="done_button" from="basebutton">
-                <position>693,515</position>
+                <position>363,495</position>
                 <value>Done</value>
             </button>
 
             <button name="play_button" from="basebutton">
-                <position>363,515</position>
+                <position>693,495</position>
                 <value>Play</value>
         </button>
 

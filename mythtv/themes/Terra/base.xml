@@ -662,7 +662,7 @@
         </buttonlist>
     </window>
 
-    <!-- Fullscreen Dialogue Box -->
+    <!-- Large Dialogue Box -->
     <window name="MythDialogBox">
         <area>0,0,1280,720</area>
 
@@ -813,7 +813,8 @@
 
     <window name="videowindow">
         <shape name="background">
-            <area>0,0,1280,720</area>
+             <!-- Oversized because of pixel rounding bug -->
+            <area>0,0,1281,721</area>
             <type>box</type>
             <fill color="#000000" alpha="255" />
         </shape>
@@ -828,7 +829,7 @@
             <value>Playback starting ...</value>
             <align>allcenter</align>
         </textarea>
-
+        
     </window>
 
 </mythuitheme>
