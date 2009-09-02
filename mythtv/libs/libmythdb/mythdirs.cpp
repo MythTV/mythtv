@@ -59,6 +59,9 @@ void InitializeMythDirs(void)
     else
         confdir = QDir::homePath() + "/.mythtv";
 
+    VERBOSE(VB_IMPORTANT, QString("Using configuration directory = %1")
+                                 .arg(confdir));
+
     sharedir = installprefix + "/share/mythtv/";
     libdir = installprefix + '/' + QString(LIBDIRNAME) + "/mythtv/";
     themedir = sharedir + "themes/";
