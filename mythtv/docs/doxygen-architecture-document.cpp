@@ -973,9 +973,9 @@ Without an argument, this tool also exercises the "Live TV" recording chain.
 This can even be done on a machine without any tuner cards by creating a dummy
 MpegRecorder which loops through a sample MPEG file.
 
-On a machine that supports V4L, just add an IVTV type card,
+On a machine that supports V4L, just add an IVTV type card in mythtv-setup,
 with the device set to something like "file:/path/to/some/mpeg/file.mpg".
-You also need you to attach the card to a video source.
+You also need to attach the card to a video source.
 
 On non-V4L machines, you currently need to manually create entries
 in the capturecard and cardinput tables.
