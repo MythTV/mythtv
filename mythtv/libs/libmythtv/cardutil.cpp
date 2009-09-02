@@ -661,7 +661,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    quicktune       = :V8 "
                 "WHERE cardinputid = :INPUTID");
 
-            for (uint j = 0; j < 11; j++)
+            for (uint j = 0; j < 9; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
@@ -695,7 +695,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    quicktune       = :V8 ");
 
             query2.bindValue(":CARDID", dst_cardid);
-            for (uint j = 0; j < 11; j++)
+            for (uint j = 0; j < 9; j++)
             {
                 query2.bindValue(QString(":V%1").arg(j),
                                  query.value(j).toString());
