@@ -574,6 +574,9 @@ void ChannelImporter::CleanupDuplicates(ScanDTVTransportList &transports) const
 
 void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 {
+    bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
+    bool require_a  = m_service_requirements & kRequireAudio;
+        
     for (uint i = 0; i < transports.size(); i++)
     {
         ChannelInsertInfoList filtered;
@@ -583,11 +586,10 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
                 transports[i].channels[k].decryption_status != kEncDecrypted)
                 continue;
 
-            if (transports[i].channels[k].is_data_service)
+            if (require_a && transports[i].channels[k].is_data_service)
                 continue;
 
-            if (!m_add_radio_services &&
-                transports[i].channels[k].is_audio_service)
+            if (require_av && transports[i].channels[k].is_audio_service)
                 continue;
 
             // filter channels out only in channels.conf, i.e. not found

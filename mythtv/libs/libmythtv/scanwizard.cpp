@@ -127,25 +127,11 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::ExistingScanImport)
     {
         do_scan = false;
-        bool fta_only = false, radio_services = false;
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT freetoaironly, radioservices "
-                      "FROM cardinput "
-                      "WHERE sourceid = :SOURCEID AND "
-                      "      cardid   = :CARDID");
-        query.bindValue(":CARDID",   cardid);
-        query.bindValue(":SOURCEID", sourceid);
-
-        if (query.exec() && query.next())
-        {
-            fta_only       = query.value(0).toBool();
-            radio_services = query.value(1).toBool();
-        }
-
         uint scanid = configPane->GetScanID();
         ScanDTVTransportList transports = LoadScan(scanid);
-        ChannelImporter ci(true, true, true, false, fta_only, radio_services);
+        ChannelImporter ci(true, true, true, false,
+                           configPane->DoFreeToAirOnly(),
+                           configPane->GetServiceRequirements());
         ci.Process(transports);
     }
     else
@@ -187,14 +173,15 @@ void ScanWizard::SetPage(const QString &pageTitle)
         configPane->GetFrequencyTableRange(table_start, table_end);
 
         scannerPane->Scan(
-            configPane->GetScanType(),       configPane->GetCardID(),
-            configPane->GetInputName(),      configPane->GetSourceID(),
-            /*configPane->DoDeleteChannels(),configPane->DoRenameChannels(),*/
-            configPane->DoFollowNIT(),       configPane->DoTestDecryption(),
-            configPane->DoIgnoreSignalTimeout(), configPane->GetMultiplex(),
-            start_chan,
+            configPane->GetScanType(),            configPane->GetCardID(),
+            configPane->GetInputName(),           configPane->GetSourceID(),
+            configPane->DoIgnoreSignalTimeout(),  configPane->DoFollowNIT(),
+            configPane->DoTestDecryption(),       configPane->DoFreeToAirOnly(),
+            configPane->GetServiceRequirements(),
+            // stuff needed for particular scans
+            configPane->GetMultiplex(),         start_chan,
             configPane->GetFrequencyStandard(), configPane->GetModulation(),
-            configPane->GetFrequencyTable()/*,configPane->GetATSCFormat()*/,
+            configPane->GetFrequencyTable(),
             table_start, table_end);
     }
 }

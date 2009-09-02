@@ -614,8 +614,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
     {
         query.prepare(
             "SELECT sourceid,        inputname,       externalcommand, "
-            "       tunechan,        startchan,       "
-            "       freetoaironly,   displayname,     radioservices,   "
+            "       tunechan,        startchan,       displayname,     "
             "       dishnet_eit,     recpriority,     quicktune        "
             "FROM cardinput "
             "WHERE cardinputid = :INPUTID");
@@ -656,12 +655,10 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    externalcommand = :V2, "
                 "    tunechan        = :V3, "
                 "    startchan       = :V4, "
-                "    freetoaironly   = :V5, "
-                "    displayname     = :V6, "
-                "    radioservices   = :V7, "
-                "    dishnet_eit     = :V8, "
-                "    recpriority     = :V9, "
-                "    quicktune       = :V10 "
+                "    displayname     = :V5, "
+                "    dishnet_eit     = :V6, "
+                "    recpriority     = :V7, "
+                "    quicktune       = :V8 "
                 "WHERE cardinputid = :INPUTID");
 
             for (uint j = 0; j < 11; j++)
@@ -692,12 +689,10 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
                 "    externalcommand = :V2, "
                 "    tunechan        = :V3, "
                 "    startchan       = :V4, "
-                "    freetoaironly   = :V5, "
-                "    displayname     = :V6, "
-                "    radioservices   = :V7, "
-                "    dishnet_eit     = :V8, "
-                "    recpriority     = :V9, "
-                "    quicktune       = :V10 ");
+                "    displayname     = :V5, "
+                "    dishnet_eit     = :V6, "
+                "    recpriority     = :V7, "
+                "    quicktune       = :V8 ");
 
             query2.bindValue(":CARDID", dst_cardid);
             for (uint j = 0; j < 11; j++)
@@ -1425,47 +1420,6 @@ bool CardUtil::GetTimeouts(uint cardid,
     }
 
     return false;
-}
-
-bool CardUtil::IgnoreEncrypted(uint cardid, const QString &input_name)
-{
-    bool freetoair = true;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT freetoaironly "
-        "FROM cardinput "
-        "WHERE cardid    = :CARDID AND "
-        "      inputname = :INPUTNAME");
-    query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", input_name);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("CardUtil::IgnoreEncrypted()", query);
-    else if (query.next())
-        freetoair = query.value(0).toBool();
-
-    return freetoair;
-}
-
-bool CardUtil::TVOnly(uint cardid, const QString &input_name)
-{
-    bool radioservices = true;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT radioservices "
-        "FROM cardinput "
-        "WHERE cardid    = :CARDID AND "
-        "      inputname = :INPUTNAME");
-    query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", input_name);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("CardUtil::TVOnly()", query);
-    else if (query.next())
-        radioservices = query.value(0).toBool();
-
-    return !radioservices;
 }
 
 bool CardUtil::IsInNeedOfExternalInputConf(uint cardid)

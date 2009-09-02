@@ -19,6 +19,7 @@
 // MythTV headers
 #include "mythexp.h"
 #include "scaninfo.h"
+#include "channelscantypes.h"
 
 typedef enum {
     kOCTCancelAll = -1,
@@ -75,10 +76,10 @@ class MPUBLIC ChannelImporter
 {
   public:
     ChannelImporter(bool gui, bool interactive, bool insert, bool save,
-                    bool only_fta, bool add_radio_services) :
+                    bool fta_only, ServiceRequirements service_requirements) :
         use_gui(gui), is_interactive(interactive),
-        do_insert(insert), do_save(save), m_fta_only(only_fta),
-        m_add_radio_services(add_radio_services) { }
+        do_insert(insert), do_save(save), m_fta_only(fta_only),
+        m_service_requirements(service_requirements) { }
 
     void Process(const ScanDTVTransportList&);
 
@@ -204,8 +205,10 @@ class MPUBLIC ChannelImporter
     bool is_interactive;
     bool do_insert;
     bool do_save;
+    /// Only FreeToAir (non-encrypted) channels desired post scan?
     bool m_fta_only;
-    bool m_add_radio_services;
+    /// Services desired post scan
+    ServiceRequirements m_service_requirements;
 };
 
 #endif // _CHANNEL_IMPORTER_H_

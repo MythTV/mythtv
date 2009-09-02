@@ -34,11 +34,16 @@
 #include "mythexp.h"
 #include "dtvconfparser.h"
 #include "scanmonitor.h"
+#include "channelscantypes.h"
 
 class ScanMonitor;
 class IPTVChannelFetcher;
 class ChannelScanSM;
 class ChannelBase;
+
+// Not (yet?) implemented from old scanner
+// do_delete_channels, do_rename_channels, atsc_format
+// TODO implement deletion of stale channels..
 
 class MPUBLIC ChannelScanner
 {
@@ -55,6 +60,8 @@ class MPUBLIC ChannelScanner
               bool           do_ignore_signal_timeout,
               bool           do_follow_nit,
               bool           do_test_decryption,
+              bool           do_fta_only,
+              ServiceRequirements service_requirements,
               // stuff needed for particular scans
               uint           mplexid,
               const QMap<QString,QString> &startChan,
@@ -96,10 +103,11 @@ class MPUBLIC ChannelScanner
     /// imported channels
     DTVChannelList      channels;
 
-    /// import/update only fta channels, input connection setting
-    bool                m_fta_only;
-    /// add radio services on import/update, input connection setting
-    bool                m_audio_only;
+    /// Only fta channels desired post scan?
+    bool                freeToAirOnly;
+
+    /// Services desired post scan
+    ServiceRequirements serviceRequirements;
 };
 
 #endif // _CHANNEL_SCANNER_H_

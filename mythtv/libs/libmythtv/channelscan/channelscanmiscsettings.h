@@ -31,6 +31,7 @@
 #define _MISC_SETTINGS_H_
 
 #include "settings.h"
+#include "channelscantypes.h"
 
 class TransLabelSetting;
 class ScanWizard;
@@ -75,12 +76,56 @@ class FollowNITSetting : public CheckBoxSetting, public TransientStorage
     }
 };
 
+class DesiredServices : public ComboBoxSetting, public TransientStorage
+{
+  public:
+    DesiredServices() : ComboBoxSetting(this)
+    {
+        setLabel(QObject::tr("Desired Services"));
+        setHelpText(QObject::tr(
+                        "TV - Adds A/V services only, "
+                        "TV+Radio - Adds all services with audio, "
+                        "All - Adds all services "
+                        "(including data only serices)."));
+        addSelection(tr("TV"),       "tv", true);
+        addSelection(tr("TV+Radio"), "audio");
+        addSelection(tr("All"),      "all");
+    };
+
+    ServiceRequirements GetServiceRequirements(void) const
+    {
+        QString val = getValue();
+        int ret = kRequireVideo | kRequireAudio;
+        if (val == "tv")
+            ret = kRequireVideo | kRequireAudio;
+        else if (val == "audio")
+            ret = kRequireAudio;
+        else if (val == "all")
+            ret = 0;
+        return (ServiceRequirements) ret;
+    }
+};
+
+class FreeToAirOnly : public CheckBoxSetting, public TransientStorage
+{
+  public:
+    FreeToAirOnly() : CheckBoxSetting(this)
+    {
+        setValue(true);
+        setLabel(QObject::tr("Only Free"));
+        setHelpText(
+            QObject::tr(
+                "If set, only non-encrypted channels will be "
+                "added during the scan."));
+    };
+};
+
 class TrustEncSISetting : public CheckBoxSetting, public TransientStorage
 {
   public:
     TrustEncSISetting() : CheckBoxSetting(this)
     {
-        setLabel(QObject::tr("Test decryptability"));
+        setLabel(QObject::tr("Test Decryptability"));
         setHelpText(
             QObject::tr("Test channels if they can be decrypted with CAM and "
                         "smartcard. Sometimes encrypted flag is also set "

@@ -138,6 +138,8 @@ int main(int argc, char *argv[])
     bool    doScanSaveOnly = false;
     bool    scanInteractive = true;
     uint    scanImport = 0;
+    bool    scanFTAOnly = false;
+    ServiceRequirements scanServiceRequirements = kRequireAV;
     uint    scanCardId = 0;
     QString scanTableName = "atsc-vsb8-us";
     QString scanInputName = "";
@@ -280,6 +282,30 @@ int main(int argc, char *argv[])
                 QString tmpArg = a.argv()[argpos + 1];
                 scanImport = tmpArg.toUInt();
                 ++argpos;
+
+                if (a.argc()-1 > argpos)
+                {
+                    tmpArg = a.argv()[argpos + 1];
+                    scanFTAOnly = tmpArg.toUInt();
+                    ++argpos;
+                }
+
+                if (a.argc()-1 > argpos)
+                {
+                    tmpArg = a.argv()[argpos + 1];
+                    tmpArg = tmpArg.toLower();
+                    scanServiceRequirements = kRequireNothing;
+                    if (tmpArg.contains("radio"))
+                        scanServiceRequirements = kRequireAudio;
+                    if (tmpArg.contains("tv"))
+                        scanServiceRequirements = kRequireAV;
+                    if (tmpArg.contains("tv+radio") ||
+                        tmpArg.contains("radio+tv"))
+                        scanServiceRequirements = kRequireAudio;
+                    if (tmpArg.contains("all"))
+                        scanServiceRequirements = kRequireNothing;
+                    ++argpos;
+                }
             }
             else
             {
@@ -453,9 +479,11 @@ int main(int argc, char *argv[])
                 /* cardid    */ scanCardId,
                 /* inputname */ scanInputName,
                 /* sourceid  */ sourceid,
-                false,
-                false,
-                false,
+                /* ignore signal timeout */ false,
+                /* follow_nit */            true,
+                /* test decryption */       true,
+                scanFTAOnly,
+                scanServiceRequirements,
                 // stuff needed for particular scans
                 /* mplexid   */ 0,
                 startChan, freq_std, mod, tbl);
@@ -483,33 +511,12 @@ int main(int argc, char *argv[])
 
     if (scanImport)
     {
-        bool fta_only = false, radio_services = false;
         vector<ScanInfo> scans = LoadScanList();
-        for (uint i = 0; i < scans.size(); i++)
-        {
-            if (scans[i].scanid == scanImport)
-            {
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.prepare("SELECT freetoaironly, radioservices "
-                              "FROM cardinput "
-                              "WHERE sourceid = :SOURCEID AND "
-                              "      cardid   = :CARDID");
-                query.bindValue(":CARDID",   scans[i].cardid);
-                query.bindValue(":SOURCEID", scans[i].sourceid);
-
-                if (query.exec() && query.next())
-                {
-                    fta_only       = query.value(0).toBool();
-                    radio_services = query.value(1).toBool();
-                }
-                break;
-            }
-        }
         cout<<"*** SCAN IMPORT START ***"<<endl;
         {
             ScanDTVTransportList list = LoadScan(scanImport);
-            ChannelImporter ci(false, true, true, false, fta_only,
-                               radio_services);
+            ChannelImporter ci(false, true, true, false,
+                               scanFTAOnly, scanServiceRequirements);
             ci.Process(list);
         }
         cout<<"*** SCAN IMPORT END ***"<<endl;

@@ -33,6 +33,7 @@
 // MythTV headers
 #include "settings.h"
 #include "inputselectorsetting.h"
+#include "channelscantypes.h"
 
 class ScanWizard;
 class VideoSourceSelector;
@@ -40,6 +41,8 @@ class ScanTypeSetting;
 class ScanCountry;
 class ScanNetwork;
 class IgnoreSignalTimeout;
+class DesiredServices;
+class FreeToAirOnly;
 class TrustEncSISetting;
 
 class PaneAll;
@@ -143,6 +146,7 @@ class ScanWizardConfig: public VerticalConfigurationGroup
                      QString     default_inputname);
 
     uint    GetSourceID(void)     const;
+    uint    GetScanID(void)       const { return scanConfig->GetScanID();     }
     QString GetModulation(void)   const { return scanConfig->GetModulation(); }
     int     GetScanType(void)     const { return scanType->getValue().toInt();}
     uint    GetCardID(void)       const { return input->GetCardID();          }
@@ -151,26 +155,27 @@ class ScanWizardConfig: public VerticalConfigurationGroup
     uint    GetMultiplex(void)    const { return scanConfig->GetMultiplex();  }
     bool    GetFrequencyTableRange(QString &start, QString &end) const
         { return scanConfig->GetFrequencyTableRange(start, end); }
-
     QString GetFrequencyStandard(void) const
         { return scanConfig->GetFrequencyStandard(); }
     QString GetFrequencyTable(void) const
         { return scanConfig->GetFrequencyTable(); }
     QMap<QString,QString> GetStartChan(void) const
         { return scanConfig->GetStartChan(); }
+    ServiceRequirements GetServiceRequirements(void) const;
     bool    DoIgnoreSignalTimeout(void) const
         { return scanConfig->DoIgnoreSignalTimeout(); }
     bool    DoFollowNIT(void) const
         { return scanConfig->DoFollowNIT(); }
+    bool    DoFreeToAirOnly(void)  const;
     bool    DoTestDecryption(void) const;
-    uint    GetScanID(void)       const
-        { return scanConfig->GetScanID(); }
 
   protected:
     VideoSourceSelector *videoSource;
     InputSelector       *input;
     ScanTypeSetting     *scanType;
     ScanOptionalConfig  *scanConfig;
+    DesiredServices     *services;
+    FreeToAirOnly       *ftaOnly;
     TrustEncSISetting   *trustEncSI;
 };
 

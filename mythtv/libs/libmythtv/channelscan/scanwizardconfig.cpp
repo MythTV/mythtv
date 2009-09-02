@@ -67,15 +67,23 @@ ScanWizardConfig::ScanWizardConfig(
     input(new InputSelector(default_cardid, default_inputname)),
     scanType(new ScanTypeSetting()),
     scanConfig(new ScanOptionalConfig(scanType)),
+    services(new DesiredServices()),
+    ftaOnly(new FreeToAirOnly()),
     trustEncSI(new TrustEncSISetting())
 {
     setLabel(tr("Scan Configuration"));
 
+    ConfigurationGroup *cfg =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    cfg->addChild(services);
+    cfg->addChild(ftaOnly);
+    cfg->addChild(trustEncSI);
+
     addChild(videoSource);
     addChild(input);
+    addChild(cfg);
     addChild(scanType);
     addChild(scanConfig);
-    addChild(trustEncSI);
 
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
             scanConfig,  SLOT(  SetSourceID( const QString&)));
@@ -93,6 +101,16 @@ ScanWizardConfig::ScanWizardConfig(
 uint ScanWizardConfig::GetSourceID(void) const
 {
     return videoSource->getValue().toUInt();
+}
+
+ServiceRequirements ScanWizardConfig::GetServiceRequirements(void) const
+{
+    return services->GetServiceRequirements();
+}
+
+bool ScanWizardConfig::DoFreeToAirOnly(void) const
+{
+    return ftaOnly->getValue().toInt();
 }
 
 bool ScanWizardConfig::DoTestDecryption(void) const

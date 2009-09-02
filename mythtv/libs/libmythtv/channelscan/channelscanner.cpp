@@ -47,7 +47,7 @@
 
 ChannelScanner::ChannelScanner() :
     scanMonitor(NULL), channel(NULL), sigmonScanner(NULL), freeboxScanner(NULL),
-    m_fta_only(false), m_audio_only(false)
+    freeToAirOnly(false), serviceRequirements(kRequireAV)
 {
 }
 
@@ -102,6 +102,8 @@ void ChannelScanner::Scan(
     bool           do_ignore_signal_timeout,
     bool           do_follow_nit,
     bool           do_test_decryption,
+    bool           do_fta_only,
+    ServiceRequirements service_requirements,
     // stuff needed for particular scans
     uint           mplexid /* TransportScan */,
     const QMap<QString,QString> &startChan /* NITAddScan */,
@@ -111,6 +113,9 @@ void ChannelScanner::Scan(
     const QString &tbl_start /* FullScan optional */,
     const QString &tbl_end   /* FullScan optional */)
 {
+    freeToAirOnly = do_fta_only;
+    serviceRequirements = service_requirements;
+
     PreScanCommon(scantype, cardid, inputname,
                   sourceid, do_ignore_signal_timeout, do_test_decryption);
 
@@ -121,20 +126,6 @@ void ChannelScanner::Scan(
         VERBOSE(VB_CHANSCAN, LOC + "Scan(): "
                 "scanner does not exist...");
         return;
-    }
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT freetoaironly, radioservices "
-                  "FROM cardinput "
-                  "WHERE sourceid = :SOURCEID AND "
-                  "      cardid   = :CARDID");
-    query.bindValue(":CARDID",   cardid);
-    query.bindValue(":SOURCEID", sourceid);
-    
-    if (query.exec() && query.next())
-    {
-        m_fta_only     = query.value(0).toBool();
-        m_audio_only   = query.value(1).toBool();
     }
 
     sigmonScanner->StartScanner();

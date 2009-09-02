@@ -2457,37 +2457,6 @@ void InputGroup::Load(void)
         setValue(index);
 }
 
-class FreeToAir : public CheckBoxSetting, public CardInputDBStorage
-{
-  public:
-    FreeToAir(const CardInput &parent) :
-        CheckBoxSetting(this),
-        CardInputDBStorage(this, parent, "freetoaironly")
-    {
-        setValue(true);
-        setLabel(QObject::tr("Unencrypted channels only"));
-        setHelpText(QObject::tr(
-                        "If set, only unencrypted channels will be tuned to "
-                        "by MythTV or not be ignored by the MythTV channel "
-                        "scanner."));
-    };
-};
-
-class RadioServices : public CheckBoxSetting, public CardInputDBStorage
-{
-  public:
-    RadioServices(const CardInput &parent) :
-        CheckBoxSetting(this),
-        CardInputDBStorage(this, parent, "radioservices")
-    {
-        setValue(true);
-        setLabel(QObject::tr("Allow audio only channels"));
-        setHelpText(QObject::tr(
-                        "If set, audio only channels will not be ignored "
-                        "by the MythTV channel scanner."));
-    };
-};
-
 class QuickTune : public ComboBoxSetting, public CardInputDBStorage
 {
   public:
@@ -2640,23 +2609,13 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
         basic->addChild(new ExternalChannelCommand(*this));
         basic->addChild(new PresetTuner(*this));
     }
-
-    if (isDTVcard)
-    {
-        // we place this in a group just so the margins match the DVB ones.
-        ConfigurationGroup *chgroup =
-            new VerticalConfigurationGroup(false, false, true, true);
-        chgroup->addChild(new QuickTune(*this));
-        chgroup->addChild(new FreeToAir(*this));
-        basic->addChild(chgroup);
-    }
-
-    if (isDVBcard)
+    else
     {
         ConfigurationGroup *chgroup =
             new HorizontalConfigurationGroup(false, false, true, true);
-        chgroup->addChild(new RadioServices(*this));
-        chgroup->addChild(new DishNetEIT(*this));
+        chgroup->addChild(new QuickTune(*this));
+        if (isDVBcard)
+            chgroup->addChild(new DishNetEIT(*this));
         basic->addChild(chgroup);
     }
 

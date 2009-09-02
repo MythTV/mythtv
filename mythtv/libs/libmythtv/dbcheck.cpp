@@ -4885,6 +4885,20 @@ NULL
             return false;
     }
 
+if (0) // apply at or near 0.22 release..
+{
+    if (dbver == "XXXX")
+    {
+       const char *updates[] = {
+"ALTER TABLE cardinput DROP COLUMN freetoaironly;",
+"ALTER TABLE cardinput DROP COLUMN radioservices;",
+NULL
+};
+        if (!performActualUpdate(updates, "YYYY", dbver))
+            return false;
+    }
+}
+
     return true;
 }
 
