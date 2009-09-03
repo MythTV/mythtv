@@ -401,9 +401,11 @@ void VideoOutputVDPAU::EmbedInWidget(int x, int y,int w, int h)
 {
     QMutexLocker locker(&m_lock);
     if (!windows[0].IsEmbedding())
+    {
         VideoOutput::EmbedInWidget(x, y, w, h);
-    MoveResize();
-    windows[0].SetDisplayVisibleRect(windows[0].GetTmpDisplayVisibleRect());
+        MoveResize();
+        windows[0].SetDisplayVisibleRect(windows[0].GetTmpDisplayVisibleRect());
+    }
 }
 
 void VideoOutputVDPAU::StopEmbedding(void)
