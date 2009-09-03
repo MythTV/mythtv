@@ -1117,7 +1117,7 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
     QMutexLocker locker(&m_lock);
     m_hWnd      = winid;
     m_hEmbedWnd = embedid;
-    windows[0].SetAllowPreviewEPG(false);
+    windows[0].SetAllowPreviewEPG(true);
 
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
