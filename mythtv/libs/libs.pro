@@ -12,8 +12,6 @@ using_live:SUBDIRS += libmythlivemedia
 using_hdhomerun:SUBDIRS += libmythhdhomerun
 using_x11:SUBDIRS += libmythnvctrl
 
-contains( CONFIG_SWSCALE, yes ) { SUBDIRS += libswscale }
-
 # Libraries with dependencies
 SUBDIRS += libmythui libmyth libmythupnp libmythtv libavcodec libavformat libswscale
 libmythui.depends = libmythdb
