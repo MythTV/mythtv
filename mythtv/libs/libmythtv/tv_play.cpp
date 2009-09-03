@@ -7045,9 +7045,12 @@ void TV::UpdateOSDProgInfo(const PlayerContext *ctx, const char *whichInfo)
 
     // Clear previous osd and add new info
     OSD *osd = GetOSDLock(ctx);
-    osd->ClearAllText(whichInfo);
-    osd->HideAll();
-    osd->SetText(whichInfo, infoMap, osd_prog_info_timeout);
+    if (osd)
+    {
+        osd->ClearAllText(whichInfo);
+        osd->HideAll();
+        osd->SetText(whichInfo, infoMap, osd_prog_info_timeout);
+    }
     ReturnOSDLock(ctx, osd);
 }
 
