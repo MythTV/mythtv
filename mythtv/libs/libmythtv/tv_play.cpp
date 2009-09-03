@@ -885,7 +885,7 @@ bool TV::Init(bool createWindow)
                     player_bounds.setSize(QSize(maxWidth, maxHeight));
 
                     // resize possibly avoids a bug on some systems
-                    GetMythMainWindow()->resize(player_bounds.size());
+                    GetMythMainWindow()->setGeometry(player_bounds);
                 }
             }
         }
@@ -945,7 +945,7 @@ TV::~TV(void)
 
     // restore window to gui size and position
     MythMainWindow* mwnd = gContext->GetMainWindow();
-    mwnd->resize(saved_gui_bounds.size());
+    mwnd->setGeometry(saved_gui_bounds);
     mwnd->setFixedSize(saved_gui_bounds.size());
     mwnd->show();
     if (!db_use_gui_size_for_tv)
