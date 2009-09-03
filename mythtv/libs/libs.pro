@@ -19,6 +19,7 @@ SUBDIRS += libmythui libmyth libmythupnp libmythtv libavcodec libavformat libsws
 libmythui.depends = libmythdb
 libmythupnp.depends = libmythdb
 libmyth.depends = libavcodec libmythdb libmythui libmythupnp
+libmyth.depends += libmythsamplerate libmythsoundtouch libmythfreesurround
 libavcodec.depends = libavutil
 libavformat.depends = libavcodec libavutil
 libswscale.depends = libavutil
