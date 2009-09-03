@@ -278,7 +278,7 @@ void ProgLister::showMenu(void)
                 menuPopup->AddButton(tr("Delete Rule"));
         }
         else
-            menuPopup->AddButton(tr("Delete Old Recorded"));
+            menuPopup->AddButton(tr("Delete Episode"));
 
         menuPopup->AddButton(tr("Cancel"));
 
@@ -613,7 +613,7 @@ void ProgLister::select()
         return;
 
     if (m_type == plPreviouslyRecorded)
-        deleteOldRecorded();
+        oldRecordedActions();
     else
         EditRecording(pi);
 }
@@ -646,7 +646,7 @@ void ProgLister::customEdit()
 void ProgLister::deleteItem()
 {
     if (m_type == plPreviouslyRecorded)
-        deleteOldRecorded();
+        deleteOldEpisode();
     else
         deleteRule();
 }
@@ -689,7 +689,73 @@ void ProgLister::doDeleteRule(bool ok)
     }
 }
 
-void ProgLister::deleteOldRecorded()
+void ProgLister::deleteOldEpisode()
+{
+    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+
+    if (!pi)
+        return;
+
+    QString message = tr("Delete this episode of '%1'?").arg(pi->title);
+
+    ShowOkPopup(message, this, SLOT(doDeleteOldEpisode(bool)), true);
+}
+
+void ProgLister::doDeleteOldEpisode(bool ok)
+{
+    if (!ok)
+        return;
+
+    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+
+    if (!pi)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM oldrecorded "
+                  "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
+    query.bindValue(":CHANID", pi->chanid);
+    query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
+    if (!query.exec())
+        MythDB::DBError("ProgLister::doDeleteOldEpisode", query);
+
+    ScheduledRecording::signalChange(0);
+    fillItemList(true);
+}
+
+void ProgLister::deleteOldTitle()
+{
+    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+
+    if (!pi)
+        return;
+
+    QString message = tr("Delete all episodes of '%1'?").arg(pi->title);
+
+    ShowOkPopup(message, this, SLOT(doDeleteOldTitle(bool)), true);
+}
+
+void ProgLister::doDeleteOldTitle(bool ok)
+{
+    if (!ok)
+        return;
+
+    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+
+    if (!pi)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE ;");
+    query.bindValue(":TITLE", pi->title);
+    if (!query.exec())
+        MythDB::DBError("ProgLister::doDeleteOldTitle -- delete", query);
+
+    ScheduledRecording::signalChange(0);
+    fillItemList(true);
+}
+
+void ProgLister::oldRecordedActions()
 {
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
@@ -707,7 +773,7 @@ void ProgLister::deleteOldRecorded()
     message += "\n\n\n" + tr("NOTE: removing items from this list will not "
                "delete any recordings.");
 
-    QString title = tr("Delete Old Recorded");
+    QString title = tr("Previously Recorded");
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     MythDialogBox *menuPopup = new MythDialogBox(title, message, mainStack, "deletepopup", true);
 
@@ -728,23 +794,6 @@ void ProgLister::deleteOldRecorded()
     {
         delete menuPopup;
     }
-}
-
-void ProgLister::doDeleteOldRecorded()
-{
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
-
-    if (!pi)
-        return;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM oldrecorded "
-                  "WHERE chanid = :CHANID AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", pi->chanid);
-    query.bindValue(":STARTTIME", pi->startts.toString(Qt::ISODate));
-    if (!query.exec())
-        MythDB::DBError("ProgLister::doDeleteOldRecorded", query);
-    ScheduledRecording::signalChange(0);
 }
 
 void ProgLister::upcoming()
@@ -1055,10 +1104,19 @@ void ProgLister::fillViewList(const QString &view)
         m_curView = m_viewList.count() - 1;
 }
 
-class plTitleSort
+class plCompare
 {
     public:
-        plTitleSort(void) {;}
+        plCompare(void) {};
+        virtual bool operator()(const ProgramInfo *a, const ProgramInfo *b)
+            = 0;
+};
+
+class plTitleSort
+    : public plCompare
+{
+    public:
+        plTitleSort(void) : plCompare() {;}
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b)
         {
@@ -1079,9 +1137,10 @@ class plTitleSort
 };
 
 class plPrevTitleSort
+    : public plCompare
 {
     public:
-        plPrevTitleSort(void) {;}
+        plPrevTitleSort(void) : plCompare() {;}
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b)
         {
@@ -1096,9 +1155,10 @@ class plPrevTitleSort
 };
 
 class plTimeSort
+    : public plCompare
 {
     public:
-        plTimeSort(void) {;}
+        plTimeSort(void) : plCompare() {;}
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b)
         {
@@ -1444,33 +1504,27 @@ void ProgLister::fillItemList(bool restorePosition)
     // Restore position after a list update
     if (restorePosition && selected)
     {
+        plCompare *comp;
+        if (!m_titleSort)
+            comp = new plTimeSort();
+        else if (m_type == plPreviouslyRecorded)
+            comp = new plPrevTitleSort();
+        else
+            comp = new plTitleSort();
+
         int i;
         for (i = m_itemList.count() - 2; i >= 0; i--)
         {
             bool dobreak;
-
-            if (!m_titleSort)
-            {
-                plTimeSort comp;
-                dobreak = comp(m_itemList[i], selected);
-            }
-            else if (m_type == plPreviouslyRecorded)
-            {
-                plPrevTitleSort comp;
-                dobreak = comp(m_itemList[i], selected);
-            }
-            else
-            {
-                plTitleSort comp;
-                dobreak = comp(m_itemList[i], selected);
-            }
-
             if (m_reverseSort)
-                dobreak = !dobreak;
-
+                dobreak = comp->operator()(selected, m_itemList[i]);
+            else
+                dobreak = comp->operator()(m_itemList[i], selected);
             if (dobreak)
                 break;
         }
+
+        delete comp;
 
         m_progList->SetItemCurrent(i + 1, i + 1 - selectedOffset);
     }
@@ -1502,7 +1556,8 @@ void ProgLister::updateButtonList(void)
                  pginfo->recstatus == rsFailed       ||
                  pginfo->recstatus == rsAborted)
             state = "error";
-        else if (pginfo->recstatus == rsRepeat       ||
+        else if (m_type == plPreviouslyRecorded      ||
+                 pginfo->recstatus == rsRepeat       ||
                  pginfo->recstatus == rsOtherShowing ||
                  pginfo->recstatus == rsNeverRecord  ||
                  pginfo->recstatus == rsDontRecord   ||
@@ -1604,9 +1659,9 @@ void ProgLister::customEvent(QEvent *event)
             {
                 deleteRule();
             }
-            else if (resulttext == tr("Delete Old Recorded"))
+            else if (resulttext == tr("Delete Episode"))
             {
-                deleteOldRecorded();
+                deleteOldEpisode();
             }
         }
         else if (resultid == "sortmenu")
@@ -1653,22 +1708,11 @@ void ProgLister::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Remove this episode from the list"))
             {
-                doDeleteOldRecorded();
+                deleteOldEpisode();
             }
             else if (resulttext == tr("Remove all episodes for this title"))
             {
-                ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
-                if (pi)
-                {
-                    MSqlQuery query(MSqlQuery::InitCon());
-                    query.prepare("DELETE FROM oldrecorded WHERE title = :TITLE ;");
-                    query.bindValue(":TITLE", pi->title);
-                    if (!query.exec())
-                        MythDB::DBError("ProgLister::customEvent -- delete",
-                                        query);
-
-                    ScheduledRecording::signalChange(0);
-                }
+                deleteOldTitle();
             }
         }
         else
