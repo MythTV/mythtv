@@ -2073,11 +2073,11 @@ void PlaybackBox::showDeletePopup(deletePopupType types)
         case DeleteRecording:
         case ForceDeleteRecording:
              tmpmessage = tr("No, keep it");
-             tmpslot = SLOT(noDelete());
+             tmpslot = NULL;
              break;
         case StopRecording:
              tmpmessage = tr("No, continue recording");
-             tmpslot = SLOT(noStop());
+             tmpslot = NULL;
              break;
     }
     m_popupMenu->AddButton(tmpmessage, tmpslot, false, !defaultIsYes);
