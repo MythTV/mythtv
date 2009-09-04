@@ -482,7 +482,9 @@
                         </state>
 
                         <state name="TV" from="DEFAULT">
-                            <imagetype name="icon"><filename>watermarks/tv.png</filename></imagetype>
+                            <imagetype name="icon">
+                                <filename>watermarks/tv.png</filename>
+                            </imagetype>
                         </state>
                         <state name="MUSIC" from="DEFAULT">
                             <imagetype name="icon">
@@ -708,9 +710,9 @@
                             </imagetype>
                         </state>
                         <state name="TV_DELETE" from="DEFAULT">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/error.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/delete.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_PREVIOUS" from="DEFAULT">
                             <!--                            <imagetype name="icon">
