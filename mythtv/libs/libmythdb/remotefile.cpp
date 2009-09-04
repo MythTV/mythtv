@@ -322,7 +322,7 @@ int RemoteFile::Write(const void *data, int size)
 
     if (!sock)
     {
-        VERBOSE(VB_NETWORK, "RemoteFile::Read(): Called with no socket");
+        VERBOSE(VB_NETWORK, "RemoteFile::Write(): Called with no socket");
         return -1;
     }
 
@@ -349,7 +349,7 @@ int RemoteFile::Write(const void *data, int size)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "RemoteFile::Read(): socket error");
+            VERBOSE(VB_IMPORTANT, "RemoteFile::Write(): socket error");
             error = true;
             break;
         }
@@ -512,7 +512,7 @@ void RemoteFile::SetTimeout(bool fast)
 
     if (!sock)
     {
-        VERBOSE(VB_NETWORK, "RemoteFile::Seek(): Called with no socket");
+        VERBOSE(VB_NETWORK, "RemoteFile::SetTimeout(): Called with no socket");
         return;
     }
 
