@@ -175,7 +175,7 @@ namespace
                             if (!outFile->isOpen())
                             {
                                 VERBOSE(VB_IMPORTANT,
-                                    QString("RingBuffer::RingBuffer(): Failed to open "
+                                    QString("VideoDialog: Failed to open "
                                             "remote file (%1) for write.  Does Coverart "
                                             "Storage Group Exist?").arg(m_dest_file));
                                 delete outFile;
@@ -342,7 +342,7 @@ namespace
                             if (!outFile->isOpen())
                             {
                                 VERBOSE(VB_IMPORTANT,
-                                    QString("RingBuffer::RingBuffer(): Failed to open "
+                                    QString("VideoDialog: Failed to open "
                                             "remote file (%1) for write.  Does Screenshot "
                                             "Storage Group Exist?").arg(m_dest_file));
                                 delete outFile;
@@ -509,7 +509,7 @@ namespace
                             if (!outFile->isOpen())
                             {
                                 VERBOSE(VB_IMPORTANT,
-                                    QString("RingBuffer::RingBuffer(): Failed to open "
+                                    QString("VideoDialog: Failed to open "
                                             "remote file (%1) for write.  Does Fanart "
                                             "Storage Group Exist?").arg(m_dest_file));
                                 delete outFile; 
@@ -676,7 +676,7 @@ namespace
                             if (!outFile->isOpen()) 
                             { 
                                 VERBOSE(VB_IMPORTANT, 
-                                    QString("RingBuffer::RingBuffer(): Failed to open " 
+                                    QString("VideoDialog: Failed to open " 
                                             "remote file (%1) for write.  Does Banner "
                                             "Storage Group Exist?").arg(m_dest_file)); 
                                 delete outFile; 
