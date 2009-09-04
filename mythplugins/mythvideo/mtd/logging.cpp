@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <QDateTime>
 
+#include "compat.h"
 #include <mythtv/mythcontext.h>
 
 #define LOC      QString("MTDLogger: ")
