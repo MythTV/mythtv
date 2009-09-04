@@ -26,6 +26,8 @@ using namespace std;
 #include <QKeyEvent>
 #include <QDir>
 
+#define NEW_AVSYNC
+
 // MythTV headers
 #include "mythconfig.h"
 #include "mythdbcon.h"
@@ -2500,7 +2502,10 @@ void NuppelVideoPlayer::AVSync(void)
         if (buffer)
             videoOutput->PrepareFrame(buffer, ps);
 
+        VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, QString("AVSync waitforframe %1 %2")
+                .arg(avsync_adjustment).arg(m_double_framerate));
         videosync->WaitForFrame(avsync_adjustment);
+        VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, "AVSync show");
         if (!resetvideo)
             videoOutput->Show(ps);
 
@@ -2541,7 +2546,11 @@ void NuppelVideoPlayer::AVSync(void)
 
             // Display the second field
             videosync->AdvanceTrigger();
+#ifdef NEW_AVSYNC
+            videosync->WaitForFrame(avsync_adjustment);
+#else
             videosync->WaitForFrame(0);
+#endif
             if (!resetvideo)
             {
                 videoOutput->Show(ps);
@@ -2569,7 +2578,11 @@ void NuppelVideoPlayer::AVSync(void)
         // If audio is way behind of video, adjust for it...
         // by cutting the frame rate in half for the length of this frame
 
+#ifdef NEW_AVSYNC
+        avsync_adjustment = refreshrate;
+#else
         avsync_adjustment = frame_interval;
+#endif
         lastsync = true;
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Video is %1 frames ahead of audio,\n"
