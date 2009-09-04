@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.3" # 0.1.0 Initial development 
+__version__=u"v0.4.4" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -151,6 +151,10 @@ __version__=u"v0.4.3" # 0.1.0 Initial development
                      #       feature has been turned off in Jamu. There is a new user option 
                      #       "folderart" that can reactivate this feature through the Jamu 
                      #       configuration file.
+					 # 0.4.4 Changes to assist SG image hunting Jamu now adds the suffix "_coverart,
+                     #       _fanart, _banner, _screenshot" respectively to downloaded graphics.
+					 #       With the use of a graphic suffix the requirement for unique graphics 
+					 #       directories is gone. The check has been removed.
 
 
 usage_txt=u'''
@@ -1609,10 +1613,7 @@ http://www.pythonware.com/products/pil/\n""")
 
 		# Validate language as specified by user
 		if self.config['local_language']:
-			for lang in valid_languages:
-				if self.config['local_language'] == lang: 
-					break
-			else:
+			if not self.config['local_language'] in valid_languages:
 				valid_langs = ''
 				for lang in valid_languages: valid_langs+= lang+', '
 				valid_langs=valid_langs[:-2]
@@ -2160,8 +2161,9 @@ class Tvdatabase(object):
 			for key in ['seasonnumber', 'episodenumber']:
 				if tmp_dict.has_key(key):
 					tmp_dict[key] = int(tmp_dict[key])
+			if not tmp_dict.has_key(u'episodename'):
+				tmp_dict[u'episodename'] = u''
 			filename="%s/%s" % (self.config['metadatadir'],self.config['ep_metadata'] % tmp_dict)
-
 			image_filename = None
 			if 	self.config['get_ep_image'] and tmp_dict.has_key('filename'):
 				url= tmp_dict['filename']
@@ -2725,6 +2727,9 @@ class MythTvMetaData(VideoFiles):
 	global graphicsDirectories
 	movie_file_format=u"%s/%s.%s"
 	initialize_record = {u'subtitle': u'', u'director': u'Unknown', u'rating': u'NR', u'inetref': u'00000000', u'year': 1895, u'userrating': 0.0, u'length': 0, u'showlevel': 1, u'coverfile': u'No Cover', u'host': u'',}
+	graphic_suffix = {u'coverfile': u'_coverart', u'fanart': u'_fanart', u'banner': u'_banner'}
+	graphic_name_suffix = u"%s/%s%s.%s"
+	graphic_name_season_suffix = u"%s/%s - Season %d%s.%s"
 
 
 	def _getSubtitle(self, cfile):
@@ -2740,23 +2745,6 @@ class MythTvMetaData(VideoFiles):
 		self.verifySeriesExists()
 		return self.config['episode_name']
 	# end _getSubtitle
-
-
-	def checkUniqueDirectories(self):
-		'''Verify that all of the graphics directories are unique
-		abort if not unique
-		return True id all are unique
-		'''
-		for directory in graphicsDirectories.keys():
-			for key in graphicsDirectories.keys(): 
-				if key != directory:
-					for dirtarget in self.config[graphicsDirectories[directory]]:
-						for dircheck in self.config[graphicsDirectories[key]]:
-							if dircheck == dirtarget:
-								sys.stderr.write("\n! Error: You must have unique directories for each type of graphics\n%s (%s) is the same as %s (%s)\n" % (directory, self.config[directory], key, self.config[key]))
-								sys.exit(False)
-		return True
-	# end checkUniqueDirectories()
 
 
 	def rtnRelativePath(self, abpath, filetype):
@@ -3023,9 +3011,9 @@ class MythTvMetaData(VideoFiles):
 
 		self.config['sid']=None
 		if watched:
-			self.config['g_series'] = cfile['file_seriesname']+u'.%(ext)s'
+			self.config['g_series'] = cfile['file_seriesname']+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		else:
-			self.config['g_series'] = cfile['inetref']+u'.%(ext)s'
+			self.config['g_series'] = cfile['inetref']+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		if graphic_type == '-P':
 			g_type = u'poster'
 		else:
@@ -3118,9 +3106,9 @@ class MythTvMetaData(VideoFiles):
 			if fileExtension == u'jpeg':
 				fileExtension = u'jpg'
 			if watched:
-				filename = u'%s/%s.%s' % (self.config['posterdir'][0], cfile['file_seriesname'], fileExtension)
+				filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], cfile['file_seriesname'], self.graphic_suffix[rel_type], fileExtension)
 			else:
-				filename = u'%s/%s.%s' % (self.config['posterdir'][0], cfile['inetref'], fileExtension)
+				filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], cfile['inetref'], self.graphic_suffix[rel_type], fileExtension)
 
 			if os.path.isfile(filename): # This may be the same small file or worse then current
 				try:
@@ -3144,9 +3132,9 @@ class MythTvMetaData(VideoFiles):
 
 			self.config['sid']=None
 			if watched:
-				self.config['g_series'] = cfile['file_seriesname']+'.%(ext)s'
+				self.config['g_series'] = cfile['file_seriesname']+self.graphic_suffix[rel_type]+'.%(ext)s'
 			else:
-				self.config['g_series'] = cfile['inetref']+'.%(ext)s'
+				self.config['g_series'] = cfile['inetref']+self.graphic_suffix[rel_type]+'.%(ext)s'
 			g_type = graphic_type
 
 			self.config['season_num']= None	# Needed to get graphics named in 'g_series' format
@@ -3403,6 +3391,12 @@ class MythTvMetaData(VideoFiles):
 		return None
 		return full qualified path and filename of downloaded graphic
 		'''
+		rel_type = graphic_type
+		if graphic_type == u'coverfile':
+			graphic_type = u'poster'
+		elif graphic_type == u'poster':
+			rel_type =u'coverfile'
+
 		self.config['g_defaultname']=False
 		self.config['toprated'] = toprated
 		self.config['nokeys'] = False
@@ -3417,8 +3411,8 @@ class MythTvMetaData(VideoFiles):
 		if not watched:
 			self.config['season_num']=u"%d" % cfile['seasno']
 			self.config['episode_num']=u"%d" % cfile['epno']
-		self.config['g_series'] = cfile['file_seriesname']+u'.%(ext)s'
-		self.config['g_season'] = cfile['file_seriesname']+u' Season %(seasonnumber)d.%(ext)s'
+		self.config['g_series'] = cfile['file_seriesname']+self.graphic_suffix[rel_type]+u'.%(ext)s'
+		self.config['g_season'] = cfile['file_seriesname']+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		
 		if not self.verifySeriesExists():
 			self._displayMessage(u"tvdb Series not found(%s)" % cfile['filename'])
@@ -3428,12 +3422,6 @@ class MythTvMetaData(VideoFiles):
 			self.config['season_num']= None	# Needed to get toprated graphics named in 'g_series' format
 		else:
 			typegetGraphics=self.getGraphics
-
-		rel_type = graphic_type
-		if graphic_type == u'coverfile':
-			graphic_type = u'poster'
-		elif graphic_type == u'poster':
-			rel_type =u'coverfile'
 
 		self.config['overwrite'] = True # Force overwriting any existing graphic file
 		value = self._downloadGraphics(typegetGraphics(graphic_type), mythtv=True)
@@ -4039,18 +4027,20 @@ class MythTvMetaData(VideoFiles):
 				# Deal with TV series level graphics
 				(dirName, fileName) = os.path.split(meta_dict[key])
 				(fileBaseName, fileExtension)=os.path.splitext(fileName)
-				index = fileBaseName.find(' Season ')
-				if index != -1:
-					try:
-						dummy = graphics_file_dict[key].index(os.path.join(dirName, u'%s%s' % (fileBaseName[:index], fileExtension)))
-						graphics_file_dict[key].remove(os.path.join(dirName, u'%s%s' % (fileBaseName[:index], fileExtension)))
-					except ValueError:
-						pass
-				try:
-					dummy = graphics_file_dict[key].index(meta_dict[key])
+				index = fileBaseName.find(u' Season ')
+				if index != -1: # Was a season string found?
+					filename = os.path.join(dirName, u'%s%s' % (fileBaseName[:index], fileExtension))
+					if filename in graphics_file_dict[key]: # No suffix
+						graphics_file_dict[key].remove(filename)
+					filename = os.path.join(dirName, u'%s%s%s' % (fileBaseName[:index], self.graphic_suffix[key], fileExtension))
+					if filename in graphics_file_dict[key]: # With suffix
+						graphics_file_dict[key].remove(filename)
+
+				if meta_dict[key] in graphics_file_dict[key]: # No suffix
 					graphics_file_dict[key].remove(meta_dict[key])
-				except ValueError:
-					pass
+				filename = os.path.join(dirName, u'%s%s%s' % (fileBaseName, self.graphic_suffix[key], fileExtension))
+				if filename in graphics_file_dict[key]: # With suffix
+					graphics_file_dict[key].remove(filename)
 
 		# Get Scheduled and Recorded program list
 		programs = self._getScheduledRecordedProgramList()
@@ -4316,9 +4306,6 @@ class MythTvMetaData(VideoFiles):
 			return
 		total_progs_checked = len(programs)
 
-		# Make sure the graphics directories are unique
-		self.checkUniqueDirectories()
-
 		# Prossess all TV shows and Movies
 		for program in programs:
 			program['need'] = False		# Initalize that this program does not need graphic(s) downloaded
@@ -4430,15 +4417,21 @@ class MythTvMetaData(VideoFiles):
 	# end _downloadScheduledRecordedGraphics()
 
 
-	def findFileInDir(self, filename, directories):
-		'''Find is a file is in any of the specified directories
+	def findFileInDir(self, filename, directories, suffix=None):
+		'''Find if a file is in any of the specified directories
 		return False - File not found in directories
 		return True - Absolute file name and path
 		'''
+		(dirName, fileName) = os.path.split(filename)
+		(fileBaseName, fileExtension)=os.path.splitext(fileName)
 		for directory in directories:
-			file_path = "%s/%s" % (directory, filename)
+			file_path = u"%s/%s" % (directory, filename)
 			if os.path.isfile(file_path):
 				return file_path
+			elif suffix:
+				file_path = u"%s/%s%s%s" % (directory, fileBaseName, suffix, fileExtension)
+				if os.path.isfile(file_path):
+					return file_path
 		else:
 			return False
 	# end findFileInDir()
@@ -4510,9 +4503,6 @@ class MythTvMetaData(VideoFiles):
 		missing_inetref=[]
 
 		sys.stdout.write(u'Mythtv video database maintenance start: %s\n' % (datetime.datetime.now()).strftime("%Y-%m-%d %H:%M"))
-
-		# Make sure the graphics directories are unique
-		self.checkUniqueDirectories()
 
 		if not self.config['video_dir'] and not self.config['mythtv_inetref']:
 			allFiles = self._findFiles(directories, self.config['recursive'] , verbose = self.config['debug_enabled'])
@@ -4659,8 +4649,8 @@ class MythTvMetaData(VideoFiles):
 					undersized_graphic = False
 					for ext in self.image_extensions:
 						for graphicsdir in graphicsdirs:
-							filename = tv_series_format % (graphicsdir, inetref, ext)
-							if os.path.isfile(filename):
+							filename = self.findFileInDir(u"%s.%s" % (inetref, ext), [graphicsdir], suffix=self.graphic_suffix[graphic_type])
+							if filename:
 								available_metadata[graphic_type]=self.rtnRelativePath(filename,  graphicsDirectories[graphic_type])
 								if graphic_type == 'coverfile':
 									try:
@@ -4701,16 +4691,15 @@ class MythTvMetaData(VideoFiles):
 						graphic_file = self.rtnAbsolutePath(available_metadata[graphic_type], graphicsDirectories[graphic_type])
 						filepath, filename = os.path.split(graphic_file)
 						filename, ext = os.path.splitext( filename )
-						if filename == (available_metadata['title']+u' Season '+u"%d" % available_metadata['season']):
+						if filename.startswith((available_metadata['title']+u' Season '+u"%d" % available_metadata['season'])):
 							new_format = False
 					else:
 						need_graphic = True
 					if need_graphic or new_format:
 						for ext in self.image_extensions:
 							for graphicsdir in graphicsdirs:
-								filename=tv_series_season_format % (graphicsdir, 
-	available_metadata['title'], available_metadata['season'], ext)
-								if os.path.isfile(filename):
+								filename=self.findFileInDir(u"%s Season %d.%s" % (available_metadata['title'], available_metadata['season'], ext), [graphicsdir], suffix=self.graphic_suffix[graphic_type])
+								if filename:
 									available_metadata[graphic_type]=self.rtnRelativePath(filename,  graphicsDirectories[graphic_type])
 									need_graphic = False
 									if graphic_type == 'coverfile':
@@ -4739,7 +4728,7 @@ class MythTvMetaData(VideoFiles):
 											u"Simulation renaming (%s) to (%s)\n" % (graphic_file, tv_series_season_format % (graphicsdir,available_metadata['title'], available_metadata['season'], ext))
 										)
 									else:
-										dest = tv_series_season_format % (graphicsdir, available_metadata['title'], available_metadata['season'], ext)
+										dest = self.graphic_name_season_suffix % (graphicsdir, available_metadata['title'], available_metadata['season'], self.graphic_suffix[graphic_type], ext)
 										os.rename(graphic_file, dest)
 									available_metadata[graphic_type]= self.rtnRelativePath(dest,  graphicsDirectories[graphic_type])
 							else: # Must see if a graphic is on thetvdb wiki
@@ -4749,7 +4738,7 @@ class MythTvMetaData(VideoFiles):
 										tmp = self._getTvdbGraphics(cfile, graphic_type, toprated=True)
 										if tmp!= None:
 											ext = _getExtention(tmp)
-											dest = tv_series_season_format %(graphicsdir, available_metadata['title'], available_metadata['season'], ext)
+											dest = self.graphic_name_season_suffix %(graphicsdir, available_metadata['title'], available_metadata['season'], self.graphic_suffix[graphic_type], ext)
 											if self.config['simulation']:
 												sys.stdout.write(
 													u"Simulation copy (%s) to (%s)\n" % (tmp,dest)
@@ -4778,7 +4767,7 @@ class MythTvMetaData(VideoFiles):
 									tmp = self._getTvdbGraphics(cfile, graphic_type, toprated=True)
 									if tmp!= None:
 										ext = _getExtention(tmp)
-										dest = tv_series_season_format % (graphicsdir, available_metadata['title'], available_metadata['season'], ext)
+										dest = self.graphic_name_season_suffix % (graphicsdir, available_metadata['title'], available_metadata['season'], self.graphic_suffix[graphic_type], ext)
 										if self.config['simulation']:
 											sys.stdout.write(
 												u"Simulation fanart copy (%s) to (%s)\n" % (tmp, dest)
@@ -4795,9 +4784,9 @@ class MythTvMetaData(VideoFiles):
 					else:
 						if graphic_type == 'coverfile' or graphic_type == 'banner':
 							for ext in self.image_extensions:
-								filename = self.findFileInDir(u"%s.%s" % (available_metadata['title'], ext), self.config[graphicsDirectories[graphic_type]])
+								filename = self.findFileInDir(u"%s.%s" % (available_metadata['title'], ext), self.config[graphicsDirectories[graphic_type]], suffix=self.graphic_suffix[graphic_type])
 								if filename:
-									size = self.findFileInDir(u"%s Season %d.%s" % (available_metadata['title'], available_metadata['season'], ext), self.config[graphicsDirectories[graphic_type]])
+									size = self.findFileInDir(u"%s Season %d.%s" % (available_metadata['title'], available_metadata['season'], ext), self.config[graphicsDirectories[graphic_type]], suffix=self.graphic_suffix[graphic_type])
 									if not size:
 										continue
 									if os.path.getsize(size) == os.path.getsize(filename):
@@ -4834,7 +4823,7 @@ class MythTvMetaData(VideoFiles):
 														num_banners_downloads+=1
 									break
 					for ext in self.image_extensions:
-						dest = self.findFileInDir(u"%s.%s" % (available_metadata['title'], ext), graphicsdirs)
+						dest = self.findFileInDir(u"%s.%s" % (available_metadata['title'], ext), graphicsdirs, suffix=self.graphic_suffix[graphic_type])
 						if dest:
 							break
 					else:
