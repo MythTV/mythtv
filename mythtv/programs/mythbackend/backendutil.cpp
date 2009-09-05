@@ -21,6 +21,7 @@
 #include "util.h"
 #include "decodeencode.h"
 #include "compat.h"
+#include "storagegroup.h"
 
 static QMap<QString, int> fsID_cache;
 static QMutex cache_lock;
@@ -73,14 +74,17 @@ void BackendQueryDiskSpace(QStringList &strlist,
     QString driveKey;
     QString localStr = "1";
     struct statfs statbuf;
+    QStringList groups(StorageGroup::kSpecialGroups);
+    groups.removeAll("LiveTV");
+    QString specialGroups = groups.join("', '");
+    QString sql = QString("SELECT MIN(id),dirname "
+                            "FROM storagegroup "
+                           "WHERE hostname = :HOSTNAME "
+                             "AND groupname NOT IN ( '%1' ) "
+                           "GROUP BY dirname;").arg(specialGroups);
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT MIN(id),dirname "
-                  "FROM storagegroup "
-                  "WHERE hostname = :HOSTNAME "
-                    "AND groupname <> :BACKUPGRP "
-                  "GROUP BY dirname;");
+    query.prepare(sql);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
-    query.bindValue(":BACKUPGRP", "DB Backups");
 
     if (query.exec() && query.isActive())
     {
