@@ -381,23 +381,67 @@ void EditMetadataDialog::fillWidgets()
 
     if (m_coverart)
     {
-        m_coverart->SetFilename(m_workingMetadata->GetCoverFile());
-        m_coverart->Load();
+        if (!m_workingMetadata->GetHost().isEmpty() &&
+            !m_workingMetadata->GetCoverFile().isEmpty() &&
+            !m_workingMetadata->GetCoverFile().startsWith("/"))
+        {
+            m_coverart->SetFilename(GenRemoteFileURL("Coverart",
+                                  m_workingMetadata->GetHost(),
+                                  m_workingMetadata->GetCoverFile()));
+        }
+        else
+            m_coverart->SetFilename(m_workingMetadata->GetCoverFile());
+
+        if (!m_workingMetadata->GetCoverFile().isEmpty())
+            m_coverart->Load();
     }
     if (m_screenshot)
     {
-        m_screenshot->SetFilename(m_workingMetadata->GetScreenshot());
-        m_screenshot->Load();
+        if (!m_workingMetadata->GetHost().isEmpty() &&
+            !m_workingMetadata->GetScreenshot().isEmpty() &&
+            !m_workingMetadata->GetScreenshot().startsWith("/"))
+        {
+            m_screenshot->SetFilename(GenRemoteFileURL("Screenshots",
+                                  m_workingMetadata->GetHost(),
+                                  m_workingMetadata->GetScreenshot()));
+        }
+        else
+            m_screenshot->SetFilename(m_workingMetadata->GetScreenshot());
+
+        if (!m_workingMetadata->GetScreenshot().isEmpty())
+            m_screenshot->Load();
     }
     if (m_banner)
     {
-        m_banner->SetFilename(m_workingMetadata->GetBanner());
-        m_banner->Load();
+        if (!m_workingMetadata->GetHost().isEmpty() &&
+            !m_workingMetadata->GetBanner().isEmpty() &&
+            !m_workingMetadata->GetBanner().startsWith("/"))
+        {
+            m_banner->SetFilename(GenRemoteFileURL("Banners",
+                                  m_workingMetadata->GetHost(),
+                                  m_workingMetadata->GetBanner()));
+        }
+        else
+            m_banner->SetFilename(m_workingMetadata->GetBanner());
+
+        if (!m_workingMetadata->GetBanner().isEmpty())
+            m_banner->Load();
     }
     if (m_fanart)
     {
-        m_fanart->SetFilename(m_workingMetadata->GetFanart());
-        m_fanart->Load();
+        if (!m_workingMetadata->GetHost().isEmpty() &&
+            !m_workingMetadata->GetFanart().isEmpty() &&
+            !m_workingMetadata->GetFanart().startsWith("/"))
+        {
+            m_fanart->SetFilename(GenRemoteFileURL("Fanart", 
+                                  m_workingMetadata->GetHost(),
+                                  m_workingMetadata->GetFanart()));
+        }
+        else
+            m_fanart->SetFilename(m_workingMetadata->GetFanart());
+
+        if (!m_workingMetadata->GetFanart().isEmpty())
+            m_fanart->Load();
     }
 }
 
