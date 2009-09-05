@@ -96,6 +96,10 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
             if (scanStage)
                 scanStage->SetScanProgress(1.0);
             raise(doneStage);
+
+            // HACK: make channel insertion work after [21644]
+            post_event(scanMonitor, ScannerEvent::ScanShutdown,
+                       kDialogCodeAccepted);
         }
         break;
 
