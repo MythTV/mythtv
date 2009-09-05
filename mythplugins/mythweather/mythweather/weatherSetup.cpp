@@ -806,9 +806,7 @@ bool SourceSetup::loadData()
         si->email = db.value(5).toString();
         si->version = db.value(6).toString();
 
-        MythUIButtonListItem *item =
-                            new MythUIButtonListItem(m_sourceList, si->name,
-                                                     qVariantFromValue(si));
+        new MythUIButtonListItem(m_sourceList, si->name, qVariantFromValue(si));
     }
 
     return true;
