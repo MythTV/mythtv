@@ -135,20 +135,17 @@ int main(int argc, char *argv[])
         MythUIHelper::SetX11Display(cmdline.GetDisplay());
     }
 
+    if (!cmdline.GetGeometry().isEmpty())
+    {
+        MythUIHelper::ParseGeometryOverride(cmdline.GetGeometry());
+    }
+
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return TV_EXIT_NO_MYTHCONTEXT;
-    }
-
-    QString geometry = cmdline.GetGeometry();
-    if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Illegal -geometry argument '%1' (ignored)")
-                .arg(geometry));
     }
 
     QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();

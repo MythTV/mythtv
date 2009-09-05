@@ -1256,6 +1256,11 @@ int main(int argc, char **argv)
         MythUIHelper::SetX11Display(cmdline.GetDisplay());
     }
 
+    if (!cmdline.GetGeometry().isEmpty())
+    {
+        MythUIHelper::ParseGeometryOverride(cmdline.GetGeometry());
+    }
+
     CleanupGuard callCleanup(cleanup);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -1360,14 +1365,6 @@ int main(int argc, char **argv)
             MythDB::DBError("Updating language", query);
 
         return FRONTEND_EXIT_OK;
-    }
-
-    QString geometry = cmdline.GetGeometry();
-    if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Illegal -geometry argument '%1' (ignored)")
-                .arg(geometry));
     }
 
     if (settingsOverride.size())

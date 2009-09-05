@@ -355,6 +355,11 @@ int main(int argc, char *argv[])
         MythUIHelper::SetX11Display(display);
     }
 
+    if (!geometry.isEmpty())
+    {
+        MythUIHelper::ParseGeometryOverride(geometry);
+    }
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     std::auto_ptr<MythContext> contextScopeDelete(gContext);
@@ -363,13 +368,6 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return GENERIC_EXIT_NO_MYTHCONTEXT;
-    }
-
-    if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
-    {
-        QString msg = QString("Illegal -geometry argument '%1' (ignored)")
-            .arg(geometry);
-        cerr << msg.toLocal8Bit().constData() << endl;
     }
 
     if (settingsOverride.size())
