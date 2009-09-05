@@ -1737,8 +1737,8 @@ namespace
             QString coverfile;
             if ((metadata->IsHostSet()
                 && !metadata->GetCoverFile().startsWith("/"))
-                && (metadata->GetCoverFile() != "No Cover")
-                && !metadata->GetCoverFile().isEmpty())
+                && !metadata->GetCoverFile().isEmpty()
+                && IsDefaultCoverFile(metadata->GetCoverFile()))
             {
                 coverfile = GenRemoteFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
@@ -2582,7 +2582,8 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     QString imgFilename = GetCoverImage(node);
 
     if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+       (QFileInfo(imgFilename).exists() || 
+       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
     {
         if (parent && metadata &&
             ((QString::compare(parent->getString(), 
@@ -2620,7 +2621,8 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         imgFilename = GetFirstImage(node, "Screenshots");
 
     if (!imgFilename.isEmpty() &&
-        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+       (QFileInfo(imgFilename).exists() ||
+       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
         item->SetImage(imgFilename, "screenshot");
 
     imgFilename = GetBanner(node);
@@ -2629,7 +2631,8 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         imgFilename = GetFirstImage(node, "Banners");
 
     if (!imgFilename.isEmpty() &&
-        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+       (QFileInfo(imgFilename).exists() ||
+       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
         item->SetImage(imgFilename, "banner");
 
     imgFilename = GetFanart(node);
@@ -2638,7 +2641,8 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         imgFilename = GetFirstImage(node, "Fanart");
 
     if (!imgFilename.isEmpty() &&
-        (QFileInfo(imgFilename).exists() || imgFilename.startsWith("myth://")))
+       (QFileInfo(imgFilename).exists() ||
+       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
         item->SetImage(imgFilename, "fanart");
 
     if (nodeInt == kSubFolder)
@@ -3020,7 +3024,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                     QString test_file = GenRemoteFileURL("Coverart",
                                                 metadata->GetHost(), metadata->GetCoverFile());
                                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
-                                        !test_file.endsWith(VIDEO_COVERFILE_DEFAULT))
+                                        !IsDefaultCoverFile(test_file))
                                     {
                                         icon_file = test_file;
                                         break;
@@ -3029,8 +3033,8 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                 else
                                 {
                                     QString test_file = metadata->GetCoverFile();
-                                    if (!test_file.isEmpty() && 
-                                         test_file != VIDEO_COVERFILE_DEFAULT)
+                                    if (!test_file.isEmpty() &&
+                                        !IsDefaultCoverFile(test_file))
                                     {
                                         icon_file = test_file;
                                         break;
@@ -3067,9 +3071,9 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
         if (metadata)
         {
-            if ((metadata->IsHostSet()
-               && !metadata->GetCoverFile().startsWith("/"))
-               && (metadata->GetCoverFile() != "No Cover"))
+            if (metadata->IsHostSet() &&
+                !metadata->GetCoverFile().startsWith("/") &&
+                !IsDefaultCoverFile(metadata->GetCoverFile()))
             {
                 icon_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
@@ -3114,7 +3118,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                         test_file = GenRemoteFileURL("Coverart",
                                     metadata->GetHost(), metadata->GetCoverFile());
                         if (!test_file.endsWith("/") && !test_file.isEmpty() &&
-                            !test_file.endsWith(VIDEO_COVERFILE_DEFAULT))
+                            !IsDefaultCoverFile(test_file))
                         {
                             icon_file = test_file;
                             break;
@@ -3124,7 +3128,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                     {
                         test_file = metadata->GetCoverFile();
                         if (!test_file.isEmpty() &&
-                             test_file != VIDEO_COVERFILE_DEFAULT)
+                            !IsDefaultCoverFile(test_file))
                         {
                             icon_file = test_file;
                             break;

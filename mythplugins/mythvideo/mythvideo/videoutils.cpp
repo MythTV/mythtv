@@ -17,6 +17,7 @@
 namespace
 {
     const QString VIDEO_COVERFILE_DEFAULT_OLD = QObject::tr("None");
+    const QString VIDEO_COVERFILE_DEFAULT_OLD2 = QObject::tr("No Cover");
 
     template <typename T>
     void CopySecond(const T &src, QStringList &dest)
@@ -122,7 +123,10 @@ QStringList GetVideoDirs()
 bool IsDefaultCoverFile(const QString &coverfile)
 {
     return coverfile == VIDEO_COVERFILE_DEFAULT ||
-            coverfile == VIDEO_COVERFILE_DEFAULT_OLD;
+            coverfile == VIDEO_COVERFILE_DEFAULT_OLD ||
+            coverfile == VIDEO_COVERFILE_DEFAULT_OLD2 ||
+            coverfile.endsWith(VIDEO_COVERFILE_DEFAULT_OLD) ||
+            coverfile.endsWith(VIDEO_COVERFILE_DEFAULT_OLD2);
 }
 
 bool IsDefaultScreenshot(const QString &screenshot)
