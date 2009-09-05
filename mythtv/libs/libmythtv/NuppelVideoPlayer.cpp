@@ -746,13 +746,8 @@ bool NuppelVideoPlayer::InitVideo(void)
         }
 
         QRect display_rect;
-        int pbp_width = widget->width() / 2;
         if (pipState == kPIPStandAlone)
             display_rect = QRect(embx, emby, embw, embh);
-        else if (pipState == kPBPLeft)
-            display_rect = QRect(0, 0, pbp_width, widget->height());
-        else if (pipState == kPBPRight)
-            display_rect = QRect(pbp_width, 0, pbp_width, widget->height());
         else
             display_rect = QRect(0, 0, widget->width(), widget->height());
 

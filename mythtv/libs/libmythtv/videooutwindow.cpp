@@ -455,6 +455,13 @@ bool VideoOutWindow::Init(const QSize &new_video_dim, float new_video_aspect,
     display_visible_rect = db_use_gui_size ? new_display_visible_rect :
                                              screen_geom;
 
+    int pbp_width = display_visible_rect.width() / 2;
+    if (pip_state == kPBPLeft || pip_state == kPBPRight)
+        display_visible_rect.setWidth(pbp_width);
+
+    if (pip_state == kPBPRight)
+            display_visible_rect.moveLeft(pbp_width);
+
     video_disp_dim = fix_1080i(new_video_dim);
     video_dim = fix_alignment(new_video_dim);
     video_rect = QRect(display_visible_rect.topLeft(), video_disp_dim);
