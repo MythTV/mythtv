@@ -399,7 +399,7 @@ MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
     return m_itemList.at(m_selPosition);
 }
 
-int MythUIButtonList::GetIntValue()
+int MythUIButtonList::GetIntValue() const
 {
     MythUIButtonListItem *item = GetItemCurrent();
     if (item)
@@ -408,13 +408,22 @@ int MythUIButtonList::GetIntValue()
     return 0;
 }
 
-QString MythUIButtonList::GetValue()
+QString MythUIButtonList::GetValue() const
 {
     MythUIButtonListItem *item = GetItemCurrent();
     if (item)
         return item->GetText();
 
     return QString();
+}
+
+QVariant MythUIButtonList::GetDataValue() const
+{
+    MythUIButtonListItem *item = GetItemCurrent();
+    if (item)
+        return item->GetData();
+
+    return QVariant();
 }
 
 MythUIButtonListItem* MythUIButtonList::GetItemFirst() const

@@ -117,11 +117,12 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void Reset();
     void Update();
 
-    void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
-    void SetValue(QString value) { MoveToNamedPosition(value); }
+    virtual void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
+    virtual void SetValue(QString value) { MoveToNamedPosition(value); }
     void SetValueByData(QVariant data);
-    int  GetIntValue();
-    QString  GetValue();
+    virtual int  GetIntValue() const;
+    virtual QString  GetValue() const;
+    QVariant GetDataValue() const;
 
     void SetItemCurrent(MythUIButtonListItem* item);
     void SetItemCurrent(int pos, int topPos = -1);

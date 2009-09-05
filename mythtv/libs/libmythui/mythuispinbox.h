@@ -21,9 +21,20 @@ class MPUBLIC MythUISpinBox : public MythUIButtonList
 
     void SetRange(int low, int high, int step);
 
+    void SetValue(int val) { SetValueByData(val); }
+    void SetValue(const QString &val) { SetValueByData(val.toInt()); }
+    QString GetValue(void) const { return GetDataValue().toString(); }
+    int GetIntValue(void) const { return GetDataValue().toInt(); }
+
   protected:
+    virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+
+    bool m_hasTemplate;
+    QString m_negativeTemplate;
+    QString m_zeroTemplate;
+    QString m_positiveTemplate;
 };
 
 #endif
