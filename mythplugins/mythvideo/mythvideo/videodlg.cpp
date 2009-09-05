@@ -1738,7 +1738,7 @@ namespace
             if ((metadata->IsHostSet()
                 && !metadata->GetCoverFile().startsWith("/"))
                 && !metadata->GetCoverFile().isEmpty()
-                && IsDefaultCoverFile(metadata->GetCoverFile()))
+                && !IsDefaultCoverFile(metadata->GetCoverFile()))
             {
                 coverfile = GenRemoteFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
