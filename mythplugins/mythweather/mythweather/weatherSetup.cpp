@@ -807,11 +807,9 @@ bool SourceSetup::loadData()
         si->version = db.value(6).toString();
 
         MythUIButtonListItem *item =
-                            new MythUIButtonListItem(m_sourceList, si->name);
-        item->SetData(qVariantFromValue(si));
+                            new MythUIButtonListItem(m_sourceList, si->name,
+                                                     qVariantFromValue(si));
     }
-
-    m_sourceList->SetItemCurrent(0);
 
     return true;
 }
