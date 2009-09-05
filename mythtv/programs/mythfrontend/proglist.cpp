@@ -1572,6 +1572,13 @@ void ProgLister::updateButtonList(void)
 
         pginfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
+        if (m_type == plTitle)
+        {
+            QString tempSubTitle = pginfo->subtitle;
+            if (tempSubTitle.trimmed().isEmpty())
+                tempSubTitle = pginfo->title;
+            item->SetText(tempSubTitle, "titlesubtitle", state);
+        }
 
         QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
         item->DisplayState(rating, "ratingstate");
