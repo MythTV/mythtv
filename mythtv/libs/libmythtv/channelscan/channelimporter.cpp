@@ -32,6 +32,9 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     {
         if (use_gui)
         {
+            VERBOSE(VB_IMPORTANT, LOC + (ChannelUtil::GetChannelCount()
+                                         ? "No new channels to process"
+                                         : "No channels to process.."));
             MythPopupBox::showOkPopup(
                 gContext->GetMainWindow(), QObject::tr("Channel Importer"),
                 ChannelUtil::GetChannelCount()
@@ -40,9 +43,9 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC + (ChannelUtil::GetChannelCount()
-                                         ? "No new channels to process"
-                                         : "No channels to process.."));
+            cout << (ChannelUtil::GetChannelCount() ?
+                     "No new channels to process" :
+                     "No channels to process..");
         }
 
         return;
@@ -74,6 +77,18 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     // Make sure "Open Cable" channels are marked that way.
     FixUpOpenCable(transports);
 
+    // if scan was not aborted prematurely..
+    uint deleted_count = 0;
+    if (do_delete)
+    {
+        ScanDTVTransportList trans = transports;
+        for (uint i = 0; i < db_trans.size(); i++)
+            trans.push_back(db_trans[i]);
+        deleted_count = DeleteChannels(trans);
+        if (deleted_count)
+            transports = trans;
+    }
+
     // Determine System Info standards..
     ChannelImporterBasicStats info = CollectStats(transports);
 
@@ -88,19 +103,14 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     QString msg = GetSummary(transports.size(), info, stats);
     cout << msg.toAscii().constData() << endl << endl;
 
-/*
-    if (use_gui)
-    {
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), QObject::tr("Channel Importer"), msg);
-    }
-*/
-
     if (do_insert)
-    {
         InsertChannels(transports, info);
+
+    if (do_delete && sourceid)
+        DeleteUnusedTransports(sourceid);
+
+    if (do_delete || do_insert)
         ScanInfo::MarkProcessed(saved_scan);
-    }
 }
 
 QString ChannelImporter::toString(ChannelType type)
@@ -121,6 +131,127 @@ QString ChannelImporter::toString(ChannelType type)
         case kNTSCConflicting:    return "NTSC";
     }
     return "Unknown";
+}
+
+uint ChannelImporter::DeleteChannels(
+    ScanDTVTransportList &transports)
+{
+    vector<uint> off_air_list;
+    QMap<uint,bool> deleted;
+
+    for (uint i = 0; i < transports.size(); i++)
+    {
+        for (uint j = 0; j < transports[i].channels.size(); j++)
+        {
+            ChannelInsertInfo chan = transports[i].channels[j];
+            bool was_in_db = chan.db_mplexid && chan.channel_id;
+            if (!was_in_db)
+                continue;
+
+            if (!chan.in_pmt)
+                off_air_list.push_back(i<<16|j);
+        }
+    }
+
+    ScanDTVTransportList newlist;
+    if (off_air_list.empty())
+    {
+        return 0;
+    }
+
+    // ask user whether to delete all or some of these stale channels
+    //   if some is selected ask about each individually
+    QString msg = QObject::tr(
+        "Found %1 off-air channels.").arg(off_air_list.size());
+    DeleteAction action = QueryUserDelete(msg);
+    if (kDeleteIgnoreAll == action)
+        return 0;
+
+    if (kDeleteAll == action)
+    {
+        for (uint k = 0; k < off_air_list.size(); k++)
+        {
+            int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
+            ChannelUtil::DeleteChannel(
+                transports[i].channels[j].channel_id);
+            deleted[off_air_list[k]] = true;
+        }
+    }
+    else
+    {
+        // TODO manual delete
+    }
+
+    // TODO delete encrypted channels when m_fta_only set
+
+    // Create a new transports list without the deleted channels
+    for (uint i = 0; i < transports.size(); i++)
+    {
+        newlist.push_back(transports[i]);
+        newlist.back().channels.clear();
+        for (uint j = 0; j < transports[i].channels.size(); j++)
+        {
+            if (!deleted.contains(i<<16|j))
+            {
+                newlist.back().channels.push_back(
+                    transports[i].channels[j]);
+            }
+        }
+    }
+
+    // TODO print list of stale channels (as deleted if action approved).
+
+    transports = newlist;
+    return deleted.size();
+}
+
+uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT mplexid FROM dtv_multiplex "
+        "WHERE sourceid = :SOURCEID1 AND "
+        "      mplexid NOT IN "
+        " (SELECT mplexid "
+        "  FROM channel "
+        "  WHERE sourceid = :SOURCEID2)");
+    query.bindValue(":SOURCEID1", sourceid);
+    query.bindValue(":SOURCEID2", sourceid);
+    if (!query.exec())
+    {
+        MythDB::DBError("DeleteUnusedTransports() -- select", query);
+        return 0;
+    }
+
+    VERBOSE(VB_IMPORTANT, 
+            QObject::tr("Found %1 unused transports.").arg(query.size()));
+
+    QString msg = QObject::tr("Found %1 unused transports.").arg(query.size());
+    DeleteAction action = QueryUserDelete(msg);
+    if (kDeleteIgnoreAll == action)
+        return 0;
+
+    if (kDeleteAll == action)
+    {
+        query.prepare(
+            "DELETE FROM dtv_multiplex "
+            "WHERE sourceid = :SOURCEID1 AND "
+            "      mplexid NOT IN "
+            " (SELECT mplexid "
+            "  FROM channel "
+            "  WHERE sourceid = :SOURCEID2)");
+        query.bindValue(":SOURCEID1", sourceid);
+        query.bindValue(":SOURCEID2", sourceid);
+        if (!query.exec())
+        {
+            MythDB::DBError("DeleteUnusedTransports() -- delete", query);
+            return 0;
+        }
+    }
+    else
+    {
+        // TODO manual delete
+    }
 }
 
 void ChannelImporter::InsertChannels(
@@ -205,16 +336,9 @@ void ChannelImporter::InsertChannels(
         }
     }    
 
-    // if scan was not aborted prematurely
-    //   ask user whether to delete all or some of these stale channels
-    //     if some is selected ask about each individually
-    //   ask user whether to delete all or some of these stale transports
-    //     if some is selected ask about each individually
-
     // print list of inserted channels
     // print list of ignored channels (by ignored reason category)
     // print list of invalid channels
-    // print list of stale channels (as deleted if action approved).
 }
 
 ScanDTVTransportList ChannelImporter::InsertChannels(
@@ -1012,6 +1136,65 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
     last_free_chan_num_map[chan.source_id] = last_free_chan_num;
 
     return chan_num;
+}
+
+ChannelImporter::DeleteAction
+ChannelImporter::QueryUserDelete(const QString &msg)
+{
+    DeleteAction action = kDeleteAll;
+    if (use_gui)
+    {
+        QStringList buttons;
+        buttons.push_back(QObject::tr("Delete all"));
+//        buttons.push_back(QObject::tr("Delete manually"));
+        buttons.push_back(QObject::tr("Ignore all"));
+
+        DialogCode ret;
+        do
+        {
+            ret = MythPopupBox::ShowButtonPopup(
+                gContext->GetMainWindow(), QObject::tr("Channel Importer"),
+                msg, buttons, kDialogCodeButton0);
+
+            ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
+
+        } while (!(kDialogCodeButton0 <= ret && ret <= kDialogCodeButton2));
+
+        action = (kDialogCodeButton0 == ret) ? kDeleteAll       : action;
+        action = (kDialogCodeButton1 == ret) ? kDeleteIgnoreAll   : action;//
+//        action = (kDialogCodeButton1 == ret) ? kDeleteManual    : action;
+//        action = (kDialogCodeButton2 == ret) ? kDeleteIgnoreAll : action;
+    }
+    else if (is_interactive)
+    {
+        cout << msg.toAscii().constData()          << endl;
+        cout << "Do you want to:"    << endl;
+        cout << "1. Delete all"      << endl;
+//        cout << "2. Delete manually" << endl;
+        cout << "3. Ignore all"      << endl;
+        while (true)
+        {
+            string ret;
+            cin >> ret;
+            bool ok;
+            uint val = QString(ret.c_str()).toUInt(&ok);
+            if (ok && (1 <= val) && (val <= 3))
+            {
+                action = (1 == val) ? kDeleteAll       : action;
+                //action = (2 == val) ? kDeleteManual    : action;
+                action = (2 == val) ? kDeleteIgnoreAll : action;//
+                action = (3 == val) ? kDeleteIgnoreAll : action;
+                break;
+            }
+            else
+            {
+                //cout << "Please enter either 1, 2, or 3:" << endl;
+                cout << "Please enter either 1 or 3:" << endl;//
+            }
+        }
+    }
+
+    return action;
 }
 
 ChannelImporter::InsertAction

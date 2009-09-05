@@ -75,15 +75,23 @@ class ChannelImporterUniquenessStats
 class MPUBLIC ChannelImporter
 {
   public:
-    ChannelImporter(bool gui, bool interactive, bool insert, bool save,
+    ChannelImporter(bool gui, bool interactive,
+                    bool _delete, bool insert, bool save,
                     bool fta_only, ServiceRequirements service_requirements) :
         use_gui(gui), is_interactive(interactive),
+        do_delete(_delete),
         do_insert(insert), do_save(save), m_fta_only(fta_only),
         m_service_requirements(service_requirements) { }
 
     void Process(const ScanDTVTransportList&);
 
   protected:
+    typedef enum
+    {
+        kDeleteAll,
+        kDeleteManual,
+        kDeleteIgnoreAll,
+    } DeleteAction;
     typedef enum
     {
         kInsertAll,
@@ -126,6 +134,9 @@ class MPUBLIC ChannelImporter
     ScanDTVTransportList GetDBTransports(
         uint sourceid, ScanDTVTransportList&) const;
 
+    uint DeleteChannels(ScanDTVTransportList&);
+    uint DeleteUnusedTransports(uint sourceid);
+
     void InsertChannels(const ScanDTVTransportList&,
                         const ChannelImporterBasicStats&);
 
@@ -141,10 +152,13 @@ class MPUBLIC ChannelImporter
         UpdateAction action, ChannelType type,
         ScanDTVTransportList &filtered);
 
-    /// For a multiple channels
+    /// For multiple channels
+    DeleteAction QueryUserDelete(const QString &msg);
+
+    /// For multiple channels
     InsertAction QueryUserInsert(const QString &msg);
 
-    /// For a multiple channels
+    /// For multiple channels
     UpdateAction QueryUserUpdate(const QString &msg);
 
     /// For a single channel
@@ -203,6 +217,7 @@ class MPUBLIC ChannelImporter
   private:
     bool use_gui;
     bool is_interactive;
+    bool do_delete;
     bool do_insert;
     bool do_save;
     /// Only FreeToAir (non-encrypted) channels desired post scan?

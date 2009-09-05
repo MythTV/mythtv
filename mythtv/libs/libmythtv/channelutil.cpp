@@ -1550,6 +1550,23 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     return true;
 }
 
+bool ChannelUtil::DeleteChannel(uint channel_id)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "DELETE FROM channel "
+        "WHERE chanid = :ID");
+    query.bindValue(":ID", channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("Delete Channel", query);
+        return false;
+    }
+
+    return true;
+}
+
 bool ChannelUtil::SetServiceVersion(int mplexid, int version)
 {
     MSqlQuery query(MSqlQuery::InitCon());

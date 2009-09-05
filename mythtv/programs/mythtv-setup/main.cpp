@@ -513,7 +513,7 @@ int main(int argc, char *argv[])
         cout<<"*** SCAN IMPORT START ***"<<endl;
         {
             ScanDTVTransportList list = LoadScan(scanImport);
-            ChannelImporter ci(false, true, true, false,
+            ChannelImporter ci(false, true, true, true, false,
                                scanFTAOnly, scanServiceRequirements);
             ci.Process(list);
         }

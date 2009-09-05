@@ -172,7 +172,7 @@ void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 
 void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports)
 {
-    ChannelImporter ci(true, true, true, true,
+    ChannelImporter ci(true, true, true, true, true,
                        freeToAirOnly, serviceRequirements);
     ci.Process(_transports);
 }

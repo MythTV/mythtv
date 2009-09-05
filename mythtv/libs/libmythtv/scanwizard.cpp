@@ -129,7 +129,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
         do_scan = false;
         uint scanid = configPane->GetScanID();
         ScanDTVTransportList transports = LoadScan(scanid);
-        ChannelImporter ci(true, true, true, false,
+        ChannelImporter ci(true, true, true, true, false,
                            configPane->DoFreeToAirOnly(),
                            configPane->GetServiceRequirements());
         ci.Process(transports);

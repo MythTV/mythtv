@@ -22,6 +22,7 @@
 #include "channelsettings.h"
 #include "transporteditor.h"
 #include "sourceutil.h"
+#include "channelutil.h"
 
 #include "scanwizard.h"
 #include "importicons.h"
@@ -605,18 +606,9 @@ void ChannelEditor::customEvent(QEvent *event)
                     qVariantValue<MythUIButtonListItem *>(dce->GetData());
             if (!item)
                 return;
-            int chanid = item->GetData().toInt();
-            if (chanid > 0)
-            {
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.prepare("DELETE FROM channel WHERE chanid = :CHID ;");
-                query.bindValue(":CHID", chanid);
-                if (!query.exec() || !query.isActive())
-                    MythDB::DBError("ChannelEditor Delete Channel", query);
-
+            uint chanid = item->GetData().toUInt();
+            if (chanid && ChannelUtil::DeleteChannel(chanid))
                 m_channelList->RemoveItem(item);
-            }
-            //fillList();
         }
         else if (resultid == "delall" && buttonnum == 1)
         {

@@ -151,7 +151,7 @@ void ChannelScannerCLI::InformUser(const QString &error)
 
 void ChannelScannerCLI::Process(const ScanDTVTransportList &_transports)
 {
-    ChannelImporter ci(false, interactive, !onlysavescan, true,
+    ChannelImporter ci(false, interactive, !onlysavescan, !onlysavescan, true,
                        freeToAirOnly, serviceRequirements);
     ci.Process(_transports);
 }
