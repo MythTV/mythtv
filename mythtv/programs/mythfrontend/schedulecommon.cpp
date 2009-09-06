@@ -37,37 +37,6 @@ void ScheduleCommon::ShowDetails(ProgramInfo *pginfo) const
     }
     
     mainStack->AddScreen(details_dialog);
-    
-    // HACK begin - remove when everything is using mythui
-    if (GetMythMainWindow()->currentWidget())
-    {
-        QWidget *widget = GetMythMainWindow()->currentWidget();
-        vector<QWidget *> widgetList;
-        
-        while (widget)
-        {
-            widgetList.push_back(widget);
-            GetMythMainWindow()->detach(widget);
-            widget = GetMythMainWindow()->currentWidget();
-        }
-        
-        GetMythMainWindow()->GetPaintWindow()->raise();
-        GetMythMainWindow()->GetPaintWindow()->setFocus();
-        
-        int screenCount = mainStack->TotalScreens();
-        do
-        {
-            qApp->processEvents();
-            usleep(5000);
-        } while (mainStack->TotalScreens() >= screenCount);
-        
-        vector<QWidget*>::reverse_iterator it;
-        for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
-        {
-            GetMythMainWindow()->attach(*it);
-        }
-    }
-    // HACK end
 }
 
 /**
