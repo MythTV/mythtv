@@ -330,7 +330,7 @@
                     <imagetype name="buttonimage">
                         <area>0,2,25,25</area>
                         <preserveaspect>yes</preserveaspect>
-                        <filename>mv_browse_nocover.png</filename>
+                        <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
                         <position>0,9</position>
@@ -413,7 +413,7 @@
                     <imagetype name="buttonimage">
                         <area>10,15,133,200</area>
                         <preserveaspect>true</preserveaspect>
-                        <filename>mv_browse_nocover.png</filename>
+                        <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
                         <position>60,140</position>
@@ -597,11 +597,11 @@
                 <state name="active">
                     <area>0,0,175,160</area>
                     <imagetype name="buttonbackground">
-                        <filename>mv_gallery_back_reg.png</filename>
+                        <filename>shared/grid_back_reg.png</filename>
                     </imagetype>
                     <imagetype name="buttonimage">
                         <area>10,8,155,125</area>
-                        <filename>mv_browse_nocover.png</filename>
+                        <filename>shared/grid_noimage.png</filename>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="nodetype">
@@ -634,7 +634,7 @@
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
-                        <filename>mv_gallery_back_sel.png</filename>
+                        <filename>shared/grid_back_sel.png</filename>
                     </imagetype>
                 </state>
             </statetype>

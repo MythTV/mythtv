@@ -341,7 +341,7 @@
                     <imagetype name="buttonimage">
                         <area>0,2,25,25</area>
                         <preserveaspect>yes</preserveaspect>
-                        <filename>mv_browse_nocover.png</filename>
+                        <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
                         <position>0,9</position>
@@ -425,7 +425,7 @@
                     <imagetype name="buttonimage">
                         <area>10,15,80,120</area>
                         <preserveaspect>true</preserveaspect>
-                        <filename>mv_browse_nocover.png</filename>
+                        <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
                         <position>35,80</position>
@@ -624,12 +624,12 @@
                 <area>0,0,150,125</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
-                        <filename>mv_gallery_back_reg.png</filename>
+                        <filename>shared/grid_back_reg.png</filename>
                     </imagetype>
                     <imagetype name="buttonimage">
                         <area>10,8,130,90</area>
                         <preserveaspect>true</preserveaspect>
-                        <filename>mv_browse_nocover.png</filename>
+                        <filename>shared/grid_noimage.png</filename>
                     </imagetype>
                     <statetype name="nodetype">
                         <position>80,55</position>
@@ -661,7 +661,7 @@
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
-                        <filename>mv_gallery_back_sel.png</filename>
+                        <filename>shared/grid_back_sel.png</filename>
                     </imagetype>
                 </state>
             </statetype>
