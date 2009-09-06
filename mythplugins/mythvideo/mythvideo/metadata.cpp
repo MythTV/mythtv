@@ -933,7 +933,7 @@ QString Metadata::FilenameToMeta(const QString &file_name, int position)
     else if (position == 2 || position == 3)
         return QString("0");
 
-    return QString("");
+    return QString();
 }
 
 namespace
