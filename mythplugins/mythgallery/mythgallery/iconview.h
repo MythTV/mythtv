@@ -25,6 +25,7 @@
 #include <QStringList>
 #include <QList>
 #include <QHash>
+#include <QThread>
 
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
@@ -41,6 +42,7 @@ using namespace std;
 
 class ThumbGenerator;
 class MediaMonitor;
+class ChildCountThread;
 
 Q_DECLARE_METATYPE(ThumbItem*)
 
@@ -105,6 +107,7 @@ class IconView : public MythScreenType
     void ImportFromDir(const QString &fromDir, const QString &toDir);
     void CopyMarkedFiles(bool move = false);
     ThumbItem *GetCurrentThumb(void);
+    int GetChildCount(ThumbItem *thumbitem);
 
     QList<ThumbItem*>           m_itemList;
     QHash<QString, ThumbItem*>  m_itemHash;
@@ -114,6 +117,8 @@ class IconView : public MythScreenType
 
     MythUIButtonList   *m_imageList;
     MythUIText         *m_captionText;
+    MythUIText         *m_crumbsText;
+    MythUIText         *m_positionText;
     MythUIText         *m_noImagesText;
     MythUIImage        *m_selectedImage;
     MythDialogBox      *m_menuPopup;
@@ -125,6 +130,7 @@ class IconView : public MythScreenType
     MythMediaDevice    *m_currDevice;
 
     ThumbGenerator     *m_thumbGen;
+    ChildCountThread   *m_childCountThread;
 
     int                 m_showcaption;
     int                 m_sortorder;
@@ -143,5 +149,45 @@ class IconView : public MythScreenType
     friend class FileCopyThread;
 };
 
+typedef struct 
+{
+    QString fileName;
+    int count;
+} ChildCountData;
+
+const int kMythGalleryChildCountEventType = QEvent::User + 4001;
+
+class ChildCountEvent : public QEvent
+{
+  public:
+    ChildCountEvent(ChildCountData *ccd)
+         : QEvent((QEvent::Type)kMythGalleryChildCountEventType) { childCountData = ccd; }
+    ~ChildCountEvent() {}
+
+    ChildCountData *childCountData;
+};
+
+class ChildCountThread : public QThread
+{
+public:
+
+    ChildCountThread(QObject *parent);
+    ~ChildCountThread();
+
+    void addFile(const QString &fileName);
+    void cancel();
+
+protected:
+    void run();
+
+private:
+
+    bool moreWork();
+    int  getChildCount(const QString &fileName);
+
+    QObject     *m_parent;
+    QStringList  m_fileList;
+    QMutex       m_mutex;
+};
 
 #endif /* ICONVIEW_H */

@@ -103,7 +103,8 @@ IconView::IconView(MythScreenStack *parent, const char *name,
     m_showDevices = false;
     m_currDevice = initialDevice;
 
-    m_thumbGen = new ThumbGenerator(this,0,0);
+    m_thumbGen = new ThumbGenerator(this, 0, 0);
+    m_childCountThread = new ChildCountThread(this);
 
     m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
     m_sortorder = gContext->GetNumSetting("GallerySortOrder", 0);
@@ -136,6 +137,12 @@ IconView::~IconView()
         delete m_thumbGen;
         m_thumbGen = NULL;
     }
+
+    if (m_childCountThread)
+    {
+        delete m_childCountThread;
+        m_childCountThread = NULL;
+    }
 }
 
 bool IconView::Create(void)
@@ -148,16 +155,17 @@ bool IconView::Create(void)
     if (!foundtheme)
         return false;
 
-    m_imageList = dynamic_cast<MythUIButtonList *> (GetChild("images"));
-    m_captionText = dynamic_cast<MythUIText *> (GetChild("text"));
-    m_noImagesText = dynamic_cast<MythUIText *> (GetChild("noimages"));
+    bool err = false;
+    UIUtilE::Assign(this, m_imageList,     "images", &err);
+    UIUtilW::Assign(this, m_captionText,   "title");
+    UIUtilW::Assign(this, m_noImagesText,  "noimages");
+    UIUtilW::Assign(this, m_selectedImage, "selectedimage");
+    UIUtilW::Assign(this, m_positionText,  "position");
+    UIUtilW::Assign(this, m_crumbsText,    "breadcrumbs");
 
-    m_selectedImage = dynamic_cast<MythUIImage *>
-                (GetChild("selectedimage"));
-
-    if (!m_imageList)
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'gallery'");
         return false;
     }
 
@@ -194,6 +202,12 @@ bool IconView::Create(void)
 
 void IconView::LoadDirectory(const QString &dir)
 {
+    if (m_thumbGen && m_thumbGen->isRunning())
+        m_thumbGen->cancel();
+
+    if (m_childCountThread && m_childCountThread->isRunning())
+        m_childCountThread->cancel();
+
     QDir d(dir);
     if (!d.exists())
     {
@@ -228,6 +242,11 @@ void IconView::LoadDirectory(const QString &dir)
             new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), 0,
                                      true, MythUIButtonListItem::NotChecked);
         item->SetData(qVariantFromValue(thumbitem));
+        if (thumbitem->IsDir())
+        {
+            item->DisplayState("subfolder", "nodetype");
+            m_childCountThread->addFile(thumbitem->GetPath());
+        }
 
         LoadThumbnail(thumbitem);
 
@@ -238,8 +257,13 @@ void IconView::LoadDirectory(const QString &dir)
             item->setChecked(MythUIButtonListItem::FullChecked);
     }
 
+    if (m_childCountThread && !m_childCountThread->isRunning())
+                m_childCountThread->start();
+
     if (m_noImagesText)
         m_noImagesText->SetVisible((m_itemList.size() == 0));
+
+    UpdateText(m_imageList->GetItemCurrent());
 }
 
 void IconView::LoadThumbnail(ThumbItem *item)
@@ -297,7 +321,6 @@ void IconView::LoadThumbnail(ThumbItem *item)
 //             matrix.rotate(rotateAngle);
 //             image = image.xForm(matrix);
 //         }
-
     item->SetImageFilename(imagePath);
 }
 
@@ -341,18 +364,37 @@ void IconView::SetupMediaMonitor(void)
 
 void IconView::UpdateText(MythUIButtonListItem *item)
 {
-    if (!m_captionText)
+    if (!item)
+    {
+        if (m_positionText)
+            m_positionText->SetText("");
         return;
+    }
+
+    if (m_positionText)
+        m_positionText->SetText(QString(tr("%1 of %2"))
+                                .arg(m_imageList->GetCurrentPos() + 1)
+                                .arg(m_imageList->GetCount()));
 
     ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    if (!thumbitem)
+        return;
 
-    QString caption = "";
-    if (thumbitem)
+    if (m_crumbsText)
     {
+        QString path = thumbitem->GetPath();
+        path.replace(m_galleryDir, tr("Gallery Home"));
+        path.replace("/", " > ");
+        m_crumbsText->SetText(path);
+    }
+
+    if (m_captionText)
+    {
+        QString caption;
         caption = thumbitem->GetCaption();
         caption = (caption.isNull()) ? "" : caption;
+        m_captionText->SetText(caption);
     }
-    m_captionText->SetText(caption);
 }
 
 void IconView::UpdateImage(MythUIButtonListItem *item)
@@ -679,6 +721,24 @@ void IconView::customEvent(QEvent *event)
                 item->SetImage(thumbitem->GetImageFilename());
         }
         delete td;
+    }
+    else if (event->type() == kMythGalleryChildCountEventType)
+    {
+        ChildCountEvent *cce = (ChildCountEvent *)event;
+
+        ChildCountData *ccd = cce->childCountData;
+        if (!ccd)
+            return;
+
+        ThumbItem *thumbitem = m_itemHash.value(ccd->fileName);
+        if (thumbitem)
+        {
+            int pos = m_itemList.indexOf(thumbitem);
+            MythUIButtonListItem *item = m_imageList->GetItemAt(pos);
+            if (item)
+                item->SetText(QString("%1").arg(ccd->count), "childcount");
+        }
+        delete ccd;
     }
     else if (event->type() == kMythDialogBoxCompletionEventType)
     {
@@ -1340,4 +1400,104 @@ ThumbItem *IconView::GetCurrentThumb(void)
     if (item)
         return qVariantValue<ThumbItem *>(item->GetData());
     return NULL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ChildCountThread::ChildCountThread(QObject *parent)
+{
+    m_parent = parent;
+}
+
+ChildCountThread::~ChildCountThread()
+{
+    cancel();
+    wait();
+}
+
+void ChildCountThread::addFile(const QString& filePath)
+{
+    m_mutex.lock();
+    m_fileList.append(filePath);
+    m_mutex.unlock();
+}
+
+void ChildCountThread::cancel()
+{
+    m_mutex.lock();
+    m_fileList.clear();
+    m_mutex.unlock();
+}
+
+void ChildCountThread::run()
+{
+    while (moreWork())
+    {
+        QString file;
+
+        m_mutex.lock();
+        file = m_fileList.first();
+        if (!m_fileList.isEmpty())
+            m_fileList.pop_front();
+        m_mutex.unlock();
+
+        if (file.isEmpty())
+            continue;
+        int count = getChildCount(file);
+
+        ChildCountData *ccd = new ChildCountData;
+        ccd->fileName  = file.section('/', -1);
+        ccd->count     = count;
+
+        // inform parent we have got a count ready for it
+        QApplication::postEvent(m_parent, new ChildCountEvent(ccd));
+    }
+}
+
+bool ChildCountThread::moreWork()
+{
+    bool result;
+    m_mutex.lock();
+    result = !m_fileList.isEmpty();
+    m_mutex.unlock();
+    return result;
+}
+
+int ChildCountThread::getChildCount(const QString &filepath)
+{
+    QDir d(filepath);
+
+    bool isGallery;
+    QFileInfoList gList = d.entryInfoList(QStringList("serial*.dat"),
+                                          QDir::Files);
+    isGallery = (gList.count() != 0);
+
+    QFileInfoList list = d.entryInfoList(GalleryUtil::GetMediaFilter(),
+                                         QDir::Files | QDir::AllDirs);
+
+    if (list.isEmpty())
+        return 0;
+
+    QFileInfoList::const_iterator it = list.begin();
+    const QFileInfo *fi;
+
+    int count = 0;
+    while (it != list.end())
+    {
+        fi = &(*it);
+        ++it;
+        if (fi->fileName() == "." || fi->fileName() == "..")
+            continue;
+
+        // remove these already-resized pictures.
+        if (isGallery && (
+                (fi->fileName().indexOf(".thumb.") > 0) ||
+                (fi->fileName().indexOf(".sized.") > 0) ||
+                (fi->fileName().indexOf(".highlight.") > 0)))
+            continue;
+
+        count++;
+    }
+
+    return count;
 }

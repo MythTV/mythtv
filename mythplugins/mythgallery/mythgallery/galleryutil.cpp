@@ -163,7 +163,7 @@ long GalleryUtil::GetNaturalRotation(const QString &filePathString)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            VERBOSE(VB_FILE, LOC_ERR +
                     QString("Could not load exif data from '%1'")
                     .arg(filePath));
         }
@@ -300,9 +300,9 @@ QString GalleryUtil::GetCaption(const QString &filePath)
 #if NEW_LIB_EXIF
                     exif_entry_get_value(entry, exifvalue, 1023);
                     caption = exifvalue;
-#else           
+#else
                     caption = exif_entry_get_value(entry);
-#endif          
+#endif
                     // Found one, done
                     if(!caption.isEmpty())
                        break;
@@ -315,9 +315,9 @@ QString GalleryUtil::GetCaption(const QString &filePath)
 #if NEW_LIB_EXIF
                     exif_entry_get_value(entry, exifvalue, 1023);
                     caption = exifvalue;
-#else           
+#else
                     caption = exif_entry_get_value(entry);
-#endif          
+#endif
                     // Found one, done
                     if(!caption.isEmpty())
                        break;
@@ -327,11 +327,11 @@ QString GalleryUtil::GetCaption(const QString &filePath)
         }
         else
         {
-           VERBOSE(VB_IMPORTANT, LOC_ERR +
+           VERBOSE(VB_FILE, LOC_ERR +
                    QString("Could not load exif data from '%1'")
                    .arg(filePath));
         }
-        
+
         delete [] exifvalue;
 #endif // EXIF_SUPPORT
     }
