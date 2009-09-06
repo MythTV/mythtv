@@ -2,6 +2,9 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
+QMAKE_COPY_DIR = sh ../../cpsvndir
+win32:QMAKE_COPY_DIR = sh ../../cpsimple
+
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libavformat
 INCLUDEPATH += $${SYSROOT}$${PREFIX}/include/mythtv/libswscale
 DEPENDPATH *= $${INCLUDEPATH}

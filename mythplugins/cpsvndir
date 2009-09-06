@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# cpsvndir: recursive directory copy excluding .svn sub dirs.
+
+DESTDIR=$2
+SOURCE=$(basename "$1")
+
+if [ -z "$1" -o -z "$2" ]; then
+    echo "Usage: $0 source-dir destination-dir"
+    exit -1
+fi
+
+# Some shells don't set EUID
+if [ -z "$EUID" ]; then
+    if [ -x /usr/bin/id ]; then EUID=`id -u` ;fi
+    if [ -z "$EUID" ];     then EUID=$USER   ;fi
+    if [ -z "$EUID" ];     then EUID=0       ;fi  # Will fail if not root
+fi
+
+# Do similarly for EGID
+if [ -z "$EGID" ]; then
+    if [ -x /usr/bin/id ]; then EGID=`id -g` ;fi
+    if [ -z "$EGID" ];     then EGID=0       ;fi  # Will fail if not root
+fi
+
+mkdir -p $DESTDIR/$SOURCE || exit 1
+
+find $SOURCE -path '*/.svn' -prune -or -type d -exec mkdir -p $DESTDIR/{} \;
+find $SOURCE -path '*/.svn' -prune -or ! -type d \
+             -exec cp -p {}    $DESTDIR/{} \; \
+             -exec chown $EUID $DESTDIR/{} \; \
+             -exec chgrp $EGID $DESTDIR/{} \; \
+             -exec chmod +r    $DESTDIR/{} \;
+
+exit 0
