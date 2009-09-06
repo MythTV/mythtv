@@ -844,6 +844,8 @@ void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
 
 void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 {
+    if (softwareDeinterlacer != filter)
+        CheckResize(false);
     softwareDeinterlacer = filter;
     softwareDeinterlacer.detach();
 }
@@ -925,17 +927,20 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             softwareDeinterlacing &&
             (filter->outputBuffer == kDefaultBuffer))
         {
+            bool top = (scan == kScan_Intr2ndField && topfieldfirst) ||
+                       (scan == kScan_Interlaced && !topfieldfirst);
+            bool bot = (scan == kScan_Interlaced && topfieldfirst) ||
+                       (scan == kScan_Intr2ndField && !topfieldfirst);
+            bool first = filters.size() < 2;
             float bob = (trueheight / (float)video_dim.height()) / 4.0f;
-            if ((scan == kScan_Intr2ndField && topfieldfirst) ||
-                (scan == kScan_Interlaced && !topfieldfirst))
+            if ((top && !first) || (bot && first))
             {
                 t_top /= 2;
                 t_bottom /= 2;
                 t_bottom += bob;
                 t_top    += bob;
             }
-            if ((scan == kScan_Interlaced && topfieldfirst) ||
-                (scan == kScan_Intr2ndField && !topfieldfirst))
+            if ((bot && !first) || (top && first))
             {
                 t_top = (trueheight / 2) + (t_top / 2);
                 t_bottom = (trueheight / 2) + (t_bottom / 2);

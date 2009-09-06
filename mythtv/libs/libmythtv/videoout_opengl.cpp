@@ -342,7 +342,7 @@ void VideoOutputOpenGL::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     if (!buffer)
     {
         buffer = vbuffers.GetScratchFrame();
-        if (m_deinterlacing)
+        if (m_deinterlacing && !IsBobDeint())
             t = kScan_Interlaced;
     }
 
