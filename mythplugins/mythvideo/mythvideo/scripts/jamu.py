@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.4" # 0.1.0 Initial development 
+__version__=u"v0.4.5" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -138,7 +138,7 @@ __version__=u"v0.4.4" # 0.1.0 Initial development
 					 #       distrubuted version.
 					 #		 Fixed the check that confirms that all Video and graphic directories are
 					 #       read and writable.
-					 #		 Fixed a bug where under rare circumstances a grraphic would be repeatedly
+					 #		 Fixed a bug where under rare circumstances a graphic would be repeatedly
 					 #		 downloaded.  
 					 #		 Made the installation of the python IMDbPy library manditory.
 					 #       For all movies IMDB numbers will be used instead of converting to TMDB 
@@ -155,6 +155,10 @@ __version__=u"v0.4.4" # 0.1.0 Initial development
                      #       _fanart, _banner, _screenshot" respectively to downloaded graphics.
 					 #       With the use of a graphic suffix the requirement for unique graphics 
 					 #       directories is gone. The check has been removed.
+					 # 0.4.5 Fixed a bug where lowercase tv video filenames caused graphics files to
+					 #       also be lowercase which can cause graphics to be downloaded twice.
+					 #       Fixed a bug in graphics file name creation for a TV season.
+					 #       Added checks for compatible python library versions of xml and MySQLdb
 
 
 usage_txt=u'''
@@ -293,10 +297,8 @@ without_ep_name (%(series)s - S%(seasonnumber)02dE%(episodenumber)02d.%(ext)s)
 import sys, os, re, locale, subprocess, locale, ConfigParser, urllib, codecs, shutil, datetime, fnmatch, string
 from optparse import OptionParser
 from socket import gethostname, gethostbyname
-import xml.etree.cElementTree as ElementTree
 import tempfile
 import logging
-import MySQLdb
 
 class OutStreamEncoder(object):
 	"""Wraps a stream with an encoder"""
@@ -319,6 +321,27 @@ class OutStreamEncoder(object):
 		return getattr(self.out, attr)
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
+
+try:
+	import xml
+except Exception:
+	print '''The python module xml must be installed.'''
+	sys.exit(False)
+if xml.__version__ < u'41660':
+	print '''
+\n! Warning - The module xml (v41660 or greater) must be installed. Your version is different (v%s) than what Jamu was tested with. Jamu may not work on your installation.\nIt is recommended that you upgrade.\n''' % xml.__version__
+import xml.etree.cElementTree as ElementTree
+
+try:
+	import MySQLdb
+except Exception:
+	print '''
+The module MySQLdb (v1.2.2 or greater) must be installed.'''
+	sys.exit(False)
+if MySQLdb.__version__ < u'1.2.2':
+	print '''
+\n! Warning - The module MySQLdb (v1.2.2 or greater) must be installed. Your version is different (v%s) than what Jamu was tested with. Jamu may not work on your installation.\nIt is recommended that you upgrade.\n''' % MySQLdb.__version__
+
 
 # Find out if the MythTV python bindings can be accessed and instances can created
 try:
@@ -2729,7 +2752,7 @@ class MythTvMetaData(VideoFiles):
 	initialize_record = {u'subtitle': u'', u'director': u'Unknown', u'rating': u'NR', u'inetref': u'00000000', u'year': 1895, u'userrating': 0.0, u'length': 0, u'showlevel': 1, u'coverfile': u'No Cover', u'host': u'',}
 	graphic_suffix = {u'coverfile': u'_coverart', u'fanart': u'_fanart', u'banner': u'_banner'}
 	graphic_name_suffix = u"%s/%s%s.%s"
-	graphic_name_season_suffix = u"%s/%s - Season %d%s.%s"
+	graphic_name_season_suffix = u"%s/%s Season %d%s.%s"
 
 
 	def _getSubtitle(self, cfile):
@@ -3411,12 +3434,28 @@ class MythTvMetaData(VideoFiles):
 		if not watched:
 			self.config['season_num']=u"%d" % cfile['seasno']
 			self.config['episode_num']=u"%d" % cfile['epno']
-		self.config['g_series'] = cfile['file_seriesname']+self.graphic_suffix[rel_type]+u'.%(ext)s'
-		self.config['g_season'] = cfile['file_seriesname']+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
-		
-		if not self.verifySeriesExists():
-			self._displayMessage(u"tvdb Series not found(%s)" % cfile['filename'])
-			return None
+
+		# Special logic must be used if the (-MG) guessing option has been requested
+		if not self.config['sid'] and self.config['mythtv_guess']:
+			try:
+				allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
+			except tvdb_shownotfound:
+				self._displayMessage(u"tvdb Series not found(%s)" % cfile['filename'])
+				return None
+			if filter(is_not_punct_char, allmatchingseries['name'].lower()) == filter(is_not_punct_char,cfile['file_seriesname'].lower()):
+				self.config['sid'] = allmatchingseries['sid']
+				self.config['series_name'] = allmatchingseries['name']
+				cfile['file_seriesname'] = allmatchingseries['name']
+			else:
+				sys.stderr.write(u"\nGuessing could not find an exact match on tvdb for Series (%s)\ntherefore a graphics cannot be downloaded\n\n" % cfile['filename'])
+				return None
+		else:
+			if not self.verifySeriesExists():
+				self._displayMessage(u"tvdb Series not found(%s)" % cfile['filename'])
+				return None
+
+		self.config['g_series'] = self.config['series_name']+self.graphic_suffix[rel_type]+u'.%(ext)s'
+		self.config['g_season'] = self.config['series_name']+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		if toprated:
 			typegetGraphics=self.getTopRatedGraphics
 			self.config['season_num']= None	# Needed to get toprated graphics named in 'g_series' format
@@ -3451,7 +3490,11 @@ class MythTvMetaData(VideoFiles):
 
 		# Special logic must be used if the (-MG) guessing option has been requested
 		if not self.config['sid'] and self.config['mythtv_guess']:
-			allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
+			try:
+				allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
+			except tvdb_shownotfound:
+				self._displayMessage(u"tvdb Series not found(%s)" % cfile['filename'])
+				return None
 			if filter(is_not_punct_char, allmatchingseries['name'].lower()) == filter(is_not_punct_char,cfile['file_seriesname'].lower()):
 				self.config['sid'] = allmatchingseries['sid']
 				self.config['series_name'] = allmatchingseries['name']
@@ -4424,6 +4467,7 @@ class MythTvMetaData(VideoFiles):
 		'''
 		(dirName, fileName) = os.path.split(filename)
 		(fileBaseName, fileExtension)=os.path.splitext(fileName)
+
 		for directory in directories:
 			file_path = u"%s/%s" % (directory, filename)
 			if os.path.isfile(file_path):
@@ -4561,7 +4605,6 @@ class MythTvMetaData(VideoFiles):
 
 			available_metadata['season']=cfile['seasno']
 			available_metadata['episode']=cfile['epno']
-
 			available_metadata['title'] = cfile['file_seriesname']
 
 			# There must be an Internet reference number. Get one for new records. 
@@ -4591,6 +4634,8 @@ class MythTvMetaData(VideoFiles):
 						missing_inetref.append(available_metadata['title'])
 						continue
 					inetref = tmp_dict['inetref']
+					available_metadata['title'] = tmp_dict['title']
+					cfile['file_seriesname'] = tmp_dict['title']
 				cfile['inetref'] = inetref
 				available_metadata['inetref'] = inetref
 
@@ -4601,6 +4646,8 @@ class MythTvMetaData(VideoFiles):
 					continue
 				else:
 					available_metadata['subtitle'] = tmp_subtitle
+					available_metadata['title'] = self.config['series_name']
+					cfile['file_seriesname'] = self.config['series_name']
 
 			'''# Check if current inetref is a IMDB# 
 			# If so then check it could be changed to tmdb#
