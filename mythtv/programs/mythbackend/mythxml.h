@@ -104,7 +104,7 @@ class MythXML : public Eventing
 
         void    GetConnectionInfo( HTTPRequest *pRequest );
         void    GetAlbumArt    ( HTTPRequest *pRequest );
-	void    GetVideoArt    ( HTTPRequest *pRequest );
+        void    GetVideoArt    ( HTTPRequest *pRequest );
 
         void    GetExpiring    ( HTTPRequest *pRequest );
 

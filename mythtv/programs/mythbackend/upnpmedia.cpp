@@ -244,7 +244,7 @@ void UPnpMedia::BuildMediaMap(void)
             if (!query.exec())
             {
                 MythDB::DBError("BuildMediaMap -- clearing table upnpmedia", query);
-                VERBOSE(VB_IMPORTANT, LOC + "BuildMediaMap - abourting");
+                VERBOSE(VB_IMPORTANT, LOC + "BuildMediaMap - aborting");
                 return;
             }
 
