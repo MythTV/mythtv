@@ -1950,7 +1950,10 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
         reg = regs[++regIndex];
     }
 
-    return QString("%1/%2").arg(testDirectory).arg(foundFile);
+    if (!foundFile.isEmpty())
+        return QString("%1/%2").arg(testDirectory).arg(foundFile);
+    else
+        return QString();
 }
 
 void PlaybackBox::showActions(ProgramInfo *pginfo)
