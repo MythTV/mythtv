@@ -91,6 +91,7 @@ class MPUBLIC ChannelImporter
         kDeleteAll,
         kDeleteManual,
         kDeleteIgnoreAll,
+        kDeleteInvisibleAll,
     } DeleteAction;
     typedef enum
     {

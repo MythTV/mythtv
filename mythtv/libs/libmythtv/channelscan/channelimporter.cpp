@@ -177,12 +177,24 @@ uint ChannelImporter::DeleteChannels(
             deleted[off_air_list[k]] = true;
         }
     }
+    else if (kDeleteInvisibleAll == action)
+    {
+        for (uint k = 0; k < off_air_list.size(); k++)
+        {
+            int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
+            ChannelUtil::SetVisible(
+                transports[i].channels[j].channel_id, false);
+        }
+    }
     else
     {
         // TODO manual delete
     }
 
     // TODO delete encrypted channels when m_fta_only set
+
+    if (deleted.size() == 0)
+        return 0;
 
     // Create a new transports list without the deleted channels
     for (uint i = 0; i < transports.size(); i++)
@@ -1147,7 +1159,8 @@ ChannelImporter::QueryUserDelete(const QString &msg)
     {
         QStringList buttons;
         buttons.push_back(QObject::tr("Delete all"));
-//        buttons.push_back(QObject::tr("Delete manually"));
+        buttons.push_back(QObject::tr("Set all invisible"));
+//        buttons.push_back(QObject::tr("Handle manually"));
         buttons.push_back(QObject::tr("Ignore all"));
 
         DialogCode ret;
@@ -1159,20 +1172,22 @@ ChannelImporter::QueryUserDelete(const QString &msg)
 
             ret = (kDialogCodeRejected == ret) ? kDialogCodeButton2 : ret;
 
-        } while (!(kDialogCodeButton0 <= ret && ret <= kDialogCodeButton2));
+        } while (!(kDialogCodeButton0 <= ret && ret <= kDialogCodeButton3));
 
         action = (kDialogCodeButton0 == ret) ? kDeleteAll       : action;
-        action = (kDialogCodeButton1 == ret) ? kDeleteIgnoreAll   : action;//
-//        action = (kDialogCodeButton1 == ret) ? kDeleteManual    : action;
-//        action = (kDialogCodeButton2 == ret) ? kDeleteIgnoreAll : action;
+        action = (kDialogCodeButton1 == ret) ? kDeleteInvisibleAll : action;
+        action = (kDialogCodeButton2 == ret) ? kDeleteIgnoreAll   : action;
+//        action = (kDialogCodeButton2 == ret) ? kDeleteManual    : action;
+//        action = (kDialogCodeButton3 == ret) ? kDeleteIgnoreAll : action;
     }
     else if (is_interactive)
     {
         cout << msg.toAscii().constData()          << endl;
         cout << "Do you want to:"    << endl;
         cout << "1. Delete all"      << endl;
-//        cout << "2. Delete manually" << endl;
-        cout << "3. Ignore all"      << endl;
+        cout << "2. Set all invisible" << endl;
+//        cout << "3. Handle manually" << endl;
+        cout << "4. Ignore all"      << endl;
         while (true)
         {
             string ret;
@@ -1182,15 +1197,16 @@ ChannelImporter::QueryUserDelete(const QString &msg)
             if (ok && (1 <= val) && (val <= 3))
             {
                 action = (1 == val) ? kDeleteAll       : action;
-                //action = (2 == val) ? kDeleteManual    : action;
-                action = (2 == val) ? kDeleteIgnoreAll : action;//
+                action = (2 == val) ? kDeleteInvisibleAll : action;
+                //action = (3 == val) ? kDeleteManual    : action;
                 action = (3 == val) ? kDeleteIgnoreAll : action;
+                action = (4 == val) ? kDeleteIgnoreAll : action;
                 break;
             }
             else
             {
-                //cout << "Please enter either 1, 2, or 3:" << endl;
-                cout << "Please enter either 1 or 3:" << endl;//
+                //cout << "Please enter either 1, 2, 3 or 4:" << endl;
+                cout << "Please enter either 1, 2 or 4:" << endl;//
             }
         }
     }

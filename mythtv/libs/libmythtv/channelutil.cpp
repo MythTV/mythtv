@@ -1567,6 +1567,25 @@ bool ChannelUtil::DeleteChannel(uint channel_id)
     return true;
 }
 
+bool ChannelUtil::SetVisible(uint channel_id, bool visible)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "UPDATE channel "
+        "SET   visible = :VISIBLE "
+        "WHERE chanid  = :ID");
+    query.bindValue(":ID", channel_id);
+    query.bindValue(":VISIBLE", visible);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("ChannelUtil::SetVisible", query);
+        return false;
+    }
+
+    return true;
+}
+
 bool ChannelUtil::SetServiceVersion(int mplexid, int version)
 {
     MSqlQuery query(MSqlQuery::InitCon());

@@ -114,6 +114,8 @@ class MPUBLIC ChannelUtil
 
     static bool    DeleteChannel(uint channel_id);
 
+    static bool    SetVisible(uint channel_id, bool hidden);
+
     static bool    SetServiceVersion(int mplexid, int version);
 
     static int     GetChanID(int db_mplexid,    int service_transport_id,
