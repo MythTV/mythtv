@@ -489,8 +489,8 @@ void MetadataImp::fillCast()
     if (vcm.get(m_id, cast))
     {
         VideoCast &vc = VideoCast::GetCast();
-        for (VideoCastMap::entry::values_type::const_iterator p =
-             cast.values.end() - 1; p != cast.values.begin(); --p)
+        for (VideoCastMap::entry::values_type::const_reverse_iterator p =
+             cast.values.rbegin(); p != cast.values.rend(); ++p)
         {
             // Just add empty string for no-name cast
             QString name;
