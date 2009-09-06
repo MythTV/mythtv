@@ -238,6 +238,9 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
     VERBOSE(VB_IMPORTANT, 
             QObject::tr("Found %1 unused transports.").arg(query.size()));
 
+    if (query.size() == 0)
+        return 0;
+
     QString msg = QObject::tr("Found %1 unused transports.").arg(query.size());
     DeleteAction action = QueryUserDelete(msg);
     if (kDeleteIgnoreAll == action)
