@@ -3452,7 +3452,7 @@ void VideoDialog::createOkDialog(QString title)
 void VideoDialog::searchComplete(QString string)
 {
     VERBOSE(VB_GENERAL | VB_EXTRA,
-            QString("Switching to: %1").arg(string));
+            QString("Jumping to: %1").arg(string));
 
     if (m_d->m_type == DLG_TREE)
     {

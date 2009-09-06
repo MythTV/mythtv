@@ -927,39 +927,39 @@ void VideoListImp::refreshList(bool filebrowser,
             { 
                 case 0: 
                     fillMetadata(ltDBMetadata); 
-                    VERBOSE(VB_IMPORTANT,QString("Using Folder mode")); 
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Folder mode")); 
                     break; 
                 case 1: 
                     fillMetadata(ltDBGenreGroup); 
-                    VERBOSE(VB_IMPORTANT,QString("Using Group mode")); 
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Group mode")); 
                     break; 
                 case 2: 
                     fillMetadata(ltDBCategoryGroup); 
-                    VERBOSE(VB_IMPORTANT,QString("Using Category mode")); 
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Category mode")); 
                     break; 
                 case 3:
                     fillMetadata(ltDBYearGroup);
-                    VERBOSE(VB_IMPORTANT,QString("Using Year mode"));
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Year mode"));
                     break;
                 case 4:
                     fillMetadata(ltDBDirectorGroup);
-                    VERBOSE(VB_IMPORTANT,QString("Using Director mode"));
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Director mode"));
                     break;
                 case 5:
                     fillMetadata(ltDBCastGroup);
-                    VERBOSE(VB_IMPORTANT,QString("Using Cast Mode"));
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Cast Mode"));
                     break;
                 case 6:
                     fillMetadata(ltDBUserRatingGroup);
-                    VERBOSE(VB_IMPORTANT,QString("Using User Rating Mode"));
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using User Rating Mode"));
                     break;
                 case 7:
                     fillMetadata(ltDBInsertDateGroup);
-                    VERBOSE(VB_IMPORTANT,QString("Using Insert Date Mode"));
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Insert Date Mode"));
                     break;
                 case 8:
                     fillMetadata(ltTVMetadata);
-                    VERBOSE(VB_IMPORTANT,QString("Using TV/Movie Mode"));
+                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using TV/Movie Mode"));
                     break;
             } 
         } 
