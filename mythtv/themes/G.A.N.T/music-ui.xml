@@ -1361,7 +1361,7 @@
            <textarea name="status_text" draworder="1" align="center">
                <area>250,545,300,30</area>
                <font>labels</font>
-               <value>All ready in database</value>
+               <value>Already in database</value>
            </textarea>
 
            <!--
@@ -1770,7 +1770,7 @@
            <textarea name="status_text" draworder="1" align="center">
                <area>70,245,300,30</area>
                <font>labels</font>
-               <value>All ready in database</value>
+               <value>Already in database</value>
            </textarea>
 
            <selector name="type_selector" draworder="1">
