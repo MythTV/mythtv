@@ -1449,7 +1449,7 @@ bool PlaybackBox::FillList(bool useCachedData)
     }
 
     m_titleList = QStringList("");
-    if (m_progLists[m_watchGroupLabel].size() > 1)
+    if (m_progLists[m_watchGroupLabel].size() > 0)
         m_titleList << m_watchGroupName;
     if (m_progLists["livetv"].size() > 0)
         m_titleList << tr("LiveTV");
