@@ -1150,7 +1150,7 @@
                     <textarea name="channel" from="shortstarttimedate">
                         <area>240,1,190,24</area>
                     </textarea>
-                    <textarea name="title" from="shortstarttimedate">
+                    <textarea name="titlesubtitle" from="shortstarttimedate">
                         <area>440,1,640,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
