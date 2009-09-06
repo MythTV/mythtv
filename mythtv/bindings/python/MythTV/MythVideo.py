@@ -103,7 +103,7 @@ class MythVideo:
 					break
 			else:
 				log.Msg(INFO, u'%s not exist, removing metadata...', filename)
-				rmMetadata(intid)
+				self.rmMetadata(intid)
 		c.close()
 
 
