@@ -490,7 +490,7 @@ void MetadataImp::fillCast()
     {
         VideoCast &vc = VideoCast::GetCast();
         for (VideoCastMap::entry::values_type::const_iterator p =
-             cast.values.begin(); p != cast.values.end(); ++p)
+             cast.values.end() - 1; p != cast.values.begin(); --p)
         {
             // Just add empty string for no-name cast
             QString name;
