@@ -252,6 +252,7 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
     {
         // TODO manual delete
     }
+    return 0;
 }
 
 void ChannelImporter::InsertChannels(
