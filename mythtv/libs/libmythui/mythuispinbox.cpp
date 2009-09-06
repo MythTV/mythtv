@@ -28,24 +28,17 @@ void MythUISpinBox::SetRange(int low, int high, int step)
         QString text;
         if (m_hasTemplate)
         {
+            QString temp;
             if (value < 0 && !m_negativeTemplate.isEmpty())
-            {
-                text = qApp->translate("ThemeUI",
-                                       qPrintable(m_negativeTemplate), "",
-                                       QCoreApplication::CodecForTr, value);
-            }
+                temp = m_negativeTemplate;
             else if (value == 0 && !m_zeroTemplate.isEmpty())
-            {
-                text = qApp->translate("ThemeUI",
-                                       qPrintable(m_zeroTemplate), "",
-                                       QCoreApplication::CodecForTr, value);
-            }
+                temp = m_zeroTemplate;
             else if (!m_positiveTemplate.isEmpty())
-            {
-                text = qApp->translate("ThemeUI",
-                                       qPrintable(m_positiveTemplate), "",
-                                       QCoreApplication::CodecForTr, value);
-            }
+                temp = m_positiveTemplate;
+
+            if (!temp.isEmpty())
+                text = qApp->translate("ThemeUI", qPrintable(temp), "",
+                                   QCoreApplication::CodecForTr, qAbs(value));
         }
 
         if (text.isEmpty())
