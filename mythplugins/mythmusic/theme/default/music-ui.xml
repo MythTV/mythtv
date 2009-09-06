@@ -1218,7 +1218,7 @@
 
         <textarea name="status" from="position">
             <position>250,550</position>
-            <value>All ready in database</value>
+            <value>Already in database</value>
         </textarea>
 
         <!-- data fields -->
@@ -1463,7 +1463,7 @@
 
         <textarea name="status">
             <area>70,250,300,30</area>
-            <value>All ready in database</value>
+            <value>Already in database</value>
             <align>hcenter</align>
         </textarea>
 

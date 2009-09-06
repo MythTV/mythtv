@@ -120,13 +120,13 @@ void ImportMusicDialog::fillWidgets()
         else
         {
             m_coverartButton->SetVisible(true);
-            m_statusText->SetText(tr("All Ready in Database"));
+            m_statusText->SetText(tr("Already in Database"));
         }
     }
     else
     {
         // update current
-        m_currentText->SetText(tr("Non found"));
+        m_currentText->SetText(tr("Not found"));
         m_filenameText->Reset();
         m_compilationCheck->SetCheckState(false);
         m_compartistText->Reset();
