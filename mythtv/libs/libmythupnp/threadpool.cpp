@@ -164,6 +164,8 @@ WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
     m_pThreadPool    = pThreadPool;
     m_sName          = sName;
     m_nIdleTimeoutMS = 60000;
+    m_timer          = 0;
+    m_wakeup         = 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
