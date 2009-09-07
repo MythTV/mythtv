@@ -197,6 +197,11 @@ void MythSocket::close(void)
 {
     setState(Idle);
     MSocketDevice::close();
+    if (m_cb)
+    {
+        VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
+        m_cb->connectionClosed(this);
+    }
 }
 
 qint64 MythSocket::readBlock(char *data, quint64 len)
@@ -215,14 +220,8 @@ qint64 MythSocket::readBlock(char *data, quint64 len)
 
     qint64 rval = MSocketDevice::readBlock(data, len);
     if (rval == 0)
-    {
         close();
-        if (m_cb)
-        {
-            VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
-            m_cb->connectionClosed(this);
-        }
-    }
+
     return rval;
 }
 
@@ -248,11 +247,6 @@ qint64 MythSocket::writeBlock(const char *data, quint64 len)
     if (!isValid() || error() != MSocketDevice::NoError)
     {
         close();
-        if (m_cb)
-        {
-            VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
-            m_cb->connectionClosed(this);
-        }
         return -1;
     }
     return rval;
@@ -486,11 +480,6 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
             VERBOSE(VB_IMPORTANT, LOC + "readStringList: " +
                     QString("Error, timed out after %1 ms.").arg(timeoutMS));
             close();
-            if (m_cb)
-            {
-                VERBOSE(VB_SOCKET, LOC + "calling m_cb->connectionClosed()");
-                m_cb->connectionClosed(this);
-            }
             return false;
         }
 
