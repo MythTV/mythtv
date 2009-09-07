@@ -685,6 +685,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
   if( stat( full_path, &fileinfo ) < 0 ) {
     fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
     free( dvd_file );
+    dvdinput_close(dev);
     return NULL;
   }
   dvd_file->title_sizes[ 0 ] = fileinfo.st_size / DVD_VIDEO_LB_LEN;
