@@ -1049,6 +1049,7 @@ static link_t play_PGC_post(vm_t *vm) {
   /* Should end up in the STOP_DOMAIN if next_pgc is 0. */
   if(!set_PGCN(vm, (vm->state).pgc->next_pgc_nr)) {
     link_values.command = Exit;
+    link_values.data1 = link_values.data2 = link_values.data3 = 0;
     return link_values;
   }
   return play_PGC(vm);
