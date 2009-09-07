@@ -102,7 +102,8 @@ class MPUBLIC RecordingProfile : public QObject, public ConfigurationWizard
     QString groupType(void)             const;
 
     // static functions
-    static QString getName(int id);    
+    static QString getName(int id);
+    static QMap<int, QString> listProfiles(int group);
     static void fillSelections(SelectSetting* setting,
                                int group, bool foldautodetect = false);
     static void fillSelections(SelectManagedListItem* setting,

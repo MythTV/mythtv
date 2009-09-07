@@ -1542,18 +1542,15 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
     }
 }
 
-void RecordingProfile::fillSelections(SelectManagedListItem *setting,
-                                      int group)
+QMap<int, QString> RecordingProfile::listProfiles(int group)
 {
+    QMap<int, QString> profiles;
+    
     if (!group)
     {
         for (uint i = 0; !availProfiles[i].isEmpty(); i++)
-        {
-            QString lbl = QObject::tr("Record using the \"%1\" profile")
-                .arg(availProfiles[i]);
-            setting->addSelection(lbl, availProfiles[i], false);
-        }
-        return;
+            profiles[i] = availProfiles[i];
+        return profiles;
     }
 
     MSqlQuery result(MSqlQuery::InitCon());
@@ -1567,25 +1564,25 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
     if (!result.exec())
     {
         MythDB::DBError("RecordingProfile::fillSelections 2", result);
-        return;
+        return profiles;
     }
     else if (!result.next())
     {
         VERBOSE(VB_GENERAL, "RecordingProfile::fillselections, Warning: "
                 "Failed to locate recording id for recording group.");
-        return;
+        return profiles;
     }
 
     if (group == RecordingProfile::TranscoderGroup)
     {
-        QString id = QString::number(RecordingProfile::TranscoderAutodetect);
-        setting->addSelection(QObject::tr("Transcode using Autodetect"), id);
+        int id = RecordingProfile::TranscoderAutodetect;
+        profiles[id] = QObject::tr("Transcode using Autodetect");
     }
 
     do
     {
         QString name = result.value(0).toString();
-        QString id   = result.value(1).toString();
+        int id = result.value(1).toInt();
 
         if (group == RecordingProfile::TranscoderGroup)
         {
@@ -1593,14 +1590,39 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
             if (name != "RTjpeg/MPEG4" && name != "MPEG2")
             {
                 QString lbl = QObject::tr("Transcode using \"%1\"").arg(name);
-                setting->addSelection(lbl, id, false);
+                profiles[id] = lbl;
             }
             continue;
         }
 
         QString lbl = QObject::tr("Record using the \"%1\" profile").arg(name);
-        setting->addSelection(lbl, result.value(1).toString(), false);
+        profiles[id] = lbl;
     } while (result.next());
+    
+    return profiles;
+}
+
+void RecordingProfile::fillSelections(SelectManagedListItem *setting,
+                                      int group)
+{
+    QMap<int, QString> profiles = listProfiles(group);
+    if (!group)
+    {
+        QMap<int, QString>::iterator it;
+        for (it = profiles.begin(); it != profiles.end(); it++)
+        {
+            QString lbl = QObject::tr("Record using the \"%1\" profile")
+                .arg(it.value());
+            setting->addSelection(lbl, it.value(), false);
+        }
+        return;
+    }
+
+    QMap<int, QString>::iterator it;
+    for (it = profiles.begin(); it != profiles.end(); it++)
+    {
+        setting->addSelection(it.value(), QString::number(it.key()), false);
+    }
 }
 
 QString RecordingProfile::groupType(void) const
