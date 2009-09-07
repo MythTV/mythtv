@@ -280,7 +280,6 @@ void MainServer::readyRead(MythSocket *sock)
         }
     }
 
-    QMutexLocker locker(&readReadyLock);
     prt->setup(sock);
 }
 
@@ -856,7 +855,16 @@ void MainServer::customEvent(QEvent *e)
 
     if (!broadcast.empty())
     {
-        QMutexLocker locker(&readReadyLock);
+        // Make a local copy of the list, upping the refcount as we go..
+        vector<PlaybackSock *> localPBSList;
+        sockListLock.lockForRead();
+        vector<PlaybackSock *>::iterator it = playbackList.begin();
+        for (; it != playbackList.end(); ++it)
+        {
+            (*it)->UpRef();
+            localPBSList.push_back(*it);
+        }
+        sockListLock.unlock();
 
         bool sendGlobal = false;
         if (ismaster && broadcast[1].left(7) == "GLOBAL_")
@@ -870,18 +878,7 @@ void MainServer::customEvent(QEvent *e)
 
         vector<PlaybackSock*> sentSet;
 
-        // Make a local copy of the list, upping the refcount as we go..
-        vector<PlaybackSock *> localPBSList;
-        sockListLock.lockForRead();
-        vector<PlaybackSock *>::iterator iter = playbackList.begin();
-        for (; iter != playbackList.end(); iter++)
-        {
-            PlaybackSock *pbs = *iter;
-            pbs->UpRef();
-            localPBSList.push_back(pbs);
-        }
-        sockListLock.unlock();
-
+        vector<PlaybackSock*>::const_iterator iter;
         for (iter = localPBSList.begin(); iter != localPBSList.end(); iter++)
         {
             PlaybackSock *pbs = *iter;
@@ -911,16 +908,15 @@ void MainServer::customEvent(QEvent *e)
                 reallysendit = true;
             }
 
-            if (reallysendit)
+            MythSocket *sock = pbs->getSocket();
+            if (reallysendit && sock->socket() >= 0)
             {
-                MythSocket *sock = pbs->getSocket();
-                sock->UpRef();
-
                 sock->Lock();
-                sock->writeStringList(broadcast);
-                sock->Unlock();
 
-                sock->DownRef();
+                if (sock->socket() >= 0)
+                    sock->writeStringList(broadcast);
+
+                sock->Unlock();
             }
         }
 

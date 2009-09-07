@@ -212,8 +212,6 @@ class MainServer : public QObject, public MythSocketCBs
     Scheduler *m_sched;
     AutoExpire *m_expirer;
 
-    QMutex readReadyLock;
-
     struct DeferredDeleteStruct
     {
         PlaybackSock *sock; 
