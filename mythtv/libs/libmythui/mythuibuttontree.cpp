@@ -97,7 +97,7 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
         if ((int)m_currentDepth > route.size())
             m_currentDepth = 1;
 
-        node = route.at(m_currentDepth);
+        node = route.at(m_currentDepth - 1);
         if (m_currentDepth != m_oldDepth)
             refreshAll = true;
     }
