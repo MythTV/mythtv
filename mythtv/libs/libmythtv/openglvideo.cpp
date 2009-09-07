@@ -291,15 +291,15 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
  *   the appropriate filter as necessary.
  */
 
-void OpenGLVideo::CheckResize(bool deinterlacing)
+void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 {
     // to improve performance on slower cards
     bool resize_up = (video_dim.height() < display_video_rect.height()) ||
-                     (video_dim.width()  < display_video_rect.width());
+                     (video_dim.width()  < display_video_rect.width()) && allow;
 
     // to ensure deinterlacing works correctly
     bool resize_down = (video_dim.height() > display_video_rect.height()) &&
-                        deinterlacing;
+                        deinterlacing && allow;
 
     if (resize_up && (defaultUpsize == kGLFilterBicubic))
     {
@@ -845,7 +845,7 @@ void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
 void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
 {
     if (softwareDeinterlacer != filter)
-        CheckResize(false);
+        CheckResize(false, filter != "bobdeint");
     softwareDeinterlacer = filter;
     softwareDeinterlacer.detach();
 }
@@ -875,6 +875,10 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
 
     OpenGLContextLocker ctx_lock(gl_context);
 
+    // we need to special case software bobdeint for 1080i
+    bool softwarebob = softwareDeinterlacer == "bobdeint" &&
+                       softwareDeinterlacing;
+
     // enable correct texture type
     gl_context->EnableTextures(inputTextures[0]);
 
@@ -896,12 +900,16 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             continue;
         }
 
+        bool actual = softwarebob && (filter->outputBuffer == kDefaultBuffer);
+
         // texture coordinates
         float t_right = (float)video_dim.width();
-        float t_bottom  = (float)video_dim.height();
+        float t_bottom  = (float)(actual ? actual_video_dim.height() :
+                                           video_dim.height());
         float t_top = 0.0f;
         float t_left = 0.0f;
-        float trueheight = (float)video_dim.height();
+        float trueheight = (float)(actual ? actual_video_dim.height() :
+                                            video_dim.height());
 
         // only apply overscan on last filter
         if (filter->outputBuffer == kDefaultBuffer)
@@ -923,9 +931,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         }
 
         // software bobdeint
-        if ((softwareDeinterlacer == "bobdeint") &&
-            softwareDeinterlacing &&
-            (filter->outputBuffer == kDefaultBuffer))
+        if (actual)
         {
             bool top = (scan == kScan_Intr2ndField && topfieldfirst) ||
                        (scan == kScan_Interlaced && !topfieldfirst);

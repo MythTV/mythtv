@@ -81,7 +81,7 @@ class OpenGLVideo
     void SetViewPort(const QSize &new_viewport_size);
     bool AddFilter(OpenGLFilterType filter);
     bool RemoveFilter(OpenGLFilterType filter);
-    void CheckResize(bool deinterlacing);
+    void CheckResize(bool deinterlacing, bool allow = true);
     bool OptimiseFilters(void);
     bool AddFrameBuffer(uint &framebuffer, QSize fb_size,
                         uint &texture, QSize vid_size);
