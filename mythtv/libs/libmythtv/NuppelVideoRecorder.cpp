@@ -31,6 +31,7 @@ using namespace std;
 #include "tv_rec.h"
 #include "tv_play.h"
 #include "audioinput.h"
+#include "myth_imgconvert.h"
 
 #ifdef WORDS_BIGENDIAN
 extern "C" {
@@ -1523,44 +1524,10 @@ again:
                 // Convert YUYV to YUV420P
                 unsigned conversion_buffer_size = h * w * 3 / 2;
                 uint8_t conversion_buffer[conversion_buffer_size];
-
-                uint8_t *y_plane = conversion_buffer;
-                uint8_t *cb_plane = y_plane + w * h;
-                uint8_t *cr_plane = cb_plane + w * h / 4;
-
-                uint8_t *src = buffers[frame];
-
-                // Round height to multiple of two.
-                unsigned height = (h / 2) * 2;
-
-                // Treat lines in batches of two, first use color information, then don't
-                unsigned line_size = w * 2;
-
-                for (unsigned line = 0; line < height; line += 2)
-                {
-                    uint8_t *src_endline = src + line_size;
-
-                    // convert first line, use color information
-                    while (src < src_endline)
-                    {
-                        *y_plane++ = *src++;
-                        *cb_plane++ = *src++;
-                        *y_plane++ = *src++;
-                        *cr_plane++ = *src++;
-                    }
-
-                    src_endline = src + line_size;
-
-                    // convert second line, don't use color information
-                    while (src < src_endline)
-                    {
-                        *y_plane++ = *src++;
-                        src++;
-                        *y_plane++ = *src++;
-                        src++;
-                    }
-                }
-
+                AVPicture img_in, img_out;
+                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, w, h);
+                avpicture_fill(&img_in, buffers[frame], PIX_FMT_YUYV422, w, h);
+                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_YUYV422, w, h);
                 BufferIt(conversion_buffer, video_buffer_size);
             }
             else
