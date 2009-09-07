@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.5" # 0.1.0 Initial development 
+__version__=u"v0.4.6" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -159,6 +159,7 @@ __version__=u"v0.4.5" # 0.1.0 Initial development
 					 #       also be lowercase which can cause graphics to be downloaded twice.
 					 #       Fixed a bug in graphics file name creation for a TV season.
 					 #       Added checks for compatible python library versions of xml and MySQLdb
+					 # 0.4.6 Fixed a bug where a bad IMDB number in TMDB caused an abort.
 
 
 usage_txt=u'''
@@ -2865,6 +2866,8 @@ class MythTvMetaData(VideoFiles):
 		if len(results[0]):
 			for movie in results:
 				if not movie.has_key(u'imdb'):
+					continue
+				if not _can_int(movie[u'imdb']): # Make sure the IMDB is numeric
 					continue
 				if filter(is_not_punct_char, movie['title']).lower() == filter(is_not_punct_char, name):
 					if not year:
