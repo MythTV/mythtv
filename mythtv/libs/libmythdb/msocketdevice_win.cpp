@@ -691,9 +691,13 @@ qint64 MSocketDevice::waitForMore( int msecs, bool *timeout ) const
 
 qint64 MSocketDevice::readData( char *data, qint64 maxlen )
 {
+    if ( maxlen == 0 )
+        return 0;
+
 #if defined(QT_CHECK_NULL)
-    if ( data == 0 && maxlen != 0 ) {
+    if ( data == 0 ) {
 	qWarning( "MSocketDevice::readBlock: Null pointer error" );
+        return -1;
     }
 #endif
 #if defined(QT_CHECK_STATE)

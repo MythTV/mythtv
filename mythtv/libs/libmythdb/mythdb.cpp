@@ -413,9 +413,11 @@ QString MythDB::GetSettingOnHost(const QString &key, const QString &host,
 
             if (query.exec() && query.isActive() && query.size() > 0)
             {
-                query.next();
-                value = query.value(0).toString();
-                found = true;
+                if (query.next())
+                {
+                    value = query.value(0).toString();
+                    found = true;
+                }
             }
         }
         else

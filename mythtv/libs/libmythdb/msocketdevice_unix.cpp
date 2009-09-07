@@ -734,9 +734,13 @@ qint64 MSocketDevice::waitForMore( int msecs, bool *timeout ) const
 */
 qint64 MSocketDevice::readData( char *data, qint64 maxlen )
 {
-    if ( data == 0 && maxlen != 0 ) {
+    if ( maxlen == 0 )
+        return 0;
+
+    if ( data == 0 ) {
         VERBOSE(VB_SOCKET|VB_EXTRA,
                 "MSocketDevice::readBlock: Null pointer error");
+        return -1;
     }
     if ( !isValid() ) {
         VERBOSE(VB_SOCKET|VB_EXTRA,
