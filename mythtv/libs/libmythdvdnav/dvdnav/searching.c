@@ -707,9 +707,10 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
 
   if (scan_admap)
   {
-    if (dvdnav_scan_admap(this, state->domain, offset, &new_vobu) == DVDNAV_STATUS_ERR)
+    if (dvdnav_scan_admap(this, state->domain, offset, &new_vobu) == DVDNAV_STATUS_ERR) {
       pthread_mutex_unlock(&this->vm_lock);
       return DVDNAV_STATUS_ERR;
+    }
   }
   start =  state->pgc->cell_playback[cell_nr].first_sector;
   if (vm_jump_cell_block(this->vm, cell_nr+1, new_vobu - start)) {
