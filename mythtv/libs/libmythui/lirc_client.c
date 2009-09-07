@@ -182,7 +182,7 @@ struct lirc_state *lirc_init(const char *lircrc_root_file,
 	if (lircd)
 	{
 		addr.sun_family=AF_UNIX;
-		strcpy(addr.sun_path,lircd);
+		strncpy(addr.sun_path,lircd,sizeof(addr.sun_path)-1);
 		state->lirc_lircd=socket(AF_UNIX,SOCK_STREAM,0);
 		if(state->lirc_lircd==-1)
 		{
@@ -925,6 +925,7 @@ int lirc_readconfig(const struct lirc_state *state,
 	strcat(command, filename);
 	
 	ret=system(command);
+	free(command);
 	
 	if(ret==-1 || WEXITSTATUS(ret)!=EXIT_SUCCESS)
 	{
