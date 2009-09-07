@@ -892,15 +892,12 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem(
             {
                 BuildItemQuery( query, mapParams );
 
-                if (query.exec() && query.size() > 0)
+                if (query.exec() && query.next())
                 {
-                    if ( query.next() )
-                    {
-                        pRequest->m_sObjectId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
+                    pRequest->m_sObjectId = RemoveToken( "/", pRequest->m_sObjectId, 1 );
 
-                        AddItem( pRequest->m_sObjectId, pResults, false, query );
-                        pResults->m_nTotalMatches = 1;
-                    }
+                    AddItem( pRequest->m_sObjectId, pResults, false, query );
+                    pResults->m_nTotalMatches = 1;
                 }
             }
             break;
@@ -968,25 +965,22 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
                     query.prepare  ( sSQL );
                     query.bindValue( ":KEY", sKey );
 
-                    if (query.exec() && query.size() > 0)
+                    if (query.exec() && query.next())
                     {
-                        if ( query.next() )
-                        {
-                            // ----------------------------------------------
-                            // Return Container Object Only
-                            // ----------------------------------------------
+                        // ----------------------------------------------
+                        // Return Container Object Only
+                        // ----------------------------------------------
 
-                            pResults->m_nTotalMatches   = 1;
-                            pResults->m_nUpdateID       = 1;
+                        pResults->m_nTotalMatches   = 1;
+                        pResults->m_nUpdateID       = 1;
 
-                            CDSObject *pItem = CreateContainer( pRequest->m_sObjectId,  
-                                                                query.value(1).toString(), 
-                                                                pRequest->m_sParentId );
+                        CDSObject *pItem = CreateContainer( pRequest->m_sObjectId,
+                                                            query.value(1).toString(),
+                                                            pRequest->m_sParentId );
 
-                            pItem->SetChildCount( GetDistinctCount( pInfo ));
+                        pItem->SetChildCount( GetDistinctCount( pInfo ));
 
-                            pResults->Add( pItem ); 
-                        }
+                        pResults->Add( pItem );
                     }
                 }
                 break;
@@ -1073,7 +1067,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessContainer( UPnpCDSRequest     
 
                 query.prepare( sSQL );
 
-                if (query.exec() && query.size() > 0)
+                if (query.exec())
                 {
 
                     while(query.next())
@@ -1144,10 +1138,8 @@ int UPnpCDSExtension::GetDistinctCount( UPnpCDSRootInfo *pInfo )
 
         query.prepare( sSQL );
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
-
             nCount = query.value(0).toInt();
         }
     }
@@ -1177,10 +1169,8 @@ int UPnpCDSExtension::GetCount( const QString &sColumn, const QString &sKey )
         if ( sKey.length() )
             query.bindValue( ":KEY", sKey );
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
-
             nCount = query.value(0).toInt();
         }
         VERBOSE(VB_UPNP+VB_EXTRA, "UPnpCDSExtension::GetCount() - " +
@@ -1236,7 +1226,7 @@ void UPnpCDSExtension::CreateItems( UPnpCDSRequest          *pRequest,
         if ( sKey.length() )
             query.bindValue(":KEY", sKey );
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec())
         {
             while(query.next()) 
                 AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );
