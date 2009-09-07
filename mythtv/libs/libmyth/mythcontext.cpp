@@ -1535,7 +1535,9 @@ bool MythContext::ConnectToMasterServer(bool blockingClient)
     if (!d->serverSock)
         return false;
 
-    d->eventSock = ConnectEventSocket(server, port);
+    if (!d->eventSock)
+        d->eventSock = ConnectEventSocket(server, port);
+
     if (!d->eventSock)
     {
         d->serverSock->DownRef();
