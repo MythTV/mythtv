@@ -3376,7 +3376,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
             if (!m_menuPopup && GetMetadata(GetItemCurrent()))
                 RemoveVideo();
         }
-        else if (action == "EDIT")
+        else if (action == "EDIT" && !m_menuPopup)
             EditMetadata();
         else if (action == "ESCAPE")
         {
