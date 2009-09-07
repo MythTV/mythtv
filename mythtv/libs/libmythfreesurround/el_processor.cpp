@@ -113,6 +113,8 @@ public:
         // also add a gain factor of *2 due to processing gain in algo (see center_level)
         surround_gain(1.0);
         current_buf = 0;
+        memset(inbufs, 0, sizeof(inbufs));
+        memset(outbufs, 0, sizeof(outbufs));
         // set the default coefficients
         surround_coefficients(0.8165,0.5774);
         phase_mode(0);

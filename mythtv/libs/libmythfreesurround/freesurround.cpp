@@ -276,7 +276,7 @@ FreeSurround::~FreeSurround()
 
 uint FreeSurround::putSamples(short* samples, uint numSamples, uint numChannels, int step)
 {
-    int i;
+    int i = 0;
     int ic = in_count;
     int bs = block_size/2;
     bool process = true;
@@ -426,7 +426,7 @@ uint FreeSurround::putSamples(short* samples, uint numSamples, uint numChannels,
 
 uint FreeSurround::putSamples(char* samples, uint numSamples, uint numChannels, int step)
 {
-    int i;
+    int i = 0;
     int ic = in_count;
     int bs = block_size/2;
     bool process = true;
