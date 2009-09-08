@@ -1499,7 +1499,7 @@ dvb_deps="backend"
 firewire_deps="backend"
 iptv_deps="backend"
 ivtv_deps="backend v4l"
-hdpvr_deps="backend v4l"
+hdpvr_deps="backend"
 hdhomerun_deps="backend"
 mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 opengl_deps_any="agl_h GL_gl_h darwin windows x11"
@@ -2191,7 +2191,6 @@ case $target_os in
         enable  darwin
         disable dvb
         disable ivtv
-        disable hdpvr
         # Prevent linker problems on default Intel 10.5 XCode:
         ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
         osxver=$(uname -r | cut -c 1)
@@ -3799,7 +3798,7 @@ fi
 if enabled backend; then
   echo "Video4Linux sup.          ${v4l-no}"
   echo "ivtv support              ${ivtv-no}"
-  echo "HR-PVR support            ${hdpvr-no}"
+  echo "HD-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
