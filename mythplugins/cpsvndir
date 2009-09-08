@@ -2,7 +2,6 @@
 #
 # cpsvndir: recursive directory copy excluding .svn sub dirs.
 
-
 if [ -z "$1" -o -z "$2" ]; then
     echo "Usage: $0 source-dir destination-dir"
     exit -1
@@ -21,17 +20,36 @@ if [ -z "$EGID" ]; then
     if [ -z "$EGID" ];     then EGID=0       ;fi  # Will fail if not root
 fi
 
-# Build directory structure
-IFS=$'\012'
-for directory in $(find "$1" -path '*/.svn' -prune -or -type d -print); do
-    mkdir -p "$2/${1##*/}/${directory/#$1}"
-done
+BASE=$(basename "$1")
+case "$BASE" in
+    .|..|/)  BASE="" ;;
+    *)       BASE="/$BASE" ;;
+esac
 
-# Copy files
-for file in $(find "$1" -path '*/.svn' -prune -or ! -type d -print); do
-    cp -pR "$file" "$2/${1##*/}/${file/#$1}"
-    chown $EUID:$EGID "$2/${1##*/}/${file/#$1}" &> /dev/null
-    chmod +r "$2/${1##*/}/${file/#$1}" &> /dev/null
+SRC="$1"
+
+case "$2" in
+    /*) DEST="$2$BASE" ;;
+    *)  DEST="$(pwd)/$2$BASE" ;;
+esac
+
+#echo "BASE=$BASE SRC=$SRC DEST=$DEST"
+
+IFS='
+'
+
+# Copy all files and directories except .svn
+cd "$SRC"
+for file in $(find . -name .svn -prune -or -print); do
+    #echo "processing $file"
+    if [ -d "$file" ]; then
+	mkdir -p "$DEST/$file"
+    else
+	cp -p "$file" "$DEST/$file"
+	chown $EUID:$EGID "$DEST/$file"
+	chmod +r "$DEST/$file" &> /dev/null
+    fi
 done
 
 exit 0
+
