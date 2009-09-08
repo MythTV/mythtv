@@ -980,6 +980,8 @@ You also need to attach the card to a video source.
 On non-V4L machines, you currently need to manually create entries
 in the capturecard and cardinput tables.
 videodevice=file:/path/file.mpg, cardtype=MPEG, inputname=MPEG2TS.
+On such machines, you also need to have built the backend with either
+--enable-ivtv or --enable-hdpvr
 
 */
 
