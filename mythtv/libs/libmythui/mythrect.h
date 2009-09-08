@@ -23,6 +23,7 @@ class MPUBLIC MythRect : public QRect
     MythRect(const QString &sX, const QString &sY, const QString &sWidth,
              const QString &sHeight);
     MythRect(QRect rect);
+    bool operator== (const MythRect &other) const;
 
     void Init(void);
     void CalculateArea(MythRect parentArea);

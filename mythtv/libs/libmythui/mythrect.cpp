@@ -28,6 +28,15 @@ MythRect::MythRect(QRect rect)
     Init();
 }
 
+bool MythRect::operator== (const MythRect &other) const
+{
+    return ((m_percentWidth == other.m_percentWidth) &&
+        (m_percentHeight == other.m_percentHeight) &&
+        (m_percentX == other.m_percentX) &&
+        (m_percentY == other.m_percentY) &&
+        (QRect)(*this) == (QRect)other);
+}
+
 void MythRect::Init()
 {
     m_needsUpdate = true;
