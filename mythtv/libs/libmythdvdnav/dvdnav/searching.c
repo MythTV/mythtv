@@ -666,8 +666,8 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
   {
     dsi = dvdnav_get_current_nav_dsi(this);
     if (length > 0) {
-      for (i = 1; i <= 19; i++) {
-        if (stime[i-1]/2.0 <= length/2.0) {
+      for (i = 0; i < 19; i++) {
+        if (stime[i]/2.0 <= length/2.0) {
           offset = dsi->vobu_sri.fwda[i];
           if (offset >> 31) {
             new_vobu = cur_vobu + (offset & 0xffff);
@@ -684,7 +684,7 @@ dvdnav_status_t dvdnav_relative_time_search(dvdnav_t *this,
         }
       }
     } else {
-      for (i = 1; i <= 19; i++) {
+      for (i = 0; i < 19; i++) {
         if (stime[18 - i]/2.0 >= abs(length)/2.0)
         {
           offset = dsi->vobu_sri.bwda[i];
