@@ -9,7 +9,7 @@ TARGET = themenop
 TEMPLATE = app
 CONFIG -= qt moc
 
-!macx:QMAKE_COPY_DIR = sh ../../cpsvndir
+QMAKE_COPY_DIR = sh ../../cpsvndir
 
 defaultfiles.path = $${PREFIX}/share/mythtv/themes/default
 defaultfiles.files = default/*.xml default/images/*.png
