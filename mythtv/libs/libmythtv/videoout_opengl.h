@@ -6,6 +6,12 @@
 #include "openglvideo.h"
 #include "openglcontext.h"
 
+#ifdef USING_MINGW
+#define ALLOW_PBP false
+#else
+#define ALLOW_PBP true
+#endif
+
 class VideoOutputOpenGL : public VideoOutput
 {
   public:
@@ -46,7 +52,7 @@ class VideoOutputOpenGL : public VideoOutput
 
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
     virtual bool IsPIPSupported(void) const { return true; }
-    virtual bool IsPBPSupported(void) const { return true; }
+    virtual bool IsPBPSupported(void) const { return ALLOW_PBP; }
     virtual bool hasFullScreenOSD(void) const { return gl_osd; }
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 
