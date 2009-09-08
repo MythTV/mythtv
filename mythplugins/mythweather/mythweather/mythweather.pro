@@ -10,8 +10,8 @@ TARGET = mythweather
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
-QMAKE_COPY_DIR = sh ./cpsvndir
-win32:QMAKE_COPY_DIR = sh ./cpsimple
+QMAKE_COPY_DIR = sh ../../cpsvndir
+win32:QMAKE_COPY_DIR = sh ../../cpsimple
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
