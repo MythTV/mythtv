@@ -59,7 +59,8 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           m_drawLine, m_lineWidth, m_lineColor);
     }
 
-    p->DrawImage(area.x(), area.y(), m_image, alphaMod);
+    if (m_image)
+        p->DrawImage(area.x(), area.y(), m_image, alphaMod);
 }
 
 void MythUIShape::DrawRect(const QRect &area,
@@ -142,7 +143,9 @@ bool MythUIShape::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "type")
     {
-        m_type = getFirstText(element);
+        QString type = getFirstText(element);
+        if (type == "box" || type == "roundbox") // Validate input
+            m_type = type;
     }
     else if (element.tagName() == "fill")
     {
