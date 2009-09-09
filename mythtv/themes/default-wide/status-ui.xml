@@ -18,28 +18,22 @@
             <spacing>6</spacing>
             <buttonarea>15,0,1220,40</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,180,40</area>
                 <state name="active">
-                    <imagetype name="buttonbackground">
-                        <filename>horiz_selector.png</filename>
-                    </imagetype>
+                    <area>0,0,180,40</area>
+                    <shape name="background" from="basewidgetshape" />
                     <textarea name="buttontext" from="basetextarea">
                         <area>0,0,180,40</area>
                         <font>basesmall</font>
-                        <font state="error">basesmallred</font>
-                        <font state="warning">basesmallyellow</font>
                         <align>allcenter</align>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="buttonbackground">
-                        <filename>horiz_selector_selected.png</filename>
-                    </imagetype>
+                    <shape name="background" from="baseselectedwidgetshape" />
                 </state>
                 <state name="inactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <filename>horiz_selector_inactive.png</filename>
-                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basesmallgrey</font>
+                    </textarea>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">

@@ -1747,36 +1747,10 @@
             <helptext></helptext>
         </spinbox>
 
-            <buttonlist name="input">
-                <area>215,255,395,40</area>
-                <layout>horizontal</layout>
-                <buttonarea>0,0,375,100%</buttonarea>
-                <statetype name="buttonitem">
-                    <area>0,0,375,40</area>
-                    <state name="active">
-                        <area>0,0,375,40</area>
-                        <shape name="background">
-                            <area>0,0,100%,100%</area>
-                            <type>roundbox</type>
-                            <cornerradius>4</cornerradius>
-                            <fill color="#CCCCCC" alpha="120" />
-                            <line color="#FFFFFF" width="2" />
-                        </shape>
-                        <textarea name="buttontext">
-                            <area>5,5,365,30</area>
-                            <font>basesmall</font>
-                            <cutdown>yes</cutdown>
-                            <align>allcenter</align>
-                        </textarea>
-                    </state>
-                    <state name="selected" from="active">
-                        <shape name="background">
-                            <fill color="#992222" alpha="200" />
-                        </shape>
-                    </state>
-                    <state name="inactive" from="active" />
-                </statetype>
-            </buttonlist>
+        <buttonlist name="input" from="basewideselector">
+            <position>215,255</position>
+            <helptext></helptext>
+        </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
             <position>215,300</position>
