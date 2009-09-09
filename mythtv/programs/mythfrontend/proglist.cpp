@@ -1409,15 +1409,19 @@ void ProgLister::fillItemList(bool restorePosition)
     }
     else if (m_type == plPreviouslyRecorded)
     {
-        if (m_recid > 0 && m_title > "")
+        if (m_recid > 0 && !m_title.isEmpty())
         {
             where = QString("WHERE recordid = %1 OR title = :MTITLE ").arg(m_recid);
             bindings[":MTITLE"] = m_title;
         }
-        else if (m_title > "")
+        else if (!m_title.isEmpty())
         {
             where = QString("WHERE title = :MTITLE ");
             bindings[":MTITLE"] = m_title;
+        }
+        else if (m_recid > 0)
+        {
+            where = QString("WHERE recordid = %1 ").arg(m_recid);
         }
     }
 
