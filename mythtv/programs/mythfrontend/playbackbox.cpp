@@ -2733,22 +2733,9 @@ void PlaybackBox::doEditScheduled()
         return;
 
     if (pginfo->availableStatus != asAvailable)
-    {
         showAvailablePopup(pginfo);
-    }
     else
-    {
-        ScheduledRecording *record = new ScheduledRecording();
-        ProgramInfo *t_pginfo = new ProgramInfo(*pginfo);
-        record->loadByProgram(t_pginfo);
-        record->exec();
-        record->deleteLater();
-
-        // TODO Can this be changed to a cached refill?
-        m_connected = FillList();
-        delete t_pginfo;
-    }
-
+        EditScheduled(pginfo);
 }
 
 /**
@@ -3312,6 +3299,8 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             showGroupFilter();
         else if (action == "CHANGEGROUPVIEW")
             showViewChanger();
+        else if (action == "EDIT")
+            doEditScheduled();
         else if (m_titleList.size() > 1)
         {
             if (action == "DELETE")
