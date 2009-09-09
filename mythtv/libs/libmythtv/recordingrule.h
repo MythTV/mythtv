@@ -37,7 +37,7 @@ class MPUBLIC RecordingRule
     bool LoadByProgram(const ProgramInfo* proginfo);
     bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
                       QString from = "");
-    bool modifyPowerSearchByID(int rid, QString textname, QString forwhat,
+    bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,
                                QString from = "");
     bool Save(bool sendSig = true);
     bool Delete(bool sendSig = true);

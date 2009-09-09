@@ -245,7 +245,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     return true;
 }
 
-bool RecordingRule::modifyPowerSearchByID(int rid, QString textname,
+bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
                                           QString forwhat, QString from)
 {
     if (rid <= 0)
