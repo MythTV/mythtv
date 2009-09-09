@@ -42,6 +42,8 @@ class MPUBLIC RecordingRule
     bool Save(bool sendSig = true);
     bool Delete(bool sendSig = true);
 
+    void ToMap(QHash<QString, QString> &infoMap) const;
+
     int m_recordID; /// Unique Recording Rule ID
     int m_parentRecID;
 

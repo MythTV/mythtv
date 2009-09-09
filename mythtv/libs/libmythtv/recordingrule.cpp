@@ -384,3 +384,77 @@ bool RecordingRule::Delete(bool sendSig)
 
     return true;
 }
+
+void RecordingRule::ToMap(QHash<QString, QString> &infoMap) const
+{
+    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString fullDateFormat = dateFormat;
+    if (!fullDateFormat.contains("yyyy"))
+        fullDateFormat += " yyyy";
+    QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
+
+    infoMap["title"] = m_title;
+    infoMap["subtitle"] = m_subtitle;
+    infoMap["description"] = m_description;
+
+    infoMap["category"] = m_category;
+    infoMap["callsign"] = m_station;
+
+    infoMap["starttime"] = m_starttime.toString(timeFormat);
+    infoMap["startdate"] = m_startdate.toString(dateFormat);
+    infoMap["endtime"] = m_endtime.toString(timeFormat);
+    infoMap["enddate"] = m_endtime.toString(dateFormat);
+
+    infoMap["chanid"] = m_channelid;
+    infoMap["channel"] = m_station;
+
+    QDateTime startts(m_startdate, m_starttime);
+    QDateTime endts(m_enddate, m_endtime);
+
+    QString length;
+    int hours, minutes, seconds;
+    seconds = startts.secsTo(endts);
+
+    minutes = seconds / 60;
+    infoMap["lenmins"] = QObject::tr("%n minute(s)","",minutes);
+    hours   = minutes / 60;
+    minutes = minutes % 60;
+
+    QString minstring = QObject::tr("%n minute(s)","",minutes);
+
+    if (hours > 0)
+    {
+        infoMap["lentime"] = QString("%1 %2")
+                                    .arg(QObject::tr("%n hour(s)","", hours))
+                                    .arg(minstring);
+    }
+    else
+        infoMap["lentime"] = minstring;
+
+    infoMap["timedate"] = startts.date().toString(dateFormat) + ", " +
+                            startts.time().toString(timeFormat) + " - " +
+                            endts.time().toString(timeFormat);
+
+    infoMap["shorttimedate"] = startts.date().toString(shortDateFormat) + ", " +
+                                startts.time().toString(timeFormat) + " - " +
+                                endts.time().toString(timeFormat);
+
+    if (m_type == kFindDailyRecord || m_type == kFindWeeklyRecord)
+    {
+        QString findfrom = m_findtime.toString(timeFormat);
+        if (m_type == kFindWeeklyRecord)
+        {
+            int daynum = (m_findday + 5) % 7 + 1;
+            findfrom = QString("%1, %2").arg(QDate::shortDayName(daynum))
+                                        .arg(findfrom);
+        }
+        infoMap["subtitle"] = QObject::tr("(%1 or later) %3",
+                                          "e.g. (Sunday or later) program "
+                                          "subtitle").arg(findfrom)
+                                          .arg(m_subtitle);
+    }
+
+    infoMap["searchtype"] = m_searchTypeString;
+    infoMap["searchforwhat"] = m_searchFor;
+}
