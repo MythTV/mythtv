@@ -526,7 +526,7 @@ static int YadifDeint (VideoFilter * f, VideoFrame * frame, int field)
         i = 0;
         while (filter->ready > 0 && i < 1000)
         {
-            usleep(100);
+            usleep(1000);
             i++;
         }
     }
