@@ -26,11 +26,7 @@
 #include "videoout_directfb.h"
 #endif
 
-#ifdef USING_DIRECTX
-#include "videoout_dx.h"
-#endif
-
-#ifdef USING_D3D
+#ifdef USING_MINGW
 #include "videoout_d3d.h"
 #endif
 
@@ -88,13 +84,9 @@ VideoOutput *VideoOutput::Create(
     renderers += VideoOutputDirectfb::GetAllowedRenderers(codec_id, video_dim);
 #endif // USING_DIRECTFB
 
-#ifdef USING_D3D
+#ifdef USING_MINGW
     renderers += VideoOutputD3D::GetAllowedRenderers(codec_id, video_dim);
 #endif
-
-#ifdef USING_DIRECTX
-    renderers += VideoOutputDX::GetAllowedRenderers(codec_id, video_dim);
-#endif // USING_DIRECTX
 
 #ifdef USING_XV
     const QStringList xvlist =
@@ -162,15 +154,10 @@ VideoOutput *VideoOutput::Create(
             vo = new VideoOutputDirectfb();
 #endif // USING_DIRECTFB
 
-#ifdef USING_D3D
+#ifdef USING_MINGW
         if (renderer == "direct3d")
             vo = new VideoOutputD3D();
-#endif // USING_D3D
-
-#ifdef USING_DIRECTX
-        if (renderer == "directx")
-            vo = new VideoOutputDX();
-#endif // USING_DIRECTX
+#endif // USING_MINGW
 
 #ifdef Q_OS_MACX
         if (osxlist.contains(renderer))

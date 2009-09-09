@@ -126,9 +126,9 @@ cygwin {
 }
 
 mingw {
-    SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp
-    HEADERS += mediamonitor-windows.h   audiooutputwin.h
-
+    DEFINES += USING_MINGW
+    SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp audiooutputdx.cpp
+    HEADERS += mediamonitor-windows.h   audiooutputwin.h   audiooutputdx.h
     LIBS += -lpthread -lwinmm -lws2_32
 }
 
@@ -191,12 +191,6 @@ using_jack {
     HEADERS += bio2jack.h audiooutputjack.h
     SOURCES += bio2jack.c audiooutputjack.cpp
     LIBS += $$JACK_LIBS
-}
-
-using_directx {
-    DEFINES += USING_DIRECTX
-    HEADERS += audiooutputdx.h
-    SOURCES += audiooutputdx.cpp
 }
 
 contains( HAVE_MMX, yes ) {

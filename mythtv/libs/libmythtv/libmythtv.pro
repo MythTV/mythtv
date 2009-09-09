@@ -309,10 +309,6 @@ using_frontend {
     using_directfb:SOURCES +=     videoout_directfb.cpp
     using_directfb:DEFINES +=     USING_DIRECTFB
 
-    using_directx:HEADERS +=      videoout_dx.h
-    using_directx:SOURCES +=      videoout_dx.cpp
-    using_directx:DEFINES +=      USING_DIRECTX
-
     using_ivtv:HEADERS +=         videoout_ivtv.h
     using_ivtv:SOURCES +=         videoout_ivtv.cpp
 
@@ -577,7 +573,7 @@ use_hidesyms {
 
 mingw {
     DEFINES -= USING_OPENGL_VSYNC
-    DEFINES += USING_D3D
+    DEFINES += USING_MINGW
 
     HEADERS += videoout_d3d.h
     SOURCES -= NuppelVideoRecorder.cpp

@@ -76,15 +76,6 @@ extern "C" {
 #include "ivtvdecoder.h"
 #endif
 
-#ifdef USING_DIRECTX
-#include "videoout_dx.h"
-#undef GetFreeSpace
-#undef GetFileSize
-#if CONFIG_CYGWIN
-#undef DialogBox
-#endif
-#endif
-
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif

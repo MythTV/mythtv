@@ -82,8 +82,6 @@ static HostComboBox *AudioOutputDevice()
 #endif
 #ifdef USING_MINGW
 	gc->addSelection("Windows:");
-#endif
-#ifdef USING_DIRECTX
 	gc->addSelection("DirectX:");
 #endif
     gc->addSelection("NULL", "NULL");
@@ -169,10 +167,8 @@ static HostComboBox *MixerDevice()
 #ifdef USING_ALSA
     gc->addSelection("ALSA:default", "ALSA:default");
 #endif
-#ifdef USING_DIRECTX
+#ifdef USING_MINGW
     gc->addSelection("DirectX:", "DirectX:");
-#endif
-#ifdef USING_WINAUDIO
     gc->addSelection("Windows:", "Windows:");
 #endif
 

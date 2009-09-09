@@ -1176,11 +1176,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "conversion. It is not as feature rich as the standard video "
             "renderer, but can run on Linux hardware without an X11 server.");
 
-    if (renderer == "directx")
-        msg = QObject::tr(
-            "Windows video renderer based on overlays. "
-            "Not compatible with Vista Aero Glass.");
-
     if (renderer == "direct3d")
         msg = QObject::tr(
             "Windows video renderer based on Direct3D. Requires "
@@ -1496,7 +1491,6 @@ QString VideoDisplayProfile::toString(void) const
 "xv-blit"
 "xvmc-blit"
 "directfb"
-"directx"
 "quartz-blit"
 "quartz-accel"
 "ivtv"
@@ -1553,7 +1547,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_custom += "xlib";
     safe_custom += "xshm";
     safe_custom += "directfb";
-    safe_custom += "directx";
     safe_custom += "direct3d";
     safe_custom += "quartz-blit";
     safe_custom += "xv-blit";
@@ -1629,7 +1622,6 @@ void VideoDisplayProfile::init_statics(void)
         safe_renderer[*it2] += "xlib";
         safe_renderer[*it2] += "xshm";
         safe_renderer[*it2] += "directfb";
-        safe_renderer[*it2] += "directx";
         safe_renderer[*it2] += "direct3d";
         safe_renderer[*it2] += "quartz-blit";
         safe_renderer[*it2] += "xv-blit";
@@ -1653,7 +1645,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer_priority["xvmc-blit"]    = 110;
     safe_renderer_priority["vdpau"]        = 120;
     safe_renderer_priority["directfb"]     =  60;
-    safe_renderer_priority["directx"]      =  50;
     safe_renderer_priority["direct3d"]     =  55;
     safe_renderer_priority["quartz-blit"]  =  70;
     safe_renderer_priority["quartz-accel"] =  80;

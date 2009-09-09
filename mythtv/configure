@@ -296,7 +296,6 @@ BLOCK_QUOTE
   echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
   echo "  --disable-opengl-vsync   disable OpenGL vsync method"
   echo "  --disable-directfb       disable DirectFB (Linux non-X11 video)"
-  echo "  --enable-directx         enable DirectX   (Microsoft video)"
   echo ""
   echo "  --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)"
   echo ""
@@ -1187,7 +1186,6 @@ MYTHTV_CONFIG_LIST='
     darwin
     dbox2
     directfb
-    directx
     disable_mmx_for_debugging
     dvb
     dvdv
@@ -3816,7 +3814,8 @@ if enabled frontend; then
   echo "aRts support              ${audio_arts-no}"
   echo "JACK support              ${audio_jack-no}"
   if test x"$target_os" = x"mingw32" ; then
-    echo "Windows support           yes"
+    echo "Windows (Windows audio)   yes"
+    echo "Windows (DirectX)         yes"
   fi
   echo "libfftw3 support          ${libfftw3-no}"
   echo
@@ -3839,9 +3838,6 @@ fi
   fi
   echo "OpenGL vsync              ${opengl_vsync-no}"
   echo "DirectFB                  ${directfb-no}"
-  if enabled windows ; then
-    echo "DirectX                   ${directx-no}"
-  fi
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
   fi
@@ -4221,10 +4217,6 @@ fi
 if enabled directfb; then
   echo "CONFIG_DIRECTFB_LIBS=$CONFIG_DIRECTFB_LIBS" >> $MYTH_CONFIG_MAK
   echo "CONFIG_DIRECTFB_CXXFLAGS=$CONFIG_DIRECTFB_CXXFLAGS" >> $MYTH_CONFIG_MAK
-fi
-
-if enabled directx; then
-  append CONFIG_DEFINES "USING_DIRECTX"
 fi
 
 if ! enabled darwin && enabled opengl; then

@@ -8,10 +8,8 @@ using namespace std;
 #include "compat.h"
 
 #include "audiooutputnull.h"
-#ifdef USING_DIRECTX
+#ifdef USING_MINGW
 #include "audiooutputdx.h"
-#endif
-#ifdef USING_WINAUDIO
 #include "audiooutputwin.h"
 #endif
 #ifdef USING_OSS
@@ -83,7 +81,7 @@ AudioOutput *AudioOutput::OpenAudio(
     }
     else if (main_device.startsWith("DirectX:"))
     {
-#ifdef USING_DIRECTX
+#ifdef USING_MINGW
         return new AudioOutputDX(settings);
 #else
         VERBOSE(VB_IMPORTANT, "Audio output device is set to DirectX device "
@@ -93,7 +91,7 @@ AudioOutput *AudioOutput::OpenAudio(
     }
     else if (main_device.startsWith("Windows:"))
     {
-#ifdef USING_WINAUDIO
+#ifdef USING_MINGW
         return new AudioOutputWin(settings);
 #else
         VERBOSE(VB_IMPORTANT, "Audio output device is set to a Windows device "
