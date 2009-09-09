@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# cpsimple: recursive directory copy, then delete .svn sub dirs.
+
+echo cp -pr $1 $2
+cp -pr $1 $2
+
+echo find $2 '-name .svn -prune -exec rm -fr {} \;'
+find $2 -name .svn -prune -exec rm -fr {} \;
+
+exit 0

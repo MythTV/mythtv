@@ -1,0 +1,529 @@
+<!-- theme.xml for the MythCenter theme - by Jeroen Brosens -->
+<mythuitheme>
+    <window name="mainmenu">
+
+        <font name="menufont" face="Trebuchet MS">
+            <color>#FFFFFF</color>
+            <size>22</size>
+            <bold>yes</bold>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>2,2</shadowoffset>
+            <shadowalpha>50</shadowalpha>
+        </font>
+
+        <font name="clock" from="small">
+            <size>20</size>
+            <size:small>18</size:small>
+            <size:big>22</size:big>
+        </font>
+
+        <clock name="clock">
+            <area>780,40,480,40</area>
+            <font>clock</font>
+            <format>%DATE%, %TIME%</format>
+            <align>center</align>
+        </clock>
+
+        <statetype name="titles">
+            <position>25,28</position>
+            <state name="TV">
+                <imagetype name="TV">
+                    <filename>title/title_tv.png</filename>
+                </imagetype>
+            </state>
+            <state name="MAIN">
+                <imagetype name="MAIN">
+                    <filename>title/title_main.png</filename>
+                </imagetype>
+            </state>
+            <state name="MUSIC">
+                <imagetype name="MUSIC">
+                    <filename>title/title_music.png</filename>
+                </imagetype>
+            </state>
+            <state name="GALLERY">
+                <imagetype name="GALLERY">
+                    <filename>title/title_gallery.png</filename>
+                </imagetype>
+            </state>
+            <state name="VIDEO">
+                <imagetype name="VIDEO">
+                    <filename>title/title_video.png</filename>
+                </imagetype>
+            </state>
+            <state name="GAMES">
+                <imagetype name="GAMES">
+                    <filename>title/title_games.png</filename>
+                </imagetype>
+            </state>
+            <state name="WEATHER">
+                <imagetype name="WEATHER">
+                    <filename>title/title_weather.png</filename>
+                </imagetype>
+            </state>
+            <state name="SCHEDULE">
+                <imagetype name="SCHEDULE">
+                    <filename>title/title_schedule.png</filename>
+                </imagetype>
+            </state>
+            <state name="SEARCH">
+                <imagetype name="SEARCH">
+                    <filename>title/title_search.png</filename>
+                </imagetype>
+            </state>
+            <state name="WORDS" from="SEARCH" />
+            <state name="LISTS" from="SEARCH" />
+            <state name="SETUP">
+                <imagetype name="SETUP">
+                    <filename>title/title_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="TVSETUP" from="TV" />
+            <state name="SETUP_TVRECPRIORITIES">
+                <imagetype name="SETUP_TVRECPRIORITIES">
+                    <filename>title/title_priority.png</filename>
+                </imagetype>
+            </state>
+            <state name="MEDIA_SETUP">
+                <imagetype name="MEDIA_SETUP">
+                    <filename>title/title_multimedia.png</filename>
+                </imagetype>
+            </state>
+            <state name="INFO_SETUP">
+                <imagetype name="INFO_SETUP">
+                    <filename>title/title_info_settings.png</filename>
+                </imagetype>
+            </state>
+            <state name="DVD">
+                <imagetype name="DVD">
+                    <filename>title/title_dvd.png</filename>
+                </imagetype>
+            </state>
+            <state name="DVD_SETTINGS" from="DVD" />
+            <state name="MUSIC_SETTINGS">
+                <imagetype name="MUSIC_SETTINGS">
+                    <filename>title/title_music_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="VIDEO_SETTINGS" from="VIDEO" />
+            <state name="GAME_SETTINGS" from="GAMES" />
+            <state name="MANAGE_RECORDINGS" from="SCHEDULE" />
+            <state name="LIBRARY">
+                <imagetype name="LIBRARY">
+                    <filename>title/title_multimedia.png</filename>
+                </imagetype>
+            </state>
+            <state name="INFO">
+                <imagetype name="INFO">
+                    <filename>title/title_info_center.png</filename>
+                </imagetype>
+            </state>
+            <state name="OPTICAL_DISK" from="DVD" />
+            <state name="UTIL" from="SETUP" />
+            <state name="NETFLIX" from="DVD" />
+        </statetype>
+
+        <imagetype name="logo">
+            <position>30,595</position>
+            <filename>ui/mythtv_logo.png</filename>
+        </imagetype>
+
+        <imagetype name="horizon">
+            <position>550,450</position>
+            <filename>ui/horizon.png</filename>
+            <alpha>100</alpha>
+        </imagetype>
+
+        <buttonlist name="menu">
+            <area>160,160,600,450</area>
+            <layout>vertical</layout>
+            <spacing>5</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,480,400</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,480,60</area>
+                    <imagetype name="background" />
+                    <textarea name="buttontext">
+                        <area>15,7,450,50</area>
+                        <font>menufont</font>
+                        <align>left,vcenter</align>
+                        <cutdown>yes</cutdown>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>ui/button_on.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>500,5</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                    <imagetype name="upon">
+                        <filename>ui/up.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>500,355</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                    <imagetype name="dnon">
+                        <filename>ui/down.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <statetype name="watermarks">
+            <position>832,196</position>
+
+            <state name="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/tv.png</filename>
+                    <reflection axis="vertical" shear="0" scale="85" length="35" />
+                </imagetype>
+            </state>
+            <!--   mainmenu.xml  -->
+            <state name="TV" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/tv.png</filename>
+                </imagetype>
+            </state>
+            <state name="MUSIC" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/music.png</filename>
+                </imagetype>
+            </state>
+            <state name="VIDEO" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/video.png</filename>
+                </imagetype>
+            </state>
+            <state name="DVD" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/dvd.png</filename>
+                </imagetype>
+            </state>
+            <state name="FM" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/radio.png</filename>
+                </imagetype>
+            </state>
+            <state name="IMAGES" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/gallery.png</filename>
+                </imagetype>
+            </state>
+            <state name="GAME" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/joystick.png</filename>
+                </imagetype>
+            </state>
+            <state name="WEATHER" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/weather.png</filename>
+                </imagetype>
+            </state>
+            <state name="NEWS" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/news.png</filename>
+                </imagetype>
+            </state>
+            <state name="WEBPAGE" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/browser.png</filename>
+                </imagetype>
+            </state>
+            <state name="RECIPE" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/pie.png</filename>
+                </imagetype>
+            </state>
+            <state name="PHONE" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/phone.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETUP" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="SHUTDOWN" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/important.png</filename>
+                </imagetype>
+            </state>
+
+            <!--   dvdmenu.xml  -->
+            <state name="DVD_PLAY" from="DVD" />
+            <state name="VCD_PLAY" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/cd.png</filename>
+                </imagetype>
+            </state>
+            <state name="DVD_RIP" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/dvd_rip.png</filename>
+                </imagetype>
+            </state>
+
+            <!--   dvd_settings.xml  -->
+            <state name="DVD_SETTINGS_GENERAL" from="DVD" />
+            <state name="DVD_SETTINGS_PLAY" from="DVD" />
+            <state name="DVD_SETTINGS_RIP" from="DVD_RIP" />
+
+            <!--   game_settings.xml  -->
+            <state name="GAME_SETTINGS_GENERAL" from="GAME" />
+            <state name="GAME_SCAN" from="GAME" />
+
+            <!-- Netflix -->
+            <state name="NETFLIX" from="DVD" />
+            <state name="NETFLIX_QUEUE" from="DVD" />
+            <state name="NETFLIX_BROWSE" from="DVD" />
+            <state name="NETFLIX_HISTORY" from="DVD" />
+            <state name="SETTINGS_NETFLIX" from="DVD" />
+
+            <!--   main_settings.xml  -->
+            <state name="SETTINGS_GENERAL" from="SETUP" />
+            <state name="SETTINGS_APPEARANCE" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/appearance.png</filename>
+                </imagetype>
+            </state>
+            <state name="SCREENSETUPWIZARD" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/screenwiz.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETTINGS_TV" from="TV" />
+            <state name="SETTINGS_MUSIC" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/music_settings.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETTINGS_VIDEO" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/video_settings.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETTINGS_DVD" from="DVD" />
+            <state name="SETTINGS_FM" from="FM" />
+            <state name="SETTINGS_IMAGES" from="IMAGES" />
+            <state name="SETTINGS_GAME" from="GAME" />
+            <state name="SETTINGS_WEATHER" from="WEATHER" />
+            <state name="SETTINGS_NEWS" from="NEWS" />
+            <state name="SETTINGS_WEBPAGE" from="WEBPAGE" />
+            <state name="SETTINGS_RECIPE" from="RECIPE" />
+            <state name="SETTINGS_XBOX" from="SETUP" />
+            <state name="SETUP_KEYS" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/keys.png</filename>
+                </imagetype>
+            </state>
+
+            <!--   musicmenu.xml  -->
+            <state name="MUSIC_PLAY" from="MUSIC" />
+            <state name="MUSIC_PLAYLIST" from="MUSIC" />
+            <state name="MUSIC_RIP" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/cd_rip.png</filename>
+                </imagetype>
+            </state>
+            <state name="MUSIC_SCAN" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/search.png</filename>
+                </imagetype>
+            </state>
+
+            <!--   music_settings.xml  -->
+            <state name="MUSIC_SETTINGS_GENERAL" from="SETTINGS_MUSIC" />
+            <state name="MUSIC_SETTINGS_PLAYER" from="SETTINGS_MUSIC" />
+            <state name="MUSIC_SETTINGS_RIP" from="MUSIC_RIP" />
+
+            <!--   tv_schedule.xml  -->
+
+            <state name="TV_PROGRAM_GUIDE" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/clock.png</filename>
+                </imagetype>
+            </state>
+            <state name="TV_PROGFIND" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/search.png</filename>
+                </imagetype>
+            </state>
+            <state name="TV_SEARCH_LISTINGS" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_WORDS" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_LISTS" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_POWER" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
+            <state name="TV_CUSTOM_RECORD" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/record.png</filename>
+                </imagetype>
+            </state>
+            <state name="TV_MANUAL_SCHEDULE" from="TV_PROGRAM_GUIDE" />
+            <state name="TV_RECPRIORITIES" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/priority.png</filename>
+                </imagetype>
+            </state>
+            <state name="TV_CONFLICTS" from="TV_CUSTOM_RECORD" />
+
+            <!--   recpriorities_settings.xml  -->
+            <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="TV_RECPRIORITIES" />
+            <state name="TV_RECPRIORITIES_CHANNEL" from="TV_RECPRIORITIES" />
+            <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECPRIORITIES" />
+
+            <!--   setup.xml  -->
+            <state name="SETUP_GENERAL" from="SETUP" />
+            <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
+            <state name="SETUP_CAPTURE_CARDS" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/hardware_settings.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETUP_VIDEO_SOURCES" from="SETTINGS_VIDEO" />
+            <state name="SETUP_INPUT_CONNECTIONS" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/hardware_info.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETUP_CHANNEL_EDITOR" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/checklist.png</filename>
+                </imagetype>
+            </state>
+
+            <!--   tv_search.xml  -->
+            <state name="TV_SEARCH_TITLES" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
+
+            <!--   tv_lists.xml  -->
+            <state name="TV_SEARCH_NEW_TITLES" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_MOVIES" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_CATEGORIES" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_CHANNELS" from="TV_PROGFIND" />
+            <state name="TV_SEARCH_TIMES" from="TV_PROGFIND" />
+
+            <!--   tv_settings.xml  -->
+            <state name="TV_SETTINGS_GENERAL" from="SETUP" />
+            <state name="TV_SETTINGS_PROGRAM_GUIDE" from="TV_PROGRAM_GUIDE" />
+            <state name="TV_SETTINGS_PLAYBACK" from="TV" />
+            <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV" />
+            <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
+            <state name="TV_SETTINGS_RECORDING_PROFILES" from="TV_CUSTOM_RECORD" />
+            <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
+
+            <!--   tvmenu.xml  -->
+            <state name="TV_WATCH_TV" from="TV" />
+            <state name="TV_SCHEDULE_RECORDINGS" from="TV_PROGRAM_GUIDE" />
+            <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/play.png</filename>
+                </imagetype>
+            </state>
+            <state name="TV_DELETE" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/error.png</filename>
+                </imagetype>
+            </state>
+            <state name="TV_PREVIOUS" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/big_arrow_down.png</filename>
+                </imagetype>
+            </state>
+            <state name="TV_STATUS" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/info.png</filename>
+                </imagetype>
+            </state>
+
+            <!--   video_settings.xml  -->
+            <state name="VIDEO_SETTINGS_GENERAL" from="SETTINGS_VIDEO" />
+            <state name="VIDEO_SETTINGS_PLAYER" from="SETTINGS_VIDEO" />
+            <state name="VIDEO_FILE_TYPES" from="SETTINGS_VIDEO" />
+
+            <!--   videomenu.xml  -->
+            <state name="VIDEO_GALLERY" from="VIDEO" />
+            <state name="VIDEO_BROWSER" from="VIDEO" />
+            <state name="VIDEO_LIST" from="SETTINGS_VIDEO" />
+            <state name="VIDEO_MANAGER" from="SETTINGS_VIDEO" />
+
+            <!--   AltMenus Specific Icons  -->
+            <state name="TV_UPCOMING_RECORDINGS" from="TV_PROGRAM_GUIDE" />
+            <state name="SETTINGS_MEDIA" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/multimedia.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETTINGS_INFO_CENTER" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/info_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="MENU_MEDIA_LIBRARY" from="SETTINGS_MEDIA" />
+            <state name="MENU_MANAGE_RECORDINGS" from="SETUP_CHANNEL_EDITOR" />
+            <state name="MENU_INFO_CENTER" from="TV_STATUS" />
+            <state name="MENU_OPTICAL_DISKS" from="DVD" />
+            <state name="MENU_UTILITIES_SETUP" from="SETUP" />
+            <state name="SETUP_FRONTEND" from="SETUP" />
+            <state name="SETUP_BACKEND" from="SETUP" />
+            <state name="SETUP_MENU" from="SETUP" />
+            <state name="STREAM" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/stream.png</filename>
+                </imagetype>
+            </state>
+            <state name="EJECT" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/dvd_eject.png</filename>
+                </imagetype>
+            </state>
+            <state name="ARCHIVE" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/dvd_burn.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETTINGS_ARCHIVE" from="ARCHIVE" />
+            <state name="ARCHIVE_FINDER" from="TV_PROGFIND" />
+            <state name="ARCHIVE_EXPORT_VIDEO" from="ARCHIVE" />
+            <state name="ARCHIVE_IMPORT_VIDEO" from="ARCHIVE" />
+            <state name="ARCHIVE_SELECT_RECORDINGS" from="ARCHIVE" />
+            <state name="ARCHIVE_SELECT_VIDEOS" from="ARCHIVE" />
+            <state name="ARCHIVE_SELECT_FILES" from="ARCHIVE" />
+            <state name="ARCHIVE_CREATE_DVD" from="ARCHIVE" />
+            <state name="ARCHIVE_CREATE_ARCHIVE" from="ARCHIVE" />
+            <state name="ARCHIVE_UTILITIES" from="ARCHIVE" />
+            <state name="ARCHIVE_LAST_LOG" from="TV_STATUS" />
+            <state name="ARCHIVE_TEST_DVD">
+                <imagetype name="watermark">
+                    <filename>watermark/play.png</filename>
+                </imagetype>
+            </state>
+            <state name="ARCHIVE_BURN_DVD" from="ARCHIVE" />
+            <!-- Movietimes -->
+            <state name="MOVIETIMES" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/movietime.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETTINGS_MOVIETIME" from="MOVIETIMES" />
+            <!-- Zoneminder -->
+            <state name="ZONEMINDER" from="DEFAULT">
+                <imagetype name="watermark">
+                    <filename>watermark/zoneminder.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETTINGS_ZONEMINDER" from="ZONEMINDER" />
+        </statetype>
+
+    </window>
+
+</mythuitheme>

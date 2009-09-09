@@ -1,0 +1,781 @@
+<mythuitheme>
+
+    <window name="mainmenu">
+
+        <font name="clock" from="small">
+            <size>22</size>
+            <size:small>18</size:small>
+            <size:big>22</size:big>
+        </font>
+
+        <clock name="clock">
+            <area>800,600,400,40</area>
+            <font>clock</font>
+            <format>%DATE%, %TIME%</format>
+            <align>left</align>
+        </clock>
+
+        <statetype name="titles">
+            <position>0,80</position>
+            <state name="TV">
+                <imagetype name="TV">
+                    <filename>title/title_tv.png</filename>
+                </imagetype>
+            </state>
+            <state name="MAIN">
+                <imagetype name="MAIN">
+                    <filename>title/title_main.png</filename>
+                </imagetype>
+            </state>
+            <state name="MUSIC">
+                <imagetype name="MUSIC">
+                    <filename>title/title_music.png</filename>
+                </imagetype>
+            </state>
+            <state name="GALLERY">
+                <imagetype name="GALLERY">
+                    <filename>title/title_gallery.png</filename>
+                </imagetype>
+            </state>
+            <state name="VIDEO">
+                <imagetype name="VIDEO">
+                    <filename>title/title_video.png</filename>
+                </imagetype>
+            </state>
+            <state name="SCHEDULE">
+                <imagetype name="SCHEDULE">
+                    <filename>title/title_schedule.png</filename>
+                </imagetype>
+            </state>
+            <state name="SEARCH">
+                <imagetype name="SEARCH">
+                    <filename>title/title_search.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETUP">
+                <imagetype name="SETUP">
+                    <filename>title/title_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="MEDIA_SETUP">
+                <imagetype name="MEDIA_SETUP">
+                    <filename>title/title_media_settings.png</filename>
+                </imagetype>
+            </state>
+            <state name="INFO_SETUP">
+                <imagetype name="INFO_SETUP">
+                    <filename>title/title_info_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="TVSETUP">
+                <imagetype name="TVSETUP">
+                    <filename>title/title_tv_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="DVD">
+                <imagetype name="DVD">
+                    <filename>title/title_dvd.png</filename>
+                </imagetype>
+            </state>
+            <state name="DVD_SETTINGS">
+                <imagetype name="DVD_SETTINGS">
+                    <filename>title/title_dvd_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="MUSIC_SETTINGS">
+                <imagetype name="MUSIC_SETTINGS">
+                    <filename>title/title_music_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="VIDEO_SETTINGS">
+                <imagetype name="VIDEO_SETTINGS">
+                    <filename>title/title_video_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="GAME_SETTINGS">
+                <imagetype name="GAME_SETTINGS">
+                    <filename>title/title_game_setup.png</filename>
+                </imagetype>
+            </state>
+            <state name="LIBRARY">
+                <imagetype name="LIBRARY">
+                    <filename>title/title_library.png</filename>
+                </imagetype>
+            </state>
+            <state name="MANAGE_RECORDINGS">
+                <imagetype name="MANAGE_RECORDINGS">
+                    <filename>title/title_manage_recordings.png</filename>
+                </imagetype>
+            </state>
+            <state name="INFO">
+                <imagetype name="INFO">
+                    <filename>title/title_info_center.png</filename>
+                </imagetype>
+            </state>
+            <state name="OPTICAL_DISK">
+                <imagetype name="OPTICAL_DISK">
+                    <filename>title/title_optical_disks.png</filename>
+                </imagetype>
+            </state>
+            <state name="UTIL">
+                <imagetype name="UTIL">
+                    <filename>title/title_util.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <font name="menufont" face="Bitstream Vera Sans">
+            <color>#8AAAF8</color>
+            <size>20</size>
+            <bold>yes</bold>
+            <shadow>2,2</shadow>
+            <shadowcolor>#000000</shadowcolor>
+            <outlinecolor>#41517D</outlinecolor>
+            <outlinesize>1</outlinesize>
+        </font>
+
+        <font name="menufontselected" from="menufont">
+            <color>#D1F1FF</color>
+            <outlinesize>2</outlinesize>
+        </font>
+
+        <buttonlist name="menu">
+            <area>0,240,1280,250</area>
+            <layout>horizontal</layout>
+            <buttonarea>30,0,1220,200</buttonarea>
+            <spacing>4</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,200,200</area>
+                    <statetype name="icon">
+                        <position>25,0</position>
+                        <state name="DEFAULT">
+
+                        </state>
+                        <state name="TV">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_WATCH_TV_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_PLAY_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="VIDEO">
+                            <imagetype name="icon">
+                                <filename>buttons/VIDEO_BROWSER_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="DVD">
+                            <imagetype name="icon">
+                                <filename>buttons/DVD_PLAY_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="FM">
+                            <imagetype name="icon">
+                                <filename>buttons/RADIO_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="IMAGES">
+                            <imagetype name="icon">
+                                <filename>buttons/IMAGES_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="GAME">
+                            <imagetype name="icon">
+                                <filename>buttons/GAME_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="WEATHER">
+                            <imagetype name="icon">
+                                <filename>buttons/WEATHER_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="NETFLIX" from="DVD" />
+                        <state name="NEWS">
+                            <imagetype name="icon">
+                                <filename>buttons/NEWS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="WEBPAGE">
+                            <imagetype name="icon">
+                                <filename>buttons/WEBPAGE_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="PHONE" from="DEFAULT" />
+                        <state name="RECIPE" from="DEFAULT" />
+                        <state name="SETUP">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_UTILITIES_SETUP_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SHUTDOWN" from="DEFAULT" />
+                        <state name="MENU_MEDIA_LIBRARY">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_MEDIA_LIBRARY_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_MANAGE_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_MANAGE_RECORDINGS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_INFO_CENTER">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_INFO_CENTER_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_OPTICAL_DISKS">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_OPTICAL_DISKS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_UTILITIES_SETUP" from="SETUP" />
+                        <state name="SETTINGS_GENERAL" from="SETUP" />
+                        <state name="SETTINGS_APPEARANCE">
+                            <imagetype name="icon">
+                                <filename>buttons/SETTINGS_APPEARANCE_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SCREENSETUPWIZARD" from="SETTINGS_APPEARANCE" />
+                        <state name="VIDEO_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="VIDEO_SETTINGS_PLAYER" from="DEFAULT" />
+                        <state name="VIDEO_FILE_TYPES" from="DEFAULT" />
+                        <state name="VIDEO_BROWSER" from="VIDEO" />
+                        <state name="VIDEO_LIST" from="VIDEO" />
+                        <state name="VIDEO_GALLERY" from="VIDEO" />
+                        <state name="VIDEO_MANAGER">
+                            <imagetype name="icon">
+                                <filename>buttons/VIDEO_MANAGER_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SETTINGS_TV" from="TV" />
+                        <state name="SETTINGS_MUSIC" from="MUSIC" />
+                        <state name="SETTINGS_VIDEO" from="VIDEO_MANAGER" />
+                        <state name="SETTINGS_DVD" from="DVD" />
+                        <state name="SETTINGS_FM" from="FM" />
+                        <state name="SETTINGS_IMAGES" from="IMAGES" />
+                        <state name="SETTINGS_GAME" from="GAME" />
+                        <state name="SETTINGS_WEATHER" from="WEATHER" />
+                        <state name="SETTINGS_NEWS" from="NEWS" />
+                        <state name="SETTINGS_WEBPAGE" from="WEBPAGE" />
+                        <state name="SETTINGS_RECIPE" from="DEFAULT" />
+                        <state name="SETTINGS_XBOX" from="DEFAULT" />
+                        <state name="DVD_PLAY" from="DVD" />
+                        <state name="VCD_PLAY">
+                            <imagetype name="icon">
+                                <filename>buttons/VCD_PLAY_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="DVD_RIP">
+                            <imagetype name="icon">
+                                <filename>buttons/DVD_RIP_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="EJECT">
+                            <imagetype name="icon">
+                                <filename>buttons/EJECT_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="DVD_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="DVD_SETTINGS_PLAY" from="DVD" />
+                        <state name="DVD_SETTINGS_RIP" from="DVD_RIP" />
+                        <state name="GAME_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="GAME_SCAN" from="DEFAULT" />
+                        <state name="MUSIC_PLAY" from="MUSIC" />
+                        <state name="MUSIC_PLAYLIST">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_PLAYLIST_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_RIP">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_RIP_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_IMPORT" from="MUSIC_RIP" />
+                        <state name="MUSIC_SCAN">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_SCAN_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_SETTINGS_GENERAL" from="MUSIC" />
+                        <state name="MUSIC_SETTINGS_PLAYER" from="MUSIC_PLAYLIST" />
+                        <state name="MUSIC_SETTINGS_RIP" from="MUSIC_RIP" />
+                        <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="TV_RECPRIORITIES_CHANNEL" from="DEFAULT" />
+                        <state name="TV_RECPRIORITIES_CUSTOM" from="DEFAULT" />
+                        <state name="SETUP_GENERAL" from="SETUP" />
+                        <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
+                        <state name="SETUP_CAPTURE_CARDS" from="SETUP" />
+                        <state name="SETUP_VIDEO_SOURCES" from="SETUP" />
+                        <state name="SETUP_INPUT_CONNECTIONS" from="SETUP" />
+                        <state name="SETUP_CHANNEL_EDITOR" from="SETUP" />
+                        <state name="TV_PROGRAM_GUIDE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_PROGRAM_GUIDE_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_PROGFIND">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_PROGFIND_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_WORDS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_WORDS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_LISTS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_LISTS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_CUSTOM_RECORD">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_CUSTOM_RECORD_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_MANUAL_SCHEDULE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_MANUAL_SCHEDULE_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_RECPRIORITIES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_RECPRIORITIES_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_CONFLICTS" from="DEFAULT" />
+                        <state name="TV_SEARCH_TITLES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_TITLES_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_KEYWORDS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_WORDS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_PEOPLE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_PEOPLE_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_POWER">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_POWER_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_NEW_TITLES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_NEW_TITLES_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_MOVIES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_MOVIES_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_CATEGORIES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_CATEGORIES_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_CHANNELS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_CHANNELS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_TIMES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_TIME_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_DESCRIPTIONS" from="TV_SEARCH_TITLES" />
+                        <state name="TV_SEARCH_LISTINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_LISTINGS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SETTINGS_GENERAL" from="SETUP" />
+                        <state name="TV_SETTINGS_PROGRAM_GUIDE" from="DEFAULT" />
+                        <state name="TV_SETTINGS_PLAYBACK" from="TV" />
+                        <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV" />
+                        <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
+                        <state name="TV_SETTINGS_RECORDING_PROFILES" from="DEFAULT" />
+                        <state name="TV_SETTINGS_RECPRIORITIES" from="DEFAULT" />
+                        <state name="TV_WATCH_TV" from="TV" />
+                        <state name="TV_SCHEDULE_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SCHEDULE_RECORDINGS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_WATCH_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_WATCH_RECORDINGS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_DELETE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_DELETE_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_PREVIOUS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_PREVIOUS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_STATUS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_STATUS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_UPCOMING_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_UPCOMING_RECORDINGS_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SETTINGS_MEDIA" from="MENU_MEDIA_LIBRARY" />
+                        <state name="SETTINGS_INFO_CENTER" from="MENU_INFO_CENTER" />
+                        <state name="SETUP_FRONTEND" from="DEFAULT" />
+                        <state name="SETUP_BACKEND" from="DEFAULT" />
+                        <state name="SETUP_MENU" from="SETUP" />
+                    </statetype>
+
+                    <textarea name="buttontext">
+                        <area>0,100,190,90</area>
+                        <font>menufont</font>
+                        <align>hcenter,top</align>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <statetype name="icon">
+                        <state name="DEFAULT">
+                            <imagetype name="icon">
+                                <filename>button_off.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_WATCH_TV.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_PLAY.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="VIDEO">
+                            <imagetype name="icon">
+                                <filename>buttons/VIDEO_BROWSER.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="DVD">
+                            <imagetype name="icon">
+                                <filename>buttons/DVD_PLAY.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="FM">
+                            <imagetype name="icon">
+                                <filename>buttons/RADIO.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="IMAGES">
+                            <imagetype name="icon">
+                                <filename>buttons/IMAGES.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="GAME">
+                            <imagetype name="icon">
+                                <filename>buttons/GAME.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="WEATHER">
+                            <imagetype name="icon">
+                                <filename>buttons/WEATHER.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="NETFLIX" from="DVD" />
+                        <state name="NEWS">
+                            <imagetype name="icon">
+                                <filename>buttons/NEWS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="WEBPAGE">
+                            <imagetype name="icon">
+                                <filename>buttons/WEBPAGE.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="PHONE" from="DEFAULT" />
+                        <state name="RECIPE" from="DEFAULT" />
+                        <state name="SETUP">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_UTILITIES_SETUP.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SHUTDOWN" from="DEFAULT" />
+                        <state name="MENU_MEDIA_LIBRARY">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_MEDIA_LIBRARY.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_MANAGE_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_MANAGE_RECORDINGS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_INFO_CENTER">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_INFO_CENTER.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_OPTICAL_DISKS">
+                            <imagetype name="icon">
+                                <filename>buttons/MENU_OPTICAL_DISKS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MENU_UTILITIES_SETUP" from="SETUP" />
+                        <state name="SETTINGS_GENERAL" from="SETUP" />
+                        <state name="SETTINGS_APPEARANCE">
+                            <imagetype name="icon">
+                                <filename>buttons/SETTINGS_APPEARANCE.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SCREENSETUPWIZARD" from="SETTINGS_APPEARANCE" />
+                        <state name="VIDEO_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="VIDEO_SETTINGS_PLAYER" from="DEFAULT" />
+                        <state name="VIDEO_FILE_TYPES" from="DEFAULT" />
+                        <state name="VIDEO_BROWSER" from="VIDEO" />
+                        <state name="VIDEO_LIST" from="VIDEO" />
+                        <state name="VIDEO_GALLERY" from="VIDEO" />
+                        <state name="VIDEO_MANAGER">
+                            <imagetype name="icon">
+                                <filename>buttons/VIDEO_MANAGER.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SETTINGS_TV" from="TV" />
+                        <state name="SETTINGS_MUSIC" from="MUSIC" />
+                        <state name="SETTINGS_VIDEO" from="VIDEO_MANAGER" />
+                        <state name="SETTINGS_DVD" from="DVD" />
+                        <state name="SETTINGS_FM" from="FM" />
+                        <state name="SETTINGS_IMAGES" from="IMAGES" />
+                        <state name="SETTINGS_GAME" from="GAME" />
+                        <state name="SETTINGS_WEATHER" from="WEATHER" />
+                        <state name="SETTINGS_NEWS" from="NEWS" />
+                        <state name="SETTINGS_WEBPAGE" from="WEBPAGE" />
+                        <state name="SETTINGS_RECIPE" from="DEFAULT" />
+                        <state name="SETTINGS_XBOX" from="DEFAULT" />
+                        <state name="DVD_PLAY" from="DVD" />
+                        <state name="VCD_PLAY">
+                            <imagetype name="icon">
+                                <filename>buttons/VCD_PLAY.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="DVD_RIP">
+                            <imagetype name="icon">
+                                <filename>buttons/DVD_RIP.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="EJECT">
+                            <imagetype name="icon">
+                                <filename>buttons/EJECT.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="DVD_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="DVD_SETTINGS_PLAY" from="DVD" />
+                        <state name="DVD_SETTINGS_RIP" from="DVD_RIP" />
+                        <state name="GAME_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="GAME_SCAN" from="DEFAULT" />
+                        <state name="MUSIC_PLAY" from="MUSIC" />
+                        <state name="MUSIC_PLAYLIST">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_PLAYLIST.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_RIP">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_RIP.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_IMPORT" from="MUSIC_RIP" />
+                        <state name="MUSIC_SCAN">
+                            <imagetype name="icon">
+                                <filename>buttons/MUSIC_SCAN.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_SETTINGS_GENERAL" from="MUSIC" />
+                        <state name="MUSIC_SETTINGS_PLAYER" from="MUSIC_PLAYLIST" />
+                        <state name="MUSIC_SETTINGS_RIP" from="MUSIC_RIP" />
+                        <state name="TV_RECPRIORITIES_SETTINGS_GENERAL" from="DEFAULT" />
+                        <state name="TV_RECPRIORITIES_CHANNEL" from="DEFAULT" />
+                        <state name="TV_RECPRIORITIES_CUSTOM" from="DEFAULT" />
+                        <state name="SETUP_GENERAL" from="SETUP" />
+                        <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
+                        <state name="SETUP_CAPTURE_CARDS" from="SETUP" />
+                        <state name="SETUP_VIDEO_SOURCES" from="SETUP" />
+                        <state name="SETUP_INPUT_CONNECTIONS" from="SETUP" />
+                        <state name="SETUP_CHANNEL_EDITOR" from="SETUP" />
+                        <state name="TV_PROGRAM_GUIDE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_PROGRAM_GUIDE.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_PROGFIND">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_PROGFIND.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_WORDS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_WORDS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_LISTS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_LISTS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_CUSTOM_RECORD">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_CUSTOM_RECORD.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_MANUAL_SCHEDULE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_MANUAL_SCHEDULE.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_RECPRIORITIES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_RECPRIORITIES.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_CONFLICTS" from="DEFAULT" />
+                        <state name="TV_SEARCH_TITLES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_TITLES.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_KEYWORDS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_WORDS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_PEOPLE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_PEOPLE.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_POWER">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_POWER.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_NEW_TITLES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_NEW_TITLES.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_MOVIES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_MOVIES.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_CATEGORIES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_CATEGORIES.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_CHANNELS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_CHANNELS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_TIMES">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_TIME.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_DESCRIPTIONS" from="TV_SEARCH_TITLES" />
+                        <state name="TV_SEARCH_LISTINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SEARCH_LISTINGS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SETTINGS_GENERAL" from="SETUP" />
+                        <state name="TV_SETTINGS_PROGRAM_GUIDE" from="DEFAULT" />
+                        <state name="TV_SETTINGS_PLAYBACK" from="TV" />
+                        <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV" />
+                        <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
+                        <state name="TV_SETTINGS_RECORDING_PROFILES" from="DEFAULT" />
+                        <state name="TV_SETTINGS_RECPRIORITIES" from="DEFAULT" />
+                        <state name="TV_WATCH_TV" from="TV" />
+                        <state name="TV_SCHEDULE_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_SCHEDULE_RECORDINGS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_WATCH_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_WATCH_RECORDINGS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_DELETE">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_DELETE.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_PREVIOUS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_PREVIOUS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_STATUS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_STATUS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_UPCOMING_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>buttons/TV_UPCOMING_RECORDINGS.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="SETTINGS_MEDIA" from="MENU_MEDIA_LIBRARY" />
+                        <state name="SETTINGS_INFO_CENTER" from="MENU_INFO_CENTER" />
+                        <state name="SETUP_FRONTEND" from="DEFAULT" />
+                        <state name="SETUP_BACKEND" from="DEFAULT" />
+                        <state name="SETUP_MENU" from="SETUP" />
+                    </statetype>
+
+                    <textarea name="buttontext">
+                        <font>menufontselected</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>65,120</position>
+                <showempty>yes</showempty>
+                <state type="on">
+                    <imagetype name="upon">
+                        <filename>shared/left_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>65,460</position>
+                <showempty>yes</showempty>
+                <state type="on">
+                    <imagetype name="dnon">
+                        <filename>shared/right_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+    </window>
+
+</mythuitheme>
+

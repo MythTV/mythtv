@@ -1,0 +1,56 @@
+<themeinfo>
+    <!-- The Theme Name (Required) -->
+    <name>Retro</name>
+
+    <!-- The Theme Types (Required) -->
+    <types>
+        <!-- Type. Legal Values are one or more of: UI, OSD and Menu -->
+        <type>OSD</type>
+    </types>
+
+    <!-- Aspect ratio of the theme. (Required)
+         Maybe be: 4:3, 5:4, 16:9 or 16:10 -->
+    <aspect>4:3</aspect>
+
+    <!-- The base resolution of the theme before being scaled to the users
+         resolution (Required)
+         Usually 800x600 (4:3) or 1280x720 (16:9) -->
+    <baseres>640x480</baseres>
+
+    <!-- Theme Author Details (Optional)-->
+    <author>
+        <!-- Your name -->
+        <name></name>
+
+        <!-- Your Email Address -->
+        <email></email>
+    </author>
+
+    <!-- The Versioning Info (Required) -->
+    <version>
+        <!-- Major version changes mean the theme is no longer
+             compatible with earlier versions of mythtv -->
+        <major>1</major>
+
+        <!-- Minor version changes are backwards compatible -->
+        <minor>1</minor>
+    </version>
+
+    <!-- Theme Details (Required) -->
+    <detail>
+        <!-- At least one thumbnail image named "preview" must be
+             included with the theme.
+             There is no limit to the number of thumbnails.
+             Each thumbnail must be given a different name -->
+        <thumbnail name="preview">retro-osd-preview.png</thumbnail>
+
+        <!-- A description of the theme, including general colours and
+             style. The description should include any details that
+             may help to locate your theme in a search. -->
+        <description>A graded blue theme with orange text.</description>
+
+        <!-- Errata. A list of known faults, missing elements or unfinished
+             areas. e.g. "mythgallery not themed" -->
+        <errata>N/A</errata>
+    </detail>
+</themeinfo>

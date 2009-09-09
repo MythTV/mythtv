@@ -19,12 +19,12 @@
         </imagetype>
 
         <buttonlist name="groups">
-            <area>12,58,1260,30</area>
+            <area>0,58,1280,30</area>
             <spacing>15</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
-            <buttonarea>0,0,1260,40</buttonarea>
+            <buttonarea>12,0,1260,40</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,240,40</area>
@@ -50,10 +50,20 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>132,247</position>
+                <position>1264,0</position>
+                <state type="full">
+                    <imagetype name="right">
+                        <filename>controls/right_arrow_light.png</filename>
+                    </imagetype>
+                </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>160,247</position>
+                <position>0,0</position>
+                <state type="full">
+                    <imagetype name="left">
+                        <filename>controls/left_arrow_light.png</filename>
+                    </imagetype>
+                </state>
             </statetype>
         </buttonlist>
 
@@ -63,8 +73,8 @@
         </imagetype>
 
         <buttonlist name="recordings">
-            <area>0,116,1280,300</area>
-            <buttonarea>0,0,1280,300</buttonarea>
+            <area>0,116,1280,315</area>
+            <buttonarea>0,0,1280,290</buttonarea>
             <wrapstyle>items</wrapstyle>
             <scrollstyle>center</scrollstyle>
             <layout>horizontal</layout>
@@ -171,11 +181,21 @@
                     </imagetype>
                 </state>
             </statetype>
-            <statetype name="downscrollarrow">
-                <position>700,400</position>
-            </statetype>
             <statetype name="upscrollarrow">
-                <position>728,400</position>
+                <position>0,289</position>
+                <state type="full">
+                    <imagetype name="left">
+                        <filename>recordings/reclist_left_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1256,289</position>
+                <state type="full">
+                    <imagetype name="right">
+                        <filename>recordings/reclist_right_arrow.png</filename>
+                    </imagetype>
+                </state>
             </statetype>
         </buttonlist>
 

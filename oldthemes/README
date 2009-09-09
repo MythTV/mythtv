@@ -1,0 +1,12 @@
+This module provides a number of old themes for MythTV that used to be
+distributed in the main download.
+
+Please edit myththemes.pro to point to your current mythtv installation prefix.
+This is generally /usr/local if you're compiling from source.
+
+To install:
+
+$ ./configure
+$ qmake myththemes.pro
+$ su
+# make install

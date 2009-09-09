@@ -1,0 +1,130 @@
+<mythuitheme>
+
+    <window name="backgroundwindow">
+        <imagetype name="backimg">
+            <filename>background.png</filename>
+        </imagetype>
+
+        <font name="small" face="Trebuchet MS">
+            <color>#FFFFFF</color>
+            <size>14</size>
+            <size:small>12</size:small>
+            <size:big>16</size:big>
+        </font>
+
+        <font name="medium" from="small">
+            <size>16</size>
+            <size:small>14</size:small>
+            <size:big>20</size:big>
+        </font>
+
+        <font name="large" from="small">
+            <size>20</size>
+            <size:small>18</size:small>
+            <size:big>22</size:big>
+        </font>
+
+        <!-- fonts need sorting -->
+
+        <font name="basefont"  face="Trebuchet Ms">
+            <color>#FFFFFF</color>
+            <size>15</size>
+            <size:small>14</size:small>
+            <size:big>20</size:big>
+            <shadowcolor>#000000</shadowcolor>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="title" from="basefont" face="Arial Black">
+            <color>#FFFFDD</color>
+            <size>18</size>
+            <bold>yes</bold>
+            <size:big>24</size:big>
+            <size:small>18</size:small>
+            <shadow>3,3</shadow>
+        </font>
+
+        <font name="subtitle" from="basefont">
+            <color>#FFFFDD</color>
+            <size>16</size>
+            <size:big>21</size:big>
+            <size:small>17</size:small>
+            <shadow>2,2</shadow>
+        </font>
+
+        <font name="info" from="basefont">
+            <shadow>2,2</shadow>
+        </font>
+
+        <font name="metadata" from="info">
+            <color>#FFFFDD</color>
+        </font>
+
+        <font name="help" from="info">
+            <shadow>2,2</shadow>
+            <color>#aaaaee</color>
+        </font>
+
+        <font name="description" from="info">
+            <shadow>1,1</shadow>
+        </font>
+
+        <font name="small-info" from="info">
+            <size>14</size>
+            <size:small>12</size:small>
+            <size:big>17</size:big>
+        </font>
+
+        <font name="list-active" from="basefont" face="Freesans">
+            <size>15</size>
+            <size:small>14</size:small>
+            <size:big>18</size:big>
+            <shadow>2,2</shadow>
+            <color>#ddddff</color>
+        </font>
+
+        <font name="list-inactive" from="list-active">
+            <color>#aaaaee</color>
+        </font>
+
+        <font name="list-record" from="list-active">
+            <color>#33ff33</color>
+        </font>
+
+        <font name="list-recording" from="list-active">
+            <color>#ff5544</color>
+        </font>
+
+        <font name="list-norecord" from="list-active">
+            <color>#999999</color>
+        </font>
+
+        <font name="list-conflict"  from="list-active">
+            <color>#dddd33</color>
+        </font>
+
+        <font name="list-tagged"  from="list-active">
+            <color>#dddd33</color>
+        </font>
+
+        <font name="list-selected"  from="list-active">
+            <color>#FFFFFF</color>
+        </font>
+
+        <font name="list-selectable" from="list-active">
+            <color>#ddddff</color>
+        </font>
+
+
+        <font name="recstatus" from="info">
+            <color>#ffff33</color>
+            <shadow>2,2</shadow>
+        </font>
+
+        <!-- End needs sorting -->
+
+    </window>
+
+</mythuitheme>
+

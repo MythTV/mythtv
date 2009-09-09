@@ -88,6 +88,7 @@
                         <area>705,0,60,25</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
+                    <textarea name="buttontext" />
                     <textarea name="channum" from="buttontext">
                         <area>32,1,60,24</area>
                         <align>center</align>
