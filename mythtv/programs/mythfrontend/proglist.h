@@ -207,7 +207,6 @@ class ProgLister : public ScheduleCommon
     void chooseView(void);
     void updateInfo(MythUIButtonListItem *item);
     void setViewFromList(QString item);
-    void doDeleteRule(bool ok);
     void doDeleteOldEpisode(bool ok);
     void doDeleteOldTitle(bool ok);
 
