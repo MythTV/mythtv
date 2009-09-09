@@ -156,6 +156,7 @@ HEADERS += channelsettings.h        previewgenerator.h
 HEADERS += transporteditor.h        listingsources.h
 HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
+HEADERS += recordingrule.h
 
 # Remove when everything is switched to MythUI
 HEADERS += proglist_qt.h
@@ -181,6 +182,7 @@ SOURCES += channelsettings.cpp      previewgenerator.cpp
 SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
+SOURCES += recordingrule.cpp
 
 # Remove when everything is switched to MythUI
 SOURCES += proglist_qt.cpp
