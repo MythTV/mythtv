@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdialogbox.h"
 #include "uitypes.h"
-#include "scheduledrecording.h"
+#include "recordingrule.h"
 #include "mythdb.h"
 #include "mythuihelper.h"
 
@@ -228,11 +228,11 @@ void ProgDetails::loadPage(void)
     int audioprop = 0, videoprop = 0, subtype = 0, generic = 0;
     bool recorded = false;
 
-    ScheduledRecording* record = NULL;
+    RecordingRule* record = NULL;
     if (m_progInfo.recordid)
     {
-        record = new ScheduledRecording();
-        record->loadByProgram(&m_progInfo);
+        record = new RecordingRule();
+        record->LoadByProgram(&m_progInfo);
     }
 
     if (m_progInfo.filesize > 0)
@@ -577,8 +577,8 @@ void ProgDetails::loadPage(void)
         recordingRule = QString("%1, ").arg(m_progInfo.recordid);
         if (m_progInfo.rectype != kNotRecording)
             recordingRule += m_progInfo.RecTypeText();
-        if (!(record->getRecordTitle().isEmpty()))
-            recordingRule += QString(" \"%2\"").arg(record->getRecordTitle());
+        if (!(record->m_title.isEmpty()))
+            recordingRule += QString(" \"%2\"").arg(record->m_title);
 
         query.prepare("SELECT last_record, next_record, avg_delay "
                       "FROM record WHERE recordid = :RECORDID");
@@ -619,12 +619,11 @@ void ProgDetails::loadPage(void)
                 }
             }
         }
-        if (record->getSearchType() &&
-            record->getSearchType() != kManualSearch &&
-            record->getRecordDescription() != m_progInfo.description)
-            searchPhrase = record->getRecordDescription()
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;").replace("\n", " ");
+        if (record->m_searchType != kManualSearch &&
+            record->m_description != m_progInfo.description)
+            searchPhrase = record->m_description.replace("<", "&lt;")
+                                                .replace(">", "&gt;")
+                                                .replace("\n", " ");
     }
     addItem("RECORDING_RULE", QObject::tr("Recording Rule"), recordingRule);
     addItem("LAST_RECORDED", QObject::tr("Last Recorded"), lastRecorded);
@@ -674,7 +673,7 @@ void ProgDetails::loadPage(void)
     }
     else if (m_progInfo.recordid)
     {
-        recordingProfile =  record->getProfileName();
+        recordingProfile =  record->m_recProfile;
     }
     addItem("RECORDING_HOST", QObject::tr("Recording Host"), recordingHost);
     addItem("RECORDED_FILE_NAME", QObject::tr("Recorded File Name"), recordedFilename);
@@ -685,6 +684,8 @@ void ProgDetails::loadPage(void)
     addItem("PLAYBACK_GROUP", QObject::tr("Playback Group"),  playbackGroup);
 
     m_page[m_currentPage] = m_html.join("\n");
+
+    delete record;
 }
 
 bool ProgDetails::loadHTML(void)
