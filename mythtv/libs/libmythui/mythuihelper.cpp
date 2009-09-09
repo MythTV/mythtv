@@ -854,8 +854,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 /** \fn FindThemeDir(const QString &themename)
  *  \brief Returns the full path to the theme denoted by themename
  *
- *   If the theme cannot be found falls back to the G.A.N.T theme.
- *   If the G.A.N.T theme doesn't exist then returns an empty string.
+ *   If the theme cannot be found falls back to the Terra theme.
+ *   If the Terra theme doesn't exist then returns an empty string.
  *  \param themename The theme name.
  *  \return Path to theme or empty string.
  */
@@ -876,13 +876,13 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
     else
         VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
 
-    testdir = GetThemesParentDir() + "G.A.N.T";
+    testdir = GetThemesParentDir() + "Terra";
     dir.setPath(testdir);
     if (dir.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
-                "Switching to G.A.N.T").arg(themename));
-        GetMythDB()->SaveSetting("Theme", "G.A.N.T");
+                "Switching to Terra").arg(themename));
+        GetMythDB()->SaveSetting("Theme", "Terra");
         return testdir;
     }
     else

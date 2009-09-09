@@ -286,10 +286,6 @@ MythContextPrivate::~MythContextPrivate()
  * \bug   Some of these settings (<i>e.g.</I> window size, theme)
  *        seem to be used after the temp window is destroyed.
  *
- * \bug   The default theme here is blue, but as of [12377],
- *        G.A.N.T is now meant to be the default?
- *        A simple change to make, but Nigel prefers
- *        "blue" for these initial screens and popups
  */
 void MythContextPrivate::TempMainWindow(bool languagePrompt)
 {
@@ -298,7 +294,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
     SilenceDBerrors();
 
-    m_database->SetSetting("Theme", "blue");
+    m_database->SetSetting("Theme", "Terra");
 #ifdef Q_WS_MACX
     // Myth looks horrible in default Mac style for Qt
     m_database->SetSetting("Style", "Windows");

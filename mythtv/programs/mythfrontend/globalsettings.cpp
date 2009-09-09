@@ -2965,7 +2965,7 @@ ThemeSelector::ThemeSelector(QString label):
     }
 
     if (themetype & THEME_UI)
-        setValue("G.A.N.T");
+        setValue("Terra");
 }
 
 class StyleSetting: public HostComboBox {

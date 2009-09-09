@@ -826,9 +826,9 @@ void gotoMainMenu(void)
 //
 bool resetTheme(QString themedir, const QString badtheme)
 {
-    QString themename = "blue";
+    QString themename = "Terra";
 
-    if (badtheme == "blue")
+    if (badtheme == "Terra")
         themename = "G.A.N.T";
 
     VERBOSE(VB_IMPORTANT,
@@ -1406,7 +1406,7 @@ int main(int argc, char **argv)
 
     WriteDefaults();
 
-    QString themename = gContext->GetSetting("Theme", "G.A.N.T");
+    QString themename = gContext->GetSetting("Theme", "Terra");
     bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
 
     if (randomtheme)

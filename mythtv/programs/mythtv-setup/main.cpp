@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
 
     if (use_display)
     {
-        gContext->SetSetting("Theme", "G.A.N.T");
+        gContext->SetSetting("Theme", "Terra");
         GetMythUI()->LoadQtConfig();
 
         QString fileprefix = GetConfDir();
