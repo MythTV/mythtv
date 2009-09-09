@@ -263,7 +263,7 @@ void MythUIHelperPrivate::GetScreenBounds()
  */
 void MythUIHelperPrivate::StoreGUIsettings()
 {
-    if (x_override > 0 && y_override > 0)
+    if (x_override >= 0 && y_override >= 0)
     {
         GetMythDB()->OverrideSettingForSession("GuiOffsetX", QString::number(x_override));
         GetMythDB()->OverrideSettingForSession("GuiOffsetY", QString::number(y_override));
