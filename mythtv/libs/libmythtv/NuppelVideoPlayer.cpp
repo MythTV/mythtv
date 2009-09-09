@@ -2684,6 +2684,12 @@ void NuppelVideoPlayer::DisplayPauseFrame(void)
         return;
     }
 
+    if (player_ctx->buffer->isDVD() &&
+        player_ctx->buffer->DVD()->InStillFrame())
+    {
+        SetScanType(kScan_Progressive);
+    }
+
     DisplayDVDButton();
 
     videofiltersLock.lock();
