@@ -2,11 +2,11 @@
 #include "viewscheduled.h"
 
 // Libmythtv
-#include "scheduledrecording.h"
 #include "customedit.h"
 #include "recordinginfo.h"
 #include "proglist.h"
 #include "tv_play.h"
+#include "recordingrule.h"
 
 // Libmythdb
 #include "mythverbose.h"
@@ -316,7 +316,7 @@ void ViewScheduled::LoadList(void)
 
         int listPos = plist.count() - 1;
         int i;
-        for (i = listPos; i >= 0; i--)
+        for (i = listPos; i >= 0; --i)
         {
             ProgramInfo *pginfo = plist[i];
             if (callsign == pginfo->chansign &&
@@ -530,13 +530,15 @@ void ViewScheduled::deleteRule()
     if (!pginfo)
         return;
 
-    ScheduledRecording *record = new ScheduledRecording();
-    int recid = pginfo->recordid;
-    record->loadByID(recid);
+    RecordingRule *record = new RecordingRule();
+    if (!record->LoadByProgram(pginfo))
+    {
+        delete record;
+        return;
+    }
 
-    QString message =
-        tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
-                                  .arg(pginfo->RecTypeText());
+    QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
+                                                .arg(pginfo->RecTypeText());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
@@ -678,15 +680,15 @@ void ViewScheduled::customEvent(QEvent *event)
 
         if (resultid == "deleterule")
         {
-            ScheduledRecording *record = qVariantValue<ScheduledRecording *>(dce->GetData());
+            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
             if (record)
             {
                 if (buttonnum > 0)
                 {
-                    record->remove();
-                    ScheduledRecording::signalChange(record->getRecordID());
+                    if (!record->Delete())
+                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
                 }
-                record->deleteLater();
+                delete record;
             }
 
             EmbedTVWindow();

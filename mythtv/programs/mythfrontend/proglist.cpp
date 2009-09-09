@@ -12,6 +12,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "proglist.h"
 #include "scheduledrecording.h"
+#include "recordingrule.h"
 #include "customedit.h"
 #include "remoteutil.h"
 #include "channelutil.h"
@@ -658,35 +659,28 @@ void ProgLister::deleteRule()
     if (!pi || pi->recordid <= 0)
         return;
 
-    ScheduledRecording *record = new ScheduledRecording();
-    int recid = pi->recordid;
-    record->loadByID(recid);
-
-    QString message =
-        tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
-                                  .arg(pi->RecTypeText());
-
-    ShowOkPopup(message, this, SLOT(doDeleteRule(bool)), true);
-
-    record->deleteLater();
-}
-
-void ProgLister::doDeleteRule(bool ok)
-{
-    if (ok)
+    RecordingRule *record = new RecordingRule();
+    if (!record->LoadByProgram(pi))
     {
-        ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
-
-        if (!pi || pi->recordid <= 0)
-            return;
-
-        ScheduledRecording *record = new ScheduledRecording();
-        int recid = pi->recordid;
-        record->loadByID(recid);
-        record->remove();
-        ScheduledRecording::signalChange(recid);
-        record->deleteLater();
+        delete record;
+        return;
     }
+
+    QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
+                                                .arg(pi->RecTypeText());
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythConfirmationDialog *okPopup = new MythConfirmationDialog(popupStack,
+                                                                 message, true);
+
+    okPopup->SetReturnEvent(this, "deleterule");
+    okPopup->SetData(qVariantFromValue(record));
+
+    if (okPopup->Create())
+        popupStack->AddScreen(okPopup);
+    else
+        delete okPopup;
 }
 
 void ProgLister::deleteOldEpisode()
@@ -1635,6 +1629,7 @@ void ProgLister::customEvent(QEvent *event)
 
         QString resultid= dce->GetId();
         QString resulttext  = dce->GetResultText();
+        int buttonnum  = dce->GetResult();
 
         if (resultid == "menu")
         {
@@ -1724,6 +1719,19 @@ void ProgLister::customEvent(QEvent *event)
             else if (resulttext == tr("Remove all episodes for this title"))
             {
                 deleteOldTitle();
+            }
+        }
+        else if (resultid == "deleterule")
+        {
+            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
+            if (record)
+            {
+                if (buttonnum > 0)
+                {
+                    if (!record->Delete())
+                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                }
+                delete record;
             }
         }
         else

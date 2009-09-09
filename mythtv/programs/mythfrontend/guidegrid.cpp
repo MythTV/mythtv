@@ -16,7 +16,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "dbchannelinfo.h"
 #include "programinfo.h"
-#include "scheduledrecording.h"
+#include "recordingrule.h"
 #include "oldsettings.h"
 #include "tv_play.h"
 #include "tv_rec.h"
@@ -1208,15 +1208,15 @@ void GuideGrid::customEvent(QEvent *event)
 
         if (resultid == "deleterule")
         {
-            ScheduledRecording *record = qVariantValue<ScheduledRecording *>(dce->GetData());
+            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
             if (record)
             {
                 if (buttonnum > 0)
                 {
-                    record->remove();
-                    ScheduledRecording::signalChange(record->getRecordID());
+                    if (!record->Delete())
+                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
                 }
-                record->deleteLater();
+                delete record;
             }
             EmbedTVWindow();
         }
@@ -1916,13 +1916,15 @@ void GuideGrid::deleteRule()
     if (!pginfo || pginfo->recordid <= 0)
         return;
 
-    ScheduledRecording *record = new ScheduledRecording();
-    int recid = pginfo->recordid;
-    record->loadByID(recid);
-
-    QString message =
-        tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
-                                  .arg(pginfo->RecTypeText());
+    RecordingRule *record = new RecordingRule();
+    if (!record->LoadByProgram(pginfo))
+    {
+        delete record;
+        return;
+    }
+    
+    QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
+                                                .arg(pginfo->RecTypeText());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
