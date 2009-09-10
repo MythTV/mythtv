@@ -56,7 +56,7 @@ bool BrowserConfig::Create()
     }
 
     m_commandEdit->SetText(gContext->GetSetting("WebBrowserCommand",
-                           GetInstallPrefix() + "Internal"));
+                           "Internal"));
 
     m_zoomEdit->SetText(gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
 
@@ -360,7 +360,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
 
     m_savedBookmark = *site;
 
-    QString cmd = gContext->GetSetting("WebBrowserCommand", GetInstallPrefix() + "Internal");
+    QString cmd = gContext->GetSetting("WebBrowserCommand", "Internal");
     QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4");
     QStringList urls;
 
@@ -575,7 +575,7 @@ void BookmarkManager::slotShowMarked(void)
        m_savedBookmark = *site;
     }
 
-    QString cmd = gContext->GetSetting("WebBrowserCommand", GetInstallPrefix() + "Internal");
+    QString cmd = gContext->GetSetting("WebBrowserCommand", "Internal");
     QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4");
     QStringList urls;
 
