@@ -81,7 +81,7 @@
         <cornerradius>12</cornerradius>
     </shape>
 
-    <!-- Base definition of a shape used as a background to many widget -->
+    <!-- Base definition of a shape used as a background to many widgets -->
     <shape name="basewidgetshape">
         <area>0,0,100%,100%</area>
         <type>roundbox</type>
@@ -447,9 +447,7 @@
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <shape name="background">
-                    <shape name="background" from="baseselectedwidgetshape" />
-                </shape>
+                <shape name="background" from="baseselectedwidgetshape" />
             </state>
             <state name="inactive" from="active" />
         </statetype>
@@ -478,9 +476,7 @@
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <shape name="background">
-                    <shape name="background" from="baseselectedwidgetshape" />
-                </shape>
+                <shape name="background" from="baseselectedwidgetshape" />
             </state>
             <state name="inactive" from="active" />
         </statetype>
@@ -525,9 +521,7 @@
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <shape name="background">
-                    <shape name="background" from="baseselectedwidgetshape" />
-                </shape>
+                <shape name="background" from="baseselectedwidgetshape" />
             </state>
             <state name="inactive" from="active" />
         </statetype>
@@ -562,9 +556,7 @@
                 </shape>       
             </state>
             <state name="selected" from="active">
-                <shape name="background">
-                    <shape name="background" from="baseselectedwidgetshape" />
-                </shape>
+                <shape name="background" from="baseselectedwidgetshape" />
                 <shape name="textbackground">
                     <fill color="#FFFFFF" alpha="255" />
                 </shape>       

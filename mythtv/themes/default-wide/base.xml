@@ -72,6 +72,20 @@
         <color>#9999cc</color>
     </font>
 
+    <!-- Base definition of a shape used as a background to many widgets -->
+    <shape name="basewidgetshape">
+        <area>0,0,100%,100%</area>
+        <type>roundbox</type>
+        <cornerradius>4</cornerradius>
+        <fill color="#CCCCCC" alpha="120" />
+        <line color="#FFFFFF" width="3" />
+    </shape>
+
+    <shape name="baseselectedwidgetshape" from="basewidgetshape">
+        <fill color="#43b038" alpha="200" />
+    </shape>
+    
+
     <buttonlist name="basebuttonlist">
         <area>0,0,300,250</area>
         <layout>vertical</layout>
@@ -315,9 +329,7 @@
         <statetype name="buttonitem">
             <state name="active">
                 <area>0,0,70,40</area>
-                <imagetype name="buttonbackground">
-                    <filename>spinbox_background.png</filename>
-                </imagetype>
+                <shape name="background" from="basewidgetshape" />
                 <textarea name="buttontext">
                     <area>5,5,55,30</area>
                     <font>basesmall</font>
@@ -326,15 +338,9 @@
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>spinbox_background_selected.png</filename>
-                </imagetype>
+                <shape name="background" from="baseselectedwidgetshape" />
             </state>
-            <state name="inactive" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>spinbox_background_inactive.png</filename>
-                </imagetype>
-            </state>
+            <state name="inactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>75,2</position>
@@ -372,9 +378,7 @@
         <statetype name="buttonitem">
             <state name="active">
                 <area>0,0,200,40</area>
-                <imagetype name="buttonbackground">
-                    <filename>selector_background.png</filename>
-                </imagetype>
+                <shape name="background" from="basewidgetshape" />
                 <textarea name="buttontext">
                     <area>5,5,190,30</area>
                     <font>basesmall</font>
@@ -382,16 +386,8 @@
                     <align>left,vcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>selector_background_selected.png</filename>
-                </imagetype>
-            </state>
-            <state name="inactive" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>selector_background_inactive.png</filename>
-                </imagetype>
-            </state>
+            <shape name="background" from="baseselectedwidgetshape" />
+            <state name="inactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>205,2</position>
@@ -429,9 +425,7 @@
         <statetype name="buttonitem">
             <state name="active">
                 <area>0,0,375,40</area>
-                <imagetype name="buttonbackground">
-                    <filename>selector_wide_background.png</filename>
-                </imagetype>
+                <shape name="background" from="basewidgetshape" />
                 <textarea name="buttontext">
                     <area>5,5,365,30</area>
                     <font>basesmall</font>
@@ -440,15 +434,9 @@
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>selector_wide_background_selected.png</filename>
-                </imagetype>
+                <shape name="background" from="baseselectedwidgetshape" />
             </state>
-            <state name="inactive" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>selector_wide_background_inactive.png</filename>
-                </imagetype>
-            </state>
+            <state name="inactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>380,2</position>
@@ -491,26 +479,30 @@
         <area>0,0,375,50</area>
         <statetype name="background">
             <state name="active">
-                <imagetype name="background">
-                    <filename>textedit_background.png</filename>
-                </imagetype>
+                <area>0,0,375,50</area>
+                <shape name="background" from="basewidgetshape" />
+                <shape name="textbackground">
+                    <area>10,10,355,30</area>
+                    <type>roundbox</type>
+                    <cornerradius>4</cornerradius>
+                    <fill color="#FFFFFF" alpha="200" />
+                </shape>
             </state>
-            <state name="selected">
-                <imagetype name="background">
-                    <filename>textedit_background_selected.png</filename>
-                </imagetype>
+            <state name="selected" from="active">
+                <shape name="background">
+                    <shape name="background" from="baseselectedwidgetshape" />
+                </shape>
+                <shape name="textbackground">
+                    <fill color="#FFFFFF" alpha="255" />
+                </shape>
             </state>
-            <state name="inactive">
-                <imagetype name="background">
-                    <filename>textedit_background.png</filename>
-                </imagetype>
-            </state>
+            <state name="inactive" from="active" />
         </statetype>
         <imagetype name="cursor">
             <filename>cursor.png</filename>
         </imagetype>
         <textarea name="text">
-            <area>12,13,351,35</area>
+            <area>13,13,351,25</area>
             <font>basesmallblack</font>
         </textarea>
     </textedit>
