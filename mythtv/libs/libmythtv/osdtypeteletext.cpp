@@ -755,7 +755,7 @@ void OSDTypeTeletext::SetForegroundColor(int ttcolor) const
     m_font->setOutline(0);
 }
 
-/** \fn OSDTypeTeletext:SetBackgroundColor(int) const
+/**
  *  \brief Set the background color to the given color
  *
  *  \sa TTColor
@@ -797,7 +797,7 @@ void OSDTypeTeletext::DrawBackground(OSDSurface *surface, int x, int y) const
     DrawRect(surface, QRect(x, y, m_tt_colspace, m_tt_rowspace));
 }
 
-/** \fn OSDTypeteletext::DrawRect(OSDSurface*,const QRect) const
+/**
  *  \brief Draws a Rectangle with the color set in SetBackgroundColor().
  */
 void OSDTypeTeletext::DrawRect(OSDSurface *surface, const QRect rect) const
@@ -919,7 +919,7 @@ static char cvt_char(char ch, int lang)
     return ch;
 }
 
-void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
+void OSDTypeTeletext::DrawLine(OSDSurface *surface, const uint8_t *page,
                                uint row, int lang) const
 {
     bool mosaic;
@@ -1121,7 +1121,7 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
 }
 
 void OSDTypeTeletext::DrawHeader(OSDSurface *surface,
-                                 const unsigned char* page, int lang) const
+                                 const uint8_t *page, int lang) const
 {
     if (!m_displaying)
         return;
