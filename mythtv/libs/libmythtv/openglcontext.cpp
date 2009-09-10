@@ -375,7 +375,6 @@ void OpenGLContext::EnableTextures(uint tex, uint tex_type)
 }
 
 /**
- * \fn OpenGLContext::DisableTexture(void)
  *  Disable OpenGL texturing.
  */
 
@@ -390,13 +389,6 @@ void OpenGLContext::DisableTextures(void)
 }
 
 /**
- * \fn OpenGLContext::UpdateTexture(uint tex,
-                                    const unsigned char *buf,
-                                    const int *offsets,
-                                    const int *pitches,
-                                    VideoFrameType fmt,
-                                    bool interlaced,
-                                    const unsigned char* alpha)
  *  Refresh the data for the given texture unit. If a PixelBufferObject
  *  is available, this will be used to speed up the memory transfer.
  *  Otherwise a standard texture update is used. BGRA video data is transferred

@@ -269,7 +269,7 @@ void ChannelScanSM::HandleAllGood(void)
     }
 }
 
-/** \fn ChannelScanSM::ScanExistingTransports(uint)
+/**
  *  \brief If we are not already scanning a frequency table, this creates
  *         a new frequency table from database and begins scanning it.
  *

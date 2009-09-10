@@ -45,7 +45,7 @@ StorageGroup::StorageGroup(const QString group, const QString hostname,
     Init(m_groupname, m_hostname, m_allowFallback);
 }
 
-/** \fn StorageGroup::Init(const QString, const QString)
+/**
  *  \brief Initilizes the groupname, hostname, and dirlist
  *
  *   First attempts to find the Storage Group defined with the specified name

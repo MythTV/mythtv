@@ -286,7 +286,6 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
 }
 
 /**
- *  \fn OpenGLVideo::CheckResize(bool deinterlacing)
  *   Determine if the output is to be scaled at all and create or destroy
  *   the appropriate filter as necessary.
  */
