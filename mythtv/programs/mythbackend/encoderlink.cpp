@@ -723,7 +723,7 @@ QString EncoderLink::SetInput(QString input)
     return QString::null;
 }
 
-/** \fn EncoderLink::ToggleChannelFavorite(void)
+/**
  *  \brief Toggles whether the current channel should be on our favorites list.
  *         <b>This only works on local recorders.</b>
  *  \return -1 if query does not succeed, otherwise.

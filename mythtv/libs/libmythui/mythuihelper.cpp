@@ -851,7 +851,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     }
 }
 
-/** \fn FindThemeDir(const QString &themename)
+/**
  *  \brief Returns the full path to the theme denoted by themename
  *
  *   If the theme cannot be found falls back to the Terra theme.
@@ -892,7 +892,7 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
     return QString();
 }
 
-/** \fn FindMenuThemeDir(const QString &menuname)
+/**
  *  \brief Returns the full path to the menu theme denoted by menuname
  *
  *   If the theme cannot be found falls back to the default menu.
