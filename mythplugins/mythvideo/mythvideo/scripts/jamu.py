@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.6" # 0.1.0 Initial development 
+__version__=u"v0.4.7" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -160,7 +160,12 @@ __version__=u"v0.4.6" # 0.1.0 Initial development
 					 #       Fixed a bug in graphics file name creation for a TV season.
 					 #       Added checks for compatible python library versions of xml and MySQLdb
 					 # 0.4.6 Fixed a bug where a bad IMDB number in TMDB caused an abort.
-
+					 # 0.4.7 Fixed a bug where a 'recordedprogram' record is not properly paired with a
+                     #       'recorded' record. This results in no "airdate" information being available
+                     #       and a script abort. An airdate year of u'0000' will be assumed.
+					 #       Fix an abort bug when IMDB is having service problems and a list of 
+					 #       movies cannot be retrieved.
+			
 
 usage_txt=u'''
 JAMU - Just.Another.Metadata.Utility is a versatile utility for downloading graphics and meta data
@@ -2916,7 +2921,11 @@ class MythTvMetaData(VideoFiles):
 
 		if imdb_lib:	# Can a imdb.com search be done?
 			imdb_access = imdb.IMDb()
-			movies_found = imdb_access.search_movie(tmp_title.encode("ascii", 'ignore'))
+			movies_found = []
+			try:
+				movies_found = imdb_access.search_movie(tmp_title.encode("ascii", 'ignore'))
+			except Exception:
+				return False
 			if not len(movies_found):
 				return False
 			tmp_movies={}
@@ -4294,6 +4303,11 @@ class MythTvMetaData(VideoFiles):
 		for program in programs:
 			if recordedprogram.has_key(program['title']):
 				program['originalairdate'] = recordedprogram[program['title']]
+
+		# Check that each program has an original airdate
+		for program in programs:
+			if not program.has_key('originalairdate'):
+				program['originalairdate'] = u'0000' # Set the original airdate to zero (unknown)
 
 		return programs
 	# end _getScheduledRecordedProgramList
