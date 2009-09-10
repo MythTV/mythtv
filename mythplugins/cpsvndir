@@ -42,10 +42,10 @@ IFS='
 cd "$SRC"
 for file in $(find . -name .svn -prune -or -print); do
     #echo "processing $file"
-    if [ -d "$file" ]; then
+    if [ -d "$file" -a ! -L "$file" ]; then
 	mkdir -p "$DEST/$file"
     else
-	cp -p "$file" "$DEST/$file"
+	cp -pR "$file" "$DEST/$file"
 	chown $EUID:$EGID "$DEST/$file"
 	chmod +r "$DEST/$file" &> /dev/null
     fi
