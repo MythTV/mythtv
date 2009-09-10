@@ -13,6 +13,7 @@
 
 RecordingRule::RecordingRule()
   : m_recordID(-1), m_parentRecID(0),
+    m_isInactive(false),
     m_starttime(QTime::currentTime()),
     m_startdate(QDate::currentDate()),
     m_endtime(QTime::currentTime()),
@@ -48,6 +49,8 @@ RecordingRule::RecordingRule()
     m_lastRecorded(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_lastDeleted(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_averageDelay(100),
+    m_recordTable("record"),
+    m_tempID(0),
     m_loaded(false)
 {
 }
@@ -138,6 +141,9 @@ bool RecordingRule::Load()
 
 bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 {
+    if (!proginfo)
+        return false;
+    
     if (proginfo->recordid)
     {
         m_recordID = proginfo->recordid;
@@ -147,40 +153,38 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 
     if (m_searchType == kNoSearch || m_searchType == kManualSearch)
     {
-        if (proginfo->recordid)
+        m_title = proginfo->title;
+        m_subtitle = proginfo->subtitle;
+        m_description = proginfo->description;
+        m_channelid = proginfo->chanid.toInt();
+        m_station = proginfo->chansign;
+        m_startdate = proginfo->startts.date();
+        m_starttime = proginfo->startts.time();
+        m_enddate = proginfo->endts.date();
+        m_endtime = proginfo->endts.time();
+        m_seriesid = proginfo->seriesid;
+        m_programid = proginfo->programid;
+        if (m_findday < 0)
         {
-            m_title = proginfo->title;
-            m_subtitle = proginfo->subtitle;
-            m_description = proginfo->description;
-            m_channelid = proginfo->chanid.toInt();
-            m_station = proginfo->chansign;
-            m_startdate = proginfo->startts.date();
-            m_starttime = proginfo->startts.time();
-            m_enddate = proginfo->endts.date();
-            m_endtime = proginfo->endts.time();
-            m_seriesid = proginfo->seriesid;
-            m_programid = proginfo->programid;
-            if (m_findday < 0)
-            {
-                m_findday = (proginfo->startts.date().dayOfWeek() + 1) % 7;
-                m_findtime = proginfo->startts.time();
+            m_findday = (proginfo->startts.date().dayOfWeek() + 1) % 7;
+            m_findtime = proginfo->startts.time();
 
+            QDate epoch(1970, 1, 1);
+            m_findid = epoch.daysTo(proginfo->startts.date()) + 719528;
+        }
+        else
+        {
+            if (m_findid > 0)
+                m_findid = proginfo->findid;
+            else
+            {
                 QDate epoch(1970, 1, 1);
                 m_findid = epoch.daysTo(proginfo->startts.date()) + 719528;
             }
-            else
-            {
-                if (m_findid > 0)
-                    m_findid = proginfo->findid;
-                else
-                {
-                    QDate epoch(1970, 1, 1);
-                    m_findid = epoch.daysTo(proginfo->startts.date()) + 719528;
-                }
-            }
-            m_category = proginfo->category;
         }
-        else
+        m_category = proginfo->category;
+        
+        if (!proginfo->recordid)
             m_playGroup = PlayGroup::GetInitialName(proginfo);
     }
 
@@ -276,8 +280,7 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
 
 bool RecordingRule::Save(bool sendSig)
 {
-    QString sql = "record "
-                    "SET type = :TYPE, search = :SEARCHTYPE, "
+    QString sql =   "SET type = :TYPE, search = :SEARCHTYPE, "
                     "recpriority = :RECPRIORITY, prefinput = :INPUT, "
                     "startoffset = :STARTOFFSET, endoffset = :ENDOFFSET, "
                     "dupmethod = :DUPMETHOD, dupin = :DUPIN, "
@@ -303,10 +306,11 @@ bool RecordingRule::Save(bool sendSig)
                     "last_delete = :LASTDELETE, avg_delay = :AVGDELAY ";
 
     QString sqlquery;
-    if (m_recordID > 0)
-        sqlquery = QString("UPDATE %1 WHERE recordid = :RECORDID;").arg(sql);
+    if (m_recordID > 0 || (m_recordTable != "record" && m_tempID > 0))
+        sqlquery = QString("UPDATE %1 %2 WHERE recordid = :RECORDID;")
+                                                        .arg(m_recordTable).arg(sql);
     else
-        sqlquery = QString("INSERT INTO %1;").arg(sql);
+        sqlquery = QString("INSERT INTO %1 %2;").arg(m_recordTable).arg(sql);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(sqlquery);
@@ -354,7 +358,9 @@ bool RecordingRule::Save(bool sendSig)
     query.bindValue(":LASTDELETE", m_lastDeleted);
     query.bindValue(":AVGDELAY", m_averageDelay);
 
-    if (m_recordID > 0)
+    if (m_recordTable != "record" && m_tempID > 0)
+        query.bindValue(":RECORDID", m_tempID);
+    else if (m_recordID > 0)
         query.bindValue(":RECORDID", m_recordID);
 
     if (!query.exec())
@@ -471,4 +477,63 @@ void RecordingRule::ToMap(QHash<QString, QString> &infoMap) const
 
     infoMap["searchtype"] = m_searchTypeString;
     infoMap["searchforwhat"] = m_searchFor;
+}
+
+void RecordingRule::UseTempTable(bool usetemp, QString table)
+{
+    MSqlQuery query(MSqlQuery::SchedCon());
+
+    if (usetemp)
+    {
+        m_recordTable = table;
+
+        query.prepare("SELECT GET_LOCK(:LOCK, 2);");
+        query.bindValue(":LOCK", "DiffSchedule");
+        if (!query.exec())
+        {
+            MythDB::DBError("Obtaining lock in testRecording", query);
+            return;
+        }
+
+        query.prepare(QString("DROP TABLE IF EXISTS %1;").arg(table));
+        if (!query.exec())
+        {
+            MythDB::DBError("Deleting old table in testRecording", query);
+            return;
+        }
+
+        query.prepare(QString("CREATE TABLE %1 SELECT * FROM record;")
+                        .arg(table));
+        if (!query.exec())
+        {
+            MythDB::DBError("Create new temp table", query);
+            return;
+        }
+
+        if (m_recordID == 0)
+        {
+            // FIXME: Following seems like a nasty hack
+            query.prepare(QString("SELECT MAX(recordid) FROM %1 ORDER BY "
+                                  "recordid;").arg(table));
+            if (query.exec() && query.next())
+                m_tempID = query.value(0).toInt() + 1;
+            else
+                m_tempID = 100000;
+        }
+        else
+            m_tempID = m_recordID;
+        Save();
+    }
+    else
+    {
+        query.prepare("SELECT RELEASE_LOCK(:LOCK);");
+        query.bindValue(":LOCK", "DiffSchedule");
+        if (!query.exec())
+        {
+            MythDB::DBError("Free lock", query);
+            return;
+        }
+        m_recordTable = "record";
+        m_tempID = 0;
+    }
 }

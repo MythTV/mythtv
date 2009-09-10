@@ -43,6 +43,7 @@ class MPUBLIC RecordingRule
     bool Delete(bool sendSig = true);
 
     bool IsLoaded() const { return m_loaded; }
+    void UseTempTable(bool usetemp, QString table = "record_tmp");
     
     void ToMap(QHash<QString, QString> &infoMap) const;
 
@@ -109,6 +110,10 @@ class MPUBLIC RecordingRule
     QDateTime m_lastDeleted;
     int m_averageDelay;
 
+    // Temporary table related - Used for schedule previews
+    QString m_recordTable;
+    int m_tempID;
+    
   private:
     // Internal strings for insertion into the RuleMap and display in the UI
     QString m_searchTypeString;
