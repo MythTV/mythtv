@@ -5,7 +5,7 @@ using namespace std;
 #include "tv_play.h"
 #include "tv_rec.h"
 
-/** \fn StateToString(TVState state)
+/**
  *  \brief Returns a human readable QString representing a TVState.
  *  \param state State to print.
  */

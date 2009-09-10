@@ -2932,7 +2932,7 @@ void TVRec::RecorderPaused(void)
     }
 }
 
-/** \fn TVRec::ToggleChannelFavorite()
+/**
  *  \brief Toggles whether the current channel should be on our favorites list.
  */
 void TVRec::ToggleChannelFavorite(QString changroupname)

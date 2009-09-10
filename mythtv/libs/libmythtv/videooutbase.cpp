@@ -1514,7 +1514,6 @@ void VideoOutput::ResizeForVideo(uint width, uint height)
 }
 
 /**
- * \fn VideoOutput::InitDisplayMeasurements(uint width, uint height, init resize)
  * \brief Init display measurements based on database settings and
  *        actual screen parameters.
  */

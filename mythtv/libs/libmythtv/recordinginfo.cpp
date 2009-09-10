@@ -182,7 +182,7 @@ void RecordingInfo::ApplyRecordRecID(void)
         MythDB::DBError(LOC + "RecordID update", query);
 }
 
-/** \fn RecordingInfo::ApplyRecordStateChange(RecordingType)
+/**
  *  \brief Sets RecordingType of "record", creating "record" if it
  *         does not exist.
  *  \param newstate State to apply to "record" RecordingType.

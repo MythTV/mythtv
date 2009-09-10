@@ -991,7 +991,7 @@ static void altivec_i420_2vuy(
 #endif // HAVE_ALTIVEC
 
 
-/** \fn     get_i420_2yuv_conv(void)
+/**
  *  \brief  Returns I420 to 2VUY conversion function.
  *
  *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
