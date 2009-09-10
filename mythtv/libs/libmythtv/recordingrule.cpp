@@ -47,7 +47,8 @@ RecordingRule::RecordingRule()
     m_nextRecording(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_lastRecorded(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
     m_lastDeleted(QDateTime::fromString("0000-00-00T00:00:00", Qt::ISODate)),
-    m_averageDelay(100)
+    m_averageDelay(100),
+    m_loaded(false)
 {
 }
 
@@ -131,6 +132,7 @@ bool RecordingRule::Load()
         return false;
     }
 
+    m_loaded = true;
     return true;
 }
 
@@ -182,6 +184,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
             m_playGroup = PlayGroup::GetInitialName(proginfo);
     }
 
+    m_loaded = true;
     return true;
 }
 
@@ -196,8 +199,12 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     query.bindValue(":SEARCH", lsearch);
     query.bindValue(":FORWHAT", forwhat);
 
-    if (query.exec() && query.next())
+    if (query.exec())
+    {
+        if (query.next())
             rid = query.value(0).toInt();
+        // else rid is zero, which is valid
+    }
     else
     {
         MythDB::DBError("loadBySearch", query);
@@ -242,6 +249,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
         m_searchTypeString = searchType;
     }
 
+    m_loaded = true;
     return true;
 }
 
@@ -262,6 +270,7 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
     m_description = m_searchFor = forwhat;
     m_searchTypeString = QObject::tr("Power Search");
 
+    m_loaded = true;
     return true;
 }
 
@@ -382,6 +391,11 @@ bool RecordingRule::Delete(bool sendSig)
     if (sendSig)
         ScheduledRecording::signalChange(m_recordID);
 
+    // Set m_recordID to zero, the rule is no longer in the database so it's
+    // not valid. Should you want, this allows a rule to be removed from the
+    // database and then re-inserted with Save()
+    m_recordID = 0;
+    
     return true;
 }
 

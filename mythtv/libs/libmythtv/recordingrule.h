@@ -42,6 +42,8 @@ class MPUBLIC RecordingRule
     bool Save(bool sendSig = true);
     bool Delete(bool sendSig = true);
 
+    bool IsLoaded() const { return m_loaded; }
+    
     void ToMap(QHash<QString, QString> &infoMap) const;
 
     int m_recordID; /// Unique Recording Rule ID
@@ -111,6 +113,10 @@ class MPUBLIC RecordingRule
     // Internal strings for insertion into the RuleMap and display in the UI
     QString m_searchTypeString;
     QString m_searchFor;
+
+    // Indicate that a rule has been loaded, for new rules this is still true
+    // after any of the Load* methods is called
+    bool m_loaded;
 };
 
 Q_DECLARE_METATYPE(RecordingRule*)
