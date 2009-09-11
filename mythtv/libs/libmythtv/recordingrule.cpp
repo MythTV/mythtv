@@ -365,6 +365,8 @@ bool RecordingRule::Save(bool sendSig)
 
     if (!query.exec())
         MythDB::DBError("UPDATE/INSERT record", query);
+    else
+        m_recordID = query.lastInsertId().toInt();
 
     if (sendSig)
         ScheduledRecording::signalChange(m_recordID);
