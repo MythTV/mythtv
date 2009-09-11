@@ -308,7 +308,8 @@ class PlaybackBox : public ScheduleCommon
     void fillRecGroupPasswordCache(void);
 
     QString testImageFiles(QString &testDirectory,
-                           QString &seriesID, QString &titleIn);
+                           QString &seriesID, QString &titleIn,
+                           QString imagetype);
 
     void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);

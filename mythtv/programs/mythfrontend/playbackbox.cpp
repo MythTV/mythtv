@@ -635,7 +635,9 @@ void PlaybackBox::UpdateProgramInfo(
             QString fanartTitle = pginfo->title;
             QString fanartSeriesID = pginfo->seriesid;
             QString fanartFile = testImageFiles(fanartDir,
-                                                 fanartSeriesID, fanartTitle);
+                                                fanartSeriesID,
+                                                fanartTitle,
+                                                "fanart");
             m_fanart->SetVisible(!fanartFile.isEmpty());
             m_fanart->SetFilename(fanartFile);
             m_fanart->Load();
@@ -647,7 +649,9 @@ void PlaybackBox::UpdateProgramInfo(
             QString bannerTitle = pginfo->title;
             QString bannerSeriesID = pginfo->seriesid;
             QString bannerFile = testImageFiles(bannerDir,
-                                                 bannerSeriesID, bannerTitle);
+                                                bannerSeriesID,
+                                                bannerTitle,
+                                                "banner");
             m_banner->SetVisible(!bannerFile.isEmpty());
             m_banner->SetFilename(bannerFile);
             m_banner->Load();
@@ -659,7 +663,9 @@ void PlaybackBox::UpdateProgramInfo(
             QString coverTitle = pginfo->title;
             QString coverSeriesID = pginfo->seriesid;
             QString coverFile = testImageFiles(coverDir,
-                                                 coverSeriesID, coverTitle);
+                                               coverSeriesID,
+                                               coverTitle,
+                                               "coverart");
             m_coverart->SetVisible(!coverFile.isEmpty());
             m_coverart->SetFilename(coverFile);
             m_coverart->Load();
@@ -1876,7 +1882,7 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
 }
 
 QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
-                                    QString &titleIn)
+                                    QString &titleIn, QString imagetype)
 {
     QString foundFile;
 
@@ -1928,8 +1934,9 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
             "(?:\\s|-|_|\\.)?)?" // optional separator
             "[0-9]{1,3}" // number portion of optional Episode portion
             ")?" // end optional Episode portion
+            "(?:_%2)?" // optional Suffix portion
             "\\.(?:png|gif|jpg)" // file extension
-            ).arg(titleIn),
+            ).arg(titleIn).arg(imagetype),
         QString("%1\\.(?:png|jpg|gif)").arg(seriesID),
         QString("%1\\.(?:png|jpg|gif)").arg(titleIn),
         "" };  // This blank entry must exist, do not remove.
