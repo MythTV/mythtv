@@ -46,7 +46,7 @@ for file in $(find . -name .svn -prune -or -print); do
 	mkdir -p "$DEST/$file"
     else
 	cp -pR "$file" "$DEST/$file"
-	chown $EUID:$EGID "$DEST/$file"
+        chown -h $EUID:$EGID "$DEST/$file"
 	chmod +r "$DEST/$file" &> /dev/null
     fi
 done
