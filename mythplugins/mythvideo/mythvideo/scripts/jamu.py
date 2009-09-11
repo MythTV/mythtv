@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.8" # 0.1.0 Initial development 
+__version__=u"v0.4.9" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -167,6 +167,9 @@ __version__=u"v0.4.8" # 0.1.0 Initial development
 					 #       movies cannot be retrieved.
 					 # 0.4.8 Fixed a bug in a -MJ option check that removing graphics would not 
                      #       conflict with graphic directories for non-Mythvideo plugins.
+					 # 0.4.9 Combine the video file extentions found in the "videotypes" table with those
+                     #       in Jamu to avoid possible issues in the (-MJ) option and to have tighter 
+                     #       integration with MythVideo user file extention settings. 
 			
 
 usage_txt=u'''
@@ -479,7 +482,6 @@ def getStorageGroups():
 	# Get storagegroup table field names:
 	table_names = mythvideo.getTableFieldNames('storagegroup')
 
-	# Get Recorded videos recordedprogram / airdate
 	cur = mythdb.cursor()
 	try:
 		cur.execute(u'select * from storagegroup')
@@ -1177,7 +1179,7 @@ class Configuration(object):
 		self.config['config_file'] = False
 		self.config['series_name_override'] = False
 		self.config['ep_name_massage'] = False
-		self.config['video_file_exts'] = ['3gp', 'asf', 'asx', 'avi', 'mkv', 'mov', 'mp4', 'mpg', 'qt', 'rm', 'swf', 'wmv', 'm2ts', 'ts', 'evo', 'img', 'iso']
+		self.config['video_file_exts'] = [u'3gp', u'asf', u'asx', u'avi', u'mkv', u'mov', u'mp4', u'mpg', u'qt', u'rm', u'swf', u'wmv', u'm2ts', u'ts', u'evo', u'img', u'iso']
 
 
 		# Regex pattern strings used to check for season number from directory names
@@ -1415,7 +1417,7 @@ class Configuration(object):
 					file_list.remove(g_file)
 					continue
 				g_ext = _getExtention(g_file)
-				if not g_ext in ext_filter:
+				if not g_ext.lower() in ext_filter:
 					file_list.remove(g_file)
 					continue
 			for filename in file_list:		# Actually check each file against the NFS mounts
@@ -1524,6 +1526,44 @@ class Configuration(object):
 	# end _JanitorConflicts
 
 
+	def _addMythtvUserFileTypes(self):
+		"""Add video file types to the jamu list from the "videotypes" table
+		"""
+		# Get videotypes table field names:
+		table_names = mythvideo.getTableFieldNames(u'videotypes')
+
+		cur = mythdb.cursor()
+		try:
+			cur.execute(u'select * from videotypes')
+		except MySQLdb.Error, e:
+			sys.stderr.write(u"\n! Error: Reading videotypes MythTV table: %d: %s\n" % (e.args[0], e.args[1]))
+			return False
+
+		while True:
+			data_id = cur.fetchone()
+			if not data_id:
+				break
+			record = {}
+			i = 0
+			for elem in data_id:
+				record[table_names[i]] = elem
+				i+=1
+			# Remove any extentions that are in Jamu's list but the user wants ignore
+			if record[u'f_ignore']: 
+				if record[u'extension'] in self.config['video_file_exts']:
+					self.config['video_file_exts'].remove(record[u'extension'])
+				if record[u'extension'].lower() in self.config['video_file_exts']:
+					self.config['video_file_exts'].remove(record[u'extension'].lower())
+			else: # Add extentions that are not in the Jamu list
+				if not record[u'extension'] in self.config['video_file_exts']:
+					self.config['video_file_exts'].append(record[u'extension'])
+		cur.close()
+		# Make sure that all video file extensions are lower case
+		for index in range(len(self.config['video_file_exts'])):
+			self.config['video_file_exts'][index] = self.config['video_file_exts'][index].lower()
+	# end _addMythtvUserFileTypes()
+
+
 	def validate_setVariables(self, args):
 		"""Validate the contents of specific configuration variables
 		return False and exit the script if an invalid configuation value is found
@@ -1568,6 +1608,7 @@ http://www.pythonware.com/products/pil/\n""")
 	 			sys.stderr.write(u"\n! Error: MythTV python interface is not available\n")
 				sys.exit(False)
 		if self.config['mythtvdir'] or self.config['mythtvmeta']:
+			self._addMythtvUserFileTypes() # add user filetypes from the "videotypes" table
 			self._getMythtvDirectories()
 		if self.config['mythtvjanitor']: # Check for graphic directory conflicts with other plugins
 			if self._JanitorConflicts():
@@ -2568,17 +2609,15 @@ class VideoFiles(Tvdatabase):
 
 			# Remove leading . from extension
 			ext = ext.replace(u".", u"", 1)
-			try:
-				self.config['log'].debug(u'Checking for a valid video filename extension')
-				dummy_check = self.config[u'video_file_exts'].index(ext.lower())
-			except ValueError:
+			self.config['log'].debug(u'Checking for a valid video filename extension')
+			if not ext.lower() in self.config[u'video_file_exts']:
 				for key in self.image_extensions:
 					if key == ext:
 						break	
 				else:
 					sys.stderr.write(u"\n! Warning: Skipping non-video file name: (%s)\n" % (f))
 				continue
-
+	
 			for r in self.config['name_parse']:
 				match = r.match(filename)
 				categories=''
@@ -3789,7 +3828,7 @@ class MythTvMetaData(VideoFiles):
 						if not os.path.isdir(file_dir):
 							ext = _getExtention(file_dir)
 							for tmp_ext in self.config['video_file_exts']:
-								if ext == tmp_ext:
+								if ext.lower() == tmp_ext:
 									break
 							else:
 								sys.stderr.write(u"\n! Error: Target files must be video files(%s).\nSupported video file extentions(%s)\n" % (file_dir, self.config['video_file_exts'],))
