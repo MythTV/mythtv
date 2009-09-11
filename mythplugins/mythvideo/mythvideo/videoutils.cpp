@@ -110,16 +110,19 @@ QStringList GetVideoDirsByHost(QString host)
         for (QStringList::iterator p = tmp3.begin(); p != tmp3.end(); ++p)
         {
             bool matches = false;
+            QString newpath = *p;
+            if (!newpath.endsWith("/"))
+                newpath.append("/");
 
             for (QStringList::iterator q = tmp2.begin(); q != tmp2.end(); ++q)
             {
                 QString comp = *q;
-                QString newpath = *p;
-                if (!newpath.endsWith("/"))
-                    newpath.append("/");
 
                 if (comp.endsWith(newpath))
+                {
                     matches = true;
+                    break;
+                }
             }
             if (!matches)
                 tmp.append(QDir::cleanPath(*p));
