@@ -832,8 +832,13 @@
             <filename>menu/menuframe.png</filename>
         </imagetype>
 
+        <imagetype name="description_background">
+            <position>0,547</position>
+            <filename>backgrounds/horizontal_menu_background.png</filename>
+        </imagetype>
+
         <textarea name="description">
-            <area>100,500,1080,100</area>
+            <area>100,555,1080,30</area>
             <align>allcenter</align>
             <font>basemedium</font>
             <alpha>150</alpha>

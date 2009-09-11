@@ -185,7 +185,7 @@
                 <position>0,289</position>
                 <state type="full">
                     <imagetype name="left">
-                        <filename>recordings/reclist_left_arrow.png</filename>
+                        <filename>shared/horizlist_left_arrow.png</filename>
                     </imagetype>
                 </state>
             </statetype>
@@ -193,7 +193,7 @@
                 <position>1256,289</position>
                 <state type="full">
                     <imagetype name="right">
-                        <filename>recordings/reclist_right_arrow.png</filename>
+                        <filename>shared/horizlist_right_arrow.png</filename>
                     </imagetype>
                 </state>
             </statetype>

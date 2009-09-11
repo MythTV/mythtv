@@ -104,15 +104,21 @@
     <textedit name="basetextedit">
         <area>0,0,437,45</area>
         <statetype name="background">
+            <area>0,0,100%,100%</area>
             <state name="active">
-                <imagetype name="background">
-                    <filename>controls/textedit_background.png</filename>
-                </imagetype>
+                <area>0,0,100%,100%</area>
+                <shape name="background">
+                    <area>0,0,100%,100%</area>
+                    <type>roundbox</type>
+                    <cornerradius>8</cornerradius>
+                    <fill color="#e6e6e6" />
+                    <line color="#a7ac93" width="3" />
+                </shape>
             </state>
-            <state name="selected">
-                <imagetype name="background">
-                    <filename>controls/textedit_background_selected.png</filename>
-                </imagetype>
+            <state name="selected" from="active">
+               <shape name="background">
+                    <fill color="#f9f9f9" />
+                </shape>
             </state>
             <state name="inactive" from="active"/>
         </statetype>
@@ -120,33 +126,16 @@
             <filename>cursor.png</filename>
         </imagetype>
         <textarea name="text">
-            <area>8,10,455,35</area>
+            <area>8,10,421,35</area>
             <font>basemediumbrown</font>
         </textarea>
     </textedit>
 
-    <!-- Base definition of a textedit -->
-    <textedit name="baseshorttextedit">
+    <!-- Base definition of a short textedit for years etc -->
+    <textedit name="baseshorttextedit" from="basetextedit">
         <area>0,0,318,45</area>
-        <statetype name="background">
-            <state name="active">
-                <imagetype name="background">
-                    <filename>controls/short_textedit_background.png</filename>
-                </imagetype>
-            </state>
-            <state name="selected" from="active">
-                <imagetype name="background">
-                    <filename>controls/short_textedit_background_selected.png</filename>
-                </imagetype>
-            </state>
-            <state name="inactive" from="active"/>
-        </statetype>
-        <imagetype name="cursor">
-            <filename>controls/cursor.png</filename>
-        </imagetype>
         <textarea name="text">
-            <area>8,10,305,35</area>
-            <font>basemediumbrown</font>
+            <area>8,10,301,35</area>
         </textarea>
     </textedit>
 
@@ -231,82 +220,34 @@
 
     <!-- Base definition of a spinbox -->
     <spinbox name="basespinbox">
-        <area>0,0,90,40</area>
+        <area>0,0,108,35</area>
         <layout>horizontal</layout>
+        <buttonarea>18,0,70,35</buttonarea>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <cornerradius>8</cornerradius>
+            <fill color="#a7ac93" />
+        </shape>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,70,40</area>
-                <imagetype name="buttonbackground">
-                    <filename>spinbox_background.png</filename>
-                </imagetype>
+                <area>0,0,70,35</area>
+                <shape name="buttonbackground">
+                    <area>0,0,100%,100%</area>
+                    <fill color="#757562" />
+                    <line color="#a7ac93" width="2" />
+                </shape>
                 <textarea name="buttontext">
-                    <area>5,5,55,30</area>
-                    <font>basesmall</font>
-                    <cutdown>yes</cutdown>
-                    <align>right,vcenter</align>
-                </textarea>
-            </state>
-            <state name="selected" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>spinbox_background_selected.png</filename>
-                </imagetype>
-            </state>
-            <state name="inactive" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>spinbox_background_inactive.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-        <statetype name="downscrollarrow">
-            <position>75,2</position>
-            <state type="off">
-                <imagetype name="dnon">
-                    <filename>lb-rtarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="dnoff">
-                    <filename>lb-rtarrow-sel.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-        <statetype name="upscrollarrow">
-            <position>75,21</position>
-            <state type="off">
-                <imagetype name="upon">
-                    <filename>lb-ltarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="upoff">
-                    <filename>lb-ltarrow-sel.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-    </spinbox>
-
-    <!-- Base definition of a list in 'selector' configuration -->
-    <buttonlist name="baseselector">
-        <area>0,0,220,40</area>
-        <layout>horizontal</layout>
-        <buttonarea>19,0,200,40</buttonarea>
-        <statetype name="buttonitem">
-            <state name="active">
-                <area>0,0,182,35</area>
-                <imagetype name="buttonbackground">
-                    <filename>controls/selector_background.png</filename>
-                </imagetype>
-                <textarea name="buttontext">
-                    <area>2,3,178,30</area>
+                    <area>2,4,66,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
                     <align>allcenter</align>
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>controls/selector_background_selected.png</filename>
-                </imagetype>
+                <shape name="buttonbackground">
+                    <fill color="#8a916f" />
+                </shape>
             </state>
             <state name="inactive" from="active" />
         </statetype>
@@ -317,9 +258,55 @@
                     <filename>controls/selector_left_arrow.png</filename>
                 </imagetype>
             </state>
-            <state type="off">
-                <imagetype name="noleft">
-                    <filename>controls/selector_left_noarrow.png</filename>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>87,0</position>
+            <state type="full">
+                <imagetype name="right">
+                    <filename>controls/selector_right_arrow.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </spinbox>
+
+    <!-- Base definition of a list in 'selector' configuration -->
+    <buttonlist name="baseselector">
+        <area>0,0,220,35</area>
+        <layout>horizontal</layout>
+        <buttonarea>18,0,184,100%</buttonarea>
+        <shape name="background">
+            <area>0,0,100%,100%</area>
+            <type>roundbox</type>
+            <cornerradius>8</cornerradius>
+            <fill color="#a7ac93" />
+        </shape>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,184,35</area>
+                <shape name="buttonbackground">
+                    <area>0,0,100%,100%</area>
+                    <fill color="#757562" />
+                    <line color="#a7ac93" width="2" />
+                </shape>
+                <textarea name="buttontext">
+                    <area>2,4,180,30</area>
+                    <font>basesmall</font>
+                    <cutdown>yes</cutdown>
+                    <align>allcenter</align>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <shape name="buttonbackground">
+                    <fill color="#8a916f" />
+                </shape>
+            </state>
+            <state name="inactive" from="active" />
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>0,0</position>
+            <state type="full">
+                <imagetype name="left">
+                    <filename>controls/selector_left_arrow.png</filename>
                 </imagetype>
             </state>
         </statetype>
@@ -330,71 +317,34 @@
                     <filename>controls/selector_right_arrow.png</filename>
                 </imagetype>
             </state>
-            <state type="off">
-                <imagetype name="noright">
-                    <filename>controls/selector_right_noarrow.png</filename>
-                </imagetype>
-            </state>
         </statetype>
     </buttonlist>
 
     <!-- Base definition of a list in wide 'selector' configuration -->
-    <buttonlist name="basewideselector">
-        <area>0,0,395,40</area>
-        <layout>horizontal</layout>
-        <buttonarea>0,0,375,100%</buttonarea>
+    <buttonlist name="basewideselector" from="baseselector">
+        <area>0,0,413,35</area>
+        <buttonarea>18,0,375,100%</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,375,40</area>
-                <imagetype name="buttonbackground">
-                    <filename>selector_wide_background.png</filename>
-                </imagetype>
+                <area>0,0,375,35</area>
                 <textarea name="buttontext">
-                    <area>5,5,365,30</area>
-                    <font>basesmall</font>
-                    <cutdown>yes</cutdown>
-                    <align>left,vcenter</align>
+                    <area>5,4,365,30</area>
+                    <align>allcenter</align>
                 </textarea>
             </state>
             <state name="selected" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>selector_wide_background_selected.png</filename>
-                </imagetype>
+                <shape name="buttonbackground">
+                    <fill color="#8a916f" />
+                </shape>
             </state>
-            <state name="inactive" from="active">
-                <imagetype name="buttonbackground">
-                    <filename>selector_wide_background_inactive.png</filename>
-                </imagetype>
-            </state>
+            <state name="inactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
-            <position>380,2</position>
-            <state type="off">
-                <imagetype name="dnon">
-                    <filename>lb-rtarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="dnoff">
-                    <filename>lb-rtarrow-sel.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-        <statetype name="upscrollarrow">
-            <position>380,21</position>
-            <state type="off">
-                <imagetype name="upon">
-                    <filename>lb-ltarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="upoff">
-                    <filename>lb-ltarrow-sel.png</filename>
-                </imagetype>
-            </state>
+            <position>392,0</position>
         </statetype>
     </buttonlist>
 
+    <!-- Base definition of a rating statetype -->
     <statetype name="baserating">
         <position>1193,433</position>
         <showempty>yes</showempty>
@@ -431,137 +381,6 @@
         </state>
         <state name="10" from="9" />
     </statetype>
-<!--
-    <buttonlist name="basebuttonlist2">
-        <area>64,97,600,610</area>
-        <layout>vertical</layout>
-        <spacing>0</spacing>
-        <buttonarea>0,0,580,610</buttonarea>
-        <statetype name="buttonitem">
-            <area>0,0,580,84</area>
-            <state name="active">
-                <area>0,0,580,84</area>
-                <statetype name="status">
-                    <position>4,4</position>
-                    <state name="disabled">
-                        <imagetype name="statusimage">
-                            <area>0,0,20,80</area>
-                            <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="error" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#e43e3e" end="#e43e3e" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="warning" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#ff9147" end="#ff9147" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="normal" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#066aff" end="#066aff" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="running" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#33bf33" end="#33bd33" alpha="255" />
-                        </imagetype>
-                    </state>
-                </statetype>
-
-                <imagetype name="frame">
-                    <filename>recordings/generallistbackground.png</filename>
-                </imagetype>
-                <textarea name="buttonlist" from="basetextarea">
-                    <area>35,10,517,42</area>
-                    <font>baselarge</font>
-                    <align>vcenter</align>
-                </textarea>
-                <textarea name="titlesubtitle" from="basetextarea">
-                    <area>35,10,517,42</area>
-                    <font>baselarge</font>
-                    <align>vcenter</align>
-                </textarea>
-                <textarea name="shorttimedate" from="basetextarea">
-                    <area>35,58,250,30</area>
-                    <font>basesmallbrown</font>
-                    <align>vcenter</align>
-                </textarea>
-                <textarea name="channel"  from="timedate">
-                    <area>290,58,150,30</area>
-                    <align>allcenter</align>
-                </textarea>
-                <textarea name="card" from="channel">
-                    <area>455,58,100,30</area>
-                    <align>right,vcenter</align>
-                </textarea>
-            </state>
-            <state name="selected" from="active">
-                <imagetype name="frame">
-                    <position>-19,0</position>
-                    <filename>recordings/generallistselectedframe.png</filename>
-                </imagetype>
-                <statetype name="status">
-                    <position>-13,1</position>
-                    <state name="disabled">
-                        <imagetype name="statusimage">
-                            <area>0,0,40,86</area>
-                            <gradient start="#9e9e9e" end="#9e9e9e" alpha="255" />
-                            <mask>shared/selected_state_mask.png</mask>
-                        </imagetype>
-                    </state>
-                    <state name="error" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#e43e3e" end="#e43e3e" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="warning" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#ff9147" end="#ff9147" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="normal" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#066aff" end="#066aff" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="running" from="disabled">
-                        <imagetype name="statusimage">
-                            <gradient start="#33bf33" end="#33bd33" alpha="255" />
-                        </imagetype>
-                    </state>
-                </statetype>
-                <textarea name="titlesubtitle">
-                    <area>37,10,530,42</area>
-                </textarea>
-                <textarea name="shorttimedate">
-                    <position>37,58</position>
-                </textarea>
-                <textarea name="channel">
-                    <position>292,58</position>
-                </textarea>
-                <textarea name="card">
-                    <position>457,58</position>
-                </textarea>
-            </state>
-            <state name="inactive" from="active">
-            </state>
-        </statetype>
-        <statetype name="upscrollarrow">
-            <position>240,270</position>
-            <showempty>yes</showempty>
-            <state type="full">
-            </state>
-        </statetype>
-        <statetype name="downscrollarrow">
-            <position>456,270</position>
-            <showempty>yes</showempty>
-            <state type="full">
-            </state>
-        </statetype>
-    </buttonlist>-->
 
     <imagetype name="basebackdrop">
         <area>0,39,1280,720</area>
