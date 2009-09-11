@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.4.7" # 0.1.0 Initial development 
+__version__=u"v0.4.8" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -165,6 +165,8 @@ __version__=u"v0.4.7" # 0.1.0 Initial development
                      #       and a script abort. An airdate year of u'0000' will be assumed.
 					 #       Fix an abort bug when IMDB is having service problems and a list of 
 					 #       movies cannot be retrieved.
+					 # 0.4.8 Fixed a bug in a -MJ option check that removing graphics would not 
+                     #       conflict with graphic directories for non-Mythvideo plugins.
 			
 
 usage_txt=u'''
@@ -294,7 +296,7 @@ debug_enabled (False)
 download (False)
 ... lots of configuration variables ...
 video_dir (None)
-video_file_exts (['3gp', 'asf', 'asx', 'avi', 'mkv', 'mov', 'mp4', 'mpg', 'qt', 'rm', 'swf', 'wmv'])
+video_file_exts (['3gp', 'asf', 'asx', 'avi', 'mkv', 'mov', 'mp4', 'mpg', 'qt', 'rm', 'swf', 'wmv', 'm2ts', 'evo', 'ts', 'img', 'iso'])
 with_ep_name (%(series)s - S%(seasonnumber)02dE%(episodenumber)02d - %(episodename)s.%(ext)s)
 without_ep_name (%(series)s - S%(seasonnumber)02dE%(episodenumber)02d.%(ext)s)
 '''
@@ -1175,7 +1177,7 @@ class Configuration(object):
 		self.config['config_file'] = False
 		self.config['series_name_override'] = False
 		self.config['ep_name_massage'] = False
-		self.config['video_file_exts'] = ['3gp', 'asf', 'asx', 'avi', 'mkv', 'mov', 'mp4', 'mpg', 'qt', 'rm', 'swf', 'wmv']
+		self.config['video_file_exts'] = ['3gp', 'asf', 'asx', 'avi', 'mkv', 'mov', 'mp4', 'mpg', 'qt', 'rm', 'swf', 'wmv', 'm2ts', 'ts', 'evo', 'img', 'iso']
 
 
 		# Regex pattern strings used to check for season number from directory names
@@ -1514,9 +1516,9 @@ class Configuration(object):
 					if not self.config[graphicsDirectories[directory]]:
 						continue
 					# As the Janitor processes subdirectories matching must be a starts with check 
-					for directory in self.config[graphicsDirectories[directory]]:
-						if os.path.realpath(setting).startswith(os.path.realpath(directory)):
-							sys.stderr.write(u"\n! Error - The (%s) directory (%s) conflicts\nwith the MythVideo (%s) directory (%s).\nThe Jamu Janitor (-MJ) option cannot be used.\n\n" % (field, setting, directory, self.config[graphicsDirectories[directory]]) )
+					for direc in self.config[graphicsDirectories[directory]]:
+						if os.path.realpath(setting).startswith(os.path.realpath(direc)):
+							sys.stderr.write(u"\n! Error - The (%s) directory (%s) conflicts\nwith the MythVideo (%s) directory (%s).\nThe Jamu Janitor (-MJ) option cannot be used.\n\n" % (field, setting, direc, self.config[graphicsDirectories[directory]]) )
 							returnvalue = True
 		return returnvalue
 	# end _JanitorConflicts
