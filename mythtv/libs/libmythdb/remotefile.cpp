@@ -243,6 +243,60 @@ bool RemoteFile::DeleteFile(void)
     return result;
 }
 
+bool RemoteFile::Exists(const QString &url)
+{
+    RemoteFile *rf = new RemoteFile();
+
+    if (!rf)
+        return false;
+
+    rf->SetURL(url);
+    bool ret = rf->Exists();
+
+    delete rf;
+
+    return ret;
+}
+
+bool RemoteFile::Exists(void)
+{
+    bool result      = false;
+    QUrl qurl(path);
+    QString filename = qurl.path();
+    QString sgroup   = qurl.userName();
+
+    if (!qurl.fragment().isEmpty() || path.right(1) == "#")
+        filename = filename + "#" + qurl.fragment();
+
+    if (filename.left(1) == "/")
+        filename = filename.right(filename.length()-1);
+
+    if (filename.isEmpty() || sgroup.isEmpty())
+        return false;
+
+    sock = openSocket(true);
+
+    if (!sock)
+        return false;
+
+    QStringList strlist("QUERY_FILE_EXISTS");
+    strlist << filename;
+    strlist << sgroup;
+
+    sock->writeStringList(strlist);
+    if (!sock->readStringList(strlist, false))
+    {
+        VERBOSE(VB_IMPORTANT, "Remote check file exists timeout.");
+    }
+    else if (strlist[0] == "1")
+        result = true;
+
+    sock->DownRef();
+    sock = NULL;
+
+    return result;
+}
+
 void RemoteFile::Reset(void)
 {
     if (!sock)

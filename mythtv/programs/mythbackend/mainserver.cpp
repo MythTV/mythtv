@@ -384,6 +384,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleQueryCheckFile(listline, pbs);
     }
+    else if (command == "QUERY_FILE_EXISTS")
+    {
+        if (listline.size() < 3)
+            VERBOSE(VB_IMPORTANT, "Bad QUERY_FILE_EXISTS command");
+        else
+            HandleQueryFileExists(listline, pbs);
+    }
     else if (command == "QUERY_GUIDEDATATHROUGH")
     {
         HandleQueryGuideDataThrough(pbs);
@@ -2691,6 +2698,49 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 
     delete pginfo;
+}
+
+
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_FILE_EXISTS \e storagegroup \e filename
+ */
+void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
+{
+    QString filename = slist[1];
+    QString storageGroup = "Default";
+    QStringList retlist;
+
+    if (slist.size() > 2)
+        storageGroup = slist[2];
+
+    if ((filename.isEmpty()) ||
+        (filename.contains("/../")) ||
+        (filename.startsWith("../")))
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR checking for file, filename '%1' "
+                "fails sanity checks").arg(filename));
+        retlist << "0";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    if (storageGroup.isEmpty())
+        storageGroup = "Default";
+
+    StorageGroup sgroup(storageGroup, gContext->GetHostName());
+
+    QString fullname = sgroup.FindRecordingFile(filename);
+
+    if (!fullname.isEmpty())
+    {
+        retlist << "1";
+        retlist << fullname;
+    }
+    else
+        retlist << "0";
+
+    SendResponse(pbs->getSocket(), retlist);
 }
 
 void MainServer::getGuideDataThrough(QDateTime &GuideDataThrough)

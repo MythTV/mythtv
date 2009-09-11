@@ -26,6 +26,8 @@ class MPUBLIC RemoteFile
 
     static bool DeleteFile(const QString &url);
     bool DeleteFile(void);
+    static bool Exists(const QString &url);
+    bool Exists(void);
     int Write(const void *data, int size);
     int Read(void *data, int size);
     void Reset(void);
