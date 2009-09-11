@@ -89,7 +89,7 @@ void MythUIShape::DrawRect(const QRect &area,
     else
         painter.setBrush(QBrush(Qt::NoBrush));
 
-    QRect r(lineWidth / 2, lineWidth / 2, area.width() - lineWidth, area.height() - lineWidth);
+    QRect r(lineWidth, lineWidth, area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
     painter.drawRect(r);
 
     painter.end();
@@ -130,7 +130,7 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
     if ((area.height() / 2) < radius)
         radius = area.height() / 2;
 
-    QRect r(lineWidth / 2, lineWidth / 2, area.width() - lineWidth, area.height() - lineWidth);
+    QRect r(lineWidth, lineWidth, area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
     painter.drawRoundedRect(r, (qreal)radius, qreal(radius));
 
     painter.end();
