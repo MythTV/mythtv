@@ -33,6 +33,8 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
  *  \param hostname hostname where to search, blank will search all hosts'
  *                  directories, but only in local directory structure.
  *                  This is parameter is ignored if group is an empty string.
+ *  \param allowFallback allow the storage group search code to fall back if
+ *                  no dirs exist for the specified group/host
  */
 StorageGroup::StorageGroup(const QString group, const QString hostname,
                            bool allowFallback) :
