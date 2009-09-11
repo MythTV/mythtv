@@ -426,7 +426,7 @@ class MPUBLIC MythThemedDialog : public MythDialog
     vector<UIType*>   focus_taking_widgets;
 
     QRect redrawRect;
-} __attribute__ ((deprecated));
+};
 
 class MPUBLIC MythPasswordDialog: public MythDialog
 {
