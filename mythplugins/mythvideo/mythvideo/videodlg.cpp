@@ -5449,6 +5449,9 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
 
         metadata->SetInetRef(video_uid);
 
+        metadata->UpdateDatabase();
+        UpdateItem(GetItemCurrent());
+
         StartVideoImageSet(metadata);
 
     }
