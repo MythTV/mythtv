@@ -160,12 +160,6 @@ void MythSocketThread::ReadyToBeRead(MythSocket *sock)
     {
         VERBOSE(VB_SOCKET, SLOC(sock) + "socket closed");
         sock->close();
-
-        if (sock->m_cb)
-        {
-            VERBOSE(VB_SOCKET, SLOC(sock) + "calling m_cb->connectionClosed()");
-            sock->m_cb->connectionClosed(sock);
-        }
     }
     else if (sock->m_cb)
     {
