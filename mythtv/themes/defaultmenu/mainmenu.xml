@@ -128,7 +128,7 @@
         <text lang="AR">تشغيل إسطوانات</text>
         <text lang="PL">Dyski optyczne</text>
         <text lang="HE">דיסקים אופטים</text>
-        <description>Play or import audio or video CDs or DVDs</description>
+        <description>Play or import CDs and DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
