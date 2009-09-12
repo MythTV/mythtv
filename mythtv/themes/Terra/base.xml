@@ -170,6 +170,34 @@
         </statetype>
     </button>
 
+    <!-- Base definition of a button -->
+    <button name="basewidebutton">
+        <position>0,0</position>
+        <statetype name="buttonstate">
+            <state name="active">
+                <imagetype name="buttonbackground">
+                    <filename>popups/menu_button.png</filename>
+                </imagetype>
+                <textarea name="text">
+                    <area>18,0,324,50</area>
+                    <align>allcenter</align>
+                    <font>basemedium</font>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="selecteditemarrow">
+                    <position>5,16</position>
+                    <filename>popups/selected_item_arrow.png</filename>
+                </imagetype>
+                <textarea name="text">
+                    <font>basemediumbrown</font>
+                </textarea>
+            </state>
+            <state name="disabled" from="active" />
+            <state name="pushed" from="selected" />
+        </statetype>
+    </button>
+
     <!-- Base definition of a progressbar -->
     <progressbar name="baseprogressbar">
         <area>0,0,10,10</area>
@@ -269,6 +297,30 @@
         </statetype>
     </spinbox>
 
+    <!-- Base definition of a list in wide 'selector' configuration -->
+    <spinbox name="basewidespinbox" from="basespinbox">
+        <area>0,0,513,35</area>
+        <buttonarea>18,0,475,100%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,475,35</area>
+                <textarea name="buttontext">
+                    <area>5,4,465,30</area>
+                    <align>allcenter</align>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <shape name="buttonbackground">
+                    <fill color="#8a916f" />
+                </shape>
+            </state>
+            <state name="inactive" from="active" />
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>492,0</position>
+        </statetype>
+    </spinbox>
+
     <!-- Base definition of a list in 'selector' configuration -->
     <buttonlist name="baseselector">
         <area>0,0,220,35</area>
@@ -322,13 +374,13 @@
 
     <!-- Base definition of a list in wide 'selector' configuration -->
     <buttonlist name="basewideselector" from="baseselector">
-        <area>0,0,413,35</area>
-        <buttonarea>18,0,375,100%</buttonarea>
+        <area>0,0,513,35</area>
+        <buttonarea>18,0,425,100%</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,375,35</area>
+                <area>0,0,475,35</area>
                 <textarea name="buttontext">
-                    <area>5,4,365,30</area>
+                    <area>5,4,465,30</area>
                     <align>allcenter</align>
                 </textarea>
             </state>
@@ -340,7 +392,7 @@
             <state name="inactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
-            <position>392,0</position>
+            <position>492,0</position>
         </statetype>
     </buttonlist>
 

@@ -1784,7 +1784,7 @@
 
         <textarea name="ruleactivelabel" from="basetextarea">
             <area>260,487,300,30</area>
-            <value>Disable Recording Rule</value>
+            <value>Recording Rule Active</value>
         </textarea>
 
         <button name="back" from="basebutton">
