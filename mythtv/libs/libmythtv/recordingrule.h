@@ -37,8 +37,11 @@ class MPUBLIC RecordingRule
     bool LoadByProgram(const ProgramInfo* proginfo);
     bool LoadBySearch(RecSearchType lsearch, QString textname, QString forwhat,
                       QString from = "");
+
     bool ModifyPowerSearchByID(int rid, QString textname, QString forwhat,
                                QString from = "");
+    bool MakeOverride(void);
+
     bool Save(bool sendSig = true);
     bool Delete(bool sendSig = true);
 
@@ -113,6 +116,10 @@ class MPUBLIC RecordingRule
     // Temporary table related - Used for schedule previews
     QString m_recordTable;
     int m_tempID;
+
+    // Is this an override rule? Purely for the benefit of the UI, we display
+    // different options for override rules 
+    bool m_isOverride;
     
   private:
     // Internal strings for insertion into the RuleMap and display in the UI

@@ -51,6 +51,7 @@ RecordingRule::RecordingRule()
     m_averageDelay(100),
     m_recordTable("record"),
     m_tempID(0),
+    m_isOverride(false),
     m_loaded(false)
 {
 }
@@ -128,6 +129,8 @@ bool RecordingRule::Load()
         m_lastRecorded = query.value(40).toDateTime();
         m_lastDeleted = query.value(41).toDateTime();
         m_averageDelay = query.value(42).toInt();
+        
+        m_isOverride = (m_type == kOverrideRecord || m_type == kDontRecord);
     }
     else
     {
@@ -207,7 +210,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     {
         if (query.next())
             rid = query.value(0).toInt();
-        // else rid is zero, which is valid
+        // else rid is zero, which is valid, we're looking at a new rule
     }
     else
     {
@@ -275,6 +278,26 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, QString textname,
     m_searchTypeString = QObject::tr("Power Search");
 
     m_loaded = true;
+    return true;
+}
+
+bool RecordingRule::MakeOverride(void)
+{
+    if (m_recordID <= 0)
+        return false;
+    
+    if (m_type == kOverrideRecord || m_type == kDontRecord)
+        return false;
+
+    m_isOverride = true;
+    m_parentRecID = m_recordID;
+    m_recordID = 0;
+    m_type = kNotRecording;
+    m_isInactive = 0;
+
+    if (m_searchType != kManualSearch)
+        m_searchType = kNoSearch;
+
     return true;
 }
 
