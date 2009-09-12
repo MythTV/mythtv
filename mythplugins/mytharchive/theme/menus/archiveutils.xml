@@ -3,6 +3,7 @@
    <button>
       <type>ARCHIVE_LAST_LOG</type>
       <text>Show Log Viewer</text>
+      <text lang="FR">Afficher le visualisateur de journaux</text>
       <text lang="SL">Pregled dnevnika</text>
       <text lang="PL">Przeglądanie logów</text>
       <text lang="FI">Näytä Loki</text>
@@ -12,6 +13,7 @@
    <button>
        <type>ARCHIVE_TEST_DVD</type>
        <text>Play Created DVD</text>
+       <text lang="FR">Lire un DVD créé</text>
        <text lang="SL">Predvajaj ustvarjen DVD</text>
        <text lang="PL">Testuj DVD</text>
        <text lang="FI">Toista Luotu DVD</text>
@@ -21,6 +23,7 @@
    <button>
        <type>ARCHIVE_BURN_DVD</type>
        <text>Burn DVD</text>
+       <text lang="FR">Graver un DVD</text>
        <text lang="SL">Zapeči DVD</text>
        <text lang="PL">Wypal DVD</text>
        <text lang="FI">Polta DVD</text>

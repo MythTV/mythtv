@@ -11,7 +11,7 @@
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
-      <text lang="FR">Paramètres Globaux</text>
+      <text lang="FR">Réglages généraux</text>
       <text lang="JA">全般設定</text>
       <text lang="FI">Yleiset Asetukset</text>
       <text lang="SL">Splošne nastavitve</text>
@@ -32,7 +32,7 @@
       <text lang="NL">Afspelen</text>
       <text lang="PT">Conf. Leitura de Música</text>
       <text lang="SV">Uppspelning</text>
-      <text lang="FR">Paramètres de lecture</text>
+      <text lang="FR">Réglages du lecteur</text>
       <text lang="JA">プレイヤー設定</text>
       <text lang="FI">Soittoasetukset</text>
       <text lang="SL">Nastavitve predvajanja</text>
@@ -51,7 +51,7 @@
       <text lang="SV">Kopiering</text>
       <text lang="CA">Configuració de volcat</text>
       <text lang="ES">Configuración del ripper</text>
-      <text lang="FR">Paramètres d'encodage</text>
+      <text lang="FR">Réglages de l&apos;extracteur</text>
       <text lang="JA">リッパー設定</text>
       <text lang="FI">Tuontiasetukset</text>
       <text lang="SL">Nastavitve ripanja</text>

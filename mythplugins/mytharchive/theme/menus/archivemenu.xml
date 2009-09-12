@@ -21,7 +21,7 @@
       <text>Create Archive</text>
       <text lang="es">Crear Archivo Nativo</text>
       <text lang="et">Arhiivi valmistamine</text>
-      <text lang="FR">Créer une archive native</text>
+      <text lang="FR">Créer une archive</text>
       <text lang="nl">Maak Backup</text>
       <text lang="de">Natives Archiv erstellen</text>
       <text lang="nb">Lag naturlig arkiv</text>
@@ -37,7 +37,7 @@
        <text>Encode Video File</text>
        <text lang="es">Codificar Fichero Video</text>
        <text lang="et">Videofaili kodeerimine</text>
-       <text lang="FR">Encoder un fichier video</text>
+       <text lang="FR">Encoder un fichier vidéo</text>
        <text lang="de">Videodatei kodieren</text>
        <text lang="nl">Encodeer Video Bestanden</text>
        <text lang="nb">Konverter videofil</text>
@@ -54,7 +54,7 @@
        <text>Import Archive</text>
        <text lang="es">Importar Ficheros Video</text>
        <text lang="et">Videofailide importimine</text>
-       <text lang="FR">Importer un fichier video</text>
+       <text lang="FR">Importer une archive</text>
        <text lang="de">Videodateien importieren</text>
        <text lang="nl">Importeer Video Bestanden</text>
        <text lang="nb">Importer videofiler</text>
@@ -68,6 +68,7 @@
    <button>
        <type>ARCHIVE_UTILITIES</type>
        <text>Archive Utilities</text>
+       <text lang="FR">Utilitaires d&apos;archivage</text>
        <text lang="SL">Pripomočki za arhiviranje</text>
        <text lang="FI">Lisätoiminnot</text>
        <action>MENU archiveutils.xml</action>

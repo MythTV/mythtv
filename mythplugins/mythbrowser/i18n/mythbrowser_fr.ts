@@ -1,263 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0" language="fr_FR">
 <context>
-    <name>Bookmarks</name>
+    <name>BookmarkEditor</name>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="504"/>
-        <source>MythBrowser: Select group or single site to view</source>
-        <translation>MythBrowser: Sélectionnez un groupe ou un site à afficher</translation>
+        <source>Edit Bookmark Details</source>
+        <translation>Éditer les détails du signet</translation>
+    </message>
+    <message>
+        <source>Enter Bookmark Details</source>
+        <translation>Entrer les détails du signet</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Find...</source>
+        <translation>Trouver...</translation>
+    </message>
+    <message>
+        <source>Select a category</source>
+        <translation>Sélectionner une catégorie</translation>
     </message>
 </context>
 <context>
-    <name>BookmarksConfig</name>
+    <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="245"/>
-        <source>MythBrowser Bookmarks Settings</source>
-        <translation>Paramètres des signets de MythBrowser</translation>
+        <source>No bookmarks defined.
+
+Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
+        <translation>Utiliser l&apos;option de menu « Ajouter un signet » pour ajouter de nouveaux signets</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="256"/>
-        <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
-Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation>Appuyez sur le bouton &apos;Nouveau signet&apos; pour ajouter un nouveau site/groupe. 
-Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la liste.</translation>
+        <source>Actions</source>
+        <translation>Actions</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="277"/>
-        <source>Zoom [%]:</source>
-        <translation>Zoom [%]:</translation>
+        <source>Add Bookmark</source>
+        <translation>Ajouter un signet</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="290"/>
-        <source>Browser:</source>
-        <translation>Navigateur:</translation>
+        <source>Edit Bookmark</source>
+        <translation>Éditer un signet</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="304"/>
-        <source>Hide Scrollbars</source>
-        <translation>Cacher les barres de défilement</translation>
+        <source>Delete Bookmark</source>
+        <translation>Supprimer un signet</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="311"/>
-        <source>Scroll Page</source>
-        <translation>Faire défiler la page</translation>
+        <source>Show Bookmark</source>
+        <translation>Afficher un signet</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="317"/>
-        <source>Scroll Speed:</source>
-        <translation>Vitesse de défilement:</translation>
+        <source>Delete Marked</source>
+        <translation>Supprimer les marqués</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="332"/>
-        <source>&amp;New Bookmark</source>
-        <translation>&amp;Nouveau signet</translation>
+        <source>Show Marked</source>
+        <translation>Afficher les marqués</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="339"/>
-        <source>Add a new Website</source>
-        <translation>Ajouter un nouveau site Web</translation>
+        <source>Clear Marked</source>
+        <translation>Annuler les marques</translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="345"/>
-        <source>&amp;Finish</source>
-        <translation>&amp;Terminer</translation>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete the selected bookmark</source>
+        <translation>êtes-vous sûr de vouloir supprimer les signets sélectionnés</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete the marked bookmarks</source>
+        <translation>êtes-vous sûr de vouloir supprimer les signets marqués</translation>
+    </message>
+</context>
+<context>
+    <name>BrowserConfig</name>
+    <message>
+        <source>MythBrowser Settings</source>
+        <translation>Réglages MythBrowser</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
+        <translation>C&apos;est la commande qui sera utilisée pour afficher le navigateur web. Utilisez « Interne » pour utiliser le navigateur web intégré. %ZOOM% et %URL% seront remplacés par le niveau de grossissement et la liste d&apos;URL.</translation>
+    </message>
+    <message>
+        <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
+        <translation>C&apos;est la taille de texte par défaut qui sera utilisée. Les valeurs valides pour le navigateur Interne vont de 0.3 à 5.0 avec 1.0 étant la taille normale, moins de 1 étant plus petit et plus de 1 étant plus grand que la taille normale.</translation>
+    </message>
+    <message>
+        <source>Exit without saving settings</source>
+        <translation>Sortir sans sauvegarder les réglages</translation>
+    </message>
+    <message>
+        <source>Save settings and Exit</source>
+        <translation>Sauvegarder les réglages et sortir</translation>
     </message>
 </context>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
         <source>Enter URL</source>
-        <translation type="unfinished">Entrer l&apos;URL</translation>
+        <translation>Entrer l&apos;URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="226"/>
         <source>Loading...</source>
-        <translation type="unfinished">Chargement...</translation>
+        <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="328"/>
         <source>Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Actions</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
         <source>Back</source>
-        <translation type="unfinished">Reculer</translation>
+        <translation>Retour</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="345"/>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Avancer</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="347"/>
         <source>Zoom In</source>
-        <translation type="unfinished">Zoom avant</translation>
+        <translation>Zoom avant</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="348"/>
         <source>Zoom Out</source>
-        <translation type="unfinished">Zoom arrière</translation>
+        <translation>Zoom arrière</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvel onglet</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
         <source>Delete Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer l&apos;onglet</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <source>Add Bookmark</source>
+        <translation>Ajouter un signet</translation>
+    </message>
+    <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
-    </message>
-</context>
-<context>
-    <name>PopupBox</name>
-    <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="112"/>
-        <source>&amp;Ok</source>
-        <translation>&amp;Ok</translation>
-    </message>
-    <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="93"/>
-        <source>Add New Website</source>
-        <translation>Ajouter un nouveau site Web</translation>
-    </message>
-    <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="96"/>
-        <source>Group:</source>
-        <translation>Groupe:</translation>
-    </message>
-    <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="100"/>
-        <source>Description:</source>
-        <translation>Description:</translation>
-    </message>
-    <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="104"/>
-        <source>URL:</source>
-        <translation>URL:</translation>
-    </message>
-</context>
-<context>
-    <name>TabView</name>
-    <message>
-        <location filename="" line="0"/>
-        <source>         Back         </source>
-        <translation type="obsolete">        Arrière        </translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>       Next Tab       </source>
-        <translation type="obsolete">    Onglet Suivant    </translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>       Prev Tab       </source>
-        <translation type="obsolete">   Onglet Précédent   </translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Save Link in Bookmarks</source>
-        <translation type="obsolete">Ajouter le lien aux signets</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>       zoom Out       </source>
-        <translation type="obsolete">       Dézoomer       </translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>       zoom In        </source>
-        <translation type="obsolete">        Zoomer         </translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>MythBrowser Menu</source>
-        <translation type="obsolete">Menu de MythBrowser</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Enter URL</source>
-        <translation type="obsolete">Entrer l&apos;URL</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuler</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Back</source>
-        <translation type="obsolete">Reculer</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Next Tab</source>
-        <translation type="obsolete">Prochain onglet</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Prev Tab</source>
-        <translation type="obsolete">Onglet précédent</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Remove Tab</source>
-        <translation type="obsolete">Enlever l&apos;onglet</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Zoom Out</source>
-        <translation type="obsolete">Zoom arrière</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Zoom In</source>
-        <translation type="obsolete">Zoom avant</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Add New Bookmark</source>
-        <translation type="obsolete">Ajouter un signet</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Group:</source>
-        <translation type="obsolete">Groupe:</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Description:</source>
-        <translation type="obsolete">Description:</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Loading...</source>
-        <translation type="obsolete">Chargement...</translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="131"/>
         <source>Loading...</source>
-        <translation type="unfinished">Chargement...</translation>
+        <translation>Chargement...</translation>
     </message>
 </context>
 </TS>

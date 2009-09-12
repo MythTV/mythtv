@@ -1,25 +1,75 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="fr_FR">
 <context>
     <name></name>
     <message>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tous publics</translation>
     </message>
     <message>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Avertissement</translation>
     </message>
     <message>
         <source>PG-13</source>
         <comment>PL3 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Interdit aux moins de 12 ans</translation>
     </message>
     <message>
         <source>R:NC-17</source>
         <comment>PL4 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Interdit aux moins de 16 ans</translation>
+    </message>
+    <message>
+        <source>Cover download stopped.</source>
+        <translation>Téléchargement de l&apos;affiche arrêté.</translation>
+    </message>
+    <message>
+        <source>Error writing data to file %1.</source>
+        <translation>Erreur en écrivant les données dans le fichier %1.</translation>
+    </message>
+    <message>
+        <source>Error: file error &apos;%1&apos; for file %2</source>
+        <translation>Erreur : erreur de fichier « %1 » pour le fichier %2</translation>
+    </message>
+    <message>
+        <source>Fanart download stopped.</source>
+        <translation>Téléchargement d&apos;illustration arrêté.</translation>
+    </message>
+    <message>
+        <source>No command to run.</source>
+        <translation>Aucune commande à exécuter.</translation>
+    </message>
+    <message>
+        <source>Screenshot download stopped.</source>
+        <translation>Téléchargement de la capture d&apos;écran arrêté.</translation>
+    </message>
+    <message>
+        <source>Banner download stopped.</source>
+        <translation>Téléchargement de la bannière arrêté.</translation>
+    </message>
+    <message>
+        <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
+        <translation>Tentative d&apos;enregistrer %1, mais il semble que ce soit une redirection HTML (taille de fichier %2).</translation>
+    </message>
+    <message>
+        <source>Error writing Coverart to file %1.</source>
+        <translation>Erreur lors de l&apos;enregistrement de l&apos;affiche dans le fichier %1.</translation>
+    </message>
+    <message>
+        <source>Error writing Screenshot to file %1.</source>
+        <translation>Erreur lors de l&apos;enregistrement de la copie d&apos;écran dans le fichier %1.</translation>
+    </message>
+    <message>
+        <source>Error writing Fanart to file %1.</source>
+        <translation>Erreur lors de l&apos;enregistrement du fanart dans le fichier %1.</translation>
+    </message>
+    <message>
+        <source>Error writing Banner to file %1.</source>
+        <translation>Erreur lors de l&apos;enregistrement de la bannière dans le fichier %1.</translation>
     </message>
 </context>
 <context>
@@ -29,56 +79,20 @@
         <translation>Votre connexion au service d&apos;encodage de Myth a été interrompue. Ce n&apos;est pas bon signe.</translation>
     </message>
     <message>
-        <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation>Impossible de se connecter au service d&apos;encodage de Myth. Vous pouvez essayer d&apos;appuyer sur une touche numérique pour le lancer. Si vous voyez toujours ce message, c&apos;est que quelque chose ne fonctionne pas correctement.</translation>
-    </message>
-    <message>
-        <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation>La tentative de connexion a échoué parce que le service d&apos;encodage de Myth n&apos;a pu trouver l&apos;hôte.</translation>
-    </message>
-    <message>
-        <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation>Erreur de &apos;socket&apos; de communication.</translation>
-    </message>
-    <message>
-        <source>Something is wrong, but I don&apos;t know what.</source>
-        <translation>Quelque chose ne va pas, mais je ne sais pas quoi.</translation>
-    </message>
-    <message>
         <source>Job %1 of %2</source>
         <translation>Tâche %1 de %2</translation>
-    </message>
-    <message>
-        <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation type="obsolete">Pas de tâche en cours et rien d&apos;autre à faire. Vous pouvez appuyer sur 0 pour copier un DVD.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
         <translation>Pas de tâche. En attente d&apos;un DVD.</translation>
     </message>
     <message>
-        <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation type="obsolete">Pas de tâche et rien d&apos;autre à faire. Vous pouvez appuyer sur 0 pour copier un DVD si vous le voulez.</translation>
-    </message>
-    <message>
         <source>Cancelling ...</source>
         <translation>Annulation ...</translation>
     </message>
     <message>
-        <source>0 New Rip</source>
-        <translation type="obsolete">0 Nouvelle copie</translation>
-    </message>
-    <message>
-        <source>9 Cancel Job</source>
-        <translation type="obsolete">9 Annuler la tâche</translation>
-    </message>
-    <message>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
         <translation>Aucune tâche et rien à faire. Vous pourriez extraire un DVD.</translation>
-    </message>
-    <message>
-        <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
-        <translation>Aucune tâche et rien à faire. Vous pourriez extraire un disque si vous le désirez.</translation>
     </message>
     <message>
         <source>New Rip</source>
@@ -87,6 +101,22 @@
     <message>
         <source>Cancel Job</source>
         <translation>Annuler la tâche</translation>
+    </message>
+    <message>
+        <source>Attempting to launch mtd...</source>
+        <translation>Tentative de lancement de mtd...</translation>
+    </message>
+    <message>
+        <source>Cannot connect to your Myth Transcoding Daemon.</source>
+        <translation>Ne peut se connecter à votre Myth Transcoding Daemon.</translation>
+    </message>
+    <message>
+        <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
+        <translation>La tentative de connexion à votre mtd a indiqué un hôte non trouvé. Impossible de récupérer.</translation>
+    </message>
+    <message>
+        <source>Unknown connection error.</source>
+        <translation>Erreur de connexion inconnue.</translation>
     </message>
 </context>
 <context>
@@ -100,28 +130,12 @@
         <translation>Aucun</translation>
     </message>
     <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Pas d&apos;affiche</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation>Valider</translation>
+        <source>Enter new category</source>
+        <translation>Entrez la nouvelle catégorie</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
-    <message>
-        <source>Please enter the new extension:</source>
-        <translation>Entrez une nouvelle extension:</translation>
-    </message>
-    <message>
-        <source>Create new extension</source>
-        <translation>Créer une nouvelle extension</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
     <message>
         <source>Done</source>
         <translation>Valider</translation>
@@ -134,17 +148,13 @@
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
+    <message>
+        <source>Enter the new extension:</source>
+        <translation>Entrez la nouvelle extension :</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>Directory that holds videos</source>
-        <translation type="obsolete">Répertoire contenant des vidéos</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation type="obsolete">Ce répertoire doit exister et l&apos;utilisateur de MythVideo doit avoir la permission en lecture sur ce répertoire.</translation>
-    </message>
     <message>
         <source>Starting Parental Level</source>
         <translation>Niveau parental initial</translation>
@@ -159,11 +169,7 @@
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation>C&apos;est le niveau à partir duquel MythVideo démarre. Toutes les vidéos avec un niveau inférieur ou égal à la valeur seront affiché dans la liste. Afin d&apos;empêcher le changement du niveau par défaut, le code parental doit être saisi !</translation>
-    </message>
-    <message>
-        <source>Parental Control PIN</source>
-        <translation type="obsolete">Code de contrôle parental</translation>
+        <translation>C&apos;est le niveau à partir duquel MythVideo démarre. Toutes les vidéos avec un niveau inférieur ou égal à la valeur seront affiché dans la liste. Afin d&apos;empêcher le changement du niveau par défaut, le code parental doit être saisi.</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -178,20 +184,8 @@
         <translation>Si coché, tous les fichiers du répertoire de MythVideo seront affichées sauf les fichiers pour lesquels les extensions sont explicitement ignorées.</translation>
     </message>
     <message>
-        <source>Video List browses files</source>
-        <translation>Afficher tous les fichiers</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Si coché, l&apos;écran &apos;Liste des vidéos&apos; affichera tous les fichiers du répertoire MythVideo même s&apos;ils n&apos;ont pas été recherchés.</translation>
-    </message>
-    <message>
         <source>Player Settings</source>
         <translation>Configuration du lecteur</translation>
-    </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Code parental:</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -206,28 +200,12 @@
         <translation>Aucun</translation>
     </message>
     <message>
-        <source>Unknown Rating</source>
-        <translation type="obsolete">Tout public</translation>
-    </message>
-    <message>
-        <source>Default Player</source>
-        <translation type="obsolete">Lecteur par défaut</translation>
-    </message>
-    <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation>Les fichiers nouvellement analysés sont affichés</translation>
+        <translation>Les fichiers nouvellement analysés sont affichables par défaut</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation>Si coché, les fichiers nouvellement analysés dans le gestionnaire de vidéos seront automatiquement marqué comme affichable et apparaissent dans le menu &apos;Naviguer&apos;</translation>
-    </message>
-    <message>
-        <source>New category</source>
-        <translation>Nouvelle Catégorie</translation>
-    </message>
-    <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="obsolete">Ce code est utilisé pour le contrôle du niveau du code parental. Si vous désirez utiliser cette fonctionnalité, nous vous conseillons d&apos;utiliser des valeurs numériques afin de vous rendre la vie plus facile.</translation>
+        <translation>Si coché, les fichiers nouvellement analysés dans le gestionnaire de vidéos seront marqués comme affichables et apparaîtront dans le menu « Naviguer ».</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
@@ -251,20 +229,11 @@
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation>Ce répertoire doit exister et l&apos;utilisateur exécutant MythVideo doit avoir les droits de lecture/écriture sur celui-ci</translation>
+        <translation>Ce répertoire doit exister et l&apos;utilisateur exécutant MythVideo doit avoir les droits de lecture/écriture sur celui-ci.</translation>
     </message>
     <message>
         <source>Video Manager</source>
         <translation>Gestionaire de vidéos</translation>
-    </message>
-    <message>
-        <source>Could not retrieve poster</source>
-        <translation>impossible de trouver une affiche</translation>
-    </message>
-    <message>
-        <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
-</source>
-        <translation type="obsolete">Il existe une affiche pour cette vidéo, mais Myth n&apos;a pu la télécharger en un temps raisonnable.</translation>
     </message>
     <message>
         <source>Default View</source>
@@ -288,63 +257,15 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation>cette commande est utilisée four tous le fichiers dont l&apos;extension n&apos;est explicitement définie. Vous pouvez aussi entrer le nom de l&apos;un des plugins de lecture tels que &apos;internal&apos;</translation>
-    </message>
-    <message>
-        <source>Rows to display</source>
-        <translation>Lignes à afficher</translation>
-    </message>
-    <message>
-        <source>Columns to display</source>
-        <translation>Colonnes à afficher</translation>
-    </message>
-    <message>
-        <source>Show title below thumbnails</source>
-        <translation>Afficher les titres près des miniatures</translation>
-    </message>
-    <message>
-        <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation>Si forcé, un texte supplémentaire sera affiché rendant les miniatures plus petites</translation>
-    </message>
-    <message>
-        <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="obsolete">Maintienir les proportions des miniatures</translation>
-    </message>
-    <message>
-        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="obsolete">Si forcé, l&apos;échelle des miniatures est maintenue avec le ratio d&apos;origine. Sinon, l&apos;échelle est redimensionnée avec d&apos;obtenir la taille de l&apos;icône d&apos;arrière plan du thème.</translation>
-    </message>
-    <message>
-        <source>Video Gallery</source>
-        <translation>Galerie Vidéo</translation>
+        <translation>cette commande est utilisée four tous le fichiers dont l&apos;extension n&apos;est explicitement définie. Vous pouvez aussi entrer le nom de l&apos;un des plugins de lecture tels que &apos;internal&apos;.</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation>La vue par défaut pour MythVideo. Les autres vues peuvent être atteintes à travers le menu popup accessible par la touche MENU</translation>
-    </message>
-    <message>
-        <source>Video Browser browses files</source>
-        <translation>Le gestionnaire de vidéos parcourt les fichiers</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Si cette option est activée, le gestionnaire de vidéos affichera tous les fichiers dans le répertoire de départ de MythVideo, qu&apos;ils aient été parcourus ou non.</translation>
-    </message>
-    <message>
-        <source>Video Gallery browses files</source>
-        <translation>La galerie des vidéos parcourt les fichiers</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Si cette option est activée, la galerie des vidéos affichera tous les fichiers dans le répertoire de départ de MythVideo, qu&apos;ils aient été parcourus ou non.</translation>
+        <translation>La vue par défaut pour MythVideo. Les autres vues peuvent être atteintes à travers le menu popup accessible par la touche MENU.</translation>
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
         <translation>La liste des vidéos charge les métadonnées des vidéos</translation>
-    </message>
-    <message>
-        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation>Si cette option est activée en conjonction avec Browse Files, la liste des vidéos tentera de charger toutes les métadonnées de la base de données. La désactivation de cette option accélérera le chargement de l&apos;arborescence de la liste des vidéos</translation>
     </message>
     <message>
         <source>Sorting ignores case</source>
@@ -355,24 +276,8 @@
         <translation>Si cette option est activée, la casse sera ignorée lors du tri des vidéos dans une vue.</translation>
     </message>
     <message>
-        <source>Show folders for database views</source>
-        <translation>Afficher les dossiers dans les vues de la base de données</translation>
-    </message>
-    <message>
-        <source>If set, sub folders of your video directory will be shown in supported views.</source>
-        <translation>Si cette option est activée, les sous-répertoires seront affichés dans certaines vues.</translation>
-    </message>
-    <message>
-        <source>Image cache size</source>
-        <translation>Taille de la cache des images</translation>
-    </message>
-    <message>
-        <source>This setting determines the number of images MythVideo will cache for views.</source>
-        <translation>Ce paramètre détermine le nombre maximal d&apos;images que MythVideo conservera en cache.</translation>
-    </message>
-    <message>
         <source>^(The |A |An )</source>
-        <translation>^(Le |La |Les |Un |Une |Des )</translation>
+        <translation>^(Le |La |Les |Un |Une )</translation>
     </message>
     <message>
         <source>All</source>
@@ -411,40 +316,8 @@
         <translation>Video ID</translation>
     </message>
     <message>
-        <source>
-
-You have no VCD Player command defined.</source>
-        <translation>
-
-Vous n&apos;avez pas défini de commande pour le lecteur VCD.</translation>
-    </message>
-    <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation>Ok, je vais lancer la configuration.</translation>
-    </message>
-    <message>
-        <source>
-
-You have no VCD Device defined.</source>
-        <translation type="obsolete">
-
-Vous n&apos;avez pas défini de périphérique VCD.</translation>
-    </message>
-    <message>
-        <source>
-
-You have no DVD Player command defined.</source>
-        <translation type="obsolete">
-
-Vous n&apos;avez pas défini de commande pour le lecteur DVD.</translation>
-    </message>
-    <message>
-        <source>
-
-You have no DVD Device defined.</source>
-        <translation type="obsolete">
-
-Vous n&apos;avez pas défini de périphérique DVD.</translation>
+        <translation>Ok, je vais lancer la configuration</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
@@ -459,16 +332,8 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
         <translation>Chemin du périphérique DVD</translation>
     </message>
     <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Configuration générale</translation>
-    </message>
-    <message>
         <source>DVD Player Command</source>
         <translation>Commande du lecteur de DVD</translation>
-    </message>
-    <message>
-        <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="obsolete">C&apos;est la ligne de commande qui lance le lecteur DVD (i.e. MPlayer,ogle, etc...). Si %d est présent dans la ligne de commande, il sera remplacé par le périphérique DVD (i.e. /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
@@ -477,14 +342,6 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
         <translation>C&apos;est la ligne de commande qui lance le lecteur VCD (i.e. MPlayer, xine, etc ...). Si %d est présent dans la ligne de commande, il sera remplacé par le périphérique VCD (i.e. /dev/cdrom).</translation>
-    </message>
-    <message>
-        <source>DVD Player Settings</source>
-        <translation type="obsolete">Configuration du lecteur DVD</translation>
-    </message>
-    <message>
-        <source>VCD Player Settings</source>
-        <translation type="obsolete">Configuration du lecteur VCD</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
@@ -504,11 +361,11 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation>Arguments de sous-titrage:</translation>
+        <translation>Arguments de sous-titrage :</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation>Si vous choisissez un sous-titre pour l&apos;encodage, cette commande est ajouté à la fin de la commande de lecture afin de prévisualiser le sous-titre. si %s est présent, il sera remplacé par le sous titre sélectionné</translation>
+        <translation>Si vous choisissez un sous-titre pour l&apos;encodage, cette commande est ajouté à la fin de la commande de lecture afin de prévisualiser le sous-titre. si %s est présent, il sera remplacé par le sous titre sélectionné.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
@@ -607,10 +464,6 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
         <translation>Encodage ~</translation>
     </message>
     <message>
-        <source>Transcode is thinking </source>
-        <translation>Transcode réfléchit</translation>
-    </message>
-    <message>
         <source>Simultaneous Transcode Jobs</source>
         <translation>Encodage simultanée des tâches</translation>
     </message>
@@ -621,10 +474,6 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     <message>
         <source>On DVD insertion</source>
         <translation>Sur insertion de DVD</translation>
-    </message>
-    <message>
-        <source>Display mythdvd menu menu</source>
-        <translation type="obsolete">Affiche le menu &apos;menu de mythdvd&apos;</translation>
     </message>
     <message>
         <source>Do nothing</source>
@@ -640,7 +489,7 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation>Le paramètre de surveillance des périphériques doit être activé pour pouvoir utiliser cette fonction (Paramètrage-&gt;général-&gt;Surveillance de CD/DVD)</translation>
+        <translation>Le réglage de surveillance des périphériques doit être activé pour pouvoir utiliser cette fonction (Paramètrage-&gt;général-&gt;Surveillance de CD/DVD)</translation>
     </message>
     <message>
         <source>Display mythdvd menu</source>
@@ -657,14 +506,6 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     <message>
         <source>Default Video Player</source>
         <translation>Lecteur vidéo par défaut</translation>
-    </message>
-    <message>
-        <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation>Effacer les signets des DVD de plus de (jours)</translation>
-    </message>
-    <message>
-        <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation>Efface les signets des DVD qui sont plus anciens que le nombre de jours indiqué</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
@@ -684,7 +525,7 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     </message>
     <message>
         <source>General Settings (%1/%2)</source>
-        <translation>Paramètres généraux (%1/%2)</translation>
+        <translation>Réglages généraux (%1/%2)</translation>
     </message>
     <message>
         <source>NR</source>
@@ -701,44 +542,6 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     <message>
         <source>videos</source>
         <translation>vidéos</translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation>Recherche des fichiers vidéo</translation>
-    </message>
-    <message>
-        <source>No to all</source>
-        <translation>Non pour tous</translation>
-    </message>
-    <message>
-        <source>Yes to all</source>
-        <translation>Oui pour tous</translation>
-    </message>
-    <message>
-        <source>File Missing</source>
-        <translation>Fichier manquant</translation>
-    </message>
-    <message>
-        <source>%1 appears to be missing.
-Remove it from the database?</source>
-        <translation>%1 semble être manquant.
-Désirez-vous le retirer de la base de données?</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation>Mise à jour de la base de données des vidéos</translation>
-    </message>
-    <message>
-        <source>Verifying video files</source>
-        <translation>Vérification des fichiers vidéo</translation>
-    </message>
-    <message>
-        <source>No rating available.</source>
-        <translation>La classification n&apos;est pas disponible.</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation>minutes</translation>
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
@@ -781,10 +584,6 @@ Désirez-vous le retirer de la base de données?</translation>
         <translation>Vitesse du lecteur DVD</translation>
     </message>
     <message>
-        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
-        <translation>Ajuster la vitesse du DVD durant la lecture. La vitesse est un multiple de 177KB/s</translation>
-    </message>
-    <message>
         <source>Let transcode determine frame rate</source>
         <translation>Laisser transcode déterminer la cadence</translation>
     </message>
@@ -793,162 +592,291 @@ Désirez-vous le retirer de la base de données?</translation>
         <translation>Si cette option est activée, transcode déterminera automatiquement la cadence. Dans le cas contraire, la valeur est ajustée à 23,976.</translation>
     </message>
     <message>
-        <source>Manually Enter Video #</source>
-        <translation>Inscrire manuellement le N° de la vidéo</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation>Réinitialiser l&apos;entrée</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-    <message>
         <source>Directories that hold videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Répertoire contenant les vidéos</translation>
     </message>
     <message>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les répertoires multiples peuvent être séparés par « : ». Chaque répertoire doit exister et être lisible par l&apos;utilisateur exécutant MythVideo.</translation>
     </message>
     <message>
         <source>Enable automatic Parental Level from rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le niveau parental automatique à partir de la classification</translation>
     </message>
     <message>
         <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si activé, les recherches placeront automatiquement le niveau parental à celui correspondant à la classification ci-dessous.</translation>
     </message>
     <message>
         <source>Level %1</source>
-        <translation type="unfinished">Niveau %1</translation>
+        <translation>Niveau %1</translation>
     </message>
     <message>
         <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Theme Error: browser/playwait has an invalid area.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Theme Error: browser/novideos_info has an invalid area.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Manually Enter Video Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Les classifications contenant ces chaînes (séparées par :) se verront assignées le niveau parental %1.</translation>
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Commande</translation>
     </message>
     <message>
-        <source>%1 failed</source>
-        <translation type="unfinished"></translation>
+        <source>Transcode is thinking</source>
+        <translation>Transcode réfléchit</translation>
     </message>
     <message>
-        <source>%1
+        <source>Manager</source>
+        <translation>Gestionnaire</translation>
+    </message>
+    <message>
+        <source>Command to search for movie fanart</source>
+        <translation>Commande pour rechercher des illustrations de films</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie screenshots</source>
+        <translation>Répertoire contenant les clichés de films</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie/TV Banners</source>
+        <translation>Répertoire contenant les bannières de films/TV</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie fanart</source>
+        <translation>Répertoire contenant les illustrations de films</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie trailers</source>
+        <translation>Répertoire contenant les bandes annonce de films</translation>
+    </message>
+    <message>
+        <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
+        <translation>« Par défaut » laissera le MediaMonitor choisir un périphérique.</translation>
+    </message>
+    <message>
+        <source>Remove DVD Bookmarks Older than (days)</source>
+        <translation>Supprimer les signets de DVD plus vieux de (jours)</translation>
+    </message>
+    <message>
+        <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
+        <translation>Supprime les signets de DVD plus vieux que le nombre de jours spécifié</translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
+        <translation>Fixer la vitesse du lecteur DVD durant la lecture de DVD. La vitesse est en multiple de 177 Ko/s. Les vitesses plus lentes peuvent réduire le bruit du lecteur mais dans quelques cas peut causer des sautes de lecture.</translation>
+    </message>
+    <message>
+        <source>Enable random trailers before videos</source>
+        <translation>Activer les bandes annonce aléatoires avant les vidéos</translation>
+    </message>
+    <message>
+        <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
+        <translation>Si activé, ceci activera un bouton appelé « Regarder avec bandes annonce » qui jouera un nombre de bandes annonce spécifié par l&apos;utilisateur avant chaque film.</translation>
+    </message>
+    <message>
+        <source>Number of trailers to play</source>
+        <translation>Nombre de bandes annonce à jouer</translation>
+    </message>
+    <message>
+        <source>The number of trailers to play before playing the film itself </source>
+        <translation>Le nombre de bandes annonce à jouer avabt de jouer le film proprement dit</translation>
+    </message>
+    <message>
+        <source>Loading videos ...</source>
+        <translation>Chargement des vidéos...</translation>
+    </message>
+    <message>
+        <source>You have no VCD Player command defined.</source>
+        <translation>Vous n&apos;avez pas de commande de lecteur VCD définie.</translation>
+    </message>
+    <message>
+        <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
+        <translation>Avertissement de contrôle parental agressif : mot de passe invalide. Une tentative d&apos;entrer dans l&apos;écran de paramètrage de MythVideo a été évitée.</translation>
+    </message>
+    <message>
+        <source>%1 failed
+
+%2
 
 Check VideoManager Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a échoué
+
+%2
+
+Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
-        <source>Fetching poster for %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <source>Video Home</source>
+        <translation>Base Vidéo</translation>
     </message>
     <message>
-        <source>A poster exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation type="unfinished"></translation>
+        <source>No rating available.</source>
+        <translation>Aucune classification disponible.</translation>
     </message>
     <message>
-        <source>Theme Error: selected/playwait has an invalid area.</source>
-        <translation type="unfinished"></translation>
+        <source>No directory %1 - DVD importing will fail</source>
+        <translation>Pas de répertoire %1 - L&apos;import de DVD va échouer</translation>
     </message>
     <message>
-        <source>None defined</source>
-        <translation type="unfinished"></translation>
+        <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
+        <translation>Si activé, les groupements de métadonnées du répertoire des vidéos seront affichées dans les vues supportées. Le groupe par défaut est paramétré ci-dessous.</translation>
+    </message>
+    <message>
+        <source>Group based on</source>
+        <translation>Groupe basé sur</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Dossier</translation>
+    </message>
+    <message>
+        <source>Genres</source>
+        <translation>Genres</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Catégorie</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Réalisateur</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Distribution</translation>
+    </message>
+    <message>
+        <source>Date Added</source>
+        <translation>Date d&apos;ajout</translation>
+    </message>
+    <message>
+        <source>Group videos in the tree</source>
+        <translation>Vidéos du groupe dans l&apos;arborescence</translation>
+    </message>
+    <message>
+        <source>Command to search for TV shows in MythVideo</source>
+        <translation>Commande pour rechercher les émissions TV dans MythVideo</translation>
+    </message>
+    <message>
+        <source>Command to search for TV Season posters</source>
+        <translation>Commande pour rechercher les posters de saisons TV</translation>
+    </message>
+    <message>
+        <source>Command to search for TV fanart</source>
+        <translation>Commande pour rechercher les fanarts TV</translation>
+    </message>
+    <message>
+        <source>Command to search for TV banners</source>
+        <translation>Commande pour rechercher les bannières TV</translation>
+    </message>
+    <message>
+        <source>Command to search for TV Screenshots</source>
+        <translation>Commande pour rechercher les captures d&apos;écran TV</translation>
+    </message>
+    <message>
+        <source>Command to extract data for TV Episodes</source>
+        <translation>Commande pour extraire les données pour les épisodes TV</translation>
+    </message>
+    <message>
+        <source>Command to search for TV by Title/Subtitle</source>
+        <translation>Commande pour rechercher la TV par Titre/Sous-titre</translation>
+    </message>
+    <message>
+        <source>Television in MythVideo</source>
+        <translation>Télévision dans MythVideo</translation>
+    </message>
+    <message>
+        <source>Season/Episode</source>
+        <translation>Saison/Épisode</translation>
+    </message>
+    <message>
+        <source>Enable Metadata Browse Modes</source>
+        <translation>Activer les modes de navigation des métadonnées</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Video Player</source>
+        <translation>Activer le lecteur de vidéo alternatif</translation>
+    </message>
+    <message>
+        <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
+        <translation>Si coché, vous pouvez sélectionner une commande de lecteur alternatif pour les vidéos lorsque le choix par défaut échoue.</translation>
+    </message>
+    <message>
+        <source>Alternate Player</source>
+        <translation>Lecteur alternatif</translation>
+    </message>
+    <message>
+        <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
+        <translation>Si pour une quelconque raison le lecteur par défaut ne lit pas une vidéo, vous pouvez la lire dans un lecteur alternatif en sélectionnant « Lire dans le lecteur alternatif ».</translation>
+    </message>
+    <message>
+        <source>Season</source>
+        <translation>Saison</translation>
+    </message>
+    <message>
+        <source>Episode</source>
+        <translation>Épisode</translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
+        <translation>Si coché ainsi que Parcourir les fichiers, la Liste des vidéos chargera toute métadonnée connue à partir de la base de données. Désactiver ceci peut grandement améliorer le temps nécessaire à charger l&apos;arborescence de la Liste des vidéos</translation>
+    </message>
+    <message>
+        <source>TV/Movies</source>
+        <translation>TV/Films</translation>
+    </message>
+    <message>
+        <source>Television</source>
+        <translation>Télévision</translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation>Films</translation>
+    </message>
+    <message>
+        <source>Season %1</source>
+        <translation>Saison %1</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Director:</source>
-        <translation>Réal.:</translation>
+        <translation>Réalisateur :</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation>Année:</translation>
+        <translation>Année :</translation>
     </message>
     <message>
         <source>Rated:</source>
-        <translation>Classé:</translation>
+        <translation>Évalué :</translation>
     </message>
     <message>
         <source>Parental Level:</source>
-        <translation>Niveau parental:</translation>
+        <translation>Niveau parental :</translation>
     </message>
     <message>
         <source>Browsable:</source>
-        <translation>Listé:</translation>
+        <translation>Navigable :</translation>
     </message>
     <message>
         <source>Runtime:</source>
-        <translation>Durée:</translation>
+        <translation>Durée :</translation>
     </message>
     <message>
         <source>Plot:</source>
-        <translation>Résumé:</translation>
+        <translation>Résumé :</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation>Fichier:</translation>
+        <translation>Nom de fichier :</translation>
     </message>
     <message>
         <source>Cover File:</source>
-        <translation>Affiche:</translation>
-    </message>
-    <message>
-        <source>IMDB Num.:</source>
-        <translation>N° IMDB:</translation>
-    </message>
-    <message>
-        <source>retrieving data...</source>
-        <translation>récupération des données...</translation>
-    </message>
-    <message>
-        <source>[ looking for ]</source>
-        <translation>[ recherche ]</translation>
-    </message>
-    <message>
-        <source>Enter IMDB #</source>
-        <translation>Inscrire le N° IMDB</translation>
-    </message>
-    <message>
-        <source>loading...</source>
-        <translation>chargement en cours...</translation>
-    </message>
-    <message>
-        <source>No Videos Found</source>
-        <translation>Aucune vidéo trouvée</translation>
+        <translation>Fichier affiche :</translation>
     </message>
     <message>
         <source>Directed by</source>
-        <translation>Réalisé par:</translation>
-    </message>
-    <message>
-        <source>File:</source>
-        <translation>Fichier:</translation>
-    </message>
-    <message>
-        <source>Player:</source>
-        <translation>Lecteur:</translation>
+        <translation>Réalisé par</translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
@@ -956,19 +884,19 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Extension:</source>
-        <translation>Extension:</translation>
+        <translation>Extension :</translation>
     </message>
     <message>
         <source>Command:</source>
-        <translation>Commande:</translation>
+        <translation>Commande :</translation>
     </message>
     <message>
         <source>Use default player:</source>
-        <translation>Lecteur par défaut:</translation>
+        <translation>Lecteur par défaut :</translation>
     </message>
     <message>
         <source>Ignore:</source>
-        <translation>Ignoré:</translation>
+        <translation>Ignoré :</translation>
     </message>
     <message>
         <source>Edit Video Information</source>
@@ -976,99 +904,75 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Name:</source>
-        <translation>Nom:</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <source>Parental Control:</source>
-        <translation>Niveau parental:</translation>
+        <translation>Niveau parental :</translation>
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation>Fichier à lire ensuite:</translation>
+        <translation>Fichier à toujours lire ensuite :</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
-        <translation>Inclure dans la liste:</translation>
+        <translation>Inclure lors de la navigation :</translation>
     </message>
     <message>
         <source>Cover Art:</source>
-        <translation>Affiche:</translation>
+        <translation>Affiche :</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
         <translation>/Chemin/d&apos;accès/à/l&apos;affiche.jpg</translation>
     </message>
     <message>
-        <source>1</source>
-        <translation>1</translation>
-    </message>
-    <message>
-        <source>PL </source>
-        <translation>PL </translation>
-    </message>
-    <message>
         <source>Unique Player Command:</source>
-        <translation>Commande du lecteur:</translation>
+        <translation>Commande du lecteur :</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation>Catégorie</translation>
+        <translation>Catégorie :</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation>Liste de filtres vidéo</translation>
+        <translation>Liste des filtres vidéo</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation>Catégorie:</translation>
+        <translation>Catégorie :</translation>
     </message>
     <message>
         <source>Genre :</source>
-        <translation>Genre:</translation>
+        <translation>Genre :</translation>
     </message>
     <message>
         <source>Country :</source>
-        <translation>Pays:</translation>
+        <translation>Pays :</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation>Année:</translation>
+        <translation>Année :</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation>Durée:</translation>
+        <translation>Durée :</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation>Évaluation:</translation>
+        <translation>Évaluation :</translation>
     </message>
     <message>
         <source>Browse :</source>
-        <translation>Navigable:</translation>
+        <translation>Afficher :</translation>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation>Trier par:</translation>
-    </message>
-    <message>
-        <source>Aucune video</source>
-        <translation>Aucune vidéo</translation>
-    </message>
-    <message>
-        <source>SELECT: Edit</source>
-        <translation>Sélect: Éditer</translation>
+        <translation>Trier par :</translation>
     </message>
     <message>
         <source></source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Parental</source>
-        <translation>Niveau</translation>
-    </message>
-    <message>
-        <source>Level</source>
-        <translation>parental</translation>
     </message>
     <message>
         <source>Year</source>
@@ -1083,68 +987,160 @@ Check VideoManager Settings</source>
         <translation>Évaluation</translation>
     </message>
     <message>
-        <source>INFO - Action Menu</source>
-        <translation>Info - Menu Actions</translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation>Haut/Bas, Page Haut/Bas: Naviguer   MENU: Options   INFO: Menu Action</translation>
-    </message>
-    <message>
-        <source>Play File After This:</source>
-        <translation>Jouer ensuite le fichier suivant:</translation>
-    </message>
-    <message>
         <source>Rip/Transcode</source>
         <translation>Extraction/Encodage</translation>
     </message>
     <message>
         <source>Job 1 of 1</source>
-        <translation>Tâche 1 de 1</translation>
+        <translation>Tâche 1 sur 1</translation>
     </message>
     <message>
         <source>Length:</source>
-        <translation>Durée:</translation>
+        <translation>Durée :</translation>
     </message>
     <message>
         <source>Select:</source>
-        <translation>Copié:</translation>
+        <translation>Sélection :</translation>
     </message>
     <message>
         <source>Quality:</source>
-        <translation>Qualité:</translation>
+        <translation>Qualité :</translation>
     </message>
     <message>
         <source>Audio Track:</source>
-        <translation>Piste audio:</translation>
+        <translation>Piste audio :</translation>
     </message>
     <message>
         <source>AC3 Audio:</source>
-        <translation>Audio AC3:</translation>
+        <translation>Audio AC3 :</translation>
     </message>
     <message>
         <source>Subtitles:</source>
-        <translation>Sous-titres:</translation>
+        <translation>Sous-titres :</translation>
     </message>
     <message>
         <source>View:</source>
-        <translation>Voir:</translation>
+        <translation>Vue :</translation>
     </message>
     <message>
         <source>Title 1 of 1</source>
-        <translation>Titre 1 de 1</translation>
+        <translation>Titre 1 sur 1</translation>
     </message>
     <message>
         <source>0:00:00</source>
         <translation>0:00:00</translation>
     </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Directed by:</source>
+        <translation>Réalisé par :</translation>
+    </message>
+    <message>
+        <source>User Rating:</source>
+        <translation>Évaluation :</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Valider</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Lecture</translation>
+    </message>
+    <message>
+        <source>Lowest</source>
+        <translation>Le plus bas</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>Bas</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Moyen</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>Haut</translation>
+    </message>
+    <message>
+        <source>Video Num.:</source>
+        <translation>Num. vidéo :</translation>
+    </message>
+    <message>
+        <source>Parental Level</source>
+        <translation>Niveau parental</translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation>Titre :</translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation>Sous-titre :</translation>
+    </message>
+    <message>
+        <source>Season:</source>
+        <translation>Saison :</translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation>Épisode :</translation>
+    </message>
+    <message>
+        <source>Item has been watched:</source>
+        <translation>L&apos;élément a été vu :</translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation>Capture d&apos;écran :</translation>
+    </message>
+    <message>
+        <source>Banner:</source>
+        <translation>Bannière :</translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation>Fanart :</translation>
+    </message>
+    <message>
+        <source>Trailer:</source>
+        <translation>Bande-annonce :</translation>
+    </message>
+    <message>
+        <source>Text Filter:</source>
+        <translation>Filtre texte :</translation>
+    </message>
+    <message>
+        <source>Actor/Actress :</source>
+        <translation>Acteur/Actrice :</translation>
+    </message>
+    <message>
+        <source>InetRef :</source>
+        <translation>InetRef :</translation>
+    </message>
+    <message>
+        <source>Cover File :</source>
+        <translation>Fichier affiche :</translation>
+    </message>
+    <message>
+        <source>Watched :</source>
+        <translation>Vu :</translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation>Résultat</translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation>Sauvegarder en valeur par défaut</translation>
+    </message>
 </context>
 <context>
     <name>TitleDialog</name>
-    <message>
-        <source>Unkown</source>
-        <translation type="obsolete">Inconnu</translation>
-    </message>
     <message>
         <source>%1 - Title %2</source>
         <translation>%1 - Titre %2</translation>
@@ -1162,14 +1158,6 @@ Check VideoManager Settings</source>
         <translation>Titre %1 de %2</translation>
     </message>
     <message>
-        <source>0 Process Selected Title</source>
-        <translation type="obsolete">0 Encoder le titre sélectionné</translation>
-    </message>
-    <message>
-        <source>0 Process Selected Titles</source>
-        <translation type="obsolete">0 Encoder les titres sélectionnés</translation>
-    </message>
-    <message>
         <source>ISO Image</source>
         <translation>Image ISO</translation>
     </message>
@@ -1183,73 +1171,288 @@ Check VideoManager Settings</source>
     </message>
 </context>
 <context>
-    <name>VideoBrowser</name>
+    <name>VideoDialog</name>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation>Passer en mode navigation</translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation>Passer en mode galerie</translation>
+    </message>
+    <message>
+        <source>Switch to List View</source>
+        <translation>Passer en mode liste</translation>
+    </message>
+    <message>
+        <source>No Videos Available</source>
+        <translation>Aucune vidéo disponible</translation>
+    </message>
     <message>
         <source>%1 of %2</source>
         <translation>%1 sur %2</translation>
     </message>
     <message>
-        <source>No Videos</source>
-        <translation>Pas de vidéos</translation>
+        <source>Video Info</source>
+        <translation>Info de la vidéo</translation>
     </message>
     <message>
-        <source>No rating available.</source>
-        <translation type="obsolete">Pas de note disponible.</translation>
+        <source>Scan For Changes</source>
+        <translation>Rechercher les modifications</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutes</translation>
-    </message>
-    <message>
-        <source>Watch This Video</source>
-        <translation>Regarder cette vidéo</translation>
-    </message>
-    <message>
-        <source>View Full Plot</source>
-        <translation>Voir le résumé complet</translation>
+        <source>Change View</source>
+        <translation>Modifier la vue</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filtrer</translation>
+        <translation>Filtrer l&apos;affichage</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
+        <source>Switch to Manage View</source>
+        <translation>Basculer vers la Vue Gestion</translation>
+    </message>
+    <message>
+        <source>Disable File Browse Mode</source>
+        <translation>Désactiver le mode Navigation des fichiers</translation>
+    </message>
+    <message>
+        <source>Enable File Browse Mode</source>
+        <translation>Activer le mode Navigation des fichiers</translation>
+    </message>
+    <message>
+        <source>Disable Flat View</source>
+        <translation>Désactiver la Vue À Plat</translation>
+    </message>
+    <message>
+        <source>Enable Flat View</source>
+        <translation>Activer la Vue À Plat</translation>
+    </message>
+    <message>
+        <source>View Details</source>
+        <translation>Voir les détails</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation>Voir le synopsis complet</translation>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>VideoDialog</name>
-    <message>
-        <source>Switch to Browse View</source>
-        <translation>Mode navigation</translation>
+        <translation>Voir la distribution</translation>
     </message>
     <message>
-        <source>Switch to Gallery View</source>
-        <translation>Mode galerie</translation>
+        <source>Edit Metadata</source>
+        <translation>Éditer les métadonnées</translation>
     </message>
     <message>
-        <source>Switch to List View</source>
-        <translation>Mode liste</translation>
+        <source>Download Metadata</source>
+        <translation>Télécharger les métadonnées</translation>
     </message>
     <message>
-        <source>Select action</source>
-        <translation>Choix action</translation>
+        <source>Manually Enter Video #</source>
+        <translation>Entrer manuellement le n° de la vidéo</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
+        <source>Manually Enter Video Title</source>
+        <translation>Entrer manuellement le titre de la vidéo</translation>
     </message>
     <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Code parental:</translation>
+        <source>Reset Metadata</source>
+        <translation>Remettre les métadonnées à zéro</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation>OK</translation>
+        <source>An error occurred when switching views.</source>
+        <translation>Une erreur est survenue lors du changement de vue.</translation>
+    </message>
+    <message>
+        <source>Enter Video Unique ID:</source>
+        <translation>Entrez l&apos;ID unique de la vidéo :</translation>
+    </message>
+    <message>
+        <source>Enter Video Title:</source>
+        <translation>ENtrez le titre de la vidéo :</translation>
+    </message>
+    <message>
+        <source>Failed to delete file</source>
+        <translation>Échec de suppression du fichier</translation>
+    </message>
+    <message>
+        <source>Poster download finished: %1 %2</source>
+        <translation>Téléchargement du poster terminé : %1 %2</translation>
+    </message>
+    <message>
+        <source>A poster exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Un poster existe pour cet élément mais n&apos;a pu être récupéré dans le temps imparti.</translation>
+    </message>
+    <message>
+        <source>Fanart download finished: %1 %2</source>
+        <translation>Téléchargement d&apos;illustration terminé : %1 %2</translation>
+    </message>
+    <message>
+        <source>Fanart exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Une illustration existe pour cet élément mais n&apos;a pu être récupérée dans le temps imparti.</translation>
+    </message>
+    <message>
+        <source>No matches were found.</source>
+        <translation>Aucune correspondance trouvée.</translation>
+    </message>
+    <message>
+        <source>Video Search</source>
+        <translation>Recherche Vidéo</translation>
+    </message>
+    <message>
+        <source>Video Options
+%1</source>
+        <translation>Options Vidéo
+%1</translation>
+    </message>
+    <message>
+        <source>Video Options</source>
+        <translation>Options Vidéo</translation>
+    </message>
+    <message>
+        <source>Play...</source>
+        <translation>Lecture...</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Lecture</translation>
+    </message>
+    <message>
+        <source>Mark as Unwatched</source>
+        <translation>Marquer comme Non Vu</translation>
+    </message>
+    <message>
+        <source>Mark as Watched</source>
+        <translation>Marquer comme Vu</translation>
+    </message>
+    <message>
+        <source>Metadata Options</source>
+        <translation>Options Métadonnées</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>Play Folder</source>
+        <translation>Lecture du dossier</translation>
+    </message>
+    <message>
+        <source>Playback Options
+%1</source>
+        <translation>Options de lecture
+%1</translation>
+    </message>
+    <message>
+        <source>Play With Trailers</source>
+        <translation>Lecture avec bandes-annonces</translation>
+    </message>
+    <message>
+        <source>Play Trailer</source>
+        <translation>Lecture de bande-annonce</translation>
+    </message>
+    <message>
+        <source>Video Display Menu</source>
+        <translation>Menu d&apos;affichage des vidéos</translation>
+    </message>
+    <message>
+        <source>Browse By...</source>
+        <translation>Parcourir par...</translation>
+    </message>
+    <message>
+        <source>Browse By</source>
+        <translation>Parcourir par</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Distribution</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Catégorie</translation>
+    </message>
+    <message>
+        <source>Date Added</source>
+        <translation>Date d&apos;ajout</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Réalisateur</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Dossier</translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation>Genre</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation>Évaluation</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation>Année</translation>
+    </message>
+    <message>
+        <source>Mark as Non-Browseable</source>
+        <translation>Marquer comme Non affichable</translation>
+    </message>
+    <message>
+        <source>Mark as Browseable</source>
+        <translation>Marquer comme Affichable</translation>
+    </message>
+    <message>
+        <source>Manage Metadata</source>
+        <translation>Gérer les Métadonnées</translation>
+    </message>
+    <message>
+        <source>Download Images Only</source>
+        <translation>Télécharger uniquement les images</translation>
+    </message>
+    <message>
+        <source>Search TV by Title/Subtitle</source>
+        <translation>Rechercher la TV par Titre/Sous-titre</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete:
+%1</source>
+        <translation>Êtes-vous sûr de vouloir supprimer :
+%1</translation>
+    </message>
+    <message>
+        <source>Screenshot download finished: %1 %2</source>
+        <translation>Téléchargement de capture d&apos;écran terminé : %1 %2</translation>
+    </message>
+    <message>
+        <source>Screenshot exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Une capture d&apos;écran existe pour cet élément mais n&apos;a pu être récupérée dans le délai imparti.</translation>
+    </message>
+    <message>
+        <source>Banner download finished: %1 %2</source>
+        <translation>Téléchargement de la bannière terminé : %1 %2</translation>
+    </message>
+    <message>
+        <source>Banner exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Une bannière existe pour cet élément mais n&apos;a pu être récupérée dans le délai imparti.</translation>
+    </message>
+    <message>
+        <source>Season</source>
+        <translation>Saison</translation>
+    </message>
+    <message>
+        <source>Play in Alternate Player</source>
+        <translation>Lire dans le lecteur alternatif</translation>
+    </message>
+    <message>
+        <source>TV/Movies</source>
+        <translation>TV/Films</translation>
     </message>
 </context>
 <context>
@@ -1263,231 +1466,92 @@ Check VideoManager Settings</source>
         <translation>Résultats de ce filtre : Aucune vidéo</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Inconnu</translation>
-    </message>
-    <message>
         <source>minutes</source>
         <translation>minutes</translation>
     </message>
+</context>
+<context>
+    <name>VideoScanner</name>
     <message>
-        <source>All</source>
-        <translation type="obsolete">tous</translation>
+        <source>Failed to Scan SG Video Hosts</source>
+        <translation>Échec d&apos;analyse des hôtes vidéo SG</translation>
     </message>
     <message>
-        <source>Save as default</source>
-        <translation>Filtre par défaut</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation>Valider</translation>
+        <source>If they no longer exist please remove them</source>
+        <translation>S&apos;ils n&apos;existent plus, veuillez les supprimer</translation>
     </message>
 </context>
 <context>
-    <name>VideoGallery</name>
+    <name>VideoScannerThread</name>
     <message>
-        <source>Watch This Video</source>
-        <translation>Regarder cette vidéo</translation>
+        <source>Searching for video files</source>
+        <translation>Recherche des fichiers vidéo</translation>
     </message>
     <message>
-        <source>View Full Plot</source>
-        <translation>Voir le résumé complet</translation>
+        <source>Verifying video files</source>
+        <translation>Vérification des fichiers vidéo</translation>
     </message>
     <message>
-        <source>View Details</source>
-        <translation>Voir les détails</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation>Filtrage</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <source>Updating video database</source>
+        <translation>Mise à jour de la base de données des vidéos</translation>
     </message>
 </context>
 <context>
-    <name>VideoManager</name>
+    <name>video_settings_xml</name>
     <message>
-        <source>Manually Enter IMDB #</source>
-        <translation type="obsolete">Entrer le n° allociné</translation>
+        <source>General Settings</source>
+        <translation>Réglages généraux</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuler</translation>
+        <source>Player Settings</source>
+        <translation>Réglages du lecteur</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutes</translation>
+        <source>File Types</source>
+        <translation>Types de fichier</translation>
     </message>
     <message>
-        <source>Yes</source>
-        <translation type="obsolete">Oui</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation type="obsolete">Non</translation>
-    </message>
-    <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Pas d&apos;affiche</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Inconnu</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="obsolete">Aucun</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">NR</translation>
-    </message>
-    <message>
-        <source>delete failed</source>
-        <translation type="obsolete">échec de l&apos;effacement</translation>
-    </message>
-    <message>
-        <source>Select action:</source>
-        <translation type="obsolete">Choix d&apos;action:</translation>
-    </message>
-    <message>
-        <source>Edit Metadata</source>
-        <translation type="obsolete">Édition des données</translation>
-    </message>
-    <message>
-        <source>Search IMDB</source>
-        <translation type="obsolete">Recherche allociné</translation>
-    </message>
-    <message>
-        <source>Reset Metadata</source>
-        <translation type="obsolete">Effacer les données</translation>
-    </message>
-    <message>
-        <source>Toggle Browseable</source>
-        <translation type="obsolete">Navigable O/N</translation>
-    </message>
-    <message>
-        <source>Remove Video</source>
-        <translation type="obsolete">Supprimer la vidéo</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filtre d&apos;affichage</translation>
-    </message>
-    <message>
-        <source>Delete this file?</source>
-        <translation type="obsolete">Effacer ce fichier ?</translation>
+        <source>Rip Settings</source>
+        <translation>Réglages d&apos;extraction</translation>
     </message>
 </context>
 <context>
-    <name>VideoSelected</name>
+    <name>videomenu_xml</name>
     <message>
-        <source>No rating available.</source>
-        <translation type="obsolete">Pas de note disponible.</translation>
+        <source>Browse Videos</source>
+        <translation>Parcourir les vidéos</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minutes</translation>
-    </message>
-</context>
-<context>
-    <name>VideoTree</name>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Code parental:</translation>
+        <source>Video List</source>
+        <translation>Liste des vidéos</translation>
     </message>
     <message>
-        <source>Select action</source>
-        <translation>Choix action</translation>
+        <source>Video Gallery</source>
+        <translation>Galerie vidéo</translation>
     </message>
     <message>
-        <source>Watch This Video</source>
-        <translation>Regarder cette vidéo</translation>
+        <source>Video Manager</source>
+        <translation>Gestionaire de vidéos</translation>
     </message>
     <message>
-        <source>View Full Plot</source>
-        <translation>Montrer l&apos;affiche</translation>
+        <source>Play DVD</source>
+        <translation>Lire un DVD</translation>
     </message>
     <message>
-        <source>Filter Display</source>
-        <translation>Filtre d&apos;affichage</translation>
+        <source>Play VCD</source>
+        <translation>Lire un VCD</translation>
     </message>
     <message>
-        <source>Switch to Browse View</source>
-        <translation>Mode navigation</translation>
+        <source>Rip DVD</source>
+        <translation>Extraire un DVD</translation>
     </message>
     <message>
-        <source>Switch to Gallery View</source>
-        <translation>Mode galerie</translation>
+        <source>Eject media</source>
+        <translation>Éjecter un média</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>mythvideo_videomanager::VideoManagerImp</name>
-    <message>
-        <source>Select action:</source>
-        <translation>Choix d&apos;action:</translation>
-    </message>
-    <message>
-        <source>Edit Metadata</source>
-        <translation>Édition des métadonnées</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation>Rechercher</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video #</source>
-        <translation>Entrer le N° de la vidéo manuellement</translation>
-    </message>
-    <message>
-        <source>Reset Metadata</source>
-        <translation>Effacer les métadonnées</translation>
-    </message>
-    <message>
-        <source>Toggle Browseable</source>
-        <translation>Navigable O/N</translation>
-    </message>
-    <message>
-        <source>Remove Video</source>
-        <translation>Supprimer la vidéo</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation>Filtrer l&apos;affichage</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Delete this file?</source>
-        <translation>Effacer ce fichier?</translation>
-    </message>
-    <message>
-        <source>delete failed</source>
-        <translation>Impossible d&apos;effacer</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video Title</source>
-        <translation type="unfinished"></translation>
+        <source>Videos Settings</source>
+        <translation>Réglages Vidéos</translation>
     </message>
 </context>
 </TS>

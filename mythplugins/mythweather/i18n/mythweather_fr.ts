@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="fr_FR">
 <context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Conditions actuelles</translation>
     </message>
     <message>
         <source>Three Day Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Prévision à trois jours</translation>
     </message>
     <message>
         <source>18 Hour Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Prévision sous 18 heures</translation>
     </message>
     <message>
         <source>Severe Weather Alerts</source>
-        <translation type="unfinished"></translation>
+        <translation>Alertes météo importantes</translation>
     </message>
     <message>
         <source>Six Day Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Prévision à six jours</translation>
     </message>
     <message>
         <source>Static Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Carte statique</translation>
     </message>
     <message>
         <source>Animated Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Carte animée</translation>
     </message>
 </context>
 <context>
@@ -568,18 +568,6 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>loading...</source>
-        <translation>Chargement...</translation>
-    </message>
-    <message>
-        <source>[ retrieving weather data ... ]</source>
-        <translation>[ recherche des prévisions météo... ]</translation>
-    </message>
-    <message>
-        <source>current conditions</source>
-        <translation>Conditions actuelles</translation>
-    </message>
-    <message>
         <source>Humidity</source>
         <translation>Humidité</translation>
     </message>
@@ -588,428 +576,133 @@
         <translation>Pression</translation>
     </message>
     <message>
-        <source>Wind</source>
-        <translation>Vent</translation>
-    </message>
-    <message>
         <source>Visibility</source>
         <translation>Visibilité</translation>
     </message>
     <message>
-        <source>Wind Chill</source>
-        <translation>Sensation</translation>
-    </message>
-    <message>
-        <source>UV Index</source>
-        <translation>Indice UV</translation>
-    </message>
-    <message>
-        <source>extended forecast</source>
-        <translation>Les 3 prochains jours</translation>
-    </message>
-    <message>
-        <source>LO</source>
-        <translation>MIN</translation>
-    </message>
-    <message>
-        <source>HI</source>
-        <translation>MAX</translation>
-    </message>
-    <message>
-        <source>today&apos;s forecast</source>
-        <translation>Prévisions du jour</translation>
-    </message>
-    <message>
-        <source>tomorrow&apos;s outlook</source>
-        <translation>Prévisions pour demain</translation>
-    </message>
-    <message>
-        <source>Forecast for</source>
-        <translation>Le temps de</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation>Image satellite</translation>
-    </message>
-    <message>
-        <source>Map Unavailable</source>
-        <translation>Carte indisponible</translation>
-    </message>
-    <message>
-        <source>RAIN</source>
-        <translation>PLUIE</translation>
-    </message>
-    <message>
-        <source>MIX/ICE</source>
-        <translation>GRÉSIL</translation>
-    </message>
-    <message>
-        <source>SNOW</source>
-        <translation>NEIGE</translation>
-    </message>
-    <message>
-        <source>LIGHT</source>
-        <translation>LÉGER</translation>
-    </message>
-    <message>
-        <source>HEAVY</source>
-        <translation>FORT</translation>
-    </message>
-    <message>
-        <source>Enter Zip Code</source>
-        <translation>Code Postal</translation>
-    </message>
-    <message>
-        <source>weather setup</source>
-        <translation>Paramétrage météo</translation>
-    </message>
-    <message>
-        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation>Pour enregistrer, appuyez sur &apos;i&apos; - Pour annuler, appuyez sur Escape</translation>
-    </message>
-    <message>
-        <source>COLD</source>
-        <translation>FROID</translation>
-    </message>
-    <message>
-        <source>COLDEST</source>
-        <translation>TRES FROID</translation>
-    </message>
-    <message>
-        <source>CLOUD TEMPERATURE</source>
-        <translation>TEMPERATURE NUAGES</translation>
-    </message>
-    <message>
         <source>Wind(Gust)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vent (Bourrasques)</translation>
     </message>
     <message>
         <source>Wind Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Direction du vent</translation>
     </message>
     <message>
         <source>Feels Like</source>
-        <translation type="unfinished"></translation>
+        <translation>Sensation de</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Élevé</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Faible</translation>
     </message>
     <message>
         <source>Global Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages globaux</translation>
     </message>
     <message>
         <source>Seconds to display each page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Secondes d&apos;affichage de chaque page :</translation>
     </message>
     <message>
         <source>Retrieve data in the background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Récupérer les données en arrière-plan : </translation>
     </message>
     <message>
         <source>Source Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration de la source</translation>
     </message>
     <message>
         <source>Data Retrieval Interval (minutes):</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalle de récupération des données (minutes) : </translation>
     </message>
     <message>
         <source>Source Update Timeout (seconds):</source>
-        <translation type="unfinished"></translation>
+        <translation>Délai d&apos;attente de mise à jour de la source (secondes) : </translation>
+    </message>
+    <message>
+        <source>Weather Alerts</source>
+        <translation>Alertes météo</translation>
+    </message>
+    <message>
+        <source>Temp</source>
+        <translation>Temp</translation>
+    </message>
+    <message>
+        <source>Precip</source>
+        <translation>Précip</translation>
+    </message>
+    <message>
+        <source>Screen Setup</source>
+        <translation>Configuration d&apos;écran</translation>
+    </message>
+    <message>
+        <source>Location Search</source>
+        <translation>Recherche d&apos;emplacement</translation>
+    </message>
+    <message>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation>Entrez votre emplacement actuel, le plus près d&apos;une grande ville. Dans certains pays le code postal est également supporté.</translation>
+    </message>
+    <message>
+        <source>Enter Location:</source>
+        <translation>Entrez l&apos;emplacement :</translation>
     </message>
 </context>
 <context>
     <name>Weather</name>
     <message>
-        <source> is invalid)</source>
-        <translation type="obsolete"> est invalide)</translation>
-    </message>
-    <message>
-        <source>   No Location Set, Please read the README</source>
-        <translation type="obsolete">  Lieu non précisé. Merci de lire le fichier README</translation>
-    </message>
-    <message>
-        <source>Configuring MythWeather...</source>
-        <translation type="obsolete">Configuration de MythWeather...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select unit conversion...</source>
-        <translation type="obsolete">Utilisez la flèche de droite pour choisir l&apos;unité...</translation>
-    </message>
-    <message>
-        <source>Weather Units</source>
-        <translation type="obsolete">Unités</translation>
-    </message>
-    <message>
-        <source>Location</source>
-        <translation type="obsolete">Lieu</translation>
-    </message>
-    <message>
-        <source>Aggressiveness</source>
-        <translation type="obsolete">Type de connexion</translation>
-    </message>
-    <message>
-        <source>Configuration Saved...</source>
-        <translation type="obsolete">Configuration enregistrée...</translation>
-    </message>
-    <message>
-        <source>Retrieving weather data...</source>
-        <translation type="obsolete">Acquisition des données météo...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select your location...</source>
-        <translation type="obsolete">Choix du lieu avec la flèche de droite...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation type="obsolete">Choix du type de connexion avec la flèche de droite...</translation>
-    </message>
-    <message>
-        <source> 1  High Speed Connection</source>
-        <translation type="obsolete">1 Connexion Haut Débit</translation>
-    </message>
-    <message>
-        <source> 8  Medium Speed Connection</source>
-        <translation type="obsolete">8 Connexion Débit Moyen</translation>
-    </message>
-    <message>
-        <source> 15 Low Speed Connection</source>
-        <translation type="obsolete">15 Connexion Bas Débit</translation>
-    </message>
-    <message>
-        <source>Obtaining initial weather data...</source>
-        <translation type="obsolete">Acquisition des données météo...</translation>
-    </message>
-    <message>
-        <source>Updating weather data...</source>
-        <translation type="obsolete">Mise à jour des données météo...</translation>
-    </message>
-    <message>
-        <source>Calm</source>
-        <translation type="obsolete">Calme </translation>
-    </message>
-    <message>
-        <source> at </source>
-        <translation type="obsolete"> à </translation>
-    </message>
-    <message>
-        <source>Unlimited</source>
-        <translation type="obsolete">illimité</translation>
-    </message>
-    <message>
-        <source> (minimal)</source>
-        <translation type="obsolete"> (minimal)</translation>
-    </message>
-    <message>
-        <source> (moderate)</source>
-        <translation type="obsolete"> (modéré)</translation>
-    </message>
-    <message>
-        <source> (high)</source>
-        <translation type="obsolete"> (élevé)</translation>
-    </message>
-    <message>
-        <source> (extreme)</source>
-        <translation type="obsolete"> (extrême)</translation>
-    </message>
-    <message>
-        <source>Today a high of </source>
-        <translation type="obsolete">Aujourd&apos;hui, les maximales seront de </translation>
-    </message>
-    <message>
-        <source> and a low of </source>
-        <translation type="obsolete"> °C et la minimale de </translation>
-    </message>
-    <message>
-        <source>. Currently there is a humidity of </source>
-        <translation type="obsolete">°C. Le taux d&apos;humidité actuel est de </translation>
-    </message>
-    <message>
-        <source>% and the winds are</source>
-        <translation type="obsolete">% et le vent </translation>
-    </message>
-    <message>
-        <source> calm.</source>
-        <translation type="obsolete">est calme. </translation>
-    </message>
-    <message>
-        <source> coming in at </source>
-        <translation type="obsolete"> souffle à </translation>
-    </message>
-    <message>
-        <source> mph from the </source>
-        <translation type="obsolete">mph de secteur </translation>
-    </message>
-    <message>
-        <source> Km/h from the </source>
-        <translation type="obsolete"> km/h de secteur </translation>
-    </message>
-    <message>
-        <source> Visibility will be unlimited for today.</source>
-        <translation type="obsolete"> La visibilité du jour est illimitée.</translation>
-    </message>
-    <message>
-        <source> Visibility conditions are unknown.</source>
-        <translation type="obsolete"> Les conditions de visibilité sont inconnues.</translation>
-    </message>
-    <message>
-        <source> There will be a visibility of </source>
-        <translation type="obsolete"> La visibilité sera de </translation>
-    </message>
-    <message>
-        <source> miles.</source>
-        <translation type="obsolete"> miles.</translation>
-    </message>
-    <message>
-        <source> km.</source>
-        <translation type="obsolete"> km.</translation>
-    </message>
-    <message>
-        <source>Sunday</source>
-        <translation type="obsolete">Dimanche</translation>
-    </message>
-    <message>
-        <source>Monday</source>
-        <translation type="obsolete">Lundi</translation>
-    </message>
-    <message>
-        <source>Tuesday</source>
-        <translation type="obsolete">Mardi</translation>
-    </message>
-    <message>
-        <source>Wednesday</source>
-        <translation type="obsolete">Mercredi</translation>
-    </message>
-    <message>
-        <source>Thursday</source>
-        <translation type="obsolete">Jeudi</translation>
-    </message>
-    <message>
-        <source>Friday</source>
-        <translation type="obsolete">Vendredi</translation>
-    </message>
-    <message>
-        <source>Saturday</source>
-        <translation type="obsolete">Samedi</translation>
-    </message>
-    <message>
-        <source>Date Error</source>
-        <translation type="obsolete">Erreur de date</translation>
-    </message>
-    <message>
-        <source>Tomorrow expect a high of </source>
-        <translation type="obsolete">Demain, la maximale sera de </translation>
-    </message>
-    <message>
-        <source>Expected conditions: </source>
-        <translation type="obsolete">Prévision : </translation>
-    </message>
-    <message>
-        <source>Weather data from: </source>
-        <translation type="obsolete">Bulletin météo du </translation>
-    </message>
-    <message>
-        <source>Updating...</source>
-        <translation type="obsolete">Mise à jour...</translation>
-    </message>
-    <message>
-        <source> (Not All Information Available)</source>
-        <translation type="obsolete">(Certaines informations sont indisponibles)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="obsolete">*** Code Inconnu ou Erreur du Serveur ***</translation>
-    </message>
-    <message>
-        <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="obsolete">Impérial (Fahrenheit, in, etc)</translation>
-    </message>
-    <message>
-        <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="obsolete">Métrique (Celsius, kPA, etc)</translation>
-    </message>
-    <message>
-        <source> F</source>
-        <translation type="obsolete"> °F</translation>
-    </message>
-    <message>
-        <source> C</source>
-        <translation type="obsolete"> °C</translation>
-    </message>
-    <message>
-        <source>.</source>
-        <translation type="obsolete">.</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Inconnu</translation>
-    </message>
-    <message>
-        <source> - PAUSED -</source>
-        <translation type="obsolete">- EN PAUSE -</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation type="obsolete">radar doppler</translation>
-    </message>
-    <message>
-        <source>satellite image</source>
-        <translation type="obsolete">image satellite</translation>
-    </message>
-    <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="obsolete">Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
-Presser OK pour essayer encore avec un délai plus grand. 
-Presser sur Annuler pour réessayer sans les données radar animées.</translation>
-    </message>
-    <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation type="obsolete">Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
-Presser OK pour essayer encore avec un délai plus grand. 
-Presser sur Annuler pour arrêter.</translation>
-    </message>
-    <message>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>En pause</translation>
     </message>
 </context>
 <context>
     <name>WeatherScreen</name>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished">Dimanche</translation>
+        <translation>Dimanche</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished">Lundi</translation>
+        <translation>Lundi</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished">Mardi</translation>
+        <translation>Mardi</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished">Mercredi</translation>
+        <translation>Mercredi</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished">Jeudi</translation>
+        <translation>Jeudi</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished">Vendredi</translation>
+        <translation>Vendredi</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished">Samedi</translation>
+        <translation>Samedi</translation>
+    </message>
+</context>
+<context>
+    <name>weather_settings_xml</name>
+    <message>
+        <source>Global Settings</source>
+        <translation>Réglages globaux</translation>
+    </message>
+    <message>
+        <source>Screen Settings</source>
+        <translation>Réglages d&apos;écran</translation>
+    </message>
+    <message>
+        <source>Source Settings</source>
+        <translation>Réglages des sources</translation>
     </message>
 </context>
 </TS>

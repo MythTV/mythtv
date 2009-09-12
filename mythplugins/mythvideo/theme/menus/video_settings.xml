@@ -9,7 +9,7 @@
       <text lang="DE">Grundeinstellungen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
-      <text lang="FR">Paramètres globaux</text>
+      <text lang="FR">Réglages généraux</text>
       <text lang="NL">Algemene Instellingen</text>
       <text lang="JA">全般設定</text>
       <text lang="IT">Generale</text>
@@ -30,7 +30,7 @@
       <text lang="DE">Wiedergabe</text>
       <text lang="PT">Configurar Leitura</text>
       <text lang="SV">Uppspelning</text>
-      <text lang="FR">paramètres de lecture</text>
+      <text lang="FR">Réglages du lecteur</text>
       <text lang="NL">Weergave Instellingen</text>
       <text lang="JA">プレイヤー設定</text>
       <text lang="IT">Player</text>
@@ -50,7 +50,7 @@
       <text lang="cA">Tipus d'arxius</text>
       <text lang="DE">Dateitypen</text>
       <text lang="ES">Tipos de archivos</text>
-      <text lang="FR">Types de fichiers</text>
+      <text lang="FR">Types de fichier</text>
       <text lang="NL">Bestandstypes</text>
       <text lang="JA">ファイルタイプ</text>
       <text lang="IT">Tipi di file</text>
@@ -73,7 +73,7 @@
       <text lang="SV">Inställningar för kopiering</text>
       <text lang="ES">Opciones de "ripear"</text>
       <text lang="CA">Opcions de volcat</text>
-      <text lang="FR">Paramètres d'encodage</text>
+      <text lang="FR">Réglages d&apos;extraction</text>
       <text lang="NL">DVD RIP instellingen</text>
       <text lang="JA">再生設定</text>
       <text lang="FI">Aseta DVD-Kopionti</text>
