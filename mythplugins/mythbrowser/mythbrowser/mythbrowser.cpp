@@ -69,8 +69,6 @@ bool MythBrowser::Create(void)
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
 
-    m_pageList->SetActive(false);
-
     if (m_progressBar)
         m_progressBar->SetTotal(100);
 
@@ -239,10 +237,7 @@ void MythBrowser::slotLoadStarted(void)
 {
     MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
-    {
         item->SetText(tr("Loading..."));
-        m_pageList->Update();
-    }
 }
 
 void MythBrowser::slotLoadFinished(bool OK)
@@ -265,10 +260,7 @@ void MythBrowser::slotTitleChanged(const QString &title)
 {
     MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
-    {
         item->SetText(title);
-        m_pageList->Update();
-    }
 }
 
 void MythBrowser::slotIconChanged(void)
@@ -298,8 +290,6 @@ void MythBrowser::slotIconChanged(void)
             item->setImage(mimage);
         }
     }
-
-    m_pageList->Update();
 }
 
 void MythBrowser::slotStatusBarMessage(const QString &text)
