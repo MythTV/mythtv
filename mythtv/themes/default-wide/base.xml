@@ -574,6 +574,11 @@
     <!-- Fullscreen Dialogue Box -->
     <window name="MythDialogBox">
 
+        <shape name="background" from="basebackground">
+            <area>0,0,1280,720</area>
+            <fill alpha="210" />
+        </shape>
+
         <textarea name="title" from="basetextarea">
             <area>20,15,1260,50</area>
             <font>baselarge</font>
