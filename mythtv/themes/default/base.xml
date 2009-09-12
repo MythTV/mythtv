@@ -553,13 +553,13 @@
                     <type>roundbox</type>
                     <cornerradius>4</cornerradius>
                     <fill color="#FFFFFF" alpha="200" />
-                </shape>       
+                </shape>
             </state>
             <state name="selected" from="active">
                 <shape name="background" from="baseselectedwidgetshape" />
                 <shape name="textbackground">
                     <fill color="#FFFFFF" alpha="255" />
-                </shape>       
+                </shape>
             </state>
             <state name="inactive" from="active" />
         </statetype>
@@ -632,7 +632,7 @@
 
         <shape name="background" from="basebackground">
             <area>0,0,800,600</area>
-            <fill alpha="210" />
+            <fill color="#000000" alpha="210" />
         </shape>
 
         <textarea name="title" from="basetextarea">
@@ -907,7 +907,7 @@
         <shape name="shape1">
             <area>0,0,800,600</area>
             <type>box</type>
-            <fill color="#000000" alpha="255"></fill>
+            <fill color="#000000" alpha="255" />
         </shape>
 
         <textarea name="title" from="basetextarea">
