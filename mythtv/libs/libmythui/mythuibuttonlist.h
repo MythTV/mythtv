@@ -112,8 +112,6 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     void SetDrawFromBottom(bool draw);
 
-    void SetActive(bool active);
-    bool IsActive() { return m_active; }
     void Reset();
     void Update();
 
@@ -178,6 +176,8 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void SetPositionArrowStates(void);
 
     void updateLCD(void);
+
+    void SetActive(bool active);
 
     /* methods for subclasses to override */
     virtual void CalculateVisibleItems(void);

@@ -164,11 +164,7 @@ void MythControls::ChangeButtonFocus(int direction)
         return;
 
     if (direction == 0)
-    {
         SetFocusWidget(m_actionButtons.at(0));
-        m_rightList->SetActive(false);
-        return;
-    }
 }
 
 /**

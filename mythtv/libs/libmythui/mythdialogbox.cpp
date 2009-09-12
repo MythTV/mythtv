@@ -73,10 +73,10 @@ bool MythDialogBox::Create(void)
     if (m_titlearea)
         m_titlearea->SetText(m_title);
     m_textarea->SetText(m_text);
-    m_buttonList->SetActive(true);
+    BuildFocusList();
 
     connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(Select(MythUIButtonListItem*)));
+            SLOT(Select(MythUIButtonListItem*)));
 
     return true;
 }
