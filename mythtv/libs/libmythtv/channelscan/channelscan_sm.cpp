@@ -36,7 +36,6 @@
 
 // MythTV includes - General
 #include "channelscan_sm.h"
-#include "scheduledrecording.h"
 #include "frequencies.h"
 #include "mythdbcon.h"
 #include "channelutil.h"
