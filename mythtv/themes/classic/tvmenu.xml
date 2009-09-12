@@ -28,7 +28,7 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="CA">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
-        <text lang="FR">Planifier les enregistrements</text>
+        <text lang="FR">Programmer les enregistrements</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="PT">Programar Gravações</text>
@@ -40,7 +40,7 @@
         <text lang="PL">Harmonogram nagrywania</text>
         <alttext>Schedule</alttext>
         <alttext lang="IT">Pianifica</alttext>
-        <alttext lang="FR">Planifier</alttext>
+        <alttext lang="FR">Programmation</alttext>
         <alttext lang="ES">Temporizadores</alttext>
         <alttext lang="CA">Temporitzadors</alttext>
         <alttext lang="DA">Optagelser</alttext>
@@ -90,7 +90,7 @@
         <text lang="ES">Borrar Grabaciones</text>
         <text lang="CA">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
-        <text lang="FR">Supprimer enregistrements</text>
+        <text lang="FR">Supprimer les enregistrements</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
         <text lang="PT">Apagar Gravações</text>
@@ -116,7 +116,7 @@
         <text lang="PT">Modo Directo de TV</text>
         <text lang="ES">TV directo</text>
         <text lang="CA">TV directe</text>
-        <text lang="FR">TV directe</text>
+        <text lang="FR">Mode direct</text>
         <text lang="DE">TV direkt</text>
         <text lang="SV">TV direkt</text>
         <text lang="JA">パススルーモード</text>
@@ -151,7 +151,7 @@
         <text>System Status</text>
         <text lang="IT">Stato del Sistema</text>
         <text lang="DE">Systemstatus</text>
-        <text lang="FR">Etat système</text>
+        <text lang="FR">État système</text>
         <text lang="SV">Systemstatus</text>
         <text lang="JA">システムステータス</text>
         <text lang="SL">Status sistema</text>
@@ -172,7 +172,7 @@
         <text lang="IT">Impostazioni TV</text>
         <text lang="CA">Configuració de TV</text>
         <text lang="ES">Configuración de TV</text>
-        <text lang="FR">Paramètres TV</text>
+        <text lang="FR">Réglages TV</text>
         <text lang="DE">TV</text>
         <text lang="DA">TV Indstillinger</text>
         <text lang="NL">TV Instellingen</text>

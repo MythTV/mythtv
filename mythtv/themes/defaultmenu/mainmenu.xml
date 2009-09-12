@@ -71,7 +71,7 @@
         <text>Information Center</text>
         <text lang="IT">Centro Informazioni</text>
         <text lang="DE">Informationen</text>
-        <text lang="FR">Informations</text>
+        <text lang="FR">Centre d&apos;informations</text>
         <text lang="IS">Upplýsinga miðstöð</text>
         <text lang="NL">Informatie Centrale</text>
         <text lang="SV">Informationscenter</text>
@@ -109,7 +109,7 @@
         <text>Optical Disks</text>
         <text lang="IT">CD/DVD</text>
         <text lang="DE">CD/DVD</text>
-        <text lang="FR">CD/DVD</text>
+        <text lang="FR">Disques optiques</text>
         <text lang="IS">Geisladiskar</text>
         <text lang="NL">DVD/CD</text>
         <text lang="SV">Optiska diskar</text>
@@ -167,7 +167,7 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configuración</text>
         <text lang="CS">Configurar</text>
-        <text lang="FR">paramètres</text>
+        <text lang="FR">Utilitaires / Configuration</text>
         <text lang="DE">Zubehör / Konfiguration</text>
         <text lang="DA">Tilbehør/Indstillinger</text>
         <text lang="IS">Uppsetning</text>
@@ -197,6 +197,7 @@
     <!-- <button>
         <type>SHUTDOWN</type>
         <text>Shutdown</text>
+        <text lang="FR">Éteindre</text>
         <text lang="SV">Avstängning</text>
         <text lang="DA">Sluk</text>
         <text lang="NL">Uitschakelen</text>

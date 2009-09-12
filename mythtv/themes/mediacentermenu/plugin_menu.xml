@@ -7,7 +7,7 @@
         <text lang="ES">Fotos</text>
         <text lang="CS">Imatges</text>
         <text lang="NL">Foto's</text>
-        <text lang="FR">Gallerie photo</text>
+        <text lang="FR">Galerie d&apos;images</text>
         <text lang="DE">Bilder ansehen</text>
         <text lang="DA">Billeder</text>
         <text lang="IS">Ljósmyndir</text>
@@ -35,7 +35,7 @@
         <text lang="ES">Juegos</text>
         <text lang="CS">Jocs</text>
         <text lang="NL">Spelen</text>
-        <text lang="FR">Jeux</text>
+        <text lang="FR">Jouer</text>
         <text lang="DE">Spielen</text>
         <text lang="DA">Spil</text>
         <text lang="IS">Spila leiki</text>
@@ -91,7 +91,7 @@
         <text lang="FI">Elokuvahaku</text>
         <text lang="SL">Kino program</text>
         <text lang="ET">Filmide ajad</text>
-        <text lang="FR">Programme Télé</text>
+        <text lang="FR">Horaires de cinéma</text>
         <text lang="SV">Biotider</text>
         <text lang="PT">Horário de Cinema</text>
         <text lang="DE">Kinoprogramm</text>
@@ -143,7 +143,7 @@
         <text lang="NL">MythFlix</text>
         <text lang="ET">MythFlix</text>
         <text lang="SL">MythFlix</text>
-        <text lang="FR">Location Films</text>
+        <text lang="FR">NetFlix</text>
         <text lang="PL">Filmy z internetu</text>
         <description>Manage your NetFlix queue</description>
         <action>PLUGIN mythflix</action>
@@ -180,6 +180,7 @@
     <button>
         <type>ZONEMINDER</type>
         <text>Zone Minder</text>
+        <text lang="FR">Zone Minder</text>
         <text lang="IT">Videosorveglianza</text>
         <text lang="PL">Strażnik</text>
         <text lang="FI">ZoneMinder</text>
@@ -191,6 +192,7 @@
     <button>
         <type>SMOLT</type>
         <text>Hardware profile</text>
+        <text lang="FR">Profil matériel</text>
         <description>Tell us what hardware you have so we can support it</description>
         <action>PLUGIN mythsmolt</action>
         <depends>mythsmolt</depends>

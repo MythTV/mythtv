@@ -7,7 +7,7 @@
         <text lang="ES">Guía de Programas</text>
         <text lang="CA">Guia de programes</text>
         <text lang="NL">Programmagids</text>
-        <text lang="FR">Grille des programmes</text>
+        <text lang="FR">Guide des programmes</text>
         <text lang="DE">Programmübersicht</text>
         <text lang="DA">Program Guide</text>
         <text lang="PT">Guia de Programação</text>
@@ -19,7 +19,7 @@
         <text lang="ET">Telekava</text>
         <text lang="RU">Программа передач</text>
         <alttext>Guide</alttext>
-        <alttext lang="FR">Grille</alttext>
+        <alttext lang="FR">Guide</alttext>
         <alttext lang="ES">Guía</alttext>
         <alttext lang="CA">Guia</alttext>
         <alttext lang="DE">EPG</alttext>
@@ -43,7 +43,7 @@
         <text lang="ES">Buscar Programas</text>
         <text lang="CA">Cercar programes</text>
         <text lang="NL">Programma's Zoeken</text>
-        <text lang="FR">Recherche d'émission</text>
+        <text lang="FR">Recherche de programme</text>
         <text lang="DE">Alphabetische Suche</text>
         <text lang="DA">Program SØger</text>
         <text lang="PT">Procurar Programas</text>
@@ -75,7 +75,7 @@
     <button>
         <type>TV_SEARCH_WORDS</type>
         <text>Search Words</text>
-        <text lang="FR">Recherche textuelle</text>
+        <text lang="FR">Rechercher des mots</text>
         <text lang="DE">Volltextsuche</text>
         <text lang="SV">Sök ord</text>
         <text lang="NL">Woorden Zoeken</text>
@@ -89,7 +89,7 @@
         <text lang="ES">Palabras</text>
         <text lang="RU">Поиск слов</text>
         <alttext>Search</alttext>
-        <alttext lang="FR">Texte</alttext>
+        <alttext lang="FR">Rechercher</alttext>
         <alttext lang="NL">Zoeken</alttext>
         <alttext lang="SV">Ord</alttext>
         <alttext lang="DE">Wörter</alttext>
@@ -107,7 +107,7 @@
         <text>Search Lists</text>
         <text lang="SV">Sök listor</text>
         <text lang="NL">Overzichtslijsten</text>
-        <text lang="FR">Listes de recherches</text>
+        <text lang="FR">Rechercher dans les listes</text>
         <text lang="JA">リスト検索</text>
         <text lang="DE">Listensuche</text>
         <text lang="FI">Etsi Oppaasta</text>
@@ -137,7 +137,7 @@
         <text lang="SV">Avancerad</text>
         <text lang="NL">Geavanceerd Opnameschema</text>
         <text lang="JA">カスタム録画</text>
-        <text lang="FR">Enregistrement avancé</text>
+        <text lang="FR">Recherche Personnalisée</text>
         <text lang="DE">freie Planung</text>
         <text lang="FI">Edistyneet Valinnat</text>
         <text lang="SL">Poljubno snemanje</text>
@@ -171,7 +171,7 @@
         <alttext lang="ES">Manual</alttext>
         <alttext lang="CA">Programar</alttext>
         <alttext lang="DE">Manuell</alttext>
-        <alttext lang="FR">Prog. Man.</alttext>
+        <alttext lang="FR">Prog. man.</alttext>
         <alttext lang="DA">Manuel prog.</alttext>
         <alttext lang="NL">Manueel</alttext>
         <alttext lang="PT">Manual</alttext>

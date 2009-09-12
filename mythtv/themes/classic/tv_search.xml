@@ -26,7 +26,7 @@
         <type>TV_SEARCH_KEYWORDS</type>
         <text>Keywords</text>
         <text lang="IT">Parole Chiavi</text>
-        <text lang="FR">Mots clés</text>
+        <text lang="FR">Mots-clés</text>
         <text lang="DE">nach Inhalt</text>
         <text lang="SV">Nyckelord</text>
         <text lang="NL">Beschrijving</text>     
@@ -48,7 +48,7 @@
         <type>TV_SEARCH_PEOPLE</type>
         <text>People</text>
         <text lang="IT">Persone</text>
-        <text lang="FR">Personnages</text>
+        <text lang="FR">Personnes</text>
         <text lang="SV">Person</text>
         <text lang="JA">人</text>
         <text lang="DE">nach Personen</text>
@@ -180,7 +180,7 @@
         <text>Time</text>
         <text lang="IT">Ora</text>
         <text lang="NL">Tijdstip</text>
-        <text lang="FR">Heure</text>
+        <text lang="FR">Date</text>
         <text lang="SV">Tid</text>
         <text lang="JA">時間</text>
         <text lang="DE">Sendezeit</text>
@@ -200,6 +200,7 @@
     <button>
         <type>TV_SEARCH_STORED</type>
         <text>Stored Searches</text>
+        <text lang="FR">Recherches stockées</text>
         <text lang="SL">Shranjena iskanja</text>
         <text lang="PL">Znaleziony zapamiętany</text>
         <description>Results of searches you have saved</description>

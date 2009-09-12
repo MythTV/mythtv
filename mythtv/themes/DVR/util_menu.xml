@@ -4,7 +4,7 @@
         <type>TV</type>
         <text>TV Utilities</text>
         <text lang="PT">Televisão</text>
-        <text lang="FR">TV</text>
+        <text lang="FR">Utilitaires TV</text>
         <text lang="SV">TV</text>
         <text lang="DE">TV</text>
         <text lang="SL">TV</text>
@@ -60,6 +60,7 @@
     <button>
         <type>FM</type>
         <text>Radio</text>
+        <text lang="FR">Radio</text>
         <text lang="DE">Radio</text>
         <text lang="SL">Radio</text>
         <text lang="ET">Raadio</text>
@@ -194,7 +195,7 @@
         <text>Burn DVD</text>
         <text lang="PT">Gravar DVD</text>
         <text lang="ES">Grabar DVD</text>
-        <text lang="FR">Graver DVD</text>
+        <text lang="FR">Gravure DVD</text>
         <text lang="NL">DVD Branden</text>
         <text lang="JA">DVD書込</text>
         <text lang="ET">DVD kirjutamine</text>
@@ -210,7 +211,7 @@
         <text lang="SL">Recepti</text>
         <text lang="ET">Retseptid</text>
         <text lang="SV">Recept</text>
-        <text lang="FR">Recette</text>
+        <text lang="FR">Recettes</text>
         <text lang="DA">Opskrifter</text>
         <text lang="PT">Receitas</text>
         <text lang="ES">Recetas</text>
@@ -225,7 +226,7 @@
         <type>ARCHIVE</type>
         <text>Archive Files</text>
         <text lang="ET">Arhiveerimine</text>
-        <text lang="FR">Archiver fichier</text>
+        <text lang="FR">Archivage de fichiers</text>
         <text lang="SV">Arkivera filer</text>
         <text lang="RU">Архив файлов</text>
         <action>PLUGIN mytharchive</action>
@@ -235,6 +236,7 @@
     <button>
         <type>ZONEMINDER</type>
         <text>Zone Minder</text>
+        <text lang="FR">Zone Minder</text>
         <action>PLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
     </button>
@@ -246,7 +248,7 @@
         <text lang="SL">Čas filmov</text>
         <text lang="ET">Filmide ajad</text>
         <text lang="SV">Biotider</text>
-        <text lang="FR">Programme TV</text>
+        <text lang="FR">Horaires de cinéma</text>
         <text lang="DA">Biograf</text>
         <text lang="PT">Horários de Cinema</text>
         <text lang="NL">Bioscoop Tijden</text>
@@ -261,7 +263,7 @@
         <text>NetFlix</text>
         <text lang="PT">Aluguer de Filmes</text>
         <text lang="ET">MythFlix</text>
-        <text lang="FR">Location Films</text>
+        <text lang="FR">NetFlix</text>
         <action>PLUGIN mythflix</action>
         <depends>mythflix</depends>
     </button>
@@ -270,7 +272,7 @@
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
-        <text lang="FR">Configuration touches</text>
+        <text lang="FR">Éditer les touches</text>
         <text lang="DE">Tastenbelegung ändern</text>
         <text lang="SV">Ändra knappar</text>
         <text lang="DA">Tasteopsætning</text>
@@ -307,6 +309,7 @@
     <!-- <button>
         <type>SHUTDOWN</type>
         <text>Shutdown</text>
+        <text lang="FR">Éteindre</text>
         <text lang="SV">Avstängning</text>
         <text lang="DE">Beenden</text>
         <text lang="ET">Seiskamine</text>

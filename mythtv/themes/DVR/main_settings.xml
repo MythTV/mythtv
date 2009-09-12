@@ -6,7 +6,7 @@
         <text lang="IT">Generale</text>
         <text lang="ES">General</text>
         <text lang="CA">General</text>
-        <text lang="FR">Généraux</text>
+        <text lang="FR">Général</text>
         <text lang="DE">Grundeinstellungen</text>
         <text lang="DA">Generelt</text>
         <text lang="IS">Almennt</text>
@@ -33,7 +33,7 @@
         <text lang="IT">Aspetto</text>
         <text lang="ES">Aspecto</text>
         <text lang="CA">Aspecte</text>
-        <text lang="FR">Aspect</text>
+        <text lang="FR">Apparence</text>
         <text lang="DE">Erscheinungsbild</text>
         <text lang="DA">Udseende</text>
         <text lang="IS">Útlit</text>
@@ -57,6 +57,7 @@
     <button>
         <type>SCREENSETUPWIZARD</type>
         <text>Screen Setup Wizards</text>
+        <text lang="FR">Assistants de configuration d&apos;écran</text>
         <text lang="HE">אשף הגדרות מסך</text>
         <text lang="FI">Kuvavelho</text>
         <text lang="NB">Skjerm</text>
@@ -74,7 +75,7 @@
         <text lang="NL">TV Instellingen</text>
         <text lang="CA">Configuració de TV</text>
         <text lang="ES">Configuración de TV</text>
-        <text lang="FR">Paramètres TV</text>
+        <text lang="FR">Réglages TV</text>
         <text lang="IS">Stillingar sjónvarps</text>
         <text lang="JA">TV設定</text>
         <text lang="FI">TV:n Asetukset</text>
@@ -98,7 +99,7 @@
         <text>Music Settings</text>
         <text lang="IT">Impostazioni Musica</text>
         <text lang="ES">Configurar Música</text>
-        <text lang="FR">Paramètres Musique</text>
+        <text lang="FR">Réglages Musique</text>
         <text lang="CA">Configurar Música</text>
         <text lang="DE">Musik</text>
         <text lang="DA">Musik Indstillinger</text>
@@ -128,7 +129,7 @@
         <text lang="IT">Impostazioni Video</text>
         <text lang="ES">Configurar Videos</text>
         <text lang="CA">Configurar Videos</text>
-        <text lang="FR">Paramètres Vidéos</text>
+        <text lang="FR">Réglages Vidéos</text>
         <text lang="DE">Videos</text>
         <text lang="DA">Video Indstillinger</text>
         <text lang="IS">Stillingar kvikmynda</text>
@@ -159,7 +160,7 @@
         <text lang="JA">ラジオ設定</text>
         <text lang="DE">Radio</text>
         <text lang="IS">Stillingar útvarps</text>
-        <text lang="FR">Paramètres Radio</text>
+        <text lang="FR">Réglages Radio</text>
         <text lang="FI">Radioasetukset</text>
         <text lang="SL">Radio nastavitve</text>
         <text lang="ET">Raadio sätted</text>
@@ -183,7 +184,7 @@
         <text lang="IT">Impostazioni Immagini</text>
         <text lang="ES">Configurar Fotos</text>
         <text lang="CA">Configurar Imatges</text>
-        <text lang="FR">Paramètres Photos</text>
+        <text lang="FR">Réglages Photos</text>
         <text lang="DE">Bilder</text>
         <text lang="DA">Billed indstillinger</text>
         <text lang="IS">Stillingar ljósmynda</text>
@@ -213,7 +214,7 @@
         <text lang="ES">Configurar Juegos</text>
         <text lang="CA">Configurar Jocs</text>
         <text lang="DE">Spiele</text>
-        <text lang="FR">Paramètres Jeux</text>
+        <text lang="FR">Réglages Jeux</text>
         <text lang="DA">Spil Indstillinger</text>
         <text lang="IS">Stillingar leikja</text>
         <text lang="NL">Spelen Instellingen</text>
@@ -239,7 +240,7 @@
         <text>Weather Settings</text>
         <text lang="IT">Impostazioni Meteo</text>
         <text lang="ES">Configurar El Tiempo</text>
-        <text lang="FR">Paramètres Météo</text>
+        <text lang="FR">Réglages Météo</text>
         <text lang="CA">Configurar El Temps</text>
         <text lang="DE">Wetter</text>
         <text lang="DA">Vejr Indstillinger</text>
@@ -271,7 +272,7 @@
         <text lang="CA">Configurar Notícies</text>
         <text lang="ES">Configurar Noticias</text>
         <text lang="NL">Nieuws Instellingen</text>
-        <text lang="FR">Paramètres Nouvelles</text>
+        <text lang="FR">Réglages Nouvelles</text>
         <text lang="IS">Stillingar frétta</text>
         <text lang="SV">Nyheter</text>
         <text lang="JA">ニュース設定</text>
@@ -299,7 +300,7 @@
         <text lang="DE">WWW</text>
         <text lang="SV">Webb</text>
         <text lang="JA">Web設定</text>
-        <text lang="FR">Paramètres du Web</text>
+        <text lang="FR">Réglages Web</text>
         <text lang="IS">Stillingar vefs</text>
         <text lang="NL">Web Instellingen</text>
         <text lang="FI">Nettiasetukset</text>
@@ -327,7 +328,7 @@
         <text lang="SV">Recept</text>
         <text lang="JA">レシピ設定</text>
         <text lang="DE">Rezepte</text>
-        <text lang="FR">Paramètres des Recettes</text>
+        <text lang="FR">Réglages Recettes</text>
         <text lang="FI">Reseptiasetukset</text>
         <text lang="IS">Stillingar uppskrifta</text>
         <text lang="NL">Recepten Instellingen</text>
@@ -352,7 +353,7 @@
         <type>PHONE</type>
         <text>Phone Settings</text>
         <text lang="IT">Impostazioni Telefono</text>
-        <text lang="FR">Paramètres Téléphone</text>
+        <text lang="FR">Réglages Téléphone</text>
         <text lang="DE">Telefon</text>
         <text lang="IS">Stillingar síma</text>
         <text lang="SV">Telefon</text>
@@ -383,7 +384,7 @@
         <text lang="FI">Elokuvien Aika-asetukset</text>
         <text lang="SL">Nastavitve čas filmov</text>
         <text lang="ET">Filmiaegade sätted</text>
-        <text lang="FR">Paramètres horaires films</text>
+        <text lang="FR">Réglages Horaires cinéma</text>
         <text lang="SV">Biotider</text>
         <text lang="DA">Biograf Indstillinger</text>
         <text lang="PT">Configurar Horários de Cinema</text>
@@ -406,7 +407,7 @@
         <text lang="PT">Configurar Xbox</text>
         <text lang="CA">Configurar Xbox</text>
         <text lang="ES">Configurar Xbox</text>
-        <text lang="FR">Paramètres Xbox</text>
+        <text lang="FR">Réglages Xbox</text>
         <text lang="DE">Xbox</text>
         <text lang="IS">Stillingar Xbox</text>
         <text lang="NL">Xbox Instellingen</text>
@@ -435,7 +436,7 @@
         <text lang="FI">NetFlix Asetukset</text>
         <text lang="PT">Configurar Aluguer de Filmes</text>
         <text lang="DE">NetFlix</text>
-        <text lang="FR">Paramètres Location films</text>
+        <text lang="FR">Réglages NetFlix</text>
         <text lang="ES">NetFlix</text>
         <text lang="ET">NetFlix'i sätted</text>
         <text lang="NL">NetFlix Instellingen</text>
@@ -455,7 +456,7 @@
         <text>Archive Files Settings</text>
         <text lang="IT">Impostazioni Archivia Files</text>
         <text lang="ET">Arhiveerimise sätted</text>
-        <text lang="FR">Paramètres Archivage</text>
+        <text lang="FR">Réglages Archivage de fichiers</text>
         <text lang="SV">Filarkivering</text>
         <text lang="ES">Archivado Ficheros</text>
         <text lang="RU">Настройка архива</text>
@@ -473,6 +474,7 @@
     <button>
         <type>SETTINGS_ZONEMINDER</type>
         <text>ZoneMinder Settings</text>
+        <text lang="FR">Réglages Zone Minder</text>
         <text lang="IT">Impostazioni Videosorveglianza</text>
         <text lang="DA">ZoneMinder</text>
         <text lang="PL">Ustaw straĹźnika</text>

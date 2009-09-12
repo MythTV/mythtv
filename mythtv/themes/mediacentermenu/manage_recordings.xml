@@ -7,7 +7,7 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
-        <text lang="FR">Planifier les enregistrements</text>
+        <text lang="FR">Programmer les enregistrements</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Stilla upptöku</text>
@@ -35,7 +35,9 @@
     <button>
         <type>TV_RECORDING_RULES</type>
         <text>Recording Rules</text>
+        <text lang="FR">Règles d&apos;enregistrement</text>
         <alttext>Manage Rules</alttext>
+        <alttext lang="FR">Gérer les règles</alttext>
         <description>Edit or delete any recording rule</description>
         <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
@@ -47,7 +49,7 @@
         <text lang="ES">Resolver Conflictos</text>
         <text lang="CS">Resoldre Conflictes</text>
         <text lang="NL">Geplande Opnames</text>
-        <text lang="FR">Gestion des conflits</text>
+        <text lang="FR">Prochains enregistrements</text>
         <text lang="DE">Aufnahmeplan</text>
         <text lang="DA">Planlagte optagelser</text>
         <text lang="IS">Komandi upptökur</text>
@@ -75,7 +77,7 @@
         <text lang="ES">Borrar Grabaciones</text>
         <text lang="CS">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
-        <text lang="FR">Effacer des enregistrements</text>
+        <text lang="FR">Supprimer des enresgitrements</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
         <text lang="IS">Eyða upptöku</text>
@@ -108,7 +110,7 @@
         <text lang="DE">Alte Aufnahmen</text>
         <text lang="IS">Fyrri upptökur</text>
         <text lang="NL">Vorige Opnames</text>     
-        <text lang="FR">Anciens enregistrements</text>
+        <text lang="FR">Déjà enregistré</text>
         <text lang="FI">Aiemmin Nauhoitetut</text>
         <text lang="ZH_TW">以前的錄影</text>
         <text lang="SL">Že posneto</text>

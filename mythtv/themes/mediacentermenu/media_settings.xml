@@ -5,7 +5,7 @@
         <text>Music Settings</text>
         <text lang="IT">Impostazioni Musica</text>
         <text lang="ES">Configurar Música</text>
-        <text lang="FR">Paramètres Musique</text>
+        <text lang="FR">Réglages Musique</text>
         <text lang="CA">Configurar Música</text>
         <text lang="DE">Musik</text>
         <text lang="DA">Musik Indstillinger</text>
@@ -34,7 +34,7 @@
         <text lang="IT">Impostazioni Video</text>
         <text lang="ES">Configurar Videos</text>
         <text lang="CA">Configurar Videos</text>
-        <text lang="FR">Paramètres Vidéos</text>
+        <text lang="FR">Réglages Vidéos</text>
         <text lang="DE">Videos</text>
         <text lang="DA">Video Indstillinger</text>
         <text lang="IS">Stillingar kvikmynda</text>
@@ -62,7 +62,7 @@
         <text lang="IT">Impostazioni Immagini</text>
         <text lang="ES">Configurar Fotos</text>
         <text lang="CA">Configurar Imatges</text>
-        <text lang="FR">Paramètres Photos</text>
+        <text lang="FR">Réglages Photos</text>
         <text lang="DE">Bilder</text>
         <text lang="DA">Billed indstillinger</text>
         <text lang="IS">Stillingar ljósmynda</text>
@@ -91,7 +91,7 @@
         <text lang="ES">Configurar Juegos</text>
         <text lang="CA">Configurar Jocs</text>
         <text lang="DE">Spiele</text>
-        <text lang="FR">Paramètres Jeux</text>
+        <text lang="FR">Réglages Jeux</text>
         <text lang="DA">Spil Indstillinger</text>
         <text lang="IS">Stillingar leikja</text>
         <text lang="NL">Spelen Instellingen</text>
@@ -119,7 +119,7 @@
         <text lang="JA">ラジオ設定</text>
         <text lang="DE">Radio</text>
         <text lang="IS">Stillingar útvarps</text>
-        <text lang="FR">Paramètres Radio</text>
+        <text lang="FR">Réglages Radio</text>
         <text lang="FI">Radioasetukset</text>
         <text lang="SL">Radio nastavitve</text>
         <text lang="ET">Raadio sätted</text>
@@ -139,6 +139,7 @@
     <button>
         <type>SETTINGS_STREAM</type>
         <text>MythStream Settings</text>
+        <text lang="FR">Réglages MythStream</text>
         <text lang="SL">Nastavitve Mythstream</text>
         <text lang="HE">הגדרות MythStream</text>
         <description></description>
@@ -151,7 +152,7 @@
         <text>Archive Files Settings</text>
         <text lang="IT">Impostazioni Archivia Files</text>
         <text lang="ET">Arhiveerimise sätted</text>
-        <text lang="FR">Paramètres Archivage</text>
+        <text lang="FR">Réglages Archivage de fichiers</text>
         <text lang="SV">Filarkivering</text>
         <text lang="ES">Archivado Ficheros</text>
         <text lang="RU">Настройки архива</text>

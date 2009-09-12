@@ -61,7 +61,7 @@
         <text lang="FI">Elokuvahaku</text>
         <text lang="SL">Kino program</text>
         <text lang="ET">Filmide ajad</text>
-        <text lang="FR">Programme Télé</text>
+        <text lang="FR">Horaires cinéma</text>
         <text lang="SV">Biotider</text>
         <text lang="PT">Horário de Cinema</text>
         <text lang="DE">Kinoprogramm</text>
@@ -107,6 +107,7 @@
     <button>
         <type>WEATHER</type>
         <text>Weather Station</text>
+        <text lang="FR">Station météo</text>
         <text lang="DE">Wetterstation</text>
         <description></description>
         <action>PLUGIN mythwstation</action>
@@ -122,7 +123,7 @@
         <text lang="NL">MythFlix</text>
         <text lang="ET">MythFlix</text>
         <text lang="SL">MythFlix</text>
-        <text lang="FR">Location Films</text>
+        <text lang="FR">NetFlix</text>
         <text lang="PL">Filmy z internetu</text>
         <description>Manage your NetFlix queue</description>
         <action>PLUGIN mythflix</action>
@@ -188,7 +189,7 @@
         <text>System Status</text>
         <text lang="IT">Stato del Sistema</text>
         <text lang="DE">Systemstatus</text>
-        <text lang="FR">Etat système</text>
+        <text lang="FR">État système</text>
         <text lang="IS">Staða kerfis</text>
         <text lang="NL">Systeemstatus</text>
         <text lang="SV">Systemstatus</text>
@@ -212,6 +213,7 @@
     <button>
         <type>ZONEMINDER</type>
         <text>Zone Minder</text>
+        <text lang="FR">Zone Minder</text>
         <text lang="IT">Videosorveglianza</text>
         <text lang="PL">Strażnik</text>
         <text lang="FI">ZoneMinder</text>
@@ -223,6 +225,7 @@
     <button>
         <type>SMOLT</type>
         <text>Hardware profile</text>
+        <text lang="FR">Profil matériel</text>
         <description>Tell us what hardware you have so we can support it</description>
         <action>PLUGIN mythsmolt</action>
         <depends>mythsmolt</depends>

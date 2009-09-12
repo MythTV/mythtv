@@ -7,7 +7,7 @@
         <text lang="ES">Ver la TV</text>
         <text lang="CS">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
-        <text lang="FR">Voir la TV</text>
+        <text lang="FR">Regarder la TV</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
         <text lang="IS">Horfa á sjónvarp</text>
@@ -34,7 +34,7 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
-        <text lang="FR">Planifier un enregistrement</text>
+        <text lang="FR">Programmer les enregistrements</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Stilla upptöku</text>
@@ -51,7 +51,7 @@
         <text lang="PL">Harmonogram</text>
         <text lang="HE">תזמון הקלטות</text>
         <alttext>Schedule</alttext>
-        <alttext lang="FR">Planification</alttext>
+        <alttext lang="FR">Programmation</alttext>
         <alttext lang="ES">Temporizadores</alttext>
         <alttext lang="CS">Temporitzadors</alttext>
         <alttext lang="DA">Optagelser</alttext>
@@ -77,7 +77,7 @@
         <text lang="ES">Ver Grabaciones</text>
         <text lang="CS">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
-        <text lang="FR">Visionner un enregistrement</text>
+        <text lang="FR">Regarder les enregistrements</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="IS">Horfa á upptöku</text>
@@ -106,7 +106,7 @@
         <text lang="ES">Borrar Grabaciones</text>
         <text lang="CS">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
-        <text lang="FR">Supprimer un enregistrement</text>
+        <text lang="FR">Supprimer les enregistrements</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
         <text lang="IS">Eyða upptöku</text>
@@ -136,7 +136,7 @@
         <text lang="PT">Modo Directo de TV</text>
         <text lang="ES">TV directo</text>
         <text lang="CS">TV directe</text>
-        <text lang="FR">TV directe</text>
+        <text lang="FR">Mode direct</text>
         <text lang="DE">TV direkt</text>
         <text lang="SV">TV direkt</text>
         <text lang="JA">パススルーモード</text>
@@ -153,7 +153,7 @@
         <text lang="DE">Systemstatus</text>
         <text lang="IS">Staða kerfis</text>
         <text lang="NL">Systeemstatus</text>
-        <text lang="FR">Etat du système</text>
+        <text lang="FR">État système</text>
         <text lang="SV">Systemstatus</text>
         <text lang="JA">システムステータス</text>
         <text lang="FI">Systeemin Tila</text>

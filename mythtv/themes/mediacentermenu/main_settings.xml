@@ -6,7 +6,7 @@
         <text lang="IT">Generale</text>
         <text lang="ES">General</text>
         <text lang="CA">General</text>
-        <text lang="FR">Généraux</text>
+        <text lang="FR">Général</text>
         <text lang="DE">Grundeinstellungen</text>
         <text lang="DA">Generelt</text>
         <text lang="IS">Almennt</text>
@@ -33,7 +33,7 @@
         <text lang="IT">Aspetto</text>
         <text lang="ES">Aspecto</text>
         <text lang="CA">Aspecte</text>
-        <text lang="FR">Aspect</text>
+        <text lang="FR">Apparence</text>
         <text lang="DE">Erscheinungsbild</text>
         <text lang="DA">Udseende</text>
         <text lang="IS">Útlit</text>
@@ -57,6 +57,7 @@
     <button>
         <type>SCREENSETUPWIZARD</type>
         <text>Screen Setup Wizards</text>
+        <text lang="FR">Assistants de configuration d&apos;écran</text>
         <text lang="HE">אשף הגדרות מסך</text>
         <text lang="FI">Kuvavelho</text>
         <text lang="NB">Skjerm</text>
@@ -74,7 +75,7 @@
         <text lang="NL">TV Instellingen</text>
         <text lang="CA">Configuració de TV</text>
         <text lang="ES">Configuración de TV</text>
-        <text lang="FR">Paramètres TV</text>
+        <text lang="FR">Réglages TV</text>
         <text lang="IS">Stillingar sjónvarps</text>
         <text lang="JA">TV設定</text>
         <text lang="FI">TV:n Asetukset</text>
@@ -100,7 +101,7 @@
         <text lang="DE">Medien</text>
         <text lang="SV">Media</text>
         <text lang="NL">Media Instellingen</text>
-        <text lang="FR">Paramètres médias</text>
+        <text lang="FR">Réglages Media</text>
         <text lang="IS">Stillingar margmiðlunar</text>
         <text lang="JA">メディア設定</text>
         <text lang="FI">Media</text>
@@ -126,7 +127,7 @@
         <text lang="IT">Impostazioni Centro Informazioni</text>
         <text lang="DE">Informationen</text>
         <text lang="NL">Informatiecentrale</text>   
-        <text lang="FR">Paramètres des informations</text>
+        <text lang="FR">Réglages Center d&apos;info</text>
         <text lang="IS">Stillingar upplýsinga- miðstöðvar</text>
         <text lang="SV">Informationscenter</text>
         <text lang="JA">インフォセンター設定</text>
@@ -156,7 +157,7 @@
         <text lang="PT">Configurar Xbox</text>
         <text lang="CA">Configurar Xbox</text>
         <text lang="ES">Configurar Xbox</text>
-        <text lang="FR">Paramètres Xbox</text>
+        <text lang="FR">Réglages Xbox</text>
         <text lang="DE">Xbox</text>
         <text lang="IS">Stillingar Xbox</text>
         <text lang="NL">Xbox Instellingen</text>
@@ -181,7 +182,7 @@
         <type>PHONE</type>
         <text>Phone Settings</text>
         <text lang="IT">Impostazioni Telefono</text>
-        <text lang="FR">Paramètres Téléphone</text>
+        <text lang="FR">Réglages Téléphone</text>
         <text lang="DE">Telefon</text>
         <text lang="IS">Stillingar síma</text>
         <text lang="SV">Telefon</text>
@@ -206,6 +207,7 @@
     <button>
         <type>ZONEMINDER</type>
         <text>ZoneMinder Settings</text>
+        <text lang="FR">Réglages Zone Minder</text>
         <text lang="IT">Impostazioni Videosorveglianza</text>
         <text lang="DA">ZoneMinder</text>
         <text lang="PL">Ustaw strażnika</text>

@@ -7,7 +7,7 @@
         <text lang="ES">Ver Grabaciones</text>
         <text lang="CA">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
-        <text lang="FR">Visionner</text>
+        <text lang="FR">Regarder les enregistrements</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="PT">Ver Gravações da TV</text>
@@ -30,7 +30,7 @@
         <text lang="ES">Resolver Conflictos</text>
         <text lang="CA">Resoldre Conflictes</text>
         <text lang="NL">Geplande Opnames</text>
-        <text lang="FR">Gestion des conflits</text>
+        <text lang="FR">Prochains enregistrements</text>
         <text lang="DE">Aufnahmeplan</text>
         <text lang="DA">Løs optagelseskonflikter</text>
         <text lang="PT">Resolver Conflitos</text>
@@ -54,7 +54,7 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="CA">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
-        <text lang="FR">Programmer des enregistrements</text>
+        <text lang="FR">Programmer les enregistrements</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="PT">Programar Gravações</text>
@@ -65,7 +65,7 @@
         <text lang="RU">Расписание записей</text>
         <alttext>Schedule</alttext>
         <alttext lang="IT">Pianifica</alttext>
-        <alttext lang="FR">Programmer</alttext>
+        <alttext lang="FR">Programmation</alttext>
         <alttext lang="ES">Temporizadores</alttext>
         <alttext lang="CA">Temporitzadors</alttext>
         <alttext lang="DA">Optagelser</alttext>
@@ -85,6 +85,7 @@
     <button>
         <type>TV_RECPRIORITIES</type>
         <text>Recording Priorities</text>
+        <text lang="FR">Priorités d&apos;enregistrement</text>
         <text lang="DE">Aufnahmeprioritäten</text>
         <text lang="NL">Opname Prioriteiten</text>    
         <text lang="SV">Inspelningsprioriteter</text>
@@ -96,6 +97,7 @@
         <text lang="ES">Prioridades Grabaciones</text>
         <text lang="RU">Приоритеты записей</text>
         <alttext>Priorities</alttext>
+        <alttext lang="FR">Priorités</alttext>
         <alttext lang="IT">Priorità</alttext>
         <alttext lang="SV">Prioriteter</alttext>
         <alttext lang="NL">Prioriteiten</alttext>
@@ -113,6 +115,7 @@
     <button>
         <type>TV_STATUS</type>
         <text>System Status</text>
+        <text lang="FR">État système</text>
         <text lang="IT">Stato del Sistema</text>
         <text lang="DE">Systemstatus</text>
         <text lang="SV">Systemstatus</text>
@@ -134,7 +137,7 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Utilidades/Configurar</text>
         <text lang="CA">Configurar</text>
-        <text lang="FR">Paramètres</text>
+        <text lang="FR">Utilitaires / Configuration</text>
         <text lang="DE">Zubehör / Konfiguration</text>
         <text lang="DA">Konfiguration</text>
         <text lang="NL">Beheer / Instellingen</text>
@@ -158,6 +161,7 @@
     <!-- <button>
         <type>SHUTDOWN</type>
         <text>Shutdown</text>
+        <text lang="FR">Éteindre</text>
         <text lang="ET">Seiskamine</text>
         <text lang="SV">Avstängning</text>
         <text lang="DE">Beenden</text>

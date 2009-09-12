@@ -34,7 +34,7 @@
         <text lang="ES">Guía de Programas</text>
         <text lang="CS">Guia de programes</text>
         <text lang="NL">Programmagids</text>
-        <text lang="FR">Programmes TV</text>
+        <text lang="FR">Guide des programmes</text>
         <text lang="DE">Programmübersicht</text>
         <text lang="DA">Programguide</text>
         <text lang="IS">Dagskrá</text>
@@ -65,7 +65,7 @@
         <text lang="ES">Reproducción</text>
         <text lang="CS">Reproducció</text>
         <text lang="NL">Afspelen</text>
-        <text lang="FR">Relecture</text>
+        <text lang="FR">Lecture</text>
         <text lang="DE">Wiedergabe</text>
         <text lang="DA">Afspilning</text>
         <text lang="IS">Spilun</text>
@@ -87,6 +87,7 @@
     <button>
         <type>TV_SETTINGS_PLAYBACK_OSD</type>
         <text>Playback OSD</text>
+        <text lang="FR">Incrustation de lecture</text>
         <text lang="SL">OSD</text>
         <text lang="HE">תצוגה בזמן הסרטה</text>
         <text lang="FI">OSD Asetukset</text>
@@ -98,6 +99,7 @@
   <button>
         <type>TV_SETTINGS_OSD_MENU_EDITOR</type>
         <text>OSD Menu Editor</text>
+        <text lang="FR">Éditeur de menu d&apos;incrustation</text>
         <action>OSDMENUEDITOR</action>
   </button>
     <button>
@@ -125,6 +127,7 @@
     <button>
       <type>TV_SETTINGS_CHANNEL_GROUP</type>
       <text>Channel Groups</text>
+      <text lang="FR">Groupes de chaînes</text>
       <action>SETTINGS CHANNELGROUPS</action>
     </button>
 
@@ -135,7 +138,7 @@
         <text lang="ES">Grabación</text>
         <text lang="CS">Gravació</text>
         <text lang="NL">Opnameprofielen</text>
-        <text lang="FR">Profils d'enregistrement</text>
+        <text lang="FR">Profils d&apos;enregistrement</text>
         <text lang="DE">Aufnahmeprofile</text>
         <text lang="DA">Optagelse</text>
         <text lang="IS">Upptökur</text>
@@ -165,7 +168,7 @@
         <type>TV_SETTINGS_RECPRIORITIES</type>
         <text>Recording Priorities</text>
         <text lang="IT">Priorità Registrazioni</text>
-        <text lang="FR">Priorités d'enregistrement</text>
+        <text lang="FR">Priorités d&apos;enresgitrement</text>
         <text lang="DE">Prioritäten</text>
         <text lang="IS">Forgangur</text>
         <text lang="SV">Inspelningsprioriteter</text>

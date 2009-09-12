@@ -8,7 +8,7 @@
         <text lang="ES">Guía de programas</text>
         <text lang="CA">Guia de programes</text>
         <text lang="NL">Programmagids</text>
-        <text lang="FR">Grille Horaire</text>
+        <text lang="FR">Guide des programmes</text>
         <text lang="DE">TV Programm</text>
         <text lang="DA">Program Guide</text>
         <text lang="PT">Guia de Programação</text>
@@ -21,7 +21,7 @@
         <text lang="HE">מדריך תוכניות</text>
         <alttext>Guide</alttext>
         <alttext lang="IT">Guida</alttext>
-        <alttext lang="FR">Grille</alttext>
+        <alttext lang="FR">Guide</alttext>
         <alttext lang="ES">Guía</alttext>
         <alttext lang="CA">Guia</alttext>
         <alttext lang="DE">EPG</alttext>
@@ -49,7 +49,7 @@
         <text lang="ES">Buscar Programas</text>
         <text lang="CA">Cercar programes</text>
         <text lang="NL">Programma's Zoeken</text>
-        <text lang="FR">Recherche de programmes</text>
+        <text lang="FR">Recherche de programme</text>
         <text lang="DE">Alphabetische Suche</text>
         <text lang="DA">Program Søger</text>
         <text lang="PT">Procurar Programa</text>
@@ -85,7 +85,7 @@
         <text>Search Listings</text>
         <text lang="IT">Ricerca</text>
         <text lang="DE">Suche</text>
-        <text lang="FR">Recherche</text>
+        <text lang="FR">Recherche dans la grille</text>
         <text lang="SV">Sök i TV-tablå</text>
         <text lang="NL">Gids Doorzoeken</text>
         <text lang="JA">リスト検索</text>
@@ -98,6 +98,7 @@
         <text lang="PL">Listy wyszukiwania</text>
         <text lang="HE">חיפוש ברשימות</text>
         <alttext>Search</alttext>
+        <alttext lang="FR">Rechercher</alttext>
         <alttext lang="SV">Sök tablå</alttext>
         <alttext lang="NL">Zoeken Gids</alttext>
         <alttext lang="SL">Iskanje</alttext>
@@ -115,7 +116,7 @@
         <type>TV_CUSTOM_RECORD</type>
         <text>Custom Record</text>
         <text lang="IT">Personalizzate</text>
-        <text lang="FR">Personnalisé</text>
+        <text lang="FR">Recherche Personnalisée</text>
         <text lang="SV">Avancerad</text>
         <text lang="JA">カスタム録画</text>
         <text lang="DE">freie Planung</text>
@@ -139,7 +140,7 @@
         <text lang="ES">Programación Manual</text>
         <text lang="CA">Programar Gravacions</text>
         <text lang="DE">Manuelle Aufnahme</text>
-        <text lang="FR">Manuel</text>
+        <text lang="FR">Programmation manuelle</text>
         <text lang="DA">Manuel programmering</text>
         <text lang="NL">Manuele Opname</text>
         <text lang="PT">Gravação Manual</text>
@@ -151,6 +152,7 @@
         <text lang="PL">Dodaj ręcznie</text>
         <text lang="HE">תיזמון ידני</text>
         <alttext>Man. Sched.</alttext>
+        <alttext lang="FR">Prog. man.</alttext>
         <alttext lang="IT">Manuale</alttext>
         <alttext lang="ES">Manual</alttext>
         <alttext lang="CA">Programar</alttext>
@@ -172,7 +174,9 @@
     <button>
         <type>TV_RECORDING_RULES</type>
         <text>Recording Rules</text>
+        <text lang="FR">Règles d&apos;enregistrement</text>
         <alttext>Manage Rules</alttext>
+        <alttext lang="FR">Gérer les règles</alttext>
         <description>Edit or delete any recording rule</description>
         <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
@@ -184,7 +188,7 @@
         <text lang="ES">Resolver conflictos</text>
         <text lang="CA">Resoldre Conflictes</text>
         <text lang="NL">Geplande Opnames</text>
-        <text lang="FR">Gestion des conflits</text>
+        <text lang="FR">Prochains enregistrements</text>
         <text lang="DE">Aufnahmeplan</text>
         <text lang="DA">Løs konflikter</text>
         <text lang="PT">Resolver Conflitos</text>
@@ -210,7 +214,7 @@
         <text>Recording Priorities</text>
         <text lang="IT">Priorità Registrazioni</text>
         <text lang="DE">Aufnahmeprioritäten</text>
-        <text lang="FR">Priorités d'enregistrement</text>
+        <text lang="FR">Priorités d&apos;enregistrement</text>
         <text lang="NL">Opnameprioriteiten</text>
         <text lang="SV">Inspelningsprioriteter</text>
         <text lang="JA">録画優先順位</text>
@@ -222,6 +226,7 @@
         <text lang="PL">Priorytet nagrywania</text>
         <text lang="HE">קדימויות ההקלטות</text>
         <alttext>Priorities</alttext>
+        <alttext lang="FR">Priorités</alttext>
         <alttext lang="IT">Priorità</alttext>
         <alttext lang="SV">Prioriteter</alttext>
         <alttext lang="NL">Prioriteiten</alttext>

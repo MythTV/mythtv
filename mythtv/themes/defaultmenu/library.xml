@@ -7,7 +7,7 @@
         <text lang="ES">Ver Grabaciones</text>
         <text lang="CS">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
-        <text lang="FR">Voir un enregistrement</text>
+        <text lang="FR">Regarder les enregistrements</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="IS">Horfa á upptökur</text>
@@ -42,7 +42,7 @@
         <text lang="IS">Horfa á myndir</text>
         <text lang="PT">Ver Filmes</text>
         <text lang="SV">Visa filmer</text>
-        <text lang="FR">Voir une vidéo</text>
+        <text lang="FR">Regarder les vidéos</text>
         <text lang="NL">Films Bekijken</text>
         <text lang="JA">ビデオブラウズ</text>
         <text lang="FI">Katso Videoita</text>
@@ -99,7 +99,7 @@
         <text lang="NL">Radio Luisteren</text>
         <text lang="JA">ラジオ放送</text>
         <text lang="DE">Radio hören</text>
-        <text lang="FR">Ecouter la radio</text>
+        <text lang="FR">Écouter la radio</text>
         <text lang="FI">Kuuntele Radiota</text>
         <text lang="IS">Hlusta á útvarp</text>
         <text lang="SL">Poslušanje radia</text>
@@ -124,6 +124,7 @@
     <button>
         <type>STREAM</type>
         <text>Play Online Streams</text>
+        <text lang="FR">Lire des flux en ligne</text>
         <text lang="HE">נגן מדיה מכוונת</text>
         <description></description>
         <action>PLUGIN mythstream</action>
@@ -137,7 +138,7 @@
         <text lang="ES">Fotos</text>
         <text lang="CS">Imatges</text>
         <text lang="NL">Foto's</text>
-        <text lang="FR">Gallerie photo</text>
+        <text lang="FR">Galerie d&apos;images</text>
         <text lang="DE">Bilder ansehen</text>
         <text lang="DA">Billeder</text>
         <text lang="IS">Ljósmyndir</text>
@@ -165,7 +166,7 @@
         <text lang="ES">Juegos</text>
         <text lang="CS">Jocs</text>
         <text lang="NL">Spelen</text>
-        <text lang="FR">Jeux</text>
+        <text lang="FR">Jouer</text>
         <text lang="DE">Spielen</text>
         <text lang="DA">Spil</text>
         <text lang="IS">Spila leiki</text>
