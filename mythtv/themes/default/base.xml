@@ -631,8 +631,8 @@
     <window name="MythDialogBox">
 
         <shape name="background" from="basebackground">
-            <area>0,0,800,600</area>
-            <fill color="#000000" alpha="210" />
+            <area>10,10,780,580</area>
+            <fill color="#333333" alpha="210" />
         </shape>
 
         <textarea name="title" from="basetextarea">
