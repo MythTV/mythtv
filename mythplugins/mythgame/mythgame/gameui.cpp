@@ -276,11 +276,7 @@ void GameUI::searchComplete(QString string)
     MythGenericTree *parent = m_gameTreeUI->GetCurrentNode()->getParent();
     MythGenericTree *new_node = parent->getChildByName(string);
     if (new_node)
-    {
         m_gameTreeUI->SetCurrentNode(new_node);
-        // SetActive updates the buttonlist but SetCurrentNode doesn't.
-        m_gameTreeUI->SetActive(true);
-    }
 }
 
 void GameUI::updateRomInfo(RomInfo *rom)
@@ -729,9 +725,5 @@ void GameUI::updateChangedNode(MythGenericTree *node, RomInfo *romInfo)
         m_gameTreeUI->SetCurrentNode(m_favouriteNode);
     }
     else
-    {
         nodeChanged(node);
-    }
-    // SetActive to update the buttonlist text
-    m_gameTreeUI->SetActive(true);
 }

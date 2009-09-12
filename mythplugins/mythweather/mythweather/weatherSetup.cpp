@@ -550,7 +550,7 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
         {
             if (!m_inactiveList->GetCount())
             {
-                m_inactiveList->SetActive(false);
+                //m_inactiveList->SetActive(false);
                 NextPrevWidgetFocus(true);
             }
             if (hasUnits)
@@ -619,7 +619,7 @@ void ScreenSetup::deleteScreen()
     if (!m_activeList->GetCount())
     {
         NextPrevWidgetFocus(false);
-        m_activeList->SetActive(false);
+        m_activeList->SetEnabled(false);
     }
 }
 
@@ -697,7 +697,7 @@ void ScreenSetup::customEvent(QEvent *event)
             MythUIButtonListItem *item = new MythUIButtonListItem(m_activeList, txt);
             item->SetData(qVariantFromValue(si));
             if (m_activeList->GetCount())
-                m_activeList->SetActive(true);
+                m_activeList->SetEnabled(true);
         }
 
     }
@@ -1019,10 +1019,7 @@ void LocationDialog::doSearch()
 
     m_resultsText->SetText(tr("Search Complete. Results: %1").arg(numresults));
     if (numresults)
-    {
-        m_locationList->SetActive(true);
         SetFocusWidget(m_locationList);
-    }
 }
 
 void LocationDialog::clearResults()
