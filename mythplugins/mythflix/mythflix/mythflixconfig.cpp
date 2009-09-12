@@ -196,8 +196,6 @@ bool MythFlixConfig::Create()
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
     SetFocusWidget(m_genresList);
-    m_genresList->SetActive(true);
-    m_siteList->SetActive(false);
 
     loadData();
 

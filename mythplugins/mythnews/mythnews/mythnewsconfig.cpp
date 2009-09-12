@@ -149,8 +149,6 @@ bool MythNewsConfig::Create(void)
     }
 
     SetFocusWidget(m_categoriesList);
-    m_categoriesList->SetActive(true);
-    m_siteList->SetActive(false);
 
     loadData();
 

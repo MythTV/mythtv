@@ -2439,7 +2439,6 @@ bool VideoDialog::Create()
     if (m_d->m_type == DLG_TREE)
     {
         SetFocusWidget(m_videoButtonTree);
-        m_videoButtonTree->SetActive(true);
 
         connect(m_videoButtonTree, SIGNAL(itemClicked(MythUIButtonListItem *)),
                 SLOT(handleSelect(MythUIButtonListItem *)));
@@ -2451,7 +2450,6 @@ bool VideoDialog::Create()
     else
     {
         SetFocusWidget(m_videoButtonList);
-        m_videoButtonList->SetActive(true);
 
         connect(m_videoButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
                 SLOT(handleSelect(MythUIButtonListItem *)));
@@ -3455,14 +3453,10 @@ void VideoDialog::searchComplete(QString string)
         if (new_node)
         {
             m_videoButtonTree->SetCurrentNode(new_node);
-            m_videoButtonTree->SetActive(true);
         }
     }
     else
-    {
         m_videoButtonList->MoveToNamedPosition(string);
-        m_videoButtonList->SetActive(true);
-    }
 }
 
 /** \fn VideoDialog::searchStart(void)

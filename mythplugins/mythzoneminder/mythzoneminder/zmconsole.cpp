@@ -167,7 +167,6 @@ bool ZMConsole::Create(void)
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
     SetFocusWidget(m_monitor_list);
-    m_monitor_list->SetActive(true);
 
     m_timeTimer->start(TIME_UPDATE_TIME);
     m_updateTimer->start(100);

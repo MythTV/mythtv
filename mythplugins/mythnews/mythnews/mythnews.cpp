@@ -133,8 +133,6 @@ bool MythNews::Create(void)
     }
 
     SetFocusWidget(m_sitesList);
-    m_sitesList->SetActive(true);
-    m_articlesList->SetActive(false);
 
     loadSites();
     updateInfoView(m_sitesList->GetItemFirst());
