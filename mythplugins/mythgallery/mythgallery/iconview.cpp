@@ -194,9 +194,6 @@ bool IconView::Create(void)
 
     SetupMediaMonitor();
 
-    SetFocusWidget(m_imageList);
-    m_imageList->SetActive(true);
-
     return true;
 }
 
