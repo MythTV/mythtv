@@ -632,7 +632,7 @@
 
         <shape name="background" from="basebackground">
             <area>10,10,780,580</area>
-            <fill color="#333333" alpha="210" />
+            <fill color="#333333" alpha="255" />
         </shape>
 
         <textarea name="title" from="basetextarea">
