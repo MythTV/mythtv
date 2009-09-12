@@ -164,9 +164,6 @@ bool BookmarkManager::Create(void)
         return false;
     }
 
-    m_groupList->SetActive(true);
-    m_bookmarkList->SetActive(false);
-
     GetSiteList(m_siteList);
     UpdateGroupList();
     UpdateURLList();
@@ -176,8 +173,6 @@ bool BookmarkManager::Create(void)
 
     connect(m_bookmarkList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(slotBookmarkClicked(MythUIButtonListItem*)));
-
-    m_groupList->SetActive(true);
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
