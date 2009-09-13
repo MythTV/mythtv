@@ -13,7 +13,6 @@ using namespace std;
 #include "proglist.h"
 #include "scheduledrecording.h"
 #include "recordingrule.h"
-#include "customedit.h"
 #include "remoteutil.h"
 #include "channelutil.h"
 #include "recordinginfo.h"
@@ -24,6 +23,10 @@ using namespace std;
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
+
+// MythFrontend
+#include "customedit.h"
+#include "scheduleeditor.h"
 
 ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
                const QString &view, const QString &from)
@@ -1947,24 +1950,29 @@ void PhrasePopup::recordClicked(void)
         MSqlEscapeAsAQuery(what, bindings);
     }
 
-    ScheduledRecording *record = new ScheduledRecording();
+    RecordingRule *record = new RecordingRule();
 
     if (genreflag)
     {
         QString fromgenre = QString("LEFT JOIN programgenres ON "
                 "program.chanid = programgenres.chanid AND "
                 "program.starttime = programgenres.starttime ");
-        record->loadBySearch(m_searchType, text, fromgenre, what);
+        record->LoadBySearch(m_searchType, text, what, fromgenre);
     }
     else
     {
-        record->loadBySearch(m_searchType, text, what);
+        record->LoadBySearch(m_searchType, text, what);
     }
 
-    record->exec();
-    record->deleteLater();
-
-    okClicked();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    if (schededit->Create())
+    {
+        mainStack->AddScreen(schededit);
+        okClicked();
+    }
+    else
+        delete schededit;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2221,25 +2229,30 @@ void PowerSearchPopup::recordClicked(void)
         MSqlEscapeAsAQuery(what, bindings);
     }
 
-    ScheduledRecording *record = new ScheduledRecording();
+    RecordingRule *record = new RecordingRule();
 
     if (genreflag)
     {
         QString fromgenre = QString("LEFT JOIN programgenres ON "
                 "program.chanid = programgenres.chanid AND "
                 "program.starttime = programgenres.starttime ");
-        record->loadBySearch(m_searchType, text, fromgenre, what);
+        record->LoadBySearch(m_searchType, text, what, fromgenre);
     }
     else
     {
-        record->loadBySearch(m_searchType, text, what);
+        record->LoadBySearch(m_searchType, text, what);
     }
-
-    record->exec();
-    record->deleteLater();
-
-    emit haveResult(m_phraseList->GetValue());
-    Close();
+    
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    if (schededit->Create())
+    {
+        mainStack->AddScreen(schededit);
+        emit haveResult(m_phraseList->GetValue());
+        Close();
+    }
+    else
+        delete schededit;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

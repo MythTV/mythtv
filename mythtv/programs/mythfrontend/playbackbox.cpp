@@ -21,7 +21,6 @@
 #include "mythdbcon.h"
 #include "mythverbose.h"
 #include "recordinginfo.h"
-#include "scheduledrecording.h"
 #include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "previewgenerator.h"

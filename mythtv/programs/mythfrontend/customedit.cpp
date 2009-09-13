@@ -1,15 +1,24 @@
 #include "customedit.h"
-#include "proglist.h"
-#include "scheduledrecording.h"
 
-#include "mythcontext.h"
+// libmythdb
 #include "mythdb.h"
 
+// libmyth
+#include "mythcontext.h"
+
+// libmythui
 #include "mythuibuttonlist.h"
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 #include "mythdialogbox.h"
 #include "mythdialogs.h"
+
+// libmythtv
+#include "recordingrule.h"
+
+// mythfrontend
+#include "scheduleeditor.h"
+#include "proglist.h"
 
 CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
               : MythScreenType(parent, "CustomEdit")
@@ -588,35 +597,42 @@ void CustomEdit::testClicked(void)
 void CustomEdit::recordClicked(void)
 {
     if (!checkSyntax())
-    {
         return;
-    }
 
-    ScheduledRecording *record = new ScheduledRecording();
+    RecordingRule *record = new RecordingRule();
 
     MythUIButtonListItem* item = m_ruleList->GetItemCurrent();
     CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
      
     int cur_recid = rule.recordid.toInt();
-
     if (cur_recid > 0)
     {
-        record->modifyPowerSearchByID(cur_recid, m_titleEdit->GetText(),
-                                      m_subtitleEdit->GetText(),
-                                      m_descriptionEdit->GetText());
+        record->ModifyPowerSearchByID(cur_recid, m_titleEdit->GetText(),
+                                      m_descriptionEdit->GetText(),
+                                      m_subtitleEdit->GetText());
     }
     else
     {
-        record->loadBySearch(kPowerSearch, m_titleEdit->GetText(),
-                             m_subtitleEdit->GetText(),
-                             m_descriptionEdit->GetText());
+        record->LoadBySearch(kPowerSearch, m_titleEdit->GetText(),
+                             m_descriptionEdit->GetText(),
+                             m_subtitleEdit->GetText());
     }
-    record->exec();
 
-    if (record->getRecordID())
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    if (schededit->Create())
+    {
+        mainStack->AddScreen(schededit);
+        connect(schededit, SIGNAL(ruleSaved(int)), SLOT(scheduleCreated(int)));
+    }
+    else
+        delete schededit;
+}
+
+void CustomEdit::scheduleCreated(int ruleID)
+{
+    if (ruleID > 0)
         Close();
-
-    record->deleteLater();
 }
 
 void CustomEdit::storeClicked(void)

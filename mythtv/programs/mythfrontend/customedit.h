@@ -29,7 +29,7 @@ class MPUBLIC CustomEdit : public MythScreenType
     void testClicked(void);
     void recordClicked(void);
     void storeClicked(void);
-//    void cancelClicked(void);
+    void scheduleCreated(int);
 
   private:
     void loadData(void);

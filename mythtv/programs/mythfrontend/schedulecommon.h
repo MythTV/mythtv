@@ -19,9 +19,11 @@ class ScheduleCommon : public MythScreenType
    ~ScheduleCommon() {};
       
     void ShowDetails(ProgramInfo *pginfo) const;
+    void ShowUpcoming(ProgramInfo *pginfo) const;
     void EditRecording(ProgramInfo *pginfo);
     void EditScheduled(ProgramInfo *pginfo);
     void EditScheduled(RecordingInfo *recinfo);
+    void MakeOverride(RecordingInfo *recinfo);
     void ShowRecordingDialog(RecordingInfo recinfo);
     void ShowNotRecordingDialog(RecordingInfo recinfo);
 

@@ -2,7 +2,6 @@
 #define PROGRAMRECPROIRITY_H_
 
 #include "recordinginfo.h"
-#include "scheduledrecording.h"
 #include "mythscreentype.h"
 
 // mythfrontend
@@ -63,7 +62,6 @@ class ProgramRecPriority : public ScheduleCommon
   protected slots:
     void updateInfo(MythUIButtonListItem *item);
     void edit(MythUIButtonListItem *item);
-    void doRemove(bool doRemove);
 
   private:
     void FillList(void);

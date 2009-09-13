@@ -561,17 +561,8 @@ void ViewScheduled::upcoming()
         return;
 
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
-    if (!pginfo)
-        return;
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
-    if (pl->Create())
-    {
-        mainStack->AddScreen(pl);
-    }
-    else
-        delete pl;
+    ShowUpcoming(pginfo);
 
     //FIXME:
     //EmbedTVWindow();

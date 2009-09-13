@@ -29,6 +29,7 @@ class ManualSchedule : public MythScreenType
     void hourRollover(void);
     void minuteRollover(void);
     void recordClicked(void);
+    void scheduleCreated(int);
 
   private:
     void connectSignals();

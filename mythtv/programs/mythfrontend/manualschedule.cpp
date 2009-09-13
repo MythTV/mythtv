@@ -1,21 +1,30 @@
 
-#include <QDateTime>
-
 #include "manualschedule.h"
 
-#include "mythcontext.h"
+// qt
+#include <QDateTime>
+
+// libmythdb
 #include "mythdbcon.h"
 #include "mythverbose.h"
+
+// libmyth
+#include "mythcontext.h"
 #include "programinfo.h"
-#include "scheduledrecording.h"
+
+// libmythtv
+#include "recordingrule.h"
 #include "recordingtypes.h"
-// #include "remoteutil.h"
 #include "channelutil.h"
 
+// libmythui
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
 #include "mythuispinbox.h"
+
+// mythfrontend
+#include "scheduleeditor.h"
 
 ManualSchedule::ManualSchedule(MythScreenStack *parent)
                : MythScreenType(parent, "ManualSchedule")
@@ -31,10 +40,6 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
     m_recordButton = m_cancelButton = NULL;
     m_startdate = NULL;
     m_duration = m_starthour = m_startminute = NULL;
-
-    m_categoryString = "";
-    m_startString = "";
-    m_chanidString = "";
 }
 
 bool ManualSchedule::Create(void)
@@ -90,14 +95,14 @@ bool ManualSchedule::Create(void)
         new MythUIButtonListItem(m_startdate, dinfo);
         if (m_nowDateTime.addDays(index).toString("MMdd") ==
             m_startDateTime.toString("MMdd"))
-            m_startdate->SetItemCurrent(m_startdate->GetCount() - 1);
+            m_startdate->SetValue(m_startdate->GetCount() - 1);
     }
 
     QTime thisTime = m_nowDateTime.time();
     thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
 
     if (thisTime < QTime(0,30))
-        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
+        m_startdate->SetValue(m_startdate->GetCurrentPos() + 1);
 
     m_starthour->SetRange(0,23,1);
     m_starthour->SetValue(thisTime.hour());
@@ -136,40 +141,40 @@ void ManualSchedule::disconnectSignals()
 
 void ManualSchedule::hourRollover(void)
 {
-    if (m_startminute->GetCurrentPos() == 0 )
+    if (m_startminute->GetIntValue() == 0 )
     {
-        m_startminute->SetItemCurrent(12);
-        m_starthour->SetItemCurrent(m_starthour->GetCurrentPos() - 1);
+        m_startminute->SetValue(12);
+        m_starthour->SetValue(m_starthour->GetIntValue() - 1);
     }
-    if (m_startminute->GetCurrentPos() == 13 )
+    if (m_startminute->GetIntValue() == 13 )
     {
-        m_starthour->SetItemCurrent(m_starthour->GetCurrentPos() + 1);
-        m_startminute->SetItemCurrent(1);
+        m_starthour->SetValue(m_starthour->GetIntValue() + 1);
+        m_startminute->SetValue(1);
     }
 }
 
 void ManualSchedule::minuteRollover(void)
 {
-    if (m_starthour->GetCurrentPos() == 0 )
+    if (m_starthour->GetIntValue() == 0 )
     {
-        m_starthour->SetItemCurrent(24);
-        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() - 1);
+        m_starthour->SetValue(24);
+        m_startdate->SetValue(m_startdate->GetIntValue() - 1);
     }
-    if (m_starthour->GetCurrentPos() == 25 )
+    if (m_starthour->GetIntValue() == 25 )
     {
-        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
-        m_starthour->SetItemCurrent(1);
+        m_startdate->SetValue(m_startdate->GetIntValue() + 1);
+        m_starthour->SetValue(1);
     }
 }
 
 void ManualSchedule::dateChanged(void)
 {
     disconnectSignals();
-    daysahead = m_startdate->GetCurrentPos();
+    daysahead = m_startdate->GetIntValue();
     m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
 
-    int hr = m_starthour->GetItemCurrent()->GetText().toInt();
-    int min = m_startminute->GetItemCurrent()->GetText().toInt();
+    int hr = m_starthour->GetIntValue();
+    int min = m_startminute->GetIntValue();
     m_startDateTime.setTime(QTime(hr, min));
 
     VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
@@ -178,13 +183,12 @@ void ManualSchedule::dateChanged(void)
     // Note we allow start times up to one hour in the past so
     // if it is 20:25 the user can start a recording at 20:30
     // by first setting the hour and then the minute.
-    QDateTime tmp = QDateTime(
-        m_startDateTime.date(),
-        QTime(m_startDateTime.time().hour(),59,59));
+    QDateTime tmp = QDateTime(m_startDateTime.date(),
+                              QTime(m_startDateTime.time().hour(),59,59));
     if (tmp < m_nowDateTime)
     {
         hr = m_nowDateTime.time().hour();
-        m_starthour->SetItemCurrent(hr);
+        m_starthour->SetValue(hr);
         m_startDateTime.setDate(m_nowDateTime.date());
         m_startDateTime.setTime(QTime(hr, min));
     }
@@ -210,7 +214,7 @@ void ManualSchedule::recordClicked(void)
         p.channame = query.value(3).toString();
     }
 
-    int addsec = m_duration->GetItemCurrent()->GetText().toInt() * 60;
+    int addsec = m_duration->GetIntValue() * 60;
 
     if (!addsec)
         addsec = 60;
@@ -218,22 +222,32 @@ void ManualSchedule::recordClicked(void)
     p.startts = m_startDateTime;
     p.endts = p.startts.addSecs(addsec);
 
-    if (m_title->GetText() > "")
+    if (!m_title->GetText().isEmpty())
         p.title = m_title->GetText();
     else
         p.title = p.ChannelText(channelFormat) + " - " +
                   p.startts.toString(m_timeformat);
 
-    p.title += " (" + tr("Manual Record") + ")";
+    p.title = QString("%1 (%2)").arg(p.title).arg(tr("Manual Record"));
     p.description = p.title; p.description.detach();
 
-    ScheduledRecording *record = new ScheduledRecording();
-    record->loadByProgram(&p);
-    record->setSearchType(kManualSearch);
-    record->exec();
+    RecordingRule *record = new RecordingRule();
+    record->LoadByProgram(&p);
+    record->m_searchType = kManualSearch;
 
-    if (record->getRecordID())
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    if (schededit->Create())
+    {
+        mainStack->AddScreen(schededit);
+        connect(schededit, SIGNAL(ruleSaved(int)), SLOT(scheduleCreated(int)));
+    }
+    else
+        delete schededit;
+}
+
+void ManualSchedule::scheduleCreated(int ruleid)
+{
+    if (ruleid > 0)
         Close();
-
-    record->deleteLater();
 }

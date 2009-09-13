@@ -1950,12 +1950,7 @@ void GuideGrid::upcoming()
     if (pginfo->title == m_unknownTitle)
         return;
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
-    if (pl->Create())
-        mainStack->AddScreen(pl);
-    else
-        delete pl;
+    ShowUpcoming(pginfo);
 }
 
 void GuideGrid::details()

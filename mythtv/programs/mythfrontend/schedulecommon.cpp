@@ -10,7 +10,6 @@
 #include "remoteutil.h"
 
 // libmythtv 
-#include "progdetails.h"
 #include "recordinginfo.h"
 #include "tvremoteutil.h"
 
@@ -18,6 +17,11 @@
 #include "mythscreentype.h"
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
+
+// mythfrontend
+#include "scheduleeditor.h"
+#include "progdetails.h"
+#include "proglist.h"
 
 /**
 *  \brief Show the Program Details screen
@@ -40,6 +44,24 @@ void ScheduleCommon::ShowDetails(ProgramInfo *pginfo) const
 }
 
 /**
+*  \brief Show the upcoming recordings for this title
+*/
+void ScheduleCommon::ShowUpcoming(ProgramInfo *pginfo) const
+{
+    if (!pginfo)
+        return;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
+    if (pl->Create())
+    {
+        mainStack->AddScreen(pl);
+    }
+    else
+        delete pl;
+}
+
+/**
 *  \brief Creates a dialog for editing the recording status,
 *         blocking until user leaves dialog.
 */
@@ -51,7 +73,7 @@ void ScheduleCommon::EditRecording(ProgramInfo *pginfo)
     RecordingInfo ri(*pginfo);
 
     if (ri.recordid == 0)
-        ri.EditScheduled();
+        EditScheduled(&ri);
     else if (ri.recstatus <= rsWillRecord)
         ShowRecordingDialog(ri);
     else
@@ -75,7 +97,42 @@ void ScheduleCommon::EditScheduled(ProgramInfo *pginfo)
 */
 void ScheduleCommon::EditScheduled(RecordingInfo *recinfo)
 {
-    recinfo->EditScheduled();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ScheduleEditor *schededit = new ScheduleEditor(mainStack, recinfo);
+    if (schededit->Create())
+        mainStack->AddScreen(schededit);
+    else
+        delete schededit;
+}
+
+/**
+*  \brief Creates a dialog for editing an override recording schedule
+*/
+void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
+{
+    if (!recinfo || recinfo->recordid <= 0)
+        return;
+
+    VERBOSE(VB_IMPORTANT, QString("We're OK"));
+    
+    RecordingRule *recrule = new RecordingRule();
+    
+    if (!recrule->LoadByProgram(static_cast<ProgramInfo*>(recinfo)))
+        VERBOSE(VB_IMPORTANT, QString("Failed to load by program info"));
+    
+    if (!recrule->MakeOverride())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to make Override"));
+        delete recrule;
+        return;
+    }
+    
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ScheduleEditor *schededit = new ScheduleEditor(mainStack, recrule);
+    if (schededit->Create())
+        mainStack->AddScreen(schededit);
+    else
+        delete schededit;
 }
 
 /**
@@ -382,8 +439,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Add Override"))
             {
-                recInfo.makeOverride();
-                EditScheduled(&recInfo);
+                MakeOverride(&recInfo);
             }
         }
         else if (resultid == "schedulerecording")
@@ -436,8 +492,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Add Override"))
             {
-                recInfo.makeOverride();
-                EditScheduled(&recInfo);
+                MakeOverride(&recInfo);
             }
         }
     }

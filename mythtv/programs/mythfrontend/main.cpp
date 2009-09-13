@@ -35,6 +35,7 @@ using namespace std;
 #include "playgroup.h"
 #include "networkcontrol.h"
 #include "DVDRingBuffer.h"
+#include "scheduledrecording.h"
 
 #include "compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
@@ -926,6 +927,7 @@ void InitJumpPoints(void)
     TV::SetFuncPtr("viewscheduled", (void *)ViewScheduled::RunViewScheduled);
     TV::SetFuncPtr("programguide", (void *)GuideGrid::RunProgramGuide);
     TV::SetFuncPtr("programfinder", (void *)RunProgramFinder);
+    TV::SetFuncPtr("scheduleeditor", (void *)RunProgramFinder);
 }
 
 

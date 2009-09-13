@@ -7,6 +7,7 @@ using namespace std;
 
 #include "programrecpriority.h"
 #include "scheduledrecording.h"
+#include "recordingrule.h"
 #include "customedit.h"
 #include "proglist.h"
 #include "storagegroup.h"
@@ -644,6 +645,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
 
         QString resultid= dce->GetId();
         QString resulttext  = dce->GetResultText();
+        int buttonnum  = dce->GetResult();
 
         if (resultid == "menu")
         {
@@ -766,6 +768,26 @@ void ProgramRecPriority::customEvent(QEvent *event)
                 SortList();
             }
         }
+        else if (resultid == "deleterule")
+        {
+            RecordingRule *record = qVariantValue<RecordingRule *>(dce->GetData());
+            if (record)
+            {
+                if (buttonnum > 0)
+                {
+                    MythUIButtonListItem *item = m_programList->GetItemCurrent();
+                    if (record->Delete() && item)
+                    {
+                        RemoveItemFromList(item);
+                        countMatches();
+                        UpdateList();
+                    }
+                    else
+                        VERBOSE(VB_IMPORTANT, "Failed to delete recording rule");
+                }
+                delete record;
+            }
+        }
         else
             ScheduleCommon::customEvent(event);
     }
@@ -885,54 +907,29 @@ void ProgramRecPriority::remove(void)
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
 
-    ScheduledRecording *record = new ScheduledRecording();
-    int recid = pgRecInfo->recordid;
-    record->loadByID(recid);
+    RecordingRule *record = new RecordingRule();
+    record->m_recordID = pgRecInfo->recordid;
+    if (!record->Load())
+    {
+        delete record;
+        return;
+    }
 
-    QString message =
-        tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
-                                  .arg(pgRecInfo->RecTypeText());
+    QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
+                                                .arg(pgRecInfo->RecTypeText());
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
 
-    if (dialog->Create())
-        popupStack->AddScreen(dialog);
+    MythConfirmationDialog *okPopup = new MythConfirmationDialog(popupStack,
+                                                                message, true);
+
+    okPopup->SetReturnEvent(this, "deleterule");
+    okPopup->SetData(qVariantFromValue(record));
+
+    if (okPopup->Create())
+        popupStack->AddScreen(okPopup);
     else
-        delete dialog;
-
-    connect(dialog, SIGNAL(haveResult(bool)),
-            this, SLOT(doRemove(bool)));
-
-    record->deleteLater();
-}
-
-void ProgramRecPriority::doRemove(bool doRemove)
-{
-    if (doRemove)
-    {
-        MythUIButtonListItem *item = m_programList->GetItemCurrent();
-        if (!item)
-           return;
-
-        ProgramRecPriorityInfo *pgRecInfo =
-                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
-
-        ScheduledRecording *record = new ScheduledRecording();
-        int recid = pgRecInfo->recordid;
-        record->loadByID(recid);
-        record->remove();
-
-        RemoveItemFromList(item);
-
-        countMatches();
-
-        ScheduledRecording::signalChange(recid);
-
-        UpdateList();
-
-        record->deleteLater();
-    }
+        delete okPopup;
 }
 
 void ProgramRecPriority::deactivate(void)

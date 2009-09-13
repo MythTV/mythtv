@@ -30,7 +30,6 @@
 #include "playbackbox.h"
 #include "globalsettings.h"
 #include "libmythtv/recordingprofile.h"
-#include "libmythtv/scheduledrecording.h"
 #include "mythxdisplay.h"
 #include "DisplayRes.h"
 #include "uitypes.h"
