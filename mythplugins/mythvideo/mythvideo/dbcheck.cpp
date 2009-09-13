@@ -7,6 +7,8 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdbparams.h>
 
+#include "storagegroup.h"
+
 #include "videodlg.h"
 #include "dbcheck.h"
 
@@ -38,7 +40,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1027";
+    const QString currentDatabaseVersion = "1028";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -867,6 +869,49 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             updates += "DELETE FROM keybindings "
                        " WHERE action = 'DELETE' AND context = 'Video';";
             performActualUpdate(updates, "1027", dbver, MythVideoVersionName);
+        }
+
+        if (dbver == "1027")
+        {
+            bool ok = true;
+            MSqlQuery query(MSqlQuery::InitCon());
+            MSqlQuery update(MSqlQuery::InitCon());
+
+            query.prepare("SELECT DISTINCT filename FROM filemarkup;");
+            update.prepare("UPDATE filemarkup SET filename = :RELPATH "
+                           "    WHERE filename = :FULLPATH;");
+            if (query.exec())
+            {
+                QString origPath;
+                QString relPath;
+                while (query.next())
+                {
+                    origPath = query.value(0).toString();
+                    if (origPath.startsWith("dvd:"))
+                        continue;
+
+                    relPath = StorageGroup::GetRelativePathname(origPath);
+                    if ((!relPath.isEmpty()) &&
+                        (relPath != origPath))
+                    {
+                        update.bindValue(":RELPATH", relPath);
+                        update.bindValue(":FULLPATH", origPath);
+                        if (!update.exec())
+                        {
+                            VERBOSE(VB_IMPORTANT,
+                                    QString("ERROR converting '%1' to '%2' in "
+                                            "filemarkup table.")
+                                            .arg(origPath).arg(relPath));
+                            ok = false;
+                        }
+                    }
+                }
+            }
+            else
+                ok = false;
+
+            if (ok)
+                UpdateDBVersionNumber(MythVideoVersionName, "1028");
         }
     }
 }
