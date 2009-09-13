@@ -1211,29 +1211,44 @@
 
     <window name="scheduleeditor">
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
-        </shape>
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Schedule Editor</value>
+        </textarea>
+
+
+        <imagetype name="textbackground">
+            <position>30,133</position>
+            <filename>recordings/descriptionbackground.png</filename>
+        </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
+            <area>48,138,980,35</area>
             <font>baselarge</font>
         </textarea>
 
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
+        <statetype name="ratingstate" from="baserating">
+            <position>1193,135</position>
+        </statetype>
+
+        <textarea name="description" from="basetextarea">
+            <area>48,187,1190,145</area>
+            <multiline>yes</multiline>
+            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
         </textarea>
 
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
+        <textarea name="year" from="basetextarea">
+            <area>48,347,290,30</area>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>430,347,800,30</area>
             <align>right</align>
         </textarea>
 
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
-        </textarea>
 
         <buttonlist name="rules" from="basewideselector">
             <position>215,210</position>
@@ -1283,29 +1298,21 @@
 
     <window name="scheduleoptionseditor">
 
+        <!-- <imagetype name="backdrop" from="basebackdrop" /> -->
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Schedule Options</value>
+        </textarea>
+        
         <shape name="details_background" from="basebackground">
             <area>25,25,750,175</area>
         </shape>
 
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
 
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
 
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
-        </textarea>
+        
         <spinbox name="priority" from="basewidespinbox">
             <position>215,210</position>
             <template type="negative">Reduce priority by %n</template>
@@ -1362,29 +1369,20 @@
 
     <window name="storageoptionseditor">
 
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Storage Options</value>
+        </textarea>
+
         <shape name="details_background" from="basebackground">
             <area>25,25,750,175</area>
         </shape>
 
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
 
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
 
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
-        </textarea>
 
         <buttonlist name="recprofile" from="basewideselector">
             <position>215,210</position>
@@ -1435,29 +1433,20 @@
 
     <window name="postproceditor">
 
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Post-Processing Options</value>
+        </textarea>
+
         <shape name="details_background" from="basebackground">
             <area>25,25,750,175</area>
         </shape>
 
-        <textarea name="title" from="basetextarea">
-            <area>50,35,700,45</area>
-            <font>baselarge</font>
-        </textarea>
 
-        <textarea name="timedate" from="basetextarea">
-            <area>50,170,440,27</area>
-        </textarea>
 
-        <textarea name="channel" from="basetextarea">
-            <area>550,170,200,35</area>
-            <align>right</align>
-        </textarea>
-
-        <textarea name="description" from="basetextarea">
-            <area>50,70,700,100</area>
-            <multiline>yes</multiline>
-            <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
-        </textarea>
 
         <checkbox name="autocommflag" from="basecheckbox">
             <position>215,210</position>
@@ -1486,36 +1475,32 @@
             <position>215,345</position>
         </checkbox>
 
-        <textarea name="userjob1label" from="basetextarea">
+        <textarea name="userjob1text" from="basetextarea">
             <area>260,352,300,30</area>
-            <value>Transcode new recordings</value>
         </textarea>
 
         <checkbox name="userjob2" from="basecheckbox">
             <position>215,390</position>
         </checkbox>
 
-        <textarea name="userjob2label" from="basetextarea">
+        <textarea name="userjob2text" from="basetextarea">
             <area>260,397,300,30</area>
-            <value>Transcode new recordings</value>
         </textarea>
 
         <checkbox name="userjob3" from="basecheckbox">
             <position>215,435</position>
         </checkbox>
 
-        <textarea name="userjob3label" from="basetextarea">
+        <textarea name="userjob3text" from="basetextarea">
             <area>260,447,300,30</area>
-            <value>Transcode new recordings</value>
         </textarea>
 
         <checkbox name="userjob4" from="basecheckbox">
             <position>215,480</position>
         </checkbox>
 
-        <textarea name="userjob4label" from="basetextarea">
+        <textarea name="userjob4text" from="basetextarea">
             <area>260,487,300,30</area>
-            <value>Transcode new recordings</value>
         </textarea>
 
         <button name="back" from="basebutton">

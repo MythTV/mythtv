@@ -33,6 +33,7 @@
                         <align>allcenter</align>
                         <cutdown>yes</cutdown>
                         <font>basemedium</font>
+                        <case>capitaliseall</case>
                         <alpha>220</alpha>
                     </textarea>
                 </state>
