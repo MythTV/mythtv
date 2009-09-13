@@ -1,10 +1,12 @@
+
+#include "mythuitext.h"
+
 #include <QApplication>
 #include <QDomDocument>
 
 #include "mythverbose.h"
 
 #include "mythuihelper.h"
-#include "mythuitext.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
@@ -250,14 +252,33 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             m_CutMessage = m_Message;
     }
 
-    switch (m_textCase)
-    {
-        case CaseUpper :
-            m_CutMessage = m_CutMessage.toUpper();
-        break;
-        case CaseLower :
-            m_CutMessage = m_CutMessage.toLower();
-        break;
+    if (!m_CutMessage.isEmpty())
+        {
+        QStringList templist;
+        QStringList::iterator it;
+        switch (m_textCase)
+        {
+            case CaseUpper :
+                m_CutMessage = m_CutMessage.toUpper();
+            break;
+            case CaseLower :
+                m_CutMessage = m_CutMessage.toLower();
+            break;
+            case CaseCapitaliseFirst :
+                m_CutMessage = m_CutMessage.toLower();
+                templist = m_CutMessage.split(". ");
+                for (it = templist.begin(); it != templist.end(); ++it)
+                    (*it).replace(0,1,(*it).left(1).toUpper());
+                m_CutMessage = templist.join(". ");
+                break;
+            case CaseCapitaliseAll :
+                m_CutMessage = m_CutMessage.toLower();
+                templist = m_CutMessage.split(" ");
+                for (it = templist.begin(); it != templist.end(); ++it)
+                    (*it).replace(0,1,(*it).left(1).toUpper());
+                m_CutMessage = templist.join(" ");
+            break;
+        }
     }
 
     p->DrawText(drawrect, m_CutMessage, m_Justification, *m_Font, alpha, area);
@@ -531,6 +552,10 @@ bool MythUIText::ParseElement(QDomElement &element)
             m_textCase = CaseLower;
         else if (stringCase == "upper")
             m_textCase = CaseUpper;
+        else if (stringCase == "capitalisefirst")
+            m_textCase = CaseCapitaliseFirst;
+        else  if (stringCase == "capitaliseall")
+            m_textCase = CaseCapitaliseAll;
         else
             m_textCase = CaseNormal;
     }

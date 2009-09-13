@@ -109,7 +109,8 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
     bool m_scrolling;
     ScrollDir m_scrollDirection;
 
-    enum TextCase {CaseNormal, CaseUpper, CaseLower};
+    enum TextCase {CaseNormal, CaseUpper, CaseLower, CaseCapitaliseFirst,
+                   CaseCapitaliseAll};
 
     TextCase m_textCase;
 
