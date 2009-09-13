@@ -437,7 +437,23 @@
     <imagetype name="basebackdrop">
         <area>0,39,1280,720</area>
         <crop>0,65,1280,646</crop>
+        <!--<filename>background.jpg</filename>-->
     </imagetype>
+
+    <shape name="basetextbackground">
+        <area>0,0,1222,240</area>
+        <type>roundbox</type>
+        <cornerradius>25</cornerradius>
+        <fill color="#484537" alpha="210" />
+        <shape name="hline">
+            <area>15,41,1192,6</area>
+            <fill color="#97997d" alpha="240" />
+            <line color="#686350" alpha="255" width="1" />
+        </shape>
+        <shape name="hline2" from="hline">
+            <position>15,204</position>
+        </shape>
+    </shape>
 
     <imagetype name="basetopbar">
         <position>0,0</position>

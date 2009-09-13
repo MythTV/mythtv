@@ -580,7 +580,6 @@
                     <shape name="titlebackground">
                         <area>0,0,183,25</area>
                         <fill color="#767662" alpha="180" />
-                        <cornerradius>10</cornerradius>
                     </shape>
 
                     <textarea name="buttontext" from="basetextarea">
@@ -605,10 +604,9 @@
             <filename>video/browserlistframe.png</filename>
         </imagetype>
 
-        <imagetype name="textbackground">
+        <shape name="textbackground" from="basetextbackground">
             <position>30,70</position>
-            <filename>recordings/descriptionbackground.png</filename>
-        </imagetype>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>48,78,590,35</area>
@@ -649,7 +647,7 @@
 
     <window name="gallery">
 
-<!--        <imagetype name="fanart" from="basebackdrop" />-->
+        <imagetype name="fanart" from="basebackdrop" />
 
         <imagetype name="topbar" from="basetopbar" />
 
@@ -736,10 +734,12 @@
             <align>hcenter,vcenter</align>
         </textarea>
 
-        <imagetype name="textbackground">
-            <position>30,490</position>
-            <filename>video/video_gallery_text_background.png</filename>
-        </imagetype>
+        <shape name="textbackground" from="basetextbackground">
+            <area>30,490,1222,188</area>
+            <shape name="hline2" from="hline">
+                <position>15,152</position>
+            </shape>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>48,497,590,35</area>

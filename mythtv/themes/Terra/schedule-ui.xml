@@ -260,10 +260,15 @@
             </statetype>
         </buttonlist>
 
-        <imagetype name="overviewbackground">
-            <position>680,123</position>
-            <filename>recordings/overviewbackground.png</filename>
-        </imagetype>
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,123,567,161</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
+        </shape>
 
         <textarea name="overviewlabel" from="basetextarea">
             <area>700,130,490,40</area>
@@ -293,18 +298,23 @@
             <position>870,223</position>
         </textarea>
 
-        <imagetype name="descriptionbackground">
-            <position>680,307</position>
-            <filename>recordings/upcomingdescriptionbackground.png</filename>
-        </imagetype>
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,307,567,365</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,329</position>
+            </shape>
+        </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>700,315,490,40</area>
+            <area>700,312,490,40</area>
             <font>baselarge</font>
         </textarea>
 
         <statetype name="ratingstate" from="baserating">
-            <position>1195,312</position>
+            <position>1195,309</position>
         </statetype>
 
         <textarea name="channel" from="basetextarea">
@@ -319,20 +329,18 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
-            <area>700,640,420,30</area>
+            <area>700,646,420,30</area>
         </textarea>
 
-        <textarea name="norecordings_info">
-            <area>700,405,535,230</area>
+        <textarea name="norecordings_info" from="description">
             <font>basemedium</font>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
                 Select 'Program Guide' or 'Program Finder'</value>
-            <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
 
@@ -857,11 +865,6 @@
             <value>Program Listings</value>
         </textarea>
 
-        <textarea name="curview" from="basetextarea">
-            <area>800,100,440,40</area>
-            <align>right,bottom</align>
-        </textarea>
-
         <buttonlist name="proglist" focusorder="0">
             <area>64,97,600,610</area>
             <layout>vertical</layout>
@@ -978,51 +981,62 @@
             </statetype>
         </buttonlist>
 
-        <imagetype name="overviewbackground">
-            <position>680,123</position>
-            <filename>recordings/overviewbackground.png</filename>
-        </imagetype>
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,123,567,161</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
+        </shape>
 
         <textarea name="overviewlabel" from="basetextarea">
             <area>700,130,490,40</area>
             <font>baselarge</font>
-            <value>Schedules Overview</value>
+            <value>List Overview</value>
         </textarea>
 
-        <textarea name="statuslabel" from="basetextarea">
+        <textarea name="curviewlabel" from="basetextarea">
             <area>700,183,160,30</area>
             <font>basemedium</font>
-            <value>First Conflict:</value>
+            <value>Current View:</value>
             <align>vcenter</align>
         </textarea>
 
-        <textarea name="status" from="basetextarea">
+        <textarea name="curview" from="basetextarea">
             <area>870,183,380,30</area>
-            <font state="warning">basesmallred</font>
             <align>vcenter</align>
+            <case>capitaliseall</case>
         </textarea>
 
-        <textarea name="filterlabel" from="statuslabel">
+        <textarea name="positionlabel" from="curviewlabel">
             <position>700,223</position>
-            <value>Filter:</value>
+            <value>Position:</value>
         </textarea>
 
-        <textarea name="filter" from="status">
+        <textarea name="position" from="curview">
             <position>870,223</position>
+            <case>normal</case>
         </textarea>
 
-        <imagetype name="descriptionbackground">
-            <position>680,307</position>
-            <filename>recordings/upcomingdescriptionbackground.png</filename>
-        </imagetype>
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,307,567,365</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,329</position>
+            </shape>
+        </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>700,315,490,40</area>
+            <area>700,312,490,40</area>
             <font>baselarge</font>
         </textarea>
 
         <statetype name="ratingstate" from="baserating">
-            <position>1195,312</position>
+            <position>1195,309</position>
         </statetype>
 
         <textarea name="channel" from="basetextarea">
@@ -1037,18 +1051,15 @@
         <textarea name="description" from="basetextarea">
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
             <area>700,640,420,30</area>
         </textarea>
 
-        <textarea name="msg">
-            <area>20,75,1240,400</area>
+        <textarea name="msg" from="description">
             <font>basemedium</font>
-            <value></value>
-            <multiline>yes</multiline>
             <align>allcenter</align>
             <value>No listings found for this program.</value>
         </textarea>
@@ -1112,9 +1123,14 @@
             </statetype>
         </buttonlist>
 
+        <shape name="guidebackground"> // Transparent guide bars don't work against custom background
+            <area>250,99,1030,357</area>
+            <fill color="#484537" />
+        </shape>
+
         <!-- Temporary Guide Widget for 0.22 -->
         <guidegrid name="guidegrid">
-            <area>252,99,1040,357</area>
+            <area>252,99,1028,358</area>
             <layout>horizontal</layout>
             <channels>5</channels>
             <timeslots>4</timeslots>
@@ -1172,10 +1188,12 @@
             <multiline>yes</multiline>
         </textarea>
 
-        <imagetype name="textbackground">
-            <position>30,475</position>
-            <filename>guide/guide_description_background.png</filename>
-        </imagetype>
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>30,475,1222,195</area>
+            <shape name="hline2" from="hline">
+                <position>15,159</position>
+            </shape>
+        </shape>
 
         <textarea name="title" from="basetextarea">
             <area>48,480,980,35</area>
@@ -1189,7 +1207,7 @@
         <textarea name="description" from="basetextarea">
             <area>48,529,1190,100</area>
             <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
         </textarea>
 
         <textarea name="year" from="basetextarea">
@@ -1205,7 +1223,6 @@
             <area>490,642,300,30</area>
             <align>hcenter</align>
         </textarea>
-
     </window>
 
 
@@ -1219,86 +1236,131 @@
             <value>Schedule Editor</value>
         </textarea>
 
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,70,567,214</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
+        </shape>
+        
+        <textarea name="overviewlabel" from="basetextarea">
+            <area>700,77,490,40</area>
+            <font>baselarge</font>
+            <value>Rule Overview</value>
+        </textarea>
 
-        <imagetype name="textbackground">
-            <position>30,133</position>
-            <filename>recordings/descriptionbackground.png</filename>
-        </imagetype>
+<!--        <textarea name="statuslabel" from="basetextarea">
+            <area>700,183,160,30</area>
+            <font>basemedium</font>
+            <value>First Conflict:</value>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="status" from="basetextarea">
+            <area>870,183,380,30</area>
+            <font state="warning">basesmallred</font>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="filterlabel" from="statuslabel">
+            <position>700,223</position>
+            <value>Filter:</value>
+        </textarea>
+
+        <textarea name="filter" from="status">
+            <position>870,223</position>
+        </textarea>-->
+
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,307,567,365</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,329</position>
+            </shape>
+        </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>48,138,980,35</area>
+            <area>700,312,490,40</area>
             <font>baselarge</font>
         </textarea>
 
         <statetype name="ratingstate" from="baserating">
-            <position>1193,135</position>
+            <position>1195,309</position>
         </statetype>
 
-        <textarea name="description" from="basetextarea">
-            <area>48,187,1190,145</area>
-            <multiline>yes</multiline>
-            <value>%|"SUBTITLE|"% %DESCRIPTION%</value>
-        </textarea>
-
-        <textarea name="year" from="basetextarea">
-            <area>48,347,290,30</area>
-        </textarea>
-
-        <textarea name="timedate" from="basetextarea">
-            <area>430,347,800,30</area>
+        <textarea name="channel" from="basetextarea">
+            <area>1030,370,195,30</area>
             <align>right</align>
         </textarea>
 
+        <textarea name="timedate" from="basetextarea">
+            <area>700,370,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>700,405,535,230</area>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+        </textarea>
+
+        <textarea name="rectypestatus" from="basetextarea">
+            <area>700,646,420,30</area>
+        </textarea>
 
         <buttonlist name="rules" from="basewideselector">
-            <position>215,210</position>
+            <position>64,160</position>
             <helptext>Select the recording rule</helptext>
         </buttonlist>
 
         <button name="schedoptions" from="basewidebutton">
-            <position>310,255</position>
+            <position>137,230</position>
             <value>Schedule Options</value>
             <helptext></helptext>
         </button>
 
         <button name="storeoptions" from="basewidebutton">
-            <position>310,300</position>
+            <position>137,295</position>
             <value>Storage Options</value>
             <helptext></helptext>
         </button>
 
         <button name="postprocessing" from="basewidebutton">
-            <position>310,345</position>
+            <position>137,360</position>
             <value>Post Processing</value>
             <helptext></helptext>
         </button>
 
         <button name="schedinfo" from="basewidebutton">
-            <position>310,390</position>
+            <position>137,425</position>
             <value>Schedule Info</value>
             <helptext></helptext>
         </button>
 
         <button name="preview" from="basewidebutton">
-            <position>310,435</position>
+            <position>137,490</position>
             <value>Preview</value>
             <helptext></helptext>
         </button>
 
         <button name="cancel" from="basebutton">
-            <position>40,525</position>
+            <position>40,595</position>
             <value>Cancel</value>
         </button>
 
         <button name="save" from="basebutton">
-            <position>540,525</position>
+            <position>377,595</position>
             <value>Save</value>
         </button>
     </window>
 
     <window name="scheduleoptionseditor">
 
-        <!-- <imagetype name="backdrop" from="basebackdrop" /> -->
+        <imagetype name="backdrop" from="basebackdrop" />
 
         <imagetype name="topbar" from="basetopbar" />
 
@@ -1306,15 +1368,62 @@
             <value>Schedule Options</value>
         </textarea>
         
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,70,567,214</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
         </shape>
 
+        <textarea name="overviewlabel" from="basetextarea">
+            <area>700,77,490,40</area>
+            <font>baselarge</font>
+            <value>Rule Overview</value>
+        </textarea>
 
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,307,567,365</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,329</position>
+            </shape>
+        </shape>
 
+        <textarea name="title" from="basetextarea">
+            <area>700,312,490,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <statetype name="ratingstate" from="baserating">
+            <position>1195,309</position>
+        </statetype>
+
+        <textarea name="channel" from="basetextarea">
+            <area>1030,370,195,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>700,370,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>700,405,535,230</area>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+        </textarea>
+
+        <textarea name="rectypestatus" from="basetextarea">
+            <area>700,646,420,30</area>
+        </textarea>
         
         <spinbox name="priority" from="basewidespinbox">
-            <position>215,210</position>
+            <position>64,160</position>
             <template type="negative">Reduce priority by %n</template>
             <template type="zero">Normal recording priority</template>
             <template type="positive">Raise priority by %n</template>
@@ -1322,12 +1431,12 @@
         </spinbox>
 
         <buttonlist name="input" from="basewideselector">
-            <position>215,255</position>
+            <position>64,220</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
-            <position>215,300</position>
+            <position>64,280</position>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
             <template type="positive">Start recording %n minute(s) early</template>
@@ -1335,7 +1444,7 @@
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
-            <position>215,345</position>
+            <position>64,340</position>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
             <template type="positive">End recording %n minute(s) late</template>
@@ -1343,26 +1452,26 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <position>215,390</position>
+            <position>64,400</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
-            <position>215,435</position>
+            <position>64,460</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="ruleactive" from="basecheckbox">
-            <position>215,480</position>
+            <position>154,520</position>
         </checkbox>
 
         <textarea name="ruleactivelabel" from="basetextarea">
-            <area>260,487,300,30</area>
+            <area>196,527,600,30</area>
             <value>Recording Rule Active</value>
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>40,595</position>
             <value>Back</value>
         </button>
     </window>
@@ -1377,56 +1486,103 @@
             <value>Storage Options</value>
         </textarea>
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,70,567,214</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
         </shape>
 
+        <textarea name="overviewlabel" from="basetextarea">
+            <area>700,77,490,40</area>
+            <font>baselarge</font>
+            <value>Rule Overview</value>
+        </textarea>
 
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,307,567,365</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,329</position>
+            </shape>
+        </shape>
 
+        <textarea name="title" from="basetextarea">
+            <area>700,312,490,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <statetype name="ratingstate" from="baserating">
+            <position>1195,309</position>
+        </statetype>
+
+        <textarea name="channel" from="basetextarea">
+            <area>1030,370,195,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>700,370,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>700,405,535,230</area>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+        </textarea>
+
+        <textarea name="rectypestatus" from="basetextarea">
+            <area>700,646,420,30</area>
+        </textarea>
 
         <buttonlist name="recprofile" from="basewideselector">
-            <position>215,210</position>
+            <position>64,160</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="recgroup" from="basewideselector">
-            <position>215,255</position>
+            <position>64,220</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="storagegroup" from="basewideselector">
-            <position>215,300</position>
+            <position>64,280</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="playgroup" from="basewideselector">
-            <position>215,345</position>
+            <position>64,340</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="maxepisodes" from="basewidespinbox">
-            <position>215,390</position>
+            <position>64,400</position>
             <template type="zero">No episode limit</template>
             <template type="positive">Keep at most %n episode(s)</template>
             <helptext></helptext>
         </spinbox>
 
         <buttonlist name="maxnewest" from="basewideselector">
-            <position>215,435</position>
+            <position>64,460</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="autoexpire" from="basecheckbox">
-            <position>215,480</position>
+            <position>154,520</position>
         </checkbox>
 
         <textarea name="autoexpirelabel" from="basetextarea">
-            <area>260,485,300,30</area>
+            <area>196,527,600,30</area>
             <value>Allow recordings to expire?</value>
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>40,595</position>
             <value>Back</value>
         </button>
     </window>
@@ -1441,70 +1597,117 @@
             <value>Post-Processing Options</value>
         </textarea>
 
-        <shape name="details_background" from="basebackground">
-            <area>25,25,750,175</area>
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,70,567,214</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
         </shape>
 
+        <textarea name="overviewlabel" from="basetextarea">
+            <area>700,77,490,40</area>
+            <font>baselarge</font>
+            <value>Rule Overview</value>
+        </textarea>
 
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,307,567,365</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,329</position>
+            </shape>
+        </shape>
 
+        <textarea name="title" from="basetextarea">
+            <area>700,312,490,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <statetype name="ratingstate" from="baserating">
+            <position>1195,309</position>
+        </statetype>
+
+        <textarea name="channel" from="basetextarea">
+            <area>1030,370,195,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>700,370,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>700,405,535,230</area>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+        </textarea>
+
+        <textarea name="rectypestatus" from="basetextarea">
+            <area>700,646,420,30</area>
+        </textarea>
 
         <checkbox name="autocommflag" from="basecheckbox">
-            <position>215,210</position>
+            <position>154,160</position>
         </checkbox>
 
         <textarea name="autocommflaglabel" from="basetextarea">
-            <area>260,217,300,30</area>
+            <area>196,167,600,30</area>
             <value>Commercial Flag new recordings</value>
         </textarea>
 
         <checkbox name="autotranscode" from="basecheckbox">
-            <position>215,255</position>
+            <position>154,220</position>
         </checkbox>
 
-        <textarea name="autotranscodelabel" from="basetextarea">
-            <area>260,262,300,30</area>
+        <textarea name="autotranscodelabel" from="autocommflaglabel">
+            <position>196,227</position>
             <value>Transcode new recordings</value>
         </textarea>
 
         <buttonlist name="transcodeprofile" from="basewideselector">
-            <position>215,300</position>
+            <position>64,280</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="userjob1" from="basecheckbox">
-            <position>215,345</position>
+            <position>154,340</position>
         </checkbox>
 
-        <textarea name="userjob1text" from="basetextarea">
-            <area>260,352,300,30</area>
+        <textarea name="userjob1text" from="autocommflaglabel">
+            <position>196,347</position>
         </textarea>
 
         <checkbox name="userjob2" from="basecheckbox">
-            <position>215,390</position>
+            <position>154,400</position>
         </checkbox>
 
-        <textarea name="userjob2text" from="basetextarea">
-            <area>260,397,300,30</area>
+        <textarea name="userjob2text" from="autocommflaglabel">
+            <position>196,407</position>
         </textarea>
 
         <checkbox name="userjob3" from="basecheckbox">
-            <position>215,435</position>
+            <position>154,460</position>
         </checkbox>
 
-        <textarea name="userjob3text" from="basetextarea">
-            <area>260,447,300,30</area>
+        <textarea name="userjob3text" from="autocommflaglabel">
+            <position>196,467</position>
         </textarea>
 
         <checkbox name="userjob4" from="basecheckbox">
-            <position>215,480</position>
+            <position>154,520</position>
         </checkbox>
 
-        <textarea name="userjob4text" from="basetextarea">
-            <area>260,487,300,30</area>
+        <textarea name="userjob4text" from="autocommflaglabel">
+            <position>196,527</position>
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>40,525</position>
+            <position>40,595</position>
             <value>Back</value>
         </button>
     </window>
