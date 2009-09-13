@@ -174,7 +174,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     {
         if (!fromBase)
         {
-            VERBOSE(VB_IMPORTANT, "Font needs a face");
+            VERBOSE(VB_IMPORTANT, QString("Font '%1' needs a face").arg(name));
             delete newFont;
             return NULL;
         }
@@ -260,8 +260,9 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("Unknown tag %1 in font")
-                                              .arg(info.tagName()));
+                VERBOSE(VB_IMPORTANT, QString("Unknown tag %1 in font '%2'")
+                                              .arg(info.tagName())
+                                              .arg(name));
                 return NULL;
             }
         }
