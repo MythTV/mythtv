@@ -1234,6 +1234,9 @@ void VideoListImp::buildDbList()
                                                QObject::tr("Unknown Prefix"),
                                                NULL, true));
 
+    smart_dir_node sg_prefix_root(new meta_dir_node("",
+                                               QObject::tr("Storage Groups"),
+                                               NULL, true));
     meta_dir_node *insert_hint = NULL;
     for (metadata_view_list::iterator p = mlist.begin(); p != mlist.end(); ++p)
     {
@@ -1254,12 +1257,6 @@ void VideoListImp::buildDbList()
                     break;
                 }
             }
-
-            // TODO: Should this be based on a GUI option.
-            if (!found_prefix)
-                if ((*p)->IsHostSet())
-                    found_prefix = true;
-
         }
 
         if (found_prefix)
@@ -1285,10 +1282,19 @@ void VideoListImp::buildDbList()
             (*p)->SetPrefix(test_prefix);
             insert_hint = AddMetadataToDir(*p, insert_base, insert_hint);
         }
+        else if (!found_prefix && ((*p)->IsHostSet()))
+        {
+            AddMetadataToDir(*p, sg_prefix_root.get());
+        }
         else
         {
             AddMetadataToDir(*p, unknown_prefix_root.get());
         }
+    }
+
+    if (!sg_prefix_root->empty())
+    {
+        video_root->addSubDir(sg_prefix_root);
     }
 
     if (!unknown_prefix_root->empty())
