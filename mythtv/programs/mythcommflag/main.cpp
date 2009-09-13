@@ -119,7 +119,12 @@ QString get_filename(ProgramInfo *program_info)
 
 int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
 {
-    QString filename = get_filename(program_info);
+    QString filename;
+    
+    if (program_info->pathname.startsWith("myth://"))
+        filename = program_info->pathname;
+    else
+        filename = get_filename(program_info);
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
     if (!tmprbuf)
@@ -1316,8 +1321,12 @@ int main(int argc, char *argv[])
         ProgramInfo *pginfo = new ProgramInfo;
         pginfo->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
         pginfo->recendts = QDateTime::currentDateTime().addSecs(-1);
-        pginfo->pathname = QFileInfo(filename).absoluteFilePath();
         pginfo->isVideo = true;
+
+        if (filename.startsWith("myth://"))
+            pginfo->pathname = filename;
+        else
+            pginfo->pathname = QFileInfo(filename).absoluteFilePath();
 
         result = BuildVideoMarkup(pginfo, useDB);
 

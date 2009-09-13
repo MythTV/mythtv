@@ -25,6 +25,7 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     QStringList GetFileList(QString Path);
     bool FileExists(QString filename);
     QStringList GetFileInfo(QString filename);
+    static QString GetRelativePathname(const QString &filename);
 
     QString FindRecordingFile(QString filename);
     QString FindRecordingDir(QString filename);

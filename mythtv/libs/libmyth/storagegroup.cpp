@@ -1,6 +1,7 @@
 #include <QDir>
 #include <QFile>
 #include <QRegExp>
+#include <QUrl>
 
 #include "storagegroup.h"
 #include "mythcontext.h"
@@ -226,6 +227,80 @@ QStringList StorageGroup::GetFileInfo(QString filename)
     }
 
     return details;
+}
+
+/** \fn StorageGroup::GetRelativePathname(const Qstring&)
+ *  \brief Returns the relative pathname of a file by comparing the filename
+ *         against all Storage Group directories (and MythVideo's startupdir)
+ *
+ *  \param filename The full pathname of the file to use
+ *  \return         The relative path if it can be determined, otherwise the
+ *                  full input filename is returned back to the caller.
+ */
+QString StorageGroup::GetRelativePathname(const QString &filename)
+{
+    QString result = filename;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    VERBOSE(VB_FILE+VB_EXTRA,
+            QString("StorageGroup::GetRelativePathname(%1)").arg(filename));
+
+    if (filename.startsWith("myth://"))
+    {
+        QUrl qurl(filename);
+
+        if (qurl.hasFragment())
+            result = qurl.path() + "#" + qurl.fragment();
+        else
+            result = qurl.path();
+
+        if (result.startsWith("/"))
+            result.replace(0, 1, "");
+
+        return result;
+    }
+
+    query.prepare("SELECT DISTINCT dirname FROM storagegroup;");
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            if (filename.startsWith(query.value(0).toString()))
+            {
+                result = filename;
+                result.replace(0, query.value(0).toString().length(), "");
+                if (result.startsWith("/"))
+                    result.replace(0, 1, "");
+
+                VERBOSE(VB_FILE+VB_EXTRA,
+                        QString("StorageGroup::GetRelativePathname(%1) = '%2'")
+                                .arg(filename).arg(result));
+                return result;
+            }
+        }
+    }
+
+    query.prepare("SELECT DISTINCT data FROM settings WHERE value = 'VideoStartupDir';");
+    if (query.exec())
+    {
+        while (query.next())
+        {
+            if (filename.startsWith(query.value(0).toString()))
+            {
+                result = filename;
+                result.replace(0, query.value(0).toString().length(), "");
+                if (result.startsWith("/"))
+                    result.replace(0, 1, "");
+
+                VERBOSE(VB_FILE+VB_EXTRA,
+                        QString("StorageGroup::GetRelativePathname(%1) = '%2'")
+                                .arg(filename).arg(result));
+                return result;
+            }
+        }
+    }
+
+    return result;
 }
 
 /** \fn StorageGroup::FindDirs(const QString, const QString)

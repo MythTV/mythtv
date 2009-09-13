@@ -2145,7 +2145,7 @@ void ProgramInfo::ClearMarkupMap(int type, long long min_frame,
         query.prepare("DELETE FROM filemarkup"
                       " WHERE filename = :PATH "
                       + comp + ";");
-        query.bindValue(":PATH", pathname);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
     }
     else
     {
@@ -2168,8 +2168,13 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
 {
     QMap<long long, int>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
+    QString videoPath;
 
-    if (!isVideo)
+    if (isVideo)
+    {
+       videoPath = StorageGroup::GetRelativePathname(pathname);
+    }
+    else
     {
         // check to make sure the show still exists before saving markups
         query.prepare("SELECT starttime FROM recorded"
@@ -2206,7 +2211,7 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
         {
             query.prepare("INSERT INTO filemarkup (filename, mark, type)"
                           " VALUES ( :PATH , :MARK , :TYPE );");
-            query.bindValue(":PATH", pathname);
+            query.bindValue(":PATH", videoPath);
         }
         else
         {
@@ -2238,7 +2243,7 @@ void ProgramInfo::GetMarkupMap(frm_dir_map_t &marks,
                       " WHERE filename = :PATH"
                       " AND type = :TYPE"
                       " ORDER BY mark;");
-        query.bindValue(":PATH", pathname);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
     }
     else
     {
@@ -2321,7 +2326,7 @@ void ProgramInfo::GetPositionMap(frm_pos_map_t &posMap,
         query.prepare("SELECT mark, offset FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type = :TYPE ;");
-        query.bindValue(":PATH", pathname);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
     }
     else
     {
@@ -2357,7 +2362,7 @@ void ProgramInfo::ClearPositionMap(int type) const
         query.prepare("DELETE FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type = :TYPE ;");
-        query.bindValue(":PATH", pathname);
+        query.bindValue(":PATH", StorageGroup::GetRelativePathname(pathname));
     }
     else
     {
@@ -2430,13 +2435,16 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
     if (max_frame >= 0)
         comp += " AND mark <= :MAX_FRAME ";
 
+    QString videoPath;
     if (isVideo)
     {
+        videoPath = StorageGroup::GetRelativePathname(pathname);
+
         query.prepare("DELETE FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type = :TYPE"
                       + comp + ";");
-        query.bindValue(":PATH", pathname);
+        query.bindValue(":PATH", videoPath);
     }
     else
     {
@@ -2475,7 +2483,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
                           " (filename, mark, type, offset)"
                           " VALUES"
                           " ( :PATH , :MARK , :TYPE , :OFFSET );");
-            query.bindValue(":PATH", pathname);
+            query.bindValue(":PATH", videoPath);
         }
         else
         {
@@ -2515,6 +2523,10 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
 
     QMap<long long, long long>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
+    QString videoPath;
+    
+    if (isVideo)
+        videoPath = StorageGroup::GetRelativePathname(pathname);
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -2527,7 +2539,7 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
                           " (filename, mark, type, offset)"
                           " VALUES"
                           " ( :PATH , :MARK , :TYPE , :OFFSET );");
-            query.bindValue(":PATH", pathname);
+            query.bindValue(":PATH", videoPath);
         }
         else
         {
