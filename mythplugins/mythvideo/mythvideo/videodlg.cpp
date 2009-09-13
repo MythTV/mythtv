@@ -3453,6 +3453,7 @@ void VideoDialog::searchComplete(QString string)
         if (new_node)
         {
             m_videoButtonTree->SetCurrentNode(new_node);
+            m_videoButtonTree->SetActive(true);
         }
     }
     else
