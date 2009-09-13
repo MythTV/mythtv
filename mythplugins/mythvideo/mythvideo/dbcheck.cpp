@@ -873,6 +873,10 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
         if (dbver == "1027")
         {
+            VERBOSE(VB_IMPORTANT, "Converting filenames in filemarkup table "
+                    "from absolute to relative paths.  This may take a long "
+                    "time if you have a large number of MythVideo seektables.");
+
             bool ok = true;
             MSqlQuery query(MSqlQuery::InitCon());
             MSqlQuery update(MSqlQuery::InitCon());
