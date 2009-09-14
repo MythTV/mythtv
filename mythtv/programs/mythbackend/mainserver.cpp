@@ -4701,10 +4701,13 @@ void MainServer::connectionClosed(MythSocket *socket)
                 if (m_sched && !isFallingAsleep)
                     m_sched->Reschedule(0);
 
-                QString message = QString("LOCAL_SLAVE_BACKEND_OFFLINE %2")
+                QString message = QString("LOCAL_SLAVE_BACKEND_OFFLINE %1")
                                           .arg(pbs->getHostname());
                 MythEvent me(message);
                 gContext->dispatch(me);
+
+                MythEvent me2("RECORDING_LIST_CHANGE");
+                gContext->dispatch(me2);
             }
 
             LiveTVChain *chain;
