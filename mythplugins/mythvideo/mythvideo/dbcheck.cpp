@@ -6,6 +6,7 @@
 #include <mythtv/mythdb.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdbparams.h>
+#include <mythtv/schemawizard.h>
 
 #include "storagegroup.h"
 
@@ -657,10 +658,36 @@ namespace
                             "combined version: %1.").arg(dbver));
         }
 
-        QString dbver = gContext->GetSetting(MythVideoVersionName);
 
-        if (dbver == currentDatabaseVersion)
+        SchemaUpgradeWizard  * DBup; 
+        DBup = SchemaUpgradeWizard::Get(MythVideoVersionName,
+                                        currentDatabaseVersion); 
+	 
+        // There may be a race condition where another frontend is upgrading, 
+        // so wait up to 3 seconds for a more accurate version: 
+        DBup->CompareAndWait(3); 
+
+        if (DBup->versionsBehind == 0)  // same schema 
             return true;
+
+        // An upgrade is likely. Ensure we have a backup first:
+        if (!DBup->didBackup)
+            DBup->BackupDB();
+
+        // Pop up messages, questions, warnings, et c. 
+        switch (DBup->PromptForUpgrade("Video", true, false)) 
+        { 
+            case MYTH_SCHEMA_USE_EXISTING: 
+                gContext->ActivateSettingsCache(true); 
+                return true; 
+            case MYTH_SCHEMA_ERROR: 
+            case MYTH_SCHEMA_EXIT: 
+                return false; 
+            case MYTH_SCHEMA_UPGRADE: 
+                break; 
+        }
+
+        QString dbver = DBup->DBver;
 
         if (dbver == "1011")
         {
