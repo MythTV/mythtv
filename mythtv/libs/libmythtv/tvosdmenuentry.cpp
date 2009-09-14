@@ -208,11 +208,11 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(new TVOSDMenuEntry(
         "PREVCHAN",           1, -1, -1, -1, "Previous TV Channel"));
     curMenuEntries.append(new TVOSDMenuEntry(
-        "TRANSCODE",          1,  1, -1, -1, "Transcode Show"));
+        "TRANSCODE",          0,  1, -1, -1, "Transcode Show"));
     curMenuEntries.append(new TVOSDMenuEntry(
-        "COMMSKIP",           1,  1,  0, -1, "Commercial Skip"));
+        "COMMSKIP",           0,  1,  0, -1, "Commercial Skip"));
     curMenuEntries.append(new TVOSDMenuEntry(
-        "TOGGLEEXPIRE",       1,  1, -1, -1, "Toggle Expire"));
+        "TOGGLEEXPIRE",      -1,  1, -1, -1, "Toggle Expire"));
     curMenuEntries.append(new TVOSDMenuEntry(
         "SCHEDULERECORDING",  1,  1,  0,  0, "Schedule Recordings"));
     curMenuEntries.append(new TVOSDMenuEntry(
