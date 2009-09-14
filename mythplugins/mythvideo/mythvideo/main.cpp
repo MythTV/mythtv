@@ -526,8 +526,15 @@ int mythplugin_init(const char *libversion)
         return -1;
 
     gContext->ActivateSettingsCache(false);
-    UpgradeVideoDatabaseSchema();
+    bool upgraded = UpgradeVideoDatabaseSchema();
     gContext->ActivateSettingsCache(true);
+
+    if (!upgraded)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade video database schema, exiting.");
+        return -1;
+    }
 
     VideoGeneralSettings general;
     general.Load();

@@ -47,25 +47,33 @@ namespace
 
     const QString MythVideoVersionName = "mythvideo.DBSchemaVer";
 
-    void UpdateDBVersionNumber(const QString &field_name,
+    bool UpdateDBVersionNumber(const QString &field_name,
                                const QString &newnumber)
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
         if (!query.exec(QString("DELETE FROM settings WHERE value='%1';")
                         .arg(field_name)))
+        {
             MythDB::DBError("UpdateDBVersionNumber - delete", query);
+            return false;
+        }
+
         if (!query.exec(QString("INSERT INTO settings (value, data, hostname) "
                                 "VALUES ('%1', %2, NULL);")
                         .arg(field_name).arg(newnumber)))
+        {
             MythDB::DBError("UpdateDBVersionNumber - insert", query);
+            return false;
+        }
 
         VERBOSE(VB_IMPORTANT,
                 QString("Upgraded to MythVideo schema version %1")
                 .arg(newnumber));
+        return true;
     }
 
-    void performActualUpdate(const QStringList &updates, const QString &version,
+    bool performActualUpdate(const QStringList &updates, const QString &version,
                              QString &dbver, const QString &field_name)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -78,14 +86,20 @@ namespace
              p != updates.end(); ++p)
         {
             if (!query.exec(*p))
+            {
                 MythDB::DBError("performActualUpdate", query);
+                return false;
+            }
         }
 
-        UpdateDBVersionNumber(field_name, version);
+        if (!UpdateDBVersionNumber(field_name, version))
+            return false;
+
         dbver = version;
+        return true;
     }
 
-    void performActualUpdate(const QString updates[], const QString &version,
+    bool performActualUpdate(const QString updates[], const QString &version,
                              QString &dbver, const QString &field_name)
     {
         QStringList upQuery;
@@ -95,10 +109,10 @@ namespace
             if (q == "") break;
             upQuery.append(q);
         }
-        performActualUpdate(upQuery, version, dbver, field_name);
+        return performActualUpdate(upQuery, version, dbver, field_name);
     }
 
-    void InitializeVideoDatabase()
+    bool InitializeVideoDatabase()
     {
         VERBOSE(VB_IMPORTANT,
                 "Inserting MythVideo initial database information.");
@@ -133,7 +147,9 @@ namespace
     ""
         };
         QString dbver = "";
-        performActualUpdate(updates, "1000", dbver, OldMythVideoVersionName);
+        if (!performActualUpdate(updates, "1000", dbver,
+                                 OldMythVideoVersionName))
+            return false;
 
         MSqlQuery qQuery(MSqlQuery::InitCon());
 
@@ -155,9 +171,12 @@ namespace
     ""
             };
             dbver = "";
-            performActualUpdate(updates2, "1000", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates2, "1000", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
+
+        return true;
     }
 
     bool IsCombinedSchema()
@@ -167,18 +186,20 @@ namespace
         return dbver.size();
     }
 
-    void DoOldVideoDatabaseSchemaUpgrade()
+    bool DoOldVideoDatabaseSchemaUpgrade()
     {
-        if (IsCombinedSchema()) return;
+        if (IsCombinedSchema())
+            return true;  // already upgraded before it was combined?
 
         QString dbver = gContext->GetSetting(OldMythVideoVersionName);
 
         if (dbver == lastMythVideoVersion)
-            return;
+            return true;
 
         if (dbver == "")
         {
-            InitializeVideoDatabase();
+            if (!InitializeVideoDatabase())
+                return false;
             dbver = "1000";
         }
 
@@ -191,8 +212,9 @@ namespace
 ""
             };
 
-            performActualUpdate(updates, "1001", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1001", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1001")
@@ -202,8 +224,9 @@ namespace
 ""
             };
 
-            performActualUpdate(updates, "1002", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1002", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1002")
@@ -219,8 +242,9 @@ namespace
 ""
             };
 
-            performActualUpdate(updates, "1003", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1003", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
 
@@ -236,8 +260,9 @@ namespace
 ");",
 ""
             };
-            performActualUpdate(updates, "1004", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1004", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1004")
@@ -247,8 +272,9 @@ namespace
 "UPDATE keybindings SET keylist = \"],},F11\" WHERE action = \"INCPARENT\" AND keylist = \"Right\";",
 ""
             };
-            performActualUpdate(updates, "1005", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1005", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1005")
@@ -261,8 +287,9 @@ namespace
 ""
             };
 
-            performActualUpdate(updates, "1006", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1006", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1006")
@@ -275,8 +302,9 @@ namespace
 ""
             };
 
-            performActualUpdate(updates, "1007", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1007", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1007")
@@ -287,8 +315,9 @@ namespace
 ""
             };
 
-            performActualUpdate(updates, "1008", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1008", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1008")
@@ -313,8 +342,9 @@ namespace
                 updates.append("SELECT 1;");
             }
 
-            performActualUpdate(updates, "1009", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1009", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1009")
@@ -346,12 +376,15 @@ namespace
 "INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) VALUES "
 "('img', 'Internal', 0, 0);");
 
-            performActualUpdate(updates, "1010", dbver,
-                                OldMythVideoVersionName);
+            if (!performActualUpdate(updates, "1010", dbver,
+                                     OldMythVideoVersionName))
+                return false;
         }
+
+        return true;
     }
 
-    void InitializeDVDDatabase()
+    bool InitializeDVDDatabase()
     {
         VERBOSE(VB_IMPORTANT,
                 "Inserting MythDVD initial database information.");
@@ -414,7 +447,9 @@ namespace
 ""
             };
             QString dbver = "";
-            performActualUpdate(updates, "1000", dbver, OldMythDVDVersionName);
+            if (!performActualUpdate(updates, "1000", dbver,
+                                     OldMythDVDVersionName))
+                return false;
         }
 
         if (!qQuery.exec("SELECT * FROM dvdtranscode;") || qQuery.size() <= 0)
@@ -549,18 +584,23 @@ namespace
 ""
             };
             QString dbver = "";
-            performActualUpdate(updates, "1000", dbver, OldMythDVDVersionName);
+            if (!performActualUpdate(updates, "1000", dbver,
+                                     OldMythDVDVersionName))
+                return false;
         }
+
+        return true;
     }
 
-    void DoOldDVDDatabaseSchemaUpgrage()
+    bool DoOldDVDDatabaseSchemaUpgrage()
     {
-        if (IsCombinedSchema()) return;
+        if (IsCombinedSchema())
+            return true;  // already upgraded before it was combined?
 
         QString dbver = gContext->GetSetting(OldMythDVDVersionName);
 
         if (dbver == lastMythDVDDBVersion)
-            return;
+            return true;
 
         if (dbver == "")
         {
@@ -574,7 +614,9 @@ namespace
 "UPDATE dvdtranscode SET use_yv12=1 WHERE (intid=1 OR intid=2 OR intid=12 OR intid=13);",
 ""
             };
-            performActualUpdate(updates, "1001", dbver, OldMythDVDVersionName);
+            if (!performActualUpdate(updates, "1001", dbver,
+                                     OldMythDVDVersionName))
+                return false;
         }
 
         if (dbver == "1001")
@@ -583,11 +625,15 @@ namespace
 "ALTER TABLE dvdtranscode ADD COLUMN tc_param VARCHAR(128);",
 ""
             };
-            performActualUpdate(updates, "1002", dbver, OldMythDVDVersionName);
+            if (!performActualUpdate(updates, "1002", dbver,
+                                     OldMythDVDVersionName))
+                return false;
         }
+
+        return true;
     }
 
-    void DoVideoDatabaseSchemaUpgrade()
+    bool DoVideoDatabaseSchemaUpgrade()
     {
         QString dvdver = gContext->GetSetting(OldMythDVDVersionName);
         QString oldmythvideover = gContext->GetSetting(OldMythVideoVersionName);
@@ -602,7 +648,9 @@ namespace
                     .arg(OldMythDVDVersionName);
 
             QString dbver;
-            performActualUpdate(updates, "1011", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1011", dbver,
+                                     MythVideoVersionName))
+                return false;
 
             VERBOSE(VB_IMPORTANT,
                     QString("Updated from old MythDVD/MythVideo schema to "
@@ -612,7 +660,7 @@ namespace
         QString dbver = gContext->GetSetting(MythVideoVersionName);
 
         if (dbver == currentDatabaseVersion)
-            return;
+            return true;
 
         if (dbver == "1011")
         {
@@ -622,7 +670,9 @@ namespace
                        "MODIFY type TINYINT NOT NULL DEFAULT 0;",
 ""
 };
-            performActualUpdate(updates, "1012", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1012", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1012")
@@ -641,15 +691,17 @@ namespace
                 }
                 gContext->SaveSetting(setting, view);
             }
-            performActualUpdate(QStringList(), "1013", dbver,
-                                MythVideoVersionName);
+            if (!UpdateDBVersionNumber(MythVideoVersionName, "1013"))
+                return false;
         }
 
         if (dbver == "1013")
         {
             QStringList updates;
             updates += "ALTER TABLE filemarkup ADD INDEX (filename(255));";
-            performActualUpdate(updates, "1014", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1014", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1014")
@@ -665,7 +717,9 @@ namespace
 ""
             };
 
-            performActualUpdate(updates, "1015", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1015", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1015")
@@ -673,7 +727,9 @@ namespace
             QStringList updates;
             updates +=
             "ALTER TABLE videometadata MODIFY inetref VARCHAR(255) NOT NULL;";
-            performActualUpdate(updates, "1016", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1016", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1016")
@@ -716,7 +772,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
 ""
 };
 
-            performActualUpdate(updates, "1017", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1017", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
 
@@ -776,7 +834,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 ""
 };
 
-            performActualUpdate(updates, "1018", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1018", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1018")
@@ -788,14 +848,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                        "'MovieDataCommandLine' AND data LIKE '%imdb%';";
             updates += "DELETE FROM settings WHERE value="
                        "'MoviePosterCommandLine' AND data LIKE '%imdb%';";
-            performActualUpdate(updates, "1019", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1019", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1019")
         {
             QStringList updates(
                     "ALTER TABLE videometadata ADD `trailer` TEXT;");
-            performActualUpdate(updates, "1020", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1020", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1020")
@@ -814,7 +878,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             AddFileType("ogm");
             AddFileType("flv");
 
-            UpdateDBVersionNumber(MythVideoVersionName, "1021");
+            if (!UpdateDBVersionNumber(MythVideoVersionName, "1021"))
+                return false;
+
             dbver = "1021";
         }
 
@@ -823,7 +889,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
              QStringList updates;
              updates += "ALTER TABLE videometadata ADD host text CHARACTER SET utf8 NOT NULL;";
 
-             performActualUpdate(updates, "1022", dbver, MythVideoVersionName);
+             if (!performActualUpdate(updates, "1022", dbver,
+                                      MythVideoVersionName))
+                return false;
          }
 
         if (dbver == "1022")
@@ -832,7 +900,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             updates += "ALTER TABLE videometadata ADD `screenshot` TEXT;";
             updates += "ALTER TABLE videometadata ADD `banner` TEXT;";
             updates += "ALTER TABLE videometadata ADD `fanart` TEXT;";
-            performActualUpdate(updates, "1023", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1023", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1023")
@@ -844,7 +914,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                        "UNSIGNED NOT NULL DEFAULT '0' AFTER `length`;";
             updates += "ALTER TABLE videometadata ADD `episode` SMALLINT "
                        "UNSIGNED NOT NULL DEFAULT '0' AFTER `season`;";
-            performActualUpdate(updates, "1024", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1024", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1024") 
@@ -852,7 +924,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             QStringList updates; 
             updates += "ALTER TABLE videometadata ADD watched BOOL "
                        "NOT NULL DEFAULT 0 AFTER browse;"; 
-            performActualUpdate(updates, "1025", dbver, MythVideoVersionName); 
+            if (!performActualUpdate(updates, "1025", dbver,
+                                     MythVideoVersionName))
+                return false;
         } 
 
         if (dbver == "1025")
@@ -860,7 +934,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             QStringList updates;
             updates += "ALTER TABLE videometadata ADD `insertdate` TIMESTAMP "
                        "NULL DEFAULT CURRENT_TIMESTAMP AFTER `fanart`;";
-            performActualUpdate(updates, "1026", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1026", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1026")
@@ -868,7 +944,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             QStringList updates;
             updates += "DELETE FROM keybindings "
                        " WHERE action = 'DELETE' AND context = 'Video';";
-            performActualUpdate(updates, "1027", dbver, MythVideoVersionName);
+            if (!performActualUpdate(updates, "1027", dbver,
+                                     MythVideoVersionName))
+                return false;
         }
 
         if (dbver == "1027")
@@ -914,19 +992,26 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             else
                 ok = false;
 
-            if (ok)
-                UpdateDBVersionNumber(MythVideoVersionName, "1028");
+            if (!ok)
+                return false;
+
+            if (!UpdateDBVersionNumber(MythVideoVersionName, "1028"))
+                return false;
         }
+
+        return true;
     }
 }
 
-void UpgradeVideoDatabaseSchema()
+bool UpgradeVideoDatabaseSchema()
 {
     if (!IsCombinedSchema())
     {
-        DoOldVideoDatabaseSchemaUpgrade();
-        DoOldDVDDatabaseSchemaUpgrage();
+        if (!DoOldVideoDatabaseSchemaUpgrade())
+            return false;
+        if (!DoOldDVDDatabaseSchemaUpgrage())
+            return false;
     }
 
-    DoVideoDatabaseSchemaUpgrade();
+    return DoVideoDatabaseSchemaUpgrade();
 }
