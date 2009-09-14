@@ -187,56 +187,56 @@ TVOSDMenuEntry *TVOSDMenuEntryList::FindEntry(QString category)
 */
 void TVOSDMenuEntryList::InitDefaultEntries(void)
 {
-    curMenuEntries.append(
-        new TVOSDMenuEntry("DVD",                        -1,  -1,  -1,  1, "DVD Menu"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("GUIDE",                     1,  1,  0,  0, "Program Guide"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("PIP",                          1,  1,  1,  -1, "Picture-in-Picture"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("INPUTSWITCHING",   1,  -1,  -1,  -1, "Change TV Input"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("EDITCHANNEL",         1,  -1,  -1,  -1, "Edit Channel"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("EDITRECORDING",     -1,  1,  -1,  -1, "Edit Recording"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("JUMPREC",                 1,  1,  1,  0, "List of Recorded Shows"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("CHANNELGROUP",            1,  -1,  -1,  -1, "Channel Groups"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("TOGGLEBROWSE",     1,  -1,  -1,  -1, "Live TV Browse Mode"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("PREVCHAN",              1,  -1,  -1,  -1, "Previous TV Channel"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("TRANSCODE",            1,  1,  -1,  -1, "Transcode Show"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("COMMSKIP",              1,  1,  0,  -1, "Commercial Skip"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("TOGGLEEXPIRE",        1,  1,  -1,  -1, "Toggle Expire"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("SCHEDULEREC",         1,  1,  0,  0, "Schedule Recordings"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("AUDIOTRACKS",          1,  1,  1,  1, "Audio Tracks"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("SUBTITLETRACKS",     1,  1,  1,  1, "Subtitle Tracks"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("CCTRACKS",               1,  1,  1,  1, "Closed Caption Tracks"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("VIDEOASPECT",          1,  1,  1,  1, "Video Aspect"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("ADJUSTFILL",              1, 1,  1,  1, "Adjust Fill"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("MANUALZOOM",        1, 1, 1, 1, "Manual Zoom"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("ADJUSTPICTURE",     1, 1, 1, 1, "Adjust Picture"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("AUDIOSYNC",           1, 1, 1, 1 , "Audio Sync"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("TIMESTRETCH",        1, 1, 1, 1, "Time Stretch"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("VIDEOSCAN",            1, 1, 1, 1, "Video Scan"));
-    curMenuEntries.append(
-        new TVOSDMenuEntry("SLEEP",                     1, 1, 1, 1, "Sleep"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "DVD",               -1, -1, -1,  1, "DVD Menu"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "GUIDE",              1,  1,  0,  0, "Program Guide"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "PIP",                1,  1,  1, -1, "Picture-in-Picture"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "INPUTSWITCHING",     1, -1, -1, -1, "Change TV Input"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "EDITCHANNEL",        1, -1, -1, -1, "Edit Channel"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "EDITRECORDING",     -1,  1, -1, -1, "Edit Recording"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "JUMPREC",            1,  1,  1,  0, "List of Recorded Shows"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "CHANNELGROUP",       1, -1, -1, -1, "Channel Groups"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "TOGGLEBROWSE",       1, -1, -1, -1, "Live TV Browse Mode"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "PREVCHAN",           1, -1, -1, -1, "Previous TV Channel"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "TRANSCODE",          1,  1, -1, -1, "Transcode Show"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "COMMSKIP",           1,  1,  0, -1, "Commercial Skip"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "TOGGLEEXPIRE",       1,  1, -1, -1, "Toggle Expire"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "SCHEDULEREC",        1,  1,  0,  0, "Schedule Recordings"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "AUDIOTRACKS",        1,  1,  1,  1, "Audio Tracks"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "SUBTITLETRACKS",     1,  1,  1,  1, "Subtitle Tracks"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "CCTRACKS",           1,  1,  1,  1, "Closed Caption Tracks"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "VIDEOASPECT",        1,  1,  1,  1, "Video Aspect"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "ADJUSTFILL",         1,  1,  1,  1, "Adjust Fill"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "MANUALZOOM",         1,  1,  1,  1, "Manual Zoom"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "ADJUSTPICTURE",      1,  1,  1,  1, "Adjust Picture"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "AUDIOSYNC",          1,  1,  1,  1, "Audio Sync"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "TIMESTRETCH",        1,  1,  1,  1, "Time Stretch"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "VIDEOSCAN",          1,  1,  1,  1, "Video Scan"));
+    curMenuEntries.append(new TVOSDMenuEntry(
+        "SLEEP",              1,  1,  1,  1, "Sleep"));
 
     GetEntriesFromDB();
     if (GetCount() != curMenuEntries.count())
