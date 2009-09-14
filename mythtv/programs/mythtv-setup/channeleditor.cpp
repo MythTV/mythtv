@@ -196,7 +196,7 @@ bool ChannelEditor::Create()
 
     // Import Icons Button
     importIconButton->SetHelpText(tr("Starts the icon downloader"));
-    importIconButton->SetEnabled(SourceUtil::IsAnySourceScanable());
+    importIconButton->SetEnabled(true);
     connect(importIconButton,  SIGNAL(Clicked()), SLOT(channelIconImport()));
 
     // Transport Editor Button
