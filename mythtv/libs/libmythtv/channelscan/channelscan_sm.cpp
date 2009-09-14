@@ -536,6 +536,11 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 
             mplexid = ChannelUtil::GetMplexID(sourceID, frequency, tsid, netid);
 
+            if (!GetDVBChannel())
+            {
+                continue;
+            }
+
             DTVMultiplex tuning;
             if (mplexid > 0)
             {
