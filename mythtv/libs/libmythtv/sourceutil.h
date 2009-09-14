@@ -24,7 +24,7 @@ class MPUBLIC SourceUtil
                                         QString &grabber, QString &userid,
                                         QString &passwd,  QString &lineupid);
     static uint    GetConnectionCount(uint sourceid);
-    static bool    IsProperlyConnected(uint sourceid, bool strich = false);
+    static bool    IsProperlyConnected(uint sourceid, bool strict = false);
     static bool    IsEncoder(uint sourceid, bool strict = false);
     static bool    IsUnscanable(uint sourceid);
     static bool    IsAnySourceScanable(void);
