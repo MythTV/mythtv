@@ -975,7 +975,7 @@ void PostProcEditor::Load()
     // User Job #2
     m_userjob2Check->SetCheckState(m_recordingRule->m_autoUserJob2);
     MythUIText *userjob2Text = NULL;
-    UIUtilW::Assign(this, userjob1Text, "userjob2text");
+    UIUtilW::Assign(this, userjob2Text, "userjob2text");
     if (userjob2Text)
         userjob2Text->SetText(tr("Run '%1'")
                     .arg(gContext->GetSetting("UserJobDesc2", "User Job 2")));
@@ -983,7 +983,7 @@ void PostProcEditor::Load()
     // User Job #3
     m_userjob3Check->SetCheckState(m_recordingRule->m_autoUserJob3);
     MythUIText *userjob3Text = NULL;
-    UIUtilW::Assign(this, userjob1Text, "userjob3text");
+    UIUtilW::Assign(this, userjob3Text, "userjob3text");
     if (userjob3Text)
         userjob3Text->SetText(tr("Run '%1'")
                     .arg(gContext->GetSetting("UserJobDesc3", "User Job 3")));
@@ -991,7 +991,7 @@ void PostProcEditor::Load()
     // User Job #4
     m_userjob4Check->SetCheckState(m_recordingRule->m_autoUserJob4);
     MythUIText *userjob4Text = NULL;
-    UIUtilW::Assign(this, userjob1Text, "userjob4text");
+    UIUtilW::Assign(this, userjob4Text, "userjob4text");
     if (userjob4Text)
         userjob4Text->SetText(tr("Run '%1'")
                     .arg(gContext->GetSetting("UserJobDesc4", "User Job 4")));
