@@ -242,8 +242,6 @@ void ClassicCommDetector::Init()
     decoderFoundAspectChanges = false;
 
     lastSentCommBreakMap.clear();
-    commBreakMapUpdateRequested = false;
-    sendCommBreakMapUpdates = false;
 
     // Check if close to 4:3
     if (fabs(((width*1.0)/height) - 1.333333) < 0.1)
