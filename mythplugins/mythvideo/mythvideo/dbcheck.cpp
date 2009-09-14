@@ -678,7 +678,6 @@ namespace
         switch (DBup->PromptForUpgrade("Video", true, false)) 
         { 
             case MYTH_SCHEMA_USE_EXISTING: 
-                gContext->ActivateSettingsCache(true); 
                 return true; 
             case MYTH_SCHEMA_ERROR: 
             case MYTH_SCHEMA_EXIT: 
