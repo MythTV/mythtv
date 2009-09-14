@@ -214,7 +214,7 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(new TVOSDMenuEntry(
         "TOGGLEEXPIRE",       1,  1, -1, -1, "Toggle Expire"));
     curMenuEntries.append(new TVOSDMenuEntry(
-        "SCHEDULEREC",        1,  1,  0,  0, "Schedule Recordings"));
+        "SCHEDULERECORDING",  1,  1,  0,  0, "Schedule Recordings"));
     curMenuEntries.append(new TVOSDMenuEntry(
         "AUDIOTRACKS",        1,  1,  1,  1, "Audio Tracks"));
     curMenuEntries.append(new TVOSDMenuEntry(
