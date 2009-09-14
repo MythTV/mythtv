@@ -71,8 +71,6 @@ bool UpgradeMusicDatabaseSchema(void)
     SchemaUpgradeWizard  * DBup;
 
 
-    gContext->ActivateSettingsCache(false);
-
     DBup = SchemaUpgradeWizard::Get("MusicDBSchemaVer",
                                     currentDatabaseVersion);
 
@@ -81,26 +79,18 @@ bool UpgradeMusicDatabaseSchema(void)
     DBup->CompareAndWait(3);
 
     if (DBup->versionsBehind == 0)  // same schema
-    {
-        gContext->ActivateSettingsCache(true);
         return true;
-    }
 
     bool retVal;
 
     if (DBup->DBver.isEmpty())
-    {
-        retVal = doUpgradeMusicDatabaseSchema(DBup->DBver);
-        gContext->ActivateSettingsCache(true);
-        return retVal;
-    }
+        return doUpgradeMusicDatabaseSchema(DBup->DBver);
 
 
     // Pop up messages, questions, warnings, et c.
     switch (DBup->PromptForUpgrade("Music", true, false))
     {
         case MYTH_SCHEMA_USE_EXISTING:
-            gContext->ActivateSettingsCache(true);
             return true;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
@@ -109,9 +99,7 @@ bool UpgradeMusicDatabaseSchema(void)
             break;
     }
 
-    retVal = doUpgradeMusicDatabaseSchema(DBup->DBver);
-    gContext->ActivateSettingsCache(true);
-    return retVal;
+    return doUpgradeMusicDatabaseSchema(DBup->DBver);
 }
 
 

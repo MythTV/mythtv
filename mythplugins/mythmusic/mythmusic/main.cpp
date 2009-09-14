@@ -415,13 +415,15 @@ int mythplugin_init(const char *libversion)
         return -1;
 
     gContext->ActivateSettingsCache(false);
-    if (!UpgradeMusicDatabaseSchema())
+    bool upgraded = UpgradeMusicDatabaseSchema();
+    gContext->ActivateSettingsCache(true);
+
+    if (!upgraded)
     {
         VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade database to new schema, exiting.");
+                "Couldn't upgrade music database schema, exiting.");
         return -1;
     }
-    gContext->ActivateSettingsCache(true);
 
     MusicGeneralSettings general;
     general.Load();
