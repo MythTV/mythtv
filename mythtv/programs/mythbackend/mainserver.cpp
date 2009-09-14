@@ -767,6 +767,7 @@ void MainServer::customEvent(QEvent *e)
             if (pinfo)
             {
                 RecordingInfo recInfo(*pinfo);
+                delete pinfo;
                 if (tokens[0] == "FORCE_DELETE_RECORDING")
                     DoHandleDeleteRecording(recInfo, NULL, true);
                 else
@@ -4001,6 +4002,7 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
             pginfo->GetCommBreakList(markMap);
         else
             pginfo->GetCutList(markMap);
+        delete pginfo;
 
         for (it = markMap.begin(); it != markMap.end(); ++it)
         {
@@ -4075,7 +4077,10 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
     ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
                                                               startdt);
     if (pginfo)
+    {
         bookmark = pginfo->GetBookmark();
+        delete pginfo;
+    }
 
     encodeLongLong(retlist,bookmark);
 
@@ -4116,6 +4121,7 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
     if (pginfo)
     {
         pginfo->SetBookmark(bookmark);
+        delete pginfo;
         retlist << "OK";
     }
     else
