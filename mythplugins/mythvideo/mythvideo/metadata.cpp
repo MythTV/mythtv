@@ -558,10 +558,6 @@ void MetadataImp::saveToDatabase()
         m_plot = VIDEO_PLOT_DEFAULT;
     if (m_rating.isEmpty())
         m_rating = VIDEO_RATING_DEFAULT;
-    if (m_season == 0)
-        m_season = Metadata::FilenameToMeta(m_filename, 2).toInt();
-    if (m_episode == 0)
-        m_episode = Metadata::FilenameToMeta(m_filename, 3).toInt();
     if (m_coverfile.isEmpty())
         m_coverfile = VIDEO_COVERFILE_DEFAULT;
     if (m_screenshot.isEmpty())
