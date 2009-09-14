@@ -6,8 +6,8 @@ using namespace std;
 #include <QRegExp>
 
 #include "programrecpriority.h"
-#include "scheduledrecording.h"
 #include "recordingrule.h"
+#include "scheduledrecording.h"
 #include "customedit.h"
 #include "proglist.h"
 #include "storagegroup.h"
@@ -21,6 +21,8 @@ using namespace std;
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
+
+#include "scheduleeditor.h"
 
 // overloaded version of RecordingInfo with additional recording priority
 // values so we can keep everything together and don't
@@ -801,84 +803,101 @@ void ProgramRecPriority::edit(MythUIButtonListItem *item)
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
 
-    if (pgRecInfo)
+    if (!pgRecInfo)
+        return;
+    
+    RecordingRule *record = new RecordingRule();
+    record->m_recordID = pgRecInfo->recordid;
+    if (record->m_searchType == kNoSearch)
+        record->LoadByProgram(pgRecInfo);
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ScheduleEditor *schededit = new ScheduleEditor(mainStack, record);
+    if (schededit->Create())
     {
-        int recid = 0;
-
-        {
-            ScheduledRecording *record = new ScheduledRecording();
-            record->loadByID(pgRecInfo->recordid);
-            if (record->getSearchType() == kNoSearch)
-                record->loadByProgram(pgRecInfo);
-            record->exec();
-            recid = record->getRecordID();
-            record->deleteLater();
-        }
-
-        // We need to refetch the recording priority values since the Advanced
-        // Recording Options page could've been used to change them
-
-        if (!recid)
-            recid = pgRecInfo->getRecordID();
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT recpriority, type, inactive "
-                      "FROM record "
-                      "WHERE recordid = :RECORDID");
-        query.bindValue(":RECORDID", recid);
-        if (!query.exec())
-        {
-            MythDB::DBError("Get new recording priority query", query);
-        }
-        else if (query.next())
-        {
-            int recPriority = query.value(0).toInt();
-            int rectype = query.value(1).toInt();
-            int inactive = query.value(2).toInt();
-
-            int rtRecPriors[11];
-            rtRecPriors[0] = 0;
-            rtRecPriors[kSingleRecord] =
-                gContext->GetNumSetting("SingleRecordRecPriority", 1);
-            rtRecPriors[kTimeslotRecord] =
-                gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
-            rtRecPriors[kChannelRecord] =
-                gContext->GetNumSetting("ChannelRecordRecPriority", 0);
-            rtRecPriors[kAllRecord] =
-                gContext->GetNumSetting("AllRecordRecPriority", 0);
-            rtRecPriors[kWeekslotRecord] =
-                gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
-            rtRecPriors[kFindOneRecord] =
-                gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-            rtRecPriors[kOverrideRecord] =
-                gContext->GetNumSetting("OverrideRecordRecPriority", 0);
-            rtRecPriors[kDontRecord] =
-                gContext->GetNumSetting("OverrideRecordRecPriority", 0);
-            rtRecPriors[kFindDailyRecord] =
-                gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-            rtRecPriors[kFindWeeklyRecord] =
-                gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-
-            // set the recording priorities of that program
-            pgRecInfo->recpriority = recPriority;
-            pgRecInfo->recType = (RecordingType)rectype;
-            pgRecInfo->recTypeRecPriority = rtRecPriors[pgRecInfo->recType];
-            // also set the m_origRecPriorityData with new recording
-            // priority so we don't save to db again when we exit
-            m_origRecPriorityData[pgRecInfo->recordid] =
-                                                    pgRecInfo->recpriority;
-            // also set the active/inactive state
-            pgRecInfo->recstatus = inactive ? rsInactive : rsUnknown;
-
-            SortList();
-        }
-        else
-        {
-            RemoveItemFromList(item);
-        }
-
-        countMatches();
+        mainStack->AddScreen(schededit);
+        connect(schededit, SIGNAL(ruleSaved(int)), SLOT(scheduleChanged(int)));
     }
+    else
+        delete schededit;
+
+}
+
+void ProgramRecPriority::scheduleChanged(int recid)
+{
+    // Assumes that the current item didn't change, which isn't guaranteed
+    MythUIButtonListItem *item = m_programList->GetItemCurrent();
+    ProgramRecPriorityInfo *pgRecInfo =
+                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+                        
+    if (!pgRecInfo)
+        return;
+
+    // We need to refetch the recording priority values since the Advanced
+    // Recording Options page could've been used to change them
+
+    // Only time the recording id would not match is if this wasn't the same
+    // item we started editing earlier.
+    if (recid != pgRecInfo->getRecordID())
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT recpriority, type, inactive "
+                    "FROM record "
+                    "WHERE recordid = :RECORDID");
+    query.bindValue(":RECORDID", recid);
+    if (!query.exec())
+    {
+        MythDB::DBError("Get new recording priority query", query);
+    }
+    else if (query.next())
+    {
+        int recPriority = query.value(0).toInt();
+        int rectype = query.value(1).toInt();
+        int inactive = query.value(2).toInt();
+
+        int rtRecPriors[11];
+        rtRecPriors[0] = 0;
+        rtRecPriors[kSingleRecord] =
+            gContext->GetNumSetting("SingleRecordRecPriority", 1);
+        rtRecPriors[kTimeslotRecord] =
+            gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
+        rtRecPriors[kChannelRecord] =
+            gContext->GetNumSetting("ChannelRecordRecPriority", 0);
+        rtRecPriors[kAllRecord] =
+            gContext->GetNumSetting("AllRecordRecPriority", 0);
+        rtRecPriors[kWeekslotRecord] =
+            gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
+        rtRecPriors[kFindOneRecord] =
+            gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+        rtRecPriors[kOverrideRecord] =
+            gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+        rtRecPriors[kDontRecord] =
+            gContext->GetNumSetting("OverrideRecordRecPriority", 0);
+        rtRecPriors[kFindDailyRecord] =
+            gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+        rtRecPriors[kFindWeeklyRecord] =
+            gContext->GetNumSetting("FindOneRecordRecPriority", -1);
+
+        // set the recording priorities of that program
+        pgRecInfo->recpriority = recPriority;
+        pgRecInfo->recType = (RecordingType)rectype;
+        pgRecInfo->recTypeRecPriority = rtRecPriors[pgRecInfo->recType];
+        // also set the m_origRecPriorityData with new recording
+        // priority so we don't save to db again when we exit
+        m_origRecPriorityData[pgRecInfo->recordid] =
+                                                pgRecInfo->recpriority;
+        // also set the active/inactive state
+        pgRecInfo->recstatus = inactive ? rsInactive : rsUnknown;
+
+        SortList();
+    }
+    else
+    {
+        RemoveItemFromList(item);
+    }
+
+    countMatches();
 }
 
 void ProgramRecPriority::customEdit(void)
@@ -996,10 +1015,14 @@ void ProgramRecPriority::upcoming(void)
 
     if (m_listMatch[pgRecInfo->recordid] > 0)
     {
-        ScheduledRecording *record = new ScheduledRecording();
-        record->loadByID(pgRecInfo->recordid);
-        record->runRuleList();
-        record->deleteLater();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        ProgLister *pl = new ProgLister(mainStack, plRecordid,
+                                    QString::number(pgRecInfo->recordid), "");
+
+        if (pl->Create())
+            mainStack->AddScreen(pl);
+        else
+            delete pl;
     }
     else
     {

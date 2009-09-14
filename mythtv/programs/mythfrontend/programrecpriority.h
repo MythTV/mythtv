@@ -62,6 +62,7 @@ class ProgramRecPriority : public ScheduleCommon
   protected slots:
     void updateInfo(MythUIButtonListItem *item);
     void edit(MythUIButtonListItem *item);
+    void scheduleChanged(int recid);
 
   private:
     void FillList(void);
