@@ -86,6 +86,9 @@ bool UpgradeMusicDatabaseSchema(void)
     if (DBup->DBver.isEmpty())
         return doUpgradeMusicDatabaseSchema(DBup->DBver);
 
+    // An upgrade is likely. Ensure we have a backup first:
+    if (!DBup->didBackup)
+        DBup->BackupDB();
 
     // Pop up messages, questions, warnings, et c.
     switch (DBup->PromptForUpgrade("Music", true, false))
