@@ -27,7 +27,7 @@ using namespace std;
 #include "dtvsignalmonitor.h"
 #include "mythdb.h"
 #include "jobqueue.h"
-#include "scheduledrecording.h"
+#include "recordingrule.h"
 #include "eitscanner.h"
 #include "RingBuffer.h"
 #include "previewgenerator.h"
@@ -2763,16 +2763,16 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     rec->cardid    = cardid;
     rec->inputid   = get_input_id(cardid, channel->GetCurrentInput());
 
-    rec->rectype = rec->GetScheduledRecording()->getRecordingType();
+    rec->rectype = rec->GetRecordingRule()->m_type;
 
     if (rec->rectype == kNotRecording)
     {
         rec->rectype = kSingleRecord;
-        rec->GetScheduledRecording()->setRecordingType(kSingleRecord);
+        rec->GetRecordingRule()->m_type = kSingleRecord;
     }
 
     // + remove DefaultEndOffset which would mismatch the live session
-    rec->GetScheduledRecording()->setEndOffset(0);
+    rec->GetRecordingRule()->m_endOffset = 0;
 
     // + save rsInactive recstatus to so that a reschedule call
     //   doesn't start recording this on another card before we
@@ -2780,9 +2780,9 @@ void TVRec::NotifySchedulerOfRecording(RecordingInfo *rec)
     rec->recstatus = rsInactive;
     rec->AddHistory(false);
 
-    // + save ScheduledRecording so that we get a recordid
+    // + save RecordingRule so that we get a recordid
     //   (don't allow signalChange(), avoiding unneeded reschedule)
-    rec->GetScheduledRecording()->save(false);
+    rec->GetRecordingRule()->Save(false);
 
     // + save recordid to recorded entry
     rec->ApplyRecordRecID();
@@ -3954,7 +3954,7 @@ static QString load_profile(QString cardtype, void *tvchain,
     // be found, fall back to the "Default" profile for card type.
     QString profileName = "Live TV";
     if (!tvchain && rec)
-        profileName = rec->GetScheduledRecording()->getProfileName();
+        profileName = rec->GetRecordingRule()->m_recProfile;
 
     if (!profile.loadByType(profileName, cardtype))
     {
@@ -4185,9 +4185,9 @@ void TVRec::TuningRestartRecorder(void)
                 "\n\t\t\t" + msg1 + "\n\t\t\t" + msg2);
 
         curRecording->SetAutoExpire(
-            curRecording->GetScheduledRecording()->GetAutoExpire());
+            curRecording->GetRecordingRule()->m_autoExpire);
         curRecording->ApplyRecordRecGroupChange(
-            curRecording->GetScheduledRecording()->GetRecGroup());
+            curRecording->GetRecordingRule()->m_recGroup);
 
         RecordingProfile profile;
         QString profileName = load_profile(genOpt.cardtype, NULL,

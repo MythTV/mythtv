@@ -1483,7 +1483,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
     new_pi->AddHistory(false);
 
     // Make sure we have a ScheduledRecording instance
-    new_pi->GetScheduledRecording();
+    new_pi->GetRecordingRule();
 
     // Trigger reschedule..
     ScheduledRecording::signalChange(pi.recordid);

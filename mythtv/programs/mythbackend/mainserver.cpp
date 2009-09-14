@@ -50,6 +50,8 @@ using namespace std;
 #include "programlist.h"
 #include "recordinginfo.h"
 #include "recordinglist.h"
+#include "recordingrule.h"
+#include "scheduledrecording.h"
 #include "jobqueue.h"
 #include "autoexpire.h"
 #include "previewgenerator.h"
@@ -2800,13 +2802,14 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
                               "WHERE recordid = :RECID;");
                 query.bindValue(":RECID", recordid);
 
-                if (query.exec() && query.isActive() && query.size())
+                if (query.exec() && query.size())
                 {
-                    ScheduledRecording *record = new ScheduledRecording();
-                    record->loadByID(recordid);
-                    if (record->getSearchType() == kManualSearch)
+                    RecordingRule *record = new RecordingRule();
+                    record->m_recordID = recordid;
+                    if (record->Load() &&
+                        record->m_searchType == kManualSearch)
                         HandleRescheduleRecordings(recordid, NULL);
-                    record->deleteLater();
+                    delete record;
                 }
                 query.prepare("DELETE FROM program WHERE manualid = :RECID;");
                 query.bindValue(":RECID", recordid);

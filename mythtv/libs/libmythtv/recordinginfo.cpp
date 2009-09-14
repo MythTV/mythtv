@@ -13,14 +13,13 @@ using namespace std;
 // Qt headers
 #include <QRegExp>
 #include <QMap>
-#include <QLayout>
-#include <QLabel>
 #include <QApplication>
 #include <QFile>
 #include <QFileInfo>
 
 // MythTV headers
 #include "recordinginfo.h"
+#include "recordingrule.h"
 #include "scheduledrecording.h"
 #include "util.h"
 #include "mythcontext.h"
@@ -33,25 +32,19 @@ using namespace std;
 #include "storagegroup.h"
 #include "previewgenerator.h"
 #include "channelutil.h"
-#include "programlist.h"
-#include "progdetails_temp.h"
-
 #define LOC QString("RecordingInfo: ")
 #define LOC_ERR QString("RecordingInfo, Error: ")
 
 static bool insert_program(const RecordingInfo*,
-                           const ScheduledRecording*);
+                           const RecordingRule*);
 
 /** \fn RecordingInfo::clone(const ProgramInfo &other)
  *  \brief Copies important fields from other RecordingInfo.
  */
 RecordingInfo &RecordingInfo::clone(const ProgramInfo &other)
 {
-    if (record)
-    {
-        record->deleteLater();
-        record = NULL;
-    }
+    delete record;
+    record = NULL;
 
     ProgramInfo::clone(other);
 
@@ -62,11 +55,8 @@ void RecordingInfo::clear(void)
 {
     ProgramInfo::clear();
     
-    if (record)
-    {
-        record->deleteLater();
-        record = NULL;
-    }
+    delete record;
+    record = NULL;
 }
 
 
@@ -75,11 +65,8 @@ void RecordingInfo::clear(void)
  */
 RecordingInfo::~RecordingInfo()
 {
-    if (record)
-    {
-        record->deleteLater();
-        record = NULL;
-    }
+    delete record;
+    record = NULL;
 }
 
 
@@ -96,46 +83,36 @@ void RecordingInfo::ToMap(InfoMap &progMap, bool showrerecord) const
         progMap["iconpath"] = iconpath;
 }
 
-/** \fn RecordingInfo::IsFindApplicable(void) const
- *  \brief Returns true if a search should be employed to find a matching
- *         program.
- */
-bool RecordingInfo::IsFindApplicable(void) const
-{
-    return rectype == kFindDailyRecord ||
-           rectype == kFindWeeklyRecord;
-}
-
 /** \fn RecordingInfo::GetProgramRecordingStatus()
  *  \brief Returns the recording type for this RecordingInfo, creating
  *         "record" field if necessary.
- *  \sa RecordingType, ScheduledRecording
+ *  \sa RecordingType, RecordingRule
  */
 RecordingType RecordingInfo::GetProgramRecordingStatus(void)
 {
     if (record == NULL)
     {
-        record = new ScheduledRecording();
-        record->loadByProgram(this);
+        record = new RecordingRule();
+        record->LoadByProgram(this);
     }
 
-    return record->getRecordingType();
+    return record->m_type;
 }
 
 /** \fn RecordingInfo::GetProgramRecordingProfile() const
  *  \brief Returns recording profile name that will be, or was used,
  *         for this program, creating "record" field if necessary.
- *  \sa ScheduledRecording
+ *  \sa RecordingRule
  */
 QString RecordingInfo::GetProgramRecordingProfile(void) const
 {
     if (record == NULL)
     {
-        record = new ScheduledRecording();
-        record->loadByProgram(this);
+        record = new RecordingRule();
+        record->LoadByProgram(this);
     }
 
-    return record->getProfileName();
+    return record->m_recProfile;
 }
 
 /** \fn RecordingInfo::GetAutoRunJobs()
@@ -146,15 +123,30 @@ int RecordingInfo::GetAutoRunJobs(void) const
 {
     if (record == NULL)
     {
-        record = new ScheduledRecording();
-        record->loadByProgram(this);
+        record = new RecordingRule();
+        record->LoadByProgram(this);
     }
 
-    return record->GetAutoRunJobs();
+    int result = 0;
+
+    if (record->m_autoTranscode)
+        result |= JOB_TRANSCODE;
+    if (record->m_autoCommFlag)
+        result |= JOB_COMMFLAG;
+    if (record->m_autoUserJob1)
+        result |= JOB_USERJOB1;
+    if (record->m_autoUserJob2)
+        result |= JOB_USERJOB2;
+    if (record->m_autoUserJob3)
+        result |= JOB_USERJOB3;
+    if (record->m_autoUserJob4)
+        result |= JOB_USERJOB4;
+
+    return result;
 }
 
 /** \fn RecordingInfo::ApplyRecordRecID(void)
- *  \brief Sets recordid to match ScheduledRecording recordid
+ *  \brief Sets recordid to match RecordingRule recordid
  */
 void RecordingInfo::ApplyRecordRecID(void)
 {
@@ -192,8 +184,8 @@ void RecordingInfo::ApplyRecordStateChange(RecordingType newstate, bool save)
 {
     GetProgramRecordingStatus();
     if (newstate == kOverrideRecord || newstate == kDontRecord)
-        record->makeOverride();
-    record->setRecordingType(newstate);
+        record->MakeOverride();
+    record->m_type = newstate;
 
     if (save)
         record->Save();
@@ -207,7 +199,7 @@ void RecordingInfo::ApplyRecordStateChange(RecordingType newstate, bool save)
 void RecordingInfo::ApplyRecordRecPriorityChange(int newrecpriority)
 {
     GetProgramRecordingStatus();
-    record->setRecPriority(newrecpriority);
+    record->m_recPriority = newrecpriority;
     record->Save();
 }
 
@@ -452,10 +444,10 @@ void RecordingInfo::ToggleRecord(void)
     }
 }
 
-/** \fn RecordingInfo::GetScheduledRecording(void)
+/**
  *  \brief Returns the "record" field, creating it if necessary.
  */
-ScheduledRecording* RecordingInfo::GetScheduledRecording(void)
+RecordingRule* RecordingInfo::GetRecordingRule(void)
 {
     GetProgramRecordingStatus();
     return record;
@@ -467,7 +459,7 @@ ScheduledRecording* RecordingInfo::GetScheduledRecording(void)
 int RecordingInfo::getRecordID(void)
 {
     GetProgramRecordingStatus();
-    recordid = record->getRecordID();
+    recordid = record->m_recordID;
     return recordid;
 }
 
@@ -485,8 +477,8 @@ void RecordingInfo::StartedRecording(QString ext)
 
     if (!record)
     {
-        record = new ScheduledRecording();
-        record->loadByProgram(this);
+        record = new RecordingRule();
+        record->LoadByProgram(this);
     }
 
     hostname = gContext->GetHostName();
@@ -558,7 +550,7 @@ void RecordingInfo::StartedRecording(QString ext)
 }
 
 static bool insert_program(const RecordingInfo        *pg,
-                           const ScheduledRecording *schd)
+                           const RecordingRule *rule)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -627,20 +619,20 @@ static bool insert_program(const RecordingInfo        *pg,
     query.bindValue(":HOSTNAME",    pg->hostname);
     query.bindValue(":CATEGORY",    pg->category);
     query.bindValue(":RECGROUP",    pg->recgroup);
-    query.bindValue(":AUTOEXP",     schd->GetAutoExpire());
+    query.bindValue(":AUTOEXP",     rule->m_autoExpire);
     query.bindValue(":SERIESID",    pg->seriesid);
     query.bindValue(":PROGRAMID",   pg->programid);
     query.bindValue(":FINDID",      pg->findid);
     query.bindValue(":STARS",       pg->stars);
     query.bindValue(":REPEAT",      pg->repeat);
-    query.bindValue(":TRANSCODER",  schd->GetTranscoder());
+    query.bindValue(":TRANSCODER",  rule->m_transcoder);
     query.bindValue(":PLAYGROUP",   pg->playgroup);
-    query.bindValue(":RECPRIORITY", schd->getRecPriority());
+    query.bindValue(":RECPRIORITY", rule->m_recPriority);
     query.bindValue(":BASENAME",    pg->pathname);
     query.bindValue(":STORGROUP",   pg->storagegroup);
     query.bindValue(":PROGSTART",   pg->startts);
     query.bindValue(":PROGEND",     pg->endts);
-    query.bindValue(":PROFILE",     schd->getProfileName());
+    query.bindValue(":PROFILE",     rule->m_recProfile);
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     bool active = query.isActive();
@@ -700,7 +692,20 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
 
     GetProgramRecordingStatus();
     if (!prematurestop)
-        record->doneRecording(*this);
+    {
+        recstatus = rsRecorded;
+
+        QString msg = "Finished recording";
+        QString msg_subtitle = subtitle.isEmpty() ? "" :
+                                        QString(" \"%1\"").arg(subtitle);
+        QString details = QString("%1%2: channel %3")
+                                        .arg(title)
+                                        .arg(msg_subtitle)
+                                        .arg(chanid);
+
+        VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details));
+        gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
+    }
 }
 
 /** \fn RecordingInfo::UpdateRecordingEnd(void)
@@ -919,400 +924,6 @@ void RecordingInfo::SetDupHistory(void)
         MythDB::DBError("setDupHistory", result);
 
     ScheduledRecording::signalChange(0);
-}
-
-/** \fn RecordingInfo::EditRecording(void)
- *  \brief Creates a dialog for editing the recording status,
- *         blocking until user leaves dialog.
- */
-void RecordingInfo::EditRecording(void)
-{
-    if (recordid == 0)
-        EditScheduled();
-    else if (recstatus <= rsWillRecord)
-        ShowRecordingDialog();
-    else
-        ShowNotRecordingDialog();
-}
-
-/** \fn RecordingInfo::EditScheduled(void)
- *  \brief Creates a dialog for editing the recording status,
- *         blocking until user leaves dialog.
- */
-void RecordingInfo::EditScheduled(void)
-{
-    GetProgramRecordingStatus();
-    record->exec();
-}
-
-/** \fn RecordingInfo::showDetails(void) const
- *  \brief Pops up a DialogBox with program info.
- */
-void RecordingInfo::showDetails(void) const
-{
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgDetailsTemp *details_dialog  = new ProgDetailsTemp(mainStack, this);
-
-    if (!details_dialog->Create())
-    {
-        delete details_dialog;
-        return;
-    }
-
-    mainStack->AddScreen(details_dialog);
-
-    // HACK begin - remove when everything is using mythui
-    if (GetMythMainWindow()->currentWidget())
-    {
-        QWidget *widget = GetMythMainWindow()->currentWidget();
-        vector<QWidget *> widgetList;
-
-        while (widget)
-        {
-            widgetList.push_back(widget);
-            GetMythMainWindow()->detach(widget);
-            widget = GetMythMainWindow()->currentWidget();
-        }
-
-        GetMythMainWindow()->GetPaintWindow()->raise();
-        GetMythMainWindow()->GetPaintWindow()->setFocus();
-
-        int screenCount = mainStack->TotalScreens();
-        do
-        {
-            qApp->processEvents();
-            usleep(5000);
-        } while (mainStack->TotalScreens() >= screenCount);
-
-        vector<QWidget*>::reverse_iterator it;
-        for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
-        {
-            GetMythMainWindow()->attach(*it);
-        }
-    }
-    // HACK end
-}
-
-void RecordingInfo::ShowRecordingDialog(void)
-{
-    QDateTime now = QDateTime::currentDateTime();
-
-    QString message = title;
-
-    if (subtitle != "")
-        message += QString(" - \"%1\"").arg(subtitle);
-
-    message += "\n\n";
-    message += RecStatusDesc();
-
-    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
-    int button = 0, ok = -1, react = -1, stop = -1, addov = -1, forget = -1,
-        clearov = -1, edend = -1, ednorm = -1, edcust = -1;
-
-    dlg->AddButton(QObject::tr("OK"));
-    ok = button++;
-
-    if (recstartts < now && recendts > now)
-    {
-        if (recstatus != rsRecording)
-        {
-            dlg->AddButton(QObject::tr("Reactivate"));
-            react = button++;
-        }
-        else
-        {
-            dlg->AddButton(QObject::tr("Stop recording"));
-            stop = button++;
-        }
-    }
-    if (recendts > now)
-    {
-        if (rectype != kSingleRecord && rectype != kOverrideRecord)
-        {
-            if (recstartts > now)
-            {
-                dlg->AddButton(QObject::tr("Don't record"));
-                addov = button++;
-            }
-            if (recstatus != rsRecording && rectype != kFindOneRecord &&
-                !((findid == 0 || !IsFindApplicable()) &&
-                  catType == "series" &&
-                  programid.contains(QRegExp("0000$"))) &&
-                ((!(dupmethod & kDupCheckNone) && !programid.isEmpty() &&
-                  (findid != 0 || !IsFindApplicable())) ||
-                 ((dupmethod & kDupCheckSub) && !subtitle.isEmpty()) ||
-                 ((dupmethod & kDupCheckDesc) && !description.isEmpty()) ||
-                 ((dupmethod & kDupCheckSubThenDesc) && (!subtitle.isEmpty() || !description.isEmpty())) ))
-            {
-                dlg->AddButton(QObject::tr("Never record"));
-                forget = button++;
-            }
-        }
-
-        if (rectype != kOverrideRecord && rectype != kDontRecord)
-        {
-            if (recstatus == rsRecording)
-            {
-                dlg->AddButton(QObject::tr("Change Ending Time"));
-                edend = button++;
-            }
-            else
-            {
-                dlg->AddButton(QObject::tr("Edit Options"));
-                ednorm = button++;
-
-                if (rectype != kSingleRecord && rectype != kFindOneRecord)
-                {
-                    dlg->AddButton(QObject::tr("Add Override"));
-                    edcust = button++;
-                }
-            }
-        }
-
-        if (rectype == kOverrideRecord || rectype == kDontRecord)
-        {
-            if (recstatus == rsRecording)
-            {
-                dlg->AddButton(QObject::tr("Change Ending Time"));
-                edend = button++;
-            }
-            else
-            {
-                dlg->AddButton(QObject::tr("Edit Override"));
-                ednorm = button++;
-                dlg->AddButton(QObject::tr("Clear Override"));
-                clearov = button++;
-            }
-        }
-    }
-
-    DialogCode code = dlg->exec();
-    int ret = MythDialog::CalcItemIndex(code);
-    dlg->deleteLater();
-    dlg = NULL;
-
-    if (ret == react)
-        ReactivateRecording();
-    else if (ret == stop)
-    {
-        ProgramInfo *p = GetProgramFromRecorded(chanid, recstartts);
-        if (p)
-        {
-            RemoteStopRecording(p);
-            delete p;
-        }
-    }
-    else if (ret == addov)
-        ApplyRecordStateChange(kDontRecord);
-    else if (ret == forget)
-    {
-        recstatus = rsNeverRecord;
-        startts = QDateTime::currentDateTime();
-        endts = recstartts;
-        AddHistory(true, true);
-    }
-    else if (ret == clearov)
-        ApplyRecordStateChange(kNotRecording);
-    else if (ret == edend)
-    {
-        GetProgramRecordingStatus();
-        if (rectype != kSingleRecord && rectype != kOverrideRecord &&
-            rectype != kFindOneRecord)
-        {
-            record->makeOverride();
-            record->setRecordingType(kOverrideRecord);
-        }
-        record->exec();
-    }
-    else if (ret == ednorm)
-    {
-        GetProgramRecordingStatus();
-        record->exec();
-    }
-    else if (ret == edcust)
-    {
-        GetProgramRecordingStatus();
-        record->makeOverride();
-        record->exec();
-    }
-
-    return;
-}
-
-void RecordingInfo::ShowNotRecordingDialog(void)
-{
-    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-
-    QString message = title;
-
-    if (subtitle != "")
-        message += QString(" - \"%1\"").arg(subtitle);
-
-    message += "\n\n";
-    message += RecStatusDesc();
-
-    if (recstatus == rsConflict || recstatus == rsLaterShowing)
-    {
-        vector<ProgramInfo *> *confList = RemoteGetConflictList(this);
-
-        if (confList->size())
-            message += QObject::tr(" The following programs will be recorded "
-                                   "instead:\n");
-
-        for (int maxi = 0; confList->begin() != confList->end() &&
-             maxi < 4; maxi++)
-        {
-            ProgramInfo *p = *confList->begin();
-            message += QString("%1 - %2  %3")
-                .arg(p->recstartts.toString(timeFormat))
-                .arg(p->recendts.toString(timeFormat)).arg(p->title);
-            if (p->subtitle != "")
-                message += QString(" - \"%1\"").arg(p->subtitle);
-            message += "\n";
-            delete p;
-            confList->erase(confList->begin());
-        }
-        message += "\n";
-        while (!confList->empty())
-        {
-            delete confList->back();
-            confList->pop_back();
-        }
-        delete confList;
-    }
-
-    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), message);
-    int button = 0, ok = -1, react = -1, addov = -1, clearov = -1,
-        ednorm = -1, edcust = -1, forget = -1, addov1 = -1, forget1 = -1;
-
-    dlg->AddButton(QObject::tr("OK"));
-    ok = button++;
-
-    QDateTime now = QDateTime::currentDateTime();
-
-    if ((recstartts < now) && (recendts > now) &&
-        (recstatus != rsDontRecord) && (recstatus != rsNotListed))
-    {
-        dlg->AddButton(QObject::tr("Reactivate"));
-        react = button++;
-    }
-
-    if (recendts > now)
-    {
-        if ((rectype != kSingleRecord &&
-             rectype != kOverrideRecord) &&
-            (recstatus == rsDontRecord ||
-             recstatus == rsPreviousRecording ||
-             recstatus == rsCurrentRecording ||
-             recstatus == rsEarlierShowing ||
-             recstatus == rsOtherShowing ||
-             recstatus == rsNeverRecord ||
-             recstatus == rsRepeat ||
-             recstatus == rsInactive ||
-             recstatus == rsLaterShowing))
-        {
-            dlg->AddButton(QObject::tr("Record anyway"));
-            addov = button++;
-            if (recstatus == rsPreviousRecording || recstatus == rsNeverRecord)
-            {
-                dlg->AddButton(QObject::tr("Forget Previous"));
-                forget = button++;
-            }
-        }
-
-        if (rectype != kOverrideRecord && rectype != kDontRecord)
-        {
-            if (rectype != kSingleRecord &&
-                recstatus != rsPreviousRecording &&
-                recstatus != rsCurrentRecording &&
-                recstatus != rsNeverRecord &&
-                recstatus != rsNotListed)
-            {
-                if (recstartts > now)
-                {
-                    dlg->AddButton(QObject::tr("Don't record"));
-                    addov1 = button++;
-                }
-                if (rectype != kFindOneRecord &&
-                    !((findid == 0 || !IsFindApplicable()) &&
-                      catType == "series" &&
-                      programid.contains(QRegExp("0000$"))) &&
-                    ((!(dupmethod & kDupCheckNone) && !programid.isEmpty() &&
-                      (findid != 0 || !IsFindApplicable())) ||
-                     ((dupmethod & kDupCheckSub) && !subtitle.isEmpty()) ||
-                     ((dupmethod & kDupCheckDesc) && !description.isEmpty())))
-                {
-                    dlg->AddButton(QObject::tr("Never record"));
-                    forget1 = button++;
-                }
-            }
-
-            dlg->AddButton(QObject::tr("Edit Options"));
-            ednorm = button++;
-
-            if (rectype != kSingleRecord && rectype != kFindOneRecord &&
-                recstatus != rsNotListed)
-            {
-                dlg->AddButton(QObject::tr("Add Override"));
-                edcust = button++;
-            }
-        }
-
-        if (rectype == kOverrideRecord || rectype == kDontRecord)
-        {
-            dlg->AddButton(QObject::tr("Edit Override"));
-            ednorm = button++;
-
-            dlg->AddButton(QObject::tr("Clear Override"));
-            clearov = button++;
-        }
-    }
-
-    DialogCode code = dlg->exec();
-    int ret = MythDialog::CalcItemIndex(code);
-    dlg->deleteLater();
-    dlg = NULL;
-
-    if (ret == react)
-        ReactivateRecording();
-    else if (ret == addov)
-    {
-        ApplyRecordStateChange(kOverrideRecord);
-        if (recstartts < now)
-            ReactivateRecording();
-    }
-    else if (ret == forget)
-        ForgetHistory();
-    else if (ret == addov1)
-        ApplyRecordStateChange(kDontRecord);
-    else if (ret == forget1)
-    {
-        recstatus = rsNeverRecord;
-        startts = QDateTime::currentDateTime();
-        endts = recstartts;
-        AddHistory(true, true);
-    }
-    else if (ret == clearov)
-        ApplyRecordStateChange(kNotRecording);
-    else if (ret == ednorm)
-    {
-        GetProgramRecordingStatus();
-        record->exec();
-    }
-    else if (ret == edcust)
-    {
-        GetProgramRecordingStatus();
-        record->makeOverride();
-        record->exec();
-    }
-
-    return;
-}
-
-void RecordingInfo::makeOverride()
-{
-    GetProgramRecordingStatus();
-    record->makeOverride();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

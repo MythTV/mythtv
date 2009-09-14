@@ -3,7 +3,7 @@
 
 #include "programinfo.h"
 
-class ScheduledRecording;
+class RecordingRule;
 
 /** \class RecordingInfo
  *  \brief Holds information on a %TV Program one might wish to record.
@@ -14,7 +14,7 @@ class ScheduledRecording;
 
 // Note: methods marked with "//pi" could be moved to ProgramInfo without
 // breaking linkage or adding new classes to libmyth. For some of them
-// ScheduledRecording::signalChange would need to be moved to remoteutil.{cpp,h},
+// RecordingRule::signalChange would need to be moved to remoteutil.{cpp,h},
 // but that is a static method which is fairly easy to move.
 // These methods are in RecordingInfo because it currently makes sense
 // for them to be in this class in terms of related functions being here.
@@ -40,8 +40,8 @@ class MPUBLIC RecordingInfo : public ProgramInfo
     virtual void ToMap(QHash<QString, QString> &progMap,
                        bool showrerecord = false) const;
 
-    // Used to query and set ScheduledRecording info
-    ScheduledRecording *GetScheduledRecording(void);
+    // Used to query and set RecordingRule info
+    RecordingRule *GetRecordingRule(void);
     int getRecordID(void);
     int GetAutoRunJobs(void) const;
     RecordingType GetProgramRecordingStatus(void);
@@ -49,7 +49,6 @@ class MPUBLIC RecordingInfo : public ProgramInfo
     void ApplyRecordStateChange(RecordingType newstate, bool save = true);
     void ApplyRecordRecPriorityChange(int);
     void ToggleRecord(void);
-    void makeOverride(void);
 
     // these five can be moved to programinfo
     void AddHistory(bool resched = true, bool forcedup = false);//pi
@@ -70,21 +69,10 @@ class MPUBLIC RecordingInfo : public ProgramInfo
                                    const QString &newSubtitle);
     void ApplyTranscoderProfileChange(const QString &profile) const;//pi
 
-
-    // GUI stuff
-    void showDetails(void) const;
-    void EditRecording(void);
-    void EditScheduled(void);
-    
+    static void signalChange(int recordid);
 
   private:
-    // GUI helper functions
-    bool IsFindApplicable(void) const;
-    void ShowRecordingDialog(void);
-    void ShowNotRecordingDialog(void);
-
-  private:
-    mutable class ScheduledRecording *record;
+    mutable class RecordingRule *record;
 };
 
 Q_DECLARE_METATYPE(RecordingInfo*)

@@ -27,6 +27,7 @@ using namespace std;
 #include <QRegExp>
 
 #include "tv_rec.h"
+#include "scheduledrecording.h"
 #include "autoexpire.h"
 #include "scheduler.h"
 #include "mainserver.h"

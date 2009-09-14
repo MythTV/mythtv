@@ -120,6 +120,11 @@ EMBEDRETURNPROGRAM TV::RunPlaybackBoxPtr = NULL;
 EMBEDRETURNVOID TV::RunViewScheduledPtr = NULL;
 
 /**
+ * \brief function pointer for RunScheduleEditor in scheduleeditor.cpp
+ */
+EMBEDRETURNVOIDSCHEDIT TV::RunScheduleEditorPtr = NULL;
+
+/**
  * \brief function pointer for RunProgramGuide in guidegrid.cpp
  */
 EMBEDRETURNVOIDEPG TV::RunProgramGuidePtr = NULL;
@@ -414,6 +419,8 @@ void TV::SetFuncPtr(const char *string, void *lptr)
         RunProgramGuidePtr = (EMBEDRETURNVOIDEPG)lptr;
     else if (name == "programfinder")
         RunProgramFinderPtr = (EMBEDRETURNVOIDFINDER)lptr;
+    else if (name == "scheduleeditor")
+        RunScheduleEditorPtr = (EMBEDRETURNVOIDSCHEDIT)lptr;
 }
 
 void TV::InitKeys(void)
@@ -7836,10 +7843,8 @@ void TV::DoEditSchedule(int editType)
         }
         case kScheduledRecording:
         {
-            ScheduledRecording *record = new ScheduledRecording();
-            record->loadByProgram(&pginfo);
-            record->exec();
-            record->deleteLater();
+            RunScheduleEditorPtr(&pginfo);
+            ignoreKeyPresses = true;
             break;
         }
         case kViewSchedule:
@@ -7856,66 +7861,9 @@ void TV::DoEditSchedule(int editType)
         }
     }
 
-    // TODO need to remove this once everything is using mythui
-    if (editType == kScheduledRecording)
-    {
-        // Resize the window back to the MythTV Player size
-        if (!db_use_gui_size_for_tv)
-        {
-            mwnd->setGeometry(player_bounds.left(), player_bounds.top(),
-                            player_bounds.width(), player_bounds.height());
-            mwnd->setFixedSize(player_bounds.size());
-        }
-        mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        mctx->LockDeleteNVP(__FILE__, __LINE__);
-        if (mctx->nvp && mctx->nvp->getVideoOutput())
-            mctx->nvp->getVideoOutput()->ResizeForVideo();
-        mctx->UnlockDeleteNVP(__FILE__, __LINE__);
-        ReturnPlayerLock(mctx);
-
-        actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-        StopEmbedding(actx);               // Undo any embedding
-        DoSetPauseState(actx, saved_pause); // Restore pause states
-        ReturnPlayerLock(actx);
-
-        // Handle RunPlaybackBoxPtr return value..
-        if (nextProgram)
-        {
-            if (jumpToProgramPIPState == kPIPonTV)
-            {
-                mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-                CreatePIP(mctx, nextProgram);
-            }
-            else if (jumpToProgramPIPState == kPBPLeft)
-            {
-                mctx = GetPlayerWriteLock(0, __FILE__, __LINE__);
-                CreatePBP(mctx, nextProgram);
-            }
-            else
-            {
-                mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-                SetLastProgram(nextProgram);
-                mctx->LockDeleteNVP(__FILE__, __LINE__);
-                if (mctx->nvp)
-                    mctx->nvp->DiscardVideoFrames(true);
-                mctx->UnlockDeleteNVP(__FILE__, __LINE__);
-                jumpToProgram = true;
-                SetExitPlayer(true, true);
-            }
-
-            jumpToProgramPIPState = kPIPOff;
-            delete nextProgram;
-            nextProgram = NULL;
-
-            ReturnPlayerLock(mctx);
-        }
-    }
-    else
-    {
-        //we are embedding in a mythui window so show the gui paint window again
-        GetMythMainWindow()->SetDrawEnabled(true);
-        GetMythMainWindow()->GetPaintWindow()->show();
-    }
+    //we are embedding in a mythui window so show the gui paint window again
+    GetMythMainWindow()->SetDrawEnabled(true);
+    GetMythMainWindow()->GetPaintWindow()->show();
 }
 
 void TV::EditSchedule(const PlayerContext *ctx, int editType)

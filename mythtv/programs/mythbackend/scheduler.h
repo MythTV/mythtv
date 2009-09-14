@@ -14,7 +14,6 @@ using namespace std;
 #include <qobject.h>
 
 // MythTV headers
-#include "scheduledrecording.h"
 #include "recordinginfo.h"
 #include "remoteutil.h"
 #include "inputgroupmap.h"

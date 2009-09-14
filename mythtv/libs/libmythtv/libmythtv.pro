@@ -138,7 +138,7 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 # Misc. needed by backend/frontend
 HEADERS += recordinginfo.h          recordinglist.h
 HEADERS += RingBuffer.h             avfringbuffer.h
-HEADERS += ThreadedFileWriter.h     previouslist.h
+HEADERS += ThreadedFileWriter.h
 HEADERS += dbcheck.h
 HEADERS += tvremoteutil.h           tv.h
 HEADERS += jobqueue.h
@@ -147,23 +147,19 @@ HEADERS += remoteencoder.h          videosource.h
 HEADERS += cardutil.h               sourceutil.h
 HEADERS += cc608decoder.h
 HEADERS += cc708decoder.h           cc708window.h
-HEADERS += sr_dialog.h              sr_root.h
-HEADERS += sr_items.h               scheduledrecording.h
+HEADERS += scheduledrecording.h
 HEADERS += signalmonitorvalue.h     signalmonitorlistener.h
 HEADERS += viewschdiff.h            livetvchain.h
-HEADERS += playgroup.h              progdetails_temp.h
+HEADERS += playgroup.h
 HEADERS += channelsettings.h        previewgenerator.h
 HEADERS += transporteditor.h        listingsources.h
 HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
 HEADERS += recordingrule.h
 
-# Remove when everything is switched to MythUI
-HEADERS += proglist_qt.h
-
 SOURCES += recordinginfo.cpp        recordinglist.cpp
 SOURCES += RingBuffer.cpp           avfringbuffer.cpp
-SOURCES += ThreadedFileWriter.cpp   previouslist.cpp
+SOURCES += ThreadedFileWriter.cpp
 SOURCES += dbcheck.cpp
 SOURCES += tvremoteutil.cpp         tv.cpp
 SOURCES += jobqueue.cpp
@@ -172,21 +168,15 @@ SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += cardutil.cpp             sourceutil.cpp
 SOURCES += cc608decoder.cpp
 SOURCES += cc708decoder.cpp         cc708window.cpp
-SOURCES += sr_dialog.cpp            sr_root.cpp
-SOURCES += sr_items.cpp             scheduledrecording.cpp
+SOURCES += scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
 SOURCES += viewschdiff.cpp
 SOURCES += livetvchain.cpp          playgroup.cpp
-SOURCES += progdetails_temp.cpp
 SOURCES += channelsettings.cpp      previewgenerator.cpp
 SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
 SOURCES += recordingrule.cpp
-
-# Remove when everything is switched to MythUI
-SOURCES += proglist_qt.cpp
-
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h

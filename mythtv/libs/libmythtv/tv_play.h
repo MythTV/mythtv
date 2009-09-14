@@ -58,6 +58,7 @@ typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);
 typedef void (*EMBEDRETURNVOID) (void *, bool);
 typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool, bool, int);
 typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool, bool);
+typedef void (*EMBEDRETURNVOIDSCHEDIT) (const ProgramInfo *);
 
 // Locking order
 //
@@ -310,6 +311,7 @@ class MPUBLIC TV : public QThread
     static EMBEDRETURNVOID RunViewScheduledPtr;
     static EMBEDRETURNVOIDEPG RunProgramGuidePtr;
     static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
+    static EMBEDRETURNVOIDSCHEDIT RunScheduleEditorPtr;
 
   private:
     void SetActive(PlayerContext *lctx, int index, bool osd_msg);

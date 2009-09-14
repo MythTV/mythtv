@@ -14,7 +14,6 @@
 
 #include "viewschdiff.h"
 #include "scheduledrecording.h"
-#include "proglist_qt.h"
 #include "tv.h"
 
 #include "exitcodes.h"
@@ -134,12 +133,12 @@ void ViewScheduleDiff::keyPressEvent(QKeyEvent *e)
             pageUp();
         else if (action == "PAGEDOWN")
             pageDown();
-        else if (action == "INFO")
-            edit();
-        else if (action == "UPCOMING")
-            upcoming();
-        else if (action == "DETAILS")
-            details();
+//         else if (action == "INFO")
+//             edit();
+//         else if (action == "UPCOMING")
+//             upcoming();
+//         else if (action == "DETAILS")
+//             details();
         else if (action == "SELECT")
             statusDialog();
         else
@@ -257,37 +256,37 @@ void ViewScheduleDiff::cursorUp(bool page)
 
 void ViewScheduleDiff::edit()
 {
-    ProgramInfo *pi = CurrentProgram();
-
-    if (!pi)
-        return;
-
-    RecordingInfo ri(*pi);
-    ri.EditScheduled();
-    *pi = ri;
+//     ProgramInfo *pi = CurrentProgram();
+// 
+//     if (!pi)
+//         return;
+// 
+//     RecordingInfo ri(*pi);
+//     ri.EditScheduled();
+//     *pi = ri;
 }
 
 void ViewScheduleDiff::upcoming()
 {
-    ProgramInfo *pi = CurrentProgram();
-    if (!pi)
-        return;
-
-    ProgListerQt *pl = new ProgListerQt(plTitle, pi->title, "",
-                                   gContext->GetMainWindow(), "proglist");
-    pl->exec();
-    delete pl;
+//     ProgramInfo *pi = CurrentProgram();
+//     if (!pi)
+//         return;
+// 
+//     ProgListerQt *pl = new ProgListerQt(plTitle, pi->title, "",
+//                                    gContext->GetMainWindow(), "proglist");
+//     pl->exec();
+//     delete pl;
 }
 
 void ViewScheduleDiff::details()
 {
-    ProgramInfo *pi = CurrentProgram();
-
-    if (pi)
-    {
-        const RecordingInfo ri(*pi);
-        ri.showDetails();
-    }
+//     ProgramInfo *pi = CurrentProgram();
+// 
+//     if (pi)
+//     {
+//         const RecordingInfo ri(*pi);
+//         ri.showDetails();
+//     }
 }
 
 void ViewScheduleDiff::statusDialog()
