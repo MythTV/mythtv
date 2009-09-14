@@ -1084,7 +1084,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
 QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
 {
     //VERBOSE(VB_GENERAL, QString("LoadScaleImage  : %1 ").arg(filename));
-    if (filename.isEmpty())
+    if (filename.isEmpty() || filename == "none")
         return NULL;
 
     if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
@@ -1152,7 +1152,7 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
 QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 {
     //VERBOSE(VB_GENERAL, QString("LoadScalePixmap  : %1 ").arg(filename));
-    if (filename.isEmpty())
+    if (filename.isEmpty() || filename == "none")
         return NULL;
 
     if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
