@@ -252,13 +252,18 @@
             </statetype>
         </buttonlist>
 
-        <imagetype name="overviewbackground">
-            <position>680,123</position>
-            <filename>config/list_options_background.png</filename>
-        </imagetype>
+        <shape name="overviewbackground" from="basetextbackground">
+            <area>680,123,567,231</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
+        </shape>
 
         <textarea name="overviewlabel" from="basetextarea">
-            <area>700,130,490,40</area>
+            <area>700,128,490,40</area>
             <font>baselarge</font>
             <value>List Options</value>
         </textarea>
@@ -289,22 +294,18 @@
             <value>Delete All</value>
         </button>
 
-<!--        <textarea name="filterlabel" from="statuslabel">
-            <position>700,223</position>
-            <value>Filter:</value>
-        </textarea>
-
-        <textarea name="filter" from="status">
-            <position>870,223</position>
-        </textarea>-->
-
-        <imagetype name="descriptionbackground">
-            <position>680,372</position>
-            <filename>config/general_options_background.png</filename>
-        </imagetype>
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,372,567,299</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2">
+                <area>0,0,0,0</area>
+            </shape>
+        </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>700,380,490,40</area>
+            <area>700,377,490,40</area>
             <font>baselarge</font>
             <value>Global Options</value>
         </textarea>

@@ -3,9 +3,7 @@
     <!-- Popups -->
     <window name="moviesel">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>877,78</position>
@@ -34,9 +32,7 @@
 
     <window name="castpopup">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>877,78</position>
@@ -65,9 +61,7 @@
 
     <window name="plotpopup">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>877,78</position>
@@ -96,9 +90,7 @@
 
     <window name="filter">
         <area>0,22,1280,555</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>236,40</position>
@@ -369,24 +361,23 @@
             </state>
         </statetype>
 
-        <imagetype name="descriptionbackground">
-            <position>680,57</position>
-            <filename>video/manager_description_background.png</filename>
-        </imagetype>
-
-        <textarea name="novideos" from="basetextarea">
-            <area>0,110,800,70</area>
-            <multiline>yes</multiline>
-            <align>hcenter,vcenter</align>
-        </textarea>
+        <shape name="descriptionbackground" from="basetextbackground">
+            <area>680,57,567,614</area>
+            <shape name="hline">
+                <area>15,41,537,6</area>
+            </shape>
+            <shape name="hline2" from="hline">
+                <position>15,425</position>
+            </shape>
+        </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>700,65,490,40</area>
+            <area>700,62,490,40</area>
             <font>baselarge</font>
         </textarea>
 
         <statetype name="userratingstate" from="baserating">
-            <position>1195,62</position>
+            <position>1195,59</position>
         </statetype>
 
         <textarea name="dirlbl" from="basetextarea">
@@ -513,6 +504,10 @@
             <multiline>yes</multiline>
         </textarea>
 
+        <textarea name="novideos" from="plot">
+            <align>allcenter</align>
+        </textarea>
+
     </window>
 
     <window name="browser">
@@ -609,12 +604,12 @@
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>48,78,590,35</area>
+            <area>48,75,590,35</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="subtitle" from="basetextarea">
-            <area>600,78,590,35</area>
+            <area>600,75,590,35</area>
             <align>right</align>
             <font>baselarge</font>
         </textarea>
@@ -1218,9 +1213,7 @@
 
     <window name="itemdetailpopup">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>236,58</position>

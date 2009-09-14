@@ -455,6 +455,11 @@
         </shape>
     </shape>
 
+    <shape name="basefadebackground">
+        <area>0,0,1280,642</area>
+        <fill color="#1a1a1a" alpha="170" />
+    </shape>
+
     <imagetype name="basetopbar">
         <position>0,0</position>
         <filename>backgrounds/topbar.png</filename>
@@ -498,9 +503,7 @@
     <!-- Menu Dialog -->
     <window name="MythPopupBox">
         <area>0,42,1280,642</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>0,78</position>
@@ -552,9 +555,7 @@
     <!-- Large Dialogue Box -->
     <window name="MythDialogBox">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>236,58</position>
@@ -607,9 +608,7 @@
     <!-- Confirmation Dialog -->
     <window name="MythConfirmationDialog">
         <area>0,42,1280,642</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>377,206</position>
@@ -637,9 +636,7 @@
     <!-- Text Input Dialog -->
     <window name="MythTextInputDialog">
         <area>0,42,1280,642</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>377,206</position>

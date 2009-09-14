@@ -336,9 +336,7 @@
 
     <window name="groupselector">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>877,78</position>
@@ -391,9 +389,7 @@
 
     <window name="changeview">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>877,78</position>
@@ -478,9 +474,7 @@
 
     <window name="passwordchanger">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>877,78</position>
@@ -523,9 +517,7 @@
 
     <window name="editmetadata">
         <area>0,42,1280,515</area>
-        <imagetype name="fade">
-            <filename>popups/fade_background.png</filename>
-        </imagetype>
+        <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
             <position>877,78</position>

@@ -2,9 +2,11 @@
 
     <window name="manualschedule">
 
-        <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,1200,40</area>
-            <font>baselarge</font>
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
             <value>Manual Recording Schedule</value>
         </textarea>
 
