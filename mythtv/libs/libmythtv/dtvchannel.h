@@ -20,6 +20,7 @@ using namespace std;
 
 // MythTV headers
 #include "channelbase.h"
+#include "dtvconfparserhelpers.h" // for DTVTunerType
 
 typedef pair<uint,uint> pid_cache_item_t;
 typedef vector<pid_cache_item_t> pid_cache_t;
@@ -75,6 +76,9 @@ class DTVChannel : public ChannelBase
     /// \brief Returns tuning mode last set by SetTuningMode().
     QString GetTuningMode(void) const;
 
+    /// \brief Returns a vector of supported tuning types.
+    virtual vector<DTVTunerType> GetTunerTypes(void) const;
+
     /** \brief Returns cached MPEG PIDs for last tuned channel.
      *  \param pid_cache List of PIDs with their TableID
      *                   types is returned in pid_cache.
@@ -110,6 +114,7 @@ class DTVChannel : public ChannelBase
   protected:
     mutable QMutex dtvinfo_lock;
 
+    DTVTunerType tunerType;
     QString sistandard; ///< PSIP table standard: MPEG, DVB, ATSC, OpenCable
     QString tuningMode;
     int     currentProgramNum;

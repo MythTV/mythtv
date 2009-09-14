@@ -72,15 +72,40 @@ class DTVTunerType : public DTVParamHelper
     static const DTVParamHelperStruct parseTable[];
 
   public:
-    enum
+    typedef enum
     {
-        kTunerTypeQPSK    = 0,
-        kTunerTypeQAM     = 1,
-        kTunerTypeOFDM    = 2,
-        kTunerTypeATSC    = 3,
-        kTunerTypeDVB_S2  = (1 << 5),
-        kTunerTypeUnknown = (1 << 31),
-    };
+        //                           Modulations which may be supported
+        kTunerTypeDVBS1   = 0x00, // QPSK
+        kTunerTypeDVBS2   = 0x20, // QPSK, 8PSK, 16APSK, 32APSK
+        kTunerTypeDVBC    = 0x01, // QAM-64, QAM-256
+        kTunerTypeDVBT    = 0x02, // OFDM
+        kTunerTypeATSC    = 0x03, // 8-VSB, 16-VSB, QAM-16, QAM-64, QAM-256, QPSK
+        kTunerTypeUnknown = 0x80000000,
+
+        // Note: Just because some cards sold in different regions support the same
+        // modulation scheme does not mean that they decode the same signals, there
+        // are also region specific FEC algorithms and the tuner which precedes the
+        // demodulator may be limited to frequencies used in that specific market.
+        // The tuner may also be bandwidth limited to 6 or 7 Mhz, so it could not
+        // support the 8 Mhz channels used in some contries, and/or the ADC which
+        // sits between the tuner and the demodulator may be bandwidth limited.
+        // While often the same hardware could physically support more than it
+        // is designed for the card/device maker does not write the firmware
+        // but licenses blocks of it and so only selects the pieces absolutely
+        // necessary for their market segment. Some ATSC cards only supported
+        // 8-VSB, newer cards don't support the unpopular 16-VSB, no consumer
+        // card supports the QAM-16 or QPSK used for USA Cable PSIP, etc.
+        // DVB-S cards also generally support DiSEqC signaling, and future
+        // ATSC cards may support similar but incompatible signalling for
+        // pointable antennas.
+        //
+        // Note 2: These values are keyed to the Linux DVB driver values, in
+        // reality some hardware does support multiple formats and this should
+        // be a mask. Also the transmission schemes used in Asia and South
+        // America are not represented here.
+    } my_enum;
+
+    bool operator==(const my_enum& v) const { return value == (int) v; }
 
     DTVTunerType(int _default = kTunerTypeUnknown)
         : DTVParamHelper(_default) { initStr(); }
@@ -90,16 +115,22 @@ class DTVTunerType : public DTVParamHelper
 
     bool IsFECVariable(void) const
     {
-        return ((kTunerTypeQPSK   == value) ||
-                (kTunerTypeQAM    == value) ||
-                (kTunerTypeDVB_S2 == value));
+        return ((kTunerTypeDVBC  == value) ||
+                (kTunerTypeDVBS1 == value) ||
+                (kTunerTypeDVBS2 == value));
     }
 
     bool IsModulationVariable(void) const
     {
-        return ((DTVTunerType::kTunerTypeQAM    == value) ||
-                (DTVTunerType::kTunerTypeATSC   == value) ||
-                (DTVTunerType::kTunerTypeDVB_S2 == value));
+        return ((kTunerTypeDVBC  == value) ||
+                (kTunerTypeATSC  == value) ||
+                (kTunerTypeDVBS2 == value));
+    }
+
+    bool IsDiSEqCSupported(void) const
+    {
+        return ((kTunerTypeDVBS1 == value) ||
+                (kTunerTypeDVBS2 == value));
     }
 
     QString toString() const { return toString(value); }

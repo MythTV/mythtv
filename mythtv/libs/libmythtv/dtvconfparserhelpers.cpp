@@ -43,11 +43,11 @@ static QMap<int,QString> dtv_tt_canonical_str;
 void DTVTunerType::initStr(void)
 {
     QMutexLocker locker(&dtv_tt_canonical_str_lock);
-    dtv_tt_canonical_str[kTunerTypeQPSK]    = "QPSK";
-    dtv_tt_canonical_str[kTunerTypeQAM]     = "QAM";
-    dtv_tt_canonical_str[kTunerTypeOFDM]    = "OFDM";
     dtv_tt_canonical_str[kTunerTypeATSC]    = "ATSC";
-    dtv_tt_canonical_str[kTunerTypeDVB_S2]  = "DVB_S2";
+    dtv_tt_canonical_str[kTunerTypeDVBT]    = "QPSK";
+    dtv_tt_canonical_str[kTunerTypeDVBC]    = "QAM";
+    dtv_tt_canonical_str[kTunerTypeDVBS1]   = "DVBS";
+    dtv_tt_canonical_str[kTunerTypeDVBS2]   = "DVB_S2";
     dtv_tt_canonical_str[kTunerTypeUnknown] = "UNKNOWN";
 }
 
@@ -62,11 +62,11 @@ QString DTVTunerType::toString(int _value)
 
 const DTVParamHelperStruct DTVTunerType::parseTable[] =
 {
-    { "QPSK",    kTunerTypeQPSK    },
-    { "QAM",     kTunerTypeQAM     },
-    { "OFDM",    kTunerTypeOFDM    },
+    { "QPSK",    kTunerTypeDVBS1   },
+    { "QAM",     kTunerTypeDVBC    },
+    { "OFDM",    kTunerTypeDVBT    },
     { "ATSC",    kTunerTypeATSC    },
-    { "DVB_S2",  kTunerTypeDVB_S2  },
+    { "DVB_S2",  kTunerTypeDVBS2   },
     { "UNKNOWN", kTunerTypeUnknown },
     { NULL,      kTunerTypeUnknown },
 };

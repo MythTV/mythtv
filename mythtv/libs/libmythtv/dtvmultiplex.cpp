@@ -76,7 +76,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
         return false;
     }
 
-    if (DTVTunerType::kTunerTypeQAM == type)
+    if (DTVTunerType::kTunerTypeDVBC == type)
     {
         if (fuzzy)
             return
@@ -91,7 +91,7 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
             (modulation == other.modulation);
     }
 
-    if (DTVTunerType::kTunerTypeOFDM == type)
+    if (DTVTunerType::kTunerTypeDVBT == type)
     {
         if (fuzzy)
             return
@@ -121,8 +121,8 @@ bool DTVMultiplex::IsEqual(DTVTunerType type, const DTVMultiplex &other,
         return (modulation == other.modulation);
     }
 
-    if ((DTVTunerType::kTunerTypeDVB_S2 == type) ||
-        (DTVTunerType::kTunerTypeQPSK   == type))
+    if ((DTVTunerType::kTunerTypeDVBS1 == type) ||
+        (DTVTunerType::kTunerTypeDVBS2 == type))
     {
         bool ret =
             (symbolrate == other.symbolrate)        &&
@@ -261,7 +261,7 @@ bool DTVMultiplex::ParseTuningParams(
     QString _modulation,   QString _bandwidth,
     QString _mod_sys,      QString _rolloff)
 {
-    if (DTVTunerType::kTunerTypeOFDM == type)
+    if (DTVTunerType::kTunerTypeDVBT == type)
     {
         return ParseDVB_T(
             _frequency,       _inversion,       _bandwidth,    _hp_code_rate,
@@ -269,19 +269,21 @@ bool DTVMultiplex::ParseTuningParams(
             _hierarchy);
     }
 
-    if ((DTVTunerType::kTunerTypeQPSK   == type) ||
-        (DTVTunerType::kTunerTypeQAM    == type))
+    if ((DTVTunerType::kTunerTypeDVBS1 == type) ||
+        (DTVTunerType::kTunerTypeDVBC  == type))
     {
         return ParseDVB_S_and_C(
             _frequency,       _inversion,     _symbolrate,
             _fec,             _modulation,    _polarity);
     }
 
-    if (DTVTunerType::kTunerTypeDVB_S2 == type)
+    if (DTVTunerType::kTunerTypeDVBS2 == type)
+    {
         return ParseDVB_S2(
             _frequency,       _inversion,     _symbolrate,
             _fec,             _modulation,    _polarity,
             _mod_sys,         _rolloff);
+    }
 
     if (DTVTunerType::kTunerTypeATSC == type)
         return ParseATSC(_frequency, _modulation);
@@ -350,7 +352,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
     {
         case DescriptorID::terrestrial_delivery_system:
         {
-            if (type != DTVTunerType::kTunerTypeOFDM)
+            if (type != DTVTunerType::kTunerTypeDVBT)
                 break;
 
             const TerrestrialDeliverySystemDescriptor cd(desc);
@@ -366,7 +368,7 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
         {
             const SatelliteDeliverySystemDescriptor cd(desc);
 
-            if (type == DTVTunerType::kTunerTypeQPSK)
+            if (type == DTVTunerType::kTunerTypeDVBS1)
             {
                 if (cd.ModulationSystem())
                 {
@@ -374,13 +376,15 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                             "Ignoring DVB-S2 transponder with DVB-S card");
                     return false;
                 }
+
                 return ParseDVB_S_and_C(
                     QString().number(cd.FrequencyHz()),  "auto",
                     QString().number(cd.SymbolRateHz()), cd.FECInnerString(),
                     cd.ModulationString(),
                     cd.PolarizationString());
             }
-            if (type == DTVTunerType::kTunerTypeDVB_S2)
+
+            if (type == DTVTunerType::kTunerTypeDVBS2)
             {
                 return ParseDVB_S2(
                     QString().number(cd.FrequencyHz()),  "auto",
@@ -389,11 +393,12 @@ bool DTVMultiplex::FillFromDeliverySystemDesc(DTVTunerType type,
                     cd.PolarizationString(),
                     cd.ModulationSystemString(),         cd.RollOffString());
             }
+
             break;
         }
         case DescriptorID::cable_delivery_system:
         {
-            if (type != DTVTunerType::kTunerTypeQAM)
+            if (type != DTVTunerType::kTunerTypeDVBC)
                 break;
 
             const CableDeliverySystemDescriptor cd(desc);

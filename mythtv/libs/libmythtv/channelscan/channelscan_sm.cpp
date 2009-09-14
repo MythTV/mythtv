@@ -31,6 +31,10 @@
 #include <pthread.h>
 #include <unistd.h>
 
+// C++ includes
+#include <algorithm>
+using namespace std;
+
 // Qt includes
 #include <QMutex>
 
@@ -145,6 +149,8 @@ ChannelScanSM::ChannelScanSM(
       inputname(_inputname),
       m_test_decryption(test_decryption),
       extend_scan_list(false),
+      // Optional state
+      scanDTVTunerType(DTVTunerType::kTunerTypeUnknown),
       // State
       scanning(false),
       threadExit(false),
@@ -487,6 +493,30 @@ bool ChannelScanSM::TestNextProgramEncryption(void)
     return false;
 }
 
+DTVTunerType ChannelScanSM::GuessDTVTunerType(DTVTunerType type) const
+{
+    if (scanDTVTunerType != (int)DTVTunerType::kTunerTypeUnknown)
+        type = scanDTVTunerType;
+
+    const DTVChannel *chan = GetDTVChannel();
+
+    if (!chan)
+        return type;
+
+    vector<DTVTunerType> tts = chan->GetTunerTypes();
+
+    for (uint i = 0; i < tts.size(); ++i)
+    {
+        if (tts[i] == type)
+            return type;
+    }
+
+    if (tts.size() > 0)
+        return tts[0];
+
+    return type;
+}
+
 void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
 {
     for (uint i = 0; i < nit->TransportStreamCount(); ++i)
@@ -508,47 +538,52 @@ void ChannelScanSM::UpdateScanTransports(const NetworkInformationTable *nit)
             uint64_t frequency = 0;
             const MPEGDescriptor desc(list[j]);
             uint tag = desc.DescriptorTag();
+            DTVTunerType tt = DTVTunerType::kTunerTypeUnknown;
 
             switch (tag)
             {
-            case DescriptorID::terrestrial_delivery_system:
-            {
-                const TerrestrialDeliverySystemDescriptor cd(desc);
-                frequency = cd.FrequencyHz();
-                break;
-            }
-            case DescriptorID::satellite_delivery_system:
-            {
-                const SatelliteDeliverySystemDescriptor cd(desc);
-                frequency = cd.FrequencyHz()/1000;
-                break;
-            }
-            case DescriptorID::cable_delivery_system:
-            {
-                const CableDeliverySystemDescriptor cd(desc);
-                frequency = cd.FrequencyHz();
-                break;
-            }
-            default:
-                VERBOSE(VB_CHANSCAN, LOC + "unknown delivery system descriptor");
-                continue;
+                case DescriptorID::terrestrial_delivery_system:
+                {
+                    const TerrestrialDeliverySystemDescriptor cd(desc);
+                    frequency = cd.FrequencyHz();
+                    tt = DTVTunerType::kTunerTypeDVBT;
+                    break;
+                }
+                case DescriptorID::satellite_delivery_system:
+                {
+                    const SatelliteDeliverySystemDescriptor cd(desc);
+                    frequency = cd.FrequencyHz()/1000;
+                    tt = DTVTunerType::kTunerTypeDVBS1;
+                    break;
+                }
+                case DescriptorID::cable_delivery_system:
+                {
+                    const CableDeliverySystemDescriptor cd(desc);
+                    frequency = cd.FrequencyHz();
+                    tt = DTVTunerType::kTunerTypeDVBC;
+                    break;
+                }
+                default:
+                    VERBOSE(VB_CHANSCAN, LOC +
+                            "unknown delivery system descriptor");
+                    continue;
             }
 
             mplexid = ChannelUtil::GetMplexID(sourceID, frequency, tsid, netid);
+            mplexid = max(0, mplexid);
 
-            if (!GetDVBChannel())
-            {
-                continue;
-            }
+            tt = GuessDTVTunerType(tt);
 
             DTVMultiplex tuning;
-            if (mplexid > 0)
+            if (mplexid)
             {
-                if (!tuning.FillFromDB(GetDVBChannel()->GetCardType(), mplexid))
+                if (!tuning.FillFromDB(tt, mplexid))
                     continue;
             }
-            else if (!tuning.FillFromDeliverySystemDesc(GetDVBChannel()->GetCardType(), desc))
+            else if (!tuning.FillFromDeliverySystemDesc(tt, desc))
+            {
                 continue;
+            }
 
             extend_transports[id] = tuning;
             break;
@@ -1131,16 +1166,14 @@ ScanDTVTransportList ChannelScanSM::GetChannelList(void) const
 
     uint cardid = channel->GetCardID();
 
-    DTVTunerType tuner_type = DTVTunerType::kTunerTypeATSC;
-    if (GetDVBChannel())
-        tuner_type = GetDVBChannel()->GetCardType();
+    DTVTunerType tuner_type = GuessDTVTunerType(DTVTunerType::kTunerTypeATSC);
 
     ChannelList::const_iterator it = channelList.begin();
     for (; it != channelList.end(); ++it)
     {
-        QMap<uint,ChannelInsertInfo> pnum_to_dbchan = GetChannelList(it->first, it->second);
+        QMap<uint,ChannelInsertInfo> pnum_to_dbchan =
+            GetChannelList(it->first, it->second);
 
-        // Insert channels into DB
         ScanDTVTransport item((*it->first).tuning, tuner_type, cardid);
 
         QMap<uint,ChannelInsertInfo>::iterator dbchan_it;
@@ -1174,6 +1207,11 @@ DVBSignalMonitor* ChannelScanSM::GetDVBSignalMonitor(void)
 DTVChannel *ChannelScanSM::GetDTVChannel(void)
 {
     return dynamic_cast<DTVChannel*>(channel);
+}
+
+const DTVChannel *ChannelScanSM::GetDTVChannel(void) const
+{
+    return dynamic_cast<const DTVChannel*>(channel);
 }
 
 HDHRChannel *ChannelScanSM::GetHDHRChannel(void)
@@ -1698,9 +1736,11 @@ bool ChannelScanSM::AddToList(uint mplexid)
     uint    sourceid   = query.value(0).toUInt();
     QString sistandard = query.value(1).toString();
     uint    tsid       = query.value(2).toUInt();
+    DTVTunerType tt = DTVTunerType::kTunerTypeUnknown;
 
     QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
         QString("Multiplex #%1").arg(mplexid);
+
     if (query.value(4).toString() == "8vsb")
     {
         QString chan = QString("%1 Hz").arg(query.value(3).toInt());
@@ -1716,27 +1756,22 @@ bool ChannelScanSM::AddToList(uint mplexid)
             }
         }
         fn = QObject::tr("ATSC Channel %1").arg(chan);
+        tt = DTVTunerType::kTunerTypeATSC;
     }
+
+    tt = GuessDTVTunerType(tt);
 
     TransportScanItem item(sourceid, sistandard, fn, mplexid, signalTimeout);
 
-    bool ok = false;
-    if (GetDVBChannel())
-        ok = item.tuning.FillFromDB(GetDVBChannel()->GetCardType(), mplexid);
-    else if (GetHDHRChannel())
-        ok = item.tuning.FillFromDB(DTVTunerType::kTunerTypeATSC, mplexid);
-
-    if (ok)
+    if (item.tuning.FillFromDB(tt, mplexid))
     {
         VERBOSE(VB_CHANSCAN, LOC + "Adding " + fn);
         scanTransports.push_back(item);
-    }
-    else
-    {
-        VERBOSE(VB_CHANSCAN, LOC + "Not adding incomplete transport " + fn);
+        return true;
     }
 
-    return ok;
+    VERBOSE(VB_CHANSCAN, LOC + "Not adding incomplete transport " + fn);
+    return false;
 }
 
 bool ChannelScanSM::ScanTransport(uint mplexid, bool follow_nit)

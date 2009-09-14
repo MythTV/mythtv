@@ -562,7 +562,23 @@ PIDPriority HDHRStreamHandler::GetPIDPriority(uint pid) const
 
 bool HDHRStreamHandler::Open(void)
 {
-    return Connect();
+    if (Connect())
+    {
+        const char *model = hdhomerun_device_get_model_str(_hdhomerun_device);
+        _tuner_types.clear();
+        if (QString(model).toLower().contains("dvb"))
+        {
+            _tuner_types.push_back(DTVTunerType::kTunerTypeDVBT);
+            _tuner_types.push_back(DTVTunerType::kTunerTypeDVBC);
+        }
+        else
+        {
+            _tuner_types.push_back(DTVTunerType::kTunerTypeATSC);
+        }
+
+        return true;
+    }
+    return false;
 }
 
 void HDHRStreamHandler::Close(void)

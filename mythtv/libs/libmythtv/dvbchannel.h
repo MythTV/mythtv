@@ -8,13 +8,14 @@
 #ifndef DVBCHANNEL_H
 #define DVBCHANNEL_H
 
-#include <qobject.h>
-#include <qstring.h>
-#include <qmap.h>
+#include <QObject>
+#include <QString>
+#include <QMap>
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dtvchannel.h"
+#include "dtvconfparserhelpers.h" // for DTVTunerType
 #include "streamlisteners.h"
 #include "diseqc.h"
 
@@ -52,7 +53,6 @@ class DVBChannel : public DTVChannel
     QString GetCardNum(void)            const { return device; };
     /// Returns frontend name as reported by driver
     QString GetFrontendName(void)       const;
-    DTVTunerType GetCardType(void)      const { return card_type; }
     bool IsMaster(void)                 const { return master == NULL; }
     /// Returns true iff we have a faulty DVB driver that munges PMT
     bool HasCRCBug(void)                const { return has_crc_bug; }
@@ -115,7 +115,6 @@ class DVBChannel : public DTVChannel
 
     // Device info
     QString           frontend_name;
-    DTVTunerType      card_type;
     uint64_t          capabilities;
     uint64_t          ext_modulations;
     uint64_t          frequency_minimum;

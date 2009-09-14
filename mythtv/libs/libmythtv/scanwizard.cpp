@@ -93,22 +93,22 @@ void ScanWizard::SetPage(const QString &pageTitle)
     else if (scantype == ScanTypeSetting::NITAddScan_DVBT)
     {
         start_chan = configPane->GetStartChan();
-        parse_type = DTVTunerType::kTunerTypeOFDM;
+        parse_type = DTVTunerType::kTunerTypeDVBT;
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBS)
     {
         start_chan = configPane->GetStartChan();
-        parse_type = DTVTunerType::kTunerTypeQPSK;
+        parse_type = DTVTunerType::kTunerTypeDVBS1;
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBS2)
     {
         start_chan = configPane->GetStartChan();
-        parse_type = DTVTunerType::kTunerTypeDVB_S2;
+        parse_type = DTVTunerType::kTunerTypeDVBS2;
     }
     else if (scantype == ScanTypeSetting::NITAddScan_DVBC)
     {
         start_chan = configPane->GetStartChan();
-        parse_type = DTVTunerType::kTunerTypeQAM;
+        parse_type = DTVTunerType::kTunerTypeDVBC;
     }
     else if (scantype == ScanTypeSetting::IPTVImport)
     {

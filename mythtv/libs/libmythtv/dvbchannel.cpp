@@ -70,7 +70,7 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
       // Helper classes
       diseqc_tree(NULL),            dvbcam(NULL),
       // Device info
-      frontend_name(QString::null), card_type(DTVTunerType::kTunerTypeUnknown),
+      frontend_name(QString::null),
       // Tuning
       tune_lock(),                  hw_lock(),
       last_lnb_dev_id(-1),
@@ -166,7 +166,7 @@ bool DVBChannel::Open(DVBChannel *who)
 
         fd_frontend         = master->fd_frontend;
         frontend_name       = master->frontend_name;
-        card_type           = master->card_type;
+        tunerType           = master->tunerType;
         capabilities        = master->capabilities;
         ext_modulations     = master->ext_modulations;
         frequency_minimum   = master->frequency_minimum;
@@ -212,11 +212,11 @@ bool DVBChannel::Open(DVBChannel *who)
     }
 
     frontend_name       = info.name;
-    card_type           = info.type;
+    tunerType           = info.type;
 #if HAVE_FE_CAN_2G_MODULATION
-    if (card_type == DTVTunerType::kTunerTypeQPSK &&
+    if (tunerType == DTVTunerType::kTunerTypeDVBS1 &&
         (info.caps & FE_CAN_2G_MODULATION))
-        card_type = DTVTunerType::kTunerTypeDVB_S2;
+        tunerType = DTVTunerType::kTunerTypeDVBS2;
 #endif // HAVE_FE_CAN_2G_MODULATION
     capabilities        = info.caps;
     frequency_minimum   = info.frequency_min;
@@ -228,8 +228,7 @@ bool DVBChannel::Open(DVBChannel *who)
             .arg(device).arg(frontend_name));
 
     // Turn on the power to the LNB
-    if (card_type == DTVTunerType::kTunerTypeQPSK ||
-        card_type == DTVTunerType::kTunerTypeDVB_S2)
+    if (tunerType.IsDiSEqCSupported())
     {
         diseqc_tree = diseqc_dev.FindTree(GetCardID());
         if (diseqc_tree)
@@ -272,7 +271,7 @@ bool DVBChannel::Init(QString &inputname, QString &startchannel, bool setchan)
 bool DVBChannel::TuneMultiplex(uint mplexid, QString inputname)
 {
     DTVMultiplex tuning;
-    if (!tuning.FillFromDB(card_type, mplexid))
+    if (!tuning.FillFromDB(tunerType, mplexid))
         return false;
 
     CheckOptions(tuning);
@@ -354,7 +353,7 @@ bool DVBChannel::SetChannelByString(const QString &channum)
 
     // Initialize basic the tuning parameters
     DTVMultiplex tuning;
-    if (!mplexid || !tuning.FillFromDB(card_type, mplexid))
+    if (!mplexid || !tuning.FillFromDB(tunerType, mplexid))
     {
         VERBOSE(VB_IMPORTANT, loc_err +
                 "Failed to initialize multiplex options");
@@ -457,7 +456,7 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
                 .arg(frequency_minimum).arg(frequency_maximum));
     }
 
-    if (card_type.IsFECVariable() &&
+    if (tunerType.IsFECVariable() &&
         symbol_rate_minimum && symbol_rate_maximum &&
         (symbol_rate_minimum <= symbol_rate_maximum) &&
         (tuning.symbolrate < symbol_rate_minimum ||
@@ -470,17 +469,17 @@ void DVBChannel::CheckOptions(DTVMultiplex &tuning) const
                 .arg(symbol_rate_minimum).arg(symbol_rate_maximum));
     }
 
-    if (card_type.IsFECVariable() && !CheckCodeRate(tuning.fec))
+    if (tunerType.IsFECVariable() && !CheckCodeRate(tuning.fec))
     {
         VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported fec_inner parameter.");
     }
 
-    if (card_type.IsModulationVariable() && !CheckModulation(tuning.modulation))
+    if (tunerType.IsModulationVariable() && !CheckModulation(tuning.modulation))
     {
         VERBOSE(VB_GENERAL, LOC_WARN + "Unsupported modulation parameter.");
     }
 
-    if (DTVTunerType::kTunerTypeOFDM != card_type)
+    if (DTVTunerType::kTunerTypeDVBT != tunerType)
     {
         VERBOSE(VB_CHANNEL, LOC + tuning.toString());
         return;
@@ -614,10 +613,10 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     uint c = 0;
     struct dtv_properties *cmdseq;
 
-    if (tuner_type != DTVTunerType::kTunerTypeDVB_S2 &&
-        tuner_type != DTVTunerType::kTunerTypeOFDM   &&
-        tuner_type != DTVTunerType::kTunerTypeQAM    &&
-        tuner_type != DTVTunerType::kTunerTypeQPSK)
+    if (tuner_type != DTVTunerType::kTunerTypeDVBT  &&
+        tuner_type != DTVTunerType::kTunerTypeDVBC  &&
+        tuner_type != DTVTunerType::kTunerTypeDVBS1 &&
+        tuner_type != DTVTunerType::kTunerTypeDVBS2)
     {
         VERBOSE(VB_IMPORTANT, "Unsupported tuner type " + tuner_type.toString());
         return NULL;
@@ -639,7 +638,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
         can_fec_auto = false;
 
-    if (tuner_type == DTVTunerType::kTunerTypeDVB_S2)
+    if (tuner_type == DTVTunerType::kTunerTypeDVBS2)
     {
         cmdseq->props[c].cmd      = DTV_DELIVERY_SYSTEM;
         cmdseq->props[c++].u.data = tuning.mod_sys;
@@ -652,9 +651,9 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
     cmdseq->props[c].cmd      = DTV_INVERSION;
     cmdseq->props[c++].u.data = tuning.inversion;
 
-    if (tuner_type == DTVTunerType::kTunerTypeQPSK   ||
-        tuner_type == DTVTunerType::kTunerTypeDVB_S2 ||
-        tuner_type == DTVTunerType::kTunerTypeQAM)
+    if (tuner_type == DTVTunerType::kTunerTypeDVBS1 ||
+        tuner_type == DTVTunerType::kTunerTypeDVBS2 ||
+        tuner_type == DTVTunerType::kTunerTypeDVBC)
     {
         cmdseq->props[c].cmd      = DTV_SYMBOL_RATE;
         cmdseq->props[c++].u.data = tuning.symbolrate;
@@ -666,7 +665,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
         cmdseq->props[c++].u.data = can_fec_auto ? FEC_AUTO : tuning.fec;
     }
 
-    if (tuner_type == DTVTunerType::kTunerTypeOFDM)
+    if (tuner_type == DTVTunerType::kTunerTypeDVBT)
     {
         cmdseq->props[c].cmd      = DTV_BANDWIDTH_HZ;
         cmdseq->props[c++].u.data = (8-tuning.bandwidth) * 1000000;
@@ -706,7 +705,7 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(
 
 
 /*****************************************************************************
-           Tuning functions for each of the four types of cards.
+           Tuning functions for each of the five types of cards.
  *****************************************************************************/
 
 /**
@@ -739,11 +738,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     bool can_fec_auto = false;
     bool reset = (force_reset || first_tune);
 
-    bool is_dvbs = (DTVTunerType::kTunerTypeQPSK   == card_type ||
-                    DTVTunerType::kTunerTypeDVB_S2 == card_type);
-
-    bool has_diseqc = (diseqc_tree != NULL);
-    if (is_dvbs && !has_diseqc)
+    if (tunerType.IsDiSEqCSupported() && !diseqc_tree)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "DVB-S needs device tree for LNB handling");
@@ -765,7 +760,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
     drain_dvb_events(fd_frontend);
 
     // send DVB-S setup
-    if (is_dvbs)
+    if (diseqc_tree)
     {
         // configure for new input
         if (!same_input)
@@ -809,17 +804,19 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             tuning.toString());
 
     // DVB-S is in kHz, other DVB is in Hz
+    bool is_dvbs = ((DTVTunerType::kTunerTypeDVBS1 == tunerType) ||
+                    (DTVTunerType::kTunerTypeDVBS2 == tunerType));
     int     freq_mult = (is_dvbs) ? 1 : 1000;
     QString suffix    = (is_dvbs) ? "kHz" : "Hz";
 
-    if (reset || !prev_tuning.IsEqual(card_type, tuning, 500 * freq_mult))
+    if (reset || !prev_tuning.IsEqual(tunerType, tuning, 500 * freq_mult))
     {
         VERBOSE(VB_CHANNEL, LOC + QString("Tune(): Tuning to %1%2")
                 .arg(intermediate_freq ? intermediate_freq : tuning.frequency)
                 .arg(suffix));
 
 #if DVB_API_VERSION >=5
-        if (DTVTunerType::kTunerTypeDVB_S2 == card_type)
+        if (DTVTunerType::kTunerTypeDVBS2 == tunerType)
         {
             struct dtv_property p_clear;
             struct dtv_properties cmdseq_clear;
@@ -836,7 +833,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             }
 
             struct dtv_properties *cmds = dtvmultiplex_to_dtvproperties(
-                card_type, tuning, intermediate_freq, can_fec_auto);
+                tunerType, tuning, intermediate_freq, can_fec_auto);
 
             if (!cmds) {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to convert "
@@ -869,9 +866,8 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
         else
 #endif
         {
-            struct dvb_frontend_parameters params = dtvmultiplex_to_dvbparams(card_type, tuning,
-                                                                              intermediate_freq,
-                                                                              can_fec_auto);
+            struct dvb_frontend_parameters params = dtvmultiplex_to_dvbparams(
+                tunerType, tuning, intermediate_freq, can_fec_auto);
 
             if (ioctl(fd_frontend, FE_SET_FRONTEND, &params) < 0)
             {
@@ -968,7 +964,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
         return false;
     }
 
-    if (card_type == DTVTunerType::kTunerTypeDVB_S2)
+    if (tunerType == DTVTunerType::kTunerTypeDVBS2)
     {
         // TODO implement probing of tuning parameters with FE_GET_PROPERTY
         return false;
@@ -986,7 +982,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     uint    mplex      = tuning.mplex;
     QString sistandard = tuning.sistandard; sistandard.detach();
 
-    tuning = dvbparams_to_dtvmultiplex(card_type, params);
+    tuning = dvbparams_to_dtvmultiplex(tunerType, params);
 
     tuning.mplex       = mplex;
     tuning.sistandard  = sistandard;
@@ -1210,7 +1206,7 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
     params.frequency = tuning.frequency;
     params.inversion = (fe_spectral_inversion_t) (int) tuning.inversion;
 
-    if (DTVTunerType::kTunerTypeQPSK == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBS1 == tuner_type)
     {
         if (tuning.mod_sys == DTVModulationSystem::kModulationSystem_DVBS2)
             VERBOSE(VB_IMPORTANT, "DVBChan Error, Tuning of a DVB-S2 transport "
@@ -1222,20 +1218,20 @@ static struct dvb_frontend_parameters dtvmultiplex_to_dvbparams(
             : (fe_code_rate_t) (int) tuning.fec;
     }
 
-    if (DTVTunerType::kTunerTypeDVB_S2 == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBS2 == tuner_type)
     {
         VERBOSE(VB_IMPORTANT, "DVBChan Error, MythTV was compiled without "
                 "DVB-S2 headers being present so DVB-S2 tuning will fail.");
     }
 
-    if (DTVTunerType::kTunerTypeQAM  == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBC == tuner_type)
     {
         params.u.qam.symbol_rate  = tuning.symbolrate;
         params.u.qam.fec_inner    = (fe_code_rate_t) (int) tuning.fec;
         params.u.qam.modulation   = (fe_modulation_t) (int) tuning.modulation;
     }
 
-    if (DTVTunerType::kTunerTypeOFDM == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBT == tuner_type)
     {
         params.u.ofdm.bandwidth             =
             (fe_bandwidth_t) (int) tuning.bandwidth;
@@ -1270,21 +1266,21 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
     tuning.frequency = params.frequency;
     tuning.inversion = params.inversion;
 
-    if ((DTVTunerType::kTunerTypeQPSK   == tuner_type) ||
-        (DTVTunerType::kTunerTypeDVB_S2 == tuner_type))
+    if ((DTVTunerType::kTunerTypeDVBS1 == tuner_type) ||
+        (DTVTunerType::kTunerTypeDVBS2 == tuner_type))
     {
         tuning.symbolrate     = params.u.qpsk.symbol_rate;
         tuning.fec            = params.u.qpsk.fec_inner;
     }
 
-    if (DTVTunerType::kTunerTypeQAM  == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBC   == tuner_type)
     {
         tuning.symbolrate     = params.u.qam.symbol_rate;
         tuning.fec            = params.u.qam.fec_inner;
         tuning.modulation     = params.u.qam.modulation;
     }
 
-    if (DTVTunerType::kTunerTypeOFDM == tuner_type)
+    if (DTVTunerType::kTunerTypeDVBT   == tuner_type)
     {
         tuning.bandwidth      = params.u.ofdm.bandwidth;
         tuning.hp_code_rate   = params.u.ofdm.code_rate_HP;
@@ -1295,7 +1291,7 @@ static DTVMultiplex dvbparams_to_dtvmultiplex(
         tuning.hierarchy      = params.u.ofdm.hierarchy_information;
     }
 
-    if (DTVTunerType::kTunerTypeATSC == tuner_type)
+    if (DTVTunerType::kTunerTypeATSC    == tuner_type)
     {
         tuning.modulation     = params.u.vsb.modulation;
     }

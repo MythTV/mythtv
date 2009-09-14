@@ -13,6 +13,7 @@ QMap<QString,DTVChannel*> DTVChannel::master_map;
 
 DTVChannel::DTVChannel(TVRec *parent)
     : ChannelBase(parent),
+      tunerType(DTVTunerType::kTunerTypeUnknown),
       sistandard("mpeg"),         tuningMode(QString::null),
       currentProgramNum(-1),
       currentATSCMajorChannel(0), currentATSCMinorChannel(0),
@@ -152,6 +153,14 @@ QString DTVChannel::GetTuningMode(void) const
     QMutexLocker locker(&dtvinfo_lock);
     QString tmp = tuningMode; tmp.detach();
     return tmp;
+}
+
+vector<DTVTunerType> DTVChannel::GetTunerTypes(void) const
+{
+    vector<DTVTunerType> tts;
+    if (tunerType != DTVTunerType::kTunerTypeUnknown)
+        tts.push_back(tunerType);
+    return tts;
 }
 
 void DTVChannel::SetTuningMode(const QString &tuning_mode)

@@ -35,10 +35,10 @@ using namespace std;
 #define LOC_ERR QString("HDHRChan(%1), Error: ").arg(GetDevice())
 
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device)
-    : DTVChannel(parent),       _stream_handler(NULL),
-      _device_id(device),       _lock(QMutex::Recursive),
-      tune_lock(QMutex::Recursive),
-      hw_lock(QMutex::Recursive)
+    : DTVChannel(parent),
+      _device_id(device),           _stream_handler(NULL),
+      _lock(QMutex::Recursive),
+      tune_lock(QMutex::Recursive), hw_lock(QMutex::Recursive)
 {
 }
 
@@ -57,6 +57,10 @@ bool HDHRChannel::Open(void)
         return true;
 
     _stream_handler = HDHRStreamHandler::Get(_device_id);
+
+    _tuner_types = _stream_handler->GetTunerTypes();
+    tunerType = (_tuner_types.empty()) ?
+        DTVTunerType::kTunerTypeUnknown : _tuner_types[0];
 
     if (!InitializeInputs())
     {

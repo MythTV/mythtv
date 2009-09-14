@@ -376,6 +376,36 @@ void ChannelScanner::PreScanCommon(
         signal_timeout, channel_timeout, inputname,
         do_test_decryption);
 
+    // If we know the channel types we can give the signal montior a hint.
+    // Since we unfortunately do not record this info in the DB, we can not
+    // do this for the other scan types and have to guess later on...
+    switch (scantype)
+    {
+        case ScanTypeSetting::FullScan_ATSC:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeATSC);
+            break;
+        case ScanTypeSetting::FullScan_DVBC:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBC);
+            break;
+        case ScanTypeSetting::FullScan_DVBT:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
+            break;
+        case ScanTypeSetting::NITAddScan_DVBT:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBT);
+            break;
+        case ScanTypeSetting::NITAddScan_DVBS:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBS1);
+            break;
+        case ScanTypeSetting::NITAddScan_DVBS2:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBS2);
+            break;
+        case ScanTypeSetting::NITAddScan_DVBC:
+            sigmonScanner->SetScanDTVTunerType(DTVTunerType::kTunerTypeDVBC);
+            break;
+        default:
+            break;
+    }
+
     // Signal Meters are connected here
     SignalMonitor *mon = sigmonScanner->GetSignalMonitor();
     if (mon)

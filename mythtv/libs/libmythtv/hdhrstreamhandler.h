@@ -12,6 +12,7 @@ using namespace std;
 #include "util.h"
 #include "DeviceReadBuffer.h"
 #include "mpegstreamdata.h"
+#include "dtvconfparserhelpers.h"
 
 class QString;
 class HDHRStreamHandler;
@@ -44,6 +45,7 @@ class HDHRStreamHandler : public ReaderPausedCB
     bool IsRunning(void) const { return _running; }
     void GetTunerStatus(struct hdhomerun_tuner_status_t *status);
     bool IsConnected(void) const;
+    vector<DTVTunerType> GetTunerTypes(void) const { return _tuner_types; }
 
     // Commands
     bool TuneChannel(const QString &chanid);
@@ -91,6 +93,7 @@ class HDHRStreamHandler : public ReaderPausedCB
     hdhomerun_device_t *_hdhomerun_device;
     uint                _tuner;
     QString             _devicename;
+    vector<DTVTunerType> _tuner_types;
 
     mutable QMutex    _start_stop_lock;
     bool              _running;

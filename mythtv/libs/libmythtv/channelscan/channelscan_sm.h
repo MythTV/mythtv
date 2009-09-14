@@ -46,6 +46,7 @@
 #include "streamlisteners.h"
 #include "scanmonitor.h"
 #include "signalmonitorlistener.h"
+#include "dtvconfparserhelpers.h" // for DTVTunerType
 
 class MSqlQuery;
 
@@ -114,6 +115,7 @@ class ChannelScanSM : public MPEGStreamListener,
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
     void SetSignalTimeout(uint val)    { signalTimeout = val; }
     void SetChannelTimeout(uint val)   { channelTimeout = val; }
+    void SetScanDTVTunerType(DTVTunerType t) { scanDTVTunerType = t; }
 
     uint GetSignalTimeout(void)  const { return signalTimeout; }
     uint GetChannelTimeout(void) const { return channelTimeout; }
@@ -147,6 +149,7 @@ class ChannelScanSM : public MPEGStreamListener,
   private:
     // some useful gets
     DTVChannel       *GetDTVChannel(void);
+    const DTVChannel *GetDTVChannel(void) const;
     V4LChannel       *GetV4LChannel(void);
     HDHRChannel      *GetHDHRChannel(void);
     DVBChannel       *GetDVBChannel(void);
@@ -162,6 +165,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool Tune(const transport_scan_items_it_t transport);
     uint InsertMultiplex(const transport_scan_items_it_t transport);
     void ScanTransport(const transport_scan_items_it_t transport);
+    DTVTunerType GuessDTVTunerType(DTVTunerType) const;
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
@@ -202,6 +206,9 @@ class ChannelScanSM : public MPEGStreamListener,
     QString           inputname;
     bool              m_test_decryption;
     bool              extend_scan_list;
+
+    // Optional info
+    DTVTunerType      scanDTVTunerType;
 
     // State
     bool              scanning;

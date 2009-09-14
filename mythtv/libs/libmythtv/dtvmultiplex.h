@@ -78,7 +78,6 @@ class DTVMultiplex
     DTVBandwidth     bandwidth;
     DTVCodeRate      hp_code_rate;  ///< High Priority FEC rate
     DTVCodeRate      lp_code_rate;  ///< Low Priority FEC rate
-    //DTVModulation    constellation; ///< Modulation for OFDM, TODO Remove
     DTVModulation    modulation;
     DTVTransmitMode  trans_mode;
     DTVGuardInterval guard_interval;
