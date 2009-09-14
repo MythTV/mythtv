@@ -299,6 +299,40 @@
         </statetype>
     </button>
 
+    <button name="basewidebutton">
+        <area>0,0,300,40</area>
+        <statetype name="buttonstate">
+            <state name="active">
+                <imagetype name="background">
+                    <area>0,0,300,40</area>
+                    <filename>button_background.png</filename>
+                </imagetype>
+                <textarea name="text">
+                    <area>5,5,290,30</area>
+                    <align>allcenter</align>
+                    <font>basemedium</font>
+                    <font state="selected">basemedium</font>
+                    <font state="disabled">basemediumgrey</font>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="background">
+                    <area>0,0,300,40</area>
+                    <filename>button_selected_background.png</filename>
+                </imagetype>
+            </state>
+            <state name="disabled" from="active" />
+            <state name="pushed" from="active">
+                <imagetype name="background">
+                    <filename>button_pushed_background.png</filename>
+                </imagetype>
+                <textarea name="text">
+                    <position>8,8</position>
+                </textarea>
+            </state>
+        </statetype>
+    </button>
+
     <!-- Base definition of checkbox -->
     <checkbox name="basecheckbox">
         <position>0,0</position>
