@@ -2681,8 +2681,11 @@ CardInput::~CardInput()
 
 void CardInput::SetSourceID(const QString &sourceid)
 {
+    uint cid = cardid->getValue().toUInt();
+    QString raw_card_type = CardUtil::GetRawCardType(cid);
     bool enable = (sourceid.toInt() > 0);
-    scan->setEnabled(enable);
+    scan->setEnabled(enable && !raw_card_type.isEmpty() &&
+                     !CardUtil::IsUnscanable(raw_card_type));
     srcfetch->setEnabled(enable);
 }
 
