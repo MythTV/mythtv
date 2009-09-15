@@ -1,5 +1,3 @@
-#include <QString>
-
 #include <mythcontext.h>
 #include <mythuibuttontree.h>
 #include <mythdialogbox.h>
@@ -16,7 +14,7 @@ class GameTreeInfo
 {
   public:
     GameTreeInfo(const QString& levels, const QString& filter)
-      : m_levels(levels.split(' '))
+      : m_levels(QStringList::split(" ", levels))
       , m_filter(filter)
     {
     }
@@ -79,9 +77,9 @@ bool GameUI::Create()
 
     // The call to GameHandler::count() fills the handler list for us
     // to move through.
-    int handlercount = GameHandler::count();
+    unsigned handlercount = GameHandler::count();
 
-    for (int i = 0; i < handlercount; ++i)
+    for (unsigned i = 0; i < handlercount; ++i)
     {
         QString system = GameHandler::getHandler(i)->SystemName();
         if (i == 0)
@@ -114,7 +112,7 @@ bool GameUI::Create()
 
     if (m_showHashed)
     {
-        int pos = levels.indexOf("gamename");
+        int pos = levels.find("gamename",0);
         if (pos >= 0)
             levels.insert(pos, " hash ");
     }
@@ -245,7 +243,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
             {
                 chooseSystemPopup->SetReturnEvent(this, "chooseSystemPopup");
                 QString all_systems = romInfo->AllSystems();
-                QStringList players = all_systems.split(',');
+                QStringList players = QStringList::split(",", all_systems);
                 for (QStringList::Iterator it = players.begin();
                      it != players.end(); ++it)
                 {
@@ -662,16 +660,16 @@ void GameUI::fillNode(MythGenericTree *node)
     {
         while (query.next())
         {
-            QString current = query.value(0).toString().trimmed();
+            QString current = query.value(0).toString().stripWhiteSpace();
             MythGenericTree *new_node =
                 new MythGenericTree(current, node->getInt() + 1, false);
             if (IsLeaf)
             {
                 RomInfo *temp = new RomInfo();
-                temp->setSystem(query.value(1).toString().trimmed());
+                temp->setSystem(query.value(1).toString().stripWhiteSpace());
                 temp->setYear(query.value(2).toString());
-                temp->setGenre(query.value(3).toString().trimmed());
-                temp->setGamename(query.value(4).toString().trimmed());
+                temp->setGenre(query.value(3).toString().stripWhiteSpace());
+                temp->setGamename(query.value(4).toString().stripWhiteSpace());
                 new_node->SetData(qVariantFromValue(temp));
                 node->addNode(new_node);
             }

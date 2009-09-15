@@ -30,7 +30,7 @@ struct GameData
 void GameCallback(void *data, QString &selection)
 {
     GameData *ddata = (GameData *)data;
-    QString sel = selection.toLower();
+    QString sel = selection.lower();
 
     (void)ddata;
 

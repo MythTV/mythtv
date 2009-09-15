@@ -60,9 +60,9 @@ class GameHandler
         m_RemoveAll(false),         m_KeepAll(false) {}
 
     static void updateSettings(GameHandler*);
-    static GameHandler* getHandler(int i);
+    static GameHandler* getHandler(uint i);
     static GameHandler* newHandler(QString name);
-    static int count(void);
+    static uint count(void);
     void InitMetaDataMap(QString GameType);
     void GetMetadata(GameHandler *handler, QString rom, 
                              QString* Genre, QString* Year, QString* Country,
