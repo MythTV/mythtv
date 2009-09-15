@@ -95,14 +95,14 @@ bool ManualSchedule::Create(void)
         new MythUIButtonListItem(m_startdate, dinfo);
         if (m_nowDateTime.addDays(index).toString("MMdd") ==
             m_startDateTime.toString("MMdd"))
-            m_startdate->SetValue(m_startdate->GetCount() - 1);
+            m_startdate->SetItemCurrent(m_startdate->GetCount() - 1);
     }
 
     QTime thisTime = m_nowDateTime.time();
     thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
 
     if (thisTime < QTime(0,30))
-        m_startdate->SetValue(m_startdate->GetCurrentPos() + 1);
+        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
 
     m_starthour->SetRange(0,23,1);
     m_starthour->SetValue(thisTime.hour());
@@ -158,11 +158,11 @@ void ManualSchedule::minuteRollover(void)
     if (m_starthour->GetIntValue() == 0 )
     {
         m_starthour->SetValue(24);
-        m_startdate->SetValue(m_startdate->GetIntValue() - 1);
+        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() - 1);
     }
     if (m_starthour->GetIntValue() == 25 )
     {
-        m_startdate->SetValue(m_startdate->GetIntValue() + 1);
+        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
         m_starthour->SetValue(1);
     }
 }
@@ -170,7 +170,7 @@ void ManualSchedule::minuteRollover(void)
 void ManualSchedule::dateChanged(void)
 {
     disconnectSignals();
-    daysahead = m_startdate->GetIntValue();
+    daysahead = m_startdate->GetCurrentPos();
     m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
 
     int hr = m_starthour->GetIntValue();
