@@ -2894,6 +2894,10 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
         QString host = node->GetData().value<TreeNodeData>().GetHost();
         QString prefix = node->GetData().value<TreeNodeData>().GetPrefix();
 
+        if (folder_path.startsWith("myth://"))
+            folder_path = folder_path.right(folder_path.length()
+                                - folder_path.lastIndexOf("//") - 1);
+
         QString filename = QString("%1/folder").arg(folder_path);
 
         // VERBOSE(VB_GENERAL, QString("GetCoverImage host : %1  prefix : %2 file : %3")
