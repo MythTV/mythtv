@@ -639,7 +639,7 @@ void ProgLister::customEdit()
     if (!pi)
         return;
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("popup stack");
     CustomEdit *ce = new CustomEdit(mainStack, pi);
     if (ce->Create())
         mainStack->AddScreen(ce);
