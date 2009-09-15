@@ -1,14 +1,10 @@
 #ifndef ROMMETADATA_H_
 #define ROMMETADATA_H_
 
-#include <qobject.h>
-#include <q3ptrlist.h>
-#include <qstringlist.h>
-#include <iostream>
-#include <qdir.h>
-#include <qstring.h>
-#include <qwidget.h>
-
+#include <QObject>
+#include <QStringList>
+#include <QDir>
+#include <QString>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>

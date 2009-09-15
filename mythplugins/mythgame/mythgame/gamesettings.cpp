@@ -146,7 +146,7 @@ QString GameDBStorage::GetWhereClause(MSqlBindings &bindings) const
 QString GameDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString playerID(":SETPLAYERID");
-    QString colTag(":SET" + GetColumnName().upper());
+    QString colTag(":SET" + GetColumnName().toUpper());
 
     QString query("gameplayerid = " + playerID + ", " +
                   GetColumnName() + " = " + colTag);

@@ -1,35 +1,33 @@
-#include <qobject.h>
-#include <q3ptrlist.h>
-#include <qstringlist.h>
-#include <iostream>
-#include <qdir.h>
-#include <qstring.h>
-#include <qwidget.h>
+#include "rom_metadata.h"
 
+#include <QFile>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
-#include "rom_metadata.h"
 #include "unzip.h"
 
-int calcOffset(QString GameType, uLong filesize) {
+int calcOffset(QString GameType, uLong filesize)
+{
     int result;
     uLong rom_size;
 
     result = 0;
 
-    if (GameType == "NES") {
+    if (GameType == "NES")
+    {
         result = 16;
     }
-    else if (GameType == "SNES") {
+    else if (GameType == "SNES")
+    {
          rom_size = (filesize / 0x2000) * 0x2000;
 
          if (rom_size < filesize)
              result = filesize - rom_size;
     }
-    else if (GameType == "PCE") {
+    else if (GameType == "PCE")
+    {
          if (filesize & 0x0FFF)
              result = filesize & 0x0FFF;
 
@@ -38,20 +36,23 @@ int calcOffset(QString GameType, uLong filesize) {
     return result;
 }
 
-QString crcStr(uLong crc) {
-    QString tmpcrc("");
+QString crcStr(uLong crc)
+{
+    QString tmpcrc;
 
     tmpcrc = QString("%1").arg( crc, 0, 16 );
     if (tmpcrc == "0")
         tmpcrc = "";
     else
-        tmpcrc = tmpcrc.rightJustify( 8,'0');
+        tmpcrc = tmpcrc.rightJustified( 8,'0');
 
     return tmpcrc;
 }
 
-// Return the crc32 info for this rom. (ripped mostly from the old neshandler.cpp source)
-QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
+// Return the crc32 info for this rom. (ripped mostly from the old
+// neshandler.cpp source)
+QString crcinfo(QString romname, QString GameType, QString *key,
+                RomDBMap *romDB)
 {
     // Get CRC of file
     char block[32768];
@@ -65,9 +66,8 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
     int blocksize;
 
     blocksize = 8192;
-    // VERBOSE(VB_GENERAL, QString("crcinfo : %1 : %2 :").arg(romname).arg(GameType));
 
-    if ((zf = unzOpen(romname)))
+    if ((zf = unzOpen(qPrintable(romname))))
     {
         int FoundFile;
         for (FoundFile = unzGoToFirstFile(zf); FoundFile == UNZ_OK;
@@ -75,7 +75,9 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
         {
             if (unzOpenCurrentFile(zf) == UNZ_OK)
             {
-                err = unzGetCurrentFileInfo(zf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
+                err = unzGetCurrentFileInfo(zf, &file_info, filename_inzip,
+                                            sizeof(filename_inzip), NULL, 0,
+                                            NULL, 0);
 
                 offset = calcOffset(GameType, file_info.uncompressed_size);
 
@@ -113,11 +115,11 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
             offset = calcOffset(GameType, f.size());
 
             if (offset > 0)
-                f.readBlock(block, offset);
+                f.read(block, offset);
 
             // Get CRC of rom data
-            Q_LONG count;
-            while ((count = f.readBlock(block, blocksize)) > 0)
+            qint64 count;
+            while ((count = f.read(block, blocksize)) > 0)
             {
                 crc = crc32(crc, (Bytef *)block, (uInt)count);
             }   

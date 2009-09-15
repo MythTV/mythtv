@@ -1,4 +1,4 @@
-#include <qfile.h>
+#include <QFile>
 
 #include <mythtv/mythdb.h>
 #include <mythtv/mythcontext.h>
@@ -130,7 +130,7 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
     graphic_formats.append("tif");
     graphic_formats.append("tiff");
 
-    int dotLocation = BaseFileName.findRev('.');
+    int dotLocation = BaseFileName.lastIndexOf('.');
     if(dotLocation == -1)
     {
         BaseFileName.append('.');
@@ -210,7 +210,7 @@ void RomInfo::setFavorite(bool updateDatabase)
 
 QString RomInfo::getExtension()
 {
-    int pos = Romname().findRev(".");
+    int pos = Romname().lastIndexOf(".");
     if (pos == -1)
         return NULL;
 
@@ -223,7 +223,7 @@ QString RomInfo::getExtension()
 
 void RomInfo::fillData()
 {
-    if (gamename == "")
+    if (gamename.isEmpty())
     {
         return;
     }
