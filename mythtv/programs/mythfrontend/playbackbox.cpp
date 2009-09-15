@@ -1923,8 +1923,8 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
             "(?:" // begin optional Season portion
             "S(?:eason)?" // optional "S" or "Season"
             "(?:\\s|-|_|\\.)?" // optional separator
-            ")?" // end optional Season portion
             "[0-9]{1,3}" // number
+            ")?" // end optional Season portion
             "(?:" // begin optional Episode portion
             "(?:\\s|-|_|\\.)?" // optional separator
             "(?:x?" // optional "x"
@@ -1937,7 +1937,6 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
             "\\.(?:png|gif|jpg)" // file extension
             ).arg(titleIn).arg(imagetype),
         QString("%1\\.(?:png|jpg|gif)").arg(seriesID),
-        QString("%1\\.(?:png|jpg|gif)").arg(titleIn),
         "" };  // This blank entry must exist, do not remove.
 
     QString reg = regs[regIndex];
