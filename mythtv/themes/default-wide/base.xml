@@ -305,7 +305,7 @@
             <state name="active">
                 <imagetype name="background">
                     <area>0,0,300,40</area>
-                    <filename>button_background.png</filename>
+                    <filename>button_wide_background.png</filename>
                 </imagetype>
                 <textarea name="text">
                     <area>5,5,290,30</area>
@@ -318,13 +318,13 @@
             <state name="selected" from="active">
                 <imagetype name="background">
                     <area>0,0,300,40</area>
-                    <filename>button_selected_background.png</filename>
+                    <filename>button_wide_selected_background.png</filename>
                 </imagetype>
             </state>
             <state name="disabled" from="active" />
             <state name="pushed" from="active">
                 <imagetype name="background">
-                    <filename>button_pushed_background.png</filename>
+                    <filename>button_wide_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">
                     <position>8,8</position>
