@@ -458,7 +458,14 @@ bool MSqlQuery::prepare(const QString& query)
                 .arg(m_testbindings.cap(1)) + query);
         //exit(1);
     }
-    return QSqlQuery::prepare(query);
+    bool ok = QSqlQuery::prepare(query);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error preparing query: %1").arg(query));
+        VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(QSqlQuery::lastError()));
+    }
+
+    return ok;
 }
 
 bool MSqlQuery::testDBConnection()
