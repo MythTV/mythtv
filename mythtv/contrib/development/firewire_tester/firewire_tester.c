@@ -118,22 +118,25 @@ int test_connection(raw1394handle_t handle, int channel)
 // create and test a p2p connection
 // returns 1 on success, 0 on failure
 int test_p2p(raw1394handle_t handle, nodeid_t node) {
+    int oplug = -1, iplug = -1, bandwidth = -1;
     int channel, count, success = 0;
-    channel = node;
-
 
     VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
 
     printf("P2P: Testing...");
     fflush(stdout);
- 
+
     // make connection
+    channel = iec61883_cmp_connect(handle, node, &oplug,
+    		raw1394_get_local_id(handle), &iplug, &bandwidth);
+#if 0
     if (iec61883_cmp_create_p2p_output(handle, node | 0xffc0, 0, channel,
                                        1 /* fix me, speed */ ) != 0)
     {
         printf("iec61883_cmp_create_p2p_output failed\n");
         return 0;
     }
+#endif
 
     count = test_connection(handle, channel);
     if (count >= MIN_PACKETS)
@@ -239,26 +242,31 @@ int fix_broadcast(raw1394handle_t handle, nodeid_t node) {
 // returns 1 on success, 0 on failure
 int output_p2p(raw1394handle_t handle, nodeid_t node) {
     int channel, count = 0, success = 0;
+    int oplug = -1, iplug = -1, bandwidth = -1;
     int retry = 0;
     FILE *fp = stdout;
     iec61883_mpeg2_t mpeg;
     struct timeval tv;
     fd_set rfds;
-    channel = node;
     int fd = raw1394_get_fd(handle);
 
     sync_failed = 0;
 
-    VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
-    fflush(stdout);
- 
     // make connection
+    channel = iec61883_cmp_connect(handle, node, &oplug,
+		raw1394_get_local_id(handle), &iplug, &bandwidth);
+#if 0
     if (iec61883_cmp_create_p2p_output(handle, node | 0xffc0, 0, channel,
                                        1 /* fix me, speed */ ) != 0)
     {
         fprintf(stderr, "iec61883_cmp_create_p2p_output failed\n");
         return 0;
     }
+#endif
+
+    VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
+    fflush(stdout);
+
     mpeg = iec61883_mpeg2_recv_init(handle, fwrite_packet, (void*) fp);
     run = 1;
     iec61883_mpeg2_recv_start(mpeg, channel);
