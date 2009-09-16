@@ -4137,7 +4137,7 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
     if (!usevideotimebase)
     {
         if (!audioOutput->AddSamples(buffer, samples, timecode))
-            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p1: "
+            VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p1: "
                     "Audio buffer overflow, audio data lost!");
         return;
     }
@@ -4170,7 +4170,7 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 
     // Send new warped audio to audioOutput
     if (!audioOutput->AddSamples((char*)warplbuff, samples, timecode))
-        VERBOSE(VB_IMPORTANT,"NVP::AddAudioData():p2: "
+        VERBOSE(VB_PLAYBACK,"NVP::AddAudioData():p2: "
                 "Audio buffer overflow, audio data lost!");
 }
 
@@ -4198,7 +4198,7 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
         buffers[0] = (char*) lbuffer;
         buffers[1] = (char*) rbuffer;
         if (!audioOutput->AddSamples(buffers, samples, timecode))
-            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p3: "
+            VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p3: "
                     "Audio buffer overflow, audio data lost!");
         return;
     }
@@ -4233,7 +4233,7 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
     buffers[0] = (char*) warplbuff;
     buffers[1] = (char*) warprbuff;
     if (!audioOutput->AddSamples(buffers, samples, timecode))
-        VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p4: "
+        VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p4: "
                 "Audio buffer overflow, audio data lost!");
 }
 
