@@ -3095,12 +3095,12 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
 {
     QString icon_file;
 
-    int list_count = node->childCount();
+    int list_count = node->visibleChildCount();
     if (list_count > 0)
     {
         for (int i = 0; i < list_count; i++)
         {
-            MythGenericTree *subnode = node->getChildAt(i);
+            MythGenericTree *subnode = node->getVisibleChildAt(i);
             if (subnode)
             {
                 Metadata *metadata = GetMetadataPtrFromNode(subnode);
@@ -4625,9 +4625,6 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
 
         MythGenericTree *parent = gtItem->getParent();
         parent->deleteNode(gtItem);
-        // Prevent scan segfaults if the directory has become empty by reloading the tree.
-        if (parent->visibleChildCount() == 0)
-            reloadData();
     }
     else
     {
