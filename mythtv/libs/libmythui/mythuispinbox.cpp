@@ -16,14 +16,19 @@ MythUISpinBox::~MythUISpinBox()
 
 void MythUISpinBox::SetRange(int low, int high, int step)
 {
-    if ((high - low) == 0 || step == 0)
+    if ((high == low) || step == 0)
         return;
 
+    bool reverse = false;
+    int value = low;
+    
+    if (low > high)
+        reverse = true;
+    
     Reset();
 
-    int value = low;
-
-    while (value <= high)
+    while ((reverse && (value >= high)) ||
+           (!reverse && (value <= high)))
     {
         QString text;
         if (m_hasTemplate)
@@ -45,7 +50,10 @@ void MythUISpinBox::SetRange(int low, int high, int step)
             text = QString::number(value);
         
         new MythUIButtonListItem(this, text, qVariantFromValue(value));
-        value = value + step;
+        if (reverse)
+            value = value - step;
+        else    
+            value = value + step;
     }
 
     SetPositionArrowStates();
