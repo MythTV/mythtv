@@ -7756,6 +7756,14 @@ vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
 
 void TV::DoEditSchedule(int editType)
 {
+    if ((editType == kScheduleProgramGuide  && !RunProgramGuidePtr) ||
+        (editType == kScheduleProgramFinder && !RunProgramFinderPtr) ||
+        (editType == kScheduledRecording    && !RunScheduleEditorPtr) ||
+        (editType == kViewSchedule          && !RunViewScheduledPtr))
+    {
+        return;
+    }
+
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
     actx->LockPlayingInfo(__FILE__, __LINE__);
