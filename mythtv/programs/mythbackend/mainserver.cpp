@@ -2889,7 +2889,8 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
 
     VERBOSE(VB_FILE, QString("HandleSGGetFileList: group = %1  host = %2  path = %3 wanthost = %4").arg(groupname).arg(host).arg(path).arg(wantHost));
 
-    if (host.toLower() == wantHost.toLower())
+    if ((host.toLower() == wantHost.toLower()) ||
+        (gContext->GetSetting("BackendServerIP") == wantHost))
     {
         StorageGroup sg(groupname, host);
         VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting local info"));
