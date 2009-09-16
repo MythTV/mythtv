@@ -6,7 +6,7 @@ QT += network xml sql
 
 TEMPLATE = app
 CONFIG += thread
-TARGET = mythtv
+TARGET = mythavtest
 target.path = $${PREFIX}/bin
 INSTALLS = target
 
@@ -17,7 +17,7 @@ SOURCES += main.cpp
 
 macx {
     mac_bundle {
-        QMAKE_POST_LINK = ../../contrib/OSX/build/makebundle.sh mythtv
+        QMAKE_POST_LINK = ../../contrib/OSX/build/makebundle.sh mythavtest
     }
 }
 
