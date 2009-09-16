@@ -1029,6 +1029,8 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
             if (!UpdateDBVersionNumber(MythVideoVersionName, "1028"))
                 return false;
+
+            dbver = "1028";
         }
 
         return true;
