@@ -207,9 +207,7 @@ namespace
         if (dbver == "1000")
         {
             const QString updates[] = {
-"ALTER TABLE videometadata ADD playcommand VARCHAR(255);",
 "ALTER TABLE videometadata ADD INDEX(title);",
-"ALTER TABLE videometadata ADD browse BOOL NOT NULL DEFAULT 1;",
 ""
             };
 
@@ -310,6 +308,10 @@ namespace
 
         if (dbver == "1007")
         {
+// videobookmarks table was dropped in MythTV schema version 1218
+// Since mythfrontend will refuse to run without a current MythTV schema, the
+// table will be gone before this code executes.
+/*
             const QString updates[] = {
 "INSERT INTO filemarkup (filename, type, mark) SELECT filename,"
 " '2', bookmark FROM videobookmarks;",
@@ -319,6 +321,8 @@ namespace
             if (!performActualUpdate(updates, "1008", dbver,
                                      OldMythVideoVersionName))
                 return false;
+ */
+            dbver = "1008";
         }
 
         if (dbver == "1008")
@@ -719,6 +723,8 @@ namespace
             }
             if (!UpdateDBVersionNumber(MythVideoVersionName, "1013"))
                 return false;
+
+            dbver = "1013";
         }
 
         if (dbver == "1013")
