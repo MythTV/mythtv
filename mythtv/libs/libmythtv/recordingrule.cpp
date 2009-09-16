@@ -388,6 +388,8 @@ bool RecordingRule::Save(bool sendSig)
 
     if (!query.exec())
         MythDB::DBError("UPDATE/INSERT record", query);
+    else if (m_recordTable != "record")
+        m_tempID = query.lastInsertId().toInt();
     else
         m_recordID = query.lastInsertId().toInt();
 
@@ -535,19 +537,20 @@ void RecordingRule::UseTempTable(bool usetemp, QString table)
             return;
         }
 
-        if (m_recordID == 0)
+        query.prepare(QString("ALTER TABLE %1 MODIFY recordid int(10) "
+                              "UNSIGNED NOT NULL AUTO_INCREMENT primary key;")
+                              .arg(table));
+        if (!query.exec())
         {
-            // FIXME: Following seems like a nasty hack
-            query.prepare(QString("SELECT MAX(recordid) FROM %1 ORDER BY "
-                                  "recordid;").arg(table));
-            if (query.exec() && query.next())
-                m_tempID = query.value(0).toInt() + 1;
-            else
-                m_tempID = 100000;
+            MythDB::DBError("Modify recordid column to include "
+                            "auto-increment", query);
+            return;
         }
-        else
+
+        if (m_recordID > 0)
             m_tempID = m_recordID;
-        Save();
+
+        Save(false);
     }
     else
     {
