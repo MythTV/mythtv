@@ -3003,12 +3003,12 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             // Take the Coverfile for the first valid node in the dir, if it exists.
             if (icon_file.isEmpty())
             {
-                int list_count = node->childCount();
+                int list_count = node->visibleChildCount();
                 if (list_count > 0)
                 {
                     for (int i = 0; i < list_count; i++)
                     {
-                        MythGenericTree *subnode = node->getChildAt(i);
+                        MythGenericTree *subnode = node->getVisibleChildAt(i);
                         if (subnode)
                         {
                             Metadata *metadata = GetMetadataPtrFromNode(subnode);
@@ -4609,6 +4609,7 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
         return;
 
     MythUIButtonListItem *item = GetItemCurrent();
+    MythGenericTree *gtItem = GetNodePtrFromButton(item);
 
     Metadata *metadata = GetMetadata(item);
 
@@ -4621,6 +4622,12 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
             m_videoButtonTree->RemoveItem(item, false); // FIXME Segfault when true
         else
             m_videoButtonList->RemoveItem(item);
+
+        MythGenericTree *parent = gtItem->getParent();
+        parent->deleteNode(gtItem);
+        // Prevent scan segfaults if the directory has become empty by reloading the tree.
+        if (parent->visibleChildCount() == 0)
+            reloadData();
     }
     else
     {
