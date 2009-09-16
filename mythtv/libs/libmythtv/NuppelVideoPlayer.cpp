@@ -2762,7 +2762,8 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
             }
         }
         prebuffering_lock.unlock();
-        videosync->Start();
+        if (normal_speed)
+            videosync->Start();
 
         return false;
     }
