@@ -121,14 +121,16 @@ int test_p2p(raw1394handle_t handle, nodeid_t node) {
     int oplug = -1, iplug = -1, bandwidth = -1;
     int channel, count, success = 0;
 
-    VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
-
     printf("P2P: Testing...");
     fflush(stdout);
 
     // make connection
     channel = iec61883_cmp_connect(handle, node, &oplug,
-    		raw1394_get_local_id(handle), &iplug, &bandwidth);
+		raw1394_get_local_id(handle), &iplug, &bandwidth);
+
+    VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
+    fflush(stdout);
+
 #if 0
     if (iec61883_cmp_create_p2p_output(handle, node | 0xffc0, 0, channel,
                                        1 /* fix me, speed */ ) != 0)
