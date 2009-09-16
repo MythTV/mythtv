@@ -516,7 +516,7 @@ void SchedOptEditor::Load()
     m_inputList->SetValueByData(m_recordingRule->m_prefInput);
 
     // Start Offset
-    m_startoffsetSpin->SetRange(-480,480,1);
+    m_startoffsetSpin->SetRange(480,-480,1);
     m_startoffsetSpin->SetValue(m_recordingRule->m_startOffset);
 
     // End Offset
