@@ -377,7 +377,7 @@
                     <area>5,5,55,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
-                    <align>right,vcenter</align>
+                    <align>left,vcenter</align>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -410,6 +410,31 @@
                     <filename>lb-ltarrow-sel.png</filename>
                 </imagetype>
             </state>
+        </statetype>
+    </spinbox>
+
+    <!-- Base definition of a wide spinbox (room for strings) -->
+    <spinbox name="basewidespinbox" from="basespinbox">
+        <area>0,0,495,40</area>
+        <layout>horizontal</layout>
+        <buttonarea>0,0,475,100%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,475,40</area>
+                <textarea name="buttontext">
+                    <area>5,5,465,30</area>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
+            <state name="inactive" from="active" />
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>480,2</position>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>480,21</position>
         </statetype>
     </spinbox>
 
@@ -461,19 +486,14 @@
     </buttonlist>
 
     <!-- Base definition of a list in wide 'selector' configuration -->
-    <buttonlist name="basewideselector">
-        <area>0,0,395,40</area>
-        <layout>horizontal</layout>
-        <buttonarea>0,0,375,100%</buttonarea>
+    <buttonlist name="basewideselector" from="baseselector">
+        <area>0,0,495,40</area>
+        <buttonarea>0,0,475,100%</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,375,40</area>
-                <shape name="background" from="basewidgetshape" />
+                <area>0,0,475,40</area>
                 <textarea name="buttontext">
-                    <area>5,5,365,30</area>
-                    <font>basesmall</font>
-                    <cutdown>yes</cutdown>
-                    <align>left,vcenter</align>
+                    <area>5,5,465,30</area>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -482,30 +502,10 @@
             <state name="inactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
-            <position>380,2</position>
-            <state type="off">
-                <imagetype name="dnon">
-                    <filename>lb-rtarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="dnoff">
-                    <filename>lb-rtarrow-sel.png</filename>
-                </imagetype>
-            </state>
+            <position>480,2</position>
         </statetype>
         <statetype name="upscrollarrow">
-            <position>380,21</position>
-            <state type="off">
-                <imagetype name="upon">
-                    <filename>lb-ltarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="upoff">
-                    <filename>lb-ltarrow-sel.png</filename>
-                </imagetype>
-            </state>
+            <position>480,21</position>
         </statetype>
     </buttonlist>
 

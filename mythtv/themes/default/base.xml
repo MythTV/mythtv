@@ -398,7 +398,7 @@
                     <area>5,5,55,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
-                    <align>right,vcenter</align>
+                    <align>left,vcenter</align>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -511,7 +511,6 @@
     <!-- Base definition of a list in wide 'selector' configuration -->
     <buttonlist name="basewideselector" from="baseselector">
         <area>0,0,395,40</area>
-        <layout>horizontal</layout>
         <buttonarea>0,0,375,100%</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
