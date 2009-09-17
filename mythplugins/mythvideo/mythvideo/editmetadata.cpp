@@ -2,7 +2,6 @@
 
 #include <QImageReader>
 #include <QUrl>
-#include <QFileInfo>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
@@ -588,8 +587,7 @@ void EditMetadataDialog::FindCoverArt()
         QString url = GenRemoteFileURL("Coverart",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,
-                       gContext->GetSetting("mythvideo.bannerDir"),
+        FindImagePopup(url,"",
                        *this, CEID_COVERARTFILE);
     }
     else
@@ -622,8 +620,7 @@ void EditMetadataDialog::FindBanner()
         QString url = GenRemoteFileURL("Banners",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,          
-                gContext->GetSetting("mythvideo.bannerDir"),
+        FindImagePopup(url,"",
                 *this, CEID_BANNERFILE);
     }
     else
@@ -656,8 +653,7 @@ void EditMetadataDialog::FindFanart()
         QString url = GenRemoteFileURL("Fanart",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,          
-                gContext->GetSetting("mythvideo.fanartDir"),
+        FindImagePopup(url,"",
                 *this, CEID_FANARTFILE);
     }
     else
@@ -690,8 +686,7 @@ void EditMetadataDialog::FindScreenshot()
         QString url = GenRemoteFileURL("Screenshots",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,          
-                gContext->GetSetting("mythvideo.screenshotDir"),
+        FindImagePopup(url,"",
                 *this, CEID_SCREENSHOTFILE);
     }
     else
@@ -724,8 +719,7 @@ void EditMetadataDialog::FindTrailer()
         QString url = GenRemoteFileURL("Trailers",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,
-                gContext->GetSetting("mythvideo.TrailersDir"),
+        FindImagePopup(url,"",
                 *this, CEID_TRAILERFILE);
     }
     FindVideoFilePopup(gContext->GetSetting("mythvideo.TrailersDir"),
