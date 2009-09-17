@@ -81,8 +81,6 @@ bool UpgradeMusicDatabaseSchema(void)
     if (DBup->versionsBehind == 0)  // same schema
         return true;
 
-    bool retVal;
-
     if (DBup->DBver.isEmpty())
         return doUpgradeMusicDatabaseSchema(DBup->DBver);
 
