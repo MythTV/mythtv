@@ -431,6 +431,10 @@ if test "$music" != "no" ; then
 
     taglib="no"
     taglib_minor=`taglib-config --version | cut -d. -f2`
+    if test "$taglib_minor" == "" ; then
+        echo "Can't find taglib-config. Assuming 1.5 or later."
+        taglib_minor="5"
+    fi
     if has_library libtag && has_header taglib/fileref.h && test $taglib_minor -ge 5 ; then
         taglib="yes"
     else
