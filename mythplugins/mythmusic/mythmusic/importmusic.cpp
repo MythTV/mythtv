@@ -25,6 +25,7 @@
 #include <mythuibutton.h>
 #include <mythuibuttonlist.h>
 #include <mythprogressdialog.h>
+#include <mythuifilebrowser.h>
 
 static bool copyFile(const QString &src, const QString &dst)
 {

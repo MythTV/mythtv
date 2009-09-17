@@ -13,6 +13,7 @@
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuicheckbox.h>
 #include <mythtv/libmythui/mythuispinbox.h>
+#include <mythtv/libmyth/mythuifilebrowser.h>
 
 #include "globals.h"
 #include "dbaccess.h"
@@ -570,9 +571,19 @@ void EditMetadataDialog::ToggleWatched()
 
 void EditMetadataDialog::FindCoverArt()
 {
-    FindImagePopup(gContext->GetSetting("VideoArtworkDir"),
-            GetConfDir() + "/MythVideo",
-            *this, CEID_COVERARTFILE);
+    if (m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = GenRemoteFileURL("Coverart",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,
+                gContext->GetSetting("VideoArtworkDir"),
+                *this, CEID_COVERARTFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("VideoArtworkDir"),
+                GetConfDir() + "/MythVideo",
+                *this, CEID_COVERARTFILE);
 }
 
 void EditMetadataDialog::SetCoverArt(QString file)
@@ -586,9 +597,19 @@ void EditMetadataDialog::SetCoverArt(QString file)
 
 void EditMetadataDialog::FindBanner()
 {
-    FindImagePopup(gContext->GetSetting("mythvideo.bannerDir"),
-            GetConfDir() + "/MythVideo/Banners",
-            *this, CEID_BANNERFILE);
+    if (m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = GenRemoteFileURL("Banners",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,          
+                gContext->GetSetting("mythvideo.bannerDir"),
+                *this, CEID_BANNERFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("mythvideo.bannerDir"),
+                GetConfDir() + "/MythVideo/Banners",
+                *this, CEID_BANNERFILE);
 }
 
 void EditMetadataDialog::SetBanner(QString file)
@@ -602,9 +623,19 @@ void EditMetadataDialog::SetBanner(QString file)
 
 void EditMetadataDialog::FindFanart()
 {
-    FindImagePopup(gContext->GetSetting("mythvideo.fanartDir"),
-            GetConfDir() + "/MythVideo/Fanart",
-            *this, CEID_FANARTFILE);
+    if (m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = GenRemoteFileURL("Fanart",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,          
+                gContext->GetSetting("mythvideo.fanartDir"),
+                *this, CEID_FANARTFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("mythvideo.fanartDir"),
+                GetConfDir() + "/MythVideo/Fanart",
+                *this, CEID_FANARTFILE);
 }
 
 void EditMetadataDialog::SetFanart(QString file)
@@ -618,9 +649,19 @@ void EditMetadataDialog::SetFanart(QString file)
 
 void EditMetadataDialog::FindScreenshot()
 {
-    FindImagePopup(gContext->GetSetting("mythvideo.screenshotDir"),
-            GetConfDir() + "/MythVideo/Screenshots",
-            *this, CEID_SCREENSHOTFILE);
+    if (m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = GenRemoteFileURL("Screenshots",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,          
+                gContext->GetSetting("mythvideo.screenshotDir"),
+                *this, CEID_SCREENSHOTFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("mythvideo.screenshotDir"),
+                GetConfDir() + "/MythVideo/Screenshots",
+                *this, CEID_SCREENSHOTFILE);
 }
 
 void EditMetadataDialog::SetScreenshot(QString file)
@@ -634,6 +675,15 @@ void EditMetadataDialog::SetScreenshot(QString file)
 
 void EditMetadataDialog::FindTrailer()
 {
+    if (m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = GenRemoteFileURL("Trailers",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,
+                gContext->GetSetting("mythvideo.TrailersDir"),
+                *this, CEID_TRAILERFILE);
+    }
     FindVideoFilePopup(gContext->GetSetting("mythvideo.TrailersDir"),
             GetConfDir() + "/MythVideo/Trailers",
             *this, CEID_TRAILERFILE);

@@ -11,6 +11,7 @@
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuicheckbox.h>
+#include <mythtv/libmyth/mythuifilebrowser.h>
 
 #include "romedit.h"
 #include "rominfo.h"
