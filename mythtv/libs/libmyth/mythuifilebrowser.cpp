@@ -302,7 +302,14 @@ void MythUIFileBrowser::PathClicked(MythUIButtonListItem *item)
 
     if (finfo.isFile())
     {
-        OKPressed();
+        if (m_retObject)
+        {
+            DialogCompletionEvent *dce =
+                new DialogCompletionEvent(m_id, 0, finfo.filePath(),
+                                          item->GetData());
+            QApplication::postEvent(m_retObject, dce);
+        }
+        Close();
         return;
     }
 
@@ -402,8 +409,9 @@ void MythUIFileBrowser::OKPressed()
 
     if (m_retObject)
     {
+        QString selectedPath = m_locationEdit->GetText();
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
-                                                            finfo.filePath(),
+                                                            selectedPath,
                                                             item->GetData());
         QApplication::postEvent(m_retObject, dce);
     }
@@ -497,8 +505,6 @@ void MythUIFileBrowser::updateRemoteFileList()
             dataName = QString("%1/%2/%3").arg(m_baseDirectory)
                                .arg(m_subDirectory).arg(displayName);
 
-        item->SetText(dataName, "fullpath");
-
         MFileInfo finfo(dataName, m_storageGroupDir);
 
         if (tokens[0] == "dir")
@@ -519,7 +525,6 @@ void MythUIFileBrowser::updateRemoteFileList()
             finfo.setSize(tokens[2].toInt());
 
             item->SetText(FormatSize(tokens[2].toInt()), "filesize");
-            item->SetText(dataName, "fullpath");
 
             if (IsImage(finfo.suffix()))
             {
@@ -530,6 +535,7 @@ void MythUIFileBrowser::updateRemoteFileList()
                 type = "file";
         }
 
+        item->SetText(dataName, "fullpath");
         item->DisplayState(type, "nodetype");
         item->SetData(qVariantFromValue(finfo));
 
