@@ -446,6 +446,21 @@ void MythUIFileBrowser::updateRemoteFileList()
         return;
     }
 
+    if ((slist.size() == 1) &&
+        (slist[0].startsWith("sgdir::")))
+    {
+        QStringList tokens = slist[0].split("::");
+
+        m_storageGroupDir = tokens[1];
+
+        if (!GetRemoteFileList(dirURL, m_storageGroupDir, slist))
+        {
+            VERBOSE(VB_IMPORTANT, QString("GetRemoteFileList failed for "
+                    "'%1' in '%2' SG dir").arg(dirURL).arg(m_storageGroupDir));
+            return;
+        }
+    }
+
     m_locationEdit->SetText(dirURL);
 
     QString displayName;
