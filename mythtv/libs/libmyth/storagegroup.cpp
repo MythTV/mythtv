@@ -293,17 +293,26 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
     {
         while (query.next())
         {
-            if (filename.startsWith(query.value(0).toString()))
+            QString videostartupdir = query.value(0).toString();
+            QStringList videodirs = videostartupdir.split(':',
+                                            QString::SkipEmptyParts);
+            QString directory;
+            for (QStringList::Iterator it = videodirs.begin();
+                                       it != videodirs.end(); ++it)
             {
-                result = filename;
-                result.replace(0, query.value(0).toString().length(), "");
-                if (result.startsWith("/"))
-                    result.replace(0, 1, "");
+                directory = *it;
+                if (filename.startsWith(directory))
+                {
+                    result = filename;
+                    result.replace(0, directory.length(), "");
+                    if (result.startsWith("/"))
+                        result.replace(0, 1, "");
 
-                VERBOSE(VB_FILE+VB_EXTRA,
-                        QString("StorageGroup::GetRelativePathname(%1) = '%2'")
-                                .arg(filename).arg(result));
-                return result;
+                    VERBOSE(VB_FILE+VB_EXTRA,
+                            QString("StorageGroup::GetRelativePathname(%1) "
+                                    "= '%2'").arg(filename).arg(result));
+                    return result;
+                }
             }
         }
     }
