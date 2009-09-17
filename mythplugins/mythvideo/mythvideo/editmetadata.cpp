@@ -606,7 +606,10 @@ void EditMetadataDialog::SetCoverArt(QString file)
         QUrl url(file);
         file = url.path();
         file = file.right(file.length() - 1);
-        m_workingMetadata->SetCoverFile(file);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetCoverFile(file);
+        else
+            m_workingMetadata->SetCoverFile(QString());
     }
     else
         m_workingMetadata->SetCoverFile(file);
@@ -639,7 +642,10 @@ void EditMetadataDialog::SetBanner(QString file)
         QUrl url(file);
         file = url.path();
         file = file.right(file.length() - 1);
-        m_workingMetadata->SetBanner(file);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetBanner(file);
+        else
+            m_workingMetadata->SetBanner(QString());
     }
     else
         m_workingMetadata->SetBanner(file);
@@ -672,7 +678,10 @@ void EditMetadataDialog::SetFanart(QString file)
         QUrl url(file);
         file = url.path();
         file = file.right(file.length() - 1);
-        m_workingMetadata->SetFanart(file);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetFanart(file);
+        else
+            m_workingMetadata->SetFanart(QString());
     }
     else
         m_workingMetadata->SetFanart(file);
@@ -705,7 +714,10 @@ void EditMetadataDialog::SetScreenshot(QString file)
         QUrl url(file);
         file = url.path();
         file = file.right(file.length() - 1);
-        m_workingMetadata->SetScreenshot(file);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetScreenshot(file);
+        else
+            m_workingMetadata->SetScreenshot(QString());
     }
     else
         m_workingMetadata->SetScreenshot(file);
@@ -737,7 +749,10 @@ void EditMetadataDialog::SetTrailer(QString file)
         QUrl url(file);
         file = url.path();
         file = file.right(file.length() - 1);
-        m_workingMetadata->SetTrailer(file);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetTrailer(file);
+        else
+            m_workingMetadata->SetTrailer(QString());
     }
     else
         m_workingMetadata->SetTrailer(file);
