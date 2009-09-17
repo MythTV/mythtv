@@ -239,6 +239,8 @@ void ScheduleEditor::RuleChanged(MythUIButtonListItem *item)
     m_schedOptButton->SetEnabled(isScheduled);
     m_storeOptButton->SetEnabled(isScheduled);
     m_postProcButton->SetEnabled(isScheduled);
+
+    m_recordingRule->m_type = type;
 }
 
 void ScheduleEditor::Save()
