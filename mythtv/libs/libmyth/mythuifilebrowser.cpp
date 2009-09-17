@@ -153,6 +153,11 @@ MythUIFileBrowser::MythUIFileBrowser(MythScreenStack *parent,
 
     Init(startPath);
 
+    m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files |
+                    QDir::Readable | QDir::Writable | QDir::Executable);
+    m_nameFilter.clear();
+    m_nameFilter << "*";
+
     m_previewTimer = new QTimer(this);
     m_previewTimer->setSingleShot(true);
     connect(m_previewTimer, SIGNAL(timeout()), SLOT(LoadPreview()));
@@ -191,11 +196,6 @@ void MythUIFileBrowser::Init(const QString &startPath)
         m_isRemote = false;
         m_baseDirectory = "";
         m_subDirectory = startPath;
-
-        m_typeFilter = (QDir::AllDirs | QDir::Drives | QDir::Files |
-                        QDir::Readable | QDir::Writable | QDir::Executable);
-        m_nameFilter.clear();
-        m_nameFilter << "*";
     }
 }
 
@@ -265,8 +265,6 @@ void MythUIFileBrowser::PathSelected(MythUIButtonListItem *item)
 
     if (finfo.isParentDir())
     {
-        if (m_infoText)
-            m_infoText->Reset();
         if (m_infoText)
             m_infoText->Reset();
         if (m_filenameText)
@@ -504,12 +502,8 @@ void MythUIFileBrowser::updateRemoteFileList()
     QStringList::const_iterator it = slist.begin();
     while (it != slist.end())
     {
-        VERBOSE(VB_IMPORTANT, QString("Remote Entry: %1").arg(*it));
         QStringList tokens = (*it).split("::");
         displayName = tokens[1];
-
-        MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_fileList, displayName);
 
         if (tokens[0] == "sgdir")
             dataName = m_baseDirectory;
@@ -522,33 +516,48 @@ void MythUIFileBrowser::updateRemoteFileList()
 
         MFileInfo finfo(dataName, m_storageGroupDir);
 
-        if (tokens[0] == "dir")
+        if ((tokens[0] == "dir") &&
+            (m_typeFilter & (QDir::Dirs | QDir::AllDirs)))
         {
             type = "folder";
             finfo.setIsDir(true);
             finfo.setSGDir(m_storageGroupDir);
+            finfo.setSize(0);
         }
-        else if (tokens[0] == "sgdir")
+        else if ((tokens[0] == "sgdir") &&
+                 (m_typeFilter & (QDir::Dirs | QDir::AllDirs)))
         {
             type = "folder";
             finfo.setIsDir(true);
             finfo.setSGDir(displayName);
+            finfo.setSize(0);
         }
-        else
+        else if ((tokens[0] == "file") &&
+                 (m_typeFilter & QDir::Files))
         {
             finfo.setIsDir(false);
             finfo.setSize(tokens[2].toInt());
 
-            item->SetText(FormatSize(tokens[2].toInt()), "filesize");
-
             if (IsImage(finfo.suffix()))
-            {
-                item->SetImage(dataName);
                 type = "image";
-            }
             else
                 type = "file";
         }
+        else
+        {
+            // unknown type or filtered out
+            it++;
+            continue;
+        }
+
+        MythUIButtonListItem* item =
+            new MythUIButtonListItem(m_fileList, displayName);
+
+        if (finfo.size())
+            item->SetText(FormatSize(finfo.size()), "filesize");
+
+        if (type == "image")
+            item->SetImage(dataName);
 
         item->SetText(dataName, "fullpath");
         item->DisplayState(type, "nodetype");
