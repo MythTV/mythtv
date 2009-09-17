@@ -146,6 +146,9 @@ bool ScheduleEditor::Create()
 
 void ScheduleEditor::Load()
 {
+    // Copy this now, it will change briefly after the first item is inserted
+    // into the list by design of MythUIButtonList::itemSelected()
+    RecordingType type = m_recordingRule->m_type;
     // Rules List
     if (m_recordingRule->m_isOverride)
     {
@@ -197,7 +200,7 @@ void ScheduleEditor::Load()
                                      tr("Record at any time on any channel"),
                                      ENUM_TO_QVARIANT(kAllRecord));
     }
-    m_rulesList->SetValueByData(ENUM_TO_QVARIANT(m_recordingRule->m_type));
+    m_rulesList->SetValueByData(ENUM_TO_QVARIANT(type));
 
     QHash<QString, QString> progMap;
     if (m_recInfo)
