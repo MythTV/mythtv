@@ -1591,17 +1591,15 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
         }
         else
         {
-            const QRect display_visible_rect =
-                windows[0].GetDisplayVisibleRect();
+            int width  = windows[0].GetDisplayVisibleRect().width()  & ~0x1;
+            int height = windows[0].GetDisplayVisibleRect().height() & ~0x1;
             XImage *img =
                 XShmCreateImage(d, DefaultVisual(d, disp->GetScreen()),
                                 disp->GetDepth(), ZPixmap, 0, info,
-                                display_visible_rect.width(),
-                                display_visible_rect.height());
+                                width, height);
             size = img->bytes_per_line * img->height + 64;
             image = img;
-            desiredsize = (display_visible_rect.width() *
-                           display_visible_rect.height() * 3 / 2);
+            desiredsize = (width * height * 3 / 2);
             if (image && size < desiredsize)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
@@ -2172,18 +2170,18 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         return;
     }
 
-    unsigned char *sbuf = new unsigned char[
-        display_visible_rect.width() * display_visible_rect.height() * 3 / 2];
+    int out_width  = display_visible_rect.width()  & ~0x1;
+    int out_height = display_visible_rect.height() & ~0x1;
+    unsigned char *sbuf = new unsigned char[out_width * out_height * 3 / 2];
     AVPicture image_in, image_out;
     static struct SwsContext  *scontext;
 
     avpicture_fill(&image_out, (uint8_t *)sbuf, PIX_FMT_YUV420P,
-                   display_visible_rect.width(),
-                   display_visible_rect.height());
+                   out_width, out_height);
 
     vbuffers.LockFrame(buffer, "PrepareFrameMem");
-    if ((display_visible_rect.width() == width) &&
-        (display_visible_rect.height() == height))
+    if ((out_width  == width) &&
+        (out_height == height))
     {
         memcpy(sbuf, buffer->buf, width * height * 3 / 2);
     }
@@ -2192,8 +2190,8 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         avpicture_fill(&image_in, buffer->buf, PIX_FMT_YUV420P,
                        width, height);
         scontext = sws_getCachedContext(scontext, width, height,
-                       PIX_FMT_YUV420P, display_visible_rect.width(),
-                       display_visible_rect.height(), PIX_FMT_YUV420P,
+                       PIX_FMT_YUV420P, out_width,
+                       out_height, PIX_FMT_YUV420P,
                        SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
         sws_scale(scontext, image_in.data, image_in.linesize, 0, height,
@@ -2202,26 +2200,23 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     vbuffers.UnlockFrame(buffer, "PrepareFrameMem");
 
     avpicture_fill(&image_in, (uint8_t *)XJ_non_xv_image->data,
-                   non_xv_av_format, display_visible_rect.width(),
-                   display_visible_rect.height());
+                   non_xv_av_format, out_width, out_height);
 
 
     // XXX TODO: join with the scaling after removing img_convert, img_resample
     myth_sws_img_convert(
         &image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
-                display_visible_rect.width(), display_visible_rect.height());
+         out_width, out_height);
 
     {
         QMutexLocker locker(&global_lock);
         disp->Lock();
         if (XShm == video_output_subtype)
             XShmPutImage(disp->GetDisplay(), XJ_curwin, disp->GetGC(), XJ_non_xv_image,
-                         0, 0, 0, 0, display_visible_rect.width(),
-                         display_visible_rect.height(), False);
+                         0, 0, 0, 0, out_width, out_height, False);
         else
             XPutImage(disp->GetDisplay(), XJ_curwin, disp->GetGC(), XJ_non_xv_image,
-                      0, 0, 0, 0, display_visible_rect.width(),
-                      display_visible_rect.height());
+                      0, 0, 0, 0, out_width, out_height);
         disp->Unlock();
     }
 
