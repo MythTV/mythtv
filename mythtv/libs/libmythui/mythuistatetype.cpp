@@ -108,9 +108,9 @@ bool MythUIStateType::DisplayState(const QString &name)
 
     if (m_CurrentState != old)
     {
-        if (m_ShowEmpty || m_CurrentState != NULL)
+        if (m_ShowEmpty || m_CurrentState)
         {
-            if (m_deferload)
+            if (m_deferload && m_CurrentState)
                 m_CurrentState->LoadNow();
 
             if (old)
