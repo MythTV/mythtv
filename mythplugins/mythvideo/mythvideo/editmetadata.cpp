@@ -731,12 +731,13 @@ void EditMetadataDialog::FindTrailer()
         QString url = GenRemoteFileURL("Trailers",
                       m_workingMetadata->GetHost(),
                       "");
-        FindImagePopup(url,"",
+        FindVideoFilePopup(url,"",
                 *this, CEID_TRAILERFILE);
     }
-    FindVideoFilePopup(gContext->GetSetting("mythvideo.TrailersDir"),
-            GetConfDir() + "/MythVideo/Trailers",
-            *this, CEID_TRAILERFILE);
+    else
+        FindVideoFilePopup(gContext->GetSetting("mythvideo.TrailersDir"),
+                GetConfDir() + "/MythVideo/Trailers",
+                *this, CEID_TRAILERFILE);
 }
     
 void EditMetadataDialog::SetTrailer(QString file)
