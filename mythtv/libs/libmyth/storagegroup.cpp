@@ -137,6 +137,14 @@ QStringList StorageGroup::GetFileList(QString Path)
     QStringList files;
     bool badPath = true;
 
+    if (Path.isEmpty() || Path == "/")
+    {
+        for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
+            files << QString("sgdir::%1").arg(*it);
+
+        return files;
+    }
+
     for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
     {
         if (Path.startsWith(*it))
@@ -170,9 +178,9 @@ QStringList StorageGroup::GetFileList(QString Path)
         QString tmp;
 
         if (p->isDir())
-            tmp = QString("dir::%1").arg(p->fileName());
+            tmp = QString("dir::%1::0").arg(p->fileName());
         else
-            tmp = QString("file::%1").arg(p->fileName());
+            tmp = QString("file::%1::%2").arg(p->fileName()).arg(p->size());
 
         VERBOSE(VB_FILE, LOC + QString("GetFileList: (%1)").arg(tmp));
         files.append(tmp);

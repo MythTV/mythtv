@@ -227,61 +227,6 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
-class MPUBLIC MythUIFileBrowser : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    MythUIFileBrowser(MythScreenStack *parent, const QString &startPath);
-   ~MythUIFileBrowser();
-
-    bool Create(void);
-
-    void SetReturnEvent(QObject *retobject, const QString &resultid);
-
-    void SetTypeFilter(QDir::Filters filter) { m_typeFilter = filter; }
-    void SetNameFilter(QStringList filter) { m_nameFilter = filter; }
-
-  private slots:
-    void OKPressed(void);
-    void cancelPressed(void);
-    void backPressed(void);
-    void homePressed(void);
-    void editLostFocus(void);
-    void PathSelected(MythUIButtonListItem *item);
-    void PathClicked(MythUIButtonListItem *item);
-    void LoadPreview(void);
-
-  private:
-    void updateFileList(void);
-    void updateSelectedList(void);
-    void updateWidgets(void);
-
-    bool IsImage(QString extension);
-    QString FormatSize(int size);
-
-    QTimer            *m_previewTimer;
-
-    QString            m_curDirectory;
-
-    QDir::Filters      m_typeFilter;
-    QStringList        m_nameFilter;
-
-    MythUIButtonList  *m_fileList;
-    MythUITextEdit    *m_locationEdit;
-    MythUIButton      *m_okButton;
-    MythUIButton      *m_cancelButton;
-    MythUIButton      *m_backButton;
-    MythUIButton      *m_homeButton;
-    MythUIImage       *m_previewImage;
-    MythUIText        *m_infoText;
-    MythUIText        *m_filenameText;
-    MythUIText        *m_fullpathText;
-
-    QObject           *m_retObject;
-    QString           m_id;
-};
-
 MPUBLIC MythConfirmationDialog  *ShowOkPopup(const QString &message, QObject *parent = NULL,
                                              const char *slot = NULL, bool showCancel = false);
 
