@@ -3088,21 +3088,35 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 }
 
 /** \fn VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
- *  \brief Find the first image of "type" within a folder.
+ *  \brief Find the first image of "type" within a folder structure.
  *  \return QString local or myth:// for the image.
+ *
+ *  Will try immediate children (files) first, if no hits, will continue
+ *  through subfolders recursively.  Will only return a value on a
+ *  grandchild node if it matches the grandparent title, eg:
+ *
+ *  Lost->Season 1->Lost
+ *
  */
-QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
+QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
+                                   QString gpnode, int levels)
 {
     QString icon_file;
 
     int list_count = node->visibleChildCount();
     if (list_count > 0)
     {
+        QList<MythGenericTree *> subDirs;
+        int maxRecurse = 1;
+
         for (int i = 0; i < list_count; i++)
         {
             MythGenericTree *subnode = node->getVisibleChildAt(i);
             if (subnode)
             {
+                if (subnode->childCount() > 0)
+                    subDirs << subnode;
+                
                 Metadata *metadata = GetMetadataPtrFromNode(subnode);
                 if (metadata)
                 {
@@ -3116,8 +3130,11 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                         if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                             !IsDefaultCoverFile(test_file))
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
                     }
                     else if (type == "Coverart")
@@ -3126,8 +3143,11 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                         if (!test_file.isEmpty() &&
                             !IsDefaultCoverFile(test_file))
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
                     }
 
@@ -3138,8 +3158,11 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                                     metadata->GetHost(), metadata->GetFanart());
                         if (!test_file.endsWith("/") && !test_file.isEmpty())
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
                     }
                     else if (type == "Fanart")
@@ -3148,8 +3171,11 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                         if (!test_file.isEmpty() &&
                              test_file != VIDEO_FANART_DEFAULT)
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
                     }
 
@@ -3160,8 +3186,11 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                                     metadata->GetHost(), metadata->GetBanner());
                         if (!test_file.endsWith("/") && !test_file.isEmpty())
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
                     }
                     else if (type == "Banners")
@@ -3170,8 +3199,11 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                         if (!test_file.isEmpty() &&
                              test_file != VIDEO_BANNER_DEFAULT)
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
                     }
 
@@ -3182,8 +3214,11 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                                     metadata->GetHost(), metadata->GetScreenshot());
                         if (!test_file.endsWith("/") && !test_file.isEmpty())
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
                     }
                     else if (type == "Screenshots")
@@ -3192,9 +3227,30 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
                         if (!test_file.isEmpty() &&
                              test_file != VIDEO_SCREENSHOT_DEFAULT)
                         {
-                            icon_file = test_file;
-                            break;
+                            if (gpnode.isEmpty() || gpnode == metadata->GetTitle())
+                            {
+                                icon_file = test_file;
+                                break;
+                            }
                         }
+                    }
+                }
+            }
+        }
+        if (icon_file.isEmpty() && !subDirs.isEmpty())
+        {
+            QString test_file;
+            int subDirCount = subDirs.count();
+            for (int i = 0; i < subDirCount; i ++)
+            {
+                if (levels < maxRecurse)
+                {
+                    test_file = GetFirstImage(subDirs[i], type,
+                                     node->getString(), levels + 1);
+                    if (!test_file.isEmpty())
+                    {
+                        icon_file = test_file;
+                        break;
                     }
                 }
             }
