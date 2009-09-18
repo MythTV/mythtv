@@ -388,7 +388,7 @@ bool RecordingRule::Save(bool sendSig)
 
     if (!query.exec())
         MythDB::DBError("UPDATE/INSERT record", query);
-    else if (m_recordTable != "record")
+    else if (m_recordTable != "record" && m_tempID <= 0)
         m_tempID = query.lastInsertId().toInt();
     else if (m_recordID <= 0)
         m_recordID = query.lastInsertId().toInt();
