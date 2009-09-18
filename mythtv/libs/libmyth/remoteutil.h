@@ -30,14 +30,14 @@ class MPUBLIC FileSystemInfo
 };
 
 MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
-MPUBLIC vector<FileSystemInfo> RemoteGetFreeSpace();
+MPUBLIC vector<FileSystemInfo> RemoteGetFreeSpace(void);
 MPUBLIC bool RemoteGetLoad(float load[3]);
 MPUBLIC bool RemoteGetUptime(time_t &uptime);
 MPUBLIC
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 MPUBLIC bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves = true);
 MPUBLIC
-bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
+bool RemoteDeleteRecording(const ProgramInfo *pginfo, bool forgetHistory,
                            bool forceMetadataDelete = false);
 MPUBLIC
 bool RemoteUndeleteRecording(const ProgramInfo *pginfo);

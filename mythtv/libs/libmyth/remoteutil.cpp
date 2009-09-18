@@ -28,10 +28,10 @@ vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
     return info;
 }
 
-/** \fn RemoteGetFreeSpace()
+/** \fn RemoteGetFreeSpace(void)
  *  \brief Returns total and used space in kilobytes for each backend.
  */
-vector<FileSystemInfo> RemoteGetFreeSpace()
+vector<FileSystemInfo> RemoteGetFreeSpace(void)
 {
     FileSystemInfo fsInfo;
     vector<FileSystemInfo> fsInfos;
@@ -128,29 +128,37 @@ bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
     return true;
 }
 
-bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
-                           bool forceMetadataDelete)
+bool RemoteDeleteRecording(
+    const ProgramInfo *pginfo, bool forgetHistory, bool forceMetadataDelete)
 {
     bool result = true;
-    QStringList strlist;
+    QStringList strlist(
+        forceMetadataDelete ? "FORCE_DELETE_RECORDING" : "DELETE_RECORDING");
 
-    if (forceMetadataDelete)
-        strlist.append(QString("FORCE_DELETE_RECORDING"));
-    else
-        strlist.append(QString("DELETE_RECORDING"));
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
-
-    if (strlist[0].toInt() == -2)
+    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+        result = false;
+    else if (strlist[0].toInt() == -2)
         result = false;
 
+    if (!result)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to delete recording %1:%2")
+                .arg(pginfo->title).arg(pginfo->subtitle));
+    }
+
+    // We don't care if the recording is successfully deleted..
     if (forgetHistory)
     {
-        strlist = QStringList(QString("FORGET_RECORDING"));
+        strlist = QStringList("FORGET_RECORDING");
         pginfo->ToStringList(strlist);
 
-        gContext->SendReceiveStringList(strlist);
+        if (!gContext->SendReceiveStringList(strlist))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Failed to forget recording %1:%2")
+                    .arg(pginfo->title).arg(pginfo->subtitle));
+        }
     }
 
     return result;
