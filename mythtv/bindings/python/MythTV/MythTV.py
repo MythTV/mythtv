@@ -172,7 +172,7 @@ class MythTV:
 		Returns a list of recorders, or an empty list if none.
 		"""
 		recorders = []
-		pc = self.db.cursor()
+		c = self.db.cursor()
 		c.execute('SELECT cardid FROM capturecard')
 		row = c.fetchone()
 		while row is not None:
