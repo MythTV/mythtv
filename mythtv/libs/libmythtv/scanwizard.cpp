@@ -148,7 +148,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
 
     // Just verify what we get from the UI...
     DTVMultiplex tuning;
-    if ((DTVTunerType::kTunerTypeUnknown != parse_type) &&
+    if ((parse_type != DTVTunerType::kTunerTypeUnknown) &&
         !tuning.ParseTuningParams(
             parse_type,
             start_chan["frequency"],      start_chan["inversion"],

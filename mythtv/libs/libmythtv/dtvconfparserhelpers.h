@@ -55,6 +55,7 @@ class DTVParamHelper
     operator int()                const { return value;          }
     int operator=(int _value)           { return value = _value; }
     bool operator==(const int& v) const { return value == v;     }
+    bool operator!=(const int& v) const { return value != v;     }
 
   protected:
     static bool ParseParam(const QString &symbol, int &value,
@@ -106,6 +107,7 @@ class DTVTunerType : public DTVParamHelper
     } my_enum;
 
     bool operator==(const my_enum& v) const { return value == (int) v; }
+    bool operator!=(const my_enum& v) const { return value != (int) v; }
 
     DTVTunerType(int _default = kTunerTypeUnknown)
         : DTVParamHelper(_default) { initStr(); }
