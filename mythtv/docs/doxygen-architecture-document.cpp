@@ -174,7 +174,7 @@ The database schema is documented here \ref db_schema.
           for viewing programs and using the %MythTV plugins.
   <dt>mythtv-setup     <dd>This is the program which sets up the database
                            to use a machine as a backend server.
-  <dt>mythtv
+  <dt>mythavtest
       <dd>For testing audio and video playback. Was once an "External Player"
           used to play video files from within mythfrontend. %Setting the
           player command to "internal" achieves the same thing now.
@@ -961,12 +961,12 @@ an annotated versions of the code, and saving results.
 /** \defgroup testing    Testing hints and shortcuts
 This line is filler that is ignored by Doxygen.
 
-The internal video playback can be tested by the programs/mythtv tool:
+The internal video playback can be tested by the programs/mythavtest tool:
 
 \verbatim
-mythtv /myth/tv/1003_20060302232800.mpg
-mythtv dvd:\\
-mythtv dvd:\\/path/to/dvd.iso
+mythavtest /myth/tv/1003_20060302232800.mpg
+mythavtest dvd:\\
+mythavtest dvd:\\/path/to/dvd.iso
 \endverbatim
 
 Without an argument, this tool also exercises the "Live TV" recording chain.
