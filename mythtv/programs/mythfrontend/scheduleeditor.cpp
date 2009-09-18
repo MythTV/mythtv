@@ -410,10 +410,11 @@ void ScheduleEditor::ShowPreview(void)
 {
     QString ttable = "record_tmp";
     m_recordingRule->UseTempTable(true, ttable);
+    int recordid = (m_recordingRule->m_recordID > 0) ? 
+        m_recordingRule->m_recordID : m_recordingRule->m_tempID;
     
     ViewScheduleDiff vsd(gContext->GetMainWindow(), "Preview Schedule Changes",
-                         ttable, m_recordingRule->m_tempID,
-                         m_recordingRule->m_title);
+                         ttable, recordid, m_recordingRule->m_title);
 
     m_recordingRule->UseTempTable(false);
 
