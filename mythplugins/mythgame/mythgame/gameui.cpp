@@ -345,6 +345,8 @@ void GameUI::showInfo()
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (!romInfo)
+            return;
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         GameDetailsPopup *details_dialog  =
             new GameDetailsPopup(mainStack, romInfo);
@@ -365,6 +367,8 @@ void GameUI::showMenu()
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (!romInfo)
+            return;
         MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
         MythDialogBox *showMenuPopup =
