@@ -1406,8 +1406,6 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    WriteDefaults();
-
     QString themename = gContext->GetSetting("Theme", "Terra");
     bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
 
@@ -1440,6 +1438,8 @@ int main(int argc, char **argv)
                 "Couldn't upgrade database to new schema, exiting.");
         return FRONTEND_EXIT_DB_OUTOFDATE;
     }
+
+    WriteDefaults();
 
     InitJumpPoints();
 
