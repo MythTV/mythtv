@@ -2786,6 +2786,7 @@ void Scheduler::UpdateMatches(int recordid) {
 "      ((RECTABLE.type = %7) " // weekslotrecord
 "       OR"
 "       ((TO_DAYS(RECTABLE.startdate) = TO_DAYS(program.starttime)) " // date matches
+"        AND (RECTABLE.type <> %8)" // single,override,don't,etc.
 "        )"
 "       )"
 "      )"
@@ -2801,7 +2802,8 @@ void Scheduler::UpdateMatches(int recordid) {
             .arg(kFindWeeklyRecord)
             .arg(kChannelRecord)
             .arg(kTimeslotRecord)
-            .arg(kWeekslotRecord);
+            .arg(kWeekslotRecord)
+            .arg(kNotRecording);
 
         while (1)
         {
