@@ -698,7 +698,6 @@ TV::TV(void)
       // Program Info for currently playing video
       lastProgram(NULL),
       inPlaylist(false), underNetworkControl(false),
-      isnearend(false),
       // Jump to program stuff
       jumpToProgramPIPState(kPIPOff),
       jumpToProgram(false),
@@ -3640,6 +3639,9 @@ bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
     }
 
     bool handled = true;
+    actx->LockDeleteNVP(__FILE__, __LINE__);
+    bool isnearend = actx->nvp && actx->nvp->IsNearEnd();
+    actx->UnlockDeleteNVP(__FILE__, __LINE__);
     if (((has_action("RWNDSTICKY", actions) ||
           has_action("SEEKRWND", actions) ||
           has_action("JUMPRWND", actions))) &&

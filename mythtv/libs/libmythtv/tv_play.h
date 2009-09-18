@@ -238,8 +238,6 @@ class MPUBLIC TV : public QThread
     /// This is set if the user asked MythTV to jump to the previous
     /// recording in the playlist.
     bool getJumpToProgram(void)  const { return jumpToProgram; }
-    /// true if NVP is near the end
-    bool IsNearEnd(void) const { return isnearend; }
     /// true iff program is the same as the one in the selected player
     bool IsSameProgram(int player_idx, const ProgramInfo *p) const;
     bool IsBookmarkAllowed(const PlayerContext*) const;
@@ -719,7 +717,6 @@ class MPUBLIC TV : public QThread
     ProgramInfo *lastProgram;   ///< last program played with this player
     bool         inPlaylist; ///< show is part of a playlist
     bool         underNetworkControl; ///< initial show started via by the network control interface
-    bool         isnearend;
 
     // Program Jumping
     PIPState     jumpToProgramPIPState;
