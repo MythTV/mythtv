@@ -54,11 +54,14 @@ MythSocket *RemoteFile::openSocket(bool control)
 
     QString host = qurl.host();
     int port = qurl.port();
+   
+    dir = qurl.path();
 
+    if (qurl.hasQuery())
+        dir += "?" + QUrl::fromPercentEncoding(qurl.encodedQuery());
+    
     if (qurl.hasFragment()) 
-        dir = qurl.path() + "#" + qurl.fragment();
-    else
-        dir = qurl.path();
+        dir += "#" + qurl.fragment();
 
     QString sgroup = qurl.userName();
 
