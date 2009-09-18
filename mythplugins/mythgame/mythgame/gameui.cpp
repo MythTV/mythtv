@@ -226,6 +226,8 @@ void GameUI::itemClicked(MythUIButtonListItem*)
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (!romInfo)
+            return;
         if (romInfo->RomCount() == 1)
         {
             GameHandler::Launchgame(romInfo, NULL);
