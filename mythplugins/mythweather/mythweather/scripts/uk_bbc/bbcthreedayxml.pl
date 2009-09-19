@@ -71,24 +71,20 @@ if (!(defined $opt_u && defined $locid && !$locid eq "")) {
 }
 
 my $units = $opt_u;
-my $base_url;
-my $local_base_url = 'http://feeds.bbc.co.uk/weather/feeds/rss/5day/id/';
-my $world_base_url = 'http://feeds.bbc.co.uk/weather/feeds/rss/5day/world/';
+my $base_url = 'http://newsrss.bbc.co.uk/weather/forecast/';
+my $base_xml = '/Next3DaysRSS.xml';
 
-if ($locid =~ s/^W(.*)/$1/)
+if ($locid =~ s/^(\d*)/$1/)
 {
-    $base_url = $world_base_url;
-}
-elsif ($locid =~ s/^L(.*)/$1/)
-{
-    $base_url = $local_base_url;
+    $base_url = $base_url . $1 . $base_xml;
 }
 else
 {
     die "Invalid Location ID";
 }
 
-my $response = get $base_url . $locid . '.xml';
+
+my $response = get $base_url;
 die unless defined $response;
 
 my $xml = XMLin($response);
@@ -143,10 +139,14 @@ foreach $item (@{$xml->{channel}->{item}}) {
     $weather_string =~ s/.*?\: (.*?),.*/$1/s;
     $weather_string = ucfirst($weather_string);
 
-    if ($weather_string =~ /^cloudy$/i) {
+    if ($weather_string =~ /^cloudy$/i     ||
+        $weather_string =~ /^grey cloud$/i ||
+        $weather_string =~ /^white cloud$/i) {
         printf "icon-" . $i . "::cloudy.png\n";
     }
-    elsif ($weather_string =~ /^foggy$/i ||
+    elsif ($weather_string =~ /^fog$/i ||
+        $weather_string =~ /^foggy$/i  ||
+        $weather_string =~ /^mist$/i   ||
         $weather_string =~ /^misty$/i) {
         printf "icon-" . $i . "::fog.png\n";
     }
@@ -159,14 +159,17 @@ foreach $item (@{$xml->{channel}->{item}}) {
     }
     elsif ($weather_string =~ /^drizzle$/i ||
         $weather_string =~ /^light rain$/i ||
-        $weather_string =~ /^light showers$/i) {
+        $weather_string =~ /^light rain showers?$/i ||
+        $weather_string =~ /^light showers?$/i) {
         printf "icon-" . $i . "::lshowers.png\n";
     }
-    elsif ($weather_string =~ /^heavy rain$/i ||
-        $weather_string =~ /^heavy showers$/i) {
+    elsif ($weather_string =~ /^heavy rain$/i  ||
+        $weather_string =~ /^heavy showers?$/i ||
+        $weather_string =~ /^heavy rain showers?$/i) {
         printf "icon-" . $i . "::showers.png\n";
     }
     elsif ($weather_string =~ /^thundery rain$/i ||
+        $weather_string =~ /^thunder storm$/i    ||
         $weather_string =~ /^thundery showers$/i) {
         printf "icon-" . $i . "::thunshowers.png\n";
     }
@@ -178,11 +181,12 @@ foreach $item (@{$xml->{channel}->{item}}) {
         printf "icon-" . $i . "::flurries.png\n";
     }
     elsif ($weather_string =~ /^sleet$/i ||
-        $weather_string =~ /^sleet showers$/i ||
-        $weather_string =~ /^hail showers$/i) {
+        $weather_string =~ /^sleet showers?$/i ||
+        $weather_string =~ /^hail showers?$/i) {
         printf "icon-" . $i . "::rainsnow.png\n";
     }
-    elsif ($weather_string =~ /^clear$/i) {
+    elsif ($weather_string =~ /^clear$/i ||
+           $weather_string =~ /^clear sky$/i) {
         printf "icon-" . $i . "::fair.png\n";
     }
     else {
