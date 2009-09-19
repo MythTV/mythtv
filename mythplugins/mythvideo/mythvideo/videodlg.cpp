@@ -3648,7 +3648,8 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
         CheckedSet(m_titleText, item->GetText());
     UpdatePosition();
 
-    CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
+    if (m_d->m_currentNode)
+        CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
 
     if (node && node->getInt() == kSubFolder)
         CheckedSet(this, "childcount",
