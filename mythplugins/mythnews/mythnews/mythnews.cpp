@@ -772,10 +772,10 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
     if (it == m_articles.end())
         return;
 
-    if ((*it).title().isEmpty())
-        return;
-
     const NewsArticle article = *it;
+
+    if (article.articleURL().isEmpty())
+        return;
 
     if (article.enclosure().isEmpty())
     {
