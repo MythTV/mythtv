@@ -814,10 +814,14 @@ bool SourceSetup::loadData()
 
 void SourceSetup::saveData()
 {
-    SourceListInfo *si = qVariantValue<SourceListInfo *>
-                                    (m_sourceList->GetItemCurrent()->GetData());
-    si->update_timeout = m_updateSpinbox->GetIntValue();
-    si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
+    MythUIButtonListItem *curritem = m_sourceList->GetItemCurrent();
+
+    if (curritem)
+    {
+        SourceListInfo *si = qVariantValue<SourceListInfo *>(curritem->GetData());
+        si->update_timeout = m_updateSpinbox->GetIntValue();
+        si->retrieve_timeout = m_retrieveSpinbox->GetIntValue();
+    }
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "UPDATE weathersourcesettings "
@@ -828,7 +832,7 @@ void SourceSetup::saveData()
     for (int i=0; i < m_sourceList->GetCount(); i++)
     {
         MythUIButtonListItem *item = m_sourceList->GetItemAt(i);
-        si = qVariantValue<SourceListInfo *>(item->GetData());
+        SourceListInfo *si = qVariantValue<SourceListInfo *>(item->GetData());
         db.bindValue(":ID", si->id);
         db.bindValue(":UPDATE", si->update_timeout * 60);
         db.bindValue(":RETRIEVE", si->retrieve_timeout);
