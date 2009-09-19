@@ -147,7 +147,7 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
     kDisplayNUVTeletextCaptions,
 };
 
-NuppelVideoPlayer::NuppelVideoPlayer()
+NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
     : decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
       no_hardware_decoders(false),
@@ -215,6 +215,7 @@ NuppelVideoPlayer::NuppelVideoPlayer()
       audio_channels(2),            audio_bits(-1),
       audio_samplerate(44100),      audio_stretchfactor(1.0f),
       audio_codec(NULL),            audio_lock(QMutex::Recursive),
+      audio_muted_on_creation(muted),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
       // Preview window support
@@ -933,6 +934,11 @@ QString NuppelVideoPlayer::ReinitAudio(void)
         {
             VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
             no_audio_out = false;
+        }
+        if (audio_muted_on_creation)
+        {
+            SetMuteState(kMuteAll);
+            audio_muted_on_creation = false;
         }
     }
 

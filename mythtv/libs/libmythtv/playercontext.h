@@ -47,7 +47,8 @@ class MPUBLIC PlayerContext
     // Actions
     bool CreateNVP(TV *tv, QWidget *widget,
                    TVState desiredState,
-                   WId embedwinid, const QRect *embedBounds);
+                   WId embedwinid, const QRect *embedBounds,
+                   bool muted = false);
     void TeardownPlayer(void);
     bool StartDecoderThread(int maxWait = -1);
     bool StartOSD(TV *tv);

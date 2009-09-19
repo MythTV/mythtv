@@ -302,6 +302,7 @@ class MPUBLIC TV : public QThread
     void TVEventThreadChecks(void);
 
     void SetMuteTimer(PlayerContext*, int timeout);
+    bool MuteChannelChange(PlayerContext *ctx);
 
     bool eventFilter(QObject *o, QEvent *e);
     static QStringList lastProgramStringList;

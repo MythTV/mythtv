@@ -2672,14 +2672,13 @@ void TV::timerEvent(QTimerEvent *te)
     if (ctx)
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        bool still_exists = find_player_index(ctx) >= 0;
-
-        ctx->LockDeleteNVP(__FILE__, __LINE__);
-        if (still_exists && ctx->nvp && ctx->nvp->IsMuted())
-            ctx->nvp->SetMuted(false);
-        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-
+        if (find_player_index(ctx) >= 0)
+        {
+            ctx->LockDeleteNVP(__FILE__, __LINE__);
+            if (ctx->nvp && ctx->nvp->IsMuted())
+                ctx->nvp->SetMuted(false);
+            ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+        }
         ReturnPlayerLock(mctx);
         handled = true;
     }
@@ -5685,7 +5684,7 @@ bool TV::DoNVPSeek(PlayerContext *ctx, float time)
     }
 
     if (ctx == GetPlayer(ctx, 0))
-        muted = ctx->nvp->SetMuted(true);
+        muted = MuteChannelChange(ctx);
 
     bool res = false;
 
@@ -5991,7 +5990,7 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
         return;
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
-    bool muted = ctx->nvp->SetMuted(true);
+    bool muted = MuteChannelChange(ctx);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     struct StatusPosInfo posInfo;
@@ -6184,6 +6183,12 @@ void TV::SwitchCards(PlayerContext *ctx,
         if (mctx != ctx)
             PIPRemovePlayer(mctx, ctx);
 
+        bool muted = false;
+        ctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (ctx->nvp && ctx->nvp->IsMuted())
+            muted = true;
+        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
         // pause the decoder first, so we're not reading too close to the end.
         ctx->buffer->IgnoreLiveEOF(true);
         ctx->buffer->StopReads();
@@ -6217,9 +6222,7 @@ void TV::SwitchCards(PlayerContext *ctx,
         {
             ctx->LockPlayingInfo(__FILE__, __LINE__);
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
-
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
-
             ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
                                               opennow ? 12 : (uint)-1));
 
@@ -6237,7 +6240,7 @@ void TV::SwitchCards(PlayerContext *ctx,
 
             if (ctx->CreateNVP(
                     this, gContext->GetMainWindow(), ctx->GetState(),
-                    mctx->embedWinID, &mctx->embedBounds))
+                    mctx->embedWinID, &mctx->embedBounds, muted))
             {
                 ScheduleStateChange(ctx);
                 ok = true;
@@ -6626,10 +6629,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 
     QString oldinputname = ctx->recorder->GetInput();
 
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (ctx->nvp && !ctx->nvp->IsMuted())
-        muted = ctx->nvp->SetMuted(true);
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    muted = MuteChannelChange(ctx);
 
     if (ctx->paused)
     {
@@ -6747,10 +6747,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (getit || !ctx->recorder || !ctx->recorder->CheckChannel(channum))
         return;
 
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (ctx->nvp && !ctx->nvp->IsMuted())
-        muted = ctx->nvp->SetMuted(true);
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    muted = MuteChannelChange(ctx);
 
     OSD *osd = GetOSDLock(ctx);
     if (osd && ctx->paused)
@@ -8243,6 +8240,20 @@ void TV::SetMuteTimer(PlayerContext *ctx, int timeout)
     // otherwise it never fires on Win32
     QString message = QString("UNMUTE %1 %2").arg((long long)ctx).arg(timeout);
     qApp->postEvent(gContext->GetMainWindow(), new MythEvent(message));
+}
+
+bool TV::MuteChannelChange(PlayerContext *ctx)
+{
+    if (!ctx)
+        return false;
+
+    bool muted = false;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp && !ctx->nvp->IsMuted())
+        muted = ctx->nvp->SetMuted(true);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+    return muted;
 }
 
 void TV::customEvent(QEvent *e)
@@ -10892,11 +10903,6 @@ void TV::UnpauseLiveTV(PlayerContext *ctx)
         UpdateOSDProgInfo(ctx, "program_info");
         UpdateLCD();
         ctx->PushPreviousChannel();
-
-        ctx->LockDeleteNVP(__FILE__, __LINE__);
-        if (!ctx->IsPIP() && ctx->nvp)
-            ctx->nvp->SetMuted(false);
-        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
     }
 }
 
