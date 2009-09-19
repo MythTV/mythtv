@@ -48,6 +48,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
     int twinview =  0;
     map<int, map<int,bool> > maprate;
 
+    memset(pModeLines, 0, sizeof(pModeLines));
+    memset(ModeLineLen, 0, sizeof(ModeLineLen));
+
     /*
      * Open a display connection, and make sure the NV-CONTROL X
      * extension is present on the screen we want to use.

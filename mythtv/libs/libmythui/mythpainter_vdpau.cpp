@@ -305,8 +305,17 @@ MythVDPAUPrivate::MythVDPAUPrivate(MythVDPAUPainter *painter) :
     m_painter(painter),
     surfaceNum(0), initialized(false),
     curOutput(0), vdp_device(0),
-    vdpFlipTarget(0), vdpFlipQueue(0)
+    vdpFlipTarget(0), vdpFlipQueue(0),
+    vdp_get_proc_address(0), vdp_device_destroy(0),
+    vdp_presentation_queue_target_destroy(0), vdp_presentation_queue_create(0),
+    vdp_presentation_queue_destroy(0), vdp_presentation_queue_display(0),
+    vdp_presentation_queue_block_until_surface_idle(0), vdp_presentation_queue_target_create_x11(0),
+    vdp_bitmap_surface_create(0), vdp_bitmap_surface_destroy(0),
+    vdp_bitmap_surface_put_bits_native(0), vdp_output_surface_create(0),
+    vdp_output_surface_destroy(0), vdp_output_surface_render_bitmap_surface(0)
 {
+    memset(outputSurfaces, 0, sizeof(outputSurfaces));
+    memset(&outRect, 0, sizeof(outRect));
 }
 
 MythVDPAUPrivate::~MythVDPAUPrivate()

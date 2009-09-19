@@ -50,6 +50,7 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
 
     m_fillType = Solid;
 
+    m_rowCount = 0;
     m_progPastCol = 0;
 
     m_drawCategoryColors = GetMythDB()->GetNumSetting("EPGShowCategoryColors", 1);

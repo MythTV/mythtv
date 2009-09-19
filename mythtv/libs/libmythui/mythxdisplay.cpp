@@ -122,8 +122,8 @@ int MythXGetRefreshRate(void)
 
 MythXDisplay::MythXDisplay()
   : m_disp(NULL), m_screen_num(0), m_screen(NULL),
-    m_black(0), m_gc(0), m_root(0),
-    m_lock(QMutex::Recursive)
+    m_depth(0), m_black(0), m_gc(0),
+    m_root(0), m_lock(QMutex::Recursive)
 {
 }
 
