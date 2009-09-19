@@ -895,10 +895,8 @@ void StorageGroupListEditor::doDelete(void)
     if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
         return;
 
-    if ((gContext->GetSetting("MasterServerIP","master") ==
-         gContext->GetSetting("BackendServerIP","me")) &&
-        (name == "Default"))
-        return;
+    bool is_master_host = gContext->GetSetting("MasterServerIP","master") ==
+                          gContext->GetSetting("BackendServerIP","me");
 
     QString dispGroup = name;
     if (name == "Default")
@@ -907,6 +905,17 @@ void StorageGroupListEditor::doDelete(void)
         dispGroup = QObject::tr(name.toLatin1().constData());
 
     QString message = tr("Delete '%1' Storage Group?").arg(dispGroup);
+    if (is_master_host)
+    {
+        if (name == "Default")
+        {
+            message.append("\n" + tr("(from remote hosts)"));
+        }
+        else
+        {
+            message.append("\n" + tr("(from all hosts"));
+        }
+    }
 
     DialogCode value = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(),
@@ -917,10 +926,27 @@ void StorageGroupListEditor::doDelete(void)
     if (kDialogCodeButton0 == value)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM storagegroup "
-                      "WHERE groupname = :NAME AND hostname = :HOSTNAME;");
+        QString sql = "DELETE FROM storagegroup "
+                      "WHERE groupname = :NAME";
+        if (is_master_host)
+        {
+            // From the master host, delete the group completely (versus just
+            // local directory list) unless it's the Default group, then just
+            // delete remote overrides of the Default group
+            if (name == "Default")
+                sql.append(" AND hostname != :HOSTNAME");
+        }
+        else
+        {
+            // For non-master hosts, delete only the local override of the
+            // group directory list
+            sql.append(" AND hostname = :HOSTNAME");
+        }
+        sql.append(';');
+        query.prepare(sql);
         query.bindValue(":NAME", name);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        if (!is_master_host || (name == "Default"))
+            query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("StorageGroupListEditor::doDelete", query);
 
