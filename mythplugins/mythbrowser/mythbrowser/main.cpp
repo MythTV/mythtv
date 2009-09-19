@@ -21,6 +21,12 @@ using namespace std;
 
 int handleMedia(const QString &url, const QString &, const QString &, const QString &, const QString &, int, int, int, const QString &)
 {
+    if (url.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, "MythBrowser: handleMedia got empty url!");
+        return 1;
+    }
+
     QStringList urls = url.split(" ", QString::SkipEmptyParts);
     float zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();
 
