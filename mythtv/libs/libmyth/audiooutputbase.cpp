@@ -291,6 +291,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     }
 
     SyncVolume();
+    VolumeBase::UpdateVolume();
 
     VERBOSE(VB_AUDIO, LOC + QString("Audio fragment size: %1")
             .arg(fragment_size));
