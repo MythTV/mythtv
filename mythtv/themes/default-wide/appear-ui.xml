@@ -2,7 +2,7 @@
 <mythuitheme>
     <window name="appearance">
 
-        <font name="title" face="Bitstream Vera Sans">
+        <font name="title" face="DejaVu Sans">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>

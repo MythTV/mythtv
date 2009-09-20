@@ -2,7 +2,7 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Bitstream Vera Sans">
+    <font name="basesmall" face="DejaVu Sans">
         <size>14</size>
         <color>#FFFFFF</color>
     </font>
