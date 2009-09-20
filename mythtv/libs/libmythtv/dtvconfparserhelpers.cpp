@@ -44,9 +44,9 @@ void DTVTunerType::initStr(void)
 {
     QMutexLocker locker(&dtv_tt_canonical_str_lock);
     dtv_tt_canonical_str[kTunerTypeATSC]    = "ATSC";
-    dtv_tt_canonical_str[kTunerTypeDVBT]    = "QPSK";
+    dtv_tt_canonical_str[kTunerTypeDVBT]    = "OFDM";
     dtv_tt_canonical_str[kTunerTypeDVBC]    = "QAM";
-    dtv_tt_canonical_str[kTunerTypeDVBS1]   = "DVBS";
+    dtv_tt_canonical_str[kTunerTypeDVBS1]   = "QPSK";
     dtv_tt_canonical_str[kTunerTypeDVBS2]   = "DVB_S2";
     dtv_tt_canonical_str[kTunerTypeUnknown] = "UNKNOWN";
 }
