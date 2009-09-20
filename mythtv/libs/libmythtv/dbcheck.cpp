@@ -406,7 +406,8 @@ static bool performActualUpdate(
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to schema version ") + version);
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythTV schema version ") +
+            version);
 
     int counter = 0;
     const char *thequery = updates[counter];
@@ -461,7 +462,8 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
 
-    DBup = SchemaUpgradeWizard::Get("DBSchemaVer", currentDatabaseVersion);
+    DBup = SchemaUpgradeWizard::Get("DBSchemaVer", "MythTV",
+                                    currentDatabaseVersion);
 
     // There may be a race condition where another program (e.g. mythbackend)
     // is upgrading, so wait up to 5 seconds for a more accurate version:
@@ -502,7 +504,8 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
         MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
 
 
-    VERBOSE(VB_IMPORTANT, "Newest Schema Version : " + currentDatabaseVersion);
+    VERBOSE(VB_IMPORTANT, "Newest MythTV Schema Version : "+
+            currentDatabaseVersion);
 
     if (!DBUtil::lockSchema(query))
         return false;
@@ -2998,7 +3001,7 @@ NULL
 
     if (dbver == "1181")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to schema version 1182");
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1182");
 
         MSqlQuery airdates(MSqlQuery::InitCon());
         airdates.prepare("SELECT chanid, starttime FROM recordedprogram "
@@ -3067,7 +3070,7 @@ NULL
 
     if (dbver == "1185")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to schema version 1186");
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1186");
 
         MSqlQuery ppuq(MSqlQuery::InitCon());
 

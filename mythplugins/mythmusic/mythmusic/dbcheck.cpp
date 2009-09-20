@@ -71,7 +71,7 @@ bool UpgradeMusicDatabaseSchema(void)
     SchemaUpgradeWizard  * DBup;
 
 
-    DBup = SchemaUpgradeWizard::Get("MusicDBSchemaVer",
+    DBup = SchemaUpgradeWizard::Get("MusicDBSchemaVer", "MythMusic",
                                     currentDatabaseVersion);
 
     // There may be a race condition where another frontend is upgrading,
@@ -85,7 +85,8 @@ bool UpgradeMusicDatabaseSchema(void)
         return doUpgradeMusicDatabaseSchema(DBup->DBver);
 
     // An upgrade is likely. Ensure we have a backup first:
-    if (!DBup->didBackup)
+    if ((DBup->backupStatus == kDB_Backup_Unknown) ||
+        (DBup->backupStatus == kDB_Backup_Failed))
         DBup->BackupDB();
 
     // Pop up messages, questions, warnings, et c.

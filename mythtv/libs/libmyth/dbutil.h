@@ -7,6 +7,15 @@
 #include "mythexp.h"
 #include "mythdbcon.h"
 
+enum MythDBBackupStatus
+{
+    kDB_Backup_Unknown = 0,
+    kDB_Backup_Failed,
+    kDB_Backup_Completed,
+    kDB_Backup_Empty_DB,
+    kDB_Backup_Disabled
+};
+
 /** \class DBUtil
  *  \brief Aggregates database and DBMS utility functions.
  *
@@ -28,7 +37,7 @@ class MPUBLIC DBUtil
     QString GetDBMSVersion(void);
     int CompareDBMSVersion(int major, int minor=0, int point=0);
 
-    bool BackupDB(QString &filename);
+    MythDBBackupStatus BackupDB(QString &filename);
 
     static QMap<QString,bool> GetTableMap(void);
     static bool IsNewDatabase(void);

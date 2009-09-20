@@ -50,13 +50,13 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
     Q_OBJECT
 
   public:
-    SchemaUpgradeWizard(const QString &DBSchemaSetting,
+    SchemaUpgradeWizard(const QString &DBSchemaSetting, const QString &appName,
                         const QString &upgradeSchemaVal);
     ~SchemaUpgradeWizard();
 
 
     /// Call DBUtil::BackupDB(), and store results
-    bool BackupDB(void);
+    MythDBBackupStatus BackupDB(void);
 
     /// How many schema versions old is the DB?
     int Compare(void);
@@ -67,6 +67,7 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
     /// Instead of creating a new wizard, use the existing one
     /// for its DB backup file & results and expert settings.
     static SchemaUpgradeWizard *Get(const QString &DBSchemaSetting,
+                                    const QString &appName,
                                     const QString &upgradeSchemaVal);
 
     /// Query user, to prevent silent, automatic database upgrades
@@ -78,9 +79,10 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
                                             const int  minDBMSpoint = 0);
 
     QString DBver;            ///< Schema version in the database
-    bool    didBackup;        ///< BackupDB() was successful
     bool    emptyDB;          ///< Is the database currently empty?
     int     versionsBehind;   ///< How many schema versions old is the DB?
+
+    MythDBBackupStatus backupStatus;   ///< BackupDB() status
 
   private:
     void              BusyPopup(const QString &message);
@@ -92,6 +94,7 @@ class MPUBLIC SchemaUpgradeWizard : public QObject, public DBUtil
     MythUIBusyDialog *m_busyPopup;          ///< Displayed during long pauses
     bool              m_expertMode;         ///< Also allow newer DB schema
     QString           m_schemaSetting;      ///< To lookup the schema version
+    QString           m_schemaName;         ///< Shown to user in VERBOSE logs
     QString           m_newSchemaVer;       ///< What we need to upgrade to
 
 };

@@ -664,9 +664,9 @@ namespace
 
 
         SchemaUpgradeWizard  * DBup; 
-        DBup = SchemaUpgradeWizard::Get(MythVideoVersionName,
+        DBup = SchemaUpgradeWizard::Get(MythVideoVersionName, "MythVideo",
                                         currentDatabaseVersion); 
-	 
+
         // There may be a race condition where another frontend is upgrading, 
         // so wait up to 3 seconds for a more accurate version: 
         DBup->CompareAndWait(3); 
@@ -675,7 +675,8 @@ namespace
             return true;
 
         // An upgrade is likely. Ensure we have a backup first:
-        if (!DBup->didBackup)
+        if ((DBup->backupStatus == kDB_Backup_Unknown) ||
+            (DBup->backupStatus == kDB_Backup_Failed))
             DBup->BackupDB();
 
         // Pop up messages, questions, warnings, et c. 
@@ -707,6 +708,8 @@ namespace
 
         if (dbver == "1012")
         {
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1013");
+
             // handle DialogType value change
             const QString setting("Default MythVideo View");
             int view = gContext->GetNumSetting(setting, -1);
@@ -896,6 +899,8 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
         if (dbver == "1020")
         {
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1021");
+
             AddFileType("mkv");
             AddFileType("mp4");
             AddFileType("m2ts");
@@ -983,6 +988,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
         if (dbver == "1027")
         {
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1028");
             VERBOSE(VB_IMPORTANT, "Converting filenames in filemarkup table "
                     "from absolute to relative paths.  This may take a long "
                     "time if you have a large number of MythVideo seektables.");
