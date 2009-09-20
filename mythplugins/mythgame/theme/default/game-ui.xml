@@ -5,20 +5,6 @@
     <imagetype name="fanart">
         <area>0,0,800,600</area>
     </imagetype>
-
-    <font name="largetitle" face="Arial">
-        <color>#ffffff</color>
-        <dropcolor>#000000</dropcolor>
-        <size>32</size>
-        <shadow>3,3</shadow>
-        <bold>yes</bold>
-    </font>
-
-    <font name="infofont" face="Arial">
-        <color>#ffffff</color>
-        <size>20</size>
-        <bold>yes</bold>
-    </font>
     
     <buttontree name="gametreelist">
         <area>0,10,800,310</area>
@@ -27,58 +13,60 @@
         <buttonlist name="listtemplate" from="basebuttonlist" />
     </buttontree>
 
-    <textarea name="gametitle">
+    <textarea name="gametitle" from="basetextarea">
         <area>38,360,500,50</area>
-        <font>largetitle</font>
+        <font>baseextralarge</font>
     </textarea>
 
-    <textarea name="system">
+    <textarea name="systemlabel" from="basetextarea">
         <area>38,430,150,35</area>
-        <font>infofont</font>
         <value>System:</value>
     </textarea>
 
-    <textarea name="systemname">
+    <textarea name="systemname" from="basetextarea">
         <area>178,430,500,35</area>
-        <font>infofont</font>
     </textarea>
 
-    <textarea name="year">
-        <area>38,465,150,35</area>
-        <font>infofont</font>
+    <textarea name="yearlabel" from="systemlabel">
+        <position>38,465</position>
         <value>Year:</value>
     </textarea>
 
-    <textarea name="yearname">
-        <area>178,465,500,35</area>
-        <font>infofont</font>
+    <textarea name="yearname" from="systemname">
+        <position>178,465</position>
     </textarea>
 
-    <textarea name="genre">
-        <area>38,495,150,35</area>
-        <font>infofont</font>
+    <textarea name="genrelabel" from="systemlabel">
+        <position>38,495</position>
         <value>Genre:</value>
     </textarea>
 
-    <textarea name="genrename">
-        <area>178,495,500,35</area>
-        <font>infofont</font>
+    <textarea name="genrename" from="systemname">
+        <position>178,495</position>
     </textarea>
 
-    <textarea name="favorite">
-        <area>38,525,150,35</area>
-        <font>infofont</font>
+    <textarea name="favoritelabel" from="systemlabel">
+        <position>38,525</position>
         <value>Favorite:</value>
     </textarea>
 
-    <textarea name="showfavorite">
+    <statetype name="favorite">
         <area>178,525,500,35</area>
-        <font>infofont</font>
-    </textarea>
+        <state name="no">
+            <textarea name="favorite" from="systemname">
+                <position>0,0</position>
+                <value>No</value>
+            </textarea>
+        </state>
+        <state name="yes" from="no">
+            <textarea name="favorite">
+                <value>Yes</value>
+            </textarea>
+        </state>
+    </statetype>
 
-    <textarea name="plot">
-        <area>38,565,500,35</area>
-        <font>infofont</font>
+    <textarea name="plot" from="systemname">
+        <position>38,565</position>
     </textarea>
 
     <imagetype name="gameimage">
