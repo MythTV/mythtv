@@ -473,7 +473,7 @@ QString StorageGroup::FindNextDirMostFree(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("FindNextDirMostFree: '%1' does not exist!")
-                            .arg(nextDir));
+                            .arg(m_dirlist[curDir]));
             curDir++;
             continue;
         }
