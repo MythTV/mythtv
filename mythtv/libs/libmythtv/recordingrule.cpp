@@ -75,7 +75,13 @@ bool RecordingRule::Load()
 
     query.bindValue(":RECORDID", m_recordID);
 
-    if (query.exec() && query.next())
+    if (!query.exec())
+    {
+        MythDB::DBError("SELECT record", query);
+        return false;
+    }
+
+    if (query.next())
     {
         // Schedule
         m_type = static_cast<RecordingType>(query.value(0).toInt());
@@ -134,7 +140,6 @@ bool RecordingRule::Load()
     }
     else
     {
-        MythDB::DBError("SELECT record", query);
         return false;
     }
 
