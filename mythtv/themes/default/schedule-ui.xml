@@ -1247,13 +1247,7 @@
             <align>left,bottom</align>
             <value>Program Listings</value>
         </textarea>
-        <!--
-        <textarea name="keyinstr" from="basetextarea">
-            <area>260,5,180,40</area>
-            <align>hcenter,bottom</align>
-            <value>(1)Time (2)Title</value>
-        </textarea>
-        -->
+
         <shape name="list_background" from="basebackground">
             <area>15,55,770,330</area>
         </shape>

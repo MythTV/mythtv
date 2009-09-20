@@ -48,13 +48,14 @@
             <font>basesmallpurple</font>
         </textarea>
 
+        // Temporary guide widget for 0.22
         <guidegrid name="guidegrid">
             <area>220,295,1032,390</area>
             <layout>horizontal</layout>
             <channels>5</channels>
             <timeslots>4</timeslots>
             <solidcolor>#003256</solidcolor>
-            <selector type="roundbox" linecolor="#ffff33" ></selector>
+            <selector type="roundbox" linecolor="#ffff33" />
             <showcategories>yes</showcategories>
             <categoryalpha>60</categoryalpha>
             <recordingcolor>#00aa00</recordingcolor>
@@ -62,15 +63,15 @@
             <cutdown>no</cutdown>
             <multiline>yes</multiline>
             <textoffset>9,6</textoffset>
-            <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
-            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
-            <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
-            <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
-            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
-            <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
-            <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
-            <arrow direction="left" image="gg-arrow-left.png"></arrow>
-            <arrow direction="right" image="gg-arrow-right.png"></arrow>
+            <recordstatus type="SingleRecord" image="gg-rs-single.png" />
+            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png" />
+            <recordstatus type="ChannelRecord" image="gg-rs-channel.png" />
+            <recordstatus type="AllRecord" image="gg-rs-all.png" />
+            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png" />
+            <recordstatus type="FindOneRecord" image="gg-rs-findone.png" />
+            <recordstatus type="OverrideRecord" image="gg-rs-override.png" />
+            <arrow direction="left" image="gg-arrow-left.png" />
+            <arrow direction="right" image="gg-arrow-right.png" />
             <font>basesmall</font>
         </guidegrid>
 
