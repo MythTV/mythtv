@@ -736,7 +736,7 @@ void WelcomeDialog::shutdownNow(void)
 
     // run command to set wakeuptime in bios and shutdown the system
     QString mythshutdown_exe =
-        "sudo " + m_installDir + "/bin/mythshutdown --startup";
+        "sudo " + m_installDir + "/bin/mythshutdown --shutdown";
     myth_system(mythshutdown_exe);
 }
 
