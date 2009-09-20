@@ -152,7 +152,7 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     /// \brief Returns dedicated connection. (Required for using temporary SQL tables.)
     static MSqlQueryInfo DDCon();
 
-    static QMutex prepareLock;
+    QMutex prepareLock;
 
   private:
     MSqlDatabase *m_db;
