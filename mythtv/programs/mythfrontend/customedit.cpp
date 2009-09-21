@@ -1,3 +1,5 @@
+#include <QSqlError>
+
 #include "customedit.h"
 
 // libmythdb
@@ -112,7 +114,7 @@ void CustomEdit::loadData(void)
                    "FROM record WHERE search = :SEARCH ORDER BY title;");
     result.bindValue(":SEARCH", kPowerSearch);
 
-    if (result.exec() && result.isActive())
+    if (result.exec())
     {
         while (result.next())
         {
@@ -484,7 +486,7 @@ void CustomEdit::loadClauses()
     result.prepare("SELECT rulename,fromclause,whereclause,search "
                    "FROM customexample;");
 
-    if (result.exec() && result.isActive())
+    if (result.exec())
     {
         while (result.next())
         {
@@ -645,7 +647,7 @@ void CustomEdit::storeClicked(void)
                   "WHERE rulename = :RULE;");
     query.bindValue(":RULE", m_titleEdit->GetText());
 
-    if (query.exec() && query.isActive() && query.next())
+    if (query.exec() && query.next())
     {
         nameExists = true;
         oldwhere = query.value(1).toString();
@@ -718,7 +720,7 @@ bool CustomEdit::checkSyntax(void)
         query.prepare(QString("SELECT NULL FROM (program,channel) "
                               "%1 WHERE\n%2").arg(from).arg(desc));
 
-        if (query.exec() && query.isActive())
+        if (query.exec())
         {
             ret = true;
         }

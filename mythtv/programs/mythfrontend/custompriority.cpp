@@ -1,3 +1,4 @@
+#include <QSqlError>
 
 #include "custompriority.h"
 
@@ -350,7 +351,7 @@ bool CustomPriority::checkSyntax(void)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(qstr);
 
-        if (query.exec() && query.isActive())
+        if (query.exec())
         {
             ret = true;
         }
