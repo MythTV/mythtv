@@ -9,6 +9,8 @@
 #include "mythdb.h"
 #include "mythverbose.h"
 
+QMutex MSqlQuery::prepareLock;
+
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
     m_name = name;
