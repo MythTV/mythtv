@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query Engine";
 __author__="R.D.Vaughan"
-__version__="v0.9.9"        # Version .1 Initial development
+__version__="v0.1.0"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -104,6 +104,8 @@ __version__="v0.9.9"        # Version .1 Initial development
 							# Version .9.8 Added a (-S) option for requesting a thetvdb  
 							#              episode screen shot
 							# Version .9.9 Fixed the -S option when NO episode image exists
+							# Version .1.0 Removed LF and replace with a space for all TVDB metatdata 
+                            #              fields
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -671,6 +673,7 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 				else:
 					text = change_amp(text)
 					value = change_to_commas(text)
+					value = value.replace(u'\n', u' ')
 				key_values[i]=value
 			index = 0
 			if SID == False:
