@@ -374,14 +374,12 @@ PlaybackBox::~PlaybackBox(void)
     if (m_fillListTimer)
     {
         m_fillListTimer->disconnect(this);
-        m_fillListTimer->deleteLater();
         m_fillListTimer = NULL;
     }
 
     if (m_freeSpaceTimer)
     {
         m_freeSpaceTimer->disconnect(this);
-        m_freeSpaceTimer->deleteLater();
         m_freeSpaceTimer = NULL;
     }
 

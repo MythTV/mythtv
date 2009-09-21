@@ -113,7 +113,7 @@ class WorkerThread : public QThread
         QString             m_sName;
 
         long                m_nIdleTimeoutMS;
-        QTimer             *m_timer;
+        QTimer             *m_timer; // audited ref #5318
         WorkerEvent        *m_wakeup;
 
         void                WakeForWork();

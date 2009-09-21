@@ -1,11 +1,16 @@
-#include "xbox.h"
+// ANSI C
+#include <cstdlib>
 
+// POSIX
+#include <unistd.h>
+
+// Qt
+#include <QTimer>
+
+#include "xbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"
 #include "mythsystem.h"
-
-#include <unistd.h>
-#include <stdlib.h>
 
 XBox::XBox(void) :
     timer(NULL),      RecCheck(0),
@@ -19,8 +24,9 @@ void XBox::GetSettings(void)
 {
     if (timer)
     {
+        timer->disconnect();
         timer->stop();
-        delete timer;
+        timer = NULL;
     }
 
     RecordingLED = gContext->GetSetting("XboxLEDRecording","rrrr");

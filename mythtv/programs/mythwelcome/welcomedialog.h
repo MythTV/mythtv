@@ -62,9 +62,9 @@ class WelcomeDialog : public MythScreenType
 
     MythDialogBox *m_menuPopup;
 
-    QTimer        *m_updateStatusTimer;
-    QTimer        *m_updateScreenTimer;
-    QTimer        *m_timeTimer;
+    QTimer        *m_updateStatusTimer; // audited ref #5318
+    QTimer        *m_updateScreenTimer; // audited ref #5318
+    QTimer        *m_timeTimer; // audited ref #5318
 
     QString        m_installDir;
     QString        m_timeFormat;

@@ -312,13 +312,13 @@ WelcomeDialog::~WelcomeDialog()
     gContext->removeListener(this);
 
     if (m_updateStatusTimer)
-        delete m_updateStatusTimer;
+        m_updateStatusTimer->disconnect();
 
     if (m_updateScreenTimer)
-        delete m_updateScreenTimer;
+        m_updateScreenTimer->disconnect();
 
     if (m_timeTimer)
-        delete m_timeTimer;
+        m_timeTimer->disconnect();
 }
 
 void WelcomeDialog::updateTime(void)

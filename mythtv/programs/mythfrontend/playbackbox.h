@@ -386,7 +386,7 @@ class PlaybackBox : public ScheduleCommon
 
     // State Variables ////////////////////////////////////////////////////////
     // Main Recording List support
-    QTimer             *m_fillListTimer;
+    QTimer             *m_fillListTimer; // audited ref #5318
     bool                m_fillListFromCache;
     bool                m_connected;  ///< true if last FillList() succeeded
     QStringList         m_titleList;  ///< list of pages
@@ -424,7 +424,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Free disk space tracking
     bool                m_freeSpaceNeedsUpdate;
-    QTimer             *m_freeSpaceTimer;
+    QTimer             *m_freeSpaceTimer; // audited ref #5318
     int                 m_freeSpaceTotal;
     int                 m_freeSpaceUsed;
 

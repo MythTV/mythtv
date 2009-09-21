@@ -13,5 +13,5 @@ class ConnectToBackend : public QThread
     void Connect(void);
 
   private:
-    QTimer *timer;
+    QTimer *timer; // audited ref #5318
 };

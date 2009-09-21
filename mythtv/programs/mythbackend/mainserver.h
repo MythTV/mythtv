@@ -2,7 +2,6 @@
 #define MAINSERVER_H_
 
 #include <QMap>
-#include <QTimer>
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QEvent>
@@ -27,6 +26,7 @@ using namespace std;
 class ProcessRequestThread;
 class QUrl;
 class MythServer;
+class QTimer;
 
 class MainServer : public QObject, public MythSocketCBs
 {

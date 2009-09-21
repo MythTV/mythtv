@@ -35,6 +35,7 @@ using namespace std;
 #include <QEvent>
 #include <QUrl>
 #include <QTcpServer>
+#include <QTimer>
 
 #include "exitcodes.h"
 #include "mythcontext.h"
