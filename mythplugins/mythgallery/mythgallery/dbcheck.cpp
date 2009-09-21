@@ -3,10 +3,11 @@ using namespace std;
 
 // qt
 #include <QString>
+#include <QSqlError>
 
 // myth
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdb.h"
+#include "mythcontext.h"
+#include "mythdb.h"
 
 // mythgallery
 #include "dbcheck.h"

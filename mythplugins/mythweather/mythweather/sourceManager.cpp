@@ -47,7 +47,7 @@ bool SourceManager::findScriptsDB()
     db.bindValue(":HOST", gContext->GetHostName());
     if (!db.exec())
     {
-        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        MythDB::DBError("Finding weather source scripts for host", db);
         return false;
     }
 
@@ -136,7 +136,7 @@ bool SourceManager::findScripts()
         db.bindValue(":ID", toRemove[i]);
         if (!db.exec())
         {
-            VERBOSE(VB_IMPORTANT,  db.lastError().text());
+            MythDB::DBError("Deleting weather source settings", db);
         }
     }
 
@@ -164,14 +164,16 @@ void SourceManager::setupSources()
 {
     MSqlQuery db(MSqlQuery::InitCon());
 
-    QString query = "SELECT DISTINCT location,weathersourcesettings_sourceid,weatherscreens.units,"
-        "weatherscreens.screen_id FROM weatherdatalayout,weatherscreens "
-        "WHERE weatherscreens.screen_id = weatherscreens_screen_id AND weatherscreens.hostname = :HOST;";
-    db.prepare(query);
+    db.prepare(
+        "SELECT DISTINCT location, weathersourcesettings_sourceid, "
+        "                weatherscreens.units, weatherscreens.screen_id "
+        "FROM weatherdatalayout,weatherscreens "
+        "WHERE weatherscreens.screen_id = weatherscreens_screen_id AND "
+        "      weatherscreens.hostname = :HOST");
     db.bindValue(":HOST", gContext->GetHostName());
     if (!db.exec())
     {
-        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        MythDB::DBError("Finding weather sources for this host", db);
         return;
     }
 

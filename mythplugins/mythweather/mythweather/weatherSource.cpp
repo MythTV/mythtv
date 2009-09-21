@@ -8,7 +8,7 @@
 
 // MythTV headers
 #include <mythcontext.h>
-#include <mythdbcon.h>
+#include <mythdb.h>
 #include <compat.h>
 #include <mythdirs.h>
 
@@ -303,7 +303,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
             db.bindValue(":EMAIL", info.email);
             if (!db.exec())
             {
-                VERBOSE(VB_IMPORTANT, db.lastError().text());
+                MythDB::DBError("Updating weather source settings.", query);
                 return NULL;
             }
         }
@@ -337,7 +337,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         db.bindValue(":TYPES", info.types.join(","));
         if (!db.exec())
         {
-            VERBOSE(VB_IMPORTANT, db.lastError().text());
+            MythDB::DBError("Inserting weather source", query);
             return NULL;
         }
         query = "SELECT sourceid FROM weathersourcesettings "
@@ -349,11 +349,18 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         db.bindValue(":NAME", info.name);
         if (!db.exec())
         {
-            VERBOSE(VB_IMPORTANT, db.lastError().text());
+            MythDB::DBError("Getting weather sourceid", query);
             return NULL;
         }
-        db.next();
-        info.id = db.value(0).toInt();
+        else if (!db.next())
+        {
+            VERBOSE(VB_IMPORTANT, "Error getting weather sourceid");
+            return NULL;
+        }
+        else
+        {
+            info.id = db.value(0).toInt();
+        }
     }
 
     return new ScriptInfo(info);
@@ -608,7 +615,7 @@ void WeatherSource::processExit()
     db.bindValue(":ID", getId());
     if (!db.exec())
     {
-        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        MythDB::DBError("Updating weather source's last update time", db);
         return;
     }
 

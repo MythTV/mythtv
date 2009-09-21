@@ -2,7 +2,7 @@
 using namespace std;
 
 #include <QString>
-//#include <QSqlError>
+#include <QSqlError>
 
 #include "dbcheck.h"
 #include "datadirect.h"          // for DataDirectProcessor::FixProgramIDs

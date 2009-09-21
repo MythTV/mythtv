@@ -1,21 +1,17 @@
 #ifndef MYTHDBCON_H_
 #define MYTHDBCON_H_
 
-#include <iostream>
-
-#include <qsqldatabase.h>
-#include <qvariant.h>
-#include <qsql.h>
-#include <qsqlquery.h>
-#include <qsemaphore.h>
-#include <qsqlerror.h>
-#include <qsqlfield.h>
+#include <QSqlDatabase>
+#include <QVariant>
+#include <QSqlQuery>
 #include <QRegExp>
 #include <QDateTime>
 #include <QMutex>
 #include <QList>
 
 #include "mythexp.h"
+
+class QSemaphore;
 
 /// \brief QSqlDatabase wrapper, used by MSqlQuery. Do not use directly.
 class MPUBLIC MSqlDatabase
@@ -114,10 +110,10 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     bool isConnected(void) { return m_isConnected; }
 
     /// \brief Wrap QSqlQuery::exec() so we can display SQL
-    bool exec(void) __attribute__ ((warn_unused_result));
+    bool exec(void);
 
     /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
-    bool exec(const QString &query) __attribute__ ((warn_unused_result));
+    bool exec(const QString &query);
 
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);

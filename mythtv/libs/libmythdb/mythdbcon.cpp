@@ -1,9 +1,17 @@
-#include "unistd.h"
-#include "stdlib.h"
+// ANSI C
+#include <cstdlib>
 
+// POSIX
+#include "unistd.h"
+
+// Qt
 #include <QVector>
 #include <QSqlDriver>
+#include <QSemaphore>
+#include <QSqlError>
+#include <QSqlField>
 
+// MythTV
 #include "compat.h"
 #include "mythdbcon.h"
 #include "mythdb.h"

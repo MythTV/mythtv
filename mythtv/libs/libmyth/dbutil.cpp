@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QRegExp>
 #include <QDateTime>
+#include <QSqlError>
 
 #include "dbutil.h"
 #include "mythcontext.h"

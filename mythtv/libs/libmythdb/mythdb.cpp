@@ -1,5 +1,6 @@
 #include <QMutex>
 #include <QHash>
+#include <QSqlError>
 
 #include "mythdb.h"
 #include "mythdbcon.h"

@@ -1,11 +1,12 @@
 
 // QT headers
 #include <QApplication>
+#include <QSqlError>
 
 // MythTV headers
-#include <mythdbcon.h>
+//#include <mythdbcon.h>
+#include <mythdb.h>
 #include <mythprogressdialog.h>
-#include <mythtv/mythdb.h>
 
 // MythWeather headers
 #include "weatherScreen.h"

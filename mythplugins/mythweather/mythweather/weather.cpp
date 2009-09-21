@@ -7,7 +7,7 @@
 #include <QApplication>
 
 // MythTV headers
-#include <mythdbcon.h>
+#include <mythdb.h>
 #include <mythcontext.h>
 
 // MythWeather headers
@@ -132,7 +132,7 @@ void Weather::setupScreens()
     db.bindValue(":HOST", gContext->GetHostName());
     if (!db.exec())
     {
-        VERBOSE(VB_IMPORTANT, db.lastError().text());
+        MythDB::DBError("Selecting weather screens.", db);
         return;
     }
 
