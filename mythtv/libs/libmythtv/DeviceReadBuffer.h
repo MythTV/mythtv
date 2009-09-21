@@ -7,9 +7,9 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qstring.h>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QString>
 
 #include "util.h"
 
@@ -88,6 +88,7 @@ class DeviceReadBuffer
     bool             request_pause;
     bool             paused;
     bool             using_poll;
+    uint             max_poll_wait;
 
     size_t           size;
     size_t           used;

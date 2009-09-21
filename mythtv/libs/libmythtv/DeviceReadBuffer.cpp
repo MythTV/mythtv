@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <cassert>
+using namespace std;
 
 #include "DeviceReadBuffer.h"
 #include "mythcontext.h"
@@ -25,7 +25,7 @@ DeviceReadBuffer::DeviceReadBuffer(ReaderPausedCB *cb, bool use_poll)
       run(false),                   running(false),
       eof(false),                   error(false),
       request_pause(false),         paused(false),
-      using_poll(use_poll),
+      using_poll(use_poll),         max_poll_wait(2500 /*ms*/),
 
       size(0),                      used(0),
       dev_read_size(0),             min_read(0),
@@ -54,6 +54,10 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd)
 
     videodevice   = streamName;
     _stream_fd    = streamfd;
+
+    // BEGIN HACK -- see #6897
+    max_poll_wait = (videodevice.contains("dvb")) ? 25000 : 2500;
+    // END HACK
 
     // Setup device ringbuffer
     eof           = false;
@@ -237,7 +241,6 @@ void DeviceReadBuffer::IncrReadPointer(uint len)
     used    -= len;
     readPtr += len;
     readPtr  = (readPtr == endPtr) ? buffer : readPtr;
-    assert(readPtr <= endPtr);
 }
 
 void *DeviceReadBuffer::boot_ringbuffer(void *arg)
@@ -344,7 +347,7 @@ bool DeviceReadBuffer::Poll(void) const
 
         int ret = poll(&polls, 1 /*number of polls*/, 10 /*msec*/);
 
-        if (polls.revents & (POLLERR | POLLHUP | POLLNVAL))
+        if (polls.revents & (POLLHUP | POLLNVAL))
         {
             VERBOSE(VB_IMPORTANT, LOC + "poll error");
             error = true;
@@ -371,9 +374,9 @@ bool DeviceReadBuffer::Poll(void) const
         }
         else //  ret == 0
         {
-            if (timer.elapsed() > 2500 /*ms*/)
+            if (timer.elapsed() > max_poll_wait)
             {
-                VERBOSE(VB_RECORD, LOC_ERR + "Poll giving up");
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Poll giving up");
                 QMutexLocker locker(&lock);
                 error = true;
                 return true;
