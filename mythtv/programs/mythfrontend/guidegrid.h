@@ -70,7 +70,7 @@ class MPUBLIC JumpToChannel : public QObject
     int      previous_start_channel_index;
     int      previous_current_channel_index;
     uint     rows_displayed;
-    QTimer  *timer;
+    QTimer  *timer; // audited ref #5318
 
     static const uint kJumpToChannelTimeout = 3500; // ms
 };
@@ -176,6 +176,8 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     ProgramList GetProgramList(uint chanid) const;
     uint GetAlternateChannelIndex(uint chan_idx, bool with_same_channum) const;
 
+    virtual bool event(QEvent *e);
+
   private:
     bool  m_selectChangesChannel;
     int   m_selectRecThreshold;
@@ -211,7 +213,7 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     TV     *m_player;
     bool    m_usingNullVideo;
     bool    m_embedVideo;
-    QTimer *previewVideoRefreshTimer;
+    QTimer *previewVideoRefreshTimer; // audited ref #5318
     void    EmbedTVWindow(void);
     void    HideTVWindow(void);
     QRect   m_videoRect;
@@ -222,7 +224,7 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     QString m_unknownTitle;
     QString m_unknownCategory;
 
-    QTimer *m_updateTimer;
+    QTimer *m_updateTimer; // audited ref #5318
 
     int               m_changrpid;
     ChannelGroupList  m_changrplist;

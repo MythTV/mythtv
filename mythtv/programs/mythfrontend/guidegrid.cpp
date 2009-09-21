@@ -323,7 +323,7 @@ GuideGrid::~GuideGrid()
     if (m_updateTimer)
     {
         m_updateTimer->disconnect(this);
-        m_updateTimer->deleteLater();
+        m_updateTimer = NULL;
     }
 
     if (previewVideoRefreshTimer)
@@ -2049,9 +2049,33 @@ void GuideGrid::HideTVWindow(void)
     GetMythMainWindow()->GetPaintWindow()->clearMask();
 }
 
+bool GuideGrid::event(QEvent *e)
+{
+    if (e->type() ==  MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if (message == "STOP_VIDEO_REFRESH_TIMER")
+        {
+            previewVideoRefreshTimer->stop();
+            return true;
+        }
+        else if (message == "START_VIDEO_REFRESH_TIMER")
+        {
+            previewVideoRefreshTimer->start(66);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void GuideGrid::EmbedTVWindow(void)
 {
-    previewVideoRefreshTimer->stop();
+    MythEvent *me = new MythEvent("STOP_VIDEO_REFRESH_TIMER");
+    qApp->postEvent(this, me);
+
     if (m_embedVideo)
     {
         PlayerContext *ctx =
@@ -2067,7 +2091,8 @@ void GuideGrid::EmbedTVWindow(void)
         }
         else
         {
-            previewVideoRefreshTimer->start(66);
+            me = new MythEvent("START_VIDEO_REFRESH_TIMER");
+            qApp->postEvent(this, me);
         }
         m_player->ReturnPlayerLock(ctx);
     }

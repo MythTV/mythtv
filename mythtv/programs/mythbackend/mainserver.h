@@ -220,11 +220,10 @@ class MainServer : public QObject, public MythSocketCBs
     };
 
     QMutex deferredDeleteLock;
-    QTimer *deferredDeleteTimer;
+    QTimer *deferredDeleteTimer; // audited ref #5318
     MythDeque<DeferredDeleteStruct> deferredDeleteList;
 
-    QTimer *autoexpireUpdateTimer;
-
+    QTimer *autoexpireUpdateTimer; // audited ref #5318
     static QMutex truncate_and_close_lock;
 
     int m_exitCode;

@@ -37,7 +37,8 @@ HttpComms::~HttpComms()
 {
     if (m_timer)
     {
-        delete m_timer;
+        m_timer->disconnect();
+        m_timer->deleteLater();
         m_timer = NULL;
     }
 
