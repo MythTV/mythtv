@@ -45,7 +45,7 @@
             <position>236,580</position>
         </textarea>
 
-        <textarea name="favorite" from="systemlabel">
+        <textarea name="favoritelabel" from="systemlabel">
             <position>96,615</position>
             <value>Favorite:</value>
         </textarea>
@@ -53,7 +53,7 @@
         <statetype name="favorite">
             <area>236,615,580,35</area>
             <state name="no">
-                <textarea name="favorite" from="systemname">
+                <textarea name="favorite" from="basetextarea">
                     <position>0,0</position>
                     <value>No</value>
                 </textarea>
