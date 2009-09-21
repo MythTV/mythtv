@@ -2079,12 +2079,17 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                                  "server has gone away for some reason.. "
                                  "Is it running?"));
                 else
+                {
+                    QMutexLocker locker(&d->MBEconnectPopupLock);
                     if (!d->MBEconnectPopup)
+                    {
                         d->MBEconnectPopup = ShowOkPopup(
                             QObject::tr(
                                 "The connection to the master backend "
                                 "server has gone away for some reason.. "
                                 "Is it running?"));
+                    }
+                }
             }
 
             if (!block)
