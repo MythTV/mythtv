@@ -51,10 +51,9 @@
     </textarea>
 
     <statetype name="favorite">
-        <area>178,525,500,35</area>
         <state name="no">
             <textarea name="favorite" from="basetextarea">
-                <position>0,0</position>
+                <area>178,525,500,35</area>
                 <value>No</value>
             </textarea>
         </state>
