@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="pl_PL">
 <context>
     <name>MythNews</name>
     <message>
@@ -42,35 +44,35 @@
     <name>MythNewsEditor</name>
     <message>
         <source>Edit Site Details</source>
-        <translation type="unfinished">Edytuj szczegóły strony</translation>
+        <translation>Edytuj szczegóły strony</translation>
     </message>
     <message>
         <source>Enter Site Details</source>
-        <translation type="unfinished">Wprowadź szczegóły strony</translation>
+        <translation>Wprowadź szczegóły strony</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished">Nazwa:</translation>
+        <translation>Nazwa:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Icon:</source>
-        <translation type="unfinished">Ikona:</translation>
+        <translation>Ikona:</translation>
     </message>
     <message>
         <source>Podcast:</source>
-        <translation type="unfinished">Podkast:</translation>
+        <translation>Podkast:</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuluj</translation>
+        <translation>Anuluj</translation>
     </message>
 </context>
 <context>
