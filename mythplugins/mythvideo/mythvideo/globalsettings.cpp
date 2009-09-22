@@ -250,7 +250,7 @@ HostLineEdit *GetTVBannerCommand()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TVBannerCommandLine");
     gc->setLabel(QObject::tr("Command to search for TV banners"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -tB");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -B");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;

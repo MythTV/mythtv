@@ -1272,7 +1272,7 @@ namespace
 
             const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -tB"));
+                    .arg("mythvideo/scripts/ttvdb.py -B"));
             const QString cmd = gContext->GetSetting("mythvideo.TVBannerCommandLine",
                                                         def_cmd);
             QStringList args;
