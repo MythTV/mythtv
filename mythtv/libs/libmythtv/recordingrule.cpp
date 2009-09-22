@@ -232,6 +232,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
     else
     {
         QString searchType;
+        m_searchType = lsearch;
         switch (m_searchType)
         {
             case kPowerSearch:
