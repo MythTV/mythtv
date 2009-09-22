@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.5.1" # 0.1.0 Initial development 
+__version__=u"v0.5.2" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -206,6 +206,8 @@ __version__=u"v0.5.1" # 0.1.0 Initial development
                      #       graphics for other languages were available. Now if there are no selected
                      #       language graphics English graphics are the fall back and if there are no 
                      #       English graphics then any available graphics will be returned.
+					 # 0.5.2 Fixed an abort when trying to add a storage group graphics without a 
+                     #       proper file path.  
 			
 
 usage_txt=u'''
@@ -5427,17 +5429,18 @@ class MythTvMetaData(VideoFiles):
 									if available_metadata[graphic_type] == None:
 										tmp = self._getTvdbGraphics(cfile, graphic_type, toprated=True)
 										if tmp!= None:
-											filepath, filename = os.path.split(tmp)
+											tmp_fullfilename = self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type])
+											filepath, filename = os.path.split(tmp_fullfilename)
 											baseFilename, ext = os.path.splitext( filename )
 											baseFilename = baseFilename.replace(self.graphic_suffix[graphic_type], u'')
 											newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename, available_metadata['season'], self.graphic_suffix[graphic_type], ext)
 											if self.config['simulation']:
 												sys.stdout.write(
-													u"Simulation copy (%s) to (%s)\n" % (tmp,newFilename)
+													u"Simulation copy (%s) to (%s)\n" % (tmp_fullfilename,newFilename)
 												)
 											else:
 												self._displayMessage(u"Coping existing graphic %s for  series (%s)" % (graphic_type, available_metadata['title']))
-												shutil.copy2(self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type]), newFilename)
+												shutil.copy2(tmp_fullfilename, newFilename)
 											if graphic_type == 'coverfile':
 												self._displayMessage("1-Added a poster for(%s)" % cfile['filename'])
 												num_posters_downloads+=1
