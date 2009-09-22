@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query Engine";
 __author__="R.D.Vaughan"
-__version__="v0.1.0"        # Version .1 Initial development
+__version__="v1.0.0"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -104,7 +104,7 @@ __version__="v0.1.0"        # Version .1 Initial development
 							# Version .9.8 Added a (-S) option for requesting a thetvdb  
 							#              episode screen shot
 							# Version .9.9 Fixed the -S option when NO episode image exists
-							# Version .1.0 Removed LF and replace with a space for all TVDB metatdata 
+							# Version 1.0. Removed LF and replace with a space for all TVDB metatdata 
                             #              fields
 
 usage_txt='''
