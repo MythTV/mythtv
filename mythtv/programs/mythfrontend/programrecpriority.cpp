@@ -1634,11 +1634,9 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
     QMap<QString, ProgramRecPriorityInfo>::iterator it;
     for (it = m_programData.begin(); it != m_programData.end(); it++)
     {
-        VERBOSE(VB_IMPORTANT, QString("Iterating %1").arg(it.key()));
         ProgramRecPriorityInfo *value = &(it.value());
         if (value == pgRecInfo)
         {
-            VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(it.key()));
             m_programData.erase(it);
             break;
         }
