@@ -24,8 +24,6 @@ class VideoScanner;
 
 class QUrl;
 
-typedef QMap<QString, QString> SearchListResults;
-
 enum CoverDownloadErrorState { esOK, esError, esTimeout };
 enum ScreenshotDownloadErrorState { ssesOK, ssesError, ssesTimeout };
 enum FanartDownloadErrorState { fesOK, fesError, fesTimeout };
@@ -205,13 +203,13 @@ class VideoDialog : public MythScreenType
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,
-                                  const SearchListResults &results,
+                                  const QStringList &results,
                                   Metadata *metadata);
     void OnVideoSearchByTitleSubtitleDone(bool normal_exit,
                                   QStringList result,
                                   Metadata *metadata);
     void OnVideoImageOnlyDone(bool normal_exit,
-                                  const SearchListResults &results,
+                                  const QStringList &results,
                                   Metadata *metadata);
 
 // and now the end points

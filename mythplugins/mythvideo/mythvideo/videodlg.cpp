@@ -923,7 +923,7 @@ namespace
         Q_OBJECT
 
       signals:
-        void SigSearchResults(bool normal_exit, const SearchListResults &items,
+        void SigSearchResults(bool normal_exit, const QStringList &items,
                 Metadata *item);
 
       public:
@@ -966,18 +966,7 @@ namespace
         {
             (void) err;
 
-            SearchListResults results;
-            if (normal_exit)
-            {
-                for (QStringList::const_iterator p = out.begin();
-                        p != out.end(); ++p)
-                {
-                    results.insert((*p).section(':', 0, 0),
-                            (*p).section(':', 1));
-                }
-            }
-
-            emit SigSearchResults(normal_exit, results, m_item);
+            emit SigSearchResults(normal_exit, out, m_item);
             deleteLater();
         }
 
@@ -1228,14 +1217,19 @@ namespace
             QString url;
             if (normal_exit && out.size())
             {
-                for (QStringList::const_iterator p = out.begin();
-                        p != out.end(); ++p)
+                if (m_item->GetSeason() >= 1 && out.count() >= m_item->GetSeason())
+                    url = out.takeAt(out.count() - m_item->GetSeason());
+                else
                 {
-                    if ((*p).length())
-                    {
-                        url = *p;
-                        break;
-                    }
+                    for (QStringList::const_iterator p = out.begin();
+                            p != out.end(); ++p)
+                    { 
+                        if ((*p).length())
+                        {
+                            url = *p;
+                            break;
+                        }
+                    } 
                 }
             }
 
@@ -1441,7 +1435,7 @@ namespace
 
       public:
         SearchResultsDialog(MythScreenStack *lparent,
-                const SearchListResults &results) :
+                const QStringList &results) :
             MythScreenType(lparent, "videosearchresultspopup"),
             m_results(results), m_resultsList(0)
         {
@@ -1460,14 +1454,13 @@ namespace
                 return false;
             }
 
-            QMapIterator<QString, QString> resultsIterator(m_results);
-            while (resultsIterator.hasNext())
+            for (QStringList::const_iterator i = m_results.begin();
+                    i != m_results.end(); ++i)
             {
-                resultsIterator.next();
-                MythUIButtonListItem *button =
-                    new MythUIButtonListItem(m_resultsList,
-                            resultsIterator.value());
-                QString key = resultsIterator.key();
+                QString key = ((*i).left((*i).indexOf(':')));
+                QString value = ((*i).right((*i).length() - (*i).indexOf(":") - 1));
+                MythUIButtonListItem *button = new MythUIButtonListItem(m_resultsList, value);
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Inserting into ButtonList: %1:%2").arg(key).arg(value));
                 button->SetData(key);
             }
 
@@ -1484,7 +1477,7 @@ namespace
         void haveResult(QString);
 
       private:
-        SearchListResults m_results;
+        QStringList m_results;
         MythUIButtonList *m_resultsList;
 
       private slots:
@@ -4485,9 +4478,9 @@ void VideoDialog::ImageOnlyDownload()
         createBusyDialog(title);
 
         VideoTitleSearch *vts = new VideoTitleSearch(this);
-        connect(vts, SIGNAL(SigSearchResults(bool, const SearchListResults &,
+        connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
                                 Metadata *)),
-                SLOT(OnVideoImageOnlyDone(bool, const SearchListResults &,
+                SLOT(OnVideoImageOnlyDone(bool, const QStringList &,
                                 Metadata *)));
         vts->Run(title, metadata);
     }
@@ -5531,22 +5524,22 @@ void VideoDialog::StartVideoSearchByTitle(QString video_uid, QString title,
         createBusyDialog(title);
 
         VideoTitleSearch *vts = new VideoTitleSearch(this);
-        connect(vts, SIGNAL(SigSearchResults(bool, const SearchListResults &,
+        connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
                                 Metadata *)),
-                SLOT(OnVideoSearchByTitleDone(bool, const SearchListResults &,
+                SLOT(OnVideoSearchByTitleDone(bool, const QStringList &,
                                 Metadata *)));
         vts->Run(title, metadata);
     }
     else
     {
-        SearchListResults videos;
-        videos.insertMulti(video_uid, title);
+        QStringList videos;
+        videos.append(QString("%1:%2").arg(video_uid).arg(title));
         OnVideoSearchByTitleDone(true, videos, metadata);
     }
 }
 
 void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
-        const SearchListResults &results, Metadata *metadata)
+        const QStringList &results, Metadata *metadata)
 {
     if (m_busyPopup)
     {
@@ -5561,15 +5554,19 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
 
     if (results.size() == 1)
     {
+        QString keyValue = results.first();
+        QString key = (keyValue.left(keyValue.indexOf(':')));
+        QString value = (keyValue.right(keyValue.length() - keyValue.indexOf(":") - 1));
+
         // Only one search result, fetch data.
-        if (results.begin().value().isEmpty())
+        if (value.isEmpty())
         {
             metadata->Reset();
             metadata->UpdateDatabase();
             UpdateItem(GetItemCurrent());
             return;
         }
-        StartVideoSearchByUID(results.begin().key(), metadata);
+        StartVideoSearchByUID(key, metadata);
     }
     else if (results.size() < 1)
     {
@@ -5590,7 +5587,7 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
 }
 
 void VideoDialog::OnVideoImageOnlyDone(bool normal_exit,
-        const SearchListResults &results, Metadata *metadata)
+        const QStringList &results, Metadata *metadata)
 {
     if (m_busyPopup)
     {
@@ -5605,12 +5602,16 @@ void VideoDialog::OnVideoImageOnlyDone(bool normal_exit,
 
     if (results.size() == 1)
     {
+        QString keyValue = results.first();
+        QString key = (keyValue.left(keyValue.indexOf(':')));
+        QString value = (keyValue.right(keyValue.length() - keyValue.indexOf(":") - 1));
+
         // Only one search result, fetch data.
-        if (results.begin().value().isEmpty())
+        if (value.isEmpty())
             return;
         else
         {
-            metadata->SetInetRef(results.begin().key());
+            metadata->SetInetRef(key);
             metadata->UpdateDatabase();
             UpdateItem(GetItemCurrent());
             StartVideoImageSet(metadata);
