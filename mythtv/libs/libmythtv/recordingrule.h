@@ -122,6 +122,13 @@ class MPUBLIC RecordingRule
     bool m_isOverride;
     
   private:
+    // Populate variables from a ProgramInfo object
+    void AssignProgramInfo();
+      
+    // Pointer for ProgramInfo, exists only if we loaded from ProgramInfo in
+    // the first place
+    const ProgramInfo *m_progInfo;
+    
     // Internal strings for insertion into the RuleMap and display in the UI
     QString m_searchTypeString;
     QString m_searchFor;

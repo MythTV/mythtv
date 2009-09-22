@@ -52,6 +52,7 @@ RecordingRule::RecordingRule()
     m_recordTable("record"),
     m_tempID(0),
     m_isOverride(false),
+    m_progInfo(NULL),
     m_loaded(false)
 {
 }
@@ -151,6 +152,8 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 {
     if (!proginfo)
         return false;
+
+    m_progInfo = proginfo;
     
     if (proginfo->recordid)
     {
@@ -161,37 +164,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
 
     if (m_searchType == kNoSearch || m_searchType == kManualSearch)
     {
-        m_title = proginfo->title;
-        m_subtitle = proginfo->subtitle;
-        m_description = proginfo->description;
-        m_channelid = proginfo->chanid.toInt();
-        m_station = proginfo->chansign;
-        m_startdate = proginfo->startts.date();
-        m_starttime = proginfo->startts.time();
-        m_enddate = proginfo->endts.date();
-        m_endtime = proginfo->endts.time();
-        m_seriesid = proginfo->seriesid;
-        m_programid = proginfo->programid;
-        if (m_findday < 0)
-        {
-            m_findday = (proginfo->startts.date().dayOfWeek() + 1) % 7;
-            m_findtime = proginfo->startts.time();
-
-            QDate epoch(1970, 1, 1);
-            m_findid = epoch.daysTo(proginfo->startts.date()) + 719528;
-        }
-        else
-        {
-            if (m_findid > 0)
-                m_findid = proginfo->findid;
-            else
-            {
-                QDate epoch(1970, 1, 1);
-                m_findid = epoch.daysTo(proginfo->startts.date()) + 719528;
-            }
-        }
-        m_category = proginfo->category;
-        
+        AssignProgramInfo();
         if (!proginfo->recordid)
             m_playGroup = PlayGroup::GetInitialName(proginfo);
     }
@@ -304,6 +277,8 @@ bool RecordingRule::MakeOverride(void)
     if (m_searchType != kManualSearch)
         m_searchType = kNoSearch;
 
+    AssignProgramInfo();
+    
     return true;
 }
 
@@ -570,4 +545,41 @@ void RecordingRule::UseTempTable(bool usetemp, QString table)
         m_recordTable = "record";
         m_tempID = 0;
     }
+}
+
+void RecordingRule::AssignProgramInfo()
+{
+    if (!m_progInfo)
+        return;
+
+    m_title = m_progInfo->title;
+    m_subtitle = m_progInfo->subtitle;
+    m_description = m_progInfo->description;
+    m_channelid = m_progInfo->chanid.toInt();
+    m_station = m_progInfo->chansign;
+    m_startdate = m_progInfo->startts.date();
+    m_starttime = m_progInfo->startts.time();
+    m_enddate = m_progInfo->endts.date();
+    m_endtime = m_progInfo->endts.time();
+    m_seriesid = m_progInfo->seriesid;
+    m_programid = m_progInfo->programid;
+    if (m_findday < 0)
+    {
+        m_findday = (m_progInfo->startts.date().dayOfWeek() + 1) % 7;
+        m_findtime = m_progInfo->startts.time();
+
+        QDate epoch(1970, 1, 1);
+        m_findid = epoch.daysTo(m_progInfo->startts.date()) + 719528;
+    }
+    else
+    {
+        if (m_findid > 0)
+            m_findid = m_progInfo->findid;
+        else
+        {
+            QDate epoch(1970, 1, 1);
+            m_findid = epoch.daysTo(m_progInfo->startts.date()) + 719528;
+        }
+    }
+    m_category = m_progInfo->category;
 }
