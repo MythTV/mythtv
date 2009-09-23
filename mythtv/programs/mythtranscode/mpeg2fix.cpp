@@ -565,7 +565,7 @@ void MPEG2replex::Start()
                    video_delay, audio_delay, fd_out, fill_buffers,
                    &vrbuf, &index_vrbuf, extrbuf, index_extrbuf,
                    ac3extrbuf, index_ac3extrbuf,
-		   otype);
+                   otype);
 
     VERBOSE(MPF_RPLXQUEUE, QString("  Finished:  init_multiplex "));
     setup_multiplex(&mx);
@@ -575,7 +575,7 @@ void MPEG2replex::Start()
     {
         check_times( &mx, &video_ok, ext_ok, ac3_ok, &start);
         VERBOSE(MPF_RPLXQUEUE, QString("  vid_ok: %1 ext_ok: %2  ac3_ok: %3  ")
-			.arg(video_ok).arg(ext_ok[0]).arg(ac3_ok[0]));
+                                .arg(video_ok).arg(ext_ok[0]).arg(ac3_ok[0]));
         write_out_packs( &mx, video_ok, ext_ok, ac3_ok);
     }
 }
@@ -826,11 +826,11 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                     break;
                 }
                 if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3)
-	        {
+                {
                     aud_map[i] = ac3_count++;
                     aFrame[i] = Q3PtrList<MPEG2frame> ();
-		}
-		else if (/* inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3 || */
+                }
+                else if (/* inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3 || */
                     inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
                     inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
                 {
@@ -1159,7 +1159,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (! out_codec)
     {
-	free(picture);
+        free(picture);
         VERBOSE(MPF_IMPORTANT, "Couldn't find MPEG2 encoder");
         return 1;
     }
@@ -1433,7 +1433,7 @@ bool MPEG2fixup::FindStart()
                     //Check all video sequence packets against current
                     //audio packet
                     MPEG2frame *found = NULL;
-		    while (vFrame.current())
+                    while (vFrame.current())
                     {
                         if(vFrame.current()->isSequence)
                         {
@@ -1441,7 +1441,7 @@ bool MPEG2fixup::FindStart()
                                                      vFrame.current()->pkt.pts);
                             if (dlta1 >= -180000 && dlta1 <= 180000)
                             {
-				found = vFrame.current();
+                                found = vFrame.current();
                                 delta = dlta1;
                                 break;
                             }
@@ -1472,14 +1472,14 @@ bool MPEG2fixup::FindStart()
                 }
                 if (delta < 0 && af->count() > 1)
                 {
-		    int aud_cmp = cmp2x33(af->next()->pkt.pts, vFrame.first()->pkt.pts);
+                    int aud_cmp = cmp2x33(af->next()->pkt.pts, vFrame.first()->pkt.pts);
 
                     VERBOSE(MPF_PROCESS,
                                 QString("Looking for A packet from stream %1  delta %2 cmp2x33 %3")
                                         .arg(it.key()).arg(delta).arg(aud_cmp));
                     //if (cmp2x33(af->next()->pkt.pts,
                     //            vFrame.first()->pkt.pts) > 0)
-		    if (aud_cmp > 0)
+                    if (aud_cmp > 0)
                     {
                         VERBOSE(MPF_PROCESS, QString("Found useful audio "
                                 "frame from stream %1").arg(it.key()));
@@ -1569,14 +1569,17 @@ MPEG2frame *MPEG2fixup::FindFrameNum(int frameNum)
 
 void MPEG2fixup::RenumberFrames(int start_pos, int delta)
 {
+    // FIXME: We sometimes end up here with invalid frames pointers in the list
+    //        which needs fixing - symptom is segfaults of mythtranscode when
+    //        dereferencing the iterator value
     Q3PtrListIterator<MPEG2frame> it (vFrame);
-
+    
     it+= start_pos;
 
     while (!it.atLast() || (it.atFirst() && (*it)->isSequence))
     {
         SetFrameNum((*it)->framePos,
-                      GetFrameNum((*it)) + delta);
+                    GetFrameNum((*it)) + delta);
         (*it)->mpeg2_pic.temporal_reference += delta;
 
         ++it;
@@ -2563,7 +2566,7 @@ int main(int argc, char **argv)
                 break;
 
             case 'e':
-		if (strlen(optarg) == 3 && strncmp(optarg, "dvd", 3) == 0)
+                if (strlen(optarg) == 3 && strncmp(optarg, "dvd", 3) == 0)
                     otype = REPLEX_DVD;
                 break;
 
