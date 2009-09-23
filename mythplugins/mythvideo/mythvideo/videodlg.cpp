@@ -1051,7 +1051,7 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -mD"));
+                    .arg("mythvideo/scripts/ttvdb.py -D"));
                 const QString cmd = gContext->GetSetting("mythvideo.TVDataCommandLine",
                                                         def_cmd);
                 QStringList args;
@@ -1112,7 +1112,7 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -mP"));
+                    .arg("mythvideo/scripts/ttvdb.py -P"));
                 const QString cmd = gContext->GetSetting("mythvideo.TVPosterCommandLine",
                                                         def_cmd);
                 QStringList args;
