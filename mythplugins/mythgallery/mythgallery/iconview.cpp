@@ -15,6 +15,9 @@
  *
  * ============================================================ */
 
+// POSIX headers
+#include <unistd.h>
+
 // ANSI C headers
 #include <cmath>
 
