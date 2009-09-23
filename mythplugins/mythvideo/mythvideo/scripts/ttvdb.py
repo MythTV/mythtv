@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query Engine";
 __author__="R.D.Vaughan"
-__version__="v1.0.0"        # Version .1 Initial development
+__version__="v1.0.1"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -106,6 +106,8 @@ __version__="v1.0.0"        # Version .1 Initial development
 							# Version .9.9 Fixed the -S option when NO episode image exists
 							# Version 1.0. Removed LF and replace with a space for all TVDB metatdata 
                             #              fields
+							# Version 1.0.1 Return all graphics (series and season) in the order 
+							#               highest to lowest as rated by users 
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -393,6 +395,76 @@ class OutStreamEncoder(object):
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
+# Alternate tvdb_api's method for retrieving graphics URLs but returned as a list that preserves
+# the user rating order highest rated to lowest rated
+def _ttvdb_parseBanners(self, sid):
+	"""Parses banners XML, from
+	http://www.thetvdb.com/api/[APIKEY]/series/[SERIES ID]/banners.xml
+
+	Banners are retrieved using t['show name]['_banners'], for example:
+
+	>>> t = Tvdb(banners = True)
+	>>> t['scrubs']['_banners'].keys()
+	['fanart', 'poster', 'series', 'season']
+	>>> t['scrubs']['_banners']['poster']['680x1000']['35308']['_bannerpath']
+	'http://www.thetvdb.com/banners/posters/76156-2.jpg'
+	>>>
+
+	Any key starting with an underscore has been processed (not the raw
+	data from the XML)
+
+	This interface will be improved in future versions.
+	Changed in this interface is that a list or URLs is created to preserve the user rating order from
+	top rated to lowest rated. 
+	"""
+
+	self.log.debug('Getting season banners for %s' % (sid))
+	bannersEt = self._getetsrc( self.config['url_seriesBanner'] % (sid) )
+	banners = {}
+	bid_order = {'fanart': [], 'poster': [], 'series': [], 'season': []}
+	for cur_banner in bannersEt.findall('Banner'):
+		bid = cur_banner.find('id').text
+		btype = cur_banner.find('BannerType')
+		btype2 = cur_banner.find('BannerType2')
+		if btype is None or btype2 is None:
+			continue
+		btype, btype2 = btype.text, btype2.text
+		if not btype in banners:
+			banners[btype] = {}
+		if not btype2 in banners[btype]:
+			banners[btype][btype2] = {}
+		if not bid in banners[btype][btype2]:
+			banners[btype][btype2][bid] = {}
+			if btype in bid_order.keys():
+				if btype2 != u'blank':
+					bid_order[btype].append([bid, btype2])
+
+		self.log.debug("Banner: %s", bid)
+		for cur_element in cur_banner.getchildren():
+			tag = cur_element.tag.lower()
+			value = cur_element.text
+			if tag is None or value is None:
+				continue
+			tag, value = tag.lower(), value.lower()
+			self.log.debug("Banner info: %s = %s" % (tag, value))
+			banners[btype][btype2][bid][tag] = value
+
+		for k, v in banners[btype][btype2][bid].items():
+			if k.endswith("path"):
+				new_key = "_%s" % (k)
+				self.log.debug("Transforming %s to %s" % (k, new_key))
+				new_url = self.config['url_artworkPrefix'] % (v)
+				self.log.debug("New banner URL: %s" % (new_url))
+				banners[btype][btype2][bid][new_key] = new_url
+
+	graphics_in_order = {'fanart': [], 'poster': [], 'series': [], 'season': []}
+	for key in bid_order.keys():
+		for bid in bid_order[key]:
+			graphics_in_order[key].append(banners[key][bid[1]][bid[0]])
+	return graphics_in_order
+tvdb_api.Tvdb.ttvdb_parseBanners = _ttvdb_parseBanners
+# end _ttvdb_parseBanners()
+
 # new Tvdb method to search for a series and return it's sid
 def _series_by_sid(self, sid):
 	"Lookup a series via it's sid"
@@ -483,53 +555,44 @@ def get_graphics(t, opts, series_season_ep, graphics_type, single_option, langua
 	else:
 		series_name=series_season_ep[0] # Leave the series name alone
 
-	if graphics_type == fanart_type: # Series fanart graphics
-		lowres_items=[]
-		hires_items=[]
-		lowres_flag=True
-		highres_flag=True
-		try:
-			lowres_items=search_for_series(t, series_name).data[banners][fanart_key][fanart_lowres_key].values()
-		except:
-			lowres_flag=False
-		try:
-			hires_items=search_for_series(t, series_name).data[banners][fanart_key][fanart_hires_key].values()
-		except:
-			highres_flag=False
-		if highres_flag==False and lowres_flag==False:
-			return []
-		for item in lowres_items:
-			graphics.append(item)
-		for item in hires_items:
-			graphics.append(item)
-	elif len(series_season_ep) == 1:
-		if graphics_type == banner_type: # Series Banners
-			try:
-				graphics=[b for b in
-						search_for_series(t, series_name).data[banners][banner_key][banner_series_key].values()]
-			except:
-				return []
-		else: # Series Posters
-			try:
-				graphics=[b for b in
-						search_for_series(t, series_name).data[banners][poster_key][poster_series_key].values()]
-			except:
-				return []
+	if SID == True:
+		URLs = t.ttvdb_parseBanners(series_name)
 	else:
+		URLs = t.ttvdb_parseBanners(t._nameToSid(series_name))
+
+	if graphics_type == fanart_type: # Series fanart graphics
+		if not len(URLs[u'fanart']):
+			return []
+		for url in URLs[u'fanart']:
+			graphics.append(url)
+	elif len(series_season_ep) == 1:
+		if not len(URLs[u'series']):
+			return []
+		if graphics_type == banner_type: # Series Banners
+			for url in URLs[u'series']:
+				graphics.append(url)
+		else: # Series Posters
+			for url in URLs[u'poster']:
+				graphics.append(url)
+	else:
+		if not len(URLs[u'season']):
+			return []
 		if graphics_type == banner_type: # Season Banners
-			try:
-				graphics=[b for b in
-						search_for_series(t, series_name).data[banners][season_key][banner_season_key].values()
-						if b[season_key] == series_season_ep[1]]
-			except:
+			season_banners=[]
+			for url in URLs[u'season']:
+				if url[u'bannertype2'] == u'seasonwide' and url[u'season'] == series_season_ep[1]:
+					season_banners.append(url)
+			if not len(season_banners):
 				return []
+			graphics = season_banners
 		else: # Season Posters
-			try:
-				graphics=[b for b in
-						search_for_series(t, series_name).data[banners][season_key][poster_season_key].values()
-						if b[season_key] == series_season_ep[1]]
-			except:
+			season_posters=[]
+			for url in URLs[u'season']:
+				if url[u'bannertype2'] == u'season' and url[u'season'] == series_season_ep[1]:
+					season_posters.append(url)
+			if not len(season_posters):
 				return []
+			graphics = season_posters
 
 	graphicsURLs=[]
 	if single_option==False:
@@ -546,7 +609,6 @@ def get_graphics(t, opts, series_season_ep, graphics_type, single_option, langua
 
 	if len(graphicsURLs) == 1 and graphicsURLs[0] == graphics_type+':':
 		return [] # Due to the language filter there may not be any URLs
-
 	return(graphicsURLs)
 # end get_graphics
 

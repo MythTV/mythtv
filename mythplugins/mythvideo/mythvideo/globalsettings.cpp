@@ -240,7 +240,7 @@ HostLineEdit *GetTVFanartCommand()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TVFanartCommandLine");
     gc->setLabel(QObject::tr("Command to search for TV fanart"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -tF");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -F");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;

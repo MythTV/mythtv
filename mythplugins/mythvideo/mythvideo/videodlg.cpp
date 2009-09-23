@@ -1188,7 +1188,7 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -tF"));
+                    .arg("mythvideo/scripts/ttvdb.py -F"));
                 const QString cmd = gContext->GetSetting("mythvideo.TVFanartCommandLine",
                                                         def_cmd);
                 QStringList args;
@@ -1218,7 +1218,7 @@ namespace
             if (normal_exit && out.size())
             {
                 if (m_item->GetSeason() >= 1 && out.count() >= m_item->GetSeason())
-                    url = out.takeAt(out.count() - m_item->GetSeason());
+                    url = out.takeAt(m_item->GetSeason() - 1);
                 else
                 {
                     for (QStringList::const_iterator p = out.begin();
