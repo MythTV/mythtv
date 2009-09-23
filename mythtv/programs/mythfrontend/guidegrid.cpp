@@ -2051,7 +2051,7 @@ void GuideGrid::HideTVWindow(void)
 
 bool GuideGrid::event(QEvent *e)
 {
-    if (e->type() ==  MythEvent::MythEventMessage)
+    if ((MythEvent::Type)(e->type()) ==  MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();

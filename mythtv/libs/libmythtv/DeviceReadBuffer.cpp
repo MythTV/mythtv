@@ -374,7 +374,7 @@ bool DeviceReadBuffer::Poll(void) const
         }
         else //  ret == 0
         {
-            if (timer.elapsed() > max_poll_wait)
+            if ((uint)timer.elapsed() > max_poll_wait)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Poll giving up");
                 QMutexLocker locker(&lock);
