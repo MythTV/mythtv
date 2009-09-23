@@ -646,6 +646,8 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
  */
 void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 {
+    // NOTE: Format changes and relevant additions made here should be
+    //       reflected in RecordingRule
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString fullDateFormat = dateFormat;
