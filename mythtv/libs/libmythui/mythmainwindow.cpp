@@ -53,7 +53,7 @@
 #include "mythevent.h"
 #include "mythdirs.h"
 
-/* from libmyth */
+/* from libmythui */
 #include "screensaver.h"
 
 #ifdef USING_VDPAU
