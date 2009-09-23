@@ -5519,7 +5519,24 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
 void VideoDialog::StartVideoSearchByTitle(QString video_uid, QString title,
                                             Metadata *metadata)
 {
-    if (video_uid == VIDEO_INETREF_DEFAULT || video_uid.isEmpty())
+    if (video_uid.isEmpty())
+    {
+        createBusyDialog(title);
+
+        metadata->SetTitle(Metadata::FilenameToMeta(metadata->GetFilename(), 1));
+        QString seas = Metadata::FilenameToMeta(metadata->GetFilename(), 2);
+        metadata->SetSeason(seas.toInt());
+        QString ep = Metadata::FilenameToMeta(metadata->GetFilename(), 3);
+        metadata->SetEpisode(ep.toInt());
+
+        VideoTitleSearch *vts = new VideoTitleSearch(this);
+        connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
+                                Metadata *)),
+                SLOT(OnVideoSearchByTitleDone(bool, const QStringList &,
+                                Metadata *)));
+        vts->Run(title, metadata);
+    }
+    else if (video_uid == VIDEO_INETREF_DEFAULT)
     {
         createBusyDialog(title);
 
