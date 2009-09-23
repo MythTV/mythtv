@@ -297,7 +297,7 @@ void GameUI::updateRomInfo(RomInfo *rom)
         m_gameSystemText->SetText(rom->System());
     if (m_gameYearText)
         m_gameYearText->SetText(rom->Year());
-    if (m_gamePlotText)
+    if (m_gameGenreText)
         m_gameGenreText->SetText(rom->Genre());
     if (m_gamePlotText)
         m_gamePlotText->SetText(rom->Plot());
