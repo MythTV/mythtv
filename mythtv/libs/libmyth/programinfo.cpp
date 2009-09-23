@@ -832,6 +832,10 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
                           recstartts.time().toString(timeFormat) + " - " +
                           recendts.time().toString(timeFormat);
 
+    progMap["starttimedate"] =
+                          recstartts.date().toString(dateFormat) + ", " +
+                          recstartts.time().toString(timeFormat);
+                          
     progMap["shortstarttimedate"] =
                           recstartts.date().toString(shortDateFormat) + " " +
                           recstartts.time().toString(timeFormat);
@@ -869,7 +873,7 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     if (stars)
     {
         QString str = QObject::tr("%n star(s)", "", (int)(stars * 4));
-        progMap["yearstars"] = QString("(%1, %2) ").arg(year).arg(str);
+        progMap["yearstars"] = QString("(%1, %2)").arg(year).arg(str);
     }
     else
         progMap["yearstars"] = "";
