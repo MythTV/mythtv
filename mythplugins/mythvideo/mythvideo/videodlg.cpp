@@ -5519,7 +5519,7 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
 void VideoDialog::StartVideoSearchByTitle(QString video_uid, QString title,
                                             Metadata *metadata)
 {
-    if (video_uid == VIDEO_INETREF_DEFAULT)
+    if (video_uid == VIDEO_INETREF_DEFAULT || video_uid.isEmpty())
     {
         createBusyDialog(title);
 
