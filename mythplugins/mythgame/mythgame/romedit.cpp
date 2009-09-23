@@ -37,11 +37,11 @@ bool EditRomInfoDialog::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_gamenameEdit, "gamename_edit", &err);
+    UIUtilE::Assign(this, m_gamenameEdit, "title_edit", &err);
     UIUtilE::Assign(this, m_genreEdit, "genre_edit", &err);
     UIUtilE::Assign(this, m_yearEdit, "year_edit", &err);
     UIUtilE::Assign(this, m_countryEdit, "country_edit", &err);
-    UIUtilE::Assign(this, m_plotEdit, "plot_edit", &err);
+    UIUtilE::Assign(this, m_plotEdit, "description_edit", &err);
     UIUtilE::Assign(this, m_publisherEdit, "publisher_edit", &err);
 
     UIUtilE::Assign(this, m_favoriteCheck, "favorite_check", &err);

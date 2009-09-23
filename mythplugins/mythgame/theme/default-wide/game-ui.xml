@@ -13,7 +13,7 @@
             <buttonlist name="listtemplate" from="basebuttonlist" />
         </buttontree>
 
-        <textarea name="gametitle" from="basetextarea">
+        <textarea name="title" from="basetextarea">
             <area>96,440,752,60</area>
             <font>baseextralarge</font>
         </textarea>
@@ -64,7 +64,7 @@
             </state>
         </statetype>
 
-        <textarea name="plot" from="systemname">
+        <textarea name="description" from="systemname">
             <position>236,665</position>
         </textarea>
 
@@ -98,7 +98,7 @@
             <align>right</align>
         </textarea>
 
-        <textarea name="gamename" from="basetextarea">
+        <textarea name="title" from="basetextarea">
             <area>190,160,570,40</area>
         </textarea>
 
@@ -192,7 +192,7 @@
             <area>190,520,400,40</area>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>190,560,400,40</area>
         </textarea>
 
@@ -286,7 +286,7 @@
 
         <!-- Widgets -->
 
-        <textedit name="gamename_edit" from="basetextedit">
+        <textedit name="title_edit" from="basetextedit">
             <position>510,100</position>
         </textedit>
 
@@ -306,7 +306,7 @@
             <position>510,280</position>
         </textedit>
 
-        <textedit name="plot_edit" from="basetextedit">
+        <textedit name="description_edit" from="basetextedit">
             <position>510,325</position>
         </textedit>
 
