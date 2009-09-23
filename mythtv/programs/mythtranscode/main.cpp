@@ -4,6 +4,7 @@
 // C++ headers
 #include <iostream>
 #include <fstream>
+#include <cerrno>
 using namespace std;
 
 // Qt headers
