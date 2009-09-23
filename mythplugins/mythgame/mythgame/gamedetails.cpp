@@ -78,8 +78,8 @@ bool GameDetailsPopup::Create(void)
     handleText("description", m_romInfo->Plot());
     handleText("allsystems", m_romInfo->AllSystems());
     handleImage("fanart", m_romInfo->Fanart());
-    handleImage("boxart", m_romInfo->Boxart());
-    handleImage("gameimage", m_romInfo->Screenshot());
+    handleImage("coverart", m_romInfo->Boxart());
+    handleImage("screenshot", m_romInfo->Screenshot());
 
     return true;
 }

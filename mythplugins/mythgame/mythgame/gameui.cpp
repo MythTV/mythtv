@@ -52,14 +52,14 @@ bool GameUI::Create()
     bool err = false;
     UIUtilE::Assign(this, m_gameUITree, "gametreelist", &err);
     UIUtilW::Assign(this, m_gameTitleText, "title");
-    UIUtilW::Assign(this, m_gameSystemText, "systemname");
-    UIUtilW::Assign(this, m_gameYearText, "yearname");
-    UIUtilW::Assign(this, m_gameGenreText, "genrename");
+    UIUtilW::Assign(this, m_gameSystemText, "system");
+    UIUtilW::Assign(this, m_gameYearText, "year");
+    UIUtilW::Assign(this, m_gameGenreText, "genre");
     UIUtilW::Assign(this, m_gameFavouriteState, "favorite");
     UIUtilW::Assign(this, m_gamePlotText, "description");
-    UIUtilW::Assign(this, m_gameImage, "gameimage");
+    UIUtilW::Assign(this, m_gameImage, "screenshot");
     UIUtilW::Assign(this, m_fanartImage, "fanart");
-    UIUtilW::Assign(this, m_boxImage, "boxart");
+    UIUtilW::Assign(this, m_boxImage, "coverart");
 
     if (err)
     {

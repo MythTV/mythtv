@@ -23,7 +23,7 @@
             <value>System:</value>
         </textarea>
 
-        <textarea name="systemname" from="basetextarea">
+        <textarea name="system" from="basetextarea">
             <area>236,510,580,35</area>
         </textarea>
 
@@ -32,16 +32,16 @@
             <value>Year:</value>
         </textarea>
 
-        <textarea name="yearname" from="systemname">
+        <textarea name="year" from="system">
             <position>236,545</position>
         </textarea>
 
-        <textarea name="genre" from="systemlabel">
+        <textarea name="genrelabel" from="systemlabel">
             <position>96,580</position>
             <value>Genre:</value>
         </textarea>
 
-        <textarea name="genrename" from="systemname">
+        <textarea name="genre" from="system">
             <position>236,580</position>
         </textarea>
 
@@ -64,16 +64,16 @@
             </state>
         </statetype>
 
-        <textarea name="description" from="systemname">
+        <textarea name="description" from="system">
             <position>236,665</position>
         </textarea>
 
-        <imagetype name="boxart">
+        <imagetype name="coverart">
             <area>610,500,180,150</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
-        <imagetype name="gameimage">
+        <imagetype name="screenshot">
             <area>880,500,300,196</area>
         </imagetype>
 
@@ -196,7 +196,7 @@
             <area>190,560,400,40</area>
         </textarea>
 
-        <imagetype name="boxart">
+        <imagetype name="coverart">
             <area>800,200,415,320</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
@@ -278,7 +278,7 @@
             <align>right,top</align>
         </textarea>
 
-        <textarea name="boxart_label" from="basetextarea">
+        <textarea name="coverart_label" from="basetextarea">
             <area>250,535,250,40</area>
             <value>Boxart:</value>
             <align>right,top</align>
@@ -332,11 +332,11 @@
             <value>/path/to/the/thing.jpg</value>
         </textarea>
 
-        <button name="boxart_button" from="basesearchbutton">
+        <button name="coverart_button" from="basesearchbutton">
             <position>510,525</position>
         </button>
 
-        <textarea name="boxart_text" from="basetextarea">
+        <textarea name="coverart_text" from="basetextarea">
             <area>550,530,750,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>

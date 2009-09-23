@@ -50,8 +50,8 @@ bool EditRomInfoDialog::Create()
     UIUtilE::Assign(this, m_screenshotText, "screenshot_text", &err);
     UIUtilE::Assign(this, m_fanartButton, "fanart_button", &err);
     UIUtilE::Assign(this, m_fanartText, "fanart_text", &err);
-    UIUtilE::Assign(this, m_boxartButton, "boxart_button", &err);
-    UIUtilE::Assign(this, m_boxartText, "boxart_text", &err);
+    UIUtilE::Assign(this, m_boxartButton, "coverart_button", &err);
+    UIUtilE::Assign(this, m_boxartText, "coverart_text", &err);
 
     UIUtilE::Assign(this, m_doneButton, "done_button", &err);
 
