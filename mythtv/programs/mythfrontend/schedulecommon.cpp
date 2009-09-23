@@ -112,8 +112,6 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
 {
     if (!recinfo || recinfo->recordid <= 0)
         return;
-
-    VERBOSE(VB_IMPORTANT, QString("We're OK"));
     
     RecordingRule *recrule = new RecordingRule();
     
