@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QDomDocument>
+#include <QFontMetrics>
 
 #include "mythverbose.h"
 
@@ -253,7 +254,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     }
 
     if (!m_CutMessage.isEmpty())
-        {
+    {
         QStringList templist;
         QStringList::iterator it;
         switch (m_textCase)
