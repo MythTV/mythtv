@@ -116,20 +116,41 @@ namespace
             if (m_timer.isActive())
                 m_timer.stop();
 
-            VERBOSE(VB_GENERAL, tr("Image download stopped."));
             m_http.abort();
+        }
+
+      public slots:
+        void InspectHeader(const QHttpResponseHeader &header)
+        {
+            if (header.statusCode() == 302)
+            {
+                QString m_redirectUrl = header.value("Location");
+                m_redirectCount++;
+            }
+            else if (header.statusCode() == 404)
+            {
+                VERBOSE(VB_IMPORTANT, QString("404 error received when "
+                                              "retrieving '%1'")
+                                                    .arg(m_url.toString()));
+            }
+            else
+                m_redirectUrl.clear();
         }
 
       private:
         ImageDownloadProxy(const QUrl &url, const QString &dest,
                            Metadata *item, const QString &db_value)
           : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(esOK)
+            m_id(0), m_url(url), m_error_state(esOK), m_redirectCount(0)
         {
+            connect(&m_http,
+                    SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+                    SLOT(InspectHeader(const QHttpResponseHeader &)));
             connect(&m_http, SIGNAL(requestFinished(int, bool)),
                     SLOT(OnFinished(int, bool)));
 
             connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
+            
             m_timer.setSingleShot(true);
             m_http.setHost(m_url.host());
         }
@@ -147,6 +168,12 @@ namespace
 
         void OnFinished(int id, bool error)
         {
+            if (!m_redirectUrl.isEmpty() && m_redirectCount <= 8)
+            {
+                m_url.setUrl(m_redirectUrl);
+                StartCopy();
+            }
+
             QString errorMsg;
             if (error)
                 errorMsg = m_http.errorString();
@@ -249,6 +276,8 @@ namespace
         QTimer m_timer;
         QUrl m_url;
         ImageDownloadErrorState m_error_state;
+        QString m_redirectUrl;
+        int m_redirectCount;
     };
 
     /** \class ExecuteExternalCommand
