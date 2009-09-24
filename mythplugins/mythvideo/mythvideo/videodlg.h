@@ -24,10 +24,7 @@ class VideoScanner;
 
 class QUrl;
 
-enum CoverDownloadErrorState { esOK, esError, esTimeout };
-enum ScreenshotDownloadErrorState { ssesOK, ssesError, ssesTimeout };
-enum FanartDownloadErrorState { fesOK, fesError, fesTimeout };
-enum BannerDownloadErrorState { besOK, besError, besTimeout };
+enum ImageDownloadErrorState { esOK, esError, esTimeout };
 
 class VideoDialog : public MythScreenType
 {
@@ -189,17 +186,17 @@ class VideoDialog : public MythScreenType
   private slots:
     // called during StartVideoPosterSet
     void OnPosterURL(QString uri, Metadata *metadata);
-    void OnPosterCopyFinished(CoverDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
+    void OnPosterCopyFinished(ImageDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata, const QString &imagePath);
     void OnFanartURL(QString uri, Metadata *metadata);
-    void OnFanartCopyFinished(FanartDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
+    void OnFanartCopyFinished(ImageDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata, const QString &imagePath);
     void OnScreenshotURL(QString uri, Metadata *metadata);
-    void OnScreenshotCopyFinished(ScreenshotDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
+    void OnScreenshotCopyFinished(ImageDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata, const QString &imagePath);
     void OnBannerURL(QString uri, Metadata *metadata);
-    void OnBannerCopyFinished(BannerDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
+    void OnBannerCopyFinished(ImageDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata, const QString &imagePath);
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,
@@ -215,10 +212,7 @@ class VideoDialog : public MythScreenType
 // and now the end points
 
     // StartVideoPosterSet end
-    void OnVideoPosterSetDone(Metadata *metadata);
-    void OnVideoFanartSetDone(Metadata *metadata);
-    void OnVideoScreenshotSetDone(Metadata *metadata); 
-    void OnVideoBannerSetDone(Metadata *metadata);
+    void OnVideoImageSetDone(Metadata *metadata);
 
     // StartVideoSearchByUID end
     void OnVideoSearchByUIDDone(bool normal_exit,

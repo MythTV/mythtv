@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QList>
 #include <QFile>
+#include <QFileInfo>
 #include <QDir>
 #include <QProcess>
 #include <QHttp>
@@ -86,19 +87,19 @@ namespace
         return ret;
     }
 
-    class CoverDownloadProxy : public QObject
+    class ImageDownloadProxy : public QObject
     {
         Q_OBJECT
 
       signals:
-        void SigFinished(CoverDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
+        void SigFinished(ImageDownloadErrorState reason, QString errorMsg,
+                         Metadata *item, const QString &);
       public:
-        static CoverDownloadProxy *Create(const QUrl &url, const QString &dest,
+        static ImageDownloadProxy *Create(const QUrl &url, const QString &dest,
                                           Metadata *item,
                                           const QString &db_value)
         {
-            return new CoverDownloadProxy(url, dest, item, db_value);
+            return new ImageDownloadProxy(url, dest, item, db_value);
         }
 
       public:
@@ -115,12 +116,12 @@ namespace
             if (m_timer.isActive())
                 m_timer.stop();
 
-            VERBOSE(VB_GENERAL, tr("Cover download stopped."));
+            VERBOSE(VB_GENERAL, tr("Image download stopped."));
             m_http.abort();
         }
 
       private:
-        CoverDownloadProxy(const QUrl &url, const QString &dest,
+        ImageDownloadProxy(const QUrl &url, const QString &dest,
                            Metadata *item, const QString &db_value)
           : m_item(item), m_dest_file(dest), m_db_value(db_value),
             m_id(0), m_url(url), m_error_state(esOK)
@@ -133,7 +134,7 @@ namespace
             m_http.setHost(m_url.host());
         }
 
-        ~CoverDownloadProxy() {}
+        ~ImageDownloadProxy() {}
 
       private slots:
         void OnDownloadTimeout()
@@ -187,7 +188,7 @@ namespace
                                 off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
                                 if (written != m_data_buffer.size())
                                 {
-                                    errorMsg = tr("Error writing Coverart to file %1.")
+                                    errorMsg = tr("Error writing image to file %1.")
                                             .arg(m_dest_file);
                                     m_error_state = esError;
                                 }
@@ -232,12 +233,9 @@ namespace
                             m_error_state = esError;
                         }
                     }
-
-                    if (m_error_state != esError)
-                        m_item->SetCoverFile(m_db_value);
                 }
 
-                emit SigFinished(m_error_state, errorMsg, m_item);
+                emit SigFinished(m_error_state, errorMsg, m_item, m_db_value);
             }
         }
 
@@ -250,508 +248,7 @@ namespace
         int m_id;
         QTimer m_timer;
         QUrl m_url;
-        CoverDownloadErrorState m_error_state;
-    };
-
-    class ScreenshotDownloadProxy : public QObject
-    {
-        Q_OBJECT
-
-      signals:
-        void SigFinished(ScreenshotDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
-      public:
-        static ScreenshotDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                               Metadata *item,
-                                               const QString &db_value)
-        {
-            return new ScreenshotDownloadProxy(url, dest, item, db_value);
-        }
-
-      public:
-        void StartCopy()
-        {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
-
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
-                          * 1000);
-        }
-
-        void Stop()
-        {
-            if (m_timer.isActive())
-                m_timer.stop();
-
-            VERBOSE(VB_GENERAL, tr("Screenshot download stopped."));
-            m_http.abort();
-        } 
-    
-      private:
-        ScreenshotDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item, const QString &db_value)
-          : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(ssesOK)
-        {
-            connect(&m_http, SIGNAL(requestFinished(int, bool)),
-                    SLOT(OnFinished(int, bool)));
-
-            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            m_timer.setSingleShot(true);
-            m_http.setHost(m_url.host());
-        }
-
-        ~ScreenshotDownloadProxy() {}
-
-      private slots:
-        void OnDownloadTimeout()
-        {
-            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
-                    .arg(m_url.toString()));
-            m_error_state = ssesTimeout;
-            Stop();
-        }
-
-        void OnFinished(int id, bool error)
-        {
-            QString errorMsg;
-            if (error)
-                errorMsg = m_http.errorString();
-
-            if (id == m_id)
-            {
-                if (m_timer.isActive())
-                    m_timer.stop();
-
-                if (!error)
-                {
-                    if (m_dest_file.startsWith("myth://"))
-                    {
-                        QImage testImage;
-                        const QByteArray &testArray = m_data_buffer.data();
-                        bool didLoad = testImage.loadFromData(testArray);
-                        if (!didLoad)
-                        {
-                            errorMsg = tr("Tried to write %1, but it appears to "
-                                          "be an HTML redirect (filesize %2).")
-                                    .arg(m_dest_file).arg(m_data_buffer.size());
-                            m_error_state = ssesError;
-                        }
-                        else
-                        {
-                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                            if (!outFile->isOpen())
-                            {
-                                VERBOSE(VB_IMPORTANT,
-                                    QString("VideoDialog: Failed to open "
-                                            "remote file (%1) for write.  Does Screenshot "
-                                            "Storage Group Exist?").arg(m_dest_file));
-                                delete outFile;
-                                outFile = NULL;
-                                m_error_state = ssesError;
-                            }
-                            else
-                            {
-                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                                if (written != m_data_buffer.size())
-                                {
-                                    errorMsg = tr("Error writing Screenshot to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = ssesError;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        QFile dest_file(m_dest_file);
-                        if (dest_file.exists())
-                            dest_file.remove();
-
-                        if (dest_file.open(QIODevice::WriteOnly))
-                        {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
-                            {
-                                errorMsg = tr("Tried to write %1, but it appears to "
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
-                                dest_file.remove();
-                                m_error_state = ssesError;
-                            }
-                            else
-                            {
-                                const QByteArray &data = m_data_buffer.data();
-                                qint64 size = dest_file.write(data);
-                                if (size != data.size())
-                                {
-                                    errorMsg = tr("Error writing data to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = ssesError;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errorMsg = tr("Error: file error '%1' for file %2").
-                                    arg(dest_file.errorString()).arg(m_dest_file);
-                            m_error_state = ssesError;
-                        }
-                    }
-
-                    if (m_error_state != ssesError)
-                        m_item->SetScreenshot(m_db_value);
-                }
-
-                emit SigFinished(m_error_state, errorMsg, m_item);
-            }
-        }
-
-      private:
-        Metadata *m_item;
-        QHttp m_http;
-        QBuffer m_data_buffer;
-        QString m_dest_file;
-        QString m_db_value;
-        int m_id;
-        QTimer m_timer;
-        QUrl m_url;
-        ScreenshotDownloadErrorState m_error_state;
-    };
-
-    class FanartDownloadProxy : public QObject
-    {
-        Q_OBJECT
-
-      signals:
-        void SigFinished(FanartDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
-      public:
-        static FanartDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                          Metadata *item,
-                                          const QString db_value)
-        {
-            return new FanartDownloadProxy(url, dest, item, db_value);
-        }
-
-      public:
-        void StartCopy()
-        {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
-
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
-                          * 1000);
-        }
-
-        void Stop()
-        {
-            if (m_timer.isActive())
-                m_timer.stop();
-
-            VERBOSE(VB_GENERAL, tr("Fanart download stopped."));
-            m_http.abort();
-        }
-
-      private:
-        FanartDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item, const QString &db_value)
-          : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(fesOK)
-        {
-            connect(&m_http, SIGNAL(requestFinished(int, bool)),
-                    SLOT(OnFinished(int, bool)));
-
-            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            m_timer.setSingleShot(true);
-            m_http.setHost(m_url.host());
-        }
-
-        ~FanartDownloadProxy() {}
-
-      private slots:
-        void OnDownloadTimeout()
-        {
-            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
-                    .arg(m_url.toString()));
-            m_error_state = fesTimeout;
-            Stop();
-        }
-
-        void OnFinished(int id, bool error)
-        {
-            QString errorMsg;
-            if (error)
-                errorMsg = m_http.errorString();
-
-            if (id == m_id)
-            {
-                if (m_timer.isActive())
-                    m_timer.stop();
-
-                if (!error)
-                {
-                    if (m_dest_file.startsWith("myth://"))
-                    {
-                        QImage testImage;
-                        const QByteArray &testArray = m_data_buffer.data();
-                        bool didLoad = testImage.loadFromData(testArray);
-                        if (!didLoad)
-                        {
-                            errorMsg = tr("Tried to write %1, but it appears to "
-                                          "be an HTML redirect (filesize %2).")
-                                    .arg(m_dest_file).arg(m_data_buffer.size());
-                            m_error_state = fesError;
-                        }
-                        else
-                        {
-                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                            if (!outFile->isOpen())
-                            {
-                                VERBOSE(VB_IMPORTANT,
-                                    QString("VideoDialog: Failed to open "
-                                            "remote file (%1) for write.  Does Fanart "
-                                            "Storage Group Exist?").arg(m_dest_file));
-                                delete outFile; 
-                                outFile = NULL;
-                                m_error_state = fesError;
-                            }
-                            else
-                            {
-                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                                if (written != m_data_buffer.size())
-                                {
-                                    errorMsg = tr("Error writing Fanart to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = fesError;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        QFile dest_file(m_dest_file);
-                        if (dest_file.exists())
-                            dest_file.remove();
-
-                        if (dest_file.open(QIODevice::WriteOnly))
-                        {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
-                            {
-                                errorMsg = tr("Tried to write %1, but it appears to "
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
-                                dest_file.remove();
-                                m_error_state = fesError;
-                            }
-                            else
-                            {
-                                const QByteArray &data = m_data_buffer.data();
-                                qint64 size = dest_file.write(data);
-                                if (size != data.size())
-                                {
-                                    errorMsg = tr("Error writing data to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = fesError;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errorMsg = tr("Error: file error '%1' for file %2").
-                                    arg(dest_file.errorString()).arg(m_dest_file);
-                            m_error_state = fesError;
-                        }
-                    }
-
-                    if (m_error_state != fesError)
-                        m_item->SetFanart(m_db_value);
-                }
-
-                emit SigFinished(m_error_state, errorMsg, m_item);
-            }
-        }
-
-      private:
-        Metadata *m_item;
-        QHttp m_http;
-        QBuffer m_data_buffer;
-        QString m_dest_file;
-        QString m_db_value;
-        int m_id;
-        QTimer m_timer;
-        QUrl m_url;
-        FanartDownloadErrorState m_error_state;
-    };
-
-    class BannerDownloadProxy : public QObject
-    {
-        Q_OBJECT
-
-      signals:
-        void SigFinished(BannerDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
-      public:
-        static BannerDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                           Metadata *item,
-                                           const QString &db_value)
-        {
-            return new BannerDownloadProxy(url, dest, item, db_value);
-        }
-
-      public:
-        void StartCopy()
-        {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
-
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
-                          * 1000);
-        }
-
-        void Stop()
-        {
-            if (m_timer.isActive())
-                m_timer.stop();
-
-            VERBOSE(VB_GENERAL, tr("Banner download stopped."));
-            m_http.abort();
-        }
-
-      private:
-        BannerDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item, const QString &db_value)
-          : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(besOK)
-        {
-            connect(&m_http, SIGNAL(requestFinished(int, bool)),
-                    SLOT(OnFinished(int, bool)));
-
-            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            m_timer.setSingleShot(true);
-            m_http.setHost(m_url.host());
-        }
-
-        ~BannerDownloadProxy() {}
-
-      private slots:
-        void OnDownloadTimeout()
-        {
-            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
-                    .arg(m_url.toString()));
-            m_error_state = besTimeout;
-            Stop();
-        }
-
-        void OnFinished(int id, bool error)
-        {
-            QString errorMsg;
-            if (error)
-                errorMsg = m_http.errorString();
-
-            if (id == m_id)
-            {
-                if (m_timer.isActive())
-                    m_timer.stop();
-
-                if (!error)
-                {
-                    if (m_dest_file.startsWith("myth://"))
-                    {
-                        QImage testImage;
-                        const QByteArray &testArray = m_data_buffer.data();
-                        bool didLoad = testImage.loadFromData(testArray);
-                        if (!didLoad)
-                        {
-                            errorMsg = tr("Tried to write %1, but it appears to "
-                                          "be an HTML redirect (filesize %2).")
-                                    .arg(m_dest_file).arg(m_data_buffer.size());
-                            m_error_state = besError;
-                        }
-                        else
-                        {
-                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                            if (!outFile->isOpen()) 
-                            { 
-                                VERBOSE(VB_IMPORTANT, 
-                                    QString("VideoDialog: Failed to open " 
-                                            "remote file (%1) for write.  Does Banner "
-                                            "Storage Group Exist?").arg(m_dest_file)); 
-                                delete outFile; 
-                                outFile = NULL;
-                                m_error_state = besError;
-                            }
-                            else
-                            {
-                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                                if (written != m_data_buffer.size())
-                                {
-                                    errorMsg = tr("Error writing Banner to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = besError;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        QFile dest_file(m_dest_file);
-                        if (dest_file.exists())
-                            dest_file.remove();
-
-                        if (dest_file.open(QIODevice::WriteOnly))
-                        {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
-                            {
-                                errorMsg = tr("Tried to write %1, but it appears to "
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
-                                dest_file.remove();
-                                m_error_state = besError;
-                            }
-                            else
-                            {
-                                const QByteArray &data = m_data_buffer.data();
-                                qint64 size = dest_file.write(data);
-                                if (size != data.size())
-                                {
-                                    errorMsg = tr("Error writing data to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = besError;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errorMsg = tr("Error: file error '%1' for file %2").
-                                    arg(dest_file.errorString()).arg(m_dest_file);
-                            m_error_state = besError;
-                        }
-                    }
-
-                    if (m_error_state != besError)
-                        m_item->SetBanner(m_db_value);
-                }
-
-                emit SigFinished(m_error_state, errorMsg, m_item);
-            }
-        }
-
-      private:
-        Metadata *m_item;
-        QHttp m_http;
-        QBuffer m_data_buffer;
-        QString m_dest_file;
-        QString m_db_value;
-        int m_id;
-        QTimer m_timer;
-        QUrl m_url;
-        BannerDownloadErrorState m_error_state;
+        ImageDownloadErrorState m_error_state;
     };
 
     /** \class ExecuteExternalCommand
@@ -2075,10 +1572,7 @@ class VideoDialogPrivate
     ~VideoDialogPrivate()
     {
         delete m_scanner;
-        StopAllRunningCoverDownloads();
-        StopAllRunningFanartDownloads();
-        StopAllRunningBannerDownloads();
-        StopAllRunningScreenshotDownloads();
+        StopAllRunningImageDownloads();
 
         if (m_rememberPosition && m_lastTreeNodePath.length())
         {
@@ -2109,107 +1603,32 @@ class VideoDialogPrivate
         m_savedPtr = new VideoListDeathDelay(videoList);
     }
 
-    void AddCoverDownload(CoverDownloadProxy *download)
+    void AddImageDownload(ImageDownloadProxy *download)
     {
         m_running_downloads.insert(download);
     }
 
-    void RemoveCoverDownload(CoverDownloadProxy *download)
+    void RemoveImageDownload(ImageDownloadProxy *download)
     {
         if (download)
         {
-            cover_download_list::iterator p =
+            image_download_list::iterator p =
                     m_running_downloads.find(download);
             if (p != m_running_downloads.end())
                 m_running_downloads.erase(p);
         }
     }
 
-    void AddScreenshotDownload(ScreenshotDownloadProxy *download)
-    {   
-        m_running_ssdownloads.insert(download);
-    }
-
-    void RemoveScreenshotDownload(ScreenshotDownloadProxy *download)
-    {   
-        if (download)
-        {   
-            screenshot_download_list::iterator p =
-                    m_running_ssdownloads.find(download);
-            if (p != m_running_ssdownloads.end())
-                m_running_ssdownloads.erase(p);
-        }
-    }
-
-    void AddFanartDownload(FanartDownloadProxy *download)
+    void StopAllRunningImageDownloads()
     {
-        m_running_fdownloads.insert(download);
-    }
-
-    void RemoveFanartDownload(FanartDownloadProxy *download)
-    {
-        if (download)
-        {
-            fanart_download_list::iterator p =
-                    m_running_fdownloads.find(download);
-            if (p != m_running_fdownloads.end())
-                m_running_fdownloads.erase(p);
-        }
-    }
-
-    void AddBannerDownload(BannerDownloadProxy *download)
-    {
-        m_running_bdownloads.insert(download);
-    }
-
-    void RemoveBannerDownload(BannerDownloadProxy *download)
-    {
-        if (download)
-        {
-            banner_download_list::iterator p =
-                    m_running_bdownloads.find(download);
-            if (p != m_running_bdownloads.end())
-                m_running_bdownloads.erase(p);
-        }
-    }
-
-    void StopAllRunningCoverDownloads()
-    {
-        cover_download_list tmp(m_running_downloads);
-        for (cover_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
-            (*p)->Stop();
-    }
-
-    void StopAllRunningScreenshotDownloads()
-    {   
-        screenshot_download_list tmp(m_running_ssdownloads);
-        for (screenshot_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
-            (*p)->Stop();
-    }
-
-    void StopAllRunningFanartDownloads()
-    {
-        fanart_download_list tmp(m_running_fdownloads);
-        for (fanart_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
-            (*p)->Stop();
-    }
-
-    void StopAllRunningBannerDownloads()
-    {
-        banner_download_list tmp(m_running_bdownloads);
-        for (banner_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
+        image_download_list tmp(m_running_downloads);
+        for (image_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
             (*p)->Stop();
     }
 
   public:
-    typedef std::set<CoverDownloadProxy *> cover_download_list;
-    cover_download_list m_running_downloads;
-    typedef std::set<ScreenshotDownloadProxy *> screenshot_download_list;
-    screenshot_download_list m_running_ssdownloads;
-    typedef std::set<FanartDownloadProxy *> fanart_download_list;
-    fanart_download_list m_running_fdownloads;
-    typedef std::set<BannerDownloadProxy *> banner_download_list;
-    banner_download_list m_running_bdownloads;
+    typedef std::set<ImageDownloadProxy *> image_download_list;
+    image_download_list m_running_downloads;
     ParentalLevelNotifyContainer m_parentalLevel;
     bool m_switchingLayout;
 
@@ -4762,7 +4181,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 "Coverart"))
         {
             metadata->SetCoverFile(cover_file);
-            OnVideoPosterSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (cover_file.isEmpty() || IsDefaultCoverFile(cover_file))
@@ -4788,7 +4207,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 "Fanart"))
         {
             metadata->SetFanart(fanart_file);
-            OnVideoFanartSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (metadata->GetFanart().isEmpty())
@@ -4814,7 +4233,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 "Banners"))
         {
             metadata->SetBanner(banner_file);
-            OnVideoBannerSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (metadata->GetBanner().isEmpty() &&
@@ -4841,7 +4260,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 metadata->GetEpisode(), true))
         {
             metadata->SetScreenshot(screenshot_file);
-            OnVideoScreenshotSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (metadata->GetScreenshot().isEmpty() &&
@@ -4932,38 +4351,46 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            CoverDownloadProxy *cd =
-                    CoverDownloadProxy::Create(url, dest_file, metadata,
+            ImageDownloadProxy *cd =
+                    ImageDownloadProxy::Create(url, dest_file, metadata,
                                                db_value);
 
-            connect(cd, SIGNAL(SigFinished(CoverDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnPosterCopyFinished(CoverDownloadErrorState,
-                                              QString, Metadata *)));
+            connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                           QString, Metadata *,
+                                           const QString &)),
+                    SLOT(OnPosterCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
 
             cd->StartCopy();
-            m_d->AddCoverDownload(cd);
+            m_d->AddImageDownload(cd);
         }
         else
         {
             metadata->SetCoverFile("");
-            OnVideoPosterSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
     }
     else
-        OnVideoPosterSetDone(metadata);
+        OnVideoImageSetDone(metadata);
 }
 
-void VideoDialog::OnPosterCopyFinished(CoverDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
+void VideoDialog::OnPosterCopyFinished(ImageDownloadErrorState error,
+                                       QString errorMsg, Metadata *item,
+                                       const QString &imagePath)
 {
     QObject *src = sender();
     if (src)
-        m_d->RemoveCoverDownload(dynamic_cast<CoverDownloadProxy *>
+        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
                                        (src));
 
-    if (error != esOK && item)
-        item->SetCoverFile("");
+    if (item)
+    {
+        if (error != esOK)
+            item->SetCoverFile("");
+        else
+            item->SetCoverFile(imagePath);
+    }
 
     VERBOSE(VB_IMPORTANT, tr("Poster download finished: %1 %2")
             .arg(errorMsg).arg(error));
@@ -4974,11 +4401,11 @@ void VideoDialog::OnPosterCopyFinished(CoverDownloadErrorState error,
                             "retrieved within the timeout period.\n"));
     }
 
-    OnVideoPosterSetDone(item);
+    OnVideoImageSetDone(item);
 }
 
 // This is the final call as part of a StartVideoImageSet
-void VideoDialog::OnVideoPosterSetDone(Metadata *metadata)
+void VideoDialog::OnVideoImageSetDone(Metadata *metadata)
 {
     // The metadata has some cover file set
     if (m_busyPopup)
@@ -5066,62 +4493,57 @@ void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            FanartDownloadProxy *fd =
-                    FanartDownloadProxy::Create(url, dest_file, metadata,
-                                                db_value);
+            ImageDownloadProxy *fd =
+                        ImageDownloadProxy::Create(url, dest_file, metadata,
+                                                   db_value);
 
-            connect(fd, SIGNAL(SigFinished(FanartDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnFanartCopyFinished(FanartDownloadErrorState,
-                                              QString, Metadata *)));
+            connect(fd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                           QString, Metadata *,
+                                           const QString &)),
+                    SLOT(OnFanartCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
 
             fd->StartCopy();
-            m_d->AddFanartDownload(fd);
+            m_d->AddImageDownload(fd);
         }
         else
         {
             metadata->SetFanart("");
-            OnVideoFanartSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
     }
     else
-        OnVideoFanartSetDone(metadata);
+        OnVideoImageSetDone(metadata);
 }
 
-void VideoDialog::OnFanartCopyFinished(FanartDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
+void VideoDialog::OnFanartCopyFinished(ImageDownloadErrorState error,
+                                       QString errorMsg, Metadata *item,
+                                       const QString &imagePath)
 {
     QObject *src = sender();
     if (src)
-        m_d->RemoveFanartDownload(dynamic_cast<FanartDownloadProxy *>
+        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
                                        (src));
 
-    if (error != fesOK && item)
-        item->SetFanart("");
+    if (item)
+    {
+        if (error != esOK)
+            item->SetFanart("");
+        else
+            item->SetFanart(imagePath);
+    }
 
     VERBOSE(VB_IMPORTANT, tr("Fanart download finished: %1 %2")
             .arg(errorMsg).arg(error));
 
-    if (error == fesTimeout)
+    if (error == esTimeout)
     {
         createOkDialog(tr("Fanart exists for this item but could not be "
                             "retrieved within the timeout period.\n"));
     }
 
-    OnVideoFanartSetDone(item);
-}
-
-void VideoDialog::OnVideoFanartSetDone(Metadata *metadata)
-{
-    // The metadata has some fanart set
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
-    metadata->UpdateDatabase();
-    UpdateItem(GetItemCurrent());
+    OnVideoImageSetDone(item);
 }
 
 void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
@@ -5199,62 +4621,57 @@ void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            ScreenshotDownloadProxy *ssd =
-                    ScreenshotDownloadProxy::Create(url, dest_file, metadata,
+            ImageDownloadProxy *ssd =
+                    ImageDownloadProxy::Create(url, dest_file, metadata,
                                                    db_value);
 
-            connect(ssd, SIGNAL(SigFinished(ScreenshotDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnScreenshotCopyFinished(ScreenshotDownloadErrorState,
-                                              QString, Metadata *)));
+            connect(ssd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                            QString, Metadata *,
+                                            const QString &)),
+                    SLOT(OnScreenshotCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
 
             ssd->StartCopy();
-            m_d->AddScreenshotDownload(ssd);
+            m_d->AddImageDownload(ssd);
         }
         else
         {
             metadata->SetScreenshot("");
-            OnVideoScreenshotSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
     }
     else
-        OnVideoScreenshotSetDone(metadata);
+        OnVideoImageSetDone(metadata);
 }
 
-void VideoDialog::OnScreenshotCopyFinished(ScreenshotDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
+void VideoDialog::OnScreenshotCopyFinished(ImageDownloadErrorState error,
+                                           QString errorMsg, Metadata *item,
+                                           const QString &imagePath)
 {
     QObject *src = sender();
     if (src)
-        m_d->RemoveScreenshotDownload(dynamic_cast<ScreenshotDownloadProxy *>
+        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
                                        (src));
 
-    if (error != ssesOK && item)
-        item->SetScreenshot("");
+    if (item)
+    {
+        if (error != esOK)
+            item->SetScreenshot("");
+        else
+            item->SetScreenshot(imagePath);
+    }
 
     VERBOSE(VB_IMPORTANT, tr("Screenshot download finished: %1 %2")
             .arg(errorMsg).arg(error));
 
-    if (error == ssesTimeout)
+    if (error == esTimeout)
     {
         createOkDialog(tr("Screenshot exists for this item but could not be "
                             "retrieved within the timeout period.\n"));
     }
 
-    OnVideoScreenshotSetDone(item);
-}
-
-void VideoDialog::OnVideoScreenshotSetDone(Metadata *metadata)
-{   
-    // The metadata has some fanart set
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
-    metadata->UpdateDatabase();
-    UpdateItem(GetItemCurrent());
+    OnVideoImageSetDone(item);
 }
 
 
@@ -5333,62 +4750,57 @@ void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            BannerDownloadProxy *bd =
-                    BannerDownloadProxy::Create(url, dest_file, metadata,
+            ImageDownloadProxy *bd =
+                    ImageDownloadProxy::Create(url, dest_file, metadata,
                                                 db_value);
 
-            connect(bd, SIGNAL(SigFinished(BannerDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnBannerCopyFinished(BannerDownloadErrorState,
-                                              QString, Metadata *)));
+            connect(bd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                           QString, Metadata *,
+                                           const QString &)),
+                    SLOT(OnBannerCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
 
             bd->StartCopy();
-            m_d->AddBannerDownload(bd);
+            m_d->AddImageDownload(bd);
         }
         else
         {
             metadata->SetBanner("");
-            OnVideoBannerSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
     }
     else
-        OnVideoBannerSetDone(metadata);
+        OnVideoImageSetDone(metadata);
 }
 
-void VideoDialog::OnBannerCopyFinished(BannerDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
+void VideoDialog::OnBannerCopyFinished(ImageDownloadErrorState error,
+                                       QString errorMsg, Metadata *item,
+                                       const QString &imagePath)
 {
     QObject *src = sender();
     if (src)
-        m_d->RemoveBannerDownload(dynamic_cast<BannerDownloadProxy *>
+        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
                                        (src));
 
-    if (error != besOK && item)
-        item->SetBanner("");
+    if (item)
+    {
+        if (error != esOK)
+            item->SetBanner("");
+        else
+            item->SetBanner(imagePath);
+    }
 
     VERBOSE(VB_IMPORTANT, tr("Banner download finished: %1 %2")
             .arg(errorMsg).arg(error));
 
-    if (error == besTimeout)
+    if (error == esTimeout)
     {
         createOkDialog(tr("Banner exists for this item but could not be "
                             "retrieved within the timeout period.\n"));
     }
 
-    OnVideoBannerSetDone(item);
-}
-
-void VideoDialog::OnVideoBannerSetDone(Metadata *metadata)
-{
-    // The metadata has a banner set
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
-    metadata->UpdateDatabase();
-    UpdateItem(GetItemCurrent());
+    OnVideoImageSetDone(item);
 }
 
 void VideoDialog::StartVideoSearchByUID(QString video_uid, Metadata *metadata)
