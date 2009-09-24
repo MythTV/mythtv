@@ -1736,7 +1736,7 @@ namespace
             }
 
             if (!IsDefaultCoverFile(coverfile))
-                tmp["coverimage"] = coverfile;
+                tmp["coverart"] = coverfile;
 
             tmp["coverfile"] = coverfile;
 
@@ -1799,7 +1799,7 @@ namespace
             tmp["title"] = metadata->GetTitle();
             tmp["subtitle"] = metadata->GetSubtitle();
             tmp["director"] = metadata->GetDirector();
-            tmp["plot"] = metadata->GetPlot();
+            tmp["description"] = metadata->GetPlot();
             tmp["genres"] = GetDisplayGenres(*metadata);
             tmp["countries"] = GetDisplayCountries(*metadata);
             tmp["cast"] = GetDisplayCast(*metadata).join(", ");
@@ -1862,7 +1862,7 @@ namespace
 
         helper h(tmp, dest);
 
-        h.handleImage("coverimage");
+        h.handleImage("coverart");
         h.handleImage("screenshot");
         h.handleImage("banner");
         h.handleImage("fanart");
@@ -1877,7 +1877,7 @@ namespace
         h.handleText("title");
         h.handleText("subtitle");
         h.handleText("director");
-        h.handleText("plot");
+        h.handleText("description");
         h.handleText("genres");
         h.handleText("countries");
         h.handleText("cast");
@@ -2407,7 +2407,7 @@ bool VideoDialog::Create()
     UIUtilW::Assign(this, m_positionText, "position");
     UIUtilW::Assign(this, m_crumbText, "breadcrumbs");
 
-    UIUtilW::Assign(this, m_coverImage, "coverimage");
+    UIUtilW::Assign(this, m_coverImage, "coverart");
     UIUtilW::Assign(this, m_screenshot, "screenshot");
     UIUtilW::Assign(this, m_banner, "banner");
     UIUtilW::Assign(this, m_fanart, "fanart");
@@ -2586,7 +2586,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         else
         {
             item->SetImage(imgFilename);
-            item->SetImage(imgFilename, "coverimage");
+            item->SetImage(imgFilename, "coverart");
         }
     }
 //    else if (metadata)

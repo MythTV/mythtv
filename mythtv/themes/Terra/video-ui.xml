@@ -59,7 +59,7 @@
         </buttonlist>
     </window>
 
-    <window name="plotpopup">
+    <window name="descriptionpopup">
         <area>0,42,1280,515</area>
         <shape name="fade" from="basefadebackground" />
 
@@ -82,7 +82,7 @@
             <scroll direction="left">auto</scroll>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>903,242,350,307</area>
             <multiline>yes</multiline>
         </textarea>
@@ -499,12 +499,12 @@
             <position>838,440</position>
         </textarea>
 
-        <textarea name="plot" from="director">
+        <textarea name="description" from="director">
             <area>695,500,540,160</area>
             <multiline>yes</multiline>
         </textarea>
 
-        <textarea name="novideos" from="plot">
+        <textarea name="novideos" from="description">
             <align>allcenter</align>
         </textarea>
 
@@ -535,7 +535,7 @@
             <statetype name="buttonitem">
                 <state name="selected">
                     <area>-13,0,209,332</area>
-                    <imagetype name="coverimage">
+                    <imagetype name="coverart">
                         <area>1,3,209,325</area>
                         <filename>mv_browse_nocover.png</filename>
                         <mask>video/postermask.png</mask>
@@ -568,7 +568,7 @@
                 </state>
                 <state name="active" from="selected">
                     <area>0,0,183,332</area>
-                    <imagetype name="coverimage">
+                    <imagetype name="coverart">
                         <area>0,25,183,275</area>
                     </imagetype>
 
@@ -618,7 +618,7 @@
             <position>1193,72</position>
         </statetype>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>48,124,1182,145</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
@@ -751,7 +751,7 @@
             <position>1193,492</position>
         </statetype>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>48,535,1182,110</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
@@ -814,7 +814,7 @@
             <align>right</align>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>40,395,530,80</area>
             <align>left,top</align>
             <multiline>yes</multiline>
@@ -834,7 +834,7 @@
             <align>hcenter,vcenter</align>
         </textarea>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>624,335,140,212</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
@@ -1220,7 +1220,7 @@
             <filename>video/info_background.png</filename>
         </imagetype>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>759,79,260,391</area>
             <mask>video/info_poster_mask.png</mask>
             <preserveaspect>true</preserveaspect>
@@ -1231,7 +1231,7 @@
             <font>baselarge</font>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>270,165,455,220</area>
             <multiline>yes</multiline>
         </textarea>

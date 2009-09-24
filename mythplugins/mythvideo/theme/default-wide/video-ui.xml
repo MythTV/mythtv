@@ -32,14 +32,14 @@
         </button>
     </window>
 
-    <window name="plotpopup">
+    <window name="descriptionpopup">
         <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mv_results_popup.png</filename>
         </imagetype>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>18,18,360,325</area>
             <multiline>yes</multiline>
         </textarea>
@@ -66,7 +66,7 @@
             <filename>mv_itemdetail_popup.png</filename>
         </imagetype>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>25,100,312,465</area>
             <filename>mv_browse_nocover_large.png</filename>
             <preserveaspect>true</preserveaspect>
@@ -79,7 +79,7 @@
             <align>center</align>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>369,100,770,290</area>
             <multiline>yes</multiline>
         </textarea>
@@ -278,12 +278,12 @@
             <area>160,125,350,35</area>
         </textarea>
 
-        <textarea name="pltlbl" from="dirlbl">
+        <textarea name="desclbl" from="dirlbl">
             <position>20,155</position>
             <value>Plot:</value>
         </textarea>
 
-        <textarea name="plot" from="director">
+        <textarea name="description" from="director">
             <area>160,155,600,35</area>
         </textarea>
 
@@ -460,7 +460,7 @@
             </statetype>
         </buttonlist>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>23,15,312,465</area>
             <filename>mv_browse_nocover_large.png</filename>
             <preserveaspect>true</preserveaspect>
@@ -498,7 +498,7 @@
             <font>basemedium</font>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>380,97,840,145</area>
             <multiline>yes</multiline>
         </textarea>
@@ -755,7 +755,7 @@
               <align>right</align>
           </textarea>
   
-          <textarea name="plot" from="basetextarea">
+          <textarea name="description" from="basetextarea">
              <area>40,495,530,80</area>
               <align>left,top</align>
               <multiline>yes</multiline>
@@ -775,7 +775,7 @@
               <align>hcenter,vcenter</align>
           </textarea>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>1000,400,225,250</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>

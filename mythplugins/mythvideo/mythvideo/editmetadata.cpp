@@ -92,12 +92,12 @@ bool EditMetadataDialog::Create()
     UIUtilW::Assign(this, m_ratingEdit, "rating_edit");
     UIUtilW::Assign(this, m_directorEdit, "director_edit");
     UIUtilW::Assign(this, m_inetrefEdit, "inetref_edit");
-    UIUtilW::Assign(this, m_plotEdit, "plot_edit");
+    UIUtilW::Assign(this, m_plotEdit, "description_edit");
     UIUtilW::Assign(this, m_yearSpin, "year_spin");
     UIUtilW::Assign(this, m_userRatingSpin, "userrating_spin");
     UIUtilW::Assign(this, m_lengthSpin, "length_spin");
 
-    UIUtilW::Assign(this, m_coverart, "coverimage");
+    UIUtilW::Assign(this, m_coverart, "coverart");
     UIUtilW::Assign(this, m_screenshot, "screenshot");
     UIUtilW::Assign(this, m_banner, "banner");
     UIUtilW::Assign(this, m_fanart, "fanart");
