@@ -1983,31 +1983,21 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     else
         item->SetText(metadata ? metadata->GetTitle() : node->getString());
 
-    QString imgFilename = GetCoverImage(node);
-
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() || 
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
+    QString coverimage = GetCoverImage(node);
+    QString screenshot = GetScreenshot(node);
+    QString banner     = GetBanner(node);
+    QString fanart     = GetFanart(node);
+    
+    if (!screenshot.isEmpty() && parent && metadata &&
+        ((QString::compare(parent->getString(),
+                            metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
+            parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
     {
-        if (parent && metadata &&
-            ((QString::compare(parent->getString(), 
-                              metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
-             parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)) &&
-            !GetScreenshot(node).isEmpty())
-        {
-            QString screenshot = GetScreenshot(node);
-            if (!screenshot.isEmpty())
-            {
-                item->SetImage(GetScreenshot(node));
-                item->SetImage(GetScreenshot(node), "buttonitem");
-            }
-        }
-        else
-        {
-            item->SetImage(imgFilename);
-            item->SetImage(imgFilename, "coverart");
-        }
+        item->SetImage(screenshot);
     }
+    else
+        item->SetImage(coverimage);
+    
 //    else if (metadata)
 //    {
 //        imgFilename = GetImageFromFolder(metadata);
@@ -2017,37 +2007,28 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 //            item->SetImage(imgFilename);
 //    }
 
+
     int nodeInt = node->getInt();
 
-    imgFilename = GetScreenshot(node);
+    if (coverimage.isEmpty() && nodeInt == kSubFolder)
+        coverimage = GetFirstImage(node, "Coverart");
 
-    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
-        imgFilename = GetFirstImage(node, "Screenshots");
+    item->SetImage(coverimage, "coverart");
 
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() ||
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
-        item->SetImage(imgFilename, "screenshot");
+    if (screenshot.isEmpty() && nodeInt == kSubFolder)
+        screenshot = GetFirstImage(node, "Screenshots");
 
-    imgFilename = GetBanner(node);
+    item->SetImage(screenshot, "screenshot");
+    
+    if (banner.isEmpty() && nodeInt == kSubFolder)
+        banner = GetFirstImage(node, "Banners");
 
-    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
-        imgFilename = GetFirstImage(node, "Banners");
+    item->SetImage(banner, "banner");
 
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() ||
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
-        item->SetImage(imgFilename, "banner");
+    if (fanart.isEmpty() && nodeInt == kSubFolder)
+        fanart = GetFirstImage(node, "Fanart");
 
-    imgFilename = GetFanart(node);
-
-    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
-        imgFilename = GetFirstImage(node, "Fanart");
-
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() ||
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
-        item->SetImage(imgFilename, "fanart");
+    item->SetImage(fanart, "fanart");
 
     if (nodeInt == kSubFolder)
     {
