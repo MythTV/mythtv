@@ -124,7 +124,7 @@
             </state>
         </statetype>
 
-        <font name="menufont" face="Bitstream Vera Sans">
+        <font name="menufont" face="DejaVu Sans">
             <color>#8AAAF8</color>
             <size>20</size>
             <bold>yes</bold>
