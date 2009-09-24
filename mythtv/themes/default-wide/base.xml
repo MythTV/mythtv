@@ -552,13 +552,15 @@
 
     <!-- Base definition of a progressbar -->
     <progressbar name="baseprogressbar">
-        <area>0,0,10,10</area>
+        <area>0,0,536,38</area>
         <layout>horizontal</layout>
         <style>reveal</style>
         <imagetype name="background">
+            <area>0,0,100%,100%</area>
             <filename>progressbar_background.png</filename>
         </imagetype>
         <imagetype name="progressimage">
+            <area>0,0,100%,100%</area>
             <filename>progressbar_fill.png</filename>
         </imagetype>
     </progressbar>
