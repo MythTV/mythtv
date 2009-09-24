@@ -171,7 +171,9 @@ namespace
             if (!m_redirectUrl.isEmpty() && m_redirectCount <= 8)
             {
                 m_url.setUrl(m_redirectUrl);
+                m_data_buffer.reset();
                 StartCopy();
+                return;
             }
 
             QString errorMsg;
