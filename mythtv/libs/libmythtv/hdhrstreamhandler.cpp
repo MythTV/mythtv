@@ -689,6 +689,14 @@ QString HDHRStreamHandler::TunerSet(
         return QString::null;
     }
 
+    if (error && name == QString("channel"))
+    {
+        QString newval = val;
+        newval.replace("qam_256", "qam");
+        newval.replace("qam_64", "qam");
+        return TunerSet(name, newval, report_error_return, print_error);
+    }
+
     if (report_error_return && error)
     {
         if (print_error)
