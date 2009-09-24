@@ -258,6 +258,84 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             {
                 newFont->m_face.setUnderline(parseBool(info));
             }
+            else if (info.tagName() == "decoration")
+            {
+                QString dec = getFirstText(info).toLower();
+                QStringList values = dec.split(",");
+
+                QStringList::Iterator it;
+                for ( it = values.begin(); it != values.end(); ++it )
+                {
+                    if (*it == "underline")
+                        newFont->m_face.setUnderline(true);
+                    else if (*it == "overline")  
+                        newFont->m_face.setOverline(true);
+                    else if (*it == "strikeout")  
+                        newFont->m_face.setStrikeOut(true);
+                }
+            }
+            else if (info.tagName() == "weight")
+            {
+                QString weight = getFirstText(info).toLower();
+
+                if (weight == "ultralight" ||
+                    weight == "1")
+                    newFont->m_face.setWeight(1);
+                else if (weight == "light" ||
+                         weight == "2")
+                    newFont->m_face.setWeight(QFont::Light);
+                else if (weight == "normal" ||
+                         weight == "3")
+                    newFont->m_face.setWeight(QFont::Normal);
+                else if (weight == "demibold" ||
+                         weight == "4")
+                    newFont->m_face.setWeight(QFont::DemiBold);
+                else if (weight == "bold" ||
+                         weight == "5")
+                    newFont->m_face.setWeight(QFont::Bold);
+                else if (weight == "black" ||
+                         weight == "6")
+                    newFont->m_face.setWeight(QFont::Black);
+                else if (weight == "ultrablack" ||
+                         weight == "7")
+                    newFont->m_face.setWeight(100);
+                else
+                    newFont->m_face.setWeight(QFont::Normal);
+            }
+            else if (info.tagName() == "stretch")
+            {
+                QString stretch = getFirstText(info).toLower();
+
+                if (stretch == "ultracondensed" ||
+                    stretch == "1")    
+                    newFont->m_face.setStretch(QFont::UltraCondensed);
+                else if (stretch == "extracondensed" ||
+                         stretch == "2")
+                    newFont->m_face.setStretch(QFont::ExtraCondensed);
+                else if (stretch == "condensed" ||
+                         stretch == "3")
+                    newFont->m_face.setStretch(QFont::Condensed);
+                else if (stretch == "semicondensed" ||
+                         stretch == "4")
+                    newFont->m_face.setStretch(QFont::SemiCondensed);
+                else if (stretch == "unstretched" ||
+                         stretch == "5")
+                    newFont->m_face.setStretch(QFont::Unstretched);
+                else if (stretch == "semiexpanded" ||
+                         stretch == "6")
+                    newFont->m_face.setStretch(QFont::SemiExpanded);
+                else if (stretch == "expanded" ||
+                         stretch == "7")
+                    newFont->m_face.setStretch(QFont::Expanded);
+                else if (stretch == "extraexpanded" ||
+                         stretch == "8")
+                    newFont->m_face.setStretch(QFont::ExtraExpanded);
+                else if (stretch == "ultraexpanded" ||
+                         stretch == "9")
+                    newFont->m_face.setStretch(QFont::UltraExpanded);
+                else
+                    newFont->m_face.setStretch(QFont::Unstretched);
+            }
             else
             {
                 VERBOSE(VB_IMPORTANT, QString("Unknown tag %1 in font '%2'")
