@@ -59,4 +59,4 @@ if ! is_qmake4 $qmake; then
     fi
 fi
 
-${qmake} QMAKE=$(which ${qmake}) myththemes.pro
+${qmake} QMAKE=$(which ${qmake}) oldthemes.pro
