@@ -1065,8 +1065,12 @@ void MpegRecorder::StartRecording(void)
         _wait_for_keyframe_option = true;
     }
 
-    encoding = true;
-    recording = true;
+    {
+        QMutexLocker locker(&recording_wait_lock);
+        encoding = true;
+        recording = true;
+    }
+
     unsigned char *buffer = new unsigned char[bufferSize + 1];
     int len;
     int remainder = 0;
@@ -1086,9 +1090,6 @@ void MpegRecorder::StartRecording(void)
         if (requires_special_pause && !StartEncoding(readfd))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to start recording");
-            recording = false;
-            QMutexLocker locker(&recording_wait_lock);
-            recording_wait.wakeAll();
             _error = true;
         }
         else
@@ -1120,7 +1121,7 @@ void MpegRecorder::StartRecording(void)
                 if (!Open())
                 {
                     _error = true;
-                    return;
+                    break;
                 }
 
                 if (readfd < 0)
@@ -1258,8 +1259,10 @@ void MpegRecorder::StartRecording(void)
 
     delete[] buffer;
     SetStreamData(NULL);
-    recording = false;
+    encoding = false;
+
     QMutexLocker locker(&recording_wait_lock);
+    recording = false;
     recording_wait.wakeAll();
 }
 
@@ -1355,8 +1358,9 @@ bool MpegRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
 void MpegRecorder::StopRecording(void)
 {
     QMutexLocker locker(&recording_wait_lock);
-    if (encoding) {
-        encoding = false;
+    if (recording)
+    {
+        encoding = false; // force exit from StartRecording() while loop
         recording_wait.wait(&recording_wait_lock);
     }
 }
