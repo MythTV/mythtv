@@ -1654,13 +1654,9 @@ void PlaybackBox::customEdit()
         showAvailablePopup(pginfo);
         return;
     }
-    ProgramInfo *pi = pginfo;
-
-    if (!pi)
-        return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pi);
+    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
     if (ce->Create())
         mainStack->AddScreen(ce);
     else
