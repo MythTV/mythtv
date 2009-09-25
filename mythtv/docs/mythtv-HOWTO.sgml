@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-05-12, v0.22.00pre
+<date>2009-09-25, v0.22.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -89,22 +89,18 @@ you use one of the big-name OS packages.
 See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
 like to install a custom version of Knoppix optimized for MythTV.
 
-See <url url="http://linpvr.org" name="http://linpvr.org"> if you'd like
-to install MythTV onto a VIA Epia M machine.
-
-See <url url="http://bit.blkbk.com" name="http://bit.blkbk.com"> if you'd
-like to install MythTV on a Xbox.
+See <url url="http://www.minimyth.org" name="http://www.minimyth.org"> for a
+small MythTV distribution which can be booted over a network.
 
 See <url url="http://wilsonet.com/mythtv/"
 name="http://wilsonet.com/mythtv/"> for instructions tailored to RedHat's
 Fedora Core distribution.
 
+See <url url="http://www.mythbuntu.org/" name="http://www.mythbuntu.org/">
+for a distribution using a customized Ubuntu.
+
 There is a MythTV wiki at <url url="http://wiki.mythtv.org"
 name="http://wiki.mythtv.org">.
-
-If you are installing this version for Schedules Direct support, please see
-the <ref id="migratingtoSD" name="Migrating from DataDirect Labs to
-Schedules Direct"> section for additional information.
 
 <sect1>Upgrading from previous versions
 <p>The upgrade from previous versions should be transparent.  Any changes to
@@ -129,8 +125,8 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 This HOWTO is for MythTV v0.22
 
 Release notes for this version may be found in the MythTV Wiki at <url
-url="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21"
-name="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21">
+url="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22"
+name="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22">
 
 <sect1>Books about MythTV
 <p>If you would like to purchase a book specifically about MythTV:
@@ -7721,32 +7717,6 @@ name="http://aurora.zemris.fer.hr/filesystems/big.html">), XFS provide
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.
-
-<label id="migratingtoSD">
-<!-- Mostly from a post by Bruce Markey -->
-<sect1>Migrating from DataDirect Labs to Schedules Direct
-
-<p>MythTV v0.20.2 or later is required to natively support Schedules Direct.
-Code has been included to make the transition as simple as possible.
-
-<bf>You do not need to delete your existing video sources or add new ones!</bf>
-
-The following steps should work for most users:
-<itemize>
-<item>Create a Schedules Direct account and use the same information as your
-existing lineups at Zap2It Labs.  Do not add or delete channels at this
-time.
-<item>Shut down any running <bf>mythfrontend</bf> and <bf>mythbackend</bf> programs.
-<item>Perform a backup of your existing database.  See <ref id="backupdb"
-name="Saving or restoring the database"> for instructions.
-<item>Run <bf>mythtv-setup</bf> -> Video Sources.  Change the grabber to
-Schedules Direct, update the username and password fields with the account
-information you created at Schedules Direct and select "Retrieve Lineups".
-Click Finish.
-<item>Exit <bf>mythtv-setup</bf> and run <bf>mythfilldatabase</bf>.  Check
-if there were any errors.
-<item>Restart your <bf>mythbackend</bf> and <bf>mythfrontend</bf> programs.
-</itemize>
 
 <sect1>Caching support for Schedules Direct
 <p>MythTV 0.20.2 or later supports caching of downloaded information from
