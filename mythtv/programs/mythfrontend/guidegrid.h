@@ -213,7 +213,7 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     TV     *m_player;
     bool    m_usingNullVideo;
     bool    m_embedVideo;
-    QTimer *previewVideoRefreshTimer; // audited ref #5318
+    QTimer *m_previewVideoRefreshTimer; // audited ref #5318
     void    EmbedTVWindow(void);
     void    HideTVWindow(void);
     QRect   m_videoRect;

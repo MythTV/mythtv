@@ -141,7 +141,7 @@ void ScheduleCommon::ShowRecordingDialog(RecordingInfo recinfo)
 {
     QString message = recinfo.title;
     
-    if (recinfo.subtitle != "")
+    if (!recinfo.subtitle.isEmpty())
         message += QString(" - \"%1\"").arg(recinfo.subtitle);
     
     message += "\n\n";
@@ -254,7 +254,7 @@ void ScheduleCommon::ShowNotRecordingDialog(RecordingInfo recinfo)
 
     QString message = recinfo.title;
 
-    if (recinfo.subtitle != "")
+    if (!recinfo.subtitle.isEmpty())
         message += QString(" - \"%1\"").arg(recinfo.subtitle);
 
     message += "\n\n";
@@ -275,7 +275,7 @@ void ScheduleCommon::ShowNotRecordingDialog(RecordingInfo recinfo)
             message += QString("%1 - %2  %3")
             .arg(p->recstartts.toString(timeFormat))
             .arg(p->recendts.toString(timeFormat)).arg(p->title);
-            if (p->subtitle != "")
+            if (!p->subtitle.isEmpty())
                 message += QString(" - \"%1\"").arg(p->subtitle);
             message += "\n";
             delete p;

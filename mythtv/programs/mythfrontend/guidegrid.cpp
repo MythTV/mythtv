@@ -186,12 +186,12 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_allowFinder(allowFinder),
     m_player(player),
     m_usingNullVideo(false), m_embedVideo(embedVideo),
-    previewVideoRefreshTimer(new QTimer(this)),
+    m_previewVideoRefreshTimer(new QTimer(this)),
     m_jumpToChannelLock(QMutex::Recursive),
     m_jumpToChannel(NULL),
     m_jumpToChannelEnabled(true)
 {
-    connect(previewVideoRefreshTimer, SIGNAL(timeout()),
+    connect(m_previewVideoRefreshTimer, SIGNAL(timeout()),
             this,                     SLOT(refreshVideo()));
 
     m_channelCount = 5;
@@ -326,10 +326,10 @@ GuideGrid::~GuideGrid()
         m_updateTimer = NULL;
     }
 
-    if (previewVideoRefreshTimer)
+    if (m_previewVideoRefreshTimer)
     {
-        previewVideoRefreshTimer->disconnect(this);
-        previewVideoRefreshTimer = NULL;
+        m_previewVideoRefreshTimer->disconnect(this);
+        m_previewVideoRefreshTimer = NULL;
     }
 
     gContext->SaveSetting("EPGSortReverse", m_sortReverse ? "1" : "0");
@@ -2013,7 +2013,7 @@ void GuideGrid::GoTo(int start, int cur_row)
 
 void GuideGrid::updateJumpToChannel(void)
 {
-    QString txt = "";
+    QString txt;
     {
         QMutexLocker locker(&m_jumpToChannelLock);
         if (m_jumpToChannel)
@@ -2058,12 +2058,12 @@ bool GuideGrid::event(QEvent *e)
 
         if (message == "STOP_VIDEO_REFRESH_TIMER")
         {
-            previewVideoRefreshTimer->stop();
+            m_previewVideoRefreshTimer->stop();
             return true;
         }
         else if (message == "START_VIDEO_REFRESH_TIMER")
         {
-            previewVideoRefreshTimer->start(66);
+            m_previewVideoRefreshTimer->start(66);
             return true;
         }
     }

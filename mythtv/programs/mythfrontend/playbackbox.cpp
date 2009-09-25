@@ -441,7 +441,7 @@ bool PlaybackBox::Create()
 
         if ((m_titleList.size() <= 1) && (m_progsInDB > 0))
         {
-            m_recGroup = "";
+            m_recGroup.clear();
             showGroupFilter();
         }
     }
@@ -893,7 +893,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     m_recordingList->Reset();
 
     if (groupname == "default")
-        groupname = "";
+        groupname.clear();
 
     ProgramMap::iterator pmit = m_progLists.find(groupname);
     if (pmit == m_progLists.end())
@@ -3977,7 +3977,7 @@ void PlaybackBox::showRecGroupChanger(void)
 
     QStringList groupNames;
     QStringList displayNames;
-    QString selected = "";
+    QString selected;
 
     QString itemStr;
     QString dispGroup;
@@ -4047,7 +4047,7 @@ void PlaybackBox::showPlayGroupChanger(void)
 {
     QStringList groupNames;
     QStringList displayNames;
-    QString selected = "";
+    QString selected;
 
     displayNames.append(tr("Default"));
     groupNames.append("Default");

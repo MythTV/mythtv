@@ -95,7 +95,7 @@ ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(const ProgramInfo &other)
     last_record        = QDateTime();
     avg_delay          = 0;
     autoRecPriority    = 0;
-    profile            = "";
+    profile.clear();
 
     return *this;
 }
@@ -111,7 +111,7 @@ void ProgramRecPriorityInfo::clear(void)
     last_record        = QDateTime();
     avg_delay          = 0;
     autoRecPriority    = 0;
-    profile            = "";
+    profile.clear();
 }
 
 typedef struct RecPriorityInfo
@@ -1387,7 +1387,7 @@ void ProgramRecPriority::UpdateList()
             item->DisplayState(rating, "ratingstate");
         }
         else
-            progInfo->subtitle = "";
+            progInfo->subtitle.clear();
 
         QString state;
         if (progInfo->recType == kDontRecord ||
@@ -1487,7 +1487,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     rectyperecpriority = pgRecInfo->recTypeRecPriority;
     finalRecPriority = progRecPriority + autorecpri + rectyperecpriority;
 
-    QString subtitle = "";
+    QString subtitle;
     if (pgRecInfo->subtitle != "(null)" &&
         (pgRecInfo->rectype == kSingleRecord ||
             pgRecInfo->rectype == kOverrideRecord ||

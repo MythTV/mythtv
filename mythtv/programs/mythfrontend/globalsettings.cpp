@@ -1004,7 +1004,7 @@ void PlaybackProfileItemConfig::Save(void)
     for (uint i = 0; i < 2; i++)
     {
         QString val = QString("pref_cmp%1").arg(i);
-        QString data = "";
+        QString data;
         if (!cmp[i]->getValue().isEmpty())
         {
             data = QString("%1 %2 %3")

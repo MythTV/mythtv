@@ -94,9 +94,9 @@ void CustomPriority::loadData()
     m_prioritySpin->SetValue(1);
 
     RuleInfo rule;
-    rule.title = "";
+    rule.title;
     rule.priority = QString().setNum(1);
-    rule.description = "";
+    rule.description;
 
     MythUIButtonListItem *item = NULL;
     item = new MythUIButtonListItem(m_ruleList, tr("<New priority rule>"),

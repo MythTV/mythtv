@@ -618,7 +618,7 @@ void StatusBox::doScheduleStatus()
     {
         while (query.next())
         {
-            if (query.value(3).toString() > "")
+            if (!query.value(3).toString().isEmpty())
                 inputText[query.value(0).toInt()] = query.value(3).toString();
             else
                 inputText[query.value(0).toInt()] = QString("%1: %2")
@@ -666,7 +666,6 @@ void StatusBox::doScheduleStatus()
     {
         RecStatusType type = statusMap[i];
 
-        fontstate = "";
         if (statusMatch[type] > 0)
         {
             tmpstr = QString("%1 %2").arg(statusMatch[type])

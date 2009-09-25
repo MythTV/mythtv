@@ -258,7 +258,7 @@ void NetworkControl::RunCommandThread(void)
 void NetworkControl::processNetworkControlCommand(QString command)
 {
     QMutexLocker locker(&clientLock);
-    QString result = "";
+    QString result;
     QStringList tokens = command.simplified().split(" ");
 
     if (is_abbrev("jump", tokens[0]))
@@ -309,7 +309,7 @@ void NetworkControl::deleteClientLater(void)
 
 void NetworkControl::newConnection()
 {
-    QString welcomeStr = "";
+    QString welcomeStr;
     bool closedOldConn = false;
 
     VERBOSE(VB_GENERAL, LOC +
@@ -514,7 +514,7 @@ QString NetworkControl::processKey(QStringList tokens)
 QString NetworkControl::processPlay(QStringList tokens)
 {
     QString result = "OK";
-    QString message = "";
+    QString message;
 
     if (tokens.size() < 2)
         return QString("ERROR: See 'help %1' for usage information")
@@ -585,7 +585,7 @@ QString NetworkControl::processPlay(QStringList tokens)
             MythEvent me(message);
             gContext->dispatch(me);
 
-            result = "";
+            result.clear();
         }
         else
         {
@@ -855,7 +855,7 @@ QString NetworkControl::processHelp(QStringList tokens)
             if (tokens.size() >= 2)
                 command = tokens[1];
             else
-                command = "";
+                command.clear();
         }
         else
         {
@@ -1104,7 +1104,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
 
 QString NetworkControl::listRecordings(QString chanid, QString starttime)
 {
-    QString result = "";
+    QString result;
     QString episode;
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryStr;
@@ -1154,7 +1154,7 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
 
 QString NetworkControl::saveScreenshot(QStringList tokens)
 {
-    QString result = "";
+    QString result;
     int width = -1;
     int height = -1;
     long long frameNumber = 150;

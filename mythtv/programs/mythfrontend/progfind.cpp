@@ -270,7 +270,7 @@ void ProgFinder::customEvent(QEvent *event)
         {
             if (resulttext == tr("Clear Search"))
             {
-                m_searchStr = "";
+                m_searchStr.clear();
                 if (m_searchText)
                     m_searchText->SetText(m_searchStr);
                 updateShowList();
@@ -331,8 +331,8 @@ void ProgFinder::updateInfo(void)
 
     if (GetFocusWidget() == m_alphabetList)
     {
-        QString title = "";
-        QString description = "";
+        QString title;
+        QString description;
 
         if (m_showList->GetCount() == 0)
         {
@@ -502,7 +502,7 @@ void ProgFinder::quickRecord()
 
 void ProgFinder::updateTimesList()
 {
-    QString itemText = "";
+    QString itemText;
 
     m_timesList->Reset();
 

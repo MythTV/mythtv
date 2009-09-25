@@ -86,7 +86,7 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
     }
 
     QMap<QString,QString> main_ratings;
-    QString advisory = "";
+    QString advisory;
     while (query.next())
     {
         if (query.value(0).toString().toLower() == "advisory")
@@ -111,7 +111,7 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
         return *main_ratings.begin() + advisory;
     }
 
-    QString ratings = "";
+    QString ratings;
     QMap<QString,QString>::const_iterator it;
     for (it = main_ratings.begin(); it != main_ratings.end(); ++it)
     {
@@ -178,7 +178,7 @@ void ProgDetails::addItem(const QString &key, const QString &title, const QStrin
 {
     QString escapedKey = "%" + key + "%";
 
-    if (data == "")
+    if (data.isEmpty())
     {
         removeItem(key);
         return;
@@ -277,7 +277,7 @@ void ProgDetails::loadPage(void)
         rating = getRatings(recorded, m_progInfo.chanid.toUInt(), m_progInfo.startts);
     }
 
-    if (category_type == "" && m_progInfo.programid != "")
+    if (category_type.isEmpty() && !m_progInfo.programid.isEmpty())
     {
         QString prefix = m_progInfo.programid.left(2);
 
@@ -291,10 +291,8 @@ void ProgDetails::loadPage(void)
            category_type = "tvshow";
     }
 
-    QString s   = "";
-
-    s = m_progInfo.title;
-    if (m_progInfo.subtitle != "")
+    QString s = m_progInfo.title;
+    if (!m_progInfo.subtitle.isEmpty())
         s += " - \"" + m_progInfo.subtitle + "\"";
     addItem("TITLE", QObject::tr("Title"), s);
 
@@ -302,22 +300,22 @@ void ProgDetails::loadPage(void)
 
     s = m_progInfo.description;
 
-    QString attr = "";
+    QString attr;
 
     if (partnumber > 0)
         attr += QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
 
-    if (rating != "" && rating != "NR")
+    if (!rating.isEmpty() && rating != "NR")
         attr += rating + ", ";
     if (category_type == "movie")
     {
-        if (year != "")
+        if (!year.isEmpty())
             attr += year + ", ";
 
         if (stars > 0.0)
             attr += QObject::tr("%n star(s)", "", (int) (stars * 4.0)) + ", ";
     }
-    if (colorcode != "")
+    if (!colorcode.isEmpty())
         attr += colorcode + ", ";
 
     if (audioprop & AUD_MONO)
@@ -358,7 +356,7 @@ void ProgDetails::loadPage(void)
     else if (m_progInfo.repeat)
         attr += QObject::tr("Repeat") + ", ";
 
-    if (attr != "")
+    if (!attr.isEmpty())
     {
         attr.truncate(attr.lastIndexOf(','));
         s += " (" + attr + ")";
@@ -366,8 +364,8 @@ void ProgDetails::loadPage(void)
 
     addItem("DESCRIPTION", QObject::tr("Description"), s);
 
-    s = "";
-    if (m_progInfo.category != "")
+    s.clear();
+    if (!m_progInfo.category.isEmpty())
     {
         s = m_progInfo.category;
 
@@ -386,32 +384,32 @@ void ProgDetails::loadPage(void)
     }
     addItem("CATEGORY", QObject::tr("Category"), s);
 
-    s = "";
-    if (category_type  != "")
+    s.clear();
+    if (!category_type.isEmpty())
     {
         s = category_type;
-        if (m_progInfo.seriesid != "")
+        if (!m_progInfo.seriesid.isEmpty())
             s += "  (" + m_progInfo.seriesid + ")";
-        if (showtype != "")
+        if (!showtype.isEmpty())
             s += "  " + showtype;
     }
     addItem("CATEGORY_TYPE", QObject::tr("Type", "category_type"), s);
 
     addItem("EPISODE", QObject::tr("Episode Number"), epinum);
 
-    s = "";
+    s.clear();
     if (m_progInfo.hasAirDate && category_type != "movie")
     {
-          s = m_progInfo.originalAirDate.toString(fullDateFormat);
+        s = m_progInfo.originalAirDate.toString(fullDateFormat);
     }
     addItem("ORIGINAL_AIRDATE", QObject::tr("Original Airdate"), s);
 
     addItem("PROGRAMID", QObject::tr("Program ID"), m_progInfo.programid);
 
-    QString role = "", pname = "";
-    QString actors = "", director = "", producer = "", execProducer = "";
-    QString writer = "", guestStar = "", host = "", adapter = "";
-    QString presenter = "", commentator = "", guest = "";
+    QString role, pname;
+    QString actors, director, producer, execProducer;
+    QString writer, guestStar, host, adapter;
+    QString presenter, commentator, guest;
 
     if (m_progInfo.endts != m_progInfo.startts)
     {
@@ -433,7 +431,7 @@ void ProgDetails::loadPage(void)
 
         if (query.exec() && query.isActive() && query.size() > 0)
         {
-            QString rstr = "", plist = "";
+            QString rstr, plist;
 
             while(query.next())
             {
@@ -564,13 +562,13 @@ void ProgDetails::loadPage(void)
     addItem("MYTHTV_STATUS", QString("MythTV " + QObject::tr("Status")), s);
     delete p;
 
-    QString recordingRule = "";
-    QString lastRecorded = "";
-    QString nextRecording = "";
-    QString averageTimeShift = "";
-    QString watchListScore = "";
-    QString watchListStatus = "";
-    QString searchPhrase = "";
+    QString recordingRule;
+    QString lastRecorded;
+    QString nextRecording;
+    QString averageTimeShift;
+    QString watchListScore;
+    QString watchListStatus;
+    QString searchPhrase;
 
     if (m_progInfo.recordid)
     {
@@ -633,7 +631,7 @@ void ProgDetails::loadPage(void)
     addItem("WATCH_LIST_STATUS", QObject::tr("Watch List Status"), watchListStatus);
     addItem("SEARCH_PHRASE", QObject::tr("Search Phrase"), searchPhrase);
 
-    s = "";
+    s.clear();
     if (m_progInfo.findid > 0)
     {
         QDate fdate(1970, 1, 1);
@@ -642,13 +640,13 @@ void ProgDetails::loadPage(void)
     }
     addItem("FINDID", QObject::tr("Find ID"), s);
 
-    QString recordingHost = "";
-    QString recordedFilename = "";
-    QString recordedFileSize = "";
-    QString recordingGroup = "";
-    QString storageGroup = "";
-    QString playbackGroup = "";
-    QString recordingProfile = "";
+    QString recordingHost;
+    QString recordedFilename;
+    QString recordedFileSize;
+    QString recordingGroup;
+    QString storageGroup;
+    QString playbackGroup;
+    QString recordingProfile;
 
     if (recorded)
     {
