@@ -1992,7 +1992,6 @@ bool CardUtil::HDHRdoesDVB(const QString &device)
 QString CardUtil::GetHDHRdesc(const QString &device)
 {
     QString connectErr = QObject::tr("Unable to connect to device.");
-    (void) device;
 
 #ifdef USING_HDHOMERUN
     bool      deviceIsIP = false;
@@ -2031,7 +2030,9 @@ QString CardUtil::GetHDHRdesc(const QString &device)
         description += QObject::tr(", firmware: %2").arg(sVersion);
 
     return description;
-#endif
+#else
 
+    (void) device;
     return connectErr;
+#endif
 }
