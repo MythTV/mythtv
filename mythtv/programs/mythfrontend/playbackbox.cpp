@@ -771,6 +771,16 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
 
 void PlaybackBox::updateUsage()
 {
+    MythUIText        *freereport = dynamic_cast<MythUIText *>
+                                        (GetChild("freereport"));
+    MythUIProgressBar *usedbar    = dynamic_cast<MythUIProgressBar *>
+                                        (GetChild("usedbar"));
+
+    // If the theme doesn't have these widgets,
+    // don't waste time querying the backend...
+    if (!freereport && !usedbar)
+        return;
+
     if (m_freeSpaceNeedsUpdate || m_connected)
     {
         m_freeSpaceNeedsUpdate = false;
@@ -803,17 +813,13 @@ void PlaybackBox::updateUsage()
     QString rep = tr(", %1 GB free").arg(size);
     usestr = usestr + rep;
 
-    MythUIText *m_freeSpaceText = dynamic_cast<MythUIText *>
-                                                    (GetChild("freereport"));
-    if (m_freeSpaceText)
-        m_freeSpaceText->SetText(usestr);
+    if (freereport)
+        freereport->SetText(usestr);
 
-    MythUIProgressBar *m_freeSpaceProgress = dynamic_cast<MythUIProgressBar *>
-                                                        (GetChild("usedbar"));
-    if (m_freeSpaceProgress)
+    if (usedbar)
     {
-        m_freeSpaceProgress->SetUsed(m_freeSpaceUsed);
-        m_freeSpaceProgress->SetTotal(m_freeSpaceTotal);
+        usedbar->SetUsed(m_freeSpaceUsed);
+        usedbar->SetTotal(m_freeSpaceTotal);
     }
 }
 
