@@ -412,6 +412,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[sa_vendor_ids[i] << 32 | 0x0be0] = "SA3250HD";
         id_to_model[sa_vendor_ids[i] << 32 | 0x1072] = "SA4200HD";
         id_to_model[sa_vendor_ids[i] << 32 | 0x10cc] = "SA4250HDC";
+        id_to_model[sa_vendor_ids[i] << 32 | 0x22ce] = "SA8300HD";
     }
 
     const uint64_t motorola_vendor_ids[] =
@@ -490,6 +491,7 @@ bool FirewireDevice::IsSTBSupported(const QString &panel_model)
             (model == "SA3250HD") ||
             (model == "SA4200HD") ||
             (model == "SA4250HDC") ||
+            (model == "SA8300HD") ||
             (model == "PACE-550") ||
             (model == "PACE-779") ||
             (model == "QIP-7100") ||
