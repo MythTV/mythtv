@@ -155,7 +155,9 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     bool m_isConnected;
     bool m_returnConnection;
     QString m_last_prepared_query; // holds a copy of the last prepared query
+#ifdef DEBUG_QT4_PORT
     QRegExp m_testbindings;
+#endif
 };
 
 #endif
