@@ -892,7 +892,7 @@ class MPUBLIC UICheckBoxType : public UIType
 
 class IntStringPair
 {
-    //  Miniscule class for holding data
+    //  Minuscule class for holding data
     //  in a UISelectorType (below)
 
   public:
@@ -919,7 +919,7 @@ class MPUBLIC UISelectorType : public UIPushButtonType
 
     //
     //  A theme-able "thingy" (that's the
-    //  offical term) that can hold a list
+    //  official term) that can hold a list
     //  of strings and emit an int and/or
     //  the string when the user selects
     //  from among them.

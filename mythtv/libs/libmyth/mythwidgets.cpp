@@ -188,7 +188,7 @@ void MythComboBox::focusOutEvent(QFocusEvent *e)
     {
         lineEdit()->setPalette(QPalette());
 
-        // commit change if the user was editting an entry
+        // commit change if the user was editing an entry
         QString curText = currentText();
         int i;
         bool foundItem = false;
@@ -714,7 +714,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
 
     //  Show the characters in the current set being cycled
     //  through, with the current choice in a different color. If the current
-    //  character is uppercase X (interpreted as desctructive
+    //  character is uppercase X (interpreted as destructive
     //  backspace) or an underscore (interpreted as a space)
     //  then show these special cases in yet another color.
 
@@ -943,7 +943,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
             }
             break;
 
-            //  If you want to mess arround with other ways to allocate
+            //  If you want to mess around with other ways to allocate
             //  key presses you can just add entries between the quotes
 
         case Qt::Key_1:

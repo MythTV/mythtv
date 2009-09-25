@@ -234,7 +234,7 @@ bool AudioOutputCA::OpenDevice()
 
     if (!deviceOpened)
     {
-        Debug("OpenDevice() Trying Analogue.");
+        Debug("OpenDevice() Trying Analog.");
         deviceOpened = d->OpenAnalog();
     }
 

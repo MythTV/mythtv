@@ -162,7 +162,7 @@ void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
             pSoundStretch->setTempo(audio_stretchfactor);
             pSoundStretch->setSetting(SETTING_SEQUENCE_MS, 35);
 
-            // dont need these with only tempo change
+            // don't need these with only tempo change
             //pSoundStretch->setPitch(1.0);
             //pSoundStretch->setRate(1.0);
 
@@ -701,7 +701,7 @@ bool AudioOutputBase::AddSamples(char *buffers[], int samples,
         int error = src_process(src_ctx, &src_data);
         if (error)
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Error occured while resampling audio: %1")
+                    QString("Error occurred while resampling audio: %1")
                     .arg(src_strerror(error)));
 
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff,
@@ -765,7 +765,7 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
         int error = src_process(src_ctx, &src_data);
         if (error)
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Error occured while resampling audio: %1")
+                    QString("Error occurred while resampling audio: %1")
                     .arg(src_strerror(error)));
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff,
                                  src_data.output_frames_gen*audio_channels);
@@ -811,7 +811,7 @@ int AudioOutputBase::WaitForFreeSpace(int samples)
                 int error = src_reset(src_ctx);
                 if (error)
                     VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
-                            "Error occured while resetting resampler: %1")
+                            "Error occurred while resetting resampler: %1")
                             .arg(src_strerror(error)));
             }
         }

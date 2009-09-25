@@ -1102,7 +1102,7 @@ bool telnet(const QString &host, int port)
  *   This function does not care if the files are actual files.
  *   For compatibility with pipes and socket streams the file location
  *   will not be reset to 0 at the end of this function. If the function
- *   is succesful the file pointers will be at the end of the copied
+ *   is successful the file pointers will be at the end of the copied
  *   data.
  *
  *  \param dst Destination QFile
