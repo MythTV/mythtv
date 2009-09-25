@@ -433,13 +433,15 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         0x0f9f,    0x152f,
         /* DCT-6216, 2224 */
         0x17ee,    0x1a66,
+        /* QIP 6200 */
+        0x211e,
         /* QIP 7100 */
         0x2374,
         /* unknown, see http://standards.ieee.org/regauth/oui/oui.txt */
         0x04db,    0x0406,    0x0ce5,    0x111a,    0x1225,    0x1404,
-        0x1626,    0x18c0,    0x1ade,    0x1cfb,    0x2040,    0x211e,
-        0x2180,    0x2210,    0x230b,    0x2375,    0x2395,    0x23a2,
-        0x23ed,    0x23ee,    0x23a0,    0x23a1,
+        0x1626,    0x18c0,    0x1ade,    0x1cfb,    0x2040,    0x2180,
+        0x2210,    0x230b,    0x2375,    0x2395,    0x23a2,    0x23ed,
+        0x23ee,    0x23a0,    0x23a1,
 
     };
     const uint motorola_vendor_id_cnt =
@@ -459,6 +461,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
         id_to_model[motorola_vendor_ids[i] << 32 | 0x64cb] = "DCT-6212";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x646b] = "DCT-6216";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x8100] = "QIP-7100";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0x7100] = "QIP-6200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x0001] = "QIP-7100";
     }
 
@@ -494,6 +497,7 @@ bool FirewireDevice::IsSTBSupported(const QString &panel_model)
             (model == "SA8300HD") ||
             (model == "PACE-550") ||
             (model == "PACE-779") ||
+            (model == "QIP-6200") ||
             (model == "QIP-7100") ||
             (model == "GENERIC"));
 }
