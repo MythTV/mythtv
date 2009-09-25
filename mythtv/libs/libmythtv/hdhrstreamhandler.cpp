@@ -78,7 +78,7 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref)
     if (*rit > 1)
     {
         ref = NULL;
-        *rit--;
+        (*rit)--;
         return;
     }
 
