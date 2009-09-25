@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.5.2" # 0.1.0 Initial development 
+__version__=u"v0.5.3" # 0.1.0 Initial development 
 					 # 0.2.0 Inital beta release
 					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
                      #       the use of tmdb.pl when the perl script exists
@@ -208,7 +208,11 @@ __version__=u"v0.5.2" # 0.1.0 Initial development
                      #       English graphics then any available graphics will be returned.
 					 # 0.5.2 Fixed an abort when trying to add a storage group graphics without a 
                      #       proper file path.  
-			
+					 # 0.5.3 Fixed a bug where the filemarkup table is not cleaned up if Jamu renames
+					 #       a Miro movie trailor video file that the user wants to keep in MythVideo.
+					 #       Fixed a bug with Miro video file renaming of Miro Movie trailers 
+                     #       for the same movie but which had different file extentions.
+
 
 usage_txt=u'''
 JAMU - Just.Another.Metadata.Utility is a versatile utility for downloading graphics and meta data
@@ -4439,6 +4443,46 @@ class MythTvMetaData(VideoFiles):
 	# end _getVideoLength
 
 
+	def removeMythvideoSeekTable(self, filename):
+		'''Remove seektable entries for a Mythvideo from the "filemarkup" table. Entries may of may not
+		exist. The deletes need to remove entries for both an absolute file path and a Storage Groups 
+		"myth://..." file name definition.
+		return nothing
+		'''
+		global storagegroups
+		table = u'filemarkup'
+
+		## "myth://Videos@192.168.0.102:6543/0Review/Boxing.......mpg"
+		## Plus turn any relative path into an absolute path (create a routine as also needed in the create)
+		filename = self.rtnAbsolutePath(filename, u'mythvideo')
+		for group in storagegroups[u'mythvideo']:
+			if filename.startswith(group):
+				filename2 = filename.replace(group+u'/', u'')
+				break
+			else:
+				filename2 = False
+		else:
+			filename2 = False
+
+		if self.config['simulation']:
+			logger.info(u'Simulation: DELETE FROM %s WHERE filename="%s"' % (table, filename))
+			if filename2:
+				logger.info(u'Simulation: DELETE FROM %s WHERE filename="%s"' % (table, filename2))
+		else:
+			cur = mythdb.db.cursor()
+			try:
+				cur.execute(u'DELETE FROM %s WHERE  filename="%s"' % (table, filename))
+			except MySQLdb.Error, e:
+				logger.error(u"Cannot delete from table (%s) records: (%s)\nMySql error: %d: %s" % (table, filename, e.args[0], e.args[1]))
+			if filename2:
+				try:
+					cur.execute(u'DELETE FROM %s WHERE  filename="%s"' % (table, filename2))
+				except MySQLdb.Error, e:
+					logger.error(u"Cannot delete from table (%s) records: (%s)\nMySql error: %d: %s" % (table, filename2, e.args[0], e.args[1]))
+			cur.close()
+	# end removeMythvideoSeekTable()
+
+
 	def _getMiroVideometadataRecords(self):
 		"""Fetches all videometadata records with an inetref of '99999999' and a category of 'Miro'. If the
 		videometadata record has a host them it must match the lower-case of the locahostname.
@@ -4581,28 +4625,37 @@ class MythTvMetaData(VideoFiles):
 					changed_fields[key] = mirodetails[key]
 					if changed_fields[key][0] != u'/':
 						changed_fields[u'host'] = localhostname.lower()
-			if not mirodetails[u'tv'] and not mirodetails[u'symlink']:
+
+			if not mirodetails[u'tv'] and not mirodetails[u'symlink'] and os.path.isfile(mirodetails[u'pathfilename']):
 				changed_fields[u'inetref'] = mirodetails[u'inetref']
 				changed_fields[u'subtitle'] = u''
 				changed_fields[u'year'] = mirodetails[u'year']
 				changed_fields[u'banner'] = u''
 				(dirName, fileName) = os.path.split(mirodetails[u'pathfilename'])
 				(fileBaseName, fileExtension) = os.path.splitext(fileName)
+				try:
+					dir_list = os.listdir(unicode(dirName, 'utf8'))
+				except (UnicodeEncodeError, TypeError):
+					dir_list = os.listdir(dirName)
 				index = 1
 				while index != 0:
 					filename = u'%s - Trailer %d' % (mirodetails[u'moviename'], index)
 					fullfilename = u'%s/%s%s' % (dirName, filename, fileExtension)
-					if not os.path.isfile(fullfilename):
+					for flenme in dir_list: 
+						if fnmatch.fnmatch(flenme.lower(), u'%s.*' % filename.lower()):
+							break
+					else:
 						changed_fields[u'title'] = filename
 						if self.config['simulation']:
 							sys.stdout.write(
 							u"Simulation rename Miro-MythTV movie trailer from (%s) to (%s)\n" % (mirodetails[u'pathfilename'], fullfilename))
 						else:
 							os.rename(mirodetails[u'pathfilename'], fullfilename)
+							self.removeMythvideoSeekTable(mirodetails[u'pathfilename'])
 						changed_fields[u'filename'] = self.rtnRelativePath(fullfilename, u'mythvideo')
 						break
-					else:
-						index+=1
+					index+=1
+
 			if len(changed_fields):
 				if self.config['simulation']:
 					if program['subtitle']:
