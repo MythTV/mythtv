@@ -771,14 +771,13 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
 
 void PlaybackBox::updateUsage()
 {
-    vector<FileSystemInfo> fsInfos;
-    if (m_freeSpaceNeedsUpdate && m_connected)
+    if (m_freeSpaceNeedsUpdate || m_connected)
     {
         m_freeSpaceNeedsUpdate = false;
         m_freeSpaceTotal = 0;
         m_freeSpaceUsed = 0;
 
-        fsInfos = RemoteGetFreeSpace();
+        vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
         for (unsigned int i = 0; i < fsInfos.size(); i++)
         {
             if (fsInfos[i].directory == "TotalDiskSpace")
