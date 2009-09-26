@@ -4,12 +4,10 @@
  * \brief Provide a web browser widget.
  *
  * This requires qt4.4.0 or later to function properly.
- * There is a dummy class so to make it optimal.
- * Qt 4.3.x users can still compile MythTV but with reduced functionality.
  * 
  */
 
-#ifdef USING_QTWEBKIT
+#include "mythuiwebbrowser.h"
 
 // qt
 #include <QApplication>
@@ -31,8 +29,6 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythuihelper.h"
-
-#include "mythuiwebbrowser.h"
 
 /**
  * @class MythWebView
@@ -149,10 +145,7 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
  *  \param name the name of this widget
  */
 MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name),
-#ifdef USING_QTWEBKIT
-      m_browser(NULL),
-#endif
+    : MythUIType(parent, name), m_browser(NULL),
       m_image(NULL),         m_active(false),
       m_initialized(false),  m_lastUpdateTime(QTime()),
       m_updateInterval(0),   m_zoom(1.0),
@@ -701,7 +694,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         else if (action == "NEXTLINK")
         {
             QKeyEvent tabKey(event->type(), Qt::Key_Tab,
-                             event->modifiers(), QString::null,
+                             event->modifiers(), QString(),
                              event->isAutoRepeat(), event->count());
 
             *event = tabKey;
@@ -712,7 +705,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         else if (action == "PREVIOUSLINK")
         {
             QKeyEvent shiftTabKey(event->type(), Qt::Key_Tab,
-                          event->modifiers() | Qt::ShiftModifier,QString::null,
+                          event->modifiers() | Qt::ShiftModifier,QString(),
                           event->isAutoRepeat(), event->count());
 
             *event = shiftTabKey;
@@ -722,7 +715,7 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         else if (action == "FOLLOWLINK")
         {
             QKeyEvent returnKey(event->type(), Qt::Key_Return,
-                                event->modifiers(), QString::null,
+                                event->modifiers(), QString(),
                                 event->isAutoRepeat(), event->count());
             *event = returnKey;
 
@@ -855,231 +848,3 @@ void MythUIWebBrowser::CreateCopy(MythUIType *parent)
     MythUIWebBrowser *browser = new MythUIWebBrowser(parent, objectName());
     browser->CopyFrom(this);
 }
-
-
-#else // USING_QTWEBKIT
-///////////////////////////////////////////////////////////////////////////////
-// fake MythUIWebBrowser
-// remove when we require qtwebkit
-///////////////////////////////////////////////////////////////////////////////
-
-// qt
-#include <QPainter>
-
-// myth
-#include "mythpainter.h"
-#include "mythfontproperties.h"
-#include "mythverbose.h"
-#include "mythmainwindow.h"
-#include "mythimage.h"
-
-#include "mythuiwebbrowser.h"
-
-MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
-                : MythUIType(parent, name)
-{
-    m_zoom = 1.0;
-    m_image = NULL;
-
-    m_initialized = false;
-    m_active = false;
-
-    SetCanTakeFocus(false);
-}
-
-void MythUIWebBrowser::Init(void)
-{
-    QImage image = QImage(m_Area.size(), QImage::Format_ARGB32);
-    m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
-    m_image->Assign(image);
-
-    QRect area(0, 0, m_Area.width(), m_Area.height());
-    QPainter painter((QImage*)m_image);
-    painter.fillRect(area, QColor(Qt::white));
-    painter.setPen(Qt::black);
-    painter.setFont(QFont("Arial", 30));
-    painter.drawText(area, Qt::AlignCenter|Qt::TextWordWrap,
-                     "This feature requires QtWebKit from Qt 4.4.0 or later");
-    painter.end();
-
-    m_initialized = true;
-}
-
-void MythUIWebBrowser::Finalize(void)
-{
-    Init();
-
-    MythUIType::Finalize();
-}
-
-MythUIWebBrowser::~MythUIWebBrowser()
-{
-    if (m_image)
-    {
-        m_image->DownRef();
-        m_image = NULL;
-    }
-}
-
-void MythUIWebBrowser::LoadPage(QUrl url)
-{
-    (void) url;
-}
-
-void MythUIWebBrowser::SetHtml(const QString &html, const QUrl &baseUrl)
-{
-    (void) html;
-    (void) baseUrl;
-}
-
-void MythUIWebBrowser::SetBackgroundColor(QColor color)
-{
-    (void) color;
-}
-
-void MythUIWebBrowser::SetActive(bool active)
-{
-    (void) active;
-}
-
-void SetHtml(const QString &html, const QUrl &baseUrl)
-{
-}
-
-void MythUIWebBrowser::ZoomIn(void)
-{
-}
-
-void MythUIWebBrowser::ZoomOut(void)
-{
-}
-
-void MythUIWebBrowser::SetZoom(float zoom)
-{
-    (void) zoom;
-}
-
-float MythUIWebBrowser::GetZoom(void)
-{
-    return 1.0;
-}
-
-bool MythUIWebBrowser::CanGoForward(void)
-{
-    return false;
-}
-
-bool MythUIWebBrowser::CanGoBack(void)
-{
-    return false;
-}
-
-void MythUIWebBrowser::Back(void)
-{
-}
-
-void MythUIWebBrowser::Forward(void)
-{
-}
-
-QIcon MythUIWebBrowser::GetIcon(void)
-{
-    return QIcon();
-}
-
-QUrl MythUIWebBrowser::GetUrl(void)
-{
-    return QUrl();
-}
-
-void MythUIWebBrowser::slotLoadStarted(void)
-{
-}
-
-void MythUIWebBrowser::slotLoadFinished(bool ok)
-{
-    (void) ok;
-}
-
-void MythUIWebBrowser::slotLoadProgress(int progress)
-{
-    (void) progress;
-}
-
-void MythUIWebBrowser::slotTitleChanged(const QString &title)
-{
-    (void) title;
-}
-
-void MythUIWebBrowser::slotStatusBarMessage(const QString &text)
-{
-    (void) text;
-}
-
-void MythUIWebBrowser::slotIconChanged(void)
-{
-}
-
-void MythUIWebBrowser::slotTakingFocus(void)
-{
-}
-
-void MythUIWebBrowser::slotLosingFocus(void)
-{
-}
-
-void MythUIWebBrowser::UpdateBuffer(void)
-{
-}
-
-void MythUIWebBrowser::Pulse(void)
-{
-}
-
-void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                       int alphaMod, QRect clipRegion)
-{
-    if (!m_initialized)
-        Init();
-
-
-    QRect area = m_Area;
-    area.translate(xoffset, yoffset);
-
-    p->DrawImage(area.x(), area.y(), m_image, alphaMod);
-}
-
-bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
-{
-    return false;
-}
-
-void MythUIWebBrowser::HandleMouseAction(const QString &action)
-{
-    (void) action;
-}
-
-bool MythUIWebBrowser::ParseElement(QDomElement &element)
-{
-    return MythUIType::ParseElement(element);
-}
-
-void MythUIWebBrowser::CopyFrom(MythUIType *base)
-{
-    MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *>(base);
-    if (!browser)
-    {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
-        return;
-    }
-
-    MythUIType::CopyFrom(base);
-}
-
-void MythUIWebBrowser::CreateCopy(MythUIType *parent)
-{
-    MythUIWebBrowser *browser = new MythUIWebBrowser(parent, objectName());
-    browser->CopyFrom(this);
-}
-
-#endif // USING_QTWEBKIT
