@@ -1,13 +1,20 @@
+
+// Own header
+#include "xmlparsebase.h"
+
+// C++/C headers
 #include <typeinfo>
 
+// QT headers
 #include <QFile>
 #include <QDomDocument>
 
-#include "xmlparsebase.h"
+// libmyth headers
+#include "mythverbose.h"
+
+// Mythui headers
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
-
-#include "mythverbose.h"
 
 /* ui type includes */
 #include "mythscreentype.h"
@@ -118,7 +125,7 @@ int XMLParseBase::parseAlignment(const QString &text)
 {
     int alignment = 0;
 
-    QStringList values = text.split(",");
+    QStringList values = text.split(',');
 
     QStringList::Iterator it;
     for ( it = values.begin(); it != values.end(); ++it )
@@ -533,7 +540,7 @@ bool XMLParseBase::LoadBaseTheme(void)
     for (i = searchpath.begin(); i != searchpath.end(); ++i)
     {
         QString themefile = *i + "base.xml";
-        if (doLoad(QString::null, GetGlobalObjectStore(), themefile, false))
+        if (doLoad(QString(), GetGlobalObjectStore(), themefile, false))
         {
             VERBOSE(VB_GENERAL, "Loading base theme from " + themefile);
         }

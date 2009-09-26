@@ -1,6 +1,11 @@
+
+// Own header
+#include "DisplayResScreen.h"
+
+// QT headers
 #include <QStringList>
 
-#include "DisplayResScreen.h"
+// C++ headers
 #include <cmath>
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
@@ -53,9 +58,9 @@ DisplayResScreen::DisplayResScreen(const QString &str)
     : width(0), height(0), width_mm(0), height_mm(0), aspect(-1.0), custom(false)
 {
     refreshRates.clear();
-    QStringList slist = str.split(":");
+    QStringList slist = str.split(':');
     if (slist.size()<4)
-        slist = str.split(","); // for backward compatibility
+        slist = str.split(','); // for backward compatibility
     if (slist.size() >= 4)
     {
         width = slist[0].toInt();

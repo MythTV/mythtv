@@ -21,6 +21,9 @@
 **
 **--------------------------------------------------------------------------*/
 
+// Own header
+#include "jsmenu.h"
+
 // QT headers
 #include <QApplication>
 #include <QEvent>
@@ -43,7 +46,6 @@
 #include "mythverbose.h"
 
 // Mythui headers
-#include "jsmenu.h"
 #include "jsmenuevent.h"
 
 #define LOC QString("JoystickMenuThread: ")
@@ -168,7 +170,7 @@ int JoystickMenuThread::ReadConfig(QString config_file)
     {
         QString rawline = istream.readLine();
         QString simple_line = rawline.simplified();
-        if (simple_line.isEmpty() || simple_line.startsWith("#"))
+        if (simple_line.isEmpty() || simple_line.startsWith('#'))
             continue;
 
         QStringList tokens = simple_line.split(" ");

@@ -3,11 +3,16 @@
 **  GPL license; Original copyright 2004 Jeremy White <jwhite@whitesen.org>
 **     although this is largely a derivative of lircevent.cpp
 **--------------------------------------------------------------------------*/
+
+// Own header
+#include "jsmenuevent.h"
+
+// QT headers
 #include <QApplication>
 #include <QString>
-#include "mythmainwindow.h"
 
-#include "jsmenuevent.h"
+// Mythui headers
+#include "mythmainwindow.h"
 
 JoystickMenuEventLock::JoystickMenuEventLock(bool lock_events)
              : m_eventsLocked(false)

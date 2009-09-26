@@ -1,5 +1,6 @@
-#include "config.h"
+
 #include "DisplayRes.h"
+#include "config.h"
 #include "mythverbose.h"
 #include "mythdb.h"
 

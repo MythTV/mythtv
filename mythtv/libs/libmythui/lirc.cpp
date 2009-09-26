@@ -1,3 +1,7 @@
+
+// Own header
+#include "lirc.h"
+
 // C headers
 #include <cstdio>
 #include <cerrno>
@@ -18,7 +22,6 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythdb.h"
 #include "mythsystem.h"
-#include "lirc.h"
 #include "lircevent.h"
 #include "lirc_client.h"
 
@@ -367,7 +370,7 @@ void LIRC::Process(const QByteArray &data)
                     QEvent::KeyPress, 0,
                     (Qt::KeyboardModifiers)
                     LircKeycodeEvent::kLIRCInvalidKeyCombo,
-                    QString::null, lirctext));
+                    QString(), lirctext));
         }
 
         vector<LircKeycodeEvent*> keyReleases;

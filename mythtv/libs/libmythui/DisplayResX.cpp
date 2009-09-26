@@ -1,13 +1,12 @@
-#include <iostream>
 
 #include "config.h"
 #include "DisplayResX.h"
-#include "mythverbose.h"
-#include "mythdb.h"
-
-#include "mythxdisplay.h"
 
 #include <cmath>
+
+#include "mythverbose.h"
+#include "mythdb.h"
+#include "mythxdisplay.h"
 #include "util-nvctrl.h"
 
 #include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
@@ -142,7 +141,8 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
             std::map<double, short> realRates;
             const std::vector<double>& rates = scr.RefreshRates();
             bool found = false;
-            for (std::vector<double>::const_iterator it = rates.begin() ; it !=  rates.end();  it++)
+            for (std::vector<double>::const_iterator it = rates.begin();
+                 it !=  rates.end(); ++it)
             {
                 uint key = DisplayResScreen::CalcKey(w, h, *it);
                 if (screenmap.find(key) != screenmap.end())

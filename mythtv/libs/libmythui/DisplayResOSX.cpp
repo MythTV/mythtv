@@ -1,9 +1,11 @@
+
+#include "DisplayResOSX.h"
+
 #import <CoreGraphics/CGBase.h>
 #import <CoreGraphics/CGDisplayConfiguration.h>
 #import <Carbon/Carbon.h>
 #import <IOKit/graphics/IOGraphicsLib.h> // for IODisplayCreateInfoDictionary()
 
-#include "DisplayResOSX.h"
 #include "util-osx.h"
 
 CGDirectDisplayID mythtv_display();

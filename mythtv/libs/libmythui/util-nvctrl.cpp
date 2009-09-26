@@ -1,18 +1,15 @@
-#include <map>
-#include <vector>
-using namespace std;
+
+#include "util-nvctrl.h"
 
 #include "mythverbose.h"
 #include "mythdb.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <cmath>
 
 #include "mythxdisplay.h"
-#include "util-nvctrl.h"
 
 #include "libmythnvctrl/NVCtrl.h"
 #include "libmythnvctrl/NVCtrlLib.h"
@@ -135,7 +132,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
     /* now, parse each MetaMode */
     str = start = pMetaModes;
 
-    for (j = 0; j < MetaModeLen; j++)
+    for (j = 0; j < MetaModeLen; ++j)
     {
         /*
          * if we found the end of a line, treat the string from
@@ -240,7 +237,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
         }
     }
     // Free Memory
-    for (j=0; j < nDisplayDevice; j++)
+    for (j=0; j < nDisplayDevice; ++j)
     {
         free(pModeLines[j]);
     }

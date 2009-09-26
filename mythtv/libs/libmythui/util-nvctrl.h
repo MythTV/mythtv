@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <stdlib.h>
 using namespace std;
 
 typedef map<uint, double> t_screenrate;
