@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <window name="programguide">
@@ -71,7 +72,6 @@
         <buttonlist name="timelist">
             <area>155,175,630,30</area>
             <layout>horizontal</layout>
-            <spacing>0</spacing>
             <buttonarea>0,0,630,30</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,156,30</area>
@@ -89,36 +89,10 @@
                 <state name="selected" from="active"/>
                 <state name="inactive" from="active"/>
             </statetype>
-            <statetype name="downscrollarrow">
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-            </statetype>
         </buttonlist>
 
         <buttonlist name="channellist">
             <area>20,205,135,380</area>
-            <layout>vertical</layout>
-            <spacing>0</spacing>
             <buttonarea>0,0,135,380</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,135,74</area>
@@ -142,30 +116,6 @@
                 </state>
                 <state name="selected" from="active"/>
                 <state name="inactive" from="active"/>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
             </statetype>
         </buttonlist>
 
