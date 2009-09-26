@@ -1,7 +1,14 @@
 #ifndef MYTHUIGUIDEGRID_H_
 #define MYTHUIGUIDEGRID_H_
 
+// QT
 #include <QPixmap>
+
+// MythDB
+#include "mythexp.h"
+
+// MythUI
+#include "mythuitype.h"
 
 #define ARROWIMAGESIZE 4
 #define RECSTATUSSIZE  8

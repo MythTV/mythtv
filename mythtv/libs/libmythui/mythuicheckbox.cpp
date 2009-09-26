@@ -1,11 +1,13 @@
+
+// Own header
+#include "mythuicheckbox.h"
+
 // Myth headers
 #include "mythverbose.h"
 
 // MythUI headers
 #include "mythmainwindow.h"
 #include "mythgesture.h"
-
-#include "mythuicheckbox.h"
 
 MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
             : MythUIType(parent, name)
@@ -132,7 +134,7 @@ void MythUICheckBox::Disable()
     m_BackgroundState->DisplayState(m_state);
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
+/** \brief Mouse click/movement handler, receives mouse gesture events from the
  *         QApplication event loop. Should not be used directly.
  *
  *  \param uitype The mythuitype receiving the event

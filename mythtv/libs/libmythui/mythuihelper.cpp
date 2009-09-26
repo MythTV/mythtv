@@ -1,3 +1,6 @@
+
+#include "mythuihelper.h"
+
 #include <cmath>
 
 #include <QImage>
@@ -13,7 +16,6 @@
 #include <QStyleFactory>
 
 #include "mythdirs.h"
-#include "mythuihelper.h"
 #include "mythverbose.h"
 #include "oldsettings.h"
 #include "screensaver.h"
@@ -29,7 +31,7 @@
 
 static MythUIHelper *mythui = NULL;
 static QMutex uiLock;
-QString MythUIHelper::x11_display = QString::null;
+QString MythUIHelper::x11_display;
 
 MythUIHelper *MythUIHelper::getMythUI(void)
 {
@@ -132,13 +134,11 @@ int MythUIHelperPrivate::h_override = -1;
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
     : m_qtThemeSettings(new Settings()),
       m_themeloaded(false),
-      m_menuthemepathname(QString::null), m_themepathname(QString::null),
       language(""),
       m_wmult(1.0), m_hmult(1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
-      themecachedir(QString::null),
       bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
       screenSetup(false), parent(p)
@@ -401,7 +401,7 @@ void MythUIHelper::LoadQtConfig(void)
     // Recalculate GUI dimensions
     d->StoreGUIsettings();
 
-    d->m_themepathname = themedir + "/";
+    d->m_themepathname = themedir + '/';
 
     themedir += "/qtlook.txt";
     d->m_qtThemeSettings->ReadSettings(themedir);
@@ -410,7 +410,7 @@ void MythUIHelper::LoadQtConfig(void)
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
     if (themename == "default")
         themename = "defaultmenu";
-    d->m_menuthemepathname = FindMenuThemeDir(themename) + "/";
+    d->m_menuthemepathname = FindMenuThemeDir(themename) + '/';
 
     d->bigfontsize    = GetMythDB()->GetNumSetting("QtFontBig",    25);
     d->mediumfontsize = GetMythDB()->GetNumSetting("QtFontMedium", 16);
@@ -480,7 +480,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     if (!nodisk)
     {
-        QString dstfile = GetMythUI()->GetThemeCacheDir() + "/" + url;
+        QString dstfile = GetMythUI()->GetThemeCacheDir() + '/' + url;
         VERBOSE(VB_FILE, QString("Saved to Cache (%1)").arg(dstfile));
 
         // This would probably be better off somewhere else before any
@@ -562,7 +562,7 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 
     QString dstfile;
 
-    dstfile = GetThemeCacheDir() + "/" + url;
+    dstfile = GetThemeCacheDir() + '/' + url;
     VERBOSE(VB_FILE, QString("RemoveFromCacheByURL removed :%1: "
                              "from cache").arg(dstfile));
     QFile::remove(dstfile);
@@ -633,7 +633,7 @@ void MythUIHelper::ClearOldImageCache(void)
 
     QString themecachedir = d->themecachedir;
 
-    d->themecachedir += "/";
+    d->themecachedir += '/';
 
     dir.setPath(themecachedir);
     if (!dir.exists())
@@ -1059,7 +1059,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     bool foundit = false;
     QList<QString> searchpath = GetThemeSearchPath();
     for (QList<QString>::const_iterator ii = searchpath.begin();
-        ii != searchpath.end(); ii++)
+        ii != searchpath.end(); ++ii)
     {
         if (fi.isRelative())
         {
@@ -1220,7 +1220,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
 {
     //VERBOSE(VB_GENERAL, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
        
-    QString cachefilepath = GetThemeCacheDir() + "/" + label;
+    QString cachefilepath = GetThemeCacheDir() + '/' + label;
     QFileInfo fi(cachefilepath);
 
     MythImage *ret = NULL;
@@ -1310,7 +1310,7 @@ QString MythUIHelper::GetLanguage(void)
  */
 QString MythUIHelper::GetLanguageAndVariant(void)
 {
-    if (d->language == QString::null || d->language.isEmpty())
+    if (d->language.isEmpty())
         d->language = GetMythDB()->GetSetting("Language", "EN_US").toLower();
 
     return d->language;
@@ -1424,14 +1424,14 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
             // get popup stack main screen
             stack = GetMythMainWindow()->GetStack("popup stack");
             if (!stack->GetLocation(true).isEmpty())
-                result += "/" + stack->GetLocation(false);
+                result += '/' + stack->GetLocation(false);
         }
 
         // if there's a location in the stringlist add that (non mythui screen or external app running)
         if (!m_currentLocation.isEmpty())
         {
             for (int x = 0; x < m_currentLocation.count(); x++)
-                result += "/" + m_currentLocation[x];
+                result += '/' + m_currentLocation[x];
         }
     }
     else

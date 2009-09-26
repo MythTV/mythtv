@@ -1,3 +1,6 @@
+
+#include "mythuiimage.h"
+
 #include <cstdlib>
 
 #include <QFile>
@@ -7,7 +10,6 @@
 
 #include "mythverbose.h"
 
-#include "mythuiimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
@@ -336,7 +338,7 @@ QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
                           .arg(s_Attrib)
                           .arg(w)
                           .arg(h);
-    imagelabel.replace("/","-");
+    imagelabel.replace('/','-');
 
     return imagelabel;
 }
@@ -577,12 +579,12 @@ bool MythUIImage::ParseElement(QDomElement &element)
     if (element.tagName() == "filename")
     {
         m_OrigFilename = m_Filename = getFirstText(element);
-        if (m_Filename.endsWith("/"))
+        if (m_Filename.endsWith('/'))
         {
             QDir imageDir(m_Filename);
             if (!imageDir.exists())
             {
-                QString themeDir = GetMythUI()->GetThemeDir() + "/";
+                QString themeDir = GetMythUI()->GetThemeDir() + '/';
                 imageDir = themeDir + m_Filename;
             }
             QStringList imageTypes;

@@ -1,3 +1,7 @@
+
+// Own Header
+#include "mythuiprogressbar.h"
+
 // QT
 #include <QApplication>
 #include <QDomDocument>
@@ -6,7 +10,7 @@
 #include "mythverbose.h"
 
 // MythUI
-#include "mythuiprogressbar.h"
+
 
 MythUIProgressBar::MythUIProgressBar(MythUIType *parent, const QString &name)
                   : MythUIType(parent, name),

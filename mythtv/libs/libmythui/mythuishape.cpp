@@ -1,14 +1,18 @@
+
+// Own header
+#include "mythuishape.h"
+
 // qt
 #include <QDomDocument>
 #include <QPainter>
+#include <QBrush>
+#include <QSize>
 
 // myth
 #include "mythverbose.h"
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythmainwindow.h"
-
-#include "mythuishape.h"
 
 MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
           : MythUIType(parent, name)

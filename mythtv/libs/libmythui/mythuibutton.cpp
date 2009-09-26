@@ -1,4 +1,6 @@
 
+#include "mythuibutton.h"
+
 // QT
 #include <QTimer>
 #include <QDomDocument>
@@ -9,8 +11,6 @@
 // MythUI headers
 #include "mythmainwindow.h"
 #include "mythuigroup.h"
-
-#include "mythuibutton.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
             : MythUIType(parent, name)
@@ -143,7 +143,7 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
+/** \brief Mouse click/movement handler, receives mouse gesture events from the
  *         QApplication event loop. Should not be used directly.
  *
  *  \param uitype The mythuitype receiving the event

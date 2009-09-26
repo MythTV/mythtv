@@ -1,3 +1,6 @@
+
+#include "mythuiguidegrid.h"
+
 // ANSI C headers
 #include <cmath>
 
@@ -18,7 +21,6 @@ using namespace std;
 #include "mythimage.h"
 #include "mythmainwindow.h"
 #include "mythdb.h"
-#include "mythuiguidegrid.h"
 
 #define LOC QString("MythUIGuideGrid: ")
 #define LOC_ERR QString("MythUIGuideGrid, Error: ")
@@ -486,8 +488,8 @@ void MythUIGuideGrid::drawText(MythPainter *p, UIGTCon *data, int alphaMod)
 {
     QString msg = data->title;
 
-    if (m_drawCategoryText && data->category.length() > 0)
-        msg += " (" + data->category + ")";
+    if (m_drawCategoryText && !data->category.isEmpty())
+        msg += QString(" (%1)").arg(data->category);
 
     QRect area = data->drawArea;
     area.translate(m_Area.x(), m_Area.y());
@@ -540,7 +542,7 @@ bool MythUIGuideGrid::parseDefaultCategoryColors(QMap<QString, QString> &catColo
     QFile f;
     QStringList searchpath = GetMythUI()->GetThemeSearchPath();
     for (QStringList::const_iterator ii = searchpath.begin();
-        ii != searchpath.end(); ii++)
+        ii != searchpath.end(); ++ii)
     {
         f.setFileName(*ii + "categories.xml");
         if (f.open(QIODevice::ReadOnly))

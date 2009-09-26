@@ -8,7 +8,7 @@
 #include "mythimage.h"
 
 // Image class that displays one of an array of images (either predefined states
-// or by typename).  Displays nothing if told to display a non-existant state
+// or by typename).  Displays nothing if told to display a non-existent state
 class MPUBLIC MythUIStateType : public MythUIType
 {
   public:

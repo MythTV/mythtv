@@ -1,8 +1,11 @@
+
+// Own header
+#include "mythuistatetype.h"
+
 // Qt headers
 #include <QDomDocument>
 
 // MythUI headers
-#include "mythuistatetype.h"
 #include "mythuiimage.h"
 #include "mythuigroup.h"
 #include "mythpainter.h"

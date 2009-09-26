@@ -1,7 +1,11 @@
 #ifndef MYTHUIUTILS_H_
 #define MYTHUIUTILS_H_
 
+#include <cstdlib>
+
 #include "mythexp.h"
+
+class QString;
 
 struct MPUBLIC ETPrintWarning
 {

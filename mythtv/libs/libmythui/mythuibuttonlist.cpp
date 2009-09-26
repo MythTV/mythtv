@@ -1,3 +1,6 @@
+
+#include "mythuibuttonlist.h"
+
 #include <math.h>
 
 // QT headers
@@ -7,7 +10,6 @@
 #include "mythverbose.h"
 
 // mythui headers
-#include "mythuibuttonlist.h"
 #include "mythuigroup.h"
 #include "mythmainwindow.h"
 #include "mythuistatetype.h"
@@ -873,7 +875,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
+/** \brief Mouse click/movement handler, receives mouse gesture events from the
  *         QApplication event loop. Should not be used directly.
  *
  *  \param uitype The mythuitype receiving the event
@@ -1083,7 +1085,7 @@ void MythUIButtonList::Finalize(void)
 void MythUIButtonList::SetLCDTitles(const QString &title, const QString &columnList)
 {
     m_lcdTitle = title;
-    m_lcdColumns = columnList.split("|");
+    m_lcdColumns = columnList.split('|');
 }
 
 void MythUIButtonList::updateLCD(void)
@@ -1154,7 +1156,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                       bool showArrow)
 {
     if (!lbtype)
-        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existant list!");
+        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existent list!");
 
     m_parent    = lbtype;
     m_text      = text;
@@ -1177,7 +1179,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                        QVariant data)
 {
     if (!lbtype)
-        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existant list!");
+        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existent list!");
 
     m_parent    = lbtype;
     m_text      = text;
@@ -1341,7 +1343,7 @@ QString MythUIButtonListItem::GetImage(const QString &name) const
     if (it != m_imageFilenames.end())
         return *it;
 
-    return QString::null;
+    return QString();
 }
 
 void MythUIButtonListItem::DisplayState(const QString &state,

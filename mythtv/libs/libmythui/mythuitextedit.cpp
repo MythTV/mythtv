@@ -1,18 +1,24 @@
 
+// Own header
+#include "mythuitextedit.h"
+
+// QT headers
 #include <QApplication>
 #include <QRegExp>
 #include <QChar>
 #include <QKeyEvent>
 #include <QDomDocument>
 
-#include "mythuitextedit.h"
+// Libmythdb headers
+#include "mythverbose.h"
+#include "mythdb.h"
+
+// MythUI headers
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
-
-#include "mythverbose.h"
 #include "mythuihelper.h"
-#include "mythdb.h"
+
 
 MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
            : MythUIType(parent, name)

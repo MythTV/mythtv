@@ -1,7 +1,9 @@
+
+#include "mythuiclock.h"
+
 #include <QApplication>
 #include <QDomDocument>
 
-#include "mythuiclock.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
@@ -48,8 +50,8 @@ void MythUIClock::Pulse(void)
         {
             if (m_Flash)
             {
-                newMsg.replace(":", " ");
-                newMsg.replace(".", " ");
+                newMsg.replace(':', " ");
+                newMsg.replace('.', " ");
                 m_Flash = false;
             }
             else
