@@ -1,4 +1,7 @@
 
+#include "playbackbox.h"
+
+// QT
 #include <QDateTime>
 #include <QDir>
 #include <QApplication>
@@ -8,26 +11,27 @@
 #include <QMap>
 #include <QWaitCondition>
 
-#include "playbackbox.h"
-#include "playbackboxlistitem.h"
-#include "proglist.h"
-#include "tv.h"
+// libmythdb
 #include "oldsettings.h"
-#include "NuppelVideoPlayer.h"
-
-#include "mythdirs.h"
-#include "mythcontext.h"
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
+#include "mythdirs.h"
+
+// libmythtv
+#include "tv.h"
+#include "NuppelVideoPlayer.h"
 #include "recordinginfo.h"
-#include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "previewgenerator.h"
 #include "playgroup.h"
-#include "customedit.h"
+
+// libmyth
+#include "mythcontext.h"
+#include "remoteutil.h"
 #include "util.h"
 
+// libmythui
 #include "mythuihelper.h"
 #include "mythuitext.h"
 #include "mythuibutton.h"
@@ -38,6 +42,11 @@
 #include "mythuiimage.h"
 #include "mythuicheckbox.h"
 #include "mythuiprogressbar.h"
+
+//  Mythfrontend
+#include "playbackboxlistitem.h"
+#include "proglist.h"
+#include "customedit.h"
 
 #define LOC QString("PlaybackBox: ")
 #define LOC_ERR QString("PlaybackBox Error: ")
@@ -206,7 +215,7 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
         //
         // Deal with QMap sorting. Positive recpriority values have a
         // '+' prefix (QMap alphabetically sorts before '-'). Positive
-        // recpriority values are "inverted" by substracting them from
+        // recpriority values are "inverted" by subtracting them from
         // 1000, so that high recpriorities are sorted first (QMap
         // alphabetically). For example:
         //
@@ -226,7 +235,7 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
         else
             sortprefix.sprintf("-%03u", -recpriority);
 
-        sTitle = sortprefix + "-" + sTitle;
+        sTitle = sortprefix + '-' + sTitle;
     }
     return sTitle;
 }
@@ -385,8 +394,7 @@ PlaybackBox::~PlaybackBox(void)
 
     clearProgramCache();
 
-    if (m_currentItem)
-        delete m_currentItem;
+    delete m_currentItem;
 
     // disconnect preview generators
     QMutexLocker locker(&m_previewGeneratorLock);
@@ -592,7 +600,7 @@ void PlaybackBox::UpdateProgramInfo(
     item->DisplayState(rating, "ratingstate");
 
     QString oldimgfile = item->GetImage("preview");
-    QString imagefile = QString::null;
+    QString imagefile;
     if (oldimgfile.isEmpty() || force_preview_reload)
         imagefile = getPreviewImage(pginfo);
 
@@ -788,7 +796,7 @@ void PlaybackBox::updateUsage()
         m_freeSpaceUsed = 0;
 
         vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
-        for (unsigned int i = 0; i < fsInfos.size(); i++)
+        for (unsigned int i = 0; i < fsInfos.size(); ++i)
         {
             if (fsInfos[i].directory == "TotalDiskSpace")
             {
@@ -835,7 +843,7 @@ void PlaybackBox::updateGroupList()
 
         bool foundGroup = false;
         QStringList::iterator it;
-        for (it = m_titleList.begin(); it != m_titleList.end(); it++)
+        for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
             groupname = (*it).simplified();
 
@@ -905,7 +913,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
 
     ProgramList::iterator it = progList.begin();
-    for (; it != progList.end(); it++)
+    for (; it != progList.end(); ++it)
     {
         MythUIButtonListItem *item =
             new PlaybackBoxListItem(this, m_recordingList, *it);
@@ -930,8 +938,9 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
         QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
 
-        QString state = ((*it)->recstatus == rsRecording) ?
-            QString("running") : QString::null;
+        QString state;
+        if ((*it)->recstatus == rsRecording)
+            state = "running";
 
         if ((((*it)->recstatus != rsRecording) &&
              ((*it)->availableStatus != asAvailable) &&
@@ -958,7 +967,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         disp_flag_stat[0] = !m_playList.filter((*it)->MakeUniqueKey()).empty();
         disp_flag_stat[1] = (*it)->programflags & FL_WATCHED;
 
-        for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); i++)
+        for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
             item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
 
         if (m_currentItem &&
@@ -1047,7 +1056,6 @@ bool PlaybackBox::FillList(bool useCachedData)
     QMap<QString, QString> sortedList;
     QMap<int, QString> searchRule;
     QMap<int, int> recidEpisodes;
-    QString sTitle;
 
     m_progCacheLock.lock();
     if (!useCachedData || !m_progCache || m_progCache->empty())
@@ -1068,12 +1076,14 @@ bool PlaybackBox::FillList(bool useCachedData)
                 i = m_progCache->erase(i);
             }
             else
-                i++;
+                ++i;
         }
     }
 
     if (m_progCache)
     {
+        QString sTitle;
+
         if ((m_viewMask & VIEW_SEARCHES))
         {
             MSqlQuery query(MSqlQuery::InitCon());
@@ -1093,7 +1103,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         }
 
         vector<ProgramInfo *>::iterator i = m_progCache->begin();
-        for ( ; i != m_progCache->end(); i++)
+        for ( ; i != m_progCache->end(); ++i)
         {
             m_progsInDB++;
             p = *i;
@@ -1467,7 +1477,6 @@ bool PlaybackBox::FillList(bool useCachedData)
     if (m_progCache)
     {
         QMutexLocker locker(&m_recGroupsLock);
-        QString name;
 
         m_recGroups.clear();
         m_recGroupIdx = -1;
@@ -1480,6 +1489,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                       "deletepending = 0 ORDER BY recgroup");
         if (query.exec())
         {
+            QString name;
             while (query.next())
             {
                 name = query.value(0).toString();
@@ -1915,7 +1925,7 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
     QStringList entries = dir.entryList();
 
     int regIndex = 0;
-    titleIn.replace(" ", "(?:\\s|-|_|\\.)?");
+    titleIn.replace(' ', "(?:\\s|-|_|\\.)?");
     QString regs[] = {
         QString("%1" // title
             "(?:\\s|-|_|\\.)?" // optional separator
@@ -2259,10 +2269,10 @@ void PlaybackBox::showPlaylistJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc1");
 
         if (!isRunningUserJob1)
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                              SLOT(doPlaylistBeginUserJob1()));
         else
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                              SLOT(stopPlaylistUserJob1()));
     }
 
@@ -2272,10 +2282,10 @@ void PlaybackBox::showPlaylistJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc2");
 
         if (!isRunningUserJob2)
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                              SLOT(doPlaylistBeginUserJob2()));
         else
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                              SLOT(stopPlaylistUserJob2()));
     }
 
@@ -2285,10 +2295,10 @@ void PlaybackBox::showPlaylistJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc3");
 
         if (!isRunningUserJob3)
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                              SLOT(doPlaylistBeginUserJob3()));
         else
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                              SLOT(stopPlaylistUserJob3()));
     }
 
@@ -2360,14 +2370,8 @@ MythDialogBox *PlaybackBox::createPlaylistPopupMenu()
     if (m_popupMenu)
         return NULL;
 
-    QString label;
-    if (m_playList.size() > 1)
-        label = tr("There are %1 items in the playlist.").arg(m_playList.size());
-    else
-        label = tr("There is %1 item in the playlist.").arg(m_playList.size());
-
-    label.append(" ");
-    label.append(tr("Actions affect all items in the playlist"));
+    QString label = tr("There is %n item(s) in the playlist. Actions affect "
+                       "all items in the playlist").arg(m_playList.size());
 
     return createPopupMenu(label);
 }
@@ -2476,10 +2480,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob1()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob1()));
     }
 
@@ -2490,10 +2494,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob2()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob2()));
     }
 
@@ -2504,10 +2508,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob3()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob3()));
     }
 
@@ -2518,10 +2522,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob4()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " "  + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' '  + jobTitle,
                                     SLOT(doBeginUserJob4()));
     }
 }
@@ -2934,7 +2938,7 @@ ProgramInfo *PlaybackBox::findMatchingProg(const QString &key)
     if ((key.isEmpty()) || (key.indexOf('_') < 0))
         return NULL;
 
-    keyParts = key.split("_");
+    keyParts = key.split('_');
 
     // ProgramInfo::MakeUniqueKey() has 2 parts separated by '_' characters
     if (keyParts.size() == 2)
@@ -3243,7 +3247,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
@@ -3367,7 +3371,7 @@ void PlaybackBox::customEvent(QEvent *event)
                     return;
                 }
                 vector<ProgramInfo *>::iterator i = m_progCache->begin();
-                for ( ; i != m_progCache->end(); i++)
+                for ( ; i != m_progCache->end(); ++i)
                 {
                    if (((*i)->chanid == tokens[2]) &&
                        ((*i)->recstartts.toString(Qt::ISODate) == tokens[3]))
@@ -3860,9 +3864,9 @@ void PlaybackBox::showGroupFilter(void)
     groups.sort();
     displayGroups.sort();
     QStringList::iterator it;
-    for (it = displayGroups.begin(); it != displayGroups.end(); it++)
+    for (it = displayGroups.begin(); it != displayGroups.end(); ++it)
         displayNames.append(*it);
-    for (it = groups.begin(); it != groups.end(); it++)
+    for (it = groups.begin(); it != groups.end(); ++it)
         groupNames.append(*it);
 
     QString label = tr("Change Filter");
@@ -3975,14 +3979,13 @@ void PlaybackBox::showRecGroupChanger(void)
     QStringList displayNames;
     QString selected;
 
-    QString itemStr;
-    QString dispGroup;
-
     groupNames.append("addnewgroup");
     displayNames.append(tr("Add New"));
 
     if (query.exec())
     {
+        QString itemStr;
+        QString dispGroup;
         while (query.next())
         {
             dispGroup = query.value(0).toString();
@@ -4309,7 +4312,7 @@ void PlaybackBox::clearProgramCache(void)
         return;
 
     vector<ProgramInfo *>::iterator i = m_progCache->begin();
-    for ( ; i != m_progCache->end(); i++)
+    for ( ; i != m_progCache->end(); ++i)
         delete *i;
     delete m_progCache;
     m_progCache = NULL;
@@ -4575,7 +4578,8 @@ void RecMetadataEdit::SaveChanges()
 //////////////////////////////////////////
 
 HelpPopup::HelpPopup(MythScreenStack *lparent)
-                : MythScreenType(lparent, "helppopup")
+                : MythScreenType(lparent, "helppopup"),
+                  m_iconList(NULL)
 {
 
 }

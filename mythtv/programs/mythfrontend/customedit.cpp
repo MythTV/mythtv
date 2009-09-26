@@ -1,6 +1,8 @@
-#include <QSqlError>
 
 #include "customedit.h"
+
+// QT
+#include <QSqlError>
 
 // libmythdb
 #include "mythdb.h"
@@ -40,8 +42,7 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
 
 CustomEdit::~CustomEdit(void)
 {
-    if (m_pginfo)
-        delete m_pginfo;
+    delete m_pginfo;
 
     gContext->removeListener(this);
 }
@@ -100,7 +101,7 @@ void CustomEdit::loadData(void)
     baseTitle.remove(QRegExp(" \\(.*\\)$"));
 
     CustomRuleInfo rule;
-    rule.recordid = "0";
+    rule.recordid = '0';
 
     MythUIButtonListItem *item;
     item = new MythUIButtonListItem(m_ruleList, tr("<New rule>"),
@@ -541,7 +542,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
     CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
 
     QString msg = rule.description;
-    msg.replace("\n", " ");
+    msg.replace('\n', ' ');
     msg.replace(QRegExp(" [ ]*"), " ");
     msg = QString("\"%1\"").arg(msg);
     m_clauseText->SetText(msg);
@@ -635,7 +636,6 @@ void CustomEdit::scheduleCreated(int ruleID)
 void CustomEdit::storeClicked(void)
 {
     bool nameExists = false;
-    QString oldwhere;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT rulename,whereclause FROM customexample "
@@ -643,11 +643,9 @@ void CustomEdit::storeClicked(void)
     query.bindValue(":RULE", m_titleEdit->GetText());
 
     if (query.exec() && query.next())
-    {
         nameExists = true;
-        oldwhere = query.value(1).toString();
-    }
-    QString msg = QString("%1: %2\n\n").arg(QObject::tr("Current Example"))
+
+    QString msg = QString("%1: %2\n\n").arg(tr("Current Example"))
                                        .arg(m_titleEdit->GetText());
 
     if (m_subtitleEdit->GetText().length())
@@ -662,9 +660,9 @@ void CustomEdit::storeClicked(void)
     storediag->SetReturnEvent(this, "storeruledialog");
     if (storediag->Create())
     {
-        QString action = QObject::tr("Store");
+        QString action = tr("Store");
         if (nameExists)
-            action = QObject::tr("Replace");
+            action = tr("Replace");
 
         QString str = QString("%1 \"%2\"").arg(action)
                                           .arg(m_titleEdit->GetText());
@@ -672,20 +670,20 @@ void CustomEdit::storeClicked(void)
         if (!m_titleEdit->GetText().isEmpty())
         {
             QString str2;
-            str2 = QString("%1 %2").arg(str).arg(QObject::tr("as a search"));
+            str2 = QString("%1 %2").arg(str).arg(tr("as a search"));
             storediag->AddButton(str2);
 
-            str2 = QString("%1 %2").arg(str).arg(QObject::tr("as an example"));
+            str2 = QString("%1 %2").arg(str).arg(tr("as an example"));
             storediag->AddButton(str2);
         }
         if (m_clauseList->GetCurrentPos() >= maxex)
         {
             MythUIButtonListItem* item = m_clauseList->GetItemCurrent();
-            str = QString("%1 \"%2\"").arg(QObject::tr("Delete"))
+            str = QString("%1 \"%2\"").arg(tr("Delete"))
                                       .arg(item->GetText());
             storediag->AddButton(str);
         }
-        storediag->AddButton(QObject::tr("Cancel"));
+        storediag->AddButton(tr("Cancel"));
         mainStack->AddScreen(storediag);
     }
     else
@@ -753,7 +751,7 @@ bool CustomEdit::checkSyntax(void)
 void CustomEdit::storeRule(bool is_search, bool is_new)
 {
     CustomRuleInfo rule;
-    rule.recordid = "0";
+    rule.recordid = '0';
     rule.title = m_titleEdit->GetText();
     rule.subtitle = m_subtitleEdit->GetText();
     rule.description = m_descriptionEdit->GetText();

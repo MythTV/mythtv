@@ -1,15 +1,22 @@
-#include <QSqlError>
 
 #include "custompriority.h"
 
-#include "mythcontext.h"
+// qt
+#include <QSqlError>
+
+// libmythdb
 #include "mythdb.h"
 #include "mythverbose.h"
 
+// libmyth
+#include "mythcontext.h"
+
+// libmythtv
 #include "scheduledrecording.h"
 #include "viewschdiff.h"
 #include "channelutil.h"
 
+// libmythui
 #include "mythuibuttonlist.h"
 #include "mythuispinbox.h"
 #include "mythuitextedit.h"
@@ -29,8 +36,7 @@ CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)
 
 CustomPriority::~CustomPriority(void)
 {
-    if (m_pginfo)
-        delete m_pginfo;
+    delete m_pginfo;
 
     gContext->removeListener(this);
 }
