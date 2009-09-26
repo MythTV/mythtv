@@ -30,7 +30,7 @@ class ViewScheduled : public ScheduleCommon
 {
     Q_OBJECT
   public:
-    ViewScheduled(MythScreenStack *parent, TV *player = NULL,
+    explicit ViewScheduled(MythScreenStack *parent, TV *player = NULL,
                   bool showTV = false);
     ~ViewScheduled();
 

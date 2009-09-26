@@ -24,7 +24,8 @@
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ViewScheduled *vsb = new ViewScheduled(mainStack, (TV*)player, showTV);
+    ViewScheduled *vsb = new ViewScheduled(mainStack, static_cast<TV*>(player),
+                                           showTV);
 
     if (vsb->Create())
         mainStack->AddScreen(vsb);

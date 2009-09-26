@@ -1,3 +1,6 @@
+
+#include "guidegrid.h"
+
 // c/c++
 #include <math.h>
 #include <unistd.h>
@@ -30,8 +33,6 @@ using namespace std;
 #include "mythuiguidegrid.h"
 #include "mythdialogbox.h"
 #include "progfind.h"
-
-#include "guidegrid.h"
 
 QWaitCondition epgIsVisibleCond;
 
@@ -210,17 +211,17 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
 
     m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    m_channelFormat.replace(" ", "\n");
+    m_channelFormat.replace(' ', "\n");
 
     m_unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
     m_unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
 
-    for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
+    for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
         m_programs[y] = NULL;
 
-    for (int x = 0; x < MAX_DISPLAY_TIMES; x++)
+    for (int x = 0; x < MAX_DISPLAY_TIMES; ++x)
     {
-        for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
+        for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
             m_programInfos[y][x] = NULL;
     }
 
@@ -309,7 +310,7 @@ GuideGrid::~GuideGrid()
 {
     gContext->removeListener(this);
 
-    for (int y = 0; y < MAX_DISPLAY_CHANS; y++)
+    for (int y = 0; y < MAX_DISPLAY_CHANS; ++y)
     {
         if (m_programs[y])
         {
@@ -389,7 +390,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             handled = m_jumpToChannel->ProcessEntry(actions, event);
     }
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
@@ -684,7 +685,7 @@ DBChanList GuideGrid::GetSelection(void) const
     if (proglist.empty())
         return selected;
 
-    for (uint i = 0; i < m_channelInfos[idx].size(); i++)
+    for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
         const PixmapChannel *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
@@ -694,7 +695,7 @@ DBChanList GuideGrid::GetSelection(void) const
         }
     }
 
-    for (uint i = 0; i < m_channelInfos[idx].size(); i++)
+    for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
         const PixmapChannel *ci = GetChannelInfo(idx, i);
         if (ci && (i != si) &&
@@ -704,7 +705,7 @@ DBChanList GuideGrid::GetSelection(void) const
         }
     }
 
-    for (uint i = 0; i < m_channelInfos[idx].size(); i++)
+    for (uint i = 0; i < m_channelInfos[idx].size(); ++i)
     {
         const PixmapChannel *ci = GetChannelInfo(idx, i);
         if ((i != si) && (ci->callsign != ch->callsign))
@@ -713,7 +714,7 @@ DBChanList GuideGrid::GetSelection(void) const
         }
     }
 
-    for (uint i = 1; i < sel.size(); i++)
+    for (uint i = 1; i < sel.size(); ++i)
     {
         const PixmapChannel *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
         if (!ci)
@@ -748,7 +749,7 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     QMap<QString,uint_list_t> channum_to_index_map;
     QMap<QString,uint_list_t> callsign_to_index_map;
 
-    for (uint i = 0; i < channels.size(); i++)
+    for (uint i = 0; i < channels.size(); ++i)
     {
         uint chan = i;
         if (m_sortReverse)
@@ -774,17 +775,17 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     }
 
     // handle duplicates
-    for (uint i = 0; i < channels.size(); i++)
+    for (uint i = 0; i < channels.size(); ++i)
     {
         const uint_list_t &ndups = channum_to_index_map[channels[i].channum];
-        for (uint j = 0; j < ndups.size(); j++)
+        for (uint j = 0; j < ndups.size(); ++j)
         {
             if (channels[i].chanid != m_channelInfos[ndups[j]][0].chanid)
                 m_channelInfos[ndups[j]].push_back(channels[i]);
         }
 
         const uint_list_t &cdups = callsign_to_index_map[channels[i].callsign];
-        for (uint j = 0; j < cdups.size(); j++)
+        for (uint j = 0; j < cdups.size(); ++j)
         {
             if (channels[i].chanid != m_channelInfos[cdups[j]][0].chanid)
                 m_channelInfos[cdups[j]].push_back(channels[i]);
@@ -813,7 +814,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
 
     // first check chanid
     uint i = (chanid) ? 0 : GetChannelCount();
-    for (; i < GetChannelCount(); i++)
+    for (; i < GetChannelCount(); ++i)
     {
         if (m_channelInfos[i][0].chanid == chanid)
                 return i;
@@ -821,9 +822,9 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
 
     // then check for chanid in duplicates
     i = (chanid) ? 0 : GetChannelCount();
-    for (; i < GetChannelCount(); i++)
+    for (; i < GetChannelCount(); ++i)
     {
-        for (uint j = 1; j < m_channelInfos[i].size(); j++)
+        for (uint j = 1; j < m_channelInfos[i].size(); ++j)
         {
             if (m_channelInfos[i][j].chanid == chanid)
                 return i;
@@ -832,7 +833,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
 
     // then check channum, first only
     i = (channum.isEmpty()) ? GetChannelCount() : 0;
-    for (; i < GetChannelCount(); i++)
+    for (; i < GetChannelCount(); ++i)
     {
          if (m_channelInfos[i][0].channum == channum)
             return i;
@@ -840,9 +841,9 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
 
     // then check channum duplicates
     i = (channum.isEmpty()) ? GetChannelCount() : 0;
-    for (; i < GetChannelCount(); i++)
+    for (; i < GetChannelCount(); ++i)
     {
-        for (uint j = 1; j < m_channelInfos[i].size(); j++)
+        for (uint j = 1; j < m_channelInfos[i].size(); ++j)
         {
             if (m_channelInfos[i][j].channum == channum)
                 return i;
@@ -853,16 +854,16 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
         return -1;
 
     // then check partial channum, first only
-    for (i = 0; i < GetChannelCount(); i++)
+    for (i = 0; i < GetChannelCount(); ++i)
     {
         if (m_channelInfos[i][0].channum.left(channum.length()) == channum)
             return i;
     }
 
     // then check all partial channum
-    for (i = 0; i < GetChannelCount(); i++)
+    for (i = 0; i < GetChannelCount(); ++i)
     {
-        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        for (uint j = 0; j < m_channelInfos[i].size(); ++j)
         {
             if (m_channelInfos[i][j].channum.left(channum.length()) == channum)
                 return i;
@@ -878,7 +879,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     }
     else if (channum.length() >= 2)
     {
-        tmpchannum = channum.left(channum.length() - 1) + "_" +
+        tmpchannum = channum.left(channum.length() - 1) + '_' +
             channum.right(1);
     }
     else
@@ -886,9 +887,9 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
         return -1;
     }
 
-    for (i = 0; i < GetChannelCount(); i++)
+    for (i = 0; i < GetChannelCount(); ++i)
     {
-        for (uint j = 0; j < m_channelInfos[i].size(); j++)
+        for (uint j = 0; j < m_channelInfos[i].size(); ++j)
         {
             QString tmp = m_channelInfos[i][j].channum;
             tmp.replace(chanSepRegExp, "_");
@@ -910,7 +911,7 @@ void GuideGrid::fillTimeInfos()
     m_firstTime = m_currentStartTime;
     m_lastTime = m_firstTime.addSecs(m_timeCount * 60 * 4);
 
-    for (int x = 0; x < m_timeCount; x++)
+    for (int x = 0; x < m_timeCount; ++x)
     {
         int mins = t.time().minute();
         mins = 5 * (mins / 5);
@@ -932,7 +933,7 @@ void GuideGrid::fillProgramInfos(void)
 {
     m_guideGrid->ResetData();
 
-    for (int y = 0; y < m_channelCount; y++)
+    for (int y = 0; y < m_channelCount; ++y)
     {
         fillProgramRowInfos(y);
     }
@@ -948,7 +949,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
         delete m_programs[row];
     m_programs[row] = NULL;
 
-    for (int x = 0; x < m_timeCount; x++)
+    for (int x = 0; x < m_timeCount; ++x)
     {
         m_programInfos[row][x] = NULL;
     }
@@ -1001,7 +1002,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     vector<ProgramInfo*> unknownlist;
     bool unknown = false;
     ProgramInfo *proginfo = NULL;
-    for (int x = 0; x < m_timeCount; x++)
+    for (int x = 0; x < m_timeCount; ++x)
     {
         if (program != proglist->end() && (ts >= (*program)->endts))
         {
@@ -1073,7 +1074,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     QRect tempRect;
     bool isCurrent = false;
 
-    for (int x = 0; x < m_timeCount; x++)
+    for (int x = 0; x < m_timeCount; ++x)
     {
         ProgramInfo *pginfo = m_programInfos[row][x];
         if (!pginfo)
@@ -1094,7 +1095,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
             }
             else
             {
-                for (int z = x + 1; z < m_timeCount; z++)
+                for (int z = x + 1; z < m_timeCount; ++z)
                 {
                     ProgramInfo *test = m_programInfos[row][z];
                     if (test && test->startts == pginfo->startts)
@@ -1103,7 +1104,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 pginfo->spread = spread;
                 pginfo->startCol = x;
 
-                for (int z = x + 1; z < x + spread; z++)
+                for (int z = x + 1; z < x + spread; ++z)
                 {
                     ProgramInfo *test = m_programInfos[row][z];
                     if (test)
@@ -1332,7 +1333,7 @@ void GuideGrid::updateChannels(void)
 
     bool showChannelIcon = gContext->GetNumSetting("EPGShowChannelIcon", 0);
 
-    for (unsigned int y = 0; (y < (unsigned int)m_channelCount) && chinfo; y++)
+    for (unsigned int y = 0; (y < (unsigned int)m_channelCount) && chinfo; ++y)
     {
         unsigned int chanNumber = y + m_currentStartChannel;
         if (chanNumber >= m_channelInfos.size())
@@ -1519,7 +1520,7 @@ void GuideGrid::ChannelGroupMenu(int mode)
             menuPopup->AddButton(QObject::tr("All Channels"));
         }
 
-        for (uint i = 0; i < m_changrplist.size(); i++)
+        for (uint i = 0; i < m_changrplist.size(); ++i)
             menuPopup->AddButton(m_changrplist[i].name);
 
         menuPopup->AddButton(tr("Cancel"));

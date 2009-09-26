@@ -1,4 +1,5 @@
-#define MYTHAPPEARANCE_CPP
+
+#include "mythappearance.h"
 
 /* QT includes */
 #include <QStringList>
@@ -13,8 +14,6 @@
 #include "mythverbose.h"
 
 using namespace std;
-
-#include "mythappearance.h"
 
 
 MythAppearance::MythAppearance(MythScreenStack *parent, const char *name) :

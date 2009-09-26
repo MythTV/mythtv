@@ -181,8 +181,8 @@ class ProgLister : public ScheduleCommon
   public:
     ProgLister(MythScreenStack *parent, ProgListType pltype,
                const QString &view, const QString &from);
-    ProgLister(MythScreenStack *parent, int recid = 0, 
-               const QString &title = "");
+    explicit ProgLister(MythScreenStack *parent, int recid = 0, 
+                        const QString &title = QString());
     ~ProgLister();
 
     bool Create(void);
