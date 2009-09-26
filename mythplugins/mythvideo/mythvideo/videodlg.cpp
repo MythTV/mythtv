@@ -105,7 +105,7 @@ namespace
       public:
         void StartCopy()
         {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
+            m_id = m_http.get(m_url.toEncoded(), &m_data_buffer);
 
             m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
                           * 1000);
