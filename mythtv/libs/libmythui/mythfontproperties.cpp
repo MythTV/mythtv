@@ -1,3 +1,6 @@
+
+#include "mythfontproperties.h"
+
 #include <QApplication>
 #include <QDomDocument>
 
@@ -5,7 +8,6 @@
 #include "mythdb.h"
 
 #include "mythuihelper.h"
-#include "mythfontproperties.h"
 #include "mythmainwindow.h"
 
 MythFontProperties::MythFontProperties() :
@@ -261,7 +263,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             else if (info.tagName() == "decoration")
             {
                 QString dec = getFirstText(info).toLower();
-                QStringList values = dec.split(",");
+                QStringList values = dec.split(',');
 
                 QStringList::Iterator it;
                 for ( it = values.begin(); it != values.end(); ++it )

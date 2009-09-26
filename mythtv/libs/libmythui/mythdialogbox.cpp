@@ -1,4 +1,6 @@
 
+#include "mythdialogbox.h"
+
 #include <QApplication>
 #include <QFileInfo>
 #include <QImageReader>
@@ -8,7 +10,6 @@
 
 #include "mythverbose.h"
 
-#include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 #include "mythuiutils.h"
@@ -66,7 +67,8 @@ bool MythDialogBox::Create(void)
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'");
+        VERBOSE(VB_IMPORTANT, QString("Cannot load screen '%1'")
+                                        .arg(windowName));
         return false;
     }
 

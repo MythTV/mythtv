@@ -1,12 +1,23 @@
-#include <cassert>
+
+// Own header
+#include "mythpainter_ogl.h"
+
+// Config header generated in base directory by configure
+#include "config.h"
+
+// C/C++ headers
 #include <math.h>
 
+// QT headers
 #include <QApplication>
 #include <QPixmap>
 #include <QPainter>
 #include <QGLWidget>
 
-#include "config.h"
+// libmythdb headers
+#include "mythverbose.h"
+
+// OpenGL headers
 #if CONFIG_DARWIN
 #include <OpenGL/glext.h>
 #endif
@@ -15,10 +26,10 @@
 #include <GL/glext.h>
 #endif
 
-#include "mythverbose.h"
-#include "mythpainter_ogl.h"
+// Mythui headers
 #include "mythfontproperties.h"
 
+// Defines
 #define MAX_GL_ITEMS 256
 #define MAX_STRING_ITEMS 256
 
@@ -66,12 +77,21 @@ MythOpenGLPainter::~MythOpenGLPainter()
 
 void MythOpenGLPainter::Begin(QWidget *parent)
 {
-    assert(parent);
+    if (!parent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No parent widget defined for "
+                              "OpenGL Painter, bailing");
+        return;
+    }
 
     MythPainter::Begin(parent);
 
     QGLWidget *realParent = dynamic_cast<QGLWidget *>(parent);
-    assert(realParent);
+    if (!realParent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: Failed to cast parent to QGLWidget");
+        return;
+    }
 
     realParent->makeCurrent();
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -95,7 +115,11 @@ void MythOpenGLPainter::Begin(QWidget *parent)
 void MythOpenGLPainter::End(void)
 {
     QGLWidget *realParent = dynamic_cast<QGLWidget *>(m_Parent);
-    assert(realParent);
+    if (!realParent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: Failed to cast parent to QGLWidget");
+        return;
+    }
 
     realParent->makeCurrent();
     glFlush();

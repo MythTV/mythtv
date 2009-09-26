@@ -1,8 +1,9 @@
-// Myth headers
-#include "mythverbose.h"
 
 // Mythui headers
 #include "mythgenerictree.h"
+
+// Myth headers
+#include "mythverbose.h"
 
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {
@@ -453,7 +454,7 @@ MythGenericTree* MythGenericTree::getParent() const
 
 void MythGenericTree::setAttribute(uint attribute_position, int value_of_attribute)
 {
-    // You can use attibutes for anything you like. Mythmusic, for example,
+    // You can use attributes for anything you like. Mythmusic, for example,
     // stores a value for random ordering in the first "column" (0) and a value
     // for "intelligent" (1) ordering in the second column
 
@@ -466,7 +467,7 @@ int MythGenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
-        VERBOSE(VB_IMPORTANT, "asked a MythGenericTree node for a nonexistant"
+        VERBOSE(VB_IMPORTANT, "Asked a MythGenericTree node for a non-existent"
                               "attribute");
         return 0;
     }

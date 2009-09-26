@@ -1,12 +1,16 @@
-#include <cassert>
-#include <iostream>
+
+// QT headers
 #include <QPainter>
 #include <QPixmap>
 
+// MythUI headers
 #include "mythpainter_qt.h"
 #include "mythfontproperties.h"
 #include "mythmainwindow.h"
+
+// MythDB headers
 #include "compat.h"
+#include "mythverbose.h"
 
 class MythQtImage : public MythImage
 {
@@ -40,7 +44,12 @@ MythQtPainter::~MythQtPainter()
 
 void MythQtPainter::Begin(QWidget *parent)
 {
-    assert(parent);
+    if (!parent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No parent widget defined for "
+                              "QT Painter, bailing");
+        return;
+    }
 
     MythPainter::Begin(parent);
 
@@ -74,7 +83,12 @@ void MythQtPainter::SetClipRect(const QRect &clipRect)
 void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
                               const QRect &src, int alpha)
 {
-    assert(painter);
+    if (!painter)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawImage called with no painter");
+        return;
+    }
+    
     (void)alpha;
 
     MythQtImage *qim = reinterpret_cast<MythQtImage *>(im);
@@ -86,7 +100,12 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
                              int flags, const MythFontProperties &font,
                              int alpha, const QRect &boundRect)
 {
-    assert(painter);
+    if (!painter)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawText called with no painter");
+        return;
+    }
+
     (void)alpha;
 
     painter->setFont(font.face());

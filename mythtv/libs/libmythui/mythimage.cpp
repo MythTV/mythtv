@@ -1,20 +1,31 @@
-#include <cassert>
+
+// Own header
+#include "mythimage.h"
+
+// C++ headers
 #include <stdint.h>
 
 // QT headers
 #include <QPainter>
 #include <QMatrix>
+#include <QRgb>
 
-#include "mythimage.h"
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
+// Mythdb headers
+#include "mythverbose.h"
+
+// Myth headers
 #include "remotefile.h"
+
+// MythUI headers
+#include "mythuihelper.h"
+#include "mythmainwindow.h"
 
 MythUIHelper *MythImage::m_ui = NULL;
 
 MythImage::MythImage(MythPainter *parent)
 {
-    assert(parent);
+    if (!parent)
+        VERBOSE(VB_IMPORTANT, "ERROR: Image created without parent!");
 
     m_Parent = parent;
     m_RefCount = 0;
@@ -307,7 +318,7 @@ void MythImage::MakeGradient(QImage &image, const QColor &begin,
 
     if (drawBoundary)
     {
-        // Draw boundry rect
+        // Draw boundary rect
         QColor black(0, 0, 0, alpha);
         painter.setPen(black);
         QPen pen = painter.pen();

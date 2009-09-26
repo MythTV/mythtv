@@ -1,20 +1,28 @@
-#include <cassert>
 
+// Config header
+#include "config.h"
+
+// Own header
+#include "mythpainter_vdpau.h"
+
+// QT headers
 #include <QApplication>
 #include <QPixmap>
 #include <QPainter>
 #include <QX11Info>
 
-#include "config.h"
-
+// Mythdb headers
 #include "mythverbose.h"
-#include "mythpainter_vdpau.h"
+
+// Mythui headers
 #include "mythfontproperties.h"
 
+// VDPAU headers
 extern "C" {
 #include "vdpau/vdpau.h"
 #include "vdpau/vdpau_x11.h"
 }
+
 
 #define MAX_GL_ITEMS 256
 #define MAX_STRING_ITEMS 256
@@ -339,7 +347,12 @@ void MythVDPAUPrivate::Begin(QWidget *parent)
     VdpTime dummy = 0;
     bool ok = true;
 
-    assert(parent);
+    if (!parent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No parent widget defined for "
+                              "VDPAU Painter, bailing");
+        return;
+    }
 
     if (initialized &&
         (parent->width() != (int)outRect.x1 || parent->height() != (int)outRect.y1))

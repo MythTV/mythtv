@@ -1,13 +1,18 @@
+
+// Own header
+#include "mythsystem.h"
+
+// compat header
+#include "compat.h"
+
+// C++/C headers
 #include <cerrno>
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
 
+// QT headers
 #include <QApplication>
-
-#include "mythsystem.h"
-
-#include "compat.h"
 
 # ifdef linux
 #   include <sys/vfs.h>
@@ -25,9 +30,12 @@
 #   endif
 # endif
 
+// libmythdb headers
 #include "mythverbose.h"
-#include "mythmainwindow.h"
 #include "exitcodes.h"
+
+// Mythui headers
+#include "mythmainwindow.h"
 
 #ifdef USE_LIRC
 #include "lircevent.h"

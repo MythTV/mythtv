@@ -1,10 +1,14 @@
 
+#include "mythmainwindow.h"
+#include "mythmainwindow_internal.h"
+
+// C++ headers
 #include <math.h>
 #include <pthread.h>
-
 #include <algorithm>
 #include <vector>
 
+// QT headers
 #ifdef USE_OPENGL_PAINTER
 #include <QGLWidget>
 #endif
@@ -16,7 +20,9 @@
 #include <QFile>
 #include <QDir>
 #include <QEvent>
+#include <QKeyEvent>
 
+// Platform headers
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
@@ -24,6 +30,14 @@
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
+// libmythdb headers
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "mythevent.h"
+#include "mythdirs.h"
+
+// Libmythui headers
+#include "screensaver.h"
 #include "lirc.h"
 #include "lircevent.h"
 
@@ -36,8 +50,6 @@
 #include "jsmenuevent.h"
 #endif
 
-#include "mythmainwindow.h"
-#include "mythmainwindow_internal.h"
 #include "mythscreentype.h"
 #include "mythpainter.h"
 #ifdef USE_OPENGL_PAINTER
@@ -46,15 +58,6 @@
 #include "mythpainter_qt.h"
 #include "mythgesture.h"
 #include "mythuihelper.h"
-
-/* from libmythdb */
-#include "mythdb.h"
-#include "mythverbose.h"
-#include "mythevent.h"
-#include "mythdirs.h"
-
-/* from libmythui */
-#include "screensaver.h"
 
 #ifdef USING_VDPAU
 #include "mythpainter_vdpau.h"
@@ -156,7 +159,7 @@ class MythMainWindowPrivate
     MythGesture gesture;
     QTimer *gestureTimer;
 
-    /* compatability only, FIXME remove */
+    /* compatibility only, FIXME remove */
     std::vector<QWidget *> widgetList;
 
     QWidget *paintwin;
@@ -845,7 +848,7 @@ void MythMainWindow::Show(void)
 #endif
 }
 
-/* FIXME compatability only */
+/* FIXME compatibility only */
 void MythMainWindow::attach(QWidget *child)
 {
 #ifdef USING_MINGW
@@ -905,7 +908,7 @@ void MythMainWindow::SetDrawEnabled(bool enable)
     d->m_drawEnabled = enable;
 }
 
-/* FIXME: end compatability */
+/* FIXME: end compatibility */
 
 bool MythMainWindow::IsExitingToMain(void) const
 {
@@ -918,7 +921,7 @@ void MythMainWindow::ExitToMainMenu(void)
 
     d->exitingtomain = true;
 
-    /* compatability code, remove, FIXME */
+    /* compatibility code, remove, FIXME */
     QWidget *current = currentWidget();
     if (current && d->exitingtomain && d->popwindows)
     {
@@ -1102,9 +1105,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         query.bindValue(":ACTION", action);
         query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
-        bool ok = query.exec() && query.isActive();
-
-        if (ok && query.next())
+        if (query.exec() && query.next())
         {
             keybind = query.value(0).toString();
             QString db_description = query.value(1).toString();
@@ -1112,7 +1113,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
             // Update keybinding description if changed
             if (db_description != description)
             {
-                VERBOSE(VB_IMPORTANT, "Updating description...");
+                VERBOSE(VB_IMPORTANT, "Updating keybinding description...");
                 query.prepare(
                     "UPDATE keybindings "
                     "SET description = :DESCRIPTION "
@@ -1247,9 +1248,8 @@ void MythMainWindow::RegisterJump(const QString &destination,
         query.bindValue(":DEST", destination);
         query.bindValue(":HOST", GetMythDB()->GetHostName());
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             keybind = query.value(0).toString();
         }
         else
@@ -1281,7 +1281,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
 void MythMainWindow::JumpTo(const QString& destination, bool pop)
 {
     if (destination == "ScreenShot")
-	screenShot();
+        screenShot();
     else if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
@@ -1364,7 +1364,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 {
     MythGestureEvent *ge;
 
-    /* dont let anything through if input is disallowed. */
+    /* Don't let anything through if input is disallowed. */
     if (!d->AllowInput)
         return true;
 
@@ -1671,7 +1671,7 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         if (message.left(12) == "HANDLE_MEDIA")
         {
-            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            QStringList tokens = message.split(' ', QString::SkipEmptyParts);
             HandleMedia(tokens[1],
                         message.mid(tokens[0].length() +
                                     tokens[1].length() + 2));

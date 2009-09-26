@@ -1,6 +1,7 @@
 
-#include "mythmainwindow.h"
 #include "mythrect.h"
+
+#include "mythmainwindow.h"
 
 MythRect::MythRect()
          : QRect()
@@ -104,7 +105,7 @@ void MythRect::setRect(const QString &sX, const QString &sY, const QString &sWid
 void MythRect::setX(const QString &sX)
 {
     QString X = sX;
-    if (X.endsWith("%"))
+    if (X.endsWith('%'))
     {
         X.chop(1);
         m_percentX = X.toFloat() / 100.0;
@@ -117,7 +118,7 @@ void MythRect::setX(const QString &sX)
 void MythRect::setY(const QString &sY)
 {
     QString Y = sY;
-    if (Y.endsWith("%"))
+    if (Y.endsWith('%'))
     {
         Y.chop(1);
         m_percentY = Y.toFloat() / 100.0;
@@ -130,7 +131,7 @@ void MythRect::setY(const QString &sY)
 void MythRect::setWidth(const QString &sWidth)
 {
     QString width = sWidth;
-    if (width.endsWith("%"))
+    if (width.endsWith('%'))
     {
         width.chop(1);
         m_percentWidth = width.toFloat() / 100.0;
@@ -143,7 +144,7 @@ void MythRect::setWidth(const QString &sWidth)
 void MythRect::setHeight(const QString &sHeight)
 {
     QString height = sHeight;
-    if (height.endsWith("%"))
+    if (height.endsWith('%'))
     {
         height.chop(1);
         m_percentHeight = height.toFloat() / 100.0;
@@ -170,7 +171,7 @@ void MythRect::moveTopLeft(const MythPoint &point)
 void MythRect::moveLeft(const QString &sX)
 {
     QString X = sX;
-    if (X.endsWith("%"))
+    if (X.endsWith('%'))
     {
         X.chop(1);
         m_percentX = X.toFloat() / 100.0;
@@ -183,7 +184,7 @@ void MythRect::moveLeft(const QString &sX)
 void MythRect::moveTop(const QString &sY)
 {
     QString Y = sY;
-    if (Y.endsWith("%"))
+    if (Y.endsWith('%'))
     {
         Y.chop(1);
         m_percentY = Y.toFloat() / 100.0;
@@ -306,7 +307,7 @@ void MythPoint::NormPoint(void)
 void MythPoint::setX(const QString &sX)
 {
     QString X = sX;
-    if (X.endsWith("%"))
+    if (X.endsWith('%'))
     {
         X.chop(1);
         m_percentX = X.toFloat() / 100.0;
@@ -319,7 +320,7 @@ void MythPoint::setX(const QString &sX)
 void MythPoint::setY(const QString &sY)
 {
     QString Y = sY;
-    if (Y.endsWith("%"))
+    if (Y.endsWith('%'))
     {
         Y.chop(1);
         m_percentY = Y.toFloat() / 100.0;

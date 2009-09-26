@@ -1,6 +1,8 @@
 #ifndef MYTHPAINTER_OPENGL_H_
 #define MYTHPAINTER_OPENGL_H_
 
+#include <QMap>
+
 #include <list>
 
 #include "mythpainter.h"
