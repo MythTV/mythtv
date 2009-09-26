@@ -1,59 +1,28 @@
+
+// Own header
+#include "themeinfo.h"
+
+// QT headers
 #include <QFile>
 #include <QDir>
 #include <QDomElement>
 
-#include "themeinfo.h"
+// Mythdb headers
 #include "mythverbose.h"
 
 ThemeInfo::ThemeInfo(QString theme)
 {
 
     m_theme = new QFileInfo (theme);
-    m_name = m_aspect = m_previewpath = m_description = m_errata = "";
     m_type = THEME_UNKN;
     m_baseres = QSize(800, 600);
     m_majorver = m_minorver = 0;
 
     if (!parseThemeInfo())
     {
-        // Fallback for old themes
-        // N.B. This is temporary to allow theme maintainers
-        // to catch up and implement a themeinfo.xml
-
-        VERBOSE(VB_GENERAL, QString("The theme (%1) is missing a themeinfo.xml file")
+        VERBOSE(VB_GENERAL, QString("WARNING: The theme (%1) is missing a "
+                                    "themeinfo.xml file, ignoring.")
                                     .arg(m_theme->fileName()));
-
-        m_name = m_theme->fileName();
-
-        if (m_name.contains("-wide"))
-            m_aspect = "16:9";
-        else
-            m_aspect = "4:3";
-
-        if (QFile::exists(m_theme->absoluteFilePath() + "/theme.xml"))
-        {
-            m_type |= THEME_UI;
-
-            if (IsWide())
-            {
-                m_baseres = QSize(1280, 720);
-            }
-            else
-            {
-                m_baseres = QSize(800, 600);
-            }
-        }
-
-        if (QFile::exists(m_theme->absoluteFilePath() + "/osd.xml"))
-        {
-            m_type |= THEME_OSD;
-            m_baseres = QSize(640, 480);
-        }
-
-        if (QFile::exists(m_theme->absoluteFilePath() + "/mainmenu.xml"))
-            m_type |= THEME_MENU;
-
-        m_previewpath = m_theme->absoluteFilePath() + "/preview.jpg";
     }
 }
 
@@ -176,7 +145,7 @@ bool ThemeInfo::parseThemeInfo()
                             {
                                 QString thumbnail = ce.firstChild().toText()
                                                                     .data();
-                                m_previewpath = m_theme->absoluteFilePath() + "/"
+                                m_previewpath = m_theme->absoluteFilePath() + '/'
                                                     + thumbnail;
                             }
                         }
