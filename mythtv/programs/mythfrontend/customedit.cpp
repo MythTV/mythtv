@@ -101,9 +101,6 @@ void CustomEdit::loadData(void)
 
     CustomRuleInfo rule;
     rule.recordid = "0";
-    rule.title;
-    rule.subtitle;
-    rule.description;
 
     MythUIButtonListItem *item;
     item = new MythUIButtonListItem(m_ruleList, tr("<New rule>"),
