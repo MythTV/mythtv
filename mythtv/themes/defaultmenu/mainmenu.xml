@@ -30,6 +30,7 @@
         <alttext lang="AR">المكتبة</alttext>
         <action>MENU library.xml</action>
         <description>Play any of your media</description>
+        <description lang="DE">Musik hören, Videos ansehen usw.</description>
     </button>
   
     <button>
@@ -63,6 +64,7 @@
         <alttext lang="RU">Записи</alttext>
         <alttext lang="AR">التسجيلات</alttext>
         <description>Pick and prioritize shows to record</description>
+        <description lang="DE">Planen Sie Ihre Aufnahmen</description>
         <action>MENU manage_recordings.xml</action>
     </button>
 
@@ -101,6 +103,7 @@
         <alttext lang="RU">Информация</alttext>
         <alttext lang="AR">معلومات</alttext>
         <description>Information and Communications</description>
+        <description lang="DE">Informationen &amp; Kommunikation</description>
         <action>MENU info_menu.xml</action>
     </button>
 
@@ -129,6 +132,7 @@
         <text lang="PL">Dyski optyczne</text>
         <text lang="HE">דיסקים אופטים</text>
         <description>Play or import CDs and DVDs</description>
+        <description lant="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
@@ -158,6 +162,7 @@
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
         <description>Watch live television</description>
+        <description lang="DE">Jetzt Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -191,6 +196,7 @@
         <alttext lang="RU">Настройки</alttext>
         <alttext lang="AR">تضبيطات</alttext>
         <description>Configure MythTV and plugins</description>
+        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU util_menu.xml</action>
     </button>
 

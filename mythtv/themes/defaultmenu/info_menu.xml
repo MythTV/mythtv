@@ -22,6 +22,7 @@
         <text lang="PL">Telefon</text>
         <text lang="HE">טלפון</text>
         <description>Make or accept a VoIP call</description>
+        <description lang="DE">Über VoIP telefonieren</description>
         <action>PLUGIN mythphone</action>
         <depends>mythphone</depends>
     </button>
@@ -50,6 +51,7 @@
         <text lang="PL">Wiadomości</text>
         <text lang="HE">חדשות</text>
         <description>Keep up with the news</description>
+        <description lang="DE">Was passiert in der Welt?</description>
         <action>PLUGIN mythnews</action>
         <depends>mythnews</depends>
     </button>
@@ -72,6 +74,7 @@
         <text lang="PL">Repertuar kin</text>
         <text lang="HE">זמני הקרנת סרטים</text>
         <description>See when local movies are playing</description>
+        <description lang="DE">Was läuft im Kino?</description>
         <action>PLUGIN mythmovies</action>
         <depends>mythmovies</depends>
     </button>
@@ -101,6 +104,7 @@
         <text lang="HE">מזג האויר</text>
         <action>PLUGIN mythweather</action>
         <description>Local weather forecast</description>
+        <description lang="DE">Wie wird das Wetter?</description>
         <depends>mythweather</depends>
     </button>
 
@@ -153,6 +157,7 @@
         <text lang="PL">Internet WWW</text>
         <text lang="HE">אינטרנט</text>
         <description>Browse the web</description>
+        <description lang="DE">Surfen Sie im Netz</description>
         <action>PLUGIN mythbrowser</action>
         <depends>mythbrowser</depends>
     </button>
@@ -180,6 +185,7 @@
         <text lang="PL">Przepisy</text>
         <text lang="HE">מתכונים</text>
         <description>Start cooking!</description>
+        <description lang="DE">Was wollen Sie heute Kochen?</description>
         <action>PLUGIN mythRecipe</action>
         <depends>mythrecipe</depends>
     </button>
@@ -207,6 +213,7 @@
         <text lang="PL">Status systemu</text>
         <text lang="HE">מצב מערכת</text>
         <description>What your system is doing right now</description>
+        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 
@@ -217,7 +224,9 @@
         <text lang="IT">Videosorveglianza</text>
         <text lang="PL">Strażnik</text>
         <text lang="FI">ZoneMinder</text>
+        <text lang="DE">Videoüberwachung</text>
         <description>Home surveillance</description>
+        <description lang="DE">Videoüberwachung</description>
         <action>PLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
  </button>
@@ -225,8 +234,10 @@
     <button>
         <type>SMOLT</type>
         <text>Hardware profile</text>
+        <text lang="DE">Ger�teprofil</text>
         <text lang="FR">Profil matériel</text>
         <description>Tell us what hardware you have so we can support it</description>
+        <description lang="DE">Sagen Sie uns welche Ger�te Sie verwenden</description>
         <action>PLUGIN mythsmolt</action>
         <depends>mythsmolt</depends>
  </button>

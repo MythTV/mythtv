@@ -17,6 +17,7 @@
         <text lang="ET">Vaata telerit</text>
         <text lang="RU">Смотреть ТВ</text>
         <description>Watch live television</description>
+        <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -42,6 +43,7 @@
         <alttext lang="NL">Verwijderen</alttext>
         <alttext lang="RU">Удалить</alttext>
         <description>Remove television recordings</description>
+        <description lang="DE">TV-Aufnahmen löschen</description>
         <action>TV_DELETE</action>
     </button>
 

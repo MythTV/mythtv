@@ -19,6 +19,7 @@
         <text lang="ET">Üldine</text>
         <text lang="RU">Общие</text>
         <description>TV navigation and recording preferences</description>
+        <description lang="DE">TV-Navigation und Aufnahme-Voreinstellungen</description>
         <action>SETTINGS GENERAL</action>
     </button>
 
@@ -44,6 +45,7 @@
         <alttext lang="ET">Kava</alttext>
         <alttext lang="RU">Программа</alttext>
         <description>Guide appearance and behavior</description>
+        <description lang="DE">Einstellungen für das EPG</description>
         <action>SETTINGS EPG</action>
     </button>
 
@@ -67,21 +69,26 @@
         <text lang="RU">Воспроизведение</text>
         <alttext lang="RU">Группы</alttext>
         <description>Settings for viewing and playing TV</description>
+        <description lang="DE">Einstellungen zur TV-Wiedergabe</description>
         <action>SETTINGS PLAYBACK</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_PLAYBACK_OSD</type>
         <text>Playback OSD</text>
+        <text lang="DE">Wiedergabe-OSD</text>
         <text lang="FR">Incrustation de lecture</text>
         <description>Theme and settings for OSD</description>
+        <description lang="DE">Einstellungen f�r das On-Screen-Display</description>
         <action>SETTINGS OSD</action>
     </button>
 
     <button>
         <type>TV_SETTINGS_OSD_MENU_EDITOR</type>
         <text>OSD Menu Editor</text>
+        <text lang="DE">OSD-Men� anpassen</text>
         <text lang="FR">Éditeur de menu d&apos;incrustation</text>
+        <description lang="DE">Welche Men�punkte sollen im OSD erscheinen?</description>
         <action>OSDMENUEDITOR</action>
     </button>
 
@@ -97,13 +104,16 @@
         <text lang="JA">プレイバックグループ</text>
         <text lang="RU">Группы воспроизведения</text>
         <description>Adjust settings for different playback styles</description>
+        <description lang="DE">Einstellungen f�r die Sendergruppen</description>
         <action>SETTINGS PLAYGROUP</action>
     </button>
 
     <button>
       <type>TV_SETTINGS_CHANNEL_GROUP</type>
       <text>Channel Groups</text>
+      <text lang="DE">Sendergruppen</text>
       <text lang="FR">Groupes de chaînes</text>
+      <description lang="DE">Gruppieren Sie Ihre Lieblingssender</description>
       <action>SETTINGS CHANNELGROUPS</action>
     </button>
 
@@ -157,6 +167,7 @@
         <alttext lang="ES">Prioridades</alttext>
         <alttext lang="RU">Приоритеты</alttext>
         <description>Global recording priority and scheduling</description>
+        <description lang="DE">Aufnahmeprioritäten und Planung</description>
         <action>MENU recpriorities_settings.xml</action>
     </button>
 

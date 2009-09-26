@@ -24,6 +24,7 @@
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
         <description>Watch live television</description>
+        <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -67,6 +68,7 @@
         <alttext lang="NB">Planlegg</alttext>
         <alttext lang="RU">Расписание</alttext>
         <description>Pick shows to record</description>
+        <description lang="DE">Eine neue Aufnahme planen</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
@@ -169,6 +171,7 @@
         <text lang="PL">Status systemu</text>
         <text lang="HE">מצב מערכת</text>     
         <description>What your system is doing right now</description>
+        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 

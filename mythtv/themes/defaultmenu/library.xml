@@ -124,6 +124,7 @@
     <button>
         <type>STREAM</type>
         <text>Play Online Streams</text>
+        <text lang="DE">Internetstreams</text>
         <text lang="FR">Lire des flux en ligne</text>
         <text lang="HE">נגן מדיה מכוונת</text>
         <description></description>
@@ -183,6 +184,7 @@
         <text lang="PL">Graj w gry</text>
         <text lang="HE">לשחק משחקים</text>
         <description>Play video games</description>
+        <description lang="DE">Videospiele spielen</description>
         <action>PLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>

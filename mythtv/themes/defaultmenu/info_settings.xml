@@ -24,6 +24,7 @@
         <text lang="PL">Ustaw Pogodę</text>
         <text lang="HE">הגדרות מזג האויר</text>
         <description>Weather locale and sources</description>
+        <description lang="DE">Standort und Datenquelle einrichten</description>
         <action>CONFIGPLUGIN mythweather</action>
         <depends>mythweather</depends>
     </button>
@@ -62,6 +63,7 @@
         <text lang="PL">Ustaw wiadomości</text>
         <text lang="HE">הגדרות חדשות</text>
         <description>Choose which news sources interest you</description>
+        <description lang="DE">Wählen Sie Ihre Nachrichtenquellen</description>
         <action>CONFIGPLUGIN mythnews</action>
         <depends>mythnews</depends>
     </button>
@@ -86,6 +88,7 @@
         <text lang="PL">Ustaw repertuar kin</text>
         <text lang="HE">הגדרות Movie Times</text>
         <description>Select local movie theaters</description>
+        <description lang="DE">Wählen Sie ihr lokales Kino</description>
         <action>CONFIGPLUGIN mythmovies</action>
         <depends>mythmovies</depends>
     </button>
@@ -135,6 +138,7 @@
         <text lang="HE">הגדרות אינטרנט</text>
         <action>CONFIGPLUGIN mythbrowser</action>
         <description>Manage web bookmarks</description>
+        <description lang="DE">Verwalten Sie Ihre Bookmarks</description>
         <depends>mythbrowser</depends>
     </button>
 
@@ -162,6 +166,7 @@
         <alttext lang="ET">Retseptid</alttext>
         <alttext lang="PT">Receitas</alttext>
         <description></description>
+        <description lang="DE">Rezeptsammlung einrichten</description>
         <action>CONFIGPLUGIN mythrecipe</action>
         <depends>mythrecipe</depends>
     </button>

@@ -44,6 +44,7 @@
         <alttext lang="SV">Kommande</alttext>
         <alttext lang="ET">Tulevased</alttext>
         <description>See what will be recorded next</description>
+        <description lang="DE">Was wird als nächstes aufgenommen?</description>
         <action>TV_FIX_CONFLICTS</action>
     </button>
 
@@ -79,6 +80,7 @@
         <alttext lang="ET">Plaanimine</alttext>
         <alttext lang="RU">Расписание</alttext>
         <description>Pick shows to record</description>
+        <description lang="DE">Eine neue Aufnahme planen</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
@@ -109,6 +111,7 @@
         <alttext lang="ES">Prioridades</alttext>
         <alttext lang="RU">Приоритеты</alttext>
         <description>Prioritize some shows over others</description>
+        <description lang="DE">Welche Aufnahme ist Ihnen am wichtigsten?</description>
         <action>TV_SET_RECPRIORITIES</action>
     </button>
 
@@ -128,6 +131,7 @@
         <text lang="NL">Systeemstatus</text>
         <text lang="RU">Состояние системы</text>
         <description>What your system is doing right now</description>
+        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 
@@ -155,6 +159,7 @@
         <alttext lang="ET">Sätted</alttext>
         <alttext lang="RU">Настройки</alttext>
         <description>Settings for TV, Images, Music, Video, Weather, et c.</description>
+        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU util_menu.xml</action>
     </button>
 
