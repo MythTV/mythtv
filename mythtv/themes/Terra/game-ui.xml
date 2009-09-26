@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
   <window name="gameui">
@@ -84,16 +85,26 @@
         <font>basemedium</font>
     </textarea>
 
-    <textarea name="favorite">
+    <textarea name="favoritelabel">
         <area>296,615,140,35</area>
         <font>basemedium</font>
         <value>Favorite:</value>
     </textarea>
 
-    <textarea name="showfavorite">
+    <statetype name="favorite">
         <area>436,615,580,35</area>
-        <font>basemedium</font>
-    </textarea>
+        <state name="yes">
+            <textarea name="favorite" from="basetextarea">
+                <area>0,0,580,35</area>
+                <value>Yes</value>
+            </textarea>
+        </state>
+        <state name="no" from="yes">
+            <textarea name="favorite">
+                <value>No</value>
+            </textarea>
+        </state>
+    </statetype>
 
     <imagetype name="screenshot">
           <area>880,448,300,196</area>

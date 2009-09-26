@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
     <window name="mainmenu">
 
@@ -71,11 +71,15 @@
 
             </state>
             <state name="DVD">
-
+                <textarea name="heading" from="baseheading">
+                    <value>CD/DVD Options</value>
+                </textarea>
             </state>
             <state name="DVD_SETTINGS" from="DVD" />
             <state name="MUSIC_SETTINGS">
-
+                <textarea name="heading" from="baseheading">
+                    <value>Music Settings</value>
+                </textarea>
             </state>
             <state name="VIDEO_SETTINGS" from="VIDEO" />
             <state name="GAME_SETTINGS" from="GAMES" />

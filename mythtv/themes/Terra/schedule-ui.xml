@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <window name="manualschedule">
@@ -1057,7 +1058,7 @@
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
-            <area>700,640,420,30</area>
+            <area>700,646,420,30</area>
         </textarea>
 
         <textarea name="msg" from="description">

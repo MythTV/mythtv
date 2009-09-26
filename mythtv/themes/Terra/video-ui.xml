@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <!-- Popups -->
@@ -79,7 +80,6 @@
             <font>basemedium</font>
             <multiline>yes</multiline>
             <value>Full Plot</value>
-            <scroll direction="left">auto</scroll>
         </textarea>
 
         <textarea name="description" from="basetextarea">

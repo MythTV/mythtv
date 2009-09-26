@@ -1,8 +1,8 @@
-
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Arial">
+    <font name="basesmall" face="DejaVu Sans">
         <size>14</size>
         <color>#DDDDDD</color>
     </font>
