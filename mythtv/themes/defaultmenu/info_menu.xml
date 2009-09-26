@@ -235,10 +235,10 @@
     <button>
         <type>SMOLT</type>
         <text>Hardware profile</text>
-        <text lang="DE">Ger‰teprofil</text>
+        <text lang="DE">Ger√§teprofil</text>
         <text lang="FR">Profil mat√©riel</text>
         <description>Tell us what hardware you have so we can support it</description>
-        <description lang="DE">Sagen Sie uns welche Ger‰te Sie verwenden</description>
+        <description lang="DE">Sagen Sie uns welche Ger√§te Sie verwenden</description>
         <action>PLUGIN mythsmolt</action>
         <depends>mythsmolt</depends>
  </button>

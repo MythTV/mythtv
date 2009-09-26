@@ -37,7 +37,7 @@
         <text lang="CS">Guia de programes</text>
         <text lang="NL">Programmagids</text>
         <text lang="FR">Guide des programmes</text>
-        <text lang="DE">Programm�bersicht</text>
+        <text lang="DE">Programmübersicht</text>
         <text lang="DA">Programguide</text>
         <text lang="IS">Dagskrá</text>
         <text lang="PT">Configurar Guia de Programação</text>
@@ -57,7 +57,7 @@
         <alttext lang="ET">Kava</alttext>
         <alttext lang="PL">Program TV</alttext>
         <description>Guide appearance and behavior</description>
-        <description lang="DE">Einstellungen f�r das EPG</description>
+        <description lang="DE">Einstellungen für das EPG</description>
         <action>SETTINGS EPG</action>
     </button>
 
@@ -97,16 +97,16 @@
         <text lang="FI">OSD Asetukset</text>
         <text lang="DE">Wiedergabe-OSD</text>
         <description>Theme and settings for OSD</description>
-        <description lang="DE">Einstellungen f�r das On-Screen-Display</description>
+        <description lang="DE">Einstellungen für das On-Screen-Display</description>
         <action>SETTINGS OSD</action>
     </button>
 
   <button>
         <type>TV_SETTINGS_OSD_MENU_EDITOR</type>
         <text>OSD Menu Editor</text>
-        <text lang="DE">OSD-Men� anpassen</text>
+        <text lang="DE">OSD-Menü anpassen</text>
         <text lang="FR">Éditeur de menu d&apos;incrustation</text>
-        <description lang="DE">Welche Men�punkte sollen im OSD-Men� erscheinen?</description>
+        <description lang="DE">Welche Menüpunkte sollen im OSD-Menü erscheinen?</description>
         <action>OSDMENUEDITOR</action>
   </button>
     <button>
@@ -128,7 +128,7 @@
         <text lang="HE">קבוצות הסרטה</text>
         <text lang="FI">Toistoryhmät</text>
         <description>Adjust settings for different playback styles</description>
-        <description lang="DE">Einstellungen f�r die Wiedergabegruppen</description>
+        <description lang="DE">Einstellungen für die Wiedergabegruppen</description>
         <action>SETTINGS PLAYGROUP</action>
     </button>
 
@@ -137,7 +137,7 @@
       <text>Channel Groups</text>
       <text lang="DE">Sendergruppen</text>
       <text lang="FR">Groupes de chaînes</text>
-      <description lang="DE">Einstellungen f�r die Sendergruppen</description>
+      <description lang="DE">Einstellungen für die Sendergruppen</description>
       <action>SETTINGS CHANNELGROUPS</action>
     </button>
 
@@ -179,7 +179,7 @@
         <text>Recording Priorities</text>
         <text lang="IT">Priorità Registrazioni</text>
         <text lang="FR">Priorités d&apos;enresgitrement</text>
-        <text lang="DE">Priorit�ten</text>
+        <text lang="DE">Prioritäten</text>
         <text lang="IS">Forgangur</text>
         <text lang="SV">Inspelningsprioriteter</text>
         <text lang="JA">録画優先順位</text>
@@ -196,14 +196,14 @@
         <text lang="RU">Приоритеты записей</text>
         <text lang="PL">Priorytety nagrań</text>
         <text lang="HE">קדימויות הקלטה</text>
-        <alttext lang="DE">Priorit�ten</alttext>
+        <alttext lang="DE">Prioritäten</alttext>
         <alttext lang="ET">Prioriteedid</alttext>
         <alttext lang="ES">Prioridades</alttext>
         <alttext lang="PT">Prioridades</alttext>
         <alttext lang="RU">Приоритеты</alttext>
         <alttext lang="PL">Priorytety</alttext>
         <description>Global recording priority and scheduling</description>
-        <description lang="DE">Aufnahmepriorit�ten und Planung</description>
+        <description lang="DE">Aufnahmeprioritäten und Planung</description>
         <action>MENU recpriorities_settings.xml</action>
     </button>
 

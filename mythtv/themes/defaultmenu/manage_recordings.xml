@@ -30,7 +30,7 @@
         <alttext lang="RU">Расписание</alttext>
         <alttext lang="PL">Harmonogram</alttext>
         <description>Pick shows to record</description>
-        <description lang="DE">Welche Sendung m�chten Sie aufnehmen?</description>
+        <description lang="DE">Welche Sendung möchten Sie aufnehmen?</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
@@ -42,7 +42,7 @@
         <alttext>Manage Rules</alttext>
         <alttext lang="FR">Gérer les règles</alttext>
         <description>Edit or delete any recording rule</description>
-        <description lang="DE">Bearbeiten/L�schen der Aufnahmeregeln</description>
+        <description lang="DE">Bearbeiten/Löschen der Aufnahmeregeln</description>
         <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
 
