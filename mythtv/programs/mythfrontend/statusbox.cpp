@@ -110,13 +110,10 @@ bool StatusBox::Create()
                 SLOT(clicked(MythUIButtonListItem *)));
 
     BuildFocusList();
-
-    Load();
-    
     return true;
 }
 
-void StatusBox::Load()
+void StatusBox::Init()
 {
     MythUIButtonListItem *item;
 
