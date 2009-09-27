@@ -1,4 +1,6 @@
 
+#include "progfind.h"
+
 // qt
 #include <QDateTime>
 #include <QApplication>
@@ -7,24 +9,30 @@
 #include <QKeyEvent>
 #include <QEvent>
 
-// myth
-#include "customedit.h"
-#include "recordinginfo.h"
+// libmythdb
 #include "oldsettings.h"
-#include "tv.h"
-#include "guidegrid.h"
 #include "mythdb.h"
-#include "mythcontext.h"
 #include "mythdbcon.h"
-#include "mythuihelper.h"
 #include "mythdirs.h"
-#include "proglist.h"
+
+// libmyth
+#include "mythcontext.h"
+
+// libmythtv
+#include "recordinginfo.h"
+#include "tv.h"
+
+// libmythui
 #include "mythuitext.h"
 #include "mythuitextedit.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
+#include "mythuihelper.h"
 
-#include "progfind.h"
+// mythfrontend
+#include "guidegrid.h"
+#include "proglist.h"
+#include "customedit.h"
 
 #define LOC      QString("ProgFinder: ")
 #define LOC_ERR  QString("ProgFinder, Error: ")
@@ -51,10 +59,11 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
 ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG,
                        TV *player, bool embedVideo)
           : ScheduleCommon(parentStack, "ProgFinder"),
-    m_searchStr(QString::null),
     m_player(player),            m_embedVideo(embedVideo),
-    m_allowEPG(allowEPG),        m_allowKeypress(false),
-    m_dateFormat(QString::null), m_timeFormat(QString::null)
+    m_allowEPG(allowEPG),        m_allowKeypress(true),
+    m_alphabetList(NULL),        m_showList(NULL),
+    m_timesList(NULL),           m_searchText(NULL),
+    m_help1Text(NULL),           m_help2Text(NULL)
 {
 }
 
@@ -90,7 +99,7 @@ bool ProgFinder::Create()
 void ProgFinder::Init(void)
 {
     m_allowKeypress = true;
-
+    
     m_timeFormat = gContext->GetSetting("TimeFormat");
     m_dateFormat = gContext->GetSetting("DateFormat");
 
@@ -170,7 +179,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
@@ -392,7 +401,7 @@ void ProgFinder::showGuide()
     {
         QString startchannel = gContext->GetSetting("DefaultTVChannel");
         if (startchannel.isEmpty())
-            startchannel = "3";
+            startchannel = '3';
         uint startchanid = 0;
         GuideGrid::RunProgramGuide(startchanid, startchannel, m_player, m_embedVideo, false);
     }
@@ -476,7 +485,8 @@ void ProgFinder::upcoming()
             return;
 
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        ProgLister *pl = new ProgLister(mainStack, plTitle, curPick->title, "");
+        ProgLister *pl = new ProgLister(mainStack, plTitle, curPick->title,
+                                        QString());
         if (pl->Create())
             mainStack->AddScreen(pl);
         else
@@ -502,16 +512,15 @@ void ProgFinder::quickRecord()
 
 void ProgFinder::updateTimesList()
 {
-    QString itemText;
-
     m_timesList->Reset();
 
     if (m_showData.size() > 0)
     {
-        for (uint i = 0; i < m_showData.size(); i++)
+        QString itemText;
+        for (uint i = 0; i < m_showData.size(); ++i)
         {
             itemText = m_showData[i]->startts.toString(m_dateFormat)
-                    + " " + m_showData[i]->startts.toString(m_timeFormat);
+                    + ' ' + m_showData[i]->startts.toString(m_timeFormat);
 
             MythUIButtonListItem *item = new MythUIButtonListItem(m_timesList, "");
 
@@ -548,7 +557,6 @@ void ProgFinder::updateShowList()
     m_showList->Reset();
 
     QString thequery;
-    QString data;
     MSqlBindings bindings;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -562,29 +570,23 @@ void ProgFinder::updateShowList()
         return;
     }
 
-    int rows = 0;
-    if (query.next())
+    QString data;
+    typedef QMap<QString,QString> ShowData;
+    ShowData tempList; // Assign to temporary map for sorting
+    while (query.next())
     {
-        typedef QMap<QString,QString> ShowData;
-        ShowData tempList;
+        data = query.value(0).toString();
 
-        do
-        {
-            rows++;
-            data = query.value(0).toString();
+        if (formatSelectedData(data))
+            tempList[data.toLower()] = data;
+    }
 
-            if (formatSelectedData(data))
-                tempList[data.toLower()] = data;
-        }
-        while (query.next());
-
-        ShowData::Iterator it;
-        for (it = tempList.begin(); it != tempList.end(); ++it)
-        {
-            QString tmpProgData = *it;
-            restoreSelectedData(tmpProgData);
-            new MythUIButtonListItem(m_showList, tmpProgData);
-       }
+    ShowData::Iterator it;
+    for (it = tempList.begin(); it != tempList.end(); ++it)
+    {
+        QString tmpProgData = *it;
+        restoreSelectedData(tmpProgData);
+        new MythUIButtonListItem(m_showList, tmpProgData);
     }
 }
 
@@ -611,7 +613,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
 
 void ProgFinder::initAlphabetList(void)
 {
-    for (int charNum = 48; charNum < 91; charNum++)
+    for (int charNum = 48; charNum < 91; ++charNum)
     {
         if (charNum == 58)
             charNum = 65;
@@ -638,7 +640,7 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
         if (!m_searchStr.isEmpty())
         {
             where += "AND title LIKE :SEARCH ";
-            bindings[":SEARCH"] = "%" + m_searchStr + "%";
+            bindings[":SEARCH"] = '%' + m_searchStr + '%';
         }
 
         where += "ORDER BY title;";
@@ -647,7 +649,7 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
     }
     else
     {
-        QString one = searchChar + "%";
+        QString one = searchChar + '%';
         QString two = QString("The ") + one;
         QString three = QString("A ") + one;
         QString four = QString("An ") + one;
@@ -670,7 +672,7 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
         bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
 
         if (!m_searchStr.isEmpty())
-            bindings[":SEARCH"] = "%" + m_searchStr + "%";
+            bindings[":SEARCH"] = '%' + m_searchStr + '%';
     }
 }
 
@@ -776,13 +778,13 @@ JaProgFinder::JaProgFinder(MythScreenStack *parentStack, bool gg,
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
     for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
-         numberOfSearchChars++)
+         ++numberOfSearchChars)
          ;
 }
 
 void JaProgFinder::initAlphabetList()
 {
-    for (int charNum = 0; charNum < numberOfSearchChars; charNum++)
+    for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
     {
         new MythUIButtonListItem(m_alphabetList, QString(searchChars[charNum]));
     }
@@ -843,7 +845,7 @@ void JaProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     if (!m_searchStr.isEmpty())
     {
         where += "AND title_pronounce LIKE :SEARCH ";
-        bindings[":SEARCH"] = "%" + m_searchStr + "%";
+        bindings[":SEARCH"] = '%' + m_searchStr + '%';
     }
 
     where += "ORDER BY title_pronounce;";
@@ -883,13 +885,13 @@ HeProgFinder::HeProgFinder(MythScreenStack *parentStack, bool gg,
             : ProgFinder(parentStack, gg, player, embedVideo)
 {
     for (numberOfSearchChars = 0; searchChars[numberOfSearchChars];
-         numberOfSearchChars++)
+         ++numberOfSearchChars)
         ;
 }
 
 void HeProgFinder::initAlphabetList()
 {
-    for (int charNum = 0; charNum < numberOfSearchChars; charNum++)
+    for (int charNum = 0; charNum < numberOfSearchChars; ++charNum)
     {
         new MythUIButtonListItem(m_alphabetList, QString(searchChars[charNum]));
     }
@@ -914,7 +916,7 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     }
     else
     {
-        QString one = searchChar + "%";
+        QString one = searchChar + '%';
         bindings[":ONE"] = one;
         where += "WHERE ( title LIKE :ONE ) ";
     }
@@ -924,7 +926,7 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
     if (!m_searchStr.isEmpty())
     {
         where += "AND title LIKE :SEARCH ";
-        bindings[":SEARCH"] = "%" + m_searchStr + "%";
+        bindings[":SEARCH"] = '%' + m_searchStr + '%';
     }
 
     where += "ORDER BY title;";

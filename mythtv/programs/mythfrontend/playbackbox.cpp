@@ -2371,7 +2371,7 @@ MythDialogBox *PlaybackBox::createPlaylistPopupMenu()
         return NULL;
 
     QString label = tr("There is %n item(s) in the playlist. Actions affect "
-                       "all items in the playlist").arg(m_playList.size());
+                       "all items in the playlist", "", m_playList.size());
 
     return createPopupMenu(label);
 }

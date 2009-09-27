@@ -868,11 +868,11 @@ void ProgLister::fillViewList(const QString &view)
 
         if (query.exec() && query.size())
         {
-            QString lastGenre1;
+            QString lastGenre1, genre1;
 
             while (query.next())
             {
-                QString genre1 = query.value(0).toString();
+                genre1 = query.value(0).toString();
                 if (genre1.isEmpty())
                     continue;
 
@@ -1845,9 +1845,9 @@ bool PhrasePopup::Create()
 
 void PhrasePopup::editChanged(void)
 {
-    m_okButton->SetEnabled((m_phraseEdit->GetText().trimmed().length() > 0));
+    m_okButton->SetEnabled(!m_phraseEdit->GetText().trimmed().isEmpty());
     m_deleteButton->SetEnabled((m_list.indexOf(m_phraseEdit->GetText().trimmed()) != -1));
-    m_recordButton->SetEnabled((m_phraseEdit->GetText().trimmed().length() > 0));
+    m_recordButton->SetEnabled(!m_phraseEdit->GetText().trimmed().isEmpty());
 }
 
 void PhrasePopup::phraseClicked(MythUIButtonListItem *item)
@@ -1880,7 +1880,7 @@ void PhrasePopup::phraseSelected(MythUIButtonListItem *item)
 
 void PhrasePopup::okClicked(void)
 {
-    if (m_phraseEdit->GetText().trimmed().length() == 0)
+    if (m_phraseEdit->GetText().trimmed().isEmpty())
         return;
 
     // check to see if we need to save the phrase

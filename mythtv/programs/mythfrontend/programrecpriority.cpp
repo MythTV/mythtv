@@ -1396,7 +1396,7 @@ void ProgramRecPriority::UpdateList()
         if ((progInfo->rectype == kSingleRecord ||
                 progInfo->rectype == kOverrideRecord ||
                 progInfo->rectype == kDontRecord) &&
-            (progInfo->subtitle).trimmed().length() > 0)
+            !(progInfo->subtitle).trimmed().isEmpty())
         {
 
             QString rating = QString::number((int)((progInfo->stars * 10.0) + 0.5));

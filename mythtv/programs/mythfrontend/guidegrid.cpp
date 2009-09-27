@@ -43,17 +43,17 @@ QWaitCondition epgIsVisibleCond;
 JumpToChannel::JumpToChannel(
     JumpToChannelListener *parent, const QString &start_entry,
     int start_chan_idx, int cur_chan_idx, uint rows_disp) :
-    listener(parent),
-    entry(start_entry),
-    previous_start_channel_index(start_chan_idx),
-    previous_current_channel_index(cur_chan_idx),
-    rows_displayed(rows_disp),
-    timer(new QTimer(this))
+    m_listener(parent),
+    m_entry(start_entry),
+    m_previous_start_channel_index(start_chan_idx),
+    m_previous_current_channel_index(cur_chan_idx),
+    m_rows_displayed(rows_disp),
+    m_timer(new QTimer(this))
 {
-    if (parent && timer)
+    if (parent && m_timer)
     {
-        connect(timer, SIGNAL(timeout()), SLOT(deleteLater()));
-        timer->setSingleShot(true);
+        connect(m_timer, SIGNAL(timeout()), SLOT(deleteLater()));
+        m_timer->setSingleShot(true);
     }
     Update();
 }
@@ -61,16 +61,16 @@ JumpToChannel::JumpToChannel(
 
 void JumpToChannel::deleteLater(void)
 {
-    if (listener)
+    if (m_listener)
     {
-        listener->SetJumpToChannel(NULL);
-        listener = NULL;
+        m_listener->SetJumpToChannel(NULL);
+        m_listener = NULL;
     }
 
-    if (timer)
+    if (m_timer)
     {
-        timer->stop();
-        timer = NULL;
+        m_timer->stop();
+        m_timer = NULL;
     }
 
     QObject::deleteLater();
@@ -88,24 +88,23 @@ static bool has_action(QString action, const QStringList &actions)
     return false;
 }
 
-bool JumpToChannel::ProcessEntry(
-    const QStringList &actions, const QKeyEvent *e)
+bool JumpToChannel::ProcessEntry(const QStringList &actions, const QKeyEvent *e)
 {
-    if (!listener)
+    if (!m_listener)
         return false;
 
     if (has_action("ESCAPE", actions))
     {
-        listener->GoTo(previous_start_channel_index,
-                       previous_current_channel_index);
+        m_listener->GoTo(m_previous_start_channel_index,
+                         m_previous_current_channel_index);
         deleteLater();
         return true;
     }
 
     if (has_action("DELETE", actions))
     {
-        if (entry.length())
-            entry = entry.left(entry.length()-1);
+        if (!m_entry.isEmpty())
+            m_entry = m_entry.left(m_entry.length()-1);
         Update();
         return true;
     }
@@ -122,14 +121,14 @@ bool JumpToChannel::ProcessEntry(
     txt.toUInt(&isUInt);
     if (isUInt)
     {
-        entry += txt;
+        m_entry += txt;
         Update();
         return true;
     }
 
-    if (entry.length() && (txt=="_" || txt=="-" || txt=="#" || txt=="."))
+    if (!m_entry.isEmpty() && (txt=="_" || txt=="-" || txt=="#" || txt=="."))
     {
-        entry += txt;
+        m_entry += txt;
         Update();
         return true;
     }
@@ -139,22 +138,22 @@ bool JumpToChannel::ProcessEntry(
 
 bool JumpToChannel::Update(void)
 {
-    if (!timer || !listener)
+    if (!m_timer || !m_listener)
         return false;
 
-    timer->stop();
+    m_timer->stop();
 
     // find the closest channel ...
-    int i = listener->FindChannel(0, entry, false);
+    int i = m_listener->FindChannel(0, m_entry, false);
     if (i >= 0)
     {
         // setup the timeout timer for jump mode
-        timer->start(kJumpToChannelTimeout);
+        m_timer->start(kJumpToChannelTimeout);
 
         // rows_displayed to center
-        int start = i - rows_displayed/2;
-        int cur   = rows_displayed/2;
-        listener->GoTo(start, cur);
+        int start = i - m_rows_displayed/2;
+        int cur   = m_rows_displayed/2;
+        m_listener->GoTo(start, cur);
         return true;
     }
     else

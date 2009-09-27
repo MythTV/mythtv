@@ -736,13 +736,13 @@ int internal_play_media(const QString &mrl, const QString &plot,
         pginfo->pathname = QString("dvd:%1").arg(mrl);
     }
 
-    if (director.length())
+    if (!director.isEmpty())
         pginfo->description = QString( "%1: %2.  " )
                            .arg(QObject::tr("Directed By")).arg(director);
 
     pginfo->description += plot;
 
-    if (subtitle.length())
+    if (!subtitle.isEmpty())
         pginfo->subtitle = subtitle;
 
     if ((season > 0) || (episode > 0))
@@ -1156,7 +1156,7 @@ int main(int argc, char **argv)
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
-    QApplication::setDesktopSettingsAware(FALSE);
+    QApplication::setDesktopSettingsAware(false);
 #endif
     QApplication a(argc, argv);
 
@@ -1500,8 +1500,7 @@ int main(int argc, char **argv)
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
     {
-        if (networkControl)
-            delete networkControl;
+        delete networkControl;
         return FRONTEND_EXIT_NO_THEME;
     }
 
@@ -1525,8 +1524,7 @@ int main(int argc, char **argv)
         pthread_join(priv_thread, NULL);
     }
 
-    if (networkControl)
-        delete networkControl;
+    delete networkControl;
 
     DestroyMythMainWindow();
 

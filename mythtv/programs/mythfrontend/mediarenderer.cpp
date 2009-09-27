@@ -131,6 +131,5 @@ MediaRenderer::MediaRenderer()
 
 MediaRenderer::~MediaRenderer()
 {
-    if (m_pHttpServer)
-        delete m_pHttpServer;
+    delete m_pHttpServer;
 }

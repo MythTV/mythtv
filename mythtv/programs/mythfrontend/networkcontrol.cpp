@@ -226,7 +226,7 @@ bool NetworkControl::listen(const QHostAddress & address, quint16 port)
 
 void *NetworkControl::CommandThread(void *param)
 {
-    NetworkControl *networkControl = (NetworkControl *)param;
+    NetworkControl *networkControl = static_cast<NetworkControl *>(param);
     networkControl->RunCommandThread();
 
     return NULL;
@@ -467,7 +467,7 @@ QString NetworkControl::processKey(QStringList tokens)
 
             if (tokenLen > 1)
             {
-                QStringList tokenParts = tokens[curToken].split("+");
+                QStringList tokenParts = tokens[curToken].split('+');
 
                 int partNum = 0;
                 while (partNum < (tokenParts.size() - 1))
@@ -1072,14 +1072,14 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     query.bindValue(":END", QDateTime::currentDateTime());
     query.bindValue(":CHANID", chanID);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         while (query.next())
         {
             QString title = query.value(3).toString();
             QString subtitle = query.value(4).toString();
 
-            if (subtitle > " ")
+            if (!subtitle.isEmpty())
                 title += QString(" -\"%1\"").arg(subtitle);
             QByteArray atitle = title.toLocal8Bit();
 
@@ -1105,7 +1105,6 @@ QString NetworkControl::listSchedule(const QString& chanID) const
 QString NetworkControl::listRecordings(QString chanid, QString starttime)
 {
     QString result;
-    QString episode;
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryStr;
     bool appendCRLF = true;
@@ -1123,14 +1122,15 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     queryStr += "ORDER BY starttime, title;";
 
     query.prepare(queryStr);
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
+        QString episode, title, subtitle;
         while (query.next())
         {
-            QString title = query.value(2).toString();
-            QString subtitle = query.value(3).toString();
+            title = query.value(2).toString();
+            subtitle = query.value(3).toString();
 
-            if (subtitle > " ")
+            if (!subtitle.isEmpty())
                 episode = QString("%1 -\"%2\"")
                                   .arg(title)
                                   .arg(subtitle);
@@ -1155,8 +1155,6 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
 QString NetworkControl::saveScreenshot(QStringList tokens)
 {
     QString result;
-    int width = -1;
-    int height = -1;
     long long frameNumber = 150;
 
     QString location = GetMythUI()->GetCurrentLocation();
@@ -1179,6 +1177,8 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
     ProgramInfo *pginfo = NULL;
     if (gotAnswer)
     {
+        int width = -1;
+        int height = -1;
         QStringList results = answer.simplified().split(" ");
         pginfo = ProgramInfo::GetProgramFromRecorded(results[5], results[6]);
         if (!pginfo)
@@ -1191,7 +1191,7 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
 
         if (tokens.size() >= 5)
         {
-            QStringList size = tokens[4].split("x");
+            QStringList size = tokens[4].split('x');
             width  = size[0].toInt();
             height = size[1].toInt();
         }

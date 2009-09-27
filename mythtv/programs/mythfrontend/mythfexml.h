@@ -23,33 +23,33 @@ typedef enum
 
 class MythFEXML : public Eventing
 {
-    private:
+  private:
 
-        QString                      m_sControlUrl;
-        QString                      m_sServiceDescFileName;
+    QString m_sControlUrl;
+    QString m_sServiceDescFileName;
 
-    protected:
+  protected:
 
-        // Implement UPnpServiceImpl methods that we can
+    // Implement UPnpServiceImpl methods that we can
 
-        virtual QString GetServiceType      () { return "urn:schemas-mythtv-org:service:MythTv:1"; }
-        virtual QString GetServiceId        () { return "urn:mythtv-org:serviceId:MYTHTV_1-0"; }
-        virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
-        virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
+    virtual QString GetServiceType      () { return "urn:schemas-mythtv-org:service:MythTv:1"; }
+    virtual QString GetServiceId        () { return "urn:mythtv-org:serviceId:MYTHTV_1-0"; }
+    virtual QString GetServiceControlURL() { return m_sControlUrl.mid( 1 ); }
+    virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
-    private:
+  private:
 
-        MythFEXMLMethod GetMethod( const QString &sURI );
+    MythFEXMLMethod GetMethod( const QString &sURI );
 
-	void    GetScreenShot    ( HTTPRequest *pRequest );
+    void GetScreenShot    ( HTTPRequest *pRequest );
 
-    public:
-                 MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);
-        virtual ~MythFEXML();
+  public:
+    MythFEXML( UPnpDevice *pDevice ,  const QString sSharePath);
+    virtual ~MythFEXML();
 
-        bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
+    bool ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 
-        // Static methods shared with HttpStatus
+    // Static methods shared with HttpStatus
 
 };
 

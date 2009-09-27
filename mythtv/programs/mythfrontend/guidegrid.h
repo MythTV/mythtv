@@ -55,7 +55,7 @@ class MPUBLIC JumpToChannel : public QObject
 
     bool ProcessEntry(const QStringList &actions, const QKeyEvent *e);
 
-    QString GetEntry(void) const { return entry; }
+    QString GetEntry(void) const { return m_entry; }
 
   public slots:
     virtual void deleteLater(void);
@@ -65,12 +65,12 @@ class MPUBLIC JumpToChannel : public QObject
     bool Update(void);
 
   private:
-    JumpToChannelListener *listener;
-    QString  entry;
-    int      previous_start_channel_index;
-    int      previous_current_channel_index;
-    uint     rows_displayed;
-    QTimer  *timer; // audited ref #5318
+    JumpToChannelListener *m_listener;
+    QString  m_entry;
+    int      m_previous_start_channel_index;
+    int      m_previous_current_channel_index;
+    uint     m_rows_displayed;
+    QTimer  *m_timer; // audited ref #5318
 
     static const uint kJumpToChannelTimeout = 3500; // ms
 };

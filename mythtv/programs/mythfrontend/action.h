@@ -97,7 +97,7 @@ class ActionID
 {
   public:
     /// \brief Create an empty action
-    ActionID() : m_context(QString::null), m_action(QString::null) { }
+    ActionID(void);
 
     /** \brief Create a new action identifier
      *  \param context The action's context

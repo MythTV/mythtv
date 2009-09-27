@@ -16,7 +16,6 @@ KeyGrabPopupBox::KeyGrabPopupBox(MythScreenStack *parent)
     : MythScreenType (parent, "keygrabberdialog")
 {
     m_waitingForKeyRelease = m_keyReleaseSeen = false;
-    m_capturedKey = QString::null;
     m_okButton = m_cancelButton = NULL;
     m_messageText = NULL;
 }
@@ -67,7 +66,7 @@ bool KeyGrabPopupBox::Create(void)
 
 bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
 {
-    // If no capturing has occured yet, then start waiting for key release
+    // If no capturing has occurred yet, then start waiting for key release
     m_waitingForKeyRelease |= !m_keyReleaseSeen;
 
     bool handled = false;

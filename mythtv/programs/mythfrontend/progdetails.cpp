@@ -161,7 +161,7 @@ bool ProgDetails::keyPressEvent(QKeyEvent *event)
 
 void ProgDetails::updatePage(void)
 {
-    if (m_page[m_currentPage] == QString())
+    if (m_page[m_currentPage].isEmpty())
         loadPage();
 
     m_browser->SetHtml(m_page[m_currentPage]);
@@ -247,9 +247,8 @@ void ProgDetails::loadPage(void)
         query.bindValue(":CHANID", m_progInfo.chanid);
         query.bindValue(":STARTTIME", m_progInfo.startts);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             category_type = query.value(0).toString();
             year = query.value(1).toString();
             stars = query.value(2).toDouble();
@@ -369,7 +368,7 @@ void ProgDetails::loadPage(void)
         query.bindValue(":CHANID", m_progInfo.chanid);
         query.bindValue(":STARTTIME", m_progInfo.startts);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec())
         {
             while (query.next())
                 s += ", " + query.value(0).toString();
@@ -399,7 +398,6 @@ void ProgDetails::loadPage(void)
 
     addItem("PROGRAMID", tr("Program ID"), m_progInfo.programid);
 
-    QString role, pname;
     QString actors, director, producer, execProducer;
     QString writer, guestStar, host, adapter;
     QString presenter, commentator, guest;
@@ -422,9 +420,10 @@ void ProgDetails::loadPage(void)
         query.bindValue(":CHANID", m_progInfo.chanid);
         query.bindValue(":STARTTIME", m_progInfo.startts);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.size() > 0)
         {
             QString rstr, plist;
+            QString role, pname;
 
             while(query.next())
             {
@@ -526,9 +525,8 @@ void ProgDetails::loadPage(void)
         if (!query.exec() || !query.isActive())
             MythDB::DBError("showDetails", query);
 
-        if (query.isActive() && query.size() > 0)
+        if (query.next())
         {
-            query.next();
             if (p->recstatus == rsUnknown)
                 p->recstatus = RecStatusType(query.value(0).toInt());
             if (p->recstatus == rsPreviousRecording ||
@@ -575,9 +573,8 @@ void ProgDetails::loadPage(void)
                       "FROM record WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", m_progInfo.recordid);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             if (query.value(0).toDateTime().isValid())
                 lastRecorded = query.value(0).toDateTime().toString(fullDateFormat);
             if (query.value(1).toDateTime().isValid())
