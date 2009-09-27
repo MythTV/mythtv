@@ -126,7 +126,7 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
 
         uint key = DisplayResScreen::CalcKey(width, height, 0.0);
 
-	if (screen_map.find(key)==screen_map.end())
+    if (screen_map.find(key)==screen_map.end())
             screen_map[key] = DisplayResScreen(width, height,
                                                0, 0, -1.0, (double) refresh);
         else

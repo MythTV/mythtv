@@ -41,15 +41,18 @@ class MPUBLIC DisplayResScreen
 
     // Sets, adds
     void SetAspectRatio(double a);
-    void AddRefreshRate(double rr) {
+    void AddRefreshRate(double rr)
+    {
         refreshRates.push_back(rr);
         std::sort(refreshRates.begin(), refreshRates.end());
     }
-    void ClearRefreshRates(void) {
-    	refreshRates.clear();
+    void ClearRefreshRates(void)
+    {
+        refreshRates.clear();
     }
-    void SetCustom(bool b) {
-    	custom = b;
+    void SetCustom(bool b)
+    {
+        custom = b;
     }
 
     // Map for matching real rates and xrandr rate;
@@ -74,7 +77,7 @@ class MPUBLIC DisplayResScreen
     int width_mm, height_mm; // physical size in millimeters
     double aspect; // aspect ratio, calculated or set
     std::vector<double> refreshRates;
-    bool custom;	// Set if resolution was defined manually
+    bool custom; // Set if resolution was defined manually
 };
 
 typedef std::vector<DisplayResScreen>          DisplayResVector;
