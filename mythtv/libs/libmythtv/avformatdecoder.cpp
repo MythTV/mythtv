@@ -3418,7 +3418,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
 
-            VERBOSE(VB_PLAYBACK+VB_EXTRA, 
+            VERBOSE(VB_PLAYBACK+VB_EXTRA,
                 QString("DVD Playback Debugging: mpeg seq end %1 "
                 " inDVDStill %2 decodeStillFrame %3")
                 .arg(mpeg_seq_end_seen).arg(inDVDStill).arg(decodeStillFrame));
@@ -3461,10 +3461,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             .arg(video_width).arg(current_width)
                             .arg(dvd_video_codec_changed));
                     av_free_packet(pkt);
-                    CloseCodecs();
-                    ScanStreams(false);
-                    allowedquit = true;
-                    dvd_video_codec_changed = false;
+                    if (current_width > 0) {
+                      CloseCodecs();
+                      ScanStreams(false);
+                      allowedquit = true;
+                      dvd_video_codec_changed = false;
+                    }
                     continue;
                 }
             }
