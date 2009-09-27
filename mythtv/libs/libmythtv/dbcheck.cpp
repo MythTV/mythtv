@@ -3594,9 +3594,9 @@ NULL
         MSqlQuery query(MSqlQuery::InitCon());
         int tableIndex      = 0;
         QString tables[][3] = {
-            { "people",  // table name
-              "name",    // columns to convert, colon-separated
-              "name"},   // columns for test index, comma-separated
+            { "people",    // table name
+              "name",      // columns to convert, colon-separated
+              "name(41)"}, // columns for test index, comma-separated
             { "oldprogram",
               "oldtitle",
               "oldtitle"},
