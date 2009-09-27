@@ -128,7 +128,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             break;
         default:
             return;
-    }       
+    }
 
     if ((print_verbose_messages & verbose_level) != verbose_level)
         return;
@@ -3462,10 +3462,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             .arg(dvd_video_codec_changed));
                     av_free_packet(pkt);
                     if (current_width > 0) {
-                      CloseCodecs();
-                      ScanStreams(false);
-                      allowedquit = true;
-                      dvd_video_codec_changed = false;
+                        CloseCodecs();
+                        ScanStreams(false);
+                        allowedquit = true;
+                        dvd_video_codec_changed = false;
                     }
                     continue;
                 }
