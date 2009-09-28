@@ -244,6 +244,7 @@ class VideoDialog : public MythScreenType
     MythUIStateType  *m_parentalLevelState;
     MythUIStateType  *m_videoLevelState;
     MythUIStateType  *m_userRatingState;
+    MythUIStateType  *m_watchedState;
 
     class VideoDialogPrivate *m_d;
 };

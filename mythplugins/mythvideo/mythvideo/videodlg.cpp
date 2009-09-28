@@ -87,6 +87,16 @@ namespace
         return ret;
     }
 
+    QString WatchedToState(bool watched)
+    {
+        QString ret;
+        if (watched)
+            ret = "yes";
+        else
+            ret = "no";
+        return ret;
+    }
+
     class ImageDownloadProxy : public QObject
     {
         Q_OBJECT
@@ -1353,6 +1363,8 @@ namespace
             tmp["trailerstate"] = TrailerToState(metadata->GetTrailer());
             tmp["userratingstate"] =
                     QString::number((int)(metadata->GetUserRating()));
+            tmp["watchedstate"] = WatchedToState(metadata->GetWatched());
+
             tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
 
             tmp["insertdate"] = metadata->GetInsertdate()
@@ -1427,6 +1439,7 @@ namespace
 
         h.handleState("trailerstate");
         h.handleState("userratingstate");
+        h.handleState("watchedstate");
         h.handleState("videolevel");
     }
 }
@@ -1748,7 +1761,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
     m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0), 
-    m_parentalLevelState(0)
+    m_parentalLevelState(0), m_watchedState(0)
 {
     m_d = new VideoDialogPrivate(video_list, type, browse);
 
@@ -1864,6 +1877,7 @@ bool VideoDialog::Create()
 
     UIUtilW::Assign(this, m_trailerState, "trailerstate");
     UIUtilW::Assign(this, m_parentalLevelState, "parentallevel");
+    UIUtilW::Assign(this, m_watchedState, "watchedstate");
 
     if (err)
     {
@@ -1875,6 +1889,7 @@ bool VideoDialog::Create()
 
     CheckedSet(m_trailerState, "None");
     CheckedSet(m_parentalLevelState, "None");
+    CheckedSet(m_watchedState, "None");
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
