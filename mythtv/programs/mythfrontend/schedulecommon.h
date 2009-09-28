@@ -23,6 +23,7 @@ class ScheduleCommon : public MythScreenType
     void EditRecording(ProgramInfo *pginfo);
     void EditScheduled(ProgramInfo *pginfo);
     void EditScheduled(RecordingInfo *recinfo);
+    void EditCustom(ProgramInfo *pginfo);
     void MakeOverride(RecordingInfo *recinfo);
     void ShowRecordingDialog(RecordingInfo recinfo);
     void ShowNotRecordingDialog(RecordingInfo recinfo);

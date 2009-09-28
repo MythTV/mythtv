@@ -22,6 +22,7 @@
 #include "scheduleeditor.h"
 #include "progdetails.h"
 #include "proglist.h"
+#include "customedit.h"
 
 /**
 *  \brief Show the Program Details screen
@@ -103,6 +104,22 @@ void ScheduleCommon::EditScheduled(RecordingInfo *recinfo)
         mainStack->AddScreen(schededit);
     else
         delete schededit;
+}
+
+/**
+*  \brief Creates a dialog for creating a custom recording rule
+*/
+void ScheduleCommon::EditCustom(ProgramInfo *pginfo)
+{
+    if (!pginfo)
+        return;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
+    if (ce->Create())
+        mainStack->AddScreen(ce);
+    else
+        delete ce;
 }
 
 /**

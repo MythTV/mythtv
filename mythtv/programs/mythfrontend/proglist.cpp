@@ -634,9 +634,6 @@ void ProgLister::edit()
 {
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
-    if (!pi)
-        return;
-
     EditScheduled(pi);
 }
 
@@ -644,15 +641,7 @@ void ProgLister::customEdit()
 {
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
-    if (!pi)
-        return;
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("popup stack");
-    CustomEdit *ce = new CustomEdit(mainStack, pi);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-    else
-        delete ce;
+    EditCustom(pi);
 }
 
 void ProgLister::deleteItem()
