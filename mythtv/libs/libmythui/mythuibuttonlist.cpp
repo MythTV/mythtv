@@ -1548,7 +1548,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         statetype = dynamic_cast<MythUIStateType *>
                                     (buttonstate->GetChild(state_it.key()));
         if (statetype)
-            statetype->DisplayState(state_it.value());
+        {
+            if (!statetype->DisplayState(state_it.value()))
+                statetype->Reset();
+        }
         ++state_it;
     }
 }

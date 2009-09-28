@@ -173,7 +173,7 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
     if (m_watermarkState)
     {
         if (!(m_watermarkState->DisplayState(button.type)))
-            m_watermarkState->DisplayState("DEFAULT");
+            m_watermarkState->Reset();
     }
 
     if (m_descriptionText)
