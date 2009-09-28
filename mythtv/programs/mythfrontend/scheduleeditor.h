@@ -72,9 +72,6 @@ class ScheduleEditor : public ScheduleCommon
     MythUIButton    *m_postProcButton;
     MythUIButton    *m_schedInfoButton;
     MythUIButton    *m_previewButton;
-
-    bool m_isManual;
-    bool m_hasChannel;
     
 };
 

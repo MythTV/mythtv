@@ -60,8 +60,7 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             m_saveButton(NULL), m_cancelButton(NULL), m_rulesList(NULL),
             m_schedOptButton(NULL), m_storeOptButton(NULL),
             m_postProcButton(NULL), m_schedInfoButton(NULL),
-            m_previewButton(NULL),
-            m_isManual(false), m_hasChannel(true)
+            m_previewButton(NULL)
 {
     m_recordingRule = new RecordingRule();
     m_recordingRule->m_recordID = m_recInfo->recordid;
@@ -75,8 +74,7 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
             m_saveButton(NULL), m_cancelButton(NULL), m_rulesList(NULL),
             m_schedOptButton(NULL), m_storeOptButton(NULL),
             m_postProcButton(NULL), m_schedInfoButton(NULL),
-            m_previewButton(NULL),
-            m_isManual(false), m_hasChannel(true)
+            m_previewButton(NULL)
 {
 }
 
@@ -149,6 +147,7 @@ void ScheduleEditor::Load()
     // Copy this now, it will change briefly after the first item is inserted
     // into the list by design of MythUIButtonList::itemSelected()
     RecordingType type = m_recordingRule->m_type;
+    
     // Rules List
     if (m_recordingRule->m_isOverride)
     {
@@ -164,38 +163,41 @@ void ScheduleEditor::Load()
     }
     else
     {
+        bool hasChannel = !m_recordingRule->m_station.isEmpty();
+        bool isManual = (m_recordingRule->m_searchType == kManualSearch);
+        
         new MythUIButtonListItem(m_rulesList, tr("Do not record this program"),
                                  ENUM_TO_QVARIANT(kNotRecording));
 
-        if (m_hasChannel)
+        if (hasChannel)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record only this showing"),
                                      ENUM_TO_QVARIANT(kSingleRecord));
-        if (!m_isManual)
+        if (!isManual)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record one showing of this title"),
                                      ENUM_TO_QVARIANT(kFindOneRecord));
-        if (m_hasChannel)
+        if (hasChannel)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record in this timeslot every week"),
                                      ENUM_TO_QVARIANT(kWeekslotRecord));
-        if (!m_isManual)
+        if (!isManual)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record one showing of this title every week"),
                                      ENUM_TO_QVARIANT(kFindWeeklyRecord));
-        if (m_hasChannel)
+        if (hasChannel)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record in this timeslot every day"),
                                      ENUM_TO_QVARIANT(kTimeslotRecord));
-        if (!m_isManual)
+        if (!isManual)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record one showing of this title every day"),
                                      ENUM_TO_QVARIANT(kFindDailyRecord));
-        if (m_hasChannel && !m_isManual)
+        if (hasChannel && !isManual)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record at any time on this channel"),
                                      ENUM_TO_QVARIANT(kChannelRecord));
-        if (!m_isManual)
+        if (!isManual)
             new MythUIButtonListItem(m_rulesList,
                                      tr("Record at any time on any channel"),
                                      ENUM_TO_QVARIANT(kAllRecord));
