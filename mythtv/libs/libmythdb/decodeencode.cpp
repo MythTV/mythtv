@@ -1,15 +1,31 @@
-
-#include "decodeencode.h"
-
 // C++ headers
 #include <iostream>
 
 using namespace std;
 
+// C headers
+#include <cerrno>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <time.h>
+
+// System specific C headers
+#include "compat.h"
+
 // Qt headers
-#include <QStringList>
+#include <QApplication>
+#include <QImage>
+#include <QPainter>
+#include <QPixmap>
+#include <QFont>
+#include <QFile>
+#include <QDir>
+#include <QFileInfo>
 
 #include "mythverbose.h"
+
+#include "decodeencode.h"
 
 /** \fn encodeLongLong(QStringList&,long long)
  *  \brief Encodes a long for streaming in the MythTV protocol.
