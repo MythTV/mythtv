@@ -2570,126 +2570,75 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                 if (metadata)
                 {
                     QString test_file;
+                    QString host = metadata->GetHost();
+                    QString title = metadata->GetTitle();
 
-                    if (type == "Coverart" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Coverart" && !host.isEmpty() &&
                         !metadata->GetCoverFile().startsWith("/"))
                     {
                         test_file = GenRemoteFileURL("Coverart",
-                                    metadata->GetHost(), metadata->GetCoverFile());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty() &&
-                            !IsDefaultCoverFile(test_file))
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+                                    host, metadata->GetCoverFile());
                     }
                     else if (type == "Coverart")
-                    {
                         test_file = metadata->GetCoverFile();
-                        if (!test_file.isEmpty() &&
-                            !IsDefaultCoverFile(test_file))
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                        !IsDefaultCoverFile(test_file) && (gpnode.isEmpty() ||
+                        (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
                     }
 
-                    if (type == "Fanart" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Fanart" && !host.isEmpty() &&
                         !metadata->GetFanart().startsWith("/"))
                     {
                         test_file = GenRemoteFileURL("Fanart",
-                                    metadata->GetHost(), metadata->GetFanart());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty())
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+                                    host, metadata->GetFanart());
                     }
                     else if (type == "Fanart")
-                    {
                         test_file = metadata->GetFanart();
-                        if (!test_file.isEmpty() &&
-                             test_file != VIDEO_FANART_DEFAULT)
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                        test_file != VIDEO_FANART_DEFAULT && (gpnode.isEmpty() || 
+                        (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
                     }
 
-                    if (type == "Banners" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Banners" && !host.isEmpty() &&
                         !metadata->GetBanner().startsWith("/"))
                     {
                         test_file = GenRemoteFileURL("Banners",
-                                    metadata->GetHost(), metadata->GetBanner());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty())
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+                                    host, metadata->GetBanner());
                     }
                     else if (type == "Banners")
-                    {
                         test_file = metadata->GetBanner();
-                        if (!test_file.isEmpty() &&
-                             test_file != VIDEO_BANNER_DEFAULT)
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                        test_file != VIDEO_BANNER_DEFAULT && (gpnode.isEmpty() ||
+                        (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
                     }
 
-                    if (type == "Screenshots" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Screenshots" && !host.isEmpty() &&
                         !metadata->GetScreenshot().startsWith("/"))
                     {
                         test_file = GenRemoteFileURL("Screenshots",
-                                    metadata->GetHost(), metadata->GetScreenshot());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty())
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+                                    host, metadata->GetScreenshot());
                     }
                     else if (type == "Screenshots")
-                    {
                         test_file = metadata->GetScreenshot();
-                        if (!test_file.isEmpty() &&
-                             test_file != VIDEO_SCREENSHOT_DEFAULT)
-                        {
-                            if (gpnode.isEmpty() ||(QString::compare(gpnode, 
-                                       metadata->GetTitle(), Qt::CaseInsensitive) == 0))
-                            {
-                                icon_file = test_file;
-                                break;
-                            }
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() && 
+                       test_file != VIDEO_SCREENSHOT_DEFAULT && (gpnode.isEmpty() ||
+                       (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
                     }
                 }
             }
