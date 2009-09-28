@@ -221,9 +221,9 @@ void MythImage::ToGreyscale()
     if (isGrayscale())
         return;
 
-    for (int y = 0; y < height(); y++)
+    for (int y = 0; y < height(); ++y)
     {
-        for (int x = 0; x < width(); x++)
+        for (int x = 0; x < width(); ++x)
         {
             QRgb oldPixel = pixel(x, y);
             int greyVal = qGray(oldPixel);
