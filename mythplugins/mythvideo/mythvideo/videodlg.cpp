@@ -2043,7 +2043,11 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         item->SetImage(screenshot);
     }
     else
+    {
+        if (coverimage.isEmpty())
+            coverimage = GetFirstImage(node, "Coverart");
         item->SetImage(coverimage);
+    }
     
 //    else if (metadata)
 //    {
