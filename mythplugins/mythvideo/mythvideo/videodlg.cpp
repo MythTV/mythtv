@@ -2022,8 +2022,9 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     MythGenericTree *parent = node->getParent();    
 
-    if (parent && metadata && ((QString::compare(parent->getString(),
-                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
+    if (parent && metadata && !(m_d->m_type & DLG_MANAGER) &&
+                            ((QString::compare(parent->getString(),
+                            metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
                             parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
         item->SetText(metadata->GetSubtitle());
     else
