@@ -2912,10 +2912,29 @@ void VideoDialog::searchComplete(QString string)
     VERBOSE(VB_GENERAL | VB_EXTRA,
             QString("Jumping to: %1").arg(string));
 
+    MythGenericTree *parent = m_d->m_currentNode->getParent();
+    QStringList childList;
+    QList<MythGenericTree*>::iterator it;
+    QList<MythGenericTree*> *children;
+    QMap<int, QString> idTitle;
+
+    if (parent && m_d->m_type == DLG_TREE)
+        children = parent->getAllChildren();
+    else
+        children = m_d->m_currentNode->getAllChildren();
+
+    for (it = children->begin(); it != children->end(); ++it)
+    {
+        MythGenericTree *child = *it;
+        QString title = child->getString();
+        int id = child->getPosition();
+        idTitle.insert(id, title);
+    }
+
     if (m_d->m_type == DLG_TREE)
     {
         MythGenericTree *parent = m_videoButtonTree->GetCurrentNode()->getParent();
-        MythGenericTree *new_node = parent->getChildByName(string);
+        MythGenericTree *new_node = parent->getChildAt(idTitle.key(string));
         if (new_node)
         {
             m_videoButtonTree->SetCurrentNode(new_node);
@@ -2923,7 +2942,7 @@ void VideoDialog::searchComplete(QString string)
         }
     }
     else
-        m_videoButtonList->MoveToNamedPosition(string);
+        m_videoButtonList->SetItemCurrent(idTitle.key(string));
 }
 
 /** \fn VideoDialog::searchStart(void)
