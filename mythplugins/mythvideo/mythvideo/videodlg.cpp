@@ -4405,7 +4405,7 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
             connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
                                            QString, Metadata *,
                                            const QString &)),
-                    SLOT(OnPosterCopyFinished(ImageDownloadErrorState,
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
                                               QString, Metadata *,
                                               const QString &)));
             }
@@ -4414,7 +4414,7 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
             connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
                                            QString, Metadata *,
                                            const QString &)),
-                    SLOT(OnFanartCopyFinished(ImageDownloadErrorState,
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
                                               QString, Metadata *,
                                               const QString &)));
             }
@@ -4423,7 +4423,7 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
             connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
                                            QString, Metadata *,
                                            const QString &)),
-                    SLOT(OnBannerCopyFinished(ImageDownloadErrorState,
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
                                               QString, Metadata *,
                                               const QString &)));
             }
@@ -4432,7 +4432,7 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
             connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
                                            QString, Metadata *,
                                            const QString &)),
-                    SLOT(OnScreenshotCopyFinished(ImageDownloadErrorState,
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
                                               QString, Metadata *,
                                               const QString &)));
             }
@@ -4458,7 +4458,7 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
         OnVideoImageSetDone(metadata);
 }
 
-void VideoDialog::OnPosterCopyFinished(ImageDownloadErrorState error,
+void VideoDialog::OnImageCopyFinished(ImageDownloadErrorState error,
                                        QString errorMsg, Metadata *item,
                                        const QString &imagePath)
 {
@@ -4467,21 +4467,51 @@ void VideoDialog::OnPosterCopyFinished(ImageDownloadErrorState error,
         m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
                                        (src));
 
+    QString type;
+
+    if (imagePath.contains("_coverart."))
+        type = QString("Coverart");
+    else if (imagePath.contains("_fanart."))
+        type = QString("Fanart");
+    else if (imagePath.contains("_banner."))
+        type = QString("Banner");
+    else if (imagePath.contains("_screenshot."))
+        type = QString("Screenshot");
+
     if (item)
     {
         if (error != esOK)
-            item->SetCoverFile("");
+        {
+            if (type == "Coverart")
+                item->SetCoverFile("");
+            else if (type == "Fanart")
+                item->SetFanart("");
+            else if (type == "Banner")
+                item->SetBanner("");
+            else if (type == "Screenshot")
+                item->SetScreenshot("");
+        }
         else
-            item->SetCoverFile(imagePath);
+        {
+            if (type == "Coverart")
+                item->SetCoverFile(imagePath);
+            else if (type == "Fanart")
+                item->SetFanart(imagePath);
+            else if (type == "Banner")
+                item->SetBanner(imagePath);
+            else if (type == "Screenshot")
+                item->SetScreenshot(imagePath);
+        }
     }
 
-    VERBOSE(VB_IMPORTANT, tr("Poster download finished: %1 %2")
-            .arg(errorMsg).arg(error));
+    VERBOSE(VB_IMPORTANT, tr("%1 download finished: %2 %3")
+            .arg(type).arg(errorMsg).arg(error));
 
     if (error == esTimeout)
     {
-        createOkDialog(tr("A poster exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
+        createOkDialog(tr("%1 exists for this item but could not be "
+                            "retrieved within the timeout period.\n")
+                            .arg(type));
     }
 
     OnVideoImageSetDone(item);
@@ -4499,93 +4529,6 @@ void VideoDialog::OnVideoImageSetDone(Metadata *metadata)
 
     metadata->UpdateDatabase();
     UpdateItem(GetItemCurrent());
-}
-
-void VideoDialog::OnFanartCopyFinished(ImageDownloadErrorState error,
-                                       QString errorMsg, Metadata *item,
-                                       const QString &imagePath)
-{
-    QObject *src = sender();
-    if (src)
-        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
-                                       (src));
-
-    if (item)
-    {
-        if (error != esOK)
-            item->SetFanart("");
-        else
-            item->SetFanart(imagePath);
-    }
-
-    VERBOSE(VB_IMPORTANT, tr("Fanart download finished: %1 %2")
-            .arg(errorMsg).arg(error));
-
-    if (error == esTimeout)
-    {
-        createOkDialog(tr("Fanart exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
-    }
-
-    OnVideoImageSetDone(item);
-}
-
-void VideoDialog::OnScreenshotCopyFinished(ImageDownloadErrorState error,
-                                           QString errorMsg, Metadata *item,
-                                           const QString &imagePath)
-{
-    QObject *src = sender();
-    if (src)
-        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
-                                       (src));
-
-    if (item)
-    {
-        if (error != esOK)
-            item->SetScreenshot("");
-        else
-            item->SetScreenshot(imagePath);
-    }
-
-    VERBOSE(VB_IMPORTANT, tr("Screenshot download finished: %1 %2")
-            .arg(errorMsg).arg(error));
-
-    if (error == esTimeout)
-    {
-        createOkDialog(tr("Screenshot exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
-    }
-
-    OnVideoImageSetDone(item);
-}
-
-void VideoDialog::OnBannerCopyFinished(ImageDownloadErrorState error,
-                                       QString errorMsg, Metadata *item,
-                                       const QString &imagePath)
-{
-    QObject *src = sender();
-    if (src)
-        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
-                                       (src));
-
-    if (item)
-    {
-        if (error != esOK)
-            item->SetBanner("");
-        else
-            item->SetBanner(imagePath);
-    }
-
-    VERBOSE(VB_IMPORTANT, tr("Banner download finished: %1 %2")
-            .arg(errorMsg).arg(error));
-
-    if (error == esTimeout)
-    {
-        createOkDialog(tr("Banner exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
-    }
-
-    OnVideoImageSetDone(item);
 }
 
 void VideoDialog::StartVideoSearchByUID(QString video_uid, Metadata *metadata)
