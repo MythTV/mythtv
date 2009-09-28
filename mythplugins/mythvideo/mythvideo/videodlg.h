@@ -185,7 +185,7 @@ class VideoDialog : public MythScreenType
 
   private slots:
     // called during StartVideoPosterSet
-    void OnPosterURL(QString uri, Metadata *metadata);
+    void OnImageURL(QString uri, Metadata *metadata, QString type);
     void OnPosterCopyFinished(ImageDownloadErrorState error, QString errorMsg,
                               Metadata *metadata, const QString &imagePath);
     void OnFanartURL(QString uri, Metadata *metadata);
