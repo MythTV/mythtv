@@ -2022,8 +2022,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     MythGenericTree *parent = node->getParent();    
 
-    if (parent && metadata && !(m_d->m_type & DLG_MANAGER) &&
-                            ((QString::compare(parent->getString(),
+    if (parent && metadata && ((QString::compare(parent->getString(),
                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
                             parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
         item->SetText(metadata->GetSubtitle());
@@ -2085,9 +2084,15 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     {
         item->SetText(QString("%1").arg(node->visibleChildCount()), "childcount");
         item->DisplayState("subfolder", "nodetype");
+        item->SetText(node->getString(), "title");
+        item->SetText(node->getString());
     }
     else if (nodeInt == kUpFolder)
+    {
         item->DisplayState("upfolder", "nodetype");
+        item->SetText(node->getString(), "title");
+        item->SetText(node->getString());
+    }
 
     if (item == GetItemCurrent())
         UpdateText(item);
