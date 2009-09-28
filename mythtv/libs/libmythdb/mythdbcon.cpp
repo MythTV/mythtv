@@ -471,7 +471,7 @@ bool MSqlQuery::prepare(const QString& query)
     }
 #endif
     bool ok = QSqlQuery::prepare(query);
-    if (!ok)
+    if (!ok && !(GetMythDB()->SuppressDBMessages()))
     {
         VERBOSE(VB_IMPORTANT, QString("Error preparing query: %1").arg(query));
         VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(QSqlQuery::lastError()));

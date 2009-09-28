@@ -29,6 +29,9 @@ class MPUBLIC MythDB
     void IgnoreDatabase(bool bIgnore);
     bool IsDatabaseIgnored(void) const;
 
+    void SetSuppressDBMessages(bool bUpgraded);
+    bool SuppressDBMessages(void) const;
+
     void ClearSettingsCache(QString myKey = "", QString newVal = "");
     void ActivateSettingsCache(bool activate = true);
     void OverrideSettingForSession(const QString &key, const QString &newValue);

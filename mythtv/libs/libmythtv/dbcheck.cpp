@@ -457,6 +457,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     SchemaUpgradeWizard  * DBup;
 
 
+    GetMythDB()->SetSuppressDBMessages(true);
     gContext->ActivateSettingsCache(false);
 
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
@@ -472,6 +473,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (DBup->versionsBehind == 0)  // same schema
     {
         gContext->ActivateSettingsCache(true);
+        GetMythDB()->SetSuppressDBMessages(false);
         return true;
     }
 
@@ -489,9 +491,11 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     {
         case MYTH_SCHEMA_USE_EXISTING:
             gContext->ActivateSettingsCache(true);
+            GetMythDB()->SetSuppressDBMessages(false);
             return true;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
+            GetMythDB()->SetSuppressDBMessages(false);
             return false;
         case MYTH_SCHEMA_UPGRADE:
             break;
@@ -508,7 +512,10 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
             currentDatabaseVersion);
 
     if (!DBUtil::lockSchema(query))
+    {
+        GetMythDB()->SetSuppressDBMessages(false);
         return false;
+    }
 
     bool ret = doUpgradeTVDatabaseSchema();
 
@@ -520,6 +527,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     DBUtil::unlockSchema(query);
     gContext->ActivateSettingsCache(true);
 
+    GetMythDB()->SetSuppressDBMessages(false);
     return ret;
 }
 

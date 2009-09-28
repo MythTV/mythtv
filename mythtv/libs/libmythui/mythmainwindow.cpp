@@ -1126,7 +1126,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                 query.bindValue(":ACTION",      action);
                 query.bindValue(":HOSTNAME",    GetMythDB()->GetHostName());
 
-                if (!query.exec())
+                if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
                 {
                     MythDB::DBError("Update Keybinding", query);
                 }
@@ -1146,7 +1146,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
             query.bindValue(":KEYLIST", inskey);
             query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
-            if (!query.exec() || !query.isActive())
+            if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
             {
                 MythDB::DBError("Insert Keybinding", query);
             }
