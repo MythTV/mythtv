@@ -598,7 +598,7 @@ void PlaybackBox::UpdateProgramInfo(
     QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
 
     item->DisplayState(rating, "ratingstate");
-
+    
     QString oldimgfile = item->GetImage("preview");
     QString imagefile;
     if (oldimgfile.isEmpty() || force_preview_reload)
@@ -909,9 +909,30 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     ProgramList &progList = *pmit;
 
-    static const char *disp_flags[] = { "playlist", "watched", };
+    static const char *disp_flags[] = { "playlist", "watched", "preserve",
+                                        "cutlist", "autoexpire", "editing",
+                                        "bookmark", "inuse", "commflagged",
+                                        "transcoded" };
     bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
 
+    QMap<AudioProps, QString> audioFlags;
+    audioFlags[AUD_DOLBY] = "dolby";
+    audioFlags[AUD_SURROUND] = "surround";
+    audioFlags[AUD_STEREO] = "stereo";
+    audioFlags[AUD_MONO] = "mono";
+
+    QMap<VideoProps, QString> videoFlags;
+    videoFlags[VID_1080] = "hd1080";
+    videoFlags[VID_720] = "hd720";
+    videoFlags[VID_HDTV] = "hdtv";
+    videoFlags[VID_WIDESCREEN] = "widescreen";
+
+    QMap<SubtitleTypes, QString> subtitleFlags;
+    subtitleFlags[SUB_SIGNED] = "deafsigned";
+    subtitleFlags[SUB_ONSCREEN] = "onscreensub";
+    subtitleFlags[SUB_NORMAL] = "subtitles";
+    subtitleFlags[SUB_HARDHEAR] = "cc";
+    
     ProgramList::iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
@@ -966,9 +987,44 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
         disp_flag_stat[0] = !m_playList.filter((*it)->MakeUniqueKey()).empty();
         disp_flag_stat[1] = (*it)->programflags & FL_WATCHED;
-
+        disp_flag_stat[2] = (*it)->programflags & FL_PRESERVED;
+        disp_flag_stat[3] = (*it)->programflags & FL_CUTLIST;
+        disp_flag_stat[4] = (*it)->programflags & FL_AUTOEXP;
+        disp_flag_stat[5] = (*it)->programflags & FL_EDITING;
+        disp_flag_stat[6] = (*it)->programflags & FL_BOOKMARK;
+        disp_flag_stat[7] = (*it)->programflags & FL_INUSEPLAYING;
+        disp_flag_stat[8] = (*it)->programflags & FL_COMMFLAG;
+        disp_flag_stat[9] = (*it)->programflags & FL_TRANSCODED;
+        
         for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
             item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
+
+        item->DisplayState("default", "audioprops");
+        
+        QMap<AudioProps, QString>::iterator ait;
+        for (ait = audioFlags.begin(); ait != audioFlags.end(); ++ait)
+        {
+            if ((*it)->audioproperties & ait.key())
+                item->DisplayState(ait.value(), "audioprops");
+        }
+
+        item->DisplayState("default", "videoprops");
+
+        QMap<VideoProps, QString>::iterator vit;
+        for (vit = videoFlags.begin(); vit != videoFlags.end(); ++vit)
+        {
+            if ((*it)->videoproperties & vit.key())
+                item->DisplayState(vit.value(), "videoprops");
+        }
+
+        item->DisplayState("default", "subtitletypes");
+          
+        QMap<SubtitleTypes, QString>::iterator sit;
+        for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
+        {
+            if ((*it)->subtitleType & sit.key())
+                item->DisplayState(sit.value(), "subtitletypes");
+        }
 
         if (m_currentItem &&
             (m_currentItem->chanid     == (*it)->chanid) &&
