@@ -998,8 +998,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         
         for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
             item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
-
-        item->DisplayState("default", "audioprops");
         
         QMap<AudioProps, QString>::iterator ait;
         for (ait = audioFlags.begin(); ait != audioFlags.end(); ++ait)
@@ -1008,16 +1006,12 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
                 item->DisplayState(ait.value(), "audioprops");
         }
 
-        item->DisplayState("default", "videoprops");
-
         QMap<VideoProps, QString>::iterator vit;
         for (vit = videoFlags.begin(); vit != videoFlags.end(); ++vit)
         {
             if ((*it)->videoproperties & vit.key())
                 item->DisplayState(vit.value(), "videoprops");
         }
-
-        item->DisplayState("default", "subtitletypes");
           
         QMap<SubtitleTypes, QString>::iterator sit;
         for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
