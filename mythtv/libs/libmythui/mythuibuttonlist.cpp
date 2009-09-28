@@ -485,7 +485,7 @@ int MythUIButtonList::GetItemPos(MythUIButtonListItem* item) const
     return m_itemList.indexOf(item);
 }
 
-bool MythUIButtonList::MoveUp(MovementUnit unit)
+bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
 {
     int pos = m_selPosition;
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
@@ -512,7 +512,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
         case MoveRow:
             if ((pos - m_columns) >= 0)
             {
-                for (int i = 0; i < m_columns; i++)
+                for (int i = 0; i < m_columns; ++i)
                 {
                     --m_selPosition;
                 }
@@ -540,6 +540,15 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
         case MoveMax:
             m_selPosition = 0;
             break;
+        case MoveByAmount:
+            for (uint i = 0; i < amount; ++i)
+            {
+                if (m_selPosition > 0)
+                    --m_selPosition;
+                else if (m_wrapStyle > WrapNone)
+                    m_selPosition = m_itemList.size() - 1;
+            }
+            break;
     }
 
     SanitizePosition();
@@ -555,7 +564,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
     return true;
 }
 
-bool MythUIButtonList::MoveDown(MovementUnit unit)
+bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
 {
     int pos = m_selPosition;
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
@@ -600,6 +609,15 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
             break;
         case MoveMax:
             m_selPosition = m_itemCount - 1;
+            break;
+        case MoveByAmount:
+            for (uint i = 0; i < amount; ++i)
+            {
+                if (m_selPosition < m_itemList.size() - 1)
+                    ++m_selPosition;
+                else if (m_wrapStyle > WrapNone)
+                    m_selPosition = 0;
+            }
             break;
     }
 

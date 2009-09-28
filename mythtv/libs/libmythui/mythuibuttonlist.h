@@ -146,11 +146,12 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     enum ScrollStyle  { ScrollFree, ScrollCenter };
     enum LayoutType   { LayoutVertical, LayoutHorizontal, LayoutGrid };
-    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax, MoveMid };
+    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
+                        MoveMid, MoveByAmount };
     enum WrapStyle    { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems };
 
-    bool MoveDown(MovementUnit unit = MoveItem);
-    bool MoveUp(MovementUnit unit = MoveItem);
+    virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
+    virtual bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0);
     bool MoveToNamedPosition(const QString &position_name);
 
     void RemoveItem(MythUIButtonListItem *item);
