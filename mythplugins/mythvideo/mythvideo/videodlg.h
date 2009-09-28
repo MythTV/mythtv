@@ -188,9 +188,6 @@ class VideoDialog : public MythScreenType
     void OnImageURL(QString uri, Metadata *metadata, QString type);
     void OnImageCopyFinished(ImageDownloadErrorState error, QString errorMsg,
                               Metadata *metadata, const QString &imagePath);
-    void OnFanartURL(QString uri, Metadata *metadata);
-    void OnScreenshotURL(QString uri, Metadata *metadata);
-    void OnBannerURL(QString uri, Metadata *metadata);
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,
