@@ -2336,7 +2336,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
     QString icon_file;
 
-    if (nodeInt  == kSubFolder || nodeInt == kUpFolder)  // subdirectory
+    if (nodeInt  == kSubFolder)  // subdirectory
     {
         // load folder icon
         QString folder_path = node->GetData().value<TreeNodeData>().GetPath();
