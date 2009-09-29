@@ -329,11 +329,11 @@ uint FreeSurround::putSamples(short* samples, uint numSamples, uint numChannels,
                     for (i=0;(i<numSamples) && (ic < bs);i++,ic++)
                     {
                         int16bufs->l[ic] = *samples++ >> 1;
-                        int16bufs->c[ic] = *samples++ >> 1;
                         int16bufs->r[ic] = *samples++ >> 1;
+                        int16bufs->c[ic] = *samples++ >> 1;
+                        int16bufs->lfe[ic] = *samples++ >> 1;
                         int16bufs->ls[ic] = *samples++ >> 1;
                         int16bufs->rs[ic] = *samples++ >> 1;
-                        int16bufs->lfe[ic] = *samples++ >> 1;
                     }
                     break;
             }
@@ -391,11 +391,11 @@ uint FreeSurround::putSamples(short* samples, uint numSamples, uint numChannels,
                         for (i=0;i<numSamples;i++)
                         {
                             *l++ = *samples++ >> 1;
-                            *c++ = *samples++ >> 1;
                             *r++ = *samples++ >> 1;
+                            *c++ = *samples++ >> 1;
+                            *lfe++ = *samples++ >> 1;
                             *ls++ = *samples++ >> 1;
                             *rs++ = *samples++ >> 1;
-                            *lfe++ = *samples++ >> 1;
                         }
                         } break;
                 }
@@ -479,11 +479,11 @@ uint FreeSurround::putSamples(char* samples, uint numSamples, uint numChannels, 
                     for (i=0;(i<numSamples) && (ic < bs);i++,ic++)
                     {
                         int16bufs->l[ic] = *samples++ << 7;
-                        int16bufs->c[ic] = *samples++ << 7;
                         int16bufs->r[ic] = *samples++ << 7;
+                        int16bufs->c[ic] = *samples++ << 7;
+                        int16bufs->lfe[ic] = *samples++ << 7;
                         int16bufs->ls[ic] = *samples++ << 7;
                         int16bufs->rs[ic] = *samples++ << 7;
-                        int16bufs->lfe[ic] = *samples++ << 7;
                     }
                     break;
             }
@@ -541,11 +541,11 @@ uint FreeSurround::putSamples(char* samples, uint numSamples, uint numChannels, 
                         for (i=0;i<numSamples;i++)
                         {
                             *l++ = *samples++ << 7;
-                            *c++ = *samples++ << 7;
                             *r++ = *samples++ << 7;
+                            *c++ = *samples++ << 7;
+                            *lfe++ = *samples++ << 7;
                             *ls++ = *samples++ << 7;
                             *rs++ = *samples++ << 7;
-                            *lfe++ = *samples++ << 7;
                         }
                         } break;
                 }
@@ -588,10 +588,10 @@ uint FreeSurround::receiveSamples(
             {
                 *output++ = int16bufs->l[outindex];
                 *output++ = int16bufs->r[outindex];
-                *output++ = int16bufs->ls[outindex];
-                *output++ = int16bufs->rs[outindex];
                 *output++ = int16bufs->c[outindex];
                 *output++ = int16bufs->lfe[outindex];
+                *output++ = int16bufs->ls[outindex];
+                *output++ = int16bufs->rs[outindex];
                 oc--;
                 outindex++;
             }
@@ -611,10 +611,10 @@ uint FreeSurround::receiveSamples(
                 {
                     *output++ = lrintf(*l++ INV_MASTER_GAIN);
                     *output++ = lrintf(*r++ INV_MASTER_GAIN);
-                    *output++ = lrintf(*ls++ INV_MASTER_GAIN);
-                    *output++ = lrintf(*rs++ INV_MASTER_GAIN);
                     *output++ = lrintf(*c++ INV_MASTER_GAIN);
                     *output++ = lrintf(*lfe++ INV_MASTER_GAIN);
+                    *output++ = lrintf(*ls++ INV_MASTER_GAIN);
+                    *output++ = lrintf(*rs++ INV_MASTER_GAIN);
                 }
                 oc -= maxSamples;
                 outindex += maxSamples;
@@ -631,10 +631,10 @@ uint FreeSurround::receiveSamples(
                 {
                     *output++ = *l++;
                     *output++ = *r++;
-                    *output++ = *ls++;
-                    *output++ = *rs++;
                     *output++ = *c++;
                     *output++ = *lfe++;
+                    *output++ = *ls++;
+                    *output++ = *rs++;
                 }
                 oc -= maxSamples;
                 outindex += maxSamples;
