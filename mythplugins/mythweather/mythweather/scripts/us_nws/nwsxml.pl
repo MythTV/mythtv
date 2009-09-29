@@ -10,7 +10,7 @@ use NWSLocation;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NWS-XML';
-my $version = 0.2;
+my $version = 0.3;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 15*60;
@@ -21,7 +21,7 @@ my @types = ('cclocation', 'station_id', 'latitude', 'longitude',
         'wind_dir', 'wind_degrees', 'wind_speed', 'wind_gust',
         'pressure_string', 'pressure', 'dewpoint_string', 'dewpoint',
         'heat_index_string', 'heat_index', 'windchill_string', 'windchill',
-        'visibility', 'weather_icon', 'appt', 'wind_spdgst');
+        'visibility', 'weather_icon', 'appt', 'wind_spdgst', 'copyright');
 my $dir = "./";
 
 getopts('Tvtlu:d:');
@@ -99,11 +99,17 @@ foreach (@types) {
             $xml->{$key} = int($xml->{'wind_mph'} * 1.609344 + .5);
         }
     } elsif (/wind_gust/) {
-        if ($units =~ /ENG/ || $xml->{'wind_gust_mph'} eq 'NA') {
-            $key = 'wind_gust_mph';
+        if (defined($xml->{'wind_gust_mph'})) {
+            if ($units =~ /ENG/ || $xml->{'wind_gust_mph'} eq 'NA') {
+                $key = 'wind_gust_mph';
+            } else {
+                $key = 'wind_gust_kph';
+                $xml->{$key} = int($xml->{'wind_gust_mph'} * 1.609344 + .5);
+            }
         } else {
-            $key = 'wind_gust_kph';
-            $xml->{$key} = int($xml->{'wind_gust_mph'} * 1.609344 + .5);
+            $xml->{'wind_gust_mph'} = 'NA';
+            $xml->{'wind_gust_kph'} = 'NA';
+            $key = 'wind_gust';
         }
     } elsif (/visibility/) {
         if ($units =~ /ENG/) {
@@ -128,14 +134,17 @@ foreach (@types) {
     } elsif (/cclocation/) {
         $key = 'location';   
     } elsif (/appt$/) {
-        if ($xml->{windchill_f} eq 'NA') {
-            $key = 'heat_index_f' if ($units =~ /ENG/); 
-            $key = 'heat_index_c' if ($units =~ /SI/);
-        } else { 
-            $key = 'windchill_f' if ($units =~ /ENG/); 
-            $key = 'windchill_c' if ($units =~ /SI/);
-        };
-        
+        if (defined($xml->{windchill_f})) {
+            if ($xml->{windchill_f} eq 'NA') {
+                $key = 'heat_index_f' if ($units =~ /ENG/); 
+                $key = 'heat_index_c' if ($units =~ /SI/);
+            } else { 
+                $key = 'windchill_f' if ($units =~ /ENG/); 
+                $key = 'windchill_c' if ($units =~ /SI/);
+            };
+        } else {
+            $key = 'appt';
+        }
     } elsif (/wind_spdgst/) {
         # relying on this being after speed and gust
         $key = "wind_spdgst";
@@ -144,9 +153,18 @@ foreach (@types) {
         } else {
             $xml->{$key} = "$xml->{wind_kph} ($xml->{wind_gust_kph}) kph";
         }
-
+    } elsif (/copyright/) {
+        $key = "copyright";
+        $xml->{$key} = $xml->{credit};
     } else {
         $key = $label;
     }
-    printf $label . "::" . $xml->{$key}. "\n";
+
+    print $label . "::";
+    if (defined($xml->{$key})) {
+        print $xml->{$key};
+    } else {
+        print "NA";
+    }
+    print "\n";
 }

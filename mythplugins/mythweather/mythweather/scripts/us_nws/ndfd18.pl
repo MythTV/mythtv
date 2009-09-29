@@ -9,7 +9,7 @@ use Date::Manip;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NDFD-18_Hour';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 15*60;
@@ -18,7 +18,7 @@ my @types = ('18hrlocation',  'updatetime',
         'temp-0', 'temp-1', 'temp-2', 'temp-3', 'temp-4', 'temp-5',
         '18icon-0', '18icon-1', '18icon-2', '18icon-3', '18icon-4', '18icon-5',
         'pop-0', 'pop-1', 'pop-2', 'pop-3', 'pop-4', 'pop-5',
-        'time-0', 'time-1', 'time-2', 'time-3', 'time-4', 'time-5');
+        'time-0', 'time-1', 'time-2', 'time-3', 'time-4', 'time-5', 'copyright');
 my $dir = './';
 
 getopts('Tvtlu:d:');
@@ -130,6 +130,7 @@ my $index = 0;
 my $icon;
 printf "updatetime::Last Updated on %s\n", 
        UnixDate($creationdate, "%b %d, %I:%M %p %Z");
+printf "copyright::National Digital Forecast Database\n";
 my $pop12;
 foreach my $time (sort keys %$result) {
     if (defined $result->{$time}->{'probability-of-precipitation_12 hour'}) {

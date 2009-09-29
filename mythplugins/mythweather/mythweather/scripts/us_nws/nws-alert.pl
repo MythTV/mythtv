@@ -102,12 +102,12 @@ sub getEffectiveWarnings {
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'NWS-Alerts';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 10*60;
 my $retrieveTimeout = 30;
-my @types = ('swlocation', 'updatetime', 'alerts');
+my @types = ('swlocation', 'updatetime', 'alerts', 'copyright');
 my $dir = "./";
 
 getopts('Tvtlu:d:');
@@ -182,6 +182,7 @@ print "swlocation::$locstr,$state\n";
 
 print "updatetime::Last Updated on " .
 UnixDate(Date_ConvTZ(ParseDate($updatetime)), "%b %d, %I:%M %p %Z") . "\n";
+print "copyright::NOAA,National Weather Service\n";
 
 sub doLocation {
     my $code = shift;
