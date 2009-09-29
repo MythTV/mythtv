@@ -548,7 +548,22 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "description")
             {
-                description = getFirstText(info);
+                if ((description.isNull() || description.isEmpty()) &&
+                    info.attribute("lang","").isEmpty())
+                {
+                    description = qApp->translate("ThemeUI",
+                                            qPrintable(getFirstText(info)));
+                }
+                else if (info.attribute("lang","").toLower() ==
+                         GetMythUI()->GetLanguageAndVariant())
+                {
+                    description = getFirstText(info);
+                }
+                else if (info.attribute("lang","").toLower() ==
+                         GetMythUI()->GetLanguage())
+                {
+                    description = getFirstText(info);
+                }
             }
             else if (info.tagName() == "password")
             {
