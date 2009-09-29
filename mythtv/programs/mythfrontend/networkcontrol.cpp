@@ -187,6 +187,30 @@ NetworkControl::NetworkControl() :
     keyMap["f23"]                    = Qt::Key_F23;
     keyMap["f24"]                    = Qt::Key_F24;
 
+    keyTextMap[Qt::Key_Plus]            = "+";
+    keyTextMap[Qt::Key_Comma]           = ",";
+    keyTextMap[Qt::Key_Minus]           = "-";
+    keyTextMap[Qt::Key_Underscore]      = "_";
+    keyTextMap[Qt::Key_Period]          = ".";
+    keyTextMap[Qt::Key_NumberSign]      = "#";
+    keyTextMap[Qt::Key_BracketLeft]     = "[";
+    keyTextMap[Qt::Key_BracketRight]    = "]";
+    keyTextMap[Qt::Key_Backslash]       = "\\";
+    keyTextMap[Qt::Key_Dollar]          = "$";
+    keyTextMap[Qt::Key_Percent]         = "%";
+    keyTextMap[Qt::Key_Ampersand]       = "&";
+    keyTextMap[Qt::Key_ParenLeft]       = "(";
+    keyTextMap[Qt::Key_ParenRight]      = ")";
+    keyTextMap[Qt::Key_Asterisk]        = "*";
+    keyTextMap[Qt::Key_Question]        = "?";
+    keyTextMap[Qt::Key_Slash]           = "/";
+    keyTextMap[Qt::Key_Colon]           = ":";
+    keyTextMap[Qt::Key_Semicolon]       = ";";
+    keyTextMap[Qt::Key_Less]            = "<";
+    keyTextMap[Qt::Key_Equal]           = "=";
+    keyTextMap[Qt::Key_Greater]         = ">";
+    keyTextMap[Qt::Key_Bar]             = "|";
+
     stopCommandThread = false;
     pthread_create(&command_thread, NULL, CommandThread, this);
 
@@ -447,13 +471,19 @@ QString NetworkControl::processKey(QStringList tokens)
         else if (keyMap.contains(tokens[curToken]))
         {
             int keyCode = keyMap[tokens[curToken]];
+            QString keyText;
+
+            if (keyTextMap.contains(keyCode))
+                keyText = keyTextMap[keyCode];
 
             GetMythUI()->ResetScreensaver();
 
-            event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier);
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier,
+                                  keyText);
             QApplication::postEvent(keyDest, event);
 
-            event = new QKeyEvent(QEvent::KeyRelease, keyCode, Qt::NoModifier);
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, Qt::NoModifier,
+                                  keyText);
             QApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
