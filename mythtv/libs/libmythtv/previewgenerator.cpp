@@ -361,7 +361,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
         else
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Remote Preview failed due to an uknown error.");
+                    "Remote Preview failed due to an unknown error.");
         }
         return false;
     }
@@ -372,7 +372,15 @@ bool PreviewGenerator::RemotePreviewRun(void)
         QDir remotecachedir(remotecachedirname);
 
         if (!remotecachedir.exists())
-            remotecachedir.mkdir(remotecachedirname);
+        {
+            if (!remotecachedir.mkdir(remotecachedirname))
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Remote Preview failed because we could not create a "
+                        "remote cache directory");
+                return false;
+            }
+        }
 
         QString filename = programInfo.pathname.section('/',-1) + ".png";
         outFileName = QString("%1/%2").arg(remotecachedirname).arg(filename);
