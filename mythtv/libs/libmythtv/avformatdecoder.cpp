@@ -3641,6 +3641,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                          (curstream->codec->codec_id == CODEC_ID_DTS));
                     bool using_passthru = do_ac3_passthru || do_dts_passthru;
 
+                    /// XXX HACK: set sample format to signed 16 bit
+                    if (curstream->codec->codec_id == CODEC_ID_TRUEHD)
+                        curstream->codec->sample_fmt = SAMPLE_FMT_S16;
+
                     // detect channels on streams that need
                     // to be decoded before we can know this
                     bool already_decoded = false;
