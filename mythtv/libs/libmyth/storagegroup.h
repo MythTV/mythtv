@@ -26,6 +26,9 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     bool FileExists(QString filename);
     QStringList GetFileInfo(QString filename);
     static QString GetRelativePathname(const QString &filename);
+    static bool FindDirs(const QString group = "Default",
+                         const QString hostname = "",
+                         QStringList *dirlist = NULL);
 
     QString FindRecordingFile(QString filename);
     QString FindRecordingDir(QString filename);
@@ -41,9 +44,6 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     static QStringList getGroupDirs(QString groupname, QString host);
 
   private:
-    bool FindDirs(const QString group = "Default",
-                  const QString hostname = "");
-
     QString      m_groupname;
     QString      m_hostname;
     bool         m_allowFallback;

@@ -69,7 +69,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
     m_allowFallback = allowFallback;
     m_dirlist.clear();
 
-    found = FindDirs(m_groupname, m_hostname);
+    found = FindDirs(m_groupname, m_hostname, &m_dirlist);
     if ((!found) && m_allowFallback && (m_groupname != "LiveTV") &&
         (!hostname.isEmpty()))
     {
@@ -77,7 +77,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
                 QString("Unable to find any directories for the local "
                         "storage group '%1' on '%2', trying directories on "
                         "all hosts!").arg(group).arg(hostname));
-        found = FindDirs(m_groupname, "");
+        found = FindDirs(m_groupname, "", &m_dirlist);
         if (found)
         {
             m_hostname = "";
@@ -89,7 +89,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
         VERBOSE(VB_FILE, LOC +
                 QString("Unable to find storage group '%1', trying "
                         "'Default' group!").arg(group));
-        found = FindDirs("Default", m_hostname);
+        found = FindDirs("Default", m_hostname, &m_dirlist);
         if(found)
         {
             m_groupname = "Default";
@@ -101,7 +101,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
                     QString("Unable to find any directories for the local "
                             "Default storage group on '%1', trying directories "
                             "in all Default groups!").arg(hostname));
-            found = FindDirs("Default", "");
+            found = FindDirs("Default", "", &m_dirlist);
             if(found)
             {
                 m_groupname = "Default";
@@ -321,16 +321,16 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
 }
 
 /** \fn StorageGroup::FindDirs(const QString, const QString)
- *  \brief Finds and initializes the directory list associated with the Storage
- *         Group
- *
- *   This function should only be called by StorageGroup::Init().
+ *  \brief Finds and and optionally initialize a directory list
+ *         associated with a Storage Group
  *
  *  \param group    The name of the Storage Group
  *  \param hostname The host whose directory list should be checked, first
+ *  \param dirlist  Optional pointer to a QStringList to hold found dir list
  *  \return         true if directories were found
  */
-bool StorageGroup::FindDirs(const QString group, const QString hostname)
+bool StorageGroup::FindDirs(const QString group, const QString hostname,
+                            QStringList *dirlist)
 {
     bool found = false;
     QString dirname;
@@ -365,7 +365,11 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname)
             dirname.replace(QRegExp("\\s*$"), "");
             if (dirname.right(1) == "/")
                 dirname.remove(dirname.length() - 1, 1);
-            m_dirlist << dirname;
+
+            if (dirlist)
+                (*dirlist) << dirname;
+            else
+                return true;
         }
         while (query.next());
         found = true;
