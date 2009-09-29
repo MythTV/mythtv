@@ -155,8 +155,9 @@ bool checkImageStoragePaths(QStringList &probs)
                 QObject::tr("You have a Video Storage "
                             "Group, but have not set up "
                             "all Image Groups.  If you continue, "
-                            "video image downloads will fail.  Do "
-                            "you want to go back and fix this?");
+                            "video image downloads will be saved in "
+                            "your Videos Storage Group.  Do you want "
+                            "to store them in their own groups?");
             probs.push_back(trMesg);
             VERBOSE(VB_IMPORTANT, trMesg);
             problemFound = true;
