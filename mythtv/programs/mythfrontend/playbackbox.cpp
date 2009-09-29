@@ -2714,7 +2714,21 @@ void PlaybackBox::popupString(ProgramInfo *program, QString &message)
 
     QString title = program->title;
 
-    message = QString("%1\n%2\n%3").arg(message).arg(title).arg(timedate);
+    QString extra("");
+
+    if (!program->subtitle.isEmpty())
+    {
+        extra = program->subtitle;
+        extra = (title.length() + extra.length() + 2 <= message.length()) ?
+            QString(" -- ") + extra : QString("\n") + extra;
+
+        uint maxll = max(max(message.length(),title.length()), 20);
+        if (extra.length() > maxll)
+            extra = extra.left(maxll - 3) + "...";
+    }
+
+    message = QString("%1\n%2%3\n%4")
+        .arg(message).arg(title).arg(extra).arg(timedate);
 }
 
 void PlaybackBox::doClearPlaylist(void)
