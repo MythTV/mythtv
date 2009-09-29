@@ -3092,6 +3092,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     MythSocket *pbssock = pbs->getSocket();
     QString pbshost = pbs->getHostname();
 
+    vector<uint> excluded_cardids;
     QStringList strlist;
     int retval = -1;
 
@@ -3116,7 +3117,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
                 enchost = elink->GetHostName();
 
             if (enchost == pbshost && elink->IsConnected() &&
-                !elink->IsBusy() && !elink->IsTunerLocked())
+                !elink->IsTunerLocked() &&
+                !elink->GetFreeInputs(excluded_cardids).empty())
             {
                 encoder = elink;
                 retval = iter.key();
@@ -3127,7 +3129,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         }
 
         if ((retval == -1 || lastcard) && elink->IsConnected() &&
-            !elink->IsBusy() && !elink->IsTunerLocked())
+            !elink->IsTunerLocked() &&
+            !elink->GetFreeInputs(excluded_cardids).empty())
         {
             encoder = elink;
             retval = iter.key();
@@ -3167,6 +3170,7 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
 
+    vector<uint> excluded_cardids;
     QStringList strlist;
     int count = 0;
 
@@ -3175,9 +3179,8 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
     {
         EncoderLink *elink = *iter;
 
-        if ((elink->IsConnected()) &&
-            (!elink->IsBusy()) &&
-            (!elink->IsTunerLocked()))
+        if (elink->IsConnected() && !elink->IsTunerLocked() &&
+            !elink->GetFreeInputs(excluded_cardids).empty())
         {
             count++;
         }
@@ -3199,9 +3202,8 @@ void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
     {
         EncoderLink *elink = *iter;
 
-        if ((elink->IsConnected()) &&
-            (!elink->IsBusy()) &&
-            (!elink->IsTunerLocked()))
+        if (elink->IsConnected() && !elink->IsTunerLocked() &&
+            !elink->IsBusy())
         {
             strlist << QString::number(iter.key());
         }
@@ -3234,6 +3236,9 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
 
     if (currrec > 0 && curr != encoderList->end())
     {
+        vector<uint> excluded_cardids;
+        excluded_cardids.push_back(currrec);
+
         // cycle through all recorders
         for (iter = curr;;)
         {
@@ -3247,10 +3252,9 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
 
             elink = *iter;
 
-            if ((retval == -1) &&
-                (elink->IsConnected()) &&
-                (!elink->IsBusy()) &&
-                (!elink->IsTunerLocked()))
+            if (retval == -1 && elink->IsConnected() &&
+                !elink->IsTunerLocked() &&
+                !elink->GetFreeInputs(excluded_cardids).empty())
             {
                 encoder = elink;
                 retval = iter.key();
