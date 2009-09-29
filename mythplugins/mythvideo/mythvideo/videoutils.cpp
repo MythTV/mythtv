@@ -86,9 +86,45 @@ bool GetRemoteFileList(QString host, QString path, QStringList* list, QString sg
     return ok;
 }
 
+static QMutex cacheLock;
+static QHash <QString, QString>sgroupMap;
+
+bool ClearRemoteSGMap(void)
+{
+    QMutexLocker locker(&cacheLock);
+    sgroupMap.clear();
+}
+
 QString GenRemoteFileURL(QString sgroup, QString host, QString path)
 {
-    return QString("myth://%1@").arg(sgroup) +
+    QString tmpGroup = sgroup;
+    QString groupKey = QString("%1:%2").arg(sgroup, host);
+
+    QMutexLocker locker(&cacheLock);
+
+    if (sgroupMap.contains(groupKey))
+    {
+        tmpGroup = sgroupMap[groupKey];
+    }
+    else
+    {
+        if (StorageGroup::FindDirs(sgroup, host))
+        {
+            sgroupMap[groupKey] = sgroup;
+        }
+        else
+        {
+            VERBOSE(VB_FILE+VB_EXTRA, QString("GenRemoteFileURL(): "
+                    "falling back to Videos Storage Group for host %1 "
+                    "since it does not have a %2 Storage Group.")
+                    .arg(host).arg(sgroup));
+
+            tmpGroup = "Videos";
+            sgroupMap[groupKey] = tmpGroup;
+        }
+    }
+
+    return QString("myth://%1@").arg(tmpGroup) +
               gContext->GetSettingOnHost("BackendServerIP", host) + ":" +
               gContext->GetSettingOnHost("BackendServerPort", host) + "/" +
               path;

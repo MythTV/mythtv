@@ -1771,6 +1771,8 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
                     lname));
 
     srand(time(NULL));
+
+    ClearRemoteSGMap();
 }
 
 VideoDialog::~VideoDialog()
