@@ -3373,9 +3373,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (ringBuffer->isDVD() &&
                 ringBuffer->DVD()->InStillFrame())
             {
-                mpeg_seq_end_seen = false;
-                decodeStillFrame = false;
-                ringBuffer->DVD()->InStillFrame(false);
+                AVStream *curstream = ic->streams[pkt->stream_index];
+                if (curstream && 
+                    curstream->codec->codec_type == CODEC_TYPE_VIDEO)
+                {
+                    mpeg_seq_end_seen = false;
+                    decodeStillFrame = false;
+                    ringBuffer->DVD()->InStillFrame(false);
+                }
             }
 
             if (waitingForChange && pkt->pos >= readAdjust)
