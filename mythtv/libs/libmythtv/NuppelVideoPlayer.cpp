@@ -1029,6 +1029,12 @@ void NuppelVideoPlayer::AutoDeint(VideoFrame *frame)
             VERBOSE(VB_PLAYBACK, LOC + "interlaced frame seen after "
                     << abs(m_scan_tracker) << " progressive frames");
             m_scan_tracker = 2;
+            if (!player_ctx->buffer->isDVD())
+            {
+                VERBOSE(VB_PLAYBACK, LOC + "Locking scan to Interlaced.");
+                SetScanType(kScan_Interlaced);
+                return;
+            }
         }
         m_scan_tracker++;
     }
