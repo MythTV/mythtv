@@ -1942,6 +1942,14 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
 QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
                                     QString &titleIn, QString imagetype)
 {
+    static QHash <QString, QString>imageFileCache;
+
+    QString cacheKey = QString("%1:%2:%3").arg(imagetype).arg(seriesID)
+                               .arg(titleIn);
+
+    if (imageFileCache.contains(cacheKey))
+        return imageFileCache[cacheKey];
+
     QString foundFile;
 
     // Attempts to match image file in specified directory.
@@ -2015,7 +2023,10 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
     }
 
     if (!foundFile.isEmpty())
-        return QString("%1/%2").arg(testDirectory).arg(foundFile);
+    {
+        imageFileCache[cacheKey] = QString("%1/%2").arg(testDirectory).arg(foundFile);
+        return imageFileCache[cacheKey];
+    }
     else
         return QString();
 }
