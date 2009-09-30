@@ -4061,7 +4061,7 @@ void VideoDialog::EditMetadata()
             "mythvideoeditmetadata", metadata,
             m_d->m_videoList->getListCache());
 
-    connect(md_editor, SIGNAL(Finished()), SLOT(reloadData()));
+    connect(md_editor, SIGNAL(Finished()), SLOT(refreshData()));
 
     if (md_editor->Create())
         screenStack->AddScreen(md_editor);
