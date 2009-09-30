@@ -260,6 +260,15 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             {
                 newFont->m_face.setUnderline(parseBool(info));
             }
+            else if (info.tagName() == "letterspacing")
+            {
+                newFont->m_face.setLetterSpacing(QFont::AbsoluteSpacing,
+                                              getFirstText(info).toInt());
+            }
+            else if (info.tagName() == "wordspacing")
+            {
+                newFont->m_face.setWordSpacing(getFirstText(info).toInt());
+            }
             else if (info.tagName() == "decoration")
             {
                 QString dec = getFirstText(info).toLower();
