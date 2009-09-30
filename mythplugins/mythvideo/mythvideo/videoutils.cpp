@@ -66,26 +66,6 @@ void CheckedSet(MythUIImage *uiItem, const QString &filename)
     }
 }
 
-bool GetRemoteFileList(QString host, QString path, QStringList* list, QString sgroup)
-{
-
-    // Make sure the list is empty when we get started
-    list->clear();
-
-    if (sgroup.isEmpty())
-        sgroup = "Videos";
-
-    *list << "QUERY_SG_GETFILELIST";
-    *list << host;
-    *list << sgroup;
-    *list << path;
-
-    bool ok = gContext->SendReceiveStringList(*list);
-
-// Should the SLAVE UNREACH test be here ?
-    return ok;
-}
-
 static QMutex cacheLock;
 static QHash <QString, QString>sgroupMap;
 
@@ -95,7 +75,7 @@ bool ClearRemoteSGMap(void)
     sgroupMap.clear();
 }
 
-QString GenRemoteFileURL(QString sgroup, QString host, QString path)
+QString GetHostSGToUse(QString host, QString sgroup)
 {
     QString tmpGroup = sgroup;
     QString groupKey = QString("%1:%2").arg(sgroup, host);
@@ -114,7 +94,7 @@ QString GenRemoteFileURL(QString sgroup, QString host, QString path)
         }
         else
         {
-            VERBOSE(VB_FILE+VB_EXTRA, QString("GenRemoteFileURL(): "
+            VERBOSE(VB_FILE+VB_EXTRA, QString("GetHostSGToUse(): "
                     "falling back to Videos Storage Group for host %1 "
                     "since it does not have a %2 Storage Group.")
                     .arg(host).arg(sgroup));
@@ -124,7 +104,34 @@ QString GenRemoteFileURL(QString sgroup, QString host, QString path)
         }
     }
 
-    return QString("myth://%1@").arg(tmpGroup) +
+    return tmpGroup;
+}
+
+bool GetRemoteFileList(QString host, QString path, QStringList* list,
+                       QString sgroup, bool fileNamesOnly)
+{
+
+    // Make sure the list is empty when we get started
+    list->clear();
+
+    if (sgroup.isEmpty())
+        sgroup = "Videos";
+
+    *list << "QUERY_SG_GETFILELIST";
+    *list << host;
+    *list << GetHostSGToUse(host, sgroup);
+    *list << path;
+    *list << QString::number(fileNamesOnly);
+
+    bool ok = gContext->SendReceiveStringList(*list);
+
+// Should the SLAVE UNREACH test be here ?
+    return ok;
+}
+
+QString GenRemoteFileURL(QString sgroup, QString host, QString path)
+{
+    return QString("myth://%1@").arg(GetHostSGToUse(host, sgroup)) +
               gContext->GetSettingOnHost("BackendServerIP", host) + ":" +
               gContext->GetSettingOnHost("BackendServerPort", host) + "/" +
               path;

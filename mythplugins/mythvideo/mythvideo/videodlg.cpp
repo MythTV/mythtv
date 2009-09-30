@@ -1060,8 +1060,12 @@ namespace
             image_exts.insert(QString(*it).toLower());
         }
 
-        if (!host.isEmpty())
+        if ((!host.isEmpty()) &&
+            (season > 0 || !isScreenshot))
         {
+            QStringList hostFiles;
+
+            GetRemoteFileList(host, "", &hostFiles, sgroup, true);
             const QString hntm("%2.%3");
 
             for (image_type_list::const_iterator ext = image_exts.begin();
@@ -1092,14 +1096,10 @@ namespace
                 for (QStringList::const_iterator i = sfn.begin();
                         i != sfn.end(); ++i)
                 {
-                    if (!host.isEmpty())
+                    if (hostFiles.contains(*i))
                     {
-                        QString url = GenRemoteFileURL(sgroup, host, *i);
-                        if (RemoteFile::Exists(url))
-                        {
-                            image = *i;
-                            return true;
-                        }
+                        image = *i;
+                        return true;
                     }
                 }
             }
