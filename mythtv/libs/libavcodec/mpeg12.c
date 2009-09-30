@@ -2300,7 +2300,8 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         /* parse DVD Closed Caption data */
         p += 2;
         len -= 2;
-        avctx->decode_cc_dvd(avctx, p, len);
+        if (avctx->decode_cc_dvd)
+            avctx->decode_cc_dvd(avctx, p, len);
     } else if (len >= 6 &&
                p[0] == 'G' && p[1] == 'A' && p[2] == '9' && p[3] == '4') {
         /* parse ATSC info (EIA-708 Closed Captions && letterbox info) */
