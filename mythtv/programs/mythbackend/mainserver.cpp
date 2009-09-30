@@ -2884,7 +2884,11 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     QString wantHost = sList.at(1);
     QString groupname = sList.at(2);
     QString path = sList.at(3);
+    bool fileNamesOnly = false;
     QStringList strList;
+
+    if (sList.size() >= 5)
+        fileNamesOnly = sList.at(4).toInt();
 
     bool slaveUnreachable = false;
 
@@ -2895,7 +2899,10 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     {
         StorageGroup sg(groupname, host);
         VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting local info"));
-        strList = sg.GetFileList(path);
+        if (fileNamesOnly)
+            strList = sg.GetFileList(path);
+        else
+            strList = sg.GetFileInfoList(path);
     }
     else
     {
@@ -2903,7 +2910,8 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
         if (slave)
         {
             VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting remote info"));
-            strList = slave->GetSGFileList(wantHost, groupname, path);
+            strList = slave->GetSGFileList(wantHost, groupname, path,
+                                           fileNamesOnly);
             slave->DownRef();
             slaveUnreachable = false;
         }

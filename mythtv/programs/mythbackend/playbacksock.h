@@ -49,8 +49,10 @@ class PlaybackSock
     int CheckRecordingActive(const ProgramInfo *pginfo);
     int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);
     bool FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
-    QStringList GetSGFileList(QString &host, QString &groupname, QString &directory);
-    QStringList GetSGFileQuery(QString &host, QString &groupname, QString &filename);
+    QStringList GetSGFileList(QString &host, QString &groupname,
+                              QString &directory, bool fileNamesOnly);
+    QStringList GetSGFileQuery(QString &host, QString &groupname,
+                               QString &filename);
 
     QStringList GenPreviewPixmap(const ProgramInfo *pginfo);
     QStringList GenPreviewPixmap(const ProgramInfo *pginfo,

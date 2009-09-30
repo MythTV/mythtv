@@ -135,6 +135,32 @@ void StorageGroup::Init(const QString group, const QString hostname,
 QStringList StorageGroup::GetFileList(QString Path)
 {
     QStringList files;
+    QString tmpDir;
+    QDir d;
+
+    for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
+    {
+        tmpDir = *it + Path;
+
+        d.setPath(tmpDir);
+        if (d.exists())
+        {
+            VERBOSE(VB_FILE, LOC + QString("GetFileList: Reading '%1'").arg(tmpDir));
+            QStringList list = d.entryList(QDir::Files|QDir::Readable);
+            for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
+            {
+                VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetFileList: (%1)").arg(*p));
+                files.append(*p);
+            }
+        }
+    }
+
+    return files;
+}
+
+QStringList StorageGroup::GetFileInfoList(QString Path)
+{
+    QStringList files;
     bool badPath = true;
 
     if (Path.isEmpty() || Path == "/")
@@ -153,7 +179,7 @@ QStringList StorageGroup::GetFileList(QString Path)
         }
     }
 
-    VERBOSE(VB_FILE, LOC + QString("GetFileList: Reading '%1'").arg(Path));
+    VERBOSE(VB_FILE, LOC + QString("GetFileInfoList: Reading '%1'").arg(Path));
 
     if (badPath)
         return files;
@@ -182,7 +208,7 @@ QStringList StorageGroup::GetFileList(QString Path)
         else
             tmp = QString("file::%1::%2").arg(p->fileName()).arg(p->size());
 
-        VERBOSE(VB_FILE, LOC + QString("GetFileList: (%1)").arg(tmp));
+        VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetFileInfoList: (%1)").arg(tmp));
         files.append(tmp);
     }
 

@@ -201,12 +201,13 @@ bool PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
 }
 
 QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
-                                      QString &directory)
+                                      QString &directory, bool fileNamesOnly)
 {
     QStringList strlist( QString("QUERY_SG_GETFILELIST") );
     strlist << host;
     strlist << groupname;
     strlist << directory;
+    QString::number(fileNamesOnly);
 
     SendReceiveStringList(strlist);
 

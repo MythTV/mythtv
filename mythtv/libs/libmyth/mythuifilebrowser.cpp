@@ -689,6 +689,7 @@ bool MythUIFileBrowser::GetRemoteFileList(const QString &url,
         path += "#" + qurl.fragment();
 
     list << path;
+    list << "0";
 
     bool ok = gContext->SendReceiveStringList(list);
 

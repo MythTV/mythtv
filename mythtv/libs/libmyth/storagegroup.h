@@ -23,6 +23,7 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
         { QStringList tmp = m_dirlist; tmp.detach(); return tmp; }
 
     QStringList GetFileList(QString Path);
+    QStringList GetFileInfoList(QString Path);
     bool FileExists(QString filename);
     QStringList GetFileInfo(QString filename);
     static QString GetRelativePathname(const QString &filename);
