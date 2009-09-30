@@ -2715,15 +2715,15 @@ void PlaybackBox::popupString(ProgramInfo *program, QString &message)
 
     QString title = program->title;
 
-    QString extra("");
+    QString extra;
 
     if (!program->subtitle.isEmpty())
     {
         extra = program->subtitle;
         extra = (title.length() + extra.length() + 2 <= message.length()) ?
-            QString(" -- ") + extra : QString("\n") + extra;
+            QString(" -- ") + extra : QString('\n') + extra;
 
-        uint maxll = max(max(message.length(),title.length()), 20);
+        int maxll = max(max(message.length(),title.length()), 20);
         if (extra.length() > maxll)
             extra = extra.left(maxll - 3) + "...";
     }
