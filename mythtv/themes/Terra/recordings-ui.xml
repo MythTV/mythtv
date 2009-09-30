@@ -20,7 +20,7 @@
         </imagetype>
 
         <buttonlist name="groups">
-            <area>0,58,1280,30</area>
+            <area>0,58,1280,38</area>
             <spacing>15</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
@@ -55,7 +55,7 @@
                 <position>1264,0</position>
                 <state type="full">
                     <imagetype name="right">
-                        <filename>controls/right_arrow_light.png</filename>
+                        <filename>shared/horizlist_internal_right_arrow.png</filename>
                     </imagetype>
                 </state>
             </statetype>
@@ -63,7 +63,7 @@
                 <position>0,0</position>
                 <state type="full">
                     <imagetype name="left">
-                        <filename>controls/left_arrow_light.png</filename>
+                        <filename>shared/horizlist_internal_left_arrow.png</filename>
                     </imagetype>
                 </state>
             </statetype>
