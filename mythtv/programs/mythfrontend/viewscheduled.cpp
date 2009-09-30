@@ -509,15 +509,7 @@ void ViewScheduled::customEdit()
         return;
 
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
-    if (!pginfo)
-        return;
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-    else
-        delete ce;
+    EditCustom(pginfo);
 }
 
 void ViewScheduled::deleteRule()

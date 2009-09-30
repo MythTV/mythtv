@@ -461,17 +461,8 @@ void ProgFinder::customEdit()
 {
     if (GetFocusWidget() == m_timesList)
     {
-        ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-
-        if (!curPick)
-            return;
-
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        CustomEdit *ce = new CustomEdit(mainStack, curPick);
-        if (ce->Create())
-            mainStack->AddScreen(ce);
-        else
-            delete ce;
+        ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
+        EditCustom(pginfo);
     }
 }
 
@@ -479,18 +470,8 @@ void ProgFinder::upcoming()
 {
     if (GetFocusWidget() == m_timesList)
     {
-        ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-
-        if (!curPick)
-            return;
-
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-        ProgLister *pl = new ProgLister(mainStack, plTitle, curPick->title,
-                                        QString());
-        if (pl->Create())
-            mainStack->AddScreen(pl);
-        else
-            delete pl;
+        ProgramInfo *pginfo = m_showData[m_timesList->GetCurrentPos()];
+        ShowUpcoming(pginfo);
     }
 }
 
@@ -500,9 +481,7 @@ void ProgFinder::details()
         return;
 
     ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-
-    if (curPick)
-        ShowDetails(curPick);
+    ShowDetails(curPick);
 }
 
 void ProgFinder::quickRecord()

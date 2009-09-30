@@ -926,12 +926,7 @@ void ProgramRecPriority::customEdit(void)
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pgRecInfo);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-     else
-        delete ce;
+    EditCustom(pgRecInfo);
 }
 
 void ProgramRecPriority::remove(void)

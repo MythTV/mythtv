@@ -397,15 +397,7 @@ void ScheduleEditor::showUpcomingByRule(void)
 
 void ScheduleEditor::showUpcomingByTitle(void)
 {
-    if (!m_recInfo)
-        return;
-    
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, m_recInfo->title, "");
-    if (pl->Create())
-        mainStack->AddScreen(pl);
-    else
-        delete pl;
+    ShowUpcoming(m_recInfo);
 }
 
 void ScheduleEditor::ShowPreview(void)

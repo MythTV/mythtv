@@ -1677,12 +1677,7 @@ void PlaybackBox::upcoming()
         return;
     }
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
-    if (pl->Create())
-        mainStack->AddScreen(pl);
-    else
-        delete pl;
+    ShowUpcoming(pginfo);
 }
 
 ProgramInfo *PlaybackBox::CurrentItem(void)
@@ -1715,12 +1710,7 @@ void PlaybackBox::customEdit()
         return;
     }
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-    else
-        delete ce;
+    EditCustom(pginfo);
 }
 
 void PlaybackBox::details()

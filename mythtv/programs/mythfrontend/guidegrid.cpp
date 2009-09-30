@@ -1898,15 +1898,7 @@ void GuideGrid::customEdit()
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
-    if (!pginfo)
-        return;
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-    else
-        delete ce;
+    EditCustom(pginfo);
 }
 
 void GuideGrid::deleteRule()

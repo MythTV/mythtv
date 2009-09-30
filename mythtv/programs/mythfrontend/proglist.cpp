@@ -797,20 +797,14 @@ void ProgLister::upcoming()
     if (!pi || m_type == plTitle)
         return;
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, pi->title, "");
-    if (pl->Create())
-        mainStack->AddScreen(pl);
-    else
-        delete pl;
+    ShowUpcoming(pi);
 }
 
 void ProgLister::details()
 {
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
-    if (pi)
-        ShowDetails(pi);
+    ShowDetails(pi);
 }
 
 void ProgLister::fillViewList(const QString &view)
