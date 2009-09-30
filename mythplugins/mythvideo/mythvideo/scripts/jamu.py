@@ -47,171 +47,175 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.5.3" # 0.1.0 Initial development 
-					 # 0.2.0 Inital beta release
-					 # 0.3.0 Add mythvideo metadata updating including movie graphics through
-                     #       the use of tmdb.pl when the perl script exists
-                     # 0.3.1 Add mythvideo meta data add and update functionality. Intend use for 
-					 #       maintenance cron jobs. 
-					 #       Increase integration with mythtvideo download meta data and MythUI
-                     #       Added the ability to movie video files while maintaining the metadata
-                     # 0.3.2 Fixed bug where some poster downloads were unnecessary 
-                     #       Fixed bug where the mythtv database was updated for no reason 
-                     #       Fixed bug in jamu-example.conf "min_poster_size" variable had '=' not ':' 
-                     #       Fixed bug where a unicode URL would abort the script 
-                     #       Using ffmpeg added setting accurate video length in minutes. A hack but
-                     #       lacked python method to find audio/video properties.
-                     # 0.3.3 Add logic to skip any video with a inetref of '99999999'. Meta data and
-                     #       graphics are all manually entered and should not be altered by Jamu.
-                     #       Currently used for any meta data that you do not want modified by Jamu.
-                     #       Fixed issues with filenames containing Unicode characters.
-                     # 0.3.4 Added logic to skip any secondary source meta data plot less than 10 words.
-                     #       Properly initialized a new record so warning messages do not display.
-                     #       In plot meta data replace line-feeds with a space (e.g. Space Cowboys
-                     #       plot contains line-feeds). Mythvideo does not expect line-feeds in a plot. 
-                     #       Significant improvements in combining meta data between primary and 
-                     #       secondary data sources.
-					 #       Remove 'tmdb.pl' calls and use the tmdb api directly.
-					 #       Added detection of broken symbolic links and fixed those links.
-					 #       Fixed inconsistencies in graphics file extentions (as received from the 
-                     #       sources), made all extentions lowercase and changed ".jpeg" to ".jpg". 
-                     # 0.3.5 Fixed bug when themoviedb.com times out from an api request.
-                     #       A few documentation corrections. 
-                     #       Fixed a bug with utf8 directory names. 
-                     #       Added code to not abort script when themoviedb.com has problems. The issue
-					 #       is reported but the scripts continues processing. 
-					 #       Added option "-W" to download graphics for Scheduled and Recorded videos.
-					 #       Change the "-J" Janitor function to avoid deleting graphics for Scheduled
-					 #		 and Recorded videos.
-					 #       Fixed bug where a TMDB Poster image was not found when it was really 
-                     #       available.
-                     # 0.3.6 Fixed bug when searching themoviedb.com for a movie by title or 
-					 #       alternate title.
-                     #       Increased accuracy of non-interactive TMDB movie searching and matching.
-					 #       Set up for transition to TMDB's beta v2.1 api which adds language support.
-					 #       Corrected Watched Recording graphic file naming convention for movies.
-					 #       If interactive mode is selected but an exact match is found for a movie
-					 #       then the exact match is chosen and no interative session is initiated.
-					 #       Added additional messages when access to MythTV python bindings has issues.
-					 # 0.3.7 Removed some redundant code. 
-					 #       Sync up with v1.0 of tvdb_api and new way to assign tvdb api key
-					 #       Added an option (-MG) to allow Jamu best guessing at a video's inetref
-					 #		 number. To guess accurately the video file name must be very close to
-					 #		 those found on tmdb or imdb and tvdb web sites. 
-					 #       Remove all use of the MythVideo.py "pruneMetadata" routine as it deletes
-                     #       records from the Mythvideo table for all video files with relative file 						 #		 paths.
-					 #       Jamu will skip processing any videometadata which is using a Storage group. 						 #       Jamu will now restrict itself to updating only videometadata records whose
-					 #       video files reside on the current host machine. In the case where a user 
-					 #       has multiple backends jamu must run on each of those backends.
-					 #       The Janitor option (-MJ) now checks if the users has set the plugins 
-					 #       MythGallery, MythGame and MythMusic to use the same graphics directories as
-					 #       MythVideo. If they share directories the Janitor option will exit 
-					 #       without removing any graphics files. Messages indicating which directories
-					 #       are in conflict will be displayed.
-					 #       Added the detection of video or graphics on an NFS mount exiting jamu without
-					 #       any processing and displaying a message why this has been done. A new option
-					 #       for NFS (-MN) will allow a user to override this check and jamu will continue
-					 #       processing.
-					 #       Fixed a bug when TMDB does not have a 'year' for a movie (e.g. 'Bambi')
-					 #		 Added compatibility with or without the MythTV.py Ticket #6678
-					 #       Fixed a bug when ffmpeg cannot find the true length in minutes of a video
-					 #       Cleaned up documenation consistency with Warning and Error messages. 
-					 #       Added to the existing TV episode video file renaming (-MF) option. 
-					 #       Now movie video files can also be renamed to the format "title (year)" 
-					 #       e.g. "The Duchess (2008)". If tmdb.com has no year for the movie then only
-					 #		 the movie title will be used when renaming. Any existing metadata is
-					 #		 preserved.
-					 # 0.3.8 Made changes to sync up with MythTV trunk change set [r21138]. 
-					 #       Now handles TVDB's change from a 5 digit inetref number to 6 digits.
-					 # 0.3.9 Check accessability (Read and Write) to directories and files before
-					 #       including them in files/directories to process. 
-					 #       Add the ability to process Storage Groups for all Videos and graphics.
-					 #       Jamu now uses MythVideo.py binding's Genre and Cast routines
-					 #       Fixed a unicode bug with file paths.
-					 #		 Fixed a unicode bug with some URLs containing UTF8 characters.
-					 #		 Fixed a bug were a bad image file could avbort the script.
-					 #		 Changed all subdirectory cover art to a copied graphic file "folder.jpg/png"
-					 #		 to conform to the Storage Group standard. This also works for local subdirs.
-					 #       Fixed a bug where a TV series with out a season specific poster or 
-					 #		 banner would get repeatedly download. 
-					 # 0.4.0 Removed a few lines of debugging code which should never have been left in a
-					 #       distrubuted version.
-					 #		 Fixed the check that confirms that all Video and graphic directories are
-					 #       read and writable.
-					 #		 Fixed a bug where under rare circumstances a graphic would be repeatedly
-					 #		 downloaded.  
-					 #		 Made the installation of the python IMDbPy library manditory.
-					 #       For all movies IMDB numbers will be used instead of converting to TMDB 
-					 #       numbers. This is done to maintain consistency with MythVideo movie inetref
-					 #       numbers.
-					 # 0.4.1 Fixed an obscure video file rename (-F option) error
-					 # 0.4.2 Fixed a bug where bad data for either TMDB or TVDB would abort script 
-					 # 0.4.3 Recent changes in the MythVideo UI graphic hunts (cover art and fanart) 
-                     #       have made Jamu's creation of "folder.xxx" graphics redundant. This 
-                     #       feature has been turned off in Jamu. There is a new user option 
-                     #       "folderart" that can reactivate this feature through the Jamu 
-                     #       configuration file.
-					 # 0.4.4 Changes to assist SG image hunting Jamu now adds the suffix "_coverart,
-                     #       _fanart, _banner, _screenshot" respectively to downloaded graphics.
-					 #       With the use of a graphic suffix the requirement for unique graphics 
-					 #       directories is gone. The check has been removed.
-					 # 0.4.5 Fixed a bug where lowercase tv video filenames caused graphics files to
-					 #       also be lowercase which can cause graphics to be downloaded twice.
-					 #       Fixed a bug in graphics file name creation for a TV season.
-					 #       Added checks for compatible python library versions of xml and MySQLdb
-					 # 0.4.6 Fixed a bug where a bad IMDB number in TMDB caused an abort.
-					 # 0.4.7 Fixed a bug where a 'recordedprogram' record is not properly paired with a
-                     #       'recorded' record. This results in no "airdate" information being available
-                     #       and a script abort. An airdate year of u'0000' will be assumed.
-					 #       Fix an abort bug when IMDB is having service problems and a list of 
-					 #       movies cannot be retrieved.
-					 # 0.4.8 Fixed a bug in a -MJ option check that removing graphics would not 
-                     #       conflict with graphic directories for non-Mythvideo plugins.
-					 # 0.4.9 Combine the video file extentions found in the "videotypes" table with those
-                     #       in Jamu to avoid possible issues in the (-MJ) option and to have tighter 
-                     #       integration with MythVideo user file extention settings. 
-					 # 0.5.0 Fixed a bug where a filename containing invalid characters caused an abort.
-                     #       Such invalid filenames are now skipped with an appropriate message.
-					 #       Added to the -MW option the fetching of graphics from TVDB and TMDB for 
-                     #       videos added by Miro Bridge to either Watched Recordings or MythVideo.
-                     #       If Miro Bridge is not being used no additional processing is performed.
-					 #       Two new sections ([mb_tv] and [mb_movies]) were added to the Jamu
-                     #       configuration file to accomodate this new functionality.
-					 #       The jamu configuration file now has a default name and location of
-					 #       "~/.mythtv/jamu.conf". This can be overridden with the command line option.
-					 #       This has been done so Jamu can better support Mythbuntu.
-					 #       Removed code that was required until ticket #6678 was committed with
-					 #       change set [21191]
-					 #       Filtered out checks for video run length on iso, img ... etc potentially
-                     #       large video files due to processing overhead especially on NFS mounts.
-					 #       With the -MW option skip any recordings who's recgroup is "Deleted"
-					 #       Fixed an abort where a TVDB TV series exists for a language but does not
-                     #       have a series name in other languages.
-					 # 0.5.1 Fixed an abort when a user specifies secondary source input parameters
-                     #       that cannot be parsed from the file name. This 
-					 #       covers secondary sources for metadata and graphics. 
-					 #       Fixed an abort when thetvdb.com cannot be contact due to network or
-                     #       site issues.
-					 #       Added detection of erroneous graphics file downloads that are actually HTML
-                     #       due to source Web site issues. Jamu's (-MJ) janitor option also detects,
-                     #       deletes these files and repairs the MythVideo record if necessary.
-					 #       For the -MW option any downloaded graphics names will use the title of the
-                     #       recorded program instead of that found on sources like TVDB and TMDB. This 
-                     #       resolves Watch Recordings image hunt issues when Schedule Direct uses a 
-                     #       different program title then is on either TVDB or TMDB.
-					 #       Fixed an obscure bug where TVDB returns empty graphics URLs along with 
-                     #       proper URLs. The empty URLs are now ignored.
-					 #       Fixed a bug when a language was specified and there were no graphics
-                     #       for the specified language none were returned/downloaded. This even when 
-                     #       graphics for other languages were available. Now if there are no selected
-                     #       language graphics English graphics are the fall back and if there are no 
-                     #       English graphics then any available graphics will be returned.
-					 # 0.5.2 Fixed an abort when trying to add a storage group graphics without a 
-                     #       proper file path.  
-					 # 0.5.3 Fixed a bug where the filemarkup table is not cleaned up if Jamu renames
-					 #       a Miro movie trailor video file that the user wants to keep in MythVideo.
-					 #       Fixed a bug with Miro video file renaming of Miro Movie trailers 
-                     #       for the same movie but which had different file extentions.
+__version__=u"v0.5.4" 
+ # 0.1.0 Initial development 
+ # 0.2.0 Inital beta release
+ # 0.3.0 Add mythvideo metadata updating including movie graphics through
+ #       the use of tmdb.pl when the perl script exists
+ # 0.3.1 Add mythvideo meta data add and update functionality. Intend use for 
+ #       maintenance cron jobs. 
+ #       Increase integration with mythtvideo download meta data and MythUI
+ #       Added the ability to movie video files while maintaining the metadata
+ # 0.3.2 Fixed bug where some poster downloads were unnecessary 
+ #       Fixed bug where the mythtv database was updated for no reason 
+ #       Fixed bug in jamu-example.conf "min_poster_size" variable had '=' not ':' 
+ #       Fixed bug where a unicode URL would abort the script 
+ #       Using ffmpeg added setting accurate video length in minutes. A hack but
+ #       lacked python method to find audio/video properties.
+ # 0.3.3 Add logic to skip any video with a inetref of '99999999'. Meta data and
+ #       graphics are all manually entered and should not be altered by Jamu.
+ #       Currently used for any meta data that you do not want modified by Jamu.
+ #       Fixed issues with filenames containing Unicode characters.
+ # 0.3.4 Added logic to skip any secondary source meta data plot less than 10 words.
+ #       Properly initialized a new record so warning messages do not display.
+ #       In plot meta data replace line-feeds with a space (e.g. Space Cowboys
+ #       plot contains line-feeds). Mythvideo does not expect line-feeds in a plot. 
+ #       Significant improvements in combining meta data between primary and 
+ #       secondary data sources.
+ #       Remove 'tmdb.pl' calls and use the tmdb api directly.
+ #       Added detection of broken symbolic links and fixed those links.
+ #       Fixed inconsistencies in graphics file extentions (as received from the 
+ #       sources), made all extentions lowercase and changed ".jpeg" to ".jpg". 
+ # 0.3.5 Fixed bug when themoviedb.com times out from an api request.
+ #       A few documentation corrections. 
+ #       Fixed a bug with utf8 directory names. 
+ #       Added code to not abort script when themoviedb.com has problems. The issue
+ #       is reported but the scripts continues processing. 
+ #       Added option "-W" to download graphics for Scheduled and Recorded videos.
+ #       Change the "-J" Janitor function to avoid deleting graphics for Scheduled
+ #		 and Recorded videos.
+ #       Fixed bug where a TMDB Poster image was not found when it was really 
+ #       available.
+ # 0.3.6 Fixed bug when searching themoviedb.com for a movie by title or 
+ #       alternate title.
+ #       Increased accuracy of non-interactive TMDB movie searching and matching.
+ #       Set up for transition to TMDB's beta v2.1 api which adds language support.
+ #       Corrected Watched Recording graphic file naming convention for movies.
+ #       If interactive mode is selected but an exact match is found for a movie
+ #       then the exact match is chosen and no interative session is initiated.
+ #       Added additional messages when access to MythTV python bindings has issues.
+ # 0.3.7 Removed some redundant code. 
+ #       Sync up with v1.0 of tvdb_api and new way to assign tvdb api key
+ #       Added an option (-MG) to allow Jamu best guessing at a video's inetref
+ #		 number. To guess accurately the video file name must be very close to
+ #		 those found on tmdb or imdb and tvdb web sites. 
+ #       Remove all use of the MythVideo.py "pruneMetadata" routine as it deletes
+ #       records from the Mythvideo table for all video files with relative file
+ #		 paths.
+ #       Jamu will skip processing any videometadata which is using a Storage group. 						 
+ #       Jamu will now restrict itself to updating only videometadata records whose
+ #       video files reside on the current host machine. In the case where a user 
+ #       has multiple backends jamu must run on each of those backends.
+ #       The Janitor option (-MJ) now checks if the users has set the plugins 
+ #       MythGallery, MythGame and MythMusic to use the same graphics directories as
+ #       MythVideo. If they share directories the Janitor option will exit 
+ #       without removing any graphics files. Messages indicating which directories
+ #       are in conflict will be displayed.
+ #       Added the detection of video or graphics on an NFS mount exiting jamu without
+ #       any processing and displaying a message why this has been done. A new option
+ #       for NFS (-MN) will allow a user to override this check and jamu will continue
+ #       processing.
+ #       Fixed a bug when TMDB does not have a 'year' for a movie (e.g. 'Bambi')
+ #		 Added compatibility with or without the MythTV.py Ticket #6678
+ #       Fixed a bug when ffmpeg cannot find the true length in minutes of a video
+ #       Cleaned up documenation consistency with Warning and Error messages. 
+ #       Added to the existing TV episode video file renaming (-MF) option. 
+ #       Now movie video files can also be renamed to the format "title (year)" 
+ #       e.g. "The Duchess (2008)". If tmdb.com has no year for the movie then only
+ #		 the movie title will be used when renaming. Any existing metadata is
+ #		 preserved.
+ # 0.3.8 Made changes to sync up with MythTV trunk change set [r21138]. 
+ #       Now handles TVDB's change from a 5 digit inetref number to 6 digits.
+ # 0.3.9 Check accessability (Read and Write) to directories and files before
+ #       including them in files/directories to process. 
+ #       Add the ability to process Storage Groups for all Videos and graphics.
+ #       Jamu now uses MythVideo.py binding's Genre and Cast routines
+ #       Fixed a unicode bug with file paths.
+ #		 Fixed a unicode bug with some URLs containing UTF8 characters.
+ #		 Fixed a bug were a bad image file could avbort the script.
+ #		 Changed all subdirectory cover art to a copied graphic file "folder.jpg/png"
+ #		 to conform to the Storage Group standard. This also works for local subdirs.
+ #       Fixed a bug where a TV series with out a season specific poster or 
+ #		 banner would get repeatedly download. 
+ # 0.4.0 Removed a few lines of debugging code which should never have been left in a
+ #       distrubuted version.
+ #		 Fixed the check that confirms that all Video and graphic directories are
+ #       read and writable.
+ #		 Fixed a bug where under rare circumstances a graphic would be repeatedly
+ #		 downloaded.  
+ #		 Made the installation of the python IMDbPy library manditory.
+ #       For all movies IMDB numbers will be used instead of converting to TMDB 
+ #       numbers. This is done to maintain consistency with MythVideo movie inetref
+ #       numbers.
+ # 0.4.1 Fixed an obscure video file rename (-F option) error
+ # 0.4.2 Fixed a bug where bad data for either TMDB or TVDB would abort script 
+ # 0.4.3 Recent changes in the MythVideo UI graphic hunts (cover art and fanart) 
+ #       have made Jamu's creation of "folder.xxx" graphics redundant. This 
+ #       feature has been turned off in Jamu. There is a new user option 
+ #       "folderart" that can reactivate this feature through the Jamu 
+ #       configuration file.
+ # 0.4.4 Changes to assist SG image hunting Jamu now adds the suffix "_coverart,
+ #       _fanart, _banner, _screenshot" respectively to downloaded graphics.
+ #       With the use of a graphic suffix the requirement for unique graphics 
+ #       directories is gone. The check has been removed.
+ # 0.4.5 Fixed a bug where lowercase tv video filenames caused graphics files to
+ #       also be lowercase which can cause graphics to be downloaded twice.
+ #       Fixed a bug in graphics file name creation for a TV season.
+ #       Added checks for compatible python library versions of xml and MySQLdb
+ # 0.4.6 Fixed a bug where a bad IMDB number in TMDB caused an abort.
+ # 0.4.7 Fixed a bug where a 'recordedprogram' record is not properly paired with a
+ #       'recorded' record. This results in no "airdate" information being available
+ #       and a script abort. An airdate year of u'0000' will be assumed.
+ #       Fix an abort bug when IMDB is having service problems and a list of 
+ #       movies cannot be retrieved.
+ # 0.4.8 Fixed a bug in a -MJ option check that removing graphics would not 
+ #       conflict with graphic directories for non-Mythvideo plugins.
+ # 0.4.9 Combine the video file extentions found in the "videotypes" table with those
+ #       in Jamu to avoid possible issues in the (-MJ) option and to have tighter 
+ #       integration with MythVideo user file extention settings. 
+ # 0.5.0 Fixed a bug where a filename containing invalid characters caused an abort.
+ #       Such invalid filenames are now skipped with an appropriate message.
+ #       Added to the -MW option the fetching of graphics from TVDB and TMDB for 
+ #       videos added by Miro Bridge to either Watched Recordings or MythVideo.
+ #       If Miro Bridge is not being used no additional processing is performed.
+ #       Two new sections ([mb_tv] and [mb_movies]) were added to the Jamu
+ #       configuration file to accomodate this new functionality.
+ #       The jamu configuration file now has a default name and location of
+ #       "~/.mythtv/jamu.conf". This can be overridden with the command line option.
+ #       This has been done so Jamu can better support Mythbuntu.
+ #       Removed code that was required until ticket #6678 was committed with
+ #       change set [21191]
+ #       Filtered out checks for video run length on iso, img ... etc potentially
+ #       large video files due to processing overhead especially on NFS mounts.
+ #       With the -MW option skip any recordings who's recgroup is "Deleted"
+ #       Fixed an abort where a TVDB TV series exists for a language but does not
+ #       have a series name in other languages.
+ # 0.5.1 Fixed an abort when a user specifies secondary source input parameters
+ #       that cannot be parsed from the file name. This 
+ #       covers secondary sources for metadata and graphics. 
+ #       Fixed an abort when thetvdb.com cannot be contact due to network or
+ #       site issues.
+ #       Added detection of erroneous graphics file downloads that are actually HTML
+ #       due to source Web site issues. Jamu's (-MJ) janitor option also detects,
+ #       deletes these files and repairs the MythVideo record if necessary.
+ #       For the -MW option any downloaded graphics names will use the title of the
+ #       recorded program instead of that found on sources like TVDB and TMDB. This 
+ #       resolves Watch Recordings image hunt issues when Schedule Direct uses a 
+ #       different program title then is on either TVDB or TMDB.
+ #       Fixed an obscure bug where TVDB returns empty graphics URLs along with 
+ #       proper URLs. The empty URLs are now ignored.
+ #       Fixed a bug when a language was specified and there were no graphics
+ #       for the specified language none were returned/downloaded. This even when 
+ #       graphics for other languages were available. Now if there are no selected
+ #       language graphics English graphics are the fall back and if there are no 
+ #       English graphics then any available graphics will be returned.
+ # 0.5.2 Fixed an abort when trying to add a storage group graphics without a 
+ #       proper file path.  
+ # 0.5.3 Fixed a bug where the filemarkup table is not cleaned up if Jamu renames
+ #       a Miro movie trailer video file that the user wants to keep in MythVideo.
+ #       Fixed a bug with Miro video file renaming of Miro Movie trailers 
+ #       for the same movie but which had different file extentions.
+ # 0.5.4 Conform to changeset 22104 setting of SG graphics directories to default to SG Videos if not configured.
 
 
 usage_txt=u'''
@@ -1524,6 +1528,9 @@ class Configuration(object):
 		for key in dir_dict.keys():
 			if key == 'episodeimagedir': # Jamu does nothing with Screenshots
 				continue
+			# The fall back graphics SG is the Videos SG directory as of changeset 22104
+			if storagegroups.has_key(u'mythvideo') and not len(self.config[key]):
+				self.config[key] = storagegroups[u'mythvideo']
 			if not len(self.config[key]):
 	 			sys.stderr.write(u"\n! Error: There must be a directory for Videos and each graphic type. The (%s) directory is missing.\n" % (key))
 				sys.exit(False)
