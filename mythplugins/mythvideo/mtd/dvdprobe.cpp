@@ -439,6 +439,13 @@ bool DVDProbe::Probe(void)
         return false;
     }
 
+    if (!dvdDevice.open(QIODevice::ReadOnly))
+    {
+        // Can't open device.
+        Reset();
+        return false;
+    }
+
     int drive_handle = dvdDevice.handle();
 
     if (drive_handle == -1)
@@ -489,13 +496,6 @@ bool DVDProbe::Probe(void)
         return titles.size();
     }
 #endif
-
-    if (!dvdDevice.open(QIODevice::ReadOnly))
-    {
-        // Can't open device.
-        Reset();
-        return false;
-    }
 
     dvdDevice.close();
 
