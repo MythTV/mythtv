@@ -168,8 +168,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         fromBase = true;
     }
 
-    int size, sizeSmall, sizeBig;
-    size = sizeSmall = sizeBig = -1;
+    int size, pixelsize;
+    size = pixelsize = -1;
 
     QString face = element.attribute("face", "");
     if (face.isEmpty())
@@ -208,13 +208,9 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             {
                 size = getFirstText(info).toInt();
             }
-            else if (info.tagName() == "size:small")
+            else if (info.tagName() == "pixelsize")
             {
-                sizeSmall = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "size:big")
-            {
-                sizeBig = getFirstText(info).toInt();
+                pixelsize = getFirstText(info).toInt();
             }
             else if (info.tagName() == "color")
             {
@@ -357,20 +353,13 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         }
     }
 
-    if (sizeSmall > 0 && fontSizeType == "small")
-    {
-        size = sizeSmall;
-    }
-    else if (sizeBig > 0 && fontSizeType == "big")
-    {
-        size = sizeBig;
-    }
-
-    if (size <= 0 && !fromBase)
+    if (size <= 0 && pixelsize <= 0 && !fromBase)
     {
         VERBOSE(VB_IMPORTANT, "Error, font size must be > 0");
         return NULL;
     }
+    else if (pixelsize > 0)
+        newFont->m_face.setPixelSize(GetMythMainWindow()->NormY(pixelsize));
     else if (size > 0)
         newFont->m_face.setPointSize(GetMythMainWindow()->NormalizeFontSize(size));
 
