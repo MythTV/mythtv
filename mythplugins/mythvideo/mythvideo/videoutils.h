@@ -23,7 +23,7 @@ void CheckedSet(class MythUIImage *uiItem, const QString &filename);
 
 bool GetRemoteFileList(QString host, QString path, QStringList* list,
                        QString sgroup, bool fileNamesOnly = false);
-bool ClearRemoteSGMap(void);
+void ClearRemoteSGMap(void);
 QString GenRemoteFileURL(QString sgroup, QString host, QString path);
 QStringList GetVideoDirsByHost(QString host);
 QStringList GetVideoDirs();

@@ -2110,14 +2110,14 @@ void VideoDialog::fetchVideos()
     if (!m_d->m_treeLoaded)
     {
         m_d->m_rootNode = m_d->m_videoList->buildVideoList(m_d->m_isFileBrowser,
-                m_d->m_isGroupList, m_d->m_groupType,
+                m_d->m_isFlatList, m_d->m_isGroupList, m_d->m_groupType,
                 m_d->m_parentalLevel.GetLevel(), true);
     }
     else
     {
         m_d->m_videoList->refreshList(m_d->m_isFileBrowser,
                 m_d->m_parentalLevel.GetLevel(),
-                m_d->m_isGroupList, m_d->m_groupType);
+                m_d->m_isFlatList, m_d->m_isGroupList, m_d->m_groupType);
         m_d->m_rootNode = m_d->m_videoList->GetTreeRoot();
     }
 

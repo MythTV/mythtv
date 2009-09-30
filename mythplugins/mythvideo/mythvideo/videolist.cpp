@@ -646,12 +646,12 @@ class VideoListImp
 
     void build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                             bool include_updirs);
-    MythGenericTree *buildVideoList(bool filebrowser, bool group_list,
+    MythGenericTree *buildVideoList(bool filebrowser, bool flatlist, bool group_list,
                                 int group_type, const ParentalLevel &parental_level,
                                 bool include_updirs);
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
-                     bool group_list, int group_type);
+                     bool flatlist, bool group_list, int group_type);
 
     unsigned int count() const
     {
@@ -749,19 +749,19 @@ VideoList::~VideoList()
     delete m_imp;
 }
 
-MythGenericTree *VideoList::buildVideoList(bool filebrowser,
+MythGenericTree *VideoList::buildVideoList(bool filebrowser, bool flatlist,
     bool grouplist, int group_type, const ParentalLevel &parental_level,
     bool include_updirs)
 {
-    return m_imp->buildVideoList(filebrowser, grouplist, group_type,
-                                 parental_level, include_updirs);
+    return m_imp->buildVideoList(filebrowser, flatlist, grouplist,
+                                 group_type, parental_level, include_updirs);
 }
 
 void VideoList::refreshList(bool filebrowser,
                             const ParentalLevel &parental_level,
-                            bool group_list, int group_type)
+                            bool flat_list, bool group_list, int group_type)
 {
-    m_imp->refreshList(filebrowser, parental_level, group_list,
+    m_imp->refreshList(filebrowser, parental_level, flat_list, group_list,
                        group_type);
 }
 
@@ -880,12 +880,12 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
 //      videos found.
 //      If false, the hierarchy present on the filesystem or in the database
 //      is preserved. In this mode, both sub-dirs and updirs are present.
-MythGenericTree *VideoListImp::buildVideoList(bool filebrowser,
+MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
                                           bool grouplist, int group_type,
                                           const ParentalLevel &parental_level,
                                           bool include_updirs)
 {
-    refreshList(filebrowser, parental_level, grouplist, group_type);
+    refreshList(filebrowser, parental_level, flatlist, grouplist, group_type);
 
     typedef std::map<QString, MythGenericTree *> string_to_tree;
     string_to_tree prefix_tree_map;
@@ -909,9 +909,9 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser,
 
 void VideoListImp::refreshList(bool filebrowser,
                                const ParentalLevel &parental_level,
-                               bool group_list, int group_type)
+                               bool flat_list, bool group_list,
+                               int group_type)
 {
-    bool flat_list = false;
 
     m_video_filter.setParentalLevel(parental_level.GetLevel());
 
@@ -934,7 +934,7 @@ void VideoListImp::refreshList(bool filebrowser,
                     VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Group mode")); 
                     break; 
                 case 2: 
-                    fillMetadata(ltDBCategoryGroup); 
+                    fillMetadata(ltDBCategoryGroup);
                     VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Category mode")); 
                     break; 
                 case 3:
@@ -964,10 +964,7 @@ void VideoListImp::refreshList(bool filebrowser,
             } 
         } 
         else 
-        { 
             fillMetadata(ltDBMetadata); 
-            flat_list = true; 
-        } 
     } 
     update_meta_view(flat_list);
 }

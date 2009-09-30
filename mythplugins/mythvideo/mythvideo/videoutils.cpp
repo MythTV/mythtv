@@ -69,7 +69,7 @@ void CheckedSet(MythUIImage *uiItem, const QString &filename)
 static QMutex cacheLock;
 static QHash <QString, QString>sgroupMap;
 
-bool ClearRemoteSGMap(void)
+void ClearRemoteSGMap(void)
 {
     QMutexLocker locker(&cacheLock);
     sgroupMap.clear();
