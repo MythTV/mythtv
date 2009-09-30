@@ -4216,6 +4216,8 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 {
     ProgramInfo *tmpItem = CurrentItem();
 
+    newRecGroup = newRecGroup.simplified();
+
     if (newRecGroup.isEmpty() || !tmpItem)
         return;
 
