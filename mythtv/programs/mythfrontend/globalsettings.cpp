@@ -347,33 +347,6 @@ static HostCheckBox *RememberRecGroup()
     return gc;
 }
 
-static HostComboBox *DefaultView()
-{
-    HostComboBox *gc = new HostComboBox("DisplayGroupDefaultView");
-    gc->setLabel(QObject::tr("Default View"));
-
-    gc->addSelection(QObject::tr("Show Titles only"),
-            QString::number(PlaybackBox::TitlesOnly));
-    gc->addSelection(QObject::tr("Show Titles and Categories"),
-            QString::number(PlaybackBox::TitlesCategories));
-    gc->addSelection(QObject::tr(
-                "Show Titles, Categories, and Recording Groups"),
-            QString::number(PlaybackBox::TitlesCategoriesRecGroups));
-    gc->addSelection(QObject::tr("Show Titles and Recording Groups"),
-            QString::number(PlaybackBox::TitlesRecGroups));
-    gc->addSelection(QObject::tr("Show Categories only"),
-            QString::number(PlaybackBox::Categories));
-    gc->addSelection(QObject::tr("Show Categories and Recording Groups"),
-            QString::number(PlaybackBox::CategoriesRecGroups));
-    gc->addSelection(QObject::tr("Show Recording Groups only"),
-            QString::number(PlaybackBox::RecGroups));
-
-    gc->setHelpText(QObject::tr("Select what type of grouping to show on the "
-                    "Watch Recordings screen by default."));
-
-    return gc;
-}
-
 static HostCheckBox *UseGroupNameAsAllPrograms()
 {
     HostCheckBox *gc = new HostCheckBox("DispRecGroupAsAllProg");
@@ -3781,29 +3754,6 @@ static HostComboBox *DisplayGroupTitleSort()
     return gc;
 }
 
-class DefaultViewSettings : public TriggeredConfigurationGroup
-{
-  public:
-    DefaultViewSettings() :
-        TriggeredConfigurationGroup(false, false, true, true)
-    {
-        HostComboBox *defaultView = DefaultView();
-        addChild(defaultView);
-        setTrigger(defaultView);
-
-        HostComboBox *titleSort = DisplayGroupTitleSort();
-
-        for (unsigned int ii = 0; ii < PlaybackBox::ViewTypes; ++ii)
-        {
-            if (ii == PlaybackBox::TitlesOnly)
-                addTarget(QString::number(ii), titleSort);
-            else
-                addTarget(QString::number(ii),
-                        new VerticalConfigurationGroup(false, false));
-        }
-    }
-};
-
 static HostCheckBox *PlaybackWatchList()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackWatchList");
@@ -4870,7 +4820,7 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
     pbox3->setLabel(QObject::tr("View Recordings") +
                     QString(" (%1/%2)").arg(++i).arg(total));
-    pbox3->addChild(new DefaultViewSettings());
+    pbox3->addChild(DisplayGroupTitleSort());
     pbox3->addChild(new WatchListSettings());
     addChild(pbox3);
 
