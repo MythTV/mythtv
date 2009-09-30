@@ -2,21 +2,21 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="DejaVu Sans">
-        <size>14</size>
+    <font name="basesmall" face="Arial">
+        <pixelsize>19</pixelsize>
         <color>#DDDDDD</color>
     </font>
 
     <font name="basemedium" from="basesmall">
-        <size>16</size>
+        <pixelsize>22</pixelsize>
     </font>
 
     <font name="baselarge" from="basesmall">
-        <size>21</size>
+        <pixelsize>29</pixelsize>
     </font>
 
     <font name="baseextralarge" from="basesmall">
-        <size>22</size>
+        <pixelsize>31</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
