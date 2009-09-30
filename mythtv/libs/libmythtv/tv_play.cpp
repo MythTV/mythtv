@@ -933,6 +933,12 @@ TV::~TV(void)
 {
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- begin");
 
+    if (udpnotify)
+    {
+        udpnotify->deleteLater();
+        udpnotify = NULL;
+    }
+
     gContext->removeListener(this);
 
     GetMythMainWindow()->SetDrawEnabled(true);
