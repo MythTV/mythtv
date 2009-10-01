@@ -217,6 +217,10 @@ class MPUBLIC ChannelUtil
                                    uint           sourceid,
                                    const QString &channum);
 
+    static bool    SetChannelValue(const QString &field_name,
+                                   QString        value,
+                                   int            chanid);
+
     static const QString kATSCSeparators;
 
   private:

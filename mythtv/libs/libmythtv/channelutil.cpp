@@ -1083,6 +1083,22 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
     return query.exec();
 }
 
+bool ChannelUtil::SetChannelValue(const QString &field_name,
+                                  QString        value,
+                                  int            chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        QString("UPDATE channel SET channel.%1=:VALUE "
+                "WHERE channel.chanid = :CHANID").arg(field_name));
+
+    query.bindValue(":VALUE",  value);
+    query.bindValue(":CHANID", chanid);
+
+    return query.exec();
+}
+
 /** Returns the DVB default authority for the chanid given. */
 QString ChannelUtil::GetDefaultAuthority(uint chanid)
 {
