@@ -183,6 +183,8 @@ const DTVParamHelperStruct DTVCodeRate::parseTable[] =
     { "7/8",  kFEC_7_8 },
     { "8/9",  kFEC_8_9 },
     { "none", kFECNone },
+    { "3/5",  KFEC_3_5 },
+    { "9/10", KFEC_9_10},
     { NULL,   kFECAuto }
 };
 
