@@ -2829,17 +2829,6 @@ static HostComboBox *MythTimeFormat()
     return gc;
 }
 
-static HostComboBox *ThemeFontSizeType()
-{
-    HostComboBox *gc = new HostComboBox("ThemeFontSizeType");
-    gc->setLabel(QObject::tr("Font size"));
-    gc->addSelection(QObject::tr("default"), "default");
-    gc->addSelection(QObject::tr("small"), "small");
-    gc->addSelection(QObject::tr("big"), "big");
-    gc->setHelpText(QObject::tr("default: TV, small: monitor, big:"));
-    return gc;
-}
-
 static HostComboBox *ThemePainter()
 {
     HostComboBox *gc = new HostComboBox("ThemePainter");
@@ -5072,7 +5061,6 @@ AppearanceSettings::AppearanceSettings()
 
     theme->addChild(ThemePainter());
     theme->addChild(new StyleSetting());
-    theme->addChild(ThemeFontSizeType());
     theme->addChild(MenuTheme());
     addChild(theme);
 
