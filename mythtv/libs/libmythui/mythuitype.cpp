@@ -206,7 +206,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
 
     if (GetArea().contains(p))
     {
-        if (!IsVisible())
+        if (!IsVisible() || !IsEnabled())
             return NULL;
 
         if (m_ChildrenList.isEmpty())
