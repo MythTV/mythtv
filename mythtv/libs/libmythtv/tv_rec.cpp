@@ -128,6 +128,10 @@ TVRec::TVRec(int capturecardnum)
       internalState(kState_None), desiredNextState(kState_None),
       changeState(false), pauseNotify(true),
       stateFlags(0), lastTuningRequest(0),
+      triggerEventLoopLock(QMutex::NonRecursive),
+      triggerEventLoopSignal(false),
+      triggerEventSleepLock(QMutex::NonRecursive),
+      triggerEventSleepSignal(false),
       m_switchingBuffer(false),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
@@ -310,6 +314,13 @@ void TVRec::TeardownAll(void)
     TeardownRecorder(true);
 
     SetRingBuffer(NULL);
+}
+
+void TVRec::WakeEventLoop(void)
+{
+    QMutexLocker locker(&triggerEventLoopLock);
+    triggerEventLoopSignal = true;
+    triggerEventLoopWait.wakeAll();
 }
 
 /** \fn TVRec::GetState() const
@@ -954,7 +965,7 @@ void TVRec::ChangeState(TVState nextState)
 
     desiredNextState = nextState;
     changeState = true;
-    triggerEventLoop.wakeAll();
+    WakeEventLoop();
 }
 
 /** \fn TVRec::SetupRecorder(RecordingProfile&)
@@ -1371,11 +1382,6 @@ void TVRec::RunTV(void)
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (HasFlags(kFlagRunMainLoop))
     {
         // If there is a state change queued up, do it...
@@ -1543,12 +1549,30 @@ void TVRec::RunTV(void)
         // WaitforEventThreadSleep() will still work...
         if (tuningRequests.empty() && !changeState)
         {
-            triggerEventSleep.wakeAll();
-            lock.mutex()->unlock();
+            lock.unlock(); // stateChangeLock
+
+            {
+                QMutexLocker locker(&triggerEventSleepLock);
+                triggerEventSleepSignal = true;
+                triggerEventSleepWait.wakeAll();
+            }
+
             sched_yield();
-            triggerEventSleep.wakeAll();
-            triggerEventLoop.wait(&mutex, 1000 /* ms */);
-            lock.mutex()->lock();
+
+            {
+                QMutexLocker locker(&triggerEventLoopLock);
+                // We check tELSignal because it is possible
+                // that WakeEventLoop() was called since we
+                // unlocked the stateChangeLock
+                if (!triggerEventLoopSignal)
+                {
+                    triggerEventLoopWait.wait(
+                        &triggerEventLoopLock, 1000 /* ms */);
+                }
+                triggerEventLoopSignal = false;
+            }
+
+            lock.relock(); // stateChangeLock
         }
     }
 
@@ -1559,13 +1583,13 @@ void TVRec::RunTV(void)
     }
 }
 
+/** \fn TVRec::WaitForEventThreadSleep(bool wake, ulong time)
+ *
+ *  You MUST HAVE the stateChange-lock locked when you call this method!
+ */
+
 bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
 {
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     bool ok = false;
     MythTimer t;
     t.start();
@@ -1573,13 +1597,19 @@ bool TVRec::WaitForEventThreadSleep(bool wake, ulong time)
     while (!ok && ((unsigned long) t.elapsed()) < time)
     {
         if (wake)
-            triggerEventLoop.wakeAll();
+            WakeEventLoop();
 
         stateChangeLock.unlock();
-        // It is possible for triggerEventSleep.wakeAll() to be sent
-        // before we enter wait so we only wait 100 ms so we can try
-        // again a few times before 15 second timeout on frontend...
-        triggerEventSleep.wait(&mutex, 100);
+
+        sched_yield();
+
+        {
+            QMutexLocker locker(&triggerEventSleepLock);
+            if (!triggerEventSleepSignal)
+                triggerEventSleepWait.wait(&triggerEventSleepLock);
+            triggerEventSleepSignal = false;
+        }
+
         stateChangeLock.lock();
 
         // verify that we were triggered.
@@ -2926,10 +2956,7 @@ void TVRec::PauseRecorder(void)
 void TVRec::RecorderPaused(void)
 {
     if (pauseNotify)
-    {
-        QMutexLocker lock(&stateChangeLock);
-        triggerEventLoop.wakeAll();
-    }
+        WakeEventLoop();
 }
 
 /**
@@ -4205,7 +4232,7 @@ void TVRec::SetFlags(uint f)
     stateFlags |= f;
     VERBOSE(VB_RECORD, LOC + QString("SetFlags(%1) -> %2")
             .arg(FlagToString(f)).arg(FlagToString(stateFlags)));
-    triggerEventLoop.wakeAll();
+    WakeEventLoop();
 }
 
 void TVRec::ClearFlags(uint f)
@@ -4214,7 +4241,7 @@ void TVRec::ClearFlags(uint f)
     stateFlags &= ~f;
     VERBOSE(VB_RECORD, LOC + QString("ClearFlags(%1) -> %2")
             .arg(FlagToString(f)).arg(FlagToString(stateFlags)));
-    triggerEventLoop.wakeAll();
+    WakeEventLoop();
 }
 
 QString TVRec::FlagToString(uint f)

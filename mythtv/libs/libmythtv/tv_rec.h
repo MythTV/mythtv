@@ -21,6 +21,9 @@
 
 #include "mythconfig.h"
 
+// locking order
+// stateChangeLock -> triggerEventLoopLock
+
 class NuppelVideoRecorder;
 class RingBuffer;
 class EITScanner;
@@ -251,7 +254,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
 
     static TVRec *GetTVRec(uint cardid);
 
-    virtual void AllGood(void) { triggerEventLoop.wakeAll(); }
+    virtual void AllGood(void) { WakeEventLoop(); }
     virtual void StatusSignalLock(const SignalMonitorValue&) { }
     virtual void StatusSignalStrength(const SignalMonitorValue&) { }
 
@@ -265,6 +268,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     void SetRingBuffer(RingBuffer *);
     void SetPseudoLiveTVRecording(ProgramInfo*);
     void TeardownAll(void);
+    void WakeEventLoop(void);
 
     static bool GetDevices(int cardid,
                            GeneralDBOptions   &general_opts,
@@ -378,8 +382,12 @@ class MPUBLIC TVRec : public SignalMonitorListener
     TuningQueue    tuningRequests;
     TuningRequest  lastTuningRequest;
     QDateTime      eitScanStartTime;
-    QWaitCondition triggerEventLoop;
-    QWaitCondition triggerEventSleep;
+    mutable QMutex triggerEventLoopLock;
+    QWaitCondition triggerEventLoopWait;
+    bool           triggerEventLoopSignal;
+    mutable QMutex triggerEventSleepLock;
+    QWaitCondition triggerEventSleepWait;
+    bool           triggerEventSleepSignal;
     bool           m_switchingBuffer;
 
     // Current recording info
