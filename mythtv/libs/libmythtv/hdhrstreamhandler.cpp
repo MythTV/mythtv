@@ -616,13 +616,16 @@ bool HDHRStreamHandler::Connect(void)
 
 bool HDHRStreamHandler::EnterPowerSavingMode(void)
 {
-    if (!hdhomerun_device_get_video_sock(_hdhomerun_device))
+    QMutexLocker locker(&_listener_lock);
+
+    if (!_stream_data_list.empty())
     {
         VERBOSE(VB_RECORD, LOC + "Ignoring request - video streaming active");
         return false;
     }
     else
     {
+        locker.unlock(); // _listener_lock
         return TuneChannel("none");
     }
 }
