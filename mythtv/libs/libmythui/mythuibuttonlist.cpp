@@ -903,8 +903,9 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-        QPoint position = event->GetPosition();
-
+        // We want the relative position of the click
+        QPoint position = event->GetPosition() - m_Parent->GetArea().topLeft();
+        
         MythUIType *type = uitype->GetChildAt(position,false,false);
 
         if (!type)
