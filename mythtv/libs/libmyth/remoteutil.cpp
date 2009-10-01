@@ -6,6 +6,7 @@
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "decodeencode.h"
+#include "storagegroup.h"
 
 vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
 {
@@ -369,6 +370,78 @@ int RemoteGetFreeRecorderCount(void)
     }
 
     return strlist[0].toInt();
+}
+
+static QMutex sgroupMapLock;
+static QHash <QString, QString>sgroupMap;
+
+void RemoteClearSGMap(void)
+{
+    QMutexLocker locker(&sgroupMapLock);
+    sgroupMap.clear();
+}
+
+QString GetHostSGToUse(QString host, QString sgroup)
+{
+    QString tmpGroup = sgroup;
+    QString groupKey = QString("%1:%2").arg(sgroup, host);
+
+    QMutexLocker locker(&sgroupMapLock);
+
+    if (sgroupMap.contains(groupKey))
+    {
+        tmpGroup = sgroupMap[groupKey];
+    }
+    else
+    {
+        if (StorageGroup::FindDirs(sgroup, host))
+        {
+            sgroupMap[groupKey] = sgroup;
+        }
+        else
+        {
+            VERBOSE(VB_FILE+VB_EXTRA, QString("GetHostSGToUse(): "
+                    "falling back to Videos Storage Group for host %1 "
+                    "since it does not have a %2 Storage Group.")
+                    .arg(host).arg(sgroup));
+
+            tmpGroup = "Videos";
+            sgroupMap[groupKey] = tmpGroup;
+        }
+    }
+
+    return tmpGroup;
+}
+
+bool RemoteGetFileList(QString host, QString path, QStringList* list,
+                       QString sgroup, bool fileNamesOnly)
+{
+
+    // Make sure the list is empty when we get started
+    list->clear();
+
+    if (sgroup.isEmpty())
+        sgroup = "Videos";
+
+    *list << "QUERY_SG_GETFILELIST";
+    *list << host;
+    *list << GetHostSGToUse(host, sgroup);
+    *list << path;
+    *list << QString::number(fileNamesOnly);
+
+    bool ok = gContext->SendReceiveStringList(*list);
+
+// Should the SLAVE UNREACH test be here ?
+    return ok;
+}
+
+QString RemoteGenFileURL(QString sgroup, QString host, QString path)
+{
+    return QString("myth://%1@").arg(GetHostSGToUse(host, sgroup)) +
+              gContext->GetSettingOnHost("BackendServerIP", host) + ":" +
+              gContext->GetSettingOnHost("BackendServerPort", host) + "/" +
+              path;
+
 }
 
 /**
