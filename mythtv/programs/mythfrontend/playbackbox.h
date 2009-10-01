@@ -309,7 +309,7 @@ class PlaybackBox : public ScheduleCommon
 
     QString testImageFiles(QString &testDirectory,
                            QString &seriesID, QString &titleIn,
-                           QString imagetype);
+                           QString imagetype, QString host);
 
     void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);

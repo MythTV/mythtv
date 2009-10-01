@@ -30,6 +30,7 @@
 #include "mythcontext.h"
 #include "remoteutil.h"
 #include "util.h"
+#include "storagegroup.h"
 
 // libmythui
 #include "mythuihelper.h"
@@ -358,6 +359,9 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
             m_recGroup = tmp;
     }
 
+    // Clear SG Map
+    RemoteClearSGMap();
+
     // recording group stuff
     m_recGroupIdx = -1;
     m_recGroupType.clear();
@@ -634,6 +638,8 @@ void PlaybackBox::UpdateProgramInfo(
             m_previewImage->Load();
         }
 
+        QString hostip = pginfo->hostname;
+
         if (m_fanart)
         {
             QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
@@ -642,7 +648,8 @@ void PlaybackBox::UpdateProgramInfo(
             QString fanartFile = testImageFiles(fanartDir,
                                                 fanartSeriesID,
                                                 fanartTitle,
-                                                "fanart");
+                                                "fanart",
+                                                hostip);
             m_fanart->SetVisible(!fanartFile.isEmpty());
             m_fanart->SetFilename(fanartFile);
             m_fanart->Load();
@@ -656,7 +663,8 @@ void PlaybackBox::UpdateProgramInfo(
             QString bannerFile = testImageFiles(bannerDir,
                                                 bannerSeriesID,
                                                 bannerTitle,
-                                                "banner");
+                                                "banner",
+                                                hostip);
             m_banner->SetVisible(!bannerFile.isEmpty());
             m_banner->SetFilename(bannerFile);
             m_banner->Load();
@@ -670,7 +678,8 @@ void PlaybackBox::UpdateProgramInfo(
             QString coverFile = testImageFiles(coverDir,
                                                coverSeriesID,
                                                coverTitle,
-                                               "coverart");
+                                               "coverart",
+                                               hostip);
             m_coverart->SetVisible(!coverFile.isEmpty());
             m_coverart->SetFilename(coverFile);
             m_coverart->Load();
@@ -1930,7 +1939,7 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
 }
 
 QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
-                                    QString &titleIn, QString imagetype)
+                                    QString &titleIn, QString imagetype, QString host)
 {
     static QHash <QString, QString>imageFileCache;
 
@@ -1941,6 +1950,14 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
         return imageFileCache[cacheKey];
 
     QString foundFile;
+    QString sgroup;
+
+    if (imagetype == "coverart")
+        sgroup = "Coverart";
+    if (imagetype == "fanart")
+        sgroup = "Fanart";
+    if (imagetype == "banner")
+        sgroup = "Banners";
 
     // Attempts to match image file in specified directory.
     // Falls back like this:
@@ -1971,6 +1988,9 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
     dir.setSorting(QDir::Name | QDir::Reversed | QDir::IgnoreCase);
 
     QStringList entries = dir.entryList();
+    QStringList sgEntries;
+
+    RemoteGetFileList(host, "", &sgEntries, sgroup, true); 
 
     int regIndex = 0;
     titleIn.replace(' ', "(?:\\s|-|_|\\.)?");
@@ -2009,12 +2029,25 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
                 break;
             }
         }
+        for (QStringList::const_iterator it = sgEntries.begin();
+            it != sgEntries.end(); ++it)
+        {
+            if (re.exactMatch(*it))
+            {
+                foundFile = RemoteGenFileURL(sgroup, host, *it);
+                break;
+            }
+        }
         reg = regs[++regIndex];
     }
 
     if (!foundFile.isEmpty())
     {
-        imageFileCache[cacheKey] = QString("%1/%2").arg(testDirectory).arg(foundFile);
+        if (foundFile.startsWith("myth://"))
+            imageFileCache[cacheKey] = foundFile;
+        else
+            imageFileCache[cacheKey] = QString("%1/%2")
+                               .arg(testDirectory).arg(foundFile);
         return imageFileCache[cacheKey];
     }
     else
