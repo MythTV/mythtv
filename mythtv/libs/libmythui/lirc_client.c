@@ -932,8 +932,8 @@ int lirc_readconfig(const struct lirc_state *state,
 		goto lirc_readconfig_compat;
 	}
 	
-	if(sha_bang!=NULL) free(sha_bang);
-	free(filename);
+	if(sha_bang!=NULL) { free(sha_bang); sha_bang = NULL; }
+	free(filename); filename = NULL;
 	
 	sockfd=socket(AF_UNIX,SOCK_STREAM,0);
 	if(sockfd==-1)
