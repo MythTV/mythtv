@@ -4,6 +4,7 @@
 
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythsystem.h>
+#include <mythtv/libmyth/remoteutil.h>
 
 #include "dbaccess.h"
 #include "metadata.h"
@@ -201,7 +202,7 @@ class VideoPlayerCommandPrivate
             QString filename;
 
             if (item->IsHostSet())
-                filename = GenRemoteFileURL("Videos", item->GetHost(),
+                filename = RemoteGenFileURL("Videos", item->GetHost(),
                         item->GetFilename());
             else
                 filename = item->GetFilename();
@@ -229,7 +230,7 @@ class VideoPlayerCommandPrivate
             QString filename;
 
             if (item->IsHostSet())
-                filename = GenRemoteFileURL("Videos", item->GetHost(),
+                filename = RemoteGenFileURL("Videos", item->GetHost(),
                         item->GetFilename());
             else
                 filename = item->GetFilename();

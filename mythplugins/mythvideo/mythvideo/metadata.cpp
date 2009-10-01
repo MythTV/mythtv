@@ -8,6 +8,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdb.h>
 #include <mythtv/libmyth/remotefile.h>
+#include <mythtv/libmyth/remoteutil.h>
 #include <mythtv/libmythdb/mythverbose.h>
 
 #include "globals.h"
@@ -394,7 +395,7 @@ bool MetadataImp::DeleteFile(class VideoList &dummy)
 
     if (!m_host.isEmpty())
     {
-        QString url = GenRemoteFileURL("Videos", m_host, m_filename);
+        QString url = RemoteGenFileURL("Videos", m_host, m_filename);
         isremoved = RemoteFile::DeleteFile(url);
     }
     else
