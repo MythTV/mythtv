@@ -26,14 +26,15 @@ ImportIconsWizard::ImportIconsWizard(MythScreenStack *parent, bool fRefresh,
     m_strChannelname(channelname), m_fRefresh(fRefresh),
     m_nMaxCount(0),                m_nCount(0),
     m_missingMaxCount(0),          m_missingCount(0),
-    m_url("http://services.mythtv.org/channel-icon/")
+    m_url("http://services.mythtv.org/channel-icon/"), m_progressDialog(NULL),
+    m_iconsList(NULL),             m_manualEdit(NULL),
+    m_nameText(NULL),              m_manualButton(NULL),
+    m_skipButton(NULL),            m_statusText(NULL)
 {
-
     m_strChannelname.detach();
     VERBOSE(VB_IMPORTANT, QString("Fetch Icons for channel %1").arg(m_strChannelname));
 
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_progressDialog = NULL;
 
     m_tmpDir = QDir(QString("%1/icontmp").arg(GetConfDir()));
 
@@ -56,6 +57,10 @@ ImportIconsWizard::~ImportIconsWizard()
 
 bool ImportIconsWizard::Create()
 {
+    if (!initialLoad(m_strChannelname))
+        return false;
+
+    
     bool foundtheme = false;
 
     // Load the theme for this screen
@@ -72,7 +77,7 @@ bool ImportIconsWizard::Create()
     m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
 
     if (!m_iconsList || !m_manualEdit || !m_nameText || !m_manualButton ||
-        !m_skipButton)
+        !m_skipButton || !m_statusText)
     {
         VERBOSE(VB_IMPORTANT, "Unable to load window 'iconimport', missing"
                               " required element(s)");
@@ -91,15 +96,21 @@ bool ImportIconsWizard::Create()
     connect(m_skipButton, SIGNAL(Clicked()), SLOT(skip()));
     connect(m_iconsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(menuSelection(MythUIButtonListItem *)));
-
-    if (!initialLoad(m_strChannelname))
-        return false;
-
+            
     BuildFocusList();
 
     enableControls(STATE_NORMAL);
 
     return true;
+}
+
+void ImportIconsWizard::Init()
+{
+    if (m_nMaxCount > 0)
+    {
+        m_missingIter = m_missingEntries.begin();
+        doLoad();
+    }
 }
 
 void ImportIconsWizard::enableControls(dialogState state, bool selectEnabled)
@@ -141,7 +152,8 @@ void ImportIconsWizard::enableControls(dialogState state, bool selectEnabled)
 void ImportIconsWizard::manualSearch()
 {
     QString str = m_manualEdit->GetText();
-    search(escape_csv(str));
+    if (!search(escape_csv(str)))
+        m_statusText->SetText(tr("No matches found for %1") .arg(str));
 }
 
 void ImportIconsWizard::skip()
@@ -182,7 +194,7 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
     if (checkAndDownload(entry.strLogo, entry2.strChanId))
     {
         if (m_statusText)
-            m_statusText->SetText(tr("Channel icon for %1 was downloaded successfully.")
+            m_statusText->SetText(tr("Icon for %1 was downloaded successfully.")
                                     .arg(entry2.strName));
     }
     else
@@ -363,13 +375,7 @@ bool ImportIconsWizard::initialLoad(QString name)
     if (m_missingEntries.size() == 0 || closeDialog)
         return false;
 
-    if (m_nMaxCount > 0)
-    {
-        m_missingIter = m_missingEntries.begin();
-        if (!doLoad())
-            return false;
-    }
-    else
+    if (m_nMaxCount <= 0)
         return false;
 
     return true;
@@ -392,7 +398,9 @@ bool ImportIconsWizard::doLoad()
     {
         // Look for the next missing icon
         m_nameText->SetText(tr("Choose icon for channel %1").arg((*m_missingIter).strName));
-        search((*m_missingIter).strNameCSV);
+        if (!search((*m_missingIter).strNameCSV))
+            m_statusText->SetText(tr("No matches found for %1")
+                                    .arg((*m_missingIter).strName));
         m_manualEdit->SetText((*m_missingIter).strName);
         return true;
     }
@@ -537,6 +545,9 @@ bool ImportIconsWizard::lookup(const QString& strParam)
 
 bool ImportIconsWizard::search(const QString& strParam)
 {
+    if (m_progressDialog)
+        return false;
+
     QString strParam1 = QUrl::toPercentEncoding(strParam);
     bool retVal = false;
     enableControls(STATE_SEARCHING);
@@ -567,11 +578,32 @@ bool ImportIconsWizard::search(const QString& strParam)
     {
         VERBOSE(VB_CHANNEL, QString("Icon Import: Working search : %1").arg(str));
         QStringList strSplit = str.split("\n");
+        
+        MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        QString prevIconName = "";
+        QString message = QObject::tr("Searching for icons for channel %1")
+                                                        .arg(entry2.strName);
+        m_progressDialog = new MythUIProgressDialog(message,
+                                                        popupStack,
+                                                        "iconsearchdialog");
+
+        if (m_progressDialog->Create())
+        {
+            popupStack->AddScreen(m_progressDialog, false);
+            m_progressDialog->SetTotal(strSplit.size());
+        }
+        else
+        {
+            delete m_progressDialog;
+            m_progressDialog = NULL;
+        }
+
+        qApp->processEvents();
+
+        QString prevIconName;
         int namei = 1;
 
-        for (int x = 0; x < strSplit.size(); x++)
+        for (int x = 0; x < strSplit.size(); ++x)
         {
             QString row = strSplit[x];
             if (row != "#" )
@@ -610,7 +642,15 @@ bool ImportIconsWizard::search(const QString& strParam)
                 if (haveIcon)
                     item->SetImage(iconfile, "icon");
                 prevIconName = entry.strName;
+                if (m_progressDialog)
+                    m_progressDialog->SetProgress(x+1);
+                qApp->processEvents();
             }
+        }
+        if (m_progressDialog)
+        {
+            m_progressDialog->Close();
+            m_progressDialog = NULL;
         }
         retVal = true;
     }
@@ -746,4 +786,9 @@ void ImportIconsWizard::customEvent(QEvent *event)
             }
         }
     }
+}
+
+void ImportIconsWizard::Close()
+{
+    MythScreenType::Close();
 }

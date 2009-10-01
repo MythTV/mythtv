@@ -151,7 +151,11 @@ class ImportIconsWizard : public MythScreenType
     void menuSelection(MythUIButtonListItem *);//!< process the icon selection
     void skip();                   //!< skip this icon
     void askSubmit(const QString& strParam);
+    void Close();
 
+  protected:
+    void Init(void);
+    
   private:
     ListSearchEntries m_listSearch;  //!< the list of SearchEntry
     QString m_strMatches;            //!< the string for the submit() call
