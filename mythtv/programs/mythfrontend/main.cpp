@@ -758,8 +758,6 @@ int internal_play_media(const QString &mrl, const QString &plot,
 
     pginfo->title = title;
 
-    long long pos = 0;
-
     if (pginfo->pathname.startsWith("dvd:"))
     {
         bool allowdvdbookmark = gContext->GetNumSetting("EnableDVDBookmark", 0);
@@ -768,12 +766,6 @@ int internal_play_media(const QString &mrl, const QString &plot,
             gContext->GetNumSetting("DVDBookmarkPrompt", 0))
         {
             RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
-
-            if (!tmprbuf) 
-            { 
-                delete pginfo; 
-                return res;               
-            } 
             QString name;
             QString serialid;
             if (tmprbuf->isDVD() &&
@@ -783,34 +775,33 @@ int internal_play_media(const QString &mrl, const QString &plot,
                 if (!fields.empty())
                 {
                     QStringList::Iterator it = fields.begin();
-                    pos = (long long)((*++it).toLongLong() & 0xffffffffLL);
+                    long long pos = (long long)
+                        ((*++it).toLongLong() & 0xffffffffLL);
+                    if (pos > 0)
+                    {
+                        QString msg = QObject::tr("DVD contains a bookmark");
+                        QString btn0msg = QObject::tr("Play from bookmark");
+                        QString btn1msg = QObject::tr("Play from beginning");
+
+                        DialogCode ret = MythPopupBox::Show2ButtonPopup(
+                            gContext->GetMainWindow(),
+                            "", msg,
+                            btn0msg,
+                            btn1msg,
+                            kDialogCodeButton0);
+                        if (kDialogCodeButton1 == ret)
+                            pginfo->setIgnoreBookmark(true);
+                        else if (kDialogCodeRejected == ret)
+                        {
+                            delete tmprbuf;
+                            delete pginfo;
+                            return res;
+                        }
+                    }
                 }
             }
             delete tmprbuf;
         }
-    }
-    else if (pginfo->isVideo)
-        pos = pginfo->GetBookmark(); 
- 
-    if (pos > 0) 
-    { 
-        QString msg = QObject::tr("DVD/Video contains a bookmark"); 
-        QString btn0msg = QObject::tr("Play from bookmark"); 
-        QString btn1msg = QObject::tr("Play from beginning"); 
- 
-        DialogCode ret = MythPopupBox::Show2ButtonPopup( 
-            gContext->GetMainWindow(), 
-            "", msg, 
-            btn0msg, 
-            btn1msg, 
-            kDialogCodeButton0); 
-        if (kDialogCodeButton1 == ret) 
-            pginfo->setIgnoreBookmark(true); 
-        else if (kDialogCodeRejected == ret) 
-        { 
-            delete pginfo;
-            return res;
-        } 
     }
 
     TV::StartTV(pginfo);
