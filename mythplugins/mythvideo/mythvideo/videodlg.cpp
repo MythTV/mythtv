@@ -1060,8 +1060,7 @@ namespace
             image_exts.insert(QString(*it).toLower());
         }
 
-        if ((!host.isEmpty()) &&
-            (season > 0 || !isScreenshot))
+        if (!host.isEmpty())
         {
             QStringList hostFiles;
 
@@ -1072,22 +1071,22 @@ namespace
                     ext != image_exts.end(); ++ext)
             {
                 QStringList sfn;
-                if (season > 0)
+                if (episode > 0)
                 {
-                    if (episode > 0 && isScreenshot)
+                    if (isScreenshot)
                         sfn += hntm.arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
                                  .arg(suffix))
                                  .arg(*ext);
-                    else if (!isScreenshot)
+                    else
                         sfn += hntm.arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(*ext);
 
                 }
-                if (!isScreenshot)
+                else
                 {
                 sfn += hntm.arg(base_name + "_%1").arg(suffix).arg(*ext);
                 sfn += hntm.arg(video_uid + "_%1").arg(suffix).arg(*ext);
