@@ -1,55 +1,9 @@
-/*
- * multiplex.c: multiplex functions for replex
- *        
- *
- * Copyright (C) 2003 - 2006
- *                    Marcus Metzler <mocm@metzlerbros.de>
- *                    Metzler Brothers Systementwicklung GbR
- *           (C) 2006 Reel Multimedia
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * General Public License for more details.
- *
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
- *
- */
-
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "multiplex.h"
-
-
-static int mplx_write(multiplex_t *mx, uint8_t *buffer,int length)
-{
-	int k=0;
-
-	if ( mx->max_write && mx->total_written+ length >  
-	     mx-> max_write && !mx->max_reached){
-		mx->max_reached = 1;
-		fprintf(stderr,"Maximum file size %dKB reached\n", mx->max_write/1024);
-		return 0;
-	}
-	if ((k=write(mx->fd_out, buffer, length)) <= 0){
-		mx->zero_write_count++;
-	} else {
-		mx->total_written += k;
-	}
-	return k;
-}
+#include "ts.h"
 
 static int buffers_filled(multiplex_t *mx)
 {
@@ -57,47 +11,15 @@ static int buffers_filled(multiplex_t *mx)
 
 	vavail = ring_avail(mx->index_vrbuffer)/sizeof(index_unit);
 	
-//	for (i=0; i<mx->extcnt;i++){
-//		aavail += ring_avail(&mx->index_extrbuffer[i])/
-//				     sizeof(index_unit);
-//	}
-	for (i=0; i<mx->apidn;i++){
-		aavail += ring_avail(&mx->index_arbuffer[i])/sizeof(index_unit);
- 	}
- 
-	for (i=0; i<mx->ac3n;i++){
-		aavail += ring_avail(&mx->index_ac3rbuffer[i])
-			/sizeof(index_unit);
+	for (i=0; i<mx->extcnt;i++){
+		aavail += ring_avail(&mx->index_extrbuffer[i])/
+				     sizeof(index_unit);
 	}
 
 	if (aavail+vavail) return ((aavail+vavail));
 	return 0;
 }
 
-static int all_audio_ok(int *aok, int n)
-{
-       int ok=0,i;
- 
-       if (!n) return 0;
-       for (i=0;  i < n ;i++){
-               if (aok[i]) ok++;
-       }
-       if (ok == n) return 1;
-       return 0;
-}
-static int rest_audio_ok(int j, int *aok, int n)
-{
-       int ok=0,i;
- 
-       if (!(n-1)) return 0;
-       for (i=0;  i < n ;i++){
-               if (i!=j && aok[i]) ok++;
-       }
-       if (ok == n) return 1;
-       return 0;
-}
-
-/*
 static int use_video(uint64_t vpts, extdata_t *ext, int *aok, int n)
 {
 	int i;
@@ -106,8 +28,6 @@ static int use_video(uint64_t vpts, extdata_t *ext, int *aok, int n)
 			return 0;
 	return 1;
 }
-*/
-/*
 static int which_ext(extdata_t *ext, int *aok, int n)
 {
 	int i;
@@ -127,8 +47,7 @@ static int which_ext(extdata_t *ext, int *aok, int n)
 		}
 	return pos;
 }
-*/
-/*
+
 static int peek_next_video_unit(multiplex_t *mx, index_unit *viu)
 {
 	if (!ring_avail(mx->index_vrbuffer) && mx->finish) return 0;
@@ -140,79 +59,113 @@ static int peek_next_video_unit(multiplex_t *mx, index_unit *viu)
 		}
 
 	ring_peek(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit),0);
-*/
+#ifdef OUT_DEBUG
+	fprintf(stderr,"video index start: %d  stop: %d  (%d)  rpos: %d\n", 
+		viu->start, (viu->start+viu->length),
+		viu->length, ring_rpos(mx->vrbuffer));
+#endif
+
+	return 1;
+}
+	
 static int get_next_video_unit(multiplex_t *mx, index_unit *viu)
 {
-       if (!ring_avail(mx->index_vrbuffer) && mx->finish) return 0;
- 
-       while (ring_avail(mx->index_vrbuffer) < sizeof(index_unit))
-               if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-                       fprintf(stderr,"error in get next video unit\n");
-                       return 0;
-               }
- 
-       ring_read(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit));
+	index_unit nviu;
+	if (!ring_avail(mx->index_vrbuffer) && mx->finish) return 0;
 
+	while (ring_avail(mx->index_vrbuffer) < sizeof(index_unit))
+		if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
+			fprintf(stderr,"error in get next video unit\n");
+			return 0;
+		}
+
+	ring_read(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit));
 #ifdef OUT_DEBUG
 	fprintf(stderr,"video index start: %d  stop: %d  (%d)  rpos: %d\n", 
 		viu->start, (viu->start+viu->length),
 		viu->length, ring_rpos(mx->vrbuffer));
 #endif
-
+	if(! peek_next_video_unit(mx, &nviu))
+		return 1;
+	//left-shift by 8 to increase precision
+	viu->ptsrate = (uptsdiff(nviu.dts, viu->dts) << 8) / viu->length;
 	return 1;
 }
 
-static int peek_next_video_unit(multiplex_t *mx, index_unit *viu)
+static int peek_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 {
-	if (!ring_avail(mx->index_vrbuffer) && mx->finish) return 0;
+	if (!ring_avail(&mx->index_extrbuffer[i]) && mx->finish) return 0;
 
-	while (ring_avail(mx->index_vrbuffer) < sizeof(index_unit))
+	while (ring_avail(&mx->index_extrbuffer[i]) < sizeof(index_unit))
 		if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
 			fprintf(stderr,"error in peek next video unit\n");
 			return 0;
 		}
 
-	ring_peek(mx->index_vrbuffer, (uint8_t *)viu, sizeof(index_unit),0);
+	ring_peek(&mx->index_extrbuffer[i], (uint8_t *)extiu,
+		  sizeof(index_unit),0);
 #ifdef OUT_DEBUG
-	fprintf(stderr,"video index start: %d  stop: %d  (%d)  rpos: %d\n", 
-		viu->start, (viu->start+viu->length),
-		viu->length, ring_rpos(mx->vrbuffer));
+	fprintf(stderr,"ext index start: %d  stop: %d  (%d)  rpos: %d\n", 
+		extiu->start, (extiu->start+extiu->length),
+		extiu->length, ring_rpos(mx->extrbuffer));
 #endif
 
 	return 1;
 }
 	
-static int get_next_audio_unit(multiplex_t *mx, index_unit *aiu, int i)
+static int get_next_ext_unit(multiplex_t *mx, index_unit *extiu, int i)
 {
-	if (!ring_avail(&mx->index_arbuffer[i]) && mx->finish) return 0;
+	index_unit niu, *piu = extiu;
+	int j, length = 0;
+	for(j = 0; j < mx->ext[i].frmperpkt; j++) {
+		if (!ring_avail(&mx->index_extrbuffer[i]) && mx->finish)
+			break;
 
-	while(ring_avail(&mx->index_arbuffer[i]) < sizeof(index_unit))
-		if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-			fprintf(stderr,"error in get next audio unit\n");
-			return 0;
-		}
+		while(ring_avail(&mx->index_extrbuffer[i]) < sizeof(index_unit))
+			if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
+				fprintf(stderr,"error in get next ext unit\n");
+				break;
+			}
 	
-	ring_read(&mx->index_arbuffer[i], (uint8_t *)aiu, sizeof(index_unit));
+		ring_read(&mx->index_extrbuffer[i], (uint8_t *)piu,
+			  sizeof(index_unit));
+		length += piu->length;
+		piu = &niu;
+	}
+	if (j == 0)
+		return 0;
+	extiu->length = length;
+	extiu->framesize = length;
+	if(! peek_next_ext_unit(mx, &niu, i))
+		return 1;
+	//left-shift by 8 to increase precision
+	extiu->ptsrate = (uptsdiff(niu.pts, extiu->pts) << 8) / extiu->length;
 
 #ifdef OUT_DEBUG
-	fprintf(stderr,"audio index start: %d  stop: %d  (%d)  rpos: %d\n", 
-		aiu->start, (aiu->start+aiu->length),
-		aiu->length, ring_rpos(&mx->arbuffer[i]));
+	fprintf(stderr,"ext index start: %d  stop: %d  (%d)  rpos: %d\n", 
+		extiu->start, (extiu->start+extiu->length),
+		extiu->length, ring_rpos(&mx->extrbuffer[i]));
 #endif
 	return 1;
 }
 
-static int get_next_ac3_unit(multiplex_t *mx, index_unit *aiu, int i)
+static uint8_t get_ptsdts(multiplex_t *mx, index_unit *viu)
 {
-	if (!ring_avail(&mx->index_ac3rbuffer[i]) && mx->finish) return 0;
-	while(ring_avail(&mx->index_ac3rbuffer[i]) < sizeof(index_unit))
-		if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-			fprintf(stderr,"error in get next ac3 unit\n");
-			return 0;
-		}
-	
-	ring_read(&mx->index_ac3rbuffer[i], (uint8_t *)aiu, sizeof(index_unit));
-	return 1;
+	uint8_t ptsdts = 0;
+	switch (mx->frame_timestamps){
+	case TIME_ALWAYS:
+		if (viu->frame == I_FRAME || viu->frame == P_FRAME)
+			ptsdts = PTS_DTS;
+		else 
+			ptsdts = PTS_ONLY;
+		break;
+
+	case TIME_IFRAME:
+		if (viu->frame == I_FRAME)
+			ptsdts = PTS_DTS;
+		break;
+	}
+	return ptsdts;
 }
 
 static void writeout_video(multiplex_t *mx)
@@ -220,20 +173,30 @@ static void writeout_video(multiplex_t *mx)
 	uint8_t outbuf[3000];
 	int written=0;
 	uint8_t ptsdts=0;
-	int length;
+	unsigned int length;
 	int nlength=0;
+        int frame_len=0;
 	index_unit *viu = &mx->viu;
 
 #ifdef OUT_DEBUG
-	fprintf(stderr,"writing VIDEO pack");
+	fprintf(stderr,"writing VIDEO pack\n");
 #endif
-	
+
+	if(viu->frame_start) {
+		ptsdts = get_ptsdts(mx, viu);
+                frame_len = viu->length;
+	}
+
 	if (viu->frame_start && viu->seq_header && viu->gop && 
 	    viu->frame == I_FRAME){
-		if (!mx->startup && mx->navpack){
-			write_nav_pack(mx->pack_size, mx->apidn, mx->ac3n, 
+		if (!mx->startup && mx->is_ts){
+			write_ts_patpmt(mx->ext, mx->extcnt, 1, outbuf);
+			write(mx->fd_out, outbuf, mx->pack_size*2);
+			ptsinc(&mx->SCR, mx->SCRinc*2);
+		} else if (!mx->startup && mx->navpack){
+			write_nav_pack(mx->pack_size, mx->extcnt, 
 				       mx->SCR, mx->muxr, outbuf);
-			mplx_write(mx, outbuf, mx->pack_size);
+			write(mx->fd_out, outbuf, mx->pack_size);
 			ptsinc(&mx->SCR, mx->SCRinc);
 		} else mx->startup = 0;
 #ifdef OUT_DEBUG
@@ -244,47 +207,46 @@ static void writeout_video(multiplex_t *mx)
 	if (mx->finish != 2 && dummy_space(&mx->vdbuf) < mx->data_size){
 		return;
 	}
-
 	length = viu->length;
-	if  (length  < mx->data_size )
-		dummy_add(&mx->vdbuf, uptsdiff(viu->dts+mx->video_delay,0)
-			  , length);
-
-	while (length  < mx->data_size ){
+	while (!mx->is_ts && length  < mx->data_size){
 		index_unit nviu;
+                int old_start = viu->frame_start;
+                int old_frame = viu->frame;
+                uint64_t old_pts = viu->pts;
+                uint64_t old_dts = viu->dts;
+		dummy_add(&mx->vdbuf, uptsdiff(viu->dts+mx->video_delay,0)
+			  , viu->length);
 		if ( peek_next_video_unit(mx, &nviu)){
 			if (!(nviu.seq_header && nviu.gop && 
 			      nviu.frame == I_FRAME)){
 				get_next_video_unit(mx, viu);
+                                frame_len = viu->length;
 				length += viu->length; 
-				if  (length  < mx->data_size )
-					dummy_add(&mx->vdbuf, 
-						  uptsdiff(viu->dts+
-							   mx->video_delay,0)
-						  , viu->length);
+				if(old_start) {
+					viu->pts = old_pts;
+					viu->dts = old_dts;
+					viu->frame = old_frame;
+				} else {
+					ptsdts = get_ptsdts(mx, viu);
+				}
 			} else break;
 		} else break;
 	}
 
 	if (viu->frame_start){
-		switch (mx->frame_timestamps){
-		case TIME_ALWAYS:
-			if (viu->frame == I_FRAME || viu->frame == P_FRAME)
-				ptsdts = PTS_DTS;
-			else 
-				ptsdts = PTS_ONLY;
-			break;
-
-		case TIME_IFRAME:
-			if (viu->frame == I_FRAME)
-				ptsdts = PTS_DTS;
-			break;
-		}
 		viu->frame_start=0;
+	if (viu->gop){
+                uint8_t gop[8];
+                frame_len=length-frame_len;
+                ring_peek(mx->vrbuffer, gop, 8, frame_len);
+		pts2time( viu->pts + mx->video_delay, gop, 8);
+                ring_poke(mx->vrbuffer, gop, 8, frame_len);
+                viu->gop=0;
+	}
 		if (mx->VBR) {
 			mx->extra_clock = ptsdiff(viu->dts + mx->video_delay, 
 						  mx->SCR + 500*CLOCK_MS);
-#ifdef OUT_DEBUG
+#ifdef OUT_DEBUG1
 			fprintf(stderr,"EXTRACLOCK2: %lli %lli %lli\n", viu->dts, mx->video_delay, mx->SCR);
 			fprintf(stderr,"EXTRACLOCK2: %lli ", mx->extra_clock);
 			printpts(mx->extra_clock);
@@ -297,156 +259,7 @@ static void writeout_video(multiplex_t *mx)
 	}
 
 
-       nlength = length;
-
-       written = write_video_pes( mx->pack_size, mx->apidn, mx->ac3n, 
-                                  viu->pts+mx->video_delay, 
-                                  viu->dts+mx->video_delay, 
-                                  mx->SCR, mx->muxr, outbuf, &nlength, ptsdts,
-                                  mx->vrbuffer);
-  
-      length -= nlength;
-      dummy_add(&mx->vdbuf, uptsdiff( viu->dts+mx->video_delay,0)
-                 , viu->length-length);
-      viu->length = length;
-      if (viu->gop){
-              pts2time( viu->pts + mx->video_delay, outbuf, written);
-      }
-  
-      mplx_write(mx, outbuf, written);
-      
-      if (viu->length == 0){
-              get_next_video_unit(mx, viu);
-      }
-  
-}
- 
-#define INSIZE 6000
-int add_to_inbuf(uint8_t *inbuf,ringbuffer *arbuffer, int inbc, int off, int length)
-{  
-       int add;
-       
-       if (inbc + length > INSIZE) {
-               fprintf(stderr,"buffer too small in write_out_audio %d %d\n",inbc,length);
-               return 0;
-       }
-       add= ring_peek( arbuffer, inbuf+inbc, length, off);
-       if (add < length) {
-               fprintf(stderr,"error while peeking audio ring %d (%d)\n", add,length);
-               return 0;
-       }
-       return add;
-}
- 
- 
- static void clear_audio(multiplex_t *mx, int type, int n)
-{
-       index_unit *aiu;
-       int g=0;
-       ringbuffer *arbuffer;
- 
-       switch (type){
-               
-       case MPEG_AUDIO:
-#ifdef OUT_DEBUG
-               fprintf(stderr,"clear AUDIO%d pack\n",n);
-#endif
-               arbuffer = &mx->arbuffer[n];
-               aiu = &mx->aiu[n];
-               break;
- 
-       case AC3:
-#ifdef OUT_DEBUG
-               fprintf(stderr,"clear AC3%d pack\n",n);
-#endif
-               arbuffer = &mx->ac3rbuffer[n];
-               aiu = &mx->ac3iu[n];
-               break;
- 
-       default:
-               return;
-       }
-       while (aiu->err == JUMP_ERR){
-//            fprintf(stderr,"FOUND ONE\n");
-               ring_skip(arbuffer, aiu->length);               
-               if (type == MPEG_AUDIO)
-                       g = get_next_audio_unit(mx, aiu, n);
-               else
-                       g = get_next_ac3_unit(mx, aiu, n);              
-      }
-
-}
-static void my_memcpy(uint8_t *target, int offset, uint8_t *source, int length, int maxlength)
-{
-       uint8_t *targ = NULL;
- 
-       targ = target + offset;
-       
-       if ( offset+length > maxlength){
-               fprintf(stderr,"WARNING: buffer overflow in my_memcopy \n");
-//            fprintf(stderr, "source 0x%x  offset %d target 0x%x  length %d maxlength %d\n"
-//                    , source, offset, target, length, maxlength);
-       }
-       memcpy(targ, source, length);
-}
- 
-static void writeout_audio(multiplex_t *mx, int type, int n)
-{  
-       uint8_t outbuf[3000];
-       uint8_t inbuf[INSIZE];
-       int inbc=0;
-       int written=0;
-       int length=0;
-       dummy_buffer *dbuf;
-       ringbuffer *airbuffer;
-       ringbuffer *arbuffer;
-       int nlength=0;
-       uint64_t pts, dpts=0;
-       uint64_t adelay;
-       int aframesize;
-       int newpts=0;
-       int nframes=1;
-       int ac3_off=0;
-       int rest_data = 5;
-       uint64_t *apts;
-       index_unit *aiu;
-       int g=0;
-       int add, off=0;
-       int fakelength = 0;
-       int droplength = 0;
-  
-       switch (type){
-  
-       case MPEG_AUDIO:
-#ifdef OUT_DEBUG
-               fprintf(stderr,"writing AUDIO%d pack\n",n);
-#endif
-               airbuffer = &mx->index_arbuffer[n];
-               arbuffer = &mx->arbuffer[n];
-               dbuf = &mx->adbuf[n];
-               adelay = mx->apts_off[n];
-               aframesize = mx->aframes[n];    
-               apts = &mx->apts[n];
-               aiu = &mx->aiu[n];
-               break;
-  
-       case AC3:
-#ifdef OUT_DEBUG
-               fprintf(stderr,"writing AC3%d pack\n",n);
-#endif
-               airbuffer = &mx->index_ac3rbuffer[n];
-               arbuffer = &mx->ac3rbuffer[n];
-               dbuf = &mx->ac3dbuf[n];
-               adelay = mx->ac3pts_off[n];
-               aframesize = mx->ac3frames[n];  
-               rest_data = 1; // 4 bytes AC3 header
-               apts = &mx->ac3pts[n];
-               aiu = &mx->ac3iu[n];
-               break;
- 
-       default:
-
-/*
+	nlength = length;
 	if (mx->is_ts)
 		written = write_video_ts(  viu->pts+mx->video_delay, 
 					   viu->dts+mx->video_delay, 
@@ -523,7 +336,6 @@ static void writeout_ext(multiplex_t *mx, int n)
 		break;
 
 	default:
-*/
 		return;
 	}
 	
@@ -534,38 +346,10 @@ static void writeout_ext(multiplex_t *mx, int n)
 	pts = uptsdiff( aiu->pts + mx->audio_delay, adelay );
 	*apts = pts;
 	length = aiu->length;
-
-	if (length <  aiu->framesize){
+	if (length < aiu->framesize){
 		newpts = 1;
 		ac3_off = length;
-		nframes = 0;
-	} 
-
-	switch (aiu->err){
-		
-	case NO_ERR:
-		add = add_to_inbuf(inbuf, arbuffer, inbc, off, aiu->length);
-		off += add;
-		inbc += add;
-		break;
-	case PTS_ERR:
-		break;
-	case FRAME_ERR:
-	case JUMP_ERR: 
-		break;
-	case DUMMY_ERR:
-	  if (aiu->fillframe){
-//		  fprintf(stderr,"1. memcopy 0x%x\n",aiu->fillframe);
-			my_memcpy(inbuf, inbc
-			       , aiu->fillframe + aframesize - length
-				  , length, INSIZE);
-			inbc += length;
-			fakelength += length;
-		} else fprintf(stderr,"no fillframe \n");
-		
-		break;
 	}
-
 	dummy_add(dbuf, pts, aiu->length);
 
 #ifdef OUT_DEBUG
@@ -579,53 +363,21 @@ static void writeout_ext(multiplex_t *mx, int n)
 	printpts(pts);
 	fprintf(stderr,"\n");
 #endif
-	while (length  < mx->data_size + rest_data){
+	while (!mx->is_ts && length  < mx->data_size + rest_data){
 		if (ring_read(airbuffer, (uint8_t *)aiu, sizeof(index_unit)) > 0){
-			
 			dpts = uptsdiff(aiu->pts +mx->audio_delay, adelay );
 			
 			if (newpts){
 				pts = dpts;
 				newpts=0;
 			}
-			
-			
-			switch(aiu->err)
-			{
-			case NO_ERR:
-				length += aiu->length;
-				add = add_to_inbuf(inbuf, arbuffer, inbc, off, aiu->length);
-				inbc += add;
-				off += add;
-				nframes++;
-				break;
 
-			case PTS_ERR:
-				break;
-			case FRAME_ERR:
-			case JUMP_ERR:
-				droplength += aiu->length;
- 				off += aiu->length;
-				break;
-			case DUMMY_ERR:
-				length += aframesize;
-				if (aiu->fillframe){
-//					fprintf(stderr,"2. memcopy 0x%x\n",aiu->fillframe);
-					my_memcpy(inbuf, inbc, aiu->fillframe, aframesize, INSIZE);
-					inbc += aframesize;
-					fakelength += aframesize;
-					nframes++;
-				} else fprintf(stderr,"no fillframe \n");
-				
-				break;
-			} 
-
+			length+= aiu->length;
 			if (length < mx->data_size + rest_data)
 				dummy_add(dbuf, dpts, aiu->length);
 			
 			*apts = dpts;
-
-
+			nframes++;
 #ifdef OUT_DEBUG
 			fprintf(stderr,"start: %d  stop: %d (%d)  length %d ", 
 				aiu->start, (aiu->start+aiu->length),
@@ -639,63 +391,13 @@ static void writeout_ext(multiplex_t *mx, int n)
 		} else if (mx->finish){
 			break;
 		} else if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-			fprintf(stderr,"error in writeout audio\n");
+			fprintf(stderr,"error in writeout ext\n");
 			exit(1);
 		}
 	}
 
 	nlength = length;
 
-/*
-       if (type == MPEG_AUDIO)
-               written = write_audio_pes( mx->pack_size, mx->apidn, mx->ac3n
-                                          , n, pts, mx->SCR, mx->muxr, 
-                                          outbuf, &nlength, PTS_ONLY,
-                                          arbuffer);
-       else 
-               written = write_ac3_pes( mx->pack_size, mx->apidn, mx->ac3n
-                                        , n, pts, mx->SCR, mx->muxr, 
-                                        outbuf, &nlength, PTS_ONLY,
-                                        nframes, ac3_off,
-                                        arbuffer, aiu->length);
-*/
- 
-       if (type == MPEG_AUDIO)
-               written = bwrite_audio_pes( mx->pack_size, mx->apidn, mx->ac3n
-                                          , n, pts, mx->SCR, mx->muxr, 
-                                          outbuf, &nlength, PTS_ONLY,
-                                          inbuf, inbc);
-       else 
-               written = bwrite_ac3_pes( mx->pack_size, mx->apidn, mx->ac3n
-                                        , n, pts, mx->SCR, mx->muxr, 
-                                        outbuf, &nlength, PTS_ONLY,
-                                        nframes, ac3_off,
-                                        inbuf, inbc , aiu->length);
-       
-       if (aiu->err == DUMMY_ERR){
-               fakelength -= length-nlength;
-       }
-       length -= nlength;
-       mplx_write(mx, outbuf, written);
-       if (nlength-fakelength+droplength){
-               ring_skip(arbuffer, nlength-fakelength+droplength);
-       }
-
-       dummy_add(dbuf, dpts, aiu->length-length);
-       aiu->length = length;
-       aiu->start = ring_rpos(arbuffer);
- 
-       if (aiu->length == 0){
-               if (type == MPEG_AUDIO)
-                       g = get_next_audio_unit(mx, aiu, n);
-               else
-                       g = get_next_ac3_unit(mx, aiu, n);
-       }
- 
- 
-       *apts = uptsdiff(aiu->pts + mx->audio_delay, adelay);
-
-/*
 	switch (type) {
 	case MPEG_AUDIO:
 		if(mx->is_ts)
@@ -741,10 +443,8 @@ static void writeout_ext(multiplex_t *mx, int n)
 		aiu->pts = uptsdiff(aiu->pts + ((nlength*aiu->ptsrate)>>8), 0);
 	}
 	*apts = uptsdiff(aiu->pts + mx->audio_delay, adelay);
-*/
 #ifdef OUT_DEBUG
-	//if ((int64_t)*apts < 0) fprintf(stderr,"SCHEISS ");
-	if ((int64_t)*apts < 0) fprintf(stderr,"MIST ");
+	if ((int64_t)*apts < 0) fprintf(stderr,"SCHEISS ");
 	fprintf(stderr,"APTS");
 	printpts(*apts);
 	printpts(aiu->pts);
@@ -752,19 +452,9 @@ static void writeout_ext(multiplex_t *mx, int n)
 	printpts(adelay);
 	fprintf(stderr,"\n");
 #endif
-	int lc=0;
-	while (aiu->err == JUMP_ERR && lc < 100){
-		lc++;
-		
-		ring_skip(arbuffer, aiu->length);		
-		if (type == MPEG_AUDIO)
-			g = get_next_audio_unit(mx, aiu, n);
-		else
-			g = get_next_ac3_unit(mx, aiu, n);		
-	}
 
 	if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
-		fprintf(stderr,"error in writeout audio\n");
+		fprintf(stderr,"error in writeout ext\n");
 		exit(1);
 	}
 }
@@ -774,18 +464,17 @@ static void writeout_padding (multiplex_t *mx)
 	uint8_t outbuf[3000];
 	//fprintf(stderr,"writing PADDING pack\n");
 
-	write_padding_pes( mx->pack_size, mx->apidn, mx->ac3n, mx->SCR, 
+	write_padding_pes( mx->pack_size, mx->extcnt, mx->SCR, 
 			   mx->muxr, outbuf);
-	mplx_write(mx, outbuf, mx->pack_size);
+	write(mx->fd_out, outbuf, mx->pack_size);
 }
 
-void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
-		  int *start)
+void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start)
 {
 	int i;
-	
-	memset(audio_ok, 0, N_AUDIO*sizeof(int));
-	memset(ac3_ok, 0, N_AC3*sizeof(int));
+	int set_ok = 0;
+
+	memset(ext_ok, 0, N_AUDIO*sizeof(int));
 	*video_ok = 0;
 	
 	if (mx->fill_buffers(mx->priv, mx->finish)< 0) {
@@ -800,7 +489,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 	} else *start = 0;
 	
 	if (mx->VBR) {
-#ifdef OUT_DEBUG
+#ifdef OUT_DEBUG1
 		fprintf(stderr,"EXTRACLOCK: %lli ", mx->extra_clock);
 		printpts(mx->extra_clock);
 		fprintf(stderr,"\n");
@@ -817,23 +506,12 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 		if (mx->extra_clock > 0.0) {
 			int64_t temp_scr = mx->extra_clock;
 			
-			for (i=0; i<mx->apidn; i++){
+			for (i=0; i<mx->extcnt; i++){
 				if (ptscmp(mx->SCR + temp_scr + 100*CLOCK_MS, 
-					   mx->aiu[i].pts) > 0) {
+					   mx->ext[i].iu.pts) > 0) {
 					while (ptscmp(mx->SCR + temp_scr 
 						      + 100*CLOCK_MS,
-						      mx->aiu[i].pts) > 0) 
-						temp_scr -= mx->SCRinc;
-					temp_scr += mx->SCRinc;
-				}
-			}
-			
-			for (i=0; i<mx->ac3n; i++){
-				if (ptscmp(mx->SCR + temp_scr + 100*CLOCK_MS, 
-					   mx->ac3iu[i].pts) > 0) {
-					while (ptscmp(mx->SCR + temp_scr
-						      + 100*CLOCK_MS,
-						      mx->ac3iu[i].pts) > 0) 
+						      mx->ext[i].iu.pts) > 0) 
 						temp_scr -= mx->SCRinc;
 					temp_scr += mx->SCRinc;
 				}
@@ -846,80 +524,60 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 				mx->extra_clock = 0.0;
 		}
 	}
-
-
+	
 	/* clear decoder buffers up to SCR */
 	dummy_delete(&mx->vdbuf, mx->SCR);    
 	
-	for (i=0;i <mx->apidn; i++){
-		dummy_delete(&mx->adbuf[i], mx->SCR);
-		clear_audio(mx, MPEG_AUDIO, i);
-	}
-	for (i=0;i <mx->ac3n; i++) {
-		dummy_delete(&mx->ac3dbuf[i], mx->SCR);
-		clear_audio(mx, AC3, i);
-	}
-	
+	for (i=0;i <mx->extcnt; i++)
+		dummy_delete(&mx->ext[i].dbuf, mx->SCR);
 	
 	if (dummy_space(&mx->vdbuf) > mx->vsize && mx->viu.length > 0 &&
-	    (ptscmp(mx->viu.dts + mx->video_delay, 1000*CLOCK_MS +mx->oldSCR)<0)
+	    (ptscmp(mx->viu.dts + mx->video_delay, 500*CLOCK_MS +mx->oldSCR)<0)
 	    && ring_avail(mx->index_vrbuffer)){
 		*video_ok = 1;
+                set_ok = 1;
 	}
 	
-	for (i = 0; i < mx->apidn; i++){
-	        //fprintf(stdout, "0 check_times AC3 ptscmp: %d apidn: %d ac3n: %d \n",
-		//		ptscmp(mx->ac3pts[i], 200*CLOCK_MS + mx->oldSCR), mx->apidn, mx->ac3n);
-		if (dummy_space(&mx->adbuf[i]) > mx->asize && 
-		    mx->aiu[i].length > 0 &&
-		    ptscmp(mx->apts[i], 200*CLOCK_MS + mx->oldSCR) < 0
-		    && ring_avail(&mx->index_arbuffer[i])){
-			audio_ok[i] = 1;
+	for (i = 0; i < mx->extcnt; i++){
+		if (dummy_space(&mx->ext[i].dbuf) > mx->extsize && 
+		    mx->ext[i].iu.length > 0 &&
+		    ptscmp(mx->ext[i].pts, 500*CLOCK_MS + mx->oldSCR) < 0
+		    && ring_avail(&mx->index_extrbuffer[i])){
+			ext_ok[i] = 1;
+                        set_ok = 1;
 		}
 	}
-	for (i = 0; i < mx->ac3n; i++){
-	        //fprintf(stdout, "1 check_times AC3 ptscmp: %d \n", ptscmp(mx->ac3pts[i], 200*CLOCK_MS + mx->oldSCR));
-		if (dummy_space(&mx->ac3dbuf[i]) > mx->asize && 
-		    mx->ac3iu[i].length > 0 &&
-		    ptscmp(mx->ac3pts[i], 200*CLOCK_MS + mx->oldSCR) < 0
-		    && ring_avail(&mx->index_ac3rbuffer[i])){
-			ac3_ok[i] = 1;
+#ifdef OUT_DEBUG
+	if (set_ok) {
+		fprintf(stderr, "SCR");
+		printpts(mx->oldSCR);
+		fprintf(stderr, "VDTS");
+		printpts(mx->viu.dts);
+		fprintf(stderr, " (%d)", *video_ok);
+		fprintf(stderr, " EXT");
+		for (i = 0; i < mx->extcnt; i++){
+			fprintf(stderr, "%d:", mx->ext[i].type);
+			printpts(mx->ext[i].pts);
+			fprintf(stderr, " (%d)", ext_ok[i]);
 		}
-		//else
-	        //    fprintf(stdout, "2 check_times AC3 ptscmp: %d \n", ptscmp(mx->ac3pts[i], 200*CLOCK_MS + mx->oldSCR));
+		fprintf(stderr, "\n");
 	}
+#endif
 }
-
-void write_out_packs( multiplex_t *mx, int video_ok, 
-		      int *audio_ok, int *ac3_ok)
+void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok)
 {
 	int i;
 
-	if (video_ok && /* !all_audio_ok(audio_ok, mx->apidn) &&  */
-	    !all_audio_ok(ac3_ok, mx->ac3n)) {
+	if (video_ok && use_video(mx->viu.dts + mx->video_delay,
+	    mx->ext, ext_ok, mx->extcnt)) {
 		writeout_video(mx);  
 	} else { // second case(s): audio ok, video in time
+		i = which_ext(mx->ext, ext_ok, mx->extcnt);
 		int done=0;
-		for ( i = 0; i < mx->ac3n; i++){
-			if ( ac3_ok[i] && !rest_audio_ok(i,ac3_ok, mx->ac3n)
-			     && !all_audio_ok(audio_ok, mx->apidn)){
-
-				writeout_audio(mx, AC3, i);
-				done = 1;
-				break;
-			}
+		if(i>=0) {
+			writeout_ext(mx, i);
+			done = 1;
 		}
-
-		for ( i = 0; i < mx->apidn && !done; i++){
-			if ( audio_ok[i] && !rest_audio_ok(i, audio_ok, 
-							   mx->apidn)){
-				writeout_audio(mx, MPEG_AUDIO, i);
-				done = 1;
-				break;
-			}
-		}
-
-
 		if (!done && !mx->VBR){
 			writeout_padding(mx);
 		}
@@ -931,29 +589,27 @@ void finish_mpg(multiplex_t *mx)
 {
 	int start=0;
 	int video_ok = 0;
-	int audio_ok[N_AUDIO];
-	int ac3_ok[N_AC3];
+	int ext_ok[N_AUDIO];
         int n,nn,old,i;
         uint8_t mpeg_end[4] = { 0x00, 0x00, 0x01, 0xB9 };
                                                                                 
-        memset(audio_ok, 0, N_AUDIO*sizeof(int));
-        memset(ac3_ok, 0, N_AC3*sizeof(int));
+        memset(ext_ok, 0, N_AUDIO*sizeof(int));
         mx->finish = 1;
                                                                                 
         old = 0;nn=0;
-        while ((n=buffers_filled(mx)) && nn<20 ){
+        while ((n=buffers_filled(mx)) && nn<1000 ){
                 if (n== old) nn++;
-                else if (nn) nn--;
+                else  nn=0;
                 old = n;
-                check_times( mx, &video_ok, audio_ok, ac3_ok, &start);
-                write_out_packs( mx, video_ok, audio_ok, ac3_ok);
+                check_times( mx, &video_ok, ext_ok, &start);
+                write_out_packs( mx, video_ok, ext_ok);
         }
 
         old = 0;nn=0;
 	while ((n=ring_avail(mx->index_vrbuffer)/sizeof(index_unit))
-	       && nn<10){
+	       && nn<1000){
 		if (n== old) nn++;
-		else if (nn) nn--;
+		else nn= 0;
 		old = n;
 		writeout_video(mx);  
 	}
@@ -961,41 +617,61 @@ void finish_mpg(multiplex_t *mx)
 // flush the rest
         mx->finish = 2;
         old = 0;nn=0;
-	for (i = 0; i < mx->apidn; i++){
-		while ((n=ring_avail(&mx->index_arbuffer[i])/sizeof(index_unit))
-		       && nn <10){
+	for (i = 0; i < mx->extcnt; i++){
+		while ((n=ring_avail(&mx->index_extrbuffer[i])/
+				     sizeof(index_unit)) && nn <100){
 			if (n== old) nn++;
-			else if (nn) nn--;
+			else nn = 0;
 			old = n;
-			writeout_audio(mx, MPEG_AUDIO, i);
+			writeout_ext(mx, i);
 		}
 	}
 	
-        old = 0;nn=0;
-	for (i = 0; i < mx->ac3n; i++){
-		while ((n=ring_avail(&mx->index_ac3rbuffer[i])
-			/sizeof(index_unit))
-			&& nn<10){
-			if (n== old) nn++;
-			else if (nn) nn--;
-			old = n;
-			writeout_audio(mx, AC3, i);
-		}
-	}
-                        
-                          
 	if (mx->otype == REPLEX_MPEG2)
-		mplx_write(mx, mpeg_end,4);
+		write(mx->fd_out, mpeg_end,4);
+
+	dummy_destroy(&mx->vdbuf);
+	for (i=0; i<mx->extcnt;i++)
+		dummy_destroy(&mx->ext[i].dbuf);
 }
 
+static int get_ts_video_overhead(int pktsize, sequence_t *seq)
+{
+	uint32_t framesize;
+	uint32_t numpkt;
+	int pktdata = pktsize - TS_HEADER_MIN;
+	framesize = seq->bit_rate * 50 / seq->frame_rate; //avg bytes/frame
+	numpkt = (framesize + PES_H_MIN + 10 + pktdata -1) / pktdata;
+	return pktsize- ((pktsize * numpkt) - framesize + numpkt - 1) / numpkt;
+}
 
-void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *aframe,
-		     audio_frame_t *ac3frame, int apidn, int ac3n, 
+static int get_ts_ext_overhead(int pktsize, audio_frame_t *extframe,
+				extdata_t *ext, int cnt)
+{
+	int i, max = 0;
+	int pktdata = pktsize - TS_HEADER_MIN;
+	for (i = 0; i < cnt; i++) {
+		int size, numpkt, overhead;
+		// 1/53 is approx 0.15 * 1/8 which allows us to calculate the
+		// # of packets in .15 seconds (which is the number of packets
+		// per PES.
+		ext[i].frmperpkt = extframe[i].bit_rate / 53 /
+					extframe[i].framesize;
+		size = extframe[i].framesize * ext[i].frmperpkt;
+		numpkt = (size + pktdata - 1) / pktdata;
+		overhead = (pktsize * numpkt - size + numpkt - 1) / numpkt;
+		if(overhead > max)
+			max = overhead;
+	}
+	return pktsize - max;
+}
+
+void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
+                     audio_frame_t *extframe, int *exttype, int *exttypcnt,
 		     uint64_t video_delay, uint64_t audio_delay, int fd,
 		     int (*fill_buffers)(void *p, int f),
 		     ringbuffer *vrbuffer, ringbuffer *index_vrbuffer,	
-		     ringbuffer *arbuffer, ringbuffer *index_arbuffer,
-		     ringbuffer *ac3rbuffer, ringbuffer *index_ac3rbuffer,
+		     ringbuffer *extrbuffer, ringbuffer *index_extrbuffer,
 		     int otype)
 {
 	int i;
@@ -1006,10 +682,6 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *afram
 	mx->audio_delay = audio_delay;
 	mx->fd_out = fd;
 	mx->otype = otype;
-	mx->total_written = 0;
-	mx->zero_write_count = 0;
-	mx->max_write = 0;
-	mx->max_reached = 0;
 
 	switch(mx->otype){
 
@@ -1026,7 +698,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *afram
 		mx->reset_clocks = 0;
 		mx->write_end_codes = 0;
 		mx->set_broken_link = 0;
-		//		mx->max_write = 1024*1024*1024; // 1GB max VOB length
+		mx->is_ts = 0;
 		break;
 
 
@@ -1043,6 +715,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *afram
 		mx->reset_clocks = 1;
 		mx->write_end_codes = 1;
 		mx->set_broken_link = 1;
+		mx->is_ts = 0;
 		break;
 
 	case REPLEX_HDTV:
@@ -1058,43 +731,84 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *afram
 		mx->reset_clocks = 1;
 		mx->write_end_codes = 1;
 		mx->set_broken_link = 1;
+		mx->is_ts = 0;
+		break;
+
+	case REPLEX_TS_SD:
+		mx->video_delay += 180*CLOCK_MS;
+		mx->audio_delay += 180*CLOCK_MS;
+		mx->pack_size = 188;
+		mx->audio_buffer_size = 4*1024;
+		mx->video_buffer_size = 232*1024;
+		mx->mux_rate = 1260000;
+		mx->navpack = 0;
+		mx->frame_timestamps = TIME_ALWAYS;
+		mx->VBR = 1;
+		mx->reset_clocks = 0;
+		mx->write_end_codes = 0;
+		mx->set_broken_link = 0;
+		mx->is_ts = 1;
+		break;
+
+	case REPLEX_TS_HD:
+		mx->video_delay += 180*CLOCK_MS;
+		mx->audio_delay += 180*CLOCK_MS;
+		mx->pack_size = 188;
+		mx->audio_buffer_size = 4*1024;
+		mx->video_buffer_size = 4*224*1024;
+		mx->mux_rate = 0;
+		mx->navpack = 0;
+		mx->frame_timestamps = TIME_ALWAYS;
+		mx->VBR = 1;
+		mx->reset_clocks = 0;
+		mx->write_end_codes = 0;
+		mx->set_broken_link = 0;
+		mx->is_ts = 1;
 		break;
 	}
 
-	mx->apidn = apidn;
-	mx->ac3n = ac3n;
-
+	for (mx->extcnt = 0, data_rate = 0, i = 0;
+			 i < N_AUDIO && exttype[i]; i++){
+		if (exttype[i] >= MAX_TYPES) {
+			fprintf(stderr, "Found illegal stream type %d\n",
+				exttype[i]);
+			exit(1);
+		}
+		mx->ext[i].type = exttype[i];
+		mx->ext[i].pts_off = 0;
+		mx->ext[i].frmperpkt = 1;
+		mx->ext[i].strmnum = exttypcnt[i];
+		strncpy(mx->ext[i].language, extframe[i].language, 4);
+		dummy_init(&mx->ext[i].dbuf, mx->audio_buffer_size);
+		data_rate += extframe[i].bit_rate;
+		mx->extcnt++;
+	}
 
 	mx->vrbuffer = vrbuffer;
 	mx->index_vrbuffer = index_vrbuffer;
-	mx->arbuffer = arbuffer;
-	mx->index_arbuffer = index_arbuffer;
-	mx->ac3rbuffer = ac3rbuffer;
-	mx->index_ac3rbuffer = index_ac3rbuffer;
+	mx->extrbuffer = extrbuffer;
+	mx->index_extrbuffer = index_extrbuffer;
 
 	dummy_init(&mx->vdbuf, mx->video_buffer_size);
-	for (i=0; i<mx->apidn;i++){
-		mx->apts_off[i] = 0;
-		dummy_init(&mx->adbuf[i],mx->audio_buffer_size);
-	}
-	for (i=0; i<mx->ac3n;i++){
-		mx->ac3pts_off[i] = 0;
-		dummy_init(&mx->ac3dbuf[i], mx->audio_buffer_size);
-	}
 
-	mx->data_size = mx->pack_size - PES_H_MIN -10; 
+	//NOTE: vpkt_hdr/extpkt_hdr are worst-case for PS streams, but
+	//best-guess for TS streams
+	if(mx->is_ts) {
+		//Use best guess for TS streams
+		mx->data_size = get_ts_video_overhead(mx->pack_size, seq_head);
+		mx->extsize = get_ts_ext_overhead(mx->pack_size, extframe,
+				mx->ext, mx->extcnt);
+		
+	} else {
+		//Use worst case for PS streams
+		mx->data_size = mx->pack_size - PES_H_MIN - PS_HEADER_L1 - 10;
+		mx->extsize = mx->data_size + 5; //one less DTS
+	}
 	mx->vsize = mx->data_size;
-	mx->asize = mx->data_size+5; // one less DTS
 	
-	data_rate = seq_head->bit_rate *400;
-	for ( i = 0; i < mx->apidn; i++)
-		data_rate += aframe[i].bit_rate;
-	for ( i = 0; i < mx->ac3n; i++)
-		data_rate += ac3frame[i].bit_rate;
+	data_rate += seq_head->bit_rate *400;
 
-	
-	mx->muxr = ((uint64_t)data_rate / 8 * mx->pack_size) / mx->data_size;
-//        mx->muxr = (data_rate / 8 * mx->pack_size) / mx->data_size; 
+	mx->muxr = ((uint64_t)data_rate / 8 * mx->pack_size) / mx->data_size; 
                                      // muxrate of payload in Byte/s
 
 	if (mx->mux_rate) {
@@ -1111,31 +825,35 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *afram
 
 void setup_multiplex(multiplex_t *mx)
 {
-	int packlen;
 	int i;
 
  	get_next_video_unit(mx, &mx->viu);
-	for (i=0; i < mx->apidn; i++){
-		get_next_audio_unit(mx, &mx->aiu[i], i);
-		mx->apts[i] = uptsdiff(mx->aiu[i].pts +mx->audio_delay, 
-				       mx->apts_off[i]); 
+	for (i=0; i < mx->extcnt; i++)
+        {
+		get_next_ext_unit(mx, &mx->ext[i].iu, i);
+		if (mx->ext[i].type == MPEG_AUDIO || mx->ext[i].type == AC3)
+			mx->ext[i].pts = uptsdiff(
+					mx->ext[i].iu.pts + mx->audio_delay, 
+					mx->ext[i].pts_off);
+		else
+			mx->ext[i].pts = uptsdiff(
+					mx->ext[i].iu.pts, mx->ext[i].pts_off);
 	}
-	for (i=0; i < mx->ac3n; i++){
-		get_next_ac3_unit(mx, &mx->ac3iu[i], i);
-		mx->ac3pts[i] = uptsdiff(mx->ac3iu[i].pts +mx->audio_delay, 
-					 mx->ac3pts_off[i]); 
-	}
-
-	packlen = mx->pack_size;
 
 	mx->SCR = 0;
 
 	// write first VOBU header
-	if (mx->navpack){
+	if (mx->is_ts) {
 		uint8_t outbuf[2048];
-		write_nav_pack(mx->pack_size, mx->apidn, mx->ac3n, 
+		write_ts_patpmt(mx->ext, mx->extcnt, 1, outbuf);
+		write(mx->fd_out, outbuf, mx->pack_size*2);
+		ptsinc(&mx->SCR, mx->SCRinc*2);
+		mx->startup = 1;
+	} else if (mx->navpack){
+		uint8_t outbuf[2048];
+		write_nav_pack(mx->pack_size, mx->extcnt, 
 			       mx->SCR, mx->muxr, outbuf);
-		mplx_write(mx, outbuf, mx->pack_size);
+		write(mx->fd_out, outbuf, mx->pack_size);
 		ptsinc(&mx->SCR, mx->SCRinc);
 		mx->startup = 1;
 	} else mx->startup = 0;

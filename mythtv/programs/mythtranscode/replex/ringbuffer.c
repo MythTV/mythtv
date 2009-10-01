@@ -2,10 +2,8 @@
  * ringbuffer.c
  *        
  *
- * Copyright (C) 2003 - 2006
- *                    Marcus Metzler <mocm@metzlerbros.de>
+ * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
- *           (C) 2006 Reel Multimedia
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,7 +30,6 @@
 #include "pes.h"
 
 #define DEBUG 1
-// Initialize buffer
 int ring_init (ringbuffer *rbuf, int size)
 {
 	if (size > 0){
@@ -50,7 +47,26 @@ int ring_init (ringbuffer *rbuf, int size)
 	return 0;
 }
 
-// reset buffer
+int ring_reinit (ringbuffer *rbuf, int size)
+{
+	if (size > (int)(rbuf->size)) {
+		uint8_t *tmpalloc = (uint8_t *) realloc(rbuf->buffer,
+							sizeof(uint8_t)*size);
+		if (! tmpalloc)
+			return -1;
+		rbuf->buffer = tmpalloc;
+		if (rbuf->write_pos < rbuf->read_pos)
+		{
+			unsigned int delta = size - rbuf->size;
+			memmove(rbuf->buffer + rbuf->read_pos + delta,
+				rbuf->buffer + rbuf->read_pos,
+				rbuf->size - rbuf->read_pos);
+			rbuf->read_pos += delta;
+		}
+		rbuf->size = size;
+	}
+	return 0;
+}
 void ring_clear(ringbuffer *rbuf)
 {
 	rbuf->read_pos = 0;	
@@ -58,14 +74,13 @@ void ring_clear(ringbuffer *rbuf)
 }
 
 
-// delete buffer
+
 void ring_destroy(ringbuffer *rbuf)
 {
 	free(rbuf->buffer);
 }
 
 
-//write into buffer
 int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 {
 
@@ -77,13 +92,9 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	free = ring_free(rbuf);
 
 	if ( free < count ){
-		if ( free > 0 ){
-			count = free;
-		} else {
-			if (DEBUG) fprintf(stderr,"ringbuffer overflow %d<%d %d\n", 
-					   free, count, rbuf->size);
-			return FULL_BUFFER;
-		}
+		if (DEBUG) fprintf(stderr,"ringbuffer overflow %d<%d %d\n", 
+				   free, count, rbuf->size);
+		return FULL_BUFFER;
 	}
 	
 	if (count >= rest){
@@ -101,11 +112,10 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	return count;
 }
 
-// peek into buffer
-int ring_peek(ringbuffer *rbuf, uint8_t *data, int count, long off)
+int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 {
 
-	int avail, pos, rest;
+	unsigned int avail, pos, rest;
 
 	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return -1;
 	pos  = (rbuf->read_pos+off)%rbuf->size;
@@ -130,8 +140,34 @@ int ring_peek(ringbuffer *rbuf, uint8_t *data, int count, long off)
 	return count;
 }
 
+int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
+{
 
-//read from buffer
+	unsigned int avail, pos, rest;
+
+	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return -1;
+	pos  = (rbuf->read_pos+off)%rbuf->size;
+	rest = rbuf->size - pos ;
+	avail = ring_avail(rbuf); 
+
+	
+	if ( avail < count ){
+//		if (DEBUG) fprintf(stderr,"ringbuffer peek underflow %d<%d %d %d\n", 
+//				   avail, count, pos, rbuf->write_pos);
+		return EMPTY_BUFFER;
+	}
+
+	if ( count < rest ){
+		memcpy(rbuf->buffer+pos, data, count);
+	} else {
+		memcpy(rbuf->buffer+pos, data, rest);
+		if ( count - rest)
+			memcpy(rbuf->buffer, data+rest, count - rest);
+	}
+
+	return count;
+}
+
 int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
 {
 
@@ -163,7 +199,6 @@ int ring_read(ringbuffer *rbuf, uint8_t *data, int count)
 	return count;
 }
 
-//skip buffer
 int ring_skip(ringbuffer *rbuf, int count)
 {
 
@@ -191,7 +226,7 @@ int ring_skip(ringbuffer *rbuf, int count)
 }
 
 
-// write from file into buffer
+
 int ring_write_file(ringbuffer *rbuf, int fd, int count)
 {
 
@@ -202,13 +237,11 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 	rest = rbuf->size - pos;
 	free = ring_free(rbuf);
 
-	if ( !free ){
+	if ( free < count ){
 		if (DEBUG) fprintf(stderr,"ringbuffer overflow %d<%d %d %d\n", 
 				   free, count, pos, rbuf->read_pos);
 		return FULL_BUFFER;
 	}
-
-	if ( count > free ) count = free;
 	
 	if (count >= rest){
 		rr = read (fd, rbuf->buffer+pos, rest);
@@ -229,7 +262,6 @@ int ring_write_file(ringbuffer *rbuf, int fd, int count)
 
 
 
-// write from buffer into file
 int ring_read_file(ringbuffer *rbuf, int fd, int count)
 {
 
@@ -264,7 +296,7 @@ int ring_read_file(ringbuffer *rbuf, int fd, int count)
 	return rr;
 }
 
-// print memory 
+
 static void show(uint8_t *buf, int length)
 {
 	int i,j,r;
@@ -297,10 +329,10 @@ static void show(uint8_t *buf, int length)
 	}
 }
 
-void ring_show(ringbuffer *rbuf, int count, long off)
+void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off)
 {
 
-	int avail, pos, rest;
+	unsigned int avail, pos, rest;
 
 	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return;
 	pos  = (rbuf->read_pos+off)%rbuf->size;
@@ -334,6 +366,12 @@ int dummy_init(dummy_buffer *dbuf, int s)
 		return -1;
 
 	return 0;
+}
+
+void dummy_destroy(dummy_buffer *dbuf)
+{
+        ring_destroy(&dbuf->time_index);
+        ring_destroy(&dbuf->data_index);
 }
 
 void dummy_clear(dummy_buffer *dbuf)
@@ -385,7 +423,6 @@ int dummy_delete(dummy_buffer *dbuf, uint64_t time)
 
 	return dsize;
 }
-/*
 void dummy_print(dummy_buffer *dbuf)
 {
    int i;
@@ -402,4 +439,3 @@ void dummy_print(dummy_buffer *dbuf)
    }
    printf("Used: %d Free: %d data-free: %d\n", avail, 1000-avail, dbuf->size - dbuf->fill);
 }
-*/

@@ -2,8 +2,7 @@
  * avi.c: AVI container functions for replex
  *        
  *
- * Copyright (C) 2003 - 2006
- *                    Marcus Metzler <mocm@metzlerbros.de>
+ * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
  *
  * This program is free software; you can redistribute it and/or

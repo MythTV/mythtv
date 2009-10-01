@@ -2,10 +2,8 @@
  * mpg_common.c: COMMON MPEG functions for replex
  *        
  *
- * Copyright (C) 2003 - 2006
- *                    Marcus Metzler <mocm@metzlerbros.de>
+ * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
- *           (C) 2006 Reel Multimedia
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -63,91 +61,9 @@ void show_buf(uint8_t *buf, int length)
 	}
 }
 
-//----------------------------------------------------------------------------
-#define CMP_CORE(offset) \
-        x=Data[i+1+offset]; \
-        if (x<2) { \
-                if (x==0) { \
-                        if ( Data[i+offset]==0 && Data[i+2+offset]==1) \
-                                return i+offset; \
-                        else if (Data[i+2+offset]==0 && Data[i+3+offset]==1) \
-                                return i+1+offset; \
-                } \
-                else if (x==1 && Data[i-1+offset]==0 && Data[i+offset]==0 && (i+offset)>0) \
-                         return i-1+offset; \
-         }
 
-int FindPacketHeader(const uint8_t *Data, int s, int l)
-{
-        int i;
-        uint8_t x;
 
-        if (l>12) {
-                for(i=s;i<l-12;i+=12) { 
-                        CMP_CORE(0);
-                        CMP_CORE(3);
-                        CMP_CORE(6);
-                        CMP_CORE(9);
-                }
-
-                for(; i<l-3; i+=3) {
-                        CMP_CORE(0);
-		}	       
-        }
-        else {
-                for(i=s; i<l-3; i+=3) {
-                        CMP_CORE(0);
-		}
-        }
-        return -1;
-}
-//----------------------------------------------------------------------------
-
-int find_mpg_header(uint8_t head, uint8_t *buf, int Count)
-{
-	int n=0;
-	uint8_t *Data=buf;
-        while(n<Count) {
-                int x;
-                x=FindPacketHeader(Data, 0, Count - n); // returns position of first 00
-                if (x!=-1) {
-                        Data+=x;
-                        n+=x;
-			if (Data[3]==head) {
-                                return n; 
-                        }
-                        n+=3;
-                        Data+=3;
-                        Count-=3;
-                }
-                else
-                        break;
-        }
-        return -1;
-
-}
-
-int find_any_header(uint8_t *head, uint8_t *buf, int Count)
-{
-	int n=0;
-	uint8_t *Data=buf;
-        while(n<Count) {
-                int x;
-                x=FindPacketHeader(Data, 0, Count - n); // returns position of first 00
-                if (x!=-1) {
-                        Data+=x;
-                        n+=x;
-			*head=Data[3];
-			return n; 
-                }
-                else
-                        break;
-        }
-        return -1;
-
-}
-
-int find_mpg_headerx(uint8_t head, uint8_t *buf, int length)
+int find_mpg_header(uint8_t head, uint8_t *buf, int length)
 {
 
 	int c = 0;
@@ -183,7 +99,7 @@ int find_mpg_headerx(uint8_t head, uint8_t *buf, int length)
 }
 
 
-int find_any_headerx(uint8_t *head, uint8_t *buf, int length)
+int find_any_header(uint8_t *head, uint8_t *buf, int length)
 {
 
 	int c = 0;
@@ -237,7 +153,7 @@ uint64_t trans_pts_dts(uint8_t *pts)
 }
 
 
-int mring_peek( ringbuffer *rbuf, uint8_t *buf, int l, long off)
+int mring_peek( ringbuffer *rbuf, uint8_t *buf, unsigned int l, uint32_t off)
 {
         int c = 0;
 
@@ -289,57 +205,7 @@ int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le)
 }
 
 
-#define PEEK_SIZE (512+1024)
-int ring_find_any_headery(ringbuffer *rbuf, uint8_t *head, int off, int le)
-{
-	uint8_t buf[PEEK_SIZE];
-//	int xoff;
-	int res,x;
-//	int found;
-	int n=off;
-	int peek_snip;
-//	printf("# %i %i\n",off,le);
-	while(le>0) {
-		if (le>PEEK_SIZE)
-			peek_snip=PEEK_SIZE;
-		else
-			peek_snip=le;
-
-		res=mring_peek(rbuf, buf, peek_snip, n);
-		if (res<0) {
-			peek_snip=ring_avail(rbuf);
-//			printf("PP %i\n",peek_snip);
-			if (peek_snip>PEEK_SIZE)
-				peek_snip=PEEK_SIZE;
-			if (peek_snip>le)
-				peek_snip=le;
-			res=mring_peek(rbuf,buf,peek_snip,n);
-			if (res<0)
-				return -1;
-		}
-//		printf("ZZ %i %i\n",peek_snip,n);
-		x=FindPacketHeader(buf, 0, peek_snip); // returns position of first 00
-                if (x!=-1 && x<=peek_snip-4) {
-                        n+=x-off;
-			
-			*head=buf[x+3];
-			return n; 
-                }
-		if (peek_snip<=4) {
-			int i;
-			for(i=0;i<peek_snip;i++)
-				if (buf[i]==0)
-					return -2;
-			return -1;
-		}
-
-		n+=peek_snip-4;
-		le-=peek_snip-4;
-	}
-	return -1; // Not found
-}
-
-int ring_find_any_headerx(ringbuffer *rbuf, uint8_t *head, int off, int le)
+int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le)
 {
 
 	int c = 0;
@@ -378,19 +244,3 @@ int ring_find_any_headerx(ringbuffer *rbuf, uint8_t *head, int off, int le)
 	else return -1;
 }
 
-int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le)
-{
-	uint8_t a=0;
-//	uint8_t b=0;
-	int x;
-//	int y;
-
-	x=ring_find_any_headery(rbuf, &a, off, le);
-#if 0
-	y=ring_find_any_headery(rbuf, &b, off, le);
-	if (x!=y || a!=b)
-		printf("MY %i %i, ORG %i %i\n",y, b, x, a);
-#endif
-	*head=a;
-	return x;
-}

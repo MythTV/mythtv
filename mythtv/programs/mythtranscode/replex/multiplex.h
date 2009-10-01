@@ -2,10 +2,8 @@
  * multiplex.h
  *        
  *
- * Copyright (C) 2003 - 2006
- *                    Marcus Metzler <mocm@metzlerbros.de>
+ * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
- *           (C) 2006 Reel Multimedia
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -35,12 +33,13 @@
 #define N_AUDIO 32
 #define N_AC3 8
 
-
 typedef struct multiplex_s{
 	int fd_out;
 #define REPLEX_MPEG2  0
 #define REPLEX_DVD    1
 #define REPLEX_HDTV   2
+#define REPLEX_TS_SD  3
+#define REPLEX_TS_HD  4
 	int otype;
 	int startup;
 	int finish;
@@ -49,7 +48,7 @@ typedef struct multiplex_s{
 	uint64_t video_delay;
 	uint64_t audio_delay;
 	int pack_size;
-	int data_size;
+	unsigned int data_size;
 	uint32_t audio_buffer_size;
 	uint32_t video_buffer_size;
 	uint32_t mux_rate;
@@ -59,44 +58,24 @@ typedef struct multiplex_s{
 #define TIME_IFRAME 2
 	int frame_timestamps;
 	int VBR;
+	int is_ts;
 	int reset_clocks;
 	int write_end_codes;
 	int set_broken_link;
-	int vsize, asize;
+	unsigned int vsize, extsize;
 	int64_t extra_clock;
-	uint64_t first_vpts;
-	uint64_t first_apts[N_AUDIO];
-	uint64_t first_ac3pts[N_AC3];
-	
 	uint64_t SCR;
 	uint64_t oldSCR;
 	uint64_t SCRinc;
 	index_unit viu;
-	index_unit aiu[N_AUDIO];
-	index_unit ac3iu[N_AC3];
-	uint64_t apts[N_AUDIO];
-	uint64_t ac3pts[N_AC3];
-	uint64_t ac3pts_off[N_AC3];
-	uint64_t apts_off[N_AUDIO];
-	int aframes[N_AUDIO];
-	int ac3frames[N_AUDIO];
-	int total_written;
-	int zero_write_count;
-	int max_write;
-	int max_reached;
-
-/* needed from replex */
-	int apidn;
-	int ac3n;
 
 	dummy_buffer vdbuf;
-	dummy_buffer adbuf[N_AUDIO];
-	dummy_buffer ac3dbuf[N_AC3];
 
-	ringbuffer *ac3rbuffer;
-	ringbuffer *index_ac3rbuffer;
-	ringbuffer *arbuffer;
-	ringbuffer *index_arbuffer;
+	extdata_t ext[N_AUDIO];
+	int extcnt;
+
+	ringbuffer *extrbuffer;
+	ringbuffer *index_extrbuffer;
 	ringbuffer *vrbuffer;
 	ringbuffer *index_vrbuffer;
 
@@ -104,18 +83,15 @@ typedef struct multiplex_s{
 	void *priv;
 } multiplex_t;
 
-void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
-		  int *start);
-void write_out_packs( multiplex_t *mx, int video_ok, 
-		      int *audio_ok, int *ac3_ok);
+void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start);
+void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok);
 void finish_mpg(multiplex_t *mx);
-void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *aframe,
-		     audio_frame_t *ac3frame, int apidn, int ac3n,	
+void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
+		     audio_frame_t *extframe, int *exttype, int *exttypcnt,
 		     uint64_t video_delay, uint64_t audio_delay, int fd,
 		     int (*fill_buffers)(void *p, int f),
 		     ringbuffer *vrbuffer, ringbuffer *index_vrbuffer,	
-		     ringbuffer *arbuffer, ringbuffer *index_arbuffer,
-		     ringbuffer *ac3rbuffer, ringbuffer *index_ac3rbuffer,
+		     ringbuffer *extrbuffer, ringbuffer *index_extrbuffer,
 		     int otype);
 
 void setup_multiplex(multiplex_t *mx);
