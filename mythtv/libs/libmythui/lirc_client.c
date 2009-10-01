@@ -1361,7 +1361,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 	{
 		*config=NULL;
 		lirc_freeconfigentries(first);
-		if(*sha_bang!=NULL)
+		if(sha_bang && *sha_bang!=NULL)
 		{
 			free(*sha_bang);
 			*sha_bang=NULL;
