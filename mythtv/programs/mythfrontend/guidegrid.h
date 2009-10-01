@@ -122,7 +122,6 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void generateListings();
 
     void enter();
-    void escape();
 
     void showProgFinder();
     void channelUpdate();
@@ -138,6 +137,7 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void upcoming();
     void details();
 
+    void Close();
     void customEvent(QEvent *event);
 
   protected:

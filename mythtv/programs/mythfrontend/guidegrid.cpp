@@ -460,7 +460,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
         else if (action == "MENU")
             showMenu();
         else if (action == "ESCAPE" || action == "GUIDE")
-            escape();
+            Close();
         else if (action == "SELECT")
         {
             if (m_player && m_selectChangesChannel)
@@ -1835,8 +1835,13 @@ void GuideGrid::enter()
     epgIsVisibleCond.wakeAll();
 }
 
-void GuideGrid::escape()
+void GuideGrid::Close()
 {
+    // HACK: Do not allow exit if we have a popup menu open, not convinced
+    // that this is the right solution
+    if (GetMythMainWindow()->GetStack("popup stack")->TotalScreens() > 0)
+        return;
+        
     if (m_updateTimer)
         m_updateTimer->stop();
 
