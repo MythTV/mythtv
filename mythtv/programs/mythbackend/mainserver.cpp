@@ -532,6 +532,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandlePixmapLastModified(listline, pbs);
     }
+    else if (command == "QUERY_PIXMAP_GET_IF_MODIFIED")
+    {
+        HandlePixmapGetIfModified(listline, pbs);
+    }
     else if (command == "QUERY_ISRECORDING")
     {
         HandleIsRecording(listline, pbs);
@@ -4627,6 +4631,131 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
     SendResponse(pbssock, strlist);
     delete pginfo;
+}
+
+void MainServer::HandlePixmapGetIfModified(
+    const QStringList &slist, PlaybackSock *pbs)
+{
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+    if (slist.size() < (3 + NUMPROGRAMLINES))
+    {
+        strlist = QStringList("ERROR");
+        strlist += "1: Parameter list too short";
+        SendResponse(pbssock, strlist);
+        return;
+    }
+
+    QDateTime cachemodified;
+    if (slist[1].toInt() != -1)
+        cachemodified.setTime_t(slist[1].toInt());
+
+    int max_file_size = slist[2].toInt();
+
+    ProgramInfo pginfo;
+
+    if (!pginfo.FromStringList(slist, 3))
+    {
+        strlist = QStringList("ERROR");
+        strlist += "2: Invalid ProgramInfo";
+        SendResponse(pbssock, strlist);
+        return;
+    }
+
+    pginfo.pathname = GetPlaybackURL(&pginfo) + ".png";
+    if (pginfo.pathname.left(1) == "/")
+    {
+        QFileInfo finfo(pginfo.pathname);
+        if (finfo.exists())
+        {
+            size_t fsize = finfo.size();
+            QDateTime lastmodified = finfo.lastModified();
+            bool out_of_date = !cachemodified.isValid() ||
+                (lastmodified > cachemodified);
+
+            if (out_of_date && (fsize > 0) && ((ssize_t)fsize < max_file_size))
+            {
+                QByteArray data;
+                QFile file(pginfo.pathname);
+                bool open_ok = file.open(QIODevice::ReadOnly);
+                if (open_ok)
+                    data = file.readAll();
+
+                if (data.size())
+                {
+                    VERBOSE(VB_FILE, QString("Read preview file '%1'")
+                            .arg(pginfo.pathname));
+                    strlist += QString::number(lastmodified.toTime_t());
+                    strlist += QString::number(data.size());
+                    strlist += QString::number(
+                        qChecksum(data.constData(), data.size()));
+                    strlist += QString(data.toBase64());
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Failed to read preview file '%1'")
+                            .arg(pginfo.pathname));
+
+                    strlist = QStringList("ERROR");
+                    strlist +=
+                        QString("3: Failed to read preview file '%1'%2")
+                        .arg(pginfo.pathname)
+                        .arg((open_ok) ? "" : " open failed");
+                }
+            }
+            else if (out_of_date && (max_file_size > 0))
+            {
+                if (fsize >= (size_t) max_file_size)
+                {
+                    strlist = QStringList("WARNING");
+                    strlist += QString("1: Preview file too big %1 > %2")
+                        .arg(fsize).arg(max_file_size);
+                }
+                else
+                {
+                    strlist = QStringList("ERROR");
+                    strlist += "4: Preview file is invalid";
+                }
+            }
+            else
+            {
+                strlist += QString::number(lastmodified.toTime_t());
+            }
+
+            SendResponse(pbssock, strlist);
+            return;
+        }
+    }
+
+    // handle remote ...
+    if (ismaster && pginfo.hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo.hostname);
+        if (!slave)
+        {
+            strlist = QStringList("ERROR");
+            strlist +=
+                "5: Could not locate mythbackend that made this recording";
+            SendResponse(pbssock, strlist);
+            return;
+        }
+
+        strlist = slave->ForwardRequest(slist);
+
+        slave->DownRef(); slave = NULL;
+
+        if (!strlist.empty())
+        {
+            SendResponse(pbssock, strlist);
+            return;
+        }
+    }
+
+    strlist = QStringList("WARNING");
+    strlist += "2: Could not locate requested file";
+    SendResponse(pbssock, strlist);
 }
 
 void MainServer::HandleBackendRefresh(MythSocket *socket)

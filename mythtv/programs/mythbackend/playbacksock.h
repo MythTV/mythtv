@@ -80,6 +80,8 @@ class PlaybackSock
                                     const vector<uint> &excluded_cardids);
     void CancelNextRecording(int capturecardnum, bool cancel);
 
+    QStringList ForwardRequest(const QStringList&);
+
   private:
     bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);
 

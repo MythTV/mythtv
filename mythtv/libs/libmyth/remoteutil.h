@@ -52,6 +52,8 @@ MPUBLIC void RemoteSendMessage(const QString &message);
 MPUBLIC vector<uint> RemoteRequestFreeRecorderList(void);
 MPUBLIC void RemoteGeneratePreviewPixmap(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);
+MPUBLIC QDateTime RemoteGetPreviewIfModified(
+    const ProgramInfo &pginfo, const QString &cachefile);
 MPUBLIC void RemoteFillProginfo(ProgramInfo *pginfo,
                                 const QString &playbackhostname);
 MPUBLIC QStringList RemoteRecordings(void);

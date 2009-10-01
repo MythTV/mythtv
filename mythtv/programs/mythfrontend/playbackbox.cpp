@@ -606,7 +606,7 @@ void PlaybackBox::UpdateProgramInfo(
     QString oldimgfile = item->GetImage("preview");
     QString imagefile;
     if (oldimgfile.isEmpty() || force_preview_reload)
-        imagefile = getPreviewImage(pginfo);
+        imagefile = GetPreviewImage(pginfo);
 
     if (!imagefile.isEmpty())
         item->SetImage(imagefile, "preview", force_preview_reload);
@@ -3546,25 +3546,6 @@ bool PlaybackBox::fileExists(ProgramInfo *pginfo)
     return false;
 }
 
-QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
-{
-    QDateTime datetime;
-    QString filename = pginfo->pathname + ".png";
-
-    if (filename.left(7) != "myth://")
-    {
-        QFileInfo retfinfo(filename);
-        if (retfinfo.exists())
-            datetime = retfinfo.lastModified();
-    }
-    else
-    {
-        datetime = RemoteGetPreviewLastModified(pginfo);
-    }
-
-    return datetime;
-}
-
 void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)
 {
     QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
@@ -3726,41 +3707,83 @@ void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
     UpdateProgramInfo(item, item == sel_item, true);
 }
 
-bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)
+QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
 {
-    LastCheckedMap::iterator it = elapsedtime.find(filename);
-
-    if (it != elapsedtime.end() && ((*it).elapsed() < 300))
-        return false;
-
-    elapsedtime[filename].restart();
-    return true;
-}
-
-QString PlaybackBox::getPreviewImage(ProgramInfo *pginfo)
-{
-    QString filename;
-
     if (!pginfo || pginfo->availableStatus == asPendingDelete)
-        return filename;
+        return QString();
 
-    filename = pginfo->GetPlaybackURL() + ".png";
+    QString filename = pginfo->GetPlaybackURL() + ".png";
 
+    // If someone is asking for this preview it must be on screen
+    // and hence higher priority than anything else we may have
+    // queued up recently....
     IncPreviewGeneratorPriority(filename);
 
-    bool check_date = check_lastmod(m_previewLastModifyCheck, filename);
-
     QDateTime previewLastModified;
+    QString ret_file = filename;
+    bool streaming = filename.left(1) != "/";
+    bool locally_accessible = false;
+    bool bookmark_updated = false;
 
-    if (check_date)
-        previewLastModified = getPreviewLastModified(pginfo);
+    if (m_previewFromBookmark || streaming)
+    {
+        if (streaming)
+        {
+            ret_file = QString("%1/remotecache/%2")
+                .arg(GetConfDir()).arg(filename.section('/', -1));
 
-    if (m_previewFromBookmark && check_date &&
-        (!previewLastModified.isValid() ||
-         (previewLastModified <  pginfo->lastmodified &&
-          previewLastModified >= pginfo->recendts)) &&
-        !pginfo->IsEditing() &&
-        !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo) &&
+            QFileInfo finfo(ret_file);
+            if (finfo.exists() &&
+                (!m_previewFromBookmark ||
+                 (finfo.lastModified() >= pginfo->lastmodified)))
+            {
+                // This is just an optimization to avoid
+                // hitting the backend if our cached copy
+                // is newer than the bookmark, or if we have
+                // a preview and do not update it when the
+                // bookmark changes.
+                previewLastModified = finfo.lastModified();
+            }
+            else
+            {
+                previewLastModified =
+                    RemoteGetPreviewIfModified(*pginfo, ret_file);
+            }
+        }
+        else
+        {
+            QFileInfo fi(filename);
+            if ((locally_accessible = fi.exists()))
+                previewLastModified = fi.lastModified();
+        }
+
+        bookmark_updated =
+            m_previewFromBookmark &&
+            ((!previewLastModified.isValid() ||
+              (previewLastModified <  pginfo->lastmodified &&
+               previewLastModified >= pginfo->recendts)));
+    }
+    else
+    {
+        locally_accessible = QFileInfo(filename).exists();
+    }
+
+    bool up_to_date_preview_exists =
+        locally_accessible || previewLastModified.isValid();
+
+    if (0)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("File  '%1' \n\t\t\tCache '%2'")
+                .arg(filename).arg(ret_file) +
+                QString("\n\t\t\tPreview Exists: %1, "
+                        "Bookmark Updated: %2, "
+                        "Need Preview: %3")
+                .arg(up_to_date_preview_exists).arg(bookmark_updated)
+                .arg((bookmark_updated || !up_to_date_preview_exists)));
+    }
+
+    if ((bookmark_updated || !up_to_date_preview_exists) &&
         !IsGeneratingPreview(filename))
     {
         uint attempts = IncPreviewGeneratorAttempts(filename);
@@ -3777,46 +3800,18 @@ QString PlaybackBox::getPreviewImage(ProgramInfo *pginfo)
                             "%2 times, giving up.")
                     .arg(filename).arg(PreviewGenState::maxAttempts));
         }
-
-        if (attempts >= PreviewGenState::maxAttempts)
-            return filename;
     }
 
     UpdatePreviewGeneratorThreads();
 
-    // Image is local
-    if (QFileInfo(filename).exists())
-        return filename;
+    QString ret = (locally_accessible) ?
+        filename : (previewLastModified.isValid()) ?
+        ret_file : (QFileInfo(ret_file).exists()) ?
+        ret_file : QString();
 
-    // If this is a remote frontend then check the remote file cache
-    QString cachefile = QString("%1/remotecache/%3").arg(GetConfDir())
-                                                .arg(filename.section('/', -1));
-    QFileInfo cachefileinfo(cachefile);
-    if (!cachefileinfo.exists() ||
-        previewLastModified.addSecs(-60) > cachefileinfo.lastModified())
-    {
-        if (!IsGeneratingPreview(filename))
-        {
-            uint attempts = IncPreviewGeneratorAttempts(filename);
-            if (attempts < PreviewGenState::maxAttempts)
-            {
-                SetPreviewGenerator(filename, new PreviewGenerator(pginfo,
-                                (PreviewGenerator::Mode)m_previewGeneratorMode));
-            }
-            else if (attempts == PreviewGenState::maxAttempts)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Attempted to generate m_preview for '%1' "
-                                "%2 times, giving up.")
-                        .arg(filename).arg(PreviewGenState::maxAttempts));
-            }
-        }
-    }
+    //VERBOSE(VB_IMPORTANT, QString("Returning: '%1'").arg(ret));
 
-    if (cachefileinfo.exists())
-        return cachefile;
-
-    return "";
+    return ret;
 }
 
 void PlaybackBox::showIconHelp(void)

@@ -482,4 +482,14 @@ void PlaybackSock::CancelNextRecording(int capturecardnum, bool cancel)
     SendReceiveStringList(strlist);
 }
 
+QStringList PlaybackSock::ForwardRequest(const QStringList &slist)
+{
+    QStringList strlist = slist;
+
+    if (SendReceiveStringList(strlist))
+        return strlist;
+
+    return QStringList();
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

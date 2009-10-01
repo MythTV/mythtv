@@ -1,6 +1,8 @@
 #include <unistd.h>
 
+#include <QFileInfo>
 #include <QFile>
+#include <QDir>
 
 #include "remoteutil.h"
 #include "programinfo.h"
@@ -285,6 +287,128 @@ QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
         retdatetime.setTime_t(timet);
     }
         
+    return retdatetime;
+}
+
+/// Download preview & get timestamp if newer than cachefile's
+/// last modified time, otherwise just get the timestamp
+QDateTime RemoteGetPreviewIfModified(
+    const ProgramInfo &pginfo, const QString &cachefile)
+{
+    QString loc_err("RemoteGetPreviewIfModified, Error: ");
+
+    QDateTime cacheLastModified;
+    QFileInfo cachefileinfo(cachefile);
+    if (cachefileinfo.exists())
+        cacheLastModified = cachefileinfo.lastModified();
+
+    QStringList strlist("QUERY_PIXMAP_GET_IF_MODIFIED");
+    strlist << ((cacheLastModified.isValid()) ? // unix secs, UTC
+                QString::number(cacheLastModified.toTime_t()) : QString("-1"));
+    strlist << QString::number(200 * 1024); // max size of preview file
+    pginfo.ToStringList(strlist);
+
+    if (!gContext->SendReceiveStringList(strlist) ||
+        strlist.empty() || strlist[0] == "ERROR")
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Remote error") +
+                ((strlist.size() >= 2) ?
+                 (QString(":\n\t\t\t") + strlist[1]) : QString("")));
+
+        return QDateTime();
+    }
+
+    if (strlist[0] == "WARNING")
+    {
+        VERBOSE(VB_NETWORK, QString("RemoteGetPreviewIfModified, Warning: ") +
+                QString("Remote warning") +
+                ((strlist.size() >= 2) ?
+                 (QString(":\n\t\t\t") + strlist[1]) : QString("")));
+
+        return QDateTime();
+    }
+
+    QDateTime retdatetime;
+    qlonglong timet = strlist[0].toLongLong();
+    if (timet >= 0)
+        retdatetime.setTime_t(timet);
+
+    if (strlist.size() < 4)
+    {
+        return retdatetime;
+    }
+
+    size_t  length     = strlist[1].toLongLong();
+    quint16 checksum16 = strlist[2].toUInt();
+    QByteArray data = QByteArray::fromBase64(strlist[3].toAscii());
+    if ((size_t) data.size() < length)
+    { // (note data.size() may be up to 3 bytes longer after decoding
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Preview size check failed %1 < %2")
+                .arg(data.size()).arg(length));
+        return QDateTime();
+    }
+
+    if (checksum16 != qChecksum(data.constData(), data.size()))
+    {
+        VERBOSE(VB_IMPORTANT, loc_err + "Preview checksum failed");
+        return QDateTime();
+    }
+
+    QString pdir(cachefile.section("/", 0, -2));
+    QDir cfd(pdir);
+    if (!cfd.exists() && !cfd.mkdir(pdir))
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Unable to create remote cache directory '%1'")
+                .arg(pdir));
+
+        return QDateTime();
+    }
+
+    QFile file(cachefile);
+    if (!file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Unable to open cached "
+                        "preview file for writing '%1'")
+                .arg(cachefile));
+
+        return QDateTime();
+    }
+
+    off_t offset = 0;
+    size_t remaining = length;
+    uint failure_cnt = 0;
+    while ((remaining > 0) && (failure_cnt < 5))
+    {
+        ssize_t written = file.write(data.data() + offset, remaining);
+        if (written < 0)
+        {
+            failure_cnt++;
+            usleep(50000);
+            continue;
+        }
+
+        failure_cnt  = 0;
+        offset      += written;
+        remaining   -= written;
+    }
+
+    if (remaining)
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Failed to write cached preview file '%1'")
+                .arg(cachefile));
+
+        file.resize(0); // in case unlink fails..
+        file.remove();  // closes fd
+        return QDateTime();
+    }
+
+    file.close();
+
     return retdatetime;
 }
 

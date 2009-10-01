@@ -128,6 +128,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleSetVerbose(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
     void HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs);
+    void HandlePixmapGetIfModified(const QStringList &slist, PlaybackSock *pbs);
     void HandleIsRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleCheckRecordingActive(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);

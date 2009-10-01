@@ -56,7 +56,6 @@ class PreviewGenState
 typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
 typedef QMap<QString,PreviewGenState>   PreviewMap;
-typedef QMap<QString,MythTimer>         LastCheckedMap;
 
 class PlaybackBox : public ScheduleCommon
 {
@@ -272,8 +271,7 @@ class PlaybackBox : public ScheduleCommon
     void UpdateProgressBar(void);
 
     QString cutDown(const QString &, QFont *, int);
-    QDateTime getPreviewLastModified(ProgramInfo *);
-    QString getPreviewImage(ProgramInfo *);
+    QString GetPreviewImage(ProgramInfo *);
 
     bool play(ProgramInfo *rec, bool inPlaylist = false);
     void stop(ProgramInfo *);
@@ -431,7 +429,6 @@ class PlaybackBox : public ScheduleCommon
     // Preview Pixmap Variables ///////////////////////////////////////////////
     bool                m_previewFromBookmark;
     uint                m_previewGeneratorMode;
-    LastCheckedMap      m_previewLastModifyCheck;
     QMap<QString,QDateTime> m_previewFileTS;
     bool                m_previewSuspend;
     mutable QMutex      m_previewGeneratorLock;
