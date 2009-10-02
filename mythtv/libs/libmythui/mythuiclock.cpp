@@ -58,13 +58,7 @@ void MythUIClock::Pulse(void)
                 m_Flash = true;
         }
 
-        m_CutMessage.clear();
-
-        if (m_Message != newMsg)
-        {
-            m_Message = newMsg;
-            SetRedraw();
-        }
+        SetText(newMsg);
 
         m_nextUpdate = m_Time.addSecs(1);
     }
@@ -74,7 +68,8 @@ void MythUIClock::Pulse(void)
 
 bool MythUIClock::ParseElement(QDomElement &element)
 {
-    if (element.tagName() == "format")
+    if (element.tagName() == "format" ||
+        element.tagName() == "template")
     {
         QString format = getFirstText(element);
         format.replace("%TIME%", m_TimeFormat, Qt::CaseInsensitive);
