@@ -1981,6 +1981,12 @@ void VideoDialog::loadData()
         if (!m_d->m_treeLoaded)
             return;
 
+        if (!m_d->m_currentNode)
+            SetCurrentNode(m_d->m_rootNode);
+
+        if (!m_d->m_currentNode)
+            return;
+
         MythGenericTree *selectedNode = m_d->m_currentNode->getSelectedChild();
 
         typedef QList<MythGenericTree *> MGTreeChildList;
