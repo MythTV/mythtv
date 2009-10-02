@@ -375,6 +375,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleQueryUptime(pbs);
     }
+    else if (command == "QUERY_HOSTNAME")
+    {
+        HandleQueryHostname(pbs);
+    }
     else if (command == "QUERY_MEMSTATS")
     {
         HandleQueryMemStats(pbs);
@@ -2613,6 +2617,21 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
         strlist << "ERROR";
         strlist << "Could not determine uptime.";
     }
+
+    SendResponse(pbssock, strlist);
+}
+
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_HOSTNAME
+ * Returns the hostname of this backend
+ */
+void MainServer::HandleQueryHostname(PlaybackSock *pbs)
+{
+    MythSocket    *pbssock = pbs->getSocket();
+    QStringList strlist;
+
+    strlist << gContext->GetHostName();
 
     SendResponse(pbssock, strlist);
 }

@@ -152,6 +152,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
     void HandleQueryUptime(PlaybackSock *pbs);
+    void HandleQueryHostname(PlaybackSock *pbs);
     void HandleQueryMemStats(PlaybackSock *pbs);
     void HandleQueryTimeZone(PlaybackSock *pbs);
     void HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs);

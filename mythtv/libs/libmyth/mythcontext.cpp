@@ -110,6 +110,7 @@ class MythContextPrivate
 
     QMutex  m_hostnamelock;      ///< Locking for thread-safe copying of:
     QString m_localhostname;     ///< hostname from mysql.txt or gethostname()
+    QString m_masterhostname;    ///< master backend hostname
 
     DatabaseParams  m_DBparams;  ///< Current database host & WOL details
     QString         m_DBhostCp;  ///< dbHostName backup
@@ -1874,6 +1875,25 @@ QString MythContext::GetMasterHostPrefix(void)
         ret = QString("myth://%1:%2/")
                      .arg(d->serverSock->peerAddress().toString())
                      .arg(d->serverSock->peerPort());
+    return ret;
+}
+
+QString MythContext::GetMasterHostName(void)
+{
+    QMutexLocker locker(&d->m_hostnamelock);
+
+    if (d->m_masterhostname.isEmpty())
+    {
+        QStringList strlist("QUERY_HOSTNAME");
+
+        SendReceiveStringList(strlist);
+
+        d->m_masterhostname = strlist[0];
+    }
+
+    QString ret = d->m_masterhostname;
+    ret.detach();
+
     return ret;
 }
 
