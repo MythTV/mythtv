@@ -64,7 +64,8 @@ class MPUBLIC MythUIHelper
 
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
-    MythImage *LoadCacheImage(QString srcfile, QString label);
+    MythImage *LoadCacheImage(QString srcfile, QString label,
+                              bool allowLoadFromDisk = true);
 
     void ThemeWidget(QWidget *widget);
 

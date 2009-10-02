@@ -1216,7 +1216,8 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     return ret;
 }
 
-MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
+MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
+                                        bool allowLoadFromDisk)
 {
     //VERBOSE(VB_GENERAL, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
        
@@ -1234,7 +1235,7 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
         {
             // Check Memory Cache
             ret = GetImageFromCache(label);
-            if (!ret)
+            if (!ret && allowLoadFromDisk)
             {
                 // Load file from disk cache to memory cache
                 ret = GetMythPainter()->GetFormatImage();
