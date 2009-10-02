@@ -79,11 +79,7 @@ bool MythUIClock::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "secondflash")
     {
-        QString flash = getFirstText(element);
-        if (flash == "yes")
-        {
-            m_SecsFlash = true;
-        }
+        m_SecsFlash = parseBool(element);
     }
     else
         return MythUIText::ParseElement(element);
