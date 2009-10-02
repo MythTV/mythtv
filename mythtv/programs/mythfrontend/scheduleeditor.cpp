@@ -489,7 +489,7 @@ void SchedOptEditor::Load()
     MSqlQuery query(MSqlQuery::InitCon());
     
     // Priority
-    m_prioritySpin->SetRange(-99,99,1);
+    m_prioritySpin->SetRange(-99,99,1,5);
     m_prioritySpin->SetValue(m_recordingRule->m_recPriority);
     
     // Preferred Input
@@ -515,11 +515,11 @@ void SchedOptEditor::Load()
     m_inputList->SetValueByData(m_recordingRule->m_prefInput);
 
     // Start Offset
-    m_startoffsetSpin->SetRange(480,-480,1);
+    m_startoffsetSpin->SetRange(480,-480,1,10);
     m_startoffsetSpin->SetValue(m_recordingRule->m_startOffset);
 
     // End Offset
-    m_endoffsetSpin->SetRange(-480,480,1);
+    m_endoffsetSpin->SetRange(-480,480,1,10);
     m_endoffsetSpin->SetValue(m_recordingRule->m_endOffset);
 
     // Duplicate Match Type
@@ -819,7 +819,7 @@ void StoreOptEditor::Load()
     m_autoexpireCheck->SetCheckState(m_recordingRule->m_autoExpire);
 
     // Max Episodes
-    m_maxepSpin->SetRange(0,100,1);
+    m_maxepSpin->SetRange(0,100,1,5);
     m_maxepSpin->SetValue(m_recordingRule->m_maxEpisodes);
 
     // Max Episode Behaviour
