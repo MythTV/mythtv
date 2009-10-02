@@ -1384,8 +1384,6 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 QWidget *current = currentWidget();
                 if (current && current->isEnabled())
                     qApp->notify(current, ke);
-                //else
-                //    QDialog::keyPressEvent(ke);
 
                 break;
             }
@@ -1397,9 +1395,12 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 if (top)
                 {
                     if (top->keyPressEvent(ke))
-                    {
                         return true;
-                    }
+
+                    // Note:  The following break prevents keypresses being
+                    //        sent to windows below popups
+                    if ((*it)->objectName() == "popup stack")
+                        break;
                 }
             }
             break;
