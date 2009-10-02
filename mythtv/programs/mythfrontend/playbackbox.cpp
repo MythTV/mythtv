@@ -264,6 +264,9 @@ ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
                             TV *player, bool showTV)
     : ScheduleCommon(parent, name),
+      // Artwork Variables
+      m_fanartTimer(new QTimer(this)),    m_bannerTimer(new QTimer(this)),
+      m_coverartTimer(new QTimer(this)),
       // Settings
       m_type(ltype),
       m_formatShortDate("M/d"),           m_formatLongDate("ddd MMMM d"),
@@ -384,6 +387,24 @@ PlaybackBox::~PlaybackBox(void)
 {
     gContext->removeListener(this);
 
+    if (m_fanartTimer)
+    {
+        m_fanartTimer->disconnect(this);
+        m_fanartTimer = NULL;
+    }
+
+    if (m_bannerTimer)
+    {
+        m_bannerTimer->disconnect(this);
+        m_bannerTimer = NULL;
+    }
+
+    if (m_coverartTimer)
+    {
+        m_coverartTimer->disconnect(this);
+        m_coverartTimer = NULL;
+    }
+
     if (m_fillListTimer)
     {
         m_fillListTimer->disconnect(this);
@@ -459,6 +480,9 @@ bool PlaybackBox::Create()
     }
 
     // connect up timers...
+    connect(m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+    connect(m_bannerTimer, SIGNAL(timeout()), SLOT(bannerLoad()));
+    connect(m_coverartTimer, SIGNAL(timeout()), SLOT(coverartLoad()));
     connect(m_freeSpaceTimer, SIGNAL(timeout()), SLOT(setUpdateFreeSpace()));
     connect(m_fillListTimer, SIGNAL(timeout()), SLOT(listChanged()));
 
@@ -517,6 +541,9 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     InfoMap infoMap;
     int countInGroup;
 
+    if (m_fanart)
+        m_fanart->SetVisible(false);
+
     if (groupname.isEmpty())
     {
         countInGroup = m_progLists[""].size();
@@ -531,6 +558,33 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
                                              .arg(grouplabel);
         infoMap["group"] = m_groupDisplayName;
         infoMap["show"]  = grouplabel;
+
+        if (m_fanart)
+        {
+            m_fanart->Reset();
+            m_fanartTimer->stop();
+
+            QString fanartHost;
+            if (gContext->GetNumSetting("MasterBackendOverride", 0))
+                fanartHost = gContext->GetMasterHostName();
+            else
+                fanartHost = (*(m_progLists[groupname].begin()))->hostname;
+
+            QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
+            QString fanartTitle = groupname;
+            QString fanartSeriesID;
+            QString fanartFile = testImageFiles(fanartDir, fanartSeriesID,
+                                                fanartTitle, "fanart",
+                                                fanartHost);
+            if (!fanartFile.isEmpty())
+            {
+                m_fanart->SetFilename(fanartFile);
+
+                m_fanartTimer->setSingleShot(true);
+                m_fanartTimer->start(500);
+            }
+        }
+
     }
 
     if (countInGroup > 1)
@@ -562,9 +616,6 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
 
     if (m_previewImage)
         m_previewImage->SetVisible(false);
-
-    if (m_fanart)
-        m_fanart->SetVisible(false);
 
     if (m_banner)
         m_banner->SetVisible(false);
@@ -638,10 +689,18 @@ void PlaybackBox::UpdateProgramInfo(
             m_previewImage->Load();
         }
 
-        QString hostip = pginfo->hostname;
+        QString artworkHost;
+        if (gContext->GetNumSetting("MasterBackendOverride", 0))
+            artworkHost = gContext->GetMasterHostName();
+        else
+            artworkHost = pginfo->hostname;
 
         if (m_fanart)
         {
+            m_fanartTimer->stop();
+            m_fanart->SetVisible(false);
+            m_fanart->Reset();
+
             QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
             QString fanartTitle = pginfo->title;
             QString fanartSeriesID = pginfo->seriesid;
@@ -649,14 +708,23 @@ void PlaybackBox::UpdateProgramInfo(
                                                 fanartSeriesID,
                                                 fanartTitle,
                                                 "fanart",
-                                                hostip);
-            m_fanart->SetVisible(!fanartFile.isEmpty());
-            m_fanart->SetFilename(fanartFile);
-            m_fanart->Load();
+                                                artworkHost);
+            if (!fanartFile.isEmpty())
+            {
+                m_fanart->SetFilename(fanartFile);
+
+                m_fanartTimer->stop();
+                m_fanartTimer->setSingleShot(true);
+                m_fanartTimer->start(500);
+            }
         }
 
         if (m_banner)
         {
+            m_bannerTimer->stop();
+            m_banner->SetVisible(false);
+            m_banner->Reset();
+
             QString bannerDir = gContext->GetSetting("mythvideo.bannerDir");
             QString bannerTitle = pginfo->title;
             QString bannerSeriesID = pginfo->seriesid;
@@ -664,14 +732,22 @@ void PlaybackBox::UpdateProgramInfo(
                                                 bannerSeriesID,
                                                 bannerTitle,
                                                 "banner",
-                                                hostip);
-            m_banner->SetVisible(!bannerFile.isEmpty());
-            m_banner->SetFilename(bannerFile);
-            m_banner->Load();
+                                                artworkHost);
+            if (!bannerFile.isEmpty())
+            {
+                m_banner->SetFilename(bannerFile);
+
+                m_bannerTimer->setSingleShot(true);
+                m_bannerTimer->start(500);
+            }
         }
 
         if (m_coverart)
         {
+            m_coverartTimer->stop();
+            m_coverart->SetVisible(false);
+            m_coverart->Reset();
+
             QString coverDir = gContext->GetSetting("VideoArtworkDir");
             QString coverTitle = pginfo->title;
             QString coverSeriesID = pginfo->seriesid;
@@ -679,10 +755,14 @@ void PlaybackBox::UpdateProgramInfo(
                                                coverSeriesID,
                                                coverTitle,
                                                "coverart",
-                                               hostip);
-            m_coverart->SetVisible(!coverFile.isEmpty());
-            m_coverart->SetFilename(coverFile);
-            m_coverart->Load();
+                                               artworkHost);
+            if (!coverFile.isEmpty())
+            {
+                m_coverart->SetFilename(coverFile);
+
+                m_coverartTimer->setSingleShot(true);
+                m_coverartTimer->start(500);
+            }
         }
 
         updateIcons(pginfo);
@@ -1936,6 +2016,24 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
         showDeletePopup(ForceDeleteRecording);
 
     return result;
+}
+
+void PlaybackBox::fanartLoad(void)
+{
+    m_fanart->SetVisible(true);
+    m_fanart->Load();
+}
+
+void PlaybackBox::bannerLoad(void)
+{
+    m_banner->SetVisible(true);
+    m_banner->Load();
+}
+
+void PlaybackBox::coverartLoad(void)
+{
+    m_coverart->SetVisible(true);
+    m_coverart->Load();
 }
 
 QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,

@@ -259,6 +259,10 @@ class PlaybackBox : public ScheduleCommon
 
     void checkPassword(const QString &password);
 
+    void fanartLoad(void);
+    void bannerLoad(void);
+    void coverartLoad(void);
+
   protected:
     bool SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
     void IncPreviewGeneratorPriority(const QString &fn);
@@ -329,6 +333,9 @@ class PlaybackBox : public ScheduleCommon
     MythUIImage *m_fanart;
     MythUIImage *m_banner;
     MythUIImage *m_coverart;
+    QTimer      *m_fanartTimer;
+    QTimer      *m_bannerTimer;
+    QTimer      *m_coverartTimer;
 
     InfoMap m_currentMap;
 
