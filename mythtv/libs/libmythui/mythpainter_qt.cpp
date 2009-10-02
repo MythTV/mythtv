@@ -15,21 +15,41 @@
 class MythQtImage : public MythImage
 {
   public:
-    MythQtImage(MythPainter *parent) : MythImage(parent) { }
+    MythQtImage(MythPainter *parent) : MythImage(parent),
+                m_Pixmap(NULL), m_bRegenPixmap(false) { }
+   ~MythQtImage() { if (m_Pixmap) delete m_Pixmap; }
 
     void SetChanged(bool change = true);
-    QPixmap *GetPixmap(void) { return &m_Pixmap; }
+    QPixmap *GetPixmap(void) { return m_Pixmap; }
+
+    bool NeedsRegen(void) { return m_bRegenPixmap; }
+    void RegeneratePixmap(void);
 
   protected:
-    QPixmap m_Pixmap;
+    QPixmap *m_Pixmap;
+    bool m_bRegenPixmap;
 };
 
 void MythQtImage::SetChanged(bool change)
 {
     if (change)
-        m_Pixmap = QPixmap::fromImage(*((QImage *)this));
+        m_bRegenPixmap = true;
 
     MythImage::SetChanged(change);
+}
+
+void MythQtImage::RegeneratePixmap(void)
+{
+    // We allocate the pixmap here so it is done in the UI
+    // thread since QPixmap uses non-reentrant X calls.
+    if (!m_Pixmap)
+        m_Pixmap = new QPixmap;
+
+    if (m_Pixmap)
+    {
+        *m_Pixmap = QPixmap::fromImage(*((QImage *)this));
+        m_bRegenPixmap = false;
+    }
 }
 
 MythQtPainter::MythQtPainter() :
@@ -92,6 +112,11 @@ void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
     (void)alpha;
 
     MythQtImage *qim = reinterpret_cast<MythQtImage *>(im);
+
+    if (qim->NeedsRegen())
+    {
+       qim->RegeneratePixmap();
+    }
 
     painter->drawPixmap(r.topLeft(), *(qim->GetPixmap()), src);
 }
