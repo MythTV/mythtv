@@ -1886,8 +1886,6 @@ bool VideoDialog::Create()
         return false;
     }
 
-    CheckedSet(m_novideoText, tr("No Videos Available"));
-
     CheckedSet(m_trailerState, "None");
     CheckedSet(m_parentalLevelState, "None");
     CheckedSet(m_watchedState, "None");
@@ -1919,11 +1917,17 @@ bool VideoDialog::Create()
     connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
             SLOT(reloadData()));
 
+    return true;
+}
+
+void VideoDialog::Init()
+{
+
+    CheckedSet(m_novideoText, tr("No Videos Available"));
+
     m_d->m_parentalLevel.SetLevel(ParentalLevel(gContext->
                     GetNumSetting("VideoDefaultParentalLevel",
                             ParentalLevel::plLowest)));
-
-    return true;
 }
 
 /** \fn VideoDialog::refreshData()

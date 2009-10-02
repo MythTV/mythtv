@@ -60,6 +60,9 @@ class VideoDialog : public MythScreenType
   public slots:
     void searchComplete(QString string);
 
+  protected slots:
+    void Init(); /// Called after the screen is created by MythScreenStack
+
   private slots:
     void UpdatePosition();
     void UpdateText(MythUIButtonListItem *);
