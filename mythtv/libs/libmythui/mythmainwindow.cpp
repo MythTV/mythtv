@@ -1445,20 +1445,36 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
 
+                        if (!screen)
+                            continue;
+
                         // A focusable screen should be a rare event but there
                         // but may be desirable in a couple of scenarios
-                        if (screen && screen->CanTakeFocus())
+                        // e.g. Clicking anywhere on the screen when watching a
+                        // video could bring up playback controls, or pause/play
+                        if (screen->CanTakeFocus())
                         {
                             screen->gestureEvent(screen, ge);
                             break;
                         }
 
-                        if (screen && (clicked = screen->GetChildAt(p)) != NULL)
+                        MythUIType *clicked = screen->GetChildAt(p);
+                        if (clicked && clicked->IsEnabled())
                         {
                             screen->SetFocusWidget(clicked);
                             clicked->gestureEvent(clicked, ge);
                             break;
                         }
+
+                        // Note:  The following break prevents clicks being
+                        //        sent to windows below popups
+                        //
+                        //        we want to permit this in some cases, e.g.
+                        //        when the music miniplayer is on screen or a
+                        //        non-interactive alert/news scroller. So these
+                        //        things need to be in a third or more stack
+                        if ((*it)->objectName() == "popup stack")
+                            break;
                     }
 
                     delete ge;
