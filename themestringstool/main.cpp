@@ -135,10 +135,10 @@ void parseDirectory(QString dir)
             continue;
         }
 
-        if ((themeDir.dirName() != "default") &&
-            (themeDir.dirName() != "default-wide") &&
-            !themeDir.exists("themeinfo.xml"))
-            return;
+//         if ((themeDir.dirName() != "default") &&
+//             (themeDir.dirName() != "default-wide") &&
+//             !themeDir.exists("themeinfo.xml"))
+//             return;
 
         if ((*it).suffix() != "xml")
             continue;
