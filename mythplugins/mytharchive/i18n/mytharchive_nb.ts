@@ -35,10 +35,6 @@
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <source>Save</source>
-        <translation type="obsolete">Lagre</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -81,60 +77,9 @@
         <source>You don&apos;t have any videos!</source>
         <translation>Du har ingen videoer!</translation>
     </message>
-</context>
-<context>
-    <name>ExportNativeWizard</name>
     <message>
-        <source>0 Mb</source>
-        <translation type="obsolete">0 MB</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Neste</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Forrige</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>Choose File...</source>
-        <translation type="obsolete">Velg fil . . .</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth-arkiv</translation>
-    </message>
-    <message>
-        <source>You need to select at least one item to archive!</source>
-        <translation type="obsolete">Du må velge minst ett element å arkivere.</translation>
-    </message>
-    <message>
-        <source>Finish</source>
-        <translation type="obsolete">Ferdig</translation>
-    </message>
-    <message>
-        <source>All Archive Items</source>
-        <translation type="obsolete">Alle arkivelementer</translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth-brenner</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any items to archive!
-
-Click OK</source>
-        <translation type="obsolete">Du har ingen ting å arkivere. 
-
-Trykk OK</translation>
-    </message>
-    <message>
-        <source>Remove Item</source>
-        <translation type="obsolete">Fjern element</translation>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -154,14 +99,6 @@ Trykk OK</translation>
     <message>
         <source>Home</source>
         <translation>Hjem</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth-arkiverer</translation>
-    </message>
-    <message>
-        <source>You need to select at least one file!</source>
-        <translation type="obsolete">Du må velge minst én fil.</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
@@ -220,70 +157,7 @@ Trykk OK</translation>
     </message>
 </context>
 <context>
-    <name>ImportNativeWizard</name>
-    <message>
-        <source>Back</source>
-        <translation type="obsolete">Tilbake</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="obsolete">Hjem</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Neste</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Forrige</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth-arkiv</translation>
-    </message>
-    <message>
-        <source>You need to select a valid archive XML file!</source>
-        <translation type="obsolete">Du må velge en gydlig akriv-XML-fil.</translation>
-    </message>
-    <message>
-        <source>You need to select a valid chanID!</source>
-        <translation type="obsolete">Du må velge en gydlig kanal-id.</translation>
-    </message>
-    <message>
-        <source>Finish</source>
-        <translation type="obsolete">Fullfør</translation>
-    </message>
-    <message>
-        <source>Select a ChanID</source>
-        <translation type="obsolete">Velg en kanal-id</translation>
-    </message>
-    <message>
-        <source>Select a ChanNo</source>
-        <translation type="obsolete">Velg et kanalnr.</translation>
-    </message>
-    <message>
-        <source>Select a Channel Name</source>
-        <translation type="obsolete">Velg et kanalnavn</translation>
-    </message>
-    <message>
-        <source>Select a Callsign</source>
-        <translation type="obsolete">Velg et kanaltegn</translation>
-    </message>
-</context>
-<context>
     <name>LogViewer</name>
-    <message>
-        <source>Log Viewer</source>
-        <translation type="obsolete">Loggviser</translation>
-    </message>
-    <message>
-        <source>Seconds</source>
-        <translation type="obsolete">Sekunder</translation>
-    </message>
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
@@ -311,6 +185,10 @@ Trykk OK</translation>
     <message>
         <source>Auto Update</source>
         <translation>Oppdater automatisk</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -391,72 +269,9 @@ Trykk OK</translation>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Klarte ikke lage DVD&apos;en; en feil oppstod under kjøringen av skriptene</translation>
     </message>
-</context>
-<context>
-    <name>MythburnWizard</name>
     <message>
-        <source>Next</source>
-        <translation type="obsolete">Neste</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Forrige</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth-arkiv</translation>
-    </message>
-    <message>
-        <source>You need to select at least one item to archive!</source>
-        <translation type="obsolete">Du må velge minst ett element å arkivere.</translation>
-    </message>
-    <message>
-        <source>Finish</source>
-        <translation type="obsolete">Fullfør</translation>
-    </message>
-    <message>
-        <source>All Archive Items</source>
-        <translation type="obsolete">Alle arkivelementer</translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth-brenner</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any items to archive!
-
-Click OK</source>
-        <translation type="obsolete">Du har ingen elementer å arkivere 
-
-Trykk OK</translation>
-    </message>
-    <message>
-        <source>Edit Details</source>
-        <translation type="obsolete">Rediger detaljer</translation>
-    </message>
-    <message>
-        <source>Remove Item</source>
-        <translation type="obsolete">Fjern element</translation>
-    </message>
-    <message>
-        <source>Choose File...</source>
-        <translation type="obsolete">Velg fil . . .</translation>
-    </message>
-    <message>
-        <source>Don&apos;t re-encode</source>
-        <translation type="obsolete">Ikke kod på nytt</translation>
-    </message>
-    <message>
-        <source>New Size </source>
-        <translation type="obsolete">Ny størrelse </translation>
-    </message>
-    <message>
-        <source>Original Size </source>
-        <translation type="obsolete">Opprinnelig størrelse </translation>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -553,14 +368,6 @@ Trykk OK</translation>
         <translation>Kommando for å kjøre tcrequant (del av transcode-pakken). Valgfritt - bruk at tomt felt hvis transcode-pakken ikke er installert.</translation>
     </message>
     <message>
-        <source>png2yuv command</source>
-        <translation type="obsolete">png2yuv-kommando</translation>
-    </message>
-    <message>
-        <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation type="obsolete">Kommando for åkjøre png2yuv. Del av mjpegtools-pakken</translation>
-    </message>
-    <message>
         <source>spumux command</source>
         <translation>spumux-kommando</translation>
     </message>
@@ -589,22 +396,10 @@ Trykk OK</translation>
         <translation>Eksterne kommandoer for Myth-arkiv (2)</translation>
     </message>
     <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth-brenner</translation>
-    </message>
-    <message>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>Bakgrunnslagingen har blitt bedt om å stoppe. 
 Dette kan ta et par minutter.</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth-arkiv</translation>
-    </message>
-    <message>
-        <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="obsolete">Klarte ikke lage DVD&apos;en; en feil oppstod under kjøringen av skriptene</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
@@ -631,16 +426,8 @@ Dette kan ta et par minutter.</translation>
         <translation>Alltid bruk Mythtranscode</translation>
     </message>
     <message>
-        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation type="obsolete">Hvis på vil alltid MPEG-2-filer kjøres gjennom mythtranscode for å rette opp eventuelle feil. Kan kanskje ordne noen lydproblemer.</translation>
-    </message>
-    <message>
         <source>Use FIFOs</source>
         <translation>Bruk FIFO&apos;er</translation>
-    </message>
-    <message>
-        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation type="obsolete">Gjør at skriptet bruker FIFO&apos;er for å sende utdata fra mplex til dvdauthor, i stedet for å lage midlertidige filer. Sparer tid og diskplass under multiplex-operasjoner, men virker ikke i Windows</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -661,10 +448,6 @@ Dette kan ta et par minutter.</translation>
     <message>
         <source>MythArchive Settings (2)</source>
         <translation>Oppsett av Myth-arkiv (2)</translation>
-    </message>
-    <message>
-        <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="obsolete">Klarte ikke importere akrivet; feil oppsetod ved kjøring av «mytharchivehelper»</translation>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
@@ -759,10 +542,6 @@ Dette kan ta et par minutter.</translation>
         <translation>DVD menyinstillinger</translation>
     </message>
     <message>
-        <source>Video Selector</source>
-        <translation type="obsolete">Video-velger</translation>
-    </message>
-    <message>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation>Kan ikke finne arbeidskatalog for Myth-arkiv.
@@ -849,28 +628,8 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>OK</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth-arkiv</translation>
-    </message>
-    <message>
-        <source>You need to select at least one recording!</source>
-        <translation type="obsolete">Du må velge minst ett opptak.</translation>
-    </message>
-    <message>
         <source>All Recordings</source>
         <translation>Alle opptak</translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth-brenner</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any recordings!
-
-Click OK</source>
-        <translation type="obsolete">Du har ingen opptak. 
-
-Trykk OK</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
@@ -879,6 +638,10 @@ Trykk OK</translation>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>Enter har du ingen opptak eller så er ikke opptakene tilgjengelig lokalt!</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -899,6 +662,42 @@ Trykk OK</translation>
         <source>Find...</source>
         <translation>Finn...</translation>
     </message>
+    <message>
+        <source>Single Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Layer DVD (4482Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD (8964Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD +/- RW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewritable DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any file accessable from your filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeSelector</name>
@@ -913,6 +712,213 @@ Trykk OK</translation>
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Select Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>description goes here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free Space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.00Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make ISO Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force Overwrite of DVD-RW Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>title goes here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x.xx Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No videos available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Viewer</source>
+        <translation type="unfinished">Loggviser</translation>
+    </message>
+    <message>
+        <source>Change Encoding Profile</source>
+        <translation type="unfinished">Endre kodingsprofil</translation>
+    </message>
+    <message>
+        <source>12.34GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Intro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chapter Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Archive Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No files are selected for archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>xxxxx mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Item Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Date:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thumb Image Selector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0:00:00.00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seek Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sep 13, 2004 11:00 pm (1h 15m)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder To Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Associated Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. No:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Channel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -932,6 +938,10 @@ Trykk OK</translation>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Avslutt, Ikke lagre miniatyrbildene</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -953,32 +963,16 @@ Trykk OK</translation>
         <translation>OK</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth-arkiv</translation>
-    </message>
-    <message>
-        <source>You need to select at least one video file!</source>
-        <translation type="obsolete">Du må velge minst én videofil.</translation>
-    </message>
-    <message>
         <source>All Videos</source>
         <translation>Alle videoer</translation>
     </message>
     <message>
-        <source>Video Selector</source>
-        <translation type="obsolete">Video-velger</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any videos!
-
-Click OK</source>
-        <translation type="obsolete">Du har ingen videoer. 
-
-Trykk OK</translation>
-    </message>
-    <message>
         <source>Parental Pin:</source>
         <translation>Forelder-pin:</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

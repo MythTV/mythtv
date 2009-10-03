@@ -701,6 +701,21 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
 </context>
 <context>
+    <name>ThemeSelector</name>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Nästa</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Föregående</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Avbryt</translation>
+    </message>
+</context>
+<context>
     <name>ThemeUI</name>
     <message>
         <source>Select Archive Items</source>
@@ -959,44 +974,6 @@ Place a blank DVD in the drive and select an option below.</source>
     <message>
         <source>Menu</source>
         <translation>Meny</translation>
-    </message>
-</context>
-<context>
-    <name>archivemenu_xml</name>
-    <message>
-        <source>Create DVD</source>
-        <translation>Skapa DVD</translation>
-    </message>
-    <message>
-        <source>Create Archive</source>
-        <translation>Skapa arkiv</translation>
-    </message>
-    <message>
-        <source>Encode Video File</source>
-        <translation>Koda videofil</translation>
-    </message>
-    <message>
-        <source>Import Archive</source>
-        <translation>Importera arkiv</translation>
-    </message>
-    <message>
-        <source>Archive Utilities</source>
-        <translation>Arkiveringsverktyg</translation>
-    </message>
-</context>
-<context>
-    <name>archiveutils_xml</name>
-    <message>
-        <source>Show Log Viewer</source>
-        <translation>Visa loggvisare</translation>
-    </message>
-    <message>
-        <source>Play Created DVD</source>
-        <translation>Spela skapad DVD</translation>
-    </message>
-    <message>
-        <source>Burn DVD</source>
-        <translation>Bränn DVD</translation>
     </message>
 </context>
 </TS>

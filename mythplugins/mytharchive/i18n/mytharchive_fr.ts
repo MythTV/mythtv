@@ -77,6 +77,10 @@
         <source>You don&apos;t have any videos!</source>
         <translation>Vous n&apos;avez aucune vidéo !</translation>
     </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FileSelector</name>
@@ -182,6 +186,10 @@
         <source>Auto Update</source>
         <translation>Mise à jour automatique</translation>
     </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythBurn</name>
@@ -260,6 +268,10 @@
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Il n&apos;a pas été possible de créer le DVD.  Une erreur est apparue lors de l&apos;exécution des scripts</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -626,6 +638,10 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>Soit vous n&apos;avez aucun enregistrement, soir aucun d&apos;eux n&apos;est disponible en local !</translation>
     </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SelectDestination</name>
@@ -645,6 +661,42 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>Find...</source>
         <translation>Trouver...</translation>
     </message>
+    <message>
+        <source>Single Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Layer DVD (4482Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD (8964Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD +/- RW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewritable DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any file accessable from your filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeSelector</name>
@@ -659,6 +711,213 @@ Place a blank DVD in the drive and select an option below.</source>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Select Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>description goes here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free Space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.00Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make ISO Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force Overwrite of DVD-RW Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>title goes here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x.xx Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No videos available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Encoding Profile</source>
+        <translation type="unfinished">Modifier le profil d&apos;encodage</translation>
+    </message>
+    <message>
+        <source>12.34GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Intro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chapter Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Archive Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No files are selected for archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>xxxxx mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Item Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Date:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thumb Image Selector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0:00:00.00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seek Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sep 13, 2004 11:00 pm (1h 15m)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder To Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Associated Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. No:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Channel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -678,6 +937,10 @@ Place a blank DVD in the drive and select an option below.</source>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Sortir, ne pas sauvegarder les vignettes</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -706,43 +969,9 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>Parental Pin:</source>
         <translation>Code d&apos;accès parental :</translation>
     </message>
-</context>
-<context>
-    <name>archivemenu_xml</name>
     <message>
-        <source>Create DVD</source>
-        <translation>Créer un DVD</translation>
-    </message>
-    <message>
-        <source>Create Archive</source>
-        <translation>Créer une archive</translation>
-    </message>
-    <message>
-        <source>Encode Video File</source>
-        <translation>Encoder un fichier vidéo</translation>
-    </message>
-    <message>
-        <source>Import Archive</source>
-        <translation>Importer une archive</translation>
-    </message>
-    <message>
-        <source>Archive Utilities</source>
-        <translation>Utilitaires d&apos;archivage</translation>
-    </message>
-</context>
-<context>
-    <name>archiveutils_xml</name>
-    <message>
-        <source>Show Log Viewer</source>
-        <translation>Afficher le visualisateur de journaux</translation>
-    </message>
-    <message>
-        <source>Play Created DVD</source>
-        <translation>Lire un DVD créé</translation>
-    </message>
-    <message>
-        <source>Burn DVD</source>
-        <translation>Graver un DVD</translation>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
