@@ -1,20 +1,10 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
-    <name>GameTree</name>
+    <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Favourites</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>-   By Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>-   By Year</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -22,13 +12,43 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Players Available. 
-
- Please pick one.</source>
+        <source>-   By Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-   By Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose System for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Search</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -151,14 +171,6 @@
     </message>
     <message>
         <source>File Extensions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ScreenShots</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Path to any screenshots for this player</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -297,7 +309,27 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Directory where Game Screenshots are stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning screenshots.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Fanart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning fanart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Boxart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning boxart.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -317,6 +349,90 @@ want to do this?</source>
     </message>
     <message>
         <source>Favorite:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Publisher:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Boxart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rompath:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System(s):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Plot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Information</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

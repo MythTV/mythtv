@@ -47,6 +47,10 @@
         <source>Game Search</source>
         <translation>Spelsökning</translation>
     </message>
+    <message>
+        <source>Choose System for</source>
+        <translation type="unfinished">Välj system för</translation>
+    </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
@@ -331,10 +335,6 @@ att du vill göra det?</translation>
         <source>This directory will be the default browse location when assigning boxart.</source>
         <translation>Denna katalog är standardplatsen att gå till när förpackningsbilder tilldelas.</translation>
     </message>
-    <message>
-        <source>Choose System for</source>
-        <translation>Välj system för</translation>
-    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -430,31 +430,13 @@ att du vill göra det?</translation>
         <source>Game Information</source>
         <translation>Spelinformation</translation>
     </message>
-</context>
-<context>
-    <name>game_settings_xml</name>
     <message>
-        <source>General Settings</source>
-        <translation>Allmänna inställningar</translation>
+        <source>No</source>
+        <translation type="unfinished">Nej</translation>
     </message>
     <message>
-        <source>Game Players</source>
-        <translation>Spelare</translation>
-    </message>
-    <message>
-        <source>Scan for Games</source>
-        <translation>Sök efter spel</translation>
-    </message>
-    <message>
-        <source>Clear Game Data</source>
-        <translation>Rensa speldata</translation>
-    </message>
-</context>
-<context>
-    <name>gamemenu_xml</name>
-    <message>
-        <source>Games</source>
-        <translation>Spel</translation>
+        <source>Yes</source>
+        <translation type="unfinished">Ja</translation>
     </message>
 </context>
 </TS>

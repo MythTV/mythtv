@@ -1,5 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
+<context>
+    <name>GameUI</name>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="125"/>
+        <source>All Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="130"/>
+        <source>-   By Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="135"/>
+        <source>-   By Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="140"/>
+        <source>-   By Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="145"/>
+        <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="242"/>
+        <source>Choose System for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="259"/>
+        <location filename="../mythgame/gameui.cpp" line="491"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="406"/>
+        <location filename="../mythgame/gameui.cpp" line="479"/>
+        <source>Show Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="408"/>
+        <location filename="../mythgame/gameui.cpp" line="484"/>
+        <source>Remove Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="410"/>
+        <location filename="../mythgame/gameui.cpp" line="483"/>
+        <source>Make Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="411"/>
+        <location filename="../mythgame/gameui.cpp" line="475"/>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/gameui.cpp" line="438"/>
+        <source>Game Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>MythGamePlayerEditor</name>
     <message>
@@ -23,7 +92,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="337"/>
+        <location filename="../mythgame/gamesettings.cpp" line="336"/>
         <source>Are you sure you want to delete this item?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -41,16 +110,27 @@
 <context>
     <name>QObject</name>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="166"/>
         <location filename="../mythgame/gamehandler.cpp" line="447"/>
         <source>19xx</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="167"/>
+        <location filename="../mythgame/gamehandler.cpp" line="168"/>
+        <location filename="../mythgame/gamehandler.cpp" line="169"/>
+        <location filename="../mythgame/gamehandler.cpp" line="170"/>
+        <location filename="../mythgame/gamehandler.cpp" line="171"/>
+        <location filename="../mythgame/gamehandler.cpp" line="445"/>
+        <location filename="../mythgame/gamehandler.cpp" line="448"/>
+        <location filename="../mythgame/gamehandler.cpp" line="449"/>
+        <location filename="../mythgame/gamehandler.cpp" line="450"/>
         <location filename="../mythgame/gamehandler.cpp" line="456"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="172"/>
         <location filename="../mythgame/gamehandler.cpp" line="451"/>
         <source>0</source>
         <translation type="unfinished"></translation>
@@ -58,9 +138,10 @@
     <message>
         <location filename="../mythgame/gamehandler.cpp" line="453"/>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="231"/>
         <location filename="../mythgame/gamehandler.cpp" line="622"/>
         <source>No</source>
         <translation type="unfinished"></translation>
@@ -71,6 +152,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythgame/gamehandler.cpp" line="233"/>
         <location filename="../mythgame/gamehandler.cpp" line="623"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
@@ -86,13 +168,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="241"/>
+        <location filename="../mythgame/gamehandler.cpp" line="240"/>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="409"/>
+        <location filename="../mythgame/gamehandler.cpp" line="408"/>
         <source>Updating %1(%2) ROM database</source>
         <translation type="unfinished"></translation>
     </message>
@@ -107,7 +189,7 @@ Remove it from the database?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamehandler.cpp" line="630"/>
+        <location filename="../mythgame/gamehandler.cpp" line="628"/>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
@@ -124,7 +206,7 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="35"/>
+        <location filename="../mythgame/gamesettings.cpp" line="33"/>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
         <translation type="unfinished"></translation>
     </message>
@@ -134,7 +216,7 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="47"/>
+        <location filename="../mythgame/gamesettings.cpp" line="44"/>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
         <translation type="unfinished"></translation>
     </message>
@@ -144,7 +226,7 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="57"/>
+        <location filename="../mythgame/gamesettings.cpp" line="55"/>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -154,7 +236,7 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="67"/>
+        <location filename="../mythgame/gamesettings.cpp" line="65"/>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
         <translation type="unfinished"></translation>
     </message>
@@ -184,7 +266,7 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="95"/>
+        <location filename="../mythgame/gamesettings.cpp" line="94"/>
         <source>This directory will be the default browse location when assigning screenshots.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -194,7 +276,7 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="105"/>
+        <location filename="../mythgame/gamesettings.cpp" line="104"/>
         <source>This directory will be the default browse location when assigning fanart.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -204,7 +286,7 @@ want to do this?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgame/gamesettings.cpp" line="115"/>
+        <location filename="../mythgame/gamesettings.cpp" line="114"/>
         <source>This directory will be the default browse location when assigning boxart.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -374,6 +456,111 @@ want to do this?</source>
     <message>
         <location filename="themestrings.h" line="5"/>
         <source>Favorite:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Edit Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Game Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Country:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Publisher:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Plot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Boxart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>/path/to/the/thing.jpg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>Game:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Rompath:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>System(s):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="23"/>
+        <source>CRC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
+        <source>No Plot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="25"/>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="26"/>
+        <source>Game Information</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

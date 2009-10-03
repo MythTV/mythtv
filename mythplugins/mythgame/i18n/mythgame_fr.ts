@@ -2,6 +2,57 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
+    <name>GameUI</name>
+    <message>
+        <source>All Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-   By Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-   By Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-   By Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose System for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythGamePlayerEditor</name>
     <message>
         <source>Game Player Menu</source>
@@ -379,31 +430,13 @@ tes-vous sûr de vouloir faire cela ?</translation>
         <source>Game Information</source>
         <translation>Informations du jeu</translation>
     </message>
-</context>
-<context>
-    <name>game_settings_xml</name>
     <message>
-        <source>General Settings</source>
-        <translation>Réglages généraux</translation>
+        <source>No</source>
+        <translation type="unfinished">Non</translation>
     </message>
     <message>
-        <source>Game Players</source>
-        <translation>Émulateurs</translation>
-    </message>
-    <message>
-        <source>Scan for Games</source>
-        <translation>Rechercher des jeux</translation>
-    </message>
-    <message>
-        <source>Clear Game Data</source>
-        <translation>Effacer les données sur les jeux</translation>
-    </message>
-</context>
-<context>
-    <name>gamemenu_xml</name>
-    <message>
-        <source>Games</source>
-        <translation>Jeux</translation>
+        <source>Yes</source>
+        <translation type="unfinished">Oui</translation>
     </message>
 </context>
 </TS>
