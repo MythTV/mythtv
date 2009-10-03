@@ -232,6 +232,8 @@ namespace
                                             .arg(m_dest_file);
                                     m_error_state = esError;
                                 }
+
+                                delete outFile;
                             }
                         }
                     }
