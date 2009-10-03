@@ -452,7 +452,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             if ((progress > 0) && (total > 0) && (progress < total))
             {
                 float fProgress = (float)progress/total;
-                QString text = QString("%1 of %2 (%3 percent)")
+                QString text = tr("%1 of %2 (%3 percent)")
                         .arg(formatSize(progress, 2))
                         .arg(formatSize(total, 2))
                         .arg(floor(fProgress*100));
@@ -711,7 +711,7 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
             if ((progress > 0) && (total > 0) && (progress < total))
             {
                 float fProgress = (float)progress/total;
-                QString text = QString("%1 of %2 (%3 percent)")
+                QString text = tr("%1 of %2 (%3 percent)")
                         .arg(formatSize(progress, 2))
                         .arg(formatSize(total, 2))
                         .arg(floor(fProgress*100));
