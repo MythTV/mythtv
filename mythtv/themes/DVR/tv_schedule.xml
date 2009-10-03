@@ -48,7 +48,7 @@
         <text lang="DE">Alphabetische Suche</text>
         <text lang="DA">Program SØger</text>
         <text lang="PT">Procurar Programas</text>
-        <text lang="SV">Programletaren</text>
+        <text lang="SV">Sök program</text>
         <text lang="JA">番組検索</text>
         <text lang="FI">Ohjelman Etsintä</text>
         <text lang="ZH_TW">搜尋節目</text>
@@ -63,7 +63,7 @@
         <alttext lang="DA">Søger</alttext>
         <alttext lang="NL">Zoek A-Z</alttext>
         <alttext lang="PT">Procurar</alttext>
-        <alttext lang="SV">Letaren</alttext>
+        <alttext lang="SV">Sök</alttext>
         <alttext lang="JA">検索</alttext>
         <alttext lang="ZH_TW">搜尋</alttext>
         <alttext lang="SL">Iskalec</alttext>
@@ -138,7 +138,7 @@
     <button>
         <type>TV_CUSTOM_RECORD</type>
         <text>Custom Record</text>
-        <text lang="SV">Avancerad</text>
+        <text lang="SV">Avancerat</text>
         <text lang="NL">Geavanceerd Opnameschema</text>
         <text lang="JA">カスタム録画</text>
         <text lang="FR">Recherche Personnalisée</text>

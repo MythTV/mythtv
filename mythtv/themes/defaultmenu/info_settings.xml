@@ -97,6 +97,7 @@
     <button>
         <type>SETTINGS_NETFLIX</type>
         <text>NetFlix Settings</text>
+        <text lang="SV">Nätfilmer</text>
         <text lang="IT">Impostazioni NetFlix</text>
         <text lang="FI">NetFlix Asetukset</text>
         <text lang="PT">Configurar Aluguer de Filmes</text>

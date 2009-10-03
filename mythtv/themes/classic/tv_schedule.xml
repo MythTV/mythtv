@@ -54,7 +54,7 @@
         <text lang="DE">Alphabetische Suche</text>
         <text lang="DA">Program Søger</text>
         <text lang="PT">Procurar Programa</text>
-        <text lang="SV">Programletaren</text>
+        <text lang="SV">Sök program</text>
         <text lang="JA">番組検索</text>
         <text lang="SL">Iskalec programov</text>
         <text lang="ET">Programmiotsija</text>
@@ -70,7 +70,7 @@
         <alttext lang="DA">Søger</alttext>
         <alttext lang="NL">Zoeken A-Z</alttext>
         <alttext lang="PT">Procurar</alttext>
-        <alttext lang="SV">Letaren</alttext>
+        <alttext lang="SV">Sök</alttext>
         <alttext lang="JA">検索</alttext>
         <alttext lang="SL">Iskalec</alttext>
         <alttext lang="ET">Otsija</alttext>
@@ -199,7 +199,7 @@
         <text lang="DE">Aufnahmeplan</text>
         <text lang="DA">Løs konflikter</text>
         <text lang="PT">Resolver Conflitos</text>
-        <text lang="SV">Kommande inspelningar</text>
+        <text lang="SV">Kommande Inspelningar</text>
         <text lang="JA">これからの録画</text>
         <text lang="FI">Tulevat Nauhoitukset</text>
         <text lang="ZH_TW">修正預設錄影衝突</text>

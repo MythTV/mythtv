@@ -12,7 +12,7 @@
         <text lang="IS">Almennt</text>
         <text lang="NL">Algemeen</text>
         <text lang="PT">Configurações Gerais</text>
-        <text lang="SV">Generellt</text>
+        <text lang="SV">Allmänt</text>
         <text lang="JA">全般</text>
         <text lang="FI">Yleiset</text>
         <text lang="ZH_TW">一般設定</text>
@@ -496,6 +496,7 @@
     <button>
         <type>SETTINGS_NETFLIX</type>
         <text>NetFlix Settings</text>
+        <text lang="SV">Nätfilmer</text>
         <text lang="IT">Impostazioni NetFlix</text>
         <text lang="FI">NetFlix Asetukset</text>
         <text lang="PT">Configurar Aluguer de Filmes</text>

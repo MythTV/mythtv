@@ -5,7 +5,7 @@
      <text>1. General</text>
      <text lang="IT">1. Generale</text>
      <text lang="PT">1. Geral</text>
-     <text lang="SV">1. Generellt</text>
+     <text lang="SV">1. Allmänt</text>
      <text lang="JA">1. 一般</text>
      <text lang="DE">1. Allgemeines</text>
      <text lang="FI">1. Yleiset</text>
@@ -105,7 +105,7 @@
      <text lang="FR">6. Répertoires de stockage</text>
      <text lang="IT">6. Cartelle</text>
      <text lang="FI">Tallennusryhmät</text>
-     <text lang="SV">Lagringsgrupper</text>
+     <text lang="SV">6. Lagringsgrupper</text>
      <text lang="DE">6. Speicherplatz</text>
      <action>STORAGE GROUPS</action>
    </button>

@@ -61,7 +61,7 @@
         <text lang="DA">Find program</text>
         <text lang="IS">Dagsskrár leit</text>
         <text lang="PT">Procurar Programa</text>
-        <text lang="SV">Programletaren</text>
+        <text lang="SV">Sök program</text>
         <text lang="JA">番組検索</text>
         <text lang="FI">Ohjelman Etsintä</text>
         <text lang="ZH_TW">搜尋節目</text>
@@ -83,7 +83,7 @@
         <alttext lang="IS">Leit</alttext>
         <alttext lang="NL">Zoek A-Z</alttext>
         <alttext lang="PT">Procurar</alttext>
-        <alttext lang="SV">Letaren</alttext>
+        <alttext lang="SV">Sök</alttext>
         <alttext lang="JA">検索</alttext>
         <alttext lang="ZH_TW">搜尋</alttext>
         <alttext lang="SL">Iskalec</alttext>
@@ -185,7 +185,7 @@
         <type>TV_CUSTOM_RECORD</type>
         <text>Custom Record</text>
         <text lang="IT">Registrazione Personalizzata</text>
-        <text lang="SV">Avancerad</text>
+        <text lang="SV">Avancerat</text>
         <text lang="NL">Geavanceerd Opnameschema</text>
         <text lang="JA">カスタム録画</text>
         <text lang="FR">Recherche Personnalisée</text>

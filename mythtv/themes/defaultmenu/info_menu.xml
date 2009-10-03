@@ -122,6 +122,7 @@
     <button>
         <type>NETFLIX</type>
         <text>NetFlix</text>
+        <text lang="SV">Nätfilmer</text>
         <text lang="FI">MythFlix</text>
         <text lang="PT">Aluguer de Filmes</text>
         <text lang="DE">MythFlix</text>

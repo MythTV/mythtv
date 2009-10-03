@@ -193,6 +193,7 @@
     <button>
         <type>BURN</type>
         <text>Burn DVD</text>
+        <text lang="SV">Skriv DVD</text>
         <text lang="PT">Gravar DVD</text>
         <text lang="ES">Grabar DVD</text>
         <text lang="FR">Gravure DVD</text>
@@ -261,6 +262,7 @@
     <button>
         <type>NETFLIX</type>
         <text>NetFlix</text>
+        <text lang="SV">Nätfilmer</text>
         <text lang="PT">Aluguer de Filmes</text>
         <text lang="ET">MythFlix</text>
         <text lang="FR">NetFlix</text>

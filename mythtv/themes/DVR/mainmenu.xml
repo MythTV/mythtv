@@ -11,7 +11,7 @@
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="PT">Ver Gravações da TV</text>
-        <text lang="SV">Titta på inspelningar</text>
+        <text lang="SV">Visa inspelningar</text>
         <text lang="JA">録画再生</text>
         <text lang="SL">Predvajanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
@@ -34,7 +34,7 @@
         <text lang="DE">Aufnahmeplan</text>
         <text lang="DA">Løs optagelseskonflikter</text>
         <text lang="PT">Resolver Conflitos</text>
-        <text lang="SV">Kommande inspelningar</text>
+        <text lang="SV">Kommande</text>
         <text lang="JA">これからの録画</text>
         <text lang="FI">Tulevat Nauhoitukset</text>
         <text lang="ZH_TW">修正預設錄影衝突</text>
@@ -59,7 +59,7 @@
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="PT">Programar Gravações</text>
-        <text lang="SV">Schemalägg inspelningar</text>
+        <text lang="SV">Schemalägg</text>
         <text lang="JA">録画予約</text>
         <text lang="SL">Plan snemanj</text>
         <text lang="ET">Salvestamise plaanimine</text>
