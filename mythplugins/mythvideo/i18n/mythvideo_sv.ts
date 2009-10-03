@@ -1,184 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="sv">
-<defaultcodec></defaultcodec>
+<!DOCTYPE TS>
+<TS version="2.0" language="sv">
 <context>
     <name></name>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="610"/>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation>G
-
-PL 1  förvald sök sträng.
-</translation>
+        <translation>G</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="612"/>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
-        <translation>PG
-
-PL 2 förvald söksträng.</translation>
+        <translation>PG</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="614"/>
         <source>PG-13</source>
         <comment>PL3 default search string.</comment>
-        <translation>PG-13
-
-PL3 förvald söksträng</translation>
+        <translation>PG-13</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="616"/>
         <source>R:NC-17</source>
         <comment>PL4 default search string.</comment>
-        <translation>R:NC-17
-
-PL4 förvald söksträng</translation>
+        <translation>R:NC-17</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="104"/>
         <source>Cover download stopped.</source>
         <translation>Nerladdning av omslag stoppat.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="156"/>
         <source>Error writing data to file %1.</source>
         <translation>Misslyckades skriva data till fil %1.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="163"/>
         <source>Error: file error &apos;%1&apos; for file %2</source>
         <translation>Fel: Fil fel  &apos;%1&apos; för fil %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="253"/>
         <source>No command to run.</source>
         <translation>Inget kommando att köra.</translation>
     </message>
-</context>
-<context>
-    <name>@default</name>
     <message>
-        <source>G</source>
-        <comment>PL 1 default search string.</comment>
-        <translation type="obsolete">G
-
-PL 1  förvald sök sträng.
-</translation>
+        <source>Screenshot download stopped.</source>
+        <translation>Nerladdning av skärmbild stoppad.</translation>
     </message>
     <message>
-        <source>PG</source>
-        <comment>PL 2 default search string.</comment>
-        <translation type="obsolete">PG
-
-PL 2 förvald söksträng.</translation>
+        <source>Fanart download stopped.</source>
+        <translation>Nerladdning av användarbild stoppad.</translation>
     </message>
     <message>
-        <source>PG-13</source>
-        <comment>PL3 default search string.</comment>
-        <translation type="obsolete">PG-13
-
-PL3 förvald söksträng</translation>
+        <source>Banner download stopped.</source>
+        <translation>Nerladdning av banderoll stoppad.</translation>
     </message>
     <message>
-        <source>R:NC-17</source>
-        <comment>PL4 default search string.</comment>
-        <translation type="obsolete">R:NC-17
-
-PL4 förvald söksträng</translation>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation>Att ställa in detta värde till bara siffror kommer att förenkla livet.</translation>
+    </message>
+    <message>
+        <source>Error writing Coverart to file %1.</source>
+        <translation>Fel vid skrivning av albumomslag i filen %1.</translation>
+    </message>
+    <message>
+        <source>Error writing Screenshot to file %1.</source>
+        <translation>Fel vid skrivning av skärmbild i filen %1.</translation>
+    </message>
+    <message>
+        <source>Error writing Fanart to file %1.</source>
+        <translation>Fel vid skrivning av användarbild i filen %1.</translation>
     </message>
 </context>
 <context>
     <name>DVDRipBox</name>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="243"/>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
         <translation>Förbindelsen till Myth omkodningsdemon har brutits. Inte bra.</translation>
     </message>
     <message>
-        <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation type="obsolete">Kan ej ansluta till Myth omkodningsdemon. Du kan försöka med att trycka på godtycklig siffertangent för att starta den. Om du ser detta meddelande är något fel.</translation>
-    </message>
-    <message>
-        <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation type="obsolete">Kunde ej slå upp datornamnet för din omkodningsserver. Inte bra.</translation>
-    </message>
-    <message>
-        <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation type="obsolete">Kommunikationsfel (eng: Socket communication errors). Inte bra.</translation>
-    </message>
-    <message>
-        <source>Something is wrong, but I don&apos;t know what.</source>
-        <translation type="obsolete">Något är fel men jag vet inte riktigt vad.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="451"/>
         <source>Job %1 of %2</source>
         <translation>Jobb %1 av %2</translation>
     </message>
     <message>
-        <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation type="obsolete">Inga kopieringsjobb och inget annat att göra. Tryck 0 för att kopiera en DVD.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="549"/>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
         <translation>Inga jobb. Kontrollerar/väntar på DVDn.</translation>
     </message>
     <message>
-        <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation type="obsolete">Inga jobb och inget annat att göra. Du kan trycka 0 för att kopiera en DVD.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="866"/>
         <source>Cancelling ...</source>
         <translation>Avbryter ...</translation>
     </message>
     <message>
-        <source>0 New Rip</source>
-        <translation type="obsolete">0 Ny kopiering</translation>
-    </message>
-    <message>
-        <source>9 Cancel Job</source>
-        <translation type="obsolete">9 Avbryt jobb</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="547"/>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
-        <translation>Inga jobb och inget annat att göra. Du kan rippa en DVD.</translation>
+        <translation>Inga jobb och inget annat att göra. Du kan lagra en DVD.</translation>
     </message>
     <message>
-        <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
-        <translation type="obsolete">Inga jobb och inget annat att göra. Du kan rippa en disk om du vill.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="170"/>
         <source>New Rip</source>
-        <translation>Ny rip</translation>
+        <translation>Ny lagring</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="171"/>
         <source>Cancel Job</source>
         <translation>Avbryt jobb</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="268"/>
         <source>Attempting to launch mtd...</source>
-        <translation>Försöker lansera mtd...</translation>
+        <translation>Försöker starta mtd...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="273"/>
         <source>Cannot connect to your Myth Transcoding Daemon.</source>
         <translation>Kan inte skapa förbindelse till Myth omkodningsdemon.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="281"/>
         <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
-        <translation>Försök att skapa förbindelse till din mtd sade hittar inte värd. Kan inte återfås.</translation>
+        <translation>Försök att skapa förbindelse till din mtd rapporterade att värddatorn inte hittades. Kan inte återhämta.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/dvdripbox.cpp" line="286"/>
         <source>Unknown connection error.</source>
         <translation>Okänt förbindelsefel.</translation>
     </message>
@@ -186,1786 +118,1405 @@ PL4 förvald söksträng</translation>
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <location filename="../mythvideo/editmetadata.cpp" line="124"/>
         <source>Level %1</source>
         <translation>Nivå %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/editmetadata.cpp" line="138"/>
         <source>None</source>
-        <translation>Inga</translation>
+        <translation>Ingen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/editmetadata.cpp" line="65"/>
-        <source>Done</source>
-        <translation>Klart</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/editmetadata.cpp" line="225"/>
         <source>Enter new category</source>
-        <translation>Mata in ny kategori</translation>
+        <translation>Ange ny kategori</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
-        <source>Please enter the new extension:</source>
-        <translation type="obsolete">Skriv in den nya filändelsen:</translation>
-    </message>
-    <message>
-        <source>Create new extension</source>
-        <translation type="obsolete">Skapa ny filändelse</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="374"/>
         <source>Done</source>
         <translation>Klar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="375"/>
         <source>New</source>
         <translation>Ny</translation>
     </message>
     <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="373"/>
         <source>Delete</source>
-        <translation>Radera</translation>
+        <translation>Ta bort</translation>
     </message>
     <message>
-        <location filename="../mythvideo/fileassoc.cpp" line="437"/>
         <source>Enter the new extension:</source>
-        <translation>Mata in ny filändelse:</translation>
+        <translation>Ange ny filändelse:</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Directory that holds videos</source>
-        <translation type="obsolete">Katalog som innehåller videofiler</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation type="obsolete">Denna katalog måste finnas och användaren som kör MythVideo måste åtminstone ha läsrättigheter i det.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="18"/>
         <source>Starting Parental Level</source>
         <translation>Startnivå för barnlås</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="19"/>
         <source>4 - Highest</source>
         <translation>4 - Högsta</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="21"/>
         <source>1 - Lowest</source>
         <translation>1 - Lägsta</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="28"/>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
-        <translation>Detta är nivån som barnlåset startar på. Filmer som har en nivå lägre än eller lika med denna kommer att visas i listorna medans filer som har en högre nivå kommer att döljas tills rätt PIN-kod har matats in.</translation>
+        <translation>Detta är nivån som barnlåset startar på. Filmer som har en nivå lägre än eller lika med denna kommer att visas i listorna medan filer som har en högre nivå kommer att döljas till rätt PIN-kod har matats in.</translation>
     </message>
     <message>
-        <source>Parental Control PIN</source>
-        <translation type="obsolete">PIN-kod för barnlås</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="93"/>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
-        <translation>Om denna funktion är aktiverad måste PIN-koden matas in för att kunna återvända till denna vy. Du har härmed blivit varnad.</translation>
+        <translation>Om aktiverat, måste nuvarande PIN-kod matas in för att kunna återvända till denna vy och återställa barnlåsets PIN-kod. Du har härmed blivit varnad.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="100"/>
         <source>Show Unknown File Types</source>
         <translation>Visa okända filtyper</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="104"/>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation>Visa alla filer som ligger under den tidigare specifierade katalogen såvida inte deras filändelse har satts upp för att ignoreras.</translation>
+        <translation>Om aktiverat, visas alla filer under Mythvideos katalog, såvida inte deras filändelse är explicit inställda att ignoreras.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="135"/>
         <source>Video List browses files</source>
-        <translation>Videolistvyn visar filer som inte sökts upp i videohanteraren</translation>
+        <translation>Videolistan bläddrar i filer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="140"/>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Videolistvyn visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
+        <translation>Om aktiverat, gör det att videolistan visar alla relevanta filer under Mythvideos startkatalog, vare sig de har sökts upp eller inte.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="752"/>
         <source>Player Settings</source>
         <translation>Inställningar för spelare</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="159"/>
         <source>Newly scanned files are browsable by default</source>
-        <translation>Nyscannade filer är bläddringsbara som standard</translation>
+        <translation>Nyfunna filer är normalt blädderbara</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="163"/>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation>Nyscannade filer i Video Manager kommer att markeras som bläddringsbara och kommer att synas i bläddra-menyn.</translation>
+        <translation>Om aktiverat, kommer nyfunna filer i videohanteraren att markeras som blädderbara och kommer att synas i bläddringsmenyn.</translation>
     </message>
     <message>
-        <source>New category</source>
-        <translation type="obsolete">Ny kategori</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="201"/>
         <source>Command to search for movie listings</source>
         <translation>Kommando för att söka efter filmlistor</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="224"/>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation>Detta kommando måste kunna exekveras av användaren som kör MythVideo.</translation>
+        <translation>Detta kommando måste kunna exekveras av användaren som kör Mythvideo.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="211"/>
         <source>Command to search for movie posters</source>
-        <translation>Kommando för att söka efter filmposters</translation>
+        <translation>Kommando för att söka efter filmaffischer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="221"/>
         <source>Command to extract data for movies</source>
         <translation>Kommando för att hämta filminformation</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="242"/>
         <source>Directory that holds movie posters</source>
-        <translation>Katalog innehållande filmposters</translation>
+        <translation>Katalog som innehåller filmaffischer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="257"/>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation>Katalogen måste existera och användaren som kör MythVideo måste ha skriv/läs-rättigheter till den.</translation>
+        <translation>Katalogen måste finnas, och användaren som kör Mythvideo måste ha skriv/läs-rättigheter till den.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="708"/>
         <source>Video Manager</source>
         <translation>Videohanterare</translation>
     </message>
     <message>
-        <source>Could not retrieve poster</source>
-        <translation type="obsolete">Kunde inte hämta poster</translation>
-    </message>
-    <message>
-        <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
-</source>
-        <translation type="obsolete">En filmposter finns för denna filmen men MythTVideo kunde inte hämta den inom rimlig tid.</translation>
-    </message>
-    <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="obsolete">Denna PIN-kod används för att låsa upp barnlåset för filmer. Om ingen kod anges kommer barnlåset att vara avslaget. Om du slår på barnlåset är det lättast om bara siffror används.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="88"/>
         <source>Aggressive Parental Control</source>
-        <translation>Lås även vy för barnlåskonfigurationen</translation>
+        <translation>Utökad barnlåsning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="35"/>
         <source>Default View</source>
         <translation>Standardvy</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="36"/>
         <source>Gallery</source>
         <translation>Galleri</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="38"/>
         <source>Browser</source>
         <translation>Bläddrare</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="40"/>
         <source>Listings</source>
         <translation>Listningar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="271"/>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation>Detta är standardkommandot för uppspelning av filer. &apos;Internal&apos; använder Myth&apos;s egna uppspelningsmetod.</translation>
+        <translation>Detta är kommandot använt för alla filer som inte har en explicit definierad filändelse. Namnet på ett av insticksprogrammen för uppspelning kan också anges, exempelvis &apos;Internal&apos;.</translation>
     </message>
     <message>
-        <source>Rows to display</source>
-        <translation type="obsolete">Rader att visa</translation>
-    </message>
-    <message>
-        <source>Columns to display</source>
-        <translation type="obsolete">Kolumner att visa</translation>
-    </message>
-    <message>
-        <source>Show title below thumbnails</source>
-        <translation type="obsolete">Visa titel under miniatyrbild</translation>
-    </message>
-    <message>
-        <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation type="obsolete">Om denna funktion aktiveras kommer texten att göra miniatyrbilderna mindre.</translation>
-    </message>
-    <message>
-        <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="obsolete">Bibehåll aspekt på miniatyrbilder</translation>
-    </message>
-    <message>
-        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="obsolete">Låt miniatyrbilderna bibehålla sin ursprungliga aspekt, annars skalas de för att matcha storleken på bakgrundsikonen.</translation>
-    </message>
-    <message>
-        <source>Video Gallery</source>
-        <translation type="obsolete">Videogalleri</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="46"/>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation>Standardvy för MythVideo. Andra vyer kan nås genom popup-menyn tillgänglig via MENY-knappen.</translation>
+        <translation>Standardvy för Mythvideo. Andra vyer kan nås genom menyn tillgänglig via MENY-knappen.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="111"/>
         <source>Video Browser browses files</source>
-        <translation>Bläddraren visar filer som inte sökts upp i videohanteraren</translation>
+        <translation>Videobläddraren visar filer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="116"/>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Bläddraren visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
+        <translation>Om aktiverat, gör det att videobläddraren visar alla relevanta filer under Mythvideos startkatalog, vare sig de har sökts upp eller inte.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="123"/>
         <source>Video Gallery browses files</source>
-        <translation>Videogalleriet visar filer som inte sökts upp i videohanteraren</translation>
+        <translation>Videogalleriet visar filer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="128"/>
         <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Videogalleriet visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
+        <translation>Om aktiverat, gör det att videogalleriet visar alla relevanta filer under Mythvideos startkatalog, vare sig de har sökts upp eller inte.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="147"/>
         <source>Video List Loads Video Meta Data</source>
-        <translation>Videolistvyn laddar videometadata</translation>
+        <translation>Videolistan laddar videometadata</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="152"/>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation>Videolistvyn laddar alla kända videometadata från databasen. Att stänga av denna funktion kan minska tiden det tar att ladda videolistvyn väsentligt</translation>
+        <translation>Om aktiverat tillsammans med filbläddring, gör det att videolistan laddar alla kända videometadata från databasen. Att stänga av det kan i hög grad snabba upp tiden det tar att visa videolistan</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="170"/>
         <source>Sorting ignores case</source>
         <translation>Skiftlägesokänslig sortering</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="173"/>
         <source>If set, case is ignored when sorting entries in a view.</source>
-        <translation>Ignorerar skillnad mellan stora och små bokstäver vid sortering i en vy.</translation>
+        <translation>Om aktiverat, Ignoreras skillnader mellan stora och små bokstäver vid sortering av en vy.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="180"/>
-        <source>Show folders for database views</source>
-        <translation>Visa kataloger i databasvyer</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="184"/>
-        <source>If set, sub folders of your video directory will be shown in supported views.</source>
-        <translation>Visar underkataloger till din videokatalog i de vyer som stödjer detta.</translation>
-    </message>
-    <message>
-        <source>Image cache size</source>
-        <translation type="obsolete">Bildcachestorlek</translation>
-    </message>
-    <message>
-        <source>This setting determines the number of images MythVideo will cache for views.</source>
-        <translation type="obsolete">Antal bilder som MythVideo cachar för vyer.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/metadata.cpp" line="772"/>
         <source>^(The |A |An )</source>
-        <translation>^(The |A |An )</translation>
+        <translatorcomment>English prefixes kept on purpose</translatorcomment>
+        <translation>^(The |A |An |En |Ett |Den |Det |De )</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="646"/>
         <source>All</source>
         <translation>Alla</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoutils.cpp" line="85"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoutils.cpp" line="85"/>
         <source>No</source>
         <translation>Nej</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="653"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="655"/>
         <source>Year</source>
         <translation>År</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="657"/>
         <source>User Rating</source>
         <translation>Användarbetyg</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="659"/>
         <source>Runtime</source>
         <translation>Speltid</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="661"/>
         <source>Filename</source>
         <translation>Filnamn</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="663"/>
         <source>Video ID</source>
         <translation>Video-ID</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="641"/>
         <source>Unknown</source>
         <translation>Okänd</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoutils.cpp" line="17"/>
         <source>None</source>
-        <translation>Inga</translation>
+        <translation>Ingen</translation>
     </message>
     <message>
-        <source>
-
-You have no VCD Player command defined.</source>
-        <translation type="obsolete">
-
-Du har inget VCD-uppspelningskommando definierat.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/main.cpp" line="127"/>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation>OK, kör Inställningar</translation>
+        <translation>Ok, kör Inställningar</translation>
     </message>
     <message>
-        <source>
-
-You have no VCD Device defined.</source>
-        <translation type="obsolete">
-
-Du har ingen VCD-enhet definierad.</translation>
-    </message>
-    <message>
-        <source>
-
-You have no DVD Device defined.</source>
-        <translation type="obsolete">
-
-Du har ingen DVD-enhet definierad.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="284"/>
         <source>Location of VCD device</source>
         <translation>VCD-enhet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="305"/>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation>Denna enhet måste existera och användaren som kör MythDVD måste ha läsrättigheter på den.</translation>
+        <translation>Enheten måste finnas, och användaren som kör MythDVD måste ha läsrättigheter för den.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="295"/>
         <source>Location of DVD device</source>
         <translation>DVD-enhet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="387"/>
         <source>DVD Player Command</source>
-        <translation>Kommando för DVD-avspelning</translation>
+        <translation>Kommando för DVD-uppspelning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="398"/>
         <source>VCD Player Command</source>
-        <translation>Kommando för VCD-avspelning</translation>
+        <translation>Kommando för VCD-uppspelning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="402"/>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation>Detta är ett godtyckligt kommando för att starta en VCD-spelare (t ex MPlayer, xine etc). Om tecknen &apos;%d&apos; ingår i kommandot kommer detta att ersättas med den konfigurerade VCD-enheten (t ex /dev/cdrom).</translation>
+        <translation>Detta är ett godtyckligt kommando för att starta en VCD-spelare (t.ex. MPlayer, xine etc). Om tecknen &apos;%d&apos; ingår i kommandot kommer de att ersättas med den inställda VCD-enheten (t.ex. /dev/cdrom).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="411"/>
         <source>Directory to hold temporary files</source>
-        <translation>Bibliotek för temporära filer</translation>
+        <translation>Katalog för tillfälliga filer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="419"/>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
-        <translation>Detta bibliotek måste existera och användaren som kör MythDVD måste ha skrivrättigheter till det.</translation>
+        <translation>Denna katalog måste finnas, och användaren som kör MythDVD måste ha skrivrättigheter till den.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="426"/>
         <source>Title Playing Command</source>
-        <translation>Titelavspeningskommando</translation>
+        <translation>Uppspelningskommando för titel</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="432"/>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation>Detta kommando används för att spela upp en förhandsvisning för en given DVD-titel. Följande teckensekvenser, som ersätts i det slutliga kommandot, kan användas: %d för enhet, %a för ljudspår, %c för ljudkanaler.</translation>
+        <translation>Detta kommando används för förhandsvisning av en given DVD-titel. Om de finns, ersätts %t av titeln, %d av enheten, %a av ljudspåret och %c av ljudkanalerna.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="439"/>
         <source>Subtitle arguments:</source>
         <translation>Textningsargument:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="444"/>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation>Om du väljer textning vid kopiering kommer dessa kommandoradsargument att läggas till på slutet av Titelavspelningskommandot. Om teckensekvensen %s anges kommer denna att ersättas med textningsspårets namn i det slutliga kommandot.</translation>
+        <translation>Om du väljer någon textning vid lagring kommer detta kommando att läggas till i slutet av uppspelningskommandot för att tillåta förhandsgranskning av textningen. Om teckenföljden %s anges kommer den att ersättas av textningsspårets namn.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="451"/>
         <source>Base transcode command</source>
         <translation>Baskommando för omkodning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="454"/>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation>Detta är baskommandot (utan kommandoradsargument) för att köra omkodning på ditt system.</translation>
+        <translation>Detta är baskommandot (utan kommandoradsargument) för att köra transcode på systemet.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="461"/>
         <source>MTD port number</source>
         <translation>Portnummer för omkodningsdemon</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="465"/>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation>Detta är TCP-portnumret som skall användas för att kommunicera med omkodningsdemonen</translation>
+        <translation>Detta är TCP-portnumret som skall användas för att kommunicera med omkodningsdemonen (MTD)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="472"/>
         <source>MTD logs to terminal window</source>
-        <translation>Omkodningsdemonen loggar till terminalfönstret</translation>
+        <translation>Omkodningsdemonen loggar i terminalfönstret</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="477"/>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation>Om denna funktion aktiveras kommer omkodningsdemonen (eng: Myth Transconding Daemon) att logga till det teminalfönster den startades från. Om funktionen inte är aktiverad kommer loggningen att ske till filen mtd.log.</translation>
+        <translation>Om aktiverat, kommer omkodningsdemonen (MTD) att logga i det teminalfönster den startades. Annars kommer den att skriva i filen med namnet mtd.log, i lagringskatalogens toppnivå.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="484"/>
         <source>Transcode AC3 Audio</source>
         <translation>Använd AC3-ljud</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="488"/>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation>Om denna funktion är aktiverad kommer omkodningsdemonen (eng: Myth Transcoding Daemon) att bevara AC3-ljud (Dolby Digital) i omkodade filer.</translation>
+        <translation>Om aktiverat, kommer omkodningsdemonen (MTD) normalt att bevara AC3-ljud (Dolby Digital) i omkodade filer.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="495"/>
         <source>Use xvid rather than divx</source>
         <translation>Använd xvid i stället för divx</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="499"/>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation>Om funktionen är aktiverad kommer MythDVD att använda den fria kodnings/avkodnings-mjukvaran xvid i stället för divx närhelst det är möjligt.</translation>
+        <translation>Om aktiverat, kommer MythDVD att använda (den öppna, fria) kodaren xvid, i stället för divx, närhelst det är möjligt.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="517"/>
         <source>Nice level for MTD</source>
         <translation>Prioritet för omkodning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="521"/>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation>Denna inställning justerar prioriteten för omkodningsdemonen (eng: Myth Transcoding Daemon). Värdet kan sägas vara en omvänd prioritet där högre värden (max 20) ger lägre prioritet och lägre värden (min -20) ger högre prioritet. Ett värde större än 0 är ofta bra för att inte störa andra processer.</translation>
+        <translation>Denna inställning bestämmer prioriteten för omkodningsdemonen (MTD). Högre värden betyder lägre prioritet (mer processorkraft för andra uppgifter).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="539"/>
         <source>Ripped video segments</source>
-        <translation>Segmentstorlek för kopierad video</translation>
+        <translation>Segmentstorlek för lagrad video</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="545"/>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation>Om detta värde är satt till något annat än 0 kommer kopierade videospår att delas upp i filer med motsvarande storlek (i MB). Inställningen gäller för både inspelningar av perfekt kvalitet och mellanfiler som används vid omkodning.</translation>
+        <translation>Om satt till något annat än 0 kommer lagrade videospår att delas upp i filer med motsvarande storlek (i MiB). Gäller både för inspelningar med perfekt kvalitet och tillfälliga filer som används vid omkodning.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="763"/>
         <source>DVD Ripper Settings</source>
-        <translation>DVD-kopieringsinställningar</translation>
+        <translation>Inställningar för DVD-lagring</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="772"/>
         <source>MTD Settings</source>
         <translation>Inställningar för omkodningsdemon</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="372"/>
         <source>Waiting For Access to DVD</source>
         <translation>Väntar på tillgång till DVD</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="756"/>
         <source>Ripping to file ~</source>
-        <translation>Kopierar till fil ~</translation>
+        <translation>Lagrar till fil ~</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="798"/>
         <source>Perfect DVD Rip of %1</source>
-        <translation>Perfekt DVD-kopiering av %1</translation>
+        <translation>Perfekt DVD-lagring av %1</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="875"/>
         <source>Transcode of %1</source>
         <translation>Omkodning av %1</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="893"/>
         <source>Waiting for Permission to Start Transcoding</source>
         <translation>Väntar på tillstånd att börja omkodning</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="1432"/>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation>Omkodar pass 1 av 2 ~</translation>
+        <translation>Omkodar genomgång 1 av 2 ~</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="1440"/>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation>Omkodar pass 2 av 2 ~</translation>
+        <translation>Omkodar genomgång 2 av 2 ~</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="1449"/>
         <source>Transcoding ~</source>
         <translation>Omkodar ~</translation>
     </message>
     <message>
-        <source>Transcode is thinking </source>
-        <translation type="obsolete">Omkodningsprocessen tänker</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="528"/>
         <source>Simultaneous Transcode Jobs</source>
         <translation>Antal samtida omkodningsjobb</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="532"/>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation>Bestämmer hur många omkodningsprocesser som kan vara igång samtidigt. Från början är denna 1 vilket ger att endast en omkodning kan göras i taget.</translation>
+        <translation>Bestämmer antal samtidiga omkodningsjobb. Med standardvärdet 1, kommer endast ett jobb vara aktivt åt gången.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="312"/>
         <source>On DVD insertion</source>
-        <translation>Vid iläggning av DVD</translation>
+        <translation>Vid inmatning av DVD</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="314"/>
         <source>Do nothing</source>
         <translation>Gör ingenting</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="315"/>
         <source>Play DVD</source>
         <translation>Spela DVD</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="316"/>
         <source>Rip DVD</source>
-        <translation>Kopiera DVD</translation>
+        <translation>Lagra DVD</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="318"/>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation>Mediaövervakning måste aktiveras för att tillåta denna funktion.</translation>
+        <translation>Mediaövervakning måste aktiveras för att tillåta denna funktion (Inställning -&gt; Allmänt -&gt; CD/DVD-övervakning)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="313"/>
         <source>Display mythdvd menu</source>
         <translation>Visa MythDVD-menyn</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="650"/>
         <source>ISO copy of %1</source>
         <translation>ISO-kopiering av %1</translation>
     </message>
     <message>
-        <location filename="../mtd/jobthread.cpp" line="661"/>
         <source>Waiting for access to DVD</source>
         <translation>Väntar på åtkomst till DVD</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="266"/>
         <source>Default Video Player</source>
         <translation>Förvald videospelare</translation>
     </message>
     <message>
-        <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation type="obsolete">Ta bort DVD-bokmärken äldre än (dagar)</translation>
-    </message>
-    <message>
-        <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation type="obsolete">Ta bort DVD-bokmärken som är äldre än detta antal dagar</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="349"/>
         <source>Enable DVD Bookmark Support</source>
         <translation>Aktivera stöd för DVD-bokmärken</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="356"/>
         <source>DVD Bookmark Prompt</source>
-        <translation>Visa prompt för DVD-bokmärke</translation>
+        <translation>Visa fråga för DVD-bokmärke</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="359"/>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation>Fråga om en DVD ska spelas upp från början eller bokmärket</translation>
+        <translation>Visa en fråga för att välja om en DVD ska spelas upp från början eller från bokmärket</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="391"/>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation>Kommando för att spela upp en DVD (dvs mplayer, ogle, etc.). %d ersätts med DVD-enheten (/dev/dvd).</translation>
+        <translation>Detta kan vara vilket kommando som helst för att spela upp en DVD (t.ex. MPlayer, ogle, etc.). %d ersätts med DVD-enheten (t.ex. /dev/dvd).</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="742"/>
         <source>General Settings (%1/%2)</source>
-        <translation>Generella inställningar (%1/%2)</translation>
+        <translation>Allmänna inställningar (%1/%2)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globals.cpp" line="17"/>
         <source>No Cover</source>
         <translation>Inget omslag</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globals.cpp" line="19"/>
         <source>NR</source>
         <translation>NR</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="800"/>
         <source>No files found</source>
-        <translation>Inga filer funna</translation>
+        <translation>Inga filer hittades</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="888"/>
         <source>Unknown Prefix</source>
         <translation>Okänt prefix</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="974"/>
         <source>videos</source>
-        <translation>videor</translation>
+        <translation>video</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Söker efter videofiler</translation>
-    </message>
-    <message>
-        <source>No to all</source>
-        <translation type="obsolete">Nej till allt</translation>
-    </message>
-    <message>
-        <source>Yes to all</source>
-        <translation type="obsolete">Ja till allt</translation>
-    </message>
-    <message>
-        <source>File Missing</source>
-        <translation type="obsolete">Fil saknas</translation>
-    </message>
-    <message>
-        <source>%1 appears to be missing.
-Remove it from the database?</source>
-        <translation type="obsolete">%1 verkar saknas
-Ta bort den från databasen?</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Uppdaterar videodatabas</translation>
-    </message>
-    <message>
-        <source>Verifying video files</source>
-        <translation type="obsolete">Verifierar videodatabas</translation>
-    </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Föräldra-PIN:</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videoutils.cpp" line="96"/>
         <source>No rating available.</source>
-        <translation>Ingen klassificering tillgänglig.</translation>
+        <translation>Inget betyg tillgänglig.</translation>
     </message>
     <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuter</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="335"/>
         <source>DVD Drive Speed</source>
         <translation>DVD-enhetshastighet</translation>
     </message>
     <message>
-        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 1350KB/sec</source>
-        <translation type="obsolete">Sätter DVD-enhetens hastighet under DVD-uppspelning. Hastigheten anges i multipler av 1350KB/sek</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="52"/>
-        <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation>Ställa in dethär värdet för alla nummer kommer göra ditt liv mycket enklare.</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="57"/>
         <source>Parental Level 4 PIN</source>
-        <translation>Förälder nivå 4 PIN</translation>
+        <translation>Barnlåsnivå 4 PIN-kod</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="60"/>
         <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
-        <translation>Denhär PIN är använt för att komma till barnlås nivå 4.</translation>
+        <translation>Den här PIN-koden används för att komma till barnlåsnivå 4 samt filmhanteraren.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="68"/>
         <source>Parental Level 3 PIN</source>
-        <translation>Förälder nivå 4 PIN {3 ?}</translation>
+        <translation>Barnlåsnivå 3 PIN-kod</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="70"/>
         <source>This PIN is used to enter Parental Control Level 3.</source>
-        <translation>Denhär PIN används för barnlås nivå 3.</translation>
+        <translation>Den här PIN-koden används för att komma till barnlåsnivå 3.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="78"/>
         <source>Parental Level 2 PIN</source>
-        <translation>Barnlås nivå 2 PIN</translation>
+        <translation>Barnlåsnivå 2 PIN-kod</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="80"/>
         <source>This PIN is used to enter Parental Control Level 2.</source>
-        <translation>Denhär PIN används för Barnlås nivå 2.</translation>
+        <translation>Den här PIN-koden används för att komma till barnlåsnivå 2.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="191"/>
         <source>Video Tree remembers last selected position</source>
         <translation>Videoträdet kommer ihåg senast markerade position</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="194"/>
         <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation>Om inställt, nuvarande position i videoträdet är ständig.</translation>
+        <translation>Om aktiverat, är nuvarande position i videoträdet bestående.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="231"/>
         <source>Directories that hold videos</source>
-        <translation>Kataloger som kontrollerar videor</translation>
+        <translation>Kataloger som innehåller videor</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="235"/>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
-        <translation>Mångfaldiga kataloger kan separeras med &apos;:&apos;. Varje katalog måste existera och vara läsbar för användaren som kör MythVideo.</translation>
+        <translation>Flera kataloger kan skiljas åt med &apos;:&apos;. Alla kataloger måste finnas, och vara läsbara av användaren som kör Mythvideo.</translation>
     </message>
     <message>
-        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
-        <translation type="obsolete">Ställ in DVD hastighet under DVD uppspelning. Hastigheten är multipler av 177KB/s</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="506"/>
         <source>Let transcode determine frame rate</source>
         <translation>Låt transcode bestämma bildhastighet</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="510"/>
         <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
-        <translation>Om inställt, trancode kommer att bestämma bildrutans hastighet automatiskt. Om inte inställt, 23.976 är antaget.</translation>
+        <translation>Om angivet, kommer trancode att bestämma bildhastighet automatiskt. Om inte angivet, antas 23,976.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="599"/>
         <source>Enable automatic Parental Level from rating</source>
-        <translation>Möjliggör automatisk barnlås värdighet</translation>
+        <translation>Aktivera automatisk barnlåsnivå från klassificering</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="603"/>
         <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation>Om möjligt, sökningar vill automatiskt ställas in på barnlås till det som matchar värdet ovanför.</translation>
+        <translation>Om aktiverad, ställs sökningar automatiskt in barnlåsnivån till den som motsvarar klassificeringen nedan.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="625"/>
         <source>Level %1</source>
         <translation>Nivå %1</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="629"/>
         <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation>Värdering som innehåller dessa strängar (separerade med :) kommer vara utsett till barnlås nivå %1.</translation>
+        <translation>Klassificeringar som innehåller dessa strängar (åtskilda av :) kommer att tilldelas till barnlåsnivå %1.</translation>
     </message>
     <message>
-        <source>Theme Error: browser/playwait has an invalid area.</source>
-        <translation type="obsolete">Tema fel: Webbläsare/playwait har en ogiltigt område.</translation>
-    </message>
-    <message>
-        <source>Theme Error: browser/novideos_info has an invalid area.</source>
-        <translation type="obsolete">Tema fel: webbläsare/novideos_info har ett ogiltigt område.</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video #</source>
-        <translation type="obsolete">Lägg till video manuellt #</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video Title</source>
-        <translation type="obsolete">Lägg till videotitel manuellt</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">Nollställ inmatning</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="195"/>
         <source>Command</source>
         <translation>Kommando</translation>
     </message>
     <message>
-        <source>%1 failed</source>
-        <translation type="obsolete">%1 misslyckades</translation>
-    </message>
-    <message>
-        <source>%1
-
-Check VideoManager Settings</source>
-        <translation type="obsolete">%1 Kontrollera Videomanager inställníngar</translation>
-    </message>
-    <message>
-        <source>Fetching poster for %1 (%2)</source>
-        <translation type="obsolete">Tilldragande anslag för %1 (%2)</translation>
-    </message>
-    <message>
-        <source>A poster exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation type="obsolete">Ett omslag existerar för dethär numret men kan inte hämta inom tidsramen perioden.</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Theme Error: selected/playwait has an invalid area.</source>
-        <translation type="obsolete">Tema fel: markerad/playwait har ett ogiltig område.</translation>
-    </message>
-    <message>
-        <source>None defined</source>
-        <translation type="obsolete">Ingen begränsning</translation>
-    </message>
-    <message>
-        <location filename="../mtd/jobthread.cpp" line="1454"/>
         <source>Transcode is thinking</source>
-        <translation>Omkodningsprocessen tänker</translation>
+        <translation>Omkodningsprocessen arbetar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="42"/>
         <source>Manager</source>
         <translation>Hanterare</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="253"/>
         <source>Directory that holds movie trailers</source>
-        <translation>Katalog som håller filmsnuttar</translation>
+        <translation>Katalog som håller filmtrailrar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="325"/>
         <source>Remove DVD Bookmarks Older than (days)</source>
         <translation>Ta bort DVD bokmärken äldre än (dagar)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="328"/>
         <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
-        <translation>Ta bort DVD bokmärken som är äldre än numret av dagar specifierade</translation>
+        <translation>Ta bort DVD bokmärken som är äldre än antal angivna dagar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="340"/>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
-        <translation>Ställ in hastighet för DVD Drivern vid DVD återuppspelning. Hastigheten är multipler av 177kb/s. Långsammare hastigheter kan reducera ljud från drivern men i vissa fall åtstadkomma knyckningar vid återuppspelning.</translation>
+        <translation>Ställ in hastighet för DVD-enheten vid uppspelning. Hastigheten är en multipel av 177 KiB/s. Långsammare hastigheter kan reducera ljud från enheten, men kan i vissa fall orsaka att uppspelningen blir ryckig.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="652"/>
         <source>Enable random trailers before videos</source>
-        <translation>Möjliggör slumpvisa filmsnuttar innan videon</translation>
+        <translation>Aktivera slumpmässig filmtrailer innan video</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="657"/>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation>Om inställt, kommer det att möjliggöra en knapp kallat &quot;Titta med filmsnuttar&quot; som kommer spela en användar-specifierad nummer av filmsnuttan innan filmen.</translation>
+        <translation>Om aktiverat, kommer en knapp kallad &quot;Titta med filmtrailer&quot; visas, som spelar ett användarspecificerat antal filmtrailrar innan filmen.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="665"/>
         <source>Number of trailers to play</source>
-        <translation>Nummer av filmsnuttar att spela</translation>
+        <translation>Antal filmtrailrar att spela</translation>
     </message>
     <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="668"/>
         <source>The number of trailers to play before playing the film itself </source>
-        <translation>Numret av filmsnuttar att spela innan själva filmen</translation>
+        <translation>Antal filmtrailrar att spela innan själva filmen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="31"/>
         <source>Loading videos ...</source>
         <translation>Laddar videor...</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="120"/>
         <source>You have no VCD Player command defined.</source>
-        <translation>Du hari nget VCD spelar kommando definierat.</translation>
+        <translation>Du har inte definierat något kommando för VCD-uppspelning.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="379"/>
         <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
-        <translation>Barnlås varning: Ogiltigt lösenord. Försök att komma in i skärminställningar för MythVideo blev förhindrat.</translation>
+        <translation>Utökad barnlåsningsvarning: Ogiltigt lösenord. Ett försök att komma åt skärminställningar för MythVideo förhindrades.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="322"/>
         <source>%1 failed
 
 %2
 
 Check VideoManager Settings</source>
-        <translation>%1 misslyckades %2 Kontrollera Videomanager inställningar</translation>
+        <translation>%1 misslyckades
+
+%2
+
+Kontrollera videohanterarens inställningar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videolist.cpp" line="797"/>
         <source>Video Home</source>
-        <translation>Video Hem</translation>
+        <translation>Hemkatalog för video</translation>
+    </message>
+    <message>
+        <source>Show groups for database views</source>
+        <translation>Visa grupper för databasvyer</translation>
+    </message>
+    <message>
+        <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
+        <translation>Om aktiverat, visas metadatagrupper av videokatalogen i vyer som stöder det. Standardgruppen ställs in nedan.</translation>
+    </message>
+    <message>
+        <source>Group based on</source>
+        <translation>Grupp baserad på</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Katalog</translation>
+    </message>
+    <message>
+        <source>Genres</source>
+        <translation>Genre</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Kategori</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Regissör</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Skådespelare</translation>
+    </message>
+    <message>
+        <source>Date Added</source>
+        <translation>Tillagd datum</translation>
+    </message>
+    <message>
+        <source>Group videos in the tree</source>
+        <translation>Gruppera videor i trädet</translation>
+    </message>
+    <message>
+        <source>Command to search for movie fanart</source>
+        <translation>Kommando för att söka efter användarbilder för filmer</translation>
+    </message>
+    <message>
+        <source>Command to search for TV shows in MythVideo</source>
+        <translation>Kommando för att söka efter TV-program i Mythvideo</translation>
+    </message>
+    <message>
+        <source>Command to search for TV Season posters</source>
+        <translation>Kommando för att söka efter TV-säsongsaffischer</translation>
+    </message>
+    <message>
+        <source>Command to search for TV fanart</source>
+        <translation>Kommando för att söka efter TV-användarbilder</translation>
+    </message>
+    <message>
+        <source>Command to search for TV banners</source>
+        <translation>Kommando för att söka efter TV-banderoller</translation>
+    </message>
+    <message>
+        <source>Command to search for TV Screenshots</source>
+        <translation>Kommando för att söka efter TV-skärmbilder</translation>
+    </message>
+    <message>
+        <source>Command to extract data for TV Episodes</source>
+        <translation>Kommando för att hämta information om TV-avsnitt</translation>
+    </message>
+    <message>
+        <source>Command to search for TV by Title/Subtitle</source>
+        <translation>Kommando för att söka efter TV enligt titel eller undertitel</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie screenshots</source>
+        <translation>Katalog som innehåller filmskärmbilder</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie/TV Banners</source>
+        <translation>Katalog som innehåller TV- och filmbanderoller</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie fanart</source>
+        <translation>Katalog som innehåller användarbilder för filmer</translation>
+    </message>
+    <message>
+        <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Television in MythVideo</source>
+        <translation>Television i Mythvideo</translation>
+    </message>
+    <message>
+        <source>No directory %1 - DVD importing will fail</source>
+        <translation>Katalogen %1 finns inte: Import av DVD kommer att misslyckas</translation>
+    </message>
+    <message>
+        <source>Season/Episode</source>
+        <translation>Säsong/avsnitt</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
         <source>Director:</source>
         <translation>Regissör:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="3"/>
         <source>Year:</source>
         <translation>År:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="4"/>
         <source>Rated:</source>
-        <translation>Klassificering:</translation>
+        <translation>Betyg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="5"/>
         <source>Parental Level:</source>
         <translation>Barnlåsnivå:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
         <source>Browsable:</source>
         <translation>Blädderbar:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
         <source>Runtime:</source>
         <translation>Längd:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="8"/>
         <source>Plot:</source>
         <translation>Handling:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
         <source>Filename:</source>
         <translation>Filnamn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
         <source>Cover File:</source>
-        <translation>Fil för omslagsbild:</translation>
+        <translation>Omslagsfil:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
-        <source>IMDB Num.:</source>
-        <translation>IMDB-nummer:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="14"/>
-        <source>retrieving data...</source>
-        <translation>hämtar data...</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="15"/>
-        <source>[ looking for ]</source>
-        <translation>[ letar efter ]</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="16"/>
-        <source>Enter IMDB #</source>
-        <translation>Mata in IMDB-nummer</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="33"/>
-        <source>loading...</source>
-        <translation>laddar...</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="34"/>
-        <source>No Videos Found</source>
-        <translation>Inga filmer hittades</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="29"/>
         <source>Directed by</source>
-        <translation>Regi:</translation>
+        <translation>Regi</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
-        <source>File:</source>
-        <translation>Fil:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="36"/>
-        <source>Player:</source>
-        <translation>Spelare:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="37"/>
-        <source>PL </source>
-        <translation>Nivå </translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="39"/>
         <source>MythVideo File Associations</source>
         <translation>Filassociationer för videospelaren</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
         <source>Extension:</source>
         <translation>Filändelse:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
         <source>Command:</source>
         <translation>Kommando:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
         <source>Use default player:</source>
-        <translation>Använd standardspelare:</translation>
+        <translation>Standardspelare:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
         <source>Ignore:</source>
         <translation>Ignorera:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
         <source>Edit Video Information</source>
         <translation>Redigera filminformation</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="71"/>
         <source>Name:</source>
         <translation>Namn:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="47"/>
         <source>Parental Control:</source>
         <translation>Barnlås:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="49"/>
         <source>File to Always Play Next:</source>
-        <translation>Fil som alltid spelas efter denna:</translation>
+        <translation>Spela alltid som nästa:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
         <source>Include while Browsing:</source>
         <translation>Inkludera vid bläddring:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
         <source>Cover Art:</source>
         <translation>Omslagsbild:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
         <source>Unique Player Command:</source>
-        <translation>Kommando för uppspelning:</translation>
+        <translation>Spelarkommando:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
         <source>/path/to/the/thing.jpg</source>
         <translation>/sökväg/till/bilden.jpg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
-        <source>1</source>
-        <translation>1</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="46"/>
         <source>Category:</source>
         <translation>Kategori:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
         <source>Filters video list</source>
         <translation>Filtrerar videolistan</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
         <source>Category :</source>
         <translation>Kategori:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
         <source>Genre :</source>
         <translation>Genre:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
         <source>Country :</source>
         <translation>Land:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
         <source>Year :</source>
         <translation>År:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
         <source>Runtime :</source>
         <translation>Speltid:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
         <source>User Rating :</source>
         <translation>Användarbetyg:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
         <source>Browse :</source>
         <translation>Bläddra:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
         <source>Sort by :</source>
-        <translation>Sortera efter:</translation>
+        <translation>Sortera enligt:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="63"/>
-        <source>Aucune video</source>
-        <translation>Ingen video</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="12"/>
-        <source>SELECT: Edit</source>
-        <translation>VÄLJ: Ändra</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="20"/>
-        <source>Parental</source>
-        <translation>Barnlås</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="21"/>
-        <source>Level</source>
-        <translation>Nivå</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="30"/>
         <source>Year</source>
         <translation>År</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="31"/>
         <source>Runtime</source>
         <translation>Speltid</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
         <source>User Rating</source>
         <translation>Användarbetyg</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
-        <source>INFO - Action Menu</source>
-        <translation>INFO - Handlingsmeny</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="19"/>
-        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation>Upp/Ner, Page Up/Down: Bläddra   MENY: Inställningar   INFO: Handlingsmeny</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="48"/>
-        <source>Play File After This:</source>
-        <translation>Spela fil efter detta:</translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="68"/>
         <source>Rip/Transcode</source>
-        <translation>Kopiering/Omkodning</translation>
+        <translation>Lagring/Omkodning</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="67"/>
         <source>Job 1 of 1</source>
         <translation>Jobb 1 av 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="69"/>
         <source>Length:</source>
         <translation>Längd:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="70"/>
         <source>Select:</source>
         <translation>Välj:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="72"/>
         <source>Quality:</source>
         <translation>Kvalitet:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="73"/>
         <source>Audio Track:</source>
         <translation>Ljudspår:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="74"/>
         <source>AC3 Audio:</source>
         <translation>AC3-ljud:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="75"/>
         <source>Subtitles:</source>
         <translation>Textning:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="76"/>
         <source>View:</source>
-        <translation>Vy:</translation>
+        <translation>Visa:</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="78"/>
         <source>Title 1 of 1</source>
         <translation>Titel 1 av 1</translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="77"/>
         <source>0:00:00</source>
         <translation>0:00:00</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Directed by:</source>
+        <translation>Regi:</translation>
+    </message>
+    <message>
+        <source>User Rating:</source>
+        <translation>Användarbetyg:</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Klar</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Spela</translation>
+    </message>
+    <message>
+        <source>Lowest</source>
+        <translation>Lägsta</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>Låg</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation>Medium</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>Hög</translation>
+    </message>
+    <message>
+        <source>Video Num.:</source>
+        <translation>Video nr:</translation>
+    </message>
+    <message>
+        <source>Parental Level</source>
+        <translation>Barnlåsnivå</translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation>Titel:</translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation>Undertitel:</translation>
+    </message>
+    <message>
+        <source>Season:</source>
+        <translation>Säsong:</translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation>Avsnitt:</translation>
+    </message>
+    <message>
+        <source>Item has been watched:</source>
+        <translation>Filmen är sedd:</translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation>Skärmbild:</translation>
+    </message>
+    <message>
+        <source>Banner:</source>
+        <translation>Banderoll:</translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation>Användarbild:</translation>
+    </message>
+    <message>
+        <source>Trailer:</source>
+        <translation>Trailer:</translation>
+    </message>
+    <message>
+        <source>Text Filter:</source>
+        <translation>Textfilter:</translation>
+    </message>
+    <message>
+        <source>Actor/Actress :</source>
+        <translation>Skådespelare:</translation>
+    </message>
+    <message>
+        <source>InetRef :</source>
+        <translation>Inetref:</translation>
+    </message>
+    <message>
+        <source>Cover File :</source>
+        <translation>Omslagsfil:</translation>
+    </message>
+    <message>
+        <source>Watched :</source>
+        <translation>Sedd: </translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation>Resultat</translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation>Spara som standard</translation>
     </message>
 </context>
 <context>
     <name>TitleDialog</name>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="56"/>
         <source>%1 - Title %2</source>
         <translation>%1 - Titel %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="152"/>
         <source>Perfect</source>
         <translation>Perfekt</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="172"/>
         <source>None</source>
         <translation>Ingen</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="186"/>
         <source>Title %1 of %2</source>
         <translation>Titel %1 av %2</translation>
     </message>
     <message>
-        <source>0 Process Selected Title</source>
-        <translation type="obsolete">0 Processa vald titel</translation>
-    </message>
-    <message>
-        <source>0 Process Selected Titles</source>
-        <translation type="obsolete">0 Processa valda titlar</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/titledialog.cpp" line="151"/>
         <source>ISO Image</source>
         <translation>ISO-avbildning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="28"/>
         <source>Unknown</source>
         <translation>Okänd</translation>
     </message>
     <message>
-        <location filename="../mythvideo/titledialog.cpp" line="93"/>
         <source>Begin Ripping</source>
-        <translation>Börja rippa</translation>
-    </message>
-</context>
-<context>
-    <name>VideoBrowser</name>
-    <message>
-        <source>%1 of %2</source>
-        <translation type="obsolete">%1 av %2</translation>
-    </message>
-    <message>
-        <source>No Videos</source>
-        <translation type="obsolete">Inga filmer</translation>
-    </message>
-    <message>
-        <source>Watch This Video</source>
-        <translation type="obsolete">Spela upp denna film</translation>
-    </message>
-    <message>
-        <source>View Full Plot</source>
-        <translation type="obsolete">Visa full beskrivning</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filtervisning</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="obsolete">Visa fördelning</translation>
+        <translation>Börja lagra</translation>
     </message>
 </context>
 <context>
     <name>VideoDialog</name>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1706"/>
         <source>Switch to Browse View</source>
         <translation>Byt till bläddringsläge</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1710"/>
         <source>Switch to Gallery View</source>
         <translation>Byt till galleriläge</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1714"/>
         <source>Switch to List View</source>
         <translation>Byt till listläge</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1762"/>
-        <source>Select action</source>
-        <translation>Välj åtgärd</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">ok</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1252"/>
         <source>No Videos Available</source>
         <translation>Inga videor tillgängliga</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1614"/>
         <source>%1 of %2</source>
         <translation>%1 av %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1665"/>
-        <source>Watch This Video</source>
-        <translation>Spela upp denna film</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1669"/>
-        <source>Watch With Trailers</source>
-        <translation>Spela upp med filmsnuttar</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1679"/>
-        <source>Watch Trailer</source>
-        <translation>Spela upp filmsnutt</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1684"/>
         <source>Video Info</source>
-        <translation>Video information</translation>
+        <translation>Videoinformation</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1685"/>
-        <source>Manage Video</source>
-        <translation>Hantera video</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1687"/>
         <source>Scan For Changes</source>
-        <translation>Scanna för ändringar</translation>
+        <translation>Sök efter ändringar</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1696"/>
         <source>Change View</source>
         <translation>Ändra vy</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1689"/>
         <source>Filter Display</source>
         <translation>Filtervisning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1781"/>
-        <source>Cancel</source>
-        <translation>Avbryt</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1717"/>
         <source>Switch to Manage View</source>
         <translation>Byt till hanteringsvy</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1721"/>
         <source>Disable File Browse Mode</source>
         <translation>Inaktivera filbläddringsläge</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1724"/>
         <source>Enable File Browse Mode</source>
         <translation>Aktivera filbläddringsläge</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1728"/>
         <source>Disable Flat View</source>
-        <translation>Inaktivera flat visnings läge</translation>
+        <translation>Inaktivera enkelt visningsläge</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1731"/>
         <source>Enable Flat View</source>
-        <translation>Aktivera flat visnings läge</translation>
+        <translation>Aktivera enkelt visningsläge</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1749"/>
         <source>View Details</source>
         <translation>Visa detaljer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1751"/>
         <source>View Full Plot</source>
         <translation>Visa full beskrivning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1755"/>
         <source>View Cast</source>
         <translation>Visa fördelning</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1771"/>
         <source>Edit Metadata</source>
         <translation>Redigera metadata</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1772"/>
         <source>Download Metadata</source>
         <translation>Ladda ner metadata</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1773"/>
         <source>Manually Enter Video #</source>
-        <translation>Lägg till video manuellt #</translation>
+        <translation>Lägg till video nr. manuellt</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1775"/>
         <source>Manually Enter Video Title</source>
         <translation>Lägg till videotitel manuellt</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1777"/>
         <source>Reset Metadata</source>
         <translation>Återställ metadata</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1778"/>
-        <source>Toggle Browseable</source>
-        <translation>Växla bläddringsbar</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1779"/>
-        <source>Remove Video</source>
-        <translation>Ta bort film</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="1882"/>
         <source>An error occurred when switching views.</source>
         <translation>Ett fel skedde när  omkopplade  vyer.</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2140"/>
         <source>Enter Video Unique ID:</source>
         <translation>Lägg till Video Unik ID:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2161"/>
         <source>Enter Video Title:</source>
         <translation>Lägg till Video Titel:</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2207"/>
-        <source>Delete this file?</source>
-        <translation>Ta bort denna fil?</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2233"/>
         <source>Failed to delete file</source>
         <translation>Misslyckades ta bort fil</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2362"/>
         <source>Poster download finished: %1 %2</source>
-        <translation>Färdigt nerladdat omslag: %1%2</translation>
+        <translation>Färdigt nerladdat omslag: %1 %2</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2367"/>
         <source>A poster exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation>Ett omslag existerar för dethär numret men kan inte hämta inom tidsramen perioden.
+        <translation>En affisch finns för den här posten, men den kunde inte hämtas inom tidsgränsen.
 </translation>
     </message>
     <message>
-        <location filename="../mythvideo/videodlg.cpp" line="2541"/>
         <source>No matches were found.</source>
         <translation>Inga träffar hittades.</translation>
+    </message>
+    <message>
+        <source>Video Search</source>
+        <translation>Videosökning</translation>
+    </message>
+    <message>
+        <source>Video Options
+%1</source>
+        <translation>Videoinställningar
+%1</translation>
+    </message>
+    <message>
+        <source>Video Options</source>
+        <translation>Videoinställningar</translation>
+    </message>
+    <message>
+        <source>Play...</source>
+        <translation>Spela...</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Spela</translation>
+    </message>
+    <message>
+        <source>Mark as Unwatched</source>
+        <translation>Markera som ej sedd</translation>
+    </message>
+    <message>
+        <source>Mark as Watched</source>
+        <translation>Markera som sedd</translation>
+    </message>
+    <message>
+        <source>Metadata Options</source>
+        <translation>Metadatainställningar</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Ta bort</translation>
+    </message>
+    <message>
+        <source>Play Folder</source>
+        <translation>Spela katalog</translation>
+    </message>
+    <message>
+        <source>Playback Options
+%1</source>
+        <translation>Uppspelningsalternativ
+%1</translation>
+    </message>
+    <message>
+        <source>Play With Trailers</source>
+        <translation>Spela med trailer</translation>
+    </message>
+    <message>
+        <source>Play Trailer</source>
+        <translation>Spela trailer</translation>
+    </message>
+    <message>
+        <source>Video Display Menu</source>
+        <translation>Videovisningsmeny</translation>
+    </message>
+    <message>
+        <source>Browse By...</source>
+        <translation>Bläddra enligt...</translation>
+    </message>
+    <message>
+        <source>Browse By</source>
+        <translation>Bläddra enligt</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Skådespelare</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Kategori</translation>
+    </message>
+    <message>
+        <source>Date Added</source>
+        <translation>Tillagd datum</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Regissör</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Katalog</translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation>Genre</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation>Användarbetyg</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation>År</translation>
+    </message>
+    <message>
+        <source>Mark as Non-Browseable</source>
+        <translation>Markera som ej blädderbar</translation>
+    </message>
+    <message>
+        <source>Mark as Browseable</source>
+        <translation>Markera som blädderbar</translation>
+    </message>
+    <message>
+        <source>Manage Metadata</source>
+        <translation>Hantera metadata</translation>
+    </message>
+    <message>
+        <source>Download Images Only</source>
+        <translation>Ladda bara ner bilder</translation>
+    </message>
+    <message>
+        <source>Search TV by Title/Subtitle</source>
+        <translation>Sök efter TV enligt titel eller undertitel</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete:
+%1</source>
+        <translation>Är du säker på att du vill ta bort:
+%1</translation>
+    </message>
+    <message>
+        <source>Fanart download finished: %1 %2</source>
+        <translation>Nerladdning av användarbild klar: %1 %2</translation>
+    </message>
+    <message>
+        <source>Fanart exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Användarbilder finns för posten, men kunde inte hämtas inom tidsgränsen.
+</translation>
+    </message>
+    <message>
+        <source>Screenshot download finished: %1 %2</source>
+        <translation>Nerladdning av skärmbild klar: %1 %2</translation>
+    </message>
+    <message>
+        <source>Screenshot exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>En skärmbild finns för posten, men kunde inte hämtas inom tidsgränsen.
+</translation>
+    </message>
+    <message>
+        <source>Banner download finished: %1 %2</source>
+        <translation>Nerladdning av banderoll klar: %1 %2</translation>
+    </message>
+    <message>
+        <source>Banner exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>En banderoll finns för posten, men kunde inte hämtas inom tidsgränsen.
+</translation>
     </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="488"/>
         <source>Result of this filter : %1 video(s)</source>
         <translation>Resultat av detta filter: %1 video(s)</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="494"/>
         <source>Result of this filter : No Videos</source>
         <translation>Resultat av detta filter: Inga videos</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videofilter.cpp" line="610"/>
         <source>minutes</source>
         <translation>minuter</translation>
     </message>
-    <message>
-        <location filename="../mythvideo/videofilter.cpp" line="443"/>
-        <source>Save as default</source>
-        <translation>Spara som standard</translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/videofilter.cpp" line="444"/>
-        <source>Done</source>
-        <translation>Klar</translation>
-    </message>
 </context>
 <context>
-    <name>VideoGallery</name>
+    <name>VideoScanner</name>
     <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filtervisning</translation>
+        <source>Failed to Scan SG Video Hosts</source>
+        <translation>Misslyckades söka SG-videovärddatorer</translation>
     </message>
     <message>
-        <source>Watch This Video</source>
-        <translation type="obsolete">Spela upp denna film</translation>
-    </message>
-    <message>
-        <source>View Full Plot</source>
-        <translation type="obsolete">Visa full beskrivning</translation>
-    </message>
-    <message>
-        <source>View Details</source>
-        <translation type="obsolete">Visa detaljer</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="obsolete">visa fördelning</translation>
-    </message>
-</context>
-<context>
-    <name>VideoManager</name>
-    <message>
-        <source>Manually Enter IMDB #</source>
-        <translation type="obsolete">Skriv in IMDB-numret manuellt</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>delete failed</source>
-        <translation type="obsolete">borttagning misslyckades</translation>
-    </message>
-    <message>
-        <source>Select action:</source>
-        <translation type="obsolete">Välj åtgärd:</translation>
-    </message>
-    <message>
-        <source>Edit Metadata</source>
-        <translation type="obsolete">Ändra metadata</translation>
-    </message>
-    <message>
-        <source>Search IMDB</source>
-        <translation type="obsolete">Sök IMDB</translation>
-    </message>
-    <message>
-        <source>Reset Metadata</source>
-        <translation type="obsolete">Återställ metadata</translation>
-    </message>
-    <message>
-        <source>Toggle Browseable</source>
-        <translation type="obsolete">Växla bläddringsbar</translation>
-    </message>
-    <message>
-        <source>Remove Video</source>
-        <translation type="obsolete">Ta bort film</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filtervisning</translation>
-    </message>
-    <message>
-        <source>Delete this file?</source>
-        <translation type="obsolete">Ta bort denna fil?</translation>
+        <source>If they no longer exist please remove them</source>
+        <translation>Om de inte längre finns, ta bort dem</translation>
     </message>
 </context>
 <context>
     <name>VideoScannerThread</name>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="99"/>
         <source>Searching for video files</source>
         <translation>Söker efter videofiler</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="178"/>
         <source>Verifying video files</source>
         <translation>Verifierar video filer</translation>
     </message>
     <message>
-        <location filename="../mythvideo/videoscan.cpp" line="211"/>
         <source>Updating video database</source>
         <translation>Uppdaterar video databas</translation>
     </message>
 </context>
 <context>
-    <name>VideoTree</name>
+    <name>video_settings_xml</name>
     <message>
-        <source>Select action</source>
-        <translation type="obsolete">Välj åtgärd</translation>
+        <source>General Settings</source>
+        <translation>Allmänna inställningar</translation>
     </message>
     <message>
-        <source>Watch This Video</source>
-        <translation type="obsolete">Spela upp denna film</translation>
+        <source>Player Settings</source>
+        <translation>Inställningar för spelare</translation>
     </message>
     <message>
-        <source>View Full Plot</source>
-        <translation type="obsolete">Visa full beskrivning</translation>
+        <source>File Types</source>
+        <translation>Filtyper</translation>
     </message>
     <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filtervisning</translation>
-    </message>
-    <message>
-        <source>Switch to Browse View</source>
-        <translation type="obsolete">Byt till bläddringsläge</translation>
-    </message>
-    <message>
-        <source>Switch to Gallery View</source>
-        <translation type="obsolete">Byt till galleriläge</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="obsolete">visa fördelning</translation>
+        <source>Rip Settings</source>
+        <translation>Lagringsinställningar</translation>
     </message>
 </context>
 <context>
-    <name>mythvideo_videomanager::VideoManagerImp</name>
+    <name>videomenu_xml</name>
     <message>
-        <source>Select action:</source>
-        <translation type="obsolete">Välj åtgärd:</translation>
+        <source>Browse Videos</source>
+        <translation>Bläddra i videor</translation>
     </message>
     <message>
-        <source>Edit Metadata</source>
-        <translation type="obsolete">Ändra metadata</translation>
+        <source>Video List</source>
+        <translation>Videolista</translation>
     </message>
     <message>
-        <source>Search</source>
-        <translation type="obsolete">sök</translation>
+        <source>Video Gallery</source>
+        <translation>Videogalleri</translation>
     </message>
     <message>
-        <source>Manually Enter Video #</source>
-        <translation type="obsolete">Lägg till video manuellt #</translation>
+        <source>Video Manager</source>
+        <translation>Videohanterare</translation>
     </message>
     <message>
-        <source>Manually Enter Video Title</source>
-        <translation type="obsolete">Lägg till videotitel manuellt</translation>
+        <source>Play DVD</source>
+        <translation>Spela DVD</translation>
     </message>
     <message>
-        <source>Reset Metadata</source>
-        <translation type="obsolete">Återställ metadata</translation>
+        <source>Play VCD</source>
+        <translation>Spela VCD</translation>
     </message>
     <message>
-        <source>Toggle Browseable</source>
-        <translation type="obsolete">Växla bläddringsbar</translation>
+        <source>Rip DVD</source>
+        <translation>Lagra DVD</translation>
     </message>
     <message>
-        <source>Remove Video</source>
-        <translation type="obsolete">Ta bort film</translation>
+        <source>Eject media</source>
+        <translation>Mata ut</translation>
     </message>
     <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filtervisning</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
-    </message>
-    <message>
-        <source>Delete this file?</source>
-        <translation type="obsolete">Ta bort denna fil?</translation>
-    </message>
-    <message>
-        <source>delete failed</source>
-        <translation type="obsolete">borttagning misslyckades</translation>
+        <source>Videos Settings</source>
+        <translation>Videoinställningar</translation>
     </message>
 </context>
 </TS>
