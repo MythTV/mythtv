@@ -21,6 +21,7 @@ SOURCES += ../programs/mythshutdown/*.cpp
 SOURCES += ../programs/mythjobqueue/*.cpp
 SOURCES += ../programs/mythtvosd/*.cpp
 SOURCES += ../themes/themestrings.h
+SOURCES += ../programs/themestrings.h
 
 TRANSLATIONS  = mythfrontend_it.ts mythfrontend_es.ts mythfrontend_ca.ts
 TRANSLATIONS += mythfrontend_nl.ts mythfrontend_fr.ts mythfrontend_de.ts
