@@ -244,14 +244,6 @@
         <translation>Nouveau fichier</translation>
     </message>
     <message>
-        <source>All Ready in Database</source>
-        <translation>Déjà dans la bibliothèque</translation>
-    </message>
-    <message>
-        <source>Non found</source>
-        <translation>Introuvable</translation>
-    </message>
-    <message>
         <source>This track is already in the database</source>
         <translation>Cette piste est déjà dans la bibliothèque</translation>
     </message>
@@ -300,6 +292,14 @@
 Could not copy file to: %1</source>
         <translation>Copie en échec
 N&apos;a pu copier le fichier vers : %1</translation>
+    </message>
+    <message>
+        <source>Already in Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1252,6 +1252,22 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
         <source>cover</source>
         <translation>pochette</translation>
     </message>
+    <message>
+        <source>All My Playlists</source>
+        <translation type="unfinished">Toutes mes listes d&apos;écoute</translation>
+    </message>
+    <message>
+        <source>Active Play Queue</source>
+        <translation type="unfinished">Activer la liste d&apos;écoute</translation>
+    </message>
+    <message>
+        <source>Active Play Queue (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Something is Wrong</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RipStatus</name>
@@ -1751,10 +1767,6 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
         <translation>Emplacement : </translation>
     </message>
     <message>
-        <source>All ready in database</source>
-        <translation>Déjà dans la bibliothèque</translation>
-    </message>
-    <message>
         <source>Import Cover Art</source>
         <translation>Importer une pochette</translation>
     </message>
@@ -1818,6 +1830,10 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
+    <message>
+        <source>Already in database</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VisualizationsEditor</name>
@@ -1856,52 +1872,6 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-</context>
-<context>
-    <name>music_settings_xml</name>
-    <message>
-        <source>General Settings</source>
-        <translation>Réglages généraux</translation>
-    </message>
-    <message>
-        <source>Player Settings</source>
-        <translation>Réglages du lecteur</translation>
-    </message>
-    <message>
-        <source>Ripper Settings</source>
-        <translation>Réglages de l&apos;extracteur</translation>
-    </message>
-</context>
-<context>
-    <name>musicmenu_xml</name>
-    <message>
-        <source>Play Music</source>
-        <translation>Jouer la musique</translation>
-    </message>
-    <message>
-        <source>Select Music</source>
-        <translation>Sélectionner la musique</translation>
-    </message>
-    <message>
-        <source>Import CD</source>
-        <translation>Importer un CD</translation>
-    </message>
-    <message>
-        <source>Import Files</source>
-        <translation>Importer des fichiers</translation>
-    </message>
-    <message>
-        <source>Scan for New Music</source>
-        <translation>Rechercher de nouvelles musiques</translation>
-    </message>
-    <message>
-        <source>Eject media</source>
-        <translation>Éjecter le média</translation>
-    </message>
-    <message>
-        <source>Music Settings</source>
-        <translation>Réglages Musique</translation>
     </message>
 </context>
 </TS>

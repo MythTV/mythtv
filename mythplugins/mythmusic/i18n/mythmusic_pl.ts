@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>AlbumArtImages</name>
     <message>
@@ -69,23 +71,23 @@
         <translation>Trwa czyszczenie CD-RW</translation>
     </message>
     <message>
-        <source>Compilation Artist:<byte value="x9"/></source>
+        <source>Compilation Artist:	</source>
         <translation>Wykonawca składanki:</translation>
     </message>
     <message>
-        <source>Artist:<byte value="x9"/></source>
+        <source>Artist:	</source>
         <translation>Wykonawca:</translation>
     </message>
     <message>
-        <source>Album:<byte value="x9"/></source>
+        <source>Album:	</source>
         <translation>Album:</translation>
     </message>
     <message>
-        <source>Title:<byte value="x9"/></source>
+        <source>Title:	</source>
         <translation>Tytuł:</translation>
     </message>
     <message>
-        <source>Length:<byte value="x9"/></source>
+        <source>Length:	</source>
         <translation>Długość:</translation>
     </message>
     <message>
@@ -242,14 +244,6 @@
         <translation>Nowy plik</translation>
     </message>
     <message>
-        <source>All Ready in Database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Non found</source>
-        <translation>Nie znaleziono</translation>
-    </message>
-    <message>
         <source>Copy Failed
 Could not copy file to: %1</source>
         <translation>Kopiowanie nie powiodło się.Nie można skopiować pliku do: %1</translation>
@@ -297,6 +291,14 @@ Could not copy file to: %1</source>
     <message>
         <source>Cancel</source>
         <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>Already in Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1719,10 +1721,6 @@ Chcesz usunąć istniejący utwór?</translation>
         <translation></translation>
     </message>
     <message>
-        <source>Please select a quality level and check the album information below:</source>
-        <translation>Proszę wybrać poziom jakości i sprawdzić poniższe informacje o albumie:</translation>
-    </message>
-    <message>
         <source>Quality:</source>
         <translation>Jakość:</translation>
     </message>
@@ -1767,38 +1765,6 @@ Chcesz usunąć istniejący utwór?</translation>
         <translation>Lokalizacja:</translation>
     </message>
     <message>
-        <source>123 of 345</source>
-        <translation>123 z 345</translation>
-    </message>
-    <message>
-        <source>All ready in database</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>/some/file/goes/here/test.mp3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Compilation Artist</source>
-        <translation>Wykonawca składanki</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation>Album</translation>
-    </message>
-    <message>
-        <source>Genre</source>
-        <translation>Gatunek</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation>Rok</translation>
-    </message>
-    <message>
-        <source>Directory Finder</source>
-        <translation>Wyszukiwacz katalogów</translation>
-    </message>
-    <message>
         <source>Import Cover Art</source>
         <translation>Importuj okładkę</translation>
     </message>
@@ -1813,6 +1779,58 @@ Chcesz usunąć istniejący utwór?</translation>
     <message>
         <source>Image Type:</source>
         <translation>Typ obrazu:</translation>
+    </message>
+    <message>
+        <source>Please Wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Zakończone</translation>
+    </message>
+    <message>
+        <source>Switch Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already in database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Szukaj</translation>
+    </message>
+    <message>
+        <source>Cover Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Dodaj</translation>
+    </message>
+    <message>
+        <source>Next New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add All New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

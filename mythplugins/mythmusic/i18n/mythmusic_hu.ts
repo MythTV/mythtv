@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>AlbumArtImages</name>
     <message>
@@ -23,7 +24,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1595"/>
+        <location filename="../mythmusic/metadata.cpp" line="1594"/>
         <source>Inlay</source>
         <translation type="unfinished"></translation>
     </message>
@@ -31,16 +32,19 @@
 <context>
     <name>DatabaseBox</name>
     <message>
+        <location filename="../mythmusic/databasebox.cpp" line="77"/>
+        <location filename="../mythmusic/databasebox.cpp" line="101"/>
         <location filename="../mythmusic/databasebox.cpp" line="391"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="99"/>
+        <location filename="../mythmusic/databasebox.cpp" line="97"/>
         <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/databasebox.cpp" line="114"/>
         <location filename="../mythmusic/databasebox.cpp" line="214"/>
         <source>All My Music</source>
         <translation type="unfinished"></translation>
@@ -71,11 +75,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/databasebox.cpp" line="356"/>
         <location filename="../mythmusic/databasebox.cpp" line="376"/>
         <source>Couldn&apos;t create CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/databasebox.cpp" line="358"/>
         <location filename="../mythmusic/databasebox.cpp" line="378"/>
         <source>CD Created</source>
         <translation type="unfinished"></translation>
@@ -87,27 +93,27 @@
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="659"/>
-        <source>Compilation Artist:<byte value="x9"/></source>
+        <source>Compilation Artist:	</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="664"/>
-        <source>Artist:<byte value="x9"/></source>
+        <source>Artist:	</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="668"/>
-        <source>Album:<byte value="x9"/></source>
+        <source>Album:	</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="672"/>
-        <source>Title:<byte value="x9"/></source>
+        <source>Title:	</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="690"/>
-        <source>Length:<byte value="x9"/></source>
+        <source>Length:	</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -146,7 +152,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="891"/>
+        <location filename="../mythmusic/databasebox.cpp" line="890"/>
         <source>Create Audio CD from Playlist</source>
         <translation type="unfinished"></translation>
     </message>
@@ -184,6 +190,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/editmetadata.cpp" line="513"/>
         <location filename="../mythmusic/editmetadata.cpp" line="517"/>
         <source>Various Artists</source>
         <translation type="unfinished"></translation>
@@ -244,7 +251,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/editmetadata.cpp" line="706"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="683"/>
+        <location filename="../mythmusic/editmetadata.cpp" line="705"/>
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -257,26 +265,31 @@
 <context>
     <name>ImportCoverArtDialog</name>
     <message>
+        <location filename="../mythmusic/importmusic.cpp" line="841"/>
         <location filename="../mythmusic/importmusic.cpp" line="1007"/>
         <source>Front Cover</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/importmusic.cpp" line="843"/>
         <location filename="../mythmusic/importmusic.cpp" line="1009"/>
         <source>Back Cover</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/importmusic.cpp" line="845"/>
         <location filename="../mythmusic/importmusic.cpp" line="1013"/>
         <source>CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/importmusic.cpp" line="847"/>
         <location filename="../mythmusic/importmusic.cpp" line="1011"/>
         <source>Inlay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/importmusic.cpp" line="849"/>
         <location filename="../mythmusic/importmusic.cpp" line="1015"/>
         <source>&lt;Unknown&gt;</source>
         <translation type="unfinished"></translation>
@@ -310,7 +323,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/importmusic.cpp" line="348"/>
+        <location filename="../mythmusic/importmusic.cpp" line="347"/>
         <source>Copy Failed
 Could not copy file to: %1</source>
         <translation type="unfinished"></translation>
@@ -394,17 +407,19 @@ Could not copy file to: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/miniplayer.cpp" line="304"/>
         <location filename="../mythmusic/miniplayer.cpp" line="310"/>
         <source>kHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/miniplayer.cpp" line="304"/>
         <location filename="../mythmusic/miniplayer.cpp" line="310"/>
         <source>ch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/miniplayer.cpp" line="415"/>
+        <location filename="../mythmusic/miniplayer.cpp" line="413"/>
         <source>%1  by  %2</source>
         <comment>Music track &apos;title by artist&apos;</comment>
         <translation type="unfinished"></translation>
@@ -435,6 +450,7 @@ Could not copy file to: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/miniplayer.cpp" line="586"/>
         <location filename="../mythmusic/miniplayer.cpp" line="617"/>
         <source>None</source>
         <translation type="unfinished"></translation>
@@ -521,7 +537,7 @@ Could not copy file to: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/playbackbox.cpp" line="413"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="412"/>
         <source>Exiting Music Player
 Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
@@ -617,11 +633,14 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/playbackbox.cpp" line="1608"/>
         <location filename="../mythmusic/playbackbox.cpp" line="1697"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/playbackbox.cpp" line="1620"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1623"/>
         <location filename="../mythmusic/playbackbox.cpp" line="1627"/>
         <source>Shuffle</source>
         <translation type="unfinished"></translation>
@@ -637,6 +656,8 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/playbackbox.cpp" line="1710"/>
+        <location filename="../mythmusic/playbackbox.cpp" line="1713"/>
         <location filename="../mythmusic/playbackbox.cpp" line="1717"/>
         <source>Repeat</source>
         <translation type="unfinished"></translation>
@@ -662,11 +683,13 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/playbackbox.cpp" line="1961"/>
         <location filename="../mythmusic/playbackbox.cpp" line="1967"/>
         <source>kHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/playbackbox.cpp" line="1961"/>
         <location filename="../mythmusic/playbackbox.cpp" line="1967"/>
         <source>ch</source>
         <translation type="unfinished"></translation>
@@ -770,11 +793,12 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/databasebox.cpp" line="75"/>
+        <location filename="../mythmusic/databasebox.cpp" line="69"/>
         <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/databasebox.cpp" line="1353"/>
         <location filename="../mythmusic/metadata.cpp" line="1133"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
@@ -785,6 +809,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/filescanner.cpp" line="559"/>
         <location filename="../mythmusic/importmusic.cpp" line="430"/>
         <source>Searching for music files</source>
         <translation type="unfinished"></translation>
@@ -810,7 +835,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="47"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="45"/>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -845,7 +870,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="88"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="84"/>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -855,7 +880,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="98"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="97"/>
         <source>If present this script will be executed after a CD Rip is completed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -865,7 +890,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="110"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="107"/>
         <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -875,7 +900,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="123"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="120"/>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -910,7 +935,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="145"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="143"/>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -920,7 +945,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="155"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="154"/>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -930,7 +955,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="166"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="164"/>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -950,7 +975,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="180"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="178"/>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -990,7 +1015,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="203"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="201"/>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1000,7 +1025,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="214"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="212"/>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1010,7 +1035,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="224"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="223"/>
         <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1030,7 +1055,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="236"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="234"/>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1040,7 +1065,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="246"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="245"/>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1050,7 +1075,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="258"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="255"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1060,7 +1085,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="270"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="267"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1070,7 +1095,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="282"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="279"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1080,7 +1105,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="294"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="291"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1090,7 +1115,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="304"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="303"/>
         <source>Used to limit the number of results returned when using the search feature.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1115,7 +1140,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="318"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="315"/>
         <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1135,7 +1160,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="337"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="336"/>
         <source>List songs on the playback screen in the order they will be played.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1145,7 +1170,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="348"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="346"/>
         <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1175,7 +1200,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="363"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="362"/>
         <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1200,7 +1225,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="376"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="374"/>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1235,7 +1260,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="397"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="396"/>
         <source>If set to 0, visualizations will never automatically start.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1245,7 +1270,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="407"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="406"/>
         <source>Change the visualizer when the song changes.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1255,7 +1280,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="417"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="416"/>
         <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1265,7 +1290,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="427"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="426"/>
         <source>On changing the visualizer pick a new one at random.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1275,7 +1300,8 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="451"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="436"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="448"/>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1290,7 +1316,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="462"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="461"/>
         <source>List of visualizations to use during playback. Click the button below to edit this list</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1320,12 +1346,12 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="492"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="491"/>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="493"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="492"/>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1365,7 +1391,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="527"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="526"/>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1385,7 +1411,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/globalsettings.cpp" line="538"/>
+        <location filename="../mythmusic/globalsettings.cpp" line="537"/>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1430,16 +1456,21 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/main.cpp" line="219"/>
         <location filename="../mythmusic/playbackbox.cpp" line="1024"/>
         <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/metadata.cpp" line="544"/>
+        <location filename="../mythmusic/metadata.cpp" line="836"/>
         <location filename="../mythmusic/metadata.cpp" line="1008"/>
         <source>Unknown Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/metadata.cpp" line="548"/>
+        <location filename="../mythmusic/metadata.cpp" line="840"/>
         <location filename="../mythmusic/metadata.cpp" line="1012"/>
         <source>Unknown Album</source>
         <translation type="unfinished"></translation>
@@ -1450,11 +1481,13 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/metadata.cpp" line="844"/>
         <location filename="../mythmusic/metadata.cpp" line="1016"/>
         <source>Unknown Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/metadata.cpp" line="892"/>
         <location filename="../mythmusic/metadata.cpp" line="1243"/>
         <source>CD -- none</source>
         <translation type="unfinished"></translation>
@@ -1465,6 +1498,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/metadata.cpp" line="1136"/>
         <location filename="../mythmusic/metadata.cpp" line="1371"/>
         <source>title</source>
         <translation type="unfinished"></translation>
@@ -1480,7 +1514,8 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/metadata.cpp" line="1400"/>
+        <location filename="../mythmusic/metadata.cpp" line="1369"/>
+        <location filename="../mythmusic/metadata.cpp" line="1399"/>
         <source>%1 - %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1540,11 +1575,16 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/playlistcontainer.cpp" line="191"/>
+        <location filename="../mythmusic/playlistcontainer.cpp" line="282"/>
+        <location filename="../mythmusic/playlistcontainer.cpp" line="315"/>
         <location filename="../mythmusic/playlistcontainer.cpp" line="563"/>
         <source>Active Play Queue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/playlistcontainer.cpp" line="293"/>
+        <location filename="../mythmusic/playlistcontainer.cpp" line="330"/>
         <location filename="../mythmusic/playlistcontainer.cpp" line="358"/>
         <source>Active Play Queue (%1)</source>
         <translation type="unfinished"></translation>
@@ -1555,16 +1595,22 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/treebuilders.cpp" line="213"/>
+        <location filename="../mythmusic/treebuilders.cpp" line="228"/>
+        <location filename="../mythmusic/treebuilders.cpp" line="245"/>
+        <location filename="../mythmusic/treebuilders.cpp" line="261"/>
         <location filename="../mythmusic/treebuilders.cpp" line="273"/>
         <source>Artists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/visualize.cpp" line="279"/>
         <location filename="../mythmusic/visualize.cpp" line="577"/>
         <source>Visualization requires FFT library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/visualize.cpp" line="280"/>
         <location filename="../mythmusic/visualize.cpp" line="578"/>
         <source>Did you run configure?</source>
         <translation type="unfinished"></translation>
@@ -1583,7 +1629,7 @@ Do you want to continue playing in the background?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="1553"/>
+        <location filename="../mythmusic/cdrip.cpp" line="1551"/>
         <source>The encoder failed to create the file.
 Do you have write permissions for the music directory?</source>
         <translation type="unfinished"></translation>
@@ -1612,7 +1658,7 @@ Do you have write permissions for the music directory?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/cdrip.cpp" line="642"/>
+        <location filename="../mythmusic/cdrip.cpp" line="637"/>
         <source>Artist: %1
 Album: %2
 Track: %3
@@ -1930,7 +1976,7 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1970"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1969"/>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1958,11 +2004,15 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="966"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1157"/>
         <location filename="../mythmusic/smartplaylist.cpp" line="1258"/>
         <source>All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="967"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1260"/>
         <location filename="../mythmusic/smartplaylist.cpp" line="1491"/>
         <source>Any</source>
         <translation type="unfinished"></translation>
@@ -1988,6 +2038,7 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1071"/>
         <location filename="../mythmusic/smartplaylist.cpp" line="1346"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
@@ -2023,7 +2074,7 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythmusic/smartplaylist.cpp" line="1413"/>
+        <location filename="../mythmusic/smartplaylist.cpp" line="1412"/>
         <source>Are you sure you want to delete this Category?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2036,7 +2087,7 @@ Do you want to remove the existing track?</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
+        <location filename="themestrings.h" line="46"/>
         <source>Please Wait ...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2046,42 +2097,42 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="39"/>
+        <location filename="themestrings.h" line="4"/>
         <source>Compilation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Comp. Artist:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Artist:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Album:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="43"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Title:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="46"/>
+        <location filename="themestrings.h" line="11"/>
         <source>Track No.:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="44"/>
+        <location filename="themestrings.h" line="9"/>
         <source>Genre:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="45"/>
+        <location filename="themestrings.h" line="10"/>
         <source>Year:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2101,7 +2152,7 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Filename:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2116,132 +2167,147 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="19"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="22"/>
-        <source>Please select a quality level and check the album information below:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="23"/>
+        <location filename="themestrings.h" line="21"/>
         <source>Quality:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="27"/>
+        <location filename="themestrings.h" line="22"/>
         <source>Multi-Artist:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="56"/>
+        <location filename="themestrings.h" line="23"/>
+        <source>Switch Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="24"/>
         <source>Track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="53"/>
+        <location filename="themestrings.h" line="25"/>
         <source>Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="51"/>
+        <location filename="themestrings.h" line="26"/>
         <source>Artist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="32"/>
+        <location filename="themestrings.h" line="27"/>
         <source>Length</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="28"/>
+        <source>Scan CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="29"/>
         <source>Rip CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="30"/>
         <source>Importing CD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
+        <location filename="themestrings.h" line="31"/>
         <source>Encoding Track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="32"/>
         <source>Import Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="58"/>
+        <location filename="themestrings.h" line="33"/>
         <source>Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="65"/>
-        <source>123 of 345</source>
+        <location filename="themestrings.h" line="34"/>
+        <source>Already in database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="66"/>
-        <source>All ready in database</source>
+        <location filename="themestrings.h" line="35"/>
+        <source>Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="64"/>
-        <source>/some/file/goes/here/test.mp3</source>
+        <location filename="themestrings.h" line="36"/>
+        <source>Cover Art</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="50"/>
-        <source>Compilation Artist</source>
+        <location filename="themestrings.h" line="37"/>
+        <source>Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="52"/>
-        <source>Album</source>
+        <location filename="themestrings.h" line="38"/>
+        <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="54"/>
-        <source>Genre</source>
+        <location filename="themestrings.h" line="39"/>
+        <source>Next New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="55"/>
-        <source>Year</source>
+        <location filename="themestrings.h" line="40"/>
+        <source>Add All New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="57"/>
-        <source>Directory Finder</source>
+        <location filename="themestrings.h" line="45"/>
+        <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="59"/>
+        <location filename="themestrings.h" line="41"/>
         <source>Import Cover Art</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="60"/>
+        <location filename="themestrings.h" line="42"/>
         <source>File:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="61"/>
+        <location filename="themestrings.h" line="43"/>
         <source>Destination:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="62"/>
+        <location filename="themestrings.h" line="44"/>
         <source>Image Type:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2264,11 +2330,13 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/globalsettings.cpp" line="681"/>
         <location filename="../mythmusic/globalsettings.cpp" line="696"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythmusic/globalsettings.cpp" line="682"/>
         <location filename="../mythmusic/globalsettings.cpp" line="697"/>
         <source>Provider</source>
         <translation type="unfinished"></translation>

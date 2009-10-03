@@ -244,14 +244,6 @@
         <translation>Ny fil</translation>
     </message>
     <message>
-        <source>All Ready in Database</source>
-        <translation>Allt färdigt i databasen</translation>
-    </message>
-    <message>
-        <source>Non found</source>
-        <translation>Inget hittat</translation>
-    </message>
-    <message>
         <source>This track is already in the database</source>
         <translation>Den här låten finns redan i databasen</translation>
     </message>
@@ -300,6 +292,14 @@
 Could not copy file to: %1</source>
         <translation>Kopiering misslyckades
 Kunde inte kopiera fil till: %1</translation>
+    </message>
+    <message>
+        <source>Already in Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1252,6 +1252,22 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
         <source>cover</source>
         <translation>omslag</translation>
     </message>
+    <message>
+        <source>All My Playlists</source>
+        <translation type="unfinished">Alla spellistor</translation>
+    </message>
+    <message>
+        <source>Active Play Queue</source>
+        <translation type="unfinished">Aktiv spellista</translation>
+    </message>
+    <message>
+        <source>Active Play Queue (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Something is Wrong</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RipStatus</name>
@@ -1746,10 +1762,6 @@ Vill du ta bort det existerande spåret?</translation>
         <translation>Plats:</translation>
     </message>
     <message>
-        <source>All ready in database</source>
-        <translation>Allt färdigt i databasen</translation>
-    </message>
-    <message>
         <source>Import Cover Art</source>
         <translation>Importera omslagsbild</translation>
     </message>
@@ -1813,6 +1825,10 @@ Vill du ta bort det existerande spåret?</translation>
         <source>Copy</source>
         <translation>Kopiera</translation>
     </message>
+    <message>
+        <source>Already in database</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VisualizationsEditor</name>
@@ -1851,52 +1867,6 @@ Vill du ta bort det existerande spåret?</translation>
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-</context>
-<context>
-    <name>music_settings_xml</name>
-    <message>
-        <source>General Settings</source>
-        <translation>Allmänna inställningar</translation>
-    </message>
-    <message>
-        <source>Player Settings</source>
-        <translation>Spelarinställningar</translation>
-    </message>
-    <message>
-        <source>Ripper Settings</source>
-        <translation>Lagringsinställningar</translation>
-    </message>
-</context>
-<context>
-    <name>musicmenu_xml</name>
-    <message>
-        <source>Play Music</source>
-        <translation>Spela musik</translation>
-    </message>
-    <message>
-        <source>Select Music</source>
-        <translation>Välj musik</translation>
-    </message>
-    <message>
-        <source>Import CD</source>
-        <translation>Importera CD</translation>
-    </message>
-    <message>
-        <source>Import Files</source>
-        <translation>Importera filer</translation>
-    </message>
-    <message>
-        <source>Scan for New Music</source>
-        <translation>Sök efter ny musik</translation>
-    </message>
-    <message>
-        <source>Eject media</source>
-        <translation>Mata ut media</translation>
-    </message>
-    <message>
-        <source>Music Settings</source>
-        <translation>Musikinställningar</translation>
     </message>
 </context>
 </TS>
