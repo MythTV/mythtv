@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="nb_NO">
+<context>
+    <name>ArchiveFileSelector</name>
+    <message>
+        <source>Find File To Import</source>
+        <translation>Finn fil som skal importeres</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Neste</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Forrige</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation>Tilbake</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation>Hjem</translation>
+    </message>
+    <message>
+        <source>The selected item is not a valid archive file!</source>
+        <translation>Det valgte elementet er ikke en gyld arkivfil!</translation>
+    </message>
+</context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
@@ -13,42 +44,42 @@
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>ExportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Fullfør</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Forrige</translation>
+        <translation>Forrige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Legg til opptak</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Legg til video</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du må legge til minst ett element for å arkivere!</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Fjern element</translation>
+        <translation>Fjern element</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har ingen videoer!</translation>
     </message>
 </context>
 <context>
@@ -134,19 +165,58 @@ Trykk OK</translation>
     </message>
     <message>
         <source>The selected item is not a directory!</source>
-        <translation>Valgte element er ikke en katalog.</translation>
+        <translation>Det valgte element er ikke en katalog!</translation>
     </message>
     <message>
         <source>Find File</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn fil</translation>
     </message>
     <message>
         <source>Find Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn mappe</translation>
     </message>
     <message>
         <source>Find Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn filer</translation>
+    </message>
+</context>
+<context>
+    <name>ImportNative</name>
+    <message>
+        <source>Finish</source>
+        <translation>Fullfør</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Forrige</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>You need to select a valid chanID!</source>
+        <translation>Du må velge en gydlig kanal-id!</translation>
+    </message>
+    <message>
+        <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
+        <translation>Klarte ikke importere arkivet; en feil oppsetod ved kjøring av «mytharchivehelper»</translation>
+    </message>
+    <message>
+        <source>Select a ChanID</source>
+        <translation>Velg en kanal-id</translation>
+    </message>
+    <message>
+        <source>Select a ChanNo</source>
+        <translation>Velg et kanalnr</translation>
+    </message>
+    <message>
+        <source>Select a Channel Name</source>
+        <translation>Velg et kanalnavn</translation>
+    </message>
+    <message>
+        <source>Select a Callsign</source>
+        <translation>Velg et kanaltegn</translation>
     </message>
 </context>
 <context>
@@ -228,19 +298,98 @@ Trykk OK</translation>
     </message>
     <message>
         <source>Show Progress Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis fremdriftslogg</translation>
     </message>
     <message>
         <source>Show Full Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis hele loggen</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke oppdater automatisk</translation>
     </message>
     <message>
         <source>Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppdater automatisk</translation>
+    </message>
+</context>
+<context>
+    <name>MythBurn</name>
+    <message>
+        <source>Finish</source>
+        <translation>Fullfør</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Forrige</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation>Legg til opptak</translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation>Legg til video</translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation>Legg til fil</translation>
+    </message>
+    <message>
+        <source>Using Cutlist</source>
+        <translation>Bruker kuttliste</translation>
+    </message>
+    <message>
+        <source>Not Using Cutlist</source>
+        <translation>Bruker ikke kuttliste</translation>
+    </message>
+    <message>
+        <source>No Cut List</source>
+        <translation>Ingen kuttliste</translation>
+    </message>
+    <message>
+        <source>You need to add at least one item to archive!</source>
+        <translation>Du må legge til minst ett element for å arkivere!</translation>
+    </message>
+    <message>
+        <source>Retrieving File Information. Please Wait...</source>
+        <translation>Henter filinformasjon. Vennligst vent...</translation>
+    </message>
+    <message>
+        <source>Encoder: </source>
+        <translation>Koder: </translation>
+    </message>
+    <message>
+        <source>Don&apos;t Use Cutlist</source>
+        <translation>Ikke bruk kuttliste</translation>
+    </message>
+    <message>
+        <source>Use Cutlist</source>
+        <translation>Bruk kuttliste</translation>
+    </message>
+    <message>
+        <source>Remove Item</source>
+        <translation>Fjern element</translation>
+    </message>
+    <message>
+        <source>Edit Details</source>
+        <translation>Rediger detaljer</translation>
+    </message>
+    <message>
+        <source>Change Encoding Profile</source>
+        <translation>Endre kodingsprofil</translation>
+    </message>
+    <message>
+        <source>Edit Thumbnails</source>
+        <translation>Rediger miniatyrbilder</translation>
+    </message>
+    <message>
+        <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
+        <translation>Klarte ikke lage DVD&apos;en; en feil oppstod under kjøringen av skriptene</translation>
     </message>
 </context>
 <context>
@@ -308,6 +457,13 @@ Trykk OK</translation>
     <message>
         <source>Original Size </source>
         <translation type="obsolete">Opprinnelig størrelse </translation>
+    </message>
+</context>
+<context>
+    <name>ProfileDialog</name>
+    <message>
+        <source>Ok</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -512,95 +668,95 @@ Dette kan ta et par minutter.</translation>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrivehastighet for DVD-stasjon</translation>
     </message>
     <message>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette er skrivehastigheten som blir brukt under DVD-brenning. Sett denne til 0 hvis growisofs skal velge den raskeste tilgjengelige hastigheten.</translation>
     </message>
     <message>
         <source>Command to play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for å spille DVD</translation>
     </message>
     <message>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando som kjøres under testing av en ny DVD. Settes denne til &apos;Internal&apos; vil den interne MythtTV avspilleren brukes. %f vil bli erstattet av stien til DVD-strukturen, dvs. &apos;xine -pfhq --no-splash dvd:/%f&apos;. </translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis på vil alltid MPEG-2-filer kjøres gjennom mythtranscode for å rette opp eventuelle feil. Dette kan kanskje ordne noen lydproblemer.</translation>
     </message>
     <message>
         <source>Use ProjectX</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruk ProjectX</translation>
     </message>
     <message>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis valgt vil ProjectX bli brukt til å fjerne reklamer og splitte mpeg2 filer istendenfor mythtranscode og mythreplex.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjør at skriptet bruker FIFO&apos;er for å sende utdata fra mplex til dvdauthor, i stedet for å lage midlertidige filer. Sparer tid og diskplass under multiplex-operasjoner, men virker ikke i Windows</translation>
     </message>
     <message>
         <source>Add Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Legg til undertekster</translation>
     </message>
     <message>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis tilgjengelig vil denne instillingen legge til undertekster på DVDen. Krever at &apos;Bruk ProjectX&apos; er på.</translation>
     </message>
     <message>
         <source>Date format</source>
-        <translation type="unfinished"></translation>
+        <translation>Datoformat</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksempler vises med dagens dato.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eksempler vises med dato for i morgen.</translation>
     </message>
     <message>
         <source>Your preferred date format to use on DVD menus.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ditt prefererte datoformat i DVD menyen.</translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsformat</translation>
     </message>
     <message>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ditt prefererte tidsformat i DVD menyen. Du må velge et format med &quot;AM&quot; eller &quot;PM&quot;, ellers vil tidsvisningen være basert på 24 timer formatet.</translation>
     </message>
     <message>
         <source>Default Encoder Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard kodingsprofil</translation>
     </message>
     <message>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard kodingsprofil som vil bli brukt hvis filen trenger å rekodes.</translation>
     </message>
     <message>
         <source>jpeg2yuv command</source>
-        <translation type="unfinished"></translation>
+        <translation>jpeg2yuv-kommando</translation>
     </message>
     <message>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for åkjøre jpeg2yuv. Del av mjpegtools-pakken</translation>
     </message>
     <message>
         <source>projectx command</source>
-        <translation type="unfinished"></translation>
+        <translation>projectx-kommando</translation>
     </message>
     <message>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for ProjectX. Vil bli brukt å kutte reklamer og splitte mpeg filer istedenfor mythtranscode og mythreplex.</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD menyinstillinger</translation>
     </message>
     <message>
         <source>Video Selector</source>
@@ -609,32 +765,69 @@ Dette kan ta et par minutter.</translation>
     <message>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan ikke finne arbeidskatalog for Myth-arkiv.
+Har du satt opp riktig katalog in instillingene?</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>Klarte ikke lage DVD&apos;en; en feil oppstod under kjøringen av skriptene</translation>
     </message>
     <message>
         <source>Cannot find any logs to show!</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan ikke finne noen logger å vise!</translation>
     </message>
     <message>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fant en låsfil men prosessen som eier denne kjører ikke!
+Fjerner gammel låsfil.</translation>
     </message>
     <message>
         <source>Last run did not create a playable DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige kjøring produserte ikke en spillbar DVD.</translation>
     </message>
     <message>
         <source>Last run failed to create a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige kjøring klarte ikke å lage en DVD.</translation>
+    </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation>Du har ingen videoer!</translation>
+    </message>
+    <message>
+        <source>Cannot burn a DVD.
+The last run failed to create a DVD.</source>
+        <translation>Kan ikke brenne en DVD.
+Forrige kjøring kunne ikke lage en DVD.</translation>
+    </message>
+    <message>
+        <source>
+Place a blank DVD in the drive and select an option below.</source>
+        <translation>Sett i en tom DVD og velg et alternativ under.</translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation>Brenn DVD</translation>
+    </message>
+    <message>
+        <source>Burn DVD Rewritable</source>
+        <translation>Brenn DVD Rewritable</translation>
+    </message>
+    <message>
+        <source>Burn DVD Rewritable (Force Erase)</source>
+        <translation>Brenn DVD Rewritable (Tving Sletting)</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
+        <translation>Det var ikke mulig å kjøre mytharchivehelper for å brenne en DVD.</translation>
     </message>
 </context>
 <context>
@@ -681,49 +874,64 @@ Trykk OK</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Henter opptaksliste. Vennligst vent...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
-        <translation type="unfinished"></translation>
+        <translation>Enter har du ingen opptak eller så er ikke opptakene tilgjengelig lokalt!</translation>
     </message>
 </context>
 <context>
     <name>SelectDestination</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Neste</translation>
+        <translation>Neste</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Forrige</translation>
+        <translation>Forrige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn...</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeSelector</name>
+    <message>
+        <source>Next</source>
+        <translation>Neste</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Forrige</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Lagre</translation>
+        <translation>Lagre</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Exit, Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutt, og lagre miniatyrbildene</translation>
     </message>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutt, Ikke lagre miniatyrbildene</translation>
     </message>
 </context>
 <context>

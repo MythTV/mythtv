@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="nb_NO">
 <context>
     <name></name>
     <message>
@@ -21,6 +23,54 @@
         <comment>PL4 default search string.</comment>
         <translation>R:NC-17</translation>
     </message>
+    <message>
+        <source>Cover download stopped.</source>
+        <translation>Covernedlasting stoppet.</translation>
+    </message>
+    <message>
+        <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
+        <translation>Forsøkte å skrive %1, men det virker som om dette er en HTML redirect (filstørrelse %2).</translation>
+    </message>
+    <message>
+        <source>Error writing Coverart to file %1.</source>
+        <translation>Feil under skriving av Coverart til fil %1.</translation>
+    </message>
+    <message>
+        <source>Error writing data to file %1.</source>
+        <translation>Feil ved skriving av data til fil %1.</translation>
+    </message>
+    <message>
+        <source>Error: file error &apos;%1&apos; for file %2</source>
+        <translation>Feil: Filfeil &apos;%1&apos; for fil %2</translation>
+    </message>
+    <message>
+        <source>Screenshot download stopped.</source>
+        <translation>Screenshot nedlasting stoppet.</translation>
+    </message>
+    <message>
+        <source>Error writing Screenshot to file %1.</source>
+        <translation>Feil ved skriving av Screenshot til fil %1.</translation>
+    </message>
+    <message>
+        <source>Fanart download stopped.</source>
+        <translation>Fanart nedlasting stoppet.</translation>
+    </message>
+    <message>
+        <source>Error writing Fanart to file %1.</source>
+        <translation>Feil under skriving av Fanart til fil %1.</translation>
+    </message>
+    <message>
+        <source>Banner download stopped.</source>
+        <translation>Banner nedlasting stoppet.</translation>
+    </message>
+    <message>
+        <source>Error writing Banner to file %1.</source>
+        <translation>Feil ved skriving av Banner til fil %1.</translation>
+    </message>
+    <message>
+        <source>No command to run.</source>
+        <translation>Har ingen kommando å kjøre.</translation>
+    </message>
 </context>
 <context>
     <name>DVDRipBox</name>
@@ -30,19 +80,19 @@
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation>Klarte ikke koble til Myths kodingsdemon. Prøv å starte den ved å trykke på en hvilken som helst tall-tast. Hvis denne meldingen vises fortsatt, er det definitivt ugler i mosen.</translation>
+        <translation type="obsolete">Klarte ikke koble til Myths kodingsdemon. Prøv å starte den ved å trykke på en hvilken som helst tall-tast. Hvis denne meldingen vises fortsatt, er det definitivt ugler i mosen.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation>Forsøket på å koble til MTD svarte at verten ikike ble funnet, noe som er litt dumt.</translation>
+        <translation type="obsolete">Forsøket på å koble til MTD svarte at verten ikike ble funnet, noe som er litt dumt.</translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation>Feil med søylekommunikasjon, et tegn på dommedag. </translation>
+        <translation type="obsolete">Feil med søylekommunikasjon, et tegn på dommedag. </translation>
     </message>
     <message>
-        <source>Something is wrong, but I don't know what.</source>
-        <translation>En ukjent feil har oppstått.</translation>
+        <source>Something is wrong, but I don&apos;t know what.</source>
+        <translation type="obsolete">En ukjent feil har oppstått.</translation>
     </message>
     <message>
         <source>Job %1 of %2</source>
@@ -54,15 +104,15 @@
     </message>
     <message>
         <source>Cancelling ...</source>
-        <translation>Avbryter . . .</translation>
+        <translation>Avbryter...</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
-        <translation>Har hverken jobber eller annet å gjøre. Du kan jo rippe en DVD:</translation>
+        <translation>Har hverken jobber eller annet å gjøre. Du kan jo rippe en DVD.</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
-        <translation>Hverken jobber eller annet å gjøre. Du kan jo rippe en plate.</translation>
+        <translation type="obsolete">Hverken jobber eller annet å gjøre. Du kan jo rippe en plate.</translation>
     </message>
     <message>
         <source>New Rip</source>
@@ -71,6 +121,22 @@
     <message>
         <source>Cancel Job</source>
         <translation>Avbryt jobb</translation>
+    </message>
+    <message>
+        <source>Attempting to launch mtd...</source>
+        <translation>Forsøker å starte mtd...</translation>
+    </message>
+    <message>
+        <source>Cannot connect to your Myth Transcoding Daemon.</source>
+        <translation>Kan ikke koble til Myths kodingsdemon.</translation>
+    </message>
+    <message>
+        <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
+        <translation>Forsøket på å koble til MTD svarte at verten ikike ble funnet, noe som er litt dumt.</translation>
+    </message>
+    <message>
+        <source>Unknown connection error.</source>
+        <translation>Ukjent tilkoblingsfeil.</translation>
     </message>
 </context>
 <context>
@@ -85,22 +151,26 @@
     </message>
     <message>
         <source>Done</source>
-        <translation>Ferdig</translation>
+        <translation type="obsolete">Ferdig</translation>
+    </message>
+    <message>
+        <source>Enter new category</source>
+        <translation>Skriv inn ny kategori</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
         <source>Please enter the new extension:</source>
-        <translation>Skriv inn det nye filetternavnet:</translation>
+        <translation type="obsolete">Skriv inn det nye filetternavnet:</translation>
     </message>
     <message>
         <source>Create new extension</source>
-        <translation>Lag nytt filetternavn</translation>
+        <translation type="obsolete">Lag nytt filetternavn</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>Done</source>
@@ -114,12 +184,16 @@
         <source>Delete</source>
         <translation>Slett</translation>
     </message>
+    <message>
+        <source>Enter the new extension:</source>
+        <translation>Skriv inn det nye filetternavnet:</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>New category</source>
-        <translation>Ny kategori</translation>
+        <translation type="obsolete">Ny kategori</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
@@ -134,7 +208,7 @@
         <translation>1 - lavest</translation>
     </message>
     <message>
-        <source>This is the 'level' that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
+        <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation>Dette er nivået MythVideo begynner på. Alle videoer med et nivå lik eller lavere enn dette vises i listen eller ved blaing som standard. Angi en forelder-kode for å begrense endringer av standardnivået.</translation>
     </message>
     <message>
@@ -175,18 +249,18 @@
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation>Videolisten blar gjennom filer</translation>
+        <translation type="obsolete">Videolisten blar gjennom filer</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Dette gjør at videolisten viser alle relevante filer i MythVideo-katalogen, selv de som ikke har blitt indeksert.</translation>
+        <translation type="obsolete">Dette gjør at videolisten viser alle relevante filer i MythVideo-katalogen, selv de som ikke har blitt indeksert.</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
         <translation>Nye indekserte filer er visbare som standard</translation>
     </message>
     <message>
-        <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the 'Browse' menu.</source>
+        <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
         <translation>Nylig indekserte filer i videobehandleren blir markert som visbare og vises i bla-menyen.</translation>
     </message>
     <message>
@@ -214,24 +288,24 @@
         <translation>Denne katalogen må finnes fra før, og brukeren som kjører MythVideo må ha lese- og skrivetillatelse til den.</translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as 'Internal'.</source>
-        <translation>Denne kommandoen brukes for å spille av filer som ikke har en spesiell spiller angitt for sitt filformat. Det går òg an å bruke navnet på en av tilleggsmodulene for avspilling, f.eks. 'internal'.</translation>
+        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation>Denne kommandoen brukes for å spille av filer som ikke har en spesiell spiller angitt for sitt filformat. Det går òg an å bruke navnet på en av tilleggsmodulene for avspilling, f.eks. &apos;internal&apos;.</translation>
     </message>
     <message>
         <source>Rows to display</source>
-        <translation>Raderå vise</translation>
+        <translation type="obsolete">Raderå vise</translation>
     </message>
     <message>
         <source>Columns to display</source>
-        <translation>Kolonner å vise</translation>
+        <translation type="obsolete">Kolonner å vise</translation>
     </message>
     <message>
         <source>Show title below thumbnails</source>
-        <translation>Vis tittel under filmplakater</translation>
+        <translation type="obsolete">Vis tittel under filmplakater</translation>
     </message>
     <message>
         <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation>Aktiveres dette vil den ekstra teksten gjøre bildene mindre.</translation>
+        <translation type="obsolete">Aktiveres dette vil den ekstra teksten gjøre bildene mindre.</translation>
     </message>
     <message>
         <source>Video Manager</source>
@@ -239,7 +313,7 @@
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation>Videogalleri</translation>
+        <translation type="obsolete">Videogalleri</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -259,23 +333,23 @@
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation>Klarte ikke hente plakat</translation>
+        <translation type="obsolete">Klarte ikke hente plakat</translation>
     </message>
     <message>
         <source>Video Browser browses files</source>
-        <translation>Bla-modus blar i filer</translation>
+        <translation type="obsolete">Bla-modus blar i filer</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Dette gjør at bla-modus viser alle relevante filer i MythVideos startkatalog, selv om de ikke er indeksert.</translation>
+        <translation type="obsolete">Dette gjør at bla-modus viser alle relevante filer i MythVideos startkatalog, selv om de ikke er indeksert.</translation>
     </message>
     <message>
         <source>Video Gallery browses files</source>
-        <translation>Videogalleri blar i filer</translation>
+        <translation type="obsolete">Videogalleri blar i filer</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Dette gjør at videogallerivisningen viser alle relevante filer i MythVideos startkatalog, selv om de ikke er indeksert.</translation>
+        <translation type="obsolete">Dette gjør at videogallerivisningen viser alle relevante filer i MythVideos startkatalog, selv om de ikke er indeksert.</translation>
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
@@ -283,7 +357,7 @@
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation>Hvis dette og bla i filer er på, laster videolisten all kjent videodata fra databasen. Å slå dette på kan gjøre det mye raskere å laste inn videoliste-treet</translation>
+        <translation type="obsolete">Hvis dette og bla i filer er på, laster videolisten all kjent videodata fra databasen. Å slå dette på kan gjøre det mye raskere å laste inn videoliste-treet</translation>
     </message>
     <message>
         <source>Sorting ignores case</source>
@@ -295,23 +369,23 @@
     </message>
     <message>
         <source>Show folders for database views</source>
-        <translation>Vis mapper for databasevisning</translation>
+        <translation type="obsolete">Vis mapper for databasevisning</translation>
     </message>
     <message>
         <source>If set, sub folders of your video directory will be shown in supported views.</source>
-        <translation>Undermapper i videomappen vises i temaer hvor dette støttes.</translation>
+        <translation type="obsolete">Undermapper i videomappen vises i temaer hvor dette støttes.</translation>
     </message>
     <message>
         <source>Image cache size</source>
-        <translation>Antall hurtiglagrede bilder</translation>
+        <translation type="obsolete">Antall hurtiglagrede bilder</translation>
     </message>
     <message>
         <source>This setting determines the number of images MythVideo will cache for views.</source>
-        <translation>Antall bilder MythTV skal hurtiglagre for raskere visning.</translation>
+        <translation type="obsolete">Antall bilder MythTV skal hurtiglagre for raskere visning.</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished" />
+        <translation></translation>
     </message>
     <message>
         <source>All</source>
@@ -353,12 +427,12 @@
         <source>
 
 You have no VCD Player command defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
-        <source>OK, I'll go run Setup</source>
+        <source>OK, I&apos;ll go run Setup</source>
         <translation>Greit, oppsett neste</translation>
     </message>
     <message>
@@ -394,9 +468,9 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
         <translation>Ripp DVD</translation>
     </message>
     <message>
-        <source>Media Monitoring should be turned on to allow this feature (Setup -> General -> CD/DVD Monitor</source>
+        <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
         <translation>Dette krever at medieovervåking er aktivert 
-(Innstillinger -> Generelt -> Overvåk CD/DVD)</translation>
+(Innstillinger -&gt; Generelt -&gt; Overvåk CD/DVD)</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
@@ -408,7 +482,7 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation>En kommando som starter en VCD-avspiller (MPlayer, xine etc.). '%d' erstattes med VCD-enheten (f.eks. '/dev/cdrom').</translation>
+        <translation>En kommando som starter en VCD-avspiller (MPlayer, xine etc.). &apos;%d&apos; erstattes med VCD-enheten (f.eks. &apos;/dev/cdrom&apos;).</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
@@ -424,15 +498,15 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation>Kommandoen som brukes for å forhåndsvise en gitt tittel på en DVD. '%t' ersattes med tittelen, '%d' med enheten, '%a' med lyssporet og '%c' med lydkanaler.</translation>
+        <translation>Kommandoen som brukes for å forhåndsvise en gitt tittel på en DVD. &apos;%t&apos; ersattes med tittelen, &apos;%d&apos; med enheten, &apos;%a&apos; med lyssporet og &apos;%c&apos; med lydkanaler.</translation>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation>Argumenter for undertekster</translation>
+        <translation>Argumenter for undertekster:</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation>Hvis du velger å ta med undertekster i rippinger, legges disse argumentene til slutten av forhåndsvisningskommandoen, slik at undertekstene forhåndsvises. '%s' erstattes med undertekst-sporet. </translation>
+        <translation>Hvis du velger å ta med undertekster i rippinger, legges disse argumentene til slutten av forhåndsvisningskommandoen, slik at undertekstene forhåndsvises. &apos;%s&apos; erstattes med undertekst-sporet. </translation>
     </message>
     <message>
         <source>Base transcode command</source>
@@ -456,7 +530,7 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation>Dette gjør at MTD (Myths Transcode-demon) viser utdata i terminalvinduet den ble startet fra, i stedet for filen 'mtd.log' i rippe-katalogen.</translation>
+        <translation>Dette gjør at MTD (Myths Transcode-demon) viser utdata i terminalvinduet den ble startet fra, i stedet for filen &apos;mtd.log&apos; i rippe-katalogen.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
@@ -468,7 +542,7 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
-        <translation>Bruk 'XviD' i stedet for 'DivX'</translation>
+        <translation>Bruk &apos;XviD&apos; i stedet for &apos;DivX&apos;</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
@@ -512,15 +586,15 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>Ripping to file ~</source>
-        <translation>Ripper til filen '~'</translation>
+        <translation>Ripper til filen &apos;~&apos;</translation>
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
-        <translation>Perfekt DVD-ripping av '%1'</translation>
+        <translation>Perfekt DVD-ripping av &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
-        <translation>Konvertering av '%1'</translation>
+        <translation>Konvertering av &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
@@ -540,7 +614,7 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation>Konverteringsprogrammet tenker </translation>
+        <translation type="obsolete">Konverteringsprogrammet tenker </translation>
     </message>
     <message>
         <source>ISO copy of %1</source>
@@ -556,11 +630,11 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation>Fjern DVD-bokmerker etter (dager)</translation>
+        <translation type="obsolete">Fjern DVD-bokmerker etter (dager)</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation>Fjerner DVD-bokmerker som er eldre enn det oppgitte antall dager</translation>
+        <translation type="obsolete">Fjerner DVD-bokmerker som er eldre enn det oppgitte antall dager</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
@@ -568,11 +642,11 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>DVD Bookmark Prompt</source>
-        <translation>Vis valg for bokmerke når DVD'er startes</translation>
+        <translation>Vis valg for bokmerke når DVD&apos;er startes</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation>Spør om DVD'en skal spilles fra begynnelsen av eller starte fra et bokmerke</translation>
+        <translation>Spør om DVD&apos;en skal spilles fra begynnelsen av eller starte fra et bokmerke</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
@@ -600,41 +674,41 @@ Det er ikke angitt et program for VCD-avspilling.</translation>
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation>Søke etter videofiler</translation>
+        <translation type="obsolete">Søke etter videofiler</translation>
     </message>
     <message>
         <source>No to all</source>
-        <translation>Nei til alt</translation>
+        <translation type="obsolete">Nei til alt</translation>
     </message>
     <message>
         <source>Yes to all</source>
-        <translation>Ja til alt</translation>
+        <translation type="obsolete">Ja til alt</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation>FIlen mangler</translation>
+        <translation type="obsolete">FIlen mangler</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
 Remove it from the database?</source>
-        <translation>%1 finns ikke 
+        <translation type="obsolete">%1 finns ikke 
 Vil du fjerne den fra databasen?</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation>Oppdaterer videodatabase</translation>
+        <translation type="obsolete">Oppdaterer videodatabase</translation>
     </message>
     <message>
         <source>Verifying video files</source>
-        <translation>Kontrollerer videofiler</translation>
+        <translation type="obsolete">Kontrollerer videofiler</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation>Ingen</translation>
+        <translation>Ingen rangering er tilgjengelig.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation>minutter</translation>
+        <translation type="obsolete">minutter</translation>
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
@@ -662,11 +736,11 @@ Vil du fjerne den fra databasen?</translation>
     </message>
     <message>
         <source>This PIN is used to enter Parental Control Level 2.</source>
-        <translation>Denne koden brukes for å aktivere forelderkontroll nivå 2</translation>
+        <translation>Denne koden brukes for å aktivere forelderkontroll nivå 2.</translation>
     </message>
     <message>
         <source>Video Tree remembers last selected position</source>
-        <translation>VIdeoviseren husker forrige valgte posisjon</translation>
+        <translation>Videoviseren husker forrige valgte posisjon</translation>
     </message>
     <message>
         <source>If set, the current position in the Video Tree is persistent.</source>
@@ -677,7 +751,7 @@ Vil du fjerne den fra databasen?</translation>
         <translation>Mapper som inneholder videofiler</translation>
     </message>
     <message>
-        <source>Multiple directories can be separated by ':'. Each directory must exist and be readable by the user running MythVideo.</source>
+        <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
         <translation>Flere mapper kan skilles med kolon (:). 
 Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.</translation>
     </message>
@@ -687,7 +761,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
-        <translation>Velg DVD-stasjonens fart for avspilling. Farten må være et multiplum av 177 KB/s</translation>
+        <translation type="obsolete">Velg DVD-stasjonens fart for avspilling. Farten må være et multiplum av 177 KB/s</translation>
     </message>
     <message>
         <source>Let transcode determine frame rate</source>
@@ -715,27 +789,27 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>Theme Error: browser/playwait has an invalid area.</source>
-        <translation>Feil i tema: browser/playwait har et ugyldig område.</translation>
+        <translation type="obsolete">Feil i tema: browser/playwait har et ugyldig område.</translation>
     </message>
     <message>
         <source>Theme Error: browser/novideos_info has an invalid area.</source>
-        <translation>Feil i tema: browser/novideos_info har et ugyldig område.</translation>
+        <translation type="obsolete">Feil i tema: browser/novideos_info har et ugyldig område.</translation>
     </message>
     <message>
         <source>Manually Enter Video #</source>
-        <translation>Skriv inn videonr. manuelt</translation>
+        <translation type="obsolete">Skriv inn videonr. manuelt</translation>
     </message>
     <message>
         <source>Manually Enter Video Title</source>
-        <translation>Skriv inn videonavn manuelt</translation>
+        <translation type="obsolete">Skriv inn videonavn manuelt</translation>
     </message>
     <message>
         <source>Reset Entry</source>
-        <translation>TIlbakestill</translation>
+        <translation type="obsolete">TIlbakestill</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>Command</source>
@@ -743,36 +817,252 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>%1 failed</source>
-        <translation>%1 feilet</translation>
+        <translation type="obsolete">%1 feilet</translation>
     </message>
     <message>
         <source>%1
 
 Check VideoManager Settings</source>
-        <translation>%1 
+        <translation type="obsolete">%1 
 
 Kontroller innstillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Fetching poster for %1 (%2)</source>
-        <translation>Henter plakat for %1 (%2)</translation>
+        <translation type="obsolete">Henter plakat for %1 (%2)</translation>
     </message>
     <message>
         <source>A poster exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation>Det finnes en plakat for denne filmen, men det oppstod et tidsavbrudd ved nedlasting.</translation>
+        <translation type="obsolete">Det finnes en plakat for denne filmen, men det oppstod et tidsavbrudd ved nedlasting.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Theme Error: selected/playwait has an invalid area.</source>
-        <translation>Feil i tema: selected/playwait har et ugyldig område.</translation>
+        <translation type="obsolete">Feil i tema: selected/playwait har et ugyldig område.</translation>
     </message>
     <message>
         <source>None defined</source>
-        <translation>Ingen oppgitt</translation>
+        <translation type="obsolete">Ingen oppgitt</translation>
+    </message>
+    <message>
+        <source>Transcode is thinking</source>
+        <translation>Konverteringsprogrammet tenker </translation>
+    </message>
+    <message>
+        <source>Manager</source>
+        <translation>Behandler</translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
+        <translation>Hvis dette og bla i filer er på, laster videolisten all kjent videodata fra databasen. Å slå dette på kan gjøre det mye raskere å laste inn videoliste-treet</translation>
+    </message>
+    <message>
+        <source>Enable Metadata Browse Modes</source>
+        <translation>Slå på Metadata bla-modus</translation>
+    </message>
+    <message>
+        <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
+        <translation>Hvis aktivert viser dette metadata gruppering av din videomappe i visninger som støtter dette. Standardgruppe settes under.</translation>
+    </message>
+    <message>
+        <source>Group based on</source>
+        <translation>Grupper basert på</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Mappe</translation>
+    </message>
+    <message>
+        <source>Genres</source>
+        <translation>Sjangrer</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Kategori</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Regissør</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Skuespillere</translation>
+    </message>
+    <message>
+        <source>Date Added</source>
+        <translation>Dato lagt til</translation>
+    </message>
+    <message>
+        <source>TV/Movies</source>
+        <translation>TV/Filmer</translation>
+    </message>
+    <message>
+        <source>Group videos in the tree</source>
+        <translation>Grupper videoer i treet</translation>
+    </message>
+    <message>
+        <source>Command to search for movie fanart</source>
+        <translation>Kommando for å søke etter Fanart for film</translation>
+    </message>
+    <message>
+        <source>Command to search for TV shows in MythVideo</source>
+        <translation>Kommando for å søke etter TV serier i MythVideo</translation>
+    </message>
+    <message>
+        <source>Command to search for TV Season posters</source>
+        <translation>Kommando for å søke etter Sesongplakater for TV serier</translation>
+    </message>
+    <message>
+        <source>Command to search for TV fanart</source>
+        <translation>Kommando for å søke etter Fanart for TV programmer</translation>
+    </message>
+    <message>
+        <source>Command to search for TV banners</source>
+        <translation>Kommando for å søke etter Bannere for TV programmer</translation>
+    </message>
+    <message>
+        <source>Command to search for TV Screenshots</source>
+        <translation>Kommando for å søke etter Screenshots for TV programmer</translation>
+    </message>
+    <message>
+        <source>Command to extract data for TV Episodes</source>
+        <translation>Kommando for å hente data for episoder fra TV serier</translation>
+    </message>
+    <message>
+        <source>Command to search for TV by Title/Subtitle</source>
+        <translation>Kommando for å søke etter TV etter tittel og undertittel</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie screenshots</source>
+        <translation>Mappe som inneholder Screenshots for filmer</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie/TV Banners</source>
+        <translation>Mappe som inneholder Banners for filmer og TV</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie fanart</source>
+        <translation>Mappe som inneholder Fanart for filmer</translation>
+    </message>
+    <message>
+        <source>Directory that holds movie trailers</source>
+        <translation>Mappe som inneholder filmtrailere</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Video Player</source>
+        <translation>Aktiver alternativ videoavspiller</translation>
+    </message>
+    <message>
+        <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
+        <translation>Hvis valgt kan du velge en alternativ videoavspillekommando hvis standardverdien feiler.</translation>
+    </message>
+    <message>
+        <source>Alternate Player</source>
+        <translation>Alternativ avspiller</translation>
+    </message>
+    <message>
+        <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
+        <translation>Hvis standardavspilleren ikke kan spille en gitt video, så kan du spille den av med den alternative avspilleren ved å velge &apos;Spill av i alternativ avspiller.&apos;</translation>
+    </message>
+    <message>
+        <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
+        <translation> &apos;standard&apos; vil la MediaMonitor velge en enhet.</translation>
+    </message>
+    <message>
+        <source>Remove DVD Bookmarks Older than (days)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
+        <translation>Fjern DVD-bokmerker som er eldre enn det oppgitte antall dager</translation>
+    </message>
+    <message>
+        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
+        <translation>Setter DVD avspillingshastighet. Avspillingshastighet settes med en faktor som ganges med 177KB/s. Lavere hastigheter kan redusere avspillingsstøy men det kan også skape hakking i avspillingen.</translation>
+    </message>
+    <message>
+        <source>Enable random trailers before videos</source>
+        <translation>Slå på tilfeldige trailere før videoavspilling</translation>
+    </message>
+    <message>
+        <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
+        <translation>Hvis satt slår dette på en knapp kalt &quot;Se med trailere&quot;. Denne knappen vil spille et brukerbestemt antall trailere før filmen.</translation>
+    </message>
+    <message>
+        <source>Number of trailers to play</source>
+        <translation>Antall trailere som skal spilles</translation>
+    </message>
+    <message>
+        <source>The number of trailers to play before playing the film itself </source>
+        <translation>Antall tailere som skal spilles før filmen blir startet</translation>
+    </message>
+    <message>
+        <source>Television in MythVideo</source>
+        <translation>TV i MythVideo</translation>
+    </message>
+    <message>
+        <source>Loading videos ...</source>
+        <translation>Laster videoer...</translation>
+    </message>
+    <message>
+        <source>No directory %1 - DVD importing will fail</source>
+        <translation>Ingen mappe %1 - DVD importering vil feile</translation>
+    </message>
+    <message>
+        <source>You have no VCD Player command defined.</source>
+        <translation>Du har ikke definert noen VCD avspillingskommando.</translation>
+    </message>
+    <message>
+        <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
+        <translation>Advarsel fra Aggressiv Foreldrestyring: Feil passord. Tilgang til MythVideo innstillingsvindu ble stoppet.</translation>
+    </message>
+    <message>
+        <source>Season</source>
+        <translation>Sesong</translation>
+    </message>
+    <message>
+        <source>Episode</source>
+        <translation>Episode</translation>
+    </message>
+    <message>
+        <source>%1 failed
+
+%2
+
+Check VideoManager Settings</source>
+        <translation>%1 feilet
+
+%2
+
+Undersøk instillingene for videobehandleren</translation>
+    </message>
+    <message>
+        <source>Season/Episode</source>
+        <translation>Sesong/Episode</translation>
+    </message>
+    <message>
+        <source>Video Home</source>
+        <translation>Video Hjem</translation>
+    </message>
+    <message>
+        <source>Television</source>
+        <translation>TV</translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation>Filmer</translation>
+    </message>
+    <message>
+        <source>Season %1</source>
+        <translation>Sesong %1</translation>
+    </message>
+    <message>
+        <source>Storage Groups</source>
+        <translation>Lagringsgrupper</translation>
     </message>
 </context>
 <context>
@@ -827,7 +1117,7 @@ Kontroller innstillingene for videobehandleren</translation>
     </message>
     <message>
         <source>retrieving data...</source>
-        <translation>Henter data . . .</translation>
+        <translation>Henter data...</translation>
     </message>
     <message>
         <source>[ looking for ]</source>
@@ -839,7 +1129,7 @@ Kontroller innstillingene for videobehandleren</translation>
     </message>
     <message>
         <source>loading...</source>
-        <translation>Laster . . .</translation>
+        <translation>Laster...</translation>
     </message>
     <message>
         <source>No Videos Found</source>
@@ -1003,7 +1293,7 @@ Kontroller innstillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Select:</source>
-        <translation>Velg</translation>
+        <translation>Velg:</translation>
     </message>
     <message>
         <source>Quality:</source>
@@ -1069,31 +1359,31 @@ Kontroller innstillingene for videobehandleren</translation>
     <name>VideoBrowser</name>
     <message>
         <source>Watch This Video</source>
-        <translation>Se denne videoen</translation>
+        <translation type="obsolete">Se denne videoen</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation>Vis hele beskrivelsen</translation>
+        <translation type="obsolete">Vis hele beskrivelsen</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filtrer visning</translation>
+        <translation type="obsolete">Filtrer visning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation>%1 av %2</translation>
+        <translation type="obsolete">%1 av %2</translation>
     </message>
     <message>
         <source>No Videos</source>
-        <translation>Ingen videoer</translation>
+        <translation type="obsolete">Ingen videoer</translation>
     </message>
     <message>
         <source>View Cast</source>
-        <translation>Vis skuespillere</translation>
+        <translation type="obsolete">Vis skuespillere</translation>
     </message>
 </context>
 <context>
@@ -1112,11 +1402,289 @@ Kontroller innstillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation>Velg handling</translation>
+        <translation type="obsolete">Velg handling</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <source>No Videos Available</source>
+        <translation>Ingen videoer er tilgjengelig</translation>
+    </message>
+    <message>
+        <source>Season</source>
+        <translation>Sesong</translation>
+    </message>
+    <message>
+        <source>Video Search</source>
+        <translation>Videosøk</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation>%1 av %2</translation>
+    </message>
+    <message>
+        <source>Video Options
+%1
+%2</source>
+        <translation>Videoinstillinger
+%1
+%2</translation>
+    </message>
+    <message>
+        <source>Video Options
+%1</source>
+        <translation>Videoinstillinger
+%1</translation>
+    </message>
+    <message>
+        <source>Video Options</source>
+        <translation>Videoinstillinger</translation>
+    </message>
+    <message>
+        <source>Play...</source>
+        <translation>Spill av...</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Spill av</translation>
+    </message>
+    <message>
+        <source>Mark as Unwatched</source>
+        <translation>Merk som ikke sett</translation>
+    </message>
+    <message>
+        <source>Mark as Watched</source>
+        <translation>Merk som sett</translation>
+    </message>
+    <message>
+        <source>Video Info</source>
+        <translation>Videoinfo</translation>
+    </message>
+    <message>
+        <source>Metadata Options</source>
+        <translation>Metadata instillinger</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Slett</translation>
+    </message>
+    <message>
+        <source>Play Folder</source>
+        <translation>Spill mappe</translation>
+    </message>
+    <message>
+        <source>Playback Options
+%1</source>
+        <translation>Avspillingsinstillinger
+%1</translation>
+    </message>
+    <message>
+        <source>Play in Alternate Player</source>
+        <translation>Spill av i alternativ avspiller</translation>
+    </message>
+    <message>
+        <source>Play With Trailers</source>
+        <translation>Spill med trailere</translation>
+    </message>
+    <message>
+        <source>Play Trailer</source>
+        <translation>Vis trailere</translation>
+    </message>
+    <message>
+        <source>Video Display Menu</source>
+        <translation>Meny for videovisning</translation>
+    </message>
+    <message>
+        <source>Scan For Changes</source>
+        <translation>Søk etter endringer</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation>Filtrer visning</translation>
+    </message>
+    <message>
+        <source>Browse By...</source>
+        <translation>Bla basert på...</translation>
+    </message>
+    <message>
+        <source>Change View</source>
+        <translation>Endre visning</translation>
+    </message>
+    <message>
+        <source>Disable File Browse Mode</source>
+        <translation>Slå av bla-modus for filer</translation>
+    </message>
+    <message>
+        <source>Enable File Browse Mode</source>
+        <translation>Slå på bla-modus for filer</translation>
+    </message>
+    <message>
+        <source>Disable Flat View</source>
+        <translation>Slå av flat visning</translation>
+    </message>
+    <message>
+        <source>Enable Flat View</source>
+        <translation>Slå på flat visning</translation>
+    </message>
+    <message>
+        <source>Switch to Manage View</source>
+        <translation>Bytt til videobehandler visning</translation>
+    </message>
+    <message>
+        <source>Browse By</source>
+        <translation>Bla basert på</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Skuespillere</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Kategori</translation>
+    </message>
+    <message>
+        <source>Date Added</source>
+        <translation>Dato lagt til</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Regissør</translation>
+    </message>
+    <message>
+        <source>Folder</source>
+        <translation>Mappe</translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation>Sjanger</translation>
+    </message>
+    <message>
+        <source>TV/Movies</source>
+        <translation>TV/Filmer</translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation>Rangering</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation>År</translation>
+    </message>
+    <message>
+        <source>View Details</source>
+        <translation>Vis detaljer</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation>Vis hele beskrivelsen</translation>
+    </message>
+    <message>
+        <source>View Cast</source>
+        <translation>Vis skuespillere</translation>
+    </message>
+    <message>
+        <source>Mark as Non-Browseable</source>
+        <translation>Merk som ikke visbar</translation>
+    </message>
+    <message>
+        <source>Mark as Browseable</source>
+        <translation>Merk som visbar</translation>
+    </message>
+    <message>
+        <source>Manage Metadata</source>
+        <translation>Behandle metadata</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Rediger metadata</translation>
+    </message>
+    <message>
+        <source>Download Metadata</source>
+        <translation>Last ned metadata</translation>
+    </message>
+    <message>
+        <source>Download Images Only</source>
+        <translation>Last ned kun bildene</translation>
+    </message>
+    <message>
+        <source>Search TV by Title/Subtitle</source>
+        <translation>Søk etter TV basert på tittel og undertittel</translation>
+    </message>
+    <message>
+        <source>Manually Enter Video #</source>
+        <translation>Skriv inn videonr. manuelt</translation>
+    </message>
+    <message>
+        <source>Manually Enter Video Title</source>
+        <translation>Skriv inn videotittel manuelt</translation>
+    </message>
+    <message>
+        <source>Reset Metadata</source>
+        <translation>Tilbakestill</translation>
+    </message>
+    <message>
+        <source>An error occurred when switching views.</source>
+        <translation>Det skjedde en feil under skifte av visning.</translation>
+    </message>
+    <message>
+        <source>Enter Video Unique ID:</source>
+        <translation>Legg til unik video-id:</translation>
+    </message>
+    <message>
+        <source>Enter Video Title:</source>
+        <translation>Skriv inn videotittel:</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete:
+%1</source>
+        <translation>Er du sikker på at du vil slette:
+%1</translation>
+    </message>
+    <message>
+        <source>Failed to delete file</source>
+        <translation>Klarte ikke å slette filen</translation>
+    </message>
+    <message>
+        <source>Poster download finished: %1 %2</source>
+        <translation>Nedlasting av plakat fullført: %1 %2</translation>
+    </message>
+    <message>
+        <source>A poster exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Det finnes en plakat for denne filmen, men det oppstod et tidsavbrudd ved nedlasting.</translation>
+    </message>
+    <message>
+        <source>Fanart download finished: %1 %2</source>
+        <translation>Nedlasting av Fanart fullført: %1 %2</translation>
+    </message>
+    <message>
+        <source>Fanart exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Det finnes Fanart for denne filmen, men det oppstod et tidsavbrudd ved nedlasting.</translation>
+    </message>
+    <message>
+        <source>Screenshot download finished: %1 %2</source>
+        <translation>Nedlasting av Screenshot fullført: %1 %2</translation>
+    </message>
+    <message>
+        <source>Screenshot exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Det finnes et Screenshot for denne filmen, men det oppstod et tidsavbrudd ved nedlasting.</translation>
+    </message>
+    <message>
+        <source>Banner download finished: %1 %2</source>
+        <translation>Nedlasting av Banner fullført: %1 %2</translation>
+    </message>
+    <message>
+        <source>Banner exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation>Det finnes et Banner for denne filmen, men det oppstod et tidsavbrudd ved nedlasting.</translation>
+    </message>
+    <message>
+        <source>No matches were found.</source>
+        <translation>Ingen treff.</translation>
     </message>
 </context>
 <context>
@@ -1135,124 +1703,150 @@ Kontroller innstillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation>Sett som standard</translation>
+        <translation type="obsolete">Sett som standard</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation>Ferdig</translation>
+        <translation type="obsolete">Ferdig</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
         <source>Watch This Video</source>
-        <translation>Se denne videoen</translation>
+        <translation type="obsolete">Se denne videoen</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation>Vis hele beskrivelsen</translation>
+        <translation type="obsolete">Vis hele beskrivelsen</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation>Vis detaljer</translation>
+        <translation type="obsolete">Vis detaljer</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filtrer visning</translation>
+        <translation type="obsolete">Filtrer visning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>View Cast</source>
-        <translation>Vis skuespillere</translation>
+        <translation type="obsolete">Vis skuespillere</translation>
+    </message>
+</context>
+<context>
+    <name>VideoScanner</name>
+    <message>
+        <source>Failed to Scan SG Video Hosts</source>
+        <translation>Kunne ikke skanne SG videoverter</translation>
+    </message>
+    <message>
+        <source>If they no longer exist please remove them</source>
+        <translation>Hvis de ikke lenger finnes vennligst fjern dem</translation>
+    </message>
+</context>
+<context>
+    <name>VideoScannerThread</name>
+    <message>
+        <source>Searching for video files</source>
+        <translation>Søker etter videofiler</translation>
+    </message>
+    <message>
+        <source>Verifying video files</source>
+        <translation>Kontrollerer videofiler</translation>
+    </message>
+    <message>
+        <source>Updating video database</source>
+        <translation>Oppdaterer videodatabase</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Select action</source>
-        <translation>Velg handling</translation>
+        <translation type="obsolete">Velg handling</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation>Se denne videoen</translation>
+        <translation type="obsolete">Se denne videoen</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation>Vis hele beskrivelsen</translation>
+        <translation type="obsolete">Vis hele beskrivelsen</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filtrer visning</translation>
+        <translation type="obsolete">Filtrer visning</translation>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation>Bytt til bla-visning</translation>
+        <translation type="obsolete">Bytt til bla-visning</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation>Bytt til galleri-visning</translation>
+        <translation type="obsolete">Bytt til galleri-visning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>View Cast</source>
-        <translation>Vis skuespillere</translation>
+        <translation type="obsolete">Vis skuespillere</translation>
     </message>
 </context>
 <context>
     <name>mythvideo_videomanager::VideoManagerImp</name>
     <message>
         <source>Select action:</source>
-        <translation>Velg handling:</translation>
+        <translation type="obsolete">Velg handling:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation>Rediger info</translation>
+        <translation type="obsolete">Rediger info</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation>Søk</translation>
+        <translation type="obsolete">Søk</translation>
     </message>
     <message>
         <source>Manually Enter Video #</source>
-        <translation>Skriv inn filmnr. manuelt</translation>
+        <translation type="obsolete">Skriv inn filmnr. manuelt</translation>
     </message>
     <message>
         <source>Manually Enter Video Title</source>
-        <translation>Skriv inn videotittel manuelt</translation>
+        <translation type="obsolete">Skriv inn videotittel manuelt</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation>Tilbakestill</translation>
+        <translation type="obsolete">Tilbakestill</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation>Skru visning av/på</translation>
+        <translation type="obsolete">Skru visning av/på</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation>Fjern video</translation>
+        <translation type="obsolete">Fjern video</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation>Filtrer visning</translation>
+        <translation type="obsolete">Filtrer visning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation>Slette denne filen?</translation>
+        <translation type="obsolete">Slette denne filen?</translation>
     </message>
     <message>
         <source>delete failed</source>
-        <translation>Klarte ikke slette</translation>
+        <translation type="obsolete">Klarte ikke slette</translation>
     </message>
 </context>
 </TS>
