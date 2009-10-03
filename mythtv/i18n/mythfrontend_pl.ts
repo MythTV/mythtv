@@ -1,94 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="pl_PL">
 <context>
     <name></name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Nieznany</translation>
+        <translation>Nieznany</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation type="unfinished">W kolejce</translation>
+        <translation>W kolejce</translation>
     </message>
     <message>
         <source>Pending</source>
-        <translation type="unfinished">Oczekujący</translation>
+        <translation>Oczekujący</translation>
     </message>
     <message>
         <source>Starting</source>
-        <translation type="unfinished">Startuje</translation>
+        <translation>Startuje</translation>
     </message>
     <message>
         <source>Running</source>
-        <translation type="unfinished">Uruchomiony</translation>
+        <translation>Uruchamianie</translation>
     </message>
     <message>
         <source>Stopping</source>
-        <translation type="unfinished">Zatrzymany</translation>
+        <translation>Zatrzymywanie</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished">Pauza</translation>
+        <translation>Wstrzymano</translation>
     </message>
     <message>
         <source>Retrying</source>
-        <translation type="unfinished">Powtarzanie</translation>
+        <translation>Ponawianie</translation>
     </message>
     <message>
         <source>Erroring</source>
-        <translation type="unfinished">Błędy</translation>
+        <translation>Błędne</translation>
     </message>
     <message>
         <source>Aborting</source>
-        <translation type="unfinished">Zaniechanie</translation>
+        <translation>Zaniechanie</translation>
     </message>
     <message>
         <source>Done (Invalid status!)</source>
-        <translation type="unfinished">Zrobione (Zły status!)</translation>
+        <translation>Zrobione (Błędny status!)</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">Ukończone</translation>
+        <translation>Ukończono</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation type="unfinished">Zaniechane</translation>
+        <translation>Zaniechano</translation>
     </message>
     <message>
         <source>Errored</source>
-        <translation type="unfinished">Błędne</translation>
+        <translation>Błędnie</translation>
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="unfinished">Anulowane</translation>
+        <translation>Anulowano</translation>
     </message>
 </context>
 <context>
     <name>BackendSelect</name>
     <message>
         <source>Please select default Myth Backend Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Prosze wybrać domyślny serwer Myth Backend</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuluj</translation>
+        <translation>Anuluj</translation>
     </message>
     <message>
         <source>Configure Manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguruj ręcznie</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Szukaj</translation>
+        <translation>Szukaj</translation>
     </message>
     <message>
         <source>Shall I attempt to connect to this host with default database parameters?</source>
-        <translation type="unfinished"></translation>
+        <translation>Podjąć próbę połączenia z tym hostem  przy użyciu domyślnych prametrów bazy danacyh?</translation>
     </message>
 </context>
 <context>
@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation>Napewno chcesz usunąć WSZYSTKIE karty przechwytywania?</translation>
+        <translation>Na pewno chcesz usunąć WSZYSTKIE karty przechwytywania?</translation>
     </message>
     <message>
         <source>Yes, delete capture cards</source>
@@ -119,7 +119,7 @@
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>Napewno chcesz usunąć tą kartę przechwytywania?</translation>
+        <translation>Na pewno chcesz usunąć tą kartę przechwytywania?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
@@ -131,11 +131,11 @@
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards on %1?</source>
-        <translation>Napewno chcesz usunąć WSZYSTKIE karty przechwytywania na %1?</translation>
+        <translation>Na pewno chcesz usunąć WSZYSTKIE karty przechwytywania na %1?</translation>
     </message>
     <message>
         <source>Error getting list of cards for this host</source>
-        <translation>Błąd pobierania listy kart przechwytu na tym Hoście</translation>
+        <translation>Błąd pobierania listy kart na tym Hoście</translation>
     </message>
     <message>
         <source>Unable to delete capturecards for %1</source>
@@ -146,43 +146,43 @@
     <name>CardInput</name>
     <message>
         <source>Scan for channels</source>
-        <translation>Skanowanie kanałów</translation>
+        <translation>Skanuj kanały</translation>
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Użyj skanera kanałów do wyszukania kanałów dla tego wejścia.</translation>
     </message>
     <message>
         <source>Fetch channels from listings source</source>
-        <translation type="unfinished"></translation>
+        <translation>Przenieś kanały ze źródła listy kanałów</translation>
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Używa źródła listy kanałów do dostarczania kanałów dla tego wejścia</translation>
     </message>
     <message>
         <source>This can take a long time to run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Może to wymagać dużo czasu.</translation>
     </message>
     <message>
         <source>Create Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Utwórz grupę wejść</translation>
     </message>
     <message>
         <source>Enter new group name</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadź nazwę nowej grupy</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Niestety, nazwa tej grupy wejść nie może być pusta.</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Niestety, nazwa tej grupy wejść jest już używana.</translation>
     </message>
 </context>
 <context>
@@ -204,7 +204,7 @@
     </message>
     <message>
         <source>Are you sure you would like to delete this channel?</source>
-        <translation>Napewno chcesz usunąć ten kanał?</translation>
+        <translation type="unfinished">Na pewno chcesz usunąć ten kanał?</translation>
     </message>
     <message>
         <source>Yes, delete the channel</source>
@@ -295,53 +295,53 @@
     <name>ChannelGroupEditor</name>
     <message>
         <source>Channel Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupy kanałów</translation>
     </message>
     <message>
         <source>Create New Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Utwórz nową grupę kanałów</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished">Wprowadź nazwę grupy lub naciśnij SELECT żeby wprowadzić za pomocą klawiatury ekranowej</translation>
+        <translation>Wprowadź nazwę grupy lub naciśnij SELECT żeby wprowadzić za pomocą klawiatury ekranowej</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; Channel group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuąć grupę kanałów: &apos;%1&apos;?</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Tak, usuń grupę</translation>
+        <translation>Tak, usuń grupę</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">Nie, nie usuwaj grupy</translation>
+        <translation>Nie, nie usuwaj grupy</translation>
     </message>
     <message>
         <source>(Create new group)</source>
-        <translation type="unfinished">(Utwórz nową grupę)</translation>
+        <translation>(Utwórz nową grupę)</translation>
     </message>
 </context>
 <context>
     <name>ChannelRecPriority</name>
     <message>
         <source>Channel Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje kanału</translation>
     </message>
     <message>
         <source>Program List</source>
-        <translation type="unfinished"></translation>
+        <translation>Program TV</translation>
     </message>
 </context>
 <context>
     <name>ChannelScannerGUI</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished">Skanowanie</translation>
+        <translation>Skanowanie</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Asystent skanowania</translation>
     </message>
 </context>
 <context>
@@ -682,30 +682,30 @@
     <name>DVBConfigurationGroup</name>
     <message>
         <source>DiSEqC</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje nagrywania</translation>
     </message>
     <message>
         <source>Input and satellite settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wejście i ustawienia satelity.</translation>
     </message>
     <message>
         <source>Could not open card %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można otworzyć karty %1</translation>
     </message>
     <message>
         <source>Could not get card info for card %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można pobrać informacji o karcie %1</translation>
     </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobieranie programu z %1...</translation>
     </message>
 </context>
 <context>
@@ -1033,19 +1033,19 @@
     <name>EditPowerSearchPopup</name>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>(Any Program Type)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Program dowolnego typu)</translation>
     </message>
     <message>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Filmy</translation>
     </message>
     <message>
         <source>Series</source>
-        <translation type="unfinished">Seriale</translation>
+        <translation>Seriale</translation>
     </message>
     <message>
         <source>Show</source>
@@ -1053,50 +1053,50 @@
     </message>
     <message>
         <source>Sports</source>
-        <translation type="unfinished">Sporty</translation>
+        <translation>Sportowe</translation>
     </message>
     <message>
         <source>(Any Genre)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Dowolny rodzaj)</translation>
     </message>
     <message>
         <source>(Any Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Dowolny gatunek)</translation>
     </message>
 </context>
 <context>
     <name>ExitPrompter</name>
     <message>
         <source>Do you really want to exit MythTV?</source>
-        <translation type="unfinished"></translation>
+        <translation>Naprawdę chcesz wyjść z MythTV?</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">Nie</translation>
+        <translation>Nie</translation>
     </message>
     <message>
         <source>If this is the master backend server, please run &apos;mythfilldatabase&apos; to populate the database with channel information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeżeli to jest główny serwer (backend), uruchom proszę &apos;mythfilldatabase&apos; w celu wprowadzenia informacji o kanałach do bazy danych.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Do you want to go back and fix these problems?</source>
-        <translation type="unfinished"></translation>
+        <translation>Chcesz wrócić i rozwiązać te problemy?</translation>
     </message>
     <message>
         <source>Do you want to go back and fix this problem?</source>
-        <translation type="unfinished"></translation>
+        <translation>Chcesz wrócić i rozwiązać ten problem?</translation>
     </message>
     <message>
         <source>Yes please</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak, proszę</translation>
     </message>
     <message>
         <source>No, I know what I am doing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie, nie wiem co robię</translation>
     </message>
 </context>
 <context>
@@ -1110,174 +1110,174 @@
     <name>GuideGrid</name>
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation>Usuń &apos;%1&apos; %2 regułę?</translation>
+        <translation>Usunąć regułę &apos;%1&apos; %2?</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj</translation>
     </message>
     <message>
         <source>Edit Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj harmonogram</translation>
     </message>
     <message>
         <source>Program Details</source>
-        <translation type="unfinished">Szczegóły programu</translation>
+        <translation>Szczegóły programu</translation>
     </message>
     <message>
         <source>Upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation>Nadchodzące</translation>
     </message>
     <message>
         <source>Custom Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Własna edycja</translation>
     </message>
     <message>
         <source>Delete Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń regułę</translation>
     </message>
     <message>
         <source>Reverse Channel Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Odwróć porządek kanałów</translation>
     </message>
     <message>
         <source>Add To Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj do grupy kanałów</translation>
     </message>
     <message>
         <source>Remove from Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń z grupy kanałów</translation>
     </message>
     <message>
         <source>Choose Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz grupę kanałów</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuluj</translation>
+        <translation>Anuluj</translation>
     </message>
     <message>
         <source>You don&apos;t have any channel groups defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie zdefiniowałeś żadnych grup kanałów</translation>
     </message>
     <message>
         <source>Select Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz grupę kanałów</translation>
     </message>
 </context>
 <context>
     <name>HDHomeRunConfigurationGroup</name>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje nagrywania</translation>
     </message>
 </context>
 <context>
     <name>HDHomeRunDeviceID</name>
     <message>
         <source>Device ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Identyfikator urządzenia</translation>
     </message>
     <message>
         <source>Deviced ID of HDHomeRun device</source>
-        <translation type="unfinished"></translation>
+        <translation>Identyfikator urządzenia HDHomeRun</translation>
     </message>
 </context>
 <context>
     <name>HDHomeRunDeviceIDList</name>
     <message>
         <source>Manually Enter IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadź adres IP ręcznie</translation>
     </message>
 </context>
 <context>
     <name>HDPVRConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobrane informacje</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation type="unfinished">Nie potrafię otworzyć</translation>
+        <translation>Nie zdołano otworzyć</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation type="unfinished">Nie potrafię sprawdzić</translation>
+        <translation>Nie zdołano zbadać</translation>
     </message>
 </context>
 <context>
     <name>HelpPopup</name>
     <message>
         <source>Commercials are flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Oznaczono reklamy</translation>
     </message>
     <message>
         <source>An editing cutlist is present</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista edycji *cut list* jest obecna</translation>
     </message>
     <message>
         <source>The program is able to auto-expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Program może się przedawnić</translation>
     </message>
     <message>
         <source>Commercials are being flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamy są oznaczane</translation>
     </message>
     <message>
         <source>A bookmark is set</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakładka jest ustawiona</translation>
     </message>
     <message>
         <source>Recording is in Mono</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie w mono</translation>
     </message>
     <message>
         <source>Recording is in Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie w stereo</translation>
     </message>
     <message>
         <source>Recording is in Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie w Surround Sound</translation>
     </message>
     <message>
         <source>Recording is in Dolby Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie w systemie Dolby Surround Sound</translation>
     </message>
     <message>
         <source>Recording is Closed Captioned</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie z napisami CC</translation>
     </message>
     <message>
         <source>Recording has Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie zawiera napisy</translation>
     </message>
     <message>
         <source>Recording is Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie z napisami</translation>
     </message>
     <message>
         <source>Recording is in High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie w HD</translation>
     </message>
     <message>
         <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie zostało obejrzane</translation>
     </message>
     <message>
         <source>Recording is in 1080i/p High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie w standardzie HD 1080i/p</translation>
     </message>
     <message>
         <source>Recording is in 720p High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie w standardzie HD 720p</translation>
     </message>
     <message>
         <source>Recording is Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie panoramiczne</translation>
     </message>
 </context>
 <context>
@@ -1354,7 +1354,7 @@
     <name>JobQueue</name>
     <message>
         <source>Transcode</source>
-        <translation>Przekodowywanie</translation>
+        <translation>Rekompresja</translation>
     </message>
     <message>
         <source>Flag Commercials</source>
@@ -1362,7 +1362,7 @@
     </message>
     <message>
         <source>Unknown Job</source>
-        <translation>Nieznana *praca*</translation>
+        <translation>Nieznane zadanie</translation>
     </message>
     <message>
         <source>Undefined</source>
@@ -1370,34 +1370,36 @@
     </message>
     <message>
         <source>Commercial Flagging Starting</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchamianie oznaczania reklam</translation>
     </message>
     <message>
         <source>Unable to find mythcommflag</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można znaleźć &quot;mythcommflag&quot;</translation>
     </message>
     <message>
         <source>Aborted by user</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaniechane przez użytkownika</translation>
     </message>
     <message>
         <source>Unable to open file or init decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można otworzyć pliku lub zainicjować dekodera</translation>
     </message>
     <message>
         <source>Failed with exit status %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Niepowodzenie ze stanem wyjścia %1</translation>
     </message>
     <message numerus="yes">
         <source>%n commercial break(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n przerwa reklamowa</numerusform>
+            <numerusform>%n przerwy reklamowe</numerusform>
+            <numerusform>%n przerw reklamowych</numerusform>
         </translation>
     </message>
     <message>
         <source>Commercial Flagging %1</source>
         <comment>Job ID</comment>
-        <translation type="unfinished"></translation>
+        <translation>Oznaczanie reklam %1</translation>
     </message>
 </context>
 <context>
@@ -1431,11 +1433,11 @@
     <name>LCDProcClient</name>
     <message>
         <source>RECORDING</source>
-        <translation type="unfinished"></translation>
+        <translation>NAGRYWANIE</translation>
     </message>
     <message>
         <source>RECORDING|</source>
-        <translation type="unfinished"></translation>
+        <translation>NAGRYWANIE|</translation>
     </message>
 </context>
 <context>
@@ -1519,37 +1521,39 @@
     <name>MythAppearance</name>
     <message>
         <source>Size: %1 x %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozmiar: %1 x %2</translation>
     </message>
     <message>
         <source>Offset: %1 x %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Przesunięcie: %1 x %2</translation>
     </message>
     <message numerus="yes">
         <source>Change amount: %n pixel(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Wielkość zmian: %n piksel</numerusform>
+            <numerusform>Wielkość zmian: %n piksele</numerusform>
+            <numerusform>Wielkość zmian: %n pikseli</numerusform>
         </translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje</translation>
     </message>
     <message>
         <source>Save and Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapisz i wyjdź</translation>
     </message>
     <message>
         <source>Reset Changes and Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść zmiany i wyjdź</translation>
     </message>
     <message>
         <source>Coarse/Fine adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia zgrubne/dokładne</translation>
     </message>
     <message>
         <source>Close Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij menu</translation>
     </message>
 </context>
 <context>
@@ -1684,7 +1688,7 @@
     <name>MythTerminal</name>
     <message>
         <source>*** Exited with status: %1 ***</source>
-        <translation type="unfinished"></translation>
+        <translation>***Zakończono ze stanem: %1 ***</translation>
     </message>
 </context>
 <context>
@@ -1693,70 +1697,76 @@
         <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;.
 
 Returning to the previous menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się zlokalizować &apos;%1&apos; w motywie &apos;%2&apos;. 
+
+Powracanie do poprzedniego menu.</translation>
     </message>
     <message>
         <source>Missing UI Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Brakujący element interfejsu</translation>
     </message>
 </context>
 <context>
     <name>MythThemedMenu</name>
     <message>
         <source>System Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu systemowe</translation>
     </message>
     <message>
         <source>Shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz</translation>
     </message>
     <message>
         <source>Reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom ponownie</translation>
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>O programie</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuluj</translation>
+        <translation>Anuluj</translation>
     </message>
     <message>
         <source>Revision: %1
  Branch: %2
  %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja: %1
+gałąź: %2
+ %3</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
     <name>MythUIBusyDialog</name>
     <message>
         <source>Please Wait ...</source>
-        <translation type="unfinished">Proszę czekać ...</translation>
+        <translation>Proszę czekać ...</translation>
     </message>
 </context>
 <context>
     <name>MythUIFileBrowser</name>
     <message>
         <source>Parent Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalog nadrzędny</translation>
     </message>
     <message>
         <source>Parent</source>
-        <translation type="unfinished"></translation>
+        <translation>Nadrzędny</translation>
     </message>
 </context>
 <context>
     <name>MythUISearchDialog</name>
     <message numerus="yes">
         <source>%n match(es)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n dopasowanie</numerusform>
+            <numerusform>%n dopasowania</numerusform>
+            <numerusform>%n dopasowań</numerusform>
         </translation>
     </message>
 </context>
@@ -1764,7 +1774,7 @@ Returning to the previous menu.</source>
     <name>MythWebView</name>
     <message>
         <source>Error loading page: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd ładowania strony: %1</translation>
     </message>
 </context>
 <context>
@@ -1790,35 +1800,35 @@ Returning to the previous menu.</source>
     <name>PhrasePopup</name>
     <message>
         <source>Select Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz wyszukiwanie</translation>
     </message>
     <message>
         <source>&lt;New Search&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Nowe wyszukiwanie&gt;</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished">Edytuj</translation>
+        <translation>Edytuj</translation>
     </message>
     <message>
         <source>Phrase</source>
-        <translation type="unfinished"></translation>
+        <translation>Fraza</translation>
     </message>
     <message>
         <source>&lt;New Phrase&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Nowa fraza&gt;</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Usuń</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj</translation>
     </message>
 </context>
 <context>
@@ -1860,15 +1870,15 @@ Returning to the previous menu.</source>
     <name>PlaybackBox</name>
     <message>
         <source>There are %1 recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Liczba nagrań w wyświetlanej grupie: %1</translation>
     </message>
     <message>
         <source>There is one recording in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>W wyświetlanej grupie jest jedno nagranie</translation>
     </message>
     <message>
         <source>There are no recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>W wyświetlanej grupie nie ma żadnych nagrań</translation>
     </message>
     <message>
         <source>% used</source>
@@ -1880,39 +1890,39 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Recording List Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu listy nagrań</translation>
     </message>
     <message>
         <source>Change Group Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień filtr grupy</translation>
     </message>
     <message>
         <source>Change Group View</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień widok grupy</translation>
     </message>
     <message>
         <source>Change Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień hasło grupy</translation>
     </message>
     <message>
         <source>Playlist options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje listy odtwarzania</translation>
     </message>
     <message>
         <source>Add this Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj tą grupę do listy odtwarzania</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj to nagranie do listy odtwarzania</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewny, że chcesz usunąć:</translation>
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jesteś pewny, że chcesz zatrzymać:</translation>
     </message>
     <message>
         <source>Yes, and allow re-record</source>
@@ -1924,11 +1934,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ilość pozycji na tej liście odtwarzania: %1.</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Na tej liście odtwarzania jest %1 pozycja.</translation>
     </message>
     <message>
         <source>Play</source>
@@ -1936,123 +1946,123 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Shuffle Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzanie losowe</translation>
     </message>
     <message>
         <source>Clear Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść listę odtwarzania</translation>
     </message>
     <message>
         <source>Toggle playlist for this Category/Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz listę odtwarzania dla tej kategorii/tytułu</translation>
     </message>
     <message>
         <source>Toggle playlist for this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz listę odtwarzania dla tego nagrania</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień grupę nagrywania</translation>
     </message>
     <message>
         <source>Change Playback Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień grupę odtwarzania</translation>
     </message>
     <message>
         <source>Job Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje zadań</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Usuń</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation type="unfinished">Uruchom przekodowywanie</translation>
+        <translation>Rozpocznij rekompresję</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation type="unfinished">Zatrzymaj przekodowywanie</translation>
+        <translation>Zatrzymaj rekompresję</translation>
     </message>
     <message>
         <source>Begin Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpocznij oznaczanie reklam</translation>
     </message>
     <message>
         <source>Stop Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj oznaczanie reklam</translation>
     </message>
     <message>
         <source>Begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpocznij</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished">Koniec</translation>
+        <translation>Zatrzymaj</translation>
     </message>
     <message>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj od zakładki</translation>
     </message>
     <message>
         <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj od początku</translation>
     </message>
     <message>
         <source>Disable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącz automatyczne przedawnianie</translation>
     </message>
     <message>
         <source>Enable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz automatyczne przedawnianie</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie chroń tego odcinka</translation>
     </message>
     <message>
         <source>Preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Chroń ten odcinek</translation>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj harmonogram nagrania</translation>
     </message>
     <message>
         <source>Show Program Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż szczegóły programu</translation>
     </message>
     <message>
         <source>Change Recording Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień tytuł nagrania</translation>
     </message>
     <message>
         <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Zadanie użytkownika</translation>
     </message>
     <message>
         <source>Play from...</source>
-        <translation type="unfinished"></translation>
+        <translation>Odtwarzaj od...</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń z listy odtwarzania</translation>
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj do listy odtwarzania</translation>
     </message>
     <message>
         <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj nagrywanie</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje przechowywania</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje nagrywania</translation>
     </message>
     <message>
         <source>item</source>
@@ -2060,7 +2070,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>items</source>
-        <translation>elementów</translation>
+        <translation>elementy(ów)</translation>
     </message>
     <message>
         <source>Default</source>
@@ -2080,7 +2090,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Autodetect</source>
-        <translation type="unfinished">Automatyczna jakość</translation>
+        <translation>Automatyczna jakość</translation>
     </message>
     <message>
         <source>High Quality</source>
@@ -2096,252 +2106,252 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista podręczna</translation>
     </message>
     <message>
         <source>There are no recordings in your current view</source>
-        <translation type="unfinished"></translation>
+        <translation>W Twoim bieżącym widoku nie ma żadnych nagrań</translation>
     </message>
     <message>
         <source>There are no recordings available</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie ma tu żadnych nagrań</translation>
     </message>
     <message>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Oznacz jako nieobejrzane</translation>
     </message>
     <message>
         <source>Mark as Watched</source>
-        <translation>Zaznacz do obejrzenia</translation>
+        <translation>Zaznacz jako obejrzane</translation>
     </message>
     <message>
         <source>_NO_TITLE_</source>
-        <translation type="unfinished"></translation>
+        <translation>_BRAK_TYTUŁU_</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Nieznany</translation>
+        <translation>Nieznany</translation>
     </message>
     <message>
         <source>Help (Status Icons)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pomoc (ikony stanu)</translation>
     </message>
     <message>
         <source>Delete, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń i pozwól nagrać ponownie</translation>
     </message>
     <message>
         <source>Allow this program to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Zazwól na ponowne nagranie programu</translation>
     </message>
     <message>
         <source>Undelete</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć</translation>
     </message>
     <message>
         <source>Delete Forever</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń trwałe</translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Usunięte</translation>
     </message>
     <message>
         <source>Password for group &apos;%1&apos;:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hasło grupy &apos;%1&apos;:</translation>
     </message>
     <message>
         <source>Recording file does not exist.
 Are you sure you want to delete:</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak pliku nagrania. Na pewno chcesz skasować:</translation>
     </message>
     <message>
         <source>Yes, stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak, zatrzymaj nagrywanie</translation>
     </message>
     <message>
         <source>No, keep it</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie, zachowaj to</translation>
     </message>
     <message>
         <source>No, continue recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie, kontynuuj nagrywanie</translation>
     </message>
     <message>
         <source>Recording Available
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie jest dostępne</translation>
     </message>
     <message>
         <source>This recording is currently in use by:</source>
-        <translation type="unfinished"></translation>
+        <translation>To nagranie jest teraz używane przez:</translation>
     </message>
     <message>
         <source>This recording is currently Available</source>
-        <translation type="unfinished"></translation>
+        <translation>To nagranie jest teraz dostępne</translation>
     </message>
     <message>
         <source>Recording Unavailable
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Nagranie niedostępne</translation>
     </message>
     <message>
         <source>This recording is currently being deleted and is unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>To nagranie jest teraz usuwane i nie jest dostępne</translation>
     </message>
     <message>
         <source>The file for this recording can not be found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie znaleziono pliku z tego nagrania</translation>
     </message>
     <message>
         <source>The file for this recording is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plik z tego nagrania jest pusty.</translation>
     </message>
     <message>
         <source>This recording is not yet available.</source>
-        <translation type="unfinished"></translation>
+        <translation>To nagranie nie jest jeszcze dostępne.</translation>
     </message>
     <message>
         <source>Actions affect all items in the playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Działanie wpłynie na wszystkie pozycje na tej liście odtwarzania</translation>
     </message>
     <message>
         <source>Toggle playlist for this Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz listę odtwarzania dla tej grupy</translation>
     </message>
     <message>
         <source>Transcoding profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Profile rekompresji</translation>
     </message>
     <message>
         <source>Start As PIP</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom jako PIP</translation>
     </message>
     <message>
         <source>Start As PBP</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom jako PBP</translation>
     </message>
     <message>
         <source>Recording file can not be found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie znaleziono pliku nagrania</translation>
     </message>
     <message>
         <source>Change Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmień filtr</translation>
     </message>
     <message>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj nową</translation>
     </message>
     <message>
         <source>Select Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz grupę nagrywania</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz grupę odtwarzania</translation>
     </message>
     <message>
         <source>New Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Nowa grupa nagrywania</translation>
     </message>
     <message>
         <source>Play Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje odtwarzania</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje planowania</translation>
     </message>
     <message>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrania</translation>
     </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
     <message>
         <source>Match Criteria</source>
-        <translation type="unfinished"></translation>
+        <translation>Kryteria dopasowania</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation>Sz.</translation>
     </message>
     <message>
         <source>H</source>
-        <translation type="unfinished"></translation>
+        <translation>Wys.</translation>
     </message>
     <message>
         <source>Decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Dekoder</translation>
     </message>
     <message>
         <source>Max CPUs</source>
-        <translation type="unfinished"></translation>
+        <translation>maks. proc.</translation>
     </message>
     <message>
         <source>Video Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>Renderer obrazu</translation>
     </message>
     <message>
         <source>OSD Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>Renderer menu</translation>
     </message>
     <message>
         <source>OSD Fade</source>
-        <translation type="unfinished"></translation>
+        <translation>Zanikanie menu</translation>
     </message>
     <message>
         <source>Primary Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Podstawowe usuwanie przeplotu</translation>
     </message>
     <message>
         <source>Fallback Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Zapasowe usuwanie przeplotu</translation>
     </message>
     <message>
         <source>Custom Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtry uzytkownika</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dekodowanie wielowątkowe nie jest dostępne - używany będzie tylko jeden procesor, w celu włączenia proszę ponownie skompilować z --enable-ffmpeg-pthreads.</translation>
     </message>
     <message>
         <source>When unchecked the OSD will not fade away but instead will disappear abruptly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiedy odznaczone, menu ekranowe nie zanika łagodnie, ale znika nagle.</translation>
     </message>
     <message>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
-        <translation type="unfinished"></translation>
+        <translation>Odznacz to, jeżeli obraz zacina się przy łagodnym zanikaniu menu ekranowego.</translation>
     </message>
     <message>
         <source>Maximum number of CPU cores used for video decoding and filtering.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksymalna liczba rdzeni procesora używanych do dekodowania obrazu i filtrowania.</translation>
     </message>
 </context>
 <context>
     <name>PowerSearchPopup</name>
     <message>
         <source>Select Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz wyszukiwanie</translation>
     </message>
     <message>
         <source>&lt;New Search&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Nowe wyszukiwanie&gt;</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished">Edytuj</translation>
+        <translation>Edytuj</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Usuń</translation>
+        <translation>Usuń</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj</translation>
     </message>
 </context>
 <context>
@@ -2388,38 +2398,38 @@ Are you sure you want to delete:</source>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Czas</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Tytuł</translation>
+        <translation>Tytuł</translation>
     </message>
 </context>
 <context>
     <name>ProgDetails</name>
     <message>
         <source>Sorry, this screen requires Qt 4.4 or greater</source>
-        <translation type="unfinished"></translation>
+        <translation>Niestety ten ekran wymaga Qt w wersji 4.4 lub wyższej</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>Powiększ</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Pomniejsz</translation>
     </message>
     <message>
         <source>Switch Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Przełącz stronę</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuluj</translation>
+        <translation>Anuluj</translation>
     </message>
 </context>
 <context>
@@ -3567,7 +3577,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Transcoders</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Transkodery</translation>
     </message>
     <message>
         <source>New Profile Group Name</source>
@@ -3632,7 +3642,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Transcoding</source>
-        <translation>Przekodowuję</translation>
+        <translation type="unfinished">Rekompresja</translation>
     </message>
     <message>
         <source>PIP</source>
@@ -4188,7 +4198,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Bitrate</source>
-        <translation>Bitrata</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Sets the audio bitrate</source>
@@ -4228,7 +4238,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation>Bitrata w kilobitach na sekundę.(sp)(sp)2200Kbps to mniej więcej 1 Gigabajt na godzinę.</translation>
+        <translation>*Bitrate* w kilobitach na sekundę. 2200Kbps to mniej więcej 1 Gigabajt na godzinę.</translation>
     </message>
     <message>
         <source>Scale bitrate for frame size</source>
@@ -4288,7 +4298,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Max. Bitrate</source>
-        <translation>Maksymalna bitrata</translation>
+        <translation>Maksymalny *bitrate*</translation>
     </message>
     <message>
         <source>Stream Type</source>
@@ -4348,19 +4358,19 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable auto-transcode after recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zezwalaj na automatyczną rekompresję po nagraniu</translation>
     </message>
     <message>
         <source>Resize Video while transcoding</source>
-        <translation>Zmień rozdzielczość przy przekodowywaniu</translation>
+        <translation>Zmień rozdzielczość przy rekompresji</translation>
     </message>
     <message>
         <source>Allows the transcoder to resize the video during transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zezwól transkoderowi na zmianę rozmiaru obrazu podczas rekompresji.</translation>
     </message>
     <message>
         <source>Lossless transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rekompresja bezstratna </translation>
     </message>
     <message>
         <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
@@ -4396,11 +4406,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Transcode using Autodetect</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rekompresuj używając automatycznego wykrywania</translation>
     </message>
     <message>
         <source>Transcode using &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rekompresuj używając &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Profile name</source>
@@ -4492,31 +4502,31 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Signal Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Moc sygnału</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje planowania</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Przetwarzanie po nagraniu</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje przechowywania</translation>
     </message>
     <message>
         <source>Schedule Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informacje o zadaniu</translation>
     </message>
     <message>
         <source>Program details</source>
-        <translation type="unfinished"></translation>
+        <translation>Szczegóły programu</translation>
     </message>
     <message>
         <source>Create New Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Utwórz nową grupę nagrywania</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
@@ -4532,95 +4542,95 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Do not record this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie nagrywaj tego programu</translation>
     </message>
     <message>
         <source>Record only this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj tylko tą emisję</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished">Nagraj jeden *pokaz* tego tytułu</translation>
+        <translation>Nagraj jedną emisję tego tytułu</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj w tym przedziale czasowym co tydzień</translation>
     </message>
     <message>
         <source>Record one showing of this title every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj jedną emisję o tym tytule co tydzień</translation>
     </message>
     <message>
         <source>Record in this timeslot every day</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj w tym przedziale czasowym codziennie</translation>
     </message>
     <message>
         <source>Record one showing of this title every day</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj jedną emisję o tym tytule codziennie</translation>
     </message>
     <message>
         <source>Record at any time on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj kiedykolwiek na tym kanale</translation>
     </message>
     <message>
         <source>Record at any time on any channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj kiedykolwiek na dowolnym kanale</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj tą emisję z normalnymi ustawieniami</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj tą emisję zastępując ustawienia</translation>
     </message>
     <message>
         <source>Do not allow this showing to be recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie pozwól na nagranie tej emisji</translation>
     </message>
     <message>
         <source>Start recording %1 minutes late</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpocznij nagrywanie %1 minut(y) później</translation>
     </message>
     <message>
         <source>Start recording %1 minute late</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpocznij nagrywanie %1 minutę później</translation>
     </message>
     <message>
         <source>Start recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpocznij nagrywanie o czasie</translation>
     </message>
     <message>
         <source>Start recording %1 minute early</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpocznij nagrywanie %1 minutę wcześniej</translation>
     </message>
     <message>
         <source>Start recording %1 minutes early</source>
-        <translation type="unfinished"></translation>
+        <translation>Rozpocznij nagrywanie %1 minut(y) wcześniej</translation>
     </message>
     <message>
         <source>End recording %1 minutes early</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończ nagrywanie %1 minut(y) wcześniej</translation>
     </message>
     <message>
         <source>End recording %1 minute early</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończ nagrywanie %1 minutę wcześniej</translation>
     </message>
     <message>
         <source>End recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończ nagrywanie o czasie</translation>
     </message>
     <message>
         <source>End recording %1 minute late</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończ nagrywanie %1 minutę później</translation>
     </message>
     <message>
         <source>End recording %1 minutes late</source>
-        <translation type="unfinished"></translation>
+        <translation>Zakończ nagrywanie %1 minut(y) później</translation>
     </message>
     <message>
         <source>Record new episodes only</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj tylko nowe epizody</translation>
     </message>
     <message>
         <source>Look for duplicates in current and previous recordings</source>
@@ -4660,15 +4670,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Transcode new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rekompresuj nowe nagrania</translation>
     </message>
     <message>
         <source>Do not Transcode new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nie rekompresuj nowych nagrań</translation>
     </message>
     <message>
         <source>[ Select transcoder ]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">[ Wybierz transkoder ]</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
@@ -5252,15 +5262,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Jest to domyślna wartośc dla automatycznej rekompresji, kiedy tworzony jest nowy harmonogram nagrania.</translation>
     </message>
     <message>
         <source>Default Transcoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Domyślny transkoder</translation>
     </message>
     <message>
         <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">To jest domyślna wartośc uzywana do ustawnia transkodera, kiedy tworzone sa nowe harmonogramy nagrań.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -6760,11 +6770,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Save original files after transcoding (globally)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zachowaj pierwotny plik po rekompresji (globalne)</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiedy włączone i transkoder jest aktywny, po zakończeniu rekompresji nazwa pierwotnego pliku zostanie zmieniona na &quot;.old&quot;.</translation>
     </message>
     <message>
         <source>Follow symbolic links when deleting files</source>
@@ -6912,11 +6922,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uruchom zadania rekompresji przed automatycznym oznaczaniem reklam</translation>
     </message>
     <message>
         <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiedy ustawione, jeżeli zarówno automatczyna rekompresja jak i automatyczne oznaczanie reklam  są włączone, pierwsza będzie uruchomiona rekompresja, inaczej pierwsze uruchomione zostanie oznaczanie reklam.</translation>
     </message>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
@@ -6944,7 +6954,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Zezwalaj na zadania rekompresji</translation>
     </message>
     <message>
         <source>Host Address Backend Setup</source>
@@ -7016,11 +7026,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Transcoder command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Polecenie transkodera</translation>
     </message>
     <message>
         <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Program używany do rekompresji. Domyślnie jest to &apos;mythtranscode&apos;, jeżeli nie ustawiono.</translation>
     </message>
     <message>
         <source>Commercial Flagger command</source>
@@ -7551,7 +7561,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Filtry używane przy rekompresji z tym profilem. Ta wartośc musi byc pusta przy rekompresji bezstratnej. Format: [[&lt;filtr&gt;=&lt;opcje&gt;,]...]</translation>
     </message>
     <message>
         <source>Cable IRC</source>
@@ -8011,7 +8021,7 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configured to allow transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rekompresuj automatycznie, kiedy nagrano uzywając tego profilu i harmongram nagrania dopuszcza rekompresję.</translation>
     </message>
     <message>
         <source>Width to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 720 or 768 for NTSC and PAL, respectively.</source>
@@ -9165,15 +9175,15 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Run transcoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Uruchom transkoder</translation>
     </message>
     <message>
         <source>Deferral days for Auto-Transcode jobs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ilośc dni zwłoki dla zadań automatycznej rekompresji</translation>
     </message>
     <message>
         <source>If non-zero, Auto-Transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kiedy różne od zera, zadania automatycznej rekompresji będą planowane tyle dni po zakończeniu nagrywania zamiast bezpośrednio po nim.</translation>
     </message>
     <message>
         <source>Run User Job #%1</source>
@@ -10057,56 +10067,62 @@ You may have to use the eject button under its tray.</source>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n godzina</numerusform>
+            <numerusform>%n godziny</numerusform>
+            <numerusform>%n godzin</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n minuta</numerusform>
+            <numerusform>%n minuty</numerusform>
+            <numerusform>%n minut</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n star(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n gwiazdka</numerusform>
+            <numerusform>%n gwiazdki</numerusform>
+            <numerusform>%n gwiazdek</numerusform>
         </translation>
     </message>
     <message>
         <source>Default</source>
         <comment>Recording Profile Default</comment>
-        <translation type="unfinished"></translation>
+        <translation>Domyślny</translation>
     </message>
     <message>
         <source>High Quality</source>
         <comment>Recording Profile High Quality</comment>
-        <translation type="unfinished">Wysoka jakość</translation>
+        <translation>Wysoka jakość</translation>
     </message>
     <message>
         <source>Live TV</source>
         <comment>Recording Profile Live TV</comment>
-        <translation type="unfinished"></translation>
+        <translation>TV na żywo</translation>
     </message>
     <message>
         <source>Low Quality</source>
         <comment>Recording Profile Low Quality</comment>
-        <translation type="unfinished">Niska jakość</translation>
+        <translation>Niska jakość</translation>
     </message>
     <message>
         <source>Medium Quality</source>
         <comment>Recording Profile Medium Quality</comment>
-        <translation type="unfinished">Średnia jakość</translation>
+        <translation>Średnia jakość</translation>
     </message>
     <message>
         <source>MPEG2</source>
         <comment>Recording Profile MPEG2</comment>
-        <translation type="unfinished"></translation>
+        <translation>MPEG2</translation>
     </message>
     <message>
         <source>RTjpeg/MPEG4</source>
         <comment>Recording Profile RTjpeg/MPEG4</comment>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg/MPEG4</translation>
     </message>
     <message>
         <source>CRC IP Recorders</source>
@@ -10166,7 +10182,7 @@ You may have to use the eject button under its tray.</source>
     <message>
         <source>Transcoders</source>
         <comment>Recording Profile Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Transkodery</translation>
     </message>
     <message>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
@@ -10591,7 +10607,7 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Transcode Completed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rekompresja zakończona</translation>
     </message>
     <message>
         <source>Completed</source>
@@ -10669,6 +10685,8 @@ Do you wish to continue watching?</source>
         <source>%n second(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -10699,19 +10717,21 @@ Do you wish to continue watching?</source>
         <source>Finished, %n break(s) found.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Yes, Exit now</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak, wyjdź teraz</translation>
     </message>
     <message>
         <source>Yes, Exit and Reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak, wyjdź i uruchom ponownie</translation>
     </message>
     <message>
         <source>Yes, Exit and Shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak, wyjdź i wyłącz</translation>
     </message>
     <message>
         <source>%1 remaining</source>
@@ -10726,6 +10746,8 @@ Do you wish to continue watching?</source>
     <message numerus="yes">
         <source>%n day(s)</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -10990,17 +11012,23 @@ Do you wish to continue watching?</source>
         <source> %n day(s),</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source> %n hour(s) and</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source> %n minute(s)</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -11049,19 +11077,19 @@ Do you wish to continue watching?</source>
     <name>RecOptDialog</name>
     <message>
         <source>Missing Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Brakujący element</translation>
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Motyw, którego używasz, nie zawiera elementu &apos;recording_options&apos;. Skontaktuj się, proszę, z twórcą motywu i spytaj o możliwość aktualizacji.</translation>
     </message>
     <message>
         <source>Unknown Element</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznany element</translation>
     </message>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation type="unfinished"></translation>
+        <translation>Motyw, którego używasz, zawiera nieznany element (&apos;%1&apos;). Będzie on zignorowany</translation>
     </message>
 </context>
 <context>
@@ -11086,7 +11114,7 @@ Do you wish to continue watching?</source>
     <name>ScanMonitor</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished">Skanowanie</translation>
+        <translation>Skanowanie</translation>
     </message>
 </context>
 <context>
@@ -11129,7 +11157,7 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Rotor Movement</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruch obrotnicy</translation>
     </message>
 </context>
 <context>
@@ -11152,26 +11180,26 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Import existing scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Importuj wcześniejsze skanowanie</translation>
     </message>
     <message>
         <source>Scan of all existing transports</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanuj wszystkie istniejące stransporty</translation>
     </message>
     <message>
         <source>Scan of single existing transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanuj jeden z istniejących stransportów</translation>
     </message>
 </context>
 <context>
     <name>ScanWizard</name>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Asystent skanowania</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd analizy parametrów</translation>
     </message>
 </context>
 <context>
@@ -11185,59 +11213,59 @@ Do you wish to continue watching?</source>
     <name>ScheduleRecording</name>
     <message>
         <source>Do not record this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie nagrywaj tego programu</translation>
     </message>
     <message>
         <source>Record only this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj tylko tą emisję</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished">Nagraj jeden *pokaz* tego tytułu</translation>
+        <translation>Nagraj jedną emisję tego tytułu</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj w tym przedziale czasowym co tydzień</translation>
     </message>
     <message>
         <source>Record one showing of this title every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj jedną emisję o tym tytule co tydzień</translation>
     </message>
     <message>
         <source>Record in this timeslot every day</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj w tym przedziale czasowym codziennie</translation>
     </message>
     <message>
         <source>Record one showing of this title every day</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj jedną emisję o tym tytule codziennie</translation>
     </message>
     <message>
         <source>Record at any time on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj kiedykolwiek na tym kanale</translation>
     </message>
     <message>
         <source>Record at any time on any channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagrywaj kiedykolwiek na dowolnym kanale</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj tą emisję z normalnymi ustawieniami</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagraj tą emisję zastępując ustawienia</translation>
     </message>
     <message>
         <source>Do not allow this showing to be recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie pozwól na nagranie tej emisji</translation>
     </message>
     <message>
         <source>Prefer input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Preferuj wejście %1</translation>
     </message>
     <message>
         <source>Use any available input</source>
-        <translation type="unfinished"></translation>
+        <translation>Użyj dowolnego dostępnego wejścia</translation>
     </message>
 </context>
 <context>
@@ -11335,35 +11363,35 @@ Database Name: %2</source>
     <name>StartPrompter</name>
     <message>
         <source>WARNING: The backend is currently running.</source>
-        <translation type="unfinished"></translation>
+        <translation>UWAGA: &apos;Backend&apos; teraz uruchamiany.</translation>
     </message>
     <message>
         <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zmiana istniejących wejść kart, usuwanie niektórych rzeczy lub skanowanie kanałów może nie działać.</translation>
     </message>
     <message>
         <source>Recording Status: RECORDING.</source>
-        <translation type="unfinished"></translation>
+        <translation>Status nagrywania: NAGRYWANIE.</translation>
     </message>
     <message>
         <source>If you stop the backend now these recordings will be stopped!</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeżeli teraz zatrzymasz &apos;backend&apos;, tamte nagrywania zostaną zatrzymane!</translation>
     </message>
     <message>
         <source>Recording Status: None.</source>
-        <translation type="unfinished"></translation>
+        <translation>Status nagrywania: BRAK.</translation>
     </message>
     <message>
         <source>Stop Backend and Continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatrzymaj &apos;backend&apos; i kontynuuj</translation>
     </message>
     <message>
         <source>Continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontynuuj</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Wyjście</translation>
+        <translation>Wyjście</translation>
     </message>
 </context>
 <context>
@@ -11671,11 +11699,15 @@ No other details</source>
         <source>%n day(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n standard rule(s) (is) defined</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -11683,11 +11715,15 @@ No other details</source>
         <source>%n search rule(s) are defined</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n matching showing(s)</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -11695,6 +11731,8 @@ No other details</source>
         <source>%n recording(s) consuming %1 (is) allowed to expire
 </source>
         <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -11707,12 +11745,16 @@ No other details</source>
 </source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n (is) Deleted and consume(s) %1
 </source>
         <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -11721,75 +11763,75 @@ No other details</source>
     <name>StorageGroupEditor</name>
     <message>
         <source>&apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalogi grupy przechowywania &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Local &apos;%1&apos; Storage Group Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalogi lokalnej grupy przechowywania &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Add Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj katalog grupy przechowywania</translation>
     </message>
     <message>
         <source>Enter directory name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Wprowadź nazwę katalogu lub naciśnij SELECT aby wprowadzić tekst za pomocą klawiatury ekranowej</translation>
     </message>
     <message>
         <source>Edit Storage Group Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj katalog grupy przechowywania</translation>
     </message>
     <message>
         <source>Remove &apos;%1&apos;
 Directory From Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Usunąć katalog &apos;%1&apos; z grupy przechowywania?</translation>
     </message>
     <message>
         <source>Yes, remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak, usuń katalog</translation>
     </message>
     <message>
         <source>No, Don&apos;t remove directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie, nie usuwaj katalogu</translation>
     </message>
     <message>
         <source>(Add New Directory)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Dodaj nowy katalog)</translation>
     </message>
 </context>
 <context>
     <name>StorageGroupListEditor</name>
     <message>
         <source>Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupy przechowywania (katalogi na nowe nagrania)</translation>
     </message>
     <message>
         <source>Local Storage Groups (directories for new recordings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokalne grupy przechowywania (katalogi na nowe nagrania)</translation>
     </message>
     <message>
         <source>Create New Storage Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Utwórz nową grupę przechowywania</translation>
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished">Wprowadź nazwę grupy lub naciśnij SELECT żeby wprowadzić za pomocą klawiatury ekranowej</translation>
+        <translation>Wprowadź nazwę grupy lub naciśnij SELECT żeby wprowadzić za pomocą klawiatury ekranowej</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; Storage Group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Usunąć grupę przechowywania &apos;%1&apos;?</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Tak, usuń grupę</translation>
+        <translation>Tak, usuń grupę</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">Nie, nie usuwaj grupy</translation>
+        <translation>Nie, nie usuwaj grupy</translation>
     </message>
     <message>
         <source>(Create %1 group)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Utwórz grupę %1)</translation>
     </message>
 </context>
 <context>
@@ -11808,39 +11850,39 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustawienia %1</translation>
     </message>
     <message>
         <source>Seek:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szukaj:</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Do przodu</translation>
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Skocz naprzód</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Przewiń do tyłu</translation>
     </message>
     <message>
         <source>Skip Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Skocz wstecz</translation>
     </message>
     <message>
         <source>Previous Chapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Poprzedni rozdział</translation>
     </message>
     <message>
         <source>Jump Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Szkocz wstecz</translation>
     </message>
     <message>
         <source>Next Chapter</source>
-        <translation type="unfinished"></translation>
+        <translation>Następny rozdział</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
@@ -11916,11 +11958,11 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation>Zatrzymaj przekodowywanie</translation>
+        <translation>Zatrzymywanie rekompresji</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation>Przekoduj</translation>
+        <translation type="unfinished">Rekompresuj</translation>
     </message>
     <message>
         <source>Try Again</source>
@@ -12078,11 +12120,11 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation>Zatrzymaj przekodowywanie</translation>
+        <translation type="unfinished">Zatrzymaj rekompresję</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation>Uruchom przekodowywanie</translation>
+        <translation type="unfinished">Rozpocznij rekompresję</translation>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
@@ -12190,7 +12232,7 @@ Directory From Storage Group?</source>
     </message>
     <message>
         <source>Edit Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytuj harmonogram nagrywania</translation>
     </message>
     <message>
         <source>Previous Title</source>
@@ -12640,6 +12682,8 @@ Select a Current Recording</source>
         <source>%n minute(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -12858,25 +12902,25 @@ Select a Current Recording</source>
     <name>TimePopup</name>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
     <name>TransportList</name>
     <message>
         <source>New Transport</source>
-        <translation>Nowy *transport*</translation>
+        <translation>Nowy transport</translation>
     </message>
 </context>
 <context>
     <name>TransportListEditor</name>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation>Napewno chcesz usunąć ten *transport*?</translation>
+        <translation>Na pewno chcesz usunąć ten transport?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation>Tak, usuń ten *transport*</translation>
+        <translation>Tak, usuń ten transport</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
@@ -12884,7 +12928,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation>Menu *transport*</translation>
+        <translation>Menu transportu</translation>
     </message>
     <message>
         <source>Edit..</source>
@@ -12896,26 +12940,26 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Multiplex Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Edytor multipleksu</translation>
     </message>
 </context>
 <context>
     <name>UIListBtnType</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Szukaj</translation>
+        <translation>Szukaj</translation>
     </message>
     <message>
         <source>Starts with text</source>
-        <translation type="unfinished">Zaczyna się od tekstu</translation>
+        <translation>Zaczyna się od tekstu</translation>
     </message>
     <message>
         <source>Contains text</source>
-        <translation type="unfinished">Zawiera tekst</translation>
+        <translation>Zawiera tekst</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuluj</translation>
+        <translation>Anuluj</translation>
     </message>
 </context>
 <context>
@@ -12941,22 +12985,22 @@ Select a Current Recording</source>
     <name>V4LConfigurationGroup</name>
     <message>
         <source>Probed info</source>
-        <translation>Informacja ze sprawdzania</translation>
+        <translation>Pobrana informacja</translation>
     </message>
     <message>
         <source>Failed to open</source>
-        <translation>Nie potrafię otworzyć</translation>
+        <translation>Nie zdołano otworzyć</translation>
     </message>
     <message>
         <source>Failed to probe</source>
-        <translation>Nie potrafię sprawdzić</translation>
+        <translation>Nie zdołano zbadać</translation>
     </message>
 </context>
 <context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video Source Menu</source>
-        <translation>Menu Źródeł</translation>
+        <translation>Menu żródła obrazu</translation>
     </message>
     <message>
         <source>Edit..</source>
@@ -12968,11 +13012,11 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
-        <translation>Napewno chcesz usunąć WSZYSTKIE źródła?</translation>
+        <translation>Na pewno chcesz usunąć WSZYSTKIE źródła obrazu?</translation>
     </message>
     <message>
         <source>Yes, delete video sources</source>
-        <translation>Tak usuń źródła</translation>
+        <translation>Tak, usuń źródła obrazu</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
@@ -12980,7 +13024,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>Napewno usunąć to źródło?</translation>
+        <translation>Na pewno usunąć to źródło obrazu?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
@@ -13029,66 +13073,66 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Conflict Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Dzisiejszy konflikt</translation>
     </message>
     <message>
         <source>Conflict %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Konflikt %1</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opcje</translation>
     </message>
     <message>
         <source>Show Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż ważne</translation>
     </message>
     <message>
         <source>Show All</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż wszystkie</translation>
     </message>
     <message>
         <source>Program Details</source>
-        <translation type="unfinished">Szczegóły programu</translation>
+        <translation>Szczegóły programu</translation>
     </message>
     <message>
         <source>Upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation>Nadchodzące</translation>
     </message>
     <message>
         <source>Custom Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Własna edycja</translation>
     </message>
     <message>
         <source>Delete Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń regułę</translation>
     </message>
     <message>
         <source>Show Cards</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż karty</translation>
     </message>
     <message>
         <source>Show Inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż wejścia</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Anuluj</translation>
+        <translation>Anuluj</translation>
     </message>
     <message>
         <source>Scheduled Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaplanowane nagrania</translation>
     </message>
     <message>
         <source>Group List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista grup</translation>
     </message>
 </context>
 <context>
     <name>WelcomeDialog</name>
     <message>
         <source>Start Frontend</source>
-        <translation>Uruchom *Frontend*</translation>
+        <translation>Uruchom interfejs</translation>
     </message>
     <message>
         <source>Cannot connect to server!</source>
@@ -13096,11 +13140,11 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>There are no recordings currently taking place</source>
-        <translation type="unfinished"></translation>
+        <translation>W tej chwili żadne nagrania nie zajmują tam miejsca</translation>
     </message>
     <message>
         <source>There are no scheduled recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie ma tam zaplanowanych nagrań</translation>
     </message>
     <message>
         <source>Please Wait ...</source>
@@ -13108,7 +13152,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>MythTV is about to start recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV za chwilę uruchomi nagrywanie.</translation>
     </message>
     <message>
         <source>MythTV is busy recording.</source>
@@ -13116,7 +13160,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>MythTV is busy transcoding.</source>
-        <translation>MythTV jest zajęte przkodowywaniem.</translation>
+        <translation>MythTV jest zajęte rekompresją.</translation>
     </message>
     <message>
         <source>MythTV is busy flagging commercials.</source>
@@ -13124,7 +13168,7 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>MythTV is busy grabbing EPG data.</source>
-        <translation>MythTV jest zajęte ściąganiem danych EPG.</translation>
+        <translation>MythTV jest zajęte przechwytywaniem danych EPG.</translation>
     </message>
     <message>
         <source>MythTV is locked by a user.</source>
@@ -13172,34 +13216,35 @@ Select a Current Recording</source>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is currently recording</source>
-        <translation>Nie można wyłączyć ponieważ MythTV jest w trakcie nagrywania</translation>
+        <translation>Nie można wyłączyć ponieważ MythTV teraz nagrywa</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można wyłączyć ponieważ MythTV za chwilę uruchomi nagrywanie</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można wyłączyć ponieważ MythTV za chwilę uruchomi cykl budzenia/wyłaczania.</translation>
     </message>
     <message>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>do</translation>
     </message>
     <message>
         <source>MythTV has running or pending jobs.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>MythTV jest uruchommione lub trwają zadania.</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>XMLTV_generic_config</name>
     <message>
         <source>Configure</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguruj</translation>
     </message>
     <message>
         <source>Run xmltv configure command.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uruchom komendę konfiguracji xml.</translation>
     </message>
 </context>
 </TS>
